@@ -53,6 +53,7 @@ handle setting xattrs
 handle non-ascii/utf8 xattr names by escaping
 
 fs info - type, free space, total space
+Do this via g_file_get_fs_info -> GFileInfo method?
 
 HAL implementation of VolumeMonitor
 
