@@ -5,7 +5,7 @@ Work on GFile:
 
 Implement the rest of the mountable GFile ops
 
-Add g_file_set_contents_async
+Implement g_file_replace_contents_async
 
 getting selinux attrs is a bit slow, it does all sort of weird ops.
 
@@ -64,8 +64,6 @@ GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 Set owner:user, owner:group for local files
 
 document create time vs change time vs mtime, etc
-
-Fix crash on "gvfs-ls smb://WORKGROUP/SERVER", (maybe also when running gvfs-ls on unmounted shares?)
 
 FUTURE IDEAS:
 -------------
