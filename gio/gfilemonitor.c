@@ -14,6 +14,12 @@ G_DEFINE_TYPE (GFileMonitor, g_file_monitor, G_TYPE_OBJECT);
 
 struct _GFileMonitorPrivate {
   gboolean cancelled;
+  int rate_limit_msec;
+
+  /* Rate limiting change events */
+  guint32 last_change_event_time; /* Some monitonic clock in msecs */
+  GFile *last_change_event_file;
+  guint last_change_timeout_tag;
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -24,6 +30,12 @@ g_file_monitor_finalize (GObject *object)
   GFileMonitor *monitor;
 
   monitor = G_FILE_MONITOR (object);
+
+  if (monitor->priv->last_change_event_file)
+    g_object_unref (monitor->priv->last_change_event_file);
+
+  if (monitor->priv->last_change_timeout_tag != 0)
+    g_source_remove (monitor->priv->last_change_timeout_tag);
   
   if (G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize) (object);
@@ -73,6 +85,7 @@ g_file_monitor_init (GFileMonitor *monitor)
   monitor->priv = G_TYPE_INSTANCE_GET_PRIVATE (monitor,
 					       G_TYPE_FILE_MONITOR,
 					       GFileMonitorPrivate);
+  monitor->priv->rate_limit_msec = 800;
 }
 
 
@@ -91,10 +104,105 @@ g_file_monitor_cancel (GFileMonitor* monitor)
 }
 
 void
+g_file_monitor_set_rate_limit (GFileMonitor *monitor,
+			       int           limit_msecs)
+{
+  monitor->priv->rate_limit_msec = limit_msecs;
+}
+
+static guint32
+time_difference (guint32 from, guint32 to)
+{
+  if (from > to)
+    return 0;
+  return to - from;
+}
+
+static void
+remove_last_event (GFileMonitor *monitor, gboolean emit_first)
+{
+  if (monitor->priv->last_change_event_file == NULL)
+    return;
+  
+  if (emit_first)
+    g_signal_emit (monitor, signals[CHANGED], 0,
+		   monitor->priv->last_change_event_file, NULL,
+		   G_FILE_MONITOR_EVENT_CHANGED);
+  
+  if (monitor->priv->last_change_event_file)
+    {
+      g_object_unref (monitor->priv->last_change_event_file);
+      monitor->priv->last_change_event_file = NULL;
+    }
+  if (monitor->priv->last_change_timeout_tag)
+    {
+      g_source_remove (monitor->priv->last_change_timeout_tag);
+      monitor->priv->last_change_timeout_tag = 0;
+    }
+}
+
+static gboolean
+delayed_changed_event_timeout (gpointer data)
+{
+  GFileMonitor *monitor = data;
+
+  monitor->priv->last_change_timeout_tag = 0;
+
+  remove_last_event (monitor, TRUE);
+  
+  return FALSE;
+}
+
+void
 g_file_monitor_emit_event (GFileMonitor *monitor,
 			   GFile *file,
 			   GFile *other_file,
 			   GFileMonitorEvent event_type)
 {
-  g_signal_emit (monitor, signals[CHANGED], 0, file, other_file, event_type);
+  guint32 time_now, since_last, time_left;
+  gboolean emit_now;
+
+  if (event_type != G_FILE_MONITOR_EVENT_CHANGED)
+    {
+      remove_last_event (monitor, TRUE);
+      g_signal_emit (monitor, signals[CHANGED], 0, file, other_file, event_type);
+    }
+  else
+    {
+      time_now = g_thread_gettime() / (1000 * 1000);
+      emit_now = TRUE;
+      
+      if (monitor->priv->last_change_event_file)
+	{
+	  since_last = time_difference (monitor->priv->last_change_event_time, time_now);
+	  if (since_last > monitor->priv->rate_limit_msec)
+	    {
+	      /* Its been enought time so that we can emit the stored one, but
+	       * we instead report the change we just got and forget the old one.
+	       */
+	      remove_last_event (monitor, FALSE);
+	    }
+	  else
+	    {
+	      /* We ignore this change, but arm a timer so that we can fire it later if we
+		 don't get any other events (that kill this timeout) */
+	      emit_now = FALSE;
+	      if (monitor->priv->last_change_timeout_tag == 0) /* Only set the timeout once */
+		{
+		  time_left = monitor->priv->rate_limit_msec - since_last;
+		  monitor->priv->last_change_timeout_tag = 
+		    g_timeout_add (time_left,  delayed_changed_event_timeout, monitor);
+		}
+	    }
+	}
+      
+      if (emit_now)
+	{
+	  g_signal_emit (monitor, signals[CHANGED], 0, file, other_file, event_type);
+	  
+	  monitor->priv->last_change_event_time = time_now;
+	  monitor->priv->last_change_event_file = g_object_ref (file);
+	  monitor->priv->last_change_timeout_tag = 0;
+	}
+    }
 }
