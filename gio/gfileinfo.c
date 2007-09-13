@@ -1126,7 +1126,8 @@ g_file_attribute_matcher_matches_only (GFileAttributeMatcher *matcher,
 
   if (matcher->sub_matchers[0].id != 0 &&
       matcher->sub_matchers[1].id == 0 &&
-      matcher->sub_matchers[0].id == (id & matcher->sub_matchers[0].mask))
+      matcher->sub_matchers[0].mask == 0xffffffff &&
+      matcher->sub_matchers[0].id == id)
     return TRUE;
   
   return FALSE;
