@@ -95,7 +95,8 @@ io_job_thread (gpointer       data,
 
   if (job->cancellable)
     g_object_unref (job->cancellable);
-  g_main_context_unref (job->callback_context);
+  if (job->callback_context)
+    g_main_context_unref (job->callback_context);
   g_free (job);
 
   if (resort_jobs)
@@ -115,23 +116,17 @@ g_schedule_io_job (GIOJobFunc     job_func,
   static GOnce once_init = G_ONCE_INIT;
   GIOJob *job;
 
-  if (callback_context == NULL)
-    callback_context = g_main_context_default ();
-  
   job = g_new0 (GIOJob, 1);
   job->job_func = job_func;
   job->data = data;
   job->destroy_notify = notify;
   job->io_priority = io_priority;
-  job->callback_context = g_main_context_ref (callback_context);
-  /* TODO: Should we create this cancellation always?
-   * If we do cancel_all_jobs works for all ops, but if we
-   * don't we save some resources for non-cancellable jobs
-   */
+  job->callback_context = callback_context;
+  if (callback_context)
+    g_main_context_ref (callback_context);
+    
   if (cancellable)
     job->cancellable = g_object_ref (cancellable);
-  else
-    job->cancellable = g_cancellable_new ();
 
   G_LOCK (active_jobs);
   active_jobs = g_slist_prepend (active_jobs, job);
@@ -142,6 +137,8 @@ g_schedule_io_job (GIOJobFunc     job_func,
   g_thread_pool_push (job_thread_pool, job, NULL);
 }
 
+
+/* Only cancels the cancellable jobs */
 void
 g_cancel_all_io_jobs (void)
 {

@@ -426,7 +426,8 @@ g_input_stream_set_async_context (GInputStream *stream,
  *
  * Returns the mainloop used for async operation on this stream.
  * If you implement a stream you have to look at this to know what
- * context to use for async i/o.
+ * context to use for async i/o. Returns NULL if the default
+ * context is used.
  *
  * The context is set by the user by calling g_input_stream_set_async_context().
  *
@@ -438,12 +439,6 @@ g_input_stream_get_async_context (GInputStream *stream)
   g_return_val_if_fail (G_IS_INPUT_STREAM (stream), NULL);
   g_return_val_if_fail (stream != NULL, NULL);
 
-  if (stream->priv->context == NULL)
-    {
-      stream->priv->context = g_main_context_default ();
-      g_main_context_ref (stream->priv->context);
-    }
-  
   return stream->priv->context;
 }
 

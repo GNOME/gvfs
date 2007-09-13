@@ -119,7 +119,8 @@ cancel_closure_notify (gpointer	 data,
 		       GClosure	*closure)
 {
   GMainContext *context = data;
-  g_main_context_unref (context);
+  if (context)
+    g_main_context_unref (context);
 }
 
 GSource *
@@ -149,7 +150,7 @@ _g_fd_source_new (GObject *object,
     fd_source->cancelled_tag =
       g_signal_connect_data (cancellable, "cancelled",
 			     (GCallback)fd_source_cancelled_cb,
-			     g_main_context_ref (context),
+			     context ? g_main_context_ref (context) : NULL,
 			     cancel_closure_notify,
 			     0);
   

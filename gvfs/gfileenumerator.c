@@ -209,7 +209,8 @@ g_file_enumerator_set_async_context (GFileEnumerator *enumerator,
  *
  * Returns the mainloop used for async operation on this enumerator.
  * If you implement a enumerator you have to look at this to know what
- * context to use for async i/o.
+ * context to use for async i/o. Returns NULL if the default
+ * context is used.
  *
  * The context is set by the user by calling g_file_enumerator_set_async_context().
  *
@@ -221,12 +222,6 @@ g_file_enumerator_get_async_context (GFileEnumerator *enumerator)
   g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), NULL);
   g_return_val_if_fail (enumerator != NULL, NULL);
 
-  if (enumerator->priv->context == NULL)
-    {
-      enumerator->priv->context = g_main_context_default ();
-      g_main_context_ref (enumerator->priv->context);
-    }
-  
   return enumerator->priv->context;
 }
 
