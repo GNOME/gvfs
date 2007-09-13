@@ -1091,7 +1091,8 @@ do_close_write (GVfsBackend *backend,
 }
 
 static void
-set_info_from_stat (GFileInfo *info, struct stat *statbuf)
+set_info_from_stat (GFileInfo *info, struct stat *statbuf,
+		    GFileAttributeMatcher *matcher)
 {
   GFileType file_type;
   GFileFlags flags;
@@ -1165,6 +1166,13 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
     if (statbuf->st_mode & S_IXGRP)
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, TRUE);
   }
+
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ETAG_VALUE))
+    {
+      char *etag = create_etag (statbuf);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
+      g_free (etag);
+    }
 }
 
 static void
@@ -1175,6 +1183,7 @@ do_get_info (GVfsBackend *backend,
 	     GFileGetInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GFileAttributeMatcher *matcher;
   struct stat st = {0};
   char *uri;
   int res, saved_errno;
@@ -1187,13 +1196,17 @@ do_get_info (GVfsBackend *backend,
 
   if (res == 0)
     {
+      matcher = g_file_attribute_matcher_new (attributes);
+      
       info = g_file_info_new ();
-      set_info_from_stat (info, &st);
+      set_info_from_stat (info, &st, matcher);
       
       g_vfs_job_get_info_set_info (job, info);
 
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
+      
+      g_file_attribute_matcher_free (matcher);
     }
   else
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
@@ -1323,7 +1336,7 @@ do_enumerate (GVfsBackend *backend,
 		      info = g_file_info_new ();
 		      g_file_info_set_name (info, dirp->name);
 		      
-		      set_info_from_stat (info, &st);
+		      set_info_from_stat (info, &st, matcher);
 		      files = g_list_prepend (files, info);
 		    }
 		}
