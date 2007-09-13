@@ -246,6 +246,106 @@ get_xattrs (const char *path,
     }
 }
 
+static void
+get_one_xattr_from_fd (int fd,
+		       GFileInfo *info,
+		       const char *attr)
+{
+  char value[64];
+  char *value_p;
+  ssize_t len;
+
+  len = fgetxattr (fd, attr, value, sizeof (value)-1);
+
+  value_p = NULL;
+  if (len >= 0)
+    value_p = value;
+  else if (len == -1 && errno == ERANGE)
+    {
+      len = fgetxattr (fd, attr, NULL, 0);
+
+      if (len < 0)
+	return;
+
+      value_p = g_malloc (len+1);
+
+      len = fgetxattr (fd, attr, value_p, len);
+
+      if (len < 0)
+	{
+	  g_free (value_p);
+	  return;
+	}
+    }
+  else
+    return;
+  
+  /* Null terminate */
+  value_p[len] = 0;
+
+  escape_xattr (info, attr, value_p, len);
+  
+  if (value_p != value)
+    g_free (value_p);
+}
+
+static void
+get_xattrs_from_fd (int fd,
+		    GFileInfo *info,
+		    GFileAttributeMatcher *matcher)
+{
+  gboolean all;
+  gsize list_size;
+  ssize_t list_res_size;
+  size_t len;
+  char *list;
+  const char *attr;
+
+  all = g_file_attribute_matcher_enumerate (matcher, "xattr");
+
+  if (all)
+    {
+      list_res_size = flistxattr (fd, NULL, 0);
+
+      if (list_res_size == -1 ||
+	  list_res_size == 0)
+	return;
+
+      list_size = list_res_size;
+      list = g_malloc (list_size);
+
+    retry:
+      
+      list_res_size = flistxattr (fd, list, list_size);
+      
+      if (list_res_size == -1 && errno == ERANGE)
+	{
+	  list_size = list_size * 2;
+	  list = g_realloc (list, list_size);
+	  goto retry;
+	}
+
+      if (list_res_size == -1)
+	return;
+
+      attr = list;
+      while (list_res_size > 0)
+	{
+	  get_one_xattr_from_fd (fd, info, attr);
+	  len = strlen (attr) + 1;
+	  attr += len;
+	  list_res_size -= len;
+	}
+
+      g_free (list);
+    }
+  else
+    {
+      while ((attr = g_file_attribute_matcher_enumerate_next (matcher)) != NULL)
+	get_one_xattr_from_fd (fd, info, attr);
+    }
+}
+
 GFileInfo *
 g_file_info_simple_get (const char *basename,
 			const char *path,
@@ -330,7 +430,6 @@ g_file_info_simple_get (const char *basename,
   return info;
 }
 
-
 GFileInfo *
 g_file_info_simple_get_from_fd (int fd,
 				GFileInfoRequestFlags requested,
@@ -364,6 +463,8 @@ g_file_info_simple_get_from_fd (int fd,
       }
   }
 #endif
+
+  get_xattrs_from_fd (fd, info, matcher);
   
   g_file_attribute_matcher_free (matcher);
   
