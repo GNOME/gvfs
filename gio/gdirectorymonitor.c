@@ -31,7 +31,7 @@ struct _GDirectoryMonitorPrivate {
 };
 
 #define DEFAULT_RATE_LIMIT_MSECS 800
-#define DEFAULT_VIRTUAL_CHANGES_DONE_DELAY_SECS 3
+#define DEFAULT_VIRTUAL_CHANGES_DONE_DELAY_SECS 2
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
