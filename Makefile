@@ -1,4 +1,4 @@
-LIBS=`pkg-config --libs glib-2.0 gobject-2.0 gthread-2.0`
+LIBS=`pkg-config --libs glib-2.0 gobject-2.0 gthread-2.0` -lselinux
 CFLAGS=`pkg-config --cflags glib-2.0 gobject-2.0 gthread-2.0` -I./ -Wall -O -g -D_GNU_SOURCE
 
 CFILES=gfileinfo.c ginputstream.c goutputstream.c \

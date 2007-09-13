@@ -4,7 +4,7 @@ Implement the rest of g_file_info_simple_get
 
 Add Seekable support to LocalFile streams
 
-add selinux support to test extension code (requires attribute matching support)
+add selinux support to test extension code
 
 Work on GFile
 

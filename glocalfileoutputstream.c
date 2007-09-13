@@ -5,6 +5,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#ifdef HAVE_SELINUX
+#include <selinux/selinux.h>
+#endif
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -559,6 +562,7 @@ g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
   GLocalFileOutputStream *file;
   GFileInfo *info;
   struct stat stat_buf;
+  GFileAttributeMatcher matcher;
 
   file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
@@ -574,6 +578,21 @@ g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
   info = g_file_info_new ();
 
   g_file_info_set_from_stat (info, requested, &stat_buf);
+
+  g_file_attribute_matcher_init (&matcher, attributes);
+  
+#ifdef HAVE_SELINUX
+  if (is_selinux_enabled ()) {
+    char *context;
+    if (fgetfilecon_raw (file->priv->fd, &context) >= 0)
+      {
+	g_file_info_set_attribute (info, "selinux:context", context);
+	freecon(context);
+      }
+  }
+#endif
+  
+  g_file_attribute_matcher_cleanup (&matcher);
   
   return info;
 }

@@ -2,6 +2,10 @@
 
 #include <unistd.h>
 #include <errno.h>
+#ifdef HAVE_SELINUX
+#include <selinux/selinux.h>
+#endif
+
 #include <glib/gi18n-lib.h>
 
 #include "gfileinfosimple.h"
@@ -30,6 +34,39 @@ read_link (const gchar *full_name)
                 size *= 2;
 		buffer = g_realloc (buffer, size);
 	}
+}
+
+
+/* Get the SELinux security context */
+static void
+get_selinux_context (const char *path,
+		     GFileInfo *info,
+		     GFileAttributeMatcher *attribute_matcher,
+		     gboolean follow_symlinks)
+{
+#ifdef HAVE_SELINUX
+  char *context;
+
+  if (!g_file_attribute_matcher_matches (attribute_matcher,
+					 "selinux", "selinux:context"))
+    return;
+  
+  if (is_selinux_enabled ()) {
+    if (follow_symlinks) {
+      if (lgetfilecon_raw (path, &context) < 0)
+	return;
+    } else {
+      if (getfilecon_raw (path, &context) < 0)
+	return;
+    }
+
+    if (context)
+      {
+	g_file_info_set_attribute (info, "selinux:context", context);
+	freecon(context);
+      }
+  }
+#endif
 }
 
 gboolean
@@ -92,5 +129,7 @@ g_file_info_simple_get (const char *path,
       /* TODO */
     }
 
+  get_selinux_context (path, info, attribute_matcher, follow_symlinks);
+  
   return TRUE;
 }
