@@ -41,7 +41,7 @@ struct _GVfsReadStreamPrivate
   gpointer data; /* user data, i.e. GVfsHandle */
   guint32 seq_nr;
   
-  char command_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE];
+  char command_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE];
   int command_buffer_size;
 
   char reply_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE];
@@ -208,24 +208,27 @@ static void
 got_command (GVfsReadStream *stream,
 	     guint32 command,
 	     guint32 seq_nr,
-	     guint32 arg)
+	     guint32 arg1,
+	     guint32 arg2)
 {
   GVfsJob *job;
   GError *error;
 
-  g_print ("got_command %d %d %d\n", command, seq_nr, arg);
+  g_print ("got_command %d %d %d %d\n", command, seq_nr, arg1, arg2);
   
   job = NULL;
   switch (command)
     {
-    case G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ:
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ:
       stream->priv->seq_nr = seq_nr;
       job = g_vfs_job_read_new (stream,
 				stream->priv->data,
-				arg);
+				arg1);
       break;
-    case G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SEEK:
-    case G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_CANCEL:
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR:
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END:
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_SET:
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL:
     default:
       /* TODO */
       error = NULL;
@@ -250,10 +253,10 @@ command_read_cb (GInputStream *input_stream,
 		 GError       *error)
 {
   GVfsReadStream *stream = G_VFS_READ_STREAM (data);
-  GVfsDaemonSocketProtocolCommand *cmd;
+  GVfsDaemonSocketProtocolRequest *cmd;
   guint32 seq_nr;
   guint32 command;
-  guint32 arg;
+  guint32 arg1, arg2;
   
   if (count_read <= 0)
     {
@@ -264,11 +267,11 @@ command_read_cb (GInputStream *input_stream,
   g_print ("command_read_cb: %d\n", count_read);
   stream->priv->command_buffer_size += count_read;
 
-  if (stream->priv->command_buffer_size < G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE)
+  if (stream->priv->command_buffer_size < G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE)
     {
       g_input_stream_read_async (stream->priv->command_stream,
 				 stream->priv->command_buffer + stream->priv->command_buffer_size,
-				 G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE - stream->priv->command_buffer_size,
+				 G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - stream->priv->command_buffer_size,
 				 0,
 				 command_read_cb,
 				 stream,
@@ -276,12 +279,13 @@ command_read_cb (GInputStream *input_stream,
       return;
     }
 
-  cmd = (GVfsDaemonSocketProtocolCommand *)stream->priv->command_buffer;
+  cmd = (GVfsDaemonSocketProtocolRequest *)stream->priv->command_buffer;
   command = g_ntohl (cmd->command);
-  arg = g_ntohl (cmd->arg);
+  arg1 = g_ntohl (cmd->arg1);
+  arg2 = g_ntohl (cmd->arg2);
   seq_nr = g_ntohl (cmd->seq_nr);
   stream->priv->command_buffer_size = 0;
-  got_command (stream, command, seq_nr, arg);
+  got_command (stream, command, seq_nr, arg1, arg2);
 }
 
 static void
@@ -290,7 +294,7 @@ request_command (GVfsReadStream *stream)
   stream->priv->command_buffer_size = 0;
   g_input_stream_read_async (stream->priv->command_stream,
 			     stream->priv->command_buffer + stream->priv->command_buffer_size,
-			     G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE - stream->priv->command_buffer_size,
+			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - stream->priv->command_buffer_size,
 			     0,
 			     command_read_cb,
 			     stream,

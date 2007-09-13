@@ -35,6 +35,11 @@ typedef enum {
 
 typedef enum {
   SEEK_STATE_INIT = 0,
+  SEEK_STATE_WROTE_REQUEST,
+  SEEK_STATE_HANDLE_INPUT,
+  SEEK_STATE_HANDLE_INPUT_BLOCK,
+  SEEK_STATE_SKIP_BLOCK,
+  SEEK_STATE_HANDLE_HEADER,
 } SeekState;
 
 
@@ -75,7 +80,7 @@ typedef struct {
   /* Output */
   gboolean ret_val;
   GError *ret_error;
-  goffset ret_pos;
+  goffset ret_offset;
   
   gboolean sent_cancel;
   
@@ -314,21 +319,23 @@ error_is_cancel (GError *error)
 }
 
 static void
-append_request (GUnixFileInputStream *stream, guint32 command, guint32 arg, guint32 *seq_nr)
+append_request (GUnixFileInputStream *stream, guint32 command,
+		guint32 arg1, guint32 arg2, guint32 *seq_nr)
 {
-  GVfsDaemonSocketProtocolCommand cmd;
+  GVfsDaemonSocketProtocolRequest cmd;
 
-  g_assert (sizeof (cmd) == G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE);
+  g_assert (sizeof (cmd) == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
   
   if (seq_nr)
     *seq_nr = stream->priv->seq_nr;
   
   cmd.command = g_htonl (command);
   cmd.seq_nr = g_htonl (stream->priv->seq_nr++);
-  cmd.arg = g_htonl (arg);
+  cmd.arg1 = g_htonl (arg1);
+  cmd.arg2 = g_htonl (arg2);
 
   g_string_append_len (stream->priv->output_buffer,
-		       (char *)&cmd, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE);
+		       (char *)&cmd, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
 }
 
 static gsize
@@ -473,8 +480,8 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 	      return STATE_OP_READ;
 	    }
 
-	  append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ,
-			  op->buffer_size, &op->seq_nr);
+	  append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ,
+			  op->buffer_size, 0, &op->seq_nr);
 	  op->state = READ_STATE_WROTE_COMMAND;
 	  io_op->io_buffer = priv->output_buffer->str;
 	  io_op->io_size = priv->output_buffer->len;
@@ -515,8 +522,8 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 	  if (io_op->cancelled && !op->sent_cancel)
 	    {
 	      op->sent_cancel = TRUE;
-	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_CANCEL,
-			      op->seq_nr, NULL);
+	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
+			      op->seq_nr, 0, NULL);
 	      op->state = READ_STATE_WROTE_COMMAND;
 	      io_op->io_buffer = priv->output_buffer->str;
 	      io_op->io_size = priv->output_buffer->len;
@@ -553,7 +560,7 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 	    {
 	      op->state = READ_STATE_SKIP_BLOCK;
 	      /* Reuse client buffer for skipping */
-	      io_op->io_buffer = op->buffer;
+	      io_op->io_buffer = NULL;
 	      io_op->io_size = priv->input_block_size;
 	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_SKIP;
@@ -782,7 +789,195 @@ g_unix_file_input_stream_can_seek (GFileInputStream *stream)
 static StateOp
 iterate_seek_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, SeekOperation *op)
 {
-  return 0;
+  GUnixFileInputStreamPrivate *priv = file->priv;
+  gsize len;
+  guint32 request;
+
+  while (TRUE)
+    {
+      switch (op->state)
+	{
+	  /* Initial state for read op */
+	case SEEK_STATE_INIT:
+	  request = G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_SET;
+	  if (op->seek_type == G_SEEK_CUR)
+	    request = G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR;
+	  else if (op->seek_type == G_SEEK_END)
+	    request = G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END;
+	  append_request (file, request,
+			  op->offset & 0xffffffff,
+			  op->offset >> 32,
+			  &op->seq_nr);
+	  op->state = SEEK_STATE_WROTE_REQUEST;
+	  io_op->io_buffer = priv->output_buffer->str;
+	  io_op->io_size = priv->output_buffer->len;
+	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
+	  return STATE_OP_WRITE;
+
+	  /* wrote parts of output_buffer */
+	case SEEK_STATE_WROTE_REQUEST:
+	  if (io_op->io_cancelled)
+	    {
+	      op->ret_val = -1;
+	      g_set_error (&op->ret_error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      return STATE_OP_DONE;
+	    }
+	  
+	  if (io_op->io_res < priv->output_buffer->len)
+	    {
+	      memcpy (priv->output_buffer->str,
+		      priv->output_buffer->str + io_op->io_res,
+		      priv->output_buffer->len - io_op->io_res);
+	      g_string_truncate (priv->output_buffer,
+				 priv->output_buffer->len - io_op->io_res);
+	      io_op->io_buffer = priv->output_buffer->str;
+	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_allow_cancel = FALSE;
+	      return STATE_OP_WRITE;
+	    }
+	  g_string_truncate (priv->output_buffer, 0);
+
+	  op->state = SEEK_STATE_HANDLE_INPUT;
+	  break;
+
+	  /* No op */
+	case SEEK_STATE_HANDLE_INPUT:
+	  if (io_op->cancelled && !op->sent_cancel)
+	    {
+	      op->sent_cancel = TRUE;
+	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
+			      op->seq_nr, 0, NULL);
+	      op->state = SEEK_STATE_WROTE_REQUEST;
+	      io_op->io_buffer = priv->output_buffer->str;
+	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_allow_cancel = FALSE;
+	    }
+	  
+	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
+	    {
+	      op->state = SEEK_STATE_HANDLE_INPUT_BLOCK;
+	      break;
+	    }
+	  else if (priv->input_state == INPUT_STATE_IN_REPLY_HEADER)
+	    {
+	      op->state = SEEK_STATE_HANDLE_HEADER;
+	      break;
+	    }
+	  g_assert_not_reached ();
+	  break;
+
+	  /* No op */
+	case SEEK_STATE_HANDLE_INPUT_BLOCK:
+	  g_assert (priv->input_state == INPUT_STATE_IN_BLOCK);
+	  
+	  op->state = SEEK_STATE_SKIP_BLOCK;
+	  /* Reuse client buffer for skipping */
+	  io_op->io_buffer = NULL;
+	  io_op->io_size = priv->input_block_size;
+	  io_op->io_allow_cancel = !op->sent_cancel;
+	  return STATE_OP_SKIP;
+
+	  /* Read block data */
+	case SEEK_STATE_SKIP_BLOCK:
+	  if (io_op->io_cancelled)
+	    {
+	      op->state = SEEK_STATE_HANDLE_INPUT;
+	      break;
+	    }
+	  
+	  g_assert (io_op->io_res <= priv->input_block_size);
+	  priv->input_block_size -= io_op->io_res;
+	  
+	  if (priv->input_block_size == 0)
+	    priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
+	  
+	  op->state = SEEK_STATE_HANDLE_INPUT;
+	  break;
+	  
+	  /* read header data, (or manual io_len/res = 0) */
+	case SEEK_STATE_HANDLE_HEADER:
+	  if (io_op->io_cancelled)
+	    {
+	      op->state = SEEK_STATE_HANDLE_INPUT;
+	      break;
+	    }
+
+	  if (io_op->io_res > 0)
+	    {
+	      gsize unread_size = io_op->io_size - io_op->io_res;
+	      g_string_set_size (priv->input_buffer,
+				 priv->input_buffer->len - unread_size);
+	    }
+	  
+	  len = get_reply_header_missing_bytes (priv->input_buffer);
+	  if (len > 0)
+	    {
+	      gsize current_len = priv->input_buffer->len;
+	      g_string_set_size (priv->input_buffer,
+				 current_len + len);
+	      io_op->io_buffer = priv->input_buffer->str + current_len;
+	      io_op->io_size = len;
+	      io_op->io_allow_cancel = !op->sent_cancel;
+	      return STATE_OP_READ;
+	    }
+
+	  /* Got full header */
+
+	  {
+	    GVfsDaemonSocketProtocolReply reply;
+	    char *data;
+	    data = decode_reply (priv->input_buffer, &reply);
+
+	    if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
+		reply.seq_nr == op->seq_nr)
+	      {
+		op->ret_val = FALSE;
+		g_set_error (&op->ret_error,
+			     g_quark_from_string (data),
+			     reply.arg1,
+			     data + strlen (data) + 1);
+		g_string_truncate (priv->input_buffer, 0);
+		return STATE_OP_DONE;
+	      }
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
+	      {
+		g_string_truncate (priv->input_buffer, 0);
+		priv->input_state = INPUT_STATE_IN_BLOCK;
+		priv->input_block_size = reply.arg1;
+		priv->input_block_seek_generation = reply.arg2;
+		op->state = SEEK_STATE_HANDLE_INPUT_BLOCK;
+		break;
+	      }
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS)
+	      {
+		op->ret_val = TRUE;
+		op->ret_offset = ((goffset)reply.arg2) << 32 | (goffset)reply.arg1;
+		g_string_truncate (priv->input_buffer, 0);
+		return STATE_OP_DONE;
+	      }
+	    else
+	      g_assert_not_reached ();
+	  }
+
+	  g_string_truncate (priv->input_buffer, 0);
+	  
+	  /* This wasn't interesting, read next reply */
+	  op->state = SEEK_STATE_HANDLE_HEADER;
+	  break;
+
+	default:
+	  g_assert_not_reached ();
+	}
+      
+      /* Clear io_op between non-op state switches */
+      io_op->io_size = 0;
+      io_op->io_res = 0;
+      io_op->io_cancelled = FALSE;
+ 
+    }
 }
 
 
@@ -820,7 +1015,7 @@ g_unix_file_input_stream_seek (GFileInputStream *stream,
   if (!op.ret_val)
     g_propagate_error (error, op.ret_error);
   else
-    file->priv->current_offset = op.ret_pos;
+    file->priv->current_offset = op.ret_offset;
   
   return op.ret_val;
 }
