@@ -8,6 +8,7 @@ Makefile
 Makefile.in
 gvfs-daemon
 gvfs-daemon-smb
+gvfs-daemon-smb-browse
 gvfs-daemon-test
 *.service
 *.mount
