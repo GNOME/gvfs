@@ -24,6 +24,7 @@ typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
 typedef struct _GVfsJobRead         GVfsJobRead;
 typedef struct _GVfsJobGetInfo      GVfsJobGetInfo;
+typedef struct _GVfsJobEnumerate    GVfsJobEnumerate;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -70,6 +71,12 @@ struct _GVfsBackendClass
 			     GFileInfoRequestFlags requested,
 			     const char *attributes,
 			     gboolean follow_symlinks);
+  gboolean (*enumerate)     (GVfsBackend *backend,
+			     GVfsJobEnumerate *job,
+			     char *filename,
+			     GFileInfoRequestFlags requested,
+			     const char *attributes,
+			     gboolean follow_symlinks);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
@@ -92,6 +99,12 @@ gboolean g_vfs_backend_seek_on_read         (GVfsBackend           *backend,
 					     GSeekType              type);
 gboolean g_vfs_backend_get_info             (GVfsBackend           *backend,
 					     GVfsJobGetInfo        *job,
+					     char                  *filename,
+					     GFileInfoRequestFlags  requested,
+					     const char            *attributes,
+					     gboolean               follow_symlinks);
+gboolean g_vfs_backend_enumerate            (GVfsBackend           *backend,
+					     GVfsJobEnumerate      *job,
 					     char                  *filename,
 					     GFileInfoRequestFlags  requested,
 					     const char            *attributes,

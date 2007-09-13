@@ -18,6 +18,7 @@
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobgetinfo.h"
+#include "gvfsjobenumerate.h"
 
 G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_TYPE_VFS_BACKEND);
 
@@ -269,6 +270,20 @@ do_get_info (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+do_enumerate (GVfsBackend *backend,
+	      GVfsJobEnumerate *job,
+	      char *filename,
+	      GFileInfoRequestFlags requested,
+	      const char *attributes,
+	      gboolean follow_symlinks)
+{
+  g_vfs_job_enumerate_set_result (job, requested);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  return TRUE;
+}
+
 static void
 g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
 {
@@ -282,4 +297,5 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
   backend_class->get_info = do_get_info;
+  backend_class->enumerate = do_enumerate;
 }

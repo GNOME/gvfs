@@ -229,11 +229,11 @@ g_file_daemon_enumerate_children (GFile      *file,
   if (!dbus_message_iter_init (reply, &iter) ||
       (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_UINT32))
     {
-      /*      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-	      _("Invalid return value from Enumerate"));*/
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from Enumerate"));
       goto error;
     }
-
+  
   dbus_message_iter_get_basic (&iter, &requested_32);
   
   dbus_message_unref (reply);

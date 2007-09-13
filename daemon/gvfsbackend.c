@@ -13,6 +13,7 @@
 #include "gvfsdaemonprotocol.h"
 #include <gvfsjobopenforread.h>
 #include <gvfsjobgetinfo.h>
+#include <gvfsjobenumerate.h>
 
 enum {
   PROP_0,
@@ -252,6 +253,21 @@ g_vfs_backend_get_info (GVfsBackend           *backend,
 			  attributes, follow_symlinks);
 }
 
+gboolean
+g_vfs_backend_enumerate (GVfsBackend           *backend,
+			 GVfsJobEnumerate      *job,
+			 char                  *filename,
+			 GFileInfoRequestFlags  requested,
+			 const char            *attributes,
+			 gboolean               follow_symlinks)
+{
+  GVfsBackendClass *class;
+
+  class = G_VFS_BACKEND_GET_CLASS (backend);
+  
+  return class->enumerate (backend, job, filename, requested,
+			   attributes, follow_symlinks);
+}
 
 static DBusHandlerResult
 backend_dbus_handler (DBusConnection  *connection,
@@ -271,6 +287,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
 					G_VFS_DBUS_OP_GET_INFO))
     job = g_vfs_job_get_info_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+					G_VFS_DBUS_OP_ENUMERATE))
+    job = g_vfs_job_enumerate_new (connection, message, backend);
 
   if (job)
     {

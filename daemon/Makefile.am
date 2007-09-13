@@ -33,6 +33,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobseekread.c gvfsjobseekread.h \
 	gvfsjobcloseread.c gvfsjobcloseread.h \
 	gvfsjobgetinfo.c gvfsjobgetinfo.h \
+	gvfsjobenumerate.c gvfsjobenumerate.h \
 	gvfsdaemonprotocol.h gvfsdaemonprotocol.c \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
