@@ -266,6 +266,7 @@ g_file_get_filesystem_info (GFile *file,
   return (* iface->get_filesystem_info) (file, attributes, cancellable, error);
 }
 
+/* Fails on directories */
 GFileInputStream *
 g_file_read (GFile *file,
 	     GCancellable *cancellable,
@@ -476,6 +477,7 @@ file_copy_fallback (GFile                  *source,
   return FALSE;
 }
 
+/* Fails on directory source */
 gboolean
 g_file_copy (GFile                  *source,
 	     GFile                  *destination,
@@ -523,6 +525,7 @@ g_file_copy (GFile                  *source,
 			     error);
 }
 
+/* May fail on directory source with NOT_SUPPORTED (i.e. if rename fails) */
 gboolean
 g_file_move (GFile                  *source,
 	     GFile                  *destination,
