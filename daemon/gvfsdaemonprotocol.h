@@ -30,7 +30,7 @@ seek reply:
 type, pos (64),
 
 error:
-type, domain_len, code, message_len, data (2 strings)
+type, code, size, data (size bytes, 2 strings: domain, message)
 */
 
 typedef struct {

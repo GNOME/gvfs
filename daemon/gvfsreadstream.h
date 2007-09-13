@@ -44,7 +44,9 @@ gboolean        g_vfs_read_stream_has_job         (GVfsReadStream  *read_stream)
 GVfsJob *       g_vfs_read_stream_get_job         (GVfsReadStream  *read_stream);
 void            g_vfs_read_stream_send_data       (GVfsReadStream  *read_stream,
 						   char            *buffer,
-						   gssize           count);
+						   gsize            count);
+void            g_vfs_read_stream_send_error      (GVfsReadStream  *read_stream,
+						   GError          *error);
 
 /* TODO: i/o priority? */
 
