@@ -38,8 +38,10 @@
 /* Valid attribute flags */
 
 #define SSH_FILEXFER_ATTR_SIZE              0x00000001
+#define SSH_FILEXFER_ATTR_UIDGID            0x00000002 /* deprecated in recent versions */
 #define SSH_FILEXFER_ATTR_PERMISSIONS       0x00000004
 #define SSH_FILEXFER_ATTR_ACCESSTIME        0x00000008
+#define SSH_FILEXFER_ATTR_ACMODTIME SSH_FILEXFER_ATTR_ACCESSTIME /* Hmm? these differ in version 3 and 13? */
 #define SSH_FILEXFER_ATTR_CREATETIME        0x00000010
 #define SSH_FILEXFER_ATTR_MODIFYTIME        0x00000020
 #define SSH_FILEXFER_ATTR_ACL               0x00000040
