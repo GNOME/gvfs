@@ -106,7 +106,7 @@ try_open_for_read (GVfsBackend *backend,
 {
   GError *error;
 
-  g_print ("open_for_read (%s)\n", filename);
+  g_print ("try_open_for_read (%s)\n", filename);
   
   if (strcmp (filename, "/fail") == 0)
     {
@@ -251,6 +251,8 @@ do_get_info (GVfsBackend *backend,
   GFileInfo *info;
   GError *error;
 
+  g_print ("do_get_file_info (%s)\n", filename);
+  
   file = g_file_local_new (filename);
 
   error = NULL;
@@ -279,7 +281,9 @@ try_enumerate (GVfsBackend *backend,
 {
   GFileInfo *info1, *info2;;
   GList *l;
-  
+
+  g_print ("try_enumerate (%s)\n", filename);
+
   g_vfs_job_enumerate_set_result (job, requested);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
