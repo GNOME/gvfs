@@ -6,14 +6,15 @@ CFILES=gfileinfo.c ginputstream.c goutputstream.c \
 	gvfs.c glocalfileinputstream.c\
 	glocalfileoutputstream.c gioscheduler.c\
 	gfileinputstream.c gfileoutputstream.c \
-	gvfssimple.c gfilesimple.c
+	gvfssimple.c gfilesimple.c gfileinfosimple.c \
+
 
 HFILES=gfileinfo.h ginputstream.h goutputstream.h\
 	gvfserror.h gfileenumerator.h gfile.h\
 	gvfs.h glocalfileinputstream.h\
 	glocalfileoutputstream.h gioscheduler.h\
 	gfileinputstream.h gfileoutputstream.h\
-	gvfssimple.h gfilesimple.h\
+	gvfssimple.h gfilesimple.h gfileinfosimple.h \
 	gvfstypes.h
 
 test: test.c $(CFILES) $(HFILES) Makefile

@@ -1,9 +1,9 @@
 #include <config.h>
 
 #include <string.h>
-#include <unistd.h>
 
 #include "gfilesimple.h"
+#include "gfileinfosimple.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
 #include <glib/gi18n-lib.h>
@@ -237,33 +237,6 @@ g_file_simple_enumerate_children (GFile      *file,
   return NULL;
 }
 
-static gchar *
-read_link (const gchar *full_name)
-{
-	gchar *buffer;
-	guint size;
-
-	size = 256;
-	buffer = g_malloc (size);
-          
-	while (1) {
-		int read_size;
-
-                read_size = readlink (full_name, buffer, size);
-		if (read_size < 0) {
-			g_free (buffer);
-			return NULL;
-		}
-                if (read_size < size) {
-			buffer[read_size] = 0;
-			return buffer;
-		}
-                size *= 2;
-		buffer = g_realloc (buffer, size);
-	}
-}
-
-
 GFileInfo *
 g_file_simple_get_info (GFile                *file,
 			GFileInfoRequestFlags requested,
@@ -272,19 +245,8 @@ g_file_simple_get_info (GFile                *file,
 {
   GFileSimple *simple = G_FILE_SIMPLE (file);
   GFileInfo *info;
-  struct stat statbuf;
 
   info = g_file_info_new ();
-  
-  if (requested && G_FILE_INFO_REQUEST_FLAGS_FROM_STAT_MASK)
-    {
-      if (follow_symlinks)
-	stat (simple->filename, &statbuf);
-      else
-	lstat (simple->filename, &statbuf);
-
-      g_file_info_set_from_stat (info, requested, &statbuf);
-    }
 
   if (requested && G_FILE_INFO_NAME)
     {
@@ -293,37 +255,8 @@ g_file_simple_get_info (GFile                *file,
       g_free (basename);
     }
 
-  if (requested && G_FILE_INFO_SYMLINK_TARGET)
-    {
-      char *link = read_link (simple->filename);
-      g_file_info_set_symlink_target (info, link);
-      g_free (link);
-    }
-
-  if (requested && G_FILE_INFO_ACCESS_RIGHTS)
-    {
-      /* TODO */
-    }
-  
-  if (requested && G_FILE_INFO_DISPLAY_NAME)
-    {
-      /* TODO */
-    }
-  
-  if (requested && G_FILE_INFO_EDIT_NAME)
-    {
-      /* TODO */
-    }
-
-  if (requested && G_FILE_INFO_MIME_TYPE)
-    {
-      /* TODO */
-    }
-  
-  if (requested && G_FILE_INFO_ICON)
-    {
-      /* TODO */
-    }
+  g_file_info_simple_get (simple->filename, info,
+			  requested, attributes, follow_symlinks);
   
   return info;
 }
