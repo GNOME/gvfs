@@ -435,17 +435,18 @@ start_request_reader (GVfsChannel *channel)
 }
 
 static void
-send_reply_cb (GOutputStream *output_stream,
-	       void          *buffer,
-	       gsize          bytes_requested,
-	       gssize         bytes_written,
-	       gpointer       data,
-	       GError        *error)
+send_reply_cb (GObject *source_object,
+	       GAsyncResult *res,
+	       gpointer user_data)
 {
-  GVfsChannel *channel = data;
+  GOutputStream *output_stream = G_OUTPUT_STREAM (source_object);
+  gssize bytes_written;
+  GVfsChannel *channel = user_data;
   GVfsChannelClass *class;
   GVfsJob *job;
 
+  bytes_written = g_output_stream_write_finish (output_stream, res, NULL);
+  
   if (bytes_written <= 0)
     {
       g_vfs_channel_connection_closed (channel);
@@ -462,9 +463,8 @@ send_reply_cb (GOutputStream *output_stream,
 	  g_output_stream_write_async (channel->priv->reply_stream,
 				       channel->priv->reply_buffer + channel->priv->reply_buffer_pos,
 				       G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE - channel->priv->reply_buffer_pos,
-				       0,
-				       send_reply_cb, channel,
-				       NULL);  
+				       0, NULL,
+				       send_reply_cb, channel);  
 	  return;
 	}
       bytes_written = 0;
@@ -479,9 +479,8 @@ send_reply_cb (GOutputStream *output_stream,
       g_output_stream_write_async (channel->priv->reply_stream,
 				   channel->priv->output_data + channel->priv->output_data_pos,
 				   channel->priv->output_data_size - channel->priv->output_data_pos,
-				   0,
-				   send_reply_cb, channel,
-				   NULL);
+				   0, NULL,
+				   send_reply_cb, channel);
       return;
     }
 
@@ -533,9 +532,8 @@ g_vfs_channel_send_reply (GVfsChannel *channel,
       g_output_stream_write_async (channel->priv->reply_stream,
 				   channel->priv->reply_buffer,
 				   G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
-				   0,
-				   send_reply_cb, channel,
-				   NULL);  
+				   0, NULL,
+				   send_reply_cb, channel);  
     }
   else
     {
@@ -543,9 +541,8 @@ g_vfs_channel_send_reply (GVfsChannel *channel,
       g_output_stream_write_async (channel->priv->reply_stream,
 				   channel->priv->output_data,
 				   channel->priv->output_data_size,
-				   0,
-				   send_reply_cb, channel,
-				   NULL);  
+				   0, NULL,
+				   send_reply_cb, channel);  
     }
 }
 

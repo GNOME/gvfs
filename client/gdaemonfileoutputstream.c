@@ -18,6 +18,7 @@
 #include "gvfsdaemondbus.h"
 #include <gio/gsocketinputstream.h>
 #include <gio/gsocketoutputstream.h>
+#include <gio/gsimpleasyncresult.h>
 #include <gvfsdaemonprotocol.h>
 
 #define MAX_WRITE_SIZE (4*1024*1024)
@@ -149,14 +150,20 @@ static void       g_daemon_file_output_stream_write_async   (GOutputStream      
 							     void                       *buffer,
 							     gsize                       count,
 							     int                         io_priority,
-							     GAsyncWriteCallback         callback,
-							     gpointer                    data,
-							     GCancellable               *cancellable);
+							     GCancellable               *cancellable,
+							     GAsyncReadyCallback         callback,
+							     gpointer                    data);
+static gssize     g_daemon_file_output_stream_write_finish  (GOutputStream              *stream,
+							     GAsyncResult         *result,
+							     GError              **error);
 static void       g_daemon_file_output_stream_close_async   (GOutputStream              *stream,
 							     int                         io_priority,
-							     GAsyncCloseOutputCallback   callback,
-							     gpointer                    data,
-							     GCancellable               *cancellable);
+							     GCancellable               *cancellable,
+							     GAsyncReadyCallback         callback,
+							     gpointer                    data);
+static gboolean   g_daemon_file_output_stream_close_finish  (GOutputStream              *stream,
+							     GAsyncResult         *result,
+							     GError              **error);
 
 G_DEFINE_TYPE (GDaemonFileOutputStream, g_daemon_file_output_stream,
 	       G_TYPE_FILE_OUTPUT_STREAM)
@@ -193,7 +200,9 @@ g_daemon_file_output_stream_class_init (GDaemonFileOutputStreamClass *klass)
   stream_class->close = g_daemon_file_output_stream_close;
   
   stream_class->write_async = g_daemon_file_output_stream_write_async;
+  stream_class->write_finish = g_daemon_file_output_stream_write_finish;
   stream_class->close_async = g_daemon_file_output_stream_close_async;
+  stream_class->close_finish = g_daemon_file_output_stream_close_finish;
   
   file_stream_class->tell = g_daemon_file_output_stream_tell;
   file_stream_class->can_seek = g_daemon_file_output_stream_can_seek;
@@ -1060,14 +1069,19 @@ async_skip_op_callback (GObject *source_object,
 }
 
 static void
-async_write_op_callback (GOutputStream *stream,
-			 void          *buffer,
-			 gsize          bytes_requested,
-			 gssize         bytes_written,
-			 gpointer       data,
-			 GError        *error)
+async_write_op_callback (GObject *source_object,
+			 GAsyncResult *res,
+			 gpointer user_data)
 {
-  async_op_handle ((AsyncIterator *)data, bytes_written, error);
+  GOutputStream *stream = G_OUTPUT_STREAM (source_object);
+  gssize bytes_written;
+  GError *error = NULL;
+  
+  bytes_written = g_output_stream_write_finish (stream, res, &error);
+  
+  async_op_handle ((AsyncIterator *)user_data, bytes_written, error);
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -1111,8 +1125,8 @@ async_iterate (AsyncIterator *iterator)
       g_output_stream_write_async (file->command_stream,
 				   io_data->io_buffer, io_data->io_size,
 				   iterator->io_priority,
-				   async_write_op_callback, iterator,
-				   io_data->io_allow_cancel ? iterator->cancellable : NULL);
+				   io_data->io_allow_cancel ? iterator->cancellable : NULL,
+				   async_write_op_callback, iterator);
     }
   else
     g_assert_not_reached ();
@@ -1146,12 +1160,14 @@ run_async_state_machine (GDaemonFileOutputStream *file,
 static void
 async_write_done (GOutputStream *stream,
 		  gpointer op_data,
-		  gpointer callback,
-		  gpointer callback_data,
+		  GAsyncReadyCallback callback,
+		  gpointer user_data,
 		  GError *io_error)
 {
+  GSimpleAsyncResult *simple;
   WriteOperation *op;
   gssize count_written;
+  gssize *count_written_p;
   GError *error;
 
   op = op_data;
@@ -1167,13 +1183,19 @@ async_write_done (GOutputStream *stream,
       error = op->ret_error;
     }
 
-  if (callback)
-    ((GAsyncWriteCallback)callback) (stream,
-				     op->buffer,
-				     op->buffer_size,
-				     count_written,
-				     callback_data,
-				     error);
+  count_written_p = g_new (gssize, 1);
+  *count_written_p = count_written;
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback, user_data,
+				      g_daemon_file_output_stream_write_async,
+				      count_written_p, g_free);
+
+  if (count_written == -1)
+    g_simple_async_result_set_from_error (simple, error);
+
+  /* Complete immediately, not in idle, since we're already in a mainloop callout */
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 
   if (op->ret_error)
     g_error_free (op->ret_error);
@@ -1185,9 +1207,9 @@ g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
 					  void               *buffer,
 					  gsize               count,
 					  int                 io_priority,
-					  GAsyncWriteCallback callback,
-					  gpointer            data,
-					  GCancellable       *cancellable)
+					  GCancellable       *cancellable,
+					  GAsyncReadyCallback callback,
+					  gpointer            data)
 {
   GDaemonFileOutputStream *file;
   AsyncIterator *iterator;
@@ -1210,19 +1232,35 @@ g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
 			   (state_machine_iterator)iterate_write_state_machine,
 			   op,
 			   io_priority,
-			   (gpointer)callback, data,
+			   callback, data,
 			   cancellable,
-			   (gpointer)async_write_done);
+			   async_write_done);
+}
+
+static gssize
+g_daemon_file_output_stream_write_finish (GOutputStream             *stream,
+					  GAsyncResult              *result,
+					  GError                   **error)
+{
+  GSimpleAsyncResult *simple;
+  gssize *nwritten;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_output_stream_write_async);
+  
+  nwritten = g_simple_async_result_get_op_data (simple);
+  return *nwritten;
 }
 
 static void
 async_close_done (GOutputStream *stream,
 		  gpointer op_data,
-		  gpointer callback,
-		  gpointer callback_data,
+		  GAsyncReadyCallback callback,
+		  gpointer user_data,
 		  GError *io_error)
 {
   GDaemonFileOutputStream *file;
+  GSimpleAsyncResult *simple;
   CloseOperation *op;
   gboolean result;
   GError *error;
@@ -1253,11 +1291,17 @@ async_close_done (GOutputStream *stream,
   else
     g_input_stream_close (file->data_stream, cancellable, NULL);
   
-  if (callback)
-    ((GAsyncCloseOutputCallback)callback) (stream,
-					  result,
-					  callback_data,
-					  error);
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback, user_data,
+				      g_daemon_file_output_stream_close_async,
+				      NULL, NULL);
+
+  if (!result)
+    g_simple_async_result_set_from_error (simple, error);
+
+  /* Complete immediately, not in idle, since we're already in a mainloop callout */
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
   
   if (op->ret_error)
     g_error_free (op->ret_error);
@@ -1265,11 +1309,11 @@ async_close_done (GOutputStream *stream,
 }
 
 static void
-g_daemon_file_output_stream_close_async (GOutputStream        *stream,
-					int                  io_priority,
-					GAsyncCloseOutputCallback callback,
-					gpointer            data,
-					GCancellable       *cancellable)
+g_daemon_file_output_stream_close_async (GOutputStream     *stream,
+					int                 io_priority,
+					GCancellable       *cancellable,
+					GAsyncReadyCallback callback,
+					gpointer            data)
 {
   GDaemonFileOutputStream *file;
   AsyncIterator *iterator;
@@ -1288,4 +1332,13 @@ g_daemon_file_output_stream_close_async (GOutputStream        *stream,
 			   (gpointer)callback, data,
 			   cancellable,
 			   (gpointer)async_close_done);
+}
+
+static gboolean
+g_daemon_file_output_stream_close_finish (GOutputStream             *stream,
+					  GAsyncResult              *result,
+					  GError                   **error)
+{
+  /* Failures handled in generic close_finish code */
+  return TRUE;
 }

@@ -3,8 +3,6 @@
 #include <glib.h>
 
 #include "ginputstream.h"
-#include "gioscheduler.h"
-#include "gasynchelper.h"
 #include "gsimpleasyncresult.h"
 
 G_DEFINE_TYPE (GInputStream, g_input_stream, G_TYPE_OBJECT);
@@ -995,19 +993,15 @@ g_input_stream_real_skip_finish (GInputStream              *stream,
   return op->count_skipped;
 }
 
-typedef struct {
-  gboolean           res;
-} CloseData;
-
 static void
 close_async_thread (GSimpleAsyncResult *res,
 		    gpointer op_data,
 		    GObject *object,
 		    GCancellable *cancellable)
 {
-  CloseData *op = op_data;
   GInputStreamClass *class;
   GError *error = NULL;
+  gboolean result;
 
   /* Auto handling of cancelation disabled, and ignore
      cancellation, since we want to close things anyway, although
@@ -1015,8 +1009,8 @@ close_async_thread (GSimpleAsyncResult *res,
      open handles */
   
   class = G_INPUT_STREAM_GET_CLASS (object);
-  op->res = class->close (G_INPUT_STREAM (object), cancellable, &error);
-  if (!op->res)
+  result = class->close (G_INPUT_STREAM (object), cancellable, &error);
+  if (!result)
     {
       g_simple_async_result_set_from_error (res, error);
       g_error_free (error);
@@ -1031,10 +1025,8 @@ g_input_stream_real_close_async (GInputStream        *stream,
 				 gpointer             user_data)
 {
   GSimpleAsyncResult *res;
-  CloseData *op;
   
-  op = g_new (CloseData, 1);
-  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_input_stream_real_close_async, op, g_free);
+  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_input_stream_real_close_async, NULL, NULL);
 
   g_simple_async_result_set_handle_cancellation (res, FALSE);
   
@@ -1048,10 +1040,6 @@ g_input_stream_real_close_finish (GInputStream              *stream,
 				  GError                   **error)
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
-  CloseData *op;
-
   g_assert (g_simple_async_result_get_source_tag (simple) == g_input_stream_real_close_async);
-
-  op = g_simple_async_result_get_op_data (simple);
-  return op->res;
+  return TRUE;
 }

@@ -1307,7 +1307,7 @@ async_read_op_callback (GObject *source_object,
 static void
 async_skip_op_callback (GObject *source_object,
 			GAsyncResult *res,
-			gpointer      user_data)
+			gpointer user_data)
 {
   GInputStream *stream = G_INPUT_STREAM (source_object);
   gssize count_skipped;
@@ -1321,14 +1321,19 @@ async_skip_op_callback (GObject *source_object,
 }
 
 static void
-async_write_op_callback (GOutputStream *stream,
-			 void          *buffer,
-			 gsize          bytes_requested,
-			 gssize         bytes_written,
-			 gpointer       data,
-			 GError        *error)
+async_write_op_callback (GObject *source_object,
+			 GAsyncResult *res,
+			 gpointer user_data)
 {
-  async_op_handle ((AsyncIterator *)data, bytes_written, error);
+  GOutputStream *stream = G_OUTPUT_STREAM (source_object);
+  gssize bytes_written;
+  GError *error = NULL;
+  
+  bytes_written = g_output_stream_write_finish (stream, res, &error);
+  
+  async_op_handle ((AsyncIterator *)user_data, bytes_written, error);
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -1372,8 +1377,8 @@ async_iterate (AsyncIterator *iterator)
       g_output_stream_write_async (file->command_stream,
 				   io_data->io_buffer, io_data->io_size,
 				   iterator->io_priority,
-				   async_write_op_callback, iterator,
-				   io_data->io_allow_cancel ? iterator->cancellable : NULL);
+				   io_data->io_allow_cancel ? iterator->cancellable : NULL,
+				   async_write_op_callback, iterator);
     }
   else
     g_assert_not_reached ();
@@ -1566,7 +1571,7 @@ async_close_done (GInputStream *stream,
 				      g_daemon_file_input_stream_read_async,
 				      NULL, NULL);
 
-  if (!result == -1)
+  if (!result)
     g_simple_async_result_set_from_error (simple, error);
 
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
