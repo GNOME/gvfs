@@ -1389,7 +1389,6 @@ g_local_file_move (GFile                *source,
   gboolean destination_exist, source_is_dir;
   char *backup_name;
   int res;
-  int errsv;
 
   res = g_lstat (local_source->filename, &statbuf);
   if (res == -1)
@@ -1405,7 +1404,6 @@ g_local_file_move (GFile                *source,
   
   destination_exist = FALSE;
   res = g_lstat (local_destination->filename, &statbuf);
-  errsv = errno;
   if (res == 0)
     {
       destination_exist = TRUE; /* Target file exists */
