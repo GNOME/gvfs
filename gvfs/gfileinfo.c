@@ -211,7 +211,7 @@ g_file_info_get_attribute (GFileInfo *info,
   return NULL;
 }
   
-const GFileAttribute *
+GFileAttribute *
 g_file_info_get_attributes (GFileInfo *info,
 			    const char *namespace,
 			    int *n_attributes)
@@ -238,8 +238,8 @@ g_file_info_get_attributes (GFileInfo *info,
       if (internal->namespace_q == namespace_q)
 	{
 	  GFileAttribute attr;
-	  attr.attribute = (char *)g_quark_to_string (internal->attribute_q);
-	  attr.value = (char *)internal->value;
+	  attr.attribute = g_quark_to_string (internal->attribute_q);
+	  attr.value = internal->value;
 	  g_array_append_val (result, attr);
 	}
     }
@@ -256,7 +256,7 @@ g_file_info_get_attributes (GFileInfo *info,
   return (GFileAttribute *)g_array_free (result, FALSE);
 }
   
-const GFileAttribute *
+GFileAttribute *
 g_file_info_get_all_attributes (GFileInfo *info,
 				int *n_attributes)
 {
@@ -275,8 +275,8 @@ g_file_info_get_all_attributes (GFileInfo *info,
       GFileAttribute attr;
       internal = &g_array_index (attrs, GFileAttributeInternal, i);
       
-      attr.attribute = (char *)g_quark_to_string (internal->attribute_q);
-      attr.value = (char *)internal->value;
+      attr.attribute = g_quark_to_string (internal->attribute_q);
+      attr.value = internal->value;
       g_array_append_val (result, attr);
     }
 

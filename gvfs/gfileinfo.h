@@ -51,8 +51,8 @@ struct _GFileInfoClass
 };
 
 struct _GFileAttribute {
-  char *attribute;
-  char *value;
+  const char *attribute;
+  const char *value;
 };
 
 typedef enum {
@@ -93,10 +93,10 @@ gboolean               g_file_info_get_is_hidden         (GFileInfo         *inf
 const struct stat *    g_file_info_get_stat_info         (GFileInfo         *info);
 const char *           g_file_info_get_attribute         (GFileInfo         *info,
 							  const char        *attribute);
-const GFileAttribute  *g_file_info_get_attributes        (GFileInfo         *info,
+GFileAttribute *       g_file_info_get_attributes        (GFileInfo         *info,
 							  const char        *namespace,
 							  int               *n_attributes);
-const GFileAttribute  *g_file_info_get_all_attributes    (GFileInfo         *info,
+GFileAttribute *       g_file_info_get_all_attributes    (GFileInfo         *info,
 							  int               *n_attributes);
 void                   g_file_info_set_file_type         (GFileInfo         *info,
 							  GFileType          type);
