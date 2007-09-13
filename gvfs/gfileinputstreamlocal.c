@@ -92,10 +92,20 @@ g_file_input_stream_local_new (const char *filename)
 
 static gboolean
 g_file_input_stream_local_open (GFileInputStreamLocal *file,
+				GCancellable *cancellable,
 				GError      **error)
 {
   if (file->priv->fd != -1)
     return TRUE;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
   
   file->priv->fd = g_open (file->priv->filename, O_RDONLY, 0);
   if (file->priv->fd == -1)
@@ -120,23 +130,22 @@ g_file_input_stream_local_read (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_LOCAL (stream);
 
-  if (!g_file_input_stream_local_open (file, error))
+  if (!g_file_input_stream_local_open (file, cancellable, error))
     return -1;
   
   while (1)
     {
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  break;
+	}
       res = read (file->priv->fd, buffer, count);
       if (res == -1)
 	{
-	  if (g_input_stream_is_cancelled (stream))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -163,9 +172,18 @@ g_file_input_stream_local_skip (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_LOCAL (stream);
   
-  if (!g_file_input_stream_local_open (file, error))
+  if (!g_file_input_stream_local_open (file, cancellable, error))
     return -1;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return -1;
+    }
+  
   start = lseek (file->priv->fd, 0, SEEK_CUR);
   if (start == -1)
     {
@@ -207,18 +225,6 @@ g_file_input_stream_local_close (GInputStream *stream,
       res = close (file->priv->fd);
       if (res == -1)
 	{
-	  if (g_input_stream_is_cancelled (stream))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
 	  g_set_error (error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
 		       _("Error closing file '%s': %s"),
@@ -241,9 +247,18 @@ g_file_input_stream_local_get_file_info (GFileInputStream     *stream,
 
   file = G_FILE_INPUT_STREAM_LOCAL (stream);
 
-  if (!g_file_input_stream_local_open (file, error))
+  if (!g_file_input_stream_local_open (file, cancellable, error))
     return NULL;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   return g_file_info_local_get_from_fd (file->priv->fd,
 					requested,
 					attributes,

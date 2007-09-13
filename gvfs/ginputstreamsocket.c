@@ -228,31 +228,21 @@ g_input_stream_socket_read (GInputStream *stream,
 		       g_strerror (errno));
 	  return -1;
 	}
-      
-      if (poll_fds[1].revents)
+    }
+
+  while (1)
+    {
+      if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
 		       G_VFS_ERROR,
 		       G_VFS_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
-	  return -1;
+	  break;
 	}
-    }
-
-  while (1)
-    {
       res = read (socket_stream->priv->fd, buffer, count);
       if (res == -1)
 	{
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -287,18 +277,6 @@ g_input_stream_socket_close (GInputStream *stream,
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
 	  g_set_error (error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
 		       _("Error closing socket: %s"),
@@ -329,31 +307,20 @@ read_async_cb (GInputStreamSocket  *stream,
 
   socket_stream = G_INPUT_STREAM_SOCKET (stream);
   
-  if (g_input_stream_is_cancelled (G_INPUT_STREAM (stream)))
-    {
-      g_set_error (&error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      count_read = -1;
-      goto out;
-    }
-
   /* We know that we can read from fd once without blocking */
   while (1)
     {
+      if (g_input_stream_is_cancelled (G_INPUT_STREAM (stream)))
+	{
+	  g_set_error (&error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  break;
+	}
       count_read = read (socket_stream->priv->fd, data->buffer, data->count);
       if (count_read == -1)
 	{
-	  if (g_input_stream_is_cancelled (G_INPUT_STREAM (stream)))
-	    {
-	      g_set_error (&error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -365,7 +332,6 @@ read_async_cb (GInputStreamSocket  *stream,
       break;
     }
 
- out:
   data->callback (G_INPUT_STREAM (stream),
 		  data->buffer,
 		  data->count,
@@ -456,16 +422,6 @@ close_async_cb (CloseAsyncData *data)
 
   socket_stream = G_INPUT_STREAM_SOCKET (data->stream);
 
-  if (g_input_stream_is_cancelled (data->stream))
-    {
-      g_set_error (&error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      result = FALSE;
-      goto out;
-    }
-
   if (!socket_stream->priv->close_fd_at_close)
     {
       result = TRUE;
@@ -477,19 +433,6 @@ close_async_cb (CloseAsyncData *data)
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  if (g_input_stream_is_cancelled (data->stream))
-	    {
-	      g_set_error (&error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      
-	      break;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
 	  g_set_error (&error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
 		       _("Error closing socket: %s"),

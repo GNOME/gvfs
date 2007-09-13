@@ -239,6 +239,7 @@ g_file_input_stream_daemon_new (const char *filename,
 
 static gboolean
 g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
+				 GCancellable *cancellable,
 				 GError **error)
 {
   DBusConnection *connection;
@@ -253,10 +254,28 @@ g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
   if (file->priv->fd != -1)
     return TRUE;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+
   connection = _g_vfs_daemon_get_connection_sync (file->priv->mountpoint, error);
   if (connection == NULL)
     return FALSE;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
   message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
@@ -708,9 +727,18 @@ g_file_input_stream_daemon_read (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!g_file_input_stream_daemon_open (file, error))
+  if (!g_file_input_stream_daemon_open (file, cancellable, error))
     return -1;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return -1;
+    }
+  
   /* Limit for sanity and to avoid 32bit overflow */
   if (count > MAX_READ_SIZE)
     count = MAX_READ_SIZE;
@@ -742,7 +770,7 @@ g_file_input_stream_daemon_skip (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
   
-  if (!g_file_input_stream_daemon_open (file, error))
+  if (!g_file_input_stream_daemon_open (file, cancellable, error))
     return -1;
 
   /* TODO: .. */
@@ -967,9 +995,9 @@ g_file_input_stream_daemon_close (GInputStream *stream,
     g_output_stream_close (file->priv->command_stream, cancellable, NULL);
     
   if (res)
-    res = g_input_stream_close (file->priv->data_stream, NULL, error);
+    res = g_input_stream_close (file->priv->data_stream, cancellable, error);
   else
-    g_input_stream_close (file->priv->data_stream, NULL, NULL);
+    g_input_stream_close (file->priv->data_stream, cancellable, NULL);
   
   return res;
 }
@@ -991,7 +1019,7 @@ g_file_input_stream_daemon_can_seek (GFileInputStream *stream)
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!g_file_input_stream_daemon_open (file, NULL))
+  if (!g_file_input_stream_daemon_open (file, NULL, NULL))
     return FALSE;
 
   return file->priv->can_seek;
@@ -1206,8 +1234,8 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!g_file_input_stream_daemon_open (file, error))
-    return -1;
+  if (!g_file_input_stream_daemon_open (file, cancellable, error))
+    return FALSE;
 
   if (!file->priv->can_seek)
     {
@@ -1215,7 +1243,16 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 		   _("Seek not supported on stream"));
       return FALSE;
     }
-
+  
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
   memset (&op, 0, sizeof (op));
   op.state = SEEK_STATE_INIT;
   op.offset = offset;
@@ -1244,7 +1281,7 @@ g_file_input_stream_daemon_get_file_info (GFileInputStream     *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!g_file_input_stream_daemon_open (file, error))
+  if (!g_file_input_stream_daemon_open (file, cancellable, error))
     return NULL;
 
   return NULL;

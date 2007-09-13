@@ -407,10 +407,20 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
 
 static gboolean
 g_file_output_stream_local_open (GFileOutputStreamLocal *file,
+				 GCancellable *cancellable,
 				 GError      **error)
 {
   if (file->priv->fd != -1)
     return TRUE;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
 
   switch (file->priv->open_mode)
     {
@@ -474,23 +484,23 @@ g_file_output_stream_local_write (GOutputStream *stream,
 
   file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
 
-  if (!g_file_output_stream_local_open (file, error))
+  if (!g_file_output_stream_local_open (file, cancellable, error))
     return -1;
+
   
   while (1)
     {
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  return -1;
+	}
       res = write (file->priv->fd, buffer, count);
       if (res == -1)
 	{
-	  if (g_output_stream_is_cancelled (stream))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -529,8 +539,26 @@ g_file_output_stream_local_close (GOutputStream *stream,
       if (file->priv->create_backup)
 	{
 	  char *backup_filename;
-      
+
+	  if (g_cancellable_is_cancelled (cancellable))
+	    {
+	      g_set_error (error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      goto err_out;
+	    }
+	  
 	  backup_filename = create_backup_filename (file->priv->filename);
+	  
+	  if (g_cancellable_is_cancelled (cancellable))
+	    {
+	      g_set_error (error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      goto err_out;
+	    }
 	  
 	  /* create original -> backup link, the original is then renamed over */
 	  if (link (file->priv->filename, backup_filename) != 0)
@@ -544,6 +572,16 @@ g_file_output_stream_local_close (GOutputStream *stream,
 	    }
 	}
       
+
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  goto err_out;
+	}
+
       /* tmp -> original */
       if (rename (file->priv->tmp_filename, file->priv->filename) != 0)
 	{
@@ -555,11 +593,20 @@ g_file_output_stream_local_close (GOutputStream *stream,
 	}
     }
   
-  if (g_file_output_stream_get_should_get_final_mtime (G_FILE_OUTPUT_STREAM (stream)) &&
-      fstat (file->priv->fd, &final_stat) == 0)
+  if (g_file_output_stream_get_should_get_final_mtime (G_FILE_OUTPUT_STREAM (stream)))
     {
-      g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
-					    final_stat.st_mtime);
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  goto err_out;
+	}
+      
+      if (fstat (file->priv->fd, &final_stat) == 0)
+	g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
+					      final_stat.st_mtime);
     }
 
   while (1)
@@ -567,18 +614,6 @@ g_file_output_stream_local_close (GOutputStream *stream,
       res = close (file->priv->fd);
       if (res == -1)
 	{
-	  if (g_output_stream_is_cancelled (stream))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
 	  g_set_error (error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
 		       _("Error closing file: %s"),
@@ -586,7 +621,7 @@ g_file_output_stream_local_close (GOutputStream *stream,
 	}
       break;
     }
-
+  
   return res != -1;
 
  err_out:
@@ -606,12 +641,20 @@ g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
 
   file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
 
-  if (!g_file_output_stream_local_open (file, error))
+  if (!g_file_output_stream_local_open (file, cancellable, error))
     return NULL;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   return g_file_info_local_get_from_fd (file->priv->fd,
 					requested,
 					attributes,
 					error);
-
 }

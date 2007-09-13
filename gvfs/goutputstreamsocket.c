@@ -226,31 +226,21 @@ g_output_stream_socket_write (GOutputStream *stream,
 		       g_strerror (errno));
 	  return -1;
 	}
+    }
       
-      if (poll_fds[1].revents)
+  while (1)
+    {
+      if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
 		       G_VFS_ERROR,
 		       G_VFS_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
-	  return -1;
+	  break;
 	}
-    }
-      
-  while (1)
-    {
       res = write (socket_stream->priv->fd, buffer, count);
       if (res == -1)
 	{
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -285,18 +275,6 @@ g_output_stream_socket_close (GOutputStream *stream,
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
 	  g_set_error (error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
 		       _("Error closing socket: %s"),
@@ -452,16 +430,6 @@ close_async_cb (CloseAsyncData *data)
 
   socket_stream = G_OUTPUT_STREAM_SOCKET (data->stream);
 
-  if (g_output_stream_is_cancelled (data->stream))
-    {
-      g_set_error (&error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      result = FALSE;
-      goto out;
-    }
-
   if (!socket_stream->priv->close_fd_at_close)
     {
       result = TRUE;
@@ -473,19 +441,6 @@ close_async_cb (CloseAsyncData *data)
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  if (g_output_stream_is_cancelled (data->stream))
-	    {
-	      g_set_error (&error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      
-	      break;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
 	  g_set_error (&error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
 		       _("Error closing socket: %s"),
