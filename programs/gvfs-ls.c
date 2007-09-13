@@ -74,7 +74,7 @@ list (GFile *file)
   if (file == NULL)
     return;
   
-  request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME | G_FILE_INFO_SIZE;
+  request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME | G_FILE_INFO_SIZE | G_FILE_INFO_IS_HIDDEN;
 
   enumerator = g_file_enumerate_children (file, request, attributes, TRUE);
 
