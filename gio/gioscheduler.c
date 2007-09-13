@@ -8,9 +8,11 @@ struct _GIOJob {
   GIODataFunc cancel_func; /* Runs under job map lock */
   gpointer data;
   GDestroyNotify destroy_notify;
-  
+
   gint io_priority;
   GCancellable *cancellable;
+
+  guint idle_tag;
 };
 
 G_LOCK_DEFINE_STATIC(active_jobs);
@@ -20,6 +22,14 @@ static GThreadPool *job_thread_pool = NULL;
 
 static void io_job_thread (gpointer       data,
 			   gpointer       user_data);
+
+static void
+g_io_job_free (GIOJob *job)
+{
+  if (job->cancellable)
+    g_object_unref (job->cancellable);
+  g_free (job);
+}
 
 static gint
 g_io_job_compare (gconstpointer  a,
@@ -59,23 +69,12 @@ init_scheduler (gpointer arg)
 }
 
 static void
-io_job_thread (gpointer       data,
-	       gpointer       user_data)
+remove_active_job (GIOJob *job)
 {
-  GIOJob *job = data;
   GIOJob *other_job;
   GSList *l;
   gboolean resort_jobs;
-
-  if (job->cancellable)
-    g_push_current_cancellable (job->cancellable);
-  job->job_func (job, job->cancellable, job->data);
-  if (job->cancellable)
-    g_pop_current_cancellable (job->cancellable);
-
-  if (job->destroy_notify)
-    job->destroy_notify (job->data);
-
+  
   G_LOCK (active_jobs);
   active_jobs = g_slist_delete_link (active_jobs, job->active_link);
   
@@ -91,15 +90,55 @@ io_job_thread (gpointer       data,
 	}
     }
   G_UNLOCK (active_jobs);
-
-  if (job->cancellable)
-    g_object_unref (job->cancellable);
-  g_free (job);
-
-  if (resort_jobs)
+  
+  if (resort_jobs &&
+      job_thread_pool != NULL)
     g_thread_pool_set_sort_function (job_thread_pool,
 				     g_io_job_compare,
 				     NULL);
+
+}
+
+static void
+io_job_thread (gpointer       data,
+	       gpointer       user_data)
+{
+  GIOJob *job = data;
+
+  if (job->cancellable)
+    g_push_current_cancellable (job->cancellable);
+  job->job_func (job, job->cancellable, job->data);
+  if (job->cancellable)
+    g_pop_current_cancellable (job->cancellable);
+
+  if (job->destroy_notify)
+    job->destroy_notify (job->data);
+
+  remove_active_job (job);
+  g_io_job_free (job);
+
+}
+
+static gboolean
+run_job_at_idle (gpointer data)
+{
+  GIOJob *job = data;
+
+  if (job->cancellable)
+    g_push_current_cancellable (job->cancellable);
+  
+  job->job_func (job, job->cancellable, job->data);
+  
+  if (job->cancellable)
+    g_pop_current_cancellable (job->cancellable);
+
+  if (job->destroy_notify)
+    job->destroy_notify (job->data);
+
+  remove_active_job (job);
+  g_io_job_free (job);
+
+  return FALSE;
 }
 
 void
@@ -126,8 +165,20 @@ g_schedule_io_job (GIOJobFunc     job_func,
   job->active_link = active_jobs;
   G_UNLOCK (active_jobs);
 
-  g_once (&once_init, init_scheduler, NULL);
-  g_thread_pool_push (job_thread_pool, job, NULL);
+  if (g_thread_supported())
+    {
+      g_once (&once_init, init_scheduler, NULL);
+      g_thread_pool_push (job_thread_pool, job, NULL);
+    }
+  else
+    {
+      /* Threads not availible, instead do the i/o sync inside a
+       * low prio idle handler
+       */
+      job->idle_tag = g_idle_add_full (G_PRIORITY_DEFAULT_IDLE + 1 + io_priority / 10,
+				       run_job_at_idle,
+				       job, NULL);
+    }
 }
 
 
@@ -219,10 +270,20 @@ g_io_job_send_to_mainloop (GIOJob        *job,
   MainLoopProxy *proxy;
   guint id;
 
+  if (job->idle_tag)
+    {
+      /* We just immediately re-enter in the case of idles (non-threads)
+       * Anything else would just deadlock. If you can't handle this, enable threads.
+       */
+      func (user_data); 
+      return;
+    }
+  
   proxy = g_new0 (MainLoopProxy, 1);
   proxy->func = func;
   proxy->data = user_data;
   proxy->notify = notify;
+  
   if (block)
     {
       proxy->ack_lock = g_mutex_new ();
@@ -240,11 +301,12 @@ g_io_job_send_to_mainloop (GIOJob        *job,
   id = g_source_attach (source, NULL);
   g_source_unref (source);
 
-  if (block) {
-	g_cond_wait (proxy->ack_condition, proxy->ack_lock);
-	g_mutex_unlock (proxy->ack_lock);
-
-	/* destroy notify didn't free proxy */
-	mainloop_proxy_free (proxy);
-  }
+  if (block)
+    {
+      g_cond_wait (proxy->ack_condition, proxy->ack_lock);
+      g_mutex_unlock (proxy->ack_lock);
+      
+      /* destroy notify didn't free proxy */
+      mainloop_proxy_free (proxy);
+    }
 }
