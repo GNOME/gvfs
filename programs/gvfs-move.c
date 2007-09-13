@@ -9,11 +9,15 @@
 #include <glib.h>
 #include <gio/gfile.h>
 
+static gboolean progress = FALSE;
 static gboolean interactive = FALSE;
 static gboolean backup = FALSE;
+static gboolean no_target_directory = FALSE;
 
 static GOptionEntry entries[] = 
 {
+	{ "no-target-directory", 'T', 0, G_OPTION_ARG_NONE, &no_target_directory, "no target directory", NULL },
+	{ "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, "show progress", NULL },
 	{ "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, "prompt before overwrite", NULL },
 	{ "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, "backup existing destination files", NULL },
 	{ NULL }
@@ -31,6 +35,16 @@ is_dir (GFile *file)
     g_object_unref (info);
   return res;
 }
+
+static void
+show_progress (goffset current_num_bytes,
+	       goffset total_num_bytes,
+	       gpointer user_data)
+{
+  g_print ("progress %"G_GUINT64_FORMAT"/%"G_GUINT64_FORMAT"\n",
+	   current_num_bytes, total_num_bytes);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -60,6 +74,13 @@ main (int argc, char *argv[])
 
   dest = g_file_get_for_commandline_arg (argv[argc-1]);
 
+  if (no_target_directory && argc > 3)
+    {
+      g_printerr ("Too many arguments\n");
+      g_object_unref (dest);
+      return 1;
+    }
+  
   dest_is_dir = is_dir (dest);
 
   if (!dest_is_dir && argc > 3)
@@ -73,7 +94,7 @@ main (int argc, char *argv[])
     {
       source = g_file_get_for_commandline_arg (argv[i]);
 
-      if (dest_is_dir)
+      if (dest_is_dir && !no_target_directory)
 	{
 	  basename = g_file_get_basename (source);
 	  target = g_file_get_child (dest, basename);
@@ -89,7 +110,7 @@ main (int argc, char *argv[])
 	flags |= G_FILE_COPY_OVERWRITE;
 	
       error = NULL;
-      if (!g_file_move (source, target, flags, NULL, NULL, NULL, &error))
+      if (!g_file_move (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
 	{
 	  if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
 	    {
