@@ -16,6 +16,7 @@
 #include "gunixfileinputstream.h"
 #include "gvfsunixdbus.h"
 #include "gfileinfosimple.h"
+#include "gsocketoutputstream.h"
 #include <daemon/gvfsdaemonprotocol.h>
 
 G_DEFINE_TYPE (GUnixFileInputStream, g_unix_file_input_stream, G_TYPE_FILE_INPUT_STREAM);
@@ -23,6 +24,7 @@ G_DEFINE_TYPE (GUnixFileInputStream, g_unix_file_input_stream, G_TYPE_FILE_INPUT
 struct _GUnixFileInputStreamPrivate {
   char *filename;
   char *mountpoint;
+  GOutputStream *command_stream;
   int fd;
   int seek_generation;
 
@@ -50,6 +52,9 @@ g_unix_file_input_stream_finalize (GObject *object)
   GUnixFileInputStream *file;
   
   file = G_UNIX_FILE_INPUT_STREAM (object);
+
+  if (file->priv->command_stream)
+    g_object_unref (file->priv->command_stream);
   
   g_free (file->priv->filename);
   g_free (file->priv->mountpoint);
@@ -185,6 +190,9 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   /* TODO: verify fd id */
   file->priv->fd = receive_fd (extra_fd);
   g_print ("new fd: %d\n", file->priv->fd);
+
+  file->priv->command_stream = g_socket_output_stream_new (file->priv->fd, FALSE);
+    
   return TRUE;
 }
 
@@ -193,7 +201,6 @@ write_command (GUnixFileInputStream *file,
 	       char *buffer, gsize len,
 	       GError **error)
 {
-  GInputStream *stream = G_INPUT_STREAM (file);
   char *write_buffer;
   gsize bytes_to_write;
   gssize bytes_written;
@@ -202,28 +209,13 @@ write_command (GUnixFileInputStream *file,
   write_buffer = buffer;
   do
     {
-      bytes_written = write (file->priv->fd, write_buffer, bytes_to_write);
-
+      bytes_written = g_output_stream_write (file->priv->command_stream,
+					     write_buffer, bytes_to_write,
+					     error);
+      /* TODO: We sent a partial command, what do we do here.
+	 Especially if the error is a cancel... */
       if (bytes_written == -1)
-	{
-	  if (g_input_stream_is_cancelled (stream))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-
-	  if (errno == EINTR)
-	    continue;
-     
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
-		       _("Error writing command to stream: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
+	return FALSE;
 	  
       bytes_to_write -= bytes_written;
       write_buffer += bytes_written;
