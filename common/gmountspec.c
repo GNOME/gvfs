@@ -82,10 +82,11 @@ g_mount_spec_from_dbus (DBusMessageIter *iter)
     return NULL;
 
   dbus_message_iter_recurse (iter, &spec_iter);
-  
-  if (_g_dbus_message_iter_get_args (&spec_iter, NULL,
-				     G_DBUS_TYPE_CSTRING, &mount_prefix,
-				     0))
+
+  mount_prefix = NULL;
+  if (!_g_dbus_message_iter_get_args (&spec_iter, NULL,
+				      G_DBUS_TYPE_CSTRING, &mount_prefix,
+				      0))
     return NULL;
 
   spec = g_mount_spec_new ();
@@ -97,8 +98,8 @@ g_mount_spec_from_dbus (DBusMessageIter *iter)
       g_mount_spec_free (spec);
       return NULL;
     }
-  
-  dbus_message_iter_recurse (iter, &array_iter);
+
+  dbus_message_iter_recurse (&spec_iter, &array_iter);
   while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
     {
       dbus_message_iter_recurse (&array_iter, &struct_iter);
@@ -127,12 +128,7 @@ g_mount_spec_to_dbus (DBusMessageIter *iter,
 
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_STRUCT,
-					 DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
-					 DBUS_TYPE_ARRAY_AS_STRING 
- 					   DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-					     DBUS_TYPE_STRING_AS_STRING
-					     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
- 					   DBUS_STRUCT_END_CHAR_AS_STRING,
+					 G_MOUNT_SPEC_INNER_TYPE_AS_STRING,
 					 &spec_iter))
     _g_dbus_oom ();
 
@@ -140,13 +136,9 @@ g_mount_spec_to_dbus (DBusMessageIter *iter,
 
   if (!dbus_message_iter_open_container (&spec_iter,
 					 DBUS_TYPE_ARRAY,
-					   DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-					     DBUS_TYPE_STRING_AS_STRING
-					     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
- 					   DBUS_STRUCT_END_CHAR_AS_STRING,
+ 					 G_MOUNT_SPEC_ITEM_TYPE_AS_STRING,
 					 &array_iter))
     _g_dbus_oom ();
-
 
   for (i = 0; i < spec->items->len; i++)
     {
@@ -154,8 +146,7 @@ g_mount_spec_to_dbus (DBusMessageIter *iter,
 
       if (!dbus_message_iter_open_container (&array_iter,
 					     DBUS_TYPE_STRUCT,
-					     DBUS_TYPE_STRING_AS_STRING
-					     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING,
+					     G_MOUNT_SPEC_ITEM_INNER_TYPE_AS_STRING,
 					     &item_iter))
 	_g_dbus_oom ();
 
@@ -177,4 +168,56 @@ g_mount_spec_to_dbus (DBusMessageIter *iter,
   if (!dbus_message_iter_close_container (iter, &spec_iter))
     _g_dbus_oom ();
     
+}
+
+static gboolean
+items_equal (GArray *a,
+	     GArray *b)
+{
+  int i;
+  
+  if (a->len != b->len)
+    return FALSE;
+
+  for (i = 0; i < a->len; i++)
+    {
+      GMountSpecItem *item_a = &g_array_index (a, GMountSpecItem, i);
+      GMountSpecItem *item_b = &g_array_index (b, GMountSpecItem, i);
+      
+      if (strcmp (item_a->key, item_b->key) != 0)
+	return FALSE;
+      if (strcmp (item_a->value, item_b->value) != 0)
+	return FALSE;
+    }
+  
+  return TRUE;
+}
+
+static gboolean
+path_has_prefix (const char *path,
+		 const char *prefix)
+{
+  int prefix_len;
+  
+  if (prefix == NULL)
+    return TRUE;
+
+  prefix_len = strlen (prefix);
+  
+  if (strncmp (path, prefix, prefix_len) == 0 &&
+      (path[prefix_len] == 0 ||
+       path[prefix_len] == '/'))
+    return TRUE;
+  
+  return FALSE;
+}
+
+gboolean
+g_mount_spec_match (GMountSpec      *mount,
+		    GMountSpec      *path)
+{
+  if (items_equal (mount->items, path->items) &&
+      path_has_prefix (path->mount_prefix, mount->mount_prefix))
+    return TRUE;
+  return FALSE;
 }
