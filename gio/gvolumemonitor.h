@@ -7,11 +7,12 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_VOLUME_MONITOR        (g_volume_monitor_get_type ())
-#define G_VOLUME_MONITOR(o)          (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VOLUME_MONITOR, GVolumeMonitor))
-#define G_VOLUME_MONITOR_CLASS(k)    (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VOLUME_MONITOR, GVolumeMonitorClass))
-#define G_IS_VOLUME_MONITOR(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VOLUME_MONITOR))
-#define G_IS_VOLUME_MONITOR_CLASS(k) (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VOLUME_MONITOR))
+#define G_TYPE_VOLUME_MONITOR         (g_volume_monitor_get_type ())
+#define G_VOLUME_MONITOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VOLUME_MONITOR, GVolumeMonitor))
+#define G_VOLUME_MONITOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VOLUME_MONITOR, GVolumeMonitorClass))
+#define G_VOLUME_MONITOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VOLUME_MONITOR, GVolumeMonitorClass))
+#define G_IS_VOLUME_MONITOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VOLUME_MONITOR))
+#define G_IS_VOLUME_MONITOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VOLUME_MONITOR))
 
 typedef struct _GVolumeMonitor GVolumeMonitor;
 typedef struct _GVolumeMonitorClass GVolumeMonitorClass;
@@ -37,6 +38,11 @@ struct _GVolumeMonitorClass {
 				 GDrive	        *drive);
   void (* drive_disconnected)	(GVolumeMonitor *volume_monitor,
 				 GDrive         *drive);
+
+  /* Vtable */
+
+  GList * (*get_mounted_volumes)  (GVolumeMonitor *volume_monitor);
+  GList * (*get_connected_drives) (GVolumeMonitor *volume_monitor);
 };
 
 GType g_volume_monitor_get_type (void) G_GNUC_CONST;

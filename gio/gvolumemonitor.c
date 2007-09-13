@@ -82,3 +82,23 @@ g_volume_monitor_init (GVolumeMonitor *monitor)
 }
 
 
+GList *
+g_volume_monitor_get_mounted_volumes  (GVolumeMonitor *volume_monitor)
+{
+  GVolumeMonitorClass *class;
+
+  class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
+
+  return class->get_mounted_volumes (volume_monitor);
+}
+
+GList *
+g_volume_monitor_get_connected_drives (GVolumeMonitor *volume_monitor)
+{
+  GVolumeMonitorClass *class;
+
+  class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
+
+  return class->get_connected_drives (volume_monitor);
+}
+
