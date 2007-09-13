@@ -19,15 +19,18 @@ Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion,
 
 Make backend pluggable
 
-local file access through the daemon for remote X clients?
-
-Sometimes we handle the dbus socket before the extra_fd one, need synchronization
-
 figure out the right semantics for error or cancel of close()
 
 Expose the seek operations on GInputStream also, not only via iface
 
 Handle closing of stream protocol fd, on both sides.
 
-Better, shorter class names...
+implement Async i/o for GFileInputStreamDaemon
+
+implement get_file_info for GFileInputStreamDaemon
+
+FUTURE IDEAS:
+-------------
+
+local file access through the daemon for remote X clients?
 
