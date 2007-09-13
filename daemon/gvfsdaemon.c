@@ -187,20 +187,6 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
       return NULL;
     }
 
-  dbus_bus_add_match (conn,
-		      "sender='org.freedesktop.DBus',"
-		      "interface='org.freedesktop.DBus',"
-		      "member='NameLost'",
-		      &error);
-  if (dbus_error_is_set (&error))
-    {
-      g_printerr ("Failed to connect to add dbus match: %s\n",
-		  error.message);
-      dbus_error_free (&error);
-      return NULL;
-    }
-
-
   dbus_connection_setup_with_g_main (conn, NULL);
   
   daemon = g_object_new (G_TYPE_VFS_DAEMON, NULL);
