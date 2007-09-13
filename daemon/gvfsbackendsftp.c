@@ -105,7 +105,8 @@ struct _GVfsBackendSftp
 static void parse_attributes (GVfsBackendSftp *backend,
                               GFileInfo *info,
                               const char *basename,
-                              GDataInputStream *reply);
+                              GDataInputStream *reply,
+                              GFileAttributeMatcher *attribute_matcher);
 
 
 G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
@@ -934,7 +935,7 @@ get_uid_sync (GVfsBackendSftp *backend)
   if (type == SSH_FXP_ATTRS)
     {
       info = g_file_info_new ();
-      parse_attributes (backend, info, NULL, reply);
+      parse_attributes (backend, info, NULL, reply, NULL);
       if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID))
         {
           /* Both are always set if set */
@@ -1201,7 +1202,8 @@ static void
 parse_attributes (GVfsBackendSftp *backend,
                   GFileInfo *info,
                   const char *basename,
-                  GDataInputStream *reply)
+                  GDataInputStream *reply,
+                  GFileAttributeMatcher *attribute_matcher)
 {
   guint32 flags;
   GFileType type;
@@ -1331,6 +1333,35 @@ parse_attributes (GVfsBackendSftp *backend,
       g_print ("extended count: %d\n", v);
       /* TODO: Handle more */
     }
+
+  /* We use the same setting as for local files. Can't really
+   * do better, since there is no way in this version of sftp to find out
+   * the remote charset encoding
+   */
+  if (basename != NULL &&
+      g_file_attribute_matcher_matches (attribute_matcher,
+                                        G_FILE_ATTRIBUTE_STD_DISPLAY_NAME))
+    {
+      char *display_name = g_filename_display_name (basename);
+      
+      if (strstr (display_name, "\357\277\275") != NULL)
+        {
+          char *p = display_name;
+          display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
+          g_free (p);
+        }
+      g_file_info_set_display_name (info, display_name);
+      g_free (display_name);
+    }
+  
+  if (basename != NULL &&
+      g_file_attribute_matcher_matches (attribute_matcher,
+                                        G_FILE_ATTRIBUTE_STD_EDIT_NAME))
+    {
+      char *edit_name = g_filename_display_name (basename);
+      g_file_info_set_edit_name (info, edit_name);
+      g_free (edit_name);
+    }
 }
 
 typedef struct {
@@ -1368,7 +1399,7 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
       g_file_info_set_name (info, name);
       g_file_info_set_is_symlink (info, TRUE);
       
-      parse_attributes (backend, info, name, reply);
+      parse_attributes (backend, info, name, reply, G_VFS_JOB_ENUMERATE (job)->attribute_matcher);
 
       g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), info);
       
@@ -1432,7 +1463,7 @@ read_dir_reply (GVfsBackendSftp *backend,
       longname = read_string (reply, NULL);
       g_free (longname);
       
-      parse_attributes (backend, info, name, reply);
+      parse_attributes (backend, info, name, reply, enum_job->attribute_matcher);
       
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
           ! (enum_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
@@ -1567,7 +1598,7 @@ get_info_reply (GVfsBackendSftp *backend,
 
   basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
   
-  parse_attributes (backend, info, basename, reply);
+  parse_attributes (backend, info, basename, reply, G_VFS_JOB_ENUMERATE (job)->attribute_matcher);
   g_free (basename);
 
   finished_count = GPOINTER_TO_INT (job->backend_data);
