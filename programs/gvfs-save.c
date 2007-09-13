@@ -8,13 +8,24 @@
 #include <glib.h>
 #include <gio/gfile.h>
 
+static char *etag = NULL;
+static gboolean backup = FALSE;
+static gboolean create = FALSE;
+static gboolean append = FALSE;
+static gboolean print_etag = FALSE;
+
 static GOptionEntry entries[] = 
 {
+	{ "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, "Create backup", NULL },
+	{ "create", 'c', 0, G_OPTION_ARG_NONE, &create, "Only create if not existing", NULL },
+	{ "append", 'a', 0, G_OPTION_ARG_NONE, &append, "Append to end of file", NULL },
+	{ "print_etag", 'p', 0, G_OPTION_ARG_NONE, &print_etag, "Print new etag at end", NULL },
+	{ "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, "The etag of the file being overwritten", NULL },
 	{ NULL }
 };
 
 static void
-create (GFile *file)
+save (GFile *file)
 {
   GOutputStream *out;
   char buffer[1025];
@@ -24,7 +35,12 @@ create (GFile *file)
   GError *error;
   
   error = NULL;
-  out = (GOutputStream *)g_file_create (file, NULL, &error);
+  if (create)
+    out = (GOutputStream *)g_file_create (file, NULL, &error);
+  else if (append)
+    out = (GOutputStream *)g_file_append_to  (file, NULL, &error);
+  else
+    out = (GOutputStream *)g_file_replace  (file, etag, backup, NULL, &error);
   if (out == NULL)
     {
       g_printerr ("Error opening file: %s\n", error->message);
@@ -71,6 +87,24 @@ create (GFile *file)
       g_printerr ("Error closing: %s\n", error->message);
       g_error_free (error);
     }
+
+  if (close_res && print_etag)
+    {
+      char *etag;
+      etag = g_file_output_stream_get_etag (G_FILE_OUTPUT_STREAM (out), NULL, &error);
+
+      if (etag)
+	g_print ("Etag: %s\n", etag);
+      else
+	{
+	  g_printerr ("Error getting etag: %s\n", error->message);
+	  g_error_free (error);
+	}
+	
+      g_free (etag);
+    }
+  
+  g_object_unref (out);
 }
 
 int
@@ -92,7 +126,7 @@ main (int argc, char *argv[])
   if (argc > 1)
     {
       file = g_file_get_for_commandline_arg (argv[1]);
-      create (file);
+      save (file);
       g_object_unref (file);
     }
 

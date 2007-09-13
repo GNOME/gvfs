@@ -13,7 +13,7 @@ libraries =						\
 bin_PROGRAMS =					\
 	gvfs-mount				\
 	gvfs-cat				\
-	gvfs-create				\
+	gvfs-save				\
 	gvfs-ls					\
 	gvfs-info				\
 	gvfs-trash				\
@@ -30,8 +30,8 @@ gvfs_cat_LDADD = $(libraries)
 gvfs_copy_SOURCES = gvfs-copy.c
 gvfs_copy_LDADD = $(libraries)
 
-gvfs_create_SOURCES = gvfs-create.c
-gvfs_create_LDADD = $(libraries)
+gvfs_save_SOURCES = gvfs-save.c
+gvfs_save_LDADD = $(libraries)
 
 gvfs_info_SOURCES = gvfs-info.c
 gvfs_info_LDADD = $(libraries)
