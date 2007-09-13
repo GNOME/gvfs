@@ -1,5 +1,3 @@
-Catch EINTR in all syscalls
-
 Implement the rest of g_file_info_simple_get:
 * can_rename & can_delete
 * mime type
@@ -19,9 +17,9 @@ Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion,
 
 Make backend pluggable
 
-figure out the right semantics for error or cancel of close()
-
 Expose the seek operations on GInputStream also, not only via iface
+
+implement readahead in GVFSReadStream, time difference
 
 implement Async i/o for GFileInputStreamDaemon
 
@@ -31,8 +29,6 @@ Is handling open inside the file stream really right?
 e.g. It forces you to open the stream (sync!) to figure out can_seek in the daemon case
 
 implement daemon write stream, maybe break out common parts of gvfsreadstream to gvfsjobstream
-
-Close daemon backend open handle when readstream is closed.
 
 FUTURE IDEAS:
 -------------
