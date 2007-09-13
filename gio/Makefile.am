@@ -56,6 +56,9 @@ socket_sources = \
 	$(NULL)
 endif
 
+if OS_WIN32
+appinfo_sources += gwin32appinfo.c gwin32appinfo.h
+endif
 
 libgio_la_SOURCES = 	\
 	gappinfo.c \
