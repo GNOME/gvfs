@@ -21,3 +21,6 @@ add get_file_info_async for FileStreams
 
 test outputstream (especially replace + backup) (and test everything else too)
 
+support extended attributes for local files
+
+
