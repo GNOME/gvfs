@@ -331,7 +331,6 @@ void
 g_file_info_remove_attribute (GFileInfo  *info,
 			      const char *attribute)
 {
-
   guint32 attr_id;
   GFileAttribute *attrs;
   int i;
