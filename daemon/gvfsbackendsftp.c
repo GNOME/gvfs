@@ -1207,7 +1207,7 @@ parse_attributes (GVfsBackendSftp *backend,
   GFileType type;
   guint32 uid, gid;
   guint32 mode;
-  gboolean has_uid;
+  gboolean has_uid, free_mimetype;
   char *mimetype;
   
   flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
@@ -1277,16 +1277,23 @@ parse_attributes (GVfsBackendSftp *backend,
           mimetype = "inode/symlink";
         }
 
-      if (mimetype)
-        g_file_info_set_content_type (info, mimetype);
-      else if (basename)
+      free_mimetype = FALSE;
+      if (mimetype == NULL)
         {
-          mimetype = g_content_type_guess (basename, NULL, 0, NULL);
-          g_file_info_set_content_type (info, mimetype);
-          g_free (mimetype);
+          if (basename)
+            {
+              mimetype = g_content_type_guess (basename, NULL, 0, NULL);
+              free_mimetype = TRUE;
+            }
+          else
+            mimetype = "application/octet-stream";
         }
-      else
-        g_file_info_set_content_type (info, "application/octet-stream");
+      
+      g_file_info_set_content_type (info, mimetype);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STD_FAST_CONTENT_TYPE, mimetype);
+      
+      if (free_mimetype)
+        g_free (mimetype);
       
       if (has_uid && backend->my_uid != (guint32)-1)
         {
