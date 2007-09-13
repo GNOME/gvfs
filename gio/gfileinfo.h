@@ -82,6 +82,15 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE "mountable:unix_device"
 #define G_FILE_ATTRIBUTE_MOUNTABLE_HAL_UDI "mountable:hal_udi"
 
+/* Time attributes (sans mtime)*/
+
+#define G_FILE_ATTRIBUTE_TIME_ACCESS "time:access"
+#define G_FILE_ATTRIBUTE_TIME_ACCESS_USEC "time:access_usec"
+#define G_FILE_ATTRIBUTE_TIME_CHANGED "time:changed"
+#define G_FILE_ATTRIBUTE_TIME_CHANGED_USEC "time:changed_usec"
+#define G_FILE_ATTRIBUTE_TIME_CREATED "time:created"
+#define G_FILE_ATTRIBUTE_TIME_CREATED_USEC "time:created_usec"
+
 /* Unix specific attributes */
 
 #define G_FILE_ATTRIBUTE_UNIX_DEVICE "unix:device"
@@ -93,10 +102,11 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_UNIX_RDEV "unix:rdev"
 #define G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE "unix:block_size"
 #define G_FILE_ATTRIBUTE_UNIX_BLOCKS "unix:blocks"
-#define G_FILE_ATTRIBUTE_UNIX_ATIME "unix:atime"
-#define G_FILE_ATTRIBUTE_UNIX_ATIME_USEC "unix:atime_usec"
-#define G_FILE_ATTRIBUTE_UNIX_CTIME "unix:ctime"
-#define G_FILE_ATTRIBUTE_UNIX_CTIME_USEC "unix:ctime_usec"
+
+/* DOS specific attributes */
+
+#define G_FILE_ATTRIBUTE_DOS_ARCHIVE "dos:archive"
+#define G_FILE_ATTRIBUTE_DOS_SYSTEM "dos:system"
 
 /* Owner attributes */
 

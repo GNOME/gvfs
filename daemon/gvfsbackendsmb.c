@@ -1120,17 +1120,18 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_RDEV, statbuf->st_rdev);
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE, statbuf->st_blksize);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_ATIME, statbuf->st_atime);
+  
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atimensec / 1000);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atimensec / 1000);
 #elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atim.tv_nsec / 1000);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atim.tv_nsec / 1000);
 #endif
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_CTIME, statbuf->st_ctime);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CHANGED, statbuf->st_ctime);
 #if defined (HAVE_STRUCT_STAT_ST_CTIMENSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_CTIME_USEC, statbuf->st_ctimensec / 1000);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctimensec / 1000);
 #elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_CTIME_USEC, statbuf->st_ctim.tv_nsec / 1000);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctim.tv_nsec / 1000);
 #endif
 }
 
@@ -1146,7 +1147,7 @@ do_get_info (GVfsBackend *backend,
   char *uri;
   int res;
   GFileInfo *info;
-  
+
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
   g_free (uri);
@@ -1157,6 +1158,7 @@ do_get_info (GVfsBackend *backend,
       set_info_from_stat (info, &st);
       
       g_vfs_job_get_info_set_info (job, info);
+
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
     }
