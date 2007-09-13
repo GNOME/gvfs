@@ -661,6 +661,77 @@ g_daemon_file_get_info (GFile                *file,
   return info;
 }
 
+static void
+get_info_async_cb (DBusMessage *reply,
+		   DBusConnection *connection,
+		   GSimpleAsyncResult *result,
+		   GCancellable *cancellable,
+		   gpointer callback_data)
+{
+  DBusMessageIter iter;
+  GFileInfo *info;
+  GError *error;
+
+  info = NULL;
+  
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+    {
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       _("Invalid return value from get_info"));
+      g_simple_async_result_complete (result);
+      return;
+    }
+
+  error = NULL;
+  info = _g_dbus_get_file_info (&iter, &error);
+  if (info == NULL)
+    {
+      g_simple_async_result_set_from_error (result, error);
+      g_error_free (error);
+      g_simple_async_result_complete (result);
+      return;
+    }
+
+  g_simple_async_result_set_op_res_gpointer (result, info, g_object_unref);
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_get_info_async (GFile                      *file,
+			      const char                 *attributes,
+			      GFileGetInfoFlags           flags,
+			      int                         io_priority,
+			      GCancellable               *cancellable,
+			      GAsyncReadyCallback         callback,
+			      gpointer                    user_data)
+{
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_GET_INFO,
+		      cancellable,
+		      callback, user_data,
+		      get_info_async_cb, NULL, NULL,
+		      DBUS_TYPE_STRING, &attributes,
+		      DBUS_TYPE_UINT32, &flags,
+		      0);
+}
+
+static GFileInfo *
+g_daemon_file_get_info_finish (GFile                      *file,
+			       GAsyncResult               *res,
+			       GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GFileInfo *info;
+
+  info = g_simple_async_result_get_op_res_gpointer (simple);
+  if (info)
+    return g_object_ref (info);
+  
+  return NULL;
+}
+
 typedef struct {
   GSimpleAsyncResult *result;
   gboolean can_seek;
@@ -1611,6 +1682,8 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_child_for_display_name = g_daemon_file_get_child_for_display_name;
   iface->enumerate_children = g_daemon_file_enumerate_children;
   iface->get_info = g_daemon_file_get_info;
+  iface->get_info_async = g_daemon_file_get_info_async;
+  iface->get_info_finish = g_daemon_file_get_info_finish;
   iface->read = g_daemon_file_read;
   iface->append_to = g_daemon_file_append_to;
   iface->create = g_daemon_file_create;
