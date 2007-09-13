@@ -4,7 +4,6 @@
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
 #include "gdaemonfile.h"
-#include "glocaldaemonfile.h"
 #include <gio/glocalvfs.h>
 #include <gvfsdaemonprotocol.h>
 #include "gvfsdaemondbus.h"
@@ -199,23 +198,19 @@ g_daemon_vfs_new (void)
 
 static GFile *
 g_daemon_vfs_get_file_for_path (GVfs       *vfs,
-				     const char *path)
+				const char *path)
 {
-  GFile *file;
-
   /* TODO: detect fuse paths and convert to daemon vfs GFiles */
   
-  file = g_vfs_get_file_for_path (G_DAEMON_VFS (vfs)->wrapped_vfs, path);
-  
-  return g_local_daemon_file_new (file);
+  return g_vfs_get_file_for_path (G_DAEMON_VFS (vfs)->wrapped_vfs, path);
 }
 
 static GFile *
 g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
-				    const char *uri)
+			       const char *uri)
 {
   GDaemonVfs *daemon_vfs;
-  GFile *file, *wrapped;
+  GFile *file;
   GDecodedUri *decoded;
   GMountSpec *spec;
   char *path;
@@ -227,10 +222,7 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
     return NULL;
 
   if (strcmp (decoded->scheme, "file") == 0)
-    {
-      wrapped = g_daemon_vfs_get_file_for_path  (vfs, decoded->path);
-      file = g_local_daemon_file_new (wrapped);
-    }
+    file = g_daemon_vfs_get_file_for_path (vfs, decoded->path);
   else
     {
       get_mountspec_from_uri (decoded, &spec, &path);

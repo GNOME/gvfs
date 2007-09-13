@@ -15,7 +15,6 @@ libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = 	\
 	gdaemonvfs.c gdaemonvfs.h \
 	gdaemonfile.c gdaemonfile.h \
-	glocaldaemonfile.c glocaldaemonfile.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gdaemonfileinputstream.c gdaemonfileinputstream.h \
 	gdaemonfileoutputstream.c gdaemonfileoutputstream.h \
