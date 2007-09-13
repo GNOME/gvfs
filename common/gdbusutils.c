@@ -1166,6 +1166,8 @@ _g_dbus_message_iter_copy (DBusMessageIter *dest,
 typedef struct {
   GAsyncDBusCallback callback;
   gpointer user_data;
+  GError *io_error;
+  
   
   /* protected by async_call lock: */
   gboolean ran;  /* the pending_call reply handler ran */
@@ -1224,6 +1226,19 @@ idle_async_callback (void *_data)
   return FALSE;
 }
 
+static gboolean
+async_call_error_at_idle (gpointer _data)
+{
+  AsyncDBusCallData *data = _data;
+
+  data->callback (NULL, data->io_error, data->user_data);
+
+  g_error_free (data->io_error);
+  g_free (data);
+  
+  return FALSE;
+}
+
 void
 _g_dbus_connection_call_async (DBusConnection *connection,
 			       DBusMessage *message,
@@ -1235,17 +1250,19 @@ _g_dbus_connection_call_async (DBusConnection *connection,
   DBusPendingCall *pending_call;
   DBusError derror;
 
+  data = g_new0 (AsyncDBusCallData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+  
   if (connection == NULL)
     {
       dbus_error_init (&derror);
       connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
       if (connection == NULL)
 	{
-	  GError *error = NULL;
-	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
+	  g_set_error (&data->io_error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
 		       "Can't open dbus connection");
-	  callback (NULL, error, user_data);
-	  g_error_free (error);
+	  g_idle_add (async_call_error_at_idle, data);
 	  return;
 	}
     }
@@ -1255,19 +1272,13 @@ _g_dbus_connection_call_async (DBusConnection *connection,
   
   if (pending_call == NULL)
     {
-      GError *error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&data->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   "Connection is closed");
-      callback (NULL, error, user_data);
-      g_error_free (error);
+      g_idle_add (async_call_error_at_idle, data);
       return;
     }
 
-  data = g_new0 (AsyncDBusCallData, 1);
-  data->callback = callback;
-  data->user_data = user_data;
-    
   if (!dbus_pending_call_set_notify (pending_call,
 				     async_call_reply,
 				     data, g_free))
