@@ -75,6 +75,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobtrash.c gvfsjobtrash.h \
 	gvfsjobdelete.c gvfsjobdelete.h \
 	gvfsjobcopy.c gvfsjobcopy.h \
+	gvfsjobmove.c gvfsjobmove.h \
 	gvfsjobmakedirectory.c gvfsjobmakedirectory.h \
 	gvfsdaemonprotocol.c \
 	dbus-gmain.h dbus-gmain.c \

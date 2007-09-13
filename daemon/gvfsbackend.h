@@ -41,6 +41,7 @@ typedef struct _GVfsJobTrash           GVfsJobTrash;
 typedef struct _GVfsJobDelete          GVfsJobDelete;
 typedef struct _GVfsJobMakeDirectory   GVfsJobMakeDirectory;
 typedef struct _GVfsJobCopy            GVfsJobCopy;
+typedef struct _GVfsJobMove            GVfsJobMove;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -225,6 +226,20 @@ struct _GVfsBackendClass
 				 GFileProgressCallback progress_callback,
 				 gpointer progress_callback_data);
   gboolean (*try_copy)          (GVfsBackend *backend,
+				 GVfsJobCopy *job,
+				 const char *source,
+				 const char *destination,
+				 GFileCopyFlags flags,
+				 GFileProgressCallback progress_callback,
+				 gpointer progress_callback_data);
+  void     (*move)              (GVfsBackend *backend,
+				 GVfsJobCopy *job,
+				 const char *source,
+				 const char *destination,
+				 GFileCopyFlags flags,
+				 GFileProgressCallback progress_callback,
+				 gpointer progress_callback_data);
+  gboolean (*try_move)          (GVfsBackend *backend,
 				 GVfsJobCopy *job,
 				 const char *source,
 				 const char *destination,

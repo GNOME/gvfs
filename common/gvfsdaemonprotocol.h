@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_TRASH "Trash"
 #define G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY "MakeDirectory"
 #define G_VFS_DBUS_MOUNT_OP_COPY "Copy"
+#define G_VFS_DBUS_MOUNT_OP_MOVE "Move"
 
 /* Progress callback interface for copy and move */
 #define G_VFS_DBUS_PROGRESS_INTERFACE "org.gtk.vfs.Progress"

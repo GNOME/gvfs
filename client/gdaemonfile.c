@@ -1379,6 +1379,56 @@ g_daemon_file_copy (GFile                  *source,
   return TRUE;
 }
 
+static gboolean
+g_daemon_file_move (GFile                  *source,
+		    GFile                  *destination,
+		    GFileCopyFlags          flags,
+		    GCancellable           *cancellable,
+		    GFileProgressCallback   progress_callback,
+		    gpointer                progress_callback_data,
+		    GError                **error)
+{
+  GDaemonFile *daemon_source, *daemon_dest;
+  DBusMessage *reply;
+  char *obj_path, *dbus_obj_path;
+  dbus_uint32_t flags_dbus;
+  struct ProgressCallbackData data;
+
+  daemon_source = G_DAEMON_FILE (source);
+  daemon_dest = G_DAEMON_FILE (destination);
+
+  if (progress_callback)
+    {
+      obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
+      dbus_obj_path = obj_path;
+    }
+  else
+    {
+      obj_path = NULL;
+      /* Can't pass NULL obj path as arg */
+      dbus_obj_path = "/org/gtk/vfs/void";
+    }
+
+  data.progress_callback = progress_callback;
+  data.progress_callback_data = progress_callback_data;
+
+  flags_dbus = flags;
+  reply = do_sync_2_path_call (source, destination, 
+			       G_VFS_DBUS_MOUNT_OP_MOVE,
+			       obj_path, progress_callback_message, &data,
+			       NULL, cancellable, error,
+			       DBUS_TYPE_UINT32, &flags_dbus,
+			       DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+			       0);
+
+  g_free (obj_path);
+
+  if (reply == NULL)
+    return FALSE;
+
+  dbus_message_unref (reply);
+  return TRUE;
+}
 
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
@@ -1411,4 +1461,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->trash = g_daemon_file_trash;
   iface->make_directory = g_daemon_file_make_directory;
   iface->copy = g_daemon_file_copy;
+  iface->move = g_daemon_file_move;
 }
