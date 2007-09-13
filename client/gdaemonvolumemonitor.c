@@ -72,8 +72,7 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
       return;
     }
 
-  /* The volume takes ownership of mount_info */
-  volume = g_daemon_volume_new (G_VOLUME_MONITOR (daemon_monitor), mount_info);
+  volume = g_daemon_volume_new (G_VOLUME_MONITOR (daemon_monitor), g_mount_info_dup (mount_info));
   daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
   g_signal_emit_by_name (daemon_monitor, "volume_mounted", volume);
 }
