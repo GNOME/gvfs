@@ -301,7 +301,7 @@ try_enumerate (GVfsBackend *backend,
   l = g_list_append (l, info1);
   l = g_list_append (l, info2);
 
-  g_vfs_job_enumerate_add_info (job, l);
+  g_vfs_job_enumerate_add_infos (job, l);
 
   g_list_free (l);
   g_object_unref (info1);

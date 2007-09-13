@@ -102,8 +102,8 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
 }
 
 void
-g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
-			      GList *infos)
+g_vfs_job_enumerate_add_infos (GVfsJobEnumerate *job,
+			       GList *infos)
 {
   DBusMessage *message, *orig_message;
   DBusMessageIter iter, array_iter;

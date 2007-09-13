@@ -1317,7 +1317,7 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
       parse_attributes (backend, info, reply);
 
       l.data = info;
-      g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), &l);
+      g_vfs_job_enumerate_add_infos (G_VFS_JOB_ENUMERATE (job), &l);
       
       g_object_unref (info);
     }
@@ -1412,7 +1412,7 @@ read_dir_reply (GVfsBackendSftp *backend,
 
   if (infos)
     {
-      g_vfs_job_enumerate_add_info (enum_job, infos);
+      g_vfs_job_enumerate_add_infos (enum_job, infos);
       g_list_foreach (infos, (GFunc)g_object_unref, NULL);
       g_list_free (infos);
     }

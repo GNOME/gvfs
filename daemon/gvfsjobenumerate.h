@@ -39,7 +39,7 @@ GType g_vfs_job_enumerate_get_type (void) G_GNUC_CONST;
 GVfsJob *g_vfs_job_enumerate_new        (DBusConnection        *connection,
 					 DBusMessage           *message,
 					 GVfsBackend           *backend);
-void     g_vfs_job_enumerate_add_info   (GVfsJobEnumerate      *job,
+void     g_vfs_job_enumerate_add_infos  (GVfsJobEnumerate      *job,
 					 GList                 *info);
 void     g_vfs_job_enumerate_done       (GVfsJobEnumerate      *job);
 
