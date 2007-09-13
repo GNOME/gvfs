@@ -59,6 +59,13 @@ g_union_drive_init (GUnionDrive *union_drive)
 {
 }
 
+
+static void
+child_changed (GDrive *child_drive, GDrive *union_drive)
+{
+  g_signal_emit_by_name (union_drive, "changed");
+}
+
 GUnionDrive *
 g_union_drive_new (GVolumeMonitor *union_monitor,
 		   GDrive *child_drive,
@@ -75,6 +82,8 @@ g_union_drive_new (GVolumeMonitor *union_monitor,
   drive->child_drive = g_object_ref (child_drive);
   drive->child_monitor = g_object_ref (child_monitor);
 
+  g_signal_connect_object (drive->child_drive, "changed", (GCallback)child_changed, drive, 0);
+  
   return drive;
 }
 

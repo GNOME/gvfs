@@ -9,6 +9,7 @@
 typedef struct {
   GVolume *volume;
   GVolumeMonitor *monitor;
+  guint32 changed_tag;
 } ChildVolume;
 
 struct _GUnionVolume {
@@ -41,6 +42,7 @@ g_union_volume_finalize (GObject *object)
     {
       child = l->data;
 
+      g_signal_handler_disconnect (child->volume, child->changed_tag);
       g_object_unref (child->volume);
       g_object_unref (child->monitor);
       g_free (child);
@@ -71,7 +73,6 @@ g_union_volume_new (GVolumeMonitor *union_monitor,
 		    GVolumeMonitor *child_monitor)
 {
   GUnionVolume *volume;
-  ChildVolume *child;
   
   volume = g_object_new (G_TYPE_UNION_VOLUME, NULL);
 
@@ -79,13 +80,16 @@ g_union_volume_new (GVolumeMonitor *union_monitor,
   g_object_add_weak_pointer (G_OBJECT (volume->union_monitor),
 			     (gpointer *)&volume->union_monitor);
   
-  child = g_new (ChildVolume, 1);
-  child->volume = g_object_ref (child_volume);
-  child->monitor = g_object_ref (child_monitor);
 
-  volume->child_volumes = g_list_prepend (volume->child_volumes, child);
+  g_union_volume_add_volume (volume, child_volume, child_monitor);
 
   return volume;
+}
+
+static void
+child_changed (GDrive *child_drive, GDrive *union_drive)
+{
+  g_signal_emit_by_name (union_drive, "changed");
 }
 
 void
@@ -98,6 +102,7 @@ g_union_volume_add_volume (GUnionVolume   *union_volume,
   child = g_new (ChildVolume, 1);
   child->volume = g_object_ref (child_volume);
   child->monitor = g_object_ref (child_monitor);
+  child->changed_tag = g_signal_connect (child->volume, "changed", (GCallback)child_changed, union_volume);
 
   union_volume->child_volumes = g_list_prepend (union_volume->child_volumes, child);
 
@@ -119,6 +124,7 @@ g_union_volume_remove_volume (GUnionVolume   *union_volume,
       if (child->volume == child_volume)
 	{
 	  union_volume->child_volumes = g_list_delete_link (union_volume->child_volumes, l);
+	  g_signal_handler_disconnect (child->volume, child->changed_tag);
 	  g_object_unref (child->volume);
 	  g_object_unref (child->monitor);
 	  g_free (child);
