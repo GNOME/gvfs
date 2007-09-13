@@ -110,6 +110,56 @@ g_mount_tracker_class_init (GMountTrackerClass *klass)
   gobject_class->finalize = g_mount_tracker_finalize;
 }
 
+static void
+vfs_mount_to_dbus (VFSMount *mount,
+		   DBusMessageIter *iter)
+{
+  if (!dbus_message_iter_append_basic (iter,
+				       DBUS_TYPE_STRING,
+				       &mount->display_name))
+    _g_dbus_oom ();
+  
+  if (!dbus_message_iter_append_basic (iter,
+				       DBUS_TYPE_STRING,
+				       &mount->icon))
+    _g_dbus_oom ();
+	      
+  if (!dbus_message_iter_append_basic (iter,
+				       DBUS_TYPE_STRING,
+				       &mount->dbus_id))
+    _g_dbus_oom ();
+  
+  if (!dbus_message_iter_append_basic (iter,
+				       DBUS_TYPE_OBJECT_PATH,
+				       &mount->object_path))
+    _g_dbus_oom ();
+  
+  g_mount_spec_to_dbus (iter, mount->mount_spec);
+}
+
+static void
+signal_mounted_unmounted (VFSMount *mount,
+			  gboolean mounted)
+{
+  DBusMessage *message;
+  DBusMessageIter iter;
+  DBusConnection *conn;
+
+  message = dbus_message_new_signal (G_VFS_DBUS_MOUNTTRACKER_PATH,
+				     G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				     mounted?"mounted":"unmounted");
+  if (message == NULL)
+    _g_dbus_oom ();
+
+  dbus_message_iter_init_append (message, &iter);
+  vfs_mount_to_dbus (mount, &iter);
+
+  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  dbus_connection_send (conn, message, NULL);
+  dbus_connection_unref (conn);
+  
+  dbus_message_unref (message);
+}
 
 
 static void
@@ -128,6 +178,7 @@ register_mount (GMountTracker *tracker,
 
   dbus_message_iter_init (message, &iter);
 
+  dbus_error_init (&error);
   if (_g_dbus_message_iter_get_args (&iter,
 				     &error,
 				     DBUS_TYPE_STRING, &display_name,
@@ -153,6 +204,8 @@ register_mount (GMountTracker *tracker,
 	  mount->mount_spec = mount_spec;
 	  
 	  tracker->mounts = g_list_prepend (tracker->mounts, mount);
+
+	  signal_mounted_unmounted (mount, TRUE);
 
 	  reply = dbus_message_new_method_return (message);
 	}
@@ -203,26 +256,8 @@ lookup_mount (GMountTracker *tracker,
 	  if (reply)
 	    {
 	      dbus_message_iter_init_append (reply, &iter);
-	      
-	      if (!dbus_message_iter_append_basic (&iter,
-						   DBUS_TYPE_STRING,
-						   &mount->display_name))
-		_g_dbus_oom ();
-	      if (!dbus_message_iter_append_basic (&iter,
-						   DBUS_TYPE_STRING,
-						   &mount->icon))
-		_g_dbus_oom ();
-	      
-	      if (!dbus_message_iter_append_basic (&iter,
-						   DBUS_TYPE_STRING,
-						   &mount->dbus_id))
-		_g_dbus_oom ();
-      
-	      if (!dbus_message_iter_append_basic (&iter,
-						   DBUS_TYPE_OBJECT_PATH,
-						   &mount->object_path))
-		_g_dbus_oom ();
-	      g_mount_spec_to_dbus (&iter, mount->mount_spec);
+
+	      vfs_mount_to_dbus (mount, &iter);
 	    }
 	}
     }
@@ -282,29 +317,8 @@ list_mounts (GMountTracker *tracker,
 					     G_MOUNT_SPEC_TYPE_AS_STRING,
 					     &struct_iter))
 	_g_dbus_oom ();
-	
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_STRING,
-					   &mount->display_name))
-	_g_dbus_oom ();
-      
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_STRING,
-					   &mount->icon))
-	_g_dbus_oom ();
-      
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_STRING,
-					   &mount->dbus_id))
-	_g_dbus_oom ();
-      
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_OBJECT_PATH,
-					   &mount->object_path))
-	_g_dbus_oom ();
-      
-      
-      g_mount_spec_to_dbus (&struct_iter, mount->mount_spec);
+
+      vfs_mount_to_dbus (mount, &struct_iter);
       
       if (!dbus_message_iter_close_container (&array_iter, &struct_iter))
 	_g_dbus_oom ();
@@ -335,7 +349,7 @@ dbus_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT))
     lookup_mount (tracker, connection, message);
   else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					"listMounts"))
     list_mounts (tracker, connection, message);
   else
@@ -348,11 +362,61 @@ struct DBusObjectPathVTable tracker_dbus_vtable = {
   NULL,
   dbus_message_function,
 };
-  
+
+static void
+client_disconnected (GMountTracker *tracker,
+		     const char *dbus_id)
+{
+  GList *l, *next;
+
+  next = NULL;
+  for (l = tracker->mounts; l != NULL; l = next)
+    {
+      VFSMount *mount = l->data;
+      next = l->next;
+
+      if (strcmp (mount->dbus_id, dbus_id) == 0)
+	{
+	  signal_mounted_unmounted (mount, FALSE);
+	  
+	  vfs_mount_free (mount);
+	  tracker->mounts = g_list_delete_link (tracker->mounts, l);
+	}
+    }
+}
+
+static DBusHandlerResult
+mount_tracker_filter_func (DBusConnection *conn,
+			   DBusMessage    *message,
+			   gpointer        data)
+{
+  GMountTracker *tracker = data;
+  const char *name, *from, *to;
+
+  if (dbus_message_is_signal (message,
+			      DBUS_INTERFACE_DBUS,
+			      "NameOwnerChanged"))
+    {
+      if (dbus_message_get_args (message, NULL,
+				 DBUS_TYPE_STRING, &name,
+				 DBUS_TYPE_STRING, &from,
+				 DBUS_TYPE_STRING, &to,
+				 DBUS_TYPE_INVALID))
+	{
+	  if (*name == ':' &&  *to == 0)
+	    client_disconnected (tracker, name);
+	}
+      
+    }
+  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+
 static void
 g_mount_tracker_init (GMountTracker *tracker)
 {
   DBusConnection *conn;
+  DBusError error;
   
   conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
 
@@ -360,6 +424,22 @@ g_mount_tracker_init (GMountTracker *tracker)
 					     &tracker_dbus_vtable, tracker))
     _g_dbus_oom ();
 
+  if (!dbus_connection_add_filter (conn,
+				   mount_tracker_filter_func, tracker, NULL))
+    _g_dbus_oom ();
+
+  
+  dbus_error_init (&error);
+  dbus_bus_add_match (conn,
+		      "sender='org.freedesktop.DBus',"
+		      "interface='org.freedesktop.DBus',"
+		      "member='NameOwnerChanged'",
+		      &error);
+  if (dbus_error_is_set (&error))
+    {
+      g_warning ("Failed to add dbus match: %s\n", error.message);
+      dbus_error_free (&error);
+    }
 }
 
 GMountTracker *
