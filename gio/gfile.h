@@ -353,15 +353,38 @@ GFileMonitor*      g_file_monitor_file               (GFile                  *fi
 
 /* Utilities */
 
-void     g_file_get_contents_async  (GFile                *file,
-				     GCancellable         *cancellable,
-				     GAsyncReadyCallback   callback,
-				     gpointer              user_data);
-gboolean g_file_get_contents_finish (GFile                *file,
-				     GAsyncResult         *res,
-				     gchar               **contents,
-				     gsize                *length,
-				     GError              **error);
+gboolean g_file_load_contents           (GFile                *file,
+					 GCancellable         *cancellable,
+					 gchar               **contents,
+					 gsize                *length,
+					 GError              **error);
+void     g_file_load_contents_async     (GFile                *file,
+					 GCancellable         *cancellable,
+					 GAsyncReadyCallback   callback,
+					 gpointer              user_data);
+gboolean g_file_load_contents_finish    (GFile                *file,
+					 GAsyncResult         *res,
+					 gchar               **contents,
+					 gsize                *length,
+					 GError              **error);
+gboolean g_file_replace_contents_sync   (GFile                *file,
+					 const gchar          *contents,
+					 gssize                length,
+					 time_t                mtime,
+					 gboolean              make_backup,
+					 GError              **error);
+void     g_file_replace_contents_async  (GFile                *file,
+					 const gchar          *contents,
+					 gssize                length,
+					 time_t                mtime,
+					 gboolean              make_backup,
+					 GCancellable         *cancellable,
+					 GAsyncReadyCallback   callback,
+					 gpointer              user_data);
+gboolean g_file_replace_contents_finish (GFile                *file,
+					 GAsyncResult         *res,
+					 GError              **error);
+
 
 G_END_DECLS
 

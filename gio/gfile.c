@@ -1327,11 +1327,11 @@ typedef struct {
   gpointer user_data;
   GByteArray *content;
   gsize pos;
-} GetContentsData;
+} LoadContentsData;
 
 
 static void
-get_contents_data_free (GetContentsData *data)
+load_contents_data_free (LoadContentsData *data)
 {
   if (data->error)
     g_error_free (data->error);
@@ -1344,12 +1344,12 @@ get_contents_data_free (GetContentsData *data)
 }
 
 static void
-get_contents_close_callback (GObject *obj,
+load_contents_close_callback (GObject *obj,
 			     GAsyncResult *close_res,
 			     gpointer user_data)
 {
   GInputStream *stream = G_INPUT_STREAM (obj);
-  GetContentsData *data = user_data;
+  LoadContentsData *data = user_data;
   GSimpleAsyncResult *res;
 
   /* Ignore errors here, we're only reading anyway */
@@ -1359,19 +1359,19 @@ get_contents_close_callback (GObject *obj,
   res = g_simple_async_result_new (G_OBJECT (data->file),
 				   data->callback,
 				   data->user_data,
-				   g_file_get_contents_async);
-  g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)get_contents_data_free);
+				   g_file_load_contents_async);
+  g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)load_contents_data_free);
   g_simple_async_result_complete (res);
   g_object_unref (res);
 }
 
 static void
-get_contents_read_callback (GObject *obj,
+load_contents_read_callback (GObject *obj,
 			    GAsyncResult *read_res,
 			    gpointer user_data)
 {
   GInputStream *stream = G_INPUT_STREAM (obj);
-  GetContentsData *data = user_data;
+  LoadContentsData *data = user_data;
   GError *error = NULL;
   gssize read_size;
 
@@ -1384,7 +1384,7 @@ get_contents_read_callback (GObject *obj,
 	data->error = error;
       g_input_stream_close_async (stream, 0,
 				  data->cancellable,
-				  get_contents_close_callback, data);
+				  load_contents_close_callback, data);
     }
   else if (read_size > 0)
     {
@@ -1397,19 +1397,19 @@ get_contents_read_callback (GObject *obj,
 				 GET_CONTENT_BLOCK_SIZE,
 				 0,
 				 data->cancellable,
-				 get_contents_read_callback,
+				 load_contents_read_callback,
 				 data);
     }
 }
 
 static void
-get_contents_open_callback (GObject *obj,
+load_contents_open_callback (GObject *obj,
 			    GAsyncResult *open_res,
 			    gpointer user_data)
 {
   GFile *file = G_FILE (obj);
   GFileInputStream *stream;
-  GetContentsData *data = user_data;
+  LoadContentsData *data = user_data;
   GError *error = NULL;
   GSimpleAsyncResult *res;
 
@@ -1424,7 +1424,7 @@ get_contents_open_callback (GObject *obj,
 				 GET_CONTENT_BLOCK_SIZE,
 				 0,
 				 data->cancellable,
-				 get_contents_read_callback,
+				 load_contents_read_callback,
 				 data);
       
     }
@@ -1436,20 +1436,20 @@ get_contents_open_callback (GObject *obj,
 						  error);
       g_simple_async_result_complete (res);
       g_error_free (error);
-      get_contents_data_free (data);
+      load_contents_data_free (data);
       g_object_unref (res);
     }
 }
 
 void
-g_file_get_contents_async (GFile                *file,
+g_file_load_contents_async (GFile                *file,
 			   GCancellable         *cancellable,
 			   GAsyncReadyCallback   callback,
 			   gpointer              user_data)
 {
-  GetContentsData *data;
+  LoadContentsData *data;
 
-  data = g_new0 (GetContentsData, 1);
+  data = g_new0 (LoadContentsData, 1);
 
   if (cancellable)
     data->cancellable = g_object_ref (cancellable);
@@ -1461,24 +1461,24 @@ g_file_get_contents_async (GFile                *file,
   g_file_read_async (file,
 		     0,
 		     cancellable,
-		     get_contents_open_callback,
+		     load_contents_open_callback,
 		     data);
 }
 
 gboolean
-g_file_get_contents_finish (GFile                *file,
+g_file_load_contents_finish (GFile                *file,
 			    GAsyncResult         *res,
 			    gchar               **contents,
 			    gsize                *length,
 			    GError              **error)
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
-  GetContentsData *data;
+  LoadContentsData *data;
 
   if (g_simple_async_result_propagate_error (simple, error))
     return FALSE;
   
-  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_get_contents_async);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_load_contents_async);
   
   data = g_simple_async_result_get_op_res_gpointer (simple);
 
