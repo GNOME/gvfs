@@ -5,7 +5,9 @@ Implement the rest of g_file_info_simple_get:
 
 Work on GFile
 
-add get_file_info_async for FileStreams 
+add get_file_info_async for FileStreams
+Add async opens to GFile.
+More GFile operations (rename, move, copy, etc)
 
 test outputstream (especially replace + backup) (and test everything else too)
 
@@ -15,13 +17,9 @@ Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion,
 
 Expose the seek operations on GInputStream also, not only via iface
 
-Add async opens to GFile.
-
 implement readahead in GVFSReadStream, time difference
 
 implement get_file_info for GFileInputStreamDaemon
-
-implement daemon write stream, maybe break out common parts of gvfsreadstream to gvfsjobstream
 
 implement seeks in local streams
 
@@ -35,7 +33,28 @@ Change all error handling to be more consistent and sane.
  - better enums. Not use G_FILE?
  - how to handle "error chaining"
  - sane consistent not-mounted errors
- 
+
+Consider something like GnomeVFSVolumeMonitor and Volume/Drive
+
+merge JobSeekRead/Write and JobCloseReadWrite ?
+
+smb support for xattrs!
+smb support for hidden
+smb - handle server going down
+
+is-slow marking for e.g. thumbnailing?
+
+Add info to mountpoints in smb-browser
+
+modularize uri handling
+decide how to handle not-mounted errors
+handle mounting
+mount daemons should re-register when new owner for vfs daemon
+
+remove dbus-gmain.[ch]? We have no server integration in common/ atm
+
+gvfserror => gioerror?
+  
 FUTURE IDEAS:
 -------------
 
