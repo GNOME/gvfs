@@ -841,7 +841,7 @@ copy_file (GVfsBackendSmb *backend,
 static char *
 create_etag (struct stat *statbuf)
 {
-  return g_strdup_printf ("%ld", statbuf->st_mtime);
+  return g_strdup_printf ("%lu", (long unsigned int)statbuf->st_mtime);
 }
 
 static void
