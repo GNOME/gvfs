@@ -61,6 +61,11 @@ struct _GVfsBackendSftp
   GOutputStream *command_stream;
   GInputStream *reply_stream;
   GDataInputStream *error_stream;
+
+  /* Reply reading: */
+  guint32 reply_size;
+  guint32 reply_size_read;
+  guint8 *reply;
   
   GMountSource *mount_source; /* Only used/set during mount */
   int mount_try;
@@ -358,14 +363,28 @@ wait_for_reply (GVfsBackend *backend, int stdout_fd, GError **error)
 }
 
 static GDataInputStream *
+make_reply_stream (guint8 *data, gsize len)
+{
+  GInputStream *mem_stream;
+  GDataInputStream *data_stream;
+  
+  mem_stream = g_memory_input_stream_from_data (data, len);
+  g_memory_input_stream_set_free_data (G_MEMORY_INPUT_STREAM (mem_stream), TRUE);
+
+  data_stream = g_data_input_stream_new (mem_stream);
+  g_object_unref (mem_stream);
+  
+  return data_stream;
+}
+
+static GDataInputStream *
 read_reply_sync (GVfsBackend *backend, gsize *len_out, GError **error)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 len;
   gsize bytes_read;
   GByteArray *array;
-  GInputStream *mem_stream;
-  GDataInputStream *data_stream;
+  guint8 *data;
   
   if (!g_input_stream_read_all (op_backend->reply_stream,
 				&len, 4,
@@ -374,7 +393,6 @@ read_reply_sync (GVfsBackend *backend, gsize *len_out, GError **error)
 
   
   len = GUINT32_FROM_BE (len);
-  g_print ("Reply size: %d\n", (int)len);
   
   array = g_byte_array_sized_new (len);
 
@@ -386,15 +404,13 @@ read_reply_sync (GVfsBackend *backend, gsize *len_out, GError **error)
       return NULL;
     }
 
-  mem_stream = g_memory_input_stream_from_data (array->data, len);
-  g_byte_array_free (array, FALSE);
-  data_stream = g_data_input_stream_new (mem_stream);
-  g_object_unref (mem_stream);
-  
   if (len_out)
     *len_out = len;
+
+  data = array->data;
+  g_byte_array_free (array, FALSE);
   
-  return data_stream;
+  return make_reply_stream (data, len);
 }
 
 static char *
@@ -572,7 +588,92 @@ handle_login (GVfsBackend *backend,
   return ret_val;
 }
 
+static void read_reply_async (GVfsBackendSftp *backend);
 
+static void
+read_reply_async_got_data  (GObject *source_object,
+			   GAsyncResult *result,
+			   gpointer user_data)
+{
+  GVfsBackendSftp *backend = user_data;
+  gssize res;
+  GDataInputStream *reply;
+
+  res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, NULL);
+
+  if (res <= 0)
+    {
+      /* TODO: unmount, etc */
+      g_warning ("Error reading results");
+      return;
+    }
+
+  backend->reply_size_read += res;
+
+  if (backend->reply_size_read < backend->reply_size)
+    {
+      g_input_stream_read_async (backend->reply_stream,
+				 backend->reply + backend->reply_size_read, backend->reply_size - backend->reply_size_read,
+				 0, NULL, read_reply_async_got_data, backend);
+      return;
+    }
+
+  reply = make_reply_stream (backend->reply, backend->reply_size);
+  backend->reply = NULL;
+
+  /* TODO: Handle the reply */
+  g_print ("Got reply of size %d\n", backend->reply_size);
+
+  g_object_unref (reply);
+
+  read_reply_async (backend);
+  
+}
+
+static void
+read_reply_async_got_len  (GObject *source_object,
+			   GAsyncResult *result,
+			   gpointer user_data)
+{
+  GVfsBackendSftp *backend = user_data;
+  gssize res;
+
+  res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, NULL);
+
+  if (res <= 0)
+    {
+      /* TODO: unmount, etc */
+      g_warning ("Error reading results");
+      return;
+    }
+
+  backend->reply_size_read += res;
+
+  if (backend->reply_size_read < 4)
+    {
+      g_input_stream_read_async (backend->reply_stream,
+				 &backend->reply_size, 4 - backend->reply_size_read,
+				 0, NULL, read_reply_async_got_len, backend);
+      return;
+    }
+  backend->reply_size = GUINT32_FROM_BE (backend->reply_size);
+
+  backend->reply_size_read = 0;
+  backend->reply = g_malloc (backend->reply_size_read);
+  g_input_stream_read_async (backend->reply_stream,
+			     backend->reply, backend->reply_size,
+			     0, NULL, read_reply_async_got_data, backend);
+}
+
+static void
+read_reply_async (GVfsBackendSftp *backend)
+{
+  backend->reply_size_read = 0;
+  g_input_stream_read_async (backend->reply_stream,
+			     &backend->reply_size, 4,
+			     0, NULL, read_reply_async_got_len, backend);
+}
+  
 static void
 do_mount (GVfsBackend *backend,
 	  GVfsJobMount *job,
@@ -671,7 +772,8 @@ do_mount (GVfsBackend *backend,
     }
       
   g_object_unref (reply);
-  
+
+  read_reply_async (op_backend);
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
   if (op_backend->user_specified)
