@@ -222,7 +222,7 @@ g_file_input_stream_daemon_class_init (GFileInputStreamDaemonClass *klass)
   stream_class->close = g_file_input_stream_daemon_close;
   
   stream_class->read_async = g_file_input_stream_daemon_read_async;
-  stream_class->skip_async = g_file_input_stream_daemon_skip_async;
+  if (0) stream_class->skip_async = g_file_input_stream_daemon_skip_async;
   stream_class->close_async = g_file_input_stream_daemon_close_async;
   
   file_stream_class->tell = g_file_input_stream_daemon_tell;
@@ -900,11 +900,13 @@ g_file_input_stream_daemon_close (GInputStream *stream,
 
   if (!run_sync_state_machine (file, (state_machine_iterator)iterate_close_state_machine,
 			       &op, cancellable, error))
-    return -1; /* IO Error */
-
-  if (op.ret_val == -1)
-    g_propagate_error (error, op.ret_error);
-  res = op.ret_val;
+    res = FALSE;
+  else
+    {
+      if (!op.ret_val)
+	g_propagate_error (error, op.ret_error);
+      res = op.ret_val;
+    }
 
   /* Return the first error, but close all streams */
   if (res)
@@ -1474,6 +1476,55 @@ g_file_input_stream_daemon_skip_async  (GInputStream        *stream,
 }
 
 static void
+async_close_done (GInputStream *stream,
+		  gpointer op_data,
+		  gpointer callback,
+		  gpointer callback_data,
+		  GError *io_error)
+{
+  GFileInputStreamDaemon *file;
+  CloseOperation *op;
+  gboolean result;
+  GError *error;
+  GCancellable *cancellable = NULL; /* TODO: get cancellable */
+
+  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  
+  op = op_data;
+
+  if (io_error)
+    {
+      result = FALSE;
+      error = io_error;
+    }
+  else
+    {
+      result = op->ret_val;
+      error = op->ret_error;
+    }
+
+  if (result)
+    result = g_output_stream_close (file->priv->command_stream, cancellable, &error);
+  else
+    g_output_stream_close (file->priv->command_stream, cancellable, NULL);
+    
+  if (result)
+    result = g_input_stream_close (file->priv->data_stream, cancellable, &error);
+  else
+    g_input_stream_close (file->priv->data_stream, cancellable, NULL);
+  
+  if (callback)
+    ((GAsyncCloseInputCallback)callback) (stream,
+					  result,
+					  callback_data,
+					  error);
+  
+  if (op->ret_error)
+    g_error_free (op->ret_error);
+  g_free (op);
+}
+
+static void
 g_file_input_stream_daemon_close_async (GInputStream        *stream,
 					int                  io_priority,
 					GAsyncCloseInputCallback callback,
@@ -1481,4 +1532,21 @@ g_file_input_stream_daemon_close_async (GInputStream        *stream,
 					GDestroyNotify      notify,
 					GCancellable       *cancellable)
 {
+  GFileInputStreamDaemon *file;
+  AsyncIterator *iterator;
+  CloseOperation *op;
+
+  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  
+  op = g_new0 (CloseOperation, 1);
+  op->state = CLOSE_STATE_INIT;
+
+  iterator = g_new0 (AsyncIterator, 1);
+  
+  run_async_state_machine (file,
+			   (state_machine_iterator)iterate_close_state_machine,
+			   op, io_priority,
+			   callback, data, notify,
+			   cancellable,
+			   async_close_done);
 }
