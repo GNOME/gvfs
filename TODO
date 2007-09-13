@@ -1,14 +1,13 @@
 Catch EINTR in all syscalls
 
-error reporting in get_file_info (not exist)
+error reporting in get_file_info (e.g. ENOEXIST)
 
-fileenumerator per-enumerator maincontext instead of each call
-
-async support for file enumerator
+fileenumerator per-enumerator maincontext instead of each call (like in streams)
+implement async support for file enumerator
 
 Add Seekable support to LocalFile streams
 
-test outputstream (especially replace + backup)
+test outputstream (especially replace + backup) (and test everything else too)
 
 Work on GFile
 
@@ -19,6 +18,4 @@ Use G_FILE_ERRORS and g_file_error_from_errno:
 	       _("Error opening directory '%s': %s"),
 	       path, g_strerror (errno));
 
-
-auto*
-	       
+autoconfize
