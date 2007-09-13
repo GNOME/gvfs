@@ -226,6 +226,7 @@ fi
 AC_OUTPUT([
 Makefile
 gio/Makefile
+common/Makefile
 client/Makefile
 daemon/Makefile
 programs/Makefile

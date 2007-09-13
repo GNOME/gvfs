@@ -5,6 +5,8 @@
 
 G_BEGIN_DECLS
 
+int _g_socket_send_fd    (int          socket_fd,
+			  int          fd);
 int _g_socket_receive_fd (int          socket_fd);
 int _g_socket_connect    (const char  *address,
 			  GError     **error);

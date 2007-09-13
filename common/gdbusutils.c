@@ -14,6 +14,66 @@ _g_dbus_oom (void)
   exit(1);
 }
 
+/* We use _ for escaping, so its not valid */
+#define VALID_INITIAL_NAME_CHARACTER(c)         \
+  ( ((c) >= 'A' && (c) <= 'Z') ||               \
+    ((c) >= 'a' && (c) <= 'z') )
+#define VALID_NAME_CHARACTER(c)                 \
+  ( ((c) >= '0' && (c) <= '9') ||               \
+    ((c) >= 'A' && (c) <= 'Z') ||               \
+    ((c) >= 'a' && (c) <= 'z'))
+
+
+static void
+append_escaped_name (GString *s,
+		     const char *unescaped)
+{
+  char c;
+  gboolean first;
+  static const gchar hex[16] = "0123456789ABCDEF";
+
+  while ((c = *unescaped++) != 0)
+    {
+      if (first)
+	{
+	  if (VALID_INITIAL_NAME_CHARACTER (c))
+	    {
+	      g_string_append_c (s, c);
+	      continue;
+	    }
+	}
+      else
+	{
+	  if (VALID_NAME_CHARACTER (c))
+	    {
+	      g_string_append_c (s, c);
+	      continue;
+	    }
+	}
+
+      first = FALSE;
+      g_string_append_c (s, '_');
+      g_string_append_c (s, hex[((guchar)c) >> 4]);
+      g_string_append_c (s, hex[((guchar)c) & 0xf]);
+    }
+}
+
+DBusMessage *
+_dbus_message_new_error_from_gerror (DBusMessage *message,
+				     GError *error)
+{
+  DBusMessage *reply;
+  GString *str;
+
+  str = g_string_new ("org.glib.GError.");
+  append_escaped_name (str, g_quark_to_string (error->domain));
+  g_string_append_printf (str, ".c%d", error->code);
+  reply = dbus_message_new_error (message, str->str, error->message);
+  g_string_free (str, TRUE);
+  return reply;
+}
+
+
 static void
 append_unescaped_dbus_name (GString *s,
 			    const char *escaped,

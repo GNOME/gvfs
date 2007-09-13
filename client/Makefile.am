@@ -1,7 +1,7 @@
 NULL =
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
-	-I$(top_srcdir)/daemon \
+	-I$(top_srcdir)/common \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DDBUS_API_SUBJECT_TO_CHANGE
@@ -13,8 +13,6 @@ modules_LTLIBRARIES = libgvfsdbus.la
 
 libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = 	\
-	gsysutils.c gsysutils.h \
-	gdbusutils.c gdbusutils.h \
 	gvfsimpldaemon.c gvfsimpldaemon.h \
 	gfiledaemon.c gfiledaemon.h \
 	gfiledaemonlocal.c gfiledaemonlocal.h \
@@ -26,5 +24,6 @@ libgvfsdbus_la_SOURCES = 	\
 
 libgvfsdbus_la_LIBADD = \
 	$(top_builddir)/gio/libgio.la	\
+	$(top_builddir)/common/libcommon.la	\
 	$(DBUS_LIBS) 			\
 	$(GLIB_LIBS)

@@ -2,9 +2,11 @@ NULL =
 
 INCLUDES =					\
 	-I$(top_srcdir)				\
+	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
+	-DMOUNTPOINT_DIR=\"$(sysconfdir)/gvfs/mounts/\" \
 	-DG_DISABLE_DEPRECATED
 
 noinst_LTLIBRARIES=libdaemon.la
@@ -12,6 +14,7 @@ noinst_LTLIBRARIES=libdaemon.la
 libraries =						\
 	$(top_builddir)/gio/libgio.la			\
 	libdaemon.la					\
+	$(top_builddir)/common/libcommon.la		\
 	$(GLIB_LIBS) $(DBUS_LIBS)
 
 
@@ -35,7 +38,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobcloseread.c gvfsjobcloseread.h \
 	gvfsjobgetinfo.c gvfsjobgetinfo.h \
 	gvfsjobenumerate.c gvfsjobenumerate.h \
-	gvfsdaemonprotocol.h gvfsdaemonprotocol.c \
+	gvfsdaemonprotocol.c \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
 

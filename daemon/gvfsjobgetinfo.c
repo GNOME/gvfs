@@ -9,7 +9,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobgetinfo.h"
-#include "gvfsdaemonutils.h"
+#include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobGetInfo, g_vfs_job_get_info, G_TYPE_VFS_JOB_DBUS);
@@ -160,7 +160,7 @@ create_reply (GVfsJob *job,
   if (!dbus_message_iter_append_basic (&iter,
 				       DBUS_TYPE_UINT32,
 				       &requested_32))
-    g_dbus_oom ();
+    _g_dbus_oom ();
 
   g_dbus_append_file_info (&iter, 
 			   op_job->requested_result,

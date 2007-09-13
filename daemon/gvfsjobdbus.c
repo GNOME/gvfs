@@ -9,7 +9,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobdbus.h"
-#include "gvfsdaemonutils.h"
+#include "gdbusutils.h"
 
 G_DEFINE_TYPE (GVfsJobDBus, g_vfs_job_dbus, G_TYPE_VFS_JOB);
 
@@ -139,7 +139,7 @@ send_reply (GVfsJob *job)
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   
   if (job->failed) 
-    reply = dbus_message_new_error_from_gerror (dbus_job->message, job->error);
+    reply = _dbus_message_new_error_from_gerror (dbus_job->message, job->error);
   else
     reply = class->create_reply (job, dbus_job->connection, dbus_job->message);
  

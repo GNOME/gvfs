@@ -10,6 +10,7 @@
 #include <glib/gi18n.h>
 #include "gvfsreadchannel.h"
 #include "gvfsjobopenforread.h"
+#include "gdbusutils.h"
 #include "gvfsdaemonutils.h"
 
 G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_TYPE_VFS_JOB_DBUS);
@@ -156,7 +157,7 @@ create_reply (GVfsJob *job,
   channel = g_vfs_read_channel_new (open_job->backend, &error);
   if (channel == NULL)
     {
-      reply = dbus_message_new_error_from_gerror (message, error);
+      reply = _dbus_message_new_error_from_gerror (message, error);
       g_error_free (error);
       return reply;
     }
@@ -167,7 +168,7 @@ create_reply (GVfsJob *job,
 				&fd_id, &error))
     {
       close (remote_fd);
-      reply = dbus_message_new_error_from_gerror (message, error);
+      reply = _dbus_message_new_error_from_gerror (message, error);
       g_error_free (error);
       g_object_unref (channel);
       return reply;

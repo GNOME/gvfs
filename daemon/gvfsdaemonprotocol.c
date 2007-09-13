@@ -1,7 +1,7 @@
 #include <glib-object.h>
 #include <dbus/dbus.h>
 #include <gvfsdaemonprotocol.h>
-#include <gvfsdaemonutils.h>
+#include <gdbusutils.h>
 
 char *
 g_dbus_get_file_info_signature (GFileInfoRequestFlags requested)
@@ -92,7 +92,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
 					 DBUS_TYPE_STRUCT,
 					 sig,
 					 &struct_iter))
-    g_dbus_oom ();
+    _g_dbus_oom ();
   g_free (sig);
 
   if (requested & G_FILE_INFO_FILE_TYPE)
@@ -101,7 +101,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_UINT16,
 					   &type))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_NAME)
@@ -117,7 +117,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_STRING,
 					   &str))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_EDIT_NAME)
@@ -127,7 +127,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_STRING,
 					   &str))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_ICON)
@@ -137,7 +137,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_STRING,
 					   &str))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_MIME_TYPE)
@@ -147,7 +147,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_STRING,
 					   &str))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_SIZE)
@@ -156,7 +156,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_UINT64,
 					   &size))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_MODIFICATION_TIME)
@@ -165,7 +165,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_UINT64,
 					   &time))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_ACCESS_RIGHTS)
@@ -174,7 +174,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_UINT32,
 					   &rights))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_STAT_INFO)
@@ -184,7 +184,7 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_UINT32,
 					   &tmp))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   if (requested & G_FILE_INFO_SYMLINK_TARGET)
@@ -199,11 +199,11 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_BOOLEAN,
 					   &is_hidden))
-	g_dbus_oom ();
+	_g_dbus_oom ();
     }
 
   /* TODO: Attributes */
 
   if (!dbus_message_iter_close_container (iter, &struct_iter))
-    g_dbus_oom ();
+    _g_dbus_oom ();
 }

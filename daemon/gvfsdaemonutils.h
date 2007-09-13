@@ -6,8 +6,6 @@
 
 G_BEGIN_DECLS
 
-DBusMessage *dbus_message_new_error_from_gerror   (DBusMessage      *message,
-						   GError           *error);
 void         dbus_connection_add_fd_send_fd       (DBusConnection   *connection,
 						   int               extra_fd);
 gboolean     dbus_connection_send_fd              (DBusConnection   *connection,
@@ -17,10 +15,6 @@ gboolean     dbus_connection_send_fd              (DBusConnection   *connection,
 char *       g_error_to_daemon_reply              (GError           *error,
 						   guint32           seq_nr,
 						   gsize            *len_out);
-char *       _g_dbus_bus_name_from_mountpoint     (const char       *mountpoint);
-void         _g_dbus_message_iter_append_cstring  (DBusMessageIter  *iter,
-						   const char       *filename);
-void g_dbus_oom (void) G_GNUC_NORETURN;
 
 G_END_DECLS
 

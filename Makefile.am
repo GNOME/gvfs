@@ -1,5 +1,6 @@
 SUBDIRS = \
 	gio \
+	common \
 	client \
 	daemon \
 	po   \

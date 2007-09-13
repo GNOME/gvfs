@@ -7,7 +7,7 @@
 #include <gfileenumeratordaemon.h>
 #include <gio/gfileinfo.h>
 #include <gvfsdaemondbus.h>
-#include <daemon/gvfsdaemonprotocol.h>
+#include <gvfsdaemonprotocol.h>
 
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/client/enumerator/"
 

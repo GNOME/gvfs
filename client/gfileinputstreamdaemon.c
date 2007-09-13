@@ -19,7 +19,7 @@
 #include <gio/gfileinfolocal.h>
 #include <gio/ginputstreamsocket.h>
 #include <gio/goutputstreamsocket.h>
-#include <daemon/gvfsdaemonprotocol.h>
+#include <gvfsdaemonprotocol.h>
 
 #define MAX_READ_SIZE (4*1024*1024)
 

@@ -9,7 +9,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjobenumerate.h"
-#include "gvfsdaemonutils.h"
+#include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
 G_DEFINE_TYPE (GVfsJobEnumerate, g_vfs_job_enumerate, G_TYPE_VFS_JOB_DBUS);
@@ -135,7 +135,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   if (!dbus_message_iter_open_container (&iter,
 					 DBUS_TYPE_ARRAY, sig, 
 					 &array_iter))
-    g_dbus_oom ();
+    _g_dbus_oom ();
   
   g_free (sig);
 
@@ -148,7 +148,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
     }
 
   if (!dbus_message_iter_close_container (&iter, &array_iter))
-    g_dbus_oom ();
+    _g_dbus_oom ();
   
   dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
 			message, NULL);
@@ -220,7 +220,7 @@ send_reply (GVfsJob *job)
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   
   if (job->failed) 
-    reply = dbus_message_new_error_from_gerror (dbus_job->message, job->error);
+    reply = _dbus_message_new_error_from_gerror (dbus_job->message, job->error);
   else
     reply = class->create_reply (job, dbus_job->connection, dbus_job->message);
  
@@ -253,7 +253,7 @@ create_reply (GVfsJob *job,
   if (!dbus_message_iter_append_basic (&iter,
 				       DBUS_TYPE_UINT32,
 				       &requested_32))
-    g_dbus_oom ();
+    _g_dbus_oom ();
 
   return reply;
 }
