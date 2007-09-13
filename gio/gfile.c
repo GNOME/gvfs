@@ -477,7 +477,19 @@ file_copy_fallback (GFile                  *source,
   return FALSE;
 }
 
-/* Fails on directory source */
+/* Fails on directory source
+   
+   Errors:
+
+   source    dest    flags   res
+    -        *       *       G_IO_ERROR_NOT_FOUND
+    file     -       *       ok
+    file     file    0       G_IO_ERROR_EXISTS
+    file     file    overwr  ok
+    file     dir     *       G_IO_ERROR_IS_DIRECTORY
+    
+    dir      *       *       G_IO_ERROR_WOULD_RECURSE
+ */
 gboolean
 g_file_copy (GFile                  *source,
 	     GFile                  *destination,
@@ -525,7 +537,22 @@ g_file_copy (GFile                  *source,
 			     error);
 }
 
-/* May fail on directory source with IS_DIRECTORY (i.e. if rename fails) */
+/* May fail on directory source with IS_DIRECTORY (i.e. if rename fails)
+
+   Errors:
+
+   source    dest    flags   res
+    -        *       *       G_IO_ERROR_NOT_FOUND
+    file     -       *       ok
+    file     file    0       G_IO_ERROR_EXISTS
+    file     file    overwr  ok
+    file     dir     *       G_IO_ERROR_IS_DIRECTORY
+    
+    dir      -       *       ok || G_IO_ERROR_WOULD_RECURSE
+    dir      *       0       G_IO_ERROR_EXISTS
+    dir      dir     overwr  G_IO_ERROR_IS_DIRECTORY
+    dir      file    overwr  ok || G_IO_ERROR_WOULD_RECURSE
+ */
 gboolean
 g_file_move (GFile                  *source,
 	     GFile                  *destination,
