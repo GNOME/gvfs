@@ -249,8 +249,6 @@ read_async_cb (ReadAsyncData *data,
 		  error);
   if (error)
     g_error_free (error);
-
-  g_free (data);
 }
 
 static void
