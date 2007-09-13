@@ -24,12 +24,12 @@ gvfs-marshal.c: gvfs-marshal.h gvfs-marshal.list $(GLIB_GENMARSHAL)
 local_sources = \
 	glocalfileenumerator.c \
 	glocalfileenumerator.h \
-	gfileinfolocal.c \
-	gfileinfolocal.h \
+	glocalfileinfo.c \
+	glocalfileinfo.h \
 	glocalfile.c \
 	glocalfile.h \
-	gfileinputstreamlocal.c \
-	gfileinputstreamlocal.h \
+	glocalfileinputstream.c \
+	glocalfileinputstream.h \
 	gfileoutputstreamlocal.c \
 	gfileoutputstreamlocal.h \
 	gvfslocal.c \

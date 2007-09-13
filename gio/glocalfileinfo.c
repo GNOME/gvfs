@@ -23,7 +23,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#include "gfileinfolocal.h"
+#include "glocalfileinfo.h"
 #include "gvfserror.h"
 
 static gchar *
@@ -484,7 +484,7 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 }
 
 GFileInfo *
-g_file_info_local_get (const char *basename,
+g_local_file_info_get (const char *basename,
 		       const char *path,
 		       GFileAttributeMatcher *attribute_matcher,
 		       GFileGetInfoFlags flags,
@@ -605,7 +605,7 @@ g_file_info_local_get (const char *basename,
 }
 
 GFileInfo *
-g_file_info_local_get_from_fd (int fd,
+g_local_file_info_get_from_fd (int fd,
 			       char *attributes,
 			       GError **error)
 {

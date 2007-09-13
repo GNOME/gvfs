@@ -16,7 +16,6 @@
 #include <gio/gseekable.h>
 #include "gfileoutputstreamdaemon.h"
 #include "gvfsdaemondbus.h"
-#include <gio/gfileinfolocal.h>
 #include <gio/ginputstreamsocket.h>
 #include <gio/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>

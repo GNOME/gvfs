@@ -3,7 +3,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include <glocalfileenumerator.h>
-#include <gfileinfolocal.h>
+#include <glocalfileinfo.h>
 
   /* TODO:
    *  It would be nice to use the dirent->d_type to check file type without
@@ -114,7 +114,7 @@ g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
     return NULL;
 
   path = g_build_filename (local->filename, filename, NULL);
-  info = g_file_info_local_get (filename, path,
+  info = g_local_file_info_get (filename, path,
 				local->matcher,
 				local->flags,
 				&my_error); 

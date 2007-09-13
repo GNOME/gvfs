@@ -7,9 +7,9 @@
 #include <fcntl.h>
 
 #include "glocalfile.h"
-#include "gfileinfolocal.h"
+#include "glocalfileinfo.h"
 #include "glocalfileenumerator.h"
-#include "gfileinputstreamlocal.h"
+#include "glocalfileinputstream.h"
 #include "gfileoutputstreamlocal.h"
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
@@ -263,7 +263,7 @@ g_local_file_get_info (GFile                *file,
   
   basename = g_path_get_basename (local->filename);
   
-  info = g_file_info_local_get (basename, local->filename,
+  info = g_local_file_info_get (basename, local->filename,
 				matcher, flags,
 				error);
   
@@ -301,7 +301,7 @@ g_local_file_read (GFile *file,
       return NULL;
     }
   
-  return g_file_input_stream_local_new (fd);
+  return g_local_file_input_stream_new (fd);
 }
 
 static GFileOutputStream *

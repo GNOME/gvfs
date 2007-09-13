@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include <gio/gfileinputstreamlocal.h>
+#include <gio/glocalfileinputstream.h>
 #include <gio/gfileoutputstreamlocal.h>
 #include "gfiledaemonlocal.h"
 #include <glib/gi18n-lib.h>

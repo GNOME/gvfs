@@ -11,7 +11,7 @@
 #include <glib/gi18n-lib.h>
 #include "gvfserror.h"
 #include "gfileoutputstreamlocal.h"
-#include "gfileinfolocal.h"
+#include "glocalfileinfo.h"
 
 G_DEFINE_TYPE (GFileOutputStreamLocal, g_file_output_stream_local, G_TYPE_FILE_OUTPUT_STREAM);
 
@@ -249,7 +249,7 @@ g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
       return NULL;
     }
   
-  return g_file_info_local_get_from_fd (file->priv->fd,
+  return g_local_file_info_get_from_fd (file->priv->fd,
 					attributes,
 					error);
 }

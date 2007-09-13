@@ -4,7 +4,7 @@
 #include <glib.h>
 #include "gfile.h"
 #include "gseekable.h"
-#include "gfileinputstreamlocal.h"
+#include "glocalfileinputstream.h"
 #include "gfileoutputstreamlocal.h"
 #include "ginputstreamsocket.h"
 
