@@ -157,14 +157,8 @@ g_socket_input_stream_read (GInputStream *stream,
 
   while (1)
     {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  break;
-	}
+      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	break;
       res = read (socket_stream->priv->fd, buffer, count);
       if (res == -1)
 	{
@@ -234,12 +228,8 @@ read_async_cb (ReadAsyncData *data,
   /* We know that we can read from fd once without blocking */
   while (1)
     {
-      if (g_cancellable_is_cancelled (data->cancellable))
+      if (g_cancellable_set_error_if_cancelled (data->cancellable, &error))
 	{
-	  g_set_error (&error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
 	  count_read = -1;
 	  break;
 	}

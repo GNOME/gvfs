@@ -109,14 +109,8 @@ g_local_file_input_stream_read (GInputStream *stream,
   res = -1;
   while (1)
     {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  break;
-	}
+      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	break;
       res = read (file->priv->fd, buffer, count);
       if (res == -1)
 	{
@@ -146,14 +140,8 @@ g_local_file_input_stream_skip (GInputStream *stream,
 
   file = G_LOCAL_FILE_INPUT_STREAM (stream);
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return -1;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return -1;
   
   start = lseek (file->priv->fd, 0, SEEK_CUR);
   if (start == -1)
@@ -294,14 +282,8 @@ g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
 
   file = G_LOCAL_FILE_INPUT_STREAM (stream);
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   return _g_local_file_info_get_from_fd (file->priv->fd,
 					 attributes,

@@ -479,18 +479,10 @@ next_op_func (GIOJob *job,
 
   for (i = 0; i < op->num_files; i++)
     {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  info = NULL;
-	  g_set_error (&op->op.error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	}
+      if (g_cancellable_set_error_if_cancelled (cancellable, &op->op.error))
+	info = NULL;
       else
-	{
-	  info = class->next_file (op->op.enumerator, cancellable, &op->op.error);
-	}
+	info = class->next_file (op->op.enumerator, cancellable, &op->op.error);
       
       if (info == NULL)
 	{
@@ -568,14 +560,8 @@ stop_op_func (GIOJob *job,
   StopAsyncOp *op = data;
   GFileEnumeratorClass *class;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      op->result = FALSE;
-      g_set_error (&op->op.error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, &op->op.error))
+    op->result = FALSE;
   else 
     {
       class = G_FILE_ENUMERATOR_GET_CLASS (op->op.enumerator);

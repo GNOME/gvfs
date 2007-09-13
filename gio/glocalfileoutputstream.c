@@ -118,14 +118,8 @@ g_local_file_output_stream_write (GOutputStream *stream,
 
   while (1)
     {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  return -1;
-	}
+      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	return -1;
       res = write (file->priv->fd, buffer, count);
       if (res == -1)
 	{
@@ -163,14 +157,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
 
       if (file->priv->backup_filename)
 	{
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_IO_ERROR,
-			   G_IO_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      goto err_out;
-	    }
+	  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	    goto err_out;
 	  
 #ifdef HAVE_LINK
 	  /* create original -> backup link, the original is then renamed over */
@@ -205,14 +193,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	}
       
 
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  goto err_out;
-	}
+      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	goto err_out;
 
       /* tmp -> original */
       if (rename (file->priv->tmp_filename, file->priv->original_filename) != 0)
@@ -225,14 +207,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	}
     }
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      goto err_out;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    goto err_out;
       
   if (fstat (file->priv->fd, &final_stat) == 0)
     file->priv->etag = _g_local_file_info_create_etag (&final_stat);
@@ -371,14 +347,8 @@ g_local_file_output_stream_truncate (GFileOutputStream    *stream,
     {
       if (errno == EINTR)
 	{
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_IO_ERROR,
-			   G_IO_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      return FALSE;
-	    }
+	  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	    return FALSE;
 	  goto restart;
 	}
 
@@ -403,14 +373,8 @@ g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
 
   file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   return _g_local_file_info_get_from_fd (file->priv->fd,
 					 attributes,
@@ -425,14 +389,8 @@ g_local_file_output_stream_create  (const char   *filename,
   GLocalFileOutputStream *stream;
   int fd;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   fd = g_open (filename,
 	       O_CREAT | O_EXCL | O_WRONLY,
@@ -467,14 +425,8 @@ g_local_file_output_stream_append  (const char   *filename,
   GLocalFileOutputStream *stream;
   int fd;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   fd = g_open (filename,
 	       O_CREAT | O_APPEND | O_WRONLY,
@@ -842,15 +794,8 @@ g_local_file_output_stream_replace (const char   *filename,
   int fd;
   char *temp_file;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
-
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
 
   temp_file = NULL;
   /* If the file doesn't exist, create it */

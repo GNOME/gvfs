@@ -541,12 +541,8 @@ async_get_connection_response (DBusMessage *reply,
 
   /* Maybe we were canceled while setting up connection, then
    * avoid doing the operation */
-  if (g_cancellable_is_cancelled (async_call->cancellable))
+  if (g_cancellable_set_error_if_cancelled (async_call->cancellable, &async_call->io_error))
     {
-      g_set_error (&async_call->io_error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
       async_call_finish (async_call, NULL);
       return;
     }
@@ -626,14 +622,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   gboolean handle_callbacks;
   const char *dbus_id = dbus_message_get_destination (message);
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
 	    
   connection = _g_dbus_connection_get_sync (dbus_id, error);
   if (connection == NULL)
@@ -642,14 +632,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   /* TODO: Handle errors below due to unmount and invalidate the
      sync connection cache */
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
 
   handle_callbacks = FALSE;
   if (callback_obj_path != NULL && callback != NULL)

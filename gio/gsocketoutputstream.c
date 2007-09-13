@@ -144,14 +144,8 @@ g_socket_output_stream_write (GOutputStream *stream,
       
   while (1)
     {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  break;
-	}
+      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	break;
       res = write (socket_stream->priv->fd, buffer, count);
       if (res == -1)
 	{
@@ -220,12 +214,8 @@ write_async_cb (WriteAsyncData *data,
 
   while (1)
     {
-      if (g_cancellable_is_cancelled (data->cancellable))
+      if (g_cancellable_set_error_if_cancelled (data->cancellable, &error))
 	{
-	  g_set_error (&error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
 	  count_written = -1;
 	  break;
 	}

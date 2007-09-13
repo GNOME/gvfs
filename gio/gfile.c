@@ -244,14 +244,8 @@ g_file_enumerate_children (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -268,14 +262,8 @@ g_file_get_info (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -290,14 +278,8 @@ g_file_get_filesystem_info (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -312,14 +294,8 @@ g_file_read (GFile *file,
 {
   GFileIface *iface;
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
 
   iface = G_FILE_GET_IFACE (file);
 
@@ -333,14 +309,8 @@ g_file_append_to (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -354,14 +324,8 @@ g_file_create (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -377,14 +341,8 @@ g_file_replace (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return NULL;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -946,14 +904,8 @@ g_file_copy (GFile                  *source,
   GError *my_error;
   gboolean res;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   if (G_OBJECT_TYPE (source) == G_OBJECT_TYPE (destination))
     {
@@ -1007,14 +959,8 @@ g_file_move (GFile                  *source,
   GError *my_error;
   gboolean res;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   if (G_OBJECT_TYPE (source) == G_OBJECT_TYPE (destination))
     {
@@ -1052,14 +998,8 @@ g_file_make_directory (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1074,14 +1014,8 @@ g_file_make_symbolic_link (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1095,14 +1029,8 @@ g_file_delete (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1116,14 +1044,8 @@ g_file_trash (GFile *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1155,14 +1077,8 @@ g_file_set_display_name (GFile                  *file,
       return FALSE;
     }
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1183,14 +1099,8 @@ g_file_query_settable_attributes (GFile                      *file,
   GError *my_error;
   GFileAttributeInfoList *list;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1225,14 +1135,8 @@ g_file_query_writable_namespaces (GFile                      *file,
   GError *my_error;
   GFileAttributeInfoList *list;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1266,14 +1170,8 @@ g_file_set_attribute (GFile                  *file,
 {
   GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
 
@@ -1295,14 +1193,8 @@ g_file_set_attributes_from_info (GFile                      *file,
 {
  GFileIface *iface;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   g_file_info_clear_status (info);
   

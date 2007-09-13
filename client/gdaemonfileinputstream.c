@@ -665,14 +665,8 @@ g_daemon_file_input_stream_read (GInputStream *stream,
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return -1;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return -1;
   
   /* Limit for sanity and to avoid 32bit overflow */
   if (count > MAX_READ_SIZE)
@@ -1167,14 +1161,8 @@ g_daemon_file_input_stream_seek (GFileInputStream *stream,
       return FALSE;
     }
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
   
   memset (&op, 0, sizeof (op));
   op.state = SEEK_STATE_INIT;
