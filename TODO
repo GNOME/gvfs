@@ -14,15 +14,11 @@ Work on GFile:
    copy
    move
 
-Add more filter streams: data reading, conversion (with general converter interface)
-
-is-slow marking for e.g. thumbnailing? How would you know this though?
-
 HAL implementation of VolumeMonitor
 
 Move GAppInfo to Gtk+
 
-Implement PRE_UNMOUNT for file monitors
+Implement PRE_UNMOUNT for file monitors, send it when unmounting
 
 Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg list.
 Implement std:icon for local files. This is related to mimetype decisions (fast vs slow)
@@ -30,6 +26,9 @@ Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
 Don't hardcode the libgvfsdbus.so name, instead have some generic pluggable system
 
+Add more filter streams: data reading, conversion (with general converter interface)
+ => gicmo is working on this
+ 
 gvfs:
 ====
 	
@@ -65,5 +64,7 @@ Make built-in uri parsers link into gvfs shared lib instead of using a module
 
 FUTURE IDEAS:
 -------------
+
+is-slow marking for e.g. thumbnailing? How would you know this though?
 
 local file access through the daemon for remote X clients?
