@@ -29,8 +29,6 @@ Use giomodules for fam volume monitor backend
 Add more filter streams: data reading, conversion (with general converter interface)
  => gicmo is working on this
 
-Implement dummy GFile fallback for non-existing uris (both for local and gvfs)
- 
 gvfs:
 ====
 	
