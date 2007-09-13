@@ -308,51 +308,37 @@ do_sync_path_call (GFile *file,
 
 typedef void (*AsyncPathCallCallback) (DBusMessage *reply,
 				       DBusConnection *connection,
-				       GError *io_error,
+				       GSimpleAsyncResult *result,
 				       GCancellable *cancellable,
-				       GAsyncReadyCallback op_callback,
-				       gpointer op_callback_data,
 				       gpointer callback_data);
 
 
 typedef struct {
+  GSimpleAsyncResult *result;
   GFile *file;
   char *op;
   GCancellable *cancellable;
   DBusMessage *args;
-  GError *io_error;
-  GAsyncReadyCallback op_callback;
-  gpointer op_callback_data;
   AsyncPathCallCallback callback;
   gpointer callback_data;
+  GDestroyNotify notify;
 } AsyncPathCall;
 
 static void
 async_path_call_free (AsyncPathCall *data)
 {
+  if (data->notify)
+    data->notify (data->callback_data);
+
+  if (data->result)
+    g_object_unref (data->result);
   g_object_unref (data->file);
   g_free (data->op);
   if (data->cancellable)
     g_object_unref (data->cancellable);
-  if (data->io_error)
-    g_error_free (data->io_error);
   if (data->args)
     dbus_message_unref (data->args);
   g_free (data);
-}
-
-static gboolean
-do_async_path_call_error_idle (gpointer _data)
-{
-  AsyncPathCall *data = _data;
-
-  data->callback (NULL, NULL, data->io_error, data->cancellable,
-		  data->op_callback, data->op_callback_data,
-		  data->callback_data);
-
-  async_path_call_free (data);
-  
-  return FALSE;
 }
 
 static void
@@ -362,12 +348,28 @@ async_path_call_done (DBusMessage *reply,
 		      gpointer _data)
 {
   AsyncPathCall *data = _data;
+  GSimpleAsyncResult *result;
 
-  data->callback (reply, connection, io_error, data->cancellable,
-		  data->op_callback, data->op_callback_data,
-		  data->callback_data);
-  
-  async_path_call_free (data);
+  if (io_error != NULL)
+    {
+      g_simple_async_result_set_from_error (data->result, io_error);
+      g_simple_async_result_complete (data->result);
+      async_path_call_free (data);
+    }
+  else
+    {
+      result = data->result;
+      g_object_weak_ref (G_OBJECT (result), (GWeakNotify)async_path_call_free, data);
+      data->result = NULL;
+      
+      data->callback (reply, connection,
+		      result,
+		      data->cancellable,
+		      data->callback_data);
+
+      /* Free data here, or later if callback ref:ed the result */
+      g_object_unref (result);
+    }
 }
 
 static void
@@ -383,8 +385,9 @@ do_async_path_call_callback (GMountRef *mount_ref,
   
   if (error != NULL)
     {
-      data->io_error = g_error_copy (error);
-      g_idle_add (do_async_path_call_error_idle, data);
+      g_simple_async_result_set_from_error (data->result, error);      
+      g_simple_async_result_complete (data->result);
+      async_path_call_free (data);
       return;
     }
 
@@ -394,8 +397,7 @@ do_async_path_call_callback (GMountRef *mount_ref,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  data->op);
   
-  path = _g_mount_ref_resolve_path (mount_ref,
-				    daemon_file->path);
+  path = _g_mount_ref_resolve_path (mount_ref, daemon_file->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
   /* Append more args from data->args */
@@ -423,6 +425,7 @@ do_async_path_call (GFile *file,
 		    gpointer op_callback_data,
 		    AsyncPathCallCallback callback,
 		    gpointer callback_data,
+		    GDestroyNotify notify,
 		    int first_arg_type,
 		    ...)
 {
@@ -433,14 +436,17 @@ do_async_path_call (GFile *file,
 
   data = g_new0 (AsyncPathCall, 1);
 
+  data->result = g_simple_async_result_new (G_OBJECT (file),
+					    op_callback, op_callback_data,
+					    NULL);
+
   data->file = g_object_ref (file);
   data->op = g_strdup (op);
   if (data->cancellable)
     data->cancellable = g_object_ref (cancellable);
-  data->op_callback = op_callback;
-  data->op_callback_data = op_callback_data;
   data->callback = callback;
   data->callback_data = callback_data;
+  data->notify = notify;
   
   error = NULL;
 
@@ -552,9 +558,7 @@ g_daemon_file_get_info (GFile                *file,
 }
 
 typedef struct {
-  GFile *file;
-  GAsyncReadyCallback callback;
-  gpointer user_data;
+  GSimpleAsyncResult *result;
   gboolean can_seek;
 } GetFDData;
 
@@ -564,79 +568,54 @@ read_async_get_fd_cb (int fd,
 {
   GetFDData *data = callback_data;
   GFileInputStream *stream;
-  GSimpleAsyncResult *res;
   
   if (fd == -1)
     {
-      res = g_simple_async_result_new_error (G_OBJECT (data->file),
-					     data->callback,
-					     data->user_data,
-					     G_IO_ERROR, G_IO_ERROR_FAILED,
-					     _("Didn't get stream file descriptor"));
+      g_simple_async_result_set_error (data->result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       _("Couldn't get stream file descriptor"));
     }
   else
     {
-      res = g_simple_async_result_new (G_OBJECT (data->file),
-				       data->callback,
-				       data->user_data,
-				       g_daemon_file_read_async);
       stream = g_daemon_file_input_stream_new (fd, data->can_seek);
-      g_simple_async_result_set_op_res_gpointer (res, stream, g_object_unref);
+      g_simple_async_result_set_op_res_gpointer (data->result, stream, g_object_unref);
     }
 
-  g_simple_async_result_complete (res);
-  
+  g_simple_async_result_complete (data->result);
+
+  g_object_unref (data->result);
   g_free (data);
 }
 
 static void
 read_async_cb (DBusMessage *reply,
 	       DBusConnection *connection,
-	       GError *io_error,
+	       GSimpleAsyncResult *result,
 	       GCancellable *cancellable,
-	       GAsyncReadyCallback op_callback,
-	       gpointer op_callback_data,
 	       gpointer callback_data)
 {
-  GFile *file = callback_data;
   guint32 fd_id;
   dbus_bool_t can_seek;
   GetFDData *get_fd_data;
-  GSimpleAsyncResult *res;
   
-  if (io_error != NULL)
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &can_seek,
+			      DBUS_TYPE_INVALID))
     {
-      res = g_simple_async_result_new_from_error (G_OBJECT (file),
-						  op_callback,
-						  op_callback_data,
-						  io_error);
-      g_simple_async_result_complete (res);
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       _("Invalid return value from open"));
+      g_simple_async_result_complete (result);
+      return;
     }
-  else
-    {
-      if (!dbus_message_get_args (reply, NULL,
-				  DBUS_TYPE_UINT32, &fd_id,
-				  DBUS_TYPE_BOOLEAN, &can_seek,
-				  DBUS_TYPE_INVALID))
-	{
-	  res = g_simple_async_result_new_error (G_OBJECT (file),
-						 op_callback,
-						 op_callback_data,
-						 G_IO_ERROR, G_IO_ERROR_FAILED,
-						 _("Invalid return value from open"));
-	  g_simple_async_result_complete (res);
-	  return;
-	}
-
-      get_fd_data = g_new0 (GetFDData, 1);
-      get_fd_data->file = file;
-      get_fd_data->callback = op_callback;
-      get_fd_data->user_data = op_callback_data;
-      get_fd_data->can_seek = can_seek;
-      
-      _g_dbus_connection_get_fd_async (connection, fd_id,
-				       read_async_get_fd_cb, get_fd_data);
-    }
+  
+  get_fd_data = g_new0 (GetFDData, 1);
+  get_fd_data->result = g_object_ref (result);
+  get_fd_data->can_seek = can_seek;
+  
+  _g_dbus_connection_get_fd_async (connection, fd_id,
+				   read_async_get_fd_cb, get_fd_data);
 }
 
 static void
@@ -650,7 +629,7 @@ g_daemon_file_read_async (GFile *file,
 		      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ,
 		      cancellable,
 		      callback, callback_data,
-		      read_async_cb, file,
+		      read_async_cb, NULL, NULL,
 		      0);
 }
 
@@ -661,8 +640,6 @@ g_daemon_file_read_finish (GFile                  *file,
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
   gpointer op;
-
-  g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_read_async);
 
   op = g_simple_async_result_get_op_res_gpointer (simple);
   if (op)
@@ -877,14 +854,13 @@ g_daemon_file_replace (GFile *file,
 
 
 static void
-mount_mountable_cb (DBusMessage *reply,
-		    DBusConnection *connection,
-		    GError *io_error,
-		    GCancellable *cancellable,
-		    GAsyncReadyCallback op_callback,
-		    gpointer op_callback_data,
-		    gpointer callback_data)
+mount_mountable_async_cb (DBusMessage *reply,
+			  DBusConnection *connection,
+			  GSimpleAsyncResult *result,
+			  GCancellable *cancellable,
+			  gpointer callback_data)
 {
+  /* TODO */
 }
 
 static void
@@ -898,7 +874,7 @@ g_daemon_file_mount_mountable (GFile               *file,
 		      G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE,
 		      cancellable,
 		      callback, user_data,
-		      mount_mountable_cb, file,
+		      mount_mountable_async_cb, NULL, NULL,
 		      0);
 }
 
