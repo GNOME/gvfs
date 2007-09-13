@@ -163,6 +163,10 @@ void          g_input_stream_close_async       (GInputStream              *strea
 						GDestroyNotify             notify);
 void          g_input_stream_cancel            (GInputStream              *stream);
 gboolean      g_input_stream_is_cancelled      (GInputStream              *stream);
+gboolean      g_input_stream_is_closed         (GInputStream              *stream);
+gboolean      g_input_stream_has_pending       (GInputStream              *stream);
+void          g_input_stream_set_pending       (GInputStream              *stream,
+						gboolean                   pending);
 
 
 G_END_DECLS

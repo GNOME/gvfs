@@ -1,4 +1,5 @@
 #include <string.h>
+#include <unistd.h>
 
 #include <glib.h>
 #include "gfile.h"
@@ -23,6 +24,10 @@ test_out ()
   for (i = 0; i < sizeof(buffer); i++) {
     buffer[i] = str[i%str_len];
   }
+
+  g_print ("test_out\n");
+  
+  unlink ("/tmp/test");
   
   out = g_output_stream_file_new ("/tmp/test",
 				  G_OUTPUT_STREAM_FILE_OPEN_CREATE);
@@ -114,7 +119,7 @@ read_done (GInputStream *stream,
   if (count_read > 0)
     {
       g_input_stream_read_async (stream, buffer, 1024, 0, read_done, buffer, NULL);
-      g_input_stream_cancel (stream);
+      //g_input_stream_cancel (stream);
     }
   else
     g_input_stream_close_async (stream, 0, close_done, buffer, g_free);
@@ -146,8 +151,8 @@ main (int argc, char *argv[])
   
   file = g_file_get_for_path ("/tmp");
 
-  if (0) test_sync ("/etc/passwd", FALSE);
-  if (0) test_async ("/etc/passwd", TRUE);
+  if (1) test_sync ("/etc/passwd", FALSE);
+  if (1) test_async ("/etc/passwd", TRUE);
 
   test_out ();
 

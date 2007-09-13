@@ -813,6 +813,35 @@ g_output_stream_is_cancelled (GOutputStream *stream)
   return stream->priv->cancelled;
 }
 
+gboolean
+g_output_stream_is_closed (GOutputStream *stream)
+{
+  g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), TRUE);
+  g_return_val_if_fail (stream != NULL, TRUE);
+  
+  return stream->priv->closed;
+}
+  
+gboolean
+g_output_stream_has_pending (GOutputStream *stream)
+{
+  g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), TRUE);
+  g_return_val_if_fail (stream != NULL, TRUE);
+  
+  return stream->priv->pending;
+}
+
+void
+g_output_stream_set_pending (GOutputStream              *stream,
+			    gboolean                   pending)
+{
+  g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
+  g_return_if_fail (stream != NULL);
+  
+  stream->priv->pending = pending;
+}
+
+
 /********************************************
  *   Default implementation of async ops    *
  ********************************************/

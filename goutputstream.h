@@ -138,6 +138,10 @@ void          g_output_stream_close_async       (GOutputStream              *str
 						 GDestroyNotify              notify);
 void          g_output_stream_cancel            (GOutputStream              *stream);
 gboolean      g_output_stream_is_cancelled      (GOutputStream              *stream);
+gboolean      g_output_stream_is_closed         (GOutputStream              *stream);
+gboolean      g_output_stream_has_pending       (GOutputStream              *stream);
+void          g_output_stream_set_pending       (GOutputStream              *stream,
+						 gboolean                   pending);
 
 G_END_DECLS
 

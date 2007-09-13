@@ -889,6 +889,34 @@ g_input_stream_is_cancelled (GInputStream *stream)
   return stream->priv->cancelled;
 }
 
+gboolean
+g_input_stream_is_closed (GInputStream *stream)
+{
+  g_return_val_if_fail (G_IS_INPUT_STREAM (stream), TRUE);
+  g_return_val_if_fail (stream != NULL, TRUE);
+  
+  return stream->priv->closed;
+}
+  
+gboolean
+g_input_stream_has_pending (GInputStream *stream)
+{
+  g_return_val_if_fail (G_IS_INPUT_STREAM (stream), TRUE);
+  g_return_val_if_fail (stream != NULL, TRUE);
+  
+  return stream->priv->pending;
+}
+
+void
+g_input_stream_set_pending (GInputStream              *stream,
+			    gboolean                   pending)
+{
+  g_return_if_fail (G_IS_INPUT_STREAM (stream));
+  g_return_if_fail (stream != NULL);
+  
+  stream->priv->pending = pending;
+}
+
 /********************************************
  *   Default implementation of async ops    *
  ********************************************/

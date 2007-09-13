@@ -21,12 +21,14 @@ struct _GFileInfoPrivate {
   GFileType file_type;
   char *name;
   char *display_name;
+  char *edit_name;
   char *icon;
   GQuark mime_type_q;
   goffset size;
   time_t mtime;
   GFileAccessRights access_rights;
   struct stat *stat_info;
+  char *symlink_target;
   GArray *attributes;
 };
 
@@ -47,6 +49,7 @@ g_file_info_finalize (GObject *object)
   g_free (priv->display_name);
   g_free (priv->icon);
   g_free (priv->stat_info);
+  g_free (priv->symlink_target);
 
   attrs = info->priv->attributes;
   for (i = 0; i < attrs->len; i++)
@@ -134,9 +137,9 @@ g_file_info_get_modification_time (GFileInfo *info)
 }
 
 const char *
-g_file_info_get_link_target (GFileInfo *info)
+g_file_info_get_symlink_target (GFileInfo *info)
 {
-  return g_file_info_get_attribute (info, "vfs:link_target");
+  return info->priv->symlink_target;
 }
 
 GFileAccessRights
@@ -333,12 +336,11 @@ g_file_info_set_modification_time (GFileInfo *info,
 }
 
 void
-g_file_info_set_link_target (GFileInfo *info,
-			 const char *link_target)
+g_file_info_set_symlink_target (GFileInfo *info,
+				const char *link_target)
 {
-  g_file_info_set_attribute (info,
-			     "vfs:link_target",
-			     link_target);
+  g_free (info->priv->symlink_target);
+  info->priv->symlink_target = g_strdup (link_target);
 }
   
 void

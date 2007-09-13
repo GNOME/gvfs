@@ -54,6 +54,21 @@ struct _GFileAttribute {
   char *value;
 };
 
+typedef enum {
+  G_FILE_INFO_FILE_TYPE      = 1 << 0,
+  G_FILE_INFO_NAME           = 1 << 1,
+  G_FILE_INFO_DISPLAY_NAME   = 1 << 2,
+  G_FILE_INFO_EDIT_NAME      = 1 << 3,
+  G_FILE_INFO_ICON           = 1 << 4,
+  G_FILE_INFO_MIME_TYPE      = 1 << 5,
+  G_FILE_INFO_SIZE           = 1 << 6,
+  G_FILE_INFO_MTIME          = 1 << 7,
+  G_FILE_INFO_ACCESS_RIGHTS  = 1 << 8,
+  G_FILE_INFO_STAT_INFO      = 1 << 9,
+  G_FILE_INFO_SYMLINK_TARGET = 1 << 10,
+  
+} GFileInfoFlags;
+
 GType g_file_info_get_type (void) G_GNUC_CONST;
   
 GFileType              g_file_info_get_file_type         (GFileInfo         *info);
@@ -92,7 +107,7 @@ void                   g_file_info_set_size              (GFileInfo         *inf
 							  goffset            size);
 void                   g_file_info_set_modification_time (GFileInfo         *info,
 							  time_t             time);
-void                   g_file_info_set_link_target       (GFileInfo         *info,
+void                   g_file_info_set_symlink_target    (GFileInfo         *info,
 							  const char        *link_target);
 void                   g_file_info_set_access_rights     (GFileInfo         *info,
 							  GFileAccessRights  access_rights);

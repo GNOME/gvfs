@@ -39,7 +39,7 @@ GFile {
    
  GFile *get_parent ()
  GFile *get_child (char *name)
- GFileEnumerator *enumerate_children(flags, attributes...)
+ GFileEnumerator *enumerate_children(flags, attributes... "*", "vfs:*;dav:*;foo:bar")
  GFileInfo *get_info (flags, attributes...)
  
  void reload()
