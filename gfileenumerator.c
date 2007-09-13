@@ -1,6 +1,7 @@
 #include <config.h>
 #include "gfileenumerator.h"
 #include <glib/gi18n-lib.h>
+#include "gioscheduler.h"
 #include "gasynchelper.h"
 
 G_DEFINE_TYPE (GFileEnumerator, g_file_enumerator, G_TYPE_OBJECT);
@@ -13,7 +14,21 @@ struct _GFileEnumeratorPrivate {
   GMainContext *context;
   gint io_job_id;
   gpointer outstanding_callback;
+  GError *outstanding_error;
 };
+
+static void g_file_enumerator_real_next_files_async (GFileEnumerator               *enumerator,
+						     int                            num_files,
+						     int                            io_priority,
+						     GAsyncNextFilesCallback        callback,
+						     gpointer                       data,
+						     GDestroyNotify                 notify);
+static void g_file_enumerator_real_stop_async       (GFileEnumerator               *enumerator,
+						     int                            io_priority,
+						     GAsyncStopEnumeratingCallback  callback,
+						     gpointer                       data,
+						     GDestroyNotify                 notify);
+static void g_file_enumerator_real_cancel           (GFileEnumerator               *enumerator);
 
 static void
 g_file_enumerator_finalize (GObject *object)
@@ -43,7 +58,10 @@ g_file_enumerator_class_init (GFileEnumeratorClass *klass)
   g_type_class_add_private (klass, sizeof (GFileEnumeratorPrivate));
   
   gobject_class->finalize = g_file_enumerator_finalize;
-  
+
+  klass->next_files_async = g_file_enumerator_real_next_files_async;
+  klass->stop_async = g_file_enumerator_real_stop_async;
+  klass->cancel = g_file_enumerator_real_cancel;
 }
 
 static void
@@ -89,6 +107,13 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
     {
       g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
 		   _("File enumerator has outstanding operation"));
+      return NULL;
+    }
+
+  if (enumerator->priv->outstanding_error)
+    {
+      g_propagate_error (error, enumerator->priv->outstanding_error);
+      enumerator->priv->outstanding_error = NULL;
       return NULL;
     }
   
@@ -236,7 +261,7 @@ queue_next_async_result (GFileEnumerator *enumerator,
 
 static void
 next_async_callback_wrapper (GFileEnumerator *enumerator,
-			     GFileInfo **files,
+			     GList *files,
 			     int num_files,
 			     gpointer data,
 			     GError *error)
@@ -490,4 +515,210 @@ g_file_enumerator_set_pending (GFileEnumerator              *enumerator,
   g_return_if_fail (enumerator != NULL);
   
   enumerator->priv->pending = pending;
+}
+
+typedef struct {
+  GFileEnumerator   *enumerator;
+  GError            *error;
+  gpointer           data;
+  GDestroyNotify     notify;
+} FileEnumeratorOp;
+
+static void
+file_enumerator_op_free (gpointer data)
+{
+  FileEnumeratorOp *op = data;
+
+  if (op->notify)
+    op->notify (op->data);
+
+  if (op->error)
+    g_error_free (op->error);
+
+  g_free (op);
+}
+
+static void
+file_enumerator_op_cancel (gpointer data)
+{
+  FileEnumeratorOp *op = data;
+  GFileEnumeratorClass *class;
+
+  class = G_FILE_ENUMERATOR_GET_CLASS (op->enumerator);
+  if (class->cancel_sync)
+    class->cancel_sync (op->enumerator);
+}
+
+typedef struct {
+  FileEnumeratorOp  op;
+  int                num_files;
+  GList             *files;
+  GAsyncNextFilesCallback callback;
+} NextAsyncOp;
+
+static void
+next_op_report (gpointer data)
+{
+  NextAsyncOp *op = data;
+
+  op->callback (op->op.enumerator,
+		op->files,
+		op->num_files,
+		op->op.data,
+		op->op.error);
+
+  g_list_foreach (op->files, (GFunc)g_object_unref, NULL);
+  g_list_free (op->files);
+  op->files = NULL;
+}
+
+static void
+next_op_func (GIOJob *job,
+	      gpointer data)
+{
+  NextAsyncOp *op = data;
+  GFileEnumeratorClass *class;
+  GFileInfo *info;
+  int i;
+
+  class = G_FILE_ENUMERATOR_GET_CLASS (op->op.enumerator);
+
+  for (i = 0; i < op->num_files; i++)
+    {
+      if (g_io_job_is_cancelled (job))
+	{
+	  info = NULL;
+	  g_set_error (&op->op.error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	}
+      else
+	info = class->next_file (op->op.enumerator, &op->op.error);
+      
+      if (info == NULL)
+	{
+	  /* If we get an error after first file, return that on next operation */
+	  if (op->op.error != NULL && i > 0)
+	    {
+	      op->op.enumerator->priv->outstanding_error = op->op.error;
+	      op->op.error = NULL;
+	    }
+	      
+	  break;
+	}
+    }
+  
+  if (op->op.error != NULL)
+    op->num_files = -1;
+  else
+    op->num_files = i;
+
+  g_io_job_mark_done (job);
+  g_io_job_send_to_mainloop (job, next_op_report,
+			     op, file_enumerator_op_free,
+			     FALSE);
+}
+
+static void
+g_file_enumerator_real_next_files_async (GFileEnumerator              *enumerator,
+					 int                           num_files,
+					 int                           io_priority,
+					 GAsyncNextFilesCallback       callback,
+					 gpointer                      data,
+					 GDestroyNotify                notify)
+{
+  NextAsyncOp *op;
+
+  op = g_new0 (NextAsyncOp, 1);
+
+  op->op.enumerator = enumerator;
+  op->num_files = num_files;
+  op->files = NULL;
+  op->callback = callback;
+  op->op.data = data;
+  op->op.notify = notify;
+  
+  enumerator->priv->io_job_id =
+    g_schedule_io_job (next_op_func,
+		       file_enumerator_op_cancel,
+		       op,
+		       NULL,
+		       io_priority,
+		       g_file_enumerator_get_async_context (enumerator));
+}
+
+typedef struct {
+  FileEnumeratorOp  op;
+  gboolean result;
+  GAsyncStopEnumeratingCallback callback;
+} StopAsyncOp;
+
+static void
+stop_op_report (gpointer data)
+{
+  StopAsyncOp *op = data;
+
+  op->callback (op->op.enumerator,
+		op->result,
+		op->op.data,
+		op->op.error);
+}
+
+static void
+stop_op_func (GIOJob *job,
+	      gpointer data)
+{
+  StopAsyncOp *op = data;
+  GFileEnumeratorClass *class;
+
+  if (g_io_job_is_cancelled (job))
+    {
+      op->result = FALSE;
+      g_set_error (&op->op.error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+    }
+  else 
+    {
+      class = G_FILE_ENUMERATOR_GET_CLASS (op->op.enumerator);
+      op->result = class->stop (op->op.enumerator, &op->op.error);
+    }
+  
+  g_io_job_mark_done (job);
+  g_io_job_send_to_mainloop (job, stop_op_report,
+			     op, file_enumerator_op_free,
+			     FALSE);
+}
+
+static void
+g_file_enumerator_real_stop_async (GFileEnumerator              *enumerator,
+				  int                           io_priority,
+				  GAsyncStopEnumeratingCallback callback,
+				  gpointer                      data,
+				  GDestroyNotify                notify)
+{
+  StopAsyncOp *op;
+
+  op = g_new0 (StopAsyncOp, 1);
+
+  op->op.enumerator = enumerator;
+  op->callback = callback;
+  op->op.data = data;
+  op->op.notify = notify;
+  
+  enumerator->priv->io_job_id =
+    g_schedule_io_job (stop_op_func,
+		       file_enumerator_op_cancel,
+		       op,
+		       NULL,
+		       io_priority,
+		       g_file_enumerator_get_async_context (enumerator));
+}
+
+static void
+g_file_enumerator_real_cancel (GFileEnumerator *enumerator)
+{
+  g_cancel_io_job (enumerator->priv->io_job_id);
 }

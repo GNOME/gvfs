@@ -2,8 +2,6 @@ Catch EINTR in all syscalls
 
 Implement the rest of g_file_info_simple_get
 
-implement async support for file enumerator
-
 Add Seekable support to LocalFile streams
 
 add selinux support to test extension code (requires attribute matching support)

@@ -24,12 +24,12 @@ typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
 /**
  * GAsyncNextFilesCallback:
  * @enumerator: a #GFileEnumerator
- * @files: array of #GFileInfo objects
- * @num_files: size of @files array, or -1 on error
+ * @files: list of #GFileInfo objects
+ * @num_files: size of @files list, or -1 on error
  * @data: the @data pointer passed to the async call
  * @error: the error, if num_files is -1, otherwise %NULL
  *
- * This callback is called when an asychronous close operation
+ * This callback is called when an asychronous next_file operation
  * is finished. When there are no more files to enumerate @num_files
  * is set to 0.
  *
@@ -38,7 +38,7 @@ typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
  * will be %G_VFS_ERROR_CANCELLED.
  **/
 typedef void (*GAsyncNextFilesCallback) (GFileEnumerator *enumerator,
-					 GFileInfo **files,
+					 GList *files,
 					 int num_files,
 					 gpointer data,
 					 GError *error);
