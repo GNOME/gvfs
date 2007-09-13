@@ -518,7 +518,7 @@ do_call_async (AsyncDBusCall *async_call)
 					async_call->message,
 					&pending,
 					DBUS_TIMEOUT_DEFAULT))
-    g_error ("Failed to send message (oom)");
+    oom ();
 
   if (pending == NULL)
     {
@@ -546,7 +546,7 @@ do_call_async (AsyncDBusCall *async_call)
 				     async_dbus_response,
 				     async_call,
 				     NULL))
-    g_error ("Failed to send message (oom)");
+    oom ();
 
 }
 
@@ -746,12 +746,12 @@ open_connection_async (AsyncDBusCall *async_call)
 							 G_VFS_DBUS_OP_GET_CONNECTION);
   
   if (get_connection_message == NULL)
-    g_error ("Failed to allocate message");
+    oom ();
 
   if (!dbus_connection_send_with_reply (async_call->private_bus,
 					get_connection_message, &pending,
 					DBUS_TIMEOUT_DEFAULT))
-    g_error ("Failed to send message (oom)");
+    oom ();
   
   dbus_message_unref (get_connection_message);
   
@@ -769,7 +769,7 @@ open_connection_async (AsyncDBusCall *async_call)
 				     async_get_connection_response,
 				     async_call,
 				     NULL))
-    g_error ("Failed to send message (oom)");
+    oom ();
 }
 
 static void
@@ -836,17 +836,17 @@ do_find_owner_async (AsyncDBusCall *async_call)
                                           DBUS_INTERFACE_DBUS,
                                           "GetNameOwner");
   if (message == NULL)
-    g_error ("oom");
+    oom ();
   
   if (!dbus_message_append_args (message,
 				 DBUS_TYPE_STRING, &async_call->bus_name,
 				 DBUS_TYPE_INVALID))
-    g_error ("oom");
+    oom ();
   
   if (!dbus_connection_send_with_reply (async_call->private_bus,
 					message, &pending,
 					DBUS_TIMEOUT_DEFAULT))
-    g_error ("Failed to send message (oom)");
+    oom ();
   
   dbus_message_unref (message);
   
@@ -863,7 +863,7 @@ do_find_owner_async (AsyncDBusCall *async_call)
 				     async_get_name_owner_response,
 				     async_call,
 				     NULL))
-    g_error ("Failed to send message (oom)");
+    oom ();
 }
 
 void
@@ -955,7 +955,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
     {
       if (!dbus_connection_send_with_reply (connection, message,
 					    &pending, DBUS_TIMEOUT_DEFAULT))
-	g_error ("Failed to send message (oom)");
+	oom ();
       
       if (pending == NULL)
 	{
@@ -1092,12 +1092,12 @@ get_name_owner_sync (const char *bus_name, GError **error)
                                           DBUS_INTERFACE_DBUS,
                                           "GetNameOwner");
   if (message == NULL)
-    g_error ("oom");
+    oom ();
   
   if (!dbus_message_append_args (message,
 				 DBUS_TYPE_STRING, &bus_name,
 				 DBUS_TYPE_INVALID))
-    g_error ("oom");
+    oom ();
   
   reply = dbus_connection_send_with_reply_and_block (connection, message, -1, &derror);
   dbus_message_unref (message);
