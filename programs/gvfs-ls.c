@@ -50,6 +50,8 @@ show_info (GFileInfo *info)
 {
   const char *name, *type;
   goffset size;
+  char **attributes;
+  int i;
 
   if ((g_file_info_get_is_hidden (info)) && !show_hidden)
     return;
@@ -60,7 +62,28 @@ show_info (GFileInfo *info)
 
   size = g_file_info_get_size (info);
   type = type_to_string (g_file_info_get_file_type (info));
-  g_print ("%s\t%"G_GUINT64_FORMAT" (%s)\n", name, (guint64)size, type);
+  g_print ("%s\t%"G_GUINT64_FORMAT" (%s)", name, (guint64)size, type);
+
+  attributes = g_file_info_list_attributes (info, NULL);
+  for (i = 0 ; attributes[i] != NULL; i++)
+    {
+      GFileAttributeValue *val;
+      char *val_as_string;
+
+      if (strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_NAME) == 0 ||
+	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_SIZE) == 0 ||
+	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_TYPE) == 0)
+	continue;
+      
+      val = g_file_info_get_attribute (info, attributes[i]);
+      val_as_string = g_file_attribute_value_as_string (val);
+      g_print (" %s=%s", attributes[i], val_as_string);
+      g_free (val_as_string);
+    }
+  
+  g_strfreev (attributes);
+  
+  g_print ("\n");
 }
 
 static void
@@ -73,9 +96,6 @@ list (GFile *file)
   if (file == NULL)
     return;
 
-  if (attributes == NULL)
-    attributes = "*";
-  
   error = NULL;
   enumerator = g_file_enumerate_children (file, attributes, 0, NULL, &error);
   if (enumerator == NULL)
@@ -123,6 +143,11 @@ main (int argc, char *argv[])
   context = g_option_context_new ("- list files at <location>");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
+
+  attributes = g_strconcat (G_FILE_ATTRIBUTE_STD_NAME "," G_FILE_ATTRIBUTE_STD_TYPE "," G_FILE_ATTRIBUTE_STD_SIZE,
+			    attributes != NULL ? "," : "",
+			    attributes,
+			    NULL);
   
   if (argc > 1)
     {
@@ -145,5 +170,7 @@ main (int argc, char *argv[])
       g_object_unref (file);
     }
 
+  g_free (attributes);
+  
   return 0;
 }
