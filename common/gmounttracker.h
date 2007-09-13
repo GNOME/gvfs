@@ -45,6 +45,8 @@ GMountTracker *g_mount_tracker_new                (void);
 GList *        g_mount_tracker_list_mounts        (GMountTracker *tracker);
 GMountInfo *   g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
 						   GMountSpec    *mount_spec);
+gboolean       g_mount_tracker_has_mount_spec     (GMountTracker *tracker,
+						   GMountSpec    *mount_spec);
 
 G_END_DECLS
 
