@@ -160,7 +160,8 @@ lookup_attribute (const char *attribute)
 static void
 free_attribute_value (GFileAttributeValue *value)
 {
-      if (value->type == G_FILE_ATTRIBUTE_TYPE_STRING)
+      if (value->type == G_FILE_ATTRIBUTE_TYPE_STRING ||
+          value->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
 	g_free (value->value.string);
 }
 
