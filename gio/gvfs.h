@@ -2,7 +2,7 @@
 #define __G_VFS_IMPLEMENTATION_H__
 
 #include <glib-object.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 #include <gio/gfile.h>
 
 G_BEGIN_DECLS

@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <gvfstypes.h>
+#include <giotypes.h>
 
 #include "gcancellable.h"
 

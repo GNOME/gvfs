@@ -2,7 +2,6 @@
 
 #include <string.h>
 
-#include <gvfstypes.h>
 #include "gfileinfo.h"
 #include <glib/gi18n-lib.h>
 

@@ -2,7 +2,7 @@
 #define __G_VFS_CHANNEL_H__
 
 #include <glib-object.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 #include <gvfsjob.h>
 #include <gvfsbackend.h>
 #include <gvfsdaemonprotocol.h>

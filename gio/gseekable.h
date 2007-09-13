@@ -2,7 +2,7 @@
 #define __G_SEEKABLE_H__
 
 #include <glib-object.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 #include <gio/gcancellable.h>
 
 G_BEGIN_DECLS

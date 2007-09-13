@@ -83,7 +83,7 @@ gvfsinclude_HEADERS = \
 	goutputstream.h \
 	gseekable.h \
 	gioerror.h \
-	gvfstypes.h \
+	giotypes.h \
 	$(NULL)
 
 noinst_PROGRAMS= \

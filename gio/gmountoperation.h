@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include <glib-object.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 
 G_BEGIN_DECLS
 

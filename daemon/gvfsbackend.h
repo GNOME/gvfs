@@ -2,7 +2,7 @@
 #define __G_VFS_BACKEND_H__
 
 #include <dbus/dbus.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 #include <gio/gfileinfo.h>
 #include <gio/gfile.h>
 #include <gvfsdaemon.h>

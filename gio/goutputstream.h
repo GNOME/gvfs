@@ -2,7 +2,7 @@
 #define __G_OUTPUT_STREAM_H__
 
 #include <glib-object.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 #include <gio/gioerror.h>
 #include <gio/gcancellable.h>
 

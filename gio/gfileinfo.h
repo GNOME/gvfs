@@ -2,7 +2,7 @@
 #define __G_FILE_INFO_H__
 
 #include <glib-object.h>
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 
 G_BEGIN_DECLS
 

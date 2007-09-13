@@ -4,7 +4,7 @@
 
 #include <dbus/dbus.h>
 
-#include <gio/gvfstypes.h>
+#include <gio/giotypes.h>
 #include <gio/gioerror.h>
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
