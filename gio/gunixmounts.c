@@ -25,6 +25,8 @@
 #include <signal.h>
 
 #include "gunixmounts.h"
+#include "gfile.h"
+#include "gfilemonitor.h"
 
 #define MOUNT_POLL_INTERVAL 4000
 
@@ -812,51 +814,52 @@ typedef struct {
   gpointer user_data;
 } MountMonitor;
 
-
-/*
-static GMonitorHandle *fstab_monitor = NULL;
-static GMonitorHandle *mtab_monitor = NULL;
-*/
-static guint poll_tag = 0;
+static GFileMonitor *fstab_monitor;
+static GFileMonitor *mtab_monitor;
 static GList *mount_monitors = NULL;
 
-#if 0 /* Needs file monitoring */
 static void
-fstab_monitor_callback (GMonitorHandle *handle,
-			const char *monitor_uri,
-			const char *info_uri,
-			GMonitorEventType event_type,
-			gpointer user_data)
-{
-  (*fstab_callback) (user_data);
-}
-
-static void
-mtab_monitor_callback (GMonitorHandle *handle,
-		       const char *monitor_uri,
-		       const char *info_uri,
-		       GMonitorEventType event_type,
-		       gpointer user_data)
-{
-  (*mtab_callback) (user_data);
-}
-
-#endif
-
-static gboolean
-poll_mounts (gpointer user_data)
+fstab_file_changed (GFileMonitor* monitor,
+		    GFile* file,
+		    GFile* other_file,
+		    GFileMonitorEvent event_type,
+		    gpointer user_data)
 {
   GList *l;
+
+  if (event_type != G_FILE_MONITOR_EVENT_CHANGED &&
+      event_type != G_FILE_MONITOR_EVENT_CREATED &&
+      event_type != G_FILE_MONITOR_EVENT_DELETED)
+    return;
 
   for (l = mount_monitors; l != NULL; l = l->next)
     {
       MountMonitor *mount_monitor = l->data;
 
       mount_monitor->mountpoints_changed (mount_monitor->user_data);
+    }
+}
+
+static void
+mtab_file_changed (GFileMonitor* monitor,
+		   GFile* file,
+		   GFile* other_file,
+		   GFileMonitorEvent event_type,
+		   gpointer user_data)
+{
+  GList *l;
+
+  if (event_type != G_FILE_MONITOR_EVENT_CHANGED &&
+      event_type != G_FILE_MONITOR_EVENT_CREATED &&
+      event_type != G_FILE_MONITOR_EVENT_DELETED)
+    return;
+  
+  for (l = mount_monitors; l != NULL; l = l->next)
+    {
+      MountMonitor *mount_monitor = l->data;
+
       mount_monitor->mounts_changed (mount_monitor->user_data);
     }
-  
-  return TRUE;
 }
 
 gpointer
@@ -864,8 +867,7 @@ _g_monitor_unix_mounts (GUnixMountCallback mountpoints_changed,
 			GUnixMountCallback mounts_changed,
 			gpointer user_data)
 {
-  char *fstab_file;
-  char *mtab_file;
+  GFile *file;
   MountMonitor *mount_monitor;
 
   mount_monitor = g_new0 (MountMonitor, 1);
@@ -875,40 +877,23 @@ _g_monitor_unix_mounts (GUnixMountCallback mountpoints_changed,
 
   if (mount_monitors == NULL)
     {
-      fstab_file = get_fstab_file ();
-      mtab_file = get_mtab_monitor_file ();
-
-#if 0
-      if (fstab_file != NULL)
+      if (get_fstab_file () != NULL)
 	{
-	  char *fstab_uri;
-	  fstab_uri = g_get_uri_from_local_path (fstab_file);
-	  g_monitor_add (&fstab_monitor,
-			 fstab_uri,
-			 G_MONITOR_FILE,
-			 fstab_monitor_callback,
-			 mount_table_changed_user_data);
-	  g_free (fstab_uri);
+	  file = g_file_new_for_path (get_fstab_file ());
+	  fstab_monitor = g_file_monitor_file (file, 0);
+	  g_object_unref (file);
+
+	  g_signal_connect (fstab_monitor, "changed", (GCallback)fstab_file_changed, NULL);
 	}
       
-      if (mtab_file != NULL)
+      if (get_mtab_monitor_file () != NULL)
 	{
-	  char *mtab_uri;
-	  mtab_uri = g_get_uri_from_local_path (mtab_file);
-	  g_monitor_add (&mtab_monitor,
-			 mtab_uri,
-			 G_MONITOR_FILE,
-			 mtab_monitor_callback,
-			 current_mounts_user_data);
-	  g_free (mtab_uri);
+	  file = g_file_new_for_path (get_mtab_monitor_file ());
+	  mtab_monitor = g_file_monitor_file (file, 0);
+	  g_object_unref (file);
+	  
+	  g_signal_connect (mtab_monitor, "changed", (GCallback)mtab_file_changed, NULL);
 	}
-#endif
-
-      /* Fallback to polling */
-      
-      poll_tag = g_timeout_add (MOUNT_POLL_INTERVAL,
-				poll_mounts,
-				NULL);
     }
 
   mount_monitors = g_list_prepend (mount_monitors, mount_monitor);
@@ -931,23 +916,17 @@ _g_stop_monitoring_unix_mounts (gpointer tag)
 
   if (mount_monitors == NULL)
     {
-      /*
-	if (fstab_monitor != NULL)
+      if (fstab_monitor != NULL)
 	{
-	g_monitor_cancel (fstab_monitor);
-	fstab_monitor = NULL;
+	  g_file_monitor_cancel (fstab_monitor);
+	  g_object_unref (fstab_monitor);
+	  fstab_monitor = NULL;
 	}
-	if (mtab_monitor != NULL)
+      if (mtab_monitor != NULL)
 	{
-	g_monitor_cancel (mtab_monitor);
-	mtab_monitor = NULL;
-	}
-      */
-  
-      if (poll_tag != 0)
-	{
-	  g_source_remove (poll_tag);
-	  poll_tag = 0;
+	  g_file_monitor_cancel (mtab_monitor);
+	  g_object_unref (mtab_monitor);
+	  mtab_monitor = NULL;
 	}
     }
 }
