@@ -19,11 +19,11 @@ struct _GUnixDrive {
   GUnixMountType guessed_type;
 };
 
-static void g_unix_volue_drive_iface_init (GDriveIface *iface);
+static void g_unix_volume_drive_iface_init (GDriveIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GUnixDrive, g_unix_drive, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_DRIVE,
-						g_unix_volue_drive_iface_init))
+						g_unix_volume_drive_iface_init))
 
 static void
 g_unix_drive_finalize (GObject *object)
@@ -248,7 +248,7 @@ g_unix_drive_eject_finish (GDrive *drive,
 }
 
 static void
-g_unix_volue_drive_iface_init (GDriveIface *iface)
+g_unix_volume_drive_iface_init (GDriveIface *iface)
 {
   iface->get_name = g_unix_drive_get_name;
   iface->get_icon = g_unix_drive_get_icon;
