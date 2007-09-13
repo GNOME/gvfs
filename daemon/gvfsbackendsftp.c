@@ -882,7 +882,7 @@ do_mount (GVfsBackend *backend,
   g_data_output_stream_put_byte (ds,
 				 SSH_FXP_INIT, NULL, NULL);
   g_data_output_stream_put_int32 (ds,
-				  SSH2_FILEXFER_VERSION, NULL, NULL);
+				  SSH_FILEXFER_VERSION, NULL, NULL);
   send_command_sync (so,ds, NULL, NULL);
   g_object_unref (ds);
 
@@ -1054,6 +1054,7 @@ get_info_reply (GVfsBackendSftp *backend,
   g_print ("get_info_reply, %d\n", len);
   guint32 flags;
   GFileInfo *info;
+  GFileType type;
   
   if (reply_type == SSH_FXP_STATUS)
     {
@@ -1087,12 +1088,30 @@ get_info_reply (GVfsBackendSftp *backend,
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, v);
     }
 
+  type = G_FILE_TYPE_UNKNOWN;
+  
   if (flags & SSH_FILEXFER_ATTR_PERMISSIONS)
     {
       guint32 v;
       v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, v);
+
+      if (S_ISREG (v))
+	type = G_FILE_TYPE_REGULAR;
+      else if (S_ISDIR (v))
+	type = G_FILE_TYPE_DIRECTORY;
+      else if (S_ISFIFO (v) ||
+	       S_ISSOCK (v) ||
+	       S_ISCHR (v) ||
+	       S_ISBLK (v))
+	type = G_FILE_TYPE_SPECIAL;
+      else if (S_ISLNK (v))
+	type = G_FILE_TYPE_SYMBOLIC_LINK;
     }
+
+  g_file_info_set_file_type (info, type);
+  
+  /* TODO: Handle is_symlink */
 
   if (flags & SSH_FILEXFER_ATTR_ACMODTIME)
     {
