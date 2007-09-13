@@ -35,21 +35,20 @@ typedef struct  {
 
 GFileAttributeValue *g_file_attribute_value_new             (void);
 void                 g_file_attribute_value_free            (GFileAttributeValue *attr);
-void                 g_file_attribute_value_destroy         (GFileAttributeValue *attr);
 void                 g_file_attribute_value_clear           (GFileAttributeValue *attr);
 void                 g_file_attribute_value_set             (GFileAttributeValue *attr,
-							     GFileAttributeValue *new_value);
-GFileAttributeValue *g_file_attribute_value_dup             (GFileAttributeValue *attr);
+							     const GFileAttributeValue *new_value);
+GFileAttributeValue *g_file_attribute_value_dup             (const GFileAttributeValue *attr);
 
-char *               g_file_attribute_value_as_string       (GFileAttributeValue *attr);
+char *               g_file_attribute_value_as_string       (const GFileAttributeValue *attr);
 
-const char *         g_file_attribute_value_get_string      (GFileAttributeValue *attr);
-const char *         g_file_attribute_value_get_byte_string (GFileAttributeValue *attr);
-guint32              g_file_attribute_value_get_uint32      (GFileAttributeValue *attr);
-gint32               g_file_attribute_value_get_int32       (GFileAttributeValue *attr);
-guint64              g_file_attribute_value_get_uint64      (GFileAttributeValue *attr);
-gint64               g_file_attribute_value_get_int64       (GFileAttributeValue *attr);
-GObject *            g_file_attribute_value_get_object      (GFileAttributeValue *attr);
+const char *         g_file_attribute_value_get_string      (const GFileAttributeValue *attr);
+const char *         g_file_attribute_value_get_byte_string (const GFileAttributeValue *attr);
+guint32              g_file_attribute_value_get_uint32      (const GFileAttributeValue *attr);
+gint32               g_file_attribute_value_get_int32       (const GFileAttributeValue *attr);
+guint64              g_file_attribute_value_get_uint64      (const GFileAttributeValue *attr);
+gint64               g_file_attribute_value_get_int64       (const GFileAttributeValue *attr);
+GObject *            g_file_attribute_value_get_object      (const GFileAttributeValue *attr);
 
 void                 g_file_attribute_value_set_string      (GFileAttributeValue *attr,
 							     const char          *value);

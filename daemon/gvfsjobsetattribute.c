@@ -30,7 +30,7 @@ g_vfs_job_set_attribute_finalize (GObject *object)
 
   g_free (job->filename);
   g_free (job->attribute);
-  g_file_attribute_value_destroy (&job->value);
+  g_file_attribute_value_clear (&job->value);
   
   if (G_OBJECT_CLASS (g_vfs_job_set_attribute_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_set_attribute_parent_class)->finalize) (object);

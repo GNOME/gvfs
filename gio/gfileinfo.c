@@ -159,7 +159,7 @@ g_file_info_finalize (GObject *object)
 
   attrs = (GFileAttribute *)info->attributes->data;
   for (i = 0; i < info->attributes->len; i++)
-    g_file_attribute_value_destroy (&attrs[i].value);
+    g_file_attribute_value_clear (&attrs[i].value);
   g_array_free (info->attributes, TRUE);  
   
   if (G_OBJECT_CLASS (g_file_info_parent_class)->finalize)
@@ -332,7 +332,7 @@ g_file_info_remove_attribute (GFileInfo  *info,
   if (i < info->attributes->len &&
       attrs[i].attribute == attr_id)
     {
-      g_file_attribute_value_destroy (&attrs[i].value);
+      g_file_attribute_value_clear (&attrs[i].value);
       g_array_remove_index (info->attributes, i);
     }
 }

@@ -247,7 +247,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
   const gchar *attribute_temp;
   dbus_uint32_t obj_type;
 
-  g_file_attribute_value_destroy (value);
+  g_file_attribute_value_clear (value);
   
   dbus_message_iter_recurse (iter, &inner_struct_iter);
       

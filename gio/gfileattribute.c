@@ -8,12 +8,12 @@
 void
 g_file_attribute_value_free (GFileAttributeValue *attr)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   g_free (attr);
 }
 
 void
-g_file_attribute_value_destroy (GFileAttributeValue *attr)
+g_file_attribute_value_clear (GFileAttributeValue *attr)
 {
   if (attr->type == G_FILE_ATTRIBUTE_TYPE_STRING ||
       attr->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
@@ -22,20 +22,15 @@ g_file_attribute_value_destroy (GFileAttributeValue *attr)
   if (attr->type == G_FILE_ATTRIBUTE_TYPE_OBJECT &&
       attr->u.obj != NULL)
     g_object_unref (attr->u.obj);
-}
-
-void
-g_file_attribute_value_clear (GFileAttributeValue *attr)
-{
-  g_file_attribute_value_destroy (attr);
+  
   attr->type = G_FILE_ATTRIBUTE_TYPE_INVALID;
 }
 
 void
 g_file_attribute_value_set (GFileAttributeValue *attr,
-			    GFileAttributeValue *new_value)
+			    const GFileAttributeValue *new_value)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   *attr = *new_value;
 
   if (attr->type == G_FILE_ATTRIBUTE_TYPE_STRING ||
@@ -58,7 +53,7 @@ g_file_attribute_value_new (void)
 }
 
 GFileAttributeValue *
-g_file_attribute_value_dup (GFileAttributeValue *old_attr)
+g_file_attribute_value_dup (const GFileAttributeValue *old_attr)
 {
   GFileAttributeValue *attr;
 
@@ -118,7 +113,7 @@ escape_byte_string (const char *str)
 }
 
 char *
-g_file_attribute_value_as_string (GFileAttributeValue *attr)
+g_file_attribute_value_as_string (const GFileAttributeValue *attr)
 {
   char *str;
 
@@ -152,7 +147,7 @@ g_file_attribute_value_as_string (GFileAttributeValue *attr)
 }
 
 const char *
-g_file_attribute_value_get_string (GFileAttributeValue *attr)
+g_file_attribute_value_get_string (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_STRING)
     {
@@ -164,7 +159,7 @@ g_file_attribute_value_get_string (GFileAttributeValue *attr)
 }
 
 const char *
-g_file_attribute_value_get_byte_string (GFileAttributeValue *attr)
+g_file_attribute_value_get_byte_string (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
     {
@@ -176,7 +171,7 @@ g_file_attribute_value_get_byte_string (GFileAttributeValue *attr)
 }
   
 guint32
-g_file_attribute_value_get_uint32 (GFileAttributeValue *attr)
+g_file_attribute_value_get_uint32 (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_UINT32)
     {
@@ -188,7 +183,7 @@ g_file_attribute_value_get_uint32 (GFileAttributeValue *attr)
 }
   
 gint32
-g_file_attribute_value_get_int32 (GFileAttributeValue *attr)
+g_file_attribute_value_get_int32 (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_INT32)
     {
@@ -200,7 +195,7 @@ g_file_attribute_value_get_int32 (GFileAttributeValue *attr)
 }
   
 guint64
-g_file_attribute_value_get_uint64 (GFileAttributeValue *attr)
+g_file_attribute_value_get_uint64 (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_UINT64)
     {
@@ -212,7 +207,7 @@ g_file_attribute_value_get_uint64 (GFileAttributeValue *attr)
 }
   
 gint64
-g_file_attribute_value_get_int64 (GFileAttributeValue *attr)
+g_file_attribute_value_get_int64 (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_INT64)
     {
@@ -224,7 +219,7 @@ g_file_attribute_value_get_int64 (GFileAttributeValue *attr)
 }
 
 GObject *
-g_file_attribute_value_get_object (GFileAttributeValue *attr)
+g_file_attribute_value_get_object (const GFileAttributeValue *attr)
 {
   if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_OBJECT)
     {
@@ -242,7 +237,7 @@ void
 g_file_attribute_value_set_string (GFileAttributeValue *attr,
 				   const char          *string)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_STRING;
   attr->u.string = g_strdup (string);
 }
@@ -252,7 +247,7 @@ void
 g_file_attribute_value_set_byte_string (GFileAttributeValue *attr,
 					const char          *string)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
   attr->u.string = g_strdup (string);
 }
@@ -261,7 +256,7 @@ void
 g_file_attribute_value_set_uint32 (GFileAttributeValue *attr,
 				   guint32              value)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_UINT32;
   attr->u.uint32 = value;
 }
@@ -270,7 +265,7 @@ void
 g_file_attribute_value_set_int32 (GFileAttributeValue *attr,
 				  gint32               value)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_INT32;
   attr->u.int32 = value;
 }
@@ -279,7 +274,7 @@ void
 g_file_attribute_value_set_uint64 (GFileAttributeValue *attr,
 				   guint64              value)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_UINT64;
   attr->u.uint64 = value;
 }
@@ -288,7 +283,7 @@ void
 g_file_attribute_value_set_int64 (GFileAttributeValue *attr,
 				  gint64               value)
 {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_INT64;
   attr->u.int64 = value;
 }
@@ -297,7 +292,7 @@ void
 g_file_attribute_value_set_object (GFileAttributeValue *attr,
 				   GObject             *obj)
   {
-  g_file_attribute_value_destroy (attr);
+  g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
   if (obj)
     attr->u.obj = g_object_ref (obj);
