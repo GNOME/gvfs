@@ -13,6 +13,7 @@
 #include "gvfsjobsource.h"
 #include "gvfsdaemonprotocol.h"
 #include <gvfsjobopenforread.h>
+#include <gvfsjobopenforwrite.h>
 #include <gvfsjobgetinfo.h>
 #include <gvfsjobenumerate.h>
 #include <gdbusutils.h>
@@ -262,6 +263,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
 					G_VFS_DBUS_OP_ENUMERATE))
     job = g_vfs_job_enumerate_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+					G_VFS_DBUS_OP_OPEN_FOR_WRITE))
+    job = g_vfs_job_open_for_write_new (connection, message, backend);
 
   if (job)
     {
