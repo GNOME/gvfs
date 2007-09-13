@@ -169,6 +169,7 @@ g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
   DBusMessage *message, *reply;
   DBusMessageIter iter;
   char *icon = "icon";
+  DBusError error;
   
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
   backend->object_path = g_vfs_daemon_register_mount  (daemon,
@@ -197,13 +198,13 @@ g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
 
   dbus_message_set_auto_start (message, TRUE);
   
+  dbus_error_init (&error);
   reply = dbus_connection_send_with_reply_and_block (conn, message,
-						     -1, NULL);
-  if (reply == NULL ||
-      dbus_message_get_type (reply) == DBUS_MESSAGE_TYPE_ERROR)
+						     -1, &error);
+  if (reply == NULL)
     {
       /* TODO: handle better */
-      g_print ("failed to register mountpoint");
+      g_error ("failed to register mountpoint: %s", error.message);
       exit (1);
     }
 

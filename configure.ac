@@ -33,6 +33,9 @@ AC_SUBST(GLIB_LIBS)
 PKG_CHECK_MODULES(DBUS, dbus-1)
 AC_SUBST(DBUS_CFLAGS)
 AC_SUBST(DBUS_LIBS)
+AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
+DBUS_SERVICE_DIR=$with_dbus_service_dir
+AC_SUBST(DBUS_SERVICE_DIR)
 
 	
 GETTEXT_PACKAGE=gvfs

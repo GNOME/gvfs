@@ -17,9 +17,21 @@ libraries =						\
 	$(top_builddir)/common/libcommon.la		\
 	$(GLIB_LIBS) $(DBUS_LIBS)
 
+# D-BUS service file
+%.service: %.service.in ../config.log
+	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+
+servicedir = $(DBUS_SERVICE_DIR)
+service_in_files = gvfs-daemon.service.in
+service_DATA = gvfs-daemon.service
+
+EXTRA_DIST = gvfs-daemon.service.in
+
+DISTCLEANFILES = gvfs-daemon.service
+
+libexec_PROGRAMS=gvfs-daemon
 
 noinst_PROGRAMS =				\
-	gvfs-daemon				\
 	gvfs-daemon-test			\
 	gvfs-daemon-smb				\
 	$(NULL)

@@ -9,4 +9,4 @@ Makefile.in
 gvfs-daemon
 gvfs-daemon-smb
 gvfs-daemon-test
-
+*.service
