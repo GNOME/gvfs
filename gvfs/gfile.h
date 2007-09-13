@@ -17,6 +17,12 @@ G_BEGIN_DECLS
 typedef struct _GFile         GFile; /* Dummy typedef */
 typedef struct _GFileIface    GFileIface;
 
+typedef void (*GFileReadCallback) (GFile *file,
+				   GFileInputStream *stream,
+				   gpointer user_data,
+				   GError *error);
+
+
 struct _GFileIface
 {
   GTypeInterface g_iface;
@@ -55,6 +61,13 @@ struct _GFileIface
 					     gboolean              make_backup,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  
+  void                (*read_async)         (GFile                *file,
+					     int                   io_priority,
+					     GFileReadCallback     callback,
+					     gpointer              callback_data,
+					     GMainContext         *context,
+					     GCancellable         *cancellable);
 };
 
 GType g_file_get_type (void) G_GNUC_CONST;
@@ -64,37 +77,43 @@ GFile *g_file_get_for_uri             (const char *uri);
 GFile *g_file_parse_name              (const char *parse_name);
 GFile *g_file_get_for_commandline_arg (const char *arg);
 
-GFile *            g_file_copy              (GFile                 *file);
-gboolean           g_file_is_native          (GFile                 *file);
-char *             g_file_get_path           (GFile                 *file);
-char *             g_file_get_uri            (GFile                 *file);
-char *             g_file_get_parse_name     (GFile                 *file);
-GFile *            g_file_get_parent         (GFile                 *file);
-GFile *            g_file_get_child          (GFile                 *file,
-					      const char            *name);
-GFileEnumerator *  g_file_enumerate_children (GFile                 *file,
-					      GFileInfoRequestFlags  requested,
-					      const char            *attributes,
-					      gboolean               follow_symlinks);
-GFileInfo *        g_file_get_info           (GFile                 *file,
-					      GFileInfoRequestFlags  requested,
-					      const char            *attributes,
-					      gboolean               follow_symlinks,
-					      GError               **error);
-GFileInputStream * g_file_read               (GFile                 *file,
-					      GCancellable          *cancellable,
-					      GError               **error);
-GFileOutputStream *g_file_append_to          (GFile                 *file,
-					      GCancellable          *cancellable,
-					      GError               **error);
-GFileOutputStream *g_file_create             (GFile                 *file,
-					      GCancellable          *cancellable,
-					      GError               **error);
-GFileOutputStream *g_file_replace            (GFile                 *file,
-					      time_t                 mtime,
-					      gboolean               make_backup,
-					      GCancellable          *cancellable,
-					      GError               **error);
+GFile *            g_file_copy               (GFile                  *file);
+gboolean           g_file_is_native          (GFile                  *file);
+char *             g_file_get_path           (GFile                  *file);
+char *             g_file_get_uri            (GFile                  *file);
+char *             g_file_get_parse_name     (GFile                  *file);
+GFile *            g_file_get_parent         (GFile                  *file);
+GFile *            g_file_get_child          (GFile                  *file,
+					      const char             *name);
+GFileEnumerator *  g_file_enumerate_children (GFile                  *file,
+					      GFileInfoRequestFlags   requested,
+					      const char             *attributes,
+					      gboolean                follow_symlinks);
+GFileInfo *        g_file_get_info           (GFile                  *file,
+					      GFileInfoRequestFlags   requested,
+					      const char             *attributes,
+					      gboolean                follow_symlinks,
+					      GError                **error);
+GFileInputStream * g_file_read               (GFile                  *file,
+					      GCancellable           *cancellable,
+					      GError                **error);
+GFileOutputStream *g_file_append_to          (GFile                  *file,
+					      GCancellable           *cancellable,
+					      GError                **error);
+GFileOutputStream *g_file_create             (GFile                  *file,
+					      GCancellable           *cancellable,
+					      GError                **error);
+GFileOutputStream *g_file_replace            (GFile                  *file,
+					      time_t                  mtime,
+					      gboolean                make_backup,
+					      GCancellable           *cancellable,
+					      GError                **error);
+void               g_file_read_async         (GFile                  *file,
+					      int                     io_priority,
+					      GFileReadCallback       callback,
+					      gpointer                callback_data,
+					      GMainContext           *context,
+					      GCancellable           *cancellable);
 
 G_END_DECLS
 

@@ -4,10 +4,20 @@
 #include <pwd.h>
 #include "gfile.h"
 #include "gvfs.h"
+#include "gioscheduler.h"
 #include <glib/gi18n-lib.h>
 
 static void g_file_base_init (gpointer g_class);
+static void g_file_class_init (gpointer g_class,
+			       gpointer class_data);
 
+
+static void g_file_real_read_async (GFile                  *file,
+				    int                     io_priority,
+				    GFileReadCallback       callback,
+				    gpointer                callback_data,
+				    GMainContext           *context,
+				    GCancellable           *cancellable);
 
 GType
 g_file_get_type (void)
@@ -21,7 +31,7 @@ g_file_get_type (void)
         sizeof (GFileIface), /* class_size */
 	g_file_base_init,   /* base_init */
 	NULL,		/* base_finalize */
-	NULL,
+	g_file_class_init,
 	NULL,		/* class_finalize */
 	NULL,		/* class_data */
 	0,
@@ -37,6 +47,15 @@ g_file_get_type (void)
     }
 
   return file_type;
+}
+
+static void
+g_file_class_init (gpointer g_class,
+		   gpointer class_data)
+{
+  GFileIface *iface = g_class;
+
+  iface->read_async = g_file_real_read_async;
 }
 
 static void
@@ -195,7 +214,116 @@ g_file_replace (GFile *file,
   return (* iface->replace) (file, mtime, make_backup, cancellable, error);
 }
 
-/* Default vfs ops */
+void
+g_file_read_async (GFile                  *file,
+		   int                     io_priority,
+		   GFileReadCallback       callback,
+		   gpointer                callback_data,
+		   GMainContext           *context,
+		   GCancellable           *cancellable)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  (* iface->read_async) (file,
+			 io_priority,
+			 callback,
+			 callback_data,
+			 context,
+			 cancellable);
+}
+
+/********************************************
+ *   Default implementation of async ops    *
+ ********************************************/
+
+typedef struct {
+  GFile *file;
+  GError *error;
+  gpointer callback_data;
+} AsyncOp;
+
+static void
+async_op_free (gpointer data)
+{
+  AsyncOp *op = data;
+
+  if (op->error)
+    g_error_free (op->error);
+
+  g_object_unref (op->file);
+  
+  g_free (op);
+}
+
+typedef struct {
+  AsyncOp      op;
+  GFileInputStream *res_stream;
+  GFileReadCallback callback;
+} ReadAsyncOp;
+
+static void
+read_op_report (gpointer data)
+{
+  ReadAsyncOp *op = data;
+
+  op->callback (op->op.file,
+		op->res_stream,
+		op->op.callback_data,
+		op->op.error);
+}
+
+static void
+read_op_func (GIOJob *job,
+	      GCancellable *c,
+	      gpointer data)
+{
+  ReadAsyncOp *op = data;
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (c))
+    {
+      op->res_stream = NULL;
+      g_set_error (&op->op.error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+    }
+  else
+    {
+      iface = G_FILE_GET_IFACE (op->op.file);
+      op->res_stream = iface->read (op->op.file, c, &op->op.error);
+    }
+
+  g_io_job_send_to_mainloop (job, read_op_report,
+			     op, async_op_free,
+			     FALSE);
+}
+
+static void
+g_file_real_read_async (GFile                  *file,
+			int                     io_priority,
+			GFileReadCallback       callback,
+			gpointer                callback_data,
+			GMainContext           *context,
+			GCancellable           *cancellable)
+{
+  ReadAsyncOp *op;
+
+  op = g_new0 (ReadAsyncOp, 1);
+
+  op->op.file = g_object_ref (file);
+  op->callback = callback;
+  op->op.callback_data = callback_data;
+  
+  g_schedule_io_job (read_op_func, op, NULL, io_priority,
+		     context, cancellable);
+}
+
+/********************************************
+ *   Default VFS operations                 *
+ ********************************************/
 
 GFile *
 g_file_get_for_path (const char *path)
