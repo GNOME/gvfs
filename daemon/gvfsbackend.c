@@ -36,3 +36,29 @@ g_vfs_backend_init (GVfsBackend *backend)
 {
 }
 
+gboolean
+g_vfs_backend_open_for_read (GVfsBackend *backend,
+			     GVfsJobOpenForRead *job,
+			     char *filename)
+{
+  GVfsBackendClass *class;
+
+  class = G_VFS_BACKEND_GET_CLASS (backend);
+  
+  return class->open_for_read (backend, job, filename);
+}
+
+gboolean
+g_vfs_backend_read (GVfsBackend *backend,
+		    GVfsJobRead *job,
+		    GVfsHandle *handle,
+		    char *buffer,
+		    gsize bytes_requested)
+{
+  GVfsBackendClass *class;
+
+  class = G_VFS_BACKEND_GET_CLASS (backend);
+  
+  return class->read (backend, job, handle,
+		      buffer, bytes_requested);
+}
