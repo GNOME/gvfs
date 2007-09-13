@@ -24,7 +24,7 @@ static GOptionEntry entries[] =
 	{ NULL }
 };
 
-static void
+static gboolean
 save (GFile *file)
 {
   GOutputStream *out;
@@ -33,7 +33,8 @@ save (GFile *file)
   gssize res;
   gboolean close_res;
   GError *error;
-  
+  gboolean save_res;
+
   error = NULL;
   if (create)
     out = (GOutputStream *)g_file_create (file, NULL, &error);
@@ -45,9 +46,11 @@ save (GFile *file)
     {
       g_printerr ("Error opening file: %s\n", error->message);
       g_error_free (error);
-      return;
+      return FALSE;
     }
-
+  
+  save_res = TRUE;
+  
   while (1)
     {
       res = read (STDIN_FILENO, buffer, 1024);
@@ -62,6 +65,7 @@ save (GFile *file)
 	      written = g_output_stream_write (out, p, res, NULL, &error);
 	      if (written == -1)
 		{
+		  save_res = FALSE;
 		  g_printerr ("Error writing to stream: %s", error->message);
 		  g_error_free (error);
 		  goto out;
@@ -72,6 +76,7 @@ save (GFile *file)
 	}
       else if (res < 0)
 	{
+	  save_res = FALSE;
 	  perror ("Error reading stdin");
 	  break;
 	}
@@ -84,6 +89,7 @@ save (GFile *file)
   close_res = g_output_stream_close (out, NULL, &error);
   if (!close_res)
     {
+      save_res = FALSE;
       g_printerr ("Error closing: %s\n", error->message);
       g_error_free (error);
     }
@@ -105,6 +111,8 @@ save (GFile *file)
     }
   
   g_object_unref (out);
+  
+  return save_res;
 }
 
 int
@@ -113,6 +121,7 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
+  gboolean res;
   
   setlocale (LC_ALL, "");
 
@@ -122,13 +131,17 @@ main (int argc, char *argv[])
   context = g_option_context_new ("- output files at <location>");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
+
+  res = FALSE;
   
   if (argc > 1)
     {
       file = g_file_get_for_commandline_arg (argv[1]);
-      save (file);
+      res = save (file);
       g_object_unref (file);
     }
 
-  return 0;
+  if (res)
+    return 0;
+  return 1;
 }
