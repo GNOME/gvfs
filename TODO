@@ -29,6 +29,10 @@ implement seeks in local streams
 
 pass cancellable to async callbacks?
 
+g_input_stream_get_async_context should return NULL for default, to be more threadsafe
+
+rename glib lib from gvfs to gio (since it has more than gvfs)
+
 FUTURE IDEAS:
 -------------
 
