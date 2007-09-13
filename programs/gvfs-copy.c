@@ -9,11 +9,13 @@
 #include <glib.h>
 #include <gio/gfile.h>
 
+static gboolean progress = FALSE;
 static gboolean interactive = FALSE;
 static gboolean backup = FALSE;
 
 static GOptionEntry entries[] = 
 {
+	{ "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, "show progress", NULL },
 	{ "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, "prompt before overwrite", NULL },
 	{ "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, "backup existing destination files", NULL },
 	{ NULL }
@@ -31,6 +33,16 @@ is_dir (GFile *file)
     g_object_unref (info);
   return res;
 }
+
+static void
+show_progress (goffset current_num_bytes,
+	       goffset total_num_bytes,
+	       gpointer user_data)
+{
+  g_print ("progress %"G_GUINT64_FORMAT"/%"G_GUINT64_FORMAT"\n",
+	   current_num_bytes, total_num_bytes);
+}
+
 
 int
 main (int argc, char *argv[])
@@ -89,7 +101,7 @@ main (int argc, char *argv[])
 	flags |= G_FILE_COPY_OVERWRITE;
 	
       error = NULL;
-      if (!g_file_copy (source, target, flags, NULL, NULL, NULL, &error))
+      if (!g_file_copy (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
 	{
 	  if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
 	    {
