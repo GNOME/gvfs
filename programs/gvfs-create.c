@@ -35,7 +35,6 @@ create (GFile *file)
   while (1)
     {
       res = read (STDIN_FILENO, buffer, 1024);
-      g_print ("read: %d\n", res);
       if (res > 0)
 	{
 	  ssize_t written;
@@ -45,7 +44,6 @@ create (GFile *file)
 	    {
 	      error = NULL;
 	      written = g_output_stream_write (out, p, res, NULL, &error);
-	      g_print ("written: %d\n", written);
 	      if (written == -1)
 		{
 		  g_printerr ("Error writing to stream: %s", error->message);
