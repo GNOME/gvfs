@@ -169,9 +169,16 @@ g_vfs_backend_sftp_finalize (GObject *object)
 }
 
 static void
+expected_reply_free (ExpectedReply *reply)
+{
+  g_object_unref (reply->job);
+  g_slice_free (ExpectedReply, reply);
+}
+
+static void
 g_vfs_backend_sftp_init (GVfsBackendSftp *backend)
 {
-  backend->expected_replies = g_hash_table_new_full (NULL, NULL, NULL, g_free);
+  backend->expected_replies = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify)expected_reply_free);
 }
 
 static void
@@ -825,13 +832,12 @@ expect_reply (GVfsBackendSftp *backend,
 {
   ExpectedReply *expected;
 
-  expected = g_new (ExpectedReply, 1);
+  expected = g_slice_new (ExpectedReply);
   expected->callback = callback;
-  expected->job = job;
+  expected->job = g_object_ref (job);
 
   g_hash_table_replace (backend->expected_replies, GINT_TO_POINTER (id), expected);
 }
-
 
 static void
 queue_command_stream_and_free (GVfsBackendSftp *backend,
@@ -1077,6 +1083,10 @@ get_info_reply (GVfsBackendSftp *backend,
   guint32 flags;
   GFileInfo *info;
   GFileType type;
+  int finished_count;
+  
+  if (job->sent_reply)
+    return; /* Other might have failed */
   
   if (reply_type == SSH_FXP_STATUS)
     {
@@ -1119,16 +1129,16 @@ get_info_reply (GVfsBackendSftp *backend,
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, v);
 
       if (S_ISREG (v))
-	type = G_FILE_TYPE_REGULAR;
+        type = G_FILE_TYPE_REGULAR;
       else if (S_ISDIR (v))
-	type = G_FILE_TYPE_DIRECTORY;
+        type = G_FILE_TYPE_DIRECTORY;
       else if (S_ISFIFO (v) ||
-	       S_ISSOCK (v) ||
-	       S_ISCHR (v) ||
-	       S_ISBLK (v))
-	type = G_FILE_TYPE_SPECIAL;
+               S_ISSOCK (v) ||
+               S_ISCHR (v) ||
+               S_ISBLK (v))
+        type = G_FILE_TYPE_SPECIAL;
       else if (S_ISLNK (v))
-	type = G_FILE_TYPE_SYMBOLIC_LINK;
+        type = G_FILE_TYPE_SYMBOLIC_LINK;
     }
 
   g_file_info_set_file_type (info, type);
@@ -1152,8 +1162,73 @@ get_info_reply (GVfsBackendSftp *backend,
       /* TODO: Handle more */
     }
 
-  g_vfs_job_succeeded (job);
+  finished_count = GPOINTER_TO_INT (job->backend_data);
+  job->backend_data = GINT_TO_POINTER (--finished_count);
+  if (finished_count == 0)
+    g_vfs_job_succeeded (job);
 }
+
+static void
+get_info_is_link_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job)
+{
+  g_print ("get_info_is_link_reply, %d\n", len);
+  guint32 flags;
+  GFileInfo *info;
+  GFileType type;
+  int finished_count;
+
+  if (job->sent_reply)
+    return; /* Other might have failed */
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply);
+      return;
+    }
+
+  if (reply_type != SSH_FXP_ATTRS)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Invalid reply recieved"));
+      return;
+    }
+
+  info = G_VFS_JOB_GET_INFO (job)->file_info;
+
+  flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  if (flags & SSH_FILEXFER_ATTR_SIZE)
+    {
+      g_data_input_stream_get_uint64 (reply, NULL, NULL);
+    }
+  
+  if (flags & SSH_FILEXFER_ATTR_UIDGID)
+    {
+      g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_data_input_stream_get_uint32 (reply, NULL, NULL);
+    }
+
+  type = G_FILE_TYPE_UNKNOWN;
+  
+  if (flags & SSH_FILEXFER_ATTR_PERMISSIONS)
+    {
+      guint32 v;
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, v);
+
+      if (S_ISLNK (v))
+        g_file_info_set_is_symlink (info, TRUE);
+    }
+
+  finished_count = GPOINTER_TO_INT (job->backend_data);
+  job->backend_data = GINT_TO_POINTER (--finished_count);
+  if (finished_count == 0)
+    g_vfs_job_succeeded (job);
+}
+
 
 static gboolean
 try_get_info (GVfsBackend *backend,
@@ -1167,12 +1242,32 @@ try_get_info (GVfsBackend *backend,
   guint32 id;
   GDataOutputStream *command;
 
-  command = new_command_stream (op_backend,
-                                SSH_FXP_STAT,
-                                &id);
-  put_string (command, filename);
-  
-  queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
+  if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+    {
+      G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
+      command = new_command_stream (op_backend,
+                                    SSH_FXP_LSTAT,
+                                    &id);
+      put_string (command, filename);
+      
+      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
+    }
+  else
+    {
+      G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (2);
+      
+      command = new_command_stream (op_backend,
+                                    SSH_FXP_LSTAT,
+                                    &id);
+      put_string (command, filename);
+      queue_command_stream_and_free (op_backend, command, id, get_info_is_link_reply, G_VFS_JOB (job));
+
+      command = new_command_stream (op_backend,
+                                    SSH_FXP_STAT,
+                                    &id);
+      put_string (command, filename);
+      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
+    }
 
   return TRUE;
 }
