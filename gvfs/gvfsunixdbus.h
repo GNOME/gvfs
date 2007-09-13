@@ -7,7 +7,8 @@
 G_BEGIN_DECLS
 
 DBusConnection *_g_vfs_unix_get_connection_sync (const char *mountpoint,
-						 int *extra_fd_out);
+						 int *extra_fd_out,
+						 GError **error);
 
 G_END_DECLS
 

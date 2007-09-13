@@ -9,6 +9,7 @@
 #include "gfileunix.h"
 #include "gvfsunixdbus.h"
 #include <gvfsdaemonprotocol.h>
+#include <gunixfileinputstream.h>
 #include <glib/gi18n-lib.h>
 
 static void g_file_unix_file_iface_init (GFileIface       *iface);
@@ -179,90 +180,15 @@ g_file_unix_get_info (GFile                *file,
   return NULL;
 }
 
-/* receive a file descriptor over file descriptor fd */
-static int 
-receive_fd (int connection_fd)
-{
-  struct msghdr msg;
-  struct iovec iov;
-  char buf[1];
-  int rv;
-  char ccmsg[CMSG_SPACE (sizeof(int))];
-  struct cmsghdr *cmsg;
-
-  iov.iov_base = buf;
-  iov.iov_len = 1;
-  msg.msg_name = 0;
-  msg.msg_namelen = 0;
-  msg.msg_iov = &iov;
-  msg.msg_iovlen = 1;
-  msg.msg_control = ccmsg;
-  msg.msg_controllen = sizeof (ccmsg);
-  
-  rv = recvmsg (connection_fd, &msg, 0);
-  if (rv == -1) 
-    {
-      perror ("recvmsg");
-      return -1;
-    }
-
-  cmsg = CMSG_FIRSTHDR (&msg);
-  if (!cmsg->cmsg_type == SCM_RIGHTS) {
-    g_warning("got control message of unknown type %d", 
-	      cmsg->cmsg_type);
-    return -1;
-  }
-
-  return *(int*)CMSG_DATA(cmsg);
-}
-
 static GFileInputStream *
 g_file_unix_read (GFile *file)
 {
   GFileUnix *unix_file = G_FILE_UNIX (file);
-  DBusConnection *connection;
-  DBusMessage *message, *reply;
-  DBusError error;
-  char *str;
-  int fd, extra_fd;
+  GFileInputStream *stream;
 
-  connection = _g_vfs_unix_get_connection_sync (unix_file->mountpoint, &extra_fd);
-
-  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
-					  G_VFS_DBUS_DAEMON_PATH,
-					  G_VFS_DBUS_DAEMON_INTERFACE,
-					  G_VFS_DBUS_OP_READ_FILE);
-
-  
-  /* TODO: strings are utf8, filenames are not */
-  if (!dbus_message_append_args (message, 
-				 DBUS_TYPE_STRING, &unix_file->filename,
-				 0))
-      g_error ("Out of memory");
-
-  dbus_error_init (&error);
-  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
-						     &error);
-  dbus_message_unref (message);
-
-  if (!reply)
-    {
-      g_warning ("Error while running READ_FILE: %s",
-		 error.message);
-      dbus_error_free (&error);
-      return NULL;
-    }
-  
-  dbus_message_get_args (reply, NULL,
-			 DBUS_TYPE_STRING, &str,
-			 DBUS_TYPE_INVALID);
-
-  g_print ("read_file: %s\n", str);
-
-  fd = receive_fd (extra_fd);
-  g_print ("new fd: %d\n", fd);
-
-  return NULL;
+  stream = g_unix_file_input_stream_new (unix_file->filename,
+					 unix_file->mountpoint);
+  return stream;
 }
 
 static GFileOutputStream *

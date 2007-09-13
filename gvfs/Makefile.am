@@ -40,6 +40,7 @@ unix_sources = \
 	gfileunix.c gfileunix.h \
 	gfileunixsimple.c gfileunixsimple.h \
 	gvfsunixuri.c gvfsunixuri.h \
+	gunixfileinputstream.c gunixfileinputstream.h \
 	gvfsunixdbus.c \
 	$(NULL)
 

@@ -152,13 +152,14 @@ close_wrapper (gpointer p)
 
 DBusConnection *
 _g_vfs_unix_get_connection_sync (const char *mountpoint,
-				 gint *fd)
+				 gint *fd,
+				 GError **error)
 {
   static GOnce once_init = G_ONCE_INIT;
   ThreadLocalConnections *local;
   DBusConnection *connection;
   DBusMessage *message, *reply;
-  DBusError error;
+  DBusError derror;
   GString *bus_name;
   char *address1, *address2;
   int extra_fd;
@@ -184,13 +185,14 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint,
   
   if (local->bus == NULL)
     {
-      dbus_error_init (&error);
-      local->bus = dbus_bus_get_private (DBUS_BUS_SESSION, &error);
+      dbus_error_init (&derror);
+      local->bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);
       if (local->bus == NULL)
 	{
-	  g_printerr ("Couldn't get main dbus connection: %s\n",
-		      error.message);
-	  dbus_error_free (&error);
+	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       "Couldn't get main dbus connection: %s\n",
+		       derror.message);
+	  dbus_error_free (&derror);
 	  return NULL;
 	}
     }
@@ -203,16 +205,17 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint,
 					  G_VFS_DBUS_OP_GET_CONNECTION);
   g_string_free (bus_name, TRUE);
   
-  dbus_error_init (&error);
+  dbus_error_init (&derror);
   reply = dbus_connection_send_with_reply_and_block (local->bus, message, -1,
-						     &error);
+						     &derror);
   dbus_message_unref (message);
 
   if (!reply)
     {
-      g_warning ("Error while getting peer-to-peer connection: %s",
-		 error.message);
-      dbus_error_free (&error);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting peer-to-peer dbus connection: %s",
+		   derror.message);
+      dbus_error_free (&derror);
       return NULL;
     }
   
@@ -224,14 +227,15 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint,
   extra_fd = unix_socket_connect (address2);
   g_print ("extra fd: %d\n", extra_fd);
 
-  dbus_error_init (&error);
-  connection = dbus_connection_open_private (address1, &error);
+  dbus_error_init (&derror);
+  connection = dbus_connection_open_private (address1, &derror);
   if (!connection)
     {
-      g_warning ("Failed to connect to peer-to-peer address (%s): %s",
-		 address1, error.message);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting peer-to-peer dbus connection: %s",
+		   derror.message);
       dbus_message_unref (reply);
-      dbus_error_free (&error);
+      dbus_error_free (&derror);
       return NULL;
     }
   dbus_message_unref (reply);
