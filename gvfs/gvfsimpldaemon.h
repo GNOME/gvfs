@@ -29,10 +29,11 @@ struct _GVfsImplDaemonClass
 GType   g_vfs_impl_daemon_get_type  (void) G_GNUC_CONST;
 
 GVfsImplDaemon *g_vfs_impl_daemon_new       (void);
-DBusMessage *   _g_vfs_impl_daemon_new_call (GQuark      match_bus_name,
-					     const char *path,
-					     const char *op,
-					     char      **new_path);
+DBusMessage *   _g_vfs_impl_daemon_new_path_call (GQuark      match_bus_name,
+						  const char *path,
+						  const char *op,
+						  int         first_arg_type,
+						  ...);
 
 G_END_DECLS
 

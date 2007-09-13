@@ -155,13 +155,14 @@ g_file_get_info (GFile *file,
 		 GFileInfoRequestFlags requested,
 		 const char *attributes,
 		 gboolean follow_symlinks,
+		 GCancellable *cancellable,
 		 GError **error)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->get_info) (file, requested, attributes, follow_symlinks, error);
+  return (* iface->get_info) (file, requested, attributes, follow_symlinks, cancellable, error);
 }
 
 GFileInputStream *

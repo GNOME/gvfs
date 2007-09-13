@@ -132,7 +132,7 @@ get_info (GFile *file)
     G_FILE_INFO_DISPLAY_NAME | G_FILE_INFO_EDIT_NAME;
   
   error = NULL;
-  info = g_file_get_info (file, request, attributes, follow_symlinks, &error);
+  info = g_file_get_info (file, request, attributes, follow_symlinks, NULL, &error);
 
   if (info == NULL)
     {

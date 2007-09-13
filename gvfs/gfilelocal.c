@@ -251,6 +251,7 @@ g_file_local_get_info (GFile                *file,
 		       GFileInfoRequestFlags requested,
 		       const char           *attributes,
 		       gboolean              follow_symlinks,
+		       GCancellable         *cancellable,
 		       GError              **error)
 {
   GFileLocal *local = G_FILE_LOCAL (file);

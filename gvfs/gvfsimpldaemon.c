@@ -318,13 +318,16 @@ g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
 }
 
 DBusMessage *
-_g_vfs_impl_daemon_new_call (GQuark match_bus_name,
-			     const char *path,
-			     const char *op,
-			     char **new_path)
+_g_vfs_impl_daemon_new_path_call (GQuark match_bus_name,
+				  const char *path,
+				  const char *op,
+				  int    first_arg_type,
+				  ...)
 {
   GList *l;
   DBusMessage *message = NULL;
+  va_list var_args;
+  char *new_path;
   
   G_LOCK (mounts);
 
@@ -352,7 +355,18 @@ _g_vfs_impl_daemon_new_call (GQuark match_bus_name,
   if (message)
     {
       /* TODO: Handle path prefixes */
-      *new_path = g_strdup (path);
+      new_path = g_strdup (path);
+
+      _g_dbus_message_append_args (message,
+				   G_DBUS_TYPE_CSTRING, &new_path,
+				   0);
+      g_free (new_path);
+      
+      va_start (var_args, first_arg_type);
+      _g_dbus_message_append_args_valist (message,
+					  first_arg_type,
+					  var_args);
+      va_end (var_args);
     }
   return message;
 }

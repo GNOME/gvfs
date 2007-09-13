@@ -172,10 +172,48 @@ g_file_daemon_get_info (GFile                *file,
 			GFileInfoRequestFlags requested,
 			const char           *attributes,
 			gboolean              follow_symlinks,
+			GCancellable         *cancellable,
 			GError              **error)
 {
- 
-  /* TODO: implement */
+  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  DBusConnection *connection;
+  DBusMessage *message, *reply;
+  guint32 requested_32;
+  dbus_bool_t follow_symlinks_dbus;
+
+  requested_32 = (guint32)requested;
+  if (attributes == NULL)
+    attributes = "";
+  follow_symlinks_dbus = follow_symlinks;
+  message =
+    _g_vfs_impl_daemon_new_path_call (daemon_file->match_bus_name,
+				      daemon_file->path,
+				      G_VFS_DBUS_OP_GET_INFO,
+				      DBUS_TYPE_UINT32, &requested_32,
+				      DBUS_TYPE_STRING, &attributes,
+				      DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
+				      0);
+  
+  /* TODO: handle nonmounted => message == NULL */
+  
+  reply = _g_vfs_daemon_call_sync (message,
+				   &connection,
+				   cancellable, error);
+  dbus_message_unref (message);
+  if (reply == NULL)
+    return NULL;
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_INVALID))
+    {
+      dbus_message_unref (reply);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from open"));
+      return NULL;
+    }
+  
+  dbus_message_unref (reply);
+
   return NULL;
 }
 
@@ -266,20 +304,13 @@ g_file_daemon_read_async (GFile *file,
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
   DBusMessage *message;
-  DBusMessageIter iter;
-  char *path;
   
-  message = _g_vfs_impl_daemon_new_call (daemon_file->match_bus_name,
-					 daemon_file->path,
-					 G_VFS_DBUS_OP_OPEN_FOR_READ,
-					 &path);
+  message =
+    _g_vfs_impl_daemon_new_path_call (daemon_file->match_bus_name,
+				      daemon_file->path,
+				      G_VFS_DBUS_OP_OPEN_FOR_READ,
+				      0);
   /* TODO: handle nonmounted => message == NULL */
-  
-  dbus_message_iter_init_append (message, &iter);
-  if (!_g_dbus_message_iter_append_filename (&iter, path))
-    g_error ("Out of memory appending filename");
-  g_free (path);
-
   _g_vfs_daemon_call_async (message,
 			    context,
 			    callback, callback_data,
@@ -297,33 +328,15 @@ g_file_daemon_read (GFile *file,
   DBusConnection *connection;
   int fd;
   DBusMessage *message, *reply;
-  DBusMessageIter iter;
   guint32 fd_id;
   dbus_bool_t can_seek;
-  char *path;
 
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
-
-  message = _g_vfs_impl_daemon_new_call (daemon_file->match_bus_name,
-					 daemon_file->path,
-					 G_VFS_DBUS_OP_OPEN_FOR_READ,
-					 &path);
+  message =
+    _g_vfs_impl_daemon_new_path_call (daemon_file->match_bus_name,
+				      daemon_file->path,
+				      G_VFS_DBUS_OP_OPEN_FOR_READ,
+				      0);
   /* TODO: handle nonmounted => message == NULL */
-  
-  dbus_message_iter_init_append (message, &iter);
-  if (!_g_dbus_message_iter_append_filename (&iter, path))
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOMEM,
-		   _("Out of memory"));
-      return NULL;
-    }
 
   reply = _g_vfs_daemon_call_sync (message,
 				   &connection,

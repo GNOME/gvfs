@@ -65,6 +65,14 @@ vfs_dbus_init (gpointer arg)
   return NULL;
 }
 
+static void oom (void) G_GNUC_NORETURN;
+
+static void oom (void)
+{
+  g_error ("DBus failed with out of memory error");
+  exit(1);
+}
+
 static char *
 get_owner_for_bus_name (const char *bus_name)
 {
@@ -916,7 +924,15 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   DBusMessage *cancel_message;
   dbus_uint32_t serial;
   const char *bus_name = dbus_message_get_destination (message);
-			 
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
 	    
   connection = get_connection_sync (bus_name, error);
   if (connection == NULL)
@@ -1246,7 +1262,7 @@ get_connection_sync (const char *bus_name,
 }
 
 gboolean
-_g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filename)
+_g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *filename)
 {
   DBusMessageIter array;
 
@@ -1906,3 +1922,129 @@ _g_dbus_connection_setup_with_main (DBusConnection         *connection,
   source = set_connection_for_main_context (context, NULL, connection);
   g_source_unref ((GSource *)source);
 }
+
+void
+_g_dbus_message_append_args_valist (DBusMessage *message,
+				    int          first_arg_type,
+				    va_list      var_args)
+{
+  int type;
+  DBusMessageIter iter;
+
+  g_return_if_fail (message != NULL);
+
+  type = first_arg_type;
+
+  dbus_message_iter_init_append (message, &iter);
+
+  while (type != DBUS_TYPE_INVALID)
+    {
+      if (type == G_DBUS_TYPE_CSTRING)
+	{
+	  const char **value_p;
+	  const char *value;
+
+	  value_p = va_arg (var_args, const char**);
+	  value = *value_p;
+
+	  if (!_g_dbus_message_iter_append_cstring (&iter, value))
+	    oom ();
+	}
+      else if (dbus_type_is_basic (type))
+        {
+          const void *value;
+          value = va_arg (var_args, const void*);
+
+          if (!dbus_message_iter_append_basic (&iter,
+                                               type,
+                                               value))
+	    oom ();
+        }
+      else if (type == DBUS_TYPE_ARRAY)
+        {
+          int element_type;
+          DBusMessageIter array;
+          char buf[2];
+
+          element_type = va_arg (var_args, int);
+              
+          buf[0] = element_type;
+          buf[1] = '\0';
+          if (!dbus_message_iter_open_container (&iter,
+                                                 DBUS_TYPE_ARRAY,
+                                                 buf,
+                                                 &array))
+	    oom ();
+          
+          if (dbus_type_is_fixed (element_type))
+            {
+              const void **value;
+              int n_elements;
+
+              value = va_arg (var_args, const void**);
+              n_elements = va_arg (var_args, int);
+              
+              if (!dbus_message_iter_append_fixed_array (&array,
+                                                         element_type,
+                                                         value,
+                                                         n_elements))
+		oom ();
+            }
+          else if (element_type == DBUS_TYPE_STRING ||
+                   element_type == DBUS_TYPE_SIGNATURE ||
+                   element_type == DBUS_TYPE_OBJECT_PATH)
+            {
+              const char ***value_p;
+              const char **value;
+              int n_elements;
+              int i;
+              
+              value_p = va_arg (var_args, const char***);
+              n_elements = va_arg (var_args, int);
+
+              value = *value_p;
+              
+              i = 0;
+              while (i < n_elements)
+                {
+                  if (!dbus_message_iter_append_basic (&array,
+                                                       element_type,
+                                                       &value[i]))
+		    oom ();
+                  ++i;
+                }
+            }
+          else
+            {
+              g_error ("arrays of %d can't be appended with _g_dbus_message_append_args_valist for now\n",
+		       element_type);
+            }
+
+          if (!dbus_message_iter_close_container (&iter, &array))
+	    oom ();
+        }
+
+      type = va_arg (var_args, int);
+    }
+}
+
+
+/* Same as the dbus one, except doesn't give OOM and handles
+   G_DBUS_TYPE_CSTRING
+*/
+void
+_g_dbus_message_append_args (DBusMessage *message,
+			     int          first_arg_type,
+			     ...)
+{
+  va_list var_args;
+
+  g_return_if_fail (message != NULL);
+
+  va_start (var_args, first_arg_type);
+  _g_dbus_message_append_args_valist (message,
+				      first_arg_type,
+				      var_args);
+  va_end (var_args);
+}
+

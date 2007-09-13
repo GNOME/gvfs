@@ -45,6 +45,7 @@ struct _GFileIface
 					     GFileInfoRequestFlags requested,
 					     const char           *attributes,
 					     gboolean              follow_symlinks,
+					     GCancellable         *cancellable,
 					     GError              **error);
   /*                  (*get_info_async)     (GFile                *file.. */
   GFileInputStream *  (*read)               (GFile                *file,
@@ -93,6 +94,7 @@ GFileInfo *        g_file_get_info           (GFile                  *file,
 					      GFileInfoRequestFlags   requested,
 					      const char             *attributes,
 					      gboolean                follow_symlinks,
+					      GCancellable           *cancellable,
 					      GError                **error);
 GFileInputStream * g_file_read               (GFile                  *file,
 					      GCancellable           *cancellable,

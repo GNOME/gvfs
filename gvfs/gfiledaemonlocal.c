@@ -127,11 +127,12 @@ g_file_daemon_local_get_info (GFile *file,
 			      GFileInfoRequestFlags requested,
 			      const char *attributes,
 			      gboolean follow_symlinks,
+			      GCancellable *cancellable,
 			      GError **error)
 {
   return g_file_get_info (G_FILE_DAEMON_LOCAL (file)->wrapped,
 			  requested, attributes, follow_symlinks,
-			  error);
+			  cancellable, error);
 }
 
 static GFileInputStream *

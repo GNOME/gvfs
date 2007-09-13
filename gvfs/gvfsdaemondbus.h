@@ -7,6 +7,9 @@
 
 G_BEGIN_DECLS
 
+/* Only used internally */
+#define G_DBUS_TYPE_CSTRING 1024
+
 typedef void (*GVfsAsyncDBusCallback) (DBusMessage *reply,
 				       DBusConnection *conntection,
 				       GError *io_error,
@@ -22,8 +25,14 @@ GList *      _g_dbus_bus_list_names_with_prefix_sync (DBusConnection         *co
 						      DBusError              *error);
 int          _g_dbus_connection_get_fd_sync          (DBusConnection         *conn,
 						      int                     fd_id);
-gboolean     _g_dbus_message_iter_append_filename    (DBusMessageIter        *iter,
+gboolean     _g_dbus_message_iter_append_cstring     (DBusMessageIter        *iter,
 						      const char             *filename);
+void         _g_dbus_message_append_args_valist      (DBusMessage            *message,
+						      int                     first_arg_type,
+						      va_list                 var_args);
+void         _g_dbus_message_append_args             (DBusMessage            *message,
+						      int                     first_arg_type,
+						      ...);
 void         _g_error_from_dbus                      (DBusError              *derror,
 						      GError                **error);
 void         _g_dbus_connection_get_fd_async         (DBusConnection         *connection,
