@@ -30,14 +30,18 @@ service_DATA = gvfs-daemon.service
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 mountdir = $(sysconfdir)/gvfs/mounts
-mount_in_files = smb.mount.in smb-browse.mount.in
-mount_DATA = smb.mount smb-browse.mount
 
 EXTRA_DIST = gvfs-daemon.service.in
 
 DISTCLEANFILES = gvfs-daemon.service
 
-libexec_PROGRAMS=gvfs-daemon gvfs-daemon gvfs-daemon-smb-browse gvfs-daemon-smb 
+libexec_PROGRAMS=gvfs-daemon gvfs-daemon
+
+if HAVE_SAMBA
+mount_in_files = smb.mount.in smb-browse.mount.in
+mount_DATA = smb.mount smb-browse.mount
+libexec_PROGRAMS += gvfs-daemon-smb-browse gvfs-daemon-smb
+endif
 
 noinst_PROGRAMS =				\
 	gvfs-daemon-test			\
