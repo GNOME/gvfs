@@ -30,6 +30,9 @@ struct _GDirectoryMonitorPrivate {
   guint32 timeout_fires_at;
 };
 
+#define DEFAULT_RATE_LIMIT_MSECS 800
+#define DEFAULT_VIRTUAL_CHANGES_DONE_DELAY_SECS 3
+
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void
@@ -103,7 +106,7 @@ g_directory_monitor_init (GDirectoryMonitor *monitor)
 					       G_TYPE_DIRECTORY_MONITOR,
 					       GDirectoryMonitorPrivate);
 
-  monitor->priv->rate_limit_msec = 800;
+  monitor->priv->rate_limit_msec = DEFAULT_RATE_LIMIT_MSECS;
   monitor->priv->rate_limiter = g_hash_table_new_full (g_file_hash, (GEqualFunc)g_file_equal,
 						       NULL, (GDestroyNotify) rate_limiter_free);
 }
@@ -394,7 +397,7 @@ g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
       /* Schedule a virtual change done. This is removed if we get a real one, and
 	 postponed if we get more change events. */
 
-      limiter->send_virtual_changes_done_at = time_now + 3000;
+      limiter->send_virtual_changes_done_at = time_now + DEFAULT_VIRTUAL_CHANGES_DONE_DELAY_SECS * 1000;
       update_rate_limiter_timeout (monitor, limiter->send_virtual_changes_done_at);
     }
 }

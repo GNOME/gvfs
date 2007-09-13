@@ -27,6 +27,9 @@ struct _GFileMonitorPrivate {
   GFile *virtual_changes_done_file;
 };
 
+#define DEFAULT_RATE_LIMIT_MSECS 800
+#define DEFAULT_VIRTUAL_CHANGES_DONE_DELAY_SECS 3
+
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void
@@ -96,7 +99,7 @@ g_file_monitor_init (GFileMonitor *monitor)
   monitor->priv = G_TYPE_INSTANCE_GET_PRIVATE (monitor,
 					       G_TYPE_FILE_MONITOR,
 					       GFileMonitorPrivate);
-  monitor->priv->rate_limit_msec = 800;
+  monitor->priv->rate_limit_msec = DEFAULT_RATE_LIMIT_MSECS;
 }
 
 
@@ -242,7 +245,7 @@ schedule_virtual_change_done (GFileMonitor *monitor, GFile *file)
 {
   GSource *source;
   
-  source = g_timeout_source_new_seconds (3);
+  source = g_timeout_source_new_seconds (DEFAULT_VIRTUAL_CHANGES_DONE_DELAY_SECS);
   
   g_source_set_callback (source, virtual_changes_done_timeout, monitor, NULL);
   g_source_attach (source, NULL);
