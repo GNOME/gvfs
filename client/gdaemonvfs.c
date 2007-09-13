@@ -70,8 +70,6 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   char *path;
   g_mountspec_from_uri_func func;
   
-  /* TODO: Share MountSpec objects between files (its refcounted) */
-
   spec = NULL;
   
   if (strcmp (uri->scheme, "test") == 0)
@@ -92,7 +90,8 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
       path = g_strdup (uri->path);
     }
 
-  *spec_out = spec;
+  *spec_out = g_mount_spec_get_unique_for (spec);
+  g_mount_spec_unref (spec);
   *path_out = path;
 }
 
