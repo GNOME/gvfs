@@ -92,7 +92,9 @@ get_mountspec_from_uri (GDecodedUri *uri,
 	    {
 	      /* uri form: smb://$host/ */
 	      spec = g_mount_spec_new ("smb-server");
-	      g_mount_spec_set  (spec, "server", uri->host);
+	      tmp = g_ascii_strdown (uri->host, -1);
+	      g_mount_spec_set  (spec, "server", tmp);
+	      g_free (tmp);
 	      path = g_strdup ("/");
 	    }
 	  else
@@ -114,7 +116,9 @@ get_mountspec_from_uri (GDecodedUri *uri,
 		  if (share[0] == '#' && share[1] == '#')
 		    {
 		      spec = g_mount_spec_new ("smb-server");
-		      g_mount_spec_set  (spec, "server", uri->host);
+		      tmp = g_ascii_strdown (uri->host, -1);
+		      g_mount_spec_set  (spec, "server", tmp);
+		      g_free (tmp);
 		      tmp = g_strndup (share+2, share_end - share);
 		      path = g_strconcat ("/", tmp, NULL);
 		      g_free (tmp);
@@ -122,7 +126,9 @@ get_mountspec_from_uri (GDecodedUri *uri,
 		  else
 		    {
 		      spec = g_mount_spec_new ("smb-share");
-		      g_mount_spec_set  (spec, "server", uri->host);
+		      tmp = g_ascii_strdown (uri->host, -1);
+		      g_mount_spec_set  (spec, "server", tmp);
+		      g_free (tmp);
 		      tmp = g_strndup (share, share_end - share);
 		      g_mount_spec_set  (spec, "share", tmp);
 		      g_free (tmp);
@@ -133,7 +139,9 @@ get_mountspec_from_uri (GDecodedUri *uri,
 		{
 		  spec = g_mount_spec_new ("smb-share");
 		  
-		  g_mount_spec_set  (spec, "server", uri->host);
+		  tmp = g_ascii_strdown (uri->host, -1);
+		  g_mount_spec_set  (spec, "server", tmp);
+		  g_free (tmp);
 
 		  tmp = g_strndup (share, share_end - share);
 		  g_mount_spec_set  (spec, "share", tmp);
