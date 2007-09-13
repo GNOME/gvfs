@@ -23,12 +23,11 @@ gboolean     _g_dbus_message_iter_append_filename (DBusMessageIter        *iter,
 						   const char             *filename);
 void         _g_error_from_dbus                   (DBusError              *derror,
 						   GError                **error);
-char *       _g_dbus_bus_name_from_mountpoint     (const char             *mountpoint);
 void         _g_dbus_connection_get_fd_async      (DBusConnection         *connection,
 						   int                     fd_id,
 						   GetFdAsyncCallback      callback,
 						   gpointer                callback_data);
-void         _g_vfs_daemon_call_async             (const char             *mountpoint,
+void         _g_vfs_daemon_call_async             (const char             *owner,
 						   DBusMessage            *message,
 						   GMainContext           *context,
 						   gpointer                op_callback,
@@ -36,12 +35,13 @@ void         _g_vfs_daemon_call_async             (const char             *mount
 						   GVfsAsyncDBusCallback   callback,
 						   gpointer                callback_data,
 						   GCancellable           *cancellable);
-DBusMessage *_g_vfs_daemon_call_sync              (const char             *mountpoint,
+DBusMessage *_g_vfs_daemon_call_sync              (const char             *owner,
 						   DBusMessage            *message,
 						   DBusConnection        **connection_out,
 						   GCancellable           *cancellable,
 						   GError                **error);
-
+void         _g_dbus_connection_setup_with_main   (DBusConnection         *connection,
+						   GMainContext           *context);
 
 G_END_DECLS
 

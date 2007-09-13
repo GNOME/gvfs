@@ -192,7 +192,7 @@ backend_dbus_handler (DBusConnection  *connection,
   job = NULL;
   
   if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_DAEMON_INTERFACE,
+				   G_VFS_DBUS_MOUNTPOINT_INTERFACE,
 				   G_VFS_DBUS_OP_OPEN_FOR_READ))
     job = g_vfs_job_open_for_read_new (connection, message, backend);
 

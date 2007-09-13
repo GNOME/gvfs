@@ -92,30 +92,36 @@ g_vfs_mountpoint_from_dbus (DBusMessageIter *iter)
   g_vfs_mountpoint_free (mountpoint);
   return NULL;
 }
+
+static void
+append_string (DBusMessageIter *iter, char *string)
+{
+  if (string == NULL)
+    string = "";
   
+  if (!dbus_message_iter_append_basic (iter, DBUS_TYPE_STRING,
+				       &string))
+    g_error ("out of memory");
+}
+
+static void
+append_int (DBusMessageIter *iter, int _val)
+{
+  dbus_int32_t val;
+  val = _val;
+  
+  if (!dbus_message_iter_append_basic (iter, DBUS_TYPE_INT32, &val))
+    g_error ("out of memory");
+}
+
 void
 g_vfs_mountpoint_to_dbus (GVfsMountpoint  *mountpoint,
 			  DBusMessageIter *iter)
 {
-  dbus_bool_t res;
-  dbus_int32_t port;
-
-  res = TRUE;
-  res &= dbus_message_iter_append_basic (iter, DBUS_TYPE_STRING,
-					 &mountpoint->method);
-  
+  append_string (iter, mountpoint->method);
   /* TODO: Is this always utf8? */
-  res &= dbus_message_iter_append_basic (iter, DBUS_TYPE_STRING,
-					 &mountpoint->user);
-  
-  res &= dbus_message_iter_append_basic (iter, DBUS_TYPE_STRING,
-					 &mountpoint->host);
-  
-  port = mountpoint->port;
-  res &= dbus_message_iter_append_basic (iter, DBUS_TYPE_INT32, &port);
-  
-  res &= _g_dbus_message_iter_append_filename (iter, mountpoint->path);
-  
-  if (!res)
-    g_error ("out of memory");
+  append_string (iter, mountpoint->user);
+  append_string (iter, mountpoint->host);
+  append_int (iter, mountpoint->port);
+  _g_dbus_message_iter_append_filename (iter, mountpoint->path);
 }

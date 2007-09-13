@@ -10,7 +10,8 @@
   DBUS_TYPE_STRING_AS_STRING			\
   DBUS_TYPE_INT32_AS_STRING			\
   DBUS_TYPE_ARRAY_AS_STRING			\
-    DBUS_TYPE_BYTE_AS_STRING			\
+    DBUS_TYPE_BYTE_AS_STRING
+
 
 typedef struct {
   char *method;

@@ -19,3 +19,25 @@ At startup the client calls ListMountpoints to get a list of all active
 mountpoints. It then continues to track changes by looking at signals for
 availibility and daemon deaths.
 
+----------
+
+ideas:
+NameLost when you loose a name
+GetNameOwner - gets the owners name
+
+
+---- New version --------------------------------------------------------------------
+
+All info for mapping uri -> dbus name + remainder path is stored in config files read by the client at startup.
+
+Each "mountpoint" in a mountpoint daemon owns a name like "org.gtk.vfs.mount.smb.$server.$share".
+It also instantiates a Mountpoint interface at /org/gtk/vfs/mountpoint/smb.$server.$share which
+listens to operations.
+
+Each daemon that contains at least one mountpoint also registers a org.gtk.vfs.Daemon interface
+at /org/gtk/vfs/Daemon which supports operations like GetConnection and CancelOp.
+
+Clients use GetNameOwner to map uri -> mountpoint name -> owner of name -> GetConnection call so that
+it can handle multiple mountpoints in each daemon. This can be cached, and NameOwnerChanged can be used
+to invalidate the cache.
+

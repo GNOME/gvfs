@@ -19,7 +19,6 @@
 #define DBUS_TIMEOUT_DEFAULT 30 * 1000 /* 1/2 min */
 
 typedef struct {
-  DBusConnection *bus;
   GHashTable *connections;
 } ThreadLocalConnections;
 
@@ -44,13 +43,12 @@ static GOnce once_init_dbus = G_ONCE_INIT;
 static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
 
 static DBusConnection *get_connection_for_main_context (GMainContext    *context,
-							const char      *mountpoint);
+							const char      *owner);
 static DBusSource     *set_connection_for_main_context (GMainContext    *context,
-							char           **mountpoints,
-							int              n_mountpoints,
+							const char      *owner,
 							DBusConnection  *connection);
 static void            dbus_source_destroy             (DBusSource      *dbus_source);
-static DBusConnection *get_connection_sync             (const char      *mountpoint,
+static DBusConnection *get_connection_sync             (const char      *owner,
 							GError         **error);
 
 
@@ -66,12 +64,6 @@ vfs_dbus_init (gpointer arg)
 static void
 free_local_connections (ThreadLocalConnections *local)
 {
-  if (local->bus)
-    {
-      dbus_connection_close (local->bus);
-      dbus_connection_unref (local->bus);
-    }
-  
   g_hash_table_destroy (local->connections);
   g_free (local);
 }
@@ -106,64 +98,6 @@ append_unescaped_dbus_name (GString *s,
       g_string_append_c (s, c);
     }
 }
-
-
-/* We use _ for escaping */
-#define VALID_INITIAL_BUS_NAME_CHARACTER(c)         \
-  ( ((c) >= 'A' && (c) <= 'Z') ||               \
-    ((c) >= 'a' && (c) <= 'z') ||               \
-   /*((c) == '_') || */((c) == '-'))
-#define VALID_BUS_NAME_CHARACTER(c)                 \
-  ( ((c) >= '0' && (c) <= '9') ||               \
-    ((c) >= 'A' && (c) <= 'Z') ||               \
-    ((c) >= 'a' && (c) <= 'z') ||               \
-   /*((c) == '_')||*/  ((c) == '-'))
-
-
-static void
-append_escaped_bus_name (GString *s,
-			 const char *unescaped)
-{
-  char c;
-  gboolean first;
-  static const gchar hex[16] = "0123456789ABCDEF";
-
-  while ((c = *unescaped++) != 0)
-    {
-      if (first)
-	{
-	  if (VALID_INITIAL_BUS_NAME_CHARACTER (c))
-	    {
-	      g_string_append_c (s, c);
-	      continue;
-	    }
-	}
-      else
-	{
-	  if (VALID_BUS_NAME_CHARACTER (c))
-	    {
-	      g_string_append_c (s, c);
-	      continue;
-	    }
-	}
-
-      first = FALSE;
-      g_string_append_c (s, '_');
-      g_string_append_c (s, hex[((guchar)c) >> 4]);
-      g_string_append_c (s, hex[((guchar)c) & 0xf]);
-    }
-}
-
-char *
-_g_dbus_bus_name_from_mountpoint (const char *mountpoint)
-{
-  GString *bus_name;
-  
-  bus_name = g_string_new (G_VFS_DBUS_MOUNTPOINT_NAME);
-  append_escaped_bus_name (bus_name, mountpoint);
-  return g_string_free (bus_name, FALSE);
-}
-
 
 static int
 daemon_socket_connect (const char *address, GError **error)
@@ -340,7 +274,7 @@ _g_dbus_connection_get_fd_async (DBusConnection *connection,
 
 
 typedef struct {
-  char *mountpoint;
+  char *owner;
   DBusMessage *message;
   DBusConnection *connection;
   GMainContext *context;
@@ -369,7 +303,7 @@ async_dbus_call_finish (AsyncDBusCall *async_call,
 			async_call->op_callback_data,
 			async_call->callback_data);
 
-  g_free (async_call->mountpoint);
+  g_free (async_call->owner);
   dbus_message_unref (async_call->message);
   if (async_call->context)
     g_main_context_unref (async_call->context);
@@ -548,8 +482,6 @@ async_get_connection_response (DBusPendingCall *pending,
   DBusConnection *connection, *existing_connection;
   VfsConnectionData *connection_data;
   DBusSource *source;
-  char **mountpoints;
-  int n_mountpoints;
 
   reply = dbus_pending_call_steal_reply (pending);
   dbus_pending_call_unref (pending);
@@ -563,7 +495,6 @@ async_get_connection_response (DBusPendingCall *pending,
   if (!dbus_message_get_args (reply, &derror,
 			      DBUS_TYPE_STRING, &address1,
 			      DBUS_TYPE_STRING, &address2,
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &mountpoints, &n_mountpoints,
 			      DBUS_TYPE_INVALID))
     {
       _g_error_from_dbus (&derror, &async_call->io_error);
@@ -577,7 +508,6 @@ async_get_connection_response (DBusPendingCall *pending,
   extra_fd = daemon_socket_connect (address2, &async_call->io_error);
   if (extra_fd == -1)
     {
-      dbus_free_string_array (mountpoints);
       dbus_message_unref (reply);
       async_dbus_call_finish (async_call, NULL);
       return;
@@ -588,7 +518,6 @@ async_get_connection_response (DBusPendingCall *pending,
   connection = dbus_connection_open_private (address1, &derror);
   if (!connection)
     {
-      dbus_free_string_array (mountpoints);
       close (extra_fd);
       dbus_message_unref (reply);
       
@@ -619,12 +548,12 @@ async_get_connection_response (DBusPendingCall *pending,
     g_error ("Out of memory");
 
   /* Maybe we already had a connection? This happens if we requested
-   * the same mountpoint, or a mountpoint in the same daemon in parallel.
+   * the same owner several times in parallel.
    * If so, just drop this connection and use that.
    */
   
   existing_connection = get_connection_for_main_context (async_call->context,
-							 async_call->mountpoint);
+							 async_call->owner);
   if (existing_connection != NULL)
     {
       async_call->connection = existing_connection;
@@ -634,16 +563,13 @@ async_get_connection_response (DBusPendingCall *pending,
     {  
       async_call->connection = connection;
       source = set_connection_for_main_context (async_call->context,
-						mountpoints,
-						n_mountpoints,
+						async_call->owner,
 						connection);
       g_source_unref ((GSource *)source); /* Owned by context */
     }
   
   dbus_connection_unref (connection);
 
-  dbus_free_string_array (mountpoints);
-  
   /* Maybe we were canceled while setting up connection, then
    * avoid doing the operation */
   if (g_cancellable_is_cancelled (async_call->cancellable))
@@ -663,7 +589,6 @@ static void
 open_connection_async (AsyncDBusCall *async_call)
 {
   DBusError derror;
-  char *bus_name;
   DBusMessage *get_connection_message;
   DBusPendingCall *pending;
   DBusConnection *bus;
@@ -684,14 +609,12 @@ open_connection_async (AsyncDBusCall *async_call)
   
   /* Connect with mainloop */
   async_call->get_connection_source =
-    set_connection_for_main_context (async_call->context, NULL, 0, bus);
+    set_connection_for_main_context (async_call->context, NULL, bus);
   
-  bus_name = _g_dbus_bus_name_from_mountpoint (async_call->mountpoint);
-  get_connection_message = dbus_message_new_method_call (bus_name,
+  get_connection_message = dbus_message_new_method_call (async_call->owner,
 							 G_VFS_DBUS_DAEMON_PATH,
 							 G_VFS_DBUS_DAEMON_INTERFACE,
 							 G_VFS_DBUS_OP_GET_CONNECTION);
-  g_free (bus_name);
   
   if (get_connection_message == NULL)
     g_error ("Failed to allocate message");
@@ -726,7 +649,7 @@ open_connection_async (AsyncDBusCall *async_call)
 }
 
 void
-_g_vfs_daemon_call_async (const char *mountpoint,
+_g_vfs_daemon_call_async (const char *owner,
 			  DBusMessage *message,
 			  GMainContext *context,
 			  gpointer op_callback,
@@ -740,7 +663,7 @@ _g_vfs_daemon_call_async (const char *mountpoint,
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
 
   async_call = g_new0 (AsyncDBusCall, 1);
-  async_call->mountpoint = g_strdup (mountpoint);
+  async_call->owner = g_strdup (owner);
   async_call->message = dbus_message_ref (message);
   if (context)
     async_call->context = g_main_context_ref (context);
@@ -751,7 +674,7 @@ _g_vfs_daemon_call_async (const char *mountpoint,
   async_call->op_callback = op_callback,
   async_call->op_callback_data = op_callback_data,
   
-  async_call->connection = get_connection_for_main_context (context, mountpoint);
+  async_call->connection = get_connection_for_main_context (context, owner);
   if (async_call->connection != NULL)
     do_call_async (async_call);
   else
@@ -759,7 +682,7 @@ _g_vfs_daemon_call_async (const char *mountpoint,
 }
 
 DBusMessage *
-_g_vfs_daemon_call_sync (const char *mountpoint,
+_g_vfs_daemon_call_sync (const char *owner,
 			 DBusMessage *message,
 			 DBusConnection **connection_out,
 			 GCancellable *cancellable,
@@ -775,7 +698,7 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
   DBusMessage *cancel_message;
   dbus_uint32_t serial;
 	    
-  connection = get_connection_sync (mountpoint, error);
+  connection = get_connection_sync (owner, error);
   if (connection == NULL)
     return NULL;
 
@@ -909,20 +832,17 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
 }
 
 static DBusConnection *
-get_connection_sync (const char *mountpoint,
+get_connection_sync (const char *owner,
 		     GError **error)
 {
+  DBusConnection *bus;
   ThreadLocalConnections *local;
   DBusConnection *connection;
   DBusMessage *message, *reply;
   DBusError derror;
-  GString *bus_name;
   char *address1, *address2;
   int extra_fd;
   VfsConnectionData *connection_data;
-  char **mountpoints;
-  int n_mountpoints;
-  int i;
 
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
 
@@ -935,36 +855,29 @@ get_connection_sync (const char *mountpoint,
       g_static_private_set (&local_connections, local, (GDestroyNotify)free_local_connections);
     }
   
-  connection = g_hash_table_lookup (local->connections, mountpoint);
+  connection = g_hash_table_lookup (local->connections, owner);
   if (connection != NULL)
     return connection;
   
-  if (local->bus == NULL)
+  dbus_error_init (&derror);
+  bus = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+  if (bus == NULL)
     {
-      dbus_error_init (&derror);
-      local->bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);
-      if (local->bus == NULL)
-	{
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		       "Couldn't get main dbus connection: %s\n",
-		       derror.message);
-	  dbus_error_free (&derror);
-	  return NULL;
-	}
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Couldn't get main dbus connection: %s\n",
+		   derror.message);
+      dbus_error_free (&derror);
+      return NULL;
     }
 
-  bus_name = g_string_new (G_VFS_DBUS_MOUNTPOINT_NAME);
-  append_escaped_bus_name (bus_name, mountpoint);
-  message = dbus_message_new_method_call (bus_name->str,
+  message = dbus_message_new_method_call (owner,
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_GET_CONNECTION);
-  g_string_free (bus_name, TRUE);
-  
-  dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (local->bus, message, -1,
+  reply = dbus_connection_send_with_reply_and_block (bus, message, -1,
 						     &derror);
   dbus_message_unref (message);
+  dbus_connection_unref (bus);
 
   if (!reply)
     {
@@ -985,13 +898,11 @@ get_connection_sync (const char *mountpoint,
   dbus_message_get_args (reply, NULL,
 			 DBUS_TYPE_STRING, &address1,
 			 DBUS_TYPE_STRING, &address2,
-			 DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &mountpoints, &n_mountpoints,
 			 DBUS_TYPE_INVALID);
 
   extra_fd = daemon_socket_connect (address2, error);
   if (extra_fd == -1)
     {
-      dbus_free_string_array (mountpoints);
       dbus_message_unref (reply);
       return NULL;
     }
@@ -1003,7 +914,6 @@ get_connection_sync (const char *mountpoint,
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
-      dbus_free_string_array (mountpoints);
       close (extra_fd);
       dbus_message_unref (reply);
       dbus_error_free (&derror);
@@ -1018,12 +928,7 @@ get_connection_sync (const char *mountpoint,
   if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
     g_error ("Out of memory");
 
-  for (i = 0; i < n_mountpoints; i++)
-    g_hash_table_insert (local->connections, g_strdup (mountpoints[i]),
-			 dbus_connection_ref (connection));
-  dbus_connection_unref (connection);
-
-  dbus_free_string_array (mountpoints);
+  g_hash_table_insert (local->connections, g_strdup (owner), connection);
 
   return connection;
 }
@@ -1109,6 +1014,7 @@ struct DBusSource
 {
   GSource source;             /**< the parent GSource */
   gboolean in_finalize;
+  char *owner;
   DBusConnection *connection; /**< the dbus connection, owned */
   GMainContext *context;      /**< the main context, not owed */
   GSList *ios;                /**< all IOHandler */
@@ -1129,38 +1035,25 @@ typedef struct
   DBusTimeout *timeout;
 } TimeoutHandler;
 
-typedef struct
-{
-  char *mountpoint;
-  GMainContext *context;
-} ContextMapKey;
-
 static GHashTable *context_map = NULL;
 G_LOCK_DEFINE_STATIC(context_map);
 
-static void
-context_map_key_free (ContextMapKey *key)
-{
-  g_free (key->mountpoint);
-  g_free (key);
-}
-
 static guint
-context_map_key_hash (gconstpointer _key)
+dbus_source_hash (gconstpointer _key)
 {
-  const ContextMapKey *key = _key;
-  return g_str_hash (key->mountpoint) ^ (guint)key->context;
+  const DBusSource *key = _key;
+  return g_str_hash (key->owner) ^ (guint)key->context;
 }
   
 static gboolean
-context_map_key_equal (gconstpointer a,
-		       gconstpointer b)
+dbus_source_equal (gconstpointer a,
+		   gconstpointer b)
 {
-  const ContextMapKey *aa = a;
-  const ContextMapKey *bb = b;
+  const DBusSource *aa = a;
+  const DBusSource *bb = b;
   
   return
-    strcmp (aa->mountpoint, bb->mountpoint) == 0 &&
+    strcmp (aa->owner, bb->owner) == 0 &&
     aa->context == bb->context;
 }
 
@@ -1491,15 +1384,6 @@ wakeup_main (void *data)
     g_main_context_wakeup (source->context);
 }
 
-static gboolean
-remove_source_cb (gpointer  key,
-		  gpointer  value,
-		  gpointer  user_data)
-{
-  return value == user_data;
-}
-
-
 static void
 dbus_source_finalize (GSource *source)
 {
@@ -1507,14 +1391,17 @@ dbus_source_finalize (GSource *source)
   GSList *l;
 
   dbus_source->in_finalize = TRUE;
-  
-  G_LOCK (context_map);
-  if (context_map)
-    g_hash_table_foreach_remove (context_map,
-				 remove_source_cb,
-				 dbus_source);
-  G_UNLOCK (context_map);
 
+  if (dbus_source->owner)
+    {
+      G_LOCK (context_map);
+      if (context_map)
+	g_hash_table_remove (context_map,
+			     dbus_source);
+      G_UNLOCK (context_map);
+      g_free (dbus_source->owner);
+    }
+      
   dbus_connection_close (dbus_source->connection);
   dbus_connection_unref (dbus_source->connection);
   
@@ -1554,10 +1441,10 @@ static const GSourceFuncs dbus_source_funcs = {
 
 static DBusConnection *
 get_connection_for_main_context (GMainContext *context,
-				 const char *mountpoint)
+				 const char *owner)
 {
   DBusConnection *connection;
-  ContextMapKey key;
+  DBusSource key;
   DBusSource *dbus_source;
 
   if (context == NULL)
@@ -1568,7 +1455,7 @@ get_connection_for_main_context (GMainContext *context,
   
   if (context_map != NULL)
     {
-      key.mountpoint = (char *)mountpoint;
+      key.owner = (char *)owner;
       key.context = context;
       
       dbus_source = g_hash_table_lookup (context_map, &key);
@@ -1596,12 +1483,10 @@ dbus_source_destroy (DBusSource *dbus_source)
 
 static DBusSource *
 set_connection_for_main_context (GMainContext *context,
-				 char **mountpoints,
-				 int n_mountpoints,
+				 const char *owner,
 				 DBusConnection *connection)
 {
   DBusSource *dbus_source;
-  int i;
   
   g_assert (connection != NULL);
   
@@ -1613,7 +1498,8 @@ set_connection_for_main_context (GMainContext *context,
 		  sizeof (DBusSource));
   dbus_source->context = context;
   dbus_source->connection = dbus_connection_ref (connection);
-
+  dbus_source->owner = g_strdup (owner);
+  
   if (!dbus_connection_set_watch_functions (connection,
                                             add_watch,
                                             remove_watch,
@@ -1633,24 +1519,17 @@ set_connection_for_main_context (GMainContext *context,
 					    dbus_source, NULL);
 
 
-  if (n_mountpoints > 0)
+  if (owner)
     {
       G_LOCK (context_map);
       
       if (context_map == NULL)
-	context_map = g_hash_table_new_full (context_map_key_hash,
-					     context_map_key_equal,
-					     (GDestroyNotify)context_map_key_free,
+	context_map = g_hash_table_new_full (dbus_source_hash,
+					     dbus_source_equal,
+					     NULL,
 					     NULL);
 
-      for (i = 0; i < n_mountpoints; i++)
-	{
-	  ContextMapKey *key = g_new (ContextMapKey, 1);
-	  key->mountpoint = g_strdup (mountpoints[i]);
-	  key->context = context;
-  
-	  g_hash_table_insert (context_map, key, dbus_source);
-	}
+      g_hash_table_insert (context_map, dbus_source, dbus_source);
       
       G_UNLOCK (context_map);
     }
@@ -1662,4 +1541,14 @@ set_connection_for_main_context (GMainContext *context,
  nomem:
   g_error ("Not enough memory to set up DBusConnection for use with GLib");
   return NULL;
+}
+
+void
+_g_dbus_connection_setup_with_main (DBusConnection         *connection,
+				    GMainContext           *context)
+{
+  DBusSource *source;
+  
+  source = set_connection_for_main_context (context, NULL, connection);
+  g_source_unref ((GSource *)source);
 }

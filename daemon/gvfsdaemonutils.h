@@ -18,7 +18,7 @@ char *       g_error_to_daemon_reply              (GError           *error,
 						   guint32           seq_nr,
 						   gsize            *len_out);
 char *       _g_dbus_bus_name_from_mountpoint     (const char       *mountpoint);
-gboolean     _g_dbus_message_iter_append_filename (DBusMessageIter  *iter,
+void         _g_dbus_message_iter_append_filename (DBusMessageIter  *iter,
 						   const char       *filename);
 
 G_END_DECLS

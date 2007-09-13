@@ -15,8 +15,7 @@ typedef struct {
   char *fragment;
 } GDecodedUri;
 
-char *       _g_encode_uri       (GDecodedUri *decoded,
-				  gboolean     only_base);
+char *       _g_encode_uri       (GDecodedUri *decoded);
 void         _g_decoded_uri_free (GDecodedUri *decoded);
 GDecodedUri *_g_decode_uri       (const char  *uri);
 

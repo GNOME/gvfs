@@ -821,6 +821,7 @@ daemon_message_func (DBusConnection *conn,
   GList *l, *next;
   RegisteredPath *registered_path;
   MountpointData *mount_data;
+  const char *path;
 
   if (daemon->priv->main_daemon &&
       dbus_message_is_signal (message, G_VFS_DBUS_MOUNTPOINT_INTERFACE,
@@ -926,29 +927,36 @@ daemon_message_func (DBusConnection *conn,
 				   G_VFS_DBUS_LIST_MOUNT_POINTS))
     {
       DBusMessage *reply;
-      DBusMessageIter iter, array;
+      DBusMessageIter iter, array, struct_iter;
 
       reply = dbus_message_new_method_return (message);
       
       dbus_message_iter_init_append (reply, &iter);
 
-      
+
       if (dbus_message_iter_open_container (&iter, DBUS_TYPE_ARRAY,
-					    DBUS_TYPE_STRING_AS_STRING	
-					    DBUS_TYPE_STRING_AS_STRING	
-					    G_VFS_MOUNTPOINT_SIGNATURE,
+					    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+					    DBUS_TYPE_STRING_AS_STRING
+					    DBUS_TYPE_STRING_AS_STRING
+					    G_VFS_MOUNTPOINT_SIGNATURE
+					    DBUS_STRUCT_END_CHAR_AS_STRING,
 					    &array))
 	{
 	  for (l = daemon->priv->tracked_mountpoints; l != NULL; l = l->next)
 	    {
 	      mount_data = l->data;
 
-	      dbus_message_iter_append_basic (&array, DBUS_TYPE_STRING,
-					      mount_data->owner);
-	      dbus_message_iter_append_basic (&array, DBUS_TYPE_STRING,
-					      mount_data->path);
-	      
-	      g_vfs_mountpoint_to_dbus (mount_data->mountpoint, &array);
+	      if (dbus_message_iter_open_container (&array, DBUS_TYPE_STRUCT,
+						    NULL, /* for struct */
+						    &struct_iter))
+		{
+		  dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING,
+						  &mount_data->owner);
+		  dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING,
+						  &mount_data->path);
+		  g_vfs_mountpoint_to_dbus (mount_data->mountpoint, &struct_iter);
+		  dbus_message_iter_close_container (&array, &struct_iter);
+		}
 	    }
 
 	  dbus_message_iter_close_container (&iter, &array);
@@ -1006,8 +1014,11 @@ daemon_message_func (DBusConnection *conn,
       return DBUS_HANDLER_RESULT_HANDLED;
     }
 
-  registered_path = g_hash_table_lookup (daemon->priv->registered_paths,
-					 dbus_message_get_path (message));
+  path = dbus_message_get_path (message);
+  registered_path = NULL;
+  if (path != NULL)
+    registered_path = g_hash_table_lookup (daemon->priv->registered_paths, path);
+  
   if (registered_path)
     return registered_path->callback (conn, message, registered_path->data);
   else

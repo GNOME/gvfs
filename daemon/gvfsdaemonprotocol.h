@@ -7,18 +7,18 @@ G_BEGIN_DECLS
 
 #define G_VFS_DBUS_MOUNTPOINT_INTERFACE "org.gtk.vfs.Mountpoint"
 #define G_VFS_DBUS_ANNOUNCE_MOUNTPOINT "AnnounceMountpoint"
+#define G_VFS_DBUS_OP_OPEN_FOR_READ "OpenForRead"
 
 #define G_VFS_DBUS_MOUNTPOINT_TRACKER_INTERFACE "org.gtk.vfs.MountpointTracker"
+#define G_VFS_DBUS_MOUNTPOINT_TRACKER_PATH "/org/gtk/vfs/MountpointTracker"
 #define G_VFS_DBUS_LIST_MOUNT_POINTS "ListMountpoints"
-
 
 #define G_VFS_DBUS_MOUNTPOINT_NAME "org.gtk.vfs.mount."
 #define G_VFS_DBUS_ERROR_SOCKET_FAILED "org.gtk.vfs.Error.SocketFailed"
 
-#define G_VFS_DBUS_DAEMON_PATH "/org/gtk/vfs/Daemon"
 #define G_VFS_DBUS_DAEMON_INTERFACE "org.gtk.vfs.Daemon"
+#define G_VFS_DBUS_DAEMON_PATH "/org/gtk/vfs/Daemon"
 #define G_VFS_DBUS_OP_GET_CONNECTION "GetConnection"
-#define G_VFS_DBUS_OP_OPEN_FOR_READ "OpenForRead"
 #define G_VFS_DBUS_OP_CANCEL "Cancel"
 
 

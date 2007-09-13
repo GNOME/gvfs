@@ -269,7 +269,7 @@ g_string_append_encoded (GString *string, const char *encoded,
 }
 
 char *
-_g_encode_uri (GDecodedUri *decoded, gboolean only_base)
+_g_encode_uri (GDecodedUri *decoded)
 {
   GString *uri;
 
@@ -298,10 +298,6 @@ _g_encode_uri (GDecodedUri *decoded, gboolean only_base)
 	}
     }
 
-  if (only_base)
-    return g_string_free (uri, FALSE);
-    
-  
   g_string_append_encoded (uri, decoded->path, SUB_DELIM_CHARS ":@/");
   
   if (decoded->query)

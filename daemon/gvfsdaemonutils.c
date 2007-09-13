@@ -265,24 +265,25 @@ g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)
   return buffer;
 }
 
-gboolean
+void
 _g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filename)
 {
   DBusMessageIter array;
 
+  if (filename == NULL)
+    filename = "";
+  
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_TYPE_BYTE_AS_STRING,
 					 &array))
-    return FALSE;
+    g_error ("out of memory");
 
   if (!dbus_message_iter_append_fixed_array (&array,
 					     DBUS_TYPE_BYTE,
 					     &filename, strlen (filename)))
-    return FALSE;
+    g_error ("out of memory");
 
   if (!dbus_message_iter_close_container (iter, &array))
-    return FALSE;
-
-  return TRUE;
+    g_error ("out of memory");
 }
