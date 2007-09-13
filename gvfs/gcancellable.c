@@ -10,7 +10,7 @@ struct _GCancellable
   GObject parent_instance;
 
   int active_count;
-  int cancel_count;
+  gboolean cancelled;
   int cancel_pipe[2];
 };
 
@@ -95,9 +95,9 @@ g_get_current_cancellable  (void)
   return c;
 }
 
-/* These are only safe to call inside a cancellable op */
-GCancellable *
-g_cancellable_begin (GCancellableOp cancellable_op)
+/* These are only safe to call inside a cancellable operation  */
+void 
+g_cancellable_begin (GCancellable **cancellable_ptr)
 {
   GCancellable *c;
 
@@ -110,27 +110,25 @@ g_cancellable_begin (GCancellableOp cancellable_op)
       /* Non-recursive */
 
       /* Make sure we're not leaving old cancel state around */
-      while (c->cancel_count > 0)
+      if (c->cancelled)
 	{
 	  if (c->cancel_pipe[0] != -1)
 	    read (c->cancel_pipe[0], &ch, 1);
-	  c->cancel_count--;
+	  c->cancelled = FALSE;
 	}
     }
-  *(GCancellable **)cancellable_op = c;
+  *cancellable_ptr = c;
   
   G_UNLOCK(cancellable);
-
-  return c;
 }
 
 void
-g_cancellable_end (GCancellableOp  cancellable_op)
+g_cancellable_end (GCancellable **cancellable_ptr)
 {
   GCancellable *c;
 
   /* Safe to do outside lock, since we're between begin/end */
-  c = *(GCancellable **)cancellable_op;
+  c = *cancellable_ptr;
   g_assert (c != NULL);
 
   G_LOCK(cancellable);
@@ -138,7 +136,7 @@ g_cancellable_end (GCancellableOp  cancellable_op)
   c->active_count--;
   /* cancel_count is cleared on begin */
 
-  *(GCancellable **)cancellable_op = NULL;
+  *cancellable_ptr = NULL;
   
   G_UNLOCK(cancellable);
 }
@@ -146,7 +144,7 @@ g_cancellable_end (GCancellableOp  cancellable_op)
 gboolean
 g_cancellable_is_cancelled (GCancellable *cancellable)
 {
-  return cancellable->cancel_count != 0;
+  return cancellable->cancelled;
 }
 
 /* May return -1 if fds not supported, or on errors */
@@ -158,18 +156,17 @@ g_cancellable_get_fd (GCancellable *cancellable)
 
 /* This is safe to call from another thread */
 void
-g_cancellable_cancel (GCancellableOp  cancellable_op)
+g_cancellable_cancel (GCancellable **cancellable_ptr)
 {
   GCancellable *c;
 
   G_LOCK(cancellable);
   
-  c = *(GCancellable **)cancellable_op;
-  if (c != NULL)
+  c = *cancellable_ptr;
+  if (c != NULL && !c->cancelled)
     {
       char ch = 'x';
-      
-      c->cancel_count++;
+      c->cancelled = TRUE;
       if (c->cancel_pipe[1] != -1)
 	write (c->cancel_pipe[1], &ch, 1);
     }

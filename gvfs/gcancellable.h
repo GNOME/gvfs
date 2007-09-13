@@ -14,7 +14,6 @@ G_BEGIN_DECLS
 
 typedef struct _GCancellable        GCancellable;
 typedef struct _GCancellableClass   GCancellableClass;
-typedef gpointer                    GCancellableOp;
 
 struct _GCancellableClass
 {
@@ -24,14 +23,14 @@ struct _GCancellableClass
 GType g_cancellable_get_type (void) G_GNUC_CONST;
   
 /* These are only safe to call inside a cancellable op */
-GCancellable *g_cancellable_begin        (GCancellableOp  cancellable_op);
+void          g_cancellable_begin        (GCancellable  **cancellable_ptr);
 GCancellable *g_get_current_cancellable  (void);
-void          g_cancellable_end          (GCancellableOp  cancellable_op);
+void          g_cancellable_end          (GCancellable  **cancellable_ptr);
 gboolean      g_cancellable_is_cancelled (GCancellable   *cancellable);
 int           g_cancellable_get_fd       (GCancellable   *cancellable);
 
 /* This is safe to call from another thread */
-void          g_cancellable_cancel       (GCancellableOp  cancellable_op);
+void          g_cancellable_cancel       (GCancellable  **cancellable_ptr);
 
 G_END_DECLS
 
