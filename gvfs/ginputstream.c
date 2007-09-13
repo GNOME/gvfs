@@ -100,8 +100,7 @@ g_input_stream_init (GInputStream *stream)
  *
  * On success, the number of bytes read into the buffer is returned.
  * It is not an error if this is not the same as the requested size, as it
- * can happen e.g. near the end of a file, but generally we try to read
- * as many bytes as requested. Zero is returned on end of file
+ * can happen e.g. near the end of a file. Zero is returned on end of file
  * (or if @count is zero),  but never otherwise.
  * 
  * On error -1 is returned and @error is set accordingly.
