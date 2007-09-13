@@ -244,7 +244,8 @@ GFileInfo *
 g_file_simple_get_info (GFile                *file,
 			GFileInfoRequestFlags requested,
 			const char           *attributes,
-			gboolean              follow_symlinks)
+			gboolean              follow_symlinks,
+			GError              **error)
 {
   GFileSimple *simple = G_FILE_SIMPLE (file);
   GFileInfo *info;
