@@ -18,20 +18,6 @@
 
 G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_TYPE_VFS_BACKEND);
 
-static gboolean do_open_for_read (GVfsBackend        *backend,
-				  GVfsJobOpenForRead *job,
-				  char               *filename);
-static gboolean do_read          (GVfsBackend        *backend,
-				  GVfsJobRead        *job,
-				  GVfsHandle         *handle,
-				  char               *buffer,
-				  gsize               bytes_requested);
-static gboolean do_seek_on_read  (GVfsBackend        *backend,
-				  GVfsJobSeekRead    *job,
-				  GVfsHandle         *handle,
-				  goffset             offset,
-				  GSeekType           type);
-
 static void
 g_vfs_backend_test_finalize (GObject *object)
 {
@@ -41,19 +27,6 @@ g_vfs_backend_test_finalize (GObject *object)
   
   if (G_OBJECT_CLASS (g_vfs_backend_test_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_test_parent_class)->finalize) (object);
-}
-
-static void
-g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
-{
-  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
-  
-  gobject_class->finalize = g_vfs_backend_test_finalize;
-
-  backend_class->open_for_read = do_open_for_read;
-  backend_class->read = do_read;
-  backend_class->seek_on_read = do_seek_on_read;
 }
 
 static void
@@ -217,4 +190,35 @@ do_seek_on_read (GVfsBackend *backend,
     }
 
   return TRUE;
+}
+
+static gboolean
+do_close_read (GVfsBackend *backend,
+	       GVfsJobCloseRead *job,
+	       GVfsHandle *handle)
+{
+  int fd;
+
+  g_print ("close ()\n");
+
+  fd = GPOINTER_TO_INT (handle);
+  close(fd);
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  return TRUE;
+}
+
+static void
+g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
+  
+  gobject_class->finalize = g_vfs_backend_test_finalize;
+
+  backend_class->open_for_read = do_open_for_read;
+  backend_class->read = do_read;
+  backend_class->seek_on_read = do_seek_on_read;
+  backend_class->close_read = do_close_read;
 }

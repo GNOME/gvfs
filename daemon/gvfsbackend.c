@@ -49,6 +49,18 @@ g_vfs_backend_open_for_read (GVfsBackend *backend,
 }
 
 gboolean
+g_vfs_backend_close_read (GVfsBackend        *backend,
+			  GVfsJobCloseRead   *job,
+			  GVfsHandle         *handle)
+{
+  GVfsBackendClass *class;
+
+  class = G_VFS_BACKEND_GET_CLASS (backend);
+  
+  return class->close_read (backend, job, handle);
+}
+
+gboolean
 g_vfs_backend_read (GVfsBackend *backend,
 		    GVfsJobRead *job,
 		    GVfsHandle *handle,

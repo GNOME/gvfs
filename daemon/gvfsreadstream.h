@@ -49,6 +49,7 @@ void            g_vfs_read_stream_send_data        (GVfsReadStream  *read_stream
 						    gsize            count);
 void            g_vfs_read_stream_send_error       (GVfsReadStream  *read_stream,
 						    GError          *error);
+void            g_vfs_read_stream_send_closed      (GVfsReadStream  *read_stream);
 void            g_vfs_read_stream_send_seek_offset (GVfsReadStream  *read_stream,
 						    goffset          offset);
 

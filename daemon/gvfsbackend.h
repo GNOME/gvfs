@@ -41,6 +41,9 @@ struct _GVfsBackendClass
   gboolean (*open_for_read) (GVfsBackend *backend,
 			     GVfsJobOpenForRead *job,
 			     char *filename);
+  gboolean (*close_read)    (GVfsBackend *backend,
+			     GVfsJobCloseRead *job,
+			     GVfsHandle *handle);
   gboolean (*read)          (GVfsBackend *backend,
 			     GVfsJobRead *job,
 			     GVfsHandle *handle,
@@ -58,6 +61,9 @@ GType g_vfs_backend_get_type (void) G_GNUC_CONST;
 gboolean g_vfs_backend_open_for_read (GVfsBackend        *backend,
 				      GVfsJobOpenForRead *job,
 				      char               *filename);
+gboolean g_vfs_backend_close_read    (GVfsBackend        *backend,
+				      GVfsJobCloseRead   *job,
+				      GVfsHandle         *handle);
 gboolean g_vfs_backend_read          (GVfsBackend        *backend,
 				      GVfsJobRead        *job,
 				      GVfsHandle         *handle,

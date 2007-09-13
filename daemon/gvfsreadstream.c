@@ -19,6 +19,7 @@
 #include <gvfsdaemonutils.h>
 #include <gvfsjobread.h>
 #include <gvfsjobseekread.h>
+#include <gvfsjobcloseread.h>
 
 G_DEFINE_TYPE (GVfsReadStream, g_vfs_read_stream, G_TYPE_OBJECT);
 
@@ -44,7 +45,7 @@ typedef struct
 
 struct _GVfsReadStreamPrivate
 {
-  gboolean closed;
+  gboolean connection_closed;
   GInputStream *command_stream;
   GOutputStream *reply_stream;
   int remote_fd;
@@ -135,13 +136,19 @@ g_vfs_read_stream_init (GVfsReadStream *stream)
 }
 
 static void
-g_vfs_read_stream_close (GVfsReadStream *stream)
+g_vfs_read_stream_connection_closed (GVfsReadStream *stream)
 {
-  g_object_ref (stream);
-  if (!stream->priv->closed)
-    g_signal_emit (stream, signals[CLOSED], 0);
-  stream->priv->closed = TRUE;
-  g_object_unref (stream);
+  if (stream->priv->connection_closed)
+    return;
+  stream->priv->connection_closed = TRUE;
+  
+  if (stream->priv->current_job == NULL)
+    {
+      stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->data);
+      stream->priv->current_job_seq_nr = 0;
+      g_signal_emit (stream, signals[NEW_JOB], 0, stream->priv->current_job);
+    }
+  /* Otherwise we'll close when current_job is finished */
 }
 
 static void
@@ -177,6 +184,10 @@ got_command (GVfsReadStream *stream,
       job = g_vfs_job_read_new (stream,
 				stream->priv->data,
 				arg1);
+      break;
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CLOSE:
+      job = g_vfs_job_close_read_new (stream,
+				      stream->priv->data);
       break;
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR:
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END:
@@ -241,7 +252,7 @@ command_read_cb (GInputStream *input_stream,
   if (count_read <= 0)
     {
       reader->read_stream->priv->request_reader = NULL;
-      g_vfs_read_stream_close (reader->read_stream);
+      g_vfs_read_stream_connection_closed (reader->read_stream);
       g_object_unref (reader->command_stream);
       g_free (reader);
       return;
@@ -319,7 +330,7 @@ send_reply_cb (GOutputStream *output_stream,
 
   if (bytes_written <= 0)
     {
-      g_vfs_read_stream_close (stream);
+      g_vfs_read_stream_connection_closed (stream);
       goto error_out;
     }
 
@@ -364,6 +375,16 @@ send_reply_cb (GOutputStream *output_stream,
   job = stream->priv->current_job;
   stream->priv->current_job = NULL;
   g_vfs_job_emit_finished (job);
+
+  if (G_IS_VFS_JOB_CLOSE_READ (job))
+    g_signal_emit (stream, signals[CLOSED], 0);
+  else if (stream->priv->connection_closed)
+    {
+      stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->data);
+      stream->priv->current_job_seq_nr = 0;
+      g_signal_emit (stream, signals[NEW_JOB], 0, stream->priv->current_job);
+    }
+
   g_object_unref (job);
   g_print ("Sent reply\n");
 }
@@ -421,7 +442,7 @@ g_vfs_read_stream_send_error (GVfsReadStream  *read_stream,
 /* Might be called on an i/o thread
  */
 void
-g_vfs_read_stream_send_seek_offset (GVfsReadStream  *read_stream,
+g_vfs_read_stream_send_seek_offset (GVfsReadStream *read_stream,
 				    goffset offset)
 {
   GVfsDaemonSocketProtocolReply *reply;
@@ -431,6 +452,22 @@ g_vfs_read_stream_send_seek_offset (GVfsReadStream  *read_stream,
   reply->seq_nr = g_htonl (read_stream->priv->current_job_seq_nr);
   reply->arg1 = g_htonl (offset & 0xffffffff);
   reply->arg2 = g_htonl (offset >> 32);
+
+  send_reply (read_stream, TRUE, NULL, 0);
+}
+
+/* Might be called on an i/o thread
+ */
+void
+g_vfs_read_stream_send_closed (GVfsReadStream *read_stream)
+{
+  GVfsDaemonSocketProtocolReply *reply;
+  
+  reply = (GVfsDaemonSocketProtocolReply *)read_stream->priv->reply_buffer;
+  reply->type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED);
+  reply->seq_nr = g_htonl (read_stream->priv->current_job_seq_nr);
+  reply->arg1 = g_htonl (0);
+  reply->arg2 = g_htonl (0);
 
   send_reply (read_stream, TRUE, NULL, 0);
 }
