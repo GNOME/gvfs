@@ -1,0 +1,24 @@
+Catch EINTR in all syscalls
+
+error reporting in get_file_info (not exist)
+
+fileenumerator per-enumerator maincontext instead of each call
+
+async support for file enumerator
+
+Add Seekable support to LocalFile streams
+
+test outputstream (especially replace + backup)
+
+Work on GFile
+
+Use G_FILE_ERRORS and g_file_error_from_errno:
+  g_set_error (error,
+	       G_FILE_ERROR,
+	       g_file_error_from_errno (errno),
+	       _("Error opening directory '%s': %s"),
+	       path, g_strerror (errno));
+
+
+auto*
+	       
