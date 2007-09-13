@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "gfileunix.h"
+#include "gvfsunixdbus.h"
 #include <glib/gi18n-lib.h>
 
 static void g_file_unix_file_iface_init (GFileIface       *iface);
@@ -176,6 +177,13 @@ g_file_unix_get_info (GFile                *file,
 static GFileInputStream *
 g_file_unix_read (GFile *file)
 {
+  GFileUnix *unix_file = G_FILE_UNIX (file);
+  DBusConnection *connection;
+
+  connection = _g_vfs_unix_get_connection_sync (unix_file->mountpoint);
+
+  g_print ("connection: %p\n", connection);
+  
   /* TODO: implement */
   return NULL;
 }
