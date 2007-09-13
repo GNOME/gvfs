@@ -1,7 +1,7 @@
 #ifndef __G_LOCAL_FILE_INPUT_STREAM_H__
 #define __G_LOCAL_FILE_INPUT_STREAM_H__
 
-#include "gfileinputstream.h"
+#include <gvfs/gfileinputstream.h>
 
 G_BEGIN_DECLS
 

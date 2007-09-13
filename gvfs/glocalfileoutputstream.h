@@ -1,7 +1,7 @@
 #ifndef __G_LOCAL_FILE_OUTPUT_STREAM_H__
 #define __G_LOCAL_FILE_OUTPUT_STREAM_H__
 
-#include "gfileoutputstream.h"
+#include <gvfs/gfileoutputstream.h>
 
 G_BEGIN_DECLS
 

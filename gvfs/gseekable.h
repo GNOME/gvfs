@@ -2,7 +2,7 @@
 #define __G_SEEKABLE_H__
 
 #include <glib-object.h>
-#include <gvfstypes.h>
+#include <gvfs/gvfstypes.h>
 
 G_BEGIN_DECLS
 

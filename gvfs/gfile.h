@@ -2,10 +2,10 @@
 #define __G_FILE_H__
 
 #include <glib-object.h>
-#include <gvfstypes.h>
-#include <gfileenumerator.h>
-#include <gfileinputstream.h>
-#include <gfileoutputstream.h>
+#include <gvfs/gvfstypes.h>
+#include <gvfs/gfileenumerator.h>
+#include <gvfs/gfileinputstream.h>
+#include <gvfs/gfileoutputstream.h>
 
 G_BEGIN_DECLS
 

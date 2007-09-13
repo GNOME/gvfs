@@ -1,8 +1,8 @@
 #ifndef __G_FILE_INPUT_STREAM_H__
 #define __G_FILE_INPUT_STREAM_H__
 
-#include <ginputstream.h>
-#include <gfileinfo.h>
+#include <gvfs/ginputstream.h>
+#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 

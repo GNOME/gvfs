@@ -1,8 +1,8 @@
 #ifndef __G_FILE_OUTPUT_STREAM_H__
 #define __G_FILE_OUTPUT_STREAM_H__
 
-#include <goutputstream.h>
-#include <gfileinfo.h>
+#include <gvfs/goutputstream.h>
+#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 

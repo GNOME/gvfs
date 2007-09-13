@@ -2,9 +2,9 @@
 #define __G_FILE_ENUMERATOR_H__
 
 #include <glib-object.h>
-#include <gvfstypes.h>
-#include <gvfserror.h>
-#include <gfileinfo.h>
+#include <gvfs/gvfstypes.h>
+#include <gvfs/gvfserror.h>
+#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 

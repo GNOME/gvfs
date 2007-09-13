@@ -2,8 +2,8 @@
 #define __G_INPUT_STREAM_H__
 
 #include <glib-object.h>
-#include <gvfstypes.h>
-#include <gvfserror.h>
+#include <gvfs/gvfstypes.h>
+#include <gvfs/gvfserror.h>
 
 G_BEGIN_DECLS
 
