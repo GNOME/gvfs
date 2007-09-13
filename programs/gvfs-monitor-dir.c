@@ -20,7 +20,8 @@ static gboolean
 dir_monitor_callback (GDirectoryMonitor* monitor,
 		      GFile* parent,
 		      GFile* child,
-		      GDirectoryMonitorEventFlags eflags)
+		      GFile* other_file,
+		      GDirectoryMonitorEvent eflags)
 {
   g_print ("Directory Monitor Event:\n");
   g_print ("Parent = %s\n", g_file_get_parse_name (parent));

@@ -1,73 +1,103 @@
 #include <config.h>
 #include <string.h>
 
-#include "gdirectorymonitor.h"
+#include "gdirectorymonitorpriv.h"
 #include "gvfs-marshal.h"
 #include "gfile.h"
 #include "gvfs.h"
 
-static void g_directory_monitor_class_init (gpointer g_class, gpointer class_data);
-static void g_directory_monitor_base_init (gpointer g_class);
+enum {
+  CHANGED,
+  LAST_SIGNAL
+};
 
-GType
-g_directory_monitor_get_type (void)
+G_DEFINE_TYPE (GDirectoryMonitor, g_directory_monitor, G_TYPE_OBJECT);
+
+struct _GDirectoryMonitorPrivate {
+  gboolean cancelled;
+};
+
+static guint signals[LAST_SIGNAL] = { 0 };
+
+static void
+g_directory_monitor_finalize (GObject *object)
 {
-  static GType directory_monitor_type = 0;
+  GDirectoryMonitor *monitor;
+
+  monitor = G_DIRECTORY_MONITOR (object);
   
-  if (! directory_monitor_type)
-    {
-      static const GTypeInfo directory_monitor_info =
-	{
-	  sizeof (GDirectoryMonitorIface), /* class_size */
-	  g_directory_monitor_base_init,   /* base_init */
-	  NULL,				 /* base_finalize */
-	  g_directory_monitor_class_init,  /* class_init */
-	  NULL,				 /* class_finalize */
-	  NULL,				 /* class_data */
-	  0,
-	  0,				 /* n_preallocs */
-	  NULL
-	};
-      
-      directory_monitor_type = g_type_register_static (G_TYPE_INTERFACE, I_("GDirectoryMonitor"), &directory_monitor_info, 0);
-      g_type_interface_add_prerequisite (directory_monitor_type, G_TYPE_OBJECT);
-    }
-  return directory_monitor_type;
+  if (G_OBJECT_CLASS (g_directory_monitor_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_directory_monitor_parent_class)->finalize) (object);
 }
 
 static void
-g_directory_monitor_class_init (gpointer g_class,
-				gpointer class_data)
+g_directory_monitor_dispose (GObject *object)
 {
+  GDirectoryMonitor *monitor;
+  
+  monitor = G_DIRECTORY_MONITOR (object);
+
+  /* Make sure we cancel on last unref */
+  if (!monitor->priv->cancelled)
+    g_directory_monitor_cancel (monitor);
+  
+  if (G_OBJECT_CLASS (g_directory_monitor_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_directory_monitor_parent_class)->dispose) (object);
 }
 
 static void
-g_directory_monitor_base_init (gpointer g_class)
+g_directory_monitor_class_init (GDirectoryMonitorClass *klass)
 {
-  static gboolean initialized = FALSE;
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   
-  if (! initialized)
-    {
-      g_signal_new (I_("changed"),
-		    G_TYPE_DIRECTORY_MONITOR,
-		    G_SIGNAL_RUN_LAST,
-		    G_STRUCT_OFFSET (GDirectoryMonitorIface, changed),
-		    NULL, NULL,
-		    _gvfs_marshal_VOID__OBJECT_OBJECT_INT,
-		    G_TYPE_NONE,3,
-		    G_TYPE_FILE,
-		    G_TYPE_FILE,
-		    G_TYPE_INT);
-      initialized = TRUE;
-    }
+  g_type_class_add_private (klass, sizeof (GDirectoryMonitorPrivate));
+  
+  gobject_class->finalize = g_directory_monitor_finalize;
+  gobject_class->dispose = g_directory_monitor_dispose;
+
+  signals[CHANGED] =
+    g_signal_new (I_("changed"),
+		  G_TYPE_DIRECTORY_MONITOR,
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GDirectoryMonitorClass, changed),
+		  NULL, NULL,
+		  _gvfs_marshal_VOID__OBJECT_OBJECT_OBJECT_INT,
+		  G_TYPE_NONE,4,
+		  G_TYPE_FILE,
+		  G_TYPE_FILE,
+		  G_TYPE_FILE,
+		  G_TYPE_INT);
 }
+
+static void
+g_directory_monitor_init (GDirectoryMonitor *monitor)
+{
+  monitor->priv = G_TYPE_INSTANCE_GET_PRIVATE (monitor,
+					       G_TYPE_DIRECTORY_MONITOR,
+					       GDirectoryMonitorPrivate);
+}
+
 
 gboolean
 g_directory_monitor_cancel (GDirectoryMonitor* monitor)
 {
-  GDirectoryMonitorIface* iface;
+  GDirectoryMonitorClass *class;
   
-  iface = G_DIRECTORY_MONITOR_GET_IFACE (monitor);
+  if (monitor->priv->cancelled)
+    return TRUE;
   
-  return (* iface->cancel) (monitor);
+  monitor->priv->cancelled = TRUE;
+  
+  class = G_DIRECTORY_MONITOR_GET_CLASS (monitor);
+  return (* class->cancel) (monitor);
+}
+
+void
+g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
+				GFile *parent,
+				GFile *child,
+				GFile *other_file,
+				GDirectoryMonitorEvent event_type)
+{
+  g_signal_emit (monitor, signals[CHANGED], 0, parent, child, other_file, event_type);
 }

@@ -42,8 +42,8 @@
 #endif
 #endif
 #include <gio/glocalfile.h>
-#include <gio/gfilemonitor.h>
-#include <gio/gdirectorymonitor.h>
+#include <gio/gfilemonitorpriv.h>
+#include <gio/gdirectorymonitorpriv.h>
 #include "inotify-helper.h"
 #include "inotify-missing.h"
 #include "inotify-path.h"
@@ -67,7 +67,7 @@ static void ih_not_missing_callback (inotify_sub *sub);
  */
 G_LOCK_DEFINE (inotify_lock);
 
-static GDirectoryMonitorEventFlags ih_mask_to_EventFlags (guint32 mask);
+static GDirectoryMonitorEvent ih_mask_to_EventFlags (guint32 mask);
 
 /**
  * Initializes the inotify backend.  This must be called before
@@ -145,7 +145,7 @@ ih_sub_cancel (inotify_sub * sub)
 static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 {
 	gchar *fullpath;
-	GDirectoryMonitorEventFlags eflags;
+	GDirectoryMonitorEvent eflags;
 	GFile* parent;
 	GFile* child;
 
@@ -163,11 +163,14 @@ static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))
 	{
 		GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "changed", parent, child, eflags);
+		g_directory_monitor_emit_event (monitor, 
+						parent, child, NULL, eflags);
 	} else if (G_IS_FILE_MONITOR(sub->user_data))
 	{
 		GFileMonitor* monitor = G_FILE_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "changed", child, eflags);
+
+		g_file_monitor_emit_event (monitor,
+					   child, NULL, eflags);
 	}
 
 	g_object_unref (child);
@@ -178,7 +181,7 @@ static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 static void ih_not_missing_callback (inotify_sub *sub)
 {
 	gchar *fullpath;
-	GDirectoryMonitorEventFlags eflags;
+	GDirectoryMonitorEvent eflags;
 	guint32 mask;
 	GFile* parent;
 	GFile* child;
@@ -205,11 +208,13 @@ static void ih_not_missing_callback (inotify_sub *sub)
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))
 	{
 		GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "changed", parent, child, eflags);
+		g_directory_monitor_emit_event (monitor, 
+						parent, child, NULL, eflags);
 	} else if (G_IS_FILE_MONITOR(sub->user_data))
 	{
 		GFileMonitor* monitor = G_FILE_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "changed", child, eflags);
+		g_file_monitor_emit_event (monitor,
+					   child, NULL, eflags);
 	}
 
 	g_object_unref (child);
@@ -217,7 +222,7 @@ static void ih_not_missing_callback (inotify_sub *sub)
 }
 
 /* Transforms a inotify event to a GVFS event. */
-static GDirectoryMonitorEventFlags
+static GDirectoryMonitorEvent
 ih_mask_to_EventFlags (guint32 mask)
 {
 	mask &= ~IN_ISDIR;

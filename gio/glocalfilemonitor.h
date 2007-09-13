@@ -16,7 +16,7 @@ typedef struct _GLocalFileMonitor      GLocalFileMonitor;
 typedef struct _GLocalFileMonitorClass GLocalFileMonitorClass;
 
 struct _GLocalFileMonitorClass {
-  GObjectClass parent_class;
+  GFileMonitorClass parent_class;
 };
 
 GType g_local_file_monitor_get_type (void) G_GNUC_CONST;

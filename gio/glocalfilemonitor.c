@@ -7,19 +7,17 @@
 #include "inotify/inotify-helper.h"
 #endif
 
-static void g_local_file_monitor_iface_init (GFileMonitorIface       *iface);
+static gboolean g_local_file_monitor_cancel (GFileMonitor* monitor);
 
 struct _GLocalFileMonitor
 {
-  GObject parent_instance;
+  GFileMonitor parent_instance;
   gchar *dirname;
   gchar *filename;
-  gboolean cancelled;
   void *private; /* backend stuff goes here */
 };
 
-G_DEFINE_TYPE_WITH_CODE (GLocalFileMonitor, g_local_file_monitor, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE_MONITOR, g_local_file_monitor_iface_init))
+G_DEFINE_TYPE (GLocalFileMonitor, g_local_file_monitor, G_TYPE_FILE_MONITOR)
 
 static void
 g_local_file_monitor_finalize (GObject* object)
@@ -37,28 +35,16 @@ g_local_file_monitor_finalize (GObject* object)
     (*G_OBJECT_CLASS (g_local_file_monitor_parent_class)->finalize) (object);
 }
 
-static void
-g_local_file_monitor_dispose (GObject *object)
-{
-  GLocalFileMonitor* local_monitor;
-  
-  local_monitor = G_LOCAL_FILE_MONITOR (object);
-
-  /* Make sure we cancel on last unref */
-  if (!local_monitor->cancelled)
-    g_file_monitor_cancel (G_FILE_MONITOR (object));
-  
-  if (G_OBJECT_CLASS (g_local_file_monitor_parent_class)->dispose)
-    (*G_OBJECT_CLASS (g_local_file_monitor_parent_class)->dispose) (object);
-}
 
 static void
 g_local_file_monitor_class_init (GLocalFileMonitorClass* klass)
 {
   GObjectClass* gobject_class = G_OBJECT_CLASS (klass);
+  GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (klass);
   
   gobject_class->finalize = g_local_file_monitor_finalize;
-  gobject_class->dispose = g_local_file_monitor_dispose;
+
+  file_monitor_class->cancel = g_local_file_monitor_cancel;
 }
 
 static void
@@ -67,7 +53,6 @@ g_local_file_monitor_init (GLocalFileMonitor* local_monitor)
   local_monitor->private   = NULL;
   local_monitor->dirname   = NULL;
   local_monitor->filename  = NULL;
-  local_monitor->cancelled = FALSE;
 }
 
 GFileMonitor*
@@ -109,10 +94,6 @@ g_local_file_monitor_cancel (GFileMonitor* monitor)
 {
   GLocalFileMonitor *local_monitor = G_LOCAL_FILE_MONITOR (monitor);
   
-  if (local_monitor->cancelled)
-    return TRUE;
-  local_monitor->cancelled = TRUE;
-
   if (local_monitor->dirname)
     g_free (local_monitor->dirname);
   local_monitor->dirname = NULL;
@@ -130,10 +111,4 @@ g_local_file_monitor_cancel (GFileMonitor* monitor)
 #endif
   
   return TRUE;
-}
-
-static void
-g_local_file_monitor_iface_init (GFileMonitorIface* iface)
-{
-  iface->cancel = g_local_file_monitor_cancel;
 }

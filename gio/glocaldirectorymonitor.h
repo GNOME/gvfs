@@ -16,7 +16,7 @@ typedef struct _GLocalDirectoryMonitor      GLocalDirectoryMonitor;
 typedef struct _GLocalDirectoryMonitorClass GLocalDirectoryMonitorClass;
 
 struct _GLocalDirectoryMonitorClass {
-  GObjectClass parent_class;
+  GDirectoryMonitorClass parent_class;
 };
 
 GType g_local_directory_monitor_get_type (void) G_GNUC_CONST;

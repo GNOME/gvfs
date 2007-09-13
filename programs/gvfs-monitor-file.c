@@ -19,7 +19,8 @@ static GOptionEntry entries[] = {
 static gboolean
 file_monitor_callback (GFileMonitor* monitor,
 		       GFile* child,
-		       GFileMonitorEventFlags eflags)
+		       GFile* other_file,
+		       GFileMonitorEvent eflags)
 {
   g_print ("File Monitor Event:\n");
   g_print ("File = %s\n", g_file_get_parse_name (child));
