@@ -185,6 +185,8 @@ if test "x$should_disable_fam" = "xno"; then
 AC_CHECK_LIB(fam, FAMOpen,
   [AC_CHECK_HEADERS(fam.h,
     [AC_DEFINE(HAVE_FAM, [], [Define if we have FAM])
+     AC_CHECK_LIB(fam, FAMNoExists,
+     		  AC_DEFINE(HAVE_FAM_NO_EXISTS, [], [Define if we have FAMNoExists in fam]))
      FAM_LIBS="-lfam"]
      fam_support=yes,
     AC_MSG_WARN(*** FAM support will not be built (header files not found) ***))],

@@ -136,6 +136,10 @@ fam_helper_startup (void)
       G_UNLOCK (fam_connection);
       return FALSE;
     }
+#ifdef HAVE_FAM_NO_EXISTS
+    /* This is a gamin extension that avoids sending all the Exists event for dir monitors */
+    FAMNoExists (fam_connection);
+#endif
     ioc = g_io_channel_unix_new (FAMCONNECTION_GETFD(fam_connection));
     fam_watch_id = g_io_add_watch (ioc,
 				   G_IO_IN | G_IO_HUP | G_IO_ERR,
