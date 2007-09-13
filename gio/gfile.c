@@ -540,6 +540,40 @@ g_file_replace_finish (GFile                      *file,
 }
 
 static gboolean
+copy_symlink (GFile                  *destination,
+	      GFileCopyFlags          flags,
+	      GCancellable           *cancellable,
+	      const char             *target,
+	      GError                **error)
+{
+  GError *my_error;
+  gboolean tried_delete;
+
+  tried_delete = FALSE;
+  
+ retry:
+  my_error = NULL;
+  if (!g_file_make_symbolic_link (destination, target, cancellable, &my_error))
+    {
+      /* Maybe it already existed, and we want to overwrite? */
+      if (!tried_delete && (flags & G_FILE_COPY_OVERWRITE) && 
+	  my_error->domain == G_IO_ERROR && my_error->domain == G_IO_ERROR_EXISTS)
+	{
+	  if (!g_file_delete (destination, cancellable, error))
+	    return FALSE;
+	  tried_delete = TRUE;
+	  goto retry;
+	}
+      
+      /* Nah, fail */
+      g_propagate_error (error, my_error);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static gboolean
 file_copy_fallback (GFile                  *source,
 		    GFile                  *destination,
 		    GFileCopyFlags          flags,
@@ -556,58 +590,91 @@ file_copy_fallback (GFile                  *source,
   GFileInfo *info;
   GError *my_error;
   GFileType file_type;
+  const char *target;
 
+  /* Maybe copy the symlink? */
+  if (flags & G_FILE_COPY_NOFOLLOW_SYMLINKS)
+    {
+      info = g_file_get_info (source,
+			      G_FILE_ATTRIBUTE_STD_TYPE "," G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET,
+			      G_FILE_GET_INFO_NOFOLLOW_SYMLINKS,
+			      cancellable,
+			      error);
+      if (info == NULL)
+	return FALSE;
+
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
+	  (target = g_file_info_get_symlink_target (info)) != NULL)
+	{
+	  if (!copy_symlink (destination, flags, cancellable, target, error))
+	    {
+	      g_object_unref (info);
+	      return FALSE;
+	    }
+	  
+	  g_object_unref (info);
+	  goto copied_file;
+	}
+      
+      g_object_unref (info);
+    }
+  
   my_error = NULL;
   in = (GInputStream *)g_file_read (source, cancellable, &my_error);
-  if (in == NULL) {
-    if (my_error->domain == G_IO_ERROR && my_error->code == G_IO_ERROR_IS_DIRECTORY)
-      {
-	g_error_free (my_error);
-	my_error = NULL;
-	
-	/* The source is a directory, don't fail with WOULD_RECURSE immediately, as
-	   that is less useful to the app. Better check for errors on the target instead. */
-	
-	info = g_file_get_info (destination, G_FILE_ATTRIBUTE_STD_TYPE,
-				G_FILE_GET_INFO_NOFOLLOW_SYMLINKS,
-				cancellable, &my_error);
-	if (info != NULL) {
-	  file_type = g_file_info_get_file_type (info);
-	  g_object_unref (info);
-
-	  if (flags & G_FILE_COPY_OVERWRITE)
+  if (in == NULL)
+    {
+      if (my_error->domain == G_IO_ERROR && my_error->code == G_IO_ERROR_IS_DIRECTORY)
+	{
+	  g_error_free (my_error);
+	  my_error = NULL;
+	  
+	  /* The source is a directory, don't fail with WOULD_RECURSE immediately, as
+	     that is less useful to the app. Better check for errors on the target instead. */
+	  
+	  info = g_file_get_info (destination, G_FILE_ATTRIBUTE_STD_TYPE,
+				  G_FILE_GET_INFO_NOFOLLOW_SYMLINKS,
+				  cancellable, &my_error);
+	  if (info != NULL)
 	    {
-	      if (file_type == G_FILE_TYPE_DIRECTORY)
+	      file_type = g_file_info_get_file_type (info);
+	      g_object_unref (info);
+	      
+	      if (flags & G_FILE_COPY_OVERWRITE)
 		{
-		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-			     _("Can't copy over directory"));
+		  if (file_type == G_FILE_TYPE_DIRECTORY)
+		    {
+		      g_set_error (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+				   _("Can't copy over directory"));
+		      return FALSE;
+		    }
+		}
+	      else
+		{
+		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS,
+			       _("Target file exists"));
 		  return FALSE;
 		}
 	    }
 	  else
 	    {
-	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS,
-			   _("Target file exists"));
-	      return FALSE;
+	      /* Error getting info from target, return that error (except for NOT_FOUND, which is no error here) */
+	      if (my_error->domain != G_IO_ERROR && my_error->code != G_IO_ERROR_NOT_FOUND)
+		{
+		  g_propagate_error (error, my_error);
+		  return FALSE;
+		}
+	      g_error_free (my_error);
 	    }
-	} else {
-	  /* Error getting info from target, return that error (except for NOT_FOUND, which is no error here) */
-	  if (my_error->domain != G_IO_ERROR && my_error->code != G_IO_ERROR_NOT_FOUND)
-	    {
-	      g_propagate_error (error, my_error);
-	      return FALSE;
-	    }
-	  g_error_free (my_error);
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+		       _("Can't recursively copy directory"));
+	  return FALSE;
 	}
-	g_set_error (error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-		     _("Can't recursively copy directory"));
-	return FALSE;
-      }
-    else
-      g_propagate_error (error, my_error);
-    return FALSE;
-  }
-
+      else
+	g_propagate_error (error, my_error);
+      
+      return FALSE;
+    }
+  
   total_size = 0;
   current_size = 0;
 
@@ -667,6 +734,10 @@ file_copy_fallback (GFile                  *source,
 
   g_object_unref (in);
   g_object_unref (out);
+
+ copied_file:
+
+  
   
   return TRUE;
 
