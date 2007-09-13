@@ -18,3 +18,7 @@ write command line apps: ls, cat, stat
 add get_file_info_async for FileStreams 
 
 test outputstream (especially replace + backup) (and test everything else too)
+
+xattrs from fd
+
+
