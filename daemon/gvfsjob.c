@@ -211,6 +211,19 @@ g_vfs_job_failed_from_error (GVfsJob *job,
 }
 
 void
+g_vfs_job_failed_from_errno (GVfsJob     *job,
+			     gint         errno_arg)
+{
+  GError *error = NULL;
+  
+  g_set_error (&error, G_FILE_ERROR,
+	       g_file_error_from_errno (errno_arg),
+	       g_strerror (errno_arg));
+  g_vfs_job_failed_from_error (job, error);
+  g_error_free (error);
+}
+
+void
 g_vfs_job_succeeded (GVfsJob *job)
 {
   job->failed = FALSE;
