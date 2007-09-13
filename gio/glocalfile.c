@@ -430,6 +430,25 @@ g_local_file_delete (GFile *file,
 }
 
 static gboolean
+g_local_file_make_directory (GFile *file,
+			     GCancellable *cancellable,
+			     GError **error)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  
+  if (g_mkdir (local->filename, 0755) == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error removing file %s: %s"),
+		   local->filename, g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
+static gboolean
 g_local_file_copy (GFile                *source,
 		   GFile                *destination,
 		   GFileCopyFlags        flags,
@@ -553,6 +572,7 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->create = g_local_file_create;
   iface->replace = g_local_file_replace;
   iface->delete_file = g_local_file_delete;
+  iface->make_directory = g_local_file_make_directory;
   iface->copy = g_local_file_copy;
   iface->move = g_local_file_move;
   iface->mount = g_local_file_mount;

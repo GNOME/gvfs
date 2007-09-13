@@ -527,6 +527,27 @@ g_file_move (GFile                  *source,
 }
 
 gboolean
+g_file_make_directory (GFile *file,
+		       GCancellable *cancellable,
+		       GError **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->make_directory) (file, cancellable, error);
+}
+
+gboolean
 g_file_delete (GFile *file,
 	       GCancellable *cancellable,
 	       GError **error)

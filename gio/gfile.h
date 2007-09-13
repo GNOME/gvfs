@@ -82,6 +82,9 @@ struct _GFileIface
   gboolean            (*delete_file)        (GFile                *file,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  gboolean            (*make_directory)     (GFile                *file,
+					     GCancellable         *cancellable,
+					     GError              **error);
   gboolean            (*copy)               (GFile                *source,
 					     GFile                *destination,
 					     GFileCopyFlags        flags,
@@ -160,6 +163,9 @@ void               g_file_read_async         (GFile                  *file,
 					      GCancellable           *cancellable);
 
 
+gboolean           g_file_make_directory     (GFile                  *file,
+					      GCancellable           *cancellable,
+					      GError                **error);
 gboolean           g_file_delete             (GFile                  *file,
 					      GCancellable           *cancellable,
 					      GError                **error);
