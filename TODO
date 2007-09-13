@@ -60,6 +60,7 @@ Finish general attribute copy in gfile.c move fallback.
 Think about atomic updates of several attributes.
 gedit uses attr_copy_fd in libattr to copy xattrs
 handle attributes in atomic save backup copy
+GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 
 Get rid of std:flags, split it up to avoid problems with unknow flag values
 Add std:is_backup flags
