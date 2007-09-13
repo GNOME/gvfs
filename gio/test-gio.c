@@ -505,7 +505,7 @@ get_contents_callback (GObject *obj,
   gchar *contents;
   gsize length;
   
-  if (!g_file_get_contents_finish (file, res, &contents, &length, &error))
+  if (!g_file_load_contents_finish (file, res, &contents, &length, &error))
     {
       g_print ("Error reading file: %s\n", error->message);
       g_error_free (error);
@@ -517,14 +517,14 @@ get_contents_callback (GObject *obj,
 }
 
 static void
-test_get_content (void)
+test_load_content (void)
 {
   GFile *file;
   
   file = g_file_get_for_path ("/etc/passwd");
-  g_file_get_contents_async (file,
-			     NULL,
-			     get_contents_callback, NULL);
+  g_file_load_contents_async (file,
+			      NULL,
+			      get_contents_callback, NULL);
 }
 
 int
@@ -585,7 +585,7 @@ main (int argc, char *argv[])
   if (1) test_async ("test:///etc/passwd", TRUE);
   if (0) test_out ();
 
-  if (0) test_get_content ();
+  if (0) test_load_content ();
 
 
   g_print ("Starting mainloop\n");
