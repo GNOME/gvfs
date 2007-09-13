@@ -397,8 +397,8 @@ typedef struct {
 } AsyncDBusCall;
 
 static void
-async_dbus_call_finish (AsyncDBusCall *async_call,
-			DBusMessage *reply)
+async_call_finish (AsyncDBusCall *async_call,
+		   DBusMessage *reply)
 {
   async_call->callback (reply, async_call->connection,
 			async_call->io_error, 
@@ -424,11 +424,11 @@ async_dbus_call_finish (AsyncDBusCall *async_call,
 }
 
 static gboolean
-async_dbus_call_finish_at_idle (gpointer data)
+async_call_finish_at_idle (gpointer data)
 {
   AsyncDBusCall *async_call = data;
 
-  async_dbus_call_finish (async_call, NULL);
+  async_call_finish (async_call, NULL);
   
   return FALSE;
 }
@@ -453,10 +453,10 @@ async_dbus_response (DBusPendingCall *pending,
     {
       _g_error_from_dbus (&derror, &async_call->io_error);
       dbus_error_free (&derror);
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
     }
   else
-    async_dbus_call_finish (async_call, reply);
+    async_call_finish (async_call, reply);
   
   dbus_message_unref (reply);
 }
@@ -501,7 +501,7 @@ async_call_cancelled_cb (GCancellable *cancellable,
 }
 
 static void
-do_call_async (AsyncDBusCall *async_call)
+async_call_send (AsyncDBusCall *async_call)
 {
   DBusPendingCall *pending;
   AsyncCallCancelData *cancel_data;
@@ -525,7 +525,7 @@ do_call_async (AsyncDBusCall *async_call)
       g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   "Connection is closed");
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
   
@@ -566,7 +566,7 @@ get_private_bus_async (AsyncDBusCall *async_call)
 		       "Couldn't get main dbus connection: %s\n",
 		       derror.message);
 	  dbus_error_free (&derror);
-	  g_idle_add (async_dbus_call_finish_at_idle, async_call);
+	  g_idle_add (async_call_finish_at_idle, async_call);
 	  return FALSE;
 	}
       dbus_connection_set_exit_on_disconnect (async_call->private_bus, FALSE);
@@ -601,7 +601,7 @@ async_get_connection_response (DBusPendingCall *pending,
     {
       _g_error_from_dbus (&derror, &async_call->io_error);
       dbus_error_free (&derror);
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
 
@@ -614,7 +614,7 @@ async_get_connection_response (DBusPendingCall *pending,
 		   _("Error connecting to daemon: %s"), error->message);
       g_error_free (error);
       dbus_message_unref (reply);
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
 
@@ -630,7 +630,7 @@ async_get_connection_response (DBusPendingCall *pending,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
       dbus_error_free (&derror);
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
   dbus_message_unref (reply);
@@ -664,11 +664,11 @@ async_get_connection_response (DBusPendingCall *pending,
 		   G_VFS_ERROR,
 		   G_VFS_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
 
-  do_call_async (async_call);
+  async_call_send (async_call);
 }
 
 static void
@@ -700,7 +700,7 @@ open_connection_async (AsyncDBusCall *async_call)
       g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   "Connection is closed");
-      g_idle_add (async_dbus_call_finish_at_idle, async_call);
+      g_idle_add (async_call_finish_at_idle, async_call);
       return;
     }
   
@@ -709,6 +709,16 @@ open_connection_async (AsyncDBusCall *async_call)
 				     async_call,
 				     NULL))
     oom ();
+}
+
+static void
+async_call_got_owner (AsyncDBusCall *async_call)
+{
+  async_call->connection = get_connection_for_owner (async_call->owner);
+  if (async_call->connection == NULL)
+    open_connection_async (async_call);
+  else
+    async_call_send (async_call);
 }
 
 static void
@@ -733,7 +743,7 @@ async_get_name_owner_response (DBusPendingCall *pending,
     {
       _g_error_from_dbus (&derror, &async_call->io_error);
       dbus_error_free (&derror);
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
   
@@ -743,19 +753,13 @@ async_get_name_owner_response (DBusPendingCall *pending,
     {
       _g_error_from_dbus (&derror, &async_call->io_error);
       dbus_error_free (&derror);
-      async_dbus_call_finish (async_call, NULL);
+      async_call_finish (async_call, NULL);
       return;
     }
 
   async_call->owner = g_strdup (owner);
-  async_call->connection = get_connection_for_owner (async_call->owner);
-  if (async_call->connection == NULL)
-    {
-      open_connection_async (async_call);
-      return;
-    }
   
-  do_call_async (async_call);
+  async_call_got_owner (async_call);
 }
 
 
@@ -792,7 +796,7 @@ do_find_owner_async (AsyncDBusCall *async_call)
       g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   "Connection is closed");
-      g_idle_add (async_dbus_call_finish_at_idle, async_call);
+      g_idle_add (async_call_finish_at_idle, async_call);
       return;
     }
   
@@ -827,19 +831,9 @@ _g_vfs_daemon_call_async (DBusMessage *message,
 
   async_call->owner = get_owner_for_bus_name (async_call->bus_name);
   if (async_call->owner == NULL)
-    {
-      do_find_owner_async (async_call);
-      return;
-    }
-    
-  async_call->connection = get_connection_for_owner (async_call->owner);
-  if (async_call->connection == NULL)
-    {
-      open_connection_async (async_call);
-      return;
-    }
-  
-  do_call_async (async_call);
+    do_find_owner_async (async_call);
+  else
+    async_call_got_owner (async_call);
 }
 
 DBusMessage *
