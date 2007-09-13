@@ -17,7 +17,6 @@ vfssources = \
 	gdaemonvolume.c gdaemonvolume.h \
 	gdaemonvolumemonitor.c gdaemonvolumemonitor.h \
 	gdaemonfile.c gdaemonfile.h \
-	gvfsuriutils.c gvfsuriutils.h \
 	gdaemonfileinputstream.c gdaemonfileinputstream.h \
 	gdaemonfileoutputstream.c gdaemonfileoutputstream.h \
 	gdaemonfileenumerator.c gdaemonfileenumerator.h \

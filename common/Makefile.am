@@ -16,7 +16,8 @@ libgvfscommon_la_SOURCES = 	\
 	gmountsource.c gmountsource.h \
 	gmounttracker.c gmounttracker.h \
 	gvfsdaemonprotocol.c gvfsdaemonprotocol.h \
-	gvfsmapuri.h \
+	gvfsuriutils.c gvfsuriutils.h \
+	gvfsurimapper.c gvfsurimapper.h \
 	$(NULL)
 
 libgvfscommon_la_LIBADD =	\

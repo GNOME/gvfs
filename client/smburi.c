@@ -1,7 +1,70 @@
 #include <config.h>
 #include <string.h>
 
-#include <gvfsmapuri.h>
+#include <gio/giomodule.h>
+#include <gvfsurimapper.h>
+
+typedef struct _GVfsUriMapperSmb GVfsUriMapperSmb;
+typedef struct _GVfsUriMapperSmbClass GVfsUriMapperSmbClass;
+
+struct _GVfsUriMapperSmb
+{
+  GVfsUriMapper parent;
+};
+
+struct _GVfsUriMapperSmbClass
+{
+  GVfsUriMapperClass parent_class;
+};
+
+static GType g_vfs_uri_mapper_smb_get_type  (GTypeModule *module);
+static void g_vfs_uri_mapper_smb_class_init (GVfsUriMapperSmbClass *class);
+static void g_vfs_uri_mapper_smb_init (GVfsUriMapperSmb *mapper);
+
+
+static GType g_vfs_uri_mapper_smb_type = 0;
+
+static GType
+g_vfs_uri_mapper_smb_get_type (GTypeModule *module)
+{
+  if (!g_vfs_uri_mapper_smb_type)
+    {
+      static const GTypeInfo type_info =
+	{
+	  sizeof (GVfsUriMapperSmbClass),
+	  (GBaseInitFunc) NULL,
+	  (GBaseFinalizeFunc) NULL,
+	  (GClassInitFunc) g_vfs_uri_mapper_smb_class_init,
+	  NULL,           /* class_finalize */
+	  NULL,           /* class_data     */
+	  sizeof (GVfsUriMapperSmb),
+	  0,              /* n_preallocs    */
+	  (GInstanceInitFunc) g_vfs_uri_mapper_smb_init
+	};
+
+      g_vfs_uri_mapper_smb_type =
+        g_type_module_register_type (module, G_VFS_TYPE_URI_MAPPER,
+                                     "GVfsUriMapperSmb", &type_info, 0);
+    }
+  
+  return g_vfs_uri_mapper_smb_type;
+}
+
+static void
+g_vfs_uri_mapper_smb_init (GVfsUriMapperSmb *vfs)
+{
+}
+
+void
+g_io_module_load (GIOModule *module)
+{
+  g_vfs_uri_mapper_smb_get_type (G_TYPE_MODULE (module));
+}
+
+void
+g_io_module_unload (GIOModule   *module)
+{
+}
 
 
 static char *
@@ -17,8 +80,19 @@ normalize_smb_name (const char *name, gssize len)
     return g_ascii_strdown (name, len);
 }
 
+static const char **
+smb_get_handled_schemes (GVfsUriMapper *mapper)
+{
+  static const char *schemes[] = {
+    "smb",
+    NULL
+  };
+  return schemes;
+}
+
 static void
-smb_from_uri (GDecodedUri *uri,
+smb_from_uri (GVfsUriMapper *mapper,
+	      GDecodedUri *uri,
 	      GMountSpec **spec_out,
 	      char **path_out)
 {
@@ -125,8 +199,21 @@ smb_from_uri (GDecodedUri *uri,
   *path_out = path;
 }
 
+static const char **
+smb_get_handled_mount_types (GVfsUriMapper *mapper)
+{
+  static const char *types[] = {
+    "smb-network", 
+    "smb-server", 
+    "smb-share",
+    NULL
+  };
+  return types;
+}
+
 static void
-smb_to_uri (GMountSpec *spec,
+smb_to_uri (GVfsUriMapper *mapper,
+	    GMountSpec *spec,
 	    char *path,
 	    GDecodedUri *uri_out)
 {
@@ -165,14 +252,18 @@ smb_to_uri (GMountSpec *spec,
     }
 }
 
-GVfsMapFromUri G_VFS_MAP_FROM_URI_TABLE_NAME [] = {
-  { "smb", smb_from_uri },
-  { NULL }
-};
 
-GVfsMapToUri G_VFS_MAP_TO_URI_TABLE_NAME [] = {
-  { "smb-network", smb_to_uri },
-  { "smb-server", smb_to_uri },
-  { "smb-share", smb_to_uri },
-  { NULL }
-};
+static void
+g_vfs_uri_mapper_smb_class_init (GVfsUriMapperSmbClass *class)
+{
+  GObjectClass *object_class;
+  GVfsUriMapperClass *mapper_class;
+  
+  object_class = (GObjectClass *) class;
+
+  mapper_class = G_VFS_URI_MAPPER_CLASS (class);
+  mapper_class->get_handled_schemes = smb_get_handled_schemes;
+  mapper_class->from_uri = smb_from_uri;
+  mapper_class->get_handled_mount_types = smb_get_handled_mount_types;
+  mapper_class->to_uri = smb_to_uri;
+}

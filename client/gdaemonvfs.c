@@ -12,7 +12,7 @@
 #include "gvfsdaemondbus.h"
 #include "gdbusutils.h"
 #include "gmountspec.h"
-#include "gvfsmapuri.h"
+#include "gvfsurimapper.h"
 
 #define G_TYPE_DAEMON_VFS		(g_daemon_vfs_type)
 #define G_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_DAEMON_VFS, GDaemonVfs))
@@ -102,7 +102,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 {
   GMountSpec *spec;
   char *path;
-  g_mountspec_from_uri_func func;
+  GVfsUriMapper *mapper;
   
   spec = NULL;
   
@@ -113,9 +113,9 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
     }
   else
     {
-      func = g_hash_table_lookup (vfs->from_uri_hash, uri->scheme);
-      if (func)
-	func (uri, &spec, &path);
+      mapper = g_hash_table_lookup (vfs->from_uri_hash, uri->scheme);
+      if (mapper)
+	g_vfs_uri_mapper_from_uri (mapper, uri, &spec, &path);
     }
   
   if (spec == NULL)
@@ -130,79 +130,17 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 }
 
 static void
-load_vfs_module (GDaemonVfs *vfs,
-		 const char *filename)
-{
-  GModule *module;
-  gpointer ptr;
-  
-  module = g_module_open (filename, G_MODULE_BIND_LOCAL);
-  if (module)
-    {
-      if (g_module_symbol (module, G_STRINGIFY(G_VFS_MAP_FROM_URI_TABLE_NAME), &ptr))
-	{
-	  GVfsMapFromUri *from_uri_table = ptr;
-
-	  while (from_uri_table->scheme != NULL)
-	    {
-	      g_hash_table_insert (vfs->from_uri_hash,
-				   from_uri_table->scheme, from_uri_table->func);
-	      from_uri_table++;
-	    }
-	}
-	  
-      if (g_module_symbol (module, G_STRINGIFY(G_VFS_MAP_TO_URI_TABLE_NAME), &ptr))
-	{
-	  GVfsMapToUri *to_uri_table = ptr;
-	  
-	  while (to_uri_table->mount_type != NULL)
-	    {
-	      g_hash_table_insert (vfs->to_uri_hash,
-				   to_uri_table->mount_type, to_uri_table->func);
-	      to_uri_table++;
-	    }
-	}
-    }
-}
-
-static void
-load_vfs_module_dir (GDaemonVfs *vfs,
-		     const char *dirname)
-{
-  GDir *dir;
-  
-  dir = g_dir_open (dirname, 0, NULL);
-  if (dir)
-    {
-      const char *name;
-      
-      while ((name = g_dir_read_name (dir)))
-	{
-	  if (g_str_has_suffix (name, "." G_MODULE_SUFFIX))
-	    {
-	      char *filename;
-	      
-	      filename = g_build_filename (dirname, 
-					   name, 
-					   NULL);
-	      load_vfs_module (vfs, filename);
-	      g_free (filename);
-	    }
-	}
-      
-      g_dir_close (dir);
-    }
-}
-
-static void
 g_daemon_vfs_init (GDaemonVfs *vfs)
 {
+  GType *mappers;
+  guint n_mappers;
+  const char **schemes, **mount_types;
+  GVfsUriMapper *mapper;
+  int i;
+  
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
 
-  vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
-  vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
-  
   vfs->wrapped_vfs = g_local_vfs_new ();
 
   if (g_thread_supported ())
@@ -213,8 +151,27 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   if (vfs->bus)
     _g_dbus_connection_integrate_with_main (vfs->bus);
 
-					 
-  load_vfs_module_dir (vfs, GVFS_MODULE_DIR);
+  g_io_modules_ensure_loaded (GVFS_MODULE_DIR);
+
+  vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
+  vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
+  
+  mappers = g_type_children (G_VFS_TYPE_URI_MAPPER, &n_mappers);
+  for (i = 0; i < n_mappers; i++)
+    {
+      mapper = g_object_new (mappers[i], NULL);
+
+      schemes = g_vfs_uri_mapper_get_handled_schemes (mapper);
+
+      for (i = 0; schemes != NULL && schemes[i] != NULL; i++)
+	g_hash_table_insert (vfs->from_uri_hash, (char *)schemes[i], mapper);
+      
+      mount_types = g_vfs_uri_mapper_get_handled_mount_types (mapper);
+      for (i = 0; mount_types != NULL && mount_types[i] != NULL; i++)
+	g_hash_table_insert (vfs->to_uri_hash, (char *)mount_types[i], mapper);
+    }
+  
+  g_free (mappers);
 }
 
 GDaemonVfs *
@@ -269,7 +226,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
 {
   GDecodedUri *uri;
   const char *type;
-  g_mountspec_to_uri_func func;
+  GVfsUriMapper *mapper;
 
   uri = g_new0 (GDecodedUri, 1);
   uri->port = -1;
@@ -282,9 +239,9 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
       return uri;
     }
 
-  func = g_hash_table_lookup (the_vfs->to_uri_hash, type);
-  if (func)
-    func (spec, path, uri);
+  mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
+  if (mapper)
+    g_vfs_uri_mapper_to_uri (mapper, spec, path, uri);
 
   if (uri->scheme == NULL)
     {
@@ -629,8 +586,6 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 }
 
 /* Module API */
-
-GVfs * create_vfs (void);
 
 void
 g_io_module_load (GIOModule *module)
