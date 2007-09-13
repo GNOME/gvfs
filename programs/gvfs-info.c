@@ -199,7 +199,6 @@ attribute_type_to_string (GFileAttributeType type)
 static void
 get_writable_info (GFile *file)
 {
-  GFileGetInfoFlags flags;
   GFileAttributeInfoList *list;
   GError *error;
   int i;
