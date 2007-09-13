@@ -34,11 +34,27 @@ g_local_directory_monitor_finalize (GObject* object)
 }
 
 static void
+g_local_directory_monitor_dispose (GObject *object)
+{
+  GLocalDirectoryMonitor* local_monitor;
+  
+  local_monitor = G_LOCAL_DIRECTORY_MONITOR (object);
+
+  /* Make sure we cancel on last unref */
+  if (!local_monitor->cancelled)
+    g_directory_monitor_cancel (G_DIRECTORY_MONITOR (object));
+  
+  if (G_OBJECT_CLASS (g_local_directory_monitor_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_local_directory_monitor_parent_class)->dispose) (object);
+}
+
+static void
 g_local_directory_monitor_class_init (GLocalDirectoryMonitorClass* klass)
 {
   GObjectClass* gobject_class = G_OBJECT_CLASS (klass);
   
   gobject_class->finalize = g_local_directory_monitor_finalize;
+  gobject_class->dispose = g_local_directory_monitor_dispose;
 }
 
 static void
