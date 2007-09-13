@@ -51,11 +51,11 @@ typedef void (*ReplyCallback) (GVfsBackendSftp *backend,
 			       int reply_type,
 			       GDataInputStream *reply,
 			       guint32 len,
-			       gpointer user_data);
+			       GVfsJob *job);
 
 typedef struct {
   ReplyCallback callback;
-  gpointer data;
+  GVfsJob *job;
 } ExpectedReply;
 
 struct _GVfsBackendSftp
@@ -484,7 +484,6 @@ read_string (GDataInputStream *stream, gsize *len_out)
 
   error = NULL;
   len = g_data_input_stream_get_uint32 (stream, NULL, &error);
-  g_print ("len: %d, erro: %p\n", len, error);
   if (error)
     {
       g_error_free (error);
@@ -493,18 +492,14 @@ read_string (GDataInputStream *stream, gsize *len_out)
   
   data = g_malloc (len + 1);
 
-  g_print ("a\n");
   if (!g_input_stream_read_all (G_INPUT_STREAM (stream), data, len, NULL, NULL, NULL))
     {
-      g_print ("b\n");
       g_free (data);
       return NULL;
     }
   
-  g_print ("c\n");
   data[len] = 0;
 
-  g_print ("d\n");
   if (len_out)
     *len_out = len;
   
@@ -692,7 +687,7 @@ read_reply_async_got_data  (GObject *source_object,
   expected_reply = g_hash_table_lookup (backend->expected_replies, GINT_TO_POINTER (id));
   if (expected_reply)
     {
-      (expected_reply->callback) (backend, type, reply, backend->reply_size, expected_reply->data);
+      (expected_reply->callback) (backend, type, reply, backend->reply_size, expected_reply->job);
       g_hash_table_remove (backend->expected_replies, GINT_TO_POINTER (id));
     }
   else
@@ -813,13 +808,13 @@ static void
 expect_reply (GVfsBackendSftp *backend,
 	      guint32 id,
 	      ReplyCallback callback,
-	      gpointer user_data)
+	      GVfsJob *job)
 {
   ExpectedReply *expected;
 
   expected = g_new (ExpectedReply, 1);
   expected->callback = callback;
-  expected->data = user_data;
+  expected->job = job;
 
   g_hash_table_replace (backend->expected_replies, GINT_TO_POINTER (id), expected);
 }
@@ -829,7 +824,7 @@ queue_command (GVfsBackendSftp *backend,
 	       GDataOutputStream *command_stream,
 	       guint32 id,
 	       ReplyCallback callback,
-	       gpointer user_data)
+	       GVfsJob *job)
 {
   GByteArray *array;
   gboolean first;
@@ -839,7 +834,7 @@ queue_command (GVfsBackendSftp *backend,
   first = backend->command_queue == NULL;
 
   backend->command_queue = g_list_append (backend->command_queue, array);
-  expect_reply (backend, id, callback, user_data);
+  expect_reply (backend, id, callback, job);
   
   if (first)
     send_command (backend);
@@ -1000,15 +995,69 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
+static void
+result_from_status (GVfsJob *job,
+		    GDataInputStream *reply)
+{
+  GError error;
+  guint32 code;
+
+  code = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+
+  if (code == SSH_FX_OK)
+    {
+      g_vfs_job_succeeded (job);
+      return;
+    }
+
+  error.domain = G_IO_ERROR;
+  error.code = G_IO_ERROR_FAILED;
+
+  switch (code)
+    {
+    default:
+    case SSH_FX_EOF:
+    case SSH_FX_FAILURE:
+    case SSH_FX_BAD_MESSAGE:
+    case SSH_FX_NO_CONNECTION:
+    case SSH_FX_CONNECTION_LOST:
+      break;
+      
+    case SSH_FX_NO_SUCH_FILE:
+      error.code = G_IO_ERROR_NOT_FOUND;
+      break;
+      
+    case SSH_FX_PERMISSION_DENIED:
+      error.code = G_IO_ERROR_PERMISSION_DENIED;
+      break;
+
+    case SSH_FX_OP_UNSUPPORTED:
+      error.code = G_IO_ERROR_NOT_SUPPORTED;
+      break;
+    }
+  
+  error.message = read_string (reply, NULL);
+  if (error.message == NULL)
+    error.message = g_strdup ("Unknown reason");
+
+  g_vfs_job_failed_from_error (job, &error);
+  g_free (error.message);
+}
 
 static void
 get_info_reply (GVfsBackendSftp *backend,
 		int reply_type,
 		GDataInputStream *reply,
 		guint32 len,
-		gpointer user_data)
+		GVfsJob *job)
 {
   g_print ("get_info_reply, %d\n", len);
+
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply);
+      return;
+    }
 }
 
 static gboolean
@@ -1023,10 +1072,12 @@ try_get_info (GVfsBackend *backend,
   guint32 id;
   GDataOutputStream *command;
 
-  command = new_command_stream (op_backend, SSH_FXP_STAT, &id);
+  command = new_command_stream (op_backend,
+				flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS ? SSH_FXP_LSTAT : SSH_FXP_STAT,
+				&id);
   put_string (command, filename);
   
-  queue_command (op_backend, command, id, get_info_reply, job);
+  queue_command (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
 
   return TRUE;
 }
