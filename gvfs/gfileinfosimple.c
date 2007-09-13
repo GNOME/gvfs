@@ -73,57 +73,110 @@ get_selinux_context (const char *path,
 #endif
 }
 
+static gboolean
+valid_char (char c)
+{
+  return c >= 32 && c <= 126 && c != '\\';
+}
+
+static void
+escape_xattr (GFileInfo *info,
+	      const char *attr,
+	      const char *value, /* Is zero terminated */
+	      size_t len /* not including zero termination */)
+{
+  char *full_attr;
+  int num_invalid, i;
+  char *escaped_val, *p;
+  unsigned char c;
+  static char *hex_digits = "0123456789abcdef";
+  
+  full_attr = g_strconcat ("xattr:", attr, NULL);
+
+  num_invalid = 0;
+  for (i = 0; i < len; i++)
+    {
+      if (!valid_char (value[i]))
+	num_invalid++;
+    }
+	
+  if (num_invalid == 0)
+    g_file_info_set_attribute (info, full_attr, value);
+  else
+    {
+      escaped_val = g_malloc (len + num_invalid*3 + 1);
+
+      p = escaped_val;
+      for (i = 0; i < len; i++)
+	{
+	  if (valid_char (value[i]))
+	    *p++ = value[i];
+	  else
+	    {
+	      c = value[i];
+	      *p++ = '\\';
+	      *p++ = 'x';
+	      *p++ = hex_digits[(c >> 8) & 0xf];
+	      *p++ = hex_digits[c & 0xf];
+	    }
+	}
+      *p++ = 0;
+      g_file_info_set_attribute (info, full_attr, escaped_val);
+      g_free (escaped_val);
+    }
+  
+  g_free (full_attr);
+}
+
 static void
 get_one_xattr (const char *path,
 	       GFileInfo *info,
 	       const char *attr,
 	       gboolean follow_symlinks)
 {
-  char value[65];
+  char value[64];
   char *value_p;
-  ssize_t res;
-  char *full_attr;
+  ssize_t len;
 
   if (follow_symlinks)  
-    res = getxattr (path, attr, value, sizeof (value)-1);
+    len = getxattr (path, attr, value, sizeof (value)-1);
   else
-    res = lgetxattr (path, attr,value, sizeof (value)-1);
+    len = lgetxattr (path, attr,value, sizeof (value)-1);
 
   value_p = NULL;
-  if (res > 0) {
-    /* Null terminate */
-    value[res] = 0;
+  if (len >= 0)
     value_p = value;
-  } else if (res == -1 && errno == ERANGE)
+  else if (len == -1 && errno == ERANGE)
     {
       if (follow_symlinks)  
-	res = getxattr (path, attr, NULL, 0);
+	len = getxattr (path, attr, NULL, 0);
       else
-	res = lgetxattr (path, attr, NULL, 0);
+	len = lgetxattr (path, attr, NULL, 0);
 
-      if (res < 0)
+      if (len < 0)
 	return;
 
-      value_p = g_malloc (res+1);
+      value_p = g_malloc (len+1);
 
       if (follow_symlinks)  
-	res = getxattr (path, attr, value_p, res);
+	len = getxattr (path, attr, value_p, len);
       else
-	res = lgetxattr (path, attr, value_p, res);
+	len = lgetxattr (path, attr, value_p, len);
 
-      if (res < 0)
+      if (len < 0)
 	{
 	  g_free (value_p);
 	  return;
 	}
-
-      /* Null terminate */
-      value_p[res] = 0;
     }
+  else
+    return;
+  
+  /* Null terminate */
+  value_p[len] = 0;
 
-  full_attr = g_strconcat ("xattr:", attr, NULL);
-  g_file_info_set_attribute (info, full_attr, value_p);
-  g_free (full_attr);
+  escape_xattr (info, attr, value_p, len);
+  
   if (value_p != value)
     g_free (value_p);
 }
