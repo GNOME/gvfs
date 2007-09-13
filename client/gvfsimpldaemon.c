@@ -253,59 +253,26 @@ lookup_mount_info_in_cache (GMountSpec *spec,
   return info;
 }
 
-GMountInfo *
-_g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
-					const char *path,
-					GError **error)
+static GMountInfo *
+handler_lookup_mount_reply (DBusMessage *reply,
+			    GError **error)
 {
-  GMountInfo *info;
-  DBusConnection *conn;
-  DBusMessage *message, *reply;
-  DBusMessageIter iter;
   DBusError derror;
+  GMountInfo *info;
+  DBusMessageIter iter;
   const char *display_name, *icon, *obj_path, *dbus_id;
   GMountSpec *mount_spec;
   GList *l;
-	
-  info = lookup_mount_info_in_cache (spec, path);
-
-  if (info != NULL)
-    return info;
-  
-  conn = _g_dbus_connection_get_sync (NULL, error);
-  if (conn == NULL)
-    return NULL;
-
-  message =
-    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-				  G_VFS_DBUS_MOUNTTRACKER_PATH,
-				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT);
-  dbus_message_set_auto_start (message, TRUE);
-  
-  dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus_with_path (&iter, spec, path);
 
   dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
-  dbus_message_unref (message);
-
-  if (!reply)
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Error while getting mount info: %s",
-		   derror.message);
-      dbus_error_free (&derror);
-      return NULL;
-    }
-
+  
   if (dbus_set_error_from_message (&derror, reply))
     {
       _g_error_from_dbus (&derror, error);
       dbus_error_free (&derror);
       return NULL;
     }
-  
+
   dbus_message_iter_init (reply, &iter);
   if (!_g_dbus_message_iter_get_args (&iter,
 				      &derror,
@@ -317,17 +284,15 @@ _g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
     {
       _g_error_from_dbus (&derror, error);
       dbus_error_free (&derror);
-      dbus_message_unref (reply);
       return NULL;
     }
-  
+
   mount_spec = g_mount_spec_from_dbus (&iter);
   if (mount_spec == NULL)
     {
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting mount info: %s",
 		   "Invalid reply");
-      dbus_message_unref (reply);
       return NULL;
     }
 
@@ -364,6 +329,150 @@ _g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
   G_UNLOCK (mount_cache);
 
   g_mount_spec_unref (mount_spec);
+
+  return info;
+}
+
+typedef struct {
+  GMountInfoLookupCallback callback;
+  gpointer user_data;
+} GetMountInfoData;
+
+static void
+async_get_mount_info_response (DBusPendingCall *pending,
+			       void            *_data)
+{
+  GetMountInfoData *data = _data;
+  DBusMessage *reply;
+  GError *error;
+  GMountInfo *info;
+
+  
+  reply = dbus_pending_call_steal_reply (pending);
+  dbus_pending_call_unref (pending);
+
+  error = NULL;
+  info = handler_lookup_mount_reply (reply, &error);
+
+  dbus_message_unref (reply);
+  
+  data->callback (info, data, error);
+
+  if (info)
+    _g_mount_info_unref (info);
+  
+  if (error)
+    g_error_free (error);
+  
+  g_free (data);
+}
+
+void
+_g_vfs_impl_daemon_get_mount_info_async (GMountSpec *spec,
+					 const char *path,
+					 GMountInfoLookupCallback callback,
+					 gpointer user_data)
+{
+  DBusPendingCall *pending;
+  GMountInfo *info;
+  GError *error;
+  GetMountInfoData *data;
+  DBusMessage *message;
+  DBusMessageIter iter;
+  
+  info = lookup_mount_info_in_cache (spec, path);
+
+  if (info != NULL)
+    {
+      callback (info, user_data, NULL);
+      _g_mount_info_unref (info);
+      return;
+    }
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+				  G_VFS_DBUS_MOUNTTRACKER_PATH,
+				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT);
+  dbus_message_set_auto_start (message, TRUE);
+  
+  dbus_message_iter_init_append (message, &iter);
+  g_mount_spec_to_dbus_with_path (&iter, spec, path);
+
+  if (!dbus_connection_send_with_reply (the_vfs->bus, message, &pending,
+					1000))
+    _g_dbus_oom ();
+
+  dbus_message_unref (message);
+
+  if (pending == NULL)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting peer-to-peer dbus connection: %s",
+		   "Connection is closed");
+      callback (NULL, user_data, error);
+      return;
+    }
+
+  data = g_new0 (GetMountInfoData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+  
+  if (!dbus_pending_call_set_notify (pending,
+				     async_get_mount_info_response,
+				     data,
+				     NULL))
+    _g_dbus_oom ();
+}
+
+
+GMountInfo *
+_g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
+					const char *path,
+					GError **error)
+{
+  GMountInfo *info;
+  DBusConnection *conn;
+  DBusMessage *message, *reply;
+  DBusMessageIter iter;
+  DBusError derror;
+	
+  info = lookup_mount_info_in_cache (spec, path);
+
+  if (info != NULL)
+    return info;
+  
+  conn = _g_dbus_connection_get_sync (NULL, error);
+  if (conn == NULL)
+    return NULL;
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+				  G_VFS_DBUS_MOUNTTRACKER_PATH,
+				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT);
+  dbus_message_set_auto_start (message, TRUE);
+  
+  dbus_message_iter_init_append (message, &iter);
+  g_mount_spec_to_dbus_with_path (&iter, spec, path);
+
+  dbus_error_init (&derror);
+  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
+  dbus_message_unref (message);
+
+  if (!reply)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting mount info: %s",
+		   derror.message);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  info = handler_lookup_mount_reply (reply, error);
+
+  dbus_message_unref (reply);
   
   return info;
 }

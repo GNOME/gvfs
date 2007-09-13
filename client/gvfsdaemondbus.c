@@ -350,8 +350,6 @@ typedef struct {
 
   GError *io_error;
   gulong cancelled_tag;
-  
-  DBusConnection *private_bus;
 } AsyncDBusCall;
 
 static void
@@ -365,11 +363,6 @@ async_call_finish (AsyncDBusCall *async_call,
 			async_call->op_callback_data,
 			async_call->callback_data);
 
-  if (async_call->private_bus)
-    {
-      dbus_connection_close (async_call->private_bus);
-      dbus_connection_unref (async_call->private_bus);
-    }
   if (async_call->connection)
     dbus_connection_unref (async_call->connection);
   dbus_message_unref (async_call->message);
@@ -463,14 +456,6 @@ async_call_send (AsyncDBusCall *async_call)
   DBusPendingCall *pending;
   AsyncCallCancelData *cancel_data;
 
-  /* If we had to create a private session, kill it now instead of later */
-  if (async_call->private_bus)
-    {
-      dbus_connection_close (async_call->private_bus);
-      dbus_connection_unref (async_call->private_bus);
-      async_call->private_bus = NULL;
-    }
-    
   if (!dbus_connection_send_with_reply (async_call->connection,
 					async_call->message,
 					&pending,
@@ -505,34 +490,6 @@ async_call_send (AsyncDBusCall *async_call)
 				     NULL))
     _g_dbus_oom ();
 
-}
-
-static gboolean
-get_private_bus_async (AsyncDBusCall *async_call)
-{
-  DBusError derror;
-
-  if (async_call->private_bus == NULL)
-    {
-      /* Unfortunately dbus doesn't have an async get */
-      dbus_error_init (&derror);
-      async_call->private_bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);
-      if (async_call->private_bus == NULL)
-	{
-	  g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		       "Couldn't get main dbus connection: %s\n",
-		       derror.message);
-	  dbus_error_free (&derror);
-	  g_idle_add (async_call_finish_at_idle, async_call);
-	  return FALSE;
-	}
-      dbus_connection_set_exit_on_disconnect (async_call->private_bus, FALSE);
-     
-      /* Connect with mainloop */
-      _g_dbus_connection_integrate_with_main (async_call->private_bus);
-    }
-  
-  return TRUE;
 }
 
 static void
@@ -633,10 +590,8 @@ open_connection_async (AsyncDBusCall *async_call)
 {
   DBusMessage *get_connection_message;
   DBusPendingCall *pending;
+  DBusConnection *session_bus;
 
-  if (!get_private_bus_async (async_call))
-    return;
-  
   get_connection_message = dbus_message_new_method_call (async_call->dbus_id,
 							 G_VFS_DBUS_DAEMON_PATH,
 							 G_VFS_DBUS_DAEMON_INTERFACE,
@@ -645,12 +600,14 @@ open_connection_async (AsyncDBusCall *async_call)
   if (get_connection_message == NULL)
     _g_dbus_oom ();
 
-  if (!dbus_connection_send_with_reply (async_call->private_bus,
+  session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  if (!dbus_connection_send_with_reply (session_bus,
 					get_connection_message, &pending,
 					DBUS_TIMEOUT_DEFAULT))
     _g_dbus_oom ();
-  
+
   dbus_message_unref (get_connection_message);
+  dbus_connection_unref (session_bus);
   
   if (pending == NULL)
     {
@@ -920,7 +877,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   
   if (local->session_bus == NULL)
     {
-      bus = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+      bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);
       if (bus == NULL)
 	{
 	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,

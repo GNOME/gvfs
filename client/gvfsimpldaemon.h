@@ -24,6 +24,10 @@ typedef struct {
   GMountSpec *spec;
 } GMountInfo;
 
+typedef void (*GMountInfoLookupCallback) (GMountInfo *mount_info,
+					  gpointer data,
+					  GError *error);
+
 struct _GVfsImplDaemonClass
 {
   GObjectClass parent_class;
@@ -33,12 +37,16 @@ GType   g_vfs_impl_daemon_get_type  (void) G_GNUC_CONST;
 
 GVfsImplDaemon *g_vfs_impl_daemon_new (void);
 
-GMountInfo *_g_vfs_impl_daemon_get_mount_info_sync (GMountSpec  *spec,
-						    const char  *path,
-						    GError     **error);
-const char *_g_mount_info_resolve_path             (GMountInfo  *info,
-						    const char  *path);
-void        _g_mount_info_unref                    (GMountInfo  *info);
+void        _g_vfs_impl_daemon_get_mount_info_async (GMountSpec                *spec,
+						     const char                *path,
+						     GMountInfoLookupCallback   callback,
+						     gpointer                   user_data);
+GMountInfo *_g_vfs_impl_daemon_get_mount_info_sync  (GMountSpec                *spec,
+						     const char                *path,
+						     GError                   **error);
+const char *_g_mount_info_resolve_path              (GMountInfo                *info,
+						     const char                *path);
+void        _g_mount_info_unref                     (GMountInfo                *info);
 
 G_END_DECLS
 

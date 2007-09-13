@@ -201,8 +201,102 @@ do_sync_path_call (GFile *file,
 				   connection_out,
 				   cancellable, error);
   dbus_message_unref (message);
+
+  _g_mount_info_unref (mount_info);
   
   return reply;
+}
+
+typedef struct {
+  GFile *file;
+  char *op;
+  GCancellable *cancellable;
+  DBusMessage *args;
+  GError *io_error;
+  gpointer op_callback;
+  gpointer op_callback_data;
+  GVfsAsyncDBusCallback callback;
+  gpointer callback_data;
+} AsyncPathCall;
+
+static void
+async_path_call_free (AsyncPathCall *data)
+{
+  g_object_unref (data->file);
+  g_free (data->op);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  if (data->io_error)
+    g_error_free (data->io_error);
+  if (data->args)
+    dbus_message_unref (data->args);
+  g_free (data);
+}
+
+static gboolean
+do_async_path_call_error_idle (gpointer _data)
+{
+  AsyncPathCall *data = _data;
+
+  data->callback (NULL, NULL,
+		  data->io_error,
+		  data->cancellable,
+		  data->op_callback,
+		  data->op_callback_data,
+		  data->callback_data);
+
+  async_path_call_free (data);
+  
+  return FALSE;
+}
+  
+static void
+do_async_path_call_callback (GMountInfo *mount_info,
+			     gpointer _data,
+			     GError *error)
+{
+  AsyncPathCall *data = _data;
+  GFileDaemon *daemon_file = G_FILE_DAEMON (data->file);
+  const char *path;
+  DBusMessage *message;
+  DBusMessageIter arg_source, arg_dest;
+  
+  if (error != NULL)
+    {
+      data->io_error = g_error_copy (error);
+      g_idle_add (do_async_path_call_error_idle, data);
+      return;
+    }
+
+  message =
+    dbus_message_new_method_call (mount_info->dbus_id,
+				  mount_info->object_path,
+				  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+				  data->op);
+  
+  path = _g_mount_info_resolve_path (mount_info,
+				     daemon_file->path);
+  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
+
+  /* Append more args from data->args */
+
+  if (data->args)
+    {
+      dbus_message_iter_init (data->args, &arg_source);
+      dbus_message_iter_init_append (message, &arg_dest);
+
+      _g_dbus_message_iter_copy (&arg_dest, &arg_source);
+    }
+
+  /* TODO: ref GFile during async call? */
+  
+  _g_vfs_daemon_call_async (message,
+			    data->op_callback, data->op_callback_data,
+			    data->callback, data->callback_data,
+			    data->cancellable);
+  
+  dbus_message_unref (message);
+  async_path_call_free (data);
 }
 
 static void
@@ -217,47 +311,41 @@ do_async_path_call (GFile *file,
 		    ...)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
-  DBusMessage *message;
-  GMountInfo *mount_info;
-  const char *path;
   va_list var_args;
   GError *error;
+  AsyncPathCall *data;
 
+  data = g_new0 (AsyncPathCall, 1);
+
+  data->file = g_object_ref (file);
+  data->op = g_strdup (op);
+  if (data->cancellable)
+    data->cancellable = g_object_ref (cancellable);
+  data->op_callback = op_callback;
+  data->op_callback_data = op_callback_data;
+  data->callback = callback;
+  data->callback_data = callback_data;
+  
   error = NULL;
 
-  /* TODO: Should be async */
-  mount_info = _g_vfs_impl_daemon_get_mount_info_sync (daemon_file->mount_spec,
-						       daemon_file->path,
-						       &error);
-  if (mount_info == NULL)
+  if (first_arg_type != 0)
     {
-      g_assert ("TODO" == NULL);
-      g_error_free (error);
-      return; /* TODO: Should cause error via dile*/
+      data->args = dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_CALL);
+      if (data->args == NULL)
+	_g_dbus_oom ();
+      
+      va_start (var_args, first_arg_type);
+      _g_dbus_message_append_args_valist (data->args,
+					  first_arg_type,
+					  var_args);
+      va_end (var_args);
     }
   
-  message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
-				  op);
-
-  path = _g_mount_info_resolve_path (mount_info,
-				     daemon_file->path);
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
-
-  va_start (var_args, first_arg_type);
-  _g_dbus_message_append_args_valist (message,
-				      first_arg_type,
-				      var_args);
-  va_end (var_args);
-
-  _g_vfs_daemon_call_async (message,
-			    op_callback, op_callback_data,
-			    callback, callback_data,
-			    cancellable);
   
-  dbus_message_unref (message);
+  _g_vfs_impl_daemon_get_mount_info_async (daemon_file->mount_spec,
+					   daemon_file->path,
+					   do_async_path_call_callback,
+					   file);
 }
 
 
