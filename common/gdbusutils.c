@@ -1179,6 +1179,8 @@ _g_dbus_message_iter_copy (DBusMessageIter *dest,
 	}
       else
 	g_error ("Unsupported type %c in _g_dbus_message_iter_copy", type);
+
+      dbus_message_iter_next (source);      
     }
   
 }
