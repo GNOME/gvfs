@@ -2,6 +2,7 @@
 #define __G_SIMPLE_ASYNC_RESULT_H__
 
 #include <gio/gasyncresult.h>
+#include <gio/gcancellable.h>
 
 G_BEGIN_DECLS
 
@@ -20,26 +21,57 @@ struct _GSimpleAsyncResultClass
   GObjectClass parent_class;
 };
 
+typedef void (*GSimpleAsyncThreadFunc) (GSimpleAsyncResult *res,
+					gpointer op_data,
+					GObject *object,
+					GCancellable *cancellable);
+
+
 GType g_simple_async_result_get_type (void) G_GNUC_CONST;
   
-GAsyncResult * g_simple_async_result_new (void);
-
-gpointer g_simple_async_result_get_op_data      (GSimpleAsyncResult  *simple);
-void     g_simple_async_result_complete_in_idle (GSimpleAsyncResult  *simple);
-void     g_simple_async_result_run_in_thread    (GSimpleAsyncResult  *simple,
-						 GCallback            callback);
-void     g_simple_async_result_set_error        (GSimpleAsyncResult  *simple,
-						 GQuark               domain,
-						 gint                 code,
-						 const gchar         *format,
-						 ...)  G_GNUC_PRINTF (4, 5);
-void     g_simple_async_result_set_from_error   (GSimpleAsyncResult  *simple,
-						 GError              *error);
-gboolean g_simple_async_result_propagate_error  (GSimpleAsyncResult  *simple,
-						 GError             **dest);
+GSimpleAsyncResult *g_simple_async_result_new              (GObject                 *source_object,
+							    GAsyncReadyCallback      callback,
+							    gpointer                 user_data,
+							    gpointer                 source_tag,
+							    gpointer                 op_data,
+							    GDestroyNotify           destroy_op_data);
+GSimpleAsyncResult *g_simple_async_result_new_error        (GObject                 *source_object,
+							    GAsyncReadyCallback      callback,
+							    gpointer                 user_data,
+							    GQuark                   domain,
+							    gint                     code,
+							    const gchar             *format,
+							    ...) G_GNUC_PRINTF (6, 7);
+GSimpleAsyncResult *g_simple_async_result_new_from_error   (GObject                 *source_object,
+							    GAsyncReadyCallback      callback,
+							    gpointer                 user_data,
+							    GError                  *error);
+gpointer            g_simple_async_result_get_op_data      (GSimpleAsyncResult      *simple);
+gpointer            g_simple_async_result_get_source_tag   (GSimpleAsyncResult      *simple);
+void                g_simple_async_result_complete         (GSimpleAsyncResult      *simple);
+void                g_simple_async_result_complete_in_idle (GSimpleAsyncResult      *simple);
+void                g_simple_async_result_run_in_thread    (GSimpleAsyncResult      *simple,
+							    GSimpleAsyncThreadFunc   func,
+							    int                      io_priority,
+							    GCancellable            *cancellable);
+void                g_simple_async_result_set_from_error   (GSimpleAsyncResult      *simple,
+							    GError                  *error);
+gboolean            g_simple_async_result_propagate_error  (GSimpleAsyncResult      *simple,
+							    GError                 **dest);
+void                g_simple_async_result_set_error        (GSimpleAsyncResult      *simple,
+							    GQuark                   domain,
+							    gint                     code,
+							    const gchar             *format,
+							    ...) G_GNUC_PRINTF (4, 5);
+void                g_simple_async_result_set_error_va     (GSimpleAsyncResult      *simple,
+							    GQuark                   domain,
+							    gint                     code,
+							    const gchar             *format,
+							    va_list                  args);
 
 
 G_END_DECLS
 
 
+  
 #endif /* __G_SIMPLE_ASYNC_RESULT_H__ */

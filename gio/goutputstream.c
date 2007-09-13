@@ -369,7 +369,7 @@ g_output_stream_close (GOutputStream  *stream,
 }
 
 typedef struct {
-  GAsyncResult       generic;
+  GAsyncResultData       generic;
   void               *buffer;
   gsize               bytes_requested;
   gssize              bytes_written;
@@ -410,7 +410,7 @@ queue_write_async_result (GOutputStream      *stream,
   res->bytes_written = bytes_written;
   res->callback = callback;
 
-  _g_queue_async_result ((GAsyncResult *)res, stream,
+  _g_queue_async_result ((GAsyncResultData *)res, stream,
 			 error, data,
 			 call_write_async_result);
 }
@@ -524,7 +524,7 @@ g_output_stream_write_async (GOutputStream        *stream,
 }
 
 typedef struct {
-  GAsyncResult        generic;
+  GAsyncResultData        generic;
   gboolean            result;
   GAsyncFlushCallback callback;
 } FlushAsyncResult;
@@ -557,7 +557,7 @@ queue_flush_async_result (GOutputStream      *stream,
   res->result = result;
   res->callback = callback;
   
-  _g_queue_async_result ((GAsyncResult *)res, stream,
+  _g_queue_async_result ((GAsyncResultData *)res, stream,
 			 error, data,
 			 call_flush_async_result);
 }
@@ -617,7 +617,7 @@ g_output_stream_flush_async (GOutputStream       *stream,
 }
 
 typedef struct {
-  GAsyncResult       generic;
+  GAsyncResultData       generic;
   gboolean            result;
   GAsyncCloseOutputCallback callback;
 } CloseAsyncResult;
@@ -650,7 +650,7 @@ queue_close_async_result (GOutputStream       *stream,
   res->result = result;
   res->callback = callback;
 
-  _g_queue_async_result ((GAsyncResult *)res, stream,
+  _g_queue_async_result ((GAsyncResultData *)res, stream,
 			 error, data,
 			 call_close_async_result);
 }

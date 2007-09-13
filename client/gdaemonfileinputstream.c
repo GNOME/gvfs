@@ -18,6 +18,7 @@
 #include "gvfsdaemondbus.h"
 #include <gio/gsocketinputstream.h>
 #include <gio/gsocketoutputstream.h>
+#include <gio/gsimpleasyncresult.h>
 #include <gvfsdaemonprotocol.h>
 
 #define MAX_READ_SIZE (4*1024*1024)
@@ -169,9 +170,12 @@ static void       g_daemon_file_input_stream_read_async    (GInputStream        
 							    void                      *buffer,
 							    gsize                      count,
 							    int                        io_priority,
-							    GAsyncReadCallback         callback,
-							    gpointer                   data,
-							    GCancellable              *cancellable);
+							    GCancellable              *cancellable,
+							    GAsyncReadyCallback        callback,
+							    gpointer                   data);
+static gssize     g_daemon_file_input_stream_read_finish   (GInputStream              *stream,
+							    GAsyncResult              *result,
+							    GError                   **error);
 static void       g_daemon_file_input_stream_skip_async    (GInputStream              *stream,
 							    gsize                      count,
 							    int                        io_priority,
@@ -220,6 +224,7 @@ g_daemon_file_input_stream_class_init (GDaemonFileInputStreamClass *klass)
   stream_class->close = g_daemon_file_input_stream_close;
   
   stream_class->read_async = g_daemon_file_input_stream_read_async;
+  stream_class->read_finish = g_daemon_file_input_stream_read_finish;
   if (0) stream_class->skip_async = g_daemon_file_input_stream_skip_async;
   stream_class->close_async = g_daemon_file_input_stream_close_async;
   
@@ -1272,14 +1277,19 @@ async_op_handle (AsyncIterator *iterator,
 }
 
 static void
-async_read_op_callback (GInputStream *stream,
-			void         *buffer,
-			gsize         count_requested,
-			gssize        count_read,
-			gpointer      data,
-			GError       *error)
+async_read_op_callback (GObject *source_object,
+			GAsyncResult *res,
+			gpointer      user_data)
 {
-  async_op_handle ((AsyncIterator *)data, count_read, error);
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  gssize count_read;
+  GError *error = NULL;
+  
+  count_read = g_input_stream_read_finish (stream, res, &error);
+  
+  async_op_handle ((AsyncIterator *)user_data, count_read, error);
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -1328,8 +1338,8 @@ async_iterate (AsyncIterator *iterator)
       g_input_stream_read_async (file->data_stream,
 				 io_data->io_buffer, io_data->io_size,
 				 iterator->io_priority,
-				 async_read_op_callback, iterator,
-				 io_data->io_allow_cancel ? iterator->cancellable : NULL);
+				 io_data->io_allow_cancel ? iterator->cancellable : NULL,
+				 async_read_op_callback, iterator);
     }
   else if (io_op == STATE_OP_SKIP)
     {
@@ -1380,12 +1390,14 @@ static void
 async_read_done (GInputStream *stream,
 		 gpointer op_data,
 		 gpointer callback,
-		 gpointer callback_data,
+		 gpointer user_data,
 		 GError *io_error)
 {
   ReadOperation *op;
   gssize count_read;
+  gssize *count_read_p;
   GError *error;
+  GSimpleAsyncResult *simple;
 
   op = op_data;
 
@@ -1400,14 +1412,20 @@ async_read_done (GInputStream *stream,
       error = op->ret_error;
     }
 
-  if (callback)
-    ((GAsyncReadCallback)callback) (stream,
-				    op->buffer,
-				    op->buffer_size,
-				    count_read,
-				    callback_data,
-				    error);
+  count_read_p = g_new (gssize, 1);
+  *count_read_p = count_read;
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback, user_data,
+				      g_daemon_file_input_stream_read_async,
+				      count_read_p, g_free);
 
+  if (count_read == -1)
+    g_simple_async_result_set_from_error (simple, error);
+
+  /* Complete immediately, not in idle, since we're already in a mainloop callout */
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+  
   if (op->ret_error)
     g_error_free (op->ret_error);
   g_free (op);
@@ -1418,9 +1436,9 @@ g_daemon_file_input_stream_read_async  (GInputStream        *stream,
 					void               *buffer,
 					gsize               count,
 					int                 io_priority,
-					GAsyncReadCallback  callback,
-					gpointer            data,
-					GCancellable       *cancellable)
+					GCancellable       *cancellable,
+					GAsyncReadyCallback callback,
+					gpointer            user_data)
 {
   GDaemonFileInputStream *file;
   AsyncIterator *iterator;
@@ -1443,10 +1461,26 @@ g_daemon_file_input_stream_read_async  (GInputStream        *stream,
 			   (state_machine_iterator)iterate_read_state_machine,
 			   op,
 			   io_priority,
-			   callback, data,
+			   callback, user_data,
 			   cancellable,
 			   async_read_done);
 }
+
+static gssize
+g_daemon_file_input_stream_read_finish (GInputStream              *stream,
+					GAsyncResult              *result,
+					GError                   **error)
+{
+  GSimpleAsyncResult *simple;
+  gssize *nread;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_input_stream_read_async);
+  
+  nread = g_simple_async_result_get_op_data (simple);
+  return *nread;
+}
+
 
 static void
 g_daemon_file_input_stream_skip_async  (GInputStream        *stream,

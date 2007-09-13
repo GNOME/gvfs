@@ -9,6 +9,8 @@
 #include <unistd.h>
 
 #include "gsimpleasyncresult.h"
+#include "gioscheduler.h"
+#include <gio/gioerror.h>
 #include <glib/gi18n-lib.h>
 
 static void g_simple_async_result_async_result_iface_init (GAsyncResultIface       *iface);
@@ -18,10 +20,13 @@ struct _GSimpleAsyncResult
   GObject parent_instance;
 
   GObject *source_object;
+  GAsyncReadyCallback callback;
   gpointer user_data;
   GError *error;
   gboolean failed;
-  
+
+  gpointer source_tag;
+
   gpointer op_data;
   GDestroyNotify destroy_op_data;
 };
@@ -63,16 +68,68 @@ g_simple_async_result_init (GSimpleAsyncResult *simple)
 {
 }
 
-
-GAsyncResult *
-g_simple_async_result_new (void)
+GSimpleAsyncResult *
+g_simple_async_result_new (GObject *source_object,
+			   GAsyncReadyCallback callback,
+			   gpointer user_data,
+			   gpointer source_tag,
+			   gpointer op_data,
+			   GDestroyNotify destroy_op_data)
 {
   GSimpleAsyncResult *simple;
 
   simple = g_object_new (G_TYPE_SIMPLE_ASYNC_RESULT, NULL);
+  simple->callback = callback;
+  simple->source_object = g_object_ref (source_object);
+  simple->user_data = user_data;
+  simple->op_data = op_data;
+  simple->destroy_op_data = destroy_op_data;
+  simple->source_tag = source_tag;
   
-  return G_ASYNC_RESULT (simple);
+  return simple;
 }
+
+GSimpleAsyncResult *
+g_simple_async_result_new_from_error (GObject *source_object,
+				      GAsyncReadyCallback callback,
+				      gpointer user_data,
+				      GError *error)
+{
+  GSimpleAsyncResult *simple;
+
+  simple = g_simple_async_result_new (source_object,
+				      callback,
+				      user_data, NULL,
+				      NULL, NULL);
+  g_simple_async_result_set_from_error (simple, error);
+
+  return simple;
+}
+
+GSimpleAsyncResult *
+g_simple_async_result_new_error (GObject *source_object,
+				 GAsyncReadyCallback callback,
+				 gpointer user_data,
+				 GQuark         domain,
+				 gint           code,
+				 const gchar   *format,
+				 ...)
+{
+  GSimpleAsyncResult *simple;
+  va_list args;
+
+  simple = g_simple_async_result_new (source_object,
+				      callback,
+				      user_data, NULL,
+				      NULL, NULL);
+
+  va_start (args, format);
+  g_simple_async_result_set_error_va (simple, domain, code, format, args);
+  va_end (args);
+  
+  return simple;
+}
+
 
 static gpointer
 g_simple_async_result_get_user_data (GAsyncResult *res)
@@ -93,6 +150,13 @@ g_simple_async_result_async_result_iface_init (GAsyncResultIface *iface)
 {
   iface->get_user_data = g_simple_async_result_get_user_data;
   iface->get_source_object = g_simple_async_result_get_source_object;
+}
+
+
+gpointer
+g_simple_async_result_get_source_tag (GSimpleAsyncResult *simple)
+{
+  return simple->source_tag;
 }
 
 
@@ -119,7 +183,7 @@ void
 g_simple_async_result_set_from_error (GSimpleAsyncResult *simple,
 				      GError *error)
 {
-  simple->error = error;
+  simple->error = g_error_copy (error);
   simple->failed = TRUE;
 }
 
@@ -141,6 +205,18 @@ _g_error_new_valist (GQuark         domain,
 }
 
 void
+g_simple_async_result_set_error_va (GSimpleAsyncResult *simple,
+				    GQuark         domain,
+				    gint           code,
+				    const gchar   *format,
+				    va_list        args)
+{
+  simple->error = _g_error_new_valist (domain, code, format, args);
+  simple->failed = TRUE;
+}
+
+
+void
 g_simple_async_result_set_error (GSimpleAsyncResult *simple,
 				 GQuark         domain,
 				 gint           code,
@@ -150,21 +226,89 @@ g_simple_async_result_set_error (GSimpleAsyncResult *simple,
   va_list args;
 
   va_start (args, format);
-  simple->error = _g_error_new_valist (domain, code, format, args);
+  g_simple_async_result_set_error_va (simple, domain, code, format, args);
   va_end (args);
-  
-  simple->failed = TRUE;
 }
 
+
+void
+g_simple_async_result_complete (GSimpleAsyncResult *simple)
+{
+  if (simple->callback)
+    simple->callback (simple->source_object,
+		      G_ASYNC_RESULT (simple),
+		      simple->user_data);
+}
+
+static gboolean
+complete_in_idle_cb (gpointer data)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (data);
+
+  g_simple_async_result_complete (simple);
+
+  return FALSE;
+}
 
 void
 g_simple_async_result_complete_in_idle (GSimpleAsyncResult *simple)
 {
-  /* TODO */
+  GSource *source;
+  guint id;
+  
+  g_object_ref (simple);
+  
+  source = g_idle_source_new ();
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, complete_in_idle_cb, simple, g_object_unref);
+
+  id = g_source_attach (source, NULL);
+  g_source_unref (source);
+}
+
+typedef struct {
+  GSimpleAsyncResult *simple;
+  GSimpleAsyncThreadFunc func;
+} RunInThreadData;
+
+static void
+run_in_thread (GIOJob *job,
+	       GCancellable *c,
+	       gpointer _data)
+{
+  RunInThreadData *data = _data;
+  GSimpleAsyncResult *simple = data->simple;
+
+  if (g_cancellable_is_cancelled (c))
+    {
+      g_simple_async_result_set_error (simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_CANCELLED,
+                                       _("Operation was cancelled"));
+    }
+  else
+    {
+      data->func (simple,
+		  simple->op_data,
+		  simple->source_object,
+		  c);
+    }
+
+  g_simple_async_result_complete_in_idle (data->simple);
+  g_object_unref (data->simple);
+  g_free (data);
 }
 
 void
 g_simple_async_result_run_in_thread (GSimpleAsyncResult *simple,
-				     GCallback callback)
+				     GSimpleAsyncThreadFunc func,
+				     int io_priority, 
+				     GCancellable *cancellable)
 {
+  RunInThreadData *data;
+
+  data = g_new (RunInThreadData, 1);
+  data->func = func;
+  data->simple = g_object_ref (simple);
+  g_schedule_io_job (run_in_thread, data, NULL, io_priority, cancellable);
 }

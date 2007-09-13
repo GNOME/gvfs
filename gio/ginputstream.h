@@ -5,6 +5,7 @@
 #include <gio/giotypes.h>
 #include <gio/gioerror.h>
 #include <gio/gcancellable.h>
+#include <gio/gasyncresult.h>
 
 G_BEGIN_DECLS
 
@@ -18,37 +19,6 @@ G_BEGIN_DECLS
 typedef struct _GInputStream         GInputStream;
 typedef struct _GInputStreamClass    GInputStreamClass;
 typedef struct _GInputStreamPrivate  GInputStreamPrivate;
-
-/**
- * GAsyncReadCallback:
- * @stream: a #GAsyncInputStream
- * @buffer: the buffer passed to the read call
- * @count_requested: the number of bytes requested to be read
- * @count_read: the number of bytes actually read
- * @user_data: the @user_data pointer passed to the read call
- * @error: the error, if count_read is -1, otherwise %NULL
- *
- * This callback is called when an asychronous read operation
- * is finished. 
- *
- * On success, the number of bytes read into the buffer is passed in @count_read.
- * It is not an error if this is not the same as the requested size, as it
- * can happen e.g. near the end of a file, but generally we try to read
- * as many bytes as requested. Zero is passed on end of file
- * (or if @count_requested is zero), but never otherwise.
- *
- * On error @count_read is set to -1, and @error is set accordingly.
- * 
- * The callback is always called, even if the operation was cancelled.
- * If the operation was cancelled @count_read will be -1, and @error
- * will be %G_IO_ERROR_CANCELLED.
- **/
-typedef void (*GAsyncReadCallback)  (GInputStream *stream,
-				     void         *buffer,
-				     gsize         count_requested,
-				     gssize        count_read,
-				     gpointer      user_data,
-				     GError       *error);
 
 typedef void (*GAsyncSkipCallback)  (GInputStream *stream,
 				     gsize         count_requested,
@@ -106,9 +76,12 @@ struct _GInputStreamClass
 			   void               *buffer,
 			   gsize               count,
 			   int                 io_priority,
-			   GAsyncReadCallback  callback,
-			   gpointer            user_data,
-			   GCancellable       *cancellable);
+			   GCancellable       *cancellable,
+			   GAsyncReadyCallback callback,
+			   gpointer            user_data);
+  gssize  (* read_finish) (GInputStream      *stream,
+			   GAsyncResult      *result,
+			   GError           **error);
   void    (* skip_async)  (GInputStream        *stream,
 			   gsize               count,
 			   int                 io_priority,
@@ -153,9 +126,12 @@ void          g_input_stream_read_async        (GInputStream              *strea
 						void                      *buffer,
 						gsize                      count,
 						int                        io_priority,
-						GAsyncReadCallback         callback,
-						gpointer                   user_data,
-						GCancellable              *cancellable);
+						GCancellable              *cancellable,
+						GAsyncReadyCallback        callback,
+						gpointer                   user_data);
+gssize        g_input_stream_read_finish       (GInputStream              *stream,
+						GAsyncResult              *result,
+						GError                    **error);
 void          g_input_stream_skip_async        (GInputStream              *stream,
 						gsize                      count,
 						int                        io_priority,

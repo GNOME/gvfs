@@ -289,12 +289,9 @@ got_request (GVfsChannel *channel,
     }
 }
 
-static void command_read_cb (GInputStream *input_stream,
-			     void         *buffer,
-			     gsize         count_requested,
-			     gssize        count_read,
-			     gpointer      data,
-			     GError       *error);
+static void command_read_cb (GObject *source_object,
+			     GAsyncResult *res,
+			     gpointer user_data);
 
 
 static void
@@ -312,21 +309,19 @@ finish_request (RequestReader *reader)
   g_input_stream_read_async (reader->command_stream,
 			     reader->buffer + reader->buffer_size,
 			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
-			     0,
+			     0, NULL,
 			     command_read_cb,
-			     reader,
-			     NULL);
+			     reader);
 }
 
 static void
-data_read_cb (GInputStream *input_stream,
-	      void         *buffer,
-	      gsize         count_requested,
-	      gssize        count_read,
-	      gpointer      data,
-	      GError       *error)
+data_read_cb (GObject *source_object,
+	      GAsyncResult *res,
+	      gpointer user_data)
 {
-  RequestReader *reader = data;
+  RequestReader *reader = user_data;
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  gssize count_read;
 
   if (reader->channel == NULL)
     {
@@ -335,6 +330,8 @@ data_read_cb (GInputStream *input_stream,
       return;
     }
 
+  count_read = g_input_stream_read_finish (stream, res, NULL);
+  
   if (count_read <= 0)
     {
       reader->channel->priv->request_reader = NULL;
@@ -350,10 +347,8 @@ data_read_cb (GInputStream *input_stream,
       g_input_stream_read_async (reader->command_stream,
 				 reader->data + reader->data_pos,
 				 reader->data_len - reader->data_pos,
-				 0,
-				 data_read_cb,
-				 reader,
-				 NULL);
+				 0, NULL,
+				 data_read_cb, reader);
       return;
     }
   
@@ -362,16 +357,15 @@ data_read_cb (GInputStream *input_stream,
   
 
 static void
-command_read_cb (GInputStream *input_stream,
-		 void         *buffer,
-		 gsize         count_requested,
-		 gssize        count_read,
-		 gpointer      data,
-		 GError       *error)
+command_read_cb (GObject *source_object,
+		 GAsyncResult *res,
+		 gpointer user_data)
 {
-  RequestReader *reader = data;
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  RequestReader *reader = user_data;
   GVfsDaemonSocketProtocolRequest *request;
   guint32 data_len;
+  gssize count_read;
 
   if (reader->channel == NULL)
     {
@@ -379,6 +373,8 @@ command_read_cb (GInputStream *input_stream,
       request_reader_free (reader);
       return;
     }
+
+  count_read = g_input_stream_read_finish (stream, res, NULL);
   
   if (count_read <= 0)
     {
@@ -395,10 +391,8 @@ command_read_cb (GInputStream *input_stream,
       g_input_stream_read_async (reader->command_stream,
 				 reader->buffer + reader->buffer_size,
 				 G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
-				 0,
-				 command_read_cb,
-				 reader,
-				 NULL);
+				 0, NULL, 
+				 command_read_cb, reader);
       return;
     }
 
@@ -414,10 +408,8 @@ command_read_cb (GInputStream *input_stream,
       g_input_stream_read_async (reader->command_stream,
 				 reader->data + reader->data_pos,
 				 reader->data_len - reader->data_pos,
-				 0,
-				 data_read_cb,
-				 reader,
-				 NULL);
+				 0, NULL,
+				 data_read_cb, reader);
       return;
     }
   
@@ -436,10 +428,8 @@ start_request_reader (GVfsChannel *channel)
   g_input_stream_read_async (reader->command_stream,
 			     reader->buffer + reader->buffer_size,
 			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
-			     0,
-			     command_read_cb,
-			     reader,
-			     NULL);
+			     0, NULL,
+			     command_read_cb, reader);
 
   channel->priv->request_reader = reader;
 }

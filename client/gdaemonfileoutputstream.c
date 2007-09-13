@@ -1028,14 +1028,19 @@ async_op_handle (AsyncIterator *iterator,
 }
 
 static void
-async_read_op_callback (GInputStream *stream,
-			void         *buffer,
-			gsize         count_requested,
-			gssize        count_read,
-			gpointer      data,
-			GError       *error)
+async_read_op_callback (GObject *source_object,
+			GAsyncResult *res,
+			gpointer      user_data)
 {
-  async_op_handle ((AsyncIterator *)data, count_read, error);
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  gssize count_read;
+  GError *error = NULL;
+  
+  count_read = g_input_stream_read_finish (stream, res, &error);
+  
+  async_op_handle ((AsyncIterator *)user_data, count_read, error);
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -1084,8 +1089,8 @@ async_iterate (AsyncIterator *iterator)
       g_input_stream_read_async (file->data_stream,
 				 io_data->io_buffer, io_data->io_size,
 				 iterator->io_priority,
-				 async_read_op_callback, iterator,
-				 io_data->io_allow_cancel ? iterator->cancellable : NULL);
+				 io_data->io_allow_cancel ? iterator->cancellable : NULL,
+				 async_read_op_callback, iterator);
     }
   else if (io_op == STATE_OP_SKIP)
     {

@@ -5,7 +5,7 @@
 static void
 async_result_free (gpointer data)
 {
-  GAsyncResult *res = data;
+  GAsyncResultData *res = data;
 
   if (res->error)
     g_error_free (res->error);
@@ -16,7 +16,7 @@ async_result_free (gpointer data)
 }
 
 void
-_g_queue_async_result (GAsyncResult   *result,
+_g_queue_async_result (GAsyncResultData *result,
 		       gpointer        async_object,
 		       GError         *error,
 		       gpointer        user_data,

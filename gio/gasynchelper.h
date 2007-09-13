@@ -10,13 +10,13 @@ typedef struct {
   gpointer       async_object;
   GError *       error;
   gpointer       user_data;
-} GAsyncResult;
+} GAsyncResultData;
 
 typedef gboolean (*GFDSourceFunc) (gpointer user_data,
 				   GIOCondition condition,
 				   int fd);
 
-void     _g_queue_async_result (GAsyncResult    *result,
+void     _g_queue_async_result (GAsyncResultData *result,
 				gpointer         async_object,
 				GError          *error,
 				gpointer         user_data,

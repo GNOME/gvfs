@@ -173,7 +173,7 @@ g_file_enumerator_stop (GFileEnumerator *enumerator,
 }
 
 typedef struct {
-  GAsyncResult            generic;
+  GAsyncResultData            generic;
   int                     num_files;
   GAsyncNextFilesCallback callback;
 } NextAsyncResult;
@@ -207,7 +207,7 @@ queue_next_async_result (GFileEnumerator *enumerator,
   res->num_files = num_files;
   res->callback = callback;
   
-  _g_queue_async_result ((GAsyncResult *)res, enumerator,
+  _g_queue_async_result ((GAsyncResultData *)res, enumerator,
 			 error, data,
 			 call_next_async_result);
 }
@@ -304,7 +304,7 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
 
 
 typedef struct {
-  GAsyncResult                  generic;
+  GAsyncResultData                  generic;
   gboolean                      result;
   GAsyncStopEnumeratingCallback callback;
 } StopAsyncResult;
@@ -337,7 +337,7 @@ queue_stop_async_result (GFileEnumerator *enumerator,
   res->result = result;
   res->callback = callback;
 
-  _g_queue_async_result ((GAsyncResult *)res, enumerator,
+  _g_queue_async_result ((GAsyncResultData *)res, enumerator,
 			 error, data,
 			 call_stop_async_result);
 }

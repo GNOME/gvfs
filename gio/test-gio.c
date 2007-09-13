@@ -158,21 +158,31 @@ close_done (GInputStream *stream,
 }
 
 static void
-read_done (GInputStream *stream,
-	   void         *buffer,
-	   gsize         count_requested,
-	   gssize        count_read,
-	   gpointer      _data,
-	   GError       *error)
+read_done (GObject *source_object,
+	   GAsyncResult *res,
+	   gpointer      user_data)
 {
-  AsyncData *data = _data;
+  AsyncData *data = user_data;
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  gssize        count_read;
+  GError       *error = NULL;
+
+
+  count_read = g_input_stream_read_finish (stream, res, &error);
+  
   g_print ("count_read: %d\n", count_read);
+
   if (count_read == -1)
     g_print ("Error %d: %s\n", error->code, error->message);
-
+  else if (0)
+    {
+      data->buffer[count_read] = 0;
+      g_print ("data:\n %s\n", data->buffer);
+    }
+  
   if (count_read > 0)
     {
-      g_input_stream_read_async (stream, data->buffer, 1024, 0, read_done, data, data->c);
+      g_input_stream_read_async (stream, data->buffer, 1024, 0, data->c, read_done, data);
       //g_cancellable_cancel (data->c);
     }
   else
@@ -189,7 +199,7 @@ test_async_open_callback (GFile *file,
   
   g_print ("test_async_open_callback: %p\n", stream);
   if (stream)
-    g_input_stream_read_async (G_INPUT_STREAM (stream), data->buffer, 1024, 0, read_done, data, data->c);
+    g_input_stream_read_async (G_INPUT_STREAM (stream), data->buffer, 1024, 0, data->c, read_done, data);
   else
     g_print ("%s\n", error->message);
 }
@@ -495,7 +505,7 @@ main (int argc, char *argv[])
   
   loop = g_main_loop_new (NULL, FALSE);
 
-  if (1)
+  if (0)
     test_volumes ();
   
   if (0) {
@@ -517,7 +527,7 @@ main (int argc, char *argv[])
       }
 
     c = g_cancellable_new ();
-    g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, c);
+    g_input_stream_read_async (s, buffer, 128, 0, c, read_done, buffer);
     if (1) g_timeout_add (1000, cancel_cancellable_cb, g_object_ref (c));
     g_print ("main loop run\n");
     g_main_loop_run (loop);
@@ -527,7 +537,7 @@ main (int argc, char *argv[])
 
   file = g_file_get_for_path ("/tmp");
   if (0) test_sync ("test:///etc/passwd", FALSE);
-  if (0) test_async ("test:///etc/passwd", TRUE);
+  if (1) test_async ("test:///etc/passwd", TRUE);
   if (0) test_out ();
 
   g_print ("Starting mainloop\n");

@@ -12,6 +12,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include "gioerror.h"
+#include "gsimpleasyncresult.h"
 #include "gsocketinputstream.h"
 #include "gcancellable.h"
 #include "gasynchelper.h"
@@ -35,9 +36,12 @@ static void     g_socket_input_stream_read_async  (GInputStream              *st
 						   void                      *buffer,
 						   gsize                      count,
 						   int                        io_priority,
-						   GAsyncReadCallback         callback,
-						   gpointer                   data,
-						   GCancellable              *cancellable);
+						   GCancellable              *cancellable,
+						   GAsyncReadyCallback        callback,
+						   gpointer                   data);
+static gssize   g_socket_input_stream_read_finish (GInputStream              *stream,
+						   GAsyncResult              *result,
+						   GError                   **error);
 static void     g_socket_input_stream_skip_async  (GInputStream              *stream,
 						   gsize                      count,
 						   int                        io_priority,
@@ -74,6 +78,7 @@ g_socket_input_stream_class_init (GSocketInputStreamClass *klass)
   stream_class->read = g_socket_input_stream_read;
   stream_class->close = g_socket_input_stream_close;
   stream_class->read_async = g_socket_input_stream_read_async;
+  stream_class->read_finish = g_socket_input_stream_read_finish;
   stream_class->skip_async = g_socket_input_stream_skip_async;
   stream_class->close_async = g_socket_input_stream_close_async;
 }
@@ -199,7 +204,7 @@ g_socket_input_stream_close (GInputStream *stream,
 typedef struct {
   gsize count;
   void *buffer;
-  GAsyncReadCallback callback;
+  GAsyncReadyCallback callback;
   gpointer user_data;
   GCancellable *cancellable;
   GSocketInputStream *stream;
@@ -210,8 +215,10 @@ read_async_cb (ReadAsyncData *data,
 	       GIOCondition condition,
 	       int fd)
 {
+  GSimpleAsyncResult *simple;
   GError *error = NULL;
   gssize count_read;
+  gssize *count_read_p;
 
   /* We know that we can read from fd once without blocking */
   while (1)
@@ -239,24 +246,25 @@ read_async_cb (ReadAsyncData *data,
       break;
     }
 
-  data->callback (G_INPUT_STREAM (data->stream),
-		  data->buffer,
-		  data->count,
-		  count_read,
-		  data->user_data,
-		  error);
-  if (error)
-    g_error_free (error);
+  count_read_p = g_new (gssize, 1);
+  *count_read_p = count_read;
+  simple = g_simple_async_result_new (G_OBJECT (data->stream),
+				      data->callback,
+				      data->user_data,
+				      g_socket_input_stream_read_async,
+				      count_read_p, g_free);
+
+  if (count_read == -1)
+    {
+      g_simple_async_result_set_from_error (simple, error);
+      g_error_free (error);
+    }
+
+  /* Complete immediately, not in idle, since we're already in a mainloop callout */
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
 
   return FALSE;
-}
-
-static void
-read_async_data_free (gpointer _data)
-{
-  ReadAsyncData *data = _data;
-  
-  g_free (data);
 }
 
 static void
@@ -264,9 +272,9 @@ g_socket_input_stream_read_async (GInputStream        *stream,
 				  void                *buffer,
 				  gsize                count,
 				  int                  io_priority,
-				  GAsyncReadCallback   callback,
-				  gpointer             user_data,
-				  GCancellable        *cancellable)
+				  GCancellable        *cancellable,
+				  GAsyncReadyCallback  callback,
+				  gpointer             user_data)
 {
   GSource *source;
   GSocketInputStream *socket_stream;
@@ -286,10 +294,25 @@ g_socket_input_stream_read_async (GInputStream        *stream,
 			     POLLIN,
 			     cancellable);
   
-  g_source_set_callback (source, (GSourceFunc)read_async_cb, data, read_async_data_free);
+  g_source_set_callback (source, (GSourceFunc)read_async_cb, data, g_free);
   g_source_attach (source, NULL);
  
   g_source_unref (source);
+}
+
+static gssize
+g_socket_input_stream_read_finish (GInputStream              *stream,
+				   GAsyncResult              *result,
+				   GError                   **error)
+{
+  GSimpleAsyncResult *simple;
+  gssize *nread;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_socket_input_stream_read_async);
+  
+  nread = g_simple_async_result_get_op_data (simple);
+  return *nread;
 }
 
 static void

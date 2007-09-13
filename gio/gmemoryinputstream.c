@@ -6,6 +6,7 @@
 #include "ginputstream.h"
 #include "gseekable.h"
 #include "string.h"
+#include "gsimpleasyncresult.h"
 
 struct _GMemoryInputStreamPrivate {
 
@@ -31,9 +32,12 @@ static void     g_memory_input_stream_read_async  (GInputStream              *st
                                                    void                      *buffer,
                                                    gsize                      count,
                                                    int                        io_priority,
-                                                   GAsyncReadCallback         callback,
-                                                   gpointer                   data,
-                                                   GCancellable              *cancellable);
+                                                   GCancellable              *cancellable,
+                                                   GAsyncReadyCallback        callback,
+                                                   gpointer                   user_data);
+static gssize   g_memory_input_stream_read_finish (GInputStream              *stream,
+						   GAsyncResult              *result,
+						   GError                   **error);
 static void     g_memory_input_stream_skip_async  (GInputStream              *stream,
                                                    gsize                      count,
                                                    int                        io_priority,
@@ -78,6 +82,7 @@ g_memory_input_stream_class_init (GMemoryInputStreamClass *klass)
   istream_class->close = g_memory_input_stream_close;
 
   istream_class->read_async  = g_memory_input_stream_read_async;
+  istream_class->read_finish  = g_memory_input_stream_read_finish;
   istream_class->skip_async  = g_memory_input_stream_skip_async;
   istream_class->close_async = g_memory_input_stream_close_async;
 
@@ -172,22 +177,37 @@ g_memory_input_stream_read_async (GInputStream              *stream,
                                   void                      *buffer,
                                   gsize                      count,
                                   int                        io_priority,
-                                  GAsyncReadCallback         callback,
-                                  gpointer                   data,
-                                  GCancellable              *cancellable)
+                                  GCancellable              *cancellable,
+                                  GAsyncReadyCallback        callback,
+                                  gpointer                   user_data)
 {
-  GMemoryInputStream *memory_stream;
-  GMemoryInputStreamPrivate *priv;
-  gsize nread;
+  GSimpleAsyncResult *simple;
+  gssize *nread;
 
-  memory_stream = G_MEMORY_INPUT_STREAM (stream);
-  priv = memory_stream->priv;
+  nread = g_new (gssize, 1);
+  *nread =  g_memory_input_stream_read (stream,	buffer, count, cancellable, NULL);
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback,
+				      user_data,
+				      g_memory_input_stream_read_async,
+				      nread, g_free);
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+}
+
+static gssize
+g_memory_input_stream_read_finish (GInputStream              *stream,
+				   GAsyncResult              *result,
+				   GError                   **error)
+{
+  GSimpleAsyncResult *simple;
+  gssize *nread;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_memory_input_stream_read_async);
   
-  nread = MIN (count, priv->len - priv->pos);
-  memcpy (buffer, priv->buffer + priv->pos, nread);
-  priv->pos += nread;
-  
-  (*callback) (stream, buffer, count, nread, data, NULL);
+  nread = g_simple_async_result_get_op_data (simple);
+  return *nread;
 }
 
 static void
