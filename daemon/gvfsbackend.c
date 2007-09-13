@@ -23,6 +23,17 @@ enum {
   PROP_DAEMON
 };
 
+struct _GVfsBackendPrivate
+{
+  GVfsDaemon *daemon;
+  char *object_path;
+  
+  char *display_name;
+  char *icon;
+  GMountSpec *mount_spec;
+};
+
+
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
@@ -84,13 +95,13 @@ g_vfs_backend_finalize (GObject *object)
 
   backend = G_VFS_BACKEND (object);
 
-  g_vfs_daemon_unregister_path (backend->daemon, backend->object_path);
-  g_object_unref (backend->daemon);
-  g_free (backend->object_path);
+  g_vfs_daemon_unregister_path (backend->priv->daemon, backend->priv->object_path);
+  g_object_unref (backend->priv->daemon);
+  g_free (backend->priv->object_path);
   
-  g_free (backend->display_name);
-  if (backend->mount_spec)
-    g_mount_spec_unref (backend->mount_spec);
+  g_free (backend->priv->display_name);
+  if (backend->priv->mount_spec)
+    g_mount_spec_unref (backend->priv->mount_spec);
   
   if (G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize) (object);
@@ -105,6 +116,8 @@ static void
 g_vfs_backend_class_init (GVfsBackendClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (GVfsBackendPrivate));
   
   gobject_class->constructor = g_vfs_backend_constructor;
   gobject_class->finalize = g_vfs_backend_finalize;
@@ -132,6 +145,9 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
 static void
 g_vfs_backend_init (GVfsBackend *backend)
 {
+  backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_TYPE_VFS_BACKEND, GVfsBackendPrivate);
+  backend->priv->icon = g_strdup ("");
+  backend->priv->display_name = g_strdup ("");
 }
 
 static void
@@ -145,10 +161,10 @@ g_vfs_backend_set_property (GObject         *object,
   switch (prop_id)
     {
     case PROP_OBJECT_PATH:
-      backend->object_path = g_value_dup_string (value);
+      backend->priv->object_path = g_value_dup_string (value);
       break;
     case PROP_DAEMON:
-      backend->daemon = G_VFS_DAEMON (g_value_dup_object (value));
+      backend->priv->daemon = G_VFS_DAEMON (g_value_dup_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -167,10 +183,10 @@ g_vfs_backend_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_OBJECT_PATH:
-      g_value_set_string (value, backend->object_path);
+      g_value_set_string (value, backend->priv->object_path);
       break;
     case PROP_DAEMON:
-      g_value_set_object (value, backend->daemon);
+      g_value_set_object (value, backend->priv->daemon);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -191,12 +207,37 @@ g_vfs_backend_constructor (GType                  type,
 									 construct_params);
   backend = G_VFS_BACKEND (object);
   
-  g_vfs_daemon_register_path (backend->daemon,
-			      backend->object_path, 
+  g_vfs_daemon_register_path (backend->priv->daemon,
+			      backend->priv->object_path, 
 			      backend_dbus_handler,
 			      backend);
   
   return object;
+}
+
+void
+g_vfs_backend_set_display_name (GVfsBackend *backend,
+				const char *display_name)
+{
+  g_free (backend->priv->display_name);
+  backend->priv->display_name = g_strdup (display_name);
+}
+
+void
+g_vfs_backend_set_icon (GVfsBackend *backend,
+			const char *icon)
+{
+  g_free (backend->priv->icon);
+  backend->priv->display_name = g_strdup (icon);
+}
+
+void
+g_vfs_backend_set_mount_spec (GVfsBackend *backend,
+			      GMountSpec *mount_spec)
+{
+  if (backend->priv->mount_spec)
+    g_mount_spec_unref (backend->priv->mount_spec);
+  backend->priv->mount_spec = g_mount_spec_ref (mount_spec);
 }
 
 static DBusHandlerResult
@@ -239,7 +280,6 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 {
   DBusMessage *message;
   DBusMessageIter iter;
-  char *icon = "icon";
   
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  "/org/gtk/vfs/mounttracker",
@@ -249,14 +289,14 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
     _g_dbus_oom ();
 
   if (!dbus_message_append_args (message,
-				 DBUS_TYPE_STRING, &backend->display_name,
-				 DBUS_TYPE_STRING, &icon,
-				 DBUS_TYPE_OBJECT_PATH, &backend->object_path,
+				 DBUS_TYPE_STRING, &backend->priv->display_name,
+				 DBUS_TYPE_STRING, &backend->priv->icon,
+				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
 				 0))
     _g_dbus_oom ();
 
   dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus (&iter, backend->mount_spec);
+  g_mount_spec_to_dbus (&iter, backend->priv->mount_spec);
 
   dbus_message_set_auto_start (message, TRUE);
 

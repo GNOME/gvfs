@@ -259,6 +259,8 @@ do_mount (GVfsBackend *backend,
   struct stat st;
   char *uri;
   int res;
+  char *display_name;
+  GMountSpec *smb_mount_spec;
 
   g_print ("do_mount\n");
   
@@ -304,10 +306,14 @@ do_mount (GVfsBackend *backend,
 
   op_backend->smb_context = smb_context;
 
-  backend->display_name = g_strdup_printf ("%s on %s", op_backend->share, op_backend->server);
-  backend->mount_spec = g_mount_spec_new ("smb-share");
-  g_mount_spec_set (backend->mount_spec, "share", op_backend->share);
-  g_mount_spec_set (backend->mount_spec, "server", op_backend->server);
+  display_name = g_strdup_printf ("%s on %s", op_backend->share, op_backend->server);
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  smb_mount_spec = g_mount_spec_new ("smb-share");
+  g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
+  g_mount_spec_set (smb_mount_spec, "server", op_backend->server);
+  g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
+  g_mount_spec_unref (smb_mount_spec);
 
   uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
   res = smb_context->stat (smb_context, uri, &st);

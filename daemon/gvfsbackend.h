@@ -19,6 +19,7 @@ G_BEGIN_DECLS
 #define G_VFS_BACKEND_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_BACKEND, GVfsBackendClass))
 
 typedef struct _GVfsBackend        GVfsBackend;
+typedef struct _GVfsBackendPrivate GVfsBackendPrivate;
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 
 typedef struct _GVfsJobMount        GVfsJobMount;
@@ -34,12 +35,8 @@ typedef gpointer GVfsBackendHandle;
 struct _GVfsBackend
 {
   GObject parent_instance;
-  
-  GVfsDaemon *daemon;
-  char *object_path;
-  
-  char *display_name;
-  GMountSpec *mount_spec;
+
+  GVfsBackendPrivate *priv;
 };
 
 struct _GVfsBackendClass
@@ -128,9 +125,16 @@ void  g_vfs_register_backend       (GType               backend_type,
 				    const char         *type);
 GType g_vfs_lookup_backend         (const char         *type);
 
-void  g_vfs_backend_register_mount (GVfsBackend        *backend,
-				    GAsyncDBusCallback  callback,
-				    gpointer            user_data);
+void g_vfs_backend_set_display_name (GVfsBackend        *backend,
+				     const char         *display_name);
+void g_vfs_backend_set_icon         (GVfsBackend        *backend,
+				     const char         *icon);
+void g_vfs_backend_set_mount_spec   (GVfsBackend        *backend,
+				     GMountSpec         *mount_spec);
+void g_vfs_backend_register_mount   (GVfsBackend        *backend,
+				     GAsyncDBusCallback  callback,
+				     gpointer            user_data);
+
 
 
 G_END_DECLS

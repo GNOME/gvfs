@@ -467,6 +467,8 @@ do_mount (GVfsBackend *backend,
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   SMBCCTX *smb_context;
+  char *display_name;
+  GMountSpec *browse_mount_spec;
 
   g_print ("do_mount\n");
   
@@ -514,15 +516,20 @@ do_mount (GVfsBackend *backend,
   
   if (op_backend->server == NULL)
     {
-      backend->display_name = g_strdup ("smb network");
-      backend->mount_spec = g_mount_spec_new ("smb-network");
+      display_name = g_strdup ("smb network");
+      browse_mount_spec = g_mount_spec_new ("smb-network");
     }
   else
     {
-      backend->display_name = g_strdup_printf ("smb share %s", op_backend->server);
-      backend->mount_spec = g_mount_spec_new ("smb-server");
-      g_mount_spec_set (backend->mount_spec, "server", op_backend->server);
+      display_name = g_strdup_printf ("smb share %s", op_backend->server);
+      browse_mount_spec = g_mount_spec_new ("smb-server");
+      g_mount_spec_set (browse_mount_spec, "server", op_backend->server);
     }
+
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
+  g_mount_spec_unref (browse_mount_spec);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_print ("finished mount\n");

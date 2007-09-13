@@ -37,9 +37,13 @@ static void
 g_vfs_backend_test_init (GVfsBackendTest *test_backend)
 {
   GVfsBackend *backend = G_VFS_BACKEND (test_backend);
-  
-  backend->display_name = g_strdup ("test");
-  backend->mount_spec = g_mount_spec_new ("test");
+  GMountSpec *mount_spec;
+
+  g_vfs_backend_set_display_name (backend, "test");
+
+  mount_spec = g_mount_spec_new ("test");
+  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  g_mount_spec_unref (mount_spec);
 }
 
 
