@@ -47,6 +47,7 @@ noinst_PROGRAMS =				\
 libdaemon_la_SOURCES = \
 	gvfsdaemon.c gvfsdaemon.h \
 	gvfsbackend.c gvfsbackend.h \
+	gvfschannel.c gvfschannel.h \
 	gvfsreadchannel.c gvfsreadchannel.h \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
 	gvfsjob.c gvfsjob.h \

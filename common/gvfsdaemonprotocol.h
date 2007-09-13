@@ -44,9 +44,10 @@ typedef struct {
   guint32 seq_nr;
   guint32 arg1;
   guint32 arg2;
+  guint32 data_len;
 } GVfsDaemonSocketProtocolRequest;
 
-#define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE 16
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE sizeof(GVfsDaemonSocketProtocolRequest)
 
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ 0
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CLOSE 1

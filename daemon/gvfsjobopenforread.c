@@ -154,15 +154,9 @@ create_reply (GVfsJob *job,
   g_assert (open_job->backend_handle != NULL);
 
   error = NULL;
-  channel = g_vfs_read_channel_new (open_job->backend, &error);
-  if (channel == NULL)
-    {
-      reply = _dbus_message_new_error_from_gerror (message, error);
-      g_error_free (error);
-      return reply;
-    }
+  channel = g_vfs_read_channel_new (open_job->backend);
 
-  remote_fd = g_vfs_read_channel_steal_remote_fd (channel);
+  remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));
   if (!dbus_connection_send_fd (connection, 
 				remote_fd,
 				&fd_id, &error))
@@ -182,7 +176,7 @@ create_reply (GVfsJob *job,
 				  DBUS_TYPE_BOOLEAN, &can_seek,
 				  DBUS_TYPE_INVALID);
 
-  g_vfs_read_channel_set_backend_handle (channel, open_job->backend_handle);
+  g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
   open_job->backend_handle = NULL;
   open_job->read_channel = channel;
   

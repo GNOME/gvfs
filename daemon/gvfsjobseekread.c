@@ -77,7 +77,7 @@ send_reply (GVfsJob *job)
   g_print ("job_seek_read send reply, pos %d\n", (int)op_job->final_offset);
 
   if (job->failed)
-    g_vfs_read_channel_send_error (op_job->channel, job->error);
+    g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);
   else
     {
       g_vfs_read_channel_send_seek_offset (op_job->channel,

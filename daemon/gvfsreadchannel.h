@@ -4,7 +4,7 @@
 #include <glib-object.h>
 #include <gio/gvfstypes.h>
 #include <gvfsjob.h>
-#include <gvfsbackend.h>
+#include <gvfschannel.h>
 
 G_BEGIN_DECLS
 
@@ -19,38 +19,20 @@ typedef struct _GVfsReadChannel        GVfsReadChannel;
 typedef struct _GVfsReadChannelClass   GVfsReadChannelClass;
 typedef struct _GVfsReadChannelPrivate GVfsReadChannelPrivate;
 
-struct _GVfsReadChannel
-{
-  GObject parent_instance;
-
-  GVfsReadChannelPrivate *priv;
-};
-
 struct _GVfsReadChannelClass
 {
-  GObjectClass parent_class;
+  GVfsChannelClass parent_class;
 };
 
 GType g_vfs_read_channel_get_type (void) G_GNUC_CONST;
 
-GVfsReadChannel *g_vfs_read_channel_new                (GVfsBackend        *backend,
-							GError            **error);
-int             g_vfs_read_channel_steal_remote_fd    (GVfsReadChannel     *read_channel);
-GVfsBackend    *g_vfs_read_channel_get_backend        (GVfsReadChannel     *read_channel);
-void            g_vfs_read_channel_set_backend_handle (GVfsReadChannel     *read_channel,
-						       GVfsBackendHandle   backend_handle);
-gboolean        g_vfs_read_channel_has_job            (GVfsReadChannel     *read_channel);
-GVfsJob *       g_vfs_read_channel_get_job            (GVfsReadChannel     *read_channel);
+GVfsReadChannel *g_vfs_read_channel_new                (GVfsBackend        *backend);
 void            g_vfs_read_channel_send_data          (GVfsReadChannel     *read_channel,
 						       char               *buffer,
 						       gsize               count);
-void            g_vfs_read_channel_send_error         (GVfsReadChannel     *read_channel,
-						       GError             *error);
 void            g_vfs_read_channel_send_closed        (GVfsReadChannel     *read_channel);
 void            g_vfs_read_channel_send_seek_offset   (GVfsReadChannel     *read_channel,
 						      goffset             offset);
-
-/* TODO: i/o priority? */
 
 G_END_DECLS
 

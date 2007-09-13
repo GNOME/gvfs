@@ -278,6 +278,7 @@ append_request (GFileInputStreamDaemon *stream, guint32 command,
   cmd.seq_nr = g_htonl (stream->priv->seq_nr++);
   cmd.arg1 = g_htonl (arg1);
   cmd.arg2 = g_htonl (arg2);
+  cmd.data_len = 0;
 
   g_string_append_len (stream->priv->output_buffer,
 		       (char *)&cmd, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
