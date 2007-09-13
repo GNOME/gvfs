@@ -66,7 +66,11 @@ Add something like:
 GFileAttributes *  g_file_query_attributes           (GFile                  *file,
 						      GCancellable           *cancellable,
 						      GError                **error);
-Returns type and is_writable for all attributes supportable
+Returns writable attributes supportable.
+Use this to copy xattrs in general move fallback.
+
+document type for file attrs
+
 						      
 FUTURE IDEAS:
 -------------
