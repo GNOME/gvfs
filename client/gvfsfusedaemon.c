@@ -15,7 +15,8 @@
 #include <glib/gi18n.h>
 #include <glib/gprintf.h>
 
-#include <gio/gvfs.h>
+#include "gdaemonvfs.h"
+#include "gdaemonfile.h"
 #include <gmounttracker.h>
 
 #define FUSE_USE_VERSION 26
@@ -277,11 +278,15 @@ escape_fs_name (const gchar *name)
   return escape_to_uri_syntax (name, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+@#$., ");
 }
 
+#if 0
+
 static gchar *
 escape_uri_component (const gchar *uri_component)
 {
   return escape_to_uri_syntax (uri_component, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/_-+., ");
 }
+
+#endif
 
 static MountRecord *
 mount_record_find_by_mount_spec (GMountSpec *mount_spec)
@@ -344,6 +349,8 @@ mount_record_find_by_mount_name (const gchar *mount_name)
   return mount_record;
 }
 
+#if 0
+
 static gchar *
 mount_spec_to_uri (GMountSpec *mount_spec)
 {
@@ -380,6 +387,8 @@ mount_spec_to_uri (GMountSpec *mount_spec)
 
   return uri;
 }
+
+#endif
 
 static gboolean
 path_to_mount_record_and_path (const gchar *full_path, MountRecord **mount_record, gchar **mount_path)
@@ -434,13 +443,16 @@ path_to_mount_record_and_path (const gchar *full_path, MountRecord **mount_recor
 static GFile *
 file_from_mount_record_and_path (MountRecord *mount_record, const gchar *path)
 {
+#if 0
   gchar *mount_uri;
   gchar *base_uri;
   gchar *escaped_path;
+#endif
   GFile *file;
 
-  /* Files in a directory */
+  file = g_daemon_file_new (mount_record->info->mount_spec, path);
 
+#if 0
   mount_uri = mount_spec_to_uri (mount_record->info->mount_spec);
   escaped_path = escape_uri_component (path);
   base_uri = g_strconcat (mount_uri, escaped_path, NULL);
@@ -449,6 +461,7 @@ file_from_mount_record_and_path (MountRecord *mount_record, const gchar *path)
   g_free (mount_uri);
   g_free (escaped_path);
   g_free (base_uri);
+#endif
 
   g_assert (file != NULL);
 
@@ -995,7 +1008,7 @@ vfs_init (struct fuse_conn_info *conn)
   mount_list_mutex = g_mutex_new ();
 
   /* Initializes D-Bus and other VFS necessities */
-  gvfs = g_vfs_get ();
+  gvfs = G_VFS (g_daemon_vfs_new ());
 
   mount_tracker = g_mount_tracker_new ();
 
@@ -1009,10 +1022,9 @@ static void
 vfs_destroy (gpointer param)
 {
   mount_list_free ();
-
   g_main_loop_quit (subthread_main_loop);
-
   g_mutex_free (mount_list_mutex);
+  g_object_unref (gvfs);
 }
 
 static struct fuse_operations vfs_oper =

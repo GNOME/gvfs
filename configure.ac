@@ -349,7 +349,6 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	-Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
 	-Wnested-externs -Wpointer-arith \
 	-Wcast-align -Wsign-compare \
-	-Werror \
 	$CFLAGS"
 
 	for option in -Wno-strict-aliasing -Wno-sign-compare; do
@@ -380,7 +379,6 @@ gio/fam/Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
-fuse/Makefile
 programs/Makefile
 po/Makefile.in
 gio-standalone.pc
