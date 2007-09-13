@@ -1,6 +1,7 @@
 NULL =
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
+	-I$(top_srcdir)/daemon \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DDBUS_API_SUBJECT_TO_CHANGE

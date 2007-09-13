@@ -1,6 +1,7 @@
 #include <config.h>
 
 #include "gvfsunixdbus.h"
+#include <gvfsdaemonprotocol.h>
 
 typedef struct {
   DBusConnection *bus;
@@ -114,12 +115,12 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint)
 	}
     }
 
-  bus_name = g_string_new ("org.gtk.vfs.mount.");
+  bus_name = g_string_new (G_VFS_DBUS_MOUNTPOINT_NAME);
   append_escaped_bus_name (bus_name, mountpoint);
   message = dbus_message_new_method_call (bus_name->str,
-					  "/org/gtk/vfs/Daemon",
-					  "org.gtk.vfs.Daemon",
-					  "GetConnection");
+					  G_VFS_DBUS_DAEMON_PATH,
+					  G_VFS_DBUS_DAEMON_INTERFACE,
+					  G_VFS_DBUS_OP_GET_CONNECTION);
   g_string_free (bus_name, TRUE);
 
   dbus_error_init (&error);

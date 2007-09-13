@@ -5,11 +5,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <dbus-gmain.h>
-#include <dbus/dbus.h>
-
-#define BUS_NAME "org.gtk.vfs.mount.foo_3A_2F_2F"
-
-#define VFS_ERROR_SOCKET_FAILED "org.gtk.vfs.Error.SocketFailed"
+#include <gvfsdaemonprotocol.h>
 
 static void              daemon_unregistered_func (DBusConnection *conn,
 						   gpointer        data);
@@ -208,7 +204,7 @@ daemon_handle_get_connection (DBusConnection *conn,
   if (!server)
     {
       reply = dbus_message_new_error (message,
-				      VFS_ERROR_SOCKET_FAILED,
+				      G_VFS_DBUS_ERROR_SOCKET_FAILED,
 				      "Failed to create new socket");
       if (!reply)
 	g_error ("Out of memory");
@@ -257,8 +253,8 @@ daemon_message_func (DBusConnection *conn,
 {
   g_print ("daemon_message_func\n");
   if (dbus_message_is_method_call (message,
-				   "org.gtk.vfs.Daemon",
-				   "GetConnection"))
+				   G_VFS_DBUS_DAEMON_INTERFACE,
+				   G_VFS_DBUS_OP_GET_CONNECTION))
     daemon_handle_get_connection (conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -287,7 +283,8 @@ setup_daemon (char *mountpoint)
 
   dbus_connection_setup_with_g_main (conn, NULL);
   
-  ret = dbus_bus_request_name (conn, BUS_NAME, 0, &error);
+  ret = dbus_bus_request_name (conn, G_VFS_DBUS_MOUNTPOINT_NAME "foo_3A_2F_2F", 
+			       0, &error);
   if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
     {
       g_warning ("Failed to acquire vfs-daemon service: %s", error.message);
