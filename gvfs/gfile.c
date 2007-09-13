@@ -158,35 +158,41 @@ g_file_read (GFile *file,
 }
 
 GFileOutputStream *
-g_file_append_to (GFile *file)
+g_file_append_to (GFile *file,
+		  GCancellable *cancellable,
+		  GError **error)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->append_to) (file);
+  return (* iface->append_to) (file, cancellable, error);
 }
 
 GFileOutputStream *
-g_file_create (GFile *file)
+g_file_create (GFile *file,
+	       GCancellable *cancellable,
+	       GError **error)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->create) (file);
+  return (* iface->create) (file, cancellable, error);
 }
 
 GFileOutputStream *
-g_file_replace (GFile                 *file,
-		time_t                 mtime,
-		gboolean               make_backup)
+g_file_replace (GFile *file,
+		time_t mtime,
+		gboolean  make_backup,
+		GCancellable *cancellable,
+		GError **error)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->replace) (file, mtime, make_backup);
+  return (* iface->replace) (file, mtime, make_backup, cancellable, error);
 }
 
 /* Default vfs ops */

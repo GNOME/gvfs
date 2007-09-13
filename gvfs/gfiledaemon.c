@@ -266,14 +266,18 @@ g_file_daemon_read (GFile *file,
 }
 
 static GFileOutputStream *
-g_file_daemon_append_to (GFile *file)
+g_file_daemon_append_to (GFile *file,
+			 GCancellable *cancellable,
+			 GError **error)
 {
   /* TODO: implement */
   return NULL;
 }
 
 static GFileOutputStream *
-g_file_daemon_create (GFile *file)
+g_file_daemon_create (GFile *file,
+		      GCancellable *cancellable,
+		      GError **error)
 {
   /* TODO: implement */
   return NULL;
@@ -282,7 +286,9 @@ g_file_daemon_create (GFile *file)
 static GFileOutputStream *
 g_file_daemon_replace (GFile *file,
 		       time_t mtime,
-		       gboolean  make_backup)
+		       gboolean  make_backup,
+		       GCancellable *cancellable,
+		       GError **error)
 {
   /* TODO: implement */
   return NULL;

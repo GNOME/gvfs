@@ -144,23 +144,29 @@ g_file_daemon_local_read (GFile *file,
 }
 
 static GFileOutputStream *
-g_file_daemon_local_append_to (GFile *file)
+g_file_daemon_local_append_to (GFile *file,
+			       GCancellable *cancellable,
+			       GError **error)
 {
-  return g_file_append_to (G_FILE_DAEMON_LOCAL (file)->wrapped);
+  return g_file_append_to (G_FILE_DAEMON_LOCAL (file)->wrapped, cancellable, error);
 }
 
 static GFileOutputStream *
-g_file_daemon_local_create (GFile *file)
+g_file_daemon_local_create (GFile *file,
+			    GCancellable *cancellable,
+			    GError **error)
 {
-  return g_file_create (G_FILE_DAEMON_LOCAL (file)->wrapped);
+  return g_file_create (G_FILE_DAEMON_LOCAL (file)->wrapped, cancellable, error);
 }
 
 static GFileOutputStream *
 g_file_daemon_local_replace (GFile *file,
 			     time_t mtime,
-			     gboolean  make_backup)
+			     gboolean  make_backup,
+			     GCancellable *cancellable,
+			     GError **error)
 {
-  return g_file_replace (G_FILE_DAEMON_LOCAL (file)->wrapped, mtime, make_backup);
+  return g_file_replace (G_FILE_DAEMON_LOCAL (file)->wrapped, mtime, make_backup, cancellable, error);
 }
 
 static void

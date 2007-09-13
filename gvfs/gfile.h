@@ -44,11 +44,17 @@ struct _GFileIface
   GFileInputStream *  (*read)               (GFile                *file,
 					     GCancellable         *cancellable,
 					     GError              **error);
-  GFileOutputStream * (*append_to)          (GFile                *file);
-  GFileOutputStream * (*create)             (GFile                *file);
+  GFileOutputStream * (*append_to)          (GFile                *file,
+					     GCancellable         *cancellable,
+					     GError               **error);
+  GFileOutputStream * (*create)             (GFile                *file,
+					     GCancellable         *cancellable,
+					     GError               **error);
   GFileOutputStream * (*replace)            (GFile                *file,
 					     time_t                mtime,
-					     gboolean              make_backup);
+					     gboolean              make_backup,
+					     GCancellable         *cancellable,
+					     GError              **error);
 };
 
 GType g_file_get_type (void) G_GNUC_CONST;
@@ -78,11 +84,17 @@ GFileInfo *        g_file_get_info           (GFile                 *file,
 GFileInputStream * g_file_read               (GFile                 *file,
 					      GCancellable          *cancellable,
 					      GError               **error);
-GFileOutputStream *g_file_append_to          (GFile                 *file);
-GFileOutputStream *g_file_create             (GFile                 *file);
+GFileOutputStream *g_file_append_to          (GFile                 *file,
+					      GCancellable          *cancellable,
+					      GError               **error);
+GFileOutputStream *g_file_create             (GFile                 *file,
+					      GCancellable          *cancellable,
+					      GError               **error);
 GFileOutputStream *g_file_replace            (GFile                 *file,
 					      time_t                 mtime,
-					      gboolean               make_backup);
+					      gboolean               make_backup,
+					      GCancellable          *cancellable,
+					      GError               **error);
 
 G_END_DECLS
 

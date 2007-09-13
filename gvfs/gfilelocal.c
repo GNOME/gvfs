@@ -304,34 +304,33 @@ g_file_local_read (GFile *file,
 }
 
 static GFileOutputStream *
-g_file_local_append_to (GFile *file)
+g_file_local_append_to (GFile *file,
+			GCancellable *cancellable,
+			GError **error)
 {
-  return g_file_output_stream_local_new (G_FILE_LOCAL (file)->filename,
-					 G_OUTPUT_STREAM_OPEN_MODE_APPEND);
+  return g_file_output_stream_local_append (G_FILE_LOCAL (file)->filename,
+					    cancellable, error);
 }
 
 static GFileOutputStream *
-g_file_local_create (GFile *file)
+g_file_local_create (GFile *file,
+		     GCancellable *cancellable,
+		     GError **error)
 {
-  return g_file_output_stream_local_new (G_FILE_LOCAL (file)->filename,
-					 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
+  return g_file_output_stream_local_create (G_FILE_LOCAL (file)->filename,
+					    cancellable, error);
 }
 
 static GFileOutputStream *
 g_file_local_replace (GFile *file,
 		      time_t mtime,
-		      gboolean  make_backup)
+		      gboolean make_backup,
+		      GCancellable *cancellable,
+		      GError **error)
 {
-  GFileOutputStream *out;
-
-  out = g_file_output_stream_local_new (G_FILE_LOCAL (file)->filename,
-					G_OUTPUT_STREAM_OPEN_MODE_REPLACE);
-
-  g_file_output_stream_local_set_original_mtime (G_FILE_OUTPUT_STREAM_LOCAL (out),
-						 mtime);
-  g_file_output_stream_local_set_create_backup (G_FILE_OUTPUT_STREAM_LOCAL (out),
-						make_backup);
-  return out;
+  return g_file_output_stream_local_replace (G_FILE_LOCAL (file)->filename,
+					     mtime, make_backup,
+					     cancellable, error);
 }
 
 static void

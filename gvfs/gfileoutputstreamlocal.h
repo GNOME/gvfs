@@ -29,20 +29,19 @@ struct _GFileOutputStreamLocalClass
   GFileOutputStreamClass parent_class;
 };
 
-typedef enum {
-  G_OUTPUT_STREAM_OPEN_MODE_CREATE,
-  G_OUTPUT_STREAM_OPEN_MODE_APPEND,
-  G_OUTPUT_STREAM_OPEN_MODE_REPLACE
-} GOutputStreamOpenMode;
-
 GType g_file_output_stream_local_get_type (void) G_GNUC_CONST;
+GFileOutputStream *g_file_output_stream_local_create  (const char    *filename,
+						       GCancellable  *cancellable,
+						       GError       **error);
+GFileOutputStream *g_file_output_stream_local_append  (const char    *filename,
+						       GCancellable  *cancellable,
+						       GError       **error);
+GFileOutputStream *g_file_output_stream_local_replace (const char    *filename,
+						       time_t         mtime,
+						       gboolean       make_backup,
+						       GCancellable  *cancellable,
+						       GError       **error);
 
-GFileOutputStream *g_file_output_stream_local_new                (const char             *filename,
-								  GOutputStreamOpenMode   open_mode);
-void               g_file_output_stream_local_set_original_mtime (GFileOutputStreamLocal *stream,
-								  time_t                  original_mtime);
-void               g_file_output_stream_local_set_create_backup  (GFileOutputStreamLocal *stream,
-								  gboolean                create_backup);
 
 G_END_DECLS
 

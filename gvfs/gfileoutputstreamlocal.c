@@ -23,11 +23,9 @@ G_DEFINE_TYPE (GFileOutputStreamLocal, g_file_output_stream_local, G_TYPE_FILE_O
 #define BACKUP_EXTENSION "~"
 
 struct _GFileOutputStreamLocalPrivate {
-  char *filename;
   char *tmp_filename;
-  GOutputStreamOpenMode open_mode;
-  time_t original_mtime;
-  gboolean create_backup;
+  char *original_filename;
+  char *backup_filename;
   int fd;
 };
 
@@ -53,8 +51,9 @@ g_file_output_stream_local_finalize (GObject *object)
   
   file = G_FILE_OUTPUT_STREAM_LOCAL (object);
   
-  g_free (file->priv->filename);
   g_free (file->priv->tmp_filename);
+  g_free (file->priv->original_filename);
+  g_free (file->priv->backup_filename);
   
   if (G_OBJECT_CLASS (g_file_output_stream_local_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_output_stream_local_parent_class)->finalize) (object);
@@ -84,33 +83,236 @@ g_file_output_stream_local_init (GFileOutputStreamLocal *stream)
 					      GFileOutputStreamLocalPrivate);
 }
 
+static gssize
+g_file_output_stream_local_write (GOutputStream *stream,
+				  void         *buffer,
+				  gsize         count,
+				  GCancellable *cancellable,
+				  GError      **error)
+{
+  GFileOutputStreamLocal *file;
+  gssize res;
+
+  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
+
+  while (1)
+    {
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  return -1;
+	}
+      res = write (file->priv->fd, buffer, count);
+      if (res == -1)
+	{
+	  if (errno == EINTR)
+	    continue;
+	  
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error writing to file': %s"),
+		       g_strerror (errno));
+	}
+      
+      break;
+    }
+  
+  return res;
+}
+
+static gboolean
+g_file_output_stream_local_close (GOutputStream *stream,
+				  GCancellable *cancellable,
+				  GError      **error)
+{
+  GFileOutputStreamLocal *file;
+  struct stat final_stat;
+  int res;
+
+  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
+
+  if (file->priv->tmp_filename)
+    {
+      /* We need to move the temp file to its final place,
+       * and possibly create the backup file
+       */
+
+      if (file->priv->backup_filename)
+	{
+	  if (g_cancellable_is_cancelled (cancellable))
+	    {
+	      g_set_error (error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      goto err_out;
+	    }
+	  
+	  /* create original -> backup link, the original is then renamed over */
+	  if (link (file->priv->original_filename, file->priv->backup_filename) != 0)
+	    {
+	      g_set_error (error, G_FILE_ERROR,
+			   g_file_error_from_errno (errno),
+			   _("Error creating backup link: %s"),
+			   g_strerror (errno));
+	      goto err_out;
+	    }
+	}
+      
+
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  goto err_out;
+	}
+
+      /* tmp -> original */
+      if (rename (file->priv->tmp_filename, file->priv->original_filename) != 0)
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error renamining temporary file: %s"),
+		       g_strerror (errno));
+	  goto err_out;
+	}
+    }
+  
+  if (g_file_output_stream_get_should_get_final_mtime (G_FILE_OUTPUT_STREAM (stream)))
+    {
+      if (g_cancellable_is_cancelled (cancellable))
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  goto err_out;
+	}
+      
+      if (fstat (file->priv->fd, &final_stat) == 0)
+	g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
+					      final_stat.st_mtime);
+    }
+
+  while (1)
+    {
+      res = close (file->priv->fd);
+      if (res == -1)
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error closing file: %s"),
+		       g_strerror (errno));
+	}
+      break;
+    }
+  
+  return res != -1;
+
+ err_out:
+  /* A simple try to close the fd in case we fail before the actual close */
+  close (file->priv->fd);
+  return FALSE;
+}
+
+static GFileInfo *
+g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
+					  GFileInfoRequestFlags requested,
+					  char                 *attributes,
+					  GCancellable         *cancellable,
+					  GError              **error)
+{
+  GFileOutputStreamLocal *file;
+
+  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
+  return g_file_info_local_get_from_fd (file->priv->fd,
+					requested,
+					attributes,
+					error);
+}
+
 GFileOutputStream *
-g_file_output_stream_local_new (const char *filename,
-				GOutputStreamOpenMode open_mode)
+g_file_output_stream_local_create  (const char   *filename,
+				    GCancellable *cancellable,
+				    GError     **error)
 {
   GFileOutputStreamLocal *stream;
+  int fd;
 
-  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
-
-  stream->priv->filename = g_strdup (filename);
-  stream->priv->open_mode = open_mode;
-  stream->priv->fd = -1;
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
   
+  fd = g_open (filename,
+	       O_CREAT | O_EXCL | O_WRONLY,
+	       0666);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error opening file '%s': %s"),
+		   filename, g_strerror (errno));
+      return NULL;
+    }
+  
+  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
+  stream->priv->fd = fd;
   return G_FILE_OUTPUT_STREAM (stream);
 }
 
-void
-g_file_output_stream_local_set_original_mtime (GFileOutputStreamLocal *stream,
-					       time_t                  original_mtime)
+GFileOutputStream *
+g_file_output_stream_local_append  (const char   *filename,
+				    GCancellable *cancellable,
+				    GError      **error)
 {
-  stream->priv->original_mtime = original_mtime;
-}
+  GFileOutputStreamLocal *stream;
+  int fd;
 
-void
-g_file_output_stream_local_set_create_backup  (GFileOutputStreamLocal *stream,
-					       gboolean                create_backup)
-{
-  stream->priv->create_backup = create_backup;
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
+  fd = g_open (filename,
+	       O_CREAT | O_APPEND | O_WRONLY,
+	       0666);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error opening file '%s': %s"),
+		   filename, g_strerror (errno));
+      return NULL;
+    }
+  
+  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
+  stream->priv->fd = fd;
+  
+  return G_FILE_OUTPUT_STREAM (stream);
 }
 
 static char *
@@ -182,8 +384,12 @@ copy_file_data (gint     sfd,
   return ret;
 }
 
-static void
-handle_overwrite_open (GFileOutputStreamLocal *file,
+static int
+handle_overwrite_open (const char *filename,
+		       time_t original_mtime,
+		       gboolean create_backup,
+		       char **temp_filename,
+		       GCancellable *cancellable,
 		       GError      **error)
 {
   int fd = -1;
@@ -193,7 +399,7 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
 
   /* We only need read access to the original file if we are creating a backup.
    * We also add O_CREATE to avoid a race if the file was just removed */
-  if (file->priv->create_backup)
+  if (create_backup)
     open_flags = O_RDWR | O_CREAT;
   else
     open_flags = O_WRONLY | O_CREAT;
@@ -202,18 +408,18 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
    * when finding out if the file we opened was a symlink */
 #ifdef O_NOFOLLOW
   is_symlink = FALSE;
-  fd = g_open (file->priv->filename, open_flags | O_NOFOLLOW, 0666);
+  fd = g_open (filename, open_flags | O_NOFOLLOW, 0666);
   if (fd == -1 && errno == ELOOP)
     {
       /* Could be a symlink, or it could be a regular ELOOP error,
        * but then the next open will fail too. */
       is_symlink = TRUE;
-      fd = g_open (file->priv->filename, open_flags, 0666);
+      fd = g_open (filename, open_flags, 0666);
     }
 #else
-  fd = g_open (file->priv->filename, open_flags, 0666);
+  fd = g_open (filename, open_flags, 0666);
   /* This is racy, but we do it as soon as possible to minimize the race */
-  is_symlink = g_file_test (file->priv->filename, G_FILE_TEST_IS_SYMLINK);
+  is_symlink = g_file_test (filename, G_FILE_TEST_IS_SYMLINK);
 #endif
     
   if (fd == -1)
@@ -221,8 +427,8 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
 		   _("Error opening file '%s': %s"),
-		   file->priv->filename, g_strerror (errno));
-      goto err_out;
+		   filename, g_strerror (errno));
+      return -1;
     }
   
   if (fstat (fd, &original_stat) != 0) 
@@ -230,10 +436,10 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
 		   _("Error stating file '%s': %s"),
-		   file->priv->filename, g_strerror (errno));
+		   filename, g_strerror (errno));
       goto err_out;
     }
-
+  
   /* not a regular file */
   if (!S_ISREG (original_stat.st_mode))
     {
@@ -250,8 +456,8 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
       goto err_out;
     }
   
-  if (file->priv->original_mtime != 0 &&
-      original_stat.st_mtime != file->priv->original_mtime)
+  if (original_mtime != 0 &&
+      original_stat.st_mtime != original_mtime)
     {
       g_set_error (error,
 		   G_VFS_ERROR,
@@ -276,7 +482,7 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
       char *dirname, *tmp_filename;
       int tmpfd;
       
-      dirname = g_path_get_dirname (file->priv->filename);
+      dirname = g_path_get_dirname (filename);
       tmp_filename = g_build_filename (dirname, ".goutputstream-XXXXXX", NULL);
       g_free (dirname);
 
@@ -298,20 +504,18 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
 	}
 
       close (fd);
-      file->priv->fd = tmpfd;
-      file->priv->tmp_filename = tmp_filename;
-      return;
-   
+      *temp_filename = tmp_filename;
+      return tmpfd;
     }
 
  fallback_strategy:
 
-  if (file->priv->create_backup)
+  if (create_backup)
     {
       char *backup_filename;
       int bfd;
       
-      backup_filename = create_backup_filename (file->priv->filename);
+      backup_filename = create_backup_filename (filename);
 
       if (unlink (backup_filename) == -1 && errno != ENOENT)
 	{
@@ -323,9 +527,9 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
 	  goto err_out;
 	}
 
-      bfd = open (backup_filename,
-		  O_WRONLY | O_CREAT | O_EXCL,
-		  original_stat.st_mode & 0777);
+      bfd = g_open (backup_filename,
+		    O_WRONLY | O_CREAT | O_EXCL,
+		    original_stat.st_mode & 0777);
 
       if (bfd == -1)
 	{
@@ -395,254 +599,23 @@ handle_overwrite_open (GFileOutputStreamLocal *file,
       goto err_out;
     }
     
-  file->priv->fd = fd;
-  
-  return;
+  return fd;
 
  err_out:
-  if (fd != -1)
-    close (fd);
-  return;
+  close (fd);
+  return -1;
 }
 
-static gboolean
-g_file_output_stream_local_open (GFileOutputStreamLocal *file,
-				 GCancellable *cancellable,
-				 GError      **error)
+GFileOutputStream *
+g_file_output_stream_local_replace (const char   *filename,
+				    time_t        original_mtime,
+				    gboolean      create_backup,
+				    GCancellable *cancellable,
+				    GError      **error)
 {
-  if (file->priv->fd != -1)
-    return TRUE;
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
-
-  switch (file->priv->open_mode)
-    {
-    case G_OUTPUT_STREAM_OPEN_MODE_CREATE:
-      file->priv->fd = g_open (file->priv->filename,
-			       O_CREAT | O_EXCL | O_WRONLY,
-			       0666);
-      if (file->priv->fd == -1)
-	g_set_error (error, G_FILE_ERROR,
-		     g_file_error_from_errno (errno),
-		     _("Error opening file '%s': %s"),
-		     file->priv->filename, g_strerror (errno));
-      break;
-    case G_OUTPUT_STREAM_OPEN_MODE_APPEND:
-      file->priv->fd = g_open (file->priv->filename,
-			       O_CREAT | O_APPEND | O_WRONLY,
-			       0666);
-      if (file->priv->fd == -1)
-	g_set_error (error, G_FILE_ERROR,
-		     g_file_error_from_errno (errno),
-		     _("Error opening file '%s': %s"),
-		     file->priv->filename, g_strerror (errno));
-      break;
-    case G_OUTPUT_STREAM_OPEN_MODE_REPLACE:
-      /* If the file doesn't exist, create it */
-      file->priv->fd = g_open (file->priv->filename,
-			       O_CREAT | O_EXCL | O_WRONLY,
-			       0666);
-
-      if (file->priv->fd == -1 && errno == EEXIST)
-	{
-	  /* The file already exists */
-	  handle_overwrite_open (file, error);
-	}
-      else if (file->priv->fd == -1)
-	g_set_error (error, G_FILE_ERROR,
-		     g_file_error_from_errno (errno),
-		     _("Error opening file '%s': %s"),
-		     file->priv->filename, g_strerror (errno));
-      break;
-    default:
-      g_set_error (error,
-		   G_FILE_ERROR,
-		   G_FILE_ERROR_INVAL,
-		   _("Invalid open mode"));
-    }
-
-  return file->priv->fd != -1;
-}
-			  
-
-static gssize
-g_file_output_stream_local_write (GOutputStream *stream,
-				  void         *buffer,
-				  gsize         count,
-				  GCancellable *cancellable,
-				  GError      **error)
-{
-  GFileOutputStreamLocal *file;
-  gssize res;
-
-  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
-
-  if (!g_file_output_stream_local_open (file, cancellable, error))
-    return -1;
-
-  
-  while (1)
-    {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  return -1;
-	}
-      res = write (file->priv->fd, buffer, count);
-      if (res == -1)
-	{
-	  if (errno == EINTR)
-	    continue;
-	  
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
-		       _("Error writing to file '%s': %s"),
-		       file->priv->filename, g_strerror (errno));
-	}
-      
-      break;
-    }
-  
-  return res;
-}
-
-static gboolean
-g_file_output_stream_local_close (GOutputStream *stream,
-				  GCancellable *cancellable,
-				  GError      **error)
-{
-  GFileOutputStreamLocal *file;
-  struct stat final_stat;
-  int res;
-
-  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
-
-  if (file->priv->fd == -1)
-    return TRUE;
-
-  if (file->priv->tmp_filename)
-    {
-      /* We need to move the temp file to its final place,
-       * and possibly create the backup file
-       */
-
-      if (file->priv->create_backup)
-	{
-	  char *backup_filename;
-
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      goto err_out;
-	    }
-	  
-	  backup_filename = create_backup_filename (file->priv->filename);
-	  
-	  if (g_cancellable_is_cancelled (cancellable))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      goto err_out;
-	    }
-	  
-	  /* create original -> backup link, the original is then renamed over */
-	  if (link (file->priv->filename, backup_filename) != 0)
-	    {
-	      g_set_error (error, G_FILE_ERROR,
-			   g_file_error_from_errno (errno),
-			   _("Error creating backup link: %s"),
-			   g_strerror (errno));
-	      g_free (backup_filename);
-	      goto err_out;
-	    }
-	}
-      
-
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  goto err_out;
-	}
-
-      /* tmp -> original */
-      if (rename (file->priv->tmp_filename, file->priv->filename) != 0)
-	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
-		       _("Error renamining temporary file: %s"),
-		       g_strerror (errno));
-	  goto err_out;
-	}
-    }
-  
-  if (g_file_output_stream_get_should_get_final_mtime (G_FILE_OUTPUT_STREAM (stream)))
-    {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  goto err_out;
-	}
-      
-      if (fstat (file->priv->fd, &final_stat) == 0)
-	g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
-					      final_stat.st_mtime);
-    }
-
-  while (1)
-    {
-      res = close (file->priv->fd);
-      if (res == -1)
-	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
-		       _("Error closing file: %s"),
-		       g_strerror (errno));
-	}
-      break;
-    }
-  
-  return res != -1;
-
- err_out:
-  /* A simple try to close the fd in case we fail before the actual close */
-  close (file->priv->fd);
-  return FALSE;
-}
-
-static GFileInfo *
-g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
-					  GFileInfoRequestFlags requested,
-					  char                 *attributes,
-					  GCancellable         *cancellable,
-					  GError              **error)
-{
-  GFileOutputStreamLocal *file;
-
-  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
-
-  if (!g_file_output_stream_local_open (file, cancellable, error))
-    return NULL;
+  GFileOutputStreamLocal *stream;
+  int fd;
+  char *temp_file;
 
   if (g_cancellable_is_cancelled (cancellable))
     {
@@ -652,9 +625,37 @@ g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
 		   _("Operation was cancelled"));
       return NULL;
     }
+
+
+  temp_file = NULL;
+  /* If the file doesn't exist, create it */
+  fd = g_open (filename,
+	       O_CREAT | O_EXCL | O_WRONLY,
+	       0666);
+
+  if (fd == -1 && errno == EEXIST)
+    {
+      /* The file already exists */
+      fd = handle_overwrite_open (filename, original_mtime, create_backup, &temp_file,
+				  cancellable, error);
+      if (fd == -1)
+	return NULL;
+    }
+  else if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error opening file '%s': %s"),
+		   filename, g_strerror (errno));
+      return NULL;
+    }
   
-  return g_file_info_local_get_from_fd (file->priv->fd,
-					requested,
-					attributes,
-					error);
+ 
+  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
+  stream->priv->fd = fd;
+  stream->priv->tmp_filename = temp_file;
+  stream->priv->backup_filename = create_backup_filename (filename);
+  stream->priv->original_filename =  g_strdup (filename);
+  
+  return G_FILE_OUTPUT_STREAM (stream);
 }

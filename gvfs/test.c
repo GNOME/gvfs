@@ -12,6 +12,7 @@ static void
 test_out ()
 {
   GOutputStream *out;
+  GFile *file;
   char buffer[2345];
   char *ptr;
   char *str = "Test_String ";
@@ -31,8 +32,8 @@ test_out ()
   
   unlink ("/tmp/test");
 
-  out = (GOutputStream *)g_file_output_stream_local_new ("/tmp/test",
-							 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
+  file = g_file_get_for_path ("/tmp/test");
+  out = (GOutputStream *)g_file_create (file, NULL, NULL);
 
   left = sizeof(buffer);
   ptr = buffer;
