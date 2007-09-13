@@ -971,7 +971,7 @@ _g_unix_mount_point_free (GUnixMountPoint *mount_point)
   g_free (mount_point);
 }
 
-static gboolean
+static int
 strcmp_null (const char *str1,
 	     const char *str2)
 {
