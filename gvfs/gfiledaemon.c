@@ -157,6 +157,36 @@ g_file_daemon_get_child (GFile *file,
   return child;
 }
 
+static DBusMessage *
+do_sync_path_call (GFile *file,
+		   const char *op,
+		   GCancellable *cancellable,
+		   GError **error,
+		   int first_arg_type,
+		   ...)
+{
+  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  va_list var_args;
+  DBusMessage *message, *reply;
+
+  va_start (var_args, first_arg_type);
+  message =
+    _g_vfs_impl_daemon_new_path_call_valist (daemon_file->match_bus_name,
+					     daemon_file->path,
+					     op,
+					     first_arg_type, var_args);
+  va_end (var_args);
+  
+  /* TODO: handle nonmounted => message == NULL */
+  
+  reply = _g_vfs_daemon_call_sync (message,
+				   NULL,
+				   cancellable, error);
+  dbus_message_unref (message);
+  
+  return reply;
+}
+
 static GFileEnumerator *
 g_file_daemon_enumerate_children (GFile      *file,
 				  GFileInfoRequestFlags requested,
@@ -175,9 +205,7 @@ g_file_daemon_get_info (GFile                *file,
 			GCancellable         *cancellable,
 			GError              **error)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
-  DBusConnection *connection;
-  DBusMessage *message, *reply;
+  DBusMessage *reply;
   guint32 requested_32;
   dbus_bool_t follow_symlinks_dbus;
 
@@ -185,21 +213,13 @@ g_file_daemon_get_info (GFile                *file,
   if (attributes == NULL)
     attributes = "";
   follow_symlinks_dbus = follow_symlinks;
-  message =
-    _g_vfs_impl_daemon_new_path_call (daemon_file->match_bus_name,
-				      daemon_file->path,
-				      G_VFS_DBUS_OP_GET_INFO,
-				      DBUS_TYPE_UINT32, &requested_32,
-				      DBUS_TYPE_STRING, &attributes,
-				      DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
-				      0);
-  
-  /* TODO: handle nonmounted => message == NULL */
-  
-  reply = _g_vfs_daemon_call_sync (message,
-				   &connection,
-				   cancellable, error);
-  dbus_message_unref (message);
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_OP_GET_INFO,
+			     cancellable, error,
+			     DBUS_TYPE_UINT32, &requested_32,
+			     DBUS_TYPE_STRING, &attributes,
+			     DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
+			     0);
   if (reply == NULL)
     return NULL;
 
