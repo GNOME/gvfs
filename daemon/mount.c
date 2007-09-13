@@ -14,7 +14,6 @@ struct _Mountable {
   char *type;
   char *exec;
   char *dbus_name;
-  char *obj_path;
   gboolean automount;
 }; 
 
@@ -54,7 +53,6 @@ mount_init (void)
 			  mountable->type = g_strdup (types[i]);
 			  mountable->exec = g_key_file_get_string (keyfile, "Mount", "Exec", NULL);
 			  mountable->dbus_name = g_key_file_get_string (keyfile, "Mount", "DBusName", NULL);
-			  mountable->obj_path = g_key_file_get_string (keyfile, "Mount", "ObjPath", NULL);
 			  mountable->automount = g_key_file_get_boolean (keyfile, "Mount", "AutoMount", NULL);
 			  
 			  mountables = g_list_prepend (mountables, mountable);
@@ -186,10 +184,10 @@ mountable_mount (Mountable *mountable,
   op = g_mount_operation_dbus_new (spec);
   g_object_set_data (G_OBJECT (op), "mountable", mountable);
   
-  if (mountable->dbus_name && mountable->obj_path)
+  if (mountable->dbus_name)
     {
       message = dbus_message_new_method_call (mountable->dbus_name,
-					      mountable->obj_path,
+					      G_VFS_DBUS_MOUNTABLE_PATH,
 					      G_VFS_DBUS_MOUNTABLE_INTERFACE,
 					      "mount");
       if (!dbus_message_append_args (message,

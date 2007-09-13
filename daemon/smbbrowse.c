@@ -12,77 +12,6 @@
 #include "gvfsbackendsmbbrowse.h"
 #include <gvfsdaemonprotocol.h>
 
-static void
-dbus_mount (GVfsDaemon *daemon,
-	    DBusConnection *connection,
-	    DBusMessage *message)
-{
-  const char *dbus_id, *obj_path;
-  DBusMessageIter iter;
-  DBusError derror;
-  DBusMessage *reply;
-  GMountSpec *mount_spec;
-  GMountSource *mount_source;
-
-  dbus_id = dbus_message_get_sender (message);
-  
-  dbus_message_iter_init (message, &iter);
-
-  mount_spec = NULL;
-  dbus_error_init (&derror);
-  if (!_g_dbus_message_iter_get_args (&iter, &derror,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
-				      0))
-    {
-      reply = dbus_message_new_error (message, derror.name, derror.message);
-      dbus_error_free (&derror);
-    }
-  else if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
-    reply = dbus_message_new_error (message,
-				    DBUS_ERROR_INVALID_ARGS,
-				    "Error in mount spec");
-  else
-    reply = dbus_message_new_method_return (message);
-      
-  dbus_connection_send (connection, reply, NULL);
-  dbus_message_unref (reply);
-
-  if (mount_spec)
-    {
-      mount_source = g_mount_source_new_dbus (dbus_id, obj_path, mount_spec);
-      g_mount_spec_unref (mount_spec);
-
-      g_vfs_daemon_initiate_mount (daemon, mount_source);
-      g_object_unref (mount_source);
-    }
-}
-
-static DBusHandlerResult
-mountable_message_function (DBusConnection  *connection,
-			    DBusMessage     *message,
-			    void            *user_data)
-{
-  GVfsDaemon *daemon = user_data;
-
-  DBusHandlerResult res;
-  
-  res = DBUS_HANDLER_RESULT_HANDLED;
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNTABLE_INTERFACE,
-				   "mount"))
-    dbus_mount (daemon, connection, message);
-  else
-    res = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-  
-  return res;
-}
-
-
-struct DBusObjectPathVTable mountable_vtable = {
-  NULL,
-  mountable_message_function,
-};
-
 int
 main (int argc, char *argv[])
 {
@@ -163,12 +92,6 @@ main (int argc, char *argv[])
 
   g_vfs_daemon_initiate_mount (daemon, mount_source);
   g_object_unref (mount_source);
-  
-  if (!dbus_connection_register_object_path (connection,
-					     "/org/gtk/vfs/mountpoint/smb_browse",
-					     &mountable_vtable, daemon))
-    _g_dbus_oom ();
-
   
   loop = g_main_loop_new (NULL, FALSE);
 

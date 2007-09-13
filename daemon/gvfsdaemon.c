@@ -766,6 +766,51 @@ daemon_handle_get_connection (DBusConnection *conn,
     }
 }
 
+static void
+daemon_start_mount (GVfsDaemon *daemon,
+		    DBusConnection *connection,
+		    DBusMessage *message)
+{
+  const char *dbus_id, *obj_path;
+  DBusMessageIter iter;
+  DBusError derror;
+  DBusMessage *reply;
+  GMountSpec *mount_spec;
+  GMountSource *mount_source;
+
+  dbus_id = dbus_message_get_sender (message);
+  
+  dbus_message_iter_init (message, &iter);
+
+  mount_spec = NULL;
+  dbus_error_init (&derror);
+  if (!_g_dbus_message_iter_get_args (&iter, &derror,
+				      DBUS_TYPE_OBJECT_PATH, &obj_path,
+				      0))
+    {
+      reply = dbus_message_new_error (message, derror.name, derror.message);
+      dbus_error_free (&derror);
+    }
+  else if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
+    reply = dbus_message_new_error (message,
+				    DBUS_ERROR_INVALID_ARGS,
+				    "Error in mount spec");
+  else
+    reply = dbus_message_new_method_return (message);
+      
+  dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
+
+  if (mount_spec)
+    {
+      mount_source = g_mount_source_new_dbus (dbus_id, obj_path, mount_spec);
+      g_mount_spec_unref (mount_spec);
+
+      g_vfs_daemon_initiate_mount (daemon, mount_source);
+      g_object_unref (mount_source);
+    }
+}
+
 static DBusHandlerResult
 daemon_message_func (DBusConnection *conn,
 		     DBusMessage    *message,
@@ -776,6 +821,10 @@ daemon_message_func (DBusConnection *conn,
   const char *path;
 
   g_print ("daemon_message_func\n");
+  
+  path = dbus_message_get_path (message);
+  if (path == NULL)
+    path = "";
   
   if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameLost"))
     {
@@ -807,8 +856,6 @@ daemon_message_func (DBusConnection *conn,
       dbus_uint32_t serial;
       GVfsJob *job_to_cancel = NULL;
       
-      g_print ("Got cancel dbus call\n");
-
       if (dbus_message_get_args (message, NULL, 
 				 DBUS_TYPE_UINT32, &serial,
 				 DBUS_TYPE_INVALID))
@@ -839,10 +886,16 @@ daemon_message_func (DBusConnection *conn,
       return DBUS_HANDLER_RESULT_HANDLED;
     }
 
-  path = dbus_message_get_path (message);
-  registered_path = NULL;
-  if (path != NULL)
-    registered_path = g_hash_table_lookup (daemon->registered_paths, path);
+  if (strcmp (path, G_VFS_DBUS_MOUNTABLE_PATH) == 0 &&
+      dbus_message_is_method_call (message,
+				   G_VFS_DBUS_MOUNTABLE_INTERFACE,
+				   "mount"))
+    {
+      daemon_start_mount (daemon, conn, message);
+      return DBUS_HANDLER_RESULT_HANDLED;
+    }
+  
+  registered_path = g_hash_table_lookup (daemon->registered_paths, path);
   
   if (registered_path)
     return registered_path->callback (conn, message, registered_path->data);
@@ -881,6 +934,7 @@ mount_got_spec (GMountSource *mount_source,
   char *obj_path;
   GVfsJob *job;
   GVfsBackend *backend;
+  GError *io_error;
 
   if (mount_spec == NULL)
     {
@@ -896,7 +950,11 @@ mount_got_spec (GMountSource *mount_source,
 
   if (backend_type == G_TYPE_INVALID)
     {
-      g_mount_source_failed (mount_source, error);
+      io_error = NULL;
+      g_set_error (&io_error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		   "Unsupported mount type");
+      g_mount_source_failed (mount_source, io_error);
+      g_error_free (io_error);
       return;
     }
 

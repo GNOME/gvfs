@@ -26,6 +26,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_LIST_MOUNT_POINTS "ListMountpoints"
 
 #define G_VFS_DBUS_MOUNTABLE_INTERFACE "org.gtk.vfs.Mountable"
+#define G_VFS_DBUS_MOUNTABLE_PATH "/org/gtk/vfs/mountable"
 
 #define G_VFS_DBUS_ERROR_SOCKET_FAILED "org.gtk.vfs.Error.SocketFailed"
 
