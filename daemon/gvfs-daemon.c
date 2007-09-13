@@ -292,7 +292,7 @@ setup_daemon (char *mountpoint)
     }
 
   if (!dbus_connection_register_object_path (conn,
-					     "/org/gtk/vfs/Daemon",
+					     G_VFS_DBUS_DAEMON_PATH,
 					     &daemon_vtable,
 					     NULL))
     {
