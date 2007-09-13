@@ -69,8 +69,6 @@ GFileAttributes *  g_file_query_attributes           (GFile                  *fi
 						      GError                **error);
 Returns type and is_writable for all attributes supportable
 						      
-Set gvfs:backend attribute in get_filesystem_info() call
-
 FUTURE IDEAS:
 -------------
 
