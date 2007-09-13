@@ -1489,27 +1489,29 @@ g_local_file_move (GFile                *source,
 
 
 static GDirectoryMonitor*
-g_local_file_monitor_dir (GFile* file)
+g_local_file_monitor_dir (GFile* file,
+			  GFileMonitorFlags flags)
 {
   GLocalFile* local_file = G_LOCAL_FILE(file);
-  return g_local_directory_monitor_new (local_file->filename);
+  return g_local_directory_monitor_new (local_file->filename, flags);
 }
 
 static GFileMonitor*
-g_local_file_monitor_file (GFile* file)
+g_local_file_monitor_file (GFile* file,
+			  GFileMonitorFlags flags)
 {
   GLocalFile* local_file = G_LOCAL_FILE(file);
   GFileMonitor *monitor;
   GFileIface* default_iface;
 
-  monitor = g_local_file_monitor_new (local_file->filename);
+  monitor = g_local_file_monitor_new (local_file->filename, flags);
 
   if (monitor)
     return monitor;
 
   default_iface = g_type_default_interface_peek (G_TYPE_FILE);
 
-  return (default_iface->monitor_file) (file);
+  return (default_iface->monitor_file) (file, flags);
 }
 
 static void

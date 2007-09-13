@@ -31,6 +31,7 @@ typedef struct _GFile         		GFile; /* Dummy typedef */
 typedef struct _GFileIface    		GFileIface;
 typedef struct _GDirectoryMonitor       GDirectoryMonitor;
 typedef struct _GFileMonitor            GFileMonitor;
+typedef enum _GFileMonitorFlags GFileMonitorFlags;
 
 typedef void (*GFileProgressCallback) (goffset current_num_bytes,
 				       goffset total_num_bytes,
@@ -214,9 +215,11 @@ struct _GFileIface
 					 GAsyncResult *result,
 					 GError **error);
   
-  GDirectoryMonitor* (*monitor_dir)         (GFile                  *file);
+  GDirectoryMonitor* (*monitor_dir)         (GFile                  *file,
+					     GFileMonitorFlags       flags);
 
-  GFileMonitor*      (*monitor_file)        (GFile                  *file);
+  GFileMonitor*      (*monitor_file)        (GFile                  *file,
+					     GFileMonitorFlags       flags);
 };
 
 GType g_file_get_type (void) G_GNUC_CONST;
@@ -431,10 +434,10 @@ gboolean                g_file_eject_mountable_finish     (GFile                
 
 
 
-GDirectoryMonitor* g_file_monitor_directory          (GFile                  *file);
-GFileMonitor*      g_file_monitor_file               (GFile                  *file);
-
-
+GDirectoryMonitor* g_file_monitor_directory          (GFile                  *file,
+						      GFileMonitorFlags       flags);
+GFileMonitor*      g_file_monitor_file               (GFile                  *file,
+						      GFileMonitorFlags       flags);
 
 
 /* Utilities */

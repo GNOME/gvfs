@@ -65,7 +65,8 @@ static gboolean           g_file_real_set_attributes_from_info (GFile           
 								GFileGetInfoFlags     flags,
 								GCancellable         *cancellable,
 								GError              **error);
-static GFileMonitor*      g_file_real_monitor_file              (GFile               *file);
+static GFileMonitor*      g_file_real_monitor_file              (GFile               *file,
+								 GFileMonitorFlags    flags);
 
 GType
 g_file_get_type (void)
@@ -1484,28 +1485,31 @@ g_file_eject_mountable_finish (GFile                  *file,
 }
 
 GDirectoryMonitor*
-g_file_monitor_directory (GFile *file)
+g_file_monitor_directory (GFile *file,
+			  GFileMonitorFlags flags)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->monitor_dir) (file);
+  return (* iface->monitor_dir) (file, flags);
 }
 
 GFileMonitor*
-g_file_monitor_file (GFile *file)
+g_file_monitor_file (GFile *file,
+		     GFileMonitorFlags flags)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->monitor_file) (file);
+  return (* iface->monitor_file) (file, flags);
 }
 
 /* Fallback to polling */
 static GFileMonitor*
-g_file_real_monitor_file (GFile *file)
+g_file_real_monitor_file (GFile *file,
+			  GFileMonitorFlags flags)
 {
   return g_poll_file_monitor_new (file);
 }

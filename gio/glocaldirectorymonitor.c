@@ -61,7 +61,8 @@ g_local_directory_monitor_init (GLocalDirectoryMonitor* local_monitor)
 }
 
 GDirectoryMonitor*
-g_local_directory_monitor_new (const char* dirname)
+g_local_directory_monitor_new (const char* dirname,
+			       GFileMonitorFlags flags)
 {
   GLocalDirectoryMonitor* local_monitor;
   LocalMonitorBackend backend;

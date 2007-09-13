@@ -21,7 +21,8 @@ struct _GLocalFileMonitorClass {
 
 GType g_local_file_monitor_get_type (void) G_GNUC_CONST;
 
-GFileMonitor* g_local_file_monitor_new (const char* dirname);
+GFileMonitor* g_local_file_monitor_new (const char* dirname,
+					GFileMonitorFlags flags);
 
 G_END_DECLS
 

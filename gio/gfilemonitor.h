@@ -24,6 +24,11 @@ typedef enum {
   G_FILE_MONITOR_EVENT_UNMOUNTED
 } GFileMonitorEvent;
 
+enum _GFileMonitorFlags {
+  G_FILE_MONITOR_FLAGS_NONE = 0,
+  G_FILE_MONITOR_FLAGS_MONITOR_MOUNTS = (1<<0)
+};
+
 typedef struct _GFileMonitorClass	GFileMonitorClass;
 typedef struct _GFileMonitorPrivate	GFileMonitorPrivate;
 
