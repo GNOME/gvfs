@@ -49,6 +49,8 @@ handle non-ascii/utf8 xattr names by escaping
 
 fs info - type, free space, total space
 
+Use "data" -> "user_data" as name for user data pointer.
+
 FUTURE IDEAS:
 -------------
 
