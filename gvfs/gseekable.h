@@ -20,6 +20,8 @@ struct _GSeekableIface
 
   /* Virtual Table */
   
+  /* TODO: Add can_seek? Would be nice if checks can be done at runtime 
+   * rather than being tied to the class at buildtime */
   goffset     (* tell)	         (GSeekable *seekable);
   goffset     (* seek)	         (GSeekable *seekable,
 				  goffset    offset,
