@@ -229,12 +229,7 @@ g_daemon_file_equal (GFile *file1,
 		     GFile *file2)
 {
   GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
-  GDaemonFile *daemon_file2;
-
-  if (!G_IS_DAEMON_FILE (file2))
-    return FALSE;
-
-  daemon_file2 = G_DAEMON_FILE (file2);
+  GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
 
   return g_str_equal (daemon_file1->path, daemon_file2->path);
 }

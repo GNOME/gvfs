@@ -290,12 +290,7 @@ g_local_file_equal (GFile *file1,
 		    GFile *file2)
 {
   GLocalFile *local1 = G_LOCAL_FILE (file1);
-  GLocalFile *local2;
-
-  if (!G_IS_LOCAL_FILE (file2))
-    return FALSE;
-  
-  local2 = G_LOCAL_FILE (file2);
+  GLocalFile *local2 = G_LOCAL_FILE (file2);
 
   return g_str_equal (local1->filename, local2->filename);
 }

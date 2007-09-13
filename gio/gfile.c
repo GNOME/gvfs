@@ -141,22 +141,12 @@ g_file_equal (GFile *file1,
 {
   GFileIface *iface;
   
-  /* If file1 is local, pass file2 to handle the
-   * case where one file is a GLocalFile and the other
-   * is a wrapper of GLocalFile.
-   */
-  if (G_IS_LOCAL_FILE (file1))
-    {
-      iface = G_FILE_GET_IFACE (file2);
-      
-      return (* iface->equal) (file2, file1);
-    }
-  else
-    {
-      iface = G_FILE_GET_IFACE (file1);
-      
-      return (* iface->equal) (file1, file2);
-    }
+  if (G_TYPE_FROM_INSTANCE (file1) != G_TYPE_FROM_INSTANCE (file2))
+    return FALSE;
+
+  iface = G_FILE_GET_IFACE (file1);
+  
+  return (* iface->equal) (file1, file2);
 }
 
 
