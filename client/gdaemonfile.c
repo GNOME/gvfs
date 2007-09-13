@@ -277,7 +277,8 @@ g_daemon_file_resolve_relative (GFile *file,
 
 static DBusMessage *
 create_empty_message (GFile *file,
-		      const char *op)
+		      const char *op,
+		      GError **error)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   DBusMessage *message;
@@ -286,7 +287,7 @@ create_empty_message (GFile *file,
 
   mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
 						daemon_file->path,
-						NULL);
+						error);
   if (mount_ref == NULL)
     return NULL;
   
@@ -316,7 +317,7 @@ do_sync_path_call (GFile *file,
   DBusMessage *message, *reply;
   va_list var_args;
 
-  message = create_empty_message (file, op);
+  message = create_empty_message (file, op, error);
   if (!message)
     return NULL;
 
@@ -1398,7 +1399,7 @@ g_daemon_file_set_attribute (GFile *file,
 
   daemon_file = G_DAEMON_FILE (file);
 
-  message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE);
+  message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE, error);
   if (!message)
     return FALSE;
 
