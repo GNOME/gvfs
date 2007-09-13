@@ -59,6 +59,13 @@ typedef struct {
   gboolean cancelled;
   gboolean sent_cancel;
   
+  guint32 seq_nr;
+  
+} ReadOperation;
+
+typedef struct {
+  gboolean cancelled;
+  
   char *io_buffer;
   gsize io_size;
   gsize io_res;
@@ -66,11 +73,9 @@ typedef struct {
      If we get an error doing the i/o that is considered fatal */
   gboolean io_allow_cancel;
   gboolean io_cancelled;
-  
-  guint32 seq_nr;
-  
-} ReadOperation;
+} IOOperationData;
 
+typedef StateOp (*state_machine_iterator) (GUnixFileInputStream *file, IOOperationData *io_op, gpointer data);
 
 struct _GUnixFileInputStreamPrivate {
   char *filename;
@@ -339,12 +344,12 @@ get_reply_header_missing_bytes (GString *buffer)
  */
 
 static StateOp
-run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
+iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, ReadOperation *op)
 {
   GUnixFileInputStreamPrivate *priv = file->priv;
   gsize len;
 
-  do
+  while (TRUE)
     {
       switch (op->state)
 	{
@@ -356,23 +361,23 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	      priv->seek_generation == priv->input_block_seek_generation)
 	    {
 	      op->state = READ_STATE_READ_BLOCK;
-	      op->io_buffer = op->buffer;
-	      op->io_size = MIN (op->buffer_size, priv->input_block_size);
-	      op->io_allow_cancel = TRUE; /* Allow cancel before we sent request */
+	      io_op->io_buffer = op->buffer;
+	      io_op->io_size = MIN (op->buffer_size, priv->input_block_size);
+	      io_op->io_allow_cancel = TRUE; /* Allow cancel before we sent request */
 	      return STATE_OP_READ;
 	    }
 
 	  append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ,
 			  op->buffer_size, &op->seq_nr);
 	  op->state = READ_STATE_WROTE_COMMAND;
-	  op->io_buffer = priv->output_buffer->str;
-	  op->io_size = priv->output_buffer->len;
-	  op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
+	  io_op->io_buffer = priv->output_buffer->str;
+	  io_op->io_size = priv->output_buffer->len;
+	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
 	  return STATE_OP_WRITE;
 
 	  /* wrote parts of output_buffer */
 	case READ_STATE_WROTE_COMMAND:
-	  if (op->io_cancelled)
+	  if (io_op->io_cancelled)
 	    {
 	      op->ret_val = -1;
 	      g_set_error (&op->ret_error,
@@ -382,16 +387,16 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	      return STATE_OP_DONE;
 	    }
 	  
-	  if (op->io_res < priv->output_buffer->len)
+	  if (io_op->io_res < priv->output_buffer->len)
 	    {
 	      memcpy (priv->output_buffer->str,
-		      priv->output_buffer->str + op->io_res,
-		      priv->output_buffer->len - op->io_res);
+		      priv->output_buffer->str + io_op->io_res,
+		      priv->output_buffer->len - io_op->io_res);
 	      g_string_truncate (priv->output_buffer,
-				 priv->output_buffer->len - op->io_res);
-	      op->io_buffer = priv->output_buffer->str;
-	      op->io_size = priv->output_buffer->len;
-	      op->io_allow_cancel = FALSE;
+				 priv->output_buffer->len - io_op->io_res);
+	      io_op->io_buffer = priv->output_buffer->str;
+	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
 	  g_string_truncate (priv->output_buffer, 0);
@@ -401,15 +406,15 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 
 	  /* No op */
 	case READ_STATE_HANDLE_INPUT:
-	  if (op->cancelled && !op->sent_cancel)
+	  if (io_op->cancelled && !op->sent_cancel)
 	    {
 	      op->sent_cancel = TRUE;
 	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_CANCEL,
 			      op->seq_nr, NULL);
 	      op->state = READ_STATE_WROTE_COMMAND;
-	      op->io_buffer = priv->output_buffer->str;
-	      op->io_size = priv->output_buffer->len;
-	      op->io_allow_cancel = FALSE;
+	      io_op->io_buffer = priv->output_buffer->str;
+	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_allow_cancel = FALSE;
 	    }
 	  
 	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
@@ -419,9 +424,6 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	    }
 	  else if (priv->input_state == INPUT_STATE_IN_REPLY_HEADER)
 	    {
-	      op->io_size = 0;
-	      op->io_res = 0;
-	      op->io_cancelled = FALSE;
 	      op->state = READ_STATE_HANDLE_HEADER;
 	      break;
 	    }
@@ -436,32 +438,32 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	      priv->input_block_seek_generation)
 	    {
 	      op->state = READ_STATE_READ_BLOCK;
-	      op->io_buffer = op->buffer;
-	      op->io_size = MIN (op->buffer_size, priv->input_block_size);
-	      op->io_allow_cancel = FALSE;
+	      io_op->io_buffer = op->buffer;
+	      io_op->io_size = MIN (op->buffer_size, priv->input_block_size);
+	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_READ;
 	    }
 	  else
 	    {
 	      op->state = READ_STATE_SKIP_BLOCK;
 	      /* Reuse client buffer for skipping */
-	      op->io_buffer = op->buffer;
-	      op->io_size = priv->input_block_size;
-	      op->io_allow_cancel = !op->sent_cancel;
+	      io_op->io_buffer = op->buffer;
+	      io_op->io_size = priv->input_block_size;
+	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_SKIP;
 	    }
 	  break;
 
 	  /* Read block data */
 	case READ_STATE_SKIP_BLOCK:
-	  if (op->io_cancelled)
+	  if (io_op->io_cancelled)
 	    {
 	      op->state = READ_STATE_HANDLE_INPUT;
 	      break;
 	    }
 	  
-	  g_assert (op->io_res <= priv->input_block_size);
-	  priv->input_block_size -= op->io_res;
+	  g_assert (io_op->io_res <= priv->input_block_size);
+	  priv->input_block_size -= io_op->io_res;
 	  
 	  if (priv->input_block_size == 0)
 	    priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
@@ -471,15 +473,15 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	  
 	  /* read header data, (or manual io_len/res = 0) */
 	case READ_STATE_HANDLE_HEADER:
-	  if (op->io_cancelled)
+	  if (io_op->io_cancelled)
 	    {
 	      op->state = READ_STATE_HANDLE_INPUT;
 	      break;
 	    }
 
-	  if (op->io_res > 0)
+	  if (io_op->io_res > 0)
 	    {
-	      gsize unread_size = op->io_size - op->io_res;
+	      gsize unread_size = io_op->io_size - io_op->io_res;
 	      g_string_set_size (priv->input_buffer,
 				 priv->input_buffer->len - unread_size);
 	    }
@@ -490,9 +492,9 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	      gsize current_len = priv->input_buffer->len;
 	      g_string_set_size (priv->input_buffer,
 				 current_len + len);
-	      op->io_buffer = priv->input_buffer->str + current_len;
-	      op->io_size = len;
-	      op->io_allow_cancel = !op->sent_cancel;
+	      io_op->io_buffer = priv->input_buffer->str + current_len;
+	      io_op->io_size = len;
+	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_READ;
 	    }
 
@@ -541,15 +543,12 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	  g_string_truncate (priv->input_buffer, 0);
 	  
 	  /* This wasn't interesting, read next reply */
-	  op->io_size = 0;
-	  op->io_res = 0;
-	  op->io_cancelled = FALSE;
 	  op->state = READ_STATE_HANDLE_HEADER;
 	  break;
 
 	  /* Read block data */
 	case READ_STATE_READ_BLOCK:
-	  if (op->io_cancelled)
+	  if (io_op->io_cancelled)
 	    {
 	      op->ret_val = -1;
 	      g_set_error (&op->ret_error,
@@ -559,15 +558,15 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	      return STATE_OP_DONE;
 	    }
 	  
-	  if (op->io_res > 0)
+	  if (io_op->io_res > 0)
 	    {
-	      g_assert (op->io_res <= priv->input_block_size);
-	      priv->input_block_size -= op->io_res;
+	      g_assert (io_op->io_res <= priv->input_block_size);
+	      priv->input_block_size -= io_op->io_res;
 	      if (priv->input_block_size == 0)
 		priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
 	    }
 	  
-	  op->ret_val = op->io_res;
+	  op->ret_val = io_op->io_res;
 	  op->ret_error = NULL;
 	  return STATE_OP_DONE;
 	  
@@ -575,9 +574,89 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	  g_assert_not_reached ();
 	}
       
+      /* Clear io_op between non-op state switches */
+      io_op->io_size = 0;
+      io_op->io_res = 0;
+      io_op->io_cancelled = FALSE;
+ 
     }
-  while (1);
 }
+
+
+static gboolean
+run_sync_state_machine (GUnixFileInputStream *file,
+			state_machine_iterator iterator,
+			gpointer data,
+			GCancellable *cancellable,
+			GError **error)
+{
+  gssize res;
+  StateOp io_op;
+  IOOperationData io_data;
+  GError *io_error;
+
+  memset (&io_data, 0, sizeof (io_data));
+  
+  while (TRUE)
+    {
+      if (cancellable)
+	io_data.cancelled = g_cancellable_is_cancelled (cancellable);
+      
+      io_op = iterator (file, &io_data, data);
+
+      if (io_op == STATE_OP_DONE)
+	return TRUE;
+      
+      io_error = NULL;
+      if (io_op == STATE_OP_READ)
+	{
+	  res = g_input_stream_read (file->priv->data_stream,
+				     io_data.io_buffer, io_data.io_size,
+				     io_data.io_allow_cancel ? cancellable : NULL,
+				     &io_error);
+	}
+      else if (io_op == STATE_OP_SKIP)
+	{
+	  res = g_input_stream_skip (file->priv->data_stream,
+				     io_data.io_size,
+				     io_data.io_allow_cancel ? cancellable : NULL,
+				     &io_error);
+	}
+      else if (io_op == STATE_OP_WRITE)
+	{
+	  res = g_output_stream_write (file->priv->command_stream,
+				       io_data.io_buffer, io_data.io_size,
+				       io_data.io_allow_cancel ? cancellable : NULL,
+				       &io_error);
+	}
+      else
+	g_assert_not_reached ();
+      
+      if (res == -1)
+	{
+	  if (error_is_cancel (io_error))
+	    {
+	      io_data.io_res = 0;
+	      io_data.io_cancelled = TRUE;
+	      g_error_free (io_error);
+	    }
+	  else
+	    {
+	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+			   "Error in stream protocol: %s", io_error->message);
+	      g_error_free (io_error);
+	      return FALSE;
+	    }
+	}
+      else
+	{
+	  io_data.io_res = res;
+	  io_data.io_cancelled = FALSE;
+	}
+    }
+  while (io_op != STATE_OP_DONE);
+}
+
 
 static gssize
 g_unix_file_input_stream_read (GInputStream *stream,
@@ -587,10 +666,7 @@ g_unix_file_input_stream_read (GInputStream *stream,
 			       GError      **error)
 {
   GUnixFileInputStream *file;
-  gssize res;
-  StateOp io_op;
   ReadOperation op;
-  GError *io_error;
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
@@ -601,69 +677,14 @@ g_unix_file_input_stream_read (GInputStream *stream,
   if (count > MAX_READ_SIZE)
     count = MAX_READ_SIZE;
 
-  memset (&op, 0, sizeof (ReadOperation));
+  memset (&op, 0, sizeof (op));
   op.state = READ_STATE_INIT;
-  
   op.buffer = buffer;
   op.buffer_size = count;
   
-  do
-    {
-      if (cancellable)
-	op.cancelled = g_cancellable_is_cancelled (cancellable);
-      
-      io_op = run_read_state_machine (file, &op);
-
-      if (io_op == STATE_OP_DONE)
-	break;
-      
-      io_error = NULL;
-      if (io_op == STATE_OP_READ)
-	{
-	  res = g_input_stream_read (file->priv->data_stream,
-				     op.io_buffer, op.io_size,
-				     op.io_allow_cancel ? cancellable : NULL,
-				     &io_error);
-	}
-      else if (io_op == STATE_OP_SKIP)
-	{
-	  res = g_input_stream_skip (file->priv->data_stream,
-				     op.io_size,
-				     op.io_allow_cancel ? cancellable : NULL,
-				     &io_error);
-	}
-      else if (io_op == STATE_OP_WRITE)
-	{
-	  res = g_output_stream_write (file->priv->command_stream,
-				       op.io_buffer, op.io_size,
-				       op.io_allow_cancel ? cancellable : NULL,
-				       &io_error);
-	}
-
-      if (res == -1)
-	{
-	  if (error_is_cancel (io_error))
-	    {
-	      op.io_res = 0;
-	      op.io_cancelled = TRUE;
-	      g_error_free (io_error);
-	    }
-	  else
-	    {
-	      op.ret_val = -1;
-	      g_set_error (&op.ret_error, G_FILE_ERROR, G_FILE_ERROR_IO,
-			   "Error in stream protocol: %s", io_error->message);
-	      g_error_free (io_error);
-	      break;
-	    }
-	}
-      else
-	{
-	  op.io_res = res;
-	  op.io_cancelled = FALSE;
-	}
-    }
-  while (io_op != STATE_OP_DONE);
+  if (!run_sync_state_machine (file, (state_machine_iterator)iterate_read_state_machine,
+			       &op, cancellable, error))
+    return -1; /* IO Error */
 
   if (op.ret_val == -1)
     g_propagate_error (error, op.ret_error);
