@@ -11,23 +11,25 @@ libgvfs_la_SOURCES = 	\
 	gasynchelper.h \
 	gfile.c \
 	gfileenumerator.c \
-	gfileinfo.c \
-	gfileinputstream.c \
-	gfileoutputstream.c \
-	gioscheduler.c \
-	glocalfileinputstream.c \
-	glocalfileoutputstream.c \
-	goutputstream.c \
-	ginputstream.c \
-	gvfs.c \
-	gvfserror.c \
-	gvfs.h \
 	gfileenumeratorsimple.c \
 	gfileenumeratorsimple.h \
+	gfileinfo.c \
 	gfileinfosimple.c \
 	gfileinfosimple.h \
+	gfileinputstream.c \
+	gfileoutputstream.c \
 	gfilesimple.c \
 	gfilesimple.h \
+	ginputstream.c \
+	gioscheduler.c \
+	glocalfileinputstream.c \
+	glocalfileinputstream.h \
+	glocalfileoutputstream.c \
+	glocalfileoutputstream.h \
+	goutputstream.c \
+	gvfs.c \
+	gvfs.h \
+	gvfserror.c \
 	gvfssimple.c \
 	gvfssimple.h \
 	$(NULL)
@@ -49,8 +51,6 @@ gvfsinclude_HEADERS = \
 	gseekable.h \
 	gvfserror.h \
 	gvfstypes.h \
-	glocalfileinputstream.h \
-	glocalfileoutputstream.h \
 	$(NULL)
 
 noinst_PROGRAMS= \
