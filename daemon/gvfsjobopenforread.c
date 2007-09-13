@@ -194,6 +194,7 @@ finished (GVfsJob *job)
 {
   GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
 
-  g_signal_emit_by_name (job, "new-source", open_job->read_channel);
+  if (open_job->read_channel)
+    g_signal_emit_by_name (job, "new-source", open_job->read_channel);
 
 }
