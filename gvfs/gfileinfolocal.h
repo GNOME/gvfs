@@ -6,15 +6,15 @@
 G_BEGIN_DECLS
 
 GFileInfo *g_file_info_local_get         (const char             *basename,
-					   const char             *path,
-					   GFileInfoRequestFlags   requested,
-					   GFileAttributeMatcher  *attribute_matcher,
-					   gboolean                follow_symlinks,
-					   GError                **error);
+					  const char             *path,
+					  GFileInfoRequestFlags   requested,
+					  GFileAttributeMatcher  *attribute_matcher,
+					  gboolean                follow_symlinks,
+					  GError                **error);
 GFileInfo *g_file_info_local_get_from_fd (int                     fd,
-					   GFileInfoRequestFlags   requested,
-					   char                   *attributes,
-					   GError                **error);
+					  GFileInfoRequestFlags   requested,
+					  char                   *attributes,
+					  GError                **error);
 
 G_END_DECLS
 

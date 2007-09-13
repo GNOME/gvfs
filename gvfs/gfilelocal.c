@@ -214,7 +214,7 @@ g_file_local_copy (GFile *file)
 
 static GFile *
 g_file_local_get_child (GFile *file,
-			 const char *name)
+			const char *name)
 {
   GFileLocal *local = G_FILE_LOCAL (file);
   char *filename;
@@ -230,9 +230,9 @@ g_file_local_get_child (GFile *file,
 
 static GFileEnumerator *
 g_file_local_enumerate_children (GFile      *file,
-				  GFileInfoRequestFlags requested,
-				  const char *attributes,
-				  gboolean follow_symlinks)
+				 GFileInfoRequestFlags requested,
+				 const char *attributes,
+				 gboolean follow_symlinks)
 {
   GFileLocal *local = G_FILE_LOCAL (file);
   return g_file_enumerator_local_new (local->filename,
@@ -242,10 +242,10 @@ g_file_local_enumerate_children (GFile      *file,
 
 static GFileInfo *
 g_file_local_get_info (GFile                *file,
-			GFileInfoRequestFlags requested,
-			const char           *attributes,
-			gboolean              follow_symlinks,
-			GError              **error)
+		       GFileInfoRequestFlags requested,
+		       const char           *attributes,
+		       gboolean              follow_symlinks,
+		       GError              **error)
 {
   GFileLocal *local = G_FILE_LOCAL (file);
   GFileInfo *info;
@@ -289,8 +289,8 @@ g_file_local_create (GFile *file)
 
 static GFileOutputStream *
 g_file_local_replace (GFile *file,
-		       time_t mtime,
-		       gboolean  make_backup)
+		      time_t mtime,
+		      gboolean  make_backup)
 {
   GFileOutputStream *out;
 

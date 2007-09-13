@@ -52,8 +52,8 @@ g_vfs_daemon_new (void)
 }
 
 static GFile *
-g_vfs_daemon_get_file_for_path  (GVfs       *vfs,
-			       const char *path)
+g_vfs_daemon_get_file_for_path (GVfs       *vfs,
+				const char *path)
 {
   GFile *file;
 
@@ -65,7 +65,7 @@ g_vfs_daemon_get_file_for_path  (GVfs       *vfs,
 }
 
 static GFile *
-g_vfs_daemon_get_file_for_uri   (GVfs       *vfs,
+g_vfs_daemon_get_file_for_uri (GVfs       *vfs,
 			       const char *uri)
 {
   char *base;
@@ -95,7 +95,7 @@ g_vfs_daemon_get_file_for_uri   (GVfs       *vfs,
 
 static GFile *
 g_vfs_daemon_parse_name (GVfs       *vfs,
-		       const char *parse_name)
+			 const char *parse_name)
 {
   GFile *file;
   char *path;

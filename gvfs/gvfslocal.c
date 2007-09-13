@@ -9,8 +9,6 @@ static void g_vfs_local_finalize       (GObject         *object);
 struct _GVfsLocal
 {
   GObject parent;
-
-  
 };
 
 G_DEFINE_TYPE_WITH_CODE (GVfsLocal, g_vfs_local, G_TYPE_OBJECT,
@@ -47,14 +45,14 @@ g_vfs_local_new (void)
 
 static GFile *
 g_vfs_local_get_file_for_path  (GVfs       *vfs,
-				 const char *path)
+				const char *path)
 {
   return g_file_local_new (path);
 }
 
 static GFile *
 g_vfs_local_get_file_for_uri   (GVfs       *vfs,
-				 const char *uri)
+				const char *uri)
 {
   char *path;
   GFile *file;
@@ -73,7 +71,7 @@ g_vfs_local_get_file_for_uri   (GVfs       *vfs,
 
 static GFile *
 g_vfs_local_parse_name (GVfs       *vfs,
-			 const char *parse_name)
+			const char *parse_name)
 {
   GFile *file;
   char *filename;

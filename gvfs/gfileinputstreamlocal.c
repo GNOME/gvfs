@@ -191,7 +191,7 @@ g_file_input_stream_local_skip (GInputStream *stream,
 
 static gboolean
 g_file_input_stream_local_close (GInputStream *stream,
-				GCancellable  *cancellable,
+				 GCancellable *cancellable,
 				 GError      **error)
 {
   GFileInputStreamLocal *file;

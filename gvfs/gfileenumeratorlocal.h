@@ -27,9 +27,9 @@ struct _GFileEnumeratorLocalClass
 GType g_file_enumerator_local_get_type (void) G_GNUC_CONST;
 
 GFileEnumerator *g_file_enumerator_local_new (const char *filename,
-					       GFileInfoRequestFlags requested,
-					       const char *attributes,
-					       gboolean follow_symlinks);
+					      GFileInfoRequestFlags requested,
+					      const char *attributes,
+					      gboolean follow_symlinks);
 
 G_END_DECLS
 

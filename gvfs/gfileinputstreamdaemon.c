@@ -123,29 +123,29 @@ struct _GFileInputStreamDaemonPrivate {
 };
 
 static gssize     g_file_input_stream_daemon_read          (GInputStream           *stream,
-							  void                   *buffer,
-							  gsize                   count,
-							  GCancellable           *cancellable,
-							  GError                **error);
+							    void                   *buffer,
+							    gsize                   count,
+							    GCancellable           *cancellable,
+							    GError                **error);
 static gssize     g_file_input_stream_daemon_skip          (GInputStream           *stream,
-							  gsize                   count,
-							  GCancellable           *cancellable,
-							  GError                **error);
+							    gsize                   count,
+							    GCancellable           *cancellable,
+							    GError                **error);
 static gboolean   g_file_input_stream_daemon_close         (GInputStream           *stream,
-							  GCancellable           *cancellable,
-							  GError                **error);
+							    GCancellable           *cancellable,
+							    GError                **error);
 static GFileInfo *g_file_input_stream_daemon_get_file_info (GFileInputStream       *stream,
-							  GFileInfoRequestFlags   requested,
-							  char                   *attributes,
-							  GCancellable           *cancellable,
-							  GError                **error);
+							    GFileInfoRequestFlags   requested,
+							    char                   *attributes,
+							    GCancellable           *cancellable,
+							    GError                **error);
 static goffset    g_file_input_stream_daemon_tell          (GFileInputStream       *stream);
 static gboolean   g_file_input_stream_daemon_can_seek      (GFileInputStream       *stream);
 static gboolean   g_file_input_stream_daemon_seek          (GFileInputStream       *stream,
-							  goffset                 offset,
-							  GSeekType               type,
-							  GCancellable           *cancellable,
-							  GError                **error);
+							    goffset                 offset,
+							    GSeekType               type,
+							    GCancellable           *cancellable,
+							    GError                **error);
 
 G_DEFINE_TYPE (GFileInputStreamDaemon, g_file_input_stream_daemon,
 	       G_TYPE_FILE_INPUT_STREAM)
@@ -254,7 +254,7 @@ receive_fd (int connection_fd)
 
 static gboolean
 g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
-			       GError      **error)
+				 GError **error)
 {
   DBusConnection *connection;
   DBusError derror;
@@ -707,10 +707,10 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 
 static gssize
 g_file_input_stream_daemon_read (GInputStream *stream,
-			       void         *buffer,
-			       gsize         count,
-			       GCancellable *cancellable,
-			       GError      **error)
+				 void         *buffer,
+				 gsize         count,
+				 GCancellable *cancellable,
+				 GError      **error)
 {
   GFileInputStreamDaemon *file;
   ReadOperation op;
@@ -743,9 +743,9 @@ g_file_input_stream_daemon_read (GInputStream *stream,
 
 static gssize
 g_file_input_stream_daemon_skip (GInputStream *stream,
-			       gsize         count,
-			       GCancellable *cancellable,
-			       GError      **error)
+				 gsize         count,
+				 GCancellable *cancellable,
+				 GError      **error)
 {
   GFileInputStreamDaemon *file;
 
@@ -762,8 +762,8 @@ g_file_input_stream_daemon_skip (GInputStream *stream,
 
 static gboolean
 g_file_input_stream_daemon_close (GInputStream *stream,
-				GCancellable *cancellable,
-				GError      **error)
+				  GCancellable *cancellable,
+				  GError      **error)
 {
   GFileInputStreamDaemon *file;
   GError *my_error;
@@ -1008,10 +1008,10 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 
 static gboolean
 g_file_input_stream_daemon_seek (GFileInputStream *stream,
-			       goffset     offset,
-			       GSeekType   type,
-			       GCancellable  *cancellable,
-			       GError    **error)
+				 goffset offset,
+				 GSeekType type,
+				 GCancellable *cancellable,
+				 GError **error)
 {
   GFileInputStreamDaemon *file;
   SeekOperation op;
@@ -1047,10 +1047,10 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 
 static GFileInfo *
 g_file_input_stream_daemon_get_file_info (GFileInputStream     *stream,
-					GFileInfoRequestFlags requested,
-					char                 *attributes,
-					GCancellable         *cancellable,
-					GError              **error)
+					  GFileInfoRequestFlags requested,
+					  char                 *attributes,
+					  GCancellable         *cancellable,
+					  GError              **error)
 {
   GFileInputStreamDaemon *file;
 

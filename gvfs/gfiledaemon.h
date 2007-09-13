@@ -23,7 +23,7 @@ struct _GFileDaemonClass
 GType g_file_daemon_get_type (void) G_GNUC_CONST;
   
 GFile * g_file_daemon_new (const char *filename,
-			 const char *mountpoint);
+			   const char *mountpoint);
 
 G_END_DECLS
 

@@ -101,7 +101,7 @@ g_file_daemon_local_copy (GFile *file)
 
 static GFile *
 g_file_daemon_local_get_child (GFile *file,
-			 const char *name)
+			       const char *name)
 {
   GFile *child;
 
@@ -113,21 +113,21 @@ g_file_daemon_local_get_child (GFile *file,
 }
 
 static GFileEnumerator *
-g_file_daemon_local_enumerate_children (GFile      *file,
-				       GFileInfoRequestFlags requested,
-				       const char *attributes,
-				       gboolean follow_symlinks)
+g_file_daemon_local_enumerate_children (GFile *file,
+					GFileInfoRequestFlags requested,
+					const char *attributes,
+					gboolean follow_symlinks)
 {
   return g_file_enumerate_children (G_FILE_DAEMON_LOCAL (file)->wrapped,
 				    requested, attributes, follow_symlinks);
 }
 
 static GFileInfo *
-g_file_daemon_local_get_info (GFile                *file,
-			     GFileInfoRequestFlags requested,
-			     const char           *attributes,
-			     gboolean              follow_symlinks,
-			     GError              **error)
+g_file_daemon_local_get_info (GFile *file,
+			      GFileInfoRequestFlags requested,
+			      const char *attributes,
+			      gboolean follow_symlinks,
+			      GError **error)
 {
   return g_file_get_info (G_FILE_DAEMON_LOCAL (file)->wrapped,
 			  requested, attributes, follow_symlinks,
@@ -154,8 +154,8 @@ g_file_daemon_local_create (GFile *file)
 
 static GFileOutputStream *
 g_file_daemon_local_replace (GFile *file,
-			    time_t mtime,
-			    gboolean  make_backup)
+			     time_t mtime,
+			     gboolean  make_backup)
 {
   return g_file_replace (G_FILE_DAEMON_LOCAL (file)->wrapped, mtime, make_backup);
 }

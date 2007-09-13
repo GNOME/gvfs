@@ -27,11 +27,11 @@ struct _GFileEnumeratorLocal
 G_DEFINE_TYPE (GFileEnumeratorLocal, g_file_enumerator_local, G_TYPE_FILE_ENUMERATOR);
 
 static GFileInfo *g_file_enumerator_local_next_file (GFileEnumerator  *enumerator,
-						      GCancellable     *cancellable,
-						      GError          **error);
+						     GCancellable     *cancellable,
+						     GError          **error);
 static gboolean   g_file_enumerator_local_stop      (GFileEnumerator  *enumerator,
-						      GCancellable     *cancellable,
-						      GError          **error);
+						     GCancellable     *cancellable,
+						     GError          **error);
 
 
 static void
@@ -68,9 +68,9 @@ g_file_enumerator_local_init (GFileEnumeratorLocal *local)
 
 GFileEnumerator *
 g_file_enumerator_local_new (const char *filename,
-			      GFileInfoRequestFlags requested,
-			      const char *attributes,
-			      gboolean follow_symlinks)
+			     GFileInfoRequestFlags requested,
+			     const char *attributes,
+			     gboolean follow_symlinks)
 {
   GFileEnumeratorLocal *local;
 
@@ -96,8 +96,8 @@ g_file_enumerator_local_open_dir (GFileEnumeratorLocal *local, GError **error)
 
 static GFileInfo *
 g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
-				    GCancellable     *cancellable,
-				    GError **error)
+				   GCancellable     *cancellable,
+				   GError **error)
 {
   GFileEnumeratorLocal *local = G_FILE_ENUMERATOR_LOCAL (enumerator);
   const char *filename;
@@ -116,10 +116,10 @@ g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
 
   path = g_build_filename (local->filename, filename, NULL);
   info = g_file_info_local_get (filename, path,
-				 local->requested,
-				 local->matcher,
-				 local->follow_symlinks,
-				 &my_error); 
+				local->requested,
+				local->matcher,
+				local->follow_symlinks,
+				&my_error); 
   g_free (path);
   
   if (info == NULL)
@@ -143,8 +143,8 @@ g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
 
 static gboolean
 g_file_enumerator_local_stop (GFileEnumerator *enumerator,
-			       GCancellable     *cancellable,
-			       GError          **error)
+			      GCancellable     *cancellable,
+			      GError          **error)
 {
   GFileEnumeratorLocal *local = G_FILE_ENUMERATOR_LOCAL (enumerator);
 

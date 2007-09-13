@@ -29,29 +29,31 @@
 static gchar *
 read_link (const gchar *full_name)
 {
-	gchar *buffer;
-	guint size;
-
-	size = 256;
-	buffer = g_malloc (size);
-          
-	while (1) {
-		int read_size;
-
-                read_size = readlink (full_name, buffer, size);
-		if (read_size < 0) {
-			g_free (buffer);
-			return NULL;
-		}
-                if (read_size < size) {
-			buffer[read_size] = 0;
-			return buffer;
-		}
-                size *= 2;
-		buffer = g_realloc (buffer, size);
+  gchar *buffer;
+  guint size;
+  
+  size = 256;
+  buffer = g_malloc (size);
+  
+  while (1)
+    {
+      int read_size;
+      
+      read_size = readlink (full_name, buffer, size);
+      if (read_size < 0)
+	{
+	  g_free (buffer);
+	  return NULL;
 	}
+      if (read_size < size)
+	{
+	  buffer[read_size] = 0;
+	  return buffer;
+	}
+      size *= 2;
+      buffer = g_realloc (buffer, size);
+    }
 }
-
 
 /* Get the SELinux security context */
 static void
@@ -67,21 +69,25 @@ get_selinux_context (const char *path,
 					 "selinux", "selinux:context"))
     return;
   
-  if (is_selinux_enabled ()) {
-    if (follow_symlinks) {
-      if (lgetfilecon_raw (path, &context) < 0)
-	return;
-    } else {
-      if (getfilecon_raw (path, &context) < 0)
-	return;
-    }
+  if (is_selinux_enabled ())
+    {
+      if (follow_symlinks)
+	{
+	  if (lgetfilecon_raw (path, &context) < 0)
+	    return;
+	}
+      else
+	{
+	  if (getfilecon_raw (path, &context) < 0)
+	    return;
+	}
 
-    if (context)
-      {
-	g_file_info_set_attribute (info, "selinux:context", context);
-	freecon(context);
-      }
-  }
+      if (context)
+	{
+	  g_file_info_set_attribute (info, "selinux:context", context);
+	  freecon(context);
+	}
+    }
 #endif
 }
 
@@ -422,11 +428,11 @@ get_access_rights (const gchar *path)
 
 GFileInfo *
 g_file_info_local_get (const char *basename,
-			const char *path,
-			GFileInfoRequestFlags requested,
-			GFileAttributeMatcher *attribute_matcher,
-			gboolean follow_symlinks,
-			GError **error)
+		       const char *path,
+		       GFileInfoRequestFlags requested,
+		       GFileAttributeMatcher *attribute_matcher,
+		       gboolean follow_symlinks,
+		       GError **error)
 {
   GFileInfo *info;
   struct stat statbuf;
@@ -439,8 +445,8 @@ g_file_info_local_get (const char *basename,
 
   if (requested & G_FILE_INFO_IS_HIDDEN)
     g_file_info_set_is_hidden (info,
-			  basename != NULL &&
-			  basename[0] == '.');
+			       basename != NULL &&
+			       basename[0] == '.');
 
 
   /* Avoid stat in trivial case */
@@ -517,9 +523,9 @@ g_file_info_local_get (const char *basename,
 
 GFileInfo *
 g_file_info_local_get_from_fd (int fd,
-				GFileInfoRequestFlags requested,
-				char *attributes,
-				GError **error)
+			       GFileInfoRequestFlags requested,
+			       char *attributes,
+			       GError **error)
 {
   struct stat stat_buf;
   GFileAttributeMatcher *matcher;
@@ -542,14 +548,15 @@ g_file_info_local_get_from_fd (int fd,
   
 #ifdef HAVE_SELINUX
   if (g_file_attribute_matcher_matches (matcher, "selinux", "selinux:context") &&
-      is_selinux_enabled ()) {
-    char *context;
-    if (fgetfilecon_raw (fd, &context) >= 0)
-      {
-	g_file_info_set_attribute (info, "selinux:context", context);
-	freecon(context);
-      }
-  }
+      is_selinux_enabled ())
+    {
+      char *context;
+      if (fgetfilecon_raw (fd, &context) >= 0)
+	{
+	  g_file_info_set_attribute (info, "selinux:context", context);
+	  freecon(context);
+	}
+    }
 #endif
 
   get_xattrs_from_fd (fd, info, matcher);

@@ -55,7 +55,7 @@ g_file_daemon_init (GFileDaemon *daemon_file)
 
 GFile *
 g_file_daemon_new (const char *filename,
-		 const char *mountpoint)
+		   const char *mountpoint)
 {
   GFileDaemon *daemon_file;
   int len;
@@ -139,13 +139,13 @@ g_file_daemon_copy (GFile *file)
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
 
   return g_file_daemon_new (daemon_file->filename,
-			  daemon_file->mountpoint);
+			    daemon_file->mountpoint);
 }
 
 
 static GFile *
 g_file_daemon_get_child (GFile *file,
-		       const char *name)
+			 const char *name)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
   char *filename;
@@ -161,9 +161,9 @@ g_file_daemon_get_child (GFile *file,
 
 static GFileEnumerator *
 g_file_daemon_enumerate_children (GFile      *file,
-				GFileInfoRequestFlags requested,
-				const char *attributes,
-				gboolean follow_symlinks)
+				  GFileInfoRequestFlags requested,
+				  const char *attributes,
+				  gboolean follow_symlinks)
 {
   /* TODO: implement */
   return NULL;
@@ -171,10 +171,10 @@ g_file_daemon_enumerate_children (GFile      *file,
 
 static GFileInfo *
 g_file_daemon_get_info (GFile                *file,
-		      GFileInfoRequestFlags requested,
-		      const char           *attributes,
-		      gboolean              follow_symlinks,
-		      GError              **error)
+			GFileInfoRequestFlags requested,
+			const char           *attributes,
+			gboolean              follow_symlinks,
+			GError              **error)
 {
   /* TODO: implement */
   return NULL;
@@ -207,8 +207,8 @@ g_file_daemon_create (GFile *file)
 
 static GFileOutputStream *
 g_file_daemon_replace (GFile *file,
-		     time_t mtime,
-		     gboolean  make_backup)
+		       time_t mtime,
+		       gboolean  make_backup)
 {
   /* TODO: implement */
   return NULL;
