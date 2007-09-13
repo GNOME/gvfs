@@ -525,7 +525,7 @@ g_file_copy (GFile                  *source,
 			     error);
 }
 
-/* May fail on directory source with NOT_SUPPORTED (i.e. if rename fails) */
+/* May fail on directory source with IS_DIRECTORY (i.e. if rename fails) */
 gboolean
 g_file_move (GFile                  *source,
 	     GFile                  *destination,
