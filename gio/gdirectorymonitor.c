@@ -48,10 +48,10 @@ g_directory_monitor_base_init (gpointer g_class)
   
   if (! initialized)
     {
-      g_signal_new (I_("change"),
+      g_signal_new (I_("changed"),
 		    G_TYPE_DIRECTORY_MONITOR,
 		    G_SIGNAL_RUN_LAST,
-		    G_STRUCT_OFFSET (GDirectoryMonitorIface, change),
+		    G_STRUCT_OFFSET (GDirectoryMonitorIface, changed),
 		    NULL, NULL,
 		    _gvfs_marshal_VOID__OBJECT_OBJECT_INT,
 		    G_TYPE_NONE,3,

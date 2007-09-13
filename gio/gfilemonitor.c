@@ -50,10 +50,10 @@ g_file_monitor_base_init (gpointer g_class)
   
   if (! initialized)
     {
-      g_signal_new (I_("change"),
+      g_signal_new (I_("changed"),
 		    G_TYPE_FILE_MONITOR,
 		    G_SIGNAL_RUN_LAST,
-		    G_STRUCT_OFFSET (GFileMonitorIface, change),
+		    G_STRUCT_OFFSET (GFileMonitorIface, changed),
 		    NULL, NULL,
 		    _gvfs_marshal_VOID__OBJECT_INT,
 		    G_TYPE_NONE,2,

@@ -163,11 +163,11 @@ static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))
 	{
 		GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "change", parent, child, eflags);
+		g_signal_emit_by_name (monitor, "changed", parent, child, eflags);
 	} else if (G_IS_FILE_MONITOR(sub->user_data))
 	{
 		GFileMonitor* monitor = G_FILE_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "change", child, eflags);
+		g_signal_emit_by_name (monitor, "changed", child, eflags);
 	}
 
 	g_object_unref (child);
@@ -205,11 +205,11 @@ static void ih_not_missing_callback (inotify_sub *sub)
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))
 	{
 		GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "change", parent, child, eflags);
+		g_signal_emit_by_name (monitor, "changed", parent, child, eflags);
 	} else if (G_IS_FILE_MONITOR(sub->user_data))
 	{
 		GFileMonitor* monitor = G_FILE_MONITOR(sub->user_data);
-		g_signal_emit_by_name (monitor, "change", child, eflags);
+		g_signal_emit_by_name (monitor, "changed", child, eflags);
 	}
 
 	g_object_unref (child);

@@ -66,7 +66,7 @@ main (int argc, char *argv[])
     {
       file = g_file_get_for_commandline_arg (argv[1]);
       fmonitor = g_file_monitor_file (file);
-      g_signal_connect (fmonitor, "change", (GCallback)file_monitor_callback, NULL);
+      g_signal_connect (fmonitor, "changed", (GCallback)file_monitor_callback, NULL);
     }
   
   main_loop = g_main_loop_new (NULL, FALSE);

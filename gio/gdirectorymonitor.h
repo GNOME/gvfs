@@ -27,10 +27,10 @@ struct _GDirectoryMonitorIface
   GTypeInterface g_iface;
   
   /* Signals */
-  void (* change) (GDirectoryMonitor* monitor,
-		   GFile* parent,
-		   GFile* child,
-		   GDirectoryMonitorEventFlags change_flags);
+  void (* changed) (GDirectoryMonitor* monitor,
+		    GFile* parent,
+		    GFile* child,
+		    GDirectoryMonitorEventFlags change_flags);
   
   /* Virtual Table */
   gboolean	(*cancel)(GDirectoryMonitor* monitor);

@@ -27,9 +27,9 @@ struct _GFileMonitorIface
   GTypeInterface g_iface;
   
   /* Signals */
-  void (* change) (GFileMonitor* monitor,
-		   GFile* file,
-		   GFileMonitorEventFlags change_flags);
+  void (* changed) (GFileMonitor* monitor,
+		    GFile* file,
+		    GFileMonitorEventFlags change_flags);
   
   /* Virtual Table */
   gboolean	(*cancel)(GFileMonitor* monitor);
