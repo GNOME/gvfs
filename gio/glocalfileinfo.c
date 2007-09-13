@@ -312,7 +312,7 @@ get_xattrs (const char *path,
   ssize_t list_res_size;
   size_t len;
   char *list;
-  const char *attr;
+  const char *attr, *attr2;
 
   if (user)
     all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
@@ -390,11 +390,11 @@ get_xattrs (const char *path,
 	  char *unescaped_attribute, *a;
 	  gboolean free_unescaped_attribute;
 
-	  attr = strchr (attr, ':');
-	  if (attr)
+	  attr2 = strchr (attr, ':');
+	  if (attr2)
 	    {
-	      attr++; /* Skip ':' */
-	      unescaped_attribute = hex_unescape_string (attr, NULL, &free_unescaped_attribute);
+	      attr2++; /* Skip ':' */
+	      unescaped_attribute = hex_unescape_string (attr2, NULL, &free_unescaped_attribute);
 	      if (user)
 		a = g_strconcat ("user.", unescaped_attribute, NULL);
 	      else
@@ -471,7 +471,7 @@ get_xattrs_from_fd (int fd,
   ssize_t list_res_size;
   size_t len;
   char *list;
-  const char *attr;
+  const char *attr, *attr2;
 
   if (user)
     all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
@@ -543,17 +543,17 @@ get_xattrs_from_fd (int fd,
 	  char *unescaped_attribute, *a;
 	  gboolean free_unescaped_attribute;
 
-	  attr = strchr (attr, ':');
-	  if (attr)
+	  attr2 = strchr (attr, ':');
+	  if (attr2)
 	    {
-	      attr++; /* Skip ':' */
-	      unescaped_attribute = hex_unescape_string (attr, NULL, &free_unescaped_attribute);
+	      attr2++; /* Skip ':' */
+	      unescaped_attribute = hex_unescape_string (attr2, NULL, &free_unescaped_attribute);
 	      if (user)
 		a = g_strconcat ("user.", unescaped_attribute, NULL);
 	      else
 		a = unescaped_attribute;
 	      
-	      get_one_xattr_from_fd (fd, info, attr,a);
+	      get_one_xattr_from_fd (fd, info, attr, a);
 
 	      if (user)
 		g_free (a);
