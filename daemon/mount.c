@@ -638,13 +638,10 @@ lookup_mount (DBusConnection *connection,
   dbus_message_iter_init (message, &iter);
   spec = g_mount_spec_from_dbus (&iter);
 
-  g_print ("lookup_mount %s\n", g_mount_spec_to_string (spec));
-  
   reply = NULL;
   if (spec != NULL)
     {
       mount = match_vfs_mount (spec);
-      g_print ("match_vfs_mount: %p\n", mount);
 
       if (mount == NULL)
 	reply = maybe_automount (spec, message, connection, do_automount);
@@ -702,8 +699,6 @@ list_mounts (DBusConnection *connection,
     {
       mount = l->data;
 
-      g_print ("mount: %p, name: %s, spec: %p\n", mount, mount->display_name, mount->mount_spec);
-      
       vfs_mount_to_dbus (mount, &array_iter);
     }
 
