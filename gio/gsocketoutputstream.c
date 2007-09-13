@@ -26,7 +26,7 @@ struct _GSocketOutputStreamPrivate {
 };
 
 static gssize   g_socket_output_stream_write        (GOutputStream              *stream,
-						     void                       *buffer,
+						     const void                 *buffer,
 						     gsize                       count,
 						     GCancellable               *cancellable,
 						     GError                    **error);
@@ -34,7 +34,7 @@ static gboolean g_socket_output_stream_close        (GOutputStream              
 						     GCancellable               *cancellable,
 						     GError                    **error);
 static void     g_socket_output_stream_write_async  (GOutputStream              *stream,
-						     void                       *buffer,
+						     const void                 *buffer,
 						     gsize                       count,
 						     int                         io_priority,
 						     GCancellable               *cancellable,
@@ -106,7 +106,7 @@ g_socket_output_stream_new (int fd,
 
 static gssize
 g_socket_output_stream_write (GOutputStream *stream,
-			      void          *buffer,
+			      const void    *buffer,
 			      gsize          count,
 			      GCancellable  *cancellable,
 			      GError       **error)
@@ -202,7 +202,7 @@ g_socket_output_stream_close (GOutputStream *stream,
 
 typedef struct {
   gsize count;
-  void *buffer;
+  const void *buffer;
   GAsyncReadyCallback callback;
   gpointer user_data;
   GCancellable *cancellable;
@@ -266,7 +266,7 @@ write_async_cb (WriteAsyncData *data,
 
 static void
 g_socket_output_stream_write_async (GOutputStream      *stream,
-				    void               *buffer,
+				    const void         *buffer,
 				    gsize               count,
 				    int                 io_priority,
 				    GCancellable       *cancellable,

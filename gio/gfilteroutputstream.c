@@ -26,7 +26,7 @@ static void     g_filter_output_stream_dispose      (GObject *object);
 
 
 static gssize   g_filter_output_stream_write        (GOutputStream *stream,
-                                                     void          *buffer,
+                                                     const void    *buffer,
                                                      gsize          count,
                                                      GCancellable  *cancellable,
                                                      GError       **error);
@@ -37,7 +37,7 @@ static gboolean g_filter_output_stream_close        (GOutputStream  *stream,
                                                      GCancellable   *cancellable,
                                                      GError        **error);
 static void     g_filter_output_stream_write_async  (GOutputStream        *stream,
-                                                     void                 *buffer,
+                                                     const void           *buffer,
                                                      gsize                 count,
                                                      int                   io_priority,
                                                      GCancellable         *cancellable,
@@ -180,7 +180,7 @@ g_filter_output_stream_get_base_stream (GFilterOutputStream *stream)
 
 static gssize
 g_filter_output_stream_write (GOutputStream *stream,
-                              void          *buffer,
+                              const void *buffer,
                               gsize          count,
                               GCancellable  *cancellable,
                               GError       **error)
@@ -235,7 +235,7 @@ g_filter_output_stream_close (GOutputStream  *stream,
 
 static void
 g_filter_output_stream_write_async (GOutputStream        *stream,
-                                    void                 *buffer,
+                                    const void           *buffer,
                                     gsize                 count,
                                     int                   io_priority,
                                     GCancellable         *cancellable,

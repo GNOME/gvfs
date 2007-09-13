@@ -41,7 +41,7 @@ typedef struct {
   WriteState state;
 
   /* Output */
-  char *buffer;
+  const char *buffer;
   gsize buffer_size;
   gsize buffer_pos;
   
@@ -128,7 +128,7 @@ struct _GDaemonFileOutputStream {
 };
 
 static gssize     g_daemon_file_output_stream_write         (GOutputStream              *stream,
-							     void                       *buffer,
+							     const void                 *buffer,
 							     gsize                       count,
 							     GCancellable               *cancellable,
 							     GError                    **error);
@@ -147,7 +147,7 @@ static gboolean   g_daemon_file_output_stream_seek          (GFileOutputStream  
 							     GCancellable               *cancellable,
 							     GError                    **error);
 static void       g_daemon_file_output_stream_write_async   (GOutputStream              *stream,
-							     void                       *buffer,
+							     const void                 *buffer,
 							     gsize                       count,
 							     int                         io_priority,
 							     GCancellable               *cancellable,
@@ -454,7 +454,7 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	  
 	  if (op->buffer_pos < op->buffer_size)
 	    {
-	      io_op->io_buffer = op->buffer + op->buffer_pos;
+	      io_op->io_buffer = (char *)(op->buffer + op->buffer_pos);
 	      io_op->io_size = op->buffer_size - op->buffer_pos;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
@@ -540,7 +540,7 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 
 static gssize
 g_daemon_file_output_stream_write (GOutputStream *stream,
-				   void         *buffer,
+				   const void   *buffer,
 				   gsize         count,
 				   GCancellable *cancellable,
 				   GError      **error)
@@ -1202,7 +1202,7 @@ async_write_done (GOutputStream *stream,
 
 static void
 g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
-					  void               *buffer,
+					  const void         *buffer,
 					  gsize               count,
 					  int                 io_priority,
 					  GCancellable       *cancellable,

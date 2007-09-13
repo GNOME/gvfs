@@ -14,7 +14,7 @@ struct _GOutputStreamPrivate {
 };
 
 static void     g_output_stream_real_write_async  (GOutputStream        *stream,
-						   void                 *buffer,
+						   const void           *buffer,
 						   gsize                 count,
 						   int                   io_priority,
 						   GCancellable         *cancellable,
@@ -123,7 +123,7 @@ g_output_stream_init (GOutputStream *stream)
  **/
 gssize
 g_output_stream_write (GOutputStream *stream,
-		       void          *buffer,
+		       const void    *buffer,
 		       gsize          count,
 		       GCancellable  *cancellable,
 		       GError       **error)
@@ -207,7 +207,7 @@ g_output_stream_write (GOutputStream *stream,
  **/
 gboolean
 g_output_stream_write_all (GOutputStream *stream,
-			   void          *buffer,
+			   const void    *buffer,
 			   gsize          count,
 			   gsize         *bytes_written,
 			   GCancellable  *cancellable,
@@ -447,8 +447,8 @@ async_ready_close_callback_wrapper (GObject *source_object,
  * override one you must override all.
  **/
 void
-g_output_stream_write_async (GOutputStream        *stream,
-			     void                *buffer,
+g_output_stream_write_async (GOutputStream       *stream,
+			     const void          *buffer,
 			     gsize                count,
 			     int                  io_priority,
 			     GCancellable        *cancellable,
@@ -728,7 +728,7 @@ g_output_stream_set_pending (GOutputStream              *stream,
  ********************************************/
 
 typedef struct {
-  void               *buffer;
+  const void         *buffer;
   gsize               count_requested;
   gssize              count_written;
 } WriteData;
@@ -755,7 +755,7 @@ write_async_thread (GSimpleAsyncResult *res,
 
 static void
 g_output_stream_real_write_async (GOutputStream       *stream,
-				  void                *buffer,
+				  const void          *buffer,
 				  gsize                count,
 				  int                  io_priority,
 				  GCancellable        *cancellable,

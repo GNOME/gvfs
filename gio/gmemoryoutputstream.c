@@ -38,7 +38,7 @@ static void     g_memory_output_stream_get_property (GObject    *object,
                                                      GParamSpec *pspec);
 
 static gssize   g_memory_output_stream_write       (GOutputStream *stream,
-                                                    void          *buffer,
+                                                    const void    *buffer,
                                                     gsize          count,
                                                     GCancellable  *cancellable,
                                                     GError       **error);
@@ -48,7 +48,7 @@ static gboolean g_memory_output_stream_close       (GOutputStream  *stream,
                                                     GError        **error);
 
 static void     g_memory_output_stream_write_async  (GOutputStream        *stream,
-                                                     void                 *buffer,
+                                                     const void           *buffer,
                                                      gsize                 count,
                                                      int                   io_priority,
                                                      GCancellable         *cancellable,
@@ -354,7 +354,7 @@ array_resize (GMemoryOutputStream  *stream,
 
 static gssize
 g_memory_output_stream_write (GOutputStream *stream,
-                              void          *buffer,
+                              const void    *buffer,
                               gsize          count,
                               GCancellable  *cancellable,
                               GError       **error)
@@ -424,7 +424,7 @@ g_memory_output_stream_close (GOutputStream  *stream,
 
 static void
 g_memory_output_stream_write_async  (GOutputStream        *stream,
-                                     void                 *buffer,
+                                     const void           *buffer,
                                      gsize                 count,
                                      int                   io_priority,
                                      GCancellable         *cancellable,

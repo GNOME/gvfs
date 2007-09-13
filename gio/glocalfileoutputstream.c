@@ -30,7 +30,7 @@ struct _GLocalFileOutputStreamPrivate {
 };
 
 static gssize     g_local_file_output_stream_write         (GOutputStream          *stream,
-							    void                   *buffer,
+							    const void             *buffer,
 							    gsize                   count,
 							    GCancellable           *cancellable,
 							    GError                **error);
@@ -84,7 +84,7 @@ g_local_file_output_stream_init (GLocalFileOutputStream *stream)
 
 static gssize
 g_local_file_output_stream_write (GOutputStream *stream,
-				  void         *buffer,
+				  const void   *buffer,
 				  gsize         count,
 				  GCancellable *cancellable,
 				  GError      **error)

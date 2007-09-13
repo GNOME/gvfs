@@ -36,7 +36,7 @@ static void     g_buffered_output_stream_finalize     (GObject *object);
 
 
 static gssize   g_buffered_output_stream_write        (GOutputStream *stream,
-                                                       void          *buffer,
+                                                       const void    *buffer,
                                                        gsize          count,
                                                        GCancellable  *cancellable,
                                                        GError       **error);
@@ -48,7 +48,7 @@ static gboolean g_buffered_output_stream_close        (GOutputStream  *stream,
                                                        GError        **error);
 
 static void     g_buffered_output_stream_write_async  (GOutputStream        *stream,
-                                                       void                 *buffer,
+                                                       const void           *buffer,
                                                        gsize                 count,
                                                        int                   io_priority,
                                                        GCancellable         *cancellable,
@@ -262,7 +262,7 @@ flush_buffer (GBufferedOutputStream  *stream,
 
 static gssize
 g_buffered_output_stream_write  (GOutputStream *stream,
-                                 void          *buffer,
+                                 const void    *buffer,
                                  gsize          count,
                                  GCancellable  *cancellable,
                                  GError       **error)
@@ -434,7 +434,7 @@ typedef struct {
   FlushData fdata;
 
   gsize  count;
-  void  *buffer;
+  const void  *buffer;
 
 } WriteData;
 
@@ -446,7 +446,7 @@ free_write_data (gpointer data)
 
 static void
 g_buffered_output_stream_write_async (GOutputStream        *stream,
-                                      void                 *buffer,
+                                      const void           *buffer,
                                       gsize                 count,
                                       int                   io_priority,
                                       GCancellable         *cancellable,

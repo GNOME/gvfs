@@ -36,7 +36,7 @@ struct _GOutputStreamClass
   /* Sync ops: */
   
   gssize      (* write)  (GOutputStream *stream,
-			  void *buffer,
+			  const void *buffer,
 			  gsize count,
 			  GCancellable *cancellable,
 			  GError **error);
@@ -50,7 +50,7 @@ struct _GOutputStreamClass
   /* Async ops: (optional in derived classes) */
 
   void     (* write_async)  (GOutputStream       *stream,
-			     void                *buffer,
+			     const void          *buffer,
 			     gsize                count,
 			     int                  io_priority,
 			     GCancellable        *cancellable,
@@ -87,12 +87,12 @@ struct _GOutputStreamClass
 GType g_output_stream_get_type (void) G_GNUC_CONST;
   
 gssize   g_output_stream_write        (GOutputStream        *stream,
-				       void                 *buffer,
+				       const void           *buffer,
 				       gsize                 count,
 				       GCancellable         *cancellable,
 				       GError              **error);
 gboolean g_output_stream_write_all    (GOutputStream        *stream,
-				       void                 *buffer,
+				       const void           *buffer,
 				       gsize                 count,
 				       gsize                *bytes_written,
 				       GCancellable         *cancellable,
@@ -104,7 +104,7 @@ gboolean g_output_stream_close        (GOutputStream        *stream,
 				       GCancellable         *cancellable,
 				       GError              **error);
 void     g_output_stream_write_async  (GOutputStream        *stream,
-				       void                 *buffer,
+				       const void           *buffer,
 				       gsize                 count,
 				       int                   io_priority,
 				       GCancellable         *cancellable,
