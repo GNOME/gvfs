@@ -187,10 +187,8 @@ g_file_enumerator_get_async_context (GFileEnumerator *enumerator)
  * Any outstanding i/o request with higher priority (lower numerical value) will
  * be executed before an outstanding request with lower priority. Default
  * priority is %G_PRIORITY_DEFAULT.
- * 
- * Return value: A tag that can be passed to g_file_enumerator_cancel()
  **/
-guint
+void
 g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
 				    int                     num_files,
 				    int                     io_priority,
@@ -200,13 +198,13 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
 {
   GFileEnumeratorClass *class;
 
-  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), 0);
-  g_return_val_if_fail (enumerator != NULL, 0);
+  g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
+  g_return_if_fail (enumerator != NULL);
   
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
   
-  return (* class->next_files_async) (enumerator, num_files, io_priority, 
-				      callback, data, notify);
+  (* class->next_files_async) (enumerator, num_files, io_priority, 
+			       callback, data, notify);
 }
 
 /**
@@ -220,13 +218,12 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
  *
  * Generally if a request is cancelled before its callback has been
  * called the cancellation will succeed and the callback will only
- * be called with %G_VFS_ERROR_CANCELLED. However, if multiple threads
- * are in use this cannot be guaranteed, and the cancel will not result
- * in a %G_VFS_ERROR_CANCELLED callback.
+ * be called with %G_VFS_ERROR_CANCELLED. However, this cannot be guaranteed,
+ * especially if multiple threads are in use, so you might get a succeeding
+ * callback and no %G_VFS_ERROR_CANCELLED callback even if you call cancel.
  **/
 void
-g_file_enumerator_cancel (GFileEnumerator  *enumerator,
-			  guint             tag)
+g_file_enumerator_cancel (GFileEnumerator  *enumerator)
 {
   GFileEnumeratorClass *class;
 
@@ -235,5 +232,5 @@ g_file_enumerator_cancel (GFileEnumerator  *enumerator,
   
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
   
-  (* class->cancel) (enumerator, tag);
+  (* class->cancel) (enumerator);
 }

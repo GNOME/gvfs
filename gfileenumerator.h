@@ -59,14 +59,13 @@ struct _GFileEnumeratorClass
 				  GError               **error);
   void       (*stop)             (GFileEnumerator        *enumerator);
 
-  guint      (*next_files_async) (GFileEnumerator        *enumerator,
+  void       (*next_files_async) (GFileEnumerator        *enumerator,
 				  int                     num_files,
 				  int                     io_priority,
 				  GAsyncNextFilesCallback callback,
 				  gpointer                data,
 				  GDestroyNotify          notify);
-  void       (*cancel)           (GFileEnumerator        *enumerator,
-				  guint                   tag);
+  void       (*cancel)           (GFileEnumerator        *enumerator);
 };
 
 
@@ -78,14 +77,13 @@ void          g_file_enumerator_stop               (GFileEnumerator          *en
 void          g_file_enumerator_set_async_context  (GFileEnumerator          *enumerator,
 						    GMainContext             *context);
 GMainContext *g_file_enumerator_get_async_context  (GFileEnumerator          *enumerator);
-guint         g_file_enumerator_request_next_files (GFileEnumerator          *enumerator,
+void          g_file_enumerator_request_next_files (GFileEnumerator          *enumerator,
 						    int                       num_files,
 						    int                       io_priority,
 						    GAsyncNextFilesCallback   callback,
 						    gpointer                  data,
 						    GDestroyNotify            notify);
-void          g_file_enumerator_cancel             (GFileEnumerator          *enumerator,
-						    guint                     tag);
+void          g_file_enumerator_cancel             (GFileEnumerator          *enumerator);
 
 G_END_DECLS
 
