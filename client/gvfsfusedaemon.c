@@ -849,6 +849,92 @@ vfs_readlink (const gchar *path, gchar *target, size_t size)
 }
 
 static gint
+setup_input_stream (GFile *file, FileHandle *fh)
+{
+  GError *error  = NULL;
+  gint    result = 0;
+
+  if (fh->stream)
+    {
+      debug_print ("setup_input_stream: have stream\n");
+
+      if (fh->op == FILE_OP_READ)
+        {
+          debug_print ("setup_input_stream: doing read\n");
+        }
+      else
+        {
+          debug_print ("setup_input_stream: doing write\n");
+
+          g_output_stream_close (fh->stream, NULL, NULL);
+          g_object_unref (fh->stream);
+          fh->stream = NULL;
+        }
+    }
+
+  if (!fh->stream)
+    {
+      debug_print ("setup_input_stream: no stream\n");
+      fh->stream = g_file_read (file, NULL, &error);
+      fh->pos = 0;
+    }
+
+  if (fh->stream)
+    fh->op = FILE_OP_READ;
+  else
+    fh->op = FILE_OP_NONE;
+
+  if (error)
+    {
+      debug_print ("setup_input_stream: error\n");
+      result = -errno_from_error (error);
+      g_error_free (error);
+    }
+
+  return result;
+}
+
+static gint
+setup_output_stream (GFile *file, FileHandle *fh)
+{
+  GError *error  = NULL;
+  gint    result = 0;
+
+  if (fh->stream)
+    {
+      if (fh->op == FILE_OP_WRITE)
+        {
+        }
+      else
+        {
+          g_input_stream_close (fh->stream, NULL, NULL);
+          g_object_unref (fh->stream);
+          fh->stream = NULL;
+        }
+    }
+
+  if (!fh->stream)
+    {
+      fh->stream = g_file_append_to (file, NULL, &error);
+      if (fh->stream)
+        fh->pos = g_seekable_tell (G_SEEKABLE (fh->stream));
+    }
+
+  if (fh->stream)
+    fh->op = FILE_OP_WRITE;
+  else
+    fh->op = FILE_OP_NONE;
+
+  if (error)
+    {
+      result = -errno_from_error (error);
+      g_error_free (error);
+    }
+
+  return result;
+}
+
+static gint
 vfs_open (const gchar *path, struct fuse_file_info *fi)
 {
   GFile *file;
@@ -871,12 +957,19 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
             {
               FileHandle *fh = file_handle_new ();
               
-              /* Success */
+              /* File exists */
 
               SET_FILE_HANDLE (fi, fh);
               fh->op = FILE_OP_NONE;
 
-              /* TODO: Cache the GFile for performance? */
+              debug_print ("vfs_open: flags=%o\n", fi->flags);
+
+              /* Set up a stream here, so we can check for errors */
+
+              if (fi->flags & O_WRONLY)
+                result = setup_output_stream (file, fh);
+              else
+                result = setup_input_stream (file, fh);
             }
           else if (file_type == G_FILE_TYPE_DIRECTORY)
             {
@@ -988,88 +1081,6 @@ vfs_release (const gchar *path, struct fuse_file_info *fi)
 }
 
 static gint
-setup_input_stream (GFile *file, FileHandle *fh)
-{
-  GError *error  = NULL;
-  gint    result = 0;
-
-  if (fh->stream)
-    {
-      debug_print ("setup_input_stream: have stream\n");
-
-      if (fh->op == FILE_OP_READ)
-        {
-          debug_print ("setup_input_stream: doing read\n");
-        }
-      else
-        {
-          debug_print ("setup_input_stream: doing write\n");
-
-          g_output_stream_close (fh->stream, NULL, NULL);
-          g_object_unref (fh->stream);
-          fh->stream = NULL;
-        }
-    }
-
-  if (!fh->stream)
-    {
-      debug_print ("setup_input_stream: no stream\n");
-      fh->stream = g_file_read (file, NULL, &error);
-      fh->pos = 0;
-    }
-
-  fh->op = FILE_OP_READ;
-
-  if (error)
-    {
-      debug_print ("setup_input_stream: error\n");
-      result = -errno_from_error (error);
-      g_error_free (error);
-    }
-
-  return result;
-}
-
-static gint
-setup_output_stream (GFile *file, FileHandle *fh)
-{
-  GError *error  = NULL;
-  gint    result = 0;
-
-  if (fh->stream)
-    {
-      if (fh->op == FILE_OP_WRITE)
-        {
-        }
-      else
-        {
-          g_input_stream_close (fh->stream, NULL, NULL);
-          g_object_unref (fh->stream);
-          fh->stream = NULL;
-        }
-    }
-
-  if (!fh->stream)
-    {
-      return -EIO;
-#if 0
-      fh->stream = g_file_read (file, NULL, &error);
-      fh->pos = 0;
-#endif
-    }
-
-  fh->op = FILE_OP_WRITE;
-
-  if (error)
-    {
-      result = -errno_from_error (error);
-      g_error_free (error);
-    }
-
-  return result;
-}
-
-static gint
 read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t offset)
 {
   GInputStream *input_stream;
@@ -1082,7 +1093,7 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
 
   if (offset != fh->pos)
     {
-      if (G_IS_SEEKABLE (input_stream))
+      if (g_seekable_can_seek (G_SEEKABLE (input_stream)))
         {
           /* Can seek */
 
@@ -1124,11 +1135,11 @@ read_stream (FileHandle *fh, gchar *output_buf, size_t output_buf_size, off_t of
         }
       else
         {
-          /* Can't seek, can't skip */
+          /* Can't seek, can't skip backwards */
 
           debug_print ("read_stream: can't seek nor skip to offset %d!\n", offset);
 
-          result = -EIO;  /* TODO: Better error code? */
+          result = -ENOTSUP;
         }
     }
 
@@ -1219,7 +1230,7 @@ write_stream (FileHandle *fh, const gchar *input_buf, size_t input_buf_size, off
 
   if (offset != fh->pos)
     {
-      if (G_IS_SEEKABLE (output_stream))
+      if (g_seekable_can_seek (G_SEEKABLE (output_stream)))
         {
           /* Can seek */
 
@@ -1610,13 +1621,103 @@ vfs_rmdir (const gchar *path)
 }
 
 static gint
+vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
+{
+  GFile  *file;
+  GError *error  = NULL;
+  gint    result = 0;
+
+  file = file_from_full_path (path);
+
+  if (file)
+    {
+      FileHandle *fh = GET_FILE_HANDLE (fi);
+
+      g_mutex_lock (fh->mutex);
+
+      result = setup_output_stream (file, fh);
+
+      if (result == 0)
+        {
+          if (g_seekable_can_truncate (G_SEEKABLE (fh->stream)))
+            {
+              g_seekable_truncate (fh->stream, size, NULL, &error);
+            }
+          else if (size == 0)
+            {
+              g_output_stream_close (fh->stream, NULL, NULL);
+              g_object_unref (fh->stream);
+              fh->stream = NULL;
+
+              fh->stream = g_file_replace (file, 0, FALSE, NULL, &error);
+            }
+          else
+            {
+              result = -ENOTSUP;
+            }
+
+          if (error)
+            {
+              result = -errno_from_error (error);
+              g_error_free (error);
+            }
+        }
+
+      g_object_unref (file);
+      g_mutex_unlock (fh->mutex);
+    }
+  else
+    {
+      result = -ENOENT;
+    }
+
+  return -EIO;
+}
+
+static gint
 vfs_truncate (const gchar *path, off_t size)
 {
   GFile  *file;
   GError *error  = NULL;
   gint    result = 0;
 
-  return -EIO;
+  file = file_from_full_path (path);
+
+  if (file)
+    {
+      GFileOutputStream *file_output_stream = NULL;
+
+      if (size == 0)
+        {
+          file_output_stream = g_file_replace (file, 0, FALSE, NULL, &error);
+        }
+      else
+        {
+          file_output_stream = g_file_append_to (file, NULL, &error);
+          if (file_output_stream)
+              g_seekable_truncate (G_SEEKABLE (file_output_stream), size, NULL, &error);
+        }
+
+      if (error)
+        {
+          result = -errno_from_error (error);
+          g_error_free (error);
+        }
+
+      if (file_output_stream)
+        {
+          g_output_stream_close (G_OUTPUT_STREAM (file_output_stream), NULL, NULL);
+          g_object_unref (file_output_stream);
+        }
+
+      g_object_unref (file);
+    }
+  else
+    {
+      result = -ENOENT;
+    }
+
+  return result;
 }
 
 static void
@@ -1727,6 +1828,7 @@ static struct fuse_operations vfs_oper =
   .unlink      = vfs_unlink,
   .mkdir       = vfs_mkdir,
   .rmdir       = vfs_rmdir,
+  .ftruncate   = vfs_ftruncate,
   .truncate    = vfs_truncate,
 
 #if 0
