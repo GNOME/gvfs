@@ -1557,6 +1557,68 @@ vfs_mkdir (const gchar *path, mode_t mode)
   return result;
 }
 
+static gint
+vfs_rmdir (const gchar *path)
+{
+  GFile  *file;
+  GError *error = NULL;
+  gint   result = 0;
+
+  file = file_from_full_path (path);
+
+  if (file)
+    {
+      GFileInfo *file_info;
+
+      file_info = g_file_get_info (file, "*", 0, NULL, &error);
+      if (file_info)
+        {
+          if (g_file_info_get_file_type (file_info) == G_FILE_TYPE_DIRECTORY)
+            {
+              g_file_delete (file, NULL, &error);
+
+              if (error)
+                {
+                  result = -errno_from_error (error);
+                  g_error_free (error);
+                }
+            }
+          else
+            {
+              result = -ENOTDIR;
+            }
+        }
+      else
+        {
+          if (error)
+            {
+              result = -errno_from_error (error);
+              g_error_free (error);
+            }
+          else
+            {
+              result = -ENOENT;
+            }
+        }
+    }
+  else
+    {
+      result = -ENOENT;
+    }
+
+  return result;
+}
+
+static gint
+vfs_truncate (const gchar *path, off_t size)
+{
+  GFile  *file;
+  GError *error  = NULL;
+  gint    result = 0;
+
+  return -EIO;
+}
+
 static void
 mount_tracker_mounted_cb (GMountTracker *tracer, GMountInfo *mount_info)
 {
@@ -1664,14 +1726,14 @@ static struct fuse_operations vfs_oper =
   .rename      = vfs_rename,
   .unlink      = vfs_unlink,
   .mkdir       = vfs_mkdir,
+  .rmdir       = vfs_rmdir,
+  .truncate    = vfs_truncate,
 
 #if 0
   .mknod       = vfs_mknod,
-  .rmdir       = vfs_rmdir,
   .symlink     = vfs_symlink,
   .chmod       = vfs_chmod,
   .chown       = vfs_chown,
-  .truncate    = vfs_truncate,
   .utime       = vfs_utime,
   .fsync       = vfs_fsync,
   .setxattr    = vfs_setxattr,
