@@ -226,11 +226,11 @@ struct _GVfsBackendClass
 				 GVfsJobMakeDirectory *job,
 				 const char *filename);
   void     (*make_symlink)      (GVfsBackend *backend,
-				 GVfsJobMakeSymlink *make_directory,
+				 GVfsJobMakeSymlink *make_symlink,
 				 const char *filename,
 				 const char *symlink_value);
   gboolean (*try_make_symlink)  (GVfsBackend *backend,
-				 GVfsJobMakeSymlink *make_directory,
+				 GVfsJobMakeSymlink *make_symlink,
 				 const char *filename,
 				 const char *symlink_value);
   void     (*copy)              (GVfsBackend *backend,
