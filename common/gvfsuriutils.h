@@ -15,6 +15,8 @@ typedef struct {
   char *fragment;
 } GDecodedUri;
 
+char *       g_uri_get_scheme            (const char *uri);
+
 char *       g_uri_unescape_string       (const gchar *escaped_string,
 					  const gchar *escaped_string_end,
 					  const gchar *illegal_characters);

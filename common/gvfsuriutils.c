@@ -91,6 +91,42 @@ g_decoded_uri_new (void)
   return uri;
 }
 
+char *
+g_uri_get_scheme (const char *uri)
+{
+  const char *p;
+  char c;
+
+  /* From RFC 3986 Decodes:
+   * URI         = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+   */ 
+
+  p = uri;
+  
+  /* Decode scheme:
+     scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+  */
+
+  if (!g_ascii_isalpha (*p))
+    return NULL;
+
+  while (1)
+    {
+      c = *p++;
+
+      if (c == ':')
+	break;
+      
+      if (!(g_ascii_isalnum(c) ||
+	    c == '+' ||
+	    c == '-' ||
+	    c == '.'))
+	return NULL;
+    }
+
+  return g_strndup (uri, p - uri - 1);
+}
+
 GDecodedUri *
 g_decode_uri (const char *uri)
 {
