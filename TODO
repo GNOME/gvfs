@@ -71,8 +71,6 @@ Returns type and is_writable for all attributes supportable
 						      
 Set gvfs:backend attribute in get_filesystem_info() call
 
-verify g_file_move() errors on dir and/or files, both fallback version and file: + smb: implementations
-
 FUTURE IDEAS:
 -------------
 
