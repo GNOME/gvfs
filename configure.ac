@@ -1,4 +1,4 @@
-AC_INIT(gvfs/gfile.h)
+AC_INIT(gio/gfile.h)
 
 AM_INIT_AUTOMAKE(gvfs, 0.0.1)
 AM_CONFIG_HEADER(config.h)
@@ -26,7 +26,7 @@ GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES(GLIB, glib-2.0 gthread-2.0 gobject-2.0)
+PKG_CHECK_MODULES(GLIB, glib-2.0 gthread-2.0 gobject-2.0 gmodule-no-export-2.0)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
@@ -154,7 +154,8 @@ fi
 			       
 AC_OUTPUT([
 Makefile
-gvfs/Makefile
+gio/Makefile
+client/Makefile
 daemon/Makefile
 programs/Makefile
 po/Makefile.in

@@ -8,10 +8,10 @@
 #include <string.h>
 
 #include <glib/gstdio.h>
-#include <gvfs/gvfserror.h>
 #include <glib/gi18n.h>
-#include <gvfs/gfile.h>
-#include <gvfs/gfilelocal.h>
+#include <gio/gvfserror.h>
+#include <gio/gfile.h>
+#include <gio/gfilelocal.h>
 
 #include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"

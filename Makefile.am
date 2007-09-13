@@ -1,5 +1,6 @@
 SUBDIRS = \
-	gvfs \
+	gio \
+	client \
 	daemon \
 	po   \
 	programs

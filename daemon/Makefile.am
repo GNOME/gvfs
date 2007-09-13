@@ -10,7 +10,7 @@ INCLUDES =					\
 noinst_LTLIBRARIES=libdaemon.la
 
 libraries =						\
-	$(top_builddir)/gvfs/libgvfs.la			\
+	$(top_builddir)/gio/libgio.la			\
 	libdaemon.la					\
 	$(GLIB_LIBS) $(DBUS_LIBS)
 

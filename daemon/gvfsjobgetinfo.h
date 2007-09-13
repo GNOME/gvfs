@@ -1,10 +1,10 @@
 #ifndef __G_VFS_JOB_GET_INFO_H__
 #define __G_VFS_JOB_GET_INFO_H__
 
+#include <gio/gfileinfo.h>
 #include <gvfsjob.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
-#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 

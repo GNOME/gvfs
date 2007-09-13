@@ -1,11 +1,11 @@
 #ifndef __G_VFS_BACKEND_H__
 #define __G_VFS_BACKEND_H__
 
-#include <gvfs/gvfstypes.h>
+#include <dbus/dbus.h>
+#include <gio/gvfstypes.h>
+#include <gio/gfileinfo.h>
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
-#include <dbus/dbus.h>
-#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 

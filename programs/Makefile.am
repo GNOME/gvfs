@@ -7,7 +7,7 @@ INCLUDES =					\
 	-DG_DISABLE_DEPRECATED
 
 libraries =						\
-	$(top_builddir)/gvfs/libgvfs.la			\
+	$(top_builddir)/gio/libgio.la			\
 	$(GLIB_LIBS)
 
 bin_PROGRAMS =					\

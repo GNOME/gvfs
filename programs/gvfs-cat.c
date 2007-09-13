@@ -6,7 +6,7 @@
 #include <errno.h>
 
 #include <glib.h>
-#include <gvfs/gfile.h>
+#include <gio/gfile.h>
 
 static GOptionEntry entries[] = 
 {

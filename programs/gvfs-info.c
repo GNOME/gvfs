@@ -2,7 +2,7 @@
 
 #include <glib.h>
 #include <locale.h>
-#include <gvfs/gfile.h>
+#include <gio/gfile.h>
 
 static char *attributes = NULL;
 static gboolean follow_symlinks = FALSE;

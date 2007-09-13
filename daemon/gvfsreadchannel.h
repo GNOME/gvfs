@@ -2,9 +2,9 @@
 #define __G_VFS_READ_CHANNEL_H__
 
 #include <glib-object.h>
+#include <gio/gvfstypes.h>
 #include <gvfsjob.h>
 #include <gvfsbackend.h>
-#include <gvfs/gvfstypes.h>
 
 G_BEGIN_DECLS
 
