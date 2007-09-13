@@ -143,7 +143,6 @@ g_file_get_basename (GFile *file)
   return (* iface->get_basename) (file);
 }
 
-
 char *
 g_file_get_path (GFile *file)
 {
@@ -265,6 +264,14 @@ g_file_enumerate_children (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->enumerate_children == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+
   return (* iface->enumerate_children) (file, attributes, flags,
 					cancellable, error);
 }
@@ -283,6 +290,14 @@ g_file_get_info (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->get_info == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
   return (* iface->get_info) (file, attributes, flags, cancellable, error);
 }
 
@@ -338,6 +353,14 @@ g_file_get_filesystem_info (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->get_filesystem_info == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
   return (* iface->get_filesystem_info) (file, attributes, cancellable, error);
 }
 
@@ -354,6 +377,14 @@ g_file_read (GFile *file,
 
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->read == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
   return (* iface->read) (file, cancellable, error);
 }
 
@@ -369,6 +400,14 @@ g_file_append_to (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->append_to == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
   return (* iface->append_to) (file, cancellable, error);
 }
 
@@ -384,6 +423,14 @@ g_file_create (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->create == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
   return (* iface->create) (file, cancellable, error);
 }
 
@@ -401,6 +448,15 @@ g_file_replace (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->replace == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
+  
   /* Handle empty tag string as NULL in consistent way. */
   if (etag && *etag == 0)
     etag = NULL;
@@ -1058,6 +1114,14 @@ g_file_make_directory (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->make_directory == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return FALSE;
+    }
+  
   return (* iface->make_directory) (file, cancellable, error);
 }
 
@@ -1074,6 +1138,14 @@ g_file_make_symbolic_link (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->make_symbolic_link == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return FALSE;
+    }
+  
   return (* iface->make_symbolic_link) (file, symlink_value, cancellable, error);
 }
 
@@ -1089,6 +1161,14 @@ g_file_delete (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
+  if (iface->delete_file == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return FALSE;
+    }
+  
   return (* iface->delete_file) (file, cancellable, error);
 }
 
@@ -1229,6 +1309,14 @@ g_file_set_attribute (GFile                  *file,
     return FALSE;
   
   iface = G_FILE_GET_IFACE (file);
+
+  if (iface->set_attribute == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return FALSE;
+    }
 
   return (* iface->set_attribute) (file, attribute, value, flags, cancellable, error);
 }
@@ -1392,6 +1480,17 @@ g_file_mount_mountable (GFile                  *file,
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
+
+  if (iface->mount_mountable == NULL)
+    {
+      g_simple_async_report_error_in_idle (G_OBJECT (file),
+					   callback,
+					   user_data,
+					   G_IO_ERROR,
+					   G_IO_ERROR_NOT_SUPPORTED,
+					   _("Operation not supported"));
+    }
+  
   (* iface->mount_mountable) (file,
 			      mount_operation,
 			      cancellable,
@@ -1427,6 +1526,17 @@ g_file_unmount_mountable (GFile                  *file,
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
+  
+  if (iface->unmount_mountable == NULL)
+    {
+      g_simple_async_report_error_in_idle (G_OBJECT (file),
+					   callback,
+					   user_data,
+					   G_IO_ERROR,
+					   G_IO_ERROR_NOT_SUPPORTED,
+					   _("Operation not supported"));
+    }
+  
   (* iface->unmount_mountable) (file,
 				cancellable,
 				callback,
@@ -1460,6 +1570,17 @@ g_file_eject_mountable (GFile                  *file,
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
+  
+  if (iface->eject_mountable == NULL)
+    {
+      g_simple_async_report_error_in_idle (G_OBJECT (file),
+					   callback,
+					   user_data,
+					   G_IO_ERROR,
+					   G_IO_ERROR_NOT_SUPPORTED,
+					   _("Operation not supported"));
+    }
+  
   (* iface->eject_mountable) (file,
 			      cancellable,
 			      callback,
@@ -1491,6 +1612,9 @@ g_file_monitor_directory (GFile *file,
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
+
+  if (iface->monitor_dir == NULL)
+    return NULL;
 
   return (* iface->monitor_dir) (file, flags);
 }
