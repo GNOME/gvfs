@@ -31,6 +31,9 @@ g_vfs_backend_smb_finalize (GObject *object)
   GVfsBackendSmb *backend;
 
   backend = G_VFS_BACKEND_SMB (object);
+
+  g_free (backend->share);
+  g_free (backend->server);
   
   if (G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize) (object);
@@ -88,14 +91,14 @@ add_cached_server (SMBCCTX *context, SMBCSRV *new,
 		   const char *domain, const char *username)
 {
   g_print ("add_cached_server\n");
-  if (smb_backend->server != NULL)
+  if (smb_backend->cached_server != NULL)
     return 1;
 
-  smb_backend->server_name = g_strdup (server_name);
-  smb_backend->share_name = g_strdup (share_name);
-  smb_backend->domain = g_strdup (domain);
-  smb_backend->username = g_strdup (username);
-  smb_backend->server = new;
+  smb_backend->cached_server_name = g_strdup (server_name);
+  smb_backend->cached_share_name = g_strdup (share_name);
+  smb_backend->cached_domain = g_strdup (domain);
+  smb_backend->cached_username = g_strdup (username);
+  smb_backend->cached_server = new;
 
   return 0;
 }
@@ -111,17 +114,17 @@ static int
 remove_cached_server(SMBCCTX * context, SMBCSRV * server)
 {
   g_print ("remove_cached_server\n");
-  if (smb_backend->server == server)
+  if (smb_backend->cached_server == server)
     {
-      g_free (smb_backend->server_name);
-      smb_backend->server_name = NULL;
-      g_free (smb_backend->share_name);
-      smb_backend->share_name = NULL;
-      g_free (smb_backend->domain);
-      smb_backend->domain = NULL;
-      g_free (smb_backend->username);
-      smb_backend->username = NULL;
-      smb_backend->server = NULL;
+      g_free (smb_backend->cached_server_name);
+      smb_backend->cached_server_name = NULL;
+      g_free (smb_backend->cached_share_name);
+      smb_backend->cached_share_name = NULL;
+      g_free (smb_backend->cached_domain);
+      smb_backend->cached_domain = NULL;
+      g_free (smb_backend->cached_username);
+      smb_backend->cached_username = NULL;
+      smb_backend->cached_server = NULL;
       return 0;
     }
   return 1;
@@ -143,12 +146,12 @@ get_cached_server (SMBCCTX * context,
 		   const char *server_name, const char *share_name,
 		   const char *domain, const char *username)
 {
-  if (smb_backend->server != NULL &&
-      strcmp (smb_backend->server_name, server_name) == 0 &&
-      strcmp (smb_backend->share_name, server_name) == 0 &&
-      strcmp (smb_backend->domain, domain) == 0 &&
-      strcmp (smb_backend->username, username) == 0)
-    return smb_backend->server;
+  if (smb_backend->cached_server != NULL &&
+      strcmp (smb_backend->cached_server_name, server_name) == 0 &&
+      strcmp (smb_backend->cached_share_name, server_name) == 0 &&
+      strcmp (smb_backend->cached_domain, domain) == 0 &&
+      strcmp (smb_backend->cached_username, username) == 0)
+    return smb_backend->cached_server;
 
   return NULL;
 }
@@ -163,8 +166,8 @@ get_cached_server (SMBCCTX * context,
 static int
 purge_cached (SMBCCTX * context)
 {
-  if (smb_backend->server)
-    remove_cached_server(context, smb_backend->server);
+  if (smb_backend->cached_server)
+    remove_cached_server(context, smb_backend->cached_server);
   
   return 0;
 }
@@ -282,6 +285,10 @@ g_vfs_backend_smb_new (const char *server,
 			  "object-path", obj_path,
 			  "bus-name", bus_name,
 			  NULL);
+
+  backend->server = g_strdup (server);
+  backend->share = g_strdup (share);
+
   smb_backend = backend;
   backend->smb_context = smb_context;
   
@@ -337,6 +344,31 @@ do_get_info (GVfsBackend *backend,
 	     const char *attributes,
 	     gboolean follow_symlinks)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat st;
+  char *uri;
+  int res;
+  GFileInfo *info;
+  
+  uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
+  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
+  g_free (uri);
+
+  info = g_file_info_new ();
+
+  if (res == 0)
+    {
+      g_file_info_set_from_stat (info, requested, &st);
+    }
+  
+  if (info)
+    {
+      g_vfs_job_get_info_set_info (job, requested & ~(G_FILE_INFO_DISPLAY_NAME|G_FILE_INFO_EDIT_NAME), info);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_object_unref (info);
+    }
+  else
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), NULL); /* TODO */
 }
 
 static void

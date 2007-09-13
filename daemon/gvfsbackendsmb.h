@@ -21,14 +21,17 @@ struct _GVfsBackendSmb
 {
   GVfsBackend parent_instance;
 
+  char *server;
+  char *share;
+  
   SMBCCTX *smb_context;
 
   /* Cache */
-  char *server_name;
-  char *share_name;
-  char *domain;
-  char *username;
-  SMBCSRV *server;
+  char *cached_server_name;
+  char *cached_share_name;
+  char *cached_domain;
+  char *cached_username;
+  SMBCSRV *cached_server;
 };
 
 struct _GVfsBackendSmbClass
