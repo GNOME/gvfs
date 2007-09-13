@@ -14,9 +14,20 @@ static DBusHandlerResult daemon_message_func      (DBusConnection *conn,
 						   gpointer        data);
 
 static void
-daemon_connection_setup (DBusConnection  *dbus_conn)
+daemon_handle_read_file (DBusConnection *conn,
+			 DBusMessage *message)
 {
-  g_print ("Got connection: %p\n", dbus_conn);
+  DBusMessage *reply;
+  char *str = "YAY";
+  g_print ("daemon_handler_read_file\n");
+  
+  reply = dbus_message_new_method_return (message);
+  g_print ("daemon_handler_read_file reply: %p\n", reply);
+  dbus_message_append_args (reply,
+			    DBUS_TYPE_STRING, &str,
+			    DBUS_TYPE_INVALID);
+  dbus_connection_send (conn, reply, NULL);
+  dbus_message_unref (reply);
 }
 
 static DBusObjectPathVTable daemon_vtable = {
@@ -24,6 +35,22 @@ static DBusObjectPathVTable daemon_vtable = {
 	daemon_message_func,
 	NULL
 };
+
+static void
+daemon_peer_connection_setup (DBusConnection  *dbus_conn)
+{
+  g_print ("daemon_peer_connection_setup\n");
+  dbus_connection_setup_with_g_main (dbus_conn, NULL);
+
+  if (!dbus_connection_register_object_path (dbus_conn,
+					     G_VFS_DBUS_DAEMON_PATH,
+					     &daemon_vtable,
+					     NULL))
+    {
+      dbus_connection_unref (dbus_conn);
+      g_printerr ("Failed to register object with new dbus peer connection.\n");
+    }
+}
 
 #ifdef __linux__
 #define USE_ABSTRACT_SOCKETS
@@ -178,7 +205,7 @@ daemon_new_connection_func (DBusServer     *server,
   /* Take ownership */
   dbus_connection_ref (conn);
   
-  daemon_connection_setup (conn);
+  daemon_peer_connection_setup (conn);
   
   /* Kill the server, no more need for it */
   dbus_server_disconnect (server);
@@ -256,6 +283,10 @@ daemon_message_func (DBusConnection *conn,
 				   G_VFS_DBUS_DAEMON_INTERFACE,
 				   G_VFS_DBUS_OP_GET_CONNECTION))
     daemon_handle_get_connection (conn, message);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_DAEMON_INTERFACE,
+					G_VFS_DBUS_OP_READ_FILE))
+    daemon_handle_read_file (conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   

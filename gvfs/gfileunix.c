@@ -4,6 +4,7 @@
 
 #include "gfileunix.h"
 #include "gvfsunixdbus.h"
+#include <gvfsdaemonprotocol.h>
 #include <glib/gi18n-lib.h>
 
 static void g_file_unix_file_iface_init (GFileIface       *iface);
@@ -179,12 +180,36 @@ g_file_unix_read (GFile *file)
 {
   GFileUnix *unix_file = G_FILE_UNIX (file);
   DBusConnection *connection;
+  DBusMessage *message, *reply;
+  DBusError error;
+  char *str;
 
   connection = _g_vfs_unix_get_connection_sync (unix_file->mountpoint);
 
-  g_print ("connection: %p\n", connection);
+  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
+					  G_VFS_DBUS_DAEMON_PATH,
+					  G_VFS_DBUS_DAEMON_INTERFACE,
+					  G_VFS_DBUS_OP_READ_FILE);
+
+  dbus_error_init (&error);
+  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
+						     &error);
+  dbus_message_unref (message);
+
+  if (!reply)
+    {
+      g_warning ("Error while running READ_FILE: %s",
+		 error.message);
+      dbus_error_free (&error);
+      return NULL;
+    }
   
-  /* TODO: implement */
+  dbus_message_get_args (reply, NULL,
+			 DBUS_TYPE_STRING, &str,
+			 DBUS_TYPE_INVALID);
+
+  g_print ("read_file: %s\n", str);
+
   return NULL;
 }
 
