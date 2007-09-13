@@ -1124,7 +1124,7 @@ g_file_attribute_matcher_new (const char *attributes)
   int i;
   GFileAttributeMatcher *matcher;
 
-  if (attributes == NULL)
+  if (attributes == NULL || *attributes == 0)
     return NULL;
 
   matcher = g_malloc0 (sizeof (GFileAttributeMatcher));
