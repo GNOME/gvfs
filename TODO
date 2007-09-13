@@ -57,11 +57,13 @@ Make built-in uri parsers link into gvfs shared lib instead of using a module
 
 Add flags to the query attribute calls, add SHOULD_COPY flag.
 Finish general attribute copy in gfile.c move fallback.
+Think about atomic updates of several attributes.
+gedit uses attr_copy_fd in libattr to copy xattrs
 
 Get rid of std:flags, split it up to avoid problems with unknow flag values
 Add std:is_backup flags
 Set owner:user, owner:group for local files
-Think about atomic updates of several attributes.
+
 
 document create time vs change time vs mtime, etc
 
