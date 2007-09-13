@@ -62,7 +62,7 @@ struct _GVfsChannelPrivate
   char reply_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE];
   int reply_buffer_pos;
   
-  char *output_data; /* Owned by job */
+  const char *output_data; /* Owned by job */
   gsize output_data_size;
   gsize output_data_pos;
 };
@@ -516,7 +516,7 @@ send_reply_cb (GObject *source_object,
 void
 g_vfs_channel_send_reply (GVfsChannel *channel,
 			  GVfsDaemonSocketProtocolReply *reply,
-			  void *data,
+			  const void *data,
 			  gsize data_len)
 {
   

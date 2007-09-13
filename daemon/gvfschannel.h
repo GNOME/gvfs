@@ -55,7 +55,7 @@ void              g_vfs_channel_send_error         (GVfsChannel                 
 						    GError                        *error);
 void              g_vfs_channel_send_reply         (GVfsChannel                   *channel,
 						    GVfsDaemonSocketProtocolReply *reply,
-						    void                          *data,
+						    const void                    *data,
 						    gsize                          data_len);
 guint32           g_vfs_channel_get_current_seq_nr (GVfsChannel                   *channel);
 
