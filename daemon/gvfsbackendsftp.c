@@ -1370,7 +1370,6 @@ parse_attributes (GVfsBackendSftp *backend,
 
 typedef struct {
   DataBuffer *handle;
-  GHashTable *get_symlink_hash;
   int outstanding_requests;
 } ReadDirData;
 
@@ -1390,11 +1389,13 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
                         GVfsJob *job,
                         gpointer user_data)
 {
-  char *name;
+  const char *name;
   GFileInfo *info;
+  GFileInfo *lstat_info;
   ReadDirData *data;
 
-  name = user_data;
+  lstat_info = user_data;
+  name = g_file_info_get_name (lstat_info);
   data = job->backend_data;
   
   if (reply_type == SSH_FXP_ATTRS)
@@ -1409,10 +1410,12 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
       
       g_object_unref (info);
     }
+  else
+    g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), lstat_info);
 
-  g_free (name);
-  data->outstanding_requests --;
+  g_object_unref (lstat_info);
   
+  data->outstanding_requests--;
   if (data->outstanding_requests == 0)
     g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
 }
@@ -1477,9 +1480,7 @@ read_dir_reply (GVfsBackendSftp *backend,
           put_string (command, abs_name);
           g_free (abs_name);
           
-          queue_command_stream_and_free (backend, command, id, read_dir_symlink_reply, G_VFS_JOB (job), name);
-          
-          name = NULL; /* Owned by get_info_symlink_reply */
+          queue_command_stream_and_free (backend, command, id, read_dir_symlink_reply, G_VFS_JOB (job), g_object_ref (info));
           data->outstanding_requests ++;
         }
       else if (strcmp (".", name) != 0 &&
