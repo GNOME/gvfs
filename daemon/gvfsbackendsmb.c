@@ -21,6 +21,7 @@
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobgetinfo.h"
+#include "gvfsjobgetfsinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 
@@ -1418,7 +1419,7 @@ do_make_directory (GVfsBackend *backend,
 
 static void
 do_move (GVfsBackend *backend,
-	 GVfsJobCopy *job,
+	 GVfsJobMove *job,
 	 const char *source,
 	 const char *destination,
 	 GFileCopyFlags flags,
