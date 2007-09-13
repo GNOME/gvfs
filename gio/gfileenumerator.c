@@ -265,7 +265,7 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
 
   g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
   g_return_if_fail (enumerator != NULL);
-  g_return_if_fail (num_files > 0);
+  g_return_if_fail (num_files >= 0);
 
   if (num_files == 0)
     {
