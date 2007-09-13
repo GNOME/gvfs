@@ -3,8 +3,8 @@
 
 #include <glib.h>
 #include "gfile.h"
-#include "ginputstreamfile.h"
-#include "goutputstreamfile.h"
+#include "glocalfileinputstream.h"
+#include "glocalfileoutputstream.h"
 
 static void
 test_out ()
@@ -29,8 +29,8 @@ test_out ()
   
   unlink ("/tmp/test");
   
-  out = g_output_stream_file_new ("/tmp/test",
-				  G_OUTPUT_STREAM_FILE_OPEN_CREATE);
+  out = (GOutputStream *)g_local_file_output_stream_new ("/tmp/test",
+							 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
 
   left = sizeof(buffer);
   ptr = buffer;
@@ -69,7 +69,7 @@ test_sync (char *filename, gboolean dump)
   gssize res;
   gboolean close_res;
   
-  in = g_input_stream_file_new (filename);
+  in = (GInputStream *)g_local_file_input_stream_new (filename);
 
   while (1)
     {
@@ -134,7 +134,7 @@ test_async (char *filename, gboolean dump)
 
   buffer = g_malloc (1025);
   
-  in = g_input_stream_file_new (filename);
+  in = (GInputStream *)g_local_file_input_stream_new (filename);
   
   g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL);
 }

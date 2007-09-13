@@ -3,14 +3,14 @@ CFLAGS=`pkg-config --cflags glib-2.0 gobject-2.0 gthread-2.0` -I./ -Wall -O -g -
 
 CFILES=gfileinfo.c ginputstream.c goutputstream.c \
 	gvfserror.c gfileenumerator.c gfile.c\
-	gvfs.c gvfssimple.c ginputstreamfile.c\
-	goutputstreamfile.c gioscheduler.c\
+	gvfs.c gvfssimple.c glocalfileinputstream.c\
+	glocalfileoutputstream.c gioscheduler.c\
 	gfileinputstream.c gfileoutputstream.c
 
 HFILES=gfileinfo.h ginputstream.h goutputstream.h\
 	gvfserror.h gfileenumerator.h gfile.h\
-	gvfs.h gvfssimple.h ginputstreamfile.h\
-	goutputstreamfile.h gioscheduler.h\
+	gvfs.h gvfssimple.h glocalfileinputstream.h\
+	glocalfileoutputstream.h gioscheduler.h\
 	gfileinputstream.h gfileoutputstream.h\
 	gvfstypes.h
 
