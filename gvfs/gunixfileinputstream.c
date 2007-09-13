@@ -371,6 +371,15 @@ decode_reply (GString *buffer, GVfsDaemonSocketProtocolReply *reply_out)
   return buffer->str + G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE;
 }
 
+static void
+decode_error (GVfsDaemonSocketProtocolReply *reply, char *data, GError **error)
+{
+  g_set_error (error,
+	       g_quark_from_string (data),
+	       reply->arg1,
+	       data + strlen (data) + 1);
+}
+
 
 static gboolean
 run_sync_state_machine (GUnixFileInputStream *file,
@@ -622,10 +631,7 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 		reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = -1;
-		g_set_error (&op->ret_error,
-			     g_quark_from_string (data),
-			     reply.arg1,
-			     data + strlen (data) + 1);
+		decode_error (&reply, data, &op->ret_error);
 		g_string_truncate (priv->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
@@ -935,10 +941,7 @@ iterate_seek_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 		reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = FALSE;
-		g_set_error (&op->ret_error,
-			     g_quark_from_string (data),
-			     reply.arg1,
-			     data + strlen (data) + 1);
+		decode_error (&reply, data, &op->ret_error);
 		g_string_truncate (priv->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
