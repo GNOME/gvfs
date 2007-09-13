@@ -313,10 +313,16 @@ _g_mount_ref_resolve_path (GMountRef *ref,
 			   const char *path)
 {
   const char *new_path;
-  
+  int len;
+
   if (ref->spec->mount_prefix != NULL &&
       ref->spec->mount_prefix[0] != 0)
-    new_path = path + strlen (ref->spec->mount_prefix);
+    {
+      len = strlen (ref->spec->mount_prefix);
+      if (ref->spec->mount_prefix[len-1] == '/')
+	len--;
+      new_path = path + len;
+    }
   else
     new_path = path;
 
