@@ -227,23 +227,30 @@ daemon_handle_read_file (GVfsDaemon *daemon,
 {
   GVfsDaemonClass *class;
   DBusMessage *reply;
-  const char *path;
+  const char *path_data;
+  int path_len;
+  char *path;
   int fd;
   int socket_fd;
   
   class = G_VFS_DAEMON_GET_CLASS (daemon);
   
   if (!dbus_message_get_args (message, NULL, 
-			      DBUS_TYPE_STRING, &path,
+			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
+			      &path_data, &path_len,
 			      0))
     {
       g_warning ("Wrong types in read_file call");
       return;
     }
 
+  path = g_strndup (path_data, path_len);
+
   reply = dbus_message_new_method_return (message);
   socket_fd = -1;
   class->read_file (daemon, reply, path, &socket_fd);
+
+  g_free (path);
 
   dbus_connection_send (conn, reply, NULL);
   dbus_message_unref (reply);

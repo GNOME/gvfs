@@ -160,10 +160,7 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
 
   
   dbus_message_iter_init_append (message, &iter);
-  if (!dbus_message_iter_append_fixed_array (&iter, 
-					     DBUS_TYPE_BYTE,
-					     file->priv->filename,
-					     strlen (file->priv->filename)))
+  if (!_g_dbus_message_iter_append_filename (&iter, file->priv->filename))
     {
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOMEM,
 		   "Out of memory");
