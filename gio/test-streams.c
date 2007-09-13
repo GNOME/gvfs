@@ -258,7 +258,7 @@ test_buffered_input_stream ()
   test_assert (res && nread == strlen (gmis_data) - 7);
   test_assert (strcmp (buf, gmis_data + 7) == 0);
 
-  g_object_unref (mem_stream);
+  g_object_unref (stream);
 
   g_print ("DONE [OK]\n");
 
