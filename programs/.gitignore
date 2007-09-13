@@ -7,5 +7,5 @@ gvfs-cat
 gvfs-info
 gvfs-mount
 gvfs-create
-
-
+gvfs-copy
+gvfs-move
