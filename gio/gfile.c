@@ -773,7 +773,12 @@ g_file_set_display_name (GFile                  *file,
 
   return (* iface->set_display_name) (file, display_name, cancellable, error);
 }
-
+/*
+  Returns the type and full attribute name of all the attributes that
+  the file can set. This doesn't mean setting it will always succeed though,
+  you might get an access failure, or some specific file may not support a
+  specific attribute
+*/
 GFileAttributeInfoList *
 g_file_query_settable_attributes (GFile                      *file,
 				  GCancellable               *cancellable,
@@ -803,6 +808,8 @@ g_file_query_settable_attributes (GFile                      *file,
   return (* iface->query_settable_attributes) (file, cancellable, error);
 }
 
+/* Returns the list of attribute namespaces where the user can create
+   their own attribute names, such as extended attributes */
 GFileAttributeInfoList *
 g_file_query_writable_namespaces (GFile                      *file,
 				  GCancellable               *cancellable,
