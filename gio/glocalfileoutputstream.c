@@ -662,7 +662,8 @@ g_local_file_output_stream_replace (const char   *filename,
   stream = g_object_new (G_TYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
   stream->priv->tmp_filename = temp_file;
-  stream->priv->backup_filename = create_backup_filename (filename);
+  if (create_backup)
+    stream->priv->backup_filename = create_backup_filename (filename);
   stream->priv->original_filename =  g_strdup (filename);
   
   return G_FILE_OUTPUT_STREAM (stream);
