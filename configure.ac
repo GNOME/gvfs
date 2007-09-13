@@ -101,10 +101,81 @@ fi
 AC_SUBST(XATTR_LIBS)
 
 dnl ==========================================================================
+dnl Samba 3.0
+
+AC_ARG_ENABLE(samba, [  --disable-samba       build without samba support])
+msg_samba="no"
+if test "x$enable_samba" != "xno"; then
+  AC_ARG_WITH(samba-includes, [  --with-samba-includes=PREFIX     Location of samba includes.],
+	      with_samba_includes="$withval", with_samba_includes="/usr/include")
+  have_samba_includes="no"
+  if test "x${with_samba_includes}" != "xno"; then
+	CPPFLAGS_save="$CPPFLAGS"
+
+	echo "before test, samba_includes: ${samba_includes}"
+
+	CPPFLAGS="$CPPFLAGS -I$with_samba_includes"
+	AC_CHECK_HEADER(libsmbclient.h, [ samba_includes="yes" ])
+	CPPFLAGS="$CPPFLAGS_save"
+	
+	if test "x{samba_includes}" != "xno" -a "x${samba_includes}" != "x"; then
+		have_samba_includes="yes"
+		if test "${with_samba_includes}" != "/usr/include" ; then
+			SAMBA_CFLAGS="-I$with_samba_includes"
+		else
+			SAMBA_CFLAGS=""
+		fi
+		
+		CPPFLAGS="$CPPFLAGS -I$with_samba_includes"
+		AC_CHECK_MEMBER(SMBCCTX.flags,
+				[AC_DEFINE(HAVE_SAMBA_FLAGS,, [Defined if flags availible in SMBCCTXT])],,
+				[#include <libsmbclient.h>])
+		AC_CHECK_MEMBER(SMBCCTX.close,
+				[AC_DEFINE(HAVE_SAMBA_OLD_CLOSE, , [Defined if old close is available in SMBCCTXT])],,
+				[#include <libsmbclient.h>])
+		CPPFLAGS="$CPPFLAGS_save"
+	else
+		SAMBA_CFLAGS=""
+	fi
+  fi
+  echo "have_samba_includes: ${have_samba_includes}"
+  AC_ARG_WITH(samba-libs, [  --with-samba-libs=PREFIX     	Location of Samba libs.],
+	      with_samba_libs="$withval", with_samba_libs="/usr/lib")
+  if test "x${with_samba_libs}" != "xno" -a "x${have_samba_includes}" != "xno"; then
+	LDFLAGS_save="$LDFLAGS"
+	
+	LDFLAGS="$LDFLAGS -L$with_samba_libs"
+	AC_CHECK_LIB(smbclient, smbc_new_context,samba_libs="yes", samba_libs="no")
+	LDFLAGS="$LDFLAGS_save"
+	if test "x${samba_libs}" != "xno"; then
+		AC_DEFINE(HAVE_SAMBA,, [Define to 1 if you have the samba 3.0 libraries])
+		msg_samba="yes"
+                if test x$with_samba_libs != x/usr/lib; then
+                        SAMBA_LIBS="-L$with_samba_libs -lsmbclient"
+                else
+                	SAMBA_LIBS="-lsmbclient"
+                fi
+	else
+		SAMBA_CFLAGS=""
+		SAMBA_LIBS=""
+	fi
+  fi
+  AC_MSG_CHECKING(for Samba 3.0 libraries)
+  AC_MSG_RESULT($msg_samba)
+fi
+AM_CONDITIONAL(HAVE_SAMBA, test $msg_samba = yes)
+AC_SUBST(SAMBA_CFLAGS)
+AC_SUBST(SAMBA_LIBS)
+	
+dnl ==========================================================================
 	
 dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
 AC_DEFINE(_GNU_SOURCE, 1, [Enable GNU Extensions])
 
+dnl ==========================================================================
+	
+AC_DEFINE(_FILE_OFFSET_BITS, 64, [Enable LFS])
+		       
 dnl ==========================================================================
 
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)

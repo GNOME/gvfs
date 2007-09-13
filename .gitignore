@@ -2,6 +2,10 @@ Makefile
 Makefile.in
 *~
 *.o
+*.la
+*.lo
+.deps
+.libs
 test
 aclocal.m4
 autom4te.cache

@@ -18,6 +18,7 @@ libraries =						\
 noinst_PROGRAMS =				\
 	gvfs-daemon				\
 	gvfs-daemon-test			\
+	gvfs-daemon-smb				\
 	$(NULL)
 
 libdaemon_la_SOURCES = \
@@ -48,3 +49,9 @@ gvfs_daemon_test_SOURCES = \
 	test.c
 
 gvfs_daemon_test_LDADD = $(libraries)
+
+gvfs_daemon_smb_SOURCES = \
+	gvfsbackendsmb.c gvfsbackendsmb.h \
+	smb.c
+
+gvfs_daemon_smb_LDADD = $(libraries) $(SAMBA_LIBS)

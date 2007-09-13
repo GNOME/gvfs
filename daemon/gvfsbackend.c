@@ -307,7 +307,7 @@ void
 g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
 				    GVfsDaemon      *daemon)
 {
-  g_print ("registering %s\n", backend->object_path);
+  g_print ("registering %s with %p\n", backend->object_path, daemon);
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
   g_vfs_daemon_register_path  (daemon, backend->object_path,
 			       backend_dbus_handler, backend);
