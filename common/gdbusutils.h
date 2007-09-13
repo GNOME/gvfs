@@ -42,6 +42,11 @@ gboolean     _g_error_from_message                  (DBusMessage      *message,
 						     GError          **error);
 DBusMessage *_dbus_message_new_error_from_gerror    (DBusMessage      *message,
 						     GError           *error);
+DBusMessage *_dbus_message_new_gerror               (DBusMessage      *message,
+						     GQuark            domain,
+						     gint              code,
+						     const gchar      *format,
+						     ...);
 char *       _g_dbus_unescape_bus_name              (const char       *escaped,
 						     const char       *end);
 void         _g_dbus_append_escaped_bus_name        (GString          *string,

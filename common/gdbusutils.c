@@ -60,6 +60,30 @@ append_escaped_name (GString *s,
 }
 
 DBusMessage *
+_dbus_message_new_gerror (DBusMessage      *message,
+			  GQuark            domain,
+			  gint              code,
+			  const gchar      *format,
+			  ...)
+{
+  DBusMessage *reply;
+  va_list args;
+  GError error;
+  
+  error.domain = domain;
+  error.code = code;
+  va_start (args, format);
+  error.message = g_strdup_vprintf (format, args);
+  va_end (args);
+
+  reply = dbus_message_new_from_gerror (message, &error);
+
+  g_free (error.message);
+  
+  return reply;
+}
+
+DBusMessage *
 _dbus_message_new_error_from_gerror (DBusMessage *message,
 				     GError *error)
 {
