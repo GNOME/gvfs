@@ -46,6 +46,8 @@ finish implementing copy progress callbacks
 
 implement stuff in GDaemonVolume / GDaemonVolumeMonitor
 
+convert GDaemonFiles to fuse paths on request
+
 detect fuse paths and reverse map back to GDaemonFile
 
 remove owners from bus_name_map when they fail
@@ -57,8 +59,6 @@ add trash:/// support
 
 decide exactly how to handle not-mounted errors and make sure its consistent.
 mount daemons should re-register when new owner for vfs daemon.
-
-remove dbus-gmain.[ch]? We have no server integration in common/ atm
 
 Make built-in uri parsers link into gvfs shared lib instead of using a module
 
