@@ -19,16 +19,6 @@
 
 #include <windows.h>
 
-gboolean
-g_content_type_equals (const char *type1,
-		       const char *type2)
-{
-  g_return_val_if_fail (type1 != NULL, FALSE);
-  g_return_val_if_fail (type2 != NULL, FALSE);
-
-  return strcmp (type1, type2) == 0;
-}
-
 static char *
 get_registry_classes_key (const char *subdir,
 			  const wchar_t *key_name)
@@ -65,6 +55,31 @@ get_registry_classes_key (const char *subdir,
 }
 
 gboolean
+g_content_type_equals (const char *type1,
+		       const char *type2)
+{
+  char *progid1, *progid2;
+  gboolean res;
+  
+  g_return_val_if_fail (type1 != NULL, FALSE);
+  g_return_val_if_fail (type2 != NULL, FALSE);
+
+  if (strcmp (type1, type2) == 0)
+    return TRUE;
+
+  res = FALSE;
+  progid1 = get_registry_classes_key (type1, NULL);
+  progid2 = get_registry_classes_key (type2, NULL);
+  if (progid1 != NULL && progid2 != NULL &&
+      strcmp (progid1, progid2) == 0)
+    res = TRUE;
+  g_free (progid1);
+  g_free (progid2);
+  
+  return res;
+}
+
+gboolean
 g_content_type_is_a (const char   *type,
 		     const char   *supertype)
 {
@@ -74,7 +89,7 @@ g_content_type_is_a (const char   *type,
   g_return_val_if_fail (type != NULL, FALSE);
   g_return_val_if_fail (supertype != NULL, FALSE);
 
-  if (strcmp (type, supertype) == 0)
+  if (g_content_type_equals (type, supertype))
     return TRUE;
 
   res = FALSE;
@@ -110,7 +125,7 @@ g_content_type_get_description (const char *type)
 
   if (g_content_type_is_unknown (type))
     return g_strdup (_("Unknown type"));
-  return g_strdup_printf (_("%s type"));
+  return g_strdup_printf (_("%s filetype"), type);
 }
 
 char *
@@ -192,7 +207,37 @@ g_content_type_guess (const char   *filename,
 GList *
 g_get_registered_content_types (void)
 {
-  return NULL;
+  DWORD index;
+  wchar_t keyname[256];
+  DWORD key_len;
+  char *key_utf8;
+  GList *types;
+
+  types = NULL;
+  index = 0;
+  key_len = 256;
+  while (RegEnumKeyExW(HKEY_CLASSES_ROOT,
+		       index,
+		       keyname,
+		       &key_len,
+		       NULL,
+		       NULL,
+		       NULL,
+		       NULL) == ERROR_SUCCESS)
+    {
+      key_utf8 = g_utf16_to_utf8 (keyname, -1, NULL, NULL, NULL);
+      if (key_utf8)
+	{
+	  if (*key_utf8 == '.')
+	    types = g_list_prepend (types, key_utf8);
+	  else
+	    g_free (key_utf8);
+	}
+      index++;
+      key_len = 256;
+    }
+  
+  return g_list_reverse (types);
 }
 
 #else /* !G_OS_WIN32 - Unix specific version */

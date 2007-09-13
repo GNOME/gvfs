@@ -272,6 +272,48 @@ test_seek (void)
   g_print ("close res: %d\n", close_res);
 }
 
+static void
+test_content_types (void)
+{
+  GList *types, *l;
+  char *type;
+  char *desc;
+  char *mime;
+  
+#ifdef G_OS_WIN32
+  g_print (".aiff is_a .aiff: %d\n", g_content_type_is_a (".aiff", ".aiff"));
+  g_print (".aiff is_a .gif: %d\n", g_content_type_is_a (".aiff", ".gif"));
+  g_print (".aiff is_a text: %d\n", g_content_type_is_a (".aiff", "text"));
+  g_print (".aiff is_a audio: %d\n", g_content_type_is_a (".aiff", "audio"));
+  g_print (".jpg is_a .jpeg: %d\n", g_content_type_is_a (".jpg", ".jpeg"));
+
+  g_print (".aiff descr: %s\n", g_content_type_get_description (".aiff"));
+  g_print (".gif descr: %s\n", g_content_type_get_description (".gif"));
+  g_print (".jpeg descr: %s\n", g_content_type_get_description (".jpeg"));
+  
+  g_print (".aiff mimetype: %s\n", g_content_type_get_mime_type (".aiff"));
+  g_print (".gif mimetype: %s\n", g_content_type_get_mime_type (".gif"));
+  g_print (".jpeg mimetype: %s\n", g_content_type_get_mime_type (".jpeg"));
+  g_print ("* mimetype: %s\n", g_content_type_get_mime_type ("*"));
+  g_print ("image mimetype: %s\n", g_content_type_get_mime_type ("image"));
+#endif
+
+  types = g_get_registered_content_types ();
+  
+  for (l = types; l != NULL; l = l->next)
+    {
+      type = l->data;
+      desc = g_content_type_get_description (type);
+      mime = g_content_type_get_mime_type (type);
+      g_print ("type %s - %s (%s)\n", type, desc, mime);
+      g_free (mime);
+      g_free (type);
+      g_free (desc);
+    }
+  
+  g_list_free (types);
+}
+
 
 #if 0
 static gint
@@ -296,23 +338,6 @@ compare_apps (gconstpointer  _a,
 static void
 test_appinfo (void)
 {
-#ifdef G_OS_WIN32
-  g_print (".aiff is_a .aiff: %d\n", g_content_type_is_a (".aiff", ".aiff"));
-  g_print (".aiff is_a .gif: %d\n", g_content_type_is_a (".aiff", ".gif"));
-  g_print (".aiff is_a text: %d\n", g_content_type_is_a (".aiff", "text"));
-  g_print (".aiff is_a audio: %d\n", g_content_type_is_a (".aiff", "audio"));
-
-  g_print (".aiff descr: %s\n", g_content_type_get_description (".aiff"));
-  g_print (".gif descr: %s\n", g_content_type_get_description (".gif"));
-  g_print (".jpeg descr: %s\n", g_content_type_get_description (".jpeg"));
-  
-  g_print (".aiff mimetype: %s\n", g_content_type_get_mime_type (".aiff"));
-  g_print (".gif mimetype: %s\n", g_content_type_get_mime_type (".gif"));
-  g_print (".jpeg mimetype: %s\n", g_content_type_get_mime_type (".jpeg"));
-  g_print ("* mimetype: %s\n", g_content_type_get_mime_type ("*"));
-  g_print ("image mimetype: %s\n", g_content_type_get_mime_type ("image"));
-#endif
-  
 #if 0
   GList *infos, *l;
   GAppInfo *info;
@@ -373,7 +398,8 @@ main (int argc, char *argv[])
 
   if (1)
     {
-      test_appinfo  ();
+      test_content_types ();
+      test_appinfo ();
       return 0;
     }
   
