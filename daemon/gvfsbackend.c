@@ -51,7 +51,7 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->object_path);
   g_free (backend->display_name);
   if (backend->mount_spec)
-    g_mount_spec_free (backend->mount_spec);
+    g_mount_spec_unref (backend->mount_spec);
   
   if (G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize) (object);

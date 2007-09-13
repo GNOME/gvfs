@@ -30,12 +30,14 @@ typedef struct {
 } GMountSpecItem;
 
 typedef struct {
+  volatile int ref_count;
   GArray *items;
   char *mount_prefix;
 } GMountSpec;
 
 GMountSpec *g_mount_spec_new       (void);
-void        g_mount_spec_free      (GMountSpec      *spec);
+GMountSpec *g_mount_spec_ref       (GMountSpec      *spec);
+void        g_mount_spec_unref     (GMountSpec      *spec);
 GMountSpec *g_mount_spec_from_dbus (DBusMessageIter *iter);
 void        g_mount_spec_to_dbus   (DBusMessageIter *iter,
 				    GMountSpec      *spec);

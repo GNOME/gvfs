@@ -51,22 +51,32 @@ g_mount_spec_add_item (GMountSpec *spec,
   g_array_sort (spec->items, item_compare);
 }
 
+GMountSpec *
+g_mount_spec_ref (GMountSpec *spec)
+{
+  g_atomic_int_inc (&spec->ref_count);
+  return spec;
+}
+
 
 void
-g_mount_spec_free (GMountSpec *spec)
+g_mount_spec_unref (GMountSpec *spec)
 {
   int i;
-  
-  g_free (spec->mount_prefix);
-  for (i = 0; i < spec->items->len; i++)
+
+  if (g_atomic_int_dec_and_test (&spec->ref_count))
     {
-      GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
-      g_free (item->key);
-      g_free (item->value);
+      g_free (spec->mount_prefix);
+      for (i = 0; i < spec->items->len; i++)
+	{
+	  GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
+	  g_free (item->key);
+	  g_free (item->value);
+	}
+      g_array_free (spec->items, TRUE);
+      
+      g_free (spec);
     }
-  g_array_free (spec->items, TRUE);
-  
-  g_free (spec);
 }
 
 GMountSpec *
@@ -95,7 +105,7 @@ g_mount_spec_from_dbus (DBusMessageIter *iter)
   if (dbus_message_iter_get_arg_type (&spec_iter) != DBUS_TYPE_ARRAY ||
       dbus_message_iter_get_element_type (&spec_iter) != DBUS_TYPE_STRUCT)
     {
-      g_mount_spec_free (spec);
+      g_mount_spec_unref (spec);
       return NULL;
     }
 

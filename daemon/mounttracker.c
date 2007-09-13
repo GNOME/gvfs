@@ -81,7 +81,7 @@ vfs_mount_free (VFSMount *mount)
   g_free (mount->icon);
   g_free (mount->dbus_id);
   g_free (mount->object_path);
-  g_mount_spec_free (mount->mount_spec);
+  g_mount_spec_unref (mount->mount_spec);
   
   g_free (mount);
 }
@@ -214,7 +214,7 @@ lookup_mount (GMountTracker *tracker,
   if (reply == NULL)
     _g_dbus_oom ();
 
-  g_mount_spec_free (spec);
+  g_mount_spec_unref (spec);
   dbus_connection_send (connection, reply, NULL);
 }
 
