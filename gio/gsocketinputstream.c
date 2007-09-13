@@ -120,9 +120,9 @@ g_socket_input_stream_read (GInputStream *stream,
     {
       do
 	{
-	  poll_fds[0].events = GLIB_SYSDEF_POLLIN;
+	  poll_fds[0].events = POLLIN;
 	  poll_fds[0].fd = socket_stream->priv->fd;
-	  poll_fds[1].events = GLIB_SYSDEF_POLLIN;
+	  poll_fds[1].events = POLLIN;
 	  poll_fds[1].fd = cancel_fd;
 	  poll_ret = poll (poll_fds, 2, -1);
 	}
@@ -283,7 +283,7 @@ g_socket_input_stream_read_async (GInputStream        *stream,
   data->stream = socket_stream;
 
   source = _g_fd_source_new (socket_stream->priv->fd,
-			     GLIB_SYSDEF_POLLIN,
+			     POLLIN,
 			     cancellable);
   
   g_source_set_callback (source, (GSourceFunc)read_async_cb, data, read_async_data_free);
