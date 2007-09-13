@@ -100,6 +100,12 @@ g_file_monitor_init (GFileMonitor *monitor)
 
 
 gboolean
+g_file_monitor_is_cancelled (GFileMonitor *monitor)
+{
+  return monitor->priv->cancelled;
+}
+
+gboolean
 g_file_monitor_cancel (GFileMonitor* monitor)
 {
   GFileMonitorClass *class;

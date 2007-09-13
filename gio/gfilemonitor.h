@@ -52,6 +52,7 @@ struct _GFileMonitorClass
 GType g_file_monitor_get_type (void) G_GNUC_CONST;
 
 gboolean g_file_monitor_cancel         (GFileMonitor *monitor);
+gboolean g_file_monitor_is_cancelled   (GFileMonitor *monitor);
 void     g_file_monitor_set_rate_limit (GFileMonitor *monitor,
 					int           limit_msecs);
 

@@ -43,6 +43,7 @@ struct _GDirectoryMonitorClass
 GType g_directory_monitor_get_type (void) G_GNUC_CONST;
 
 gboolean g_directory_monitor_cancel         (GDirectoryMonitor *monitor);
+gboolean g_directory_monitor_is_cancelled   (GDirectoryMonitor *monitor);
 void     g_directory_monitor_set_rate_limit (GDirectoryMonitor *monitor,
 					     int                limit_msecs);
 

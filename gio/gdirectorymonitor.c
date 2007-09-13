@@ -91,6 +91,12 @@ g_directory_monitor_cancel (GDirectoryMonitor* monitor)
   return (* class->cancel) (monitor);
 }
 
+gboolean
+g_directory_monitor_is_cancelled (GDirectoryMonitor *monitor)
+{
+  return monitor->priv->cancelled;
+}
+
 void
 g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
 				GFile *child,
