@@ -860,7 +860,34 @@ mount_mountable_async_cb (DBusMessage *reply,
 			  GCancellable *cancellable,
 			  gpointer callback_data)
 {
-  /* TODO */
+  GMountSpec *mount_spec;
+  char *path;
+  DBusMessageIter iter;
+  g_simple_async_result_complete (result);
+  GFile *file;
+
+  path = NULL;
+  
+  dbus_message_iter_init (reply, &iter);
+  mount_spec = g_mount_spec_from_dbus (&iter);
+  
+  if (mount_spec == NULL ||
+      !_g_dbus_message_iter_get_args (&iter, NULL,
+				      G_DBUS_TYPE_CSTRING, &path,
+				      0))
+    {
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       _("Invalid return value from call"));
+    }
+  else
+    {
+      file = g_daemon_file_new (mount_spec, path);
+      g_mount_spec_unref (mount_spec);
+      g_free (path);
+      g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
+    }
+  g_simple_async_result_complete (result);
 }
 
 static void
@@ -883,6 +910,13 @@ g_daemon_file_mount_mountable_finish (GFile               *file,
 				      GAsyncResult        *result,
 				      GError             **error)
 {
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+  GFile *result_file;
+  
+  result_file = g_simple_async_result_get_op_res_gpointer (simple);
+  if (result_file)
+    return g_object_ref (result_file);
+  
   return NULL;
 }
 
