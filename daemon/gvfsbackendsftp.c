@@ -1381,6 +1381,20 @@ read_dir_data_free (ReadDirData *data)
   g_slice_free (ReadDirData, data);
 }
 
+
+static void
+read_dir_got_stat_info (GVfsBackendSftp *backend,
+                        GVfsJob *job,
+                        GFileInfo *info)
+{
+  GVfsJobEnumerate *enum_job;
+  
+  enum_job = G_VFS_JOB_ENUMERATE (job);
+  
+  g_vfs_job_enumerate_add_info (enum_job, info);
+}
+
+
 static void
 read_dir_symlink_reply (GVfsBackendSftp *backend,
                         int reply_type,
@@ -1406,12 +1420,12 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
       
       parse_attributes (backend, info, name, reply, G_VFS_JOB_ENUMERATE (job)->attribute_matcher);
 
-      g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), info);
+      read_dir_got_stat_info (backend, job, info);
       
       g_object_unref (info);
     }
   else
-    g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), lstat_info);
+    read_dir_got_stat_info (backend, job, lstat_info);
 
   g_object_unref (lstat_info);
   
@@ -1485,7 +1499,7 @@ read_dir_reply (GVfsBackendSftp *backend,
         }
       else if (strcmp (".", name) != 0 &&
                strcmp ("..", name) != 0)
-        g_vfs_job_enumerate_add_info (enum_job, info);
+        read_dir_got_stat_info (backend, job, info);
         
       g_object_unref (info);
       g_free (name);
