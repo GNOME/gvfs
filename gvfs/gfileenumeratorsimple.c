@@ -110,10 +110,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   
   filename = g_dir_read_name (simple->dir);
   if (filename == NULL)
-    {
-      g_propagate_error (error, NULL);
-      return NULL;
-    }
+    return NULL;
 
   info = g_file_info_new ();
   g_file_info_set_name (info, filename);
@@ -162,8 +159,11 @@ g_file_enumerator_simple_stop (GFileEnumerator *enumerator,
 {
   GFileEnumeratorSimple *simple = G_FILE_ENUMERATOR_SIMPLE (enumerator);
 
-  g_dir_close (simple->dir);
-  simple->dir = NULL;
+  if (simple->dir)
+    {
+      g_dir_close (simple->dir);
+      simple->dir = NULL;
+    }
 
   return TRUE;
 }
