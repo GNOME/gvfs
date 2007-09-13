@@ -561,6 +561,17 @@ looks_like_text (const guchar *data, gsize data_size)
   return TRUE;
 }
 
+static gboolean
+mimetype_is_often_subclassed (const char *mimetype)
+{
+  return
+    (strcmp (mimetype, "application/x-ole-storage") == 0) ||
+    (strcmp (mimetype, "text/xml") == 0) ||
+    (strcmp (mimetype, "application/x-bzip") == 0) ||
+    (strcmp (mimetype, "application/x-gzip") == 0) ||
+    (strcmp (mimetype, "application/zip") == 0);
+}
+
 char *
 g_content_type_guess (const char   *filename,
 		      const guchar *data,
@@ -612,12 +623,8 @@ g_content_type_guess (const char   *filename,
 
 	  /* Some container formats are often used in many types of files,
 	     then look at name instead. */
-	  if (name_mimetype != XDG_MIME_TYPE_UNKNOWN && 
-	      ((strcmp (sniffed_mimetype, "application/x-ole-storage") == 0) ||
-	       (strcmp (sniffed_mimetype, "text/xml") == 0) ||
-	       (strcmp (sniffed_mimetype, "application/x-bzip") == 0) ||
-	       (strcmp (sniffed_mimetype, "application/x-gzip") == 0) ||
-	       (strcmp (sniffed_mimetype, "application/zip") == 0))) 
+	  if (name_mimetype != XDG_MIME_TYPE_UNKNOWN &&
+	      mimetype_is_often_subclassed (sniffed_mimetype))
 	    mimetype = g_strdup (name_mimetype);
 	  /* If the name mimetype is a more specific version of the
 	     sniffed type, use it. */
