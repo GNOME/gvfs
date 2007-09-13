@@ -573,6 +573,71 @@ copy_symlink (GFile                  *destination,
   return TRUE;
 }
 
+/* Closes the streams */
+static gboolean
+copy_stream_with_progress (GInputStream *in,
+			   GOutputStream *out,
+			   goffset total_size,
+			   GCancellable *cancellable,
+			   GFileProgressCallback progress_callback,
+			   gpointer progress_callback_data,
+			   GError **error)
+{
+  gssize n_read, n_written;
+  goffset current_size;
+  char buffer[8192], *p;
+  gboolean res;
+  
+  current_size = 0;
+  res = TRUE;
+  while (TRUE)
+    {
+      n_read = g_input_stream_read (in, buffer, sizeof (buffer), cancellable, error);
+      if (n_read == -1)
+	{
+	  res = FALSE;
+	  break;
+	}
+	
+      if (n_read == 0)
+	break;
+
+      current_size += n_read;
+
+      p = buffer;
+      while (n_read > 0)
+	{
+	  n_written = g_output_stream_write (out, p, n_read, cancellable, error);
+	  if (n_written == -1)
+	    {
+	      res = FALSE;
+	      break;
+	    }
+
+	  p += n_written;
+	  n_read -= n_read;
+	}
+      
+      if (progress_callback)
+	progress_callback (current_size, total_size, progress_callback_data);
+    }
+
+  if (!res)
+    error = NULL; /* Ignore further errors */
+      
+  /* Don't care about errors in source here */
+  g_input_stream_close (in, cancellable, NULL);
+
+  /* But write errors on close are bad! */
+  if (!g_output_stream_close (out, cancellable, error))
+    res = FALSE;
+
+  g_object_unref (in);
+  g_object_unref (out);
+      
+  return res;
+}
+
 static gboolean
 file_copy_fallback (GFile                  *source,
 		    GFile                  *destination,
@@ -584,9 +649,7 @@ file_copy_fallback (GFile                  *source,
 {
   GInputStream *in;
   GOutputStream *out;
-  char buffer[8192], *p;
-  gssize n_read, n_written;
-  goffset total_size, current_size;
+  goffset total_size;
   GFileInfo *info;
   GError *my_error;
   GFileType file_type;
@@ -676,7 +739,6 @@ file_copy_fallback (GFile                  *source,
     }
   
   total_size = 0;
-  current_size = 0;
 
   info = g_file_input_stream_get_file_info (G_FILE_INPUT_STREAM (in),
 					    G_FILE_ATTRIBUTE_STD_SIZE,
@@ -698,53 +760,14 @@ file_copy_fallback (GFile                  *source,
       return FALSE;
     }
 
-  do
-    {
-      n_read = g_input_stream_read (in, buffer, sizeof (buffer), cancellable, error);
-      if (n_read == -1)
-	goto error;
-      if (n_read == 0)
-	break;
-
-      current_size += n_read;
-
-      p = buffer;
-      while (n_read > 0)
-	{
-	  n_written = g_output_stream_write (out, p, n_read, cancellable, error);
-	  if (n_written == -1)
-	    goto error;
-
-	  p += n_written;
-	  n_read -= n_read;
-	}
-
-
-      if (progress_callback)
-	progress_callback (current_size, total_size, progress_callback_data);
-    }
-  while (TRUE);
-
-  /* Don't care about errors in source here */
-  g_input_stream_close (in, cancellable, NULL);
-
-  /* But write errors on close are bad! */
-  if (!g_output_stream_close (out, cancellable, error))
-    goto error;
-
-  g_object_unref (in);
-  g_object_unref (out);
+  if (!copy_stream_with_progress (in, out, total_size, cancellable,
+				  progress_callback, progress_callback_data,
+				  error))
+    return FALSE;
 
  copied_file:
-
-  
   
   return TRUE;
-
- error:
-  g_object_unref (in);
-  g_object_unref (out);
-  return FALSE;
 }
 
 /* Errors:
