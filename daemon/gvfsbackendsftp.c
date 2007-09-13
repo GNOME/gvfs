@@ -2937,6 +2937,43 @@ try_move (GVfsBackend *backend,
   put_string (command, destination);
   
   queue_command_stream_and_free (op_backend, command, id, move_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
+}
+static void
+make_symlink_reply (GVfsBackendSftp *backend,
+                    int reply_type,
+                    GDataInputStream *reply,
+                    guint32 len,
+                    GVfsJob *job,
+                    gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1); 
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static gboolean
+try_make_symlink (GVfsBackend *backend,
+                  GVfsJobMakeSymlink *job,
+                  const char *filename,
+                  const char *symlink_value)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_SYMLINK,
+                                &id);
+  put_string (command, filename);
+  put_string (command, symlink_value);
+  
+  queue_command_stream_and_free (op_backend, command, id, make_symlink_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
 }
 
 static void
@@ -2961,4 +2998,6 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_replace = try_replace;
   backend_class->try_write = try_write;
   backend_class->try_seek_on_write = try_seek_on_write;
+  backend_class->try_move = try_move;
+  backend_class->try_make_symlink = try_make_symlink;
 }
