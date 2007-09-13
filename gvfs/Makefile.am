@@ -47,6 +47,8 @@ unix_sources = \
 libgvfs_la_SOURCES = 	\
 	gasynchelper.c \
 	gasynchelper.h \
+	gcancellable.c \
+	gcancellable.h \
 	gfile.c \
 	gfileenumerator.c \
 	gfileinfo.c \
