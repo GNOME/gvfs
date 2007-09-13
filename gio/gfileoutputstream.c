@@ -5,19 +5,19 @@
 #include <gfileoutputstream.h>
 #include <gseekable.h>
 
-static void     g_file_output_stream_seekable_iface_init (GSeekableIface  *iface);
-static goffset  g_file_output_stream_tell                (GSeekable       *seekable);
-static gboolean g_file_output_stream_can_seek            (GSeekable       *seekable);
-static gboolean g_file_output_stream_seek                (GSeekable       *seekable,
-							  goffset          offset,
-							  GSeekType        type,
-							  GCancellable    *cancellable,
-							  GError         **error);
-static gboolean g_file_output_stream_can_truncate        (GSeekable       *seekable);
-static gboolean g_file_output_stream_truncate            (GSeekable       *seekable,
-							  goffset          offset,
-							  GCancellable    *cancellable,
-							  GError         **error);
+static void     g_file_output_stream_seekable_iface_init   (GSeekableIface  *iface);
+static goffset  g_file_output_stream_seekable_tell         (GSeekable       *seekable);
+static gboolean g_file_output_stream_seekable_can_seek     (GSeekable       *seekable);
+static gboolean g_file_output_stream_seekable_seek         (GSeekable       *seekable,
+							    goffset          offset,
+							    GSeekType        type,
+							    GCancellable    *cancellable,
+							    GError         **error);
+static gboolean g_file_output_stream_seekable_can_truncate (GSeekable       *seekable);
+static gboolean g_file_output_stream_seekable_truncate     (GSeekable       *seekable,
+							    goffset          offset,
+							    GCancellable    *cancellable,
+							    GError         **error);
 
 G_DEFINE_TYPE_WITH_CODE (GFileOutputStream, g_file_output_stream, G_TYPE_OUTPUT_STREAM,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
@@ -36,11 +36,11 @@ g_file_output_stream_class_init (GFileOutputStreamClass *klass)
 static void
 g_file_output_stream_seekable_iface_init (GSeekableIface *iface)
 {
-  iface->tell = g_file_output_stream_tell;
-  iface->can_seek = g_file_output_stream_can_seek;
-  iface->seek = g_file_output_stream_seek;
-  iface->can_truncate = g_file_output_stream_can_truncate;
-  iface->truncate = g_file_output_stream_truncate;
+  iface->tell = g_file_output_stream_seekable_tell;
+  iface->can_seek = g_file_output_stream_seekable_can_seek;
+  iface->seek = g_file_output_stream_seekable_seek;
+  iface->can_truncate = g_file_output_stream_seekable_can_truncate;
+  iface->truncate = g_file_output_stream_seekable_truncate;
 }
 
 static void
@@ -153,7 +153,7 @@ g_file_output_stream_get_etag (GFileOutputStream  *stream,
 }
 
 static goffset
-g_file_output_stream_tell (GSeekable *seekable)
+g_file_output_stream_seekable_tell (GSeekable *seekable)
 {
   GFileOutputStream *file;
   GFileOutputStreamClass *class;
@@ -170,7 +170,7 @@ g_file_output_stream_tell (GSeekable *seekable)
 }
 
 static gboolean
-g_file_output_stream_can_seek (GSeekable *seekable)
+g_file_output_stream_seekable_can_seek (GSeekable *seekable)
 {
   GFileOutputStream *file;
   GFileOutputStreamClass *class;
@@ -191,11 +191,11 @@ g_file_output_stream_can_seek (GSeekable *seekable)
 }
 
 static gboolean
-g_file_output_stream_seek (GSeekable  *seekable,
-			   goffset     offset,
-			   GSeekType   type,
-			   GCancellable  *cancellable,
-			   GError    **error)
+g_file_output_stream_seekable_seek (GSeekable  *seekable,
+				    goffset     offset,
+				    GSeekType   type,
+				    GCancellable  *cancellable,
+				    GError    **error)
 {
   GFileOutputStream *file;
   GFileOutputStreamClass *class;
@@ -243,7 +243,7 @@ g_file_output_stream_seek (GSeekable  *seekable,
 }
 
 static gboolean
-g_file_output_stream_can_truncate (GSeekable  *seekable)
+g_file_output_stream_seekable_can_truncate (GSeekable  *seekable)
 {
   GFileOutputStream *file;
   GFileOutputStreamClass *class;
@@ -264,10 +264,10 @@ g_file_output_stream_can_truncate (GSeekable  *seekable)
 }
 
 static gboolean
-g_file_output_stream_truncate (GSeekable     *seekable,
-			       goffset        size,
-			       GCancellable  *cancellable,
-			       GError       **error)
+g_file_output_stream_seekable_truncate (GSeekable     *seekable,
+					goffset        size,
+					GCancellable  *cancellable,
+					GError       **error)
 {
   GFileOutputStream *file;
   GFileOutputStreamClass *class;
