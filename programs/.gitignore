@@ -11,3 +11,4 @@ gvfs-copy
 gvfs-move
 gvfs-monitor-file
 gvfs-monitor-dir
+gvfs-trash

@@ -16,6 +16,7 @@ bin_PROGRAMS =					\
 	gvfs-create				\
 	gvfs-ls					\
 	gvfs-info				\
+	gvfs-trash				\
 	gvfs-copy				\
 	gvfs-move				\
 	gvfs-monitor-file			\
@@ -33,6 +34,9 @@ gvfs_create_LDADD = $(libraries)
 
 gvfs_info_SOURCES = gvfs-info.c
 gvfs_info_LDADD = $(libraries)
+
+gvfs_trash_SOURCES = gvfs-trash.c
+gvfs_trash_LDADD = $(libraries)
 
 gvfs_ls_SOURCES = gvfs-ls.c
 gvfs_ls_LDADD = $(libraries)
