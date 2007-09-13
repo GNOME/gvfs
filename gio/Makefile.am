@@ -91,6 +91,8 @@ libgio_la_SOURCES = 	\
 	gmountoperation.h \
 	goutputstream.c \
 	gseekable.c \
+	guniondrive.c \
+	guniondrive.h \
 	gunionvolume.c \
 	gunionvolume.h \
 	gunionvolumemonitor.c \

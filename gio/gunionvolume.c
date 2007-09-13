@@ -200,10 +200,136 @@ g_union_volume_get_icon (GVolume *volume)
   return NULL;
 }
 
+static GFile *
+g_union_volume_get_root (GVolume *volume)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_get_root (child->volume);
+    }
+  return NULL;
+}
+
+static GDrive *
+g_union_volume_get_drive (GVolume *volume)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_get_drive (child->volume);
+    }
+  return NULL;
+}
+
+static gboolean
+g_union_volume_can_unmount (GVolume *volume)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_can_unmount (child->volume);
+    }
+  return FALSE;
+}
+
+static gboolean
+g_union_volume_can_eject (GVolume *volume)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_can_eject (child->volume);
+    }
+  return FALSE;
+}
+
+typedef struct {
+  GVolumeCallback callback;
+  gpointer user_data;
+} VolData;
+
+static gboolean
+error_on_idle (gpointer _data)
+{
+  VolData *data = _data;
+  GError *error = NULL;
+
+  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
+
+  if (data->callback)
+    data->callback (error, data->user_data);
+
+  g_free (data);
+  return FALSE;
+}
+
+static void
+g_union_volume_unmount (GVolume         *volume,
+			GVolumeCallback  callback,
+			gpointer         user_data)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+  VolData *data;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_unmount (child->volume,
+			       callback, user_data);
+    }
+
+  data = g_new0 (VolData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+  g_idle_add (error_on_idle, data);
+}
+
+static void
+g_union_volume_eject (GVolume         *volume,
+		      GVolumeCallback  callback,
+		      gpointer         user_data)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+  VolData *data;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_eject (child->volume,
+			     callback, user_data);
+    }
+  
+  data = g_new0 (VolData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+  g_idle_add (error_on_idle, data);
+}
+
 static void
 g_union_volue_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_platform_id = g_union_volume_get_platform_id;
   iface->get_name = g_union_volume_get_name;
   iface->get_icon = g_union_volume_get_icon;
+  iface->get_root = g_union_volume_get_root;
+  iface->get_drive = g_union_volume_get_drive;
+  iface->can_unmount = g_union_volume_can_unmount;
+  iface->can_eject = g_union_volume_can_eject;
+  iface->unmount = g_union_volume_unmount;
+  iface->eject = g_union_volume_eject;
 }

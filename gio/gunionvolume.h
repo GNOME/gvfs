@@ -33,8 +33,6 @@ gboolean      g_union_volume_has_child_volume      (GUnionVolume   *union_volume
 						    GVolume        *child_volume);
 GVolume *     g_union_volume_get_child_for_monitor (GUnionVolume   *union_volume,
 						    GVolumeMonitor *child_monitor);
-void          g_unix_volume_unset_drive            (GUnionVolume   *union_volume,
-						    GDrive         *drive);
 
 G_END_DECLS
 
