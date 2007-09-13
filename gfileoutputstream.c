@@ -6,8 +6,6 @@
 
 G_DEFINE_TYPE (GFileOutputStream, g_file_output_stream, G_TYPE_OUTPUT_STREAM);
 
-static GOutputStreamClass *parent_class = NULL;
-
 struct _GFileOutputStreamPrivate {
   guint get_final_mtime : 1;
   time_t final_mtime;
@@ -16,8 +14,6 @@ struct _GFileOutputStreamPrivate {
 static void
 g_file_output_stream_class_init (GFileOutputStreamClass *klass)
 {
-  parent_class = g_type_class_peek_parent (klass);
-  
   g_type_class_add_private (klass, sizeof (GFileOutputStreamPrivate));
 }
 

@@ -8,8 +8,6 @@
 
 G_DEFINE_TYPE (GFileInfo, g_file_info, G_TYPE_OBJECT);
 
-static GObjectClass *parent_class = NULL;
-
 typedef struct  {
   GQuark namespace_q;
   GQuark attribute_q; /* full namespace:attribute form */
@@ -60,16 +58,14 @@ g_file_info_finalize (GObject *object)
   
   g_array_free (priv->attributes, TRUE);  
   
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    (*G_OBJECT_CLASS (parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_file_info_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_file_info_parent_class)->finalize) (object);
 }
 
 static void
 g_file_info_class_init (GFileInfoClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  
-  parent_class = g_type_class_peek_parent (klass);
   
   g_type_class_add_private (klass, sizeof (GFileInfoPrivate));
   

@@ -4,8 +4,6 @@
 
 G_DEFINE_TYPE (GFileEnumerator, g_file_enumerator, G_TYPE_OBJECT);
 
-static GObjectClass *parent_class = NULL;
-
 struct _GFileEnumeratorPrivate {
   /* TODO: Should be public for subclasses? */
   guint stopped : 1;
@@ -21,16 +19,14 @@ g_file_enumerator_finalize (GObject *object)
   if (!enumerator->priv->stopped)
     g_file_enumerator_stop (enumerator);
   
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    (*G_OBJECT_CLASS (parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize) (object);
 }
 
 static void
 g_file_enumerator_class_init (GFileEnumeratorClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  
-  parent_class = g_type_class_peek_parent (klass);
   
   g_type_class_add_private (klass, sizeof (GFileEnumeratorPrivate));
   

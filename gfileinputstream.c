@@ -6,8 +6,6 @@
 
 G_DEFINE_TYPE (GFileInputStream, g_file_input_stream, G_TYPE_INPUT_STREAM);
 
-static GInputStreamClass *parent_class = NULL;
-
 struct _GFileInputStreamPrivate {
   int dummy;
 };
@@ -15,8 +13,6 @@ struct _GFileInputStreamPrivate {
 static void
 g_file_input_stream_class_init (GFileInputStreamClass *klass)
 {
-  parent_class = g_type_class_peek_parent (klass);
-  
   g_type_class_add_private (klass, sizeof (GFileInputStreamPrivate));
 }
 

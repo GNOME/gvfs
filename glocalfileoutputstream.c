@@ -21,8 +21,6 @@ G_DEFINE_TYPE (GLocalFileOutputStream, g_local_file_output_stream, G_TYPE_FILE_O
 
 #define BACKUP_EXTENSION "~"
 
-static GFileOutputStreamClass *parent_class = NULL;
-
 struct _GLocalFileOutputStreamPrivate {
   char *filename;
   char *tmp_filename;
@@ -54,8 +52,8 @@ g_local_file_output_stream_finalize (GObject *object)
   g_free (file->priv->filename);
   g_free (file->priv->tmp_filename);
   
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    (*G_OBJECT_CLASS (parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize) (object);
 }
 
 static void
@@ -64,8 +62,6 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
   GFileOutputStreamClass *file_stream_class = G_FILE_OUTPUT_STREAM_CLASS (klass);
-  
-  parent_class = g_type_class_peek_parent (klass);
   
   g_type_class_add_private (klass, sizeof (GLocalFileOutputStreamPrivate));
   

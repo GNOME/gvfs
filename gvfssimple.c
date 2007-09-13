@@ -65,7 +65,6 @@ g_vfs_simple_parse_name (GVfs       *vfs,
   return NULL;
 }
 
-
 static void
 g_vfs_simple_vfs_iface_init (GVfsIface *iface)
 {

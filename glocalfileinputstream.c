@@ -14,8 +14,6 @@
 
 G_DEFINE_TYPE (GLocalFileInputStream, g_local_file_input_stream, G_TYPE_FILE_INPUT_STREAM);
 
-static GFileInputStreamClass *parent_class = NULL;
-
 struct _GLocalFileInputStreamPrivate {
   char *filename;
   int fd;
@@ -44,8 +42,8 @@ g_local_file_input_stream_finalize (GObject *object)
   
   g_free (file->priv->filename);
   
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    (*G_OBJECT_CLASS (parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_local_file_input_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_local_file_input_stream_parent_class)->finalize) (object);
 }
 
 static void
@@ -54,8 +52,6 @@ g_local_file_input_stream_class_init (GLocalFileInputStreamClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
   GFileInputStreamClass *file_stream_class = G_FILE_INPUT_STREAM_CLASS (klass);
-  
-  parent_class = g_type_class_peek_parent (klass);
   
   g_type_class_add_private (klass, sizeof (GLocalFileInputStreamPrivate));
   

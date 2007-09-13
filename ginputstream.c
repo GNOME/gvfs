@@ -7,8 +7,6 @@
 
 G_DEFINE_TYPE (GInputStream, g_input_stream, G_TYPE_OBJECT);
 
-static GObjectClass *parent_class = NULL;
-
 struct _GInputStreamPrivate {
   guint closed : 1;
   guint pending : 1;
@@ -58,16 +56,14 @@ g_input_stream_finalize (GObject *object)
       stream->priv->context = NULL;
     }
   
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    (*G_OBJECT_CLASS (parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_input_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_input_stream_parent_class)->finalize) (object);
 }
 
 static void
 g_input_stream_class_init (GInputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  
-  parent_class = g_type_class_peek_parent (klass);
   
   g_type_class_add_private (klass, sizeof (GInputStreamPrivate));
   
