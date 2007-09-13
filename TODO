@@ -1,13 +1,20 @@
 Implement the rest of g_file_info_simple_get:
 * can_rename & can_delete
-* mime type
 * icon
+
+How do we represent icons in the APIs?
+* Sometimes list of themed icon names
+* handle e.g. win32 icons
 
 Work on GFile
 
 add get_file_info_async for FileStreams
 Add async opens to GFile.
 More GFile operations (rename, move, copy, etc)
+
+Better async callback API?
+
+Add helper functions for reading/writing a whole file.
 
 Make direct callbacks in stream async calls auto-add-idle
 
