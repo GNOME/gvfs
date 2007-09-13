@@ -1236,7 +1236,7 @@ try_get_info (GVfsBackend *backend,
               const char *filename,
               GFileGetInfoFlags flags,
               GFileInfo *info,
-              GFileAttributeMatcher *attribute_matcher)
+              GFileAttributeMatcher *matcher)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
@@ -1254,14 +1254,18 @@ try_get_info (GVfsBackend *backend,
     }
   else
     {
-      G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (2);
+      if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STD_IS_SYMLINK))
+        {
+          G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (2);
+          command = new_command_stream (op_backend,
+                                        SSH_FXP_LSTAT,
+                                        &id);
+          put_string (command, filename);
+          queue_command_stream_and_free (op_backend, command, id, get_info_is_link_reply, G_VFS_JOB (job));
+        }
+      else
+        G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
       
-      command = new_command_stream (op_backend,
-                                    SSH_FXP_LSTAT,
-                                    &id);
-      put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, get_info_is_link_reply, G_VFS_JOB (job));
-
       command = new_command_stream (op_backend,
                                     SSH_FXP_STAT,
                                     &id);
