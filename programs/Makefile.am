@@ -11,18 +11,16 @@ libraries =						\
 	$(GLIB_LIBS)
 
 bin_PROGRAMS =					\
+	gvfs-cat				\
 	gvfs-ls					\
+	gvfs-info				\
 	$(NULL)
 
-#	gvfs-cat				\
-#	gvfs-info				\
-#
+gvfs_cat_SOURCES = gvfs-cat.c
+gvfs_cat_LDADD = $(libraries)
 
-#gvfs_cat_SOURCES = gvfs-cat.c
-#gvfs_cat_LDADD = $(libraries)
-
-#gvfs_info_SOURCES = gvfs-info.c
-#gvfs_info_LDADD = $(libraries)
+gvfs_info_SOURCES = gvfs-info.c
+gvfs_info_LDADD = $(libraries)
 
 gvfs_ls_SOURCES = gvfs-ls.c
 gvfs_ls_LDADD = $(libraries)
