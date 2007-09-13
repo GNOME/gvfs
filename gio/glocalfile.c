@@ -550,8 +550,6 @@ g_local_file_set_display_name (GFile *file,
   local = G_LOCAL_FILE (file);
   new_local = G_LOCAL_FILE (new_file);
   
-  g_stat (new_local->filename, &statbuf);
-
   if (!(g_stat (new_local->filename, &statbuf) == -1 &&
 	errno == ENOENT))
     {
@@ -853,6 +851,461 @@ g_local_file_delete (GFile *file,
   return TRUE;
 }
 
+static char *
+strip_trailing_slashes (const char *path)
+{
+  char *path_copy;
+  int len;
+
+  path_copy = g_strdup (path);
+  len = strlen (path_copy);
+  while (len > 1 && path_copy[len-1] == '/')
+    path_copy[--len] = 0;
+
+  return path_copy;
+ }
+
+static char *
+expand_symlink (const char *link)
+{
+  char *resolved, *canonical, *parent, *link2;
+  char symlink_value[4096];
+  ssize_t res;
+  
+  res = readlink (link, symlink_value, sizeof (symlink_value) - 1);
+  if (res == -1)
+    return g_strdup (link);
+  symlink_value[res] = 0;
+  
+  if (g_path_is_absolute (symlink_value))
+    return canonicalize_filename (symlink_value);
+  else
+    {
+      link2 = strip_trailing_slashes (link);
+      parent = g_path_get_dirname (link2);
+      g_free (link2);
+      
+      resolved = g_build_filename (parent, symlink_value, NULL);
+      g_free (parent);
+      
+      canonical = canonicalize_filename (resolved);
+      
+      g_free (resolved);
+
+      return canonical;
+    }
+}
+
+static char *
+get_parent (const char *path, dev_t *parent_dev)
+{
+  char *parent, *tmp;
+  struct stat parent_stat;
+  int num_recursions;
+  char *path_copy;
+
+  path_copy = strip_trailing_slashes (path);
+  
+  parent = g_path_get_dirname (path_copy);
+  if (strcmp (parent, ".") == 0 ||
+      strcmp (parent, path_copy) == 0)
+    {
+      g_free (path_copy);
+      return NULL;
+    }
+  g_free (path_copy);
+
+  num_recursions = 0;
+  do {
+    if (g_lstat (parent, &parent_stat) != 0)
+      {
+	g_free (parent);
+	return NULL;
+      }
+    
+    if (S_ISLNK (parent_stat.st_mode))
+      {
+	tmp = parent;
+	parent = expand_symlink (parent);
+	g_free (tmp);
+      }
+    
+    num_recursions++;
+    if (num_recursions > 12)
+      {
+	g_free (parent);
+	return NULL;
+      }
+  } while (S_ISLNK (parent_stat.st_mode));
+
+  *parent_dev = parent_stat.st_dev;
+  
+  return parent;
+}
+
+static char *
+expand_all_symlinks (const char *path)
+{
+  char *parent, *parent_expanded;
+  char *basename, *res;
+  dev_t parent_dev;
+
+  parent = get_parent (path, &parent_dev);
+  if (parent)
+    {
+      parent_expanded = expand_all_symlinks (parent);
+      g_free (parent);
+      basename = g_path_get_basename (path);
+      res = g_build_filename (parent_expanded, basename, NULL);
+      g_free (basename);
+      g_free (parent_expanded);
+    }
+  else
+    res = g_strdup (path);
+  
+  return res;
+}
+
+static char *
+find_topdir_for (char *file)
+{
+  char *dir, *parent;
+  dev_t dir_dev, parent_dev;
+
+  dir = get_parent (file, &dir_dev);
+  if (dir == NULL)
+    return NULL;
+
+  while (1) {
+    parent = get_parent (dir, &parent_dev);
+    if (parent == NULL)
+      return dir;
+    
+    if (parent_dev != dir_dev)
+      {
+	g_free (parent);
+	return dir;
+      }
+    
+    g_free (dir);
+    dir = parent;
+  }
+}
+
+static char *
+get_unique_filename (const char *basename, int id)
+{
+  const char *dot;
+      
+  if (id == 1)
+    return g_strdup (basename);
+
+  dot = strchr (basename, '.');
+  if (dot)
+    return g_strdup_printf ("%.*s.%d%s", dot - basename, basename, id, dot);
+  else
+    return g_strdup_printf ("%s.%d", basename, id);
+}
+
+static gboolean
+path_has_prefix (const char *path, const char *prefix)
+{
+  int prefix_len;
+
+  if (prefix == NULL)
+    return TRUE;
+
+  prefix_len = strlen (prefix);
+  
+  if (strncmp (path, prefix, prefix_len) == 0 &&
+      (prefix_len == 0 || /* empty prefix always matches */
+       prefix[prefix_len - 1] == '/' || /* last char in prefix was a /, so it must be in path too */
+       path[prefix_len] == 0 ||
+       path[prefix_len] == '/'))
+    return TRUE;
+  
+  return FALSE;
+}
+
+static char *
+try_make_relative (const char *path, const char *base)
+{
+  char *path2, *base2;
+  char *relative;
+
+  path2 = expand_all_symlinks (path);
+  base2 = expand_all_symlinks (base);
+
+  relative = NULL;
+  if (path_has_prefix (path2, base2))
+    {
+      relative = path2 + strlen (base2);
+      while (*relative == '/')
+	relative ++;
+      relative = g_strdup (relative);
+    }
+  g_free (path2);
+  g_free (base2);
+
+  if (relative)
+    return relative;
+  
+  /* Failed, use abs path */
+  return g_strdup (path);
+}
+
+static char *
+escape_trash_name (char *name)
+{
+  GString *str;
+  const gchar hex[16] = "0123456789ABCDEF";
+  
+  str = g_string_new ("");
+
+  while (*name != 0)
+    {
+      char c;
+
+      c = *name++;
+
+      if (g_ascii_isprint (c))
+	g_string_append_c (str, c);
+      else
+	{
+          g_string_append_c (str, '%');
+          g_string_append_c (str, hex[((guchar)c) >> 4]);
+          g_string_append_c (str, hex[((guchar)c) & 0xf]);
+	}
+    }
+
+  return g_string_free (str, FALSE);
+}
+
+static gboolean
+g_local_file_trash (GFile *file,
+		    GCancellable *cancellable,
+		    GError **error)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  struct stat file_stat, home_stat, trash_stat, global_stat;
+  const char *homedir;
+  char *dirname;
+  char *trashdir, *globaldir, *topdir, *infodir, *filesdir;
+  char *basename, *trashname, *trashfile, *infoname, *infofile;
+  char *original_name, *original_name_escaped;
+  uid_t uid;
+  char uid_str[32];
+  int i;
+  char *data;
+  gboolean is_homedir_trash;
+  time_t t;
+  struct tm now;
+  char delete_time[32];
+  int fd;
+  
+  if (g_lstat (local->filename, &file_stat) != 0)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error trashing file: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+    
+  homedir = g_get_home_dir ();
+  g_stat (homedir, &home_stat);
+
+  is_homedir_trash = FALSE;
+  trashdir = NULL;
+  if (file_stat.st_dev == home_stat.st_dev)
+    {
+      is_homedir_trash = TRUE;
+      trashdir = g_build_filename (g_get_user_data_dir (), "Trash", NULL);
+      if (g_mkdir (trashdir, 0755) == -1 && errno != EEXIST)
+	{
+	  g_free (trashdir);
+	  g_set_error (error, G_IO_ERROR,
+		       G_IO_ERROR_FAILED,
+		       _("Unable to create trash dir %s"),
+		       trashdir);
+	  return FALSE;
+	}
+      topdir = g_strdup (g_get_user_data_dir ());
+    }
+  else
+    {
+      uid = geteuid ();
+      snprintf (uid_str, sizeof (uid_str), "%lu", (unsigned long)uid);
+      
+      topdir = find_topdir_for (local->filename);
+      if (topdir == NULL)
+	{
+	  g_set_error (error, G_IO_ERROR,
+		       G_IO_ERROR_NOT_SUPPORTED,
+		       _("Unable to find toplevel directory for trash"));
+	  return FALSE;
+	}
+      
+      /* Try looking for global trash dir $topdir/.Trash/$uid */
+      globaldir = g_build_filename (topdir, ".Trash", NULL);
+      if (g_lstat (globaldir, &global_stat) == 0 &&
+	  S_ISDIR (global_stat.st_mode) &&
+	  (global_stat.st_mode & S_ISVTX) != 0)
+	{
+	  trashdir = g_build_filename (globaldir, uid_str, NULL);
+
+	  if (g_lstat (trashdir, &trash_stat) == 0)
+	    {
+	      if (!S_ISDIR (trash_stat.st_mode) ||
+		  trash_stat.st_uid != uid)
+		{
+		  /* Not a directory or not owned by user, ignore */
+		  g_free (trashdir);
+		  trashdir = NULL;
+		}
+	    }
+	  else if (g_mkdir (trashdir, 0700) == -1)
+	    {
+	      g_free (trashdir);
+	      trashdir = NULL;
+	    }
+	}
+      g_free (globaldir);
+
+      if (trashdir == NULL)
+	{
+	  /* No global trash dir, or it failed the tests, fall back to $topdir/.Trash-$uid */
+	  dirname = g_strdup_printf (".Trash-%s", uid_str);
+	  trashdir = g_build_filename (topdir, dirname, NULL);
+	  g_free (dirname);
+	  
+	  if (g_lstat (trashdir, &trash_stat) == 0)
+	    {
+	      if (!S_ISDIR (trash_stat.st_mode) ||
+		  trash_stat.st_uid != uid)
+		{
+		  /* Not a directory or not owned by user, ignore */
+		  g_free (trashdir);
+		  trashdir = NULL;
+		}
+	    }
+	  else if (g_mkdir (trashdir, 0700) == -1)
+	    {
+	      g_free (trashdir);
+	      trashdir = NULL;
+	    }
+	}
+
+      if (trashdir == NULL)
+	{
+	  g_free (topdir);
+	  g_set_error (error, G_IO_ERROR,
+		       G_IO_ERROR_NOT_SUPPORTED,
+		       _("Unable to find or create trash directory"));
+	  return FALSE;
+	}
+    }
+
+  /* Trashdir points to the trash dir with the "info" and "files" subdirectories */
+
+  infodir = g_build_filename (trashdir, "info", NULL);
+  filesdir = g_build_filename (trashdir, "files", NULL);
+  g_free (trashdir);
+
+  /* Make sure we have the subdirectories */
+  if ((g_mkdir (infodir, 0700) == -1 && errno != EEXIST) ||
+      (g_mkdir (filesdir, 0700) == -1 && errno != EEXIST))
+    {
+      g_free (topdir);
+      g_free (infodir);
+      g_free (filesdir);
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SUPPORTED,
+		   _("Unable to find or create trash directory"));
+      return FALSE;
+    }  
+
+  basename = g_path_get_basename (local->filename);
+  i = 1;
+  trashname = NULL;
+  trashfile = NULL;
+  do {
+    g_free (trashname);
+    g_free (trashfile);
+    
+    trashname = get_unique_filename (basename, i++);
+    trashfile = g_build_filename (filesdir, trashname, NULL);
+
+    fd = open (trashfile, O_CREAT | O_EXCL, 0666);
+  } while (fd == -1 && errno == EEXIST);
+
+  g_free (filesdir);
+  
+  if (fd == -1)
+    {
+      g_free (topdir);
+      g_free (infodir);
+      g_free (trashname);
+      g_free (trashfile);
+      
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Unable to create trashed file: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+
+  close (fd);
+
+  /* TODO: Maybe we should verify that you can delete the file from the trash
+     before moving it? OTOH, that is hard, as it needs a recursive scan */
+  
+  if (g_rename (local->filename, trashfile) == -1)
+    {
+      g_free (topdir);
+      g_free (infodir);
+      g_free (trashname);
+      g_free (trashfile);
+      
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Unable to trash file: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+
+  g_free (trashfile);
+
+  /* TODO: Do we need to update mtime/atime here after the move? */
+
+  /* Use absolute names for homedir */
+  if (is_homedir_trash)
+    original_name = g_strdup (local->filename);
+  else
+    original_name = try_make_relative (local->filename, topdir);
+  original_name_escaped = escape_trash_name (original_name);
+  
+  g_free (original_name);
+  g_free (topdir);
+  
+  t = time (NULL);
+  localtime_r (&t, &now);
+  delete_time[0] = 0;
+  strftime(delete_time, sizeof (delete_time), "%Y-%m-%dT%H:%M:%S", &now);
+
+  data = g_strdup_printf ("[Trash Info]\nPath=%s\nDeletionDate=%s\n",
+			  original_name_escaped, delete_time);
+
+  infoname = g_strconcat (trashname, ".trashinfo", NULL);
+  infofile = g_build_filename (infodir, infoname, NULL);
+  g_free (infoname);
+  g_file_set_contents (infofile, data, -1, NULL);
+  
+  g_free (original_name_escaped);
+  
+  return TRUE;
+}
+
 static gboolean
 g_local_file_make_directory (GFile *file,
 			     GCancellable *cancellable,
@@ -1033,6 +1486,7 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->create = g_local_file_create;
   iface->replace = g_local_file_replace;
   iface->delete_file = g_local_file_delete;
+  iface->trash = g_local_file_trash;
   iface->make_directory = g_local_file_make_directory;
   iface->make_symbolic_link = g_local_file_make_symbolic_link;
   iface->copy = g_local_file_copy;
