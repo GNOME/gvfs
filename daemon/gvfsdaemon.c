@@ -6,6 +6,7 @@
 #include <sys/un.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <glib-object.h>
 #include <dbus-gmain.h>
 #include <gvfsdaemon.h>
@@ -31,6 +32,18 @@ struct _GVfsDaemonPrivate
   guint queued_job_start; /* protected by lock */
   GList *read_streams; /* protected by lock */
 };
+
+typedef struct {
+  GVfsDaemon *daemon;
+  char *socket_dir;
+  guint io_watch;
+  DBusServer *server;
+  
+  gboolean got_dbus_connection;
+  gboolean got_fd_connection;
+  int fd;
+  DBusConnection *conn;
+} NewConnectionData;
 
 static void g_vfs_daemon_get_property (GObject    *object,
 				       guint       prop_id,
@@ -310,23 +323,54 @@ start_or_queue_job (GVfsDaemon *daemon,
 }
 
 static void
+new_connection_data_free (void *memory)
+{
+  NewConnectionData *data = memory;
+  
+  /* Remove the socket and dir after connected */
+  if (data->socket_dir) 
+    rmdir (data->socket_dir);
+
+  if (data->io_watch)
+    g_source_remove (data->io_watch);
+
+  g_free (data->socket_dir);
+  g_free (data);
+}
+
+static void
 daemon_peer_connection_setup (GVfsDaemon *daemon,
 			      DBusConnection  *dbus_conn,
-			      int extra_fd)
+			      NewConnectionData *data)
 {
-  dbus_connection_setup_with_g_main (dbus_conn, NULL);
+  /* We wait until we have the extra fd */
+  if (!data->got_fd_connection)
+    return;
 
+  if (data->fd == -1)
+    {
+      /* The fd connection failed, abort the whole thing */
+      g_warning (_("Failed to accept client: %s"), _("accept of extra fd failed"));
+      dbus_connection_unref (dbus_conn);
+      goto error_out;
+    }
+  
+  dbus_connection_setup_with_g_main (dbus_conn, NULL);
   if (!dbus_connection_register_object_path (dbus_conn,
 					     G_VFS_DBUS_DAEMON_PATH,
 					     &daemon_vtable,
 					     daemon))
     {
+      g_warning (_("Failed to accept client: %s"), _("object registration failed"));
       dbus_connection_unref (dbus_conn);
-      close (extra_fd);
-      g_printerr ("Failed to register object with new dbus peer connection.\n");
+      close (data->fd);
+      goto error_out;
     }
+  
+  dbus_connection_add_fd_send_fd (dbus_conn, data->fd);
 
-  dbus_connection_add_fd_send_fd (dbus_conn, extra_fd);
+ error_out:
+  new_connection_data_free (data);
 }
 
 #ifdef __linux__
@@ -458,29 +502,6 @@ generate_addresses (char **address1,
 #endif
 }
 
-typedef struct {
-  GVfsDaemon *daemon;
-  char *socket_dir;
-  guint io_watch;
-  int socket;
-} NewConnectionData;
-
-static void
-new_connection_data_free (void *memory)
-{
-  NewConnectionData *data = memory;
-  
-  /* Remove the socket and dir after connected */
-  if (data->socket_dir) 
-    rmdir (data->socket_dir);
-
-  if (data->io_watch)
-    g_source_remove (data->io_watch);
-  
-  g_free (data->socket_dir);
-  g_free (data);
-}
-
 static void
 daemon_new_connection_func (DBusServer     *server,
 			    DBusConnection *conn,
@@ -489,11 +510,12 @@ daemon_new_connection_func (DBusServer     *server,
   NewConnectionData *data;
 
   data = user_data;
+  data->got_dbus_connection = TRUE;
 
   /* Take ownership */
-  dbus_connection_ref (conn);
+  data->conn = dbus_connection_ref (conn);
 
-  daemon_peer_connection_setup (data->daemon, conn, data->socket);
+  daemon_peer_connection_setup (data->daemon, conn, data);
 
   /* Kill the server, no more need for it */
   dbus_server_disconnect (server);
@@ -559,13 +581,30 @@ accept_new_fd_client (GIOChannel  *channel,
   struct sockaddr_un addr;
   socklen_t addrlen;
 
+  data->got_fd_connection = TRUE;
+  
   fd = g_io_channel_unix_get_fd (channel);
   
   addrlen = sizeof (addr);
   new_fd = accept (fd, (struct sockaddr *) &addr, &addrlen);
-  data->socket = new_fd;
+
+  data->fd = new_fd;
   data->io_watch = 0;
 
+  /* Did we already accept the dbus connection, if so, finish it now */
+  if (data->got_dbus_connection)
+    daemon_peer_connection_setup (data->daemon,
+				  data->conn,
+				  data);
+  else if (data->fd == -1)
+    {
+      /* Didn't accept a dbus connection, and there is no need for one now */
+      g_warning (_("Failed to accept client: %s"), _("accept of extra fd failed"));
+      dbus_server_disconnect (data->server);
+      dbus_server_unref (data->server);
+      new_connection_data_free (data);
+    }
+  
   return FALSE;
 }
 
@@ -588,8 +627,11 @@ daemon_handle_get_connection (DBusConnection *conn,
 
   data = g_new (NewConnectionData, 1);
   data->daemon = daemon;
-  data->socket = -1;
   data->socket_dir = socket_dir;
+  data->got_fd_connection = FALSE;
+  data->got_dbus_connection = FALSE;
+  data->fd = -1;
+  data->conn = NULL;
   
   dbus_error_init (&error);
   server = dbus_server_listen (address1, &error);
@@ -608,10 +650,11 @@ daemon_handle_get_connection (DBusConnection *conn,
       
       goto error_out;
     }
+  data->server = server;
 
   dbus_server_set_new_connection_function (server,
 					   daemon_new_connection_func,
-					   data, new_connection_data_free);
+					   data, NULL);
   dbus_server_setup_with_g_main (server, NULL);
   
   fd = unix_socket_at (address2);
@@ -619,16 +662,18 @@ daemon_handle_get_connection (DBusConnection *conn,
     goto error_out;
 
   channel = g_io_channel_unix_new (fd);
+  g_io_channel_set_close_on_unref (channel, TRUE);
   data->io_watch = g_io_add_watch (channel, G_IO_IN | G_IO_HUP, accept_new_fd_client, data);
   g_io_channel_unref (channel);
     
   reply = dbus_message_new_method_return (message);
-  /* TODO: Check OOM */
-  dbus_message_append_args (reply,
-			    DBUS_TYPE_STRING, &address1,
-			    DBUS_TYPE_STRING, &address2,
-			    DBUS_TYPE_INVALID);
-  dbus_connection_send (conn, reply, NULL);
+  if (reply && 
+      dbus_message_append_args (reply,
+				DBUS_TYPE_STRING, &address1,
+				DBUS_TYPE_STRING, &address2,
+				DBUS_TYPE_INVALID))
+    dbus_connection_send (conn, reply, NULL);
+  
   dbus_message_unref (reply);
 
   g_free (address1);
