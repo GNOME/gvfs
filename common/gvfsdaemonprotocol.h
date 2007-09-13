@@ -10,7 +10,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNTTRACKER_INTERFACE "org.gtk.gvfs.MountTracker"
 #define G_VFS_DBUS_MOUNTTRACKER_PATH "/org/gtk/vfs/mounttracker"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT "lookupMount"
-#define G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT "mount"
+#define G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION "mountLocation"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS "listMounts"
 
 #define G_VFS_DBUS_MOUNTPOINT_INTERFACE "org.gtk.vfs.Mountpoint"

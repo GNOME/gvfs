@@ -423,9 +423,9 @@ list_mounts (GMountTracker *tracker,
 }
 
 static void
-mount (GMountTracker *tracker,
-       DBusConnection *connection,
-       DBusMessage *message)
+mount_location (GMountTracker *tracker,
+		DBusConnection *connection,
+		DBusMessage *message)
 {
   DBusMessageIter iter;
   DBusMessage *reply;
@@ -436,7 +436,6 @@ mount (GMountTracker *tracker,
   Mountable *mountable;
   dbus_bool_t automount;
   
-
   dbus_message_iter_init (message, &iter);
 
   mountable = NULL;
@@ -466,9 +465,7 @@ mount (GMountTracker *tracker,
 	    {
 	      mountable = lookup_mountable (spec);
 
-	      if (mountable != NULL)
-		reply = dbus_message_new_method_return (message);
-	      else
+	      if (mountable == NULL)
 		{
 		  error = NULL;
 		  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
@@ -526,12 +523,12 @@ dbus_message_function (DBusConnection  *connection,
     lookup_mount (tracker, connection, message, TRUE);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					"listMounts"))
+					G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS))
     list_mounts (tracker, connection, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT))
-    mount (tracker, connection, message);
+					G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION))
+    mount_location (tracker, connection, message);
   else
     res = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   

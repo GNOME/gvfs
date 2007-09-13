@@ -939,7 +939,7 @@ g_daemon_file_mount_for_location (GFile *location,
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  G_VFS_DBUS_MOUNTTRACKER_PATH,
 					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					  G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT);
+					  G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION);
   g_mount_source_to_dbus (mount_source, message);
   g_object_unref (mount_source);
 
