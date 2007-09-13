@@ -45,6 +45,8 @@ G_BEGIN_DECLS
 
 /* Mounts time out in 10 minutes, since they can be slow, with auth, etc */
 #define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*10)
+/* Normal ops are faster, one minute timeout */
+#define G_VFS_DBUS_TIMEOUT_MSECS (1000*60)
 
 typedef struct {
   guint32 command;

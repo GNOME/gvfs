@@ -17,8 +17,6 @@
 #include "gdbusutils.h"
 #include "gsysutils.h"
 
-#define DBUS_TIMEOUT_DEFAULT 30 * 1000 /* 1/2 min */
-
 /* Extra vfs-specific data for DBusConnections */
 typedef struct {
   int extra_fd;
@@ -455,7 +453,7 @@ async_call_send (AsyncDBusCall *async_call)
 
   _g_dbus_connection_call_async (async_call->connection,
 				 async_call->message,
-				 DBUS_TIMEOUT_DEFAULT,
+				 G_VFS_DBUS_TIMEOUT_MSECS,
 				 async_dbus_response,
 				 async_call);
 }
@@ -568,7 +566,8 @@ open_connection_async (AsyncDBusCall *async_call)
     _g_dbus_oom ();
 
 
-  _g_dbus_connection_call_async (NULL, get_connection_message, DBUS_TIMEOUT_DEFAULT,
+  _g_dbus_connection_call_async (NULL, get_connection_message,
+				 G_VFS_DBUS_TIMEOUT_MSECS,
 				 async_get_connection_response,
 				 async_call);
   
@@ -650,7 +649,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   if (cancel_fd != -1)
     {
       if (!dbus_connection_send_with_reply (connection, message,
-					    &pending, DBUS_TIMEOUT_DEFAULT))
+					    &pending,
+					    G_VFS_DBUS_TIMEOUT_MSECS))
 	_g_dbus_oom ();
       
       if (pending == NULL)
@@ -723,7 +723,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 
 	  if (poll_fds[0].revents != 0)
 	    {
-	      dbus_connection_read_write (connection, DBUS_TIMEOUT_DEFAULT);
+	      dbus_connection_read_write (connection,
+					  G_VFS_DBUS_TIMEOUT_MSECS);
 
 	      while (dbus_connection_dispatch (connection) == DBUS_DISPATCH_DATA_REMAINS)
 		;
@@ -738,7 +739,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
     {
       dbus_error_init (&derror);
       reply = dbus_connection_send_with_reply_and_block (connection, message,
-							 DBUS_TIMEOUT_DEFAULT,
+							 G_VFS_DBUS_TIMEOUT_MSECS,
 							 &derror);
       if (!reply)
 	{
