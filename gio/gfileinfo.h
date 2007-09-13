@@ -72,12 +72,16 @@ struct _GFileInfoClass
 
 /* Time attributes */
 
+  /* The last time the file content or an attribute was modified */
 #define G_FILE_ATTRIBUTE_TIME_MODIFIED "time:modified"           /* uint64 */
 #define G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC "time:modified_usec" /* uint32 */
+  /* The last time the file was read */
 #define G_FILE_ATTRIBUTE_TIME_ACCESS "time:access"               /* uint64 */
 #define G_FILE_ATTRIBUTE_TIME_ACCESS_USEC "time:access_usec"     /* uint32 */
+  /* The last time a file attribute was changed (e.g. unix ctime) */
 #define G_FILE_ATTRIBUTE_TIME_CHANGED "time:changed"             /* uint64 */
 #define G_FILE_ATTRIBUTE_TIME_CHANGED_USEC "time:changed_usec"   /* uint32 */
+  /* When the file was originally created (e.g. ntfs ctime) */
 #define G_FILE_ATTRIBUTE_TIME_CREATED "time:created"             /* uint64 */
 #define G_FILE_ATTRIBUTE_TIME_CREATED_USEC "time:created_usec"   /* uint32 */
 

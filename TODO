@@ -59,8 +59,6 @@ GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 
 Set owner:user, owner:group for local files
 
-document create time vs change time vs mtime, etc
-
 FUTURE IDEAS:
 -------------
 
