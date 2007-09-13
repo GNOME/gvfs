@@ -28,8 +28,10 @@ GUnionVolume *g_union_volume_new                   (GVolumeMonitor *union_monito
 void          g_union_volume_add_volume            (GUnionVolume   *union_volume,
 						    GVolume        *volume,
 						    GVolumeMonitor *monitor);
-gboolean      g_union_volume_remove_volume         (GUnionVolume   *union_volume,
+void         g_union_volume_remove_volume         (GUnionVolume   *union_volume,
 						    GVolume        *volume);
+gboolean      g_union_volume_is_last_child         (GUnionVolume   *union_volume,
+						    GVolume        *child_volume);
 gboolean      g_union_volume_has_child_volume      (GUnionVolume   *union_volume,
 						    GVolume        *child_volume);
 GVolume *     g_union_volume_get_child_for_monitor (GUnionVolume   *union_volume,

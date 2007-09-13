@@ -390,6 +390,88 @@ test_appinfo (void)
     }
 }
 
+static void
+volume_mounted (GVolumeMonitor *volume_monitor,
+		GVolume        *v)
+{
+  g_print ("Volume mounted %p: %s - %s\n", v,
+	   g_volume_get_name (v), g_volume_get_icon (v));
+}
+  
+static void
+volume_pre_unmount (GVolumeMonitor *volume_monitor,
+		    GVolume	*v)
+{
+  g_print ("Volume_pre_unmount %p: %s - %s\n", v,
+	   g_volume_get_name (v), g_volume_get_icon (v));
+}
+
+static void
+volume_unmounted (GVolumeMonitor *volume_monitor,
+		  GVolume        *v)
+{
+  g_print ("Volume_unmounted %p: %s - %s\n", v,
+	   g_volume_get_name (v), g_volume_get_icon (v));
+}
+
+static void
+drive_connected (GVolumeMonitor *volume_monitor,
+		 GDrive	        *d)
+{
+  g_print ("Drive connected %p: %s - %s\n", d,
+	   g_drive_get_name (d), g_drive_get_icon (d));
+}
+
+static void
+drive_disconnected (GVolumeMonitor *volume_monitor,
+		    GDrive         *d)
+{
+  g_print ("Drive disconnected %p: %s - %s\n", d,
+	   g_drive_get_name (d), g_drive_get_icon (d));
+}
+
+static void
+test_volumes (void)
+{
+  GVolumeMonitor *monitor;
+  GList *volumes, *drives, *l;
+
+  monitor = g_get_volume_monitor ();
+
+  g_print ("Drives: \n");
+  drives = g_volume_monitor_get_connected_drives (monitor);
+  for (l = drives; l != NULL; l = l->next)
+    {
+      GDrive *d = l->data;
+      
+      g_print ("Drive %p: %s - %s\n", d,
+	       g_drive_get_name (d), g_drive_get_icon (d));
+    }
+  g_list_foreach (drives, (GFunc)g_object_unref, NULL);
+  g_list_free (drives);
+
+  g_print ("Volumes: \n");
+  volumes = g_volume_monitor_get_mounted_volumes (monitor);
+  for (l = volumes; l != NULL; l = l->next)
+    {
+      GVolume *v = l->data;
+      
+      g_print ("Volume %p: %s - %s\n", v,
+	       g_volume_get_name (v), g_volume_get_icon (v));
+    }
+  g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
+  g_list_free (volumes);
+
+  g_signal_connect (monitor, "volume_mounted", (GCallback)volume_mounted, NULL);
+  g_signal_connect (monitor, "volume_pre_unmount", (GCallback)volume_pre_unmount, NULL);
+  g_signal_connect (monitor, "volume_unmounted", (GCallback)volume_unmounted, NULL);
+  g_signal_connect (monitor, "drive_connected", (GCallback)drive_connected, NULL);
+  g_signal_connect (monitor, "drive_disconnected", (GCallback)drive_disconnected, NULL);
+      
+  //g_object_unref (monitor);
+
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -413,6 +495,9 @@ main (int argc, char *argv[])
   
   loop = g_main_loop_new (NULL, FALSE);
 
+  if (1)
+    test_volumes ();
+  
   if (0) {
     GInputStream *s;
     char *buffer;
@@ -440,35 +525,11 @@ main (int argc, char *argv[])
     g_print ("main loop quit\n");
   }
 
-  
   file = g_file_get_for_path ("/tmp");
-
   if (0) test_sync ("test:///etc/passwd", FALSE);
   if (0) test_async ("test:///etc/passwd", TRUE);
-
   if (0) test_out ();
 
-  if (1)
-    {
-      GVolumeMonitor *mon;
-      GList *volumes, *l;
-
-      mon = g_get_volume_monitor ();
-
-      volumes = g_volume_monitor_get_mounted_volumes (mon);
-
-      for (l = volumes; l != NULL; l = l->next)
-	{
-	  GVolume *v = l->data;
-
-	  g_print ("Volume %p: %s - %s\n", v,
-		   g_volume_get_name (v), g_volume_get_icon (v));
-	}
-
-      g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
-      g_list_free (volumes);
-    }
-  
   g_print ("Starting mainloop\n");
   g_main_loop_run (loop);
   

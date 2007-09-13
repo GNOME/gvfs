@@ -110,6 +110,20 @@ g_union_volume_add_volume (GUnionVolume   *union_volume,
 }
 
 gboolean
+g_union_volume_is_last_child (GUnionVolume   *union_volume,
+			      GVolume        *child_volume)
+{
+  if (union_volume->child_volumes != NULL &&
+      union_volume->child_volumes->next == NULL)
+    {
+      ChildVolume *child = union_volume->child_volumes->data;
+      if (child->volume == child_volume)
+	return TRUE;
+    }
+  return FALSE;
+}
+
+void
 g_union_volume_remove_volume (GUnionVolume   *union_volume,
 			      GVolume        *child_volume)
 {
@@ -131,11 +145,9 @@ g_union_volume_remove_volume (GUnionVolume   *union_volume,
 	  
 	  g_signal_emit_by_name (union_volume, "changed");
 	  
-	  return union_volume->child_volumes == NULL;
+	  return;
 	}
     }
-  
-  return FALSE;
 }
 
 GVolume *

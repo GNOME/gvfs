@@ -161,17 +161,29 @@ remove_child_volume (GUnionVolumeMonitor *union_monitor,
 		     GVolume *child_volume)
 {
   GUnionVolume *union_volume;
+  gboolean last;
 
   union_volume = lookup_union_volume (union_monitor, child_volume);
-  if (g_union_volume_remove_volume (union_volume, child_volume))
+  if (union_volume == NULL)
+    return;
+  
+  last = g_union_volume_is_last_child (union_volume, child_volume);
+
+  /* Emit volume_unmounted before we remove the child volume so that
+     ops still work on the union volume */
+  if (last)
     {
       union_monitor->volumes = g_list_remove (union_monitor->volumes,
 					      union_volume);
       g_signal_emit_by_name (union_monitor,
 			     "volume_unmounted",
 			     union_volume);
-      g_object_unref (union_volume);
     }
+  
+  g_union_volume_remove_volume (union_volume, child_volume);
+  
+  if (last)
+    g_object_unref (union_volume);
 }
 
 static GUnionDrive *
@@ -203,7 +215,7 @@ add_child_drive (GUnionVolumeMonitor *union_monitor,
   union_monitor->drives = g_list_prepend (union_monitor->drives,
 					  union_drive);
   g_signal_emit_by_name (union_monitor,
-			 "drive_conntected",
+			 "drive_connected",
 			 child_drive);
 }
 
