@@ -1,4 +1,4 @@
-/* From draft-ietf-secsh-filexfer-13.txt */
+/* From draft-ietf-secsh-filexfer-02.txt */
 
 /* version */
 #define	SSH_FILEXFER_VERSION		3
