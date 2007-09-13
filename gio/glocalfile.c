@@ -54,28 +54,80 @@ g_local_file_init (GLocalFile *local)
 {
 }
 
+
+static char *
+canonicalize_filename (const char *filename)
+{
+  char *canon, *start, *p, *q;
+  char *cwd;
+  
+  if (!g_path_is_absolute (filename))
+    {
+      cwd = g_get_current_dir ();
+      canon = g_build_filename (cwd, filename, NULL);
+      g_free (cwd);
+    }
+  else
+    canon = g_strdup (filename);
+
+  start = (char *)g_path_skip_root (canon);
+
+  p = start;
+  while (*p != 0)
+    {
+      if (p[0] == '.' && (p[1] == 0 || G_IS_DIR_SEPARATOR (p[1])))
+	{
+	  memmove (p, p+1, strlen (p+1)+1);
+	}
+      else if (p[0] == '.' && p[1] == '.' && (p[2] == 0 || G_IS_DIR_SEPARATOR (p[2])))
+	{
+	  q = p + 2;
+	  /* Skip previous separator */
+	  p = p - 2;
+	  if (p < start)
+	    p = start;
+	  while (p > start && !G_IS_DIR_SEPARATOR (*p))
+	    p--;
+	  if (G_IS_DIR_SEPARATOR (*p))
+	    *p++ = G_DIR_SEPARATOR;
+	  memmove (p, q, strlen (q)+1);
+	}
+      else
+	{
+	  /* Skip until next separator */
+	  while (*p != 0 && !G_IS_DIR_SEPARATOR (*p))
+	    p++;
+	  
+	  if (*p != 0)
+	    {
+	      /* Canonicalize one separator */
+	      *p++ = G_DIR_SEPARATOR;
+	    }
+	}
+
+      /* Remove additional separators */
+      q = p;
+      while (*q && G_IS_DIR_SEPARATOR (*q))
+	q++;
+
+      if (p != q)
+	memmove (p, q, strlen (q)+1);
+    }
+
+  /* Remove trailing slashes */
+  if (p > start && G_IS_DIR_SEPARATOR (*(p-1)))
+    *(p-1) = 0;
+  
+  return canon;
+}
+
 GFile *
 g_local_file_new (const char *filename)
 {
   GLocalFile *local;
-  char *non_root;
-  int len;
 
   local = g_object_new (G_TYPE_LOCAL_FILE, NULL);
-  local->filename = g_strdup (filename);
-
-  /* Remove any trailing slashes */
-  non_root = (char *)g_path_skip_root (local->filename);
-  if (non_root != NULL)
-    {
-      len = strlen (non_root);
-      while (len > 0 &&
-	     G_IS_DIR_SEPARATOR (non_root[len-1]))
-	{
-	  non_root[len-1] = 0;
-	  len--;
-	}
-    }
+  local->filename = canonicalize_filename (filename);
   
   return G_FILE (local);
 }
