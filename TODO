@@ -19,8 +19,6 @@ is-slow marking for e.g. thumbnailing?
 getting selinux attrs is a bit slow, it does all sort of weird ops.
 
 handle setting xattrs on local files (and list the namespace as writable)
-Split user.* and system.* into two namespaces?
-handle non-ascii/utf8 xattr names by escaping
 
 handle setting mtime, ctime, etc for local files
 

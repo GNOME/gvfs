@@ -124,51 +124,71 @@ valid_char (char c)
   return c >= 32 && c <= 126 && c != '\\';
 }
 
+static char *
+hex_escape_string (const char *str, gboolean *free_return)
+{
+  int num_invalid, i;
+  char *escaped_str, *p;
+  unsigned char c;
+  static char *hex_digits = "0123456789abcdef";
+  int len;
+
+  len = strlen (str);
+  
+  num_invalid = 0;
+  for (i = 0; i < len; i++)
+    {
+      if (!valid_char (str[i]))
+	num_invalid++;
+    }
+
+  if (num_invalid == 0)
+    {
+      *free_return = FALSE;
+      return (char *)str;
+    }
+
+  escaped_str = g_malloc (len + num_invalid*3 + 1);
+
+  p = escaped_str;
+  for (i = 0; i < len; i++)
+    {
+      if (valid_char (str[i]))
+	*p++ = str[i];
+      else
+	{
+	  c = str[i];
+	  *p++ = '\\';
+	  *p++ = 'x';
+	  *p++ = hex_digits[(c >> 8) & 0xf];
+	  *p++ = hex_digits[c & 0xf];
+	}
+    }
+  *p++ = 0;
+
+  *free_return = TRUE;
+  return escaped_str;
+}
+
 static void
 escape_xattr (GFileInfo *info,
-	      const char *attr,
+	      const char *attr, /* not escaped */
 	      const char *value, /* Is zero terminated */
 	      size_t len /* not including zero termination */)
 {
   char *full_attr;
-  int num_invalid, i;
-  char *escaped_val, *p;
-  unsigned char c;
-  static char *hex_digits = "0123456789abcdef";
+  char *escaped_val, *escaped_attr;
+  gboolean free_escaped_val, free_escaped_attr;
   
-  full_attr = g_strconcat ("xattr:", attr, NULL);
+  escaped_attr = hex_escape_string (attr, &free_escaped_attr);
+  full_attr = g_strconcat ("xattr:", escaped_attr, NULL);
+  if (free_escaped_attr)
+    g_free (escaped_attr);
 
-  num_invalid = 0;
-  for (i = 0; i < len; i++)
-    {
-      if (!valid_char (value[i]))
-	num_invalid++;
-    }
-	
-  if (num_invalid == 0)
-    g_file_info_set_attribute_string (info, full_attr, value);
-  else
-    {
-      escaped_val = g_malloc (len + num_invalid*3 + 1);
-
-      p = escaped_val;
-      for (i = 0; i < len; i++)
-	{
-	  if (valid_char (value[i]))
-	    *p++ = value[i];
-	  else
-	    {
-	      c = value[i];
-	      *p++ = '\\';
-	      *p++ = 'x';
-	      *p++ = hex_digits[(c >> 8) & 0xf];
-	      *p++ = hex_digits[c & 0xf];
-	    }
-	}
-      *p++ = 0;
-      g_file_info_set_attribute_string (info, full_attr, escaped_val);
-      g_free (escaped_val);
-    }
+  escaped_val = hex_escape_string (value, &free_escaped_val);
+  g_file_info_set_attribute_string (info, full_attr, escaped_val);
+  if (free_escaped_val)
+    g_free (escaped_val);
   
   g_free (full_attr);
 }
@@ -243,7 +263,6 @@ get_xattrs (const char *path,
   const char *attr;
 
   all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
-
   if (all)
     {
       if (follow_symlinks)
