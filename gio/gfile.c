@@ -15,6 +15,16 @@ static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
 			       gpointer class_data);
 
+static void               g_file_real_get_info_async           (GFile                *file,
+								const char           *attributes,
+								GFileGetInfoFlags     flags,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              user_data);
+static GFileInfo *        g_file_real_get_info_finish          (GFile                *file,
+								GAsyncResult         *res,
+								GError              **error);
 static void               g_file_real_read_async               (GFile                *file,
 								int                   io_priority,
 								GCancellable         *cancellable,
@@ -91,6 +101,8 @@ g_file_class_init (gpointer g_class,
 {
   GFileIface *iface = g_class;
 
+  iface->get_info_async = g_file_real_get_info_async;
+  iface->get_info_finish = g_file_real_get_info_finish;
   iface->read_async = g_file_real_read_async;
   iface->read_finish = g_file_real_read_finish;
   iface->append_to_async = g_file_real_append_to_async;
@@ -268,6 +280,45 @@ g_file_get_info (GFile *file,
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->get_info) (file, attributes, flags, cancellable, error);
+}
+
+void
+g_file_get_info_async (GFile                      *file,
+		       const char                 *attributes,
+		       GFileGetInfoFlags           flags,
+		       int                         io_priority,
+		       GCancellable               *cancellable,
+		       GAsyncReadyCallback         callback,
+		       gpointer                    user_data)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->get_info_async) (file,
+			     attributes,
+			     flags,
+			     io_priority,
+			     cancellable,
+			     callback,
+			     user_data);
+}
+
+GFileInfo *
+g_file_get_info_finish (GFile                      *file,
+			GAsyncResult               *res,
+			GError                    **error)
+{
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (res))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->get_info_finish) (file, res, error);
 }
 
 GFileInfo *
@@ -1454,6 +1505,83 @@ g_file_monitor_file (GFile *file)
  *   Default implementation of async ops    *
  ********************************************/
 
+typedef struct {
+  char *attributes;
+  GFileGetInfoFlags flags;
+  GFileInfo *info;
+} GetInfoAsyncData;
+
+static void
+get_info_data_free (GetInfoAsyncData *data)
+{
+  if (data->info)
+    g_object_unref (data->info);
+  g_free (data->attributes);
+  g_free (data);
+}
+
+static void
+get_info_async_thread (GSimpleAsyncResult *res,
+		       GObject *object,
+		       GCancellable *cancellable)
+{
+  GError *error = NULL;
+  GetInfoAsyncData *data;
+  GFileInfo *info;
+  
+  data = g_simple_async_result_get_op_res_gpointer (res);
+  
+  info = g_file_get_info (G_FILE (object), data->attributes, data->flags, cancellable, &error);
+
+  if (info == NULL)
+    {
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
+    }
+  else
+    data->info = info;
+}
+
+static void
+g_file_real_get_info_async (GFile                      *file,
+			    const char                 *attributes,
+			    GFileGetInfoFlags           flags,
+			    int                         io_priority,
+			    GCancellable               *cancellable,
+			    GAsyncReadyCallback         callback,
+			    gpointer                    user_data)
+{
+  GSimpleAsyncResult *res;
+  GetInfoAsyncData *data;
+
+  data = g_new0 (GetInfoAsyncData, 1);
+  data->attributes = g_strdup (attributes);
+  data->flags = flags;
+  
+  res = g_simple_async_result_new (G_OBJECT (file), callback, user_data, g_file_real_get_info_async);
+  g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)get_info_data_free);
+  
+  g_simple_async_result_run_in_thread (res, get_info_async_thread, io_priority, cancellable);
+  g_object_unref (res);
+}
+
+static GFileInfo *
+g_file_real_get_info_finish (GFile                      *file,
+			     GAsyncResult               *res,
+			     GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GetInfoAsyncData *data;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_real_get_info_async);
+
+  data = g_simple_async_result_get_op_res_gpointer (simple);
+  if (data->info)
+    return g_object_ref (data->info);
+  
+  return NULL;
+}
+
 static void
 open_read_async_thread (GSimpleAsyncResult *res,
 			GObject *object,
@@ -1668,7 +1796,7 @@ g_file_real_replace_async (GFile                  *file,
   GSimpleAsyncResult *res;
   ReplaceAsyncData *data;
 
-  data = g_new (ReplaceAsyncData, 1);
+  data = g_new0 (ReplaceAsyncData, 1);
   data->etag = g_strdup (etag);
   data->make_backup = make_backup;
   

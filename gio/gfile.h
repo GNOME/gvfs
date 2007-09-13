@@ -67,11 +67,20 @@ struct _GFileIface
 					     GFileGetInfoFlags     flags,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  void                (*get_info_async)     (GFile                *file,
+					     const char           *attributes,
+					     GFileGetInfoFlags     flags,
+					     int                   io_priority,
+					     GCancellable         *cancellable,
+					     GAsyncReadyCallback   callback,
+					     gpointer              user_data);
+  GFileInfo *         (*get_info_finish)    (GFile                *file,
+					     GAsyncResult         *res,
+					     GError              **error);
   GFileInfo *         (*get_filesystem_info)(GFile                *file,
 					     const char           *attributes,
 					     GCancellable         *cancellable,
 					     GError              **error);
-  /*                  (*get_info_async)     (GFile                *file.. */
   GFile *             (*set_display_name)   (GFile                *file,
 					     const char           *display_name,
 					     GCancellable         *cancellable,
@@ -286,6 +295,16 @@ GFileInfo *             g_file_get_info                   (GFile                
 							   GFileGetInfoFlags           flags,
 							   GCancellable               *cancellable,
 							   GError                    **error);
+void                    g_file_get_info_async             (GFile                      *file,
+							   const char                 *attributes,
+							   GFileGetInfoFlags           flags,
+							   int                         io_priority,
+							   GCancellable               *cancellable,
+							   GAsyncReadyCallback         callback,
+							   gpointer                    user_data);
+GFileInfo *             g_file_get_info_finish            (GFile                      *file,
+							   GAsyncResult               *res,
+							   GError                    **error);
 GFileInfo *             g_file_get_filesystem_info        (GFile                      *file,
 							   const char                 *attributes,
 							   GCancellable               *cancellable,
@@ -409,6 +428,7 @@ void                    g_file_eject_mountable            (GFile                
 gboolean                g_file_eject_mountable_finish     (GFile                      *file,
 							   GAsyncResult               *result,
 							   GError                    **error);
+
 
 
 GDirectoryMonitor* g_file_monitor_directory          (GFile                  *file);
