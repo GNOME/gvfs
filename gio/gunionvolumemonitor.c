@@ -7,6 +7,9 @@
 #include "gunionvolumemonitor.h"
 #include "gunionvolume.h"
 #include "gvolumepriv.h"
+#ifdef G_OS_UNIX
+#include "gunixvolumemonitor.h"
+#endif
 
 struct _GUnionVolumeMonitor {
   GVolumeMonitor parent;
@@ -55,13 +58,45 @@ g_union_volume_monitor_dispose (GObject *object)
     (*G_OBJECT_CLASS (g_union_volume_monitor_parent_class)->dispose) (object);
 }
 
+static GList *
+get_mounted_volumes (GVolumeMonitor *volume_monitor)
+{
+  GUnionVolumeMonitor *monitor;
+  GList *l;
+  
+  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+
+  l = g_list_copy (monitor->volumes);
+  g_list_foreach (l, (GFunc)g_object_ref, NULL);
+
+  return l;
+}
+
+static GList *
+get_connected_drives (GVolumeMonitor *volume_monitor)
+{
+  GUnionVolumeMonitor *monitor;
+  GList *l;
+  
+  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+
+  l = g_list_copy (monitor->drives);
+  g_list_foreach (l, (GFunc)g_object_ref, NULL);
+
+  return l;
+}
+
 static void
 g_union_volume_monitor_class_init (GUnionVolumeMonitorClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GVolumeMonitorClass *monitor_class = G_VOLUME_MONITOR_CLASS (klass);
   
   gobject_class->finalize = g_union_volume_monitor_finalize;
   gobject_class->dispose = g_union_volume_monitor_dispose;
+
+  monitor_class->get_mounted_volumes = get_mounted_volumes;
+  monitor_class->get_connected_drives = get_connected_drives;
 }
 
 static void
@@ -223,7 +258,7 @@ g_union_volume_monitor_add_monitor (GUnionVolumeMonitor *union_monitor,
 					    g_object_ref (volume_monitor));
 
   g_signal_connect (volume_monitor, "volume_mounted", (GCallback)child_volume_mounted, union_monitor);
-  g_signal_connect (volume_monitor, "volume_pre_mount", (GCallback)child_volume_pre_unmount, union_monitor);
+  g_signal_connect (volume_monitor, "volume_pre_unmount", (GCallback)child_volume_pre_unmount, union_monitor);
   g_signal_connect (volume_monitor, "volume_unmounted", (GCallback)child_volume_unmounted, union_monitor);
   g_signal_connect (volume_monitor, "drive_connected", (GCallback)child_drive_connected, union_monitor);
   g_signal_connect (volume_monitor, "drive_disconnected", (GCallback)child_drive_disconnected, union_monitor);
@@ -274,14 +309,9 @@ g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
 static void
 g_union_volume_monitor_init (GUnionVolumeMonitor *union_monitor)
 {
-
-  /* Remove unused warnings for now */
-  if (0)
-    {
-      g_union_volume_monitor_add_monitor (union_monitor, NULL);
-      g_union_volume_monitor_remove_monitor (union_monitor, NULL);
-    }
-    
+#ifdef G_OS_UNIX
+  g_union_volume_monitor_add_monitor (union_monitor, g_unix_volume_monitor_new ());
+#endif
 }
 
 static GUnionVolumeMonitor *

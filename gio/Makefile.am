@@ -48,7 +48,15 @@ appinfo_sources =
 if OS_UNIX
 appinfo_sources += gdesktopappinfo.c gdesktopappinfo.h
 platform_libadd += xdgmime/libxdgmime.la
-socket_sources = \
+unix_sources = \
+	gunixmounts.c \
+	gunixmounts.h \
+	gunixdrive.c \
+	gunixdrive.h \
+	gunixvolume.c \
+	gunixvolume.h \
+	gunixvolumemonitor.c \
+	gunixvolumemonitor.h \
 	gsocketinputstream.c \
 	gsocketinputstream.h \
 	gsocketoutputstream.c \
@@ -69,6 +77,7 @@ libgio_la_SOURCES = 	\
 	gcontenttype.c \
 	gcontenttypeprivate.h \
 	gdrive.c \
+	gdrivepriv.h \
 	gfile.c \
 	gfileenumerator.c \
 	gfileinfo.c \
@@ -91,7 +100,7 @@ libgio_la_SOURCES = 	\
 	gvolumemonitor.c \
 	gvolumepriv.h \
 	$(appinfo_sources) \
-	$(socket_sources) \
+	$(unix_sources) \
 	$(local_sources) \
 	$(daemon_sources) \
 	$(marshal_sources) \

@@ -35,9 +35,12 @@ CFLAGS=$saved_CFLAGS
 
 AC_CHECK_HEADERS([pwd.h])
 
-	
 AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link)
 
+dnl Volume monitor stuff			     
+AC_CHECK_FUNCS(setmntent endmntent hasmntopt getmntinfo)
+AC_CHECK_HEADERS(mntent.h sys/mnttab.h sys/vfstab.h sys/cdio.h sys/mount.h sys/mntctl.h sys/vfs.h sys/vmount.h sys/sysctl.h fstab.h fnmatch.h util.h sys/sysmacros.h)
+			     
 AC_MSG_CHECKING([for Win32])
 case "$host" in
   *-*-mingw*)

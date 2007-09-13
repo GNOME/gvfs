@@ -172,8 +172,38 @@ g_union_volume_get_platform_id (GVolume *volume)
   return NULL;
 }
 
+static char *
+g_union_volume_get_name (GVolume *volume)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_get_name (child->volume);
+    }
+  return g_strdup ("volume");
+}
+
+static char *
+g_union_volume_get_icon (GVolume *volume)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      return g_volume_get_icon (child->volume);
+    }
+  return NULL;
+}
+
 static void
 g_union_volue_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_platform_id = g_union_volume_get_platform_id;
+  iface->get_name = g_union_volume_get_name;
+  iface->get_icon = g_union_volume_get_icon;
 }

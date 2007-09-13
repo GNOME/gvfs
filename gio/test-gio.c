@@ -6,6 +6,7 @@
 
 #include <glib.h>
 #include "gfile.h"
+#include "gvolumemonitor.h"
 #include "gseekable.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
@@ -397,10 +398,10 @@ main (int argc, char *argv[])
 
   setlocale (LC_ALL, "");
   
-  g_type_init ();
   g_thread_init (NULL);
+  g_type_init ();
 
-  if (1)
+  if (0)
     {
       test_content_types ();
       test_appinfo ();
@@ -443,10 +444,31 @@ main (int argc, char *argv[])
   file = g_file_get_for_path ("/tmp");
 
   if (0) test_sync ("test:///etc/passwd", FALSE);
-  if (1) test_async ("test:///etc/passwd", TRUE);
+  if (0) test_async ("test:///etc/passwd", TRUE);
 
   if (0) test_out ();
 
+  if (1)
+    {
+      GVolumeMonitor *mon;
+      GList *volumes, *l;
+
+      mon = g_get_volume_monitor ();
+
+      volumes = g_volume_monitor_get_mounted_volumes (mon);
+
+      for (l = volumes; l != NULL; l = l->next)
+	{
+	  GVolume *v = l->data;
+
+	  g_print ("Volume %p: %s - %s\n", v,
+		   g_volume_get_name (v), g_volume_get_icon (v));
+	}
+
+      g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
+      g_list_free (volumes);
+    }
+  
   g_print ("Starting mainloop\n");
   g_main_loop_run (loop);
   
