@@ -495,7 +495,7 @@ async_get_connection_response (DBusMessage *reply,
   extra_fd = _g_socket_connect (address2, &error);
   if (extra_fd == -1)
     {
-      g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&async_call->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Error connecting to daemon: %s"), error->message);
       g_error_free (error);
       async_call_finish (async_call, NULL);
@@ -510,7 +510,7 @@ async_get_connection_response (DBusMessage *reply,
       close (extra_fd);
       dbus_message_unref (reply);
       
-      g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&async_call->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
       dbus_error_free (&derror);
@@ -655,7 +655,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
       
       if (pending == NULL)
 	{
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       "Error while getting peer-to-peer dbus connection: %s",
 		       "Connection is closed");
 	  return NULL;
@@ -667,7 +667,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
       if (!dbus_connection_get_unix_fd (connection, &dbus_fd))
 	{
 	  dbus_pending_call_unref (pending);
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       "Error while getting peer-to-peer dbus connection: %s",
 		       "No fd");
 	  return NULL;
@@ -692,7 +692,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 	  if (poll_ret == -1)
 	    {
 	      dbus_pending_call_unref (pending);
-	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   "Error while getting peer-to-peer dbus connection: %s",
 			   "poll error");
 	      return NULL;
@@ -824,7 +824,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
       bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);
       if (bus == NULL)
 	{
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       "Couldn't get main dbus connection: %s\n",
 		       derror.message);
 	  dbus_error_free (&derror);
@@ -847,7 +847,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 
   if (!reply)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
       dbus_error_free (&derror);
@@ -866,7 +866,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   extra_fd = _g_socket_connect (address2, &local_error);
   if (extra_fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Error connecting to daemon: %s"), local_error->message);
       g_error_free (local_error);
       dbus_message_unref (reply);
@@ -877,7 +877,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
   connection = dbus_connection_open_private (address1, &derror);
   if (!connection)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
       close (extra_fd);
@@ -986,7 +986,7 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 
  error:
   g_object_unref (info);
-  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 	       _("Invalid file info format"));
   return NULL;
 }

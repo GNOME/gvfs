@@ -398,8 +398,8 @@ do_mount (GVfsBackend *backend,
   if (smb_context == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_IO,
-			"Failed to allocate smb context");
+			G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Failed to allocate smb context"));
       return;
     }
   smbc_option_set (smb_context, "user_data", backend);
@@ -433,8 +433,8 @@ do_mount (GVfsBackend *backend,
   if (!smbc_init_context (smb_context))
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_IO,
-			"Failed to initialize smb context");
+			G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Failed to initialize smb context"));
       smbc_free_context (smb_context, FALSE);
       return;
     }
@@ -484,8 +484,8 @@ do_mount (GVfsBackend *backend,
       /* TODO: Error from errno? */
       op_backend->mount_source = NULL;
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_IO,
-			"Failed to mount smb share");
+			G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Failed to mount smb share"));
       return;
     }
   
@@ -507,7 +507,7 @@ try_mount (GVfsBackend *backend,
   if (server == NULL || share == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_INVAL,
+			G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 			_("Invalid mount spec"));
       return TRUE;
     }
@@ -858,8 +858,8 @@ do_replace (GVfsBackend *backend,
 					O_CREAT|O_WRONLY|O_EXCL, 0);
   if (file == NULL && errno != EEXIST)
     {
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (&error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   g_strerror (errno));
       goto error;
     }
@@ -919,8 +919,8 @@ do_replace (GVfsBackend *backend,
 						O_CREAT|O_WRONLY|O_TRUNC, 0);
 	  if (file == NULL)
 	    {
-	      g_set_error (&error, G_FILE_ERROR,
-			   g_file_error_from_errno (errno),
+	      g_set_error (&error, G_IO_ERROR,
+			   g_io_error_from_errno (errno),
 			   g_strerror (errno));
 	      goto error;
 	    }
@@ -1187,8 +1187,8 @@ do_enumerate (GVfsBackend *backend,
   if (dir == NULL)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (&error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   g_strerror (errno));
       goto error;
     }

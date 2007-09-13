@@ -172,7 +172,7 @@ try (GVfsJob *job)
   else
     {
       GError *error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   "Wrong open for write type");
       g_vfs_job_failed_from_error (job, error);
       g_error_free (error);

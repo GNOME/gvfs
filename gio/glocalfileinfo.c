@@ -511,8 +511,8 @@ g_local_file_info_get (const char *basename,
   if (res == -1)
     {
       g_object_unref (info);
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error stating file '%s': %s"),
 		   path, g_strerror (errno));
       return NULL;
@@ -615,8 +615,8 @@ g_local_file_info_get_from_fd (int fd,
   
   if (fstat (fd, &stat_buf) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error stating file descriptor: %s"),
 		   g_strerror (errno));
       return NULL;

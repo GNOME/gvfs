@@ -9,6 +9,7 @@
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
+#include <gio/gioerror.h>
 
 struct _Mountable {
   char *type;
@@ -111,7 +112,7 @@ exec_mount (Mountable *mountable,
   error = NULL;
   if (mountable->exec == NULL)
     {
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "No exec key defined for mountpoint");
       g_mount_source_failed (source, error);
       g_error_free (error);
@@ -176,7 +177,7 @@ mountable_mount (Mountable *mountable,
   conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
   if (conn == NULL)
     {
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection");
       g_mount_source_failed (source, error);
       g_error_free (error);
@@ -199,7 +200,7 @@ mountable_mount (Mountable *mountable,
   
   if (pending == NULL)
     {
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   "Connection is closed");
       g_mount_source_failed (source, error);

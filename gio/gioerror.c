@@ -18,7 +18,7 @@ g_io_error_from_errno (gint err_no)
     {
 #ifdef EEXIST
     case EEXIST:
-      return G_IO_ERROR_FILE_EXIST;
+      return G_IO_ERROR_EXIST;
       break;
 #endif
 

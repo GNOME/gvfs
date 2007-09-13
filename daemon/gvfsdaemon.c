@@ -960,7 +960,7 @@ mount_got_spec (GMountSource *mount_source,
   if (backend_type == G_TYPE_INVALID)
     {
       io_error = NULL;
-      g_set_error (&io_error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (&io_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   "Unsupported mount type");
       g_mount_source_failed (mount_source, io_error);
       g_error_free (io_error);

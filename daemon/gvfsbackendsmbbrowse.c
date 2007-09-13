@@ -483,7 +483,7 @@ do_mount (GVfsBackend *backend,
   if (smb_context == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_IO,
+			G_IO_ERROR, G_IO_ERROR_FAILED,
 			"Failed to allocate smb context");
       return;
     }
@@ -518,7 +518,7 @@ do_mount (GVfsBackend *backend,
   if (!smbc_init_context (smb_context))
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_IO,
+			G_IO_ERROR, G_IO_ERROR_FAILED,
 			"Failed to initialize smb context");
       smbc_free_context (smb_context, FALSE);
       return;
@@ -572,7 +572,7 @@ try_mount (GVfsBackend *backend,
       if (server == NULL)
 	{
 	  g_vfs_job_failed (G_VFS_JOB (job),
-			    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+			    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 			    "No server specified for smb-server share");
 	  return TRUE;
 	}
@@ -585,7 +585,7 @@ try_mount (GVfsBackend *backend,
       ((user != NULL) || (domain != NULL)))
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_INVAL,
+			G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 			"Can't automount smb browsing with specified user or domain");
       return TRUE;
     }
@@ -604,11 +604,11 @@ run_open_for_read (GVfsBackendSmbBrowse *backend,
 {
   if (has_name (backend, filename))
     g_vfs_job_failed (G_VFS_JOB (job),
-		      G_FILE_ERROR, G_FILE_ERROR_ISDIR,
+		      G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
 		      _("Not a regular file"));
   else
     g_vfs_job_failed (G_VFS_JOB (job),
-		      G_FILE_ERROR, G_FILE_ERROR_NOENT,
+		      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 		      _("File doesn't exist"));
 }
 
@@ -647,7 +647,7 @@ try_read (GVfsBackend *backend,
 	  gsize bytes_requested)
 {
   g_vfs_job_failed (G_VFS_JOB (job),
-		    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		    "Invalid argument");
   
   return TRUE;
@@ -661,7 +661,7 @@ try_seek_on_read (GVfsBackend *backend,
 		 GSeekType  type)
 {
   g_vfs_job_failed (G_VFS_JOB (job),
-		    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		    "Invalid argument");
   return TRUE;
 }
@@ -672,7 +672,7 @@ try_close_read (GVfsBackend *backend,
 	       GVfsBackendHandle handle)
 {
   g_vfs_job_failed (G_VFS_JOB (job),
-		    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		    "Invalid argument");
   return TRUE;
 }
@@ -723,7 +723,7 @@ run_get_info (GVfsBackendSmbBrowse *backend,
   else
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_FILE_ERROR, G_FILE_ERROR_NOENT,
+			G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 			_("File doesn't exist"));
     }
 }
@@ -785,11 +785,11 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
     {
       if (has_name (backend, filename))
 	g_vfs_job_failed (G_VFS_JOB (job),
-			  G_FILE_ERROR, G_FILE_ERROR_NOTDIR,
+			  G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
 			  _("Not a directory"));
       else
 	g_vfs_job_failed (G_VFS_JOB (job),
-			  G_FILE_ERROR, G_FILE_ERROR_NOENT,
+			  G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 			  _("File doesn't exist"));
       return;
     }

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
+#include <gio/gioerror.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -92,8 +93,8 @@ _g_socket_connect (const char *address,
   fd = socket (PF_UNIX, SOCK_STREAM, 0);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error creating socket: %s"),
 		   g_strerror (errno));
       return -1;
@@ -128,8 +129,8 @@ _g_socket_connect (const char *address,
   
   if (connect (fd, (struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
     {      
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error connecting to socket: %s"),
 		   g_strerror (errno));
       close (fd);

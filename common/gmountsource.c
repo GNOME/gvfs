@@ -263,7 +263,7 @@ g_mount_source_request_mount_spec (GMountSource *source,
   dbus_message_unref (reply);
   if (source->mount_spec == NULL)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   "No mount spec gotten from mount source");
       return NULL;
     }
@@ -297,7 +297,7 @@ request_mount_spec_reply (DBusMessage *reply,
   if (data->source->mount_spec == NULL)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   "No mount spec gotten from mount source");
       data->callback (data->source, NULL, error, data->user_data);
       g_error_free (error);

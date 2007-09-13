@@ -343,7 +343,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
   mount_spec = g_mount_spec_from_dbus (&iter);
   if (mount_spec == NULL)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting mount info: %s",
 		   "Invalid reply");
       return NULL;
@@ -497,7 +497,7 @@ _g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
 
   if (!reply)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting mount info: %s",
 		   derror.message);
       dbus_error_free (&derror);

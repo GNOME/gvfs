@@ -379,16 +379,16 @@ g_local_file_set_display_name (GFile *file,
   if (!(g_stat (new_local->filename, &statbuf) == -1 &&
 	errno == ENOENT))
     {
-      g_set_error (error, G_FILE_ERROR,
-		   G_FILE_ERROR_EXIST,
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_EXISTS,
 		   _("Can't rename file, filename already exist"));
       return NULL;
     }
 
   if (rename (local->filename, new_local->filename) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error renaming file: %s"),
 		   g_strerror (errno));
       g_object_unref (new_file);
@@ -433,7 +433,7 @@ get_uint32 (GFileAttributeType type,
 {
   if (type != G_FILE_ATTRIBUTE_TYPE_UINT32)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Invalid attribute type (uint32 expected)"));
       return FALSE;
     }
@@ -451,7 +451,7 @@ get_byte_string (GFileAttributeType type,
 {
   if (type != G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Invalid attribute type (byte string expected)"));
       return FALSE;
     }
@@ -483,8 +483,8 @@ g_local_file_set_attribute (GFile *file,
 
       if (g_chmod (local->filename, val) == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error setting permissions: %s"),
 		       g_strerror (errno));
 	  return FALSE;
@@ -505,8 +505,8 @@ g_local_file_set_attribute (GFile *file,
 	
       if (res == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error setting owner: %s"),
 		       g_strerror (errno));
 	  return FALSE;
@@ -527,8 +527,8 @@ g_local_file_set_attribute (GFile *file,
 	
       if (res == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error setting owner: %s"),
 		       g_strerror (errno));
 	  return FALSE;
@@ -546,15 +546,15 @@ g_local_file_set_attribute (GFile *file,
       
       if (val == NULL)
 	{
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		       _("symlink must be non-NULL"));
 	  return FALSE;
 	}
 
       if (g_lstat (local->filename, &statbuf))
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error setting symlink: %s"),
 		       g_strerror (errno));
 	  return FALSE;
@@ -570,8 +570,8 @@ g_local_file_set_attribute (GFile *file,
 
 	if (g_unlink (local->filename))
 	  {
-	    g_set_error (error, G_FILE_ERROR,
-			 g_file_error_from_errno (errno),
+	    g_set_error (error, G_IO_ERROR,
+			 g_io_error_from_errno (errno),
 			 _("Error setting symlink: %s"),
 			 g_strerror (errno));
 	    return FALSE;
@@ -579,8 +579,8 @@ g_local_file_set_attribute (GFile *file,
 
 	if (symlink (local->filename, val) != 0)
 	  {
-	    g_set_error (error, G_FILE_ERROR,
-			 g_file_error_from_errno (errno),
+	    g_set_error (error, G_IO_ERROR,
+			 g_io_error_from_errno (errno),
 			 _("Error setting symlink: %s"),
 			 g_strerror (errno));
 	    return FALSE;
@@ -604,8 +604,8 @@ g_local_file_read (GFile *file,
   fd = g_open (local->filename, O_RDONLY, 0);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error opening file: %s"),
 		   g_strerror (errno));
       return NULL;
@@ -654,8 +654,8 @@ g_local_file_delete (GFile *file,
   
   if (g_remove (local->filename) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error removing file: %s"),
 		   g_strerror (errno));
       return FALSE;
@@ -673,8 +673,8 @@ g_local_file_make_directory (GFile *file,
   
   if (g_mkdir (local->filename, 0755) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error removing file: %s"),
 		   g_strerror (errno));
       return FALSE;
@@ -693,8 +693,8 @@ g_local_file_make_symbolic_link (GFile *file,
   
   if (symlink (local->filename, symlink_value) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error making symbolic link: %s"),
 		   g_strerror (errno));
       return FALSE;
@@ -745,8 +745,8 @@ g_local_file_move (GFile                *source,
   if ((flags & G_FILE_COPY_OVERWRITE) == 0 && destination_exist)
     {
       g_set_error (error,
-		   G_FILE_ERROR,
-		   G_FILE_ERROR_EXIST,
+		   G_IO_ERROR,
+		   G_IO_ERROR_EXISTS,
 		   _("Target file already exists"));
       return FALSE;
     }
@@ -771,8 +771,8 @@ g_local_file_move (GFile                *source,
       if (errno == EXDEV)
 	goto fallback;
       else
-	g_set_error (error, G_FILE_ERROR,
-		     g_file_error_from_errno (errno),
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errno),
 		     _("Error moving file: %s"),
 		     g_strerror (errno));
       return FALSE;

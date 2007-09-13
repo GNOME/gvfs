@@ -529,7 +529,6 @@ _g_error_from_dbus (DBusError *derror,
 		    GError **error)
 {
   const char *name, *end;;
-  char *m;
   GString *str;
   GQuark domain;
   int code;
@@ -557,11 +556,8 @@ _g_error_from_dbus (DBusError *derror,
     }
   /* TODO: Special case other types, like DBUS_ERROR_NO_MEMORY etc? */
   else
-    {
-      m = g_strdup_printf ("DBus error %s: %s", derror->name, derror->message);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO, "%s", m);
-      g_free (m);
-    }
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		 "DBus error %s: %s", derror->name, derror->message);
 }
 
 GList *
@@ -1272,7 +1268,7 @@ _g_dbus_connection_call_async (DBusConnection *connection,
   
   if (pending_call == NULL)
     {
-      g_set_error (&data->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&data->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   "Connection is closed");
       g_idle_add (async_call_error_at_idle, data);

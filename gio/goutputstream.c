@@ -81,7 +81,7 @@ g_output_stream_init (GOutputStream *stream)
  * during the operation.
  * 
  * If count is zero returns zero and does nothing. A value of @count
- * larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
+ * larger than %G_MAXSSIZE will cause a %G_IO_ERROR_INVALID_ARGUMENT error.
  *
  * On success, the number of bytes written to the stream is returned.
  * It is not an error if this is not the same as the requested size, as it
@@ -118,7 +118,7 @@ g_output_stream_write (GOutputStream *stream,
   
   if (((gssize) count) < 0)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to g_output_stream_write"));
       return -1;
     }
@@ -447,7 +447,7 @@ write_async_callback_wrapper (GOutputStream *stream,
  * During an async request no other sync and async calls are allowed, and will
  * result in %G_IO_ERROR_PENDING errors. 
  *
- * A value of @count larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
+ * A value of @count larger than %G_MAXSSIZE will cause a %G_IO_ERROR_INVALID_ARGUMENT error.
  *
  * On success, the number of bytes written will be passed to the
  * callback. It is not an error if this is not the same as the requested size, as it
@@ -488,7 +488,7 @@ g_output_stream_write_async (GOutputStream        *stream,
   if (((gssize) count) < 0)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to g_input_stream_read_async"));
       queue_write_async_result (stream, buffer, count, -1, error,
 				callback, data);

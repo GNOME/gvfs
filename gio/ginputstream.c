@@ -87,7 +87,7 @@ g_input_stream_init (GInputStream *stream)
  * @buffer. Will block during this read.
  * 
  * If count is zero returns zero and does nothing. A value of @count
- * larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
+ * larger than %G_MAXSSIZE will cause a %G_IO_ERROR_INVALID_ARGUMENT error.
  *
  * On success, the number of bytes read into the buffer is returned.
  * It is not an error if this is not the same as the requested size, as it
@@ -123,7 +123,7 @@ g_input_stream_read  (GInputStream  *stream,
   
   if (((gssize) count) < 0)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to g_input_stream_read"));
       return -1;
     }
@@ -261,7 +261,7 @@ g_input_stream_skip (GInputStream         *stream,
 
   if (((gssize) count) < 0)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to g_input_stream_skip"));
       return -1;
     }
@@ -468,7 +468,7 @@ read_async_callback_wrapper (GInputStream *stream,
  * During an async request no other sync and async calls are allowed, and will
  * result in %G_IO_ERROR_PENDING errors. 
  *
- * A value of @count larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
+ * A value of @count larger than %G_MAXSSIZE will cause a %G_IO_ERROR_INVALID_ARGUMENT error.
  *
  * On success, the number of bytes read into the buffer will be passed to the
  * callback. It is not an error if this is not the same as the requested size, as it
@@ -510,7 +510,7 @@ g_input_stream_read_async (GInputStream        *stream,
   if (((gssize) count) < 0)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to g_input_stream_read_async"));
       queue_read_async_result (stream, buffer, count, -1, error,
 			       callback, data);
@@ -618,7 +618,7 @@ skip_async_callback_wrapper (GInputStream *stream,
  * During an async request no other sync and async calls are allowed, and will
  * result in %G_IO_ERROR_PENDING errors. 
  *
- * A value of @count larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
+ * A value of @count larger than %G_MAXSSIZE will cause a %G_IO_ERROR_INVALID_ARGUMENT error.
  *
  * On success, the number of bytes skipped will be passed to the
  * callback. It is not an error if this is not the same as the requested size, as it
@@ -658,7 +658,7 @@ g_input_stream_skip_async (GInputStream        *stream,
   if (((gssize) count) < 0)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to g_input_stream_skip_async"));
       queue_skip_async_result (stream, count, -1, error,
 			       callback, data);

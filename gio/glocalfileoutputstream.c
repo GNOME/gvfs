@@ -110,8 +110,8 @@ g_local_file_output_stream_write (GOutputStream *stream,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error writing to file': %s"),
 		       g_strerror (errno));
 	}
@@ -153,8 +153,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	  /* create original -> backup link, the original is then renamed over */
 	  if (link (file->priv->original_filename, file->priv->backup_filename) != 0)
 	    {
-	      g_set_error (error, G_FILE_ERROR,
-			   g_file_error_from_errno (errno),
+	      g_set_error (error, G_IO_ERROR,
+			   g_io_error_from_errno (errno),
 			   _("Error creating backup link: %s"),
 			   g_strerror (errno));
 	      goto err_out;
@@ -174,8 +174,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
       /* tmp -> original */
       if (rename (file->priv->tmp_filename, file->priv->original_filename) != 0)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error renamining temporary file: %s"),
 		       g_strerror (errno));
 	  goto err_out;
@@ -214,8 +214,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
       res = close (file->priv->fd);
       if (res == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error closing file: %s"),
 		       g_strerror (errno));
 	}
@@ -276,8 +276,8 @@ g_local_file_output_stream_create  (const char   *filename,
 	       0666);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error opening file '%s': %s"),
 		   filename, g_strerror (errno));
       return NULL;
@@ -310,8 +310,8 @@ g_local_file_output_stream_append  (const char   *filename,
 	       0666);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error opening file '%s': %s"),
 		   filename, g_strerror (errno));
       return NULL;
@@ -353,8 +353,8 @@ copy_file_data (gint     sfd,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error reading from file': %s"),
 		       g_strerror (errno));
 	  ret = FALSE;
@@ -372,8 +372,8 @@ copy_file_data (gint     sfd,
 	      if (errno == EINTR)
 		continue;
 	      
-	      g_set_error (error, G_FILE_ERROR,
-			   g_file_error_from_errno (errno),
+	      g_set_error (error, G_IO_ERROR,
+			   g_io_error_from_errno (errno),
 			   _("Error writing to file: %s"),
 			   g_strerror (errno));
 	      ret = FALSE;
@@ -432,8 +432,8 @@ handle_overwrite_open (const char *filename,
     
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error opening file '%s': %s"),
 		   filename, g_strerror (errno));
       return -1;
@@ -441,8 +441,8 @@ handle_overwrite_open (const char *filename,
   
   if (fstat (fd, &original_stat) != 0) 
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error stating file '%s': %s"),
 		   filename, g_strerror (errno));
       goto err_out;
@@ -453,8 +453,8 @@ handle_overwrite_open (const char *filename,
     {
       if (S_ISDIR (original_stat.st_mode))
 	g_set_error (error,
-		     G_FILE_ERROR,
-		     G_FILE_ERROR_ISDIR,
+		     G_IO_ERROR,
+		     G_IO_ERROR_IS_DIRECTORY,
 		     _("Target file is a directory"));
       else
 	g_set_error (error,
@@ -589,8 +589,8 @@ handle_overwrite_open (const char *filename,
       /* Seek back to the start of the file after the backup copy */
       if (lseek (fd, 0, SEEK_SET) == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error seeking in file: %s"),
 		       g_strerror (errno));
 	  goto err_out;
@@ -600,8 +600,8 @@ handle_overwrite_open (const char *filename,
   /* Truncate the file at the start */
   if (ftruncate (fd, 0) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error truncating file: %s"),
 		   g_strerror (errno));
       goto err_out;
@@ -651,8 +651,8 @@ g_local_file_output_stream_replace (const char   *filename,
     }
   else if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error opening file '%s': %s"),
 		   filename, g_strerror (errno));
       return NULL;

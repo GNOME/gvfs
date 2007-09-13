@@ -126,8 +126,8 @@ g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
       /* If the file does not exist there might have been a race where
        * the file was removed between the readdir and the stat, so we
        * ignore the file. */
-      if (my_error->domain == G_FILE_ERROR &&
-	  my_error->code == G_FILE_ERROR_NOENT)
+      if (my_error->domain == G_IO_ERROR &&
+	  my_error->code == G_IO_ERROR_NOT_FOUND)
 	{
 	  g_error_free (my_error);
 	  goto next_file;

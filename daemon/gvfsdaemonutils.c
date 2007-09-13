@@ -9,6 +9,8 @@
 
 #include <glib/gthread.h>
 #include <glib/gi18n.h>
+
+#include <gio/gioerror.h>
 #include "gdbusutils.h"
 #include "gsysutils.h"
 #include "gvfsdaemonutils.h"
@@ -61,8 +63,8 @@ dbus_connection_send_fd (DBusConnection *connection,
 
   if (extra->extra_fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_FAILED,
 		   _("No fd passing socket availible"));
       return FALSE;
     }
@@ -71,8 +73,8 @@ dbus_connection_send_fd (DBusConnection *connection,
 
   if (_g_socket_send_fd (extra->extra_fd, fd) == -1)
     {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
 		   _("Error sending fd: %s"),
 		   g_strerror (errno));
       g_static_mutex_unlock (&extra_lock);

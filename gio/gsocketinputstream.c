@@ -130,8 +130,8 @@ g_socket_input_stream_read (GInputStream *stream,
       
       if (poll_ret == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error reading from socket: %s"),
 		       g_strerror (errno));
 	  return -1;
@@ -154,8 +154,8 @@ g_socket_input_stream_read (GInputStream *stream,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error reading from socket: %s"),
 		       g_strerror (errno));
 	}
@@ -185,8 +185,8 @@ g_socket_input_stream_close (GInputStream *stream,
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error closing socket: %s"),
 		       g_strerror (errno));
 	}
@@ -231,8 +231,8 @@ read_async_cb (ReadAsyncData *data,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_set_error (&error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (&error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error reading from socket: %s"),
 		       g_strerror (errno));
 	}
@@ -339,8 +339,8 @@ close_async_cb (CloseAsyncData *data)
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  g_set_error (&error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
+	  g_set_error (&error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
 		       _("Error closing socket: %s"),
 		       g_strerror (errno));
 	}

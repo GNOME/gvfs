@@ -537,7 +537,7 @@ g_daemon_file_get_info (GFile                *file,
   if (!dbus_message_iter_init (reply, &iter) ||
       (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Invalid return value from get_info"));
       goto out;
     }
@@ -567,7 +567,7 @@ read_async_get_fd_cb (int fd,
   if (fd == -1)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Didn't get stream file descriptor"));
       data->read_callback (data->file, NULL, data->callback_data, error);
       g_error_free (error);
@@ -609,7 +609,7 @@ read_async_cb (DBusMessage *reply,
 				  DBUS_TYPE_INVALID))
 	{
 	  error = NULL;
-	  g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       _("Invalid return value from open"));
 	  read_callback (file, NULL, op_callback_data, error);
 	  g_error_free (error);
@@ -665,7 +665,7 @@ g_daemon_file_read (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Invalid return value from open"));
       return NULL;
     }
@@ -675,7 +675,7 @@ g_daemon_file_read (GFile *file,
   fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Didn't get stream file descriptor"));
       return NULL;
     }
@@ -718,7 +718,7 @@ g_daemon_file_append_to (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Invalid return value from open"));
       return NULL;
     }
@@ -728,7 +728,7 @@ g_daemon_file_append_to (GFile *file,
   fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Didn't get stream file descriptor"));
       return NULL;
     }
@@ -771,7 +771,7 @@ g_daemon_file_create (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Invalid return value from open"));
       return NULL;
     }
@@ -781,7 +781,7 @@ g_daemon_file_create (GFile *file,
   fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Didn't get stream file descriptor"));
       return NULL;
     }
@@ -826,7 +826,7 @@ g_daemon_file_replace (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Invalid return value from open"));
       return NULL;
     }
@@ -836,7 +836,7 @@ g_daemon_file_replace (GFile *file,
   fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
   if (fd == -1)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Didn't get stream file descriptor"));
       return NULL;
     }

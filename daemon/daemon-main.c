@@ -146,8 +146,8 @@ daemon_main (int argc,
 	  if (res == -1)
 	    _g_error_from_dbus (&derror, &error);
 	  else
-	    g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
-			 "mountpoint for %s already running", mountable_name);
+	    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			 _("mountpoint for %s already running"), mountable_name);
 	  g_mount_source_failed (mount_source, error);
 	  exit (1);
 	}
@@ -156,8 +156,8 @@ daemon_main (int argc,
   daemon = g_vfs_daemon_new (FALSE, FALSE);
   if (daemon == NULL)
     {
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "error starting mount daemon");
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("error starting mount daemon"));
       g_mount_source_failed (mount_source, error);
       exit (1);
     }

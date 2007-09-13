@@ -383,7 +383,7 @@ run_sync_state_machine (GDaemonFileInputStream *file,
 	    }
 	  else
 	    {
-	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   _("Error in stream protocol: %s"), io_error->message);
 	      g_error_free (io_error);
 	      return FALSE;
@@ -391,7 +391,7 @@ run_sync_state_machine (GDaemonFileInputStream *file,
 	}
       else if (res == 0 && io_data.io_size != 0)
 	{
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       _("Error in stream protocol: %s"), _("End of stream"));
 	  return FALSE;
 	}
@@ -1246,7 +1246,7 @@ async_op_handle (AsyncIterator *iterator,
       else
 	{
 	  error = NULL;
-	  g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       _("Error in stream protocol: %s"), io_error->message);
 	  async_iterator_done (iterator, error);
 	  g_error_free (error);
@@ -1256,7 +1256,7 @@ async_op_handle (AsyncIterator *iterator,
   else if (res == 0 && io_data->io_size != 0)
     {
       error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Error in stream protocol: %s"), _("End of stream"));
       async_iterator_done (iterator, error);
       g_error_free (error);

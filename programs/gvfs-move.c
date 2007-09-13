@@ -91,7 +91,7 @@ main (int argc, char *argv[])
       error = NULL;
       if (!g_file_move (source, target, flags, NULL, NULL, NULL, &error))
 	{
-	  if (interactive && g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_EXIST))
+	  if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
 	    {
 	      char line[16];
 	      
