@@ -7,6 +7,7 @@
 #include "gunixvolumemonitor.h"
 #include "gunixmounts.h"
 #include "gunixvolume.h"
+#include "gunixdrive.h"
 #include "gvolumepriv.h"
 
 struct _GUnixVolumeMonitor {
@@ -219,6 +220,7 @@ update_drives (GUnixVolumeMonitor *monitor)
 	  drive = g_unix_volume_monitor_lookup_drive_for_mountpoint (monitor, mountpoint->mount_path);
 	  if (drive)
 	    {
+	      g_unix_drive_disconnected (drive);
 	      monitor->drives = g_list_remove (monitor->drives, drive);
 	      g_signal_emit_by_name (monitor, "drive_disconnected", drive);
 	      g_object_unref (drive);
@@ -269,6 +271,7 @@ update_volumes (GUnixVolumeMonitor *monitor)
 	  volume = find_volume_by_mountpoint (monitor, mount->mount_path);
 	  if (volume)
 	    {
+	      g_unix_volume_unmounted (volume);
 	      monitor->volumes = g_list_remove (monitor->volumes, volume);
 	      g_signal_emit_by_name (monitor, "volume_unmounted", volume);
 	      g_object_unref (volume);

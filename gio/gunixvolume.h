@@ -4,7 +4,7 @@
 #include <glib-object.h>
 #include <gio/gvolume.h>
 #include <gio/gunixmounts.h>
-#include <gio/gvolumemonitor.h>
+#include <gio/gunixvolumemonitor.h>
 
 G_BEGIN_DECLS
 
@@ -14,7 +14,6 @@ G_BEGIN_DECLS
 #define G_IS_UNIX_VOLUME(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_UNIX_VOLUME))
 #define G_IS_UNIX_VOLUME_CLASS(k) (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_UNIX_VOLUME))
 
-typedef struct _GUnixVolume GUnixVolume;
 typedef struct _GUnixVolumeClass GUnixVolumeClass;
 
 struct _GUnixVolumeClass {
@@ -24,9 +23,12 @@ struct _GUnixVolumeClass {
 GType g_unix_volume_get_type (void) G_GNUC_CONST;
 
 GUnixVolume *g_unix_volume_new            (GVolumeMonitor *volume_monitor,
-					   GUnixMount  *mount);
-gboolean     g_unix_volume_has_mountpoint (GUnixVolume *volume,
-					   const char  *mountpoint);
+					   GUnixMount     *mount);
+gboolean     g_unix_volume_has_mountpoint (GUnixVolume    *volume,
+					   const char     *mountpoint);
+void         g_unix_volume_unset_drive    (GUnixVolume    *volume,
+					   GUnixDrive     *drive);
+void         g_unix_volume_unmounted      (GUnixVolume    *volume);
 
 G_END_DECLS
 

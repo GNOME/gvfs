@@ -4,7 +4,7 @@
 #include <glib-object.h>
 #include <gio/gdrive.h>
 #include <gio/gunixmounts.h>
-#include <gio/gvolumemonitor.h>
+#include <gio/gunixvolumemonitor.h>
 
 G_BEGIN_DECLS
 
@@ -14,7 +14,6 @@ G_BEGIN_DECLS
 #define G_IS_UNIX_DRIVE(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_UNIX_DRIVE))
 #define G_IS_UNIX_DRIVE_CLASS(k) (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_UNIX_DRIVE))
 
-typedef struct _GUnixDrive GUnixDrive;
 typedef struct _GUnixDriveClass GUnixDriveClass;
 
 struct _GUnixDriveClass {
@@ -27,6 +26,11 @@ GUnixDrive *g_unix_drive_new            (GVolumeMonitor *volume_monitor,
 					 GUnixMountPoint *mountpoint);
 gboolean    g_unix_drive_has_mountpoint (GUnixDrive     *drive,
 					 const char     *mountpoint);
+void        g_unix_drive_set_volume     (GUnixDrive     *drive,
+					 GUnixVolume    *volume);
+void        g_unix_drive_unset_volume   (GUnixDrive     *drive,
+					 GUnixVolume    *volume);
+void        g_unix_drive_disconnected   (GUnixDrive     *drive);
 
 G_END_DECLS
 

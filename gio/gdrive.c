@@ -56,27 +56,6 @@ g_drive_base_init (gpointer g_class)
                     NULL, NULL,
                     g_cclosure_marshal_VOID__VOID,
                     G_TYPE_NONE, 0);
-      g_signal_new (I_("volume_mounted"),
-                    G_TYPE_DRIVE,
-                    G_SIGNAL_RUN_LAST,
-                    G_STRUCT_OFFSET (GDriveIface, volume_mounted),
-                    NULL, NULL,
-                    g_cclosure_marshal_VOID__OBJECT,
-                    G_TYPE_NONE, 1, G_TYPE_VOLUME);
-      g_signal_new (I_("volume_pre_unmount"),
-                    G_TYPE_DRIVE,
-                    G_SIGNAL_RUN_LAST,
-                    G_STRUCT_OFFSET (GDriveIface, volume_pre_unmount),
-                    NULL, NULL,
-                    g_cclosure_marshal_VOID__OBJECT,
-                    G_TYPE_NONE, 1, G_TYPE_VOLUME);
-      g_signal_new (I_("volume_unmounted"),
-                    G_TYPE_DRIVE,
-                    G_SIGNAL_RUN_LAST,
-                    G_STRUCT_OFFSET (GDriveIface, volume_unmounted),
-                    NULL, NULL,
-                    g_cclosure_marshal_VOID__OBJECT,
-                    G_TYPE_NONE, 1, G_TYPE_VOLUME);
 
       initialized = TRUE;
     }

@@ -19,18 +19,10 @@ struct _GDriveIface
   GTypeInterface g_iface;
 
   /* signals */
-
   void (*changed)            (GVolume *volume);
-  void (*volume_mounted)     (GDrive *drive,
-			      GVolume *volume);
-  void (*volume_pre_unmount) (GDrive *drive,
-			      GVolume *volume);
-  void (*volume_unmounted)   (GDrive *drive,
-			      GVolume *volume);
   
   /* Virtual Table */
   
-  GFile *  (*get_root)    (GDrive         *drive);
   char *   (*get_name)    (GDrive         *drive);
   char *   (*get_icon)    (GDrive         *drive);
   GList *  (*get_volumes) (GDrive         *drive);

@@ -3,7 +3,6 @@
 
 #include <glib-object.h>
 #include <gio/gvolumemonitor.h>
-#include <gio/gunixdrive.h>
 
 G_BEGIN_DECLS
 
@@ -15,6 +14,10 @@ G_BEGIN_DECLS
 
 typedef struct _GUnixVolumeMonitor GUnixVolumeMonitor;
 typedef struct _GUnixVolumeMonitorClass GUnixVolumeMonitorClass;
+
+/* Forward definitions */
+typedef struct _GUnixVolume GUnixVolume;
+typedef struct _GUnixDrive GUnixDrive;
 
 struct _GUnixVolumeMonitorClass {
   GVolumeMonitorClass parent_class;

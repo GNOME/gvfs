@@ -4,8 +4,9 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
-#include "gunixvolume.h"
 #include "gunixvolumemonitor.h"
+#include "gunixvolume.h"
+#include "gunixdrive.h"
 #include "gvolumepriv.h"
 #include "gvolumemonitor.h"
 
@@ -13,7 +14,7 @@ struct _GUnixVolume {
   GObject parent;
   GVolumeMonitor *monitor;
 
-  GUnixDrive *drive;
+  GUnixDrive *drive; /* owned by volume monitor */
   char *name;
   char *icon;
   char *mountpoint;
@@ -204,7 +205,9 @@ g_unix_volume_new (GVolumeMonitor *volume_monitor,
   
   volume = g_object_new (G_TYPE_UNIX_VOLUME, NULL);
   volume->monitor = volume_monitor;
-  volume->drive = drive; /* TODO: Ownership? */
+  volume->drive = drive;
+  if (drive)
+    g_unix_drive_set_volume (drive, volume);
   volume->mountpoint = g_strdup (mount->mount_path);
 
   type = _g_guess_type_for_mount (mount->mount_path,
@@ -245,12 +248,44 @@ g_unix_volume_new (GVolumeMonitor *volume_monitor,
   return volume;
 }
 
+
+void
+g_unix_volume_unmounted (GUnixVolume *volume)
+{
+  if (volume->drive)
+    {
+      g_unix_drive_unset_volume (volume->drive, volume);
+      volume->drive = NULL;
+      g_signal_emit_by_name (volume, "changed");
+    }
+}
+
+void
+g_unix_volume_unset_drive (GUnixVolume   *volume,
+			   GUnixDrive    *drive)
+{
+  if (volume->drive == drive)
+    {
+      volume->drive = NULL;
+      /* TODO: Emit changed in idle to avoid locking issues */
+      g_signal_emit_by_name (volume, "changed");
+    }
+}
+
 static char *
 g_unix_volume_get_platform_id (GVolume *volume)
 {
   GUnixVolume *unix_volume = G_UNIX_VOLUME (volume);
 
   return g_strdup (unix_volume->mountpoint);
+}
+
+static GFile *
+g_unix_volume_get_root (GVolume *volume)
+{
+  GUnixVolume *unix_volume = G_UNIX_VOLUME (volume);
+
+  return g_file_get_for_path (unix_volume->mountpoint);
 }
 
 static char *
@@ -276,10 +311,57 @@ g_unix_volume_has_mountpoint (GUnixVolume *volume,
   return strcmp (volume->mountpoint, mountpoint) == 0;
 }
 
+static GDrive *
+g_unix_volume_get_drive (GVolume *volume)
+{
+  GUnixVolume *unix_volume = G_UNIX_VOLUME (volume);
+
+  if (unix_volume->drive)
+    return G_DRIVE (g_object_ref (unix_volume->drive));
+  
+  return NULL;
+}
+
+static gboolean
+g_unix_volume_can_unmount (GVolume *volume)
+{
+  /* TODO */
+  return FALSE;
+}
+
+static gboolean
+g_unix_volume_can_eject (GVolume *volume)
+{
+  /* TODO */
+  return FALSE;
+}
+
+static void
+g_unix_volume_unmount (GVolume         *volume,
+		       GVolumeCallback  callback,
+		       gpointer         user_data)
+{
+  /* TODO */
+}
+
+static void
+g_unix_volume_eject (GVolume         *volume,
+		     GVolumeCallback  callback,
+		     gpointer         user_data)
+{
+  /* TODO */
+}
+
 static void
 g_unix_volue_volume_iface_init (GVolumeIface *iface)
 {
-  iface->get_platform_id = g_unix_volume_get_platform_id;
+  iface->get_root = g_unix_volume_get_root;
   iface->get_name = g_unix_volume_get_name;
   iface->get_icon = g_unix_volume_get_icon;
+  iface->get_drive = g_unix_volume_get_drive;
+  iface->can_unmount = g_unix_volume_can_unmount;
+  iface->can_eject = g_unix_volume_can_eject;
+  iface->unmount = g_unix_volume_unmount;
+  iface->eject = g_unix_volume_eject;
+  iface->get_platform_id = g_unix_volume_get_platform_id;
 }
