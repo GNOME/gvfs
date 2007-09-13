@@ -263,7 +263,7 @@ gboolean           g_file_make_symbolic_link         (GFile                  *fi
 gboolean           g_file_set_attribute              (GFile                  *file,
 						      const char             *attribute,
 						      GFileAttributeType      type,
-						      gconstpointer           value,
+						      gconstpointer           value_ptr,
 						      GFileGetInfoFlags       flags,
 						      GCancellable           *cancellable,
 						      GError                **error);
