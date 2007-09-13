@@ -126,6 +126,26 @@ dnl   failure. try libattr
 fi
 AC_SUBST(XATTR_LIBS)
 
+dnl **********************
+dnl *** Check for FUSE ***
+dnl **********************
+AC_ARG_ENABLE(fuse, [  --disable-fuse           build without FUSE support])
+msg_fuse=no
+FUSE_LIBS=
+FUSE_CFLAGS=
+
+if test "x$enable_fuse" != "xno"; then
+  PKG_CHECK_EXISTS(fuse, msg_fuse=yes)
+
+  if test "x$msg_fuse" == "xyes"; then
+    PKG_CHECK_MODULES(FUSE, fuse)
+    AC_DEFINE(HAVE_FUSE, 1, [Define to 1 if FUSE is available])
+  fi
+fi
+
+AC_SUBST(FUSE_LIBS)
+AC_SUBST(FUSE_CFLAGS)
+
 dnl ==========================================================================
 dnl Samba 3.0
 
@@ -268,4 +288,5 @@ echo "
 	SELinux support:      $msg_selinux
 	xattr support:        $msg_xattr
 	Samba support:	      $msg_samba
+	FUSE support:         $msg_fuse
 "
