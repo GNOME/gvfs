@@ -209,8 +209,9 @@ typedef struct {
 } WriteAsyncData;
 
 static void
-write_async_cb (GOutputStreamSocket  *stream,
-		gpointer             _data)
+write_async_cb (gpointer             _data,
+		GOutputStreamSocket  *stream,
+		int fd)
 {
   GOutputStreamSocket *socket_stream;
   WriteAsyncData *data = _data;
@@ -292,7 +293,7 @@ g_output_stream_socket_write_async (GOutputStream      *stream,
 
   source = _g_fd_source_new (G_OBJECT (socket_stream),
 			     socket_stream->priv->fd,
-			     POLLIN,
+			     POLLOUT,
 			     g_output_stream_get_async_context (stream),
 			     cancellable);
   
