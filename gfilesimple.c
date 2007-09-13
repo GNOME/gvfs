@@ -10,6 +10,12 @@
 
 static void g_file_simple_file_iface_init (GFileIface       *iface);
 
+struct _GFileSimple
+{
+  GObject parent_instance;
+
+  char *filename;
+};
 
 G_DEFINE_TYPE_WITH_CODE (GFileSimple, g_file_simple, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE,
@@ -224,7 +230,8 @@ g_file_simple_get_child (GFile *file,
 GFileEnumerator *
 g_file_simple_enumerate_children (GFile      *file,
 				  GFileInfoRequestFlags requested,
-				  const char           *attributes)
+				  const char *attributes,
+				  gboolean follow_symlinks)
 {
   /* TODO */
   return NULL;

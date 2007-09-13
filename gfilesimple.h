@@ -15,13 +15,6 @@ G_BEGIN_DECLS
 typedef struct _GFileSimple        GFileSimple;
 typedef struct _GFileSimpleClass   GFileSimpleClass;
 
-struct _GFileSimple
-{
-  GObject parent_instance;
-
-  char *filename;
-};
-
 struct _GFileSimpleClass
 {
   GObjectClass parent_class;

@@ -1,5 +1,10 @@
 2006-09-28  Alexander Larsson  <alexl@redhat.com>
 
+	* gfilesimple.[ch]:
+	Move GFileSimple struct into c file	
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
 	* gfile.[ch]:
 	Add follow_symlinks argument to get_info
 	
