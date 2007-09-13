@@ -324,7 +324,7 @@ array_check_boundary (GMemoryOutputStream  *stream,
   return TRUE; 
 }
 
-static gboolean
+static gssize
 array_resize (GMemoryOutputStream  *stream,
               goffset               size,
               GError              **error)
@@ -334,18 +334,22 @@ array_resize (GMemoryOutputStream  *stream,
 
   priv = stream->priv;
 
-  if (! array_check_boundary (stream, size, error)) {
-    return FALSE;
-  }
+  if (! array_check_boundary (stream, size, error)) 
+    return -1;
+  
+
+  if (priv->data->len == size) 
+    return priv->data->len - priv->pos;
+  
 
   old_len = priv->data->len;
   g_byte_array_set_size (priv->data, size);
 
-  if (size > old_len && priv->pos > old_len) {
+  if (size > old_len && priv->pos > old_len) 
     memset (priv->data->data + priv->pos, 0, size - old_len);
-  }
+  
 
-  return TRUE;
+  return priv->data->len - priv->pos;
 }
 
 static gssize
@@ -357,7 +361,6 @@ g_memory_output_stream_write (GOutputStream *stream,
 {
   GMemoryOutputStream        *ostream;
   GMemoryOutputStreamPrivate *priv;
-  gboolean  res;
   gsize     new_size;
   gssize    n;
   guint8   *dest;
@@ -369,16 +372,30 @@ g_memory_output_stream_write (GOutputStream *stream,
 
   n = MIN (count, priv->data->len - priv->pos);
 
-  if (n < 1) {
-    new_size = priv->pos + count;
-    res = array_resize (ostream, new_size, error);
+  if (n < 1)
+    {
+      new_size = priv->pos + count;
 
-    if (res == FALSE) {
-      return -1;
+      if (priv->max_size > 0)
+        {
+          new_size = MIN (new_size, priv->max_size);
+        }
+
+      n = array_resize (ostream, new_size, error);
+
+      if (n == 0) 
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_FAILED,
+                       "Reached maximum data array limit");
+          return -1;
+        }
+      else if (n < 0)
+        {
+          return -1;
+        }
     }
-
-    n = count;
-  }
 
   dest = priv->data->data + priv->pos;
   memcpy (dest, buffer, n); 
@@ -554,9 +571,8 @@ g_memory_output_stream_seek (GSeekable      *seekable,
     return FALSE;
   }
 
-  if (! array_check_boundary (stream, absolute, error)) {
+  if (! array_check_boundary (stream, absolute, error)) 
     return FALSE;  
-  }
 
   priv->pos = absolute;
 
@@ -580,10 +596,9 @@ g_memory_output_stream_truncate (GSeekable      *seekable,
 
   ostream = G_MEMORY_OUTPUT_STREAM (seekable);
   priv = ostream->priv;
-
-  if (! array_resize (ostream, offset, error)) {
-    return FALSE;
-  }
+ 
+  if (array_resize (ostream, offset, error) < 0)
+      return FALSE;
 
   return TRUE;
 }
