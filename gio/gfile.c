@@ -765,8 +765,8 @@ copy_attributes (GFile *source,
       g_object_unref (info);
     }
   
-  g_file_attribute_info_list_free (attributes);
-  g_file_attribute_info_list_free (namespaces);
+  g_file_attribute_info_list_unref (attributes);
+  g_file_attribute_info_list_unref (namespaces);
   
   return res;
 }

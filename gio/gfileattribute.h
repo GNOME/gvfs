@@ -95,7 +95,8 @@ void                 g_file_attribute_value_set_object      (GFileAttributeValue
 							     GObject             *obj);
 
 GFileAttributeInfoList *  g_file_attribute_info_list_new    (void);
-void                      g_file_attribute_info_list_free   (GFileAttributeInfoList *list);
+GFileAttributeInfoList *  g_file_attribute_info_list_ref    (GFileAttributeInfoList *list);
+void                      g_file_attribute_info_list_unref  (GFileAttributeInfoList *list);
 GFileAttributeInfoList *  g_file_attribute_info_list_dup    (GFileAttributeInfoList *list);
 const GFileAttributeInfo *g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
 							     const char             *name);

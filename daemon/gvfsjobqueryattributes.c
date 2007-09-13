@@ -30,7 +30,7 @@ g_vfs_job_query_attributes_finalize (GObject *object)
 
   g_free (job->filename);
   if (job->list)
-    g_file_attribute_info_list_free (job->list);
+    g_file_attribute_info_list_unref (job->list);
   
   if (G_OBJECT_CLASS (g_vfs_job_query_attributes_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_query_attributes_parent_class)->finalize) (object);
@@ -145,7 +145,7 @@ void
 g_vfs_job_query_attributes_set_list (GVfsJobQueryAttributes *job,
 				     GFileAttributeInfoList *list)
 {
-  job->list = g_file_attribute_info_list_dup (list);
+  job->list = g_file_attribute_info_list_ref (list);
 }
 
 /* Might be called on an i/o thread */

@@ -265,7 +265,7 @@ get_writable_info (GFile *file)
       g_free (flags);
     }
 
-  g_file_attribute_info_list_free (list);
+  g_file_attribute_info_list_unref (list);
   
   list = g_file_query_writable_namespaces (file, NULL, &error);
   if (list == NULL)
@@ -288,7 +288,7 @@ get_writable_info (GFile *file)
 	}
     }
   
-  g_file_attribute_info_list_free (list);
+  g_file_attribute_info_list_unref (list);
 }
 
 

@@ -1246,7 +1246,7 @@ try_query_settable_attributes (GVfsBackend *backend,
   g_vfs_job_query_attributes_set_list (job, list);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   
-  g_file_attribute_info_list_free (list);
+  g_file_attribute_info_list_unref (list);
   return TRUE;
 }
 

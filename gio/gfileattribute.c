@@ -326,6 +326,7 @@ g_file_attribute_value_set_object (GFileAttributeValue *attr,
 typedef struct {
   GFileAttributeInfoList public;
   GArray *array;
+  int ref_count;
 } GFileAttributeInfoListPriv;
 
 static void
@@ -342,6 +343,7 @@ g_file_attribute_info_list_new (void)
 
   priv = g_new0 (GFileAttributeInfoListPriv, 1);
   
+  priv->ref_count = 1;
   priv->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
   
   list_update_public (priv);
@@ -356,6 +358,7 @@ g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
   int i;
 
   new = g_new0 (GFileAttributeInfoListPriv, 1);
+  new->ref_count = 1;
   new->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
 
   g_array_set_size (new->array, list->n_infos);
@@ -370,16 +373,32 @@ g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
   return (GFileAttributeInfoList *)new;
 }
 
+GFileAttributeInfoList *
+g_file_attribute_info_list_ref (GFileAttributeInfoList *list)
+{
+  GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
+  
+  priv->ref_count ++;
+  
+  return list;
+}
+
 void
-g_file_attribute_info_list_free (GFileAttributeInfoList *list)
+g_file_attribute_info_list_unref (GFileAttributeInfoList *list)
 {
   GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
   int i;
+  
   if (list)
     {
-      for (i = 0; i < list->n_infos; i++)
-	g_free (list->infos[i].name);
-      g_array_free (priv->array, TRUE);
+      priv->ref_count --;
+
+      if (priv->ref_count == 0)
+	{
+	  for (i = 0; i < list->n_infos; i++)
+	    g_free (list->infos[i].name);
+	  g_array_free (priv->array, TRUE);
+	}
     }
 }
 
