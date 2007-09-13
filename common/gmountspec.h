@@ -44,7 +44,7 @@ void        g_mount_spec_to_dbus           (DBusMessageIter *iter,
 void        g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
 					    GMountSpec      *spec,
 					    const char      *path);
-void        g_mount_spec_add_item          (GMountSpec      *spec,
+void        g_mount_spec_set               (GMountSpec      *spec,
 					    const char      *key,
 					    const char      *value);
 gboolean    g_mount_spec_match             (GMountSpec      *mount,
@@ -52,6 +52,8 @@ gboolean    g_mount_spec_match             (GMountSpec      *mount,
 gboolean    g_mount_spec_match_with_path   (GMountSpec      *mount,
 					    GMountSpec      *spec,
 					    const char      *path);
+const char *g_mount_spec_get               (GMountSpec      *spec,
+					    const char      *key);
 const char *g_mount_spec_get_type          (GMountSpec      *spec);
 
 G_END_DECLS

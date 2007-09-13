@@ -6,7 +6,7 @@ INCLUDES =					\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
-	-DMOUNTPOINT_DIR=\"$(sysconfdir)/gvfs/mounts/\" \
+	-DMOUNTABLE_DIR=\"$(sysconfdir)/gvfs/mounts/\" \
 	-DG_DISABLE_DEPRECATED
 
 noinst_LTLIBRARIES=libdaemon.la
@@ -25,15 +25,21 @@ servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = gvfs-daemon.service.in
 service_DATA = gvfs-daemon.service
 
+%.mount: %.mount.in ../config.log
+	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+
+mountdir = $(sysconfdir)/gvfs/mounts
+mount_in_files = smb.mount.in
+mount_DATA = smb.mount
+
 EXTRA_DIST = gvfs-daemon.service.in
 
 DISTCLEANFILES = gvfs-daemon.service
 
-libexec_PROGRAMS=gvfs-daemon
+libexec_PROGRAMS=gvfs-daemon gvfs-daemon-smb
 
 noinst_PROGRAMS =				\
 	gvfs-daemon-test			\
-	gvfs-daemon-smb				\
 	$(NULL)
 
 libdaemon_la_SOURCES = \
@@ -56,6 +62,7 @@ libdaemon_la_SOURCES = \
 
 gvfs_daemon_SOURCES = \
 	mounttracker.c mounttracker.h \
+	mount.c mount.h \
 	main.c
 
 gvfs_daemon_LDADD = $(libraries)

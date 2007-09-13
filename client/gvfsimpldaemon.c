@@ -76,7 +76,7 @@ get_mountspec_from_uri (GDecodedUri *uri,
 	{
 	  spec = g_mount_spec_new ("smb-share");
 	  
-	  g_mount_spec_add_item  (spec, "server", uri->host);
+	  g_mount_spec_set  (spec, "server", uri->host);
 
 	  share = uri->path + 1;
 	  share_end = strchr (share, '/');
@@ -86,7 +86,7 @@ get_mountspec_from_uri (GDecodedUri *uri,
 	  else
 	    tmp = g_strdup (share);
 
-	  g_mount_spec_add_item  (spec, "share", tmp);
+	  g_mount_spec_set  (spec, "share", tmp);
 	  g_free (tmp);
 
 	  if (share_end)

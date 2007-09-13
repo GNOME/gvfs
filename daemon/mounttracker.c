@@ -14,6 +14,7 @@
 #include "gmountspec.h"
 #include "gvfsdaemonprotocol.h"
 #include <gio/gvfserror.h>
+#include <mount.h>
 
 typedef struct {
   char *key;
@@ -38,6 +39,11 @@ struct _GMountTracker
 
   GList *mounts;
 };
+
+static void lookup_mount (GMountTracker *tracker,
+			  DBusConnection *connection,
+			  DBusMessage *message,
+			  gboolean do_automount);
 
 G_DEFINE_TYPE (GMountTracker, g_mount_tracker, G_TYPE_OBJECT);
 
@@ -223,32 +229,129 @@ register_mount (GMountTracker *tracker,
   dbus_connection_send (connection, reply, NULL);
 }
 
+typedef struct {
+  DBusMessage *message;
+  DBusConnection *connection;
+  GMountTracker *tracker;
+} AutoMountData;
+
+static void
+automount_done (GMountOperation *op,
+		gboolean         succeeded,
+		GError          *error,
+		gpointer _data)
+{
+  DBusMessage *reply;
+  AutoMountData *data = _data;
+  
+  if (!succeeded)
+    {
+      GError *mount_error = NULL;
+      g_set_error (&mount_error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+		   _("Automount failed: %s"), error->message);
+      reply = _dbus_message_new_error_from_gerror (data->message, mount_error);
+      g_error_free (mount_error);
+      dbus_connection_send (data->connection, reply, NULL);
+    }
+  else
+    lookup_mount (data->tracker,
+		  data->connection,
+		  data->message,
+		  FALSE);
+
+  g_object_unref (op);
+
+
+  dbus_connection_unref (data->connection);
+  dbus_message_unref (data->message);
+  g_free (data);
+}
+
+static DBusMessage *
+maybe_automount (GMountTracker *tracker,
+		 GMountSpec *spec,
+		 DBusMessage *message,
+		 DBusConnection *connection,
+		 gboolean do_automount)
+{
+  Mountable *mountable;
+  DBusMessage *reply;
+  GError *error;
+
+  mountable = lookup_mountable (spec);
+
+  g_print ("mountable: %p, do-automount: %d, is_automount: %d\n",
+	   mountable, do_automount,
+	   mountable_is_automount (mountable));
+  
+  reply = NULL;
+  
+  if (mountable != NULL && do_automount &&
+      mountable_is_automount (mountable))
+    {
+      GMountOperation *op;
+      GError *mount_error;
+
+      g_print ("automounting...\n");
+      
+      mount_error = NULL;
+      op = mountable_mount (mountable, spec, &error);
+      g_print ("op = %p\n", op);
+      
+      if (op == NULL)
+	{
+	  error = NULL;
+	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+		       _("Error automounting location: %s"), mount_error->message);
+	  reply = _dbus_message_new_error_from_gerror (message, error);
+	  g_error_free (mount_error);
+	  g_error_free (error);
+	}
+      else
+	{
+	  AutoMountData *data = g_new0 (AutoMountData, 1);
+	  
+	  data->tracker = tracker;
+	  data->message = dbus_message_ref (message);
+	  data->connection = dbus_connection_ref (connection);
+	  g_signal_connect (op, "done", (GCallback)automount_done, data);
+	}
+    }
+  else
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+		   (mountable == NULL) ?
+		   _("Location is not mountable") :
+		   _("Location is not mounted"));
+      reply = _dbus_message_new_error_from_gerror (message, error);
+      g_error_free (error);
+    }
+  
+  return reply;
+}
+
 static void
 lookup_mount (GMountTracker *tracker,
 	      DBusConnection *connection,
-	      DBusMessage *message)
+	      DBusMessage *message,
+	      gboolean do_automount)
 {
   VFSMount *mount;
   DBusMessage *reply;
   DBusMessageIter iter;
   GMountSpec *spec;
-  GError *error;
 
   dbus_message_iter_init (message, &iter);
   spec = g_mount_spec_from_dbus (&iter);
 
+  reply = NULL;
   if (spec != NULL)
     {
       mount = match_vfs_mount (tracker, spec);
 
       if (mount == NULL)
-	{
-	  error = NULL;
-	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
-		       _("Location is not mounted"));
-	  reply = _dbus_message_new_error_from_gerror (message, error);
-	  g_error_free (error);
-	}
+	reply = maybe_automount (tracker, spec, message, connection, do_automount);
       else
 	{
 	  reply = dbus_message_new_method_return (message);
@@ -266,11 +369,9 @@ lookup_mount (GMountTracker *tracker,
 				    DBUS_ERROR_INVALID_ARGS,
 				    "Invalid arguments");
   
-  if (reply == NULL)
-    _g_dbus_oom ();
-
   g_mount_spec_unref (spec);
-  dbus_connection_send (connection, reply, NULL);
+  if (reply != NULL)
+    dbus_connection_send (connection, reply, NULL);
 }
 
 static void
@@ -347,7 +448,7 @@ dbus_message_function (DBusConnection  *connection,
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT))
-    lookup_mount (tracker, connection, message);
+    lookup_mount (tracker, connection, message, TRUE);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					"listMounts"))

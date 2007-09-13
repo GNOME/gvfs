@@ -247,8 +247,8 @@ create_smb_uri (const char *server,
 }
 
 GVfsBackendSmb *
-g_vfs_backend_smb_new (const char *server,
-		       const char *share)
+g_vfs_backend_smb_new (GMountSpec *spec,
+		       GError **error)
 {
   GVfsBackendSmb *backend;
   GVfsBackend *_backend;
@@ -256,12 +256,32 @@ g_vfs_backend_smb_new (const char *server,
   int res;
   char *uri;
   struct stat st;
+  const char *server;
+  const char *share;
 
   g_assert (smb_backend == NULL);
 
+  
+  server = g_mount_spec_get (spec, "server");
+  share = g_mount_spec_get (spec, "share");
+
+  if (server == NULL ||
+      share == NULL)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		   _("Invalid mount spec"));
+      return NULL;
+    }
+ 
+  
+  
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
-    return NULL;
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Failed to allocate smb context");
+      return NULL;
+    }
 
   smb_context->debug = 0;
   smb_context->callbacks.auth_fn 		     = auth_callback;
@@ -286,7 +306,8 @@ g_vfs_backend_smb_new (const char *server,
 
   if (!smbc_init_context (smb_context))
     {
-      g_print ("init context failed\n");
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Failed to initialize smb context");
       smbc_free_context (smb_context, FALSE);
       return NULL;
     }
@@ -300,10 +321,10 @@ g_vfs_backend_smb_new (const char *server,
   _backend = G_VFS_BACKEND (backend);
   _backend->display_name = g_strdup_printf ("%s on %s", share, server);
   _backend->mount_spec = g_mount_spec_new ("smb-share");
-  g_mount_spec_add_item (_backend->mount_spec,
-			 "share", share);
-  g_mount_spec_add_item (_backend->mount_spec,
-			 "server", server);
+  g_mount_spec_set (_backend->mount_spec,
+		    "share", share);
+  g_mount_spec_set (_backend->mount_spec,
+		    "server", server);
   
   smb_backend = backend;
   backend->smb_context = smb_context;
@@ -313,6 +334,8 @@ g_vfs_backend_smb_new (const char *server,
   g_free (uri);
   if (res != 0)
     {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Failed to mount smb share");
       g_object_unref (backend);
       return NULL;
     }

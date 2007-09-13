@@ -109,7 +109,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  G_STRUCT_OFFSET (GMountOperationClass, ask_question),
 		  boolean_handled_accumulator, NULL,
 		  _gvfs_marshal_BOOLEAN__STRING_POINTER,
-		  G_TYPE_NONE, 2,
+		  G_TYPE_BOOLEAN, 2,
 		  G_TYPE_STRING, G_TYPE_POINTER);
 
   signals[REPLY] =
@@ -118,9 +118,9 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, reply),
 		  NULL, NULL,
-		  _gvfs_marshal_VOID__BOOLEAN_POINTER,
-		  G_TYPE_NONE, 2,
-		  G_TYPE_BOOLEAN, G_TYPE_POINTER);
+		  g_cclosure_marshal_VOID__BOOLEAN,
+		  G_TYPE_NONE, 1,
+		  G_TYPE_BOOLEAN);
 
   signals[DONE] =
     g_signal_new (I_("done"),
@@ -128,9 +128,10 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, done),
 		  NULL, NULL,
-		  g_cclosure_marshal_VOID__BOOLEAN,
-		  G_TYPE_NONE, 1,
-		  G_TYPE_BOOLEAN);
+		  _gvfs_marshal_VOID__BOOLEAN_POINTER,
+		  G_TYPE_NONE, 2,
+		  G_TYPE_BOOLEAN,
+		  G_TYPE_POINTER);
 }
 
 static void

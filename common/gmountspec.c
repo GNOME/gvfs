@@ -27,7 +27,7 @@ g_mount_spec_new (const char *type)
   spec->items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
 
   if (type != NULL)
-    g_mount_spec_add_item (spec, "type", type);
+    g_mount_spec_set (spec, "type", type);
   
   return spec;
 }
@@ -47,9 +47,9 @@ add_item (GMountSpec *spec,
 
 
 void 
-g_mount_spec_add_item (GMountSpec *spec,
-		       const char *key,
-		       const char *value)
+g_mount_spec_set (GMountSpec *spec,
+		  const char *key,
+		  const char *value)
 {
   add_item (spec, key, g_strdup (value));
   g_array_sort (spec->items, item_compare);
@@ -253,7 +253,8 @@ g_mount_spec_match (GMountSpec      *mount,
 }
 
 const char *
-g_mount_spec_get_type (GMountSpec *spec)
+g_mount_spec_get (GMountSpec *spec,
+		  const char *key)
 {
   int i;
   
@@ -261,9 +262,16 @@ g_mount_spec_get_type (GMountSpec *spec)
     {
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
       
-      if (strcmp (item->key, "type") == 0)
+      if (strcmp (item->key, key) == 0)
 	return item->value;
     }
 
   return NULL;
 }
+
+const char *
+g_mount_spec_get_type (GMountSpec *spec)
+{
+  return g_mount_spec_get (spec, "type");
+}
+ 

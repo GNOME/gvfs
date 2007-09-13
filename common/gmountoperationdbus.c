@@ -21,6 +21,8 @@ static void              mount_op_ask_question        (GMountOperationDBus *op,
 						       DBusMessage         *message);
 static void              mount_op_done                (GMountOperationDBus *op,
 						       DBusMessage         *message);
+static void              mount_op_get_mount_spec      (GMountOperationDBus *op,
+						       DBusMessage         *message);
 
 static void
 g_mount_operation_dbus_finalize (GObject *object)
@@ -67,9 +69,14 @@ g_mount_operation_dbus_init (GMountOperationDBus *operation)
 }
 
 GMountOperationDBus *
-g_mount_operation_dbus_new (void)
+g_mount_operation_dbus_new (GMountSpec *spec)
 {
-  return g_object_new (G_TYPE_MOUNT_OPERATION_DBUS, NULL);
+  GMountOperationDBus *op;
+
+  op = g_object_new (G_TYPE_MOUNT_OPERATION_DBUS, NULL);
+  op->mount_spec = g_mount_spec_ref (spec);
+  
+  return op;
 }
 
 
@@ -107,12 +114,31 @@ mount_op_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					"done"))
     mount_op_done (op, message);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					"getMountSpec"))
+    mount_op_get_mount_spec (op, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
   return DBUS_HANDLER_RESULT_HANDLED;
 }
 
+static void
+mount_op_get_mount_spec (GMountOperationDBus *op,
+			 DBusMessage *message)
+{
+  DBusMessage *reply;
+  DBusMessageIter iter;
+  
+  reply = dbus_message_new_method_return (message);
+  
+  dbus_message_iter_init_append (reply, &iter);
+  g_mount_spec_to_dbus (&iter, op->mount_spec);
+
+  if (!dbus_connection_send (op->connection, reply, NULL))
+    _g_dbus_oom ();
+}
 
 static void
 mount_op_send_reply (GMountOperationDBus *op,

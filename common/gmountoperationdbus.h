@@ -5,6 +5,7 @@
 
 #include <glib-object.h>
 #include <gio/gmountoperation.h>
+#include <gmountspec.h>
 #include <dbus/dbus.h>
 
 G_BEGIN_DECLS
@@ -25,6 +26,7 @@ struct _GMountOperationDBus
 
   char *obj_path;
   DBusConnection *connection;
+  GMountSpec *mount_spec;
 };
 
 struct _GMountOperationDBusClass
@@ -34,7 +36,7 @@ struct _GMountOperationDBusClass
 
 GType g_mount_operation_dbus_get_type (void) G_GNUC_CONST;
   
-GMountOperationDBus *  g_mount_operation_dbus_new (void);
+GMountOperationDBus *  g_mount_operation_dbus_new (GMountSpec *spec);
 
 G_END_DECLS
 

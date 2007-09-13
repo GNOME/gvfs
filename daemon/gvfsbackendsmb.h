@@ -2,6 +2,7 @@
 #define __G_VFS_BACKEND_SMB_H__
 
 #include <gvfsbackend.h>
+#include <gmountspec.h>
 
 #include <libsmbclient.h>
 
@@ -41,8 +42,8 @@ struct _GVfsBackendSmbClass
 
 GType g_vfs_backend_smb_get_type (void) G_GNUC_CONST;
   
-GVfsBackendSmb *g_vfs_backend_smb_new (const char *server,
-				       const char *share);
+GVfsBackendSmb *g_vfs_backend_smb_new (GMountSpec *mount_spec,
+				       GError **error);
 
 G_END_DECLS
 
