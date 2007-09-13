@@ -356,7 +356,7 @@ async_get_mount_info_response (DBusPendingCall *pending,
 
   dbus_message_unref (reply);
   
-  data->callback (info, data, error);
+  data->callback (info, data->user_data, error);
 
   if (info)
     _g_mount_info_unref (info);
