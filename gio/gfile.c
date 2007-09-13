@@ -1023,6 +1023,7 @@ get_contents_close_callback (GObject *obj,
 
   /* Ignore errors here, we're only reading anyway */
   g_input_stream_close_finish (stream, close_res, NULL);
+  g_object_unref (stream);
 
   res = g_simple_async_result_new (G_OBJECT (data->file),
 				   data->callback,
@@ -1030,6 +1031,7 @@ get_contents_close_callback (GObject *obj,
 				   g_file_get_contents_async);
   g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)get_contents_data_free);
   g_simple_async_result_complete (res);
+  g_object_unref (res);
 }
 
 static void
@@ -1104,6 +1106,7 @@ get_contents_open_callback (GObject *obj,
       g_simple_async_result_complete (res);
       g_error_free (error);
       get_contents_data_free (data);
+      g_object_unref (res);
     }
 }
 
