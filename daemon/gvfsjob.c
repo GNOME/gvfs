@@ -160,7 +160,7 @@ g_vfs_job_try (GVfsJob *job)
 void
 g_vfs_job_cancel (GVfsJob *job)
 {
-  if (job->cancelled || job->sending_reply)
+  if (job->cancelled || job->sent_reply)
     return;
 
   job->cancelled = TRUE;
@@ -170,7 +170,7 @@ g_vfs_job_cancel (GVfsJob *job)
 static void 
 g_vfs_job_send_reply (GVfsJob *job)
 {
-  job->sending_reply = TRUE;
+  job->sent_reply = TRUE;
   g_signal_emit (job, signals[SEND_REPLY], 0);
 }
 
