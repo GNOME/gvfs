@@ -5,6 +5,9 @@
 #include "gfileinfo.h"
 #include <glib/gi18n-lib.h>
 
+/* We use this nasty thing, because NULL is a valid attribute matcher (matches nothing) */
+#define NO_ATTRIBUTE_MASK ((GFileAttributeMatcher *)1)
+
 typedef struct  {
   guint32 attribute;
   GFileAttributeValue value;
@@ -15,7 +18,11 @@ struct _GFileInfo
   GObject parent_instance;
 
   GArray *attributes;
+  GFileAttributeMatcher *mask;
 };
+
+static gboolean g_file_attribute_matcher_matches_id (GFileAttributeMatcher *matcher,
+						     guint32 id);
 
 G_DEFINE_TYPE (GFileInfo, g_file_info, G_TYPE_OBJECT);
 
@@ -161,6 +168,9 @@ g_file_info_finalize (GObject *object)
   for (i = 0; i < info->attributes->len; i++)
     g_file_attribute_value_clear (&attrs[i].value);
   g_array_free (info->attributes, TRUE);  
+
+  if (info->mask != NO_ATTRIBUTE_MASK)
+    g_file_attribute_matcher_unref (info->mask);
   
   if (G_OBJECT_CLASS (g_file_info_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_info_parent_class)->finalize) (object);
@@ -177,6 +187,7 @@ g_file_info_class_init (GFileInfoClass *klass)
 static void
 g_file_info_init (GFileInfo *info)
 {
+  info->mask = NO_ATTRIBUTE_MASK;
   info->attributes = g_array_new (FALSE, FALSE,
 				  sizeof (GFileAttribute));
 }
@@ -208,7 +219,29 @@ g_file_info_copy (GFileInfo  *other)
       g_file_attribute_value_set (&dest[i].value, &source[i].value);
     }
 
+  new->mask = g_file_attribute_matcher_ref (other->mask);
+
   return new;
+}
+
+void
+g_file_info_set_attribute_mask (GFileInfo *info,
+				GFileAttributeMatcher *mask)
+{
+  if (mask != info->mask)
+    {
+      if (info->mask != NO_ATTRIBUTE_MASK)
+	g_file_attribute_matcher_unref (info->mask);
+      info->mask = g_file_attribute_matcher_ref (mask);
+    }
+}
+
+void
+g_file_info_unset_attribute_mask (GFileInfo *info)
+{
+  if (info->mask != NO_ATTRIBUTE_MASK)
+    g_file_attribute_matcher_unref (info->mask);
+  info->mask = NO_ATTRIBUTE_MASK;
 }
 
 void
@@ -443,6 +476,10 @@ g_file_info_create_value (GFileInfo *info,
   GFileAttribute attr;
   int i;
 
+  if (info->mask != NO_ATTRIBUTE_MASK &&
+      !g_file_attribute_matcher_matches_id (info->mask, attr_id))
+    return NULL;
+  
   i = g_file_info_find_place (info, attr_id);
   
   attrs = (GFileAttribute *)info->attributes->data;
@@ -478,7 +515,8 @@ g_file_info_set_attribute (GFileInfo  *info,
 {
   GFileAttributeValue *value;
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set (value, attr_value);
+  if (value)
+    g_file_attribute_value_set (value, attr_value);
 }
 
 void
@@ -489,7 +527,8 @@ g_file_info_set_attribute_object (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_object (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_object (value, attr_value);
 }
 
 void
@@ -500,7 +539,8 @@ g_file_info_set_attribute_string (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_string (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_string (value, attr_value);
 }
 
 void
@@ -511,7 +551,8 @@ g_file_info_set_attribute_byte_string (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_byte_string (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_byte_string (value, attr_value);
 }
 
 void
@@ -522,7 +563,8 @@ g_file_info_set_attribute_boolean (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_boolean (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_boolean (value, attr_value);
 }
 
 void
@@ -533,7 +575,8 @@ g_file_info_set_attribute_uint32 (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_uint32 (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_uint32 (value, attr_value);
 }
 
 void
@@ -544,7 +587,8 @@ g_file_info_set_attribute_int32  (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_int32 (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_int32 (value, attr_value);
 }
 
 void
@@ -555,7 +599,8 @@ g_file_info_set_attribute_uint64 (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_uint64 (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_uint64 (value, attr_value);
 }
 
 void
@@ -566,7 +611,8 @@ g_file_info_set_attribute_int64  (GFileInfo  *info,
   GFileAttributeValue *value;
 
   value = g_file_info_create_value_by_name (info, attribute);
-  g_file_attribute_value_set_int64 (value, attr_value);
+  if (value)
+    g_file_attribute_value_set_int64 (value, attr_value);
 }
 
 /* Helper getters */
@@ -736,7 +782,8 @@ g_file_info_set_file_type (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_TYPE);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_uint32 (value, type);
+  if (value)
+    g_file_attribute_value_set_uint32 (value, type);
 }
 
 
@@ -751,7 +798,8 @@ g_file_info_set_is_hidden (GFileInfo *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_IS_HIDDEN);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_boolean (value, is_hidden);
+  if (value)
+    g_file_attribute_value_set_boolean (value, is_hidden);
 }
 
 void
@@ -765,7 +813,8 @@ g_file_info_set_is_symlink (GFileInfo *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_IS_SYMLINK);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_boolean (value, is_symlink);
+  if (value)
+    g_file_attribute_value_set_boolean (value, is_symlink);
 }
 
 void
@@ -779,7 +828,8 @@ g_file_info_set_name (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_NAME);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_byte_string (value, name);
+  if (value)
+    g_file_attribute_value_set_byte_string (value, name);
 }
 
 void
@@ -793,7 +843,8 @@ g_file_info_set_display_name (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_DISPLAY_NAME);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_string (value, display_name);
+  if (value)
+    g_file_attribute_value_set_string (value, display_name);
 }
 
 void
@@ -807,7 +858,8 @@ g_file_info_set_edit_name (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_EDIT_NAME);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_string (value, edit_name);
+  if (value)
+    g_file_attribute_value_set_string (value, edit_name);
 }
 
 void
@@ -821,7 +873,8 @@ g_file_info_set_icon (GFileInfo   *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ICON);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_object (value, G_OBJECT (icon));
+  if (value)
+    g_file_attribute_value_set_object (value, G_OBJECT (icon));
 }
 
 void
@@ -835,7 +888,8 @@ g_file_info_set_content_type (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_CONTENT_TYPE);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_string (value, content_type);
+  if (value)
+    g_file_attribute_value_set_string (value, content_type);
 }
 
 void
@@ -849,7 +903,8 @@ g_file_info_set_size (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_SIZE);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_uint64 (value, size);
+  if (value)
+    g_file_attribute_value_set_uint64 (value, size);
 }
 
 void
@@ -866,9 +921,11 @@ g_file_info_set_modification_time (GFileInfo         *info,
     }
   
   value = g_file_info_create_value (info, attr_mtime);
-  g_file_attribute_value_set_uint64 (value, mtime->tv_sec);
+  if (value)
+    g_file_attribute_value_set_uint64 (value, mtime->tv_sec);
   value = g_file_info_create_value (info, attr_mtime_usec);
-  g_file_attribute_value_set_uint32 (value, mtime->tv_usec);
+  if (value)
+    g_file_attribute_value_set_uint32 (value, mtime->tv_usec);
 }
 
 void
@@ -882,7 +939,8 @@ g_file_info_set_symlink_target (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_byte_string (value, symlink_target);
+  if (value)
+    g_file_attribute_value_set_byte_string (value, symlink_target);
 }
 
 #define ON_STACK_MATCHERS 5
@@ -1045,22 +1103,13 @@ g_file_attribute_matcher_matches_only (GFileAttributeMatcher *matcher,
   return FALSE;
 }
 
-gboolean
-g_file_attribute_matcher_matches (GFileAttributeMatcher *matcher,
-				  const char            *attribute)
+static gboolean
+matcher_matches_id (GFileAttributeMatcher *matcher,
+		    guint32 id)
 {
   SubMatcher *sub_matchers;
-  guint32 id;
   int i;
-
-  if (matcher == NULL)
-    return FALSE;
   
-  if (matcher->all)
-    return TRUE;
-  
-  id = lookup_attribute (attribute);
-
   for (i = 0; i < ON_STACK_MATCHERS; i++)
     {
       if (matcher->sub_matchers[i].id == 0)
@@ -1079,7 +1128,34 @@ g_file_attribute_matcher_matches (GFileAttributeMatcher *matcher,
 	    return TRUE;
 	}
     }
+  
   return FALSE;
+}
+
+static gboolean
+g_file_attribute_matcher_matches_id (GFileAttributeMatcher *matcher,
+				     guint32 id)
+{
+  if (matcher == NULL)
+    return FALSE;
+  
+  if (matcher->all)
+    return TRUE;
+  
+  return matcher_matches_id (matcher, id);
+}
+
+gboolean
+g_file_attribute_matcher_matches (GFileAttributeMatcher *matcher,
+				  const char            *attribute)
+{
+  if (matcher == NULL)
+    return FALSE;
+  
+  if (matcher->all)
+    return TRUE;
+  
+  return matcher_matches_id (matcher, lookup_attribute (attribute));
 }
 
 /* return TRUE -> all */

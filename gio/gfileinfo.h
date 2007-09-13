@@ -190,6 +190,10 @@ void              g_file_info_get_modification_time  (GFileInfo         *info,
 						      GTimeVal          *result);
 const char *      g_file_info_get_symlink_target     (GFileInfo         *info);
 
+void              g_file_info_set_attribute_mask     (GFileInfo         *info,
+						      GFileAttributeMatcher *mask);
+void              g_file_info_unset_attribute_mask   (GFileInfo         *info);
+
 /* Helper setters: */
 void              g_file_info_set_file_type          (GFileInfo         *info,
 						      GFileType          type);
