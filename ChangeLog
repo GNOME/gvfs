@@ -1,0 +1,196 @@
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfile.[ch]:
+	Add follow_symlinks argument to get_info
+	
+	* gfileinfo.[ch]:
+	Some mask fixes
+	
+	* gfilesimple.c:
+	More implementation work
+	
+	* glocalfileoutputstream.[ch]:
+	Implement set_original_mtime and set_create_backup
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	Add gfilesimple
+	
+	* gfile.[ch]:
+	Add g_file_copy()
+	Finish rename to parse_name
+	Remove set_keep_open for now
+	
+	* gfilesimple.[ch]:
+	Initial skeleton for GFileSimple
+	Handle parse names
+	
+	* gvfssimple.c:
+	Handle parse names
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfileenumerator.c:
+	* gfileinfo.c:
+	* gfileinputstream.c:
+	* gfileoutputstream.c:
+	* ginputstream.c:
+	* glocalfileinputstream.c:
+	* glocalfileoutputstream.c:
+	* goutputstream.c:
+	* gvfssimple.c:
+	Use macro-created parent_class
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfile.c:
+	* gvfs.[ch]:
+	* gvfssimple.c:
+	Clean up parse_name names.
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfile.[ch]:
+	Add request flags & attributes
+	Use FileStreams
+	
+	* gfileinputstream.h:
+	* gfileoutputstream.h:
+	Fix G_TYPE_... defines
+	
+	* glocalfileoutputstream.c:
+	Small cleanups and mention gedit.
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* gfileinfo.[ch]:
+	Added g_file_info_new, g_file_info_set_from_stat
+	
+	* glocalfileinputstream.c:
+	* glocalfileoutputstream.c:
+	Implemented get_file_info.
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* glocalfileoutputstream.c:
+	Update implementation of final mtime
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* gfileinfo.h:
+	* gfileinputstream.[ch]:
+	* gfileoutputstream.[ch]:
+	Flags & attributes in get_file_info
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	* ginputstreamfile.[ch]:
+	* goutputstreamfile.[ch]:
+	* glocalfileinputstream.[ch]:
+	* glocalfileoutputstream.[ch]:
+	Rename local file streams and make them
+	inherit from FileInput/OutputStream
+	
+	* test.c:
+	Update
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	* gfileinputstream.[ch]:
+	* gfileoutputstream.[ch]:
+	Add new classes.
+	
+	* gfileinfo.[ch]:
+	Add flags, symlink_target and edit_name
+	
+	* ginputstream.[ch]
+	* goutputstream.[ch]:
+	Export close/pending state a bit
+	
+	* gvfserror.h:
+	Add NOT_SUPPORTED
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* ginputstream.c:
+	* goutputstream.c:
+	Wrap async callback to automatically handle
+	setting of pending, closed and ref/unref of the stream.
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	reviewed by: <delete if not using a buddy>
+
+	* ginputstream.c: (read_async_callback_wrapper),
+	(g_input_stream_read_async), (skip_async_callback_wrapper),
+	(g_input_stream_skip_async), (close_async_callback_wrapper),
+	(g_input_stream_close_async), (read_op_report), (read_op_free),
+	(g_input_stream_real_read_async), (skip_op_report), (skip_op_free),
+	(g_input_stream_real_skip_async), (close_op_report),
+	(close_op_free), (g_input_stream_real_close_async):
+	* goutputstream.c: (write_async_callback_wrapper),
+	(g_output_stream_write_async), (flush_async_callback_wrapper),
+	(g_output_stream_flush_async), (close_async_callback_wrapper),
+	(g_output_stream_close_async):
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* ginputstream.[ch]:
+	Update of close and pending handling.
+	
+	* goutputstream.[ch]:
+	Implement default async version
+	
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	Add output file streams
+	
+	* ginputstream.c: (g_input_stream_is_cancelled):
+	Cleanup
+	
+	* ginputstreamfile.[ch]:
+	remove get_fd.
+	
+	* goutputstream.[ch]:
+	Add g_output_stream_is_cancelled
+	Add padding
+	Add cancel_async
+	
+	* goutputstreamfile.[ch]:
+	Add new class
+	
+	* gvfserror.h:
+	Add new errors
+	
+	* test.c:
+	Some tests
+	
+2006-09-26  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	Add gthread-2.0
+	
+	* ginputstream.h:
+	add async_skip and is_cancelled.
+	
+	* ginputstream.c:
+	Implement async fallbacks using thread
+	
+	* ginputstreamfile.c:
+	Handle cancellation
+	
+	* gioscheduler.c:
+	Schedule cancelled jobs first
+	Fix out-of-lock reads of job
+	Add g_io_job_mark_done().
+	
+	* gioscheduler.h:
+	Add g_io_job_mark_done().
+	
+	* test.c:
+	Add some stream tests
+
