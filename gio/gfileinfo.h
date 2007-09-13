@@ -71,8 +71,8 @@ struct _GFileInfoClass
 
 /* Time attributes */
 
-#define G_FILE_ATTRIBUTE_TIME_MODIFIED "time:modified"              /* uint64 */
-#define G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC "time:modified_usec"    /* uint32 */
+#define G_FILE_ATTRIBUTE_TIME_MODIFIED "time:modified"           /* uint64 */
+#define G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC "time:modified_usec" /* uint32 */
 #define G_FILE_ATTRIBUTE_TIME_ACCESS "time:access"               /* uint64 */
 #define G_FILE_ATTRIBUTE_TIME_ACCESS_USEC "time:access_usec"     /* uint32 */
 #define G_FILE_ATTRIBUTE_TIME_CHANGED "time:changed"             /* uint64 */
