@@ -282,6 +282,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
     case DBUS_TYPE_STRING:
       value->type = G_FILE_ATTRIBUTE_TYPE_STRING;
       dbus_message_iter_get_basic (&variant_iter, &value->u.string);
+      value->u.string = g_strdup (value->u.string);
       break;
     case DBUS_TYPE_ARRAY:
       if (dbus_message_iter_get_element_type (&variant_iter) != DBUS_TYPE_BYTE)
