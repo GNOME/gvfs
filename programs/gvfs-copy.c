@@ -11,7 +11,9 @@
 
 static gboolean progress = FALSE;
 static gboolean interactive = FALSE;
+static gboolean no_dereference = FALSE;
 static gboolean backup = FALSE;
+static gboolean preserve = FALSE;
 static gboolean no_target_directory = FALSE;
 
 static GOptionEntry entries[] = 
@@ -19,7 +21,9 @@ static GOptionEntry entries[] =
 	{ "no-target-directory", 'T', 0, G_OPTION_ARG_NONE, &no_target_directory, "no target directory", NULL },
 	{ "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, "show progress", NULL },
 	{ "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, "prompt before overwrite", NULL },
+	{ "preserve", 'p', 0, G_OPTION_ARG_NONE, &preserve, "preserve all attributes", NULL },
 	{ "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, "backup existing destination files", NULL },
+	{ "no-dereference", 'P', 0, G_OPTION_ARG_NONE, &no_dereference, "never follow symbolic links", NULL },
 	{ NULL }
 };
 
@@ -108,6 +112,11 @@ main (int argc, char *argv[])
 	flags |= G_FILE_COPY_BACKUP;
       if (!interactive)
 	flags |= G_FILE_COPY_OVERWRITE;
+      if (no_dereference)
+	flags |= G_FILE_COPY_NOFOLLOW_SYMLINKS;
+      if (preserve)
+	flags |= G_FILE_COPY_ALL_METADATA;
+	
 	
       error = NULL;
       if (!g_file_copy (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
