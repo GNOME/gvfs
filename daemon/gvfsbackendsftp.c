@@ -40,7 +40,10 @@
 
 /* TODO for sftp:
  * Implement can_delete & can_rename
- * lots of ops   
+ * set_display_name
+ * query_writable_attributes
+ * set_attributes
+ * fstat
  */
 
 #ifdef HAVE_GRANTPT
