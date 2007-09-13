@@ -1185,8 +1185,6 @@ handle_async_reply (DBusPendingCall *pending,
   DBusMessage *reply;
   GError *error;
   
-  g_print ("handle_async_reply\n");
-
   reply = dbus_pending_call_steal_reply (pending);
   
   error = NULL;
@@ -1235,8 +1233,6 @@ _g_dbus_connection_call_async (DBusConnection *connection,
   DBusPendingCall *pending_call;
   DBusError derror;
 
-  g_print ("_g_dbus_connection_call_async\n");
-  
   if (connection == NULL)
     {
       dbus_error_init (&derror);
@@ -1270,7 +1266,6 @@ _g_dbus_connection_call_async (DBusConnection *connection,
   data->callback = callback;
   data->user_data = user_data;
     
-  g_print ("set_notify %p\n", pending_call);
   if (!dbus_pending_call_set_notify (pending_call,
 				     async_call_reply,
 				     data, g_free))
