@@ -718,7 +718,20 @@ async_get_name_owner_response (DBusPendingCall *pending,
   reply = dbus_pending_call_steal_reply (pending);
   dbus_pending_call_unref (pending);
 
+  if (dbus_message_is_error (reply, "org.freedesktop.DBus.Error.NameHasNoOwner"))
+    {
+      /* TODO: Not mounted */
+    }
+  
   dbus_error_init (&derror);
+  if (dbus_set_error_from_message (&derror, reply))
+    {
+      _g_error_from_dbus (&derror, &async_call->io_error);
+      dbus_error_free (&derror);
+      async_dbus_call_finish (async_call, NULL);
+      return;
+    }
+  
   if (!dbus_message_get_args (reply, &derror,
 			      DBUS_TYPE_STRING, &owner,
 			      DBUS_TYPE_INVALID))
@@ -728,7 +741,8 @@ async_get_name_owner_response (DBusPendingCall *pending,
       async_dbus_call_finish (async_call, NULL);
       return;
     }
-  
+
+
   async_call->owner = g_strdup (owner);
 
   async_call->connection = get_connection_for_main_context (async_call->context, async_call->owner);
@@ -750,7 +764,7 @@ do_find_owner_async (AsyncDBusCall *async_call)
 
   if (!get_private_bus_async (async_call))
     return;
-  
+
   message = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
                                           DBUS_PATH_DBUS,
                                           DBUS_INTERFACE_DBUS,
@@ -916,7 +930,6 @@ _g_vfs_daemon_call_sync (const char *bus_name,
 	  
 	  if (!sent_cancel && g_cancellable_is_cancelled (cancellable))
 	    {
-	      g_print ("Sending cancel\n");
 	      sent_cancel = TRUE;
 	      serial = dbus_message_get_serial (message);
 	      cancel_message =
@@ -950,9 +963,6 @@ _g_vfs_daemon_call_sync (const char *bus_name,
 
       reply = dbus_pending_call_steal_reply (pending);
       dbus_pending_call_unref (pending);
-
-      g_print ("reply: %p, is_error: %d\n", reply,
-	       dbus_message_get_type (reply) == DBUS_MESSAGE_TYPE_ERROR);
     }
   else
     {
@@ -1026,6 +1036,18 @@ get_name_owner_sync (const char *bus_name, GError **error)
       goto out;
     }
 
+  if (dbus_message_is_error (reply, "org.freedesktop.DBus.Error.NameHasNoOwner"))
+    {
+      /* TODO: Not mounted */
+    }
+
+  if (dbus_set_error_from_message (&derror, reply))
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      goto out;
+    }
+  
   if (!dbus_message_get_args (reply, &derror,
                               DBUS_TYPE_STRING, &owner,
                               DBUS_TYPE_INVALID))
@@ -1033,6 +1055,7 @@ get_name_owner_sync (const char *bus_name, GError **error)
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Couldn't get dbus name owner: %s\n",
 		   derror.message);
+      dbus_error_free (&derror);
       goto out;
     }
   
@@ -1404,7 +1427,7 @@ dbus_source_add_watch (DBusSource *dbus_source,
   guint flags;
   GIOCondition condition;
   IOHandler *handler;
-  
+
   if (!dbus_watch_get_enabled (watch))
     return;
   
