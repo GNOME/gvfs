@@ -58,17 +58,17 @@ struct _GFileInfoClass
 
 /* Calculated Access Rights for current user */
 
-#define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"               /* uint32 */
-#define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"             /* uint32 */
-#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:execute"         /* uint32 */
-#define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"           /* uint32 */
-#define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"           /* uint32 */ 
+#define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"               /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"             /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:execute"         /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"           /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"           /* boolean */ 
 
 /* Mountable attributes */
 
-#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT "mountable:can_mount"     /* uint32 */
-#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT "mountable:can_unmount" /* uint32 */
-#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT "mountable:can_eject"     /* uint32 */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT "mountable:can_mount"     /* boolean */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT "mountable:can_unmount" /* boolean */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT "mountable:can_eject"     /* boolean */
 #define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE "mountable:unix_device" /* uint32 */
 #define G_FILE_ATTRIBUTE_MOUNTABLE_HAL_UDI "mountable:hal_udi"         /* string */
 
@@ -95,8 +95,8 @@ struct _GFileInfoClass
 
 /* DOS specific attributes */
 
-#define G_FILE_ATTRIBUTE_DOS_ARCHIVE "dos:archive"               /* uint32 */
-#define G_FILE_ATTRIBUTE_DOS_SYSTEM "dos:system"                 /* uint32 */
+#define G_FILE_ATTRIBUTE_DOS_ARCHIVE "dos:archive"               /* boolean */
+#define G_FILE_ATTRIBUTE_DOS_SYSTEM "dos:system"                 /* boolean */
 
 /* Owner attributes */
 

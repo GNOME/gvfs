@@ -424,18 +424,18 @@ get_access_rights (GFileAttributeMatcher *attribute_matcher,
 {
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_ACCESS_READ))
-    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_READ,
-				      g_access (path, R_OK) == 0);
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_READ,
+				       g_access (path, R_OK) == 0);
   
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_ACCESS_WRITE))
-    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE,
-				      g_access (path, W_OK) == 0);
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_WRITE,
+				       g_access (path, W_OK) == 0);
   
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_ACCESS_EXECUTE))
-    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE,
-				      g_access (path, X_OK) == 0);
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE,
+				       g_access (path, X_OK) == 0);
 
 
   if (parent_info)
@@ -459,12 +459,12 @@ get_access_rights (GFileAttributeMatcher *attribute_matcher,
 	}
 
       if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_RENAME))
-	g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_RENAME,
-					  writable);
+	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_RENAME,
+					   writable);
       
       if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_DELETE))
-	g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_DELETE,
-					  writable);
+	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_DELETE,
+					   writable);
     }
 }
 

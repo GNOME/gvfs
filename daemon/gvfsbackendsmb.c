@@ -1123,7 +1123,7 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
   /* If file is dos-readonly, libsmbclient doesn't set S_IWUSR, we use this to
      trigger ACCESS_WRITE = FALSE: */
   if (!(statbuf->st_mode & S_IWUSR))
-    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE, FALSE);
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_WRITE, FALSE);
 
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
@@ -1147,10 +1147,10 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
     g_file_info_set_flags (info, flags);
     
     if (statbuf->st_mode & S_IXUSR)
-      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, 1);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, TRUE);
     
     if (statbuf->st_mode & S_IXGRP)
-      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, 1);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, TRUE);
   }
 }
 
