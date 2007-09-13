@@ -41,6 +41,7 @@ Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
 
 Don't export struct stat in API, its size depends on OS and lfs defines...
 
+
 FUTURE IDEAS:
 -------------
 
