@@ -32,8 +32,6 @@ e.g. It forces you to open the stream (sync!) to figure out can_seek in the daem
 
 implement daemon write stream, maybe break out common parts of gvfsreadstream to gvfsjobstream
 
-Handle client dbus connections being disconnected.
-
 Close daemon backend open handle when readstream is closed.
 
 FUTURE IDEAS:
