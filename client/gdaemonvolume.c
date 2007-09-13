@@ -11,7 +11,7 @@
 struct _GDaemonVolume {
   GObject     parent;
 
-  GMountInfo *mount_info;
+  GMountRef *mount_info;
   char       *name;
   char       *icon;
 };
@@ -32,7 +32,7 @@ g_daemon_volume_finalize (GObject *object)
 
   g_free (volume->name);
   g_free (volume->icon);
-  _g_mount_info_unref (volume->mount_info);
+  _g_mount_ref_unref (volume->mount_info);
   
   if (G_OBJECT_CLASS (g_daemon_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_parent_class)->finalize) (object);
@@ -53,13 +53,13 @@ g_daemon_volume_init (GDaemonVolume *daemon_volume)
 
 GDaemonVolume *
 g_daemon_volume_new (GVolumeMonitor *volume_monitor,
-		     GMountInfo *mount_info)
+		     GMountRef *mount_info)
 {
   GDaemonVolume *volume;
   char *volume_name;
 
   volume = g_object_new (G_TYPE_DAEMON_VOLUME, NULL);
-  volume->mount_info = _g_mount_info_ref (mount_info);
+  volume->mount_info = _g_mount_ref_ref (mount_info);
 
   volume_name = NULL;
 
