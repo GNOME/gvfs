@@ -47,11 +47,13 @@ add_item (GMountSpec *spec,
 
 
 void 
-g_mount_spec_set (GMountSpec *spec,
-		  const char *key,
-		  const char *value)
+g_mount_spec_set_with_len (GMountSpec *spec,
+			   const char *key,
+			   const char *value,
+			   int value_len)
 {
   int i;
+  char *value_copy;
   
   for (i = 0; i < spec->items->len; i++)
     {
@@ -64,9 +66,22 @@ g_mount_spec_set (GMountSpec *spec,
 	}
     }
 
-  add_item (spec, key, g_strdup (value));
+  if (value_len == -1)
+    value_copy = g_strdup (value);
+  else
+    value_copy = g_strndup (value, value_len);
+  add_item (spec, key, value_copy);
   g_array_sort (spec->items, item_compare);
 }
+
+void 
+g_mount_spec_set (GMountSpec *spec,
+		  const char *key,
+		  const char *value)
+{
+  g_mount_spec_set_with_len (spec, key, value, -1);
+}
+
 
 GMountSpec *
 g_mount_spec_ref (GMountSpec *spec)

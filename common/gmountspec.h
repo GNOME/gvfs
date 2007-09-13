@@ -47,6 +47,10 @@ void        g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
 void        g_mount_spec_set               (GMountSpec      *spec,
 					    const char      *key,
 					    const char      *value);
+void        g_mount_spec_set_with_len      (GMountSpec      *spec,
+					    const char      *key,
+					    const char      *value,
+					    int              value_len);
 gboolean    g_mount_spec_match             (GMountSpec      *mount,
 					    GMountSpec      *path);
 gboolean    g_mount_spec_match_with_path   (GMountSpec      *mount,
