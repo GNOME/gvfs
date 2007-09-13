@@ -36,7 +36,9 @@ struct _GMountOperationDBusClass
 
 GType g_mount_operation_dbus_get_type (void) G_GNUC_CONST;
   
-GMountOperationDBus *  g_mount_operation_dbus_new (GMountSpec *spec);
+GMountOperationDBus *g_mount_operation_dbus_new          (GMountSpec          *spec);
+void                 g_mount_operation_dbus_fail_at_idle (GMountOperationDBus *op,
+							  GError              *error);
 
 G_END_DECLS
 

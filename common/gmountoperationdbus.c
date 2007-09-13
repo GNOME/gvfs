@@ -398,3 +398,38 @@ mount_op_done (GMountOperationDBus *op,
     _g_dbus_oom ();
   dbus_message_unref (reply);
 }
+
+struct FailData {
+  GMountOperationDBus *op;
+  GError *error;
+};
+
+static void
+fail_data_free (struct FailData *data)
+{
+  g_object_unref (data->op);
+  g_error_free (data->error);
+  g_free (data);
+}
+
+static gboolean
+fail_at_idle (struct FailData *data)
+{
+  g_signal_emit_by_name (data->op, "done", FALSE, data->error);
+  return FALSE;
+}
+
+void
+g_mount_operation_dbus_fail_at_idle (GMountOperationDBus *op,
+				     GError     *error)
+{
+  struct FailData *data;
+
+  data = g_new (struct FailData, 1);
+  data->op = g_object_ref (op);
+  data->error = g_error_copy (error);
+  
+  g_idle_add_full (G_PRIORITY_DEFAULT,
+		   (GSourceFunc)fail_at_idle,
+		   data, (GDestroyNotify)fail_data_free);
+}
