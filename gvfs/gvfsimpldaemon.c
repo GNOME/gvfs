@@ -120,15 +120,16 @@ g_vfs_impl_daemon_get_file_for_path (GVfs       *vfs,
   return g_file_daemon_local_new (file);
 }
 
+static GDaemonMountInfo foo_info = {
+  "org.gtk.vfs.mount.foo",
+  "/org/gtk/vfs/mount/foo"
+};
+
 static char *
 get_path_for_uri (GDecodedUri *uri, GDaemonMountInfo **info)
 {
   if (strcmp (uri->scheme, "foo") == 0)
     {
-      GDaemonMountInfo foo_info = {
-	"org.gtk.vfs.mount.foo",
-	"/org/gtk/vfs/mount/foo"
-      };
       *info = &foo_info;
       return g_strdup (uri->path);
     }
