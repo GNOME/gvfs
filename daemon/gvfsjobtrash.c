@@ -126,9 +126,7 @@ create_reply (GVfsJob *job,
 	      DBusConnection *connection,
 	      DBusMessage *message)
 {
-  GVfsJobTrash *op_job = G_VFS_JOB_TRASH (job);
   DBusMessage *reply;
-  DBusMessageIter iter;
 
   reply = dbus_message_new_method_return (message);
   
