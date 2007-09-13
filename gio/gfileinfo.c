@@ -969,7 +969,10 @@ g_file_attribute_matcher_new (const char *attributes)
 	  guint32 id, mask;
   
 	  colon = strchr (split[i], ':');
-	  if (colon != NULL && colon[1] != 0)
+	  if (colon != NULL &&
+	      !(colon[1] == 0 ||
+		(colon[1] == '*' &&
+		 colon[2] == 0)))
 	    {
 	      id = lookup_attribute (split[i]);
 	      mask = 0xffffffff;
