@@ -5,4 +5,5 @@ Makefile.in
 gvfs-ls
 gvfs-cat
 gvfs-info
+gvfs-mount
 
