@@ -33,12 +33,14 @@ static GOnce once_init_dbus = G_ONCE_INIT;
 
 static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
 
-static DBusConnection *get_connection_for_main_context (GMainContext   *context,
-							const char     *mountpoint);
-static DBusSource     *set_connection_for_main_context (GMainContext   *context,
-							const char     *mountpoint,
-							DBusConnection *connection);
-static void           dbus_source_destroy              (DBusSource     *dbus_source);
+static DBusConnection *get_connection_for_main_context (GMainContext    *context,
+							const char      *mountpoint);
+static DBusSource     *set_connection_for_main_context (GMainContext    *context,
+							const char      *mountpoint,
+							DBusConnection  *connection);
+static void            dbus_source_destroy             (DBusSource      *dbus_source);
+static DBusConnection *get_connection_sync             (const char      *mountpoint,
+							GError         **error);
 
 
 static gpointer
@@ -598,10 +600,50 @@ _g_vfs_daemon_call_async (const char *mountpoint,
     open_connection_async (async_call);
 }
 
+DBusMessage *
+_g_vfs_daemon_call_sync (const char *mountpoint,
+			 DBusMessage *message,
+			 DBusConnection **connection_out,
+			 GCancellable *cancellable,
+			 GError **error)
+{
+  DBusConnection *connection;
+  DBusError derror;
+  DBusMessage *reply;
+  
+  connection = get_connection_sync (mountpoint, error);
+  if (connection == NULL)
+    return NULL;
 
-DBusConnection *
-_g_vfs_daemon_get_connection_sync (const char *mountpoint,
-				   GError **error)
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+
+  /* TODO: We should handle cancellation while waiting for the reply if cancellable != NULL */
+  dbus_error_init (&derror);
+  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
+						     &derror);
+  if (!reply)
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  if (connection_out)
+    *connection_out = connection;
+  
+  return reply;
+}
+
+static DBusConnection *
+get_connection_sync (const char *mountpoint,
+		     GError **error)
 {
   ThreadLocalConnections *local;
   DBusConnection *connection;

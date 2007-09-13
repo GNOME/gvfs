@@ -272,7 +272,6 @@ g_file_daemon_read (GFile *file,
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
   DBusConnection *connection;
-  DBusError derror;
   int fd;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
@@ -288,19 +287,6 @@ g_file_daemon_read (GFile *file,
       return NULL;
     }
 
-  connection = _g_vfs_daemon_get_connection_sync (daemon_file->mountpoint, error);
-  if (connection == NULL)
-    return NULL;
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
-  
   message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
@@ -314,17 +300,13 @@ g_file_daemon_read (GFile *file,
       return NULL;
     }
 
-  /* TODO: We should handle cancellation while waiting for the reply */
-  dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
-						     &derror);
+  reply = _g_vfs_daemon_call_sync (daemon_file->mountpoint,
+				   message,
+				   &connection,
+				   cancellable, error);
   dbus_message_unref (message);
-  if (!reply)
-    {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return NULL;
-    }
+  if (reply == NULL)
+    return NULL;
 
   if (!dbus_message_get_args (reply, NULL,
 			      DBUS_TYPE_UINT32, &fd_id,
