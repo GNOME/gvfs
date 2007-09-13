@@ -18,6 +18,7 @@
 #include <gio/gsocketinputstream.h>
 #include <gio/gsocketoutputstream.h>
 #include <gio/gmemoryoutputstream.h>
+#include <gio/gmemoryinputstream.h>
 
 #include "gvfsbackendsftp.h"
 #include "gvfsjobopenforread.h"
@@ -55,6 +56,8 @@ struct _GVfsBackendSftp
   gboolean user_specified;
   char *user;
 
+  int protocol_version;
+  
   GOutputStream *command_stream;
   GInputStream *reply_stream;
   GDataInputStream *error_stream;
@@ -354,13 +357,15 @@ wait_for_reply (GVfsBackend *backend, int stdout_fd, GError **error)
   return TRUE;
 }
 
-static GByteArray *
-read_reply_sync (GVfsBackend *backend, GError **error)
+static GDataInputStream *
+read_reply_sync (GVfsBackend *backend, gsize *len_out, GError **error)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 len;
   gsize bytes_read;
   GByteArray *array;
+  GInputStream *mem_stream;
+  GDataInputStream *data_stream;
   
   if (!g_input_stream_read_all (op_backend->reply_stream,
 				&len, 4,
@@ -369,6 +374,7 @@ read_reply_sync (GVfsBackend *backend, GError **error)
 
   
   len = GUINT32_FROM_BE (len);
+  g_print ("Reply size: %d\n", (int)len);
   
   array = g_byte_array_sized_new (len);
 
@@ -379,8 +385,52 @@ read_reply_sync (GVfsBackend *backend, GError **error)
       g_byte_array_free (array, TRUE);
       return NULL;
     }
+
+  mem_stream = g_memory_input_stream_from_data (array->data, len);
+  g_byte_array_free (array, FALSE);
+  data_stream = g_data_input_stream_new (mem_stream);
+  g_object_unref (mem_stream);
   
-  return array;
+  if (len_out)
+    *len_out = len;
+  
+  return data_stream;
+}
+
+static char *
+read_string (GDataInputStream *stream, gsize *len_out)
+{
+  guint32 len;
+  char *data;
+  GError *error;
+
+  error = NULL;
+  len = g_data_input_stream_get_uint32 (stream, NULL, &error);
+  g_print ("len: %d, erro: %p\n", len, error);
+  if (error)
+    {
+      g_error_free (error);
+      return NULL;
+    }
+  
+  data = g_malloc (len + 1);
+
+  g_print ("a\n");
+  if (!g_input_stream_read_all (G_INPUT_STREAM (stream), data, len, NULL, NULL, NULL))
+    {
+      g_print ("b\n");
+      g_free (data);
+      return NULL;
+    }
+  
+  g_print ("c\n");
+  data[len] = 0;
+
+  g_print ("d\n");
+  if (len_out)
+    *len_out = len;
+  
+  return data;
 }
 
 static gboolean
@@ -538,9 +588,10 @@ do_mount (GVfsBackend *backend,
   GInputStream *is;
   GOutputStream *so;
   GDataOutputStream *ds;
+  GDataInputStream *reply;
   gboolean res;
-  GByteArray *reply;
   GMountSpec *sftp_mount_spec;
+  char *extension_name, *extension_data;
 
   args = setup_ssh_commandline (backend);
 
@@ -588,7 +639,7 @@ do_mount (GVfsBackend *backend,
   op_backend->error_stream = g_data_input_stream_new (is);
   g_object_unref (is);
 
-  reply = read_reply_sync (backend, NULL);
+  reply = read_reply_sync (backend, NULL, NULL);
   if (reply == NULL)
     {
       look_for_stderr_errors (backend, &error);
@@ -596,6 +647,31 @@ do_mount (GVfsBackend *backend,
       g_error_free (error);
       return;
     }
+
+  if (g_data_input_stream_get_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
+    {
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+  
+  op_backend->protocol_version = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+
+  while ((extension_name = read_string (reply, NULL)) != NULL)
+    {
+      g_print ("Extension name: %s\n", extension_name);
+      extension_data = read_string (reply, NULL);
+      if (extension_data)
+	{
+	  /* TODO: Do something with this */
+	}
+      g_free (extension_name);
+      g_free (extension_data);
+    }
+      
+  g_object_unref (reply);
+  
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
   if (op_backend->user_specified)

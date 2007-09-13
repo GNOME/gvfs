@@ -1,6 +1,6 @@
 /* From draft-ietf-secsh-filexfer-13.txt */
 
-#define	SSH2_FILEXFER_VERSION		3
+#define	SSH2_FILEXFER_VERSION		6
 
 #define	SSH_FXP_INIT                1
 #define	SSH_FXP_VERSION             2
