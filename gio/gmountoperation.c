@@ -62,6 +62,24 @@ boolean_handled_accumulator (GSignalInvocationHint *ihint,
   return continue_emission;
 }
 
+static gboolean
+ask_password (GMountOperation *op,
+	      const char      *message,
+	      const char      *default_user,
+	      const char      *default_domain,
+	      GPasswordFlags   flags)
+{
+  return FALSE;
+}
+  
+static gboolean
+ask_question (GMountOperation *op,
+	      const char      *message,
+	      const char      *choices[])
+{
+  return FALSE;
+}
+
 static void
 g_mount_operation_class_init (GMountOperationClass *klass)
 {
@@ -70,7 +88,10 @@ g_mount_operation_class_init (GMountOperationClass *klass)
   g_type_class_add_private (klass, sizeof (GMountOperationPrivate));
   
   gobject_class->finalize = g_mount_operation_finalize;
-
+  
+  klass->ask_password = ask_password;
+  klass->ask_question = ask_question;
+  
   signals[ASK_PASSWORD] =
     g_signal_new (I_("ask_password"),
 		  G_TYPE_FROM_CLASS (gobject_class),
