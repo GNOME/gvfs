@@ -69,14 +69,6 @@ vfs_dbus_init (gpointer arg)
   return NULL;
 }
 
-static void oom (void) G_GNUC_NORETURN;
-
-static void oom (void)
-{
-  g_error ("DBus failed with out of memory error");
-  exit(1);
-}
-
 typedef struct {
   DBusHandleMessageFunction callback;
   GObject *data;
@@ -241,10 +233,10 @@ vfs_connection_setup (DBusConnection *connection,
     }
   
   if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
-    oom ();
+    _g_dbus_oom ();
 
   if (!dbus_connection_add_filter (connection, vfs_connection_filter, NULL, NULL))
-    oom ();
+    _g_dbus_oom ();
 }
 
 
@@ -518,7 +510,7 @@ async_call_send (AsyncDBusCall *async_call)
 					async_call->message,
 					&pending,
 					DBUS_TIMEOUT_DEFAULT))
-    oom ();
+    _g_dbus_oom ();
 
   if (pending == NULL)
     {
@@ -546,7 +538,7 @@ async_call_send (AsyncDBusCall *async_call)
 				     async_dbus_response,
 				     async_call,
 				     NULL))
-    oom ();
+    _g_dbus_oom ();
 
 }
 
@@ -686,12 +678,12 @@ open_connection_async (AsyncDBusCall *async_call)
 							 G_VFS_DBUS_OP_GET_CONNECTION);
   
   if (get_connection_message == NULL)
-    oom ();
+    _g_dbus_oom ();
 
   if (!dbus_connection_send_with_reply (async_call->private_bus,
 					get_connection_message, &pending,
 					DBUS_TIMEOUT_DEFAULT))
-    oom ();
+    _g_dbus_oom ();
   
   dbus_message_unref (get_connection_message);
   
@@ -708,7 +700,7 @@ open_connection_async (AsyncDBusCall *async_call)
 				     async_get_connection_response,
 				     async_call,
 				     NULL))
-    oom ();
+    _g_dbus_oom ();
 }
 
 static void
@@ -777,17 +769,17 @@ do_find_owner_async (AsyncDBusCall *async_call)
                                           DBUS_INTERFACE_DBUS,
                                           "GetNameOwner");
   if (message == NULL)
-    oom ();
+    _g_dbus_oom ();
   
   if (!dbus_message_append_args (message,
 				 DBUS_TYPE_STRING, &async_call->bus_name,
 				 DBUS_TYPE_INVALID))
-    oom ();
+    _g_dbus_oom ();
   
   if (!dbus_connection_send_with_reply (async_call->private_bus,
 					message, &pending,
 					DBUS_TIMEOUT_DEFAULT))
-    oom ();
+    _g_dbus_oom ();
   
   dbus_message_unref (message);
   
@@ -804,7 +796,7 @@ do_find_owner_async (AsyncDBusCall *async_call)
 				     async_get_name_owner_response,
 				     async_call,
 				     NULL))
-    oom ();
+    _g_dbus_oom ();
 }
 
 void
@@ -883,7 +875,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
     {
       if (!dbus_connection_send_with_reply (connection, message,
 					    &pending, DBUS_TIMEOUT_DEFAULT))
-	oom ();
+	_g_dbus_oom ();
       
       if (pending == NULL)
 	{
@@ -1020,12 +1012,12 @@ get_name_owner_sync (const char *bus_name, GError **error)
                                           DBUS_INTERFACE_DBUS,
                                           "GetNameOwner");
   if (message == NULL)
-    oom ();
+    _g_dbus_oom ();
   
   if (!dbus_message_append_args (message,
 				 DBUS_TYPE_STRING, &bus_name,
 				 DBUS_TYPE_INVALID))
-    oom ();
+    _g_dbus_oom ();
   
   reply = dbus_connection_send_with_reply_and_block (connection, message, -1, &derror);
   dbus_message_unref (message);

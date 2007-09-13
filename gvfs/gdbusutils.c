@@ -7,9 +7,8 @@
 #include <gdbusutils.h>
 #include <gasynchelper.h>
 
-static void oom (void) G_GNUC_NORETURN;
-
-static void oom (void)
+void
+_g_dbus_oom (void)
 {
   g_error ("DBus failed with out of memory error");
   exit(1);
@@ -104,15 +103,15 @@ _g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *str)
 					 DBUS_TYPE_ARRAY,
 					 DBUS_TYPE_BYTE_AS_STRING,
 					 &array))
-    oom ();
+    _g_dbus_oom ();
   
   if (!dbus_message_iter_append_fixed_array (&array,
 					     DBUS_TYPE_BYTE,
 					     &str, strlen (str)))
-    oom ();
+    _g_dbus_oom ();
   
   if (!dbus_message_iter_close_container (iter, &array))
-    oom ();
+    _g_dbus_oom ();
 }
 
 void
@@ -149,7 +148,7 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
           if (!dbus_message_iter_append_basic (&iter,
                                                type,
                                                value))
-	    oom ();
+	    _g_dbus_oom ();
         }
       else if (type == DBUS_TYPE_ARRAY)
         {
@@ -165,7 +164,7 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
                                                  DBUS_TYPE_ARRAY,
                                                  buf,
                                                  &array))
-	    oom ();
+	    _g_dbus_oom ();
           
           if (dbus_type_is_fixed (element_type))
             {
@@ -179,7 +178,7 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
                                                          element_type,
                                                          value,
                                                          n_elements))
-		oom ();
+		_g_dbus_oom ();
             }
           else if (element_type == DBUS_TYPE_STRING ||
                    element_type == DBUS_TYPE_SIGNATURE ||
@@ -201,7 +200,7 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
                   if (!dbus_message_iter_append_basic (&array,
                                                        element_type,
                                                        &value[i]))
-		    oom ();
+		    _g_dbus_oom ();
                   ++i;
                 }
             }
@@ -212,7 +211,7 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
             }
 
           if (!dbus_message_iter_close_container (&iter, &array))
-	    oom ();
+	    _g_dbus_oom ();
         }
 
       type = va_arg (var_args, int);
@@ -688,14 +687,14 @@ _g_dbus_connection_integrate_with_main  (DBusConnection *connection)
                                             remove_watch,
                                             watch_toggled,
                                             dbus_source, NULL))
-    oom ();
+    _g_dbus_oom ();
 
   if (!dbus_connection_set_timeout_functions (connection,
                                               add_timeout,
                                               remove_timeout,
                                               timeout_toggled,
                                               dbus_source, NULL))
-    oom ();
+    _g_dbus_oom ();
     
   dbus_connection_set_wakeup_main_function (connection,
 					    wakeup_main,
@@ -707,7 +706,7 @@ _g_dbus_connection_integrate_with_main  (DBusConnection *connection)
   if (!dbus_connection_set_data (connection,
 				 main_integration_data_slot,
 				 dbus_source, (DBusFreeFunction)dbus_source_free))
-    oom ();
+    _g_dbus_oom ();
 }
 
 void
@@ -718,5 +717,5 @@ _g_dbus_connection_remove_from_main (DBusConnection *connection)
   if (!dbus_connection_set_data (connection,
 				 main_integration_data_slot,
 				 NULL, NULL))
-    oom ();
+    _g_dbus_oom ();
 }
