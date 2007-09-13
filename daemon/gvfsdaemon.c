@@ -32,12 +32,10 @@ struct _GVfsDaemonPrivate
   GMutex *lock;
   gboolean main_daemon;
 
+  GThreadPool *thread_pool;
   DBusConnection *session_bus;
   GHashTable *registered_paths;
-  GQueue *new_pending_jobs; 
-  GQueue *pending_jobs;  /* Only accessed from main thread */
-  GQueue *jobs;
-  guint queued_job_start; 
+  GList *jobs;
   GList *job_sources;
 };
 
@@ -82,11 +80,7 @@ g_vfs_daemon_finalize (GObject *object)
 
   daemon = G_VFS_DAEMON (object);
 
-  g_assert (daemon->priv->jobs->head == NULL);
-  g_assert (daemon->priv->pending_jobs->head == NULL);
-  g_queue_free (daemon->priv->jobs);
-  g_queue_free (daemon->priv->pending_jobs);
-  g_queue_free (daemon->priv->new_pending_jobs);
+  g_assert (daemon->priv->jobs == NULL);
 
   g_hash_table_destroy (daemon->priv->registered_paths);
   g_mutex_free (daemon->priv->lock);
@@ -108,16 +102,32 @@ g_vfs_daemon_class_init (GVfsDaemonClass *klass)
 }
 
 static void
+job_handler_callback (gpointer       data,
+		      gpointer       user_data)
+{
+  GVfsJob *job = G_VFS_JOB (data);
+
+  g_vfs_job_run (job);
+}
+
+static void
 g_vfs_daemon_init (GVfsDaemon *daemon)
 {
+  gint max_threads = 1; /* TODO: handle max threads */
+  
   daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE (daemon,
 					      G_TYPE_VFS_DAEMON,
 					      GVfsDaemonPrivate);
   daemon->priv->lock = g_mutex_new ();
   daemon->priv->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-  daemon->priv->jobs = g_queue_new ();
-  daemon->priv->pending_jobs = g_queue_new ();
-  daemon->priv->new_pending_jobs = g_queue_new ();
+  daemon->priv->thread_pool = g_thread_pool_new (job_handler_callback,
+						 daemon,
+						 max_threads,
+						 FALSE, NULL);
+  /* TODO: verify thread_pool != NULL in a nicer way */
+  g_assert (daemon->priv->thread_pool != NULL);
+  
+  daemon->priv->jobs = NULL;
   daemon->priv->registered_paths =
     g_hash_table_new_full (g_str_hash,
 			   g_str_equal,
@@ -297,53 +307,6 @@ g_vfs_daemon_register_path (GVfsDaemon                    *daemon,
   return TRUE;
 }
 
-static void
-g_queue_move_items (GQueue *to, GQueue *from)
-{
-  GList *ignore;
-  if (from->head != NULL)
-    {
-      if (to->head == NULL)
-	to->head = from->head;
-      else
-	ignore = g_list_concat (to->tail, from->head);
-      to->tail = from->tail;
-      to->length += from->length;
-      
-      from->head = NULL;
-      from->tail = NULL;
-      from->length = 0;
-    }
-}
-
-static gboolean
-start_jobs_at_idle (gpointer data)
-{
-  GVfsDaemon *daemon = data;
-  GList *l, *next;
-  GVfsJob *job;
-
-  g_mutex_lock (daemon->priv->lock);
-  daemon->priv->queued_job_start = 0;
-  g_queue_move_items (daemon->priv->pending_jobs,
-		      daemon->priv->new_pending_jobs);
-  g_mutex_unlock (daemon->priv->lock);
-
-  l = daemon->priv->pending_jobs->head;
-  while (l != NULL)
-    {
-      job = l->data;
-      next = l->next;
-
-      if (g_vfs_job_start (job))
-	g_queue_delete_link (daemon->priv->pending_jobs, l);
-      
-      l = next;
-    }
-  
-  return FALSE;
-}
-
 /* NOTE: Might be emitted on a thread */
 static void
 job_new_source_callback (GVfsJob *job,
@@ -367,12 +330,7 @@ job_finished_callback (GVfsJob *job,
 					daemon);
 
   g_mutex_lock (daemon->priv->lock);
-  
-  g_queue_remove (daemon->priv->jobs, job);
-  
-  if (daemon->priv->queued_job_start == 0)
-    daemon->priv->queued_job_start = g_idle_add (start_jobs_at_idle, daemon);
- 
+  daemon->priv->jobs = g_list_remove (daemon->priv->jobs, job);
   g_mutex_unlock (daemon->priv->lock);
   
   g_object_unref (job);
@@ -389,16 +347,14 @@ g_vfs_daemon_queue_job (GVfsDaemon *daemon,
   g_signal_connect (job, "new_source", (GCallback)job_new_source_callback, daemon);
   
   g_mutex_lock (daemon->priv->lock);
-  g_queue_push_tail (daemon->priv->jobs, job);
+  daemon->priv->jobs = g_list_prepend (daemon->priv->jobs, job);
   g_mutex_unlock (daemon->priv->lock);
   
-  /* Can we start the job immediately */
-  if (!g_vfs_job_start (job))
+  /* Can we start the job immediately / async */
+  if (!g_vfs_job_try (job))
     {
-      /* Didn't start, queue as pending */
-      g_mutex_lock (daemon->priv->lock);
-      g_queue_push_tail (daemon->priv->new_pending_jobs, job);
-      g_mutex_unlock (daemon->priv->lock);
+      /* Couldn't finish / run async, queue worker thread */
+      g_thread_pool_push (daemon->priv->thread_pool, job, NULL); /* TODO: Check error */
     }
 }
 
@@ -822,7 +778,7 @@ daemon_message_func (DBusConnection *conn,
 				 DBUS_TYPE_INVALID))
 	{
 	  g_mutex_lock (daemon->priv->lock);
-	  for (l = daemon->priv->jobs->head; l != NULL; l = l->next)
+	  for (l = daemon->priv->jobs; l != NULL; l = l->next)
 	    {
 	      GVfsJob *job = l->data;
 	      

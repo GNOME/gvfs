@@ -95,9 +95,9 @@ open_read_cancelled_cb (GVfsJob *job, gpointer data)
 }
 
 static gboolean 
-do_open_for_read (GVfsBackend *backend,
-		  GVfsJobOpenForRead *job,
-		  char *filename)
+try_open_for_read (GVfsBackend *backend,
+		   GVfsJobOpenForRead *job,
+		   char *filename)
 {
   GError *error;
 
@@ -107,14 +107,14 @@ do_open_for_read (GVfsBackend *backend,
     {
       error = g_error_new (G_FILE_ERROR, G_FILE_ERROR_IO, "Test error");
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      return TRUE;
     }
   else
     {
       guint tag = g_timeout_add (0, open_idle_cb, job);
       g_signal_connect (job, "cancelled", (GCallback)open_read_cancelled_cb, GINT_TO_POINTER (tag));
-      return TRUE;
     }
+  
+  return TRUE;
 }
 
 static gboolean 
@@ -156,11 +156,11 @@ read_cancelled_cb (GVfsJob *job, gpointer data)
 }
 
 static gboolean
-do_read (GVfsBackend *backend,
-	 GVfsJobRead *job,
-	 GVfsBackendHandle handle,
-	 char *buffer,
-	 gsize bytes_requested)
+try_read (GVfsBackend *backend,
+	  GVfsJobRead *job,
+	  GVfsBackendHandle handle,
+	  char *buffer,
+	  gsize bytes_requested)
 {
   guint tag;
 
@@ -173,7 +173,7 @@ do_read (GVfsBackend *backend,
   return TRUE;
 }
 
-static gboolean
+static void
 do_seek_on_read (GVfsBackend *backend,
 		 GVfsJobSeekRead *job,
 		 GVfsBackendHandle handle,
@@ -217,11 +217,9 @@ do_seek_on_read (GVfsBackend *backend,
       g_vfs_job_seek_read_set_offset (job, offset);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
-
-  return TRUE;
 }
 
-static gboolean
+static void
 do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
@@ -234,11 +232,9 @@ do_close_read (GVfsBackend *backend,
   close(fd);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  
-  return TRUE;
 }
 
-static gboolean
+static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     char *filename,
@@ -266,17 +262,15 @@ do_get_info (GVfsBackend *backend,
 
   g_object_unref (info);
   g_object_unref (file);
-  
-  return TRUE;
 }
 
 static gboolean
-do_enumerate (GVfsBackend *backend,
-	      GVfsJobEnumerate *job,
-	      char *filename,
-	      GFileInfoRequestFlags requested,
-	      const char *attributes,
-	      gboolean follow_symlinks)
+try_enumerate (GVfsBackend *backend,
+	       GVfsJobEnumerate *job,
+	       char *filename,
+	       GFileInfoRequestFlags requested,
+	       const char *attributes,
+	       gboolean follow_symlinks)
 {
   GFileInfo *info1, *info2;;
   GList *l;
@@ -314,10 +308,10 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
   
   gobject_class->finalize = g_vfs_backend_test_finalize;
 
-  backend_class->open_for_read = do_open_for_read;
-  backend_class->read = do_read;
+  backend_class->try_open_for_read = try_open_for_read;
+  backend_class->try_read = try_read;
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
   backend_class->get_info = do_get_info;
-  backend_class->enumerate = do_enumerate;
+  backend_class->try_enumerate = try_enumerate;
 }

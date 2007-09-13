@@ -297,195 +297,39 @@ g_vfs_backend_smb_new (const char *server,
   return backend;
 }
 
-static gboolean 
-open_idle_cb (gpointer data)
-{
-  GVfsJobOpenForRead *job = data;
-  int fd;
-
-  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_VFS_ERROR,
-			G_VFS_ERROR_CANCELLED,
-			_("Operation was cancelled"));
-      return FALSE;
-    }
-  
-  fd = g_open (job->filename, O_RDONLY);
-  if (fd == -1)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_FILE_ERROR,
-			g_file_error_from_errno (errno),
-			"Error opening file %s: %s",
-			job->filename, g_strerror (errno));
-    }
-  else
-    {
-      g_vfs_job_open_for_read_set_can_seek (job, TRUE);
-      g_vfs_job_open_for_read_set_handle (job, GINT_TO_POINTER (fd));
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  return FALSE;
-}
-
-static void
-open_read_cancelled_cb (GVfsJob *job, gpointer data)
-{
-  guint tag = GPOINTER_TO_INT (data);
-
-  g_print ("open_read_cancelled_cb\n");
-  
-  if (g_source_remove (tag))
-    g_vfs_job_failed (job, G_VFS_ERROR,
-		      G_VFS_ERROR_CANCELLED,
-		      _("Operation was cancelled"));
-}
-
-static gboolean 
+static void 
 do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
 		  char *filename)
 {
-  GError *error;
-
-  g_print ("open_for_read (%s)\n", filename);
-  
-  if (strcmp (filename, "/fail") == 0)
-    {
-      error = g_error_new (G_FILE_ERROR, G_FILE_ERROR_IO, "Smb error");
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      return TRUE;
-    }
-  else
-    {
-      guint tag = g_timeout_add (0, open_idle_cb, job);
-      g_signal_connect (job, "cancelled", (GCallback)open_read_cancelled_cb, GINT_TO_POINTER (tag));
-      return TRUE;
-    }
-}
-
-static gboolean 
-read_idle_cb (gpointer data)
-{
-  GVfsJobRead *job = data;
-  int fd;
-  ssize_t res;
-
-  fd = GPOINTER_TO_INT (job->handle);
-
-  res = read (fd, job->buffer, job->bytes_requested);
-
-  if (res == -1)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_FILE_ERROR,
-			g_file_error_from_errno (errno),
-			"Error reading from file: %s",
-			g_strerror (errno));
-    }
-  else
-    {
-      g_vfs_job_read_set_size (job, res);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  
-  return FALSE;
 }
 
 static void
-read_cancelled_cb (GVfsJob *job, gpointer data)
-{
-  guint tag = GPOINTER_TO_INT (job->backend_data);
-
-  g_source_remove (tag);
-  g_vfs_job_failed (job, G_VFS_ERROR,
-		    G_VFS_ERROR_CANCELLED,
-		    _("Operation was cancelled"));
-}
-
-static gboolean
 do_read (GVfsBackend *backend,
 	 GVfsJobRead *job,
 	 GVfsBackendHandle handle,
 	 char *buffer,
 	 gsize bytes_requested)
 {
-  guint tag;
-
-  g_print ("read (%d)\n", bytes_requested);
-
-  tag = g_timeout_add (0, read_idle_cb, job);
-  G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (tag);
-  g_signal_connect (job, "cancelled", (GCallback)read_cancelled_cb, NULL);
-  
-  return TRUE;
 }
 
-static gboolean
+static void
 do_seek_on_read (GVfsBackend *backend,
 		 GVfsJobSeekRead *job,
 		 GVfsBackendHandle handle,
 		 goffset    offset,
 		 GSeekType  type)
 {
-  int whence;
-  int fd;
-  off_t final_offset;
-
-  g_print ("seek_on_read (%d, %d)\n", (int)offset, type);
-
-  switch (type)
-    {
-    default:
-    case G_SEEK_SET:
-      whence = SEEK_SET;
-      break;
-    case G_SEEK_CUR:
-      whence = SEEK_CUR;
-      break;
-    case G_SEEK_END:
-      whence = SEEK_END;
-      break;
-    }
-      
-  
-  fd = GPOINTER_TO_INT (handle);
-
-  final_offset = lseek (fd, offset, whence);
-  
-  if (final_offset == (off_t)-1)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job), G_FILE_ERROR,
-			g_file_error_from_errno (errno),
-			"Error seeking in file: %s",
-			g_strerror (errno));
-    }
-  else
-    {
-      g_vfs_job_seek_read_set_offset (job, offset);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-
-  return TRUE;
 }
 
-static gboolean
+static void
 do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
 {
-  int fd;
-
-  g_print ("close ()\n");
-
-  fd = GPOINTER_TO_INT (handle);
-  close(fd);
-  
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-  
-  return TRUE;
 }
 
-static gboolean
+static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     char *filename,
@@ -493,31 +337,9 @@ do_get_info (GVfsBackend *backend,
 	     const char *attributes,
 	     gboolean follow_symlinks)
 {
-  GFile *file;
-  GFileInfo *info;
-  GError *error;
-
-  file = g_file_local_new (filename);
-
-  error = NULL;
-  info = g_file_get_info (file, requested, attributes, follow_symlinks,
-			  NULL, &error);
-
-  if (info)
-    {
-      g_vfs_job_get_info_set_info (job, requested, info);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-  else
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-
-  g_object_unref (info);
-  g_object_unref (file);
-  
-  return TRUE;
 }
 
-static gboolean
+static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      char *filename,
@@ -525,32 +347,6 @@ do_enumerate (GVfsBackend *backend,
 	      const char *attributes,
 	      gboolean follow_symlinks)
 {
-  GFileInfo *info1, *info2;;
-  GList *l;
-  
-  g_vfs_job_enumerate_set_result (job, requested);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-
-  info1 = g_file_info_new ();
-  info2 = g_file_info_new ();
-  g_file_info_set_name (info1, "file1");
-  g_file_info_set_file_type (info1, G_FILE_TYPE_REGULAR);
-  g_file_info_set_name (info2, "file2");
-  g_file_info_set_file_type (info2, G_FILE_TYPE_REGULAR);
-  
-  l = NULL;
-  l = g_list_append (l, info1);
-  l = g_list_append (l, info2);
-
-  g_vfs_job_enumerate_add_info (job, l);
-
-  g_list_free (l);
-  g_object_unref (info1);
-  g_object_unref (info2);
-
-  g_vfs_job_enumerate_done (job);
-  
-  return TRUE;
 }
 
 static void

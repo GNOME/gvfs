@@ -13,7 +13,8 @@
 
 G_DEFINE_TYPE (GVfsJobCloseRead, g_vfs_job_close_read, G_TYPE_VFS_JOB);
 
-static gboolean start (GVfsJob *job);
+static void run (GVfsJob *job);
+static gboolean try (GVfsJob *job);
 static void send_reply (GVfsJob *job);
 
 static void
@@ -36,7 +37,8 @@ g_vfs_job_close_read_class_init (GVfsJobCloseReadClass *klass)
   
   gobject_class->finalize = g_vfs_job_close_read_finalize;
 
-  job_class->start = start;
+  job_class->run = run;
+  job_class->try = try;
   job_class->send_reply = send_reply;
 }
 
@@ -76,12 +78,27 @@ send_reply (GVfsJob *job)
     g_vfs_read_channel_send_closed (op_job->channel);
 }
 
-static gboolean
-start (GVfsJob *job)
+static void
+run (GVfsJob *job)
 {
   GVfsJobCloseRead *op_job = G_VFS_JOB_CLOSE_READ (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  
+  class->close_read (op_job->backend,
+		     op_job,
+		     op_job->handle);
+}
 
-  return g_vfs_backend_close_read (op_job->backend,
-				   op_job,
-				   op_job->handle);
+static gboolean
+try (GVfsJob *job)
+{
+  GVfsJobCloseRead *op_job = G_VFS_JOB_CLOSE_READ (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  
+  if (class->try_close_read == NULL)
+    return FALSE;
+  
+  return class->try_close_read (op_job->backend,
+				op_job,
+				op_job->handle);
 }

@@ -13,8 +13,9 @@
 
 G_DEFINE_TYPE (GVfsJobRead, g_vfs_job_read, G_TYPE_VFS_JOB);
 
-static gboolean start (GVfsJob *job);
-static void send_reply (GVfsJob *job);
+static void     run        (GVfsJob *job);
+static gboolean try        (GVfsJob *job);
+static void     send_reply (GVfsJob *job);
 
 static void
 g_vfs_job_read_finalize (GObject *object)
@@ -38,7 +39,8 @@ g_vfs_job_read_class_init (GVfsJobReadClass *klass)
   
   gobject_class->finalize = g_vfs_job_read_finalize;
 
-  job_class->start = start;
+  job_class->run = run;
+  job_class->try = try;
   job_class->send_reply = send_reply;
 }
 
@@ -84,17 +86,35 @@ send_reply (GVfsJob *job)
     }
 }
 
-static gboolean
-start (GVfsJob *job)
+static void
+run (GVfsJob *job)
 {
   GVfsJobRead *op_job = G_VFS_JOB_READ (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  return g_vfs_backend_read (op_job->backend,
-			     op_job,
-			     op_job->handle,
-			     op_job->buffer,
-			     op_job->bytes_requested);
+  class->read (op_job->backend,
+	       op_job,
+	       op_job->handle,
+	       op_job->buffer,
+	       op_job->bytes_requested);
 }
+
+static gboolean
+try (GVfsJob *job)
+{
+  GVfsJobRead *op_job = G_VFS_JOB_READ (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->try_read == NULL)
+    return FALSE;
+
+  return class->try_read (op_job->backend,
+			  op_job,
+			  op_job->handle,
+			  op_job->buffer,
+			  op_job->bytes_requested);
+}
+
 
 /* Takes ownership */
 void

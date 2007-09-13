@@ -49,66 +49,66 @@ struct _GVfsBackendClass
    * A NULL here means operation not supported 
    */
 
-  gboolean (*open_for_read) (GVfsBackend *backend,
-			     GVfsJobOpenForRead *job,
-			     char *filename);
-  gboolean (*close_read)    (GVfsBackend *backend,
-			     GVfsJobCloseRead *job,
-			     GVfsBackendHandle handle);
-  gboolean (*read)          (GVfsBackend *backend,
-			     GVfsJobRead *job,
-			     GVfsBackendHandle handle,
-			     char *buffer,
-			     gsize bytes_requested);
-  gboolean (*seek_on_read)  (GVfsBackend *backend,
-			     GVfsJobSeekRead *job,
-			     GVfsBackendHandle handle,
-			     goffset    offset,
-			     GSeekType  type);
-  gboolean (*get_info)      (GVfsBackend *backend,
-			     GVfsJobGetInfo *job,
-			     char *filename,
-			     GFileInfoRequestFlags requested,
-			     const char *attributes,
-			     gboolean follow_symlinks);
-  gboolean (*enumerate)     (GVfsBackend *backend,
-			     GVfsJobEnumerate *job,
-			     char *filename,
-			     GFileInfoRequestFlags requested,
-			     const char *attributes,
-			     gboolean follow_symlinks);
+  void     (*open_for_read)     (GVfsBackend *backend,
+				 GVfsJobOpenForRead *job,
+				 char *filename);
+  gboolean (*try_open_for_read) (GVfsBackend *backend,
+				 GVfsJobOpenForRead *job,
+				 char *filename);
+  void     (*close_read)        (GVfsBackend *backend,
+				 GVfsJobCloseRead *job,
+				 GVfsBackendHandle handle);
+  gboolean (*try_close_read)    (GVfsBackend *backend,
+				 GVfsJobCloseRead *job,
+				 GVfsBackendHandle handle);
+  void     (*read)              (GVfsBackend *backend,
+				 GVfsJobRead *job,
+				 GVfsBackendHandle handle,
+				 char *buffer,
+				 gsize bytes_requested);
+  gboolean (*try_read)          (GVfsBackend *backend,
+				 GVfsJobRead *job,
+				 GVfsBackendHandle handle,
+				 char *buffer,
+				 gsize bytes_requested);
+  void     (*seek_on_read)      (GVfsBackend *backend,
+				 GVfsJobSeekRead *job,
+				 GVfsBackendHandle handle,
+				 goffset    offset,
+				 GSeekType  type);
+  gboolean (*try_seek_on_read)  (GVfsBackend *backend,
+				 GVfsJobSeekRead *job,
+				 GVfsBackendHandle handle,
+				 goffset    offset,
+				 GSeekType  type);
+  void     (*get_info)          (GVfsBackend *backend,
+				 GVfsJobGetInfo *job,
+				 char *filename,
+				 GFileInfoRequestFlags requested,
+				 const char *attributes,
+				 gboolean follow_symlinks);
+  gboolean (*try_get_info)      (GVfsBackend *backend,
+				 GVfsJobGetInfo *job,
+				 char *filename,
+				 GFileInfoRequestFlags requested,
+				 const char *attributes,
+				 gboolean follow_symlinks);
+  void     (*enumerate)         (GVfsBackend *backend,
+				 GVfsJobEnumerate *job,
+				 char *filename,
+				 GFileInfoRequestFlags requested,
+				 const char *attributes,
+				 gboolean follow_symlinks);
+  gboolean (*try_enumerate)     (GVfsBackend *backend,
+				 GVfsJobEnumerate *job,
+				 char *filename,
+				 GFileInfoRequestFlags requested,
+				 const char *attributes,
+				 gboolean follow_symlinks);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
 
-gboolean g_vfs_backend_open_for_read        (GVfsBackend           *backend,
-					     GVfsJobOpenForRead    *job,
-					     char                  *filename);
-gboolean g_vfs_backend_close_read           (GVfsBackend           *backend,
-					     GVfsJobCloseRead      *job,
-					     GVfsBackendHandle      handle);
-gboolean g_vfs_backend_read                 (GVfsBackend           *backend,
-					     GVfsJobRead           *job,
-					     GVfsBackendHandle      handle,
-					     char                  *buffer,
-					     gsize                  bytes_requested);
-gboolean g_vfs_backend_seek_on_read         (GVfsBackend           *backend,
-					     GVfsJobSeekRead       *job,
-					     GVfsBackendHandle      handle,
-					     goffset                offset,
-					     GSeekType              type);
-gboolean g_vfs_backend_get_info             (GVfsBackend           *backend,
-					     GVfsJobGetInfo        *job,
-					     char                  *filename,
-					     GFileInfoRequestFlags  requested,
-					     const char            *attributes,
-					     gboolean               follow_symlinks);
-gboolean g_vfs_backend_enumerate            (GVfsBackend           *backend,
-					     GVfsJobEnumerate      *job,
-					     char                  *filename,
-					     GFileInfoRequestFlags  requested,
-					     const char            *attributes,
-					     gboolean               follow_symlinks);
 void     g_vfs_backend_register_with_daemon (GVfsBackend           *backend,
 					     GVfsDaemon            *daemon);
 

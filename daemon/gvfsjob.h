@@ -47,7 +47,8 @@ struct _GVfsJobClass
 
   /* vtable */
 
-  gboolean (*start) (GVfsJob *job);
+  void     (*run)    (GVfsJob *job);
+  gboolean (*try)    (GVfsJob *job);
 };
 
 GType g_vfs_job_get_type (void) G_GNUC_CONST;
@@ -55,7 +56,8 @@ GType g_vfs_job_get_type (void) G_GNUC_CONST;
 gboolean g_vfs_job_is_finished       (GVfsJob     *job);
 gboolean g_vfs_job_is_cancelled      (GVfsJob     *job);
 void     g_vfs_job_cancel            (GVfsJob     *job);
-gboolean g_vfs_job_start             (GVfsJob     *job);
+void     g_vfs_job_run               (GVfsJob     *job);
+gboolean g_vfs_job_try               (GVfsJob     *job);
 void     g_vfs_job_emit_finished     (GVfsJob     *job);
 void     g_vfs_job_failed            (GVfsJob     *job,
 				      GQuark       domain,

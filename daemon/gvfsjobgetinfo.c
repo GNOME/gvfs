@@ -14,7 +14,8 @@
 
 G_DEFINE_TYPE (GVfsJobGetInfo, g_vfs_job_get_info, G_TYPE_VFS_JOB_DBUS);
 
-static gboolean     start        (GVfsJob        *job);
+static void         run          (GVfsJob        *job);
+static gboolean     try          (GVfsJob        *job);
 static DBusMessage *create_reply (GVfsJob        *job,
 				  DBusConnection *connection,
 				  DBusMessage    *message);
@@ -44,7 +45,8 @@ g_vfs_job_get_info_class_init (GVfsJobGetInfoClass *klass)
   GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
   
   gobject_class->finalize = g_vfs_job_get_info_finalize;
-  job_class->start = start;
+  job_class->run = run;
+  job_class->try = try;
   job_dbus_class->create_reply = create_reply;
 }
 
@@ -99,17 +101,35 @@ g_vfs_job_get_info_new (DBusConnection *connection,
   return G_VFS_JOB (job);
 }
 
-static gboolean
-start (GVfsJob *job)
+static void
+run (GVfsJob *job)
 {
   GVfsJobGetInfo *op_job = G_VFS_JOB_GET_INFO (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  
+  class->get_info (op_job->backend,
+		   op_job,
+		   op_job->filename,
+		   op_job->requested,
+		   op_job->attributes,
+		   op_job->follow_symlinks);
+}
 
-  return g_vfs_backend_get_info (op_job->backend,
-				 op_job,
-				 op_job->filename,
-				 op_job->requested,
-				 op_job->attributes,
-				 op_job->follow_symlinks);
+static gboolean
+try (GVfsJob *job)
+{
+  GVfsJobGetInfo *op_job = G_VFS_JOB_GET_INFO (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->try_get_info == NULL)
+    return FALSE;
+
+  return class->try_get_info (op_job->backend,
+			      op_job,
+			      op_job->filename,
+			      op_job->requested,
+			      op_job->attributes,
+			      op_job->follow_symlinks);
 }
 
 void

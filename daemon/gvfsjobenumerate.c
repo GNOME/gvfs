@@ -14,7 +14,8 @@
 
 G_DEFINE_TYPE (GVfsJobEnumerate, g_vfs_job_enumerate, G_TYPE_VFS_JOB_DBUS);
 
-static gboolean     start        (GVfsJob        *job);
+static void         run        (GVfsJob        *job);
+static gboolean     try        (GVfsJob        *job);
 static void         send_reply   (GVfsJob        *job);
 static DBusMessage *create_reply (GVfsJob        *job,
 				  DBusConnection *connection,
@@ -43,7 +44,8 @@ g_vfs_job_enumerate_class_init (GVfsJobEnumerateClass *klass)
   GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
   
   gobject_class->finalize = g_vfs_job_enumerate_finalize;
-  job_class->start = start;
+  job_class->run = run;
+  job_class->try = try;
   job_class->send_reply = send_reply;
   job_dbus_class->create_reply = create_reply;
 }
@@ -175,17 +177,35 @@ g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
   g_vfs_job_emit_finished (G_VFS_JOB (job));
 }
 
-static gboolean
-start (GVfsJob *job)
+static void
+run (GVfsJob *job)
 {
   GVfsJobEnumerate *op_job = G_VFS_JOB_ENUMERATE (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
   
-  return g_vfs_backend_enumerate (op_job->backend,
-				  op_job,
-				  op_job->filename,
-				  op_job->requested,
-				  op_job->attributes,
-				  op_job->follow_symlinks);
+  class->enumerate (op_job->backend,
+		    op_job,
+		    op_job->filename,
+		    op_job->requested,
+		    op_job->attributes,
+		    op_job->follow_symlinks);
+}
+
+static gboolean
+try (GVfsJob *job)
+{
+  GVfsJobEnumerate *op_job = G_VFS_JOB_ENUMERATE (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  
+  if (class->try_enumerate == NULL)
+    return FALSE;
+  
+  return class->try_enumerate (op_job->backend,
+			       op_job,
+			       op_job->filename,
+			       op_job->requested,
+			       op_job->attributes,
+			       op_job->follow_symlinks);
 }
 
 static void

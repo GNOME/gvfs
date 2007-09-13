@@ -14,7 +14,8 @@
 
 G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_TYPE_VFS_JOB_DBUS);
 
-static gboolean     start        (GVfsJob        *job);
+static void         run          (GVfsJob        *job);
+static gboolean     try          (GVfsJob        *job);
 static void         finished     (GVfsJob        *job);
 static DBusMessage *create_reply (GVfsJob        *job,
 				  DBusConnection *connection,
@@ -46,7 +47,8 @@ g_vfs_job_open_for_read_class_init (GVfsJobOpenForReadClass *klass)
   GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
   
   gobject_class->finalize = g_vfs_job_open_for_read_finalize;
-  job_class->start = start;
+  job_class->run = run;
+  job_class->try = try;
   job_class->finished = finished;
   job_dbus_class->create_reply = create_reply;
 }
@@ -93,15 +95,31 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
   return G_VFS_JOB (job);
 }
 
-static gboolean
-start (GVfsJob *job)
+static void
+run (GVfsJob *job)
 {
   GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  return g_vfs_backend_open_for_read (op_job->backend,
-				      op_job,
-				      op_job->filename);
+  class->open_for_read (op_job->backend,
+			op_job,
+			op_job->filename);
 }
+
+static gboolean
+try (GVfsJob *job)
+{
+  GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->try_open_for_read == NULL)
+    return FALSE;
+  
+  return class->try_open_for_read (op_job->backend,
+				   op_job,
+				   op_job->filename);
+}
+
 
 void
 g_vfs_job_open_for_read_set_handle (GVfsJobOpenForRead *job,

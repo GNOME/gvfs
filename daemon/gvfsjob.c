@@ -138,13 +138,22 @@ g_vfs_job_get_property (GObject    *object,
     }
 }
 
-gboolean
-g_vfs_job_start (GVfsJob *job)
+void
+g_vfs_job_run (GVfsJob *job)
 {
   GVfsJobClass *class;
 
   class = G_VFS_JOB_GET_CLASS (job);
-  return class->start (job);
+  class->run (job);
+}
+
+gboolean
+g_vfs_job_try (GVfsJob *job)
+{
+  GVfsJobClass *class;
+
+  class = G_VFS_JOB_GET_CLASS (job);
+  return class->try (job);
 }
 
 void
