@@ -51,6 +51,8 @@ fs info - type, free space, total space
 
 Use "data" -> "user_data" as name for user data pointer.
 
+Handle the conflicting globs (*.pcf) case and fallback to sniffing
+
 FUTURE IDEAS:
 -------------
 
