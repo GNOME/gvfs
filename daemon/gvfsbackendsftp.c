@@ -103,6 +103,7 @@ struct _GVfsBackendSftp
 
 static void parse_attributes (GVfsBackendSftp *backend,
                               GFileInfo *info,
+                              const char *basename,
                               GDataInputStream *reply);
 
 
@@ -932,7 +933,7 @@ get_uid_sync (GVfsBackendSftp *backend)
   if (type == SSH_FXP_ATTRS)
     {
       info = g_file_info_new ();
-      parse_attributes (backend, info, reply);
+      parse_attributes (backend, info, NULL, reply);
       if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID))
         {
           /* Both are always set if set */
@@ -1198,6 +1199,7 @@ set_access_attributes (GFileInfo *info,
 static void
 parse_attributes (GVfsBackendSftp *backend,
                   GFileInfo *info,
+                  const char *basename,
                   GDataInputStream *reply)
 {
   guint32 flags;
@@ -1206,6 +1208,12 @@ parse_attributes (GVfsBackendSftp *backend,
   gboolean has_uid;
   
   flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+
+  if (basename != NULL && basename[0] == '.')
+    g_file_info_set_is_hidden (info, TRUE);
+
+  if (basename != NULL && basename[strlen (basename) -1] == '~')
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_BACKUP, TRUE);
   
   if (flags & SSH_FILEXFER_ATTR_SIZE)
     {
@@ -1313,7 +1321,7 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
       g_file_info_set_name (info, name);
       g_file_info_set_is_symlink (info, TRUE);
       
-      parse_attributes (backend, info, reply);
+      parse_attributes (backend, info, name, reply);
 
       g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), info);
       
@@ -1377,7 +1385,7 @@ read_dir_reply (GVfsBackendSftp *backend,
       longname = read_string (reply, NULL);
       g_free (longname);
       
-      parse_attributes (backend, info, reply);
+      parse_attributes (backend, info, name, reply);
       
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
           ! (enum_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
@@ -1490,6 +1498,7 @@ get_info_reply (GVfsBackendSftp *backend,
 {
   GFileInfo *info;
   int finished_count;
+  char *basename;
   
   if (job->sent_reply)
     return; /* Other might have failed */
@@ -1509,7 +1518,10 @@ get_info_reply (GVfsBackendSftp *backend,
 
   info = G_VFS_JOB_GET_INFO (job)->file_info;
 
-  parse_attributes (backend, info, reply);
+  basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
+  
+  parse_attributes (backend, info, basename, reply);
+  g_free (basename);
 
   finished_count = GPOINTER_TO_INT (job->backend_data);
   job->backend_data = GINT_TO_POINTER (--finished_count);
