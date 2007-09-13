@@ -45,9 +45,9 @@ fi
 	DIE=1
 }
 
-if automake-1.7 --version < /dev/null > /dev/null 2>&1 ; then
-    AUTOMAKE=automake-1.7
-    ACLOCAL=aclocal-1.7
+if automake --version < /dev/null > /dev/null 2>&1 ; then
+    AUTOMAKE=automake
+    ACLOCAL=aclocal
 else
 	echo
 	echo "You must have automake 1.7.x installed to compile $PROJECT."
@@ -98,10 +98,11 @@ rm -rf autom4te.cache
 # regenerated from their corresponding *.in files by ./configure anyway.
 touch README INSTALL
 
-$ACLOCAL $ACLOCAL_FLAGS || exit $?
-
 libtoolize --force || exit $?
+glib-gettextize -f || exit $?
 gtkdocize || exit $?
+
+$ACLOCAL $ACLOCAL_FLAGS || exit $?
 
 autoheader || exit $?
 
