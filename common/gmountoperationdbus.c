@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <gio/gvfstypes.h>
+#include <gio/gvfserror.h>
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
@@ -336,14 +337,11 @@ mount_op_done (GMountOperationDBus *op,
 {
   const char *domain, *error_message;
   dbus_bool_t success;
-  DBusMessage *reply;
   DBusMessageIter iter;
   DBusError derror;
   guint32 code;
   GError *error;
 
-  reply = NULL;
-  
   dbus_message_iter_init (message, &iter);
   
   dbus_error_init (&derror);
@@ -352,51 +350,34 @@ mount_op_done (GMountOperationDBus *op,
 				      DBUS_TYPE_BOOLEAN, &success,
 				      0))
     {
-      reply = dbus_message_new_error (message, derror.name, derror.message);
-      if (reply == NULL)
-	_g_dbus_oom ();
-      if (!dbus_connection_send (op->connection, reply, NULL))
-	_g_dbus_oom ();
-      dbus_message_unref (reply);
+      g_warning ("Can't get mountDone args: %s\n", derror.message);
+      dbus_error_free (&derror);
       return;
     }
 
   error = NULL;
   if (!success)
     {
-      if (!_g_dbus_message_iter_get_args (&iter,
-					  &derror,
-					  DBUS_TYPE_STRING, &domain,
-					  DBUS_TYPE_UINT32, &code,
-					  DBUS_TYPE_STRING, &error_message,
-					  0))
+      if (_g_dbus_message_iter_get_args (&iter,
+					 &derror,
+					 DBUS_TYPE_STRING, &domain,
+					 DBUS_TYPE_UINT32, &code,
+					 DBUS_TYPE_STRING, &error_message,
+					 0))
+	error = g_error_new_literal (g_quark_from_string (domain),
+				     code, error_message);
+      else
 	{
-	  reply = dbus_message_new_error (message, derror.name, derror.message);
-	  if (reply == NULL)
-	    _g_dbus_oom ();
-	  if (!dbus_connection_send (op->connection, reply, NULL))
-	    _g_dbus_oom ();
-	  dbus_message_unref (reply);
-	  return;
+	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
+		       "Can't parse mount error: %s", derror.message);
+	  dbus_error_free (&derror);
 	}
-
-      error = g_error_new_literal (g_quark_from_string (domain),
-				   code, error_message);
     }
-  
   
   g_signal_emit_by_name (op, "done", success, error);
 
   if (error)
     g_error_free (error);
-
-  reply = dbus_message_new_method_return (message);
-  if (reply == NULL)
-    _g_dbus_oom ();
-
-  if (!dbus_connection_send (op->connection, reply, NULL))
-    _g_dbus_oom ();
-  dbus_message_unref (reply);
 }
 
 struct FailData {

@@ -7,6 +7,7 @@
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <gmountspec.h>
+#include <gdbusutils.h>
 
 G_BEGIN_DECLS
 
@@ -20,6 +21,7 @@ G_BEGIN_DECLS
 typedef struct _GVfsBackend        GVfsBackend;
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 
+typedef struct _GVfsJobMount        GVfsJobMount;
 typedef struct _GVfsJobOpenForRead  GVfsJobOpenForRead;
 typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
@@ -32,7 +34,10 @@ typedef gpointer GVfsBackendHandle;
 struct _GVfsBackend
 {
   GObject parent_instance;
+  
+  GVfsDaemon *daemon;
   char *object_path;
+  
   char *display_name;
   GMountSpec *mount_spec;
 };
@@ -43,14 +48,22 @@ struct _GVfsBackendClass
 
   /* vtable */
 
-  /* These should all be fast and non-blocking, scheduling the i/o
-   * operations async (or on a thread).
-   * Returning FALSE means "Can't do this right now, try later" 
-   * Returning TRUE means you started the job and will set the
-   * result (or error) on the opernation object when done.
+  /* These try_ calls should be fast and non-blocking, scheduling the i/o
+   * operations async (or on a thread) or reading from cache.
+   * Returning FALSE means "Can't do this now or async", which
+   * means the non-try_ version will be scheduled in a worker
+   * thread.
    * A NULL here means operation not supported 
    */
 
+  void     (*mount)             (GVfsBackend *backend,
+				 GVfsJobMount *job,
+				 GMountSpec *mount_spec,
+				 GMountSource *mount_source);
+  gboolean (*try_mount)         (GVfsBackend *backend,
+				 GVfsJobMount *job,
+				 GMountSpec *mount_spec,
+				 GMountSource *mount_source);
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);
@@ -111,8 +124,13 @@ struct _GVfsBackendClass
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
 
-void     g_vfs_backend_register_with_daemon (GVfsBackend           *backend,
-					     GVfsDaemon            *daemon);
+void  g_vfs_register_backend       (GType               backend_type,
+				    const char         *type);
+GType g_vfs_lookup_backend         (const char         *type);
+
+void  g_vfs_backend_register_mount (GVfsBackend        *backend,
+				    GAsyncDBusCallback  callback,
+				    gpointer            user_data);
 
 
 G_END_DECLS

@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <gvfsjobsource.h>
+#include <gmountsource.h>
 #include <dbus/dbus.h>
 
 G_BEGIN_DECLS
@@ -35,15 +36,20 @@ struct _GVfsDaemonClass
 
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
-GVfsDaemon *g_vfs_daemon_new            (gboolean                       main_daemon,
-					 gboolean                       replace);
-void        g_vfs_daemon_add_job_source (GVfsDaemon                    *daemon,
-					 GVfsJobSource                 *job_source);
-void        g_vfs_daemon_queue_job      (GVfsDaemon                    *daemon,
-					 GVfsJob                       *job);
-char       *g_vfs_daemon_register_mount (GVfsDaemon                    *daemon,
-					 DBusObjectPathMessageFunction  callback,
-					 gpointer                       user_data);
+GVfsDaemon *g_vfs_daemon_new             (gboolean                       main_daemon,
+					  gboolean                       replace);
+void        g_vfs_daemon_add_job_source  (GVfsDaemon                    *daemon,
+					  GVfsJobSource                 *job_source);
+void        g_vfs_daemon_queue_job       (GVfsDaemon                    *daemon,
+					  GVfsJob                       *job);
+void        g_vfs_daemon_register_path   (GVfsDaemon                    *daemon,
+					  const char                    *obj_path,
+					  DBusObjectPathMessageFunction  callback,
+					  gpointer                       user_data);
+void        g_vfs_daemon_unregister_path (GVfsDaemon                    *daemon,
+					  const char                    *obj_path);
+void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
+					  GMountSource                  *mount_source);
 
 G_END_DECLS
 

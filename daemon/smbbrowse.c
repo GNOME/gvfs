@@ -12,44 +12,6 @@
 #include "gvfsbackendsmbbrowse.h"
 #include <gvfsdaemonprotocol.h>
 
-static DBusConnection *connection;
-
-static gboolean
-do_mount (GVfsDaemon *daemon,
-	  GMountSource *mount_source)
-{
-  GMountSpec *mount_spec;
-  GVfsBackendSmbBrowse *backend;
-  GError *error;
-
-  error = NULL;
-  mount_spec = g_mount_source_request_mount_spec (mount_source, &error);
-  if (mount_spec == NULL)
-    {
-      g_mount_source_failed (mount_source, error);
-      return FALSE;
-    }
-
-  backend = g_vfs_backend_smb_browse_new (mount_spec, &error);
-  g_mount_spec_unref (mount_spec);
-  
-  if (backend == NULL)
-    {
-      g_mount_source_failed (mount_source, error);
-      return FALSE;
-    }
-  
-  g_vfs_backend_register_with_daemon (G_VFS_BACKEND (backend), daemon);
-  g_object_unref (backend);
-
-  /* TODO: Verify registration succeeded? */
-
-  g_mount_source_done (mount_source);
-
-  return TRUE;
-}
-
-
 static void
 dbus_mount (GVfsDaemon *daemon,
 	    DBusConnection *connection,
@@ -85,16 +47,13 @@ dbus_mount (GVfsDaemon *daemon,
   dbus_connection_send (connection, reply, NULL);
   dbus_message_unref (reply);
 
-  /* Make sure we send the reply so the sender doesn't timeout
-   * while we mount stuff */
-  dbus_connection_flush (connection);
-
   if (mount_spec)
     {
       mount_source = g_mount_source_new_dbus (dbus_id, obj_path, mount_spec);
       g_mount_spec_unref (mount_spec);
 
-      do_mount (daemon, mount_source);
+      g_vfs_daemon_initiate_mount (daemon, mount_source);
+      g_object_unref (mount_source);
     }
 }
 
@@ -127,6 +86,7 @@ struct DBusObjectPathVTable mountable_vtable = {
 int
 main (int argc, char *argv[])
 {
+  DBusConnection *connection;
   GMainLoop *loop;
   GVfsDaemon *daemon;
   DBusError derror;
@@ -136,11 +96,12 @@ main (int argc, char *argv[])
   int res;
 
   dbus_threads_init_default ();
-  
   g_thread_init (NULL);
-
   g_type_init ();
 
+  g_vfs_register_backend (G_TYPE_VFS_BACKEND_SMB_BROWSE, "smb-network");
+  g_vfs_register_backend (G_TYPE_VFS_BACKEND_SMB_BROWSE, "smb-server");
+  
   dbus_error_init (&derror);
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
@@ -200,8 +161,8 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  if (!do_mount (daemon, mount_source))
-    return 1;
+  g_vfs_daemon_initiate_mount (daemon, mount_source);
+  g_object_unref (mount_source);
   
   if (!dbus_connection_register_object_path (connection,
 					     "/org/gtk/vfs/mountpoint/smb_browse",

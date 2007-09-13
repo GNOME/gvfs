@@ -34,25 +34,23 @@ g_vfs_backend_test_finalize (GObject *object)
 }
 
 static void
-g_vfs_backend_test_init (GVfsBackendTest *backend)
+g_vfs_backend_test_init (GVfsBackendTest *test_backend)
 {
-}
-
-GVfsBackendTest *
-g_vfs_backend_test_new (void)
-{
-  GVfsBackendTest *test_backend;
-  GVfsBackend *backend;
-  
-  test_backend = g_object_new (G_TYPE_VFS_BACKEND_TEST,
-			  NULL);
-
-  backend = G_VFS_BACKEND (test_backend);
+  GVfsBackend *backend = G_VFS_BACKEND (test_backend);
   
   backend->display_name = g_strdup ("test");
   backend->mount_spec = g_mount_spec_new ("test");
-  
-  return test_backend;
+}
+
+
+static gboolean
+try_mount (GVfsBackend *backend,
+	   GVfsJobMount *job,
+	   GMountSpec *mount_spec,
+	   GMountSource *mount_source)
+{
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
 }
 
 static gboolean 
@@ -317,6 +315,7 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
   
   gobject_class->finalize = g_vfs_backend_test_finalize;
 
+  backend_class->try_mount = try_mount;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;
   backend_class->seek_on_read = do_seek_on_read;

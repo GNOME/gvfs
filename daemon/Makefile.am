@@ -36,11 +36,12 @@ EXTRA_DIST = gvfs-daemon.service.in
 
 DISTCLEANFILES = gvfs-daemon.service
 
-libexec_PROGRAMS=gvfs-daemon gvfs-daemon-smb gvfs-daemon gvfs-daemon-smb-browse
+libexec_PROGRAMS=gvfs-daemon gvfs-daemon gvfs-daemon-smb-browse gvfs-daemon-smb 
 
 noinst_PROGRAMS =				\
 	gvfs-daemon-test			\
 	$(NULL)
+
 
 libdaemon_la_SOURCES = \
 	gvfsdaemon.c gvfsdaemon.h \
@@ -50,6 +51,7 @@ libdaemon_la_SOURCES = \
 	gvfsjob.c gvfsjob.h \
 	gvfsjobsource.c gvfsjobsource.h \
 	gvfsjobdbus.c gvfsjobdbus.h \
+	gvfsjobmount.c gvfsjobmount.h \
 	gvfsjobopenforread.c gvfsjobopenforread.h \
 	gvfsjobread.c gvfsjobread.h \
 	gvfsjobseekread.c gvfsjobseekread.h \

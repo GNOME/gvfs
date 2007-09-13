@@ -12,47 +12,10 @@
 #include "gvfsbackendsmb.h"
 #include <gvfsdaemonprotocol.h>
 
-static DBusConnection *connection;
-
-
-static gboolean
-do_mount (GVfsDaemon *daemon,
-	  GMountSource *mount_source)
-{
-  GMountSpec *mount_spec;
-  GVfsBackendSmb *backend;
-  GError *error;
-
-  error = NULL;
-  mount_spec = g_mount_source_request_mount_spec (mount_source, &error);
-  if (mount_spec == NULL)
-    {
-      g_mount_source_failed (mount_source, error);
-      return FALSE;
-    }
-
-  backend = g_vfs_backend_smb_new (mount_spec, &error);
-  g_mount_spec_unref (mount_spec);
-  
-  if (backend == NULL)
-    {
-      g_mount_source_failed (mount_source, error);
-      return FALSE;
-    }
-  
-  g_vfs_backend_register_with_daemon (G_VFS_BACKEND (backend), daemon);
-  g_object_unref (backend);
-
-  /* TODO: Verify registration succeeded? */
-
-  g_mount_source_done (mount_source);
-
-  return TRUE;
-}
-
 int
 main (int argc, char *argv[])
 {
+  DBusConnection *connection;
   GMainLoop *loop;
   GVfsDaemon *daemon;
   DBusError derror;
@@ -61,11 +24,11 @@ main (int argc, char *argv[])
   GError *error;
 
   dbus_threads_init_default ();
-  
   g_thread_init (NULL);
-
   g_type_init ();
 
+  g_vfs_register_backend (G_TYPE_VFS_BACKEND_SMB, "smb-share");
+  
   dbus_error_init (&derror);
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
@@ -112,8 +75,8 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  if (!do_mount (daemon, mount_source))
-    return 1;
+  g_vfs_daemon_initiate_mount (daemon, mount_source);
+  g_object_unref (mount_source);
   
   loop = g_main_loop_new (NULL, FALSE);
 

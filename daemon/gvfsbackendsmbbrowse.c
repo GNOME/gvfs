@@ -104,6 +104,11 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
   backend = G_VFS_BACKEND_SMB_BROWSE (object);
 
   g_mutex_free (backend->entries_lock);
+
+  smbc_free_context (backend->smb_context, TRUE);
+  
+  g_list_foreach (backend->entries, (GFunc)browse_entry_free, NULL);
+  g_list_free (backend->entries);
   
   if (G_OBJECT_CLASS (g_vfs_backend_smb_browse_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_smb_browse_parent_class)->finalize) (object);
@@ -202,7 +207,7 @@ remove_cb (gpointer  key,
  *
  */ 
 static int
-remove_cached_server(SMBCCTX * context, SMBCSRV * server)
+remove_cached_server (SMBCCTX * context, SMBCSRV * server)
 {
   guint num;
 
@@ -396,92 +401,6 @@ update_cache (GVfsBackendSmbBrowse *backend)
   
 }
 
-
-/* TODO: This does i/o on the main thread, not on the work thread => multithread issues */
-
-GVfsBackendSmbBrowse *
-g_vfs_backend_smb_browse_new (GMountSpec *spec,
-			      GError **error)
-{
-  GVfsBackendSmbBrowse *backend;
-  GVfsBackend *_backend;
-  SMBCCTX *smb_context;
-  const char *server;
-
-  if (strcmp (g_mount_spec_get_type (spec), "smb-network") == 0)
-    server = NULL;
-  else
-    {
-      server = g_mount_spec_get (spec, "server");
-      if (server == NULL)
-	{
-	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
-		       "No server specified for smb-server share");
-	  return NULL;
-	}
-    }
-  
-  smb_context = smbc_new_context ();
-  if (smb_context == NULL)
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Failed to allocate smb context");
-      return NULL;
-    }
-
-  smb_context->debug = 0;
-  smb_context->callbacks.auth_fn 	      = auth_callback;
-  
-  smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
-  smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
-  smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
-  smb_context->callbacks.purge_cached_fn      = purge_cached;
-
-  smb_context->flags = 0;
-  
-#if defined(HAVE_SAMBA_FLAGS) 
-#if defined(SMB_CTX_FLAG_USE_KERBEROS) && defined(SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS)
-  smb_context->flags |= SMB_CTX_FLAG_USE_KERBEROS | SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS;
-#endif
-#if defined(SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON)
-  //smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
-#endif
-#endif
-
-  if (1) 
-    smbc_option_set(smb_context, "debug_stderr", (void *) 1);
-
-  if (!smbc_init_context (smb_context))
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Failed to initialize smb context");
-      smbc_free_context (smb_context, FALSE);
-      return NULL;
-    }
-  
-  backend = g_object_new (G_TYPE_VFS_BACKEND_SMB_BROWSE,
-			  NULL);
-
-  backend->server = g_strdup (server);
-  
-  _backend = G_VFS_BACKEND (backend);
-  if (server == NULL)
-    {
-      _backend->display_name = g_strdup ("smb network");
-      _backend->mount_spec = g_mount_spec_new ("smb-network");
-    }
-  else
-    {
-      _backend->display_name = g_strdup_printf ("smb share %s", server);
-      _backend->mount_spec = g_mount_spec_new ("smb-server");
-      g_mount_spec_set (_backend->mount_spec, "server", server);
-    }
-  
-  backend->smb_context = smb_context;
-  
-  return backend;
-}
-
 static BrowseEntry *
 find_entry_unlocked (GVfsBackendSmbBrowse *backend,
 		     const char *filename)
@@ -540,21 +459,118 @@ cache_needs_updating (GVfsBackendSmbBrowse *backend)
     (now - backend->last_entry_update) > 10;
 }
 
+static void
+do_mount (GVfsBackend *backend,
+	  GVfsJobMount *job,
+	  GMountSpec *mount_spec,
+	  GMountSource *mount_source)
+{
+  GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
+  SMBCCTX *smb_context;
+
+  g_print ("do_mount\n");
+  
+  smb_context = smbc_new_context ();
+  if (smb_context == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_IO,
+			"Failed to allocate smb context");
+      return;
+    }
+  
+  smb_context->debug = 0;
+  smb_context->callbacks.auth_fn 	      = auth_callback;
+  
+  smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
+  smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
+  smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
+  smb_context->callbacks.purge_cached_fn      = purge_cached;
+  
+  smb_context->flags = 0;
+  
+#if defined(HAVE_SAMBA_FLAGS) 
+#if defined(SMB_CTX_FLAG_USE_KERBEROS) && defined(SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS)
+  smb_context->flags |= SMB_CTX_FLAG_USE_KERBEROS | SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS;
+#endif
+#if defined(SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON)
+  //smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
+#endif
+#endif
+  
+  if (1) 
+    smbc_option_set(smb_context, "debug_stderr", (void *) 1);
+  
+  if (!smbc_init_context (smb_context))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_IO,
+			"Failed to initialize smb context");
+      smbc_free_context (smb_context, FALSE);
+      return;
+    }
+
+  op_backend->smb_context = smb_context;
+  
+  if (op_backend->server == NULL)
+    {
+      backend->display_name = g_strdup ("smb network");
+      backend->mount_spec = g_mount_spec_new ("smb-network");
+    }
+  else
+    {
+      backend->display_name = g_strdup_printf ("smb share %s", op_backend->server);
+      backend->mount_spec = g_mount_spec_new ("smb-server");
+      g_mount_spec_set (backend->mount_spec, "server", op_backend->server);
+    }
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_print ("finished mount\n");
+}
+
+static gboolean
+try_mount (GVfsBackend *backend,
+	   GVfsJobMount *job,
+	   GMountSpec *mount_spec,
+	   GMountSource *mount_source)
+{
+  GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
+  const char *server;
+
+  g_print ("try_mount\n");
+  
+  if (strcmp (g_mount_spec_get_type (mount_spec), "smb-network") == 0)
+    server = NULL;
+  else
+    {
+      server = g_mount_spec_get (mount_spec, "server");
+      if (server == NULL)
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job),
+			    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+			    "No server specified for smb-server share");
+	  return TRUE;
+	}
+    }
+
+  op_backend->server = g_strdup (server);
+  
+  return FALSE;
+}
+
 static void 
 run_open_for_read (GVfsBackendSmbBrowse *backend,
 		    GVfsJobOpenForRead *job,
 		    const char *filename)
 {
-  GError *error = NULL;
-  
   if (has_name (backend, filename))
-    g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_ISDIR,
-		 _("Not a regular file"));
+    g_vfs_job_failed (G_VFS_JOB (job),
+		      G_FILE_ERROR, G_FILE_ERROR_ISDIR,
+		      _("Not a regular file"));
   else
-    g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_NOENT,
-		 _("File doesn't exist"));
-  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-  g_error_free (error);
+    g_vfs_job_failed (G_VFS_JOB (job),
+		      G_FILE_ERROR, G_FILE_ERROR_NOENT,
+		      _("File doesn't exist"));
 }
 
 static void
@@ -591,13 +607,9 @@ try_read (GVfsBackend *backend,
 	  char *buffer,
 	  gsize bytes_requested)
 {
-  GError *error;
-  error = NULL;
-  g_set_error (&error, G_FILE_ERROR,
-	       G_FILE_ERROR_INVAL,
-	       "Invalid argument");
-  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-  g_error_free (error);
+  g_vfs_job_failed (G_VFS_JOB (job),
+		    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		    "Invalid argument");
   
   return TRUE;
 }
@@ -609,14 +621,9 @@ try_seek_on_read (GVfsBackend *backend,
 		 goffset    offset,
 		 GSeekType  type)
 {
-  GError *error;
-  error = NULL;
-  g_set_error (&error, G_FILE_ERROR,
-	       G_FILE_ERROR_INVAL,
-	       "Invalid argument");
-  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-  g_error_free (error);
-  
+  g_vfs_job_failed (G_VFS_JOB (job),
+		    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		    "Invalid argument");
   return TRUE;
 }
 
@@ -625,14 +632,9 @@ try_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
 {
-  GError *error;
-  error = NULL;
-  g_set_error (&error, G_FILE_ERROR,
-	       G_FILE_ERROR_INVAL,
-	       "Invalid argument");
-  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-  g_error_free (error);
-  
+  g_vfs_job_failed (G_VFS_JOB (job),
+		    G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		    "Invalid argument");
   return TRUE;
 }
 
@@ -681,12 +683,9 @@ run_get_info (GVfsBackendSmbBrowse *backend,
     }
   else
     {
-      GError *error = NULL;
-      
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_NOENT,
-		   _("File doesn't exist"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_NOENT,
+			_("File doesn't exist"));
     }
 }
 
@@ -748,18 +747,15 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
 
   if (!is_root (filename))
     {
-      GError *error = NULL;
-      
       if (has_name (backend, filename))
-	g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_NOTDIR,
-		     _("Not a directory"));
+	g_vfs_job_failed (G_VFS_JOB (job),
+			  G_FILE_ERROR, G_FILE_ERROR_NOTDIR,
+			  _("Not a directory"));
       else
-	g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_NOENT,
-		     _("File doesn't exist"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      
-      return ;
+	g_vfs_job_failed (G_VFS_JOB (job),
+			  G_FILE_ERROR, G_FILE_ERROR_NOENT,
+			  _("File doesn't exist"));
+      return;
     }
   
   /* TODO: limit requested to what we support */
@@ -832,6 +828,8 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
   
   gobject_class->finalize = g_vfs_backend_smb_browse_finalize;
 
+  backend_class->mount = do_mount;
+  backend_class->try_mount = try_mount;
   backend_class->open_for_read = do_open_for_read;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;

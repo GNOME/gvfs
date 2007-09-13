@@ -23,9 +23,6 @@ struct _GVfsBackendSmbBrowseClass
 
 GType g_vfs_backend_smb_browse_get_type (void) G_GNUC_CONST;
   
-GVfsBackendSmbBrowse *g_vfs_backend_smb_browse_new (GMountSpec *mount_spec,
-						    GError **error);
-
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_SMB_BROWSE_H__ */

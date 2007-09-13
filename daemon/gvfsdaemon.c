@@ -13,7 +13,7 @@
 #include <gvfsdaemon.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
-#include <gvfsjobopenforread.h>
+#include <gvfsjobmount.h>
 #include <gdbusutils.h>
 
 G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
@@ -39,6 +39,8 @@ struct _GVfsDaemonPrivate
   GList *jobs;
   GList *job_sources;
 
+  guint exit_tag;
+  
   gint mount_counter;
 };
 
@@ -241,6 +243,30 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
   return daemon;
 }
 
+static gboolean
+exit_at_idle (gpointer data)
+{
+  exit (0);
+  return FALSE;
+}
+
+static void
+daemon_unschedule_exit (GVfsDaemon *daemon)
+{
+  if (daemon->priv->exit_tag != 0)
+    {
+      g_source_remove (daemon->priv->exit_tag);
+      daemon->priv->exit_tag = 0;
+    }
+}
+
+static void
+daemon_schedule_exit (GVfsDaemon *daemon)
+{
+  if (daemon->priv->exit_tag == 0)
+    daemon->priv->exit_tag = g_timeout_add (1000, exit_at_idle, daemon);
+}
+
 static void
 job_source_new_job_callback (GVfsJobSource *job_source,
 			     GVfsJob *job,
@@ -266,6 +292,9 @@ job_source_closed_callback (GVfsJobSource *job_source,
 					daemon);
   
   g_object_unref (job_source);
+
+  if (daemon->priv->job_sources == NULL)
+    daemon_schedule_exit (daemon);
   
   g_mutex_unlock (daemon->priv->lock);
 }
@@ -278,6 +307,8 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
   
   g_mutex_lock (daemon->priv->lock);
 
+  daemon_unschedule_exit (daemon);
+  
   g_object_ref (job_source);
   daemon->priv->job_sources = g_list_append (daemon->priv->job_sources,
 					     job_source);
@@ -289,25 +320,29 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
   g_mutex_unlock (daemon->priv->lock);
 }
 
-char *
-g_vfs_daemon_register_mount (GVfsDaemon                    *daemon,
-			     DBusObjectPathMessageFunction  callback,
-			     gpointer                       user_data)
+/* This registers a dbus callback on *all* connections, client and session bus */
+void
+g_vfs_daemon_register_path (GVfsDaemon *daemon,
+			    const char *obj_path,
+			    DBusObjectPathMessageFunction callback,
+			    gpointer user_data)
 {
   RegisteredPath *data;
-  int id;
-
-  id = ++daemon->priv->mount_counter;
 
   data = g_new0 (RegisteredPath, 1);
-  data->obj_path = g_strdup_printf ("/org/gtk/vfs/mount/%d", id);;
+  data->obj_path = g_strdup (obj_path);
   data->callback = callback;
   data->data = user_data;
 
   g_hash_table_insert (daemon->priv->registered_paths, data->obj_path,
 		       data);
+}
 
-  return g_strdup (data->obj_path);
+void
+g_vfs_daemon_unregister_path (GVfsDaemon *daemon,
+			      const char *obj_path)
+{
+  g_hash_table_remove (daemon->priv->registered_paths, obj_path);
 }
 
 /* NOTE: Might be emitted on a thread */
@@ -834,4 +869,59 @@ peer_to_peer_filter_func (DBusConnection *conn,
     }
   
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+static void
+mount_got_spec (GMountSource *mount_source,
+		GMountSpec *mount_spec,
+		GError *error,
+		gpointer data)
+{
+  GVfsDaemon *daemon = data;
+  const char *type;
+  GType backend_type;
+  char *obj_path;
+  GVfsJob *job;
+  GVfsBackend *backend;
+
+  if (mount_spec == NULL)
+    {
+      g_mount_source_failed (mount_source, error);
+      return;
+    }
+
+  type = g_mount_spec_get_type (mount_spec);
+
+  backend_type = G_TYPE_INVALID;
+  if (type)
+    backend_type = g_vfs_lookup_backend (type);
+
+  if (backend_type == G_TYPE_INVALID)
+    {
+      g_mount_source_failed (mount_source, error);
+      return;
+    }
+
+  obj_path = g_strdup_printf ("/org/gtk/vfs/mount/%d", ++daemon->priv->mount_counter);
+  backend = g_object_new (backend_type,
+			  "daemon", daemon,
+			  "object_path", obj_path,
+			  NULL);
+
+  g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
+  g_object_unref (backend);
+
+  job = g_vfs_job_mount_new (mount_spec, mount_source, backend);
+  g_vfs_daemon_queue_job (daemon, job);
+  
+  g_object_unref (mount_source);
+}
+
+void
+g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
+			     GMountSource *mount_source)
+{
+  g_object_ref (mount_source);
+  g_mount_source_request_mount_spec_async (mount_source,
+					   mount_got_spec, daemon);
 }

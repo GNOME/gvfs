@@ -19,28 +19,64 @@
 
 enum {
   PROP_0,
+  PROP_OBJECT_PATH,
+  PROP_DAEMON
 };
 
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
-static void     g_vfs_backend_job_source_iface_init (GVfsJobSourceIface    *iface);
-static void     g_vfs_backend_get_property          (GObject               *object,
-						     guint                  prop_id,
-						     GValue                *value,
-						     GParamSpec            *pspec);
-static void     g_vfs_backend_set_property          (GObject               *object,
-						     guint                  prop_id,
-						     const GValue          *value,
-						     GParamSpec            *pspec);
-static GObject* g_vfs_backend_constructor           (GType                  type,
-						     guint                  n_construct_properties,
-						     GObjectConstructParam *construct_params);
+static void              g_vfs_backend_job_source_iface_init (GVfsJobSourceIface    *iface);
+static void              g_vfs_backend_get_property          (GObject               *object,
+							      guint                  prop_id,
+							      GValue                *value,
+							      GParamSpec            *pspec);
+static void              g_vfs_backend_set_property          (GObject               *object,
+							      guint                  prop_id,
+							      const GValue          *value,
+							      GParamSpec            *pspec);
+static GObject*          g_vfs_backend_constructor           (GType                  type,
+							      guint                  n_construct_properties,
+							      GObjectConstructParam *construct_params);
+static DBusHandlerResult backend_dbus_handler                (DBusConnection        *connection,
+							      DBusMessage           *message,
+							      void                  *user_data);
+
 
 G_DEFINE_TYPE_WITH_CODE (GVfsBackend, g_vfs_backend, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS_JOB_SOURCE,
 						g_vfs_backend_job_source_iface_init))
 
+
+static GHashTable *registered_backends = NULL;
+
+void
+g_vfs_register_backend (GType backend_type,
+			const char *type)
+{
+  if (registered_backends == NULL)
+    registered_backends = g_hash_table_new_full (g_str_hash, g_str_equal,
+						 g_free, NULL);
+
+  g_hash_table_insert (registered_backends,
+		       g_strdup (type), (void *)backend_type);
+}
+
+GType
+g_vfs_lookup_backend (const char *type)
+{
+  gpointer res;
+  
+  if (registered_backends != NULL)
+    {
+      res = g_hash_table_lookup (registered_backends, type);
+      if (res != NULL)
+	return (GType)res;
+    }
+  
+  return G_TYPE_INVALID;
+}
+  
 static void
 g_vfs_backend_finalize (GObject *object)
 {
@@ -48,7 +84,10 @@ g_vfs_backend_finalize (GObject *object)
 
   backend = G_VFS_BACKEND (object);
 
+  g_vfs_daemon_unregister_path (backend->daemon, backend->object_path);
+  g_object_unref (backend->daemon);
   g_free (backend->object_path);
+  
   g_free (backend->display_name);
   if (backend->mount_spec)
     g_mount_spec_unref (backend->mount_spec);
@@ -71,6 +110,23 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
   gobject_class->finalize = g_vfs_backend_finalize;
   gobject_class->set_property = g_vfs_backend_set_property;
   gobject_class->get_property = g_vfs_backend_get_property;
+
+  g_object_class_install_property (gobject_class,
+				   PROP_OBJECT_PATH,
+				   g_param_spec_string ("object-path",
+							P_("Backend object path"),
+							P_("The dbus object path for the backend object."),
+							"",
+							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+  g_object_class_install_property (gobject_class,
+				   PROP_DAEMON,
+				   g_param_spec_object ("daemon",
+							P_("Daemon"),
+							P_("The daemon this backend is handled by."),
+							G_TYPE_VFS_DAEMON,
+							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
 
 static void
@@ -84,10 +140,16 @@ g_vfs_backend_set_property (GObject         *object,
 			    const GValue    *value,
 			    GParamSpec      *pspec)
 {
-  /*GVfsBackend *backend = G_VFS_BACKEND (object);*/
+  GVfsBackend *backend = G_VFS_BACKEND (object);
   
   switch (prop_id)
     {
+    case PROP_OBJECT_PATH:
+      backend->object_path = g_value_dup_string (value);
+      break;
+    case PROP_DAEMON:
+      backend->daemon = G_VFS_DAEMON (g_value_dup_object (value));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -100,10 +162,16 @@ g_vfs_backend_get_property (GObject    *object,
 			    GValue     *value,
 			    GParamSpec *pspec)
 {
-  /*GVfsBackend *backend = G_VFS_BACKEND (object);*/
+  GVfsBackend *backend = G_VFS_BACKEND (object);
   
   switch (prop_id)
     {
+    case PROP_OBJECT_PATH:
+      g_value_set_string (value, backend->object_path);
+      break;
+    case PROP_DAEMON:
+      g_value_set_object (value, backend->daemon);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -121,8 +189,12 @@ g_vfs_backend_constructor (GType                  type,
   object = (* G_OBJECT_CLASS (g_vfs_backend_parent_class)->constructor) (type,
 									 n_construct_properties,
 									 construct_params);
-
   backend = G_VFS_BACKEND (object);
+  
+  g_vfs_daemon_register_path (backend->daemon,
+			      backend->object_path, 
+			      backend_dbus_handler,
+			      backend);
   
   return object;
 }
@@ -160,25 +232,15 @@ backend_dbus_handler (DBusConnection  *connection,
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
-
 void
-g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
-				    GVfsDaemon      *daemon)
+g_vfs_backend_register_mount (GVfsBackend *backend,
+			      GAsyncDBusCallback callback,
+			      gpointer user_data)
 {
-  DBusConnection *conn;
-  DBusMessage *message, *reply;
+  DBusMessage *message;
   DBusMessageIter iter;
   char *icon = "icon";
-  DBusError error;
   
-  g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
-  backend->object_path = g_vfs_daemon_register_mount  (daemon,
-						       backend_dbus_handler,
-						       backend);
-  g_print ("registered backend at path %s\n", backend->object_path);
-
-  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  "/org/gtk/vfs/mounttracker",
 					  "org.gtk.gvfs.MountTracker",
@@ -197,16 +259,8 @@ g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
   g_mount_spec_to_dbus (&iter, backend->mount_spec);
 
   dbus_message_set_auto_start (message, TRUE);
-  
-  dbus_error_init (&error);
-  reply = dbus_connection_send_with_reply_and_block (conn, message,
-						     -1, &error);
-  if (reply == NULL)
-    {
-      /* TODO: handle better */
-      g_error ("failed to register mountpoint: %s", error.message);
-      exit (1);
-    }
 
-  /* TODO: check result for ok */
+  _g_dbus_connection_call_async (NULL, message,
+				 callback, user_data);
+  dbus_message_unref (message);
 }

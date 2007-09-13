@@ -105,11 +105,32 @@ send_sync_and_unref (DBusMessage *message,
   return reply;
 }
 
+static void
+send_noreply_and_unref (DBusMessage *message)
+{
+  DBusError derror;
+  DBusConnection *connection;
+
+  dbus_message_set_no_reply (message, TRUE);
+  
+  dbus_error_init (&derror);
+  connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+  if (connection == NULL)
+    {
+      g_warning ("Can't get dbus connection");
+      return;
+    }
+
+  dbus_connection_send (connection, message, NULL);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
+}
+
 void
 g_mount_source_done (GMountSource *source)
 {
   dbus_bool_t succeeded_dbus = TRUE;
-  DBusMessage *message, *reply;
+  DBusMessage *message;
   
   if (source->dbus_id == NULL)
     return;
@@ -122,8 +143,7 @@ g_mount_source_done (GMountSource *source)
 			       DBUS_TYPE_BOOLEAN, &succeeded_dbus,
 			       0);
 
-  reply = send_sync_and_unref (message, NULL);
-  dbus_message_unref (reply);
+  send_noreply_and_unref (message);
 }
 
 void
@@ -131,7 +151,7 @@ g_mount_source_failed (GMountSource *source,
 		       GError *error)
 {
   dbus_bool_t succeeded_dbus = FALSE;
-  DBusMessage *message, *reply;
+  DBusMessage *message;
   const char *domain;
   guint32 code;
   
@@ -155,8 +175,7 @@ g_mount_source_failed (GMountSource *source,
 			       DBUS_TYPE_STRING, &error->message,
 			       0);
 
-  reply = send_sync_and_unref (message, NULL);
-  dbus_message_unref (reply);
+  send_noreply_and_unref (message);
 }
 
 GMountSpec *
@@ -194,10 +213,74 @@ g_mount_source_request_mount_spec (GMountSource *source,
   return source->mount_spec;
 }
 
+typedef struct {
+  GMountSource *source;
+  RequestMountSpecCallback callback;
+  gpointer user_data;
+} RequestMountSpecData;
+
+static void
+request_mount_spec_reply (DBusMessage *reply,
+			  GError *error,
+			  gpointer _data)
+{
+  DBusMessageIter iter;
+  RequestMountSpecData *data = _data;
+
+  if (reply == NULL)
+    {
+      data->callback (data->source, NULL, error, data->user_data);
+      goto out;
+    }
+  
+  dbus_message_iter_init (reply, &iter);
+  data->source->mount_spec = g_mount_spec_from_dbus (&iter);
+  
+  if (data->source->mount_spec == NULL)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		   "No mount spec gotten from mount source");
+      data->callback (data->source, NULL, error, data->user_data);
+      g_error_free (error);
+      goto out;
+    }
+  
+  data->callback (data->source, data->source->mount_spec, NULL, data->user_data);
+
+ out:
+  g_object_unref (data->source);
+  g_free (data);
+}
+
 void
 g_mount_source_request_mount_spec_async (GMountSource *source,
 					 RequestMountSpecCallback callback,
-					 gpointer data)
+					 gpointer user_data)
 {
+  RequestMountSpecData *data;
+  DBusMessage *message;
   
+  if (source->mount_spec)
+    {
+      callback (source, source->mount_spec, NULL, user_data);
+      return;
+    }
+
+  g_assert (source->dbus_id != NULL || source->obj_path != NULL);
+
+  message = dbus_message_new_method_call (source->dbus_id,
+					  source->obj_path,
+					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					  "getMountSpec");
+
+
+  data = g_new (RequestMountSpecData, 1);
+  data->source = g_object_ref (source);
+  data->callback = callback;
+  data->user_data = user_data;
+  
+  _g_dbus_connection_call_async (NULL, message,
+				 request_mount_spec_reply, data);
+  dbus_message_unref (message);
 }

@@ -42,6 +42,8 @@ g_vfs_backend_smb_finalize (GObject *object)
 static void
 g_vfs_backend_smb_init (GVfsBackendSmb *backend)
 {
+  g_assert (smb_backend == NULL);
+  smb_backend = backend;
 }
 
 /* Authentication callback function type (traditional method)
@@ -246,6 +248,115 @@ create_smb_uri (const char *server,
   return g_string_free (uri, FALSE);
 }
 
+static void
+do_mount (GVfsBackend *backend,
+	  GVfsJobMount *job,
+	  GMountSpec *mount_spec,
+	  GMountSource *mount_source)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  SMBCCTX *smb_context;
+  struct stat st;
+  char *uri;
+  int res;
+
+  g_print ("do_mount\n");
+  
+  smb_context = smbc_new_context ();
+  if (smb_context == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_IO,
+			"Failed to allocate smb context");
+      return;
+    }
+  
+  smb_context->debug = 0;
+  smb_context->callbacks.auth_fn 	      = auth_callback;
+  
+  smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
+  smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
+  smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
+  smb_context->callbacks.purge_cached_fn      = purge_cached;
+  
+  smb_context->flags = 0;
+  
+#if defined(HAVE_SAMBA_FLAGS) 
+#if defined(SMB_CTX_FLAG_USE_KERBEROS) && defined(SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS)
+  smb_context->flags |= SMB_CTX_FLAG_USE_KERBEROS | SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS;
+#endif
+#if defined(SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON)
+  //smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
+#endif
+#endif
+  
+  if (1) 
+    smbc_option_set(smb_context, "debug_stderr", (void *) 1);
+  
+  if (!smbc_init_context (smb_context))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_IO,
+			"Failed to initialize smb context");
+      smbc_free_context (smb_context, FALSE);
+      return;
+    }
+
+  op_backend->smb_context = smb_context;
+
+  backend->display_name = g_strdup_printf ("%s on %s", op_backend->share, op_backend->server);
+  backend->mount_spec = g_mount_spec_new ("smb-share");
+  g_mount_spec_set (backend->mount_spec, "share", op_backend->share);
+  g_mount_spec_set (backend->mount_spec, "server", op_backend->server);
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
+  res = smb_context->stat (smb_context, uri, &st);
+  g_free (uri);
+  if (res != 0)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_IO,
+			"Failed to mount smb share");
+      return;
+    }
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_print ("finished mount\n");
+}
+
+static gboolean
+try_mount (GVfsBackend *backend,
+	   GVfsJobMount *job,
+	   GMountSpec *mount_spec,
+	   GMountSource *mount_source)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  const char *server;
+  const char *share;
+
+  g_print ("try_mount\n");
+  
+  server = g_mount_spec_get (mount_spec, "server");
+  share = g_mount_spec_get (mount_spec, "share");
+
+  if (server == NULL || share == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_INVAL,
+			_("Invalid mount spec"));
+      return FALSE;
+    }
+ 
+
+  op_backend->server = g_strdup (server);
+  op_backend->share = g_strdup (share);
+  
+  return FALSE;
+}
+
+
+#if 0
+
 GVfsBackendSmb *
 g_vfs_backend_smb_new (GMountSpec *spec,
 		       GError **error)
@@ -273,7 +384,6 @@ g_vfs_backend_smb_new (GMountSpec *spec,
       return NULL;
     }
  
-  
   
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
@@ -342,6 +452,7 @@ g_vfs_backend_smb_new (GMountSpec *spec,
   
   return backend;
 }
+#endif 
 
 static void 
 do_open_for_read (GVfsBackend *backend,
@@ -630,6 +741,8 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   
   gobject_class->finalize = g_vfs_backend_smb_finalize;
 
+  backend_class->mount = do_mount;
+  backend_class->try_mount = try_mount;
   backend_class->open_for_read = do_open_for_read;
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
