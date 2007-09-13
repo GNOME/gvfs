@@ -194,6 +194,13 @@ g_vfs_job_open_for_write_set_can_seek (GVfsJobOpenForWrite *job,
   job->can_seek = can_seek;
 }
 
+void
+g_vfs_job_open_for_write_set_initial_offset (GVfsJobOpenForWrite *job,
+					     goffset              initial_offset)
+{
+  job->initial_offset = initial_offset;
+}
+
 /* Might be called on an i/o thwrite */
 static DBusMessage *
 create_reply (GVfsJob *job,
@@ -208,7 +215,8 @@ create_reply (GVfsJob *job,
   int fd_id;
   gboolean res;
   dbus_bool_t can_seek;
-
+  guint64 initial_offset;
+  
   g_assert (open_job->backend_handle != NULL);
 
   error = NULL;
@@ -229,9 +237,11 @@ create_reply (GVfsJob *job,
 
   reply = dbus_message_new_method_return (message);
   can_seek = open_job->can_seek;
+  initial_offset = open_job->initial_offset;
   res = dbus_message_append_args (reply,
 				  DBUS_TYPE_UINT32, &fd_id,
 				  DBUS_TYPE_BOOLEAN, &can_seek,
+				  DBUS_TYPE_UINT64, &initial_offset,
 				  DBUS_TYPE_INVALID);
 
   g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);

@@ -18,9 +18,9 @@ G_BEGIN_DECLS
 typedef struct _GVfsJobOpenForWriteClass   GVfsJobOpenForWriteClass;
 
 typedef enum {
-  OPEN_FOR_WRITE_CREATE,
-  OPEN_FOR_WRITE_APPEND,
-  OPEN_FOR_WRITE_REPLACE,
+  OPEN_FOR_WRITE_CREATE = 0,
+  OPEN_FOR_WRITE_APPEND = 1,
+  OPEN_FOR_WRITE_REPLACE = 2,
 } GVfsJobOpenForWriteMode;
 
 struct _GVfsJobOpenForWrite
@@ -36,6 +36,7 @@ struct _GVfsJobOpenForWrite
   GVfsBackendHandle backend_handle;
 
   gboolean can_seek;
+  goffset initial_offset;
   GVfsWriteChannel *write_channel;
 };
 
@@ -46,13 +47,15 @@ struct _GVfsJobOpenForWriteClass
 
 GType g_vfs_job_open_for_write_get_type (void) G_GNUC_CONST;
 
-GVfsJob *        g_vfs_job_open_for_write_new           (DBusConnection     *connection,
-							 DBusMessage        *message,
-							 GVfsBackend        *backend);
-void             g_vfs_job_open_for_write_set_handle    (GVfsJobOpenForWrite *job,
-							 GVfsBackendHandle   handle);
-void             g_vfs_job_open_for_write_set_can_seek  (GVfsJobOpenForWrite *job,
-							 gboolean            can_seek);
+GVfsJob *g_vfs_job_open_for_write_new                (DBusConnection      *connection,
+						      DBusMessage         *message,
+						      GVfsBackend         *backend);
+void     g_vfs_job_open_for_write_set_handle         (GVfsJobOpenForWrite *job,
+						      GVfsBackendHandle    handle);
+void     g_vfs_job_open_for_write_set_can_seek       (GVfsJobOpenForWrite *job,
+						      gboolean             can_seek);
+void     g_vfs_job_open_for_write_set_initial_offset (GVfsJobOpenForWrite *job,
+						      goffset              initial_offset);
 
 G_END_DECLS
 
