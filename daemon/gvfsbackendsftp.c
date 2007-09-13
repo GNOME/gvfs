@@ -891,6 +891,32 @@ expect_reply (GVfsBackendSftp *backend,
   g_hash_table_replace (backend->expected_replies, GINT_TO_POINTER (id), expected);
 }
 
+static DataBuffer *
+data_buffer_new (guchar *data, gsize len)
+{
+  DataBuffer *buffer;
+  
+  buffer = g_slice_new (DataBuffer);
+  buffer->data = data;
+  buffer->size = len;
+
+  return buffer;
+}
+
+static void
+queue_command_buffer (GVfsBackendSftp *backend,
+                      DataBuffer *buffer)
+{
+  gboolean first;
+  
+  first = backend->command_queue == NULL;
+
+  backend->command_queue = g_list_append (backend->command_queue, buffer);
+  
+  if (first)
+    send_command (backend);
+}
+
 static void
 queue_command_stream_and_free (GVfsBackendSftp *backend,
                                GDataOutputStream *command_stream,
@@ -900,25 +926,15 @@ queue_command_stream_and_free (GVfsBackendSftp *backend,
                                gpointer user_data)
 {
   GByteArray *array;
-  gboolean first;
   DataBuffer *buffer;
 
-  buffer = g_slice_new (DataBuffer);
-
   array = get_data_from_command_stream (command_stream, FALSE);
-  
-  buffer->data = array->data;
-  buffer->size = array->len;
+  buffer = data_buffer_new (array->data, array->len);
   g_object_unref (command_stream);
   g_byte_array_free (array, FALSE);
   
-  first = backend->command_queue == NULL;
-
-  backend->command_queue = g_list_append (backend->command_queue, buffer);
   expect_reply (backend, id, callback, job, user_data);
-  
-  if (first)
-    send_command (backend);
+  queue_command_buffer (backend, buffer);
 }
 
 static gboolean
@@ -1514,12 +1530,12 @@ try_read (GVfsBackend *backend,
 }
 
 static void
-seek_fstat_reply (GVfsBackendSftp *backend,
-                  int reply_type,
-                  GDataInputStream *reply,
-                  guint32 len,
-                  GVfsJob *job,
-                  gpointer user_data)
+seek_read_fstat_reply (GVfsBackendSftp *backend,
+                       int reply_type,
+                       GDataInputStream *reply,
+                       guint32 len,
+                       GVfsJob *job,
+                       gpointer user_data)
 {
   SftpHandle *handle;
   GFileInfo *info;
@@ -1588,7 +1604,7 @@ try_seek_on_read (GVfsBackend *backend,
                                 &id);
   put_data_buffer (command, handle->raw_handle);
   
-  queue_command_stream_and_free (op_backend, command, id, seek_fstat_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, id, seek_read_fstat_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -1630,6 +1646,260 @@ try_close_read (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+try_close_write (GVfsBackend *backend,
+                 GVfsJobCloseWrite *job,
+                 GVfsBackendHandle _handle)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend,
+                                SSH_FXP_CLOSE,
+                                &id);
+  put_data_buffer (command, handle->raw_handle);
+
+  sftp_handle_free (handle);
+  
+  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
+}
+
+static void
+create_reply (GVfsBackendSftp *backend,
+              int reply_type,
+              GDataInputStream *reply,
+              guint32 len,
+              GVfsJob *job,
+              gpointer user_data)
+{
+  SftpHandle *handle;
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply);
+      return;
+    }
+
+  if (reply_type != SSH_FXP_HANDLE)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply recieved"));
+      return;
+    }
+
+  handle = sftp_handle_new (reply);
+  
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_succeeded (job);
+}
+
+static gboolean
+try_create (GVfsBackend *backend,
+            GVfsJobOpenForWrite *job,
+            const char *filename)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend,
+                                SSH_FXP_OPEN,
+                                &id);
+  put_string (command, filename);
+  g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
+  g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
+  
+  queue_command_stream_and_free (op_backend, command, id, create_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
+}
+
+static void
+append_to_reply (GVfsBackendSftp *backend,
+                 int reply_type,
+                 GDataInputStream *reply,
+                 guint32 len,
+                 GVfsJob *job,
+                 gpointer user_data)
+{
+  SftpHandle *handle;
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply);
+      return;
+    }
+
+  if (reply_type != SSH_FXP_HANDLE)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply recieved"));
+      return;
+    }
+
+  handle = sftp_handle_new (reply);
+  
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
+  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), FALSE);
+  g_vfs_job_succeeded (job);
+}
+
+static gboolean
+try_append_to (GVfsBackend *backend,
+               GVfsJobOpenForWrite *job,
+               const char *filename)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend,
+                                SSH_FXP_OPEN,
+                                &id);
+  put_string (command, filename);
+  g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_APPEND,  NULL, NULL); /* open flags */
+  g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
+  
+  queue_command_stream_and_free (op_backend, command, id, append_to_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
+}
+
+static void
+write_reply (GVfsBackendSftp *backend,
+             int reply_type,
+             GDataInputStream *reply,
+             guint32 len,
+             GVfsJob *job,
+             gpointer user_data)
+{
+  SftpHandle *handle;
+  
+  handle = user_data;
+
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply);
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static gboolean
+try_write (GVfsBackend *backend,
+           GVfsJobWrite *job,
+           GVfsBackendHandle _handle,
+           char *buffer,
+           gsize buffer_size)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+  DataBuffer *data_buffer;
+
+  command = new_command_stream (op_backend,
+                                SSH_FXP_WRITE,
+                                &id);
+  put_data_buffer (command, handle->raw_handle);
+  g_data_output_stream_put_uint64 (command, handle->offset, NULL, NULL);
+  g_data_output_stream_put_uint32 (command, buffer_size, NULL, NULL);
+  
+  queue_command_stream_and_free (op_backend, command, id, write_reply, G_VFS_JOB (job), handle);
+
+  data_buffer = data_buffer_new ((guchar *)buffer, buffer_size);
+  queue_command_buffer (op_backend, data_buffer);
+  job->data = NULL; /* Took ownership of data */
+
+  /* We always write the full size (on success) */
+  g_vfs_job_write_set_written_size (job, buffer_size);
+
+  return TRUE;
+}
+
+static void
+seek_write_fstat_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job,
+                        gpointer user_data)
+{
+  SftpHandle *handle;
+  GFileInfo *info;
+  goffset file_size;
+  GVfsJobSeekWrite *op_job;
+  
+  handle = user_data;
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply);
+      return;
+    }
+
+  if (reply_type != SSH_FXP_ATTRS)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply recieved"));
+      return;
+    }
+
+  info = g_file_info_new ();
+  parse_attributes (backend, info, NULL,
+                    reply, NULL);
+  file_size = g_file_info_get_size (info);
+  g_object_unref (info);
+
+  op_job = G_VFS_JOB_SEEK_WRITE (job);
+
+  switch (op_job->seek_type)
+    {
+    case G_SEEK_CUR:
+      handle->offset += op_job->requested_offset;
+      break;
+    case G_SEEK_SET:
+      handle->offset = op_job->requested_offset;
+      break;
+    case G_SEEK_END:
+      handle->offset = file_size + op_job->requested_offset;
+      break;
+    }
+
+  if (handle->offset < 0)
+    handle->offset = 0;
+  if (handle->offset > file_size)
+    handle->offset = file_size;
+  
+  g_vfs_job_seek_write_set_offset (op_job, handle->offset);
+  g_vfs_job_succeeded (job);
+}
+
+static gboolean
+try_seek_on_write (GVfsBackend *backend,
+                   GVfsJobSeekWrite *job,
+                   GVfsBackendHandle _handle,
+                   goffset    offset,
+                   GSeekType  type)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend,
+                                SSH_FXP_FSTAT,
+                                &id);
+  put_data_buffer (command, handle->raw_handle);
+  
+  queue_command_stream_and_free (op_backend, command, id, seek_write_fstat_reply, G_VFS_JOB (job), handle);
+
+  return TRUE;
+}
 
 typedef struct {
   DataBuffer *handle;
@@ -2117,6 +2387,11 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_close_read = try_close_read;
+  backend_class->try_close_write = try_close_write;
   backend_class->try_get_info = try_get_info;
   backend_class->try_enumerate = try_enumerate;
+  backend_class->try_create = try_create;
+  backend_class->try_append_to = try_append_to;
+  backend_class->try_write = try_write;
+  backend_class->try_seek_on_write = try_seek_on_write;
 }
