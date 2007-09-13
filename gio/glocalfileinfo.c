@@ -620,7 +620,10 @@ _g_local_file_info_get (const char *basename,
   
   if (basename != NULL && basename[0] == '.')
     g_file_info_set_is_hidden (info, TRUE);
- 
+
+  if (basename != NULL && basename[strlen (basename) -1] == '~')
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_BACKUP, TRUE);
+
   if (is_symlink &&
       g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET))

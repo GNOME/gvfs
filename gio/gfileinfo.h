@@ -38,6 +38,7 @@ struct _GFileInfoClass
 
 #define G_FILE_ATTRIBUTE_STD_TYPE "std:type"                     /* uint32 (GFileType) */
 #define G_FILE_ATTRIBUTE_STD_IS_HIDDEN "std:is_hidden"           /* boolean */
+#define G_FILE_ATTRIBUTE_STD_IS_BACKUP "std:is_backup"           /* boolean */
 #define G_FILE_ATTRIBUTE_STD_IS_SYMLINK "std:is_symlink"         /* boolean */
 #define G_FILE_ATTRIBUTE_STD_IS_VIRTUAL "std:is_virtual"         /* boolean */
 #define G_FILE_ATTRIBUTE_STD_NAME "std:name"                     /* byte string */
