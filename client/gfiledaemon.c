@@ -186,8 +186,6 @@ do_sync_path_call (GFile *file,
       return NULL;
     }
   
-  /* TODO: handle nonmounted => message == NULL */
-  
   reply = _g_vfs_daemon_call_sync (message,
 				   connection_out,
 				   cancellable, error);
