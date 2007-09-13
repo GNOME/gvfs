@@ -20,11 +20,7 @@ HAL implementation of VolumeMonitor
 
 Move GAppInfo to Gtk+
 
-Add PRE_UNMOUNT file monitor event?
-
-Add virtual file monitor event to support inotify WRITE_CLOSE
-
-Add fallback polling GFileMonitor.
+Implement UNMOUNTED and PRE_UNMOUNT for file monitors
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
