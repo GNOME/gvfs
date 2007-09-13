@@ -284,8 +284,9 @@ _g_dbus_message_iter_get_args_valist (DBusMessageIter *iter,
 				      int              first_arg_type,
 				      va_list          var_args)
 {
-  int spec_type, msg_type, i;
+  int spec_type, msg_type, i, dbus_spec_type;
   dbus_bool_t retval;
+  
 
   retval = FALSE;
 
@@ -296,6 +297,11 @@ _g_dbus_message_iter_get_args_valist (DBusMessageIter *iter,
     {
       msg_type = dbus_message_iter_get_arg_type (iter);
 
+      if (spec_type == G_DBUS_TYPE_CSTRING)
+	dbus_spec_type = DBUS_TYPE_ARRAY;
+      else
+	dbus_spec_type = spec_type;
+      
       if (msg_type != spec_type)
 	{
           dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
@@ -307,7 +313,34 @@ _g_dbus_message_iter_get_args_valist (DBusMessageIter *iter,
           goto out;
 	}
 
-      if (dbus_type_is_basic (spec_type))
+      if (spec_type == G_DBUS_TYPE_CSTRING)
+	{
+          int element_type;
+          char **ptr;
+	  const char *str;
+          int n_elements;
+          DBusMessageIter array;
+
+          element_type = dbus_message_iter_get_element_type (iter);
+          if (DBUS_TYPE_BYTE != element_type)
+            {
+              dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
+                              "Argument %d is specified to be an array of \"char\", but "
+                              "is actually an array of \"%d\"\n",
+                              i,
+                              element_type);
+              goto out;
+            }
+
+	  ptr = va_arg (var_args, char**);
+	  g_assert (ptr != NULL);
+
+	  dbus_message_iter_recurse (iter, &array);
+	  dbus_message_iter_get_fixed_array (&array,
+					     &str, &n_elements);
+	  *ptr = g_strndup (str, n_elements);
+	}
+      else if (dbus_type_is_basic (spec_type))
         {
           void *ptr;
 
