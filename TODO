@@ -1,8 +1,9 @@
 Catch EINTR in all syscalls
 
-Handle can_rename & can_delete in simple backend
-
-Implement the rest of g_file_info_simple_get
+Implement the rest of g_file_info_simple_get:
+* can_rename & can_delete
+* mime type
+* icon
 
 Add Seekable support to LocalFile streams
 
