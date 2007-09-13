@@ -120,7 +120,6 @@ g_local_directory_monitor_cancel (GDirectoryMonitor* monitor)
   }
 #endif
   
-  g_object_unref (monitor);
   return TRUE;
 }
 

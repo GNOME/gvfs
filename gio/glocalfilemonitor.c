@@ -126,7 +126,6 @@ g_local_file_monitor_cancel (GFileMonitor* monitor)
   }
 #endif
   
-  g_object_unref (monitor);
   return TRUE;
 }
 
