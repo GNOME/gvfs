@@ -1,7 +1,7 @@
 #ifndef __G_VFS_DAEMON_BACKEND_H__
 #define __G_VFS_DAEMON_BACKEND_H__
 
-#include <gvfsdaemonoperation.h>
+#include <gvfsjob.h>
 #include <gvfs/gvfstypes.h>
 
 G_BEGIN_DECLS
@@ -38,14 +38,14 @@ struct _GVfsDaemonBackendClass
    */
 
   gboolean (*open_for_read) (GVfsDaemonBackend *backend,
-			     GVfsDaemonOperationOpenForRead *op,
+			     GVfsJobOpenForRead *job,
 			     char *filename);
   gboolean (*read)          (GVfsDaemonBackend *backend,
-			     GVfsDaemonOperationRead *op,
+			     GVfsJobRead *job,
 			     GVfsHandle *handle,
 			     gsize count);
   gboolean (*seek_on_read)  (GVfsDaemonBackend *backend,
-			     GVfsDaemonOperationReadSeek *op,
+			     GVfsJobReadSeek *job,
 			     GVfsHandle *handle,
 			     goffset    offset,
 			     GSeekType  type);

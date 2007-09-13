@@ -21,6 +21,7 @@ gvfs_daemon_SOURCES = \
 	gvfsdaemonbackendtest.c gvfsdaemonbackendtest.h \
 	gvfsreadrequest.c gvfsreadrequest.h \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
+	gvfsjob.c gvfsjob.g \
 	dbus-gmain.h dbus-gmain.c \
 	main.c
 
