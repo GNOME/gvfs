@@ -669,15 +669,24 @@ g_local_file_query_settable_attributes (GFile                      *file,
 }
 
 static GFileAttributeInfoList *
-g_local_file_query_writable_namespaces (GFile                      *file,
-					GCancellable               *cancellable,
-					GError                    **error)
+g_local_file_query_writable_namespaces (GFile *file,
+					GCancellable *cancellable,
+					GError **error)
 {
   GFileAttributeInfoList *list;
 
   list = g_file_attribute_info_list_new ();
 
-  /* TODO: Add xattrs as we make them settable */
+#ifdef HAVE_XATTR
+  g_file_attribute_info_list_add (list,
+				  "xattr",
+				  G_FILE_ATTRIBUTE_TYPE_STRING,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE);
+  g_file_attribute_info_list_add (list,
+				  "xattr_sys",
+				  G_FILE_ATTRIBUTE_TYPE_STRING,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+#endif
   
   return list;
 }
