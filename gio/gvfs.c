@@ -2,6 +2,7 @@
 #include <gmodule.h>
 #include "gvfs.h"
 #include "glocalvfs.h"
+#include "gsimpleasyncresult.h"
 #include <glib/gi18n-lib.h>
 
 static void g_vfs_base_init (gpointer g_class);
@@ -86,6 +87,16 @@ g_vfs_mount_for_location (GVfs                 *vfs,
 
   iface = G_VFS_GET_IFACE (vfs);
 
+  if (iface->mount_for_location == NULL)
+    {
+      g_simple_async_report_error_in_idle (G_OBJECT (vfs),
+					   callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("volume doesn't implement unmount"));
+      
+      return;
+    }
+  
   return (* iface->mount_for_location) (vfs, location, mount_operation, callback, user_data);
 }
 
@@ -96,6 +107,13 @@ g_vfs_mount_for_location_finish (GVfs                 *vfs,
 {
   GVfsIface *iface;
 
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+    }
+  
   iface = G_VFS_GET_IFACE (vfs);
 
   return (* iface->mount_for_location_finish) (vfs, result, error);
