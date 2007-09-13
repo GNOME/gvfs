@@ -32,6 +32,7 @@ _g_queue_async_result (GAsyncResult   *result,
   g_return_if_fail (G_IS_OBJECT (async_object));
   
   result->async_object = g_object_ref (async_object);
+  result->data = data;
   result->error = error;
   result->destroy_notify = destroy_notify;
 
@@ -94,8 +95,9 @@ fd_source_finalize (GSource *source)
   if (fd_source->cancelled_tag)
     g_signal_handler_disconnect (fd_source->cancellable,
 				 fd_source->cancelled_tag);
-  
-  g_object_unref (fd_source->cancellable);
+
+  if (fd_source->cancellable)
+    g_object_unref (fd_source->cancellable);
   g_object_unref (fd_source->object);
 }
 
