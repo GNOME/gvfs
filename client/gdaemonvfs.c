@@ -511,6 +511,112 @@ _g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
   return info;
 }
 
+static GList *
+demarshal_mount_list (DBusMessage *message, GError **error)
+{
+  DBusMessageIter iter;
+  DBusError derror;
+  GMountInfo *info;
+  GList *mount_list = NULL;
+
+  dbus_error_init (&derror);
+
+  dbus_message_iter_init (message, &iter);
+  dbus_message_iter_recurse (&iter, &iter);
+
+  do
+    {
+      DBusMessageIter struct_iter;
+      GMountSpec *mount_spec;
+      gchar *display_name;
+      gchar *icon;
+      gchar *dbus_id;
+      gchar *obj_path;
+
+      dbus_message_iter_recurse (&iter, &struct_iter);
+
+      if (!_g_dbus_message_iter_get_args (&struct_iter,
+					  &derror,
+					  DBUS_TYPE_STRING, &display_name,
+					  DBUS_TYPE_STRING, &icon,
+					  DBUS_TYPE_STRING, &dbus_id,
+					  DBUS_TYPE_OBJECT_PATH, &obj_path,
+					  0))
+	{
+	  g_list_foreach (mount_list, (GFunc) _g_mount_info_unref, NULL);
+	  g_list_free (mount_list);
+
+	  _g_error_from_dbus (&derror, error);
+	  dbus_error_free (&derror);
+	  return NULL;
+	}
+
+      mount_spec = g_mount_spec_from_dbus (&struct_iter);
+
+      if (mount_spec == NULL)
+        {
+	  g_list_foreach (mount_list, (GFunc) _g_mount_info_unref, NULL);
+	  g_list_free (mount_list);
+
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		       "Error while listing mount info: %s",
+		       "Invalid reply");
+	  return NULL;
+	}
+
+      /* TODO: Update cache */
+
+      info = g_new0 (GMountInfo, 1);
+      info->ref_count = 1;
+      info->dbus_id = g_strdup (dbus_id);
+      info->object_path = g_strdup (obj_path);
+      info->spec = mount_spec;
+
+      mount_list = g_list_prepend (mount_list, info);
+    }
+  while (dbus_message_iter_next (&iter));
+
+  return mount_list;
+}
+
+GList *
+_g_daemon_vfs_get_mount_list_sync (GError **error)
+{
+  DBusConnection *conn;
+  DBusMessage *message, *reply;
+  DBusError derror;
+  GList *mount_list;
+
+  conn = _g_dbus_connection_get_sync (NULL, error);
+  if (conn == NULL)
+    return NULL;
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+				  G_VFS_DBUS_MOUNTTRACKER_PATH,
+				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				  G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS);
+  dbus_message_set_auto_start (message, TRUE);
+  
+  dbus_error_init (&derror);
+  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
+  dbus_message_unref (message);
+
+  if (!reply)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   "Error while getting mount list: %s",
+		   derror.message);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  mount_list = demarshal_mount_list (reply, error);
+  dbus_message_unref (reply);
+
+  return mount_list;
+}
+
 static GFile *
 g_daemon_vfs_parse_name (GVfs       *vfs,
 			      const char *parse_name)

@@ -37,6 +37,8 @@ GType   g_daemon_vfs_get_type  (void) G_GNUC_CONST;
 
 GDaemonVfs *g_daemon_vfs_new (void);
 
+GList      *_g_daemon_vfs_get_mount_list_sync  (GError **error);
+
 void        _g_daemon_vfs_get_mount_info_async (GMountSpec                *spec,
 						     const char                *path,
 						     GMountInfoLookupCallback   callback,
