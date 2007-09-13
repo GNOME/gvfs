@@ -6,14 +6,12 @@
 #include <glib/gi18n-lib.h>
 #include "gdaemonvolumemonitor.h"
 #include "gdaemonvolume.h"
-#include "gdaemondrive.h"
+#include "gdaemonfile.h"
 
 struct _GDaemonVolume {
   GObject     parent;
 
-  GMountRef *mount_info;
-  char       *name;
-  char       *icon;
+  GMountInfo *mount_info;
 };
 
 static void g_daemon_volume_volume_iface_init (GVolumeIface *iface);
@@ -30,9 +28,7 @@ g_daemon_volume_finalize (GObject *object)
   
   volume = G_DAEMON_VOLUME (object);
 
-  g_free (volume->name);
-  g_free (volume->icon);
-  _g_mount_ref_unref (volume->mount_info);
+  g_mount_info_free (volume->mount_info);
   
   if (G_OBJECT_CLASS (g_daemon_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_parent_class)->finalize) (object);
@@ -53,36 +49,28 @@ g_daemon_volume_init (GDaemonVolume *daemon_volume)
 
 GDaemonVolume *
 g_daemon_volume_new (GVolumeMonitor *volume_monitor,
-		     GMountRef *mount_info)
+		     GMountInfo *mount_info)
 {
   GDaemonVolume *volume;
-  char *volume_name;
 
   volume = g_object_new (G_TYPE_DAEMON_VOLUME, NULL);
-  volume->mount_info = _g_mount_ref_ref (mount_info);
-
-  volume_name = NULL;
-
-  if (volume_name == NULL)
-    {
-      /* TODO: Use volume size as name? */
-      volume_name = g_strdup (_("Unknown volume"));
-    }
-  
-  volume->name = volume_name;
-
-  /* TODO: Figure out a better icon */
-  volume->icon = g_strdup ("network");
+  volume->mount_info = mount_info;
 
   return volume;
+}
+
+GMountInfo *
+g_daemon_volume_get_mount_info (GDaemonVolume *volume)
+{
+  return volume->mount_info;
 }
 
 static char *
 g_daemon_volume_get_platform_id (GVolume *volume)
 {
-  GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
+  /* TODO */
 
-  return g_strdup (daemon_volume->mount_info->spec->mount_prefix);
+  return NULL;
 }
 
 static GFile *
@@ -90,7 +78,7 @@ g_daemon_volume_get_root (GVolume *volume)
 {
   GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
 
-  return g_file_get_for_path (daemon_volume->mount_info->spec->mount_prefix);
+  return g_daemon_file_new (daemon_volume->mount_info->mount_spec, "/");
 }
 
 static char *
@@ -98,23 +86,21 @@ g_daemon_volume_get_icon (GVolume *volume)
 {
   GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
 
-  return g_strdup (daemon_volume->icon);
+  return g_strdup (daemon_volume->mount_info->icon);
 }
 
 static char *
 g_daemon_volume_get_name (GVolume *volume)
 {
   GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
-  
-  return g_strdup (daemon_volume->name);
+
+  return g_strdup (daemon_volume->mount_info->display_name);
 }
 
 static GDrive *
 g_daemon_volume_get_drive (GVolume *volume)
 {
-  GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
-
-  daemon_volume = NULL;
+  /* TODO */
 
   return NULL;
 }

@@ -8,6 +8,7 @@
 #endif
 #include "gdaemonvfs.h"
 #include "gdaemonvolumemonitor.h"
+#include "gmounttracker.h"
 
 G_BEGIN_DECLS
 
@@ -26,7 +27,9 @@ struct _GDaemonVolumeClass {
 GType g_daemon_volume_get_type (void) G_GNUC_CONST;
 
 GDaemonVolume *g_daemon_volume_new            (GVolumeMonitor *volume_monitor,
-					       GMountRef *mount_info);
+					       GMountInfo *mount_info);
+
+GMountInfo    *g_daemon_volume_get_mount_info (GDaemonVolume *volume);
 
 G_END_DECLS
 
