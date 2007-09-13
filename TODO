@@ -53,6 +53,8 @@ Use "data" -> "user_data" as name for user data pointer.
 
 Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
+Move GAppInfo to Gtk+
+
 FUTURE IDEAS:
 -------------
 
