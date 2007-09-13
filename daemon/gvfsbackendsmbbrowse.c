@@ -499,9 +499,10 @@ do_mount (GVfsBackend *backend,
   //smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
 #endif
 #endif
-  
-  if (1) 
-    smbc_option_set(smb_context, "debug_stderr", (void *) 1);
+
+#if 0
+  smbc_option_set (smb_context, "debug_stderr", (void *) 1);
+#endif
   
   if (!smbc_init_context (smb_context))
     {
