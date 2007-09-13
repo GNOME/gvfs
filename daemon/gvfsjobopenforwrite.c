@@ -101,7 +101,8 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
 
   job->filename = path;
   job->mode = mode;
-  job->etag = g_strdup (etag);
+  if (*etag != 0)
+    job->etag = g_strdup (etag);
   job->make_backup = make_backup;
   job->backend = backend;
   
