@@ -76,7 +76,7 @@ static gboolean stream_source_dispatch (GSource     *source,
 					gpointer     user_data);
 static void     stream_source_finalize (GSource     *source);
 
-GSourceFuncs stream_source_funcs = {
+static GSourceFuncs stream_source_funcs = {
   stream_source_prepare,
   stream_source_check,
   stream_source_dispatch,
@@ -278,7 +278,7 @@ g_socket_input_stream_read (GInputStream *stream,
 		   _("Operation was cancelled"));
       return -1;
     }
-  
+
   while (1)
     {
       res = read (socket_stream->priv->fd, buffer, count);
@@ -406,7 +406,7 @@ read_async_cb (GSocketInputStream  *stream,
 	}
       break;
     }
-  
+
  out:
   data->callback (G_INPUT_STREAM (stream),
 		  data->buffer,
