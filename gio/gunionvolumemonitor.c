@@ -16,6 +16,10 @@ struct _GUnionVolumeMonitor {
   GList *drives;
 };
 
+static void g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
+						   GVolumeMonitor *child_monitor);
+
+
 G_DEFINE_TYPE (GUnionVolumeMonitor, g_union_volume_monitor, G_TYPE_VOLUME_MONITOR);
 
 G_LOCK_DEFINE_STATIC(the_volume_monitor);
@@ -27,6 +31,10 @@ g_union_volume_monitor_finalize (GObject *object)
   GUnionVolumeMonitor *monitor;
   
   monitor = G_UNION_VOLUME_MONITOR (object);
+
+  while (monitor->monitors != NULL)
+    g_union_volume_monitor_remove_monitor (monitor,
+					   monitor->monitors->data);
   
   if (G_OBJECT_CLASS (g_union_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_union_volume_monitor_parent_class)->finalize) (object);
@@ -56,7 +64,7 @@ g_union_volume_monitor_class_init (GUnionVolumeMonitorClass *klass)
   gobject_class->dispose = g_union_volume_monitor_dispose;
 }
 
-static GUnionVolume *
+static void
 add_child_volume (GUnionVolumeMonitor *union_monitor,
 		  GVolume *child_volume,
 		  GVolumeMonitor *child_monitor)
@@ -80,43 +88,76 @@ add_child_volume (GUnionVolumeMonitor *union_monitor,
 	      g_union_volume_add_volume (G_UNION_VOLUME (current_child), child_volume, child_monitor);
 	      g_free (id);
 	      g_free (platform_id);
-	      return NULL;
+	      return;
 	    }
 	  g_free (id);
 	}
+      g_free (platform_id);
     }
-  
-  g_free (platform_id);
 
   union_volume = g_union_volume_new (child_volume, child_monitor);
   union_monitor->volumes = g_list_prepend (union_monitor->volumes,
 					   union_volume);
-  return union_volume;
+  g_signal_emit_by_name (union_monitor,
+			 "volume_mounted",
+			 union_volume);
 }
 
-static gboolean
+static GUnionVolume *
+lookup_union_volume (GUnionVolumeMonitor *union_monitor,
+		     GVolume *child_volume)
+{
+  GList *l;
+  GUnionVolume *union_volume;
+  
+  for (l = union_monitor->volumes; l != NULL; l = l->next)
+    {
+      union_volume = l->data;
+      
+      if (g_union_volume_has_child_volume (union_volume, child_volume))
+	return union_volume;
+    }
+  return NULL;
+}
+
+static void
 remove_child_volume (GUnionVolumeMonitor *union_monitor,
 		     GVolume *child_volume)
 {
-  /* TODO */
-  return FALSE;
+  GUnionVolume *union_volume;
+
+  union_volume = lookup_union_volume (union_monitor, child_volume);
+  if (g_union_volume_remove_volume (union_volume, child_volume))
+    {
+      union_monitor->volumes = g_list_remove (union_monitor->volumes,
+					      union_volume);
+      g_signal_emit_by_name (union_monitor,
+			     "volume_unmounted",
+			     union_volume);
+      g_object_unref (union_volume);
+    }
 }
 
-
-static gboolean
+static void
 add_child_drive (GUnionVolumeMonitor *union_monitor,
 		 GDrive *child_drive)
 {
   /* TODO */
-  return FALSE;
+  if (0)
+    g_signal_emit_by_name (union_monitor,
+			   "drive_conntected",
+			   child_drive);
 }
 
-static gboolean
+static void
 remove_child_drive (GUnionVolumeMonitor *union_monitor,
 		    GDrive *child_drive)
 {
   /* TODO */
-  return FALSE;
+  if (0)
+    g_signal_emit_by_name (union_monitor,
+			   "drive_disconntected",
+			   child_drive);
 }
 
 static void
@@ -124,26 +165,23 @@ child_volume_mounted (GVolumeMonitor *child_monitor,
 		      GVolume *child_volume,
 		      GUnionVolumeMonitor *union_monitor)
 {
-  GUnionVolume *union_volume;
-
-  union_volume = add_child_volume (union_monitor,
-				   child_volume,
-				   child_monitor);
-  if (union_volume)
-    g_signal_emit_by_name (union_monitor,
-			   "volume_mounted",
-			   union_volume);
+  add_child_volume (union_monitor,
+		    child_volume,
+		    child_monitor);
 }
 
 static void
 child_volume_pre_unmount (GVolumeMonitor *child_monitor,
-			  GVolume *volume,
+			  GVolume *child_volume,
 			  GUnionVolumeMonitor *union_monitor)
 {
-  /* TODO: Find right union volume */
-  g_signal_emit_by_name (union_monitor,
-			 "volume_pre_unmount",
-			 volume);
+  GUnionVolume *union_volume;
+
+  union_volume = lookup_union_volume (union_monitor, child_volume);
+  if (union_volume)
+    g_signal_emit_by_name (union_monitor,
+			   "volume_pre_unmount",
+			   union_volume);
 }
 
 static void
@@ -151,13 +189,7 @@ child_volume_unmounted (GVolumeMonitor *child_monitor,
 			GVolume *volume,
 			GUnionVolumeMonitor *union_monitor)
 {
-  if (remove_child_volume (union_monitor,
-			   volume))
-    {
-      g_signal_emit_by_name (union_monitor,
-			     "volume_unmounted",
-			     volume);
-    }
+  remove_child_volume (union_monitor, volume);
 }
 
 static void
@@ -165,13 +197,7 @@ child_drive_connected (GVolumeMonitor *child_monitor,
 		       GDrive *drive,
 		       GUnionVolumeMonitor *union_monitor)
 {
-  if (add_child_drive (union_monitor,
-		       drive))
-    {
-      g_signal_emit_by_name (union_monitor,
-			     "drive_conntected",
-			     drive);
-    }
+  add_child_drive (union_monitor, drive);
 }
 
 static void
@@ -179,13 +205,7 @@ child_drive_disconnected (GVolumeMonitor *child_monitor,
 			  GDrive *drive,
 			  GUnionVolumeMonitor *union_monitor)
 {
-  if (remove_child_drive (union_monitor,
-			  drive))
-    {
-      g_signal_emit_by_name (union_monitor,
-			     "drive_disconntected",
-			     drive);
-    }
+  remove_child_drive (union_monitor, drive);
 }
 
 static void
@@ -229,14 +249,27 @@ g_union_volume_monitor_add_monitor (GUnionVolumeMonitor *union_monitor,
 
 static void
 g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
-				       GVolumeMonitor *volume_monitor)
+				       GVolumeMonitor *child_monitor)
 {
-  if (!g_list_find (union_monitor->monitors, volume_monitor))
-    return;
+  GList *l;
+  GUnionVolume *union_volume;
+  GVolume *volume;
   
-  /* TODO */
-}
+  if (!g_list_find (union_monitor->monitors, child_monitor))
+    return;
 
+  for (l = union_monitor->volumes; l != NULL; l = l->next)
+    {
+      union_volume = l->data;
+      
+      volume = g_union_volume_get_child_for_monitor (union_volume, child_monitor);
+      if (volume)
+	{
+	  remove_child_volume (union_monitor, volume);
+	  g_object_unref (volume);
+	}
+    }
+}
 
 static void
 g_union_volume_monitor_init (GUnionVolumeMonitor *union_monitor)

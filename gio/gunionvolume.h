@@ -22,13 +22,17 @@ struct _GUnionVolumeClass {
 
 GType g_union_volume_get_type (void) G_GNUC_CONST;
 
-GUnionVolume *g_union_volume_new           (GVolume        *volume,
-					    GVolumeMonitor *monitor);
-void          g_union_volume_add_volume    (GUnionVolume   *union_volume,
-					    GVolume        *volume,
-					    GVolumeMonitor *monitor);
-gboolean      g_union_volume_remove_volume (GUnionVolume   *union_volume,
-					    GVolume        *volume);
+GUnionVolume *g_union_volume_new                   (GVolume        *volume,
+						    GVolumeMonitor *monitor);
+void          g_union_volume_add_volume            (GUnionVolume   *union_volume,
+						    GVolume        *volume,
+						    GVolumeMonitor *monitor);
+gboolean      g_union_volume_remove_volume         (GUnionVolume   *union_volume,
+						    GVolume        *volume);
+gboolean      g_union_volume_has_child_volume      (GUnionVolume   *union_volume,
+						    GVolume        *child_volume);
+GVolume *     g_union_volume_get_child_for_monitor (GUnionVolume   *union_volume,
+						    GVolumeMonitor *child_monitor);
 
 G_END_DECLS
 
