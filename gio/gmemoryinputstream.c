@@ -367,3 +367,5 @@ g_memory_input_stream_truncate (GSeekable      *seekable,
   return FALSE;
 }
 
+// vim: ts=2 sw=2 et
+

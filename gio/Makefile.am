@@ -101,6 +101,7 @@ libgio_la_SOURCES = 	\
 	gioerror.c \
 	gioscheduler.c \
 	gmemoryinputstream.c \
+	gmemoryoutputstream.c \
 	gmountoperation.c \
 	goutputstream.c \
 	gseekable.c \
@@ -155,6 +156,7 @@ gvfsinclude_HEADERS = \
 	gioscheduler.h \
 	giotypes.h \
 	gmemoryinputstream.h \
+	gmemoryoutputstream.h \
 	gmountoperation.h \
 	goutputstream.h \
 	gseekable.h \
