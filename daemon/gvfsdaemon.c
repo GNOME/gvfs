@@ -61,6 +61,9 @@ static void              daemon_unregistered_func (DBusConnection *conn,
 static DBusHandlerResult daemon_message_func      (DBusConnection *conn,
 						   DBusMessage    *message,
 						   gpointer        data);
+static DBusHandlerResult daemon_filter_func       (DBusConnection *conn,
+						   DBusMessage    *message,
+						   gpointer        data);
 static void              start_or_queue_job       (GVfsDaemon     *daemon,
 						   GVfsJob        *job);
 
@@ -369,7 +372,8 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
     }
   
   dbus_connection_setup_with_g_main (dbus_conn, NULL);
-  if (!dbus_connection_register_object_path (dbus_conn,
+  if (!dbus_connection_add_filter (dbus_conn, daemon_filter_func, daemon, NULL) ||
+      !dbus_connection_register_object_path (dbus_conn,
 					     G_VFS_DBUS_DAEMON_PATH,
 					     &daemon_vtable,
 					     daemon))
@@ -737,6 +741,24 @@ daemon_message_func (DBusConnection *conn,
 
   return DBUS_HANDLER_RESULT_HANDLED;
 }
+
+static DBusHandlerResult
+daemon_filter_func (DBusConnection *conn,
+		    DBusMessage    *message,
+		    gpointer        data)
+{
+  if (dbus_message_is_signal (message,
+			      DBUS_INTERFACE_LOCAL,
+			      "Disconnected"))
+    {
+      /* The peer-to-peer connection was disconnected */
+      dbus_connection_unref (conn);
+      return DBUS_HANDLER_RESULT_HANDLED;
+    }
+  
+  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
 
 gboolean
  g_vfs_daemon_is_active (GVfsDaemon *daemon)
