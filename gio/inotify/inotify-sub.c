@@ -1,4 +1,4 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*- */
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 8 -*- */
 
 /* inotify-sub.c - GMonitor based on inotify.
 
@@ -32,38 +32,39 @@
 static gboolean is_debug_enabled = FALSE;
 #define IS_W if (is_debug_enabled) g_warning
 
-static gchar* dup_dirname(const gchar* dirname)
+static gchar*
+dup_dirname(const gchar* dirname)
 {
-	gchar* d_dirname = g_strdup(dirname);
-	size_t len = strlen (d_dirname);
-
-	if (d_dirname[len] == '/')
-		d_dirname[len] = '\0';
-	
-	return d_dirname;
+  gchar* d_dirname = g_strdup (dirname);
+  size_t len = strlen (d_dirname);
+  
+  if (d_dirname[len] == '/')
+    d_dirname[len] = '\0';
+  
+  return d_dirname;
 }
 
 inotify_sub*
 _ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data)
 {
-	inotify_sub* sub = NULL;
-
-	sub = g_new0 (inotify_sub, 1);
-	sub->dirname = dup_dirname (dirname);
-	sub->filename = g_strdup(filename);
-	sub->user_data = user_data;
-
-	IS_W("new subscription for %s being setup\n", sub->dirname);
-
-	return sub;
+  inotify_sub* sub = NULL;
+  
+  sub = g_new0 (inotify_sub, 1);
+  sub->dirname = dup_dirname (dirname);
+  sub->filename = g_strdup (filename);
+  sub->user_data = user_data;
+  
+  IS_W ("new subscription for %s being setup\n", sub->dirname);
+  
+  return sub;
 }
 
 void
 _ih_sub_free (inotify_sub* sub)
 {
-	if (sub->dirname)
-		g_free (sub->dirname);
-	if (sub->filename)
-		g_free (sub->filename);
-	g_free (sub);
+  if (sub->dirname)
+    g_free (sub->dirname);
+  if (sub->filename)
+    g_free (sub->filename);
+  g_free (sub);
 }
