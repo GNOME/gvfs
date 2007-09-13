@@ -47,8 +47,8 @@ libgio_la_SOURCES = 	\
 	gfileinputstream.c \
 	gfileoutputstream.c \
 	gseekable.c \
-	ginputstreamsocket.c \
-	ginputstreamsocket.h \
+	gsocketinputstream.c \
+	gsocketinputstream.h \
 	goutputstreamsocket.c \
 	goutputstreamsocket.h \
 	ginputstream.c \

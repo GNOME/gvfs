@@ -6,7 +6,7 @@
 #include "gseekable.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
-#include "ginputstreamsocket.h"
+#include "gsocketinputstream.h"
 
 static gpointer
 cancel_thread (gpointer data)
@@ -285,7 +285,7 @@ main (int argc, char *argv[])
 
     buffer = g_malloc (1025);
     
-    s = g_input_stream_socket_new (0, FALSE);
+    s = g_socket_input_stream_new (0, FALSE);
 
     if (1)
       {

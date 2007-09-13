@@ -13,7 +13,7 @@
 #include <glib/gi18n.h>
 #include <dbus-gmain.h>
 #include <gvfsreadchannel.h>
-#include <gio/ginputstreamsocket.h>
+#include <gio/gsocketinputstream.h>
 #include <gio/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
@@ -155,7 +155,7 @@ g_vfs_channel_init (GVfsChannel *channel)
     g_warning ("Error creating socket pair: %d\n", errno);
   else
     {
-      channel->priv->command_stream = g_input_stream_socket_new (socket_fds[0], TRUE);
+      channel->priv->command_stream = g_socket_input_stream_new (socket_fds[0], TRUE);
       channel->priv->reply_stream = g_output_stream_socket_new (socket_fds[0], FALSE);
       channel->priv->remote_fd = socket_fds[1];
       

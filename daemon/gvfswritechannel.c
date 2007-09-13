@@ -13,8 +13,6 @@
 #include <glib/gi18n.h>
 #include <dbus-gmain.h>
 #include <gvfswritechannel.h>
-#include <gio/ginputstreamsocket.h>
-#include <gio/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobwrite.h>

@@ -16,7 +16,7 @@
 #include <gio/gseekable.h>
 #include "gfileoutputstreamdaemon.h"
 #include "gvfsdaemondbus.h"
-#include <gio/ginputstreamsocket.h>
+#include <gio/gsocketinputstream.h>
 #include <gio/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>
 
@@ -219,7 +219,7 @@ g_file_output_stream_daemon_new (int fd,
   stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_DAEMON, NULL);
 
   stream->command_stream = g_output_stream_socket_new (fd, FALSE);
-  stream->data_stream = g_input_stream_socket_new (fd, TRUE);
+  stream->data_stream = g_socket_input_stream_new (fd, TRUE);
   stream->can_seek = can_seek;
   stream->current_offset = initial_offset;
   
