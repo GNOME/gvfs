@@ -314,7 +314,7 @@ _g_dbus_connection_get_fd_sync (DBusConnection *connection,
   VfsConnectionData *data;
   int fd;
 
-  data = dbus_connection_get_data (connection , vfs_data_slot);
+  data = dbus_connection_get_data (connection, vfs_data_slot);
   g_assert (data != NULL);
 
   /* I don't think we can get reorders here, can we?
