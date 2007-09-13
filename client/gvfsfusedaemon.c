@@ -2181,11 +2181,7 @@ static struct fuse_operations vfs_oper =
   .chmod       = vfs_chmod,
 
 #if 0
-  .releasedir  = vfs_releasedir,
-  .fsyncdir    = vfs_fsyncdir,
-  .mknod       = vfs_mknod,
   .chown       = vfs_chown,
-  .fsync       = vfs_fsync,
   .setxattr    = vfs_setxattr,
   .getxattr    = vfs_getxattr,
   .listxattr   = vfs_listxattr,
