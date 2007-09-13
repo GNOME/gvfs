@@ -2,7 +2,7 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
-#include <gfileenumeratorlocal.h>
+#include <glocalfileenumerator.h>
 #include <gfileinfolocal.h>
 
   /* TODO:
@@ -12,7 +12,7 @@
    */
   
 
-struct _GFileEnumeratorLocal
+struct _GLocalFileEnumerator
 {
   GFileEnumerator parent;
 
@@ -25,22 +25,22 @@ struct _GFileEnumeratorLocal
   gboolean follow_symlinks;
 };
 
-G_DEFINE_TYPE (GFileEnumeratorLocal, g_file_enumerator_local, G_TYPE_FILE_ENUMERATOR);
+G_DEFINE_TYPE (GLocalFileEnumerator, g_local_file_enumerator, G_TYPE_FILE_ENUMERATOR);
 
-static GFileInfo *g_file_enumerator_local_next_file (GFileEnumerator  *enumerator,
+static GFileInfo *g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
 						     GCancellable     *cancellable,
 						     GError          **error);
-static gboolean   g_file_enumerator_local_stop      (GFileEnumerator  *enumerator,
+static gboolean   g_local_file_enumerator_stop      (GFileEnumerator  *enumerator,
 						     GCancellable     *cancellable,
 						     GError          **error);
 
 
 static void
-g_file_enumerator_local_finalize (GObject *object)
+g_local_file_enumerator_finalize (GObject *object)
 {
-  GFileEnumeratorLocal *local;
+  GLocalFileEnumerator *local;
 
-  local = G_FILE_ENUMERATOR_LOCAL (object);
+  local = G_LOCAL_FILE_ENUMERATOR (object);
 
   g_free (local->filename);
   g_file_attribute_matcher_free (local->matcher);
@@ -50,43 +50,43 @@ g_file_enumerator_local_finalize (GObject *object)
       local->dir = NULL;
     }
   
-  if (G_OBJECT_CLASS (g_file_enumerator_local_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_enumerator_local_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_local_file_enumerator_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_local_file_enumerator_parent_class)->finalize) (object);
 }
 
 
 static void
-g_file_enumerator_local_class_init (GFileEnumeratorLocalClass *klass)
+g_local_file_enumerator_class_init (GLocalFileEnumeratorClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GFileEnumeratorClass *enumerator_class = G_FILE_ENUMERATOR_CLASS (klass);
   
-  gobject_class->finalize = g_file_enumerator_local_finalize;
+  gobject_class->finalize = g_local_file_enumerator_finalize;
 
-  enumerator_class->next_file = g_file_enumerator_local_next_file;
-  enumerator_class->stop = g_file_enumerator_local_stop;
+  enumerator_class->next_file = g_local_file_enumerator_next_file;
+  enumerator_class->stop = g_local_file_enumerator_stop;
 }
 
 static void
-g_file_enumerator_local_init (GFileEnumeratorLocal *local)
+g_local_file_enumerator_init (GLocalFileEnumerator *local)
 {
 }
 
 GFileEnumerator *
-g_file_enumerator_local_new (const char *filename,
+g_local_file_enumerator_new (const char *filename,
 			     const char *attributes,
 			     GFileGetInfoFlags flags,
 			     GCancellable *cancellable,
 			     GError **error)
 {
-  GFileEnumeratorLocal *local;
+  GLocalFileEnumerator *local;
   GDir *dir;
 
   dir = g_dir_open (filename, 0, error);
   if (dir == NULL)
     return NULL;
   
-  local = g_object_new (G_TYPE_FILE_ENUMERATOR_LOCAL, NULL);
+  local = g_object_new (G_TYPE_LOCAL_FILE_ENUMERATOR, NULL);
 
   local->dir = dir;
   local->filename = g_strdup (filename);
@@ -97,11 +97,11 @@ g_file_enumerator_local_new (const char *filename,
 }
 
 static GFileInfo *
-g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
+g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
 				   GCancellable     *cancellable,
 				   GError **error)
 {
-  GFileEnumeratorLocal *local = G_FILE_ENUMERATOR_LOCAL (enumerator);
+  GLocalFileEnumerator *local = G_LOCAL_FILE_ENUMERATOR (enumerator);
   const char *filename;
   char *path;
   GFileInfo *info;
@@ -140,11 +140,11 @@ g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
 }
 
 static gboolean
-g_file_enumerator_local_stop (GFileEnumerator *enumerator,
+g_local_file_enumerator_stop (GFileEnumerator *enumerator,
 			      GCancellable     *cancellable,
 			      GError          **error)
 {
-  GFileEnumeratorLocal *local = G_FILE_ENUMERATOR_LOCAL (enumerator);
+  GLocalFileEnumerator *local = G_LOCAL_FILE_ENUMERATOR (enumerator);
 
   if (local->dir)
     {

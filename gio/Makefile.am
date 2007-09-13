@@ -22,8 +22,8 @@ gvfs-marshal.c: gvfs-marshal.h gvfs-marshal.list $(GLIB_GENMARSHAL)
 	 $(GLIB_GENMARSHAL) --prefix=_gvfs_marshal $(srcdir)/gvfs-marshal.list --body) > $@
 
 local_sources = \
-	gfileenumeratorlocal.c \
-	gfileenumeratorlocal.h \
+	glocalfileenumerator.c \
+	glocalfileenumerator.h \
 	gfileinfolocal.c \
 	gfileinfolocal.h \
 	glocalfile.c \

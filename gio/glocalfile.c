@@ -8,7 +8,7 @@
 
 #include "glocalfile.h"
 #include "gfileinfolocal.h"
-#include "gfileenumeratorlocal.h"
+#include "glocalfileenumerator.h"
 #include "gfileinputstreamlocal.h"
 #include "gfileoutputstreamlocal.h"
 #include <glib/gi18n-lib.h>
@@ -242,7 +242,7 @@ g_local_file_enumerate_children (GFile      *file,
 				 GError **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  return g_file_enumerator_local_new (local->filename,
+  return g_local_file_enumerator_new (local->filename,
 				      attributes, flags,
 				      cancellable, error);
 }
