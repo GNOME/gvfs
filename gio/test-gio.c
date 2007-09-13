@@ -495,6 +495,38 @@ test_volumes (void)
 
 }
 
+static void
+get_contents_callback (GObject *obj,
+		       GAsyncResult *res,
+		       gpointer user_data)
+{
+  GFile *file = G_FILE (obj);
+  GError *error = NULL;
+  gchar *contents;
+  gsize length;
+  
+  if (!g_file_get_contents_finish (file, res, &contents, &length, &error))
+    {
+      g_print ("Error reading file: %s\n", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  g_print ("Read %d bytes of data:\n%s\n", (int)length, contents);
+  g_free (contents);
+}
+
+static void
+test_get_content (void)
+{
+  GFile *file;
+  
+  file = g_file_get_for_path ("/etc/passwd");
+  g_file_get_contents_async (file,
+			     NULL,
+			     get_contents_callback, NULL);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -550,8 +582,11 @@ main (int argc, char *argv[])
 
   file = g_file_get_for_path ("/tmp");
   if (0) test_sync ("test:///etc/passwd", FALSE);
-  if (1) test_async ("test:///etc/passwd", TRUE);
+  if (0) test_async ("test:///etc/passwd", TRUE);
   if (0) test_out ();
+
+  if (1) test_get_content ();
+
 
   g_print ("Starting mainloop\n");
   g_main_loop_run (loop);

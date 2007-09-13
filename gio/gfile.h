@@ -30,11 +30,6 @@ typedef struct _GFileIface    		GFileIface;
 typedef struct _GDirectoryMonitor       GDirectoryMonitor;
 typedef struct _GFileMonitor            GFileMonitor;
 
-typedef void (*GFileReadCallback) (GFile *file,
-				   GFileInputStream *stream,
-				   gpointer user_data,
-				   GError *error);
-
 typedef void (*GFileProgressCallback) (goffset current_num_bytes,
 				       goffset total_num_bytes,
 				       gpointer user_data);
@@ -322,6 +317,19 @@ GDirectoryMonitor* g_file_monitor_directory          (GFile                  *fi
 GFileMonitor*      g_file_monitor_file               (GFile                  *file);
 
 
+
+
+/* Utilities */
+
+void     g_file_get_contents_async  (GFile                *file,
+				     GCancellable         *cancellable,
+				     GAsyncReadyCallback   callback,
+				     gpointer              user_data);
+gboolean g_file_get_contents_finish (GFile                *file,
+				     GAsyncResult         *res,
+				     gchar               **contents,
+				     gsize                *length,
+				     GError              **error);
 
 G_END_DECLS
 

@@ -981,3 +981,194 @@ g_mount_for_location_finish (GFile                  *location,
 
   return (* iface->mount_for_location_finish) (location, result, error);
 }
+
+/********************************************
+ *   Utility functions                      *
+ ********************************************/
+
+#define GET_CONTENT_BLOCK_SIZE 8192
+
+typedef struct {
+  GFile *file;
+  GError *error;
+  GCancellable *cancellable;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+  GByteArray *content;
+  gsize pos;
+} GetContentsData;
+
+
+static void
+get_contents_data_free (GetContentsData *data)
+{
+  if (data->error)
+    g_error_free (data->error);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  if (data->content)
+    g_byte_array_free (data->content, TRUE);
+  g_object_unref (data->file);
+  g_free (data);
+}
+
+static void
+get_contents_close_callback (GObject *obj,
+			     GAsyncResult *close_res,
+			     gpointer user_data)
+{
+  GInputStream *stream = G_INPUT_STREAM (obj);
+  GetContentsData *data = user_data;
+  GSimpleAsyncResult *res;
+
+  /* Ignore errors here, we're only reading anyway */
+  g_input_stream_close_finish (stream, close_res, NULL);
+
+  res = g_simple_async_result_new (G_OBJECT (data->file),
+				   data->callback,
+				   data->user_data,
+				   g_file_get_contents_async);
+  g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)get_contents_data_free);
+  g_simple_async_result_complete (res);
+}
+
+static void
+get_contents_read_callback (GObject *obj,
+			    GAsyncResult *read_res,
+			    gpointer user_data)
+{
+  GInputStream *stream = G_INPUT_STREAM (obj);
+  GetContentsData *data = user_data;
+  GError *error = NULL;
+  gssize read_size;
+
+  read_size = g_input_stream_read_finish (stream, read_res, &error);
+
+  if (read_size <= 0) 
+    {
+      /* Error or EOF, close the file */
+      if (read_size < 0)
+	data->error = error;
+      g_input_stream_close_async (stream, 0,
+				  data->cancellable,
+				  get_contents_close_callback, data);
+    }
+  else if (read_size > 0)
+    {
+      data->pos += read_size;
+      
+      g_byte_array_set_size (data->content,
+			     data->pos + GET_CONTENT_BLOCK_SIZE);
+      g_input_stream_read_async (stream,
+				 data->content->data + data->pos,
+				 GET_CONTENT_BLOCK_SIZE,
+				 0,
+				 data->cancellable,
+				 get_contents_read_callback,
+				 data);
+    }
+}
+
+static void
+get_contents_open_callback (GObject *obj,
+			    GAsyncResult *open_res,
+			    gpointer user_data)
+{
+  GFile *file = G_FILE (obj);
+  GFileInputStream *stream;
+  GetContentsData *data = user_data;
+  GError *error = NULL;
+  GSimpleAsyncResult *res;
+
+  stream = g_file_read_finish (file, open_res, &error);
+
+  if (stream)
+    {
+      g_byte_array_set_size (data->content,
+			     data->pos + GET_CONTENT_BLOCK_SIZE);
+      g_input_stream_read_async (G_INPUT_STREAM (stream),
+				 data->content->data + data->pos,
+				 GET_CONTENT_BLOCK_SIZE,
+				 0,
+				 data->cancellable,
+				 get_contents_read_callback,
+				 data);
+      
+    }
+  else
+    {
+      res = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+						  data->callback,
+						  data->user_data,
+						  error);
+      g_simple_async_result_complete (res);
+      g_error_free (error);
+      get_contents_data_free (data);
+    }
+}
+
+void
+g_file_get_contents_async (GFile                *file,
+			   GCancellable         *cancellable,
+			   GAsyncReadyCallback   callback,
+			   gpointer              user_data)
+{
+  GetContentsData *data;
+
+  data = g_new0 (GetContentsData, 1);
+
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+  data->callback = callback;
+  data->user_data = user_data;
+  data->content = g_byte_array_new ();
+  data->file = g_object_ref (file);
+
+  g_file_read_async (file,
+		     0,
+		     cancellable,
+		     get_contents_open_callback,
+		     data);
+}
+
+gboolean
+g_file_get_contents_finish (GFile                *file,
+			    GAsyncResult         *res,
+			    gchar               **contents,
+			    gsize                *length,
+			    GError              **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GetContentsData *data;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+  
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_get_contents_async);
+  
+  data = g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (data->error)
+    {
+      g_propagate_error (error, data->error);
+      data->error = NULL;
+      *contents = NULL;
+      if (length)
+	*length = 0;
+      return FALSE;
+    }
+
+  if (length)
+    *length = data->pos;
+
+  /* Zero terminate */
+  g_byte_array_set_size (data->content,
+			 data->pos + 1);
+  data->content->data[data->pos] = 0;
+  
+  *contents = (gchar *)g_byte_array_free (data->content, FALSE);
+  data->content = NULL;
+
+  return TRUE;
+}
+
