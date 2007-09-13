@@ -36,6 +36,28 @@ AC_SUBST(GETTEXT_PACKAGE)
 
 AM_GLIB_GNU_GETTEXT
 
+dnl ****************************
+dnl *** Check for libselinux ***
+dnl ****************************
+AC_ARG_ENABLE(selinux, [  --disable-selinux       build without selinux support])
+msg_selinux=no
+SELINUX_LIBS=
+if test "x$enable_selinux" != "xno"; then
+
+ AC_CHECK_LIB(selinux, is_selinux_enabled,
+   [AC_CHECK_HEADERS(selinux/selinux.h,
+     [AC_SEARCH_LIBS(lgetfilecon_raw, selinux, 
+       [AC_DEFINE(HAVE_SELINUX, 1, [Define to 1 if libselinux is available])
+        SELINUX_LIBS="-lselinux"
+        msg_selinux=yes])
+     ])
+   ])
+fi
+AC_SUBST(SELINUX_LIBS)
+
+dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
+AC_DEFINE(_GNU_SOURCE, 1, [Enable GNU Extensions])
+		
 dnl ==========================================================================
 dnl Turn on the additional warnings last, so -Werror doesn't affect other tests.
 
