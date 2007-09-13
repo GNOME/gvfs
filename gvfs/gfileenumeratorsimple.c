@@ -21,7 +21,6 @@ struct _GFileEnumeratorSimple
   char *filename;
   GFileInfoRequestFlags requested;
   char *attributes;
-  gboolean wants_attributes;
   gboolean follow_symlinks;
 };
 
@@ -78,7 +77,6 @@ g_file_enumerator_simple_new (const char *filename,
   simple->filename = g_strdup (filename);
   simple->requested = requested;
   simple->matcher = g_file_attribute_matcher_new (attributes);
-  simple->wants_attributes = attributes != NULL;
   simple->follow_symlinks = follow_symlinks;
   
   return G_FILE_ENUMERATOR (simple);
@@ -102,6 +100,8 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   const char *filename;
   char *path;
   GFileInfo *info;
+  gboolean res;
+  GError *my_error = NULL;
   
   if (!g_file_enumerator_simple_open_dir (simple, error))
     return NULL;
@@ -115,39 +115,32 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   info = g_file_info_new ();
   g_file_info_set_name (info, filename);
   
-  /* Avoid stat in trivial case */
-  if (simple->requested != G_FILE_INFO_NAME || simple->wants_attributes)
+  path = g_build_filename (simple->filename, filename, NULL);
+  res = g_file_info_simple_get (filename, path, info,
+				simple->requested,
+				simple->matcher,
+				simple->follow_symlinks,
+				&my_error); 
+  g_free (path);
+  
+  if (!res)
     {
-      gboolean res;
-      GError *my_error = NULL;
+      /* Failed to get info */
       
-      path = g_build_filename (simple->filename, filename, NULL);
-      res = g_file_info_simple_get (filename, path, info,
-				    simple->requested,
-				    simple->matcher,
-				    simple->follow_symlinks,
-				    &my_error); 
-      g_free (path);
+      g_object_unref (info);
+      info = NULL;
       
-      if (!res)
+      /* If the file does not exist there might have been a race where
+       * the file was removed between the readdir and the stat, so we
+       * ignore the file. */
+      if (my_error->domain == G_FILE_ERROR &&
+	  my_error->code == G_FILE_ERROR_NOENT)
 	{
-	  /* Failed to get info */
-	  
-	  g_object_unref (info);
-	  info = NULL;
-	  
-	  /* If the file does not exist there might have been a race where
-	   * the file was removed between the readdir and the stat, so we
-	   * ignore the file. */
-	  if (my_error->domain == G_FILE_ERROR &&
-	      my_error->code == G_FILE_ERROR_NOENT)
-	    {
-	      g_error_free (my_error);
-	      goto next_file;
-	    }
-	  else
-	    g_propagate_error (error, my_error);
+	  g_error_free (my_error);
+	  goto next_file;
 	}
+      else
+	g_propagate_error (error, my_error);
     }
 
   return info;

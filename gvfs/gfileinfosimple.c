@@ -212,6 +212,11 @@ g_file_info_simple_get (const char *basename,
 			  basename != NULL &&
 			  basename[0] == '.');
 
+
+  /* Avoid stat in trivial case */
+  if ((requested & ~(G_FILE_INFO_NAME|G_FILE_INFO_IS_HIDDEN)) == 0 ||
+      attribute_matcher == NULL)
+    return TRUE;
   
   if (follow_symlinks)
     res = stat (path, &statbuf);
