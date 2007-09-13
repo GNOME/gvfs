@@ -157,13 +157,13 @@ g_filter_output_stream_dispose (GObject *object)
 
   stream = G_FILTER_OUTPUT_STREAM (object);
 
+  G_OBJECT_CLASS (g_filter_output_stream_parent_class)->dispose (object);
+  
   if (stream->base_stream)
     {
       g_object_unref (stream->base_stream);
       stream->base_stream = NULL;
     }
-
-  G_OBJECT_CLASS (g_filter_output_stream_parent_class)->dispose (object);
 }
 
 
