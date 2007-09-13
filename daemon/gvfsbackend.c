@@ -42,6 +42,7 @@ struct _GVfsBackendPrivate
   
   char *display_name;
   char *icon;
+  char *prefered_filename_encoding;
   GMountSpec *mount_spec;
 };
 
@@ -112,6 +113,8 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->object_path);
   
   g_free (backend->priv->display_name);
+  g_free (backend->priv->icon);
+  g_free (backend->priv->prefered_filename_encoding);
   if (backend->priv->mount_spec)
     g_mount_spec_unref (backend->priv->mount_spec);
   
@@ -159,6 +162,7 @@ g_vfs_backend_init (GVfsBackend *backend)
 {
   backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_VFS_TYPE_BACKEND, GVfsBackendPrivate);
   backend->priv->icon = g_strdup ("");
+  backend->priv->prefered_filename_encoding = g_strdup ("");
   backend->priv->display_name = g_strdup ("");
 }
 
@@ -241,6 +245,14 @@ g_vfs_backend_set_icon (GVfsBackend *backend,
 {
   g_free (backend->priv->icon);
   backend->priv->display_name = g_strdup (icon);
+}
+
+void
+g_vfs_backend_set_prefered_filename_encoding (GVfsBackend  *backend,
+					      const char *prefered_filename_encoding)
+{
+  g_free (backend->priv->prefered_filename_encoding);
+  backend->priv->display_name = g_strdup (prefered_filename_encoding);
 }
 
 void
@@ -367,6 +379,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   if (!dbus_message_append_args (message,
 				 DBUS_TYPE_STRING, &backend->priv->display_name,
 				 DBUS_TYPE_STRING, &backend->priv->icon,
+				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
 				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
 				 0))
     _g_dbus_oom ();

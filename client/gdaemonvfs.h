@@ -23,6 +23,7 @@ typedef struct {
   char *dbus_id;
   char *object_path;
   GMountSpec *spec;
+  char *prefered_filename_encoding; /* NULL -> UTF8 */
 } GMountRef;
 
 typedef void (*GMountRefLookupCallback) (GMountRef *mount_ref,

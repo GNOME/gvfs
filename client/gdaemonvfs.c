@@ -25,7 +25,6 @@ struct _GDaemonVfs
   GVfs *wrapped_vfs;
   GList *mount_cache;
 
-
   GHashTable *from_uri_hash;
   GHashTable *to_uri_hash;
 };
@@ -278,13 +277,14 @@ _g_mount_ref_unref (GMountRef *ref)
       g_free (ref->dbus_id);
       g_free (ref->object_path);
       g_mount_spec_unref (ref->spec);
+      g_free (ref->prefered_filename_encoding);
       g_free (ref);
     }
 }
 
 const char *
 _g_mount_ref_resolve_path (GMountRef *ref,
-			    const char *path)
+			   const char *path)
 {
   const char *new_path;
   
@@ -343,7 +343,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
   DBusError derror;
   GMountRef *ref;
   DBusMessageIter iter, struct_iter;
-  const char *display_name, *icon, *obj_path, *dbus_id;
+  const char *display_name, *icon, *obj_path, *dbus_id, *prefered_filename_encoding;
   GMountSpec *mount_spec;
   GList *l;
 
@@ -359,6 +359,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
 				      &derror,
 				      DBUS_TYPE_STRING, &display_name,
 				      DBUS_TYPE_STRING, &icon,
+				      DBUS_TYPE_STRING, &prefered_filename_encoding,
 				      DBUS_TYPE_STRING, &dbus_id,
 				      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      0))
@@ -401,6 +402,8 @@ handler_lookup_mount_reply (DBusMessage *reply,
       ref->dbus_id = g_strdup (dbus_id);
       ref->object_path = g_strdup (obj_path);
       ref->spec = g_mount_spec_ref (mount_spec);
+      if (*prefered_filename_encoding != NULL)
+	ref->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
 
       the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, ref);
     }

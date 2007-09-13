@@ -289,19 +289,18 @@ void  g_vfs_register_backend       (GType               backend_type,
 				    const char         *type);
 GType g_vfs_lookup_backend         (const char         *type);
 
-void        g_vfs_backend_set_display_name (GVfsBackend        *backend,
-					    const char         *display_name);
-void        g_vfs_backend_set_icon         (GVfsBackend        *backend,
-					    const char         *icon);
-void        g_vfs_backend_set_mount_spec   (GVfsBackend        *backend,
-					    GMountSpec         *mount_spec);
-void        g_vfs_backend_register_mount   (GVfsBackend        *backend,
-					    GAsyncDBusCallback  callback,
-					    gpointer            user_data);
-const char *g_vfs_backend_get_backend_type (GVfsBackend        *backend);
-
-
-
+void        g_vfs_backend_set_display_name               (GVfsBackend        *backend,
+							  const char         *display_name);
+void        g_vfs_backend_set_icon                       (GVfsBackend        *backend,
+							  const char         *icon);
+void        g_vfs_backend_set_prefered_filename_encoding (GVfsBackend        *backend,
+							  const char         *prefered_filename_encoding);
+void        g_vfs_backend_set_mount_spec                 (GVfsBackend        *backend,
+							  GMountSpec         *mount_spec);
+void        g_vfs_backend_register_mount                 (GVfsBackend        *backend,
+							  GAsyncDBusCallback  callback,
+							  gpointer            user_data);
+const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);
 
 G_END_DECLS
 

@@ -14,6 +14,7 @@
 typedef struct {
   char *display_name;
   char *icon;
+  char *prefered_filename_encoding;
 
   /* Daemon object ref */
   char *dbus_id;
@@ -112,6 +113,7 @@ vfs_mount_free (VfsMount *mount)
 {
   g_free (mount->display_name);
   g_free (mount->icon);
+  g_free (mount->prefered_filename_encoding);
   g_free (mount->dbus_id);
   g_free (mount->object_path);
   g_mount_spec_unref (mount->mount_spec);
@@ -130,6 +132,7 @@ vfs_mount_to_dbus (VfsMount *mount,
 					 DBUS_TYPE_STRING_AS_STRING
 					 DBUS_TYPE_STRING_AS_STRING
 					 DBUS_TYPE_STRING_AS_STRING
+					 DBUS_TYPE_STRING_AS_STRING
 					 DBUS_TYPE_OBJECT_PATH_AS_STRING
 					 G_MOUNT_SPEC_TYPE_AS_STRING,
 					 &struct_iter))
@@ -144,6 +147,11 @@ vfs_mount_to_dbus (VfsMount *mount,
   if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_STRING,
 				       &mount->icon))
+    _g_dbus_oom ();
+	      
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &mount->prefered_filename_encoding))
     _g_dbus_oom ();
 	      
   if (!dbus_message_iter_append_basic (&struct_iter,
@@ -498,7 +506,7 @@ register_mount (DBusConnection *connection,
   VfsMount *mount;
   DBusMessage *reply;
   DBusError error;
-  const char *display_name, *icon, *obj_path, *id;
+  const char *display_name, *icon, *obj_path, *id, *prefered_filename_encoding;
   DBusMessageIter iter;
   GMountSpec *mount_spec;
 
@@ -511,6 +519,7 @@ register_mount (DBusConnection *connection,
 				     &error,
 				     DBUS_TYPE_STRING, &display_name,
 				     DBUS_TYPE_STRING, &icon,
+				     DBUS_TYPE_STRING, &prefered_filename_encoding,
 				     DBUS_TYPE_OBJECT_PATH, &obj_path,
 				     0))
     {
@@ -531,6 +540,7 @@ register_mount (DBusConnection *connection,
 	  mount = g_new0 (VfsMount, 1);
 	  mount->display_name = g_strdup (display_name);
 	  mount->icon = g_strdup (icon);
+	  mount->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
 	  mount->dbus_id = g_strdup (id);
 	  mount->object_path = g_strdup (obj_path);
 	  mount->mount_spec = mount_spec;
@@ -686,6 +696,7 @@ list_mounts (DBusConnection *connection,
   if (!dbus_message_iter_open_container (&iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
