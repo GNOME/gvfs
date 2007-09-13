@@ -61,7 +61,7 @@ static void
 g_local_file_class_init (GLocalFileClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  
+
   gobject_class->finalize = g_local_file_finalize;
 }
 
@@ -721,13 +721,6 @@ g_local_file_set_attribute (GFile *file,
 					   error);
 }
 
-static gboolean (*chained_set_attributes_from_info) (GFile *file,
-						     GFileInfo *info,
-						     GFileGetInfoFlags flags,
-						     GCancellable *cancellable,
-						     GError **error);
-
-
 static gboolean
 g_local_file_set_attributes_from_info (GFile *file,
 				       GFileInfo *info,
@@ -737,6 +730,7 @@ g_local_file_set_attributes_from_info (GFile *file,
 {
   GLocalFile *local = G_LOCAL_FILE (file);
   int res, chained_res;
+  GFileIface* default_iface;
 
   res = _g_local_file_info_set_attributes (local->filename,
 					   info, flags, 
@@ -746,7 +740,9 @@ g_local_file_set_attributes_from_info (GFile *file,
   if (!res)
     error = NULL; /* Don't write over error if further errors */
 
-  chained_res = (chained_set_attributes_from_info) (file, info, flags, cancellable, error);
+  default_iface = g_type_default_interface_peek (G_TYPE_FILE);
+
+  chained_res = (default_iface->set_attributes_from_info) (file, info, flags, cancellable, error);
   
   return res && chained_res;
 }
@@ -1528,7 +1524,6 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->query_settable_attributes = g_local_file_query_settable_attributes;
   iface->query_writable_namespaces = g_local_file_query_writable_namespaces;
   iface->set_attribute = g_local_file_set_attribute;
-  chained_set_attributes_from_info = iface->set_attributes_from_info;
   iface->set_attributes_from_info = g_local_file_set_attributes_from_info;
   iface->read = g_local_file_read;
   iface->append_to = g_local_file_append_to;
