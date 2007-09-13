@@ -897,12 +897,28 @@ g_daemon_file_mount_mountable (GFile               *file,
 			       GAsyncReadyCallback  callback,
 			       gpointer             user_data)
 {
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+  
+  mount_source = g_mount_operation_dbus_wrap (mount_operation);
+  
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+
+  if (mount_operation)
+    g_object_ref (mount_operation);
+  
   do_async_path_call (file,
 		      G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE,
 		      cancellable,
 		      callback, user_data,
-		      mount_mountable_async_cb, NULL, NULL,
+		      mount_mountable_async_cb,
+		      mount_operation, mount_operation ? g_object_unref : NULL,
+		      DBUS_TYPE_STRING, &dbus_id,
+		      DBUS_TYPE_OBJECT_PATH, &obj_path,
 		      0);
+
+  g_object_unref (mount_source);
 }
 
 static GFile *
@@ -991,10 +1007,7 @@ g_daemon_file_mount_for_location (GFile *location,
   g_mount_spec_to_dbus (&iter, spec);
   g_mount_spec_unref (spec);
 
-  if (mount_operation)
-    mount_source = g_mount_operation_dbus_wrap (mount_operation);
-  else
-    mount_source = g_mount_source_new_dummy ();
+  mount_source = g_mount_operation_dbus_wrap (mount_operation);
   g_mount_source_to_dbus (mount_source, message);
   g_object_unref (mount_source);
 

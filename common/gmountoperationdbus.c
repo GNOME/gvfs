@@ -53,6 +53,9 @@ g_mount_operation_dbus_wrap (GMountOperation *op)
     mount_op_message_function
   };
 
+  if (op == NULL)
+    return g_mount_source_new_dummy ();
+  
   op_dbus = g_new0 (GMountOperationDBus, 1);
   
   op_dbus->op = op;
