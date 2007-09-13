@@ -94,6 +94,6 @@ main (int argc, char **argv)
   res = TRUE;
   res &= test_memory_input_stream ();
 
-  return res;
+  return res ? 0 : -1;
 }
 
