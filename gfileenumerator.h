@@ -62,7 +62,6 @@ struct _GFileEnumeratorClass
   guint      (*next_files_async) (GFileEnumerator        *enumerator,
 				  int                     num_files,
 				  int                     io_priority,
-				  GMainContext           *context,
 				  GAsyncNextFilesCallback callback,
 				  gpointer                data,
 				  GDestroyNotify          notify);
@@ -73,23 +72,20 @@ struct _GFileEnumeratorClass
 
 GType g_file_enumerator_get_type (void) G_GNUC_CONST;
 
-GFileInfo *g_file_enumerator_next_file               (GFileEnumerator          *enumerator,
-						      GError                  **error);
-void       g_file_enumerator_stop                    (GFileEnumerator          *enumerator);
-guint      g_file_enumerator_request_next_files      (GFileEnumerator          *enumerator,
-						      int                       num_files,
-						      GAsyncNextFilesCallback   callback,
-						      gpointer                  data,
-						      GDestroyNotify            notify);
-guint      g_file_enumerator_request_next_files_full (GFileEnumerator          *enumerator,
-						      int                       num_files,
-						      int                       io_priority,
-						      GMainContext             *context,
-						      GAsyncNextFilesCallback   callback,
-						      gpointer                  data,
-						      GDestroyNotify            notify);
-void       g_file_enumerator_cancel                  (GFileEnumerator          *enumerator,
-						      guint                     tag);
+GFileInfo *   g_file_enumerator_next_file          (GFileEnumerator          *enumerator,
+						    GError                  **error);
+void          g_file_enumerator_stop               (GFileEnumerator          *enumerator);
+void          g_file_enumerator_set_async_context  (GFileEnumerator          *enumerator,
+						    GMainContext             *context);
+GMainContext *g_file_enumerator_get_async_context  (GFileEnumerator          *enumerator);
+guint         g_file_enumerator_request_next_files (GFileEnumerator          *enumerator,
+						    int                       num_files,
+						    int                       io_priority,
+						    GAsyncNextFilesCallback   callback,
+						    gpointer                  data,
+						    GDestroyNotify            notify);
+void          g_file_enumerator_cancel             (GFileEnumerator          *enumerator,
+						    guint                     tag);
 
 G_END_DECLS
 

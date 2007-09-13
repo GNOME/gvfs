@@ -7,6 +7,7 @@ G_DEFINE_TYPE (GFileEnumerator, g_file_enumerator, G_TYPE_OBJECT);
 struct _GFileEnumeratorPrivate {
   /* TODO: Should be public for subclasses? */
   guint stopped : 1;
+  GMainContext *context;
 };
 
 static void
@@ -18,6 +19,12 @@ g_file_enumerator_finalize (GObject *object)
   
   if (!enumerator->priv->stopped)
     g_file_enumerator_stop (enumerator);
+
+  if (enumerator->priv->context)
+    {
+      g_main_context_unref (enumerator->priv->context);
+      enumerator->priv->context = NULL;
+    }
   
   if (G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize) (object);
@@ -105,11 +112,61 @@ g_file_enumerator_stop (GFileEnumerator *enumerator)
 }
 
 /**
- * g_file_enumerator_next_files_async_full:
+ * g_file_enumerator_set_async_context:
+ * @enumerator: A #GFileEnumerator.
+ * @context: a #GMainContext (if %NULL, the default context will be used)
+ *
+ * Set the mainloop @context to be used for asynchronous i/o.
+ * If not set, or if set to %NULL the default context will be used.
+ **/
+void
+g_file_enumerator_set_async_context (GFileEnumerator *enumerator,
+				     GMainContext *context)
+{
+  g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
+  g_return_if_fail (enumerator != NULL);
+  
+  if (enumerator->priv->context)
+    g_main_context_unref (enumerator->priv->context);
+  
+  enumerator->priv->context = context;
+  
+  if (context)
+    g_main_context_ref (context);
+}
+  
+/**
+ * g_file_enumerator_get_async_context:
+ * @enumerator: A #GFileEnumerator.
+ *
+ * Returns the mainloop used for async operation on this enumerator.
+ * If you implement a enumerator you have to look at this to know what
+ * context to use for async i/o.
+ *
+ * The context is set by the user by calling g_file_enumerator_set_async_context().
+ *
+ * Return value: A #GMainContext
+ **/
+GMainContext *
+g_file_enumerator_get_async_context (GFileEnumerator *enumerator)
+{
+  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), NULL);
+  g_return_val_if_fail (enumerator != NULL, NULL);
+
+  if (enumerator->priv->context == NULL)
+    {
+      enumerator->priv->context = g_main_context_default ();
+      g_main_context_ref (enumerator->priv->context);
+    }
+  
+  return enumerator->priv->context;
+}
+
+/**
+ * g_file_enumerator_next_files_async:
  * @enumerator: a #GFileEnumerator.
  * @num_file: the number of file info objects to request
  * @io_priority: the io priority of the request
- * @context: a #GMainContext (if %NULL, the default context will be used)
  * @callback: callback to call when the request is satisfied
  * @data: the data to pass to callback function
  * @notify: a function to call when @data is no longer in use, or %NULL.
@@ -134,13 +191,12 @@ g_file_enumerator_stop (GFileEnumerator *enumerator)
  * Return value: A tag that can be passed to g_file_enumerator_cancel()
  **/
 guint
-g_file_enumerator_next_files_async_full (GFileEnumerator        *enumerator,
-					 int                     num_files,
-					 int                     io_priority,
-					 GMainContext           *context,
-					 GAsyncNextFilesCallback callback,
-					 gpointer                data,
-					 GDestroyNotify          notify)
+g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
+				    int                     num_files,
+				    int                     io_priority,
+				    GAsyncNextFilesCallback callback,
+				    gpointer                data,
+				    GDestroyNotify          notify)
 {
   GFileEnumeratorClass *class;
 
@@ -150,39 +206,7 @@ g_file_enumerator_next_files_async_full (GFileEnumerator        *enumerator,
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
   
   return (* class->next_files_async) (enumerator, num_files, io_priority, 
-				      context, callback, data, notify);
-}
-
-/**
- * g_file_enumerator_next_files_async:
- * @enumerator: a #GFileEnumerator.
- * @num_file: the number of file info objects to request
- * @callback: callback to call when the request is satisfied
- * @data: the data to pass to callback function
- * @notify: a function to call when @data is no longer in use, or %NULL.
- *
- * Request information for a number of files from the enumerator asynchronously.
- * Uses the default priority and main context. For more details see
- * g_file_enumerator_request_next_files_full().
- *
- * Return value: A tag that can be passed to g_file_enumerator_cancel()
- **/
-guint
-g_file_enumerator_next_files_async (GFileEnumerator         *enumerator,
-				    int                      num_files,
-				    GAsyncNextFilesCallback  callback,
-				    gpointer                 data,
-				    GDestroyNotify           notify)
-{
-  GFileEnumeratorClass *class;
-  
-  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), 0);
-  g_return_val_if_fail (enumerator != NULL, 0);
-  
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
-  
-  return (* class->next_files_async) (enumerator, num_files, G_PRIORITY_DEFAULT,
-				      NULL, callback, data, notify);
+				      callback, data, notify);
 }
 
 /**
