@@ -13,6 +13,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include "gvfserror.h"
+#include "gseekable.h"
 #include "gunixfileinputstream.h"
 #include "gvfsunixdbus.h"
 #include "gfileinfosimple.h"
@@ -21,8 +22,6 @@
 #include <daemon/gvfsdaemonprotocol.h>
 
 #define MAX_READ_SIZE (4*1024*1024)
-
-G_DEFINE_TYPE (GUnixFileInputStream, g_unix_file_input_stream, G_TYPE_FILE_INPUT_STREAM);
 
 typedef enum {
   READ_STATE_INIT = 0,
@@ -49,14 +48,14 @@ typedef enum {
 
 typedef struct {
   ReadState state;
-  
+
   /* Input */
   char *buffer;
   gsize buffer_size;
   /* Output */
   gssize ret_val;
   GError *ret_error;
-
+  
   gboolean cancelled;
   gboolean sent_cancel;
   
@@ -81,7 +80,11 @@ struct _GUnixFileInputStreamPrivate {
   int fd;
   int seek_generation;
   guint32 seq_nr;
- 
+  goffset current_offset;
+
+  guint can_seek : 1;
+  guint can_truncate : 1;
+  
   InputState input_state;
   gsize input_block_size;
   int input_block_seek_generation;
@@ -90,6 +93,7 @@ struct _GUnixFileInputStreamPrivate {
   GString *output_buffer;
 };
 
+static void g_unix_file_input_stream_seekable_iface_init (GSeekableIface *iface);
 static gssize     g_unix_file_input_stream_read          (GInputStream           *stream,
 							  void                   *buffer,
 							  gsize                   count,
@@ -107,6 +111,23 @@ static GFileInfo *g_unix_file_input_stream_get_file_info (GFileInputStream      
 							  char                   *attributes,
 							  GCancellable           *cancellable,
 							  GError                **error);
+static goffset    g_unix_file_input_stream_tell          (GSeekable              *seekable);
+static gboolean   g_unix_file_input_stream_can_seek      (GSeekable              *seekable);
+static gboolean   g_unix_file_input_stream_seek          (GSeekable              *seekable,
+							  goffset                 offset,
+							  GSeekType               type,
+							  GCancellable           *cancellable,
+							  GError                **error);
+static gboolean   g_unix_file_input_stream_can_truncate  (GSeekable              *seekable);
+static gboolean   g_unix_file_input_stream_truncate      (GSeekable              *seekable,
+							  goffset                 offset,
+							  GCancellable           *cancellable,
+							  GError                **error);
+
+G_DEFINE_TYPE_WITH_CODE (GUnixFileInputStream, g_unix_file_input_stream,
+			 G_TYPE_FILE_INPUT_STREAM,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
+						g_unix_file_input_stream_seekable_iface_init))
 
 static void
 g_unix_file_input_stream_finalize (GObject *object)
@@ -142,6 +163,16 @@ g_unix_file_input_stream_class_init (GUnixFileInputStreamClass *klass)
   stream_class->skip = g_unix_file_input_stream_skip;
   stream_class->close = g_unix_file_input_stream_close;
   file_stream_class->get_file_info = g_unix_file_input_stream_get_file_info;
+}
+
+static void
+g_unix_file_input_stream_seekable_iface_init (GSeekableIface *iface)
+{
+  iface->tell = g_unix_file_input_stream_tell;
+  iface->can_seek = g_unix_file_input_stream_can_seek;
+  iface->seek = g_unix_file_input_stream_seek;
+  iface->can_truncate = g_unix_file_input_stream_can_truncate;
+  iface->truncate = g_unix_file_input_stream_truncate;
 }
 
 static void
@@ -217,6 +248,8 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   DBusMessage *message, *reply;
   DBusMessageIter iter;
   guint32 fd_id;
+  dbus_bool_t can_seek, can_truncate;
+  
 
   if (file->priv->fd != -1)
     return TRUE;
@@ -235,7 +268,7 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   if (!_g_dbus_message_iter_append_filename (&iter, file->priv->filename))
     {
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOMEM,
-		   "Out of memory");
+		   _("Out of memory"));
       return FALSE;
     }
       
@@ -250,12 +283,15 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
       return FALSE;
     }
 
-  /* No args in reply, only fd */
   dbus_message_get_args (message, NULL,
                          DBUS_TYPE_UINT32, &fd_id,
+                         DBUS_TYPE_BOOLEAN, &can_seek,
+                         DBUS_TYPE_BOOLEAN, &can_truncate,
                          DBUS_TYPE_INVALID);
   /* TODO: verify fd id */
   file->priv->fd = receive_fd (extra_fd);
+  file->priv->can_seek = can_seek;
+  file->priv->can_truncate = can_truncate;
   
   file->priv->command_stream = g_socket_output_stream_new (file->priv->fd, FALSE);
   file->priv->data_stream = g_socket_input_stream_new (file->priv->fd, TRUE);
@@ -649,6 +685,9 @@ g_unix_file_input_stream_read (GInputStream *stream,
 
   if (op.ret_val == -1)
     g_propagate_error (error, op.ret_error);
+  else
+    file->priv->current_offset += op.ret_val;
+  
   return op.ret_val;
 }
 
@@ -689,6 +728,93 @@ g_unix_file_input_stream_close (GInputStream *stream,
     }
   
   return g_input_stream_close (file->priv->data_stream, NULL, error);
+}
+
+static goffset
+g_unix_file_input_stream_tell (GSeekable  *seekable)
+{
+  GUnixFileInputStream *file;
+
+  file = G_UNIX_FILE_INPUT_STREAM (seekable);
+  
+  return file->priv->current_offset;
+}
+
+static gboolean
+g_unix_file_input_stream_can_seek (GSeekable  *seekable)
+{
+  GUnixFileInputStream *file;
+
+  file = G_UNIX_FILE_INPUT_STREAM (seekable);
+
+  if (!g_unix_file_input_stream_open (file, NULL))
+    return FALSE;
+
+  return file->priv->can_seek;
+}
+
+static gboolean
+g_unix_file_input_stream_seek (GSeekable  *seekable,
+			       goffset     offset,
+			       GSeekType   type,
+			       GCancellable  *cancellable,
+			       GError    **error)
+{
+  GUnixFileInputStream *file;
+
+  file = G_UNIX_FILE_INPUT_STREAM (seekable);
+
+  if (!g_unix_file_input_stream_open (file, error))
+    return -1;
+
+  if (!file->priv->can_seek)
+    {
+      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+		   _("Seek not supported on stream"));
+      return FALSE;
+    }
+
+  /* TODO: implement seek */
+  return TRUE;
+}
+
+static gboolean
+g_unix_file_input_stream_can_truncate (GSeekable  *seekable)
+{
+  GUnixFileInputStream *file;
+
+  file = G_UNIX_FILE_INPUT_STREAM (seekable);
+
+  if (!g_unix_file_input_stream_open (file, NULL))
+    return FALSE;
+
+  return file->priv->can_seek;
+}
+
+static gboolean
+g_unix_file_input_stream_truncate (GSeekable  *seekable,
+				   goffset     offset,
+				   GCancellable  *cancellable,
+				   GError    **error)
+{
+  GUnixFileInputStream *file;
+
+  file = G_UNIX_FILE_INPUT_STREAM (seekable);
+
+  if (!g_unix_file_input_stream_open (file, error))
+    return -1;
+
+  if (!file->priv->can_truncate)
+    {
+      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+		   _("Truncate not supported on stream"));
+      return FALSE;
+    }
+
+  /* TODO: implement truncate */
+  
+  return TRUE;
+
 }
 
 static GFileInfo *
