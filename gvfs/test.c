@@ -65,18 +65,20 @@ test_out ()
 }
 
 static void
-test_sync (char *filename, gboolean dump)
+test_sync (char *uri, gboolean dump)
 {
   GInputStream *in;
   GFile *file;
   char buffer[1025];
   gssize res;
   gboolean close_res;
+
+  g_print ("> test_sync %s\n", uri);
   
-  file = g_file_get_for_path (filename);
+  file = g_file_get_for_uri (uri);
   in = (GInputStream *)g_file_read (file, NULL, NULL);
   if (in == NULL)
-    return;
+    goto out;
 
   while (1)
     {
@@ -100,6 +102,22 @@ test_sync (char *filename, gboolean dump)
 
   if (!dump)
     g_print ("close res: %d\n", close_res);
+
+ out:
+  g_print ("< test_sync\n");
+}
+
+typedef struct {
+  char *buffer;
+  GCancellable *c;
+} AsyncData;
+
+static void
+async_data_free (gpointer _data)
+{
+  AsyncData *data = _data;
+  g_object_unref (data->c);
+  g_free (data);
 }
 
 static void
@@ -109,6 +127,8 @@ close_done (GInputStream *stream,
 	    GError       *error)
 {
   g_print ("close result: %d\n", result);
+  if (!result)
+    g_print ("Close error %d: %s\n", error->code, error->message);
 }
 
 static void
@@ -116,38 +136,39 @@ read_done (GInputStream *stream,
 	   void         *buffer,
 	   gsize         count_requested,
 	   gssize        count_read,
-	   gpointer      data,
+	   gpointer      _data,
 	   GError       *error)
 {
+  AsyncData *data = _data;
   g_print ("count_read: %d\n", count_read);
   if (count_read == -1)
     g_print ("Error %d: %s\n", error->code, error->message);
 
   if (count_read > 0)
     {
-      g_input_stream_read_async (stream, buffer, 1024, 0, read_done, buffer, NULL, NULL);
-      //g_input_stream_cancel (stream);
+      g_input_stream_read_async (stream, data->buffer, 1024, 0, read_done, data, NULL, data->c);
+      //g_cancellable_cancel (data->c);
     }
   else
-    g_input_stream_close_async (stream, 0, close_done, buffer, g_free, NULL);
+    g_input_stream_close_async (stream, 0, close_done, data, async_data_free, data->c);
 }
 
-
 static void
-test_async (char *filename, gboolean dump)
+test_async (char *uri, gboolean dump)
 {
   GInputStream *in;
   GFile *file;
-  char *buffer;
+  AsyncData *data = g_new0 (AsyncData, 1);
 
-  buffer = g_malloc (1025);
+  data->buffer = g_malloc (1025);
+  data->c = g_cancellable_new ();
 
-  file = g_file_get_for_path (filename);
+  file = g_file_get_for_uri (uri);
   in = (GInputStream *)g_file_read (file, NULL, NULL);
   if (in == NULL)
     return;
   
-  g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL, NULL);
+  g_input_stream_read_async (in, data->buffer, 1024, 0, read_done, data, NULL, data->c);
 }
 
 static gboolean
@@ -232,11 +253,12 @@ main (int argc, char *argv[])
   g_type_init ();
   g_thread_init (NULL);
 
-  test_seek ();
+  if (0)
+    test_seek ();
   
   loop = g_main_loop_new (NULL, FALSE);
 
-  if (1) {
+  if (0) {
     GInputStream *s;
     char *buffer;
     gssize res;
@@ -266,10 +288,10 @@ main (int argc, char *argv[])
   
   file = g_file_get_for_path ("/tmp");
 
-  if (1) test_sync ("/etc/passwd", FALSE);
-  if (1) test_async ("/etc/passwd", TRUE);
+  if (0) test_sync ("foo:///etc/passwd", FALSE);
+  if (1) test_async ("foo:///etc/passwd", TRUE);
 
-  test_out ();
+  if (0) test_out ();
 
   g_main_loop_run (loop);
   
