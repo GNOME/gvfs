@@ -7,6 +7,7 @@
 #include "gdaemonvolumemonitor.h"
 #include "gdaemonvolume.h"
 #include "gdaemonfile.h"
+#include "gio/gthemedicon.h"
 
 struct _GDaemonVolume {
   GObject     parent;
@@ -81,12 +82,12 @@ g_daemon_volume_get_root (GVolume *volume)
   return g_daemon_file_new (daemon_volume->mount_info->mount_spec, "/");
 }
 
-static char *
+static GIcon *
 g_daemon_volume_get_icon (GVolume *volume)
 {
   GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
 
-  return g_strdup (daemon_volume->mount_info->icon);
+  return g_themed_icon_new (daemon_volume->mount_info->icon);
 }
 
 static char *
