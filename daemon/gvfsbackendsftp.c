@@ -62,11 +62,15 @@ struct _GVfsBackendSftp
   GInputStream *reply_stream;
   GDataInputStream *error_stream;
 
+  guint32 current_id;
+  
   /* Output Queue */
+  
   gsize command_bytes_written;
   GList *command_queue;
   
   /* Reply reading: */
+  GHashTable *expected_replies;
   guint32 reply_size;
   guint32 reply_size_read;
   guint8 *reply;
@@ -75,6 +79,10 @@ struct _GVfsBackendSftp
   int mount_try;
   gboolean mount_try_again;
 };
+
+typedef void (*ReplyCallback) (GVfsBackendSftp *backend,
+			       GDataInputStream *data,
+			       guint32 len);
 
 G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
 
@@ -126,6 +134,17 @@ g_vfs_backend_sftp_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_SFTP (object);
 
+  g_hash_table_destroy (backend->expected_replies);
+  
+  if (backend->command_stream)
+    g_object_unref (backend->command_stream);
+  
+  if (backend->reply_stream)
+    g_object_unref (backend->reply_stream);
+  
+  if (backend->error_stream)
+    g_object_unref (backend->error_stream);
+  
   if (G_OBJECT_CLASS (g_vfs_backend_sftp_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_sftp_parent_class)->finalize) (object);
 }
@@ -133,8 +152,8 @@ g_vfs_backend_sftp_finalize (GObject *object)
 static void
 g_vfs_backend_sftp_init (GVfsBackendSftp *backend)
 {
+  backend->expected_replies = g_hash_table_new (NULL, NULL);
 }
-
 
 static void
 look_for_stderr_errors (GVfsBackend *backend, GError **error)
@@ -602,6 +621,8 @@ read_reply_async_got_data  (GObject *source_object,
   GVfsBackendSftp *backend = user_data;
   gssize res;
   GDataInputStream *reply;
+  ReplyCallback callback;
+  guint32 id;
 
   res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, NULL);
 
@@ -625,8 +646,17 @@ read_reply_async_got_data  (GObject *source_object,
   reply = make_reply_stream (backend->reply, backend->reply_size);
   backend->reply = NULL;
 
-  /* TODO: Handle the reply */
-  g_print ("Got reply of size %d\n", backend->reply_size);
+  id = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  
+  callback = g_hash_table_lookup (backend->expected_replies, GINT_TO_POINTER (id));
+  if (callback)
+    {
+      callback (backend, reply, backend->reply_size);
+      
+      g_hash_table_remove (backend->expected_replies, GINT_TO_POINTER (id));
+    }
+  else
+    g_warning ("Got unhandled reply of size %d\n", backend->reply_size);
 
   g_object_unref (reply);
 
@@ -737,6 +767,14 @@ send_command (GVfsBackendSftp *backend)
 			       NULL,
 			       send_command_data,
 			       backend);
+}
+
+static void
+expect_reply (GVfsBackendSftp *backend,
+	      guint32 id,
+	      ReplyCallback callback)
+{
+  g_hash_table_insert (backend->expected_replies, GINT_TO_POINTER (id), callback);
 }
 
 static void
