@@ -13,6 +13,7 @@
 #include <glib/gi18n.h>
 #include <dbus-gmain.h>
 #include <gvfsreadstream.h>
+#include <gvfs/gsocketinputstream.h>
 
 G_DEFINE_TYPE (GVfsReadStream, g_vfs_read_stream, G_TYPE_OBJECT);
 
@@ -29,11 +30,12 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 struct _GVfsReadStreamPrivate
 {
-  int fd;
+  GInputStream *command_stream;
   int remote_fd;
   
   gpointer data; /* user data, i.e. GVfsHandle */
   GVfsJob *job;
+  char buffer[8];
 };
 
 static void
@@ -43,8 +45,9 @@ g_vfs_read_stream_finalize (GObject *object)
 
   read_stream = G_VFS_READ_STREAM (object);
   
-  if (read_stream->priv->fd != -1)
-    close (read_stream->priv->fd);
+  if (read_stream->priv->command_stream)
+    g_object_unref (read_stream->priv->command_stream);
+  read_stream->priv->command_stream = NULL;
   
   if (read_stream->priv->remote_fd != -1)
     close (read_stream->priv->remote_fd);
@@ -61,7 +64,6 @@ g_vfs_read_stream_class_init (GVfsReadStreamClass *klass)
   g_type_class_add_private (klass, sizeof (GVfsReadStreamPrivate));
   
   gobject_class->finalize = g_vfs_read_stream_finalize;
-
 
   signals[NEW_JOB] =
     g_signal_new ("new_job",
@@ -80,26 +82,20 @@ g_vfs_read_stream_init (GVfsReadStream *stream)
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream,
 					      G_TYPE_VFS_READ_STREAM,
 					      GVfsReadStreamPrivate);
-  stream->priv->fd = -1;
   stream->priv->remote_fd = -1;
 }
 
-
 static void
-set_fd_nonblocking (int fd)
+command_read_cb (GInputStream *stream,
+		 void         *buffer,
+		 gsize         count_requested,
+		 gssize        count_read,
+		 gpointer      data,
+		 GError       *error)
 {
-  glong fcntl_flags;
-
-  fcntl_flags = fcntl (fd, F_GETFL);
-
-#ifdef O_NONBLOCK
-  fcntl_flags |= O_NONBLOCK;
-#else
-  fcntl_flags |= O_NDELAY;
-#endif
-
-  fcntl (fd, F_SETFL, fcntl_flags);
+  g_print ("command_read_cb: %d\n", count_read);
 }
+
 
 GVfsReadStream *
 g_vfs_read_stream_new (GError **error)
@@ -118,10 +114,16 @@ g_vfs_read_stream_new (GError **error)
     }
 
   stream = g_object_new (G_TYPE_VFS_READ_STREAM, NULL);
-  stream->priv->fd = socket_fds[0];
+  stream->priv->command_stream = g_socket_input_stream_new (socket_fds[0], TRUE);
   stream->priv->remote_fd = socket_fds[1];
 
-  set_fd_nonblocking (stream->priv->fd);
+  g_input_stream_read_async (stream->priv->command_stream,
+			     stream->priv->buffer,
+			     8,
+			     0,
+			     command_read_cb,
+			     stream,
+			     NULL);
   
   return stream;
 }
