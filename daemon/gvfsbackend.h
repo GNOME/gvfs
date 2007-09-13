@@ -27,6 +27,7 @@ typedef struct _GVfsJobOpenForRead  GVfsJobOpenForRead;
 typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
 typedef struct _GVfsJobRead         GVfsJobRead;
+typedef struct _GVfsJobOpenForWrite GVfsJobOpenForWrite;
 typedef struct _GVfsJobGetInfo      GVfsJobGetInfo;
 typedef struct _GVfsJobEnumerate    GVfsJobEnumerate;
 
@@ -93,6 +94,12 @@ struct _GVfsBackendClass
 				 GVfsBackendHandle handle,
 				 goffset    offset,
 				 GSeekType  type);
+  gboolean (*try_create)        (GVfsBackend *backend,
+				 GVfsJobOpenForWrite *job,
+				 const char *filename);
+  void     (*create)            (GVfsBackend *backend,
+				 GVfsJobOpenForWrite *job,
+				 const char *filename);
   void     (*get_info)          (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
 				 const char *filename,
