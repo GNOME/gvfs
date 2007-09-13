@@ -525,10 +525,19 @@ handle_overwrite_open (const char *filename,
 	  0
 	  )
 	{
-	  close (tmpfd);
-	  unlink (tmp_filename);
-	  g_free (tmp_filename);
-	  goto fallback_strategy;
+	  struct stat tmp_statbuf;
+	  
+	  /* Check that we really needed to change something */
+	  if (fstat (tmpfd, &tmp_statbuf) != 0 ||
+	      original_stat.st_uid != tmp_statbuf.st_uid ||
+	      original_stat.st_gid != tmp_statbuf.st_gid ||
+	      original_stat.st_mode != tmp_statbuf.st_mode)
+	    {
+	      close (tmpfd);
+	      unlink (tmp_filename);
+	      g_free (tmp_filename);
+	      goto fallback_strategy;
+	    }
 	}
 
       close (fd);
@@ -540,6 +549,7 @@ handle_overwrite_open (const char *filename,
 
   if (create_backup)
     {
+      struct stat tmp_statbuf;      
       char *backup_filename;
       int bfd;
       
@@ -569,12 +579,24 @@ handle_overwrite_open (const char *filename,
 	  goto err_out;
 	}
 
-      /* Try to set the group of the backup same as the
+      /* If needed, Try to set the group of the backup same as the
        * original file. If this fails, set the protection
        * bits for the group same as the protection bits for
        * others. */
 #ifdef HAVE_FCHOWN
-      if (fchown (bfd, (uid_t) -1, original_stat.st_gid) != 0)
+      if (fstat (bfd, &tmp_statbuf) != 0)
+	{
+	  g_set_error (&error,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANT_CREATE_BACKUP,
+		       _("Backup file creation failed"));
+	  unlink (backup_filename);
+	  g_free (backup_filename);
+	  goto err_out;
+	}
+      
+      if ((original_stat.st_gid != tmp_statbuf.st_gid)  &&
+	  fchown (bfd, (uid_t) -1, original_stat.st_gid) != 0)
 	{
 	  if (fchmod (bfd,
 		      (original_stat.st_mode & 0707) |
