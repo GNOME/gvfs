@@ -12,9 +12,9 @@ add get_file_info_async for FileStreams
 Add async opens to GFile.
 More GFile operations (rename, move, copy, etc)
 
-add volume/drive GFile types and ops on them (mount/unmount/eject)
+Implement the rest of the mountable GFile ops
 
-Add helper functions for reading/writing a whole file.
+Add helper function for writing a whole file.
 
 test outputstream (especially replace + backup) (and test everything else too)
 
@@ -28,8 +28,6 @@ implement get_file_info for GFileInputStreamDaemon
 
 implement seeks in local streams
 
-pass cancellable to async callbacks?
-
 remove owners from bus_name_map when they fail
 
 smb support for xattrs!
@@ -40,21 +38,18 @@ is-slow marking for e.g. thumbnailing?
 
 add trash support
 
-Add info to mountpoints in smb-browser
-
 Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
 
-modularize uri handling
 decide how to handle not-mounted errors
 handle mounting
 mount daemons should re-register when new owner for vfs daemon
 
 remove dbus-gmain.[ch]? We have no server integration in common/ atm
 
-handle setting xattrs
+handle setting xattrs on local files
 handle non-ascii/utf8 xattr names by escaping
 
-fs info - type, free space, total space
+add fs info ops - type, free space, total space
 Do this via g_file_get_fs_info -> GFileInfo method?
 
 HAL implementation of VolumeMonitor
