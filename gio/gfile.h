@@ -76,8 +76,7 @@ struct _GFileIface
 					     GError              **error);
   gboolean            (*set_attribute)      (GFile                *file,
 					     const char           *attribute,
-					     GFileAttributeType    type,
-					     gconstpointer         data,
+					     const GFileAttributeValue *value,
 					     GFileGetInfoFlags     flags,
 					     GCancellable         *cancellable,
 					     GError              **error);
@@ -262,8 +261,7 @@ gboolean           g_file_make_symbolic_link         (GFile                  *fi
 						      GError                **error);
 gboolean           g_file_set_attribute              (GFile                  *file,
 						      const char             *attribute,
-						      GFileAttributeType      type,
-						      gconstpointer           value_ptr,
+						      const GFileAttributeValue *value,
 						      GFileGetInfoFlags       flags,
 						      GCancellable           *cancellable,
 						      GError                **error);
@@ -287,7 +285,7 @@ gboolean           g_file_set_attribute_uint32       (GFile                  *fi
 						      GError                **error);
 gboolean           g_file_set_attribute_int32        (GFile                  *file,
 						      const char             *attribute,
-						      const char             *value,
+						      gint32                  value,
 						      GFileGetInfoFlags       flags,
 						      GCancellable           *cancellable,
 						      GError                **error);

@@ -777,8 +777,7 @@ g_file_set_display_name (GFile                  *file,
 gboolean
 g_file_set_attribute (GFile                  *file,
 		      const char             *attribute,
-		      GFileAttributeType      type,
-		      gconstpointer           value,
+		      const GFileAttributeValue    *value,
 		      GFileGetInfoFlags       flags,
 		      GCancellable           *cancellable,
 		      GError                **error)
@@ -796,7 +795,7 @@ g_file_set_attribute (GFile                  *file,
   
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->set_attribute) (file, attribute, type, value, flags, cancellable, error);
+  return (* iface->set_attribute) (file, attribute, value, flags, cancellable, error);
 }
 
 gboolean
@@ -807,9 +806,10 @@ g_file_set_attribute_string (GFile                  *file,
 			     GCancellable           *cancellable,
 			     GError                **error)
 {
-  return g_file_set_attribute (file, attribute,
-			       G_FILE_ATTRIBUTE_TYPE_STRING,
-			       value, flags, cancellable, error);
+  GFileAttributeValue v;
+  v.type = G_FILE_ATTRIBUTE_TYPE_STRING;
+  v.u.string = (char *)value;
+  return g_file_set_attribute (file, attribute, &v, flags, cancellable, error);
 }
 
 gboolean
@@ -820,9 +820,10 @@ g_file_set_attribute_byte_string  (GFile                  *file,
 				   GCancellable           *cancellable,
 				   GError                **error)
 {
-  return g_file_set_attribute (file, attribute,
-			       G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
-			       value, flags, cancellable, error);
+  GFileAttributeValue v;
+  v.type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
+  v.u.string = (char *)value;
+  return g_file_set_attribute (file, attribute, &v, flags, cancellable, error);
 }
 
 gboolean
@@ -833,22 +834,24 @@ g_file_set_attribute_uint32 (GFile                  *file,
 			     GCancellable           *cancellable,
 			     GError                **error)
 {
-  return g_file_set_attribute (file, attribute,
-			       G_FILE_ATTRIBUTE_TYPE_UINT32,
-			       &value, flags, cancellable, error);
+  GFileAttributeValue v;
+  v.type = G_FILE_ATTRIBUTE_TYPE_UINT32;
+  v.u.uint32 = value;
+  return g_file_set_attribute (file, attribute, &v, flags, cancellable, error);
 }
 
 gboolean
 g_file_set_attribute_int32 (GFile                  *file,
 			    const char             *attribute,
-			    const char             *value,
+			    gint32                  value,
 			    GFileGetInfoFlags       flags,
 			    GCancellable           *cancellable,
 			    GError                **error)
 {
-  return g_file_set_attribute (file, attribute,
-			       G_FILE_ATTRIBUTE_TYPE_INT32,
-			       &value, flags, cancellable, error);
+  GFileAttributeValue v;
+  v.type = G_FILE_ATTRIBUTE_TYPE_INT32;
+  v.u.int32 = value;
+  return g_file_set_attribute (file, attribute, &v, flags, cancellable, error);
 }
 
 gboolean
@@ -858,10 +861,11 @@ g_file_set_attribute_uint64 (GFile                  *file,
 			     GFileGetInfoFlags       flags,
 			     GCancellable           *cancellable,
 			     GError                **error)
-{
-  return g_file_set_attribute (file, attribute,
-			       G_FILE_ATTRIBUTE_TYPE_UINT64,
-			       &value, flags, cancellable, error);
+ {
+  GFileAttributeValue v;
+  v.type = G_FILE_ATTRIBUTE_TYPE_UINT64;
+  v.u.uint64 = value;
+  return g_file_set_attribute (file, attribute, &v, flags, cancellable, error);
 }
 
 gboolean
@@ -872,9 +876,10 @@ g_file_set_attribute_int64 (GFile                  *file,
 			    GCancellable           *cancellable,
 			    GError                **error)
 {
-  return g_file_set_attribute (file, attribute,
-			       G_FILE_ATTRIBUTE_TYPE_INT64,
-			       &value, flags, cancellable, error);
+ GFileAttributeValue v;
+  v.type = G_FILE_ATTRIBUTE_TYPE_INT64;
+  v.u.int64 = value;
+  return g_file_set_attribute (file, attribute, &v, flags, cancellable, error);
 }
 
 void

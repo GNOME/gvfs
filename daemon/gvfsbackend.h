@@ -260,15 +260,13 @@ struct _GVfsBackendClass
 				 GVfsJobSetAttribute *set_attribute,
 				 const char *filename,
 				 const char *attribute,
-				 GFileAttributeType type,
-				 gconstpointer value_ptr,
+				 GFileAttributeValue *value,
 				 GFileGetInfoFlags flags);
   gboolean (*try_set_attribute) (GVfsBackend *backend,
 				 GVfsJobSetAttribute *set_attribute,
 				 const char *filename,
 				 const char *attribute,
-				 GFileAttributeType type,
-				 gconstpointer value_ptr,
+				 GFileAttributeValue *value,
 				 GFileGetInfoFlags flags);
 };
 

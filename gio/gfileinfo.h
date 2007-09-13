@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <gio/giotypes.h>
+#include <gio/gfileattribute.h>
 #include <gio/gicon.h>
 
 G_BEGIN_DECLS
@@ -27,17 +28,6 @@ typedef enum {
   G_FILE_TYPE_SHORTCUT,
   G_FILE_TYPE_MOUNTABLE
 } GFileType;
-
-typedef enum {
-  G_FILE_ATTRIBUTE_TYPE_INVALID = 0,
-  G_FILE_ATTRIBUTE_TYPE_STRING,
-  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
-  G_FILE_ATTRIBUTE_TYPE_UINT32,
-  G_FILE_ATTRIBUTE_TYPE_INT32,
-  G_FILE_ATTRIBUTE_TYPE_UINT64,
-  G_FILE_ATTRIBUTE_TYPE_INT64,
-  G_FILE_ATTRIBUTE_TYPE_OBJECT
-} GFileAttributeType;
 
 typedef enum {
   G_FILE_FLAG_HIDDEN  = (1<<0),
@@ -134,7 +124,7 @@ GFileAttributeType g_file_info_get_attribute_type        (GFileInfo  *info,
 							  const char *attribute);
 void               g_file_info_remove_attribute          (GFileInfo  *info,
 							  const char *attribute);
-char *             g_file_info_get_attribute_as_string   (GFileInfo  *info,
+const GFileAttributeValue * g_file_info_get_attribute         (GFileInfo  *info,
 							  const char *attribute);
 const char *       g_file_info_get_attribute_string      (GFileInfo  *info,
 							  const char *attribute);
@@ -150,6 +140,10 @@ gint64             g_file_info_get_attribute_int64       (GFileInfo  *info,
 							  const char *attribute);
 GObject *          g_file_info_get_attribute_object      (GFileInfo  *info,
 							  const char *attribute);
+
+void               g_file_info_set_attribute             (GFileInfo  *info,
+							  const char *attribute,
+							  const GFileAttributeValue *value);
 void               g_file_info_set_attribute_string      (GFileInfo  *info,
 							  const char *attribute,
 							  const char *value);

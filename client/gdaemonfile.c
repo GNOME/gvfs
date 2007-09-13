@@ -1333,8 +1333,7 @@ g_daemon_file_make_symbolic_link (GFile *file,
 static gboolean
 g_daemon_file_set_attribute (GFile *file,
 			     const char *attribute,
-			     GFileAttributeType type,
-			     gconstpointer value_ptr,
+			     const GFileAttributeValue *value,
 			     GFileGetInfoFlags flags,
 			     GCancellable *cancellable,
 			     GError **error)
@@ -1357,7 +1356,7 @@ g_daemon_file_set_attribute (GFile *file,
 				  DBUS_TYPE_UINT32,
 				  &flags_dbus);
 
-  _g_dbus_append_file_attribute (&iter, attribute, type, value_ptr);
+  _g_dbus_append_file_attribute (&iter, attribute, value);
 
   reply = _g_vfs_daemon_call_sync (message,
 				   NULL,

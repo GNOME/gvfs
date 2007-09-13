@@ -76,6 +76,8 @@ static void
 show_attributes (GFileInfo *info)
 {
   char **attributes;
+  const GFileAttributeValue *value;
+  char *s;
   int i;
   
   attributes = g_file_info_list_attributes (info, NULL);
@@ -83,10 +85,10 @@ show_attributes (GFileInfo *info)
   g_print ("attributes:\n");
   for (i = 0; attributes[i] != NULL; i++)
     {
-      char *value;
-      value = g_file_info_get_attribute_as_string (info, attributes[i]);
-      g_print ("  %s: %s\n", attributes[i], value);
-      g_free (value);
+      value = g_file_info_get_attribute (info, attributes[i]);
+      s = g_file_attribute_value_as_string (value);
+      g_print ("  %s: %s\n", attributes[i], s);
+      g_free (s);
     }
   g_strfreev (attributes);
 }

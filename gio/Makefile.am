@@ -99,6 +99,7 @@ libgio_la_SOURCES = 	\
 	gfile.c \
 	gfileenumerator.c \
 	gfileicon.c \
+	gfileattribute.c \
 	gfileinfo.c \
 	gfileinputstream.c \
 	gfilemonitor.c \
@@ -167,6 +168,7 @@ gvfsinclude_HEADERS = \
 	gfile.h \
 	gfileenumerator.h \
 	gfileicon.h \
+	gfileattribute.h \
 	gfileinfo.h \
 	gfileinputstream.h \
 	gfilemonitor.h \

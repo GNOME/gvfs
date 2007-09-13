@@ -74,23 +74,6 @@ G_BEGIN_DECLS
 /* Normal ops are faster, one minute timeout */
 #define G_VFS_DBUS_TIMEOUT_MSECS (1000*60)
 
-typedef struct
-{
-  union
-    {
-      guint32 v_uint32;
-      gint32 v_int32;
-      guint64 v_uint64;
-      gint64 v_int64;
-      gchar *v_str;
-      GObject *v_obj;
-    }
-  v;
-
-  guint32 obj_type;
-}
-GFileAttributeValue;
-
 typedef struct {
   guint32 command;
   guint32 seq_nr;
@@ -148,19 +131,17 @@ typedef struct {
   DBUS_STRUCT_END_CHAR_AS_STRING 
 
 
-gchar     *_g_dbus_type_from_file_attribute_type (GFileAttributeType     type);
-void       _g_dbus_append_file_attribute         (DBusMessageIter       *iter,
-						  const char            *attribute,
-						  GFileAttributeType     type,
-						  gconstpointer          value);
-void       _g_dbus_append_file_info              (DBusMessageIter       *iter,
-						  GFileInfo             *file_info);
-gboolean   _g_dbus_get_file_attribute            (DBusMessageIter       *iter,
-						  gchar                **attribute,
-						  GFileAttributeType    *type,
-						  GFileAttributeValue   *value);
-GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter       *iter,
-						  GError               **error);
+gchar     *_g_dbus_type_from_file_attribute_type (GFileAttributeType          type);
+void       _g_dbus_append_file_attribute         (DBusMessageIter            *iter,
+						  const char                 *attribute,
+						  const GFileAttributeValue  *value);
+void       _g_dbus_append_file_info              (DBusMessageIter            *iter,
+						  GFileInfo                  *file_info);
+gboolean   _g_dbus_get_file_attribute            (DBusMessageIter            *iter,
+						  gchar                     **attribute,
+						  GFileAttributeValue        *value);
+GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter            *iter,
+						  GError                    **error);
 
 G_END_DECLS
 

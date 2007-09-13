@@ -605,38 +605,36 @@ g_local_file_get_info (GFile                *file,
 }
 
 static gboolean
-get_uint32 (GFileAttributeType type,
-	    gconstpointer value,
+get_uint32 (const GFileAttributeValue *value,
 	    guint32 *val_out,
 	    GError **error)
 {
-  if (type != G_FILE_ATTRIBUTE_TYPE_UINT32)
+  if (value->type != G_FILE_ATTRIBUTE_TYPE_UINT32)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Invalid attribute type (uint32 expected)"));
       return FALSE;
     }
 
-  *val_out = *(guint32 *)value;
+  *val_out = value->u.uint32;
   
   return TRUE;
 }
 
 #if defined(HAVE_SYMLINK)
 static gboolean
-get_byte_string (GFileAttributeType type,
-		 gconstpointer value,
+get_byte_string (const GFileAttributeValue *value,
 		 const char **val_out,
 		 GError **error)
 {
-  if (type != G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
+  if (value->type != G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Invalid attribute type (byte string expected)"));
       return FALSE;
     }
 
-  *val_out = (const char *)value;
+  *val_out = value->u.string;
   
   return TRUE;
 }
@@ -645,8 +643,7 @@ get_byte_string (GFileAttributeType type,
 static gboolean
 g_local_file_set_attribute (GFile *file,
 			    const char *attribute,
-			    GFileAttributeType type,
-			    gconstpointer value,
+			    const GFileAttributeValue *value,
 			    GFileGetInfoFlags flags,
 			    GCancellable *cancellable,
 			    GError **error)
@@ -657,7 +654,7 @@ g_local_file_set_attribute (GFile *file,
     {
       guint32 val;
 
-      if (!get_uint32 (type, value, &val, error))
+      if (!get_uint32 (value, &val, error))
 	  return FALSE;
 
       if (g_chmod (local->filename, val) == -1)
@@ -676,7 +673,7 @@ g_local_file_set_attribute (GFile *file,
       int res;
       guint32 val;
 
-      if (!get_uint32 (type, value, &val, error))
+      if (!get_uint32 (value, &val, error))
 	  return FALSE;
 
       if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
@@ -701,7 +698,7 @@ g_local_file_set_attribute (GFile *file,
       int res;
       guint32 val;
 
-      if (!get_uint32 (type, value, &val, error))
+      if (!get_uint32 (value, &val, error))
 	  return FALSE;
 
       if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
@@ -726,7 +723,7 @@ g_local_file_set_attribute (GFile *file,
       const char *val;
       struct stat statbuf;
 
-      if (!get_byte_string (type, value, &val, error))
+      if (!get_byte_string (value, &val, error))
 	  return FALSE;
       
       

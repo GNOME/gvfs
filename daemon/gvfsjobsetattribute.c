@@ -30,6 +30,7 @@ g_vfs_job_set_attribute_finalize (GObject *object)
 
   g_free (job->filename);
   g_free (job->attribute);
+  g_file_attribute_value_destroy (&job->value);
   
   if (G_OBJECT_CLASS (g_vfs_job_set_attribute_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_set_attribute_parent_class)->finalize) (object);
@@ -51,12 +52,13 @@ g_vfs_job_set_attribute_class_init (GVfsJobSetAttributeClass *klass)
 static void
 g_vfs_job_set_attribute_init (GVfsJobSetAttribute *job)
 {
+  job->value.type = G_FILE_ATTRIBUTE_TYPE_INVALID;
 }
 
 GVfsJob *
 g_vfs_job_set_attribute_new (DBusConnection *connection,
-			DBusMessage *message,
-			GVfsBackend *backend)
+			     DBusMessage *message,
+			     GVfsBackend *backend)
 {
   GVfsJobSetAttribute *job;
   DBusMessage *reply;
@@ -64,8 +66,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   DBusError derror;
   const gchar *filename = NULL;
   gint filename_len;
-  GFileAttributeType type;
-  GFileAttributeValue value;
+  GFileAttributeValue value = G_FILE_ATTRIBUTE_VALUE_INIT;
   GFileGetInfoFlags flags;
   gchar *attribute;
   dbus_uint32_t flags_u32 = 0;
@@ -91,7 +92,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
 
   flags = flags_u32;
 
-  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, &type, &value)))
+  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, &value)))
     {
       reply = dbus_message_new_error (message,
 				      DBUS_ERROR_FAILED,
@@ -110,7 +111,6 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   job->backend = backend;
   job->filename = g_strndup (filename, filename_len);
   job->attribute = attribute;
-  job->type = type;
   job->value = value;
   job->flags = flags;
 
@@ -134,7 +134,6 @@ run (GVfsJob *job)
 			op_job,
 			op_job->filename,
 			op_job->attribute,
-			op_job->type,
 			&op_job->value,
 			op_job->flags);
 }
@@ -152,7 +151,6 @@ try (GVfsJob *job)
 				   op_job,
 				   op_job->filename,
 				   op_job->attribute,
-				   op_job->type,
 				   &op_job->value,
 				   op_job->flags);
 }
