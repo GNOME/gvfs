@@ -64,7 +64,7 @@ g_content_type_equals (const char *type1,
   g_return_val_if_fail (type1 != NULL, FALSE);
   g_return_val_if_fail (type2 != NULL, FALSE);
 
-  if (strcmp (type1, type2) == 0)
+  if (g_ascii_strcasecmp (type1, type2) == 0)
     return TRUE;
 
   res = FALSE;
