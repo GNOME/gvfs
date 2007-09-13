@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdio.h>
 #include <sys/un.h>
 #include <errno.h>
 
@@ -16,6 +17,11 @@ typedef struct {
   DBusConnection *bus;
   GHashTable *connections;
 } ThreadLocalConnections;
+
+typedef struct {
+  int extra_fd;
+  int extra_fd_count;
+} VfsConnectionData;
 
 static gint32 vfs_data_slot = -1;
 
@@ -178,15 +184,77 @@ daemon_socket_connect (const char *address, GError **error)
 }
 
 static void
-close_wrapper (gpointer p)
+connection_data_free (gpointer p)
 {
-  close (GPOINTER_TO_INT (p));
+  VfsConnectionData *data = p;
+  
+  close (data->extra_fd);
+  g_free (data);
 }
+
+
+/* receive a file descriptor over file descriptor fd */
+static int 
+receive_fd (int connection_fd)
+{
+  struct msghdr msg;
+  struct iovec iov;
+  char buf[1];
+  int rv;
+  char ccmsg[CMSG_SPACE (sizeof(int))];
+  struct cmsghdr *cmsg;
+
+  iov.iov_base = buf;
+  iov.iov_len = 1;
+  msg.msg_name = 0;
+  msg.msg_namelen = 0;
+  msg.msg_iov = &iov;
+  msg.msg_iovlen = 1;
+  msg.msg_control = ccmsg;
+  msg.msg_controllen = sizeof (ccmsg);
+  
+  rv = recvmsg (connection_fd, &msg, 0);
+  if (rv == -1) 
+    {
+      perror ("recvmsg");
+      return -1;
+    }
+
+  cmsg = CMSG_FIRSTHDR (&msg);
+  if (!cmsg->cmsg_type == SCM_RIGHTS) {
+    g_warning("got control message of unknown type %d", 
+	      cmsg->cmsg_type);
+    return -1;
+  }
+
+  return *(int*)CMSG_DATA(cmsg);
+}
+
+int
+_g_dbus_connection_get_fd_sync (DBusConnection *connection,
+				int fd_id)
+{
+  VfsConnectionData *data;
+  int fd;
+
+  data = dbus_connection_get_data (connection , vfs_data_slot);
+
+  /* I don't think we can get reorders here, can we?
+   * Its a sync per-thread connection after all
+   */
+  g_assert (fd_id == data->extra_fd_count);
+  
+  fd = receive_fd (data->extra_fd);
+  if (fd != -1)
+    data->extra_fd_count++;
+
+  return fd;
+}
+
 
 DBusConnection *
 _g_vfs_daemon_get_connection_sync (const char *mountpoint,
-				 gint *fd,
-				 GError **error)
+				   GError **error)
 {
   static GOnce once_init = G_ONCE_INIT;
   ThreadLocalConnections *local;
@@ -196,6 +264,7 @@ _g_vfs_daemon_get_connection_sync (const char *mountpoint,
   GString *bus_name;
   char *address1, *address2;
   int extra_fd;
+  VfsConnectionData *connection_data;
 
   g_once (&once_init, vfs_dbus_init, NULL);
 
@@ -210,11 +279,7 @@ _g_vfs_daemon_get_connection_sync (const char *mountpoint,
   
   connection = g_hash_table_lookup (local->connections, mountpoint);
   if (connection != NULL)
-    {
-      if (fd)
-	*fd = GPOINTER_TO_INT (dbus_connection_get_data (connection , vfs_data_slot));
-      return connection;
-    }
+    return connection;
   
   if (local->bus == NULL)
     {
@@ -278,14 +343,15 @@ _g_vfs_daemon_get_connection_sync (const char *mountpoint,
     }
   dbus_message_unref (reply);
 
-  if (!dbus_connection_set_data (connection, vfs_data_slot, GINT_TO_POINTER (extra_fd), close_wrapper))
+  connection_data = g_new (VfsConnectionData, 1);
+  connection_data->extra_fd = extra_fd;
+  connection_data->extra_fd_count = 0;
+
+  if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
     g_error ("Out of memory");
 
   g_hash_table_insert (local->connections, g_strdup (mountpoint), connection);
 
-  if (fd)
-    *fd = extra_fd;
-  
   return connection;
 }
 

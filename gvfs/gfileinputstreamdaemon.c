@@ -202,7 +202,7 @@ g_file_input_stream_daemon_init (GFileInputStreamDaemon *info)
 
 GFileInputStream *
 g_file_input_stream_daemon_new (const char *filename,
-			      const char *mountpoint)
+				const char *mountpoint)
 {
   GFileInputStreamDaemon *stream;
 
@@ -215,50 +215,13 @@ g_file_input_stream_daemon_new (const char *filename,
   return G_FILE_INPUT_STREAM (stream);
 }
 
-/* receive a file descriptor over file descriptor fd */
-static int 
-receive_fd (int connection_fd)
-{
-  struct msghdr msg;
-  struct iovec iov;
-  char buf[1];
-  int rv;
-  char ccmsg[CMSG_SPACE (sizeof(int))];
-  struct cmsghdr *cmsg;
-
-  iov.iov_base = buf;
-  iov.iov_len = 1;
-  msg.msg_name = 0;
-  msg.msg_namelen = 0;
-  msg.msg_iov = &iov;
-  msg.msg_iovlen = 1;
-  msg.msg_control = ccmsg;
-  msg.msg_controllen = sizeof (ccmsg);
-  
-  rv = recvmsg (connection_fd, &msg, 0);
-  if (rv == -1) 
-    {
-      perror ("recvmsg");
-      return -1;
-    }
-
-  cmsg = CMSG_FIRSTHDR (&msg);
-  if (!cmsg->cmsg_type == SCM_RIGHTS) {
-    g_warning("got control message of unknown type %d", 
-	      cmsg->cmsg_type);
-    return -1;
-  }
-
-  return *(int*)CMSG_DATA(cmsg);
-}
-
 static gboolean
 g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
 				 GError **error)
 {
   DBusConnection *connection;
   DBusError derror;
-  int extra_fd;
+  int fd;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
   guint32 fd_id;
@@ -268,7 +231,7 @@ g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
   if (file->priv->fd != -1)
     return TRUE;
 
-  connection = _g_vfs_daemon_get_connection_sync (file->priv->mountpoint, &extra_fd, error);
+  connection = _g_vfs_daemon_get_connection_sync (file->priv->mountpoint, error);
   if (connection == NULL)
     return FALSE;
 
@@ -309,9 +272,16 @@ g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
     }
   
   dbus_message_unref (reply);
-      
-  /* TODO: verify fd id */
-  file->priv->fd = receive_fd (extra_fd);
+
+  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Error in stream protocol: %s"), _("Didn't get stream file descriptor"));
+      return FALSE;
+    }
+  
+  file->priv->fd = fd;
   file->priv->can_seek = can_seek;
   
   file->priv->command_stream = g_output_stream_socket_new (file->priv->fd, FALSE);
