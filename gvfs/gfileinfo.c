@@ -346,8 +346,8 @@ g_file_info_set_symlink_target (GFileInfo *info,
 }
   
 void
-g_file_set_access_rights (GFileInfo *info,
-			  GFileAccessRights access_rights)
+g_file_info_set_access_rights (GFileInfo *info,
+			       GFileAccessRights access_rights)
 {
   info->priv->access_rights = access_rights;
 }
