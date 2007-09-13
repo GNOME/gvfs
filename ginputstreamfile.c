@@ -82,16 +82,6 @@ g_input_stream_file_new (const char *filename)
   return G_INPUT_STREAM (stream);
 }
 
-int
-g_input_stream_file_get_fd (GInputStream *stream)
-{
-  GInputStreamFile *file;
-  
-  file = G_INPUT_STREAM_FILE (stream);
-  
-  return file->priv->fd;
-}
-
 static gboolean
 g_input_stream_file_open (GInputStreamFile *file,
 			  GError      **error)

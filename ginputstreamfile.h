@@ -32,7 +32,6 @@ struct _GInputStreamFileClass
 GType g_input_stream_file_get_type (void) G_GNUC_CONST;
 
 GInputStream *g_input_stream_file_new    (const char *filename);
-int           g_input_stream_file_get_fd (GInputStream *stream);
 
 G_END_DECLS
 

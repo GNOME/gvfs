@@ -10,7 +10,6 @@ G_DEFINE_TYPE (GInputStream, g_input_stream, G_TYPE_OBJECT);
 static GObjectClass *parent_class = NULL;
 
 struct _GInputStreamPrivate {
-  /* TODO: Should be public for subclasses? */
   guint closed : 1;
   guint pending : 1;
   guint cancelled : 1;
@@ -829,13 +828,9 @@ g_input_stream_cancel (GInputStream *stream)
 gboolean
 g_input_stream_is_cancelled (GInputStream *stream)
 {
-  GInputStreamClass *class;
-
   g_return_val_if_fail (G_IS_INPUT_STREAM (stream), TRUE);
   g_return_val_if_fail (stream != NULL, TRUE);
   
-  class = G_INPUT_STREAM_GET_CLASS (stream);
-
   return stream->priv->cancelled;
 }
 

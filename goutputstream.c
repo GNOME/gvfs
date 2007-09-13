@@ -10,6 +10,7 @@ struct _GOutputStreamPrivate {
   /* TODO: Should be public for subclasses? */
   guint closed : 1;
   guint pending : 1;
+  guint cancelled : 1;
   GMainContext *context;
 };
 
@@ -407,6 +408,14 @@ g_output_stream_cancel (GOutputStream   *stream,
 }
 
 
+gboolean
+g_output_stream_is_cancelled (GOutputStream *stream)
+{
+  g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), TRUE);
+  g_return_val_if_fail (stream != NULL, TRUE);
+  
+  return stream->priv->cancelled;
+}
 static guint
 g_output_stream_real_write_async (GOutputStream   *stream,
 				  void                *buffer,

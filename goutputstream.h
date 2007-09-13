@@ -64,6 +64,16 @@ struct _GOutputStreamClass
 			    GDestroyNotify       notify);
   void     (* cancel)      (GOutputStream       *stream,
 			    guint                tag);
+
+  /* Optional cancel wakeup if using default async ops */
+  void     (* cancel_sync) (GInputStream  *stream);
+
+  /* Padding for future expansion */
+  void (*_g_reserved1) (void);
+  void (*_g_reserved2) (void);
+  void (*_g_reserved3) (void);
+  void (*_g_reserved4) (void);
+  void (*_g_reserved5) (void);
 };
 
 GType g_output_stream_get_type (void) G_GNUC_CONST;
@@ -93,6 +103,8 @@ guint         g_output_stream_close_async       (GOutputStream        *stream,
 						 GDestroyNotify        notify);
 void          g_output_stream_cancel            (GOutputStream        *stream,
 						 guint                 tag);
+
+gboolean      g_output_stream_is_cancelled      (GOutputStream        *stream);
 
 
 G_END_DECLS
