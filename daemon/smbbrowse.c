@@ -163,6 +163,8 @@ main (int argc, char *argv[])
   GError *error;
   int res;
 
+  dbus_threads_init_default ();
+  
   g_thread_init (NULL);
 
   g_type_init ();

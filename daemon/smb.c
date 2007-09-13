@@ -65,6 +65,8 @@ main (int argc, char *argv[])
   GMountSpec *mount_spec;
   GError *error;
 
+  dbus_threads_init_default ();
+  
   g_thread_init (NULL);
 
   g_type_init ();

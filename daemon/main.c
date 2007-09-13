@@ -38,7 +38,9 @@ main (int argc, char *argv[])
       g_error_free (error);
       return 1;
     }
- 
+
+  dbus_threads_init_default ();
+  
   g_thread_init (NULL);
 
   g_type_init ();
