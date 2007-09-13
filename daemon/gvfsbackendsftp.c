@@ -1052,12 +1052,66 @@ get_info_reply (GVfsBackendSftp *backend,
 		GVfsJob *job)
 {
   g_print ("get_info_reply, %d\n", len);
-
+  guint32 flags;
+  GFileInfo *info;
+  
   if (reply_type == SSH_FXP_STATUS)
     {
       result_from_status (job, reply);
       return;
     }
+
+  if (reply_type != SSH_FXP_ATTRS)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+			_("Invalid reply recieved"));
+      return;
+    }
+
+  info = G_VFS_JOB_GET_INFO (job)->file_info;
+
+  flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  g_print ("attribute flags: %x\n", flags);
+  if (flags & SSH_FILEXFER_ATTR_SIZE)
+    {
+      guint64 size = g_data_input_stream_get_uint64 (reply, NULL, NULL);
+      g_file_info_set_size (info, size);
+    }
+  
+  if (flags & SSH_FILEXFER_ATTR_UIDGID)
+    {
+      guint32 v;
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, v);
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, v);
+    }
+
+  if (flags & SSH_FILEXFER_ATTR_PERMISSIONS)
+    {
+      guint32 v;
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, v);
+    }
+
+  if (flags & SSH_FILEXFER_ATTR_ACMODTIME)
+    {
+      guint32 v;
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, v);
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, v);
+    }
+  
+  if (flags & SSH_FILEXFER_ATTR_EXTENDED)
+    {
+      guint32 v;
+      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_print ("extended count: %d\n", v);
+      /* TODO: Handle more */
+    }
+
+  g_vfs_job_succeeded (job);
 }
 
 static gboolean
@@ -1076,6 +1130,8 @@ try_get_info (GVfsBackend *backend,
 				flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS ? SSH_FXP_LSTAT : SSH_FXP_STAT,
 				&id);
   put_string (command, filename);
+
+  g_print ("filename: %s\n", filename);
   
   queue_command (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
 
