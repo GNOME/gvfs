@@ -49,9 +49,6 @@ remove dbus-gmain.[ch]? We have no server integration in common/ atm
 handle setting xattrs on local files
 handle non-ascii/utf8 xattr names by escaping
 
-add fs info ops - type, free space, total space
-Do this via g_file_get_fs_info -> GFileInfo method?
-
 HAL implementation of VolumeMonitor
 
 Handle the conflicting globs (*.pcf) case and fallback to sniffing
