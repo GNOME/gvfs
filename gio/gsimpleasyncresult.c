@@ -354,3 +354,26 @@ g_simple_async_result_run_in_thread (GSimpleAsyncResult *simple,
   data->simple = g_object_ref (simple);
   g_schedule_io_job (run_in_thread, data, NULL, io_priority, cancellable);
 }
+
+void
+g_simple_async_report_error_in_idle (GObject *object,
+				     GAsyncReadyCallback callback,
+				     gpointer user_data,
+				     GQuark         domain,
+				     gint           code,
+				     const gchar   *format,
+				     ...)
+{
+  GSimpleAsyncResult *simple;
+  va_list args;
+
+  simple = g_simple_async_result_new (object,
+				      callback,
+				      user_data, NULL);
+
+  va_start (args, format);
+  g_simple_async_result_set_error_va (simple, domain, code, format, args);
+  va_end (args);
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+}

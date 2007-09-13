@@ -123,29 +123,6 @@ g_volume_can_eject (GVolume *volume)
   return (* iface->can_eject) (volume);
 }
 
-static void
-report_error (GVolume *volume,
-	      GAsyncReadyCallback callback,
-	      gpointer user_data,
-	      GQuark         domain,
-	      gint           code,
-	      const gchar   *format,
-	      ...)
-{
-  GSimpleAsyncResult *simple;
-  va_list args;
-
-  simple = g_simple_async_result_new (G_OBJECT (volume),
-				      callback,
-				      user_data, NULL);
-
-  va_start (args, format);
-  g_simple_async_result_set_error_va (simple, domain, code, format, args);
-  va_end (args);
-  g_simple_async_result_complete_in_idle (simple);
-  g_object_unref (simple);
-}
-
 void
 g_volume_unmount (GVolume *volume,
 		  GAsyncReadyCallback callback,
@@ -157,9 +134,10 @@ g_volume_unmount (GVolume *volume,
 
   if (iface->unmount == NULL)
     {
-      report_error (volume, callback, user_data,
-		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		    _("volume doesn't implement unmount"));
+      g_simple_async_report_error_in_idle (G_OBJECT (volume),
+					   callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("volume doesn't implement unmount"));
       
       return;
     }
@@ -196,9 +174,10 @@ g_volume_eject (GVolume         *volume,
 
   if (iface->unmount == NULL)
     {
-      report_error (volume, callback, user_data,
-		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		    _("volume doesn't implement unmount"));
+      g_simple_async_report_error_in_idle (G_OBJECT (volume),
+					   callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("volume doesn't implement unmount"));
       
       return;
     }

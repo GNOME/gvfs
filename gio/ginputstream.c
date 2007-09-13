@@ -424,30 +424,6 @@ async_ready_close_callback_wrapper (GObject *source_object,
   g_object_unref (stream);
 }
 
-static void
-report_error (GInputStream *stream,
-	      GAsyncReadyCallback callback,
-	      gpointer user_data,
-	      GQuark         domain,
-	      gint           code,
-	      const gchar   *format,
-	      ...)
-{
-  GSimpleAsyncResult *simple;
-  va_list args;
-
-  simple = g_simple_async_result_new (G_OBJECT (stream),
-				      callback,
-				      user_data, NULL);
-
-  va_start (args, format);
-  g_simple_async_result_set_error_va (simple, domain, code, format, args);
-  va_end (args);
-  g_simple_async_result_complete_in_idle (simple);
-  g_object_unref (simple);
-}
-
-
 /**
  * g_input_stream_read_async:
  * @stream: A #GInputStream.
@@ -510,31 +486,31 @@ g_input_stream_read_async (GInputStream        *stream,
   
   if (((gssize) count) < 0)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		    _("Too large count value passed to g_input_stream_read_async"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+					   _("Too large count value passed to g_input_stream_read_async"));
       return;
     }
 
   if (stream->priv->closed)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_CLOSED,
-		    _("Stream is already closed"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_CLOSED,
+					   _("Stream is already closed"));
       return;
     }
   
   if (stream->priv->pending)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_PENDING,
-		    _("Stream has outstanding operation"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_PENDING,
+					   _("Stream has outstanding operation"));
       return;
     }
 
@@ -630,31 +606,31 @@ g_input_stream_skip_async (GInputStream        *stream,
   
   if (((gssize) count) < 0)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		    _("Too large count value passed to g_input_stream_skip_async"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+					   _("Too large count value passed to g_input_stream_skip_async"));
       return;
     }
 
   if (stream->priv->closed)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_CLOSED,
-		    _("Stream is already closed"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_CLOSED,
+					   _("Stream is already closed"));
       return;
     }
   
   if (stream->priv->pending)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_PENDING,
-		    _("Stream has outstanding operation"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_PENDING,
+					   _("Stream has outstanding operation"));
       return;
     }
 
@@ -733,11 +709,11 @@ g_input_stream_close_async (GInputStream       *stream,
 
   if (stream->priv->pending)
     {
-      report_error (stream,
-		    callback,
-		    user_data,
-		    G_IO_ERROR, G_IO_ERROR_PENDING,
-		    _("Stream has outstanding operation"));
+      g_simple_async_report_error_in_idle (G_OBJECT (stream),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_PENDING,
+					   _("Stream has outstanding operation"));
       return;
     }
   

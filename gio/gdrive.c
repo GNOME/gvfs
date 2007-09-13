@@ -128,29 +128,6 @@ g_drive_can_eject (GDrive *drive)
   return (* iface->can_eject) (drive);
 }
 
-static void
-report_error (GDrive *drive,
-	      GAsyncReadyCallback callback,
-	      gpointer user_data,
-	      GQuark         domain,
-	      gint           code,
-	      const gchar   *format,
-	      ...)
-{
-  GSimpleAsyncResult *simple;
-  va_list args;
-
-  simple = g_simple_async_result_new (G_OBJECT (drive),
-				      callback,
-				      user_data, NULL);
-
-  va_start (args, format);
-  g_simple_async_result_set_error_va (simple, domain, code, format, args);
-  va_end (args);
-  g_simple_async_result_complete_in_idle (simple);
-  g_object_unref (simple);
-}
-
 void
 g_drive_mount (GDrive         *drive,
 	       GMountOperation *mount_operation,
@@ -163,9 +140,9 @@ g_drive_mount (GDrive         *drive,
 
   if (iface->mount == NULL)
     {
-      report_error (drive, callback, user_data,
-		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		    _("drive doesn't implement mount"));
+      g_simple_async_report_error_in_idle (G_OBJECT (drive), callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("drive doesn't implement mount"));
       
       return;
     }
@@ -202,9 +179,9 @@ g_drive_eject (GDrive         *drive,
 
   if (iface->eject == NULL)
     {
-      report_error (drive, callback, user_data,
-		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		    _("drive doesn't implement eject"));
+      g_simple_async_report_error_in_idle (G_OBJECT (drive), callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("drive doesn't implement eject"));
       
       return;
     }

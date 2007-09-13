@@ -83,6 +83,13 @@ void                g_simple_async_result_set_error_va     (GSimpleAsyncResult  
 							    const gchar             *format,
 							    va_list                  args);
 
+void g_simple_async_report_error_in_idle (GObject *object,
+					  GAsyncReadyCallback callback,
+					  gpointer user_data,
+					  GQuark         domain,
+					  gint           code,
+					  const gchar   *format,
+					  ...);
 
 G_END_DECLS
 

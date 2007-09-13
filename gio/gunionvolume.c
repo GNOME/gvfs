@@ -294,30 +294,6 @@ g_union_volume_can_eject (GVolume *volume)
   return FALSE;
 }
 
-static void
-report_error (GVolume *volume,
-	      GAsyncReadyCallback callback,
-	      gpointer user_data,
-	      GQuark         domain,
-	      gint           code,
-	      const gchar   *format,
-	      ...)
-{
-  GSimpleAsyncResult *simple;
-  va_list args;
-
-  simple = g_simple_async_result_new (G_OBJECT (volume),
-				      callback,
-				      user_data, NULL);
-
-  va_start (args, format);
-  g_simple_async_result_set_error_va (simple, domain, code, format, args);
-  va_end (args);
-  g_simple_async_result_complete_in_idle (simple);
-  g_object_unref (simple);
-}
-
-
 typedef struct {
   GVolume *union_volume;
   GVolume *child_volume;
@@ -371,9 +347,10 @@ g_union_volume_unmount (GVolume *volume,
     }
   else
     {
-      report_error (volume, callback, user_data,
-		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		    _("Operation not supported"));
+      g_simple_async_report_error_in_idle (G_OBJECT (volume),
+					   callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("Operation not supported"));
       
     }
 }
@@ -414,9 +391,10 @@ g_union_volume_eject (GVolume *volume,
     }
   else
     {
-      report_error (volume, callback, user_data,
-		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		    _("Operation not supported"));
+      g_simple_async_report_error_in_idle (G_OBJECT (volume),
+					   callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("Operation not supported"));
       
     }
 }
