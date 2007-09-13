@@ -900,7 +900,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry)
   g_file_info_set_display_name (info, entry->name_utf8);
   g_file_info_set_edit_name (info, entry->name_utf8);
   g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
-  g_file_info_set_flags (info, G_FILE_FLAG_VIRTUAL);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_VIRTUAL, TRUE);
 
   mount_spec = NULL;
   if (backend->server)

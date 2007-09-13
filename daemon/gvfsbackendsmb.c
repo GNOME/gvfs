@@ -1108,7 +1108,6 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf,
 		    GFileAttributeMatcher *matcher)
 {
   GFileType file_type;
-  GFileFlags flags;
   GTimeVal t;
 
   file_type = G_FILE_TYPE_UNKNOWN;
@@ -1167,11 +1166,9 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf,
 
   /* Libsmb sets the X bit on files to indicate some special things: */
   if ((statbuf->st_mode & S_IFDIR) == 0) {
-    flags = 0;
     
     if (statbuf->st_mode & S_IXOTH)
-      flags |= G_FILE_FLAG_HIDDEN;
-    g_file_info_set_flags (info, flags);
+      g_file_info_set_is_hidden (info, TRUE);
     
     if (statbuf->st_mode & S_IXUSR)
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, TRUE);

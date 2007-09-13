@@ -570,13 +570,10 @@ _g_local_file_info_get (const char *basename,
   struct stat statbuf;
   struct stat statbuf2;
   int res;
-  GFileFlags file_flags;
   gboolean is_symlink, symlink_broken;
 
   info = g_file_info_new ();
 
-  file_flags = G_FILE_FLAG_LOCAL;
-  
   g_file_info_set_name (info, basename);
 
   /* Avoid stat in trivial case */
@@ -603,7 +600,7 @@ _g_local_file_info_get (const char *basename,
   
   if (is_symlink)
     {
-      file_flags |= G_FILE_FLAG_SYMLINK;
+      g_file_info_set_is_symlink (info, TRUE);
 
       /* Unless NOFOLLOW was set we default to following symlinks */
       if (!(flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
@@ -622,10 +619,8 @@ _g_local_file_info_get (const char *basename,
   set_info_from_stat (info, &statbuf, attribute_matcher);
   
   if (basename != NULL && basename[0] == '.')
-    file_flags |= G_FILE_FLAG_HIDDEN;
+    g_file_info_set_is_hidden (info, TRUE);
  
-  g_file_info_set_flags (info, file_flags);
-
   if (is_symlink &&
       g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET))

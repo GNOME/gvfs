@@ -124,7 +124,7 @@ show_info (GFileInfo *info)
   size = g_file_info_get_size (info);
   g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
   
-  if (g_file_info_get_flags (info) & G_FILE_FLAG_HIDDEN)
+  if (g_file_info_get_is_hidden (info))
     g_print ("hidden\n");
   
   show_attributes (info);

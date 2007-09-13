@@ -51,7 +51,7 @@ show_info (GFileInfo *info)
   const char *name, *type;
   goffset size;
 
-  if ((g_file_info_get_flags (info) & G_FILE_FLAG_HIDDEN) && !show_hidden)
+  if ((g_file_info_get_is_hidden (info)) && !show_hidden)
     return;
   
   name = g_file_info_get_name (info);

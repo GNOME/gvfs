@@ -573,17 +573,30 @@ g_file_info_get_file_type (GFileInfo *info)
   return (GFileType)g_file_attribute_value_get_uint32 (value);
 }
 
-GFileFlags
-g_file_info_get_flags (GFileInfo *info)
+gboolean
+g_file_info_get_is_hidden (GFileInfo *info)
 {
   static guint32 attr = 0;
   GFileAttributeValue *value;
   
   if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_FLAGS);
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_IS_HIDDEN);
   
   value = g_file_info_find_value (info, attr);
-  return (GFileType)g_file_attribute_value_get_uint32 (value);
+  return (GFileType)g_file_attribute_value_get_boolean (value);
+}
+
+gboolean
+g_file_info_get_is_symlink (GFileInfo *info)
+{
+  static guint32 attr = 0;
+  GFileAttributeValue *value;
+  
+  if (attr == 0)
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_IS_SYMLINK);
+  
+  value = g_file_info_find_value (info, attr);
+  return (GFileType)g_file_attribute_value_get_boolean (value);
 }
 
 const char *
@@ -718,17 +731,31 @@ g_file_info_set_file_type (GFileInfo         *info,
 
 
 void
-g_file_info_set_flags (GFileInfo         *info,
-		       GFileFlags         flags)
+g_file_info_set_is_hidden (GFileInfo *info,
+			   gboolean   is_hidden)
 {
   static guint32 attr = 0;
   GFileAttributeValue *value;
   
   if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_FLAGS);
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_IS_HIDDEN);
   
   value = g_file_info_create_value (info, attr);
-  g_file_attribute_value_set_uint32 (value, flags);
+  g_file_attribute_value_set_boolean (value, is_hidden);
+}
+
+void
+g_file_info_set_is_symlink (GFileInfo *info,
+			    gboolean   is_symlink)
+{
+  static guint32 attr = 0;
+  GFileAttributeValue *value;
+  
+  if (attr == 0)
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_IS_SYMLINK);
+  
+  value = g_file_info_create_value (info, attr);
+  g_file_attribute_value_set_boolean (value, is_symlink);
 }
 
 void

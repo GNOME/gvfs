@@ -29,13 +29,6 @@ typedef enum {
   G_FILE_TYPE_MOUNTABLE
 } GFileType;
 
-typedef enum {
-  G_FILE_FLAG_HIDDEN  = (1<<0),
-  G_FILE_FLAG_SYMLINK = (1<<1),
-  G_FILE_FLAG_LOCAL   = (1<<2),
-  G_FILE_FLAG_VIRTUAL = (1<<3),
-} GFileFlags;
-
 struct _GFileInfoClass
 {
   GObjectClass parent_class;
@@ -44,7 +37,9 @@ struct _GFileInfoClass
 /* Common Attributes:  */
 
 #define G_FILE_ATTRIBUTE_STD_TYPE "std:type"                     /* uint32 (GFileType) */
-#define G_FILE_ATTRIBUTE_STD_FLAGS "std:flags"                   /* uint32 (GFileFlags) */
+#define G_FILE_ATTRIBUTE_STD_IS_HIDDEN "std:is_hidden"           /* boolean */
+#define G_FILE_ATTRIBUTE_STD_IS_SYMLINK "std:is_symlink"         /* boolean */
+#define G_FILE_ATTRIBUTE_STD_IS_VIRTUAL "std:is_virtual"         /* boolean */
 #define G_FILE_ATTRIBUTE_STD_NAME "std:name"                     /* byte string */
 #define G_FILE_ATTRIBUTE_STD_DISPLAY_NAME "std:display_name"     /* string */
 #define G_FILE_ATTRIBUTE_STD_EDIT_NAME "std:edit_name"           /* string */
@@ -176,7 +171,8 @@ void               g_file_info_set_attribute_object      (GFileInfo  *info,
 
 /* Helper getters: */
 GFileType         g_file_info_get_file_type          (GFileInfo         *info);
-GFileFlags        g_file_info_get_flags              (GFileInfo         *info);
+gboolean          g_file_info_get_is_hidden          (GFileInfo         *info);
+gboolean          g_file_info_get_is_symlink         (GFileInfo         *info);
 const char *      g_file_info_get_name               (GFileInfo         *info);
 const char *      g_file_info_get_display_name       (GFileInfo         *info);
 const char *      g_file_info_get_edit_name          (GFileInfo         *info);
@@ -190,8 +186,10 @@ const char *      g_file_info_get_symlink_target     (GFileInfo         *info);
 /* Helper setters: */
 void              g_file_info_set_file_type          (GFileInfo         *info,
 						      GFileType          type);
-void              g_file_info_set_flags              (GFileInfo         *info,
-						      GFileFlags         flags);
+void              g_file_info_set_is_hidden          (GFileInfo         *info,
+						      gboolean           is_hidden);
+void              g_file_info_set_is_symlink         (GFileInfo         *info,
+						      gboolean           is_symlink);
 void              g_file_info_set_name               (GFileInfo         *info,
 						      const char        *name);
 void              g_file_info_set_display_name       (GFileInfo         *info,
