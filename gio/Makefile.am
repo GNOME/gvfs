@@ -98,6 +98,7 @@ libgio_la_SOURCES = 	\
 	gdrivepriv.h \
 	gfile.c \
 	gfileenumerator.c \
+	gfileicon.c \
 	gfileinfo.c \
 	gfileinputstream.c \
 	gfilemonitor.c \
@@ -108,6 +109,7 @@ libgio_la_SOURCES = 	\
 	ginputstream.c \
 	gioerror.c \
 	gioscheduler.c \
+	gloadableicon.c \
 	gmemoryinputstream.c \
 	gmemoryoutputstream.c \
 	gmountoperation.c \
@@ -164,6 +166,7 @@ gvfsinclude_HEADERS = \
 	gdrive.h \
 	gfile.h \
 	gfileenumerator.h \
+	gfileicon.h \
 	gfileinfo.h \
 	gfileinputstream.h \
 	gfilemonitor.h \
@@ -175,6 +178,7 @@ gvfsinclude_HEADERS = \
 	gioerror.h \
 	gioscheduler.h \
 	giotypes.h \
+	gloadableicon.h \
 	gmemoryinputstream.h \
 	gmemoryoutputstream.h \
 	gmountoperation.h \
