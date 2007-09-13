@@ -278,6 +278,177 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
     }
 }
 
+dbus_bool_t
+_g_dbus_message_iter_get_args_valist (DBusMessageIter *iter,
+				      DBusError       *error,
+				      int              first_arg_type,
+				      va_list          var_args)
+{
+  int spec_type, msg_type, i;
+  dbus_bool_t retval;
+
+  retval = FALSE;
+
+  spec_type = first_arg_type;
+  i = 0;
+
+  while (spec_type != DBUS_TYPE_INVALID)
+    {
+      msg_type = dbus_message_iter_get_arg_type (iter);
+
+      if (msg_type != spec_type)
+	{
+          dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
+                          "Argument %d is specified to be of type \"%d\", but "
+                          "is actually of type \"%d\"\n", i,
+                          spec_type,
+                          msg_type);
+
+          goto out;
+	}
+
+      if (dbus_type_is_basic (spec_type))
+        {
+          void *ptr;
+
+          ptr = va_arg (var_args, void*);
+
+          g_assert (ptr != NULL);
+
+	  dbus_message_iter_get_basic (iter, ptr);
+        }
+      else if (spec_type == DBUS_TYPE_ARRAY)
+        {
+          int element_type;
+          int spec_element_type;
+          const void **ptr;
+          int *n_elements_p;
+          DBusMessageIter array;
+
+          spec_element_type = va_arg (var_args, int);
+          element_type = dbus_message_iter_get_element_type (iter);
+
+          if (spec_element_type != element_type)
+            {
+              dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
+                              "Argument %d is specified to be an array of \"%d\", but "
+                              "is actually an array of \"%d\"\n",
+                              i,
+                              spec_element_type,
+                              element_type);
+
+              goto out;
+            }
+
+          if (dbus_type_is_fixed (spec_element_type))
+            {
+              ptr = va_arg (var_args, const void**);
+              n_elements_p = va_arg (var_args, int*);
+
+              g_assert (ptr != NULL);
+              g_assert (n_elements_p != NULL);
+
+              dbus_message_iter_recurse (iter, &array);
+
+              dbus_message_iter_get_fixed_array (&array,
+						 ptr, n_elements_p);
+            }
+          else if (spec_element_type == DBUS_TYPE_STRING ||
+                   spec_element_type == DBUS_TYPE_SIGNATURE ||
+                   spec_element_type == DBUS_TYPE_OBJECT_PATH)
+            {
+              char ***str_array_p;
+              int n_elements;
+              char **str_array;
+
+              str_array_p = va_arg (var_args, char***);
+              n_elements_p = va_arg (var_args, int*);
+
+              g_assert (str_array_p != NULL);
+              g_assert (n_elements_p != NULL);
+
+              /* Count elements in the array */
+              dbus_message_iter_recurse (iter, &array);
+
+              n_elements = 0;
+              while (dbus_message_iter_get_arg_type (&array) != DBUS_TYPE_INVALID)
+                {
+                  ++n_elements;
+                  dbus_message_iter_next (&array);
+                }
+
+              str_array = g_new0 (char*, n_elements + 1);
+              if (str_array == NULL)
+                {
+                  _g_dbus_oom ();
+                  goto out;
+                }
+
+              /* Now go through and dup each string */
+              dbus_message_iter_recurse (iter, &array);
+
+              i = 0;
+              while (i < n_elements)
+                {
+                  const char *s;
+                  dbus_message_iter_get_basic (&array, &s);
+                  
+                  str_array[i] = g_strdup (s);
+                  if (str_array[i] == NULL)
+                    {
+                      g_strfreev (str_array);
+		      _g_dbus_oom ();
+                      goto out;
+                    }
+                  
+                  ++i;
+                  
+                  if (!dbus_message_iter_next (&array))
+                    g_assert (i == n_elements);
+                }
+
+              g_assert (dbus_message_iter_get_arg_type (&array) == DBUS_TYPE_INVALID);
+              g_assert (i == n_elements);
+              g_assert (str_array[i] == NULL);
+
+              *str_array_p = str_array;
+              *n_elements_p = n_elements;
+            }
+        }
+
+      spec_type = va_arg (var_args, int);
+      if (!dbus_message_iter_next (iter) && spec_type != DBUS_TYPE_INVALID)
+        {
+          dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
+                          "Message has only %d arguments, but more were expected", i);
+          goto out;
+        }
+
+      i++;
+    }
+
+  retval = TRUE;
+
+ out:
+  return retval;
+}
+
+dbus_bool_t
+_g_dbus_message_iter_get_args (DBusMessageIter *iter,
+			       DBusError       *error,
+			       int              first_arg_type,
+			       ...)
+{
+  va_list var_args;
+  dbus_bool_t res;
+
+  va_start (var_args, first_arg_type);
+  res = _g_dbus_message_iter_get_args (iter, error,
+				       first_arg_type,
+				       var_args);
+  va_end (var_args);
+  return res;
+}
 
 /* Same as the dbus one, except doesn't give OOM and handles
    G_DBUS_TYPE_CSTRING

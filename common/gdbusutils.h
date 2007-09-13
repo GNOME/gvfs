@@ -26,6 +26,14 @@ void         _g_dbus_message_append_args_valist     (DBusMessage      *message,
 void         _g_dbus_message_append_args            (DBusMessage      *message,
 						     int               first_arg_type,
 						     ...);
+dbus_bool_t  _g_dbus_message_iter_get_args_valist   (DBusMessageIter  *iter,
+						     DBusError        *error,
+						     int               first_arg_type,
+						     va_list           var_args);
+dbus_bool_t  _g_dbus_message_iter_get_args          (DBusMessageIter  *iter,
+						     DBusError        *error,
+						     int               first_arg_type,
+						     ...);
 void         _g_error_from_dbus                     (DBusError        *derror,
 						     GError          **error);
 DBusMessage *_dbus_message_new_error_from_gerror    (DBusMessage      *message,
@@ -40,8 +48,7 @@ void         _g_dbus_connection_remove_from_main    (DBusConnection   *connectio
 GSource *    __g_fd_source_new                      (int               fd,
 						     gushort           events,
 						     GCancellable     *cancellable);
-
-void     _g_dbus_oom                            (void) G_GNUC_NORETURN;
+void     _g_dbus_oom                                (void) G_GNUC_NORETURN;
 
 
 

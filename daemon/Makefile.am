@@ -43,6 +43,7 @@ libdaemon_la_SOURCES = \
         $(NULL)
 
 gvfs_daemon_SOURCES = \
+	mounttracker.c mounttracker.h \
 	main.c
 
 gvfs_daemon_LDADD = $(libraries)
