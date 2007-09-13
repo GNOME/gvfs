@@ -41,7 +41,17 @@ local_sources = \
 	glocalvfs.h \
 	$(NULL)
 
+platform_libadd =
+appinfo_sources =
+
+#if OS_UNIX
+appinfo_sources = gdesktopappinfo.c gdesktopappinfo.h
+platform_libadd += xdgmime/libxdgmime.la
+#endif
+
+
 libgio_la_SOURCES = 	\
+	gappinfo.c \
 	gasynchelper.c \
 	gasynchelper.h \
 	gcancellable.c \
@@ -52,31 +62,25 @@ libgio_la_SOURCES = 	\
 	gfileinfo.c \
 	gfileinputstream.c \
 	gfileoutputstream.c \
+	ginputstream.c \
+	gioerror.c \
+	gioscheduler.c \
+	gmountoperation.c \
+	gmountoperation.h \
+	goutputstream.c \
 	gseekable.c \
 	gsocketinputstream.c \
 	gsocketinputstream.h \
 	gsocketoutputstream.c \
 	gsocketoutputstream.h \
-	ginputstream.c \
-	gioscheduler.c \
-	gmountoperation.c \
-	gmountoperation.h \
-	goutputstream.c \
 	gvfs.c \
-	gvfs.h \
-	gioerror.c \
+	$(appinfo_sources) \
 	$(local_sources) \
 	$(daemon_sources) \
 	$(marshal_sources) \
 	$(NULL)
 
 $(libgio_la_OBJECTS): $(marshal_sources)
-
-platform_libadd =
-
-#if OS_UNIX
-platform_libadd += xdgmime/libxdgmime.la
-#endif
 
 libgio_la_LIBADD = \
 	$(platform_libadd) \
@@ -87,6 +91,7 @@ libgio_la_LIBADD = \
 
 gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
+	gappinfo.h \
 	gcancellable.h \
 	gcontenttype.h \
 	gfile.h \
@@ -95,11 +100,12 @@ gvfsinclude_HEADERS = \
 	gfileinputstream.h \
 	gfileoutputstream.h \
 	ginputstream.h \
+	gioerror.h \
 	gioscheduler.h \
+	giotypes.h \
 	goutputstream.h \
 	gseekable.h \
-	gioerror.h \
-	giotypes.h \
+	gvfs.h \
 	$(NULL)
 
 noinst_PROGRAMS= \

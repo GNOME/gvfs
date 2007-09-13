@@ -5,7 +5,9 @@
 
 G_BEGIN_DECLS
 
-gsize _g_unix_content_type_get_sniff_len (void);
+gsize  _g_unix_content_type_get_sniff_len (void);
+char * _g_unix_content_type_unalias       (const char *type);
+char **_g_unix_content_type_get_parents   (const char *type);
 
 G_END_DECLS
 

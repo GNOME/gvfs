@@ -36,6 +36,46 @@ _g_unix_content_type_get_sniff_len (void)
   return size;
 }
 
+char *
+_g_unix_content_type_unalias (const char *type)
+{
+  char *res;
+  
+  G_LOCK (gio_xdgmime);
+  res = g_strdup (xdg_mime_unalias_mime_type (type));
+  G_UNLOCK (gio_xdgmime);
+  
+  return res;
+}
+
+char **
+_g_unix_content_type_get_parents (const char *type)
+{
+  const char *umime;
+  const char **parents;
+  GPtrArray *array;
+  int i;
+
+  array = g_ptr_array_new ();
+  
+  G_LOCK (gio_xdgmime);
+  
+  umime = xdg_mime_unalias_mime_type (type);
+  g_ptr_array_add (array, g_strdup (umime));
+  
+  parents = xdg_mime_get_mime_parents (umime);
+  for (i = 0; parents && parents[i] != NULL; i++)
+    g_ptr_array_add (array, g_strdup (parents[i]));
+  
+  G_UNLOCK (gio_xdgmime);
+  
+  g_ptr_array_add (array, NULL);
+  
+  return (char **)g_ptr_array_free (array, FALSE);
+}
+
+
+
 gboolean
 g_content_type_equals (const char   *type1,
 		       const char   *type2)

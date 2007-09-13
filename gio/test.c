@@ -7,6 +7,7 @@
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
 #include "gsocketinputstream.h"
+#include "gappinfo.h"
 
 static gpointer
 cancel_thread (gpointer data)
@@ -268,10 +269,30 @@ main (int argc, char *argv[])
 {
   GFile *file;
   GMainLoop *loop;
+  GList *infos, *l;
+  GAppInfo *info;
 
   g_type_init ();
   g_thread_init (NULL);
 
+
+  infos = g_get_all_app_info_for_type ("text/html");
+
+  g_print ("all app info: \n");
+  for (l = infos; l != NULL; l = l->next)
+    {
+      info = l->data;
+      g_print ("%p: %s\n", info, g_app_info_get_name (info));
+    }
+
+  info = g_get_default_app_info_for_type ("text/html");
+  g_print ("default - %p: %s\n", info, g_app_info_get_name (info));
+
+  
+  if (1)
+    return 0;
+  
+  
   if (0)
     test_seek ();
   

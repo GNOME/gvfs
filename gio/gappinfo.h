@@ -22,6 +22,7 @@ struct _GAppInfoIface
   GAppInfo *          (*dup)                (GAppInfo                *appinfo);
   gboolean            (*equal)              (GAppInfo                *appinfo1,
 					     GAppInfo                *appinfo2);
+  char *              (*get_name)           (GAppInfo                *appinfo);
   char *              (*get_description)    (GAppInfo                *appinfo);
   char *              (*get_icon)           (GAppInfo                *appinfo);
   gboolean            (*launch)             (GAppInfo                *appinfo,
@@ -35,34 +36,37 @@ struct _GAppInfoIface
 					     GError                 **error);
   gboolean            (*should_show)        (GAppInfo                *appinfo,
 					     const char              *desktop_env);
+  gboolean            (*supports_xdg_startup_notify) (GAppInfo       *appinfo);
 };
 
 GType g_app_info_get_type (void) G_GNUC_CONST;
 
-GAppInfo *g_app_info_create_from_commandline (const char  *commandline);
-GAppInfo *g_app_info_dup                     (GAppInfo    *appinfo);
-gboolean  g_app_info_equal                   (GAppInfo    *appinfo1,
-					      GAppInfo    *appinfo2);
-char *    g_app_info_get_description         (GAppInfo    *appinfo);
-char *    g_app_info_get_icon                (GAppInfo    *appinfo);
-gboolean  g_app_info_launch                  (GAppInfo    *appinfo,
-					      GList       *filenames,
-					      char       **envp,
-					      GError     **error);
-gboolean  g_app_info_supports_uris           (GAppInfo    *appinfo);
+GAppInfo *g_app_info_create_from_commandline     (const char  *commandline);
+GAppInfo *g_app_info_dup                         (GAppInfo    *appinfo);
+gboolean  g_app_info_equal                       (GAppInfo    *appinfo1,
+						  GAppInfo    *appinfo2);
+char *    g_app_info_get_name                    (GAppInfo    *appinfo);
+char *    g_app_info_get_description             (GAppInfo    *appinfo);
+char *    g_app_info_get_icon                    (GAppInfo    *appinfo);
+gboolean  g_app_info_launch                      (GAppInfo    *appinfo,
+						  GList       *filenames,
+						  char       **envp,
+						  GError     **error);
+gboolean  g_app_info_supports_uris               (GAppInfo    *appinfo);
 gboolean  g_app_info_supports_xdg_startup_notify (GAppInfo    *appinfo);
-gboolean  g_app_info_launch_uris             (GAppInfo    *appinfo,
-					      GList       *uris,
-					      char       **envp,
-					      GError     **error);
-gboolean  g_app_info_should_show             (GAppInfo    *appinfo,
-					      const char  *desktop_env);
-gboolean  g_app_info_set_as_default_for_type (GAppInfo    *appinfo,
-					      const char  *content_type);
+gboolean  g_app_info_launch_uris                 (GAppInfo    *appinfo,
+						  GList       *uris,
+						  char       **envp,
+						  GError     **error);
+gboolean  g_app_info_should_show                 (GAppInfo    *appinfo,
+						  const char  *desktop_env);
+gboolean  g_app_info_set_as_default_for_type     (GAppInfo    *appinfo,
+						  const char  *content_type);
 
-GList *   g_get_all_app_info                 (void);
-GList *   g_get_all_app_info_for_type        (const char  *content_type);
-GAppInfo *g_get_default_app_info_for_type    (const char  *content_type);
+GList *   g_get_all_app_info                     (void);
+GList *   g_get_all_app_info_for_type            (const char  *content_type);
+GAppInfo *g_get_default_app_info_for_type        (const char  *content_type);
+
 
 
 
