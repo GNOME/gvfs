@@ -80,7 +80,7 @@ main (int argc, char *argv[])
   
   dbus_id = NULL;
   obj_path = NULL;
-  if (strcmp (argv[1], "--mount") == 0)
+  if (argc > 1 && strcmp (argv[1], "--mount") == 0)
     {
       if (argc < 4)
 	{
