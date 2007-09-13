@@ -51,11 +51,17 @@ struct _GFileInputStreamClass
 
 GType g_file_input_stream_get_type (void) G_GNUC_CONST;
 
-/* TODO: Turn this into a interface like GSeekable? */
-GFileInfo *g_file_input_stream_get_file_info (GFileInputStream     *stream,
-					      char                 *attributes,
-					      GCancellable         *cancellable,
-					      GError              **error);
+GFileInfo *g_file_input_stream_get_file_info (GFileInputStream  *stream,
+					      char              *attributes,
+					      GCancellable      *cancellable,
+					      GError           **error);
+goffset    g_file_input_stream_tell          (GFileInputStream  *stream);
+gboolean   g_file_input_stream_can_seek      (GFileInputStream  *stream);
+gboolean   g_file_input_stream_seek          (GFileInputStream  *stream,
+					      goffset            offset,
+					      GSeekType          type,
+					      GCancellable      *cancellable,
+					      GError           **error);
 
 G_END_DECLS
 

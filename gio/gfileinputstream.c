@@ -5,19 +5,19 @@
 #include <gfileinputstream.h>
 #include <gseekable.h>
 
-static void     g_file_input_stream_seekable_iface_init (GSeekableIface  *iface);
-static goffset  g_file_input_stream_tell                (GSeekable       *seekable);
-static gboolean g_file_input_stream_can_seek            (GSeekable       *seekable);
-static gboolean g_file_input_stream_seek                (GSeekable       *seekable,
-							 goffset          offset,
-							 GSeekType        type,
-							 GCancellable    *cancellable,
-							 GError         **error);
-static gboolean g_file_input_stream_can_truncate        (GSeekable       *seekable);
-static gboolean g_file_input_stream_truncate            (GSeekable       *seekable,
-							 goffset          offset,
-							 GCancellable    *cancellable,
-							 GError         **error);
+static void     g_file_input_stream_seekable_iface_init   (GSeekableIface  *iface);
+static goffset  g_file_input_stream_seekable_tell         (GSeekable       *seekable);
+static gboolean g_file_input_stream_seekable_can_seek     (GSeekable       *seekable);
+static gboolean g_file_input_stream_seekable_seek         (GSeekable       *seekable,
+							   goffset          offset,
+							   GSeekType        type,
+							   GCancellable    *cancellable,
+							   GError         **error);
+static gboolean g_file_input_stream_seekable_can_truncate (GSeekable       *seekable);
+static gboolean g_file_input_stream_seekable_truncate     (GSeekable       *seekable,
+							   goffset          offset,
+							   GCancellable    *cancellable,
+							   GError         **error);
 
 G_DEFINE_TYPE_WITH_CODE (GFileInputStream, g_file_input_stream, G_TYPE_INPUT_STREAM,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
@@ -36,11 +36,11 @@ g_file_input_stream_class_init (GFileInputStreamClass *klass)
 static void
 g_file_input_stream_seekable_iface_init (GSeekableIface *iface)
 {
-  iface->tell = g_file_input_stream_tell;
-  iface->can_seek = g_file_input_stream_can_seek;
-  iface->seek = g_file_input_stream_seek;
-  iface->can_truncate = g_file_input_stream_can_truncate;
-  iface->truncate = g_file_input_stream_truncate;
+  iface->tell = g_file_input_stream_seekable_tell;
+  iface->can_seek = g_file_input_stream_seekable_can_seek;
+  iface->seek = g_file_input_stream_seekable_seek;
+  iface->can_truncate = g_file_input_stream_seekable_can_truncate;
+  iface->truncate = g_file_input_stream_seekable_truncate;
 }
 
 static void
@@ -102,59 +102,65 @@ g_file_input_stream_get_file_info (GFileInputStream     *stream,
   return info;
 }
 
-static goffset
-g_file_input_stream_tell (GSeekable *seekable)
+goffset
+g_file_input_stream_tell (GFileInputStream  *stream)
 {
-  GFileInputStream *file;
   GFileInputStreamClass *class;
   goffset offset;
 
-  file = G_FILE_INPUT_STREAM (seekable);
-  class = G_FILE_INPUT_STREAM_GET_CLASS (file);
+  class = G_FILE_INPUT_STREAM_GET_CLASS (stream);
 
   offset = 0;
   if (class->tell)
-    offset = class->tell (file);
+    offset = class->tell (stream);
 
   return offset;
 }
 
-static gboolean
-g_file_input_stream_can_seek (GSeekable *seekable)
+static goffset
+g_file_input_stream_seekable_tell (GSeekable *seekable)
 {
-  GFileInputStream *file;
+  return g_file_input_stream_tell (G_FILE_INPUT_STREAM (seekable));
+}
+
+gboolean
+g_file_input_stream_can_seek (GFileInputStream  *stream)
+{
   GFileInputStreamClass *class;
   gboolean can_seek;
 
-  file = G_FILE_INPUT_STREAM (seekable);
-  class = G_FILE_INPUT_STREAM_GET_CLASS (file);
+  class = G_FILE_INPUT_STREAM_GET_CLASS (stream);
 
   can_seek = FALSE;
   if (class->seek)
     {
       can_seek = TRUE;
       if (class->can_seek)
-	can_seek = class->can_seek (file);
+	can_seek = class->can_seek (stream);
     }
   
   return can_seek;
 }
 
 static gboolean
-g_file_input_stream_seek (GSeekable  *seekable,
-			  goffset     offset,
-			  GSeekType   type,
-			  GCancellable  *cancellable,
-			  GError    **error)
+g_file_input_stream_seekable_can_seek (GSeekable *seekable)
 {
-  GFileInputStream *file;
+  return g_file_input_stream_can_seek (G_FILE_INPUT_STREAM (seekable));
+}
+
+gboolean
+g_file_input_stream_seek (GFileInputStream  *stream,
+			  goffset            offset,
+			  GSeekType          type,
+			  GCancellable      *cancellable,
+			  GError           **error)
+{
   GFileInputStreamClass *class;
   GInputStream *input_stream;
   gboolean res;
 
-  input_stream = G_INPUT_STREAM (seekable);
-  file = G_FILE_INPUT_STREAM (seekable);
-  class = G_FILE_INPUT_STREAM_GET_CLASS (file);
+  input_stream = G_INPUT_STREAM (stream);
+  class = G_FILE_INPUT_STREAM_GET_CLASS (stream);
 
   if (g_input_stream_is_closed (input_stream))
     {
@@ -182,7 +188,7 @@ g_file_input_stream_seek (GSeekable  *seekable,
   if (cancellable)
     g_push_current_cancellable (cancellable);
   
-  res = class->seek (file, offset, type, cancellable, error);
+  res = class->seek (stream, offset, type, cancellable, error);
   
   if (cancellable)
     g_pop_current_cancellable (cancellable);
@@ -193,16 +199,27 @@ g_file_input_stream_seek (GSeekable  *seekable,
 }
 
 static gboolean
-g_file_input_stream_can_truncate (GSeekable  *seekable)
+g_file_input_stream_seekable_seek (GSeekable  *seekable,
+				   goffset     offset,
+				   GSeekType   type,
+				   GCancellable  *cancellable,
+				   GError    **error)
+{
+  return g_file_input_stream_seek (G_FILE_INPUT_STREAM (seekable),
+				   offset, type, cancellable, error);
+}
+
+static gboolean
+g_file_input_stream_seekable_can_truncate (GSeekable  *seekable)
 {
   return FALSE;
 }
 
 static gboolean
-g_file_input_stream_truncate (GSeekable  *seekable,
-			      goffset     offset,
-			      GCancellable  *cancellable,
-			      GError    **error)
+g_file_input_stream_seekable_truncate (GSeekable  *seekable,
+				       goffset     offset,
+				       GCancellable  *cancellable,
+				       GError    **error)
 {
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 	       _("Truncate not allowed on input stream"));
