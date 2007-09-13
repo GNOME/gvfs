@@ -55,7 +55,7 @@ static DBusHandlerResult backend_dbus_handler                (DBusConnection    
 
 
 G_DEFINE_TYPE_WITH_CODE (GVfsBackend, g_vfs_backend, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS_JOB_SOURCE,
+			 G_IMPLEMENT_INTERFACE (G_VFS_TYPE_JOB_SOURCE,
 						g_vfs_backend_job_source_iface_init))
 
 
@@ -137,7 +137,7 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
 				   g_param_spec_object ("daemon",
 							P_("Daemon"),
 							P_("The daemon this backend is handled by."),
-							G_TYPE_VFS_DAEMON,
+							G_VFS_TYPE_DAEMON,
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
@@ -145,7 +145,7 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
 static void
 g_vfs_backend_init (GVfsBackend *backend)
 {
-  backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_TYPE_VFS_BACKEND, GVfsBackendPrivate);
+  backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_VFS_TYPE_BACKEND, GVfsBackendPrivate);
   backend->priv->icon = g_strdup ("");
   backend->priv->display_name = g_strdup ("");
 }

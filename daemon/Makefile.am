@@ -79,7 +79,7 @@ gvfs_daemon_test_SOURCES = \
 gvfs_daemon_test_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendtest.h \
 	-DDEFAULT_BACKEND_TYPE=test \
-	-DBACKEND_TYPES='"test", G_TYPE_VFS_BACKEND_TEST,'
+	-DBACKEND_TYPES='"test", G_VFS_TYPE_BACKEND_TEST,'
 
 gvfs_daemon_test_LDADD = $(libraries)
 
@@ -92,7 +92,7 @@ gvfs_daemon_smb_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
 	-DDEFAULT_BACKEND_TYPE=smb-share \
 	-DMAX_JOB_THREADS=1 \
-	-DBACKEND_TYPES='"smb-share", G_TYPE_VFS_BACKEND_SMB,'
+	-DBACKEND_TYPES='"smb-share", G_VFS_TYPE_BACKEND_SMB,'
 
 gvfs_daemon_smb_LDADD = $(SAMBA_LIBS) $(libraries)
 
@@ -105,6 +105,6 @@ gvfs_daemon_smb_browse_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
 	-DMAX_JOB_THREADS=1 \
-	-DBACKEND_TYPES='"smb-network", G_TYPE_VFS_BACKEND_SMB_BROWSE,"smb-server", G_TYPE_VFS_BACKEND_SMB_BROWSE,'
+	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
 gvfs_daemon_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)

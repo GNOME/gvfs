@@ -11,7 +11,7 @@
 #include "gvfsjobread.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobRead, g_vfs_job_read, G_TYPE_VFS_JOB);
+G_DEFINE_TYPE (GVfsJobRead, g_vfs_job_read, G_VFS_TYPE_JOB);
 
 static void     run        (GVfsJob *job);
 static gboolean try        (GVfsJob *job);
@@ -57,7 +57,7 @@ g_vfs_job_read_new (GVfsReadChannel *channel,
 {
   GVfsJobRead *job;
   
-  job = g_object_new (G_TYPE_VFS_JOB_READ,
+  job = g_object_new (G_VFS_TYPE_JOB_READ,
 		      NULL);
 
   job->backend = backend;

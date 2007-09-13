@@ -92,7 +92,7 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 		  G_STRUCT_OFFSET (GVfsJobClass, new_source),
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__OBJECT,
-		  G_TYPE_NONE, 1, G_TYPE_VFS_JOB_SOURCE);
+		  G_TYPE_NONE, 1, G_VFS_TYPE_JOB_SOURCE);
   signals[SEND_REPLY] =
     g_signal_new ("send-reply",
 		  G_TYPE_FROM_CLASS (gobject_class),
@@ -106,7 +106,7 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 static void
 g_vfs_job_init (GVfsJob *job)
 {
-  job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_TYPE_VFS_JOB, GVfsJobPrivate);
+  job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_VFS_TYPE_JOB, GVfsJobPrivate);
   
 }
 

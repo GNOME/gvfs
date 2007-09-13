@@ -24,7 +24,7 @@
 static void g_vfs_channel_job_source_iface_init (GVfsJobSourceIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GVfsChannel, g_vfs_channel, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS_JOB_SOURCE,
+			 G_IMPLEMENT_INTERFACE (G_VFS_TYPE_JOB_SOURCE,
 						g_vfs_channel_job_source_iface_init))
 
 /* TODO: Real P_() */
@@ -135,7 +135,7 @@ g_vfs_channel_class_init (GVfsChannelClass *klass)
 				   g_param_spec_object ("backend",
 							P_("Backend"),
 							P_("Backend implementation to use"),
-							G_TYPE_VFS_BACKEND,
+							G_VFS_TYPE_BACKEND,
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
@@ -147,7 +147,7 @@ g_vfs_channel_init (GVfsChannel *channel)
   int ret;
   
   channel->priv = G_TYPE_INSTANCE_GET_PRIVATE (channel,
-					       G_TYPE_VFS_CHANNEL,
+					       G_VFS_TYPE_CHANNEL,
 					       GVfsChannelPrivate);
   channel->priv->remote_fd = -1;
 

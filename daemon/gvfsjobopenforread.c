@@ -13,7 +13,7 @@
 #include "gdbusutils.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_TYPE_VFS_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_VFS_TYPE_JOB_DBUS);
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
@@ -85,7 +85,7 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
       return NULL;
     }
 
-  job = g_object_new (G_TYPE_VFS_JOB_OPEN_FOR_READ,
+  job = g_object_new (G_VFS_TYPE_JOB_OPEN_FOR_READ,
 		      "message", message,
 		      "connection", connection,
 		      NULL);

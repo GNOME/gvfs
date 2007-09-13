@@ -202,7 +202,7 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
 
   dbus_connection_setup_with_g_main (conn, NULL);
   
-  daemon = g_object_new (G_TYPE_VFS_DAEMON, NULL);
+  daemon = g_object_new (G_VFS_TYPE_DAEMON, NULL);
   daemon->main_daemon = main_daemon;
 
   /* Request name only after we've installed the message filter */

@@ -20,7 +20,7 @@
 #include "gvfsjobgetinfo.h"
 #include "gvfsjobenumerate.h"
 
-G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_TYPE_VFS_BACKEND);
+G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_VFS_TYPE_BACKEND);
 
 static void
 g_vfs_backend_test_finalize (GObject *object)

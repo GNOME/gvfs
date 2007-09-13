@@ -12,7 +12,7 @@
 #include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
-G_DEFINE_TYPE (GVfsJobEnumerate, g_vfs_job_enumerate, G_TYPE_VFS_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobEnumerate, g_vfs_job_enumerate, G_VFS_TYPE_JOB_DBUS);
 
 static void         run        (GVfsJob        *job);
 static gboolean     try        (GVfsJob        *job);
@@ -89,7 +89,7 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
       return NULL;
     }
 
-  job = g_object_new (G_TYPE_VFS_JOB_ENUMERATE,
+  job = g_object_new (G_VFS_TYPE_JOB_ENUMERATE,
 		      "message", message,
 		      "connection", connection,
 		      NULL);

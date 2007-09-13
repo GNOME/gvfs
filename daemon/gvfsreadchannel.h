@@ -8,12 +8,12 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_VFS_READ_CHANNEL         (g_vfs_read_channel_get_type ())
-#define G_VFS_READ_CHANNEL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VFS_READ_CHANNEL, GVfsReadChannel))
-#define G_VFS_READ_CHANNEL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VFS_READ_CHANNEL, GVfsReadChannelClass))
-#define G_IS_VFS_READ_CHANNEL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VFS_READ_CHANNEL))
-#define G_IS_VFS_READ_CHANNEL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_READ_CHANNEL))
-#define G_VFS_READ_CHANNEL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_READ_CHANNEL, GVfsReadChannelClass))
+#define G_VFS_TYPE_READ_CHANNEL         (g_vfs_read_channel_get_type ())
+#define G_VFS_READ_CHANNEL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_READ_CHANNEL, GVfsReadChannel))
+#define G_VFS_READ_CHANNEL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_READ_CHANNEL, GVfsReadChannelClass))
+#define G_IS_VFS_READ_CHANNEL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_READ_CHANNEL))
+#define G_IS_VFS_READ_CHANNEL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_READ_CHANNEL))
+#define G_VFS_READ_CHANNEL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_READ_CHANNEL, GVfsReadChannelClass))
 
 typedef struct _GVfsReadChannel        GVfsReadChannel;
 typedef struct _GVfsReadChannelClass   GVfsReadChannelClass;

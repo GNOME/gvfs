@@ -53,16 +53,16 @@ g_vfs_job_source_base_init (gpointer g_class)
 
       signals[NEW_JOB] =
 	g_signal_new ("new_job",
-		      G_TYPE_VFS_JOB_SOURCE,
+		      G_VFS_TYPE_JOB_SOURCE,
 		      G_SIGNAL_RUN_LAST,
 		      G_STRUCT_OFFSET (GVfsJobSourceIface, new_job),
 		      NULL, NULL,
 		      g_cclosure_marshal_VOID__OBJECT,
-		      G_TYPE_NONE, 1, G_TYPE_VFS_JOB);
+		      G_TYPE_NONE, 1, G_VFS_TYPE_JOB);
       
       signals[CLOSED] =
 	g_signal_new ("closed",
-		      G_TYPE_VFS_JOB_SOURCE,
+		      G_VFS_TYPE_JOB_SOURCE,
 		      G_SIGNAL_RUN_LAST,
 		      G_STRUCT_OFFSET (GVfsJobSourceIface, closed),
 		      NULL, NULL,

@@ -28,7 +28,7 @@ struct _GVfsReadChannel
   int seek_generation;
 };
 
-G_DEFINE_TYPE (GVfsReadChannel, g_vfs_read_channel, G_TYPE_VFS_CHANNEL)
+G_DEFINE_TYPE (GVfsReadChannel, g_vfs_read_channel, G_VFS_TYPE_CHANNEL)
 
 static GVfsJob *read_channel_close          (GVfsChannel  *channel);
 static GVfsJob *read_channel_handle_request (GVfsChannel  *channel,
@@ -198,7 +198,7 @@ g_vfs_read_channel_send_data (GVfsReadChannel  *read_channel,
 GVfsReadChannel *
 g_vfs_read_channel_new (GVfsBackend *backend)
 {
-  return g_object_new (G_TYPE_VFS_READ_CHANNEL,
+  return g_object_new (G_VFS_TYPE_READ_CHANNEL,
 		       "backend", backend,
 		       NULL);
 }

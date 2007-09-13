@@ -9,12 +9,12 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_VFS_CHANNEL         (g_vfs_channel_get_type ())
-#define G_VFS_CHANNEL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VFS_CHANNEL, GVfsChannel))
-#define G_VFS_CHANNEL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VFS_CHANNEL, GVfsChannelClass))
-#define G_IS_VFS_CHANNEL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VFS_CHANNEL))
-#define G_IS_VFS_CHANNEL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_CHANNEL))
-#define G_VFS_CHANNEL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_CHANNEL, GVfsChannelClass))
+#define G_VFS_TYPE_CHANNEL         (g_vfs_channel_get_type ())
+#define G_VFS_CHANNEL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_CHANNEL, GVfsChannel))
+#define G_VFS_CHANNEL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_CHANNEL, GVfsChannelClass))
+#define G_IS_VFS_CHANNEL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_CHANNEL))
+#define G_IS_VFS_CHANNEL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_CHANNEL))
+#define G_VFS_CHANNEL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_CHANNEL, GVfsChannelClass))
 
 typedef struct _GVfsChannel        GVfsChannel;
 typedef struct _GVfsChannelClass   GVfsChannelClass;

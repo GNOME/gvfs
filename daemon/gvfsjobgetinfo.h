@@ -8,12 +8,12 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_VFS_JOB_GET_INFO         (g_vfs_job_get_info_get_type ())
-#define G_VFS_JOB_GET_INFO(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VFS_JOB_GET_INFO, GVfsJobGetInfo))
-#define G_VFS_JOB_GET_INFO_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VFS_JOB_GET_INFO, GVfsJobGetInfoClass))
-#define G_IS_VFS_JOB_GET_INFO(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VFS_JOB_GET_INFO))
-#define G_IS_VFS_JOB_GET_INFO_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_JOB_GET_INFO))
-#define G_VFS_JOB_GET_INFO_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_JOB_GET_INFO, GVfsJobGetInfoClass))
+#define G_VFS_TYPE_JOB_GET_INFO         (g_vfs_job_get_info_get_type ())
+#define G_VFS_JOB_GET_INFO(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB_GET_INFO, GVfsJobGetInfo))
+#define G_VFS_JOB_GET_INFO_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB_GET_INFO, GVfsJobGetInfoClass))
+#define G_IS_VFS_JOB_GET_INFO(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_GET_INFO))
+#define G_IS_VFS_JOB_GET_INFO_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_GET_INFO))
+#define G_VFS_JOB_GET_INFO_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB_GET_INFO, GVfsJobGetInfoClass))
 
 typedef struct _GVfsJobGetInfoClass   GVfsJobGetInfoClass;
 

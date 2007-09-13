@@ -52,7 +52,7 @@ typedef struct {
   char *username;
 } CachedServer;
 
-G_DEFINE_TYPE (GVfsBackendSmbBrowse, g_vfs_backend_smb_browse, G_TYPE_VFS_BACKEND);
+G_DEFINE_TYPE (GVfsBackendSmbBrowse, g_vfs_backend_smb_browse, G_VFS_TYPE_BACKEND);
 
 static void
 browse_entry_free (BrowseEntry *entry)

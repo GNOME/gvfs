@@ -12,7 +12,7 @@
 #include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
-G_DEFINE_TYPE (GVfsJobMount, g_vfs_job_mount, G_TYPE_VFS_JOB);
+G_DEFINE_TYPE (GVfsJobMount, g_vfs_job_mount, G_VFS_TYPE_JOB);
 
 static void     run        (GVfsJob *job);
 static gboolean try        (GVfsJob *job);
@@ -56,7 +56,7 @@ g_vfs_job_mount_new (GMountSpec *spec,
 {
   GVfsJobMount *job;
 
-  job = g_object_new (G_TYPE_VFS_JOB_MOUNT,
+  job = g_object_new (G_VFS_TYPE_JOB_MOUNT,
 		      NULL);
 
   job->mount_spec = g_mount_spec_ref (spec);
