@@ -14,20 +14,20 @@ typedef void (*GIOJobFunc) (GIOJob *job,
 
 typedef void (*GIODataFunc) (gpointer data);
 
-gint g_schedule_io_job    (GIOJobFunc      job_func,
-			   gpointer        data,
-			   GDestroyNotify  notify,
-			   gint            io_priority,
-			   GMainContext   *callback_context);
-void g_cancel_io_job      (gint            id);
-void g_cancel_all_io_jobs (void);
+void g_schedule_io_job         (GIOJobFunc      job_func,
+				gpointer        data,
+				GDestroyNotify  notify,
+				gint            io_priority,
+				GMainContext   *callback_context,
+				GCancellable   *cancellable);
+void g_cancel_all_io_jobs      (void);
 
-void     g_io_job_send_to_mainloop (GIOJob         *job,
-				    GIODataFunc     func,
-				    gpointer        data,
-				    GDestroyNotify  notify,
-				    gboolean        block);
-void     g_io_job_mark_done        (GIOJob         *job);
+void g_io_job_send_to_mainloop (GIOJob         *job,
+				GIODataFunc     func,
+				gpointer        data,
+				GDestroyNotify  notify,
+				gboolean        block);
+
 
 G_END_DECLS
 

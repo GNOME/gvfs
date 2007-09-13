@@ -22,18 +22,20 @@ static void g_output_stream_real_write_async (GOutputStream             *stream,
 					      int                        io_priority,
 					      GAsyncWriteCallback        callback,
 					      gpointer                   data,
-					      GDestroyNotify             notify);
+					      GDestroyNotify             notify,
+					      GCancellable              *cancellable);
 static void g_output_stream_real_flush_async (GOutputStream             *stream,
 					      int                        io_priority,
 					      GAsyncFlushCallback        callback,
 					      gpointer                   data,
-					      GDestroyNotify             notify);
+					      GDestroyNotify             notify,
+					      GCancellable              *cancellable);
 static void g_output_stream_real_close_async (GOutputStream             *stream,
 					      int                        io_priority,
 					      GAsyncCloseOutputCallback  callback,
 					      gpointer                   data,
-					      GDestroyNotify             notify);
-static void g_output_stream_real_cancel      (GOutputStream             *stream);
+					      GDestroyNotify             notify,
+					      GCancellable              *cancellable);
 
 static void
 g_output_stream_finalize (GObject *object)
@@ -67,7 +69,6 @@ g_output_stream_class_init (GOutputStreamClass *klass)
   klass->write_async = g_output_stream_real_write_async;
   klass->flush_async = g_output_stream_real_flush_async;
   klass->close_async = g_output_stream_real_close_async;
-  klass->cancel = g_output_stream_real_cancel;
 }
 
 static void
@@ -502,6 +503,7 @@ write_async_callback_wrapper (GOutputStream *stream,
  * @callback: callback to call when the request is satisfied
  * @data: the data to pass to callback function
  * @notify: a function to call when @data is no longer in use, or %NULL.
+ * @cancellable: optional cancellable object
  *
  * Request an asynchronous write of @count bytes from @buffer into the stream.
  * When the operation is finished @callback will be called, giving the results.
@@ -531,7 +533,8 @@ g_output_stream_write_async (GOutputStream        *stream,
 			     int                  io_priority,
 			     GAsyncWriteCallback  callback,
 			     gpointer             data,
-			     GDestroyNotify       notify)
+			     GDestroyNotify       notify,
+			     GCancellable        *cancellable)
 {
   GOutputStreamClass *class;
   GError *error;
@@ -540,8 +543,6 @@ g_output_stream_write_async (GOutputStream        *stream,
   g_return_if_fail (stream != NULL);
   g_return_if_fail (buffer != NULL);
 
-  stream->priv->cancelled = FALSE;
-  
   if (count == 0)
     {
       queue_write_async_result (stream, buffer, count, 0, NULL,
@@ -584,7 +585,7 @@ g_output_stream_write_async (GOutputStream        *stream,
   stream->priv->pending = TRUE;
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->write_async (stream, buffer, count, io_priority, write_async_callback_wrapper, data, notify);
+  class->write_async (stream, buffer, count, io_priority, write_async_callback_wrapper, data, notify, cancellable);
 }
 
 typedef struct {
@@ -646,7 +647,8 @@ g_output_stream_flush_async (GOutputStream       *stream,
 			     int                  io_priority,
 			     GAsyncFlushCallback  callback,
 			     gpointer             data,
-			     GDestroyNotify       notify)
+			     GDestroyNotify       notify,
+			     GCancellable        *cancellable)
 {
   GOutputStreamClass *class;
   GError *error;
@@ -654,8 +656,6 @@ g_output_stream_flush_async (GOutputStream       *stream,
   g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
 
-  stream->priv->cancelled = FALSE;
-  
   if (stream->priv->closed)
     {
       error = NULL;
@@ -681,7 +681,7 @@ g_output_stream_flush_async (GOutputStream       *stream,
   stream->priv->pending = TRUE;
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->flush_async (stream, io_priority, flush_async_callback_wrapper, data, notify);
+  class->flush_async (stream, io_priority, flush_async_callback_wrapper, data, notify, cancellable);
 }
 
 typedef struct {
@@ -745,6 +745,7 @@ close_async_callback_wrapper (GOutputStream *stream,
  * @callback: callback to call when the request is satisfied
  * @data: the data to pass to callback function
  * @notify: a function to call when @data is no longer in use, or %NULL.
+ * @cancellable: optional cancellable object
  *
  * Requests an asynchronous closes of the stream, releasing resources related to it.
  * When the operation is finished @callback will be called, giving the results.
@@ -760,15 +761,14 @@ g_output_stream_close_async (GOutputStream       *stream,
 			     int                  io_priority,
 			     GAsyncCloseOutputCallback callback,
 			     gpointer            data,
-			     GDestroyNotify      notify)
+			     GDestroyNotify      notify,
+			     GCancellable       *cancellable)
 {
   GOutputStreamClass *class;
   GError *error;
 
   g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
-  
-  stream->priv->cancelled = FALSE;
   
   if (stream->priv->closed)
     {
@@ -791,54 +791,7 @@ g_output_stream_close_async (GOutputStream       *stream,
   stream->priv->pending = TRUE;
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->close_async (stream, io_priority, close_async_callback_wrapper, data, notify);
-}
-
-/**
- * g_output_stream_cancel:
- * @stream: A #GOutputStream.
- *
- * Tries to cancel an outstanding async request for the stream.
- * If it succeeds the outstanding request will be report the error
- * %G_VFS_ERROR_CANCELLED.
- *
- * Generally if a request is cancelled before its callback has been
- * called the cancellation will succeed and the callback will only
- * be called with %G_VFS_ERROR_CANCELLED. However, if multiple threads
- * are in use this cannot be guaranteed, and the cancel may not result
- * in a %G_VFS_ERROR_CANCELLED callback.
- *
- * Its safe to call this from another thread than the one doing the operation,
- * as long as you are sure the InputStream is alive (i.e. you own a reference
- * to it).
- *
- * The asyncronous methods have a default fallback that uses threads to implement
- * asynchronicity, so they are optional for inheriting classes. However, if you
- * override one you must override all.
- **/
-void
-g_output_stream_cancel (GOutputStream   *stream)
-{
-  GOutputStreamClass *class;
-
-  g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
-  g_return_if_fail (stream != NULL);
-  
-  class = G_OUTPUT_STREAM_GET_CLASS (stream);
-
-  stream->priv->cancelled = TRUE;
-  
-  class->cancel (stream);
-}
-
-
-gboolean
-g_output_stream_is_cancelled (GOutputStream *stream)
-{
-  g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), TRUE);
-  g_return_val_if_fail (stream != NULL, TRUE);
-  
-  return stream->priv->cancelled;
+  class->close_async (stream, io_priority, close_async_callback_wrapper, data, notify, cancellable);
 }
 
 gboolean
@@ -941,7 +894,6 @@ write_op_func (GIOJob *job,
 					c, &op->op.error);
     }
 
-  g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, write_op_report,
 			     op, output_stream_op_free,
 			     FALSE);
@@ -954,7 +906,8 @@ g_output_stream_real_write_async (GOutputStream       *stream,
 				  int                  io_priority,
 				  GAsyncWriteCallback  callback,
 				  gpointer             data,
-				  GDestroyNotify       notify)
+				  GDestroyNotify       notify,
+				  GCancellable        *cancellable)
 {
   WriteAsyncOp *op;
 
@@ -967,11 +920,12 @@ g_output_stream_real_write_async (GOutputStream       *stream,
   op->op.data = data;
   op->op.notify = notify;
   
-  stream->priv->io_job_id = g_schedule_io_job (write_op_func,
-					       op,
-					       NULL,
-					       io_priority,
-					       g_output_stream_get_async_context (stream));
+  g_schedule_io_job (write_op_func,
+		     op,
+		     NULL,
+		     io_priority,
+		     g_output_stream_get_async_context (stream),
+		     cancellable);
 }
 
 typedef struct {
@@ -1016,7 +970,6 @@ flush_op_func (GIOJob *job,
 	op->result = class->flush (op->op.stream, c, &op->op.error);
     }
 
-  g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, flush_op_report,
 			     op, output_stream_op_free,
 			     FALSE);
@@ -1027,7 +980,8 @@ g_output_stream_real_flush_async (GOutputStream       *stream,
 				  int                  io_priority,
 				  GAsyncFlushCallback  callback,
 				  gpointer             data,
-				  GDestroyNotify       notify)
+				  GDestroyNotify       notify,
+				  GCancellable        *cancellable)
 {
   FlushAsyncOp *op;
 
@@ -1038,11 +992,12 @@ g_output_stream_real_flush_async (GOutputStream       *stream,
   op->op.data = data;
   op->op.notify = notify;
   
-  stream->priv->io_job_id = g_schedule_io_job (flush_op_func,
-					       op,
-					       NULL,
-					       io_priority,
-					       g_output_stream_get_async_context (stream));
+  g_schedule_io_job (flush_op_func,
+		     op,
+		     NULL,
+		     io_priority,
+		     g_output_stream_get_async_context (stream),
+		     cancellable);
 }
 
 typedef struct {
@@ -1084,8 +1039,7 @@ close_op_func (GIOJob *job,
       op->res = class->close (op->op.stream, c, &op->op.error);
     }
 
-  g_io_job_mark_done (job);
-  g_io_job_send_to_mainloop (job, close_op_report,
+ g_io_job_send_to_mainloop (job, close_op_report,
 			     op, output_stream_op_free,
 			     FALSE);
 }
@@ -1095,7 +1049,8 @@ g_output_stream_real_close_async (GOutputStream       *stream,
 				  int                  io_priority,
 				  GAsyncCloseOutputCallback callback,
 				  gpointer            data,
-				  GDestroyNotify      notify)
+				  GDestroyNotify      notify,
+				  GCancellable       *cancellable)
 {
   CloseAsyncOp *op;
 
@@ -1106,16 +1061,10 @@ g_output_stream_real_close_async (GOutputStream       *stream,
   op->op.data = data;
   op->op.notify = notify;
   
-  stream->priv->io_job_id = g_schedule_io_job (close_op_func,
-					       op,
-					       NULL,
-					       io_priority,
-					       g_output_stream_get_async_context (stream));
+  g_schedule_io_job (close_op_func,
+		     op,
+		     NULL,
+		     io_priority,
+		     g_output_stream_get_async_context (stream),
+		     cancellable);
 }
-
-static void
-g_output_stream_real_cancel (GOutputStream   *stream)
-{
-  g_cancel_io_job (stream->priv->io_job_id);
-}
-

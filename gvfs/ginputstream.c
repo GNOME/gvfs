@@ -11,12 +11,8 @@ G_DEFINE_TYPE (GInputStream, g_input_stream, G_TYPE_OBJECT);
 struct _GInputStreamPrivate {
   guint closed : 1;
   guint pending : 1;
-  guint cancelled : 1;
   GMainContext *context;
-  gint io_job_id;
   gpointer outstanding_callback;
-  GCancellable *async_cancellable; /* Used for fallback */
-  
 };
 
 static gssize g_input_stream_real_skip        (GInputStream         *stream,
@@ -29,19 +25,21 @@ static void   g_input_stream_real_read_async  (GInputStream         *stream,
 					       int                   io_priority,
 					       GAsyncReadCallback    callback,
 					       gpointer              data,
-					       GDestroyNotify        notify);
+					       GDestroyNotify        notify,
+					       GCancellable         *cancellable);
 static void   g_input_stream_real_skip_async  (GInputStream         *stream,
 					       gsize                 count,
 					       int                   io_priority,
 					       GAsyncSkipCallback    callback,
 					       gpointer              data,
-					       GDestroyNotify        notify);
+					       GDestroyNotify        notify,
+					       GCancellable         *cancellable);
 static void   g_input_stream_real_close_async (GInputStream         *stream,
 					       int                   io_priority,
 					       GAsyncCloseInputCallback   callback,
 					       gpointer              data,
-					       GDestroyNotify        notify);
-static void   g_input_stream_real_cancel      (GInputStream         *stream);
+					       GDestroyNotify        notify,
+					       GCancellable         *cancellable);
 
 
 static void
@@ -77,7 +75,6 @@ g_input_stream_class_init (GInputStreamClass *klass)
   klass->read_async = g_input_stream_real_read_async;
   klass->skip_async = g_input_stream_real_skip_async;
   klass->close_async = g_input_stream_real_close_async;
-  klass->cancel = g_input_stream_real_cancel;
 }
 
 static void
@@ -525,6 +522,7 @@ read_async_callback_wrapper (GInputStream *stream,
  * @callback: callback to call when the request is satisfied
  * @data: the data to pass to callback function
  * @notify: a function to call when @data is no longer in use, or %NULL.
+ * @cancellable: optional cancellable object
  *
  * Request an asynchronous read of @count bytes from the stream into the buffer
  * starting at @buffer. When the operation is finished @callback will be called,
@@ -556,7 +554,8 @@ g_input_stream_read_async (GInputStream        *stream,
 			   int                  io_priority,
 			   GAsyncReadCallback   callback,
 			   gpointer             data,
-			   GDestroyNotify       notify)
+			   GDestroyNotify       notify,
+			   GCancellable        *cancellable)
 {
   GInputStreamClass *class;
   GError *error;
@@ -564,8 +563,6 @@ g_input_stream_read_async (GInputStream        *stream,
   g_return_if_fail (G_IS_INPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
   g_return_if_fail (buffer != NULL);
-
-  stream->priv->cancelled = FALSE;
 
   if (count == 0)
     {
@@ -610,7 +607,7 @@ g_input_stream_read_async (GInputStream        *stream,
   stream->priv->pending = TRUE;
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->read_async (stream, buffer, count, io_priority, read_async_callback_wrapper, data, notify);
+  class->read_async (stream, buffer, count, io_priority, read_async_callback_wrapper, data, notify, cancellable);
 }
 
 typedef struct {
@@ -710,7 +707,8 @@ g_input_stream_skip_async (GInputStream        *stream,
 			   int                  io_priority,
 			   GAsyncSkipCallback   callback,
 			   gpointer             data,
-			   GDestroyNotify       notify)
+			   GDestroyNotify       notify,
+			   GCancellable        *cancellable)
 {
   GInputStreamClass *class;
   GError *error;
@@ -718,8 +716,6 @@ g_input_stream_skip_async (GInputStream        *stream,
   g_return_if_fail (G_IS_INPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
 
-  stream->priv->cancelled = FALSE;
-  
   if (count == 0)
     {
       queue_skip_async_result (stream, count, 0, NULL,
@@ -761,7 +757,7 @@ g_input_stream_skip_async (GInputStream        *stream,
   stream->priv->pending = TRUE;
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->skip_async (stream, count, io_priority, skip_async_callback_wrapper, data, notify);
+  class->skip_async (stream, count, io_priority, skip_async_callback_wrapper, data, notify, cancellable);
 }
 
 
@@ -842,7 +838,8 @@ g_input_stream_close_async (GInputStream       *stream,
 			    int                 io_priority,
 			    GAsyncCloseInputCallback callback,
 			    gpointer            data,
-			    GDestroyNotify      notify)
+			    GDestroyNotify      notify,
+			    GCancellable       *cancellable)
 {
   GInputStreamClass *class;
   GError *error;
@@ -850,8 +847,6 @@ g_input_stream_close_async (GInputStream       *stream,
   g_return_if_fail (G_IS_INPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
 
-  stream->priv->cancelled = FALSE;
-  
   if (stream->priv->closed)
     {
       queue_close_async_result (stream, TRUE, NULL,
@@ -873,54 +868,7 @@ g_input_stream_close_async (GInputStream       *stream,
   stream->priv->pending = TRUE;
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->close_async (stream, io_priority, close_async_callback_wrapper, data, notify);
-}
-
-/**
- * g_input_stream_cancel:
- * @stream: A #GInputStream.
- *
- * Tries to cancel an outstanding async request for the stream.
- * If it succeeds the outstanding request will be report the error
- * %G_VFS_ERROR_CANCELLED.
- *
- * Generally if a request is cancelled before its callback has been
- * called the cancellation will succeed and the callback will only
- * be called with %G_VFS_ERROR_CANCELLED. However, this cannot be guaranteed,
- * especially if multiple threads are in use, so you might get a succeeding
- * callback and no %G_VFS_ERROR_CANCELLED callback even if you call cancel.
- *
- * Its safe to call this from another thread than the one doing the operation,
- * as long as you are sure the InputStream is alive (i.e. you own a reference
- * to it). If you cancel after the callback has been called you might cancel
- * a different operation than you expected though.
- *
- * The asyncronous methods have a default fallback that uses threads to implement
- * asynchronicity, so they are optional for inheriting classes. However, if you
- * override one you must override all.
- **/
-void
-g_input_stream_cancel (GInputStream *stream)
-{
-  GInputStreamClass *class;
-  
-  g_return_if_fail (G_IS_INPUT_STREAM (stream));
-  g_return_if_fail (stream != NULL);
-  
-  class = G_INPUT_STREAM_GET_CLASS (stream);
-
-  stream->priv->cancelled = TRUE;
-  
-  class->cancel (stream);
-}
-
-gboolean
-g_input_stream_is_cancelled (GInputStream *stream)
-{
-  g_return_val_if_fail (G_IS_INPUT_STREAM (stream), TRUE);
-  g_return_val_if_fail (stream != NULL, TRUE);
-  
-  return stream->priv->cancelled;
+  class->close_async (stream, io_priority, close_async_callback_wrapper, data, notify, cancellable);
 }
 
 gboolean
@@ -1021,7 +969,6 @@ read_op_func (GIOJob *job,
 				    c, &op->op.error);
     }
 
-  g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, read_op_report,
 			     op, input_stream_op_free,
 			     FALSE);
@@ -1034,7 +981,8 @@ g_input_stream_real_read_async (GInputStream        *stream,
 				int                  io_priority,
 				GAsyncReadCallback   callback,
 				gpointer             data,
-				GDestroyNotify       notify)
+				GDestroyNotify       notify,
+				GCancellable        *cancellable)
 {
   ReadAsyncOp *op;
 
@@ -1047,11 +995,9 @@ g_input_stream_real_read_async (GInputStream        *stream,
   op->op.data = data;
   op->op.notify = notify;
   
-  stream->priv->io_job_id = g_schedule_io_job (read_op_func,
-					       op,
-					       NULL,
-					       io_priority,
-					       g_input_stream_get_async_context (stream));
+  g_schedule_io_job (read_op_func, op, NULL, io_priority,
+		     g_input_stream_get_async_context (stream),
+		     cancellable);
 }
 
 typedef struct {
@@ -1097,7 +1043,6 @@ skip_op_func (GIOJob *job,
 				       c, &op->op.error);
     }
 
-  g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, skip_op_report,
 			     op, input_stream_op_free,
 			     FALSE);
@@ -1109,7 +1054,8 @@ g_input_stream_real_skip_async (GInputStream        *stream,
 				int                  io_priority,
 				GAsyncSkipCallback   callback,
 				gpointer             data,
-				GDestroyNotify       notify)
+				GDestroyNotify       notify,
+				GCancellable        *cancellable)
 {
   SkipAsyncOp *op;
 
@@ -1121,11 +1067,12 @@ g_input_stream_real_skip_async (GInputStream        *stream,
   op->op.data = data;
   op->op.notify = notify;
   
-  stream->priv->io_job_id = g_schedule_io_job (skip_op_func,
-					       op,
-					       NULL,
-					       io_priority,
-					       g_input_stream_get_async_context (stream));
+  g_schedule_io_job (skip_op_func,
+		     op,
+		     NULL,
+		     io_priority,
+		     g_input_stream_get_async_context (stream),
+		     cancellable);
 }
 
 typedef struct {
@@ -1167,7 +1114,6 @@ close_op_func (GIOJob *job,
       op->res = class->close (op->op.stream, c, &op->op.error);
     }
 
-  g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, close_op_report,
 			     op, input_stream_op_free,
 			     FALSE);
@@ -1178,7 +1124,8 @@ g_input_stream_real_close_async (GInputStream       *stream,
 				 int                 io_priority,
 				 GAsyncCloseInputCallback callback,
 				 gpointer            data,
-				 GDestroyNotify      notify)
+				 GDestroyNotify      notify,
+				 GCancellable       *cancellable)
 {
   CloseAsyncOp *op;
 
@@ -1189,16 +1136,10 @@ g_input_stream_real_close_async (GInputStream       *stream,
   op->op.data = data;
   op->op.notify = notify;
   
-  stream->priv->io_job_id = g_schedule_io_job (close_op_func,
-					       op,
-					       NULL,
-					       io_priority,
-					       g_input_stream_get_async_context (stream));
+  g_schedule_io_job (close_op_func,
+		     op,
+		     NULL,
+		     io_priority,
+		     g_input_stream_get_async_context (stream),
+		     cancellable);
 }
-
-static void
-g_input_stream_real_cancel (GInputStream *stream)
-{
-  g_cancel_io_job (stream->priv->io_job_id);
-}
-

@@ -14,6 +14,7 @@
 #include "gvfserror.h"
 #include "goutputstreamsocket.h"
 #include "gcancellable.h"
+#include "gasynchelper.h"
 
 G_DEFINE_TYPE (GOutputStreamSocket, g_output_stream_socket, G_TYPE_OUTPUT_STREAM);
 
@@ -22,18 +23,6 @@ struct _GOutputStreamSocketPrivate {
   int fd;
   gboolean close_fd_at_close;
 };
-
-typedef struct _StreamSource StreamSource;
-
-struct _StreamSource
-{
-  GSource  source;
-  GPollFD  pollfd;
-  GOutputStreamSocket *stream;
-};
-
-typedef void (*StreamSourceFunc) (GOutputStreamSocket  *stream,
-				  gpointer             data);
 
 static gssize   g_output_stream_socket_write       (GOutputStream              *stream,
 						    void                       *buffer,
@@ -49,95 +38,20 @@ static void     g_output_stream_socket_write_async (GOutputStream              *
 						    int                         io_priority,
 						    GAsyncWriteCallback         callback,
 						    gpointer                    data,
-						    GDestroyNotify              notify);
+						    GDestroyNotify              notify,
+						    GCancellable               *cancellable);
 static void     g_output_stream_socket_flush_async (GOutputStream              *stream,
 						    int                         io_priority,
 						    GAsyncFlushCallback         callback,
 						    gpointer                    data,
-						    GDestroyNotify              notify);
+						    GDestroyNotify              notify,
+						    GCancellable               *cancellable);
 static void     g_output_stream_socket_close_async (GOutputStream              *stream,
 						    int                         io_priority,
 						    GAsyncCloseOutputCallback   callback,
 						    gpointer                    data,
-						    GDestroyNotify              notify);
-static void     g_output_stream_socket_cancel      (GOutputStream              *stream);
-
-
-static gboolean stream_source_prepare  (GSource     *source,
-					gint        *timeout);
-static gboolean stream_source_check    (GSource     *source);
-static gboolean stream_source_dispatch (GSource     *source,
-					GSourceFunc  callback,
-					gpointer     user_data);
-static void     stream_source_finalize (GSource     *source);
-
-static GSourceFuncs stream_source_funcs = {
-  stream_source_prepare,
-  stream_source_check,
-  stream_source_dispatch,
-  stream_source_finalize
-};
-
-static gboolean 
-stream_source_prepare (GSource  *source,
-		       gint     *timeout)
-{
-  StreamSource *stream_source = (StreamSource *)source;
-  *timeout = -1;
-  
-  return g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream_source->stream));
-}
-
-static gboolean 
-stream_source_check (GSource  *source)
-{
-  StreamSource *stream_source = (StreamSource *)source;
-
-  return
-    g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream_source->stream)) ||
-    stream_source->pollfd.revents != 0;
-}
-
-static gboolean
-stream_source_dispatch (GSource     *source,
-			GSourceFunc  callback,
-			gpointer     user_data)
-
-{
-  StreamSourceFunc func = (StreamSourceFunc)callback;
-  StreamSource *stream_source = (StreamSource *)source;
-
-  g_assert (func != NULL);
-
-  (*func) (stream_source->stream,
-	   user_data);
-  return FALSE;
-}
-
-static void 
-stream_source_finalize (GSource *source)
-{
-  StreamSource *stream_source = (StreamSource *)source;
-
-  g_object_unref (stream_source->stream);
-}
-
-static GSource *
-create_stream_source (GOutputStreamSocket *stream)
-{
-  GSource *source;
-  StreamSource *stream_source;
-
-  source = g_source_new (&stream_source_funcs, sizeof (StreamSource));
-  stream_source = (StreamSource *)source;
-
-  stream_source->stream = g_object_ref (stream);
-  stream_source->pollfd.fd = stream->priv->fd;
-  stream_source->pollfd.events = POLLOUT;
-  g_source_add_poll (source, &stream_source->pollfd);
-
-  return source;
-}
+						    GDestroyNotify              notify,
+						    GCancellable               *cancellable);
 
 static void
 g_output_stream_socket_finalize (GObject *object)
@@ -165,7 +79,6 @@ g_output_stream_socket_class_init (GOutputStreamSocketClass *klass)
   stream_class->write_async = g_output_stream_socket_write_async;
   stream_class->flush_async = g_output_stream_socket_flush_async;
   stream_class->close_async = g_output_stream_socket_close_async;
-  stream_class->cancel = g_output_stream_socket_cancel;
 }
 
 static void
@@ -292,6 +205,7 @@ typedef struct {
   GAsyncWriteCallback callback;
   gpointer user_data;
   GDestroyNotify notify;
+  GCancellable *cancellable;
 } WriteAsyncData;
 
 static void
@@ -304,31 +218,22 @@ write_async_cb (GOutputStreamSocket  *stream,
   gssize count_written;
 
   socket_stream = G_OUTPUT_STREAM_SOCKET (stream);
-  
-  if (g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream)))
-    {
-      g_set_error (&error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      count_written = -1;
-      goto out;
-    }
 
   while (1)
     {
+      if (g_cancellable_is_cancelled (data->cancellable))
+	{
+	  g_set_error (&error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  count_written = -1;
+	  break;
+	}
+      
       count_written = write (socket_stream->priv->fd, data->buffer, data->count);
       if (count_written == -1)
 	{
-	  if (g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream)))
-	    {
-	      g_set_error (&error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      break;
-	    }
-	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -340,7 +245,6 @@ write_async_cb (GOutputStreamSocket  *stream,
       break;
     }
 
- out:
   data->callback (G_OUTPUT_STREAM (stream),
 		  data->buffer,
 		  data->count,
@@ -369,7 +273,8 @@ g_output_stream_socket_write_async (GOutputStream      *stream,
 				    int                 io_priority,
 				    GAsyncWriteCallback callback,
 				    gpointer            user_data,
-				    GDestroyNotify      notify)
+				    GDestroyNotify      notify,
+				    GCancellable       *cancellable)
 {
   GSource *source;
   GOutputStreamSocket *socket_stream;
@@ -383,11 +288,16 @@ g_output_stream_socket_write_async (GOutputStream      *stream,
   data->callback = callback;
   data->user_data = user_data;
   data->notify = notify;
+  data->cancellable = cancellable;
+
+  source = _g_fd_source_new (G_OBJECT (socket_stream),
+			     socket_stream->priv->fd,
+			     POLLIN,
+			     g_output_stream_get_async_context (stream),
+			     cancellable);
   
-  source = create_stream_source (socket_stream);
   g_source_set_callback (source, (GSourceFunc)write_async_cb, data, write_async_data_free);
   
-  g_source_attach (source, g_output_stream_get_async_context (stream));
   g_source_unref (source);
 }
 
@@ -396,7 +306,8 @@ g_output_stream_socket_flush_async (GOutputStream        *stream,
 				    int                  io_priority,
 				    GAsyncFlushCallback  callback,
 				    gpointer             data,
-				    GDestroyNotify       notify)
+				    GDestroyNotify       notify,
+				    GCancellable        *cancellable)
 {
   g_assert_not_reached ();
   /* TODO: Not implemented */
@@ -467,7 +378,8 @@ g_output_stream_socket_close_async (GOutputStream       *stream,
 				    int                 io_priority,
 				    GAsyncCloseOutputCallback callback,
 				    gpointer            user_data,
-				    GDestroyNotify      notify)
+				    GDestroyNotify      notify,
+				    GCancellable       *cancellable)
 {
   GSource *idle;
   CloseAsyncData *data;
@@ -483,15 +395,4 @@ g_output_stream_socket_close_async (GOutputStream       *stream,
   g_source_set_callback (idle, (GSourceFunc)close_async_cb, data, close_async_data_free);
   g_source_attach (idle, g_output_stream_get_async_context (stream));
   g_source_unref (idle);
-}
-
-static void
-g_output_stream_socket_cancel (GOutputStream *stream)
-{
-  GOutputStreamSocket *socket_stream;
-
-  socket_stream = G_OUTPUT_STREAM_SOCKET (stream);
-  
-  /* Wake up the mainloop in case we're waiting on async calls with StreamSource */
-  g_main_context_wakeup (g_output_stream_get_async_context (stream));
 }

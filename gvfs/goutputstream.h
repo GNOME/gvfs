@@ -86,18 +86,20 @@ struct _GOutputStreamClass
 			    int                  io_priority,
 			    GAsyncWriteCallback  callback,
 			    gpointer             data,
-			    GDestroyNotify       notify);
+			    GDestroyNotify       notify,
+			    GCancellable        *cancellable);
   void     (* flush_async) (GOutputStream       *stream,
 			    int                  io_priority,
 			    GAsyncFlushCallback  callback,
 			    gpointer             data,
-			    GDestroyNotify       notify);
+			    GDestroyNotify       notify,
+			    GCancellable        *cancellable);
   void     (* close_async) (GOutputStream       *stream,
 			    int                  io_priority,
 			    GAsyncCloseOutputCallback callback,
 			    gpointer             data,
-			    GDestroyNotify       notify);
-  void     (* cancel)      (GOutputStream       *stream);
+			    GDestroyNotify       notify,
+			    GCancellable        *cancellable);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -135,19 +137,20 @@ void          g_output_stream_write_async       (GOutputStream              *str
 						 int                         io_priority,
 						 GAsyncWriteCallback         callback,
 						 gpointer                    data,
-						 GDestroyNotify              notify);
+						 GDestroyNotify              notify,
+						 GCancellable               *cancellable);
 void          g_output_stream_flush_async       (GOutputStream              *stream,
 						 int                         io_priority,
 						 GAsyncFlushCallback         callback,
 						 gpointer                    data,
-						 GDestroyNotify              notify);
+						 GDestroyNotify              notify,
+						 GCancellable               *cancellable);
 void          g_output_stream_close_async       (GOutputStream              *stream,
 						 int                         io_priority,
 						 GAsyncCloseOutputCallback   callback,
 						 gpointer                    data,
-						 GDestroyNotify              notify);
-void          g_output_stream_cancel            (GOutputStream              *stream);
-gboolean      g_output_stream_is_cancelled      (GOutputStream              *stream);
+						 GDestroyNotify              notify,
+						 GCancellable               *cancellable);
 gboolean      g_output_stream_is_closed         (GOutputStream              *stream);
 gboolean      g_output_stream_has_pending       (GOutputStream              *stream);
 void          g_output_stream_set_pending       (GOutputStream              *stream,

@@ -125,11 +125,11 @@ read_done (GInputStream *stream,
 
   if (count_read > 0)
     {
-      g_input_stream_read_async (stream, buffer, 1024, 0, read_done, buffer, NULL);
+      g_input_stream_read_async (stream, buffer, 1024, 0, read_done, buffer, NULL, NULL);
       //g_input_stream_cancel (stream);
     }
   else
-    g_input_stream_close_async (stream, 0, close_done, buffer, g_free);
+    g_input_stream_close_async (stream, 0, close_done, buffer, g_free, NULL);
 }
 
 
@@ -147,13 +147,17 @@ test_async (char *filename, gboolean dump)
   if (in == NULL)
     return;
   
-  g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL);
+  g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL, NULL);
 }
 
 static gboolean
-cancel_stream (gpointer data)
+cancel_cancellable_cb (gpointer data)
 {
-  g_input_stream_cancel (G_INPUT_STREAM (data));
+  GCancellable *cancellable = G_CANCELLABLE (data);
+
+  g_cancellable_cancel (cancellable);
+  g_object_unref (cancellable);
+  
   return FALSE;
 }
 
@@ -182,7 +186,15 @@ test_seek (void)
   file = g_file_get_for_uri ("foo:///etc/passwd");
 
   error = NULL;
-  in = (GInputStream *)g_file_read (file, NULL, NULL);
+  in = (GInputStream *)g_file_read (file, NULL, &error);
+
+  if (in == NULL)
+    {
+      g_print ("Can't find foo:///etc/passwd: %s\n", error->message);
+      g_error_free (error);
+      return;
+    }
+  
   seekable = G_SEEKABLE (in);
 
   g_print ("offset: %d\n", (int)g_seekable_tell (seekable));
@@ -220,7 +232,6 @@ main (int argc, char *argv[])
   g_type_init ();
   g_thread_init (NULL);
 
-
   test_seek ();
   
   loop = g_main_loop_new (NULL, FALSE);
@@ -229,6 +240,7 @@ main (int argc, char *argv[])
     GInputStream *s;
     char *buffer;
     gssize res;
+    GCancellable *c;
 
     buffer = g_malloc (1025);
     
@@ -241,11 +253,13 @@ main (int argc, char *argv[])
 	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
 	g_print ("res2: %d\n", res);
       }
-    
-    g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, NULL);
-    if (0) g_timeout_add (1000, cancel_stream, s);
+
+    c = g_cancellable_new ();
+    g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, NULL, c);
+    if (1) g_timeout_add (1000, cancel_cancellable_cb, g_object_ref (c));
     g_print ("main loop run\n");
     g_main_loop_run (loop);
+    g_object_unref (c);
     g_print ("main loop quit\n");
   }
 

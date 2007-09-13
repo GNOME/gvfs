@@ -3,7 +3,7 @@
 #include "gioscheduler.h"
 
 struct _GIOJob {
-  gint id;
+  GSList *active_link;
   GIOJobFunc job_func;
   GIODataFunc cancel_func; /* Runs under job map lock */
   gpointer data;
@@ -11,25 +11,16 @@ struct _GIOJob {
   
   GMainContext *callback_context;
   gint io_priority;
-  gboolean cancelled;
   GCancellable *cancellable;
 };
 
-static GHashTable *job_map = NULL;
-static GThreadPool *job_thread_pool = NULL;
-static gint next_job_id = 1;
-/* Serializes access to the job_map hash, and handles
- * lifetime issues for the jobs. (i.e. other than the
- * io thread you can only access the job when the job_map
- * lock is held) */
-G_LOCK_DEFINE_STATIC(job_map);
+G_LOCK_DEFINE_STATIC(active_jobs);
+static GSList *active_jobs = NULL;
 
-/* We allocate one cancellable per thread and reuse it */
-static GStaticPrivate job_cancellable = G_STATIC_PRIVATE_INIT;
+static GThreadPool *job_thread_pool = NULL;
 
 static void io_job_thread (gpointer       data,
 			   gpointer       user_data);
-
 
 static gint
 g_io_job_compare (gconstpointer  a,
@@ -39,12 +30,9 @@ g_io_job_compare (gconstpointer  a,
   const GIOJob *aa = a;
   const GIOJob *bb = b;
 
-  /* Always run cancelled ops first, they are quick and should be gotten rid of */
-  if (aa->cancelled && !bb->cancelled)
-    return -1;
-  if (!aa->cancelled && bb->cancelled)
-    return 1;
-
+  /* Cancelled jobs are set prio == -1, so that
+     they are executed as quickly as possible */
+  
   /* Lower value => higher priority */
   if (aa->io_priority < bb->io_priority)
     return -1;
@@ -53,10 +41,10 @@ g_io_job_compare (gconstpointer  a,
   return 1;
 }
 
-static void
-init_scheduler (void)
+static gpointer
+init_scheduler (gpointer arg)
 {
-  if (job_map == NULL)
+  if (job_thread_pool == NULL)
     {
       /* TODO: thread_pool_new can fail */
       job_thread_pool = g_thread_pool_new (io_job_thread,
@@ -67,8 +55,8 @@ init_scheduler (void)
       g_thread_pool_set_sort_function (job_thread_pool,
 				       g_io_job_compare,
 				       NULL);
-      job_map = g_hash_table_new (g_direct_hash, g_direct_equal);
     }
+  return NULL;
 }
 
 static void
@@ -76,125 +64,106 @@ io_job_thread (gpointer       data,
 	       gpointer       user_data)
 {
   GIOJob *job = data;
-  GCancellable *c;
-  gboolean cancelled;
+  GIOJob *other_job;
+  GSList *l;
+  gboolean resort_jobs;
 
-  c = g_static_private_get (&job_cancellable);
-  if (c == NULL)
-    {
-      c = g_cancellable_new ();
-      g_static_private_set (&job_cancellable, c, g_object_unref);
-    }
-
-  g_cancellable_reset (c);
-
-  G_LOCK (job_map);
-  cancelled = job->cancelled;
-  if (cancelled)
-    g_cancellable_cancel (c);
-  else
-    job->cancellable = c;
-  G_UNLOCK (job_map);
-  
-  g_push_current_cancellable (c);
-  job->job_func (job, c, job->data);
-  g_pop_current_cancellable (c);
-
-  /* Note: We can still get cancel calls here if the job didn't
-   * mark itself done, which means we can't free the data until
-   * after removal from the job_map.
-   */
-  
-  g_io_job_mark_done (job);
+  if (job->cancellable)
+    g_push_current_cancellable (job->cancellable);
+  job->job_func (job, job->cancellable, job->data);
+  if (job->cancellable)
+    g_pop_current_cancellable (job->cancellable);
 
   if (job->destroy_notify)
     job->destroy_notify (job->data);
 
+  G_LOCK (active_jobs);
+  active_jobs = g_slist_delete_link (active_jobs, job->active_link);
+  
+  resort_jobs = FALSE;
+  for (l = active_jobs; l != NULL; l = l->next)
+    {
+      other_job = l->data;
+      if (other_job->io_priority >= 0 &&
+	  g_cancellable_is_cancelled (other_job->cancellable))
+	{
+	  other_job->io_priority = -1;
+	  resort_jobs = TRUE;
+	}
+    }
+  G_UNLOCK (active_jobs);
+  
+  g_object_unref (job->cancellable);
   g_main_context_unref (job->callback_context);
   g_free (job);
+
+  if (resort_jobs)
+    g_thread_pool_set_sort_function (job_thread_pool,
+				     g_io_job_compare,
+				     NULL);
 }
 
-
-gint
-g_schedule_io_job (GIOJobFunc    job_func,
-		   gpointer      data,
+void
+g_schedule_io_job (GIOJobFunc     job_func,
+		   gpointer       data,
 		   GDestroyNotify notify,
-		   gint          io_priority,
-		   GMainContext *callback_context)
+		   gint           io_priority,
+		   GMainContext  *callback_context,
+		   GCancellable  *cancellable)
 {
+  static GOnce once_init = G_ONCE_INIT;
   GIOJob *job;
-  gint id;
 
   if (callback_context == NULL)
     callback_context = g_main_context_default ();
   
   job = g_new0 (GIOJob, 1);
-  job->id = g_atomic_int_exchange_and_add (&next_job_id, 1);
   job->job_func = job_func;
   job->data = data;
   job->destroy_notify = notify;
   job->io_priority = io_priority;
   job->callback_context = g_main_context_ref (callback_context);
-  job->cancelled = FALSE;
-  
-  G_LOCK (job_map);
-  init_scheduler ();
+  /* TODO: Should we create this cancellation always?
+   * If we do cancel_all_jobs works for all ops, but if we
+   * don't we save some resources for non-cancellable jobs
+   */
+  if (cancellable)
+    job->cancellable = g_object_ref (cancellable);
+  else
+    job->cancellable = g_cancellable_new ();
 
-  g_hash_table_insert (job_map, GINT_TO_POINTER (job->id), job);
-  
-  /* TODO: We ignore errors */
+  G_LOCK (active_jobs);
+  active_jobs = g_slist_prepend (active_jobs, job);
+  job->active_link = active_jobs;
+  G_UNLOCK (active_jobs);
+
+  g_once (&once_init, init_scheduler, NULL);
   g_thread_pool_push (job_thread_pool, job, NULL);
-
-  id = job->id;
-  G_UNLOCK (job_map);
-
-  return id;
-}
-
-void
-g_cancel_io_job (gint id)
-{
-  GIOJob *job;
-  
-  G_LOCK (job_map);
-  init_scheduler ();
-
-  job = g_hash_table_lookup (job_map, GINT_TO_POINTER (id));
-  if (job && !job->cancelled)
-    {
-      job->cancelled = TRUE;
-      g_cancellable_cancel (job->cancellable);
-    }
-  
-  G_UNLOCK (job_map);
-}
-
-/* Called with job_map lock held */
-static void
-foreach_job_cancel (gpointer       key,
-		    gpointer       value,
-		    gpointer       user_data)
-{
-  GIOJob *job = value;
-
-  if (!job->cancelled)
-    {
-      job->cancelled = TRUE;
-      g_cancellable_cancel (job->cancellable);
-    }
 }
 
 void
 g_cancel_all_io_jobs (void)
 {
-  G_LOCK (job_map);
-  init_scheduler ();
-  g_hash_table_foreach (job_map,
-			foreach_job_cancel,
-			NULL);
+  GSList *cancellable_list, *l;
   
-  
-  G_UNLOCK (job_map);
+  G_LOCK (active_jobs);
+  cancellable_list = NULL;
+  for (l = active_jobs; l != NULL; l = l->next)
+    {
+      GIOJob *job = l->data;
+      if (job->cancellable)
+	cancellable_list = g_slist_prepend (cancellable_list,
+					    g_object_ref (job->cancellable));
+    }
+  G_UNLOCK (active_jobs);
+
+  for (l = cancellable_list; l != NULL; l = l->next)
+    {
+      GCancellable *c = l->data;
+      g_cancellable_cancel (c);
+      g_object_unref (c);
+    }
+  g_slist_free (cancellable_list);
 }
 
 typedef struct {
@@ -287,14 +256,4 @@ g_io_job_send_to_mainloop (GIOJob        *job,
 	/* destroy notify didn't free proxy */
 	mainloop_proxy_free (proxy);
   }
-}
-
-/* Means you can't cancel it */
-void
-g_io_job_mark_done (GIOJob *job)
-{
-  G_LOCK (job_map);
-  g_hash_table_remove (job_map, GINT_TO_POINTER (job->id));
-  job->cancellable = NULL;
-  G_UNLOCK (job_map);
 }

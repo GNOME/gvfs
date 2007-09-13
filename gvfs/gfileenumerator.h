@@ -76,15 +76,15 @@ struct _GFileEnumeratorClass
 				  int                           io_priority,
 				  GAsyncNextFilesCallback       callback,
 				  gpointer                      data,
-				  GDestroyNotify                notify);
+				  GDestroyNotify                notify,
+				  GCancellable                 *cancellable);
   void       (*stop_async)       (GFileEnumerator              *enumerator,
 				  int                           io_priority,
 				  GAsyncStopEnumeratingCallback callback,
 				  gpointer                      data,
-				  GDestroyNotify                notify);
-  void       (*cancel)           (GFileEnumerator              *enumerator);
+				  GDestroyNotify                notify,
+				  GCancellable                 *cancellable);
 };
-
 
 GType g_file_enumerator_get_type (void) G_GNUC_CONST;
 
@@ -102,14 +102,14 @@ void          g_file_enumerator_next_files_async  (GFileEnumerator              
 						   int                             io_priority,
 						   GAsyncNextFilesCallback         callback,
 						   gpointer                        data,
-						   GDestroyNotify                  notify);
+						   GDestroyNotify                  notify,
+						   GCancellable                   *cancellable);
 void          g_file_enumerator_stop_async        (GFileEnumerator                *enumerator,
 						   int                             io_priority,
 						   GAsyncStopEnumeratingCallback   callback,
 						   gpointer                        data,
-						   GDestroyNotify                  notify);
-void          g_file_enumerator_cancel            (GFileEnumerator                *enumerator);
-gboolean      g_file_enumerator_is_cancelled      (GFileEnumerator                *enumerator);
+						   GDestroyNotify                  notify,
+						   GCancellable                   *cancellable);
 gboolean      g_file_enumerator_is_stopped        (GFileEnumerator                *enumerator);
 gboolean      g_file_enumerator_has_pending       (GFileEnumerator                *enumerator);
 void          g_file_enumerator_set_pending       (GFileEnumerator                *enumerator,
