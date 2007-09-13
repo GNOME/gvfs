@@ -13,6 +13,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "gfileinfosimple.h"
+#include "gvfserror.h"
 
 static gchar *
 read_link (const gchar *full_name)
@@ -324,4 +325,44 @@ g_file_info_simple_get (const char *basename,
   get_xattrs (path, info, attribute_matcher, follow_symlinks);
   
   return TRUE;
+}
+
+
+GFileInfo *
+g_file_info_simple_get_from_fd (int fd,
+				GFileInfoRequestFlags requested,
+				char *attributes,
+				GError **error)
+{
+  struct stat stat_buf;
+  GFileAttributeMatcher *matcher;
+  GFileInfo *info;
+  
+  if (fstat (fd, &stat_buf) == -1)
+    {
+      g_vfs_error_from_errno (error, errno);
+      return NULL;
+    }
+
+  info = g_file_info_new ();
+  
+  g_file_info_set_from_stat (info, requested, &stat_buf);
+
+  matcher = g_file_attribute_matcher_new (attributes);
+  
+#ifdef HAVE_SELINUX
+  if (g_file_attribute_matcher_matches (matcher, "selinux", "selinux:context") &&
+      is_selinux_enabled ()) {
+    char *context;
+    if (fgetfilecon_raw (fd, &context) >= 0)
+      {
+	g_file_info_set_attribute (info, "selinux:context", context);
+	freecon(context);
+      }
+  }
+#endif
+  
+  g_file_attribute_matcher_free (matcher);
+  
+  return info;
 }

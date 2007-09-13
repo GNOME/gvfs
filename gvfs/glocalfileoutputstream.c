@@ -5,15 +5,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#ifdef HAVE_SELINUX
-#include <selinux/selinux.h>
-#endif
 
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include "gvfserror.h"
-#include <glocalfileoutputstream.h>
+#include "glocalfileoutputstream.h"
+#include "gfileinfosimple.h"
 
 G_DEFINE_TYPE (GLocalFileOutputStream, g_local_file_output_stream, G_TYPE_FILE_OUTPUT_STREAM);
 
@@ -560,40 +558,15 @@ g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
 					  GError              **error)
 {
   GLocalFileOutputStream *file;
-  GFileInfo *info;
-  struct stat stat_buf;
-  GFileAttributeMatcher *matcher;
 
   file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
   if (!g_local_file_output_stream_open (file, error))
     return NULL;
 
-  if (fstat (file->priv->fd, &stat_buf) == -1)
-    {
-      g_vfs_error_from_errno (error, errno);
-      return NULL;
-    }
+  return g_file_info_simple_get_from_fd (file->priv->fd,
+					 requested,
+					 attributes,
+					 error);
 
-  info = g_file_info_new ();
-
-  g_file_info_set_from_stat (info, requested, &stat_buf);
-
-  matcher = g_file_attribute_matcher_new (attributes);
-  
-#ifdef HAVE_SELINUX
-  if (g_file_attribute_matcher_matches (matcher, "selinux", "selinux:context") &&
-      is_selinux_enabled ()) {
-    char *context;
-    if (fgetfilecon_raw (file->priv->fd, &context) >= 0)
-      {
-	g_file_info_set_attribute (info, "selinux:context", context);
-	freecon(context);
-      }
-  }
-#endif
-  
-  g_file_attribute_matcher_free (matcher);
-  
-  return info;
 }
