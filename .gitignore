@@ -30,3 +30,4 @@ core.*
 core
 compile
 gtk-doc.make
+*.pc
