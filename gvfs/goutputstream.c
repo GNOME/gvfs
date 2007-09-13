@@ -153,6 +153,63 @@ g_output_stream_write (GOutputStream *stream,
 }
 
 /**
+ * g_output_stream_write_all:
+ * @stream: a #GOutputStream.
+ * @buffer: the buffer containing the data to write. 
+ * @count: the number of bytes to write
+ * @error: location to store the error occuring, or %NULL to ignore
+ *
+ * Tries to write @count bytes from @buffer into the stream. Will block
+ * during the operation.
+ * 
+ * This function behaves like g_output_stream_read (), except it tries to
+ * read as many bytes as requested, only stopping on an error or a true
+ * end of stream.
+ *
+ * On success, the number of bytes written to the stream is returned.
+ * On error -1 is returned and @error is set accordingly.
+ * 
+ * Return value: Number of bytes written, or -1 on error
+ **/
+gssize
+g_output_stream_write_all (GOutputStream *stream,
+			   void          *buffer,
+			   gsize          count,
+			   GError       **error)
+{
+  gsize bytes_written;
+  gssize res;
+  GError *internal_error;
+
+  bytes_written = 0;
+
+  internal_error = NULL;
+  while (bytes_written < count)
+    {
+      res = g_output_stream_write (stream, (char *)buffer + bytes_written, count - bytes_written,
+				 &internal_error);
+      if (res == -1)
+	{
+	  if (bytes_written == 0)
+	    {
+	      g_propagate_error (error, internal_error);
+	      return -1;
+	    }
+	  else
+	    {
+	      g_error_free (internal_error);
+	      return bytes_written;
+	    }
+	}
+      if (res == 0)
+	return bytes_written;
+
+      bytes_written += res;
+    }
+  return bytes_written;
+}
+
+/**
  * g_output_stream_flush:
  * @stream: a #GOutputStream.
  * @error: location to store the error occuring, or %NULL to ignore

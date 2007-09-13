@@ -160,6 +160,63 @@ g_input_stream_read  (GInputStream  *stream,
 }
 
 /**
+ * g_input_stream_read_all:
+ * @stream: a #GInputStream.
+ * @buffer: a buffer to read data into (which should be at least count bytes long).
+ * @count: the number of bytes that will be read from the stream
+ * @error: location to store the error occuring, or %NULL to ignore
+ *
+ * Tries to read @count bytes from the stream into the buffer starting at
+ * @buffer. Will block during this read.
+ *
+ * This function behaves like g_input_stream_read (), except it tries to
+ * read as many bytes as requested, only stopping on an error or a true
+ * end of stream.
+ *
+ * On success, the number of bytes read into the buffer is returned.
+ * On error -1 is returned and @error is set accordingly.
+ * 
+ * Return value: Number of bytes read, or -1 on error
+ **/
+gssize
+g_input_stream_read_all (GInputStream              *stream,
+			 void                      *buffer,
+			 gsize                      count,
+			 GError                   **error)
+{
+  gsize bytes_read;
+  gssize res;
+  GError *internal_error;
+
+  bytes_read = 0;
+
+  internal_error = NULL;
+  while (bytes_read < count)
+    {
+      res = g_input_stream_read (stream, (char *)buffer + bytes_read, count - bytes_read,
+				 &internal_error);
+      if (res == -1)
+	{
+	  if (bytes_read == 0)
+	    {
+	      g_propagate_error (error, internal_error);
+	      return -1;
+	    }
+	  else
+	    {
+	      g_error_free (internal_error);
+	      return bytes_read;
+	    }
+	}
+      if (res == 0)
+	return bytes_read;
+
+      bytes_read += res;
+    }
+  return bytes_read;
+}
+
+/**
  * g_input_stream_skip:
  * @stream: a #GInputStream.
  * @count: the number of bytes that will be skipped from the stream

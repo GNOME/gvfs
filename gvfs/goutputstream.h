@@ -112,6 +112,10 @@ gssize        g_output_stream_write             (GOutputStream              *str
 						 void                       *buffer,
 						 gsize                       count,
 						 GError                    **error);
+gssize        g_output_stream_write_all         (GOutputStream              *stream,
+						 void                       *buffer,
+						 gsize                       count,
+						 GError                    **error);
 gboolean      g_output_stream_flush             (GOutputStream              *stream,
 						 GError                    **error);
 gboolean      g_output_stream_close             (GOutputStream              *stream,
