@@ -158,10 +158,19 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	  
 #ifdef HAVE_LINK
 	  /* create original -> backup link, the original is then renamed over */
+	  if (unlink (file->priv->backup_filename) != 0)
+	    {
+	      g_set_error (error, G_IO_ERROR,
+			   G_IO_ERROR_CANT_CREATE_BACKUP,
+			   _("Error removing old backup link: %s"),
+			   g_strerror (errno));
+	      goto err_out;
+	    }
+
 	  if (link (file->priv->original_filename, file->priv->backup_filename) != 0)
 	    {
 	      g_set_error (error, G_IO_ERROR,
-			   g_io_error_from_errno (errno),
+			   G_IO_ERROR_CANT_CREATE_BACKUP,
 			   _("Error creating backup link: %s"),
 			   g_strerror (errno));
 	      goto err_out;
@@ -171,7 +180,7 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	  if (!rename (file->priv->original_filename, file->priv->backup_filename) != 0)
 	    {
 	      g_set_error (error, G_IO_ERROR,
-			   g_io_error_from_errno (errno),
+			   G_IO_ERROR_CANT_CREATE_BACKUP,
 			   _("Error creating backup copy: %s"),
 			   g_strerror (errno));
 	      goto err_out;
