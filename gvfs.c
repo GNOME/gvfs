@@ -63,16 +63,15 @@ g_vfs_get_file_for_uri  (GVfs *vfs,
 }
 
 GFile *
-g_vfs_parse_absolute_display_name (GVfs *vfs,
-				   const char *display_name)
+g_vfs_parse_name (GVfs *vfs,
+		  const char *parse_name)
 {
   GVfsIface *iface;
 
   iface = G_VFS_GET_IFACE (vfs);
 
-  return (* iface->parse_absolute_display_name) (vfs, display_name);
+  return (* iface->parse_name) (vfs, parse_name);
 }
-
 
 static gpointer
 get_default_vfs (gpointer arg)

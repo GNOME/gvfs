@@ -198,8 +198,8 @@ g_file_get_for_uri (const char *uri)
 }
   
 GFile *
-g_file_parse_absolute_display_name (const char *display_name)
+g_file_parse_name (const char *parse_name)
 {
-  return g_vfs_parse_absolute_display_name (g_vfs_get (),
-					    display_name);
+  return g_vfs_parse_name (g_vfs_get (),
+			   parse_name);
 }

@@ -59,8 +59,8 @@ g_vfs_simple_get_file_for_uri   (GVfs       *vfs,
 }
   
 GFile *
-g_vfs_simple_parse_absolute_display_name (GVfs       *vfs,
-					  const char *display_name)
+g_vfs_simple_parse_name (GVfs       *vfs,
+			 const char *parse_name)
 {
   return NULL;
 }
@@ -71,5 +71,5 @@ g_vfs_simple_vfs_iface_init (GVfsIface *iface)
 {
   iface->get_file_for_path = g_vfs_simple_get_file_for_path;
   iface->get_file_for_uri = g_vfs_simple_get_file_for_uri;
-  iface->parse_absolute_display_name = g_vfs_simple_parse_absolute_display_name;
+  iface->parse_name = g_vfs_simple_parse_name;
 }
