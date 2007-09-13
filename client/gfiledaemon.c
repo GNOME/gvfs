@@ -345,7 +345,7 @@ do_async_path_call (GFile *file,
   _g_vfs_impl_daemon_get_mount_info_async (daemon_file->mount_spec,
 					   daemon_file->path,
 					   do_async_path_call_callback,
-					   file);
+					   data);
 }
 
 
