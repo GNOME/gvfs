@@ -2,25 +2,33 @@ gio:
 ===
 
 Work on GFile:
-* More async operations
+* More async operations:
+   get_filesystem_info
+   set_display_name
+   set_attribute
+   set_attributes_from_info
+   delete_file
+   trash
+   make_directory
+   make_symbolic_link
+   copy
+   move
 
-Implement the rest of the mountable GFile ops
+Implement the rest of the mountable GDaemonFile ops:
+   unmount_mountable
+   eject_mountable
 
-Test g_file_replace_contents_async
+Add more filter streams: data reading, conversion (with general converter interface)
 
-Add filter streams: data, charset conversion, etc
-
-is-slow marking for e.g. thumbnailing?
-
-getting selinux attrs is a bit slow, it does all sort of weird ops.
-
-GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
+is-slow marking for e.g. thumbnailing? How would you know this though?
 
 HAL implementation of VolumeMonitor
 
 Move GAppInfo to Gtk+
 
 Implement UNMOUNTED and PRE_UNMOUNT for file monitors
+
+Implement CHANGES_DONE_HINT for inotify
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
