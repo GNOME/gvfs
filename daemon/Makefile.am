@@ -35,11 +35,14 @@ EXTRA_DIST = gvfs-daemon.service.in
 
 DISTCLEANFILES = gvfs-daemon.service
 
-libexec_PROGRAMS=gvfs-daemon gvfs-daemon
+libexec_PROGRAMS=gvfs-daemon gvfs-daemon-ftp
+
+mount_in_files = ftp.mount.in
+mount_DATA = ftp.mount
 
 if HAVE_SAMBA
-mount_in_files = smb.mount.in smb-browse.mount.in
-mount_DATA = smb.mount smb-browse.mount
+mount_in_files += smb.mount.in smb-browse.mount.in
+mount_DATA += smb.mount smb-browse.mount
 libexec_PROGRAMS += gvfs-daemon-smb-browse gvfs-daemon-smb
 endif
 
@@ -126,3 +129,16 @@ gvfs_daemon_smb_browse_CPPFLAGS = \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
 gvfs_daemon_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
+
+gvfs_daemon_ftp_SOURCES = \
+	gvfsbackendftp.c gvfsbackendftp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfs_daemon_ftp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendftp.h \
+	-DDEFAULT_BACKEND_TYPE=ftp \
+	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP,'
+
+gvfs_daemon_ftp_LDADD = $(SAMBA_LIBS) $(libraries)
