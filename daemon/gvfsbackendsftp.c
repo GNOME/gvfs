@@ -40,7 +40,6 @@
 
 /* TODO for sftp:
  * Implement can_delete & can_rename
- * set_display_name
  * query_writable_attributes
  * set_attributes
  * fstat
@@ -2946,6 +2945,59 @@ try_move (GVfsBackend *backend,
 }
 
 static void
+set_display_name_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job,
+                        gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1); 
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static gboolean
+try_set_display_name (GVfsBackend *backend,
+                      GVfsJobSetDisplayName *job,
+                      const char *filename,
+                      const char *display_name)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+  char *dirname, *basename, *new_name;
+
+  /* We use the same setting as for local files. Can't really
+   * do better, since there is no way in this version of sftp to find out
+   * the remote charset encoding
+   */
+  
+  dirname = g_path_get_dirname (filename);
+  basename = g_filename_from_utf8 (display_name, -1, NULL, NULL, NULL);
+  if (basename == NULL)
+    basename = g_strdup (display_name);
+  new_name = g_build_filename (dirname, basename, NULL);
+  g_free (dirname);
+  g_free (basename);
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_RENAME,
+                                &id);
+  put_string (command, filename);
+  put_string (command, new_name);
+  
+  queue_command_stream_and_free (op_backend, command, id, set_display_name_reply, G_VFS_JOB (job), NULL);
+
+  g_free (new_name);
+
+  return TRUE;
+}
+
+
+static void
 make_symlink_reply (GVfsBackendSftp *backend,
                     int reply_type,
                     GDataInputStream *reply,
@@ -3131,4 +3183,5 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_make_symlink = try_make_symlink;
   backend_class->try_make_directory = try_make_directory;
   backend_class->try_delete = try_delete;
+  backend_class->try_set_display_name = try_set_display_name;
 }
