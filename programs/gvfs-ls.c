@@ -12,13 +12,50 @@ static GOptionEntry entries[] =
 	{ NULL }
 };
 
+static const char *
+type_to_string (GFileType type)
+{
+  switch (type)
+    {
+    default:
+      return "invalid type";
+      
+    case G_FILE_TYPE_UNKNOWN:
+      return "unknown";
+      
+    case G_FILE_TYPE_REGULAR:
+      return "regular";
+      
+    case G_FILE_TYPE_DIRECTORY:
+      return "directory";
+      
+    case G_FILE_TYPE_SYMBOLIC_LINK:
+      return "symlink";
+
+    case G_FILE_TYPE_SPECIAL:
+      return "special";
+
+    case G_FILE_TYPE_SHORTCUT:
+      return "shortcut";
+
+    case G_FILE_TYPE_MOUNTABLE:
+      return "mountable";
+    }
+}
+
 static void
 show_info (GFileInfo *info)
 {
-  const char *name;
+  const char *name, *type;
+  goffset size;
   
   name = g_file_info_get_name (info);
-  g_print ("filename: %s\n", name);
+  if (name == NULL)
+    name = "";
+
+  size = g_file_info_get_size (info);
+  type = type_to_string (g_file_info_get_file_type (info));
+  g_print ("%s\t%ld (%s)\n", name, (long)size, type);
 }
 
 static void
@@ -32,7 +69,7 @@ list (GFile *file)
   if (file == NULL)
     return;
   
-  request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME;
+  request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME | G_FILE_INFO_SIZE;
 
   enumerator = g_file_enumerate_children (file, request, attributes, TRUE);
 
