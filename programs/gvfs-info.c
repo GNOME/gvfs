@@ -210,6 +210,10 @@ attribute_flags_to_string (GFileAttributeFlags flags)
       G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE,
       "Copy with file"
     },
+    {
+      G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED,
+      "Keep with file when moved"
+    },
   };
 
   first = TRUE;
@@ -275,7 +279,13 @@ get_writable_info (GFile *file)
     {
       g_print ("Writable attribute namespaces:\n");
       for (i = 0; i < list->n_infos; i++)
-	g_print (" %s (%s)\n", list->infos[i].name, attribute_type_to_string (list->infos[i].type));
+	{
+	  flags = attribute_flags_to_string (list->infos[i].flags);
+	  g_print (" %s (%s%s%s)\n",
+		   list->infos[i].name,
+		   attribute_type_to_string (list->infos[i].type),
+		   (*flags != 0)?", ":"", flags);
+	}
     }
   
   g_file_attribute_info_list_free (list);
