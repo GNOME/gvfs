@@ -214,47 +214,46 @@ update_drives (GUnixVolumeMonitor *monitor)
   GList *l;
   GUnixDrive *drive;
   
-  if (_g_get_unix_mount_points (&new_mountpoints))
+  new_mountpoints = _g_get_unix_mount_points ();
+  
+  new_mountpoints = g_list_sort (new_mountpoints, (GCompareFunc) _g_unix_mount_point_compare);
+  
+  diff_sorted_lists (monitor->last_mountpoints,
+		     new_mountpoints, (GCompareFunc) _g_unix_mount_point_compare,
+		     &added, &removed);
+  
+  for (l = removed; l != NULL; l = l->next)
     {
-      new_mountpoints = g_list_sort (new_mountpoints, (GCompareFunc) _g_unix_mount_point_compare);
+      GUnixMountPoint *mountpoint = l->data;
       
-      diff_sorted_lists (monitor->last_mountpoints,
-			 new_mountpoints, (GCompareFunc) _g_unix_mount_point_compare,
-			 &added, &removed);
-    
-      for (l = removed; l != NULL; l = l->next)
+      drive = g_unix_volume_monitor_lookup_drive_for_mountpoint (monitor, mountpoint->mount_path);
+      if (drive)
 	{
-	  GUnixMountPoint *mountpoint = l->data;
-	  
-	  drive = g_unix_volume_monitor_lookup_drive_for_mountpoint (monitor, mountpoint->mount_path);
-	  if (drive)
-	    {
-	      g_unix_drive_disconnected (drive);
-	      monitor->drives = g_list_remove (monitor->drives, drive);
-	      g_signal_emit_by_name (monitor, "drive_disconnected", drive);
-	      g_object_unref (drive);
-	    }
+	  g_unix_drive_disconnected (drive);
+	  monitor->drives = g_list_remove (monitor->drives, drive);
+	  g_signal_emit_by_name (monitor, "drive_disconnected", drive);
+	  g_object_unref (drive);
 	}
-      
-      for (l = added; l != NULL; l = l->next)
-	{
-	  GUnixMountPoint *mountpoint = l->data;
-	  
-	  drive = g_unix_drive_new (G_VOLUME_MONITOR (monitor), mountpoint);
-	  if (drive)
-	    {
-	      monitor->drives = g_list_prepend (monitor->drives, drive);
-	      g_signal_emit_by_name (monitor, "drive_connected", drive);
-	    }
-	}
-      
-      g_list_free (added);
-      g_list_free (removed);
-      g_list_foreach (monitor->last_mountpoints,
-		      (GFunc)_g_unix_mount_point_free, NULL);
-      g_list_free (monitor->last_mountpoints);
-      monitor->last_mountpoints = new_mountpoints;
     }
+  
+  for (l = added; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mountpoint = l->data;
+      
+      drive = g_unix_drive_new (G_VOLUME_MONITOR (monitor), mountpoint);
+      if (drive)
+	{
+	  monitor->drives = g_list_prepend (monitor->drives, drive);
+	  g_signal_emit_by_name (monitor, "drive_connected", drive);
+	}
+    }
+  
+  g_list_free (added);
+  g_list_free (removed);
+  g_list_foreach (monitor->last_mountpoints,
+		  (GFunc)_g_unix_mount_point_free, NULL);
+  g_list_free (monitor->last_mountpoints);
+  monitor->last_mountpoints = new_mountpoints;
 }
 
 static void
@@ -265,45 +264,44 @@ update_volumes (GUnixVolumeMonitor *monitor)
   GList *l;
   GUnixVolume *volume;
   
-  if (_g_get_unix_mounts (&new_mounts))
+  new_mounts = _g_get_unix_mounts ();
+  
+  new_mounts = g_list_sort (new_mounts, (GCompareFunc) _g_unix_mount_compare);
+  
+  diff_sorted_lists (monitor->last_mounts,
+		     new_mounts, (GCompareFunc) _g_unix_mount_compare,
+		     &added, &removed);
+  
+  for (l = removed; l != NULL; l = l->next)
     {
-      new_mounts = g_list_sort (new_mounts, (GCompareFunc) _g_unix_mount_compare);
+      GUnixMount *mount = l->data;
       
-      diff_sorted_lists (monitor->last_mounts,
-			 new_mounts, (GCompareFunc) _g_unix_mount_compare,
-			 &added, &removed);
-    
-      for (l = removed; l != NULL; l = l->next)
+      volume = find_volume_by_mountpoint (monitor, mount->mount_path);
+      if (volume)
 	{
-	  GUnixMount *mount = l->data;
-	  
-	  volume = find_volume_by_mountpoint (monitor, mount->mount_path);
-	  if (volume)
-	    {
-	      g_unix_volume_unmounted (volume);
-	      monitor->volumes = g_list_remove (monitor->volumes, volume);
-	      g_signal_emit_by_name (monitor, "volume_unmounted", volume);
-	      g_object_unref (volume);
-	    }
+	  g_unix_volume_unmounted (volume);
+	  monitor->volumes = g_list_remove (monitor->volumes, volume);
+	  g_signal_emit_by_name (monitor, "volume_unmounted", volume);
+	  g_object_unref (volume);
 	}
-      
-      for (l = added; l != NULL; l = l->next)
-	{
-	  GUnixMount *mount = l->data;
-	  
-	  volume = g_unix_volume_new (G_VOLUME_MONITOR (monitor), mount);
-	  if (volume)
-	    {
-	      monitor->volumes = g_list_prepend (monitor->volumes, volume);
-	      g_signal_emit_by_name (monitor, "volume_mounted", volume);
-	    }
-	}
-      
-      g_list_free (added);
-      g_list_free (removed);
-      g_list_foreach (monitor->last_mounts,
-		      (GFunc)_g_unix_mount_free, NULL);
-      g_list_free (monitor->last_mounts);
-      monitor->last_mounts = new_mounts;
     }
+  
+  for (l = added; l != NULL; l = l->next)
+    {
+      GUnixMount *mount = l->data;
+      
+      volume = g_unix_volume_new (G_VOLUME_MONITOR (monitor), mount);
+      if (volume)
+	{
+	  monitor->volumes = g_list_prepend (monitor->volumes, volume);
+	  g_signal_emit_by_name (monitor, "volume_mounted", volume);
+	}
+    }
+  
+  g_list_free (added);
+  g_list_free (removed);
+  g_list_foreach (monitor->last_mounts,
+		  (GFunc)_g_unix_mount_free, NULL);
+  g_list_free (monitor->last_mounts);
+  monitor->last_mounts = new_mounts;
 }

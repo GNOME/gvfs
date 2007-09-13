@@ -94,40 +94,23 @@ get_mtab_monitor_file (void)
 #endif
 }
 
-gboolean
-_g_get_unix_mounts (GList **return_list)
+GList *
+_g_get_unix_mounts ()
 {
-  static time_t last_mtime = 0;
-  static off_t last_size = 0;
   struct mntent *mntent;
   FILE *file;
   char *read_file;
-  char *stat_file;
-  struct stat sb;
   GUnixMount *mount_entry;
   GHashTable *mounts_hash;
+  GList *return_list;
   
   read_file = get_mtab_read_file ();
-  stat_file = get_mtab_monitor_file ();
-  
-  *return_list = NULL;
-  
-  if (stat (stat_file, &sb) < 0)
-    {
-      g_warning ("Unable to stat %s: %s", stat_file,
-		 g_strerror (errno));
-      return TRUE;
-    }
-  
-  if (sb.st_mtime == last_mtime && sb.st_size == last_size)
-    return FALSE;
-  
-  last_mtime = sb.st_mtime;
-  last_size = sb.st_size;
   
   file = setmntent (read_file, "r");
   if (file == NULL)
-    return TRUE;
+    return NULL;
+
+  return_list = NULL;
   
   mounts_hash = g_hash_table_new (g_str_hash, g_str_equal);
   
@@ -153,23 +136,22 @@ _g_get_unix_mounts (GList **return_list)
       mount_entry->device_path = g_strdup (mntent->mnt_fsname);
       mount_entry->filesystem_type = g_strdup (mntent->mnt_type);
       
-      g_hash_table_insert (mounts_hash,
-			   mount_entry->device_path,
-			   mount_entry->device_path);
-      
 #if defined (HAVE_HASMNTOPT)
       if (hasmntopt (mntent, MNTOPT_RO) != NULL)
 	mount_entry->is_read_only = TRUE;
 #endif
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      
+      g_hash_table_insert (mounts_hash,
+			   mount_entry->device_path,
+			   mount_entry->device_path);
+      
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   g_hash_table_destroy (mounts_hash);
   
   endmntent (file);
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 
 #elif defined (HAVE_SYS_MNTTAB_H)
@@ -190,39 +172,22 @@ get_mtab_monitor_file (void)
   return get_mtab_read_file ();
 }
 
-gboolean
-_g_get_unix_mounts (GList **return_list)
+GList *
+_g_get_unix_mounts (void)
 {
-  static time_t last_mtime = 0;
-  static off_t last_size = 0;
   struct mnttab mntent;
   FILE *file;
   char *read_file;
-  char *stat_file;
-  struct stat sb;
   GUnixMount *mount_entry;
+  GList *return_list;
   
   read_file = get_mtab_read_file ();
-  stat_file = get_mtab_monitor_file ();
-  
-  *return_list = NULL;
-  
-  if (stat (stat_file, &sb) < 0)
-    {
-      g_warning ("Unable to stat %s: %s", stat_file,
-		 g_strerror (errno));
-      return TRUE;
-    }
-
-  if (sb.st_mtime == last_mtime && sb.st_size == last_size)
-    return FALSE;
-
-  last_mtime = sb.st_mtime;
-  last_size = sb.st_size;
   
   file = setmntent (read_file, "r");
   if (file == NULL)
-    return TRUE;
+    return NULL;
+  
+  return_list = NULL;
   
   while (! getmntent (file, &mntent))
     {
@@ -237,14 +202,12 @@ _g_get_unix_mounts (GList **return_list)
 	mount_entry->is_read_only = TRUE;
 #endif
       
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   
   endmntent (file);
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 
 #elif defined(HAVE_SYS_MNTCTL_H) && defined(HAVE_SYS_VMOUNT_H) && defined(HAVE_SYS_VFS_H)
@@ -255,22 +218,21 @@ get_mtab_monitor_file (void)
   return NULL;
 }
 
-gboolean
-_g_get_unix_mounts (GList **return_list)
+GList *
+_g_get_unix_mounts (void)
 {
   struct vfs_ent *fs_info;
   struct vmount *vmount_info;
   int vmount_number;
   unsigned int vmount_size;
   int current;
-  
-  *return_list = NULL;
+  GList *return_list;
   
   if (mntctl (MCTL_QUERY, sizeof (vmount_size), &vmount_size) != 0)
     {
       g_warning ("Unable to know the number of mounted volumes\n");
       
-      return TRUE;
+      return NULL;
     }
 
   vmount_info = (struct vmount*)g_malloc (vmount_size);
@@ -285,9 +247,10 @@ _g_get_unix_mounts (GList **return_list)
       g_warning ("Unable to recover mounted volumes information\n");
       
       g_free (vmount_info);
-      return TRUE;
+      return NULL;
     }
   
+  return_list = NULL;
   while (vmount_number > 0)
     {
       mount_entry = g_new0 (GUnixMount, 1);
@@ -304,7 +267,7 @@ _g_get_unix_mounts (GList **return_list)
       else
 	mount_entry->filesystem_type = g_strdup (fs_info->vfsent_name);
       
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
       
       vmount_info = (struct vmount *)( (char*)vmount_info 
 				       + vmount_info->vmt_length);
@@ -314,9 +277,7 @@ _g_get_unix_mounts (GList **return_list)
   
   g_free (vmount_info);
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 
 #elif defined(HAVE_GETMNTINFO) && defined(HAVE_FSTAB_H) && defined(HAVE_SYS_MOUNT_H)
@@ -327,18 +288,19 @@ get_mtab_monitor_file (void)
   return NULL;
 }
 
-gboolean
-_g_get_unix_mounts (GList **return_list)
+GList *
+_g_get_unix_mounts (void)
 {
   struct statfs *mntent = NULL;
   int num_mounts, i;
   GUnixMount *mount_entry;
-  
-  *return_list = NULL;
+  GList *return_list;
   
   /* Pass MNT_NOWAIT to avoid blocking trying to update NFS mounts. */
   if ((num_mounts = getmntinfo (&mntent, MNT_NOWAIT)) == 0)
-    return TRUE;
+    return NULL;
+  
+  return_list = NULL;
   
   for (i = 0; i < num_mounts; i++)
     {
@@ -350,12 +312,10 @@ _g_get_unix_mounts (GList **return_list)
       if (mntent[i].f_flags & MNT_RDONLY)
 	mount_entry->is_read_only = TRUE;
       
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 #else
 #error No _g_get_unix_mounts() implementation for system
@@ -383,40 +343,24 @@ get_fstab_file (void)
 }
 
 #ifdef HAVE_MNTENT_H
-gboolean
-_g_get_unix_mount_points (GList **return_list)
+GList *
+_g_get_unix_mount_points (void)
 {
-  static time_t last_mtime = 0;
-  static off_t last_size = 0;
   struct mntent *mntent;
   FILE *file;
   char *read_file;
-  char *stat_file;
   char *opt, *opt_end;
-  struct stat sb;
   GUnixMountPoint *mount_entry;
+  GList *return_list;
   
-  stat_file = read_file = get_fstab_file ();
-  
-  *return_list = NULL;
-  
-  if (stat (stat_file, &sb) < 0)
-    {
-      g_warning ("Unable to stat %s: %s", stat_file,
-		 g_strerror (errno));
-      return TRUE;
-    }
-
-  if (sb.st_mtime == last_mtime && sb.st_size == last_size)
-    return FALSE;
-
-  last_mtime = sb.st_mtime;
-  last_size = sb.st_size;
+  read_file = get_fstab_file ();
   
   file = setmntent (read_file, "r");
   if (file == NULL)
-    return TRUE;
+    return NULL;
 
+  return_list = NULL;
+  
   while ((mntent = getmntent (file)) != NULL)
     {
       if ((strcmp (mntent->mnt_dir, "ignore") == 0) ||
@@ -457,51 +401,33 @@ _g_get_unix_mount_points (GList **return_list)
 	  )
 	mount_entry->is_user_mountable = TRUE;
       
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   
   endmntent (file);
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 
 #elif defined (HAVE_SYS_MNTTAB_H)
 
-gboolean
-_g_get_unix_mount_points (GList **return_list)
+GList *
+_g_get_unix_mount_points (void)
 {
-  static time_t last_mtime = 0;
-  static off_t last_size = 0;
   struct mnttab mntent;
   FILE *file;
   char *read_file;
-  char *stat_file;
-  struct stat sb;
   GUnixMountPoint *mount_entry;
+  GList *return_list;
   
-  stat_file = read_file = get_fstab_file ();
-  
-  *return_list = NULL;
-  
-  if (stat (stat_file, &sb) < 0)
-    {
-      g_warning ("Unable to stat %s: %s", stat_file,
-		 g_strerror (errno));
-      return TRUE;
-    }
-
-  if (sb.st_mtime == last_mtime && sb.st_size == last_size)
-    return FALSE;
-
-  last_mtime = sb.st_mtime;
-  last_size = sb.st_size;
+  read_file = get_fstab_file ();
   
   file = setmntent (read_file, "r");
   if (file == NULL)
-    return TRUE;
+    return NULL;
 
+  return_list = NULL;
+  
   while (! getmntent (file, &mntent))
     {
       if ((strcmp (mntent.mnt_mountp, "ignore") == 0) ||
@@ -534,14 +460,12 @@ _g_get_unix_mount_points (GList **return_list)
 	mount_entry->is_user_mountable = TRUE;
       
       
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   
   endmntent (file);
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 #elif defined(HAVE_SYS_MNTCTL_H) && defined(HAVE_SYS_VMOUNT_H) && defined(HAVE_SYS_VFS_H)
 
@@ -650,39 +574,23 @@ aix_fs_get (FILE *fd, AixMountTableEntry *prop)
   return 0;
 }
 
-gboolean
-_g_get_unix_mount_points (GList **return_list)
+GList *
+_g_get_unix_mount_points (void)
 {
-  static time_t last_mtime = 0;
-  static off_t last_size = 0;
   struct mntent *mntent;
   FILE *file;
   char *read_file;
-  char *stat_file;
-  struct stat sb;
   GUnixMountPoint *mount_entry;
   AixMountTableEntry mntent;
+  GList *return_list;
   
-  stat_file = read_file = get_fstab_file ();
-  
-  *return_list = NULL;
-  
-  if (stat (stat_file, &sb) < 0)
-    {
-      g_warning ("Unable to stat %s: %s", stat_file,
-		 g_strerror (errno));
-      return TRUE;
-    }
-		
-  if (last_mtime != 0 && fsb.st_mtime == last_mtime && fsb.st_size == last_size)
-    return FALSE;
-
-  last_mtime = fsb.st_mtime;
-  last_size = fsb.st_size;
+  read_file = get_fstab_file ();
   
   file = setmntent (read_file, "r");
   if (file == NULL)
-    return TRUE;
+    return NULL;
+  
+  return_list = NULL;
   
   while (!aix_fs_get (file, &mntent))
     {
@@ -697,28 +605,23 @@ _g_get_unix_mount_points (GList **return_list)
 	  mount_entry->is_read_only = TRUE;
 	  mount_entry->is_user_mountable = TRUE;
 	  
-	  *return_list = g_list_prepend (*return_list, mount_entry);
+	  return_list = g_list_prepend (return_list, mount_entry);
 	}
     }
 	
   endmntent (file);
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 
 #elif defined(HAVE_GETMNTINFO) && defined(HAVE_FSTAB_H) && defined(HAVE_SYS_MOUNT_H)
 
-gboolean
-_g_get_unix_mount_points (GList **return_list)
+GList *
+_g_get_unix_mount_points (void)
 {
-  static time_t last_mtime = 0;
-  static off_t last_size = 0;
   struct fstab *fstab = NULL;
-  char *stat_file;
-  struct stat fsb;
   GUnixMountPoint *mount_entry;
+  GList *return_list;
 #ifdef HAVE_SYS_SYSCTL_H
   int usermnt = 0;
   size_t len = sizeof(usermnt);
@@ -727,26 +630,11 @@ _g_get_unix_mount_points (GList **return_list)
   
   stat_file = get_fstab_file ();
   
-  *return_list = NULL;
-  
-  if (stat (stat_file, &fsb) < 0)
-    {
-      g_warning ("Unable to stat %s: %s", stat_file,
-		 g_strerror (errno));
-      return TRUE;
-    }
-  
-  if (last_mtime != 0 && fsb.st_mtime == last_mtime && fsb.st_size == last_size)
-    return FALSE;
-
-  last_mtime = fsb.st_mtime;
-  last_size = fsb.st_size;
-  
-  *return_list = NULL;
-  
   if (!setfsent ())
-    return TRUE;
+    return NULL;
 
+  return_list = NULL;
+  
 #ifdef HAVE_SYS_SYSCTL_H
 #if defined(HAVE_SYSCTLBYNAME)
   sysctlbyname ("vfs.usermount", &usermnt, &len, NULL, 0);
@@ -795,18 +683,40 @@ _g_get_unix_mount_points (GList **return_list)
 	}
 #endif
 
-      *return_list = g_list_prepend (*return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   
   endfsent ();
   
-  *return_list = g_list_reverse (*return_list);
-  
-  return TRUE;
+  return g_list_reverse (return_list);
 }
 #else
 #error No _g_get_mount_table() implementation for system
 #endif
+
+GUnixMount *
+_g_get_unix_mount_at (const char *mount_path)
+{
+  GList *mounts, *l;
+  GUnixMount *mount_entry, *found;
+  
+  mounts = _g_get_unix_mounts ();
+
+  found = NULL;
+  for (l = mounts; l != NULL; l = l->next)
+    {
+      mount_entry = l->data;
+
+      if (strcmp (mount_path, mount_entry->mount_path) == 0)
+	found = mount_entry;
+      else
+	_g_unix_mount_free (mount_entry);
+      
+    }
+  g_list_free (mounts);
+
+  return found;
+}
 
 typedef struct {
   GUnixMountCallback mountpoints_changed;
@@ -836,7 +746,8 @@ fstab_file_changed (GFileMonitor* monitor,
     {
       MountMonitor *mount_monitor = l->data;
 
-      mount_monitor->mountpoints_changed (mount_monitor->user_data);
+      if (mount_monitor->mountpoints_changed)
+	mount_monitor->mountpoints_changed (mount_monitor->user_data);
     }
 }
 
@@ -858,7 +769,8 @@ mtab_file_changed (GFileMonitor* monitor,
     {
       MountMonitor *mount_monitor = l->data;
 
-      mount_monitor->mounts_changed (mount_monitor->user_data);
+      if (mount_monitor->mounts_changed)
+	mount_monitor->mounts_changed (mount_monitor->user_data);
     }
 }
 
