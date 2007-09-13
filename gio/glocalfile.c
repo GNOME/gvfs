@@ -27,7 +27,6 @@
 #include "glocalfileoutputstream.h"
 #include "glocaldirectorymonitor.h"
 #include "glocalfilemonitor.h"
-#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
