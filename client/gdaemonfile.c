@@ -839,6 +839,7 @@ g_daemon_file_replace (GFile *file,
   return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
+/* 
 static void
 mount_reply (DBusMessage *reply,
 	     GError *error,
@@ -881,6 +882,7 @@ g_daemon_file_mount (GFile *file,
   dbus_message_unref (message);
 }
 
+*/
 
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
@@ -902,5 +904,4 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->create = g_daemon_file_create;
   iface->replace = g_daemon_file_replace;
   iface->read_async = g_daemon_file_read_async;
-  iface->mount = g_daemon_file_mount;
 }

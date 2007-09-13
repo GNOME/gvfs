@@ -811,14 +811,6 @@ g_local_file_move (GFile                *source,
 }
 
 
-static void
-g_local_file_mount (GFile *file,
-		    GMountOperation *mount_operation)
-{
-  /* Always just ok... */
-  g_signal_emit_by_name (mount_operation, "done", TRUE, NULL);
-}
-
 static GDirectoryMonitor*
 g_local_file_monitor_dir (GFile* file)
 {
@@ -860,7 +852,6 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->make_symbolic_link = g_local_file_make_symbolic_link;
   iface->copy = g_local_file_copy;
   iface->move = g_local_file_move;
-  iface->mount = g_local_file_mount;
   iface->monitor_dir = g_local_file_monitor_dir;
   iface->monitor_file = g_local_file_monitor_file;
 }

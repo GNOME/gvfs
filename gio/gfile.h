@@ -127,9 +127,27 @@ struct _GFileIface
 					     gpointer              callback_data,
 					     GCancellable         *cancellable);
 
-  void               (*mount)               (GFile                  *file,
-					     GMountOperation        *mount_operation);
+  void               (*mount_mountable)           (GFile               *file,
+						   GMountOperation     *mount_operation,
+						   GAsyncReadyCallback  callback,
+						   gpointer             user_data);
+  GFile *            (*mount_mountable_finish)    (GFile               *file,
+						   GAsyncResult        *result,
+						   GError             **error);
+  void               (*unmount_mountable)         (GFile               *file,
+						   GAsyncReadyCallback  callback,
+						   gpointer             user_data);
+  gboolean            (*unmount_mountable_finish) (GFile               *file,
+						   GAsyncResult        *result,
+						   GError             **error);
+  void               (*eject_mountable)           (GFile               *file,
+						   GAsyncReadyCallback  callback,
+						   gpointer             user_data);
+  gboolean            (*eject_mountable_finish)   (GFile               *file,
+						   GAsyncResult        *result,
+						   GError             **error);
 
+  
   GDirectoryMonitor* (*monitor_dir)         (GFile                  *file);
 
   GFileMonitor*      (*monitor_file)        (GFile                  *file);
@@ -158,8 +176,6 @@ GFile *            g_file_get_child_for_display_name (GFile                  *fi
 GFile *            g_file_resolve_relative           (GFile                  *file,
 						      const char             *relative_path);
 gboolean           g_file_is_native                  (GFile                  *file);
-
-
 GFileInputStream * g_file_read                       (GFile                  *file,
 						      GCancellable           *cancellable,
 						      GError                **error);
@@ -261,12 +277,35 @@ gboolean           g_file_set_attribute_int64        (GFile                  *fi
 						      GCancellable           *cancellable,
 						      GError                **error);
 
-void               g_file_mount              (GFile                  *file,
-					      GMountOperation        *mount_operation);
+void               g_mount_for_location              (GFile                  *location,
+						      GMountOperation        *mount_operation,
+						      GAsyncReadyCallback     callback,
+						      gpointer                user_data);
+gboolean           g_mount_for_location_finish       (GAsyncResult           *result,
+						      GError                **error);
+void               g_file_mount_mountable            (GFile                  *file,
+						      GMountOperation        *mount_operation,
+						      GAsyncReadyCallback     callback,
+						      gpointer                user_data);
+GFile *            g_file_mount_mountable_finish     (GFile                  *file,
+						      GAsyncResult           *result,
+						      GError                **error);
+void               g_file_unmount_mountable          (GFile                  *file,
+						      GAsyncReadyCallback     callback,
+						      gpointer                user_data);
+gboolean           g_file_unmount_mountable_finish   (GFile                  *file,
+						      GAsyncResult           *result,
+						      GError                **error);
+void               g_file_eject_mountable            (GFile                  *file,
+						      GAsyncReadyCallback     callback,
+						      gpointer                user_data);
+gboolean           g_file_eject_mountable_finish     (GFile                  *file,
+						      GAsyncResult           *result,
+						      GError                **error);
 
 GDirectoryMonitor* g_file_monitor_directory          (GFile                  *file);
-
 GFileMonitor*      g_file_monitor_file               (GFile                  *file);
+
 
 
 G_END_DECLS

@@ -721,14 +721,49 @@ g_file_set_attribute_int64 (GFile                  *file,
 }
 
 void
-g_file_mount (GFile *file,
-	      GMountOperation *mount_operation)
+g_file_mount_mountable (GFile                  *file,
+			GMountOperation        *mount_operation,
+			GAsyncReadyCallback     callback,
+			gpointer                user_data)
 {
-  GFileIface *iface;
+}
 
-  iface = G_FILE_GET_IFACE (file);
+GFile *
+g_file_mount_mountable_finish (GFile                  *file,
+			       GAsyncResult           *result,
+			       GError                **error)
+{
+  return NULL;
+}
 
-  (* iface->mount) (file, mount_operation);
+void
+g_file_unmount_mountable (GFile                  *file,
+			  GAsyncReadyCallback     callback,
+			  gpointer                user_data)
+{
+}
+
+gboolean
+g_file_unmount_mountable_finish   (GFile                  *file,
+				   GAsyncResult           *result,
+				   GError                **error)
+{
+  return TRUE;
+}
+
+void
+g_file_eject_mountable (GFile                  *file,
+			GAsyncReadyCallback     callback,
+			gpointer                user_data)
+{
+}
+
+gboolean
+g_file_eject_mountable_finish (GFile                  *file,
+			       GAsyncResult           *result,
+			       GError                **error)
+{
+  return TRUE;
 }
 
 GDirectoryMonitor*
@@ -909,4 +944,25 @@ g_file_get_for_commandline_arg (const char *arg)
   g_free (filename);
   
   return file;
+}
+
+void
+g_mount_for_location (GFile                  *location,
+		      GMountOperation        *mount_operation,
+		      GAsyncReadyCallback     callback,
+		      gpointer                user_data)
+{
+  return g_vfs_mount_for_location (g_vfs_get (),
+				   location,
+				   mount_operation,
+				   callback, user_data);
+
+}
+
+gboolean
+g_mount_for_location_finish (GAsyncResult           *result,
+			     GError                **error)
+{
+  return g_vfs_mount_for_location_finish (g_vfs_get (),
+					  result, error);
 }

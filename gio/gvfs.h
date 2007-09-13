@@ -27,18 +27,37 @@ struct _GVfsIface
 			       const char *uri);
   GFile *(*parse_name)        (GVfs *vfs,
 			       const char *parse_name);
+
+  void     (*mount_for_location)        (GVfs *vfs,
+					 GFile *location,
+					 GMountOperation *mount_operation,
+					 GAsyncReadyCallback callback,
+					 gpointer user_data);
+  gboolean (*mount_for_location_finish) (GVfs *vfs,
+					 GAsyncResult *result,
+					 GError **error);
 };
 
 GType g_vfs_get_type (void) G_GNUC_CONST;
 
-GFile *g_vfs_get_file_for_path (GVfs       *vfs,
-				const char *path);
-GFile *g_vfs_get_file_for_uri  (GVfs       *vfs,
-				const char *uri);
-GFile *g_vfs_parse_name        (GVfs       *vfs,
-				const char *parse_name);
+GFile *  g_vfs_get_file_for_path         (GVfs                 *vfs,
+					  const char           *path);
+GFile *  g_vfs_get_file_for_uri          (GVfs                 *vfs,
+					  const char           *uri);
+GFile *  g_vfs_parse_name                (GVfs                 *vfs,
+					  const char           *parse_name);
 
-GVfs *g_vfs_get (void);
+void     g_vfs_mount_for_location        (GVfs                 *vfs,
+					  GFile                *location,
+					  GMountOperation      *mount_operation,
+					  GAsyncReadyCallback   callback,
+					  gpointer              user_data);
+gboolean g_vfs_mount_for_location_finish (GVfs                 *vfs,
+					  GAsyncResult         *result,
+					  GError              **error);
+
+GVfs *   g_vfs_get                       (void);
+
 
 G_END_DECLS
 

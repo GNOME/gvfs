@@ -74,10 +74,15 @@ ask_password_cb (GMountOperation *op,
 }
 
 static void
-mount_done_cb (GMountOperation *op,
-	       gboolean         succeeded,
-	       GError          *error)
+mount_done_cb (GObject *vfs,
+	       GAsyncResult *res,
+	       gpointer user_data)
 {
+  gboolean succeeded;
+  GError *error = NULL;
+
+  succeeded = g_mount_for_location_finish (res, &error);
+
   if (!succeeded)
     g_print ("Error mounting location: %s\n", error->message);
   
@@ -98,9 +103,8 @@ mount (GFile *file)
   op = g_mount_operation_new ();
 
   g_signal_connect (op, "ask_password", (GCallback)ask_password_cb, NULL);
-  g_signal_connect (op, "done", (GCallback)mount_done_cb, NULL);
   
-  g_file_mount (file, op);
+  g_mount_for_location (file, op, mount_done_cb, op);
   outstanding_mounts++;
 }
 

@@ -72,6 +72,15 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS_MASK "std:access_rights_mask"
 #define G_FILE_ATTRIBUTE_STD_MTIME "std:mtime"
 #define G_FILE_ATTRIBUTE_STD_MTIME_USEC "std:mtime_usec"
+#define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"
+
+/* Mountable attributes */
+
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT "mountable:can_mount"
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT "mountable:can_unmount"
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT "mountable:can_eject"
+#define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE "mountable:unix_device"
+#define G_FILE_ATTRIBUTE_MOUNTABLE_HAL_UDI "mountable:hal_udi"
 
 /* Unix specific attributes */
 

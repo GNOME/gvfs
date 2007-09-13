@@ -74,6 +74,34 @@ g_vfs_parse_name (GVfs *vfs,
   return (* iface->parse_name) (vfs, parse_name);
 }
 
+
+void
+g_vfs_mount_for_location (GVfs                 *vfs,
+			  GFile                *location,
+			  GMountOperation      *mount_operation,
+			  GAsyncReadyCallback   callback,
+			  gpointer              user_data)
+{
+  GVfsIface *iface;
+
+  iface = G_VFS_GET_IFACE (vfs);
+
+  return (* iface->mount_for_location) (vfs, location, mount_operation, callback, user_data);
+}
+
+gboolean
+g_vfs_mount_for_location_finish (GVfs                 *vfs,
+				 GAsyncResult         *result,
+				 GError              **error)
+{
+  GVfsIface *iface;
+
+  iface = G_VFS_GET_IFACE (vfs);
+
+  return (* iface->mount_for_location_finish) (vfs, result, error);
+}
+
+
 static gpointer
 get_default_vfs (gpointer arg)
 {
