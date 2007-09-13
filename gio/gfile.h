@@ -24,6 +24,7 @@ typedef enum {
   G_FILE_COPY_OVERWRITE = (1<<0),
   G_FILE_COPY_BACKUP = (1<<1),
   G_FILE_COPY_NOFOLLOW_SYMLINKS = (1<<2),
+  G_FILE_COPY_ALL_METADATA = (1<<3),
 } GFileCopyFlags;
 
 typedef struct _GFile         		GFile; /* Dummy typedef */
