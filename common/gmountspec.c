@@ -251,3 +251,19 @@ g_mount_spec_match (GMountSpec      *mount,
 {
   return g_mount_spec_match_with_path (mount, path, path->mount_prefix);
 }
+
+const char *
+g_mount_spec_get_type (GMountSpec *spec)
+{
+  int i;
+  
+  for (i = 0; i < spec->items->len; i++)
+    {
+      GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
+      
+      if (strcmp (item->key, "type") == 0)
+	return item->value;
+    }
+
+  return NULL;
+}

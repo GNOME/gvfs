@@ -52,6 +52,7 @@ gboolean    g_mount_spec_match             (GMountSpec      *mount,
 gboolean    g_mount_spec_match_with_path   (GMountSpec      *mount,
 					    GMountSpec      *spec,
 					    const char      *path);
+const char *g_mount_spec_get_type          (GMountSpec      *spec);
 
 G_END_DECLS
 
