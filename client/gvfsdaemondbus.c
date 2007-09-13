@@ -395,7 +395,6 @@ async_dbus_response (DBusPendingCall *pending,
 {
   AsyncDBusCall *async_call = data;
   DBusMessage *reply;
-  DBusError derror;
 
   if (async_call->cancelled_tag)
     g_signal_handler_disconnect (async_call->cancellable,
@@ -403,14 +402,9 @@ async_dbus_response (DBusPendingCall *pending,
 
   reply = dbus_pending_call_steal_reply (pending);
   dbus_pending_call_unref (pending);
-
-  dbus_error_init (&derror);
-  if (dbus_set_error_from_message (&derror, reply))
-    {
-      _g_error_from_dbus (&derror, &async_call->io_error);
-      dbus_error_free (&derror);
-      async_call_finish (async_call, NULL);
-    }
+  
+  if (_g_error_from_message (reply, &async_call->io_error))
+    async_call_finish (async_call, NULL);
   else
     async_call_finish (async_call, reply);
   
@@ -807,10 +801,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   if (connection_out)
     *connection_out = connection;
 
-  if (dbus_set_error_from_message (&derror, reply))
+  if (_g_error_from_message (reply, error))
     {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
       dbus_message_unref (reply);
       return NULL;
     }
@@ -912,12 +904,8 @@ _g_dbus_connection_get_sync (const char *dbus_id,
       return NULL;
     }
 
-  if (dbus_set_error_from_message (&derror, reply))
-    {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return NULL;
-    }
+  if (_g_error_from_message (reply, error))
+    return NULL;
   
   dbus_message_get_args (reply, NULL,
 			 DBUS_TYPE_STRING, &address1,

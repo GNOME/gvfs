@@ -142,7 +142,6 @@ dbus_mount_reply (DBusPendingCall *pending,
 {
   Mountable *mountable;
   DBusMessage *reply;
-  DBusError derror;
   GError *error;
   GMountOperationDBus *op = user_data;
 
@@ -157,12 +156,9 @@ dbus_mount_reply (DBusPendingCall *pending,
     }
   else
     {
-      dbus_error_init (&derror);
-      if (dbus_set_error_from_message (&derror, reply))
+      error = NULL;
+      if (_g_error_from_message (reply, &error))
 	{
-	  error = NULL;
-	  _g_error_from_dbus (&derror, &error);
-	  dbus_error_free (&derror);
 	  g_mount_operation_dbus_fail_at_idle (op, error);
 	  g_error_free (error);
 	}

@@ -321,15 +321,10 @@ handler_lookup_mount_reply (DBusMessage *reply,
   GMountSpec *mount_spec;
   GList *l;
 
-  dbus_error_init (&derror);
-  
-  if (dbus_set_error_from_message (&derror, reply))
-    {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return NULL;
-    }
+  if (_g_error_from_message (reply, error))
+    return NULL;
 
+  dbus_error_init (&derror);
   dbus_message_iter_init (reply, &iter);
   if (!_g_dbus_message_iter_get_args (&iter,
 				      &derror,
