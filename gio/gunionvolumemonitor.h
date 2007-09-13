@@ -15,10 +15,6 @@ G_BEGIN_DECLS
 typedef struct _GUnionVolumeMonitor GUnionVolumeMonitor;
 typedef struct _GUnionVolumeMonitorClass GUnionVolumeMonitorClass;
 
-struct _GUnionVolumeMonitor {
-  GVolumeMonitor parent;
-};
-
 struct _GUnionVolumeMonitorClass {
   GVolumeMonitorClass parent_class;
 

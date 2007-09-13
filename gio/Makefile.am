@@ -82,11 +82,14 @@ libgio_la_SOURCES = 	\
 	gmountoperation.h \
 	goutputstream.c \
 	gseekable.c \
+	gunionvolume.c \
+	gunionvolume.h \
 	gunionvolumemonitor.c \
 	gunionvolumemonitor.h \
 	gvfs.c \
 	gvolume.c \
 	gvolumemonitor.c \
+	gvolumepriv.h \
 	$(appinfo_sources) \
 	$(socket_sources) \
 	$(local_sources) \

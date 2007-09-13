@@ -1,5 +1,6 @@
 #include <config.h>
 #include "gvolume.h"
+#include "gvolumepriv.h"
 #include <glib/gi18n-lib.h>
 
 static void g_volume_base_init (gpointer g_class);
@@ -143,4 +144,14 @@ g_volume_eject (GVolume         *volume,
   iface = G_VOLUME_GET_IFACE (volume);
 
   return (* iface->eject) (volume, callback, user_data);
+}
+
+char *
+g_volume_get_platform_id (GVolume *volume)
+{
+  GVolumeIface *iface;
+
+  iface = G_VOLUME_GET_IFACE (volume);
+
+  return (* iface->get_platform_id) (volume);
 }

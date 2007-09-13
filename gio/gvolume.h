@@ -40,6 +40,7 @@ struct _GVolumeIface
   void     (*eject)       (GVolume         *volume,
 			   GVolumeCallback  callback,
 			   gpointer         user_data);
+  char *   (*get_platform_id) (GVolume         *volume);
 };
 
 GType g_volume_get_type (void) G_GNUC_CONST;
