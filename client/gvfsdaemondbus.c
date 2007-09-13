@@ -23,6 +23,8 @@
 typedef struct {
   int extra_fd;
   int extra_fd_count;
+  
+  /* Only used for async connections */
   GHashTable *outstanding_fds;
   GSource *extra_fd_source;
 } VfsConnectionData;
@@ -40,7 +42,7 @@ G_LOCK_DEFINE_STATIC(async_map);
 static GHashTable *obj_path_map = NULL;
 G_LOCK_DEFINE_STATIC(obj_path_map);
 
-static void            setup_async_fd_receive   (VfsConnectionData  *connection_data);
+static void setup_async_fd_receive (VfsConnectionData *connection_data);
 
 static gpointer
 vfs_dbus_init (gpointer arg)
@@ -105,6 +107,7 @@ vfs_connection_filter (DBusConnection     *connection,
 
   callback = NULL;
   data = NULL;
+  
   G_LOCK (obj_path_map);
   if (obj_path_map)
     {
@@ -299,7 +302,7 @@ _g_dbus_connection_get_fd_async (DBusConnection *connection,
 }
 
 /*******************************************************************
- *               Handling of async connections                     *
+ *                Caching of async connections                     *
  *******************************************************************/
 
 
@@ -320,11 +323,20 @@ get_connection_for_async (const char *dbus_id)
 }
 
 static void
+close_and_unref_connection (void *data)
+{
+  DBusConnection *connection = data;
+  
+  dbus_connection_close (connection);
+  dbus_connection_unref (connection);
+}
+
+static void
 set_connection_for_async (DBusConnection *connection, const char *dbus_id)
 {
   G_LOCK (async_map);
   if (async_map == NULL)
-    async_map = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify)dbus_connection_unref);
+    async_map = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, close_and_unref_connection);
       
   g_hash_table_insert (async_map, g_strdup (dbus_id), connection);
   dbus_connection_ref (connection);
