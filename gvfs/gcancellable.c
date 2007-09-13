@@ -3,7 +3,14 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <gvfstypes.h>
+
 #include "gcancellable.h"
+
+enum {
+  CANCELLED,
+  LAST_SIGNAL
+};
 
 struct _GCancellable
 {
@@ -13,6 +20,8 @@ struct _GCancellable
   guint allocated_pipe : 1;
   int cancel_pipe[2];
 };
+
+static guint signals[LAST_SIGNAL] = { 0 };
 
 G_DEFINE_TYPE (GCancellable, g_cancellable, G_TYPE_OBJECT);
 
@@ -40,6 +49,16 @@ g_cancellable_class_init (GCancellableClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   
   gobject_class->finalize = g_cancellable_finalize;
+
+  signals[CANCELLED] =
+    g_signal_new (I_("cancelled"),
+		  G_TYPE_FROM_CLASS (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GCancellableClass, cancelled),
+		  NULL, NULL,
+		  g_cclosure_marshal_VOID__VOID,
+		  G_TYPE_NONE, 0);
+  
 }
 
 static void
@@ -169,7 +188,6 @@ void
 g_cancellable_cancel (GCancellable *cancellable)
 {
   G_LOCK(cancellable);
-  
   if (cancellable != NULL &&
       !cancellable->cancelled)
     {
@@ -178,8 +196,11 @@ g_cancellable_cancel (GCancellable *cancellable)
       if (cancellable->cancel_pipe[1] != -1)
 	write (cancellable->cancel_pipe[1], &ch, 1);
     }
-  
   G_UNLOCK(cancellable);
+  
+  g_object_ref (cancellable);
+  g_signal_emit (cancellable, signals[CANCELLED], 0);
+  g_object_unref (cancellable);
 }
 
 

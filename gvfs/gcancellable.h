@@ -18,6 +18,8 @@ typedef struct _GCancellableClass   GCancellableClass;
 struct _GCancellableClass
 {
   GObjectClass parent_class;
+
+  void (* cancelled) (GCancellable *cancellable);
 };
 
 GType g_cancellable_get_type (void) G_GNUC_CONST;
