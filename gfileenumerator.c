@@ -43,35 +43,6 @@ g_file_enumerator_init (GFileEnumerator *enumerator)
 }
 
 /**
- * g_file_enumerator_has_more_files:
- * @enumerator: a #GFileEnumerator.
- *
- * Returns %TRUE if the enumerator hasn't reached the end of
- * the enumerated files. Will return %TRUE even if the next
- * file will return an error. However, once the error has been
- * seen this will return %FALSE.
- *
- * This call may block.
- * 
- * Return value: %TRUE if there are more files to read, %FALSE otherwise.
- **/
-gboolean
-g_file_enumerator_has_more_files (GFileEnumerator *enumerator)
-{
-  GFileEnumeratorClass *class;
-
-  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), FALSE);
-  g_return_val_if_fail (enumerator != NULL, FALSE);
-
-  if (enumerator->priv->stopped)
-    return FALSE;
-  
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
-  
-  return (* class->has_more_files) (enumerator);
-}
-
-/**
  * g_file_enumerator_next_file:
  * @enumerator: a #GFileEnumerator.
  * @error: location to store the error occuring, or %NULL to ignore
@@ -81,7 +52,7 @@ g_file_enumerator_has_more_files (GFileEnumerator *enumerator)
  *
  * On error, returns %NULL and sets @error to the error. If the
  * enumerator is at the end, %NULL will be returned and @error will
- * be unset. To avoid confusion, use g_file_enumerator_has_more_files()
+ * be unset.
  *
  * Return value: A GFileInfo or %NULL on error or end of enumerator
  **/

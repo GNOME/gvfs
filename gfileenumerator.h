@@ -26,11 +26,11 @@ typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
  * @enumerator: a #GFileEnumerator
  * @files: array of #GFileInfo objects
  * @num_files: size of @files array, or -1 on error
- * @has_more_files: %TRUE if there are more files in the enumerator
  * @error: the error, if num_files is -1, otherwise %NULL
  *
  * This callback is called when an asychronous close operation
- * is finished. 
+ * is finished. When there are no more files to enumerate @num_files
+ * is set to 0.
  *
  * The callback is always called, even if the operation was cancelled.
  * If the operation was cancelled @result will be %FALSE, and @error
@@ -39,7 +39,6 @@ typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
 typedef void (*GAsyncNextFilesCallback) (GFileEnumerator *enumerator,
 					 GFileInfo **files,
 					 int num_files,
-					 gboolean has_more_files,
 					 GError *error);
 
 struct _GFileEnumerator
@@ -56,7 +55,6 @@ struct _GFileEnumeratorClass
 
   /* Virtual Table */
 
-  gboolean   (*has_more_files)   (GFileEnumerator       *enumerator);
   GFileInfo *(*next_file)        (GFileEnumerator       *enumerator,
 				  GError               **error);
   void       (*stop)             (GFileEnumerator        *enumerator);
@@ -75,7 +73,6 @@ struct _GFileEnumeratorClass
 
 GType g_file_enumerator_get_type (void) G_GNUC_CONST;
 
-gboolean   g_file_enumerator_has_more_files          (GFileEnumerator          *enumerator);
 GFileInfo *g_file_enumerator_next_file               (GFileEnumerator          *enumerator,
 						      GError                  **error);
 void       g_file_enumerator_stop                    (GFileEnumerator          *enumerator);
