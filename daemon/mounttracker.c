@@ -199,7 +199,11 @@ register_mount (GMountTracker *tracker,
       else if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
 	reply = dbus_message_new_error (message,
 					DBUS_ERROR_INVALID_ARGS,
-					"Error in mount spec");
+					  "Error in mount spec");
+      else if (match_vfs_mount (tracker, mount_spec) != NULL)
+	reply = dbus_message_new_error (message,
+					DBUS_ERROR_INVALID_ARGS,
+					"Mountpoint Already registered");
       else
 	{
 	  mount = g_new0 (VFSMount, 1);
