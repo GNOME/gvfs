@@ -200,7 +200,7 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
 
   daemon_vfs = G_DAEMON_VFS (vfs);
   
-  decoded = _g_decode_uri (uri);
+  decoded = g_decode_uri (uri);
   if (decoded == NULL)
     return g_dummy_file_new (uri);
 
@@ -214,7 +214,7 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
       g_free (path);
     }
 
-  _g_decoded_uri_free (decoded);
+  g_decoded_uri_free (decoded);
   
   return file;
 }

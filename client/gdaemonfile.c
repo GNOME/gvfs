@@ -178,7 +178,7 @@ g_daemon_file_get_uri (GFile *file)
   if (uri == NULL)
     return NULL;
 
-  return _g_encode_uri (uri, FALSE);
+  return g_encode_uri (uri, FALSE);
 }
 
 static char *
@@ -193,7 +193,7 @@ g_daemon_file_get_parse_name (GFile *file)
   if (uri == NULL)
     return NULL;
 
-  return _g_encode_uri (uri, TRUE);
+  return g_encode_uri (uri, TRUE);
 }
 
 static GFile *
