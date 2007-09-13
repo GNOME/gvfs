@@ -207,6 +207,15 @@ do_sync_path_call (GFile *file,
   return reply;
 }
 
+typedef void (*AsyncPathCallCallback) (DBusMessage *reply,
+				       DBusConnection *connection,
+				       GError *io_error,
+				       GCancellable *cancellable,
+				       gpointer op_callback,
+				       gpointer op_callback_data,
+				       gpointer callback_data);
+
+
 typedef struct {
   GFile *file;
   char *op;
@@ -215,7 +224,7 @@ typedef struct {
   GError *io_error;
   gpointer op_callback;
   gpointer op_callback_data;
-  GVfsAsyncDBusCallback callback;
+  AsyncPathCallCallback callback;
   gpointer callback_data;
 } AsyncPathCall;
 
@@ -238,18 +247,30 @@ do_async_path_call_error_idle (gpointer _data)
 {
   AsyncPathCall *data = _data;
 
-  data->callback (NULL, NULL,
-		  data->io_error,
-		  data->cancellable,
-		  data->op_callback,
-		  data->op_callback_data,
+  data->callback (NULL, NULL, data->io_error, data->cancellable,
+		  data->op_callback, data->op_callback_data,
 		  data->callback_data);
 
   async_path_call_free (data);
   
   return FALSE;
 }
+
+static void
+async_path_call_done (DBusMessage *reply,
+		      DBusConnection *connection,
+		      GError *io_error,
+		      gpointer _data)
+{
+  AsyncPathCall *data = _data;
+
+  data->callback (reply, connection, io_error, data->cancellable,
+		  data->op_callback, data->op_callback_data,
+		  data->callback_data);
   
+  async_path_call_free (data);
+}
+
 static void
 do_async_path_call_callback (GMountInfo *mount_info,
 			     gpointer _data,
@@ -288,15 +309,11 @@ do_async_path_call_callback (GMountInfo *mount_info,
       _g_dbus_message_iter_copy (&arg_dest, &arg_source);
     }
 
-  /* TODO: ref GFile during async call? */
-  
   _g_vfs_daemon_call_async (message,
-			    data->op_callback, data->op_callback_data,
-			    data->callback, data->callback_data,
+			    async_path_call_done, data,
 			    data->cancellable);
   
   dbus_message_unref (message);
-  async_path_call_free (data);
 }
 
 static void
@@ -305,7 +322,7 @@ do_async_path_call (GFile *file,
 		    GCancellable *cancellable,
 		    gpointer op_callback,
 		    gpointer op_callback_data,
-		    GVfsAsyncDBusCallback callback,
+		    AsyncPathCallCallback callback,
 		    gpointer callback_data,
 		    int first_arg_type,
 		    ...)

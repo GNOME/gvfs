@@ -345,9 +345,6 @@ typedef struct {
   GVfsAsyncDBusCallback callback;
   gpointer callback_data;
   
-  gpointer op_callback;
-  gpointer op_callback_data;
-
   GError *io_error;
   gulong cancelled_tag;
 } AsyncDBusCall;
@@ -358,9 +355,6 @@ async_call_finish (AsyncDBusCall *async_call,
 {
   async_call->callback (reply, async_call->connection,
 			async_call->io_error, 
-			async_call->cancellable,
-			async_call->op_callback,
-			async_call->op_callback_data,
 			async_call->callback_data);
 
   if (async_call->connection)
@@ -627,8 +621,6 @@ open_connection_async (AsyncDBusCall *async_call)
 
 void
 _g_vfs_daemon_call_async (DBusMessage *message,
-			  gpointer op_callback,
-			  gpointer op_callback_data,
 			  GVfsAsyncDBusCallback callback,
 			  gpointer callback_data,
 			  GCancellable *cancellable)
@@ -644,8 +636,6 @@ _g_vfs_daemon_call_async (DBusMessage *message,
     async_call->cancellable = g_object_ref (cancellable);
   async_call->callback = callback;
   async_call->callback_data = callback_data;
-  async_call->op_callback = op_callback;
-  async_call->op_callback_data = op_callback_data;
 
   async_call->connection = get_connection_for_async (async_call->dbus_id);
   if (async_call->connection == NULL)

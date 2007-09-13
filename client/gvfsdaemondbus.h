@@ -9,11 +9,8 @@
 G_BEGIN_DECLS
 
 typedef void (*GVfsAsyncDBusCallback) (DBusMessage *reply,
-				       DBusConnection *conntection,
+				       DBusConnection *connection,
 				       GError *io_error,
-				       GCancellable *cancellable,
-				       gpointer op_callback,
-				       gpointer op_callback_data,
 				       gpointer callback_data);
 typedef void (*GetFdAsyncCallback)    (int fd,
 				       gpointer callback_data);
@@ -34,8 +31,6 @@ void         _g_dbus_connection_get_fd_async         (DBusConnection            
 						      GetFdAsyncCallback          callback,
 						      gpointer                    callback_data);
 void         _g_vfs_daemon_call_async                (DBusMessage                *message,
-						      gpointer                    op_callback,
-						      gpointer                    op_callback_data,
 						      GVfsAsyncDBusCallback       callback,
 						      gpointer                    callback_data,
 						      GCancellable               *cancellable);
