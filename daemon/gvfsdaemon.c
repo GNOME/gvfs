@@ -214,68 +214,6 @@ g_vfs_daemon_new (const char *mountpoint,
   return daemon;
 }
 
-#ifdef COMMENTED_OUT
-static int
-send_fd (int connection_fd, 
-	 int fd)
-{
-  struct msghdr msg;
-  struct iovec vec;
-  char buf[1] = {'x'};
-  char ccmsg[CMSG_SPACE (sizeof (fd))];
-  struct cmsghdr *cmsg;
-  int ret;
-  
-  msg.msg_name = NULL;
-  msg.msg_namelen = 0;
-
-  vec.iov_base = buf;
-  vec.iov_len = 1;
-  msg.msg_iov = &vec;
-  msg.msg_iovlen = 1;
-  msg.msg_control = ccmsg;
-  msg.msg_controllen = sizeof (ccmsg);
-  cmsg = CMSG_FIRSTHDR (&msg);
-  cmsg->cmsg_level = SOL_SOCKET;
-  cmsg->cmsg_type = SCM_RIGHTS;
-  cmsg->cmsg_len = CMSG_LEN (sizeof(fd));
-  *(int*)CMSG_DATA (cmsg) = fd;
-  msg.msg_controllen = cmsg->cmsg_len;
-  msg.msg_flags = 0;
-
-  ret = sendmsg (connection_fd, &msg, 0);
-  g_print ("sendmesg ret: %d\n", ret);
-  return ret;
-}
-
-
-  error = NULL;
-  read_request = g_vfs_read_request_new (&error);
-  if (read_request == NULL) 
-    {
-      reply = dbus_message_new_error_from_gerror (message, error);
-      g_error_free (error);
-    } 
-  else
-    {
-
-      reply = dbus_message_new_method_return (message);
-    }
-
- reply:
-  dbus_connection_send (conn, reply, NULL);
-  dbus_message_unref (reply);
-
-  if (read_request != NULL)
-    {
-      fd = GPOINTER_TO_INT (dbus_connection_get_data (conn, extra_fd_slot));
-      send_fd (fd, g_vfs_read_request_get_remote_fd (read_request));
-      g_vfs_read_request_close_remote_fd (read_request);
-      
-      /* TODO: Add request to table, etc */
-    }
-#endif
-
 static gboolean
 start_jobs_at_idle (gpointer data)
 {
@@ -370,7 +308,7 @@ randomize_string (char tmp[9])
   const char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
   for (i = 0; i < 8; i++)
-    tmp[i] = chars[g_random_int_range (0, sizeof(chars))];
+    tmp[i] = chars[g_random_int_range (0, strlen(chars))];
   
   tmp[8] = '\0';
 }
@@ -522,7 +460,7 @@ daemon_new_connection_func (DBusServer     *server,
 
   /* Take ownership */
   dbus_connection_ref (conn);
-  
+
   daemon_peer_connection_setup (data->daemon, conn, data->socket);
 
   /* Kill the server, no more need for it */
@@ -625,9 +563,11 @@ daemon_handle_get_connection (DBusConnection *conn,
   server = dbus_server_listen (address1, &error);
   if (!server)
     {
-      reply = dbus_message_new_error (message,
-				      G_VFS_DBUS_ERROR_SOCKET_FAILED,
-				      "Failed to create new socket");
+      reply = dbus_message_new_error_printf (message,
+					     G_VFS_DBUS_ERROR_SOCKET_FAILED,
+					     "Failed to create new socket: %s", 
+					     error.message);
+      dbus_error_free (&error);
       if (reply)
 	{
 	  dbus_connection_send (conn, reply, NULL);

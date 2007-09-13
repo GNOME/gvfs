@@ -142,12 +142,18 @@ dbus_connection_send_fd (DBusConnection *connection,
 			 GError **error)
 {
   ConnectionExtra *extra;
-  
+
   g_assert (extra_fd_slot != -1);
-
   extra = dbus_connection_get_data (connection, extra_fd_slot);
-
   g_assert (extra != NULL);
+
+  if (extra->extra_fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   G_FILE_ERROR_IO,
+		   _("No fd passing socket availible"));
+      return FALSE;
+    }
 
   g_static_mutex_lock (&extra_lock);
 
@@ -157,6 +163,7 @@ dbus_connection_send_fd (DBusConnection *connection,
 		   g_file_error_from_errno (errno),
 		   _("Error sending fd: %s"),
 		   g_strerror (errno));
+      g_static_mutex_unlock (&extra_lock);
       return FALSE;
     }
 
