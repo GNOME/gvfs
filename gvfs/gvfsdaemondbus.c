@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "gvfsunixdbus.h"
+#include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 
 typedef struct {
@@ -120,7 +120,7 @@ append_escaped_bus_name (GString *s,
 
 
 static int
-unix_socket_connect (const char *address)
+daemon_socket_connect (const char *address)
 {
   int fd;
   const char *path;
@@ -132,14 +132,14 @@ unix_socket_connect (const char *address)
   if (fd == -1)
     return -1;
 
-  if (g_str_has_prefix (address, "unix:abstract="))
+  if (g_str_has_prefix (address, "daemon:abstract="))
     {
-      path = address + strlen ("unix:abstract=");
+      path = address + strlen ("daemon:abstract=");
       abstract = TRUE;
     }
   else
     {
-      path = address + strlen ("unix:path=");
+      path = address + strlen ("daemon:path=");
       abstract = FALSE;
     }
     
@@ -175,7 +175,7 @@ close_wrapper (gpointer p)
 }
 
 DBusConnection *
-_g_vfs_unix_get_connection_sync (const char *mountpoint,
+_g_vfs_daemon_get_connection_sync (const char *mountpoint,
 				 gint *fd,
 				 GError **error)
 {
@@ -248,7 +248,7 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint,
 			 DBUS_TYPE_STRING, &address2,
 			 DBUS_TYPE_INVALID);
 
-  extra_fd = unix_socket_connect (address2);
+  extra_fd = daemon_socket_connect (address2);
   g_print ("extra fd: %d\n", extra_fd);
 
   dbus_error_init (&derror);

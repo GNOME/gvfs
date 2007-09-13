@@ -13,8 +13,8 @@
 #include <glib/gi18n.h>
 #include <dbus-gmain.h>
 #include <gvfsreadstream.h>
-#include <gvfs/gsocketinputstream.h>
-#include <gvfs/gsocketoutputstream.h>
+#include <gvfs/ginputstreamsocket.h>
+#include <gvfs/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobread.h>
@@ -294,6 +294,7 @@ command_read_cb (GInputStream *input_stream,
 		 gpointer      data,
 		 GError       *error)
 {
+  g_print ("command_read_cb - data: %p\n", data);
   GVfsReadStream *stream = G_VFS_READ_STREAM (data);
   GVfsDaemonSocketProtocolRequest *cmd;
   guint32 seq_nr;
@@ -412,8 +413,8 @@ g_vfs_read_stream_new (GError **error)
     }
 
   stream = g_object_new (G_TYPE_VFS_READ_STREAM, NULL);
-  stream->priv->command_stream = g_socket_input_stream_new (socket_fds[0], TRUE);
-  stream->priv->reply_stream = g_socket_output_stream_new (socket_fds[0], FALSE);
+  stream->priv->command_stream = g_input_stream_socket_new (socket_fds[0], TRUE);
+  stream->priv->reply_stream = g_output_stream_socket_new (socket_fds[0], FALSE);
   stream->priv->remote_fd = socket_fds[1];
 
   request_command (stream);

@@ -4,9 +4,9 @@
 #include <glib.h>
 #include "gfile.h"
 #include "gseekable.h"
-#include "glocalfileinputstream.h"
-#include "glocalfileoutputstream.h"
-#include "gsocketinputstream.h"
+#include "gfileinputstreamlocal.h"
+#include "gfileoutputstreamlocal.h"
+#include "ginputstreamsocket.h"
 
 static void
 test_out ()
@@ -31,7 +31,7 @@ test_out ()
   
   unlink ("/tmp/test");
   
-  out = (GOutputStream *)g_local_file_output_stream_new ("/tmp/test",
+  out = (GOutputStream *)g_file_output_stream_local_new ("/tmp/test",
 							 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
 
   left = sizeof(buffer);
@@ -71,7 +71,7 @@ test_sync (char *filename, gboolean dump)
   gssize res;
   gboolean close_res;
   
-  in = (GInputStream *)g_local_file_input_stream_new (filename);
+  in = (GInputStream *)g_file_input_stream_local_new (filename);
 
   while (1)
     {
@@ -136,7 +136,7 @@ test_async (char *filename, gboolean dump)
 
   buffer = g_malloc (1025);
   
-  in = (GInputStream *)g_local_file_input_stream_new (filename);
+  in = (GInputStream *)g_file_input_stream_local_new (filename);
   
   g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL);
 }
@@ -223,7 +223,7 @@ main (int argc, char *argv[])
 
     buffer = g_malloc (1025);
     
-    s = g_socket_input_stream_new (0, FALSE);
+    s = g_input_stream_socket_new (0, FALSE);
 
     if (1)
       {

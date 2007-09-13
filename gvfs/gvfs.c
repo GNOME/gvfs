@@ -1,7 +1,7 @@
 #include <config.h>
 #include "gvfs.h"
-#include "gvfssimple.h"
-#include "gvfsunix.h"
+#include "gvfslocal.h"
+#include "gvfsdaemon.h"
 #include <glib/gi18n-lib.h>
 
 static void g_vfs_base_init (gpointer g_class);
@@ -77,10 +77,10 @@ g_vfs_parse_name (GVfs *vfs,
 static gpointer
 get_default_vfs (gpointer arg)
 {
-  if (g_getenv ("VFS_USE_SIMPLE") != NULL)
-    return g_vfs_simple_new ();
+  if (g_getenv ("VFS_USE_LOCAL") != NULL)
+    return g_vfs_local_new ();
   else
-    return g_vfs_unix_new ();
+    return g_vfs_daemon_new ();
 }
 
 GVfs *

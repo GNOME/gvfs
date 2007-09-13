@@ -1,5 +1,5 @@
 #include <config.h>
-#include "gvfsunixuri.h"
+#include "gvfsuriutils.h"
 #include <string.h>
 #include <stdlib.h>
 

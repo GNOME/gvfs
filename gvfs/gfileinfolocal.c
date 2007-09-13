@@ -23,7 +23,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#include "gfileinfosimple.h"
+#include "gfileinfolocal.h"
 #include "gvfserror.h"
 
 static gchar *
@@ -421,7 +421,7 @@ get_access_rights (const gchar *path)
 
 
 GFileInfo *
-g_file_info_simple_get (const char *basename,
+g_file_info_local_get (const char *basename,
 			const char *path,
 			GFileInfoRequestFlags requested,
 			GFileAttributeMatcher *attribute_matcher,
@@ -516,7 +516,7 @@ g_file_info_simple_get (const char *basename,
 }
 
 GFileInfo *
-g_file_info_simple_get_from_fd (int fd,
+g_file_info_local_get_from_fd (int fd,
 				GFileInfoRequestFlags requested,
 				char *attributes,
 				GError **error)

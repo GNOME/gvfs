@@ -20,28 +20,28 @@ gvfs-marshal.c: gvfs-marshal.h gvfs-marshal.list $(GLIB_GENMARSHAL)
 	(echo "#include \"gvfs-marshal.h\""; \
 	 $(GLIB_GENMARSHAL) --prefix=_gvfs_marshal $(srcdir)/gvfs-marshal.list --body) > $@
 
-simple_sources = \
-	gfileenumeratorsimple.c \
-	gfileenumeratorsimple.h \
-	gfileinfosimple.c \
-	gfileinfosimple.h \
-	gfilesimple.c \
-	gfilesimple.h \
-	glocalfileinputstream.c \
-	glocalfileinputstream.h \
-	glocalfileoutputstream.c \
-	glocalfileoutputstream.h \
-	gvfssimple.c \
-	gvfssimple.h \
+local_sources = \
+	gfileenumeratorlocal.c \
+	gfileenumeratorlocal.h \
+	gfileinfolocal.c \
+	gfileinfolocal.h \
+	gfilelocal.c \
+	gfilelocal.h \
+	gfileinputstreamlocal.c \
+	gfileinputstreamlocal.h \
+	gfileoutputstreamlocal.c \
+	gfileoutputstreamlocal.h \
+	gvfslocal.c \
+	gvfslocal.h \
 	$(NULL)
 
-unix_sources = \
-	gvfsunix.c gvfsunix.h \
-	gfileunix.c gfileunix.h \
-	gfileunixsimple.c gfileunixsimple.h \
-	gvfsunixuri.c gvfsunixuri.h \
-	gunixfileinputstream.c gunixfileinputstream.h \
-	gvfsunixdbus.c \
+daemon_sources = \
+	gvfsdaemon.c gvfsdaemon.h \
+	gfiledaemon.c gfiledaemon.h \
+	gfiledaemonlocal.c gfiledaemonlocal.h \
+	gvfsuriutils.c gvfsuriutils.h \
+	gfileinputstreamdaemon.c gfileinputstreamdaemon.h \
+	gvfsdaemondbus.c \
 	$(NULL)
 
 libgvfs_la_SOURCES = 	\
@@ -55,10 +55,10 @@ libgvfs_la_SOURCES = 	\
 	gfileinputstream.c \
 	gfileoutputstream.c \
 	gseekable.c \
-	gsocketinputstream.c \
-	gsocketinputstream.h \
-	gsocketoutputstream.c \
-	gsocketoutputstream.h \
+	ginputstreamsocket.c \
+	ginputstreamsocket.h \
+	goutputstreamsocket.c \
+	goutputstreamsocket.h \
 	ginputstream.c \
 	gioscheduler.c \
 	gmountoperation.c \
@@ -67,8 +67,8 @@ libgvfs_la_SOURCES = 	\
 	gvfs.c \
 	gvfs.h \
 	gvfserror.c \
-	$(simple_sources) \
-	$(unix_sources) \
+	$(local_sources) \
+	$(daemon_sources) \
 	$(marshal_sources) \
 	$(NULL)
 

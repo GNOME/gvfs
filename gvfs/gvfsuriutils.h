@@ -1,5 +1,5 @@
-#ifndef __G_VFS_UNIX_URI_H__
-#define __G_VFS_UNIX_URI_H__
+#ifndef __G_VFS_URI_UTILS_H__
+#define __G_VFS_URI_UTILS_H__
 
 #include <glib.h>
 
@@ -22,4 +22,4 @@ GDecodedUri *_g_decode_uri       (const char  *uri);
 
 G_END_DECLS
 
-#endif /* __G_VFS_UNIX_URI_H__ */
+#endif /* __G_VFS_URI_UTILS_H__ */

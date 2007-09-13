@@ -10,79 +10,79 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include "gvfserror.h"
-#include "glocalfileinputstream.h"
-#include "gfileinfosimple.h"
+#include "gfileinputstreamlocal.h"
+#include "gfileinfolocal.h"
 
 
-G_DEFINE_TYPE (GLocalFileInputStream, g_local_file_input_stream, G_TYPE_FILE_INPUT_STREAM);
+G_DEFINE_TYPE (GFileInputStreamLocal, g_file_input_stream_local, G_TYPE_FILE_INPUT_STREAM);
 
-struct _GLocalFileInputStreamPrivate {
+struct _GFileInputStreamLocalPrivate {
   char *filename;
   int fd;
 };
 
-static gssize     g_local_file_input_stream_read          (GInputStream           *stream,
+static gssize     g_file_input_stream_local_read          (GInputStream           *stream,
 							   void                   *buffer,
 							   gsize                   count,
 							   GCancellable           *cancellable,
 							   GError                **error);
-static gssize     g_local_file_input_stream_skip          (GInputStream           *stream,
+static gssize     g_file_input_stream_local_skip          (GInputStream           *stream,
 							   gsize                   count,
 							   GCancellable           *cancellable,
 							   GError                **error);
-static gboolean   g_local_file_input_stream_close         (GInputStream           *stream,
+static gboolean   g_file_input_stream_local_close         (GInputStream           *stream,
 							   GCancellable           *cancellable,
 							   GError                **error);
-static GFileInfo *g_local_file_input_stream_get_file_info (GFileInputStream       *stream,
+static GFileInfo *g_file_input_stream_local_get_file_info (GFileInputStream       *stream,
 							   GFileInfoRequestFlags   requested,
 							   char                   *attributes,
 							   GCancellable           *cancellable,
 							   GError                **error);
 
 static void
-g_local_file_input_stream_finalize (GObject *object)
+g_file_input_stream_local_finalize (GObject *object)
 {
-  GLocalFileInputStream *file;
+  GFileInputStreamLocal *file;
   
-  file = G_LOCAL_FILE_INPUT_STREAM (object);
+  file = G_FILE_INPUT_STREAM_LOCAL (object);
   
   g_free (file->priv->filename);
   
-  if (G_OBJECT_CLASS (g_local_file_input_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_local_file_input_stream_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_file_input_stream_local_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_file_input_stream_local_parent_class)->finalize) (object);
 }
 
 static void
-g_local_file_input_stream_class_init (GLocalFileInputStreamClass *klass)
+g_file_input_stream_local_class_init (GFileInputStreamLocalClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
   GFileInputStreamClass *file_stream_class = G_FILE_INPUT_STREAM_CLASS (klass);
   
-  g_type_class_add_private (klass, sizeof (GLocalFileInputStreamPrivate));
+  g_type_class_add_private (klass, sizeof (GFileInputStreamLocalPrivate));
   
-  gobject_class->finalize = g_local_file_input_stream_finalize;
+  gobject_class->finalize = g_file_input_stream_local_finalize;
 
-  stream_class->read = g_local_file_input_stream_read;
-  stream_class->skip = g_local_file_input_stream_skip;
-  stream_class->close = g_local_file_input_stream_close;
-  file_stream_class->get_file_info = g_local_file_input_stream_get_file_info;
+  stream_class->read = g_file_input_stream_local_read;
+  stream_class->skip = g_file_input_stream_local_skip;
+  stream_class->close = g_file_input_stream_local_close;
+  file_stream_class->get_file_info = g_file_input_stream_local_get_file_info;
 }
 
 static void
-g_local_file_input_stream_init (GLocalFileInputStream *info)
+g_file_input_stream_local_init (GFileInputStreamLocal *info)
 {
   info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info,
-					    G_TYPE_LOCAL_FILE_INPUT_STREAM,
-					    GLocalFileInputStreamPrivate);
+					    G_TYPE_FILE_INPUT_STREAM_LOCAL,
+					    GFileInputStreamLocalPrivate);
 }
 
 GFileInputStream *
-g_local_file_input_stream_new (const char *filename)
+g_file_input_stream_local_new (const char *filename)
 {
-  GLocalFileInputStream *stream;
+  GFileInputStreamLocal *stream;
 
-  stream = g_object_new (G_TYPE_LOCAL_FILE_INPUT_STREAM, NULL);
+  stream = g_object_new (G_TYPE_FILE_INPUT_STREAM_LOCAL, NULL);
 
   stream->priv->filename = g_strdup (filename);
   stream->priv->fd = -1;
@@ -91,7 +91,7 @@ g_local_file_input_stream_new (const char *filename)
 }
 
 static gboolean
-g_local_file_input_stream_open (GLocalFileInputStream *file,
+g_file_input_stream_local_open (GFileInputStreamLocal *file,
 				GError      **error)
 {
   if (file->priv->fd != -1)
@@ -109,18 +109,18 @@ g_local_file_input_stream_open (GLocalFileInputStream *file,
 			  
 
 static gssize
-g_local_file_input_stream_read (GInputStream *stream,
+g_file_input_stream_local_read (GInputStream *stream,
 				void         *buffer,
 				gsize         count,
 				GCancellable *cancellable,
 				GError      **error)
 {
-  GLocalFileInputStream *file;
+  GFileInputStreamLocal *file;
   gssize res;
 
-  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+  file = G_FILE_INPUT_STREAM_LOCAL (stream);
 
-  if (!g_local_file_input_stream_open (file, error))
+  if (!g_file_input_stream_local_open (file, error))
     return -1;
   
   while (1)
@@ -153,17 +153,17 @@ g_local_file_input_stream_read (GInputStream *stream,
 }
 
 static gssize
-g_local_file_input_stream_skip (GInputStream *stream,
+g_file_input_stream_local_skip (GInputStream *stream,
 				gsize         count,
 				GCancellable *cancellable,
 				GError      **error)
 {
   off_t res, start;
-  GLocalFileInputStream *file;
+  GFileInputStreamLocal *file;
 
-  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+  file = G_FILE_INPUT_STREAM_LOCAL (stream);
   
-  if (!g_local_file_input_stream_open (file, error))
+  if (!g_file_input_stream_local_open (file, error))
     return -1;
 
   start = lseek (file->priv->fd, 0, SEEK_CUR);
@@ -190,14 +190,14 @@ g_local_file_input_stream_skip (GInputStream *stream,
 }
 
 static gboolean
-g_local_file_input_stream_close (GInputStream *stream,
+g_file_input_stream_local_close (GInputStream *stream,
 				GCancellable  *cancellable,
 				 GError      **error)
 {
-  GLocalFileInputStream *file;
+  GFileInputStreamLocal *file;
   int res;
 
-  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+  file = G_FILE_INPUT_STREAM_LOCAL (stream);
 
   if (file->priv->fd == -1)
     return TRUE;
@@ -231,21 +231,21 @@ g_local_file_input_stream_close (GInputStream *stream,
 }
 
 static GFileInfo *
-g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
+g_file_input_stream_local_get_file_info (GFileInputStream     *stream,
 					 GFileInfoRequestFlags requested,
 					 char                 *attributes,
 					 GCancellable         *cancellable,
 					 GError              **error)
 {
-  GLocalFileInputStream *file;
+  GFileInputStreamLocal *file;
 
-  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+  file = G_FILE_INPUT_STREAM_LOCAL (stream);
 
-  if (!g_local_file_input_stream_open (file, error))
+  if (!g_file_input_stream_local_open (file, error))
     return NULL;
 
-  return g_file_info_simple_get_from_fd (file->priv->fd,
-					 requested,
-					 attributes,
-					 error);
+  return g_file_info_local_get_from_fd (file->priv->fd,
+					requested,
+					attributes,
+					error);
 }
