@@ -391,30 +391,29 @@ typedef struct {
 } GetMountInfoData;
 
 static void
-async_get_mount_info_response (DBusPendingCall *pending,
-			       void            *_data)
+async_get_mount_info_response (DBusMessage *reply,
+			       GError *io_error,
+			       void *_data)
 {
   GetMountInfoData *data = _data;
-  DBusMessage *reply;
-  GError *error;
   GMountInfo *info;
+  GError *error;
 
-  
-  reply = dbus_pending_call_steal_reply (pending);
-  dbus_pending_call_unref (pending);
+  if (reply == NULL)
+    data->callback (NULL, data->user_data, io_error);
+  else
+    {
+      error = NULL;
+      info = handler_lookup_mount_reply (reply, &error);
 
-  error = NULL;
-  info = handler_lookup_mount_reply (reply, &error);
+      data->callback (info, data->user_data, error);
 
-  dbus_message_unref (reply);
-  
-  data->callback (info, data->user_data, error);
+      if (info)
+	_g_mount_info_unref (info);
 
-  if (info)
-    _g_mount_info_unref (info);
-  
-  if (error)
-    g_error_free (error);
+      if (error)
+	g_error_free (error);
+    }
   
   g_free (data);
 }
@@ -425,9 +424,7 @@ _g_vfs_impl_daemon_get_mount_info_async (GMountSpec *spec,
 					 GMountInfoLookupCallback callback,
 					 gpointer user_data)
 {
-  DBusPendingCall *pending;
   GMountInfo *info;
-  GError *error;
   GetMountInfoData *data;
   DBusMessage *message;
   DBusMessageIter iter;
@@ -451,31 +448,15 @@ _g_vfs_impl_daemon_get_mount_info_async (GMountSpec *spec,
   dbus_message_iter_init_append (message, &iter);
   g_mount_spec_to_dbus_with_path (&iter, spec, path);
 
-  if (!dbus_connection_send_with_reply (the_vfs->bus, message, &pending,
-					1000))
-    _g_dbus_oom ();
-
-  dbus_message_unref (message);
-
-  if (pending == NULL)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Error while getting peer-to-peer dbus connection: %s",
-		   "Connection is closed");
-      callback (NULL, user_data, error);
-      return;
-    }
-
   data = g_new0 (GetMountInfoData, 1);
   data->callback = callback;
   data->user_data = user_data;
   
-  if (!dbus_pending_call_set_notify (pending,
-				     async_get_mount_info_response,
-				     data,
-				     NULL))
-    _g_dbus_oom ();
+  _g_dbus_connection_call_async (the_vfs->bus, message, 2000,
+				 async_get_mount_info_response,
+				 data);
+  
+  dbus_message_unref (message);
 }
 
 
