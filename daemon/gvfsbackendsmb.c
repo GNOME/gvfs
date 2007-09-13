@@ -1112,15 +1112,19 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 #endif
   g_file_info_set_modification_time (info, &t);
 
+  /* Don't trust n_link, uid, gid, etc returned from libsmb, its just made up.
+     These are ok though: */
+
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, statbuf->st_mode);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_NLINK, statbuf->st_nlink);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, statbuf->st_uid);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, statbuf->st_uid);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_RDEV, statbuf->st_rdev);
-  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE, statbuf->st_blksize);
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
+
+
+  /* If file is dos-readonly, libsmbclient doesn't set S_IWUSR, we use this to
+     trigger ACCESS_WRITE = FALSE: */
+  if (!(statbud->st_mode & S_IWUSR))
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE, FALSE);
+
+  /* Look at st_mode & S_IWUSR, not set => readonly */
   
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
@@ -1195,6 +1199,7 @@ do_enumerate (GVfsBackend *backend,
   GFileInfo *info;
   GString *uri;
   int uri_start_len;
+  GFileAttributeMatcher *matcher;
 
   uri = create_smb_uri_string (op_backend->server, op_backend->share, filename);
   dir = op_backend->smb_context->opendir (op_backend->smb_context, uri->str);
@@ -1213,6 +1218,8 @@ do_enumerate (GVfsBackend *backend,
   if (uri->str[uri->len - 1] != '/')
     g_string_append_c (uri, '/');
   uri_start_len = uri->len;
+
+  matcher = g_file_attribute_matcher_new (attributes);
   
   while (TRUE)
     {
@@ -1240,19 +1247,28 @@ do_enumerate (GVfsBackend *backend,
 	      g_string_append_encoded (uri,
 				       dirp->name,
 				       SUB_DELIM_CHARS ":@/");
-	      
-	      stat_res = op_backend->smb_context->stat (op_backend->smb_context,
-							uri->str, &st);
-	      if (stat_res == 0)
+
+	      if (matcher == NULL ||
+		  g_file_attribute_matcher_matches_only (matcher, G_FILE_ATTRIBUTE_STD_NAME))
 		{
 		  info = g_file_info_new ();
 		  g_file_info_set_name (info, dirp->name);
-		  
-		  set_info_from_stat (info, &st);
-		  files = g_list_prepend (files, info);
+		}
+	      else
+		{
+		  stat_res = op_backend->smb_context->stat (op_backend->smb_context,
+							    uri->str, &st);
+		  if (stat_res == 0)
+		    {
+		      info = g_file_info_new ();
+		      g_file_info_set_name (info, dirp->name);
+		      
+		      set_info_from_stat (info, &st);
+		      files = g_list_prepend (files, info);
+		    }
 		}
 	    }
-		  
+	  
 	  dirlen = dirp->dirlen;
 	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
 	  res -= dirlen;
@@ -1267,6 +1283,8 @@ do_enumerate (GVfsBackend *backend,
 	}
     }
       
+  g_file_attribute_matcher_free (matcher);
+
   res = op_backend->smb_context->closedir (op_backend->smb_context, dir);
 
   g_vfs_job_enumerate_done (job);

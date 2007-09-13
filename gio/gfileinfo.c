@@ -1123,6 +1123,28 @@ g_file_attribute_matcher_free (GFileAttributeMatcher *matcher)
 }
 
 gboolean
+g_file_attribute_matcher_matches_only (GFileAttributeMatcher *matcher,
+				       const char            *attribute)
+{
+  guint32 id;
+
+  if (matcher == NULL)
+    return FALSE;
+  
+  if (matcher->all)
+    return FALSE;
+  
+  id = lookup_attribute (attribute);
+
+  if (matcher->sub_matchers[0].id != 0 &&
+      matcher->sub_matchers[1].id == 0 &&
+      matcher->sub_matchers[0].id == (id & matcher->sub_matchers[0].mask))
+    return TRUE;
+  
+  return FALSE;
+}
+
+gboolean
 g_file_attribute_matcher_matches (GFileAttributeMatcher *matcher,
 				  const char            *attribute)
 {

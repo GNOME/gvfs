@@ -204,6 +204,8 @@ GFileAttributeMatcher *g_file_attribute_matcher_new            (const char      
 void                   g_file_attribute_matcher_free           (GFileAttributeMatcher *matcher);
 gboolean               g_file_attribute_matcher_matches        (GFileAttributeMatcher *matcher,
 								const char            *full_name);
+gboolean               g_file_attribute_matcher_matches_only   (GFileAttributeMatcher *matcher,
+								const char            *full_name);
 gboolean               g_file_attribute_matcher_enumerate_namespace (GFileAttributeMatcher *matcher,
 								     const char            *namespace);
 const char *           g_file_attribute_matcher_enumerate_next (GFileAttributeMatcher *matcher);
