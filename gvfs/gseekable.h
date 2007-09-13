@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <gvfs/gvfstypes.h>
+#include <gvfs/gcancellable.h>
 
 G_BEGIN_DECLS
 
@@ -20,26 +21,39 @@ struct _GSeekableIface
 
   /* Virtual Table */
   
-  goffset     (* tell)	         (GSeekable *seekable);
+  goffset     (* tell)	         (GSeekable    *seekable);
   
-  gboolean    (* can_seek)       (GSeekable *seekable);
-  goffset     (* seek)	         (GSeekable *seekable,
-				  goffset    offset,
-				  GSeekType  type,
-				  GError   **err);
+  gboolean    (* can_seek)       (GSeekable    *seekable);
+  gboolean    (* seek)	         (GSeekable    *seekable,
+				  goffset       offset,
+				  GSeekType     type,
+				  GCancellable *cancellable,
+				  GError      **error);
   
-  gboolean    (* can_truncate)   (GSeekable *seekable);
-  goffset     (* truncate)       (GSeekable *seekable,
-				  goffset    offset,
-				  GError    **err);
+  gboolean    (* can_truncate)   (GSeekable    *seekable);
+  gboolean    (* truncate)       (GSeekable    *seekable,
+				  goffset       offset,
+				  GCancellable *cancellable,
+				  GError       **error);
 
-}
+  /* TODO: Async seek/truncate */
+  
+};
 
-goffset  g_seekable_tell     (GSeekable  *seekable);
-goffset  g_seekable_seek     (GSeekable *seekable,
-			      goffset    offset,
-			      GSeekType  type,
-			      GError   **err);
+GType g_seekable_get_type (void) G_GNUC_CONST;
+
+goffset  g_seekable_tell         (GSeekable     *seekable);
+gboolean g_seekable_can_seek     (GSeekable     *seekable);
+gboolean g_seekable_seek         (GSeekable     *seekable,
+				  goffset        offset,
+				  GSeekType      type,
+				  GCancellable  *cancellable,
+				  GError       **err);
+gboolean g_seekable_can_truncate (GSeekable     *seekable);
+gboolean g_seekable_truncate     (GSeekable     *seekable,
+				  goffset        offset,
+				  GCancellable  *cancellable,
+				  GError       **err);
 
 G_END_DECLS
 
