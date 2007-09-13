@@ -8,6 +8,8 @@ g_file_get_for_path -> _new_for_path? (some people wanted this)
 Work on GFile:
 * More async operations
 
+Make GFileAttributeInfoList be ref/unref so we can keep it around for the localfile backend
+
 Implement the rest of the mountable GFile ops
 
 Test g_file_replace_contents_async
