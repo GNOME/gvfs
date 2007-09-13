@@ -204,10 +204,10 @@ g_file_info_simple_get (const char *basename,
   struct stat statbuf;
   int res;
 
-  if (requested && G_FILE_INFO_NAME)
+  if (requested & G_FILE_INFO_NAME)
     g_file_info_set_name (info, basename);
 
-  if (requested && G_FILE_INFO_IS_HIDDEN)
+  if (requested & G_FILE_INFO_IS_HIDDEN)
     g_file_info_set_is_hidden (info,
 			  basename != NULL &&
 			  basename[0] == '.');
@@ -230,34 +230,34 @@ g_file_info_simple_get (const char *basename,
   
   g_file_info_set_from_stat (info, requested, &statbuf);
   
-  if (requested && G_FILE_INFO_SYMLINK_TARGET)
+  if (requested & G_FILE_INFO_SYMLINK_TARGET)
     {
       char *link = read_link (path);
       g_file_info_set_symlink_target (info, link);
       g_free (link);
     }
 
-  if (requested && G_FILE_INFO_ACCESS_RIGHTS)
+  if (requested & G_FILE_INFO_ACCESS_RIGHTS)
     {
       /* TODO */
     }
   
-  if (requested && G_FILE_INFO_DISPLAY_NAME)
+  if (requested & G_FILE_INFO_DISPLAY_NAME)
     {
       /* TODO */
     }
   
-  if (requested && G_FILE_INFO_EDIT_NAME)
+  if (requested & G_FILE_INFO_EDIT_NAME)
     {
       /* TODO */
     }
 
-  if (requested && G_FILE_INFO_MIME_TYPE)
+  if (requested & G_FILE_INFO_MIME_TYPE)
     {
       /* TODO */
     }
   
-  if (requested && G_FILE_INFO_ICON)
+  if (requested & G_FILE_INFO_ICON)
     {
       /* TODO */
     }
