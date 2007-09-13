@@ -1323,9 +1323,9 @@ async_iterate (AsyncIterator *iterator)
   
   io_data->cancelled =
     g_cancellable_is_cancelled (iterator->cancellable);
-  
+
   io_op = iterator->iterator (file, io_data, iterator->iterator_data);
-  
+
   if (io_op == STATE_OP_DONE)
     {
       async_iterator_done (iterator, NULL);
@@ -1446,7 +1446,7 @@ g_file_input_stream_daemon_read_async  (GInputStream        *stream,
   if (count > MAX_READ_SIZE)
     count = MAX_READ_SIZE;
 
-  op = g_new0 (ReadOperation, 0);
+  op = g_new0 (ReadOperation, 1);
   op->state = READ_STATE_INIT;
   op->buffer = buffer;
   op->buffer_size = count;
