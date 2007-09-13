@@ -32,15 +32,15 @@ typedef struct ik_event_s {
 	struct ik_event_s *pair;
 } ik_event_t;
 
-gboolean ik_startup (void (*cb)(ik_event_t *event));
-ik_event_t *ik_event_new_dummy (const char *name, gint32 wd, guint32 mask);
-void ik_event_free (ik_event_t *event);
+gboolean _ik_startup (void (*cb)(ik_event_t *event));
+ik_event_t *_ik_event_new_dummy (const char *name, gint32 wd, guint32 mask);
+void _ik_event_free (ik_event_t *event);
 
-gint32 ik_watch(const char *path, guint32 mask, int *err);
-int ik_ignore(const char *path, gint32 wd);
+gint32 _ik_watch(const char *path, guint32 mask, int *err);
+int _ik_ignore(const char *path, gint32 wd);
 
 /* The miss count will probably be enflated */
-void ik_move_stats (guint32 *matches, guint32 *misses);
-const char *ik_mask_to_string (guint32 mask);
+void _ik_move_stats (guint32 *matches, guint32 *misses);
+const char *_ik_mask_to_string (guint32 mask);
 
 #endif

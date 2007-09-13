@@ -195,7 +195,7 @@ GSourceFuncs ik_source_funcs =
 	NULL
 };
 
-gboolean ik_startup (void (*cb)(ik_event_t *event))
+gboolean _ik_startup (void (*cb)(ik_event_t *event))
 {
 	static gboolean initialized = FALSE;
 	GSource *source;
@@ -264,7 +264,7 @@ static ik_event_t *ik_event_new (char *buffer)
    return event;
 }
 
-ik_event_t *ik_event_new_dummy (const char *name, gint32 wd, guint32 mask)
+ik_event_t *_ik_event_new_dummy (const char *name, gint32 wd, guint32 mask)
 {
 	ik_event_t *event = g_new0(ik_event_t,1);
 	event->wd = wd;
@@ -280,15 +280,15 @@ ik_event_t *ik_event_new_dummy (const char *name, gint32 wd, guint32 mask)
 	return event;
 }
 
-void ik_event_free (ik_event_t *event)
+void _ik_event_free (ik_event_t *event)
 {
 	if (event->pair)
-		ik_event_free (event->pair);
+		_ik_event_free (event->pair);
 	g_free(event->name);
 	g_free(event);
 }
 
-gint32 ik_watch (const char *path, guint32 mask, int *err)
+gint32 _ik_watch (const char *path, guint32 mask, int *err)
 {
    gint32 wd = -1;
 
@@ -310,7 +310,7 @@ gint32 ik_watch (const char *path, guint32 mask, int *err)
    return wd;
 }
 
-int ik_ignore(const char *path, gint32 wd)
+int _ik_ignore(const char *path, gint32 wd)
 {
 	g_assert (wd >= 0);
 	g_assert (inotify_instance_fd >= 0);
@@ -325,7 +325,7 @@ int ik_ignore(const char *path, gint32 wd)
 	return 0;
 }
 
-void ik_move_stats (guint32 *matches, guint32 *misses)
+void _ik_move_stats (guint32 *matches, guint32 *misses)
 {
 	if (matches)
 		*matches = ik_move_matches;
@@ -334,7 +334,7 @@ void ik_move_stats (guint32 *matches, guint32 *misses)
 		*misses = ik_move_misses;
 }
 
-const char *ik_mask_to_string (guint32 mask)
+const char *_ik_mask_to_string (guint32 mask)
 {
 	gboolean is_dir = mask & IN_ISDIR;
 	mask &= ~IN_ISDIR;
@@ -666,7 +666,7 @@ ik_process_events ()
 	}
 }
 
-gboolean ik_process_eq_callback (gpointer user_data)
+static gboolean ik_process_eq_callback (gpointer user_data)
 {
     /* Try and move as many events to the event queue */
 	G_LOCK(inotify_lock);

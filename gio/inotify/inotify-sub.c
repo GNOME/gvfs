@@ -44,7 +44,7 @@ static gchar* dup_dirname(const gchar* dirname)
 }
 
 inotify_sub*
-ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data)
+_ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data)
 {
 	inotify_sub* sub = NULL;
 
@@ -59,7 +59,7 @@ ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data)
 }
 
 void
-ih_sub_free (inotify_sub* sub)
+_ih_sub_free (inotify_sub* sub)
 {
 	if (sub->dirname)
 		g_free (sub->dirname);

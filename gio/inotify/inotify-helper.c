@@ -76,7 +76,7 @@ static GDirectoryMonitorEvent ih_mask_to_EventFlags (guint32 mask);
  * @returns TRUE if initialization succeeded, FALSE otherwise
  */
 gboolean
-ih_startup (void)
+_ih_startup (void)
 {
 	static gboolean initialized = FALSE;
 	static gboolean result = FALSE;
@@ -88,14 +88,14 @@ ih_startup (void)
 		return result;
 	}
 
-	result = ip_startup (ih_event_callback);
+	result = _ip_startup (ih_event_callback);
 	if (!result) {
 		g_warning( "Could not initialize inotify\n");
 		G_UNLOCK(inotify_lock);
 		return FALSE;
 	}
-	im_startup (ih_not_missing_callback);
-	id_startup ();
+	_im_startup (ih_not_missing_callback);
+	_id_startup ();
 
 	IH_W ("started gvfs inotify backend\n");
 
@@ -108,13 +108,13 @@ ih_startup (void)
  * Adds a subscription to be monitored.
  */
 gboolean
-ih_sub_add (inotify_sub * sub)
+_ih_sub_add (inotify_sub * sub)
 {
 	G_LOCK(inotify_lock);
 	
-	if (!ip_start_watching (sub))
+	if (!_ip_start_watching (sub))
 	{
-		im_add (sub);
+		_im_add (sub);
 	}
 
 	G_UNLOCK(inotify_lock);
@@ -125,7 +125,7 @@ ih_sub_add (inotify_sub * sub)
  * Cancels a subscription which was being monitored.
  */
 gboolean
-ih_sub_cancel (inotify_sub * sub)
+_ih_sub_cancel (inotify_sub * sub)
 {
 	G_LOCK(inotify_lock);
 
@@ -133,8 +133,8 @@ ih_sub_cancel (inotify_sub * sub)
 	{
 		IH_W("cancelling %s\n", sub->dirname);
 		sub->cancelled = TRUE;
-		im_rm (sub);
-		ip_stop_watching (sub);
+		_im_rm (sub);
+		_ip_stop_watching (sub);
 	}
 
 	G_UNLOCK(inotify_lock);

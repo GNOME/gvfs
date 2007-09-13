@@ -42,7 +42,7 @@ static void (*missing_cb)(inotify_sub *sub) = NULL;
 G_LOCK_EXTERN (inotify_lock);
 
 /* inotify_lock must be held before calling */
-void im_startup (void (*callback)(inotify_sub *sub))
+void _im_startup (void (*callback)(inotify_sub *sub))
 {
 	static gboolean initialized = FALSE;
 
@@ -53,7 +53,7 @@ void im_startup (void (*callback)(inotify_sub *sub))
 }
 
 /* inotify_lock must be held before calling */
-void im_add (inotify_sub *sub)
+void _im_add (inotify_sub *sub)
 {
 	if (g_list_find (missing_sub_list, sub)) {
 		IM_W("asked to add %s to missing list but it's already on the list!\n", sub->dirname);
@@ -72,7 +72,7 @@ void im_add (inotify_sub *sub)
 }
 
 /* inotify_lock must be held before calling */
-void im_rm (inotify_sub *sub)
+void _im_rm (inotify_sub *sub)
 {
 	GList *link;
 
@@ -108,7 +108,7 @@ static gboolean im_scan_missing (gpointer user_data)
 		IM_W("checking %p\n", sub);
 		g_assert (sub);
 		g_assert (sub->dirname);
-		not_m = ip_start_watching (sub);
+		not_m = _ip_start_watching (sub);
 
 		if (not_m)
 		{
@@ -145,7 +145,7 @@ static gboolean im_scan_missing (gpointer user_data)
 
 /* inotify_lock must be held */
 void
-im_diag_dump (GIOChannel *ioc)
+_im_diag_dump (GIOChannel *ioc)
 {
 	GList *l;
 	g_io_channel_write_chars (ioc, "missing list:\n", -1, NULL, NULL);

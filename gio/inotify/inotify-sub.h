@@ -32,7 +32,7 @@ typedef struct
 	gpointer user_data;
 } inotify_sub;
 
-inotify_sub* ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data);
-void         ih_sub_free (inotify_sub* sub);
+inotify_sub* _ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data);
+void         _ih_sub_free (inotify_sub* sub);
 
 #endif /* __INOTIFY_SUB_H */

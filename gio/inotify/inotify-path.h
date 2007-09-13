@@ -26,8 +26,8 @@
 #include "inotify-kernel.h"
 #include "inotify-sub.h"
 
-gboolean ip_startup (void (*event_cb)(ik_event_t *event, inotify_sub *sub));
-gboolean ip_start_watching (inotify_sub *sub);
-gboolean ip_stop_watching  (inotify_sub *sub);
+gboolean _ip_startup (void (*event_cb)(ik_event_t *event, inotify_sub *sub));
+gboolean _ip_start_watching (inotify_sub *sub);
+gboolean _ip_stop_watching  (inotify_sub *sub);
 
 #endif

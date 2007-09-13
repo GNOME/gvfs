@@ -60,17 +60,17 @@ g_local_directory_monitor_start (const char* dirname)
   {
     inotify_sub* sub;
     
-    if (!ih_startup ())
+    if (!_ih_startup ())
       {
 	g_object_unref (local_monitor);
 	return NULL;
       }
-    sub = ih_sub_new (dirname, NULL, local_monitor);
+    sub = _ih_sub_new (dirname, NULL, local_monitor);
     if (!sub)
       {
 	/* error */
       }
-    if (ih_sub_add (sub) == FALSE)
+    if (_ih_sub_add (sub) == FALSE)
       {
 	/* error */
       }
@@ -95,8 +95,8 @@ g_local_directory_monitor_cancel (GDirectoryMonitor* monitor)
 #ifdef USE_INOTIFY
   {
     inotify_sub* sub = local_monitor->private;
-    ih_sub_cancel (sub);
-    ih_sub_free (sub);
+    _ih_sub_cancel (sub);
+    _ih_sub_free (sub);
   }
 #endif
   

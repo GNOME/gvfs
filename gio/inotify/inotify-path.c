@@ -87,7 +87,7 @@ static void 			ip_event_callback (ik_event_t *event);
 
 static void (*event_callback)(ik_event_t *event, inotify_sub *sub);
 
-gboolean ip_startup (void (*cb)(ik_event_t *event, inotify_sub *sub))
+gboolean _ip_startup (void (*cb)(ik_event_t *event, inotify_sub *sub))
 {
 	static gboolean initialized = FALSE;
 	static gboolean result = FALSE;
@@ -97,7 +97,7 @@ gboolean ip_startup (void (*cb)(ik_event_t *event, inotify_sub *sub))
 	}
 
 	event_callback = cb;
-	result = ik_startup (ip_event_callback);
+	result = _ik_startup (ip_event_callback);
 
 	if (!result) {
 		return FALSE;
@@ -136,7 +136,7 @@ ip_map_wd_dir (gint32 wd, ip_watched_dir_t *dir)
 	g_hash_table_replace(wd_dir_hash, GINT_TO_POINTER(dir->wd), dir_list);
 }
 
-gboolean ip_start_watching (inotify_sub *sub)
+gboolean _ip_start_watching (inotify_sub *sub)
 {
 	gint32 wd;
 	int err;
@@ -155,7 +155,7 @@ gboolean ip_start_watching (inotify_sub *sub)
 	}
 	
 	IP_W("Trying to add inotify watch ");
-	wd = ik_watch (sub->dirname, IP_INOTIFY_MASK|IN_ONLYDIR, &err);
+	wd = _ik_watch (sub->dirname, IP_INOTIFY_MASK|IN_ONLYDIR, &err);
 	if (wd < 0) 
 	{
 		IP_W("Failed\n");
@@ -231,7 +231,7 @@ ip_unmap_all_subs (ip_watched_dir_t *dir)
 	dir->subs = NULL;
 }
 
-gboolean ip_stop_watching  (inotify_sub *sub)
+gboolean _ip_stop_watching  (inotify_sub *sub)
 {
 	ip_watched_dir_t *dir = NULL;
 
@@ -244,7 +244,7 @@ gboolean ip_stop_watching  (inotify_sub *sub)
 
 	/* No one is subscribing to this directory any more */
 	if (dir->subs == NULL) {
-		ik_ignore (dir->path, dir->wd);
+		_ik_ignore (dir->path, dir->wd);
 		ip_unmap_wd_dir (dir->wd, dir);
 		ip_unmap_path_dir (dir->path, dir);
 		ip_watched_dir_free (dir);
@@ -282,7 +282,7 @@ static void ip_wd_delete (gpointer data, gpointer user_data)
 	{
 		inotify_sub *sub = l->data;
 		/* Add subscription to missing list */
-		im_add (sub);
+		_im_add (sub);
 	}
 	ip_unmap_all_subs (dir);
 	/* Unassociate the path and the directory */
@@ -379,7 +379,7 @@ ip_event_callback (ik_event_t *event)
 
 	/* We can ignore the IGNORED events */
 	if (event->mask & IN_IGNORED) {
-		ik_event_free (event);
+		_ik_event_free (event);
 		return;
 	}
 
@@ -403,5 +403,5 @@ ip_event_callback (ik_event_t *event)
 		ip_unmap_wd (event->wd);
 	}
 
-	ik_event_free (event);
+	_ik_event_free (event);
 }

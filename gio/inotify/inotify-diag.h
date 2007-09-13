@@ -24,6 +24,6 @@
 #ifndef __INOTIFY_DIAG_H
 #define __INOTIFY_DIAG_H
 
-void id_startup (void);
+void _id_startup (void);
 
 #endif /* __INOTIFY_DIAG_H */

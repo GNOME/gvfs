@@ -48,7 +48,7 @@ static gboolean id_dump (gpointer userdata)
 		return TRUE;
 	}
 
-	im_diag_dump (ioc);
+	_im_diag_dump (ioc);
 
 	g_io_channel_shutdown (ioc, TRUE, NULL);
 	g_io_channel_unref (ioc);
@@ -56,7 +56,7 @@ static gboolean id_dump (gpointer userdata)
 	return TRUE;
 }
 
-void id_startup ()
+void _id_startup ()
 {
 	if (!g_getenv ("GVFS_INOTIFY_DIAG"))
 	{
