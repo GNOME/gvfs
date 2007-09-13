@@ -241,11 +241,27 @@ void
 g_file_info_set_attribute_mask (GFileInfo *info,
 				GFileAttributeMatcher *mask)
 {
+  GFileAttribute *attr;
+  int i;
+  
   if (mask != info->mask)
     {
       if (info->mask != NO_ATTRIBUTE_MASK)
 	g_file_attribute_matcher_unref (info->mask);
       info->mask = g_file_attribute_matcher_ref (mask);
+
+      /* Remove non-matching attributes */
+      for (i = 0; i < info->attributes->len; i++)
+	{
+	  attr = &g_array_index (info->attributes, GFileAttribute, i);
+	  if (!g_file_attribute_matcher_matches_id (mask,
+						    attr->attribute))
+	    {
+	      g_file_attribute_value_clear (&attr->value);
+	      g_array_remove_index (info->attributes, i);
+	      i--;
+	    }
+	}
     }
 }
 
