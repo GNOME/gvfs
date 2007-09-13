@@ -3,6 +3,8 @@ gio:
 
 Return std:icon for local files, etc
 
+g_file_get_for_path -> _new_for_path? (some people wanted this)
+
 Work on GFile:
 * More async operations
 
