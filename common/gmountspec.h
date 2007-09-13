@@ -38,12 +38,15 @@ typedef struct {
 GMountSpec *g_mount_spec_new               (const char      *type);
 GMountSpec *g_mount_spec_ref               (GMountSpec      *spec);
 void        g_mount_spec_unref             (GMountSpec      *spec);
+GMountSpec *g_mount_spec_copy              (GMountSpec      *spec);
 GMountSpec *g_mount_spec_from_dbus         (DBusMessageIter *iter);
 void        g_mount_spec_to_dbus           (DBusMessageIter *iter,
 					    GMountSpec      *spec);
 void        g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
 					    GMountSpec      *spec,
 					    const char      *path);
+void        g_mount_spec_set_mount_prefix  (GMountSpec      *spec,
+					    const char      *mount_prefix);
 void        g_mount_spec_set               (GMountSpec      *spec,
 					    const char      *key,
 					    const char      *value);

@@ -32,6 +32,15 @@ g_mount_spec_new (const char *type)
   return spec;
 }
 
+void
+g_mount_spec_set_mount_prefix  (GMountSpec      *spec,
+				const char      *mount_prefix)
+{
+  g_free (spec->mount_prefix);
+  mount_prefix = g_strdup (mount_prefix);
+}
+
+
 static void 
 add_item (GMountSpec *spec,
 	  const char *key,
@@ -82,6 +91,24 @@ g_mount_spec_set (GMountSpec *spec,
   g_mount_spec_set_with_len (spec, key, value, -1);
 }
 
+
+GMountSpec *
+g_mount_spec_copy (GMountSpec *spec)
+{
+  GMountSpec *copy;
+  int i;
+
+  copy = g_mount_spec_new (NULL);
+  copy->mount_prefix = g_strdup (spec->mount_prefix);
+
+  for (i = 0; i < spec->items->len; i++)
+    {
+      GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
+      g_mount_spec_set (copy, item->key, item->value);
+    }
+  
+  return copy;
+}
 
 GMountSpec *
 g_mount_spec_ref (GMountSpec *spec)
