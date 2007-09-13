@@ -42,6 +42,9 @@ static GFileInfo *g_local_file_output_stream_get_file_info (GFileOutputStream   
 							    char                   *attributes,
 							    GCancellable           *cancellable,
 							    GError                **error);
+static char *     g_local_file_output_stream_get_etag      (GFileOutputStream      *stream,
+							    GCancellable           *cancellable,
+							    GError                **error);
 
 
 static void
@@ -74,6 +77,7 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
   stream_class->write = g_local_file_output_stream_write;
   stream_class->close = g_local_file_output_stream_close;
   file_stream_class->get_file_info = g_local_file_output_stream_get_file_info;
+  file_stream_class->get_etag = g_local_file_output_stream_get_etag;
 }
 
 static void
@@ -227,6 +231,18 @@ g_local_file_output_stream_close (GOutputStream *stream,
   /* A simple try to close the fd in case we fail before the actual close */
   close (file->priv->fd);
   return FALSE;
+}
+
+static char *
+g_local_file_output_stream_get_etag (GFileOutputStream      *stream,
+				     GCancellable           *cancellable,
+				     GError                **error)
+{
+  GLocalFileOutputStream *file;
+
+  file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
+  
+  return g_strdup (file->priv->etag);
 }
 
 static GFileInfo *
