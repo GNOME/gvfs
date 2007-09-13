@@ -1364,11 +1364,28 @@ do_delete (GVfsBackend *backend,
 	   const char *filename)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat statbuf;
   char *uri;
   int errsv, res;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  res = op_backend->smb_context->unlink (op_backend->smb_context, uri);
+
+  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &statbuf);
+  if (res == -1)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR,
+			g_io_error_from_errno (errno),
+			_("Error deleting file: %s"),
+			g_strerror (errno));
+      g_free (uri);
+      return;
+    }
+
+  if (S_ISDIR (statbuf.st_mode))
+    res = op_backend->smb_context->rmdir (op_backend->smb_context, uri);
+  else
+    res = op_backend->smb_context->unlink (op_backend->smb_context, uri);
   errsv = errno;
   g_free (uri);
 
