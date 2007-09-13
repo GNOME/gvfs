@@ -742,6 +742,10 @@ copy_attributes (GFile *source,
 					     error);
       g_object_unref (info);
     }
+  
+  g_file_attribute_info_list_free (attributes);
+  g_file_attribute_info_list_free (namespaces);
+  
   return res;
 }
 
