@@ -170,30 +170,20 @@ static char *
 g_daemon_file_get_uri (GFile *file)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  GDecodedUri *uri;
 
-  uri = _g_daemon_vfs_get_uri_for_mountspec (daemon_file->mount_spec,
-					     daemon_file->path);
-
-  if (uri == NULL)
-    return NULL;
-
-  return g_encode_uri (uri, FALSE);
+  return _g_daemon_vfs_get_uri_for_mountspec (daemon_file->mount_spec,
+					      daemon_file->path,
+					      FALSE);
 }
 
 static char *
 g_daemon_file_get_parse_name (GFile *file)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  GDecodedUri *uri;
 
-  uri = _g_daemon_vfs_get_uri_for_mountspec (daemon_file->mount_spec,
-					     daemon_file->path);
-
-  if (uri == NULL)
-    return NULL;
-
-  return g_encode_uri (uri, TRUE);
+  return _g_daemon_vfs_get_uri_for_mountspec (daemon_file->mount_spec,
+					      daemon_file->path,
+					      TRUE);
 }
 
 static GFile *

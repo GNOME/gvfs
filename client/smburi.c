@@ -90,9 +90,9 @@ smb_get_handled_schemes (GVfsUriMapper *mapper)
   return schemes;
 }
 
-static void
+static gboolean
 smb_from_uri (GVfsUriMapper *mapper,
-	      GDecodedUri *uri,
+	      const char *uri_str,
 	      GMountSpec **spec_out,
 	      char **path_out)
 {
@@ -100,7 +100,12 @@ smb_from_uri (GVfsUriMapper *mapper,
   char *path, *tmp;
   const char *p;
   const char *share, *share_end;
-  
+  GDecodedUri *uri;
+
+  uri = g_decode_uri (uri_str);
+  if (uri == NULL)
+    return FALSE;
+ 
   if (uri->host == NULL || strlen (uri->host) == 0)
     {
       /* uri form: smb:/// or smb:///$path */
@@ -197,6 +202,8 @@ smb_from_uri (GVfsUriMapper *mapper,
 
   *spec_out = spec;
   *path_out = path;
+
+  return spec != NULL;
 }
 
 static const char **
@@ -211,45 +218,53 @@ smb_get_handled_mount_types (GVfsUriMapper *mapper)
   return types;
 }
 
-static void
+static char *
 smb_to_uri (GVfsUriMapper *mapper,
 	    GMountSpec *spec,
 	    char *path,
-	    GDecodedUri *uri_out)
+	    gboolean allow_utf8)
 {
   const char *type;
   const char *server;
   const char *share;
+  char *s;
+  GDecodedUri *uri;
 
+  uri = g_new0 (GDecodedUri, 1);
+  
   type = g_mount_spec_get_type (spec);
 
-  uri_out->scheme = g_strdup ("smb");
+  uri->scheme = g_strdup ("smb");
   
   if (strcmp (type, "smb-network") == 0)
     {
-      uri_out->path = g_strdup (path);
+      uri->path = g_strdup (path);
     }
   else if (strcmp (type, "smb-server") == 0)
     {
       server = g_mount_spec_get (spec, "server");
-      uri_out->host = g_strdup (server);
+      uri->host = g_strdup (server);
 
       /* Map the mountables in server to ._share because the actual share mount maps to smb://server/share */
       if (path && path[0] == '/' && path[1] != 0)
-	uri_out->path = g_strconcat ("/._", path + 1, NULL);
+	uri->path = g_strconcat ("/._", path + 1, NULL);
       else
-	uri_out->path = g_strdup ("/");
+	uri->path = g_strdup ("/");
     }
   else if (strcmp (type, "smb-share") == 0)
     {
       server = g_mount_spec_get (spec, "server");
-      uri_out->host = g_strdup (server);
+      uri->host = g_strdup (server);
       share = g_mount_spec_get (spec, "share");
       if (path[0] == '/')
-	uri_out->path = g_strconcat ("/", share, path, NULL);
+	uri->path = g_strconcat ("/", share, path, NULL);
       else
-	uri_out->path = g_strconcat ("/", share, "/", path, NULL);
+	uri->path = g_strconcat ("/", share, "/", path, NULL);
     }
+
+  s = g_encode_uri (uri, allow_utf8);
+  g_decoded_uri_free (uri);
+  return s;
 }
 
 

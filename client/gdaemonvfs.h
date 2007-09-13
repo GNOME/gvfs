@@ -27,8 +27,9 @@ GType   g_daemon_vfs_get_type  (GTypeModule *module);
 
 GDaemonVfs *g_daemon_vfs_new (void);
 
-GDecodedUri *_g_daemon_vfs_get_uri_for_mountspec (GMountSpec               *spec,
-						  char                     *path);
+char *       _g_daemon_vfs_get_uri_for_mountspec (GMountSpec               *spec,
+						  char                     *path,
+						  gboolean                  allow_utf8);
 void         _g_daemon_vfs_get_mount_ref_async   (GMountSpec               *spec,
 						  const char               *path,
 						  GMountRefLookupCallback   callback,

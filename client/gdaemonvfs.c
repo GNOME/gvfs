@@ -93,39 +93,61 @@ g_daemon_vfs_finalize (GObject *object)
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
 }
 
-static void
+static gboolean
 get_mountspec_from_uri (GDaemonVfs *vfs,
-			GDecodedUri *uri,
+			const char *uri,
 			GMountSpec **spec_out,
 			char **path_out)
 {
   GMountSpec *spec;
   char *path;
   GVfsUriMapper *mapper;
+  char *scheme;
+
+  scheme = g_uri_get_scheme (uri);
+  if (scheme == NULL)
+    return FALSE;
   
   spec = NULL;
   
-  if (strcmp (uri->scheme, "test") == 0)
+  mapper = g_hash_table_lookup (vfs->from_uri_hash, scheme);
+  if (mapper == NULL ||
+      !g_vfs_uri_mapper_from_uri (mapper, uri, &spec, &path))
     {
-      spec = g_mount_spec_new ("test");
-      path = g_strdup (uri->path);
-    }
-  else
-    {
-      mapper = g_hash_table_lookup (vfs->from_uri_hash, uri->scheme);
-      if (mapper)
-	g_vfs_uri_mapper_from_uri (mapper, uri, &spec, &path);
+      GDecodedUri *decoded;
+      
+      decoded = g_decode_uri (uri);
+      if (decoded)
+	{
+	  spec = g_mount_spec_new (decoded->scheme);
+	  
+	  if (decoded->host && *decoded->host)
+	    g_mount_spec_set (spec, "host", decoded->host);
+	  
+	  if (decoded->userinfo && *decoded->userinfo)
+	    g_mount_spec_set (spec, "user", decoded->userinfo);
+	  
+	  if (decoded->port != -1)
+	    {
+	      char *port = g_strdup_printf ("%d", decoded->port);
+	      g_mount_spec_set (spec, "port", port);
+	      g_free (port);
+	    }
+	  
+	  path = g_strdup (decoded->path);
+	}
     }
   
+  g_free (scheme);
+  
   if (spec == NULL)
-    {
-      spec = g_mount_spec_new (uri->scheme);
-      path = g_strdup (uri->path);
-    }
+    return FALSE;
 
   *spec_out = g_mount_spec_get_unique_for (spec);
   g_mount_spec_unref (spec);
   *path_out = path;
+  
+  return TRUE;
 }
 
 static void
@@ -194,58 +216,72 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
 {
   GDaemonVfs *daemon_vfs;
   GFile *file;
-  GDecodedUri *decoded;
   GMountSpec *spec;
   char *path;
 
   daemon_vfs = G_DAEMON_VFS (vfs);
-  
-  decoded = g_decode_uri (uri);
-  if (decoded == NULL)
-    return g_dummy_file_new (uri);
 
-  if (strcmp (decoded->scheme, "file") == 0)
-    file = g_daemon_vfs_get_file_for_path (vfs, decoded->path);
-  else
+  if (g_str_has_prefix (uri, "file:"))
     {
-      get_mountspec_from_uri (daemon_vfs, decoded, &spec, &path);
+      path = g_filename_from_uri (uri, NULL, NULL);
+
+      if (path == NULL)
+	return g_dummy_file_new (uri);
+      
+      file = g_daemon_vfs_get_file_for_path (vfs, path);
+      g_free (path);
+      return file;
+    }
+  
+  if (get_mountspec_from_uri (daemon_vfs, uri, &spec, &path))
+    {
       file = g_daemon_file_new (spec, path);
       g_mount_spec_unref (spec);
       g_free (path);
+      return file;
     }
-
-  g_decoded_uri_free (decoded);
   
-  return file;
+  return g_dummy_file_new (uri);
 }
 
-GDecodedUri *
+char *
 _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
-				     char *path)
+				     char *path,
+				     gboolean allow_utf8)
 {
-  GDecodedUri *uri;
+  char *uri;
   const char *type;
   GVfsUriMapper *mapper;
-
-  uri = g_new0 (GDecodedUri, 1);
-  uri->port = -1;
 
   type = g_mount_spec_get_type (spec);
   if (type == NULL)
     {
-      uri->scheme = g_strdup ("unknown");
-      uri->path = g_strdup (path);
-      return uri;
+      GString *string = g_string_new ("unknown://");
+      if (path)
+	g_string_append_uri_encoded (string,
+				     path,
+				     "!$&'()*+,;=:@/",
+				     allow_utf8);
+      
+      return g_string_free (string, FALSE);
     }
 
   mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
   if (mapper)
-    g_vfs_uri_mapper_to_uri (mapper, spec, path, uri);
+    uri = g_vfs_uri_mapper_to_uri (mapper, spec, path, allow_utf8);
 
-  if (uri->scheme == NULL)
+  if (uri == NULL)
     {
-      uri->scheme = g_strdup (type);
-      uri->path = g_strdup (path);
+      GString *string = g_string_new ("");
+      g_string_append (string, type);
+      g_string_append (string, "://");
+      if (path)
+	g_string_append_uri_encoded (string,
+				     path,
+				     "!$&'()*+,;=:@/",
+				     allow_utf8);
+      
+      uri = g_string_free (string, FALSE);
     }
   
   return uri;

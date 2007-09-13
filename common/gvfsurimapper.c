@@ -26,9 +26,9 @@ g_vfs_uri_mapper_get_handled_schemes (GVfsUriMapper  *mapper)
 }
 
   
-void
+gboolean
 g_vfs_uri_mapper_from_uri (GVfsUriMapper  *mapper,
-			   GDecodedUri    *uri,
+			   const char     *uri,
 			   GMountSpec    **spec_out,
 			   char          **path_out)
 {
@@ -49,15 +49,15 @@ g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper)
   return (* class->get_handled_mount_types) (mapper);
 }
 
-void
+char *
 g_vfs_uri_mapper_to_uri (GVfsUriMapper  *mapper,
 			 GMountSpec     *spec,
 			 char           *path,
-			 GDecodedUri    *uri)
+			 gboolean        allow_utf8)
 {
   GVfsUriMapperClass *class;
   
   class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
   
-  return (* class->to_uri) (mapper, spec, path, uri);
+  return (* class->to_uri) (mapper, spec, path, allow_utf8);
 }

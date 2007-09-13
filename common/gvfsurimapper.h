@@ -28,31 +28,31 @@ struct _GVfsUriMapperClass
   /* Virtual Table */
 
   const char ** (*get_handled_schemes)     (GVfsUriMapper *mapper);
-  void          (*from_uri)                (GVfsUriMapper *mapper,
-					    GDecodedUri *uri,
+  gboolean      (*from_uri)                (GVfsUriMapper *mapper,
+					    const char *uri,
 					    GMountSpec **spec_out,
 					    char **path_out);
   
   const char ** (*get_handled_mount_types) (GVfsUriMapper *mapper);
-  void          (*to_uri)                  (GVfsUriMapper *mapper,
+  char *        (*to_uri)                  (GVfsUriMapper *mapper,
 					    GMountSpec *spec,
 					    char *path,
-					    GDecodedUri *uri);
+					    gboolean allow_utf8);
 };
 
 GType g_vfs_uri_mapper_get_type (void) G_GNUC_CONST;
 
 const char **g_vfs_uri_mapper_get_handled_schemes     (GVfsUriMapper  *mapper);
-void         g_vfs_uri_mapper_from_uri                (GVfsUriMapper  *mapper,
-						       GDecodedUri    *uri,
+gboolean     g_vfs_uri_mapper_from_uri                (GVfsUriMapper  *mapper,
+						       const char     *uri,
 						       GMountSpec    **spec_out,
 						       char          **path_out);
 
 const char **g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper);
-void         g_vfs_uri_mapper_to_uri                  (GVfsUriMapper  *mapper,
+char *       g_vfs_uri_mapper_to_uri                  (GVfsUriMapper  *mapper,
 						       GMountSpec     *spec,
 						       char           *path,
-						       GDecodedUri    *uri);
+						       gboolean        allow_utf8);
 
 G_END_DECLS
 
