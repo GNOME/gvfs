@@ -64,6 +64,8 @@ Set owner:user, owner:group for local files
 
 document create time vs change time vs mtime, etc
 
+Fix crash on "gvfs-ls smb://WORKGROUP/SERVER", (maybe also when running gvfs-ls on unmounted shares?)
+
 FUTURE IDEAS:
 -------------
 
