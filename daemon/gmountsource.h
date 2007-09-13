@@ -41,6 +41,9 @@ void          g_mount_source_request_mount_spec_async (GMountSource             
 void          g_mount_source_done                     (GMountSource              *source);
 void          g_mount_source_failed                   (GMountSource              *source,
 						       GError                    *error);
+void          g_mount_source_set_is_automount         (GMountSource              *source,
+						       gboolean                   is_automount);
+gboolean      g_mount_source_get_is_automount         (GMountSource              *source);
 
 G_END_DECLS
 

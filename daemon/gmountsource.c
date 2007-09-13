@@ -12,6 +12,7 @@ struct _GMountSource
   GMountSpec *mount_spec;
   char *dbus_id;
   char *obj_path;
+  gboolean is_automount;
 };
 
 G_DEFINE_TYPE (GMountSource, g_mount_source, G_TYPE_OBJECT);
@@ -41,8 +42,22 @@ g_mount_source_class_init (GMountSourceClass *klass)
 }
 
 static void
-g_mount_source_init (GMountSource *backend)
+g_mount_source_init (GMountSource *mount_source)
 {
+  mount_source->is_automount = FALSE;
+}
+
+void
+g_mount_source_set_is_automount (GMountSource *source,
+				 gboolean is_automount)
+{
+  source->is_automount = is_automount;
+}
+
+gboolean
+g_mount_source_get_is_automount (GMountSource *source)
+{
+  return source->is_automount;
 }
 
 GMountSource *
