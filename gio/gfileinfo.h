@@ -55,11 +55,11 @@ struct _GFileInfoClass
 
 /* Calculated Access Rights for current user */
 
-#define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"               /* boolean */
-#define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"             /* boolean */
-#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:execute"         /* boolean */
-#define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"           /* boolean */
-#define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"           /* boolean */ 
+#define G_FILE_ATTRIBUTE_ACCESS_CAN_READ "access:can_read"       /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE "access:can_write"     /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE "access:can_execute" /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE "access:can_delete"   /* boolean */
+#define G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME "access:can_rename"   /* boolean */ 
 
 /* Mountable attributes */
 

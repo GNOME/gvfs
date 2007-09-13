@@ -807,14 +807,14 @@ file_info_get_stat_mode (GFileInfo *file_info)
         break;
     }
 
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_READ)
-      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_READ))
+  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ)
+      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
     unix_mode |= S_IRUSR;
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE)
-      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE))
+  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE)
+      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
     unix_mode |= S_IWUSR;
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE)
-      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE))
+  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE)
+      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
     unix_mode |= S_IXUSR;
 
   return unix_mode;
@@ -1944,12 +1944,12 @@ vfs_access (const gchar *path, gint mode)
       file_info = g_file_get_info (file, "*", 0, NULL, &error);
       if (file_info)
         {
-          if ((mode & R_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_READ) &&
-                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_READ))) ||
-              (mode & W_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE) &&
-                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE))) ||
-              (mode & X_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE) &&
-                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE))))
+          if ((mode & R_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) &&
+                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))) ||
+              (mode & W_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) &&
+                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))) ||
+              (mode & X_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE) &&
+                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))))
             result = -EACCES;
 
           g_object_unref (file_info);

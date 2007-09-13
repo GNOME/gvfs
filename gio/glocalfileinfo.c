@@ -409,8 +409,8 @@ _g_local_file_info_get_parent_info (const char             *dir,
   parent_info->writable = FALSE;
   parent_info->is_sticky = FALSE;
 
-  if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_RENAME) ||
-      g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_DELETE))
+  if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME) ||
+      g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE))
     {
       parent_info->writable = (g_access (dir, W_OK) == 0);
       
@@ -440,18 +440,18 @@ get_access_rights (GFileAttributeMatcher *attribute_matcher,
 		   GLocalParentFileInfo *parent_info)
 {
   if (g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_ACCESS_READ))
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_READ,
+					G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
 				       g_access (path, R_OK) == 0);
   
   if (g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_ACCESS_WRITE))
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_WRITE,
+					G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
 				       g_access (path, W_OK) == 0);
   
   if (g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_ACCESS_EXECUTE))
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE,
+					G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
 				       g_access (path, X_OK) == 0);
 
 
@@ -475,12 +475,12 @@ get_access_rights (GFileAttributeMatcher *attribute_matcher,
 	    writable = TRUE;
 	}
 
-      if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_RENAME))
-	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_RENAME,
+      if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME))
+	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME,
 					   writable);
       
-      if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_DELETE))
-	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_DELETE,
+      if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE))
+	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE,
 					   writable);
     }
 }
