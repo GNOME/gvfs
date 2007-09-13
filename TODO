@@ -33,8 +33,6 @@ implement async _g_dbus_connection_get_fd_sync
 
 implement sync cancellable dbus calls
 
-handle concurrent async open dbus connection for same context
-
 rename glib lib from gvfs to gio (since it has more than gvfs)
 
 FUTURE IDEAS:
