@@ -1,3 +1,4 @@
+#include <errno.h>
 #include "gioerror.h"
 
 /**
@@ -18,7 +19,7 @@ g_io_error_from_errno (gint err_no)
     {
 #ifdef EEXIST
     case EEXIST:
-      return G_IO_ERROR_EXIST;
+      return G_IO_ERROR_EXISTS;
       break;
 #endif
 

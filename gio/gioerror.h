@@ -1,7 +1,7 @@
 #ifndef __G_IO_ERROR_H__
 #define __G_IO_ERROR_H__
 
-#include <glib-object.h>
+#include <glib/gerror.h>
 
 G_BEGIN_DECLS
 
