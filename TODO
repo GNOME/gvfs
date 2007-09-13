@@ -38,6 +38,8 @@ smb - handle server going down
 
 is-slow marking for e.g. thumbnailing?
 
+add trash support
+
 Add info to mountpoints in smb-browser
 
 Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
