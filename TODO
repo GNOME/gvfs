@@ -62,6 +62,8 @@ Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
 Move GAppInfo to Gtk+
 
+Add PRE_UNMOUNT file monitor event?
+
 FUTURE IDEAS:
 -------------
 
