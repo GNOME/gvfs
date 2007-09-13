@@ -14,6 +14,7 @@
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobopenforread.h>
+#include <gdbusutils.h>
 
 G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
 
@@ -138,7 +139,7 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
 
   if (!dbus_connection_add_filter (daemon->priv->session_bus,
 				   daemon_message_func, daemon, NULL))
-    g_error ("Not enough memory to add filter");
+    _g_dbus_oom ();
 }
 
 static void
@@ -704,13 +705,13 @@ daemon_handle_get_connection (DBusConnection *conn,
     
   reply = dbus_message_new_method_return (message);
   if (reply == NULL)
-    g_error ("Can't allocate dbus message\n");
+    _g_dbus_oom ();
 
   if (!dbus_message_append_args (reply,
 				 DBUS_TYPE_STRING, &address1,
 				 DBUS_TYPE_STRING, &address2,
 				 DBUS_TYPE_INVALID))
-    g_error ("Can't allocate dbus message\n");
+    _g_dbus_oom ();
   
   dbus_connection_send (conn, reply, NULL);
   
