@@ -1563,11 +1563,9 @@ do_move (GVfsBackend *backend,
     }
 
   
-  g_print ("rename %s to %s\n", source_uri, dest_uri);
   res = op_backend->smb_context->rename (op_backend->smb_context, source_uri,
 					 op_backend->smb_context, dest_uri);
   errsv = errno;
-  g_print ("rename errno: %d\n", errsv);
   g_free (source_uri);
   g_free (dest_uri);
 
