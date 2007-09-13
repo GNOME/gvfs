@@ -2,11 +2,6 @@
 #include "gvolumemonitor.h"
 #include <glib/gi18n-lib.h>
 
-struct _GVolumeMonitor {
-	GObject parent;
-  
-};
-
 G_DEFINE_TYPE (GVolumeMonitor, g_volume_monitor, G_TYPE_OBJECT);
 
 enum {

@@ -16,21 +16,27 @@ G_BEGIN_DECLS
 typedef struct _GVolumeMonitor GVolumeMonitor;
 typedef struct _GVolumeMonitorClass GVolumeMonitorClass;
 
-struct _GVolumeMonitorClass {
-	GObjectClass parent_class;
+struct _GVolumeMonitor {
+  GObject parent;
+  gpointer priv;
+};
 
-	/*< public >*/
-	/* signals */
-	void (* volume_mounted)	  	(GVolumeMonitor *volume_monitor,
-				   	 GVolume        *volume);
-	void (* volume_pre_unmount)	(GVolumeMonitor *volume_monitor,
-				   	 GVolume	*volume);
-	void (* volume_unmounted)	(GVolumeMonitor *volume_monitor,
-				   	 GVolume        *volume);
-	void (* drive_connected) 	(GVolumeMonitor *volume_monitor,
-				   	 GDrive	        *drive);
-	void (* drive_disconnected)	(GVolumeMonitor *volume_monitor,
-				   	 GDrive         *drive);
+
+struct _GVolumeMonitorClass {
+  GObjectClass parent_class;
+
+  /*< public >*/
+  /* signals */
+  void (* volume_mounted)	(GVolumeMonitor *volume_monitor,
+				 GVolume        *volume);
+  void (* volume_pre_unmount)	(GVolumeMonitor *volume_monitor,
+				 GVolume	*volume);
+  void (* volume_unmounted)	(GVolumeMonitor *volume_monitor,
+				 GVolume        *volume);
+  void (* drive_connected) 	(GVolumeMonitor *volume_monitor,
+				 GDrive	        *drive);
+  void (* drive_disconnected)	(GVolumeMonitor *volume_monitor,
+				 GDrive         *drive);
 };
 
 GType g_volume_monitor_get_type (void) G_GNUC_CONST;
