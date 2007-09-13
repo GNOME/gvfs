@@ -13,6 +13,7 @@
 #include <glib/gi18n-lib.h>
 #include "gvfserror.h"
 #include "gsocketoutputstream.h"
+#include "gcancellable.h"
 
 
 G_DEFINE_TYPE (GSocketOutputStream, g_socket_output_stream, G_TYPE_OUTPUT_STREAM);
@@ -20,9 +21,8 @@ G_DEFINE_TYPE (GSocketOutputStream, g_socket_output_stream, G_TYPE_OUTPUT_STREAM
 
 struct _GSocketOutputStreamPrivate {
   int fd;
-  int cancel_pipe[2];
+  GCancellable *cancellable;
   gboolean close_fd_at_close;
-  GSource *source;
 };
 
 typedef struct _StreamSource StreamSource;
@@ -31,12 +31,10 @@ struct _StreamSource
 {
   GSource  source;
   GPollFD  pollfd;
-  GPollFD  cancel_pollfd;
   GSocketOutputStream *stream;
 };
 
 typedef void (*StreamSourceFunc) (GSocketOutputStream  *stream,
-				  gboolean             cancelled,
 				  gpointer             data);
 
 static gssize   g_socket_output_stream_write       (GOutputStream              *stream,
@@ -84,8 +82,10 @@ static gboolean
 stream_source_prepare (GSource  *source,
 		       gint     *timeout)
 {
+  StreamSource *stream_source = (StreamSource *)source;
   *timeout = -1;
-  return FALSE;
+  
+  return g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream_source->stream));
 }
 
 static gboolean 
@@ -93,8 +93,9 @@ stream_source_check (GSource  *source)
 {
   StreamSource *stream_source = (StreamSource *)source;
 
-  return (stream_source->pollfd.revents != 0 ||
-	  stream_source->cancel_pollfd.revents != 0);
+  return
+    g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream_source->stream)) ||
+    stream_source->pollfd.revents != 0;
 }
 
 static gboolean
@@ -109,7 +110,6 @@ stream_source_dispatch (GSource     *source,
   g_assert (func != NULL);
 
   (*func) (stream_source->stream,
-	   stream_source->cancel_pollfd.revents != 0,
 	   user_data);
   return FALSE;
 }
@@ -134,11 +134,7 @@ create_stream_source (GSocketOutputStream *stream)
   stream_source->stream = g_object_ref (stream);
   stream_source->pollfd.fd = stream->priv->fd;
   stream_source->pollfd.events = POLLOUT;
-  stream_source->cancel_pollfd.fd = stream->priv->cancel_pipe[0];
-  stream_source->cancel_pollfd.events = POLLIN;
-
   g_source_add_poll (source, &stream_source->pollfd);
-  g_source_add_poll (source, &stream_source->cancel_pollfd);
 
   return source;
 }
@@ -150,32 +146,8 @@ g_socket_output_stream_finalize (GObject *object)
   
   stream = G_SOCKET_OUTPUT_STREAM (object);
 
-  if (stream->priv->cancel_pipe[0] != -1)
-    close (stream->priv->cancel_pipe[0]);
-  stream->priv->cancel_pipe[0] = -1;
-  
-  if (stream->priv->cancel_pipe[1] != -1)
-    close (stream->priv->cancel_pipe[1]);
-  stream->priv->cancel_pipe[1] = -1;
-  
   if (G_OBJECT_CLASS (g_socket_output_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_socket_output_stream_parent_class)->finalize) (object);
-}
-
-static void
-set_fd_nonblocking (int fd)
-{
-  glong fcntl_flags;
-
-  fcntl_flags = fcntl (fd, F_GETFL);
-
-#ifdef O_NONBLOCK
-  fcntl_flags |= O_NONBLOCK;
-#else
-  fcntl_flags |= O_NDELAY;
-#endif
-
-  fcntl (fd, F_SETFL, fcntl_flags);
 }
 
 static void
@@ -202,14 +174,6 @@ g_socket_output_stream_init (GSocketOutputStream *socket)
   socket->priv = G_TYPE_INSTANCE_GET_PRIVATE (socket,
 					      G_TYPE_SOCKET_OUTPUT_STREAM,
 					      GSocketOutputStreamPrivate);
-
-  socket->priv->cancel_pipe[0] = -1;
-  socket->priv->cancel_pipe[1] = -1;
-  if (pipe (socket->priv->cancel_pipe) == 0)
-    {
-      set_fd_nonblocking (socket->priv->cancel_pipe[0]);
-      set_fd_nonblocking (socket->priv->cancel_pipe[1]);
-    }
 }
 
 GOutputStream *
@@ -237,19 +201,23 @@ g_socket_output_stream_write (GOutputStream *stream,
   struct pollfd poll_fds[2];
   int poll_ret;
   int n;
+  int cancel_fd;
 
   socket_stream = G_SOCKET_OUTPUT_STREAM (stream);
 
+  g_cancellable_begin (&socket_stream->priv->cancellable);
+  cancel_fd = g_cancellable_get_fd (socket_stream->priv->cancellable);
+  
   do
     {
       n = 0;
       poll_fds[n].events = POLLOUT;
       poll_fds[n++].fd = socket_stream->priv->fd;
 
-      if (socket_stream->priv->cancel_pipe[0] != -1)
+      if (cancel_fd != -1)
 	{
 	  poll_fds[n].events = POLLIN;
-	  poll_fds[n++].fd = socket_stream->priv->cancel_pipe[0];
+	  poll_fds[n++].fd = cancel_fd;
 	}
       
       poll_ret = poll (poll_fds, n, -1);
@@ -262,18 +230,18 @@ g_socket_output_stream_write (GOutputStream *stream,
 		   g_file_error_from_errno (errno),
 		   _("Error writing to socket: %s"),
 		   g_strerror (errno));
-      return -1;
+      res = -1;
+      goto out;
     }
 
   if (n > 1 && poll_fds[1].revents)
     {
-      char c;
-      read (socket_stream->priv->cancel_pipe[0], &c, 1);
       g_set_error (error,
 		   G_VFS_ERROR,
 		   G_VFS_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
-      return -1;
+      res = -1;
+      goto out;
     }
   
   while (1)
@@ -302,6 +270,8 @@ g_socket_output_stream_write (GOutputStream *stream,
       break;
     }
   
+ out:
+  g_cancellable_end (&socket_stream->priv->cancellable);
   return res;
 }
 
@@ -356,7 +326,6 @@ typedef struct {
 
 static void
 write_async_cb (GSocketOutputStream  *stream,
-		gboolean             cancelled,
 		gpointer             _data)
 {
   GSocketOutputStream *socket_stream;
@@ -366,11 +335,8 @@ write_async_cb (GSocketOutputStream  *stream,
 
   socket_stream = G_SOCKET_OUTPUT_STREAM (stream);
   
-  if (cancelled)
+  if (g_output_stream_is_cancelled (G_OUTPUT_STREAM (stream)))
     {
-      char c;
-      
-      read (socket_stream->priv->cancel_pipe[0], &c, 1);
       g_set_error (&error,
 		   G_VFS_ERROR,
 		   G_VFS_ERROR_CANCELLED,
@@ -572,9 +538,12 @@ static void
 g_socket_output_stream_cancel (GOutputStream *stream)
 {
   GSocketOutputStream *socket_stream;
-  char c = 'x';
 
   socket_stream = G_SOCKET_OUTPUT_STREAM (stream);
   
-  write (socket_stream->priv->cancel_pipe[1], &c, 1);
+  /* Cancel any outstanding sync call */
+  g_cancellable_cancel (&socket_stream->priv->cancellable);
+
+  /* Wake up the mainloop in case we're waiting on async calls with StreamSource */
+  g_main_context_wakeup (g_output_stream_get_async_context (stream));
 }
