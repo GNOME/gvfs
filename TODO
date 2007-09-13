@@ -31,8 +31,11 @@ mount daemons should re-register when new owner for vfs daemon.
 
 remove dbus-gmain.[ch]? We have no server integration in common/ atm
 
-handle setting xattrs on local files
+handle setting xattrs on local files (and list the namespace as writable)
+Split user.* and system.* into two namespaces?
 handle non-ascii/utf8 xattr names by escaping
+
+handle setting mtime, ctime, etc for local files
 
 HAL implementation of VolumeMonitor
 
