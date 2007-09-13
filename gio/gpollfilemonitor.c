@@ -5,7 +5,7 @@
 #include "gfilemonitorpriv.h"
 
 static gboolean g_poll_file_monitor_cancel (GFileMonitor* monitor);
-static gboolean poll_file_timeout (gpointer data);
+static void schedule_poll_timeout (GPollFileMonitor* poll_monitor);
 
 struct _GPollFileMonitor
 {
@@ -102,9 +102,16 @@ got_new_info (GObject *source_object,
       event = calc_event_type (poll_monitor->last_info, info);
 
       if (event != -1)
-	g_file_monitor_emit_event (G_FILE_MONITOR (poll_monitor),
-				   poll_monitor->file,
-				   NULL, event);
+	{
+	  g_file_monitor_emit_event (G_FILE_MONITOR (poll_monitor),
+				     poll_monitor->file,
+				     NULL, event);
+	  /* We're polling so slowly anyway, so always emit the done hint */
+	  if (event == G_FILE_MONITOR_EVENT_CHANGED)
+	    g_file_monitor_emit_event (G_FILE_MONITOR (poll_monitor),
+				       poll_monitor->file,
+				       NULL, G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT);
+	}
       
       if (poll_monitor->last_info)
 	{
@@ -115,7 +122,7 @@ got_new_info (GObject *source_object,
       if (info)
 	poll_monitor->last_info = g_object_ref (info);
       
-      poll_monitor->timeout = g_timeout_add_seconds (POLL_TIME_SECS, poll_file_timeout, poll_monitor);
+      schedule_poll_timeout (poll_monitor);
     }
 
   if (info)
@@ -138,6 +145,12 @@ poll_file_timeout (gpointer data)
 }
 
 static void
+schedule_poll_timeout (GPollFileMonitor* poll_monitor)
+{
+  poll_monitor->timeout = g_timeout_add_seconds (POLL_TIME_SECS, poll_file_timeout, poll_monitor);
+ }
+
+static void
 got_initial_info (GObject *source_object,
 		  GAsyncResult *res,
 		  gpointer user_data)
@@ -150,7 +163,7 @@ got_initial_info (GObject *source_object,
   poll_monitor->last_info = info;
 
   if (!g_file_monitor_is_cancelled (G_FILE_MONITOR (poll_monitor)))
-    poll_monitor->timeout = g_timeout_add_seconds (POLL_TIME_SECS, poll_file_timeout, poll_monitor);
+    schedule_poll_timeout (poll_monitor);
   
   g_object_unref (poll_monitor);
 }
@@ -164,7 +177,7 @@ g_poll_file_monitor_new (GFile *file)
 
   poll_monitor->file = g_object_ref (file);
 
-  g_file_get_info_async (file, G_FILE_ATTRIBUTE_ETAG_VALUE,
+  g_file_get_info_async (file, G_FILE_ATTRIBUTE_ETAG_VALUE "," G_FILE_ATTRIBUTE_STD_SIZE,
 			 0, 0, NULL, got_initial_info, g_object_ref (poll_monitor));
   
   return G_FILE_MONITOR (poll_monitor);
