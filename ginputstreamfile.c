@@ -8,6 +8,7 @@
 
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n-lib.h>
 #include "gvfserror.h"
 #include <ginputstreamfile.h>
 
@@ -125,6 +126,15 @@ g_input_stream_file_read (GInputStream *stream,
       res = read (file->priv->fd, buffer, count);
       if (res == -1)
 	{
+	  if (g_input_stream_is_cancelled (stream))
+	    {
+	      g_set_error (error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      break;
+	    }
+	  
 	  if (errno == EINTR)
 	    continue;
 	  
@@ -150,7 +160,7 @@ g_input_stream_file_skip (GInputStream *stream,
   if (!g_input_stream_file_open (file, error))
     return -1;
 
-  start = lseek(file->priv->fd, 0, SEEK_CUR);
+  start = lseek (file->priv->fd, 0, SEEK_CUR);
   if (start == -1)
     {
       g_vfs_error_from_errno (error, errno);
@@ -184,6 +194,15 @@ g_input_stream_file_close (GInputStream *stream,
       res = close (file->priv->fd);
       if (res == -1)
 	{
+	  if (g_input_stream_is_cancelled (stream))
+	    {
+	      g_set_error (error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      break;
+	    }
+	  
 	  if (errno == EINTR)
 	    continue;
 	  

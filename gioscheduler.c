@@ -35,8 +35,13 @@ g_io_job_compare (gconstpointer  a,
   const GIOJob *aa = a;
   const GIOJob *bb = b;
 
+  /* Always run cancelled ops first, they are quick and should be gotten rid of */
+  if (aa->cancelled && !bb->cancelled)
+    return -1;
+  if (!aa->cancelled && bb->cancelled)
+    return 1;
+
   /* Lower value => higher priority */
-  
   if (aa->io_priority < bb->io_priority)
     return -1;
   if (aa->io_priority == bb->io_priority)
@@ -70,14 +75,12 @@ io_job_thread (gpointer       data,
 
   job->job_func (job, job->data);
 
-  /* Note: We can still get cancel calls here, which means
-   * we can't free the data until after removal from the
-   * job_map.
+  /* Note: We can still get cancel calls here if the job didn't
+   * mark itself done, which means we can't free the data until
+   * after removal from the job_map.
    */
   
-  G_LOCK (job_map);
-  g_hash_table_remove (job_map, GINT_TO_POINTER (job->id));
-  G_UNLOCK (job_map);
+  g_io_job_mark_done (job);
 
   if (job->destroy_notify)
     job->destroy_notify (job->data);
@@ -96,6 +99,7 @@ g_schedule_io_job (GIOJobFunc    job_func,
 		   GMainContext *callback_context)
 {
   GIOJob *job;
+  gint id;
 
   if (callback_context == NULL)
     callback_context = g_main_context_default ();
@@ -115,12 +119,13 @@ g_schedule_io_job (GIOJobFunc    job_func,
 
   g_hash_table_insert (job_map, GINT_TO_POINTER (job->id), job);
   
-  G_UNLOCK (job_map);
-  
   /* TODO: We ignore errors */
   g_thread_pool_push (job_thread_pool, job, NULL);
 
-  return job->id;
+  id = job->id;
+  G_UNLOCK (job_map);
+
+  return id;
 }
 
   
@@ -269,4 +274,13 @@ gboolean
 g_io_job_is_cancelled (GIOJob *job)
 {
   return job->cancelled;
+}
+
+/* Means you can't cancel it */
+void
+g_io_job_mark_done (GIOJob *job)
+{
+  G_LOCK (job_map);
+  g_hash_table_remove (job_map, GINT_TO_POINTER (job->id));
+  G_UNLOCK (job_map);
 }
