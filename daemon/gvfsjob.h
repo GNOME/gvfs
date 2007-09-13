@@ -25,6 +25,8 @@ struct _GVfsJob
 
   /* TODO: Move stuff to private */
   gpointer backend_data;
+  GDestroyNotify backend_data_destroy;
+  
   guint failed : 1;
   guint cancelled : 1;
   guint sent_reply : 1;
@@ -53,6 +55,9 @@ struct _GVfsJobClass
 
 GType g_vfs_job_get_type (void) G_GNUC_CONST;
 
+void     g_vfs_job_set_backend_data  (GVfsJob     *job,
+				      gpointer     backend_data,
+				      GDestroyNotify destroy);
 gboolean g_vfs_job_is_finished       (GVfsJob     *job);
 gboolean g_vfs_job_is_cancelled      (GVfsJob     *job);
 void     g_vfs_job_cancel            (GVfsJob     *job);

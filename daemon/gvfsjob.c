@@ -54,6 +54,9 @@ g_vfs_job_finalize (GObject *object)
 
   if (job->error)
     g_error_free (job->error);
+
+  if (job->backend_data_destroy)
+    job->backend_data_destroy (job->backend_data);
   
   if (G_OBJECT_CLASS (g_vfs_job_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_parent_class)->finalize) (object);
@@ -109,6 +112,20 @@ g_vfs_job_init (GVfsJob *job)
 {
   job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_VFS_TYPE_JOB, GVfsJobPrivate);
   
+}
+
+void
+g_vfs_job_set_backend_data (GVfsJob     *job,
+			    gpointer     backend_data,
+			    GDestroyNotify destroy)
+{
+  if (job->backend_data_destroy)
+    {
+      job->backend_data_destroy (job->backend_data);
+    }
+    
+  job->backend_data = backend_data;
+  job->backend_data_destroy = destroy;
 }
 
 static void
