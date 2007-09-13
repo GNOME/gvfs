@@ -14,6 +14,7 @@ struct _GOutputStreamPrivate {
   guint cancelled : 1;
   GMainContext *context;
   gint io_job_id;
+  gpointer outstanding_callback;
 };
 
 static void g_output_stream_real_write_async (GOutputStream             *stream,
@@ -401,6 +402,22 @@ queue_write_async_result (GOutputStream      *stream,
   g_source_unref (source);
 }
 
+static void
+write_async_callback_wrapper (GOutputStream *stream,
+			      void          *buffer,
+			      gsize          count_requested,
+			      gssize         count_written,
+			      gpointer       data,
+			      GError        *error)
+{
+  GAsyncWriteCallback real_callback = stream->priv->outstanding_callback;
+
+  stream->priv->pending = FALSE;
+  (*real_callback) (stream, buffer, count_requested, count_written, data, error);
+  g_object_unref (stream);
+}
+
+
 /**
  * g_output_stream_write_async:
  * @stream: A #GOutputStream.
@@ -490,7 +507,9 @@ g_output_stream_write_async (GOutputStream        *stream,
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
   stream->priv->pending = TRUE;
-  return class->write_async (stream, buffer, count, io_priority, callback, data, notify);
+  stream->priv->outstanding_callback = callback;
+  g_object_ref (stream);
+  class->write_async (stream, buffer, count, io_priority, write_async_callback_wrapper, data, notify);
 }
 
 typedef struct {
@@ -559,6 +578,20 @@ queue_flush_async_result (GOutputStream      *stream,
   g_source_unref (source);
 }
 
+static void
+flush_async_callback_wrapper (GOutputStream *stream,
+			      gboolean       result,
+			      gpointer       data,
+			      GError        *error)
+{
+  GAsyncFlushCallback real_callback = stream->priv->outstanding_callback;
+
+  stream->priv->pending = FALSE;
+  (*real_callback) (stream, result, data, error);
+  g_object_unref (stream);
+}
+
+
 void
 g_output_stream_flush_async (GOutputStream       *stream,
 			     int                  io_priority,
@@ -597,7 +630,9 @@ g_output_stream_flush_async (GOutputStream       *stream,
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
   stream->priv->pending = TRUE;
-  return class->flush_async (stream, io_priority, callback, data, notify);
+  stream->priv->outstanding_callback = callback;
+  g_object_ref (stream);
+  class->flush_async (stream, io_priority, flush_async_callback_wrapper, data, notify);
 }
 
 typedef struct {
@@ -666,6 +701,20 @@ queue_close_async_result (GOutputStream       *stream,
   g_source_unref (source);
 }
 
+static void
+close_async_callback_wrapper (GOutputStream *stream,
+			      gboolean      result,
+			      gpointer      data,
+			      GError       *error)
+{
+  GAsyncCloseOutputCallback real_callback = stream->priv->outstanding_callback;
+
+  stream->priv->pending = FALSE;
+  stream->priv->closed = TRUE;
+  (*real_callback) (stream, result, data, error);
+  g_object_unref (stream);
+}
+
 /**
  * g_output_stream_close_async:
  * @stream: A #GOutputStream.
@@ -716,7 +765,9 @@ g_output_stream_close_async (GOutputStream       *stream,
   
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
   stream->priv->pending = TRUE;
-  return class->close_async (stream, io_priority, callback, data, notify);
+  stream->priv->outstanding_callback = callback;
+  g_object_ref (stream);
+  class->close_async (stream, io_priority, close_async_callback_wrapper, data, notify);
 }
 
 /**
@@ -782,8 +833,6 @@ write_op_report (gpointer data)
 {
   WriteAsyncOp *op = data;
 
-  op->stream->priv->pending = FALSE;
-
   op->callback (op->stream,
 		op->buffer,
 		op->count_requested,
@@ -797,8 +846,6 @@ static void
 write_op_free (gpointer data)
 {
   WriteAsyncOp *op = data;
-
-  g_object_unref (op->stream);
 
   if (op->error)
     g_error_free (op->error);
@@ -861,7 +908,7 @@ g_output_stream_real_write_async (GOutputStream       *stream,
 
   op = g_new0 (WriteAsyncOp, 1);
 
-  op->stream = g_object_ref (stream);
+  op->stream = stream;
   op->buffer = buffer;
   op->count_requested = count;
   op->callback = callback;
@@ -890,8 +937,6 @@ flush_op_report (gpointer data)
 {
   FlushAsyncOp *op = data;
 
-  op->stream->priv->pending = FALSE;
-
   op->callback (op->stream,
 		op->result,
 		op->data,
@@ -903,8 +948,6 @@ static void
 flush_op_free (gpointer data)
 {
   FlushAsyncOp *op = data;
-
-  g_object_unref (op->stream);
 
   if (op->error)
     g_error_free (op->error);
@@ -967,7 +1010,7 @@ g_output_stream_real_flush_async (GOutputStream       *stream,
 
   op = g_new0 (FlushAsyncOp, 1);
 
-  op->stream = g_object_ref (stream);
+  op->stream = stream;
   op->callback = callback;
   op->data = data;
   op->notify = notify;
@@ -994,8 +1037,6 @@ close_op_report (gpointer data)
 {
   CloseAsyncOp *op = data;
 
-  op->stream->priv->pending = FALSE;
-
   op->callback (op->stream,
 		op->res,
 		op->data,
@@ -1006,8 +1047,6 @@ static void
 close_op_free (gpointer data)
 {
   CloseAsyncOp *op = data;
-
-  g_object_unref (op->stream);
 
   if (op->error)
     g_error_free (op->error);
@@ -1068,7 +1107,7 @@ g_output_stream_real_close_async (GOutputStream       *stream,
 
   op = g_new0 (CloseAsyncOp, 1);
 
-  op->stream = g_object_ref (stream);
+  op->stream = stream;
   op->callback = callback;
   op->data = data;
   op->notify = notify;
