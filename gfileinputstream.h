@@ -6,7 +6,7 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_FILE_INPUT_STREAM         (g_input_stream_get_type ())
+#define G_TYPE_FILE_INPUT_STREAM         (g_file_input_stream_get_type ())
 #define G_FILE_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILE_INPUT_STREAM, GFileInputStream))
 #define G_FILE_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILE_INPUT_STREAM, GFileInputStreamClass))
 #define G_IS_FILE_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILE_INPUT_STREAM))

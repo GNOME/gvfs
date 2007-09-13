@@ -105,7 +105,7 @@ g_file_get_parent (GFile *file)
 
 GFile *
 g_file_get_child (GFile *file,
-		  char *name)
+		  const char *name)
 {
   GFileIface *iface;
 
@@ -115,26 +115,31 @@ g_file_get_child (GFile *file,
 }
 
 GFileEnumerator *
-g_file_enumerate_children (GFile *file)
+g_file_enumerate_children (GFile *file,
+			   GFileInfoRequestFlags requested,
+			   const char *attributes)
+			   
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->enumerate_children) (file);
+  return (* iface->enumerate_children) (file, requested, attributes);
 }
 
 GFileInfo *
-g_file_get_info (GFile *file)
+g_file_get_info (GFile *file,
+		 GFileInfoRequestFlags requested,
+		 const char *attributes)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->get_info) (file);
+  return (* iface->get_info) (file, requested, attributes);
 }
 
-GInputStream *
+GFileInputStream *
 g_file_read (GFile *file)
 {
   GFileIface *iface;
@@ -144,7 +149,7 @@ g_file_read (GFile *file)
   return (* iface->read) (file);
 }
 
-GOutputStream *
+GFileOutputStream *
 g_file_append_to (GFile *file)
 {
   GFileIface *iface;
@@ -154,7 +159,7 @@ g_file_append_to (GFile *file)
   return (* iface->append_to) (file);
 }
 
-GOutputStream *
+GFileOutputStream *
 g_file_create (GFile *file)
 {
   GFileIface *iface;
@@ -164,7 +169,7 @@ g_file_create (GFile *file)
   return (* iface->create) (file);
 }
 
-GOutputStream *
+GFileOutputStream *
 g_file_replace (GFile                 *file,
 		time_t                 mtime,
 		gboolean               make_backup)
@@ -175,7 +180,6 @@ g_file_replace (GFile                 *file,
 
   return (* iface->replace) (file, mtime, make_backup);
 }
-
 
 /* Default vfs ops */
 

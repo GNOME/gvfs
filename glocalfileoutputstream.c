@@ -14,6 +14,11 @@
 
 G_DEFINE_TYPE (GLocalFileOutputStream, g_local_file_output_stream, G_TYPE_FILE_OUTPUT_STREAM);
 
+/* Some of the file replacement code was based on the code from gedit,
+ * relicenced to LGPL with permissions from the authors.
+ */
+  
+
 #define BACKUP_EXTENSION "~"
 
 static GFileOutputStreamClass *parent_class = NULL;
@@ -72,11 +77,11 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 }
 
 static void
-g_local_file_output_stream_init (GLocalFileOutputStream *info)
+g_local_file_output_stream_init (GLocalFileOutputStream *stream)
 {
-  info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info,
-					    G_TYPE_LOCAL_FILE_OUTPUT_STREAM,
-					    GLocalFileOutputStreamPrivate);
+  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream,
+					      G_TYPE_LOCAL_FILE_OUTPUT_STREAM,
+					      GLocalFileOutputStreamPrivate);
 }
 
 GFileOutputStream *
@@ -219,17 +224,6 @@ handle_overwrite_open (GLocalFileOutputStream *file,
       goto err_out;
     }
   
-  /* TODO: Is this needed, doesn't open check this? */
-  /* check if the file is actually writable */
-  if ((original_stat.st_mode & 0222) == 0)
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_READ_ONLY,
-		   _("Target file is read only"));
-      goto err_out;
-    }
-
   if (file->priv->original_mtime != 0 &&
       original_stat.st_mtime != file->priv->original_mtime)
     {
