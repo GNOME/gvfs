@@ -74,14 +74,14 @@ ask_password_cb (GMountOperation *op,
 }
 
 static void
-mount_done_cb (GObject *vfs,
+mount_done_cb (GObject *object,
 	       GAsyncResult *res,
 	       gpointer user_data)
 {
   gboolean succeeded;
   GError *error = NULL;
 
-  succeeded = g_mount_for_location_finish (res, &error);
+  succeeded = g_mount_for_location_finish (G_FILE (object), res, &error);
 
   if (!succeeded)
     g_print ("Error mounting location: %s\n", error->message);

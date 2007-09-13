@@ -123,9 +123,12 @@ struct _GFileIface
 
   void                (*read_async)         (GFile                *file,
 					     int                   io_priority,
-					     GFileReadCallback     callback,
-					     gpointer              callback_data,
-					     GCancellable         *cancellable);
+					     GCancellable         *cancellable,
+					     GAsyncReadyCallback   callback,
+					     gpointer              user_data);
+  GFileInputStream *  (*read_finish)        (GFile                *file,
+					     GAsyncResult         *res,
+					     GError              **error);
 
   void               (*mount_mountable)           (GFile               *file,
 						   GMountOperation     *mount_operation,
@@ -187,6 +190,14 @@ gboolean           g_file_is_native                  (GFile                  *fi
 GFileInputStream * g_file_read                       (GFile                  *file,
 						      GCancellable           *cancellable,
 						      GError                **error);
+void               g_file_read_async                 (GFile                  *file,
+						      int                     io_priority,
+						      GCancellable           *cancellable,
+						      GAsyncReadyCallback     callback,
+						      gpointer                user_data);
+GFileInputStream * g_file_read_finish                (GFile                  *file,
+						      GAsyncResult           *res,
+						      GError                **error);
 GFileOutputStream *g_file_append_to                  (GFile                  *file,
 						      GCancellable           *cancellable,
 						      GError                **error);
@@ -198,11 +209,6 @@ GFileOutputStream *g_file_replace                    (GFile                  *fi
 						      gboolean                make_backup,
 						      GCancellable           *cancellable,
 						      GError                **error);
-void               g_file_read_async                 (GFile                  *file,
-						      int                     io_priority,
-						      GFileReadCallback       callback,
-						      gpointer                callback_data,
-						      GCancellable           *cancellable);
 GFileInfo *        g_file_get_info                   (GFile                  *file,
 						      const char             *attributes,
 						      GFileGetInfoFlags       flags,

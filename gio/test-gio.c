@@ -199,14 +199,18 @@ read_done (GObject *source_object,
 }
 
 static void
-test_async_open_callback (GFile *file,
-			  GFileInputStream *stream,
-			  gpointer user_data,
-			  GError *error)
+test_async_open_callback (GObject *source_object,
+			  GAsyncResult *res,
+			  gpointer      user_data)
 {
+  GFile *file = G_FILE (source_object);
+  GFileInputStream *stream;
   AsyncData *data = user_data;
-  
+  GError *error = NULL;
+
+  stream = g_file_read_finish (file, res, &error);
   g_print ("test_async_open_callback: %p\n", stream);
+  
   if (stream)
     g_input_stream_read_async (G_INPUT_STREAM (stream), data->buffer, 1024, 0, data->c, read_done, data);
   else
@@ -224,7 +228,7 @@ test_async (char *uri, gboolean dump)
   data->c = g_cancellable_new ();
 
   file = g_file_get_for_uri (uri);
-  g_file_read_async (file, 0, test_async_open_callback, data, data->c);
+  g_file_read_async (file, 0, data->c, test_async_open_callback, data);
   if (0) g_thread_create (cancel_thread, data->c, FALSE, NULL);
 }
 

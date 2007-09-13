@@ -15,12 +15,14 @@ static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
 			       gpointer class_data);
 
-
-static void g_file_real_read_async (GFile                  *file,
-				    int                     io_priority,
-				    GFileReadCallback       callback,
-				    gpointer                callback_data,
-				    GCancellable           *cancellable);
+static void              g_file_real_read_async  (GFile                *file,
+						  int                   io_priority,
+						  GCancellable         *cancellable,
+						  GAsyncReadyCallback   callback,
+						  gpointer              user_data);
+static GFileInputStream *g_file_real_read_finish (GFile                *file,
+						  GAsyncResult         *res,
+						  GError              **error);
 
 GType
 g_file_get_type (void)
@@ -59,6 +61,7 @@ g_file_class_init (gpointer g_class,
   GFileIface *iface = g_class;
 
   iface->read_async = g_file_real_read_async;
+  iface->read_finish = g_file_real_read_finish;
 }
 
 static void
@@ -330,19 +333,36 @@ g_file_replace (GFile *file,
 void
 g_file_read_async (GFile                  *file,
 		   int                     io_priority,
-		   GFileReadCallback       callback,
-		   gpointer                callback_data,
-		   GCancellable           *cancellable)
+		   GCancellable           *cancellable,
+		   GAsyncReadyCallback     callback,
+		   gpointer                user_data)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
-
   (* iface->read_async) (file,
 			 io_priority,
+			 cancellable,
 			 callback,
-			 callback_data,
-			 cancellable);
+			 user_data);
+}
+
+GFileInputStream *
+g_file_read_finish (GFile                  *file,
+		    GAsyncResult           *res,
+		    GError                **error)
+{
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (res))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->read_finish) (file, res, error);
 }
 
 static gboolean
@@ -792,86 +812,58 @@ g_file_monitor_file (GFile *file)
  *   Default implementation of async ops    *
  ********************************************/
 
-typedef struct {
-  GFile *file;
-  GError *error;
-  gpointer callback_data;
-} AsyncOp;
-
 static void
-async_op_free (gpointer data)
+open_read_async_thread (GSimpleAsyncResult *res,
+			GObject *object,
+			GCancellable *cancellable)
 {
-  AsyncOp *op = data;
-
-  if (op->error)
-    g_error_free (op->error);
-
-  g_object_unref (op->file);
-  
-  g_free (op);
-}
-
-typedef struct {
-  AsyncOp      op;
-  GFileInputStream *res_stream;
-  GFileReadCallback callback;
-} ReadAsyncOp;
-
-static void
-read_op_report (gpointer data)
-{
-  ReadAsyncOp *op = data;
-
-  op->callback (op->op.file,
-		op->res_stream,
-		op->op.callback_data,
-		op->op.error);
-}
-
-static void
-read_op_func (GIOJob *job,
-	      GCancellable *c,
-	      gpointer data)
-{
-  ReadAsyncOp *op = data;
   GFileIface *iface;
+  GFileInputStream *stream;
+  GError *error = NULL;
 
-  if (g_cancellable_is_cancelled (c))
+  iface = G_FILE_GET_IFACE (object);
+
+  stream = iface->read (G_FILE (object), cancellable, &error);
+
+  if (stream == NULL)
     {
-      op->res_stream = NULL;
-      g_set_error (&op->op.error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
     }
   else
-    {
-      iface = G_FILE_GET_IFACE (op->op.file);
-      op->res_stream = iface->read (op->op.file, c, &op->op.error);
-    }
-
-  g_io_job_send_to_mainloop (job, read_op_report,
-			     op, async_op_free,
-			     FALSE);
+    g_simple_async_result_set_op_res_gpointer (res, stream, g_object_unref);
 }
 
 static void
 g_file_real_read_async (GFile                  *file,
 			int                     io_priority,
-			GFileReadCallback       callback,
-			gpointer                callback_data,
-			GCancellable           *cancellable)
+			GCancellable           *cancellable,
+			GAsyncReadyCallback     callback,
+			gpointer                user_data)
 {
-  ReadAsyncOp *op;
-
-  op = g_new0 (ReadAsyncOp, 1);
-
-  op->op.file = g_object_ref (file);
-  op->callback = callback;
-  op->op.callback_data = callback_data;
+  GSimpleAsyncResult *res;
   
-  g_schedule_io_job (read_op_func, op, NULL, io_priority,
-		     cancellable);
+  res = g_simple_async_result_new (G_OBJECT (file), callback, user_data, g_file_real_read_async);
+  
+  g_simple_async_result_run_in_thread (res, open_read_async_thread, io_priority, cancellable);
+  g_object_unref (res);
+}
+
+static GFileInputStream *
+g_file_real_read_finish (GFile                  *file,
+			 GAsyncResult           *res,
+			 GError                **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  gpointer op;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_real_read_async);
+
+  op = g_simple_async_result_get_op_res_gpointer (simple);
+  if (op)
+    return g_object_ref (op);
+  
+  return NULL;
 }
 
 /********************************************

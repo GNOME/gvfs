@@ -27,6 +27,12 @@ struct _GDaemonFile
   char *path;
 };
 
+static void g_daemon_file_read_async (GFile *file,
+				      int io_priority,
+				      GCancellable *cancellable,
+				      GAsyncReadyCallback callback,
+				      gpointer callback_data);
+
 G_DEFINE_TYPE_WITH_CODE (GDaemonFile, g_daemon_file, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE,
 						g_daemon_file_file_iface_init))
@@ -547,8 +553,8 @@ g_daemon_file_get_info (GFile                *file,
 
 typedef struct {
   GFile *file;
-  GFileReadCallback read_callback;
-  gpointer callback_data;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
   gboolean can_seek;
 } GetFDData;
 
@@ -558,22 +564,28 @@ read_async_get_fd_cb (int fd,
 {
   GetFDData *data = callback_data;
   GFileInputStream *stream;
-  GError *error;
+  GSimpleAsyncResult *res;
   
   if (fd == -1)
     {
-      error = NULL;
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Didn't get stream file descriptor"));
-      data->read_callback (data->file, NULL, data->callback_data, error);
-      g_error_free (error);
+      res = g_simple_async_result_new_error (G_OBJECT (data->file),
+					     data->callback,
+					     data->user_data,
+					     G_IO_ERROR, G_IO_ERROR_FAILED,
+					     _("Didn't get stream file descriptor"));
     }
   else
     {
+      res = g_simple_async_result_new (G_OBJECT (data->file),
+				       data->callback,
+				       data->user_data,
+				       g_daemon_file_read_async);
       stream = g_daemon_file_input_stream_new (fd, data->can_seek);
-      data->read_callback (data->file, stream, data->callback_data, NULL);
-      g_object_unref (stream);
+      g_simple_async_result_set_op_res_gpointer (res, stream, g_object_unref);
     }
+
+  g_simple_async_result_complete (res);
+  
   g_free (data);
 }
 
@@ -586,16 +598,19 @@ read_async_cb (DBusMessage *reply,
 	       gpointer op_callback_data,
 	       gpointer callback_data)
 {
-  GFileReadCallback read_callback = op_callback;
   GFile *file = callback_data;
-  GError *error;
   guint32 fd_id;
   dbus_bool_t can_seek;
   GetFDData *get_fd_data;
+  GSimpleAsyncResult *res;
   
   if (io_error != NULL)
     {
-      read_callback (file, NULL, op_callback_data, io_error);
+      res = g_simple_async_result_new_from_error (G_OBJECT (file),
+						  op_callback,
+						  op_callback_data,
+						  io_error);
+      g_simple_async_result_complete (res);
     }
   else
     {
@@ -604,17 +619,19 @@ read_async_cb (DBusMessage *reply,
 				  DBUS_TYPE_BOOLEAN, &can_seek,
 				  DBUS_TYPE_INVALID))
 	{
-	  error = NULL;
-	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       _("Invalid return value from open"));
-	  read_callback (file, NULL, op_callback_data, error);
-	  g_error_free (error);
+	  res = g_simple_async_result_new_error (G_OBJECT (file),
+						 op_callback,
+						 op_callback_data,
+						 G_IO_ERROR, G_IO_ERROR_FAILED,
+						 _("Invalid return value from open"));
+	  g_simple_async_result_complete (res);
+	  return;
 	}
 
       get_fd_data = g_new0 (GetFDData, 1);
       get_fd_data->file = file;
-      get_fd_data->read_callback = read_callback;
-      get_fd_data->callback_data = op_callback_data;
+      get_fd_data->callback = op_callback;
+      get_fd_data->user_data = op_callback_data;
       get_fd_data->can_seek = can_seek;
       
       _g_dbus_connection_get_fd_async (connection, fd_id,
@@ -625,9 +642,9 @@ read_async_cb (DBusMessage *reply,
 static void
 g_daemon_file_read_async (GFile *file,
 			  int io_priority,
-			  GFileReadCallback callback,
-			  gpointer callback_data,
-			  GCancellable *cancellable)
+			  GCancellable *cancellable,
+			  GAsyncReadyCallback callback,
+			  gpointer callback_data)
 {
   do_async_path_call (file,
 		      G_VFS_DBUS_OP_OPEN_FOR_READ,
@@ -636,6 +653,24 @@ g_daemon_file_read_async (GFile *file,
 		      read_async_cb, file,
 		      0);
 }
+
+static GFileInputStream *
+g_daemon_file_read_finish (GFile                  *file,
+			   GAsyncResult           *res,
+			   GError                **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  gpointer op;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_read_async);
+
+  op = g_simple_async_result_get_op_res_gpointer (simple);
+  if (op)
+    return g_object_ref (op);
+  
+  return NULL;
+}
+
 
 static GFileInputStream *
 g_daemon_file_read (GFile *file,
@@ -950,6 +985,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->create = g_daemon_file_create;
   iface->replace = g_daemon_file_replace;
   iface->read_async = g_daemon_file_read_async;
+  iface->read_finish = g_daemon_file_read_finish;
   iface->mount_for_location = g_daemon_file_mount_for_location;
   iface->mount_for_location_finish = g_daemon_file_mount_for_location_finish;
 }
