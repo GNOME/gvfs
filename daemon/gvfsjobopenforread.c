@@ -27,6 +27,9 @@ g_vfs_job_open_for_read_finalize (GObject *object)
   if (job->message)
     dbus_message_unref (job->message);
 
+  if (job->connection)
+    dbus_connection_unref (job->connection);
+  
   /* TODO: manage backend_handle if not put in readstream */
 
   if (job->read_stream)
@@ -82,7 +85,7 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
 
   job = g_object_new (G_TYPE_VFS_JOB_OPEN_FOR_READ, NULL);
 
-  job->connection = connection; /* TODO: ref? */
+  job->connection = dbus_connection_ref (connection);
   job->message = dbus_message_ref (message);
   job->filename = g_strndup (path_data, path_len);
   
