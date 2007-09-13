@@ -23,14 +23,14 @@ figure out the right semantics for error or cancel of close()
 
 Expose the seek operations on GInputStream also, not only via iface
 
-Handle closing of stream protocol fd in the daemon
-
 implement Async i/o for GFileInputStreamDaemon
 
 implement get_file_info for GFileInputStreamDaemon
 
 Is handling open inside the file stream really right?
 e.g. It forces you to open the stream (sync!) to figure out can_seek in the daemon case
+
+implement daemon write stream, maybe break out common parts of gvfsreadstream to gvfsjobstream
 
 FUTURE IDEAS:
 -------------
