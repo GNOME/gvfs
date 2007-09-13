@@ -714,7 +714,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
       /* Make sure the message is sent */
       dbus_connection_flush (connection);
 
-      if (!dbus_connection_get_socket (connection, &dbus_fd))
+      if (!dbus_connection_get_unix_fd (connection, &dbus_fd))
 	{
 	  dbus_pending_call_unref (pending);
 	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
