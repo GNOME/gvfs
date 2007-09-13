@@ -222,7 +222,7 @@ lookup_mount (GMountTracker *tracker,
 						   DBUS_TYPE_OBJECT_PATH,
 						   &mount->object_path))
 		_g_dbus_oom ();
-	      g_mount_spec_to_dbus (&iter, spec);
+	      g_mount_spec_to_dbus (&iter, mount->mount_spec);
 	    }
 	}
     }
