@@ -22,6 +22,9 @@ struct _GLocalFileEnumerator
   char *attributes;
   GFileGetInfoFlags flags;
 
+  gboolean got_parent_info;
+  GLocalParentFileInfo parent_info;
+  
   gboolean follow_symlinks;
 };
 
@@ -106,6 +109,12 @@ g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
   char *path;
   GFileInfo *info;
   GError *my_error = NULL;
+
+  if (!local->got_parent_info)
+    {
+      g_local_file_info_get_parent_info (local->filename, local->matcher, &local->parent_info);
+      local->got_parent_info = TRUE;
+    }
   
  next_file:
   
@@ -117,6 +126,7 @@ g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
   info = g_local_file_info_get (filename, path,
 				local->matcher,
 				local->flags,
+				&local->parent_info,
 				&my_error); 
   g_free (path);
   

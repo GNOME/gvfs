@@ -381,27 +381,91 @@ get_xattrs_from_fd (int fd,
 #endif /* defined HAVE_XATTR */
 }
 
+void
+g_local_file_info_get_parent_info (const char             *dir,
+				   GFileAttributeMatcher  *attribute_matcher,
+				   GLocalParentFileInfo   *parent_info)
+{
+  struct stat statbuf;
+  int res;
+  
+  parent_info->writable = FALSE;
+  parent_info->is_sticky = FALSE;
+
+  if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_RENAME) ||
+      g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_DELETE))
+    {
+      parent_info->writable = (g_access (dir, W_OK) == 0);
+      
+      if (parent_info->writable)
+	{
+	  res = g_stat (dir, &statbuf);
+
+	  /*
+	   * The sticky bit (S_ISVTX) on a directory means that a file in that directory can be
+	   * renamed or deleted only by the owner of the file, by the owner of the directory, and
+	   * by a privileged process.
+	   */
+	  if (res == 0)
+	    {
+	      parent_info->is_sticky = (statbuf.st_mode & S_ISVTX) != 0;
+	      parent_info->owner = statbuf.st_uid;
+	    }
+	}
+    }
+}
+
 static void
 get_access_rights (GFileAttributeMatcher *attribute_matcher,
 		   GFileInfo *info,
-		   const gchar *path)
+		   const gchar *path,
+		   struct stat *statbuf,
+		   GLocalParentFileInfo *parent_info)
 {
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_ACCESS_READ))
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_READ,
-				      g_access (path, R_OK));
+				      g_access (path, R_OK) == 0);
   
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_ACCESS_WRITE))
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE,
-				      g_access (path, W_OK));
+				      g_access (path, W_OK) == 0);
   
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_ACCESS_EXECUTE))
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE,
-				      g_access (path, X_OK));
-    
-  /* TODO: Handle can_rename and can_delete. Do we really want to stat the parent for each file in a dir... */
+				      g_access (path, X_OK) == 0);
+
+
+  if (parent_info)
+    {
+      gboolean writable;
+
+      writable = FALSE;
+      if (parent_info->writable)
+	{
+	  if (parent_info->is_sticky)
+	    {
+	      uid_t uid = geteuid ();
+
+	      if (uid == statbuf->st_uid ||
+		  uid == parent_info->owner ||
+		  uid == 0)
+		writable = TRUE;
+	    }
+	  else
+	    writable = TRUE;
+	}
+
+      if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_RENAME))
+	g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_RENAME,
+					  writable);
+      
+      if (g_file_attribute_matcher_matches (attribute_matcher, G_FILE_ATTRIBUTE_ACCESS_DELETE))
+	g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_DELETE,
+					  writable);
+    }
 }
 
 static void
@@ -475,6 +539,7 @@ g_local_file_info_get (const char *basename,
 		       const char *path,
 		       GFileAttributeMatcher *attribute_matcher,
 		       GFileGetInfoFlags flags,
+		       GLocalParentFileInfo *parent_info,
 		       GError **error)
 {
   GFileInfo *info;
@@ -635,7 +700,7 @@ g_local_file_info_get (const char *basename,
       /* TODO */
     }
 
-  get_access_rights (attribute_matcher, info, path);
+  get_access_rights (attribute_matcher, info, path, &statbuf, parent_info);
   
   get_selinux_context (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   get_xattrs (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);

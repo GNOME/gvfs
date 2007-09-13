@@ -405,14 +405,19 @@ g_local_file_get_info (GFile                *file,
   GLocalFile *local = G_LOCAL_FILE (file);
   GFileInfo *info;
   GFileAttributeMatcher *matcher;
-  char *basename;
+  char *basename, *dirname;
+  GLocalParentFileInfo parent_info;
 
   matcher = g_file_attribute_matcher_new (attributes);
   
   basename = g_path_get_basename (local->filename);
   
+  dirname = g_path_get_dirname (local->filename);
+  g_local_file_info_get_parent_info (dirname, matcher, &parent_info);
+  g_free (dirname);
+  
   info = g_local_file_info_get (basename, local->filename,
-				matcher, flags,
+				matcher, flags, &parent_info,
 				error);
   
   g_free (basename);
