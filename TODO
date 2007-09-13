@@ -66,6 +66,7 @@ Get rid of std:flags, split it up to avoid problems with unknow flag values
 Add std:is_backup flags
 Set owner:user, owner:group for local files
 
+Ben Hutchings Says: It looks like g_file_replace() takes the mtime of the previous version so that you can avoid the lost update problem. However, for HTTP you’d really want to use the ETag instead, and for other protocols maybe some other unique version identifier. Maybe GFileInfo should include some kind of opaque version identifier? Or, of course, maybe I misunderstood what the mtime is there for (haven’t looked at the code).
 
 document create time vs change time vs mtime, etc
 
