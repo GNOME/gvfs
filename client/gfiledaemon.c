@@ -10,6 +10,7 @@
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include <gfileinputstreamdaemon.h>
+#include <gfileoutputstreamdaemon.h>
 #include <gfileenumeratordaemon.h>
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
@@ -616,8 +617,52 @@ g_file_daemon_append_to (GFile *file,
 			 GCancellable *cancellable,
 			 GError **error)
 {
-  /* TODO: implement */
-  return NULL;
+  DBusConnection *connection;
+  int fd;
+  DBusMessage *reply;
+  guint32 fd_id;
+  dbus_bool_t can_seek;
+  guint16 mode;
+  guint64 mtime, initial_offset;
+  dbus_bool_t make_backup;
+
+  mode = 1;
+  mtime = 0;
+  make_backup = FALSE;
+  
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_OP_OPEN_FOR_WRITE,
+			     &connection, cancellable, error,
+			     DBUS_TYPE_UINT16, &mode,
+			     DBUS_TYPE_UINT64, &mtime,
+			     DBUS_TYPE_BOOLEAN, &make_backup,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &can_seek,
+			      DBUS_TYPE_UINT64, &initial_offset,
+			      DBUS_TYPE_INVALID))
+    {
+      dbus_message_unref (reply);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from open"));
+      return NULL;
+    }
+  
+  dbus_message_unref (reply);
+
+  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Didn't get stream file descriptor"));
+      return NULL;
+    }
+  
+  return g_file_output_stream_daemon_new (fd, can_seek, initial_offset);
 }
 
 static GFileOutputStream *
@@ -625,19 +670,107 @@ g_file_daemon_create (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  /* TODO: implement */
-  return NULL;
+  DBusConnection *connection;
+  int fd;
+  DBusMessage *reply;
+  guint32 fd_id;
+  dbus_bool_t can_seek;
+  guint16 mode;
+  guint64 mtime, initial_offset;
+  dbus_bool_t make_backup;
+
+  mode = 0;
+  mtime = 0;
+  make_backup = FALSE;
+  
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_OP_OPEN_FOR_WRITE,
+			     &connection, cancellable, error,
+			     DBUS_TYPE_UINT16, &mode,
+			     DBUS_TYPE_UINT64, &mtime,
+			     DBUS_TYPE_BOOLEAN, &make_backup,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &can_seek,
+			      DBUS_TYPE_UINT64, &initial_offset,
+			      DBUS_TYPE_INVALID))
+    {
+      dbus_message_unref (reply);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from open"));
+      return NULL;
+    }
+  
+  dbus_message_unref (reply);
+
+  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Didn't get stream file descriptor"));
+      return NULL;
+    }
+  
+  return g_file_output_stream_daemon_new (fd, can_seek, initial_offset);
 }
 
 static GFileOutputStream *
 g_file_daemon_replace (GFile *file,
 		       time_t mtime,
-		       gboolean  make_backup,
+		       gboolean make_backup,
 		       GCancellable *cancellable,
 		       GError **error)
 {
-  /* TODO: implement */
-  return NULL;
+  DBusConnection *connection;
+  int fd;
+  DBusMessage *reply;
+  guint32 fd_id;
+  dbus_bool_t can_seek;
+  guint16 mode;
+  guint64 dbus_mtime, initial_offset;
+  dbus_bool_t dbus_make_backup;
+
+  mode = 2;
+  dbus_mtime = mtime;
+  dbus_make_backup = make_backup;
+  
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_OP_OPEN_FOR_WRITE,
+			     &connection, cancellable, error,
+			     DBUS_TYPE_UINT16, &mode,
+			     DBUS_TYPE_UINT64, &dbus_mtime,
+			     DBUS_TYPE_BOOLEAN, &dbus_make_backup,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &can_seek,
+			      DBUS_TYPE_UINT64, &initial_offset,
+			      DBUS_TYPE_INVALID))
+    {
+      dbus_message_unref (reply);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from open"));
+      return NULL;
+    }
+  
+  dbus_message_unref (reply);
+
+  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Didn't get stream file descriptor"));
+      return NULL;
+    }
+  
+  return g_file_output_stream_daemon_new (fd, can_seek, initial_offset);
 }
 
 static void
