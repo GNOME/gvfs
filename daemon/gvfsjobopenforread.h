@@ -3,7 +3,7 @@
 
 #include <dbus/dbus.h>
 #include <gvfsjob.h>
-#include <gvfsdaemonbackend.h>
+#include <gvfsbackend.h>
 #include <gvfsreadstream.h>
 
 

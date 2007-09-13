@@ -4,7 +4,7 @@
 #include <dbus/dbus.h>
 #include <dbus-gmain.h>
 #include "gvfsdaemon.h"
-#include "gvfsdaemonbackendtest.h"
+#include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>
 
 static gboolean
@@ -36,7 +36,7 @@ main (int argc, char *argv[])
 {
   GMainLoop *loop;
   GVfsDaemon *daemon;
-  GVfsDaemonBackendTest *backend;
+  GVfsBackendTest *backend;
 
   g_thread_init (NULL);
 
@@ -45,9 +45,9 @@ main (int argc, char *argv[])
   if (!init_dbus ())
     return 1;
 
-  backend = g_vfs_daemon_backend_test_new ();
+  backend = g_vfs_backend_test_new ();
   daemon = g_vfs_daemon_new (G_VFS_DBUS_MOUNTPOINT_NAME "foo_3A_2F_2F",
-			     G_VFS_DAEMON_BACKEND (backend));
+			     G_VFS_BACKEND (backend));
   g_object_unref (backend);
 
   if (!g_vfs_daemon_is_active (daemon))

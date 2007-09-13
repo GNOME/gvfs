@@ -2,7 +2,7 @@
 #define __G_VFS_JOB_READ_H__
 
 #include <gvfsjob.h>
-#include <gvfsdaemonbackend.h>
+#include <gvfsbackend.h>
 #include <gvfsreadstream.h>
 
 G_BEGIN_DECLS

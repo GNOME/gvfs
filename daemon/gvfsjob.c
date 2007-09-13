@@ -76,7 +76,7 @@ g_vfs_job_init (GVfsJob *job)
 
 void
 g_vfs_job_set_backend (GVfsJob     *job,
-		       GVfsDaemonBackend *backend)
+		       GVfsBackend *backend)
 {
   job->backend = backend;
 }

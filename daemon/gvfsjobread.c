@@ -78,10 +78,10 @@ send_reply (GVfsJob *job)
 static gboolean
 start (GVfsJob *job)
 {
-  GVfsDaemonBackendClass *class;
+  GVfsBackendClass *class;
   GVfsJobRead *op_job = G_VFS_JOB_READ (job);
 
-  class = G_VFS_DAEMON_BACKEND_GET_CLASS (job->backend);
+  class = G_VFS_BACKEND_GET_CLASS (job->backend);
   
   return class->read (job->backend,
 		      op_job,

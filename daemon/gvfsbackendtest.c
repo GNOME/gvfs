@@ -9,54 +9,54 @@
 
 #include <glib/gstdio.h>
 
-#include "gvfsdaemonbackendtest.h"
+#include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 
-G_DEFINE_TYPE (GVfsDaemonBackendTest, g_vfs_daemon_backend_test, G_TYPE_VFS_DAEMON_BACKEND);
+G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_TYPE_VFS_BACKEND);
 
-static gboolean do_open_for_read (GVfsDaemonBackend  *backend,
+static gboolean do_open_for_read (GVfsBackend  *backend,
 				  GVfsJobOpenForRead *job,
 				  char               *filename);
-static gboolean do_read          (GVfsDaemonBackend  *backend,
+static gboolean do_read          (GVfsBackend  *backend,
 				  GVfsJobRead        *job,
 				  GVfsHandle         *handle,
 				  char               *buffer,
 				  gsize               bytes_requested);
 
 static void
-g_vfs_daemon_backend_test_finalize (GObject *object)
+g_vfs_backend_test_finalize (GObject *object)
 {
-  GVfsDaemonBackendTest *daemon;
+  GVfsBackendTest *backend;
 
-  daemon = G_VFS_DAEMON_BACKEND_TEST (object);
+  backend = G_VFS_BACKEND_TEST (object);
   
-  if (G_OBJECT_CLASS (g_vfs_daemon_backend_test_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_vfs_daemon_backend_test_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_vfs_backend_test_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_vfs_backend_test_parent_class)->finalize) (object);
 }
 
 static void
-g_vfs_daemon_backend_test_class_init (GVfsDaemonBackendTestClass *klass)
+g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  GVfsDaemonBackendClass *backend_class = G_VFS_DAEMON_BACKEND_CLASS (klass);
+  GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
   
-  gobject_class->finalize = g_vfs_daemon_backend_test_finalize;
+  gobject_class->finalize = g_vfs_backend_test_finalize;
 
   backend_class->open_for_read = do_open_for_read;
   backend_class->read = do_read;
 }
 
 static void
-g_vfs_daemon_backend_test_init (GVfsDaemonBackendTest *daemon)
+g_vfs_backend_test_init (GVfsBackendTest *backend)
 {
 }
 
-GVfsDaemonBackendTest *
-g_vfs_daemon_backend_test_new (void)
+GVfsBackendTest *
+g_vfs_backend_test_new (void)
 {
-  GVfsDaemonBackendTest *backend;
-  backend = g_object_new (G_TYPE_VFS_DAEMON_BACKEND_TEST,
+  GVfsBackendTest *backend;
+  backend = g_object_new (G_TYPE_VFS_BACKEND_TEST,
 			 NULL);
   return backend;
 }
@@ -84,7 +84,7 @@ open_idle_cb (gpointer data)
 }
 
 static gboolean 
-do_open_for_read (GVfsDaemonBackend *backend,
+do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
 		  char *filename)
 {
@@ -104,7 +104,7 @@ do_open_for_read (GVfsDaemonBackend *backend,
 }
 
 static gboolean
-do_read (GVfsDaemonBackend *backend,
+do_read (GVfsBackend *backend,
 	 GVfsJobRead *job,
 	 GVfsHandle *handle,
 	 char *buffer,

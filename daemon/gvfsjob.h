@@ -25,7 +25,7 @@ struct _GVfsJob
 {
   GObject parent_instance;
   
-  GVfsDaemonBackend *backend;
+  GVfsBackend *backend;
   guint failed : 1;
   guint cancelled : 1;
   guint finished : 1;
@@ -61,7 +61,7 @@ void     g_vfs_job_failed_from_error (GVfsJob     *job,
 				      GError      *error);
 void     g_vfs_job_succeeded         (GVfsJob     *job);
 void     g_vfs_job_set_backend       (GVfsJob     *job,
-				      GVfsDaemonBackend *backend);
+				      GVfsBackend *backend);
 
 G_END_DECLS
 

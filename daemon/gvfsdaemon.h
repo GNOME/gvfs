@@ -17,13 +17,13 @@ typedef struct _GVfsDaemonClass   GVfsDaemonClass;
 typedef struct _GVfsDaemonPrivate GVfsDaemonPrivate;
 
 /* Placed here to fix circular ref problems in headers */
-typedef struct _GVfsDaemonBackend GVfsDaemonBackend;
+typedef struct _GVfsBackend GVfsBackend;
 
 struct _GVfsDaemon
 {
   GObject parent_instance;
 
-  GVfsDaemonBackend *backend;
+  GVfsBackend *backend;
   GVfsDaemonPrivate *priv;
 };
 
@@ -38,7 +38,7 @@ struct _GVfsDaemonClass
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
 GVfsDaemon *g_vfs_daemon_new (const char *mountpoint,
-			      GVfsDaemonBackend *backend);
+			      GVfsBackend *backend);
 gboolean g_vfs_daemon_is_active (GVfsDaemon *daemon);
 
 G_END_DECLS

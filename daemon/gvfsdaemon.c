@@ -202,7 +202,7 @@ g_vfs_daemon_get_property (GObject    *object,
 
 GVfsDaemon *
 g_vfs_daemon_new (const char *mountpoint,
-		  GVfsDaemonBackend *backend)
+		  GVfsBackend *backend)
 {
   GVfsDaemon *daemon;
 

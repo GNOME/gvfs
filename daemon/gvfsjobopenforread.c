@@ -92,10 +92,10 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
 static gboolean
 start (GVfsJob *job)
 {
-  GVfsDaemonBackendClass *class;
+  GVfsBackendClass *class;
   GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
 
-  class = G_VFS_DAEMON_BACKEND_GET_CLASS (job->backend);
+  class = G_VFS_BACKEND_GET_CLASS (job->backend);
   
   return class->open_for_read (job->backend,
 			       op_job,

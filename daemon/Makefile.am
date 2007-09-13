@@ -17,8 +17,8 @@ noinst_PROGRAMS =				\
 
 gvfs_daemon_SOURCES = \
 	gvfsdaemon.c gvfsdaemon.h \
-	gvfsdaemonbackend.c gvfsdaemonbackend.h \
-	gvfsdaemonbackendtest.c gvfsdaemonbackendtest.h \
+	gvfsbackend.c gvfsbackend.h \
+	gvfsbackendtest.c gvfsbackendtest.h \
 	gvfsreadstream.c gvfsreadstream.h \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
 	gvfsjob.c gvfsjob.h \
