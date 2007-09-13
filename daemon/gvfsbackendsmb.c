@@ -146,13 +146,16 @@ get_cached_server (SMBCCTX * context,
 		   const char *server_name, const char *share_name,
 		   const char *domain, const char *username)
 {
+  g_print ("get_cached_server %s, %s\n", server_name, share_name);
+  
   if (smb_backend->cached_server != NULL &&
       strcmp (smb_backend->cached_server_name, server_name) == 0 &&
-      strcmp (smb_backend->cached_share_name, server_name) == 0 &&
+      strcmp (smb_backend->cached_share_name, share_name) == 0 &&
       strcmp (smb_backend->cached_domain, domain) == 0 &&
       strcmp (smb_backend->cached_username, username) == 0)
     return smb_backend->cached_server;
 
+  g_print ("get_cached_server -> miss\n");
   return NULL;
 }
 
@@ -212,10 +215,10 @@ g_string_append_encoded (GString *string,
     }
 }
 
-static char *
-create_smb_uri (const char *server,
-		const char *share,
-		const char *path)
+static GString *
+create_smb_uri_string (const char *server,
+		       const char *share,
+		       const char *path)
 {
   GString *uri;
 
@@ -229,9 +232,19 @@ create_smb_uri (const char *server,
 	g_string_append_c (uri, '/');
       g_string_append_encoded (uri, path, SUB_DELIM_CHARS ":@/");
     }
-  return g_string_free (uri, FALSE);
+  
+  return uri;
 }
 
+static char *
+create_smb_uri (const char *server,
+		const char *share,
+		const char *path)
+{
+  GString *uri;
+  uri = create_smb_uri_string (server, share, path);
+  return g_string_free (uri, FALSE);
+}
 
 GVfsBackendSmb *
 g_vfs_backend_smb_new (const char *server,
@@ -309,6 +322,30 @@ do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
 		  char *filename)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  char *uri;
+  SMBCFILE *file;
+  GError *error;
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  file = op_backend->smb_context->open (op_backend->smb_context, uri, O_RDONLY, 0);
+  g_free (uri);
+
+  if (file == NULL)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_open_for_read_set_can_seek (job, TRUE);
+      g_vfs_job_open_for_read_set_handle (job, file);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
 }
 
 static void
@@ -318,6 +355,27 @@ do_read (GVfsBackend *backend,
 	 char *buffer,
 	 gsize bytes_requested)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GError *error;
+  ssize_t res;
+
+  res = op_backend->smb_context->read (op_backend->smb_context, (SMBCFILE *)handle, buffer, bytes_requested);
+
+  if (res == -1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_read_set_size (job, res);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+	    
+    }
 }
 
 static void
@@ -327,6 +385,51 @@ do_seek_on_read (GVfsBackend *backend,
 		 goffset    offset,
 		 GSeekType  type)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GError *error;
+  int whence;
+  off_t res;
+
+  switch (type)
+    {
+    case G_SEEK_SET:
+      whence = SEEK_SET;
+      break;
+    case G_SEEK_CUR:
+      whence = SEEK_CUR;
+      break;
+    case G_SEEK_END:
+      whence = SEEK_END;
+      break;
+    default:
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR,
+		   G_VFS_ERROR_NOT_SUPPORTED,
+		   _("Unsupported seek type"));
+      goto error;
+    }
+
+  res = op_backend->smb_context->lseek (op_backend->smb_context, (SMBCFILE *)handle, offset, whence);
+
+  if (res == (off_t)-1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      goto error;
+    }
+  else
+    {
+      g_vfs_job_seek_read_set_offset (job, res);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+
+  return;
+
+ error:
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
 }
 
 static void
@@ -334,6 +437,25 @@ do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GError *error;
+  ssize_t res;
+
+  res = op_backend->smb_context->close_fn (op_backend->smb_context, (SMBCFILE *)handle);
+  if (res == -1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+	    
+    }
 }
 
 static void
@@ -350,19 +472,15 @@ do_get_info (GVfsBackend *backend,
   int res;
   GFileInfo *info;
   
-  uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
   g_free (uri);
 
-  info = g_file_info_new ();
-
   if (res == 0)
     {
+      info = g_file_info_new ();
       g_file_info_set_from_stat (info, requested, &st);
-    }
-  
-  if (info)
-    {
+      
       g_vfs_job_get_info_set_info (job, requested & ~(G_FILE_INFO_DISPLAY_NAME|G_FILE_INFO_EDIT_NAME), info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
@@ -379,6 +497,103 @@ do_enumerate (GVfsBackend *backend,
 	      const char *attributes,
 	      gboolean follow_symlinks)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat st;
+  int res;
+  GError *error;
+  SMBCFILE *dir;
+  char dirents[1024*4];
+  struct smbc_dirent *dirp;
+  GList *files;
+  GFileInfo *info;
+  GString *uri;
+  int uri_start_len;
+
+  uri = create_smb_uri_string (op_backend->server, op_backend->share, filename);
+  dir = op_backend->smb_context->opendir (op_backend->smb_context, uri->str);
+
+  if (dir == NULL)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      goto error;
+    }
+
+  /* TODO: limit requested to what we support */
+  g_vfs_job_enumerate_set_result (job, requested);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  if (uri->str[uri->len - 1] != '/')
+    g_string_append_c (uri, '/');
+  uri_start_len = uri->len;
+  
+  while (TRUE)
+    {
+      files = NULL;
+      
+      res = op_backend->smb_context->getdents (op_backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
+      if (res <= 0)
+	break;
+      
+      dirp = (struct smbc_dirent *)dirents;
+      while (res > 0)
+	{
+	  unsigned int dirlen;
+
+	  /* TODO: Only do stat if required for flags */
+	  
+	  if ((dirp->smbc_type == SMBC_DIR ||
+	       dirp->smbc_type == SMBC_FILE ||
+	       dirp->smbc_type == SMBC_LINK) &&
+	      strcmp (dirp->name, ".") != 0 &&
+	      strcmp (dirp->name, "..") != 0)
+	    {
+	      int stat_res;
+	      g_string_truncate (uri, uri_start_len);
+	      g_string_append_encoded (uri,
+				       dirp->name,
+				       SUB_DELIM_CHARS ":@/");
+	      
+	      stat_res = op_backend->smb_context->stat (op_backend->smb_context,
+							uri->str, &st);
+	      if (stat_res == 0)
+		{
+		  info = g_file_info_new ();
+		  if (requested & G_FILE_INFO_NAME)
+		    g_file_info_set_name (info, dirp->name);
+		  
+		  g_file_info_set_from_stat (info, requested, &st);
+		  files = g_list_prepend (files, info);
+		}
+	    }
+		  
+	  dirlen = dirp->dirlen;
+	  dirp = (struct smbc_dirent *) (((char *)dirp) + dirlen);
+	  res -= dirlen;
+	}
+      
+      if (files)
+	{
+	  files = g_list_reverse (files);
+	  g_vfs_job_enumerate_add_info (job, files);
+	  g_list_foreach (files, (GFunc)g_object_unref, NULL);
+	  g_list_free (files);
+	}
+    }
+      
+  res = op_backend->smb_context->closedir (op_backend->smb_context, dir);
+
+  g_vfs_job_enumerate_done (job);
+
+  g_string_free (uri, TRUE);
+  return;
+  
+ error:
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+  g_string_free (uri, TRUE);
 }
 
 static void
