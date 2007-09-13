@@ -299,6 +299,7 @@ g_win32_app_info_set_as_default_for_type (GAppInfo    *appinfo,
 					    const char  *content_type,
 					    GError     **error)
 {
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("association changes not supported on win32"));
   return FALSE;
 }
 
@@ -307,6 +308,7 @@ g_app_info_create_from_commandline (const char *commandline,
 				    const char *application_name,
 				    GError **error)
 {
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Association createion not supported on win32"));
   return NULL;
 }
 
