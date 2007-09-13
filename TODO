@@ -10,7 +10,6 @@ How do we represent icons in the APIs?
 
 Work on GFile:
 * More async operations
-* Implement all ops in Daemon backend
 
 Implement the rest of the mountable GFile ops
 
