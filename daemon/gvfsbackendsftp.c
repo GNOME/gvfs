@@ -62,6 +62,10 @@ struct _GVfsBackendSftp
   GInputStream *reply_stream;
   GDataInputStream *error_stream;
 
+  /* Output Queue */
+  gsize command_bytes_written;
+  GList *command_queue;
+  
   /* Reply reading: */
   guint32 reply_size;
   guint32 reply_size_read;
@@ -310,10 +314,10 @@ new_command_stream (void)
 }
 
 static gboolean
-send_command (GOutputStream *out_stream,
-	      GDataOutputStream *command_stream,
-	      GCancellable *cancellable,
-	      GError **error)
+send_command_sync (GOutputStream *out_stream,
+		   GDataOutputStream *command_stream,
+		   GCancellable *cancellable,
+		   GError **error)
 {
   GOutputStream *mem_stream;
   GByteArray *array;
@@ -673,7 +677,83 @@ read_reply_async (GVfsBackendSftp *backend)
 			     &backend->reply_size, 4,
 			     0, NULL, read_reply_async_got_len, backend);
 }
+
+static void send_command (GVfsBackendSftp *backend);
+
+static void
+send_command_data (GObject *source_object,
+		   GAsyncResult *result,
+		   gpointer user_data)
+{
+  GVfsBackendSftp *backend = user_data;
+  gssize res;
+  GByteArray *data;
+
+  res = g_output_stream_write_finish (G_OUTPUT_STREAM (source_object), result, NULL);
+
+  if (res <= 0)
+    {
+      /* TODO: unmount, etc */
+      g_warning ("Error sending command");
+      return;
+    }
+
+  data = backend->command_queue->data;
   
+  backend->command_bytes_written += res;
+
+  if (backend->command_bytes_written < data->len)
+    {
+      g_output_stream_write_async (backend->command_stream,
+				   data->data + backend->command_bytes_written,
+				   data->len - backend->command_bytes_written,
+				   0,
+				   NULL,
+				   send_command_data,
+				   backend);
+      return;
+    }
+
+  g_byte_array_free (data, TRUE);
+
+  backend->command_queue = g_list_delete_link (backend->command_queue, backend->command_queue);
+
+  if (backend->command_queue != NULL)
+    send_command (backend);
+}
+
+static void
+send_command (GVfsBackendSftp *backend)
+{
+  GByteArray *data;
+
+  data = backend->command_queue->data;
+  
+  backend->command_bytes_written = 0;
+  g_output_stream_write_async (backend->command_stream,
+			       data->data,
+			       data->len,
+			       0,
+			       NULL,
+			       send_command_data,
+			       backend);
+}
+
+static void
+queue_command (GVfsBackendSftp *backend,
+	       GByteArray *data)
+{
+  gboolean first;
+
+  first = backend->command_queue == NULL;
+
+  backend->command_queue = g_list_append (backend->command_queue, data);
+
+  if (first)
+    send_command (backend);
+}
+
+
 static void
 do_mount (GVfsBackend *backend,
 	  GVfsJobMount *job,
@@ -717,7 +797,7 @@ do_mount (GVfsBackend *backend,
 				 SSH_FXP_INIT, NULL, NULL);
   g_data_output_stream_put_int32 (ds,
 				  SSH2_FILEXFER_VERSION, NULL, NULL);
-  send_command (so,ds, NULL, NULL);
+  send_command_sync (so,ds, NULL, NULL);
   g_object_unref (ds);
 
   if (tty_fd == -1)
