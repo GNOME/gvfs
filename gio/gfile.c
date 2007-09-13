@@ -1844,21 +1844,21 @@ g_file_real_replace_finish (GFile                  *file,
 GFile *
 g_file_new_for_path (const char *path)
 {
-  return g_vfs_get_file_for_path (g_vfs_get (),
+  return g_vfs_get_file_for_path (g_vfs_get_default (),
 				  path);
 }
   
 GFile *
 g_file_new_for_uri (const char *uri)
 {
-  return g_vfs_get_file_for_uri (g_vfs_get (),
+  return g_vfs_get_file_for_uri (g_vfs_get_default (),
 				 uri);
 }
   
 GFile *
 g_file_parse_name (const char *parse_name)
 {
-  return g_vfs_parse_name (g_vfs_get (),
+  return g_vfs_parse_name (g_vfs_get_default (),
 			   parse_name);
 }
 

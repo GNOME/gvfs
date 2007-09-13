@@ -90,9 +90,23 @@ g_local_vfs_parse_name (GVfs       *vfs,
   return file;
 }
 
+static const char *
+g_local_vfs_get_name (GVfs *vfs)
+{
+  return "local";
+}
+
+static int
+g_local_vfs_get_priority (GVfs *vfs)
+{
+  return 0;
+}
+
 static void
 g_local_vfs_vfs_iface_init (GVfsIface *iface)
 {
+  iface->get_name = g_local_vfs_get_name;
+  iface->get_priority = g_local_vfs_get_priority;
   iface->get_file_for_path = g_local_vfs_get_file_for_path;
   iface->get_file_for_uri = g_local_vfs_get_file_for_uri;
   iface->parse_name = g_local_vfs_parse_name;

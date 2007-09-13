@@ -108,12 +108,9 @@ get_default_vfs (gpointer arg)
 }
 
 GVfs *
-g_vfs_get (void)
+g_vfs_get_default (void)
 {
   static GOnce once_init = G_ONCE_INIT;
-  GVfs *vfs;
-
-  vfs = g_once (&once_init, get_default_vfs, NULL);
   
-  return vfs;
+  return g_once (&once_init, get_default_vfs, NULL);
 }

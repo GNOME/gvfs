@@ -21,24 +21,29 @@ struct _GVfsIface
 
   /* Virtual Table */
 
-  GFile *(*get_file_for_path) (GVfs *vfs,
-			       const char *path);
-  GFile *(*get_file_for_uri)  (GVfs *vfs,
-			       const char *uri);
-  GFile *(*parse_name)        (GVfs *vfs,
-			       const char *parse_name);
+  const char *(*get_name)          (GVfs *vfs);
+  int         (*get_priority)      (GVfs *vfs);
+  GFile      *(*get_file_for_path) (GVfs *vfs,
+				    const char *path);
+  GFile      *(*get_file_for_uri)  (GVfs *vfs,
+				    const char *uri);
+  GFile      *(*parse_name)        (GVfs *vfs,
+				    const char *parse_name);
 };
 
 GType g_vfs_get_type (void) G_GNUC_CONST;
 
-GFile *  g_vfs_get_file_for_path         (GVfs                 *vfs,
-					  const char           *path);
-GFile *  g_vfs_get_file_for_uri          (GVfs                 *vfs,
-					  const char           *uri);
-GFile *  g_vfs_parse_name                (GVfs                 *vfs,
-					  const char           *parse_name);
-GVfs *   g_vfs_get                       (void);
+const char *g_vfs_get_name          (GVfs       *vfs);
+int         g_vfs_get_priority      (GVfs       *vfs);
+GFile *     g_vfs_get_file_for_path (GVfs       *vfs,
+				     const char *path);
+GFile *     g_vfs_get_file_for_uri  (GVfs       *vfs,
+				     const char *uri);
+GFile *     g_vfs_parse_name        (GVfs       *vfs,
+				     const char *parse_name);
 
+GVfs *      g_vfs_get_default       (void);
+GVfs *      g_vfs_get_by_name       (const char *name);
 
 G_END_DECLS
 

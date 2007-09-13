@@ -562,9 +562,23 @@ g_daemon_vfs_parse_name (GVfs       *vfs,
   return file;
 }
 
+static const char *
+g_daemon_vfs_get_name (GVfs *vfs)
+{
+  return "gvfs";
+}
+
+static int
+g_daemon_vfs_get_priority (GVfs *vfs)
+{
+  return 10;
+}
+
 static void
 g_daemon_vfs_vfs_iface_init (GVfsIface *iface)
 {
+  iface->get_name = g_daemon_vfs_get_name;
+  iface->get_priority = g_daemon_vfs_get_priority;
   iface->get_file_for_path = g_daemon_vfs_get_file_for_path;
   iface->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
   iface->parse_name = g_daemon_vfs_parse_name;
