@@ -98,11 +98,11 @@ mount_op_message_function (DBusConnection  *connection,
   
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-				   "askPassword"))
+				   G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD))
     mount_op_ask_password (op_dbus, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					"askQuestion"))
+					G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION))
     mount_op_ask_question (op_dbus, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;

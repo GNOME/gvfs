@@ -35,7 +35,10 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_OP_GET_CONNECTION "GetConnection"
 #define G_VFS_DBUS_OP_CANCEL "Cancel"
 
+/* Used by the dbus-proxying implementation of GMoutOperation */
 #define G_VFS_DBUS_MOUNT_OPERATION_INTERFACE "org.gtk.vfs.MountOperation"
+#define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD "askPassword"
+#define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION "askQuestion"
 
 #define G_VFS_DBUS_SPAWNER_INTERFACE "org.gtk.vfs.Spawner"
 #define G_VFS_DBUS_OP_SPAWNED "Spawned"

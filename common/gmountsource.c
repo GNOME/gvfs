@@ -188,7 +188,7 @@ g_mount_source_ask_password (GMountSource *source,
   message = dbus_message_new_method_call (source->dbus_id,
 					  source->obj_path,
 					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					  "askPassword");
+					  G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD);
   
   _g_dbus_message_append_args (message,
 			       DBUS_TYPE_STRING, &message_string,
