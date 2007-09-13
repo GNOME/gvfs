@@ -1,5 +1,5 @@
-#ifndef __G_VFS_TYPES_H__
-#define __G_VFS_TYPES_H__
+#ifndef __G_IO_TYPES_H__
+#define __G_IO_TYPES_H__
 
 #include <glib.h>
 
@@ -13,4 +13,4 @@ typedef gint64 goffset;
 
 G_END_DECLS
 
-#endif /* __G_VFS_TYPES_H__ */
+#endif /* __G_IO_TYPES_H__ */
