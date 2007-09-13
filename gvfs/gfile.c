@@ -139,14 +139,17 @@ GFileEnumerator *
 g_file_enumerate_children (GFile *file,
 			   GFileInfoRequestFlags requested,
 			   const char *attributes,
-			   gboolean follow_symlinks)
+			   gboolean follow_symlinks,
+			   GCancellable *cancellable,
+			   GError **error)
 			   
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->enumerate_children) (file, requested, attributes, follow_symlinks);
+  return (* iface->enumerate_children) (file, requested, attributes, follow_symlinks,
+					cancellable, error);
 }
 
 GFileInfo *

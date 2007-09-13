@@ -43,6 +43,11 @@ g_file_enumerator_local_finalize (GObject *object)
 
   g_free (local->filename);
   g_file_attribute_matcher_free (local->matcher);
+  if (local->dir)
+    {
+      g_dir_close (local->dir);
+      local->dir = NULL;
+    }
   
   if (G_OBJECT_CLASS (g_file_enumerator_local_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_enumerator_local_parent_class)->finalize) (object);
@@ -70,28 +75,26 @@ GFileEnumerator *
 g_file_enumerator_local_new (const char *filename,
 			     GFileInfoRequestFlags requested,
 			     const char *attributes,
-			     gboolean follow_symlinks)
+			     gboolean follow_symlinks,
+			     GCancellable *cancellable,
+			     GError **error)
 {
   GFileEnumeratorLocal *local;
+  GDir *dir;
 
+  dir = g_dir_open (filename, 0, error);
+  if (dir == NULL)
+    return NULL;
+  
   local = g_object_new (G_TYPE_FILE_ENUMERATOR_LOCAL, NULL);
 
+  local->dir = dir;
   local->filename = g_strdup (filename);
   local->requested = requested;
   local->matcher = g_file_attribute_matcher_new (attributes);
   local->follow_symlinks = follow_symlinks;
   
   return G_FILE_ENUMERATOR (local);
-}
-
-static gboolean
-g_file_enumerator_local_open_dir (GFileEnumeratorLocal *local, GError **error)
-{
-  if (local->dir != NULL)
-    return TRUE;
-  
-  local->dir = g_dir_open (local->filename, 0, error);
-  return local->dir != NULL;
 }
 
 static GFileInfo *
@@ -105,9 +108,6 @@ g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
   GFileInfo *info;
   GError *my_error = NULL;
   
-  if (!g_file_enumerator_local_open_dir (local, error))
-    return NULL;
-
  next_file:
   
   filename = g_dir_read_name (local->dir);

@@ -40,7 +40,9 @@ struct _GFileIface
   GFileEnumerator *   (*enumerate_children) (GFile                *file,
 					     GFileInfoRequestFlags requested,
 					     const char           *attributes,
-					     gboolean              follow_symlinks);
+					     gboolean              follow_symlinks,
+					     GCancellable         *cancellable,
+					     GError              **error);
   GFileInfo *         (*get_info)           (GFile                *file,
 					     GFileInfoRequestFlags requested,
 					     const char           *attributes,
@@ -88,7 +90,9 @@ GFile *            g_file_get_child          (GFile                  *file,
 GFileEnumerator *  g_file_enumerate_children (GFile                  *file,
 					      GFileInfoRequestFlags   requested,
 					      const char             *attributes,
-					      gboolean                follow_symlinks);
+					      gboolean                follow_symlinks,
+					      GCancellable           *cancellable,
+					      GError                **error);
 GFileInfo *        g_file_get_info           (GFile                  *file,
 					      GFileInfoRequestFlags   requested,
 					      const char             *attributes,

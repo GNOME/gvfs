@@ -238,12 +238,15 @@ static GFileEnumerator *
 g_file_local_enumerate_children (GFile      *file,
 				 GFileInfoRequestFlags requested,
 				 const char *attributes,
-				 gboolean follow_symlinks)
+				 gboolean follow_symlinks,
+				 GCancellable *cancellable,
+				 GError **error)
 {
   GFileLocal *local = G_FILE_LOCAL (file);
   return g_file_enumerator_local_new (local->filename,
-				       requested, attributes,
-				       follow_symlinks);
+				      requested, attributes,
+				      follow_symlinks,
+				      cancellable, error);
 }
 
 static GFileInfo *

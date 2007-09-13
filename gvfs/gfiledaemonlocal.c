@@ -116,10 +116,13 @@ static GFileEnumerator *
 g_file_daemon_local_enumerate_children (GFile *file,
 					GFileInfoRequestFlags requested,
 					const char *attributes,
-					gboolean follow_symlinks)
+					gboolean follow_symlinks,
+					GCancellable *cancellable,
+					GError **error)
 {
   return g_file_enumerate_children (G_FILE_DAEMON_LOCAL (file)->wrapped,
-				    requested, attributes, follow_symlinks);
+				    requested, attributes, follow_symlinks,
+				    cancellable, error);
 }
 
 static GFileInfo *

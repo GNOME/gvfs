@@ -193,7 +193,9 @@ static GFileEnumerator *
 g_file_daemon_enumerate_children (GFile      *file,
 				  GFileInfoRequestFlags requested,
 				  const char *attributes,
-				  gboolean follow_symlinks)
+				  gboolean follow_symlinks,
+				  GCancellable *cancellable,
+				  GError **error)
 {
   DBusMessage *reply;
   guint32 requested_32;
@@ -212,7 +214,7 @@ g_file_daemon_enumerate_children (GFile      *file,
   follow_symlinks_dbus = follow_symlinks;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_OP_ENUMERATE,
-			     &connection, NULL /*cancellable*/, NULL /*error*/,
+			     &connection, cancellable, error,
 			     DBUS_TYPE_STRING, &obj_path,
 			     DBUS_TYPE_UINT32, &requested_32,
 			     DBUS_TYPE_STRING, &attributes,

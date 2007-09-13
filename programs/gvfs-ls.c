@@ -76,9 +76,16 @@ list (GFile *file)
   
   request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME | G_FILE_INFO_SIZE | G_FILE_INFO_IS_HIDDEN;
 
-  enumerator = g_file_enumerate_children (file, request, attributes, TRUE);
-
   error = NULL;
+  enumerator = g_file_enumerate_children (file, request, attributes, TRUE, NULL, &error);
+  if (enumerator == NULL)
+    {
+      g_print ("Error: %s\n", error->message);
+      g_error_free (error);
+      error = NULL;
+      return;
+    }
+  
   while ((info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
     {
       show_info (info);
