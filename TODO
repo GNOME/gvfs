@@ -21,6 +21,8 @@ Make backend pluggable
 
 local file access through the daemon for remote X clients?
 
+Sometimes we handle the dbus socket before the extra_fd one, need synchronization
+
 -------------
 
 continue on GVfsJobOpenForRead, especially the return part

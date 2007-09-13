@@ -14,6 +14,7 @@ G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
 
 enum {
   CANCELLED,
+  SEND_REPLY,
   FINISHED,
   LAST_SIGNAL
 };
@@ -57,6 +58,14 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__VOID,
 		  G_TYPE_NONE, 0);
+  signals[SEND_REPLY] =
+    g_signal_new ("send-reply",
+		  G_TYPE_FROM_CLASS (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GVfsJobClass, send_reply),
+		  NULL, NULL,
+		  g_cclosure_marshal_VOID__VOID,
+		  G_TYPE_NONE, 0);
 
 }
 
@@ -87,10 +96,7 @@ g_vfs_job_cancel (GVfsJob *job)
 static void 
 g_vfs_job_send_reply (GVfsJob *job)
 {
-  GVfsJobClass *class;
-
-  class = G_VFS_JOB_GET_CLASS (job);
-  class->send_reply (job);
+  g_signal_emit (job, signals[SEND_REPLY], 0);
 }
 
 void

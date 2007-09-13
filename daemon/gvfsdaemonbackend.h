@@ -44,7 +44,7 @@ struct _GVfsDaemonBackendClass
   gboolean (*read)          (GVfsDaemonBackend *backend,
 			     GVfsJobRead *job,
 			     GVfsHandle *handle,
-			     gsize count);
+			     gsize bytes_requested);
   gboolean (*seek_on_read)  (GVfsDaemonBackend *backend,
 			     GVfsJobReadSeek *job,
 			     GVfsHandle *handle,

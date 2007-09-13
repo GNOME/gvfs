@@ -29,7 +29,7 @@ struct _GVfsDaemonPrivate
   GQueue *pending_jobs; 
   GQueue *jobs; /* protected by lock */
   guint queued_job_start; /* protected by lock */
-  GList *read_handles; /* protected by lock */
+  GList *read_streams; /* protected by lock */
 };
 
 static void g_vfs_daemon_get_property (GObject    *object,
@@ -43,13 +43,13 @@ static void g_vfs_daemon_set_property (GObject         *object,
 static GObject*g_vfs_daemon_constructor (GType                  type,
 					 guint                  n_construct_properties,
 					 GObjectConstructParam *construct_params);
-
 static void              daemon_unregistered_func (DBusConnection *conn,
 						   gpointer        data);
 static DBusHandlerResult daemon_message_func      (DBusConnection *conn,
 						   DBusMessage    *message,
 						   gpointer        data);
-
+static void              start_or_queue_job       (GVfsDaemon     *daemon,
+						   GVfsJob        *job);
 
 static DBusObjectPathVTable daemon_vtable = {
 	daemon_unregistered_func,
@@ -248,15 +248,44 @@ queue_start_jobs_at_idle (GVfsDaemon *daemon)
     daemon->priv->queued_job_start = g_idle_add (start_jobs_at_idle, daemon);
 }
 
+
+static void
+handle_new_job_callback (GVfsReadStream *stream,
+			 GVfsJob *job,
+			 GVfsDaemon *daemon)
+{
+  start_or_queue_job (daemon, job);
+}
+
 /* NOTE: Might be emitted on a thread */
 static void
 job_finished_callback (GVfsJob *job, 
 		       GVfsDaemon *daemon)
 {
   g_mutex_lock (daemon->priv->lock);
+  
   g_queue_remove (daemon->priv->jobs, job);
+  
   queue_start_jobs_at_idle (daemon);
+
+  if (G_IS_VFS_JOB_OPEN_FOR_READ (job))
+    {
+      GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
+      GVfsReadStream *stream;
+      
+      stream = g_vfs_job_open_for_read_steal_stream (open_job);
+
+      if (stream)
+	{
+	  g_print ("Got new read stream %p\n", stream);
+	  daemon->priv->read_streams = g_list_append (daemon->priv->read_streams,
+						      stream);
+	  g_signal_connect (stream, "new_job", (GCallback)handle_new_job_callback, daemon);
+	}
+    }
+  
   g_mutex_unlock (daemon->priv->lock);
+  
   g_object_unref (job);
 }
 
@@ -638,7 +667,7 @@ daemon_message_func (DBusConnection *conn,
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_DAEMON_INTERFACE,
 					G_VFS_DBUS_OP_OPEN_FOR_READ))
-    job = g_vfs_job_open_for_read_new (daemon, conn, message);
+    job = g_vfs_job_open_for_read_new (daemon->backend, conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   
@@ -652,17 +681,5 @@ gboolean
  g_vfs_daemon_is_active (GVfsDaemon *daemon)
 {
   return daemon->priv->active;
-}
-
-
-/* Calling this on a thread is allowed */
-void
-g_vfs_daemon_register_read_handle (GVfsDaemon *daemon,
-				   GVfsReadHandle *handle)
-{
-  g_mutex_lock (daemon->priv->lock);
-  daemon->priv->read_handles = g_list_append (daemon->priv->read_handles,
-					      handle);
-  g_mutex_unlock (daemon->priv->lock);
 }
 

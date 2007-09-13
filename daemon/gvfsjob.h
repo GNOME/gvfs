@@ -25,7 +25,7 @@ struct _GVfsJob
 {
   GObject parent_instance;
   
-  GVfsDaemon *daemon;
+  GVfsDaemonBackend *backend;
   guint failed : 1;
   guint cancelled : 1;
   guint finished : 1;
@@ -37,29 +37,29 @@ struct _GVfsJobClass
   GObjectClass parent_class;
 
   /* signals */
-  void (*cancelled) (GVfsJob *job);
-  void (*finished) (GVfsJob *job);
+  void (*cancelled)  (GVfsJob *job);
+  void (*send_reply) (GVfsJob *job);
+  void (*finished)   (GVfsJob *job);
 
   /* vtable */
 
   gboolean (*start) (GVfsJob *job);
-  void     (*send_reply) (GVfsJob *job);
 };
 
 GType g_vfs_job_get_type (void) G_GNUC_CONST;
 
-gboolean g_vfs_job_is_finished     (GVfsJob *job);
-void     g_vfs_job_cancel          (GVfsJob *job);
-gboolean g_vfs_job_start           (GVfsJob *job);
-void     g_vfs_job_emit_finished   (GVfsJob *job);
-void     g_vfs_job_failed          (GVfsJob *job,
-				    GQuark         domain,
-				    gint           code,
-				    const gchar   *format,
-				    ...) G_GNUC_PRINTF (4, 5);
-void     g_vfs_job_failed_from_error (GVfsJob *job,
-				      GError *error);
-void     g_vfs_job_succeeded         (GVfsJob *job);
+gboolean g_vfs_job_is_finished       (GVfsJob     *job);
+void     g_vfs_job_cancel            (GVfsJob     *job);
+gboolean g_vfs_job_start             (GVfsJob     *job);
+void     g_vfs_job_emit_finished     (GVfsJob     *job);
+void     g_vfs_job_failed            (GVfsJob     *job,
+				      GQuark       domain,
+				      gint         code,
+				      const gchar *format,
+				      ...) G_GNUC_PRINTF (4, 5);
+void     g_vfs_job_failed_from_error (GVfsJob     *job,
+				      GError      *error);
+void     g_vfs_job_succeeded         (GVfsJob     *job);
 
 G_END_DECLS
 

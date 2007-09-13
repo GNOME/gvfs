@@ -4,6 +4,7 @@
 #include <dbus/dbus.h>
 #include <gvfsjob.h>
 #include <gvfsdaemonbackend.h>
+#include <gvfsreadstream.h>
 
 
 G_BEGIN_DECLS
@@ -26,6 +27,7 @@ struct _GVfsJobOpenForRead
   DBusMessage *message;
   char *filename;
   GVfsHandle *backend_handle;
+  GVfsReadStream *read_stream;
 };
 
 struct _GVfsJobOpenForReadClass
@@ -35,12 +37,12 @@ struct _GVfsJobOpenForReadClass
 
 GType g_vfs_job_open_for_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_open_for_read_new (GVfsDaemon *daemon,
-				      DBusConnection *connection,
-				      DBusMessage *message);
-
-void g_vfs_job_open_for_read_set_handle (GVfsJobOpenForRead *job,
-					 GVfsHandle *handle);
+GVfsJob *       g_vfs_job_open_for_read_new          (GVfsDaemonBackend  *backend,
+						      DBusConnection     *connection,
+						      DBusMessage        *message);
+void            g_vfs_job_open_for_read_set_handle   (GVfsJobOpenForRead *job,
+						      GVfsHandle         *handle);
+GVfsReadStream *g_vfs_job_open_for_read_steal_stream (GVfsJobOpenForRead *job);
 
 G_END_DECLS
 

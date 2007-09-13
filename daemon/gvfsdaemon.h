@@ -2,7 +2,6 @@
 #define __G_VFS_DAEMON_H__
 
 #include <glib-object.h>
-#include <gvfsreadhandle.h>
 
 G_BEGIN_DECLS
 
@@ -40,11 +39,7 @@ GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
 GVfsDaemon *g_vfs_daemon_new (const char *mountpoint,
 			      GVfsDaemonBackend *backend);
-
 gboolean g_vfs_daemon_is_active (GVfsDaemon *daemon);
-void g_vfs_daemon_register_read_handle (GVfsDaemon *daemon,
-					GVfsReadHandle *handle);
-
 
 G_END_DECLS
 
