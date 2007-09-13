@@ -13,10 +13,7 @@ void             mount_init             (void);
 Mountable *      lookup_mountable       (GMountSpec  *spec);
 gboolean         mountable_is_automount (Mountable   *mountable);
 GMountOperation *mountable_mount        (Mountable   *mountable,
-					 GMountSpec  *spec,
-					 GError     **error);
-
-
+					 GMountSpec  *spec);
 
 G_END_DECLS
 

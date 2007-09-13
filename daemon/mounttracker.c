@@ -280,42 +280,22 @@ maybe_automount (GMountTracker *tracker,
 
   mountable = lookup_mountable (spec);
 
-  g_print ("mountable: %p, do-automount: %d, is_automount: %d\n",
-	   mountable, do_automount,
-	   mountable_is_automount (mountable));
-  
   reply = NULL;
-  
   if (mountable != NULL && do_automount &&
       mountable_is_automount (mountable))
     {
       GMountOperation *op;
-      GError *mount_error;
+      AutoMountData *data;
 
       g_print ("automounting...\n");
-      
-      mount_error = NULL;
-      op = mountable_mount (mountable, spec, &error);
-      g_print ("op = %p\n", op);
-      
-      if (op == NULL)
-	{
-	  error = NULL;
-	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
-		       _("Error automounting location: %s"), mount_error->message);
-	  reply = _dbus_message_new_error_from_gerror (message, error);
-	  g_error_free (mount_error);
-	  g_error_free (error);
-	}
-      else
-	{
-	  AutoMountData *data = g_new0 (AutoMountData, 1);
+
+      op = mountable_mount (mountable, spec);
 	  
-	  data->tracker = tracker;
-	  data->message = dbus_message_ref (message);
-	  data->connection = dbus_connection_ref (connection);
-	  g_signal_connect (op, "done", (GCallback)automount_done, data);
-	}
+      data = g_new0 (AutoMountData, 1);
+      data->tracker = tracker;
+      data->message = dbus_message_ref (message);
+      data->connection = dbus_connection_ref (connection);
+      g_signal_connect (op, "done", (GCallback)automount_done, data);
     }
   else
     {

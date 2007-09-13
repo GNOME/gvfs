@@ -7,10 +7,14 @@
 #include <glib/gi18n.h>
 #include "mount.h"
 #include "gmountoperationdbus.h"
+#include "gvfsdaemonprotocol.h"
+#include "gdbusutils.h"
 
 struct _Mountable {
   char *type;
   char *exec;
+  char *dbus_name;
+  char *obj_path;
   gboolean automount;
 }; 
 
@@ -23,9 +27,9 @@ mount_init (void)
   char *mount_dir, *path;
   const char *filename;
   GKeyFile *keyfile;
-  char *type, *exec;
+  char **types;
   Mountable *mountable;
-  gboolean automount;
+  int i;
   
   mount_dir = MOUNTABLE_DIR;
   dir = g_dir_open (mount_dir, 0, NULL);
@@ -39,20 +43,25 @@ mount_init (void)
 	  keyfile = g_key_file_new ();
 	  if (g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, NULL))
 	    {
-	      type = g_key_file_get_string (keyfile, "Mount", "Type", NULL);
-	      exec = g_key_file_get_string (keyfile, "Mount", "Exec", NULL);
-	      automount = g_key_file_get_boolean (keyfile, "Mount", "AutoMount", NULL);
-	      if (type != NULL && exec != NULL)
+	      types = g_key_file_get_string_list (keyfile, "Mount", "Type", NULL, NULL);
+	      if (types != NULL)
 		{
-		  mountable = g_new0 (Mountable, 1);
-		  mountable->type = g_strdup (type);
-		  mountable->exec = g_strdup (exec);
-		  mountable->automount = automount;
-		  
-		  mountables = g_list_prepend (mountables, mountable);
+		  for (i = 0; types[i] != NULL; i++)
+		    {
+		      if (*types[i] != 0)
+			{
+			  mountable = g_new0 (Mountable, 1);
+			  mountable->type = g_strdup (types[i]);
+			  mountable->exec = g_key_file_get_string (keyfile, "Mount", "Exec", NULL);
+			  mountable->dbus_name = g_key_file_get_string (keyfile, "Mount", "DBusName", NULL);
+			  mountable->obj_path = g_key_file_get_string (keyfile, "Mount", "ObjPath", NULL);
+			  mountable->automount = g_key_file_get_boolean (keyfile, "Mount", "AutoMount", NULL);
+			  
+			  mountables = g_list_prepend (mountables, mountable);
+			}
+		    }
+		  g_strfreev (types);
 		}
-	      g_free (type);
-	      g_free (exec);
 	    }
 	  g_key_file_free (keyfile);
 	  g_free (path);
@@ -94,33 +103,130 @@ lookup_mountable (GMountSpec *spec)
   return find_mountable (type);
 }
 
-GMountOperation *
-mountable_mount (Mountable *mountable,
-		 GMountSpec *spec,
-		 GError **error)
+static void
+exec_mount (GMountOperationDBus *op,
+	    Mountable *mountable)
 {
   DBusConnection *conn;
   const char *id;
   char *exec;
-  gboolean res;
-  GMountOperationDBus *op;
+  GError *error;
+  
+  if (mountable->exec == NULL)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "No exec key defined for mountpoint");
+      g_mount_operation_dbus_fail_at_idle (op, error);
+      g_error_free (error);
+      return;
+    }
 
   conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
   id = dbus_bus_get_unique_name (conn);
-  dbus_connection_unref (conn);
-
-  op = g_mount_operation_dbus_new (spec);
   
   exec = g_strconcat (mountable->exec, " ", id, " ", op->obj_path, NULL);
   
-  res = g_spawn_command_line_async (exec, error);
-  g_free (exec);
-  
-  if (!res)
+  dbus_connection_unref (conn);
+
+  if (!g_spawn_command_line_async (exec, &error))
     {
-      g_object_unref (op);
-      return NULL;
+      g_mount_operation_dbus_fail_at_idle (op, error);
+      g_error_free (error);
     }
+  
+  g_free (exec);
+}
+
+static void
+dbus_mount_reply (DBusPendingCall *pending,
+		  void            *user_data)
+{
+  Mountable *mountable;
+  DBusMessage *reply;
+  DBusError derror;
+  GError *error;
+  GMountOperationDBus *op = user_data;
+
+  reply = dbus_pending_call_steal_reply (pending);
+  dbus_pending_call_unref (pending);
+
+  if (dbus_message_is_error (reply, DBUS_ERROR_NAME_HAS_NO_OWNER) ||
+      dbus_message_is_error (reply, DBUS_ERROR_SERVICE_UNKNOWN))
+    {
+      mountable = g_object_get_data (G_OBJECT (op), "mountable");
+      exec_mount (op, mountable);
+    }
+  else
+    {
+      dbus_error_init (&derror);
+      if (dbus_set_error_from_message (&derror, reply))
+	{
+	  error = NULL;
+	  _g_error_from_dbus (&derror, &error);
+	  dbus_error_free (&derror);
+	  g_mount_operation_dbus_fail_at_idle (op, error);
+	  g_error_free (error);
+	}
+    }
+  
+  dbus_message_unref (reply);
+}
+
+GMountOperation *
+mountable_mount (Mountable *mountable,
+		 GMountSpec *spec)
+{
+  DBusConnection *conn;
+  GMountOperationDBus *op;
+  DBusMessage *message;
+  DBusMessageIter iter;
+  DBusPendingCall *pending;
+
+  op = g_mount_operation_dbus_new (spec);
+  g_object_set_data (G_OBJECT (op), "mountable", mountable);
+  
+  if (mountable->dbus_name && mountable->obj_path)
+    {
+      message = dbus_message_new_method_call (mountable->dbus_name,
+					      mountable->obj_path,
+					      G_VFS_DBUS_MOUNTABLE_INTERFACE,
+					      "mount");
+      if (!dbus_message_append_args (message,
+				     DBUS_TYPE_OBJECT_PATH, &op->obj_path,
+				     0))
+	_g_dbus_oom ();
+      
+      dbus_message_iter_init_append (message, &iter);
+      g_mount_spec_to_dbus (&iter, spec);
+      
+      conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+
+      if (!dbus_connection_send_with_reply (conn, message,
+					    &pending,
+					    2000))
+	_g_dbus_oom ();
+
+      dbus_connection_unref (conn);
+      dbus_message_unref (message);
+
+      if (pending == NULL)
+	{
+	  GError *error = NULL;
+	  g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       "Error while getting peer-to-peer dbus connection: %s",
+		       "Connection is closed");
+	  g_mount_operation_dbus_fail_at_idle (op, error);
+	  g_error_free (error);
+	}
+      else if (!dbus_pending_call_set_notify (pending,
+					      dbus_mount_reply,
+					      g_object_ref (op),
+					      g_object_unref))
+	_g_dbus_oom ();
+    }
+  else
+    exec_mount (op, mountable);
   
   return G_MOUNT_OPERATION (op);
 }
