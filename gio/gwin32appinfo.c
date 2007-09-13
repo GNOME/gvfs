@@ -452,8 +452,6 @@ g_get_all_app_info_for_type (const char *content_type)
   GList *l;
   GList *infos;
 
-  g_print ("g_get_all_app_info_for_type(%s)\n", content_type);
-  
   wc_key = g_utf8_to_utf16 (content_type, -1, NULL, NULL, NULL);
   if (RegOpenKeyExW (HKEY_CLASSES_ROOT, wc_key, 0,
 		     KEY_QUERY_VALUE, &reg_key) == ERROR_SUCCESS)
@@ -528,7 +526,24 @@ g_get_all_app_info_for_type (const char *content_type)
 GAppInfo *
 g_get_default_app_info_for_type (const char *content_type)
 {
-  
+  wchar_t *wtype;
+  wchar_t buffer[1024];
+  DWORD buffer_size;
+
+  wtype = g_utf8_to_utf16 (content_type, -1, NULL, NULL, NULL);
+
+  /* Verify that we have some sort of app registered for this type */
+  buffer_size = 1024;
+  if (AssocQueryStringW(0,
+			REAL_ASSOCSTR_COMMAND,
+			wtype,
+			NULL,
+			buffer,
+			&buffer_size) == S_OK)
+    /* Takes ownership of wtype */
+    return g_desktop_app_info_new_from_id (wtype, FALSE);
+
+  g_free (wtype);
   return NULL;
 }
 

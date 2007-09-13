@@ -337,7 +337,18 @@ test_appinfo (void)
 {
   GAppInfo *info;
   GList *infos, *l;
+  const char *test_type;
 
+
+#ifdef G_OS_WIN32
+  test_type = ".jpg";
+#else
+  test_type = "text/html";
+#endif
+  info = g_get_default_app_info_for_type (test_type);
+  g_print ("default app for %s: %s\n", test_type,
+	   info? g_app_info_get_name (info): "None");
+  
 #if 0
   GError *error = NULL;
 
@@ -351,8 +362,6 @@ test_appinfo (void)
 	g_print ("new info - %p: %s\n", info, g_app_info_get_name (info));
     }
   
-  info = g_get_default_app_info_for_type ("text/html");
-  g_print ("default html - %p: %s\n", info, g_app_info_get_name (info));
 
   g_print ("setting as default for x-test/gio\n");
   if (!g_app_info_set_as_default_for_type (info, "x-test/gio", NULL))
@@ -362,13 +371,8 @@ test_appinfo (void)
   g_print ("default x-test/gio - %p: %s\n", info, g_app_info_get_name (info));
 #endif
 
-#ifdef G_OS_WIN32
-  infos = g_get_all_app_info_for_type (".jpg");
-  g_print ("all jpeg app info: \n");
-#else
-  infos = g_get_all_app_info_for_type ("text/html");
-  g_print ("all html app info: \n");
-#endif
+  infos = g_get_all_app_info_for_type (test_type);
+  g_print ("all %s app info: \n", test_type);
   for (l = infos; l != NULL; l = l->next)
     {
       info = l->data;
