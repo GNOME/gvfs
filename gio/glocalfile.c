@@ -627,18 +627,43 @@ g_local_file_query_settable_attributes (GFile                      *file,
 				  G_FILE_ATTRIBUTE_UNIX_MODE,
 				  G_FILE_ATTRIBUTE_TYPE_UINT32,
 				  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE);
+  
+#ifdef HAVE_CHOWN
   g_file_attribute_info_list_add (list,
 				  G_FILE_ATTRIBUTE_UNIX_UID,
 				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE);
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
   g_file_attribute_info_list_add (list,
 				  G_FILE_ATTRIBUTE_UNIX_GID,
 				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE);
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+#endif
+  
+#ifdef HAVE_SYMLINK
   g_file_attribute_info_list_add (list,
 				  G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET,
 				  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
 				  0);
+#endif
+  
+#ifdef HAVE_UTIMES
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_MODIFIED,
+				  G_FILE_ATTRIBUTE_TYPE_UINT64,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_ACCESS,
+				  G_FILE_ATTRIBUTE_TYPE_UINT64,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+#endif
   
   return list;
 }

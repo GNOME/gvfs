@@ -35,7 +35,7 @@ CFLAGS=$saved_CFLAGS
 
 AC_CHECK_HEADERS([pwd.h])
 
-AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link statvfs statfs)
+AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link statvfs statfs utimes)
 
 AC_CHECK_HEADERS(sys/vfs.h sys/mount.h sys/statfs.h sys/statvfs.h sys/param.h)
 			     

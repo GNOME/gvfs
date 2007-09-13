@@ -1,5 +1,6 @@
 #include <config.h>
 
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -810,6 +811,23 @@ get_uint32 (const GFileAttributeValue *value,
   return TRUE;
 }
 
+static gboolean
+get_uint64 (const GFileAttributeValue *value,
+	    guint64 *val_out,
+	    GError **error)
+{
+  if (value->type != G_FILE_ATTRIBUTE_TYPE_UINT64)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		   _("Invalid attribute type (uint64 expected)"));
+      return FALSE;
+    }
+
+  *val_out = value->u.uint64;
+  
+  return TRUE;
+}
+
 #if defined(HAVE_SYMLINK)
 static gboolean
 get_byte_string (const GFileAttributeValue *value,
@@ -898,6 +916,7 @@ set_unix_uid_gid (char *filename,
 }
 #endif
 
+#ifdef HAVE_SYMLINK
 static gboolean
 set_symlink (char *filename,
 	     const GFileAttributeValue *value,
@@ -953,6 +972,107 @@ set_symlink (char *filename,
   
   return TRUE;
 }
+#endif
+
+static int
+lazy_stat (char *filename, struct stat *statbuf, gboolean *called_stat)
+{
+  int res;
+
+  if (*called_stat)
+    return 0;
+  
+  res = g_stat (filename, statbuf);
+  
+  if (res == 0)
+    *called_stat = TRUE;
+  
+  return res;
+}
+
+
+#ifdef HAVE_UTIMES
+static gboolean
+set_mtime_atime (char *filename,
+		 const GFileAttributeValue *mtime_value,
+		 const GFileAttributeValue *mtime_usec_value,
+		 const GFileAttributeValue *atime_value,
+		 const GFileAttributeValue *atime_usec_value,
+		 GError **error)
+{
+  int res;
+  guint64 val;
+  guint32 val_usec;
+  struct stat statbuf;
+  gboolean got_stat = FALSE;
+  struct timeval times[2] = { {0, 0}, {0, 0} };
+
+  /* ATIME */
+  if (atime_value)
+    {
+      if (!get_uint64 (atime_value, &val, error))
+	return FALSE;
+      times[0].tv_sec = val;
+    }
+  else
+    {
+      if (lazy_stat (filename, &statbuf, &got_stat) == 0)
+	{
+	  times[0].tv_sec = statbuf.st_mtime;
+#if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
+	  times[0].tv_usec = statbuf.st_atimensec / 1000;
+#elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
+	  times[0].tv_usec = statbuf.st_atim.tv_nsec / 1000;
+#endif
+	}
+    }
+  
+  if (atime_usec_value)
+    {
+      if (!get_uint32 (atime_usec_value, &val_usec, error))
+	return FALSE;
+      times[0].tv_usec = val_usec;
+    }
+
+  /* MTIME */
+  if (mtime_value)
+    {
+      if (!get_uint64 (mtime_value, &val, error))
+	return FALSE;
+      times[1].tv_sec = val;
+    }
+  else
+    {
+      if (lazy_stat (filename, &statbuf, &got_stat) == 0)
+	{
+	  times[1].tv_sec = statbuf.st_mtime;
+#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
+	  times[1].tv_usec = statbuf.st_mtimensec / 1000;
+#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
+	  times[1].tv_usec = statbuf.st_mtim.tv_nsec / 1000;
+#endif
+	}
+    }
+  
+  if (mtime_usec_value)
+    {
+      if (!get_uint32 (mtime_usec_value, &val_usec, error))
+	return FALSE;
+      times[1].tv_usec = val_usec;
+    }
+  
+  res = utimes(filename, times);
+  if (res == -1)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error setting owner: %s"),
+		   g_strerror (errno));
+	  return FALSE;
+    }
+  return TRUE;
+}
+#endif
 
 gboolean
 _g_local_file_info_set_attribute (char *filename,
@@ -975,7 +1095,18 @@ _g_local_file_info_set_attribute (char *filename,
 #ifdef HAVE_SYMLINK
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET) == 0)
     return set_symlink (filename, value, error);
-  #endif
+#endif
+
+#ifdef HAVE_UTIMES
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == 0)
+    return set_mtime_atime (filename, value, NULL, NULL, NULL, error);
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC) == 0)
+    return set_mtime_atime (filename, NULL, value, NULL, NULL, error);
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_ACCESS) == 0)
+    return set_mtime_atime (filename, NULL, NULL, value, NULL, error);
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC) == 0)
+    return set_mtime_atime (filename, NULL, NULL, NULL, value, error);
+#endif
   
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 	       _("Setting attribute %s not supported"), attribute);
