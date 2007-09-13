@@ -30,18 +30,14 @@ implement seeks in local streams
 
 remove owners from bus_name_map when they fail
 
-smb support for xattrs!
-smb support for hidden
+smb support for smbc_getxattr!
 smb - handle server going down
 
 is-slow marking for e.g. thumbnailing?
 
 add trash support
 
-Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
-
-decide how to handle not-mounted errors
-handle mounting
+decide exactly how to handle not-mounted errors and make sure its consistent
 mount daemons should re-register when new owner for vfs daemon
 
 remove dbus-gmain.[ch]? We have no server integration in common/ atm
