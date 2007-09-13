@@ -13,6 +13,7 @@ typedef struct {
 } GAsyncResult;
 
 typedef void (*GFDSourceFunc) (gpointer data,
+			       GIOCondition condition,
 			       int fd);
 
 void     _g_queue_async_result (GAsyncResult    *result,

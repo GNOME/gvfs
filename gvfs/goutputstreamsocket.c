@@ -206,10 +206,10 @@ typedef struct {
 } WriteAsyncData;
 
 static void
-write_async_cb (gpointer             _data,
+write_async_cb (WriteAsyncData *data,
+		GIOCondition condition,
 		int fd)
 {
-  WriteAsyncData *data = _data;
   GError *error = NULL;
   gssize count_written;
 

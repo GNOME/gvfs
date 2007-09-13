@@ -492,6 +492,7 @@ do_call_async (AsyncDBusCall *async_call)
 
 static void
 accept_new_fd (VfsConnectionData *data,
+	       GIOCondition condition,
 	       int fd)
 {
   int new_fd;
@@ -1209,9 +1210,9 @@ io_handler_watch_freed (void *data)
 }
 
 static gboolean
-io_handler_dispatch (GIOChannel   *source,
-                     GIOCondition  condition,
-                     gpointer      data)
+io_handler_dispatch (gpointer data,
+                     GIOCondition condition,
+                     int fd)
 {
   IOHandler *handler = data;
   guint dbus_condition = 0;
@@ -1250,9 +1251,7 @@ dbus_source_add_watch (DBusSource *dbus_source,
 {
   guint flags;
   GIOCondition condition;
-  GIOChannel *channel;
   IOHandler *handler;
-  int fd;
   
   if (!dbus_watch_get_enabled (watch))
     return;
@@ -1271,21 +1270,16 @@ dbus_source_add_watch (DBusSource *dbus_source,
   handler->dbus_source = dbus_source;
   handler->watch = watch;
 
-  /* TODO: We really don't need a full giochannel here... */
-  fd = dbus_watch_get_fd (watch);
-  channel = g_io_channel_unix_new (fd);
-  
-  handler->source = g_io_create_watch (channel, condition);
+  handler->source = _g_fd_source_new (dbus_watch_get_fd (watch),
+				      condition, dbus_source->context, NULL);
   g_source_set_callback (handler->source, (GSourceFunc) io_handler_dispatch, handler,
                          io_handler_source_finalized);
-  g_source_attach (handler->source, dbus_source->context);
   g_source_unref (handler->source);
   
   /* handler->source is owned by the context here */
   dbus_source->ios = g_slist_prepend (dbus_source->ios, handler);
   
   dbus_watch_set_data (watch, handler, io_handler_watch_freed);
-  g_io_channel_unref (channel);
 }
 
 static void

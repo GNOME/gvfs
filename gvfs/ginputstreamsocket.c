@@ -207,6 +207,7 @@ typedef struct {
 
 static void
 read_async_cb (ReadAsyncData *data,
+	       GIOCondition condition,
 	       int fd)
 {
   GError *error = NULL;
