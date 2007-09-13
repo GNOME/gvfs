@@ -1322,7 +1322,7 @@ g_mount_for_location_finish (GFile                  *location,
 gboolean
 g_file_load_contents (GFile                *file,
 		      GCancellable         *cancellable,
-		      gchar               **contents,
+		      char                **contents,
 		      gsize                *length,
 		      GError              **error)
 {
@@ -1366,7 +1366,7 @@ g_file_load_contents (GFile                *file,
   /* Zero terminate (we got an extra byte allocated for this */
   content->data[pos] = 0;
   
-  *contents = (gchar *)g_byte_array_free (content, FALSE);
+  *contents = (char *)g_byte_array_free (content, FALSE);
   
   return TRUE;
 }
@@ -1520,7 +1520,7 @@ g_file_load_contents_async (GFile                *file,
 gboolean
 g_file_load_contents_finish (GFile                *file,
 			    GAsyncResult         *res,
-			    gchar               **contents,
+			    char                **contents,
 			    gsize                *length,
 			    GError              **error)
 {
@@ -1552,7 +1552,7 @@ g_file_load_contents_finish (GFile                *file,
 			 data->pos + 1);
   data->content->data[data->pos] = 0;
   
-  *contents = (gchar *)g_byte_array_free (data->content, FALSE);
+  *contents = (char *)g_byte_array_free (data->content, FALSE);
   data->content = NULL;
 
   return TRUE;
@@ -1560,7 +1560,7 @@ g_file_load_contents_finish (GFile                *file,
 
 gboolean
 g_file_replace_contents (GFile                *file,
-			 const gchar          *contents,
+			 const char           *contents,
 			 gsize                 length,
 			 time_t                mtime,
 			 gboolean              make_backup,

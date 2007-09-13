@@ -355,7 +355,7 @@ GFileMonitor*      g_file_monitor_file               (GFile                  *fi
 
 gboolean g_file_load_contents           (GFile                *file,
 					 GCancellable         *cancellable,
-					 gchar               **contents,
+					 char                **contents,
 					 gsize                *length,
 					 GError              **error);
 void     g_file_load_contents_async     (GFile                *file,
@@ -364,18 +364,18 @@ void     g_file_load_contents_async     (GFile                *file,
 					 gpointer              user_data);
 gboolean g_file_load_contents_finish    (GFile                *file,
 					 GAsyncResult         *res,
-					 gchar               **contents,
+					 char                **contents,
 					 gsize                *length,
 					 GError              **error);
 gboolean g_file_replace_contents        (GFile                *file,
-					 const gchar          *contents,
+					 const char           *contents,
 					 gsize                 length,
 					 time_t                mtime,
 					 gboolean              make_backup,
 					 GCancellable         *cancellable,
 					 GError              **error);
 void     g_file_replace_contents_async  (GFile                *file,
-					 const gchar          *contents,
+					 const char           *contents,
 					 gsize                 length,
 					 time_t                mtime,
 					 gboolean              make_backup,
