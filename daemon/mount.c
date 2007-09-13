@@ -189,7 +189,7 @@ mountable_mount_with_name (MountData *data,
   
   if (!dbus_connection_send_with_reply (conn, message,
 					&pending,
-					2000))
+					G_VFS_DBUS_MOUNT_TIMEOUT_MSECS))
     _g_dbus_oom ();
   
   dbus_message_unref (message);

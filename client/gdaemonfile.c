@@ -958,7 +958,8 @@ g_daemon_file_mount_for_location (GFile *location,
   if (mount_operation)
     data->mount_operation = g_object_ref (mount_operation);
   
-  _g_dbus_connection_call_async (NULL, message, -1,
+  _g_dbus_connection_call_async (NULL, message,
+				 G_VFS_DBUS_MOUNT_TIMEOUT_MSECS,
 				 mount_reply, data);
  
   dbus_message_unref (message);

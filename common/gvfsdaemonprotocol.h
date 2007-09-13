@@ -43,6 +43,9 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_SPAWNER_INTERFACE "org.gtk.vfs.Spawner"
 #define G_VFS_DBUS_OP_SPAWNED "Spawned"
 
+/* Mounts time out in 10 minutes, since they can be slow, with auth, etc */
+#define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*10)
+
 typedef struct {
   guint32 command;
   guint32 seq_nr;

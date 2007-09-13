@@ -548,7 +548,7 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
   g_mount_spec_unref (browse_mount_spec);
-  
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_print ("finished mount\n");
 }
