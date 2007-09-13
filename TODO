@@ -12,11 +12,9 @@ add get_file_info_async for FileStreams
 Add async opens to GFile.
 More GFile operations (rename, move, copy, etc)
 
-Better async callback API?
+add volume/drive GFile types and ops on them (mount/unmount/eject)
 
 Add helper functions for reading/writing a whole file.
-
-Make direct callbacks in stream async calls auto-add-idle
 
 test outputstream (especially replace + backup) (and test everything else too)
 
@@ -63,6 +61,11 @@ Handle the conflicting globs (*.pcf) case and fallback to sniffing
 Move GAppInfo to Gtk+
 
 Add PRE_UNMOUNT file monitor event?
+
+Add virtual file monitor event to support inotify WRITE_CLOSE
+
+Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
+
 
 FUTURE IDEAS:
 -------------
