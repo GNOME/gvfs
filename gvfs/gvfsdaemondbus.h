@@ -41,7 +41,6 @@ DBusMessage *_g_vfs_daemon_call_sync                 (DBusMessage               
 						      DBusConnection            **connection_out,
 						      GCancellable               *cancellable,
 						      GError                    **error);
-void         _g_dbus_connection_setup_with_main      (DBusConnection             *connection);
 GFileInfo *  _g_dbus_get_file_info                   (DBusMessageIter            *iter,
 						      GFileInfoRequestFlags       requested,
 						      GError                    **error);

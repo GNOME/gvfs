@@ -129,7 +129,7 @@ g_vfs_impl_daemon_init (GVfsImplDaemon *vfs)
 
   if (vfs->bus)
     {
-      _g_dbus_connection_setup_with_main (vfs->bus);
+      _g_dbus_connection_integrate_with_main (vfs->bus);
 
       dbus_connection_add_filter (vfs->bus, session_bus_message_filter, vfs, NULL);
       

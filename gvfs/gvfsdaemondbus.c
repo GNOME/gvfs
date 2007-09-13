@@ -43,16 +43,19 @@ static GOnce once_init_dbus = G_ONCE_INIT;
 
 static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
 
+/* bus name -> dbus id */
 static GHashTable *bus_name_map = NULL;
 G_LOCK_DEFINE_STATIC(bus_name_map);
+
+/* dbus id -> async connection */
+static GHashTable *owner_map = NULL;
+G_LOCK_DEFINE_STATIC(owner_map);
 
 static GHashTable *obj_path_map = NULL;
 G_LOCK_DEFINE_STATIC(obj_path_map);
 
+
 static DBusConnection *get_connection_for_owner             (const char      *owner);
-static DBusSource *    connection_setup_with_main_and_owner (DBusConnection  *connection,
-							     const char      *owner);
-static void            dbus_source_destroy                  (DBusSource      *dbus_source);
 static DBusConnection *get_connection_sync                  (const char      *bus_name,
 							     GError         **error);
 
@@ -308,6 +311,33 @@ set_owner_for_name (const char *bus_name, const char *owner)
   G_UNLOCK (bus_name_map);
 }
 
+static DBusConnection *
+get_connection_for_owner (const char *owner)
+{
+  DBusConnection *connection;
+
+  connection = NULL;
+  G_LOCK (owner_map);
+  if (owner_map != NULL)
+    connection = g_hash_table_lookup (owner_map, owner);
+  if (connection)
+    dbus_connection_ref (connection);
+  G_UNLOCK (owner_map);
+  
+  return connection;
+}
+
+static void
+set_connection_for_owner (DBusConnection *connection, const char *owner)
+{
+  G_LOCK (owner_map);
+  if (owner_map == NULL)
+    owner_map = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify)dbus_connection_unref);
+      
+  g_hash_table_insert (owner_map, g_strdup (owner), connection);
+  dbus_connection_ref (connection);
+  G_UNLOCK (owner_map);
+}
 
 static void
 free_local_connections (ThreadLocalConnections *local)
@@ -436,7 +466,6 @@ _g_dbus_connection_get_fd_async (DBusConnection *connection,
     }
 }
 
-
 typedef struct {
   const char *bus_name;
   char *owner;
@@ -455,7 +484,6 @@ typedef struct {
   gulong cancelled_tag;
   
   DBusConnection *private_bus;
-  DBusSource *dbus_source;
 } AsyncDBusCall;
 
 static void
@@ -469,12 +497,13 @@ async_dbus_call_finish (AsyncDBusCall *async_call,
 			async_call->op_callback_data,
 			async_call->callback_data);
 
-  if (async_call->dbus_source != NULL)
+  if (async_call->private_bus)
     {
-      dbus_source_destroy (async_call->dbus_source);
-      g_source_unref ((GSource *)async_call->dbus_source);
+      dbus_connection_close (async_call->private_bus);
+      dbus_connection_unref (async_call->private_bus);
     }
- 
+  if (async_call->connection)
+    dbus_connection_unref (async_call->connection);
   g_free (async_call->owner);
   dbus_message_unref (async_call->message);
   if (async_call->cancellable)
@@ -568,13 +597,13 @@ do_call_async (AsyncDBusCall *async_call)
   AsyncCallCancelData *cancel_data;
 
   /* If we had to create a private session, kill it now instead of later */
-  if (async_call->dbus_source != NULL)
+  if (async_call->private_bus)
     {
-      dbus_source_destroy (async_call->dbus_source);
-      g_source_unref ((GSource *)async_call->dbus_source);
-      async_call->dbus_source = NULL;
+      dbus_connection_close (async_call->private_bus);
+      dbus_connection_unref (async_call->private_bus);
+      async_call->private_bus = NULL;
     }
-  
+    
   if (!dbus_connection_send_with_reply (async_call->connection,
 					async_call->message,
 					&pending,
@@ -621,7 +650,6 @@ get_private_bus_async (AsyncDBusCall *async_call)
       /* Unfortunately dbus doesn't have an async get */
       dbus_error_init (&derror);
       async_call->private_bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);
-      dbus_connection_set_exit_on_disconnect (async_call->private_bus, FALSE);
       if (async_call->private_bus == NULL)
 	{
 	  g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
@@ -631,13 +659,10 @@ get_private_bus_async (AsyncDBusCall *async_call)
 	  g_idle_add (async_dbus_call_finish_at_idle, async_call);
 	  return FALSE;
 	}
-      
+      dbus_connection_set_exit_on_disconnect (async_call->private_bus, FALSE);
+     
       /* Connect with mainloop */
-      async_call->dbus_source =
-	connection_setup_with_main_and_owner (async_call->private_bus, NULL);
-
-      /* The connection is owned by the main context */
-      dbus_connection_unref (async_call->private_bus);
+      _g_dbus_connection_integrate_with_main (async_call->private_bus);
     }
   
   return TRUE;
@@ -654,7 +679,6 @@ async_get_connection_response (DBusPendingCall *pending,
   char *address1, *address2;
   int extra_fd;
   DBusConnection *connection, *existing_connection;
-  DBusSource *source;
 
   reply = dbus_pending_call_steal_reply (pending);
   dbus_pending_call_unref (pending);
@@ -710,16 +734,14 @@ async_get_connection_response (DBusPendingCall *pending,
     {
       async_call->connection = existing_connection;
       dbus_connection_close (connection);
+      dbus_connection_unref (connection);
     }
   else
     {  
+      _g_dbus_connection_integrate_with_main (connection);
+      set_connection_for_owner (connection, async_call->owner);
       async_call->connection = connection;
-      source = connection_setup_with_main_and_owner (connection,
-						     async_call->owner);
-      g_source_unref ((GSource *)source); /* Owned by context */
     }
-  
-  dbus_connection_unref (connection);
 
   /* Maybe we were canceled while setting up connection, then
    * avoid doing the operation */
@@ -759,7 +781,6 @@ open_connection_async (AsyncDBusCall *async_call)
     oom ();
   
   dbus_message_unref (get_connection_message);
-  
   
   if (pending == NULL)
     {
@@ -813,9 +834,7 @@ async_get_name_owner_response (DBusPendingCall *pending,
       return;
     }
 
-
   async_call->owner = g_strdup (owner);
-
   async_call->connection = get_connection_for_owner (async_call->owner);
   if (async_call->connection == NULL)
     {
@@ -1309,517 +1328,6 @@ _g_dbus_bus_list_names_with_prefix_sync (DBusConnection *connection,
   return names;
 }
 
-/*************************************************************************
- *                                                                       *
- *      dbus mainloop integration for async ops                          *
- *                                                                       *
- *************************************************************************/
-
-/**
- * A GSource subclass for dispatching DBusConnection messages.
- * We need this on top of the IO handlers, because sometimes
- * there are messages to dispatch queued up but no IO pending.
- * 
- * The source is owned by the main context and keeps the connection
- * alive
- */
-struct DBusSource
-{
-  GSource source;             /**< the parent GSource */
-  gboolean in_finalize;
-  char *owner;
-  DBusConnection *connection; /**< the dbus connection, owned */
-  GSList *ios;                /**< all IOHandler */
-  GSList *timeouts;           /**< all TimeoutHandler */
-};
-
-typedef struct
-{
-  DBusSource *dbus_source;
-  GSource *source; /* owned by context */
-  DBusWatch *watch;
-} IOHandler;
-
-typedef struct
-{
-  DBusSource *dbus_source;
-  GSource *source; /* owned by context */
-  DBusTimeout *timeout;
-} TimeoutHandler;
-
-static GHashTable *owner_map = NULL;
-G_LOCK_DEFINE_STATIC(owner_map);
-
-static gboolean
-dbus_source_prepare (GSource *source,
-		     gint    *timeout)
-{
-  DBusConnection *connection = ((DBusSource *)source)->connection;
-  
-  *timeout = -1;
-
-  return (dbus_connection_get_dispatch_status (connection) == DBUS_DISPATCH_DATA_REMAINS);  
-}
-
-static gboolean
-dbus_source_check (GSource *source)
-{
-  return FALSE;
-}
-
-static gboolean
-dbus_source_dispatch (GSource     *source,
-		      GSourceFunc  callback,
-		      gpointer     user_data)
-{
-  DBusConnection *connection = ((DBusSource *)source)->connection;
-
-  dbus_connection_ref (connection);
-
-  /* Only dispatch once - we don't want to starve other GSource */
-  dbus_connection_dispatch (connection);
-  
-  dbus_connection_unref (connection);
-
-  return TRUE;
-}
-
-static void
-io_handler_source_finalized (gpointer data)
-{
-  IOHandler *handler = data;
-  DBusSource *dbus_source;
-
-  dbus_source = handler->dbus_source;
-
-  /* Source was finalized */
-  handler->source = NULL;
-  
-  if (dbus_source)
-    dbus_source->ios = g_slist_remove (dbus_source->ios, handler);
-  
-  if (handler->watch)
-    dbus_watch_set_data (handler->watch, NULL, NULL);
-  
-  g_free (handler);
-}
-
-static void
-io_handler_destroy_source (void *data)
-{
-  IOHandler *handler = data;
-
-  if (handler->source)
-    g_source_destroy (handler->source);
-}
-
-static void
-io_handler_watch_freed (void *data)
-{
-  IOHandler *handler = data;
-
-  handler->watch = NULL;
-
-  io_handler_destroy_source (handler);
-}
-
-static gboolean
-io_handler_dispatch (gpointer data,
-                     GIOCondition condition,
-                     int fd)
-{
-  IOHandler *handler = data;
-  guint dbus_condition = 0;
-  DBusConnection *connection;
-
-  connection = handler->dbus_source->connection;
-  
-  if (connection)
-    dbus_connection_ref (connection);
-  
-  if (condition & G_IO_IN)
-    dbus_condition |= DBUS_WATCH_READABLE;
-  if (condition & G_IO_OUT)
-    dbus_condition |= DBUS_WATCH_WRITABLE;
-  if (condition & G_IO_ERR)
-    dbus_condition |= DBUS_WATCH_ERROR;
-  if (condition & G_IO_HUP)
-    dbus_condition |= DBUS_WATCH_HANGUP;
-
-  /* Note that we don't touch the handler after this, because
-   * dbus may have disabled the watch and thus killed the
-   * handler.
-   */
-  dbus_watch_handle (handler->watch, dbus_condition);
-  handler = NULL;
-
-  if (connection)
-    dbus_connection_unref (connection);
-  
-  return TRUE;
-}
-
-static void
-dbus_source_add_watch (DBusSource *dbus_source,
-		       DBusWatch *watch)
-{
-  guint flags;
-  GIOCondition condition;
-  IOHandler *handler;
-
-  if (!dbus_watch_get_enabled (watch))
-    return;
-  
-  g_assert (dbus_watch_get_data (watch) == NULL);
-  
-  flags = dbus_watch_get_flags (watch);
-
-  condition = G_IO_ERR | G_IO_HUP;
-  if (flags & DBUS_WATCH_READABLE)
-    condition |= G_IO_IN;
-  if (flags & DBUS_WATCH_WRITABLE)
-    condition |= G_IO_OUT;
-
-  handler = g_new0 (IOHandler, 1);
-  handler->dbus_source = dbus_source;
-  handler->watch = watch;
-
-  handler->source = _g_fd_source_new (dbus_watch_get_fd (watch),
-				      condition, NULL);
-  g_source_set_callback (handler->source, (GSourceFunc) io_handler_dispatch, handler,
-                         io_handler_source_finalized);
-  g_source_unref (handler->source);
-  
-  /* handler->source is owned by the context here */
-  dbus_source->ios = g_slist_prepend (dbus_source->ios, handler);
-  
-  dbus_watch_set_data (watch, handler, io_handler_watch_freed);
-}
-
-static void
-dbus_source_remove_watch (DBusSource *dbus_source,
-			  DBusWatch *watch)
-{
-  IOHandler *handler;
-
-  handler = dbus_watch_get_data (watch);
-
-  if (handler == NULL)
-    return;
-  
-  io_handler_destroy_source (handler);
-}
-
-static void
-timeout_handler_source_finalized (gpointer data)
-{
-  TimeoutHandler *handler = data;
-  DBusSource *dbus_source;
-
-  dbus_source = handler->dbus_source;
-
-  /* Source was finalized */
-  handler->source = NULL;
-  
-  if (dbus_source)
-    dbus_source->timeouts = g_slist_remove (dbus_source->timeouts, handler);
-  
-  if (handler->timeout)
-    dbus_timeout_set_data (handler->timeout, NULL, NULL);
-  
-  g_free (handler);
-}
-
-static void
-timeout_handler_destroy_source (void *data)
-{
-  TimeoutHandler *handler = data;
-
-  if (handler->source)
-    g_source_destroy (handler->source);
-}
-
-static void
-timeout_handler_timeout_freed (void *data)
-{
-  TimeoutHandler *handler = data;
-
-  handler->timeout = NULL;
-
-  timeout_handler_destroy_source (handler);
-}
-
-static gboolean
-timeout_handler_dispatch (gpointer      data)
-{
-  TimeoutHandler *handler = data;
-
-  dbus_timeout_handle (handler->timeout);
-  
-  return TRUE;
-}
-
-static void
-dbus_source_add_timeout (DBusSource *dbus_source,
-			 DBusTimeout *timeout)
-{
-  TimeoutHandler *handler;
-  
-  if (!dbus_timeout_get_enabled (timeout))
-    return;
-  
-  g_assert (dbus_timeout_get_data (timeout) == NULL);
-
-  handler = g_new0 (TimeoutHandler, 1);
-  handler->dbus_source = dbus_source;
-  handler->timeout = timeout;
-
-  handler->source = g_timeout_source_new (dbus_timeout_get_interval (timeout));
-  g_source_set_callback (handler->source, timeout_handler_dispatch, handler,
-                         timeout_handler_source_finalized);
-  g_source_attach (handler->source, NULL);
-  g_source_unref (handler->source);
-
-  /* handler->source is owned by the context here */
-  dbus_source->timeouts = g_slist_prepend (dbus_source->timeouts, handler);
-
-  dbus_timeout_set_data (timeout, handler, timeout_handler_timeout_freed);
-}
-
-static void
-dbus_source_remove_timeout (DBusSource *source,
-			    DBusTimeout *timeout)
-{
-  TimeoutHandler *handler;
-  
-  handler = dbus_timeout_get_data (timeout);
-
-  if (handler == NULL)
-    return;
-  
-  timeout_handler_destroy_source (handler);
-}
-
-static dbus_bool_t
-add_watch (DBusWatch *watch,
-	   gpointer   data)
-{
-  DBusSource *dbus_source = data;
-
-  dbus_source_add_watch (dbus_source, watch);
-  
-  return TRUE;
-}
-
-static void
-remove_watch (DBusWatch *watch,
-	      gpointer   data)
-{
-  DBusSource *dbus_source = data;
-
-  dbus_source_remove_watch (dbus_source, watch);
-}
-
-static void
-watch_toggled (DBusWatch *watch,
-               void      *data)
-{
-  /* Because we just exit on OOM, enable/disable is
-   * no different from add/remove */
-  if (dbus_watch_get_enabled (watch))
-    add_watch (watch, data);
-  else
-    remove_watch (watch, data);
-}
-
-static dbus_bool_t
-add_timeout (DBusTimeout *timeout,
-	     void        *data)
-{
-  DBusSource *source = data;
-  
-  if (!dbus_timeout_get_enabled (timeout))
-    return TRUE;
-
-  dbus_source_add_timeout (source, timeout);
-
-  return TRUE;
-}
-
-static void
-remove_timeout (DBusTimeout *timeout,
-		void        *data)
-{
-  DBusSource *source = data;
-
-  dbus_source_remove_timeout (source, timeout);
-}
-
-static void
-timeout_toggled (DBusTimeout *timeout,
-                 void        *data)
-{
-  /* Because we just exit on OOM, enable/disable is
-   * no different from add/remove
-   */
-  if (dbus_timeout_get_enabled (timeout))
-    add_timeout (timeout, data);
-  else
-    remove_timeout (timeout, data);
-}
-
-static void
-wakeup_main (void *data)
-{
-  DBusSource *source = data;
-
-  if (!source->in_finalize)
-    g_main_context_wakeup (NULL);
-}
-
-static void
-dbus_source_finalize (GSource *source)
-{
-  DBusSource *dbus_source = (DBusSource *)source;
-  GSList *l;
-
-  dbus_source->in_finalize = TRUE;
-
-  if (dbus_source->owner)
-    {
-      G_LOCK (owner_map);
-      if (owner_map)
-	g_hash_table_remove (owner_map,
-			     dbus_source->owner);
-      G_UNLOCK (owner_map);
-      g_free (dbus_source->owner);
-    }
-      
-  dbus_connection_close (dbus_source->connection);
-  dbus_connection_unref (dbus_source->connection);
-  
-  /* At this point we can't free the sources, because
-   * that results in a deadlock on the context lock.
-   * However, there is only two reasons for the dbus
-   * source to be finalized, either the main context
-   * died, and then all sources will be unref:ed anyway,
-   * or because we manually destroyed it, and
-   * dbus_source_destroy() frees all the sources anyway.
-   * We just need to free any lists here.
-   */
-
-  for (l = dbus_source->ios; l != NULL; l = l->next)
-    {
-      IOHandler *handler = l->data;
-      handler->dbus_source = NULL;
-    }
-  g_slist_free (dbus_source->ios);
-  dbus_source->ios = NULL;
-  
-  for (l = dbus_source->timeouts; l != NULL; l = l->next)
-    {
-      TimeoutHandler *handler = l->data;
-      handler->dbus_source = NULL;
-    }
-  g_slist_free (dbus_source->timeouts);
-  dbus_source->timeouts = NULL;
-}
-
-static const GSourceFuncs dbus_source_funcs = {
-  dbus_source_prepare,
-  dbus_source_check,
-  dbus_source_dispatch,
-  dbus_source_finalize,
-};
-
-static DBusConnection *
-get_connection_for_owner (const char *owner)
-{
-  DBusConnection *connection;
-  DBusSource *dbus_source;
-
-  connection = NULL;
-  G_LOCK (owner_map);
-  
-  if (owner_map != NULL)
-    {
-      dbus_source = g_hash_table_lookup (owner_map, owner);
-      
-      if (dbus_source)
-	connection = dbus_source->connection;
-    }
-  G_UNLOCK (owner_map);
-  
-  return connection;
-}
-
-static void
-dbus_source_destroy (DBusSource *dbus_source)
-{
-  while (dbus_source->ios)
-    io_handler_destroy_source (dbus_source->ios->data);
-
-  while (dbus_source->timeouts)
-    timeout_handler_destroy_source (dbus_source->timeouts->data);
-
-  g_source_destroy ((GSource *)dbus_source);
-}
-
-static DBusSource *
-connection_setup_with_main_and_owner (DBusConnection *connection,
-				      const char *owner)
-{
-  DBusSource *dbus_source;
-  
-  g_assert (connection != NULL);
-
-  dbus_source = (DBusSource *)
-    g_source_new ((GSourceFuncs*)&dbus_source_funcs,
-		  sizeof (DBusSource));
-  
-  dbus_source->connection = dbus_connection_ref (connection);
-  dbus_source->owner = g_strdup (owner);
-  
-  if (!dbus_connection_set_watch_functions (connection,
-                                            add_watch,
-                                            remove_watch,
-                                            watch_toggled,
-                                            dbus_source, NULL))
-    oom ();
-
-  if (!dbus_connection_set_timeout_functions (connection,
-                                              add_timeout,
-                                              remove_timeout,
-                                              timeout_toggled,
-                                              dbus_source, NULL))
-    oom ();
-    
-  dbus_connection_set_wakeup_main_function (connection,
-					    wakeup_main,
-					    dbus_source, NULL);
-
-  g_source_attach ((GSource *)dbus_source, NULL);
-
-  if (owner)
-    {
-      G_LOCK (owner_map);
-      if (owner_map == NULL)
-	owner_map = g_hash_table_new (g_str_hash, g_str_equal);
-      g_hash_table_insert (owner_map, dbus_source->owner, dbus_source);
-      G_UNLOCK (owner_map);
-    }
-
-  return dbus_source;
-}
-
-void
-_g_dbus_connection_setup_with_main (DBusConnection *connection)
-{
-  DBusSource *source;
-  
-  source = connection_setup_with_main_and_owner (connection, NULL);
-  g_source_unref ((GSource *)source);
-}
 
 GFileInfo *
 _g_dbus_get_file_info (DBusMessageIter *iter,

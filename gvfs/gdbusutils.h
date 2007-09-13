@@ -19,13 +19,13 @@ void         _g_dbus_message_append_args             (DBusMessage               
 						      ...);
 void         _g_error_from_dbus                      (DBusError                  *derror,
 						      GError                    **error);
-//void         _g_dbus_connection_setup_with_main      (DBusConnection             *connection);
 char *       _g_dbus_unescape_bus_name               (const char                 *escaped,
 						      const char                 *end);
 void         _g_dbus_append_escaped_bus_name         (GString                    *string,
 						      gboolean                    at_start,
 						      const char                 *unescaped);
-
+void         _g_dbus_connection_integrate_with_main  (DBusConnection             *connection);
+void         _g_dbus_connection_remove_from_main     (DBusConnection             *connection);
 
 G_END_DECLS
 
