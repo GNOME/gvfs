@@ -14,6 +14,8 @@ modules_LTLIBRARIES = libgvfsdbus.la
 libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = 	\
 	gdaemonvfs.c gdaemonvfs.h \
+	gdaemonvolume.c gdaemonvolume.h \
+	gdaemonvolumemonitor.c gdaemonvolumemonitor.h \
 	gdaemonfile.c gdaemonfile.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gdaemonfileinputstream.c gdaemonfileinputstream.h \
