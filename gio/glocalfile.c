@@ -13,6 +13,8 @@
 #include "glocalfileenumerator.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
+#include "glocaldirectorymonitor.h"
+#include "glocalfilemonitor.h"
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
@@ -817,6 +819,20 @@ g_local_file_mount (GFile *file,
   g_signal_emit_by_name (mount_operation, "done", TRUE, NULL);
 }
 
+static GDirectoryMonitor*
+g_local_file_monitor_dir (GFile* file)
+{
+	GLocalFile* local_file = G_LOCAL_FILE(file);
+	return g_local_directory_monitor_start (local_file->filename);
+}
+
+static GFileMonitor*
+g_local_file_monitor_file (GFile* file)
+{
+	GLocalFile* local_file = G_LOCAL_FILE(file);
+	return g_local_file_monitor_start (local_file->filename);
+}
+
 static void
 g_local_file_file_iface_init (GFileIface *iface)
 {
@@ -845,4 +861,6 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->copy = g_local_file_copy;
   iface->move = g_local_file_move;
   iface->mount = g_local_file_mount;
+  iface->monitor_dir = g_local_file_monitor_dir;
+  iface->monitor_file = g_local_file_monitor_file;
 }

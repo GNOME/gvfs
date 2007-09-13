@@ -25,8 +25,10 @@ typedef enum {
   G_FILE_COPY_BACKUP = (1<<1)
 } GFileCopyFlags;
 
-typedef struct _GFile         GFile; /* Dummy typedef */
-typedef struct _GFileIface    GFileIface;
+typedef struct _GFile         		GFile; /* Dummy typedef */
+typedef struct _GFileIface    		GFileIface;
+typedef struct _GDirectoryMonitor       GDirectoryMonitor;
+typedef struct _GFileMonitor            GFileMonitor;
 
 typedef void (*GFileReadCallback) (GFile *file,
 				   GFileInputStream *stream,
@@ -118,7 +120,7 @@ struct _GFileIface
 					     GFileProgressCallback progress_callback,
 					     gpointer              progress_callback_data,
 					     GError              **error);
-  
+
   void                (*read_async)         (GFile                *file,
 					     int                   io_priority,
 					     GFileReadCallback     callback,
@@ -128,6 +130,9 @@ struct _GFileIface
   void               (*mount)               (GFile                  *file,
 					     GMountOperation        *mount_operation);
 
+  GDirectoryMonitor* (*monitor_dir)         (GFile                  *file);
+
+  GFileMonitor*      (*monitor_file)        (GFile                  *file);
 };
 
 GType g_file_get_type (void) G_GNUC_CONST;
@@ -258,6 +263,11 @@ gboolean           g_file_set_attribute_int64        (GFile                  *fi
 
 void               g_file_mount              (GFile                  *file,
 					      GMountOperation        *mount_operation);
+
+GDirectoryMonitor* g_file_monitor_directory          (GFile                  *file);
+
+GFileMonitor*      g_file_monitor_file               (GFile                  *file);
+
 
 G_END_DECLS
 

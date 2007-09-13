@@ -26,5 +26,4 @@ GFile * g_local_file_new (const char *filename);
 
 G_END_DECLS
 
-
 #endif /* __G_LOCAL_FILE_H__ */

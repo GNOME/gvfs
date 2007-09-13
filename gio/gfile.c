@@ -731,6 +731,27 @@ g_file_mount (GFile *file,
   (* iface->mount) (file, mount_operation);
 }
 
+GDirectoryMonitor*
+g_file_monitor_directory (GFile *file)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->monitor_dir) (file);
+}
+
+GFileMonitor*
+g_file_monitor_file (GFile *file)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->monitor_file) (file);
+}
+
+
 /********************************************
  *   Default implementation of async ops    *
  ********************************************/

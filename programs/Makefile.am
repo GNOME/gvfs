@@ -18,6 +18,8 @@ bin_PROGRAMS =					\
 	gvfs-info				\
 	gvfs-copy				\
 	gvfs-move				\
+	gvfs-monitor-file			\
+	gvfs-monitor-dir			\
 	$(NULL)
 
 gvfs_cat_SOURCES = gvfs-cat.c
@@ -40,3 +42,9 @@ gvfs_move_LDADD = $(libraries)
 
 gvfs_mount_SOURCES = gvfs-mount.c
 gvfs_mount_LDADD = $(libraries)
+
+gvfs_monitor_dir_SOURCES = gvfs-monitor-dir.c
+gvfs_monitor_dir_LDADD = $(libraries)
+
+gvfs_monitor_file_SOURCES = gvfs-monitor-file.c
+gvfs_monitor_file_LDADD = $(libraries)

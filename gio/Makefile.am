@@ -28,6 +28,10 @@ gvfs-marshal.c: gvfs-marshal.h gvfs-marshal.list $(GLIB_GENMARSHAL)
 	 $(GLIB_GENMARSHAL) --prefix=_gvfs_marshal $(srcdir)/gvfs-marshal.list --body) > $@
 
 local_sources = \
+	glocaldirectorymonitor.c \
+	glocaldirectorymonitor.h \
+	glocalfilemonitor.c \
+	glocalfilemonitor.h \
 	glocalfileenumerator.c \
 	glocalfileenumerator.h \
 	glocalfileinfo.c \
@@ -44,6 +48,11 @@ local_sources = \
 
 platform_libadd =
 appinfo_sources =
+
+if HAVE_INOTIFY
+SUBDIRS += inotify
+platform_libadd += inotify/libinotify.la
+endif
 
 if OS_UNIX
 appinfo_sources += gdesktopappinfo.c gdesktopappinfo.h
@@ -79,6 +88,8 @@ libgio_la_SOURCES = 	\
 	gcancellable.c \
 	gcontenttype.c \
 	gcontenttypeprivate.h \
+	gdirectorymonitor.c \
+	gfilemonitor.c \
 	gdrive.c \
 	gdrivepriv.h \
 	gfile.c \
@@ -131,6 +142,8 @@ gvfsinclude_HEADERS = \
 	gappinfo.h \
 	gcancellable.h \
 	gcontenttype.h \
+	gdirectorymonitor.h \
+	gfilemonitor.h \
 	gdrive.h \
 	gfile.h \
 	gfileenumerator.h \

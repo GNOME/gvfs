@@ -97,6 +97,21 @@ fi
 AC_SUBST(SELINUX_LIBS)
 
 dnl ***********************
+dnl ** Check for inotify **
+dnl ***********************
+inotify_support=no
+AC_CHECK_HEADERS([linux/inotify.h],
+[
+	inotify_support=yes
+])
+AC_CHECK_HEADERS([sys/inotify.h],
+[
+	inotify_support=yes
+])
+
+AM_CONDITIONAL(HAVE_INOTIFY, [test "$inotify_support" = "yes"])
+
+dnl ***********************
 dnl *** Check for xattr ***
 dnl ***********************
 AC_ARG_ENABLE(xattr, [  --disable-xattr           build without xattr support])
@@ -276,6 +291,7 @@ AC_OUTPUT([
 Makefile
 gio/Makefile
 gio/xdgmime/Makefile
+gio/inotify/Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
@@ -292,4 +308,5 @@ echo "
 	xattr support:        $msg_xattr
 	Samba support:	      $msg_samba
 	FUSE support:         $msg_fuse
+	inotify support:      $inotify_support
 "
