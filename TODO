@@ -20,7 +20,7 @@ test outputstream (especially replace + backup) (and test everything else too)
 
 getting selinux attrs is a bit slow, it does all sort of weird ops.
 
-Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion, etc)
+Add filter streams: data, charset conversion, etc
 
 implement readahead in GVFSReadStream, time difference
 
