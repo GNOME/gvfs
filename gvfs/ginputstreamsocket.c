@@ -205,7 +205,7 @@ typedef struct {
   GInputStreamSocket *stream;
 } ReadAsyncData;
 
-static void
+static gboolean
 read_async_cb (ReadAsyncData *data,
 	       GIOCondition condition,
 	       int fd)
@@ -247,6 +247,8 @@ read_async_cb (ReadAsyncData *data,
 		  error);
   if (error)
     g_error_free (error);
+
+  return FALSE;
 }
 
 static void

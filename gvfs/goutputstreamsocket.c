@@ -205,7 +205,7 @@ typedef struct {
   GOutputStreamSocket *stream;
 } WriteAsyncData;
 
-static void
+static gboolean
 write_async_cb (WriteAsyncData *data,
 		GIOCondition condition,
 		int fd)
@@ -247,6 +247,8 @@ write_async_cb (WriteAsyncData *data,
 		  error);
   if (error)
     g_error_free (error);
+
+  return FALSE;
 }
 
 static void

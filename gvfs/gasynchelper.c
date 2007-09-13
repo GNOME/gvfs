@@ -77,8 +77,7 @@ fd_source_dispatch (GSource     *source,
 
   g_assert (func != NULL);
 
-  (*func) (user_data, fd_source->pollfd.revents, fd_source->pollfd.fd);
-  return FALSE;
+  return (*func) (user_data, fd_source->pollfd.revents, fd_source->pollfd.fd);
 }
 
 static void 
