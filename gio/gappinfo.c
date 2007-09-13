@@ -101,6 +101,17 @@ g_app_info_get_description (GAppInfo *appinfo)
   return (* iface->get_description) (appinfo);
 }
 
+gboolean
+g_app_info_set_as_default_for_type (GAppInfo    *appinfo,
+				    const char  *content_type,
+				    GError     **error)
+{
+  GAppInfoIface *iface;
+
+  iface = G_APP_INFO_GET_IFACE (appinfo);
+
+  return (* iface->set_as_default_for_type) (appinfo, content_type, error);
+}
 
 char *
 g_app_info_get_icon (GAppInfo *appinfo)

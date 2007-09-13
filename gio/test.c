@@ -290,8 +290,18 @@ test_appinfo (void)
   GList *infos, *l;
   GAppInfo *info;
 
-  infos = g_get_all_app_info_for_type ("text/html");
+  info = g_get_default_app_info_for_type ("text/html");
+  g_print ("default html - %p: %s\n", info, g_app_info_get_name (info));
 
+  g_print ("setting as default for x-test/gio\n");
+  if (!g_app_info_set_as_default_for_type (info, "x-test/gio", NULL))
+    g_print ("Failed!");
+
+  info = g_get_default_app_info_for_type ("x-test/gio");
+  g_print ("default x-test/gio - %p: %s\n", info, g_app_info_get_name (info));
+
+  
+  infos = g_get_all_app_info_for_type ("text/html");
   g_print ("all html app info: \n");
   for (l = infos; l != NULL; l = l->next)
     {
@@ -299,9 +309,6 @@ test_appinfo (void)
       g_print ("%p: %s\n", info, g_app_info_get_name (info));
     }
 
-  info = g_get_default_app_info_for_type ("text/html");
-  g_print ("default html - %p: %s\n", info, g_app_info_get_name (info));
-  
   infos = g_get_all_app_info ();
   g_print ("all app info: \n");
   infos = g_list_sort (infos, compare_apps);

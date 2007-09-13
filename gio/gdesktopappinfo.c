@@ -11,6 +11,7 @@
 static void g_desktop_app_info_iface_init (GAppInfoIface *iface);
 
 static GList *get_all_desktop_entries_for_mime_type (const char *base_mime_type);
+static void mime_info_cache_reload (const char *dir);
 
 struct _GDesktopAppInfo
 {
@@ -692,6 +693,125 @@ g_desktop_app_info_should_show (GAppInfo *appinfo,
   return TRUE;
 }
 
+static gboolean
+ensure_dir (const char *path)
+{
+  char **split_path;
+  char *so_far;
+  int i;
+
+  if (g_file_test (path, G_FILE_TEST_IS_DIR))
+    return TRUE;
+  
+  split_path = g_strsplit (path, G_DIR_SEPARATOR_S, 0);
+  
+  so_far = g_strdup ("/");
+  for (i = 0; split_path[i] != NULL; i++)
+    {
+      char *to_check;
+      
+      to_check = g_build_filename (so_far, split_path[i], NULL);
+      g_free (so_far);
+      
+      if (!g_file_test (to_check, G_FILE_TEST_IS_DIR))
+	{
+	  if (mkdir (to_check, S_IRWXU) != 0)
+	    {
+	      g_free (to_check);
+	      g_strfreev (split_path);
+	      return FALSE;
+	    }
+	  
+	}
+    
+      so_far = to_check;
+    }
+  g_free (so_far);
+  g_strfreev (split_path);
+  
+  return TRUE;
+}
+
+static gboolean
+g_desktop_app_info_set_as_default_for_type (GAppInfo    *appinfo,
+					    const char  *content_type,
+					    GError     **error)
+{
+  GDesktopAppInfo *info = G_DESKTOP_APP_INFO (appinfo);
+  char *dirname, *filename;
+  GKeyFile *key_file;
+  gboolean load_succeeded, res;;
+  char **old_list;
+  char **list;
+  gsize length, data_size;
+  char *data;
+  int i, j;
+
+  dirname = g_build_filename (g_get_user_data_dir (), "applications", NULL);
+
+  if (!ensure_dir (dirname))
+    {
+      /* TODO: Should ensure dirname is UTF8 in error message */
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Can't create user applications dir (%s)"), dirname);
+      g_free (dirname);
+      return FALSE;
+    }
+
+  filename = g_build_filename (dirname, "defaults.list", NULL);
+  g_free (dirname);
+
+  key_file = g_key_file_new ();
+  load_succeeded = g_key_file_load_from_file (key_file, filename, G_KEY_FILE_NONE, NULL);
+  if (!load_succeeded || !g_key_file_has_group (key_file, "Default Applications"))
+    {
+      g_key_file_free (key_file);
+      key_file = g_key_file_new ();
+    }
+
+  old_list = g_key_file_get_string_list (key_file, "Default Applications",
+					 content_type, &length, NULL);
+
+  list = g_new (char *, 1 + length + 1);
+
+  i = 0;
+  list[i++] = g_strdup (info->desktop_id);
+  if (old_list)
+    {
+      for (j = 0; old_list[j] != NULL; j++)
+	{
+	  if (strcmp (old_list[j], info->desktop_id) != 0)
+	    list[i++] = g_strdup (old_list[j]);
+	}
+    }
+  list[i] = NULL;
+  
+  g_strfreev (old_list);
+
+  g_key_file_set_string_list (key_file,
+			      "Default Applications",
+			      content_type,
+			      (const char * const *)list, i);
+
+  g_strfreev (list);
+  
+  data = g_key_file_to_data (key_file, &data_size, error);
+  if (data == NULL)
+    {
+      g_free (filename);
+      return FALSE;
+    }
+  
+  res = g_file_set_contents (filename, data, data_size, error);
+
+  mime_info_cache_reload (NULL);
+			  
+  g_free (filename);
+  g_free (data);
+  
+  return res;
+}
+
 static void
 g_desktop_app_info_iface_init (GAppInfoIface *iface)
 {
@@ -704,6 +824,7 @@ g_desktop_app_info_iface_init (GAppInfoIface *iface)
   iface->supports_uris = g_desktop_app_info_supports_uris;
   iface->launch_uris = g_desktop_app_info_launch_uris;
   iface->should_show = g_desktop_app_info_should_show;
+  iface->set_as_default_for_type = g_desktop_app_info_set_as_default_for_type;
 }
 
 static gboolean
@@ -717,7 +838,6 @@ app_info_in_list (GAppInfo *info, GList *l)
     }
   return FALSE;
 }
-
 
 GList *
 g_get_all_app_info_for_type (const char *content_type)
@@ -1140,7 +1260,6 @@ mime_info_cache_dir_new (const char *path)
   return dir;
 }
 
-#if 0
 static void
 mime_info_cache_dir_free (MimeInfoCacheDir *dir)
 {
@@ -1162,7 +1281,6 @@ mime_info_cache_dir_free (MimeInfoCacheDir *dir)
   
   g_free (dir);
 }
-#endif
 
 static void
 mime_info_cache_dir_add_desktop_entries (MimeInfoCacheDir *dir,
@@ -1271,7 +1389,6 @@ mime_info_cache_new (void)
   return cache;
 }
 
-#if 0
 static void
 mime_info_cache_free (MimeInfoCache *cache)
 {
@@ -1285,16 +1402,14 @@ mime_info_cache_free (MimeInfoCache *cache)
   g_hash_table_destroy (cache->global_defaults_cache);
   g_free (cache);
 }
-#endif
 
-#if 0
 /**
  * mime_info_cache_reload:
  * @dir: directory path which needs reloading.
  * 
  * Reload the mime information for the @dir.
  */
-void
+static void
 mime_info_cache_reload (const char *dir)
 {
   /* FIXME: just reload the dir that needs reloading,
@@ -1308,8 +1423,6 @@ mime_info_cache_reload (const char *dir)
       G_UNLOCK (mime_info_cache);
     }
 }
-#endif
-
 
 static GList *
 append_desktop_entry (GList *list, const char *desktop_entry)

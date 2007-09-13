@@ -37,6 +37,9 @@ struct _GAppInfoIface
   gboolean            (*should_show)        (GAppInfo                *appinfo,
 					     const char              *desktop_env);
   gboolean            (*supports_xdg_startup_notify) (GAppInfo       *appinfo);
+  gboolean            (*set_as_default_for_type) (GAppInfo           *appinfo,
+						  const char         *content_type,
+						  GError            **error);
 };
 
 GType g_app_info_get_type (void) G_GNUC_CONST;
@@ -61,7 +64,8 @@ gboolean  g_app_info_launch_uris                 (GAppInfo    *appinfo,
 gboolean  g_app_info_should_show                 (GAppInfo    *appinfo,
 						  const char  *desktop_env);
 gboolean  g_app_info_set_as_default_for_type     (GAppInfo    *appinfo,
-						  const char  *content_type);
+						  const char  *content_type,
+						  GError     **error);
 
 GList *   g_get_all_app_info                     (void);
 GList *   g_get_all_app_info_for_type            (const char  *content_type);
