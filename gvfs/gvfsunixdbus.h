@@ -6,13 +6,13 @@
 
 G_BEGIN_DECLS
 
-DBusConnection *_g_vfs_unix_get_connection_sync (const char *mountpoint,
-						 int *extra_fd_out,
-						 GError **error);
-
-gboolean _g_dbus_message_iter_append_filename (DBusMessageIter *iter, 
-					       const char *filename);
-
+DBusConnection *_g_vfs_unix_get_connection_sync      (const char *mountpoint,
+						      int *extra_fd_out,
+						      GError **error);
+gboolean        _g_dbus_message_iter_append_filename (DBusMessageIter *iter, 
+						      const char *filename);
+gboolean         _g_error_from_dbus_message          (DBusMessage *message, 
+						      GError **error);
 
 G_END_DECLS
 

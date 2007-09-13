@@ -1,5 +1,6 @@
 #include <config.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -268,6 +269,51 @@ _g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filenam
   
   if (!dbus_message_iter_close_container (iter, &array))
     return FALSE;
+
+  return TRUE;
+}
+
+gboolean
+_g_error_from_dbus_message (DBusMessage *message, GError **error)
+{
+  const char *str;
+  const char *name;
+  char *m, *gerror_name, *end;
+  GQuark domain;
+  int code;
+
+  if (dbus_message_get_type (message) != DBUS_MESSAGE_TYPE_ERROR)
+    return FALSE;
+
+  str = NULL;
+  dbus_message_get_args (message, NULL,
+                         DBUS_TYPE_STRING, &str,
+                         DBUS_TYPE_INVALID);
+
+
+  name = dbus_message_get_error_name (message);
+  if (g_str_has_prefix (name, "org.glib.GError."))
+    {
+      gerror_name = g_strdup (name + strlen ("org.glib.GError."));
+      end = strchr (gerror_name, '.');
+      if (end)
+	*end++ = 0;
+
+      domain = g_quark_from_string (gerror_name);
+      g_free (gerror_name);
+
+      if (end)
+	code = atoi (end);
+      
+      g_set_error (error, domain, code, str);
+    }
+  else
+    {
+      m = g_strdup_printf ("DBus error %s: %s", name, str);
+      g_set_error (error, G_FILE_ERROR,
+		   G_FILE_ERROR_IO, m);
+
+    }
 
   return TRUE;
 }
