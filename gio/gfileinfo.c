@@ -523,6 +523,16 @@ get_int64 (GFileAttributeValue *value)
   return value->value.int64;
 }
 
+GObject *
+g_file_info_get_attribute_object (GFileInfo  *info,
+				  const char *attribute)
+{
+  GFileAttributeValue *value;
+
+  value = g_file_info_find_value_by_name (info, attribute);
+  return get_object (value);
+}
+
 const char *
 g_file_info_get_attribute_string (GFileInfo  *info,
 				  const char *attribute)
@@ -674,6 +684,17 @@ set_int64 (GFileAttributeValue *value, gint64 val)
   free_attribute_value (value);
   value->type = G_FILE_ATTRIBUTE_TYPE_INT64;
   value->value.int64 = val;
+}
+
+void
+g_file_info_set_attribute_object (GFileInfo  *info,
+				  const char *attribute,
+				  GObject *attr_value)
+{
+  GFileAttributeValue *value;
+
+  value = g_file_info_create_value_by_name (info, attribute);
+  set_object (value, attr_value);
 }
 
 void

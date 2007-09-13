@@ -148,7 +148,7 @@ guint64            g_file_info_get_attribute_uint64      (GFileInfo  *info,
 gint64             g_file_info_get_attribute_int64       (GFileInfo  *info,
 							  const char *attribute);
 GObject *          g_file_info_get_attribute_object      (GFileInfo  *info,
-							  GObject    *object);
+							  const char *attribute);
 void               g_file_info_set_attribute_string      (GFileInfo  *info,
 							  const char *attribute,
 							  const char *value);
