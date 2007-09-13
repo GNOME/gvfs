@@ -169,9 +169,12 @@ g_mount_source_ask_password (GMountSource *source,
   guint32 flags_as_int;
   AskPasswordData data = {0};
 
-  *password_out = NULL;
-  *user_out = NULL;
-  *domain_out = NULL;
+  if (password_out)
+    *password_out = NULL;
+  if (user_out)
+    *user_out = NULL;
+  if (domain_out)
+    *domain_out = NULL;
   
   if (source->dbus_id[0] == 0)
     return FALSE;
@@ -212,10 +215,14 @@ g_mount_source_ask_password (GMountSource *source,
   g_cond_free (data.cond);
   g_mutex_free (data.mutex);
 
-  *aborted = data.aborted;
-  *password_out = data.password;
-  *user_out = data.username;
-  *domain_out = data.domain;
+  if (aborted)
+    *aborted = data.aborted;
+  if (password_out)
+    *password_out = data.password;
+  if (user_out)
+    *user_out = data.username;
+  if (domain_out)
+    *domain_out = data.domain;
   
   return data.handled;
 }
