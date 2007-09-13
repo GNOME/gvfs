@@ -287,6 +287,7 @@ g_output_stream_socket_write_async (GOutputStream      *stream,
 			     cancellable);
   
   g_source_set_callback (source, (GSourceFunc)write_async_cb, data, write_async_data_free);
+  g_source_attach (source, NULL);
   
   g_source_unref (source);
 }

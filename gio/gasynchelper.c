@@ -130,8 +130,6 @@ _g_fd_source_new (int fd,
   fd_source->pollfd.events = events;
   g_source_add_poll (source, &fd_source->pollfd);
 
-  g_source_attach (source, NULL);
- 
   if (cancellable)
     fd_source->cancelled_tag =
       g_signal_connect_data (cancellable, "cancelled",

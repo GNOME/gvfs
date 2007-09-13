@@ -287,6 +287,8 @@ g_input_stream_socket_read_async (GInputStream        *stream,
 			     cancellable);
   
   g_source_set_callback (source, (GSourceFunc)read_async_cb, data, read_async_data_free);
+  g_source_attach (source, NULL);
+ 
   g_source_unref (source);
 }
 
