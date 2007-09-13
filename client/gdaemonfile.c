@@ -875,6 +875,24 @@ g_daemon_file_replace (GFile *file,
   return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
+
+static void
+g_daemon_file_mount_mountable (GFile               *file,
+			       GMountOperation     *mount_operation,
+			       GAsyncReadyCallback  callback,
+			       gpointer             user_data)
+{
+  
+}
+
+static GFile *
+g_daemon_file_mount_mountable_finish (GFile               *file,
+				      GAsyncResult        *result,
+				      GError             **error)
+{
+  return NULL;
+}
+
 typedef struct {
   GFile *file;
   GMountOperation *mount_operation;
@@ -998,4 +1016,6 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->read_finish = g_daemon_file_read_finish;
   iface->mount_for_location = g_daemon_file_mount_for_location;
   iface->mount_for_location_finish = g_daemon_file_mount_for_location_finish;
+  iface->mount_mountable = g_daemon_file_mount_mountable;
+  iface->mount_mountable_finish = g_daemon_file_mount_mountable_finish;
 }
