@@ -381,56 +381,27 @@ get_xattrs_from_fd (int fd,
 #endif /* defined HAVE_XATTR */
 }
 
-static GFileAccessRights
-get_access_rights (const gchar *path)
+static void
+get_access_rights (GFileAttributeMatcher *attribute_matcher,
+		   GFileInfo *info,
+		   const gchar *path)
 {
-  GFileAccessRights rights;
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_ACCESS_READ))
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_READ,
+				      g_access (path, R_OK));
   
-  /* FIXME: should check errno after calling access because we don't
-   * want to set valid_fields if something bad happened during one
-   * of the access calls
-   */
-  rights = 0;
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_ACCESS_WRITE))
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE,
+				      g_access (path, W_OK));
   
-#ifdef G_OS_WIN32
-  if (g_access (path, R_OK) == 0) {
-    rights |= G_FILE_ACCESS_CAN_READ;
-  }
-  if (g_access (path, W_OK) == 0) {
-    rights |= G_FILE_ACCESS_CAN_WRITE;
-  }
-  if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE)) {
-    rights |= G_FILE_ACCESS_CAN_EXECUTE;
-  }
-#else
-  /* Try to minimize the nr of access calls. We rely on read almost
-   * always being allowed in normal cases to keep down the number of
-   * calls needed
-   */
-  if (g_access (path, R_OK|W_OK) == 0) {
-    rights |= G_FILE_ACCESS_CAN_READ | G_FILE_ACCESS_CAN_WRITE;
-    if (g_access (path, X_OK) == 0) {
-      rights |= G_FILE_ACCESS_CAN_EXECUTE;
-    }
-  } else if (g_access (path, R_OK|X_OK) == 0) {
-    rights |= G_FILE_ACCESS_CAN_READ | G_FILE_ACCESS_CAN_EXECUTE;
-  } else {
-    if (g_access (path, R_OK) == 0) {
-      rights |= G_FILE_ACCESS_CAN_READ;
-    } else {
-      if (g_access (path, W_OK) == 0) {
-	rights |= G_FILE_ACCESS_CAN_WRITE;
-      }
-      if (g_access (path, X_OK) == 0) {
-	rights |= G_FILE_ACCESS_CAN_EXECUTE;
-      }
-    }
-  }
-#endif
-
-  /* TODO: Handle can_rename and can_delete */
-  
-  return rights;
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_ACCESS_EXECUTE))
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE,
+				      g_access (path, X_OK));
+    
+  /* TODO: Handle can_rename and can_delete. Do we really want to stat the parent for each file in a dir... */
 }
 
 static void
@@ -484,7 +455,6 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 #if defined (HAVE_STRUCT_STAT_BLOCKS)
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
 #endif
-
   
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
@@ -577,18 +547,6 @@ g_local_file_info_get (const char *basename,
     }
 
   if (g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS))
-    {
-      GFileAccessRights rights = get_access_rights (path);
-      g_file_info_set_access_rights (info, rights);
-      /* TODO: Figure out DELETE and RENAME rights */
-      g_file_info_set_access_rights_mask (info,
-					  G_FILE_ACCESS_CAN_READ |
-					  G_FILE_ACCESS_CAN_WRITE |
-					  G_FILE_ACCESS_CAN_EXECUTE);
-    }
-  
-  if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_STD_DISPLAY_NAME))
     {
       char *display_name = g_filename_display_basename (path);
@@ -677,6 +635,8 @@ g_local_file_info_get (const char *basename,
       /* TODO */
     }
 
+  get_access_rights (attribute_matcher, info, path);
+  
   get_selinux_context (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   get_xattrs (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   

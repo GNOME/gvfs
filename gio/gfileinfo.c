@@ -855,32 +855,6 @@ g_file_info_get_symlink_target (GFileInfo *info)
   return get_byte_string (value);
 }
 
-GFileAccessRights
-g_file_info_get_access_rights (GFileInfo *info)
-{
-  static guint32 attr = 0;
-  GFileAttributeValue *value;
-  
-  if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS);
-  
-  value = g_file_info_find_value (info, attr);
-  return (goffset) get_uint32 (value);
-}
-
-GFileAccessRights
-g_file_info_get_access_rights_mask (GFileInfo *info)
-{
-  static guint32 attr = 0;
-  GFileAttributeValue *value;
-  
-  if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS_MASK);
-  
-  value = g_file_info_find_value (info, attr);
-  return (goffset) get_uint32 (value);
-}
-
 /* Helper setters: */
 
 void
@@ -1027,35 +1001,6 @@ g_file_info_set_symlink_target (GFileInfo         *info,
   
   value = g_file_info_create_value (info, attr);
   set_byte_string (value, symlink_target);
-}
-
-void
-g_file_info_set_access_rights (GFileInfo         *info,
-			       GFileAccessRights  rights)
-{
-  static guint32 attr = 0;
-  GFileAttributeValue *value;
-  
-  if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS);
-  
-  value = g_file_info_create_value (info, attr);
-  set_uint32 (value, rights);
-}
-
-void
-g_file_info_set_access_rights_mask (GFileInfo         *info,
-				    GFileAccessRights  mask)
-
-{
-  static guint32 attr = 0;
-  GFileAttributeValue *value;
-  
-  if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS_MASK);
-  
-  value = g_file_info_create_value (info, attr);
-  set_uint32 (value, mask);
 }
 
 #define ON_STACK_MATCHERS 5

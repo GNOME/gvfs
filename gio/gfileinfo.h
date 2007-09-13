@@ -28,14 +28,6 @@ typedef enum {
 } GFileType;
 
 typedef enum {
-  G_FILE_ACCESS_CAN_READ = 1 << 1,
-  G_FILE_ACCESS_CAN_WRITE = 1 << 2,
-  G_FILE_ACCESS_CAN_EXECUTE = 1 << 3,
-  G_FILE_ACCESS_CAN_DELETE = 1 << 4,
-  G_FILE_ACCESS_CAN_RENAME = 1 << 5,
-} GFileAccessRights;
-
-typedef enum {
   G_FILE_ATTRIBUTE_TYPE_INVALID = 0,
   G_FILE_ATTRIBUTE_TYPE_STRING,
   G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
@@ -68,11 +60,17 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_STD_CONTENT_TYPE "std:content_type"
 #define G_FILE_ATTRIBUTE_STD_SIZE "std:size"
 #define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target"
-#define G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS "std:access_rights"
-#define G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS_MASK "std:access_rights_mask"
 #define G_FILE_ATTRIBUTE_STD_MTIME "std:mtime"
 #define G_FILE_ATTRIBUTE_STD_MTIME_USEC "std:mtime_usec"
 #define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"
+
+/* Access rights */
+
+#define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"
+#define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"
+#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:executs"
+#define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"
+#define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"
 
 /* Mountable attributes */
 
@@ -171,9 +169,6 @@ goffset           g_file_info_get_size               (GFileInfo         *info);
 void              g_file_info_get_modification_time  (GFileInfo         *info,
 						      GTimeVal          *result);
 const char *      g_file_info_get_symlink_target     (GFileInfo         *info);
-GFileAccessRights g_file_info_get_access_rights      (GFileInfo         *info);
-GFileAccessRights g_file_info_get_access_rights_mask (GFileInfo         *info);
-
 
 /* Helper setters: */
 void              g_file_info_set_file_type          (GFileInfo         *info,
@@ -196,11 +191,6 @@ void              g_file_info_set_modification_time  (GFileInfo         *info,
 						      GTimeVal          *mtime);
 void              g_file_info_set_symlink_target     (GFileInfo         *info,
 						      const char        *symlink_target);
-void              g_file_info_set_access_rights      (GFileInfo         *info,
-						      GFileAccessRights  rights);
-void              g_file_info_set_access_rights_mask (GFileInfo         *info,
-						      GFileAccessRights  mask);
-
 
 GFileAttributeMatcher *g_file_attribute_matcher_new            (const char            *attributes);
 void                   g_file_attribute_matcher_free           (GFileAttributeMatcher *matcher);
