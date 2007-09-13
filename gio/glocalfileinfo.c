@@ -34,6 +34,7 @@
 static gchar *
 read_link (const gchar *full_name)
 {
+#ifdef HAVE_READLINK
   gchar *buffer;
   guint size;
   
@@ -58,6 +59,9 @@ read_link (const gchar *full_name)
       size *= 2;
       buffer = g_realloc (buffer, size);
     }
+#else
+  return NULL;
+#endif
 }
 
 /* Get the SELinux security context */
@@ -449,8 +453,10 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 #endif
 	   )
     file_type = G_FILE_TYPE_SPECIAL;
+#ifdef S_ISLNK
   else if (S_ISLNK (statbuf->st_mode))
     file_type = G_FILE_TYPE_SYMBOLIC_LINK;
+#endif
 
   g_file_info_set_file_type (info, file_type);
   g_file_info_set_size (info, statbuf->st_size);
@@ -472,8 +478,12 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, statbuf->st_uid);
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, statbuf->st_uid);
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_RDEV, statbuf->st_rdev);
+#if defined (HAVE_STRUCT_STAT_BLKSIZE)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE, statbuf->st_blksize);
+#endif
+#if defined (HAVE_STRUCT_STAT_BLOCKS)
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
+#endif
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_ATIME, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atimensec / 1000);
@@ -523,7 +533,11 @@ g_local_file_info_get (const char *basename,
       return NULL;
     }
 
+#ifdef S_ISLNK
   is_symlink = S_ISLNK (statbuf.st_mode);
+#else
+  is_symlink = FALSE;
+#endif
   symlink_broken = FALSE;
   
   if (is_symlink)
@@ -617,14 +631,15 @@ g_local_file_info_get (const char *basename,
 #endif
       else
 	{
-	  char *mimetype;
-	  gsize sniff_length;
+	  char *content_type;
 	  
-	  mimetype = g_content_type_guess (basename, NULL, 0);
+	  content_type = g_content_type_guess (basename, NULL, 0);
 
+#ifndef G_OS_WIN32
 	  if (g_content_type_is_unknown (mimetype) && path != NULL)
 	    {
 	      guchar sniff_buffer[4096];
+	      gsize sniff_length;
 	      int fd;
 	      
 	      sniff_length = _g_unix_content_type_get_sniff_len ();
@@ -636,18 +651,20 @@ g_local_file_info_get (const char *basename,
 		{
 		  ssize_t res;
 
-		  res = read(fd, sniff_buffer, sniff_length);
+		  res = read (fd, sniff_buffer, sniff_length);
 		  close (fd);
 		  if (res != -1)
 		    {
-		      g_free (mimetype);
-		      mimetype = g_content_type_guess (basename, sniff_buffer, 0);
+		      g_free (content_type);
+		      content_type = g_content_type_guess (basename, sniff_buffer, sniff_length);
 		    }
 		  
 		}
 	    }
-	  g_file_info_set_content_type (info, mimetype);
-	  g_free (mimetype);
+#endif
+
+	  g_file_info_set_content_type (info, content_type);
+	  g_free (content_type);
 	}
             
     }

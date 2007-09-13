@@ -96,6 +96,7 @@ g_local_file_input_stream_read (GInputStream *stream,
 
   file = G_LOCAL_FILE_INPUT_STREAM (stream);
 
+  res = -1;
   while (1)
     {
       if (g_cancellable_is_cancelled (cancellable))

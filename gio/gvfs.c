@@ -77,11 +77,12 @@ g_vfs_parse_name (GVfs *vfs,
 static gpointer
 get_default_vfs (gpointer arg)
 {
+#ifdef G_OS_UNIX
   GModule *module;
   char *path;
   GVfs *vfs;
   GVfs *(*create_vfs) (void);
-  
+
   if (g_getenv ("VFS_USE_LOCAL") != NULL)
     return g_local_vfs_new ();
 
@@ -101,6 +102,8 @@ get_default_vfs (gpointer arg)
 	    return vfs;
 	}
     }
+#endif
+
   return g_local_vfs_new ();
 }
 

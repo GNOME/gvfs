@@ -150,6 +150,7 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	      goto err_out;
 	    }
 	  
+#ifdef HAVE_LINK
 	  /* create original -> backup link, the original is then renamed over */
 	  if (link (file->priv->original_filename, file->priv->backup_filename) != 0)
 	    {
@@ -159,6 +160,17 @@ g_local_file_output_stream_close (GOutputStream *stream,
 			   g_strerror (errno));
 	      goto err_out;
 	    }
+#else
+	    /* If link not supported, just rename... */
+	  if (!rename (file->priv->original_filename, file->priv->backup_filename) != 0)
+	    {
+	      g_set_error (error, G_IO_ERROR,
+			   g_io_error_from_errno (errno),
+			   _("Error creating backup copy: %s"),
+			   g_strerror (errno));
+	      goto err_out;
+	    }
+#endif
 	}
       
 
@@ -502,8 +514,16 @@ handle_overwrite_open (const char *filename,
 	}
       
       /* try to keep permissions */
-      if (fchown (tmpfd, original_stat.st_uid, original_stat.st_gid) == -1 ||
-	  fchmod (tmpfd, original_stat.st_mode) == -1)
+
+      if (
+#ifdef F_CHOWN
+	  fchown (tmpfd, original_stat.st_uid, original_stat.st_gid) == -1 ||
+#endif
+#ifdef F_CHMOD
+	  fchmod (tmpfd, original_stat.st_mode) == -1 ||
+#endif
+	  0
+	  )
 	{
 	  close (tmpfd);
 	  unlink (tmp_filename);
@@ -553,6 +573,7 @@ handle_overwrite_open (const char *filename,
        * original file. If this fails, set the protection
        * bits for the group same as the protection bits for
        * others. */
+#ifdef HAVE_FCHOWN
       if (fchown (bfd, (uid_t) -1, original_stat.st_gid) != 0)
 	{
 	  if (fchmod (bfd,
@@ -569,6 +590,7 @@ handle_overwrite_open (const char *filename,
 	      goto err_out;
 	    }
 	}
+#endif
 
       if (!copy_file_data (fd, bfd, NULL))
 	{

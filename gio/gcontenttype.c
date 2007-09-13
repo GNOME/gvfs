@@ -17,9 +17,117 @@
    can be looked up in the registry at HKEY_CLASSES_ROOT.
 */
 
+#ifdef G_OS_WIN32
+
+gboolean
+g_content_type_equals (const char   *type1,
+		       const char   *type2)
+{
+  g_return_val_if_fail (type1 != NULL, FALSE);
+  g_return_val_if_fail (type2 != NULL, FALSE);
+
+  /* TODO */
+  return FALSE;
+}
+
+gboolean
+g_content_type_is_a (const char   *type,
+		     const char   *supertype)
+{
+  g_return_val_if_fail (type != NULL, FALSE);
+  g_return_val_if_fail (supertype != NULL, FALSE);
+
+  /* TODO */
+
+  return FALSE;
+}
+
+gboolean
+g_content_type_is_unknown (const char *type)
+{
+  return strcmp ("*", type) == 0;
+}
+
+char *
+g_content_type_get_description (const char *type)
+{
+  /* TODO */
+  return NULL;
+}
+
+char *
+g_content_type_get_mime_type (const char   *type)
+{
+  /* TODO */
+  return NULL;
+}
+
+char *
+g_content_type_get_icon (const char   *type)
+{
+  /* TODO: How do we represent icons??? */
+  return NULL;
+}
+
+gboolean
+g_content_type_can_be_executable (const char   *type)
+{
+  if (strcmp (type, ".exe") == 0 ||
+      strcmp (type, ".com") == 0 ||
+      strcmp (type, ".bat") == 0)
+    return TRUE;
+  return FALSE;
+}
+
+static gboolean
+looks_like_text (const guchar *data, gsize data_size)
+{
+  gsize i;
+  for (i = 0; i < data_size; i++)
+    {
+      if g_ascii_iscntrl (data[i])
+	return FALSE;
+    }
+  return TRUE;
+}
+
+char *
+g_content_type_guess (const char   *filename,
+		      const guchar *data,
+		      gsize         data_size)
+{
+  char *basename;
+  char *type;
+  char *dot;
+
+  type = NULL;
+
+  if (filename)
+    {
+      basename = g_path_get_basename (filename);
+      dot = strrchr (basename, '.');
+      if (dot)
+	type = g_strdup (dot);
+      g_free (basename);
+    }
+
+  if (type)
+    return type;
+
+  if (data && looks_like_text (data, data_size))
+    return g_strdup (".txt");
+
+  return g_strdup ("*");
+}
 
 
-/* Unix specific version */
+GList *
+g_get_registered_content_types (void)
+{
+  return NULL;
+}
+
+#else /* !G_OS_WIN32 - Unix specific version */
 
 /* We lock this mutex whenever we modify global state in this module.  */
 G_LOCK_DEFINE_STATIC (gio_xdgmime);
@@ -73,8 +181,6 @@ _g_unix_content_type_get_parents (const char *type)
   
   return (char **)g_ptr_array_free (array, FALSE);
 }
-
-
 
 gboolean
 g_content_type_equals (const char   *type1,
@@ -276,8 +382,6 @@ g_content_type_get_description (const char *type)
   static GHashTable *type_comment_cache = NULL;
   char *comment;
   
-  /* TODO: Implement reading the xml file */
-
   G_LOCK (gio_xdgmime);
   if (type_comment_cache == NULL)
     type_comment_cache = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
@@ -492,3 +596,5 @@ g_get_registered_content_types (void)
 
   return l;
 }
+
+#endif /* Unix version */

@@ -1,6 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
+#include <stdlib.h>
 
 #include <glib.h>
 #include "gfile.h"
@@ -13,7 +14,11 @@
 static gpointer
 cancel_thread (gpointer data)
 {
+#ifdef G_OS_WIN32
+  _sleep (1);
+#else
   sleep (1);
+#endif
   g_print ("cancel_thread GO!\n");
   g_cancellable_cancel (G_CANCELLABLE (data));
   return NULL;
@@ -266,6 +271,7 @@ test_seek (void)
 }
 
 
+#if 0
 static gint
 compare_apps (gconstpointer  _a,
 	      gconstpointer  _b)
@@ -283,10 +289,12 @@ compare_apps (gconstpointer  _a,
   g_free (name_b);
   return res;
 }
+#endif
 
 static void
 test_appinfo (void)
 {
+#if 0
   GList *infos, *l;
   GAppInfo *info;
   GError *error = NULL;
@@ -330,6 +338,7 @@ test_appinfo (void)
       g_print ("%s%s\n", g_app_info_get_name (info),
 	       g_app_info_should_show (info, "GNOME")?"":" (hidden)");
     }
+#endif
 }
 
 int

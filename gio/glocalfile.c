@@ -438,6 +438,7 @@ get_uint32 (GFileAttributeType type,
   return TRUE;
 }
 
+#if defined(HAVE_SYMLINK)
 static gboolean
 get_byte_string (GFileAttributeType type,
 		 gconstpointer value,
@@ -455,7 +456,7 @@ get_byte_string (GFileAttributeType type,
   
   return TRUE;
 }
-
+#endif
 
 static gboolean
 g_local_file_set_attribute (GFile *file,
@@ -467,7 +468,6 @@ g_local_file_set_attribute (GFile *file,
 			    GError **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  int res;
 
   if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
     {
@@ -486,8 +486,10 @@ g_local_file_set_attribute (GFile *file,
 	}
       return TRUE;
     }
+#ifdef HAVE_CHOWN
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0)
     {
+      int res;
       guint32 val;
 
       if (!get_uint32 (type, value, &val, error))
@@ -508,8 +510,11 @@ g_local_file_set_attribute (GFile *file,
 	}
       return TRUE;
     }
+#endif
+#ifdef HAVE_CHOWN
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
     {
+      int res;
       guint32 val;
 
       if (!get_uint32 (type, value, &val, error))
@@ -530,6 +535,8 @@ g_local_file_set_attribute (GFile *file,
 	}
       return TRUE;
     }
+#endif
+#ifdef HAVE_SYMLINK
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET) == 0)
     {
       const char *val;
@@ -583,6 +590,7 @@ g_local_file_set_attribute (GFile *file,
 	
 	return TRUE;
     }
+  #endif
   
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Copy not supported");
   return FALSE;
@@ -684,6 +692,7 @@ g_local_file_make_symbolic_link (GFile *file,
 				 GCancellable *cancellable,
 				 GError **error)
 {
+#ifdef HAVE_SYMLINK
   GLocalFile *local = G_LOCAL_FILE (file);
   
   if (symlink (local->filename, symlink_value) == -1)
@@ -694,8 +703,11 @@ g_local_file_make_symbolic_link (GFile *file,
 		   g_strerror (errno));
       return FALSE;
     }
-  
   return TRUE;
+#else
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Symlinks not supported");
+  return FALSE;
+#endif
 }
 
 
@@ -785,7 +797,9 @@ g_local_file_move (GFile                *source,
   /* Try to inherit source permissions, etc */
   if (g_stat (local_source->filename, &statbuf) != -1)
     {
+#ifdef HAVE_CHOWN
       chown (local_destination->filename, statbuf.st_uid, statbuf.st_gid);
+#endif
       chmod (local_destination->filename, statbuf.st_mode);
     }
 

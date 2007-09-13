@@ -64,8 +64,8 @@ g_cancellable_class_init (GCancellableClass *klass)
 static void
 set_fd_nonblocking (int fd)
 {
+#ifdef F_GETFL
   glong fcntl_flags;
-
   fcntl_flags = fcntl (fd, F_GETFL);
 
 #ifdef O_NONBLOCK
@@ -75,6 +75,7 @@ set_fd_nonblocking (int fd)
 #endif
 
   fcntl (fd, F_SETFL, fcntl_flags);
+#endif
 }
 
 static void

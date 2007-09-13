@@ -4,6 +4,7 @@ Makefile.in
 *.o
 *.la
 *.lo
+*.exe
 .deps
 .libs
 test

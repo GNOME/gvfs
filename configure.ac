@@ -30,10 +30,28 @@ AH_VERBATIM([_GNU_SOURCE],
 	
 saved_CFLAGS=$CFLAGS
 AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct stat.st_atimensec, struct stat.st_atim.tv_nsec, struct stat.st_ctimensec, struct stat.st_ctim.tv_nsec])
+AC_CHECK_MEMBERS([struct stat.st_blksize, struct stat.st_blocks])
 CFLAGS=$saved_CFLAGS
 
-AC_CHECK_FUNCS(getc_unlocked)
+AC_CHECK_HEADERS([pwd.h])
+
 	
+AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link)
+
+AC_MSG_CHECKING([for Win32])
+case "$host" in
+  *-*-mingw*)
+    glib_native_win32=yes
+    ;;
+  *)
+    glib_native_win32=no
+    ;;
+esac
+
+AC_MSG_RESULT([$glib_native_win32])
+AM_CONDITIONAL(OS_WIN32, [test "$glib_native_win32" = "yes"])
+AM_CONDITIONAL(OS_UNIX, [test "$glib_native_win32" != "yes"])
+
 GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
@@ -42,13 +60,14 @@ PKG_CHECK_MODULES(GLIB, glib-2.0 gthread-2.0 gobject-2.0 gmodule-no-export-2.0)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-PKG_CHECK_MODULES(DBUS, dbus-1)
-AC_SUBST(DBUS_CFLAGS)
-AC_SUBST(DBUS_LIBS)
-AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
-DBUS_SERVICE_DIR=$with_dbus_service_dir
-AC_SUBST(DBUS_SERVICE_DIR)
-
+if test "$glib_native_win32" != yes; then
+ PKG_CHECK_MODULES(DBUS, dbus-1)
+ AC_SUBST(DBUS_CFLAGS)
+ AC_SUBST(DBUS_LIBS)
+ AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
+ DBUS_SERVICE_DIR=$with_dbus_service_dir
+ AC_SUBST(DBUS_SERVICE_DIR)
+fi
 	
 GETTEXT_PACKAGE=gvfs
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
@@ -103,14 +122,6 @@ dnl   failure. try libattr
         XATTR_LIBS="-lattr"
         msg_xattr=yes])
       ])
-
-dnl   bail if none of them was available
-    if test "x$msg_xattr" != "xyes"; then
-      echo "ERROR: Neither found glibc with extended attribute support and a <sys/xattr.h> header,"
-      echo "       nor a usable \"libattr\" extended attribute support library and a <attr/xattr.h> header."
-      echo "       Either install the required libraries/headers, or pass \"--disable-xattr\"."
-      exit 1;
-    fi
   fi
 fi
 AC_SUBST(XATTR_LIBS)
@@ -253,6 +264,7 @@ po/Makefile.in
 echo 
 echo "gvfs configuration summary:"
 echo "
+	Win32 build:          $glib_native_win32
 	SELinux support:      $msg_selinux
 	xattr support:        $msg_xattr
 	Samba support:	      $msg_samba

@@ -2,8 +2,9 @@ NULL =
 
 SUBDIRS=
 
-# TODO: Only on unix
+if OS_UNIX
 SUBDIRS += xdgmime
+endif
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
@@ -44,10 +45,16 @@ local_sources = \
 platform_libadd =
 appinfo_sources =
 
-#if OS_UNIX
+if OS_UNIX
 appinfo_sources = gdesktopappinfo.c gdesktopappinfo.h
 platform_libadd += xdgmime/libxdgmime.la
-#endif
+socket_sources = \
+	gsocketinputstream.c \
+	gsocketinputstream.h \
+	gsocketoutputstream.c \
+	gsocketoutputstream.h \
+	$(NULL)
+endif
 
 
 libgio_la_SOURCES = 	\
@@ -69,12 +76,9 @@ libgio_la_SOURCES = 	\
 	gmountoperation.h \
 	goutputstream.c \
 	gseekable.c \
-	gsocketinputstream.c \
-	gsocketinputstream.h \
-	gsocketoutputstream.c \
-	gsocketoutputstream.h \
 	gvfs.c \
 	$(appinfo_sources) \
+	$(socket_sources) \
 	$(local_sources) \
 	$(daemon_sources) \
 	$(marshal_sources) \
@@ -88,6 +92,12 @@ libgio_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(XATTR_LIBS) \
 	$(NULL)
+
+if OS_WIN32
+no_undefined = -no-undefined
+endif
+
+libgio_la_LDFLAGS= -export-dynamic $(no_undefined)
 
 gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
