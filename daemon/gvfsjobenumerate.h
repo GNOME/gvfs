@@ -27,6 +27,10 @@ struct _GVfsJobEnumerate
   GFileAttributeMatcher *attribute_matcher;
   GFileGetInfoFlags flags;
 
+  DBusMessage *building_infos;
+  DBusMessageIter building_iter;
+  DBusMessageIter building_array_iter;
+  int n_building_infos;
 };
 
 struct _GVfsJobEnumerateClass
@@ -39,6 +43,8 @@ GType g_vfs_job_enumerate_get_type (void) G_GNUC_CONST;
 GVfsJob *g_vfs_job_enumerate_new        (DBusConnection        *connection,
 					 DBusMessage           *message,
 					 GVfsBackend           *backend);
+void     g_vfs_job_enumerate_add_info   (GVfsJobEnumerate      *job,
+					 GFileInfo             *info);
 void     g_vfs_job_enumerate_add_infos  (GVfsJobEnumerate      *job,
 					 GList                 *info);
 void     g_vfs_job_enumerate_done       (GVfsJobEnumerate      *job);

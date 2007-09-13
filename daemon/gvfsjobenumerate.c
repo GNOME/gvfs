@@ -101,57 +101,67 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   return G_VFS_JOB (job);
 }
 
+static void
+send_infos (GVfsJobEnumerate *job)
+{
+  if (!dbus_message_iter_close_container (&job->building_iter, &job->building_array_iter))
+    _g_dbus_oom ();
+  
+  dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
+			job->building_infos, NULL);
+  dbus_message_unref (job->building_infos);
+  job->building_infos = NULL;
+  job->n_building_infos = 0;
+}
+
+void
+g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
+			      GFileInfo *info)
+{
+  DBusMessage *message, *orig_message;
+  
+  if (job->building_infos == NULL)
+    {
+      orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
+      
+      message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
+					      job->object_path,
+					      G_VFS_DBUS_ENUMERATOR_INTERFACE,
+					      G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO);
+      dbus_message_set_no_reply (message, TRUE);
+      
+      dbus_message_iter_init_append (message, &job->building_iter);
+      
+      if (!dbus_message_iter_open_container (&job->building_iter,
+					     DBUS_TYPE_ARRAY,
+					     G_FILE_INFO_TYPE_AS_STRING, 
+					     &job->building_array_iter))
+	_g_dbus_oom ();
+
+      job->building_infos = message;
+      job->n_building_infos = 0;
+    }
+
+  g_file_info_set_attribute_mask (info, job->attribute_matcher);
+  _g_dbus_append_file_info (&job->building_array_iter, info);
+  job->n_building_infos++;
+
+  if (job->n_building_infos == 50)
+    send_infos (job);
+}
+
 void
 g_vfs_job_enumerate_add_infos (GVfsJobEnumerate *job,
 			       GList *infos)
 {
-  DBusMessage *message, *orig_message;
-  DBusMessageIter iter, array_iter;
-  int num;
+  GList *l;
   GFileInfo *info;
 
- restart:
-  
-  orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
-  
-  message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
-					  job->object_path,
-					  G_VFS_DBUS_ENUMERATOR_INTERFACE,
-					  G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO);
-  dbus_message_set_no_reply (message, TRUE);
-
-  dbus_message_iter_init_append (message, &iter);
-
-  if (!dbus_message_iter_open_container (&iter,
-					 DBUS_TYPE_ARRAY,
-					 G_FILE_INFO_TYPE_AS_STRING, 
-					 &array_iter))
-    _g_dbus_oom ();
-  
-  num = 0;
-  while (infos != NULL)
+  for (l = infos; l != NULL; l = l->next)
     {
-      info = infos->data;
-      
-      g_file_info_set_attribute_mask (info, job->attribute_matcher);
-      
-      _g_dbus_append_file_info (&array_iter, 
-				info);
-      
-      infos = infos->next;
-      if (++num > 100)
-	break;
+      info = l->data;
+      g_vfs_job_enumerate_add_info (job, info);
     }
-
-  if (!dbus_message_iter_close_container (&iter, &array_iter))
-    _g_dbus_oom ();
-  
-  dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
-			message, NULL);
-  dbus_message_unref (message);
-
-  if (infos != NULL)
-    goto restart;
 }
 
 void
@@ -161,6 +171,9 @@ g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
   
   g_assert (!G_VFS_JOB (job)->failed);
 
+  if (job->building_infos != NULL)
+    send_infos (job);
+  
   orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
   
   message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
