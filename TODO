@@ -1,8 +1,6 @@
 gio:
 ===
 
-g_file_get_for_path -> _new_for_path? (some people wanted this)
-
 Work on GFile:
 * More async operations
 
@@ -34,7 +32,7 @@ Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
 gvfs:
 ====
-
+	
 implement readahead in GVFSReadStream, time difference
 
 implement get_file_info for GFileInputStreamDaemon, needs marshalling attributes over custom protocol
