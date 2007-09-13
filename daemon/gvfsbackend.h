@@ -28,6 +28,9 @@ typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
 typedef struct _GVfsJobRead         GVfsJobRead;
 typedef struct _GVfsJobOpenForWrite GVfsJobOpenForWrite;
+typedef struct _GVfsJobWrite        GVfsJobWrite;
+typedef struct _GVfsJobSeekWrite    GVfsJobSeekWrite;
+typedef struct _GVfsJobCloseWrite   GVfsJobCloseWrite;
 typedef struct _GVfsJobGetInfo      GVfsJobGetInfo;
 typedef struct _GVfsJobEnumerate    GVfsJobEnumerate;
 
@@ -100,6 +103,32 @@ struct _GVfsBackendClass
   void     (*create)            (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
 				 const char *filename);
+  void     (*close_write)       (GVfsBackend *backend,
+				 GVfsJobCloseWrite *job,
+				 GVfsBackendHandle handle);
+  gboolean (*try_close_write)   (GVfsBackend *backend,
+				 GVfsJobCloseWrite *job,
+				 GVfsBackendHandle handle);
+  void     (*write)             (GVfsBackend *backend,
+				 GVfsJobWrite *job,
+				 GVfsBackendHandle handle,
+				 char *buffer,
+				 gsize buffer_size);
+  gboolean (*try_write)         (GVfsBackend *backend,
+				 GVfsJobWrite *job,
+				 GVfsBackendHandle handle,
+				 char *buffer,
+				 gsize buffer_size);
+  void     (*seek_on_write)     (GVfsBackend *backend,
+				 GVfsJobSeekWrite *job,
+				 GVfsBackendHandle handle,
+				 goffset    offset,
+				 GSeekType  type);
+  gboolean (*try_seek_on_write) (GVfsBackend *backend,
+				 GVfsJobSeekWrite *job,
+				 GVfsBackendHandle handle,
+				 goffset    offset,
+				 GSeekType  type);
   void     (*get_info)          (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
 				 const char *filename,

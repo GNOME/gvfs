@@ -233,6 +233,7 @@ request_reader_free (RequestReader *reader)
   g_free (reader);
 }
 
+/* Ownership of data is passed here to avoid copying it */
 static void
 got_request (GVfsChannel *channel,
 	     GVfsDaemonSocketProtocolRequest *request,
@@ -259,11 +260,11 @@ got_request (GVfsChannel *channel,
 	  g_warning ("Ignored non-cancel request with outstanding request");
 	  /* Can't send an error reply now, that would confuse the reply
 	     to the outstanding request */
-	  return;
 	}
-
-      if (arg1 == channel->priv->current_job_seq_nr)
+      else if (arg1 == channel->priv->current_job_seq_nr)
 	g_vfs_job_cancel (channel->priv->current_job);
+      
+      g_free (data);
       return;
     }
   /* Ignore cancel with no outstanding job */
@@ -302,14 +303,14 @@ static void command_read_cb (GInputStream *input_stream,
 static void
 finish_request (RequestReader *reader)
 {
+  /* Ownership of reader->data passed here */
   got_request (reader->channel, (GVfsDaemonSocketProtocolRequest *)reader->buffer,
 	       reader->data, reader->data_len);
+  reader->data = NULL;
   
   /* Request more commands immediately, so can get cancel requests */
 
   reader->buffer_size = 0;
-  g_free (reader->data);
-  reader->data = NULL;
   reader->data_len = 0;
   g_input_stream_read_async (reader->command_stream,
 			     reader->buffer + reader->buffer_size,
