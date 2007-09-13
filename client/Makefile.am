@@ -18,6 +18,7 @@ libgvfsdbus_la_SOURCES = 	\
 	gfiledaemonlocal.c gfiledaemonlocal.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gfileinputstreamdaemon.c gfileinputstreamdaemon.h \
+	gfileoutputstreamdaemon.c gfileoutputstreamdaemon.h \
 	gfileenumeratordaemon.c gfileenumeratordaemon.h \
 	gvfsdaemondbus.c \
 	$(NULL)
