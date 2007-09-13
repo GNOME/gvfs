@@ -27,5 +27,7 @@ figure out the right semantics for error or cancel of close()
 
 Expose the seek operations on GInputStream also, not only via iface
 
+Handle closing of stream protocol fd, on both sides.
+
 Better, shorter class names...
 

@@ -26,8 +26,10 @@ struct _GVfsJob
   GObject parent_instance;
   
   GVfsBackend *backend;
+  gpointer backend_data;
   guint failed : 1;
   guint cancelled : 1;
+  guint sending_reply : 1;
   guint finished : 1;
   GError *error;
 };

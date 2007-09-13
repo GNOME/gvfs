@@ -8,6 +8,8 @@
 #include <string.h>
 
 #include <glib/gstdio.h>
+#include <gvfs/gvfserror.h>
+#include <glib/gi18n.h>
 
 #include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"
@@ -113,21 +115,16 @@ do_open_for_read (GVfsBackend *backend,
     }
 }
 
-static gboolean
-do_read (GVfsBackend *backend,
-	 GVfsJobRead *job,
-	 GVfsHandle *handle,
-	 char *buffer,
-	 gsize bytes_requested)
+static gboolean 
+read_idle_cb (gpointer data)
 {
+  GVfsJobRead *job = data;
   int fd;
   ssize_t res;
 
-  g_print ("read (%d)\n", bytes_requested);
-  
-  fd = GPOINTER_TO_INT (handle);
+  fd = GPOINTER_TO_INT (job->handle);
 
-  res = read (fd, buffer, bytes_requested);
+  res = read (fd, job->buffer, job->bytes_requested);
 
   if (res == -1)
     {
@@ -141,7 +138,36 @@ do_read (GVfsBackend *backend,
       g_vfs_job_read_set_size (job, res);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
+  
+  return FALSE;
+}
 
+static void
+read_cancelled_cb (GVfsJob *job, gpointer data)
+{
+  guint tag = GPOINTER_TO_INT (job->backend_data);
+
+  g_source_remove (tag);
+  g_vfs_job_failed (job, G_VFS_ERROR,
+		    G_VFS_ERROR_CANCELLED,
+		    _("Operation was cancelled"));
+}
+
+static gboolean
+do_read (GVfsBackend *backend,
+	 GVfsJobRead *job,
+	 GVfsHandle *handle,
+	 char *buffer,
+	 gsize bytes_requested)
+{
+  guint tag;
+
+  g_print ("read (%d)\n", bytes_requested);
+
+  tag = g_timeout_add (0, read_idle_cb, job);
+  G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (tag);
+  g_signal_connect (job, "cancelled", (GCallback)read_cancelled_cb, NULL);
+  
   return TRUE;
 }
 

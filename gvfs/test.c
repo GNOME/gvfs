@@ -152,7 +152,8 @@ static gpointer
 cancel_thread (gpointer data)
 {
   sleep (1);
-  g_input_stream_cancel (G_INPUT_STREAM (data));
+  g_print ("cancel_thread GO!\n");
+  g_cancellable_cancel (G_CANCELLABLE (data));
   return NULL;
 }
 
@@ -167,6 +168,7 @@ test_seek (void)
   GFile *file;
   GSeekable *seekable;
   GError *error;
+  GCancellable *c;
 
   file = g_file_get_for_uri ("foo:///etc/passwd");
 
@@ -184,11 +186,15 @@ test_seek (void)
   res = g_seekable_seek (seekable, 0, G_SEEK_SET, NULL, NULL);
   g_print ("seek res = %d\n", res);
 
-  res = g_input_stream_read (in, buffer2, 1024, NULL, &error);
+  c = g_cancellable_new ();
+  if (0) g_thread_create (cancel_thread, c, FALSE, NULL);
+  res = g_input_stream_read (in, buffer2, 1024, c, &error);
   g_print ("read 2 res = %d\n", res);
   if (res == -1)
     g_print ("error: %s\n", error->message);
 
+  g_object_unref (c);
+  
   if (memcmp (buffer1, buffer2, 1024) != 0)
     g_print ("Buffers differ\n");
   
@@ -223,7 +229,6 @@ main (int argc, char *argv[])
       {
 	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
 	g_print ("res1: %d\n", res);
-	g_thread_create(cancel_thread, s, FALSE, NULL);
 	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
 	g_print ("res2: %d\n", res);
       }

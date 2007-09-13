@@ -450,7 +450,6 @@ run_sync_state_machine (GUnixFileInputStream *file,
 	    }
 	  else
 	    {
-	      g_print ("io_error: %s\n", io_error->message);
 	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 			   _("Error in stream protocol: %s"), io_error->message);
 	      g_error_free (io_error);
@@ -548,6 +547,7 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 	      io_op->io_buffer = priv->output_buffer->str;
 	      io_op->io_size = priv->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
+	      return STATE_OP_WRITE;
 	    }
 	  
 	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
@@ -881,6 +881,7 @@ iterate_seek_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 	      io_op->io_buffer = priv->output_buffer->str;
 	      io_op->io_size = priv->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
+	      return STATE_OP_WRITE;
 	    }
 	  
 	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
@@ -1017,8 +1018,6 @@ g_unix_file_input_stream_seek (GFileInputStream *stream,
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
-  g_print ("g_unix_file_input_stream_seek\n");
-  
   if (!g_unix_file_input_stream_open (file, error))
     return -1;
 
