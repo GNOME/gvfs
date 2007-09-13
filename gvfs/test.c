@@ -72,17 +72,20 @@ test_sync (char *uri, gboolean dump)
   char buffer[1025];
   gssize res;
   gboolean close_res;
+  GCancellable *c;
 
   g_print ("> test_sync %s\n", uri);
+
+  c = g_cancellable_new ();
   
   file = g_file_get_for_uri (uri);
-  in = (GInputStream *)g_file_read (file, NULL, NULL);
+  in = (GInputStream *)g_file_read (file, c, NULL);
   if (in == NULL)
     goto out;
 
   while (1)
     {
-      res = g_input_stream_read (in, buffer, 1024, NULL, NULL);
+      res = g_input_stream_read (in, buffer, 1024, c, NULL);
       if (dump)
 	{
 	  if (res > 0)
@@ -98,7 +101,7 @@ test_sync (char *uri, gboolean dump)
 	break;
     }
 
-  close_res = g_input_stream_close (in, NULL, NULL);
+  close_res = g_input_stream_close (in, c, NULL);
 
   if (!dump)
     g_print ("close res: %d\n", close_res);

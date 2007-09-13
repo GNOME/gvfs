@@ -1,12 +1,13 @@
 #include <config.h>
 
-#include <stdlib.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <stdio.h>
 #include <sys/un.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 #include <errno.h>
+#include <poll.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -645,7 +646,13 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
   DBusConnection *connection;
   DBusError derror;
   DBusMessage *reply;
-  
+  DBusPendingCall *pending;
+  int dbus_fd;
+  int cancel_fd;
+  gboolean sent_cancel;
+  DBusMessage *cancel_message;
+  dbus_uint32_t serial;
+	    
   connection = get_connection_sync (mountpoint, error);
   if (connection == NULL)
     return NULL;
@@ -659,15 +666,106 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
       return NULL;
     }
 
-  /* TODO: We should handle cancellation while waiting for the reply if cancellable != NULL */
-  dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
-						     &derror);
-  if (!reply)
+  cancel_fd = g_cancellable_get_fd (cancellable);
+  if (cancel_fd != -1)
     {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return NULL;
+      if (!dbus_connection_send_with_reply (connection, message,
+					    &pending, DBUS_TIMEOUT_DEFAULT))
+	g_error ("Failed to send message (oom)");
+      
+      if (pending == NULL)
+	{
+	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       "Error while getting peer-to-peer dbus connection: %s",
+		       "Connection is closed");
+	  return NULL;
+	}
+
+      /* Make sure the message is sent */
+      dbus_connection_flush (connection);
+
+      if (!dbus_connection_get_socket (connection, &dbus_fd))
+	{
+	  dbus_pending_call_unref (pending);
+	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       "Error while getting peer-to-peer dbus connection: %s",
+		       "No fd");
+	  return NULL;
+	}
+
+      sent_cancel = FALSE;
+      while (!dbus_pending_call_get_completed (pending))
+	{
+	  struct pollfd poll_fds[2];
+	  int poll_ret;
+	  
+	  do
+	    {
+	      poll_fds[0].events = POLLIN;
+	      poll_fds[0].fd = dbus_fd;
+	      poll_fds[1].events = POLLIN;
+	      poll_fds[1].fd = cancel_fd;
+	      poll_ret = poll (poll_fds, sent_cancel?1:2, -1);
+	    }
+	  while (poll_ret == -1 && errno == EINTR);
+
+	  if (poll_ret == -1)
+	    {
+	      dbus_pending_call_unref (pending);
+	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+			   "Error while getting peer-to-peer dbus connection: %s",
+			   "poll error");
+	      return NULL;
+	    }
+	  
+	  if (!sent_cancel && g_cancellable_is_cancelled (cancellable))
+	    {
+	      sent_cancel = TRUE;
+	      serial = dbus_message_get_serial (message);
+	      cancel_message =
+		dbus_message_new_method_call (NULL,
+					      G_VFS_DBUS_DAEMON_PATH,
+					      G_VFS_DBUS_DAEMON_INTERFACE,
+					      G_VFS_DBUS_OP_CANCEL);
+	      if (cancel_message != NULL)
+		{
+		  if (dbus_message_append_args (cancel_message,
+						DBUS_TYPE_UINT32, &serial,
+						DBUS_TYPE_INVALID))
+		    {
+		      dbus_connection_send (connection, cancel_message, NULL);
+		      dbus_connection_flush (connection);
+		    }
+			    
+		  dbus_message_unref (cancel_message);
+		}
+	    }
+
+	  if (poll_fds[0].revents != 0)
+	    {
+	      dbus_connection_read_write (connection, DBUS_TIMEOUT_DEFAULT);
+
+	      while (dbus_connection_dispatch (connection) == DBUS_DISPATCH_DATA_REMAINS)
+		;
+		
+	    }
+	}
+
+      reply = dbus_pending_call_steal_reply (pending);
+      dbus_pending_call_unref (pending);
+    }
+  else
+    {
+      dbus_error_init (&derror);
+      reply = dbus_connection_send_with_reply_and_block (connection, message,
+							 DBUS_TIMEOUT_DEFAULT,
+							 &derror);
+      if (!reply)
+	{
+	  _g_error_from_dbus (&derror, error);
+	  dbus_error_free (&derror);
+	  return NULL;
+	}
     }
 
   if (connection_out)
