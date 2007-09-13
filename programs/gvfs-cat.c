@@ -28,7 +28,7 @@ cat (GFile *file)
   error = NULL;
   while (1)
     {
-      res = g_input_stream_read (in, buffer, 1024, &error);
+      res = g_input_stream_read (in, buffer, 1024, NULL, &error);
       if (res > 0)
 	{
 	  ssize_t written;
@@ -60,7 +60,7 @@ cat (GFile *file)
 
  out:
   
-  close_res = g_input_stream_close (in, &error);
+  close_res = g_input_stream_close (in, NULL, &error);
   if (!close_res)
     {
       g_printerr ("Error closing: %s\n", error->message);

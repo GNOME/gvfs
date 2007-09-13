@@ -37,18 +37,22 @@ struct _GUnixFileInputStreamPrivate {
 };
 
 static gssize     g_unix_file_input_stream_read          (GInputStream           *stream,
-							   void                   *buffer,
-							   gsize                   count,
-							   GError                **error);
+							  void                   *buffer,
+							  gsize                   count,
+							  GCancellable           *cancellable,
+							  GError                **error);
 static gssize     g_unix_file_input_stream_skip          (GInputStream           *stream,
-							   gsize                   count,
-							   GError                **error);
+							  gsize                   count,
+							  GCancellable           *cancellable,
+							  GError                **error);
 static gboolean   g_unix_file_input_stream_close         (GInputStream           *stream,
-							   GError                **error);
+							  GCancellable           *cancellable,
+							  GError                **error);
 static GFileInfo *g_unix_file_input_stream_get_file_info (GFileInputStream       *stream,
-							   GFileInfoRequestFlags   requested,
-							   char                   *attributes,
-							   GError                **error);
+							  GFileInfoRequestFlags   requested,
+							  char                   *attributes,
+							  GCancellable           *cancellable,
+							  GError                **error);
 
 static void
 g_unix_file_input_stream_finalize (GObject *object)
@@ -221,7 +225,7 @@ send_command (GUnixFileInputStream *stream, guint32 command, guint32 arg, guint3
   internal_error = NULL;
   if (g_output_stream_write_all (stream->priv->command_stream,
 				 message, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE,
-				 &bytes_written, &internal_error))
+				 &bytes_written, NULL, &internal_error))
     {
       /* This is not a cancel, because we never cancel the command stream,
        * so ignore the fact that we just sent a partial command as we have
@@ -261,6 +265,7 @@ read_outstanding_data (GUnixFileInputStream *file, char *buffer, gssize count, G
 	  internal_error = NULL;
 	  res = g_input_stream_skip (file->priv->data_stream,
 				     file->priv->outstanding_data_size,
+				     NULL,
 				     &internal_error);
 	  if (res == -1)
 	    {
@@ -287,7 +292,7 @@ read_outstanding_data (GUnixFileInputStream *file, char *buffer, gssize count, G
       count  = MIN (count, file->priv->outstanding_data_size);
       internal_error = NULL;
       res = g_input_stream_read (file->priv->data_stream,
-				 buffer, count, &internal_error);
+				 buffer, count, NULL, &internal_error);
       if (res == -1)
 	{
 	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
@@ -320,7 +325,7 @@ read_ignoring_cancel (GUnixFileInputStream *file,
       internal_error = NULL;
       ok = g_input_stream_read_all (file->priv->data_stream,
 				    ptr, count - bytes,
-				    &n_read, &internal_error);
+				    &n_read, NULL, &internal_error);
       bytes += n_read;
       ptr += n_read;
 
@@ -418,6 +423,7 @@ static gssize
 g_unix_file_input_stream_read (GInputStream *stream,
 			       void         *buffer,
 			       gsize         count,
+			       GCancellable *cancellable,
 			       GError      **error)
 {
   GUnixFileInputStream *file;
@@ -483,8 +489,9 @@ g_unix_file_input_stream_read (GInputStream *stream,
 
 static gssize
 g_unix_file_input_stream_skip (GInputStream *stream,
-				gsize         count,
-				GError      **error)
+			       gsize         count,
+			       GCancellable *cancellable,
+			       GError      **error)
 {
   GUnixFileInputStream *file;
 
@@ -498,7 +505,8 @@ g_unix_file_input_stream_skip (GInputStream *stream,
 
 static gboolean
 g_unix_file_input_stream_close (GInputStream *stream,
-				 GError      **error)
+				GCancellable *cancellable,
+				GError      **error)
 {
   GUnixFileInputStream *file;
 
@@ -515,6 +523,7 @@ static GFileInfo *
 g_unix_file_input_stream_get_file_info (GFileInputStream     *stream,
 					GFileInfoRequestFlags requested,
 					char                 *attributes,
+					GCancellable         *cancellable,
 					GError              **error)
 {
   GUnixFileInputStream *file;

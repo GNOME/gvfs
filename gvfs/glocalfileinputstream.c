@@ -24,15 +24,19 @@ struct _GLocalFileInputStreamPrivate {
 static gssize     g_local_file_input_stream_read          (GInputStream           *stream,
 							   void                   *buffer,
 							   gsize                   count,
+							   GCancellable           *cancellable,
 							   GError                **error);
 static gssize     g_local_file_input_stream_skip          (GInputStream           *stream,
 							   gsize                   count,
+							   GCancellable           *cancellable,
 							   GError                **error);
 static gboolean   g_local_file_input_stream_close         (GInputStream           *stream,
+							   GCancellable           *cancellable,
 							   GError                **error);
 static GFileInfo *g_local_file_input_stream_get_file_info (GFileInputStream       *stream,
 							   GFileInfoRequestFlags   requested,
 							   char                   *attributes,
+							   GCancellable           *cancellable,
 							   GError                **error);
 
 static void
@@ -108,6 +112,7 @@ static gssize
 g_local_file_input_stream_read (GInputStream *stream,
 				void         *buffer,
 				gsize         count,
+				GCancellable *cancellable,
 				GError      **error)
 {
   GLocalFileInputStream *file;
@@ -150,6 +155,7 @@ g_local_file_input_stream_read (GInputStream *stream,
 static gssize
 g_local_file_input_stream_skip (GInputStream *stream,
 				gsize         count,
+				GCancellable *cancellable,
 				GError      **error)
 {
   off_t res, start;
@@ -185,6 +191,7 @@ g_local_file_input_stream_skip (GInputStream *stream,
 
 static gboolean
 g_local_file_input_stream_close (GInputStream *stream,
+				GCancellable  *cancellable,
 				 GError      **error)
 {
   GLocalFileInputStream *file;
@@ -227,6 +234,7 @@ static GFileInfo *
 g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
 					 GFileInfoRequestFlags requested,
 					 char                 *attributes,
+					 GCancellable         *cancellable,
 					 GError              **error)
 {
   GLocalFileInputStream *file;

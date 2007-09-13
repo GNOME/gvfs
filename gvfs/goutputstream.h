@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include <gvfs/gvfstypes.h>
 #include <gvfs/gvfserror.h>
+#include <gvfs/gcancellable.h>
 
 G_BEGIN_DECLS
 
@@ -68,10 +69,13 @@ struct _GOutputStreamClass
   gssize      (* write)  (GOutputStream *stream,
 			  void *buffer,
 			  gsize count,
+			  GCancellable *cancellable,
 			  GError **error);
   gboolean    (* flush)	 (GOutputStream *stream,
+			  GCancellable  *cancellable,
 			  GError       **error);
   gboolean    (* close)	 (GOutputStream *stream,
+			  GCancellable  *cancellable,
 			  GError       **error);
 
   /* Async ops: (optional in derived classes) */
@@ -95,9 +99,6 @@ struct _GOutputStreamClass
 			    GDestroyNotify       notify);
   void     (* cancel)      (GOutputStream       *stream);
 
-  /* Optional cancel wakeup if using default async ops */
-  void     (* cancel_sync) (GOutputStream  *stream);
-
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
   void (*_g_reserved2) (void);
@@ -111,15 +112,19 @@ GType g_output_stream_get_type (void) G_GNUC_CONST;
 gssize        g_output_stream_write             (GOutputStream              *stream,
 						 void                       *buffer,
 						 gsize                       count,
+						 GCancellable               *cancellable,
 						 GError                    **error);
 gboolean      g_output_stream_write_all         (GOutputStream              *stream,
 						 void                       *buffer,
 						 gsize                       count,
 						 gsize                      *bytes_written,
+						 GCancellable               *cancellable,
 						 GError                    **error);
 gboolean      g_output_stream_flush             (GOutputStream              *stream,
+						 GCancellable               *cancellable,
 						 GError                    **error);
 gboolean      g_output_stream_close             (GOutputStream              *stream,
+						 GCancellable               *cancellable,
 						 GError                    **error);
 void          g_output_stream_set_async_context (GOutputStream              *stream,
 						 GMainContext               *context);

@@ -79,7 +79,7 @@ list (GFile *file)
   enumerator = g_file_enumerate_children (file, request, attributes, TRUE);
 
   error = NULL;
-  while ((info = g_file_enumerator_next_file (enumerator, &error)) != NULL)
+  while ((info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
     {
       show_info (info);
       
@@ -93,7 +93,7 @@ list (GFile *file)
       error = NULL;
     }
 	 
-  if (!g_file_enumerator_stop (enumerator, &error))
+  if (!g_file_enumerator_stop (enumerator, NULL, &error))
     {
       g_print ("Error stopping enumerator: %s\n", error->message);
       g_error_free (error);

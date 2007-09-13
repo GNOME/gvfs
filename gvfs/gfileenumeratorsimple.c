@@ -27,8 +27,10 @@ struct _GFileEnumeratorSimple
 G_DEFINE_TYPE (GFileEnumeratorSimple, g_file_enumerator_simple, G_TYPE_FILE_ENUMERATOR);
 
 static GFileInfo *g_file_enumerator_simple_next_file (GFileEnumerator  *enumerator,
+						      GCancellable     *cancellable,
 						      GError          **error);
 static gboolean   g_file_enumerator_simple_stop      (GFileEnumerator  *enumerator,
+						      GCancellable     *cancellable,
 						      GError          **error);
 
 
@@ -94,6 +96,7 @@ g_file_enumerator_simple_open_dir (GFileEnumeratorSimple *simple, GError **error
 
 static GFileInfo *
 g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
+				    GCancellable     *cancellable,
 				    GError **error)
 {
   GFileEnumeratorSimple *simple = G_FILE_ENUMERATOR_SIMPLE (enumerator);
@@ -140,6 +143,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
 
 static gboolean
 g_file_enumerator_simple_stop (GFileEnumerator *enumerator,
+			       GCancellable     *cancellable,
 			       GError          **error)
 {
   GFileEnumeratorSimple *simple = G_FILE_ENUMERATOR_SIMPLE (enumerator);

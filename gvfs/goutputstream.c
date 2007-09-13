@@ -43,7 +43,7 @@ g_output_stream_finalize (GObject *object)
   stream = G_OUTPUT_STREAM (object);
   
   if (!stream->priv->closed)
-    g_output_stream_close (stream, NULL);
+    g_output_stream_close (stream, NULL, NULL);
   
   if (stream->priv->context)
     {
@@ -83,6 +83,7 @@ g_output_stream_init (GOutputStream *stream)
  * @stream: a #GOutputStream.
  * @buffer: the buffer containing the data to write. 
  * @count: the number of bytes to write
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to write @count bytes from @buffer into the stream. Will block
@@ -97,6 +98,12 @@ g_output_stream_init (GOutputStream *stream)
  * storage in the stream. All writes either block until at least one byte
  * is written, so zero is never returned (unless @count is zero).
  * 
+ * If @cancellable is not NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned. If an
+ * operation was partially finished when the operation was cancelled the
+ * partial result will be returned, without an error.
+ *
  * On error -1 is returned and @error is set accordingly.
  * 
  * Return value: Number of bytes written, or -1 on error
@@ -105,6 +112,7 @@ gssize
 g_output_stream_write (GOutputStream *stream,
 		       void          *buffer,
 		       gsize          count,
+		       GCancellable  *cancellable,
 		       GError       **error)
 {
   GOutputStreamClass *class;
@@ -147,9 +155,15 @@ g_output_stream_write (GOutputStream *stream,
       return -1;
     }
   
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+  
   stream->priv->pending = TRUE;
-  res = class->write (stream, buffer, count, error);
+  res = class->write (stream, buffer, count, cancellable, error);
   stream->priv->pending = FALSE;
+  
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
   
   return res; 
 }
@@ -160,6 +174,7 @@ g_output_stream_write (GOutputStream *stream,
  * @buffer: the buffer containing the data to write. 
  * @count: the number of bytes to write
  * @bytes_written: location to store the number of bytes that was written to the stream
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to write @count bytes from @buffer into the stream. Will block
@@ -182,6 +197,7 @@ g_output_stream_write_all (GOutputStream *stream,
 			   void          *buffer,
 			   gsize          count,
 			   gsize         *bytes_written,
+			   GCancellable  *cancellable,
 			   GError       **error)
 {
   gsize _bytes_written;
@@ -191,7 +207,7 @@ g_output_stream_write_all (GOutputStream *stream,
   while (_bytes_written < count)
     {
       res = g_output_stream_write (stream, (char *)buffer + _bytes_written, count - _bytes_written,
-				   error);
+				   cancellable, error);
       if (res == -1)
 	{
 	  *bytes_written = _bytes_written;
@@ -211,17 +227,23 @@ g_output_stream_write_all (GOutputStream *stream,
 /**
  * g_output_stream_flush:
  * @stream: a #GOutputStream.
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Flushed any outstanding buffers in the stream. Will block during the operation.
  * Closing the stream will implicitly cause a flush.
  *
  * This function is optional for inherited classes.
+ * 
+ * If @cancellable is not NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned.
  *
  * Return value: TRUE on success, FALSE on error
  **/
 gboolean
 g_output_stream_flush (GOutputStream    *stream,
+		       GCancellable  *cancellable,
 		       GError          **error)
 {
   GOutputStreamClass *class;
@@ -245,19 +267,28 @@ g_output_stream_flush (GOutputStream    *stream,
     }
   
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
-  
-  stream->priv->pending = TRUE;
+
   res = TRUE;
   if (class->flush)
-    res = class->flush (stream, error);
-  stream->priv->pending = FALSE;
-
+    {
+      if (cancellable)
+	g_push_current_cancellable (cancellable);
+      
+      stream->priv->pending = TRUE;
+      res = class->flush (stream, cancellable, error);
+      stream->priv->pending = FALSE;
+      
+      if (cancellable)
+	g_pop_current_cancellable (cancellable);
+    }
+  
   return res;
 }
 
 /**
  * g_output_stream_close:
  * @stream: A #GOutputStream.
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Closes the stream, releasing resources related to it.
@@ -280,10 +311,15 @@ g_output_stream_flush (GOutputStream    *stream,
  * operation will finish as much as possible. A stream that failed to
  * close will still return %G_VFS_ERROR_CLOSED all operations.
  * 
+ * If @cancellable is not NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned.
+ *
  * Return value: %TRUE on success, %FALSE on failure
  **/
 gboolean
 g_output_stream_close (GOutputStream  *stream,
+		       GCancellable   *cancellable,
 		       GError        **error)
 {
   GOutputStreamClass *class;
@@ -304,24 +340,30 @@ g_output_stream_close (GOutputStream  *stream,
       return FALSE;
     }
 
-  res = g_output_stream_flush (stream, error);
+  res = g_output_stream_flush (stream, cancellable, error);
 
   stream->priv->pending = TRUE;
   
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+
   if (!res)
     {
       /* flushing caused the error that we want to return,
        * but we still want to close the underlying stream if possible
        */
       if (class->close)
-	class->close (stream, NULL);
+	class->close (stream, cancellable, NULL);
     }
   else
     {
       res = TRUE;
       if (class->close)
-	res = class->close (stream, error);
+	res = class->close (stream, cancellable, error);
     }
+  
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
   
   stream->priv->closed = TRUE;
   stream->priv->pending = FALSE;
@@ -750,7 +792,7 @@ g_output_stream_close_async (GOutputStream       *stream,
  * g_output_stream_cancel:
  * @stream: A #GOutputStream.
  *
- * Tries to cancel an outstanding request (sync or async) for the stream.
+ * Tries to cancel an outstanding async request for the stream.
  * If it succeeds the outstanding request will be report the error
  * %G_VFS_ERROR_CANCELLED.
  *
@@ -847,17 +889,6 @@ output_stream_op_free (gpointer data)
   g_free (op);
 }
 
-static void
-output_stream_op_cancel (gpointer data)
-{
-  OutputStreamOp *op = data;
-  GOutputStreamClass *class;
-
-  class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->stream);
-}
-
 typedef struct {
   OutputStreamOp      op;
   void               *buffer;
@@ -883,12 +914,13 @@ write_op_report (gpointer data)
 
 static void
 write_op_func (GIOJob *job,
+	       GCancellable *c,
 	       gpointer data)
 {
   WriteAsyncOp *op = data;
   GOutputStreamClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (c))
     {
       op->count_written = -1;
       g_set_error (&op->op.error,
@@ -899,7 +931,8 @@ write_op_func (GIOJob *job,
   else
     {
       class = G_OUTPUT_STREAM_GET_CLASS (op->op.stream);
-      op->count_written = class->write (op->op.stream, op->buffer, op->count_requested, &op->op.error);
+      op->count_written = class->write (op->op.stream, op->buffer, op->count_requested,
+					c, &op->op.error);
     }
 
   g_io_job_mark_done (job);
@@ -929,7 +962,6 @@ g_output_stream_real_write_async (GOutputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (write_op_func,
-					       output_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -956,12 +988,13 @@ flush_op_report (gpointer data)
 
 static void
 flush_op_func (GIOJob *job,
-	      gpointer data)
+	       GCancellable *c,
+	       gpointer data)
 {
   FlushAsyncOp *op = data;
   GOutputStreamClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (c))
     {
       op->result = FALSE;
       g_set_error (&op->op.error,
@@ -974,7 +1007,7 @@ flush_op_func (GIOJob *job,
       class = G_OUTPUT_STREAM_GET_CLASS (op->op.stream);
       op->result = TRUE;
       if (class->flush)
-	op->result = class->flush (op->op.stream, &op->op.error);
+	op->result = class->flush (op->op.stream, c, &op->op.error);
     }
 
   g_io_job_mark_done (job);
@@ -1000,7 +1033,6 @@ g_output_stream_real_flush_async (GOutputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (flush_op_func,
-					       output_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -1026,12 +1058,13 @@ close_op_report (gpointer data)
 
 static void
 close_op_func (GIOJob *job,
+	       GCancellable *c,
 	       gpointer data)
 {
   CloseAsyncOp *op = data;
   GOutputStreamClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (c))
     {
       op->res = FALSE;
       g_set_error (&op->op.error,
@@ -1042,7 +1075,7 @@ close_op_func (GIOJob *job,
   else
     {
       class = G_OUTPUT_STREAM_GET_CLASS (op->op.stream);
-      op->res = class->close (op->op.stream, &op->op.error);
+      op->res = class->close (op->op.stream, c, &op->op.error);
     }
 
   g_io_job_mark_done (job);
@@ -1068,7 +1101,6 @@ g_output_stream_real_close_async (GOutputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (close_op_func,
-					       output_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,

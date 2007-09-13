@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include <gvfs/gvfstypes.h>
 #include <gvfs/gvfserror.h>
+#include <gvfs/gcancellable.h>
 #include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
@@ -64,8 +65,10 @@ struct _GFileEnumeratorClass
   /* Virtual Table */
 
   GFileInfo *(*next_file)        (GFileEnumerator              *enumerator,
+				  GCancellable                 *cancellable,
 				  GError                      **error);
   gboolean   (*stop)             (GFileEnumerator              *enumerator,
+				  GCancellable                 *cancellable,
 				  GError                      **error);
 
   void       (*next_files_async) (GFileEnumerator              *enumerator,
@@ -80,18 +83,16 @@ struct _GFileEnumeratorClass
 				  gpointer                      data,
 				  GDestroyNotify                notify);
   void       (*cancel)           (GFileEnumerator              *enumerator);
-
-  /* Optional cancel wakeup if using default async ops */
-  void     (* cancel_sync)      (GFileEnumerator        *enumerator);
-  
 };
 
 
 GType g_file_enumerator_get_type (void) G_GNUC_CONST;
 
 GFileInfo *   g_file_enumerator_next_file         (GFileEnumerator                *enumerator,
+						   GCancellable                   *cancellable,
 						   GError                        **error);
 gboolean      g_file_enumerator_stop              (GFileEnumerator                *enumerator,
+						   GCancellable                   *cancellable,
 						   GError                        **error);
 void          g_file_enumerator_set_async_context (GFileEnumerator                *enumerator,
 						   GMainContext                   *context);

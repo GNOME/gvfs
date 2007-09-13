@@ -21,16 +21,19 @@ struct _GCancellableClass
 };
 
 GType g_cancellable_get_type (void) G_GNUC_CONST;
-  
+
+GCancellable *g_cancellable_new          (void);
+
 /* These are only safe to call inside a cancellable op */
-void          g_cancellable_begin        (GCancellable  **cancellable_ptr);
+gboolean      g_cancellable_is_cancelled (GCancellable *cancellable);
+int           g_cancellable_get_fd       (GCancellable *cancellable);
 GCancellable *g_get_current_cancellable  (void);
-void          g_cancellable_end          (GCancellable  **cancellable_ptr);
-gboolean      g_cancellable_is_cancelled (GCancellable   *cancellable);
-int           g_cancellable_get_fd       (GCancellable   *cancellable);
+void          g_push_current_cancellable (GCancellable *cancellable);
+void          g_pop_current_cancellable  (GCancellable *cancellable);
+void          g_cancellable_reset        (GCancellable *cancellable);
 
 /* This is safe to call from another thread */
-void          g_cancellable_cancel       (GCancellable  **cancellable_ptr);
+void          g_cancellable_cancel       (GCancellable  *cancellable);
 
 G_END_DECLS
 

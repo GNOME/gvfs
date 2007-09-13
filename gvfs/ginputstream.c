@@ -15,10 +15,13 @@ struct _GInputStreamPrivate {
   GMainContext *context;
   gint io_job_id;
   gpointer outstanding_callback;
+  GCancellable *async_cancellable; /* Used for fallback */
+  
 };
 
 static gssize g_input_stream_real_skip        (GInputStream         *stream,
 					       gsize                 count,
+					       GCancellable         *cancellable,
 					       GError              **error);
 static void   g_input_stream_real_read_async  (GInputStream         *stream,
 					       void                 *buffer,
@@ -49,7 +52,7 @@ g_input_stream_finalize (GObject *object)
   stream = G_INPUT_STREAM (object);
   
   if (!stream->priv->closed)
-    g_input_stream_close (stream, NULL);
+    g_input_stream_close (stream, NULL, NULL);
 
   if (stream->priv->context)
     {
@@ -90,6 +93,7 @@ g_input_stream_init (GInputStream *stream)
  * @stream: a #GInputStream.
  * @buffer: a buffer to read data into (which should be at least count bytes long).
  * @count: the number of bytes that will be read from the stream
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to read @count bytes from the stream into the buffer starting at
@@ -102,7 +106,13 @@ g_input_stream_init (GInputStream *stream)
  * It is not an error if this is not the same as the requested size, as it
  * can happen e.g. near the end of a file. Zero is returned on end of file
  * (or if @count is zero),  but never otherwise.
- * 
+ *
+ * If @cancellable is not NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned. If an
+ * operation was partially finished when the operation was cancelled the
+ * partial result will be returned, without an error.
+ *
  * On error -1 is returned and @error is set accordingly.
  * 
  * Return value: Number of bytes read, or -1 on error
@@ -111,6 +121,7 @@ gssize
 g_input_stream_read  (GInputStream  *stream,
 		      void          *buffer,
 		      gsize          count,
+		      GCancellable  *cancellable,
 		      GError       **error)
 {
   GInputStreamClass *class;
@@ -153,9 +164,16 @@ g_input_stream_read  (GInputStream  *stream,
       return -1;
     }
 
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+  
   stream->priv->pending = TRUE;
-  res = class->read (stream, buffer, count, error);
+  res = class->read (stream, buffer, count, cancellable, error);
   stream->priv->pending = FALSE;
+
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
+  
   return res;
 }
 
@@ -165,6 +183,7 @@ g_input_stream_read  (GInputStream  *stream,
  * @buffer: a buffer to read data into (which should be at least count bytes long).
  * @count: the number of bytes that will be read from the stream
  * @bytes_read: location to store the number of bytes that was read from the stream
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to read @count bytes from the stream into the buffer starting at
@@ -188,6 +207,7 @@ g_input_stream_read_all (GInputStream              *stream,
 			 void                      *buffer,
 			 gsize                      count,
 			 gsize                     *bytes_read,
+			 GCancellable              *cancellable,
 			 GError                   **error)
 {
   gsize _bytes_read;
@@ -197,7 +217,7 @@ g_input_stream_read_all (GInputStream              *stream,
   while (_bytes_read < count)
     {
       res = g_input_stream_read (stream, (char *)buffer + _bytes_read, count - _bytes_read,
-				 error);
+				 cancellable, error);
       if (res == -1)
 	{
 	  *bytes_read = _bytes_read;
@@ -218,6 +238,7 @@ g_input_stream_read_all (GInputStream              *stream,
  * g_input_stream_skip:
  * @stream: a #GInputStream.
  * @count: the number of bytes that will be skipped from the stream
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to skip @count bytes from the stream. Will block during the operation.
@@ -228,11 +249,18 @@ g_input_stream_read_all (GInputStream              *stream,
  *
  * This function is optional for inherited classes.
  *
+ * If @cancellable is not NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned. If an
+ * operation was partially finished when the operation was finished the
+ * partial result will be returned, without an error.
+ *
  * Return value: Number of bytes skipped, or -1 on error
  **/
 gssize
 g_input_stream_skip (GInputStream         *stream,
 		     gsize                 count,
+		     GCancellable         *cancellable,
 		     GError              **error)
 {
   GInputStreamClass *class;
@@ -267,22 +295,30 @@ g_input_stream_skip (GInputStream         *stream,
   
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+  
   stream->priv->pending = TRUE;
-  res = class->skip (stream, count, error);
+  res = class->skip (stream, count, cancellable, error);
   stream->priv->pending = FALSE;
+
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
+  
   return res;
 }
 
 static gssize
 g_input_stream_real_skip (GInputStream         *stream,
 			  gsize                 count,
+			  GCancellable         *cancellable,
 			  GError              **error)
 {
   gssize ret;
   char *buffer;
 
   buffer = g_malloc (count);
-  ret = g_input_stream_read (stream, buffer, count, error);
+  ret = g_input_stream_read (stream, buffer, count, cancellable, error);
   g_free (buffer);
 
   return ret;
@@ -309,11 +345,16 @@ g_input_stream_real_skip (GInputStream         *stream,
  * On failure the first error that happened will be reported, but the close
  * operation will finish as much as possible. A stream that failed to
  * close will still return %G_VFS_ERROR_CLOSED all operations.
- * 
+ *
+ * If @cancellable is not NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned. 
+ *
  * Return value: %TRUE on success, %FALSE on failure
  **/
 gboolean
 g_input_stream_close (GInputStream  *stream,
+		      GCancellable  *cancellable,
 		      GError       **error)
 {
   GInputStreamClass *class;
@@ -337,10 +378,19 @@ g_input_stream_close (GInputStream  *stream,
   res = TRUE;
 
   stream->priv->pending = TRUE;
+
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
   
   if (class->close)
-    res = class->close (stream, error);
+    res = class->close (stream, cancellable, error);
+
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
   
+  /* TODO: Is this really the right thing to do, what about e.g. cancellations?
+   * Won't it lead to unclosed streams? OTOH, nobody will check errors on close...
+   */
   stream->priv->closed = TRUE;
   
   stream->priv->pending = FALSE;
@@ -827,7 +877,7 @@ g_input_stream_close_async (GInputStream       *stream,
  * g_input_stream_cancel:
  * @stream: A #GInputStream.
  *
- * Tries to cancel an outstanding request (sync or async) for the stream.
+ * Tries to cancel an outstanding async request for the stream.
  * If it succeeds the outstanding request will be report the error
  * %G_VFS_ERROR_CANCELLED.
  *
@@ -839,7 +889,8 @@ g_input_stream_close_async (GInputStream       *stream,
  *
  * Its safe to call this from another thread than the one doing the operation,
  * as long as you are sure the InputStream is alive (i.e. you own a reference
- * to it).
+ * to it). If you cancel after the callback has been called you might cancel
+ * a different operation than you expected though.
  *
  * The asyncronous methods have a default fallback that uses threads to implement
  * asynchronicity, so they are optional for inheriting classes. However, if you
@@ -922,17 +973,6 @@ input_stream_op_free (gpointer data)
   g_free (op);
 }
 
-static void
-input_stream_op_cancel (gpointer data)
-{
-  InputStreamOp *op = data;
-  GInputStreamClass *class;
-
-  class = G_INPUT_STREAM_GET_CLASS (op->stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->stream);
-}
-
 typedef struct {
   InputStreamOp      op;
   void              *buffer;
@@ -957,12 +997,13 @@ read_op_report (gpointer data)
 
 static void
 read_op_func (GIOJob *job,
+	      GCancellable *c,
 	      gpointer data)
 {
   ReadAsyncOp *op = data;
   GInputStreamClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (c))
     {
       op->count_read = -1;
       g_set_error (&op->op.error,
@@ -973,7 +1014,8 @@ read_op_func (GIOJob *job,
   else
     {
       class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-      op->count_read = class->read (op->op.stream, op->buffer, op->count_requested, &op->op.error);
+      op->count_read = class->read (op->op.stream, op->buffer, op->count_requested,
+				    c, &op->op.error);
     }
 
   g_io_job_mark_done (job);
@@ -1003,7 +1045,6 @@ g_input_stream_real_read_async (GInputStream        *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (read_op_func,
-					       input_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -1032,12 +1073,13 @@ skip_op_report (gpointer data)
 
 static void
 skip_op_func (GIOJob *job,
+	      GCancellable *c,
 	      gpointer data)
 {
   SkipAsyncOp *op = data;
   GInputStreamClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (c))
     {
       op->count_skipped = -1;
       g_set_error (&op->op.error,
@@ -1048,7 +1090,8 @@ skip_op_func (GIOJob *job,
   else
     {
       class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-      op->count_skipped = class->skip (op->op.stream, op->count_requested, &op->op.error);
+      op->count_skipped = class->skip (op->op.stream, op->count_requested,
+				       c, &op->op.error);
     }
 
   g_io_job_mark_done (job);
@@ -1076,7 +1119,6 @@ g_input_stream_real_skip_async (GInputStream        *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (skip_op_func,
-					       input_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -1102,12 +1144,13 @@ close_op_report (gpointer data)
 
 static void
 close_op_func (GIOJob *job,
-	      gpointer data)
+	       GCancellable *c,
+	       gpointer data)
 {
   CloseAsyncOp *op = data;
   GInputStreamClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (c))
     {
       op->res = FALSE;
       g_set_error (&op->op.error,
@@ -1118,7 +1161,7 @@ close_op_func (GIOJob *job,
   else
     {
       class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-      op->res = class->close (op->op.stream, &op->op.error);
+      op->res = class->close (op->op.stream, c, &op->op.error);
     }
 
   g_io_job_mark_done (job);
@@ -1144,7 +1187,6 @@ g_input_stream_real_close_async (GInputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (close_op_func,
-					       input_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,

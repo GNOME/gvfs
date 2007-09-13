@@ -29,6 +29,7 @@ GFileInfo *
 g_file_output_stream_get_file_info (GFileOutputStream      *stream,
 				    GFileInfoRequestFlags   requested,
 				    char                   *attributes,
+				    GCancellable           *cancellable,
 				    GError                **error)
 {
   GFileOutputStreamClass *class;
@@ -58,12 +59,18 @@ g_file_output_stream_get_file_info (GFileOutputStream      *stream,
   
   g_output_stream_set_pending (output_stream, TRUE);
   
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+  
   class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
   if (class->get_file_info)
-    info = class->get_file_info (stream, requested, attributes, error);
+    info = class->get_file_info (stream, requested, attributes, cancellable, error);
   else
     g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
 		 _("Stream doesn't support get_file_info"));
+  
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
   
   g_output_stream_set_pending (output_stream, FALSE);
   

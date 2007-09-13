@@ -9,7 +9,6 @@ struct _GCancellable
 {
   GObject parent_instance;
 
-  int active_count;
   gboolean cancelled;
   int cancel_pipe[2];
 };
@@ -22,12 +21,8 @@ G_LOCK_DEFINE_STATIC(cancellable);
 static void
 g_cancellable_finalize (GObject *object)
 {
-  GCancellable *cancellable;
+  GCancellable *cancellable = G_CANCELLABLE (object);
 
-  cancellable = G_CANCELLABLE (object);
-
-  g_assert (cancellable->active_count == 0);
-  
   if (cancellable->cancel_pipe[0] != -1)
     close (cancellable->cancel_pipe[0]);
   
@@ -81,94 +76,92 @@ g_cancellable_init (GCancellable *cancellable)
 }
 
 GCancellable *
-g_get_current_cancellable  (void)
+g_cancellable_new (void)
 {
-  GCancellable *c;
-  
-  c = g_static_private_get (&current_cancellable);
-  if (c == NULL)
-    {
-      c = g_object_new (G_TYPE_CANCELLABLE, NULL);
-      g_static_private_set (&current_cancellable, c, (GDestroyNotify)g_object_unref);
-    }
-  
-  return c;
-}
-
-/* These are only safe to call inside a cancellable operation  */
-void 
-g_cancellable_begin (GCancellable **cancellable_ptr)
-{
-  GCancellable *c;
-
-  c = g_get_current_cancellable ();
-
-  G_LOCK(cancellable);
-  if (c->active_count++ == 0)
-    {
-      char ch;
-      /* Non-recursive */
-
-      /* Make sure we're not leaving old cancel state around */
-      if (c->cancelled)
-	{
-	  if (c->cancel_pipe[0] != -1)
-	    read (c->cancel_pipe[0], &ch, 1);
-	  c->cancelled = FALSE;
-	}
-    }
-  *cancellable_ptr = c;
-  
-  G_UNLOCK(cancellable);
+  return g_object_new (G_TYPE_CANCELLABLE, NULL);
 }
 
 void
-g_cancellable_end (GCancellable **cancellable_ptr)
+g_push_current_cancellable (GCancellable *cancellable)
 {
-  GCancellable *c;
+  GSList *l;
+  
+  l = g_static_private_get (&current_cancellable);
+  l = g_slist_prepend (l, cancellable);
+  g_static_private_set (&current_cancellable, l, NULL);
+}
 
-  /* Safe to do outside lock, since we're between begin/end */
-  c = *cancellable_ptr;
-  g_assert (c != NULL);
+void
+g_pop_current_cancellable (GCancellable *cancellable)
+{
+  GSList *l;
+  
+  l = g_static_private_get (&current_cancellable);
+  
+  g_assert (l != NULL);
+  g_assert (l->data == cancellable);
 
+  l = g_slist_delete_link (l, l);
+  g_static_private_set (&current_cancellable, l, NULL);
+}
+
+
+GCancellable *
+g_get_current_cancellable  (void)
+{
+  GSList *l;
+  
+  l = g_static_private_get (&current_cancellable);
+  if (l == NULL)
+    return NULL;
+
+  return G_CANCELLABLE (l->data);
+}
+
+void 
+g_cancellable_reset (GCancellable *cancellable)
+{
   G_LOCK(cancellable);
-  
-  c->active_count--;
-  /* cancel_count is cleared on begin */
-
-  *cancellable_ptr = NULL;
-  
+  /* Make sure we're not leaving old cancel state around */
+  if (cancellable->cancelled)
+    {
+      char ch;
+      if (cancellable->cancel_pipe[0] != -1)
+	read (cancellable->cancel_pipe[0], &ch, 1);
+      cancellable->cancelled = FALSE;
+    }
   G_UNLOCK(cancellable);
 }
 
+/* Safe to call with NULL */
 gboolean
 g_cancellable_is_cancelled (GCancellable *cancellable)
 {
-  return cancellable->cancelled;
+  return cancellable != NULL && cancellable->cancelled;
 }
 
 /* May return -1 if fds not supported, or on errors */
 int
 g_cancellable_get_fd (GCancellable *cancellable)
 {
+  if (cancellable == NULL)
+    return -1;
   return cancellable->cancel_pipe[0];
 }
 
 /* This is safe to call from another thread */
 void
-g_cancellable_cancel (GCancellable **cancellable_ptr)
+g_cancellable_cancel (GCancellable *cancellable)
 {
-  GCancellable *c;
-
   G_LOCK(cancellable);
   
-  c = *cancellable_ptr;
-  if (c != NULL && !c->cancelled)
+  if (cancellable != NULL &&
+      !cancellable->cancelled)
     {
       char ch = 'x';
-      c->cancelled = TRUE;
-      if (c->cancel_pipe[1] != -1)
-	write (c->cancel_pipe[1], &ch, 1);
+      cancellable->cancelled = TRUE;
+      if (cancellable->cancel_pipe[1] != -1)
+	write (cancellable->cancel_pipe[1], &ch, 1);
     }
   
   G_UNLOCK(cancellable);

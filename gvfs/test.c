@@ -39,7 +39,7 @@ test_out ()
   while (left > 0)
     {
       error = NULL;
-      res = g_output_stream_write (out, ptr, MIN (left, 128), &error);
+      res = g_output_stream_write (out, ptr, MIN (left, 128), NULL, &error);
       g_print ("res = %d\n", res);
 
       if (res == -1)
@@ -58,7 +58,7 @@ test_out ()
 	break;
     }
 
-  close_res = g_output_stream_close (out, NULL);
+  close_res = g_output_stream_close (out, NULL, NULL);
   g_print ("close res: %d\n", close_res);
 }
 
@@ -74,7 +74,7 @@ test_sync (char *filename, gboolean dump)
 
   while (1)
     {
-      res = g_input_stream_read (in, buffer, 1024, NULL);
+      res = g_input_stream_read (in, buffer, 1024, NULL, NULL);
       if (dump)
 	{
 	  if (res > 0)
@@ -90,7 +90,7 @@ test_sync (char *filename, gboolean dump)
 	break;
     }
 
-  close_res = g_input_stream_close (in, NULL);
+  close_res = g_input_stream_close (in, NULL, NULL);
 
   if (!dump)
     g_print ("close res: %d\n", close_res);
@@ -178,10 +178,10 @@ main (int argc, char *argv[])
 
     if (1)
       {
-	res = g_input_stream_read (s, buffer, 128, NULL);
+	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
 	g_print ("res1: %d\n", res);
 	g_thread_create(cancel_thread, s, FALSE, NULL);
-	res = g_input_stream_read (s, buffer, 128, NULL);
+	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
 	g_print ("res2: %d\n", res);
       }
     

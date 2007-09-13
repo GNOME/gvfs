@@ -32,6 +32,7 @@ struct _GFileOutputStreamClass
   GFileInfo *(*get_file_info) (GFileOutputStream    *stream,
 			       GFileInfoRequestFlags requested,
 			       char                 *attributes,
+			       GCancellable         *cancellable,
 			       GError              **error);
     
   /* Padding for future expansion */
@@ -48,6 +49,7 @@ GType g_file_output_stream_get_type (void) G_GNUC_CONST;
 GFileInfo *g_file_output_stream_get_file_info              (GFileOutputStream      *stream,
 							    GFileInfoRequestFlags   requested,
 							    char                   *attributes,
+							    GCancellable           *cancellable,
 							    GError                **error);
 void       g_file_output_stream_set_should_get_final_mtime (GFileOutputStream      *stream,
 							    gboolean                get_final_mtime);

@@ -12,6 +12,7 @@ struct _GIOJob {
   GMainContext *callback_context;
   gint io_priority;
   gboolean cancelled;
+  GCancellable *cancellable;
 };
 
 static GHashTable *job_map = NULL;
@@ -22,6 +23,9 @@ static gint next_job_id = 1;
  * io thread you can only access the job when the job_map
  * lock is held) */
 G_LOCK_DEFINE_STATIC(job_map);
+
+/* We allocate one cancellable per thread and reuse it */
+static GStaticPrivate job_cancellable = G_STATIC_PRIVATE_INIT;
 
 static void io_job_thread (gpointer       data,
 			   gpointer       user_data);
@@ -72,8 +76,29 @@ io_job_thread (gpointer       data,
 	       gpointer       user_data)
 {
   GIOJob *job = data;
+  GCancellable *c;
+  gboolean cancelled;
 
-  job->job_func (job, job->data);
+  c = g_static_private_get (&job_cancellable);
+  if (c == NULL)
+    {
+      c = g_cancellable_new ();
+      g_static_private_set (&job_cancellable, c, g_object_unref);
+    }
+
+  g_cancellable_reset (c);
+
+  G_LOCK (job_map);
+  cancelled = job->cancelled;
+  if (cancelled)
+    g_cancellable_cancel (c);
+  else
+    job->cancellable = c;
+  G_UNLOCK (job_map);
+  
+  g_push_current_cancellable (c);
+  job->job_func (job, c, job->data);
+  g_pop_current_cancellable (c);
 
   /* Note: We can still get cancel calls here if the job didn't
    * mark itself done, which means we can't free the data until
@@ -92,7 +117,6 @@ io_job_thread (gpointer       data,
 
 gint
 g_schedule_io_job (GIOJobFunc    job_func,
-		   GIODataFunc   cancel_func,
 		   gpointer      data,
 		   GDestroyNotify notify,
 		   gint          io_priority,
@@ -107,7 +131,6 @@ g_schedule_io_job (GIOJobFunc    job_func,
   job = g_new0 (GIOJob, 1);
   job->id = g_atomic_int_exchange_and_add (&next_job_id, 1);
   job->job_func = job_func;
-  job->cancel_func = cancel_func;
   job->data = data;
   job->destroy_notify = notify;
   job->io_priority = io_priority;
@@ -128,7 +151,6 @@ g_schedule_io_job (GIOJobFunc    job_func,
   return id;
 }
 
-  
 void
 g_cancel_io_job (gint id)
 {
@@ -138,12 +160,10 @@ g_cancel_io_job (gint id)
   init_scheduler ();
 
   job = g_hash_table_lookup (job_map, GINT_TO_POINTER (id));
-
   if (job && !job->cancelled)
     {
       job->cancelled = TRUE;
-      if (job->cancel_func)
-	job->cancel_func (job->data);
+      g_cancellable_cancel (job->cancellable);
     }
   
   G_UNLOCK (job_map);
@@ -160,8 +180,7 @@ foreach_job_cancel (gpointer       key,
   if (!job->cancelled)
     {
       job->cancelled = TRUE;
-      if (job->cancel_func)
-	job->cancel_func (job->data);
+      g_cancellable_cancel (job->cancellable);
     }
 }
 
@@ -270,17 +289,12 @@ g_io_job_send_to_mainloop (GIOJob        *job,
   }
 }
 
-gboolean
-g_io_job_is_cancelled (GIOJob *job)
-{
-  return job->cancelled;
-}
-
 /* Means you can't cancel it */
 void
 g_io_job_mark_done (GIOJob *job)
 {
   G_LOCK (job_map);
   g_hash_table_remove (job_map, GINT_TO_POINTER (job->id));
+  job->cancellable = NULL;
   G_UNLOCK (job_map);
 }

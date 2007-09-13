@@ -27,6 +27,8 @@ Do we really need g_output_stream_write, or will everyone want g_output_stream_w
 For read its useful, to get whatever is availible for now (say for console input), but output?
 Isn't it mainly useful to implement async writes, which we have a real API for?
 
+figure out the right semantics for error or cancel of close()
+
 -------------
 
 continue on GVfsJobOpenForRead, especially the return part

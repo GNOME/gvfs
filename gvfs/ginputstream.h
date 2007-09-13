@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include <gvfs/gvfstypes.h>
 #include <gvfs/gvfserror.h>
+#include <gvfs/gcancellable.h>
 
 G_BEGIN_DECLS
 
@@ -90,11 +91,14 @@ struct _GInputStreamClass
   gssize   (* read)        (GInputStream *stream,
 			    void         *buffer,
 			    gsize         count,
+			    GCancellable *cancellable,
 			    GError      **error);
   gssize   (* skip)        (GInputStream *stream,
 			    gsize         count,
+			    GCancellable *cancellable,
 			    GError      **error);
   gboolean (* close)	   (GInputStream *stream,
+			    GCancellable *cancellable,
 			    GError      **error);
 
   /* Async ops: (optional in derived classes) */
@@ -118,9 +122,6 @@ struct _GInputStreamClass
 			   GDestroyNotify      notify);
   void     (* cancel)     (GInputStream       *stream);
 
-  /* Optional cancel wakeup if using default async ops */
-  void     (* cancel_sync) (GInputStream  *stream);
-
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
   void (*_g_reserved2) (void);
@@ -134,16 +135,20 @@ GType g_input_stream_get_type (void) G_GNUC_CONST;
 gssize        g_input_stream_read              (GInputStream              *stream,
 						void                      *buffer,
 						gsize                      count,
+						GCancellable              *cancellable,
 						GError                   **error);
 gboolean      g_input_stream_read_all          (GInputStream              *stream,
 						void                      *buffer,
 						gsize                      count,
 						gsize                     *bytes_read,
+						GCancellable              *cancellable,
 						GError                   **error);
 gssize        g_input_stream_skip              (GInputStream              *stream,
 						gsize                      count,
+						GCancellable              *cancellable,
 						GError                   **error);
 gboolean      g_input_stream_close             (GInputStream              *stream,
+						GCancellable              *cancellable,
 						GError                   **error);
 void          g_input_stream_set_async_context (GInputStream              *stream,
 						GMainContext              *context);

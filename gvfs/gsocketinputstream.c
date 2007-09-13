@@ -19,7 +19,6 @@ G_DEFINE_TYPE (GSocketInputStream, g_socket_input_stream, G_TYPE_INPUT_STREAM);
 
 struct _GSocketInputStreamPrivate {
   int fd;
-  GCancellable *cancellable;
   gboolean close_fd_at_close;
 };
 
@@ -38,8 +37,10 @@ typedef void (*StreamSourceFunc) (GSocketInputStream  *stream,
 static gssize   g_socket_input_stream_read        (GInputStream              *stream,
 						   void                      *buffer,
 						   gsize                      count,
+						   GCancellable              *cancellable,
 						   GError                   **error);
 static gboolean g_socket_input_stream_close       (GInputStream              *stream,
+						   GCancellable              *cancellable,
 						   GError                   **error);
 static void     g_socket_input_stream_read_async  (GInputStream              *stream,
 						   void                      *buffer,
@@ -195,54 +196,47 @@ static gssize
 g_socket_input_stream_read (GInputStream *stream,
 			    void         *buffer,
 			    gsize         count,
+			    GCancellable *cancellable,
 			    GError      **error)
 {
   GSocketInputStream *socket_stream;
   gssize res;
   struct pollfd poll_fds[2];
   int poll_ret;
-  int n;
   int cancel_fd;
 
   socket_stream = G_SOCKET_INPUT_STREAM (stream);
 
-  g_cancellable_begin (&socket_stream->priv->cancellable);
-  cancel_fd = g_cancellable_get_fd (socket_stream->priv->cancellable);
-  
-  do
+  cancel_fd = g_cancellable_get_fd (cancellable);
+  if (cancel_fd != -1)
     {
-      n = 0;
-      poll_fds[n].events = POLLIN;
-      poll_fds[n++].fd = socket_stream->priv->fd;
-
-      if (cancel_fd != -1)
+      do
 	{
-	  poll_fds[n].events = POLLIN;
-	  poll_fds[n++].fd = cancel_fd;
+	  poll_fds[0].events = POLLIN;
+	  poll_fds[0].fd = socket_stream->priv->fd;
+	  poll_fds[1].events = POLLIN;
+	  poll_fds[1].fd = cancel_fd;
+	  poll_ret = poll (poll_fds, 2, -1);
+	}
+      while (poll_ret == -1 && errno == EINTR);
+      
+      if (poll_ret == -1)
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error reading from socket: %s"),
+		       g_strerror (errno));
+	  return -1;
 	}
       
-      poll_ret = poll (poll_fds, n, -1);
-    }
-  while (poll_ret == -1 && errno == EINTR);
-  
-  if (poll_ret == -1)
-    {
-      g_set_error (error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   _("Error reading from socket: %s"),
-		   g_strerror (errno));
-      res = -1;
-      goto out;
-    }
-
-  if (n > 1 && poll_fds[1].revents)
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      res = -1;
-      goto out;
+      if (poll_fds[1].revents)
+	{
+	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANCELLED,
+		       _("Operation was cancelled"));
+	  return -1;
+	}
     }
 
   while (1)
@@ -250,7 +244,7 @@ g_socket_input_stream_read (GInputStream *stream,
       res = read (socket_stream->priv->fd, buffer, count);
       if (res == -1)
 	{
-	  if (g_input_stream_is_cancelled (stream))
+	  if (g_cancellable_is_cancelled (cancellable))
 	    {
 	      g_set_error (error,
 			   G_VFS_ERROR,
@@ -271,13 +265,12 @@ g_socket_input_stream_read (GInputStream *stream,
       break;
     }
 
- out:
-  g_cancellable_end (&socket_stream->priv->cancellable);
   return res;
 }
 
 static gboolean
 g_socket_input_stream_close (GInputStream *stream,
+			     GCancellable *cancellable,
 			     GError      **error)
 {
   GSocketInputStream *socket_stream;
@@ -294,7 +287,7 @@ g_socket_input_stream_close (GInputStream *stream,
       res = close (socket_stream->priv->fd);
       if (res == -1)
 	{
-	  if (g_input_stream_is_cancelled (stream))
+	  if (g_cancellable_is_cancelled (cancellable))
 	    {
 	      g_set_error (error,
 			   G_VFS_ERROR,
@@ -313,7 +306,7 @@ g_socket_input_stream_close (GInputStream *stream,
 	}
       break;
     }
-
+  
   return res != -1;
 }
 
@@ -346,6 +339,7 @@ read_async_cb (GSocketInputStream  *stream,
       goto out;
     }
 
+  /* We know that we can read from fd once without blocking */
   while (1)
     {
       count_read = read (socket_stream->priv->fd, data->buffer, data->count);
@@ -542,9 +536,6 @@ g_socket_input_stream_cancel (GInputStream *stream)
   GSocketInputStream *socket_stream;
 
   socket_stream = G_SOCKET_INPUT_STREAM (stream);
-
-  /* Cancel any outstanding sync call */
-  g_cancellable_cancel (&socket_stream->priv->cancellable);
 
   /* Wake up the mainloop in case we're waiting on async calls with StreamSource */
   g_main_context_wakeup (g_input_stream_get_async_context (stream));

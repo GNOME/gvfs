@@ -2,18 +2,19 @@
 #define __G_IO_SCHEDULER_H__
 
 #include <glib.h>
+#include <gcancellable.h>
 
 G_BEGIN_DECLS
 
 typedef struct _GIOJob GIOJob;
 
 typedef void (*GIOJobFunc) (GIOJob *job,
+			    GCancellable *cancellable,
 			    gpointer data);
 
 typedef void (*GIODataFunc) (gpointer data);
 
 gint g_schedule_io_job    (GIOJobFunc      job_func,
-			   GIODataFunc     cancel_func,
 			   gpointer        data,
 			   GDestroyNotify  notify,
 			   gint            io_priority,
@@ -27,7 +28,6 @@ void     g_io_job_send_to_mainloop (GIOJob         *job,
 				    GDestroyNotify  notify,
 				    gboolean        block);
 void     g_io_job_mark_done        (GIOJob         *job);
-gboolean g_io_job_is_cancelled     (GIOJob         *job);
 
 G_END_DECLS
 

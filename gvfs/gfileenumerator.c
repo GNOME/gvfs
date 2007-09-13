@@ -38,7 +38,7 @@ g_file_enumerator_finalize (GObject *object)
   enumerator = G_FILE_ENUMERATOR (object);
   
   if (!enumerator->priv->stopped)
-    g_file_enumerator_stop (enumerator, NULL);
+    g_file_enumerator_stop (enumerator, NULL, NULL);
 
   if (enumerator->priv->context)
     {
@@ -75,6 +75,7 @@ g_file_enumerator_init (GFileEnumerator *enumerator)
 /**
  * g_file_enumerator_next_file:
  * @enumerator: a #GFileEnumerator.
+ * @cancellable: optional cancellable object
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Returns information for the next file in the enumerated object.
@@ -88,6 +89,7 @@ g_file_enumerator_init (GFileEnumerator *enumerator)
  **/
 GFileInfo *
 g_file_enumerator_next_file (GFileEnumerator *enumerator,
+			     GCancellable *cancellable,
 			     GError **error)
 {
   GFileEnumeratorClass *class;
@@ -119,9 +121,15 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
   
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
 
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+  
   enumerator->priv->pending = TRUE;
-  info = (* class->next_file) (enumerator, error);
+  info = (* class->next_file) (enumerator, cancellable, error);
   enumerator->priv->pending = FALSE;
+
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
   
   return info;
 }
@@ -129,6 +137,8 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
 /**
  * g_file_enumerator_stop:
  * @enumerator: a #GFileEnumerator.
+ * @cancellable: optional cancellable object
+ * @error: location to store the error occuring, or %NULL to ignore
  *
  * Releases all resources used by this enumerator, making the
  * enumerator return %G_VFS_ERROR_CLOSED on all calls.
@@ -139,6 +149,7 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
  **/
 gboolean
 g_file_enumerator_stop (GFileEnumerator *enumerator,
+			GCancellable *cancellable,
 			GError **error)
 {
   GFileEnumeratorClass *class;
@@ -157,12 +168,18 @@ g_file_enumerator_stop (GFileEnumerator *enumerator,
 		   _("File enumerator has outstanding operation"));
       return FALSE;
     }
+
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
   
   enumerator->priv->pending = TRUE;
-  (* class->stop) (enumerator, error);
+  (* class->stop) (enumerator, cancellable, error);
   enumerator->priv->pending = FALSE;
   enumerator->priv->stopped = TRUE;
 
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
+  
   return TRUE;
 }
 
@@ -538,17 +555,6 @@ file_enumerator_op_free (gpointer data)
   g_free (op);
 }
 
-static void
-file_enumerator_op_cancel (gpointer data)
-{
-  FileEnumeratorOp *op = data;
-  GFileEnumeratorClass *class;
-
-  class = G_FILE_ENUMERATOR_GET_CLASS (op->enumerator);
-  if (class->cancel_sync)
-    class->cancel_sync (op->enumerator);
-}
-
 typedef struct {
   FileEnumeratorOp  op;
   int                num_files;
@@ -574,6 +580,7 @@ next_op_report (gpointer data)
 
 static void
 next_op_func (GIOJob *job,
+	      GCancellable *cancellable,
 	      gpointer data)
 {
   NextAsyncOp *op = data;
@@ -585,7 +592,7 @@ next_op_func (GIOJob *job,
 
   for (i = 0; i < op->num_files; i++)
     {
-      if (g_io_job_is_cancelled (job))
+      if (g_cancellable_is_cancelled (cancellable))
 	{
 	  info = NULL;
 	  g_set_error (&op->op.error,
@@ -594,7 +601,9 @@ next_op_func (GIOJob *job,
 		       _("Operation was cancelled"));
 	}
       else
-	info = class->next_file (op->op.enumerator, &op->op.error);
+	{
+	  info = class->next_file (op->op.enumerator, cancellable, &op->op.error);
+	}
       
       if (info == NULL)
 	{
@@ -641,7 +650,6 @@ g_file_enumerator_real_next_files_async (GFileEnumerator              *enumerato
   
   enumerator->priv->io_job_id =
     g_schedule_io_job (next_op_func,
-		       file_enumerator_op_cancel,
 		       op,
 		       NULL,
 		       io_priority,
@@ -667,12 +675,13 @@ stop_op_report (gpointer data)
 
 static void
 stop_op_func (GIOJob *job,
+	      GCancellable *cancellable,
 	      gpointer data)
 {
   StopAsyncOp *op = data;
   GFileEnumeratorClass *class;
 
-  if (g_io_job_is_cancelled (job))
+  if (g_cancellable_is_cancelled (cancellable))
     {
       op->result = FALSE;
       g_set_error (&op->op.error,
@@ -683,7 +692,7 @@ stop_op_func (GIOJob *job,
   else 
     {
       class = G_FILE_ENUMERATOR_GET_CLASS (op->op.enumerator);
-      op->result = class->stop (op->op.enumerator, &op->op.error);
+      op->result = class->stop (op->op.enumerator, cancellable, &op->op.error);
     }
   
   g_io_job_mark_done (job);
@@ -710,7 +719,6 @@ g_file_enumerator_real_stop_async (GFileEnumerator              *enumerator,
   
   enumerator->priv->io_job_id =
     g_schedule_io_job (stop_op_func,
-		       file_enumerator_op_cancel,
 		       op,
 		       NULL,
 		       io_priority,

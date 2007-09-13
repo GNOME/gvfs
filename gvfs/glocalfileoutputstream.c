@@ -34,12 +34,15 @@ struct _GLocalFileOutputStreamPrivate {
 static gssize     g_local_file_output_stream_write         (GOutputStream          *stream,
 							    void                   *buffer,
 							    gsize                   count,
+							    GCancellable           *cancellable,
 							    GError                **error);
 static gboolean   g_local_file_output_stream_close         (GOutputStream          *stream,
+							    GCancellable           *cancellable,
 							    GError                **error);
 static GFileInfo *g_local_file_output_stream_get_file_info (GFileOutputStream      *stream,
 							    GFileInfoRequestFlags   requested,
 							    char                   *attributes,
+							    GCancellable           *cancellable,
 							    GError                **error);
 
 
@@ -463,6 +466,7 @@ static gssize
 g_local_file_output_stream_write (GOutputStream *stream,
 				  void         *buffer,
 				  gsize         count,
+				  GCancellable *cancellable,
 				  GError      **error)
 {
   GLocalFileOutputStream *file;
@@ -504,6 +508,7 @@ g_local_file_output_stream_write (GOutputStream *stream,
 
 static gboolean
 g_local_file_output_stream_close (GOutputStream *stream,
+				  GCancellable *cancellable,
 				  GError      **error)
 {
   GLocalFileOutputStream *file;
@@ -594,6 +599,7 @@ static GFileInfo *
 g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
 					  GFileInfoRequestFlags requested,
 					  char                 *attributes,
+					  GCancellable         *cancellable,
 					  GError              **error)
 {
   GLocalFileOutputStream *file;
