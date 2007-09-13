@@ -34,6 +34,15 @@ typedef struct  {
   } u;
 } GFileAttributeValue;
 
+typedef struct {
+  char *name;
+  GFileAttributeType type;
+} GFileAttributeInfo;
+
+typedef struct {
+  GFileAttributeInfo *infos;
+  int n_infos;
+} GFileAttributeInfoList;
 
 GFileAttributeValue *g_file_attribute_value_new             (void);
 void                 g_file_attribute_value_free            (GFileAttributeValue *attr);
@@ -69,6 +78,15 @@ void                 g_file_attribute_value_set_int64       (GFileAttributeValue
 							     gint64               value);
 void                 g_file_attribute_value_set_object      (GFileAttributeValue *attr,
 							     GObject             *obj);
+
+GFileAttributeInfoList *g_file_attribute_info_list_new    (void);
+void                    g_file_attribute_info_list_free   (GFileAttributeInfoList *list);
+GFileAttributeInfoList *g_file_attribute_info_list_dup    (GFileAttributeInfoList *list);
+GFileAttributeType      g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
+							   const char             *name);
+void                    g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
+							   const char             *name,
+							   GFileAttributeType      type);
 
 G_END_DECLS
 

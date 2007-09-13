@@ -323,3 +323,118 @@ g_file_attribute_value_set_object (GFileAttributeValue *attr,
     attr->u.obj = NULL;
 }
 
+typedef struct {
+  GFileAttributeInfoList public;
+  GArray *array;
+} GFileAttributeInfoListPriv;
+
+static void
+list_update_public (GFileAttributeInfoListPriv *priv)
+{
+  priv->public.infos = (GFileAttributeInfo *)priv->array->data;
+  priv->public.n_infos = priv->array->len;
+}
+
+GFileAttributeInfoList *
+g_file_attribute_info_list_new (void)
+{
+  GFileAttributeInfoListPriv *priv;
+
+  priv = g_new0 (GFileAttributeInfoListPriv, 1);
+  
+  priv->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
+  
+  list_update_public (priv);
+  return FALSE;
+}
+
+GFileAttributeInfoList *
+g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
+{
+  GFileAttributeInfoListPriv *new;
+  int i;
+
+  new = g_new0 (GFileAttributeInfoListPriv, 1);
+  new->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
+
+  g_array_set_size (new->array, list->n_infos);
+  list_update_public (new);
+  for (i = 0; i < list->n_infos; i++)
+    {
+      new->public.infos[i] = list->infos[i];
+      new->public.infos[i].name = strdup (new->public.infos[i].name);
+    }
+  
+  return (GFileAttributeInfoList *)new;
+}
+
+void
+g_file_attribute_info_list_free (GFileAttributeInfoList *list)
+{
+  GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
+  int i;
+  for (i = 0; i < list->n_infos; i++)
+    g_free (list->infos[i].name);
+  g_array_free (priv->array, TRUE);
+}
+
+static int
+g_file_attribute_info_list_bsearch (GFileAttributeInfoList *list,
+				    const char             *name)
+{
+  int start, end, mid;
+  
+  start = 0;
+  end = list->n_infos;
+
+  while (start != end)
+    {
+      mid = start + (end - start) / 2;
+
+      if (strcmp (name, list->infos[mid].name) < 0)
+	end = mid;
+      else if (strcmp (name, list->infos[mid].name) > 0)
+	start = mid + 1;
+      else
+	return mid;
+    }
+  return start;
+}
+
+GFileAttributeType
+g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
+				   const char             *name)
+{
+  int i;
+
+  i = g_file_attribute_info_list_bsearch (list, name);
+
+  if (i < list->n_infos && strcmp (list->infos[i].name, name) == 0)
+    return list->infos[i].type;
+  
+  return G_FILE_ATTRIBUTE_TYPE_INVALID;
+}
+
+void
+g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
+				   const char             *name,
+				   GFileAttributeType      type)
+{
+  GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
+  GFileAttributeInfo info;
+  int i;
+
+  i = g_file_attribute_info_list_bsearch (list, name);
+
+  if (i < list->n_infos && strcmp (list->infos[i].name, name) == 0)
+    {
+      list->infos[i].type = type;
+      return;
+    }
+
+  info.name = g_strdup (name);
+  info.type = type;
+  g_array_insert_vals (priv->array, i, &info, 1);
+
+  list_update_public (priv);
+}
