@@ -22,7 +22,6 @@ struct _GVolumeMonitor {
   gpointer priv;
 };
 
-
 struct _GVolumeMonitorClass {
   GObjectClass parent_class;
 
