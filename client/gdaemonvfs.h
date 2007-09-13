@@ -22,11 +22,11 @@ typedef struct {
   char *dbus_id;
   char *object_path;
   GMountSpec *spec;
-} GMountInfo;
+} GMountRef;
 
-typedef void (*GMountInfoLookupCallback) (GMountInfo *mount_info,
-					  gpointer data,
-					  GError *error);
+typedef void (*GMountRefLookupCallback) (GMountRef *mount_ref,
+					 gpointer data,
+					 GError *error);
 
 struct _GDaemonVfsClass
 {
@@ -37,18 +37,17 @@ GType   g_daemon_vfs_get_type  (void) G_GNUC_CONST;
 
 GDaemonVfs *g_daemon_vfs_new (void);
 
-GList      *_g_daemon_vfs_get_mount_list_sync  (GError **error);
-
-void        _g_daemon_vfs_get_mount_info_async (GMountSpec                *spec,
-						     const char                *path,
-						     GMountInfoLookupCallback   callback,
-						     gpointer                   user_data);
-GMountInfo *_g_daemon_vfs_get_mount_info_sync  (GMountSpec                *spec,
-						     const char                *path,
-						     GError                   **error);
-const char *_g_mount_info_resolve_path              (GMountInfo                *info,
-						     const char                *path);
-void        _g_mount_info_unref                     (GMountInfo                *info);
+GList      *_g_daemon_vfs_get_mount_list_sync (GError                  **error);
+void        _g_daemon_vfs_get_mount_ref_async (GMountSpec               *spec,
+					       const char               *path,
+					       GMountRefLookupCallback   callback,
+					       gpointer                  user_data);
+GMountRef  *_g_daemon_vfs_get_mount_ref_sync  (GMountSpec               *spec,
+					       const char               *path,
+					       GError                  **error);
+const char *_g_mount_ref_resolve_path         (GMountRef                *ref,
+					       const char               *path);
+void        _g_mount_ref_unref                (GMountRef                *ref);
 
 G_END_DECLS
 

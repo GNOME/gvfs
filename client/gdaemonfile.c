@@ -270,24 +270,24 @@ do_sync_path_call (GFile *file,
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   DBusMessage *message, *reply;
-  GMountInfo *mount_info;
+  GMountRef *mount_ref;
   const char *path;
   va_list var_args;
 
-  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
-						  daemon_file->path,
-						  error);
-  if (mount_info == NULL)
+  mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
+						daemon_file->path,
+						error);
+  if (mount_ref == NULL)
     return NULL;
   
   message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
+    dbus_message_new_method_call (mount_ref->dbus_id,
+				  mount_ref->object_path,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  op);
 
-  path = _g_mount_info_resolve_path (mount_info,
-				     daemon_file->path);
+  path = _g_mount_ref_resolve_path (mount_ref,
+				    daemon_file->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
   va_start (var_args, first_arg_type);
@@ -301,7 +301,7 @@ do_sync_path_call (GFile *file,
 				   cancellable, error);
   dbus_message_unref (message);
 
-  _g_mount_info_unref (mount_info);
+  _g_mount_ref_unref (mount_ref);
   
   return reply;
 }
@@ -371,7 +371,7 @@ async_path_call_done (DBusMessage *reply,
 }
 
 static void
-do_async_path_call_callback (GMountInfo *mount_info,
+do_async_path_call_callback (GMountRef *mount_ref,
 			     gpointer _data,
 			     GError *error)
 {
@@ -389,13 +389,13 @@ do_async_path_call_callback (GMountInfo *mount_info,
     }
 
   message =
-    dbus_message_new_method_call (mount_info->dbus_id,
-				  mount_info->object_path,
+    dbus_message_new_method_call (mount_ref->dbus_id,
+				  mount_ref->object_path,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  data->op);
   
-  path = _g_mount_info_resolve_path (mount_info,
-				     daemon_file->path);
+  path = _g_mount_ref_resolve_path (mount_ref,
+				    daemon_file->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
   /* Append more args from data->args */
@@ -458,10 +458,10 @@ do_async_path_call (GFile *file,
     }
   
   
-  _g_daemon_vfs_get_mount_info_async (daemon_file->mount_spec,
-				      daemon_file->path,
-				      do_async_path_call_callback,
-				      data);
+  _g_daemon_vfs_get_mount_ref_async (daemon_file->mount_spec,
+				     daemon_file->path,
+				     do_async_path_call_callback,
+				     data);
 }
 
 
