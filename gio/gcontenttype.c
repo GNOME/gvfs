@@ -659,7 +659,7 @@ enumerate_mimetypes_subdir (const char *dir, const char *prefix, GHashTable *mim
 	{
 	  if (g_str_has_suffix (ent->d_name, ".xml"))
 	    {
-	      mimetype = g_strdup_printf ("%s/%.*s", prefix, strlen (ent->d_name) - 4, ent->d_name);
+	      mimetype = g_strdup_printf ("%s/%.*s", prefix, (int) strlen (ent->d_name) - 4, ent->d_name);
 	      g_hash_table_insert (mimetypes, mimetype, NULL);
 	    }
 	}

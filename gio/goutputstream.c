@@ -193,7 +193,7 @@ g_output_stream_write (GOutputStream *stream,
  *
  * Return value: TRUE on success, FALSE if there was an error
  **/
-gssize
+gboolean
 g_output_stream_write_all (GOutputStream *stream,
 			   void          *buffer,
 			   gsize          count,

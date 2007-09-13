@@ -61,7 +61,7 @@ test_out ()
     {
       error = NULL;
       res = g_output_stream_write (out, ptr, MIN (left, 128), NULL, &error);
-      g_print ("res = %d\n", res);
+      g_print ("res = %"G_GSSIZE_FORMAT"\n", res);
 
       if (res == -1)
 	{
@@ -121,7 +121,7 @@ test_sync (char *uri, gboolean dump)
 	    }
 	}
       else
-	g_print ("res = %d\n", res);
+	g_print ("res = %"G_GSSIZE_FORMAT"\n", res);
 
       if (res <= 0)
 	break;
@@ -176,7 +176,7 @@ read_done (GObject *source_object,
 
   count_read = g_input_stream_read_finish (stream, res, &error);
   
-  g_print ("count_read: %d\n", count_read);
+  g_print ("count_read: %"G_GSSIZE_FORMAT"\n", count_read);
 
   if (count_read == -1)
     {
@@ -269,17 +269,17 @@ test_seek (void)
   g_print ("offset: %d\n", (int)g_seekable_tell (seekable));
   
   res = g_input_stream_read (in, buffer1, 1024, NULL, NULL);
-  g_print ("read 1 res = %d\n", res);
+  g_print ("read 1 res = %"G_GSSIZE_FORMAT"\n", res);
 
   g_print ("offset: %d\n", (int)g_seekable_tell (seekable));
   
   res = g_seekable_seek (seekable, 0, G_SEEK_SET, NULL, NULL);
-  g_print ("seek res = %d\n", res);
+  g_print ("seek res = %"G_GSSIZE_FORMAT"\n", res);
 
   c = g_cancellable_new ();
   if (0) g_thread_create (cancel_thread, c, FALSE, NULL);
   res = g_input_stream_read (in, buffer2, 1024, c, &error);
-  g_print ("read 2 res = %d\n", res);
+  g_print ("read 2 res = %"G_GSSIZE_FORMAT"\n", res);
   if (res == -1)
     g_print ("error: %s\n", error->message);
 
@@ -530,9 +530,9 @@ main (int argc, char *argv[])
     if (1)
       {
 	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
-	g_print ("res1: %d\n", res);
+	g_print ("res1: %"G_GSSIZE_FORMAT"\n", res);
 	res = g_input_stream_read (s, buffer, 128, NULL, NULL);
-	g_print ("res2: %d\n", res);
+	g_print ("res2: %"G_GSSIZE_FORMAT"\n", res);
       }
 
     c = g_cancellable_new ();

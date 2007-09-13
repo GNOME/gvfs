@@ -171,7 +171,7 @@ try_read (GVfsBackend *backend,
 {
   guint tag;
 
-  g_print ("read (%d)\n", bytes_requested);
+  g_print ("read (%"G_GSSIZE_FORMAT")\n", bytes_requested);
 
   tag = g_timeout_add (0, read_idle_cb, job);
   G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (tag);
