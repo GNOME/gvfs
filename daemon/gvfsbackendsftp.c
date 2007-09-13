@@ -1680,6 +1680,7 @@ close_moved_tempfile (GVfsBackendSftp *backend,
                       _("Invalid reply recieved"));
 
   /* On failure, don't remove tempfile, since we removed the new original file */
+  sftp_handle_free (handle);
 }
   
 
@@ -1727,6 +1728,7 @@ close_deleted_file (GVfsBackendSftp *backend,
       
       g_vfs_job_failed_from_error (job, error);
       g_error_free (error);
+      sftp_handle_free (handle);
     }
 }
 
@@ -1775,6 +1777,7 @@ close_moved_file (GVfsBackendSftp *backend,
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
                         _("Error creating backup file: %s"), error->message);
       g_error_free (error);
+      sftp_handle_free (handle);
     }
 }
 
@@ -1856,7 +1859,10 @@ close_reply (GVfsBackendSftp *backend,
             }
         }
       else
-        g_vfs_job_succeeded (job);
+        {
+          g_vfs_job_succeeded (job);
+          sftp_handle_free (handle);
+        }
     }
   else
     {
@@ -1867,9 +1873,9 @@ close_reply (GVfsBackendSftp *backend,
       
       g_vfs_job_failed_from_error (job, error);
       g_error_free (error);
+      
+      sftp_handle_free (handle);
     }
-  
-  sftp_handle_free (handle);
 }
 
 static gboolean
@@ -2042,7 +2048,7 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
   SftpHandle *handle;
   ReplaceData *data;
   GError *error;
-  
+
   op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   data = G_VFS_JOB (job)->backend_data;
   
@@ -2144,7 +2150,7 @@ replace_create_temp (GVfsBackendSftp *backend,
   random_text (basename + 8);
   data->tempname = g_build_filename (dirname, basename, NULL);
   g_free (dirname);
-  
+
   command = new_command_stream (op_backend,
                                 SSH_FXP_OPEN,
                                 &id);
