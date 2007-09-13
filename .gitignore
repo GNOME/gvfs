@@ -27,3 +27,4 @@ mkinstalldirs
 stamp-h1
 core.*
 core
+compile
