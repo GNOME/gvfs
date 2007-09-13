@@ -70,7 +70,8 @@ Returns writable attributes supportable.
 Use this to copy xattrs in general move fallback.
 
 document type for file attrs
-
+Get rid of std:flags, split it up to avoid problems with unknow flag values
+Set owner:user, owner:group for local files
 						      
 FUTURE IDEAS:
 -------------
