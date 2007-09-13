@@ -310,7 +310,7 @@ typedef void (*AsyncPathCallCallback) (DBusMessage *reply,
 				       DBusConnection *connection,
 				       GError *io_error,
 				       GCancellable *cancellable,
-				       gpointer op_callback,
+				       GAsyncReadyCallback op_callback,
 				       gpointer op_callback_data,
 				       gpointer callback_data);
 
@@ -321,7 +321,7 @@ typedef struct {
   GCancellable *cancellable;
   DBusMessage *args;
   GError *io_error;
-  gpointer op_callback;
+  GAsyncReadyCallback op_callback;
   gpointer op_callback_data;
   AsyncPathCallCallback callback;
   gpointer callback_data;
@@ -419,7 +419,7 @@ static void
 do_async_path_call (GFile *file,
 		    const char *op,
 		    GCancellable *cancellable,
-		    gpointer op_callback,
+		    GAsyncReadyCallback op_callback,
 		    gpointer op_callback_data,
 		    AsyncPathCallCallback callback,
 		    gpointer callback_data,
@@ -594,7 +594,7 @@ read_async_cb (DBusMessage *reply,
 	       DBusConnection *connection,
 	       GError *io_error,
 	       GCancellable *cancellable,
-	       gpointer op_callback,
+	       GAsyncReadyCallback op_callback,
 	       gpointer op_callback_data,
 	       gpointer callback_data)
 {
