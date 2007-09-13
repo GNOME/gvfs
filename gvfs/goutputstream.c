@@ -93,7 +93,9 @@ g_output_stream_init (GOutputStream *stream)
  *
  * On success, the number of bytes written to the stream is returned.
  * It is not an error if this is not the same as the requested size, as it
- * can happen e.g. on a partial i/o error. 
+ * can happen e.g. on a partial i/o error, or if the there is not enough
+ * storage in the stream. All writes either block until at least one byte
+ * is written, so zero is never returned (unless @count is zero).
  * 
  * On error -1 is returned and @error is set accordingly.
  * 
@@ -157,56 +159,53 @@ g_output_stream_write (GOutputStream *stream,
  * @stream: a #GOutputStream.
  * @buffer: the buffer containing the data to write. 
  * @count: the number of bytes to write
+ * @bytes_written: location to store the number of bytes that was written to the stream
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to write @count bytes from @buffer into the stream. Will block
  * during the operation.
  * 
- * This function behaves like g_output_stream_read (), except it tries to
- * read as many bytes as requested, only stopping on an error or a true
- * end of stream.
+ * This function is similar to g_output_stream_write(), except it tries to
+ * read as many bytes as requested, only stopping on an error.
  *
- * On success, the number of bytes written to the stream is returned.
- * On error -1 is returned and @error is set accordingly.
+ * On a successful write of @count bytes, TRUE is returned, and @bytes_written
+ * is set to @count.
  * 
- * Return value: Number of bytes written, or -1 on error
+ * If there is an error during the operation FALSE is returned and @error
+ * is set to indicate the error status, @bytes_written is updated to contain
+ * the number of bytes written into the stream before the error occured.
+ *
+ * Return value: TRUE on success, FALSE if there was an error
  **/
 gssize
 g_output_stream_write_all (GOutputStream *stream,
 			   void          *buffer,
 			   gsize          count,
+			   gsize         *bytes_written,
 			   GError       **error)
 {
-  gsize bytes_written;
+  gsize _bytes_written;
   gssize res;
-  GError *internal_error;
 
-  bytes_written = 0;
-
-  internal_error = NULL;
-  while (bytes_written < count)
+  _bytes_written = 0;
+  while (_bytes_written < count)
     {
-      res = g_output_stream_write (stream, (char *)buffer + bytes_written, count - bytes_written,
-				 &internal_error);
+      res = g_output_stream_write (stream, (char *)buffer + _bytes_written, count - _bytes_written,
+				   error);
       if (res == -1)
 	{
-	  if (bytes_written == 0)
-	    {
-	      g_propagate_error (error, internal_error);
-	      return -1;
-	    }
-	  else
-	    {
-	      g_error_free (internal_error);
-	      return bytes_written;
-	    }
+	  *bytes_written = _bytes_written;
+	  return FALSE;
 	}
+      
       if (res == 0)
-	return bytes_written;
+	g_warning ("Write returned zero without error");
 
-      bytes_written += res;
+      _bytes_written += res;
     }
-  return bytes_written;
+  
+  *bytes_written = _bytes_written;
+  return TRUE;
 }
 
 /**

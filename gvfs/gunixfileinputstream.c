@@ -215,7 +215,7 @@ g_unix_file_input_stream_read (GInputStream *stream,
   guint32 count_32;
   char message[G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE];
   GVfsDaemonSocketProtocolCommand *cmd;
-  gssize bytes_written;
+  gsize bytes_written;
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
@@ -231,10 +231,9 @@ g_unix_file_input_stream_read (GInputStream *stream,
   cmd->command = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ);
   cmd->arg = g_htonl (count_32);
 
-  bytes_written = g_output_stream_write_all (file->priv->command_stream,
-					     message, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE,
-					     error);
-  if (bytes_written == -1 || bytes_written != G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE)
+  if (g_output_stream_write_all (file->priv->command_stream,
+				 message, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE,
+				 &bytes_written, error))
     {
       /* TODO: We sent a partial command down the pipe, what do we do here.
 	 Especially if the error is a cancel... */
@@ -294,18 +293,20 @@ g_unix_file_input_stream_read (GInputStream *stream,
 	  GVfsDaemonSocketProtocolReply reply;
 
 	  g_assert (sizeof (reply) == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE);
-	  res = g_input_stream_read_all (file->priv->data_stream, (char *)&reply,
-					 G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE, error);
-	  if (res == -1)
+	  if (g_input_stream_read_all (file->priv->data_stream, (char *)&reply,
+				       G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
+				       &n_read, error))
 	    {
+	      /* TODO: We read a partial command, what do we do here, especially
+		 on a cancel */
+	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+			   "Short read in stream protocol");
 	      return -1;
 	    }
 
-	  if (res != G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
+	  if (n_read != G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
 	    {
-	      /* TODO: We read a partial command, what do we do here. */
-	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-			   "Short read in stream protocol");
+	      /* TODO: end of file */
 	      return -1;
 	    }
 

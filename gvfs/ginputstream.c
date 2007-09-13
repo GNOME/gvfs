@@ -164,56 +164,54 @@ g_input_stream_read  (GInputStream  *stream,
  * @stream: a #GInputStream.
  * @buffer: a buffer to read data into (which should be at least count bytes long).
  * @count: the number of bytes that will be read from the stream
+ * @bytes_read: location to store the number of bytes that was read from the stream
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Tries to read @count bytes from the stream into the buffer starting at
  * @buffer. Will block during this read.
  *
- * This function behaves like g_input_stream_read (), except it tries to
- * read as many bytes as requested, only stopping on an error or a true
- * end of stream.
+ * This function is similar to g_input_stream_read(), except it tries to
+ * read as many bytes as requested, only stopping on an error or end of stream.
  *
- * On success, the number of bytes read into the buffer is returned.
- * On error -1 is returned and @error is set accordingly.
+ * On a successful read of @count bytes, or if we reached the end of the
+ * stream,  TRUE is returned, and @bytes_read is set to the number of bytes
+ * read into @buffer.
  * 
- * Return value: Number of bytes read, or -1 on error
+ * If there is an error during the operation FALSE is returned and @error
+ * is set to indicate the error status, @bytes_read is updated to contain
+ * the number of bytes read into @buffer before the error occured.
+ *
+ * Return value: TRUE on success, FALSE if there was an error
  **/
-gssize
+gboolean
 g_input_stream_read_all (GInputStream              *stream,
 			 void                      *buffer,
 			 gsize                      count,
+			 gsize                     *bytes_read,
 			 GError                   **error)
 {
-  gsize bytes_read;
+  gsize _bytes_read;
   gssize res;
-  GError *internal_error;
 
-  bytes_read = 0;
-
-  internal_error = NULL;
-  while (bytes_read < count)
+  _bytes_read = 0;
+  while (_bytes_read < count)
     {
-      res = g_input_stream_read (stream, (char *)buffer + bytes_read, count - bytes_read,
-				 &internal_error);
+      res = g_input_stream_read (stream, (char *)buffer + _bytes_read, count - _bytes_read,
+				 error);
       if (res == -1)
 	{
-	  if (bytes_read == 0)
-	    {
-	      g_propagate_error (error, internal_error);
-	      return -1;
-	    }
-	  else
-	    {
-	      g_error_free (internal_error);
-	      return bytes_read;
-	    }
+	  *bytes_read = _bytes_read;
+	  return FALSE;
 	}
+      
       if (res == 0)
-	return bytes_read;
+	break;
 
-      bytes_read += res;
+      _bytes_read += res;
     }
-  return bytes_read;
+  
+  *bytes_read = _bytes_read;
+  return TRUE;
 }
 
 /**

@@ -135,9 +135,10 @@ gssize        g_input_stream_read              (GInputStream              *strea
 						void                      *buffer,
 						gsize                      count,
 						GError                   **error);
-gssize        g_input_stream_read_all          (GInputStream              *stream,
+gboolean      g_input_stream_read_all          (GInputStream              *stream,
 						void                      *buffer,
 						gsize                      count,
+						gsize                     *bytes_read,
 						GError                   **error);
 gssize        g_input_stream_skip              (GInputStream              *stream,
 						gsize                      count,
