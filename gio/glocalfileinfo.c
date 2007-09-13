@@ -161,7 +161,7 @@ hex_escape_string (const char *str, gboolean *free_return)
 	  c = str[i];
 	  *p++ = '\\';
 	  *p++ = 'x';
-	  *p++ = hex_digits[(c >> 8) & 0xf];
+	  *p++ = hex_digits[(c >> 4) & 0xf];
 	  *p++ = hex_digits[c & 0xf];
 	}
     }
@@ -169,6 +169,50 @@ hex_escape_string (const char *str, gboolean *free_return)
 
   *free_return = TRUE;
   return escaped_str;
+}
+
+static char *
+hex_unescape_string (const char *str, int *out_len, gboolean *free_return)
+{
+  int i;
+  char *unescaped_str, *p;
+  unsigned char c;
+  int len;
+
+  len = strlen (str);
+  
+  if (strchr (str, '\\') == NULL)
+    {
+      if (out_len)
+	*out_len = len;
+      *free_return = FALSE;
+      return (char *)str;
+    }
+  
+  unescaped_str = g_malloc (len + 1);
+
+  p = unescaped_str;
+  for (i = 0; i < len; i++)
+    {
+      if (str[i] == '\\' &&
+	  str[i+1] == 'x' &&
+	  len - i >= 4)
+	{
+	  c =
+	    (g_ascii_xdigit_value (str[i+2]) << 4) |
+	    g_ascii_xdigit_value (str[i+3]);
+	  *p++ = c;
+	  i += 3;
+	}
+      else
+	*p++ = str[i];
+    }
+  *p++ = 0;
+
+  if (out_len)
+    *out_len = p - unescaped_str;
+  *free_return = TRUE;
+  return unescaped_str;
 }
 
 static void
@@ -417,6 +461,52 @@ get_xattrs_from_fd (int fd,
     }
 #endif /* defined HAVE_XATTR */
 }
+
+#ifdef HAVE_XATTR
+static gboolean
+set_xattr (char *filename,
+	   const char *escaped_attribute,
+	   const GFileAttributeValue *attr_value,
+	   GError **error)
+{
+  char *attribute, *value;
+  gboolean free_attribute, free_value;
+  int val_len, res, errsv;
+  
+  if (attr_value->type != G_FILE_ATTRIBUTE_TYPE_STRING)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		   _("Invalid attribute type (string expected)"));
+      return FALSE;
+    }
+  
+  attribute = hex_unescape_string (escaped_attribute, NULL, &free_attribute);
+  value = hex_unescape_string (attr_value->u.string, &val_len, &free_value);
+
+  res = setxattr (filename, attribute, value, val_len, 0);
+  errsv = errno;
+  
+  if (free_attribute)
+    g_free (attribute);
+  
+  if (free_value)
+    g_free (value);
+
+
+  if (res == -1)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errsv),
+		   _("Error setting extended attribute '%s': %s"),
+		   escaped_attribute, g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
+#endif
+
 
 void
 _g_local_file_info_get_parent_info (const char             *dir,
@@ -1107,6 +1197,9 @@ _g_local_file_info_set_attribute (char *filename,
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC) == 0)
     return set_mtime_atime (filename, NULL, NULL, NULL, value, error);
 #endif
+
+  else if (g_str_has_prefix (attribute, "xattr:") == 0)
+    return set_xattr (filename, attribute + strlen ("xattr:"), value, error);
   
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 	       _("Setting attribute %s not supported"), attribute);
