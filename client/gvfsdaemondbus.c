@@ -608,6 +608,9 @@ _g_vfs_daemon_call_async (DBusMessage *message,
 DBusMessage *
 _g_vfs_daemon_call_sync (DBusMessage *message,
 			 DBusConnection **connection_out,
+			 const char *callback_obj_path,
+			 DBusObjectPathMessageFunction callback,
+			 gpointer callback_user_data, 
 			 GCancellable *cancellable,
 			 GError **error)
 {
@@ -620,6 +623,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   gboolean sent_cancel;
   DBusMessage *cancel_message;
   dbus_uint32_t serial;
+  gboolean handle_callbacks;
   const char *dbus_id = dbus_message_get_destination (message);
 
   if (g_cancellable_is_cancelled (cancellable))
@@ -647,8 +651,19 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
       return NULL;
     }
 
+  handle_callbacks = FALSE;
+  if (callback_obj_path != NULL && callback != NULL)
+    {
+      struct DBusObjectPathVTable vtable = { NULL, callback };
+      handle_callbacks = dbus_connection_register_object_path (connection,
+							       callback_obj_path,
+							       &vtable,
+							       callback_user_data);
+    }
+
+  reply = NULL;
   cancel_fd = g_cancellable_get_fd (cancellable);
-  if (cancel_fd != -1)
+  if (cancel_fd != -1 || handle_callbacks)
     {
       if (!dbus_connection_send_with_reply (connection, message,
 					    &pending,
@@ -660,7 +675,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       "Error while getting peer-to-peer dbus connection: %s",
 		       "Connection is closed");
-	  return NULL;
+	  goto out;
 	}
 
       /* Make sure the message is sent */
@@ -672,10 +687,10 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       "Error while getting peer-to-peer dbus connection: %s",
 		       "No fd");
-	  return NULL;
+	  goto out;
 	}
 
-      sent_cancel = FALSE;
+      sent_cancel = (cancel_fd == -1);
       while (!dbus_pending_call_get_completed (pending))
 	{
 	  struct pollfd poll_fds[2];
@@ -697,7 +712,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   "Error while getting peer-to-peer dbus connection: %s",
 			   "poll error");
-	      return NULL;
+	      goto out;
 	    }
 	  
 	  if (!sent_cancel && g_cancellable_is_cancelled (cancellable))
@@ -730,7 +745,6 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 
 	      while (dbus_connection_dispatch (connection) == DBUS_DISPATCH_DATA_REMAINS)
 		;
-		
 	    }
 	}
 
@@ -747,14 +761,19 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 	{
 	  _g_error_from_dbus (&derror, error);
 	  dbus_error_free (&derror);
-	  return NULL;
+	  goto out;
 	}
     }
 
   if (connection_out)
     *connection_out = connection;
 
-  if (_g_error_from_message (reply, error))
+ out:  
+  
+  if (handle_callbacks)
+    dbus_connection_unregister_object_path (connection, callback_obj_path);
+
+  if (reply != NULL && _g_error_from_message (reply, error))
     {
       dbus_message_unref (reply);
       return NULL;

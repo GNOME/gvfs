@@ -31,6 +31,11 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
 #define G_VFS_DBUS_MOUNT_OP_TRASH "Trash"
 #define G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY "MakeDirectory"
+#define G_VFS_DBUS_MOUNT_OP_COPY "Copy"
+
+/* Progress callback interface for copy and move */
+#define G_VFS_DBUS_PROGRESS_INTERFACE "org.gtk.vfs.Progress"
+#define G_VFS_DBUS_PROGRESS_OP_PROGRESS "Progress"
 
 /* mount daemons that support mounting more mounts implement this,
    and set the dbus name in the mountable description file */

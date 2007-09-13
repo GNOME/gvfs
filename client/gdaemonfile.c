@@ -314,10 +314,85 @@ do_sync_path_call (GFile *file,
 
   reply = _g_vfs_daemon_call_sync (message,
 				   connection_out,
+				   NULL, NULL, NULL,
 				   cancellable, error);
   dbus_message_unref (message);
 
   _g_mount_ref_unref (mount_ref);
+  
+  return reply;
+}
+
+static DBusMessage *
+do_sync_2_path_call (GFile *file1,
+		     GFile *file2,
+		     const char *op,
+		     const char *callback_obj_path,
+		     DBusObjectPathMessageFunction callback,
+		     gpointer callback_user_data, 
+		     DBusConnection **connection_out,
+		     GCancellable *cancellable,
+		     GError **error,
+		     int first_arg_type,
+		     ...)
+{
+  GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
+  GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
+  DBusMessage *message, *reply;
+  GMountRef *mount_ref1, *mount_ref2;
+  const char *path1, *path2;
+  va_list var_args;
+
+  mount_ref1 = _g_daemon_vfs_get_mount_ref_sync (daemon_file1->mount_spec,
+						 daemon_file1->path,
+						 error);
+  if (mount_ref1 == NULL)
+    return NULL;
+
+  mount_ref2 = _g_daemon_vfs_get_mount_ref_sync (daemon_file2->mount_spec,
+						 daemon_file2->path,
+						 error);
+  if (mount_ref2 == NULL)
+    return NULL;
+
+  if (mount_ref1 != mount_ref2)
+    {
+      /* For copy this will cause the fallback code to be involved */
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported, files on different mounts"));
+      return FALSE;
+    }
+  
+  message =
+    dbus_message_new_method_call (mount_ref1->dbus_id,
+				  mount_ref1->object_path,
+				  G_VFS_DBUS_MOUNT_INTERFACE,
+				  op);
+
+  path1 = _g_mount_ref_resolve_path (mount_ref1,
+				     daemon_file1->path);
+  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path1, 0);
+
+  path2 = _g_mount_ref_resolve_path (mount_ref1,
+				     daemon_file2->path);
+  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path2, 0);
+
+  va_start (var_args, first_arg_type);
+  _g_dbus_message_append_args_valist (message,
+				      first_arg_type,
+				      var_args);
+  va_end (var_args);
+
+  reply = _g_vfs_daemon_call_sync (message,
+				   connection_out,
+				   callback_obj_path,
+				   callback,
+				   callback_user_data, 
+				   cancellable, error);
+  dbus_message_unref (message);
+
+  _g_mount_ref_unref (mount_ref1);
+  _g_mount_ref_unref (mount_ref2);
   
   return reply;
 }
@@ -1223,6 +1298,88 @@ g_daemon_file_make_directory (GFile *file,
   return TRUE;
 }
 
+struct ProgressCallbackData {
+  GFileProgressCallback progress_callback;
+  gpointer progress_callback_data;
+};
+
+static DBusHandlerResult
+progress_callback_message (DBusConnection  *connection,
+			   DBusMessage     *message,
+			   void            *user_data)
+{
+  struct ProgressCallbackData *data = user_data;
+  dbus_uint64_t current_dbus, total_dbus;
+  
+  if (dbus_message_is_method_call (message,
+				   G_VFS_DBUS_PROGRESS_INTERFACE,
+				   G_VFS_DBUS_PROGRESS_OP_PROGRESS))
+    {
+      if (dbus_message_get_args (message, NULL, 
+				 DBUS_TYPE_UINT64, &current_dbus,
+				 DBUS_TYPE_UINT64, &total_dbus,
+				 0))
+	data->progress_callback (current_dbus, total_dbus, data->progress_callback_data);
+    }
+  else
+    g_warning ("Unknown progress callback message type\n");
+  
+  /* TODO: demarshal args and call reall callback */
+  return DBUS_HANDLER_RESULT_HANDLED;
+}
+
+static gboolean
+g_daemon_file_copy (GFile                  *source,
+		    GFile                  *destination,
+		    GFileCopyFlags          flags,
+		    GCancellable           *cancellable,
+		    GFileProgressCallback   progress_callback,
+		    gpointer                progress_callback_data,
+		    GError                **error)
+{
+  GDaemonFile *daemon_source, *daemon_dest;
+  DBusMessage *reply;
+  char *obj_path, *dbus_obj_path;
+  dbus_uint32_t flags_dbus;
+  struct ProgressCallbackData data;
+
+  daemon_source = G_DAEMON_FILE (source);
+  daemon_dest = G_DAEMON_FILE (destination);
+
+  if (progress_callback)
+    {
+      obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
+      dbus_obj_path = obj_path;
+    }
+  else
+    {
+      obj_path = NULL;
+      /* Can't pass NULL obj path as arg */
+      dbus_obj_path = "/org/gtk/vfs/void";
+    }
+
+  data.progress_callback = progress_callback;
+  data.progress_callback_data = progress_callback_data;
+
+  flags_dbus = flags;
+  reply = do_sync_2_path_call (source, destination, 
+			       G_VFS_DBUS_MOUNT_OP_COPY,
+			       obj_path, progress_callback_message, &data,
+			       NULL, cancellable, error,
+			       DBUS_TYPE_UINT32, &flags_dbus,
+			       DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+			       0);
+
+  g_free (obj_path);
+
+  if (reply == NULL)
+    return FALSE;
+
+  dbus_message_unref (reply);
+  return TRUE;
+}
+
+
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
@@ -1253,4 +1410,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->delete_file = g_daemon_file_delete;
   iface->trash = g_daemon_file_trash;
   iface->make_directory = g_daemon_file_make_directory;
+  iface->copy = g_daemon_file_copy;
 }

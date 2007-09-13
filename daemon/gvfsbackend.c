@@ -22,6 +22,7 @@
 #include <gvfsjobtrash.h>
 #include <gvfsjobmountmountable.h>
 #include <gvfsjobmakedirectory.h>
+#include <gvfsjobcopy.h>
 #include <gdbusutils.h>
 
 enum {
@@ -256,6 +257,10 @@ backend_dbus_handler (DBusConnection  *connection,
   GVfsJob *job;
 
   job = NULL;
+
+  g_print ("backend_dbus_handler %s:%s\n",
+	   dbus_message_get_interface (message),
+	   dbus_message_get_member (message));
   
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNT_INTERFACE,
@@ -297,6 +302,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY))
     job = g_vfs_job_make_directory_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_COPY))
+    job = g_vfs_job_copy_new (connection, message, backend);
 
   if (job)
     {
