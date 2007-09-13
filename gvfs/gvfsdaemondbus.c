@@ -439,7 +439,7 @@ async_get_connection_response (DBusPendingCall *pending,
   DBusMessage *reply;
   char *address1, *address2;
   int extra_fd;
-  DBusConnection *connection;
+  DBusConnection *connection, *existing_connection;
   VfsConnectionData *connection_data;
   DBusSource *source;
   char **mountpoints;
@@ -459,7 +459,7 @@ async_get_connection_response (DBusPendingCall *pending,
 			 DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &mountpoints, &n_mountpoints,
 			 DBUS_TYPE_INVALID);
 
-  /* TODO: This connect i sync, should be async */
+  /* I don't know of any way to do an async connect */
   error = NULL;
   extra_fd = daemon_socket_connect (address2, &async_call->io_error);
   if (extra_fd == -1)
@@ -495,12 +495,29 @@ async_get_connection_response (DBusPendingCall *pending,
   if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
     g_error ("Out of memory");
 
-  async_call->connection = connection;
-  source = set_connection_for_main_context (async_call->context,
-					    mountpoints,
-					    n_mountpoints,
-					    connection);
-  g_source_unref ((GSource *)source); /* Owned by context */
+  /* Maybe we already had a connection? This happens if we requested
+   * the same mountpoint, or a mountpoint in the same daemon in parallel.
+   * If so, just drop this connection and use that.
+   */
+  
+  existing_connection = get_connection_for_main_context (async_call->context,
+							 async_call->mountpoint);
+  if (existing_connection != NULL)
+    {
+      async_call->connection = existing_connection;
+      dbus_connection_close (connection);
+    }
+  else
+    {  
+      async_call->connection = connection;
+      source = set_connection_for_main_context (async_call->context,
+						mountpoints,
+						n_mountpoints,
+						connection);
+      g_source_unref ((GSource *)source); /* Owned by context */
+    }
+  
+  dbus_connection_unref (connection);
 
   dbus_free_string_array (mountpoints);
   
@@ -1309,6 +1326,9 @@ get_connection_for_main_context (GMainContext *context,
   DBusConnection *connection;
   ContextMapKey key;
   DBusSource *dbus_source;
+
+  if (context == NULL)
+    context = g_main_context_default ();
   
   connection = NULL;
   G_LOCK (context_map);
