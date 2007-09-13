@@ -142,16 +142,23 @@ typedef struct {
 } AsyncData;
 
 static void
-close_done (GInputStream *stream,
-	    gboolean      result,
-	    gpointer      _data,
-	    GError       *error)
+close_done (GObject *source_object,
+	   GAsyncResult *res,
+	   gpointer      user_data)
 {
-  AsyncData *data = _data;
+  AsyncData *data = user_data;
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  gboolean result;
+  GError *error = NULL;
+
+  result = g_input_stream_close_finish (stream, res, &error);
   
   g_print ("close result: %d\n", result);
   if (!result)
-    g_print ("Close error %d: %s\n", error->code, error->message);
+    {
+      g_print ("Close error %d: %s\n", error->code, error->message);
+      g_error_free (error);
+    }
 
   g_object_unref (data->c);
   g_free (data);
@@ -164,16 +171,18 @@ read_done (GObject *source_object,
 {
   AsyncData *data = user_data;
   GInputStream *stream = G_INPUT_STREAM (source_object);
-  gssize        count_read;
-  GError       *error = NULL;
-
+  gssize count_read;
+  GError *error = NULL;
 
   count_read = g_input_stream_read_finish (stream, res, &error);
   
   g_print ("count_read: %d\n", count_read);
 
   if (count_read == -1)
-    g_print ("Error %d: %s\n", error->code, error->message);
+    {
+      g_print ("Error %d: %s\n", error->code, error->message);
+      g_error_free (error);
+    }
   else if (0)
     {
       data->buffer[count_read] = 0;
@@ -186,7 +195,7 @@ read_done (GObject *source_object,
       //g_cancellable_cancel (data->c);
     }
   else
-    g_input_stream_close_async (stream, 0, close_done, data, data->c);
+    g_input_stream_close_async (stream, 0, data->c, close_done, data);
 }
 
 static void

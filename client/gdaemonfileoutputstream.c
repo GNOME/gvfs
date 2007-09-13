@@ -953,7 +953,7 @@ typedef struct AsyncIterator AsyncIterator;
 
 typedef void (*AsyncIteratorDone) (GOutputStream *stream,
 				   gpointer op_data,
-				   gpointer callback,
+				   GAsyncReadyCallback callback,
 				   gpointer callback_data,
 				   GError *io_error);
 
@@ -965,7 +965,7 @@ struct AsyncIterator {
   state_machine_iterator iterator;
   gpointer iterator_data;
   int io_priority;
-  gpointer callback;
+  GAsyncReadyCallback callback;
   gpointer callback_data;
 };
 
@@ -1044,13 +1044,19 @@ async_read_op_callback (GObject *source_object,
 }
 
 static void
-async_skip_op_callback (GInputStream *stream,
-			gsize         count_requested,
-			gssize        count_skipped,
-			gpointer      data,
-			GError       *error)
+async_skip_op_callback (GObject *source_object,
+			GAsyncResult *res,
+			gpointer      user_data)
 {
-  async_op_handle ((AsyncIterator *)data, count_skipped, error);
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+  gssize count_skipped;
+  GError *error = NULL;
+  
+  count_skipped = g_input_stream_skip_finish (stream, res, &error);
+  
+  async_op_handle ((AsyncIterator *)user_data, count_skipped, error);
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -1097,8 +1103,8 @@ async_iterate (AsyncIterator *iterator)
       g_input_stream_skip_async (file->data_stream,
 				 io_data->io_size,
 				 iterator->io_priority,
-				 async_skip_op_callback, iterator,
-				 io_data->io_allow_cancel ? iterator->cancellable : NULL);
+				 io_data->io_allow_cancel ? iterator->cancellable : NULL,
+				 async_skip_op_callback, iterator);
     }
   else if (io_op == STATE_OP_WRITE)
     {
@@ -1117,7 +1123,7 @@ run_async_state_machine (GDaemonFileOutputStream *file,
 			 state_machine_iterator iterator_cb,
 			 gpointer iterator_data,
 			 int io_priority,
-			 gpointer callback,
+			 GAsyncReadyCallback callback,
 			 gpointer data,
 			 GCancellable *cancellable,
 			 AsyncIteratorDone done_cb)
@@ -1204,9 +1210,9 @@ g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
 			   (state_machine_iterator)iterate_write_state_machine,
 			   op,
 			   io_priority,
-			   callback, data,
+			   (gpointer)callback, data,
 			   cancellable,
-			   async_write_done);
+			   (gpointer)async_write_done);
 }
 
 static void
@@ -1279,7 +1285,7 @@ g_daemon_file_output_stream_close_async (GOutputStream        *stream,
   run_async_state_machine (file,
 			   (state_machine_iterator)iterate_close_state_machine,
 			   op, io_priority,
-			   callback, data,
+			   (gpointer)callback, data,
 			   cancellable,
-			   async_close_done);
+			   (gpointer)async_close_done);
 }

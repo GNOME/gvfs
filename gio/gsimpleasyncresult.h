@@ -48,6 +48,8 @@ GSimpleAsyncResult *g_simple_async_result_new_from_error   (GObject             
 							    GError                  *error);
 gpointer            g_simple_async_result_get_op_data      (GSimpleAsyncResult      *simple);
 gpointer            g_simple_async_result_get_source_tag   (GSimpleAsyncResult      *simple);
+void                g_simple_async_result_set_handle_cancellation (GSimpleAsyncResult      *simple,
+								   gboolean          handle_cancellation);
 void                g_simple_async_result_complete         (GSimpleAsyncResult      *simple);
 void                g_simple_async_result_complete_in_idle (GSimpleAsyncResult      *simple);
 void                g_simple_async_result_run_in_thread    (GSimpleAsyncResult      *simple,

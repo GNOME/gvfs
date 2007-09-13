@@ -24,6 +24,7 @@ struct _GSimpleAsyncResult
   gpointer user_data;
   GError *error;
   gboolean failed;
+  gboolean handle_cancellation;
 
   gpointer source_tag;
 
@@ -66,6 +67,7 @@ g_simple_async_result_class_init (GSimpleAsyncResultClass *klass)
 static void
 g_simple_async_result_init (GSimpleAsyncResult *simple)
 {
+  simple->handle_cancellation = TRUE;
 }
 
 GSimpleAsyncResult *
@@ -152,6 +154,13 @@ g_simple_async_result_async_result_iface_init (GAsyncResultIface *iface)
   iface->get_source_object = g_simple_async_result_get_source_object;
 }
 
+
+void
+g_simple_async_result_set_handle_cancellation (GSimpleAsyncResult *simple,
+					       gboolean handle_cancellation)
+{
+  simple->handle_cancellation = handle_cancellation;
+}
 
 gpointer
 g_simple_async_result_get_source_tag (GSimpleAsyncResult *simple)
@@ -279,7 +288,8 @@ run_in_thread (GIOJob *job,
   RunInThreadData *data = _data;
   GSimpleAsyncResult *simple = data->simple;
 
-  if (g_cancellable_is_cancelled (c))
+  if (simple->handle_cancellation &&
+      g_cancellable_is_cancelled (c))
     {
       g_simple_async_result_set_error (simple,
                                        G_IO_ERROR,

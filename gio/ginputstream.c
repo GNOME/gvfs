@@ -15,31 +15,37 @@ struct _GInputStreamPrivate {
   GAsyncReadyCallback outstanding_callback;
 };
 
-static gssize g_input_stream_real_skip        (GInputStream              *stream,
-					       gsize                      count,
-					       GCancellable              *cancellable,
-					       GError                   **error);
-static void   g_input_stream_real_read_async  (GInputStream              *stream,
-					       void                      *buffer,
-					       gsize                      count,
-					       int                        io_priority,
-					       GCancellable              *cancellable,
-					       GAsyncReadyCallback        callback,
-					       gpointer                   user_data);
-static gssize g_input_stream_real_read_finish (GInputStream              *stream,
-					       GAsyncResult              *result,
-					       GError                   **error);
-static void   g_input_stream_real_skip_async  (GInputStream              *stream,
-					       gsize                      count,
-					       int                        io_priority,
-					       GAsyncSkipCallback         callback,
-					       gpointer                   data,
-					       GCancellable              *cancellable);
-static void   g_input_stream_real_close_async (GInputStream              *stream,
-					       int                        io_priority,
-					       GAsyncCloseInputCallback   callback,
-					       gpointer                   data,
-					       GCancellable              *cancellable);
+static gssize   g_input_stream_real_skip         (GInputStream         *stream,
+						  gsize                 count,
+						  GCancellable         *cancellable,
+						  GError              **error);
+static void     g_input_stream_real_read_async   (GInputStream         *stream,
+						  void                 *buffer,
+						  gsize                 count,
+						  int                   io_priority,
+						  GCancellable         *cancellable,
+						  GAsyncReadyCallback   callback,
+						  gpointer              user_data);
+static gssize   g_input_stream_real_read_finish  (GInputStream         *stream,
+						  GAsyncResult         *result,
+						  GError              **error);
+static void     g_input_stream_real_skip_async   (GInputStream         *stream,
+						  gsize                 count,
+						  int                   io_priority,
+						  GCancellable         *cancellable,
+						  GAsyncReadyCallback   callback,
+						  gpointer              data);
+static gssize   g_input_stream_real_skip_finish  (GInputStream         *stream,
+						  GAsyncResult         *result,
+						  GError              **error);
+static void     g_input_stream_real_close_async  (GInputStream         *stream,
+						  int                   io_priority,
+						  GCancellable         *cancellable,
+						  GAsyncReadyCallback   callback,
+						  gpointer              data);
+static gboolean g_input_stream_real_close_finish (GInputStream         *stream,
+						  GAsyncResult         *result,
+						  GError              **error);
 
 static void
 g_input_stream_finalize (GObject *object)
@@ -68,7 +74,9 @@ g_input_stream_class_init (GInputStreamClass *klass)
   klass->read_async = g_input_stream_real_read_async;
   klass->read_finish = g_input_stream_real_read_finish;
   klass->skip_async = g_input_stream_real_skip_async;
+  klass->skip_finish = g_input_stream_real_skip_finish;
   klass->close_async = g_input_stream_real_close_async;
+  klass->close_finish = g_input_stream_real_close_finish;
 }
 
 static void
@@ -553,68 +561,12 @@ g_input_stream_read_finish (GInputStream              *stream,
   return class->read_finish (stream, result, error);
 }
 
-typedef struct {
-  GAsyncResultData   generic;
-  gsize              count_requested;
-  gssize             count_skipped;
-  GAsyncSkipCallback callback;
-} SkipAsyncResult;
-
-static gboolean
-call_skip_async_result (gpointer data)
-{
-  SkipAsyncResult *res = data;
-
-  if (res->callback)
-    res->callback (res->generic.async_object,
-		   res->count_requested,
-		   res->count_skipped,
-		   res->generic.user_data,
-		   res->generic.error);
-
-  return FALSE;
-}
-
-static void
-queue_skip_async_result (GInputStream      *stream,
-			 gsize              count_requested,
-			 gssize             count_skipped,
-			 GError            *error,
-			 GAsyncSkipCallback callback,
-			 gpointer           data)
-{
-  SkipAsyncResult *res;
-
-  res = g_new0 (SkipAsyncResult, 1);
-
-  res->count_requested = count_requested;
-  res->count_skipped = count_skipped;
-  res->callback = callback;
-
-  _g_queue_async_result ((GAsyncResultData *)res, stream,
-			 error, data,
-			 call_skip_async_result);
-}
-
-static void
-skip_async_callback_wrapper (GInputStream *stream,
-			     gsize         count_requested,
-			     gssize        count_skipped,
-			     gpointer      data,
-			     GError       *error)
-{
-  GAsyncSkipCallback real_callback = (gpointer)stream->priv->outstanding_callback;
-
-  stream->priv->pending = FALSE;
-  (*real_callback) (stream, count_requested, count_skipped, data, error);
-  g_object_unref (stream);
-}
-
 /**
  * g_input_stream_skip_async:
  * @stream: A #GInputStream.
  * @count: the number of bytes that will be skipped from the stream
  * @io_priority: the io priority of the request
+ * @cancellable: optional cancellable object
  * @callback: callback to call when the request is satisfied
  * @user_data: the data to pass to callback function
  *
@@ -645,118 +597,94 @@ void
 g_input_stream_skip_async (GInputStream        *stream,
 			   gsize                count,
 			   int                  io_priority,
-			   GAsyncSkipCallback   callback,
-			   gpointer             user_data,
-			   GCancellable        *cancellable)
+			   GCancellable        *cancellable,
+			   GAsyncReadyCallback  callback,
+			   gpointer             user_data)
 {
   GInputStreamClass *class;
-  GError *error;
+  GSimpleAsyncResult *simple;
 
   g_return_if_fail (G_IS_INPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
 
   if (count == 0)
     {
-      queue_skip_async_result (stream, count, 0, NULL,
-			       callback, user_data);
+      simple = g_simple_async_result_new (G_OBJECT (stream),
+					  callback,
+					  user_data,
+					  g_input_stream_skip_async,
+					  NULL, NULL);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
       return;
     }
   
   if (((gssize) count) < 0)
     {
-      error = NULL;
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		   _("Too large count value passed to g_input_stream_skip_async"));
-      queue_skip_async_result (stream, count, -1, error,
-			       callback, user_data);
+      report_error (stream,
+		    callback,
+		    user_data,
+		    G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		    _("Too large count value passed to g_input_stream_skip_async"));
       return;
     }
 
   if (stream->priv->closed)
     {
-      error = NULL;
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_CLOSED,
-		   _("Stream is already closed"));
-      queue_skip_async_result (stream, count, -1, error,
-			       callback, user_data);
+      report_error (stream,
+		    callback,
+		    user_data,
+		    G_IO_ERROR, G_IO_ERROR_CLOSED,
+		    _("Stream is already closed"));
       return;
     }
   
   if (stream->priv->pending)
     {
-      error = NULL;
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
-		   _("Stream has outstanding operation"));
-      queue_skip_async_result (stream, count, -1, error,
-			       callback, user_data);
+      report_error (stream,
+		    callback,
+		    user_data,
+		    G_IO_ERROR, G_IO_ERROR_PENDING,
+		    _("Stream has outstanding operation"));
       return;
     }
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   stream->priv->pending = TRUE;
-  stream->priv->outstanding_callback = (gpointer)callback;
+  stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->skip_async (stream, count, io_priority, skip_async_callback_wrapper, user_data, cancellable);
+  class->skip_async (stream, count, io_priority, cancellable,
+		     async_ready_callback_wrapper, user_data);
 }
 
-
-typedef struct {
-  GAsyncResultData         generic;
-  gboolean                 result;
-  GAsyncCloseInputCallback callback;
-} CloseAsyncResult;
-
-static gboolean
-call_close_async_result (gpointer data)
+gssize
+g_input_stream_skip_finish (GInputStream              *stream,
+			    GAsyncResult              *result,
+			    GError                   **error)
 {
-  CloseAsyncResult *res = data;
+  GSimpleAsyncResult *simple;
+  GInputStreamClass *class;
 
-  if (res->callback)
-    res->callback (res->generic.async_object,
-		   res->result,
-		   res->generic.user_data,
-		   res->generic.error);
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return -1;
 
-  return FALSE;
-}
+      /* Special case skip of 0 bytes */
+      if (g_simple_async_result_get_source_tag (simple) == g_input_stream_skip_async)
+	return 0;
+    }
 
-static void
-queue_close_async_result (GInputStream       *stream,
-			  gboolean            result,
-			  GError             *error,
-			  GAsyncCloseInputCallback callback,
-			  gpointer            data)
-{
-  CloseAsyncResult *res;
-
-  res = g_new0 (CloseAsyncResult, 1);
-
-  res->result = result;
-  res->callback = callback;
-
-  _g_queue_async_result ((GAsyncResultData *)res, stream,
-			 error, data,
-			 call_close_async_result);
-}
-
-static void
-close_async_callback_wrapper (GInputStream *stream,
-			      gboolean      result,
-			      gpointer      data,
-			      GError       *error)
-{
-  GAsyncCloseInputCallback real_callback = (gpointer)stream->priv->outstanding_callback;
-
-  stream->priv->pending = FALSE;
-  stream->priv->closed = TRUE;
-  (*real_callback) (stream, result, data, error);
-  g_object_unref (stream);
+  class = G_INPUT_STREAM_GET_CLASS (stream);
+  return class->skip_finish (stream, result, error);
 }
 
 /**
  * g_input_stream_close_async:
  * @stream: A #GInputStream.
  * @io_priority: the io priority of the request
+ * @cancellable: optional cancellable object
  * @callback: callback to call when the request is satisfied
  * @user_data: the data to pass to callback function
  *
@@ -772,39 +700,69 @@ close_async_callback_wrapper (GInputStream *stream,
 void
 g_input_stream_close_async (GInputStream       *stream,
 			    int                 io_priority,
-			    GAsyncCloseInputCallback callback,
-			    gpointer            user_data,
-			    GCancellable       *cancellable)
+			    GCancellable       *cancellable,
+			    GAsyncReadyCallback callback,
+			    gpointer            user_data)
 {
   GInputStreamClass *class;
-  GError *error;
+  GSimpleAsyncResult *simple;
 
   g_return_if_fail (G_IS_INPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
 
   if (stream->priv->closed)
     {
-      queue_close_async_result (stream, TRUE, NULL,
-				callback, user_data);
+      simple = g_simple_async_result_new (G_OBJECT (stream),
+					  callback,
+					  user_data,
+					  g_input_stream_close_async,
+					  NULL, NULL);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
       return;
     }
 
   if (stream->priv->pending)
     {
-      error = NULL;
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
-		   _("Stream has outstanding operation"));
-      queue_close_async_result (stream, FALSE, error,
-				callback, user_data);
+      report_error (stream,
+		    callback,
+		    user_data,
+		    G_IO_ERROR, G_IO_ERROR_PENDING,
+		    _("Stream has outstanding operation"));
       return;
     }
   
   class = G_INPUT_STREAM_GET_CLASS (stream);
   stream->priv->pending = TRUE;
-  stream->priv->outstanding_callback = (gpointer)callback;
+  stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
-  class->close_async (stream, io_priority, close_async_callback_wrapper, user_data, cancellable);
+  class->close_async (stream, io_priority, cancellable,
+		      async_ready_callback_wrapper, user_data);
 }
+
+gboolean
+g_input_stream_close_finish (GInputStream              *stream,
+			     GAsyncResult              *result,
+			     GError                   **error)
+{
+  GSimpleAsyncResult *simple;
+  GInputStreamClass *class;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+
+      /* Special case already closed */
+      if (g_simple_async_result_get_source_tag (simple) == g_input_stream_close_async)
+	return TRUE;
+    }
+
+  class = G_INPUT_STREAM_GET_CLASS (stream);
+  return class->close_finish (stream, result, error);
+}
+
 
 gboolean
 g_input_stream_is_closed (GInputStream *stream)
@@ -837,25 +795,6 @@ g_input_stream_set_pending (GInputStream              *stream,
 /********************************************
  *   Default implementation of async ops    *
  ********************************************/
-
-typedef struct {
-  GInputStream     *stream;
-  GError            *error;
-  gpointer           data;
-} InputStreamOp;
-
-static void
-input_stream_op_free (gpointer data)
-{
-  InputStreamOp *op = data;
-
-  if (op->error)
-    g_error_free (op->error);
-
-  g_free (op);
-}
-
-/************ read_async ***********/
 
 typedef struct {
   void              *buffer;
@@ -920,90 +859,84 @@ g_input_stream_real_read_finish (GInputStream              *stream,
   return op->count_read;
 }
 
-/****  skip_async ****/
-		   
 typedef struct {
-  InputStreamOp      op;
-  gsize              count_requested;
-  gssize             count_skipped;
-  GAsyncSkipCallback callback;
-} SkipAsyncOp;
+  gsize count_requested;
+  gssize count_skipped;
+} SkipData;
+
 
 static void
-skip_op_report (gpointer data)
+skip_async_thread (GSimpleAsyncResult *res,
+		   gpointer op_data,
+		   GObject *object,
+		   GCancellable *cancellable)
 {
-  SkipAsyncOp *op = data;
-
-  op->callback (op->op.stream,
-		op->count_requested,
-		op->count_skipped,
-		op->op.data,
-		op->op.error);
-
-}
-
-static void
-skip_op_func (GIOJob *job,
-	      GCancellable *c,
-	      gpointer data)
-{
-  SkipAsyncOp *op = data;
+  SkipData *op = op_data;
   GInputStreamClass *class;
-
-  if (g_cancellable_is_cancelled (c))
+  GError *error = NULL;
+  
+  class = G_INPUT_STREAM_GET_CLASS (object);
+  
+  op->count_skipped = class->skip (G_INPUT_STREAM (object),
+				   op->count_requested,
+				   cancellable, &error);
+  if (op->count_skipped == -1)
     {
-      op->count_skipped = -1;
-      g_set_error (&op->op.error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
     }
-  else
-    {
-      class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-      op->count_skipped = class->skip (op->op.stream, op->count_requested,
-				       c, &op->op.error);
-    }
-
-  g_io_job_send_to_mainloop (job, skip_op_report,
-			     op, input_stream_op_free,
-			     FALSE);
 }
 
 typedef struct {
   char *buffer;
   gpointer user_data;
-  GAsyncSkipCallback callback;
+  GAsyncReadyCallback callback;
 } SkipFallbackAsyncData;
 
-/*
 static void
-skip_callback_wrapper (GInputStream *stream,
-		       void         *buffer,
-		       gsize         count_requested,
-		       gssize        count_skipped,
-		       gpointer      _data,
-		       GError       *error)
+skip_callback_wrapper (GObject *source_object,
+		       GAsyncResult *res,
+		       gpointer user_data)
 {
-  SkipFallbackAsyncData *data = _data;
+  SkipFallbackAsyncData *data = user_data;
+  SkipData *op;
+  GSimpleAsyncResult *simple;
+  GError *error = NULL;
 
-  data->callback (stream, count_requested, count_skipped, data->user_data, error);
+  op = g_new0 (SkipData, 1);
+  simple = g_simple_async_result_new (source_object,
+				      data->callback, data->user_data,
+				      g_input_stream_real_skip_async, op, g_free);
+
+  op->count_skipped =
+    g_input_stream_read_finish (G_INPUT_STREAM (source_object), res, &error);
+
+  if (op->count_skipped == -1)
+    {
+      g_simple_async_result_set_from_error (simple, error);
+      g_error_free (error);
+    }
+
+  /* Complete immediately, not in idle, since we're already in a mainloop callout */
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+  
   g_free (data->buffer);
   g_free (data);
-}
-*/
+ }
 
 static void
 g_input_stream_real_skip_async (GInputStream        *stream,
 				gsize                count,
 				int                  io_priority,
-				GAsyncSkipCallback   callback,
-				gpointer             user_data,
-				GCancellable        *cancellable)
+				GCancellable        *cancellable,
+				GAsyncReadyCallback  callback,
+				gpointer             user_data)
 {
   GInputStreamClass *class;
-  SkipAsyncOp *op;
+  SkipData *op;
   SkipFallbackAsyncData *data;
+  GSimpleAsyncResult *res;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
@@ -1012,97 +945,101 @@ g_input_stream_real_skip_async (GInputStream        *stream,
       /* Read is thread-using async fallback. Make skip use
        * threads too, so that we can use a possible sync skip
        * implementation. */
-      op = g_new0 (SkipAsyncOp, 1);
+      op = g_new0 (SkipData, 1);
       
-      op->op.stream = stream;
+      res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data,
+				       g_input_stream_real_skip_async, op, g_free);
       op->count_requested = count;
-      op->callback = callback;
-      op->op.data = user_data;
-      
-      g_schedule_io_job (skip_op_func,
-			 op,
-			 NULL,
-			 io_priority,
-			 cancellable);
+
+      g_simple_async_result_run_in_thread (res, skip_async_thread, io_priority, cancellable);
+      g_object_unref (res);
     }
   else
     {
-      /* TODO: Skip fallback uses too much memory, should do multiple calls */
-      /* Custom async read function, lets use that. */
+      /* TODO: Skip fallback uses too much memory, should do multiple read calls */
+      
+      /* There is a custom async read function, lets use that. */
       data = g_new (SkipFallbackAsyncData, 1);
       data->buffer = g_malloc (count);
       data->callback = callback;
       data->user_data = user_data;
-      /* TODO: uncomment when updating async 
-      class->read_async (stream, data->buffer, count, io_priority,
-			 skip_callback_wrapper, data, cancellable);
-      */
+      class->read_async (stream, data->buffer, count, io_priority, cancellable,
+			 skip_callback_wrapper, data);
     }
 
+}
+
+static gssize
+g_input_stream_real_skip_finish (GInputStream              *stream,
+				 GAsyncResult              *result,
+				 GError                   **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+  SkipData *op;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_input_stream_real_skip_async);
+
+  op = g_simple_async_result_get_op_data (simple);
+  return op->count_skipped;
 }
 
 typedef struct {
-  InputStreamOp      op;
   gboolean           res;
-  GAsyncCloseInputCallback callback;
-} CloseAsyncOp;
+} CloseData;
 
 static void
-close_op_report (gpointer data)
+close_async_thread (GSimpleAsyncResult *res,
+		    gpointer op_data,
+		    GObject *object,
+		    GCancellable *cancellable)
 {
-  CloseAsyncOp *op = data;
-
-  op->callback (op->op.stream,
-		op->res,
-		op->op.data,
-		op->op.error);
-}
-
-static void
-close_op_func (GIOJob *job,
-	       GCancellable *c,
-	       gpointer data)
-{
-  CloseAsyncOp *op = data;
+  CloseData *op = op_data;
   GInputStreamClass *class;
+  GError *error = NULL;
 
-  if (g_cancellable_is_cancelled (c))
+  /* Auto handling of cancelation disabled, and ignore
+     cancellation, since we want to close things anyway, although
+     possibly in a quick-n-dirty way. At least we never want to leak
+     open handles */
+  
+  class = G_INPUT_STREAM_GET_CLASS (object);
+  op->res = class->close (G_INPUT_STREAM (object), cancellable, &error);
+  if (!op->res)
     {
-      op->res = FALSE;
-      g_set_error (&op->op.error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
     }
-  else
-    {
-      class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-      op->res = class->close (op->op.stream, c, &op->op.error);
-    }
-
-  g_io_job_send_to_mainloop (job, close_op_report,
-			     op, input_stream_op_free,
-			     FALSE);
 }
 
 static void
-g_input_stream_real_close_async (GInputStream       *stream,
-				 int                 io_priority,
-				 GAsyncCloseInputCallback callback,
-				 gpointer            data,
-				 GCancellable       *cancellable)
+g_input_stream_real_close_async (GInputStream        *stream,
+				 int                  io_priority,
+				 GCancellable        *cancellable,
+				 GAsyncReadyCallback  callback,
+				 gpointer             user_data)
 {
-  CloseAsyncOp *op;
-
-  op = g_new0 (CloseAsyncOp, 1);
-
-  op->op.stream = stream;
-  op->callback = callback;
-  op->op.data = data;
+  GSimpleAsyncResult *res;
+  CloseData *op;
   
-  g_schedule_io_job (close_op_func,
-		     op,
-		     NULL,
-		     io_priority,
-		     cancellable);
+  op = g_new (CloseData, 1);
+  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_input_stream_real_close_async, op, g_free);
+
+  g_simple_async_result_set_handle_cancellation (res, FALSE);
+  
+  g_simple_async_result_run_in_thread (res, close_async_thread, io_priority, cancellable);
+  g_object_unref (res);
+}
+
+static gboolean
+g_input_stream_real_close_finish (GInputStream              *stream,
+				  GAsyncResult              *result,
+				  GError                   **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+  CloseData *op;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_input_stream_real_close_async);
+
+  op = g_simple_async_result_get_op_data (simple);
+  return op->res;
 }

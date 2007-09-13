@@ -16,39 +16,45 @@ struct _GMemoryInputStreamPrivate {
 
 };
 
-static gssize   g_memory_input_stream_read        (GInputStream              *stream,
-                                                   void                      *buffer,
-                                                   gsize                      count,
-                                                   GCancellable              *cancellable,
-                                                   GError                   **error);
-static gssize   g_memory_input_stream_skip        (GInputStream              *stream,
-                                                   gsize                      count,
-                                                   GCancellable              *cancellable,
-                                                   GError                   **error);
-static gboolean g_memory_input_stream_close       (GInputStream              *stream,
-                                                   GCancellable              *cancellable,
-                                                   GError                   **error);
-static void     g_memory_input_stream_read_async  (GInputStream              *stream,
-                                                   void                      *buffer,
-                                                   gsize                      count,
-                                                   int                        io_priority,
-                                                   GCancellable              *cancellable,
-                                                   GAsyncReadyCallback        callback,
-                                                   gpointer                   user_data);
-static gssize   g_memory_input_stream_read_finish (GInputStream              *stream,
-						   GAsyncResult              *result,
-						   GError                   **error);
-static void     g_memory_input_stream_skip_async  (GInputStream              *stream,
-                                                   gsize                      count,
-                                                   int                        io_priority,
-                                                   GAsyncSkipCallback         callback,
-                                                   gpointer                   data,
-                                                   GCancellable              *cancellable);
-static void     g_memory_input_stream_close_async (GInputStream              *stream,
-                                                   int                        io_priority,
-                                                   GAsyncCloseInputCallback   callback,
-                                                   gpointer                   data,
-                                                   GCancellable              *cancellable);
+static gssize   g_memory_input_stream_read         (GInputStream         *stream,
+						    void                 *buffer,
+						    gsize                 count,
+						    GCancellable         *cancellable,
+						    GError              **error);
+static gssize   g_memory_input_stream_skip         (GInputStream         *stream,
+						    gsize                 count,
+						    GCancellable         *cancellable,
+						    GError              **error);
+static gboolean g_memory_input_stream_close        (GInputStream         *stream,
+						    GCancellable         *cancellable,
+						    GError              **error);
+static void     g_memory_input_stream_read_async   (GInputStream         *stream,
+						    void                 *buffer,
+						    gsize                 count,
+						    int                   io_priority,
+						    GCancellable         *cancellable,
+						    GAsyncReadyCallback   callback,
+						    gpointer              user_data);
+static gssize   g_memory_input_stream_read_finish  (GInputStream         *stream,
+						    GAsyncResult         *result,
+						    GError              **error);
+static void     g_memory_input_stream_skip_async   (GInputStream         *stream,
+						    gsize                 count,
+						    int                   io_priority,
+						    GCancellable         *cancellabl,
+						    GAsyncReadyCallback   callback,
+						    gpointer              datae);
+static gssize   g_memory_input_stream_skip_finish  (GInputStream         *stream,
+						    GAsyncResult         *result,
+						    GError              **error);
+static void     g_memory_input_stream_close_async  (GInputStream         *stream,
+						    int                   io_priority,
+						    GCancellable         *cancellabl,
+						    GAsyncReadyCallback   callback,
+						    gpointer              data);
+static gboolean g_memory_input_stream_close_finish (GInputStream         *stream,
+						    GAsyncResult         *result,
+						    GError              **error);
 
 static void     g_memory_input_stream_seekable_iface_init (GSeekableIface  *iface);
 static goffset  g_memory_input_stream_tell                (GSeekable       *seekable);
@@ -84,8 +90,9 @@ g_memory_input_stream_class_init (GMemoryInputStreamClass *klass)
   istream_class->read_async  = g_memory_input_stream_read_async;
   istream_class->read_finish  = g_memory_input_stream_read_finish;
   istream_class->skip_async  = g_memory_input_stream_skip_async;
+  istream_class->skip_finish  = g_memory_input_stream_skip_finish;
   istream_class->close_async = g_memory_input_stream_close_async;
-
+  istream_class->close_finish = g_memory_input_stream_close_finish;
 }
 
 static void
@@ -214,31 +221,63 @@ static void
 g_memory_input_stream_skip_async (GInputStream              *stream,
                                   gsize                      count,
                                   int                        io_priority,
-                                  GAsyncSkipCallback         callback,
-                                  gpointer                   data,
-                                  GCancellable              *cancellable)
+                                  GCancellable              *cancellable,
+                                  GAsyncReadyCallback        callback,
+                                  gpointer                   user_data)
 {
-  GMemoryInputStream *memory_stream;
-  GMemoryInputStreamPrivate *priv;
-  gsize nskipped;
+  GSimpleAsyncResult *simple;
+  gssize *nskipped;
 
-  memory_stream = G_MEMORY_INPUT_STREAM (stream);
-  priv = memory_stream->priv;
+  nskipped = g_new (gssize, 1);
+  *nskipped = g_memory_input_stream_skip (stream, count, cancellable, NULL);
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback,
+				      user_data,
+				      g_memory_input_stream_skip_async,
+				      nskipped, g_free);
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+}
+
+static gssize
+g_memory_input_stream_skip_finish (GInputStream              *stream,
+				   GAsyncResult              *result,
+				   GError                   **error)
+{
+  GSimpleAsyncResult *simple;
+  gssize *nskipped;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_memory_input_stream_skip_async);
   
-  nskipped = MIN (count, priv->len - priv->pos);
-
-  priv->pos += nskipped;
-  (*callback) (stream, count, nskipped, data, NULL);
+  nskipped = g_simple_async_result_get_op_data (simple);
+  return *nskipped;
 }
 
 static void
 g_memory_input_stream_close_async (GInputStream              *stream,
                                    int                        io_priority,
-                                   GAsyncCloseInputCallback   callback,
-                                   gpointer                   data,
-                                   GCancellable              *cancellable)
+                                   GCancellable              *cancellable,
+                                   GAsyncReadyCallback        callback,
+                                   gpointer                   user_data)
 {
-  (*callback) (stream, TRUE, data, NULL);
+  GSimpleAsyncResult *simple;
+  
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback,
+				      user_data,
+				      g_memory_input_stream_close_async,
+				      NULL, NULL);
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+}
+
+static gboolean
+g_memory_input_stream_close_finish (GInputStream              *stream,
+				    GAsyncResult              *result,
+				    GError                   **error)
+{
+  return TRUE;
 }
 
 static goffset

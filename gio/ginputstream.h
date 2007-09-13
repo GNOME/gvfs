@@ -20,30 +20,6 @@ typedef struct _GInputStream         GInputStream;
 typedef struct _GInputStreamClass    GInputStreamClass;
 typedef struct _GInputStreamPrivate  GInputStreamPrivate;
 
-typedef void (*GAsyncSkipCallback)  (GInputStream *stream,
-				     gsize         count_requested,
-				     gssize        count_skipped,
-				     gpointer      user_data,
-				     GError       *error);
-
-/**
- * GAsyncCloseInputCallback:
- * @stream: a #GInputStream
- * @result: %TRUE on success, %FALSE otherwis
- * @error: the error, if result is %FALSE, otherwise %NULL
- *
- * This callback is called when an asychronous close operation
- * is finished. 
- *
- * The callback is always called, even if the operation was cancelled.
- * If the operation was cancelled @result will be %FALSE, and @error
- * will be %G_IO_ERROR_CANCELLED.
- **/
-typedef void (*GAsyncCloseInputCallback)  (GInputStream *stream,
-					   gboolean      result,
-					   gpointer      user_data,
-					   GError       *error);
-
 struct _GInputStream
 {
   GObject parent;
@@ -72,27 +48,33 @@ struct _GInputStreamClass
 			    GError      **error);
 
   /* Async ops: (optional in derived classes) */
-  void    (* read_async)  (GInputStream        *stream,
-			   void               *buffer,
-			   gsize               count,
-			   int                 io_priority,
-			   GCancellable       *cancellable,
-			   GAsyncReadyCallback callback,
-			   gpointer            user_data);
-  gssize  (* read_finish) (GInputStream      *stream,
-			   GAsyncResult      *result,
-			   GError           **error);
-  void    (* skip_async)  (GInputStream        *stream,
-			   gsize               count,
-			   int                 io_priority,
-			   GAsyncSkipCallback  callback,
-			   gpointer            user_data,
-			   GCancellable       *cancellable);
-  void    (* close_async) (GInputStream        *stream,
-			   int                  io_priority,
-			   GAsyncCloseInputCallback callback,
-			   gpointer            user_data,
-			   GCancellable       *cancellable);
+  void     (* read_async)  (GInputStream        *stream,
+			    void               *buffer,
+			    gsize               count,
+			    int                 io_priority,
+			    GCancellable       *cancellable,
+			    GAsyncReadyCallback callback,
+			    gpointer            user_data);
+  gssize   (* read_finish) (GInputStream       *stream,
+			    GAsyncResult       *result,
+			    GError            **error);
+  void     (* skip_async)  (GInputStream       *stream,
+			    gsize               count,
+			    int                 io_priority,
+			    GCancellable       *cancellable,
+			    GAsyncReadyCallback callback,
+			    gpointer            user_data);
+  gssize   (* skip_finish) (GInputStream        *stream,
+			    GAsyncResult       *result,
+			    GError            **error);
+  void     (* close_async) (GInputStream        *stream,
+			    int                  io_priority,
+			    GCancellable       *cancellable,
+			    GAsyncReadyCallback callback,
+			    gpointer            user_data);
+  gboolean (* close_finish)(GInputStream        *stream,
+			    GAsyncResult       *result,
+			    GError            **error);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -104,53 +86,58 @@ struct _GInputStreamClass
 
 GType g_input_stream_get_type (void) G_GNUC_CONST;
 
-gssize        g_input_stream_read              (GInputStream              *stream,
-						void                      *buffer,
-						gsize                      count,
-						GCancellable              *cancellable,
-						GError                   **error);
-gboolean      g_input_stream_read_all          (GInputStream              *stream,
-						void                      *buffer,
-						gsize                      count,
-						gsize                     *bytes_read,
-						GCancellable              *cancellable,
-						GError                   **error);
-gssize        g_input_stream_skip              (GInputStream              *stream,
-						gsize                      count,
-						GCancellable              *cancellable,
-						GError                   **error);
-gboolean      g_input_stream_close             (GInputStream              *stream,
-						GCancellable              *cancellable,
-						GError                   **error);
-void          g_input_stream_read_async        (GInputStream              *stream,
-						void                      *buffer,
-						gsize                      count,
-						int                        io_priority,
-						GCancellable              *cancellable,
-						GAsyncReadyCallback        callback,
-						gpointer                   user_data);
-gssize        g_input_stream_read_finish       (GInputStream              *stream,
-						GAsyncResult              *result,
-						GError                    **error);
-void          g_input_stream_skip_async        (GInputStream              *stream,
-						gsize                      count,
-						int                        io_priority,
-						GAsyncSkipCallback         callback,
-						gpointer                   user_data,
-						GCancellable              *cancellable);
-void          g_input_stream_close_async       (GInputStream              *stream,
-						int                        io_priority,
-						GAsyncCloseInputCallback   callback,
-						gpointer                   user_data,
-						GCancellable              *cancellable);
+gssize   g_input_stream_read         (GInputStream          *stream,
+				      void                  *buffer,
+				      gsize                  count,
+				      GCancellable          *cancellable,
+				      GError               **error);
+gboolean g_input_stream_read_all     (GInputStream          *stream,
+				      void                  *buffer,
+				      gsize                  count,
+				      gsize                 *bytes_read,
+				      GCancellable          *cancellable,
+				      GError               **error);
+gssize   g_input_stream_skip         (GInputStream          *stream,
+				      gsize                  count,
+				      GCancellable          *cancellable,
+				      GError               **error);
+gboolean g_input_stream_close        (GInputStream          *stream,
+				      GCancellable          *cancellable,
+				      GError               **error);
+void     g_input_stream_read_async   (GInputStream          *stream,
+				      void                  *buffer,
+				      gsize                  count,
+				      int                    io_priority,
+				      GCancellable          *cancellable,
+				      GAsyncReadyCallback    callback,
+				      gpointer               user_data);
+gssize   g_input_stream_read_finish  (GInputStream          *stream,
+				      GAsyncResult          *result,
+				      GError               **error);
+void     g_input_stream_skip_async   (GInputStream          *stream,
+				      gsize                  count,
+				      int                    io_priority,
+				      GCancellable          *cancellable,
+				      GAsyncReadyCallback    callback,
+				      gpointer               user_data);
+gssize   g_input_stream_skip_finish  (GInputStream          *stream,
+				      GAsyncResult          *result,
+				      GError               **error);
+void     g_input_stream_close_async  (GInputStream          *stream,
+				      int                    io_priority,
+				      GCancellable          *cancellable,
+				      GAsyncReadyCallback    callback,
+				      gpointer               user_data);
+gboolean g_input_stream_close_finish (GInputStream          *stream,
+				      GAsyncResult          *result,
+				      GError               **error);
 
 /* For implementations: */
 
-gboolean      g_input_stream_is_closed         (GInputStream              *stream);
-gboolean      g_input_stream_has_pending       (GInputStream              *stream);
-void          g_input_stream_set_pending       (GInputStream              *stream,
-						gboolean                   pending);
-
+gboolean g_input_stream_is_closed    (GInputStream          *stream);
+gboolean g_input_stream_has_pending  (GInputStream          *stream);
+void     g_input_stream_set_pending  (GInputStream          *stream,
+				      gboolean               pending);
 
 G_END_DECLS
 
