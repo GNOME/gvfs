@@ -551,7 +551,7 @@ g_local_file_info_get (const char *basename,
 
   info = g_file_info_new ();
 
-  file_flags = 0;
+  file_flags = G_FILE_FLAG_LOCAL;
   
   g_file_info_set_name (info, basename);
 
