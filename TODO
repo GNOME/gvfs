@@ -3,8 +3,6 @@ Implement the rest of g_file_info_simple_get:
 * mime type
 * icon
 
-Add Seekable support to LocalFile streams
-
 Work on GFile
 
 add get_file_info_async for FileStreams 
@@ -19,16 +17,17 @@ Make backend pluggable
 
 Expose the seek operations on GInputStream also, not only via iface
 
+Add async opens to GFile.
+
 implement readahead in GVFSReadStream, time difference
 
 implement Async i/o for GFileInputStreamDaemon
 
 implement get_file_info for GFileInputStreamDaemon
 
-Finishing moving opens to GFile
-Add async opens in GFile.
-
 implement daemon write stream, maybe break out common parts of gvfsreadstream to gvfsjobstream
+
+implement seeks in local streams
 
 FUTURE IDEAS:
 -------------
