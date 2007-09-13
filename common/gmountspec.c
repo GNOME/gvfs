@@ -18,13 +18,16 @@ item_compare (const void *_a, const void *_b)
 }
 
 GMountSpec *
-g_mount_spec_new (void)
+g_mount_spec_new (const char *type)
 {
   GMountSpec *spec;
 
   spec = g_new0 (GMountSpec, 1);
   spec->items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
 
+  if (type != NULL)
+    g_mount_spec_add_item (spec, "type", type);
+  
   return spec;
 }
 
@@ -99,7 +102,7 @@ g_mount_spec_from_dbus (DBusMessageIter *iter)
 				      0))
     return NULL;
 
-  spec = g_mount_spec_new ();
+  spec = g_mount_spec_new (NULL);
   spec->mount_prefix = mount_prefix;
   
   if (dbus_message_iter_get_arg_type (&spec_iter) != DBUS_TYPE_ARRAY ||

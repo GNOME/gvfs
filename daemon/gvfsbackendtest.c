@@ -50,9 +50,7 @@ g_vfs_backend_test_new (void)
   backend = G_VFS_BACKEND (test_backend);
   
   backend->display_name = g_strdup ("test");
-  backend->mount_spec = g_mount_spec_new ();
-  g_mount_spec_add_item (backend->mount_spec,
-			 "type", "test");
+  backend->mount_spec = g_mount_spec_new ("test");
   
   return test_backend;
 }

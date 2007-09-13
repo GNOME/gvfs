@@ -299,9 +299,7 @@ g_vfs_backend_smb_new (const char *server,
 
   _backend = G_VFS_BACKEND (backend);
   _backend->display_name = g_strdup_printf ("%s on %s", share, server);
-  _backend->mount_spec = g_mount_spec_new ();
-  g_mount_spec_add_item (_backend->mount_spec,
-			 "type", "smb-share");
+  _backend->mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_add_item (_backend->mount_spec,
 			 "share", share);
   g_mount_spec_add_item (_backend->mount_spec,

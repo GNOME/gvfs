@@ -35,7 +35,7 @@ typedef struct {
   char *mount_prefix;
 } GMountSpec;
 
-GMountSpec *g_mount_spec_new       (void);
+GMountSpec *g_mount_spec_new       (const char      *type);
 GMountSpec *g_mount_spec_ref       (GMountSpec      *spec);
 void        g_mount_spec_unref     (GMountSpec      *spec);
 GMountSpec *g_mount_spec_from_dbus (DBusMessageIter *iter);
