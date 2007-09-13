@@ -17,6 +17,9 @@
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
+#include "gvfsjobopenforwrite.h"
+#include "gvfsjobwrite.h"
+#include "gvfsjobseekwrite.h"
 #include "gvfsjobgetinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
@@ -652,10 +655,145 @@ do_close_read (GVfsBackend *backend,
       g_error_free (error);
     }
   else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+do_create (GVfsBackend *backend,
+	   GVfsJobOpenForWrite *job,
+	   const char *filename)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  char *uri;
+  SMBCFILE *file;
+  GError *error;
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+					O_CREAT|O_WRONLY|O_EXCL, 0);
+  g_free (uri);
+
+  if (file == NULL)
     {
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-	    
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
     }
+  else
+    {
+      g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+      g_vfs_job_open_for_write_set_handle (job, file);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+}
+
+static void
+do_write (GVfsBackend *backend,
+	  GVfsJobWrite *job,
+	  GVfsBackendHandle handle,
+	  char *buffer,
+	  gsize buffer_size)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GError *error;
+  ssize_t res;
+
+  res = op_backend->smb_context->write (op_backend->smb_context, (SMBCFILE *)handle,
+					buffer, buffer_size);
+  if (res == -1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_write_set_written_size (job, res);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+}
+
+static void
+do_seek_on_write (GVfsBackend *backend,
+		  GVfsJobSeekWrite *job,
+		  GVfsBackendHandle handle,
+		  goffset    offset,
+		  GSeekType  type)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GError *error;
+  int whence;
+  off_t res;
+
+  switch (type)
+    {
+    case G_SEEK_SET:
+      whence = SEEK_SET;
+      break;
+    case G_SEEK_CUR:
+      whence = SEEK_CUR;
+      break;
+    case G_SEEK_END:
+      whence = SEEK_END;
+      break;
+    default:
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR,
+		   G_VFS_ERROR_NOT_SUPPORTED,
+		   _("Unsupported seek type"));
+      goto error;
+    }
+
+  res = op_backend->smb_context->lseek (op_backend->smb_context, (SMBCFILE *)handle, offset, whence);
+
+  if (res == (off_t)-1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      goto error;
+    }
+  else
+    {
+      g_vfs_job_seek_write_set_offset (job, res);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+
+  return;
+
+ error:
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+}
+
+static void
+do_close_write (GVfsBackend *backend,
+		GVfsJobCloseWrite *job,
+		GVfsBackendHandle handle)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  GError *error;
+  ssize_t res;
+
+  res = op_backend->smb_context->close_fn (op_backend->smb_context, (SMBCFILE *)handle);
+  if (res == -1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
@@ -810,6 +948,10 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
+  backend_class->create = do_create;
+  backend_class->write = do_write;
+  backend_class->seek_on_write = do_seek_on_write;
+  backend_class->close_write = do_close_write;
   backend_class->get_info = do_get_info;
   backend_class->enumerate = do_enumerate;
 }
