@@ -250,19 +250,14 @@ g_file_simple_get_info (GFile                *file,
   GFileSimple *simple = G_FILE_SIMPLE (file);
   GFileInfo *info;
   GFileAttributeMatcher *matcher;
+  char *basename;
 
   info = g_file_info_new ();
 
-  if (requested && G_FILE_INFO_NAME)
-    {
-      char *basename = g_path_get_basename (simple->filename);
-      g_file_info_set_name (info, basename);
-      g_free (basename);
-    }
-
   matcher = g_file_attribute_matcher_new (attributes);
   
-  if (!g_file_info_simple_get (simple->filename, info,
+  basename = g_path_get_basename (simple->filename);
+  if (!g_file_info_simple_get (basename, simple->filename, info,
 			       requested, matcher, follow_symlinks,
 			       error))
     {
@@ -270,8 +265,12 @@ g_file_simple_get_info (GFile                *file,
       g_object_unref (info);
       info = NULL;
     }
-  
+
+  g_free (basename);
+    
+
   g_file_attribute_matcher_free (matcher);
+
   return info;
 }
 

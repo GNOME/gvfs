@@ -67,6 +67,7 @@ typedef enum {
   G_FILE_INFO_ACCESS_RIGHTS     = 1 << 8,
   G_FILE_INFO_STAT_INFO         = 1 << 9,
   G_FILE_INFO_SYMLINK_TARGET    = 1 << 10,
+  G_FILE_INFO_IS_HIDDEN         = 1 << 11,
 } GFileInfoRequestFlags;
 
 #define G_FILE_INFO_REQUEST_FLAGS_FROM_STAT_MASK (G_FILE_INFO_FILE_TYPE | G_FILE_INFO_SIZE | G_FILE_INFO_MODIFICATION_TIME | G_FILE_INFO_STAT_INFO) 
@@ -88,6 +89,7 @@ gboolean               g_file_info_can_read              (GFileInfo         *inf
 gboolean               g_file_info_can_write             (GFileInfo         *info);
 gboolean               g_file_info_can_delete            (GFileInfo         *info);
 gboolean               g_file_info_can_rename            (GFileInfo         *info);
+gboolean               g_file_info_get_is_hidden         (GFileInfo         *info);
 const struct stat *    g_file_info_get_stat_info         (GFileInfo         *info);
 const char *           g_file_info_get_attribute         (GFileInfo         *info,
 							  const char        *attribute);
@@ -114,6 +116,8 @@ void                   g_file_info_set_symlink_target    (GFileInfo         *inf
 							  const char        *link_target);
 void                   g_file_info_set_access_rights     (GFileInfo         *info,
 							  GFileAccessRights  access_rights);
+void                   g_file_info_set_is_hidden         (GFileInfo         *info,
+							  gboolean           is_hidden);
 void                   g_file_info_set_stat_info         (GFileInfo         *info,
 							  const struct stat *statbuf);
 void                   g_file_info_set_attribute         (GFileInfo         *info,

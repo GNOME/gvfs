@@ -122,7 +122,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
       GError *my_error = NULL;
       
       path = g_build_filename (simple->filename, filename, NULL);
-      res = g_file_info_simple_get (path, info,
+      res = g_file_info_simple_get (filename, path, info,
 				    simple->requested,
 				    simple->matcher,
 				    simple->follow_symlinks,

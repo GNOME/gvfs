@@ -28,6 +28,7 @@ struct _GFileInfoPrivate {
   struct stat *stat_info;
   char *symlink_target;
   GArray *attributes;
+  guint is_hidden : 1;
 };
 
 static void
@@ -173,7 +174,13 @@ g_file_info_can_rename (GFileInfo *info)
 {
   return info->priv->access_rights & G_FILE_ACCESS_CAN_RENAME;
 }
-  
+
+gboolean
+g_file_info_get_is_hidden (GFileInfo *info)
+{
+  return info->priv->is_hidden;
+}
+
 const struct stat *
 g_file_info_get_stat_info (GFileInfo *info)
 {
@@ -350,6 +357,13 @@ g_file_info_set_access_rights (GFileInfo *info,
 			       GFileAccessRights access_rights)
 {
   info->priv->access_rights = access_rights;
+}
+
+void
+g_file_info_set_is_hidden (GFileInfo *info,
+			   gboolean is_hidden)
+{
+  info->priv->is_hidden = is_hidden;
 }
 
 void

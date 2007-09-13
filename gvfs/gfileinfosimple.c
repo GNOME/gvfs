@@ -193,7 +193,8 @@ get_xattrs (const char *path,
 }
 
 gboolean
-g_file_info_simple_get (const char *path,
+g_file_info_simple_get (const char *basename,
+			const char *path,
 			GFileInfo *info,
 			GFileInfoRequestFlags requested,
 			GFileAttributeMatcher *attribute_matcher,
@@ -203,6 +204,15 @@ g_file_info_simple_get (const char *path,
   struct stat statbuf;
   int res;
 
+  if (requested && G_FILE_INFO_NAME)
+    g_file_info_set_name (info, basename);
+
+  if (requested && G_FILE_INFO_IS_HIDDEN)
+    g_file_info_set_is_hidden (info,
+			  basename != NULL &&
+			  basename[0] == '.');
+
+  
   if (follow_symlinks)
     res = stat (path, &statbuf);
   else
