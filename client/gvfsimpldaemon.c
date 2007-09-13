@@ -129,9 +129,7 @@ get_mountspec_from_uri (GDecodedUri *uri,
 		      tmp = g_ascii_strdown (uri->host, -1);
 		      g_mount_spec_set  (spec, "server", tmp);
 		      g_free (tmp);
-		      tmp = g_strndup (share, share_end - share);
-		      g_mount_spec_set  (spec, "share", tmp);
-		      g_free (tmp);
+		      g_mount_spec_set_with_len  (spec, "share", share, share_end - share);
 		      path = g_strdup ("/");
 		    }
 		}
@@ -143,13 +141,24 @@ get_mountspec_from_uri (GDecodedUri *uri,
 		  g_mount_spec_set  (spec, "server", tmp);
 		  g_free (tmp);
 
-		  tmp = g_strndup (share, share_end - share);
-		  g_mount_spec_set  (spec, "share", tmp);
-		  g_free (tmp);
+		  g_mount_spec_set_with_len  (spec, "share", share, share_end - share);
 
 		  path = g_strconcat ("/", p, NULL);
 		}
 	    }
+	}
+      if (uri->userinfo)
+	{
+	  const char *user = uri->userinfo;
+	  p = strchr (uri->userinfo, ';');
+	  if (p)
+	    {
+	      if (p != user)
+		g_mount_spec_set_with_len  (spec, "domain", user, p - user);
+	      user = p + 1;
+	    }
+	  if (*user != 0)
+	    g_mount_spec_set  (spec, "user", user);
 	}
     }
 
