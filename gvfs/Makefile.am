@@ -6,6 +6,18 @@ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 
 lib_LTLIBRARIES = libgvfs.la
 
+marshal_sources = \
+        gvfs-marshal.h \
+        gvfs-marshal.c \
+	$(NULL)
+
+gvfs-marshal.h: gvfs-marshal.list $(GLIB_GENMARSHAL)
+	$(GLIB_GENMARSHAL) --prefix=_gvfs_marshal $(srcdir)/gvfs-marshal.list --header > $@
+
+gvfs-marshal.c: gvfs-marshal.h gvfs-marshal.list $(GLIB_GENMARSHAL)
+	(echo "#include \"gvfs-marshal.h\""; \
+	 $(GLIB_GENMARSHAL) --prefix=_gvfs_marshal $(srcdir)/gvfs-marshal.list --body) > $@
+
 libgvfs_la_SOURCES = 	\
 	gasynchelper.c \
 	gasynchelper.h \
@@ -32,6 +44,9 @@ libgvfs_la_SOURCES = 	\
 	gvfserror.c \
 	gvfssimple.c \
 	gvfssimple.h \
+	gmountoperation.c \
+	gmountoperation.h \
+	$(marshal_sources) \
 	$(NULL)
 
 libgvfs_la_LIBADD = \
@@ -62,3 +77,12 @@ test_SOURCES = \
 test_LDADD = \
 	libgvfs.la \
 	$(GLIB_LIBS)
+
+EXTRA_DIST = 				\
+	gvfs-marshal.list		\
+	$(NULL)
+
+CLEANFILES = \
+	$(marshal_sources)				\
+	$(NULL)
+

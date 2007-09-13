@@ -22,6 +22,11 @@ GFSInfo {
    char *get_fs_type()
    gint64 get_free_space()
    gint64 get_total_space()
+   char * get_hal_uid()
+   can_unmount()
+   can_eject()
+   must_eject()
+   
 }
 
 GFile *g_file_for_path (char *path)

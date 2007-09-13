@@ -7,3 +7,5 @@ test
 .libs
 Makefile
 Makefile.in
+gvfs-marshal.c
+gvfs-marshal.h

@@ -55,9 +55,15 @@ if test "x$enable_selinux" != "xno"; then
 fi
 AC_SUBST(SELINUX_LIBS)
 
+dnl ==========================================================================
+	
 dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
 AC_DEFINE(_GNU_SOURCE, 1, [Enable GNU Extensions])
-		
+
+dnl ==========================================================================
+
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
 dnl ==========================================================================
 dnl Turn on the additional warnings last, so -Werror doesn't affect other tests.
 
