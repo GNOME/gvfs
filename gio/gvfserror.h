@@ -13,6 +13,7 @@ GQuark          g_vfs_error_quark      (void);
 typedef enum
 {
   G_VFS_ERROR_INTERNAL_ERROR,
+  G_VFS_ERROR_NOT_MOUNTED,
   G_VFS_ERROR_CLOSED,
   G_VFS_ERROR_CANCELLED,
   G_VFS_ERROR_PENDING,

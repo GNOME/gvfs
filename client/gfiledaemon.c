@@ -178,6 +178,13 @@ do_sync_path_call (GFile *file,
 					     op,
 					     first_arg_type, var_args);
   va_end (var_args);
+
+  if (message == NULL)
+    {
+      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+		   _("The share was not mounted"));
+      return NULL;
+    }
   
   /* TODO: handle nonmounted => message == NULL */
   
