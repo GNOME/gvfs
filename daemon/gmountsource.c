@@ -288,7 +288,7 @@ g_mount_source_request_mount_spec_async (GMountSource *source,
   data->callback = callback;
   data->user_data = user_data;
   
-  _g_dbus_connection_call_async (NULL, message,
+  _g_dbus_connection_call_async (NULL, message, -1,
 				 request_mount_spec_reply, data);
   dbus_message_unref (message);
 }

@@ -300,7 +300,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 
   dbus_message_set_auto_start (message, TRUE);
 
-  _g_dbus_connection_call_async (NULL, message,
+  _g_dbus_connection_call_async (NULL, message, -1, 
 				 callback, user_data);
   dbus_message_unref (message);
 }

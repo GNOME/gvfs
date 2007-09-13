@@ -1227,6 +1227,7 @@ idle_async_callback (void *_data)
 void
 _g_dbus_connection_call_async (DBusConnection *connection,
 			       DBusMessage *message,
+			       int timeout_msecs,
 			       GAsyncDBusCallback callback,
 			       gpointer user_data)
 {
@@ -1249,7 +1250,7 @@ _g_dbus_connection_call_async (DBusConnection *connection,
 	}
     }
 
-  if (!dbus_connection_send_with_reply (connection, message, &pending_call, -1))
+  if (!dbus_connection_send_with_reply (connection, message, &pending_call, timeout_msecs))
     _g_dbus_oom ();
   
   if (pending_call == NULL)

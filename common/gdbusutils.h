@@ -57,6 +57,7 @@ void         _g_dbus_message_iter_copy              (DBusMessageIter  *dest,
 void         _g_dbus_oom                            (void) G_GNUC_NORETURN;
 void        _g_dbus_connection_call_async           (DBusConnection *connection,
 						     DBusMessage *message,
+						     int timeout_msecs,
 						     GAsyncDBusCallback callback,
 						     gpointer user_data);
 
