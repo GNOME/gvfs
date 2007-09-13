@@ -57,6 +57,26 @@ AC_SUBST(GETTEXT_PACKAGE)
 
 AM_GLIB_GNU_GETTEXT
 
+AC_PATH_PROG(SSH_PROGRAM, ssh, "ssh")
+
+dnl ****************************
+dnl *** Checks for pty stuff ***
+dnl ****************************
+
+AC_CHECK_HEADERS(sys/un.h stropts.h termios.h utmp.h)
+
+# Check for PTY handling functions.
+AC_CHECK_FUNCS(getpt posix_openpt grantpt unlockpt ptsname ptsname_r)
+
+# Pull in the right libraries for various functions which might not be
+# bundled into an exploded libc.
+AC_CHECK_FUNC(socketpair,[have_socketpair=1],AC_CHECK_LIB(socket,socketpair,[have_socketpair=1; LIBS="$LIBS -lsocket"]))
+if test x$have_socketpair = x1 ; then
+	AC_DEFINE(HAVE_SOCKETPAIR,1,[Define if you have the socketpair function.])
+fi
+
+AC_SEARCH_LIBS(login_tty, util, [AC_DEFINE([HAVE_LOGIN_TTY],[],[Whether login_tty is available])])
+
 dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************

@@ -9,6 +9,7 @@ Makefile.in
 gvfs-daemon
 gvfs-daemon-smb
 gvfs-daemon-ftp
+gvfs-daemon-sftp
 gvfs-daemon-smb-browse
 gvfs-daemon-test
 *.service
