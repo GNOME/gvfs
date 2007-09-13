@@ -1111,77 +1111,70 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
+static gboolean
+error_from_status (GVfsJob *job,
+                   GDataInputStream *reply,
+                   GError **error)
+{
+  guint32 code;
+  gint error_code;
+  char *message;
+  
+  code = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+
+  if (code == SSH_FX_OK)
+    return TRUE;
+
+  if (error)
+    {
+      error_code = G_IO_ERROR_FAILED;
+
+      switch (code)
+        {
+        default:
+        case SSH_FX_EOF:
+        case SSH_FX_FAILURE:
+        case SSH_FX_BAD_MESSAGE:
+        case SSH_FX_NO_CONNECTION:
+        case SSH_FX_CONNECTION_LOST:
+          break;
+          
+        case SSH_FX_NO_SUCH_FILE:
+          error_code = G_IO_ERROR_NOT_FOUND;
+          break;
+          
+        case SSH_FX_PERMISSION_DENIED:
+          error_code = G_IO_ERROR_PERMISSION_DENIED;
+          break;
+          
+        case SSH_FX_OP_UNSUPPORTED:
+          error_code = G_IO_ERROR_NOT_SUPPORTED;
+          break;
+        }
+      
+      message = read_string (reply, NULL);
+      if (message == NULL)
+        message = g_strdup ("Unknown reason");
+      
+      *error = g_error_new_literal (G_IO_ERROR, error_code, message);
+      g_free (message);
+    }
+  
+  return FALSE;
+}
+
 static void
 result_from_status (GVfsJob *job,
                     GDataInputStream *reply)
 {
-  GError error;
-  guint32 code;
+  GError *error;
 
-  code = g_data_input_stream_get_uint32 (reply, NULL, NULL);
-
-  if (code == SSH_FX_OK)
+  if (error_from_status (job, reply, &error))
+    g_vfs_job_succeeded (job);
+  else
     {
-      g_vfs_job_succeeded (job);
-      return;
-    }
-
-  error.domain = G_IO_ERROR;
-  error.code = G_IO_ERROR_FAILED;
-
-  switch (code)
-    {
-    default:
-    case SSH_FX_EOF:
-    case SSH_FX_FAILURE:
-    case SSH_FX_BAD_MESSAGE:
-    case SSH_FX_NO_CONNECTION:
-    case SSH_FX_CONNECTION_LOST:
-      break;
-      
-    case SSH_FX_NO_SUCH_FILE:
-      error.code = G_IO_ERROR_NOT_FOUND;
-      break;
-      
-    case SSH_FX_PERMISSION_DENIED:
-      error.code = G_IO_ERROR_PERMISSION_DENIED;
-      break;
-
-    case SSH_FX_OP_UNSUPPORTED:
-      error.code = G_IO_ERROR_NOT_SUPPORTED;
-      break;
-    }
-  
-  error.message = read_string (reply, NULL);
-  if (error.message == NULL)
-    error.message = g_strdup ("Unknown reason");
-
-  g_vfs_job_failed_from_error (job, &error);
-  g_free (error.message);
-}
-
-static void
-parse_attributes_is_symlink (GFileInfo *info,
-                             GDataInputStream *reply)
-{
-  guint32 flags;
-
-  flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
-  if (flags & SSH_FILEXFER_ATTR_SIZE)
-    g_data_input_stream_get_uint64 (reply, NULL, NULL);
-  
-  if (flags & SSH_FILEXFER_ATTR_UIDGID)
-    {
-      g_data_input_stream_get_uint32 (reply, NULL, NULL);
-      g_data_input_stream_get_uint32 (reply, NULL, NULL);
-    }
-
-  if (flags & SSH_FILEXFER_ATTR_PERMISSIONS)
-    {
-      guint32 v;
-      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
-      if (S_ISLNK (v))
-        g_file_info_set_is_symlink (info, TRUE);
+      g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
     }
 }
 
@@ -1566,84 +1559,133 @@ try_enumerate (GVfsBackend *backend,
   return TRUE;
 }
 
+typedef struct {
+  GFileInfo *lstat_info;
+  GError *lstat_error;
+  GFileInfo *stat_info;
+  GError *stat_error;
+  char *symlink_target;
+  int cb_count;
+} GetInfoData;
+
 static void
-get_info_reply (GVfsBackendSftp *backend,
-                int reply_type,
-                GDataInputStream *reply,
-                guint32 len,
-                GVfsJob *job,
-                gpointer user_data)
+get_info_data_free (GetInfoData *data)
 {
-  GFileInfo *info;
-  int finished_count;
+  if (data->lstat_info)
+    g_object_unref (data->lstat_info);
+  if (data->lstat_error)
+    g_error_free (data->lstat_error);
+  if (data->stat_info)
+    g_object_unref (data->stat_info);
+  if (data->stat_error)
+    g_error_free (data->stat_error);
+
+  g_free (data->symlink_target);
+  
+  g_slice_free (GetInfoData, data);
+}
+
+static void
+get_info_finish (GVfsBackendSftp *backend,
+                 GVfsJob *job)
+{
+  GVfsJobGetInfo *op_job;
+  GetInfoData *data;
+
+  data = job->backend_data;
+
+  if (data->lstat_error)
+    {
+      /* This failed, file must really not exist or something bad happened */
+      g_vfs_job_failed_from_error (job, data->lstat_error);
+      return;
+    }
+
+  op_job = G_VFS_JOB_GET_INFO (job);
+  if (op_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+    {
+      g_file_info_copy_into (data->lstat_info,
+                             op_job->file_info);
+    }
+  else
+    {
+      if (data->stat_info != NULL)
+        {
+          g_file_info_copy_into (data->stat_info,
+                                 op_job->file_info);
+          if (data->lstat_info &&
+              g_file_info_get_is_symlink (data->lstat_info))
+            g_file_info_set_is_symlink (op_job->file_info, TRUE);
+        }
+      else /* Broken symlink: */
+        g_file_info_copy_into (data->lstat_info,
+                               op_job->file_info);
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}               
+
+static void
+get_info_stat_reply (GVfsBackendSftp *backend,
+                     int reply_type,
+                     GDataInputStream *reply,
+                     guint32 len,
+                     GVfsJob *job,
+                     gpointer user_data)
+{
   char *basename;
-  
-  if (job->sent_reply)
-    return; /* Other might have failed */
-  
+  GetInfoData *data;
+
+  data = job->backend_data;
+
   if (reply_type == SSH_FXP_STATUS)
+    error_from_status (job, reply, &data->stat_error);
+  else if (reply_type != SSH_FXP_ATTRS)
+    g_set_error (&data->stat_error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                 _("Invalid reply recieved"));
+  else
     {
-      result_from_status (job, reply);
-      return;
+      data->stat_info = g_file_info_new ();
+      basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
+      parse_attributes (backend, data->stat_info, basename,
+                        reply, G_VFS_JOB_GET_INFO (job)->attribute_matcher);
+      g_free (basename);
     }
 
-  if (reply_type != SSH_FXP_ATTRS)
-    {
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Invalid reply recieved"));
-      return;
-    }
-
-  info = G_VFS_JOB_GET_INFO (job)->file_info;
-
-  basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
-  
-  parse_attributes (backend, info, basename, reply, G_VFS_JOB_ENUMERATE (job)->attribute_matcher);
-  g_free (basename);
-
-  finished_count = GPOINTER_TO_INT (job->backend_data);
-  job->backend_data = GINT_TO_POINTER (--finished_count);
-  if (finished_count == 0)
-    g_vfs_job_succeeded (job);
+  if (--data->cb_count == 0)
+    get_info_finish (backend, job);
 }
 
 static void
-get_info_is_link_reply (GVfsBackendSftp *backend,
-                        int reply_type,
-                        GDataInputStream *reply,
-                        guint32 len,
-                        GVfsJob *job,
-                        gpointer user_data)
+get_info_lstat_reply (GVfsBackendSftp *backend,
+                      int reply_type,
+                      GDataInputStream *reply,
+                      guint32 len,
+                      GVfsJob *job,
+                      gpointer user_data)
 {
-  GFileInfo *info;
-  int finished_count;
+  char *basename;
+  GetInfoData *data;
 
-  if (job->sent_reply)
-    return; /* Other might have failed */
-  
+  data = job->backend_data;
+
   if (reply_type == SSH_FXP_STATUS)
+    error_from_status (job, reply, &data->lstat_error);
+  else if (reply_type != SSH_FXP_ATTRS)
+    g_set_error (&data->lstat_error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                 _("Invalid reply recieved"));
+  else
     {
-      result_from_status (job, reply);
-      return;
+      data->lstat_info = g_file_info_new ();
+      basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
+      parse_attributes (backend, data->lstat_info, basename,
+                        reply, G_VFS_JOB_GET_INFO (job)->attribute_matcher);
+      g_free (basename);
     }
 
-  if (reply_type != SSH_FXP_ATTRS)
-    {
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Invalid reply recieved"));
-      return;
-    }
-
-  info = G_VFS_JOB_GET_INFO (job)->file_info;
-
-  parse_attributes_is_symlink (info, reply);
-
-  finished_count = GPOINTER_TO_INT (job->backend_data);
-  job->backend_data = GINT_TO_POINTER (--finished_count);
-  if (finished_count == 0)
-    g_vfs_job_succeeded (job);
+  if (--data->cb_count == 0)
+    get_info_finish (backend, job);
 }
-
 
 static gboolean
 try_get_info (GVfsBackend *backend,
@@ -1656,38 +1698,29 @@ try_get_info (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
   GDataOutputStream *command;
+  GetInfoData *data;
 
-  if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+  data = g_slice_new0 (GetInfoData);
+  g_vfs_job_set_backend_data  (G_VFS_JOB (job), data, (GDestroyNotify)get_info_data_free);
+  
+  data->cb_count = 1;
+  command = new_command_stream (op_backend,
+                                SSH_FXP_LSTAT,
+                                &id);
+  put_string (command, filename);
+  queue_command_stream_and_free (op_backend, command, id, get_info_lstat_reply, G_VFS_JOB (job), NULL);
+
+  if (! (job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
     {
-      G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
-      command = new_command_stream (op_backend,
-                                    SSH_FXP_LSTAT,
-                                    &id);
-      put_string (command, filename);
-      
-      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job), NULL);
-    }
-  else
-    {
-      if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STD_IS_SYMLINK))
-        {
-          G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (2);
-          command = new_command_stream (op_backend,
-                                        SSH_FXP_LSTAT,
-                                        &id);
-          put_string (command, filename);
-          queue_command_stream_and_free (op_backend, command, id, get_info_is_link_reply, G_VFS_JOB (job), NULL);
-        }
-      else
-        G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
+      data->cb_count++;
       
       command = new_command_stream (op_backend,
                                     SSH_FXP_STAT,
                                     &id);
       put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job), NULL);
+      queue_command_stream_and_free (op_backend, command, id, get_info_stat_reply, G_VFS_JOB (job), NULL);
     }
-
+  
   return TRUE;
 }
 
