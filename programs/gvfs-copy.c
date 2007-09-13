@@ -113,7 +113,7 @@ main (int argc, char *argv[])
 	  else
 	    {
 	    copy_failed:
-	      g_printerr ("Error copying file %s: %s", argv[i], error->message);
+	      g_printerr ("Error copying file %s: %s\n", argv[i], error->message);
 	      g_error_free (error);
 	    }
 	}
