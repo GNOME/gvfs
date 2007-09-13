@@ -636,7 +636,7 @@ g_local_file_info_get (const char *basename,
 	  content_type = g_content_type_guess (basename, NULL, 0);
 
 #ifndef G_OS_WIN32
-	  if (g_content_type_is_unknown (mimetype) && path != NULL)
+	  if (g_content_type_is_unknown (content_type) && path != NULL)
 	    {
 	      guchar sniff_buffer[4096];
 	      gsize sniff_length;
