@@ -201,7 +201,8 @@ send_reply (GVfsReadStream *stream,
   stream->priv->output_data = data;
   stream->priv->output_data_size = data_len;
   stream->priv->output_data_pos = 0;
-  
+
+  /* Don't finalize the ReadStream while there is an outstanding async operation */
   g_object_ref (stream);
   if (use_header)
     {
