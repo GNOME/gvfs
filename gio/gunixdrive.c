@@ -11,12 +11,12 @@
 
 struct _GUnixDrive {
   GObject parent;
-  GVolumeMonitor *monitor;
 
   GUnixVolume *volume; /* owned by volume monitor */
   char *name;
   char *icon;
   char *mountpoint;
+  GUnixMountType guessed_type;
 };
 
 static void g_unix_volue_drive_iface_init (GDriveIface *iface);
@@ -32,6 +32,9 @@ g_unix_drive_finalize (GObject *object)
   
   drive = G_UNIX_DRIVE (object);
 
+  if (drive->volume)
+    g_unix_volume_unset_drive (drive->volume, drive);
+  
   g_free (drive->name);
   g_free (drive->icon);
   g_free (drive->mountpoint);
@@ -53,12 +56,48 @@ g_unix_drive_init (GUnixDrive *unix_drive)
 {
 }
 
+static char *
+type_to_icon (GUnixMountType type)
+{
+  const char *icon_name = NULL;
+  
+  switch (type)
+    {
+    case G_UNIX_MOUNT_TYPE_HD:
+      icon_name = "drive-harddisk";
+      break;
+    case G_UNIX_MOUNT_TYPE_FLOPPY:
+    case G_UNIX_MOUNT_TYPE_ZIP:
+    case G_UNIX_MOUNT_TYPE_JAZ:
+    case G_UNIX_MOUNT_TYPE_MEMSTICK:
+      icon_name = "drive-removable-media";
+      break;
+    case G_UNIX_MOUNT_TYPE_CDROM:
+      icon_name = "drive-optical";
+      break;
+    case G_UNIX_MOUNT_TYPE_NFS:
+      /* TODO: Would like a better icon here... */
+      icon_name = "drive-removable-media";
+      break;
+    case G_UNIX_MOUNT_TYPE_CAMERA:
+      icon_name = "camera-photo";
+      break;
+    case G_UNIX_MOUNT_TYPE_IPOD:
+      icon_name = "multimedia-player";
+      break;
+    case G_UNIX_MOUNT_TYPE_UNKNOWN:
+    default:
+      icon_name = "drive-removable-media";
+      break;
+    }
+  return g_strdup (icon_name);
+}
+
 GUnixDrive *
 g_unix_drive_new (GVolumeMonitor *volume_monitor,
 		  GUnixMountPoint *mountpoint)
 {
   GUnixDrive *drive;
-  GUnixMountType type;
   
   if (!(mountpoint->is_user_mountable ||
 	g_str_has_prefix (mountpoint->device_path, "/vol/")) ||
@@ -66,15 +105,14 @@ g_unix_drive_new (GVolumeMonitor *volume_monitor,
     return NULL;
   
   drive = g_object_new (G_TYPE_UNIX_DRIVE, NULL);
-  drive->monitor = volume_monitor;
 
-  type = _g_guess_type_for_mount (mountpoint->mount_path,
-				  mountpoint->device_path,
-				  mountpoint->filesystem_type);
+  drive->guessed_type = _g_guess_type_for_mount (mountpoint->mount_path,
+						 mountpoint->device_path,
+						 mountpoint->filesystem_type);
   
   /* TODO: */
   drive->mountpoint = g_strdup (mountpoint->mount_path);
-  drive->icon = g_strdup_printf ("drive type %d", type);
+  drive->icon = type_to_icon (drive->guessed_type);
   drive->name = g_strdup (_("Unknown drive"));
   
   return drive;
@@ -181,6 +219,7 @@ g_unix_drive_mount (GDrive         *drive,
 		    GVolumeCallback callback,
 		    gpointer        user_data)
 {
+  /* TODO */
 }
 
 static void
@@ -188,6 +227,7 @@ g_unix_drive_eject (GDrive         *drive,
 		    GVolumeCallback callback,
 		    gpointer        user_data)
 {
+  /* TODO */
 }
 
 static void

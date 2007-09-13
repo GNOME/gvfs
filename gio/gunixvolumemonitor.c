@@ -37,12 +37,13 @@ g_unix_volume_monitor_finalize (GObject *object)
   if (monitor->mount_monitor)
     _g_stop_monitoring_unix_mounts (monitor->mount_monitor);
 
-
   g_list_foreach (monitor->last_mounts, (GFunc)_g_unix_mount_free, NULL);
   g_list_free (monitor->last_mounts);
 
   g_list_foreach (monitor->volumes, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->volumes);
+  g_list_foreach (monitor->drives, (GFunc)g_object_unref, NULL);
+  g_list_free (monitor->drives);
   
   if (G_OBJECT_CLASS (g_unix_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_unix_volume_monitor_parent_class)->finalize) (object);
@@ -65,7 +66,15 @@ get_mounted_volumes (GVolumeMonitor *volume_monitor)
 static GList *
 get_connected_drives (GVolumeMonitor *volume_monitor)
 {
-  return NULL;
+  GUnixVolumeMonitor *monitor;
+  GList *l;
+  
+  monitor = G_UNIX_VOLUME_MONITOR (volume_monitor);
+
+  l = g_list_copy (monitor->drives);
+  g_list_foreach (l, (GFunc)g_object_ref, NULL);
+
+  return l;
 }
 
 static void

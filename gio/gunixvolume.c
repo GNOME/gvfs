@@ -12,7 +12,6 @@
 
 struct _GUnixVolume {
   GObject parent;
-  GVolumeMonitor *monitor;
 
   GUnixDrive *drive; /* owned by volume monitor */
   char *name;
@@ -34,6 +33,10 @@ g_unix_volume_finalize (GObject *object)
   
   volume = G_UNIX_VOLUME (object);
 
+  if (volume->drive)
+    g_unix_drive_unset_volume (volume->drive, volume);
+    
+  g_assert (volume->drive == NULL);
   g_free (volume->name);
   g_free (volume->icon);
   g_free (volume->mountpoint);
@@ -81,42 +84,33 @@ type_to_icon (GUnixMountType type)
   
   switch (type)
     {
+    case G_UNIX_MOUNT_TYPE_HD:
+      icon_name = "drive-harddisk";
+      break;
     case G_UNIX_MOUNT_TYPE_FLOPPY:
-      icon_name = "gnome-dev-floppy";
+    case G_UNIX_MOUNT_TYPE_ZIP:
+    case G_UNIX_MOUNT_TYPE_JAZ:
+      icon_name = "media-floppy";
       break;
     case G_UNIX_MOUNT_TYPE_CDROM:
-      icon_name = "gnome-dev-cdrom";
+      icon_name = "media-optical";
       break;
     case G_UNIX_MOUNT_TYPE_NFS:
-      icon_name = "gnome-fs-nfs";
-      break;
-    case G_UNIX_MOUNT_TYPE_ZIP:
-      icon_name = "gnome-dev-zipdisk";
-      break;
-    case G_UNIX_MOUNT_TYPE_JAZ:
-      icon_name = "gnome-dev-jazdisk";
+      /* TODO: Would like a better icon here... */
+      icon_name = "drive-harddisk";
       break;
     case G_UNIX_MOUNT_TYPE_MEMSTICK:
-      icon_name = "gnome-dev-media-ms";
+      icon_name = "media-flash";
       break;
-    case G_UNIX_MOUNT_TYPE_CF:
-      icon_name = "gnome-dev-media-cf";
-      break;
-    case G_UNIX_MOUNT_TYPE_SM:
-      icon_name = "gnome-dev-media-sm";
-      break;
-    case G_UNIX_MOUNT_TYPE_SDMMC:
-      icon_name = "gnome-dev-media-sdmmc";
-      break;
-    case G_UNIX_MOUNT_TYPE_HD:
-      icon_name = "gnome-dev-harddisk";
-      break;
-      
-    case G_UNIX_MOUNT_TYPE_IPOD:
     case G_UNIX_MOUNT_TYPE_CAMERA:
+      icon_name = "camera-photo";
+      break;
+    case G_UNIX_MOUNT_TYPE_IPOD:
+      icon_name = "multimedia-player";
+      break;
     case G_UNIX_MOUNT_TYPE_UNKNOWN:
     default:
-      icon_name = "gnome-dev-harddisk";
+      icon_name = "drive-harddisk";
       break;
     }
   return g_strdup (icon_name);
@@ -204,7 +198,6 @@ g_unix_volume_new (GVolumeMonitor *volume_monitor,
     }
   
   volume = g_object_new (G_TYPE_UNIX_VOLUME, NULL);
-  volume->monitor = volume_monitor;
   volume->drive = drive;
   if (drive)
     g_unix_drive_set_volume (drive, volume);
@@ -238,11 +231,6 @@ g_unix_volume_new (GVolumeMonitor *volume_monitor,
       volume_name = g_strdup (_("Unknown volume"));
     }
   
-  g_print ("mountpoint: \n");
-  g_print (" mountpoint: %s\n", mount->mount_path);
-  g_print (" device: %s\n", mount->device_path);
-  g_print (" fs_type: %s\n", mount->filesystem_type);
-  g_print (" is_ro: %d\n", mount->is_read_only);
   volume->name = volume_name;
 
   return volume;
