@@ -331,12 +331,12 @@ g_input_stream_real_skip (GInputStream         *stream,
 {
   GInputStreamClass *class;
   gssize ret, read_bytes;
-  char buffer[4096];
+  char buffer[8192];
   GError *my_error;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  if (G_IS_SEEKABLE (stream))
+  if (G_IS_SEEKABLE (stream) && g_seekable_can_seek (G_SEEKABLE (stream)))
     {
       if (g_seekable_seek (G_SEEKABLE (stream),
 			   count,
@@ -348,12 +348,15 @@ g_input_stream_real_skip (GInputStream         *stream,
 
   /* If not seekable, or seek failed, fall back to reading data: */
 
+  class = G_INPUT_STREAM_GET_CLASS (stream);
+  
   read_bytes = 0;
   while (1)
     {
       my_error = NULL;
-      ret = g_input_stream_read (stream, buffer, MIN (sizeof (buffer), count),
-				 cancellable, &my_error);
+
+      ret = class->read (stream, buffer, MIN (sizeof (buffer), count),
+			 cancellable, &my_error);
       if (ret == -1)
 	{
 	  if (read_bytes > 0 &&
@@ -927,7 +930,11 @@ skip_async_thread (GSimpleAsyncResult *res,
 }
 
 typedef struct {
-  char *buffer;
+  char buffer[8192];
+  gsize count;
+  gsize count_skipped;
+  int io_prio;
+  GCancellable *cancellable;
   gpointer user_data;
   GAsyncReadyCallback callback;
 } SkipFallbackAsyncData;
@@ -937,24 +944,45 @@ skip_callback_wrapper (GObject *source_object,
 		       GAsyncResult *res,
 		       gpointer user_data)
 {
+  GInputStreamClass *class;
   SkipFallbackAsyncData *data = user_data;
   SkipData *op;
   GSimpleAsyncResult *simple;
   GError *error = NULL;
+  gssize ret;
+
+  ret = g_input_stream_read_finish (G_INPUT_STREAM (source_object), res, &error);
+
+  if (ret > 0)
+    {
+      data->count -= ret;
+      data->count_skipped += ret;
+
+      if (data->count > 0)
+	{
+	  class = G_INPUT_STREAM_GET_CLASS (source_object);
+	  class->read_async (G_INPUT_STREAM (source_object), data->buffer, MIN (8192, data->count), data->io_prio, data->cancellable,
+			     skip_callback_wrapper, data);
+	  return;
+	}
+    }
 
   op = g_new0 (SkipData, 1);
+  op->count_skipped = data->count_skipped;
   simple = g_simple_async_result_new (source_object,
 				      data->callback, data->user_data,
 				      g_input_stream_real_skip_async);
 
   g_simple_async_result_set_op_res_gpointer (simple, op, g_free);
 
-  op->count_skipped =
-    g_input_stream_read_finish (G_INPUT_STREAM (source_object), res, &error);
-
-  if (op->count_skipped == -1)
+  if (ret == -1)
     {
-      g_simple_async_result_set_from_error (simple, error);
+      if (data->count_skipped && 
+	  error->domain == G_IO_ERROR &&
+	  error->code == G_IO_ERROR_CANCELLED)
+	{ /* No error, return partial read */ }
+      else
+	g_simple_async_result_set_from_error (simple, error);
       g_error_free (error);
     }
 
@@ -962,7 +990,6 @@ skip_callback_wrapper (GObject *source_object,
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
   
-  g_free (data->buffer);
   g_free (data);
  }
 
@@ -983,8 +1010,8 @@ g_input_stream_real_skip_async (GInputStream        *stream,
 
   if (class->read_async == g_input_stream_real_read_async)
     {
-      /* Read is thread-using async fallback. Make skip use
-       * threads too, so that we can use a possible sync skip
+      /* Read is thread-using async fallback.
+       * Make skip use threads too, so that we can use a possible sync skip
        * implementation. */
       op = g_new0 (SkipData, 1);
       
@@ -1004,10 +1031,13 @@ g_input_stream_real_skip_async (GInputStream        *stream,
       
       /* There is a custom async read function, lets use that. */
       data = g_new (SkipFallbackAsyncData, 1);
-      data->buffer = g_malloc (count);
+      data->count = count;
+      data->count_skipped = 0;
+      data->io_prio = io_priority;
+      data->cancellable = cancellable;
       data->callback = callback;
       data->user_data = user_data;
-      class->read_async (stream, data->buffer, count, io_priority, cancellable,
+      class->read_async (stream, data->buffer, MIN (8192, count), io_priority, cancellable,
 			 skip_callback_wrapper, data);
     }
 
