@@ -169,13 +169,15 @@ dbus_mount_reply (DBusPendingCall *pending,
 
 GMountOperation *
 mountable_mount (Mountable *mountable,
-		 GMountSpec *spec)
+		 GMountSpec *spec,
+		 gboolean is_automount)
 {
   DBusConnection *conn;
   GMountOperationDBus *op;
   DBusMessage *message;
   DBusMessageIter iter;
   DBusPendingCall *pending;
+  dbus_bool_t automount;
 
   op = g_mount_operation_dbus_new (spec);
   g_object_set_data (G_OBJECT (op), "mountable", mountable);
@@ -186,8 +188,10 @@ mountable_mount (Mountable *mountable,
 					      G_VFS_DBUS_MOUNTABLE_PATH,
 					      G_VFS_DBUS_MOUNTABLE_INTERFACE,
 					      "mount");
+      automount = is_automount;
       if (!dbus_message_append_args (message,
 				     DBUS_TYPE_OBJECT_PATH, &op->obj_path,
+				     DBUS_TYPE_BOOLEAN, &automount,
 				     0))
 	_g_dbus_oom ();
       

@@ -293,7 +293,7 @@ maybe_automount (GMountTracker *tracker,
 
       g_print ("automounting...\n");
 
-      op = mountable_mount (mountable, spec);
+      op = mountable_mount (mountable, spec, TRUE);
 	  
       data = g_new0 (AutoMountData, 1);
       data->tracker = tracker;

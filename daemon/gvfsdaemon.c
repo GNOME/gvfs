@@ -777,6 +777,7 @@ daemon_start_mount (GVfsDaemon *daemon,
   DBusMessage *reply;
   GMountSpec *mount_spec;
   GMountSource *mount_source;
+  dbus_bool_t automount;
 
   dbus_id = dbus_message_get_sender (message);
   
@@ -786,6 +787,7 @@ daemon_start_mount (GVfsDaemon *daemon,
   dbus_error_init (&derror);
   if (!_g_dbus_message_iter_get_args (&iter, &derror,
 				      DBUS_TYPE_OBJECT_PATH, &obj_path,
+				      DBUS_TYPE_BOOLEAN, &automount,
 				      0))
     {
       reply = dbus_message_new_error (message, derror.name, derror.message);
@@ -804,6 +806,7 @@ daemon_start_mount (GVfsDaemon *daemon,
   if (mount_spec)
     {
       mount_source = g_mount_source_new_dbus (dbus_id, obj_path, mount_spec);
+      g_mount_source_set_is_automount (mount_source, automount);
       g_mount_spec_unref (mount_spec);
 
       g_vfs_daemon_initiate_mount (daemon, mount_source);
