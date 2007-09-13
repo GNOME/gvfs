@@ -39,7 +39,6 @@
 
 /* TODO for sftp:
  * Implement can_delete & can_rename
- * Implement symlink_target for get_info and readdir
  * lots of ops   
  */
 
