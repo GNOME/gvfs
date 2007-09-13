@@ -174,6 +174,9 @@ g_file_output_stream_daemon_finalize (GObject *object)
     g_object_unref (file->command_stream);
   if (file->data_stream)
     g_object_unref (file->data_stream);
+
+  g_string_free (file->input_buffer, TRUE);
+  g_string_free (file->output_buffer, TRUE);
   
   if (G_OBJECT_CLASS (g_file_output_stream_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_output_stream_daemon_parent_class)->finalize) (object);
@@ -205,7 +208,7 @@ static void
 g_file_output_stream_daemon_init (GFileOutputStreamDaemon *info)
 {
   info->output_buffer = g_string_new ("");
-  info->output_buffer = g_string_new ("");
+  info->input_buffer = g_string_new ("");
 }
 
 GFileOutputStream *
@@ -248,7 +251,7 @@ append_request (GFileOutputStreamDaemon *stream, guint32 command,
   cmd.seq_nr = g_htonl (stream->seq_nr++);
   cmd.arg1 = g_htonl (arg1);
   cmd.arg2 = g_htonl (arg2);
-  cmd.data_len = data_len;
+  cmd.data_len = g_htonl (data_len);
 
   g_string_append_len (stream->output_buffer,
 		       (char *)&cmd, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
