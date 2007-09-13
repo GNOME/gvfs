@@ -1319,7 +1319,7 @@ g_local_file_make_symbolic_link (GFile *file,
 #ifdef HAVE_SYMLINK
   GLocalFile *local = G_LOCAL_FILE (file);
   
-  if (symlink (local->filename, symlink_value) == -1)
+  if (symlink (symlink_value, local->filename) == -1)
     {
       int errsv = errno;
 
