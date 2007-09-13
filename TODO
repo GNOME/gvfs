@@ -71,6 +71,8 @@ Add sort-priority file attribute so that e.g. volumes can be sorted not just by 
 
 Make programmer errors be g_return_if_fail instead of GErrors
 
+Return G_IO_ERROR_INVALID_FILENAME on local file operations on FAT with invalid names
+
 FUTURE IDEAS:
 -------------
 
