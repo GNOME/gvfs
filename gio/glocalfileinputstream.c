@@ -20,22 +20,29 @@ struct _GLocalFileInputStreamPrivate {
   int fd;
 };
 
-static gssize     g_local_file_input_stream_read          (GInputStream           *stream,
-							   void                   *buffer,
-							   gsize                   count,
-							   GCancellable           *cancellable,
-							   GError                **error);
-static gssize     g_local_file_input_stream_skip          (GInputStream           *stream,
-							   gsize                   count,
-							   GCancellable           *cancellable,
-							   GError                **error);
-static gboolean   g_local_file_input_stream_close         (GInputStream           *stream,
-							   GCancellable           *cancellable,
-							   GError                **error);
-static GFileInfo *g_local_file_input_stream_get_file_info (GFileInputStream       *stream,
-							   char                   *attributes,
-							   GCancellable           *cancellable,
-							   GError                **error);
+static gssize     g_local_file_input_stream_read          (GInputStream      *stream,
+							   void              *buffer,
+							   gsize              count,
+							   GCancellable      *cancellable,
+							   GError           **error);
+static gssize     g_local_file_input_stream_skip          (GInputStream      *stream,
+							   gsize              count,
+							   GCancellable      *cancellable,
+							   GError           **error);
+static gboolean   g_local_file_input_stream_close         (GInputStream      *stream,
+							   GCancellable      *cancellable,
+							   GError           **error);
+static goffset    g_local_file_input_stream_tell          (GFileInputStream  *stream);
+static gboolean   g_local_file_input_stream_can_seek      (GFileInputStream  *stream);
+static gboolean   g_local_file_input_stream_seek          (GFileInputStream  *stream,
+							   goffset            offset,
+							   GSeekType          type,
+							   GCancellable      *cancellable,
+							   GError           **error);
+static GFileInfo *g_local_file_input_stream_get_file_info (GFileInputStream  *stream,
+							   char              *attributes,
+							   GCancellable      *cancellable,
+							   GError           **error);
 
 static void
 g_local_file_input_stream_finalize (GObject *object)
@@ -62,6 +69,9 @@ g_local_file_input_stream_class_init (GLocalFileInputStreamClass *klass)
   stream_class->read = g_local_file_input_stream_read;
   stream_class->skip = g_local_file_input_stream_skip;
   stream_class->close = g_local_file_input_stream_close;
+  file_stream_class->tell = g_local_file_input_stream_tell;
+  file_stream_class->can_seek = g_local_file_input_stream_can_seek;
+  file_stream_class->seek = g_local_file_input_stream_seek;
   file_stream_class->get_file_info = g_local_file_input_stream_get_file_info;
 }
 
@@ -195,6 +205,83 @@ g_local_file_input_stream_close (GInputStream *stream,
     }
 
   return res != -1;
+}
+
+
+static goffset
+g_local_file_input_stream_tell (GFileInputStream *stream)
+{
+  GLocalFileInputStream *file;
+  off_t pos;
+
+  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+  
+  pos = lseek (file->priv->fd, 0, SEEK_CUR);
+
+  if (pos == (off_t)-1)
+    return 0;
+  
+  return pos;
+}
+
+static gboolean
+g_local_file_input_stream_can_seek (GFileInputStream *stream)
+{
+  GLocalFileInputStream *file;
+  off_t pos;
+
+  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+  
+  pos = lseek (file->priv->fd, 0, SEEK_CUR);
+
+  if (pos == (off_t)-1 &&
+      errno == ESPIPE)
+    return FALSE;
+  
+  return TRUE;
+}
+
+static int
+seek_type_to_lseek (GSeekType type)
+{
+  switch (type)
+    {
+    default:
+    case G_SEEK_CUR:
+      return SEEK_CUR;
+      
+    case G_SEEK_SET:
+      return SEEK_SET;
+      
+    case G_SEEK_END:
+      return SEEK_END;
+    }
+}
+
+static gboolean
+g_local_file_input_stream_seek (GFileInputStream     *stream,
+				goffset               offset,
+				GSeekType             type,
+				GCancellable         *cancellable,
+				GError              **error)
+{
+  GLocalFileInputStream *file;
+  off_t pos;
+
+  file = G_LOCAL_FILE_INPUT_STREAM (stream);
+
+  pos = lseek (file->priv->fd, offset, seek_type_to_lseek (type));
+
+  if (pos == (off_t)-1)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error seeking in file: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
 }
 
 static GFileInfo *
