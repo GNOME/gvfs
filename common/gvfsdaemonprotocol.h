@@ -40,6 +40,9 @@ G_BEGIN_DECLS
 
 #define G_VFS_DBUS_MOUNT_OPERATION_INTERFACE "org.gtk.vfs.MountOperation"
 
+#define G_VFS_DBUS_SPAWNER_INTERFACE "org.gtk.vfs.Spawner"
+#define G_VFS_DBUS_OP_SPAWNED "Spawned"
+
 typedef struct {
   guint32 command;
   guint32 seq_nr;

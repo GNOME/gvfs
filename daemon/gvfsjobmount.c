@@ -52,6 +52,8 @@ g_vfs_job_mount_init (GVfsJobMount *job)
 GVfsJob *
 g_vfs_job_mount_new (GMountSpec *spec,
 		     GMountSource *source,
+		     gboolean is_automount,
+		     DBusMessage *request,
 		     GVfsBackend *backend)
 {
   GVfsJobMount *job;
@@ -61,7 +63,10 @@ g_vfs_job_mount_new (GMountSpec *spec,
 
   job->mount_spec = g_mount_spec_ref (spec);
   job->mount_source = g_object_ref (source);
+  job->is_automount = is_automount;
   job->backend = backend;
+  if (request)
+    job->request = dbus_message_ref (request);
   
   return G_VFS_JOB (job);
 }
@@ -75,7 +80,8 @@ run (GVfsJob *job)
   class->mount (op_job->backend,
 		op_job,
 		op_job->mount_spec,
-		op_job->mount_source);
+		op_job->mount_source,
+		op_job->is_automount);
 }
 
 static gboolean
@@ -90,16 +96,32 @@ try (GVfsJob *job)
   return class->try_mount (op_job->backend,
 			   op_job,
 			   op_job->mount_spec,
-			   op_job->mount_source);
+			   op_job->mount_source,
+			   op_job->is_automount);
 }
 
 static void
 mount_failed (GVfsJobMount *op_job, GError *error)
 {
+  DBusConnection *conn;
+  DBusMessage *reply;
   GVfsBackend *backend;
- 
+
+  if (op_job->request)
+    {
+      reply = _dbus_message_new_from_gerror (op_job->request, error);
+      
+      /* Queues reply (threadsafely), actually sends it in mainloop */
+      conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+      if (conn)
+	{
+	  dbus_connection_send (conn, reply, NULL);
+	  dbus_message_unref (reply);
+	  dbus_connection_unref (conn);
+	}
+    }
+
   backend = g_object_ref (op_job->backend);
-  g_mount_source_failed (op_job->mount_source, error);
   g_vfs_job_emit_finished (G_VFS_JOB (op_job));
   
   /* Remove failed backend from daemon */
@@ -108,19 +130,33 @@ mount_failed (GVfsJobMount *op_job, GError *error)
 }
 
 static void
-register_mount_callback (DBusMessage *reply,
+register_mount_callback (DBusMessage *mount_reply,
 			 GError *error,
 			 gpointer user_data)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (user_data);
+  DBusConnection *conn;
+  DBusMessage *reply;
 
-  g_print ("register_mount_callback, reply: %p, error: %p\n", reply, error);
+  g_print ("register_mount_callback, mount_reply: %p, error: %p\n", mount_reply, error);
   
-  if (reply == NULL)
+  if (mount_reply == NULL)
     mount_failed (op_job, error);
   else
     {
-      g_mount_source_done (op_job->mount_source);
+      if (op_job->request)
+	{
+	  reply = dbus_message_new_method_return (op_job->request);
+	  /* Queues reply (threadsafely), actually sends it in mainloop */
+	  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+	  if (conn)
+	    {
+	      dbus_connection_send (conn, reply, NULL);
+	      dbus_message_unref (reply);
+	      dbus_connection_unref (conn);
+	    }
+	}
+
       g_vfs_job_emit_finished (G_VFS_JOB (op_job));
     }
 }

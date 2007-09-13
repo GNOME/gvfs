@@ -187,8 +187,6 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
   unsigned int flags;
   int ret;
 
-  g_print ("main_daemon: %d, replace %d\n", main_daemon, replace);
-  
   dbus_error_init (&error);
   conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
   if (!conn)
@@ -212,7 +210,6 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
       if (replace)
 	flags |= DBUS_NAME_FLAG_REPLACE_EXISTING;
 
-      g_print ("requesting name\n");
       ret = dbus_bus_request_name (conn, G_VFS_DBUS_DAEMON_NAME, flags, &error);
       if (ret == -1)
 	{
@@ -788,35 +785,34 @@ daemon_start_mount (GVfsDaemon *daemon,
 
   dbus_message_iter_init (message, &iter);
 
+  reply = NULL;
   mount_spec = NULL;
   dbus_error_init (&derror);
-  if (!_g_dbus_message_iter_get_args (&iter, &derror,
-				      DBUS_TYPE_STRING, &dbus_id,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
-				      DBUS_TYPE_BOOLEAN, &automount,
-				      0))
+  if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
+    reply = dbus_message_new_error (message,
+				    DBUS_ERROR_INVALID_ARGS,
+				    "Error in mount spec");
+  else if (!_g_dbus_message_iter_get_args (&iter, &derror,
+					   DBUS_TYPE_BOOLEAN, &automount,
+					   DBUS_TYPE_STRING, &dbus_id,
+					   DBUS_TYPE_OBJECT_PATH, &obj_path,
+					   0))
     {
       reply = dbus_message_new_error (message, derror.name, derror.message);
       dbus_error_free (&derror);
     }
-  else if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
-    reply = dbus_message_new_error (message,
-				    DBUS_ERROR_INVALID_ARGS,
-				    "Error in mount spec");
-  else
-    reply = dbus_message_new_method_return (message);
-      
-  dbus_connection_send (connection, reply, NULL);
-  dbus_message_unref (reply);
 
-  if (mount_spec)
+  if (reply)
     {
-      mount_source = g_mount_source_new_dbus (dbus_id, obj_path, mount_spec);
-      g_mount_source_set_is_automount (mount_source, automount);
-      g_mount_spec_unref (mount_spec);
-
-      g_vfs_daemon_initiate_mount (daemon, mount_source);
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+    }
+  else
+    {
+      mount_source = g_mount_source_new (dbus_id, obj_path);
+      g_vfs_daemon_initiate_mount (daemon, mount_spec, mount_source, automount, message);
       g_object_unref (mount_source);
+      g_mount_spec_unref (mount_spec);
     }
 }
 
@@ -829,8 +825,6 @@ daemon_message_func (DBusConnection *conn,
   RegisteredPath *registered_path;
   const char *path;
 
-  g_print ("daemon_message_func\n");
-  
   path = dbus_message_get_path (message);
   if (path == NULL)
     path = "";
@@ -931,25 +925,20 @@ peer_to_peer_filter_func (DBusConnection *conn,
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
-static void
-mount_got_spec (GMountSource *mount_source,
-		GMountSpec *mount_spec,
-		GError *error,
-		gpointer data)
+void
+g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
+			     GMountSpec *mount_spec,
+			     GMountSource *mount_source,
+			     gboolean is_automount,
+			     DBusMessage *request)
 {
-  GVfsDaemon *daemon = data;
   const char *type;
   GType backend_type;
   char *obj_path;
   GVfsJob *job;
   GVfsBackend *backend;
-  GError *io_error;
-
-  if (mount_spec == NULL)
-    {
-      g_mount_source_failed (mount_source, error);
-      return;
-    }
+  DBusConnection *conn;
+  DBusMessage *reply;
 
   type = g_mount_spec_get_type (mount_spec);
 
@@ -959,11 +948,23 @@ mount_got_spec (GMountSource *mount_source,
 
   if (backend_type == G_TYPE_INVALID)
     {
-      io_error = NULL;
-      g_set_error (&io_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		   "Unsupported mount type");
-      g_mount_source_failed (mount_source, io_error);
-      g_error_free (io_error);
+      if (request)
+	{
+	  reply = _dbus_message_new_gerror (request,
+					    G_IO_ERROR, G_IO_ERROR_FAILED,
+					    _("Invalid backend type"));
+	  
+	  /* Queues reply (threadsafely), actually sends it in mainloop */
+	  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+	  if (conn)
+	    {
+	      dbus_connection_send (conn, reply, NULL);
+	      dbus_message_unref (reply);
+	      dbus_connection_unref (conn);
+	    }
+	}
+      else
+	g_warning ("Error mounting: invalid backend type\n");
       return;
     }
 
@@ -976,17 +977,6 @@ mount_got_spec (GMountSource *mount_source,
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
   g_object_unref (backend);
 
-  job = g_vfs_job_mount_new (mount_spec, mount_source, backend);
+  job = g_vfs_job_mount_new (mount_spec, mount_source, is_automount, request, backend);
   g_vfs_daemon_queue_job (daemon, job);
-  
-  g_object_unref (mount_source);
-}
-
-void
-g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
-			     GMountSource *mount_source)
-{
-  g_object_ref (mount_source);
-  g_mount_source_request_mount_spec_async (mount_source,
-					   mount_got_spec, daemon);
 }

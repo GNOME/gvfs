@@ -10,8 +10,7 @@
 
 G_BEGIN_DECLS
 
-GMountSource *g_mount_operation_dbus_wrap (GMountOperation *op,
-					   GMountSpec *spec);
+GMountSource *g_mount_operation_dbus_wrap (GMountOperation *op);
 
 G_END_DECLS
 

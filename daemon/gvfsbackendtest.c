@@ -51,7 +51,8 @@ static gboolean
 try_mount (GVfsBackend *backend,
 	   GVfsJobMount *job,
 	   GMountSpec *mount_spec,
-	   GMountSource *mount_source)
+	   GMountSource *mount_source,
+	   gboolean is_automount)
 {
   g_vfs_job_succeeded (G_VFS_JOB (job));
   return TRUE;

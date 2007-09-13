@@ -470,7 +470,8 @@ static void
 do_mount (GVfsBackend *backend,
 	  GVfsJobMount *job,
 	  GMountSpec *mount_spec,
-	  GMountSource *mount_source)
+	  GMountSource *mount_source,
+	  gboolean is_automount)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   SMBCCTX *smb_context;
@@ -556,7 +557,8 @@ static gboolean
 try_mount (GVfsBackend *backend,
 	   GVfsJobMount *job,
 	   GMountSpec *mount_spec,
-	   GMountSource *mount_source)
+	   GMountSource *mount_source,
+	   gboolean is_automount)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   const char *server;
@@ -581,7 +583,7 @@ try_mount (GVfsBackend *backend,
   user = g_mount_spec_get (mount_spec, "user");
   domain = g_mount_spec_get (mount_spec, "domain");
   
-  if (g_mount_source_get_is_automount (mount_source) &&
+  if (is_automount &&
       ((user != NULL) || (domain != NULL)))
     {
       g_vfs_job_failed (G_VFS_JOB (job),

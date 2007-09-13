@@ -23,6 +23,8 @@ main (int argc, char *argv[])
     { NULL }
   };
 
+  g_thread_init (NULL);
+  
   g_set_application_name (_("GVFS Daemon"));
   context = g_option_context_new (_(""));
 
@@ -41,8 +43,6 @@ main (int argc, char *argv[])
 
   dbus_threads_init_default ();
   
-  g_thread_init (NULL);
-
   g_type_init ();
 
   daemon = g_vfs_daemon_new (TRUE, replace);

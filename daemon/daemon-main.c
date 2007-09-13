@@ -9,7 +9,13 @@
 #include "daemon-main.h"
 #include <glib/gi18n.h>
 #include <gvfsdaemon.h>
+#include <gvfsdaemonprotocol.h>
 #include <gvfsbackend.h>
+
+static char *spawner_id = NULL;
+static char *spawner_path = NULL;
+
+
 
 void
 daemon_init (void)
@@ -31,25 +37,59 @@ daemon_init (void)
     }
 }
 
-GMountSource *
+static void
+send_spawned (DBusConnection *connection, gboolean succeeded, char *error_message)
+{
+  DBusMessage *message;
+  dbus_bool_t dbus_succeeded;
+
+  if (error_message == NULL)
+    error_message = "";
+
+  if (spawner_id == NULL || spawner_path == NULL)
+    {
+      if (!succeeded)
+	g_print ("Error: %s\n", error_message);
+      return;
+    }
+  
+  message = dbus_message_new_method_call (spawner_id,
+					  spawner_path,
+					  G_VFS_DBUS_SPAWNER_INTERFACE,
+					  "spawned");
+  dbus_message_set_no_reply (message, TRUE);
+
+  dbus_succeeded = succeeded;
+  if (!dbus_message_append_args (message,
+				 DBUS_TYPE_BOOLEAN, &dbus_succeeded,
+				 DBUS_TYPE_STRING, &error_message,
+				 DBUS_TYPE_INVALID))
+    _g_dbus_oom ();
+    
+  dbus_connection_send (connection, message, NULL);
+  /* Make sure the message is sent */
+  dbus_connection_flush (connection);
+}
+
+GMountSpec *
 daemon_parse_args (int argc, char *argv[], const char *default_type)
 {
-  GMountSource *mount_source;
+  GMountSpec *mount_spec;
   
-  mount_source = NULL;
-  if (argc > 1 && strcmp (argv[1], "--dbus") == 0)
+  mount_spec = NULL;
+  if (argc > 1 && strcmp (argv[1], "--spawner") == 0)
     {
       if (argc < 4)
 	{
-	  g_printerr ("Usage: %s --dbus dbus-id object_path\n", argv[0]);
+	  g_printerr ("Usage: %s --spawner dbus-id object_path\n", argv[0]);
 	  exit (1);
 	}
-      
-      mount_source = g_mount_source_new_dbus (argv[2], argv[3], NULL);
+
+      spawner_id = argv[2];
+      spawner_path = argv[3];
     }
   else if (argc > 1 || default_type != NULL)
     {
-      GMountSpec *mount_spec;
       gboolean found_type;
       int i;
       
@@ -83,12 +123,9 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 	  g_printerr ("Usage: %s key=value key=value ...\n", argv[0]);
 	  exit (1);
 	}
-      
-      mount_source = g_mount_source_new_null (mount_spec);
-      g_mount_spec_unref (mount_spec);
     }
 
-  return mount_source;
+  return mount_spec;
 }
 
 void
@@ -105,12 +142,22 @@ daemon_main (int argc,
   GMainLoop *loop;
   GVfsDaemon *daemon;
   DBusError derror;
+  GMountSpec *mount_spec;
   GMountSource *mount_source;
   GError *error;
   int res;
   const char *type;
 
-  mount_source = daemon_parse_args (argc, argv, default_type);
+  dbus_error_init (&derror);
+  connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+  if (connection == NULL)
+    {
+      g_printerr (_("Error connecting dbus: %s\n"), derror.message);
+      dbus_error_free (&derror);
+      exit (1);
+    }
+  
+  mount_spec = daemon_parse_args (argc, argv, default_type);
 
   va_start (var_args, first_type_name);
 
@@ -128,14 +175,6 @@ daemon_main (int argc,
   error = NULL;
   if (mountable_name)
     {
-      dbus_error_init (&derror);
-      connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
-      if (connection == NULL)
-	{
-	  g_printerr (_("Error connecting dbus: %s\n"), derror.message);
-	  dbus_error_free (&derror);
-	  exit (1);
-	}
       
       res = dbus_bus_request_name (connection,
 				   mountable_name,
@@ -148,7 +187,9 @@ daemon_main (int argc,
 	  else
 	    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			 _("mountpoint for %s already running"), mountable_name);
-	  g_mount_source_failed (mount_source, error);
+
+	  send_spawned (connection, FALSE, error->message);
+	  g_error_free (error);
 	  exit (1);
 	}
     }
@@ -156,23 +197,24 @@ daemon_main (int argc,
   daemon = g_vfs_daemon_new (FALSE, FALSE);
   if (daemon == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("error starting mount daemon"));
-      g_mount_source_failed (mount_source, error);
+      send_spawned (connection, FALSE, _("error starting mount daemon"));
       exit (1);
     }
 
   g_vfs_daemon_set_max_threads (daemon, max_job_threads);  
   
-  if (mount_source)
+  send_spawned (connection, TRUE, NULL);
+	  
+  if (mount_spec)
     {
-      g_vfs_daemon_initiate_mount (daemon, mount_source);
+      mount_source = g_mount_source_new_dummy ();
+      g_vfs_daemon_initiate_mount (daemon, mount_spec, mount_source, FALSE, NULL);
+      g_mount_spec_unref (mount_spec);
       g_object_unref (mount_source);
     }
   
   loop = g_main_loop_new (NULL, FALSE);
 
-  g_print ("Entering mainloop\n");
   g_main_loop_run (loop);
 }
 

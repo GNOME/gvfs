@@ -17,7 +17,6 @@ typedef struct
   char *obj_path;
   char *dbus_id;
   DBusConnection *connection;
-  GMountSpec *mount_spec;
 } GMountOperationDBus;
 
 static DBusHandlerResult mount_op_message_function    (DBusConnection      *connection,
@@ -28,10 +27,6 @@ static void              mount_op_unregister_function (DBusConnection      *conn
 static void              mount_op_ask_password        (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
 static void              mount_op_ask_question        (GMountOperationDBus *op_dbus,
-						       DBusMessage         *message);
-static void              mount_op_done                (GMountOperationDBus *op_dbus,
-						       DBusMessage         *message);
-static void              mount_op_get_mount_spec      (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
 
 static void
@@ -45,13 +40,11 @@ g_mount_operation_dbus_free (GMountOperationDBus *op_dbus)
     }
   g_free (op_dbus->dbus_id);
   g_free (op_dbus->obj_path);
-  g_mount_spec_unref (op_dbus->mount_spec);
   g_free (op_dbus);
 }
 
 GMountSource *
-g_mount_operation_dbus_wrap (GMountOperation *op,
-			     GMountSpec *spec)
+g_mount_operation_dbus_wrap (GMountOperation *op)
 {
   GMountOperationDBus *op_dbus;
   static int mount_id = 0;
@@ -63,7 +56,6 @@ g_mount_operation_dbus_wrap (GMountOperation *op,
   op_dbus = g_new0 (GMountOperationDBus, 1);
   
   op_dbus->op = op;
-  op_dbus->mount_spec = g_mount_spec_ref (spec);
   op_dbus->connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
   op_dbus->obj_path = g_strdup_printf ("/org/gtk/gvfs/mountop/%d", mount_id++);
   if (op_dbus->connection)
@@ -79,7 +71,7 @@ g_mount_operation_dbus_wrap (GMountOperation *op,
   g_object_set_data_full (G_OBJECT (op), "dbus-op",
 			  op_dbus, (GDestroyNotify)g_mount_operation_dbus_free);
   
-  return g_mount_source_new_dbus (op_dbus->dbus_id, op_dbus->obj_path, spec);
+  return g_mount_source_new (op_dbus->dbus_id, op_dbus->obj_path);
 }
 
 /**
@@ -112,34 +104,10 @@ mount_op_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					"askQuestion"))
     mount_op_ask_question (op_dbus, message);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					"done"))
-    mount_op_done (op_dbus, message);
-  else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
-					"getMountSpec"))
-    mount_op_get_mount_spec (op_dbus, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
   return DBUS_HANDLER_RESULT_HANDLED;
-}
-
-static void
-mount_op_get_mount_spec (GMountOperationDBus *op_dbus,
-			 DBusMessage *message)
-{
-  DBusMessage *reply;
-  DBusMessageIter iter;
-  
-  reply = dbus_message_new_method_return (message);
-  
-  dbus_message_iter_init_append (reply, &iter);
-  g_mount_spec_to_dbus (&iter, op_dbus->mount_spec);
-
-  if (!dbus_connection_send (op_dbus->connection, reply, NULL))
-    _g_dbus_oom ();
 }
 
 static void
@@ -331,53 +299,4 @@ mount_op_ask_question (GMountOperationDBus *op_dbus,
     }
   
   dbus_free_string_array (choices);
-}
-  
-static void
-mount_op_done (GMountOperationDBus *op_dbus,
-	       DBusMessage         *message)
-{
-  const char *domain, *error_message;
-  dbus_bool_t success;
-  DBusMessageIter iter;
-  DBusError derror;
-  guint32 code;
-  GError *error;
-
-  dbus_message_iter_init (message, &iter);
-  
-  dbus_error_init (&derror);
-  if (!_g_dbus_message_iter_get_args (&iter,
-				      &derror,
-				      DBUS_TYPE_BOOLEAN, &success,
-				      0))
-    {
-      g_warning ("Can't get mountDone args: %s\n", derror.message);
-      dbus_error_free (&derror);
-      return;
-    }
-
-  error = NULL;
-  if (!success)
-    {
-      if (_g_dbus_message_iter_get_args (&iter,
-					 &derror,
-					 DBUS_TYPE_STRING, &domain,
-					 DBUS_TYPE_UINT32, &code,
-					 DBUS_TYPE_STRING, &error_message,
-					 0))
-	error = g_error_new_literal (g_quark_from_string (domain),
-				     code, error_message);
-      else
-	{
-	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       "Can't parse mount error: %s", derror.message);
-	  dbus_error_free (&derror);
-	}
-    }
-  
-  g_signal_emit_by_name (op_dbus->op, "done", success, error);
-
-  if (error)
-    g_error_free (error);
 }

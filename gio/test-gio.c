@@ -581,11 +581,11 @@ main (int argc, char *argv[])
   }
 
   file = g_file_get_for_path ("/tmp");
-  if (0) test_sync ("test:///etc/passwd", FALSE);
+  if (1) test_sync ("test:///etc/passwd", FALSE);
   if (0) test_async ("test:///etc/passwd", TRUE);
   if (0) test_out ();
 
-  if (1) test_get_content ();
+  if (0) test_get_content ();
 
 
   g_print ("Starting mainloop\n");

@@ -22,8 +22,10 @@ struct _GVfsJobMount
   GVfsJob parent_instance;
 
   GVfsBackend *backend;
+  gboolean is_automount;
   GMountSpec *mount_spec;
   GMountSource *mount_source;
+  DBusMessage *request;
 };
 
 struct _GVfsJobMountClass
@@ -35,6 +37,8 @@ GType g_vfs_job_mount_get_type (void) G_GNUC_CONST;
 
 GVfsJob *g_vfs_job_mount_new (GMountSpec  *spec,
 			      GMountSource *source,
+			      gboolean is_automount,
+			      DBusMessage *request,
 			      GVfsBackend *backend);
 
 G_END_DECLS

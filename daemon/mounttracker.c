@@ -241,15 +241,14 @@ typedef struct {
 } AutoMountData;
 
 static void
-automount_done (GMountOperation *op,
-		gboolean         succeeded,
-		GError          *error,
+automount_done (Mountable *mountable,
+		GError *error,
 		gpointer _data)
 {
   DBusMessage *reply;
   AutoMountData *data = _data;
   
-  if (!succeeded)
+  if (error)
     {
       reply = _dbus_message_new_gerror (data->message,
 					G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
@@ -261,8 +260,6 @@ automount_done (GMountOperation *op,
 		  data->connection,
 		  data->message,
 		  FALSE);
-
-  g_object_unref (op);
 
   dbus_connection_unref (data->connection);
   dbus_message_unref (data->message);
@@ -285,25 +282,20 @@ maybe_automount (GMountTracker *tracker,
   if (mountable != NULL && do_automount &&
       mountable_is_automount (mountable))
     {
-      GMountOperation *op;
       AutoMountData *data;
       GMountSource *mount_source;
 
       g_print ("automounting...\n");
 
-      op = g_mount_operation_new ();
-      mount_source = g_mount_operation_dbus_wrap (op, spec);
-      g_mount_source_set_is_automount (mount_source, TRUE);
+      mount_source = g_mount_source_new_dummy ();
 
       data = g_new0 (AutoMountData, 1);
       data->tracker = tracker;
       data->message = dbus_message_ref (message);
       data->connection = dbus_connection_ref (connection);
-      g_signal_connect (op, "done", (GCallback)automount_done, data);
       
-      mountable_mount (mountable, mount_source);
+      mountable_mount (mountable, spec, mount_source, TRUE, automount_done, data);
       g_object_unref (mount_source);
-	  
     }
   else
     {
@@ -331,6 +323,8 @@ lookup_mount (GMountTracker *tracker,
   dbus_message_iter_init (message, &iter);
   spec = g_mount_spec_from_dbus (&iter);
 
+  g_print ("lookup_mount\n");
+  
   reply = NULL;
   if (spec != NULL)
     {
@@ -418,6 +412,36 @@ list_mounts (GMountTracker *tracker,
 }
 
 static void
+mount_location_done  (Mountable *mountable,
+		      GError *error,
+		      gpointer user_data)
+{
+  DBusMessage *message, *reply;
+  DBusConnection *conn;
+
+  message = user_data;
+  
+  if (error)
+    reply = _dbus_message_new_from_gerror (message, error);
+  else
+    reply = dbus_message_new_method_return (message);
+
+  dbus_message_unref (message);
+
+  if (reply == NULL)
+    _g_dbus_oom ();
+    
+  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  if (conn)
+    {
+      dbus_connection_send (conn, reply, NULL);
+      dbus_connection_unref (conn);
+    }
+  
+  dbus_message_unref (reply);
+}
+
+static void
 mount_location (GMountTracker *tracker,
 		DBusConnection *connection,
 		DBusMessage *message)
@@ -428,65 +452,62 @@ mount_location (GMountTracker *tracker,
   GMountSpec *spec;
   const char *obj_path, *dbus_id;
   Mountable *mountable;
-  dbus_bool_t automount;
   
   dbus_message_iter_init (message, &iter);
 
   mountable = NULL;
   spec = NULL;
   reply = NULL;
-  dbus_error_init (&derror);
-  if (_g_dbus_message_iter_get_args (&iter,
-				     &derror,
-				     DBUS_TYPE_STRING, &dbus_id,
-				     DBUS_TYPE_OBJECT_PATH, &obj_path,
-				     DBUS_TYPE_BOOLEAN, &automount,
-				     0))
+
+  spec = g_mount_spec_from_dbus (&iter);
+  if (spec == NULL)
+    reply = dbus_message_new_error (message, DBUS_ERROR_INVALID_ARGS,
+				    "Invalid arguments");
+  else
     {
-      spec = g_mount_spec_from_dbus (&iter);
-      if (spec != NULL)
+      dbus_error_init (&derror);
+      if (!_g_dbus_message_iter_get_args (&iter,
+					  &derror,
+					  DBUS_TYPE_STRING, &dbus_id,
+					  DBUS_TYPE_OBJECT_PATH, &obj_path,
+					  0))
+	{
+	  reply = dbus_message_new_error (message, derror.name, derror.message);
+	  dbus_error_free (&derror);
+	}
+      else
 	{
 	  VFSMount *mount;
 	  mount = match_vfs_mount (tracker, spec);
+	  
 	  if (mount != NULL)
-	    {
-	      reply = _dbus_message_new_gerror (message,
-						G_IO_ERROR, G_IO_ERROR_ALREADY_MOUNTED,
-						_("Location is already mounted"));
-	    }
+	    reply = _dbus_message_new_gerror (message,
+					      G_IO_ERROR, G_IO_ERROR_ALREADY_MOUNTED,
+					      _("Location is already mounted"));
 	  else
 	    {
 	      mountable = lookup_mountable (spec);
-
+	      
 	      if (mountable == NULL)
-		{
-		  reply = _dbus_message_new_gerror (message,
-						    G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
-						    _("Location is not mountable"));
-		}
+		reply = _dbus_message_new_gerror (message,
+						  G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
+						  _("Location is not mountable"));
 	    }
 	}
-      else
-	reply = dbus_message_new_error (message, DBUS_ERROR_INVALID_ARGS,
-					"Invalid arguments");
-    }
-  else
-    {
-      reply = dbus_message_new_error (message, derror.name, derror.message);
-      dbus_error_free (&derror);
     }
   
-  if (reply == NULL)
-    _g_dbus_oom ();
-
   if (reply)
     dbus_connection_send (connection, reply, NULL);
-
-  if (mountable)
+  else
     {
       GMountSource *source;
-      source = g_mount_source_new_dbus (dbus_id, obj_path, spec);
-      mountable_mount (mountable, source);
+
+      source = g_mount_source_new (dbus_id, obj_path);
+      mountable_mount (mountable,
+		       spec,
+		       source,
+		       FALSE,
+		       mount_location_done, dbus_message_ref (message));
       g_object_unref (source);
     }
 

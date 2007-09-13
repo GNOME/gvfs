@@ -44,7 +44,10 @@ void        g_vfs_daemon_register_path   (GVfsDaemon                    *daemon,
 void        g_vfs_daemon_unregister_path (GVfsDaemon                    *daemon,
 					  const char                    *obj_path);
 void        g_vfs_daemon_initiate_mount  (GVfsDaemon                    *daemon,
-					  GMountSource                  *mount_source);
+					  GMountSpec                    *mount_spec,
+					  GMountSource                  *mount_source,
+					  gboolean                       is_automount,
+					  DBusMessage                   *request);
 
 G_END_DECLS
 

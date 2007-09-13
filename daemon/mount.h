@@ -9,11 +9,19 @@ G_BEGIN_DECLS
 
 typedef struct _Mountable Mountable;
 
+typedef void (*MountCallback) (Mountable *mountable,
+			       GError *error,
+			       gpointer user_data);
+
 void       mount_init             (void);
 Mountable *lookup_mountable       (GMountSpec            *spec);
 gboolean   mountable_is_automount (Mountable             *mountable);
 void       mountable_mount        (Mountable             *mountable,
-				   GMountSource          *source);
+				   GMountSpec            *mount_spec,
+				   GMountSource          *source,
+				   gboolean               automount,
+				   MountCallback          callback,
+				   gpointer               user_data);
 
 G_END_DECLS
 

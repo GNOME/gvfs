@@ -27,26 +27,13 @@ typedef void   (*RequestMountSpecCallback)   (GMountSource *source,
 					      GError *error,
 					      gpointer data);
 
-
 GType g_mount_source_get_type (void) G_GNUC_CONST;
 
-GMountSource *g_mount_source_new_dbus                 (const char                *dbus_id,
-						       const char                *obj_path,
-						       GMountSpec                *spec);
-GMountSource *g_mount_source_new_null                 (GMountSpec                *spec);
+GMountSource *g_mount_source_new                      (const char                *dbus_id,
+						       const char                *obj_path);
+GMountSource *g_mount_source_new_dummy                (void);
 void          g_mount_source_to_dbus                  (GMountSource              *source,
 						       DBusMessage               *message);
-GMountSpec *  g_mount_source_request_mount_spec       (GMountSource              *source,
-						       GError                   **error);
-void          g_mount_source_request_mount_spec_async (GMountSource              *source,
-						       RequestMountSpecCallback   callback,
-						       gpointer                   data);
-void          g_mount_source_done                     (GMountSource              *source);
-void          g_mount_source_failed                   (GMountSource              *source,
-						       GError                    *error);
-void          g_mount_source_set_is_automount         (GMountSource              *source,
-						       gboolean                   is_automount);
-gboolean      g_mount_source_get_is_automount         (GMountSource              *source);
 gboolean      g_mount_source_ask_password             (GMountSource              *mount_source,
 						       const char                *message,
 						       const char                *initial_user,

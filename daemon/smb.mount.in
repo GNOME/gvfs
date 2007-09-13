@@ -1,4 +1,4 @@
 [Mount]
 Type=smb-share
-Exec=@libexecdir@/gvfs-daemon-smb --dbus
+Exec=@libexecdir@/gvfs-daemon-smb
 AutoMount=false

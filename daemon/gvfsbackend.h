@@ -61,11 +61,13 @@ struct _GVfsBackendClass
   void     (*mount)             (GVfsBackend *backend,
 				 GVfsJobMount *job,
 				 GMountSpec *mount_spec,
-				 GMountSource *mount_source);
+				 GMountSource *mount_source,
+				 gboolean is_automount);
   gboolean (*try_mount)         (GVfsBackend *backend,
 				 GVfsJobMount *job,
 				 GMountSpec *mount_spec,
-				 GMountSource *mount_source);
+				 GMountSource *mount_source,
+				 gboolean is_automount);
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);

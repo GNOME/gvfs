@@ -6,7 +6,7 @@
 G_BEGIN_DECLS
 
 void          daemon_init       (void);
-GMountSource *daemon_parse_args (int         argc,
+GMountSpec   *daemon_parse_args (int         argc,
 				 char       *argv[],
 				 const char *default_type);
 void          daemon_main       (int         argc,
