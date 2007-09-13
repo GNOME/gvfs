@@ -49,8 +49,6 @@ Add virtual file monitor event to support inotify WRITE_CLOSE
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
-Make programmer errors be g_return_if_fail instead of GErrors
-
 Return G_IO_ERROR_INVALID_FILENAME on local file operations on FAT with invalid names
 
 Make built-in uri parsers link into gvfs shared lib instead of using a module
