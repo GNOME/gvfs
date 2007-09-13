@@ -17,7 +17,7 @@ typedef struct {
   GFile *file;
   guint32 last_sent_change_time; /* 0 == not sent */
   guint32 send_delayed_change_at; /* 0 == never */
-  guint32 send_virtual_change_done_at; /* 0 == never */
+  guint32 send_virtual_changes_done_at; /* 0 == never */
 } RateLimiter;
 
 struct _GDirectoryMonitorPrivate {
@@ -164,6 +164,16 @@ new_limiter (GDirectoryMonitor *monitor,
 }
 
 static void
+rate_limiter_send_virtual_changes_done_now (GDirectoryMonitor *monitor, RateLimiter *limiter)
+{
+  if (limiter->send_virtual_changes_done_at != 0)
+    {
+      g_signal_emit (monitor, signals[CHANGED], 0, limiter->file, NULL, G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT);
+      limiter->send_virtual_changes_done_at = 0;
+    }
+}
+
+static void
 rate_limiter_send_delayed_change_now (GDirectoryMonitor *monitor, RateLimiter *limiter, guint32 time_now)
 {
   if (limiter->send_delayed_change_at != 0)
@@ -208,11 +218,11 @@ calc_min_time (GDirectoryMonitor *monitor, RateLimiter *limiter, guint32 time_no
 		       time_difference (time_now, limiter->send_delayed_change_at));
     }
 
-  if (limiter->send_virtual_change_done_at != 0)
+  if (limiter->send_virtual_changes_done_at != 0)
     {
       delete_me = FALSE;
       *min_time = MIN (*min_time,
-		       time_difference (time_now, limiter->send_virtual_change_done_at));
+		       time_difference (time_now, limiter->send_virtual_changes_done_at));
     }
 
   return delete_me;
@@ -228,16 +238,11 @@ foreach_rate_limiter_fire (gpointer  key,
 
   if (limiter->send_delayed_change_at != 0 &&
       time_difference (data->time_now, limiter->send_delayed_change_at) == 0)
-    {
-      rate_limiter_send_delayed_change_now (data->monitor, limiter, data->time_now);
-      limiter->send_delayed_change_at = 0;
-    }
+    rate_limiter_send_delayed_change_now (data->monitor, limiter, data->time_now);
 
-  if (limiter->send_virtual_change_done_at != 0 &&
-      time_difference (data->time_now, limiter->send_virtual_change_done_at) == 0)
-    {
-      /* TODO */
-    }
+  if (limiter->send_virtual_changes_done_at != 0 &&
+      time_difference (data->time_now, limiter->send_virtual_changes_done_at) == 0)
+    rate_limiter_send_virtual_changes_done_now (data->monitor, limiter);
 
   return calc_min_time (data->monitor, limiter, data->time_now, &data->min_time);
 }
@@ -295,14 +300,13 @@ update_rate_limiter_timeout (GDirectoryMonitor *monitor, guint new_time)
   ForEachData data;
   GSource *source;
   
-  data.time_now = get_time_msecs ();
-  
   if (monitor->priv->timeout_fires_at != 0 && new_time != 0 &&
-      time_difference (data.time_now + new_time, monitor->priv->timeout_fires_at) == 0)
+      time_difference (new_time, monitor->priv->timeout_fires_at) == 0)
     return; /* Nothing to do, we already fire earlier than that */
 
   data.min_time = G_MAXUINT32;
   data.monitor = monitor;
+  data.time_now = get_time_msecs ();
   g_hash_table_foreach_remove (monitor->priv->rate_limiter,
 			       foreach_rate_limiter_update,
 			       &data);
@@ -344,6 +348,11 @@ g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
       if (limiter)
 	{
 	  rate_limiter_send_delayed_change_now (monitor, limiter, get_time_msecs ());
+	  if (event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT)
+	    limiter->send_virtual_changes_done_at = 0;
+	  else
+	    rate_limiter_send_virtual_changes_done_now (monitor, limiter);
+	  update_rate_limiter_timeout (monitor, 0);
 	}
       g_signal_emit (monitor, signals[CHANGED], 0, child, other_file, event_type);
     }
@@ -369,18 +378,23 @@ g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
 	    }
 	}
 
+      if (limiter == NULL)
+	limiter = new_limiter (monitor, child);
+      
       if (emit_now)
 	{
 	  g_signal_emit (monitor, signals[CHANGED], 0, child, other_file, event_type);
-
-	  if (limiter == NULL)
-	    limiter = new_limiter (monitor, child);
 
 	  limiter->last_sent_change_time = time_now;
 	  limiter->send_delayed_change_at = 0;
 	  /* Set a timeout of 2*rate limit so that we can clear out the change from the hash eventualy */
 	  update_rate_limiter_timeout (monitor, time_now + 2 * monitor->priv->rate_limit_msec);
 	}
+
+      /* Schedule a virtual change done. This is removed if we get a real one, and
+	 postponed if we get more change events. */
+
+      limiter->send_virtual_changes_done_at = time_now + 3000;
+      update_rate_limiter_timeout (monitor, limiter->send_virtual_changes_done_at);
     }
-  
 }
