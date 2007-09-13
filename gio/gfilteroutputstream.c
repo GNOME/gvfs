@@ -8,6 +8,9 @@
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
+struct _GFilterOutputStreamPrivate {
+  gboolean is_disposed;
+};
 
 enum {
   PROP_0,
@@ -23,7 +26,7 @@ static void     g_filter_output_stream_get_property (GObject    *object,
                                                      guint       prop_id,
                                                      GValue     *value,
                                                      GParamSpec *pspec);
-static void     g_filter_output_stream_finalize     (GObject *object);
+static void     g_filter_output_stream_dispose      (GObject *object);
 
 
 static gssize   g_filter_output_stream_write        (GOutputStream *stream,
@@ -76,11 +79,13 @@ g_filter_output_stream_class_init (GFilterOutputStreamClass *klass)
   GObjectClass *object_class;
   GOutputStreamClass *ostream_class;
 
+  g_type_class_add_private (klass, sizeof (GFilterOutputStreamPrivate));
+
   object_class = G_OBJECT_CLASS (klass);
   object_class->get_property = g_filter_output_stream_get_property;
   object_class->set_property = g_filter_output_stream_set_property;
-  object_class->finalize     = g_filter_output_stream_finalize;
-  
+  object_class->dispose      = g_filter_output_stream_dispose;
+    
   ostream_class = G_OUTPUT_STREAM_CLASS (klass);
   ostream_class->write = g_filter_output_stream_write;
   ostream_class->flush = g_filter_output_stream_flush;
@@ -94,7 +99,7 @@ g_filter_output_stream_class_init (GFilterOutputStreamClass *klass)
 
   g_object_class_install_property (object_class,
                                    PROP_BASE_STREAM,
-                                   g_param_spec_object ("base_stream",
+                                   g_param_spec_object ("base-stream",
                                                          P_("The Filter Base Stream"),
                                                          P_("The underlying base stream the io ops will be done on"),
                                                          G_TYPE_OUTPUT_STREAM,
@@ -152,22 +157,38 @@ g_filter_output_stream_get_property (GObject    *object,
 }
 
 static void
-g_filter_output_stream_finalize (GObject *object)
+g_filter_output_stream_dispose (GObject *object)
 {
-  GFilterOutputStream *stream;
+  GFilterOutputStream        *stream;
+  GFilterOutputStreamPrivate *priv;
 
   stream = G_FILTER_OUTPUT_STREAM (object);
+  priv = stream->priv;
+
+  if (priv->is_disposed)
+    return;
+
+  priv->is_disposed = TRUE;
+
+  /* We force a close of this stream here because the
+   * finalize vfunction of the output stream will also
+   * close the stream if it was left open BUT then *
+   * all resource will already be free'd (especially the 
+   * base_stream object which happens right here) */
+  g_output_stream_close (G_OUTPUT_STREAM (stream), NULL, NULL);
 
   g_object_unref (stream->base_stream);
 
-  if (G_OBJECT_CLASS (g_filter_output_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_filter_output_stream_parent_class)->finalize) (object);
+  G_OBJECT_CLASS (g_filter_output_stream_parent_class)->dispose (object);
 }
+
 
 static void
 g_filter_output_stream_init (GFilterOutputStream *stream)
 {
-
+  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream,
+                                              G_TYPE_FILTER_OUTPUT_STREAM,
+                                              GFilterOutputStreamPrivate);
 }
 
 
