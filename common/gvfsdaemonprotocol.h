@@ -15,6 +15,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNTPOINT_INTERFACE "org.gtk.vfs.Mountpoint"
 #define G_VFS_DBUS_ANNOUNCE_MOUNTPOINT "AnnounceMountpoint"
 #define G_VFS_DBUS_OP_OPEN_FOR_READ "OpenForRead"
+#define G_VFS_DBUS_OP_OPEN_FOR_WRITE "OpenForWrite"
 #define G_VFS_DBUS_OP_GET_INFO "GetInfo"
 #define G_VFS_DBUS_OP_ENUMERATE "Enumerate"
 
