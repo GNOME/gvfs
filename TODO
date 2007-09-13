@@ -33,8 +33,6 @@ handle Cancel signal on daemon side
 
 rename glib lib from gvfs to gio (since it has more than gvfs)
 
-verify minimal syscalls with strace
-
 FUTURE IDEAS:
 -------------
 
