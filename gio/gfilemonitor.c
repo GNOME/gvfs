@@ -17,9 +17,9 @@ struct _GFileMonitorPrivate {
   int rate_limit_msec;
 
   /* Rate limiting change events */
-  guint32 last_change_event_time; /* Some monitonic clock in msecs */
-  GFile *last_change_event_file;
-  guint last_change_timeout_tag;
+  guint32 last_sent_change_time; /* Some monitonic clock in msecs */
+  GFile *last_sent_change_file;
+  guint last_sent_change_timeout;
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -31,11 +31,11 @@ g_file_monitor_finalize (GObject *object)
 
   monitor = G_FILE_MONITOR (object);
 
-  if (monitor->priv->last_change_event_file)
-    g_object_unref (monitor->priv->last_change_event_file);
+  if (monitor->priv->last_sent_change_file)
+    g_object_unref (monitor->priv->last_sent_change_file);
 
-  if (monitor->priv->last_change_timeout_tag != 0)
-    g_source_remove (monitor->priv->last_change_timeout_tag);
+  if (monitor->priv->last_sent_change_timeout != 0)
+    g_source_remove (monitor->priv->last_sent_change_timeout);
   
   if (G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize) (object);
@@ -121,23 +121,23 @@ time_difference (guint32 from, guint32 to)
 static void
 remove_last_event (GFileMonitor *monitor, gboolean emit_first)
 {
-  if (monitor->priv->last_change_event_file == NULL)
+  if (monitor->priv->last_sent_change_file == NULL)
     return;
   
   if (emit_first)
     g_signal_emit (monitor, signals[CHANGED], 0,
-		   monitor->priv->last_change_event_file, NULL,
+		   monitor->priv->last_sent_change_file, NULL,
 		   G_FILE_MONITOR_EVENT_CHANGED);
   
-  if (monitor->priv->last_change_event_file)
+  if (monitor->priv->last_sent_change_file)
     {
-      g_object_unref (monitor->priv->last_change_event_file);
-      monitor->priv->last_change_event_file = NULL;
+      g_object_unref (monitor->priv->last_sent_change_file);
+      monitor->priv->last_sent_change_file = NULL;
     }
-  if (monitor->priv->last_change_timeout_tag)
+  if (monitor->priv->last_sent_change_timeout)
     {
-      g_source_remove (monitor->priv->last_change_timeout_tag);
-      monitor->priv->last_change_timeout_tag = 0;
+      g_source_remove (monitor->priv->last_sent_change_timeout);
+      monitor->priv->last_sent_change_timeout = 0;
     }
 }
 
@@ -146,7 +146,7 @@ delayed_changed_event_timeout (gpointer data)
 {
   GFileMonitor *monitor = data;
 
-  monitor->priv->last_change_timeout_tag = 0;
+  monitor->priv->last_sent_change_timeout = 0;
 
   remove_last_event (monitor, TRUE);
   
@@ -172,9 +172,9 @@ g_file_monitor_emit_event (GFileMonitor *monitor,
       time_now = g_thread_gettime() / (1000 * 1000);
       emit_now = TRUE;
       
-      if (monitor->priv->last_change_event_file)
+      if (monitor->priv->last_sent_change_file)
 	{
-	  since_last = time_difference (monitor->priv->last_change_event_time, time_now);
+	  since_last = time_difference (monitor->priv->last_sent_change_time, time_now);
 	  if (since_last > monitor->priv->rate_limit_msec)
 	    {
 	      /* Its been enought time so that we can emit the stored one, but
@@ -187,10 +187,10 @@ g_file_monitor_emit_event (GFileMonitor *monitor,
 	      /* We ignore this change, but arm a timer so that we can fire it later if we
 		 don't get any other events (that kill this timeout) */
 	      emit_now = FALSE;
-	      if (monitor->priv->last_change_timeout_tag == 0) /* Only set the timeout once */
+	      if (monitor->priv->last_sent_change_timeout == 0) /* Only set the timeout once */
 		{
 		  time_left = monitor->priv->rate_limit_msec - since_last;
-		  monitor->priv->last_change_timeout_tag = 
+		  monitor->priv->last_sent_change_timeout = 
 		    g_timeout_add (time_left,  delayed_changed_event_timeout, monitor);
 		}
 	    }
@@ -200,9 +200,9 @@ g_file_monitor_emit_event (GFileMonitor *monitor,
 	{
 	  g_signal_emit (monitor, signals[CHANGED], 0, file, other_file, event_type);
 	  
-	  monitor->priv->last_change_event_time = time_now;
-	  monitor->priv->last_change_event_file = g_object_ref (file);
-	  monitor->priv->last_change_timeout_tag = 0;
+	  monitor->priv->last_sent_change_time = time_now;
+	  monitor->priv->last_sent_change_file = g_object_ref (file);
+	  monitor->priv->last_sent_change_timeout = 0;
 	}
     }
 }
