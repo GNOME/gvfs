@@ -130,7 +130,7 @@ name_is_valid (const char *str)
 {
   while (*str)
     {
-      if (!valid_char (*str))
+      if (!valid_char (*str++))
 	return FALSE;
     }
   return TRUE;
