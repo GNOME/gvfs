@@ -1079,6 +1079,7 @@ static void
 set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 {
   GFileType file_type;
+  GFileFlags flags;
   GTimeVal t;
 
   file_type = G_FILE_TYPE_UNKNOWN;
@@ -1133,6 +1134,16 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 #elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctim.tv_nsec / 1000);
 #endif
+  
+  flags = 0;
+  if (statbuf->st_mode & S_IXOTH)
+    flags |= G_FILE_FLAG_HIDDEN;
+  g_file_info_set_flags (info, flags);
+
+  if (statbuf->st_mode & S_IXUSR)
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, 1);
+  if (statbuf->st_mode & S_IXGRP)
+    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, 1);
 }
 
 static void
