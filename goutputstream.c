@@ -3,6 +3,7 @@
 
 #include "goutputstream.h"
 #include "gioscheduler.h"
+#include "gasynchelper.h"
 
 G_DEFINE_TYPE (GOutputStream, g_output_stream, G_TYPE_OBJECT);
 
@@ -325,14 +326,11 @@ g_output_stream_get_async_context (GOutputStream *stream)
 }
 
 typedef struct {
-  GOutputStream      *stream;
+  GAsyncResult       generic;
   void               *buffer;
   gsize               bytes_requested;
   gssize              bytes_written;
-  GError             *error;
   GAsyncWriteCallback callback;
-  gpointer            data;
-  GDestroyNotify      notify;
 } WriteAsyncResult;
 
 static gboolean
@@ -341,30 +339,14 @@ call_write_async_result (gpointer data)
   WriteAsyncResult *res = data;
 
   if (res->callback)
-    res->callback (res->stream,
+    res->callback (res->generic.async_object,
 		   res->buffer,
 		   res->bytes_requested,
 		   res->bytes_written,
-		   res->data,
-		   res->error);
+		   res->generic.data,
+		   res->generic.error);
 
   return FALSE;
-}
-
-static void
-write_async_result_free (gpointer data)
-{
-  WriteAsyncResult *res = data;
-
-  if (res->notify)
-    res->notify (res->data);
-
-  if (res->error)
-    g_error_free (res->error);
-
-  g_object_unref (res->stream);
-  
-  g_free (res);
 }
 
 static void
@@ -377,25 +359,19 @@ queue_write_async_result (GOutputStream      *stream,
 			  gpointer            data,
 			  GDestroyNotify      notify)
 {
-  GSource *source;
   WriteAsyncResult *res;
 
   res = g_new0 (WriteAsyncResult, 1);
 
-  res->stream = g_object_ref (stream);
   res->buffer = buffer;
   res->bytes_requested = bytes_requested;
   res->bytes_written = bytes_written;
-  res->error = error;
   res->callback = callback;
-  res->data = data;
-  res->notify = notify;
-  
-  source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, call_write_async_result, res, write_async_result_free);
-  g_source_attach (source, g_output_stream_get_async_context (stream));
-  g_source_unref (source);
+
+  _g_queue_async_result ((GAsyncResult *)res, stream,
+			 error, data, notify,
+			 g_output_stream_get_async_context (stream),
+			 call_write_async_result);
 }
 
 static void
@@ -509,12 +485,9 @@ g_output_stream_write_async (GOutputStream        *stream,
 }
 
 typedef struct {
-  GOutputStream      *stream;
+  GAsyncResult        generic;
   gboolean            result;
-  GError             *error;
   GAsyncFlushCallback callback;
-  gpointer            data;
-  GDestroyNotify      notify;
 } FlushAsyncResult;
 
 static gboolean
@@ -523,28 +496,12 @@ call_flush_async_result (gpointer data)
   FlushAsyncResult *res = data;
 
   if (res->callback)
-    res->callback (res->stream,
+    res->callback (res->generic.async_object,
 		   res->result,
-		   res->data,
-		   res->error);
+		   res->generic.data,
+		   res->generic.error);
 
   return FALSE;
-}
-
-static void
-flush_async_result_free (gpointer data)
-{
-  FlushAsyncResult *res = data;
-
-  if (res->notify)
-    res->notify (res->data);
-
-  if (res->error)
-    g_error_free (res->error);
-
-  g_object_unref (res->stream);
-  
-  g_free (res);
 }
 
 static void
@@ -555,23 +512,17 @@ queue_flush_async_result (GOutputStream      *stream,
 			  gpointer            data,
 			  GDestroyNotify      notify)
 {
-  GSource *source;
   FlushAsyncResult *res;
 
   res = g_new0 (FlushAsyncResult, 1);
 
-  res->stream = g_object_ref (stream);
   res->result = result;
-  res->error = error;
   res->callback = callback;
-  res->data = data;
-  res->notify = notify;
   
-  source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, call_flush_async_result, res, flush_async_result_free);
-  g_source_attach (source, g_output_stream_get_async_context (stream));
-  g_source_unref (source);
+  _g_queue_async_result ((GAsyncResult *)res, stream,
+			 error, data, notify,
+			 g_output_stream_get_async_context (stream),
+			 call_flush_async_result);
 }
 
 static void
@@ -586,7 +537,6 @@ flush_async_callback_wrapper (GOutputStream *stream,
   (*real_callback) (stream, result, data, error);
   g_object_unref (stream);
 }
-
 
 void
 g_output_stream_flush_async (GOutputStream       *stream,
@@ -632,12 +582,9 @@ g_output_stream_flush_async (GOutputStream       *stream,
 }
 
 typedef struct {
-  GOutputStream       *stream;
+  GAsyncResult       generic;
   gboolean            result;
-  GError             *error;
   GAsyncCloseOutputCallback callback;
-  gpointer            data;
-  GDestroyNotify      notify;
 } CloseAsyncResult;
 
 static gboolean
@@ -646,28 +593,12 @@ call_close_async_result (gpointer data)
   CloseAsyncResult *res = data;
 
   if (res->callback)
-    res->callback (res->stream,
+    res->callback (res->generic.async_object,
 		   res->result,
-		   res->data,
-		   res->error);
+		   res->generic.data,
+		   res->generic.error);
 
   return FALSE;
-}
-
-static void
-close_async_result_free (gpointer data)
-{
-  CloseAsyncResult *res = data;
-
-  if (res->notify)
-    res->notify (res->data);
-
-  if (res->error)
-    g_error_free (res->error);
-  
-  g_object_unref (res->stream);
-  
-  g_free (res);
 }
 
 static void
@@ -678,23 +609,17 @@ queue_close_async_result (GOutputStream       *stream,
 			  gpointer            data,
 			  GDestroyNotify      notify)
 {
-  GSource *source;
   CloseAsyncResult *res;
 
   res = g_new0 (CloseAsyncResult, 1);
 
-  res->stream = g_object_ref (stream);
   res->result = result;
-  res->error = error;
   res->callback = callback;
-  res->data = data;
-  res->notify = notify;
-  
-  source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, call_close_async_result, res, close_async_result_free);
-  g_source_attach (source, g_output_stream_get_async_context (stream));
-  g_source_unref (source);
+
+  _g_queue_async_result ((GAsyncResult *)res, stream,
+			 error, data, notify,
+			 g_output_stream_get_async_context (stream),
+			 call_close_async_result);
 }
 
 static void

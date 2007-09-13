@@ -1,6 +1,7 @@
 #include <config.h>
 #include "gfileenumerator.h"
 #include <glib/gi18n-lib.h>
+#include "gasynchelper.h"
 
 G_DEFINE_TYPE (GFileEnumerator, g_file_enumerator, G_TYPE_OBJECT);
 
@@ -192,12 +193,9 @@ g_file_enumerator_get_async_context (GFileEnumerator *enumerator)
 }
 
 typedef struct {
-  GFileEnumerator        *enumerator;
+  GAsyncResult            generic;
   int                     num_files;
-  GError                 *error;
   GAsyncNextFilesCallback callback;
-  gpointer                data;
-  GDestroyNotify          notify;
 } NextAsyncResult;
 
 static gboolean
@@ -206,29 +204,13 @@ call_next_async_result (gpointer data)
   NextAsyncResult *res = data;
 
   if (res->callback)
-    res->callback (res->enumerator,
+    res->callback (res->generic.async_object,
 		   NULL,
 		   res->num_files,
-		   res->data,
-		   res->error);
+		   res->generic.data,
+		   res->generic.error);
 
   return FALSE;
-}
-
-static void
-next_async_result_free (gpointer data)
-{
-  NextAsyncResult *res = data;
-
-  if (res->notify)
-    res->notify (res->data);
-
-  if (res->error)
-    g_error_free (res->error);
-
-  g_object_unref (res->enumerator);
-  
-  g_free (res);
 }
 
 static void
@@ -239,23 +221,17 @@ queue_next_async_result (GFileEnumerator *enumerator,
 			 gpointer data,
 			 GDestroyNotify notify)
 {
-  GSource *source;
   NextAsyncResult *res;
 
   res = g_new0 (NextAsyncResult, 1);
 
-  res->enumerator = g_object_ref (enumerator);
   res->num_files = num_files;
-  res->error = error;
   res->callback = callback;
-  res->data = data;
-  res->notify = notify;
   
-  source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, call_next_async_result, res, next_async_result_free);
-  g_source_attach (source, g_file_enumerator_get_async_context (enumerator));
-  g_source_unref (source);
+  _g_queue_async_result ((GAsyncResult *)res, enumerator,
+			 error, data, notify,
+			 g_file_enumerator_get_async_context (enumerator),
+			 call_next_async_result);
 }
 
 static void
@@ -352,12 +328,9 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
 
 
 typedef struct {
-  GFileEnumerator *             enumerator;
+  GAsyncResult                  generic;
   gboolean                      result;
-  GError *                      error;
   GAsyncStopEnumeratingCallback callback;
-  gpointer                      data;
-  GDestroyNotify                notify;
 } StopAsyncResult;
 
 static gboolean
@@ -366,28 +339,12 @@ call_stop_async_result (gpointer data)
   StopAsyncResult *res = data;
 
   if (res->callback)
-    res->callback (res->enumerator,
+    res->callback (res->generic.async_object,
 		   res->result,
-		   res->data,
-		   res->error);
+		   res->generic.data,
+		   res->generic.error);
 
   return FALSE;
-}
-
-static void
-stop_async_result_free (gpointer data)
-{
-  StopAsyncResult *res = data;
-
-  if (res->notify)
-    res->notify (res->data);
-
-  if (res->error)
-    g_error_free (res->error);
-
-  g_object_unref (res->enumerator);
-  
-  g_free (res);
 }
 
 static void
@@ -398,23 +355,17 @@ queue_stop_async_result (GFileEnumerator *enumerator,
 			 gpointer data,
 			 GDestroyNotify notify)
 {
-  GSource *source;
   StopAsyncResult *res;
 
   res = g_new0 (StopAsyncResult, 1);
 
-  res->enumerator = g_object_ref (enumerator);
   res->result = result;
-  res->error = error;
   res->callback = callback;
-  res->data = data;
-  res->notify = notify;
-  
-  source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, call_stop_async_result, res, stop_async_result_free);
-  g_source_attach (source, g_file_enumerator_get_async_context (enumerator));
-  g_source_unref (source);
+
+  _g_queue_async_result ((GAsyncResult *)res, enumerator,
+			 error, data, notify,
+			 g_file_enumerator_get_async_context (enumerator),
+			 call_stop_async_result);
 }
 
 static void
