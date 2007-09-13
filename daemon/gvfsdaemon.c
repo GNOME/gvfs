@@ -8,15 +8,184 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <dbus-gmain.h>
+#include <gvfsdaemon.h>
 #include <gvfsdaemonprotocol.h>
 
+G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
+
+enum {
+  PROP_0,
+  PROP_MOUNTPOINT
+};
+
+struct _GVfsDaemonPrivate
+{
+  char *mountpoint;
+  gboolean active;
+};
+
 static gint32 extra_fd_slot = -1;
+
+static void g_vfs_daemon_get_property (GObject    *object,
+				       guint       prop_id,
+				       GValue     *value,
+				       GParamSpec *pspec);
+static void g_vfs_daemon_set_property (GObject         *object,
+				       guint            prop_id,
+				       const GValue    *value,
+				       GParamSpec      *pspec);
+static GObject*g_vfs_daemon_constructor (GType                  type,
+					 guint                  n_construct_properties,
+					 GObjectConstructParam *construct_params);
 
 static void              daemon_unregistered_func (DBusConnection *conn,
 						   gpointer        data);
 static DBusHandlerResult daemon_message_func      (DBusConnection *conn,
 						   DBusMessage    *message,
 						   gpointer        data);
+
+
+static DBusObjectPathVTable daemon_vtable = {
+	daemon_unregistered_func,
+	daemon_message_func,
+	NULL
+};
+
+static void
+g_vfs_daemon_finalize (GObject *object)
+{
+  GVfsDaemon *daemon;
+
+  daemon = G_VFS_DAEMON (object);
+
+  g_free (daemon->priv->mountpoint);
+
+  if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize) (object);
+}
+
+static void
+g_vfs_daemon_class_init (GVfsDaemonClass *klass)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  
+  g_type_class_add_private (klass, sizeof (GVfsDaemonPrivate));
+  
+  gobject_class->finalize = g_vfs_daemon_finalize;
+  gobject_class->set_property = g_vfs_daemon_set_property;
+  gobject_class->get_property = g_vfs_daemon_get_property;
+  gobject_class->constructor = g_vfs_daemon_constructor;
+
+  if (!dbus_connection_allocate_data_slot (&extra_fd_slot))
+    g_error ("Unable to allocate data slot");
+
+  g_object_class_install_property (gobject_class,
+				   PROP_MOUNTPOINT,
+				   g_param_spec_string ("mountpoint",
+							"Mountpoint",
+							"Mountpoint of the daemon.",
+							NULL,
+							G_PARAM_READWRITE | 
+							G_PARAM_CONSTRUCT_ONLY));
+
+}
+
+static void
+g_vfs_daemon_init (GVfsDaemon *daemon)
+{
+  daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE (daemon,
+					      G_TYPE_VFS_DAEMON,
+					      GVfsDaemonPrivate);
+}
+
+static GObject*
+g_vfs_daemon_constructor (GType                  type,
+			  guint                  n_construct_properties,
+			  GObjectConstructParam *construct_params)
+{
+  DBusConnection *conn;
+  DBusError error;
+  GObject *object;
+  GVfsDaemon *daemon;
+  int ret;
+
+  object =
+    G_OBJECT_CLASS (g_vfs_daemon_parent_class)->constructor (type,
+							     n_construct_properties,
+							     construct_params);
+
+  daemon = G_VFS_DAEMON (object);
+
+  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  
+  dbus_error_init (&error);
+
+  ret = dbus_bus_request_name (conn, daemon->priv->mountpoint, 0, &error);
+  g_print ("ret: %d\n", ret);
+  if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
+    {
+      g_printerr ("Failed to acquire vfs-daemon service: %s", error.message);
+      dbus_error_free (&error);
+    }
+  else
+    {
+      if (!dbus_connection_register_object_path (conn,
+						 G_VFS_DBUS_DAEMON_PATH,
+						 &daemon_vtable,
+						 daemon))
+	g_printerr ("Failed to register object with D-BUS.\n");
+      else
+	daemon->priv->active = TRUE;
+    }
+  
+  return object;
+}
+
+
+static void
+g_vfs_daemon_set_property (GObject         *object,
+			   guint            prop_id,
+			   const GValue    *value,
+			   GParamSpec      *pspec)
+{
+  GVfsDaemon *daemon;
+  gchar *tmp;
+  
+  daemon = G_VFS_DAEMON (object);
+  
+  switch (prop_id)
+    {
+    case PROP_MOUNTPOINT:
+      tmp = daemon->priv->mountpoint;
+      daemon->priv->mountpoint = g_value_dup_string (value);
+      g_free (tmp);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
+g_vfs_daemon_get_property (GObject    *object,
+			   guint       prop_id,
+			   GValue     *value,
+			   GParamSpec *pspec)
+{
+  GVfsDaemon *daemon;
+  
+  daemon = G_VFS_DAEMON (object);
+
+  switch (prop_id)
+    {
+    case PROP_MOUNTPOINT:
+      g_value_set_string (value, daemon->priv->mountpoint);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
 
 static int
 send_fd (int connection_fd, 
@@ -73,12 +242,6 @@ daemon_handle_read_file (DBusConnection *conn,
   send_fd (fd, socket_fds[0]);
 }
 
-static DBusObjectPathVTable daemon_vtable = {
-	daemon_unregistered_func,
-	daemon_message_func,
-	NULL
-};
-
 static void
 close_wrapper (gpointer p)
 {
@@ -86,21 +249,16 @@ close_wrapper (gpointer p)
 }
 
 static void
-daemon_peer_connection_setup (DBusConnection  *dbus_conn,
+daemon_peer_connection_setup (GVfsDaemon *daemon,
+			      DBusConnection  *dbus_conn,
 			      int extra_fd)
 {
-  if (extra_fd_slot == -1)
-    {
-      if (!dbus_connection_allocate_data_slot (&extra_fd_slot))
-	g_error ("Unable to allocate data slot");
-    }
-
   dbus_connection_setup_with_g_main (dbus_conn, NULL);
 
   if (!dbus_connection_register_object_path (dbus_conn,
 					     G_VFS_DBUS_DAEMON_PATH,
 					     &daemon_vtable,
-					     NULL))
+					     daemon))
     {
       dbus_connection_unref (dbus_conn);
       close (extra_fd);
@@ -242,6 +400,7 @@ generate_addresses (char **address1,
 }
 
 typedef struct {
+  GVfsDaemon *daemon;
   char *socket_dir;
   guint io_watch;
   int socket;
@@ -275,7 +434,7 @@ daemon_new_connection_func (DBusServer     *server,
   /* Take ownership */
   dbus_connection_ref (conn);
   
-  daemon_peer_connection_setup (conn, data->socket);
+  daemon_peer_connection_setup (data->daemon, conn, data->socket);
 
   /* Kill the server, no more need for it */
   dbus_server_disconnect (server);
@@ -353,7 +512,8 @@ accept_new_fd_client (GIOChannel  *channel,
 
 static void
 daemon_handle_get_connection (DBusConnection *conn,
-			      DBusMessage *message)
+			      DBusMessage *message,
+			      GVfsDaemon *daemon)
 {
   DBusServer    *server;
   DBusError      error;
@@ -368,6 +528,7 @@ daemon_handle_get_connection (DBusConnection *conn,
   generate_addresses (&address1, &address2, &socket_dir);
 
   data = g_new (NewConnectionData, 1);
+  data->daemon = daemon;
   data->socket = -1;
   data->socket_dir = socket_dir;
   
@@ -436,10 +597,12 @@ daemon_message_func (DBusConnection *conn,
 		     DBusMessage    *message,
 		     gpointer        data)
 {
+  GVfsDaemon *daemon = data;
+
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_DAEMON_INTERFACE,
 				   G_VFS_DBUS_OP_GET_CONNECTION))
-    daemon_handle_get_connection (conn, message);
+    daemon_handle_get_connection (conn, message, daemon);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_DAEMON_INTERFACE,
 					G_VFS_DBUS_OP_READ_FILE))
@@ -450,62 +613,8 @@ daemon_message_func (DBusConnection *conn,
   return DBUS_HANDLER_RESULT_HANDLED;
 }
 
-static gboolean
-setup_daemon (char *mountpoint)
+gboolean
+ g_vfs_daemon_is_active (GVfsDaemon *daemon)
 {
-  DBusConnection *conn;
-  DBusError error;
-  int ret;
-
-  dbus_error_init (&error);
-
-  conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
-  if (!conn)
-    {
-      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
-		  error.message);
-      
-      dbus_error_free (&error);
-      return FALSE;
-    }
-
-  dbus_connection_setup_with_g_main (conn, NULL);
-  
-  ret = dbus_bus_request_name (conn, G_VFS_DBUS_MOUNTPOINT_NAME "foo_3A_2F_2F", 
-			       0, &error);
-  if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-    {
-      g_warning ("Failed to acquire vfs-daemon service: %s", error.message);
-      dbus_error_free (&error);
-    }
-
-  if (!dbus_connection_register_object_path (conn,
-					     G_VFS_DBUS_DAEMON_PATH,
-					     &daemon_vtable,
-					     NULL))
-    {
-      g_printerr ("Failed to register object with D-BUS.\n");
-      return FALSE;
-    }
-  
-  
-  return TRUE;
-}
-
-int
-main (int argc, char *argv[])
-{
-  GMainLoop *loop;
-  
-  g_type_init ();
-
-  if (!setup_daemon ("foo"))
-    return 1;
-  
-  loop = g_main_loop_new (NULL, FALSE);
-
-  g_print ("Entering mainloop\n");
-  g_main_loop_run (loop);
-  
-  return 0;
+  return daemon->priv->active;
 }

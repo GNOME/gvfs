@@ -15,5 +15,10 @@ noinst_PROGRAMS =				\
 	gvfs-daemon				\
 	$(NULL)
 
-gvfs_daemon_SOURCES = gvfs-daemon.c dbus-gmain.h dbus-gmain.c
+gvfs_daemon_SOURCES = \
+	gvfsdaemon.c gvfsdaemon.h \
+	gvfsdaemontest.c gvfsdaemontest.h \
+	dbus-gmain.h dbus-gmain.c \
+	main.c
+
 gvfs_daemon_LDADD = $(libraries)
