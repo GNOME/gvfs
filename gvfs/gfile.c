@@ -213,25 +213,24 @@ g_file_parse_name (const char *parse_name)
 static gboolean
 is_valid_scheme_character (char c)
 {
-	return g_ascii_isalnum (c) || c == '+' || c == '-' || c == '.';
+  return g_ascii_isalnum (c) || c == '+' || c == '-' || c == '.';
 }
 
 static gboolean
 has_valid_scheme (const char *uri)
 {
-	const char *p;
+  const char *p;
+  
+  p = uri;
+  
+  if (!is_valid_scheme_character (*p))
+    return FALSE;
 
-	p = uri;
+  do {
+    p++;
+  } while (is_valid_scheme_character (*p));
 
-	if (!is_valid_scheme_character (*p)) {
-		return FALSE;
-	}
-
-	do {
-		p++;
-	} while (is_valid_scheme_character (*p));
-
-	return *p == ':';
+  return *p == ':';
 }
 
 GFile *
