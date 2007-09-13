@@ -33,6 +33,9 @@
 
 static void g_local_file_file_iface_init (GFileIface       *iface);
 
+static GFileAttributeInfoList *local_writable_attributes = NULL;
+static GFileAttributeInfoList *local_writable_namespaces = NULL;
+
 struct _GLocalFile
 {
   GObject parent_instance;
@@ -61,8 +64,77 @@ static void
 g_local_file_class_init (GLocalFileClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GFileAttributeInfoList *list;
 
   gobject_class->finalize = g_local_file_finalize;
+
+  /* Set up attribute lists */
+
+  /* Writable attributes: */
+
+  list = g_file_attribute_info_list_new ();
+
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_MODE,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  
+#ifdef HAVE_CHOWN
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_UID,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_GID,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+#endif
+  
+#ifdef HAVE_SYMLINK
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET,
+				  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
+				  0);
+#endif
+  
+#ifdef HAVE_UTIMES
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_MODIFIED,
+				  G_FILE_ATTRIBUTE_TYPE_UINT64,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_ACCESS,
+				  G_FILE_ATTRIBUTE_TYPE_UINT64,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+#endif
+
+  local_writable_attributes = list;
+
+  /* Writable namespaces: */
+  
+  list = g_file_attribute_info_list_new ();
+
+#ifdef HAVE_XATTR
+  g_file_attribute_info_list_add (list,
+				  "xattr",
+				  G_FILE_ATTRIBUTE_TYPE_STRING,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE |
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+  g_file_attribute_info_list_add (list,
+				  "xattr_sys",
+				  G_FILE_ATTRIBUTE_TYPE_STRING,
+				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
+#endif
+
+  local_writable_namespaces = list;
 }
 
 static void
@@ -630,53 +702,7 @@ g_local_file_query_settable_attributes (GFile                      *file,
 					GCancellable               *cancellable,
 					GError                    **error)
 {
-  GFileAttributeInfoList *list;
-
-  list = g_file_attribute_info_list_new ();
-
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_MODE,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-  
-#ifdef HAVE_CHOWN
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_UID,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_GID,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-#endif
-  
-#ifdef HAVE_SYMLINK
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET,
-				  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
-				  0);
-#endif
-  
-#ifdef HAVE_UTIMES
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_MODIFIED,
-				  G_FILE_ATTRIBUTE_TYPE_UINT64,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_ACCESS,
-				  G_FILE_ATTRIBUTE_TYPE_UINT64,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-#endif
-  
-  return list;
+  return g_file_attribute_info_list_ref (local_writable_attributes);
 }
 
 static GFileAttributeInfoList *
@@ -684,23 +710,7 @@ g_local_file_query_writable_namespaces (GFile *file,
 					GCancellable *cancellable,
 					GError **error)
 {
-  GFileAttributeInfoList *list;
-
-  list = g_file_attribute_info_list_new ();
-
-#ifdef HAVE_XATTR
-  g_file_attribute_info_list_add (list,
-				  "xattr",
-				  G_FILE_ATTRIBUTE_TYPE_STRING,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE |
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  "xattr_sys",
-				  G_FILE_ATTRIBUTE_TYPE_STRING,
-				  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED);
-#endif
-  
-  return list;
+  return g_file_attribute_info_list_ref (local_writable_namespaces);
 }
 
 static gboolean
