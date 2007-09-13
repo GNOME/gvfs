@@ -72,7 +72,7 @@ libexec_PROGRAMS = gvfs-fuse-daemon
 gvfs_fuse_daemon_SOURCES = \
 	gvfsfusedaemon.c
 
-gvfs_fuse_daemon_INCLUDES = \
+gvfs_fuse_daemon_CFLAGS = \
 	-I$(top_srcdir) \
         -I$(top_srcdir)/common \
         $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(FUSE_CFLAGS) \
