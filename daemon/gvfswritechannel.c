@@ -17,9 +17,9 @@
 #include <gio/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
-#include <gvfsjobread.h>
-#include <gvfsjobseekread.h>
-#include <gvfsjobcloseread.h>
+#include <gvfsjobwrite.h>
+#include <gvfsjobseekwrite.h>
+#include <gvfsjobclosewrite.h>
 
 struct _GVfsWriteChannel
 {
@@ -189,7 +189,7 @@ g_vfs_write_channel_send_written (GVfsWriteChannel  *write_channel,
   reply.arg1 = g_htonl (bytes_written);
   reply.arg2 = 0;
 
-  g_vfs_channel_send_reply (channel, &reply, buffer, count);
+  g_vfs_channel_send_reply (channel, &reply, NULL, 0);
 }
 
 
