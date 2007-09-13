@@ -307,8 +307,8 @@ _g_dbus_message_iter_get_args_valist (DBusMessageIter *iter,
       if (msg_type != dbus_spec_type)
 	{
           dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
-                          "Argument %d is specified to be of type \"%d\", but "
-                          "is actually of type \"%d\"\n", i,
+                          "Argument %d is specified to be of type \"%c\", but "
+                          "is actually of type \"%c\"\n", i,
                           spec_type,
                           msg_type);
 
