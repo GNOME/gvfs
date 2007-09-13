@@ -37,7 +37,6 @@ struct _GFileInputStreamClass
 			       GCancellable         *cancellable,
 			       GError              **error);
   GFileInfo *(*get_file_info) (GFileInputStream     *stream,
-			       GFileInfoRequestFlags requested,
 			       char                 *attributes,
 			       GCancellable         *cancellable,
 			       GError              **error);
@@ -54,7 +53,6 @@ GType g_file_input_stream_get_type (void) G_GNUC_CONST;
 
 /* TODO: Turn this into a interface like GSeekable? */
 GFileInfo *g_file_input_stream_get_file_info (GFileInputStream     *stream,
-					      GFileInfoRequestFlags requested,
 					      char                 *attributes,
 					      GCancellable         *cancellable,
 					      GError              **error);

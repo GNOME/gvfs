@@ -114,27 +114,25 @@ g_file_daemon_local_get_child (GFile *file,
 
 static GFileEnumerator *
 g_file_daemon_local_enumerate_children (GFile *file,
-					GFileInfoRequestFlags requested,
 					const char *attributes,
-					gboolean follow_symlinks,
+					GFileGetInfoFlags flags,
 					GCancellable *cancellable,
 					GError **error)
 {
   return g_file_enumerate_children (G_FILE_DAEMON_LOCAL (file)->wrapped,
-				    requested, attributes, follow_symlinks,
+				    attributes, flags,
 				    cancellable, error);
 }
 
 static GFileInfo *
 g_file_daemon_local_get_info (GFile *file,
-			      GFileInfoRequestFlags requested,
 			      const char *attributes,
-			      gboolean follow_symlinks,
+			      GFileGetInfoFlags flags,
 			      GCancellable *cancellable,
 			      GError **error)
 {
   return g_file_get_info (G_FILE_DAEMON_LOCAL (file)->wrapped,
-			  requested, attributes, follow_symlinks,
+			  attributes, flags,
 			  cancellable, error);
 }
 

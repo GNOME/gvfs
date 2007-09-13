@@ -245,9 +245,8 @@ static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     const char *filename,
-	     GFileInfoRequestFlags requested,
 	     const char *attributes,
-	     gboolean follow_symlinks)
+	     GFileGetInfoFlags flags)
 {
   GFile *file;
   GFileInfo *info;
@@ -258,12 +257,12 @@ do_get_info (GVfsBackend *backend,
   file = g_file_local_new (filename);
 
   error = NULL;
-  info = g_file_get_info (file, requested, attributes, follow_symlinks,
+  info = g_file_get_info (file, attributes, flags,
 			  NULL, &error);
 
   if (info)
     {
-      g_vfs_job_get_info_set_info (job, requested, info);
+      g_vfs_job_get_info_set_info (job, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   else
@@ -277,16 +276,14 @@ static gboolean
 try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
-	       GFileInfoRequestFlags requested,
 	       const char *attributes,
-	       gboolean follow_symlinks)
+	       GFileGetInfoFlags flags)
 {
   GFileInfo *info1, *info2;;
   GList *l;
 
   g_print ("try_enumerate (%s)\n", filename);
 
-  g_vfs_job_enumerate_set_result (job, requested);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   info1 = g_file_info_new ();

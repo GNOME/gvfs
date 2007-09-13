@@ -23,11 +23,9 @@ struct _GVfsJobGetInfo
 
   GVfsBackend *backend;
   char *filename;
-  GFileInfoRequestFlags requested;
   char *attributes;
-  gboolean follow_symlinks;
+  GFileGetInfoFlags flags;
 
-  GFileInfoRequestFlags requested_result;
   GFileInfo *file_info;
 };
 
@@ -42,7 +40,6 @@ GVfsJob *g_vfs_job_get_info_new      (DBusConnection        *connection,
 				      DBusMessage           *message,
 				      GVfsBackend           *backend);
 void     g_vfs_job_get_info_set_info (GVfsJobGetInfo        *job,
-				      GFileInfoRequestFlags  requested_result,
 				      GFileInfo             *file_info);
 
 G_END_DECLS

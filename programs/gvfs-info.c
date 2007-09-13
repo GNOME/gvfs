@@ -5,12 +5,12 @@
 #include <gio/gfile.h>
 
 static char *attributes = NULL;
-static gboolean follow_symlinks = FALSE;
+static gboolean nofollow_symlinks = FALSE;
 
 static GOptionEntry entries[] = 
 {
 	{ "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, "The attributes to get", NULL },
-	{ "follow-symlinks", 'f', 0, G_OPTION_ARG_NONE, &follow_symlinks, "Follow symlinks", NULL },
+	{ "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, "Don't follow symlinks", NULL },
 	{ NULL }
 };
 
@@ -77,8 +77,8 @@ show_info (GFileInfo *info)
   const char *name, *type;
   char *escaped;
   goffset size;
-  GFileAttribute *attributes;
-  int n_attributes, i;
+  char **attributes;
+  int i;
 
   name = g_file_info_get_display_name (info);
   if (name)
@@ -102,37 +102,41 @@ show_info (GFileInfo *info)
   size = g_file_info_get_size (info);
   g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
 
-  if (g_file_info_get_is_hidden (info))
+  if (g_file_info_get_flags (info) & G_FILE_FLAG_HIDDEN)
     g_print ("hidden\n");
 
-  attributes = g_file_info_get_all_attributes (info, &n_attributes);
+  attributes = g_file_info_list_attributes (info, NULL);
 
-  if (attributes != NULL)
+  g_print ("attributes:\n");
+  for (i = 0; attributes[i] != NULL; i++)
     {
-      g_print ("attributes:\n");
-      for (i = 0; i < n_attributes; i++)
-	g_print ("  %s: %s\n", attributes[i].attribute, attributes[i].value);
-      g_free (attributes);
+      char *value;
+      value = g_file_info_get_attribute_as_string (info, attributes[i]);
+      g_print ("  %s: %s\n", attributes[i], value);
+      g_free (value);
     }
+  g_strfreev (attributes);
 }
 
 static void
 get_info (GFile *file)
 {
-  GFileInfoRequestFlags request;
+  GFileGetInfoFlags flags;
   GFileInfo *info;
   GError *error;
 
   if (file == NULL)
     return;
 
-  request =
-    G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME |
-    G_FILE_INFO_SIZE | G_FILE_INFO_IS_HIDDEN |
-    G_FILE_INFO_DISPLAY_NAME | G_FILE_INFO_EDIT_NAME;
+  if (attributes == NULL)
+    attributes = "*";
+
+  flags = 0;
+  if (nofollow_symlinks)
+    flags |= G_FILE_GET_INFO_NOFOLLOW_SYMLINKS;
   
   error = NULL;
-  info = g_file_get_info (file, request, attributes, follow_symlinks, NULL, &error);
+  info = g_file_get_info (file, attributes, flags, NULL, &error);
 
   if (info == NULL)
     {

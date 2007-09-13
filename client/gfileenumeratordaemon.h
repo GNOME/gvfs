@@ -29,8 +29,6 @@ GFileEnumeratorDaemon *g_file_enumerator_daemon_new                 (void);
 char  *                g_file_enumerator_daemon_get_object_path     (GFileEnumeratorDaemon *enumerator);
 void                   g_file_enumerator_daemon_set_sync_connection (GFileEnumeratorDaemon *enumerator,
 								     DBusConnection        *connection);
-void                   g_file_enumerator_daemon_set_request_flags   (GFileEnumeratorDaemon *enumerator,
-								     GFileInfoRequestFlags  flags);
 
 
 G_END_DECLS

@@ -1075,15 +1075,73 @@ do_close_write (GVfsBackend *backend,
 }
 
 static void
+set_info_from_stat (GFileInfo *info, struct stat *statbuf)
+{
+  GFileType file_type;
+  GTimeVal t;
+
+  file_type = G_FILE_TYPE_UNKNOWN;
+
+  if (S_ISREG (statbuf->st_mode))
+    file_type = G_FILE_TYPE_REGULAR;
+  else if (S_ISDIR (statbuf->st_mode))
+    file_type = G_FILE_TYPE_DIRECTORY;
+  else if (S_ISCHR (statbuf->st_mode) ||
+	   S_ISBLK (statbuf->st_mode) ||
+	   S_ISFIFO (statbuf->st_mode)
+#ifdef S_ISSOCK
+	   || S_ISSOCK (statbuf->st_mode)
+#endif
+	   )
+    file_type = G_FILE_TYPE_SPECIAL;
+  else if (S_ISLNK (statbuf->st_mode))
+    file_type = G_FILE_TYPE_SYMBOLIC_LINK;
+
+  g_file_info_set_file_type (info, file_type);
+  g_file_info_set_size (info, statbuf->st_size);
+
+  t.tv_sec = statbuf->st_mtime;
+#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
+  t.tv_usec = statbuf->st_mtimensec / 1000;
+#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
+  t.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
+#else
+  t.tv_usec = 0;
+#endif
+  g_file_info_set_modification_time (info, &t);
+
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, statbuf->st_mode);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_NLINK, statbuf->st_nlink);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, statbuf->st_uid);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, statbuf->st_uid);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_RDEV, statbuf->st_rdev);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE, statbuf->st_blksize);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_ATIME, statbuf->st_atime);
+#if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atimensec / 1000);
+#elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atim.tv_nsec / 1000);
+#endif
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_CTIME, statbuf->st_ctime);
+#if defined (HAVE_STRUCT_STAT_ST_CTIMENSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_CTIME_USEC, statbuf->st_ctimensec / 1000);
+#elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_CTIME_USEC, statbuf->st_ctim.tv_nsec / 1000);
+#endif
+}
+
+static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     const char *filename,
-	     GFileInfoRequestFlags requested,
 	     const char *attributes,
-	     gboolean follow_symlinks)
+	     GFileGetInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  struct stat st;
+  struct stat st = {0};
   char *uri;
   int res;
   GFileInfo *info;
@@ -1095,9 +1153,9 @@ do_get_info (GVfsBackend *backend,
   if (res == 0)
     {
       info = g_file_info_new ();
-      g_file_info_set_from_stat (info, requested, &st);
+      set_info_from_stat (info, &st);
       
-      g_vfs_job_get_info_set_info (job, requested & ~(G_FILE_INFO_DISPLAY_NAME|G_FILE_INFO_EDIT_NAME), info);
+      g_vfs_job_get_info_set_info (job, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
     }
@@ -1109,9 +1167,8 @@ static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      const char *filename,
-	      GFileInfoRequestFlags requested,
 	      const char *attributes,
-	      gboolean follow_symlinks)
+	      GFileGetInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   struct stat st;
@@ -1137,8 +1194,6 @@ do_enumerate (GVfsBackend *backend,
       goto error;
     }
 
-  /* TODO: limit requested to what we support */
-  g_vfs_job_enumerate_set_result (job, requested);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   if (uri->str[uri->len - 1] != '/')
@@ -1177,10 +1232,9 @@ do_enumerate (GVfsBackend *backend,
 	      if (stat_res == 0)
 		{
 		  info = g_file_info_new ();
-		  if (requested & G_FILE_INFO_NAME)
-		    g_file_info_set_name (info, dirp->name);
+		  g_file_info_set_name (info, dirp->name);
 		  
-		  g_file_info_set_from_stat (info, requested, &st);
+		  set_info_from_stat (info, &st);
 		  files = g_list_prepend (files, info);
 		}
 	    }

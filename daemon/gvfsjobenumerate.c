@@ -66,18 +66,16 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   int path_len;
   const char *obj_path;
   const char *path_data;
-  guint32 requested;
   char *attributes;
-  dbus_bool_t follow_symlinks;
+  dbus_uint32_t flags;
   
   dbus_error_init (&derror);
   if (!dbus_message_get_args (message, &derror, 
 			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
 			      &path_data, &path_len,
 			      DBUS_TYPE_STRING, &obj_path,
-			      DBUS_TYPE_UINT32, &requested,
 			      DBUS_TYPE_STRING, &attributes,
-			      DBUS_TYPE_BOOLEAN, &follow_symlinks,
+			      DBUS_TYPE_UINT32, &flags,
 			      0))
     {
       reply = dbus_message_new_error (message,
@@ -97,19 +95,10 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   job->object_path = g_strdup (obj_path);
   job->filename = g_strndup (path_data, path_len);
   job->backend = backend;
-  job->requested = requested;
   job->attributes = g_strdup (attributes);
-  job->follow_symlinks = follow_symlinks;
+  job->flags = flags;
   
   return G_VFS_JOB (job);
-}
-
-
-void
-g_vfs_job_enumerate_set_result (GVfsJobEnumerate *job,
-				GFileInfoRequestFlags requested_result)
-{
-  job->requested_result = requested_result;
 }
 
 void
@@ -118,7 +107,6 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
 {
   DBusMessage *message, *orig_message;
   DBusMessageIter iter, array_iter;
-  char *sig;
   int num;
 
  restart:
@@ -133,20 +121,16 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
 
   dbus_message_iter_init_append (message, &iter);
 
-  sig = g_dbus_get_file_info_signature (job->requested_result);
-
   if (!dbus_message_iter_open_container (&iter,
-					 DBUS_TYPE_ARRAY, sig, 
+					 DBUS_TYPE_ARRAY,
+					 G_FILE_INFO_TYPE_AS_STRING, 
 					 &array_iter))
     _g_dbus_oom ();
   
-  g_free (sig);
-
   num = 0;
   while (infos != NULL)
     {
       g_dbus_append_file_info (&array_iter, 
-			       job->requested_result,
 			       infos->data);
       infos = infos->next;
       if (++num > 100)
@@ -195,9 +179,8 @@ run (GVfsJob *job)
   class->enumerate (op_job->backend,
 		    op_job,
 		    op_job->filename,
-		    op_job->requested,
 		    op_job->attributes,
-		    op_job->follow_symlinks);
+		    op_job->flags);
 }
 
 static gboolean
@@ -212,9 +195,8 @@ try (GVfsJob *job)
   return class->try_enumerate (op_job->backend,
 			       op_job,
 			       op_job->filename,
-			       op_job->requested,
 			       op_job->attributes,
-			       op_job->follow_symlinks);
+			       op_job->flags);
 }
 
 static void
@@ -249,20 +231,9 @@ create_reply (GVfsJob *job,
 	      DBusConnection *connection,
 	      DBusMessage *message)
 {
-  GVfsJobEnumerate *op_job = G_VFS_JOB_ENUMERATE (job);
   DBusMessage *reply;
-  DBusMessageIter iter;
-  guint32 requested_32;
 
   reply = dbus_message_new_method_return (message);
-
-  dbus_message_iter_init_append (reply, &iter);
-
-  requested_32 = op_job->requested_result;
-  if (!dbus_message_iter_append_basic (&iter,
-				       DBUS_TYPE_UINT32,
-				       &requested_32))
-    _g_dbus_oom ();
 
   return reply;
 }

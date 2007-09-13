@@ -22,7 +22,6 @@ struct _GFileEnumeratorDaemon
 
   gint id;
   DBusConnection *sync_connection;
-  GFileInfoRequestFlags request_flags;
 
   /* protected by infos lock */
   GList *infos;
@@ -131,7 +130,7 @@ g_file_enumerator_daemon_dbus_filter (DBusConnection     *connection,
 
 	  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
 	    {
-	      info = _g_dbus_get_file_info (&array_iter, enumerator->request_flags, NULL);
+	      info = _g_dbus_get_file_info (&array_iter, NULL);
 	      if (info)
 		g_assert (G_IS_FILE_INFO (info));
 
@@ -163,13 +162,6 @@ g_file_enumerator_daemon_set_sync_connection (GFileEnumeratorDaemon *enumerator,
 					      DBusConnection        *connection)
 {
   enumerator->sync_connection = dbus_connection_ref (connection);
-}
-
-void
-g_file_enumerator_daemon_set_request_flags (GFileEnumeratorDaemon *enumerator,
-					    GFileInfoRequestFlags  flags)
-{
-  enumerator->request_flags = flags;
 }
 
 static GFileInfo *

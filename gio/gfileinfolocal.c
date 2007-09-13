@@ -65,8 +65,7 @@ get_selinux_context (const char *path,
 #ifdef HAVE_SELINUX
   char *context;
 
-  if (!g_file_attribute_matcher_matches (attribute_matcher,
-					 "selinux", "selinux:context"))
+  if (!g_file_attribute_matcher_matches (attribute_matcher, "selinux:context"))
     return;
   
   if (is_selinux_enabled ())
@@ -84,7 +83,7 @@ get_selinux_context (const char *path,
 
       if (context)
 	{
-	  g_file_info_set_attribute (info, "selinux:context", context);
+	  g_file_info_set_attribute_string (info, "selinux:context", context);
 	  freecon(context);
 	}
     }
@@ -121,7 +120,7 @@ escape_xattr (GFileInfo *info,
     }
 	
   if (num_invalid == 0)
-    g_file_info_set_attribute (info, full_attr, value);
+    g_file_info_set_attribute_string (info, full_attr, value);
   else
     {
       escaped_val = g_malloc (len + num_invalid*3 + 1);
@@ -141,7 +140,7 @@ escape_xattr (GFileInfo *info,
 	    }
 	}
       *p++ = 0;
-      g_file_info_set_attribute (info, full_attr, escaped_val);
+      g_file_info_set_attribute_string (info, full_attr, escaped_val);
       g_free (escaped_val);
     }
   
@@ -217,7 +216,7 @@ get_xattrs (const char *path,
   char *list;
   const char *attr;
 
-  all = g_file_attribute_matcher_enumerate (matcher, "xattr");
+  all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
 
   if (all)
     {
@@ -327,7 +326,7 @@ get_xattrs_from_fd (int fd,
   char *list;
   const char *attr;
 
-  all = g_file_attribute_matcher_enumerate (matcher, "xattr");
+  all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
 
   if (all)
     {
@@ -425,40 +424,90 @@ get_access_rights (const gchar *path)
   return rights;
 }
 
+static void
+set_info_from_stat (GFileInfo *info, struct stat *statbuf)
+{
+  GFileType file_type;
+  GTimeVal t;
+
+  file_type = G_FILE_TYPE_UNKNOWN;
+
+  if (S_ISREG (statbuf->st_mode))
+    file_type = G_FILE_TYPE_REGULAR;
+  else if (S_ISDIR (statbuf->st_mode))
+    file_type = G_FILE_TYPE_DIRECTORY;
+  else if (S_ISCHR (statbuf->st_mode) ||
+	   S_ISBLK (statbuf->st_mode) ||
+	   S_ISFIFO (statbuf->st_mode)
+#ifdef S_ISSOCK
+	   || S_ISSOCK (statbuf->st_mode)
+#endif
+	   )
+    file_type = G_FILE_TYPE_SPECIAL;
+  else if (S_ISLNK (statbuf->st_mode))
+    file_type = G_FILE_TYPE_SYMBOLIC_LINK;
+
+  g_file_info_set_file_type (info, file_type);
+  g_file_info_set_size (info, statbuf->st_size);
+
+  t.tv_sec = statbuf->st_mtime;
+#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
+  t.tv_usec = statbuf->st_mtimensec / 1000;
+#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
+  t.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
+#else
+  t.tv_usec = 0;
+#endif
+  g_file_info_set_modification_time (info, &t);
+
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, statbuf->st_mode);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_NLINK, statbuf->st_nlink);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, statbuf->st_uid);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, statbuf->st_uid);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_RDEV, statbuf->st_rdev);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE, statbuf->st_blksize);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_ATIME, statbuf->st_atime);
+#if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atimensec / 1000);
+#elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_ATIME_USEC, statbuf->st_atim.tv_nsec / 1000);
+#endif
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_CTIME, statbuf->st_ctime);
+#if defined (HAVE_STRUCT_STAT_ST_CTIMENSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_CTIME_USEC, statbuf->st_ctimensec / 1000);
+#elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_CTIME_USEC, statbuf->st_ctim.tv_nsec / 1000);
+#endif
+}
 
 GFileInfo *
 g_file_info_local_get (const char *basename,
 		       const char *path,
-		       GFileInfoRequestFlags requested,
 		       GFileAttributeMatcher *attribute_matcher,
-		       gboolean follow_symlinks,
+		       GFileGetInfoFlags flags,
 		       GError **error)
 {
   GFileInfo *info;
   struct stat statbuf;
+  struct stat statbuf2;
   int res;
+  GFileFlags file_flags;
+  gboolean is_symlink;
 
   info = g_file_info_new ();
+
+  file_flags = 0;
   
-  if (requested & G_FILE_INFO_NAME)
-    g_file_info_set_name (info, basename);
-
-  if (requested & G_FILE_INFO_IS_HIDDEN)
-    g_file_info_set_is_hidden (info,
-			       basename != NULL &&
-			       basename[0] == '.');
-
+  g_file_info_set_name (info, basename);
 
   /* Avoid stat in trivial case */
-  if ((requested & ~(G_FILE_INFO_NAME|G_FILE_INFO_IS_HIDDEN)) == 0 &&
-      attribute_matcher == NULL)
+  if (attribute_matcher == NULL)
     return info;
-  
-  if (follow_symlinks)
-    res = stat (path, &statbuf);
-  else
-    res = lstat (path, &statbuf);
-  
+
+  res = g_lstat (path, &statbuf);
   if (res == -1)
     {
       g_object_unref (info);
@@ -468,23 +517,54 @@ g_file_info_local_get (const char *basename,
 		   path, g_strerror (errno));
       return NULL;
     }
+
+  is_symlink = S_ISLNK (statbuf.st_mode);
   
-  g_file_info_set_from_stat (info, requested, &statbuf);
+  if (is_symlink)
+    {
+      file_flags |= G_FILE_FLAG_SYMLINK;
+
+      /* Unless NOFOLLOW was set we default to following symlinks */
+      if (!(flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
+	{
+	  res = stat (path, &statbuf2);
+
+	    /* Report broken links as symlinks */
+	  if (res != -1)
+	    statbuf = statbuf2;
+	}
+    }
+
+  set_info_from_stat (info, &statbuf);
   
-  if (requested & G_FILE_INFO_SYMLINK_TARGET)
+  if (basename != NULL && basename[0] == '.')
+    file_flags |= G_FILE_FLAG_HIDDEN;
+ 
+  g_file_info_set_flags (info, file_flags);
+
+  if (is_symlink &&
+      g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET))
     {
       char *link = read_link (path);
       g_file_info_set_symlink_target (info, link);
       g_free (link);
     }
 
-  if (requested & G_FILE_INFO_ACCESS_RIGHTS)
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS))
     {
       GFileAccessRights rights = get_access_rights (path);
       g_file_info_set_access_rights (info, rights);
+      /* TODO: Figure out DELETE and RENAME rights */
+      g_file_info_set_access_rights_mask (info,
+					  G_FILE_ACCESS_CAN_READ |
+					  G_FILE_ACCESS_CAN_WRITE |
+					  G_FILE_ACCESS_CAN_EXECUTE);
     }
   
-  if (requested & G_FILE_INFO_DISPLAY_NAME)
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_DISPLAY_NAME))
     {
       char *display_name = g_filename_display_basename (path);
       
@@ -498,32 +578,34 @@ g_file_info_local_get (const char *basename,
       g_free (display_name);
     }
   
-  if (requested & G_FILE_INFO_EDIT_NAME)
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_EDIT_NAME))
     {
       char *edit_name = g_filename_display_basename (path);
       g_file_info_set_edit_name (info, edit_name);
       g_free (edit_name);
     }
 
-  if (requested & G_FILE_INFO_MIME_TYPE)
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_MIME_TYPE))
     {
       /* TODO */
     }
   
-  if (requested & G_FILE_INFO_ICON)
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_ICON))
     {
       /* TODO */
     }
 
-  get_selinux_context (path, info, attribute_matcher, follow_symlinks);
-  get_xattrs (path, info, attribute_matcher, follow_symlinks);
+  get_selinux_context (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
+  get_xattrs (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   
   return info;
 }
 
 GFileInfo *
 g_file_info_local_get_from_fd (int fd,
-			       GFileInfoRequestFlags requested,
 			       char *attributes,
 			       GError **error)
 {
@@ -541,19 +623,19 @@ g_file_info_local_get_from_fd (int fd,
     }
 
   info = g_file_info_new ();
-  
-  g_file_info_set_from_stat (info, requested, &stat_buf);
 
+  set_info_from_stat (info, &stat_buf);
+  
   matcher = g_file_attribute_matcher_new (attributes);
   
 #ifdef HAVE_SELINUX
-  if (g_file_attribute_matcher_matches (matcher, "selinux", "selinux:context") &&
+  if (g_file_attribute_matcher_matches (matcher, "selinux:context") &&
       is_selinux_enabled ())
     {
       char *context;
       if (fgetfilecon_raw (fd, &context) >= 0)
 	{
-	  g_file_info_set_attribute (info, "selinux:context", context);
+	  g_file_info_set_attribute_string (info, "selinux:context", context);
 	  freecon(context);
 	}
     }

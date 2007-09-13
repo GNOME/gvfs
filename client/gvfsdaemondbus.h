@@ -39,7 +39,6 @@ DBusMessage *_g_vfs_daemon_call_sync                 (DBusMessage               
 						      GCancellable               *cancellable,
 						      GError                    **error);
 GFileInfo *  _g_dbus_get_file_info                   (DBusMessageIter            *iter,
-						      GFileInfoRequestFlags       requested,
 						      GError                    **error);
 
 

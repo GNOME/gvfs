@@ -19,8 +19,9 @@ struct _GFileEnumeratorLocal
   GFileAttributeMatcher *matcher;
   GDir *dir;
   char *filename;
-  GFileInfoRequestFlags requested;
   char *attributes;
+  GFileGetInfoFlags flags;
+
   gboolean follow_symlinks;
 };
 
@@ -73,9 +74,8 @@ g_file_enumerator_local_init (GFileEnumeratorLocal *local)
 
 GFileEnumerator *
 g_file_enumerator_local_new (const char *filename,
-			     GFileInfoRequestFlags requested,
 			     const char *attributes,
-			     gboolean follow_symlinks,
+			     GFileGetInfoFlags flags,
 			     GCancellable *cancellable,
 			     GError **error)
 {
@@ -90,9 +90,8 @@ g_file_enumerator_local_new (const char *filename,
 
   local->dir = dir;
   local->filename = g_strdup (filename);
-  local->requested = requested;
   local->matcher = g_file_attribute_matcher_new (attributes);
-  local->follow_symlinks = follow_symlinks;
+  local->flags = flags;
   
   return G_FILE_ENUMERATOR (local);
 }
@@ -116,9 +115,8 @@ g_file_enumerator_local_next_file (GFileEnumerator *enumerator,
 
   path = g_build_filename (local->filename, filename, NULL);
   info = g_file_info_local_get (filename, path,
-				local->requested,
 				local->matcher,
-				local->follow_symlinks,
+				local->flags,
 				&my_error); 
   g_free (path);
   

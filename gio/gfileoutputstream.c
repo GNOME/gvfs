@@ -8,7 +8,7 @@ G_DEFINE_TYPE (GFileOutputStream, g_file_output_stream, G_TYPE_OUTPUT_STREAM);
 
 struct _GFileOutputStreamPrivate {
   guint get_final_mtime : 1;
-  time_t final_mtime;
+  GTimeVal final_mtime;
 };
 
 static void
@@ -27,7 +27,6 @@ g_file_output_stream_init (GFileOutputStream *stream)
 
 GFileInfo *
 g_file_output_stream_get_file_info (GFileOutputStream      *stream,
-				    GFileInfoRequestFlags   requested,
 				    char                   *attributes,
 				    GCancellable           *cancellable,
 				    GError                **error)
@@ -64,7 +63,7 @@ g_file_output_stream_get_file_info (GFileOutputStream      *stream,
   
   class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
   if (class->get_file_info)
-    info = class->get_file_info (stream, requested, attributes, cancellable, error);
+    info = class->get_file_info (stream, attributes, cancellable, error);
   else
     g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
 		 _("Stream doesn't support get_file_info"));
@@ -96,21 +95,22 @@ g_file_output_stream_get_should_get_final_mtime (GFileOutputStream  *stream)
   return stream->priv->get_final_mtime;
 }
 
-time_t
-g_file_output_stream_get_final_mtime (GFileOutputStream  *stream)
-{
-  g_return_val_if_fail (G_IS_FILE_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (stream != NULL, FALSE);
-
-  return stream->priv->final_mtime;
-}
-
 void
-g_file_output_stream_set_final_mtime (GFileOutputStream  *stream,
-				      time_t             final_mtime)
+g_file_output_stream_get_final_mtime (GFileOutputStream  *stream,
+				      GTimeVal *final_mtime)
 {
   g_return_if_fail (G_IS_FILE_OUTPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
 
-  stream->priv->final_mtime = final_mtime;
+  *final_mtime = stream->priv->final_mtime;
+}
+
+void
+g_file_output_stream_set_final_mtime (GFileOutputStream  *stream,
+				      GTimeVal *final_mtime)
+{
+  g_return_if_fail (G_IS_FILE_OUTPUT_STREAM (stream));
+  g_return_if_fail (stream != NULL);
+
+  stream->priv->final_mtime = *final_mtime;
 }

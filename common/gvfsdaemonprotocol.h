@@ -83,9 +83,21 @@ typedef struct {
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_WRITTEN  3
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED   4
 
-char *g_dbus_get_file_info_signature (GFileInfoRequestFlags  requested);
+#define G_FILE_INFO_INNER_TYPE_AS_STRING         \
+  DBUS_TYPE_ARRAY_AS_STRING			 \
+    DBUS_STRUCT_BEGIN_CHAR_AS_STRING		 \
+      DBUS_TYPE_STRING_AS_STRING		 \
+      DBUS_TYPE_VARIANT_AS_STRING		 \
+    DBUS_STRUCT_END_CHAR_AS_STRING
+
+#define G_FILE_INFO_TYPE_AS_STRING      \
+  DBUS_STRUCT_BEGIN_CHAR_AS_STRING      \
+    G_FILE_INFO_INNER_TYPE_AS_STRING    \
+  DBUS_STRUCT_END_CHAR_AS_STRING 
+
+
+char *g_dbus_get_file_info_signature (void);
 void  g_dbus_append_file_info        (DBusMessageIter       *iter,
-				      GFileInfoRequestFlags  requested,
 				      GFileInfo             *file_info);
 
 G_END_DECLS

@@ -3,207 +3,122 @@
 #include <gvfsdaemonprotocol.h>
 #include <gdbusutils.h>
 
-char *
-g_dbus_get_file_info_signature (GFileInfoRequestFlags requested)
-{
-  GString *str;
-
-  str = g_string_new (DBUS_STRUCT_BEGIN_CHAR_AS_STRING);
-
-  
-  if (requested & G_FILE_INFO_FILE_TYPE)
-    {
-      g_string_append_c (str, DBUS_TYPE_UINT16);
-    }
-
-  if (requested & G_FILE_INFO_NAME)
-    {
-      g_string_append (str, DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING);
-    }
-
-  if (requested & G_FILE_INFO_DISPLAY_NAME)
-    {
-      g_string_append_c (str, DBUS_TYPE_STRING);
-    }
-
-  if (requested & G_FILE_INFO_EDIT_NAME)
-    {
-      g_string_append_c (str, DBUS_TYPE_STRING);
-    }
-
-  if (requested & G_FILE_INFO_ICON)
-    {
-      g_string_append_c (str, DBUS_TYPE_STRING);
-    }
-
-  if (requested & G_FILE_INFO_MIME_TYPE)
-    {
-      g_string_append_c (str, DBUS_TYPE_STRING);
-    }
-
-  if (requested & G_FILE_INFO_SIZE)
-    {
-      g_string_append_c (str, DBUS_TYPE_UINT64);
-    }
-
-  if (requested & G_FILE_INFO_MODIFICATION_TIME)
-    {
-      g_string_append_c (str, DBUS_TYPE_UINT64);
-    }
-
-  if (requested & G_FILE_INFO_ACCESS_RIGHTS)
-    {
-      g_string_append_c (str, DBUS_TYPE_UINT32);
-    }
-
-  if (requested & G_FILE_INFO_STAT_INFO)
-    {
-      g_string_append_c (str, DBUS_TYPE_UINT32); /* TODO: struct */
-    }
-
-  if (requested & G_FILE_INFO_SYMLINK_TARGET)
-    {
-      g_string_append (str, DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING);
-    }
-
-  if (requested & G_FILE_INFO_IS_HIDDEN)
-    {
-      g_string_append_c (str, DBUS_TYPE_BOOLEAN);
-    }
-  
-
-  /* TODO: Attributes */
-  
-  g_string_append_c (str, DBUS_STRUCT_END_CHAR);
-
-  return g_string_free (str, FALSE);
-}
-
 void
 g_dbus_append_file_info (DBusMessageIter *iter,
-			 GFileInfoRequestFlags requested,
 			 GFileInfo *info)
 {
-  DBusMessageIter struct_iter;
-  char *sig;
+  DBusMessageIter struct_iter, variant_iter, array_iter, inner_struct_iter;
+  char **attributes;
+  int i;
 
-  sig = g_dbus_get_file_info_signature (requested);
+  attributes = g_file_info_list_attributes (info, NULL);
+
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_STRUCT,
-					 sig,
+					 G_FILE_INFO_INNER_TYPE_AS_STRING,
 					 &struct_iter))
     _g_dbus_oom ();
-  g_free (sig);
 
-  if (requested & G_FILE_INFO_FILE_TYPE)
+
+  if (!dbus_message_iter_open_container (&struct_iter,
+					 DBUS_TYPE_ARRAY,
+					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+					 DBUS_TYPE_STRING_AS_STRING	
+					 DBUS_TYPE_VARIANT_AS_STRING	
+					 DBUS_STRUCT_END_CHAR_AS_STRING,
+					 &array_iter))
+    _g_dbus_oom ();
+
+  for (i = 0; attributes[i] != NULL; i++)
     {
-      guint16 type = g_file_info_get_file_type (info);
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_UINT16,
-					   &type))
+      GFileAttributeType type;
+      char *dbus_type;
+      void *value;
+      const char *str;
+      guint32 v_uint32;
+      gint32 v_int32;
+      guint64 v_uint64;
+      gint64 v_int64;
+
+      type = g_file_info_get_attribute_type (info, attributes[i]);
+      switch (type)
+	{
+	case G_FILE_ATTRIBUTE_TYPE_STRING:
+	  dbus_type = DBUS_TYPE_STRING_AS_STRING;
+	  str = g_file_info_get_attribute_string (info, attributes[i]);
+	  value = &str;
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+	  dbus_type = DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING;
+	  str = g_file_info_get_attribute_byte_string (info, attributes[i]);
+	  value = &str;
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_UINT32:
+	  dbus_type = DBUS_TYPE_UINT32_AS_STRING;
+	  v_uint32 = g_file_info_get_attribute_uint32 (info, attributes[i]);
+	  value = &v_uint32;
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_INT32:
+	  dbus_type = DBUS_TYPE_INT32_AS_STRING;
+	  v_int32 = g_file_info_get_attribute_int32 (info, attributes[i]);
+	  value = &v_int32;
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_UINT64:
+	  dbus_type = DBUS_TYPE_UINT64_AS_STRING;
+	  v_uint64 = g_file_info_get_attribute_uint64 (info, attributes[i]);
+	  value = &v_uint64;
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_INT64:
+	  dbus_type = DBUS_TYPE_INT64_AS_STRING;
+	  v_int64 = g_file_info_get_attribute_int64 (info, attributes[i]);
+	  value = &v_int64;
+	  break;
+	default:
+	  g_warning ("Invalid attribute type %s=%d, ignoring\n", attributes[i], type);
+	  continue;
+	}
+
+      if (!dbus_message_iter_open_container (&array_iter,
+					     DBUS_TYPE_STRUCT,
+					     DBUS_TYPE_STRING_AS_STRING
+					     DBUS_TYPE_VARIANT_AS_STRING,
+					     &inner_struct_iter))
 	_g_dbus_oom ();
-    }
 
-  if (requested & G_FILE_INFO_NAME)
-    {
-      _g_dbus_message_iter_append_cstring (&struct_iter,
-					   g_file_info_get_name (info));
-    }
 
-  if (requested & G_FILE_INFO_DISPLAY_NAME)
-    {
-      const char *str = g_file_info_get_display_name (info);
-      
-      if (!dbus_message_iter_append_basic (&struct_iter,
+      if (!dbus_message_iter_append_basic (&inner_struct_iter,
 					   DBUS_TYPE_STRING,
-					   &str))
+					   &attributes[i]))
 	_g_dbus_oom ();
-    }
 
-  if (requested & G_FILE_INFO_EDIT_NAME)
-    {
-      const char *str = g_file_info_get_edit_name (info);
+
+      if (!dbus_message_iter_open_container (&inner_struct_iter,
+					     DBUS_TYPE_VARIANT,
+					     dbus_type,
+					     &variant_iter))
+	_g_dbus_oom ();
+
+      if (dbus_type[0] == DBUS_TYPE_ARRAY)
+	_g_dbus_message_iter_append_cstring (&variant_iter, *(char **)value);
+      else
+	{
+	  if (!dbus_message_iter_append_basic (&variant_iter,
+					       dbus_type[0], value))
+	    _g_dbus_oom ();
+	}
       
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_STRING,
-					   &str))
+      if (!dbus_message_iter_close_container (&inner_struct_iter, &variant_iter))
 	_g_dbus_oom ();
-    }
-
-  if (requested & G_FILE_INFO_ICON)
-    {
-      const char *str = g_file_info_get_icon (info);
       
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_STRING,
-					   &str))
+      if (!dbus_message_iter_close_container (&array_iter, &inner_struct_iter))
 	_g_dbus_oom ();
     }
 
-  if (requested & G_FILE_INFO_MIME_TYPE)
-    {
-      const char *str = g_file_info_get_mime_type (info);
+  g_strfreev (attributes);
+
+  if (!dbus_message_iter_close_container (&struct_iter, &array_iter))
+    _g_dbus_oom ();
       
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_STRING,
-					   &str))
-	_g_dbus_oom ();
-    }
-
-  if (requested & G_FILE_INFO_SIZE)
-    {
-      guint64 size = g_file_info_get_size (info);
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_UINT64,
-					   &size))
-	_g_dbus_oom ();
-    }
-
-  if (requested & G_FILE_INFO_MODIFICATION_TIME)
-    {
-      guint64 time = g_file_info_get_modification_time (info);
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_UINT64,
-					   &time))
-	_g_dbus_oom ();
-    }
-
-  if (requested & G_FILE_INFO_ACCESS_RIGHTS)
-    {
-      guint32 rights = g_file_info_get_access_rights (info);
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_UINT32,
-					   &rights))
-	_g_dbus_oom ();
-    }
-
-  if (requested & G_FILE_INFO_STAT_INFO)
-    {
-      /* TODO: implement statinfo */
-      guint32 tmp = 0;
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_UINT32,
-					   &tmp))
-	_g_dbus_oom ();
-    }
-
-  if (requested & G_FILE_INFO_SYMLINK_TARGET)
-    {
-      _g_dbus_message_iter_append_cstring (&struct_iter,
-					   g_file_info_get_symlink_target (info));
-    }
-
-  if (requested & G_FILE_INFO_IS_HIDDEN)
-    {
-      dbus_bool_t is_hidden = g_file_info_get_is_hidden (info);
-      if (!dbus_message_iter_append_basic (&struct_iter,
-					   DBUS_TYPE_BOOLEAN,
-					   &is_hidden))
-	_g_dbus_oom ();
-    }
-
-  /* TODO: Attributes */
-
   if (!dbus_message_iter_close_container (iter, &struct_iter))
     _g_dbus_oom ();
 }

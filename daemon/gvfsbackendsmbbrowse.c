@@ -694,7 +694,6 @@ static void
 run_get_info (GVfsBackendSmbBrowse *backend,
 	      GVfsJobGetInfo *job,
 	      const char *filename,
-	      GFileInfoRequestFlags requested,
 	      const char *attributes)
 {
   GFileInfo *info;
@@ -710,14 +709,15 @@ run_get_info (GVfsBackendSmbBrowse *backend,
       info = g_file_info_new ();
       g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
       g_file_info_set_name (info, entry->name);
-      g_file_info_set_attribute (info, "smb:comment", entry->comment);
+      /* TODO: Is this always UTF8? */
+      g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
     }
       
   g_mutex_unlock (backend->entries_lock);
 
   if (info)
     {
-      g_vfs_job_get_info_set_info (job, requested & ~(G_FILE_INFO_DISPLAY_NAME|G_FILE_INFO_EDIT_NAME), info);
+      g_vfs_job_get_info_set_info (job, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
     }
@@ -733,15 +733,14 @@ static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     const char *filename,
-	     GFileInfoRequestFlags requested,
 	     const char *attributes,
-	     gboolean follow_symlinks)
+	     GFileGetInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
   update_cache (op_backend);
 
-  run_get_info (op_backend, job, filename, requested, attributes);
+  run_get_info (op_backend, job, filename, attributes);
 }
 
 
@@ -749,9 +748,8 @@ static gboolean
 try_get_info (GVfsBackend *backend,
 	      GVfsJobGetInfo *job,
 	      const char *filename,
-	      GFileInfoRequestFlags requested,
 	      const char *attributes,
-	      gboolean follow_symlinks)
+	      GFileGetInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
@@ -760,7 +758,7 @@ try_get_info (GVfsBackend *backend,
       GFileInfo *info = g_file_info_new ();
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
-      g_vfs_job_get_info_set_info (job, requested & ~(G_FILE_INFO_DISPLAY_NAME|G_FILE_INFO_EDIT_NAME), info);
+      g_vfs_job_get_info_set_info (job, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
       
@@ -770,7 +768,7 @@ try_get_info (GVfsBackend *backend,
   if (cache_needs_updating (op_backend))
     return FALSE;
 
-  run_get_info (op_backend, job, filename, requested, attributes);
+  run_get_info (op_backend, job, filename, attributes);
   
   return TRUE;
 }
@@ -779,7 +777,6 @@ static void
 run_enumerate (GVfsBackendSmbBrowse *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
-	       GFileInfoRequestFlags requested,
 	       const char *attributes)
 {
   GList *files, *l;
@@ -799,7 +796,6 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
     }
   
   /* TODO: limit requested to what we support */
-  g_vfs_job_enumerate_set_result (job, requested);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   files = NULL;
@@ -810,9 +806,9 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
 
       info = g_file_info_new ();
       g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
-      if (requested & G_FILE_INFO_NAME)
-	g_file_info_set_name (info, entry->name);
-      g_file_info_set_attribute (info, "smb:comment", entry->comment);
+      g_file_info_set_name (info, entry->name);
+      /* TODO: Is this always in utf8??? */
+      g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
 
       files = g_list_prepend (files, info);
     }
@@ -831,31 +827,29 @@ static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      const char *filename,
-	      GFileInfoRequestFlags requested,
 	      const char *attributes,
-	      gboolean follow_symlinks)
+	      GFileGetInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   
   update_cache (op_backend);
 
-  run_enumerate (op_backend, job, filename, requested, attributes);
+  run_enumerate (op_backend, job, filename, attributes);
 }
 
 static gboolean
 try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
-	       GFileInfoRequestFlags requested,
 	       const char *attributes,
-	       gboolean follow_symlinks)
+	       GFileGetInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
   if (cache_needs_updating (op_backend))
     return FALSE;
   
-  run_enumerate (op_backend, job, filename, requested, attributes);
+  run_enumerate (op_backend, job, filename, attributes);
 
   return TRUE;
 }

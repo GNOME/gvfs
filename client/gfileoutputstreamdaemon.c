@@ -136,7 +136,6 @@ static gboolean   g_file_output_stream_daemon_close         (GOutputStream      
 							     GCancellable               *cancellable,
 							     GError                    **error);
 static GFileInfo *g_file_output_stream_daemon_get_file_info (GFileOutputStream          *stream,
-							     GFileInfoRequestFlags       requested,
 							     char                       *attributes,
 							     GCancellable               *cancellable,
 							     GError                    **error);
@@ -936,10 +935,9 @@ g_file_output_stream_daemon_seek (GFileOutputStream *stream,
 
 static GFileInfo *
 g_file_output_stream_daemon_get_file_info (GFileOutputStream     *stream,
-					  GFileInfoRequestFlags requested,
-					  char                 *attributes,
-					  GCancellable         *cancellable,
-					  GError              **error)
+					   char                 *attributes,
+					   GCancellable         *cancellable,
+					   GError              **error)
 {
   GFileOutputStreamDaemon *file;
 

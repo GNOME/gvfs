@@ -24,11 +24,9 @@ struct _GVfsJobEnumerate
   GVfsBackend *backend;
   char *filename;
   char *object_path;
-  GFileInfoRequestFlags requested;
   char *attributes;
-  gboolean follow_symlinks;
+  GFileGetInfoFlags flags;
 
-  GFileInfoRequestFlags requested_result;
 };
 
 struct _GVfsJobEnumerateClass
@@ -41,8 +39,6 @@ GType g_vfs_job_enumerate_get_type (void) G_GNUC_CONST;
 GVfsJob *g_vfs_job_enumerate_new        (DBusConnection        *connection,
 					 DBusMessage           *message,
 					 GVfsBackend           *backend);
-void     g_vfs_job_enumerate_set_result (GVfsJobEnumerate      *job,
-					 GFileInfoRequestFlags  requested_result);
 void     g_vfs_job_enumerate_add_info   (GVfsJobEnumerate      *job,
 					 GList                 *info);
 void     g_vfs_job_enumerate_done       (GVfsJobEnumerate      *job);

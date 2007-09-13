@@ -370,16 +370,13 @@ do_async_path_call (GFile *file,
 
 static GFileEnumerator *
 g_file_daemon_enumerate_children (GFile      *file,
-				  GFileInfoRequestFlags requested,
 				  const char *attributes,
-				  gboolean follow_symlinks,
+				  GFileGetInfoFlags flags,
 				  GCancellable *cancellable,
 				  GError **error)
 {
   DBusMessage *reply;
-  guint32 requested_32;
-  dbus_bool_t follow_symlinks_dbus;
-  DBusMessageIter iter;
+  dbus_uint32_t flags_dbus;
   char *obj_path;
   GFileEnumeratorDaemon *enumerator;
   DBusConnection *connection;
@@ -387,17 +384,15 @@ g_file_daemon_enumerate_children (GFile      *file,
   enumerator = g_file_enumerator_daemon_new ();
   obj_path = g_file_enumerator_daemon_get_object_path (enumerator);
 						       
-  requested_32 = (guint32)requested;
   if (attributes == NULL)
     attributes = "";
-  follow_symlinks_dbus = follow_symlinks;
+  flags_dbus = flags;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_OP_ENUMERATE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_STRING, &obj_path,
-			     DBUS_TYPE_UINT32, &requested_32,
 			     DBUS_TYPE_STRING, &attributes,
-			     DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
+			     DBUS_TYPE_UINT32, &flags_dbus,
 			     0);
   
   g_free (obj_path);
@@ -405,19 +400,9 @@ g_file_daemon_enumerate_children (GFile      *file,
   if (reply == NULL)
     goto error;
 
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_UINT32))
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   _("Invalid return value from Enumerate"));
-      goto error;
-    }
-  
-  dbus_message_iter_get_basic (&iter, &requested_32);
   dbus_message_unref (reply);
 
   g_file_enumerator_daemon_set_sync_connection (enumerator, connection);
-  g_file_enumerator_daemon_set_request_flags (enumerator, requested_32);
   
   return G_FILE_ENUMERATOR (enumerator);
 
@@ -430,28 +415,24 @@ g_file_daemon_enumerate_children (GFile      *file,
 
 static GFileInfo *
 g_file_daemon_get_info (GFile                *file,
-			GFileInfoRequestFlags requested,
 			const char           *attributes,
-			gboolean              follow_symlinks,
+			GFileGetInfoFlags     flags,
 			GCancellable         *cancellable,
 			GError              **error)
 {
   DBusMessage *reply;
-  guint32 requested_32;
-  dbus_bool_t follow_symlinks_dbus;
+  dbus_uint32_t flags_dbus;
   DBusMessageIter iter;
   GFileInfo *info;
 
-  requested_32 = (guint32)requested;
   if (attributes == NULL)
     attributes = "";
-  follow_symlinks_dbus = follow_symlinks;
+  flags_dbus = flags;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_OP_GET_INFO,
 			     NULL, cancellable, error,
-			     DBUS_TYPE_UINT32, &requested_32,
 			     DBUS_TYPE_STRING, &attributes,
-			     DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
+			     DBUS_TYPE_UINT32, &flags,
 			     0);
   if (reply == NULL)
     return NULL;
@@ -459,19 +440,14 @@ g_file_daemon_get_info (GFile                *file,
   info = NULL;
   
   if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_UINT32))
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
     {
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   _("Invalid return value from get_info"));
       goto out;
     }
 
-  dbus_message_iter_get_basic (&iter, &requested_32);
-  
-  if (!dbus_message_iter_next (&iter))
-    goto out;
-  
-  info = _g_dbus_get_file_info (&iter, requested_32, error);
+  info = _g_dbus_get_file_info (&iter, error);
 
  out:
   dbus_message_unref (reply);

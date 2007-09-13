@@ -37,7 +37,6 @@ struct _GFileOutputStreamClass
 			       GCancellable         *cancellable,
 			       GError              **error);
   GFileInfo *(*get_file_info) (GFileOutputStream    *stream,
-			       GFileInfoRequestFlags requested,
 			       char                 *attributes,
 			       GCancellable         *cancellable,
 			       GError              **error);
@@ -54,16 +53,16 @@ GType g_file_output_stream_get_type (void) G_GNUC_CONST;
 
 
 GFileInfo *g_file_output_stream_get_file_info              (GFileOutputStream      *stream,
-							    GFileInfoRequestFlags   requested,
 							    char                   *attributes,
 							    GCancellable           *cancellable,
 							    GError                **error);
 void       g_file_output_stream_set_should_get_final_mtime (GFileOutputStream      *stream,
 							    gboolean                get_final_mtime);
-time_t     g_file_output_stream_get_final_mtime            (GFileOutputStream      *stream);
+void       g_file_output_stream_get_final_mtime            (GFileOutputStream      *stream,
+							    GTimeVal               *mtime);
 gboolean   g_file_output_stream_get_should_get_final_mtime (GFileOutputStream      *stream);
 void       g_file_output_stream_set_final_mtime            (GFileOutputStream      *stream,
-							    time_t                  final_mtime);
+							    GTimeVal               *final_mtime);
 
 G_END_DECLS
 

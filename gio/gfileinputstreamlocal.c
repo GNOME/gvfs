@@ -33,7 +33,6 @@ static gboolean   g_file_input_stream_local_close         (GInputStream         
 							   GCancellable           *cancellable,
 							   GError                **error);
 static GFileInfo *g_file_input_stream_local_get_file_info (GFileInputStream       *stream,
-							   GFileInfoRequestFlags   requested,
 							   char                   *attributes,
 							   GCancellable           *cancellable,
 							   GError                **error);
@@ -199,7 +198,6 @@ g_file_input_stream_local_close (GInputStream *stream,
 
 static GFileInfo *
 g_file_input_stream_local_get_file_info (GFileInputStream     *stream,
-					 GFileInfoRequestFlags requested,
 					 char                 *attributes,
 					 GCancellable         *cancellable,
 					 GError              **error)
@@ -218,7 +216,6 @@ g_file_input_stream_local_get_file_info (GFileInputStream     *stream,
     }
   
   return g_file_info_local_get_from_fd (file->priv->fd,
-					requested,
 					attributes,
 					error);
 }

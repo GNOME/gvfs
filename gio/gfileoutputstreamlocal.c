@@ -38,7 +38,6 @@ static gboolean   g_file_output_stream_local_close         (GOutputStream       
 							    GCancellable           *cancellable,
 							    GError                **error);
 static GFileInfo *g_file_output_stream_local_get_file_info (GFileOutputStream      *stream,
-							    GFileInfoRequestFlags   requested,
 							    char                   *attributes,
 							    GCancellable           *cancellable,
 							    GError                **error);
@@ -195,8 +194,19 @@ g_file_output_stream_local_close (GOutputStream *stream,
 	}
       
       if (fstat (file->priv->fd, &final_stat) == 0)
-	g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
-					      final_stat.st_mtime);
+	{
+	  GTimeVal tv;
+	  tv.tv_sec = final_stat.st_mtime;
+#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
+	  tv.tv_usec = final_stat.st_mtimensec / 1000;
+#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
+	  tv.tv_usec = final_stat.st_mtim.tv_nsec / 1000;
+#else
+	  tv.tv_usec = 0;
+#endif
+	  g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
+						&tv);
+	}
     }
 
   while (1)
@@ -222,7 +232,6 @@ g_file_output_stream_local_close (GOutputStream *stream,
 
 static GFileInfo *
 g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
-					  GFileInfoRequestFlags requested,
 					  char                 *attributes,
 					  GCancellable         *cancellable,
 					  GError              **error)
@@ -241,7 +250,6 @@ g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
     }
   
   return g_file_info_local_get_from_fd (file->priv->fd,
-					requested,
 					attributes,
 					error);
 }

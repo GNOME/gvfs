@@ -156,7 +156,6 @@ static gboolean   g_file_input_stream_daemon_close         (GInputStream        
 							    GCancellable              *cancellable,
 							    GError                   **error);
 static GFileInfo *g_file_input_stream_daemon_get_file_info (GFileInputStream          *stream,
-							    GFileInfoRequestFlags      requested,
 							    char                      *attributes,
 							    GCancellable              *cancellable,
 							    GError                   **error);
@@ -1180,7 +1179,6 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 
 static GFileInfo *
 g_file_input_stream_daemon_get_file_info (GFileInputStream     *stream,
-					  GFileInfoRequestFlags requested,
 					  char                 *attributes,
 					  GCancellable         *cancellable,
 					  GError              **error)

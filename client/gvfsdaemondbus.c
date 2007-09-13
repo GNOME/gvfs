@@ -901,11 +901,11 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 
 GFileInfo *
 _g_dbus_get_file_info (DBusMessageIter *iter,
-		       GFileInfoRequestFlags requested,
 		       GError **error)
 {
   GFileInfo *info;
-  DBusMessageIter struct_iter, array_iter;
+  DBusMessageIter struct_iter, array_iter, inner_struct_iter, variant_iter, cstring_iter;
+  const char *attribute;
 
   info = g_file_info_new ();
 
@@ -914,176 +914,72 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 
   dbus_message_iter_recurse (iter, &struct_iter);
 
-  if (requested & G_FILE_INFO_FILE_TYPE)
-    {
-      guint16 type;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT16)
-	goto error;
+  if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_ARRAY)
+    goto error;
+  
+  dbus_message_iter_recurse (&struct_iter, &array_iter);
 
-      dbus_message_iter_get_basic (&struct_iter, &type);
-
-      g_file_info_set_file_type (info, type);
-
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_NAME)
+  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
     {
       char *str;
-      const char *data;
-      int len;
+      int n_elements;
+      guint32 v_uint32;
+      gint32 v_int32;
+      guint64 v_uint64;
+      gint64 v_int64;
       
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_ARRAY ||
-	  dbus_message_iter_get_element_type (&struct_iter) != DBUS_TYPE_BYTE)
-	goto error;
+      dbus_message_iter_recurse (&array_iter, &inner_struct_iter);
+      
+	if (dbus_message_iter_get_arg_type (&inner_struct_iter) != DBUS_TYPE_STRING)
+	  goto error;
+	
+	dbus_message_iter_get_basic (&inner_struct_iter, &attribute);
+	dbus_message_iter_next (&inner_struct_iter);
+	
+	if (dbus_message_iter_get_arg_type (&inner_struct_iter) != DBUS_TYPE_VARIANT)
+	  goto error;
 
-      dbus_message_iter_recurse (&struct_iter, &array_iter);
-      dbus_message_iter_get_fixed_array (&array_iter, &data, &len);
-      str = g_strndup (data, len);
-      g_file_info_set_name (info, str);
-      g_free (str);
-      
-      dbus_message_iter_next (&struct_iter);
+	dbus_message_iter_recurse (&inner_struct_iter, &variant_iter);
+
+	switch (dbus_message_iter_get_arg_type (&variant_iter))
+	  {
+	  case DBUS_TYPE_STRING:
+	    dbus_message_iter_get_basic (&variant_iter, &str);
+	    g_file_info_set_attribute_string (info, attribute, str);
+	    break;
+	  case DBUS_TYPE_ARRAY:
+	    if (dbus_message_iter_get_element_type (&variant_iter) != DBUS_TYPE_BYTE)
+	      goto error;
+
+	    dbus_message_iter_recurse (&variant_iter, &cstring_iter);
+	    dbus_message_iter_get_fixed_array (&cstring_iter,
+					       &str, &n_elements);
+	    str = g_strndup (str, n_elements);
+	    g_file_info_set_attribute_byte_string (info, attribute, str);
+	    g_free (str);
+	    break;
+	  case DBUS_TYPE_UINT32:
+	    dbus_message_iter_get_basic (&variant_iter, &v_uint32);
+	    g_file_info_set_attribute_uint32 (info, attribute, v_uint32);
+	    break;
+	  case DBUS_TYPE_INT32:
+	    dbus_message_iter_get_basic (&variant_iter, &v_int32);
+	    g_file_info_set_attribute_int32 (info, attribute, v_int32);
+	    break;
+	  case DBUS_TYPE_UINT64:
+	    dbus_message_iter_get_basic (&variant_iter, &v_uint64);
+	    g_file_info_set_attribute_uint64 (info, attribute, v_uint64);
+	    break;
+	  case DBUS_TYPE_INT64:
+	    dbus_message_iter_get_basic (&variant_iter, &v_int64);
+	    g_file_info_set_attribute_int64 (info, attribute, v_int64);
+	    break;
+	  default:
+	    goto error;
+	  }
+	
+	dbus_message_iter_next (&array_iter);
     }
-
-  if (requested & G_FILE_INFO_DISPLAY_NAME)
-    {
-      const char *str;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &str);
-      
-      g_file_info_set_display_name (info, str);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_EDIT_NAME)
-    {
-      const char *str;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &str);
-      
-      g_file_info_set_edit_name (info, str);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_ICON)
-    {
-      const char *str;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &str);
-      
-      g_file_info_set_icon (info, str);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_MIME_TYPE)
-    {
-      const char *str;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &str);
-      
-      g_file_info_set_mime_type (info, str);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_SIZE)
-    {
-      guint64 size;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT64)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &size);
-      
-      g_file_info_set_size (info, size);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_MODIFICATION_TIME)
-    {
-      guint64 time;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT64)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &time);
-      
-      g_file_info_set_modification_time (info, time);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_ACCESS_RIGHTS)
-    {
-      guint32 rights;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT32)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &rights);
-      
-      g_file_info_set_access_rights (info, rights);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_STAT_INFO)
-    {
-      guint32 tmp;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT32)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &tmp);
-      
-      /* TODO: implement statinfo */
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_SYMLINK_TARGET)
-    {
-      char *str;
-      const char *data;
-      int len;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_ARRAY ||
-	  dbus_message_iter_get_element_type (&struct_iter) != DBUS_TYPE_BYTE)
-	goto error;
-
-      dbus_message_iter_recurse (&struct_iter, &array_iter);
-      dbus_message_iter_get_fixed_array (&array_iter, &data, &len);
-      str = g_strndup (data, len);
-      g_file_info_set_symlink_target (info, str);
-      g_free (str);
-      
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  if (requested & G_FILE_INFO_IS_HIDDEN)
-    {
-      dbus_bool_t is_hidden;
-      
-      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_BOOLEAN)
-	goto error;
-
-      dbus_message_iter_get_basic (&struct_iter, &is_hidden);
-      
-      g_file_info_set_is_hidden (info, is_hidden);
-      dbus_message_iter_next (&struct_iter);
-    }
-
-  /* TODO: Attributes */
 
   dbus_message_iter_next (iter);
   return info;

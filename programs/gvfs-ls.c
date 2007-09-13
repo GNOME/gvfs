@@ -51,7 +51,7 @@ show_info (GFileInfo *info)
   const char *name, *type;
   goffset size;
 
-  if (g_file_info_get_is_hidden (info) && !show_hidden)
+  if ((g_file_info_get_flags (info) & G_FILE_FLAG_HIDDEN) && !show_hidden)
     return;
   
   name = g_file_info_get_name (info);
@@ -66,18 +66,18 @@ show_info (GFileInfo *info)
 static void
 list (GFile *file)
 {
-  GFileInfoRequestFlags request;
   GFileEnumerator *enumerator;
   GFileInfo *info;
   GError *error;
-
+  
   if (file == NULL)
     return;
-  
-  request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME | G_FILE_INFO_SIZE | G_FILE_INFO_IS_HIDDEN;
 
+  if (attributes == NULL)
+    attributes = "*";
+  
   error = NULL;
-  enumerator = g_file_enumerate_children (file, request, attributes, TRUE, NULL, &error);
+  enumerator = g_file_enumerate_children (file, attributes, 0, NULL, &error);
   if (enumerator == NULL)
     {
       g_print ("Error: %s\n", error->message);

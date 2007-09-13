@@ -15,6 +15,10 @@ G_BEGIN_DECLS
 #define G_IS_FILE(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_FILE))
 #define G_FILE_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_FILE, GFileIface))
 
+typedef enum {
+  G_FILE_GET_INFO_NOFOLLOW_SYMLINKS = (1<<0)
+} GFileGetInfoFlags;
+
 typedef struct _GFile         GFile; /* Dummy typedef */
 typedef struct _GFileIface    GFileIface;
 
@@ -39,15 +43,13 @@ struct _GFileIface
   GFile *             (*get_child)          (GFile                *file,
 					     const char           *name);
   GFileEnumerator *   (*enumerate_children) (GFile                *file,
-					     GFileInfoRequestFlags requested,
 					     const char           *attributes,
-					     gboolean              follow_symlinks,
+					     GFileGetInfoFlags     flags,
 					     GCancellable         *cancellable,
 					     GError              **error);
   GFileInfo *         (*get_info)           (GFile                *file,
-					     GFileInfoRequestFlags requested,
 					     const char           *attributes,
-					     gboolean              follow_symlinks,
+					     GFileGetInfoFlags     flags,
 					     GCancellable         *cancellable,
 					     GError              **error);
   /*                  (*get_info_async)     (GFile                *file.. */
@@ -93,15 +95,13 @@ GFile *            g_file_get_parent         (GFile                  *file);
 GFile *            g_file_get_child          (GFile                  *file,
 					      const char             *name);
 GFileEnumerator *  g_file_enumerate_children (GFile                  *file,
-					      GFileInfoRequestFlags   requested,
 					      const char             *attributes,
-					      gboolean                follow_symlinks,
+					      GFileGetInfoFlags       flags,
 					      GCancellable           *cancellable,
 					      GError                **error);
 GFileInfo *        g_file_get_info           (GFile                  *file,
-					      GFileInfoRequestFlags   requested,
 					      const char             *attributes,
-					      gboolean                follow_symlinks,
+					      GFileGetInfoFlags       flags,
 					      GCancellable           *cancellable,
 					      GError                **error);
 GFileInputStream * g_file_read               (GFile                  *file,

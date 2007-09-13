@@ -4,6 +4,7 @@
 #include <dbus/dbus.h>
 #include <gio/gvfstypes.h>
 #include <gio/gfileinfo.h>
+#include <gio/gfile.h>
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <gmountspec.h>
@@ -148,27 +149,23 @@ struct _GVfsBackendClass
   void     (*get_info)          (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
 				 const char *filename,
-				 GFileInfoRequestFlags requested,
 				 const char *attributes,
-				 gboolean follow_symlinks);
+				 GFileGetInfoFlags flags);
   gboolean (*try_get_info)      (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
 				 const char *filename,
-				 GFileInfoRequestFlags requested,
 				 const char *attributes,
-				 gboolean follow_symlinks);
+				 GFileGetInfoFlags flags);
   void     (*enumerate)         (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
 				 const char *filename,
-				 GFileInfoRequestFlags requested,
 				 const char *attributes,
-				 gboolean follow_symlinks);
+				 GFileGetInfoFlags flags);
   gboolean (*try_enumerate)     (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
 				 const char *filename,
-				 GFileInfoRequestFlags requested,
 				 const char *attributes,
-				 gboolean follow_symlinks);
+				 GFileGetInfoFlags flags);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;

@@ -137,9 +137,8 @@ g_file_get_child (GFile *file,
 
 GFileEnumerator *
 g_file_enumerate_children (GFile *file,
-			   GFileInfoRequestFlags requested,
 			   const char *attributes,
-			   gboolean follow_symlinks,
+			   GFileGetInfoFlags flags,
 			   GCancellable *cancellable,
 			   GError **error)
 			   
@@ -148,15 +147,14 @@ g_file_enumerate_children (GFile *file,
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->enumerate_children) (file, requested, attributes, follow_symlinks,
+  return (* iface->enumerate_children) (file, attributes, flags,
 					cancellable, error);
 }
 
 GFileInfo *
 g_file_get_info (GFile *file,
-		 GFileInfoRequestFlags requested,
 		 const char *attributes,
-		 gboolean follow_symlinks,
+		 GFileGetInfoFlags flags,
 		 GCancellable *cancellable,
 		 GError **error)
 {
@@ -164,7 +162,7 @@ g_file_get_info (GFile *file,
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->get_info) (file, requested, attributes, follow_symlinks, cancellable, error);
+  return (* iface->get_info) (file, attributes, flags, cancellable, error);
 }
 
 GFileInputStream *
