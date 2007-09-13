@@ -158,7 +158,7 @@ g_memory_input_stream_skip (GInputStream              *stream,
                             GError                   **error)
 {
   GMemoryInputStream *memory_stream;
-  GMemoryInputStreamPrivate * priv;
+  GMemoryInputStreamPrivate *priv;
 
   memory_stream = G_MEMORY_INPUT_STREAM (stream);
   priv = memory_stream->priv;

@@ -3,6 +3,7 @@
 
 #include "gmemoryinputstream.h"
 #include "gmemoryoutputstream.h"
+#include "gbufferedinputstream.h"
 #include "gbufferedoutputstream.h"
 #include "gseekable.h"
 
@@ -222,6 +223,49 @@ test_memory_output_stream (gboolean use_own_array)
 }
 
 static gboolean
+test_buffered_input_stream ()
+{
+  GInputStream *mem_stream;
+  GInputStream *stream;
+  gboolean      res;
+  gssize        n;
+  gsize         nread;
+  char          buf[100];
+
+  g_print ("Testing GBufferedInputStream ...");
+
+  mem_stream = g_memory_input_stream_from_data (gmis_data,
+                                                strlen (gmis_data));
+
+  test_assert (mem_stream != NULL);
+
+  stream = g_buffered_input_stream_new_sized (mem_stream, 5);
+  g_object_unref (mem_stream);
+
+  memset (buf, 0, sizeof (buf));
+  n = g_input_stream_read (stream, buf, 3, NULL, NULL);
+
+  test_assert (n == 3);
+  test_assert (strcmp (buf, "Hab") == 0);
+
+  /* XXX, not sure if the default impl should be doing what it does */
+  n = g_input_stream_skip (stream, 4, NULL, NULL);
+  test_assert (n == 2);
+
+  nread = 0;
+  res = g_input_stream_read_all (stream, buf, sizeof (buf), &nread, NULL, NULL);
+
+  test_assert (res && nread == strlen (gmis_data) - 5);
+  test_assert (strcmp (buf, gmis_data + 5) == 0);
+
+  g_object_unref (mem_stream);
+
+  g_print ("DONE [OK]\n");
+
+  return TRUE;
+}
+
+static gboolean
 test_buffered_output_stream ()
 {
   GOutputStream *mem_stream;
@@ -317,6 +361,7 @@ main (int argc, char **argv)
   res &= test_memory_input_stream ();
   res &= test_memory_output_stream (TRUE);
   res &= test_memory_output_stream (FALSE);
+  res &= test_buffered_input_stream ();
   res &= test_buffered_output_stream ();
 
   return res ? 0 : -1;
