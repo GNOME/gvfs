@@ -98,6 +98,27 @@ g_local_daemon_file_copy (GFile *file)
   return g_local_daemon_file_new (copy);
 }
 
+static guint
+g_local_daemon_file_hash (GFile *file)
+{
+  return g_file_hash (G_LOCAL_DAEMON_FILE (file)->wrapped);
+}
+
+static gboolean
+g_local_daemon_file_equal (GFile *file1,
+			   GFile *file2)
+{
+  GFile *wrapped1 = G_LOCAL_DAEMON_FILE (file1)->wrapped;
+  GFile *wrapped2;
+
+  /* g_file_equal makes sure that if only one file is GLocalFile it will be file2 */
+  if (G_IS_LOCAL_DAEMON_FILE (file2))
+    wrapped2 = G_LOCAL_DAEMON_FILE (file2)->wrapped;
+  else
+    wrapped2 = file2;
+  
+  return g_file_equal (wrapped1, wrapped2);
+}
 
 static GFile *
 g_local_daemon_file_resolve_relative (GFile *file,
@@ -182,6 +203,8 @@ static void
 g_local_daemon_file_file_iface_init (GFileIface *iface)
 {
   iface->copy = g_local_daemon_file_copy;
+  iface->hash = g_local_daemon_file_hash;
+  iface->equal = g_local_daemon_file_equal;
   iface->is_native = g_local_daemon_file_is_native;
   iface->get_path = g_local_daemon_file_get_path;
   iface->get_uri = g_local_daemon_file_get_uri;

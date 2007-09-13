@@ -35,6 +35,9 @@ struct _GFileIface
   /* Virtual Table */
 
   GFile *             (*copy)               (GFile                *file);
+  guint               (*hash)               (GFile                *file);
+  gboolean            (*equal)              (GFile                *file1,
+					     GFile                *file2);
   gboolean            (*is_native)          (GFile                *file);
   char *              (*get_path)           (GFile                *file);
   char *              (*get_uri)            (GFile                *file);
@@ -87,6 +90,9 @@ GFile *g_file_parse_name              (const char *parse_name);
 GFile *g_file_get_for_commandline_arg (const char *arg);
 
 GFile *            g_file_copy               (GFile                  *file);
+guint              g_file_hash               (gconstpointer           file);
+gboolean           g_file_equal              (GFile                  *file1,
+					      GFile                  *file2);
 gboolean           g_file_is_native          (GFile                  *file);
 char *             g_file_get_path           (GFile                  *file);
 char *             g_file_get_uri            (GFile                  *file);

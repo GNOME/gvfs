@@ -6,6 +6,7 @@
 #include "gvfs.h"
 #include "gioscheduler.h"
 #include <glib/gi18n-lib.h>
+#include <glocalfile.h>
 
 static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
@@ -111,6 +112,40 @@ g_file_copy (GFile *file)
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->copy) (file);
+}
+
+guint
+g_file_hash (gconstpointer file)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->hash) ((GFile *)file);
+}
+
+gboolean
+g_file_equal (GFile *file1,
+	      GFile *file2)
+{
+  GFileIface *iface;
+  
+  /* If file1 is local, pass file2 to handle the
+   * case where one file is a GLocalFile and the other
+   * is a wrapper of GLocalFile.
+   */
+  if (G_IS_LOCAL_FILE (file1))
+    {
+      iface = G_FILE_GET_IFACE (file2);
+      
+      return (* iface->equal) (file2, file1);
+    }
+  else
+    {
+      iface = G_FILE_GET_IFACE (file1);
+      
+      return (* iface->equal) (file1, file2);
+    }
 }
 
 

@@ -269,6 +269,28 @@ g_local_file_copy (GFile *file)
   return g_local_file_new (local->filename);
 }
 
+static guint
+g_local_file_hash (GFile *file)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  
+  return g_str_hash (local->filename);
+}
+
+static gboolean
+g_local_file_equal (GFile *file1,
+		    GFile *file2)
+{
+  GLocalFile *local1 = G_LOCAL_FILE (file1);
+  GLocalFile *local2;
+
+  if (!G_IS_LOCAL_FILE (file2))
+    return FALSE;
+  
+  local2 = G_LOCAL_FILE (file2);
+
+  return g_str_equal (local1->filename, local2->filename);
+}
 
 static GFile *
 g_local_file_resolve_relative (GFile *file,
@@ -400,6 +422,8 @@ static void
 g_local_file_file_iface_init (GFileIface *iface)
 {
   iface->copy = g_local_file_copy;
+  iface->hash = g_local_file_hash;
+  iface->equal = g_local_file_equal;
   iface->is_native = g_local_file_is_native;
   iface->get_path = g_local_file_get_path;
   iface->get_uri = g_local_file_get_uri;

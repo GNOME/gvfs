@@ -197,6 +197,30 @@ g_daemon_file_copy (GFile *file)
 			    daemon_file->path);
 }
 
+static guint
+g_daemon_file_hash (GFile *file)
+{
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+
+  return
+    g_str_hash (daemon_file->path) ^
+    g_mount_spec_hash (daemon_file->mount_spec);
+}
+
+static gboolean
+g_daemon_file_equal (GFile *file1,
+		     GFile *file2)
+{
+  GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
+  GDaemonFile *daemon_file2;
+
+  if (!G_IS_DAEMON_FILE (file2))
+    return FALSE;
+
+  daemon_file2 = G_DAEMON_FILE (file2);
+
+  return g_str_equal (daemon_file1->path, daemon_file2->path);
+}
 
 static GFile *
 g_daemon_file_resolve_relative (GFile *file,
@@ -850,6 +874,8 @@ static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
   iface->copy = g_daemon_file_copy;
+  iface->hash = g_daemon_file_hash;
+  iface->equal = g_daemon_file_equal;
   iface->is_native = g_daemon_file_is_native;
   iface->get_path = g_daemon_file_get_path;
   iface->get_uri = g_daemon_file_get_uri;
