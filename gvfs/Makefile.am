@@ -33,6 +33,7 @@ libgvfs_la_SOURCES = 	\
 	$(NULL)
 
 libgvfs_la_LIBADD = \
+	$(SELINUX_LIBS) \
 	$(GLIB_LIBS)
 
 gvfsincludedir=$(includedir)/gvfs/
