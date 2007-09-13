@@ -36,8 +36,6 @@ Add virtual file monitor event to support inotify WRITE_CLOSE
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
-Make copy handle things like symlinks
-
 gvfs:
 ====
 
