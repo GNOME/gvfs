@@ -124,7 +124,9 @@ typedef struct {
 
 typedef StateOp (*state_machine_iterator) (GFileInputStreamDaemon *file, IOOperationData *io_op, gpointer data);
 
-struct _GFileInputStreamDaemonPrivate {
+struct _GFileInputStreamDaemon {
+  GFileInputStream parent;
+
   GOutputStream *command_stream;
   GInputStream *data_stream;
   guint can_seek : 1;
@@ -194,10 +196,10 @@ g_file_input_stream_daemon_finalize (GObject *object)
   
   file = G_FILE_INPUT_STREAM_DAEMON (object);
 
-  if (file->priv->command_stream)
-    g_object_unref (file->priv->command_stream);
-  if (file->priv->data_stream)
-    g_object_unref (file->priv->data_stream);
+  if (file->command_stream)
+    g_object_unref (file->command_stream);
+  if (file->data_stream)
+    g_object_unref (file->data_stream);
   
   if (G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize) (object);
@@ -209,8 +211,6 @@ g_file_input_stream_daemon_class_init (GFileInputStreamDaemonClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
   GFileInputStreamClass *file_stream_class = G_FILE_INPUT_STREAM_CLASS (klass);
-  
-  g_type_class_add_private (klass, sizeof (GFileInputStreamDaemonPrivate));
   
   gobject_class->finalize = g_file_input_stream_daemon_finalize;
 
@@ -232,12 +232,8 @@ g_file_input_stream_daemon_class_init (GFileInputStreamDaemonClass *klass)
 static void
 g_file_input_stream_daemon_init (GFileInputStreamDaemon *info)
 {
-  info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info,
-					    G_TYPE_FILE_INPUT_STREAM_DAEMON,
-					    GFileInputStreamDaemonPrivate);
-
-  info->priv->output_buffer = g_string_new ("");
-  info->priv->input_buffer = g_string_new ("");
+  info->output_buffer = g_string_new ("");
+  info->input_buffer = g_string_new ("");
 }
 
 GFileInputStream *
@@ -248,9 +244,9 @@ g_file_input_stream_daemon_new (int fd,
 
   stream = g_object_new (G_TYPE_FILE_INPUT_STREAM_DAEMON, NULL);
 
-  stream->priv->command_stream = g_output_stream_socket_new (fd, FALSE);
-  stream->priv->data_stream = g_input_stream_socket_new (fd, TRUE);
-  stream->priv->can_seek = can_seek;
+  stream->command_stream = g_output_stream_socket_new (fd, FALSE);
+  stream->data_stream = g_input_stream_socket_new (fd, TRUE);
+  stream->can_seek = can_seek;
   
   return G_FILE_INPUT_STREAM (stream);
 }
@@ -272,15 +268,15 @@ append_request (GFileInputStreamDaemon *stream, guint32 command,
   g_assert (sizeof (cmd) == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
   
   if (seq_nr)
-    *seq_nr = stream->priv->seq_nr;
+    *seq_nr = stream->seq_nr;
   
   cmd.command = g_htonl (command);
-  cmd.seq_nr = g_htonl (stream->priv->seq_nr++);
+  cmd.seq_nr = g_htonl (stream->seq_nr++);
   cmd.arg1 = g_htonl (arg1);
   cmd.arg2 = g_htonl (arg2);
   cmd.data_len = 0;
 
-  g_string_append_len (stream->priv->output_buffer,
+  g_string_append_len (stream->output_buffer,
 		       (char *)&cmd, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
 }
 
@@ -354,21 +350,21 @@ run_sync_state_machine (GFileInputStreamDaemon *file,
       io_error = NULL;
       if (io_op == STATE_OP_READ)
 	{
-	  res = g_input_stream_read (file->priv->data_stream,
+	  res = g_input_stream_read (file->data_stream,
 				     io_data.io_buffer, io_data.io_size,
 				     io_data.io_allow_cancel ? cancellable : NULL,
 				     &io_error);
 	}
       else if (io_op == STATE_OP_SKIP)
 	{
-	  res = g_input_stream_skip (file->priv->data_stream,
+	  res = g_input_stream_skip (file->data_stream,
 				     io_data.io_size,
 				     io_data.io_allow_cancel ? cancellable : NULL,
 				     &io_error);
 	}
       else if (io_op == STATE_OP_WRITE)
 	{
-	  res = g_output_stream_write (file->priv->command_stream,
+	  res = g_output_stream_write (file->command_stream,
 				       io_data.io_buffer, io_data.io_size,
 				       io_data.io_allow_cancel ? cancellable : NULL,
 				       &io_error);
@@ -419,7 +415,6 @@ run_sync_state_machine (GFileInputStreamDaemon *file,
 static StateOp
 iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, ReadOperation *op)
 {
-  GFileInputStreamDaemonPrivate *priv = file->priv;
   gsize len;
 
   while (TRUE)
@@ -430,12 +425,12 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	case READ_STATE_INIT:
 	  /* If we're already reading some data, but we didn't read all, just use that
 	     and don't even send a request */
-	  if (priv->input_state == INPUT_STATE_IN_BLOCK &&
-	      priv->seek_generation == priv->input_block_seek_generation)
+	  if (file->input_state == INPUT_STATE_IN_BLOCK &&
+	      file->seek_generation == file->input_block_seek_generation)
 	    {
 	      op->state = READ_STATE_READ_BLOCK;
 	      io_op->io_buffer = op->buffer;
-	      io_op->io_size = MIN (op->buffer_size, priv->input_block_size);
+	      io_op->io_size = MIN (op->buffer_size, file->input_block_size);
 	      io_op->io_allow_cancel = TRUE; /* Allow cancel before we sent request */
 	      return STATE_OP_READ;
 	    }
@@ -443,8 +438,8 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ,
 			  op->buffer_size, 0, &op->seq_nr);
 	  op->state = READ_STATE_WROTE_COMMAND;
-	  io_op->io_buffer = priv->output_buffer->str;
-	  io_op->io_size = priv->output_buffer->len;
+	  io_op->io_buffer = file->output_buffer->str;
+	  io_op->io_size = file->output_buffer->len;
 	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
 	  return STATE_OP_WRITE;
 
@@ -460,19 +455,19 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	      return STATE_OP_DONE;
 	    }
 	  
-	  if (io_op->io_res < priv->output_buffer->len)
+	  if (io_op->io_res < file->output_buffer->len)
 	    {
-	      memcpy (priv->output_buffer->str,
-		      priv->output_buffer->str + io_op->io_res,
-		      priv->output_buffer->len - io_op->io_res);
-	      g_string_truncate (priv->output_buffer,
-				 priv->output_buffer->len - io_op->io_res);
-	      io_op->io_buffer = priv->output_buffer->str;
-	      io_op->io_size = priv->output_buffer->len;
+	      memcpy (file->output_buffer->str,
+		      file->output_buffer->str + io_op->io_res,
+		      file->output_buffer->len - io_op->io_res);
+	      g_string_truncate (file->output_buffer,
+				 file->output_buffer->len - io_op->io_res);
+	      io_op->io_buffer = file->output_buffer->str;
+	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
-	  g_string_truncate (priv->output_buffer, 0);
+	  g_string_truncate (file->output_buffer, 0);
 
 	  op->state = READ_STATE_HANDLE_INPUT;
 	  break;
@@ -485,18 +480,18 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
 			      op->seq_nr, 0, NULL);
 	      op->state = READ_STATE_WROTE_COMMAND;
-	      io_op->io_buffer = priv->output_buffer->str;
-	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_buffer = file->output_buffer->str;
+	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
 	  
-	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
+	  if (file->input_state == INPUT_STATE_IN_BLOCK)
 	    {
 	      op->state = READ_STATE_HANDLE_INPUT_BLOCK;
 	      break;
 	    }
-	  else if (priv->input_state == INPUT_STATE_IN_REPLY_HEADER)
+	  else if (file->input_state == INPUT_STATE_IN_REPLY_HEADER)
 	    {
 	      op->state = READ_STATE_HANDLE_HEADER;
 	      break;
@@ -506,14 +501,14 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 
 	  /* No op */
 	case READ_STATE_HANDLE_INPUT_BLOCK:
-	  g_assert (priv->input_state == INPUT_STATE_IN_BLOCK);
+	  g_assert (file->input_state == INPUT_STATE_IN_BLOCK);
 	  
-	  if (priv->seek_generation ==
-	      priv->input_block_seek_generation)
+	  if (file->seek_generation ==
+	      file->input_block_seek_generation)
 	    {
 	      op->state = READ_STATE_READ_BLOCK;
 	      io_op->io_buffer = op->buffer;
-	      io_op->io_size = MIN (op->buffer_size, priv->input_block_size);
+	      io_op->io_size = MIN (op->buffer_size, file->input_block_size);
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_READ;
 	    }
@@ -521,7 +516,7 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	    {
 	      op->state = READ_STATE_SKIP_BLOCK;
 	      io_op->io_buffer = NULL;
-	      io_op->io_size = priv->input_block_size;
+	      io_op->io_size = file->input_block_size;
 	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_SKIP;
 	    }
@@ -535,11 +530,11 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	      break;
 	    }
 	  
-	  g_assert (io_op->io_res <= priv->input_block_size);
-	  priv->input_block_size -= io_op->io_res;
+	  g_assert (io_op->io_res <= file->input_block_size);
+	  file->input_block_size -= io_op->io_res;
 	  
-	  if (priv->input_block_size == 0)
-	    priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
+	  if (file->input_block_size == 0)
+	    file->input_state = INPUT_STATE_IN_REPLY_HEADER;
 	  
 	  op->state = READ_STATE_HANDLE_INPUT;
 	  break;
@@ -555,17 +550,17 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  if (io_op->io_res > 0)
 	    {
 	      gsize unread_size = io_op->io_size - io_op->io_res;
-	      g_string_set_size (priv->input_buffer,
-				 priv->input_buffer->len - unread_size);
+	      g_string_set_size (file->input_buffer,
+				 file->input_buffer->len - unread_size);
 	    }
 	  
-	  len = get_reply_header_missing_bytes (priv->input_buffer);
+	  len = get_reply_header_missing_bytes (file->input_buffer);
 	  if (len > 0)
 	    {
-	      gsize current_len = priv->input_buffer->len;
-	      g_string_set_size (priv->input_buffer,
+	      gsize current_len = file->input_buffer->len;
+	      g_string_set_size (file->input_buffer,
 				 current_len + len);
-	      io_op->io_buffer = priv->input_buffer->str + current_len;
+	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
 	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_READ;
@@ -576,29 +571,29 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  {
 	    GVfsDaemonSocketProtocolReply reply;
 	    char *data;
-	    data = decode_reply (priv->input_buffer, &reply);
+	    data = decode_reply (file->input_buffer, &reply);
 
 	    if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
 		reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = -1;
 		decode_error (&reply, data, &op->ret_error);
-		g_string_truncate (priv->input_buffer, 0);
+		g_string_truncate (file->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
 	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
 	      {
-		g_string_truncate (priv->input_buffer, 0);
-		priv->input_state = INPUT_STATE_IN_BLOCK;
-		priv->input_block_size = reply.arg1;
-		priv->input_block_seek_generation = reply.arg2;
+		g_string_truncate (file->input_buffer, 0);
+		file->input_state = INPUT_STATE_IN_BLOCK;
+		file->input_block_size = reply.arg1;
+		file->input_block_seek_generation = reply.arg2;
 		op->state = READ_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
 	    /* Ignore other reply types */
 	  }
 
-	  g_string_truncate (priv->input_buffer, 0);
+	  g_string_truncate (file->input_buffer, 0);
 	  
 	  /* This wasn't interesting, read next reply */
 	  op->state = READ_STATE_HANDLE_HEADER;
@@ -618,10 +613,10 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  
 	  if (io_op->io_res > 0)
 	    {
-	      g_assert (io_op->io_res <= priv->input_block_size);
-	      priv->input_block_size -= io_op->io_res;
-	      if (priv->input_block_size == 0)
-		priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
+	      g_assert (io_op->io_res <= file->input_block_size);
+	      file->input_block_size -= io_op->io_res;
+	      if (file->input_block_size == 0)
+		file->input_state = INPUT_STATE_IN_REPLY_HEADER;
 	    }
 	  
 	  op->ret_val = io_op->io_res;
@@ -677,7 +672,7 @@ g_file_input_stream_daemon_read (GInputStream *stream,
   if (op.ret_val == -1)
     g_propagate_error (error, op.ret_error);
   else
-    file->priv->current_offset += op.ret_val;
+    file->current_offset += op.ret_val;
   
   return op.ret_val;
 }
@@ -701,7 +696,6 @@ g_file_input_stream_daemon_skip (GInputStream *stream,
 static StateOp
 iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, CloseOperation *op)
 {
-  GFileInputStreamDaemonPrivate *priv = file->priv;
   gsize len;
 
   while (TRUE)
@@ -713,8 +707,8 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 	  append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CLOSE,
 			  0, 0, &op->seq_nr);
 	  op->state = CLOSE_STATE_WROTE_REQUEST;
-	  io_op->io_buffer = priv->output_buffer->str;
-	  io_op->io_size = priv->output_buffer->len;
+	  io_op->io_buffer = file->output_buffer->str;
+	  io_op->io_size = file->output_buffer->len;
 	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
 	  return STATE_OP_WRITE;
 
@@ -730,19 +724,19 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 	      return STATE_OP_DONE;
 	    }
 
-	  if (io_op->io_res < priv->output_buffer->len)
+	  if (io_op->io_res < file->output_buffer->len)
 	    {
-	      memcpy (priv->output_buffer->str,
-		      priv->output_buffer->str + io_op->io_res,
-		      priv->output_buffer->len - io_op->io_res);
-	      g_string_truncate (priv->output_buffer,
-				 priv->output_buffer->len - io_op->io_res);
-	      io_op->io_buffer = priv->output_buffer->str;
-	      io_op->io_size = priv->output_buffer->len;
+	      memcpy (file->output_buffer->str,
+		      file->output_buffer->str + io_op->io_res,
+		      file->output_buffer->len - io_op->io_res);
+	      g_string_truncate (file->output_buffer,
+				 file->output_buffer->len - io_op->io_res);
+	      io_op->io_buffer = file->output_buffer->str;
+	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
-	  g_string_truncate (priv->output_buffer, 0);
+	  g_string_truncate (file->output_buffer, 0);
 
 	  op->state = CLOSE_STATE_HANDLE_INPUT;
 	  break;
@@ -755,18 +749,18 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
 			      op->seq_nr, 0, NULL);
 	      op->state = CLOSE_STATE_WROTE_REQUEST;
-	      io_op->io_buffer = priv->output_buffer->str;
-	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_buffer = file->output_buffer->str;
+	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
 	  
-	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
+	  if (file->input_state == INPUT_STATE_IN_BLOCK)
 	    {
 	      op->state = CLOSE_STATE_HANDLE_INPUT_BLOCK;
 	      break;
 	    }
-	  else if (priv->input_state == INPUT_STATE_IN_REPLY_HEADER)
+	  else if (file->input_state == INPUT_STATE_IN_REPLY_HEADER)
 	    {
 	      op->state = CLOSE_STATE_HANDLE_HEADER;
 	      break;
@@ -776,11 +770,11 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 
 	  /* No op */
 	case CLOSE_STATE_HANDLE_INPUT_BLOCK:
-	  g_assert (priv->input_state == INPUT_STATE_IN_BLOCK);
+	  g_assert (file->input_state == INPUT_STATE_IN_BLOCK);
 	  
 	  op->state = CLOSE_STATE_SKIP_BLOCK;
 	  io_op->io_buffer = NULL;
-	  io_op->io_size = priv->input_block_size;
+	  io_op->io_size = file->input_block_size;
 	  io_op->io_allow_cancel = !op->sent_cancel;
 	  return STATE_OP_SKIP;
 
@@ -792,11 +786,11 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 	      break;
 	    }
 	  
-	  g_assert (io_op->io_res <= priv->input_block_size);
-	  priv->input_block_size -= io_op->io_res;
+	  g_assert (io_op->io_res <= file->input_block_size);
+	  file->input_block_size -= io_op->io_res;
 	  
-	  if (priv->input_block_size == 0)
-	    priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
+	  if (file->input_block_size == 0)
+	    file->input_state = INPUT_STATE_IN_REPLY_HEADER;
 	  
 	  op->state = CLOSE_STATE_HANDLE_INPUT;
 	  break;
@@ -812,17 +806,17 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 	  if (io_op->io_res > 0)
 	    {
 	      gsize unread_size = io_op->io_size - io_op->io_res;
-	      g_string_set_size (priv->input_buffer,
-				 priv->input_buffer->len - unread_size);
+	      g_string_set_size (file->input_buffer,
+				 file->input_buffer->len - unread_size);
 	    }
 	  
-	  len = get_reply_header_missing_bytes (priv->input_buffer);
+	  len = get_reply_header_missing_bytes (file->input_buffer);
 	  if (len > 0)
 	    {
-	      gsize current_len = priv->input_buffer->len;
-	      g_string_set_size (priv->input_buffer,
+	      gsize current_len = file->input_buffer->len;
+	      g_string_set_size (file->input_buffer,
 				 current_len + len);
-	      io_op->io_buffer = priv->input_buffer->str + current_len;
+	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
 	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_READ;
@@ -833,35 +827,35 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 	  {
 	    GVfsDaemonSocketProtocolReply reply;
 	    char *data;
-	    data = decode_reply (priv->input_buffer, &reply);
+	    data = decode_reply (file->input_buffer, &reply);
 
 	    if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
 		reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = FALSE;
 		decode_error (&reply, data, &op->ret_error);
-		g_string_truncate (priv->input_buffer, 0);
+		g_string_truncate (file->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
 	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
 	      {
-		g_string_truncate (priv->input_buffer, 0);
-		priv->input_state = INPUT_STATE_IN_BLOCK;
-		priv->input_block_size = reply.arg1;
-		priv->input_block_seek_generation = reply.arg2;
+		g_string_truncate (file->input_buffer, 0);
+		file->input_state = INPUT_STATE_IN_BLOCK;
+		file->input_block_size = reply.arg1;
+		file->input_block_seek_generation = reply.arg2;
 		op->state = CLOSE_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
 	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED)
 	      {
 		op->ret_val = TRUE;
-		g_string_truncate (priv->input_buffer, 0);
+		g_string_truncate (file->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
 	    /* Ignore other reply types */
 	  }
 
-	  g_string_truncate (priv->input_buffer, 0);
+	  g_string_truncate (file->input_buffer, 0);
 	  
 	  /* This wasn't interesting, read next reply */
 	  op->state = CLOSE_STATE_HANDLE_HEADER;
@@ -908,14 +902,14 @@ g_file_input_stream_daemon_close (GInputStream *stream,
 
   /* Return the first error, but close all streams */
   if (res)
-    res = g_output_stream_close (file->priv->command_stream, cancellable, error);
+    res = g_output_stream_close (file->command_stream, cancellable, error);
   else
-    g_output_stream_close (file->priv->command_stream, cancellable, NULL);
+    g_output_stream_close (file->command_stream, cancellable, NULL);
     
   if (res)
-    res = g_input_stream_close (file->priv->data_stream, cancellable, error);
+    res = g_input_stream_close (file->data_stream, cancellable, error);
   else
-    g_input_stream_close (file->priv->data_stream, cancellable, NULL);
+    g_input_stream_close (file->data_stream, cancellable, NULL);
   
   return res;
 }
@@ -927,7 +921,7 @@ g_file_input_stream_daemon_tell (GFileInputStream *stream)
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
   
-  return file->priv->current_offset;
+  return file->current_offset;
 }
 
 static gboolean
@@ -937,13 +931,12 @@ g_file_input_stream_daemon_can_seek (GFileInputStream *stream)
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  return file->priv->can_seek;
+  return file->can_seek;
 }
 
 static StateOp
 iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, SeekOperation *op)
 {
-  GFileInputStreamDaemonPrivate *priv = file->priv;
   gsize len;
   guint32 request;
 
@@ -964,8 +957,8 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 			  &op->seq_nr);
 	  op->state = SEEK_STATE_WROTE_REQUEST;
 	  op->sent_seek = FALSE;
-	  io_op->io_buffer = priv->output_buffer->str;
-	  io_op->io_size = priv->output_buffer->len;
+	  io_op->io_buffer = file->output_buffer->str;
+	  io_op->io_size = file->output_buffer->len;
 	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
 	  return STATE_OP_WRITE;
 
@@ -984,22 +977,22 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  /* We weren't cancelled before first byte sent, so now we will send
 	   * the seek request. Increase the seek generation now. */
 	  if (!op->sent_seek)
-	    priv->seek_generation++;
+	    file->seek_generation++;
 	  op->sent_seek = TRUE;
 	  
-	  if (io_op->io_res < priv->output_buffer->len)
+	  if (io_op->io_res < file->output_buffer->len)
 	    {
-	      memcpy (priv->output_buffer->str,
-		      priv->output_buffer->str + io_op->io_res,
-		      priv->output_buffer->len - io_op->io_res);
-	      g_string_truncate (priv->output_buffer,
-				 priv->output_buffer->len - io_op->io_res);
-	      io_op->io_buffer = priv->output_buffer->str;
-	      io_op->io_size = priv->output_buffer->len;
+	      memcpy (file->output_buffer->str,
+		      file->output_buffer->str + io_op->io_res,
+		      file->output_buffer->len - io_op->io_res);
+	      g_string_truncate (file->output_buffer,
+				 file->output_buffer->len - io_op->io_res);
+	      io_op->io_buffer = file->output_buffer->str;
+	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
-	  g_string_truncate (priv->output_buffer, 0);
+	  g_string_truncate (file->output_buffer, 0);
 
 	  op->state = SEEK_STATE_HANDLE_INPUT;
 	  break;
@@ -1012,18 +1005,18 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
 			      op->seq_nr, 0, NULL);
 	      op->state = SEEK_STATE_WROTE_REQUEST;
-	      io_op->io_buffer = priv->output_buffer->str;
-	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_buffer = file->output_buffer->str;
+	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
 	      return STATE_OP_WRITE;
 	    }
 	  
-	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
+	  if (file->input_state == INPUT_STATE_IN_BLOCK)
 	    {
 	      op->state = SEEK_STATE_HANDLE_INPUT_BLOCK;
 	      break;
 	    }
-	  else if (priv->input_state == INPUT_STATE_IN_REPLY_HEADER)
+	  else if (file->input_state == INPUT_STATE_IN_REPLY_HEADER)
 	    {
 	      op->state = SEEK_STATE_HANDLE_HEADER;
 	      break;
@@ -1033,12 +1026,12 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 
 	  /* No op */
 	case SEEK_STATE_HANDLE_INPUT_BLOCK:
-	  g_assert (priv->input_state == INPUT_STATE_IN_BLOCK);
+	  g_assert (file->input_state == INPUT_STATE_IN_BLOCK);
 	  
 	  op->state = SEEK_STATE_SKIP_BLOCK;
 	  /* Reuse client buffer for skipping */
 	  io_op->io_buffer = NULL;
-	  io_op->io_size = priv->input_block_size;
+	  io_op->io_size = file->input_block_size;
 	  io_op->io_allow_cancel = !op->sent_cancel;
 	  return STATE_OP_SKIP;
 
@@ -1050,11 +1043,11 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	      break;
 	    }
 	  
-	  g_assert (io_op->io_res <= priv->input_block_size);
-	  priv->input_block_size -= io_op->io_res;
+	  g_assert (io_op->io_res <= file->input_block_size);
+	  file->input_block_size -= io_op->io_res;
 	  
-	  if (priv->input_block_size == 0)
-	    priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
+	  if (file->input_block_size == 0)
+	    file->input_state = INPUT_STATE_IN_REPLY_HEADER;
 	  
 	  op->state = SEEK_STATE_HANDLE_INPUT;
 	  break;
@@ -1070,17 +1063,17 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  if (io_op->io_res > 0)
 	    {
 	      gsize unread_size = io_op->io_size - io_op->io_res;
-	      g_string_set_size (priv->input_buffer,
-				 priv->input_buffer->len - unread_size);
+	      g_string_set_size (file->input_buffer,
+				 file->input_buffer->len - unread_size);
 	    }
 	  
-	  len = get_reply_header_missing_bytes (priv->input_buffer);
+	  len = get_reply_header_missing_bytes (file->input_buffer);
 	  if (len > 0)
 	    {
-	      gsize current_len = priv->input_buffer->len;
-	      g_string_set_size (priv->input_buffer,
+	      gsize current_len = file->input_buffer->len;
+	      g_string_set_size (file->input_buffer,
 				 current_len + len);
-	      io_op->io_buffer = priv->input_buffer->str + current_len;
+	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
 	      io_op->io_allow_cancel = !op->sent_cancel;
 	      return STATE_OP_READ;
@@ -1091,22 +1084,22 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  {
 	    GVfsDaemonSocketProtocolReply reply;
 	    char *data;
-	    data = decode_reply (priv->input_buffer, &reply);
+	    data = decode_reply (file->input_buffer, &reply);
 
 	    if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
 		reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = FALSE;
 		decode_error (&reply, data, &op->ret_error);
-		g_string_truncate (priv->input_buffer, 0);
+		g_string_truncate (file->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
 	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
 	      {
-		g_string_truncate (priv->input_buffer, 0);
-		priv->input_state = INPUT_STATE_IN_BLOCK;
-		priv->input_block_size = reply.arg1;
-		priv->input_block_seek_generation = reply.arg2;
+		g_string_truncate (file->input_buffer, 0);
+		file->input_state = INPUT_STATE_IN_BLOCK;
+		file->input_block_size = reply.arg1;
+		file->input_block_seek_generation = reply.arg2;
 		op->state = SEEK_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
@@ -1114,13 +1107,13 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	      {
 		op->ret_val = TRUE;
 		op->ret_offset = ((goffset)reply.arg2) << 32 | (goffset)reply.arg1;
-		g_string_truncate (priv->input_buffer, 0);
+		g_string_truncate (file->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
 	    /* Ignore other reply types */
 	  }
 
-	  g_string_truncate (priv->input_buffer, 0);
+	  g_string_truncate (file->input_buffer, 0);
 	  
 	  /* This wasn't interesting, read next reply */
 	  op->state = SEEK_STATE_HANDLE_HEADER;
@@ -1149,7 +1142,7 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!file->priv->can_seek)
+  if (!file->can_seek)
     {
       g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
 		   _("Seek not supported on stream"));
@@ -1177,7 +1170,7 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
   if (!op.ret_val)
     g_propagate_error (error, op.ret_error);
   else
-    file->priv->current_offset = op.ret_offset;
+    file->current_offset = op.ret_offset;
   
   return op.ret_val;
 }
@@ -1332,7 +1325,7 @@ async_iterate (AsyncIterator *iterator)
   
   if (io_op == STATE_OP_READ)
     {
-      g_input_stream_read_async (file->priv->data_stream,
+      g_input_stream_read_async (file->data_stream,
 				 io_data->io_buffer, io_data->io_size,
 				 iterator->io_priority,
 				 async_read_op_callback, iterator,
@@ -1340,7 +1333,7 @@ async_iterate (AsyncIterator *iterator)
     }
   else if (io_op == STATE_OP_SKIP)
     {
-      g_input_stream_skip_async (file->priv->data_stream,
+      g_input_stream_skip_async (file->data_stream,
 				 io_data->io_size,
 				 iterator->io_priority,
 				 async_skip_op_callback, iterator,
@@ -1348,7 +1341,7 @@ async_iterate (AsyncIterator *iterator)
     }
   else if (io_op == STATE_OP_WRITE)
     {
-      g_output_stream_write_async (file->priv->command_stream,
+      g_output_stream_write_async (file->command_stream,
 				   io_data->io_buffer, io_data->io_size,
 				   iterator->io_priority,
 				   async_write_op_callback, iterator,
@@ -1494,14 +1487,14 @@ async_close_done (GInputStream *stream,
     }
 
   if (result)
-    result = g_output_stream_close (file->priv->command_stream, cancellable, &error);
+    result = g_output_stream_close (file->command_stream, cancellable, &error);
   else
-    g_output_stream_close (file->priv->command_stream, cancellable, NULL);
+    g_output_stream_close (file->command_stream, cancellable, NULL);
     
   if (result)
-    result = g_input_stream_close (file->priv->data_stream, cancellable, &error);
+    result = g_input_stream_close (file->data_stream, cancellable, &error);
   else
-    g_input_stream_close (file->priv->data_stream, cancellable, NULL);
+    g_input_stream_close (file->data_stream, cancellable, NULL);
   
   if (callback)
     ((GAsyncCloseInputCallback)callback) (stream,

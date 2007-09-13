@@ -14,15 +14,6 @@ G_BEGIN_DECLS
 
 typedef struct _GFileInputStreamDaemon         GFileInputStreamDaemon;
 typedef struct _GFileInputStreamDaemonClass    GFileInputStreamDaemonClass;
-typedef struct _GFileInputStreamDaemonPrivate  GFileInputStreamDaemonPrivate;
-
-struct _GFileInputStreamDaemon
-{
-  GFileInputStream parent;
-
-  /*< private >*/
-  GFileInputStreamDaemonPrivate *priv;
-};
 
 struct _GFileInputStreamDaemonClass
 {
