@@ -14,16 +14,57 @@ enum {
   PROP_BASE_STREAM
 };
 
-static void g_filter_input_stream_set_property (GObject      *object,
-                                                guint         prop_id,
-                                                const GValue *value,
-                                                GParamSpec   *pspec);
+static void     g_filter_input_stream_set_property (GObject      *object,
+                                                    guint         prop_id,
+                                                    const GValue *value,
+                                                    GParamSpec   *pspec);
 
-static void g_filter_input_stream_get_property (GObject      *object,
-                                                guint         prop_id,
-                                                GValue       *value,
-                                                GParamSpec   *pspec);
-static void g_filter_input_stream_finalize     (GObject *object);
+static void     g_filter_input_stream_get_property (GObject      *object,
+                                                    guint         prop_id,
+                                                    GValue       *value,
+                                                    GParamSpec   *pspec);
+static void     g_filter_input_stream_finalize     (GObject *object);
+
+
+static gssize   g_filter_input_stream_read         (GInputStream         *stream,
+                                                    void                 *buffer,
+                                                    gsize                 count,
+                                                    GCancellable         *cancellable,
+                                                    GError              **error);
+static gssize   g_filter_input_stream_skip         (GInputStream         *stream,
+                                                    gsize                 count,
+                                                    GCancellable         *cancellable,
+                                                    GError              **error);
+static gboolean g_filter_input_stream_close        (GInputStream         *stream,
+                                                    GCancellable         *cancellable,
+                                                    GError              **error);
+static void     g_filter_input_stream_read_async   (GInputStream         *stream,
+                                                    void                 *buffer,
+                                                    gsize                 count,
+                                                    int                   io_priority,
+                                                    GCancellable         *cancellable,
+                                                    GAsyncReadyCallback   callback,
+                                                    gpointer              user_data);
+static gssize   g_filter_input_stream_read_finish  (GInputStream         *stream,
+                                                    GAsyncResult         *result,
+                                                    GError              **error);
+static void     g_filter_input_stream_skip_async   (GInputStream         *stream,
+                                                    gsize                 count,
+                                                    int                   io_priority,
+                                                    GCancellable         *cancellabl,
+                                                    GAsyncReadyCallback   callback,
+                                                    gpointer              datae);
+static gssize   g_filter_input_stream_skip_finish  (GInputStream         *stream,
+                                                    GAsyncResult         *result,
+                                                    GError              **error);
+static void     g_filter_input_stream_close_async  (GInputStream         *stream,
+                                                    int                   io_priority,
+                                                    GCancellable         *cancellabl,
+                                                    GAsyncReadyCallback   callback,
+                                                    gpointer              data);
+static gboolean g_filter_input_stream_close_finish (GInputStream         *stream,
+                                                    GAsyncResult         *result,
+                                                    GError              **error);
 
 G_DEFINE_TYPE (GFilterInputStream, g_filter_input_stream, G_TYPE_INPUT_STREAM)
 
@@ -32,11 +73,24 @@ static void
 g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
 {
   GObjectClass *object_class;
+  GInputStreamClass *istream_class;
 
   object_class = G_OBJECT_CLASS (klass);
   object_class->get_property = g_filter_input_stream_get_property;
   object_class->set_property = g_filter_input_stream_set_property;
   object_class->finalize     = g_filter_input_stream_finalize;
+
+  istream_class = G_INPUT_STREAM_CLASS (klass);
+  istream_class->read  = g_filter_input_stream_read;
+  istream_class->skip  = g_filter_input_stream_skip;
+  istream_class->close = g_filter_input_stream_close;
+
+  istream_class->read_async   = g_filter_input_stream_read_async;
+  istream_class->read_finish  = g_filter_input_stream_read_finish;
+  istream_class->skip_async   = g_filter_input_stream_skip_async;
+  istream_class->skip_finish  = g_filter_input_stream_skip_finish;
+  istream_class->close_async  = g_filter_input_stream_close_async;
+  istream_class->close_finish = g_filter_input_stream_close_finish;
 
   g_object_class_install_property (object_class,
                                    PROP_BASE_STREAM,
@@ -121,6 +175,193 @@ GInputStream *
 g_filter_input_stream_get_base_stream (GFilterInputStream *stream)
 {
   return stream->base_stream;
+}
+
+static gssize
+g_filter_input_stream_read (GInputStream *stream,
+                            void         *buffer,
+                            gsize         count,
+                            GCancellable *cancellable,
+                            GError      **error)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+  gssize              nread;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  nread = g_input_stream_read (base_stream,
+                               buffer,
+                               count,
+                               cancellable,
+                               error);
+
+  return nread;
+}
+static gssize
+g_filter_input_stream_skip (GInputStream              *stream,
+                            gsize                      count,
+                            GCancellable              *cancellable,
+                            GError                   **error)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+  gssize              nskipped;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  nskipped = g_input_stream_skip (base_stream,
+                                  count,
+                                  cancellable,
+                                  error);
+  return nskipped;
+}
+
+static gboolean
+g_filter_input_stream_close (GInputStream  *stream,
+                             GCancellable  *cancellable,
+                             GError       **error)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+  gboolean            res;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  res = g_input_stream_close (base_stream,
+                              cancellable,
+                              error);
+
+  return res;
+}
+
+static void
+g_filter_input_stream_read_async (GInputStream           *stream,
+                                  void                   *buffer,
+                                  gsize                   count,
+                                  int                     io_priority,
+                                  GCancellable           *cancellable,
+                                  GAsyncReadyCallback     callback,
+                                  gpointer                user_data)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  g_input_stream_read_async (base_stream,
+                             buffer,
+                             count,
+                             io_priority,
+                             cancellable,
+                             callback,
+                             user_data);
+}
+
+static gssize
+g_filter_input_stream_read_finish (GInputStream  *stream,
+                                   GAsyncResult  *result,
+                                   GError       **error)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+  gssize nread;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  nread = g_input_stream_read_finish (base_stream,
+                                      result,
+                                      error);
+  
+  return nread;
+}
+
+static void
+g_filter_input_stream_skip_async (GInputStream        *stream,
+                                  gsize                count,
+                                  int                  io_priority,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  g_input_stream_skip_async (base_stream,
+                             count,
+                             io_priority,
+                             cancellable,
+                             callback,
+                             user_data);
+
+}
+
+static gssize
+g_filter_input_stream_skip_finish (GInputStream  *stream,
+                                   GAsyncResult  *result,
+                                   GError       **error)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+  gssize nskipped;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  nskipped = g_input_stream_skip_finish (base_stream,
+                                         result,
+                                         error);
+
+  return nskipped;
+}
+
+static void
+g_filter_input_stream_close_async (GInputStream         *stream,
+                                   int                   io_priority,
+                                   GCancellable         *cancellable,
+                                   GAsyncReadyCallback   callback,
+                                   gpointer              user_data)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  g_input_stream_close_async (base_stream,
+                              io_priority,
+                              cancellable,
+                              callback,
+                              user_data);
+
+
+}
+
+static gboolean
+g_filter_input_stream_close_finish (GInputStream  *stream,
+                                    GAsyncResult  *result,
+                                    GError       **error)
+{
+  GFilterInputStream *filter_stream;
+  GInputStream       *base_stream;
+  gboolean res;
+
+  filter_stream = G_FILTER_INPUT_STREAM (stream);
+  base_stream = filter_stream->base_stream;
+
+  res = g_input_stream_close_finish (stream,
+                                     result,
+                                     error);
+
+  return res;
 }
 
 /* vim: ts=2 sw=2 et */
