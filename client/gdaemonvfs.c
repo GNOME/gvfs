@@ -266,6 +266,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
       return g_string_free (string, FALSE);
     }
 
+  uri = NULL;
   mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
   if (mapper)
     uri = g_vfs_uri_mapper_to_uri (mapper, spec, path, allow_utf8);
