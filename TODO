@@ -20,8 +20,6 @@ GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 
 HAL implementation of VolumeMonitor
 
-Handle the conflicting globs (*.pcf) case and fallback to sniffing
-
 Move GAppInfo to Gtk+
 
 Add PRE_UNMOUNT file monitor event?
@@ -32,6 +30,7 @@ Add sort-priority file attribute so that e.g. volumes can be sorted not just by 
 
 Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg list.
 Implement std:icon for local files. This is related to mimetype decisions (fast vs slow)
+Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
 gvfs:
 ====
