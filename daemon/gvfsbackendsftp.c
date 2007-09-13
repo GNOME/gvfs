@@ -35,6 +35,11 @@
 #include "sftp.h"
 #include "pty_open.h"
 
+#ifdef HAVE_GRANTPT
+/* We only use this on systems with unix98 ptys */
+#define USE_PTY 1
+#endif
+
 typedef enum {
   SFTP_VENDOR_INVALID = 0,
   SFTP_VENDOR_OPENSSH,
@@ -52,14 +57,20 @@ struct _GVfsBackendSftp
 
   GOutputStream *command_stream;
   GInputStream *reply_stream;
+  GDataInputStream *error_stream;
   
   GMountSource *mount_source; /* Only used/set during mount */
   int mount_try;
   gboolean mount_try_again;
 };
 
-
 G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
+
+static void
+make_fd_nonblocking (int fd)
+{
+  fcntl (fd, F_SETFL, O_NONBLOCK | fcntl (fd, F_GETFL));
+}
 
 static SFTPClientVendor
 get_sftp_client_vendor (void)
@@ -112,10 +123,65 @@ g_vfs_backend_sftp_init (GVfsBackendSftp *backend)
 {
 }
 
-#ifdef HAVE_GRANTPT
-/* We only use this on systems with unix98 ptys */
-#define USE_PTY 1
-#endif
+
+static void
+look_for_stderr_errors (GVfsBackend *backend, GError **error)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  char *line;
+
+  while (1)
+    {
+      line = g_data_input_stream_get_line (op_backend->error_stream, NULL, NULL, NULL);
+      
+      if (line == NULL)
+	{
+	  /* Error (real or WOULDBLOCK) or EOF */
+	  g_set_error (error,
+		       G_IO_ERROR, G_IO_ERROR_FAILED,
+		       _("ssh program unexpectedly exited"));
+	  return;
+	}
+
+      if (strstr (line, "Permission denied") != NULL)
+	{
+	  g_set_error (error,
+		       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+		       _("Permission denied"));
+	  return;
+	}
+      else if (strstr (line, "Name or service not known") != NULL)
+	{
+	  g_set_error (error,
+		       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+		       _("Hostname not known"));
+	  return;
+	}
+      else if (strstr (line, "No route to host") != NULL)
+	{
+	  g_set_error (error,
+		       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+		       _("No route to host"));
+	  return;
+	}
+      else if (strstr (line, "Connection refused") != NULL)
+	{
+	  g_set_error (error,
+		       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+		       _("Connection refused by server"));
+	  return;
+	}
+      else if (strstr (line, "Host key verification failed") != NULL) 
+	{
+	  g_set_error (error,
+		       G_IO_ERROR, G_IO_ERROR_FAILED,
+		       _("Host key verification failed"));
+	  return;
+	}
+      
+      g_free (line);
+    }
+}
 
 static char **
 setup_ssh_commandline (GVfsBackend *backend)
@@ -469,6 +535,7 @@ do_mount (GVfsBackend *backend,
   pid_t pid;
   int tty_fd, stdout_fd, stdin_fd, stderr_fd;
   GError *error;
+  GInputStream *is;
   GOutputStream *so;
   GDataOutputStream *ds;
   gboolean res;
@@ -505,6 +572,7 @@ do_mount (GVfsBackend *backend,
     res = wait_for_reply (backend, stdout_fd, &error);
   else
     res = handle_login (backend, mount_source, tty_fd, stdout_fd, stderr_fd, &error);
+  
   if (!res)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -512,18 +580,22 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  op_backend->command_stream = g_socket_output_stream_new (stdout_fd, TRUE);
+  op_backend->command_stream = g_socket_output_stream_new (stdin_fd, TRUE);
   op_backend->reply_stream = g_socket_input_stream_new (stdout_fd, TRUE);
 
-  reply = read_reply_sync (backend, &error);
+  make_fd_nonblocking (stderr_fd);
+  is = g_socket_input_stream_new (stderr_fd, TRUE);
+  op_backend->error_stream = g_data_input_stream_new (is);
+  g_object_unref (is);
+
+  reply = read_reply_sync (backend, NULL);
   if (reply == NULL)
     {
+      look_for_stderr_errors (backend, &error);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
-
-  /* TODO: On errors above, check stderr_fd output for errors */
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
   if (op_backend->user_specified)
@@ -578,308 +650,6 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
-static void 
-do_open_for_read (GVfsBackend *backend,
-		  GVfsJobOpenForRead *job,
-		  const char *filename)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-
-#if 0
-  if (file == NULL)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    {
-      g_vfs_job_open_for_read_set_can_seek (job, TRUE);
-      g_vfs_job_open_for_read_set_handle (job, file);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-#endif
-}
-
-static void
-do_read (GVfsBackend *backend,
-	 GVfsJobRead *job,
-	 GVfsBackendHandle handle,
-	 char *buffer,
-	 gsize bytes_requested)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-
-#if 0
-  if (res == -1)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    {
-      g_vfs_job_read_set_size (job, res);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-	    
-    }
-#endif
-}
-
-static void
-do_seek_on_read (GVfsBackend *backend,
-		 GVfsJobSeekRead *job,
-		 GVfsBackendHandle handle,
-		 goffset    offset,
-		 GSeekType  type)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-#if 0
-  switch (type)
-    {
-    case G_SEEK_SET:
-      whence = SEEK_SET;
-      break;
-    case G_SEEK_CUR:
-      whence = SEEK_CUR;
-      break;
-    case G_SEEK_END:
-      whence = SEEK_END;
-      break;
-    default:
-      g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			_("Unsupported seek type"));
-      return;
-    }
-#endif
-
-  /* TODO */
-
-#if 0
-  if (res == (off_t)-1)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    {
-      g_vfs_job_seek_read_set_offset (job, res);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-#endif
-}
-
-static void
-do_close_read (GVfsBackend *backend,
-	       GVfsJobCloseRead *job,
-	       GVfsBackendHandle handle)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-
-#if 0
-  if (res == -1)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-#endif
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-}
-
-static void
-do_create (GVfsBackend *backend,
-	   GVfsJobOpenForWrite *job,
-	   const char *filename)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-
-#if 0
-  if (file == NULL)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    {
-      handle = g_new0 (SftpWriteHandle, 1);
-      handle->file = file;
-
-      g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-      g_vfs_job_open_for_write_set_handle (job, handle);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-#endif
-}
-
-static void
-do_append_to (GVfsBackend *backend,
-	      GVfsJobOpenForWrite *job,
-	      const char *filename)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-
-#if 0
-  if (file == NULL)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    {
-      handle = g_new0 (SftpWriteHandle, 1);
-      handle->file = file;
-
-      initial_offset = op_backend->sftp_context->lseek (op_backend->sftp_context, file,
-						       0, SEEK_CUR);
-      if (initial_offset == (off_t) -1)
-	g_vfs_job_open_for_write_set_can_seek (job, FALSE);
-      else
-	{
-	  g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
-	  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-	}
-      g_vfs_job_open_for_write_set_handle (job, handle);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-#endif
-}
-
-static void
-do_replace (GVfsBackend *backend,
-	    GVfsJobOpenForWrite *job,
-	    const char *filename,
-	    time_t mtime,
-	    gboolean make_backup)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_write (GVfsBackend *backend,
-	  GVfsJobWrite *job,
-	  GVfsBackendHandle _handle,
-	  char *buffer,
-	  gsize buffer_size)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-
-#if 0
-  if (res == -1)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    {
-      g_vfs_job_write_set_written_size (job, res);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
-#endif
-}
-
-static void
-do_seek_on_write (GVfsBackend *backend,
-		  GVfsJobSeekWrite *job,
-		  GVfsBackendHandle _handle,
-		  goffset    offset,
-		  GSeekType  type)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_close_write (GVfsBackend *backend,
-		GVfsJobCloseWrite *job,
-		GVfsBackendHandle _handle)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_get_info (GVfsBackend *backend,
-	     GVfsJobGetInfo *job,
-	     const char *filename,
-	     const char *attributes,
-	     GFileGetInfoFlags flags)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_get_fs_info (GVfsBackend *backend,
-		GVfsJobGetFsInfo *job,
-		const char *filename,
-		const char *attributes)
-{
-  /* TODO */
-}
-
-static gboolean
-try_query_settable_attributes (GVfsBackend *backend,
-			       GVfsJobQueryAttributes *job,
-			       const char *filename)
-{
-  /* TODO */
-
-  return TRUE;
-}
-
-static void
-do_enumerate (GVfsBackend *backend,
-	      GVfsJobEnumerate *job,
-	      const char *filename,
-	      const char *attributes,
-	      GFileGetInfoFlags flags)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_set_display_name (GVfsBackend *backend,
-		     GVfsJobSetDisplayName *job,
-		     const char *filename,
-		     const char *display_name)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_delete (GVfsBackend *backend,
-	   GVfsJobDelete *job,
-	   const char *filename)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_make_directory (GVfsBackend *backend,
-		   GVfsJobMakeDirectory *job,
-		   const char *filename)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
-
-static void
-do_move (GVfsBackend *backend,
-	 GVfsJobMove *job,
-	 const char *source,
-	 const char *destination,
-	 GFileCopyFlags flags,
-	 GFileProgressCallback progress_callback,
-	 gpointer progress_callback_data)
-{
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-
-  /* TODO */
-}
 
 static void
 g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
@@ -891,22 +661,4 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 
   backend_class->mount = do_mount;
   backend_class->try_mount = try_mount;
-  backend_class->open_for_read = do_open_for_read;
-  backend_class->read = do_read;
-  backend_class->seek_on_read = do_seek_on_read;
-  backend_class->close_read = do_close_read;
-  backend_class->create = do_create;
-  backend_class->append_to = do_append_to;
-  backend_class->replace = do_replace;
-  backend_class->write = do_write;
-  backend_class->seek_on_write = do_seek_on_write;
-  backend_class->close_write = do_close_write;
-  backend_class->get_info = do_get_info;
-  backend_class->get_fs_info = do_get_fs_info;
-  backend_class->enumerate = do_enumerate;
-  backend_class->set_display_name = do_set_display_name;
-  backend_class->delete = do_delete;
-  backend_class->make_directory = do_make_directory;
-  backend_class->move = do_move;
-  backend_class->try_query_settable_attributes = try_query_settable_attributes;
 }
