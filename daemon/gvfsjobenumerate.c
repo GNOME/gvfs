@@ -119,7 +119,10 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   DBusMessage *message, *orig_message;
   DBusMessageIter iter, array_iter;
   char *sig;
+  int num;
 
+ restart:
+  
   orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
   
   message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
@@ -139,12 +142,15 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   
   g_free (sig);
 
+  num = 0;
   while (infos != NULL)
     {
       g_dbus_append_file_info (&array_iter, 
 			       job->requested_result,
 			       infos->data);
       infos = infos->next;
+      if (++num > 100)
+	break;
     }
 
   if (!dbus_message_iter_close_container (&iter, &array_iter))
@@ -153,6 +159,9 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
 			message, NULL);
   dbus_message_unref (message);
+
+  if (infos != NULL)
+    goto restart;
 }
 
 void
