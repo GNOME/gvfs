@@ -402,7 +402,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
       ref->dbus_id = g_strdup (dbus_id);
       ref->object_path = g_strdup (obj_path);
       ref->spec = g_mount_spec_ref (mount_spec);
-      if (*prefered_filename_encoding != NULL)
+      if (prefered_filename_encoding != NULL && *prefered_filename_encoding != 0) 
 	ref->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
 
       the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, ref);
