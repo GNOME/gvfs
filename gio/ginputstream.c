@@ -3,6 +3,7 @@
 #include <glib.h>
 
 #include "ginputstream.h"
+#include "gseekable.h"
 #include "gsimpleasyncresult.h"
 
 G_DEFINE_TYPE (GInputStream, g_input_stream, G_TYPE_OBJECT);
@@ -260,12 +261,13 @@ g_input_stream_read_all (GInputStream              *stream,
  * but the bytes that are skipped are not returned to the user. Some
  * streams have an implementation that is more efficient than reading the data.
  *
- * This function is optional for inherited classes.
+ * This function is optional for inherited classes, as the default implementation
+ * emulates it using read.
  *
  * If @cancellable is not NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error G_IO_ERROR_CANCELLED will be returned. If an
- * operation was partially finished when the operation was finished the
+ * operation was partially finished when the operation was cancelled the
  * partial result will be returned, without an error.
  *
  * Return value: Number of bytes skipped, or -1 on error
@@ -328,17 +330,50 @@ g_input_stream_real_skip (GInputStream         *stream,
 			  GError              **error)
 {
   GInputStreamClass *class;
-  gssize ret;
-  char *buffer;
+  gssize ret, read_bytes;
+  char buffer[4096];
+  GError *my_error;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  /* TODO: Skip fallback uses too much memory, should do multiple calls */
-  buffer = g_malloc (count);
-  ret = class->read (stream, buffer, count, cancellable, error);
-  g_free (buffer);
+  if (G_IS_SEEKABLE (stream))
+    {
+      if (g_seekable_seek (G_SEEKABLE (stream),
+			   count,
+			   G_SEEK_CUR,
+			   cancellable,
+			   NULL))
+	return count;
+    }
 
-  return ret;
+  /* If not seekable, or seek failed, fall back to reading data: */
+
+  read_bytes = 0;
+  while (1)
+    {
+      my_error = NULL;
+      ret = g_input_stream_read (stream, buffer, MIN (sizeof (buffer), count),
+				 cancellable, &my_error);
+      if (ret == -1)
+	{
+	  if (read_bytes > 0 &&
+	      my_error->domain == G_IO_ERROR &&
+	      my_error->code == G_IO_ERROR_CANCELLED)
+	    {
+	      g_error_free (my_error);
+	      return read_bytes;
+	    }
+	  
+	  g_propagate_error (error, my_error);
+	  return -1;
+	}
+
+      count -= ret;
+      read_bytes += ret;
+      
+      if (ret == 0 || count == 0)
+	return read_bytes;
+    }
 }
 
 /**
