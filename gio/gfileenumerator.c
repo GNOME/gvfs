@@ -503,6 +503,9 @@ next_op_func (GIOJob *job,
 	      
 	  break;
 	}
+      else
+	op->files = g_list_prepend (op->files, info);
+
     }
   
   if (op->op.error != NULL)
