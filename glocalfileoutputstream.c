@@ -24,7 +24,6 @@ struct _GLocalFileOutputStreamPrivate {
   GOutputStreamOpenMode open_mode;
   time_t original_mtime;
   gboolean create_backup;
-  time_t final_mtime;
   int fd;
 };
 
@@ -503,14 +502,13 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	}
     }
   
-  if (fstat (file->priv->fd, &final_stat) != 0)
+  if (g_file_output_stream_get_should_get_final_mtime (G_FILE_OUTPUT_STREAM (stream)) &&
+      fstat (file->priv->fd, &final_stat) == 0)
     {
-      g_vfs_error_from_errno (error, errno);
-      goto err_out;
+      g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
+					    final_stat.st_mtime);
     }
 
-  file->priv->final_mtime = final_stat.st_mtime;
-  
   while (1)
     {
       res = close (file->priv->fd);
