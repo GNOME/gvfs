@@ -206,7 +206,7 @@ handle_overwrite_open (GLocalFileOutputStream *file,
 #else
   fd = g_open (file->priv->filename, open_flags, 0666);
   /* This is racy, but we do it as soon as possible to minimize the race */
-  is_symlink = g_file_test (file->priv->filename, G_FILE_TEST_IS_SYMLINK)
+  is_symlink = g_file_test (file->priv->filename, G_FILE_TEST_IS_SYMLINK);
 #endif
     
   if (fd == -1)
