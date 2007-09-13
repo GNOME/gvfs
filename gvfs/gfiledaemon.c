@@ -10,6 +10,7 @@
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include <gfileinputstreamdaemon.h>
+#include <gfileenumeratordaemon.h>
 #include <glib/gi18n-lib.h>
 
 static void g_file_daemon_file_iface_init (GFileIface       *iface);
@@ -160,6 +161,7 @@ g_file_daemon_get_child (GFile *file,
 static DBusMessage *
 do_sync_path_call (GFile *file,
 		   const char *op,
+		   DBusConnection **connection_out,
 		   GCancellable *cancellable,
 		   GError **error,
 		   int first_arg_type,
@@ -180,7 +182,7 @@ do_sync_path_call (GFile *file,
   /* TODO: handle nonmounted => message == NULL */
   
   reply = _g_vfs_daemon_call_sync (message,
-				   NULL,
+				   connection_out,
 				   cancellable, error);
   dbus_message_unref (message);
   
@@ -193,7 +195,55 @@ g_file_daemon_enumerate_children (GFile      *file,
 				  const char *attributes,
 				  gboolean follow_symlinks)
 {
-  /* TODO: implement */
+  DBusMessage *reply;
+  guint32 requested_32;
+  dbus_bool_t follow_symlinks_dbus;
+  DBusMessageIter iter;
+  char *obj_path;
+  GFileEnumeratorDaemon *enumerator;
+  DBusConnection *connection;
+
+  enumerator = g_file_enumerator_daemon_new ();
+  obj_path = g_file_enumerator_daemon_get_object_path (enumerator);
+						       
+  requested_32 = (guint32)requested;
+  if (attributes == NULL)
+    attributes = "";
+  follow_symlinks_dbus = follow_symlinks;
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_OP_ENUMERATE,
+			     &connection, NULL /*cancellable*/, NULL /*error*/,
+			     DBUS_TYPE_STRING, &obj_path,
+			     DBUS_TYPE_UINT32, &requested_32,
+			     DBUS_TYPE_STRING, &attributes,
+			     DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
+			     0);
+  
+  g_free (obj_path);
+  
+  if (reply == NULL)
+    goto error;
+
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_UINT32))
+    {
+      /*      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	      _("Invalid return value from Enumerate"));*/
+      goto error;
+    }
+
+  dbus_message_iter_get_basic (&iter, &requested_32);
+  
+  dbus_message_unref (reply);
+
+  g_file_enumerator_daemon_set_sync_connection (enumerator, connection);
+  
+  return G_FILE_ENUMERATOR (enumerator);
+
+ error:
+  if (reply)
+    dbus_message_unref (reply);
+  g_object_unref (enumerator);
   return NULL;
 }
 
@@ -217,7 +267,7 @@ g_file_daemon_get_info (GFile                *file,
   follow_symlinks_dbus = follow_symlinks;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_OP_GET_INFO,
-			     cancellable, error,
+			     NULL, cancellable, error,
 			     DBUS_TYPE_UINT32, &requested_32,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_BOOLEAN, &follow_symlinks_dbus,
@@ -354,24 +404,16 @@ g_file_daemon_read (GFile *file,
 		    GCancellable *cancellable,
 		    GError **error)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
   DBusConnection *connection;
   int fd;
-  DBusMessage *message, *reply;
+  DBusMessage *reply;
   guint32 fd_id;
   dbus_bool_t can_seek;
 
-  message =
-    _g_vfs_impl_daemon_new_path_call (daemon_file->match_bus_name,
-				      daemon_file->path,
-				      G_VFS_DBUS_OP_OPEN_FOR_READ,
-				      0);
-  /* TODO: handle nonmounted => message == NULL */
-
-  reply = _g_vfs_daemon_call_sync (message,
-				   &connection,
-				   cancellable, error);
-  dbus_message_unref (message);
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_OP_OPEN_FOR_READ,
+			     &connection, cancellable, error,
+			     0);
   if (reply == NULL)
     return NULL;
 

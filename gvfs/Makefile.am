@@ -41,6 +41,7 @@ daemon_sources = \
 	gfiledaemonlocal.c gfiledaemonlocal.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gfileinputstreamdaemon.c gfileinputstreamdaemon.h \
+	gfileenumeratordaemon.c gfileenumeratordaemon.h \
 	gvfsdaemondbus.c \
 	$(NULL)
 
