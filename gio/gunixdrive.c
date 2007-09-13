@@ -216,18 +216,35 @@ g_unix_drive_has_mountpoint (GUnixDrive *drive,
 static void
 g_unix_drive_mount (GDrive         *drive,
 		    GMountOperation *mount_operation,
-		    GVolumeCallback callback,
+		    GAsyncReadyCallback callback,
 		    gpointer        user_data)
 {
   /* TODO */
 }
 
+
+static gboolean
+g_unix_drive_mount_finish (GDrive *drive,
+			   GAsyncResult *result,
+			   GError **error)
+{
+  return TRUE;
+}
+
 static void
 g_unix_drive_eject (GDrive         *drive,
-		    GVolumeCallback callback,
+		    GAsyncReadyCallback callback,
 		    gpointer        user_data)
 {
   /* TODO */
+}
+
+static gboolean
+g_unix_drive_eject_finish (GDrive *drive,
+			   GAsyncResult *result,
+			   GError **error)
+{
+  return TRUE;
 }
 
 static void
@@ -240,5 +257,7 @@ g_unix_volue_drive_iface_init (GDriveIface *iface)
   iface->can_mount = g_unix_drive_can_mount;
   iface->can_eject = g_unix_drive_can_eject;
   iface->mount = g_unix_drive_mount;
+  iface->mount_finish = g_unix_drive_mount_finish;
   iface->eject = g_unix_drive_eject;
+  iface->eject_finish = g_unix_drive_eject_finish;
 }

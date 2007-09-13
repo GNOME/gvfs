@@ -326,18 +326,34 @@ g_unix_volume_can_eject (GVolume *volume)
 
 static void
 g_unix_volume_unmount (GVolume         *volume,
-		       GVolumeCallback  callback,
+		       GAsyncReadyCallback callback,
 		       gpointer         user_data)
 {
   /* TODO */
 }
 
+static gboolean
+g_unix_volume_unmount_finish (GVolume *volume,
+			      GAsyncResult *result,
+			      GError **error)
+{
+  return TRUE;
+}
+
 static void
 g_unix_volume_eject (GVolume         *volume,
-		     GVolumeCallback  callback,
+		     GAsyncReadyCallback callback,
 		     gpointer         user_data)
 {
   /* TODO */
+}
+
+static gboolean
+g_unix_volume_eject_finish (GVolume *volume,
+			    GAsyncResult *result,
+			    GError **error)
+{
+  return TRUE;
 }
 
 static void
@@ -350,6 +366,8 @@ g_unix_volue_volume_iface_init (GVolumeIface *iface)
   iface->can_unmount = g_unix_volume_can_unmount;
   iface->can_eject = g_unix_volume_can_eject;
   iface->unmount = g_unix_volume_unmount;
+  iface->unmount_finish = g_unix_volume_unmount_finish;
   iface->eject = g_unix_volume_eject;
+  iface->eject_finish = g_unix_volume_eject_finish;
   iface->get_platform_id = g_unix_volume_get_platform_id;
 }

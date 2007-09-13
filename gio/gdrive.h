@@ -26,33 +26,45 @@ struct _GDriveIface
   char *   (*get_name)    (GDrive         *drive);
   char *   (*get_icon)    (GDrive         *drive);
   GList *  (*get_volumes) (GDrive         *drive);
-  gboolean (*is_automounted)(GDrive         *drive);
+  gboolean (*is_automounted)(GDrive       *drive);
   gboolean (*can_mount)   (GDrive         *drive);
   gboolean (*can_eject)   (GDrive         *drive);
   void     (*mount)       (GDrive         *drive,
 			   GMountOperation *mount_operation,
-			   GVolumeCallback callback,
+			   GAsyncReadyCallback callback,
 			   gpointer        user_data);
+  gboolean (*mount_finish)(GDrive         *drive,
+			   GAsyncResult   *result,
+			   GError        **error);
   void     (*eject)       (GDrive         *drive,
-			   GVolumeCallback callback,
+			   GAsyncReadyCallback callback,
 			   gpointer        user_data);
+  gboolean (*eject_finish)(GDrive         *drive,
+			   GAsyncResult   *result,
+			   GError        **error);
 };
 
 GType g_drive_get_type (void) G_GNUC_CONST;
 
-char *   g_drive_get_name       (GDrive          *drive);
-char *   g_drive_get_icon       (GDrive          *drive);
-GList  * g_drive_get_volumes    (GDrive          *drive);
-gboolean g_drive_is_automounted (GDrive          *drive);
-gboolean g_drive_can_mount      (GDrive          *drive);
-gboolean g_drive_can_eject      (GDrive          *drive);
-void     g_drive_mount          (GDrive          *drive,
-				 GMountOperation *mount_operation,
-				 GVolumeCallback  callback,
-				 gpointer         user_data);
-void     g_drive_eject          (GDrive          *drive,
-				 GVolumeCallback  callback,
-				 gpointer         user_data);
+char *   g_drive_get_name       (GDrive               *drive);
+char *   g_drive_get_icon       (GDrive               *drive);
+GList  * g_drive_get_volumes    (GDrive               *drive);
+gboolean g_drive_is_automounted (GDrive               *drive);
+gboolean g_drive_can_mount      (GDrive               *drive);
+gboolean g_drive_can_eject      (GDrive               *drive);
+void     g_drive_mount          (GDrive               *drive,
+				 GMountOperation      *mount_operation,
+				 GAsyncReadyCallback   callback,
+				 gpointer              user_data);
+gboolean g_drive_mount_finish   (GDrive               *drive,
+				 GAsyncResult         *result,
+				 GError              **error);
+void     g_drive_eject          (GDrive               *drive,
+				 GAsyncReadyCallback   callback,
+				 gpointer              user_data);
+gboolean g_drive_eject_finish   (GDrive               *drive,
+				 GAsyncResult         *result,
+				 GError              **error);
 
 G_END_DECLS
 

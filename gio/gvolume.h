@@ -15,9 +15,6 @@ typedef struct _GDrive          GDrive; /* Dummy typedef */
 typedef struct _GVolume         GVolume; /* Dummy typedef */
 typedef struct _GVolumeIface    GVolumeIface;
 
-typedef void (*GVolumeCallback) (GError *error,
-				 gpointer user_data);
-
 struct _GVolumeIface
 {
   GTypeInterface g_iface;
@@ -28,35 +25,48 @@ struct _GVolumeIface
   
   /* Virtual Table */
 
-  GFile *  (*get_root)    (GVolume         *volume);
-  char *   (*get_name)    (GVolume         *volume);
-  char *   (*get_icon)    (GVolume         *volume);
-  GDrive * (*get_drive)   (GVolume         *volume);
-  gboolean (*can_unmount) (GVolume         *volume);
-  gboolean (*can_eject)   (GVolume         *volume);
-  void     (*unmount)     (GVolume         *volume,
-			   GVolumeCallback  callback,
-			   gpointer         user_data);
-  void     (*eject)       (GVolume         *volume,
-			   GVolumeCallback  callback,
-			   gpointer         user_data);
-  char *   (*get_platform_id) (GVolume         *volume);
+  GFile *  (*get_root)       (GVolume         *volume);
+  char *   (*get_name)       (GVolume         *volume);
+  char *   (*get_icon)       (GVolume         *volume);
+  GDrive * (*get_drive)      (GVolume         *volume);
+  gboolean (*can_unmount)    (GVolume         *volume);
+  gboolean (*can_eject)      (GVolume         *volume);
+  void     (*unmount)        (GVolume         *volume,
+			      GAsyncReadyCallback callback,
+			      gpointer         user_data);
+  gboolean (*unmount_finish) (GVolume         *volume,
+			      GAsyncResult         *result,
+			      GError              **error);
+  void     (*eject)          (GVolume         *volume,
+			      GAsyncReadyCallback  callback,
+			      gpointer         user_data);
+  gboolean (*eject_finish)   (GVolume         *volume,
+			      GAsyncResult         *result,
+			      GError              **error);
+  char *   (*get_platform_id)(GVolume         *volume);
 };
 
 GType g_volume_get_type (void) G_GNUC_CONST;
 
-GFile   *g_volume_get_root    (GVolume         *volume);
-char *   g_volume_get_name    (GVolume         *volume);
-char *   g_volume_get_icon    (GVolume         *volume);
-GDrive * g_volume_get_drive   (GVolume         *volume);
-gboolean g_volume_can_unmount (GVolume         *volume);
-gboolean g_volume_can_eject   (GVolume         *volume);
-void     g_volume_unmount     (GVolume         *volume,
-			       GVolumeCallback  callback,
-			       gpointer         user_data);
-void     g_volume_eject       (GVolume         *volume,
-			       GVolumeCallback  callback,
-			       gpointer         user_data);
+GFile   *g_volume_get_root       (GVolume              *volume);
+char *   g_volume_get_name       (GVolume              *volume);
+char *   g_volume_get_icon       (GVolume              *volume);
+GDrive * g_volume_get_drive      (GVolume              *volume);
+gboolean g_volume_can_unmount    (GVolume              *volume);
+gboolean g_volume_can_eject      (GVolume              *volume);
+void     g_volume_unmount        (GVolume              *volume,
+				  GAsyncReadyCallback   callback,
+				  gpointer              user_data);
+gboolean g_volume_unmount_finish (GVolume              *volume,
+				  GAsyncResult         *result,
+				  GError              **error);
+void     g_volume_eject          (GVolume              *volume,
+				  GAsyncReadyCallback   callback,
+				  gpointer              user_data);
+gboolean g_volume_eject_finish   (GVolume              *volume,
+				  GAsyncResult         *result,
+				  GError              **error);
+
 
 
 G_END_DECLS

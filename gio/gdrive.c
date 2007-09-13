@@ -1,5 +1,6 @@
 #include <config.h>
 #include "gdrive.h"
+#include "gsimpleasyncresult.h"
 #include <glib/gi18n-lib.h>
 
 static void g_drive_base_init (gpointer g_class);
@@ -108,6 +109,9 @@ g_drive_can_mount (GDrive *drive)
 
   iface = G_DRIVE_GET_IFACE (drive);
 
+  if (iface->can_mount == NULL)
+    return FALSE;
+
   return (* iface->can_mount) (drive);
 }
 
@@ -118,30 +122,111 @@ g_drive_can_eject (GDrive *drive)
 
   iface = G_DRIVE_GET_IFACE (drive);
 
+  if (iface->can_eject == NULL)
+    return FALSE;
+
   return (* iface->can_eject) (drive);
 }
-  
+
+static void
+report_error (GDrive *drive,
+	      GAsyncReadyCallback callback,
+	      gpointer user_data,
+	      GQuark         domain,
+	      gint           code,
+	      const gchar   *format,
+	      ...)
+{
+  GSimpleAsyncResult *simple;
+  va_list args;
+
+  simple = g_simple_async_result_new (G_OBJECT (drive),
+				      callback,
+				      user_data, NULL);
+
+  va_start (args, format);
+  g_simple_async_result_set_error_va (simple, domain, code, format, args);
+  va_end (args);
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+}
+
 void
 g_drive_mount (GDrive         *drive,
 	       GMountOperation *mount_operation,
-	       GVolumeCallback  callback,
+	       GAsyncReadyCallback callback,
 	       gpointer         user_data)
 {
   GDriveIface *iface;
 
   iface = G_DRIVE_GET_IFACE (drive);
 
+  if (iface->mount == NULL)
+    {
+      report_error (drive, callback, user_data,
+		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		    _("drive doesn't implement mount"));
+      
+      return;
+    }
+  
   return (* iface->mount) (drive, mount_operation, callback, user_data);
 }
+
+gboolean
+g_drive_mount_finish (GDrive               *drive,
+		      GAsyncResult         *result,
+		      GError              **error)
+{
+  GDriveIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+    }
   
+  iface = G_DRIVE_GET_IFACE (drive);
+  return (* iface->mount_finish) (drive, result, error);
+}
+
 void
 g_drive_eject (GDrive         *drive,
-		GVolumeCallback  callback,
-		gpointer         user_data)
+	       GAsyncReadyCallback  callback,
+	       gpointer         user_data)
 {
   GDriveIface *iface;
 
   iface = G_DRIVE_GET_IFACE (drive);
 
+  if (iface->eject == NULL)
+    {
+      report_error (drive, callback, user_data,
+		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		    _("drive doesn't implement eject"));
+      
+      return;
+    }
+  
   return (* iface->eject) (drive, callback, user_data);
+}
+
+gboolean
+g_drive_eject_finish (GDrive               *drive,
+		      GAsyncResult         *result,
+		      GError              **error)
+{
+  GDriveIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+    }
+  
+  iface = G_DRIVE_GET_IFACE (drive);
+  
+  return (* iface->mount_finish) (drive, result, error);
 }

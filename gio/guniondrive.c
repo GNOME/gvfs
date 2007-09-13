@@ -163,28 +163,99 @@ g_union_drive_can_eject (GDrive *drive)
   return g_drive_can_eject (union_drive->child_drive);
 }
 
+typedef struct {
+  GDrive *union_drive;
+  GDrive *child_drive;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} MountOp;
+
+static void
+mount_op_free (gpointer _data)
+{
+  MountOp *data = _data;
+
+  g_object_unref (data->union_drive);
+  g_object_unref (data->child_drive);
+  g_free (data);
+}
+
+static void
+union_done (GObject *source_object,
+	    GAsyncResult *res,
+	    gpointer user_data)
+{
+  MountOp *data = user_data;
+
+  g_object_set_data_full (G_OBJECT (res), "union", data, mount_op_free);
+  data->callback (G_OBJECT (data->union_drive),
+		  res, data->user_data);
+}
+
 static void
 g_union_drive_mount (GDrive         *drive,
 		     GMountOperation *mount_operation,
-		     GVolumeCallback callback,
+		     GAsyncReadyCallback callback,
 		     gpointer        user_data)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
+  MountOp *data;
 
-  return g_drive_mount (union_drive->child_drive,
+  data = g_new (MountOp, 1);
+  data->union_drive = g_object_ref (union_drive);
+  data->child_drive = g_object_ref (union_drive->child_drive);
+  data->callback = callback;
+  data->user_data = user_data;
+
+  return g_drive_mount (data->child_drive,
 			mount_operation,
-			callback, user_data);
+			union_done, data);
+}
+
+static gboolean
+g_union_drive_mount_finish (GDrive *drive,
+			    GAsyncResult *result,
+			    GError **error)
+{
+  MountOp *data;
+
+  data = g_object_get_data (G_OBJECT (result), "union");
+  
+  return g_drive_mount_finish (data->child_drive,
+			       result,
+			       error);
 }
 
 static void
 g_union_drive_eject (GDrive         *drive,
-		     GVolumeCallback callback,
+		     GAsyncReadyCallback callback,
 		     gpointer        user_data)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
+  MountOp *data;
 
-  return g_drive_eject (union_drive->child_drive,
-			callback, user_data);
+  data = g_new (MountOp, 1);
+  data->union_drive = g_object_ref (union_drive);
+  data->child_drive = g_object_ref (union_drive->child_drive);
+  data->callback = callback;
+  data->user_data = user_data;
+
+  return g_drive_eject (data->child_drive,
+			union_done, data);
+}
+
+static gboolean
+g_union_drive_eject_finish (GDrive *drive,
+			    GAsyncResult *result,
+			    GError **error)
+{
+  MountOp *data;
+
+  data = g_object_get_data (G_OBJECT (result), "union");
+  
+  return g_drive_eject_finish (data->child_drive,
+			       result,
+			       error);
 }
 
 static void
@@ -197,5 +268,7 @@ g_union_volue_drive_iface_init (GDriveIface *iface)
   iface->can_mount = g_union_drive_can_mount;
   iface->can_eject = g_union_drive_can_eject;
   iface->mount = g_union_drive_mount;
+  iface->mount_finish = g_union_drive_mount_finish;
   iface->eject = g_union_drive_eject;
+  iface->eject_finish = g_union_drive_eject_finish;
 }

@@ -5,6 +5,7 @@
 #include "gunionvolume.h"
 #include "gunionvolumemonitor.h"
 #include "gvolumepriv.h"
+#include "gsimpleasyncresult.h"
 
 typedef struct {
   GVolume *volume;
@@ -293,69 +294,147 @@ g_union_volume_can_eject (GVolume *volume)
   return FALSE;
 }
 
+static void
+report_error (GVolume *volume,
+	      GAsyncReadyCallback callback,
+	      gpointer user_data,
+	      GQuark         domain,
+	      gint           code,
+	      const gchar   *format,
+	      ...)
+{
+  GSimpleAsyncResult *simple;
+  va_list args;
+
+  simple = g_simple_async_result_new (G_OBJECT (volume),
+				      callback,
+				      user_data, NULL);
+
+  va_start (args, format);
+  g_simple_async_result_set_error_va (simple, domain, code, format, args);
+  va_end (args);
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+}
+
+
 typedef struct {
-  GVolumeCallback callback;
+  GVolume *union_volume;
+  GVolume *child_volume;
+  GAsyncReadyCallback callback;
   gpointer user_data;
-} VolData;
+} MountOp;
+
+static void
+mount_op_free (gpointer _data)
+{
+  MountOp *data = _data;
+
+  g_object_unref (data->union_volume);
+  g_object_unref (data->child_volume);
+  g_free (data);
+}
+
+static void
+union_done (GObject *source_object,
+	    GAsyncResult *res,
+	    gpointer user_data)
+{
+  MountOp *data = user_data;
+
+  g_object_set_data_full (G_OBJECT (res), "union", data, mount_op_free);
+  data->callback (G_OBJECT (data->union_volume),
+		  res, data->user_data);
+}
+
+static void
+g_union_volume_unmount (GVolume *volume,
+			GAsyncReadyCallback callback,
+			gpointer user_data)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+  MountOp *data;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+
+      data = g_new (MountOp, 1);
+      data->union_volume = g_object_ref (volume);
+      data->child_volume = g_object_ref (child->volume);
+      data->callback = callback;
+      data->user_data = user_data;
+      
+      return g_volume_unmount (data->child_volume,
+			       union_done, data);
+    }
+  else
+    {
+      report_error (volume, callback, user_data,
+		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		    _("Operation not supported"));
+      
+    }
+}
 
 static gboolean
-error_on_idle (gpointer _data)
+g_union_volume_unmount_finish (GVolume *volume,
+			       GAsyncResult *result,
+			       GError **error)
 {
-  VolData *data = _data;
-  GError *error = NULL;
-
-  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
-
-  if (data->callback)
-    data->callback (error, data->user_data);
-
-  g_free (data);
-  return FALSE;
-}
-
-static void
-g_union_volume_unmount (GVolume         *volume,
-			GVolumeCallback  callback,
-			gpointer         user_data)
-{
-  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
-  ChildVolume *child;
-  VolData *data;
-
-  if (union_volume->child_volumes)
-    {
-      child = union_volume->child_volumes->data;
-      return g_volume_unmount (child->volume,
-			       callback, user_data);
-    }
-
-  data = g_new0 (VolData, 1);
-  data->callback = callback;
-  data->user_data = user_data;
-  g_idle_add (error_on_idle, data);
-}
-
-static void
-g_union_volume_eject (GVolume         *volume,
-		      GVolumeCallback  callback,
-		      gpointer         user_data)
-{
-  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
-  ChildVolume *child;
-  VolData *data;
-
-  if (union_volume->child_volumes)
-    {
-      child = union_volume->child_volumes->data;
-      return g_volume_eject (child->volume,
-			     callback, user_data);
-    }
+  MountOp *data;
   
-  data = g_new0 (VolData, 1);
-  data->callback = callback;
-  data->user_data = user_data;
-  g_idle_add (error_on_idle, data);
+  data = g_object_get_data (G_OBJECT (result), "union");
+  
+  return g_volume_unmount_finish (data->child_volume,
+				  result, error);
 }
+
+static void
+g_union_volume_eject (GVolume *volume,
+		      GAsyncReadyCallback callback,
+		      gpointer user_data)
+{
+  GUnionVolume *union_volume = G_UNION_VOLUME (volume);
+  ChildVolume *child;
+  MountOp *data;
+
+  if (union_volume->child_volumes)
+    {
+      child = union_volume->child_volumes->data;
+      data = g_new (MountOp, 1);
+      data->union_volume = g_object_ref (volume);
+      data->child_volume = g_object_ref (child->volume);
+      data->callback = callback;
+      data->user_data = user_data;
+      
+      return g_volume_eject (data->child_volume,
+			     union_done, data);
+    }
+  else
+    {
+      report_error (volume, callback, user_data,
+		    G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		    _("Operation not supported"));
+      
+    }
+}
+
+
+static gboolean
+g_union_volume_eject_finish (GVolume *volume,
+			     GAsyncResult *result,
+			     GError **error)
+{
+  MountOp *data;
+  
+  data = g_object_get_data (G_OBJECT (result), "union");
+  
+  return g_volume_eject_finish (data->child_volume,
+				result, error);
+}
+
 
 static void
 g_union_volue_volume_iface_init (GVolumeIface *iface)
@@ -368,5 +447,7 @@ g_union_volue_volume_iface_init (GVolumeIface *iface)
   iface->can_unmount = g_union_volume_can_unmount;
   iface->can_eject = g_union_volume_can_eject;
   iface->unmount = g_union_volume_unmount;
+  iface->unmount_finish = g_union_volume_unmount_finish;
   iface->eject = g_union_volume_eject;
+  iface->eject_finish = g_union_volume_eject_finish;
 }
