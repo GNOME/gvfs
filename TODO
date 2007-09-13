@@ -14,3 +14,5 @@ add get_file_info_async for FileStreams
 test outputstream (especially replace + backup) (and test everything else too)
 
 getting selinux attrs is a bit slow, it does all sort of weird ops.
+
+Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion, etc)
