@@ -1,4 +1,4 @@
-AC_INIT(gio/gfile.h)
+AC_INIT(client/gdaemonvfs.h)
 
 AM_INIT_AUTOMAKE(gvfs, 0.0.1)
 AM_CONFIG_HEADER(config.h)
@@ -30,203 +30,32 @@ AH_VERBATIM([_GNU_SOURCE],
 	
 saved_CFLAGS=$CFLAGS
 AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct stat.st_atimensec, struct stat.st_atim.tv_nsec, struct stat.st_ctimensec, struct stat.st_ctim.tv_nsec])
-AC_CHECK_MEMBERS([struct stat.st_blksize, struct stat.st_blocks])
 CFLAGS=$saved_CFLAGS
 
-AC_CHECK_HEADERS([pwd.h])
-
-AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link statvfs statfs utimes)
-
-AC_CHECK_HEADERS(sys/vfs.h sys/mount.h sys/statfs.h sys/statvfs.h sys/param.h)
-			     
-dnl
-dnl if statfs() takes 2 arguments or 4 (Solaris)
-dnl
-if test "$ac_cv_func_statfs" = yes ; then
-  AC_MSG_CHECKING([number of arguments to statfs()])
-  AC_TRY_COMPILE([#include <unistd.h>
-  #ifdef HAVE_SYS_PARAM_H
-  #include <sys/param.h>
-  #endif
-  #ifdef HAVE_SYS_VFS_H
-  #include <sys/vfs.h>
-  #endif
-  #ifdef HAVE_SYS_MOUNT_H
-  #include <sys/mount.h>
-  #endif
-  #ifdef HAVE_SYS_STATFS_H
-  #include <sys/statfs.h>
-  #endif], [struct statfs st;
-  statfs(NULL, &st);],[
-    AC_MSG_RESULT([2])
-    AC_DEFINE(STATFS_ARGS, 2, [Number of arguments to statfs()])],[
-    AC_TRY_COMPILE([#include <unistd.h>
-  #ifdef HAVE_SYS_PARAM_H
-  #include <sys/param.h>
-  #endif
-  #ifdef HAVE_SYS_VFS_H
-  #include <sys/vfs.h>
-  #endif
-  #ifdef HAVE_SYS_MOUNT_H
-  #include <sys/mount.h>
-  #endif
-  #ifdef HAVE_SYS_STATFS_H
-  #include <sys/statfs.h>
-  #endif], [struct statfs st;
-  statfs(NULL, &st, sizeof (st), 0);],[
-      AC_MSG_RESULT([4])
-      AC_DEFINE(STATFS_ARGS, 4, [Number of arguments to statfs()])],[
-      AC_MSG_RESULT(unknown)
-      AC_MSG_ERROR([unable to determine number of arguments to statfs()])])])
-fi
-			     
-dnl Volume monitor stuff			     
-AC_CHECK_FUNCS(setmntent endmntent hasmntopt getmntinfo)
-AC_CHECK_HEADERS(mntent.h sys/mnttab.h sys/vfstab.h sys/cdio.h sys/mount.h sys/mntctl.h sys/vfs.h sys/vmount.h sys/sysctl.h fstab.h fnmatch.h util.h sys/sysmacros.h)
-			     
-AC_MSG_CHECKING([for Win32])
-case "$host" in
-  *-*-mingw*)
-    glib_native_win32=yes
-    ;;
-  *)
-    glib_native_win32=no
-    ;;
-esac
-
-AC_MSG_RESULT([$glib_native_win32])
-AM_CONDITIONAL(OS_WIN32, [test "$glib_native_win32" = "yes"])
-AM_CONDITIONAL(OS_UNIX, [test "$glib_native_win32" != "yes"])
-
-if test "$glib_native_win32" != yes; then
-    # libtool option to control which symbols are exported
-    # right now, symbols starting with _ are not exported
-    LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
-else
-    # We currently use .def files on Windows
-    LIBTOOL_EXPORT_OPTIONS=
-fi
+LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
 AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 			
 GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.13.8 gthread-2.0 gobject-2.0 gmodule-no-export-2.0)
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.13.8 gthread-2.0 gobject-2.0 gmodule-no-export-2.0 gio-standalone)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-if test "$glib_native_win32" != yes; then
- PKG_CHECK_MODULES(DBUS, dbus-1)
- AC_SUBST(DBUS_CFLAGS)
- AC_SUBST(DBUS_LIBS)
- AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
- DBUS_SERVICE_DIR=$with_dbus_service_dir
- AC_SUBST(DBUS_SERVICE_DIR)
-fi
+PKG_CHECK_MODULES(DBUS, dbus-1)
+AC_SUBST(DBUS_CFLAGS)
+AC_SUBST(DBUS_LIBS)
+
+AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
+DBUS_SERVICE_DIR=$with_dbus_service_dir
+AC_SUBST(DBUS_SERVICE_DIR)
 	
 GETTEXT_PACKAGE=gvfs
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
 AC_SUBST(GETTEXT_PACKAGE)
 
 AM_GLIB_GNU_GETTEXT
-
-dnl ****************************
-dnl *** Check for libselinux ***
-dnl ****************************
-AC_ARG_ENABLE(selinux, [  --disable-selinux       build without selinux support])
-msg_selinux=no
-SELINUX_LIBS=
-if test "x$enable_selinux" != "xno"; then
-
- AC_CHECK_LIB(selinux, is_selinux_enabled,
-   [AC_CHECK_HEADERS(selinux/selinux.h,
-     [AC_SEARCH_LIBS(lgetfilecon_raw, selinux, 
-       [AC_DEFINE(HAVE_SELINUX, 1, [Define to 1 if libselinux is available])
-        SELINUX_LIBS="-lselinux"
-        msg_selinux=yes])
-     ])
-   ])
-fi
-AC_SUBST(SELINUX_LIBS)
-
-dnl ***********************
-dnl ** Check for inotify **
-dnl ***********************
-inotify_support=no
-AC_CHECK_HEADERS([linux/inotify.h],
-[
-	inotify_support=yes
-])
-AC_CHECK_HEADERS([sys/inotify.h],
-[
-	inotify_support=yes
-])
-
-AM_CONDITIONAL(HAVE_INOTIFY, [test "$inotify_support" = "yes"])
-
-dnl **********************
-dnl *** Checks for FAM ***
-dnl **********************
-
-should_disable_fam=no
-
-AC_ARG_ENABLE(fam, [  --disable-fam          build without enabling fam for file system monitoring],
-                         [
-                                if test "x$enable_fam" = "xno"; then
-                                        should_disable_fam=yes
-                                        echo "Not building FAM support"
-                                fi
-                         ]
-                         )
-fam_support=no
-FAM_LIBS=
-if test "x$should_disable_fam" = "xno"; then
-AC_CHECK_LIB(fam, FAMOpen,
-  [AC_CHECK_HEADERS(fam.h,
-    [AC_DEFINE(HAVE_FAM, [], [Define if we have FAM])
-     AC_CHECK_LIB(fam, FAMNoExists,
-     		  AC_DEFINE(HAVE_FAM_NO_EXISTS, [], [Define if we have FAMNoExists in fam]))
-     FAM_LIBS="-lfam"]
-     fam_support=yes,
-    AC_MSG_WARN(*** FAM support will not be built (header files not found) ***))],
-  AC_MSG_WARN(*** FAM support will not be built (FAM library not found) ***))
-AC_SUBST(FAM_LIBS)
-fi
-AM_CONDITIONAL(HAVE_FAM, [test "$fam_support" = "yes"])
-
-
-dnl ***********************
-dnl *** Check for xattr ***
-dnl ***********************
-AC_ARG_ENABLE(xattr, [  --disable-xattr           build without xattr support])
-msg_xattr=no
-XATTR_LIBS=
-if test "x$enable_xattr" != "xno"; then
-
-dnl either glibc or libattr can provide xattr support
-
-dnl for both of them, we check for getxattr being in
-dnl the library and a valid xattr header.
-
-dnl try glibc
- AC_CHECK_LIB(c, getxattr,
-   [AC_CHECK_HEADERS(sys/xattr.h,
-     [AC_DEFINE(HAVE_XATTR, 1, [Define to 1 if xattr is available])
-      msg_xattr=yes])
-   ])
-
-  if test "x$msg_xattr" != "xyes"; then
-dnl   failure. try libattr
-   AC_CHECK_LIB(attr, getxattr,
-      [AC_CHECK_HEADERS(attr/xattr.h,
-       [AC_DEFINE(HAVE_XATTR, 1, [Define to 1 if xattr is available])
-        XATTR_LIBS="-lattr"
-        msg_xattr=yes])
-      ])
-  fi
-fi
-AC_SUBST(XATTR_LIBS)
 
 dnl **********************
 dnl *** Check for FUSE ***
@@ -375,14 +204,9 @@ fi
 			       
 AC_OUTPUT([
 Makefile
-gio/Makefile
-gio/xdgmime/Makefile
-gio/inotify/Makefile
-gio/fam/Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
-programs/Makefile
 test/Makefile
 po/Makefile.in
 gio-standalone.pc
@@ -391,11 +215,6 @@ gio-standalone.pc
 echo 
 echo "gvfs configuration summary:"
 echo "
-	Win32 build:          $glib_native_win32
-	SELinux support:      $msg_selinux
-	xattr support:        $msg_xattr
 	Samba support:	      $msg_samba
 	FUSE support:         $msg_fuse
-	inotify support:      $inotify_support
-	FAM support:          $fam_support
 "

@@ -7,7 +7,6 @@
 #include <gdbusutils.h>
 #include <gio/gthemedicon.h>
 #include <gio/gfileicon.h>
-#include <gio/glocalfile.h>
 
 gchar *
 _g_dbus_type_from_file_attribute_type (GFileAttributeType type)
@@ -116,7 +115,8 @@ _g_dbus_append_file_attribute (DBusMessageIter *iter,
 
 	  file = g_file_icon_get_file (G_FILE_ICON (obj));
 
-	  if (G_IS_LOCAL_FILE (file))
+	  path = g_file_get_path (file);
+	  if (path)
 	    {
 	      if (!dbus_message_iter_open_container (&variant_iter,
 						     DBUS_TYPE_STRUCT,

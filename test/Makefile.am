@@ -7,7 +7,6 @@ AM_CFLAGS =                       \
 	-DG_DISABLE_DEPRECATED
 
 AM_LDFLAGS =                           \
-	$(top_builddir)/gio/libgio.la  \
 	$(GLIB_LIBS)
 
 noinst_PROGRAMS = \

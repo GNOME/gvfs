@@ -1,23 +1,11 @@
 NULL =
 
-if OS_UNIX
-unix_dirs = \
+SUBDIRS = \
 	common \
 	client \
 	daemon \
-	$(NULL)
-
-endif
-
-SUBDIRS = \
-	gio \
-	$(unix_dirs) \
 	po   \
-	programs \
 	test \
 	$(NULL)
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = gio-standalone.pc

@@ -11,7 +11,7 @@
 #include <glib/gi18n.h>
 #include <gio/gioerror.h>
 #include <gio/gfile.h>
-#include <gio/glocalfile.h>
+#include <gio/gvfs.h>
 
 #include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"
@@ -253,10 +253,12 @@ do_get_info (GVfsBackend *backend,
   GFile *file;
   GFileInfo *info2;
   GError *error;
+  GVfs *local_vfs;
 
   g_print ("do_get_file_info (%s)\n", filename);
   
-  file = g_local_file_new (filename);
+  local_vfs = g_vfs_get_local ();
+  file = g_vfs_get_file_for_path (local_vfs, filename);
 
   error = NULL;
   info2 = g_file_get_info (file, NULL, flags,

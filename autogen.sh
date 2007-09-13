@@ -8,7 +8,7 @@ ORIGDIR=`pwd`
 cd $srcdir
 PROJECT=GVfs
 TEST_TYPE=-f
-FILE=gio/gfile.h
+FILE=client/gdaemonvfs.h
 
 DIE=0
 

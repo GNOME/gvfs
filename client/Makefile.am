@@ -24,7 +24,6 @@ vfssources = \
 	$(NULL)
 
 vfslibs = \
-	$(top_builddir)/gio/libgio.la \
 	$(top_builddir)/common/libgvfscommon.la \
 	$(DBUS_LIBS) \
 	$(GLIB_LIBS) \
@@ -49,7 +48,6 @@ libsmb_la_SOURCES = 	\
 	$(NULL)
 
 libsmb_la_LIBADD = \
-	$(top_builddir)/gio/libgio.la	\
 	$(top_builddir)/common/libgvfscommon.la	\
 	$(GLIB_LIBS) \
 	$(NULL)
@@ -79,7 +77,6 @@ gvfs_fuse_daemon_CFLAGS = \
         -DDBUS_API_SUBJECT_TO_CHANGE
 
 gvfs_fuse_daemon_LDADD = \
-	$(top_builddir)/gio/libgio.la \
 	$(top_builddir)/common/libgvfscommon.la \
 	$(top_builddir)/client/libgvfsdbusfuse.la \
 	$(GLIB_LIBS) $(DBUS_LIBS) $(FUSE_LIBS)

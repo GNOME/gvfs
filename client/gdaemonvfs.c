@@ -4,7 +4,6 @@
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
 #include "gdaemonfile.h"
-#include <gio/glocalvfs.h>
 #include <gio/giomodule.h>
 #include <gio/gdummyfile.h>
 #include <gvfsdaemonprotocol.h>
@@ -141,7 +140,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
 
-  vfs->wrapped_vfs = g_local_vfs_new ();
+  vfs->wrapped_vfs = g_vfs_get_local ();
 
   if (g_thread_supported ())
     dbus_threads_init_default ();
