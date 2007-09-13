@@ -15,14 +15,40 @@ static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
 			       gpointer class_data);
 
-static void              g_file_real_read_async  (GFile                *file,
-						  int                   io_priority,
-						  GCancellable         *cancellable,
-						  GAsyncReadyCallback   callback,
-						  gpointer              user_data);
-static GFileInputStream *g_file_real_read_finish (GFile                *file,
-						  GAsyncResult         *res,
-						  GError              **error);
+static void               g_file_real_read_async       (GFile                *file,
+							int                   io_priority,
+							GCancellable         *cancellable,
+							GAsyncReadyCallback   callback,
+							gpointer              user_data);
+static GFileInputStream * g_file_real_read_finish      (GFile                *file,
+							GAsyncResult         *res,
+							GError              **error);
+static void               g_file_real_append_to_async  (GFile                *file,
+							int                   io_priority,
+							GCancellable         *cancellable,
+							GAsyncReadyCallback   callback,
+							gpointer              user_data);
+static GFileOutputStream *g_file_real_append_to_finish (GFile                *file,
+							GAsyncResult         *res,
+							GError              **error);
+static void               g_file_real_create_async     (GFile                *file,
+							int                   io_priority,
+							GCancellable         *cancellable,
+							GAsyncReadyCallback   callback,
+							gpointer              user_data);
+static GFileOutputStream *g_file_real_create_finish    (GFile                *file,
+							GAsyncResult         *res,
+							GError              **error);
+static void               g_file_real_replace_async    (GFile                *file,
+							const char           *etag,
+							gboolean              make_backup,
+							int                   io_priority,
+							GCancellable         *cancellable,
+							GAsyncReadyCallback   callback,
+							gpointer              user_data);
+static GFileOutputStream *g_file_real_replace_finish   (GFile                *file,
+							GAsyncResult         *res,
+							GError              **error);
 
 GType
 g_file_get_type (void)
@@ -62,6 +88,12 @@ g_file_class_init (gpointer g_class,
 
   iface->read_async = g_file_real_read_async;
   iface->read_finish = g_file_real_read_finish;
+  iface->append_to_async = g_file_real_append_to_async;
+  iface->append_to_finish = g_file_real_append_to_finish;
+  iface->create_async = g_file_real_create_async;
+  iface->create_finish = g_file_real_create_finish;
+  iface->replace_async = g_file_real_replace_async;
+  iface->replace_finish = g_file_real_replace_finish;
 }
 
 static void
@@ -390,6 +422,115 @@ g_file_read_finish (GFile                  *file,
   
   iface = G_FILE_GET_IFACE (file);
   return (* iface->read_finish) (file, res, error);
+}
+
+void
+g_file_append_to_async (GFile                      *file,
+			int                         io_priority,
+			GCancellable               *cancellable,
+			GAsyncReadyCallback         callback,
+			gpointer                    user_data)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->append_to_async) (file,
+			      io_priority,
+			      cancellable,
+			      callback,
+			      user_data);
+}
+
+GFileOutputStream *
+g_file_append_to_finish (GFile                      *file,
+			 GAsyncResult               *res,
+			 GError                    **error)
+{
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (res))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->append_to_finish) (file, res, error);
+}
+
+void
+g_file_create_async (GFile                      *file,
+		     int                         io_priority,
+		     GCancellable               *cancellable,
+		     GAsyncReadyCallback         callback,
+		     gpointer                    user_data)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->create_async) (file,
+			   io_priority,
+			   cancellable,
+			   callback,
+			   user_data);
+}
+
+GFileOutputStream *
+g_file_create_finish (GFile                      *file,
+		      GAsyncResult               *res,
+		      GError                    **error)
+{
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (res))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->create_finish) (file, res, error);
+}
+
+void
+g_file_replace_async (GFile                      *file,
+		      const char                 *etag,
+		      gboolean                    make_backup,
+		      int                         io_priority,
+		      GCancellable               *cancellable,
+		      GAsyncReadyCallback         callback,
+		      gpointer                    user_data)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->replace_async) (file,
+			    etag,
+			    make_backup,
+			    io_priority,
+			    cancellable,
+			    callback,
+			    user_data);
+}
+
+GFileOutputStream *
+g_file_replace_finish (GFile                      *file,
+		       GAsyncResult               *res,
+		       GError                    **error)
+{
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (res))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->replace_finish) (file, res, error);
 }
 
 static gboolean
@@ -1200,6 +1341,194 @@ g_file_real_read_finish (GFile                  *file,
   return NULL;
 }
 
+static void
+append_to_async_thread (GSimpleAsyncResult *res,
+			GObject *object,
+			GCancellable *cancellable)
+{
+  GFileIface *iface;
+  GFileOutputStream *stream;
+  GError *error = NULL;
+
+  iface = G_FILE_GET_IFACE (object);
+
+  stream = iface->append_to (G_FILE (object), cancellable, &error);
+
+  if (stream == NULL)
+    {
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
+    }
+  else
+    g_simple_async_result_set_op_res_gpointer (res, stream, g_object_unref);
+}
+
+static void
+g_file_real_append_to_async (GFile                  *file,
+			     int                     io_priority,
+			     GCancellable           *cancellable,
+			     GAsyncReadyCallback     callback,
+			     gpointer                user_data)
+{
+  GSimpleAsyncResult *res;
+  
+  res = g_simple_async_result_new (G_OBJECT (file), callback, user_data, g_file_real_append_to_async);
+  
+  g_simple_async_result_run_in_thread (res, append_to_async_thread, io_priority, cancellable);
+  g_object_unref (res);
+}
+
+static GFileOutputStream *
+g_file_real_append_to_finish (GFile                  *file,
+			      GAsyncResult           *res,
+			      GError                **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  gpointer op;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_real_append_to_async);
+
+  op = g_simple_async_result_get_op_res_gpointer (simple);
+  if (op)
+    return g_object_ref (op);
+  
+  return NULL;
+}
+
+static void
+create_async_thread (GSimpleAsyncResult *res,
+		     GObject *object,
+		     GCancellable *cancellable)
+{
+  GFileIface *iface;
+  GFileOutputStream *stream;
+  GError *error = NULL;
+
+  iface = G_FILE_GET_IFACE (object);
+
+  stream = iface->create (G_FILE (object), cancellable, &error);
+
+  if (stream == NULL)
+    {
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
+    }
+  else
+    g_simple_async_result_set_op_res_gpointer (res, stream, g_object_unref);
+}
+
+static void
+g_file_real_create_async (GFile                  *file,
+			  int                     io_priority,
+			  GCancellable           *cancellable,
+			  GAsyncReadyCallback     callback,
+			  gpointer                user_data)
+{
+  GSimpleAsyncResult *res;
+  
+  res = g_simple_async_result_new (G_OBJECT (file), callback, user_data, g_file_real_create_async);
+  
+  g_simple_async_result_run_in_thread (res, create_async_thread, io_priority, cancellable);
+  g_object_unref (res);
+}
+
+static GFileOutputStream *
+g_file_real_create_finish (GFile                  *file,
+			   GAsyncResult           *res,
+			   GError                **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  gpointer op;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_real_create_async);
+
+  op = g_simple_async_result_get_op_res_gpointer (simple);
+  if (op)
+    return g_object_ref (op);
+  
+  return NULL;
+}
+
+typedef struct {
+  GFileOutputStream *stream;
+  char *etag;
+  gboolean make_backup;
+} ReplaceAsyncData;
+
+static void
+replace_async_data_free (ReplaceAsyncData *data)
+{
+  if (data->stream)
+    g_object_unref (data->stream);
+  g_free (data->etag);
+  g_free (data);
+}
+
+static void
+replace_async_thread (GSimpleAsyncResult *res,
+		      GObject *object,
+		      GCancellable *cancellable)
+{
+  GFileIface *iface;
+  GFileOutputStream *stream;
+  GError *error = NULL;
+  ReplaceAsyncData *data;
+
+  iface = G_FILE_GET_IFACE (object);
+  
+  data = g_simple_async_result_get_op_res_gpointer (res);
+
+  stream = iface->replace (G_FILE (object), data->etag, data->make_backup, cancellable, &error);
+
+  if (stream == NULL)
+    {
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
+    }
+  else
+    data->stream = stream;
+}
+
+static void
+g_file_real_replace_async (GFile                  *file,
+			   const char             *etag,
+			   gboolean                make_backup,
+			   int                     io_priority,
+			   GCancellable           *cancellable,
+			   GAsyncReadyCallback     callback,
+			   gpointer                user_data)
+{
+  GSimpleAsyncResult *res;
+  ReplaceAsyncData *data;
+
+  data = g_new (ReplaceAsyncData, 1);
+  data->etag = g_strdup (etag);
+  data->make_backup = make_backup;
+  
+  res = g_simple_async_result_new (G_OBJECT (file), callback, user_data, g_file_real_replace_async);
+  g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)replace_async_data_free);
+  
+  g_simple_async_result_run_in_thread (res, replace_async_thread, io_priority, cancellable);
+  g_object_unref (res);
+}
+
+static GFileOutputStream *
+g_file_real_replace_finish (GFile                  *file,
+			    GAsyncResult           *res,
+			    GError                **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  ReplaceAsyncData *data;
+
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_real_replace_async);
+
+  data = g_simple_async_result_get_op_res_gpointer (simple);
+  if (data->stream)
+    return g_object_ref (data->stream);
+  
+  return NULL;
+}
+
 /********************************************
  *   Default VFS operations                 *
  ********************************************/
@@ -1608,5 +1937,183 @@ g_file_replace_contents (GFile                *file,
   if (!g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, error))
     return FALSE;
   
+  return TRUE;
+}
+
+typedef struct {
+  GFile *file;
+  GError *error;
+  GCancellable *cancellable;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+  const char *content;
+  gsize length;
+  gsize pos;
+} ReplaceContentsData;
+
+static void
+replace_contents_data_free (ReplaceContentsData *data)
+{
+  if (data->error)
+    g_error_free (data->error);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  g_object_unref (data->file);
+  g_free (data);
+}
+
+static void
+replace_contents_close_callback (GObject *obj,
+				 GAsyncResult *close_res,
+				 gpointer user_data)
+{
+  GOutputStream *stream = G_OUTPUT_STREAM (obj);
+  ReplaceContentsData *data = user_data;
+  GSimpleAsyncResult *res;
+
+  /* Ignore errors here, we're only reading anyway */
+  g_output_stream_close_finish (stream, close_res, NULL);
+  g_object_unref (stream);
+
+  res = g_simple_async_result_new (G_OBJECT (data->file),
+				   data->callback,
+				   data->user_data,
+				   g_file_replace_contents_async);
+  g_simple_async_result_set_op_res_gpointer (res, data, (GDestroyNotify)replace_contents_data_free);
+  g_simple_async_result_complete (res);
+  g_object_unref (res);
+}
+
+static void
+replace_contents_write_callback (GObject *obj,
+				 GAsyncResult *read_res,
+				 gpointer user_data)
+{
+  GOutputStream *stream = G_OUTPUT_STREAM (obj);
+  ReplaceContentsData *data = user_data;
+  GError *error = NULL;
+  gssize write_size;
+  
+  write_size = g_output_stream_write_finish (stream, read_res, &error);
+
+  if (write_size <= 0) 
+    {
+      /* Error or EOF, close the file */
+      if (write_size < 0)
+	data->error = error;
+      g_output_stream_close_async (stream, 0,
+				   data->cancellable,
+				   replace_contents_close_callback, data);
+    }
+  else if (write_size > 0)
+    {
+      data->pos += write_size;
+
+      if (data->pos >= data->length)
+	g_output_stream_close_async (stream, 0,
+				     data->cancellable,
+				     replace_contents_close_callback, data);
+      else
+	g_output_stream_write_async (stream,
+				     data->content + data->pos,
+				     data->length - data->pos,
+				     0,
+				     data->cancellable,
+				     replace_contents_write_callback,
+				     data);
+    }
+}
+
+static void
+replace_contents_open_callback (GObject *obj,
+				GAsyncResult *open_res,
+				gpointer user_data)
+{
+  GFile *file = G_FILE (obj);
+  GFileOutputStream *stream;
+  ReplaceContentsData *data = user_data;
+  GError *error = NULL;
+  GSimpleAsyncResult *res;
+
+  stream = g_file_replace_finish (file, open_res, &error);
+
+  if (stream)
+    {
+      g_output_stream_write_async (G_OUTPUT_STREAM (stream),
+				   data->content + data->pos,
+				   data->length - data->pos,
+				   0,
+				   data->cancellable,
+				   replace_contents_write_callback,
+				   data);
+      
+    }
+  else
+    {
+      res = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+						  data->callback,
+						  data->user_data,
+						  error);
+      g_simple_async_result_complete (res);
+      g_error_free (error);
+      replace_contents_data_free (data);
+      g_object_unref (res);
+    }
+}
+
+void
+g_file_replace_contents_async  (GFile                *file,
+				const char           *contents,
+				gsize                 length,
+				const char           *etag,
+				gboolean              make_backup,
+				GCancellable         *cancellable,
+				GAsyncReadyCallback   callback,
+				gpointer              user_data)
+{
+  ReplaceContentsData *data;
+
+  data = g_new0 (ReplaceContentsData, 1);
+
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+  data->callback = callback;
+  data->user_data = user_data;
+  data->content = contents;
+  data->length = length;
+  data->pos = 0;
+  data->file = g_object_ref (file);
+
+  g_file_replace_async (file,
+			etag,
+			make_backup,
+			0,
+			cancellable,
+			replace_contents_open_callback,
+			data);
+}
+  
+gboolean
+g_file_replace_contents_finish (GFile                *file,
+				GAsyncResult         *res,
+				GError              **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  ReplaceContentsData *data;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    return FALSE;
+  
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_file_replace_contents_async);
+  
+  data = g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (data->error)
+    {
+      g_propagate_error (error, data->error);
+      data->error = NULL;
+      return FALSE;
+    }
+
   return TRUE;
 }

@@ -137,6 +137,34 @@ struct _GFileIface
 					     GAsyncResult         *res,
 					     GError              **error);
 
+  void                 (*append_to_async)   (GFile                      *file,
+					     int                         io_priority,
+					     GCancellable               *cancellable,
+					     GAsyncReadyCallback         callback,
+					     gpointer                    user_data);
+  GFileOutputStream *  (*append_to_finish)  (GFile                      *file,
+					     GAsyncResult               *res,
+					     GError                    **error);
+  void                 (*create_async)      (GFile                      *file,
+					     int                         io_priority,
+					     GCancellable               *cancellable,
+					     GAsyncReadyCallback         callback,
+					     gpointer                    user_data);
+  GFileOutputStream *  (*create_finish)     (GFile                      *file,
+					     GAsyncResult               *res,
+					     GError                    **error);
+  void                 (*replace_async)     (GFile                      *file,
+					     const char                 *etag,
+					     gboolean                    make_backup,
+					     int                         io_priority,
+					     GCancellable               *cancellable,
+					     GAsyncReadyCallback         callback,
+					     gpointer                    user_data);
+  GFileOutputStream *  (*replace_finish)    (GFile                      *file,
+					     GAsyncResult               *res,
+					     GError                    **error);
+  
+
   void                (*mount_mountable)           (GFile               *file,
 						    GMountOperation     *mount_operation,
 						    GCancellable         *cancellable,
@@ -219,6 +247,32 @@ GFileOutputStream *     g_file_replace                    (GFile                
 							   const char                 *etag,
 							   gboolean                    make_backup,
 							   GCancellable               *cancellable,
+							   GError                    **error);
+void                    g_file_append_to_async            (GFile                      *file,
+							   int                         io_priority,
+							   GCancellable               *cancellable,
+							   GAsyncReadyCallback         callback,
+							   gpointer                    user_data);
+GFileOutputStream *     g_file_append_to_finish           (GFile                      *file,
+							   GAsyncResult               *res,
+							   GError                    **error);
+void                    g_file_create_async               (GFile                      *file,
+							   int                         io_priority,
+							   GCancellable               *cancellable,
+							   GAsyncReadyCallback         callback,
+							   gpointer                    user_data);
+GFileOutputStream *     g_file_create_finish              (GFile                      *file,
+							   GAsyncResult               *res,
+							   GError                    **error);
+void                    g_file_replace_async              (GFile                      *file,
+							   const char                 *etag,
+							   gboolean                    make_backup,
+							   int                         io_priority,
+							   GCancellable               *cancellable,
+							   GAsyncReadyCallback         callback,
+							   gpointer                    user_data);
+GFileOutputStream *     g_file_replace_finish             (GFile                      *file,
+							   GAsyncResult               *res,
 							   GError                    **error);
 GFileInfo *             g_file_get_info                   (GFile                      *file,
 							   const char                 *attributes,
