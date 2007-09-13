@@ -1,8 +1,9 @@
 NULL =
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
-	$(GLIB_CFLAGS) \
-	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED
+	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
+	-DDBUS_API_SUBJECT_TO_CHANGE
 
 lib_LTLIBRARIES = libgvfs.la
 
@@ -38,6 +39,7 @@ unix_sources = \
 	gfileunix.c gfileunix.h \
 	gfileunixsimple.c gfileunixsimple.h \
 	gvfsunixuri.c gvfsunixuri.h \
+	gvfsunixdbus.c \
 	$(NULL)
 
 libgvfs_la_SOURCES = 	\
@@ -63,6 +65,7 @@ libgvfs_la_SOURCES = 	\
 
 libgvfs_la_LIBADD = \
 	$(SELINUX_LIBS) \
+	$(DBUS_LIBS) \
 	$(GLIB_LIBS)
 
 gvfsincludedir=$(includedir)/gvfs/
