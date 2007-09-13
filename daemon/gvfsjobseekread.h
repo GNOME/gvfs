@@ -22,7 +22,7 @@ struct _GVfsJobSeekRead
   GVfsJob parent_instance;
 
   GVfsReadStream *stream;
-  gpointer handle;
+  GVfsBackendHandle handle;
   GSeekType seek_type;
   goffset requested_offset;
   goffset final_offset;
@@ -36,9 +36,10 @@ struct _GVfsJobSeekReadClass
 GType g_vfs_job_seek_read_get_type (void) G_GNUC_CONST;
 
 GVfsJob *g_vfs_job_seek_read_new (GVfsReadStream    *stream,
-				  gpointer           handle,
+				  GVfsBackendHandle  handle,
 				  GSeekType          seek_type,
-				  goffset            offset);
+				  goffset            offset,
+				  GVfsBackend       *backend);
 
 void g_vfs_job_seek_read_set_offset (GVfsJobSeekRead *job,
 				     goffset offset);

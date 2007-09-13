@@ -47,15 +47,18 @@ g_vfs_job_close_read_init (GVfsJobCloseRead *job)
 
 GVfsJob *
 g_vfs_job_close_read_new (GVfsReadStream *stream,
-			  gpointer        handle)
+			  GVfsBackendHandle handle,
+			  GVfsBackend *backend)
 {
   GVfsJobCloseRead *job;
   
   job = g_object_new (G_TYPE_VFS_JOB_CLOSE_READ, NULL);
 
+  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
+  
   job->stream = g_object_ref (stream);
   job->handle = handle;
- 
+  
   return G_VFS_JOB (job);
 }
 

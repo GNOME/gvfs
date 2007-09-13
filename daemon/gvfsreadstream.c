@@ -45,13 +45,14 @@ typedef struct
 
 struct _GVfsReadStreamPrivate
 {
+  GVfsBackend *backend;
   gboolean connection_closed;
   GInputStream *command_stream;
   GOutputStream *reply_stream;
   int remote_fd;
   int seek_generation;
   
-  gpointer data; /* user data, i.e. GVfsHandle */
+  GVfsBackendHandle backend_handle;
   GVfsJob *current_job;
   guint32 current_job_seq_nr;
 
@@ -93,7 +94,7 @@ g_vfs_read_stream_finalize (GObject *object)
   if (read_stream->priv->remote_fd != -1)
     close (read_stream->priv->remote_fd);
 
-  g_assert (read_stream->priv->data == NULL);
+  g_assert (read_stream->priv->backend_handle == NULL);
   
   if (G_OBJECT_CLASS (g_vfs_read_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_read_stream_parent_class)->finalize) (object);
@@ -145,9 +146,9 @@ g_vfs_read_stream_connection_closed (GVfsReadStream *stream)
   stream->priv->connection_closed = TRUE;
   
   if (stream->priv->current_job == NULL &&
-      stream->priv->data != NULL)
+      stream->priv->backend_handle != NULL)
     {
-      stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->data);
+      stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->backend_handle, stream->priv->backend);
       stream->priv->current_job_seq_nr = 0;
       g_signal_emit (stream, signals[NEW_JOB], 0, stream->priv->current_job);
     }
@@ -185,12 +186,14 @@ got_command (GVfsReadStream *stream,
     {
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ:
       job = g_vfs_job_read_new (stream,
-				stream->priv->data,
-				arg1);
+				stream->priv->backend_handle,
+				arg1,
+				stream->priv->backend);
       break;
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CLOSE:
       job = g_vfs_job_close_read_new (stream,
-				      stream->priv->data);
+				      stream->priv->backend_handle,
+				      stream->priv->backend);
       break;
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR:
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END:
@@ -203,9 +206,10 @@ got_command (GVfsReadStream *stream,
       
       stream->priv->seek_generation++;
       job = g_vfs_job_seek_read_new (stream,
-				     stream->priv->data,
+				     stream->priv->backend_handle,
 				     seek_type,
-				     ((goffset)arg1) | (((goffset)arg2) << 32));
+				     ((goffset)arg1) | (((goffset)arg2) << 32),
+				     stream->priv->backend);
       break;
       
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL:
@@ -382,11 +386,12 @@ send_reply_cb (GOutputStream *output_stream,
   if (G_IS_VFS_JOB_CLOSE_READ (job))
     {
       g_signal_emit (stream, signals[CLOSED], 0);
-      stream->priv->data = NULL;
+      stream->priv->backend_handle = NULL;
     }
   else if (stream->priv->connection_closed)
     {
-      stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->data);
+      stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->backend_handle,
+							    stream->priv->backend);
       stream->priv->current_job_seq_nr = 0;
       g_signal_emit (stream, signals[NEW_JOB], 0, stream->priv->current_job);
     }
@@ -497,7 +502,8 @@ g_vfs_read_stream_send_data (GVfsReadStream  *read_stream,
 }
 
 GVfsReadStream *
-g_vfs_read_stream_new (GError **error)
+g_vfs_read_stream_new (GVfsBackend *backend,
+		       GError **error)
 {
   GVfsReadStream *stream;
   int socket_fds[2];
@@ -513,6 +519,7 @@ g_vfs_read_stream_new (GError **error)
     }
 
   stream = g_object_new (G_TYPE_VFS_READ_STREAM, NULL);
+  stream->priv->backend = backend;
   stream->priv->command_stream = g_input_stream_socket_new (socket_fds[0], TRUE);
   stream->priv->reply_stream = g_output_stream_socket_new (socket_fds[0], FALSE);
   stream->priv->remote_fd = socket_fds[1];
@@ -531,9 +538,15 @@ g_vfs_read_stream_steal_remote_fd (GVfsReadStream *stream)
   return fd;
 }
 
-void
-g_vfs_read_stream_set_user_data (GVfsReadStream *read_stream,
-				 gpointer data)
+GVfsBackend *
+g_vfs_read_stream_get_backend (GVfsReadStream  *read_stream)
 {
-  read_stream->priv->data = data;
+  return read_stream->priv->backend;
+}
+
+void
+g_vfs_read_stream_set_backend_handle (GVfsReadStream *read_stream,
+				      GVfsBackendHandle backend_handle)
+{
+  read_stream->priv->backend_handle = backend_handle;
 }

@@ -22,7 +22,7 @@ struct _GVfsJobRead
   GVfsJob parent_instance;
 
   GVfsReadStream *stream;
-  gpointer handle;
+  GVfsBackendHandle handle;
   gsize bytes_requested;
   char *buffer;
   gsize data_count;
@@ -36,8 +36,9 @@ struct _GVfsJobReadClass
 GType g_vfs_job_read_get_type (void) G_GNUC_CONST;
 
 GVfsJob *g_vfs_job_read_new        (GVfsReadStream    *stream,
-				    gpointer           handle,
-				    gsize              bytes_requested);
+				    GVfsBackendHandle  handle,
+				    gsize              bytes_requested,
+				    GVfsBackend       *backend);
 void     g_vfs_job_read_set_size   (GVfsJobRead       *job,
 				    gsize              data_size);
 

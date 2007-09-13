@@ -23,7 +23,6 @@ struct _GVfsDaemon
 {
   GObject parent_instance;
 
-  GVfsBackend *backend;
   GVfsDaemonPrivate *priv;
 };
 
@@ -37,9 +36,9 @@ struct _GVfsDaemonClass
 
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
-GVfsDaemon *g_vfs_daemon_new (const char *mountpoint,
-			      GVfsBackend *backend);
-gboolean g_vfs_daemon_is_active (GVfsDaemon *daemon);
+GVfsDaemon *g_vfs_daemon_new         (void);
+gboolean    g_vfs_daemon_add_backend (GVfsDaemon  *daemon,
+				      GVfsBackend *backend);
 
 G_END_DECLS
 

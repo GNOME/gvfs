@@ -17,11 +17,12 @@ G_BEGIN_DECLS
 /* GVfsBackend defined in gvfsdaemon.h to fix circular defines */
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 
-typedef gpointer GVfsHandle;
+typedef gpointer GVfsBackendHandle;
 
 struct _GVfsBackend
 {
   GObject parent_instance;
+  char *mountpoint;
 };
 
 struct _GVfsBackendClass
@@ -43,35 +44,39 @@ struct _GVfsBackendClass
 			     char *filename);
   gboolean (*close_read)    (GVfsBackend *backend,
 			     GVfsJobCloseRead *job,
-			     GVfsHandle *handle);
+			     GVfsBackendHandle handle);
   gboolean (*read)          (GVfsBackend *backend,
 			     GVfsJobRead *job,
-			     GVfsHandle *handle,
+			     GVfsBackendHandle handle,
 			     char *buffer,
 			     gsize bytes_requested);
   gboolean (*seek_on_read)  (GVfsBackend *backend,
 			     GVfsJobSeekRead *job,
-			     GVfsHandle *handle,
+			     GVfsBackendHandle handle,
 			     goffset    offset,
 			     GSeekType  type);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
 
+void        g_vfs_backend_set_mountpoint (GVfsBackend *backend,
+					  const char  *mountpoint);
+const char *g_vfs_backend_get_mountpoint (GVfsBackend *backend);
+
 gboolean g_vfs_backend_open_for_read (GVfsBackend        *backend,
 				      GVfsJobOpenForRead *job,
 				      char               *filename);
 gboolean g_vfs_backend_close_read    (GVfsBackend        *backend,
 				      GVfsJobCloseRead   *job,
-				      GVfsHandle         *handle);
+				      GVfsBackendHandle   handle);
 gboolean g_vfs_backend_read          (GVfsBackend        *backend,
 				      GVfsJobRead        *job,
-				      GVfsHandle         *handle,
+				      GVfsBackendHandle   handle,
 				      char               *buffer,
 				      gsize               bytes_requested);
 gboolean g_vfs_backend_seek_on_read  (GVfsBackend        *backend,
 				      GVfsJobSeekRead    *job,
-				      GVfsHandle         *handle,
+				      GVfsBackendHandle   handle,
 				      goffset             offset,
 				      GSeekType           type);
 

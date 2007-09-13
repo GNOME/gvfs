@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <gvfsjob.h>
+#include <gvfsbackend.h>
 #include <gvfs/gvfstypes.h>
 
 G_BEGIN_DECLS
@@ -38,20 +39,22 @@ struct _GVfsReadStreamClass
 
 GType g_vfs_read_stream_get_type (void) G_GNUC_CONST;
 
-GVfsReadStream *g_vfs_read_stream_new              (GError         **error);
-int             g_vfs_read_stream_steal_remote_fd  (GVfsReadStream  *read_stream);
-void            g_vfs_read_stream_set_user_data    (GVfsReadStream  *read_stream,
-						    gpointer         data);
-gboolean        g_vfs_read_stream_has_job          (GVfsReadStream  *read_stream);
-GVfsJob *       g_vfs_read_stream_get_job          (GVfsReadStream  *read_stream);
-void            g_vfs_read_stream_send_data        (GVfsReadStream  *read_stream,
-						    char            *buffer,
-						    gsize            count);
-void            g_vfs_read_stream_send_error       (GVfsReadStream  *read_stream,
-						    GError          *error);
-void            g_vfs_read_stream_send_closed      (GVfsReadStream  *read_stream);
-void            g_vfs_read_stream_send_seek_offset (GVfsReadStream  *read_stream,
-						    goffset          offset);
+GVfsReadStream *g_vfs_read_stream_new                (GVfsBackend        *backend,
+						      GError            **error);
+int             g_vfs_read_stream_steal_remote_fd    (GVfsReadStream     *read_stream);
+GVfsBackend    *g_vfs_read_stream_get_backend        (GVfsReadStream     *read_stream);
+void            g_vfs_read_stream_set_backend_handle (GVfsReadStream     *read_stream,
+						      GVfsBackendHandle   backend_handle);
+gboolean        g_vfs_read_stream_has_job            (GVfsReadStream     *read_stream);
+GVfsJob *       g_vfs_read_stream_get_job            (GVfsReadStream     *read_stream);
+void            g_vfs_read_stream_send_data          (GVfsReadStream     *read_stream,
+						      char               *buffer,
+						      gsize               count);
+void            g_vfs_read_stream_send_error         (GVfsReadStream     *read_stream,
+						      GError             *error);
+void            g_vfs_read_stream_send_closed        (GVfsReadStream     *read_stream);
+void            g_vfs_read_stream_send_seek_offset   (GVfsReadStream     *read_stream,
+						      goffset             offset);
 
 /* TODO: i/o priority? */
 

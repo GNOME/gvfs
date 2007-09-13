@@ -13,6 +13,7 @@ gboolean        _g_dbus_message_iter_append_filename (DBusMessageIter  *iter,
 						      const char       *filename);
 void            _g_error_from_dbus                   (DBusError        *derror,
 						      GError          **error);
+char *          _g_dbus_bus_name_from_mountpoint     (const char       *mountpoint);
 
 
 typedef void (*GVfsAsyncDBusCallback) (DBusMessage *reply,

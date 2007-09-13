@@ -47,14 +47,17 @@ g_vfs_job_seek_read_init (GVfsJobSeekRead *job)
 
 GVfsJob *
 g_vfs_job_seek_read_new (GVfsReadStream *stream,
-			 gpointer           handle,
-			 GSeekType          seek_type,
-			 goffset            offset)
+			 GVfsBackendHandle handle,
+			 GSeekType seek_type,
+			 goffset offset,
+			 GVfsBackend *backend)
 {
   GVfsJobSeekRead *job;
   
   job = g_object_new (G_TYPE_VFS_JOB_SEEK_READ, NULL);
 
+  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
+  
   job->stream = g_object_ref (stream);
   job->handle = handle;
   job->requested_offset = offset;

@@ -32,6 +32,7 @@ g_vfs_backend_test_finalize (GObject *object)
 static void
 g_vfs_backend_test_init (GVfsBackendTest *backend)
 {
+  g_vfs_backend_set_mountpoint (G_VFS_BACKEND (backend), "foo://");
 }
 
 GVfsBackendTest *
@@ -129,7 +130,7 @@ read_cancelled_cb (GVfsJob *job, gpointer data)
 static gboolean
 do_read (GVfsBackend *backend,
 	 GVfsJobRead *job,
-	 GVfsHandle *handle,
+	 GVfsBackendHandle handle,
 	 char *buffer,
 	 gsize bytes_requested)
 {
@@ -147,7 +148,7 @@ do_read (GVfsBackend *backend,
 static gboolean
 do_seek_on_read (GVfsBackend *backend,
 		 GVfsJobSeekRead *job,
-		 GVfsHandle *handle,
+		 GVfsBackendHandle handle,
 		 goffset    offset,
 		 GSeekType  type)
 {
@@ -195,7 +196,7 @@ do_seek_on_read (GVfsBackend *backend,
 static gboolean
 do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
-	       GVfsHandle *handle)
+	       GVfsBackendHandle handle)
 {
   int fd;
 

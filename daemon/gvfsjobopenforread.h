@@ -26,7 +26,7 @@ struct _GVfsJobOpenForRead
   DBusConnection *connection;
   DBusMessage *message;
   char *filename;
-  GVfsHandle *backend_handle;
+  GVfsBackendHandle backend_handle;
   gboolean can_seek;
   GVfsReadStream *read_stream;
 };
@@ -39,9 +39,10 @@ struct _GVfsJobOpenForReadClass
 GType g_vfs_job_open_for_read_get_type (void) G_GNUC_CONST;
 
 GVfsJob *       g_vfs_job_open_for_read_new          (DBusConnection     *connection,
-						      DBusMessage        *message);
+						      DBusMessage        *message,
+						      GVfsBackend        *backend);
 void            g_vfs_job_open_for_read_set_handle   (GVfsJobOpenForRead *job,
-						      GVfsHandle         *handle);
+						      GVfsBackendHandle   handle);
 void            g_vfs_job_open_for_read_set_can_seek (GVfsJobOpenForRead *job,
 						      gboolean            can_seek);
 GVfsReadStream *g_vfs_job_open_for_read_steal_stream (GVfsJobOpenForRead *job);

@@ -36,6 +36,20 @@ g_vfs_backend_init (GVfsBackend *backend)
 {
 }
 
+void
+g_vfs_backend_set_mountpoint (GVfsBackend *backend,
+			      const char  *mountpoint)
+{
+  g_free (backend->mountpoint);
+  backend->mountpoint = g_strdup (mountpoint);
+}
+
+const char *
+g_vfs_backend_get_mountpoint (GVfsBackend *backend)
+{
+  return backend->mountpoint;
+}
+
 gboolean
 g_vfs_backend_open_for_read (GVfsBackend *backend,
 			     GVfsJobOpenForRead *job,
@@ -51,7 +65,7 @@ g_vfs_backend_open_for_read (GVfsBackend *backend,
 gboolean
 g_vfs_backend_close_read (GVfsBackend        *backend,
 			  GVfsJobCloseRead   *job,
-			  GVfsHandle         *handle)
+			  GVfsBackendHandle   handle)
 {
   GVfsBackendClass *class;
 
@@ -63,7 +77,7 @@ g_vfs_backend_close_read (GVfsBackend        *backend,
 gboolean
 g_vfs_backend_read (GVfsBackend *backend,
 		    GVfsJobRead *job,
-		    GVfsHandle *handle,
+		    GVfsBackendHandle handle,
 		    char *buffer,
 		    gsize bytes_requested)
 {
@@ -78,7 +92,7 @@ g_vfs_backend_read (GVfsBackend *backend,
 gboolean
 g_vfs_backend_seek_on_read  (GVfsBackend        *backend,
 			     GVfsJobSeekRead    *job,
-			     GVfsHandle         *handle,
+			     GVfsBackendHandle   handle,
 			     goffset             offset,
 			     GSeekType           type)
 {

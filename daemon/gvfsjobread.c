@@ -49,13 +49,16 @@ g_vfs_job_read_init (GVfsJobRead *job)
 
 GVfsJob *
 g_vfs_job_read_new (GVfsReadStream *stream,
-		    gpointer handle,
-		    gsize bytes_requested)
+		    GVfsBackendHandle handle,
+		    gsize bytes_requested,
+		    GVfsBackend *backend)
 {
   GVfsJobRead *job;
   
   job = g_object_new (G_TYPE_VFS_JOB_READ, NULL);
 
+  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
+  
   job->stream = g_object_ref (stream);
   job->handle = handle;
   job->buffer = g_malloc (bytes_requested);

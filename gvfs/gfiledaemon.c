@@ -20,6 +20,7 @@ struct _GFileDaemon
 
   char *filename;
   char *mountpoint;
+  char *bus_name;
 };
 
 G_DEFINE_TYPE_WITH_CODE (GFileDaemon, g_file_daemon, G_TYPE_OBJECT,
@@ -61,8 +62,10 @@ g_file_daemon_new (const char *filename,
   int len;
 
   daemon_file = g_object_new (G_TYPE_FILE_DAEMON, NULL);
+  /* TODO: These should be construct only properties */
   daemon_file->filename = g_strdup (filename);
   daemon_file->mountpoint = g_strdup (mountpoint);
+  daemon_file->bus_name = _g_dbus_bus_name_from_mountpoint (mountpoint);
 
   /* Remove any trailing slashes */
   len = strlen (daemon_file->filename);
@@ -247,7 +250,7 @@ g_file_daemon_read_async (GFile *file,
   DBusMessage *message;
   DBusMessageIter iter;
   
-  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
+  message = dbus_message_new_method_call (daemon_file->bus_name,
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_OPEN_FOR_READ);
@@ -287,7 +290,7 @@ g_file_daemon_read (GFile *file,
       return NULL;
     }
 
-  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
+  message = dbus_message_new_method_call (daemon_file->bus_name,
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_OPEN_FOR_READ);

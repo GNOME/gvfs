@@ -143,6 +143,16 @@ append_escaped_bus_name (GString *s,
     }
 }
 
+char *
+_g_dbus_bus_name_from_mountpoint (const char *mountpoint)
+{
+  GString *bus_name;
+  
+  bus_name = g_string_new (G_VFS_DBUS_MOUNTPOINT_NAME);
+  append_escaped_bus_name (bus_name, mountpoint);
+  return g_string_free (bus_name, FALSE);
+}
+
 
 static int
 daemon_socket_connect (const char *address, GError **error)
@@ -504,7 +514,7 @@ static void
 open_connection_async (AsyncDBusCall *async_call)
 {
   DBusError derror;
-  GString *bus_name;
+  char *bus_name;
   DBusMessage *get_connection_message;
   DBusPendingCall *pending;
   DBusConnection *bus;
@@ -527,13 +537,12 @@ open_connection_async (AsyncDBusCall *async_call)
   async_call->get_connection_source =
     set_connection_for_main_context (async_call->context, NULL, bus);
   
-  bus_name = g_string_new (G_VFS_DBUS_MOUNTPOINT_NAME);
-  append_escaped_bus_name (bus_name, async_call->mountpoint);
-  get_connection_message = dbus_message_new_method_call (bus_name->str,
+  bus_name = _g_dbus_bus_name_from_mountpoint (async_call->mountpoint);
+  get_connection_message = dbus_message_new_method_call (bus_name,
 							 G_VFS_DBUS_DAEMON_PATH,
 							 G_VFS_DBUS_DAEMON_INTERFACE,
 							 G_VFS_DBUS_OP_GET_CONNECTION);
-  g_string_free (bus_name, TRUE);
+  g_free (bus_name);
   
   if (get_connection_message == NULL)
     g_error ("Failed to allocate message");

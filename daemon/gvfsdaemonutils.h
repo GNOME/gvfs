@@ -17,6 +17,7 @@ gboolean     dbus_connection_send_fd            (DBusConnection  *connection,
 char *       g_error_to_daemon_reply            (GError          *error,
 						 guint32          seq_nr,
 						 gsize           *len_out);
+char *       _g_dbus_bus_name_from_mountpoint   (const char      *mountpoint);
 
 G_END_DECLS
 

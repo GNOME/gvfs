@@ -45,13 +45,13 @@ main (int argc, char *argv[])
   if (!init_dbus ())
     return 1;
 
+  daemon = g_vfs_daemon_new ();
+  
   backend = g_vfs_backend_test_new ();
-  daemon = g_vfs_daemon_new (G_VFS_DBUS_MOUNTPOINT_NAME "foo_3A_2F_2F",
-			     G_VFS_BACKEND (backend));
+  if (!g_vfs_daemon_add_backend (daemon, G_VFS_BACKEND (backend)))
+      return 1;
   g_object_unref (backend);
 
-  if (!g_vfs_daemon_is_active (daemon))
-    return 1;
 
   loop = g_main_loop_new (NULL, FALSE);
 

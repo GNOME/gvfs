@@ -22,7 +22,7 @@ struct _GVfsJobCloseRead
   GVfsJob parent_instance;
 
   GVfsReadStream *stream;
-  gpointer handle;
+  GVfsBackendHandle handle;
 };
 
 struct _GVfsJobCloseReadClass
@@ -33,7 +33,8 @@ struct _GVfsJobCloseReadClass
 GType g_vfs_job_close_read_get_type (void) G_GNUC_CONST;
 
 GVfsJob *g_vfs_job_close_read_new (GVfsReadStream    *stream,
-				   gpointer           handle);
+				   GVfsBackendHandle  handle,
+				   GVfsBackend       *backend);
 
 G_END_DECLS
 
