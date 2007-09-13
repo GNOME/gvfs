@@ -28,6 +28,8 @@ struct _GSimpleAsyncResult
 
   gpointer source_tag;
 
+  GValue op_value;
+
   gpointer op_data;
   GDestroyNotify destroy_op_data;
 };
@@ -52,6 +54,8 @@ g_simple_async_result_finalize (GObject *object)
   if (simple->error)
     g_error_free (simple->error);
   
+  g_value_unset (&(simple->op_value));
+
   if (G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize) (object);
 }
@@ -88,6 +92,8 @@ g_simple_async_result_new (GObject *source_object,
   simple->destroy_op_data = destroy_op_data;
   simple->source_tag = source_tag;
   
+  memset (&(simple->op_value), 0, sizeof (GValue));
+
   return simple;
 }
 
@@ -187,6 +193,21 @@ g_simple_async_result_propagate_error (GSimpleAsyncResult *simple,
     }
   return FALSE;
 }
+
+GValue *
+g_simple_async_result_set_op_value (GSimpleAsyncResult *simple,
+                                    GType               g_type)
+{ 
+  return g_value_init (&(simple->op_value), g_type);
+}
+
+const GValue *
+g_simple_async_result_get_op_value (GSimpleAsyncResult *simple)
+{
+  return &(simple->op_value);
+}
+
+
 
 void
 g_simple_async_result_set_from_error (GSimpleAsyncResult *simple,

@@ -47,6 +47,9 @@ GSimpleAsyncResult *g_simple_async_result_new_from_error   (GObject             
 							    gpointer                 user_data,
 							    GError                  *error);
 gpointer            g_simple_async_result_get_op_data      (GSimpleAsyncResult      *simple);
+GValue *            g_simple_async_result_set_op_value (GSimpleAsyncResult *simple,
+                                                        GType               g_type);
+const GValue *      g_simple_async_result_get_op_value (GSimpleAsyncResult *simple);
 gpointer            g_simple_async_result_get_source_tag   (GSimpleAsyncResult      *simple);
 void                g_simple_async_result_set_handle_cancellation (GSimpleAsyncResult      *simple,
 								   gboolean          handle_cancellation);
