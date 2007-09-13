@@ -280,6 +280,55 @@ _g_error_from_dbus (DBusError *derror,
     }
 }
 
+GList *
+_g_dbus_bus_list_names_with_prefix (DBusConnection *connection,
+				    const char *prefix,
+				    DBusError *error)
+{
+  DBusMessage *message, *reply;
+  DBusMessageIter iter, array;
+  GList *names;
+
+  g_return_val_if_fail (connection != NULL, NULL);
+  
+  message = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+                                          DBUS_PATH_DBUS,
+                                          DBUS_INTERFACE_DBUS,
+                                          "ListNames");
+  if (message == NULL)
+    return NULL;
+  
+  reply = dbus_connection_send_with_reply_and_block (connection, message, -1, error);
+  dbus_message_unref (message);
+  
+  if (reply == NULL)
+    return NULL;
+  
+  names = NULL;
+  
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_ARRAY) ||
+      (dbus_message_iter_get_element_type (&iter) != DBUS_TYPE_STRING))
+    goto out;
+
+  for (dbus_message_iter_recurse (&iter, &array);  
+       dbus_message_iter_get_arg_type (&array) == DBUS_TYPE_STRING;
+       dbus_message_iter_next (&array))
+    {
+      char *name;
+      dbus_message_iter_get_basic (&array, &name);
+      if (g_str_has_prefix (name, prefix))
+	names = g_list_prepend (names, g_strdup (name));
+    }
+
+  names = g_list_reverse (names);
+  
+ out:
+  dbus_message_unref (reply);
+  return names;
+}
+
+
 /*************************************************************************
  *                                                                       *
  *      dbus mainloop integration for async ops                          *

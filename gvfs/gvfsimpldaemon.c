@@ -145,7 +145,7 @@ g_vfs_impl_daemon_init (GVfsImplDaemon *vfs)
 	  dbus_error_free (&error);
 	}
 
-      names = _g_dbus_bus_list_names_with_prefix_sync (vfs->bus, G_VFS_DBUS_MOUNTPOINT_NAME, NULL);
+      names = _g_dbus_bus_list_names_with_prefix (vfs->bus, G_VFS_DBUS_MOUNTPOINT_NAME, NULL);
       for (l = names; l != NULL; l = l->next)
 	{
 	  name = l->data;
