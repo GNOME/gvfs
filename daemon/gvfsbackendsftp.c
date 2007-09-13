@@ -1420,7 +1420,7 @@ open_for_read_reply (GVfsBackendSftp *backend,
   handle = sftp_handle_new (reply);
   
   g_vfs_job_open_for_read_set_handle (G_VFS_JOB_OPEN_FOR_READ (job), handle);
-  g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), FALSE);
+  g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), TRUE);
   g_vfs_job_succeeded (job);
 }
 
@@ -1513,6 +1513,85 @@ try_read (GVfsBackend *backend,
   return TRUE;
 }
 
+static void
+seek_fstat_reply (GVfsBackendSftp *backend,
+                  int reply_type,
+                  GDataInputStream *reply,
+                  guint32 len,
+                  GVfsJob *job,
+                  gpointer user_data)
+{
+  SftpHandle *handle;
+  GFileInfo *info;
+  goffset file_size;
+  GVfsJobSeekRead *op_job;
+  
+  handle = user_data;
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply);
+      return;
+    }
+
+  if (reply_type != SSH_FXP_ATTRS)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply recieved"));
+      return;
+    }
+
+  info = g_file_info_new ();
+  parse_attributes (backend, info, NULL,
+                    reply, NULL);
+  file_size = g_file_info_get_size (info);
+  g_object_unref (info);
+
+  op_job = G_VFS_JOB_SEEK_READ (job);
+
+  switch (op_job->seek_type)
+    {
+    case G_SEEK_CUR:
+      handle->offset += op_job->requested_offset;
+      break;
+    case G_SEEK_SET:
+      handle->offset = op_job->requested_offset;
+      break;
+    case G_SEEK_END:
+      handle->offset = file_size + op_job->requested_offset;
+      break;
+    }
+
+  if (handle->offset < 0)
+    handle->offset = 0;
+  if (handle->offset > file_size)
+    handle->offset = file_size;
+  
+  g_vfs_job_seek_read_set_offset (op_job, handle->offset);
+  g_vfs_job_succeeded (job);
+}
+
+static gboolean
+try_seek_on_read (GVfsBackend *backend,
+                  GVfsJobSeekRead *job,
+                  GVfsBackendHandle _handle,
+                  goffset    offset,
+                  GSeekType  type)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend,
+                                SSH_FXP_FSTAT,
+                                &id);
+  put_data_buffer (command, handle->raw_handle);
+  
+  queue_command_stream_and_free (op_backend, command, id, seek_fstat_reply, G_VFS_JOB (job), handle);
+
+  return TRUE;
+}
 
 static void
 close_reply (GVfsBackendSftp *backend,
@@ -2036,6 +2115,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_mount = try_mount;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;
+  backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_close_read = try_close_read;
   backend_class->try_get_info = try_get_info;
   backend_class->try_enumerate = try_enumerate;
