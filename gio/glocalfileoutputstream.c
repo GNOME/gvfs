@@ -52,6 +52,11 @@ static gboolean   g_local_file_output_stream_seek          (GFileOutputStream  *
 							    GSeekType           type,
 							    GCancellable       *cancellable,
 							    GError            **error);
+static gboolean   g_local_file_output_stream_can_truncate  (GFileOutputStream  *stream);
+static gboolean   g_local_file_output_stream_truncate      (GFileOutputStream  *stream,
+							    goffset             size,
+							    GCancellable       *cancellable,
+							    GError            **error);
 
 static void
 g_local_file_output_stream_finalize (GObject *object)
@@ -87,6 +92,8 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
   file_stream_class->tell = g_local_file_output_stream_tell;
   file_stream_class->can_seek = g_local_file_output_stream_can_seek;
   file_stream_class->seek = g_local_file_output_stream_seek;
+  file_stream_class->can_truncate = g_local_file_output_stream_can_truncate;
+  file_stream_class->truncate = g_local_file_output_stream_truncate;
 }
 
 static void
@@ -338,6 +345,53 @@ g_local_file_output_stream_seek (GFileOutputStream     *stream,
   
   return TRUE;
 }
+
+static gboolean
+g_local_file_output_stream_can_truncate (GFileOutputStream    *stream)
+{
+  /* We can't truncate pipes and stuff where we can't seek */
+  return g_local_file_output_stream_can_seek (stream);
+}
+
+static gboolean
+g_local_file_output_stream_truncate (GFileOutputStream    *stream,
+				     goffset               size,
+				     GCancellable         *cancellable,
+				     GError              **error)
+{
+  GLocalFileOutputStream *file;
+  int res;
+
+  file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
+
+ restart:
+  res = ftruncate(file->priv->fd, size);
+  
+  if (res == -1)
+    {
+      if (errno == EINTR)
+	{
+	  if (g_cancellable_is_cancelled (cancellable))
+	    {
+	      g_set_error (error,
+			   G_IO_ERROR,
+			   G_IO_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      return FALSE;
+	    }
+	  goto restart;
+	}
+
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error truncating file: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
 
 static GFileInfo *
 g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
