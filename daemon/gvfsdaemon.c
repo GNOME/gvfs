@@ -14,6 +14,7 @@
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobopenforread.h>
+#include <gvfsmountpoint.h>
 
 G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
 
@@ -27,6 +28,12 @@ typedef struct {
   gpointer data;
 } RegisteredPath;
 
+typedef struct {
+  char *owner;
+  char *path;
+  GVfsMountpoint *mountpoint;
+} MountpointData;
+
 struct _GVfsDaemonPrivate
 {
   GMutex *lock;
@@ -39,6 +46,7 @@ struct _GVfsDaemonPrivate
   GQueue *jobs;
   guint queued_job_start; 
   GList *job_sources;
+  GList *tracked_mountpoints; /* Only accessed from main thread */
 };
 
 typedef struct {
@@ -199,6 +207,23 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
       dbus_error_free (&error);
       return NULL;
     }
+
+
+  if (main_daemon)
+    {
+      dbus_bus_add_match (conn,
+			  "interface='"G_VFS_DBUS_MOUNTPOINT_INTERFACE"',"
+			  "member='"G_VFS_DBUS_ANNOUNCE_MOUNTPOINT"'",
+			  &error);
+      if (dbus_error_is_set (&error))
+	{
+	  g_printerr ("Failed to connect to add dbus match: %s\n",
+		      error.message);
+	  dbus_error_free (&error);
+	  return NULL;
+	}
+    }
+  
   
   dbus_connection_setup_with_g_main (conn, NULL);
   
@@ -793,9 +818,46 @@ daemon_message_func (DBusConnection *conn,
 		     gpointer        data)
 {
   GVfsDaemon *daemon = data;
-  GVfsJob *job;
+  GList *l, *next;
   RegisteredPath *registered_path;
+  MountpointData *mount_data;
 
+  if (daemon->priv->main_daemon &&
+      dbus_message_is_signal (message, G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+			      G_VFS_DBUS_ANNOUNCE_MOUNTPOINT))
+    {
+      const char *path = dbus_message_get_path (message);
+      const char *sender = dbus_message_get_sender (message);
+      DBusMessageIter iter;
+
+      for (l = daemon->priv->tracked_mountpoints; l != NULL; l = l->next)
+	{
+	  mount_data = l->data;
+	  if (strcmp (mount_data->owner, sender) == 0 &&
+	      strcmp (mount_data->path, path) == 0)
+	    break;
+	}
+
+      if (l == NULL)
+	{
+	  GVfsMountpoint *mountpoint;
+	  
+	  if (dbus_message_iter_init (message, &iter) &&
+	      (mountpoint = g_vfs_mountpoint_from_dbus (&iter)) != NULL)
+	    {
+	      mount_data = g_new0 (MountpointData, 1);
+	      mount_data->mountpoint = mountpoint;
+	      mount_data->owner = g_strdup (sender);
+	      mount_data->path = g_strdup (path);
+
+	      g_print ("Added mountpoint: %s, %s, %s\n", mount_data->owner, mount_data->path, mount_data->mountpoint->method);
+	      
+	      daemon->priv->tracked_mountpoints =
+		g_list_prepend (daemon->priv->tracked_mountpoints, mount_data);
+	    }
+	}
+    }
+  
   if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
     {
       char *name, *from, *to;
@@ -830,10 +892,72 @@ daemon_message_func (DBusConnection *conn,
 		  g_mutex_unlock (daemon->priv->lock);
 		}
 	    }
+
+	  if (*name == ':' && *to == 0)
+	    {
+	      /* Sender died */
+
+	      l = daemon->priv->tracked_mountpoints;
+	      while (l != NULL)
+		{
+		  mount_data = l->data;
+		  next = l->next;
+		  
+		  if (strcmp (mount_data->owner, name) == 0)
+		    {
+		      g_print ("Removed mountpoint: %s, %s, %s\n", mount_data->owner, mount_data->path, mount_data->mountpoint->method);
+		      g_vfs_mountpoint_free (mount_data->mountpoint);
+		      g_free (mount_data->owner);
+		      g_free (mount_data->path);
+		      g_free (mount_data);
+		      daemon->priv->tracked_mountpoints =
+			g_list_delete_link (daemon->priv->tracked_mountpoints, l);
+		    }
+		  
+		  l = next;
+		}
+	    }
+	}
+    }
+
+  if (daemon->priv->main_daemon &&
+      dbus_message_is_method_call (message,
+				   G_VFS_DBUS_MOUNTPOINT_TRACKER_INTERFACE,
+				   G_VFS_DBUS_LIST_MOUNT_POINTS))
+    {
+      DBusMessage *reply;
+      DBusMessageIter iter, array;
+
+      reply = dbus_message_new_method_return (message);
+      
+      dbus_message_iter_init_append (reply, &iter);
+
+      
+      if (dbus_message_iter_open_container (&iter, DBUS_TYPE_ARRAY,
+					    DBUS_TYPE_STRING_AS_STRING	
+					    DBUS_TYPE_STRING_AS_STRING	
+					    G_VFS_MOUNTPOINT_SIGNATURE,
+					    &array))
+	{
+	  for (l = daemon->priv->tracked_mountpoints; l != NULL; l = l->next)
+	    {
+	      mount_data = l->data;
+
+	      dbus_message_iter_append_basic (&array, DBUS_TYPE_STRING,
+					      mount_data->owner);
+	      dbus_message_iter_append_basic (&array, DBUS_TYPE_STRING,
+					      mount_data->path);
+	      
+	      g_vfs_mountpoint_to_dbus (mount_data->mountpoint, &array);
+	    }
+
+	  dbus_message_iter_close_container (&iter, &array);
+
+	  dbus_connection_send (conn, reply, NULL);
+	  dbus_message_unref (reply);
 	}
     }
   
-  job = NULL;
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_DAEMON_INTERFACE,
 				   G_VFS_DBUS_OP_GET_CONNECTION))

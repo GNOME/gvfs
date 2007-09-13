@@ -275,12 +275,12 @@ _g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filenam
 					 DBUS_TYPE_BYTE_AS_STRING,
 					 &array))
     return FALSE;
-  
+
   if (!dbus_message_iter_append_fixed_array (&array,
 					     DBUS_TYPE_BYTE,
 					     &filename, strlen (filename)))
     return FALSE;
-  
+
   if (!dbus_message_iter_close_container (iter, &array))
     return FALSE;
 
