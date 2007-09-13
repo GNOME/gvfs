@@ -34,7 +34,7 @@ struct _GFileIface
 
   /* Virtual Table */
 
-  GFile *             (*copy)               (GFile                *file);
+  GFile *             (*dup)                (GFile                *file);
   guint               (*hash)               (GFile                *file);
   gboolean            (*equal)              (GFile                *file1,
 					     GFile                *file2);
@@ -89,7 +89,7 @@ GFile *g_file_get_for_uri             (const char *uri);
 GFile *g_file_parse_name              (const char *parse_name);
 GFile *g_file_get_for_commandline_arg (const char *arg);
 
-GFile *            g_file_copy               (GFile                  *file);
+GFile *            g_file_dup                (GFile                  *file);
 guint              g_file_hash               (gconstpointer           file);
 gboolean           g_file_equal              (GFile                  *file1,
 					      GFile                  *file2);

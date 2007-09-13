@@ -262,7 +262,7 @@ g_local_file_get_parent (GFile *file)
 }
 
 static GFile *
-g_local_file_copy (GFile *file)
+g_local_file_dup (GFile *file)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
 
@@ -421,7 +421,7 @@ g_local_file_mount (GFile *file,
 static void
 g_local_file_file_iface_init (GFileIface *iface)
 {
-  iface->copy = g_local_file_copy;
+  iface->dup = g_local_file_dup;
   iface->hash = g_local_file_hash;
   iface->equal = g_local_file_equal;
   iface->is_native = g_local_file_is_native;

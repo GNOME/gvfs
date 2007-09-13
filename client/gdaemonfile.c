@@ -189,7 +189,7 @@ g_daemon_file_get_parent (GFile *file)
 }
 
 static GFile *
-g_daemon_file_copy (GFile *file)
+g_daemon_file_dup (GFile *file)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
 
@@ -873,7 +873,7 @@ g_daemon_file_mount (GFile *file,
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
-  iface->copy = g_daemon_file_copy;
+  iface->dup = g_daemon_file_dup;
   iface->hash = g_daemon_file_hash;
   iface->equal = g_daemon_file_equal;
   iface->is_native = g_daemon_file_is_native;

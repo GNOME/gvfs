@@ -105,13 +105,13 @@ g_file_get_parse_name (GFile *file)
 }
 
 GFile *
-g_file_copy (GFile *file)
+g_file_dup (GFile *file)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->copy) (file);
+  return (* iface->dup) (file);
 }
 
 guint

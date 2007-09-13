@@ -90,11 +90,11 @@ g_local_daemon_file_get_parent (GFile *file)
 }
 
 static GFile *
-g_local_daemon_file_copy (GFile *file)
+g_local_daemon_file_dup (GFile *file)
 {
   GFile *copy;
 
-  copy = g_file_copy (G_LOCAL_DAEMON_FILE (file)->wrapped);
+  copy = g_file_dup (G_LOCAL_DAEMON_FILE (file)->wrapped);
   return g_local_daemon_file_new (copy);
 }
 
@@ -202,7 +202,7 @@ g_local_daemon_file_mount (GFile *file,
 static void
 g_local_daemon_file_file_iface_init (GFileIface *iface)
 {
-  iface->copy = g_local_daemon_file_copy;
+  iface->dup = g_local_daemon_file_dup;
   iface->hash = g_local_daemon_file_hash;
   iface->equal = g_local_daemon_file_equal;
   iface->is_native = g_local_daemon_file_is_native;
