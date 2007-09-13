@@ -51,6 +51,19 @@ g_mount_spec_set (GMountSpec *spec,
 		  const char *key,
 		  const char *value)
 {
+  int i;
+  
+  for (i = 0; i < spec->items->len; i++)
+    {
+      GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
+      if (strcmp (item->key, key) == 0)
+	{
+	  g_free (item->value);
+	  item->value = g_strdup (value);
+	  return;
+	}
+    }
+
   add_item (spec, key, g_strdup (value));
   g_array_sort (spec->items, item_compare);
 }
