@@ -292,8 +292,11 @@ static char *
 g_desktop_app_info_get_name (GAppInfo *appinfo)
 {
   GDesktopAppInfo *info = G_DESKTOP_APP_INFO (appinfo);
-  
-  return g_strdup (info->name);
+
+  if (info->name == NULL)
+    return g_strdup (_("Unnamed"));
+  //return g_strdup (info->name);
+  return g_strdup_printf ("%s - %s", info->name, info->desktop_id);
 }
 
 static char *
@@ -770,6 +773,111 @@ g_get_default_app_info_for_type (const char *content_type)
   return info;
 }
 
+static void
+get_apps_from_dir (GHashTable *apps, const char *dirname, const char *prefix)
+{
+  GDir *dir;
+  const char *basename;
+  char *filename, *subprefix, *desktop_id;
+  gboolean hidden;
+  GDesktopAppInfo *appinfo;
+  
+  dir = g_dir_open (dirname, 0, NULL);
+  if (dir)
+    {
+      while ((basename = g_dir_read_name (dir)) != NULL)
+	{
+	  filename = g_build_filename (dirname, basename, NULL);
+	  if (g_str_has_suffix (basename, ".desktop"))
+	    {
+	      desktop_id = g_strconcat (prefix, basename, NULL);
+
+	      /* Use _extended so we catch NULLs too (hidden) */
+	      if (!g_hash_table_lookup_extended (apps, desktop_id, NULL, NULL))
+		{
+		  appinfo = g_desktop_app_info_new_from_filename (filename, &hidden);
+
+		  /* Don't return apps that don't take arguments */
+		  if (appinfo &&
+		      strstr (appinfo->exec,"%U") == NULL &&
+		      strstr (appinfo->exec,"%u") == NULL &&
+		      strstr (appinfo->exec,"%f") == NULL &&
+		      strstr (appinfo->exec,"%F") == NULL)
+		    {
+		      g_object_unref (appinfo);
+		      appinfo = NULL;
+		      hidden = TRUE;
+		    }
+				      
+		  if (appinfo != NULL || hidden)
+		    {
+		      g_hash_table_insert (apps, g_strdup (desktop_id), appinfo);
+
+		      if (appinfo)
+			{
+			  /* Reuse instead of strdup here */
+			  appinfo->desktop_id = desktop_id;
+			  desktop_id = NULL;
+			}
+		    }
+		}
+	      g_free (desktop_id);
+	    }
+	  else
+	    {
+	      if (g_file_test (filename, G_FILE_TEST_IS_DIR))
+		{
+		  subprefix = g_strconcat (prefix, basename, "-", NULL);
+		  get_apps_from_dir (apps, filename, subprefix);
+		  g_free (subprefix);
+		}
+	    }
+	  g_free (filename);
+	}
+      g_dir_close (dir);
+    }
+}
+
+static void
+collect_apps (gpointer  key,
+	      gpointer  value,
+	      gpointer  user_data)
+{
+  GList **infos = user_data;
+
+  if (value)
+    *infos = g_list_prepend (*infos, value);
+}
+
+
+GList *
+g_get_all_app_info (void)
+{
+  const char * const *dirs;
+  GHashTable *apps;
+  int i;
+  GList *infos;
+
+  dirs = get_applications_search_path ();
+
+  apps = g_hash_table_new_full (g_str_hash, g_str_equal,
+				g_free, NULL);
+
+  
+  for (i = 0; dirs[i] != NULL; i++)
+    get_apps_from_dir (apps, dirs[i], "");
+
+
+  infos = NULL;
+  g_hash_table_foreach (apps,
+			collect_apps,
+			&infos);
+
+  g_hash_table_destroy (apps);
+
+  return g_list_reverse (infos);
+}
+
 /* Cacheing of mimeinfo.cache and defaults.list files */
 
 typedef struct {
@@ -1134,7 +1242,7 @@ mime_info_cache_init (void)
 	    time_t now;
 	    
 	    time (&now);
-	    if (now >= mime_info_cache->last_stat_time + 20)
+	    if (now >= mime_info_cache->last_stat_time + 10)
 	      {
 		mime_info_cache_update_dir_lists ();
 		mime_info_cache->last_stat_time = now;

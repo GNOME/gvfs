@@ -1,5 +1,6 @@
 #include <string.h>
 #include <unistd.h>
+#include <locale.h>
 
 #include <glib.h>
 #include "gfile.h"
@@ -264,21 +265,34 @@ test_seek (void)
   g_print ("close res: %d\n", close_res);
 }
 
-int
-main (int argc, char *argv[])
+
+static gint
+compare_apps (gconstpointer  _a,
+	      gconstpointer  _b)
 {
-  GFile *file;
-  GMainLoop *loop;
+  GAppInfo *a = (GAppInfo *)_a;
+  GAppInfo *b = (GAppInfo *)_b;
+  char *name_a;
+  char *name_b;
+  int res;
+
+  name_a = g_app_info_get_name (a);
+  name_b = g_app_info_get_name (b);
+  res = g_utf8_collate (name_a, name_b);
+  g_free (name_a);
+  g_free (name_b);
+  return res;
+}
+
+static void
+test_appinfo (void)
+{
   GList *infos, *l;
   GAppInfo *info;
 
-  g_type_init ();
-  g_thread_init (NULL);
-
-
   infos = g_get_all_app_info_for_type ("text/html");
 
-  g_print ("all app info: \n");
+  g_print ("all html app info: \n");
   for (l = infos; l != NULL; l = l->next)
     {
       info = l->data;
@@ -286,12 +300,36 @@ main (int argc, char *argv[])
     }
 
   info = g_get_default_app_info_for_type ("text/html");
-  g_print ("default - %p: %s\n", info, g_app_info_get_name (info));
+  g_print ("default html - %p: %s\n", info, g_app_info_get_name (info));
+  
+  infos = g_get_all_app_info ();
+  g_print ("all app info: \n");
+  infos = g_list_sort (infos, compare_apps);
 
+  for (l = infos; l != NULL; l = l->next)
+    {
+      info = l->data;
+      g_print ("%s%s\n", g_app_info_get_name (info),
+	       g_app_info_should_show (info, "GNOME")?"":" (hidden)");
+    }
+}
+
+int
+main (int argc, char *argv[])
+{
+  GFile *file;
+  GMainLoop *loop;
+
+  setlocale (LC_ALL, "");
   
+  g_type_init ();
+  g_thread_init (NULL);
+
   if (1)
-    return 0;
-  
+    {
+      test_appinfo  ();
+      return 0;
+    }
   
   if (0)
     test_seek ();
