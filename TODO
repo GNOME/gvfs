@@ -1,3 +1,6 @@
+gio:
+===
+
 Return std:icon for local files, etc
 
 Work on GFile:
@@ -11,25 +14,9 @@ getting selinux attrs is a bit slow, it does all sort of weird ops.
 
 Add filter streams: data, charset conversion, etc
 
-implement readahead in GVFSReadStream, time difference
-
-implement get_file_info for GFileInputStreamDaemon, needs marshalling attributes over custom protocol
-
 implement seeks in local streams
 
-remove owners from bus_name_map when they fail
-
-smb support for smbc_getxattr!
-smb - handle server going down
-
 is-slow marking for e.g. thumbnailing?
-
-add trash:/// support 
-
-decide exactly how to handle not-mounted errors and make sure its consistent.
-mount daemons should re-register when new owner for vfs daemon.
-
-remove dbus-gmain.[ch]? We have no server integration in common/ atm
 
 handle setting xattrs on local files (and list the namespace as writable)
 Split user.* and system.* into two namespaces?
@@ -49,8 +36,6 @@ Add virtual file monitor event to support inotify WRITE_CLOSE
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
-Make built-in uri parsers link into gvfs shared lib instead of using a module
-
 Finish general attribute copy in gfile.c move fallback.
 Think about atomic updates of several attributes.
 gedit uses attr_copy_fd in libattr to copy xattrs
@@ -58,6 +43,27 @@ handle attributes in atomic save backup copy
 GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 
 Set owner:user, owner:group for local files
+
+gvfs:
+====
+
+implement readahead in GVFSReadStream, time difference
+
+implement get_file_info for GFileInputStreamDaemon, needs marshalling attributes over custom protocol
+
+remove owners from bus_name_map when they fail
+
+smb support for smbc_getxattr!
+smb - handle server going down
+
+add trash:/// support 
+
+decide exactly how to handle not-mounted errors and make sure its consistent.
+mount daemons should re-register when new owner for vfs daemon.
+
+remove dbus-gmain.[ch]? We have no server integration in common/ atm
+
+Make built-in uri parsers link into gvfs shared lib instead of using a module
 
 FUTURE IDEAS:
 -------------
