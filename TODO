@@ -66,7 +66,9 @@ Use this to copy xattrs in general move fallback.
 
 Get rid of std:flags, split it up to avoid problems with unknow flag values
 Set owner:user, owner:group for local files
-						      
+
+document create time vs change time vs mtime, etc
+
 FUTURE IDEAS:
 -------------
 
