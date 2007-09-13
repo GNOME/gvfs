@@ -8,6 +8,7 @@
 #include "gunionvolume.h"
 #include "guniondrive.h"
 #include "gvolumepriv.h"
+#include "giomodule.h"
 #ifdef G_OS_UNIX
 #include "gunixvolumemonitor.h"
 #endif
@@ -402,12 +403,38 @@ g_union_volume_monitor_convert_drive (GUnionVolumeMonitor *monitor,
 static void
 g_union_volume_monitor_init (GUnionVolumeMonitor *union_monitor)
 {
-#ifdef G_OS_UNIX
   GVolumeMonitor *monitor;
-  monitor = g_unix_volume_monitor_new ();
-  g_union_volume_monitor_add_monitor (union_monitor, monitor);
-  g_object_unref (monitor);
+  GType *monitors;
+  guint n_monitors;
+  int i;
+  
+#ifdef G_OS_UNIX
+  /* Ensure GUnixVolumeMonitor type is availible */
+  {
+    GType (*casted_get_type)(void);
+    /* cast is required to avoid any G_GNUC_CONST optimizations */
+    casted_get_type = g_unix_volume_monitor_get_type;
+    casted_get_type ();
+  }
 #endif
+  
+  /* Ensure vfs in modules loaded */
+  g_io_modules_ensure_loaded ();
+  
+
+  monitors = g_type_children (G_TYPE_VOLUME_MONITOR, &n_monitors);
+
+  for (i = 0; i < n_monitors; i++)
+    {
+      if (monitors[i] == G_TYPE_UNION_VOLUME_MONITOR)
+	continue;
+      
+      monitor = g_object_new (monitors[i], NULL);
+      g_union_volume_monitor_add_monitor (union_monitor, monitor);
+      g_object_unref (monitor);
+    }
+  
+  g_free (monitors);
 }
 
 static GUnionVolumeMonitor *
