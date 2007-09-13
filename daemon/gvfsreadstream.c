@@ -33,6 +33,14 @@ enum {
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
+typedef struct
+{
+  GVfsReadStream *read_stream;
+  GInputStream *command_stream;
+  char buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE];
+  int buffer_size;
+} RequestReader;
+
 struct _GVfsReadStreamPrivate
 {
   GInputStream *command_stream;
@@ -43,20 +51,18 @@ struct _GVfsReadStreamPrivate
   gpointer data; /* user data, i.e. GVfsHandle */
   GVfsJob *current_job;
   guint32 current_job_seq_nr;
-  
-  char command_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE];
-  int command_buffer_size;
 
+  RequestReader *request_reader;
+  
   char reply_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE];
   int reply_buffer_pos;
   
   char *output_data;
   gsize output_data_size;
   gsize output_data_pos;
-  
 };
 
-static void request_command (GVfsReadStream *stream);
+static void start_request_reader (GVfsReadStream *stream);
 
 static void
 g_vfs_read_stream_finalize (GObject *object)
@@ -72,6 +78,10 @@ g_vfs_read_stream_finalize (GObject *object)
   if (read_stream->priv->reply_stream)
     g_object_unref (read_stream->priv->reply_stream);
   read_stream->priv->reply_stream = NULL;
+
+  if (read_stream->priv->request_reader)
+    read_stream->priv->request_reader->read_stream = NULL;
+  read_stream->priv->request_reader = NULL;
 
   if (read_stream->priv->command_stream)
     g_object_unref (read_stream->priv->command_stream);
@@ -128,6 +138,7 @@ send_reply_cb (GOutputStream *output_stream,
 
   if (bytes_written <= 0)
     {
+      g_object_unref (stream);
       /* TODO: handle errors */
       g_assert_not_reached ();
       return;
@@ -174,6 +185,8 @@ send_reply_cb (GOutputStream *output_stream,
   g_object_unref (stream->priv->current_job);
   stream->priv->current_job = NULL;
   g_print ("Sent reply\n");
+  
+  g_object_unref (stream);
 }
 
 /* Might be called on an i/o thread
@@ -189,6 +202,7 @@ send_reply (GVfsReadStream *stream,
   stream->priv->output_data_size = data_len;
   stream->priv->output_data_pos = 0;
   
+  g_object_ref (stream);
   if (use_header)
     {
       stream->priv->reply_buffer_pos = 0;
@@ -294,12 +308,18 @@ command_read_cb (GInputStream *input_stream,
 		 gpointer      data,
 		 GError       *error)
 {
-  g_print ("command_read_cb - data: %p\n", data);
-  GVfsReadStream *stream = G_VFS_READ_STREAM (data);
+  RequestReader *reader = data;
   GVfsDaemonSocketProtocolRequest *cmd;
   guint32 seq_nr;
   guint32 command;
   guint32 arg1, arg2;
+
+  if (reader->read_stream == NULL)
+    {
+      g_object_unref (reader->command_stream);
+      g_free (reader);
+      return;
+    }
   
   if (count_read <= 0)
     {
@@ -308,43 +328,60 @@ command_read_cb (GInputStream *input_stream,
     }
 
   g_print ("command_read_cb: %d\n", count_read);
-  stream->priv->command_buffer_size += count_read;
+  reader->buffer_size += count_read;
 
-  if (stream->priv->command_buffer_size < G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE)
+  if (reader->buffer_size < G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE)
     {
-      g_input_stream_read_async (stream->priv->command_stream,
-				 stream->priv->command_buffer + stream->priv->command_buffer_size,
-				 G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - stream->priv->command_buffer_size,
+      g_input_stream_read_async (reader->command_stream,
+				 reader->buffer + reader->buffer_size,
+				 G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
 				 0,
 				 command_read_cb,
-				 stream,
+				 reader,
 				 NULL);
       return;
     }
 
-  cmd = (GVfsDaemonSocketProtocolRequest *)stream->priv->command_buffer;
+  cmd = (GVfsDaemonSocketProtocolRequest *)reader->buffer;
   command = g_ntohl (cmd->command);
   arg1 = g_ntohl (cmd->arg1);
   arg2 = g_ntohl (cmd->arg2);
   seq_nr = g_ntohl (cmd->seq_nr);
-  stream->priv->command_buffer_size = 0;
-  got_command (stream, command, seq_nr, arg1, arg2);
+  reader->buffer_size = 0;
+
+  got_command (reader->read_stream, command, seq_nr, arg1, arg2);
   
   /* Request more commands, so can get cancel requests */
-  request_command (stream);
+
+  reader->buffer_size = 0;
+  g_input_stream_read_async (reader->command_stream,
+			     reader->buffer + reader->buffer_size,
+			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
+			     0,
+			     command_read_cb,
+			     reader,
+			     NULL);
 }
 
 static void
-request_command (GVfsReadStream *stream)
+start_request_reader (GVfsReadStream *stream)
 {
-  stream->priv->command_buffer_size = 0;
-  g_input_stream_read_async (stream->priv->command_stream,
-			     stream->priv->command_buffer + stream->priv->command_buffer_size,
-			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - stream->priv->command_buffer_size,
+  RequestReader *reader;
+
+  reader = g_new0 (RequestReader, 1);
+  reader->read_stream = stream;
+  reader->command_stream = g_object_ref (stream->priv->command_stream);
+  reader->buffer_size = 0;
+  
+  g_input_stream_read_async (reader->command_stream,
+			     reader->buffer + reader->buffer_size,
+			     G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE - reader->buffer_size,
 			     0,
 			     command_read_cb,
-			     stream,
+			     reader,
 			     NULL);
+
+  stream->priv->request_reader = reader;
 }
 
 /* Might be called on an i/o thread
@@ -417,7 +454,7 @@ g_vfs_read_stream_new (GError **error)
   stream->priv->reply_stream = g_output_stream_socket_new (socket_fds[0], FALSE);
   stream->priv->remote_fd = socket_fds[1];
 
-  request_command (stream);
+  start_request_reader (stream);
   
   return stream;
 }
