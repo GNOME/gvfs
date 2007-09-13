@@ -241,6 +241,13 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
   return daemon;
 }
 
+void
+g_vfs_daemon_set_max_threads (GVfsDaemon                    *daemon,
+			      gint                           max_threads)
+{
+  g_thread_pool_set_max_threads (daemon->thread_pool, max_threads, NULL);
+}
+
 static gboolean
 exit_at_idle (gpointer data)
 {

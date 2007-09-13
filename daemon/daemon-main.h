@@ -11,6 +11,7 @@ GMountSource *daemon_parse_args (int         argc,
 				 const char *default_type);
 void          daemon_main       (int         argc,
 				 char       *argv[],
+				 int max_job_threads,
 				 const char *default_type,
 				 const char *mountable_name,
 				 const char *first_type_name,

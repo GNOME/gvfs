@@ -94,6 +94,7 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 void
 daemon_main (int argc,
 	     char *argv[],
+	     int max_job_threads,
 	     const char *default_type,
 	     const char *mountable_name,
 	     const char *first_type_name,
@@ -161,6 +162,8 @@ daemon_main (int argc,
       exit (1);
     }
 
+  g_vfs_daemon_set_max_threads (daemon, max_job_threads);  
+  
   if (mount_source)
     {
       g_vfs_daemon_initiate_mount (daemon, mount_source);

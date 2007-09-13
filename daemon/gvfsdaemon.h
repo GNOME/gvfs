@@ -31,6 +31,8 @@ GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
 GVfsDaemon *g_vfs_daemon_new             (gboolean                       main_daemon,
 					  gboolean                       replace);
+void        g_vfs_daemon_set_max_threads (GVfsDaemon                    *daemon,
+					  gint                           max_threads);
 void        g_vfs_daemon_add_job_source  (GVfsDaemon                    *daemon,
 					  GVfsJobSource                 *job_source);
 void        g_vfs_daemon_queue_job       (GVfsDaemon                    *daemon,

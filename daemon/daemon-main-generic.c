@@ -9,6 +9,11 @@ main (int argc, char *argv[])
 {
   daemon_init ();
   daemon_main (argc, argv,
+#ifdef MAX_JOB_THREADS
+	       MAX_JOB_THREADS,
+#else
+	       -1, 
+#endif
 #ifdef DEFAULT_BACKEND_TYPE
 	       G_STRINGIFY(DEFAULT_BACKEND_TYPE),
 #else
