@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/vfs.h>
+#include <sys/time.h>
 #include <errno.h>
 
 #include <glib.h>
@@ -68,6 +69,9 @@ static time_t         daemon_creation_time;
 static uid_t          daemon_uid;
 static gid_t          daemon_gid;
 
+static GStaticMutex   global_mutex        = G_STATIC_MUTEX_INIT;
+static GHashTable    *global_fh_table     = NULL;
+
 /* ------- *
  * Helpers *
  * ------- */
@@ -123,7 +127,7 @@ errno_from_error (GError *error)
       { G_IO_ERROR_NO_SPACE,           ENOSPC       },
       { G_IO_ERROR_INVALID_ARGUMENT,   EINVAL       },
       { G_IO_ERROR_PERMISSION_DENIED,  EACCES       },
-      { G_IO_ERROR_NOT_SUPPORTED,      EIO          },
+      { G_IO_ERROR_NOT_SUPPORTED,      ENOTSUP      },
       { G_IO_ERROR_NOT_MOUNTED,        EIO          },
       { G_IO_ERROR_ALREADY_MOUNTED,    EIO          },
       { G_IO_ERROR_CLOSED,             EIO          },
@@ -133,6 +137,7 @@ errno_from_error (GError *error)
       { G_IO_ERROR_CANT_CREATE_BACKUP, EIO          },
       { G_IO_ERROR_WRONG_MTIME,        EIO          },
       { G_IO_ERROR_TIMED_OUT,          EIO          },
+      { G_IO_ERROR_BUSY,               EBUSY        },
       { -1,                            -1           }
     };
 
@@ -158,12 +163,13 @@ file_handle_new (void)
 
   file_handle = g_new0 (FileHandle, 1);
   file_handle->mutex = g_mutex_new ();
+  file_handle->op = FILE_OP_NONE;
 
   return file_handle;
 }
 
 static void
-file_handle_free (FileHandle *file_handle)
+file_handle_close_stream (FileHandle *file_handle)
 {
   if (file_handle->stream)
     {
@@ -183,10 +189,83 @@ file_handle_free (FileHandle *file_handle)
 
       g_object_unref (file_handle->stream);
       file_handle->stream = NULL;
+      file_handle->op = FILE_OP_NONE;
     }
+}
 
+static void
+file_handle_free (FileHandle *file_handle)
+{
+  file_handle_close_stream (file_handle);
   g_mutex_free (file_handle->mutex);
   g_free (file_handle);
+}
+
+static FileHandle *
+get_file_handle_for_path (const gchar *path)
+{
+  FileHandle *fh;
+
+  g_static_mutex_lock (&global_mutex);
+  fh = g_hash_table_lookup (global_fh_table, path);
+  g_static_mutex_unlock (&global_mutex);
+
+  return fh;
+}
+
+static FileHandle *
+get_or_create_file_handle_for_path (const gchar *path)
+{
+  FileHandle *fh;
+
+  fh = get_file_handle_for_path (path);
+  if (!fh)
+    {
+      fh = file_handle_new ();
+
+      g_static_mutex_lock (&global_mutex);
+      g_hash_table_insert (global_fh_table, g_strdup (path), fh);
+      g_static_mutex_unlock (&global_mutex);
+    }
+
+  return fh;
+}
+
+static void
+reindex_file_handle_for_path (const gchar *old_path, const gchar *new_path)
+{
+  gchar      *old_path_internal;
+  FileHandle *fh;
+
+  g_static_mutex_lock (&global_mutex);
+
+  if (!g_hash_table_lookup_extended (global_fh_table, old_path,
+                                     (gpointer *) &old_path_internal,
+                                     (gpointer *) &fh))
+      goto out;
+
+  g_free (old_path_internal);
+  g_hash_table_insert (global_fh_table, g_strdup (new_path), fh);
+
+ out:
+  g_static_mutex_unlock (&global_mutex);
+}
+
+static gboolean
+free_file_handle_for_path (const gchar *path)
+{
+  FileHandle *fh;
+
+  fh = get_file_handle_for_path (path);
+  if (fh)
+    {
+      g_static_mutex_lock (&global_mutex);
+      g_hash_table_remove (global_fh_table, fh);
+      g_static_mutex_unlock (&global_mutex);
+      return TRUE;
+    }
+
+  return FALSE;
 }
 
 static MountRecord *
@@ -662,7 +741,9 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
       g_object_unref (file);
     }
 
-  return 0;
+  debug_print ("vfs_statfs: -> %s\n", strerror (-result));
+
+  return result;
 }
 
 #endif
@@ -670,6 +751,8 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
 static gint
 vfs_statfs (const gchar *path, struct statvfs *stbuf)
 {
+  gint result = 0;
+
   debug_print ("vfs_statfs: %s\n", path);
 
   memset (stbuf, 0, sizeof (*stbuf));
@@ -687,9 +770,11 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
   stbuf->f_namemax = 1024;
 
   if (statvfs ("/", stbuf) != 0)
-    return -errno;
+    result = -errno;
 
-  return 0;
+  debug_print ("vfs_statfs: -> %s\n", strerror (-result));
+
+  return result;
 }
 
 static mode_t
@@ -698,7 +783,7 @@ file_info_get_stat_mode (GFileInfo *file_info)
   GFileType         file_type;
   mode_t            unix_mode;
 
-  file_type   = g_file_info_get_file_type (file_info);
+  file_type = g_file_info_get_file_type (file_info);
 
   switch (file_type)
     {
@@ -794,10 +879,15 @@ getattr_for_file (GFile *file, struct stat *sbuf)
 static gint
 vfs_getattr (const gchar *path, struct stat *sbuf)
 {
-  GFile *file;
-  gint   result = 0;
+  GFile      *file;
+  gint        result = 0;
+  FileHandle *fh;
 
   debug_print ("vfs_getattr: %s\n", path);
+
+  fh = get_file_handle_for_path (path);
+  if (fh)
+    g_mutex_lock (fh->mutex);
 
   memset (sbuf, 0, sizeof (*sbuf));
 
@@ -836,6 +926,11 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
     {
       result = -ENOENT;
     }
+
+  if (fh)
+    g_mutex_unlock (fh->mutex);
+
+  debug_print ("vfs_getattr: -> %s\n", strerror (-result));
 
   return result;
 }
@@ -955,18 +1050,17 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
 
           if (file_type == G_FILE_TYPE_REGULAR)
             {
-              FileHandle *fh = file_handle_new ();
+              FileHandle *fh = get_or_create_file_handle_for_path (path);
               
               /* File exists */
 
               SET_FILE_HANDLE (fi, fh);
-              fh->op = FILE_OP_NONE;
 
               debug_print ("vfs_open: flags=%o\n", fi->flags);
 
               /* Set up a stream here, so we can check for errors */
 
-              if (fi->flags & O_WRONLY)
+              if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
                 result = setup_output_stream (file, fh);
               else
                 result = setup_input_stream (file, fh);
@@ -1006,6 +1100,8 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
+  debug_print ("vfs_open: -> %s\n", strerror (-result));
+
   return result;
 }
 
@@ -1042,11 +1138,14 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
           file_output_stream = g_file_create (file, NULL, &error);
           if (file_output_stream)
             {
-              FileHandle *fh = file_handle_new ();
+              FileHandle *fh = get_or_create_file_handle_for_path (path);
 
               /* Success */
 
               SET_FILE_HANDLE (fi, fh);
+
+              g_assert (fh->stream == NULL);
+
               fh->stream = file_output_stream;
               fh->op = FILE_OP_WRITE;
             }
@@ -1064,6 +1163,8 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
+  debug_print ("vfs_create: -> %s\n", strerror (-result));
+
   return result;
 }
 
@@ -1075,7 +1176,7 @@ vfs_release (const gchar *path, struct fuse_file_info *fi)
   debug_print ("vfs_release: %s\n", path);
 
   if (fh)
-    file_handle_free (fh);
+    free_file_handle_for_path (path);
 
   return 0;
 }
@@ -1188,6 +1289,8 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
   GFile *file;
   gint   result = 0;
 
+  debug_print ("vfs_read: %s\n", path);
+
   if ((file = file_from_full_path (path)))
     {
       FileHandle *fh = GET_FILE_HANDLE (fi);
@@ -1212,6 +1315,11 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
     {
       result = -EIO;
     }
+
+  if (result < 0)
+    debug_print ("vfs_read: -> %s\n", strerror (-result));
+  else
+    debug_print ("vfs_read: -> %d bytes read.\n", result);
 
   return result;
 }
@@ -1322,6 +1430,11 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
       result = -EIO;
     }
 
+  if (result < 0)
+    debug_print ("vfs_write: -> %s\n", strerror (-result));
+  else
+    debug_print ("vfs_write: -> %d bytes written.\n", result);
+
   return result;
 }
 
@@ -1350,7 +1463,7 @@ vfs_opendir (const gchar *path, struct fuse_file_info *fi)
     {
       /* Submount */
 
-      /* TODO */
+      /* TODO: Check that path exists */
 
       g_free (mount_path);
     }
@@ -1472,6 +1585,16 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
 
   if (old_file && new_file)
     {
+      FileHandle *fh;
+
+      fh = get_file_handle_for_path (old_path);
+
+      if (fh)
+        {
+          g_mutex_lock (fh->mutex);
+          file_handle_close_stream (fh);
+        }
+
       g_file_move (old_file, new_file, G_FILE_COPY_OVERWRITE, NULL, NULL, NULL, &error);
 
       if (error)
@@ -1480,6 +1603,15 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
 
           result = -errno_from_error (error);
           g_error_free (error);
+        }
+      else
+        {
+          reindex_file_handle_for_path (old_path, new_path);
+        }
+
+      if (fh)
+        {
+          g_mutex_unlock (fh->mutex);
         }
 
       if (result == -EISDIR)
@@ -1498,6 +1630,8 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
   if (new_file)
     g_object_unref (new_file);
 
+  debug_print ("vfs_rename: -> %s\n", strerror (-result));
+
   return result;
 }
 
@@ -1514,7 +1648,22 @@ vfs_unlink (const gchar *path)
 
   if (file)
     {
+      FileHandle *fh;
+
+      fh = get_file_handle_for_path (path);
+
+      if (fh)
+        {
+          g_mutex_lock (fh->mutex);
+          file_handle_close_stream (fh);
+        }
+
       g_file_delete (file, NULL, &error);
+
+      if (fh)
+        {
+          g_mutex_unlock (fh->mutex);
+        }
 
       if (error)
         {
@@ -1531,6 +1680,8 @@ vfs_unlink (const gchar *path)
       result = -ENOENT;
     }
 
+  debug_print ("vfs_unlink: -> %s\n", strerror (-result));
+
   return result;
 }
 
@@ -1540,6 +1691,8 @@ vfs_mkdir (const gchar *path, mode_t mode)
   GFile  *file;
   GError *error  = NULL;
   gint    result = 0;
+
+  debug_print ("vfs_mkdir: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -1565,6 +1718,8 @@ vfs_mkdir (const gchar *path, mode_t mode)
       result = -ENOENT;
     }
 
+  debug_print ("vfs_mkdir: -> %s\n", strerror (-result));
+
   return result;
 }
 
@@ -1574,6 +1729,8 @@ vfs_rmdir (const gchar *path)
   GFile  *file;
   GError *error = NULL;
   gint   result = 0;
+
+  debug_print ("vfs_rmdir: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -1617,6 +1774,8 @@ vfs_rmdir (const gchar *path)
       result = -ENOENT;
     }
 
+  debug_print ("vfs_rmdir: -> %s\n", strerror (-result));
+
   return result;
 }
 
@@ -1626,6 +1785,8 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
   GFile  *file;
   GError *error  = NULL;
   gint    result = 0;
+
+  debug_print ("vfs_ftruncate: %s\n", path);
 
   file = file_from_full_path (path);
 
@@ -1671,7 +1832,9 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  return -EIO;
+  debug_print ("vfs_ftruncate: -> %s\n", strerror (-result));
+
+  return result;
 }
 
 static gint
@@ -1681,11 +1844,18 @@ vfs_truncate (const gchar *path, off_t size)
   GError *error  = NULL;
   gint    result = 0;
 
+  debug_print ("vfs_truncate: %s\n", path);
+
   file = file_from_full_path (path);
 
   if (file)
     {
       GFileOutputStream *file_output_stream = NULL;
+      FileHandle        *fh;
+
+      fh = get_file_handle_for_path (path);
+      if (fh)
+        g_mutex_lock (fh->mutex);
 
       if (size == 0)
         {
@@ -1710,11 +1880,188 @@ vfs_truncate (const gchar *path, off_t size)
           g_object_unref (file_output_stream);
         }
 
+      if (fh)
+        g_mutex_unlock (fh->mutex);
+
       g_object_unref (file);
     }
   else
     {
       result = -ENOENT;
+    }
+
+  debug_print ("vfs_truncate: -> %s\n", strerror (-result));
+
+  return result;
+}
+
+static gint
+vfs_symlink (const gchar *path_old, const gchar *path_new)
+{
+  GFile  *file;
+  GError *error  = NULL;
+  gint    result = 0;
+
+  debug_print ("vfs_symlink: %s -> %s\n", path_new, path_old);
+
+  file = file_from_full_path (path_new);
+
+  if (file)
+    {
+      g_file_make_symbolic_link (file, path_old, NULL, &error);
+
+      if (error)
+        {
+          result = -errno_from_error (error);
+          g_error_free (error);
+        }
+    }
+  else
+    {
+      result = -ENOENT;
+    }
+
+  debug_print ("vfs_symlink: -> %s\n", strerror (-result));
+
+  return result;
+}
+
+static gint
+vfs_access (const gchar *path, gint mode)
+{
+  GFile  *file;
+  GError *error  = NULL;
+  gint    result = 0;
+
+  debug_print ("vfs_access: %s\n", path);
+
+  file = file_from_full_path (path);
+
+  if (file)
+    {
+      GFileInfo *file_info;
+
+      file_info = g_file_get_info (file, "*", 0, NULL, &error);
+      if (file_info)
+        {
+          if ((mode & R_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_READ) &&
+                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_READ))) ||
+              (mode & W_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE) &&
+                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE))) ||
+              (mode & X_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE) &&
+                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE))))
+            result = -EACCES;
+
+          g_object_unref (file_info);
+        }
+      else if (error)
+        {
+          result = -errno_from_error (error);
+          g_error_free (error);
+        }
+      else
+        {
+          result = -EIO;
+        }
+
+      g_object_unref (file);
+    }
+  else if (path_is_mount_list (path))
+    {
+      result = 0;
+    }
+  else
+    {
+      result = -ENOENT;
+    }
+
+  debug_print ("vfs_access: -> %s\n", strerror (-result));
+  return result;
+}
+
+static gint
+vfs_utimens (const gchar *path, const struct timespec tv [2])
+{
+  GFile  *file;
+  GError *error  = NULL;
+  gint    result = 0;
+
+  debug_print ("vfs_utimens: %s\n", path);
+
+  file = file_from_full_path (path);
+
+  if (file)
+    {
+      GFileAttributeValue attr_value = G_FILE_ATTRIBUTE_VALUE_INIT;
+      guint64 atime;
+      guint64 mtime;
+
+      if (tv)
+        {
+          atime = (guint64) tv [0].tv_sec * 1000000 + (guint64) tv [0].tv_nsec / (guint64) 1000;
+          mtime = (guint64) tv [1].tv_sec * 1000000 + (guint64) tv [1].tv_nsec / (guint64) 1000;
+        }
+      else
+        {
+          struct timeval tiv;
+
+          gettimeofday (&tiv, NULL);
+          atime = (guint64) tiv.tv_sec * (guint64) 1000000 + (guint64) tiv.tv_usec;
+          mtime = atime;
+        }
+
+      attr_value.type = G_FILE_ATTRIBUTE_TYPE_UINT64;
+
+      attr_value.u.uint64 = atime;
+      g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, &attr_value, 0, NULL, &error);
+
+      if (!error)
+        {
+          attr_value.u.uint64 = mtime;
+          g_file_set_attribute (file, G_FILE_ATTRIBUTE_STD_MTIME_USEC, &attr_value, 0, NULL, &error);
+        }
+
+      if (error)
+        {
+          result = -errno_from_error (error);
+          g_error_free (error);
+        }
+
+      g_object_unref (file);
+    }
+  else if (path_is_mount_list (path))
+    {
+      /* */
+    }
+  else
+    {
+      result = -ENOENT;
+    }
+
+  debug_print ("vfs_utimens: -> %s\n", strerror (-result));
+  return result;
+}
+
+static gint
+vfs_chmod (const gchar *path, mode_t mode)
+{
+  GFile  *file;
+  GError *error  = NULL;
+  gint    result = 0;
+
+  file = file_from_full_path (path);
+
+  if (file)
+    {
+      g_file_set_attribute_uint32 (file, G_FILE_ATTRIBUTE_UNIX_MODE, mode, 0, NULL, &error);
+
+      if (error)
+        {
+          result = -errno_from_error (error);
+          g_error_free (error);
+        }
+
+      g_object_unref (file);
     }
 
   return result;
@@ -1777,6 +2124,8 @@ vfs_init (struct fuse_conn_info *conn)
   daemon_gid = getgid ();
 
   mount_list_mutex = g_mutex_new ();
+  global_fh_table = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                           g_free, (GDestroyNotify) file_handle_free);
 
   /* Initializes D-Bus and other VFS necessities */
   gvfs = G_VFS (g_daemon_vfs_new ());
@@ -1810,10 +2159,6 @@ static struct fuse_operations vfs_oper =
 
   .opendir     = vfs_opendir,
   .readdir     = vfs_readdir,
-#if 0
-  .releasedir  = vfs_releasedir,
-  .fsyncdir    = vfs_fsyncdir,
-#endif
   .readlink    = vfs_readlink,
 
   .open        = vfs_open,
@@ -1830,13 +2175,16 @@ static struct fuse_operations vfs_oper =
   .rmdir       = vfs_rmdir,
   .ftruncate   = vfs_ftruncate,
   .truncate    = vfs_truncate,
+  .symlink     = vfs_symlink,
+  .access      = vfs_access,
+  .utimens     = vfs_utimens,
+  .chmod       = vfs_chmod,
 
 #if 0
+  .releasedir  = vfs_releasedir,
+  .fsyncdir    = vfs_fsyncdir,
   .mknod       = vfs_mknod,
-  .symlink     = vfs_symlink,
-  .chmod       = vfs_chmod,
   .chown       = vfs_chown,
-  .utime       = vfs_utime,
   .fsync       = vfs_fsync,
   .setxattr    = vfs_setxattr,
   .getxattr    = vfs_getxattr,
