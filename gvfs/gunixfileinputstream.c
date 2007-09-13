@@ -16,6 +16,7 @@
 #include "gunixfileinputstream.h"
 #include "gvfsunixdbus.h"
 #include "gfileinfosimple.h"
+#include "gsocketinputstream.h"
 #include "gsocketoutputstream.h"
 #include <daemon/gvfsdaemonprotocol.h>
 
@@ -25,6 +26,7 @@ struct _GUnixFileInputStreamPrivate {
   char *filename;
   char *mountpoint;
   GOutputStream *command_stream;
+  GInputStream *data_stream;
   int fd;
   int seek_generation;
 
@@ -55,6 +57,8 @@ g_unix_file_input_stream_finalize (GObject *object)
 
   if (file->priv->command_stream)
     g_object_unref (file->priv->command_stream);
+  if (file->priv->data_stream)
+    g_object_unref (file->priv->data_stream);
   
   g_free (file->priv->filename);
   g_free (file->priv->mountpoint);
@@ -190,75 +194,11 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   /* TODO: verify fd id */
   file->priv->fd = receive_fd (extra_fd);
   g_print ("new fd: %d\n", file->priv->fd);
-
+  
   file->priv->command_stream = g_socket_output_stream_new (file->priv->fd, FALSE);
-    
+  file->priv->data_stream = g_socket_input_stream_new (file->priv->fd, TRUE);
+  
   return TRUE;
-}
-
-static gboolean 
-write_command (GUnixFileInputStream *file,
-	       char *buffer, gsize len,
-	       GError **error)
-{
-  char *write_buffer;
-  gsize bytes_to_write;
-  gssize bytes_written;
-
-  bytes_to_write = len;
-  write_buffer = buffer;
-  do
-    {
-      bytes_written = g_output_stream_write (file->priv->command_stream,
-					     write_buffer, bytes_to_write,
-					     error);
-      /* TODO: We sent a partial command, what do we do here.
-	 Especially if the error is a cancel... */
-      if (bytes_written == -1)
-	return FALSE;
-	  
-      bytes_to_write -= bytes_written;
-      write_buffer += bytes_written;
-    }
-  while (bytes_to_write > 0);
-
-  return TRUE;
-}
-
-static int
-read_data (GUnixFileInputStream *file,
-	   char *buffer, gsize count,
-	   GError **error)
-{
-  GInputStream *stream = G_INPUT_STREAM (file);
-  ssize_t res;
-
-  while (1)
-    {
-      res = read (file->priv->fd, buffer, count);
-      if (res == -1)
-	{
-	  if (g_input_stream_is_cancelled (stream))
-	    {
-	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
-	      return -1;
-	    }
-	  
-	  if (errno == EINTR)
-	    continue;
-	  
-	  g_set_error (error, G_FILE_ERROR,
-		       g_file_error_from_errno (errno),
-		       _("Error reading from file '%s': %s"),
-		       file->priv->filename, g_strerror (errno));
-	  return -1;
-	}
-      
-      return res;
-    }
 }
 
 static gssize
@@ -275,6 +215,7 @@ g_unix_file_input_stream_read (GInputStream *stream,
   guint32 count_32;
   char message[G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE];
   GVfsDaemonSocketProtocolCommand *cmd;
+  gssize bytes_written;
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
@@ -290,8 +231,15 @@ g_unix_file_input_stream_read (GInputStream *stream,
   cmd->command = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ);
   cmd->arg = g_htonl (count_32);
 
-  if (!write_command (file, message, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE, error))
-    return -1;
+  bytes_written = g_output_stream_write_all (file->priv->command_stream,
+					     message, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE,
+					     error);
+  if (bytes_written == -1 || bytes_written != G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE)
+    {
+      /* TODO: We sent a partial command down the pipe, what do we do here.
+	 Especially if the error is a cancel... */
+      return -1;
+    }
 
   n_read = 0;
   read_ptr = buffer;
@@ -307,9 +255,9 @@ g_unix_file_input_stream_read (GInputStream *stream,
 
 	      while (file->priv->outstanding_size > 0)
 		{
-		  res = read_data (file, buffer, 
-				   MIN (4096, file->priv->outstanding_size), 
-				   error);
+		  res = g_input_stream_read (file->priv->data_stream, buffer,
+					     MIN (4096, file->priv->outstanding_size),
+					     error);
 		  if (res == -1)
 		    return -1;
 		  
@@ -321,8 +269,8 @@ g_unix_file_input_stream_read (GInputStream *stream,
 	    }
 
 	  n  = MIN (count, file->priv->outstanding_size);
-	  res = read_data (file, read_ptr, n, error);
-	  
+	  res = g_input_stream_read (file->priv->data_stream,
+				     read_ptr, n, error);
 	  if (res == -1) 
 	    {
 	      if (n_read == 0)
@@ -346,13 +294,16 @@ g_unix_file_input_stream_read (GInputStream *stream,
 	  GVfsDaemonSocketProtocolReply reply;
 
 	  g_assert (sizeof (reply) == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE);
-	  res = read_data (file, (char *)&reply, G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE, error);
+	  res = g_input_stream_read_all (file->priv->data_stream, (char *)&reply,
+					 G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE, error);
 	  if (res == -1)
-	    return -1;
+	    {
+	      return -1;
+	    }
 
-	  /* TODO: Loop here to handle short pipe reads */
 	  if (res != G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
 	    {
+	      /* TODO: We read a partial command, what do we do here. */
 	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 			   "Short read in stream protocol");
 	      return -1;
