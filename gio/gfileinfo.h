@@ -68,7 +68,7 @@ struct _GFileInfoClass
 
 #define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"
 #define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"
-#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:executs"
+#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:execute"
 #define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"
 #define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"
 
