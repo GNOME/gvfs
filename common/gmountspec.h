@@ -54,6 +54,9 @@ void        g_mount_spec_set_with_len      (GMountSpec      *spec,
 					    const char      *key,
 					    const char      *value,
 					    int              value_len);
+guint       g_mount_spec_hash              (gconstpointer    mount);
+gboolean    g_mount_spec_equal             (GMountSpec      *mount1,
+					    GMountSpec      *mount2);
 gboolean    g_mount_spec_match             (GMountSpec      *mount,
 					    GMountSpec      *path);
 gboolean    g_mount_spec_match_with_path   (GMountSpec      *mount,

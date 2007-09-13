@@ -289,6 +289,36 @@ path_has_prefix (const char *path,
   return FALSE;
 }
 
+guint
+g_mount_spec_hash (gconstpointer _mount)
+{
+  GMountSpec *mount = (GMountSpec *) _mount;
+  guint hash;
+  int i;
+
+  hash = 0;
+  if (mount->mount_prefix)
+    hash ^= g_str_hash (mount->mount_prefix);
+  
+  for (i = 0; i < mount->items->len; i++)
+    {
+      GMountSpecItem *item = &g_array_index (mount->items, GMountSpecItem, i);
+      hash ^= g_str_hash (item->value);
+    }
+  
+  return hash;
+}
+
+gboolean
+g_mount_spec_equal (GMountSpec      *mount1,
+		    GMountSpec      *mount2)
+{
+  return items_equal (mount1->items, mount2->items) &&
+    ((mount1->mount_prefix == mount2->mount_prefix) ||
+     (mount1->mount_prefix != NULL && mount2->mount_prefix != NULL &&
+      strcmp (mount1->mount_prefix, mount2->mount_prefix) == 0));
+}
+
 gboolean
 g_mount_spec_match_with_path (GMountSpec      *mount,
 			      GMountSpec      *spec,
