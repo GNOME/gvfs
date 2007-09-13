@@ -29,3 +29,4 @@ stamp-h1
 core.*
 core
 compile
+gtk-doc.make
