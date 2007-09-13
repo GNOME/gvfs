@@ -9,17 +9,17 @@ G_BEGIN_DECLS
 typedef struct {
   gpointer       async_object;
   GError *       error;
-  gpointer       data;
+  gpointer       user_data;
 } GAsyncResult;
 
-typedef gboolean (*GFDSourceFunc) (gpointer data,
+typedef gboolean (*GFDSourceFunc) (gpointer user_data,
 				   GIOCondition condition,
 				   int fd);
 
 void     _g_queue_async_result (GAsyncResult    *result,
 				gpointer         async_object,
 				GError          *error,
-				gpointer         data,
+				gpointer         user_data,
 				GSourceFunc      source_func);
 
 GSource *_g_fd_source_new      (int              fd,

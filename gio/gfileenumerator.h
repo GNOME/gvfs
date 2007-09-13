@@ -27,7 +27,7 @@ typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
  * @enumerator: a #GFileEnumerator
  * @files: list of #GFileInfo objects
  * @num_files: size of @files list, or -1 on error
- * @data: the @data pointer passed to the async call
+ * @user_data: the @user_data pointer passed to the async call
  * @error: the error, if num_files is -1, otherwise %NULL
  *
  * This callback is called when an asychronous next_file operation
@@ -41,12 +41,12 @@ typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
 typedef void (*GAsyncNextFilesCallback) (GFileEnumerator *enumerator,
 					 GList *files,
 					 int num_files,
-					 gpointer data,
+					 gpointer user_data,
 					 GError *error);
 
 typedef void (*GAsyncStopEnumeratingCallback) (GFileEnumerator *enumerator,
 					       gboolean result,
-					       gpointer data,
+					       gpointer user_data,
 					       GError *error);
 
 
@@ -75,12 +75,12 @@ struct _GFileEnumeratorClass
 				  int                           num_files,
 				  int                           io_priority,
 				  GAsyncNextFilesCallback       callback,
-				  gpointer                      data,
+				  gpointer                      user_data,
 				  GCancellable                 *cancellable);
   void       (*stop_async)       (GFileEnumerator              *enumerator,
 				  int                           io_priority,
 				  GAsyncStopEnumeratingCallback callback,
-				  gpointer                      data,
+				  gpointer                      user_data,
 				  GCancellable                 *cancellable);
 };
 
@@ -96,12 +96,12 @@ void          g_file_enumerator_next_files_async  (GFileEnumerator              
 						   int                             num_files,
 						   int                             io_priority,
 						   GAsyncNextFilesCallback         callback,
-						   gpointer                        data,
+						   gpointer                        user_data,
 						   GCancellable                   *cancellable);
 void          g_file_enumerator_stop_async        (GFileEnumerator                *enumerator,
 						   int                             io_priority,
 						   GAsyncStopEnumeratingCallback   callback,
-						   gpointer                        data,
+						   gpointer                        user_data,
 						   GCancellable                   *cancellable);
 gboolean      g_file_enumerator_is_stopped        (GFileEnumerator                *enumerator);
 gboolean      g_file_enumerator_has_pending       (GFileEnumerator                *enumerator);

@@ -19,7 +19,7 @@ void
 _g_queue_async_result (GAsyncResult   *result,
 		       gpointer        async_object,
 		       GError         *error,
-		       gpointer        data,
+		       gpointer        user_data,
 		       GSourceFunc     source_func)
 {
   GSource *source;
@@ -27,7 +27,7 @@ _g_queue_async_result (GAsyncResult   *result,
   g_return_if_fail (G_IS_OBJECT (async_object));
   
   result->async_object = g_object_ref (async_object);
-  result->data = data;
+  result->user_data = user_data;
   result->error = error;
 
   source = g_idle_source_new ();

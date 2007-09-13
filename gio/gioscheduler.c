@@ -104,7 +104,7 @@ io_job_thread (gpointer       data,
 
 void
 g_schedule_io_job (GIOJobFunc     job_func,
-		   gpointer       data,
+		   gpointer       user_data,
 		   GDestroyNotify notify,
 		   gint           io_priority,
 		   GCancellable  *cancellable)
@@ -114,7 +114,7 @@ g_schedule_io_job (GIOJobFunc     job_func,
 
   job = g_new0 (GIOJob, 1);
   job->job_func = job_func;
-  job->data = data;
+  job->data = user_data;
   job->destroy_notify = notify;
   job->io_priority = io_priority;
     
@@ -211,7 +211,7 @@ mainloop_proxy_notify (gpointer data)
 void
 g_io_job_send_to_mainloop (GIOJob        *job,
 			   GIODataFunc    func,
-			   gpointer       data,
+			   gpointer       user_data,
 			   GDestroyNotify notify,
 			   gboolean       block)
 {
@@ -221,7 +221,7 @@ g_io_job_send_to_mainloop (GIOJob        *job,
 
   proxy = g_new0 (MainLoopProxy, 1);
   proxy->func = func;
-  proxy->data = data;
+  proxy->data = user_data;
   proxy->notify = notify;
   if (block)
     {
