@@ -237,6 +237,8 @@ ih_mask_to_EventFlags (guint32 mask)
     {
     case IN_MODIFY:
       return G_FILE_MONITOR_EVENT_CHANGED;
+    case IN_CLOSE_WRITE:
+      return G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT;
     case IN_ATTRIB:
       return G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED;
     case IN_MOVE_SELF:
@@ -251,7 +253,6 @@ ih_mask_to_EventFlags (guint32 mask)
       return G_FILE_MONITOR_EVENT_UNMOUNTED;
     case IN_Q_OVERFLOW:
     case IN_OPEN:
-    case IN_CLOSE_WRITE:
     case IN_CLOSE_NOWRITE:
     case IN_ACCESS:
     case IN_IGNORED:
