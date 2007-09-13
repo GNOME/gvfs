@@ -88,6 +88,12 @@ g_file_info_init (GFileInfo *info)
 					sizeof (GFileAttributeInternal));
 }
 
+GFileInfo *
+g_file_info_new (void)
+{
+  return g_object_new (G_TYPE_FILE_INFO, NULL);
+}
+
 GFileType
 g_file_info_get_file_type (GFileInfo *info)
 {
@@ -366,6 +372,42 @@ g_file_info_set_stat_info (GFileInfo *info,
       *info->priv->stat_info = *statbuf;
     }
 }
+
+void
+g_file_info_set_from_stat (GFileInfo         *info,
+			   GFileInfoRequestFlags requested,
+			   const struct stat *statbuf)
+{
+  if (requested & G_FILE_INFO_FILE_TYPE)
+    {
+      if (S_ISREG (statbuf->st_mode))
+	info->priv->file_type = G_FILE_TYPE_REGULAR;
+      else if (S_ISDIR (statbuf->st_mode))
+	info->priv->file_type = G_FILE_TYPE_DIRECTORY;
+      else if (S_ISCHR (statbuf->st_mode) ||
+	       S_ISBLK (statbuf->st_mode) ||
+	       S_ISFIFO (statbuf->st_mode)
+#ifdef S_ISSOCK
+	       || S_ISSOCK (statbuf->st_mode)
+#endif
+	       )
+	info->priv->file_type = G_FILE_TYPE_SPECIAL;
+      else if (S_ISLNK (statbuf->st_mode))
+	info->priv->file_type = G_FILE_TYPE_SYMBOLIC_LINK;
+      else 
+	info->priv->file_type = G_FILE_TYPE_UNKNOWN;
+    }
+  
+  if (requested & G_FILE_INFO_SIZE)
+    g_file_info_set_size (info, statbuf->st_size);
+
+  if (requested & G_FILE_INFO_MODIFICATION_TIME)
+    g_file_info_set_modification_time (info, statbuf->st_mtime);
+  
+  if (requested & G_FILE_INFO_STAT_INFO)
+    g_file_info_set_stat_info (info, statbuf);
+}
+
 
 void
 g_file_info_set_attribute (GFileInfo *info,

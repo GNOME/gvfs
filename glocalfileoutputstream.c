@@ -27,12 +27,17 @@ struct _GLocalFileOutputStreamPrivate {
   int fd;
 };
 
-static gssize   g_local_file_output_stream_write (GOutputStream  *stream,
-						  void           *buffer,
-						  gsize           count,
-						  GError        **error);
-static gboolean g_local_file_output_stream_close (GOutputStream  *stream,
-						  GError        **error);
+static gssize     g_local_file_output_stream_write         (GOutputStream          *stream,
+							    void                   *buffer,
+							    gsize                   count,
+							    GError                **error);
+static gboolean   g_local_file_output_stream_close         (GOutputStream          *stream,
+							    GError                **error);
+static GFileInfo *g_local_file_output_stream_get_file_info (GFileOutputStream      *stream,
+							    GFileInfoRequestFlags   requested,
+							    char                   *attributes,
+							    GError                **error);
+
 
 static void
 g_local_file_output_stream_finalize (GObject *object)
@@ -53,6 +58,7 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
+  GFileOutputStreamClass *file_stream_class = G_FILE_OUTPUT_STREAM_CLASS (klass);
   
   parent_class = g_type_class_peek_parent (klass);
   
@@ -62,6 +68,7 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 
   stream_class->write = g_local_file_output_stream_write;
   stream_class->close = g_local_file_output_stream_close;
+  file_stream_class->get_file_info = g_local_file_output_stream_get_file_info;
 }
 
 static void
@@ -537,4 +544,32 @@ g_local_file_output_stream_close (GOutputStream *stream,
   /* A simple try to close the fd in case we fail before the actual close */
   close (file->priv->fd);
   return FALSE;
+}
+
+static GFileInfo *
+g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
+					  GFileInfoRequestFlags requested,
+					  char                 *attributes,
+					  GError              **error)
+{
+  GLocalFileOutputStream *file;
+  GFileInfo *info;
+  struct stat stat_buf;
+
+  file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
+
+  if (!g_local_file_output_stream_open (file, error))
+    return NULL;
+
+  if (fstat (file->priv->fd, &stat_buf) == -1)
+    {
+      g_vfs_error_from_errno (error, errno);
+      return NULL;
+    }
+
+  info = g_file_info_new ();
+
+  g_file_info_set_from_stat (info, requested, &stat_buf);
+  
+  return info;
 }
