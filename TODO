@@ -28,6 +28,8 @@ Don't hardcode the libgvfsdbus.so name, instead have some generic pluggable syst
 
 Add more filter streams: data reading, conversion (with general converter interface)
  => gicmo is working on this
+
+Implement dummy GFile fallback for non-existing uris (both for local and gvfs)
  
 gvfs:
 ====
