@@ -372,6 +372,8 @@ read_async_cb (GInputStreamSocket  *stream,
 		  count_read,
 		  data->user_data,
 		  error);
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -503,6 +505,8 @@ close_async_cb (CloseAsyncData *data)
 		  result,
 		  data->user_data,
 		  error);
+  if (error)
+    g_error_free (error);
   
   return FALSE;
 }
