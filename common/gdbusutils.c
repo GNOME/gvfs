@@ -304,7 +304,7 @@ _g_dbus_message_iter_get_args_valist (DBusMessageIter *iter,
       else
 	dbus_spec_type = spec_type;
       
-      if (msg_type != spec_type)
+      if (msg_type != dbus_spec_type)
 	{
           dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
                           "Argument %d is specified to be of type \"%d\", but "
