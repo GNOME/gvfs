@@ -77,6 +77,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobcopy.c gvfsjobcopy.h \
 	gvfsjobmove.c gvfsjobmove.h \
 	gvfsjobmakedirectory.c gvfsjobmakedirectory.h \
+	gvfsjobsetattribute.c gvfsjobsetattribute.h \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
 

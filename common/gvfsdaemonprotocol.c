@@ -1,5 +1,8 @@
+#include <config.h>
+
 #include <glib-object.h>
 #include <dbus/dbus.h>
+#include <glib/gi18n-lib.h>
 #include <gvfsdaemonprotocol.h>
 #include <gdbusutils.h>
 #include <gio/gthemedicon.h>
@@ -7,7 +10,7 @@
 #include <gio/glocalfile.h>
 
 gchar *
-g_dbus_type_from_file_attribute_type (GFileAttributeType type)
+_g_dbus_type_from_file_attribute_type (GFileAttributeType type)
 {
   char *dbus_type;
 
@@ -49,16 +52,12 @@ append_file_attribute (DBusMessageIter *iter,
 		       GFileAttributeType type,
 		       gconstpointer value)
 {
-  DBusMessageIter struct_iter, variant_iter, array_iter, inner_struct_iter, obj_struct_iter;
+  DBusMessageIter variant_iter, inner_struct_iter, obj_struct_iter;
   char *dbus_type;
   guint32 v_uint32;
-  gint32 v_int32;
-  guint64 v_uint64;
-  gint64 v_int64;
-  const char *str = NULL;
   GObject *obj = NULL;
 
-  dbus_type = g_dbus_type_from_file_attribute_type (type);
+  dbus_type = _g_dbus_type_from_file_attribute_type (type);
 
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_STRUCT,
@@ -71,7 +70,6 @@ append_file_attribute (DBusMessageIter *iter,
 				       DBUS_TYPE_STRING,
 				       &attribute))
     _g_dbus_oom ();
-
 
   if (!dbus_message_iter_open_container (&inner_struct_iter,
 					 DBUS_TYPE_VARIANT,
@@ -196,17 +194,17 @@ append_file_attribute (DBusMessageIter *iter,
 }
 
 void
-g_dbus_append_file_attribute (DBusMessageIter *iter,
-			      const char *attribute,
-			      GFileAttributeType type,
-			      gconstpointer value)
+_g_dbus_append_file_attribute (DBusMessageIter *iter,
+			       const char *attribute,
+			       GFileAttributeType type,
+			       gconstpointer value)
 {
   append_file_attribute (iter, attribute, type, value);
 }
 
 void
-g_dbus_append_file_info (DBusMessageIter *iter,
-			 GFileInfo *info)
+_g_dbus_append_file_info (DBusMessageIter *iter,
+			  GFileInfo *info)
 {
   DBusMessageIter struct_iter, array_iter;
   char **attributes;
@@ -297,4 +295,190 @@ g_dbus_append_file_info (DBusMessageIter *iter,
       
   if (!dbus_message_iter_close_container (iter, &struct_iter))
     _g_dbus_oom ();
+}
+
+gboolean
+_g_dbus_get_file_attribute (DBusMessageIter *iter,
+			    gchar **attribute,
+			    GFileAttributeType *type,
+			    GFileAttributeValue *value)
+{
+  char *str;
+  char **strs;
+  int n_elements;
+  DBusMessageIter inner_struct_iter, variant_iter, cstring_iter, obj_iter;
+  const gchar *attribute_temp;
+
+  dbus_message_iter_recurse (iter, &inner_struct_iter);
+      
+  if (dbus_message_iter_get_arg_type (&inner_struct_iter) != DBUS_TYPE_STRING)
+    goto error;
+	
+  dbus_message_iter_get_basic (&inner_struct_iter, &attribute_temp);
+  *attribute = g_strdup (attribute_temp);
+
+  dbus_message_iter_next (&inner_struct_iter);
+	
+  if (dbus_message_iter_get_arg_type (&inner_struct_iter) != DBUS_TYPE_VARIANT)
+    goto error;
+
+  dbus_message_iter_recurse (&inner_struct_iter, &variant_iter);
+
+  switch (dbus_message_iter_get_arg_type (&variant_iter))
+    {
+    case DBUS_TYPE_STRING:
+      dbus_message_iter_get_basic (&variant_iter, &value->v.v_str);
+      *type = G_FILE_ATTRIBUTE_TYPE_STRING;
+      break;
+    case DBUS_TYPE_ARRAY:
+      if (dbus_message_iter_get_element_type (&variant_iter) != DBUS_TYPE_BYTE)
+	goto error;
+
+      *type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
+
+      dbus_message_iter_recurse (&variant_iter, &cstring_iter);
+      dbus_message_iter_get_fixed_array (&cstring_iter,
+					 &str, &n_elements);
+      value->v.v_str = g_strndup (str, n_elements);
+      break;
+    case DBUS_TYPE_UINT32:
+      dbus_message_iter_get_basic (&variant_iter, &value->v.v_uint32);
+      *type = G_FILE_ATTRIBUTE_TYPE_UINT32;
+      break;
+    case DBUS_TYPE_INT32:
+      dbus_message_iter_get_basic (&variant_iter, &value->v.v_int32);
+      *type = G_FILE_ATTRIBUTE_TYPE_INT32;
+      break;
+    case DBUS_TYPE_UINT64:
+      dbus_message_iter_get_basic (&variant_iter, &value->v.v_uint64);
+      *type = G_FILE_ATTRIBUTE_TYPE_UINT64;
+      break;
+    case DBUS_TYPE_INT64:
+      dbus_message_iter_get_basic (&variant_iter, &value->v.v_int64);
+      *type = G_FILE_ATTRIBUTE_TYPE_INT64;
+      break;
+    case DBUS_TYPE_STRUCT:
+      dbus_message_iter_recurse (&variant_iter, &obj_iter);
+      if (dbus_message_iter_get_arg_type (&obj_iter) != DBUS_TYPE_UINT32)
+	goto error;
+
+      *type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
+
+      dbus_message_iter_get_basic (&obj_iter, &value->obj_type);
+      value->v.v_obj = NULL;
+      /* 0 == NULL */
+      if (value->obj_type == 1)
+	{
+	  /* G_THEMED_ICON */
+	  if (_g_dbus_message_iter_get_args (&obj_iter,
+					     NULL,
+					     DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
+					     &strs, &n_elements, 0))
+	    {
+	      value->v.v_obj = G_OBJECT (g_themed_icon_new_from_names (strs, -1));
+	      dbus_free_string_array (strs);
+	    }
+	}
+      else if (value->obj_type == 2)
+	{
+	  /* G_FILE_ICON, w/ local file */
+	  if (_g_dbus_message_iter_get_args (&obj_iter,
+					     NULL,
+					     G_DBUS_TYPE_CSTRING, &str,
+					     0))
+	    {
+	      GFile *file = g_file_get_for_path (str);
+	      value->v.v_obj = G_OBJECT (g_file_icon_new (file));
+	      g_free (str);
+	    }
+	}
+      else
+	{
+	  /* NULL (or unsupported) */
+	  if (value->obj_type != 0)
+	    g_warning ("Unsupported object type in file attribute");
+	}
+      break;
+    default:
+      goto error;
+    }
+
+  return TRUE;
+
+ error:
+  return FALSE;
+}
+
+GFileInfo *
+_g_dbus_get_file_info (DBusMessageIter *iter,
+		       GError **error)
+{
+  GFileInfo *info;
+  DBusMessageIter struct_iter, array_iter;
+  gchar *attribute;
+
+  info = g_file_info_new ();
+
+  if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_STRUCT)
+    goto error;
+
+  dbus_message_iter_recurse (iter, &struct_iter);
+
+  if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_ARRAY)
+    goto error;
+  
+  dbus_message_iter_recurse (&struct_iter, &array_iter);
+
+  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
+    {
+      GFileAttributeType type;
+      GFileAttributeValue value;
+
+      if (!_g_dbus_get_file_attribute (&array_iter, &attribute, &type, &value))
+        goto error;
+
+      switch (type)
+	{
+	case G_FILE_ATTRIBUTE_TYPE_STRING:
+	  g_file_info_set_attribute_string (info, attribute, value.v.v_str);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+	  g_file_info_set_attribute_byte_string (info, attribute, value.v.v_str);
+	  g_free (value.v.v_str);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_UINT32:
+	  g_file_info_set_attribute_uint32 (info, attribute, value.v.v_uint32);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_INT32:
+	  g_file_info_set_attribute_int32 (info, attribute, value.v.v_int32);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_UINT64:
+	  g_file_info_set_attribute_uint64 (info, attribute, value.v.v_uint64);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_INT64:
+	  g_file_info_set_attribute_int64 (info, attribute, value.v.v_int64);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+	  g_file_info_set_attribute_object (info, attribute, value.v.v_obj);
+	  if (value.v.v_obj)
+	    g_object_unref (value.v.v_obj);
+	  break;
+	default:
+	  g_assert_not_reached ();
+	  continue;
+	}
+
+      g_free (attribute);
+
+      dbus_message_iter_next (&array_iter);
+    }
+
+  dbus_message_iter_next (iter);
+  return info;
+
+ error:
+  g_object_unref (info);
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	       _("Invalid file info format"));
+  return NULL;
 }

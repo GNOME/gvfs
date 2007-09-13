@@ -156,7 +156,7 @@ create_reply (GVfsJob *job,
 
   dbus_message_iter_init_append (reply, &iter);
 
-  g_dbus_append_file_info (&iter, 
+  _g_dbus_append_file_info (&iter, 
 			   op_job->file_info);
   
   return reply;

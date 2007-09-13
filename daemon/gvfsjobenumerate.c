@@ -130,8 +130,8 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   num = 0;
   while (infos != NULL)
     {
-      g_dbus_append_file_info (&array_iter, 
-			       infos->data);
+      _g_dbus_append_file_info (&array_iter, 
+				infos->data);
       infos = infos->next;
       if (++num > 100)
 	break;

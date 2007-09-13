@@ -42,6 +42,7 @@ typedef struct _GVfsJobDelete          GVfsJobDelete;
 typedef struct _GVfsJobMakeDirectory   GVfsJobMakeDirectory;
 typedef struct _GVfsJobCopy            GVfsJobCopy;
 typedef struct _GVfsJobMove            GVfsJobMove;
+typedef struct _GVfsJobSetAttribute    GVfsJobSetAttribute;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -213,10 +214,10 @@ struct _GVfsBackendClass
 				 GVfsJobTrash *job,
 				 const char *filename);
   void     (*make_directory)    (GVfsBackend *backend,
-				 GVfsJobMakeDirectory *make_directory,
+				 GVfsJobMakeDirectory *job,
 				 const char *filename);
   gboolean (*try_make_directory)(GVfsBackend *backend,
-				 GVfsJobMakeDirectory *make_directory,
+				 GVfsJobMakeDirectory *job,
 				 const char *filename);
   void     (*copy)              (GVfsBackend *backend,
 				 GVfsJobCopy *job,
@@ -246,6 +247,20 @@ struct _GVfsBackendClass
 				 GFileCopyFlags flags,
 				 GFileProgressCallback progress_callback,
 				 gpointer progress_callback_data);
+  void     (*set_attribute)     (GVfsBackend *backend,
+				 GVfsJobSetAttribute *set_attribute,
+				 const char *filename,
+				 const char *attribute,
+				 GFileAttributeType type,
+				 gconstpointer value_ptr,
+				 GFileGetInfoFlags flags);
+  gboolean (*try_set_attribute) (GVfsBackend *backend,
+				 GVfsJobSetAttribute *set_attribute,
+				 const char *filename,
+				 const char *attribute,
+				 GFileAttributeType type,
+				 gconstpointer value_ptr,
+				 GFileGetInfoFlags flags);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;

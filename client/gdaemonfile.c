@@ -1319,7 +1319,6 @@ g_daemon_file_set_attribute (GFile *file,
 			     GCancellable *cancellable,
 			     GError **error)
 {
-#if 0
   GDaemonFile *daemon_file;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
@@ -1338,20 +1337,17 @@ g_daemon_file_set_attribute (GFile *file,
 				  DBUS_TYPE_UINT32,
 				  &flags_dbus);
 
+  _g_dbus_append_file_attribute (&iter, attribute, type, value_ptr);
 
-  reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE,
-			     NULL, cancellable, error,
-			     DBUS_TYPE_STRING, &attribute,
-			     DBUS_TYPE_UINT, &type,
-			     DBUS_TYPE_UINT32, &flags_dbus,
-			     g_dbus_type_from_file_attribute_type (type), &value,
-			     0);
+  reply = _g_vfs_daemon_call_sync (message,
+				   NULL,
+				   NULL, NULL, NULL,
+				   cancellable, error);
+
   if (reply == NULL)
     return FALSE;
 
   dbus_message_unref (reply);
-#endif
   return TRUE;
 }
 
