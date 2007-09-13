@@ -100,7 +100,7 @@ show_info (GFileInfo *info)
   g_print ("type: %s\n", type);
 
   size = g_file_info_get_size (info);
-  g_print ("size: %ld\n", (long)size);
+  g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
 
   if (g_file_info_get_is_hidden (info))
     g_print ("hidden\n");

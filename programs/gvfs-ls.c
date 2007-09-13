@@ -60,7 +60,7 @@ show_info (GFileInfo *info)
 
   size = g_file_info_get_size (info);
   type = type_to_string (g_file_info_get_file_type (info));
-  g_print ("%s\t%ld (%s)\n", name, (long)size, type);
+  g_print ("%s\t%"G_GUINT64_FORMAT" (%s)\n", name, (guint64)size, type);
 }
 
 static void
