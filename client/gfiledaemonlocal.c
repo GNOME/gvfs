@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <gio/glocalfileinputstream.h>
-#include <gio/gfileoutputstreamlocal.h>
+#include <gio/glocalfileoutputstream.h>
 #include "gfiledaemonlocal.h"
 #include <glib/gi18n-lib.h>
 

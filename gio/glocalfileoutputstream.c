@@ -10,10 +10,10 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include "gvfserror.h"
-#include "gfileoutputstreamlocal.h"
+#include "glocalfileoutputstream.h"
 #include "glocalfileinfo.h"
 
-G_DEFINE_TYPE (GFileOutputStreamLocal, g_file_output_stream_local, G_TYPE_FILE_OUTPUT_STREAM);
+G_DEFINE_TYPE (GLocalFileOutputStream, g_local_file_output_stream, G_TYPE_FILE_OUTPUT_STREAM);
 
 /* Some of the file replacement code was based on the code from gedit,
  * relicenced to LGPL with permissions from the authors.
@@ -22,77 +22,77 @@ G_DEFINE_TYPE (GFileOutputStreamLocal, g_file_output_stream_local, G_TYPE_FILE_O
 
 #define BACKUP_EXTENSION "~"
 
-struct _GFileOutputStreamLocalPrivate {
+struct _GLocalFileOutputStreamPrivate {
   char *tmp_filename;
   char *original_filename;
   char *backup_filename;
   int fd;
 };
 
-static gssize     g_file_output_stream_local_write         (GOutputStream          *stream,
+static gssize     g_local_file_output_stream_write         (GOutputStream          *stream,
 							    void                   *buffer,
 							    gsize                   count,
 							    GCancellable           *cancellable,
 							    GError                **error);
-static gboolean   g_file_output_stream_local_close         (GOutputStream          *stream,
+static gboolean   g_local_file_output_stream_close         (GOutputStream          *stream,
 							    GCancellable           *cancellable,
 							    GError                **error);
-static GFileInfo *g_file_output_stream_local_get_file_info (GFileOutputStream      *stream,
+static GFileInfo *g_local_file_output_stream_get_file_info (GFileOutputStream      *stream,
 							    char                   *attributes,
 							    GCancellable           *cancellable,
 							    GError                **error);
 
 
 static void
-g_file_output_stream_local_finalize (GObject *object)
+g_local_file_output_stream_finalize (GObject *object)
 {
-  GFileOutputStreamLocal *file;
+  GLocalFileOutputStream *file;
   
-  file = G_FILE_OUTPUT_STREAM_LOCAL (object);
+  file = G_LOCAL_FILE_OUTPUT_STREAM (object);
   
   g_free (file->priv->tmp_filename);
   g_free (file->priv->original_filename);
   g_free (file->priv->backup_filename);
   
-  if (G_OBJECT_CLASS (g_file_output_stream_local_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_output_stream_local_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize) (object);
 }
 
 static void
-g_file_output_stream_local_class_init (GFileOutputStreamLocalClass *klass)
+g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
   GFileOutputStreamClass *file_stream_class = G_FILE_OUTPUT_STREAM_CLASS (klass);
   
-  g_type_class_add_private (klass, sizeof (GFileOutputStreamLocalPrivate));
+  g_type_class_add_private (klass, sizeof (GLocalFileOutputStreamPrivate));
   
-  gobject_class->finalize = g_file_output_stream_local_finalize;
+  gobject_class->finalize = g_local_file_output_stream_finalize;
 
-  stream_class->write = g_file_output_stream_local_write;
-  stream_class->close = g_file_output_stream_local_close;
-  file_stream_class->get_file_info = g_file_output_stream_local_get_file_info;
+  stream_class->write = g_local_file_output_stream_write;
+  stream_class->close = g_local_file_output_stream_close;
+  file_stream_class->get_file_info = g_local_file_output_stream_get_file_info;
 }
 
 static void
-g_file_output_stream_local_init (GFileOutputStreamLocal *stream)
+g_local_file_output_stream_init (GLocalFileOutputStream *stream)
 {
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream,
-					      G_TYPE_FILE_OUTPUT_STREAM_LOCAL,
-					      GFileOutputStreamLocalPrivate);
+					      G_TYPE_LOCAL_FILE_OUTPUT_STREAM,
+					      GLocalFileOutputStreamPrivate);
 }
 
 static gssize
-g_file_output_stream_local_write (GOutputStream *stream,
+g_local_file_output_stream_write (GOutputStream *stream,
 				  void         *buffer,
 				  gsize         count,
 				  GCancellable *cancellable,
 				  GError      **error)
 {
-  GFileOutputStreamLocal *file;
+  GLocalFileOutputStream *file;
   gssize res;
 
-  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
+  file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
   while (1)
     {
@@ -123,15 +123,15 @@ g_file_output_stream_local_write (GOutputStream *stream,
 }
 
 static gboolean
-g_file_output_stream_local_close (GOutputStream *stream,
+g_local_file_output_stream_close (GOutputStream *stream,
 				  GCancellable *cancellable,
 				  GError      **error)
 {
-  GFileOutputStreamLocal *file;
+  GLocalFileOutputStream *file;
   struct stat final_stat;
   int res;
 
-  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
+  file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
   if (file->priv->tmp_filename)
     {
@@ -231,14 +231,14 @@ g_file_output_stream_local_close (GOutputStream *stream,
 }
 
 static GFileInfo *
-g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
+g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
 					  char                 *attributes,
 					  GCancellable         *cancellable,
 					  GError              **error)
 {
-  GFileOutputStreamLocal *file;
+  GLocalFileOutputStream *file;
 
-  file = G_FILE_OUTPUT_STREAM_LOCAL (stream);
+  file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
   if (g_cancellable_is_cancelled (cancellable))
     {
@@ -255,11 +255,11 @@ g_file_output_stream_local_get_file_info (GFileOutputStream     *stream,
 }
 
 GFileOutputStream *
-g_file_output_stream_local_create  (const char   *filename,
+g_local_file_output_stream_create  (const char   *filename,
 				    GCancellable *cancellable,
 				    GError     **error)
 {
-  GFileOutputStreamLocal *stream;
+  GLocalFileOutputStream *stream;
   int fd;
 
   if (g_cancellable_is_cancelled (cancellable))
@@ -283,17 +283,17 @@ g_file_output_stream_local_create  (const char   *filename,
       return NULL;
     }
   
-  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
+  stream = g_object_new (G_TYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
   return G_FILE_OUTPUT_STREAM (stream);
 }
 
 GFileOutputStream *
-g_file_output_stream_local_append  (const char   *filename,
+g_local_file_output_stream_append  (const char   *filename,
 				    GCancellable *cancellable,
 				    GError      **error)
 {
-  GFileOutputStreamLocal *stream;
+  GLocalFileOutputStream *stream;
   int fd;
 
   if (g_cancellable_is_cancelled (cancellable))
@@ -317,7 +317,7 @@ g_file_output_stream_local_append  (const char   *filename,
       return NULL;
     }
   
-  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
+  stream = g_object_new (G_TYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
   
   return G_FILE_OUTPUT_STREAM (stream);
@@ -615,13 +615,13 @@ handle_overwrite_open (const char *filename,
 }
 
 GFileOutputStream *
-g_file_output_stream_local_replace (const char   *filename,
+g_local_file_output_stream_replace (const char   *filename,
 				    time_t        original_mtime,
 				    gboolean      create_backup,
 				    GCancellable *cancellable,
 				    GError      **error)
 {
-  GFileOutputStreamLocal *stream;
+  GLocalFileOutputStream *stream;
   int fd;
   char *temp_file;
 
@@ -659,7 +659,7 @@ g_file_output_stream_local_replace (const char   *filename,
     }
   
  
-  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_LOCAL, NULL);
+  stream = g_object_new (G_TYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
   stream->priv->tmp_filename = temp_file;
   stream->priv->backup_filename = create_backup_filename (filename);

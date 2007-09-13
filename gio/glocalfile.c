@@ -10,7 +10,7 @@
 #include "glocalfileinfo.h"
 #include "glocalfileenumerator.h"
 #include "glocalfileinputstream.h"
-#include "gfileoutputstreamlocal.h"
+#include "glocalfileoutputstream.h"
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
@@ -309,7 +309,7 @@ g_local_file_append_to (GFile *file,
 			GCancellable *cancellable,
 			GError **error)
 {
-  return g_file_output_stream_local_append (G_LOCAL_FILE (file)->filename,
+  return g_local_file_output_stream_append (G_LOCAL_FILE (file)->filename,
 					    cancellable, error);
 }
 
@@ -318,7 +318,7 @@ g_local_file_create (GFile *file,
 		     GCancellable *cancellable,
 		     GError **error)
 {
-  return g_file_output_stream_local_create (G_LOCAL_FILE (file)->filename,
+  return g_local_file_output_stream_create (G_LOCAL_FILE (file)->filename,
 					    cancellable, error);
 }
 
@@ -329,7 +329,7 @@ g_local_file_replace (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  return g_file_output_stream_local_replace (G_LOCAL_FILE (file)->filename,
+  return g_local_file_output_stream_replace (G_LOCAL_FILE (file)->filename,
 					     mtime, make_backup,
 					     cancellable, error);
 }

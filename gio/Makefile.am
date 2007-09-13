@@ -30,8 +30,8 @@ local_sources = \
 	glocalfile.h \
 	glocalfileinputstream.c \
 	glocalfileinputstream.h \
-	gfileoutputstreamlocal.c \
-	gfileoutputstreamlocal.h \
+	glocalfileoutputstream.c \
+	glocalfileoutputstream.h \
 	gvfslocal.c \
 	gvfslocal.h \
 	$(NULL)

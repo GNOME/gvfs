@@ -5,7 +5,7 @@
 #include "gfile.h"
 #include "gseekable.h"
 #include "glocalfileinputstream.h"
-#include "gfileoutputstreamlocal.h"
+#include "glocalfileoutputstream.h"
 #include "ginputstreamsocket.h"
 
 static gpointer
