@@ -86,6 +86,7 @@ mount_info_from_name (char *name)
 {
   MountInfo *info;
   char *last_dot;
+  char *name_as_path, *p;
 
   g_assert (g_str_has_prefix (name, G_VFS_DBUS_MOUNTPOINT_NAME));
   
@@ -97,15 +98,23 @@ mount_info_from_name (char *name)
       g_str_has_prefix (last_dot, ".f_"))
     {
       char *without_prefix = g_strndup (name, last_dot - name);
+      char *unescaped_bus_name;
       info->match_name = g_quark_from_string (without_prefix);
       g_free (without_prefix);
-      info->path_prefix = _g_dbus_unescape_bus_name (last_dot + 3, NULL);
+      unescaped_bus_name = _g_dbus_unescape_bus_name (last_dot + 3, NULL);
+      info->path_prefix = g_strconcat ("/", unescaped_bus_name, NULL);
+      g_free (unescaped_bus_name);
     }
   else
     info->match_name = g_quark_from_string (name);
 
+  name_as_path = g_strdup (name);
+  for (p = name_as_path; *p != 0; p++)
+    if (*p == '.')
+      *p = '/';
+  
   info->object_path = g_strdup_printf (G_VFS_DBUS_MOUNTPOINT_PATH "%s",
-				       name + strlen (G_VFS_DBUS_MOUNTPOINT_NAME));
+				       name_as_path + strlen (G_VFS_DBUS_MOUNTPOINT_NAME));
   return info;
 }
 
@@ -201,7 +210,7 @@ get_n_path_elements (const char *str)
 #define INCLUDE_PORT (1<<1)
 #define INCLUDE_USER (1<<2)
 #define USES_MOUNT_PREFIX (1<<3)
-#define HOSTNAME_IN_PATH (1<<3)
+#define HOSTNAME_IN_PATH (1<<4)
 
 struct UriMapping {
   const char *uri_scheme;
@@ -213,8 +222,8 @@ struct UriMapping {
 /* TODO: This should really be a config file */
 static struct UriMapping uri_mapping[] = {
   { "ftp", 0, "ftp", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER},
-  { "smb", 2, "smb-share", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER|USES_MOUNT_PREFIX},
-  { "smb", 0, "smb-browse", HOSTNAME_IN_PATH},
+  { "smb", 1, "smbshare", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER|USES_MOUNT_PREFIX},
+  { "smb", 0, "smbbrowse", HOSTNAME_IN_PATH},
   { "computer", 0, "computer", 0},
   { "network", 0, "network", 0},
   { "test", 0, "test", 0},
@@ -330,9 +339,12 @@ _g_vfs_impl_daemon_new_path_call_valist (GQuark match_bus_name,
   GList *l;
   DBusMessage *message = NULL;
   char *new_path;
+  int path_prefix_len;
   
   G_LOCK (mounts);
 
+  path_prefix_len = 0;
+  
   for (l = the_vfs->mounts; l != NULL; l = l->next)
     {
       MountInfo *mount_info = l->data;
@@ -342,6 +354,9 @@ _g_vfs_impl_daemon_new_path_call_valist (GQuark match_bus_name,
 	  if (mount_info->path_prefix == NULL ||
 	      g_str_has_prefix (path, mount_info->path_prefix))
 	    {
+	      if (mount_info->path_prefix)
+		path_prefix_len = strlen (mount_info->path_prefix);
+
 	      message =
 		dbus_message_new_method_call (mount_info->bus_name,
 					      mount_info->object_path,
@@ -356,8 +371,14 @@ _g_vfs_impl_daemon_new_path_call_valist (GQuark match_bus_name,
 
   if (message)
     {
-      /* TODO: Handle path prefixes */
-      new_path = g_strdup (path);
+      new_path = g_strdup (path + path_prefix_len);
+      /* Make sure we handle e.g. "/prefix" -> "" */
+      if (*new_path != '/')
+	{
+	  char *tmp = g_strconcat ("/", new_path, NULL);
+	  g_free (new_path);
+	  new_path = tmp;
+	}
 
       _g_dbus_message_append_args (message,
 				   G_DBUS_TYPE_CSTRING, &new_path,
