@@ -817,6 +817,9 @@ _g_local_file_info_get (const char *basename,
 
   info = g_file_info_new ();
 
+  /* Make sure we don't set any unwanted attributes */
+  g_file_info_set_attribute_mask (info, attribute_matcher);
+  
   g_file_info_set_name (info, basename);
 
   /* Avoid stat in trivial case */
@@ -833,7 +836,7 @@ _g_local_file_info_get (const char *basename,
 		   path, g_strerror (errno));
       return NULL;
     }
-
+  
 #ifdef S_ISLNK
   is_symlink = S_ISLNK (statbuf.st_mode);
 #else
@@ -971,6 +974,8 @@ _g_local_file_info_get (const char *basename,
   get_xattrs (path, TRUE, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   get_xattrs (path, FALSE, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   
+  g_file_info_unset_attribute_mask (info);
+
   return info;
 }
 
