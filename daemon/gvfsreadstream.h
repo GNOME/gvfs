@@ -42,6 +42,9 @@ void            g_vfs_read_stream_set_user_data   (GVfsReadStream  *read_stream,
 						   gpointer         data);
 gboolean        g_vfs_read_stream_has_job         (GVfsReadStream  *read_stream);
 GVfsJob *       g_vfs_read_stream_get_job         (GVfsReadStream  *read_stream);
+void            g_vfs_read_stream_send_data       (GVfsReadStream  *read_stream,
+						   char            *buffer,
+						   gssize           count);
 
 /* TODO: i/o priority? */
 

@@ -268,7 +268,6 @@ read_data (GUnixFileInputStream *file,
       return res;
     }
 }
-			  
 
 static gssize
 g_unix_file_input_stream_read (GInputStream *stream,
@@ -282,7 +281,8 @@ g_unix_file_input_stream_read (GInputStream *stream,
   gsize n_read;
   char *read_ptr;
   guint32 count_32;
-  char message[5];
+  char message[G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE];
+  GVfsDaemonSocketProtocolCommand *cmd;
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
@@ -294,10 +294,11 @@ g_unix_file_input_stream_read (GInputStream *stream,
   if (count_32 != count)
     count = count_32 = 4*1024*1024;
 
-  message[0] = 'R';
-  memcpy (&message[1], &count_32, 4);
+  cmd = (GVfsDaemonSocketProtocolCommand *)message;
+  cmd->command = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ);
+  cmd->arg = g_htonl (count_32);
 
-  if (!write_command (file, message, 5, error))
+  if (!write_command (file, message, G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE, error))
     return -1;
 
   n_read = 0;
@@ -350,25 +351,30 @@ g_unix_file_input_stream_read (GInputStream *stream,
 	}
       else /* At start of block */ 
 	{
-	  struct {
-	    gint32 block_size;
-	    gint32 seek_generation;
-	  } header;
+	  GVfsDaemonSocketProtocolReply reply;
 
-	  g_assert (sizeof (header) == 8);
-	  res = read_data (file, (char *)&header, 8, error);
+	  g_assert (sizeof (reply) == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE);
+	  res = read_data (file, (char *)&reply, G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE, error);
 	  if (res == -1)
 	    return -1;
 
-	  if (res != 8)
+	  /* TODO: Loop here to handle short pipe reads */
+	  if (res != G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
 	    {
 	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 			   "Short read in stream protocol");
 	      return -1;
 	    }
-	  
-	  file->priv->outstanding_size = header.block_size;
-	  file->priv->outstanding_seek_generation = header.seek_generation;
+
+	  if (g_ntohl (reply.type) != G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
+	    {
+	      /* TODO: handle e.g. errors */
+	      g_assert_not_reached ();
+	    }
+
+	  file->priv->outstanding_size = g_ntohl (reply.arg1);
+	  file->priv->outstanding_seek_generation = g_ntohl (reply.arg2);
+	  g_print ("read reply size: %d\n", file->priv->outstanding_size);
 	}
     }
   
@@ -407,9 +413,9 @@ g_unix_file_input_stream_close (GInputStream *stream,
 
 static GFileInfo *
 g_unix_file_input_stream_get_file_info (GFileInputStream     *stream,
-					 GFileInfoRequestFlags requested,
-					 char                 *attributes,
-					 GError              **error)
+					GFileInfoRequestFlags requested,
+					char                 *attributes,
+					GError              **error)
 {
   GUnixFileInputStream *file;
 

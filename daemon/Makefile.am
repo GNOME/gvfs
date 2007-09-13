@@ -23,6 +23,7 @@ gvfs_daemon_SOURCES = \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
 	gvfsjob.c gvfsjob.h \
 	gvfsjobopenforread.c gvfsjobopenforread.h \
+	gvfsjobread.c gvfsjobread.h \
 	dbus-gmain.h dbus-gmain.c \
 	main.c
 

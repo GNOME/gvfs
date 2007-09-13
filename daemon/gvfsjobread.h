@@ -3,7 +3,7 @@
 
 #include <gvfsjob.h>
 #include <gvfsdaemonbackend.h>
-#include <gvfsreadhandle.h>
+#include <gvfsreadstream.h>
 
 G_BEGIN_DECLS
 
@@ -21,9 +21,10 @@ struct _GVfsJobRead
 {
   GVfsJob parent_instance;
 
-  GVfsReadHandle *handle;
+  GVfsReadStream *stream;
+  gpointer handle;
   gsize bytes_requested;
-  char *data;
+  char *buffer;
   gsize data_count;
 };
 
@@ -34,11 +35,10 @@ struct _GVfsJobReadClass
 
 GType g_vfs_job_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_read_new        (GVfsDaemonBackend *backend,
-				    GVfsReadHandle    *handle,
+GVfsJob *g_vfs_job_read_new        (GVfsReadStream    *stream,
+				    gpointer           handle,
 				    gsize              bytes_requested);
-void     g_vfs_job_read_set_result (GVfsJobRead       *job,
-				    char              *data,
+void     g_vfs_job_read_set_size   (GVfsJobRead       *job,
 				    gsize              data_size);
 
 G_END_DECLS

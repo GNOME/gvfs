@@ -254,6 +254,7 @@ handle_new_job_callback (GVfsReadStream *stream,
 			 GVfsJob *job,
 			 GVfsDaemon *daemon)
 {
+  g_print ("handle_new_job_callback() job=%p daemon=%p\n", job, daemon);
   start_or_queue_job (daemon, job);
 }
 
@@ -277,7 +278,7 @@ job_finished_callback (GVfsJob *job,
 
       if (stream)
 	{
-	  g_print ("Got new read stream %p\n", stream);
+	  g_print ("Got new read stream %p for daemon %p\n", stream, daemon);
 	  daemon->priv->read_streams = g_list_append (daemon->priv->read_streams,
 						      stream);
 	  g_signal_connect (stream, "new_job", (GCallback)handle_new_job_callback, daemon);
@@ -293,6 +294,7 @@ static void
 start_or_queue_job (GVfsDaemon *daemon,
 		    GVfsJob *job)
 {
+  g_vfs_job_set_backend (job, daemon->backend);
   g_mutex_lock (daemon->priv->lock);
   g_queue_push_tail (daemon->priv->jobs, job);
   g_mutex_unlock (daemon->priv->lock);
@@ -667,7 +669,7 @@ daemon_message_func (DBusConnection *conn,
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_DAEMON_INTERFACE,
 					G_VFS_DBUS_OP_OPEN_FOR_READ))
-    job = g_vfs_job_open_for_read_new (daemon->backend, conn, message);
+    job = g_vfs_job_open_for_read_new (conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   

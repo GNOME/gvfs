@@ -56,8 +56,7 @@ g_vfs_job_open_for_read_init (GVfsJobOpenForRead *job)
 }
 
 GVfsJob *
-g_vfs_job_open_for_read_new (GVfsDaemonBackend *backend,
-			     DBusConnection *connection,
+g_vfs_job_open_for_read_new (DBusConnection *connection,
 			     DBusMessage *message)
 {
   GVfsJobOpenForRead *job;
@@ -83,7 +82,6 @@ g_vfs_job_open_for_read_new (GVfsDaemonBackend *backend,
 
   job = g_object_new (G_TYPE_VFS_JOB_OPEN_FOR_READ, NULL);
 
-  G_VFS_JOB (job)->backend = backend;
   job->connection = connection; /* TODO: ref? */
   job->message = dbus_message_ref (message);
   job->filename = g_strndup (path_data, path_len);

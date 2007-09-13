@@ -60,6 +60,8 @@ void     g_vfs_job_failed            (GVfsJob     *job,
 void     g_vfs_job_failed_from_error (GVfsJob     *job,
 				      GError      *error);
 void     g_vfs_job_succeeded         (GVfsJob     *job);
+void     g_vfs_job_set_backend       (GVfsJob     *job,
+				      GVfsDaemonBackend *backend);
 
 G_END_DECLS
 

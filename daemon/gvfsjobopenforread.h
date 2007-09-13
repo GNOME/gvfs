@@ -37,8 +37,7 @@ struct _GVfsJobOpenForReadClass
 
 GType g_vfs_job_open_for_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *       g_vfs_job_open_for_read_new          (GVfsDaemonBackend  *backend,
-						      DBusConnection     *connection,
+GVfsJob *       g_vfs_job_open_for_read_new          (DBusConnection     *connection,
 						      DBusMessage        *message);
 void            g_vfs_job_open_for_read_set_handle   (GVfsJobOpenForRead *job,
 						      GVfsHandle         *handle);
