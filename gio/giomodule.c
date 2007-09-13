@@ -195,8 +195,8 @@ g_io_modules_ensure_loaded (const char *directory)
   if (loaded_dirs == NULL)
     loaded_dirs = g_hash_table_new (g_str_hash, g_str_equal);
 
-  if (g_hash_table_lookup_extended (loaded_dirs, directory,
-				    NULL, NULL))
+  if (!g_hash_table_lookup_extended (loaded_dirs, directory,
+				     NULL, NULL))
     {
       modules = load_modules (directory);
       g_hash_table_insert (loaded_dirs,
