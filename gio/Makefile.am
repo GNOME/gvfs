@@ -84,28 +84,27 @@ platform_libadd += -lshlwapi
 endif
 
 libgio_la_SOURCES = 	\
-	gasyncresult.c \
-	gsimpleasyncresult.c \
-	gsimpleasyncresult.h \
 	gappinfo.c \
 	gasynchelper.c \
 	gasynchelper.h \
+	gasyncresult.c \
 	gbufferedinputstream.c \
 	gbufferedoutputstream.c \
 	gcancellable.c \
 	gcontenttype.c \
 	gcontenttypeprivate.h \
 	gdirectorymonitor.c \
-	gfilemonitor.c \
 	gdrive.c \
 	gdrivepriv.h \
 	gfile.c \
 	gfileenumerator.c \
 	gfileinfo.c \
 	gfileinputstream.c \
+	gfilemonitor.c \
 	gfileoutputstream.c \
 	gfilterinputstream.c \
 	gfilteroutputstream.c \
+	gicon.c \
 	ginputstream.c \
 	gioerror.c \
 	gioscheduler.c \
@@ -114,6 +113,9 @@ libgio_la_SOURCES = 	\
 	gmountoperation.c \
 	goutputstream.c \
 	gseekable.c \
+	gsimpleasyncresult.c \
+	gsimpleasyncresult.h \
+	gthemedicon.c \
 	guniondrive.c \
 	guniondrive.h \
 	gunionvolume.c \
@@ -152,22 +154,23 @@ libgio_la_LDFLAGS= -export-dynamic $(no_undefined) $(fam_ldflags)
 
 gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
-	gasyncresult.h \
 	gappinfo.h \
+	gasyncresult.h \
 	gbufferedinputstream.h \
 	gbufferedoutputstream.h \
 	gcancellable.h \
 	gcontenttype.h \
 	gdirectorymonitor.h \
-	gfilemonitor.h \
 	gdrive.h \
 	gfile.h \
 	gfileenumerator.h \
 	gfileinfo.h \
 	gfileinputstream.h \
+	gfilemonitor.h \
 	gfileoutputstream.h \
 	gfilterinputstream.h \
 	gfilteroutputstream.h \
+	gicon.h \
 	ginputstream.h \
 	gioerror.h \
 	gioscheduler.h \
@@ -177,6 +180,7 @@ gvfsinclude_HEADERS = \
 	gmountoperation.h \
 	goutputstream.h \
 	gseekable.h \
+	gthemedicon.h \
 	gvfs.h \
 	gvolume.h \
 	gvolumemonitor.h \
