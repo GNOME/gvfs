@@ -340,7 +340,7 @@ g_input_stream_get_async_context (GInputStream *stream)
       stream->priv->context = g_main_context_default ();
       g_main_context_ref (stream->priv->context);
     }
-      
+  
   return stream->priv->context;
 }
 
@@ -772,8 +772,8 @@ g_input_stream_close_async (GInputStream       *stream,
  * g_input_stream_cancel:
  * @stream: A #GInputStream.
  *
- * Tries to cancel an outstanding request for the stream. If it
- * succeeds the outstanding request callback will be called with
+ * Tries to cancel an outstanding request (sync or async) for the stream.
+ * If it succeeds the outstanding request will be report the error
  * %G_VFS_ERROR_CANCELLED.
  *
  * Generally if a request is cancelled before its callback has been
@@ -781,6 +781,10 @@ g_input_stream_close_async (GInputStream       *stream,
  * be called with %G_VFS_ERROR_CANCELLED. However, this cannot be guaranteed,
  * especially if multiple threads are in use, so you might get a succeeding
  * callback and no %G_VFS_ERROR_CANCELLED callback even if you call cancel.
+ *
+ * Its safe to call this from another thread than the one doing the operation,
+ * as long as you are sure the InputStream is alive (i.e. you own a reference
+ * to it).
  *
  * The asyncronous methods have a default fallback that uses threads to implement
  * asynchronicity, so they are optional for inheriting classes. However, if you
@@ -790,7 +794,7 @@ void
 g_input_stream_cancel (GInputStream *stream)
 {
   GInputStreamClass *class;
-
+  
   g_return_if_fail (G_IS_INPUT_STREAM (stream));
   g_return_if_fail (stream != NULL);
   

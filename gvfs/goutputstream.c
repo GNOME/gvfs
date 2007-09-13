@@ -694,8 +694,8 @@ g_output_stream_close_async (GOutputStream       *stream,
  * g_output_stream_cancel:
  * @stream: A #GOutputStream.
  *
- * Tries to cancel an outstanding request for the stream. If it
- * succeeds the outstanding request callback will be called with
+ * Tries to cancel an outstanding request (sync or async) for the stream.
+ * If it succeeds the outstanding request will be report the error
  * %G_VFS_ERROR_CANCELLED.
  *
  * Generally if a request is cancelled before its callback has been
@@ -703,6 +703,10 @@ g_output_stream_close_async (GOutputStream       *stream,
  * be called with %G_VFS_ERROR_CANCELLED. However, if multiple threads
  * are in use this cannot be guaranteed, and the cancel may not result
  * in a %G_VFS_ERROR_CANCELLED callback.
+ *
+ * Its safe to call this from another thread than the one doing the operation,
+ * as long as you are sure the InputStream is alive (i.e. you own a reference
+ * to it).
  *
  * The asyncronous methods have a default fallback that uses threads to implement
  * asynchronicity, so they are optional for inheriting classes. However, if you
