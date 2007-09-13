@@ -115,18 +115,39 @@ run (GVfsJob *job)
 
   if (op_job->mode == OPEN_FOR_WRITE_CREATE)
     {
+      if (class->create == NULL)
+	{
+	  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			    _("Operation not supported by backend"));
+	  return;
+	}
+      
       class->create (op_job->backend,
 		     op_job,
 		     op_job->filename);
     }
   else if (op_job->mode == OPEN_FOR_WRITE_APPEND)
     {
+      if (class->append_to == NULL)
+	{
+	  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			    _("Operation not supported by backend"));
+	  return;
+	}
+      
       class->append_to (op_job->backend,
 			op_job,
 			op_job->filename);
     }
   else if (op_job->mode == OPEN_FOR_WRITE_REPLACE)
     {
+      if (class->replace == NULL)
+	{
+	  g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			    _("Operation not supported by backend"));
+	  return;
+	}
+      
       class->replace (op_job->backend,
 		      op_job,
 		      op_job->filename,

@@ -83,6 +83,13 @@ run (GVfsJob *job)
 {
   GVfsJobCloseWrite *op_job = G_VFS_JOB_CLOSE_WRITE (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->close_write == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			_("Operation not supported by backend"));
+      return;
+    }
   
   class->close_write (op_job->backend,
 		      op_job,

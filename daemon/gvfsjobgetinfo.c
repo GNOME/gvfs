@@ -1,3 +1,4 @@
+
 #include <config.h>
 
 #include <unistd.h>
@@ -103,6 +104,13 @@ run (GVfsJob *job)
 {
   GVfsJobGetInfo *op_job = G_VFS_JOB_GET_INFO (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->get_info == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			_("Operation not supported by backend"));
+      return;
+    }
   
   class->get_info (op_job->backend,
 		   op_job,

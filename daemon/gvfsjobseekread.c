@@ -91,6 +91,13 @@ run (GVfsJob *job)
   GVfsJobSeekRead *op_job = G_VFS_JOB_SEEK_READ (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
+  if (class->seek_on_read == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			_("Operation not supported by backend"));
+      return;
+    }
+      
   class->seek_on_read (op_job->backend,
 		       op_job,
 		       op_job->handle,
