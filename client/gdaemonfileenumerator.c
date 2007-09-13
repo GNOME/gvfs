@@ -34,7 +34,7 @@ G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUM
 static GFileInfo *       g_daemon_file_enumerator_next_file   (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,
 							       GError          **error);
-static gboolean          g_daemon_file_enumerator_stop        (GFileEnumerator  *enumerator,
+static gboolean          g_daemon_file_enumerator_close       (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,
 							       GError          **error);
 static DBusHandlerResult g_daemon_file_enumerator_dbus_filter (DBusConnection   *connection,
@@ -73,7 +73,7 @@ g_daemon_file_enumerator_class_init (GDaemonFileEnumeratorClass *klass)
   gobject_class->finalize = g_daemon_file_enumerator_finalize;
 
   enumerator_class->next_file = g_daemon_file_enumerator_next_file;
-  enumerator_class->stop = g_daemon_file_enumerator_stop;
+  enumerator_class->close = g_daemon_file_enumerator_close;
 }
 
 static void
@@ -204,9 +204,9 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
 }
 
 static gboolean
-g_daemon_file_enumerator_stop (GFileEnumerator *enumerator,
-			      GCancellable     *cancellable,
-			      GError          **error)
+g_daemon_file_enumerator_close (GFileEnumerator *enumerator,
+				GCancellable     *cancellable,
+				GError          **error)
 {
   /*GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator); */
 
