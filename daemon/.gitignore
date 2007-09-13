@@ -1,0 +1,9 @@
+*~
+*.o
+*.lo
+*.la
+.deps
+.libs
+Makefile
+Makefile.in
+gvfs-daemon

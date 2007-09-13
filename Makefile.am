@@ -1,5 +1,6 @@
 SUBDIRS = \
 	gvfs \
+	daemon \
 	po   \
 	programs
 

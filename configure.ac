@@ -115,6 +115,7 @@ fi
 AC_OUTPUT([
 Makefile
 gvfs/Makefile
+daemon/Makefile
 programs/Makefile
 po/Makefile.in
 ])
