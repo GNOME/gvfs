@@ -133,27 +133,19 @@ g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
  * obtain authentication credentals
  *
  * @param context   Pointer to the smb context
- *
  * @param srv       Server being authenticated to
- *
  * @param shr       Share being authenticated to
- *
  * @param wg        Pointer to buffer containing a "hint" for the
  *                  workgroup to be authenticated.  Should be filled in
  *                  with the correct workgroup if the hint is wrong.
- * 
  * @param wglen     The size of the workgroup buffer in bytes
- *
  * @param un        Pointer to buffer containing a "hint" for the
  *                  user name to be use for authentication. Should be
  *                  filled in with the correct workgroup if the hint is
  *                  wrong.
- * 
  * @param unlen     The size of the username buffer in bytes
- *
  * @param pw        Pointer to buffer containing to which password 
  *                  copied
- * 
  * @param pwlen     The size of the password buffer in bytes
  *           
  */
