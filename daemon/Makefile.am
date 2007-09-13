@@ -1,6 +1,7 @@
 NULL =
 
 INCLUDES =					\
+	$(SAMBA_CFLAGS)                         \
 	-I$(top_srcdir)				\
 	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
@@ -80,10 +81,10 @@ gvfs_daemon_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h \
 	smb.c
 
-gvfs_daemon_smb_LDADD = $(libraries) $(SAMBA_LIBS)
+gvfs_daemon_smb_LDADD = $(SAMBA_LIBS) $(libraries)
 
 gvfs_daemon_smb_browse_SOURCES = \
 	gvfsbackendsmbbrowse.c gvfsbackendsmbbrowse.h \
 	smbbrowse.c
 
-gvfs_daemon_smb_browse_LDADD = $(libraries) $(SAMBA_LIBS)
+gvfs_daemon_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
