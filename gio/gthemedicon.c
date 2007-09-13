@@ -55,12 +55,21 @@ g_themed_icon_new (const char *iconname)
 }
 
 GIcon *
-g_themed_icon_new_from_names (char **iconnames)
+g_themed_icon_new_from_names (char **iconnames, int len)
 {
   GThemedIcon *themed;
+  int i;
   
   themed = g_object_new (G_TYPE_THEMED_ICON, NULL);
-  themed->names = g_strdupv (iconnames);
+  if (len == -1)
+    themed->names = g_strdupv (iconnames);
+  else
+    {
+      themed->names = g_new (char *, len + 1);
+      for (i = 0; i < len; i++)
+	themed->names[i] = g_strdup (iconnames[i]);
+    }
+  
   
   return G_ICON (themed);
 }

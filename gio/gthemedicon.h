@@ -23,7 +23,7 @@ struct _GThemedIconClass
 GType g_themed_icon_get_type (void) G_GNUC_CONST;
   
 GIcon *g_themed_icon_new (const char *iconname);
-GIcon *g_themed_icon_new_from_names (char **iconnames);
+GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
 
 char **g_themed_icon_get_names (GThemedIcon *icon);
 
