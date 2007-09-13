@@ -18,6 +18,11 @@ typedef enum {
   G_FILE_ATTRIBUTE_TYPE_OBJECT
 } GFileAttributeType;
 
+typedef enum {
+  G_FILE_ATTRIBUTE_FLAGS_NONE = 0,
+  G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE = 1 << 0,
+} GFileAttributeFlags;
+
 #define G_FILE_ATTRIBUTE_VALUE_INIT {0}
 
 typedef struct  {
@@ -37,6 +42,7 @@ typedef struct  {
 typedef struct {
   char *name;
   GFileAttributeType type;
+  GFileAttributeFlags flags;
 } GFileAttributeInfo;
 
 typedef struct {
@@ -79,14 +85,15 @@ void                 g_file_attribute_value_set_int64       (GFileAttributeValue
 void                 g_file_attribute_value_set_object      (GFileAttributeValue *attr,
 							     GObject             *obj);
 
-GFileAttributeInfoList *g_file_attribute_info_list_new    (void);
-void                    g_file_attribute_info_list_free   (GFileAttributeInfoList *list);
-GFileAttributeInfoList *g_file_attribute_info_list_dup    (GFileAttributeInfoList *list);
-GFileAttributeType      g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
-							   const char             *name);
-void                    g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
-							   const char             *name,
-							   GFileAttributeType      type);
+GFileAttributeInfoList *  g_file_attribute_info_list_new    (void);
+void                      g_file_attribute_info_list_free   (GFileAttributeInfoList *list);
+GFileAttributeInfoList *  g_file_attribute_info_list_dup    (GFileAttributeInfoList *list);
+const GFileAttributeInfo *g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
+							     const char             *name);
+void                      g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
+							     const char             *name,
+							     GFileAttributeType      type,
+							     GFileAttributeFlags     flags);
 
 G_END_DECLS
 

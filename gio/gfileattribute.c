@@ -364,6 +364,7 @@ g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
     {
       new->public.infos[i].name = g_strdup (list->infos[i].name);
       new->public.infos[i].type = list->infos[i].type;
+      new->public.infos[i].flags = list->infos[i].flags;
     }
   
   return (GFileAttributeInfoList *)new;
@@ -402,27 +403,28 @@ g_file_attribute_info_list_bsearch (GFileAttributeInfoList *list,
   return start;
 }
 
-GFileAttributeType
+const GFileAttributeInfo *
 g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
 				   const char             *name)
 {
   int i;
 
   if (list == NULL)
-    return G_FILE_ATTRIBUTE_TYPE_INVALID;
+    return NULL;
   
   i = g_file_attribute_info_list_bsearch (list, name);
 
   if (i < list->n_infos && strcmp (list->infos[i].name, name) == 0)
-    return list->infos[i].type;
+    return &list->infos[i];
   
-  return G_FILE_ATTRIBUTE_TYPE_INVALID;
+  return NULL;
 }
 
 void
 g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
 				   const char             *name,
-				   GFileAttributeType      type)
+				   GFileAttributeType      type,
+				   GFileAttributeFlags     flags)
 {
   GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
   GFileAttributeInfo info;
@@ -438,6 +440,7 @@ g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
 
   info.name = g_strdup (name);
   info.type = type;
+  info.flags = flags;
   g_array_insert_vals (priv->array, i, &info, 1);
 
   list_update_public (priv);

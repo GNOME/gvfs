@@ -419,7 +419,7 @@ _g_dbus_get_attribute_info_list (DBusMessageIter *iter,
   GFileAttributeInfoList *list;
   DBusMessageIter array_iter, struct_iter;
   const char *name;
-  dbus_uint32_t type;
+  dbus_uint32_t type, flags;
   
   if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_ARRAY ||
       dbus_message_iter_get_element_type (iter) != DBUS_TYPE_STRUCT)
@@ -444,7 +444,14 @@ _g_dbus_get_attribute_info_list (DBusMessageIter *iter,
 	  if (dbus_message_iter_get_arg_type (&struct_iter) == DBUS_TYPE_UINT32)
 	    {
 	      dbus_message_iter_get_basic (&struct_iter, &type);
-	      g_file_attribute_info_list_add (list, name, type);
+	      dbus_message_iter_next (&struct_iter);
+	      
+	      if (dbus_message_iter_get_arg_type (&struct_iter) == DBUS_TYPE_UINT32)
+		{
+		  dbus_message_iter_get_basic (&struct_iter, &flags);
+		  
+		  g_file_attribute_info_list_add (list, name, type, flags);
+		}
 	    }
 	}
   
@@ -460,12 +467,13 @@ _g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
 {
   DBusMessageIter array_iter, struct_iter;
   int i;
-  dbus_uint32_t dbus_type;
+  dbus_uint32_t dbus_type, dbus_flags;
 
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
 					 DBUS_TYPE_STRING_AS_STRING	
+					 DBUS_TYPE_UINT32_AS_STRING	
 					 DBUS_TYPE_UINT32_AS_STRING	
 					 DBUS_STRUCT_END_CHAR_AS_STRING,
 					 &array_iter))
@@ -476,6 +484,7 @@ _g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
       if (!dbus_message_iter_open_container (&array_iter,
 					     DBUS_TYPE_STRUCT,
 					     DBUS_TYPE_STRING_AS_STRING
+					     DBUS_TYPE_UINT32_AS_STRING
 					     DBUS_TYPE_UINT32_AS_STRING,
 					     &struct_iter))
 	_g_dbus_oom ();
@@ -487,6 +496,11 @@ _g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
       dbus_type = list->infos[i].type;
       if (!dbus_message_iter_append_basic (&struct_iter,
 					   DBUS_TYPE_UINT32, &dbus_type))
+	_g_dbus_oom ();
+      
+      dbus_flags = list->infos[i].flags;
+      if (!dbus_message_iter_append_basic (&struct_iter,
+					   DBUS_TYPE_UINT32, &dbus_flags))
 	_g_dbus_oom ();
       
       if (!dbus_message_iter_close_container (&array_iter, &struct_iter))
