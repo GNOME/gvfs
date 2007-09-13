@@ -52,6 +52,7 @@ show_info (GFileInfo *info)
   goffset size;
   char **attributes;
   int i;
+  gboolean first_attr;
 
   if ((g_file_info_get_is_hidden (info)) && !show_hidden)
     return;
@@ -62,8 +63,9 @@ show_info (GFileInfo *info)
 
   size = g_file_info_get_size (info);
   type = type_to_string (g_file_info_get_file_type (info));
-  g_print ("%s\t%"G_GUINT64_FORMAT" (%s)", name, (guint64)size, type);
+  g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", name, (guint64)size, type);
 
+  first_attr = TRUE;
   attributes = g_file_info_list_attributes (info, NULL);
   for (i = 0 ; attributes[i] != NULL; i++)
     {
@@ -74,10 +76,17 @@ show_info (GFileInfo *info)
 	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_SIZE) == 0 ||
 	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_TYPE) == 0)
 	continue;
-      
+
+      if (first_attr)
+	{
+	  g_print ("\t");
+	  first_attr = FALSE;
+	}
+      else
+	g_print (" ");
       val = g_file_info_get_attribute (info, attributes[i]);
       val_as_string = g_file_attribute_value_as_string (val);
-      g_print (" %s=%s", attributes[i], val_as_string);
+      g_print ("%s=%s", attributes[i], val_as_string);
       g_free (val_as_string);
     }
   
