@@ -811,6 +811,19 @@ g_file_info_get_etag (GFileInfo *info)
   return g_file_attribute_value_get_string (value);
 }
 
+gint32
+g_file_info_get_sort_order (GFileInfo *info)
+{
+  static guint32 attr = 0;
+  GFileAttributeValue *value;
+  
+  if (attr == 0)
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_SORT_ORDER);
+  
+  value = g_file_info_find_value (info, attr);
+  return g_file_attribute_value_get_int32 (value);
+}
+
 /* Helper setters: */
 
 void
@@ -983,6 +996,21 @@ g_file_info_set_symlink_target (GFileInfo         *info,
   value = g_file_info_create_value (info, attr);
   if (value)
     g_file_attribute_value_set_byte_string (value, symlink_target);
+}
+
+void
+g_file_info_set_sort_order (GFileInfo         *info,
+			    gint32             sort_order)
+{
+  static guint32 attr = 0;
+  GFileAttributeValue *value;
+  
+  if (attr == 0)
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_SORT_ORDER);
+  
+  value = g_file_info_create_value (info, attr);
+  if (value)
+    g_file_attribute_value_set_int32 (value, sort_order);
 }
 
 #define ON_STACK_MATCHERS 5

@@ -49,6 +49,7 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_STD_SIZE "std:size"                     /* uint64 */
 #define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target" /* byte string */
 #define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"         /* string */
+#define G_FILE_ATTRIBUTE_STD_SORT_ORDER "std:sort_order"         /* int32  */
 
 /* Entity tags, used to avoid missing updates on save */
 
@@ -193,6 +194,7 @@ void              g_file_info_get_modification_time  (GFileInfo         *info,
 						      GTimeVal          *result);
 const char *      g_file_info_get_symlink_target     (GFileInfo         *info);
 const char *      g_file_info_get_etag               (GFileInfo         *info);
+gint32            g_file_info_get_sort_order         (GFileInfo         *info);
 
 void              g_file_info_set_attribute_mask     (GFileInfo         *info,
 						      GFileAttributeMatcher *mask);
@@ -221,6 +223,8 @@ void              g_file_info_set_modification_time  (GFileInfo         *info,
 						      GTimeVal          *mtime);
 void              g_file_info_set_symlink_target     (GFileInfo         *info,
 						      const char        *symlink_target);
+void              g_file_info_set_sort_order         (GFileInfo         *info,
+						      gint32             sort_order);
 
 GFileAttributeMatcher *g_file_attribute_matcher_new            (const char            *attributes);
 GFileAttributeMatcher *g_file_attribute_matcher_ref            (GFileAttributeMatcher *matcher);
