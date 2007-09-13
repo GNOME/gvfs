@@ -13,12 +13,16 @@ libraries =						\
 bin_PROGRAMS =					\
 	gvfs-mount				\
 	gvfs-cat				\
+	gvfs-create				\
 	gvfs-ls					\
 	gvfs-info				\
 	$(NULL)
 
 gvfs_cat_SOURCES = gvfs-cat.c
 gvfs_cat_LDADD = $(libraries)
+
+gvfs_create_SOURCES = gvfs-create.c
+gvfs_create_LDADD = $(libraries)
 
 gvfs_info_SOURCES = gvfs-info.c
 gvfs_info_LDADD = $(libraries)
