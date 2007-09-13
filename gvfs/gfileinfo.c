@@ -152,7 +152,7 @@ g_file_info_get_symlink_target (GFileInfo *info)
 }
 
 GFileAccessRights
-g_file_get_access_rights (GFileInfo *info)
+g_file_info_get_access_rights (GFileInfo *info)
 {
   return info->priv->access_rights;
 }
