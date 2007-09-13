@@ -130,13 +130,14 @@ g_file_enumerate_children (GFile *file,
 GFileInfo *
 g_file_get_info (GFile *file,
 		 GFileInfoRequestFlags requested,
-		 const char *attributes)
+		 const char *attributes,
+		 gboolean follow_symlinks)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->get_info) (file, requested, attributes);
+  return (* iface->get_info) (file, requested, attributes, follow_symlinks);
 }
 
 GFileInputStream *

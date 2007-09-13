@@ -37,12 +37,12 @@ typedef enum {
 
 GType g_local_file_output_stream_get_type (void) G_GNUC_CONST;
 
-GFileOutputStream *g_local_file_output_stream_new                (const char            *filename,
-								  GOutputStreamOpenMode  open_mode);
-void               g_local_file_output_stream_set_original_mtime (GOutputStream         *stream,
-								  time_t                 original_mtime);
-void               g_local_file_output_stream_set_create_backup  (GOutputStream         *stream,
-								  gboolean               create_backup);
+GFileOutputStream *g_local_file_output_stream_new                (const char             *filename,
+								  GOutputStreamOpenMode   open_mode);
+void               g_local_file_output_stream_set_original_mtime (GLocalFileOutputStream *stream,
+								  time_t                  original_mtime);
+void               g_local_file_output_stream_set_create_backup  (GLocalFileOutputStream *stream,
+								  gboolean                create_backup);
 
 G_END_DECLS
 

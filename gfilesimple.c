@@ -1,8 +1,11 @@
 #include <config.h>
 
 #include <string.h>
+#include <unistd.h>
 
 #include "gfilesimple.h"
+#include "glocalfileinputstream.h"
+#include "glocalfileoutputstream.h"
 #include <glib/gi18n-lib.h>
 
 static void g_file_simple_file_iface_init (GFileIface       *iface);
@@ -42,10 +45,25 @@ GFile *
 g_file_simple_new (const char *filename)
 {
   GFileSimple *simple;
+  char *non_root;
+  int len;
 
   simple = g_object_new (G_TYPE_FILE_SIMPLE, NULL);
   simple->filename = g_strdup (filename);
 
+  /* Remove any trailing slashes */
+  non_root = (char *)g_path_skip_root (simple->filename);
+  if (non_root != NULL)
+    {
+      len = strlen (non_root);
+      while (len > 0 &&
+	     G_IS_DIR_SEPARATOR (non_root[len-1]))
+	{
+	  non_root[len-1] = 0;
+	  len--;
+	}
+    }
+  
   return G_FILE (simple);
 }
 
@@ -162,13 +180,28 @@ g_file_simple_get_parse_name (GFile *file)
 GFile *
 g_file_simple_get_parent (GFile *file)
 {
-  return NULL;
+  GFileSimple *simple = G_FILE_SIMPLE (file);
+  const char *non_root;
+  char *dirname;
+  GFile *parent;
+
+  /* Check for root */
+  non_root = g_path_skip_root (simple->filename);
+  if (*non_root == 0)
+    return NULL;
+
+  dirname = g_path_get_dirname (simple->filename);
+  parent = g_file_simple_new (dirname);
+  g_free (dirname);
+  return parent;
 }
 
 GFile *
 g_file_simple_copy (GFile *file)
 {
-  return NULL;
+  GFileSimple *simple = G_FILE_SIMPLE (file);
+
+  return g_file_simple_new (simple->filename);
 }
 
 
@@ -176,41 +209,136 @@ GFile *
 g_file_simple_get_child (GFile *file,
 			 const char *name)
 {
-  return NULL;
+  GFileSimple *simple = G_FILE_SIMPLE (file);
+  char *filename;
+  GFile *child;
+
+  filename = g_build_filename (simple->filename, name, NULL);
+
+  child = g_file_simple_new (filename);
+  g_free (filename);
+  
+  return child;
 }
 
 GFileEnumerator *
-g_file_simple_enumerate_children(GFile      *file,
-				 GFileInfoRequestFlags requested,
-				 const char           *attributes)
+g_file_simple_enumerate_children (GFile      *file,
+				  GFileInfoRequestFlags requested,
+				  const char           *attributes)
 {
+  /* TODO */
   return NULL;
 }
+
+static gchar *
+read_link (const gchar *full_name)
+{
+	gchar *buffer;
+	guint size;
+
+	size = 256;
+	buffer = g_malloc (size);
+          
+	while (1) {
+		int read_size;
+
+                read_size = readlink (full_name, buffer, size);
+		if (read_size < 0) {
+			g_free (buffer);
+			return NULL;
+		}
+                if (read_size < size) {
+			buffer[read_size] = 0;
+			return buffer;
+		}
+                size *= 2;
+		buffer = g_realloc (buffer, size);
+	}
+}
+
 
 GFileInfo *
 g_file_simple_get_info (GFile                *file,
 			GFileInfoRequestFlags requested,
-			const char           *attributes)
+			const char           *attributes,
+			gboolean              follow_symlinks)
 {
-  return NULL;
+  GFileSimple *simple = G_FILE_SIMPLE (file);
+  GFileInfo *info;
+  struct stat statbuf;
+
+  info = g_file_info_new ();
+  
+  if (requested && G_FILE_INFO_REQUEST_FLAGS_FROM_STAT_MASK)
+    {
+      if (follow_symlinks)
+	stat (simple->filename, &statbuf);
+      else
+	lstat (simple->filename, &statbuf);
+
+      g_file_info_set_from_stat (info, requested, &statbuf);
+    }
+
+  if (requested && G_FILE_INFO_NAME)
+    {
+      char *basename = g_path_get_basename (simple->filename);
+      g_file_info_set_name (info, basename);
+      g_free (basename);
+    }
+
+  if (requested && G_FILE_INFO_SYMLINK_TARGET)
+    {
+      char *link = read_link (simple->filename);
+      g_file_info_set_symlink_target (info, link);
+      g_free (link);
+    }
+
+  if (requested && G_FILE_INFO_ACCESS_RIGHTS)
+    {
+      /* TODO */
+    }
+  
+  if (requested && G_FILE_INFO_DISPLAY_NAME)
+    {
+      /* TODO */
+    }
+  
+  if (requested && G_FILE_INFO_EDIT_NAME)
+    {
+      /* TODO */
+    }
+
+  if (requested && G_FILE_INFO_MIME_TYPE)
+    {
+      /* TODO */
+    }
+  
+  if (requested && G_FILE_INFO_ICON)
+    {
+      /* TODO */
+    }
+  
+  return info;
 }
 
 GFileInputStream *
 g_file_simple_read (GFile *file)
 {
-  return NULL;
+  return g_local_file_input_stream_new (G_FILE_SIMPLE (file)->filename);
 }
 
 GFileOutputStream *
 g_file_simple_append_to (GFile *file)
 {
-  return NULL;
+  return g_local_file_output_stream_new (G_FILE_SIMPLE (file)->filename,
+					 G_OUTPUT_STREAM_OPEN_MODE_APPEND);
 }
 
 GFileOutputStream *
 g_file_simple_create (GFile *file)
 {
-  return NULL;
+  return g_local_file_output_stream_new (G_FILE_SIMPLE (file)->filename,
+					 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
 }
 
 GFileOutputStream *
@@ -218,7 +346,16 @@ g_file_simple_replace (GFile *file,
 		       time_t mtime,
 		       gboolean  make_backup)
 {
-  return NULL;
+  GFileOutputStream *out;
+
+  out = g_local_file_output_stream_new (G_FILE_SIMPLE (file)->filename,
+					G_OUTPUT_STREAM_OPEN_MODE_REPLACE);
+
+  g_local_file_output_stream_set_original_mtime (G_LOCAL_FILE_OUTPUT_STREAM (out),
+						 mtime);
+  g_local_file_output_stream_set_create_backup (G_LOCAL_FILE_OUTPUT_STREAM (out),
+						make_backup);
+  return out;
 }
 
 static void

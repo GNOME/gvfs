@@ -36,7 +36,8 @@ struct _GFileIface
 					     const char           *attributes);
   GFileInfo *         (*get_info)           (GFile                *file,
 					     GFileInfoRequestFlags requested,
-					     const char           *attributes);
+					     const char           *attributes,
+					     gboolean              follow_symlinks);
   /*                  (*get_info_async)     (GFile                *file.. */
   GFileInputStream *  (*read)               (GFile                *file);
   GFileOutputStream * (*append_to)          (GFile                *file);
@@ -65,7 +66,8 @@ GFileEnumerator *  g_file_enumerate_children (GFile                 *file,
 					      const char            *attributes);
 GFileInfo *        g_file_get_info           (GFile                 *file,
 					      GFileInfoRequestFlags  requested,
-					      const char            *attributes);
+					      const char            *attributes,
+					      gboolean               follow_symlinks);
 GFileInputStream * g_file_read               (GFile                 *file);
 GFileOutputStream *g_file_append_to          (GFile                 *file);
 GFileOutputStream *g_file_create             (GFile                 *file);

@@ -374,7 +374,7 @@ g_file_info_set_from_stat (GFileInfo         *info,
 			   GFileInfoRequestFlags requested,
 			   const struct stat *statbuf)
 {
-  if (requested & G_FILE_INFO_FILE_TYPE)
+  if (requested && G_FILE_INFO_FILE_TYPE)
     {
       if (S_ISREG (statbuf->st_mode))
 	info->priv->file_type = G_FILE_TYPE_REGULAR;
@@ -394,13 +394,13 @@ g_file_info_set_from_stat (GFileInfo         *info,
 	info->priv->file_type = G_FILE_TYPE_UNKNOWN;
     }
   
-  if (requested & G_FILE_INFO_SIZE)
+  if (requested && G_FILE_INFO_SIZE)
     g_file_info_set_size (info, statbuf->st_size);
 
-  if (requested & G_FILE_INFO_MODIFICATION_TIME)
+  if (requested && G_FILE_INFO_MODIFICATION_TIME)
     g_file_info_set_modification_time (info, statbuf->st_mtime);
   
-  if (requested & G_FILE_INFO_STAT_INFO)
+  if (requested && G_FILE_INFO_STAT_INFO)
     g_file_info_set_stat_info (info, statbuf);
 }
 

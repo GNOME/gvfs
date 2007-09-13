@@ -68,6 +68,8 @@ typedef enum {
   G_FILE_INFO_SYMLINK_TARGET    = 1 << 10,
 } GFileInfoRequestFlags;
 
+#define G_FILE_INFO_REQUEST_FLAGS_FROM_STAT_MASK (G_FILE_INFO_FILE_TYPE | G_FILE_INFO_SIZE | G_FILE_INFO_MODIFICATION_TIME | G_FILE_INFO_STAT_INFO) 
+
 GType g_file_info_get_type (void) G_GNUC_CONST;
   
 GFileInfo *            g_file_info_new                   (void);

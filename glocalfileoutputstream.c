@@ -95,6 +95,20 @@ g_local_file_output_stream_new (const char *filename,
   return G_FILE_OUTPUT_STREAM (stream);
 }
 
+void
+g_local_file_output_stream_set_original_mtime (GLocalFileOutputStream *stream,
+					       time_t                  original_mtime)
+{
+  stream->priv->original_mtime = original_mtime;
+}
+
+void
+g_local_file_output_stream_set_create_backup  (GLocalFileOutputStream *stream,
+					       gboolean                create_backup)
+{
+  stream->priv->create_backup = create_backup;
+}
+
 static char *
 create_backup_filename (const char *filename)
 {
