@@ -1469,21 +1469,10 @@ g_local_file_move (GFile                *source,
 
  fallback:
 
-  if (!g_file_copy (source, destination, G_FILE_COPY_OVERWRITE, cancellable,
+  if (!g_file_copy (source, destination, G_FILE_COPY_OVERWRITE | G_FILE_COPY_ALL_METADATA, cancellable,
 		    progress_callback, progress_callback_data,
 		    error))
     return FALSE;
-
-  /* Try to inherit source permissions, etc */
-  if (g_stat (local_source->filename, &statbuf) != -1)
-    {
-#ifdef HAVE_CHOWN
-      chown (local_destination->filename, statbuf.st_uid, statbuf.st_gid);
-#endif
-      chmod (local_destination->filename, statbuf.st_mode);
-    }
-
-  /* TODO: Inherit xattrs, acls, selinux context, etc */
   
   return g_file_delete (source, cancellable, error);
 }
