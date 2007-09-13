@@ -44,7 +44,7 @@ GVfsReadChannel *g_vfs_read_channel_new                (GVfsBackend        *back
 int             g_vfs_read_channel_steal_remote_fd    (GVfsReadChannel     *read_channel);
 GVfsBackend    *g_vfs_read_channel_get_backend        (GVfsReadChannel     *read_channel);
 void            g_vfs_read_channel_set_backend_handle (GVfsReadChannel     *read_channel,
-						      GVfsBackendHandle   backend_handle);
+						       GVfsBackendHandle   backend_handle);
 gboolean        g_vfs_read_channel_has_job            (GVfsReadChannel     *read_channel);
 GVfsJob *       g_vfs_read_channel_get_job            (GVfsReadChannel     *read_channel);
 void            g_vfs_read_channel_send_data          (GVfsReadChannel     *read_channel,

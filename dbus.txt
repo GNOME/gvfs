@@ -1,0 +1,21 @@
+The "main" daemon owns the org.gtk.vfs.Daemon bus name
+When the main daemon looses org.gtk.vfs.Daemon, it quits.
+
+each "daemon" has a unique session bus id
+
+Each daemon registers /org/gtk/vfs/Daemon which supports
+operations like GetConnection and CancelOp on iface org.gtk.vfs.Daemon.
+
+The main daemon supports ListMountpoints, iface org.gtk.vfs.MountpointTracker
+at /org/gtk/vfs/MountpointTracker. It does this by tracking signals for availible
+mountpoints and deaths of vfs daemons.
+
+Each "mountpoint" in a daemon registers a org.gtk.vfs.Mountpoint iface
+at a path like /org/gtk/vfs/mountpoint/N. It also signals availibility of this
+mountpoint (with the bus id and the "uri prefix") at startup and when there is
+a new owner of "org.gtk.vfs.Daemon".
+
+At startup the client calls ListMountpoints to get a list of all active
+mountpoints. It then continues to track changes by looking at signals for
+availibility and daemon deaths.
+

@@ -21,19 +21,15 @@
 #include <gvfsjobseekread.h>
 #include <gvfsjobcloseread.h>
 
-G_DEFINE_TYPE (GVfsReadChannel, g_vfs_read_channel, G_TYPE_OBJECT);
+static void g_vfs_read_channel_job_source_iface_init (GVfsJobSourceIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (GVfsReadChannel, g_vfs_read_channel, G_TYPE_OBJECT,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS_JOB_SOURCE,
+						g_vfs_read_channel_job_source_iface_init))
 
 enum {
   PROP_0,
 };
-
-enum {
-  NEW_JOB,
-  CLOSED,
-  LAST_SIGNAL
-};
-
-static guint signals[LAST_SIGNAL] = { 0 };
 
 typedef struct
 {
@@ -101,6 +97,11 @@ g_vfs_read_channel_finalize (GObject *object)
 }
 
 static void
+g_vfs_read_channel_job_source_iface_init (GVfsJobSourceIface *iface)
+{
+}
+
+static void
 g_vfs_read_channel_class_init (GVfsReadChannelClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -108,25 +109,6 @@ g_vfs_read_channel_class_init (GVfsReadChannelClass *klass)
   g_type_class_add_private (klass, sizeof (GVfsReadChannelPrivate));
   
   gobject_class->finalize = g_vfs_read_channel_finalize;
-
-  signals[NEW_JOB] =
-    g_signal_new ("new_job",
-		  G_TYPE_FROM_CLASS (gobject_class),
-		  G_SIGNAL_RUN_LAST,
-		  G_STRUCT_OFFSET (GVfsReadChannelClass, new_job),
-		  NULL, NULL,
-		  g_cclosure_marshal_VOID__POINTER,
-		  G_TYPE_NONE, 1, G_TYPE_VFS_JOB);
-  
-  signals[CLOSED] =
-    g_signal_new ("closed",
-		  G_TYPE_FROM_CLASS (gobject_class),
-		  G_SIGNAL_RUN_LAST,
-		  G_STRUCT_OFFSET (GVfsReadChannelClass, closed),
-		  NULL, NULL,
-		  g_cclosure_marshal_VOID__VOID,
-		  G_TYPE_NONE, 0);
-  
 }
 
 static void
@@ -150,7 +132,7 @@ g_vfs_read_channel_connection_closed (GVfsReadChannel *channel)
     {
       channel->priv->current_job = g_vfs_job_close_read_new (channel, channel->priv->backend_handle, channel->priv->backend);
       channel->priv->current_job_seq_nr = 0;
-      g_signal_emit (channel, signals[NEW_JOB], 0, channel->priv->current_job);
+      g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
     }
   /* Otherwise we'll close when current_job is finished */
 }
@@ -230,7 +212,7 @@ got_command (GVfsReadChannel *channel,
     {
       channel->priv->current_job = job;
       channel->priv->current_job_seq_nr = seq_nr;
-      g_signal_emit (channel, signals[NEW_JOB], 0, job);
+      g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
     }
 }
 
@@ -385,7 +367,7 @@ send_reply_cb (GOutputStream *output_stream,
 
   if (G_IS_VFS_JOB_CLOSE_READ (job))
     {
-      g_signal_emit (channel, signals[CLOSED], 0);
+      g_vfs_job_source_closed (G_VFS_JOB_SOURCE (channel));
       channel->priv->backend_handle = NULL;
     }
   else if (channel->priv->connection_closed)
@@ -393,7 +375,7 @@ send_reply_cb (GOutputStream *output_stream,
       channel->priv->current_job = g_vfs_job_close_read_new (channel, channel->priv->backend_handle,
 							    channel->priv->backend);
       channel->priv->current_job_seq_nr = 0;
-      g_signal_emit (channel, signals[NEW_JOB], 0, channel->priv->current_job);
+      g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
     }
 
   g_object_unref (job);

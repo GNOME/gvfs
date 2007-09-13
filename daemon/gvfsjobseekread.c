@@ -55,9 +55,9 @@ g_vfs_job_seek_read_new (GVfsReadChannel *channel,
   GVfsJobSeekRead *job;
   
   job = g_object_new (G_TYPE_VFS_JOB_SEEK_READ,
-		      "backend", backend,
 		      NULL);
-  
+
+  job->backend = backend;
   job->channel = g_object_ref (channel);
   job->handle = handle;
   job->requested_offset = offset;
@@ -88,7 +88,7 @@ start (GVfsJob *job)
 {
   GVfsJobSeekRead *op_job = G_VFS_JOB_SEEK_READ (job);
 
-  return g_vfs_backend_seek_on_read (job->backend,
+  return g_vfs_backend_seek_on_read (op_job->backend,
 				     op_job,
 				     op_job->handle,
 				     op_job->requested_offset,

@@ -1,57 +1,49 @@
 #include <config.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <dbus/dbus.h>
 #include <dbus-gmain.h>
 #include "gvfsdaemon.h"
 #include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>
 
-static gboolean
-init_dbus (void)
-{
-  DBusConnection *conn;
-  DBusError error;
-
-  dbus_error_init (&error);
-
-  conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
-  if (!conn)
-    {
-      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
-		  error.message);
-      
-      dbus_error_free (&error);
-      return FALSE;
-    }
-
-  dbus_connection_setup_with_g_main (conn, NULL);
-
-  return TRUE;
-}
-
-
 int
 main (int argc, char *argv[])
 {
   GMainLoop *loop;
   GVfsDaemon *daemon;
-  GVfsBackendTest *backend;
+  gboolean replace;
+  GError *error;
+  GOptionContext *context;
+  const GOptionEntry options[] = {
+    { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
+    { NULL }
+  };
 
+  g_set_application_name (_("GVFS Daemon"));
+  context = g_option_context_new (_(""));
+
+  g_option_context_set_summary (context, "Main daemon for GVFS");
+  
+  g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
+
+  replace = FALSE;
+  error = NULL;
+  if (!g_option_context_parse (context, &argc, &argv, &error))
+    {
+      g_print ("%s, use --help for usage\n", error->message);
+      g_error_free (error);
+      return 1;
+    }
+ 
   g_thread_init (NULL);
 
   g_type_init ();
 
-  if (!init_dbus ())
+  daemon = g_vfs_daemon_new (TRUE, replace);
+  if (daemon == NULL)
     return 1;
-
-  daemon = g_vfs_daemon_new ();
-  
-  backend = g_vfs_backend_test_new ();
-  if (!g_vfs_daemon_add_backend (daemon, G_VFS_BACKEND (backend)))
-      return 1;
-  g_object_unref (backend);
-
 
   loop = g_main_loop_new (NULL, FALSE);
 

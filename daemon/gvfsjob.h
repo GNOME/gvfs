@@ -2,7 +2,6 @@
 #define __G_VFS_JOB_H__
 
 #include <glib-object.h>
-#include <gvfsdaemon.h>
 
 G_BEGIN_DECLS
 
@@ -13,26 +12,26 @@ G_BEGIN_DECLS
 #define G_IS_VFS_JOB_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_JOB))
 #define G_VFS_JOB_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_JOB, GVfsJobClass))
 
-typedef struct _GVfsJob      GVfsJob;
-typedef struct _GVfsJobClass GVfsJobClass;
+typedef struct _GVfsJob        GVfsJob;
+typedef struct _GVfsJobPrivate GVfsJobPrivate;
+typedef struct _GVfsJobClass   GVfsJobClass;
 
-/* Define these here to avoid circular includes */
-typedef struct _GVfsJobOpenForRead  GVfsJobOpenForRead;
-typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
-typedef struct _GVfsJobRead         GVfsJobRead;
-typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
+/* Defined here to avoid circular includes */
+typedef struct _GVfsJobSource GVfsJobSource;
 
 struct _GVfsJob
 {
   GObject parent_instance;
-  
-  GVfsBackend *backend;
+
+  /* TODO: Move stuff to private */
   gpointer backend_data;
   guint failed : 1;
   guint cancelled : 1;
   guint sending_reply : 1;
   guint finished : 1;
   GError *error;
+  
+  GVfsJobPrivate *priv;
 };
 
 struct _GVfsJobClass
@@ -42,6 +41,8 @@ struct _GVfsJobClass
   /* signals */
   void (*cancelled)  (GVfsJob *job);
   void (*send_reply) (GVfsJob *job);
+  void (*new_source) (GVfsJob *job,
+		      GVfsJobSource *job_source);
   void (*finished)   (GVfsJob *job);
 
   /* vtable */

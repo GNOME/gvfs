@@ -33,6 +33,8 @@ rename glib lib from gvfs to gio (since it has more than gvfs)
 
 G_TYPE_VFS... -> G_VFS_TYPE...
 
+add _hash and _equal to GFile
+
 FUTURE IDEAS:
 -------------
 

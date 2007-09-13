@@ -81,12 +81,12 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
     }
 
   job = g_object_new (G_TYPE_VFS_JOB_OPEN_FOR_READ,
-		      "backend", backend,
 		      "message", message,
 		      "connection", connection,
 		      NULL);
 
   job->filename = g_strndup (path_data, path_len);
+  job->backend = backend;
   
   return G_VFS_JOB (job);
 }
@@ -96,7 +96,7 @@ start (GVfsJob *job)
 {
   GVfsJobOpenForRead *op_job = G_VFS_JOB_OPEN_FOR_READ (job);
 
-  return g_vfs_backend_open_for_read (job->backend,
+  return g_vfs_backend_open_for_read (op_job->backend,
 				      op_job,
 				      op_job->filename);
 }
@@ -133,7 +133,7 @@ create_reply (GVfsJob *job,
   g_assert (open_job->backend_handle != NULL);
 
   error = NULL;
-  channel = g_vfs_read_channel_new (job->backend, &error);
+  channel = g_vfs_read_channel_new (open_job->backend, &error);
   if (channel == NULL)
     {
       reply = dbus_message_new_error_from_gerror (message, error);

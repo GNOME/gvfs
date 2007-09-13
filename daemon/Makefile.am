@@ -7,27 +7,42 @@ INCLUDES =					\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
 	-DG_DISABLE_DEPRECATED
 
+noinst_LTLIBRARIES=libdaemon.la
+
 libraries =						\
 	$(top_builddir)/gvfs/libgvfs.la			\
+	libdaemon.la					\
 	$(GLIB_LIBS) $(DBUS_LIBS)
+
 
 noinst_PROGRAMS =				\
 	gvfs-daemon				\
+	gvfs-daemon-test			\
 	$(NULL)
 
-gvfs_daemon_SOURCES = \
+libdaemon_la_SOURCES = \
 	gvfsdaemon.c gvfsdaemon.h \
 	gvfsbackend.c gvfsbackend.h \
-	gvfsbackendtest.c gvfsbackendtest.h \
 	gvfsreadchannel.c gvfsreadchannel.h \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
+	gvfsmountpoint.c gvfsmountpoint.h \
 	gvfsjob.c gvfsjob.h \
+	gvfsjobsource.c gvfsjobsource.h \
 	gvfsjobdbus.c gvfsjobdbus.h \
 	gvfsjobopenforread.c gvfsjobopenforread.h \
 	gvfsjobread.c gvfsjobread.h \
 	gvfsjobseekread.c gvfsjobseekread.h \
 	gvfsjobcloseread.c gvfsjobcloseread.h \
 	dbus-gmain.h dbus-gmain.c \
+        $(NULL)
+
+gvfs_daemon_SOURCES = \
 	main.c
 
 gvfs_daemon_LDADD = $(libraries)
+
+gvfs_daemon_test_SOURCES = \
+	gvfsbackendtest.c gvfsbackendtest.h \
+	test.c
+
+gvfs_daemon_test_LDADD = $(libraries)

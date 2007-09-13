@@ -3,6 +3,11 @@
 
 G_BEGIN_DECLS
 
+#define G_VFS_DBUS_DAEMON_NAME "org.gtk.vfs.Daemon"
+
+#define G_VFS_DBUS_MOUNTPOINT_INTERFACE "org.gtk.vfs.Mountpoint"
+#define G_VFS_DBUS_ANNOUNCE_MOUNTPOINT "AnnounceMountpoint"
+
 #define G_VFS_DBUS_MOUNTPOINT_NAME "org.gtk.vfs.mount."
 #define G_VFS_DBUS_ERROR_SOCKET_FAILED "org.gtk.vfs.Error.SocketFailed"
 

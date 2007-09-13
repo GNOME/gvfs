@@ -14,7 +14,6 @@ G_BEGIN_DECLS
 #define G_IS_VFS_JOB_SEEK_READ_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_JOB_SEEK_READ))
 #define G_VFS_JOB_SEEK_READ_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_JOB_SEEK_READ, GVfsJobSeekReadClass))
 
-/* GVfsJobSeekRead declared in gvfsjob.h */
 typedef struct _GVfsJobSeekReadClass   GVfsJobSeekReadClass;
 
 struct _GVfsJobSeekRead
@@ -22,6 +21,7 @@ struct _GVfsJobSeekRead
   GVfsJob parent_instance;
 
   GVfsReadChannel *channel;
+  GVfsBackend *backend;
   GVfsBackendHandle handle;
   GSeekType seek_type;
   goffset requested_offset;

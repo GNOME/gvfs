@@ -32,15 +32,17 @@ g_vfs_backend_test_finalize (GObject *object)
 static void
 g_vfs_backend_test_init (GVfsBackendTest *backend)
 {
-  g_vfs_backend_set_mountpoint (G_VFS_BACKEND (backend), "foo://");
 }
 
 GVfsBackendTest *
 g_vfs_backend_test_new (void)
 {
   GVfsBackendTest *backend;
+  GVfsMountpoint mountpoint = { "foo", "", "", -1, "" };
+
   backend = g_object_new (G_TYPE_VFS_BACKEND_TEST,
-			 NULL);
+			  "mountpoint", &mountpoint,
+			  NULL);
   return backend;
 }
 

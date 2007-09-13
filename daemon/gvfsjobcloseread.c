@@ -53,10 +53,10 @@ g_vfs_job_close_read_new (GVfsReadChannel *channel,
   GVfsJobCloseRead *job;
   
   job = g_object_new (G_TYPE_VFS_JOB_CLOSE_READ,
-		      "backend", backend,
 		      NULL);
 
   job->channel = g_object_ref (channel);
+  job->backend = backend;
   job->handle = handle;
   
   return G_VFS_JOB (job);
@@ -81,7 +81,7 @@ start (GVfsJob *job)
 {
   GVfsJobCloseRead *op_job = G_VFS_JOB_CLOSE_READ (job);
 
-  return g_vfs_backend_close_read (job->backend,
+  return g_vfs_backend_close_read (op_job->backend,
 				   op_job,
 				   op_job->handle);
 }

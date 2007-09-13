@@ -14,7 +14,6 @@ G_BEGIN_DECLS
 #define G_IS_VFS_JOB_CLOSE_READ_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_JOB_CLOSE_READ))
 #define G_VFS_JOB_CLOSE_READ_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_JOB_CLOSE_READ, GVfsJobCloseReadClass))
 
-/* GVfsJobCloseRead declared in gvfsjob.h */
 typedef struct _GVfsJobCloseReadClass   GVfsJobCloseReadClass;
 
 struct _GVfsJobCloseRead
@@ -22,6 +21,7 @@ struct _GVfsJobCloseRead
   GVfsJob parent_instance;
 
   GVfsReadChannel *channel;
+  GVfsBackend *backend;
   GVfsBackendHandle handle;
 };
 

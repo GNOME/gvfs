@@ -2,6 +2,8 @@
 #define __G_VFS_DAEMON_H__
 
 #include <glib-object.h>
+#include <gvfsjobsource.h>
+#include <dbus/dbus.h>
 
 G_BEGIN_DECLS
 
@@ -15,9 +17,6 @@ G_BEGIN_DECLS
 typedef struct _GVfsDaemon        GVfsDaemon;
 typedef struct _GVfsDaemonClass   GVfsDaemonClass;
 typedef struct _GVfsDaemonPrivate GVfsDaemonPrivate;
-
-/* Placed here to fix circular ref problems in headers */
-typedef struct _GVfsBackend GVfsBackend;
 
 struct _GVfsDaemon
 {
@@ -36,9 +35,16 @@ struct _GVfsDaemonClass
 
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
 
-GVfsDaemon *g_vfs_daemon_new         (void);
-gboolean    g_vfs_daemon_add_backend (GVfsDaemon  *daemon,
-				      GVfsBackend *backend);
+GVfsDaemon *g_vfs_daemon_new            (gboolean                       main_daemon,
+					 gboolean                       replace);
+void        g_vfs_daemon_add_job_source (GVfsDaemon                    *daemon,
+					 GVfsJobSource                 *job_source);
+void        g_vfs_daemon_queue_job      (GVfsDaemon                    *daemon,
+					 GVfsJob                       *job);
+gboolean    g_vfs_daemon_register_path  (GVfsDaemon                    *daemon,
+					 const char                    *path,
+					 DBusObjectPathMessageFunction  callback,
+					 gpointer                       user_data);
 
 G_END_DECLS
 

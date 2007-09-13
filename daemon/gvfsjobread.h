@@ -14,7 +14,6 @@ G_BEGIN_DECLS
 #define G_IS_VFS_JOB_READ_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_JOB_READ))
 #define G_VFS_JOB_READ_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_JOB_READ, GVfsJobReadClass))
 
-/* GVfsJobRead declared in gvfsjob.h */
 typedef struct _GVfsJobReadClass   GVfsJobReadClass;
 
 struct _GVfsJobRead
@@ -22,6 +21,7 @@ struct _GVfsJobRead
   GVfsJob parent_instance;
 
   GVfsReadChannel *channel;
+  GVfsBackend *backend;
   GVfsBackendHandle handle;
   gsize bytes_requested;
   char *buffer;

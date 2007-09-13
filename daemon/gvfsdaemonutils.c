@@ -265,3 +265,24 @@ g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)
   return buffer;
 }
 
+gboolean
+_g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filename)
+{
+  DBusMessageIter array;
+
+  if (!dbus_message_iter_open_container (iter,
+					 DBUS_TYPE_ARRAY,
+					 DBUS_TYPE_BYTE_AS_STRING,
+					 &array))
+    return FALSE;
+  
+  if (!dbus_message_iter_append_fixed_array (&array,
+					     DBUS_TYPE_BYTE,
+					     &filename, strlen (filename)))
+    return FALSE;
+  
+  if (!dbus_message_iter_close_container (iter, &array))
+    return FALSE;
+
+  return TRUE;
+}

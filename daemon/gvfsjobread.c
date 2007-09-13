@@ -56,9 +56,9 @@ g_vfs_job_read_new (GVfsReadChannel *channel,
   GVfsJobRead *job;
   
   job = g_object_new (G_TYPE_VFS_JOB_READ,
-		      "backend", backend,
 		      NULL);
-  
+
+  job->backend = backend;
   job->channel = g_object_ref (channel);
   job->handle = handle;
   job->buffer = g_malloc (bytes_requested);
@@ -89,7 +89,7 @@ start (GVfsJob *job)
 {
   GVfsJobRead *op_job = G_VFS_JOB_READ (job);
 
-  return g_vfs_backend_read (job->backend,
+  return g_vfs_backend_read (op_job->backend,
 			     op_job,
 			     op_job->handle,
 			     op_job->buffer,

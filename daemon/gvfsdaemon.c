@@ -1,9 +1,10 @@
 #include <config.h>
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -20,16 +21,24 @@ enum {
   PROP_0,
 };
 
+typedef struct {
+  char *path;
+  DBusObjectPathMessageFunction callback;
+  gpointer data;
+} RegisteredPath;
+
 struct _GVfsDaemonPrivate
 {
-  GHashTable *backends; /* bus_name -> backend */
+  GMutex *lock;
+  gboolean main_daemon;
 
-  GMutex *lock; /* protects the parts that are accessed by multiple threads */
-
-  GQueue *pending_jobs; 
-  GQueue *jobs; /* protected by lock */
-  guint queued_job_start; /* protected by lock */
-  GList *read_channels; /* protected by lock */
+  DBusConnection *session_bus;
+  GHashTable *registered_paths;
+  GQueue *new_pending_jobs; 
+  GQueue *pending_jobs;  /* Only accessed from main thread */
+  GQueue *jobs;
+  guint queued_job_start; 
+  GList *job_sources;
 };
 
 typedef struct {
@@ -52,22 +61,19 @@ static void g_vfs_daemon_set_property (GObject         *object,
 				       guint            prop_id,
 				       const GValue    *value,
 				       GParamSpec      *pspec);
-static void              daemon_unregistered_func (DBusConnection *conn,
-						   gpointer        data);
 static DBusHandlerResult daemon_message_func      (DBusConnection *conn,
 						   DBusMessage    *message,
 						   gpointer        data);
-static DBusHandlerResult daemon_filter_func       (DBusConnection *conn,
+static DBusHandlerResult peer_to_peer_filter_func (DBusConnection *conn,
 						   DBusMessage    *message,
 						   gpointer        data);
-static void              start_or_queue_job       (GVfsDaemon     *daemon,
-						   GVfsJob        *job);
 
-static DBusObjectPathVTable daemon_vtable = {
-	daemon_unregistered_func,
-	daemon_message_func,
-	NULL
-};
+static void
+registered_path_free (RegisteredPath *data)
+{
+  g_free (data->path);
+  g_free (data);
+}
 
 static void
 g_vfs_daemon_finalize (GObject *object)
@@ -80,8 +86,9 @@ g_vfs_daemon_finalize (GObject *object)
   g_assert (daemon->priv->pending_jobs->head == NULL);
   g_queue_free (daemon->priv->jobs);
   g_queue_free (daemon->priv->pending_jobs);
+  g_queue_free (daemon->priv->new_pending_jobs);
 
-  g_hash_table_destroy (daemon->priv->backends);
+  g_hash_table_destroy (daemon->priv->registered_paths);
   g_mutex_free (daemon->priv->lock);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
@@ -107,12 +114,19 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
 					      G_TYPE_VFS_DAEMON,
 					      GVfsDaemonPrivate);
   daemon->priv->lock = g_mutex_new ();
+  daemon->priv->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
   daemon->priv->jobs = g_queue_new ();
   daemon->priv->pending_jobs = g_queue_new ();
-  daemon->priv->backends = g_hash_table_new_full (g_str_hash,
-						  g_str_equal,
-						  g_free,
-						  g_object_unref);
+  daemon->priv->new_pending_jobs = g_queue_new ();
+  daemon->priv->registered_paths =
+    g_hash_table_new_full (g_str_hash,
+			   g_str_equal,
+			   NULL,
+			   (GDestroyNotify)registered_path_free);
+
+  if (!dbus_connection_add_filter (daemon->priv->session_bus,
+				   daemon_message_func, daemon, NULL))
+    g_error ("Not enough memory to add filter");
 }
 
 static void
@@ -152,53 +166,167 @@ g_vfs_daemon_get_property (GObject    *object,
 }
 
 GVfsDaemon *
-g_vfs_daemon_new (void)
+g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
 {
   GVfsDaemon *daemon;
+  DBusConnection *conn;
+  DBusError error;
+  unsigned int flags;
+  int ret;
 
+  g_print ("main_daemon: %d, replace %d\n", main_daemon, replace);
+  
+  dbus_error_init (&error);
+  conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
+  if (!conn)
+    {
+      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
+		  error.message);
+      
+      dbus_error_free (&error);
+      return NULL;
+    }
+
+  dbus_bus_add_match (conn,
+		      "sender='org.freedesktop.DBus',"
+		      "interface='org.freedesktop.DBus',"
+		      "member='NameOwnerChanged'",
+		      &error);
+  if (dbus_error_is_set (&error))
+    {
+      g_printerr ("Failed to connect to add dbus match: %s\n",
+		  error.message);
+      dbus_error_free (&error);
+      return NULL;
+    }
+  
+  dbus_connection_setup_with_g_main (conn, NULL);
+  
   daemon = g_object_new (G_TYPE_VFS_DAEMON, NULL);
+  daemon->priv->main_daemon = main_daemon;
+
+  /* Request name only after we've installed the message filter */
+  if (main_daemon)
+    {
+      flags = DBUS_NAME_FLAG_ALLOW_REPLACEMENT | DBUS_NAME_FLAG_DO_NOT_QUEUE;
+      if (replace)
+	flags |= DBUS_NAME_FLAG_REPLACE_EXISTING;
+
+      g_print ("requesting name\n");
+      ret = dbus_bus_request_name (conn, G_VFS_DBUS_DAEMON_NAME, flags, &error);
+      if (ret == -1)
+	{
+	  g_printerr ("Failed to acquire daemon name: %s", error.message);
+	  dbus_error_free (&error);
+	  
+	  g_object_unref (daemon);
+	  daemon = NULL;
+	}
+      else if (ret == DBUS_REQUEST_NAME_REPLY_EXISTS)
+	{
+	  g_printerr ("VFS daemon already running, exiting.\n");
+	  g_object_unref (daemon);
+	  daemon = NULL;
+	}
+      else if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
+	{
+	  g_printerr ("Not primary owner of the service, exiting.\n");
+	  g_object_unref (daemon);
+	  daemon = NULL;
+	}
+    }
+
+  dbus_connection_unref (conn);
+  
   return daemon;
 }
 
-gboolean
-g_vfs_daemon_add_backend (GVfsDaemon  *daemon,
-			  GVfsBackend *backend)
+static void
+job_source_new_job_callback (GVfsJobSource *job_source,
+			     GVfsJob *job,
+			     GVfsDaemon *daemon)
 {
-  DBusConnection *conn;
-  const char *mountpoint;
-  char *bus_name;
-  int ret;
-  DBusError error;
+  g_vfs_daemon_queue_job (daemon, job);
+}
 
-  mountpoint = g_vfs_backend_get_mountpoint (backend);
+static void
+job_source_closed_callback (GVfsJobSource *job_source,
+			    GVfsDaemon *daemon)
+{
+  g_mutex_lock (daemon->priv->lock);
   
-  g_assert (g_hash_table_lookup (daemon->priv->backends, mountpoint) == NULL);
+  daemon->priv->job_sources = g_list_remove (daemon->priv->job_sources,
+					     job_source);
+  
+  g_signal_handlers_disconnect_by_func (job_source,
+					(GCallback)job_source_new_job_callback,
+					daemon);
+  g_signal_handlers_disconnect_by_func (job_source,
+					(GCallback)job_source_closed_callback,
+					daemon);
+  
+  g_object_unref (job_source);
+  
+  g_mutex_unlock (daemon->priv->lock);
+}
 
-  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-  if (conn == NULL)
+void
+g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
+			     GVfsJobSource *job_source)
+{
+  g_print ("Added new job source %p (%s)\n", job_source, g_type_name_from_instance ((gpointer)job_source));
+  
+  g_mutex_lock (daemon->priv->lock);
+
+  g_object_ref (job_source);
+  daemon->priv->job_sources = g_list_append (daemon->priv->job_sources,
+					     job_source);
+  g_signal_connect (job_source, "new_job",
+		    (GCallback)job_source_new_job_callback, daemon);
+  g_signal_connect (job_source, "closed",
+		    (GCallback)job_source_closed_callback, daemon);
+  
+  g_mutex_unlock (daemon->priv->lock);
+}
+
+gboolean
+g_vfs_daemon_register_path (GVfsDaemon                    *daemon,
+			    const char                    *path,
+			    DBusObjectPathMessageFunction  callback,
+			    gpointer                       user_data)
+{
+  RegisteredPath *data;
+
+  if (g_hash_table_lookup (daemon->priv->registered_paths, path) != NULL)
     return FALSE;
 
-  bus_name = _g_dbus_bus_name_from_mountpoint (mountpoint);
-  g_print ("bus_name: %s, mountpoint: %s\n", bus_name, mountpoint);
-  dbus_error_init (&error);
-  ret = dbus_bus_request_name (conn, bus_name, 0, &error);
-  if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-    {
-      g_printerr ("Failed to acquire vfs-daemon service: %s", error.message);
-      dbus_error_free (&error);
-      return FALSE;
-    }
+  data = g_new0 (RegisteredPath, 1);
+  data->path = g_strdup (path);
+  data->callback = callback;
+  data->data = user_data;
 
-  if (!dbus_connection_register_object_path (conn,
-					     G_VFS_DBUS_DAEMON_PATH,
-					     &daemon_vtable,
-					     daemon))
-    g_error ("Failed to register object with D-BUS (oom).\n");
+  g_hash_table_insert (daemon->priv->registered_paths, data->path, data);
   
-  g_hash_table_insert (daemon->priv->backends,
-		       bus_name,
-		       g_object_ref (backend));
   return TRUE;
+}
+
+static void
+g_queue_move_items (GQueue *to, GQueue *from)
+{
+  GList *ignore;
+  if (from->head != NULL)
+    {
+      if (to->head == NULL)
+	to->head = from->head;
+      else
+	ignore = g_list_concat (to->tail, from->head);
+      to->tail = from->tail;
+      to->length += from->length;
+      
+      from->head = NULL;
+      from->tail = NULL;
+      from->length = 0;
+    }
 }
 
 static gboolean
@@ -210,6 +338,8 @@ start_jobs_at_idle (gpointer data)
 
   g_mutex_lock (daemon->priv->lock);
   daemon->priv->queued_job_start = 0;
+  g_queue_move_items (daemon->priv->pending_jobs,
+		      daemon->priv->new_pending_jobs);
   g_mutex_unlock (daemon->priv->lock);
 
   l = daemon->priv->pending_jobs->head;
@@ -227,35 +357,13 @@ start_jobs_at_idle (gpointer data)
   return FALSE;
 }
 
-/* Called with lock held */
+/* NOTE: Might be emitted on a thread */
 static void
-queue_start_jobs_at_idle (GVfsDaemon *daemon)
-{
-  if (daemon->priv->queued_job_start == 0)
-    daemon->priv->queued_job_start = g_idle_add (start_jobs_at_idle, daemon);
-}
-
-static void
-handle_new_job_callback (GVfsReadChannel *channel,
-			 GVfsJob *job,
+job_new_source_callback (GVfsJob *job,
+			 GVfsJobSource *job_source,
 			 GVfsDaemon *daemon)
 {
-  g_print ("handle_new_job_callback() job=%p daemon=%p\n", job, daemon);
-  g_object_ref (job);
-  start_or_queue_job (daemon, job);
-}
-
-static void
-handle_read_channel_closed_callback (GVfsReadChannel *channel,
-				     GVfsDaemon *daemon)
-{
-  g_mutex_lock (daemon->priv->lock);
-  
-  daemon->priv->read_channels = g_list_remove (daemon->priv->read_channels, channel);
-  g_signal_handlers_disconnect_by_func (channel, (GCallback)handle_new_job_callback, daemon);
-  g_object_unref (channel);
-  
-  g_mutex_unlock (daemon->priv->lock);
+  g_vfs_daemon_add_job_source (daemon, job_source);
 }
 
 /* NOTE: Might be emitted on a thread */
@@ -263,50 +371,47 @@ static void
 job_finished_callback (GVfsJob *job, 
 		       GVfsDaemon *daemon)
 {
+
+  g_signal_handlers_disconnect_by_func (job,
+					(GCallback)job_new_source_callback,
+					daemon);
+  g_signal_handlers_disconnect_by_func (job,
+					(GCallback)job_finished_callback,
+					daemon);
+
   g_mutex_lock (daemon->priv->lock);
   
   g_queue_remove (daemon->priv->jobs, job);
   
-  queue_start_jobs_at_idle (daemon);
-
-  if (G_IS_VFS_JOB_OPEN_FOR_READ (job))
-    {
-      GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
-      GVfsReadChannel *channel;
-      
-      channel = g_vfs_job_open_for_read_steal_channel (open_job);
-
-      if (channel)
-	{
-	  g_print ("Got new read channel %p for daemon %p\n", channel, daemon);
-	  daemon->priv->read_channels = g_list_append (daemon->priv->read_channels,
-						       channel);
-	  g_signal_connect (channel, "new_job", (GCallback)handle_new_job_callback, daemon);
-	  g_signal_connect (channel, "closed", (GCallback)handle_read_channel_closed_callback, daemon);
-	}
-    }
-  
+  if (daemon->priv->queued_job_start == 0)
+    daemon->priv->queued_job_start = g_idle_add (start_jobs_at_idle, daemon);
+ 
   g_mutex_unlock (daemon->priv->lock);
   
   g_object_unref (job);
 }
 
-static void
-start_or_queue_job (GVfsDaemon *daemon,
-		    GVfsJob *job)
+void
+g_vfs_daemon_queue_job (GVfsDaemon *daemon,
+			GVfsJob *job)
 {
-  g_assert (job->backend != NULL);
+  g_print ("Queued new job %p (%s)\n", job, g_type_name_from_instance ((gpointer)job));
+  
+  g_object_ref (job);
+  g_signal_connect (job, "finished", (GCallback)job_finished_callback, daemon);
+  g_signal_connect (job, "new_source", (GCallback)job_new_source_callback, daemon);
   
   g_mutex_lock (daemon->priv->lock);
   g_queue_push_tail (daemon->priv->jobs, job);
   g_mutex_unlock (daemon->priv->lock);
-  g_signal_connect (job, "finished", (GCallback)job_finished_callback, daemon);
   
   /* Can we start the job immediately */
   if (!g_vfs_job_start (job))
     {
       /* Didn't start, queue as pending */
-      g_queue_push_tail (daemon->priv->pending_jobs, job);
+      g_mutex_lock (daemon->priv->lock);
+      g_queue_push_tail (daemon->priv->new_pending_jobs, job);
+      g_mutex_unlock (daemon->priv->lock);
     }
 }
 
@@ -328,7 +433,7 @@ new_connection_data_free (void *memory)
 
 static void
 daemon_peer_connection_setup (GVfsDaemon *daemon,
-			      DBusConnection  *dbus_conn,
+			      DBusConnection *dbus_conn,
 			      NewConnectionData *data)
 {
   /* We wait until we have the extra fd */
@@ -344,11 +449,8 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
     }
   
   dbus_connection_setup_with_g_main (dbus_conn, NULL);
-  if (!dbus_connection_add_filter (dbus_conn, daemon_filter_func, daemon, NULL) ||
-      !dbus_connection_register_object_path (dbus_conn,
-					     G_VFS_DBUS_DAEMON_PATH,
-					     &daemon_vtable,
-					     daemon))
+  if (!dbus_connection_add_filter (dbus_conn, peer_to_peer_filter_func, daemon, NULL) ||
+      !dbus_connection_add_filter (dbus_conn, daemon_message_func, daemon, NULL))
     {
       g_warning (_("Failed to accept client: %s"), _("object registration failed"));
       dbus_connection_unref (dbus_conn);
@@ -598,20 +700,6 @@ accept_new_fd_client (GIOChannel  *channel,
 }
 
 static void
-append_mountpoint_cb (gpointer       key,
-		      gpointer       value,
-		      gpointer       user_data)
-{
-  DBusMessageIter *array_iter = user_data;
-  GVfsBackend *backend = value;
-  char *mountpoint = backend->mountpoint;
-
-  if (!dbus_message_iter_append_basic (array_iter,
-				       DBUS_TYPE_STRING, &mountpoint))
-    g_error ("Can't allocate dbus message");
-}
-
-static void
 daemon_handle_get_connection (DBusConnection *conn,
 			      DBusMessage *message,
 			      GVfsDaemon *daemon)
@@ -625,7 +713,6 @@ daemon_handle_get_connection (DBusConnection *conn,
   GIOChannel *channel;
   char *socket_dir;
   int fd;
-  DBusMessageIter iter, array_iter;
   
   generate_addresses (&address1, &address2, &socket_dir);
 
@@ -679,21 +766,6 @@ daemon_handle_get_connection (DBusConnection *conn,
 				 DBUS_TYPE_STRING, &address2,
 				 DBUS_TYPE_INVALID))
     g_error ("Can't allocate dbus message\n");
-
-  dbus_message_iter_init_append (reply, &iter);
-  
-  if (!dbus_message_iter_open_container (&iter, DBUS_TYPE_ARRAY,
-					 DBUS_TYPE_STRING_AS_STRING,
-					 &array_iter))
-    g_error ("Can't allocate dbus message\n");
-
-  
-  g_hash_table_foreach (daemon->priv->backends,
-			append_mountpoint_cb,
-			&array_iter);
-  
-  if (!dbus_message_iter_close_container (&iter, &array_iter))
-    g_error ("Can't allocate dbus message\n");
   
   dbus_connection_send (conn, reply, NULL);
   
@@ -715,22 +787,51 @@ daemon_handle_get_connection (DBusConnection *conn,
     }
 }
 
-
-static void
-daemon_unregistered_func (DBusConnection *conn,
-			  gpointer        data)
-{
-}
-
 static DBusHandlerResult
 daemon_message_func (DBusConnection *conn,
 		     DBusMessage    *message,
 		     gpointer        data)
 {
   GVfsDaemon *daemon = data;
-  GVfsBackend *backend;
-  const char *dest;
   GVfsJob *job;
+  RegisteredPath *registered_path;
+
+  if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
+    {
+      char *name, *from, *to;
+      if (dbus_message_get_args (message, NULL,
+				 DBUS_TYPE_STRING, &name,
+				 DBUS_TYPE_STRING, &from,
+				 DBUS_TYPE_STRING, &to,
+				 DBUS_TYPE_INVALID))
+	{
+	  const char *my_name = dbus_bus_get_unique_name (conn);
+
+	  g_print ("NameOwnerChanged %s %s->%s (my name: %s)\n", name, from, to, my_name);
+
+	  if (strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0)
+	    {
+	      /* Someone else got the name (i.e. someone used --replace), exit */
+	      if (daemon->priv->main_daemon &&
+		  strcmp (to, my_name) != 0)
+		exit (1);
+	      
+	      if (*to != 0)
+		{
+		  GList *l;
+		  
+		  /* New owner, tell all backends to re-register */
+		  g_mutex_lock (daemon->priv->lock);
+		  for (l = daemon->priv->job_sources; l != NULL; l = l->next)
+		    {
+		      GVfsJobSource *source = l->data;
+		      g_vfs_job_source_reset (source);
+		    }
+		  g_mutex_unlock (daemon->priv->lock);
+		}
+	    }
+	}
+    }
   
   job = NULL;
   if (dbus_message_is_method_call (message,
@@ -780,32 +881,21 @@ daemon_message_func (DBusConnection *conn,
       
       return DBUS_HANDLER_RESULT_HANDLED;
     }
-  
-  backend = NULL;
-  dest = dbus_message_get_destination (message);
-  if (dest != NULL)
-    backend = g_hash_table_lookup (daemon->priv->backends,
-				   dest);
-  if (backend == NULL)
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-  if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_DAEMON_INTERFACE,
-				   G_VFS_DBUS_OP_OPEN_FOR_READ))
-    job = g_vfs_job_open_for_read_new (conn, message, backend);
+  registered_path = g_hash_table_lookup (daemon->priv->registered_paths,
+					 dbus_message_get_path (message));
+  if (registered_path)
+    return registered_path->callback (conn, message, registered_path->data);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-  
-  if (job)
-    start_or_queue_job (daemon, job);
-
-  return DBUS_HANDLER_RESULT_HANDLED;
 }
 
+
+/* Only called for peer-to-peer connections */
 static DBusHandlerResult
-daemon_filter_func (DBusConnection *conn,
-		    DBusMessage    *message,
-		    gpointer        data)
+peer_to_peer_filter_func (DBusConnection *conn,
+			  DBusMessage    *message,
+			  gpointer        data)
 {
   if (dbus_message_is_signal (message,
 			      DBUS_INTERFACE_LOCAL,

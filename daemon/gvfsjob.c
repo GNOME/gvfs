@@ -9,7 +9,6 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjob.h"
-#include "gvfsbackend.h"
 
 G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
 
@@ -18,7 +17,6 @@ G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
 
 enum {
   PROP_0,
-  PROP_BACKEND,
 };
 
 enum {
@@ -26,6 +24,11 @@ enum {
   SEND_REPLY,
   FINISHED,
   LAST_SIGNAL
+};
+
+struct _GVfsJobPrivate
+{
+  int dummy;
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -57,6 +60,8 @@ static void
 g_vfs_job_class_init (GVfsJobClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (GVfsJobPrivate));
   
   gobject_class->finalize = g_vfs_job_finalize;
   gobject_class->set_property = g_vfs_job_set_property;
@@ -86,20 +91,13 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__VOID,
 		  G_TYPE_NONE, 0);
-
-  g_object_class_install_property (gobject_class,
-				   PROP_BACKEND,
-				   g_param_spec_object ("backend",
-							P_("VFS Backend"),
-							P_("The implementation for this job operartion."),
-							G_TYPE_VFS_BACKEND,
-							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
 
 static void
 g_vfs_job_init (GVfsJob *job)
 {
+  job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_TYPE_VFS_JOB, GVfsJobPrivate);
+  
 }
 
 static void
@@ -108,13 +106,8 @@ g_vfs_job_set_property (GObject         *object,
 			const GValue    *value,
 			GParamSpec      *pspec)
 {
-  GVfsJob *job = G_VFS_JOB (object);
-  
   switch (prop_id)
     {
-    case PROP_BACKEND:
-      job->backend = g_value_get_object (value);
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -127,13 +120,8 @@ g_vfs_job_get_property (GObject    *object,
 			GValue     *value,
 			GParamSpec *pspec)
 {
-  GVfsJob *job = G_VFS_JOB (object);
-
   switch (prop_id)
     {
-    case PROP_BACKEND:
-      g_value_set_object (value, job->backend);
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
