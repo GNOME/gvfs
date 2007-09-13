@@ -51,6 +51,7 @@ struct _GMountOperationClass
 			     const char      *default_user,
 			     const char      *default_domain,
 			     GPasswordFlags   flags);
+  
   gboolean (* ask_question) (GMountOperation *op,
 			     const char      *message,
 			     const char      *choices[]);
