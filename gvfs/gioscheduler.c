@@ -92,8 +92,9 @@ io_job_thread (gpointer       data,
 	}
     }
   G_UNLOCK (active_jobs);
-  
-  g_object_unref (job->cancellable);
+
+  if (job->cancellable)
+    g_object_unref (job->cancellable);
   g_main_context_unref (job->callback_context);
   g_free (job);
 
