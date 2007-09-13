@@ -91,7 +91,6 @@ gvfs_daemon_smb_SOURCES = \
 gvfs_daemon_smb_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
 	-DDEFAULT_BACKEND_TYPE=smb-share \
-	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
 	-DBACKEND_TYPES='"smb-share", G_TYPE_VFS_BACKEND_SMB,'
 
 gvfs_daemon_smb_LDADD = $(SAMBA_LIBS) $(libraries)
