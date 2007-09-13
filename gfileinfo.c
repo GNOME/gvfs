@@ -460,10 +460,131 @@ g_file_info_set_attributes (GFileInfo *info,
   }
 }
 
+#define ON_STACK_NAMESPACES 3
+#define ON_STACK_ATTRIBUTES 3
 
-void
-g_file_attribute_matcher_init (GFileAttributeMatcher *matcher,
-			       const char            *attributes)
+
+typedef struct {
+  GQuark namespace;
+  gboolean all;
+  GQuark full_names[ON_STACK_ATTRIBUTES];
+  GArray *more_full_names;
+} NamespaceMatcher;
+
+struct _GFileAttributeMatcher {
+  gboolean all;
+  NamespaceMatcher namespaces[ON_STACK_NAMESPACES];
+  GArray *more_namespaces;
+
+  /* Interator */
+  NamespaceMatcher *matched_namespace;
+  int attribute_pos;
+};
+
+static NamespaceMatcher *
+matcher_find_namespace (GFileAttributeMatcher *matcher,
+			GQuark namespace_q,
+			gboolean create)
+{
+  NamespaceMatcher *ns_matcher;
+  int i;
+  
+  for (i = 0; i < ON_STACK_NAMESPACES; i++)
+    {
+      ns_matcher = &matcher->namespaces[i];
+
+      /* First empty spot, not found, use this */
+      if (ns_matcher->namespace == 0)
+	{
+	  if (create)
+	    {
+	      ns_matcher->namespace = namespace_q;
+	      return ns_matcher;
+	    }
+	  else
+	    return NULL;
+	}
+
+      /* Found, use this */
+      if (ns_matcher->namespace == namespace_q)
+	return ns_matcher;
+    }
+
+  if (matcher->more_namespaces == NULL)
+    {
+      if (create)
+	matcher->more_namespaces = g_array_new (FALSE, FALSE, sizeof (NamespaceMatcher));
+      else
+	return NULL;
+    }
+
+  for (i = 0; i < matcher->more_namespaces->len; i++)
+    {
+      ns_matcher = &g_array_index (matcher->more_namespaces, NamespaceMatcher, i);
+      if (ns_matcher->namespace == namespace_q)
+	return ns_matcher;
+    }
+  
+  if (create)
+    {
+      NamespaceMatcher new_space = {namespace_q};
+      g_array_append_val (matcher->more_namespaces, new_space);
+      ns_matcher = &g_array_index (matcher->more_namespaces, NamespaceMatcher, i);
+      return ns_matcher;
+    }
+  
+  return NULL;
+}
+
+static void
+matcher_add_namespace (GFileAttributeMatcher *matcher,
+		       GQuark namespace_q,
+		       GQuark full_name_q)
+{
+  int i;
+  NamespaceMatcher *ns_matcher;
+
+  ns_matcher = matcher_find_namespace (matcher, namespace_q, TRUE);
+
+  if (full_name_q == 0)
+    ns_matcher->all = TRUE;
+  else
+    {
+      for (i = 0; i < ON_STACK_ATTRIBUTES; i++)
+	{
+	  
+	  /* First empty spot, not found, use this */
+	  if (ns_matcher->full_names[i] == 0)
+	    {
+	      ns_matcher->full_names[i] = full_name_q;
+	      break;
+	    }
+
+	  /* Already added */
+	  if (ns_matcher->full_names[i] == namespace_q)
+	    break;
+	}
+      
+      if (i == ON_STACK_ATTRIBUTES)
+	{
+	  if (ns_matcher->more_full_names == NULL)
+	    ns_matcher->more_full_names = g_array_new (FALSE, FALSE, sizeof (GQuark));
+
+	  for (i = 0; i < ns_matcher->more_full_names->len; i++)
+	    {
+	      GQuark existing_name = g_array_index (ns_matcher->more_full_names, GQuark, i);
+	      if (existing_name == full_name_q)
+		break;
+	    }
+	  
+	  g_array_append_val (ns_matcher->more_full_names, full_name_q);
+	}
+    }
+}
+
+
+GFileAttributeMatcher *
+g_file_attribute_matcher_new (const char *attributes)
 {
   char **split;
   char *colon;
@@ -471,13 +592,13 @@ g_file_attribute_matcher_init (GFileAttributeMatcher *matcher,
   int num_ns, num_fn;
   GQuark full_name_q, namespace_q;
   GArray *full_name_array, *namespace_array;
-  
-
-  memset (matcher, 0, sizeof (GFileAttributeMatcher));
+  GFileAttributeMatcher *matcher;
 
   if (attributes == NULL)
-    return;
-  
+    return NULL;
+
+  matcher = g_malloc0 (sizeof (GFileAttributeMatcher));
+
   split = g_strsplit (attributes, ",", -1);
 
   num_ns = 0;
@@ -489,54 +610,59 @@ g_file_attribute_matcher_init (GFileAttributeMatcher *matcher,
   for (i = 0; split[i] != NULL; i++)
     {
       if (strcmp (split[i], "*") == 0)
-	{
-	  matcher->all = TRUE;
-	}
+	matcher->all = TRUE;
       else
 	{
 	  colon = strchr (split[i], ':');
 
-	  if (colon != NULL)
+	  full_name_q = 0;
+	  if (colon != NULL && colon[1] != 0)
 	    {
 	      full_name_q = g_quark_from_string (split[i]);
 	      *colon = 0;
-
-	      if (num_fn < 3)
-		matcher->full_names[num_fn++] = full_name_q;
-	      else
-		{
-		  if (full_name_array == NULL)
-		    full_name_array = g_array_new (TRUE, FALSE, sizeof (GQuark));
-		  g_array_append_val (full_name_array, full_name_q);
-		}
 	    }
+	  
 	  namespace_q = g_quark_from_string (split[i]);
-
-	  if (num_ns < 3)
-	    matcher->namespaces[num_ns++] = namespace_q;
-	  else
-	    {
-	      if (namespace_array == NULL)
-		namespace_array = g_array_new (TRUE, FALSE, sizeof (GQuark));
-	      g_array_append_val(namespace_array, namespace_q);
-	    }
+	  matcher_add_namespace (matcher, namespace_q, full_name_q);
 	}
     }
 
-  if (namespace_array != NULL)
-    matcher->more_namespaces = (GQuark *)g_array_free (namespace_array, FALSE);
-
-  if (full_name_array != NULL)
-    matcher->more_full_names = (GQuark *)g_array_free (full_name_array, FALSE);
-
   g_strfreev (split);
+
+  return matcher;
 }
 
 void
-g_file_attribute_matcher_cleanup (GFileAttributeMatcher *matcher)
+g_file_attribute_matcher_free (GFileAttributeMatcher *matcher)
 {
-  g_free (matcher->more_namespaces);
-  g_free (matcher->more_full_names);
+  NamespaceMatcher *ns_matcher;
+  int i;
+  
+  if (matcher == NULL)
+    return;
+
+  for (i = 0; i < ON_STACK_NAMESPACES; i++)
+    {
+      ns_matcher = &matcher->namespaces[i];
+
+      if (ns_matcher->more_full_names != NULL)
+	g_array_free (ns_matcher->more_full_names, TRUE);
+    }
+  
+  if (matcher->more_namespaces)
+    {
+      for (i = 0; i < matcher->more_namespaces->len; i++)
+	{
+	  ns_matcher = &g_array_index (matcher->more_namespaces, NamespaceMatcher, i);
+
+	  if (ns_matcher->more_full_names != NULL)
+	    g_array_free (ns_matcher->more_full_names, TRUE);
+	}
+      
+      g_array_free (matcher->more_namespaces, TRUE);
+    }
+  
+  g_free (matcher);
 }
 
 gboolean
@@ -554,37 +680,38 @@ g_file_attribute_matcher_matches_q (GFileAttributeMatcher *matcher,
 				    GQuark                 namespace,
 				    GQuark                 full_name)
 {
+  NamespaceMatcher *ns_matcher;
   int i;
+
+  if (matcher == NULL)
+    return FALSE;
   
   if (matcher->all)
     return TRUE;
 
-  for (i = 0; matcher->namespaces[i] != 0 && i < 3; i++)
+  ns_matcher = matcher_find_namespace (matcher, namespace, FALSE);
+  
+  if (ns_matcher == NULL)
+    return FALSE;
+  
+  if (ns_matcher->all)
+    return TRUE;
+
+  for (i = 0; i < ON_STACK_ATTRIBUTES; i++)
     {
-      if (matcher->namespaces[i] == namespace)
+      if (ns_matcher->full_names[i] == 0)
+	return FALSE;
+      
+      if (ns_matcher->full_names[i] == full_name)
 	return TRUE;
     }
 
-  if (matcher->more_namespaces)
+  if (ns_matcher->more_full_names)
     {
-      for (i = 0; matcher->more_namespaces[i] != 0; i++)
+      for (i = 0; i < ns_matcher->more_full_names->len; i++)
 	{
-	  if (matcher->more_namespaces[i] == namespace)
-	    return TRUE;
-	}
-    }
-
-  for (i = 0; matcher->full_names[i] != 0 && i < 3; i++)
-    {
-      if (matcher->full_names[i] == full_name)
-	return TRUE;
-    }
-
-  if (matcher->more_full_names)
-    {
-      for (i = 0; matcher->more_full_names[i] != 0; i++)
-	{
-	  if (matcher->more_full_names[i] == full_name)
+	  GQuark existing_name = g_array_index (ns_matcher->more_full_names, GQuark, i);
+	  if (existing_name == full_name)
 	    return TRUE;
 	}
     }
@@ -592,3 +719,80 @@ g_file_attribute_matcher_matches_q (GFileAttributeMatcher *matcher,
   return FALSE;
 }
 
+
+gboolean
+g_file_attribute_matcher_enumerate (GFileAttributeMatcher *matcher,
+				    const char            *namespace)
+{
+  return g_file_attribute_matcher_enumerate_q (matcher,
+					       g_quark_from_string (namespace));
+}
+
+/* return TRUE -> all */
+gboolean
+g_file_attribute_matcher_enumerate_q (GFileAttributeMatcher *matcher,
+				      GQuark                 namespace)
+{
+  NamespaceMatcher *ns_matcher;
+
+  if (matcher == NULL)
+    return FALSE;
+
+  if (matcher->all)
+    return TRUE;
+
+  ns_matcher = matcher_find_namespace (matcher, namespace, FALSE);
+
+  matcher->matched_namespace = ns_matcher;
+  matcher->attribute_pos = 0;
+  
+  if (ns_matcher == NULL)
+    return FALSE;
+  
+  if (ns_matcher->all)
+    return TRUE;
+
+  return FALSE;
+}
+
+const char *
+g_file_attribute_matcher_enumerate_next (GFileAttributeMatcher *matcher)
+{
+  NamespaceMatcher *ns_matcher;
+  int i;
+  GQuark full_name_q;
+  const char *full_name;
+  
+  if (matcher == NULL)
+    return NULL;
+
+  ns_matcher = matcher->matched_namespace;
+
+  if (ns_matcher == NULL)
+    return NULL;
+
+  i = matcher->attribute_pos++;
+
+  if (i < ON_STACK_ATTRIBUTES)
+    {
+      full_name_q = ns_matcher->full_names[i];
+      if (full_name_q == 0)
+	return NULL;
+    }
+  else
+    {
+      if (ns_matcher->more_full_names == NULL)
+	return NULL;
+      
+      i -= ON_STACK_ATTRIBUTES;
+      if (i < ns_matcher->more_full_names->len)
+	full_name_q = g_array_index (ns_matcher->more_full_names, GQuark, i);
+      else
+	return NULL;
+    }
+  
+  full_name = g_quark_to_string (full_name_q);
+
+  /* Full names are guaranteed to have a ':' in them */
+  return strchr (full_name, ':') + 1;
+}

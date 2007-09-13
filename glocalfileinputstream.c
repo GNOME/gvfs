@@ -219,7 +219,7 @@ g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
   GLocalFileInputStream *file;
   GFileInfo *info;
   struct stat stat_buf;
-  GFileAttributeMatcher matcher;
+  GFileAttributeMatcher *matcher;
 
   file = G_LOCAL_FILE_INPUT_STREAM (stream);
 
@@ -236,10 +236,11 @@ g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
 
   g_file_info_set_from_stat (info, requested, &stat_buf);
 
-  g_file_attribute_matcher_init (&matcher, attributes);
+  matcher = g_file_attribute_matcher_new (attributes);
   
 #ifdef HAVE_SELINUX
-  if (is_selinux_enabled ()) {
+  if (g_file_attribute_matcher_matches (matcher, "selinux", "selinux:context") &&
+      is_selinux_enabled ()) {
     char *context;
     if (fgetfilecon_raw (file->priv->fd, &context) >= 0)
       {
@@ -249,7 +250,7 @@ g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
   }
 #endif
   
-  g_file_attribute_matcher_cleanup (&matcher);
+  g_file_attribute_matcher_free (matcher);
  
   return info;
 }

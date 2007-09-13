@@ -55,14 +55,6 @@ struct _GFileAttribute {
   char *value;
 };
 
-struct _GFileAttributeMatcher {
-  gboolean all;
-  GQuark namespaces[3];
-  GQuark *more_namespaces;
-  GQuark full_names[3];
-  GQuark *more_full_names;
-};
-
 typedef enum {
   G_FILE_INFO_FILE_TYPE         = 1 << 0,
   G_FILE_INFO_NAME              = 1 << 1,
@@ -135,16 +127,19 @@ void                   g_file_info_set_from_stat         (GFileInfo         *inf
 							  GFileInfoRequestFlags requested,
 							  const struct stat *statbuf);
 
-void     g_file_attribute_matcher_init      (GFileAttributeMatcher *matcher,
-					     const char            *attributes);
-void     g_file_attribute_matcher_cleanup   (GFileAttributeMatcher *matcher);
-gboolean g_file_attribute_matcher_matches   (GFileAttributeMatcher *matcher,
-					     const char            *namespace,
-					     const char            *full_name);
-gboolean g_file_attribute_matcher_matches_q (GFileAttributeMatcher *matcher,
-					     GQuark                 namespace,
-					     GQuark                 full_name);
-
+GFileAttributeMatcher *g_file_attribute_matcher_new            (const char            *attributes);
+void                   g_file_attribute_matcher_free           (GFileAttributeMatcher *matcher);
+gboolean               g_file_attribute_matcher_matches        (GFileAttributeMatcher *matcher,
+								const char            *namespace,
+								const char            *full_name);
+gboolean               g_file_attribute_matcher_matches_q      (GFileAttributeMatcher *matcher,
+								GQuark                 namespace,
+								GQuark                 full_name);
+gboolean               g_file_attribute_matcher_enumerate      (GFileAttributeMatcher *matcher,
+								const char            *namespace);
+gboolean               g_file_attribute_matcher_enumerate_q    (GFileAttributeMatcher *matcher,
+								GQuark                 namespace);
+const char *           g_file_attribute_matcher_enumerate_next (GFileAttributeMatcher *matcher);
 
 G_END_DECLS
 
