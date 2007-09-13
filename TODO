@@ -40,8 +40,6 @@ Make mount_spec and path contruct only properties in GDaemonFile
 
 Don't hardcode the libgvfsdbus.so name, instead have some generic pluggable system
 
-Fallback to in-idle-async instead of threads if threads are not initialized.
-
 gvfs:
 ====
 	
