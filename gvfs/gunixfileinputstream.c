@@ -34,6 +34,11 @@ typedef enum {
 } ReadState;
 
 typedef enum {
+  SEEK_STATE_INIT = 0,
+} SeekState;
+
+
+typedef enum {
   INPUT_STATE_IN_REPLY_HEADER,
   INPUT_STATE_IN_BLOCK,
 } InputState;
@@ -56,12 +61,26 @@ typedef struct {
   gssize ret_val;
   GError *ret_error;
   
-  gboolean cancelled;
   gboolean sent_cancel;
   
   guint32 seq_nr;
-  
 } ReadOperation;
+
+typedef struct {
+  SeekState state;
+
+  /* Input */
+  goffset offset;
+  GSeekType seek_type;
+  /* Output */
+  gboolean ret_val;
+  GError *ret_error;
+  goffset ret_pos;
+  
+  gboolean sent_cancel;
+  
+  guint32 seq_nr;
+} SeekOperation;
 
 typedef struct {
   gboolean cancelled;
@@ -332,6 +351,93 @@ get_reply_header_missing_bytes (GString *buffer)
   return 0;
 }
 
+static char *
+decode_reply (GString *buffer, GVfsDaemonSocketProtocolReply *reply_out)
+{
+  GVfsDaemonSocketProtocolReply *reply;
+  reply = (GVfsDaemonSocketProtocolReply *)buffer->str;
+  reply_out->type = g_ntohl (reply->type);
+  reply_out->seq_nr = g_ntohl (reply->seq_nr);
+  reply_out->arg1 = g_ntohl (reply->arg1);
+  reply_out->arg2 = g_ntohl (reply->arg2);
+  
+  return buffer->str + G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE;
+}
+
+
+static gboolean
+run_sync_state_machine (GUnixFileInputStream *file,
+			state_machine_iterator iterator,
+			gpointer data,
+			GCancellable *cancellable,
+			GError **error)
+{
+  gssize res;
+  StateOp io_op;
+  IOOperationData io_data;
+  GError *io_error;
+
+  memset (&io_data, 0, sizeof (io_data));
+  
+  while (TRUE)
+    {
+      if (cancellable)
+	io_data.cancelled = g_cancellable_is_cancelled (cancellable);
+      
+      io_op = iterator (file, &io_data, data);
+
+      if (io_op == STATE_OP_DONE)
+	return TRUE;
+      
+      io_error = NULL;
+      if (io_op == STATE_OP_READ)
+	{
+	  res = g_input_stream_read (file->priv->data_stream,
+				     io_data.io_buffer, io_data.io_size,
+				     io_data.io_allow_cancel ? cancellable : NULL,
+				     &io_error);
+	}
+      else if (io_op == STATE_OP_SKIP)
+	{
+	  res = g_input_stream_skip (file->priv->data_stream,
+				     io_data.io_size,
+				     io_data.io_allow_cancel ? cancellable : NULL,
+				     &io_error);
+	}
+      else if (io_op == STATE_OP_WRITE)
+	{
+	  res = g_output_stream_write (file->priv->command_stream,
+				       io_data.io_buffer, io_data.io_size,
+				       io_data.io_allow_cancel ? cancellable : NULL,
+				       &io_error);
+	}
+      else
+	g_assert_not_reached ();
+      
+      if (res == -1)
+	{
+	  if (error_is_cancel (io_error))
+	    {
+	      io_data.io_res = 0;
+	      io_data.io_cancelled = TRUE;
+	      g_error_free (io_error);
+	    }
+	  else
+	    {
+	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+			   "Error in stream protocol: %s", io_error->message);
+	      g_error_free (io_error);
+	      return FALSE;
+	    }
+	}
+      else
+	{
+	  io_data.io_res = res;
+	  io_data.io_cancelled = FALSE;
+	}
+    }
+  while (io_op != STATE_OP_DONE);
+}
 
 /* read cycle:
 
@@ -501,38 +607,31 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 	  /* Got full header */
 
 	  {
-	    GVfsDaemonSocketProtocolReply *reply;
-	    guint32 type, seq_nr, arg1, arg2;
+	    GVfsDaemonSocketProtocolReply reply;
 	    char *data;
-	    
-	    reply = (GVfsDaemonSocketProtocolReply *)priv->input_buffer->str;
-	    type = g_ntohl (reply->type);
-	    seq_nr = g_ntohl (reply->seq_nr);
-	    arg1 = g_ntohl (reply->arg1);
-	    arg2 = g_ntohl (reply->arg2);
-	    data = priv->input_buffer->str + G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE;
+	    data = decode_reply (priv->input_buffer, &reply);
 
-	    if (type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
-		seq_nr == op->seq_nr)
+	    if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
+		reply.seq_nr == op->seq_nr)
 	      {
 		op->ret_val = -1;
 		g_set_error (&op->ret_error,
 			     g_quark_from_string (data),
-			     arg1,
+			     reply.arg1,
 			     data + strlen (data) + 1);
 		g_string_truncate (priv->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
-	    else if (type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
 	      {
 		g_string_truncate (priv->input_buffer, 0);
 		priv->input_state = INPUT_STATE_IN_BLOCK;
-		priv->input_block_size = arg1;
-		priv->input_block_seek_generation = arg2;
+		priv->input_block_size = reply.arg1;
+		priv->input_block_seek_generation = reply.arg2;
 		op->state = READ_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
-	    else if (type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS)
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS)
 	      {
 		/* Ignore when reading */
 	      }
@@ -581,82 +680,6 @@ iterate_read_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
  
     }
 }
-
-
-static gboolean
-run_sync_state_machine (GUnixFileInputStream *file,
-			state_machine_iterator iterator,
-			gpointer data,
-			GCancellable *cancellable,
-			GError **error)
-{
-  gssize res;
-  StateOp io_op;
-  IOOperationData io_data;
-  GError *io_error;
-
-  memset (&io_data, 0, sizeof (io_data));
-  
-  while (TRUE)
-    {
-      if (cancellable)
-	io_data.cancelled = g_cancellable_is_cancelled (cancellable);
-      
-      io_op = iterator (file, &io_data, data);
-
-      if (io_op == STATE_OP_DONE)
-	return TRUE;
-      
-      io_error = NULL;
-      if (io_op == STATE_OP_READ)
-	{
-	  res = g_input_stream_read (file->priv->data_stream,
-				     io_data.io_buffer, io_data.io_size,
-				     io_data.io_allow_cancel ? cancellable : NULL,
-				     &io_error);
-	}
-      else if (io_op == STATE_OP_SKIP)
-	{
-	  res = g_input_stream_skip (file->priv->data_stream,
-				     io_data.io_size,
-				     io_data.io_allow_cancel ? cancellable : NULL,
-				     &io_error);
-	}
-      else if (io_op == STATE_OP_WRITE)
-	{
-	  res = g_output_stream_write (file->priv->command_stream,
-				       io_data.io_buffer, io_data.io_size,
-				       io_data.io_allow_cancel ? cancellable : NULL,
-				       &io_error);
-	}
-      else
-	g_assert_not_reached ();
-      
-      if (res == -1)
-	{
-	  if (error_is_cancel (io_error))
-	    {
-	      io_data.io_res = 0;
-	      io_data.io_cancelled = TRUE;
-	      g_error_free (io_error);
-	    }
-	  else
-	    {
-	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-			   "Error in stream protocol: %s", io_error->message);
-	      g_error_free (io_error);
-	      return FALSE;
-	    }
-	}
-      else
-	{
-	  io_data.io_res = res;
-	  io_data.io_cancelled = FALSE;
-	}
-    }
-  while (io_op != STATE_OP_DONE);
-}
-
 
 static gssize
 g_unix_file_input_stream_read (GInputStream *stream,
@@ -756,6 +779,13 @@ g_unix_file_input_stream_can_seek (GFileInputStream *stream)
   return file->priv->can_seek;
 }
 
+static StateOp
+iterate_seek_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, SeekOperation *op)
+{
+  return 0;
+}
+
+
 static gboolean
 g_unix_file_input_stream_seek (GFileInputStream *stream,
 			       goffset     offset,
@@ -764,6 +794,7 @@ g_unix_file_input_stream_seek (GFileInputStream *stream,
 			       GError    **error)
 {
   GUnixFileInputStream *file;
+  SeekOperation op;
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
@@ -777,10 +808,21 @@ g_unix_file_input_stream_seek (GFileInputStream *stream,
       return FALSE;
     }
 
+  memset (&op, 0, sizeof (op));
+  op.state = SEEK_STATE_INIT;
+  op.offset = offset;
+  op.seek_type = type;
   
+  if (!run_sync_state_machine (file, (state_machine_iterator)iterate_seek_state_machine,
+			       &op, cancellable, error))
+    return -1; /* IO Error */
+
+  if (!op.ret_val)
+    g_propagate_error (error, op.ret_error);
+  else
+    file->priv->current_offset = op.ret_pos;
   
-  /* TODO: implement seek */
-  return TRUE;
+  return op.ret_val;
 }
 
 static GFileInfo *
