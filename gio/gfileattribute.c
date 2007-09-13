@@ -125,6 +125,9 @@ g_file_attribute_value_as_string (const GFileAttributeValue *attr)
     case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
       str = escape_byte_string (attr->u.string);
       break;
+    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+      str = g_strdup_printf ("%s", attr->u.boolean?"TRUE":"FALSE");
+      break;
     case G_FILE_ATTRIBUTE_TYPE_UINT32:
       str = g_strdup_printf ("%u", (unsigned int)attr->u.uint32);
       break;
@@ -139,7 +142,7 @@ g_file_attribute_value_as_string (const GFileAttributeValue *attr)
       break;
     default:
       g_warning ("Invalid type in GFileInfo attribute");
-      str = g_strdup ("");
+      str = g_strdup ("<invalid>");
       break;
     }
   
@@ -168,6 +171,18 @@ g_file_attribute_value_get_byte_string (const GFileAttributeValue *attr)
       return NULL;
     }
   return attr->u.string;
+}
+  
+gboolean
+g_file_attribute_value_get_boolean (const GFileAttributeValue *attr)
+{
+  if (attr == NULL || attr->type != G_FILE_ATTRIBUTE_TYPE_BOOLEAN)
+    {
+      if (attr != NULL)
+	g_warning ("Invalid type in GFileInfo attribute");
+      return FALSE;
+    }
+  return attr->u.boolean;
 }
   
 guint32
@@ -232,7 +247,6 @@ g_file_attribute_value_get_object (const GFileAttributeValue *attr)
   return NULL;
 }
   
-
 void
 g_file_attribute_value_set_string (GFileAttributeValue *attr,
 				   const char          *string)
@@ -250,6 +264,15 @@ g_file_attribute_value_set_byte_string (GFileAttributeValue *attr,
   g_file_attribute_value_clear (attr);
   attr->type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
   attr->u.string = g_strdup (string);
+}
+  
+void
+g_file_attribute_value_set_boolean (GFileAttributeValue *attr,
+				    gboolean             value)
+{
+  g_file_attribute_value_clear (attr);
+  attr->type = G_FILE_ATTRIBUTE_TYPE_BOOLEAN;
+  attr->u.boolean = !!value;
 }
   
 void

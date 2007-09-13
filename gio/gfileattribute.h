@@ -10,6 +10,7 @@ typedef enum {
   G_FILE_ATTRIBUTE_TYPE_INVALID = 0,
   G_FILE_ATTRIBUTE_TYPE_STRING,
   G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
+  G_FILE_ATTRIBUTE_TYPE_BOOLEAN,
   G_FILE_ATTRIBUTE_TYPE_UINT32,
   G_FILE_ATTRIBUTE_TYPE_INT32,
   G_FILE_ATTRIBUTE_TYPE_UINT64,
@@ -22,6 +23,7 @@ typedef enum {
 typedef struct  {
   GFileAttributeType type;
   union {
+    gboolean boolean;
     gint32 int32;
     guint32 uint32;
     gint64 int64;
@@ -44,6 +46,7 @@ char *               g_file_attribute_value_as_string       (const GFileAttribut
 
 const char *         g_file_attribute_value_get_string      (const GFileAttributeValue *attr);
 const char *         g_file_attribute_value_get_byte_string (const GFileAttributeValue *attr);
+gboolean             g_file_attribute_value_get_boolean     (const GFileAttributeValue *attr);
 guint32              g_file_attribute_value_get_uint32      (const GFileAttributeValue *attr);
 gint32               g_file_attribute_value_get_int32       (const GFileAttributeValue *attr);
 guint64              g_file_attribute_value_get_uint64      (const GFileAttributeValue *attr);
@@ -54,6 +57,8 @@ void                 g_file_attribute_value_set_string      (GFileAttributeValue
 							     const char          *value);
 void                 g_file_attribute_value_set_byte_string (GFileAttributeValue *attr,
 							     const char          *value);
+void                 g_file_attribute_value_set_boolean     (GFileAttributeValue *attr,
+							     gboolean             value);
 void                 g_file_attribute_value_set_uint32      (GFileAttributeValue *attr,
 							     guint32              value);
 void                 g_file_attribute_value_set_int32       (GFileAttributeValue *attr,

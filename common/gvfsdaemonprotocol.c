@@ -22,6 +22,9 @@ _g_dbus_type_from_file_attribute_type (GFileAttributeType type)
     case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
       dbus_type = DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING;
       break;
+    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+      dbus_type = DBUS_TYPE_BOOLEAN_AS_STRING;
+      break;
     case G_FILE_ATTRIBUTE_TYPE_UINT32:
       dbus_type = DBUS_TYPE_UINT32_AS_STRING;
       break;
@@ -175,10 +178,19 @@ _g_dbus_append_file_attribute (DBusMessageIter *iter,
       if (!dbus_message_iter_close_container (&variant_iter, &obj_struct_iter))
 	_g_dbus_oom ();
     }
+  else if (dbus_type[0] == DBUS_TYPE_BOOLEAN)
+    {
+      /* dbus bool is uint32, gboolean is just "int", convert */
+      dbus_bool_t bool = value->u.boolean;
+      if (!dbus_message_iter_append_basic (&variant_iter,
+					   dbus_type[0], &bool))
+	_g_dbus_oom ();
+    }
   else
     {
+      /* All other types have the same size as dbus types */
       if (!dbus_message_iter_append_basic (&variant_iter,
-					   dbus_type[0], value))
+					   dbus_type[0], &value->u))
 	_g_dbus_oom ();
     }
 
@@ -246,6 +258,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
   DBusMessageIter inner_struct_iter, variant_iter, cstring_iter, obj_iter;
   const gchar *attribute_temp;
   dbus_uint32_t obj_type;
+  dbus_bool_t dbus_bool;
 
   g_file_attribute_value_clear (value);
   
@@ -280,6 +293,11 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
       dbus_message_iter_get_fixed_array (&cstring_iter,
 					 &str, &n_elements);
       value->u.string = g_strndup (str, n_elements);
+      break;
+    case DBUS_TYPE_BOOLEAN:
+      dbus_message_iter_get_basic (&variant_iter, &dbus_bool);
+      value->u.boolean = dbus_bool;
+      value->type = G_FILE_ATTRIBUTE_TYPE_BOOLEAN;
       break;
     case DBUS_TYPE_UINT32:
       dbus_message_iter_get_basic (&variant_iter, &value->u.uint32);
