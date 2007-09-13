@@ -250,13 +250,13 @@ test_buffered_input_stream ()
 
   /* XXX, not sure if the default impl should be doing what it does */
   n = g_input_stream_skip (stream, 4, NULL, NULL);
-  test_assert (n == 2);
+  test_assert (n == 4);
 
   nread = 0;
   res = g_input_stream_read_all (stream, buf, sizeof (buf), &nread, NULL, NULL);
 
-  test_assert (res && nread == strlen (gmis_data) - 5);
-  test_assert (strcmp (buf, gmis_data + 5) == 0);
+  test_assert (res && nread == strlen (gmis_data) - 7);
+  test_assert (strcmp (buf, gmis_data + 7) == 0);
 
   g_object_unref (mem_stream);
 
