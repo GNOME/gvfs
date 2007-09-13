@@ -20,24 +20,13 @@
 
 #define DBUS_TIMEOUT_DEFAULT 30 * 1000 /* 1/2 min */
 
-typedef struct {
-  GHashTable *connections;
-} ThreadLocalConnections;
-
-typedef struct {
-  int fd;
-  GetFdAsyncCallback callback;
-  gpointer callback_data;
-} OutstandingFD;
-
+/* Extra vfs-specific data for DBusConnections */
 typedef struct {
   int extra_fd;
   int extra_fd_count;
   GHashTable *outstanding_fds;
   GSource *extra_fd_source;
 } VfsConnectionData;
-
-typedef struct DBusSource DBusSource;
 
 static gint32 vfs_data_slot = -1;
 static GOnce once_init_dbus = G_ONCE_INIT;
@@ -52,13 +41,14 @@ G_LOCK_DEFINE_STATIC(bus_name_map);
 static GHashTable *owner_map = NULL;
 G_LOCK_DEFINE_STATIC(owner_map);
 
+/* dbus object path -> dbus message filter */
 static GHashTable *obj_path_map = NULL;
 G_LOCK_DEFINE_STATIC(obj_path_map);
 
+static DBusConnection *get_connection_sync      (const char         *bus_name,
+						 GError            **error);
+static void            setup_async_fd_receive   (VfsConnectionData  *connection_data);
 
-static DBusConnection *get_connection_for_owner             (const char      *owner);
-static DBusConnection *get_connection_sync                  (const char      *bus_name,
-							     GError         **error);
 
 static gpointer
 vfs_dbus_init (gpointer arg)
@@ -68,6 +58,10 @@ vfs_dbus_init (gpointer arg)
 
   return NULL;
 }
+
+/**************************************************************************
+ *               message filters for vfs dbus connections                 *
+ *************************************************************************/
 
 typedef struct {
   DBusHandleMessageFunction callback;
@@ -145,15 +139,6 @@ vfs_connection_filter (DBusConnection     *connection,
 }
 
 static void
-outstanding_fd_free (OutstandingFD *outstanding)
-{
-  if (outstanding->fd != -1)
-    close (outstanding->fd);
-
-  g_free (outstanding);
-}
-
-static void
 connection_data_free (gpointer p)
 {
   VfsConnectionData *data = p;
@@ -165,19 +150,61 @@ connection_data_free (gpointer p)
       g_source_destroy (data->extra_fd_source);
       g_source_unref (data->extra_fd_source);
     }
+
+  if (data->outstanding_fds)
+    g_hash_table_destroy (data->outstanding_fds);
+  
   g_free (data);
 }
 
+static void
+vfs_connection_setup (DBusConnection *connection,
+		      int extra_fd,
+		      gboolean async)
+{
+  VfsConnectionData *connection_data;
+  
+  connection_data = g_new (VfsConnectionData, 1);
+  connection_data->extra_fd = extra_fd;
+  connection_data->extra_fd_count = 0;
+
+  if (async)
+    setup_async_fd_receive (connection_data);
+  
+  if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
+    _g_dbus_oom ();
+
+  if (!dbus_connection_add_filter (connection, vfs_connection_filter, NULL, NULL))
+    _g_dbus_oom ();
+}
+
+/**************************************************************************
+ *            Functions to get fds from vfs dbus connections              *
+ *************************************************************************/
+
+typedef struct {
+  int fd;
+  GetFdAsyncCallback callback;
+  gpointer callback_data;
+} OutstandingFD;
 
 static void
-accept_new_fd (VfsConnectionData *data,
-	       GIOCondition condition,
-	       int fd)
+outstanding_fd_free (OutstandingFD *outstanding)
+{
+  if (outstanding->fd != -1)
+    close (outstanding->fd);
+
+  g_free (outstanding);
+}
+
+static void
+async_connection_accept_new_fd (VfsConnectionData *data,
+				GIOCondition condition,
+				int fd)
 {
   int new_fd;
   int fd_id;
   OutstandingFD *outstanding_fd;
-
   
   fd_id = data->extra_fd_count;
   new_fd = _g_socket_receive_fd (data->extra_fd);
@@ -206,38 +233,81 @@ accept_new_fd (VfsConnectionData *data,
 }
 
 static void
-vfs_connection_setup (DBusConnection *connection,
-		      int extra_fd,
-		      gboolean async)
+setup_async_fd_receive (VfsConnectionData *connection_data)
 {
-  VfsConnectionData *connection_data;
+  connection_data->outstanding_fds =
+    g_hash_table_new_full (g_direct_hash,
+			   g_direct_equal,
+			   NULL,
+			   (GDestroyNotify)outstanding_fd_free);
   
-  connection_data = g_new (VfsConnectionData, 1);
-  connection_data->extra_fd = extra_fd;
-  connection_data->extra_fd_count = 0;
-
-  if (async)
-    {
-      connection_data->outstanding_fds =
-	g_hash_table_new_full (g_direct_hash,
-			       g_direct_equal,
-			       NULL,
-			       (GDestroyNotify)outstanding_fd_free);
-
-
-      connection_data->extra_fd_source =
-	_g_fd_source_new (extra_fd, POLLIN, NULL);
-      g_source_set_callback (connection_data->extra_fd_source,
-			     (GSourceFunc)accept_new_fd, connection_data, NULL);
-      
-    }
   
-  if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
-    _g_dbus_oom ();
-
-  if (!dbus_connection_add_filter (connection, vfs_connection_filter, NULL, NULL))
-    _g_dbus_oom ();
+  connection_data->extra_fd_source =
+    _g_fd_source_new (connection_data->extra_fd, POLLIN, NULL);
+  g_source_set_callback (connection_data->extra_fd_source,
+			 (GSourceFunc)async_connection_accept_new_fd,
+			 connection_data, NULL);
 }
+
+int
+_g_dbus_connection_get_fd_sync (DBusConnection *connection,
+				int fd_id)
+{
+  VfsConnectionData *data;
+  int fd;
+
+  data = dbus_connection_get_data (connection, vfs_data_slot);
+  g_assert (data != NULL);
+
+  /* I don't think we can get reorders here, can we?
+   * Its a sync per-thread connection after all
+   */
+  g_assert (fd_id == data->extra_fd_count);
+  
+  fd = _g_socket_receive_fd (data->extra_fd);
+  if (fd != -1)
+    data->extra_fd_count++;
+
+  return fd;
+}
+
+void
+_g_dbus_connection_get_fd_async (DBusConnection *connection,
+				 int fd_id,
+				 GetFdAsyncCallback callback,
+				 gpointer callback_data)
+{
+  VfsConnectionData *data;
+  OutstandingFD *outstanding_fd;
+  int fd;
+  
+  data = dbus_connection_get_data (connection, vfs_data_slot);
+  g_assert (data != NULL);
+
+  outstanding_fd = g_hash_table_lookup (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+
+  if (outstanding_fd)
+    {
+      fd = outstanding_fd->fd;
+      outstanding_fd->fd = -1;
+      g_hash_table_remove (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+      callback (fd, callback_data);
+    }
+  else
+    {
+      outstanding_fd = g_new0 (OutstandingFD, 1);
+      outstanding_fd->fd = -1;
+      outstanding_fd->callback = callback;
+      outstanding_fd->callback_data = callback_data;
+      g_hash_table_insert (data->outstanding_fds,
+			   GINT_TO_POINTER (fd_id),
+			   outstanding_fd);
+    }
+}
+
+/*******************************************************************
+ *               Handling of owners and bus names                  *
+ *******************************************************************/
 
 
 static char *
@@ -296,77 +366,9 @@ set_connection_for_owner (DBusConnection *connection, const char *owner)
   G_UNLOCK (owner_map);
 }
 
-static void
-free_local_connections (ThreadLocalConnections *local)
-{
-  g_hash_table_destroy (local->connections);
-  g_free (local);
-}
-
-static void
-free_mount_connection (gpointer data)
-{
-  DBusConnection *conn = data;
-  
-  dbus_connection_close (conn);
-  dbus_connection_unref (conn);
-}
-
-int
-_g_dbus_connection_get_fd_sync (DBusConnection *connection,
-				int fd_id)
-{
-  VfsConnectionData *data;
-  int fd;
-
-  data = dbus_connection_get_data (connection, vfs_data_slot);
-  g_assert (data != NULL);
-
-  /* I don't think we can get reorders here, can we?
-   * Its a sync per-thread connection after all
-   */
-  g_assert (fd_id == data->extra_fd_count);
-  
-  fd = _g_socket_receive_fd (data->extra_fd);
-  if (fd != -1)
-    data->extra_fd_count++;
-
-  return fd;
-}
-
-void
-_g_dbus_connection_get_fd_async (DBusConnection *connection,
-				 int fd_id,
-				 GetFdAsyncCallback callback,
-				 gpointer callback_data)
-{
-  VfsConnectionData *data;
-  OutstandingFD *outstanding_fd;
-  int fd;
-  
-  data = dbus_connection_get_data (connection, vfs_data_slot);
-  g_assert (data != NULL);
-
-  outstanding_fd = g_hash_table_lookup (data->outstanding_fds, GINT_TO_POINTER (fd_id));
-
-  if (outstanding_fd)
-    {
-      fd = outstanding_fd->fd;
-      outstanding_fd->fd = -1;
-      g_hash_table_remove (data->outstanding_fds, GINT_TO_POINTER (fd_id));
-      callback (fd, callback_data);
-    }
-  else
-    {
-      outstanding_fd = g_new0 (OutstandingFD, 1);
-      outstanding_fd->fd = -1;
-      outstanding_fd->callback = callback;
-      outstanding_fd->callback_data = callback_data;
-      g_hash_table_insert (data->outstanding_fds,
-			   GINT_TO_POINTER (fd_id),
-			   outstanding_fd);
-    }
-}
+/**************************************************************************
+ *                 Asynchronous daemon calls                              *
+ *************************************************************************/
 
 typedef struct {
   const char *bus_name;
@@ -828,6 +830,10 @@ _g_vfs_daemon_call_async (DBusMessage *message,
     async_call_got_owner (async_call);
 }
 
+/**************************************************************************
+ *                  Synchronous daemon calls                              *
+ *************************************************************************/
+
 DBusMessage *
 _g_vfs_daemon_call_sync (DBusMessage *message,
 			 DBusConnection **connection_out,
@@ -1059,9 +1065,31 @@ get_name_owner_sync (const char *bus_name, GError **error)
   dbus_connection_unref (connection);
   dbus_message_unref (reply);
   return owner;
-  
 }
 
+/*************************************************************************
+ *               get per-thread synchronous dbus connections             *
+ *************************************************************************/
+
+typedef struct {
+  GHashTable *connections;
+} ThreadLocalConnections;
+
+static void
+free_local_connections (ThreadLocalConnections *local)
+{
+  g_hash_table_destroy (local->connections);
+  g_free (local);
+}
+
+static void
+free_mount_connection (gpointer data)
+{
+  DBusConnection *conn = data;
+  
+  dbus_connection_close (conn);
+  dbus_connection_unref (conn);
+}
 
 static DBusConnection *
 get_connection_sync (const char *bus_name,
@@ -1183,6 +1211,11 @@ get_connection_sync (const char *bus_name,
 
   return connection;
 }
+
+/**************************************************************************
+ *                 GFileInfo demarshaller                                 *
+ *************************************************************************/
+
 
 GFileInfo *
 _g_dbus_get_file_info (DBusMessageIter *iter,
