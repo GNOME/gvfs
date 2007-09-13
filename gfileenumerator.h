@@ -68,7 +68,7 @@ struct _GFileEnumeratorClass
 				  GAsyncNextFilesCallback callback,
 				  gpointer                data,
 				  GDestroyNotify          notify);
-  void       (* cancel)          (GFileEnumerator        *enumerator,
+  void       (*cancel)           (GFileEnumerator        *enumerator,
 				  guint                   tag);
 };
 
