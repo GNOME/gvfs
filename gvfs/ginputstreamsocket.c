@@ -37,20 +37,17 @@ static void     g_input_stream_socket_read_async  (GInputStream              *st
 						   int                        io_priority,
 						   GAsyncReadCallback         callback,
 						   gpointer                   data,
-						   GDestroyNotify             notify,
 						   GCancellable              *cancellable);
 static void     g_input_stream_socket_skip_async  (GInputStream              *stream,
 						   gsize                      count,
 						   int                        io_priority,
 						   GAsyncSkipCallback         callback,
 						   gpointer                   data,
-						   GDestroyNotify             notify,
 						   GCancellable              *cancellable);
 static void     g_input_stream_socket_close_async (GInputStream              *stream,
 						   int                        io_priority,
 						   GAsyncCloseInputCallback   callback,
 						   gpointer                   data,
-						   GDestroyNotify             notify,
 						   GCancellable              *cancellable);
 
 static void
@@ -204,7 +201,6 @@ typedef struct {
   void *buffer;
   GAsyncReadCallback callback;
   gpointer user_data;
-  GDestroyNotify notify;
   GCancellable *cancellable;
 } ReadAsyncData;
 
@@ -253,15 +249,14 @@ read_async_cb (ReadAsyncData *data,
 		  error);
   if (error)
     g_error_free (error);
+
+  g_free (data);
 }
 
 static void
 read_async_data_free (gpointer _data)
 {
   ReadAsyncData *data = _data;
-
-  if (data->notify)
-    data->notify (data->user_data);
   
   g_free (data);
 }
@@ -273,7 +268,6 @@ g_input_stream_socket_read_async (GInputStream        *stream,
 				  int                  io_priority,
 				  GAsyncReadCallback   callback,
 				  gpointer             user_data,
-				  GDestroyNotify       notify,
 				  GCancellable        *cancellable)
 {
   GSource *source;
@@ -287,7 +281,6 @@ g_input_stream_socket_read_async (GInputStream        *stream,
   data->buffer = buffer;
   data->callback = callback;
   data->user_data = user_data;
-  data->notify = notify;
   data->cancellable = cancellable;
 
   source = _g_fd_source_new (G_OBJECT (socket_stream),
@@ -306,7 +299,6 @@ g_input_stream_socket_skip_async (GInputStream        *stream,
 				  int                  io_priority,
 				  GAsyncSkipCallback   callback,
 				  gpointer             data,
-				  GDestroyNotify       notify,
 				  GCancellable        *cancellable)
 {
   g_assert_not_reached ();
@@ -317,7 +309,6 @@ typedef struct {
   GInputStream *stream;
   GAsyncCloseInputCallback callback;
   gpointer user_data;
-  GDestroyNotify notify;
 } CloseAsyncData;
 
 static void
@@ -325,9 +316,6 @@ close_async_data_free (gpointer _data)
 {
   CloseAsyncData *data = _data;
 
-  if (data->notify)
-    data->notify (data->user_data);
-  
   g_free (data);
 }
 
@@ -378,7 +366,6 @@ g_input_stream_socket_close_async (GInputStream       *stream,
 				   int                 io_priority,
 				   GAsyncCloseInputCallback callback,
 				   gpointer            user_data,
-				   GDestroyNotify      notify,
 				   GCancellable       *cancellable)
 {
   GSource *idle;
@@ -389,7 +376,6 @@ g_input_stream_socket_close_async (GInputStream       *stream,
   data->stream = stream;
   data->callback = callback;
   data->user_data = user_data;
-  data->notify = notify;
   
   idle = g_idle_source_new ();
   g_source_set_callback (idle, (GSourceFunc)close_async_cb, data, close_async_data_free);

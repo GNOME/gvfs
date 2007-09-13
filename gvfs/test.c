@@ -113,22 +113,19 @@ typedef struct {
 } AsyncData;
 
 static void
-async_data_free (gpointer _data)
-{
-  AsyncData *data = _data;
-  g_object_unref (data->c);
-  g_free (data);
-}
-
-static void
 close_done (GInputStream *stream,
 	    gboolean      result,
-	    gpointer      data,
+	    gpointer      _data,
 	    GError       *error)
 {
+  AsyncData *data = _data;
+  
   g_print ("close result: %d\n", result);
   if (!result)
     g_print ("Close error %d: %s\n", error->code, error->message);
+
+  g_object_unref (data->c);
+  g_free (data);
 }
 
 static void
@@ -146,11 +143,11 @@ read_done (GInputStream *stream,
 
   if (count_read > 0)
     {
-      g_input_stream_read_async (stream, data->buffer, 1024, 0, read_done, data, NULL, data->c);
+      g_input_stream_read_async (stream, data->buffer, 1024, 0, read_done, data, data->c);
       //g_cancellable_cancel (data->c);
     }
   else
-    g_input_stream_close_async (stream, 0, close_done, data, async_data_free, data->c);
+    g_input_stream_close_async (stream, 0, close_done, data, data->c);
 }
 
 static void
@@ -168,7 +165,7 @@ test_async (char *uri, gboolean dump)
   if (in == NULL)
     return;
   
-  g_input_stream_read_async (in, data->buffer, 1024, 0, read_done, data, NULL, data->c);
+  g_input_stream_read_async (in, data->buffer, 1024, 0, read_done, data, data->c);
 }
 
 static gboolean
@@ -277,7 +274,7 @@ main (int argc, char *argv[])
       }
 
     c = g_cancellable_new ();
-    g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, NULL, c);
+    g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, c);
     if (1) g_timeout_add (1000, cancel_cancellable_cb, g_object_ref (c));
     g_print ("main loop run\n");
     g_main_loop_run (loop);

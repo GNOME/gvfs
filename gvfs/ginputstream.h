@@ -108,20 +108,17 @@ struct _GInputStreamClass
 			   int                 io_priority,
 			   GAsyncReadCallback  callback,
 			   gpointer            data,
-			   GDestroyNotify      notify,
 			   GCancellable       *cancellable);
   void    (* skip_async)  (GInputStream        *stream,
 			   gsize               count,
 			   int                 io_priority,
 			   GAsyncSkipCallback  callback,
 			   gpointer            data,
-			   GDestroyNotify      notify,
 			   GCancellable       *cancellable);
   void    (* close_async) (GInputStream        *stream,
 			   int                  io_priority,
 			   GAsyncCloseInputCallback callback,
 			   gpointer            data,
-			   GDestroyNotify      notify,
 			   GCancellable       *cancellable);
 
   /* Padding for future expansion */
@@ -161,20 +158,17 @@ void          g_input_stream_read_async        (GInputStream              *strea
 						int                        io_priority,
 						GAsyncReadCallback         callback,
 						gpointer                   data,
-						GDestroyNotify             notify,
 						GCancellable              *cancellable);
 void          g_input_stream_skip_async        (GInputStream              *stream,
 						gsize                      count,
 						int                        io_priority,
 						GAsyncSkipCallback         callback,
 						gpointer                   data,
-						GDestroyNotify             notify,
 						GCancellable              *cancellable);
 void          g_input_stream_close_async       (GInputStream              *stream,
 						int                        io_priority,
 						GAsyncCloseInputCallback   callback,
 						gpointer                   data,
-						GDestroyNotify             notify,
 						GCancellable              *cancellable);
 
 /* For implementations: */

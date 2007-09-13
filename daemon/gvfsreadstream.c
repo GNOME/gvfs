@@ -271,7 +271,6 @@ command_read_cb (GInputStream *input_stream,
 				 0,
 				 command_read_cb,
 				 reader,
-				 NULL,
 				 NULL);
       return;
     }
@@ -294,7 +293,6 @@ command_read_cb (GInputStream *input_stream,
 			     0,
 			     command_read_cb,
 			     reader,
-			     NULL,
 			     NULL);
 }
 
@@ -314,7 +312,6 @@ start_request_reader (GVfsReadStream *stream)
 			     0,
 			     command_read_cb,
 			     reader,
-			     NULL,
 			     NULL);
 
   stream->priv->request_reader = reader;
@@ -351,7 +348,7 @@ send_reply_cb (GOutputStream *output_stream,
 				       stream->priv->reply_buffer + stream->priv->reply_buffer_pos,
 				       G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE - stream->priv->reply_buffer_pos,
 				       0,
-				       send_reply_cb, stream, NULL,
+				       send_reply_cb, stream,
 				       NULL);  
 	  return;
 	}
@@ -368,7 +365,7 @@ send_reply_cb (GOutputStream *output_stream,
 				   stream->priv->output_data + stream->priv->output_data_pos,
 				   stream->priv->output_data_size - stream->priv->output_data_pos,
 				   0,
-				   send_reply_cb, stream, NULL,
+				   send_reply_cb, stream,
 				   NULL);
       return;
     }
@@ -418,7 +415,7 @@ send_reply (GVfsReadStream *stream,
 				   stream->priv->reply_buffer,
 				   G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
 				   0,
-				   send_reply_cb, stream, NULL,
+				   send_reply_cb, stream,
 				   NULL);  
     }
   else
@@ -429,7 +426,7 @@ send_reply (GVfsReadStream *stream,
 				   stream->priv->output_data,
 				   stream->priv->output_data_size,
 				   0,
-				   send_reply_cb, stream, NULL,
+				   send_reply_cb, stream,
 				   NULL);  
     }
 }

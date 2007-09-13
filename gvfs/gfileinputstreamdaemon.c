@@ -171,20 +171,17 @@ static void       g_file_input_stream_daemon_read_async    (GInputStream        
 							    int                        io_priority,
 							    GAsyncReadCallback         callback,
 							    gpointer                   data,
-							    GDestroyNotify             notify,
 							    GCancellable              *cancellable);
 static void       g_file_input_stream_daemon_skip_async    (GInputStream              *stream,
 							    gsize                      count,
 							    int                        io_priority,
 							    GAsyncSkipCallback         callback,
 							    gpointer                   data,
-							    GDestroyNotify             notify,
 							    GCancellable              *cancellable);
 static void       g_file_input_stream_daemon_close_async   (GInputStream              *stream,
 							    int                        io_priority,
 							    GAsyncCloseInputCallback   callback,
 							    gpointer                   data,
-							    GDestroyNotify             notify,
 							    GCancellable              *cancellable);
 
 G_DEFINE_TYPE (GFileInputStreamDaemon, g_file_input_stream_daemon,
@@ -1220,7 +1217,6 @@ struct AsyncIterator {
   int io_priority;
   gpointer callback;
   gpointer callback_data;
-  GDestroyNotify callback_data_destroy;
 };
 
 static void async_iterate (AsyncIterator *iterator);
@@ -1233,9 +1229,6 @@ async_iterator_done (AsyncIterator *iterator, GError *io_error)
 		     iterator->callback,
 		     iterator->callback_data,
 		     io_error);
-
-  if (iterator->callback_data_destroy)
-    iterator->callback_data_destroy (iterator->callback_data);
 
   g_free (iterator);
   
@@ -1341,7 +1334,7 @@ async_iterate (AsyncIterator *iterator)
       g_input_stream_read_async (file->priv->data_stream,
 				 io_data->io_buffer, io_data->io_size,
 				 iterator->io_priority,
-				 async_read_op_callback, iterator, NULL,
+				 async_read_op_callback, iterator,
 				 io_data->io_allow_cancel ? iterator->cancellable : NULL);
     }
   else if (io_op == STATE_OP_SKIP)
@@ -1349,7 +1342,7 @@ async_iterate (AsyncIterator *iterator)
       g_input_stream_skip_async (file->priv->data_stream,
 				 io_data->io_size,
 				 iterator->io_priority,
-				 async_skip_op_callback, iterator, NULL,
+				 async_skip_op_callback, iterator,
 				 io_data->io_allow_cancel ? iterator->cancellable : NULL);
     }
   else if (io_op == STATE_OP_WRITE)
@@ -1357,7 +1350,7 @@ async_iterate (AsyncIterator *iterator)
       g_output_stream_write_async (file->priv->command_stream,
 				   io_data->io_buffer, io_data->io_size,
 				   iterator->io_priority,
-				   async_write_op_callback, iterator, NULL,
+				   async_write_op_callback, iterator,
 				   io_data->io_allow_cancel ? iterator->cancellable : NULL);
     }
   else
@@ -1371,7 +1364,6 @@ run_async_state_machine (GFileInputStreamDaemon *file,
 			 int io_priority,
 			 gpointer callback,
 			 gpointer data,
-			 GDestroyNotify notify,
 			 GCancellable *cancellable,
 			 AsyncIteratorDone done_cb)
 {
@@ -1385,7 +1377,6 @@ run_async_state_machine (GFileInputStreamDaemon *file,
   iterator->cancellable = cancellable;
   iterator->callback = callback;
   iterator->callback_data = data;
-  iterator->callback_data_destroy = notify;
   iterator->done_cb = done_cb;
 
   async_iterate (iterator);
@@ -1435,7 +1426,6 @@ g_file_input_stream_daemon_read_async  (GInputStream        *stream,
 					int                 io_priority,
 					GAsyncReadCallback  callback,
 					gpointer            data,
-					GDestroyNotify      notify,
 					GCancellable       *cancellable)
 {
   GFileInputStreamDaemon *file;
@@ -1459,7 +1449,7 @@ g_file_input_stream_daemon_read_async  (GInputStream        *stream,
 			   (state_machine_iterator)iterate_read_state_machine,
 			   op,
 			   io_priority,
-			   callback, data, notify,
+			   callback, data,
 			   cancellable,
 			   async_read_done);
 }
@@ -1470,7 +1460,6 @@ g_file_input_stream_daemon_skip_async  (GInputStream        *stream,
 					int                 io_priority,
 					GAsyncSkipCallback  callback,
 					gpointer            data,
-					GDestroyNotify      notify,
 					GCancellable       *cancellable)
 {
 }
@@ -1529,7 +1518,6 @@ g_file_input_stream_daemon_close_async (GInputStream        *stream,
 					int                  io_priority,
 					GAsyncCloseInputCallback callback,
 					gpointer            data,
-					GDestroyNotify      notify,
 					GCancellable       *cancellable)
 {
   GFileInputStreamDaemon *file;
@@ -1546,7 +1534,7 @@ g_file_input_stream_daemon_close_async (GInputStream        *stream,
   run_async_state_machine (file,
 			   (state_machine_iterator)iterate_close_state_machine,
 			   op, io_priority,
-			   callback, data, notify,
+			   callback, data,
 			   cancellable,
 			   async_close_done);
 }

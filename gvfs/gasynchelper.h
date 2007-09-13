@@ -10,7 +10,6 @@ typedef struct {
   gpointer       async_object;
   GError *       error;
   gpointer       data;
-  GDestroyNotify destroy_notify;
 } GAsyncResult;
 
 typedef void (*GFDSourceFunc) (gpointer  data,
@@ -21,7 +20,6 @@ void     _g_queue_async_result (GAsyncResult    *result,
 				gpointer         async_object,
 				GError          *error,
 				gpointer         data,
-				GDestroyNotify   destroy_notify,
 				GMainContext    *context,
 				GSourceFunc      source_func);
 

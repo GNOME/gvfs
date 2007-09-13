@@ -76,13 +76,11 @@ struct _GFileEnumeratorClass
 				  int                           io_priority,
 				  GAsyncNextFilesCallback       callback,
 				  gpointer                      data,
-				  GDestroyNotify                notify,
 				  GCancellable                 *cancellable);
   void       (*stop_async)       (GFileEnumerator              *enumerator,
 				  int                           io_priority,
 				  GAsyncStopEnumeratingCallback callback,
 				  gpointer                      data,
-				  GDestroyNotify                notify,
 				  GCancellable                 *cancellable);
 };
 
@@ -102,13 +100,11 @@ void          g_file_enumerator_next_files_async  (GFileEnumerator              
 						   int                             io_priority,
 						   GAsyncNextFilesCallback         callback,
 						   gpointer                        data,
-						   GDestroyNotify                  notify,
 						   GCancellable                   *cancellable);
 void          g_file_enumerator_stop_async        (GFileEnumerator                *enumerator,
 						   int                             io_priority,
 						   GAsyncStopEnumeratingCallback   callback,
 						   gpointer                        data,
-						   GDestroyNotify                  notify,
 						   GCancellable                   *cancellable);
 gboolean      g_file_enumerator_is_stopped        (GFileEnumerator                *enumerator);
 gboolean      g_file_enumerator_has_pending       (GFileEnumerator                *enumerator);
