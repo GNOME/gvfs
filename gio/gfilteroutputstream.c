@@ -124,4 +124,4 @@ g_filter_output_stream_get_base_stream (GFilterOutputStream *stream)
   return stream->base_stream;
 }
 
-// vim: ts=2 sw=2 et
+/* vim: ts=2 sw=2 et */
