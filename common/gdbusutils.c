@@ -76,7 +76,7 @@ _dbus_message_new_gerror (DBusMessage      *message,
   error.message = g_strdup_vprintf (format, args);
   va_end (args);
 
-  reply = dbus_message_new_from_gerror (message, &error);
+  reply = _dbus_message_new_from_gerror (message, &error);
 
   g_free (error.message);
   
@@ -84,7 +84,7 @@ _dbus_message_new_gerror (DBusMessage      *message,
 }
 
 DBusMessage *
-_dbus_message_new_error_from_gerror (DBusMessage *message,
+_dbus_message_new_from_gerror (DBusMessage *message,
 				     GError *error)
 {
   DBusMessage *reply;

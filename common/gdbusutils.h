@@ -40,7 +40,7 @@ void         _g_error_from_dbus                     (DBusError        *derror,
 						     GError          **error);
 gboolean     _g_error_from_message                  (DBusMessage      *message,
 						     GError          **error);
-DBusMessage *_dbus_message_new_error_from_gerror    (DBusMessage      *message,
+DBusMessage *_dbus_message_new_from_gerror          (DBusMessage      *message,
 						     GError           *error);
 DBusMessage *_dbus_message_new_gerror               (DBusMessage      *message,
 						     GQuark            domain,

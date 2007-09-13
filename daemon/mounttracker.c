@@ -251,11 +251,9 @@ automount_done (GMountOperation *op,
   
   if (!succeeded)
     {
-      GError *mount_error = NULL;
-      g_set_error (&mount_error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
-		   _("Automount failed: %s"), error->message);
-      reply = _dbus_message_new_error_from_gerror (data->message, mount_error);
-      g_error_free (mount_error);
+      reply = _dbus_message_new_gerror (data->message,
+					G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
+					_("Automount failed: %s"), error->message);
       dbus_connection_send (data->connection, reply, NULL);
     }
   else
@@ -280,7 +278,6 @@ maybe_automount (GMountTracker *tracker,
 {
   Mountable *mountable;
   DBusMessage *reply;
-  GError *error;
 
   mountable = lookup_mountable (spec);
 
@@ -310,13 +307,11 @@ maybe_automount (GMountTracker *tracker,
     }
   else
     {
-      error = NULL;
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
-		   (mountable == NULL) ?
-		   _("Location is not mountable") :
-		   _("Location is not mounted"));
-      reply = _dbus_message_new_error_from_gerror (message, error);
-      g_error_free (error);
+      reply = _dbus_message_new_gerror (message,
+					G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
+					(mountable == NULL) ?
+					_("Location is not mountable") :
+					_("Location is not mounted"));
     }
   
   return reply;
@@ -432,7 +427,6 @@ mount_location (GMountTracker *tracker,
   DBusError derror;
   GMountSpec *spec;
   const char *obj_path, *dbus_id;
-  GError *error;
   Mountable *mountable;
   dbus_bool_t automount;
   
@@ -440,6 +434,7 @@ mount_location (GMountTracker *tracker,
 
   mountable = NULL;
   spec = NULL;
+  reply = NULL;
   dbus_error_init (&derror);
   if (_g_dbus_message_iter_get_args (&iter,
 				     &derror,
@@ -455,11 +450,9 @@ mount_location (GMountTracker *tracker,
 	  mount = match_vfs_mount (tracker, spec);
 	  if (mount != NULL)
 	    {
-	      error = NULL;
-	      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_ALREADY_MOUNTED,
-			   _("Location is already mounted"));
-	      reply = _dbus_message_new_error_from_gerror (message, error);
-	      g_error_free (error);
+	      reply = _dbus_message_new_gerror (message,
+						G_IO_ERROR, G_IO_ERROR_ALREADY_MOUNTED,
+						_("Location is already mounted"));
 	    }
 	  else
 	    {
@@ -467,11 +460,9 @@ mount_location (GMountTracker *tracker,
 
 	      if (mountable == NULL)
 		{
-		  error = NULL;
-		  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
-			       _("Location is not mountable"));
-		  reply = _dbus_message_new_error_from_gerror (message, error);
-		  g_error_free (error);
+		  reply = _dbus_message_new_gerror (message,
+						    G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
+						    _("Location is not mountable"));
 		}
 	    }
 	}
@@ -487,8 +478,9 @@ mount_location (GMountTracker *tracker,
   
   if (reply == NULL)
     _g_dbus_oom ();
-  
-  dbus_connection_send (connection, reply, NULL);
+
+  if (reply)
+    dbus_connection_send (connection, reply, NULL);
 
   if (mountable)
     {

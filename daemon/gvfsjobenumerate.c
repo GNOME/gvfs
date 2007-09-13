@@ -211,7 +211,7 @@ send_reply (GVfsJob *job)
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   
   if (job->failed) 
-    reply = _dbus_message_new_error_from_gerror (dbus_job->message, job->error);
+    reply = _dbus_message_new_from_gerror (dbus_job->message, job->error);
   else
     reply = class->create_reply (job, dbus_job->connection, dbus_job->message);
  

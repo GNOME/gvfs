@@ -228,7 +228,7 @@ create_reply (GVfsJob *job,
 				&fd_id, &error))
     {
       close (remote_fd);
-      reply = _dbus_message_new_error_from_gerror (message, error);
+      reply = _dbus_message_new_from_gerror (message, error);
       g_error_free (error);
       g_object_unref (channel);
       return reply;
