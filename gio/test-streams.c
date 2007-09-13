@@ -90,7 +90,7 @@ main (int argc, char **argv)
  
   g_type_init ();
   g_thread_init (NULL);
-  g_on_error_stack_trace (argv[0]);
+
   res = TRUE;
   res &= test_memory_input_stream ();
 

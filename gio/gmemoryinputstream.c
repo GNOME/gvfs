@@ -20,9 +20,31 @@ static gssize   g_memory_input_stream_read        (GInputStream              *st
                                                    gsize                      count,
                                                    GCancellable              *cancellable,
                                                    GError                   **error);
+static gssize   g_memory_input_stream_skip        (GInputStream              *stream,
+                                                   gsize                      count,
+                                                   GCancellable              *cancellable,
+                                                   GError                   **error);
 static gboolean g_memory_input_stream_close       (GInputStream              *stream,
                                                    GCancellable              *cancellable,
                                                    GError                   **error);
+static void     g_memory_input_stream_read_async  (GInputStream              *stream,
+                                                   void                      *buffer,
+                                                   gsize                      count,
+                                                   int                        io_priority,
+                                                   GAsyncReadCallback         callback,
+                                                   gpointer                   data,
+                                                   GCancellable              *cancellable);
+static void     g_memory_input_stream_skip_async  (GInputStream              *stream,
+                                                   gsize                      count,
+                                                   int                        io_priority,
+                                                   GAsyncSkipCallback         callback,
+                                                   gpointer                   data,
+                                                   GCancellable              *cancellable);
+static void     g_memory_input_stream_close_async (GInputStream              *stream,
+                                                   int                        io_priority,
+                                                   GAsyncCloseInputCallback   callback,
+                                                   gpointer                   data,
+                                                   GCancellable              *cancellable);
 
 static void     g_memory_input_stream_seekable_iface_init (GSeekableIface  *iface);
 static goffset  g_memory_input_stream_tell                (GSeekable       *seekable);
@@ -52,8 +74,12 @@ g_memory_input_stream_class_init (GMemoryInputStreamClass *klass)
 
   istream_class = G_INPUT_STREAM_CLASS (klass);
   istream_class->read  = g_memory_input_stream_read;
+  istream_class->skip  = g_memory_input_stream_skip;
   istream_class->close = g_memory_input_stream_close;
 
+  istream_class->read_async  = g_memory_input_stream_read_async;
+  istream_class->skip_async  = g_memory_input_stream_skip_async;
+  istream_class->close_async = g_memory_input_stream_close_async;
 
 }
 
@@ -113,6 +139,25 @@ g_memory_input_stream_read (GInputStream *stream,
 
   return count;
 }
+static gssize
+g_memory_input_stream_skip (GInputStream              *stream,
+                            gsize                      count,
+                            GCancellable              *cancellable,
+                            GError                   **error)
+{
+  GMemoryInputStream *memory_stream;
+  GMemoryInputStreamPrivate * priv;
+
+  memory_stream = G_MEMORY_INPUT_STREAM (stream);
+  priv = memory_stream->priv;
+
+  count = MIN (count, priv->len - priv->pos);
+  priv->pos += count;
+
+  return count;
+ 
+
+}
 
 static gboolean
 g_memory_input_stream_close (GInputStream *stream,
@@ -120,6 +165,60 @@ g_memory_input_stream_close (GInputStream *stream,
                              GError      **error)
 {
   return TRUE;
+}
+
+static void
+g_memory_input_stream_read_async (GInputStream              *stream,
+                                  void                      *buffer,
+                                  gsize                      count,
+                                  int                        io_priority,
+                                  GAsyncReadCallback         callback,
+                                  gpointer                   data,
+                                  GCancellable              *cancellable)
+{
+  GMemoryInputStream *memory_stream;
+  GMemoryInputStreamPrivate *priv;
+  gsize nread;
+
+  memory_stream = G_MEMORY_INPUT_STREAM (stream);
+  priv = memory_stream->priv;
+  
+  nread = MIN (count, priv->len - priv->pos);
+  memcpy (buffer, priv->buffer + priv->pos, nread);
+  priv->pos += nread;
+  
+  (*callback) (stream, buffer, count, nread, data, NULL);
+}
+
+static void
+g_memory_input_stream_skip_async (GInputStream              *stream,
+                                  gsize                      count,
+                                  int                        io_priority,
+                                  GAsyncSkipCallback         callback,
+                                  gpointer                   data,
+                                  GCancellable              *cancellable)
+{
+  GMemoryInputStream *memory_stream;
+  GMemoryInputStreamPrivate *priv;
+  gsize nskipped;
+
+  memory_stream = G_MEMORY_INPUT_STREAM (stream);
+  priv = memory_stream->priv;
+  
+  nskipped = MIN (count, priv->len - priv->pos);
+
+  priv->pos += nskipped;
+  (*callback) (stream, count, nskipped, data, NULL);
+}
+
+static void
+g_memory_input_stream_close_async (GInputStream              *stream,
+                                   int                        io_priority,
+                                   GAsyncCloseInputCallback   callback,
+                                   gpointer                   data,
+                                   GCancellable              *cancellable)
+{
+  (*callback) (stream, TRUE, data, NULL);
 }
 
 static goffset
