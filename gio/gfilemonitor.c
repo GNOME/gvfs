@@ -20,6 +20,10 @@ struct _GFileMonitorPrivate {
   guint32 last_sent_change_time; /* Some monitonic clock in msecs */
   GFile *last_sent_change_file;
   guint last_sent_change_timeout;
+
+  /* Virtual CHANGES_DONE_HINT emission */
+  GSource *last_recieved_change_timeout;
+  GFile *last_recieved_change_file;
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -36,6 +40,12 @@ g_file_monitor_finalize (GObject *object)
 
   if (monitor->priv->last_sent_change_timeout != 0)
     g_source_remove (monitor->priv->last_sent_change_timeout);
+
+  if (monitor->priv->last_recieved_change_file)
+    g_object_unref (monitor->priv->last_recieved_change_file);
+
+  if (monitor->priv->last_recieved_change_timeout)
+    g_source_destroy (monitor->priv->last_recieved_change_timeout);
   
   if (G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize) (object);
@@ -153,18 +163,76 @@ delayed_changed_event_timeout (gpointer data)
   return FALSE;
 }
 
+static void
+schedule_delayed_change_timeout (GFileMonitor *monitor, GFile *file, guint32 time_since_last)
+{
+  guint32 time_left;
+  
+  if (monitor->priv->last_sent_change_timeout == 0) /* Only set the timeout once */
+    {
+      time_left = monitor->priv->rate_limit_msec - time_since_last;
+      monitor->priv->last_sent_change_timeout = 
+	g_timeout_add (time_left, delayed_changed_event_timeout, monitor);
+    }
+}
+
+static void
+remove_last_recived_event (GFileMonitor *monitor, gboolean emit_first)
+{
+  if (monitor->priv->last_recieved_change_file == NULL)
+    return;
+
+  if (emit_first)
+    g_signal_emit (monitor, signals[CHANGED], 0,
+		   monitor->priv->last_recieved_change_file, NULL,
+		   G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT);
+
+  if (monitor->priv->last_recieved_change_timeout)
+    {
+      g_source_destroy (monitor->priv->last_recieved_change_timeout);
+      monitor->priv->last_recieved_change_timeout = NULL;
+    }
+}
+
+static gboolean
+virtual_changes_done_timeout (gpointer data)
+{
+  GFileMonitor *monitor = data;
+
+  monitor->priv->last_recieved_change_timeout = NULL;
+  
+  remove_last_recived_event (monitor, TRUE);
+  
+  return FALSE;
+}
+
+static void
+schedule_virtual_change_done_timeout (GFileMonitor *monitor, GFile *file)
+{
+  GSource *source;
+  
+  source = g_timeout_source_new_seconds (3);
+  
+  g_source_set_callback (source, virtual_changes_done_timeout, monitor, NULL);
+  g_source_attach (source, NULL);
+  monitor->priv->last_recieved_change_timeout = source;
+  monitor->priv->last_recieved_change_file = g_object_ref (file);
+  g_source_unref (source);
+}
+
 void
 g_file_monitor_emit_event (GFileMonitor *monitor,
 			   GFile *file,
 			   GFile *other_file,
 			   GFileMonitorEvent event_type)
 {
-  guint32 time_now, since_last, time_left;
+  guint32 time_now, since_last;
   gboolean emit_now;
 
   if (event_type != G_FILE_MONITOR_EVENT_CHANGED)
     {
       remove_last_event (monitor, TRUE);
+      remove_last_recived_event (monitor, TRUE);
       g_signal_emit (monitor, signals[CHANGED], 0, file, other_file, event_type);
     }
   else
@@ -187,12 +255,7 @@ g_file_monitor_emit_event (GFileMonitor *monitor,
 	      /* We ignore this change, but arm a timer so that we can fire it later if we
 		 don't get any other events (that kill this timeout) */
 	      emit_now = FALSE;
-	      if (monitor->priv->last_sent_change_timeout == 0) /* Only set the timeout once */
-		{
-		  time_left = monitor->priv->rate_limit_msec - since_last;
-		  monitor->priv->last_sent_change_timeout = 
-		    g_timeout_add (time_left,  delayed_changed_event_timeout, monitor);
-		}
+	      schedule_delayed_change_timeout (monitor, file, since_last);
 	    }
 	}
       
@@ -204,5 +267,10 @@ g_file_monitor_emit_event (GFileMonitor *monitor,
 	  monitor->priv->last_sent_change_file = g_object_ref (file);
 	  monitor->priv->last_sent_change_timeout = 0;
 	}
+
+      /* Schedule a virtual change done. This is removed if we get a real one, and
+	 postponed if we get more change events. */
+      remove_last_recived_event (monitor, FALSE);
+      schedule_virtual_change_done_timeout (monitor, file);
     }
 }
