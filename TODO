@@ -10,6 +10,8 @@ Implement the rest of the mountable GFile ops
 
 Test g_file_replace_contents_async
 
+Add g_cancellable_is_cancelled + set error helper
+
 Add filter streams: data, charset conversion, etc
 
 implement seeks in local streams
