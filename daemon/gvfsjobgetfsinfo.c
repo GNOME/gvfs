@@ -145,11 +145,19 @@ create_reply (GVfsJob *job,
   GVfsJobGetFsInfo *op_job = G_VFS_JOB_GET_FS_INFO (job);
   DBusMessage *reply;
   DBusMessageIter iter;
+  const char *type;
 
   reply = dbus_message_new_method_return (message);
 
   dbus_message_iter_init_append (reply, &iter);
 
+  type = g_vfs_backend_get_backend_type (op_job->backend);
+
+  if (type)
+    g_file_info_set_attribute_string (op_job->file_info,
+				      G_FILE_ATTRIBUTE_GVFS_BACKEND,
+				      type);
+  
   _g_dbus_append_file_info (&iter, 
 			    op_job->file_info);
   

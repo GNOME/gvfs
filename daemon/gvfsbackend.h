@@ -221,11 +221,11 @@ struct _GVfsBackendClass
 				 GVfsJobMakeDirectory *job,
 				 const char *filename);
   void     (*make_symlink)      (GVfsBackend *backend,
-				 GVfsJobMakeDirectory *make_directory,
+				 GVfsJobMakeSymlink *make_directory,
 				 const char *filename,
 				 const char *symlink_value);
   gboolean (*try_make_symlink)  (GVfsBackend *backend,
-				 GVfsJobMakeDirectory *make_directory,
+				 GVfsJobMakeSymlink *make_directory,
 				 const char *filename,
 				 const char *symlink_value);
   void     (*copy)              (GVfsBackend *backend,
@@ -243,14 +243,14 @@ struct _GVfsBackendClass
 				 GFileProgressCallback progress_callback,
 				 gpointer progress_callback_data);
   void     (*move)              (GVfsBackend *backend,
-				 GVfsJobCopy *job,
+				 GVfsJobMove *job,
 				 const char *source,
 				 const char *destination,
 				 GFileCopyFlags flags,
 				 GFileProgressCallback progress_callback,
 				 gpointer progress_callback_data);
   gboolean (*try_move)          (GVfsBackend *backend,
-				 GVfsJobCopy *job,
+				 GVfsJobMove *job,
 				 const char *source,
 				 const char *destination,
 				 GFileCopyFlags flags,
@@ -278,15 +278,17 @@ void  g_vfs_register_backend       (GType               backend_type,
 				    const char         *type);
 GType g_vfs_lookup_backend         (const char         *type);
 
-void g_vfs_backend_set_display_name (GVfsBackend        *backend,
-				     const char         *display_name);
-void g_vfs_backend_set_icon         (GVfsBackend        *backend,
-				     const char         *icon);
-void g_vfs_backend_set_mount_spec   (GVfsBackend        *backend,
-				     GMountSpec         *mount_spec);
-void g_vfs_backend_register_mount   (GVfsBackend        *backend,
-				     GAsyncDBusCallback  callback,
-				     gpointer            user_data);
+void        g_vfs_backend_set_display_name (GVfsBackend        *backend,
+					    const char         *display_name);
+void        g_vfs_backend_set_icon         (GVfsBackend        *backend,
+					    const char         *icon);
+void        g_vfs_backend_set_mount_spec   (GVfsBackend        *backend,
+					    GMountSpec         *mount_spec);
+void        g_vfs_backend_register_mount   (GVfsBackend        *backend,
+					    GAsyncDBusCallback  callback,
+					    gpointer            user_data);
+const char *g_vfs_backend_get_backend_type (GVfsBackend        *backend);
+
 
 
 

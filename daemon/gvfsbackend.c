@@ -251,6 +251,14 @@ g_vfs_backend_set_mount_spec (GVfsBackend *backend,
   backend->priv->mount_spec = g_mount_spec_ref (mount_spec);
 }
 
+const char *
+g_vfs_backend_get_backend_type (GVfsBackend *backend)
+{
+  if (backend->priv->mount_spec)
+    return g_mount_spec_get_type (backend->priv->mount_spec);
+  return NULL;
+}
+
 static DBusHandlerResult
 backend_dbus_handler (DBusConnection  *connection,
 		      DBusMessage     *message,
