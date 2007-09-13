@@ -888,14 +888,12 @@ try_close_read (GVfsBackend *backend,
   return TRUE;
 }
 
-static GFileInfo *
-get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry)
+static void
+get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFileInfo *info)
 {
-  GFileInfo *info;
   GMountSpec *mount_spec;
   GString *uri;
   
-  info = g_file_info_new ();
   g_file_info_set_name (info, entry->name);
   g_file_info_set_display_name (info, entry->name_utf8);
   g_file_info_set_edit_name (info, entry->name_utf8);
@@ -953,57 +951,47 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry)
     
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STD_TARGET_URI, uri->str);
   g_string_free (uri, TRUE);
-  
-  return info;
 }
 
 static void
 run_get_info (GVfsBackendSmbBrowse *backend,
 	      GVfsJobGetInfo *job,
 	      const char *filename,
-	      const char *attributes)
+	      GFileInfo *info,
+	      GFileAttributeMatcher *matcher)
 {
-  GFileInfo *info;
   BrowseEntry *entry;
 
-  info = NULL;
   g_mutex_lock (backend->entries_lock);
   
   entry = find_entry_unlocked (backend, filename);
 
   if (entry)
-    {
-      info = get_file_info_from_entry (backend, entry);
-    }
+    get_file_info_from_entry (backend, entry, info);
       
   g_mutex_unlock (backend->entries_lock);
 
-  if (info)
-    {
-      g_vfs_job_get_info_set_info (job, info);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-      g_object_unref (info);
-    }
+  if (entry)
+    g_vfs_job_succeeded (G_VFS_JOB (job));
   else
-    {
-      g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-			_("File doesn't exist"));
-    }
+    g_vfs_job_failed (G_VFS_JOB (job),
+		      G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+		      _("File doesn't exist"));
 }
 
 static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     const char *filename,
-	     const char *attributes,
-	     GFileGetInfoFlags flags)
+	     GFileGetInfoFlags flags,
+	     GFileInfo *info,
+	     GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
   update_cache (op_backend);
 
-  run_get_info (op_backend, job, filename, attributes);
+  run_get_info (op_backend, job, filename, info, matcher);
 }
 
 
@@ -1011,19 +999,17 @@ static gboolean
 try_get_info (GVfsBackend *backend,
 	      GVfsJobGetInfo *job,
 	      const char *filename,
-	      const char *attributes,
-	      GFileGetInfoFlags flags)
+	      GFileGetInfoFlags flags,
+	      GFileInfo *info,
+	      GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
   if (is_root (filename))
     {
-      GFileInfo *info = g_file_info_new ();
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
-      g_vfs_job_get_info_set_info (job, info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
-      g_object_unref (info);
       
       return TRUE;
     }
@@ -1031,7 +1017,7 @@ try_get_info (GVfsBackend *backend,
   if (cache_needs_updating (op_backend))
     return FALSE;
 
-  run_get_info (op_backend, job, filename, attributes);
+  run_get_info (op_backend, job, filename, info, matcher);
   
   return TRUE;
 }
@@ -1040,7 +1026,7 @@ static void
 run_enumerate (GVfsBackendSmbBrowse *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
-	       const char *attributes)
+	       GFileAttributeMatcher *matcher)
 {
   GList *files, *l;
   GFileInfo *info;
@@ -1067,7 +1053,8 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
     {
       BrowseEntry *entry = l->data;
 
-      info = get_file_info_from_entry (backend, entry);
+      info = g_file_info_new ();
+      get_file_info_from_entry (backend, entry, info);
 
       files = g_list_prepend (files, info);
     }
@@ -1086,21 +1073,21 @@ static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      const char *filename,
-	      const char *attributes,
+	      GFileAttributeMatcher *matcher,
 	      GFileGetInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   
   update_cache (op_backend);
 
-  run_enumerate (op_backend, job, filename, attributes);
+  run_enumerate (op_backend, job, filename, matcher);
 }
 
 static gboolean
 try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
-	       const char *attributes,
+	       GFileAttributeMatcher *matcher,
 	       GFileGetInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
@@ -1108,7 +1095,7 @@ try_enumerate (GVfsBackend *backend,
   if (cache_needs_updating (op_backend))
     return FALSE;
   
-  run_enumerate (op_backend, job, filename, attributes);
+  run_enumerate (op_backend, job, filename, matcher);
 
   return TRUE;
 }

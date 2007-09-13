@@ -1189,15 +1189,14 @@ static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     const char *filename,
-	     const char *attributes,
-	     GFileGetInfoFlags flags)
+	     GFileGetInfoFlags flags,
+	     GFileInfo *info,
+	     GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GFileAttributeMatcher *matcher;
   struct stat st = {0};
   char *uri;
   int res, saved_errno;
-  GFileInfo *info;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
@@ -1206,17 +1205,9 @@ do_get_info (GVfsBackend *backend,
 
   if (res == 0)
     {
-      matcher = g_file_attribute_matcher_new (attributes);
-      
-      info = g_file_info_new ();
       set_info_from_stat (info, &st, matcher);
       
-      g_vfs_job_get_info_set_info (job, info);
-
       g_vfs_job_succeeded (G_VFS_JOB (job));
-      g_object_unref (info);
-      
-      g_file_attribute_matcher_unref (matcher);
     }
   else
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
@@ -1227,16 +1218,12 @@ static void
 do_get_fs_info (GVfsBackend *backend,
 		GVfsJobGetFsInfo *job,
 		const char *filename,
-		const char *attributes)
+		GFileInfo *info,
+		GFileAttributeMatcher *attribute_matcher)
 {
-  GFileInfo *info;
-
-  info = g_file_info_new ();
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, "cifs");
   
-  g_vfs_job_get_fs_info_set_info (job, info);
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  g_object_unref (info);
 }
 
 
@@ -1267,7 +1254,7 @@ static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      const char *filename,
-	      const char *attributes,
+	      GFileAttributeMatcher *matcher,
 	      GFileGetInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
@@ -1281,7 +1268,6 @@ do_enumerate (GVfsBackend *backend,
   GFileInfo *info;
   GString *uri;
   int uri_start_len;
-  GFileAttributeMatcher *matcher;
 
   uri = create_smb_uri_string (op_backend->server, op_backend->share, filename);
   dir = op_backend->smb_context->opendir (op_backend->smb_context, uri->str);
@@ -1301,8 +1287,6 @@ do_enumerate (GVfsBackend *backend,
     g_string_append_c (uri, '/');
   uri_start_len = uri->len;
 
-  matcher = g_file_attribute_matcher_new (attributes);
-  
   while (TRUE)
     {
       files = NULL;
@@ -1366,8 +1350,6 @@ do_enumerate (GVfsBackend *backend,
 	}
     }
       
-  g_file_attribute_matcher_unref (matcher);
-
   res = op_backend->smb_context->closedir (op_backend->smb_context, dir);
 
   g_vfs_job_enumerate_done (job);

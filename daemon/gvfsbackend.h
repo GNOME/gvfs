@@ -170,30 +170,34 @@ struct _GVfsBackendClass
   void     (*get_info)          (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
 				 const char *filename,
-				 const char *attributes,
-				 GFileGetInfoFlags flags);
+				 GFileGetInfoFlags flags,
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
   gboolean (*try_get_info)      (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
 				 const char *filename,
-				 const char *attributes,
-				 GFileGetInfoFlags flags);
+				 GFileGetInfoFlags flags,
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
   void     (*get_fs_info)       (GVfsBackend *backend,
 				 GVfsJobGetFsInfo *job,
 				 const char *filename,
-				 const char *attributes);
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
   gboolean (*try_get_fs_info)   (GVfsBackend *backend,
 				 GVfsJobGetFsInfo *job,
 				 const char *filename,
-				 const char *attributes);
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
   void     (*enumerate)         (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
 				 const char *filename,
-				 const char *attributes,
+				 GFileAttributeMatcher *attribute_matcher,
 				 GFileGetInfoFlags flags);
   gboolean (*try_enumerate)     (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
 				 const char *filename,
-				 const char *attributes,
+				 GFileAttributeMatcher *attribute_matcher,
 				 GFileGetInfoFlags flags);
   void     (*set_display_name)  (GVfsBackend *backend,
 				 GVfsJobSetDisplayName *job,

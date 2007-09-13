@@ -23,7 +23,7 @@ struct _GVfsJobGetInfo
 
   GVfsBackend *backend;
   char *filename;
-  char *attributes;
+  GFileAttributeMatcher *attribute_matcher;
   GFileGetInfoFlags flags;
 
   GFileInfo *file_info;
@@ -39,8 +39,6 @@ GType g_vfs_job_get_info_get_type (void) G_GNUC_CONST;
 GVfsJob *g_vfs_job_get_info_new      (DBusConnection        *connection,
 				      DBusMessage           *message,
 				      GVfsBackend           *backend);
-void     g_vfs_job_get_info_set_info (GVfsJobGetInfo        *job,
-				      GFileInfo             *file_info);
 
 G_END_DECLS
 

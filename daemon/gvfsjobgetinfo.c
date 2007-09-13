@@ -28,11 +28,10 @@ g_vfs_job_get_info_finalize (GObject *object)
 
   job = G_VFS_JOB_GET_INFO (object);
 
-  if (job->file_info)
-    g_object_unref (job->file_info);
+  g_object_unref (job->file_info);
   
   g_free (job->filename);
-  g_free (job->attributes);
+  g_file_attribute_matcher_unref (job->attribute_matcher);
   
   if (G_OBJECT_CLASS (g_vfs_job_get_info_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_get_info_parent_class)->finalize) (object);
@@ -93,8 +92,11 @@ g_vfs_job_get_info_new (DBusConnection *connection,
 
   job->filename = g_strndup (path_data, path_len);
   job->backend = backend;
-  job->attributes = g_strdup (attributes);
+  job->attribute_matcher = g_file_attribute_matcher_new (attributes);
   job->flags = flags;
+
+  job->file_info = g_file_info_new ();
+  g_file_info_set_attribute_mask (job->file_info, job->attribute_matcher);
   
   return G_VFS_JOB (job);
 }
@@ -115,8 +117,9 @@ run (GVfsJob *job)
   class->get_info (op_job->backend,
 		   op_job,
 		   op_job->filename,
-		   op_job->attributes,
-		   op_job->flags);
+		   op_job->flags,
+		   op_job->file_info,
+		   op_job->attribute_matcher);
 }
 
 static gboolean
@@ -131,15 +134,9 @@ try (GVfsJob *job)
   return class->try_get_info (op_job->backend,
 			      op_job,
 			      op_job->filename,
-			      op_job->attributes,
-			      op_job->flags);
-}
-
-void
-g_vfs_job_get_info_set_info (GVfsJobGetInfo *job,
-			     GFileInfo *file_info)
-{
-  job->file_info = g_object_ref (file_info);
+			      op_job->flags,
+			      op_job->file_info,
+			      op_job->attribute_matcher);
 }
 
 /* Might be called on an i/o thread */

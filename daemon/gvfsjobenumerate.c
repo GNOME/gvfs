@@ -29,7 +29,7 @@ g_vfs_job_enumerate_finalize (GObject *object)
   job = G_VFS_JOB_ENUMERATE (object);
 
   g_free (job->filename);
-  g_free (job->attributes);
+  g_file_attribute_matcher_unref (job->attribute_matcher);
   g_free (job->object_path);
   
   if (G_OBJECT_CLASS (g_vfs_job_enumerate_parent_class)->finalize)
@@ -95,7 +95,7 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   job->object_path = g_strdup (obj_path);
   job->filename = g_strndup (path_data, path_len);
   job->backend = backend;
-  job->attributes = g_strdup (attributes);
+  job->attribute_matcher = g_file_attribute_matcher_new (attributes);
   job->flags = flags;
   
   return G_VFS_JOB (job);
@@ -108,6 +108,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   DBusMessage *message, *orig_message;
   DBusMessageIter iter, array_iter;
   int num;
+  GFileInfo *info;
 
  restart:
   
@@ -130,8 +131,13 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   num = 0;
   while (infos != NULL)
     {
+      info = infos->data;
+      
+      g_file_info_set_attribute_mask (info, job->attribute_matcher);
+      
       _g_dbus_append_file_info (&array_iter, 
-				infos->data);
+				info);
+      
       infos = infos->next;
       if (++num > 100)
 	break;
@@ -186,7 +192,7 @@ run (GVfsJob *job)
   class->enumerate (op_job->backend,
 		    op_job,
 		    op_job->filename,
-		    op_job->attributes,
+		    op_job->attribute_matcher,
 		    op_job->flags);
 }
 
@@ -202,7 +208,7 @@ try (GVfsJob *job)
   return class->try_enumerate (op_job->backend,
 			       op_job,
 			       op_job->filename,
-			       op_job->attributes,
+			       op_job->attribute_matcher,
 			       op_job->flags);
 }
 

@@ -246,11 +246,12 @@ static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
 	     const char *filename,
-	     const char *attributes,
-	     GFileGetInfoFlags flags)
+	     GFileGetInfoFlags flags,
+	     GFileInfo *info,
+	     GFileAttributeMatcher *matcher)
 {
   GFile *file;
-  GFileInfo *info;
+  GFileInfo *info2;
   GError *error;
 
   g_print ("do_get_file_info (%s)\n", filename);
@@ -258,18 +259,18 @@ do_get_info (GVfsBackend *backend,
   file = g_local_file_new (filename);
 
   error = NULL;
-  info = g_file_get_info (file, attributes, flags,
-			  NULL, &error);
+  info2 = g_file_get_info (file, NULL, flags,
+			   NULL, &error);
 
-  if (info)
+  if (info2)
     {
-      g_vfs_job_get_info_set_info (job, info);
+      g_file_info_copy_into (info2, info);
+      g_object_unref (info2);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   else
     g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
 
-  g_object_unref (info);
   g_object_unref (file);
 }
 
@@ -277,7 +278,7 @@ static gboolean
 try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
-	       const char *attributes,
+	       GFileAttributeMatcher *matcher,
 	       GFileGetInfoFlags flags)
 {
   GFileInfo *info1, *info2;;
