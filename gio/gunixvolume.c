@@ -274,7 +274,7 @@ g_unix_volume_get_root (GVolume *volume)
 {
   GUnixVolume *unix_volume = G_UNIX_VOLUME (volume);
 
-  return g_file_get_for_path (unix_volume->mountpoint);
+  return g_file_new_for_path (unix_volume->mountpoint);
 }
 
 static GIcon *

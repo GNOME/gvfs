@@ -346,7 +346,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 					     G_DBUS_TYPE_CSTRING, &str,
 					     0))
 	    {
-	      GFile *file = g_file_get_for_path (str);
+	      GFile *file = g_file_new_for_path (str);
 	      value->u.obj = G_OBJECT (g_file_icon_new (file));
 	      g_free (str);
 	    }

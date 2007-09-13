@@ -129,7 +129,7 @@ main (int argc, char *argv[])
       int i;
       
       for (i = 1; i < argc; i++) {
-	file = g_file_get_for_commandline_arg (argv[i]);
+	file = g_file_new_for_commandline_arg (argv[i]);
 	list (file);
 	g_object_unref (file);
       }
@@ -139,7 +139,7 @@ main (int argc, char *argv[])
       char *cwd;
       
       cwd = g_get_current_dir ();
-      file = g_file_get_for_path (cwd);
+      file = g_file_new_for_path (cwd);
       g_free (cwd);
       list (file);
       g_object_unref (file);

@@ -150,14 +150,14 @@ static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 	GFile* child;
 
 	eflags = ih_mask_to_EventFlags (event->mask);
-	parent = g_file_get_for_path (sub->dirname);
+	parent = g_file_new_for_path (sub->dirname);
 	if (event->name)
 	{
 		fullpath = g_strdup_printf ("%s/%s", sub->dirname, event->name);
 	} else {
 		fullpath = g_strdup_printf ("%s/", sub->dirname);
 	}
-	child = g_file_get_for_path (fullpath);
+	child = g_file_new_for_path (fullpath);
 	g_free(fullpath);
 
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))
@@ -185,7 +185,7 @@ static void ih_not_missing_callback (inotify_sub *sub)
 	guint32 mask;
 	GFile* parent;
 	GFile* child;
-	parent = g_file_get_for_path (sub->dirname);
+	parent = g_file_new_for_path (sub->dirname);
 
 	if (sub->filename)
 	{
@@ -202,7 +202,7 @@ static void ih_not_missing_callback (inotify_sub *sub)
 	}
 
 	eflags = ih_mask_to_EventFlags (mask);
-	child = g_file_get_for_path (fullpath);
+	child = g_file_new_for_path (fullpath);
 	g_free(fullpath);
 
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))

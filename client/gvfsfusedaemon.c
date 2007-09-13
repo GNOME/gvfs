@@ -654,7 +654,7 @@ file_from_mount_record_and_path (MountRecord *mount_record, const gchar *path)
   mount_uri = mount_spec_to_uri (mount_record->info->mount_spec);
   escaped_path = escape_uri_component (path);
   base_uri = g_strconcat (mount_uri, escaped_path, NULL);
-  file = g_file_get_for_uri (base_uri);
+  file = g_file_new_for_uri (base_uri);
 
   g_free (mount_uri);
   g_free (escaped_path);

@@ -103,7 +103,7 @@ fam_do_iter_unlocked (void)
 				path = g_strdup (ev.filename);
 			else
 				path = g_strdup_printf ("%s/%s", sub->pathname, ev.filename);
-			GFile* child = g_file_get_for_path (path);
+			GFile* child = g_file_new_for_path (path);
 			GFile* parent = g_file_get_parent (child);
 			g_directory_monitor_emit_event (monitor, child, NULL, eflags);
 			g_free (path);
@@ -117,7 +117,7 @@ fam_do_iter_unlocked (void)
 			if (eflags == -1)
 				continue;
 			path = g_strdup (ev.filename);
-			GFile* child = g_file_get_for_path (path);
+			GFile* child = g_file_new_for_path (path);
 			g_file_monitor_emit_event (monitor, child, NULL, eflags);
 			g_free (path);
 			g_object_unref (child);

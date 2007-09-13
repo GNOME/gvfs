@@ -324,7 +324,7 @@ g_desktop_app_info_get_icon (GAppInfo *appinfo)
     return NULL;
   
   if (g_path_is_absolute (info->icon)) {
-    file = g_file_get_for_path (info->icon);
+    file = g_file_new_for_path (info->icon);
     icon = g_file_icon_new (file);
     g_object_unref (file);
   } else {

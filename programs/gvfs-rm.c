@@ -32,7 +32,7 @@ main (int argc, char *argv[])
       int i;
       
       for (i = 1; i < argc; i++) {
-	file = g_file_get_for_commandline_arg (argv[i]);
+	file = g_file_new_for_commandline_arg (argv[i]);
 	error = NULL;
 	if (!g_file_delete (file, NULL, &error))
 	  {

@@ -141,7 +141,7 @@ benchmark_run (gint argc, gchar *argv [])
       return 1;
     }
 
-  base_dir = g_file_get_for_commandline_arg (argv [1]);
+  base_dir = g_file_new_for_commandline_arg (argv [1]);
 
   if (!is_dir (base_dir))
     {

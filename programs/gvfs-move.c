@@ -72,7 +72,7 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  dest = g_file_get_for_commandline_arg (argv[argc-1]);
+  dest = g_file_new_for_commandline_arg (argv[argc-1]);
 
   if (no_target_directory && argc > 3)
     {
@@ -92,7 +92,7 @@ main (int argc, char *argv[])
 
   for (i = 1; i < argc - 1; i++)
     {
-      source = g_file_get_for_commandline_arg (argv[i]);
+      source = g_file_new_for_commandline_arg (argv[i]);
 
       if (dest_is_dir && !no_target_directory)
 	{

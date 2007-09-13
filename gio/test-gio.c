@@ -51,7 +51,7 @@ test_out ()
   
   unlink ("/tmp/test");
 
-  file = g_file_get_for_path ("/tmp/test");
+  file = g_file_new_for_path ("/tmp/test");
   out = (GOutputStream *)g_file_create (file, NULL, NULL);
 
   left = sizeof(buffer);
@@ -98,7 +98,7 @@ test_sync (char *uri, gboolean dump)
 
   c = g_cancellable_new ();
   
-  file = g_file_get_for_uri (uri);
+  file = g_file_new_for_uri (uri);
   if (0) g_thread_create (cancel_thread, c, FALSE, NULL);
   error = NULL;
   in = (GInputStream *)g_file_read (file, c, &error);
@@ -227,7 +227,7 @@ test_async (char *uri, gboolean dump)
   data->buffer = g_malloc (1025);
   data->c = g_cancellable_new ();
 
-  file = g_file_get_for_uri (uri);
+  file = g_file_new_for_uri (uri);
   g_file_read_async (file, 0, data->c, test_async_open_callback, data);
   if (0) g_thread_create (cancel_thread, data->c, FALSE, NULL);
 }
@@ -256,7 +256,7 @@ test_seek (void)
   GError *error;
   GCancellable *c;
 
-  file = g_file_get_for_uri ("test:///etc/passwd");
+  file = g_file_new_for_uri ("test:///etc/passwd");
 
   error = NULL;
   in = (GInputStream *)g_file_read (file, NULL, &error);
@@ -521,7 +521,7 @@ test_load_content (void)
 {
   GFile *file;
   
-  file = g_file_get_for_path ("/etc/passwd");
+  file = g_file_new_for_path ("/etc/passwd");
   g_file_load_contents_async (file,
 			      NULL,
 			      get_contents_callback, NULL);
@@ -580,7 +580,7 @@ main (int argc, char *argv[])
     g_print ("main loop quit\n");
   }
 
-  file = g_file_get_for_path ("/tmp");
+  file = g_file_new_for_path ("/tmp");
   if (0) test_sync ("test:///etc/passwd", FALSE);
   if (1) test_async ("test:///etc/passwd", TRUE);
   if (0) test_out ();

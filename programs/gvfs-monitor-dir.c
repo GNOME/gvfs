@@ -65,7 +65,7 @@ main (int argc, char *argv[])
   
   if (argc > 1)
     {
-      file = g_file_get_for_commandline_arg (argv[1]);
+      file = g_file_new_for_commandline_arg (argv[1]);
       dmonitor = g_file_monitor_directory (file);
       g_signal_connect (dmonitor, "changed", (GCallback)dir_monitor_callback, NULL);
     }

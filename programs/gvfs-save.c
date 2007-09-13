@@ -136,7 +136,7 @@ main (int argc, char *argv[])
   
   if (argc > 1)
     {
-      file = g_file_get_for_commandline_arg (argv[1]);
+      file = g_file_new_for_commandline_arg (argv[1]);
       res = save (file);
       g_object_unref (file);
     }

@@ -1701,14 +1701,14 @@ g_file_real_replace_finish (GFile                  *file,
  ********************************************/
 
 GFile *
-g_file_get_for_path (const char *path)
+g_file_new_for_path (const char *path)
 {
   return g_vfs_get_file_for_path (g_vfs_get (),
 				  path);
 }
   
 GFile *
-g_file_get_for_uri (const char *uri)
+g_file_new_for_uri (const char *uri)
 {
   return g_vfs_get_file_for_uri (g_vfs_get (),
 				 uri);
@@ -1745,7 +1745,7 @@ has_valid_scheme (const char *uri)
 }
 
 GFile *
-g_file_get_for_commandline_arg (const char *arg)
+g_file_new_for_commandline_arg (const char *arg)
 {
   GFile *file;
   char *filename;
@@ -1754,16 +1754,16 @@ g_file_get_for_commandline_arg (const char *arg)
   g_return_val_if_fail (arg != NULL, NULL);
   
   if (g_path_is_absolute (arg))
-    return g_file_get_for_path (arg);
+    return g_file_new_for_path (arg);
 
   if (has_valid_scheme (arg))
-    return g_file_get_for_uri (arg);
+    return g_file_new_for_uri (arg);
     
   current_dir = g_get_current_dir ();
   filename = g_build_filename (current_dir, arg, NULL);
   g_free (current_dir);
   
-  file = g_file_get_for_path (filename);
+  file = g_file_new_for_path (filename);
   g_free (filename);
   
   return file;
