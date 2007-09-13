@@ -2,7 +2,6 @@ Catch EINTR in all syscalls
 
 Implement the rest of g_file_info_simple_get
 
-fileenumerator per-enumerator maincontext instead of each call (like in streams)
 implement async support for file enumerator
 
 Add Seekable support to LocalFile streams
