@@ -68,12 +68,35 @@ msg_xattr=no
 XATTR_LIBS=
 if test "x$enable_xattr" != "xno"; then
 
+dnl either glibc or libattr can provide xattr support
+
+dnl for both of them, we check for getxattr being in
+dnl the library and a valid xattr header.
+
+dnl try glibc
  AC_CHECK_LIB(c, getxattr,
-   [AC_CHECK_HEADERS(attr/xattr.h,
+   [AC_CHECK_HEADERS(sys/xattr.h,
      [AC_DEFINE(HAVE_XATTR, 1, [Define to 1 if xattr is available])
-      XATTR_LIBS="-lattr"
       msg_xattr=yes])
    ])
+
+  if test "x$msg_xattr" != "xyes"; then
+dnl   failure. try libattr
+   AC_CHECK_LIB(attr, getxattr,
+      [AC_CHECK_HEADERS(attr/xattr.h,
+       [AC_DEFINE(HAVE_XATTR, 1, [Define to 1 if xattr is available])
+        XATTR_LIBS="-lattr"
+        msg_xattr=yes])
+      ])
+
+dnl   bail if none of them was available
+    if test "x$msg_xattr" != "xyes"; then
+      echo "ERROR: Neither found glibc with extended attribute support and a <sys/xattr.h> header,"
+      echo "       nor a usable \"libattr\" extended attribute support library and a <attr/xattr.h> header."
+      echo "       Either install the required libraries/headers, or pass \"--disable-xattr\"."
+      exit 1;
+    fi
+  fi
 fi
 AC_SUBST(XATTR_LIBS)
 

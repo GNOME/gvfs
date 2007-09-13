@@ -9,8 +9,16 @@
 
 #include <sys/types.h>
 #ifdef HAVE_XATTR
-#include <sys/xattr.h>
-#endif
+
+#if defined HAVE_SYS_XATTR_H
+  #include <sys/xattr.h>
+#elif defined HAVE_ATTR_XATTR_H
+  #include <attr/xattr.h>
+#else
+  #error "Neither <sys/xattr.h> nor <attr/xattr.h> is present but extended attribute support is enabled."
+#endif /* defined HAVE_SYS_XATTR_H || HAVE_ATTR_XATTR_H */
+
+#endif /* HAVE_XATTR */
 
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
