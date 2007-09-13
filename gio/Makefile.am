@@ -49,8 +49,8 @@ libgio_la_SOURCES = 	\
 	gseekable.c \
 	gsocketinputstream.c \
 	gsocketinputstream.h \
-	goutputstreamsocket.c \
-	goutputstreamsocket.h \
+	gsocketoutputstream.c \
+	gsocketoutputstream.h \
 	ginputstream.c \
 	gioscheduler.c \
 	gmountoperation.c \
