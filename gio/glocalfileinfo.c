@@ -1005,6 +1005,69 @@ get_groupname_from_gid (gid_t gid)
   return res;
 }
 
+static char *
+get_content_type (const char *basename,
+		  const char *path,
+		  struct stat *statbuf,
+		  gboolean is_symlink,
+		  gboolean symlink_broken,
+		  GFileGetInfoFlags flags,
+		  gboolean fast)
+{
+  if (is_symlink &&
+      (symlink_broken || (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)))
+    return g_strdup  ("inode/symlink");
+  else if (S_ISDIR(statbuf->st_mode))
+    return g_strdup ("inode/directory");
+  else if (S_ISCHR(statbuf->st_mode))
+    return g_strdup ("inode/chardevice");
+  else if (S_ISBLK(statbuf->st_mode))
+    return g_strdup ("inode/blockdevice");
+  else if (S_ISFIFO(statbuf->st_mode))
+    return g_strdup ("inode/fifo");
+#ifdef S_ISSOCK
+  else if (S_ISSOCK(statbuf->st_mode))
+    return g_strdup ("inode/socket");
+#endif
+  else
+    {
+      char *content_type;
+      gboolean result_uncertain;
+      
+      content_type = g_content_type_guess (basename, NULL, 0, &result_uncertain);
+      
+#ifndef G_OS_WIN32
+      if (!fast && result_uncertain && path != NULL)
+	{
+	  guchar sniff_buffer[4096];
+	  gsize sniff_length;
+	  int fd;
+
+	  sniff_length = _g_unix_content_type_get_sniff_len ();
+	  if (sniff_length > 4096)
+	    sniff_length = 4096;
+	  
+	  fd = open (path, O_RDONLY);
+	  if (fd != -1)
+	    {
+	      ssize_t res;
+	      
+	      res = read (fd, sniff_buffer, sniff_length);
+	      close (fd);
+	      if (res != -1)
+		{
+		  g_free (content_type);
+		  content_type = g_content_type_guess (basename, sniff_buffer, sniff_length, NULL);
+		}
+	    }
+	}
+#endif
+      
+      return content_type;
+    }
+  
+}
+
 GFileInfo *
 _g_local_file_info_get (const char *basename,
 			const char *path,
@@ -1109,63 +1172,27 @@ _g_local_file_info_get (const char *basename,
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_STD_CONTENT_TYPE))
     {
-      /* TODO: Add windows specific code */
+      char *content_type = get_content_type (basename, path, &statbuf, is_symlink, symlink_broken, flags, FALSE);
 
-      if (is_symlink &&
-	  (symlink_broken || (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)))
-	g_file_info_set_content_type (info, "inode/symlink");
-      else if (S_ISDIR(statbuf.st_mode))
-	g_file_info_set_content_type (info, "inode/directory");
-      else if (S_ISCHR(statbuf.st_mode))
-	g_file_info_set_content_type (info, "inode/chardevice");
-      else if (S_ISBLK(statbuf.st_mode))
-	g_file_info_set_content_type (info, "inode/blockdevice");
-      else if (S_ISFIFO(statbuf.st_mode))
-	g_file_info_set_content_type (info, "inode/fifo");
-#ifdef S_ISSOCK
-      else if (S_ISSOCK(statbuf.st_mode))
-	g_file_info_set_content_type (info, "inode/socket");
-#endif
-      else
+      if (content_type)
 	{
-	  char *content_type;
-	  gboolean result_uncertain;
-	  
-	  content_type = g_content_type_guess (basename, NULL, 0, &result_uncertain);
-
-#ifndef G_OS_WIN32
-	  if (result_uncertain && path != NULL)
-	    {
-	      guchar sniff_buffer[4096];
-	      gsize sniff_length;
-	      int fd;
-	      
-	      sniff_length = _g_unix_content_type_get_sniff_len ();
-	      if (sniff_length > 4096)
-		sniff_length = 4096;
-
-	      fd = open (path, O_RDONLY);
-	      if (fd != -1)
-		{
-		  ssize_t res;
-
-		  res = read (fd, sniff_buffer, sniff_length);
-		  close (fd);
-		  if (res != -1)
-		    {
-		      g_free (content_type);
-		      content_type = g_content_type_guess (basename, sniff_buffer, sniff_length, NULL);
-		    }
-		}
-	    }
-#endif
-
 	  g_file_info_set_content_type (info, content_type);
 	  g_free (content_type);
 	}
-            
     }
-  
+
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_STD_FAST_CONTENT_TYPE))
+    {
+      char *content_type = get_content_type (basename, path, &statbuf, is_symlink, symlink_broken, flags, FALSE);
+      
+      if (content_type)
+	{
+	  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STD_FAST_CONTENT_TYPE, content_type);
+	  g_free (content_type);
+	}
+    }
+
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_STD_ICON))
     {

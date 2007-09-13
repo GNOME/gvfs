@@ -46,6 +46,7 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_STD_EDIT_NAME "std:edit_name"           /* string */
 #define G_FILE_ATTRIBUTE_STD_ICON "std:icon"                     /* object (GIcon) */
 #define G_FILE_ATTRIBUTE_STD_CONTENT_TYPE "std:content_type"     /* string */
+#define G_FILE_ATTRIBUTE_STD_FAST_CONTENT_TYPE "std:fast_content_type" /* string */
 #define G_FILE_ATTRIBUTE_STD_SIZE "std:size"                     /* uint64 */
 #define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target" /* byte string */
 #define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"         /* string */
