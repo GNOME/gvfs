@@ -1319,6 +1319,58 @@ g_mount_for_location_finish (GFile                  *location,
 
 #define GET_CONTENT_BLOCK_SIZE 8192
 
+gboolean
+g_file_load_contents (GFile                *file,
+		      GCancellable         *cancellable,
+		      gchar               **contents,
+		      gsize                *length,
+		      GError              **error)
+{
+  GFileInputStream *in;
+  GByteArray *content;
+  gsize pos;
+  gssize res;
+
+  in = g_file_read (file,
+		    cancellable,
+		    error);
+  if (in == NULL)
+    return FALSE;
+
+  content = g_byte_array_new ();
+  pos = 0;
+  
+  g_byte_array_set_size (content, pos + GET_CONTENT_BLOCK_SIZE + 1);
+  while ((res = g_input_stream_read (G_INPUT_STREAM (in),
+				     content->data + pos,
+				     GET_CONTENT_BLOCK_SIZE,
+				     cancellable, error)) > 0)
+    {
+      pos += res;
+      g_byte_array_set_size (content, pos + GET_CONTENT_BLOCK_SIZE + 1);
+    }
+
+  /* Ignore errors on close */
+  g_input_stream_close (G_INPUT_STREAM (in), cancellable, NULL);
+  
+  if (res < 0)
+    {
+      /* error is set already */
+      g_byte_array_free (content, TRUE);
+      return FALSE;
+    }
+
+  if (length)
+    *length = pos;
+
+  /* Zero terminate (we got an extra byte allocated for this */
+  content->data[pos] = 0;
+  
+  *contents = (gchar *)g_byte_array_free (content, FALSE);
+  
+  return TRUE;
+}
+
 typedef struct {
   GFile *file;
   GError *error;
