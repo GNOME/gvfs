@@ -7,9 +7,11 @@
 static char *attributes = NULL;
 static gboolean nofollow_symlinks = FALSE;
 static gboolean filesystem = FALSE;
+static gboolean writable = FALSE;
 
 static GOptionEntry entries[] = 
 {
+	{ "query-writable", 'w', 0, G_OPTION_ARG_NONE, &writable, "List writable attributes", NULL },
 	{ "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, "Get filesystem info", NULL },
 	{ "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, "The attributes to get", NULL },
 	{ "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, "Don't follow symlinks", NULL },
@@ -166,6 +168,80 @@ get_info (GFile *file)
   g_object_unref (info);
 }
 
+static char *
+attribute_type_to_string (GFileAttributeType type)
+{
+  switch (type)
+    {
+    case G_FILE_ATTRIBUTE_TYPE_INVALID:
+      return "invalid";
+    case G_FILE_ATTRIBUTE_TYPE_STRING:
+      return "string";
+    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+      return "bytestring";
+    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+      return "boolean";
+    case G_FILE_ATTRIBUTE_TYPE_UINT32:
+      return "uint32";
+    case G_FILE_ATTRIBUTE_TYPE_INT32:
+      return "int32";
+    case G_FILE_ATTRIBUTE_TYPE_UINT64:
+      return "uint64";
+    case G_FILE_ATTRIBUTE_TYPE_INT64:
+      return "int64";
+    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+      return "object";
+    default:
+      return "uknown type";
+    }
+}
+
+static void
+get_writable_info (GFile *file)
+{
+  GFileGetInfoFlags flags;
+  GFileAttributeInfoList *list;
+  GError *error;
+  int i;
+
+  if (file == NULL)
+    return;
+
+  error = NULL;
+
+  list = g_file_query_settable_attributes (file, NULL, &error);
+  if (list == NULL)
+    {
+      g_printerr ("Error getting writable attributes: %s\n", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  g_print ("Settable attributes:\n");
+  for (i = 0; i < list->n_infos; i++)
+    g_print (" %s (%s)\n", list->infos[i].name, attribute_type_to_string (list->infos[i].type));
+
+  g_file_attribute_info_list_free (list);
+  
+  list = g_file_query_writable_namespaces (file, NULL, &error);
+  if (list == NULL)
+    {
+      g_printerr ("Error getting writable namespaces: %s\n", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  if (list->n_infos > 0)
+    {
+      g_print ("Writable attribute namespaces:\n");
+      for (i = 0; i < list->n_infos; i++)
+	g_print (" %s (%s)\n", list->infos[i].name, attribute_type_to_string (list->infos[i].type));
+    }
+  
+  g_file_attribute_info_list_free (list);
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -188,7 +264,10 @@ main (int argc, char *argv[])
       
       for (i = 1; i < argc; i++) {
 	file = g_file_get_for_commandline_arg (argv[i]);
-	get_info (file);
+	if (writable)
+	  get_writable_info (file);
+	else
+	  get_info (file);
 	g_object_unref (file);
       }
     }
