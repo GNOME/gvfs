@@ -116,7 +116,7 @@ name_is_valid_for_display (const char *string,
       !g_utf8_validate (string, -1, NULL))
     return FALSE;
 
-  while ((c = *string) != 0)
+  while ((c = *string++) != 0)
     {
       if (g_ascii_iscntrl(c))
 	return FALSE;
