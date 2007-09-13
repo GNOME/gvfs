@@ -79,6 +79,7 @@ GFileInfo *            g_file_info_new                   (void);
 GFileType              g_file_info_get_file_type         (GFileInfo         *info);
 const char *           g_file_info_get_name              (GFileInfo         *info);
 const char *           g_file_info_get_display_name      (GFileInfo         *info);
+const char *           g_file_info_get_edit_name         (GFileInfo         *info);
 const char *           g_file_info_get_icon              (GFileInfo         *info);
 const char *           g_file_info_get_mime_type         (GFileInfo         *info);
 GQuark                 g_file_info_get_mime_type_quark   (GFileInfo         *info);
@@ -105,6 +106,8 @@ void                   g_file_info_set_name              (GFileInfo         *inf
 							  const char        *name);
 void                   g_file_info_set_display_name      (GFileInfo         *info,
 							  const char        *display_name);
+void                   g_file_info_set_edit_name         (GFileInfo         *info,
+							  const char        *edit_name);
 void                   g_file_info_set_icon              (GFileInfo         *info,
 							  const char        *icon);
 void                   g_file_info_set_mime_type         (GFileInfo         *info,

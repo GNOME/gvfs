@@ -460,12 +460,23 @@ g_file_info_simple_get (const char *basename,
   
   if (requested & G_FILE_INFO_DISPLAY_NAME)
     {
-      /* TODO */
+      char *display_name = g_filename_display_basename (path);
+      
+      if (strstr (display_name, "\357\277\275") != NULL)
+	{
+	  char *p = display_name;
+	  display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
+	  g_free (p);
+	}
+      g_file_info_set_display_name (info, display_name);
+      g_free (display_name);
     }
   
   if (requested & G_FILE_INFO_EDIT_NAME)
     {
-      /* TODO */
+      char *edit_name = g_filename_display_basename (path);
+      g_file_info_set_edit_name (info, edit_name);
+      g_free (edit_name);
     }
 
   if (requested & G_FILE_INFO_MIME_TYPE)

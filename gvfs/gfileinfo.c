@@ -110,9 +110,15 @@ g_file_info_get_display_name (GFileInfo *info)
 }
 
 const char *
+g_file_info_get_edit_name (GFileInfo *info)
+{
+  return info->priv->edit_name;
+}
+
+const char *
 g_file_info_get_icon (GFileInfo *info)
 {
-  return info->priv->display_name;
+  return info->priv->icon;
 }
 
 const char *
@@ -313,6 +319,14 @@ g_file_info_set_display_name (GFileInfo *info,
 {
   g_free (info->priv->display_name);
   info->priv->display_name = g_strdup (display_name);
+}
+
+void
+g_file_info_set_edit_name (GFileInfo *info,
+			   const char *edit_name)
+{
+  g_free (info->priv->edit_name);
+  info->priv->edit_name = g_strdup (edit_name);
 }
 
 void
