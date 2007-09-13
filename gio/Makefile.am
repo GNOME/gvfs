@@ -183,6 +183,10 @@ test_streams_LDADD = \
 	libgio.la \
 	$(GLIB_LIBS)
 
+if OS_WIN32
+else
+export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
+endif
 
 EXTRA_DIST = 				\
 	gvfs-marshal.list		\
