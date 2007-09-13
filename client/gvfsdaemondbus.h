@@ -25,6 +25,8 @@ void         _g_dbus_unregister_vfs_filter           (const char                
 GList *      _g_dbus_bus_list_names_with_prefix_sync (DBusConnection             *connection,
 						      const char                 *prefix,
 						      DBusError                  *error);
+DBusConnection *_g_dbus_connection_get_sync          (const char                 *dbus_id,
+						      GError                    **error);
 int          _g_dbus_connection_get_fd_sync          (DBusConnection             *conn,
 						      int                         fd_id);
 void         _g_dbus_connection_get_fd_async         (DBusConnection             *connection,

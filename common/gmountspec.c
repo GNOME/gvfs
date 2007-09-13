@@ -23,6 +23,7 @@ g_mount_spec_new (const char *type)
   GMountSpec *spec;
 
   spec = g_new0 (GMountSpec, 1);
+  spec->ref_count = 1;
   spec->items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
 
   if (type != NULL)
@@ -133,8 +134,9 @@ g_mount_spec_from_dbus (DBusMessageIter *iter)
 }
 
 void
-g_mount_spec_to_dbus (DBusMessageIter *iter,
-		      GMountSpec      *spec)
+g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
+				GMountSpec *spec,
+				const char *path)
 {
   DBusMessageIter spec_iter, array_iter, item_iter;
   int i;
@@ -145,7 +147,7 @@ g_mount_spec_to_dbus (DBusMessageIter *iter,
 					 &spec_iter))
     _g_dbus_oom ();
 
-  _g_dbus_message_iter_append_cstring (&spec_iter, spec->mount_prefix?spec->mount_prefix:"");
+  _g_dbus_message_iter_append_cstring (&spec_iter, path ? path : "");
 
   if (!dbus_message_iter_open_container (&spec_iter,
 					 DBUS_TYPE_ARRAY,
@@ -181,6 +183,13 @@ g_mount_spec_to_dbus (DBusMessageIter *iter,
   if (!dbus_message_iter_close_container (iter, &spec_iter))
     _g_dbus_oom ();
     
+}
+
+void
+g_mount_spec_to_dbus (DBusMessageIter *iter,
+		      GMountSpec      *spec)
+{
+  g_mount_spec_to_dbus_with_path (iter, spec, spec->mount_prefix);
 }
 
 static gboolean
@@ -226,11 +235,19 @@ path_has_prefix (const char *path,
 }
 
 gboolean
+g_mount_spec_match_with_path (GMountSpec      *mount,
+			      GMountSpec      *spec,
+			      const char      *path)
+{
+  if (items_equal (mount->items, spec->items) &&
+      path_has_prefix (path, mount->mount_prefix))
+    return TRUE;
+  return FALSE;
+}
+
+gboolean
 g_mount_spec_match (GMountSpec      *mount,
 		    GMountSpec      *path)
 {
-  if (items_equal (mount->items, path->items) &&
-      path_has_prefix (path->mount_prefix, mount->mount_prefix))
-    return TRUE;
-  return FALSE;
+  return g_mount_spec_match_with_path (mount, path, path->mount_prefix);
 }

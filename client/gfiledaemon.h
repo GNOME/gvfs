@@ -3,6 +3,7 @@
 
 #include <gio/gfile.h>
 #include "gvfsimpldaemon.h"
+#include "gmountspec.h"
 
 G_BEGIN_DECLS
 
@@ -23,7 +24,7 @@ struct _GFileDaemonClass
 
 GType g_file_daemon_get_type (void) G_GNUC_CONST;
   
-GFile * g_file_daemon_new (GQuark match_bus_name,
+GFile * g_file_daemon_new (GMountSpec *mount_spec,
 			   const char *path);
 
 G_END_DECLS

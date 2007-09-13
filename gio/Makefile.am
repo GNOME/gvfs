@@ -93,7 +93,7 @@ test_SOURCES = \
 	test.c
 
 test_LDADD = \
-	libgvfs.la \
+	libgio.la \
 	$(GLIB_LIBS)
 
 EXTRA_DIST = 				\

@@ -3,6 +3,7 @@
 
 #include <gio/gvfs.h>
 #include <dbus/dbus.h>
+#include "gmountspec.h"
 
 G_BEGIN_DECLS
 
@@ -17,9 +18,11 @@ typedef struct _GVfsImplDaemon       GVfsImplDaemon;
 typedef struct _GVfsImplDaemonClass  GVfsImplDaemonClass;
 
 typedef struct {
-  const char *bus_name;
-  const char *object_path;
-} GDaemonMountInfo;
+  volatile int ref_count;
+  char *dbus_id;
+  char *object_path;
+  GMountSpec *spec;
+} GMountInfo;
 
 struct _GVfsImplDaemonClass
 {
@@ -28,17 +31,14 @@ struct _GVfsImplDaemonClass
 
 GType   g_vfs_impl_daemon_get_type  (void) G_GNUC_CONST;
 
-GVfsImplDaemon *g_vfs_impl_daemon_new       (void);
-DBusMessage *_g_vfs_impl_daemon_new_path_call_valist (GQuark      match_bus_name,
-						      const char *path,
-						      const char *op,
-						      int         first_arg_type,
-						      va_list     var_args);
-DBusMessage *_g_vfs_impl_daemon_new_path_call        (GQuark      match_bus_name,
-						      const char *path,
-						      const char *op,
-						      int         first_arg_type,
-						      ...);
+GVfsImplDaemon *g_vfs_impl_daemon_new (void);
+
+GMountInfo *_g_vfs_impl_daemon_get_mount_info_sync (GMountSpec  *spec,
+						    const char  *path,
+						    GError     **error);
+const char *_g_mount_info_resolve_path             (GMountInfo  *info,
+						    const char  *path);
+void        _g_mount_info_unref                    (GMountInfo  *info);
 
 G_END_DECLS
 

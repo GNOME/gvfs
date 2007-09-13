@@ -12,6 +12,7 @@
 #include "mounttracker.h"
 #include "gdbusutils.h"
 #include "gmountspec.h"
+#include "gvfsdaemonprotocol.h"
 #include <gio/gvfserror.h>
 
 typedef struct {
@@ -202,6 +203,25 @@ lookup_mount (GMountTracker *tracker,
 	  if (reply)
 	    {
 	      dbus_message_iter_init_append (reply, &iter);
+	      
+	      if (!dbus_message_iter_append_basic (&iter,
+						   DBUS_TYPE_STRING,
+						   &mount->display_name))
+		_g_dbus_oom ();
+	      if (!dbus_message_iter_append_basic (&iter,
+						   DBUS_TYPE_STRING,
+						   &mount->icon))
+		_g_dbus_oom ();
+	      
+	      if (!dbus_message_iter_append_basic (&iter,
+						   DBUS_TYPE_STRING,
+						   &mount->dbus_id))
+		_g_dbus_oom ();
+      
+	      if (!dbus_message_iter_append_basic (&iter,
+						   DBUS_TYPE_OBJECT_PATH,
+						   &mount->object_path))
+		_g_dbus_oom ();
 	      g_mount_spec_to_dbus (&iter, spec);
 	    }
 	}
@@ -307,15 +327,15 @@ dbus_message_function (DBusConnection  *connection,
   
   res = DBUS_HANDLER_RESULT_HANDLED;
   if (dbus_message_is_method_call (message,
-				   "org.gtk.gvfs.MountTracker",
+				   G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 				   "registerMount"))
     register_mount (tracker, connection, message);
   else if (dbus_message_is_method_call (message,
-					"org.gtk.gvfs.MountTracker",
-					"lookupMount"))
+					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT))
     lookup_mount (tracker, connection, message);
   else if (dbus_message_is_method_call (message,
-					"org.gtk.gvfs.MountTracker",
+					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
 					"listMounts"))
     list_mounts (tracker, connection, message);
   else
@@ -336,7 +356,7 @@ g_mount_tracker_init (GMountTracker *tracker)
   
   conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
 
-  if (!dbus_connection_register_object_path (conn, "/org/gtk/vfs/mounttracker",
+  if (!dbus_connection_register_object_path (conn, G_VFS_DBUS_MOUNTTRACKER_PATH,
 					     &tracker_dbus_vtable, tracker))
     _g_dbus_oom ();
 

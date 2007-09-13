@@ -32,22 +32,15 @@ static GOnce once_init_dbus = G_ONCE_INIT;
 
 static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
 
-/* bus name -> dbus id */
-static GHashTable *bus_name_map = NULL;
-G_LOCK_DEFINE_STATIC(bus_name_map);
-
 /* dbus id -> async connection */
-static GHashTable *owner_map = NULL;
-G_LOCK_DEFINE_STATIC(owner_map);
+static GHashTable *async_map = NULL;
+G_LOCK_DEFINE_STATIC(async_map);
 
 /* dbus object path -> dbus message filter */
 static GHashTable *obj_path_map = NULL;
 G_LOCK_DEFINE_STATIC(obj_path_map);
 
-static DBusConnection *get_connection_sync      (const char         *bus_name,
-						 GError            **error);
 static void            setup_async_fd_receive   (VfsConnectionData  *connection_data);
-
 
 static gpointer
 vfs_dbus_init (gpointer arg)
@@ -306,64 +299,36 @@ _g_dbus_connection_get_fd_async (DBusConnection *connection,
 }
 
 /*******************************************************************
- *               Handling of owners and bus names                  *
+ *               Handling of async connections                     *
  *******************************************************************/
 
 
-static char *
-get_owner_for_bus_name (const char *bus_name)
-{
-  char *owner = NULL;
-  
-  G_LOCK (bus_name_map);
-  if (bus_name_map != NULL)
-    {
-      owner = g_hash_table_lookup (bus_name_map, bus_name);
-      owner = g_strdup (owner);
-    }
-  G_UNLOCK (bus_name_map);
-  
-  return owner;
-}
-
-static void
-set_owner_for_name (const char *bus_name, const char *owner)
-{
-  G_LOCK (bus_name_map);
-
-  if (bus_name_map == NULL)
-    bus_name_map = g_hash_table_new_full (g_str_hash, g_str_equal,
-					  g_free, g_free);
-  g_hash_table_insert (bus_name_map, g_strdup (bus_name), g_strdup (owner));
-  G_UNLOCK (bus_name_map);
-}
-
 static DBusConnection *
-get_connection_for_owner (const char *owner)
+get_connection_for_async (const char *dbus_id)
 {
   DBusConnection *connection;
 
   connection = NULL;
-  G_LOCK (owner_map);
-  if (owner_map != NULL)
-    connection = g_hash_table_lookup (owner_map, owner);
+  G_LOCK (async_map);
+  if (async_map != NULL)
+    connection = g_hash_table_lookup (async_map, dbus_id);
   if (connection)
     dbus_connection_ref (connection);
-  G_UNLOCK (owner_map);
+  G_UNLOCK (async_map);
   
   return connection;
 }
 
 static void
-set_connection_for_owner (DBusConnection *connection, const char *owner)
+set_connection_for_async (DBusConnection *connection, const char *dbus_id)
 {
-  G_LOCK (owner_map);
-  if (owner_map == NULL)
-    owner_map = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify)dbus_connection_unref);
+  G_LOCK (async_map);
+  if (async_map == NULL)
+    async_map = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify)dbus_connection_unref);
       
-  g_hash_table_insert (owner_map, g_strdup (owner), connection);
+  g_hash_table_insert (async_map, g_strdup (dbus_id), connection);
   dbus_connection_ref (connection);
-  G_UNLOCK (owner_map);
+  G_UNLOCK (async_map);
 }
 
 /**************************************************************************
@@ -371,8 +336,7 @@ set_connection_for_owner (DBusConnection *connection, const char *owner)
  *************************************************************************/
 
 typedef struct {
-  const char *bus_name;
-  char *owner;
+  const char *dbus_id;
 
   DBusMessage *message;
   DBusConnection *connection;
@@ -408,7 +372,6 @@ async_call_finish (AsyncDBusCall *async_call,
     }
   if (async_call->connection)
     dbus_connection_unref (async_call->connection);
-  g_free (async_call->owner);
   dbus_message_unref (async_call->message);
   if (async_call->cancellable)
     g_object_unref (async_call->cancellable);
@@ -636,7 +599,7 @@ async_get_connection_response (DBusPendingCall *pending,
    * If so, just drop this connection and use that.
    */
   
-  existing_connection = get_connection_for_owner (async_call->owner);
+  existing_connection = get_connection_for_async (async_call->dbus_id);
   if (existing_connection != NULL)
     {
       async_call->connection = existing_connection;
@@ -646,7 +609,7 @@ async_get_connection_response (DBusPendingCall *pending,
   else
     {  
       _g_dbus_connection_integrate_with_main (connection);
-      set_connection_for_owner (connection, async_call->owner);
+      set_connection_for_async (connection, async_call->dbus_id);
       async_call->connection = connection;
     }
 
@@ -674,7 +637,7 @@ open_connection_async (AsyncDBusCall *async_call)
   if (!get_private_bus_async (async_call))
     return;
   
-  get_connection_message = dbus_message_new_method_call (async_call->owner,
+  get_connection_message = dbus_message_new_method_call (async_call->dbus_id,
 							 G_VFS_DBUS_DAEMON_PATH,
 							 G_VFS_DBUS_DAEMON_INTERFACE,
 							 G_VFS_DBUS_OP_GET_CONNECTION);
@@ -705,102 +668,6 @@ open_connection_async (AsyncDBusCall *async_call)
     _g_dbus_oom ();
 }
 
-static void
-async_call_got_owner (AsyncDBusCall *async_call)
-{
-  async_call->connection = get_connection_for_owner (async_call->owner);
-  if (async_call->connection == NULL)
-    open_connection_async (async_call);
-  else
-    async_call_send (async_call);
-}
-
-static void
-async_get_name_owner_response (DBusPendingCall *pending,
-			       void            *data)
-{
-  AsyncDBusCall *async_call = data;
-  const char *owner;
-  DBusError derror;
-  DBusMessage *reply;
-
-  reply = dbus_pending_call_steal_reply (pending);
-  dbus_pending_call_unref (pending);
-
-  if (dbus_message_is_error (reply, "org.freedesktop.DBus.Error.NameHasNoOwner"))
-    {
-      /* TODO: Not mounted */
-    }
-  
-  dbus_error_init (&derror);
-  if (dbus_set_error_from_message (&derror, reply))
-    {
-      _g_error_from_dbus (&derror, &async_call->io_error);
-      dbus_error_free (&derror);
-      async_call_finish (async_call, NULL);
-      return;
-    }
-  
-  if (!dbus_message_get_args (reply, &derror,
-			      DBUS_TYPE_STRING, &owner,
-			      DBUS_TYPE_INVALID))
-    {
-      _g_error_from_dbus (&derror, &async_call->io_error);
-      dbus_error_free (&derror);
-      async_call_finish (async_call, NULL);
-      return;
-    }
-
-  async_call->owner = g_strdup (owner);
-  
-  async_call_got_owner (async_call);
-}
-
-
-static void
-do_find_owner_async (AsyncDBusCall *async_call)
-{
-  DBusMessage *message;
-  DBusPendingCall *pending;
-
-  if (!get_private_bus_async (async_call))
-    return;
-
-  message = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
-                                          DBUS_PATH_DBUS,
-                                          DBUS_INTERFACE_DBUS,
-                                          "GetNameOwner");
-  if (message == NULL)
-    _g_dbus_oom ();
-  
-  if (!dbus_message_append_args (message,
-				 DBUS_TYPE_STRING, &async_call->bus_name,
-				 DBUS_TYPE_INVALID))
-    _g_dbus_oom ();
-  
-  if (!dbus_connection_send_with_reply (async_call->private_bus,
-					message, &pending,
-					DBUS_TIMEOUT_DEFAULT))
-    _g_dbus_oom ();
-  
-  dbus_message_unref (message);
-  
-  if (pending == NULL)
-    {
-      g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Error while getting peer-to-peer dbus connection: %s",
-		   "Connection is closed");
-      g_idle_add (async_call_finish_at_idle, async_call);
-      return;
-    }
-  
-  if (!dbus_pending_call_set_notify (pending,
-				     async_get_name_owner_response,
-				     async_call,
-				     NULL))
-    _g_dbus_oom ();
-}
-
 void
 _g_vfs_daemon_call_async (DBusMessage *message,
 			  gpointer op_callback,
@@ -814,7 +681,7 @@ _g_vfs_daemon_call_async (DBusMessage *message,
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
 
   async_call = g_new0 (AsyncDBusCall, 1);
-  async_call->bus_name = dbus_message_get_destination (message);
+  async_call->dbus_id = dbus_message_get_destination (message);
   async_call->message = dbus_message_ref (message);
   if (cancellable)
     async_call->cancellable = g_object_ref (cancellable);
@@ -823,11 +690,11 @@ _g_vfs_daemon_call_async (DBusMessage *message,
   async_call->op_callback = op_callback;
   async_call->op_callback_data = op_callback_data;
 
-  async_call->owner = get_owner_for_bus_name (async_call->bus_name);
-  if (async_call->owner == NULL)
-    do_find_owner_async (async_call);
+  async_call->connection = get_connection_for_async (async_call->dbus_id);
+  if (async_call->connection == NULL)
+    open_connection_async (async_call);
   else
-    async_call_got_owner (async_call);
+    async_call_send (async_call);
 }
 
 /**************************************************************************
@@ -849,7 +716,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   gboolean sent_cancel;
   DBusMessage *cancel_message;
   dbus_uint32_t serial;
-  const char *bus_name = dbus_message_get_destination (message);
+  const char *dbus_id = dbus_message_get_destination (message);
 
   if (g_cancellable_is_cancelled (cancellable))
     {
@@ -860,7 +727,7 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
       return NULL;
     }
 	    
-  connection = get_connection_sync (bus_name, error);
+  connection = _g_dbus_connection_get_sync (dbus_id, error);
   if (connection == NULL)
     return NULL;
 
@@ -992,108 +859,34 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   return reply;
 }
 
-static char *
-get_name_owner_sync (const char *bus_name, GError **error)
-{
-  DBusMessage *message, *reply;
-  DBusConnection *connection;
-  char *owner;
-  DBusError derror;
-
-  dbus_error_init (&derror);
-  connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
-  if (connection == NULL)
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Couldn't get main dbus connection: %s\n",
-		   derror.message);
-      dbus_error_free (&derror);
-      return NULL;
-    }
-
-  owner = NULL;
-
-  message = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
-                                          DBUS_PATH_DBUS,
-                                          DBUS_INTERFACE_DBUS,
-                                          "GetNameOwner");
-  if (message == NULL)
-    _g_dbus_oom ();
-  
-  if (!dbus_message_append_args (message,
-				 DBUS_TYPE_STRING, &bus_name,
-				 DBUS_TYPE_INVALID))
-    _g_dbus_oom ();
-  
-  reply = dbus_connection_send_with_reply_and_block (connection, message, -1, &derror);
-  dbus_message_unref (message);
-
-  if (reply == NULL)
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Couldn't get dbus name owner: %s\n",
-		   derror.message);
-      goto out;
-    }
-
-  if (dbus_message_is_error (reply, "org.freedesktop.DBus.Error.NameHasNoOwner"))
-    {
-      /* TODO: Not mounted */
-    }
-
-  if (dbus_set_error_from_message (&derror, reply))
-    {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      goto out;
-    }
-  
-  if (!dbus_message_get_args (reply, &derror,
-                              DBUS_TYPE_STRING, &owner,
-                              DBUS_TYPE_INVALID))
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Couldn't get dbus name owner: %s\n",
-		   derror.message);
-      dbus_error_free (&derror);
-      goto out;
-    }
-  
-  owner = g_strdup (owner);
-
- out:
-  dbus_connection_unref (connection);
-  dbus_message_unref (reply);
-  return owner;
-}
-
 /*************************************************************************
  *               get per-thread synchronous dbus connections             *
  *************************************************************************/
 
 typedef struct {
   GHashTable *connections;
+  DBusConnection *session_bus;
 } ThreadLocalConnections;
+
+static void
+free_mount_connection (DBusConnection *conn)
+{
+  dbus_connection_close (conn);
+  dbus_connection_unref (conn);
+}
 
 static void
 free_local_connections (ThreadLocalConnections *local)
 {
   g_hash_table_destroy (local->connections);
+  if (local->session_bus)
+    free_mount_connection (local->session_bus);
   g_free (local);
 }
 
-static void
-free_mount_connection (gpointer data)
-{
-  DBusConnection *conn = data;
-  
-  dbus_connection_close (conn);
-  dbus_connection_unref (conn);
-}
-
-static DBusConnection *
-get_connection_sync (const char *bus_name,
-		     GError **error)
+DBusConnection *
+_g_dbus_connection_get_sync (const char *dbus_id,
+			     GError **error)
 {
   DBusConnection *bus;
   ThreadLocalConnections *local;
@@ -1102,7 +895,6 @@ get_connection_sync (const char *bus_name,
   DBusMessage *message, *reply;
   DBusError derror;
   char *address1, *address2;
-  char *owner;
   int extra_fd;
 
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
@@ -1112,48 +904,45 @@ get_connection_sync (const char *bus_name,
     {
       local = g_new0 (ThreadLocalConnections, 1);
       local->connections = g_hash_table_new_full (g_str_hash, g_str_equal,
-						  g_free, free_mount_connection);
+						  g_free, (GDestroyNotify)free_mount_connection);
       g_static_private_set (&local_connections, local, (GDestroyNotify)free_local_connections);
     }
 
-  owner = get_owner_for_bus_name (bus_name);
-  if (owner == NULL)
-    {
-      owner = get_name_owner_sync (bus_name, error);
-      if (owner == NULL)
-	return NULL;
-
-      set_owner_for_name (bus_name, owner);
-    }
+  if (dbus_id == NULL)
+    connection = local->session_bus;
+  else
+    connection = g_hash_table_lookup (local->connections, dbus_id);
   
-  connection = g_hash_table_lookup (local->connections, owner);
   if (connection != NULL)
-    {
-      g_free (owner);
-      return connection;
-    }
+    return connection;
 
   dbus_error_init (&derror);
-  bus = dbus_bus_get (DBUS_BUS_SESSION, &derror);
-  if (bus == NULL)
+  
+  if (local->session_bus == NULL)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Couldn't get main dbus connection: %s\n",
-		   derror.message);
-      dbus_error_free (&derror);
-      g_free (owner);
-      return NULL;
+      bus = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+      if (bus == NULL)
+	{
+	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       "Couldn't get main dbus connection: %s\n",
+		       derror.message);
+	  dbus_error_free (&derror);
+	  return NULL;
+	}
+      
+      local->session_bus = bus;
+
+      if (dbus_id == NULL)
+	return bus;
     }
   
-  message = dbus_message_new_method_call (owner,
+  message = dbus_message_new_method_call (dbus_id,
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_GET_CONNECTION);
-  
-  reply = dbus_connection_send_with_reply_and_block (bus, message, -1,
+  reply = dbus_connection_send_with_reply_and_block (local->session_bus, message, -1,
 						     &derror);
   dbus_message_unref (message);
-  dbus_connection_unref (bus);
 
   if (!reply)
     {
@@ -1161,7 +950,6 @@ get_connection_sync (const char *bus_name,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
       dbus_error_free (&derror);
-      g_free (owner);
       return NULL;
     }
 
@@ -1169,7 +957,6 @@ get_connection_sync (const char *bus_name,
     {
       _g_error_from_dbus (&derror, error);
       dbus_error_free (&derror);
-      g_free (owner);
       return NULL;
     }
   
@@ -1186,7 +973,6 @@ get_connection_sync (const char *bus_name,
 		   _("Error connecting to daemon: %s"), local_error->message);
       g_error_free (local_error);
       dbus_message_unref (reply);
-      g_free (owner);
       return NULL;
     }
 
@@ -1200,14 +986,13 @@ get_connection_sync (const char *bus_name,
       close (extra_fd);
       dbus_message_unref (reply);
       dbus_error_free (&derror);
-      g_free (owner);
       return NULL;
     }
   dbus_message_unref (reply);
 
   vfs_connection_setup (connection, extra_fd, FALSE);
 
-  g_hash_table_insert (local->connections, owner, connection);
+  g_hash_table_insert (local->connections, g_strdup (dbus_id), connection);
 
   return connection;
 }

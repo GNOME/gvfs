@@ -9,17 +9,11 @@
 #include <gvfsdaemonprotocol.h>
 #include "gvfsdaemondbus.h"
 #include "gdbusutils.h"
+#include "gmountspec.h"
 
 static void g_vfs_impl_daemon_class_init     (GVfsImplDaemonClass *class);
 static void g_vfs_impl_daemon_vfs_iface_init (GVfsIface       *iface);
 static void g_vfs_impl_daemon_finalize       (GObject         *object);
-
-typedef struct {
-  char *bus_name;
-  char *object_path;
-  GQuark match_name; /* bus name without path prefix */
-  char *path_prefix;
-} MountInfo;
 
 struct _GVfsImplDaemon
 {
@@ -28,11 +22,11 @@ struct _GVfsImplDaemon
   DBusConnection *bus;
   
   GVfs *wrapped_vfs;
-  GList *mounts;
+  GList *mount_cache;
 };
 
 static GVfsImplDaemon *the_vfs = NULL;
-G_LOCK_DEFINE_STATIC(mounts);
+G_LOCK_DEFINE_STATIC(mount_cache);
 
 G_DEFINE_TYPE_WITH_CODE (GVfsImplDaemon, g_vfs_impl_daemon, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS,
@@ -55,77 +49,68 @@ g_vfs_impl_daemon_finalize (GObject *object)
   G_OBJECT_CLASS (g_vfs_impl_daemon_parent_class)->finalize (object);
 }
 
-static DBusHandlerResult
-session_bus_message_filter (DBusConnection *conn,
-			    DBusMessage    *message,
-			    gpointer        data)
+static void
+get_mountspec_from_uri (GDecodedUri *uri,
+			GMountSpec **spec_out,
+			char **path_out)
 {
-  /*GVfsImplDaemon *vfs = data;*/
-  char *name, *from, *to;
-
+  GMountSpec *spec;
+  char *path, *tmp;
+  const char *share, *share_end;
   
-  if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameOwnerChanged") &&
-      dbus_message_get_args (message, NULL,
-			     DBUS_TYPE_STRING, &name,
-			     DBUS_TYPE_STRING, &from,
-			     DBUS_TYPE_STRING, &to,
-			     DBUS_TYPE_INVALID) &&
-      *name == ':' &&
-      *to == 0)
+  /* TODO: Share MountSpec objects between files (its refcounted) */
+
+  /* TODO: Make less hardcoded */
+  
+  spec = NULL;
+  
+  if (strcmp (uri->scheme, "test") == 0)
     {
-      G_LOCK (mounts);
-      G_UNLOCK (mounts);
-      /* a bus client died */
+      spec = g_mount_spec_new ("test");
+      path = g_strdup (uri->path);
+    }
+  else if (strcmp (uri->scheme, "smb") == 0)
+    {
+      if (uri->host != NULL && strlen (uri->host) > 0 &&
+	  uri->path != NULL && uri->path[0] == '/' && strlen (uri->path) > 1)
+	{
+	  spec = g_mount_spec_new ("smb-share");
+	  
+	  g_mount_spec_add_item  (spec, "server", uri->host);
+
+	  share = uri->path + 1;
+	  share_end = strchr (share, '/');
+
+	  if (share_end != NULL)
+	    tmp = g_strndup (share, share_end - share);
+	  else
+	    tmp = g_strdup (share);
+
+	  g_mount_spec_add_item  (spec, "share", tmp);
+	  g_free (tmp);
+
+	  if (share_end)
+	    path = g_strdup (share_end);
+	  else
+	    path = g_strdup ("/");
+	}
+    }
+
+  if (spec == NULL)
+    {
+      tmp = g_strdup_printf ("unknown-%s", uri->scheme);
+      spec = g_mount_spec_new (tmp);
+      g_free (tmp);
+      path = g_strdup (uri->path);
     }
   
-  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-}
-
-static MountInfo *
-mount_info_from_name (char *name)
-{
-  MountInfo *info;
-  char *last_dot;
-  char *name_as_path, *p;
-
-  g_assert (g_str_has_prefix (name, G_VFS_DBUS_MOUNTPOINT_NAME));
-  
-  info = g_new0 (MountInfo, 1);
-  info->bus_name = name;
-
-  last_dot = strrchr (name, '.');
-  if (last_dot != NULL &&
-      g_str_has_prefix (last_dot, ".f_"))
-    {
-      char *without_prefix = g_strndup (name, last_dot - name);
-      char *unescaped_bus_name;
-      info->match_name = g_quark_from_string (without_prefix);
-      g_free (without_prefix);
-      unescaped_bus_name = _g_dbus_unescape_bus_name (last_dot + 3, NULL);
-      info->path_prefix = g_strconcat ("/", unescaped_bus_name, NULL);
-      g_free (unescaped_bus_name);
-    }
-  else
-    info->match_name = g_quark_from_string (name);
-
-  name_as_path = g_strdup (name);
-  for (p = name_as_path; *p != 0; p++)
-    if (*p == '.')
-      *p = '/';
-  
-  info->object_path = g_strdup_printf (G_VFS_DBUS_MOUNTPOINT_PATH "%s",
-				       name_as_path + strlen (G_VFS_DBUS_MOUNTPOINT_NAME));
-  return info;
+  *spec_out = spec;
+  *path_out = path;
 }
 
 static void
 g_vfs_impl_daemon_init (GVfsImplDaemon *vfs)
 {
-  DBusError error;
-  GList *names, *l;
-  char *name;
-  MountInfo *info;
-
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
   
@@ -137,31 +122,7 @@ g_vfs_impl_daemon_init (GVfsImplDaemon *vfs)
   vfs->bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
 
   if (vfs->bus)
-    {
-      _g_dbus_connection_integrate_with_main (vfs->bus);
-
-      dbus_connection_add_filter (vfs->bus, session_bus_message_filter, vfs, NULL);
-      
-      dbus_error_init (&error);
-      dbus_bus_add_match (vfs->bus,
-			  "sender='org.freedesktop.DBus',"
-			  "interface='org.freedesktop.DBus',"
-			  "member='NameOwnerChanged'",
-			  &error);
-      if (dbus_error_is_set (&error))
-	{
-	  g_warning ("Failed to add dbus match: %s\n", error.message);
-	  dbus_error_free (&error);
-	}
-
-      names = _g_dbus_bus_list_names_with_prefix (vfs->bus, G_VFS_DBUS_MOUNTPOINT_NAME, NULL);
-      for (l = names; l != NULL; l = l->next)
-	{
-	  name = l->data;
-	  info = mount_info_from_name (name);
-	  vfs->mounts = g_list_prepend (vfs->mounts, info);
-	}
-    }
+    _g_dbus_connection_integrate_with_main (vfs->bus);
 }
 
 GVfsImplDaemon *
@@ -183,105 +144,6 @@ g_vfs_impl_daemon_get_file_for_path (GVfs       *vfs,
   return g_file_daemon_local_new (file);
 }
 
-static int
-get_n_path_elements (const char *str)
-{
-  int n;
-
-  n = 0;
-
-  while (*str != 0)
-    {
-      while (*str == '/')
-	str++;
-
-      if (*str != '/' && *str != 0)
-	{
-	  n++;
-	  while (*str != '/' && *str != 0)
-	    str++;
-	}
-    }
-
-  return n;
-}
-
-#define INCLUDE_HOST (1<<0)
-#define INCLUDE_PORT (1<<1)
-#define INCLUDE_USER (1<<2)
-#define USES_MOUNT_PREFIX (1<<3)
-#define HOSTNAME_IN_PATH (1<<4)
-
-struct UriMapping {
-  const char *uri_scheme;
-  int min_path_elements;
-  const char *backend;
-  guint flags;
-};
-
-/* TODO: This should really be a config file */
-static struct UriMapping uri_mapping[] = {
-  { "ftp", 0, "ftp", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER},
-  { "smb", 1, "smbshare", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER|USES_MOUNT_PREFIX},
-  { "smb", 0, "smbbrowse", HOSTNAME_IN_PATH},
-  { "computer", 0, "computer", 0},
-  { "network", 0, "network", 0},
-  { "test", 0, "test", 0},
-  { "http", 0, "http", HOSTNAME_IN_PATH},
-  { "https", 0, "https", HOSTNAME_IN_PATH},
-  { "dav", 0, "dav", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER|USES_MOUNT_PREFIX},
-  { "davs", 0, "davs", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER|USES_MOUNT_PREFIX},
-  { "nfs", 0, "nfs", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER|USES_MOUNT_PREFIX},
-  { "sftp", 0, "sftp", INCLUDE_HOST|INCLUDE_PORT|INCLUDE_USER},
-};
-
-static char *
-get_name_from_uri (GDecodedUri *uri, guint *flags_out)
-{
-  GString *name;
-  int path_elements;
-  const char *backend;
-  int flags, i;
-
-  name = g_string_new (G_VFS_DBUS_MOUNTPOINT_NAME);
-
-  path_elements = get_n_path_elements (uri->path);
-
-  backend = uri->scheme;
-  flags = 0;
-  for (i = 0; i < G_N_ELEMENTS (uri_mapping); i++)
-    {
-      if (strcmp (uri_mapping[i].uri_scheme, uri->scheme) == 0 &&
-	  path_elements >= uri_mapping[i].min_path_elements)
-	{
-	  backend = uri_mapping[i].backend;
-	  flags = uri_mapping[i].flags;
-	  break;
-	}
-    }
-  
-  _g_dbus_append_escaped_bus_name (name, TRUE, backend);
-
-  if (flags && INCLUDE_HOST && uri->host && *uri->host != 0)
-    {
-      g_string_append (name, ".h_");
-      _g_dbus_append_escaped_bus_name (name, FALSE, uri->host);
-    }
-    
-  if (flags && INCLUDE_PORT && uri->port != -1)
-    g_string_append_printf (name, ".p_%d", uri->port);
-    
-  if (flags && INCLUDE_USER && uri->userinfo && *uri->userinfo != 0)
-    {
-      g_string_append (name, ".u_");
-      _g_dbus_append_escaped_bus_name (name, FALSE, uri->userinfo);
-    }
-
-  if (flags_out)
-    *flags_out = flags;
-  return g_string_free (name, FALSE);
-}
-
 static GFile *
 g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
 				    const char *uri)
@@ -289,10 +151,8 @@ g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
   GVfsImplDaemon *daemon_vfs;
   GFile *file, *wrapped;
   GDecodedUri *decoded;
+  GMountSpec *spec;
   char *path;
-  GQuark name_q;
-  char *name;
-  guint flags;
 
   daemon_vfs = G_VFS_IMPL_DAEMON (vfs);
   
@@ -307,19 +167,10 @@ g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
     }
   else
     {
-      name = get_name_from_uri (decoded, &flags);
-      name_q = g_quark_from_string (name);
-      g_free (name);
-
-      if (flags & HOSTNAME_IN_PATH)
-	{
-	  /* TODO: What to do about user/port, and escaping hostname */
-	  path = g_build_filename ("/", decoded->host, decoded->path, NULL);
-	  file = g_file_daemon_new (name_q, path);
-	  g_free (path);
-	}
-      else
-	file = g_file_daemon_new (name_q, decoded->path);
+      get_mountspec_from_uri (decoded, &spec, &path);
+      file = g_file_daemon_new (spec, path);
+      g_mount_spec_unref (spec);
+      g_free (path);
     }
 
   _g_decoded_uri_free (decoded);
@@ -328,89 +179,194 @@ g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
 }
 
 
-
-DBusMessage *
-_g_vfs_impl_daemon_new_path_call_valist (GQuark match_bus_name,
-					 const char *path,
-					 const char *op,
-					 int    first_arg_type,
-					 va_list var_args)
+static GMountInfo *
+mount_info_ref (GMountInfo *info)
 {
+  g_atomic_int_inc (&info->ref_count);
+  return info;
+}
+
+
+void
+_g_mount_info_unref (GMountInfo *info)
+{
+  if (g_atomic_int_dec_and_test (&info->ref_count))
+    {
+      g_free (info->dbus_id);
+      g_free (info->object_path);
+      g_mount_spec_unref (info->spec);
+      g_free (info);
+    }
+}
+
+const char *
+_g_mount_info_resolve_path (GMountInfo *info,
+			    const char *path)
+{
+  const char *new_path;
+  
+  if (info->spec->mount_prefix != NULL &&
+      info->spec->mount_prefix[0] != 0)
+    new_path = path + strlen (info->spec->mount_prefix);
+  else
+    new_path = path;
+
+  if (new_path == NULL ||
+      new_path[0] == 0)
+    new_path = "/";
+
+  return new_path;
+}
+
+static GMountInfo *
+lookup_mount_info_in_cache_locked (GMountSpec *spec,
+				   const char *path)
+{
+  GMountInfo *info;
   GList *l;
-  DBusMessage *message = NULL;
-  char *new_path;
-  int path_prefix_len;
-  
-  G_LOCK (mounts);
 
-  path_prefix_len = 0;
-  
-  for (l = the_vfs->mounts; l != NULL; l = l->next)
+  info = NULL;
+  for (l = the_vfs->mount_cache; l != NULL; l = l->next)
     {
-      MountInfo *mount_info = l->data;
+      GMountInfo *mount_info = l->data;
 
-      if (mount_info->match_name == match_bus_name)
+      if (g_mount_spec_match_with_path (mount_info->spec, spec, path))
 	{
-	  if (mount_info->path_prefix == NULL ||
-	      g_str_has_prefix (path, mount_info->path_prefix))
-	    {
-	      if (mount_info->path_prefix)
-		path_prefix_len = strlen (mount_info->path_prefix);
-
-	      message =
-		dbus_message_new_method_call (mount_info->bus_name,
-					      mount_info->object_path,
-					      G_VFS_DBUS_MOUNTPOINT_INTERFACE,
-					      op);
-	      break;
-	    }
+	  info = mount_info_ref (mount_info);
+	  break;
 	}
     }
   
-  G_UNLOCK (mounts);
-
-  if (message)
-    {
-      new_path = g_strdup (path + path_prefix_len);
-      /* Make sure we handle e.g. "/prefix" -> "" */
-      if (*new_path != '/')
-	{
-	  char *tmp = g_strconcat ("/", new_path, NULL);
-	  g_free (new_path);
-	  new_path = tmp;
-	}
-
-      _g_dbus_message_append_args (message,
-				   G_DBUS_TYPE_CSTRING, &new_path,
-				   0);
-      g_free (new_path);
-      
-      _g_dbus_message_append_args_valist (message,
-					  first_arg_type,
-					  var_args);
-    }
-  return message;
+  return info;
 }
 
-DBusMessage *
-_g_vfs_impl_daemon_new_path_call (GQuark match_bus_name,
-				  const char *path,
-				  const char *op,
-				  int    first_arg_type,
-				  ...)
+static GMountInfo *
+lookup_mount_info_in_cache (GMountSpec *spec,
+			    const char *path)
 {
-  va_list var_args;
-  DBusMessage *message;
+  GMountInfo *info;
 
-  va_start (var_args, first_arg_type);
-  message = _g_vfs_impl_daemon_new_path_call_valist (match_bus_name,
-						     path, op, 
-						     first_arg_type,
-						     var_args);
-  va_end (var_args);
-  return message;
+  G_LOCK (mount_cache);
+  info = lookup_mount_info_in_cache_locked (spec, path);
+  G_UNLOCK (mount_cache);
+
+  return info;
 }
 
+GMountInfo *
+_g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
+					const char *path,
+					GError **error)
+{
+  GMountInfo *info;
+  DBusConnection *conn;
+  DBusMessage *message, *reply;
+  DBusMessageIter iter;
+  DBusError derror;
+  const char *display_name, *icon, *obj_path, *dbus_id;
+  GMountSpec *mount_spec;
+  GList *l;
+	
+  info = lookup_mount_info_in_cache (spec, path);
+
+  if (info != NULL)
+    return info;
+  
+  conn = _g_dbus_connection_get_sync (NULL, error);
+  if (conn == NULL)
+    return NULL;
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+				  G_VFS_DBUS_MOUNTTRACKER_PATH,
+				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT);
+  dbus_message_set_auto_start (message, TRUE);
+  
+  dbus_message_iter_init_append (message, &iter);
+  g_mount_spec_to_dbus_with_path (&iter, spec, path);
+
+  dbus_error_init (&derror);
+  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
+  dbus_message_unref (message);
+
+  if (!reply)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting mount info: %s",
+		   derror.message);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  if (dbus_set_error_from_message (&derror, reply))
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+  
+  dbus_message_iter_init (reply, &iter);
+  if (!_g_dbus_message_iter_get_args (&iter,
+				      &derror,
+				      DBUS_TYPE_STRING, &display_name,
+				      DBUS_TYPE_STRING, &icon,
+				      DBUS_TYPE_STRING, &dbus_id,
+				      DBUS_TYPE_OBJECT_PATH, &obj_path,
+				      0))
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      dbus_message_unref (reply);
+      return NULL;
+    }
+  
+  mount_spec = g_mount_spec_from_dbus (&iter);
+  if (mount_spec == NULL)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting mount info: %s",
+		   "Invalid reply");
+      dbus_message_unref (reply);
+      return NULL;
+    }
+
+  G_LOCK (mount_cache);
+  
+  info = NULL;
+  /* Already in cache from other thread? */
+  for (l = the_vfs->mount_cache; l != NULL; l = l->next)
+    {
+      GMountInfo *mount_info = l->data;
+      
+      if (strcmp (mount_info->dbus_id, dbus_id) == 0 &&
+	  strcmp (mount_info->object_path, obj_path) == 0)
+	{
+	  info = mount_info;
+	  break;
+	}
+    }
+
+  /* No, lets add it to the cache */
+  if (info == NULL)
+    {
+      info = g_new0 (GMountInfo, 1);
+      info->ref_count = 1;
+      info->dbus_id = g_strdup (dbus_id);
+      info->object_path = g_strdup (obj_path);
+      info->spec = g_mount_spec_ref (mount_spec);
+
+      the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, info);
+    }
+
+  mount_info_ref (info);
+
+  G_UNLOCK (mount_cache);
+
+  g_mount_spec_unref (mount_spec);
+  
+  return info;
+}
 
 static GFile *
 g_vfs_impl_daemon_parse_name (GVfs       *vfs,

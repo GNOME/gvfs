@@ -12,6 +12,7 @@
 #include <gfileinputstreamdaemon.h>
 #include <gfileenumeratordaemon.h>
 #include <glib/gi18n-lib.h>
+#include "gdbusutils.h"
 
 static void g_file_daemon_file_iface_init (GFileIface       *iface);
 
@@ -19,7 +20,7 @@ struct _GFileDaemon
 {
   GObject parent_instance;
 
-  GQuark match_bus_name;
+  GMountSpec *mount_spec;
   char *path;
 };
 
@@ -34,6 +35,7 @@ g_file_daemon_finalize (GObject *object)
 
   daemon_file = G_FILE_DAEMON (object);
 
+  g_mount_spec_unref (daemon_file->mount_spec);
   g_free (daemon_file->path);
   
   if (G_OBJECT_CLASS (g_file_daemon_parent_class)->finalize)
@@ -54,7 +56,7 @@ g_file_daemon_init (GFileDaemon *daemon_file)
 }
 
 GFile *
-g_file_daemon_new (GQuark match_bus_name,
+g_file_daemon_new (GMountSpec *mount_spec,
 		   const char *path)
 {
   GFileDaemon *daemon_file;
@@ -62,7 +64,7 @@ g_file_daemon_new (GQuark match_bus_name,
 
   daemon_file = g_object_new (G_TYPE_FILE_DAEMON, NULL);
   /* TODO: These should be construct only properties */
-  daemon_file->match_bus_name = match_bus_name;
+  daemon_file->mount_spec = g_mount_spec_ref (mount_spec);
   daemon_file->path = g_strdup (path);
 
   /* Remove any trailing slashes */
@@ -127,7 +129,7 @@ g_file_daemon_get_parent (GFile *file)
   parent_path[len] = 0;
 
   parent = g_object_new (G_TYPE_FILE_DAEMON, NULL);
-  parent->match_bus_name = daemon_file->match_bus_name;
+  parent->mount_spec = g_mount_spec_ref (daemon_file->mount_spec);
   parent->path = parent_path;
   
   return G_FILE (parent);
@@ -138,7 +140,7 @@ g_file_daemon_copy (GFile *file)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
 
-  return g_file_daemon_new (daemon_file->match_bus_name,
+  return g_file_daemon_new (daemon_file->mount_spec,
 			    daemon_file->path);
 }
 
@@ -152,7 +154,7 @@ g_file_daemon_get_child (GFile *file,
   GFile *child;
 
   path = g_build_filename (daemon_file->path, name, NULL);
-  child = g_file_daemon_new (daemon_file->match_bus_name, path);
+  child = g_file_daemon_new (daemon_file->mount_spec, path);
   g_free (path);
   
   return child;
@@ -168,24 +170,33 @@ do_sync_path_call (GFile *file,
 		   ...)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
-  va_list var_args;
   DBusMessage *message, *reply;
+  GMountInfo *mount_info;
+  const char *path;
+  va_list var_args;
+
+  mount_info = _g_vfs_impl_daemon_get_mount_info_sync (daemon_file->mount_spec,
+						       daemon_file->path,
+						       error);
+  if (mount_info == NULL)
+    return NULL;
+  
+  message =
+    dbus_message_new_method_call (mount_info->dbus_id,
+				  mount_info->object_path,
+				  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+				  op);
+
+  path = _g_mount_info_resolve_path (mount_info,
+				     daemon_file->path);
+  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
   va_start (var_args, first_arg_type);
-  message =
-    _g_vfs_impl_daemon_new_path_call_valist (daemon_file->match_bus_name,
-					     daemon_file->path,
-					     op,
-					     first_arg_type, var_args);
+  _g_dbus_message_append_args_valist (message,
+				      first_arg_type,
+				      var_args);
   va_end (var_args);
 
-  if (message == NULL)
-    {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
-		   _("The share was not mounted"));
-      return NULL;
-    }
-  
   reply = _g_vfs_daemon_call_sync (message,
 				   connection_out,
 				   cancellable, error);
@@ -193,6 +204,62 @@ do_sync_path_call (GFile *file,
   
   return reply;
 }
+
+static void
+do_async_path_call (GFile *file,
+		    const char *op,
+		    GCancellable *cancellable,
+		    gpointer op_callback,
+		    gpointer op_callback_data,
+		    GVfsAsyncDBusCallback callback,
+		    gpointer callback_data,
+		    int first_arg_type,
+		    ...)
+{
+  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  DBusMessage *message;
+  GMountInfo *mount_info;
+  const char *path;
+  va_list var_args;
+  GError *error;
+
+  error = NULL;
+
+  /* TODO: Should be async */
+  mount_info = _g_vfs_impl_daemon_get_mount_info_sync (daemon_file->mount_spec,
+						       daemon_file->path,
+						       &error);
+  if (mount_info == NULL)
+    {
+      g_assert ("TODO" == NULL);
+      g_error_free (error);
+      return; /* TODO: Should cause error via dile*/
+    }
+  
+  message =
+    dbus_message_new_method_call (mount_info->dbus_id,
+				  mount_info->object_path,
+				  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+				  op);
+
+  path = _g_mount_info_resolve_path (mount_info,
+				     daemon_file->path);
+  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
+
+  va_start (var_args, first_arg_type);
+  _g_dbus_message_append_args_valist (message,
+				      first_arg_type,
+				      var_args);
+  va_end (var_args);
+
+  _g_vfs_daemon_call_async (message,
+			    op_callback, op_callback_data,
+			    callback, callback_data,
+			    cancellable);
+  
+  dbus_message_unref (message);
+}
+
 
 static GFileEnumerator *
 g_file_daemon_enumerate_children (GFile      *file,
@@ -388,20 +455,12 @@ g_file_daemon_read_async (GFile *file,
 			  gpointer callback_data,
 			  GCancellable *cancellable)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
-  DBusMessage *message;
-  
-  message =
-    _g_vfs_impl_daemon_new_path_call (daemon_file->match_bus_name,
-				      daemon_file->path,
-				      G_VFS_DBUS_OP_OPEN_FOR_READ,
-				      0);
-  /* TODO: handle nonmounted => message == NULL */
-  _g_vfs_daemon_call_async (message,
-			    callback, callback_data,
-			    read_async_cb, file,
-			    cancellable);
-  dbus_message_unref (message);
+  do_async_path_call (file,
+		      G_VFS_DBUS_OP_OPEN_FOR_READ,
+		      cancellable,
+		      callback, callback_data,
+		      read_async_cb, file,
+		      0);
 }
 
 static GFileInputStream *
