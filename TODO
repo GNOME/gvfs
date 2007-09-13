@@ -15,8 +15,6 @@ getting selinux attrs is a bit slow, it does all sort of weird ops.
 
 Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion, etc)
 
-Expose the seek operations on GInputStream also, not only via iface
-
 implement readahead in GVFSReadStream, time difference
 
 implement get_file_info for GFileInputStreamDaemon
@@ -27,16 +25,7 @@ pass cancellable to async callbacks?
 
 remove owners from bus_name_map when they fail
 
-Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
-
-Change all error handling to be more consistent and sane.
- - better enums. Not use G_FILE?
- - how to handle "error chaining"
- - sane consistent not-mounted errors
-
 Consider something like GnomeVFSVolumeMonitor and Volume/Drive
-
-merge JobSeekRead/Write and JobCloseReadWrite ?
 
 smb support for xattrs!
 smb support for hidden
@@ -46,6 +35,8 @@ is-slow marking for e.g. thumbnailing?
 
 Add info to mountpoints in smb-browser
 
+Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
+
 modularize uri handling
 decide how to handle not-mounted errors
 handle mounting
@@ -53,10 +44,7 @@ mount daemons should re-register when new owner for vfs daemon
 
 remove dbus-gmain.[ch]? We have no server integration in common/ atm
 
-gvfserror => gioerror?
-
 handle setting xattrs
-
 handle non-ascii/utf8 xattr names by escaping
   
 FUTURE IDEAS:
