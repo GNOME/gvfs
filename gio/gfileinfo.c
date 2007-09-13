@@ -165,7 +165,8 @@ free_attribute_value (GFileAttributeValue *value)
           value->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
 	g_free (value->value.string);
       
-      if (value->type == G_FILE_ATTRIBUTE_TYPE_OBJECT)
+      if (value->type == G_FILE_ATTRIBUTE_TYPE_OBJECT &&
+	  value->value.obj != NULL)
 	  g_object_unref (value->value.obj);
 }
 
@@ -635,7 +636,10 @@ set_object (GFileAttributeValue *value, GObject *obj)
 {
   free_attribute_value (value);
   value->type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
-  value->value.obj = g_object_ref (obj);
+  if (obj)
+    value->value.obj = g_object_ref (obj);
+  else
+    value->value.obj = NULL;
 }
 
 static void

@@ -12,6 +12,8 @@
 #include <glib/gi18n-lib.h>
 
 #include <gio/gioerror.h>
+#include <gio/gthemedicon.h>
+#include <gio/gfileicon.h>
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include "gdbusutils.h"
@@ -905,7 +907,7 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 		       GError **error)
 {
   GFileInfo *info;
-  DBusMessageIter struct_iter, array_iter, inner_struct_iter, variant_iter, cstring_iter;
+  DBusMessageIter struct_iter, array_iter, inner_struct_iter, variant_iter, cstring_iter, obj_iter;
   const char *attribute;
 
   info = g_file_info_new ();
@@ -923,11 +925,14 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
   while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
     {
       char *str;
+      char **strs;
       int n_elements;
       guint32 v_uint32;
       gint32 v_int32;
       guint64 v_uint64;
       gint64 v_int64;
+      guint32 obj_type;
+      GObject *obj;
       
       dbus_message_iter_recurse (&array_iter, &inner_struct_iter);
       
@@ -974,6 +979,52 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 	  case DBUS_TYPE_INT64:
 	    dbus_message_iter_get_basic (&variant_iter, &v_int64);
 	    g_file_info_set_attribute_int64 (info, attribute, v_int64);
+	    break;
+	  case DBUS_TYPE_STRUCT:
+	    dbus_message_iter_recurse (&variant_iter, &obj_iter);
+	    if (dbus_message_iter_get_arg_type (&obj_iter) != DBUS_TYPE_UINT32)
+	      goto error;
+
+	    dbus_message_iter_get_basic (&obj_iter, &obj_type);
+	    obj = NULL;
+	    /* 0 == NULL */
+	    if (obj_type == 1)
+	      {
+		/* G_THEMED_ICON */
+		if (_g_dbus_message_iter_get_args (&obj_iter,
+						   NULL,
+						   DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
+						   &strs, &n_elements, 0))
+		  {
+		    obj = G_OBJECT (g_themed_icon_new_from_names (strs, -1));
+		    dbus_free_string_array (strs);
+		  }
+	      }
+	    else if (obj_type == 2)
+	      {
+		/* G_FILE_ICON, w/ local file */
+		if (_g_dbus_message_iter_get_args (&obj_iter,
+						   NULL,
+						   G_DBUS_TYPE_CSTRING, &str,
+						   0))
+		  {
+		    GFile *file = g_file_get_for_path (str);
+		    obj = G_OBJECT (g_file_icon_new (file));
+		    g_free (str);
+		  }
+	      }
+	    else
+	      {
+		/* NULL (or unsupported) */
+		if (obj_type != 0)
+		  g_warning ("Unsupported object type in file attribute");
+	      }
+
+	    g_file_info_set_attribute_object (info, attribute, obj);
+
+	    if (obj)
+	      g_object_unref (obj);
+	    
 	    break;
 	  default:
 	    goto error;
