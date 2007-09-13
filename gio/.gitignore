@@ -9,3 +9,5 @@ Makefile
 Makefile.in
 gvfs-marshal.c
 gvfs-marshal.h
+test-gio
+test-streams
