@@ -32,8 +32,8 @@ local_sources = \
 	glocalfileinputstream.h \
 	glocalfileoutputstream.c \
 	glocalfileoutputstream.h \
-	gvfslocal.c \
-	gvfslocal.h \
+	glocalvfs.c \
+	glocalvfs.h \
 	$(NULL)
 
 libgio_la_SOURCES = 	\

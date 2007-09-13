@@ -1,7 +1,7 @@
 #include <config.h>
 #include <gmodule.h>
 #include "gvfs.h"
-#include "gvfslocal.h"
+#include "glocalvfs.h"
 #include <glib/gi18n-lib.h>
 
 static void g_vfs_base_init (gpointer g_class);
@@ -83,7 +83,7 @@ get_default_vfs (gpointer arg)
   GVfs *(*create_vfs) (void);
   
   if (g_getenv ("VFS_USE_LOCAL") != NULL)
-    return g_vfs_local_new ();
+    return g_local_vfs_new ();
 
   if (g_module_supported ())
     {
@@ -101,7 +101,7 @@ get_default_vfs (gpointer arg)
 	    return vfs;
 	}
     }
-  return g_vfs_local_new ();
+  return g_local_vfs_new ();
 }
 
 GVfs *
