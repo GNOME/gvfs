@@ -14,7 +14,7 @@ Work on GFile:
    copy
    move
 
-HAL implementation of VolumeMonitor
+HAL implementation of VolumeMonitor (as a giomodule)
 
 Move GAppInfo to Gtk+
 
@@ -24,7 +24,7 @@ Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg l
 Implement std:icon for local files. This is related to mimetype decisions (fast vs slow)
 Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
-Don't hardcode the libgvfsdbus.so name, instead have some generic pluggable system
+Use giomodules for fam volume monitor backend
 
 Add more filter streams: data reading, conversion (with general converter interface)
  => gicmo is working on this
