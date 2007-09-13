@@ -76,6 +76,7 @@ libgio_la_SOURCES = 	\
 	ginputstream.c \
 	gioerror.c \
 	gioscheduler.c \
+	gmemoryinputstream.c \
 	gmountoperation.c \
 	gmountoperation.h \
 	goutputstream.c \
@@ -117,13 +118,15 @@ gvfsinclude_HEADERS = \
 	gioerror.h \
 	gioscheduler.h \
 	giotypes.h \
+	gmemoryinputstream.h \
 	goutputstream.h \
 	gseekable.h \
 	gvfs.h \
 	$(NULL)
 
 noinst_PROGRAMS= \
-	test-gio
+	test-gio \
+	test-streams
 
 test_gio_SOURCES = \
 	test-gio.c
@@ -131,6 +134,14 @@ test_gio_SOURCES = \
 test_gio_LDADD = \
 	libgio.la \
 	$(GLIB_LIBS)
+
+test_streams_SOURCES = \
+	test-streams.c
+
+test_streams_LDADD = \
+	libgio.la \
+	$(GLIB_LIBS)
+
 
 EXTRA_DIST = 				\
 	gvfs-marshal.list		\
