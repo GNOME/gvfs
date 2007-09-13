@@ -892,7 +892,7 @@ daemon_message_func (DBusConnection *conn,
   if (strcmp (path, G_VFS_DBUS_MOUNTABLE_PATH) == 0 &&
       dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNTABLE_INTERFACE,
-				   "mount"))
+				   G_VFS_DBUS_MOUNTABLE_OP_MOUNT))
     {
       daemon_start_mount (daemon, conn, message);
       return DBUS_HANDLER_RESULT_HANDLED;
