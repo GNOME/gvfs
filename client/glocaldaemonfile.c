@@ -61,6 +61,12 @@ g_local_daemon_file_is_native (GFile *file)
 }
 
 static char *
+g_local_daemon_file_get_basename (GFile *file)
+{
+  return g_file_get_basename (G_LOCAL_DAEMON_FILE (file)->wrapped);
+}
+
+static char *
 g_local_daemon_file_get_path (GFile *file)
 {
   return g_file_get_path (G_LOCAL_DAEMON_FILE (file)->wrapped);
@@ -206,6 +212,7 @@ g_local_daemon_file_file_iface_init (GFileIface *iface)
   iface->hash = g_local_daemon_file_hash;
   iface->equal = g_local_daemon_file_equal;
   iface->is_native = g_local_daemon_file_is_native;
+  iface->get_basename = g_local_daemon_file_get_basename;
   iface->get_path = g_local_daemon_file_get_path;
   iface->get_uri = g_local_daemon_file_get_uri;
   iface->get_parse_name = g_local_daemon_file_get_parse_name;

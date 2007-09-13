@@ -138,6 +138,23 @@ g_daemon_file_is_native (GFile *file)
 }
 
 static char *
+g_daemon_file_get_basename (GFile *file)
+{
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+  char *last_slash;    
+
+  /* This code relies on the path being canonicalized */
+  
+  last_slash = strrchr (daemon_file->path, '/');
+  /* If no slash, or only "/" fallback to full path */
+  if (last_slash == NULL ||
+      last_slash[1] == '\0')
+    return g_strdup (daemon_file->path);
+
+  return g_strdup (last_slash + 1);
+}
+
+static char *
 g_daemon_file_get_path (GFile *file)
 {
   return NULL;
@@ -877,6 +894,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->hash = g_daemon_file_hash;
   iface->equal = g_daemon_file_equal;
   iface->is_native = g_daemon_file_is_native;
+  iface->get_basename = g_daemon_file_get_basename;
   iface->get_path = g_daemon_file_get_path;
   iface->get_uri = g_daemon_file_get_uri;
   iface->get_parse_name = g_daemon_file_get_parse_name;

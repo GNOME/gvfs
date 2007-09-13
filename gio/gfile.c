@@ -74,6 +74,17 @@ g_file_is_native (GFile *file)
 }
 
 char *
+g_file_get_basename (GFile *file)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->get_basename) (file);
+}
+
+
+char *
 g_file_get_path (GFile *file)
 {
   GFileIface *iface;
@@ -274,6 +285,134 @@ g_file_read_async (GFile                  *file,
 			 callback_data,
 			 cancellable);
 }
+
+static gboolean
+file_copy_fallback (GFile                  *source,
+		    GFile                  *destination,
+		    GFileCopyFlags          flags,
+		    GCancellable           *cancellable,
+		    GFileProgressCallback   progress_callback,
+		    gpointer                progress_callback_data,
+		    GError                **error)
+{
+  GInputStream *in;
+  GOutputStream *out;
+  char buffer[8192], *p;
+  gssize n_read, n_written;
+  goffset total_size, current_size;
+  GFileInfo *info;
+
+  in = (GInputStream *)g_file_read (source, cancellable, error);
+  if (in == NULL)
+    return FALSE;
+
+  total_size = 0;
+  current_size = 0;
+
+  info = g_file_input_stream_get_file_info (G_FILE_INPUT_STREAM (in),
+					    G_FILE_ATTRIBUTE_STD_SIZE,
+					    cancellable, NULL);
+  if (info)
+    {
+      total_size = g_file_info_get_size (info);
+      g_object_unref (info);
+    }
+
+  
+  if (flags & G_FILE_COPY_OVERWRITE)
+    out = (GOutputStream *)g_file_replace (destination, 0, flags & G_FILE_COPY_BACKUP, cancellable, error);
+  else
+    out = (GOutputStream *)g_file_create (destination, cancellable, error);
+
+  if (out == NULL)
+    {
+      g_object_unref (in);
+      return FALSE;
+    }
+
+  do
+    {
+      n_read = g_input_stream_read (in, buffer, sizeof (buffer), cancellable, error);
+      if (n_read == -1)
+	goto error;
+      if (n_read == 0)
+	break;
+
+      current_size += n_read;
+
+      p = buffer;
+      while (n_read > 0)
+	{
+	  n_written = g_output_stream_write (out, p, n_read, cancellable, error);
+	  if (n_written == -1)
+	    goto error;
+
+	  p += n_written;
+	  n_read -= n_read;
+	}
+
+
+      if (progress_callback)
+	progress_callback (current_size, total_size, progress_callback_data);
+    }
+  while (TRUE);
+
+  /* Don't care about errors in source here */
+  g_input_stream_close (in, cancellable, NULL);
+
+  /* But write errors on close are bad! */
+  if (!g_output_stream_close (out, cancellable, error))
+    goto error;
+
+  g_object_unref (in);
+  g_object_unref (out);
+  
+  return TRUE;
+
+ error:
+  g_object_unref (in);
+  g_object_unref (out);
+  return FALSE;
+}
+
+gboolean
+g_file_copy (GFile                  *source,
+	     GFile                  *destination,
+	     GFileCopyFlags          flags,
+	     GCancellable           *cancellable,
+	     GFileProgressCallback   progress_callback,
+	     gpointer                progress_callback_data,
+	     GError                **error)
+{
+  GFileIface *iface;
+  GError *my_error;
+  gboolean res;
+
+  if (G_OBJECT_TYPE (source) == G_OBJECT_TYPE (destination))
+    {
+      iface = G_FILE_GET_IFACE (source);
+
+      if (iface->copy)
+	{
+	  my_error = NULL;
+	  res = (* iface->copy) (source, destination, flags, cancellable, progress_callback, progress_callback_data, &my_error);
+	  
+	  if (res)
+	    return TRUE;
+	  
+	  if (my_error->domain != G_VFS_ERROR || my_error->code != G_VFS_ERROR_NOT_SUPPORTED)
+	    {
+	      g_propagate_error (error, my_error);
+	      return FALSE;
+	    }
+	}
+    }
+
+  return file_copy_fallback (source, destination, flags, cancellable,
+			     progress_callback, progress_callback_data,
+			     error);
+}
+
 
 void
 g_file_mount (GFile *file,

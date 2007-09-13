@@ -19,6 +19,11 @@ typedef enum {
   G_FILE_GET_INFO_NOFOLLOW_SYMLINKS = (1<<0)
 } GFileGetInfoFlags;
 
+typedef enum {
+  G_FILE_COPY_OVERWRITE = (1<<0),
+  G_FILE_COPY_BACKUP = (1<<1)
+} GFileCopyFlags;
+
 typedef struct _GFile         GFile; /* Dummy typedef */
 typedef struct _GFileIface    GFileIface;
 
@@ -27,6 +32,9 @@ typedef void (*GFileReadCallback) (GFile *file,
 				   gpointer user_data,
 				   GError *error);
 
+typedef void (*GFileProgressCallback) (goffset current_num_bytes,
+				       goffset total_num_bytes,
+				       gpointer user_data);
 
 struct _GFileIface
 {
@@ -39,6 +47,7 @@ struct _GFileIface
   gboolean            (*equal)              (GFile                *file1,
 					     GFile                *file2);
   gboolean            (*is_native)          (GFile                *file);
+  char *              (*get_basename)       (GFile                *file);
   char *              (*get_path)           (GFile                *file);
   char *              (*get_uri)            (GFile                *file);
   char *              (*get_parse_name)     (GFile                *file);
@@ -70,6 +79,13 @@ struct _GFileIface
 					     gboolean              make_backup,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  gboolean            (*copy)               (GFile                *source,
+					     GFile                *destination,
+					     GFileCopyFlags        flags,
+					     GCancellable         *cancellable,
+					     GFileProgressCallback progress_callback,
+					     gpointer              progress_callback_data,
+					     GError              **error);
   
   void                (*read_async)         (GFile                *file,
 					     int                   io_priority,
@@ -94,6 +110,7 @@ guint              g_file_hash               (gconstpointer           file);
 gboolean           g_file_equal              (GFile                  *file1,
 					      GFile                  *file2);
 gboolean           g_file_is_native          (GFile                  *file);
+char *             g_file_get_basename       (GFile                  *file);
 char *             g_file_get_path           (GFile                  *file);
 char *             g_file_get_uri            (GFile                  *file);
 char *             g_file_get_parse_name     (GFile                  *file);
@@ -131,6 +148,15 @@ void               g_file_read_async         (GFile                  *file,
 					      GFileReadCallback       callback,
 					      gpointer                callback_data,
 					      GCancellable           *cancellable);
+
+
+gboolean           g_file_copy               (GFile                  *source,
+					      GFile                  *destination,
+					      GFileCopyFlags          flags,
+					      GCancellable           *cancellable,
+					      GFileProgressCallback   progress_callback,
+					      gpointer                progress_callback_data,
+					      GError                **error);
 
 
 void               g_file_mount              (GFile                  *file,
