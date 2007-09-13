@@ -36,7 +36,7 @@ local_sources = \
 	$(NULL)
 
 daemon_sources = \
-	gvfsdaemon.c gvfsdaemon.h \
+	gvfsimpldaemon.c gvfsimpldaemon.h \
 	gfiledaemon.c gfiledaemon.h \
 	gfiledaemonlocal.c gfiledaemonlocal.h \
 	gvfsuriutils.c gvfsuriutils.h \
