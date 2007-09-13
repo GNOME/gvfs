@@ -1,7 +1,10 @@
 #include <config.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 #ifdef HAVE_SELINUX
 #include <selinux/selinux.h>
@@ -25,6 +28,8 @@
 
 #include "glocalfileinfo.h"
 #include "gioerror.h"
+#include "gcontenttype.h"
+#include "gcontenttypeprivate.h"
 
 static gchar *
 read_link (const gchar *full_name)
@@ -495,7 +500,7 @@ g_local_file_info_get (const char *basename,
   struct stat statbuf2;
   int res;
   GFileFlags file_flags;
-  gboolean is_symlink;
+  gboolean is_symlink, symlink_broken;
 
   info = g_file_info_new ();
 
@@ -519,6 +524,7 @@ g_local_file_info_get (const char *basename,
     }
 
   is_symlink = S_ISLNK (statbuf.st_mode);
+  symlink_broken = FALSE;
   
   if (is_symlink)
     {
@@ -531,7 +537,10 @@ g_local_file_info_get (const char *basename,
 
 	    /* Report broken links as symlinks */
 	  if (res != -1)
-	    statbuf = statbuf2;
+	    {
+	      statbuf = statbuf2;
+	      symlink_broken = TRUE;
+	    }
 	}
     }
 
@@ -587,9 +596,60 @@ g_local_file_info_get (const char *basename,
     }
 
   if (g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_STD_MIME_TYPE))
+					G_FILE_ATTRIBUTE_STD_CONTENT_TYPE))
     {
-      /* TODO */
+      /* TODO: Add windows specific code */
+
+      if (is_symlink &&
+	  (symlink_broken || (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)))
+	g_file_info_set_content_type (info, "inode/symlink");
+      else if (S_ISDIR(statbuf.st_mode))
+	g_file_info_set_content_type (info, "inode/directory");
+      else if (S_ISCHR(statbuf.st_mode))
+	g_file_info_set_content_type (info, "inode/chardevice");
+      else if (S_ISBLK(statbuf.st_mode))
+	g_file_info_set_content_type (info, "inode/blockdevice");
+      else if (S_ISFIFO(statbuf.st_mode))
+	g_file_info_set_content_type (info, "inode/fifo");
+#ifdef S_ISSOCK
+      else if (S_ISSOCK(statbuf.st_mode))
+	g_file_info_set_content_type (info, "inode/socket");
+#endif
+      else
+	{
+	  char *mimetype;
+	  gsize sniff_length;
+	  
+	  mimetype = g_content_type_guess (basename, NULL, 0);
+
+	  if (g_content_type_is_unknown (mimetype) && path != NULL)
+	    {
+	      guchar sniff_buffer[4096];
+	      int fd;
+	      
+	      sniff_length = _g_unix_content_type_get_sniff_len ();
+	      if (sniff_length > 4096)
+		sniff_length = 4096;
+
+	      fd = open (path, O_RDONLY);
+	      if (fd != -1)
+		{
+		  ssize_t res;
+
+		  res = read(fd, sniff_buffer, sniff_length);
+		  close (fd);
+		  if (res != -1)
+		    {
+		      g_free (mimetype);
+		      mimetype = g_content_type_guess (basename, sniff_buffer, 0);
+		    }
+		  
+		}
+	    }
+	  g_file_info_set_content_type (info, mimetype);
+	  g_free (mimetype);
+	}
+            
     }
   
   if (g_file_attribute_matcher_matches (attribute_matcher,

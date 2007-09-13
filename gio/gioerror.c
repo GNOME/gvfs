@@ -1,3 +1,4 @@
+#include <config.h>
 #include <errno.h>
 #include "gioerror.h"
 

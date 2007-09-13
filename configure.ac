@@ -32,6 +32,8 @@ saved_CFLAGS=$CFLAGS
 AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct stat.st_atimensec, struct stat.st_atim.tv_nsec, struct stat.st_ctimensec, struct stat.st_ctim.tv_nsec])
 CFLAGS=$saved_CFLAGS
 
+AC_CHECK_FUNCS(getc_unlocked)
+	
 GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
@@ -240,6 +242,7 @@ fi
 AC_OUTPUT([
 Makefile
 gio/Makefile
+gio/xdgmime/Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile

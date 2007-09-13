@@ -797,13 +797,13 @@ g_file_info_get_icon (GFileInfo *info)
 }
 
 const char *
-g_file_info_get_mime_type (GFileInfo *info)
+g_file_info_get_content_type (GFileInfo *info)
 {
   static guint32 attr = 0;
   GFileAttributeValue *value;
   
   if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_MIME_TYPE);
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_CONTENT_TYPE);
   
   value = g_file_info_find_value (info, attr);
   return get_string (value);
@@ -968,17 +968,17 @@ g_file_info_set_icon (GFileInfo         *info,
 }
 
 void
-g_file_info_set_mime_type (GFileInfo         *info,
-			   const char        *mime_type)
+g_file_info_set_content_type (GFileInfo         *info,
+			      const char        *content_type)
 {
   static guint32 attr = 0;
   GFileAttributeValue *value;
   
   if (attr == 0)
-    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_MIME_TYPE);
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_CONTENT_TYPE);
   
   value = g_file_info_create_value (info, attr);
-  set_string (value, mime_type);
+  set_string (value, content_type);
 }
 
 void

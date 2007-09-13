@@ -65,7 +65,7 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_STD_DISPLAY_NAME "std:display_name"
 #define G_FILE_ATTRIBUTE_STD_EDIT_NAME "std:edit_name"
 #define G_FILE_ATTRIBUTE_STD_ICON "std:icon"
-#define G_FILE_ATTRIBUTE_STD_MIME_TYPE "std:mime_type"
+#define G_FILE_ATTRIBUTE_STD_CONTENT_TYPE "std:content_type"
 #define G_FILE_ATTRIBUTE_STD_SIZE "std:size"
 #define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target"
 #define G_FILE_ATTRIBUTE_STD_ACCESS_RIGHTS "std:access_rights"
@@ -147,7 +147,7 @@ const char *      g_file_info_get_name               (GFileInfo         *info);
 const char *      g_file_info_get_display_name       (GFileInfo         *info);
 const char *      g_file_info_get_edit_name          (GFileInfo         *info);
 const char *      g_file_info_get_icon               (GFileInfo         *info);
-const char *      g_file_info_get_mime_type          (GFileInfo         *info);
+const char *      g_file_info_get_content_type       (GFileInfo         *info);
 goffset           g_file_info_get_size               (GFileInfo         *info);
 void              g_file_info_get_modification_time  (GFileInfo         *info,
 						      GTimeVal          *result);
@@ -169,8 +169,8 @@ void              g_file_info_set_edit_name          (GFileInfo         *info,
 						      const char        *edit_name);
 void              g_file_info_set_icon               (GFileInfo         *info,
 						      const char        *icon);
-void              g_file_info_set_mime_type          (GFileInfo         *info,
-						      const char        *mime_type);
+void              g_file_info_set_content_type       (GFileInfo         *info,
+						      const char        *content_type);
 void              g_file_info_set_size               (GFileInfo         *info,
 						      goffset            size);
 void              g_file_info_set_modification_time  (GFileInfo         *info,

@@ -1,5 +1,10 @@
 NULL =
 
+SUBDIRS=
+
+# TODO: Only on unix
+SUBDIRS += xdgmime
+
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
 	-DGIO_MODULE_DIR=\"$(libdir)/gio/gvfs-modules\"	\
@@ -40,7 +45,8 @@ libgio_la_SOURCES = 	\
 	gasynchelper.c \
 	gasynchelper.h \
 	gcancellable.c \
-	gcancellable.h \
+	gcontenttype.c \
+	gcontenttypeprivate.h \
 	gfile.c \
 	gfileenumerator.c \
 	gfileinfo.c \
@@ -66,13 +72,23 @@ libgio_la_SOURCES = 	\
 
 $(libgio_la_OBJECTS): $(marshal_sources)
 
+platform_libadd =
+
+#if OS_UNIX
+platform_libadd += xdgmime/libxdgmime.la
+#endif
+
 libgio_la_LIBADD = \
+	$(platform_libadd) \
 	$(SELINUX_LIBS) \
 	$(GLIB_LIBS) \
-	$(XATTR_LIBS)
+	$(XATTR_LIBS) \
+	$(NULL)
 
 gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
+	gcancellable.h \
+	gcontenttype.h \
 	gfile.h \
 	gfileenumerator.h \
 	gfileinfo.h \
