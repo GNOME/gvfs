@@ -148,7 +148,13 @@ g_content_type_get_mime_type (const char   *type)
 char *
 g_content_type_get_icon (const char   *type)
 {
-  /* TODO: How do we represent icons??? */
+  /* TODO: How do we represent icons???
+     In the registry they are the default value of
+     HKEY_CLASSES_ROOT\<progid>\DefaultIcon with typical values like:
+     <type>: <value>
+     REG_EXPAND_SZ: %SystemRoot%\System32\Wscript.exe,3
+     REG_SZ: shimgvw.dll,3
+  */
   return NULL;
 }
 
