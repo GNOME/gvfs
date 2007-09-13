@@ -43,74 +43,73 @@ struct _GFileInfoClass
 
 /* Common Attributes:  */
 
-#define G_FILE_ATTRIBUTE_STD_TYPE "std:type"
-#define G_FILE_ATTRIBUTE_STD_FLAGS "std:flags"
-#define G_FILE_ATTRIBUTE_STD_NAME "std:name"
-#define G_FILE_ATTRIBUTE_STD_DISPLAY_NAME "std:display_name"
-#define G_FILE_ATTRIBUTE_STD_EDIT_NAME "std:edit_name"
-#define G_FILE_ATTRIBUTE_STD_ICON "std:icon"
-#define G_FILE_ATTRIBUTE_STD_CONTENT_TYPE "std:content_type"
-#define G_FILE_ATTRIBUTE_STD_SIZE "std:size"
-#define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target"
-#define G_FILE_ATTRIBUTE_STD_MTIME "std:mtime"
-#define G_FILE_ATTRIBUTE_STD_MTIME_USEC "std:mtime_usec"
-#define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"
+#define G_FILE_ATTRIBUTE_STD_TYPE "std:type"                     /* uint32 (GFileType) */
+#define G_FILE_ATTRIBUTE_STD_FLAGS "std:flags"                   /* uint32 (GFileFlags) */
+#define G_FILE_ATTRIBUTE_STD_NAME "std:name"                     /* byte string */
+#define G_FILE_ATTRIBUTE_STD_DISPLAY_NAME "std:display_name"     /* string */
+#define G_FILE_ATTRIBUTE_STD_EDIT_NAME "std:edit_name"           /* string */
+#define G_FILE_ATTRIBUTE_STD_ICON "std:icon"                     /* object (GIcon) */
+#define G_FILE_ATTRIBUTE_STD_CONTENT_TYPE "std:content_type"     /* string */
+#define G_FILE_ATTRIBUTE_STD_SIZE "std:size"                     /* uint64 */
+#define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target" /* byte string */
+#define G_FILE_ATTRIBUTE_STD_MTIME "std:mtime"                   /* uint64 */
+#define G_FILE_ATTRIBUTE_STD_MTIME_USEC "std:mtime_usec"         /* uint32 */
+#define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"         /* string */
 
-/* Access rights */
+/* Calculated Access Rights for current user */
 
-#define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"
-#define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"
-#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:execute"
-#define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"
-#define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"
+#define G_FILE_ATTRIBUTE_ACCESS_READ "access:read"               /* uint32 */
+#define G_FILE_ATTRIBUTE_ACCESS_WRITE "access:write"             /* uint32 */
+#define G_FILE_ATTRIBUTE_ACCESS_EXECUTE "access:execute"         /* uint32 */
+#define G_FILE_ATTRIBUTE_ACCESS_DELETE "access:delete"           /* uint32 */
+#define G_FILE_ATTRIBUTE_ACCESS_RENAME "access:rename"           /* uint32 */ 
 
 /* Mountable attributes */
 
-#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT "mountable:can_mount"
-#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT "mountable:can_unmount"
-#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT "mountable:can_eject"
-#define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE "mountable:unix_device"
-#define G_FILE_ATTRIBUTE_MOUNTABLE_HAL_UDI "mountable:hal_udi"
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT "mountable:can_mount"     /* uint32 */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT "mountable:can_unmount" /* uint32 */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT "mountable:can_eject"     /* uint32 */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE "mountable:unix_device" /* uint32 */
+#define G_FILE_ATTRIBUTE_MOUNTABLE_HAL_UDI "mountable:hal_udi"         /* string */
 
 /* Time attributes (sans mtime)*/
 
-#define G_FILE_ATTRIBUTE_TIME_ACCESS "time:access"
-#define G_FILE_ATTRIBUTE_TIME_ACCESS_USEC "time:access_usec"
-#define G_FILE_ATTRIBUTE_TIME_CHANGED "time:changed"
-#define G_FILE_ATTRIBUTE_TIME_CHANGED_USEC "time:changed_usec"
-#define G_FILE_ATTRIBUTE_TIME_CREATED "time:created"
-#define G_FILE_ATTRIBUTE_TIME_CREATED_USEC "time:created_usec"
+#define G_FILE_ATTRIBUTE_TIME_ACCESS "time:access"               /* uint64 */
+#define G_FILE_ATTRIBUTE_TIME_ACCESS_USEC "time:access_usec"     /* uint32 */
+#define G_FILE_ATTRIBUTE_TIME_CHANGED "time:changed"             /* uint64 */
+#define G_FILE_ATTRIBUTE_TIME_CHANGED_USEC "time:changed_usec"   /* uint32 */
+#define G_FILE_ATTRIBUTE_TIME_CREATED "time:created"             /* uint64 */
+#define G_FILE_ATTRIBUTE_TIME_CREATED_USEC "time:created_usec"   /* uint32 */
 
 /* Unix specific attributes */
 
-#define G_FILE_ATTRIBUTE_UNIX_DEVICE "unix:device"
-#define G_FILE_ATTRIBUTE_UNIX_INODE "unix:inode"
-#define G_FILE_ATTRIBUTE_UNIX_MODE "unix:mode"
-#define G_FILE_ATTRIBUTE_UNIX_NLINK "unix:nlink"
-#define G_FILE_ATTRIBUTE_UNIX_UID "unix:uid"
-#define G_FILE_ATTRIBUTE_UNIX_GID "unix:gid"
-#define G_FILE_ATTRIBUTE_UNIX_RDEV "unix:rdev"
-#define G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE "unix:block_size"
-#define G_FILE_ATTRIBUTE_UNIX_BLOCKS "unix:blocks"
+#define G_FILE_ATTRIBUTE_UNIX_DEVICE "unix:device"               /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_INODE "unix:inode"                 /* uint64 */
+#define G_FILE_ATTRIBUTE_UNIX_MODE "unix:mode"                   /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_NLINK "unix:nlink"                 /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_UID "unix:uid"                     /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_GID "unix:gid"                     /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_RDEV "unix:rdev"                   /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE "unix:block_size"       /* uint32 */
+#define G_FILE_ATTRIBUTE_UNIX_BLOCKS "unix:blocks"               /* uint64 */
 
 /* DOS specific attributes */
 
-#define G_FILE_ATTRIBUTE_DOS_ARCHIVE "dos:archive"
-#define G_FILE_ATTRIBUTE_DOS_SYSTEM "dos:system"
+#define G_FILE_ATTRIBUTE_DOS_ARCHIVE "dos:archive"               /* uint32 */
+#define G_FILE_ATTRIBUTE_DOS_SYSTEM "dos:system"                 /* uint32 */
 
 /* Owner attributes */
 
-#define G_FILE_ATTRIBUTE_OWNER_USER "owner:user"
-#define G_FILE_ATTRIBUTE_OWNER_GROUP "owner:group"
-
+#define G_FILE_ATTRIBUTE_OWNER_USER "owner:user"                 /* string */
+#define G_FILE_ATTRIBUTE_OWNER_GROUP "owner:group"               /* string */
 
 /* File system info (for g_file_get_filesystem_info) */
 
-#define G_FILE_ATTRIBUTE_FS_SIZE "fs:size"
-#define G_FILE_ATTRIBUTE_FS_FREE "fs:free"
-#define G_FILE_ATTRIBUTE_FS_TYPE "fs:type"
+#define G_FILE_ATTRIBUTE_FS_SIZE "fs:size"                       /* uint64 */
+#define G_FILE_ATTRIBUTE_FS_FREE "fs:free"                       /* uint64 */
+#define G_FILE_ATTRIBUTE_FS_TYPE "fs:type"                       /* string */
 
-#define G_FILE_ATTRIBUTE_GVFS_BACKEND "gvfs:backend"
+#define G_FILE_ATTRIBUTE_GVFS_BACKEND "gvfs:backend"             /* string */
 
 GType g_file_info_get_type (void) G_GNUC_CONST;
 
