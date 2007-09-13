@@ -829,6 +829,131 @@ get_byte_string (const GFileAttributeValue *value,
 }
 #endif
 
+static gboolean
+set_unix_mode (char *filename,
+	       const GFileAttributeValue *value,
+	       GError **error)
+{
+  guint32 val;
+  
+  if (!get_uint32 (value, &val, error))
+    return FALSE;
+  
+  if (g_chmod (filename, val) == -1)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error setting permissions: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  return TRUE;
+}
+
+#ifdef HAVE_CHOWN
+static gboolean
+set_unix_uid_gid (char *filename,
+		  const GFileAttributeValue *uid_value,
+		  const GFileAttributeValue *gid_value,
+		  GFileGetInfoFlags flags,
+		  GError **error)
+{
+  int res;
+  guint32 val;
+  uid_t uid;
+  gid_t gid;
+  
+  if (uid_value)
+    {
+      if (!get_uint32 (uid_value, &val, error))
+	return FALSE;
+      uid = val;
+    }
+  else
+    uid = -1;
+  
+  if (gid_value)
+    {
+      if (!get_uint32 (gid_value, &val, error))
+	return FALSE;
+      gid = val;
+    }
+  else
+    gid = -1;
+  
+  if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+    res = lchown (filename, uid, gid);
+  else
+    res = chown (filename, uid, gid);
+  
+  if (res == -1)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error setting owner: %s"),
+		   g_strerror (errno));
+	  return FALSE;
+    }
+  return TRUE;
+}
+#endif
+
+static gboolean
+set_symlink (char *filename,
+	     const GFileAttributeValue *value,
+	     GError **error)
+{
+  const char *val;
+  struct stat statbuf;
+  
+  if (!get_byte_string (value, &val, error))
+    return FALSE;
+  
+  if (val == NULL)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		   _("symlink must be non-NULL"));
+      return FALSE;
+    }
+  
+  if (g_lstat (filename, &statbuf))
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error setting symlink: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  
+  if (!S_ISLNK (statbuf.st_mode))
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_NOT_SYMBOLIC_LINK,
+		   _("Error setting symlink: file is not a symlink"));
+      return FALSE;
+    }
+  
+  if (g_unlink (filename))
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error setting symlink: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  
+  if (symlink (filename, val) != 0)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error setting symlink: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
 gboolean
 _g_local_file_info_set_attribute (char *filename,
 				  const char *attribute,
@@ -838,126 +963,18 @@ _g_local_file_info_set_attribute (char *filename,
 				  GError **error)
 {
   if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
-    {
-      guint32 val;
-
-      if (!get_uint32 (value, &val, error))
-	  return FALSE;
-
-      if (g_chmod (filename, val) == -1)
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting permissions: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-      return TRUE;
-    }
+    return set_unix_mode (filename, value, error);
+  
 #ifdef HAVE_CHOWN
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0)
-    {
-      int res;
-      guint32 val;
-
-      if (!get_uint32 (value, &val, error))
-	  return FALSE;
-
-      if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
-	res = lchown (filename, val, -1);
-      else
-	res = chown (filename, val, -1);
-	
-      if (res == -1)
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting owner: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-      return TRUE;
-    }
-#endif
-#ifdef HAVE_CHOWN
+    return set_unix_uid_gid (filename, value, NULL, flags, error);
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
-    {
-      int res;
-      guint32 val;
-
-      if (!get_uint32 (value, &val, error))
-	  return FALSE;
-
-      if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
-	res = lchown (filename, -1, val);
-      else
-	res = chown (filename, -1, val);
-	
-      if (res == -1)
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting owner: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-      return TRUE;
-    }
+    return set_unix_uid_gid (filename, NULL, value, flags, error);
 #endif
+  
 #ifdef HAVE_SYMLINK
   else if (strcmp (attribute, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET) == 0)
-    {
-      const char *val;
-      struct stat statbuf;
-
-      if (!get_byte_string (value, &val, error))
-	  return FALSE;
-      
-      
-      if (val == NULL)
-	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		       _("symlink must be non-NULL"));
-	  return FALSE;
-	}
-
-      if (g_lstat (filename, &statbuf))
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting symlink: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-
-	if (!S_ISLNK (statbuf.st_mode))
-	  {
-	  g_set_error (error, G_IO_ERROR,
-		       G_IO_ERROR_NOT_SYMBOLIC_LINK,
-		       _("Error setting symlink: file is not a symlink"));
-	  return FALSE;
-	}
-
-	if (g_unlink (filename))
-	  {
-	    g_set_error (error, G_IO_ERROR,
-			 g_io_error_from_errno (errno),
-			 _("Error setting symlink: %s"),
-			 g_strerror (errno));
-	    return FALSE;
-	  }
-
-	if (symlink (filename, val) != 0)
-	  {
-	    g_set_error (error, G_IO_ERROR,
-			 g_io_error_from_errno (errno),
-			 _("Error setting symlink: %s"),
-			 g_strerror (errno));
-	    return FALSE;
-	  }
-	
-	return TRUE;
-    }
+    return set_symlink (filename, value, error);
   #endif
   
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
