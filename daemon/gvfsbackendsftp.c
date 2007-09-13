@@ -1375,6 +1375,8 @@ open_dir_reply (GVfsBackendSftp *backend,
       return;
     }
 
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
   data->handle = read_data_buffer (reply);
   
   command = new_command_stream (op_backend,
