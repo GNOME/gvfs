@@ -37,6 +37,12 @@
 #include "sftp.h"
 #include "pty_open.h"
 
+/* TODO for sftp:
+ * Implement can_delete & can_rename
+ * Implement symlink_target for get_info and readdir
+ * lots of ops   
+ */
+
 #ifdef HAVE_GRANTPT
 /* We only use this on systems with unix98 ptys */
 #define USE_PTY 1
@@ -947,8 +953,6 @@ get_uid_sync (GVfsBackendSftp *backend)
       g_object_unref (info);
     }
 
-  g_print ("My uid is: %d\n", backend->my_uid);
-  
   return TRUE;
 }
 
@@ -1321,10 +1325,17 @@ parse_attributes (GVfsBackendSftp *backend,
   
   if (flags & SSH_FILEXFER_ATTR_EXTENDED)
     {
-      guint32 v;
-      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
-      g_print ("extended count: %d\n", v);
-      /* TODO: Handle more */
+      guint32 count, i;
+      char *name, *val;
+      count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      for (i = 0; i < count; i++)
+        {
+          name = read_string (reply, NULL);
+          val = read_string (reply, NULL);
+
+          g_free (name);
+          g_free (val);
+        }
     }
 
   /* We use the same setting as for local files. Can't really
@@ -1425,8 +1436,6 @@ read_dir_reply (GVfsBackendSftp *backend,
   data = job->backend_data;
   enum_job = G_VFS_JOB_ENUMERATE (job);
 
-  g_print ("read_dir_reply %d\n", reply_type);
-
   if (reply_type != SSH_FXP_NAME)
     {
       /* Ignore all error, including the expected END OF FILE.
@@ -1440,7 +1449,6 @@ read_dir_reply (GVfsBackendSftp *backend,
 
   infos = NULL;
   count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
-  g_print ("count: %d\n", count);
   for (i = 0; i < count; i++)
     {
       GFileInfo *info;
@@ -1450,7 +1458,6 @@ read_dir_reply (GVfsBackendSftp *backend,
 
       info = g_file_info_new ();
       name = read_string (reply, NULL);
-      g_print ("name: %s\n", name);
       g_file_info_set_name (info, name);
       
       longname = read_string (reply, NULL);
@@ -1502,8 +1509,6 @@ open_dir_reply (GVfsBackendSftp *backend,
   guint32 id;
   GDataOutputStream *command;
   ReadDirData *data;
-
-  g_print ("open_dir_reply %d\n", reply_type);
 
   data = job->backend_data;
   
