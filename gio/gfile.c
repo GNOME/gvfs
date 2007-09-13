@@ -774,6 +774,64 @@ g_file_set_display_name (GFile                  *file,
   return (* iface->set_display_name) (file, display_name, cancellable, error);
 }
 
+GFileAttributeInfoList *
+g_file_query_settable_attributes (GFile                      *file,
+				  GCancellable               *cancellable,
+				  GError                    **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  if (iface->query_settable_attributes == NULL)
+    {
+      g_set_error (error,
+		   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
+  return (* iface->query_settable_attributes) (file, cancellable, error);
+}
+
+GFileAttributeInfoList *
+g_file_query_writable_namespaces (GFile                      *file,
+				  GCancellable               *cancellable,
+				  GError                    **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  if (iface->query_writable_namespaces == NULL)
+    {
+      g_set_error (error,
+		   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		   _("Operation not supported"));
+      return NULL;
+    }
+  
+  return (* iface->query_writable_namespaces) (file, cancellable, error);
+}
+
 gboolean
 g_file_set_attribute (GFile                  *file,
 		      const char             *attribute,
