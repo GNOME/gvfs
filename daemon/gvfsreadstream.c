@@ -39,7 +39,7 @@ struct _GVfsReadStreamPrivate
   int remote_fd;
   
   gpointer data; /* user data, i.e. GVfsHandle */
-  GVfsJob *job;
+  guint32 seq_nr;
   
   char command_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE];
   int command_buffer_size;
@@ -207,22 +207,25 @@ send_reply (GVfsReadStream *stream,
 static void
 got_command (GVfsReadStream *stream,
 	     guint32 command,
+	     guint32 seq_nr,
 	     guint32 arg)
 {
   GVfsJob *job;
   GError *error;
 
-  g_print ("got_command %d %d\n", command, arg);
+  g_print ("got_command %d %d %d\n", command, seq_nr, arg);
   
   job = NULL;
   switch (command)
     {
     case G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ:
+      stream->priv->seq_nr = seq_nr;
       job = g_vfs_job_read_new (stream,
 				stream->priv->data,
 				arg);
       break;
     case G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SEEK:
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_CANCEL:
     default:
       /* TODO */
       error = NULL;
@@ -248,6 +251,7 @@ command_read_cb (GInputStream *input_stream,
 {
   GVfsReadStream *stream = G_VFS_READ_STREAM (data);
   GVfsDaemonSocketProtocolCommand *cmd;
+  guint32 seq_nr;
   guint32 command;
   guint32 arg;
   
@@ -275,8 +279,9 @@ command_read_cb (GInputStream *input_stream,
   cmd = (GVfsDaemonSocketProtocolCommand *)stream->priv->command_buffer;
   command = g_ntohl (cmd->command);
   arg = g_ntohl (cmd->arg);
+  seq_nr = g_ntohl (cmd->seq_nr);
   stream->priv->command_buffer_size = 0;
-  got_command (stream, command, arg);
+  got_command (stream, command, seq_nr, arg);
 }
 
 static void
@@ -301,7 +306,7 @@ g_vfs_read_stream_send_error (GVfsReadStream  *read_stream,
   char *data;
   gsize data_len;
   
-  data = g_error_to_daemon_reply (error, &data_len);
+  data = g_error_to_daemon_reply (error, read_stream->priv->seq_nr, &data_len);
   send_reply (read_stream, FALSE, data, data_len);
 }
 
@@ -316,6 +321,7 @@ g_vfs_read_stream_send_data (GVfsReadStream  *read_stream,
 
   reply = (GVfsDaemonSocketProtocolReply *)read_stream->priv->reply_buffer;
   reply->type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA);
+  reply->seq_nr = g_htonl (read_stream->priv->seq_nr);
   reply->arg1 = g_htonl (count);
   reply->arg2 = g_htonl (0); /* TODO: seek generation */
 

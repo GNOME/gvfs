@@ -176,7 +176,7 @@ dbus_connection_send_fd (DBusConnection *connection,
 }
 
 char *
-g_error_to_daemon_reply (GError *error, gsize *len_out)
+g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)
 {
   char *buffer;
   const char *domain;
@@ -193,9 +193,10 @@ g_error_to_daemon_reply (GError *error, gsize *len_out)
   buffer = g_malloc (len);
 
   reply = (GVfsDaemonSocketProtocolReply *)buffer;
-  reply->type = G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR;
-  reply->arg1 = error->code;
-  reply->arg2 = domain_len + 1 + message_len + 1;
+  reply->type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR);
+  reply->seq_nr = g_htonl (seq_nr);
+  reply->arg1 = g_htonl (error->code);
+  reply->arg2 = g_htonl (domain_len + 1 + message_len + 1);
 
   memcpy (buffer + G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
 	  domain, domain_len + 1);

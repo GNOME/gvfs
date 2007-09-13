@@ -557,8 +557,6 @@ run_read_state_machine (GUnixFileInputStream *file, ReadOperation *op)
 	  g_assert_not_reached ();
 	}
       
-
-      
     }
   while (1);
 }
