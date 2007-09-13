@@ -56,7 +56,7 @@ send_spawned (DBusConnection *connection, gboolean succeeded, char *error_messag
   message = dbus_message_new_method_call (spawner_id,
 					  spawner_path,
 					  G_VFS_DBUS_SPAWNER_INTERFACE,
-					  "spawned");
+					  G_VFS_DBUS_OP_SPAWNED);
   dbus_message_set_no_reply (message, TRUE);
 
   dbus_succeeded = succeeded;

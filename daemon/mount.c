@@ -272,7 +272,7 @@ spawn_mount_message_function (DBusConnection  *connection,
 
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_SPAWNER_INTERFACE,
-				   "spawned"))
+				   G_VFS_DBUS_OP_SPAWNED))
     {
       dbus_connection_unregister_object_path (connection, data->obj_path);
 

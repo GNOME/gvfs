@@ -40,8 +40,10 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD "askPassword"
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION "askQuestion"
 
+/* Implemented by the spawner of a process, the spawned process sends the
+   spawned message (with noreply) when it has spawned and gotten a dbus id */
 #define G_VFS_DBUS_SPAWNER_INTERFACE "org.gtk.vfs.Spawner"
-#define G_VFS_DBUS_OP_SPAWNED "Spawned"
+#define G_VFS_DBUS_OP_SPAWNED "spawned"
 
 /* Implemented by client side for a file enumerator */
 #define G_VFS_DBUS_ENUMERATOR_INTERFACE "org.gtk.vfs.Enumerator"
