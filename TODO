@@ -29,6 +29,8 @@ implement Async i/o for GFileInputStreamDaemon
 
 implement get_file_info for GFileInputStreamDaemon
 
+Is handling open inside the stream really right?
+
 FUTURE IDEAS:
 -------------
 
