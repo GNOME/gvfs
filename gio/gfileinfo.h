@@ -118,7 +118,9 @@ struct _GFileInfoClass
 GType g_file_info_get_type (void) G_GNUC_CONST;
 
 GFileInfo *        g_file_info_new                       (void);
-GFileInfo *        g_file_info_copy                      (GFileInfo  *info);
+GFileInfo *        g_file_info_dup                       (GFileInfo  *info);
+void               g_file_info_copy_into                 (GFileInfo  *src,
+							  GFileInfo  *dest);
 gboolean           g_file_info_has_attribute             (GFileInfo  *info,
 							  const char *attribute);
 char **            g_file_info_list_attributes           (GFileInfo  *info,

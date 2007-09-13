@@ -198,29 +198,42 @@ g_file_info_new (void)
   return g_object_new (G_TYPE_FILE_INFO, NULL);
 }
 
-GFileInfo *
-g_file_info_copy (GFileInfo  *other)
+void
+g_file_info_copy_into (GFileInfo *src_info, GFileInfo *dest_info)
 {
-  GFileInfo *new;
-  int i;
   GFileAttribute *source, *dest;
-  
-  new = g_file_info_new ();
-  g_array_set_size (new->attributes,
-		    other->attributes->len);
+  int i;
 
-  source = (GFileAttribute *)other->attributes->data;
-  dest = (GFileAttribute *)new->attributes->data;
+  dest = (GFileAttribute *)dest_info->attributes->data;
+  for (i = 0; i < dest_info->attributes->len; i++)
+    g_file_attribute_value_clear (&dest[i].value);
   
-  for (i = 0; i < other->attributes->len; i++)
+  g_array_set_size (dest_info->attributes,
+		    src_info->attributes->len);
+
+  source = (GFileAttribute *)src_info->attributes->data;
+  dest = (GFileAttribute *)dest_info->attributes->data;
+  
+  for (i = 0; i < src_info->attributes->len; i++)
     {
       dest[i].attribute = source[i].attribute;
       dest[i].value.type = G_FILE_ATTRIBUTE_TYPE_INVALID;
       g_file_attribute_value_set (&dest[i].value, &source[i].value);
     }
 
-  new->mask = g_file_attribute_matcher_ref (other->mask);
+  if (src_info->mask == NO_ATTRIBUTE_MASK)
+    dest_info->mask = NO_ATTRIBUTE_MASK;
+  else
+    dest_info->mask = g_file_attribute_matcher_ref (src_info->mask);
+}
 
+GFileInfo *
+g_file_info_dup (GFileInfo  *other)
+{
+  GFileInfo *new;
+  
+  new = g_file_info_new ();
+  g_file_info_copy_into (other, new);
   return new;
 }
 
