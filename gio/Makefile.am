@@ -109,6 +109,7 @@ libgio_la_SOURCES = 	\
 	gicon.c \
 	ginputstream.c \
 	gioerror.c \
+	giomodule.c \
 	gioscheduler.c \
 	gloadableicon.c \
 	gmemoryinputstream.c \
@@ -180,6 +181,7 @@ gvfsinclude_HEADERS = \
 	gicon.h \
 	ginputstream.h \
 	gioerror.h \
+	giomodule.h \
 	gioscheduler.h \
 	giotypes.h \
 	gloadableicon.h \
