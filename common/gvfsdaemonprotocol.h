@@ -34,6 +34,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_OP_GET_CONNECTION "GetConnection"
 #define G_VFS_DBUS_OP_CANCEL "Cancel"
 
+#define G_VFS_DBUS_MOUNT_OPERATION_INTERFACE "org.gtk.vfs.MountOperation"
 
 typedef struct {
   guint32 command;
