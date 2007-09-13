@@ -46,6 +46,7 @@ GMountRef  *_g_daemon_vfs_get_mount_ref_sync  (GMountSpec               *spec,
 					       GError                  **error);
 const char *_g_mount_ref_resolve_path         (GMountRef                *ref,
 					       const char               *path);
+GMountRef  *_g_mount_ref_ref                  (GMountRef                *ref);
 void        _g_mount_ref_unref                (GMountRef                *ref);
 
 G_END_DECLS

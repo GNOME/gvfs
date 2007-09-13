@@ -261,6 +261,11 @@ mount_ref_ref (GMountRef *ref)
   return ref;
 }
 
+GMountRef *
+_g_mount_ref_ref (GMountRef *ref)
+{
+  return mount_ref_ref (ref);
+}
 
 void
 _g_mount_ref_unref (GMountRef *ref)
