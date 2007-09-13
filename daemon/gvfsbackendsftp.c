@@ -30,6 +30,7 @@
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobgetinfo.h"
+#include "gvfsjobdelete.h"
 #include "gvfsjobgetfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
@@ -2940,6 +2941,7 @@ try_move (GVfsBackend *backend,
 
   return TRUE;
 }
+
 static void
 make_symlink_reply (GVfsBackendSftp *backend,
                     int reply_type,
@@ -2977,6 +2979,96 @@ try_make_symlink (GVfsBackend *backend,
 }
 
 static void
+delete_remove_reply (GVfsBackendSftp *backend,
+                     int reply_type,
+                     GDataInputStream *reply,
+                     guint32 len,
+                     GVfsJob *job,
+                     gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1); 
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static void
+delete_rmdir_reply (GVfsBackendSftp *backend,
+                    int reply_type,
+                    GDataInputStream *reply,
+                    guint32 len,
+                    GVfsJob *job,
+                    gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, G_IO_ERROR_NOT_EMPTY); 
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static void
+delete_lstat_reply (GVfsBackendSftp *backend,
+                    int reply_type,
+                    GDataInputStream *reply,
+                    guint32 len,
+                    GVfsJob *job,
+                    gpointer user_data)
+{
+  GDataOutputStream *command;
+  guint32 id;
+  GFileInfo *info;
+
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1);
+  else if (reply_type != SSH_FXP_ATTRS)
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+  else
+    {
+      info = g_file_info_new ();
+      parse_attributes (backend, info, NULL,
+                        reply, NULL);
+
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+        {
+          command = new_command_stream (backend,
+                                        SSH_FXP_RMDIR,
+                                        &id);
+          put_string (command, G_VFS_JOB_DELETE (job)->filename);
+          queue_command_stream_and_free (backend, command, id, delete_rmdir_reply, G_VFS_JOB (job), NULL);
+        }
+      else
+        {
+          command = new_command_stream (backend,
+                                        SSH_FXP_REMOVE,
+                                        &id);
+          put_string (command, G_VFS_JOB_DELETE (job)->filename);
+          queue_command_stream_and_free (backend, command, id, delete_remove_reply, G_VFS_JOB (job), NULL);
+        }
+    }
+}
+
+static gboolean
+try_delete (GVfsBackend *backend,
+            GVfsJobDelete *job,
+            const char *filename)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_LSTAT,
+                                &id);
+  put_string (command, filename);
+  queue_command_stream_and_free (op_backend, command, id, delete_lstat_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
+}
+
+static void
 g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -3000,4 +3092,5 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_seek_on_write = try_seek_on_write;
   backend_class->try_move = try_move;
   backend_class->try_make_symlink = try_make_symlink;
+  backend_class->try_delete = try_delete;
 }
