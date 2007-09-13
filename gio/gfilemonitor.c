@@ -193,6 +193,9 @@ remove_last_recived_event (GFileMonitor *monitor, gboolean emit_first)
 		   monitor->priv->last_recieved_change_file, NULL,
 		   G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT);
 
+  g_object_unref (monitor->priv->last_recieved_change_file);
+  monitor->priv->last_recieved_change_file = NULL;
+  
   if (monitor->priv->last_recieved_change_timeout)
     {
       g_source_destroy (monitor->priv->last_recieved_change_timeout);
