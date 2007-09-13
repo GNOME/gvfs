@@ -125,6 +125,17 @@ valid_char (char c)
   return c >= 32 && c <= 126 && c != '\\';
 }
 
+static gboolean
+name_is_valid (const char *str)
+{
+  while (*str)
+    {
+      if (!valid_char (*str))
+	return FALSE;
+    }
+  return TRUE;
+}
+
 static char *
 hex_escape_string (const char *str, gboolean *free_return)
 {
@@ -217,31 +228,26 @@ hex_unescape_string (const char *str, int *out_len, gboolean *free_return)
 
 static void
 escape_xattr (GFileInfo *info,
-	      const char *attr, /* not escaped */
+	      const char *gio_attr, /* gio attribute name */
 	      const char *value, /* Is zero terminated */
 	      size_t len /* not including zero termination */)
 {
-  char *full_attr;
-  char *escaped_val, *escaped_attr;
-  gboolean free_escaped_val, free_escaped_attr;
+  char *escaped_val;
+  gboolean free_escaped_val;
   
-  escaped_attr = hex_escape_string (attr, &free_escaped_attr);
-  full_attr = g_strconcat ("xattr:", escaped_attr, NULL);
-  if (free_escaped_attr)
-    g_free (escaped_attr);
-
   escaped_val = hex_escape_string (value, &free_escaped_val);
-  g_file_info_set_attribute_string (info, full_attr, escaped_val);
+  
+  g_file_info_set_attribute_string (info, gio_attr, escaped_val);
+  
   if (free_escaped_val)
     g_free (escaped_val);
-  
-  g_free (full_attr);
 }
 
 static void
 get_one_xattr (const char *path,
 	       GFileInfo *info,
-	       const char *attr,
+	       const char *gio_attr,
+	       const char *xattr,
 	       gboolean follow_symlinks)
 {
   char value[64];
@@ -249,9 +255,9 @@ get_one_xattr (const char *path,
   ssize_t len;
 
   if (follow_symlinks)  
-    len = getxattr (path, attr, value, sizeof (value)-1);
+    len = getxattr (path, xattr, value, sizeof (value)-1);
   else
-    len = lgetxattr (path, attr,value, sizeof (value)-1);
+    len = lgetxattr (path, xattr,value, sizeof (value)-1);
 
   value_p = NULL;
   if (len >= 0)
@@ -259,9 +265,9 @@ get_one_xattr (const char *path,
   else if (len == -1 && errno == ERANGE)
     {
       if (follow_symlinks)  
-	len = getxattr (path, attr, NULL, 0);
+	len = getxattr (path, xattr, NULL, 0);
       else
-	len = lgetxattr (path, attr, NULL, 0);
+	len = lgetxattr (path, xattr, NULL, 0);
 
       if (len < 0)
 	return;
@@ -269,9 +275,9 @@ get_one_xattr (const char *path,
       value_p = g_malloc (len+1);
 
       if (follow_symlinks)  
-	len = getxattr (path, attr, value_p, len);
+	len = getxattr (path, xattr, value_p, len);
       else
-	len = lgetxattr (path, attr, value_p, len);
+	len = lgetxattr (path, xattr, value_p, len);
 
       if (len < 0)
 	{
@@ -285,7 +291,7 @@ get_one_xattr (const char *path,
   /* Null terminate */
   value_p[len] = 0;
 
-  escape_xattr (info, attr, value_p, len);
+  escape_xattr (info, gio_attr, value_p, len);
   
   if (value_p != value)
     g_free (value_p);
@@ -295,6 +301,7 @@ get_one_xattr (const char *path,
 
 static void
 get_xattrs (const char *path,
+	    gboolean user,
 	    GFileInfo *info,
 	    GFileAttributeMatcher *matcher,
 	    gboolean follow_symlinks)
@@ -307,7 +314,11 @@ get_xattrs (const char *path,
   char *list;
   const char *attr;
 
-  all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
+  if (user)
+    all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
+  else
+    all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr_sys");
+
   if (all)
     {
       if (follow_symlinks)
@@ -342,7 +353,29 @@ get_xattrs (const char *path,
       attr = list;
       while (list_res_size > 0)
 	{
-	  get_one_xattr (path, info, attr, follow_symlinks);
+	  if ((user && g_str_has_prefix (attr, "user.")) ||
+	      (!user && !g_str_has_prefix (attr, "user.")))
+	    {
+	      char *escaped_attr, *gio_attr;
+	      gboolean free_escaped_attr;
+	      
+	      if (user)
+		{
+		  escaped_attr = hex_escape_string (attr + 5, &free_escaped_attr);
+		  gio_attr = g_strconcat ("xattr:", escaped_attr, NULL);
+		}
+	      else
+		{
+		  escaped_attr = hex_escape_string (attr, &free_escaped_attr);
+		  gio_attr = g_strconcat ("xattr_sys:", escaped_attr, NULL);
+		}
+	      
+	      if (free_escaped_attr)
+		g_free (escaped_attr);
+	      
+	      get_one_xattr (path, info, gio_attr, attr, follow_symlinks);
+	    }
+	      
 	  len = strlen (attr) + 1;
 	  attr += len;
 	  list_res_size -= len;
@@ -353,7 +386,29 @@ get_xattrs (const char *path,
   else
     {
       while ((attr = g_file_attribute_matcher_enumerate_next (matcher)) != NULL)
-	get_one_xattr (path, info, attr, follow_symlinks);
+	{
+	  char *unescaped_attribute, *a;
+	  gboolean free_unescaped_attribute;
+
+	  attr = strchr (attr, ':');
+	  if (attr)
+	    {
+	      attr++; /* Skip ':' */
+	      unescaped_attribute = hex_unescape_string (attr, NULL, &free_unescaped_attribute);
+	      if (user)
+		a = g_strconcat ("user.", unescaped_attribute, NULL);
+	      else
+		a = unescaped_attribute;
+	      
+	      get_one_xattr (path, info, attr, a, follow_symlinks);
+
+	      if (user)
+		g_free (a);
+	      
+	      if (free_unescaped_attribute)
+		g_free (unescaped_attribute);
+	    }
+	}
     }
 #endif /* defined HAVE_XATTR */
 }
@@ -362,27 +417,28 @@ get_xattrs (const char *path,
 static void
 get_one_xattr_from_fd (int fd,
 		       GFileInfo *info,
-		       const char *attr)
+		       const char *gio_attr,
+		       const char *xattr)
 {
   char value[64];
   char *value_p;
   ssize_t len;
 
-  len = fgetxattr (fd, attr, value, sizeof (value)-1);
+  len = fgetxattr (fd, xattr, value, sizeof (value)-1);
 
   value_p = NULL;
   if (len >= 0)
     value_p = value;
   else if (len == -1 && errno == ERANGE)
     {
-      len = fgetxattr (fd, attr, NULL, 0);
+      len = fgetxattr (fd, xattr, NULL, 0);
 
       if (len < 0)
 	return;
 
       value_p = g_malloc (len+1);
 
-      len = fgetxattr (fd, attr, value_p, len);
+      len = fgetxattr (fd, xattr, value_p, len);
 
       if (len < 0)
 	{
@@ -396,7 +452,7 @@ get_one_xattr_from_fd (int fd,
   /* Null terminate */
   value_p[len] = 0;
 
-  escape_xattr (info, attr, value_p, len);
+  escape_xattr (info, gio_attr, value_p, len);
   
   if (value_p != value)
     g_free (value_p);
@@ -405,6 +461,7 @@ get_one_xattr_from_fd (int fd,
 
 static void
 get_xattrs_from_fd (int fd,
+		    gboolean user,
 		    GFileInfo *info,
 		    GFileAttributeMatcher *matcher)
 {
@@ -416,7 +473,10 @@ get_xattrs_from_fd (int fd,
   char *list;
   const char *attr;
 
-  all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
+  if (user)
+    all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr");
+  else
+    all = g_file_attribute_matcher_enumerate_namespace (matcher, "xattr_sys");
 
   if (all)
     {
@@ -446,7 +506,29 @@ get_xattrs_from_fd (int fd,
       attr = list;
       while (list_res_size > 0)
 	{
-	  get_one_xattr_from_fd (fd, info, attr);
+	  if ((user && g_str_has_prefix (attr, "user.")) ||
+	      (!user && !g_str_has_prefix (attr, "user.")))
+	    {
+	      char *escaped_attr, *gio_attr;
+	      gboolean free_escaped_attr;
+	      
+	      if (user)
+		{
+		  escaped_attr = hex_escape_string (attr + 5, &free_escaped_attr);
+		  gio_attr = g_strconcat ("xattr:", escaped_attr, NULL);
+		}
+	      else
+		{
+		  escaped_attr = hex_escape_string (attr, &free_escaped_attr);
+		  gio_attr = g_strconcat ("xattr_sys:", escaped_attr, NULL);
+		}
+	      
+	      if (free_escaped_attr)
+		g_free (escaped_attr);
+	      
+	      get_one_xattr_from_fd (fd, info, gio_attr, attr);
+	    }
+	  
 	  len = strlen (attr) + 1;
 	  attr += len;
 	  list_res_size -= len;
@@ -457,7 +539,29 @@ get_xattrs_from_fd (int fd,
   else
     {
       while ((attr = g_file_attribute_matcher_enumerate_next (matcher)) != NULL)
-	get_one_xattr_from_fd (fd, info, attr);
+	{
+	  char *unescaped_attribute, *a;
+	  gboolean free_unescaped_attribute;
+
+	  attr = strchr (attr, ':');
+	  if (attr)
+	    {
+	      attr++; /* Skip ':' */
+	      unescaped_attribute = hex_unescape_string (attr, NULL, &free_unescaped_attribute);
+	      if (user)
+		a = g_strconcat ("user.", unescaped_attribute, NULL);
+	      else
+		a = unescaped_attribute;
+	      
+	      get_one_xattr_from_fd (fd, info, attr,a);
+
+	      if (user)
+		g_free (a);
+	      
+	      if (free_unescaped_attribute)
+		g_free (unescaped_attribute);
+	    }
+	}
     }
 #endif /* defined HAVE_XATTR */
 }
@@ -472,26 +576,55 @@ set_xattr (char *filename,
   char *attribute, *value;
   gboolean free_attribute, free_value;
   int val_len, res, errsv;
-  
+  gboolean is_user;
+  char *a;
+
   if (attr_value->type != G_FILE_ATTRIBUTE_TYPE_STRING)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Invalid attribute type (string expected)"));
       return FALSE;
     }
+
+  if (!name_is_valid (escaped_attribute))
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		   _("Invalid extended attribute name"));
+      return FALSE;
+    }
+
+  if (g_str_has_prefix (escaped_attribute, "xattr:"))
+    {
+      escaped_attribute += 6;
+      is_user = TRUE;
+    }
+  else
+    {
+      g_assert (g_str_has_prefix (escaped_attribute, "xattr_sys:"));
+      escaped_attribute += 10;
+      is_user = FALSE;
+    }
   
   attribute = hex_unescape_string (escaped_attribute, NULL, &free_attribute);
   value = hex_unescape_string (attr_value->u.string, &val_len, &free_value);
 
-  res = setxattr (filename, attribute, value, val_len, 0);
+
+  if (is_user)
+    a = g_strconcat ("user.", attribute, NULL);
+  else
+    a = attribute;
+  
+  res = setxattr (filename, a, value, val_len, 0);
   errsv = errno;
+  
+  if (is_user)
+    g_free (a);
   
   if (free_attribute)
     g_free (attribute);
   
   if (free_value)
     g_free (value);
-
 
   if (res == -1)
     {
@@ -835,7 +968,8 @@ _g_local_file_info_get (const char *basename,
   get_access_rights (attribute_matcher, info, path, &statbuf, parent_info);
   
   get_selinux_context (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
-  get_xattrs (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
+  get_xattrs (path, TRUE, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
+  get_xattrs (path, FALSE, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
   
   return info;
 }
@@ -877,7 +1011,8 @@ _g_local_file_info_get_from_fd (int fd,
     }
 #endif
 
-  get_xattrs_from_fd (fd, info, matcher);
+  get_xattrs_from_fd (fd, TRUE, info, matcher);
+  get_xattrs_from_fd (fd, FALSE, info, matcher);
   
   g_file_attribute_matcher_free (matcher);
   
@@ -1199,7 +1334,9 @@ _g_local_file_info_set_attribute (char *filename,
 #endif
 
   else if (g_str_has_prefix (attribute, "xattr:") == 0)
-    return set_xattr (filename, attribute + strlen ("xattr:"), value, error);
+    return set_xattr (filename, attribute, value, error);
+  else if (g_str_has_prefix (attribute, "xattr_sys:") == 0)
+    return set_xattr (filename, attribute, value, error);
   
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 	       _("Setting attribute %s not supported"), attribute);

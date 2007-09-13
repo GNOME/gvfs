@@ -19,6 +19,10 @@ is-slow marking for e.g. thumbnailing?
 getting selinux attrs is a bit slow, it does all sort of weird ops.
 
 handle setting xattrs on local files (and list the namespace as writable)
+test xattrs
+ensure only requested attrs are ever set
+set xattr: and xattr_sys as writable namespaces
+Why does xattr:* not work, but "xattr:" work in matcher?
 
 Finish general attribute copy in gfile.c move fallback.
 Think about atomic updates of several attributes.
