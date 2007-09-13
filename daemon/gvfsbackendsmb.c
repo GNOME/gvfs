@@ -1195,9 +1195,10 @@ do_get_fs_info (GVfsBackend *backend,
   GFileInfo *info;
 
   info = g_file_info_new ();
-  
-  g_vfs_job_succeeded (G_VFS_JOB (job));
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, "cifs");
+  
+  g_vfs_job_get_fs_info_set_info (job, info);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
   g_object_unref (info);
 }
 
