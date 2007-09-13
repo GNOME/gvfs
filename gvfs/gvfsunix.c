@@ -1,4 +1,5 @@
 #include <config.h>
+#include <string.h>
 #include "gvfsunix.h"
 #include "gvfsunixuri.h"
 #include "gfileunix.h"
@@ -63,36 +64,54 @@ g_vfs_unix_get_file_for_path  (GVfs       *vfs,
   return g_file_unix_simple_new (file);
 }
 
-/* Code for handling RFC 3986 generic uris */
-
-
-
 static GFile *
 g_vfs_unix_get_file_for_uri   (GVfs       *vfs,
 			       const char *uri)
 {
-  char *path;
-  GFile *file;
+  char *base;
+  GFile *file, *wrapped;
+  GDecodedUri *decoded;
+  
+  decoded = _g_decode_uri (uri);
+  if (decoded == NULL)
+    return NULL;
 
-  path = g_filename_from_uri (uri, NULL, NULL);
-
-  if (path != NULL)
+  if (strcmp (decoded->scheme, "file") == 0)
     {
-      file = g_vfs_unix_get_file_for_path  (vfs, path);
-      g_free (path);
+      wrapped = g_vfs_unix_get_file_for_path  (vfs, decoded->path);
+      file = g_file_unix_simple_new (wrapped);
     }
   else
     {
-      file = NULL;
+      base = _g_encode_uri (decoded, TRUE);
+      file = g_file_unix_new (decoded->path, base);
+      g_free (base);
     }
-  return NULL;
+
+  _g_decoded_uri_free (decoded);
+  
+  return file;
 }
 
 static GFile *
 g_vfs_unix_parse_name (GVfs       *vfs,
 		       const char *parse_name)
 {
-  return NULL;
+  GFile *file;
+  char *path;
+  
+  if (g_path_is_absolute (parse_name))
+    {
+      path = g_filename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
+      file = g_vfs_unix_get_file_for_path  (vfs, path);
+      g_free (path);
+    }
+  else
+    {
+      file = g_vfs_unix_get_file_for_uri (vfs, parse_name);
+    }
+
+  return file;
 }
 
 static void
@@ -102,4 +121,3 @@ g_vfs_unix_vfs_iface_init (GVfsIface *iface)
   iface->get_file_for_uri = g_vfs_unix_get_file_for_uri;
   iface->parse_name = g_vfs_unix_parse_name;
 }
-

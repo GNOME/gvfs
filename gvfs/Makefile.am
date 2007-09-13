@@ -18,34 +18,46 @@ gvfs-marshal.c: gvfs-marshal.h gvfs-marshal.list $(GLIB_GENMARSHAL)
 	(echo "#include \"gvfs-marshal.h\""; \
 	 $(GLIB_GENMARSHAL) --prefix=_gvfs_marshal $(srcdir)/gvfs-marshal.list --body) > $@
 
+simple_sources = \
+	gfileenumeratorsimple.c \
+	gfileenumeratorsimple.h \
+	gfileinfosimple.c \
+	gfileinfosimple.h \
+	gfilesimple.c \
+	gfilesimple.h \
+	glocalfileinputstream.c \
+	glocalfileinputstream.h \
+	glocalfileoutputstream.c \
+	glocalfileoutputstream.h \
+	gvfssimple.c \
+	gvfssimple.h \
+	$(NULL)
+
+unix_sources = \
+	gvfsunix.c gvfsunix.h \
+	gfileunix.c gfileunix.h \
+	gfileunixsimple.c gfileunixsimple.h \
+	gvfsunixuri.c gvfsunixuri.h \
+	$(NULL)
+
 libgvfs_la_SOURCES = 	\
 	gasynchelper.c \
 	gasynchelper.h \
 	gfile.c \
 	gfileenumerator.c \
-	gfileenumeratorsimple.c \
-	gfileenumeratorsimple.h \
 	gfileinfo.c \
-	gfileinfosimple.c \
-	gfileinfosimple.h \
 	gfileinputstream.c \
 	gfileoutputstream.c \
-	gfilesimple.c \
-	gfilesimple.h \
 	ginputstream.c \
 	gioscheduler.c \
-	glocalfileinputstream.c \
-	glocalfileinputstream.h \
-	glocalfileoutputstream.c \
-	glocalfileoutputstream.h \
+	gmountoperation.c \
+	gmountoperation.h \
 	goutputstream.c \
 	gvfs.c \
 	gvfs.h \
 	gvfserror.c \
-	gvfssimple.c \
-	gvfssimple.h \
-	gmountoperation.c \
-	gmountoperation.h \
+	$(simple_sources) \
+	$(unix_sources) \
 	$(marshal_sources) \
 	$(NULL)
 
