@@ -1,0 +1,7 @@
+[Mount]
+Type=smb-network;smb-server
+Exec=@libexecdir@/gvfs-daemon-smb-browse --mount
+DBusName=org.gtk.vfs.mountpoint.smb_browse
+ObjPath=/org/gtk/vfs/mountpoint/smb_browse
+AutoMount=true
+

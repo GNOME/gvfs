@@ -56,6 +56,7 @@ get_mountspec_from_uri (GDecodedUri *uri,
 {
   GMountSpec *spec;
   char *path, *tmp;
+  const char *p;
   const char *share, *share_end;
   
   /* TODO: Share MountSpec objects between files (its refcounted) */
@@ -71,28 +72,76 @@ get_mountspec_from_uri (GDecodedUri *uri,
     }
   else if (strcmp (uri->scheme, "smb") == 0)
     {
-      if (uri->host != NULL && strlen (uri->host) > 0 &&
-	  uri->path != NULL && uri->path[0] == '/' && strlen (uri->path) > 1)
+      if (uri->host == NULL || strlen (uri->host) == 0)
 	{
-	  spec = g_mount_spec_new ("smb-share");
-	  
-	  g_mount_spec_set  (spec, "server", uri->host);
-
-	  share = uri->path + 1;
-	  share_end = strchr (share, '/');
-
-	  if (share_end != NULL)
-	    tmp = g_strndup (share, share_end - share);
-	  else
-	    tmp = g_strdup (share);
-
-	  g_mount_spec_set  (spec, "share", tmp);
-	  g_free (tmp);
-
-	  if (share_end)
-	    path = g_strdup (share_end);
-	  else
+	  /* uri form: smb:/// or smb:///$path */
+	  spec = g_mount_spec_new ("smb-network");
+	  if (uri->path == NULL || *uri->path == 0)
 	    path = g_strdup ("/");
+	  else
+	    path = g_strdup (uri->path);
+	}
+      else
+	{
+	  /* host set */
+	  p = uri->path;
+	  while (p && *p == '/')
+	    p++;
+
+	  if (p == NULL || *p == 0)
+	    {
+	      /* uri form: smb://$host/ */
+	      spec = g_mount_spec_new ("smb-server");
+	      g_mount_spec_set  (spec, "server", uri->host);
+	      path = g_strdup ("/");
+	    }
+	  else
+	    {
+	      share = p;
+	      share_end = strchr (share, '/');
+	      if (share_end == NULL)
+		share_end = share + strlen (share);
+
+	      p = share_end;
+	      
+	      while (*p == '/')
+		p++;
+
+	      if (*p == 0)
+		{
+		  /* uri form: smb://$host/$share/
+		   * Here we special case smb-server files by adding "##" to the names in the uri */
+		  if (share[0] == '#' && share[1] == '#')
+		    {
+		      spec = g_mount_spec_new ("smb-server");
+		      g_mount_spec_set  (spec, "server", uri->host);
+		      tmp = g_strndup (share+2, share_end - share);
+		      path = g_strconcat ("/", tmp, NULL);
+		      g_free (tmp);
+		    }
+		  else
+		    {
+		      spec = g_mount_spec_new ("smb-share");
+		      g_mount_spec_set  (spec, "server", uri->host);
+		      tmp = g_strndup (share, share_end - share);
+		      g_mount_spec_set  (spec, "share", tmp);
+		      g_free (tmp);
+		      path = g_strdup ("/");
+		    }
+		}
+	      else
+		{
+		  spec = g_mount_spec_new ("smb-share");
+		  
+		  g_mount_spec_set  (spec, "server", uri->host);
+
+		  tmp = g_strndup (share, share_end - share);
+		  g_mount_spec_set  (spec, "share", tmp);
+		  g_free (tmp);
+
+		  path = g_strconcat ("/", p, NULL);
+		}
+	    }
 	}
     }
 
