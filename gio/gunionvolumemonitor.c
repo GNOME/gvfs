@@ -174,26 +174,61 @@ remove_child_volume (GUnionVolumeMonitor *union_monitor,
     }
 }
 
+static GUnionDrive *
+lookup_union_drive (GUnionVolumeMonitor *union_monitor,
+		    GDrive *child_drive)
+{
+  GList *l;
+  GUnionDrive *union_drive;
+  
+  for (l = union_monitor->drives; l != NULL; l = l->next)
+    {
+      union_drive = l->data;
+      
+      if (g_union_drive_is_for_child_drive (union_drive, child_drive))
+	return union_drive;
+    }
+  return NULL;
+}
+
+
 static void
 add_child_drive (GUnionVolumeMonitor *union_monitor,
-		 GDrive *child_drive)
+		 GDrive *child_drive,
+		 GVolumeMonitor *child_monitor)
 {
-  /* TODO */
-  if (0)
-    g_signal_emit_by_name (union_monitor,
-			   "drive_conntected",
-			   child_drive);
+  GUnionDrive *union_drive;
+  
+  union_drive = g_union_drive_new (G_VOLUME_MONITOR (union_monitor), child_drive, child_monitor);
+  union_monitor->drives = g_list_prepend (union_monitor->drives,
+					  union_drive);
+  g_signal_emit_by_name (union_monitor,
+			 "drive_conntected",
+			 child_drive);
+}
+
+
+static void
+remove_union_drive (GUnionVolumeMonitor *union_monitor,
+		    GUnionDrive *union_drive)
+{
+  union_monitor->drives = g_list_remove (union_monitor->drives,
+					 union_drive);
+  g_signal_emit_by_name (union_monitor,
+			 "drive_disconnected",
+			 union_drive);
+  g_object_unref (union_drive);
 }
 
 static void
 remove_child_drive (GUnionVolumeMonitor *union_monitor,
 		    GDrive *child_drive)
 {
-  /* TODO */
-  if (0)
-    g_signal_emit_by_name (union_monitor,
-			   "drive_disconntected",
-			   child_drive);
+  GUnionDrive *union_drive;
+
+  union_drive = lookup_union_drive (union_monitor, child_drive);
+  if (union_drive)
+    remove_union_drive (union_monitor, union_drive);
 }
 
 static void
@@ -233,7 +268,7 @@ child_drive_connected (GVolumeMonitor *child_monitor,
 		       GDrive *drive,
 		       GUnionVolumeMonitor *union_monitor)
 {
-  add_child_drive (union_monitor, drive);
+  add_child_drive (union_monitor, drive, child_monitor);
 }
 
 static void
@@ -277,7 +312,7 @@ g_union_volume_monitor_add_monitor (GUnionVolumeMonitor *union_monitor,
   for (l = drives; l != NULL; l = l->next)
     {
       drive = l->data;
-      add_child_drive (union_monitor, drive);
+      add_child_drive (union_monitor, drive, volume_monitor);
       g_object_unref (drive);
     }
   g_list_free (drives);
@@ -289,6 +324,7 @@ g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
 {
   GList *l;
   GUnionVolume *union_volume;
+  GUnionDrive *union_drive;
   GVolume *volume;
   
   if (!g_list_find (union_monitor->monitors, child_monitor))
@@ -305,29 +341,33 @@ g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
 	  g_object_unref (volume);
 	}
     }
+
+  for (l = union_monitor->drives; l != NULL; l = l->next)
+    {
+      union_drive = l->data;
+      
+      if (g_union_drive_child_is_for_monitor (union_drive, child_monitor))
+	remove_union_drive (union_monitor, union_drive);
+    }
+  
 }
 
 GList *
 g_union_volume_monitor_convert_volumes (GUnionVolumeMonitor *monitor,
 					GList *child_volumes)
 {
-  GList *union_volumes, *l, *p;
+  GList *union_volumes, *l;
 
   union_volumes = 0;
   for (l = child_volumes; l != NULL; l = l->next)
     {
       GVolume *child_volume = l->data;
-      for (p = monitor->volumes; p != NULL; p = p->next)
+      GUnionVolume *union_volume = lookup_union_volume (monitor, child_volume);
+      if (union_volume)
 	{
-	  GUnionVolume *union_volume = p->data;
-
-	  if (g_union_volume_has_child_volume (union_volume, child_volume))
-	    {
-	      union_volumes = g_list_prepend (union_volumes,
-					      g_object_ref (union_volume));
-	      break;
-	    }
-
+	  union_volumes = g_list_prepend (union_volumes,
+					  g_object_ref (union_volume));
+	  break;
 	}
     }
 
@@ -338,15 +378,11 @@ GDrive *
 g_union_volume_monitor_convert_drive (GUnionVolumeMonitor *monitor,
 				      GDrive *child_drive)
 {
-  GList *p;
+  GUnionDrive *union_drive;
 
-  for (p = monitor->drives; p != NULL; p = p->next)
-    {
-      GUnionDrive *union_drive = p->data;
-      
-      if (g_union_drive_has_child_drive (union_drive, child_drive))
-	return g_object_ref (union_drive);
-    }
+  union_drive = lookup_union_drive (monitor, child_drive);
+  if (union_drive)
+    return g_object_ref (union_drive);
 
   return NULL;
 }

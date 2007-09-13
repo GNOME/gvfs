@@ -78,19 +78,16 @@ g_union_drive_new (GVolumeMonitor *union_monitor,
   return drive;
 }
 
-GDrive *
-g_union_drive_get_child_for_monitor (GUnionDrive *union_drive,
-				     GVolumeMonitor *child_monitor)
+gboolean
+g_union_drive_child_is_for_monitor (GUnionDrive    *union_drive,
+				    GVolumeMonitor *child_monitor)
 {
-  if (union_drive->child_monitor == child_monitor)
-    return g_object_ref (union_drive->child_drive);
-  
-  return NULL;
+  return (union_drive->child_monitor == child_monitor);
 }
 
 gboolean
-g_union_drive_has_child_drive (GUnionDrive *union_drive,
-			       GDrive *child_drive)
+g_union_drive_is_for_child_drive (GUnionDrive *union_drive,
+				  GDrive *child_drive)
 {
   if (union_drive->child_drive == child_drive)
     return TRUE;

@@ -25,9 +25,9 @@ GType g_union_drive_get_type (void) G_GNUC_CONST;
 GUnionDrive *g_union_drive_new                   (GVolumeMonitor *union_monitor,
 						  GDrive         *child_drive,
 						  GVolumeMonitor *child_monitor);
-gboolean     g_union_drive_has_child_drive       (GUnionDrive    *union_drive,
+gboolean     g_union_drive_is_for_child_drive    (GUnionDrive    *union_drive,
 						  GDrive         *child_drive);
-GDrive *     g_union_drive_get_child_for_monitor (GUnionDrive    *union_drive,
+gboolean     g_union_drive_child_is_for_monitor  (GUnionDrive    *union_drive,
 						  GVolumeMonitor *child_monitor);
 
 G_END_DECLS
