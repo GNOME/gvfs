@@ -71,8 +71,6 @@ g_vfs_read_stream_finalize (GObject *object)
 {
   GVfsReadStream *read_stream;
 
-  g_print ("*****g_vfs_read_stream_finalize\n");
-  
   read_stream = G_VFS_READ_STREAM (object);
 
   if (read_stream->priv->current_job)
@@ -249,7 +247,6 @@ command_read_cb (GInputStream *input_stream,
       return;
     }
 
-  g_print ("command_read_cb: %d\n", count_read);
   reader->buffer_size += count_read;
 
   if (reader->buffer_size < G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE)
