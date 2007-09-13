@@ -603,7 +603,8 @@ append_mountpoint_cb (gpointer       key,
 		      gpointer       user_data)
 {
   DBusMessageIter *array_iter = user_data;
-  char *mountpoint = key;
+  GVfsBackend *backend = value;
+  char *mountpoint = backend->mountpoint;
 
   if (!dbus_message_iter_append_basic (array_iter,
 				       DBUS_TYPE_STRING, &mountpoint))
