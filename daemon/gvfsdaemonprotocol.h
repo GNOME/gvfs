@@ -14,13 +14,15 @@ G_BEGIN_DECLS
 
 typedef struct {
   guint32 command;
+  guint32 seq_nr;
   guint32 arg;
 } GVfsDaemonSocketProtocolCommand;
 
-#define G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE 8
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SIZE 12
 
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_READ 0
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_SEEK 1
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_COMMAND_CANCEL 2
 
 /*
 read, readahead reply:
@@ -35,14 +37,16 @@ type, code, size, data (size bytes, 2 strings: domain, message)
 
 typedef struct {
   guint32 type;
+  guint32 seq_nr;
   guint32 arg1;
   guint32 arg2;
 } GVfsDaemonSocketProtocolReply;
 
-#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE 12
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE 16
 
-#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA  0
-#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR 1
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA     0
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR    1
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS 2
 
 G_END_DECLS
 
