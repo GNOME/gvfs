@@ -56,7 +56,7 @@ typedef void (*ReplyCallback) (GVfsBackendSftp *backend,
 typedef struct {
   guchar *data;
   gsize size;
-} CommandBuffer;
+} DataBuffer;
 
 typedef struct {
   ReplyCallback callback;
@@ -99,10 +99,10 @@ struct _GVfsBackendSftp
 G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
 
 static void
-command_buffer_free (CommandBuffer *buffer)
+data_buffer_free (DataBuffer *buffer)
 {
   g_free (buffer->data);
-  g_slice_free (CommandBuffer, buffer);
+  g_slice_free (DataBuffer, buffer);
 }
 
 static void
@@ -526,6 +526,16 @@ read_string (GDataInputStream *stream, gsize *len_out)
   return data;
 }
 
+static DataBuffer
+read_data_buffer (GDataInputStream *stream)
+{
+  DataBuffer *buffer;
+
+  buffer = g_slice_new (DataBuffer);
+  buffer->data = read_string (stream, &buffer->size);
+  return buffer;
+}
+
 static gboolean
 handle_login (GVfsBackend *backend,
               GMountSource *mount_source,
@@ -772,7 +782,7 @@ send_command_data (GObject *source_object,
 {
   GVfsBackendSftp *backend = user_data;
   gssize res;
-  CommandBuffer *buffer;
+  DataBuffer *buffer;
 
   res = g_output_stream_write_finish (G_OUTPUT_STREAM (source_object), result, NULL);
 
@@ -799,7 +809,7 @@ send_command_data (GObject *source_object,
       return;
     }
 
-  command_buffer_free (buffer);
+  data_buffer_free (buffer);
 
   backend->command_queue = g_list_delete_link (backend->command_queue, backend->command_queue);
 
@@ -810,7 +820,7 @@ send_command_data (GObject *source_object,
 static void
 send_command (GVfsBackendSftp *backend)
 {
-  CommandBuffer *buffer;
+  DataBuffer *buffer;
 
   buffer = backend->command_queue->data;
   
@@ -848,9 +858,9 @@ queue_command_stream_and_free (GVfsBackendSftp *backend,
 {
   GByteArray *array;
   gboolean first;
-  CommandBuffer *buffer;
+  DataBuffer *buffer;
 
-  buffer = g_slice_new (CommandBuffer);
+  buffer = g_slice_new (DataBuffer);
 
   array = get_data_from_command_stream (command_stream, FALSE);
   
@@ -1072,6 +1082,28 @@ result_from_status (GVfsJob *job,
   g_free (error.message);
 }
 
+static gboolean
+try_enumerate (GVfsBackend *backend,
+               GVfsJobEnumerate *job,
+               const char *filename,
+               GFileAttributeMatcher *attribute_matcher,
+               GFileGetInfoFlags flags)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
+  command = new_command_stream (op_backend,
+                                SSH_FXP_OPENDIR,
+                                &id);
+  put_string (command, filename);
+  
+  queue_command_stream_and_free (op_backend, command, id, open_dir_reply, G_VFS_JOB (job));
+
+  return TRUE;
+}
+
 static void
 get_info_reply (GVfsBackendSftp *backend,
                 int reply_type,
@@ -1079,7 +1111,6 @@ get_info_reply (GVfsBackendSftp *backend,
                 guint32 len,
                 GVfsJob *job)
 {
-  g_print ("get_info_reply, %d\n", len);
   guint32 flags;
   GFileInfo *info;
   GFileType type;
@@ -1175,7 +1206,6 @@ get_info_is_link_reply (GVfsBackendSftp *backend,
                         guint32 len,
                         GVfsJob *job)
 {
-  g_print ("get_info_is_link_reply, %d\n", len);
   guint32 flags;
   GFileInfo *info;
   GFileType type;
