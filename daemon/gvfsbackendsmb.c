@@ -636,7 +636,6 @@ typedef struct {
 static void
 smb_write_handle_free (SmbWriteHandle *handle)
 {
-  g_print ("smb_write_handle_free %p\n", handle);
   g_free (handle->uri);
   g_free (handle->tmp_uri);
   g_free (handle->backup_uri);
@@ -653,8 +652,6 @@ do_create (GVfsBackend *backend,
   SMBCFILE *file;
   SmbWriteHandle *handle;
 
-  g_print ("do_create\n");
-  
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   file = op_backend->smb_context->open (op_backend->smb_context, uri,
 					O_CREAT|O_WRONLY|O_EXCL, 0666);
@@ -666,7 +663,6 @@ do_create (GVfsBackend *backend,
     {
       handle = g_new0 (SmbWriteHandle, 1);
       handle->file = file;
-      g_print ("do_create - handle = %p\n", handle);
 
       g_vfs_job_open_for_write_set_can_seek (job, TRUE);
       g_vfs_job_open_for_write_set_handle (job, handle);
@@ -756,7 +752,6 @@ open_tmpfile (GVfsBackendSmb *backend,
   do {
     random_chars (filename + 4, 4);
     tmp_uri = g_strconcat (dir_uri, filename, NULL);
-    g_print ("Random uri: %s\n", tmp_uri);
 
     file = backend->smb_context->open (backend->smb_context, tmp_uri,
 				       O_CREAT|O_WRONLY|O_EXCL, 0666);
@@ -971,8 +966,6 @@ do_write (GVfsBackend *backend,
   SmbWriteHandle *handle = _handle;
   ssize_t res;
 
-  g_print ("do_write, handle: %p\n", handle);
-  
   res = op_backend->smb_context->write (op_backend->smb_context, handle->file,
 					buffer, buffer_size);
   if (res == -1)
@@ -1035,12 +1028,18 @@ do_close_write (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   SmbWriteHandle *handle = _handle;
   ssize_t res;
-  gboolean closed;
 
-  g_print ("do_close_write %p\n", handle);
+  res = op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
+
+  if (res == -1)
+    {
+      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+      
+      if (handle->tmp_uri)
+	op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
+      goto out;
+    }
   
-  closed = FALSE;
-
   if (handle->tmp_uri)
     {
       if (handle->backup_uri)
@@ -1049,6 +1048,7 @@ do_close_write (GVfsBackend *backend,
 						 op_backend->smb_context, handle->backup_uri);
 	  if (res ==  -1)
 	    {
+	      op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
 	      g_vfs_job_failed (G_VFS_JOB (job),
 				G_VFS_ERROR, G_VFS_ERROR_CANT_CREATE_BACKUP,
 				_("Backup file creation failed: %d"), errno);
@@ -1068,17 +1068,9 @@ do_close_write (GVfsBackend *backend,
 	}
     }
   
-  closed = TRUE;
-  res = op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
-  if (res == -1)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
-  else
-    g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 
  out:
-  if (!closed)
-    op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
-  
   smb_write_handle_free (handle);  
 }
 
