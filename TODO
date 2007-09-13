@@ -20,8 +20,6 @@ getting selinux attrs is a bit slow, it does all sort of weird ops.
 
 handle setting xattrs on local files (and list the namespace as writable)
 
-handle setting mtime, ctime, etc for local files
-
 Finish general attribute copy in gfile.c move fallback.
 Think about atomic updates of several attributes.
 gedit uses attr_copy_fd in libattr to copy xattrs
