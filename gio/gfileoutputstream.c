@@ -140,7 +140,10 @@ g_file_output_stream_get_etag (GFileOutputStream  *stream,
   class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
   if (class->get_etag)
     etag = class->get_etag (stream, cancellable, error);
-  
+  else
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		 _("etag not supported on stream"));
+ 
   if (cancellable)
     g_pop_current_cancellable (cancellable);
   
