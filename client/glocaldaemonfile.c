@@ -100,12 +100,12 @@ g_local_daemon_file_copy (GFile *file)
 
 
 static GFile *
-g_local_daemon_file_get_child (GFile *file,
-			       const char *name)
+g_local_daemon_file_resolve_relative (GFile *file,
+				      const char *rel)
 {
   GFile *child;
 
-  child = g_file_get_child (G_LOCAL_DAEMON_FILE (file)->wrapped, name);
+  child = g_file_resolve_relative (G_LOCAL_DAEMON_FILE (file)->wrapped, rel);
   if (child == NULL)
     return NULL;
   
@@ -187,7 +187,7 @@ g_local_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_uri = g_local_daemon_file_get_uri;
   iface->get_parse_name = g_local_daemon_file_get_parse_name;
   iface->get_parent = g_local_daemon_file_get_parent;
-  iface->get_child = g_local_daemon_file_get_child;
+  iface->resolve_relative = g_local_daemon_file_resolve_relative;
   iface->enumerate_children = g_local_daemon_file_enumerate_children;
   iface->get_info = g_local_daemon_file_get_info;
   iface->read = g_local_daemon_file_read;

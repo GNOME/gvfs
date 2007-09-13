@@ -199,14 +199,17 @@ g_daemon_file_copy (GFile *file)
 
 
 static GFile *
-g_daemon_file_get_child (GFile *file,
-			 const char *name)
+g_daemon_file_resolve_relative (GFile *file,
+				const char *relative_path)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   char *path;
   GFile *child;
 
-  path = g_build_filename (daemon_file->path, name, NULL);
+  if (*relative_path == '/')
+    return g_daemon_file_new (daemon_file->mount_spec, relative_path);
+  
+  path = g_build_path ("/", daemon_file->path, relative_path, NULL);
   child = g_daemon_file_new (daemon_file->mount_spec, path);
   g_free (path);
   
@@ -852,7 +855,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_uri = g_daemon_file_get_uri;
   iface->get_parse_name = g_daemon_file_get_parse_name;
   iface->get_parent = g_daemon_file_get_parent;
-  iface->get_child = g_daemon_file_get_child;
+  iface->resolve_relative = g_daemon_file_resolve_relative;
   iface->enumerate_children = g_daemon_file_enumerate_children;
   iface->get_info = g_daemon_file_get_info;
   iface->read = g_daemon_file_read;

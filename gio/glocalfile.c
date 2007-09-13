@@ -271,15 +271,17 @@ g_local_file_copy (GFile *file)
 
 
 static GFile *
-g_local_file_get_child (GFile *file,
-			const char *name)
+g_local_file_resolve_relative (GFile *file,
+			       const char *relative_path)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
   char *filename;
   GFile *child;
 
-  filename = g_build_filename (local->filename, name, NULL);
-
+  if (g_path_is_absolute (relative_path))
+    return g_local_file_new (relative_path);
+  
+  filename = g_build_filename (local->filename, relative_path, NULL);
   child = g_local_file_new (filename);
   g_free (filename);
   
@@ -403,7 +405,7 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->get_uri = g_local_file_get_uri;
   iface->get_parse_name = g_local_file_get_parse_name;
   iface->get_parent = g_local_file_get_parent;
-  iface->get_child = g_local_file_get_child;
+  iface->resolve_relative = g_local_file_resolve_relative;
   iface->enumerate_children = g_local_file_enumerate_children;
   iface->get_info = g_local_file_get_info;
   iface->read = g_local_file_read;

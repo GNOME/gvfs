@@ -40,8 +40,8 @@ struct _GFileIface
   char *              (*get_uri)            (GFile                *file);
   char *              (*get_parse_name)     (GFile                *file);
   GFile *             (*get_parent)         (GFile                *file);
-  GFile *             (*get_child)          (GFile                *file,
-					     const char           *name);
+  GFile *             (*resolve_relative)   (GFile                *file,
+					     const char           *relative_path);
   GFileEnumerator *   (*enumerate_children) (GFile                *file,
 					     const char           *attributes,
 					     GFileGetInfoFlags     flags,
@@ -94,6 +94,8 @@ char *             g_file_get_parse_name     (GFile                  *file);
 GFile *            g_file_get_parent         (GFile                  *file);
 GFile *            g_file_get_child          (GFile                  *file,
 					      const char             *name);
+GFile *            g_file_resolve_relative   (GFile                  *file,
+					      const char             *relative_path);
 GFileEnumerator *  g_file_enumerate_children (GFile                  *file,
 					      const char             *attributes,
 					      GFileGetInfoFlags       flags,

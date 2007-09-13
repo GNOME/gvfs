@@ -128,11 +128,18 @@ GFile *
 g_file_get_child (GFile *file,
 		  const char *name)
 {
+  return g_file_resolve_relative (file, name);
+}
+
+GFile *
+g_file_resolve_relative (GFile *file,
+			 const char *relative_path)
+{
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->get_child) (file, name);
+  return (* iface->resolve_relative) (file, relative_path);
 }
 
 GFileEnumerator *
