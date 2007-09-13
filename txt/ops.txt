@@ -1,0 +1,137 @@
+
+
+type: File, Folder, Symlink, Shortcut, Mountable, special (fifo, socket, chardec, blockdev)
+flags: hidden, 	
+GFileInfo {
+   type get_type()
+   char *get_name()
+   char *get_display_name()
+   char *get_icon() /* string? what about win32, remote icons etc */
+   
+   gint64 get_file_size()
+   char *get_mime_type()
+   char *get_link_target()
+   can_read()/write()/delete()/rename()/maybe: move()/copy()
+   flags get_flags()
+   time_t get_modification_time()
+   gboolean get_unix_stat ()
+   char *get_attribute()
+   char **get_attributes(char *namespace)
+   char **get_all_attributes() /* form namespace:attrname -> string */
+}	
+
+GFSInfo {
+   char *get_fs_type()
+   gint64 get_free_space()
+   gint64 get_total_space()
+}
+
+GFile *g_file_for_path (char *path)
+GFile *g_file_for_uri (char *uri)
+GFile *g_file_parse_display_name (char *display_name)
+
+GFile {
+ char *get_path()
+ is_native() => is_file:///
+ 
+ char *get_uri ();
+ char *get_absolute_display_name ()
+ 
+ set_keep_open(boolean keep_open)
+   
+ GFile *get_parent ()
+ GFile *get_child (char *name)
+ GFileEnumerator *enumerate_children(flags, attributes...)
+ GFileInfo *get_info (flags, attributes...)
+ 
+ void reload()
+ GInputStream *read()
+
+ GOutputStream *append_to() /* optional (not on webdav) */
+ GOutputStream *create()
+ GSaveStream *replace(mtime, backup_name, )
+/* permissions are all set minus umask, except replace which
+   saves old permissions */
+
+/* ?? */
+ GFile *resolve_symlink(char *symlink_target);
+   
+/* output ops */
+ write/save
+ rename
+ move
+ copy
+ delete
+ mkdir
+ rmkdir
+ display name -> filename (for new files)
+ set attrs
+
+ /* other ops: */
+ monitor(flags) + signals
+ mount/unmount
+ list volumes
+
+ Maybe:
+ GFile *new_from_uri(path, flags) (file:/// uris)
+
+}
+
+
+names:
+  URIs == raw filename (no encoding), all escaped
+  We generate display absolute paths as filenames if possible, otherwise
+  as IRIs. This means we can display nice URIs for native utf8 backends
+  and filenames. However, URIs for non-utf8 shares will look bad. If we know
+  the encoding we can still get nice non-absolut display names though.
+  
+  In client we store names as mountpoint + non-escaped no-encoding string.
+  Non-uri display name handling done in daemon
+  
+GStatable iface for fstat() support
+GSaveStream, with get_final_file_info()
+
+open for writing:
+
+append vs truncate
+fail on existing or replace
+
+mtime match
+mtime return
+backup (suffix+prefix)
+create filename from display name
+unique name
+keep inode or be atomic?
+
+filename_for_display_name()
+write_append() /* optional (not on webdav) */
+write_new()
+write_replace()
+
+
+
+
+ftp supports:
+ overwrite
+ append
+ generate unique name
+ 
+http+webdav supports:
+  overwrite
+  append in recent versions
+  get mtime, length, mimetype, atime on read open
+  
+
+
+
+
+async thread work:
+
+function to run in thread
+data to pass to thread
+cancel identifier
+pass in cancel func + data
+way for function to communicate with mainloop (of specific context)
+does mainloop notifiers block on ack?
+
+  

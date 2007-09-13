@@ -1,0 +1,142 @@
+Local filenames (in utf8 mode)
+1) standard: /etc/passwd
+2) utf8 and spaces: "/tmp/a åäö.txt" (encoding==utf8)
+3) latin-1 and spaces: "/tmp/a åäö.txt" (encoding==iso8859-1)
+4) filename without encoding: "/tmp/bad:\001\010\011\012\013" (as a C string)
+5) mountpoint: /mnt/cdrom (cd has title "CD Title")
+
+Ftp mount to ftp.gnome.org
+(where filenames are stored as utf8, this is detected by using
+ ftp protocol extensions (there is an rfc) or by having the user
+ specify the encoding at mount time)
+
+6) normal dir: /pub/sources
+7) valid utf8 name: /dir/a file öää.txt
+8) latin-1 name: /dir/a file öää.txt
+
+Ftp mount to ftp.gnome.org (with filenames in latin-1)
+9) latin-1 name: /dir/a file öää.txt
+
+backend that stores display name separate from real name. Examples
+could be a flickr backend, a file backend that handles desktop files,
+or a virtual location like computer:// (which is implemented using
+virtual desktop files atm).
+
+10) /tmp/foo.desktop (with Name[en]="Display Name")
+
+special cases:
+ftp names relative to login dir
+
+Places where display filenames (i.e utf-8 strings) are used:
+
+A) Absolute filename, for editing (nautilus text entry, file selector entry)
+B) Semi-Absolute filename, for display (nautilus window title)
+C) Relative file name, for display (in nautilus/file selector icon/list view)
+D) Relative file name, for editing (rename in nautilus)
+E) Relative file name, for creating absolute name (filename completion for a)
+   This needs to know the exact form of the parent (i.e. it differs for filename vs uri).
+   I won't list this below as its always the same as A from the last slash to the end.
+
+This is how these work with gnome-vfs uris:
+
+   A                                                     B                             C                             D        
+1) file:///etc/passwd                                    passwd                        passwd                        passwd   
+2) file:///tmp/a%20%C3%B6%C3%A4%C3%A4.txt                a åäö.txt                     a åäö.txt                     a åäö.txt
+3) file:///tmp/a%20%E5%E4%F6.txt                         a ???.txt                     a ???.txt (invalid unicode)   a ???.txt
+4) file:///tmp/bad%3A%01%08%09%0A%0B                     bad:?????                     bad:????? (invalid unicode)   bad:?????
+5) file:///mnt/cdrom                                     CD Title (cdrom)              CD Title (cdrom)              CD Title
+6) ftp://ftp.gnome.org/pub/sources                       sources on ftp.gnome.org      sources                       sources
+7) ftp://ftp.gnome.org/dir/a%20%C3%B6%C3%A4%C3%A4.txt    a åäö.txt on ftp.gnome.org    a åäö.txt                     a åäö.txt
+8) ftp://ftp.gnome.org/dir/a%20%E5%E4%F6.txt             a ???.txt on ftp.gnome.org    a ???.txt (invalid unicode)   a ???.txt
+9) ftp://ftp.gnome.org/dir/a%20%E5%E4%F6.txt             a åäö.txt on ftp.gnome.org    a åäö.txt                     a åäö.txt
+10)file:///tmp/foo.desktop                               Display Name                  Display Name                  Display Name
+
+The stuff in column A is pretty insane. It works fine as an identifier
+for the computer to use, but nobody would want to have to type that in
+or look at that all the time. That is why Nautilus also allows
+entering some filenames as absolute unix pathnames, although not all
+filenames can be specified this way. If used when possible the column
+looks like this:
+
+   A
+1) /etc/passwd
+2) /tmp/a åäö.txt
+3) file:///tmp/a%20%E5%E4%F6.txt
+4) file:///tmp/bad%3A%01%08%09%0A%0B
+5) /mnt/cdrom
+6) ftp://ftp.gnome.org/pub/sources
+7) ftp://ftp.gnome.org/dir/a%20%C3%B6%C3%A4%C3%A4.txt
+8) ftp://ftp.gnome.org/dir/a%20%E5%E4%F6.txt
+9) ftp://ftp.gnome.org/dir/a%20%E5%E4%F6.txt
+10)/tmp/foo.desktop
+
+As we see this helps for most normal local paths, but it becomes
+problematic when the filenames are in the wrong encoding. For
+non-local files it doesn't help at all. We still have to look at these
+horrible escapes, even when we know the encoding of the filename.
+
+The examples 7-9 in this version shows the problem with URIs. Suppose
+we allowed an invalid URI like "ftp://ftp.gnome.org/dir/a åäö.txt"
+(utf8-encoded string). Given the state inherent in the mountpoint we
+know what encoding is used for the ftp server, so if someone types it
+in we know which file they mean. However, suppose someone pastes a URI
+like that into firefox, or mails it to someone, now we can't
+reconstruct the real valid URI anymore. If you drag and drop it
+however, the code can send the real valid uri so that firefox can load
+it correctly.
+
+So, this introduces two kinds of of URIs that are "mostly similar" but
+breaks in many nonobvious cases. This is very unfortunate, imho not
+acceptable. I think its ok to accept a URI typed in like
+"ftp://ftp.gnome.org/dir/a åäö.txt" and convert it to the right uri,
+but its not right to display such a uri in the nautilus location bar,
+as that can result in that invalid uri getting into other places.
+
+Since I dislike showing invalid URIs in the UI I think it makes sense
+to create a new absolute pathname display and entry format. Ideally
+such a system should allow any ascii or utf8 local filename to be
+represented as itself. Furthermore it would allow input of URIs, but
+immediately convert them to the display format (similar to how
+inputing a file:// uri in nautilus displays as a normal filename).
+
+One solution would be to use some other prefix than / for
+non-local files, and to use some form of escaping only for non-utf8
+chars and non-printables. Here is an example:
+
+   A
+1) /etc/passwd
+2) /tmp/a åäö.txt
+3) /tmp/a \xE5\xE4\xF6.txt
+4) /tmp/bad:\x01\x08\x09\x0A\x0B
+5) /mnt/cdrom
+6) :ftp:ftp.gnome.org/pub/sources
+7) :ftp:ftp.gnome.org/dir/a åäö.txt
+8) :ftp:ftp.gnome.org/dir/a \xE5\xE4\xF6.txt
+9) :ftp:ftp.gnome.org/dir/a åäö.txt
+10)/tmp/foo.desktop
+
+Under the hood this would use proper, valid escaped URIs. However, we
+would display things in the UI that made some sense to users, only
+falling back to escaping in the last possible case.
+
+The API could look something like:
+
+GFile *g_file_new_from_filename (char *filename);
+GFile *g_file_new_from_uri (char *uri);
+GFile *g_file_parse_display_name (char *display_name);
+
+Another approach (mentioned by Jürg Billeter on irc yesterday) is to
+move from a pure textual representation of the full uri to a more
+structured UI. For example the ftp://ftp.gnome.org/ part of the URI
+could be converted to a single item in the entry looking like
+[#ftp.gnome.org] (where # is an ftp icon). Then the rest of the entry
+would edit just the path on the ftp server, as a local filename. The
+disadvantage here is that its a bit harder to know how to type in a
+full pathname including what method to use and what server (you'd type
+in a URI). This isn't necessarily a huge problem if you rarely type in
+remote URIs (instead you can follow links, browse the network, add
+favourites, etc).
+
+I don't know how hard this is to do from a Gtk+ perspective
+though. Its somewhat similar to what the evolution address entry does.
+
