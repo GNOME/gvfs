@@ -109,8 +109,11 @@ G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
 static void
 data_buffer_free (DataBuffer *buffer)
 {
-  g_free (buffer->data);
-  g_slice_free (DataBuffer, buffer);
+  if (buffer)
+    {
+      g_free (buffer->data);
+      g_slice_free (DataBuffer, buffer);
+    }
 }
 
 static void
@@ -1267,7 +1270,17 @@ parse_attributes (GVfsBackendSftp *backend,
     }
 }
                   
+typedef struct {
+  DataBuffer *handle;
+} ReadDirData;
 
+static
+void
+read_dir_data_free (ReadDirData *data)
+{
+  data_buffer_free (data->handle);
+  g_slice_free (ReadDirData, data);
+}
 
 static void
 read_dir_reply (GVfsBackendSftp *backend,
@@ -1279,19 +1292,19 @@ read_dir_reply (GVfsBackendSftp *backend,
   guint32 count;
   int i;
   GList *infos;
+  guint32 id;
+  GDataOutputStream *command;
+  ReadDirData *data;
+
+  data = job->backend_data;
 
   g_print ("read_dir_reply %d\n", reply_type);
-  
-  if (reply_type == SSH_FXP_STATUS)
-    {
-      result_from_status (job, reply);
-      return;
-    }
 
   if (reply_type != SSH_FXP_NAME)
     {
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Invalid reply recieved"));
+      /* Ignore all error, including the expected END OF FILE.
+       * Real errors are expected in open_dir anyway */
+      g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
       return;
     }
 
@@ -1313,7 +1326,8 @@ read_dir_reply (GVfsBackendSftp *backend,
       g_free (longname);
       
       parse_attributes (backend, info, reply);
-      if (strcmp (".", name) == 0)
+      if (strcmp (".", name) == 0 ||
+          strcmp ("..", name) == 0)
         g_object_unref (info);
       else
         infos = g_list_prepend (infos, info);
@@ -1325,9 +1339,11 @@ read_dir_reply (GVfsBackendSftp *backend,
   g_list_foreach (infos, (GFunc)g_object_unref, NULL);
   g_list_free (infos);
 
-  
-  
-  g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
+  command = new_command_stream (backend,
+                                SSH_FXP_READDIR,
+                                &id);
+  put_data_buffer (command, data->handle);
+  queue_command_stream_and_free (backend, command, id, read_dir_reply, G_VFS_JOB (job));
 }
 
 static void
@@ -1338,11 +1354,13 @@ open_dir_reply (GVfsBackendSftp *backend,
                 GVfsJob *job)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  DataBuffer *handle;
   guint32 id;
   GDataOutputStream *command;
+  ReadDirData *data;
 
   g_print ("open_dir_reply %d\n", reply_type);
+
+  data = job->backend_data;
   
   if (reply_type == SSH_FXP_STATUS)
     {
@@ -1357,12 +1375,12 @@ open_dir_reply (GVfsBackendSftp *backend,
       return;
     }
 
-  handle = read_data_buffer (reply);
+  data->handle = read_data_buffer (reply);
   
   command = new_command_stream (op_backend,
                                 SSH_FXP_READDIR,
                                 &id);
-  put_data_buffer (command, handle);
+  put_data_buffer (command, data->handle);
   
   queue_command_stream_and_free (op_backend, command, id, read_dir_reply, G_VFS_JOB (job));
 }
@@ -1377,8 +1395,11 @@ try_enumerate (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
   GDataOutputStream *command;
+  ReadDirData *data;
 
-  G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
+  data = g_slice_new0 (ReadDirData);
+
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), data, (GDestroyNotify)read_dir_data_free);
   command = new_command_stream (op_backend,
                                 SSH_FXP_OPENDIR,
                                 &id);
