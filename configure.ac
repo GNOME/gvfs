@@ -202,6 +202,8 @@ fi
 AC_SUBST(FUSE_LIBS)
 AC_SUBST(FUSE_CFLAGS)
 
+AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
+
 dnl ==========================================================================
 dnl Samba 3.0
 
@@ -335,6 +337,7 @@ gio/fam/Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
+fuse/Makefile
 programs/Makefile
 po/Makefile.in
 gio-standalone.pc

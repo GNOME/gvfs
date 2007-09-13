@@ -16,6 +16,10 @@ SUBDIRS = \
 	programs \
 	$(NULL)
 
+if USE_FUSE
+SUBDIRS += fuse
+endif
+
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 pkgconfigdir = $(libdir)/pkgconfig
