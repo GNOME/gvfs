@@ -21,8 +21,6 @@ Add async opens to GFile.
 
 implement readahead in GVFSReadStream, time difference
 
-implement Async i/o for GFileInputStreamDaemon
-
 implement get_file_info for GFileInputStreamDaemon
 
 implement daemon write stream, maybe break out common parts of gvfsreadstream to gvfsjobstream
