@@ -190,7 +190,7 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
   dbus_bus_add_match (conn,
 		      "sender='org.freedesktop.DBus',"
 		      "interface='org.freedesktop.DBus',"
-		      "member='NameOwnerChanged'",
+		      "member='NameLost'",
 		      &error);
   if (dbus_error_is_set (&error))
     {
@@ -797,27 +797,17 @@ daemon_message_func (DBusConnection *conn,
   RegisteredPath *registered_path;
   const char *path;
 
-  if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
+  if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameLost"))
     {
-      char *name, *from, *to;
+      char *name;
       if (dbus_message_get_args (message, NULL,
 				 DBUS_TYPE_STRING, &name,
-				 DBUS_TYPE_STRING, &from,
-				 DBUS_TYPE_STRING, &to,
-				 DBUS_TYPE_INVALID))
+				 DBUS_TYPE_INVALID) &&
+	  strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0)
 	{
-	  const char *my_name = dbus_bus_get_unique_name (conn);
-
-	  g_print ("NameOwnerChanged %s %s->%s (my name: %s)\n", name, from, to, my_name);
-
-	  /* TODO: We should use NameLost here */
-	  if (strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0)
-	    {
-	      /* Someone else got the name (i.e. someone used --replace), exit */
-	      if (daemon->priv->main_daemon &&
-		  strcmp (to, my_name) != 0)
-		exit (1);
-	    }
+	  /* Someone else got the name (i.e. someone used --replace), exit */
+	  if (daemon->priv->main_daemon)
+	    exit (1);
 	}
     }
   
