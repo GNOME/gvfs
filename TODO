@@ -10,19 +10,27 @@ Implement the rest of the mountable GFile ops
 
 Test g_file_replace_contents_async
 
-getting selinux attrs is a bit slow, it does all sort of weird ops.
-
 Add filter streams: data, charset conversion, etc
 
 implement seeks in local streams
 
 is-slow marking for e.g. thumbnailing?
 
+getting selinux attrs is a bit slow, it does all sort of weird ops.
+
 handle setting xattrs on local files (and list the namespace as writable)
 Split user.* and system.* into two namespaces?
 handle non-ascii/utf8 xattr names by escaping
 
 handle setting mtime, ctime, etc for local files
+
+Finish general attribute copy in gfile.c move fallback.
+Think about atomic updates of several attributes.
+gedit uses attr_copy_fd in libattr to copy xattrs
+handle attributes in atomic save backup copy
+GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
+
+Set owner:user, owner:group for local files
 
 HAL implementation of VolumeMonitor
 
@@ -36,15 +44,7 @@ Add virtual file monitor event to support inotify WRITE_CLOSE
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
-Finish general attribute copy in gfile.c move fallback.
-Think about atomic updates of several attributes.
-gedit uses attr_copy_fd in libattr to copy xattrs
-handle attributes in atomic save backup copy
-GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
-
 Make copy handle things like symlinks
-
-Set owner:user, owner:group for local files
 
 gvfs:
 ====
