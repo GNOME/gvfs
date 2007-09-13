@@ -307,6 +307,7 @@ _g_error_from_dbus_message (DBusMessage *message, GError **error)
       
       g_set_error (error, domain, code, str);
     }
+  /* TODO: Special case other types, like DBUS_ERROR_NO_MEMORY etc? */
   else
     {
       m = g_strdup_printf ("DBus error %s: %s", name, str);
