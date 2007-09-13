@@ -252,20 +252,20 @@ backend_dbus_handler (DBusConnection  *connection,
   job = NULL;
   
   if (dbus_message_is_method_call (message,
-				   G_VFS_DBUS_MOUNTPOINT_INTERFACE,
-				   G_VFS_DBUS_OP_OPEN_FOR_READ))
+				   G_VFS_DBUS_MOUNT_INTERFACE,
+				   G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ))
     job = g_vfs_job_open_for_read_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
-					G_VFS_DBUS_OP_GET_INFO))
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_GET_INFO))
     job = g_vfs_job_get_info_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
-					G_VFS_DBUS_OP_ENUMERATE))
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_ENUMERATE))
     job = g_vfs_job_enumerate_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
-					G_VFS_DBUS_MOUNTPOINT_INTERFACE,
-					G_VFS_DBUS_OP_OPEN_FOR_WRITE))
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE))
     job = g_vfs_job_open_for_write_new (connection, message, backend);
 
   if (job)

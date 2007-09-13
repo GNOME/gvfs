@@ -116,7 +116,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
   message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
 					  job->object_path,
 					  G_VFS_DBUS_ENUMERATOR_INTERFACE,
-					  G_VFS_DBUS_ENUMERATOR_GOT_INFO);
+					  G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO);
   dbus_message_set_no_reply (message, TRUE);
 
   dbus_message_iter_init_append (message, &iter);
@@ -160,7 +160,7 @@ g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
   message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
 					  job->object_path,
 					  G_VFS_DBUS_ENUMERATOR_INTERFACE,
-					  G_VFS_DBUS_ENUMERATOR_DONE);
+					  G_VFS_DBUS_ENUMERATOR_OP_DONE);
   dbus_message_set_no_reply (message, TRUE);
 
   dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),

@@ -5,31 +5,27 @@
 
 G_BEGIN_DECLS
 
+/* The well known name of the main daemon */
 #define G_VFS_DBUS_DAEMON_NAME "org.gtk.vfs.Daemon"
 
-#define G_VFS_DBUS_MOUNTTRACKER_INTERFACE "org.gtk.gvfs.MountTracker"
+/* The mount tracking interface in the main daemon */
+#define G_VFS_DBUS_MOUNTTRACKER_INTERFACE "org.gtk.vfs.MountTracker"
 #define G_VFS_DBUS_MOUNTTRACKER_PATH "/org/gtk/vfs/mounttracker"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT "lookupMount"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION "mountLocation"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS "listMounts"
+#define G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED "mounted"
+#define G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED "unmounted"
 
-#define G_VFS_DBUS_MOUNTPOINT_INTERFACE "org.gtk.vfs.Mountpoint"
-#define G_VFS_DBUS_ANNOUNCE_MOUNTPOINT "AnnounceMountpoint"
-#define G_VFS_DBUS_OP_OPEN_FOR_READ "OpenForRead"
-#define G_VFS_DBUS_OP_OPEN_FOR_WRITE "OpenForWrite"
-#define G_VFS_DBUS_OP_GET_INFO "GetInfo"
-#define G_VFS_DBUS_OP_ENUMERATE "Enumerate"
-
-#define G_VFS_DBUS_ENUMERATOR_INTERFACE "org.gtk.vfs.Enumerator"
-#define G_VFS_DBUS_ENUMERATOR_DONE "Done"
-#define G_VFS_DBUS_ENUMERATOR_GOT_INFO "GotInfo"
-
-#define G_VFS_DBUS_MOUNTPOINT_TRACKER_INTERFACE "org.gtk.vfs.MountpointTracker"
-#define G_VFS_DBUS_MOUNTPOINT_TRACKER_PATH "/org/gtk/vfs/MountpointTracker"
-#define G_VFS_DBUS_LIST_MOUNT_POINTS "ListMountpoints"
+#define G_VFS_DBUS_MOUNT_INTERFACE "org.gtk.vfs.Mount"
+#define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ "OpenForRead"
+#define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE "OpenForWrite"
+#define G_VFS_DBUS_MOUNT_OP_GET_INFO "GetInfo"
+#define G_VFS_DBUS_MOUNT_OP_ENUMERATE "Enumerate"
 
 #define G_VFS_DBUS_MOUNTABLE_INTERFACE "org.gtk.vfs.Mountable"
 #define G_VFS_DBUS_MOUNTABLE_PATH "/org/gtk/vfs/mountable"
+#define G_VFS_DBUS_MOUNTABLE_OP_MOUNT "mount"
 
 #define G_VFS_DBUS_ERROR_SOCKET_FAILED "org.gtk.vfs.Error.SocketFailed"
 
@@ -42,6 +38,11 @@ G_BEGIN_DECLS
 
 #define G_VFS_DBUS_SPAWNER_INTERFACE "org.gtk.vfs.Spawner"
 #define G_VFS_DBUS_OP_SPAWNED "Spawned"
+
+/* Implemented by client side for a file enumerator */
+#define G_VFS_DBUS_ENUMERATOR_INTERFACE "org.gtk.vfs.Enumerator"
+#define G_VFS_DBUS_ENUMERATOR_OP_DONE "Done"
+#define G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO "GotInfo"
 
 /* Mounts time out in 10 minutes, since they can be slow, with auth, etc */
 #define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*10)

@@ -112,13 +112,13 @@ g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
   
   member = dbus_message_get_member (message);
 
-  if (strcmp (member, G_VFS_DBUS_ENUMERATOR_DONE) == 0)
+  if (strcmp (member, G_VFS_DBUS_ENUMERATOR_OP_DONE) == 0)
     {
       G_LOCK (infos);
       enumerator->done = TRUE;
       G_UNLOCK (infos);
     }
-  else if (strcmp (member, G_VFS_DBUS_ENUMERATOR_GOT_INFO) == 0)
+  else if (strcmp (member, G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO) == 0)
     {
       infos = NULL;
       

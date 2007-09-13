@@ -283,7 +283,7 @@ do_sync_path_call (GFile *file,
   message =
     dbus_message_new_method_call (mount_info->dbus_id,
 				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  op);
 
   path = _g_mount_info_resolve_path (mount_info,
@@ -391,7 +391,7 @@ do_async_path_call_callback (GMountInfo *mount_info,
   message =
     dbus_message_new_method_call (mount_info->dbus_id,
 				  mount_info->object_path,
-				  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
+				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  data->op);
   
   path = _g_mount_info_resolve_path (mount_info,
@@ -485,7 +485,7 @@ g_daemon_file_enumerate_children (GFile      *file,
     attributes = "";
   flags_dbus = flags;
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_OP_ENUMERATE,
+			     G_VFS_DBUS_MOUNT_OP_ENUMERATE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_STRING, &obj_path,
 			     DBUS_TYPE_STRING, &attributes,
@@ -526,7 +526,7 @@ g_daemon_file_get_info (GFile                *file,
     attributes = "";
   flags_dbus = flags;
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_OP_GET_INFO,
+			     G_VFS_DBUS_MOUNT_OP_GET_INFO,
 			     NULL, cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags,
@@ -647,7 +647,7 @@ g_daemon_file_read_async (GFile *file,
 			  gpointer callback_data)
 {
   do_async_path_call (file,
-		      G_VFS_DBUS_OP_OPEN_FOR_READ,
+		      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ,
 		      cancellable,
 		      callback, callback_data,
 		      read_async_cb, file,
@@ -684,7 +684,7 @@ g_daemon_file_read (GFile *file,
   dbus_bool_t can_seek;
 
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_OP_OPEN_FOR_READ,
+			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ,
 			     &connection, cancellable, error,
 			     0);
   if (reply == NULL)
@@ -733,7 +733,7 @@ g_daemon_file_append_to (GFile *file,
   make_backup = FALSE;
   
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_OP_OPEN_FOR_WRITE,
+			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_UINT64, &mtime,
@@ -786,7 +786,7 @@ g_daemon_file_create (GFile *file,
   make_backup = FALSE;
   
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_OP_OPEN_FOR_WRITE,
+			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_UINT64, &mtime,
@@ -841,7 +841,7 @@ g_daemon_file_replace (GFile *file,
   dbus_make_backup = make_backup;
   
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_OP_OPEN_FOR_WRITE,
+			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_UINT64, &dbus_mtime,

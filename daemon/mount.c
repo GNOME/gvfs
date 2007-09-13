@@ -225,7 +225,7 @@ mountable_mount_with_name (MountData *data,
   message = dbus_message_new_method_call (dbus_name,
 					  G_VFS_DBUS_MOUNTABLE_PATH,
 					  G_VFS_DBUS_MOUNTABLE_INTERFACE,
-					  "mount");
+					  G_VFS_DBUS_MOUNTABLE_OP_MOUNT);
 
   dbus_message_iter_init_append (message, &iter);
   g_mount_spec_to_dbus (&iter, data->mount_spec);
@@ -437,7 +437,10 @@ signal_mounted_unmounted (VfsMount *mount,
 
   message = dbus_message_new_signal (G_VFS_DBUS_MOUNTTRACKER_PATH,
 				     G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				     mounted?"mounted":"unmounted");
+				     mounted ?
+				     G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED :
+				     G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED
+				     );
   if (message == NULL)
     _g_dbus_oom ();
 
