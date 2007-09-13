@@ -183,7 +183,8 @@ looks_like_text (const guchar *data, gsize data_size)
 char *
 g_content_type_guess (const char   *filename,
 		      const guchar *data,
-		      gsize         data_size)
+		      gsize         data_size,
+		      gboolean     *result_uncertain)
 {
   char *basename;
   char *type;
@@ -561,78 +562,87 @@ looks_like_text (const guchar *data, gsize data_size)
   return TRUE;
 }
 
-static gboolean
-mimetype_is_often_subclassed (const char *mimetype)
-{
-  return
-    (strcmp (mimetype, "application/x-ole-storage") == 0) ||
-    (strcmp (mimetype, "text/xml") == 0) ||
-    (strcmp (mimetype, "application/x-bzip") == 0) ||
-    (strcmp (mimetype, "application/x-gzip") == 0) ||
-    (strcmp (mimetype, "application/zip") == 0);
-}
-
 char *
 g_content_type_guess (const char   *filename,
 		      const guchar *data,
-		      gsize         data_size)
+		      gsize         data_size,
+		      gboolean     *result_uncertain)
 {
   char *basename;
-  const char *name_mimetype, *sniffed_mimetype;
+  const char *name_mimetypes[10], *sniffed_mimetype;
   char *mimetype;
+  int i;
+  int n_name_mimetypes;
+  int sniffed_prio;
 
-  name_mimetype = NULL;
-  sniffed_mimetype = NULL;
+  sniffed_prio = 0;
+  n_name_mimetypes = 0;
+  sniffed_mimetype = XDG_MIME_TYPE_UNKNOWN;
+
+  if (result_uncertain)
+    *result_uncertain = FALSE;
   
   G_LOCK (gio_xdgmime);
   
   if (filename)
     {
       basename = g_path_get_basename (filename);
-      name_mimetype = xdg_mime_get_mime_type_from_file_name (basename);
+      n_name_mimetypes = xdg_mime_get_mime_types_from_file_name (basename, name_mimetypes, 10);
       g_free (basename);
     }
 
+  /* Got an extension match, and no conflicts. This is it. */
+  if (n_name_mimetypes == 1)
+    return g_strdup (name_mimetypes[0]);
+  
   if (data)
-    sniffed_mimetype = xdg_mime_get_mime_type_for_data (data, data_size);
-
-  if (name_mimetype == NULL)
     {
-      if (sniffed_mimetype == NULL)
-	{
-	  if (data && looks_like_text (data, data_size))
-	    mimetype = g_strdup ("text/plain");
-	  else
-	    mimetype = g_strdup (XDG_MIME_TYPE_UNKNOWN);
-	}
-      else
-	mimetype = g_strdup (sniffed_mimetype);
+      sniffed_mimetype = xdg_mime_get_mime_type_for_data (data, data_size, &sniffed_prio);
+      if (sniffed_mimetype == XDG_MIME_TYPE_UNKNOWN &&
+	  data &&
+	  looks_like_text (data, data_size))
+	sniffed_mimetype = "text/plain";
+    }
+  
+  if (n_name_mimetypes == 0)
+    {
+      if (sniffed_mimetype == XDG_MIME_TYPE_UNKNOWN &&
+	  result_uncertain)
+	*result_uncertain = TRUE;
+      
+      mimetype = g_strdup (sniffed_mimetype);
     }
   else
     {
-      if (sniffed_mimetype == XDG_MIME_TYPE_UNKNOWN && data && looks_like_text (data, data_size))
-	sniffed_mimetype = "text/plain";
-      
-      if (sniffed_mimetype == NULL || sniffed_mimetype == XDG_MIME_TYPE_UNKNOWN)
-	mimetype = g_strdup (name_mimetype);
-      else
+      mimetype = NULL;
+      if (sniffed_mimetype != XDG_MIME_TYPE_UNKNOWN)
 	{
-	  /* Both named and sniffed, use the sniffed type unless
-	   * this is a special content type
-	   */
-
-	  /* Some container formats are often used in many types of files,
-	     then look at name instead. */
-	  if (name_mimetype != XDG_MIME_TYPE_UNKNOWN &&
-	      mimetype_is_often_subclassed (sniffed_mimetype))
-	    mimetype = g_strdup (name_mimetype);
-	  /* If the name mimetype is a more specific version of the
-	     sniffed type, use it. */
-	  else if (name_mimetype != XDG_MIME_TYPE_UNKNOWN &&
-		   xdg_mime_mime_type_subclass (name_mimetype, sniffed_mimetype))
-	    mimetype = g_strdup (name_mimetype);
-	  else
+	  if (sniffed_prio >= 80) /* High priority sniffing match, use that */
 	    mimetype = g_strdup (sniffed_mimetype);
+	  else
+	    {
+	      /* There are conflicts between the name matches and we have a sniffed
+		 type, use that as a tie breaker. */
+	      
+	      for (i = 0; i < n_name_mimetypes; i++)
+		{
+		  if ( xdg_mime_mime_type_subclass (name_mimetypes[i], sniffed_mimetype))
+		    {
+		      /* This nametype match is derived from (or the same as) the sniffed type).
+			 This is probably it. */
+		      mimetype = g_strdup (name_mimetypes[i]);
+		      break;
+		    }
+		}
+	    }
+	}
+      
+      if (mimetype == NULL)
+	{
+	  /* Conflicts, and sniffed type was no help or not there. guess on the first one */
+	  mimetype = g_strdup (name_mimetypes[0]);
+	  if (result_uncertain)
+	    *result_uncertain = TRUE;
 	}
     }
   

@@ -18,7 +18,8 @@ gboolean g_content_type_can_be_executable (const char   *type);
 
 char *   g_content_type_guess             (const char   *filename,
 					   const guchar *data,
-					   gsize         data_size);
+					   gsize         data_size,
+					   gboolean     *result_uncertain );
 
 GList *  g_get_registered_content_types   (void);
 

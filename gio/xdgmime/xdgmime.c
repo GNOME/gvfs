@@ -440,16 +440,17 @@ xdg_mime_init (void)
 
 const char *
 xdg_mime_get_mime_type_for_data (const void *data,
-				 size_t      len)
+				 size_t      len,
+				 int        *result_prio)
 {
   const char *mime_type;
 
   xdg_mime_init ();
 
   if (_caches)
-    return _xdg_mime_cache_get_mime_type_for_data (data, len);
+    return _xdg_mime_cache_get_mime_type_for_data (data, len, result_prio);
 
-  mime_type = _xdg_mime_magic_lookup_data (global_magic, data, len, NULL, 0);
+  mime_type = _xdg_mime_magic_lookup_data (global_magic, data, len, result_prio, NULL, 0);
 
   if (mime_type)
     return mime_type;
@@ -524,7 +525,7 @@ xdg_mime_get_mime_type_for_file (const char  *file_name,
       return XDG_MIME_TYPE_UNKNOWN;
     }
 
-  mime_type = _xdg_mime_magic_lookup_data (global_magic, data, bytes_read,
+  mime_type = _xdg_mime_magic_lookup_data (global_magic, data, bytes_read, NULL,
 					   mime_types, n);
 
   free (data);
@@ -550,6 +551,19 @@ xdg_mime_get_mime_type_from_file_name (const char *file_name)
     return mime_type;
   else
     return XDG_MIME_TYPE_UNKNOWN;
+}
+
+int
+xdg_mime_get_mime_types_from_file_name (const char *file_name,
+					const char  *mime_types[],
+					int          n_mime_types)
+{
+  xdg_mime_init ();
+  
+  if (_caches)
+    return _xdg_mime_cache_get_mime_types_from_file_name (file_name, mime_types, n_mime_types);
+  
+  return _xdg_glob_hash_lookup_file_name (global_hash, file_name, mime_types, n_mime_types);
 }
 
 int

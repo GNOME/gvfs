@@ -50,6 +50,7 @@ typedef void (*XdgMimeDestroy)  (void *user_data);
 #define xdg_mime_get_mime_type_for_data       XDG_ENTRY(get_mime_type_for_data)
 #define xdg_mime_get_mime_type_for_file       XDG_ENTRY(get_mime_type_for_file)
 #define xdg_mime_get_mime_type_from_file_name XDG_ENTRY(get_mime_type_from_file_name)
+#define xdg_mime_get_mime_types_from_file_name XDG_ENTRY(get_mime_types_from_file_name)
 #define xdg_mime_is_valid_mime_type           XDG_ENTRY(is_valid_mime_type)
 #define xdg_mime_mime_type_equal              XDG_ENTRY(mime_type_equal)
 #define _xdg_mime_mime_type_equal             XDG_ENTRY(mime_type_equal_p)
@@ -72,10 +73,14 @@ extern const char xdg_mime_type_unknown[];
 #define XDG_MIME_TYPE_UNKNOWN xdg_mime_type_unknown
 
 const char  *xdg_mime_get_mime_type_for_data       (const void *data,
-						    size_t      len);
+						    size_t      len,
+						    int        *result_prio);
 const char  *xdg_mime_get_mime_type_for_file       (const char *file_name,
                                                     struct stat *statbuf);
 const char  *xdg_mime_get_mime_type_from_file_name (const char *file_name);
+int          xdg_mime_get_mime_types_from_file_name(const char *file_name,
+						    const char *mime_types[],
+						    int         n_mime_types);
 int          xdg_mime_is_valid_mime_type           (const char *mime_type);
 int          xdg_mime_mime_type_equal              (const char *mime_a,
 						    const char *mime_b);

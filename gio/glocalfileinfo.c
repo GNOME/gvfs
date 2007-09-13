@@ -1129,11 +1129,12 @@ _g_local_file_info_get (const char *basename,
       else
 	{
 	  char *content_type;
+	  gboolean result_uncertain;
 	  
-	  content_type = g_content_type_guess (basename, NULL, 0);
+	  content_type = g_content_type_guess (basename, NULL, 0, &result_uncertain);
 
 #ifndef G_OS_WIN32
-	  if (g_content_type_is_unknown (content_type) && path != NULL)
+	  if (result_uncertain && path != NULL)
 	    {
 	      guchar sniff_buffer[4096];
 	      gsize sniff_length;
@@ -1153,9 +1154,8 @@ _g_local_file_info_get (const char *basename,
 		  if (res != -1)
 		    {
 		      g_free (content_type);
-		      content_type = g_content_type_guess (basename, sniff_buffer, sniff_length);
+		      content_type = g_content_type_guess (basename, sniff_buffer, sniff_length, NULL);
 		    }
-		  
 		}
 	    }
 #endif

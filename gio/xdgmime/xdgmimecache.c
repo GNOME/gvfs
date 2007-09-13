@@ -623,6 +623,7 @@ _xdg_mime_cache_get_max_buffer_extents (void)
 static const char *
 cache_get_mime_type_for_data (const void *data,
 			      size_t      len,
+			      int        *result_prio,
 			      const char *mime_types[],
 			      int         n_mime_types)
 {
@@ -647,11 +648,15 @@ cache_get_mime_type_for_data (const void *data,
 	}
     }
 
+  if (result_prio)
+    *result_prio = priority;
+  
   if (priority > 0)
     return mime_type;
 
   for (n = 0; n < n_mime_types; n++)
     {
+      
       if (mime_types[n])
 	return mime_types[n];
     }
@@ -661,9 +666,10 @@ cache_get_mime_type_for_data (const void *data,
 
 const char *
 _xdg_mime_cache_get_mime_type_for_data (const void *data,
-					size_t      len)
+					size_t      len,
+					int        *result_prio)
 {
-  return cache_get_mime_type_for_data (data, len, NULL, 0);
+  return cache_get_mime_type_for_data (data, len, result_prio, NULL, 0);
 }
 
 const char *
@@ -726,7 +732,7 @@ _xdg_mime_cache_get_mime_type_for_file (const char  *file_name,
       return XDG_MIME_TYPE_UNKNOWN;
     }
 
-  mime_type = cache_get_mime_type_for_data (data, bytes_read,
+  mime_type = cache_get_mime_type_for_data (data, bytes_read, NULL,
 					    mime_types, n);
 
   free (data);
@@ -744,6 +750,14 @@ _xdg_mime_cache_get_mime_type_from_file_name (const char *file_name)
     return mime_type;
   else
     return XDG_MIME_TYPE_UNKNOWN;
+}
+
+int
+_xdg_mime_cache_get_mime_types_from_file_name (const char *file_name,
+					       const char  *mime_types[],
+					       int          n_mime_types)
+{
+  return cache_glob_lookup_file_name (file_name, mime_types, n_mime_types);
 }
 
 #if 1
