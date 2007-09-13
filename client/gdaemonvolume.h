@@ -3,9 +3,6 @@
 
 #include <glib-object.h>
 #include <gio/gvolume.h>
-#if 0
-# include <gio/gdaemonmounts.h>
-#endif
 #include "gdaemonvfs.h"
 #include "gdaemonvolumemonitor.h"
 #include "gmounttracker.h"

@@ -12,7 +12,6 @@ struct _GDaemonVolumeMonitor {
   GVolumeMonitor parent;
 
   GMountTracker *mount_tracker;
-
   GList *volumes;
 };
 
@@ -35,6 +34,7 @@ get_mounted_volumes (GVolumeMonitor *volume_monitor)
 static GList *
 get_connected_drives (GVolumeMonitor *volume_monitor)
 {
+  /* TODO: Can daemon mounts have drives? */
   return NULL;
 }
 
