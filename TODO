@@ -28,8 +28,6 @@ Move GAppInfo to Gtk+
 
 Implement UNMOUNTED and PRE_UNMOUNT for file monitors
 
-Implement CHANGES_DONE_HINT for inotify
-
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
 Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg list.
