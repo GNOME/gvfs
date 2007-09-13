@@ -691,6 +691,38 @@ do_create (GVfsBackend *backend,
 }
 
 static void
+do_append_to (GVfsBackend *backend,
+	      GVfsJobOpenForWrite *job,
+	      const char *filename)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  char *uri;
+  SMBCFILE *file;
+  GError *error;
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+					O_CREAT|O_WRONLY|O_APPEND, 0);
+  g_free (uri);
+
+  if (file == NULL)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+      g_vfs_job_open_for_write_set_handle (job, file);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+}
+
+static void
 do_write (GVfsBackend *backend,
 	  GVfsJobWrite *job,
 	  GVfsBackendHandle handle,
@@ -949,6 +981,7 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
   backend_class->create = do_create;
+  backend_class->append_to = do_append_to;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->close_write = do_close_write;
