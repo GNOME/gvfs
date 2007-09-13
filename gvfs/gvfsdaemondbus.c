@@ -5,6 +5,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <errno.h>
+
+#include <glib/gi18n-lib.h>
 
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
@@ -120,7 +123,7 @@ append_escaped_bus_name (GString *s,
 
 
 static int
-daemon_socket_connect (const char *address)
+daemon_socket_connect (const char *address, GError **error)
 {
   int fd;
   const char *path;
@@ -130,16 +133,20 @@ daemon_socket_connect (const char *address)
 
   fd = socket (PF_UNIX, SOCK_STREAM, 0);
   if (fd == -1)
-    return -1;
-
-  if (g_str_has_prefix (address, "daemon:abstract="))
     {
-      path = address + strlen ("daemon:abstract=");
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Error connecting to daemon: %s"), g_strerror (errno));
+      return -1;
+    }
+
+  if (g_str_has_prefix (address, "unix:abstract="))
+    {
+      path = address + strlen ("unix:abstract=");
       abstract = TRUE;
     }
   else
     {
-      path = address + strlen ("daemon:path=");
+      path = address + strlen ("unix:path=");
       abstract = FALSE;
     }
     
@@ -161,6 +168,8 @@ daemon_socket_connect (const char *address)
   
   if (connect (fd, (struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
     {      
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Error connecting to daemon: %s"), g_strerror (errno));
       close (fd);
       return -1;
     }
@@ -248,8 +257,12 @@ _g_vfs_daemon_get_connection_sync (const char *mountpoint,
 			 DBUS_TYPE_STRING, &address2,
 			 DBUS_TYPE_INVALID);
 
-  extra_fd = daemon_socket_connect (address2);
-  g_print ("extra fd: %d\n", extra_fd);
+  extra_fd = daemon_socket_connect (address2, error);
+  if (extra_fd == -1)
+    {
+      dbus_message_unref (reply);
+      return NULL;
+    }
 
   dbus_error_init (&derror);
   connection = dbus_connection_open_private (address1, &derror);
@@ -258,6 +271,7 @@ _g_vfs_daemon_get_connection_sync (const char *mountpoint,
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
+      close (extra_fd);
       dbus_message_unref (reply);
       dbus_error_free (&derror);
       return NULL;
@@ -271,6 +285,7 @@ _g_vfs_daemon_get_connection_sync (const char *mountpoint,
 
   if (fd)
     *fd = extra_fd;
+  
   return connection;
 }
 
