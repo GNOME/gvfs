@@ -586,7 +586,7 @@ handle_overwrite_open (const char *filename,
 #ifdef HAVE_FCHOWN
       if (fstat (bfd, &tmp_statbuf) != 0)
 	{
-	  g_set_error (&error,
+	  g_set_error (error,
 		       G_IO_ERROR,
 		       G_IO_ERROR_CANT_CREATE_BACKUP,
 		       _("Backup file creation failed"));
