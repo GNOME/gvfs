@@ -5,10 +5,12 @@
 #include <gvfs/gfile.h>
 
 static char *attributes = NULL;
+static gboolean show_hidden = FALSE;
 
 static GOptionEntry entries[] = 
 {
 	{ "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, "The attributes to get", NULL },
+	{ "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, "Show hidden files", NULL },
 	{ NULL }
 };
 
@@ -48,6 +50,9 @@ show_info (GFileInfo *info)
 {
   const char *name, *type;
   goffset size;
+
+  if (g_file_info_get_is_hidden (info) && !show_hidden)
+    return;
   
   name = g_file_info_get_name (info);
   if (name == NULL)
