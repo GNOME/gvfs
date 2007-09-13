@@ -123,27 +123,43 @@ static void
 vfs_mount_to_dbus (VfsMount *mount,
 		   DBusMessageIter *iter)
 {
-  if (!dbus_message_iter_append_basic (iter,
+  DBusMessageIter struct_iter;
+  
+  if (!dbus_message_iter_open_container (iter,
+					 DBUS_TYPE_STRUCT,
+					 DBUS_TYPE_STRING_AS_STRING
+					 DBUS_TYPE_STRING_AS_STRING
+					 DBUS_TYPE_STRING_AS_STRING
+					 DBUS_TYPE_OBJECT_PATH_AS_STRING
+					 G_MOUNT_SPEC_TYPE_AS_STRING,
+					 &struct_iter))
+    _g_dbus_oom ();
+  
+  
+  if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_STRING,
 				       &mount->display_name))
     _g_dbus_oom ();
   
-  if (!dbus_message_iter_append_basic (iter,
+  if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_STRING,
 				       &mount->icon))
     _g_dbus_oom ();
 	      
-  if (!dbus_message_iter_append_basic (iter,
+  if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_STRING,
 				       &mount->dbus_id))
     _g_dbus_oom ();
   
-  if (!dbus_message_iter_append_basic (iter,
+  if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_OBJECT_PATH,
 				       &mount->object_path))
     _g_dbus_oom ();
   
-  g_mount_spec_to_dbus (iter, mount->mount_spec);
+  g_mount_spec_to_dbus (&struct_iter, mount->mount_spec);
+
+  if (!dbus_message_iter_close_container (iter, &struct_iter))
+    _g_dbus_oom ();
 }
 
 /************************************************************************
@@ -659,7 +675,7 @@ list_mounts (DBusConnection *connection,
 {
   VfsMount *mount;
   DBusMessage *reply;
-  DBusMessageIter iter, array_iter, struct_iter;
+  DBusMessageIter iter, array_iter;
   GList *l;
 
   reply = dbus_message_new_method_return (message);
@@ -687,20 +703,7 @@ list_mounts (DBusConnection *connection,
 
       g_print ("mount: %p, name: %s, spec: %p\n", mount, mount->display_name, mount->mount_spec);
       
-      if (!dbus_message_iter_open_container (&array_iter,
-					     DBUS_TYPE_STRUCT,
-					     DBUS_TYPE_STRING_AS_STRING
-					     DBUS_TYPE_STRING_AS_STRING
-					     DBUS_TYPE_STRING_AS_STRING
-					     DBUS_TYPE_OBJECT_PATH_AS_STRING
-					     G_MOUNT_SPEC_TYPE_AS_STRING,
-					     &struct_iter))
-	_g_dbus_oom ();
-
-      vfs_mount_to_dbus (mount, &struct_iter);
-      
-      if (!dbus_message_iter_close_container (&array_iter, &struct_iter))
-	_g_dbus_oom ();
+      vfs_mount_to_dbus (mount, &array_iter);
     }
 
   if (!dbus_message_iter_close_container (&iter, &array_iter))
