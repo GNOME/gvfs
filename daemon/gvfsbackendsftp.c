@@ -2902,6 +2902,44 @@ try_get_info (GVfsBackend *backend,
 }
 
 static void
+move_reply (GVfsBackendSftp *backend,
+            int reply_type,
+            GDataInputStream *reply,
+            guint32 len,
+            GVfsJob *job,
+            gpointer user_data)
+{
+  /* on any unknown error, return NOT_SUPPORTED to get the fallback implementation */
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, G_IO_ERROR_NOT_SUPPORTED); 
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static gboolean
+try_move (GVfsBackend *backend,
+          GVfsJobMove *job,
+          const char *source,
+          const char *destination,
+          GFileCopyFlags flags,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_RENAME,
+                                &id);
+  put_string (command, source);
+  put_string (command, destination);
+  
+  queue_command_stream_and_free (op_backend, command, id, move_reply, G_VFS_JOB (job), NULL);
+}
+
+static void
 g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
