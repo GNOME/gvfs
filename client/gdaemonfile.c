@@ -1202,6 +1202,27 @@ g_daemon_file_trash (GFile *file,
   return TRUE;
 }
 
+static gboolean
+g_daemon_file_make_directory (GFile *file,
+			      GCancellable *cancellable,
+			      GError **error)
+{
+  GDaemonFile *daemon_file;
+  DBusMessage *reply;
+
+  daemon_file = G_DAEMON_FILE (file);
+
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY,
+			     NULL, cancellable, error,
+			     0);
+  if (reply == NULL)
+    return FALSE;
+
+  dbus_message_unref (reply);
+  return TRUE;
+}
+
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
@@ -1231,4 +1252,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->set_display_name = g_daemon_file_set_display_name;
   iface->delete_file = g_daemon_file_delete;
   iface->trash = g_daemon_file_trash;
+  iface->make_directory = g_daemon_file_make_directory;
 }

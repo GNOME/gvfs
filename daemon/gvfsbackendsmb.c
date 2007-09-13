@@ -1360,7 +1360,7 @@ do_set_display_name (GVfsBackend *backend,
 
 static void
 do_delete (GVfsBackend *backend,
-	   GVfsJobSetDisplayName *job,
+	   GVfsJobDelete *job,
 	   const char *filename)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
@@ -1369,6 +1369,26 @@ do_delete (GVfsBackend *backend,
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   res = op_backend->smb_context->unlink (op_backend->smb_context, uri);
+  errsv = errno;
+  g_free (uri);
+
+  if (res != 0)
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+do_make_directory (GVfsBackend *backend,
+		   GVfsJobMakeDirectory *job,
+		   const char *filename)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  char *uri;
+  int errsv, res;
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  res = op_backend->smb_context->mkdir (op_backend->smb_context, uri, 0666);
   errsv = errno;
   g_free (uri);
 
@@ -1403,4 +1423,5 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->enumerate = do_enumerate;
   backend_class->set_display_name = do_set_display_name;
   backend_class->delete = do_delete;
+  backend_class->make_directory = do_make_directory;
 }

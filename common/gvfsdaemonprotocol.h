@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME "SetDisplayName"
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
 #define G_VFS_DBUS_MOUNT_OP_TRASH "Trash"
+#define G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY "MakeDirectory"
 
 /* mount daemons that support mounting more mounts implement this,
    and set the dbus name in the mountable description file */

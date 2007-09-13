@@ -21,6 +21,7 @@
 #include <gvfsjobdelete.h>
 #include <gvfsjobtrash.h>
 #include <gvfsjobmountmountable.h>
+#include <gvfsjobmakedirectory.h>
 #include <gdbusutils.h>
 
 enum {
@@ -292,6 +293,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_TRASH))
     job = g_vfs_job_trash_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY))
+    job = g_vfs_job_make_directory_new (connection, message, backend);
 
   if (job)
     {
