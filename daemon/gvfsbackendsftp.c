@@ -1381,6 +1381,38 @@ read_dir_data_free (ReadDirData *data)
   g_slice_free (ReadDirData, data);
 }
 
+static void
+read_dir_readlink_reply (GVfsBackendSftp *backend,
+                         int reply_type,
+                         GDataInputStream *reply,
+                         guint32 len,
+                         GVfsJob *job,
+                         gpointer user_data)
+{
+  ReadDirData *data;
+  guint32 count;
+  GFileInfo *info = user_data;
+  char *target;
+
+  data = job->backend_data;
+
+  if (reply_type == SSH_FXP_NAME)
+    {
+      count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      target = read_string (reply, NULL);
+      if (target)
+        {
+          g_file_info_set_symlink_target (info, target);
+          g_free (target);
+        }
+    }
+
+  g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), info);
+  g_object_unref (info);
+  
+  if (--data->outstanding_requests == 0)
+    g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
+}
 
 static void
 read_dir_got_stat_info (GVfsBackendSftp *backend,
@@ -1388,10 +1420,29 @@ read_dir_got_stat_info (GVfsBackendSftp *backend,
                         GFileInfo *info)
 {
   GVfsJobEnumerate *enum_job;
+  GDataOutputStream *command;
+  ReadDirData *data;
+  guint32 id;
+  char *abs_name;
+  
+  data = job->backend_data;
   
   enum_job = G_VFS_JOB_ENUMERATE (job);
-  
-  g_vfs_job_enumerate_add_info (enum_job, info);
+
+  if (g_file_attribute_matcher_matches (enum_job->attribute_matcher,
+                                        G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET))
+    {
+      data->outstanding_requests++;
+      command = new_command_stream (backend,
+                                    SSH_FXP_READLINK,
+                                    &id);
+      abs_name = g_build_filename (enum_job->filename, g_file_info_get_name (info), NULL);
+      put_string (command, abs_name);
+      g_free (abs_name);
+      queue_command_stream_and_free (backend, command, id, read_dir_readlink_reply, G_VFS_JOB (job), g_object_ref (info));
+    }
+  else
+    g_vfs_job_enumerate_add_info (enum_job, info);
 }
 
 
@@ -1429,8 +1480,7 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
 
   g_object_unref (lstat_info);
   
-  data->outstanding_requests--;
-  if (data->outstanding_requests == 0)
+  if (--data->outstanding_requests == 0)
     g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
 }
 
@@ -1457,8 +1507,7 @@ read_dir_reply (GVfsBackendSftp *backend,
     {
       /* Ignore all error, including the expected END OF FILE.
        * Real errors are expected in open_dir anyway */
-      data->outstanding_requests --;
-      if (data->outstanding_requests == 0)
+      if (--data->outstanding_requests == 0)
         g_vfs_job_enumerate_done (enum_job);
       
       return;
