@@ -1408,20 +1408,121 @@ do_move (GVfsBackend *backend,
 	 gpointer progress_callback_data)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  char *source_uri, *dest_uri;
+  char *source_uri, *dest_uri, *backup_uri;
+  gboolean destination_exist, source_is_dir;
+  struct stat statbuf;
   int res, errsv;
   
   source_uri = create_smb_uri (op_backend->server, op_backend->share, source);
+
+  res = op_backend->smb_context->stat (op_backend->smb_context, source_uri, &statbuf);
+  if (res == -1)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR,
+			g_io_error_from_errno (errno),
+			_("Error moving file: %s"),
+			g_strerror (errno));
+      g_free (source_uri);
+      return;
+    }
+  else
+    source_is_dir = S_ISDIR (statbuf.st_mode);
+
   dest_uri = create_smb_uri (op_backend->server, op_backend->share, destination);
   
+  destination_exist = FALSE;
+  res = op_backend->smb_context->stat (op_backend->smb_context, dest_uri, &statbuf);
+  if (res == 0)
+    {
+      destination_exist = TRUE; /* Target file exists */
+
+      if (flags & G_FILE_COPY_OVERWRITE)
+	{
+	  /* Always fail on dirs, even with overwrite */
+	  if (S_ISDIR (statbuf.st_mode))
+	    {
+	      g_vfs_job_failed (G_VFS_JOB (job),
+				G_IO_ERROR,
+				G_IO_ERROR_IS_DIRECTORY,
+				_("Can't move over directory"));
+	      g_free (source_uri);
+	      g_free (dest_uri);
+	      return;
+	    }
+	}
+      else
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job),
+			    G_IO_ERROR,
+			    G_IO_ERROR_EXISTS,
+			    _("Target file already exists"));
+	  g_free (source_uri);
+	  g_free (dest_uri);
+	  return;
+	}
+    }
+
+  if (flags & G_FILE_COPY_BACKUP && destination_exist)
+    {
+      backup_uri = g_strconcat (dest_uri, "~", NULL);
+      res = op_backend->smb_context->rename (op_backend->smb_context, dest_uri,
+					     op_backend->smb_context, backup_uri);
+      if (res == -1)
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job),
+			    G_IO_ERROR,
+			    G_IO_ERROR_CANT_CREATE_BACKUP,
+			    _("Backup file creation failed"));
+	  g_free (source_uri);
+	  g_free (dest_uri);
+	  g_free (backup_uri);
+	  return;
+	}
+      g_free (backup_uri);
+      destination_exist = FALSE; /* It did, but no more */
+    }
+
+  if (source_is_dir && destination_exist && (flags & G_FILE_COPY_OVERWRITE))
+    {
+      /* Source is a dir, destination exists (and is not a dir, because that would have failed
+	 earlier), and we're overwriting. Manually remove the target so we can do the rename. */
+      res = op_backend->smb_context->unlink (op_backend->smb_context, dest_uri);
+      errsv = errno;
+      if (res == -1)
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+			    g_io_error_from_errno (errsv),
+			    _("Error removing target file: %s"),
+			    g_strerror (errsv));
+	  g_free (source_uri);
+	  g_free (dest_uri);
+	  return;
+	}
+    }
+
+  
+  g_print ("rename %s to %s\n", source_uri, dest_uri);
   res = op_backend->smb_context->rename (op_backend->smb_context, source_uri,
 					 op_backend->smb_context, dest_uri);
   errsv = errno;
+  g_print ("rename errno: %d\n", errsv);
   g_free (source_uri);
   g_free (dest_uri);
 
+  /* Catch moves across device boundaries */
   if (res != 0)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+    {
+      if (errsv == EXDEV ||
+	  /* Unfortunately libsmbclient doesn't correctly return EXDEV, but falls back
+	     to EINVAL, so we try to guess when this happens: */
+	  (errsv == EINVAL && source_is_dir))
+	g_vfs_job_failed (G_VFS_JOB (job), 
+			  G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+			  _("Can't recursively move directory"));
+      else
+	g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+    }
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 }
