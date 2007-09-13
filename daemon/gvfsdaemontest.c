@@ -11,10 +11,9 @@
 
 G_DEFINE_TYPE (GVfsDaemonTest, g_vfs_daemon_test, G_TYPE_VFS_DAEMON);
 
-static void read_file (GVfsDaemon *daemon,
-		       DBusMessage *reply,
-		       const char *path,
-		       int *socket_fd_out);
+static GVfsReadRequest * read_file (GVfsDaemon *daemon,
+				    const char *path,
+				    GError **error);
 
 
 static void
@@ -56,22 +55,15 @@ g_vfs_daemon_test_new (const char *mountpoint)
   return daemon;
 }
 
-static void 
+static GVfsReadRequest *
 read_file (GVfsDaemon *daemon,
-	   DBusMessage *reply,
 	   const char *path,
-	   int *socket_fd_out)
+	   GError **error)
 {
-  char *str = "YAY";
-  int socket_fds[2];
-  int ret;
+  GVfsReadRequest *read_request;
   
   g_print ("read_file: %s\n", path);
-
-  dbus_message_append_args (reply,
-			    DBUS_TYPE_STRING, &str,
-			    DBUS_TYPE_INVALID);
   
-  ret = socketpair (AF_UNIX, SOCK_STREAM, 0, socket_fds);
-  *socket_fd_out = socket_fds[0];
+  read_request = g_vfs_read_request_new (error);
+  return read_request;
 }

@@ -144,7 +144,6 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   int extra_fd;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
-  dbus_bool_t res;
 
   if (file->priv->fd != -1)
     return TRUE;
@@ -184,18 +183,13 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   /* TODO: handle errors created with dbus_message_new_error? 
    * dbus_message_is_error() ? 
    */
-      
-  if (!dbus_message_get_args (reply, &derror,
-			      DBUS_TYPE_BOOLEAN, &res, 
-			      NULL))
+  if (_g_error_from_dbus_message (reply, error))
     {
-      /* TODO: Actually propagate error */
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Error calling ReadFile: %s",
-		   derror.message);
-      dbus_error_free (&derror);
+      dbus_message_unref (reply);
       return FALSE;
     }
+  
+  /* No args in reply, only fd */
  
   file->priv->fd = receive_fd (extra_fd);
   g_print ("new fd: %d\n", file->priv->fd);

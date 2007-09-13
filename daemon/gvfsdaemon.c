@@ -10,6 +10,7 @@
 #include <dbus-gmain.h>
 #include <gvfsdaemon.h>
 #include <gvfsdaemonprotocol.h>
+#include <gvfsdaemonutils.h>
 
 G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
 
@@ -227,38 +228,59 @@ daemon_handle_read_file (GVfsDaemon *daemon,
 {
   GVfsDaemonClass *class;
   DBusMessage *reply;
+  DBusError derror;
   const char *path_data;
   int path_len;
   char *path;
   int fd;
-  int socket_fd;
+  GError *error;
+  GVfsReadRequest *read_request;
   
   class = G_VFS_DAEMON_GET_CLASS (daemon);
   
-  if (!dbus_message_get_args (message, NULL, 
+  dbus_error_init (&derror);
+  
+  read_request = NULL;
+
+  if (!dbus_message_get_args (message, &derror, 
 			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
 			      &path_data, &path_len,
 			      0))
     {
-      g_warning ("Wrong types in read_file call");
-      return;
+      reply = dbus_message_new_error (message,
+				      derror.name,
+                                      derror.message);
+      dbus_error_free (&derror);
+      goto reply;
     }
 
   path = g_strndup (path_data, path_len);
 
-  reply = dbus_message_new_method_return (message);
-  socket_fd = -1;
-  class->read_file (daemon, reply, path, &socket_fd);
-
+  error = NULL;
+  read_request = class->read_file (daemon, path, &error);
   g_free (path);
+  
+  if (read_request == NULL) 
+    {
+      reply = dbus_message_new_error_from_gerror (message, error);
+      g_error_free (error);
+    } 
+  else
+    {
+      reply = dbus_message_new_method_return (message);
+    }
 
+ reply:
   dbus_connection_send (conn, reply, NULL);
   dbus_message_unref (reply);
 
-  if (socket_fd != -1)
+  if (read_request != NULL)
     {
       fd = GPOINTER_TO_INT (dbus_connection_get_data (conn, extra_fd_slot));
-      send_fd (fd, socket_fd);
+      send_fd (fd, g_vfs_read_request_get_remote_fd (read_request));
+      g_vfs_read_request_close_remote_fd (read_request);
+      
+      /* TODO: Add request to table, etc */
     }
 }
 
