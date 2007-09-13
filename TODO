@@ -36,6 +36,8 @@ Add virtual file monitor event to support inotify WRITE_CLOSE
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
+implement icon getting for local files
+
 gvfs:
 ====
 
