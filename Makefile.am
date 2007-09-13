@@ -14,6 +14,7 @@ SUBDIRS = \
 	$(unix_dirs) \
 	po   \
 	programs \
+	test \
 	$(NULL)
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc

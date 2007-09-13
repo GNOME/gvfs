@@ -1,0 +1,18 @@
+NULL =
+
+AM_CFLAGS =                       \
+	-I$(top_srcdir)           \
+	-I$(top_builddir)         \
+	$(GLIB_CFLAGS)            \
+	-DG_DISABLE_DEPRECATED
+
+AM_LDFLAGS =                           \
+	$(top_builddir)/gio/libgio.la  \
+	$(GLIB_LIBS)
+
+noinst_PROGRAMS = \
+	benchmark-gvfs-small-files    \
+	benchmark-gvfs-big-files      \
+	benchmark-posix-small-files   \
+	benchmark-posix-big-files     \
+	$(NULL)
