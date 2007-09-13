@@ -146,13 +146,15 @@ g_file_get_info (GFile *file,
 }
 
 GFileInputStream *
-g_file_read (GFile *file)
+g_file_read (GFile *file,
+	     GCancellable *cancellable,
+	     GError **error)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->read) (file);
+  return (* iface->read) (file, cancellable, error);
 }
 
 GFileOutputStream *

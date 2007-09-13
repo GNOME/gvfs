@@ -181,14 +181,88 @@ g_file_daemon_get_info (GFile                *file,
 }
 
 static GFileInputStream *
-g_file_daemon_read (GFile *file)
+g_file_daemon_read (GFile *file,
+		    GCancellable *cancellable,
+		    GError **error)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
-  GFileInputStream *stream;
+  DBusConnection *connection;
+  DBusError derror;
+  int fd;
+  DBusMessage *message, *reply;
+  DBusMessageIter iter;
+  guint32 fd_id;
+  dbus_bool_t can_seek;
 
-  stream = g_file_input_stream_daemon_new (daemon_file->filename,
-					   daemon_file->mountpoint);
-  return stream;
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+
+  connection = _g_vfs_daemon_get_connection_sync (daemon_file->mountpoint, error);
+  if (connection == NULL)
+    return NULL;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
+					  G_VFS_DBUS_DAEMON_PATH,
+					  G_VFS_DBUS_DAEMON_INTERFACE,
+					  G_VFS_DBUS_OP_OPEN_FOR_READ);
+  
+  dbus_message_iter_init_append (message, &iter);
+  if (!_g_dbus_message_iter_append_filename (&iter, daemon_file->filename))
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOMEM,
+		   _("Out of memory"));
+      return NULL;
+    }
+
+  /* TODO: We should handle cancellation while waiting for the reply */
+  dbus_error_init (&derror);
+  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
+						     &derror);
+  dbus_message_unref (message);
+  if (!reply)
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &can_seek,
+			      DBUS_TYPE_INVALID))
+    {
+      dbus_message_unref (reply);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from open"));
+      return NULL;
+    }
+  
+  dbus_message_unref (reply);
+
+  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Didn't get stream file descriptor"));
+      return NULL;
+    }
+  
+  return g_file_input_stream_daemon_new (fd, can_seek);
 }
 
 static GFileOutputStream *

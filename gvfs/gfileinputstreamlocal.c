@@ -17,7 +17,6 @@
 G_DEFINE_TYPE (GFileInputStreamLocal, g_file_input_stream_local, G_TYPE_FILE_INPUT_STREAM);
 
 struct _GFileInputStreamLocalPrivate {
-  char *filename;
   int fd;
 };
 
@@ -45,8 +44,6 @@ g_file_input_stream_local_finalize (GObject *object)
   GFileInputStreamLocal *file;
   
   file = G_FILE_INPUT_STREAM_LOCAL (object);
-  
-  g_free (file->priv->filename);
   
   if (G_OBJECT_CLASS (g_file_input_stream_local_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_input_stream_local_parent_class)->finalize) (object);
@@ -78,45 +75,15 @@ g_file_input_stream_local_init (GFileInputStreamLocal *info)
 }
 
 GFileInputStream *
-g_file_input_stream_local_new (const char *filename)
+g_file_input_stream_local_new (int fd)
 {
   GFileInputStreamLocal *stream;
 
   stream = g_object_new (G_TYPE_FILE_INPUT_STREAM_LOCAL, NULL);
-
-  stream->priv->filename = g_strdup (filename);
-  stream->priv->fd = -1;
+  stream->priv->fd = fd;
   
   return G_FILE_INPUT_STREAM (stream);
 }
-
-static gboolean
-g_file_input_stream_local_open (GFileInputStreamLocal *file,
-				GCancellable *cancellable,
-				GError      **error)
-{
-  if (file->priv->fd != -1)
-    return TRUE;
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
-  
-  file->priv->fd = g_open (file->priv->filename, O_RDONLY, 0);
-  if (file->priv->fd == -1)
-    g_set_error (error, G_FILE_ERROR,
-		 g_file_error_from_errno (errno),
-		 _("Error opening file %s: %s"),
-		 file->priv->filename, g_strerror (errno));
-
-  return file->priv->fd != -1;
-}
-			  
 
 static gssize
 g_file_input_stream_local_read (GInputStream *stream,
@@ -130,9 +97,6 @@ g_file_input_stream_local_read (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_LOCAL (stream);
 
-  if (!g_file_input_stream_local_open (file, cancellable, error))
-    return -1;
-  
   while (1)
     {
       if (g_cancellable_is_cancelled (cancellable))
@@ -151,8 +115,8 @@ g_file_input_stream_local_read (GInputStream *stream,
 	  
 	  g_set_error (error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
-		       _("Error reading from file '%s': %s"),
-		       file->priv->filename, g_strerror (errno));
+		       _("Error reading from file: %s"),
+		       g_strerror (errno));
 	}
       
       break;
@@ -172,9 +136,6 @@ g_file_input_stream_local_skip (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_LOCAL (stream);
   
-  if (!g_file_input_stream_local_open (file, cancellable, error))
-    return -1;
-
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
@@ -189,8 +150,8 @@ g_file_input_stream_local_skip (GInputStream *stream,
     {
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
-		   _("Error seeking in file '%s': %s"),
-		   file->priv->filename, g_strerror (errno));
+		   _("Error seeking in file: %s"),
+		   g_strerror (errno));
       return -1;
     }
   
@@ -199,8 +160,8 @@ g_file_input_stream_local_skip (GInputStream *stream,
     {
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
-		   _("Error seeking in file '%s': %s"),
-		   file->priv->filename, g_strerror (errno));
+		   _("Error seeking in file: %s"),
+		   g_strerror (errno));
       return -1;
     }
 
@@ -227,8 +188,8 @@ g_file_input_stream_local_close (GInputStream *stream,
 	{
 	  g_set_error (error, G_FILE_ERROR,
 		       g_file_error_from_errno (errno),
-		       _("Error closing file '%s': %s"),
-		       file->priv->filename, g_strerror (errno));
+		       _("Error closing file: %s"),
+		       g_strerror (errno));
 	}
       break;
     }
@@ -246,9 +207,6 @@ g_file_input_stream_local_get_file_info (GFileInputStream     *stream,
   GFileInputStreamLocal *file;
 
   file = G_FILE_INPUT_STREAM_LOCAL (stream);
-
-  if (!g_file_input_stream_local_open (file, cancellable, error))
-    return NULL;
 
   if (g_cancellable_is_cancelled (cancellable))
     {

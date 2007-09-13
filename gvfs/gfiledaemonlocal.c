@@ -135,9 +135,12 @@ g_file_daemon_local_get_info (GFile *file,
 }
 
 static GFileInputStream *
-g_file_daemon_local_read (GFile *file)
+g_file_daemon_local_read (GFile *file,
+			  GCancellable *cancellable,
+			  GError **error)
 {
-  return g_file_read (G_FILE_DAEMON_LOCAL (file)->wrapped);
+  return g_file_read (G_FILE_DAEMON_LOCAL (file)->wrapped,
+		      cancellable, error);
 }
 
 static GFileOutputStream *

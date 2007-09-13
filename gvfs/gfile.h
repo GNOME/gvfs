@@ -41,7 +41,9 @@ struct _GFileIface
 					     gboolean              follow_symlinks,
 					     GError              **error);
   /*                  (*get_info_async)     (GFile                *file.. */
-  GFileInputStream *  (*read)               (GFile                *file);
+  GFileInputStream *  (*read)               (GFile                *file,
+					     GCancellable         *cancellable,
+					     GError              **error);
   GFileOutputStream * (*append_to)          (GFile                *file);
   GFileOutputStream * (*create)             (GFile                *file);
   GFileOutputStream * (*replace)            (GFile                *file,
@@ -73,7 +75,9 @@ GFileInfo *        g_file_get_info           (GFile                 *file,
 					      const char            *attributes,
 					      gboolean               follow_symlinks,
 					      GError               **error);
-GFileInputStream * g_file_read               (GFile                 *file);
+GFileInputStream * g_file_read               (GFile                 *file,
+					      GCancellable          *cancellable,
+					      GError               **error);
 GFileOutputStream *g_file_append_to          (GFile                 *file);
 GFileOutputStream *g_file_create             (GFile                 *file);
 GFileOutputStream *g_file_replace            (GFile                 *file,

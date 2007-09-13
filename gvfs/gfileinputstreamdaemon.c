@@ -125,17 +125,14 @@ typedef struct {
 typedef StateOp (*state_machine_iterator) (GFileInputStreamDaemon *file, IOOperationData *io_op, gpointer data);
 
 struct _GFileInputStreamDaemonPrivate {
-  char *filename;
-  char *mountpoint;
   GOutputStream *command_stream;
   GInputStream *data_stream;
-  int fd;
+  guint can_seek : 1;
+  
   int seek_generation;
   guint32 seq_nr;
   goffset current_offset;
 
-  guint can_seek : 1;
-  
   InputState input_state;
   gsize input_block_size;
   int input_block_seek_generation;
@@ -184,9 +181,6 @@ g_file_input_stream_daemon_finalize (GObject *object)
   if (file->priv->data_stream)
     g_object_unref (file->priv->data_stream);
   
-  g_free (file->priv->filename);
-  g_free (file->priv->mountpoint);
-  
   if (G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize) (object);
 }
@@ -223,112 +217,18 @@ g_file_input_stream_daemon_init (GFileInputStreamDaemon *info)
 }
 
 GFileInputStream *
-g_file_input_stream_daemon_new (const char *filename,
-				const char *mountpoint)
+g_file_input_stream_daemon_new (int fd,
+				gboolean can_seek)
 {
   GFileInputStreamDaemon *stream;
 
   stream = g_object_new (G_TYPE_FILE_INPUT_STREAM_DAEMON, NULL);
 
-  stream->priv->filename = g_strdup (filename);
-  stream->priv->mountpoint = g_strdup (mountpoint);
-  stream->priv->fd = -1;
+  stream->priv->command_stream = g_output_stream_socket_new (fd, FALSE);
+  stream->priv->data_stream = g_input_stream_socket_new (fd, TRUE);
+  stream->priv->can_seek = can_seek;
   
   return G_FILE_INPUT_STREAM (stream);
-}
-
-static gboolean
-g_file_input_stream_daemon_open (GFileInputStreamDaemon *file,
-				 GCancellable *cancellable,
-				 GError **error)
-{
-  DBusConnection *connection;
-  DBusError derror;
-  int fd;
-  DBusMessage *message, *reply;
-  DBusMessageIter iter;
-  guint32 fd_id;
-  dbus_bool_t can_seek;
-  
-
-  if (file->priv->fd != -1)
-    return TRUE;
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
-
-  connection = _g_vfs_daemon_get_connection_sync (file->priv->mountpoint, error);
-  if (connection == NULL)
-    return FALSE;
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return FALSE;
-    }
-  
-  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
-					  G_VFS_DBUS_DAEMON_PATH,
-					  G_VFS_DBUS_DAEMON_INTERFACE,
-					  G_VFS_DBUS_OP_OPEN_FOR_READ);
-
-  
-  dbus_message_iter_init_append (message, &iter);
-  if (!_g_dbus_message_iter_append_filename (&iter, file->priv->filename))
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOMEM,
-		   _("Out of memory"));
-      return FALSE;
-    }
-      
-  dbus_error_init (&derror);
-  reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
-						     &derror);
-  dbus_message_unref (message);
-  if (!reply)
-    {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return FALSE;
-    }
-
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_UINT32, &fd_id,
-			      DBUS_TYPE_BOOLEAN, &can_seek,
-			      DBUS_TYPE_INVALID))
-    {
-      dbus_message_unref (reply);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   _("Error in stream protocol: %s"), _("Invalid return value from open"));
-      return FALSE;
-    }
-  
-  dbus_message_unref (reply);
-
-  fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-  if (fd == -1)
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   _("Error in stream protocol: %s"), _("Didn't get stream file descriptor"));
-      return FALSE;
-    }
-  
-  file->priv->fd = fd;
-  file->priv->can_seek = can_seek;
-  
-  file->priv->command_stream = g_output_stream_socket_new (file->priv->fd, FALSE);
-  file->priv->data_stream = g_input_stream_socket_new (file->priv->fd, TRUE);
-  
-  return TRUE;
 }
 
 static gboolean
@@ -727,9 +627,6 @@ g_file_input_stream_daemon_read (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!g_file_input_stream_daemon_open (file, cancellable, error))
-    return -1;
-
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
@@ -770,9 +667,6 @@ g_file_input_stream_daemon_skip (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
   
-  if (!g_file_input_stream_daemon_open (file, cancellable, error))
-    return -1;
-
   /* TODO: .. */
   g_assert_not_reached ();
   
@@ -971,9 +865,6 @@ g_file_input_stream_daemon_close (GInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (file->priv->fd == -1)
-    return TRUE;
-
   /* We need to do a full roundtrip to guarantee that the writes have
      reached the disk. */
 
@@ -1018,9 +909,6 @@ g_file_input_stream_daemon_can_seek (GFileInputStream *stream)
   GFileInputStreamDaemon *file;
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
-
-  if (!g_file_input_stream_daemon_open (file, NULL, NULL))
-    return FALSE;
 
   return file->priv->can_seek;
 }
@@ -1234,9 +1122,6 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
-  if (!g_file_input_stream_daemon_open (file, cancellable, error))
-    return FALSE;
-
   if (!file->priv->can_seek)
     {
       g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
@@ -1280,9 +1165,6 @@ g_file_input_stream_daemon_get_file_info (GFileInputStream     *stream,
   GFileInputStreamDaemon *file;
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
-
-  if (!g_file_input_stream_daemon_open (file, cancellable, error))
-    return NULL;
 
   return NULL;
 }

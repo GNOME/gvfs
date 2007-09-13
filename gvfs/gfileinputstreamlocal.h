@@ -31,7 +31,7 @@ struct _GFileInputStreamLocalClass
 
 GType g_file_input_stream_local_get_type (void) G_GNUC_CONST;
 
-GFileInputStream *g_file_input_stream_local_new (const char *filename);
+GFileInputStream *g_file_input_stream_local_new (int fd);
 
 G_END_DECLS
 

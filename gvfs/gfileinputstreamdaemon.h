@@ -31,8 +31,8 @@ struct _GFileInputStreamDaemonClass
 
 GType g_file_input_stream_daemon_get_type (void) G_GNUC_CONST;
 
-GFileInputStream *g_file_input_stream_daemon_new (const char *filename,
-						  const char *mountpoint);
+GFileInputStream *g_file_input_stream_daemon_new (int fd,
+						  gboolean can_seek);
 
 G_END_DECLS
 

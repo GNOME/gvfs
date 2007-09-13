@@ -1,12 +1,18 @@
 #include <config.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
+#include <errno.h>
+#include <fcntl.h>
 
 #include "gfilelocal.h"
 #include "gfileinfolocal.h"
 #include "gfileenumeratorlocal.h"
 #include "gfileinputstreamlocal.h"
 #include "gfileoutputstreamlocal.h"
+#include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
 static void g_file_local_file_iface_init (GFileIface       *iface);
@@ -268,9 +274,33 @@ g_file_local_get_info (GFile                *file,
 }
 
 static GFileInputStream *
-g_file_local_read (GFile *file)
+g_file_local_read (GFile *file,
+		   GCancellable *cancellable,
+		   GError **error)
 {
-  return g_file_input_stream_local_new (G_FILE_LOCAL (file)->filename);
+  GFileLocal *local = G_FILE_LOCAL (file);
+  int fd;
+  
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+
+  fd = g_open (local->filename, O_RDONLY, 0);
+  if (fd == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error opening file %s: %s"),
+		   local->filename, g_strerror (errno));
+      return NULL;
+    }
+  
+  return g_file_input_stream_local_new (fd);
 }
 
 static GFileOutputStream *

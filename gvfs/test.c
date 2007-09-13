@@ -30,7 +30,7 @@ test_out ()
   g_print ("test_out\n");
   
   unlink ("/tmp/test");
-  
+
   out = (GOutputStream *)g_file_output_stream_local_new ("/tmp/test",
 							 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
 
@@ -67,11 +67,15 @@ static void
 test_sync (char *filename, gboolean dump)
 {
   GInputStream *in;
+  GFile *file;
   char buffer[1025];
   gssize res;
   gboolean close_res;
   
-  in = (GInputStream *)g_file_input_stream_local_new (filename);
+  file = g_file_get_for_path (filename);
+  in = (GInputStream *)g_file_read (file, NULL, NULL);
+  if (in == NULL)
+    return;
 
   while (1)
     {
@@ -132,11 +136,15 @@ static void
 test_async (char *filename, gboolean dump)
 {
   GInputStream *in;
+  GFile *file;
   char *buffer;
 
   buffer = g_malloc (1025);
-  
-  in = (GInputStream *)g_file_input_stream_local_new (filename);
+
+  file = g_file_get_for_path (filename);
+  in = (GInputStream *)g_file_read (file, NULL, NULL);
+  if (in == NULL)
+    return;
   
   g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL);
 }
@@ -173,7 +181,7 @@ test_seek (void)
   file = g_file_get_for_uri ("foo:///etc/passwd");
 
   error = NULL;
-  in = (GInputStream *)g_file_read (file);
+  in = (GInputStream *)g_file_read (file, NULL, NULL);
   seekable = G_SEEKABLE (in);
 
   g_print ("offset: %d\n", (int)g_seekable_tell (seekable));

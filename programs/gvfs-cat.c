@@ -23,9 +23,15 @@ cat (GFile *file)
   gboolean close_res;
   GError *error;
   
-  in = (GInputStream *)g_file_read (file);
-
   error = NULL;
+  in = (GInputStream *)g_file_read (file, NULL, &error);
+  if (in == NULL)
+    {
+      g_printerr ("Error opening file: %s\n", error->message);
+      g_error_free (error);
+      return;
+    }
+
   while (1)
     {
       res = g_input_stream_read (in, buffer, 1024, NULL, &error);
