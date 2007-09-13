@@ -13,6 +13,10 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_OP_GET_INFO "GetInfo"
 #define G_VFS_DBUS_OP_ENUMERATE "Enumerate"
 
+#define G_VFS_DBUS_ENUMERATOR_INTERFACE "org.gtk.vfs.Enumerator"
+#define G_VFS_DBUS_ENUMERATOR_DONE "Done"
+#define G_VFS_DBUS_ENUMERATOR_GOT_INFO "GotInfo"
+
 #define G_VFS_DBUS_MOUNTPOINT_TRACKER_INTERFACE "org.gtk.vfs.MountpointTracker"
 #define G_VFS_DBUS_MOUNTPOINT_TRACKER_PATH "/org/gtk/vfs/MountpointTracker"
 #define G_VFS_DBUS_LIST_MOUNT_POINTS "ListMountpoints"

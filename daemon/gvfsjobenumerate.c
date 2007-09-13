@@ -112,13 +112,67 @@ g_vfs_job_enumerate_set_result (GVfsJobEnumerate *job,
 
 void
 g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
-			      GList *info)
+			      GList *infos)
 {
+  DBusMessage *message, *orig_message;
+  DBusMessageIter iter, array_iter;
+  char *sig;
+
+  orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
+  
+  message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
+					  job->object_path,
+					  G_VFS_DBUS_ENUMERATOR_INTERFACE,
+					  G_VFS_DBUS_ENUMERATOR_GOT_INFO);
+  dbus_message_set_no_reply (message, TRUE);
+
+  dbus_message_iter_init_append (message, &iter);
+
+  sig = g_dbus_get_file_info_signature (job->requested_result);
+
+  if (!dbus_message_iter_open_container (&iter,
+					 DBUS_TYPE_ARRAY, sig, 
+					 &array_iter))
+    g_dbus_oom ();
+  
+  g_free (sig);
+
+  while (infos != NULL)
+    {
+      g_dbus_append_file_info (&array_iter, 
+			       job->requested_result,
+			       infos->data);
+      infos = infos->next;
+    }
+
+  if (!dbus_message_iter_close_container (&iter, &array_iter))
+    g_dbus_oom ();
+  
+  dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
+			message, NULL);
+  dbus_message_unref (message);
 }
 
 void
 g_vfs_job_enumerate_done (GVfsJobEnumerate *job)
 {
+  DBusMessage *message, *orig_message;
+  
+  g_assert (!G_VFS_JOB (job)->failed);
+
+  orig_message = g_vfs_job_dbus_get_message (G_VFS_JOB_DBUS (job));
+  
+  message = dbus_message_new_method_call (dbus_message_get_sender (orig_message),
+					  job->object_path,
+					  G_VFS_DBUS_ENUMERATOR_INTERFACE,
+					  G_VFS_DBUS_ENUMERATOR_DONE);
+  dbus_message_set_no_reply (message, TRUE);
+
+  dbus_connection_send (g_vfs_job_dbus_get_connection (G_VFS_JOB_DBUS (job)),
+			message, NULL);
+  dbus_message_unref (message);
+
+  g_vfs_job_emit_finished (G_VFS_JOB (job));
 }
 
 static gboolean

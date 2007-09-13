@@ -222,7 +222,7 @@ g_file_daemon_enumerate_children (GFile      *file,
 			     0);
   
   g_free (obj_path);
-  
+
   if (reply == NULL)
     goto error;
 
@@ -235,10 +235,10 @@ g_file_daemon_enumerate_children (GFile      *file,
     }
   
   dbus_message_iter_get_basic (&iter, &requested_32);
-  
   dbus_message_unref (reply);
 
   g_file_enumerator_daemon_set_sync_connection (enumerator, connection);
+  g_file_enumerator_daemon_set_request_flags (enumerator, requested_32);
   
   return G_FILE_ENUMERATOR (enumerator);
 

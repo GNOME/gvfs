@@ -43,8 +43,10 @@ static GOnce once_init_dbus = G_ONCE_INIT;
 static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
 
 static GHashTable *bus_name_map = NULL;
-
 G_LOCK_DEFINE_STATIC(bus_name_map);
+
+static GHashTable *obj_path_map = NULL;
+G_LOCK_DEFINE_STATIC(obj_path_map);
 
 static DBusConnection *get_connection_for_owner             (const char      *owner);
 static DBusSource *    connection_setup_with_main_and_owner (DBusConnection  *connection,
@@ -69,6 +71,213 @@ static void oom (void)
   g_error ("DBus failed with out of memory error");
   exit(1);
 }
+
+typedef struct {
+  DBusHandleMessageFunction callback;
+  GObject *data;
+} PathMapEntry;
+
+void
+_g_dbus_register_vfs_filter (const char *obj_path,
+			     DBusHandleMessageFunction callback,
+			     GObject *data)
+{
+  PathMapEntry * entry;
+  
+  G_LOCK (obj_path_map);
+  
+  if (obj_path_map == NULL)
+    obj_path_map = g_hash_table_new_full (g_str_hash, g_str_equal,
+					  g_free, g_free);
+
+  entry = g_new (PathMapEntry,1 );
+  entry->callback = callback;
+  entry->data = data;
+
+  g_hash_table_insert  (obj_path_map, g_strdup (obj_path), entry);
+  
+  G_UNLOCK (obj_path_map);
+}
+
+void
+_g_dbus_unregister_vfs_filter (const char *obj_path)
+{
+  G_LOCK (obj_path_map);
+  
+  if (obj_path_map)
+      g_hash_table_remove (obj_path_map, obj_path);
+  
+  G_UNLOCK (obj_path_map);
+}
+
+static DBusHandlerResult
+vfs_connection_filter (DBusConnection     *connection,
+		       DBusMessage        *message,
+		       void               *user_data)
+{
+  PathMapEntry *entry;
+  DBusHandlerResult res;
+  DBusHandleMessageFunction callback;
+  GObject *data;
+
+  callback = NULL;
+  data = NULL;
+  G_LOCK (obj_path_map);
+  if (obj_path_map)
+    {
+      entry = g_hash_table_lookup (obj_path_map,
+				   dbus_message_get_path (message));
+
+      if (entry)
+	{
+	  callback = entry->callback;
+	  data = g_object_ref (entry->data);
+	}
+    }
+  G_UNLOCK (obj_path_map);
+
+  res = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+  if (callback)
+    {
+      res = callback (connection, message, data);
+      g_object_unref (data);
+    }
+
+  return res;
+}
+
+static void
+outstanding_fd_free (OutstandingFD *outstanding)
+{
+  if (outstanding->fd != -1)
+    close (outstanding->fd);
+
+  g_free (outstanding);
+}
+
+static void
+connection_data_free (gpointer p)
+{
+  VfsConnectionData *data = p;
+  
+  close (data->extra_fd);
+
+  if (data->extra_fd_source)
+    {
+      g_source_destroy (data->extra_fd_source);
+      g_source_unref (data->extra_fd_source);
+    }
+  g_free (data);
+}
+
+/* receive a file descriptor over file descriptor fd */
+static int 
+receive_fd (int connection_fd)
+{
+  struct msghdr msg;
+  struct iovec iov;
+  char buf[1];
+  int rv;
+  char ccmsg[CMSG_SPACE (sizeof(int))];
+  struct cmsghdr *cmsg;
+
+  iov.iov_base = buf;
+  iov.iov_len = 1;
+  msg.msg_name = 0;
+  msg.msg_namelen = 0;
+  msg.msg_iov = &iov;
+  msg.msg_iovlen = 1;
+  msg.msg_control = ccmsg;
+  msg.msg_controllen = sizeof (ccmsg);
+  
+  rv = recvmsg (connection_fd, &msg, 0);
+  if (rv == -1) 
+    {
+      perror ("recvmsg");
+      return -1;
+    }
+
+  cmsg = CMSG_FIRSTHDR (&msg);
+  if (!cmsg->cmsg_type == SCM_RIGHTS) {
+    g_warning("got control message of unknown type %d", 
+	      cmsg->cmsg_type);
+    return -1;
+  }
+
+  return *(int*)CMSG_DATA(cmsg);
+}
+
+static void
+accept_new_fd (VfsConnectionData *data,
+	       GIOCondition condition,
+	       int fd)
+{
+  int new_fd;
+  int fd_id;
+  OutstandingFD *outstanding_fd;
+
+  
+  fd_id = data->extra_fd_count;
+  new_fd = receive_fd (data->extra_fd);
+  if (new_fd != -1)
+    {
+      data->extra_fd_count++;
+
+      outstanding_fd = g_hash_table_lookup (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+      
+      if (outstanding_fd)
+	{
+	  outstanding_fd->callback (new_fd, outstanding_fd->callback_data);
+	  g_hash_table_remove (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+	}
+      else
+	{
+	  outstanding_fd = g_new0 (OutstandingFD, 1);
+	  outstanding_fd->fd = new_fd;
+	  outstanding_fd->callback = NULL;
+	  outstanding_fd->callback_data = NULL;
+	  g_hash_table_insert (data->outstanding_fds,
+			       GINT_TO_POINTER (fd_id),
+			       outstanding_fd);
+	}
+    }
+}
+
+static void
+vfs_connection_setup (DBusConnection *connection,
+		      int extra_fd,
+		      gboolean async)
+{
+  VfsConnectionData *connection_data;
+  
+  connection_data = g_new (VfsConnectionData, 1);
+  connection_data->extra_fd = extra_fd;
+  connection_data->extra_fd_count = 0;
+
+  if (async)
+    {
+      connection_data->outstanding_fds =
+	g_hash_table_new_full (g_direct_hash,
+			       g_direct_equal,
+			       NULL,
+			       (GDestroyNotify)outstanding_fd_free);
+
+
+      connection_data->extra_fd_source =
+	_g_fd_source_new (extra_fd, POLLIN, NULL);
+      g_source_set_callback (connection_data->extra_fd_source,
+			     (GSourceFunc)accept_new_fd, connection_data, NULL);
+      
+    }
+  
+  if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
+    oom ();
+
+  if (!dbus_connection_add_filter (connection, vfs_connection_filter, NULL, NULL))
+    oom ();
+}
+
 
 static char *
 get_owner_for_bus_name (const char *bus_name)
@@ -251,59 +460,6 @@ daemon_socket_connect (const char *address, GError **error)
   return fd;
 }
 
-static void
-connection_data_free (gpointer p)
-{
-  VfsConnectionData *data = p;
-  
-  close (data->extra_fd);
-
-  if (data->extra_fd_source)
-    {
-      g_source_destroy (data->extra_fd_source);
-      g_source_unref (data->extra_fd_source);
-    }
-  g_free (data);
-}
-
-
-/* receive a file descriptor over file descriptor fd */
-static int 
-receive_fd (int connection_fd)
-{
-  struct msghdr msg;
-  struct iovec iov;
-  char buf[1];
-  int rv;
-  char ccmsg[CMSG_SPACE (sizeof(int))];
-  struct cmsghdr *cmsg;
-
-  iov.iov_base = buf;
-  iov.iov_len = 1;
-  msg.msg_name = 0;
-  msg.msg_namelen = 0;
-  msg.msg_iov = &iov;
-  msg.msg_iovlen = 1;
-  msg.msg_control = ccmsg;
-  msg.msg_controllen = sizeof (ccmsg);
-  
-  rv = recvmsg (connection_fd, &msg, 0);
-  if (rv == -1) 
-    {
-      perror ("recvmsg");
-      return -1;
-    }
-
-  cmsg = CMSG_FIRSTHDR (&msg);
-  if (!cmsg->cmsg_type == SCM_RIGHTS) {
-    g_warning("got control message of unknown type %d", 
-	      cmsg->cmsg_type);
-    return -1;
-  }
-
-  return *(int*)CMSG_DATA(cmsg);
-}
-
 int
 _g_dbus_connection_get_fd_sync (DBusConnection *connection,
 				int fd_id)
@@ -324,15 +480,6 @@ _g_dbus_connection_get_fd_sync (DBusConnection *connection,
     data->extra_fd_count++;
 
   return fd;
-}
-
-static void
-outstanding_fd_free (OutstandingFD *outstanding)
-{
-  if (outstanding->fd != -1)
-    close (outstanding->fd);
-
-  g_free (outstanding);
 }
 
 void
@@ -576,43 +723,6 @@ get_private_bus_async (AsyncDBusCall *async_call)
   return TRUE;
 }
 
-
-static void
-accept_new_fd (VfsConnectionData *data,
-	       GIOCondition condition,
-	       int fd)
-{
-  int new_fd;
-  int fd_id;
-  OutstandingFD *outstanding_fd;
-
-  
-  fd_id = data->extra_fd_count;
-  new_fd = receive_fd (data->extra_fd);
-  if (new_fd != -1)
-    {
-      data->extra_fd_count++;
-
-      outstanding_fd = g_hash_table_lookup (data->outstanding_fds, GINT_TO_POINTER (fd_id));
-      
-      if (outstanding_fd)
-	{
-	  outstanding_fd->callback (new_fd, outstanding_fd->callback_data);
-	  g_hash_table_remove (data->outstanding_fds, GINT_TO_POINTER (fd_id));
-	}
-      else
-	{
-	  outstanding_fd = g_new0 (OutstandingFD, 1);
-	  outstanding_fd->fd = new_fd;
-	  outstanding_fd->callback = NULL;
-	  outstanding_fd->callback_data = NULL;
-	  g_hash_table_insert (data->outstanding_fds,
-			       GINT_TO_POINTER (fd_id),
-			       outstanding_fd);
-	}
-    }
-}
-
 static void
 async_get_connection_response (DBusPendingCall *pending,
 			       void            *data)
@@ -624,7 +734,6 @@ async_get_connection_response (DBusPendingCall *pending,
   char *address1, *address2;
   int extra_fd;
   DBusConnection *connection, *existing_connection;
-  VfsConnectionData *connection_data;
   DBusSource *source;
 
   reply = dbus_pending_call_steal_reply (pending);
@@ -669,23 +778,8 @@ async_get_connection_response (DBusPendingCall *pending,
     }
   dbus_message_unref (reply);
 
-  connection_data = g_new0 (VfsConnectionData, 1);
-  connection_data->extra_fd = extra_fd;
-  connection_data->extra_fd_count = 0;
-  connection_data->outstanding_fds =
-    g_hash_table_new_full (g_direct_hash,
-			   g_direct_equal,
-			   NULL,
-			   (GDestroyNotify)outstanding_fd_free);
-
-  connection_data->extra_fd_source =
-    _g_fd_source_new (extra_fd, POLLIN, NULL);
-  g_source_set_callback (connection_data->extra_fd_source,
-			 (GSourceFunc)accept_new_fd, connection_data, NULL);
+  vfs_connection_setup (connection, extra_fd, TRUE);
   
-  if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
-    oom ();
-
   /* Maybe we already had a connection? This happens if we requested
    * the same owner several times in parallel.
    * If so, just drop this connection and use that.
@@ -1143,7 +1237,6 @@ get_connection_sync (const char *bus_name,
   char *address1, *address2;
   char *owner;
   int extra_fd;
-  VfsConnectionData *connection_data;
 
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
 
@@ -1181,6 +1274,7 @@ get_connection_sync (const char *bus_name,
 		   "Couldn't get main dbus connection: %s\n",
 		   derror.message);
       dbus_error_free (&derror);
+      g_free (owner);
       return NULL;
     }
   
@@ -1188,7 +1282,6 @@ get_connection_sync (const char *bus_name,
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_GET_CONNECTION);
-  g_free (owner);
   
   reply = dbus_connection_send_with_reply_and_block (bus, message, -1,
 						     &derror);
@@ -1201,6 +1294,7 @@ get_connection_sync (const char *bus_name,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
       dbus_error_free (&derror);
+      g_free (owner);
       return NULL;
     }
 
@@ -1208,6 +1302,7 @@ get_connection_sync (const char *bus_name,
     {
       _g_error_from_dbus (&derror, error);
       dbus_error_free (&derror);
+      g_free (owner);
       return NULL;
     }
   
@@ -1220,6 +1315,7 @@ get_connection_sync (const char *bus_name,
   if (extra_fd == -1)
     {
       dbus_message_unref (reply);
+      g_free (owner);
       return NULL;
     }
 
@@ -1233,18 +1329,14 @@ get_connection_sync (const char *bus_name,
       close (extra_fd);
       dbus_message_unref (reply);
       dbus_error_free (&derror);
+      g_free (owner);
       return NULL;
     }
   dbus_message_unref (reply);
 
-  connection_data = g_new (VfsConnectionData, 1);
-  connection_data->extra_fd = extra_fd;
-  connection_data->extra_fd_count = 0;
+  vfs_connection_setup (connection, extra_fd, FALSE);
 
-  if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
-    oom ();
-
-  g_hash_table_insert (local->connections, g_strdup (owner), connection);
+  g_hash_table_insert (local->connections, owner, connection);
 
   return connection;
 }

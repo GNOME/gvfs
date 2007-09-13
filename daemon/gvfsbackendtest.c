@@ -278,8 +278,30 @@ do_enumerate (GVfsBackend *backend,
 	      const char *attributes,
 	      gboolean follow_symlinks)
 {
+  GFileInfo *info1, *info2;;
+  GList *l;
+  
   g_vfs_job_enumerate_set_result (job, requested);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  info1 = g_file_info_new ();
+  info2 = g_file_info_new ();
+  g_file_info_set_name (info1, "file1");
+  g_file_info_set_file_type (info1, G_FILE_TYPE_REGULAR);
+  g_file_info_set_name (info2, "file2");
+  g_file_info_set_file_type (info2, G_FILE_TYPE_REGULAR);
+  
+  l = NULL;
+  l = g_list_append (l, info1);
+  l = g_list_append (l, info2);
+
+  g_vfs_job_enumerate_add_info (job, l);
+
+  g_list_free (l);
+  g_object_unref (info1);
+  g_object_unref (info2);
+
+  g_vfs_job_enumerate_done (job);
   
   return TRUE;
 }
