@@ -1558,3 +1558,51 @@ g_file_load_contents_finish (GFile                *file,
   return TRUE;
 }
 
+gboolean
+g_file_replace_contents (GFile                *file,
+			 const gchar          *contents,
+			 gsize                 length,
+			 time_t                mtime,
+			 gboolean              make_backup,
+			 GCancellable         *cancellable,
+			 GError              **error)
+{
+  GFileOutputStream *out;
+  gsize pos, remainder;
+  gssize res;
+
+  out = g_file_replace (file,
+			mtime,
+			make_backup,
+			cancellable,
+			error);
+  if (out == NULL)
+    return FALSE;
+
+  pos = 0;
+  remainder = length;
+  while (remainder > 0 &&
+	 (res = g_output_stream_write (G_OUTPUT_STREAM (out),
+				       contents + pos,
+				       MIN (remainder, GET_CONTENT_BLOCK_SIZE),
+				       cancellable,
+				       error)) > 0)
+    {
+      pos += res;
+      remainder -= res;
+    }
+  
+  if (remainder > 0 && res < 0)
+    {
+      /* Ignore errors on close */
+      g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, NULL);
+      
+      /* error is set already */
+      return FALSE;
+    }
+  
+  if (!g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, error))
+    return FALSE;
+  
+  return TRUE;
+}
