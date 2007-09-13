@@ -115,8 +115,6 @@ if test "x$enable_samba" != "xno"; then
   if test "x${with_samba_includes}" != "xno"; then
 	CPPFLAGS_save="$CPPFLAGS"
 
-	echo "before test, samba_includes: ${samba_includes}"
-
 	CPPFLAGS="$CPPFLAGS -I$with_samba_includes"
 	AC_CHECK_HEADER(libsmbclient.h, [ samba_includes="yes" ])
 	CPPFLAGS="$CPPFLAGS_save"
@@ -141,14 +139,13 @@ if test "x$enable_samba" != "xno"; then
 		SAMBA_CFLAGS=""
 	fi
   fi
-  echo "have_samba_includes: ${have_samba_includes}"
   AC_ARG_WITH(samba-libs, [  --with-samba-libs=PREFIX     	Location of Samba libs.],
 	      with_samba_libs="$withval", with_samba_libs="/usr/lib")
   if test "x${with_samba_libs}" != "xno" -a "x${have_samba_includes}" != "xno"; then
 	LDFLAGS_save="$LDFLAGS"
 	
 	LDFLAGS="$LDFLAGS -L$with_samba_libs"
-	AC_CHECK_LIB(smbclient, smbc_new_context,samba_libs="yes", samba_libs="no")
+	AC_CHECK_LIB(smbclient, smbc_option_get,samba_libs="yes", samba_libs="no")
 	LDFLAGS="$LDFLAGS_save"
 	if test "x${samba_libs}" != "xno"; then
 		AC_DEFINE(HAVE_SAMBA,, [Define to 1 if you have the samba 3.0 libraries])
@@ -159,6 +156,10 @@ if test "x$enable_samba" != "xno"; then
                 	SAMBA_LIBS="-lsmbclient"
                 fi
 	else
+		AC_CHECK_LIB(smbclient, smbc_new_context,samba_old_libs="yes", samba_old_libs="no")
+		if test "x${samba_old_libs}" != "xno"; then
+		   msg_samba="Too old, need at least samba 3.0.22"
+		fi
 		SAMBA_CFLAGS=""
 		SAMBA_LIBS=""
 	fi
@@ -166,7 +167,7 @@ if test "x$enable_samba" != "xno"; then
   AC_MSG_CHECKING(for Samba 3.0 libraries)
   AC_MSG_RESULT($msg_samba)
 fi
-AM_CONDITIONAL(HAVE_SAMBA, test $msg_samba = yes)
+AM_CONDITIONAL(HAVE_SAMBA, test "$msg_samba" = "yes")
 AC_SUBST(SAMBA_CFLAGS)
 AC_SUBST(SAMBA_LIBS)
 	
@@ -235,3 +236,11 @@ daemon/Makefile
 programs/Makefile
 po/Makefile.in
 ])
+
+echo 
+echo "gvfs configuration summary:"
+echo "
+	SELinux support:      $msg_selinux
+	xattr support:        $msg_xattr
+	Samba support:	      $msg_samba
+"
