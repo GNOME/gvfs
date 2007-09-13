@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
 #define G_VFS_DBUS_MOUNT_OP_TRASH "Trash"
 #define G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY "MakeDirectory"
+#define G_VFS_DBUS_MOUNT_OP_MAKE_SYMBOLIC_LINK "MakeSymbolicLink"
 #define G_VFS_DBUS_MOUNT_OP_COPY "Copy"
 #define G_VFS_DBUS_MOUNT_OP_MOVE "Move"
 #define G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE "SetAttribute"

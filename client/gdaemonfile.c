@@ -1311,6 +1311,26 @@ g_daemon_file_make_directory (GFile *file,
 }
 
 static gboolean
+g_daemon_file_make_symbolic_link (GFile *file,
+				  const char *symlink_value,
+				  GCancellable *cancellable,
+				  GError **error)
+{
+  DBusMessage *reply;
+
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_MAKE_SYMBOLIC_LINK,
+			     NULL, cancellable, error,
+			     G_DBUS_TYPE_CSTRING, &symlink_value,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  dbus_message_unref (reply);
+  return TRUE;
+}
+
+static gboolean
 g_daemon_file_set_attribute (GFile *file,
 			     const char *attribute,
 			     GFileAttributeType type,
@@ -1516,4 +1536,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->copy = g_daemon_file_copy;
   iface->move = g_daemon_file_move;
   iface->set_attribute = g_daemon_file_set_attribute;
+  iface->make_symbolic_link = g_daemon_file_make_symbolic_link;
 }

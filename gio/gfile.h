@@ -105,7 +105,7 @@ struct _GFileIface
 					     GCancellable         *cancellable,
 					     GError              **error);
   gboolean            (*make_symbolic_link) (GFile                *file,
-					     const char *symlink_value,
+					     const char           *symlink_value,
 					     GCancellable         *cancellable,
 					     GError              **error);
   gboolean            (*copy)               (GFile                *source,

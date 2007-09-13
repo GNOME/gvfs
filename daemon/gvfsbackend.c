@@ -22,6 +22,7 @@
 #include <gvfsjobtrash.h>
 #include <gvfsjobmountmountable.h>
 #include <gvfsjobmakedirectory.h>
+#include <gvfsjobmakesymlink.h>
 #include <gvfsjobcopy.h>
 #include <gvfsjobmove.h>
 #include <gvfsjobsetattribute.h>
@@ -304,6 +305,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY))
     job = g_vfs_job_make_directory_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_MAKE_SYMBOLIC_LINK))
+    job = g_vfs_job_make_symlink_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_COPY))

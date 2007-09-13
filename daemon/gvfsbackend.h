@@ -40,6 +40,7 @@ typedef struct _GVfsJobSetDisplayName  GVfsJobSetDisplayName;
 typedef struct _GVfsJobTrash           GVfsJobTrash;
 typedef struct _GVfsJobDelete          GVfsJobDelete;
 typedef struct _GVfsJobMakeDirectory   GVfsJobMakeDirectory;
+typedef struct _GVfsJobMakeSymlink     GVfsJobMakeSymlink;
 typedef struct _GVfsJobCopy            GVfsJobCopy;
 typedef struct _GVfsJobMove            GVfsJobMove;
 typedef struct _GVfsJobSetAttribute    GVfsJobSetAttribute;
@@ -219,6 +220,14 @@ struct _GVfsBackendClass
   gboolean (*try_make_directory)(GVfsBackend *backend,
 				 GVfsJobMakeDirectory *job,
 				 const char *filename);
+  void     (*make_symlink)      (GVfsBackend *backend,
+				 GVfsJobMakeDirectory *make_directory,
+				 const char *filename,
+				 const char *symlink_value);
+  gboolean (*try_make_symlink)  (GVfsBackend *backend,
+				 GVfsJobMakeDirectory *make_directory,
+				 const char *filename,
+				 const char *symlink_value);
   void     (*copy)              (GVfsBackend *backend,
 				 GVfsJobCopy *job,
 				 const char *source,
