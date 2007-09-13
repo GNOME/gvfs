@@ -488,7 +488,10 @@ file_copy_fallback (GFile                  *source,
     file     file    overwr  ok
     file     dir     *       G_IO_ERROR_IS_DIRECTORY
     
-    dir      *       *       G_IO_ERROR_WOULD_RECURSE
+    dir      -       *       G_IO_ERROR_WOULD_RECURSE
+    dir      *       0       G_IO_ERROR_EXISTS
+    dir      dir     overwr  G_IO_ERROR_IS_DIRECTORY
+    dir      file    overwr  G_IO_ERROR_WOULD_RECURSE
  */
 gboolean
 g_file_copy (GFile                  *source,
