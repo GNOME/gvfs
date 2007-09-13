@@ -7,7 +7,8 @@
 #include "gfiledaemonlocal.h"
 #include "gvfslocal.h"
 #include <gvfsdaemonprotocol.h>
-#include <gvfsdaemondbus.h>
+#include "gvfsdaemondbus.h"
+#include "gdbusutils.h"
 
 static void g_vfs_impl_daemon_class_init     (GVfsImplDaemonClass *class);
 static void g_vfs_impl_daemon_vfs_iface_init (GVfsIface       *iface);
