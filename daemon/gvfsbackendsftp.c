@@ -51,7 +51,8 @@ typedef void (*ReplyCallback) (GVfsBackendSftp *backend,
                                int reply_type,
                                GDataInputStream *reply,
                                guint32 len,
-                               GVfsJob *job);
+                               GVfsJob *job,
+                               gpointer user_data);
                                
 typedef struct {
   guchar *data;
@@ -61,6 +62,7 @@ typedef struct {
 typedef struct {
   ReplyCallback callback;
   GVfsJob *job;
+  gpointer user_data;
 } ExpectedReply;
 
 struct _GVfsBackendSftp
@@ -739,7 +741,7 @@ read_reply_async_got_data  (GObject *source_object,
   expected_reply = g_hash_table_lookup (backend->expected_replies, GINT_TO_POINTER (id));
   if (expected_reply)
     {
-      (expected_reply->callback) (backend, type, reply, backend->reply_size, expected_reply->job);
+      (expected_reply->callback) (backend, type, reply, backend->reply_size, expected_reply->job, expected_reply->user_data);
       g_hash_table_remove (backend->expected_replies, GINT_TO_POINTER (id));
     }
   else
@@ -860,13 +862,15 @@ static void
 expect_reply (GVfsBackendSftp *backend,
               guint32 id,
               ReplyCallback callback,
-              GVfsJob *job)
+              GVfsJob *job,
+              gpointer user_data)
 {
   ExpectedReply *expected;
 
   expected = g_slice_new (ExpectedReply);
   expected->callback = callback;
   expected->job = g_object_ref (job);
+  expected->user_data = user_data;
 
   g_hash_table_replace (backend->expected_replies, GINT_TO_POINTER (id), expected);
 }
@@ -876,7 +880,8 @@ queue_command_stream_and_free (GVfsBackendSftp *backend,
                                GDataOutputStream *command_stream,
                                guint32 id,
                                ReplyCallback callback,
-                               GVfsJob *job)
+                               GVfsJob *job,
+                               gpointer user_data)
 {
   GByteArray *array;
   gboolean first;
@@ -894,7 +899,7 @@ queue_command_stream_and_free (GVfsBackendSftp *backend,
   first = backend->command_queue == NULL;
 
   backend->command_queue = g_list_append (backend->command_queue, buffer);
-  expect_reply (backend, id, callback, job);
+  expect_reply (backend, id, callback, job, user_data);
   
   if (first)
     send_command (backend);
@@ -1237,7 +1242,10 @@ parse_attributes (GVfsBackendSftp *backend,
                S_ISBLK (v))
         type = G_FILE_TYPE_SPECIAL;
       else if (S_ISLNK (v))
-        type = G_FILE_TYPE_SYMBOLIC_LINK;
+        {
+          type = G_FILE_TYPE_SYMBOLIC_LINK;
+          g_file_info_set_is_symlink (info, TRUE);
+        }
 
       if (has_uid && backend->my_uid != (guint32)-1)
         {
@@ -1269,9 +1277,11 @@ parse_attributes (GVfsBackendSftp *backend,
       /* TODO: Handle more */
     }
 }
-                  
+
 typedef struct {
   DataBuffer *handle;
+  GHashTable *get_symlink_hash;
+  int outstanding_requests;
 } ReadDirData;
 
 static
@@ -1283,12 +1293,51 @@ read_dir_data_free (ReadDirData *data)
 }
 
 static void
+read_dir_symlink_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job,
+                        gpointer user_data)
+{
+  char *name;
+  GList l = { NULL };
+  GFileInfo *info;
+  ReadDirData *data;
+
+  name = user_data;
+  data = job->backend_data;
+  
+  if (reply_type == SSH_FXP_ATTRS)
+    {
+      info = g_file_info_new ();
+      g_file_info_set_name (info, name);
+      g_file_info_set_is_symlink (info, TRUE);
+      
+      parse_attributes (backend, info, reply);
+
+      l.data = info;
+      g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), &l);
+      
+      g_object_unref (info);
+    }
+
+  g_free (name);
+  data->outstanding_requests --;
+  
+  if (data->outstanding_requests == 0)
+    g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
+}
+
+static void
 read_dir_reply (GVfsBackendSftp *backend,
                 int reply_type,
                 GDataInputStream *reply,
                 guint32 len,
-                GVfsJob *job)
+                GVfsJob *job,
+                gpointer user_data)
 {
+  GVfsJobEnumerate *enum_job;
   guint32 count;
   int i;
   GList *infos;
@@ -1297,6 +1346,7 @@ read_dir_reply (GVfsBackendSftp *backend,
   ReadDirData *data;
 
   data = job->backend_data;
+  enum_job = G_VFS_JOB_ENUMERATE (job);
 
   g_print ("read_dir_reply %d\n", reply_type);
 
@@ -1304,7 +1354,10 @@ read_dir_reply (GVfsBackendSftp *backend,
     {
       /* Ignore all error, including the expected END OF FILE.
        * Real errors are expected in open_dir anyway */
-      g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
+      data->outstanding_requests --;
+      if (data->outstanding_requests == 0)
+        g_vfs_job_enumerate_done (enum_job);
+      
       return;
     }
 
@@ -1316,6 +1369,7 @@ read_dir_reply (GVfsBackendSftp *backend,
       GFileInfo *info;
       char *name;
       char *longname;
+      char *abs_name;
 
       info = g_file_info_new ();
       name = read_string (reply, NULL);
@@ -1328,22 +1382,46 @@ read_dir_reply (GVfsBackendSftp *backend,
       parse_attributes (backend, info, reply);
       if (strcmp (".", name) == 0 ||
           strcmp ("..", name) == 0)
-        g_object_unref (info);
-      else
+        {
+          g_object_unref (info);
+          info = NULL;
+        }
+      else if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
+               ! (enum_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
+        {
+          /* Default (at least for openssl) is for readdir to not follow, and this was a
+             symlink, so we need to manually follow it */
+          command = new_command_stream (backend,
+                                        SSH_FXP_STAT,
+                                        &id);
+          abs_name = g_build_filename (enum_job->filename, name, NULL);
+          put_string (command, abs_name);
+          g_free (abs_name);
+          queue_command_stream_and_free (backend, command, id, read_dir_symlink_reply, G_VFS_JOB (job), name);
+          g_object_unref (info);
+          info = NULL;
+          name = NULL; /* Owned by get_info_symlink_reply */
+          data->outstanding_requests ++;
+        }
+      
+      if (info)
         infos = g_list_prepend (infos, info);
       
       g_free (name);
     }
-  
-  g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), infos);
-  g_list_foreach (infos, (GFunc)g_object_unref, NULL);
-  g_list_free (infos);
+
+  if (infos)
+    {
+      g_vfs_job_enumerate_add_info (enum_job, infos);
+      g_list_foreach (infos, (GFunc)g_object_unref, NULL);
+      g_list_free (infos);
+    }
 
   command = new_command_stream (backend,
                                 SSH_FXP_READDIR,
                                 &id);
   put_data_buffer (command, data->handle);
-  queue_command_stream_and_free (backend, command, id, read_dir_reply, G_VFS_JOB (job));
+  queue_command_stream_and_free (backend, command, id, read_dir_reply, G_VFS_JOB (job), NULL);
 }
 
 static void
@@ -1351,7 +1429,8 @@ open_dir_reply (GVfsBackendSftp *backend,
                 int reply_type,
                 GDataInputStream *reply,
                 guint32 len,
-                GVfsJob *job)
+                GVfsJob *job,
+                gpointer user_data)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
@@ -1383,8 +1462,10 @@ open_dir_reply (GVfsBackendSftp *backend,
                                 SSH_FXP_READDIR,
                                 &id);
   put_data_buffer (command, data->handle);
+
+  data->outstanding_requests = 1;
   
-  queue_command_stream_and_free (op_backend, command, id, read_dir_reply, G_VFS_JOB (job));
+  queue_command_stream_and_free (op_backend, command, id, read_dir_reply, G_VFS_JOB (job), NULL);
 }
 
 static gboolean
@@ -1407,7 +1488,7 @@ try_enumerate (GVfsBackend *backend,
                                 &id);
   put_string (command, filename);
   
-  queue_command_stream_and_free (op_backend, command, id, open_dir_reply, G_VFS_JOB (job));
+  queue_command_stream_and_free (op_backend, command, id, open_dir_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -1417,7 +1498,8 @@ get_info_reply (GVfsBackendSftp *backend,
                 int reply_type,
                 GDataInputStream *reply,
                 guint32 len,
-                GVfsJob *job)
+                GVfsJob *job,
+                gpointer user_data)
 {
   GFileInfo *info;
   int finished_count;
@@ -1453,7 +1535,8 @@ get_info_is_link_reply (GVfsBackendSftp *backend,
                         int reply_type,
                         GDataInputStream *reply,
                         guint32 len,
-                        GVfsJob *job)
+                        GVfsJob *job,
+                        gpointer user_data)
 {
   GFileInfo *info;
   int finished_count;
@@ -1505,7 +1588,7 @@ try_get_info (GVfsBackend *backend,
                                     &id);
       put_string (command, filename);
       
-      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
+      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job), NULL);
     }
   else
     {
@@ -1516,7 +1599,7 @@ try_get_info (GVfsBackend *backend,
                                         SSH_FXP_LSTAT,
                                         &id);
           put_string (command, filename);
-          queue_command_stream_and_free (op_backend, command, id, get_info_is_link_reply, G_VFS_JOB (job));
+          queue_command_stream_and_free (op_backend, command, id, get_info_is_link_reply, G_VFS_JOB (job), NULL);
         }
       else
         G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (1);
@@ -1525,7 +1608,7 @@ try_get_info (GVfsBackend *backend,
                                     SSH_FXP_STAT,
                                     &id);
       put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job));
+      queue_command_stream_and_free (op_backend, command, id, get_info_reply, G_VFS_JOB (job), NULL);
     }
 
   return TRUE;
