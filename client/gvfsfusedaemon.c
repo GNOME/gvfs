@@ -514,11 +514,9 @@ static mode_t
 file_info_get_stat_mode (GFileInfo *file_info)
 {
   GFileType         file_type;
-  GFileAccessRights file_access;
   mode_t            unix_mode;
 
   file_type   = g_file_info_get_file_type (file_info);
-  file_access = g_file_info_get_access_rights (file_info);
 
   switch (file_type)
     {
@@ -542,11 +540,14 @@ file_info_get_stat_mode (GFileInfo *file_info)
         break;
     }
 
-  if (file_access & G_FILE_ACCESS_CAN_READ)
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_READ)
+      && g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_READ))
     unix_mode |= S_IRUSR;
-  if (file_access & G_FILE_ACCESS_CAN_WRITE)
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE)
+      && g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_WRITE))
     unix_mode |= S_IWUSR;
-  if (file_access & G_FILE_ACCESS_CAN_EXECUTE)
+  if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE)
+      && g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_EXECUTE))
     unix_mode |= S_IXUSR;
 
   return unix_mode;
@@ -580,10 +581,10 @@ getattr_for_file (GFile *file, struct stat *sbuf)
       sbuf->st_ctime = mod_time.tv_sec;
       sbuf->st_atime = mod_time.tv_sec;
 
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_CTIME))
-        sbuf->st_ctime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_CTIME);
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_ATIME))
-        sbuf->st_atime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_ATIME);
+      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED))
+        sbuf->st_ctime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_CHANGED);
+      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS))
+        sbuf->st_atime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS);
 
       if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_NLINK))
         {

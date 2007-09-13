@@ -81,7 +81,7 @@ gvfs_fuse_daemon_INCLUDES = \
 
 gvfs_fuse_daemon_LDADD = \
 	$(top_builddir)/gio/libgio.la \
-	$(top_builddir)/common/libcommon.la \
+	$(top_builddir)/common/libgvfscommon.la \
 	$(top_builddir)/client/libgvfsdbusfuse.la \
 	$(GLIB_LIBS) $(DBUS_LIBS) $(FUSE_LIBS)
 
