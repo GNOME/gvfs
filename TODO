@@ -28,8 +28,6 @@ Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg l
 Implement std:icon for local files. This is related to mimetype decisions (fast vs slow)
 Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
-Make mount_spec and path contruct only properties in GDaemonFile
-
 Don't hardcode the libgvfsdbus.so name, instead have some generic pluggable system
 
 gvfs:
