@@ -477,9 +477,7 @@ file_copy_fallback (GFile                  *source,
   return FALSE;
 }
 
-/* Fails on directory source
-   
-   Errors:
+/* Errors:
 
    source    dest    flags   res
     -        *       *       G_IO_ERROR_NOT_FOUND
@@ -540,9 +538,7 @@ g_file_copy (GFile                  *source,
 			     error);
 }
 
-/* May fail on directory source with IS_DIRECTORY (i.e. if rename fails)
-
-   Errors:
+/* Errors:
 
    source    dest    flags   res
     -        *       *       G_IO_ERROR_NOT_FOUND
