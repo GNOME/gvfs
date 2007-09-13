@@ -1000,6 +1000,9 @@ _g_local_file_info_get_from_fd (int fd,
   info = g_file_info_new ();
 
   matcher = g_file_attribute_matcher_new (attributes);
+
+  /* Make sure we don't set any unwanted attributes */
+  g_file_info_set_attribute_mask (info, matcher);
   
   set_info_from_stat (info, &stat_buf, matcher);
   
@@ -1020,6 +1023,8 @@ _g_local_file_info_get_from_fd (int fd,
   get_xattrs_from_fd (fd, FALSE, info, matcher);
   
   g_file_attribute_matcher_unref (matcher);
+
+  g_file_info_unset_attribute_mask (info);
   
   return info;
 }
