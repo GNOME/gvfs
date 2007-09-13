@@ -29,12 +29,6 @@ struct _GVfsReadChannel
 struct _GVfsReadChannelClass
 {
   GObjectClass parent_class;
-
-  /* signals */
-
-  void (*new_job) (GVfsReadChannel *stream,
-		   GVfsJob *job);
-  void (*closed)  (GVfsReadChannel *stream);
 };
 
 GType g_vfs_read_channel_get_type (void) G_GNUC_CONST;
