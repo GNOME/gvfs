@@ -21,7 +21,7 @@ struct _fam_sub
 };
 
 static GFileMonitorEvent 
-fam_event_to_file_monitor_event (FAMCodes code)
+fam_event_to_file_monitor_event (enum FAMCodes code)
 {
 	switch (code)
 	{
@@ -42,7 +42,7 @@ fam_event_to_file_monitor_event (FAMCodes code)
 }
 
 static GDirectoryMonitorEvent
-fam_event_to_dir_monitor_event (FAMCodes code)
+fam_event_to_dir_monitor_event (enum FAMCodes code)
 {
 	switch (code)
 	{
@@ -60,7 +60,6 @@ fam_event_to_dir_monitor_event (FAMCodes code)
 	break;
 	}
 }
-
 
 static gboolean
 fam_do_iter_unlocked (void)
