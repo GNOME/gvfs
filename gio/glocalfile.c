@@ -787,6 +787,7 @@ g_local_file_read (GFile *file,
 {
   GLocalFile *local = G_LOCAL_FILE (file);
   int fd;
+  struct stat buf;
   
   fd = g_open (local->filename, O_RDONLY, 0);
   if (fd == -1)
@@ -795,6 +796,15 @@ g_local_file_read (GFile *file,
 		   g_io_error_from_errno (errno),
 		   _("Error opening file: %s"),
 		   g_strerror (errno));
+      return NULL;
+    }
+
+  if (fstat(fd, &buf) == 0 && S_ISDIR (buf.st_mode))
+    {
+      close (fd);
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_IS_DIRECTORY,
+		   _("Can't open directory"));
       return NULL;
     }
   
