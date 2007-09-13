@@ -798,6 +798,19 @@ g_file_info_get_symlink_target (GFileInfo *info)
   return g_file_attribute_value_get_byte_string (value);
 }
 
+const char *
+g_file_info_get_etag (GFileInfo *info)
+{
+  static guint32 attr = 0;
+  GFileAttributeValue *value;
+  
+  if (attr == 0)
+    attr = lookup_attribute (G_FILE_ATTRIBUTE_ETAG_VALUE);
+  
+  value = g_file_info_find_value (info, attr);
+  return g_file_attribute_value_get_string (value);
+}
+
 /* Helper setters: */
 
 void

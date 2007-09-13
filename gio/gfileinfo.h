@@ -192,6 +192,7 @@ goffset           g_file_info_get_size               (GFileInfo         *info);
 void              g_file_info_get_modification_time  (GFileInfo         *info,
 						      GTimeVal          *result);
 const char *      g_file_info_get_symlink_target     (GFileInfo         *info);
+const char *      g_file_info_get_etag               (GFileInfo         *info);
 
 void              g_file_info_set_attribute_mask     (GFileInfo         *info,
 						      GFileAttributeMatcher *mask);
