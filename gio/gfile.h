@@ -125,29 +125,33 @@ struct _GFileIface
 					     GAsyncResult         *res,
 					     GError              **error);
 
-  void               (*mount_mountable)           (GFile               *file,
-						   GMountOperation     *mount_operation,
-						   GAsyncReadyCallback  callback,
-						   gpointer             user_data);
-  GFile *            (*mount_mountable_finish)    (GFile               *file,
-						   GAsyncResult        *result,
-						   GError             **error);
-  void               (*unmount_mountable)         (GFile               *file,
-						   GAsyncReadyCallback  callback,
-						   gpointer             user_data);
-  gboolean            (*unmount_mountable_finish) (GFile               *file,
-						   GAsyncResult        *result,
-						   GError             **error);
-  void               (*eject_mountable)           (GFile               *file,
-						   GAsyncReadyCallback  callback,
-						   gpointer             user_data);
-  gboolean            (*eject_mountable_finish)   (GFile               *file,
-						   GAsyncResult        *result,
-						   GError             **error);
+  void                (*mount_mountable)           (GFile               *file,
+						    GMountOperation     *mount_operation,
+						    GCancellable         *cancellable,
+						    GAsyncReadyCallback  callback,
+						    gpointer             user_data);
+  GFile *             (*mount_mountable_finish)    (GFile               *file,
+						    GAsyncResult        *result,
+						    GError             **error);
+  void                (*unmount_mountable)         (GFile               *file,
+						    GCancellable         *cancellable,
+						    GAsyncReadyCallback  callback,
+						    gpointer             user_data);
+  gboolean            (*unmount_mountable_finish)  (GFile               *file,
+						    GAsyncResult        *result,
+						    GError             **error);
+  void                (*eject_mountable)           (GFile               *file,
+						    GCancellable        *cancellable,
+						    GAsyncReadyCallback  callback,
+						    gpointer             user_data);
+  gboolean            (*eject_mountable_finish)    (GFile               *file,
+						    GAsyncResult        *result,
+						    GError             **error);
 
 
   void     (*mount_for_location)        (GFile *location,
 					 GMountOperation *mount_operation,
+					 GCancellable *cancellable,
 					 GAsyncReadyCallback callback,
 					 gpointer user_data);
   gboolean (*mount_for_location_finish) (GFile *location,
@@ -288,6 +292,7 @@ gboolean           g_file_set_attribute_int64        (GFile                  *fi
 
 void               g_mount_for_location              (GFile                  *location,
 						      GMountOperation        *mount_operation,
+						      GCancellable           *cancellable,
 						      GAsyncReadyCallback     callback,
 						      gpointer                user_data);
 gboolean           g_mount_for_location_finish       (GFile                  *location,
@@ -295,18 +300,21 @@ gboolean           g_mount_for_location_finish       (GFile                  *lo
 						      GError                **error);
 void               g_file_mount_mountable            (GFile                  *file,
 						      GMountOperation        *mount_operation,
+						      GCancellable           *cancellable,
 						      GAsyncReadyCallback     callback,
 						      gpointer                user_data);
 GFile *            g_file_mount_mountable_finish     (GFile                  *file,
 						      GAsyncResult           *result,
 						      GError                **error);
 void               g_file_unmount_mountable          (GFile                  *file,
+						      GCancellable           *cancellable,
 						      GAsyncReadyCallback     callback,
 						      gpointer                user_data);
 gboolean           g_file_unmount_mountable_finish   (GFile                  *file,
 						      GAsyncResult           *result,
 						      GError                **error);
 void               g_file_eject_mountable            (GFile                  *file,
+						      GCancellable           *cancellable,
 						      GAsyncReadyCallback     callback,
 						      gpointer                user_data);
 gboolean           g_file_eject_mountable_finish     (GFile                  *file,

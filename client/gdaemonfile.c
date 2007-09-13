@@ -877,12 +877,29 @@ g_daemon_file_replace (GFile *file,
 
 
 static void
+mount_mountable_cb (DBusMessage *reply,
+		    DBusConnection *connection,
+		    GError *io_error,
+		    GCancellable *cancellable,
+		    GAsyncReadyCallback op_callback,
+		    gpointer op_callback_data,
+		    gpointer callback_data)
+{
+}
+
+static void
 g_daemon_file_mount_mountable (GFile               *file,
 			       GMountOperation     *mount_operation,
+			       GCancellable        *cancellable,
 			       GAsyncReadyCallback  callback,
 			       gpointer             user_data)
 {
-  
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE,
+		      cancellable,
+		      callback, user_data,
+		      mount_mountable_cb, file,
+		      0);
 }
 
 static GFile *
@@ -902,6 +919,7 @@ typedef struct {
 
 static void g_daemon_file_mount_for_location (GFile *location,
 					      GMountOperation *mount_operation,
+					      GCancellable *cancellable,
 					      GAsyncReadyCallback callback,
 					      gpointer user_data);
 
@@ -939,6 +957,7 @@ mount_reply (DBusMessage *reply,
 static void
 g_daemon_file_mount_for_location (GFile *location,
 				  GMountOperation *mount_operation,
+				  GCancellable *cancellable,
 				  GAsyncReadyCallback callback,
 				  gpointer user_data)
 {
@@ -975,7 +994,8 @@ g_daemon_file_mount_for_location (GFile *location,
   data->file = g_object_ref (location);
   if (mount_operation)
     data->mount_operation = g_object_ref (mount_operation);
-  
+
+  /* TODO: Ignoring cancellable here */
   _g_dbus_connection_call_async (NULL, message,
 				 G_VFS_DBUS_MOUNT_TIMEOUT_MSECS,
 				 mount_reply, data);

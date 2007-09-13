@@ -744,9 +744,19 @@ g_file_set_attribute_int64 (GFile                  *file,
 void
 g_file_mount_mountable (GFile                  *file,
 			GMountOperation        *mount_operation,
+			GCancellable           *cancellable,
 			GAsyncReadyCallback     callback,
 			gpointer                user_data)
 {
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->mount_mountable) (file,
+			      mount_operation,
+			      cancellable,
+			      callback,
+			      user_data);
+  
 }
 
 GFile *
@@ -754,14 +764,32 @@ g_file_mount_mountable_finish (GFile                  *file,
 			       GAsyncResult           *result,
 			       GError                **error)
 {
-  return NULL;
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->mount_mountable_finish) (file, result, error);
 }
 
 void
 g_file_unmount_mountable (GFile                  *file,
+			  GCancellable           *cancellable,
 			  GAsyncReadyCallback     callback,
 			  gpointer                user_data)
 {
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->unmount_mountable) (file,
+				cancellable,
+				callback,
+				user_data);
 }
 
 gboolean
@@ -769,14 +797,32 @@ g_file_unmount_mountable_finish   (GFile                  *file,
 				   GAsyncResult           *result,
 				   GError                **error)
 {
-  return TRUE;
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->unmount_mountable_finish) (file, result, error);
 }
 
 void
 g_file_eject_mountable (GFile                  *file,
+			GCancellable           *cancellable,
 			GAsyncReadyCallback     callback,
 			gpointer                user_data)
 {
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+  (* iface->eject_mountable) (file,
+			      cancellable,
+			      callback,
+			      user_data);
 }
 
 gboolean
@@ -784,7 +830,17 @@ g_file_eject_mountable_finish (GFile                  *file,
 			       GAsyncResult           *result,
 			       GError                **error)
 {
-  return TRUE;
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+  return (* iface->eject_mountable_finish) (file, result, error);
 }
 
 GDirectoryMonitor*
@@ -942,6 +998,7 @@ g_file_get_for_commandline_arg (const char *arg)
 void
 g_mount_for_location (GFile                  *location,
 		      GMountOperation        *mount_operation,
+		      GCancellable           *cancellable,
 		      GAsyncReadyCallback     callback,
 		      gpointer                user_data)
 {
@@ -959,7 +1016,7 @@ g_mount_for_location (GFile                  *location,
       return;
     }
   
-  return (* iface->mount_for_location) (location, mount_operation, callback, user_data);
+  return (* iface->mount_for_location) (location, mount_operation, cancellable, callback, user_data);
 
 }
 

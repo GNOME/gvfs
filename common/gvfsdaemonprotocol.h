@@ -25,6 +25,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE "OpenForWrite"
 #define G_VFS_DBUS_MOUNT_OP_GET_INFO "GetInfo"
 #define G_VFS_DBUS_MOUNT_OP_ENUMERATE "Enumerate"
+#define G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE "MountMountable"
 
 /* mount daemons that support mounting more mounts implement this,
    and set the dbus name in the mountable description file */

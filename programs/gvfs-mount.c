@@ -104,7 +104,7 @@ mount (GFile *file)
 
   g_signal_connect (op, "ask_password", (GCallback)ask_password_cb, NULL);
   
-  g_mount_for_location (file, op, mount_done_cb, op);
+  g_mount_for_location (file, op, NULL, mount_done_cb, op);
   outstanding_mounts++;
 }
 
