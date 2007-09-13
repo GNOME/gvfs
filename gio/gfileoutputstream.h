@@ -29,6 +29,13 @@ struct _GFileOutputStreamClass
 {
   GOutputStreamClass parent_class;
 
+  goffset    (*tell)          (GFileOutputStream     *stream);
+  gboolean   (*can_seek)      (GFileOutputStream     *stream);
+  gboolean   (*seek)	      (GFileOutputStream     *stream,
+			       goffset               offset,
+			       GSeekType             type,
+			       GCancellable         *cancellable,
+			       GError              **error);
   GFileInfo *(*get_file_info) (GFileOutputStream    *stream,
 			       GFileInfoRequestFlags requested,
 			       char                 *attributes,
