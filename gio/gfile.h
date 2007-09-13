@@ -86,6 +86,11 @@ struct _GFileIface
 					     GFileGetInfoFlags     flags,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  gboolean            (*set_attributes_from_info) (GFile          *file,
+					     GFileInfo            *info,
+					     GFileGetInfoFlags     flags,
+					     GCancellable         *cancellable,
+					     GError              **error);
   GFileInputStream *  (*read)               (GFile                *file,
 					     GCancellable         *cancellable,
 					     GError              **error);
@@ -328,6 +333,11 @@ GFileAttributeInfoList *g_file_query_writable_namespaces  (GFile                
 gboolean                g_file_set_attribute              (GFile                      *file,
 							   const char                 *attribute,
 							   const GFileAttributeValue  *value,
+							   GFileGetInfoFlags           flags,
+							   GCancellable               *cancellable,
+							   GError                    **error);
+gboolean                g_file_set_attributes_from_info   (GFile                      *file,
+							   GFileInfo                  *info,
 							   GFileGetInfoFlags           flags,
 							   GCancellable               *cancellable,
 							   GError                    **error);

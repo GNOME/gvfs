@@ -211,6 +211,17 @@ g_file_info_copy (GFileInfo  *other)
   return new;
 }
 
+void
+g_file_info_clear_status (GFileInfo  *info)
+{
+  GFileAttribute *attrs;
+  int i;
+  
+  attrs = (GFileAttribute *)info->attributes->data;
+  for (i = 0; i < info->attributes->len; i++)
+    attrs[i].value.status = G_FILE_ATTRIBUTE_STATUS_UNSET;
+}
+
 static int
 g_file_info_find_place (GFileInfo  *info,
 			guint32 attribute)

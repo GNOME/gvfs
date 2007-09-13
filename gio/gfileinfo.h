@@ -174,6 +174,8 @@ void               g_file_info_set_attribute_object      (GFileInfo  *info,
 							  const char *attribute,
 							  GObject    *value);
 
+void               g_file_info_clear_status              (GFileInfo  *info);
+
 /* Helper getters: */
 GFileType         g_file_info_get_file_type          (GFileInfo         *info);
 gboolean          g_file_info_get_is_hidden          (GFileInfo         *info);

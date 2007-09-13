@@ -15,40 +15,45 @@ static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
 			       gpointer class_data);
 
-static void               g_file_real_read_async       (GFile                *file,
-							int                   io_priority,
-							GCancellable         *cancellable,
-							GAsyncReadyCallback   callback,
-							gpointer              user_data);
-static GFileInputStream * g_file_real_read_finish      (GFile                *file,
-							GAsyncResult         *res,
-							GError              **error);
-static void               g_file_real_append_to_async  (GFile                *file,
-							int                   io_priority,
-							GCancellable         *cancellable,
-							GAsyncReadyCallback   callback,
-							gpointer              user_data);
-static GFileOutputStream *g_file_real_append_to_finish (GFile                *file,
-							GAsyncResult         *res,
-							GError              **error);
-static void               g_file_real_create_async     (GFile                *file,
-							int                   io_priority,
-							GCancellable         *cancellable,
-							GAsyncReadyCallback   callback,
-							gpointer              user_data);
-static GFileOutputStream *g_file_real_create_finish    (GFile                *file,
-							GAsyncResult         *res,
-							GError              **error);
-static void               g_file_real_replace_async    (GFile                *file,
-							const char           *etag,
-							gboolean              make_backup,
-							int                   io_priority,
-							GCancellable         *cancellable,
-							GAsyncReadyCallback   callback,
-							gpointer              user_data);
-static GFileOutputStream *g_file_real_replace_finish   (GFile                *file,
-							GAsyncResult         *res,
-							GError              **error);
+static void               g_file_real_read_async               (GFile                *file,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              user_data);
+static GFileInputStream * g_file_real_read_finish              (GFile                *file,
+								GAsyncResult         *res,
+								GError              **error);
+static void               g_file_real_append_to_async          (GFile                *file,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              user_data);
+static GFileOutputStream *g_file_real_append_to_finish         (GFile                *file,
+								GAsyncResult         *res,
+								GError              **error);
+static void               g_file_real_create_async             (GFile                *file,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              user_data);
+static GFileOutputStream *g_file_real_create_finish            (GFile                *file,
+								GAsyncResult         *res,
+								GError              **error);
+static void               g_file_real_replace_async            (GFile                *file,
+								const char           *etag,
+								gboolean              make_backup,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              user_data);
+static GFileOutputStream *g_file_real_replace_finish           (GFile                *file,
+								GAsyncResult         *res,
+								GError              **error);
+static gboolean           g_file_real_set_attributes_from_info (GFile                *file,
+								GFileInfo            *info,
+								GFileGetInfoFlags     flags,
+								GCancellable         *cancellable,
+								GError              **error);
 
 GType
 g_file_get_type (void)
@@ -94,6 +99,7 @@ g_file_class_init (gpointer g_class,
   iface->create_finish = g_file_real_create_finish;
   iface->replace_async = g_file_real_replace_async;
   iface->replace_finish = g_file_real_replace_finish;
+  iface->set_attributes_from_info = g_file_real_set_attributes_from_info;
 }
 
 static void
@@ -1075,6 +1081,77 @@ g_file_set_attribute (GFile                  *file,
 
   return (* iface->set_attribute) (file, attribute, value, flags, cancellable, error);
 }
+
+/* Tries to set all attributes in the GFileInfo on the target values, not stopping
+   on the first error.
+   Will return TRUE if there was any error, and *error will be set to
+   the first error. Error on particular fields are flagged by setting the
+   "status" field in the attribute value to G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING.
+*/
+gboolean
+g_file_set_attributes_from_info (GFile                      *file,
+				 GFileInfo                  *info,
+				 GFileGetInfoFlags           flags,
+				 GCancellable               *cancellable,
+				 GError                    **error)
+{
+ GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  g_file_info_clear_status (info);
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->set_attributes_from_info) (file, info, flags, cancellable, error);
+}
+
+static gboolean
+g_file_real_set_attributes_from_info (GFile                      *file,
+				      GFileInfo                  *info,
+				      GFileGetInfoFlags           flags,
+				      GCancellable               *cancellable,
+				      GError                    **error)
+{
+  char **attributes;
+  int i;
+  gboolean res;
+  GFileAttributeValue *value;
+  
+  res = TRUE;
+  
+  attributes = g_file_info_list_attributes (info, NULL);
+
+  for (i = 0; attributes[i] != NULL; i++)
+    {
+      value = (GFileAttributeValue *)g_file_info_get_attribute (info, attributes[i]);
+
+      if (value->status != G_FILE_ATTRIBUTE_STATUS_UNSET)
+	continue;
+
+      if (!g_file_set_attribute (file, attributes[i], value, flags, cancellable, error))
+	{
+	  value->status = G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING;
+	  res = FALSE;
+	  /* Don't set error multiple times */
+	  error = NULL;
+	}
+      else
+	value->status = G_FILE_ATTRIBUTE_STATUS_SET;
+    }
+  
+  g_strfreev (attributes);
+  
+  return res;
+}
+
 
 gboolean
 g_file_set_attribute_string (GFile                  *file,

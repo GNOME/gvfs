@@ -23,10 +23,18 @@ typedef enum {
   G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE = 1 << 0,
 } GFileAttributeFlags;
 
+/* Used by g_file_set_attributes_from_info */
+typedef enum {
+  G_FILE_ATTRIBUTE_STATUS_UNSET = 0,
+  G_FILE_ATTRIBUTE_STATUS_SET,
+  G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING,
+} GFileAttributeStatus;
+
 #define G_FILE_ATTRIBUTE_VALUE_INIT {0}
 
 typedef struct  {
-  GFileAttributeType type;
+  GFileAttributeType type : 8;
+  GFileAttributeStatus status : 8;
   union {
     gboolean boolean;
     gint32 int32;
