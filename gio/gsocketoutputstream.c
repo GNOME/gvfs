@@ -217,7 +217,6 @@ write_async_cb (WriteAsyncData *data,
   GSimpleAsyncResult *simple;
   GError *error = NULL;
   gssize count_written;
-  gssize *count_written_p;
 
   while (1)
     {
@@ -245,13 +244,12 @@ write_async_cb (WriteAsyncData *data,
       break;
     }
 
-  count_written_p = g_new (gssize, 1);
-  *count_written_p = count_written;
   simple = g_simple_async_result_new (G_OBJECT (data->stream),
 				      data->callback,
 				      data->user_data,
-				      g_socket_output_stream_write_async,
-				      count_written_p, g_free);
+				      g_socket_output_stream_write_async);
+  
+  g_simple_async_result_set_op_res_gssize (simple, count_written);
 
   if (count_written == -1)
     {
@@ -305,13 +303,13 @@ g_socket_output_stream_write_finish (GOutputStream *stream,
 				     GError **error)
 {
   GSimpleAsyncResult *simple;
-  gssize *nwritten;
+  gssize nwritten;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
   g_assert (g_simple_async_result_get_source_tag (simple) == g_socket_output_stream_write_async);
   
-  nwritten = g_simple_async_result_get_op_data (simple);
-  return *nwritten;
+  nwritten = g_simple_async_result_get_op_res_gssize (simple);
+  return nwritten;
 }
 
 typedef struct {
@@ -356,8 +354,7 @@ close_async_cb (CloseAsyncData *data)
   simple = g_simple_async_result_new (G_OBJECT (data->stream),
 				      data->callback,
 				      data->user_data,
-				      g_socket_output_stream_close_async,
-				      NULL, NULL);
+				      g_socket_output_stream_close_async);
 
   if (!result)
     {

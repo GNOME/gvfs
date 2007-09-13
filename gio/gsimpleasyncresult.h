@@ -22,7 +22,6 @@ struct _GSimpleAsyncResultClass
 };
 
 typedef void (*GSimpleAsyncThreadFunc) (GSimpleAsyncResult *res,
-					gpointer op_data,
 					GObject *object,
 					GCancellable *cancellable);
 
@@ -32,9 +31,7 @@ GType g_simple_async_result_get_type (void) G_GNUC_CONST;
 GSimpleAsyncResult *g_simple_async_result_new              (GObject                 *source_object,
 							    GAsyncReadyCallback      callback,
 							    gpointer                 user_data,
-							    gpointer                 source_tag,
-							    gpointer                 op_data,
-							    GDestroyNotify           destroy_op_data);
+							    gpointer                 source_tag);
 GSimpleAsyncResult *g_simple_async_result_new_error        (GObject                 *source_object,
 							    GAsyncReadyCallback      callback,
 							    gpointer                 user_data,
@@ -46,10 +43,22 @@ GSimpleAsyncResult *g_simple_async_result_new_from_error   (GObject             
 							    GAsyncReadyCallback      callback,
 							    gpointer                 user_data,
 							    GError                  *error);
-gpointer            g_simple_async_result_get_op_data      (GSimpleAsyncResult      *simple);
-GValue *            g_simple_async_result_set_op_value (GSimpleAsyncResult *simple,
-                                                        GType               g_type);
-const GValue *      g_simple_async_result_get_op_value (GSimpleAsyncResult *simple);
+
+void                g_simple_async_result_set_op_res_gpointer (GSimpleAsyncResult      *simple,
+                                                               gpointer                 op_res,
+                                                               GDestroyNotify           destroy_op_res);
+gpointer            g_simple_async_result_get_op_res_gpointer (GSimpleAsyncResult      *simple);
+
+void                g_simple_async_result_set_op_res_gssize   (GSimpleAsyncResult      *simple,
+                                                               gssize                   op_res);
+gssize              g_simple_async_result_get_op_res_gssize   (GSimpleAsyncResult      *simple);
+
+void                g_simple_async_result_set_op_res_gboolean (GSimpleAsyncResult      *simple,
+                                                               gboolean                 op_res);
+gboolean            g_simple_async_result_get_op_res_gboolean (GSimpleAsyncResult      *simple);
+
+
+
 gpointer            g_simple_async_result_get_source_tag   (GSimpleAsyncResult      *simple);
 void                g_simple_async_result_set_handle_cancellation (GSimpleAsyncResult      *simple,
 								   gboolean          handle_cancellation);

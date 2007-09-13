@@ -189,15 +189,14 @@ g_memory_input_stream_read_async (GInputStream              *stream,
                                   gpointer                   user_data)
 {
   GSimpleAsyncResult *simple;
-  gssize *nread;
+  gssize nread;
 
-  nread = g_new (gssize, 1);
-  *nread =  g_memory_input_stream_read (stream,	buffer, count, cancellable, NULL);
+  nread =  g_memory_input_stream_read (stream,	buffer, count, cancellable, NULL);
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback,
 				      user_data,
-				      g_memory_input_stream_read_async,
-				      nread, g_free);
+				      g_memory_input_stream_read_async);
+  g_simple_async_result_set_op_res_gssize (simple, nread);
   g_simple_async_result_complete_in_idle (simple);
   g_object_unref (simple);
 }
@@ -208,13 +207,13 @@ g_memory_input_stream_read_finish (GInputStream              *stream,
 				   GError                   **error)
 {
   GSimpleAsyncResult *simple;
-  gssize *nread;
+  gssize nread;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
   g_assert (g_simple_async_result_get_source_tag (simple) == g_memory_input_stream_read_async);
   
-  nread = g_simple_async_result_get_op_data (simple);
-  return *nread;
+  nread = g_simple_async_result_get_op_res_gssize (simple);
+  return nread;
 }
 
 static void
@@ -226,15 +225,14 @@ g_memory_input_stream_skip_async (GInputStream              *stream,
                                   gpointer                   user_data)
 {
   GSimpleAsyncResult *simple;
-  gssize *nskipped;
+  gssize nskipped;
 
-  nskipped = g_new (gssize, 1);
-  *nskipped = g_memory_input_stream_skip (stream, count, cancellable, NULL);
+  nskipped = g_memory_input_stream_skip (stream, count, cancellable, NULL);
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback,
 				      user_data,
-				      g_memory_input_stream_skip_async,
-				      nskipped, g_free);
+				      g_memory_input_stream_skip_async);
+  g_simple_async_result_set_op_res_gssize (simple, nskipped);
   g_simple_async_result_complete_in_idle (simple);
   g_object_unref (simple);
 }
@@ -245,13 +243,13 @@ g_memory_input_stream_skip_finish (GInputStream              *stream,
 				   GError                   **error)
 {
   GSimpleAsyncResult *simple;
-  gssize *nskipped;
+  gssize nskipped;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
   g_assert (g_simple_async_result_get_source_tag (simple) == g_memory_input_stream_skip_async);
   
-  nskipped = g_simple_async_result_get_op_data (simple);
-  return *nskipped;
+  nskipped = g_simple_async_result_get_op_res_gssize (simple);
+  return nskipped;
 }
 
 static void
@@ -266,8 +264,7 @@ g_memory_input_stream_close_async (GInputStream              *stream,
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback,
 				      user_data,
-				      g_memory_input_stream_close_async,
-				      NULL, NULL);
+				      g_memory_input_stream_close_async);
   g_simple_async_result_complete_in_idle (simple);
   g_object_unref (simple);
 }
@@ -335,13 +332,14 @@ g_memory_input_stream_seek (GSeekable       *seekable,
       return FALSE;
   }
 
-  if (absolute < 0 || absolute > priv->len) {
-    g_set_error (error,
-                 G_IO_ERROR,
-                 G_IO_ERROR_INVALID_ARGUMENT,
-                 "Invalid seek request");
-    return FALSE;
-  }
+  if (absolute < 0 || absolute > priv->len)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_ARGUMENT,
+                   "Invalid seek request");
+      return FALSE;
+    }
 
   priv->pos = absolute;
 

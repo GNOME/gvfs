@@ -437,8 +437,7 @@ report_error (GInputStream *stream,
 
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback,
-				      user_data, NULL,
-				      NULL, NULL);
+				      user_data, NULL);
 
   va_start (args, format);
   g_simple_async_result_set_error_va (simple, domain, code, format, args);
@@ -502,8 +501,7 @@ g_input_stream_read_async (GInputStream        *stream,
       simple = g_simple_async_result_new (G_OBJECT (stream),
 					  callback,
 					  user_data,
-					  g_input_stream_read_async,
-					  NULL, NULL);
+					  g_input_stream_read_async);
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       return;
@@ -622,8 +620,8 @@ g_input_stream_skip_async (GInputStream        *stream,
       simple = g_simple_async_result_new (G_OBJECT (stream),
 					  callback,
 					  user_data,
-					  g_input_stream_skip_async,
-					  NULL, NULL);
+					  g_input_stream_skip_async);
+
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       return;
@@ -725,8 +723,8 @@ g_input_stream_close_async (GInputStream       *stream,
       simple = g_simple_async_result_new (G_OBJECT (stream),
 					  callback,
 					  user_data,
-					  g_input_stream_close_async,
-					  NULL, NULL);
+					  g_input_stream_close_async);
+
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       return;
@@ -814,14 +812,15 @@ typedef struct {
 
 static void
 read_async_thread (GSimpleAsyncResult *res,
-		   gpointer op_data,
 		   GObject *object,
 		   GCancellable *cancellable)
 {
-  ReadData *op = op_data;
+  ReadData *op;
   GInputStreamClass *class;
   GError *error = NULL;
-  
+ 
+  op = g_simple_async_result_get_op_res_gpointer (res);
+
   class = G_INPUT_STREAM_GET_CLASS (object);
 
   op->count_read = class->read (G_INPUT_STREAM (object),
@@ -847,7 +846,8 @@ g_input_stream_real_read_async (GInputStream *stream,
   ReadData *op;
   
   op = g_new (ReadData, 1);
-  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_input_stream_real_read_async, op, g_free);
+  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_input_stream_real_read_async);
+  g_simple_async_result_set_op_res_gpointer (res, op, g_free);
   op->buffer = buffer;
   op->count_requested = count;
   
@@ -863,9 +863,11 @@ g_input_stream_real_read_finish (GInputStream              *stream,
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
   ReadData *op;
 
-  g_assert (g_simple_async_result_get_source_tag (simple) == g_input_stream_real_read_async);
+  g_assert (g_simple_async_result_get_source_tag (simple) == 
+	    g_input_stream_real_read_async);
 
-  op = g_simple_async_result_get_op_data (simple);
+  op = g_simple_async_result_get_op_res_gpointer (simple);
+
   return op->count_read;
 }
 
@@ -877,16 +879,15 @@ typedef struct {
 
 static void
 skip_async_thread (GSimpleAsyncResult *res,
-		   gpointer op_data,
 		   GObject *object,
 		   GCancellable *cancellable)
 {
-  SkipData *op = op_data;
+  SkipData *op;
   GInputStreamClass *class;
   GError *error = NULL;
   
   class = G_INPUT_STREAM_GET_CLASS (object);
-  
+  op = g_simple_async_result_get_op_res_gpointer (res);
   op->count_skipped = class->skip (G_INPUT_STREAM (object),
 				   op->count_requested,
 				   cancellable, &error);
@@ -916,7 +917,9 @@ skip_callback_wrapper (GObject *source_object,
   op = g_new0 (SkipData, 1);
   simple = g_simple_async_result_new (source_object,
 				      data->callback, data->user_data,
-				      g_input_stream_real_skip_async, op, g_free);
+				      g_input_stream_real_skip_async);
+
+  g_simple_async_result_set_op_res_gpointer (simple, op, g_free);
 
   op->count_skipped =
     g_input_stream_read_finish (G_INPUT_STREAM (source_object), res, &error);
@@ -958,7 +961,10 @@ g_input_stream_real_skip_async (GInputStream        *stream,
       op = g_new0 (SkipData, 1);
       
       res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data,
-				       g_input_stream_real_skip_async, op, g_free);
+				       g_input_stream_real_skip_async);
+
+      g_simple_async_result_set_op_res_gpointer (res, op, g_free);
+
       op->count_requested = count;
 
       g_simple_async_result_run_in_thread (res, skip_async_thread, io_priority, cancellable);
@@ -988,14 +994,12 @@ g_input_stream_real_skip_finish (GInputStream              *stream,
   SkipData *op;
 
   g_assert (g_simple_async_result_get_source_tag (simple) == g_input_stream_real_skip_async);
-
-  op = g_simple_async_result_get_op_data (simple);
+  op = g_simple_async_result_get_op_res_gpointer (simple);
   return op->count_skipped;
 }
 
 static void
 close_async_thread (GSimpleAsyncResult *res,
-		    gpointer op_data,
 		    GObject *object,
 		    GCancellable *cancellable)
 {
@@ -1026,11 +1030,17 @@ g_input_stream_real_close_async (GInputStream        *stream,
 {
   GSimpleAsyncResult *res;
   
-  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_input_stream_real_close_async, NULL, NULL);
+  res = g_simple_async_result_new (G_OBJECT (stream),
+				   callback,
+				   user_data,
+				   g_input_stream_real_close_async);
 
   g_simple_async_result_set_handle_cancellation (res, FALSE);
   
-  g_simple_async_result_run_in_thread (res, close_async_thread, io_priority, cancellable);
+  g_simple_async_result_run_in_thread (res,
+				       close_async_thread,
+				       io_priority,
+				       cancellable);
   g_object_unref (res);
 }
 

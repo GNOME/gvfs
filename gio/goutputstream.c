@@ -417,8 +417,7 @@ report_error (GOutputStream *stream,
 
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback,
-				      user_data, NULL,
-				      NULL, NULL);
+				      user_data, NULL);
 
   va_start (args, format);
   g_simple_async_result_set_error_va (simple, domain, code, format, args);
@@ -480,8 +479,7 @@ g_output_stream_write_async (GOutputStream        *stream,
       simple = g_simple_async_result_new (G_OBJECT (stream),
 					  callback,
 					  user_data,
-					  g_output_stream_write_async,
-					  NULL, NULL);
+					  g_output_stream_write_async);
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       return;
@@ -590,8 +588,7 @@ g_output_stream_flush_async (GOutputStream       *stream,
       simple = g_simple_async_result_new (G_OBJECT (stream),
 					  callback,
 					  user_data,
-					  g_output_stream_flush_async,
-					  NULL, NULL);
+					  g_output_stream_flush_async);
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       return;
@@ -662,8 +659,7 @@ g_output_stream_close_async (GOutputStream      *stream,
       simple = g_simple_async_result_new (G_OBJECT (stream),
 					  callback,
 					  user_data,
-					  g_output_stream_close_async,
-					  NULL, NULL);
+					  g_output_stream_close_async);
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       return;
@@ -751,15 +747,15 @@ typedef struct {
 
 static void
 write_async_thread (GSimpleAsyncResult *res,
-		   gpointer op_data,
 		   GObject *object,
 		   GCancellable *cancellable)
 {
-  WriteData *op = op_data;
+  WriteData *op;
   GOutputStreamClass *class;
   GError *error = NULL;
 
   class = G_OUTPUT_STREAM_GET_CLASS (object);
+  op = g_simple_async_result_get_op_res_gpointer (res);
   op->count_written = class->write (G_OUTPUT_STREAM (object), op->buffer, op->count_requested,
 				    cancellable, &error);
   if (op->count_written == -1)
@@ -782,7 +778,8 @@ g_output_stream_real_write_async (GOutputStream       *stream,
   WriteData *op;
 
   op = g_new0 (WriteData, 1);
-  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_output_stream_real_write_async, op, g_free);
+  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_output_stream_real_write_async);
+  g_simple_async_result_set_op_res_gpointer (res, op, g_free);
   op->buffer = buffer;
   op->count_requested = count;
   
@@ -799,14 +796,12 @@ g_output_stream_real_write_finish (GOutputStream *stream,
   WriteData *op;
 
   g_assert (g_simple_async_result_get_source_tag (simple) == g_output_stream_real_write_async);
-
-  op = g_simple_async_result_get_op_data (simple);
+  op = g_simple_async_result_get_op_res_gpointer (simple);
   return op->count_written;
 }
 
 static void
 flush_async_thread (GSimpleAsyncResult *res,
-		    gpointer op_data,
 		    GObject *object,
 		    GCancellable *cancellable)
 {
@@ -835,7 +830,7 @@ g_output_stream_real_flush_async (GOutputStream       *stream,
 {
   GSimpleAsyncResult *res;
 
-  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_output_stream_real_write_async, NULL, NULL);
+  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_output_stream_real_write_async);
   
   g_simple_async_result_run_in_thread (res, flush_async_thread, io_priority, cancellable);
   g_object_unref (res);
@@ -851,7 +846,6 @@ g_output_stream_real_flush_finish (GOutputStream *stream,
 
 static void
 close_async_thread (GSimpleAsyncResult *res,
-		    gpointer op_data,
 		    GObject *object,
 		    GCancellable *cancellable)
 {
@@ -882,7 +876,7 @@ g_output_stream_real_close_async (GOutputStream      *stream,
 {
   GSimpleAsyncResult *res;
   
-  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_output_stream_real_close_async, NULL, NULL);
+  res = g_simple_async_result_new (G_OBJECT (stream), callback, user_data, g_output_stream_real_close_async);
 
   g_simple_async_result_set_handle_cancellation (res, FALSE);
   

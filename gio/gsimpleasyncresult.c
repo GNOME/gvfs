@@ -28,10 +28,13 @@ struct _GSimpleAsyncResult
 
   gpointer source_tag;
 
-  GValue op_value;
+  union {
+    gpointer v_pointer;
+    gboolean v_boolean;
+    gssize   v_ssize;
+  } op_res;
 
-  gpointer op_data;
-  GDestroyNotify destroy_op_data;
+  GDestroyNotify destroy_op_res;
 };
 
 G_DEFINE_TYPE_WITH_CODE (GSimpleAsyncResult, g_simple_async_result, G_TYPE_OBJECT,
@@ -48,14 +51,12 @@ g_simple_async_result_finalize (GObject *object)
   if (simple->source_object)
     g_object_unref (simple->source_object);
 
-  if (simple->destroy_op_data)
-    simple->destroy_op_data (simple->op_data);
+  if (simple->destroy_op_res)
+    simple->destroy_op_res (simple->op_res.v_pointer);
 
   if (simple->error)
     g_error_free (simple->error);
   
-  g_value_unset (&(simple->op_value));
-
   if (G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize) (object);
 }
@@ -78,9 +79,7 @@ GSimpleAsyncResult *
 g_simple_async_result_new (GObject *source_object,
 			   GAsyncReadyCallback callback,
 			   gpointer user_data,
-			   gpointer source_tag,
-			   gpointer op_data,
-			   GDestroyNotify destroy_op_data)
+			   gpointer source_tag)
 {
   GSimpleAsyncResult *simple;
 
@@ -88,12 +87,8 @@ g_simple_async_result_new (GObject *source_object,
   simple->callback = callback;
   simple->source_object = g_object_ref (source_object);
   simple->user_data = user_data;
-  simple->op_data = op_data;
-  simple->destroy_op_data = destroy_op_data;
   simple->source_tag = source_tag;
   
-  memset (&(simple->op_value), 0, sizeof (GValue));
-
   return simple;
 }
 
@@ -107,8 +102,7 @@ g_simple_async_result_new_from_error (GObject *source_object,
 
   simple = g_simple_async_result_new (source_object,
 				      callback,
-				      user_data, NULL,
-				      NULL, NULL);
+				      user_data, NULL);
   g_simple_async_result_set_from_error (simple, error);
 
   return simple;
@@ -128,8 +122,7 @@ g_simple_async_result_new_error (GObject *source_object,
 
   simple = g_simple_async_result_new (source_object,
 				      callback,
-				      user_data, NULL,
-				      NULL, NULL);
+				      user_data, NULL);
 
   va_start (args, format);
   g_simple_async_result_set_error_va (simple, domain, code, format, args);
@@ -174,13 +167,6 @@ g_simple_async_result_get_source_tag (GSimpleAsyncResult *simple)
   return simple->source_tag;
 }
 
-
-gpointer
-g_simple_async_result_get_op_data (GSimpleAsyncResult *simple)
-{
-  return simple->op_data;
-}
-
 gboolean
 g_simple_async_result_propagate_error (GSimpleAsyncResult *simple,
 				       GError **dest)
@@ -194,20 +180,46 @@ g_simple_async_result_propagate_error (GSimpleAsyncResult *simple,
   return FALSE;
 }
 
-GValue *
-g_simple_async_result_set_op_value (GSimpleAsyncResult *simple,
-                                    GType               g_type)
-{ 
-  return g_value_init (&(simple->op_value), g_type);
-}
-
-const GValue *
-g_simple_async_result_get_op_value (GSimpleAsyncResult *simple)
+void
+g_simple_async_result_set_op_res_gpointer (GSimpleAsyncResult      *simple,
+                                           gpointer                 op_res,
+                                           GDestroyNotify           destroy_op_res)
 {
-  return &(simple->op_value);
+  simple->op_res.v_pointer = op_res;
+  simple->destroy_op_res = destroy_op_res;
 }
 
+gpointer
+g_simple_async_result_get_op_res_gpointer (GSimpleAsyncResult      *simple)
+{
+  return simple->op_res.v_pointer;
+}
 
+void
+g_simple_async_result_set_op_res_gssize   (GSimpleAsyncResult      *simple,
+                                           gssize                   op_res)
+{
+  simple->op_res.v_ssize = op_res;
+}
+
+gssize
+g_simple_async_result_get_op_res_gssize   (GSimpleAsyncResult      *simple)
+{
+  return simple->op_res.v_ssize;
+}
+
+void
+g_simple_async_result_set_op_res_gboolean (GSimpleAsyncResult      *simple,
+                                           gboolean                 op_res)
+{
+  simple->op_res.v_boolean = op_res;
+}
+
+gboolean
+g_simple_async_result_get_op_res_gboolean (GSimpleAsyncResult      *simple)
+{
+  return simple->op_res.v_boolean;
+}
 
 void
 g_simple_async_result_set_from_error (GSimpleAsyncResult *simple,
@@ -320,7 +332,6 @@ run_in_thread (GIOJob *job,
   else
     {
       data->func (simple,
-		  simple->op_data,
 		  simple->source_object,
 		  c);
     }

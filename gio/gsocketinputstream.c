@@ -230,7 +230,6 @@ read_async_cb (ReadAsyncData *data,
   GSimpleAsyncResult *simple;
   GError *error = NULL;
   gssize count_read;
-  gssize *count_read_p;
 
   /* We know that we can read from fd once without blocking */
   while (1)
@@ -258,13 +257,12 @@ read_async_cb (ReadAsyncData *data,
       break;
     }
 
-  count_read_p = g_new (gssize, 1);
-  *count_read_p = count_read;
   simple = g_simple_async_result_new (G_OBJECT (data->stream),
 				      data->callback,
 				      data->user_data,
-				      g_socket_input_stream_read_async,
-				      count_read_p, g_free);
+				      g_socket_input_stream_read_async);
+
+  g_simple_async_result_set_op_res_gssize (simple, count_read);
 
   if (count_read == -1)
     {
@@ -318,13 +316,13 @@ g_socket_input_stream_read_finish (GInputStream              *stream,
 				   GError                   **error)
 {
   GSimpleAsyncResult *simple;
-  gssize *nread;
+  gssize nread;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
   g_assert (g_simple_async_result_get_source_tag (simple) == g_socket_input_stream_read_async);
   
-  nread = g_simple_async_result_get_op_data (simple);
-  return *nread;
+  nread = g_simple_async_result_get_op_res_gssize (simple);
+  return nread;
 }
 
 static void
@@ -399,8 +397,7 @@ close_async_cb (CloseAsyncData *data)
   simple = g_simple_async_result_new (G_OBJECT (data->stream),
 				      data->callback,
 				      data->user_data,
-				      g_socket_input_stream_close_async,
-				      NULL, NULL);
+				      g_socket_input_stream_close_async);
 
   if (!result)
     {
