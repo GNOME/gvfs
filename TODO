@@ -1,36 +1,3 @@
-gio:
-===
-
-Work on GFile:
-* More async operations:
-   get_filesystem_info
-   set_display_name
-   set_attribute
-   set_attributes_from_info
-   delete_file
-   trash
-   make_directory
-   make_symbolic_link
-   copy
-   move
-
-HAL implementation of VolumeMonitor (as a giomodule)
-
-Move GAppInfo to Gtk+
-
-Implement PRE_UNMOUNT for file monitors, send it when unmounting
-
-Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg list.
-Implement std:icon for local files. This is related to mimetype decisions (fast vs slow)
-
-Use giomodules for fam volume monitor backend
-
-Add more filter streams: data reading, conversion (with general converter interface)
- => gicmo is working on this
-
-gvfs:
-====
-	
 Implement the rest of the mountable GDaemonFile ops:
    unmount_mountable
    eject_mountable
@@ -60,10 +27,4 @@ decide exactly how to handle not-mounted errors and make sure its consistent.
 mount daemons should re-register when new owner for vfs daemon.
 
 Make built-in uri parsers link into gvfs shared lib instead of using a module
-
-FUTURE IDEAS:
--------------
-
-is-slow marking for e.g. thumbnailing? How would you know this though?
-
-local file access through the daemon for remote X clients?
+ (smb is a shared lib atm to make sure that works)
