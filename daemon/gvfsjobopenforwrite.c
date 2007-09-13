@@ -113,9 +113,28 @@ run (GVfsJob *job)
   GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  class->create (op_job->backend,
-		 op_job,
-		 op_job->filename);
+  if (op_job->mode == OPEN_FOR_WRITE_CREATE)
+    {
+      class->create (op_job->backend,
+		     op_job,
+		     op_job->filename);
+    }
+  else if (op_job->mode == OPEN_FOR_WRITE_APPEND)
+    {
+      class->append_to (op_job->backend,
+			op_job,
+			op_job->filename);
+    }
+  else if (op_job->mode == OPEN_FOR_WRITE_REPLACE)
+    {
+      class->replace (op_job->backend,
+		      op_job,
+		      op_job->filename,
+		      op_job->mtime,
+		      op_job->make_backup);
+    }
+  else
+    g_assert_not_reached (); /* Handled in try */
 }
 
 static gboolean
@@ -124,12 +143,41 @@ try (GVfsJob *job)
   GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->try_create == NULL)
-    return FALSE;
-  
-  return class->try_create (op_job->backend,
-			    op_job,
-			    op_job->filename);
+  if (op_job->mode == OPEN_FOR_WRITE_CREATE)
+    {
+      if (class->try_create == NULL)
+	return FALSE;
+      return class->try_create (op_job->backend,
+				op_job,
+				op_job->filename);
+    }
+  else if (op_job->mode == OPEN_FOR_WRITE_APPEND)
+    {
+      if (class->try_append_to == NULL)
+	return FALSE;
+      return class->try_append_to (op_job->backend,
+				   op_job,
+				   op_job->filename);
+    }
+  else if (op_job->mode == OPEN_FOR_WRITE_REPLACE)
+    {
+      if (class->try_replace == NULL)
+	return FALSE;
+      return class->try_replace (op_job->backend,
+				 op_job,
+				 op_job->filename,
+				 op_job->mtime,
+				 op_job->make_backup);
+    }
+  else
+    {
+      GError *error = NULL;
+      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		   "Wrong open for write type");
+      g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
+      return TRUE;
+    }
 }
 
 void

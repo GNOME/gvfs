@@ -103,6 +103,22 @@ struct _GVfsBackendClass
   void     (*create)            (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
 				 const char *filename);
+  gboolean (*try_append_to)     (GVfsBackend *backend,
+				 GVfsJobOpenForWrite *job,
+				 const char *filename);
+  void     (*append_to)         (GVfsBackend *backend,
+				 GVfsJobOpenForWrite *job,
+				 const char *filename);
+  gboolean (*try_replace)       (GVfsBackend *backend,
+				 GVfsJobOpenForWrite *job,
+				 const char *filename,
+				 time_t mtime,
+				 gboolean make_backup);
+  void     (*replace)           (GVfsBackend *backend,
+				 GVfsJobOpenForWrite *job,
+				 const char *filename,
+				 time_t mtime,
+				 gboolean make_backup);
   void     (*close_write)       (GVfsBackend *backend,
 				 GVfsJobCloseWrite *job,
 				 GVfsBackendHandle handle);
