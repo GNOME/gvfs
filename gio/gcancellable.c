@@ -4,6 +4,8 @@
 #include <fcntl.h>
 
 #include <giotypes.h>
+#include <gioerror.h>
+#include <glib/gi18n-lib.h>
 
 #include "gcancellable.h"
 
@@ -161,6 +163,22 @@ gboolean
 g_cancellable_is_cancelled (GCancellable *cancellable)
 {
   return cancellable != NULL && cancellable->cancelled;
+}
+
+gboolean
+g_cancellable_set_error_if_cancelled (GCancellable  *cancellable,
+				      GError       **error)
+{
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return TRUE;
+    }
+  
+  return FALSE;
 }
 
 /* May return -1 if fds not supported, or on errors */

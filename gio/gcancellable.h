@@ -27,12 +27,15 @@ GType g_cancellable_get_type (void) G_GNUC_CONST;
 GCancellable *g_cancellable_new          (void);
 
 /* These are only safe to call inside a cancellable op */
-gboolean      g_cancellable_is_cancelled (GCancellable *cancellable);
-int           g_cancellable_get_fd       (GCancellable *cancellable);
-GCancellable *g_get_current_cancellable  (void);
-void          g_push_current_cancellable (GCancellable *cancellable);
-void          g_pop_current_cancellable  (GCancellable *cancellable);
-void          g_cancellable_reset        (GCancellable *cancellable);
+gboolean      g_cancellable_is_cancelled           (GCancellable  *cancellable);
+gboolean      g_cancellable_set_error_if_cancelled (GCancellable  *cancellable,
+						    GError       **error);
+int           g_cancellable_get_fd                 (GCancellable  *cancellable);
+GCancellable *g_get_current_cancellable            (void);
+void          g_push_current_cancellable           (GCancellable  *cancellable);
+void          g_pop_current_cancellable            (GCancellable  *cancellable);
+void          g_cancellable_reset                  (GCancellable  *cancellable);
+
 
 /* This is safe to call from another thread */
 void          g_cancellable_cancel       (GCancellable  *cancellable);
