@@ -22,7 +22,6 @@ is-slow marking for e.g. thumbnailing?
 
 getting selinux attrs is a bit slow, it does all sort of weird ops.
 
-Finish general attribute copy in gfile.c move fallback.
 handle attributes in atomic save backup copy
 GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 
