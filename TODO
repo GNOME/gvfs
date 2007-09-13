@@ -6,7 +6,7 @@ implement async support for file enumerator
 
 Add Seekable support to LocalFile streams
 
-test outputstream (especially replace + backup) (and test everything else too)
+add selinux support to test extension code (requires attribute matching support)
 
 Work on GFile
 
@@ -18,3 +18,10 @@ Use G_FILE_ERRORS and g_file_error_from_errno:
 	       path, g_strerror (errno));
 
 autoconfize
+
+write command line apps: ls, cat, stat
+
+add get_file_info_async for FileStreams 
+
+test outputstream (especially replace + backup) (and test everything else too)
+
