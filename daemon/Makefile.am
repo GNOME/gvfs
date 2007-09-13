@@ -69,6 +69,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobseekwrite.c gvfsjobseekwrite.h \
 	gvfsjobclosewrite.c gvfsjobclosewrite.h \
 	gvfsjobgetinfo.c gvfsjobgetinfo.h \
+	gvfsjobgetfsinfo.c gvfsjobgetfsinfo.h \
 	gvfsjobenumerate.c gvfsjobenumerate.h \
 	gvfsdaemonprotocol.c \
 	dbus-gmain.h dbus-gmain.c \

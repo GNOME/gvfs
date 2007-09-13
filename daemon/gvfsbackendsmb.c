@@ -1118,14 +1118,11 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
 
-
   /* If file is dos-readonly, libsmbclient doesn't set S_IWUSR, we use this to
      trigger ACCESS_WRITE = FALSE: */
   if (!(statbuf->st_mode & S_IWUSR))
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE, FALSE);
 
-  /* Look at st_mode & S_IWUSR, not set => readonly */
-  
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atimensec / 1000);
@@ -1138,16 +1135,21 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 #elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctim.tv_nsec / 1000);
 #endif
-  
-  flags = 0;
-  if (statbuf->st_mode & S_IXOTH)
-    flags |= G_FILE_FLAG_HIDDEN;
-  g_file_info_set_flags (info, flags);
 
-  if (statbuf->st_mode & S_IXUSR)
-    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, 1);
-  if (statbuf->st_mode & S_IXGRP)
-    g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, 1);
+  /* Libsmb sets the X bit on files to indicate some special things: */
+  if ((statbuf->st_mode & S_IFDIR) == 0) {
+    flags = 0;
+    
+    if (statbuf->st_mode & S_IXOTH)
+      flags |= G_FILE_FLAG_HIDDEN;
+    g_file_info_set_flags (info, flags);
+    
+    if (statbuf->st_mode & S_IXUSR)
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, 1);
+    
+    if (statbuf->st_mode & S_IXGRP)
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, 1);
+  }
 }
 
 static void
@@ -1181,6 +1183,21 @@ do_get_info (GVfsBackend *backend,
   else
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
 
+}
+
+static void
+do_get_fs_info (GVfsBackend *backend,
+		GVfsJobGetFsInfo *job,
+		const char *filename,
+		const char *attributes)
+{
+  GFileInfo *info;
+
+  info = g_file_info_new ();
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, "cifs");
+  g_object_unref (info);
 }
 
 static void
@@ -1322,5 +1339,6 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->close_write = do_close_write;
   backend_class->get_info = do_get_info;
+  backend_class->get_fs_info = do_get_fs_info;
   backend_class->enumerate = do_enumerate;
 }

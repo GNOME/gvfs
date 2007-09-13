@@ -1084,6 +1084,45 @@ g_daemon_file_mount_for_location_finish (GFile                  *location,
 }
 
 
+static GFileInfo *
+g_daemon_file_get_filesystem_info (GFile                *file,
+				   const char           *attributes,
+				   GCancellable         *cancellable,
+				   GError              **error)
+{
+  DBusMessage *reply;
+  dbus_uint32_t flags_dbus;
+  DBusMessageIter iter;
+  GFileInfo *info;
+
+  if (attributes == NULL)
+    attributes = "";
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_GET_FILESYSTEM_INFO,
+			     NULL, cancellable, error,
+			     DBUS_TYPE_STRING, &attributes,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  info = NULL;
+  
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Invalid return value from get_filesystem_info"));
+      goto out;
+    }
+
+  info = _g_dbus_get_file_info (&iter, error);
+
+ out:
+  dbus_message_unref (reply);
+  return info;
+}
+
+
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
@@ -1109,4 +1148,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->mount_for_location_finish = g_daemon_file_mount_for_location_finish;
   iface->mount_mountable = g_daemon_file_mount_mountable;
   iface->mount_mountable_finish = g_daemon_file_mount_mountable_finish;
+  iface->get_filesystem_info = g_daemon_file_get_filesystem_info;
 }

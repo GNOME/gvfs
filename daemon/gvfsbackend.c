@@ -15,6 +15,7 @@
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
 #include <gvfsjobgetinfo.h>
+#include <gvfsjobgetfsinfo.h>
 #include <gvfsjobenumerate.h>
 #include <gvfsjobmountmountable.h>
 #include <gdbusutils.h>
@@ -260,6 +261,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_GET_INFO))
     job = g_vfs_job_get_info_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_GET_FILESYSTEM_INFO))
+    job = g_vfs_job_get_fs_info_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_ENUMERATE))
