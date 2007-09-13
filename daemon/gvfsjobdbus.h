@@ -37,9 +37,11 @@ struct _GVfsJobDBusClass
 
 GType g_vfs_job_dbus_get_type (void) G_GNUC_CONST;
 
-gboolean g_vfs_job_dbus_is_serial (GVfsJobDBus *job_dbus,
-				   DBusConnection *connection,
-				   dbus_uint32_t serial);
+gboolean        g_vfs_job_dbus_is_serial      (GVfsJobDBus    *job_dbus,
+					       DBusConnection *connection,
+					       dbus_uint32_t   serial);
+DBusConnection *g_vfs_job_dbus_get_connection (GVfsJobDBus    *job_dbus);
+DBusMessage    *g_vfs_job_dbus_get_message    (GVfsJobDBus    *job_dbus);
 
 G_END_DECLS
 

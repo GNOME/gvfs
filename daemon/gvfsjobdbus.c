@@ -152,6 +152,18 @@ send_reply (GVfsJob *job)
   g_vfs_job_emit_finished (job);
 }
 
+DBusConnection *
+g_vfs_job_dbus_get_connection (GVfsJobDBus *job_dbus)
+{
+  return job_dbus->connection;
+}
+
+DBusMessage *
+g_vfs_job_dbus_get_message (GVfsJobDBus *job_dbus)
+{
+  return job_dbus->message;
+}
+
 gboolean
 g_vfs_job_dbus_is_serial (GVfsJobDBus *job_dbus,
 			  DBusConnection *connection,
