@@ -645,11 +645,110 @@ open_source_for_copy (GFile *source,
   return NULL;
 }
 
+static gboolean
+should_copy (GFileAttributeInfo *info, gboolean as_move)
+{
+  if (as_move)
+    return info->flags & G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED;
+  return info->flags & G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE;
+}
+
+static char *
+build_attribute_list_for_copy (GFileAttributeInfoList *attributes,
+			       GFileAttributeInfoList *namespaces,
+			       gboolean as_move)
+{
+  GString *s;
+  gboolean first;
+  int i;
+  
+  first = TRUE;
+  s = g_string_new ("");
+
+  if (attributes)
+    {
+      for (i = 0; i < attributes->n_infos; i++)
+	{
+	  if (should_copy (&attributes->infos[i], as_move))
+	    {
+	      if (first)
+		first = FALSE;
+	      else
+		g_string_append_c (s, ',');
+		
+	      g_string_append (s, attributes->infos[i].name);
+	    }
+	}
+    }
+
+  if (namespaces)
+    {
+      for (i = 0; i < namespaces->n_infos; i++)
+	{
+	  if (should_copy (&namespaces->infos[i], as_move))
+	    {
+	      if (first)
+		first = FALSE;
+	      else
+		g_string_append_c (s, ',');
+		
+	      g_string_append (s, attributes->infos[i].name);
+	      g_string_append (s, ":*");
+	    }
+	}
+    }
+
+  return g_string_free (s, FALSE);
+
+}
+
+static gboolean
+copy_attributes (GFile *source,
+		 GFile *destination,
+		 gboolean as_move,
+		 gboolean source_nofollow_symlinks,
+		 GCancellable *cancellable,
+		 GError **error)
+{
+  GFileAttributeInfoList *attributes, *namespaces;
+  char *attrs_to_read;
+  gboolean res;
+  GFileInfo *info;
+
+  /* Ignore errors here, if the target supports no attributes there is nothing to copy */
+  attributes = g_file_query_settable_attributes (destination, cancellable, NULL);
+  namespaces = g_file_query_writable_namespaces (destination, cancellable, NULL);
+
+  if (attributes == NULL && namespaces == NULL)
+    return TRUE;
+
+  attrs_to_read = build_attribute_list_for_copy (attributes, namespaces, as_move);
+
+  /* Ignore errors here, if we can't read some info (e.g. if it doesn't exist)
+     we just don't copy it. */
+  info = g_file_get_info (source, attrs_to_read,
+			  source_nofollow_symlinks ? G_FILE_GET_INFO_NOFOLLOW_SYMLINKS:0,
+			  cancellable,
+			  NULL);
+
+  g_free (attrs_to_read);
+  
+  res = TRUE;
+  if  (info)
+    {
+      res = g_file_set_attributes_from_info (destination,
+					     info, 0,
+					     cancellable,
+					     error);
+      g_object_unref (info);
+    }
+  return res;
+}
+
 /* Closes the streams */
 static gboolean
 copy_stream_with_progress (GInputStream *in,
 			   GOutputStream *out,
-			   goffset total_size,
 			   GCancellable *cancellable,
 			   GFileProgressCallback progress_callback,
 			   gpointer progress_callback_data,
@@ -659,6 +758,18 @@ copy_stream_with_progress (GInputStream *in,
   goffset current_size;
   char buffer[8192], *p;
   gboolean res;
+  goffset total_size;
+  GFileInfo *info;
+
+  total_size = 0;
+  info = g_file_input_stream_get_file_info (G_FILE_INPUT_STREAM (in),
+					    G_FILE_ATTRIBUTE_STD_SIZE,
+					    cancellable, NULL);
+  if (info)
+    {
+      total_size = g_file_info_get_size (info);
+      g_object_unref (info);
+    }
   
   current_size = 0;
   res = TRUE;
@@ -721,7 +832,6 @@ file_copy_fallback (GFile                  *source,
 {
   GInputStream *in;
   GOutputStream *out;
-  goffset total_size;
   GFileInfo *info;
   const char *target;
 
@@ -756,17 +866,6 @@ file_copy_fallback (GFile                  *source,
   if (in == NULL)
     return FALSE;
   
-  total_size = 0;
-
-  info = g_file_input_stream_get_file_info (G_FILE_INPUT_STREAM (in),
-					    G_FILE_ATTRIBUTE_STD_SIZE,
-					    cancellable, NULL);
-  if (info)
-    {
-      total_size = g_file_info_get_size (info);
-      g_object_unref (info);
-    }
-  
   if (flags & G_FILE_COPY_OVERWRITE)
     out = (GOutputStream *)g_file_replace (destination, 0, flags & G_FILE_COPY_BACKUP, cancellable, error);
   else
@@ -778,12 +877,18 @@ file_copy_fallback (GFile                  *source,
       return FALSE;
     }
 
-  if (!copy_stream_with_progress (in, out, total_size, cancellable,
+  if (!copy_stream_with_progress (in, out, cancellable,
 				  progress_callback, progress_callback_data,
 				  error))
     return FALSE;
 
  copied_file:
+
+  /* Ignore errors here. Failure to copy metadata is not a hard error */
+  copy_attributes (source, destination,
+		   /*as_move*/FALSE,
+		   flags & G_FILE_COPY_NOFOLLOW_SYMLINKS,
+		   cancellable, NULL);
   
   return TRUE;
 }
