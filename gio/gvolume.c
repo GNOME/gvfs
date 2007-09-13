@@ -172,12 +172,12 @@ g_volume_eject (GVolume         *volume,
 
   iface = G_VOLUME_GET_IFACE (volume);
 
-  if (iface->unmount == NULL)
+  if (iface->eject == NULL)
     {
       g_simple_async_report_error_in_idle (G_OBJECT (volume),
 					   callback, user_data,
 					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-					   _("volume doesn't implement unmount"));
+					   _("volume doesn't implement eject"));
       
       return;
     }

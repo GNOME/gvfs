@@ -1061,7 +1061,7 @@ g_mount_for_location (GFile                  *location,
       g_simple_async_report_error_in_idle (G_OBJECT (location),
 					   callback, user_data,
 					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-					   _("volume doesn't implement unmount"));
+					   _("volume doesn't implement mount"));
       
       return;
     }
