@@ -58,6 +58,7 @@ endif
 
 if OS_WIN32
 appinfo_sources += gwin32appinfo.c gwin32appinfo.h
+platform_libadd += -lshlwapi
 endif
 
 libgio_la_SOURCES = 	\

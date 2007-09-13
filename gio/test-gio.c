@@ -314,8 +314,6 @@ test_content_types (void)
   g_list_free (types);
 }
 
-
-#if 0
 static gint
 compare_apps (gconstpointer  _a,
 	      gconstpointer  _b)
@@ -333,14 +331,14 @@ compare_apps (gconstpointer  _a,
   g_free (name_b);
   return res;
 }
-#endif
 
 static void
 test_appinfo (void)
 {
-#if 0
-  GList *infos, *l;
   GAppInfo *info;
+  GList *infos, *l;
+
+#if 0
   GError *error = NULL;
 
   if (0)
@@ -362,10 +360,15 @@ test_appinfo (void)
 
   info = g_get_default_app_info_for_type ("x-test/gio");
   g_print ("default x-test/gio - %p: %s\n", info, g_app_info_get_name (info));
+#endif
 
-  
+#ifdef G_OS_WIN32
+  infos = g_get_all_app_info_for_type (".jpg");
+  g_print ("all jpeg app info: \n");
+#else
   infos = g_get_all_app_info_for_type ("text/html");
   g_print ("all html app info: \n");
+#endif
   for (l = infos; l != NULL; l = l->next)
     {
       info = l->data;
@@ -382,7 +385,6 @@ test_appinfo (void)
       g_print ("%s%s\n", g_app_info_get_name (info),
 	       g_app_info_should_show (info, "GNOME")?"":" (hidden)");
     }
-#endif
 }
 
 int
