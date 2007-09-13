@@ -363,6 +363,10 @@ create_smb_uri_string (const char *server,
 	g_string_append_c (uri, '/');
       g_string_append_encoded (uri, path, SUB_DELIM_CHARS ":@/");
     }
+
+  while (uri->len > 0 &&
+	 uri->str[uri->len - 1] == '/')
+    g_string_erase (uri, uri->len - 1, 1);
   
   return uri;
 }
@@ -528,21 +532,13 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
   SMBCFILE *file;
-  GError *error;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   file = op_backend->smb_context->open (op_backend->smb_context, uri, O_RDONLY, 0);
   g_free (uri);
 
   if (file == NULL)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
       g_vfs_job_open_for_read_set_can_seek (job, TRUE);
@@ -559,20 +555,12 @@ do_read (GVfsBackend *backend,
 	 gsize bytes_requested)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GError *error;
   ssize_t res;
 
   res = op_backend->smb_context->read (op_backend->smb_context, (SMBCFILE *)handle, buffer, bytes_requested);
 
   if (res == -1)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
       g_vfs_job_read_set_size (job, res);
@@ -589,7 +577,6 @@ do_seek_on_read (GVfsBackend *backend,
 		 GSeekType  type)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GError *error;
   int whence;
   off_t res;
 
@@ -605,23 +592,16 @@ do_seek_on_read (GVfsBackend *backend,
       whence = SEEK_END;
       break;
     default:
-      error = NULL;
-      g_set_error (&error, G_VFS_ERROR,
-		   G_VFS_ERROR_NOT_SUPPORTED,
-		   _("Unsupported seek type"));
-      goto error;
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+			_("Unsupported seek type"));
+      return;
     }
 
   res = op_backend->smb_context->lseek (op_backend->smb_context, (SMBCFILE *)handle, offset, whence);
 
   if (res == (off_t)-1)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      goto error;
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
       g_vfs_job_seek_read_set_offset (job, res);
@@ -629,10 +609,6 @@ do_seek_on_read (GVfsBackend *backend,
     }
 
   return;
-
- error:
-  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-  g_error_free (error);
 }
 
 static void
@@ -641,21 +617,30 @@ do_close_read (GVfsBackend *backend,
 	       GVfsBackendHandle handle)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GError *error;
   ssize_t res;
 
   res = op_backend->smb_context->close_fn (op_backend->smb_context, (SMBCFILE *)handle);
   if (res == -1)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+typedef struct {
+  SMBCFILE *file;
+  char *uri;
+  char *tmp_uri;
+  char *backup_uri;
+} SmbWriteHandle;
+
+static void
+smb_write_handle_free (SmbWriteHandle *handle)
+{
+  g_print ("smb_write_handle_free %p\n", handle);
+  g_free (handle->uri);
+  g_free (handle->tmp_uri);
+  g_free (handle->backup_uri);
+  g_free (handle);
 }
 
 static void
@@ -666,26 +651,25 @@ do_create (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
   SMBCFILE *file;
-  GError *error;
+  SmbWriteHandle *handle;
 
+  g_print ("do_create\n");
+  
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   file = op_backend->smb_context->open (op_backend->smb_context, uri,
-					O_CREAT|O_WRONLY|O_EXCL, 0);
+					O_CREAT|O_WRONLY|O_EXCL, 0666);
   g_free (uri);
 
   if (file == NULL)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
+      handle = g_new0 (SmbWriteHandle, 1);
+      handle->file = file;
+      g_print ("do_create - handle = %p\n", handle);
+
       g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-      g_vfs_job_open_for_write_set_handle (job, file);
+      g_vfs_job_open_for_write_set_handle (job, handle);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
 }
@@ -698,52 +682,301 @@ do_append_to (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
   SMBCFILE *file;
-  GError *error;
+  SmbWriteHandle *handle;
+  off_t initial_offset;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   file = op_backend->smb_context->open (op_backend->smb_context, uri,
-					O_CREAT|O_WRONLY|O_APPEND, 0);
+					O_CREAT|O_WRONLY|O_APPEND, 0666);
   g_free (uri);
 
   if (file == NULL)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
-      g_vfs_job_open_for_write_set_can_seek (job, TRUE);
-      g_vfs_job_open_for_write_set_handle (job, file);
+      handle = g_new0 (SmbWriteHandle, 1);
+      handle->file = file;
+
+      initial_offset = op_backend->smb_context->lseek (op_backend->smb_context, file,
+						       0, SEEK_CUR);
+      if (initial_offset == (off_t) -1)
+	g_vfs_job_open_for_write_set_can_seek (job, FALSE);
+      else
+	{
+	  g_vfs_job_open_for_write_set_initial_offset (job, initial_offset);
+	  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+	}
+      g_vfs_job_open_for_write_set_handle (job, handle);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
 }
 
+
+static void
+random_chars (char *str, int len)
+{
+  int i;
+  const char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  for (i = 0; i < len; i++)
+    str[i] = chars[g_random_int_range (0, strlen(chars))];
+}
+
+static char *
+get_dir_from_uri (const char *uri)
+{
+  const char *prefix_end;
+
+  prefix_end = uri + strlen (uri);
+
+  /* Skip slashes at end */
+  while (prefix_end > uri &&
+	 *(prefix_end - 1) == '/')
+    prefix_end--;
+
+  /* Skip to next slash */
+  while (prefix_end > uri &&
+	 *(prefix_end - 1) != '/')
+    prefix_end--;
+
+  return g_strndup (uri, prefix_end - uri);
+}
+
+static SMBCFILE *
+open_tmpfile (GVfsBackendSmb *backend,
+	      const char *uri,
+	      char **tmp_uri_out)
+{
+  char *dir_uri, *tmp_uri;
+  char filename[] = "~gvfXXXX.tmp";
+  SMBCFILE *file;
+
+  dir_uri = get_dir_from_uri (uri);
+ 
+  do {
+    random_chars (filename + 4, 4);
+    tmp_uri = g_strconcat (dir_uri, filename, NULL);
+    g_print ("Random uri: %s\n", tmp_uri);
+
+    file = backend->smb_context->open (backend->smb_context, tmp_uri,
+				       O_CREAT|O_WRONLY|O_EXCL, 0666);
+  } while (file == NULL && errno == EEXIST);
+
+  g_free (dir_uri);
+  
+  if (file)
+    {
+      *tmp_uri_out = tmp_uri;
+      return file;
+    }
+  else
+    {
+      g_free (tmp_uri);
+      return NULL;
+    }
+}
+
+static gboolean
+copy_file (GVfsBackendSmb *backend,
+	   GVfsJob *job,
+	   const char *from_uri,
+	   const char *to_uri)
+{
+  SMBCFILE *from_file, *to_file;
+  char buffer[4096];
+  size_t buffer_size;
+  ssize_t res;
+  char *p;
+  gboolean succeeded;
+  
+
+  from_file = NULL;
+  to_file = NULL;
+
+  succeeded = FALSE;
+  
+  from_file = backend->smb_context->open (backend->smb_context, from_uri,
+					  O_RDONLY, 0666);
+  if (from_file == NULL || g_vfs_job_is_cancelled (job))
+    goto out;
+  
+  to_file = backend->smb_context->open (backend->smb_context, to_uri,
+					O_CREAT|O_WRONLY|O_TRUNC, 0666);
+
+  if (from_file == NULL || g_vfs_job_is_cancelled (job))
+    goto out;
+
+  while (1)
+    {
+      
+      res = backend->smb_context->read (backend->smb_context, from_file,
+					buffer, sizeof(buffer));
+      if (res < 0 || g_vfs_job_is_cancelled (job))
+	goto out;
+      if (res == 0)
+	break; /* Succeeded */
+
+      buffer_size = res;
+      p = buffer;
+      while (buffer_size > 0)
+	{
+	  res = backend->smb_context->write (backend->smb_context, to_file,
+					     p, buffer_size);
+	  if (res < 0 || g_vfs_job_is_cancelled (job))
+	    goto out;
+	  buffer_size -= res;
+	  p += res;
+	}
+    }
+  succeeded = TRUE;
+ 
+ out: 
+  if (to_file)
+    backend->smb_context->close_fn (backend->smb_context, to_file);
+  if (from_file)
+    backend->smb_context->close_fn (backend->smb_context, from_file);
+  return succeeded;
+}
+
+static void
+do_replace (GVfsBackend *backend,
+	    GVfsJobOpenForWrite *job,
+	    const char *filename,
+	    time_t mtime,
+	    gboolean make_backup)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat original_stat;
+  int res;
+  char *uri, *tmp_uri, *backup_uri;
+  SMBCFILE *file;
+  GError *error = NULL;
+  SmbWriteHandle *handle;
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  tmp_uri = NULL;
+  if (make_backup)
+    backup_uri = g_strconcat (uri, "~", NULL);
+  else
+    backup_uri = NULL;
+  
+  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+					O_CREAT|O_WRONLY|O_EXCL, 0);
+  if (file == NULL && errno != EEXIST)
+    {
+      g_set_error (&error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   g_strerror (errno));
+      goto error;
+    }
+  else if (file == NULL && errno == EEXIST)
+    {
+      if (mtime != 0)
+	{
+	  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &original_stat);
+	  if (res == 0 &&
+	      original_stat.st_mtime != mtime)
+	    {
+	      g_set_error (&error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_WRONG_MTIME,
+			   _("The file was externally modified"));
+	      goto error;
+	    }
+	}
+      
+      /* Backup strategy:
+       *
+       * By default we:
+       *  1) save to a tmp file (that doesn't exist already)
+       *  2) rename orig file to backup file
+       *     (or delete it if no backup)
+       *  3) rename tmp file to orig file
+       *
+       * However, this can fail if we can't write to the directory.
+       * In that case we just truncate the file, after having 
+       * copied directly to the backup filename.
+       */
+
+      file = open_tmpfile (op_backend, uri, &tmp_uri);
+      if (file == NULL)
+	{
+	  if (make_backup)
+	    {
+	      if (!copy_file (op_backend, G_VFS_JOB (job), uri, backup_uri))
+		{
+		  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
+		    g_set_error (&error,
+				 G_VFS_ERROR,
+				 G_VFS_ERROR_CANCELLED,
+				 _("Operation was cancelled"));
+		  else
+		    g_set_error (&error,
+				 G_VFS_ERROR,
+				 G_VFS_ERROR_CANT_CREATE_BACKUP,
+				 _("Backup file creation failed"));
+		  goto error;
+		}
+	      g_free (backup_uri);
+	      backup_uri = NULL;
+	    }
+	  
+	  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+						O_CREAT|O_WRONLY|O_TRUNC, 0);
+	  if (file == NULL)
+	    {
+	      g_set_error (&error, G_FILE_ERROR,
+			   g_file_error_from_errno (errno),
+			   g_strerror (errno));
+	      goto error;
+	    }
+	}
+    }
+  else
+    {
+      /* Doesn't exist. Just write away */
+      g_free (backup_uri);
+      backup_uri = NULL;
+    }
+
+  handle = g_new (SmbWriteHandle, 1);
+  handle->file = file;
+  handle->uri = uri;
+  handle->tmp_uri = tmp_uri;
+  handle->backup_uri = backup_uri;
+  
+  g_vfs_job_open_for_write_set_can_seek (job, TRUE);
+  g_vfs_job_open_for_write_set_handle (job, handle);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  return;
+  
+ error:
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+  g_free (backup_uri);
+  g_free (tmp_uri);
+  g_free (uri);
+}
+
+
 static void
 do_write (GVfsBackend *backend,
 	  GVfsJobWrite *job,
-	  GVfsBackendHandle handle,
+	  GVfsBackendHandle _handle,
 	  char *buffer,
 	  gsize buffer_size)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GError *error;
+  SmbWriteHandle *handle = _handle;
   ssize_t res;
 
-  res = op_backend->smb_context->write (op_backend->smb_context, (SMBCFILE *)handle,
+  g_print ("do_write, handle: %p\n", handle);
+  
+  res = op_backend->smb_context->write (op_backend->smb_context, handle->file,
 					buffer, buffer_size);
   if (res == -1)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
       g_vfs_job_write_set_written_size (job, res);
@@ -754,12 +987,12 @@ do_write (GVfsBackend *backend,
 static void
 do_seek_on_write (GVfsBackend *backend,
 		  GVfsJobSeekWrite *job,
-		  GVfsBackendHandle handle,
+		  GVfsBackendHandle _handle,
 		  goffset    offset,
 		  GSeekType  type)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GError *error;
+  SmbWriteHandle *handle = _handle;
   int whence;
   off_t res;
 
@@ -775,23 +1008,16 @@ do_seek_on_write (GVfsBackend *backend,
       whence = SEEK_END;
       break;
     default:
-      error = NULL;
-      g_set_error (&error, G_VFS_ERROR,
-		   G_VFS_ERROR_NOT_SUPPORTED,
-		   _("Unsupported seek type"));
-      goto error;
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+			_("Unsupported seek type"));
+      return;
     }
 
-  res = op_backend->smb_context->lseek (op_backend->smb_context, (SMBCFILE *)handle, offset, whence);
+  res = op_backend->smb_context->lseek (op_backend->smb_context, handle->file, offset, whence);
 
   if (res == (off_t)-1)
-    {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      goto error;
-    }
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     {
       g_vfs_job_seek_write_set_offset (job, res);
@@ -799,33 +1025,61 @@ do_seek_on_write (GVfsBackend *backend,
     }
 
   return;
-
- error:
-  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-  g_error_free (error);
 }
 
 static void
 do_close_write (GVfsBackend *backend,
 		GVfsJobCloseWrite *job,
-		GVfsBackendHandle handle)
+		GVfsBackendHandle _handle)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  GError *error;
+  SmbWriteHandle *handle = _handle;
   ssize_t res;
+  gboolean closed;
 
-  res = op_backend->smb_context->close_fn (op_backend->smb_context, (SMBCFILE *)handle);
-  if (res == -1)
+  g_print ("do_close_write %p\n", handle);
+  
+  closed = FALSE;
+
+  if (handle->tmp_uri)
     {
-      error = NULL;
-      g_set_error (&error, G_FILE_ERROR,
-		   g_file_error_from_errno (errno),
-		   g_strerror (errno));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      if (handle->backup_uri)
+	{
+	  res = op_backend->smb_context->rename (op_backend->smb_context, handle->uri,
+						 op_backend->smb_context, handle->backup_uri);
+	  if (res ==  -1)
+	    {
+	      g_vfs_job_failed (G_VFS_JOB (job),
+				G_VFS_ERROR, G_VFS_ERROR_CANT_CREATE_BACKUP,
+				_("Backup file creation failed: %d"), errno);
+	      goto out;
+	    }
+	}
+      else
+	op_backend->smb_context->unlink (op_backend->smb_context, handle->uri);
+      
+      res = op_backend->smb_context->rename (op_backend->smb_context, handle->tmp_uri,
+					     op_backend->smb_context, handle->uri);
+      if (res ==  -1)
+	{
+	  op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
+	  g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+	  goto out;
+	}
     }
+  
+  closed = TRUE;
+  res = op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
+  if (res == -1)
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
+
+ out:
+  if (!closed)
+    op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
+  
+  smb_write_handle_free (handle);  
 }
 
 static void
@@ -982,6 +1236,7 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->close_read = do_close_read;
   backend_class->create = do_create;
   backend_class->append_to = do_append_to;
+  backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->close_write = do_close_write;
