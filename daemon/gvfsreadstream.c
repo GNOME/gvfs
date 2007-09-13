@@ -18,6 +18,7 @@
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobread.h>
+#include <gvfsjobseekread.h>
 
 G_DEFINE_TYPE (GVfsReadStream, g_vfs_read_stream, G_TYPE_OBJECT);
 
@@ -37,9 +38,11 @@ struct _GVfsReadStreamPrivate
   GInputStream *command_stream;
   GOutputStream *reply_stream;
   int remote_fd;
+  int seek_generation;
   
   gpointer data; /* user data, i.e. GVfsHandle */
-  guint32 seq_nr;
+  GVfsJob *current_job;
+  guint32 current_job_seq_nr;
   
   char command_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE];
   int command_buffer_size;
@@ -61,6 +64,10 @@ g_vfs_read_stream_finalize (GObject *object)
   GVfsReadStream *read_stream;
 
   read_stream = G_VFS_READ_STREAM (object);
+
+  if (read_stream->priv->current_job)
+    g_object_unref (read_stream->priv->current_job);
+  read_stream->priv->current_job = NULL;
   
   if (read_stream->priv->reply_stream)
     g_object_unref (read_stream->priv->reply_stream);
@@ -147,7 +154,8 @@ send_reply_cb (GOutputStream *output_stream,
   stream->priv->output_data_pos += bytes_written;
 
   /* Write more of output_data if needed */
-  if (stream->priv->output_data_pos < stream->priv->output_data_size)
+  if (stream->priv->output_data != NULL &&
+      stream->priv->output_data_pos < stream->priv->output_data_size)
     {
       g_output_stream_write_async (stream->priv->reply_stream,
 				   stream->priv->output_data + stream->priv->output_data_pos,
@@ -161,13 +169,15 @@ send_reply_cb (GOutputStream *output_stream,
   /* Sent full reply */
   g_free (stream->priv->output_data);
   stream->priv->output_data = NULL;
-
+  
+  g_vfs_job_emit_finished (stream->priv->current_job);
+  g_object_unref (stream->priv->current_job);
+  stream->priv->current_job = NULL;
   g_print ("Sent reply\n");
-
-  request_command (stream);
 }
 
-/* Takes ownership of data */
+/* Might be called on an i/o thread
+ * Takes ownership of data */
 static void
 send_reply (GVfsReadStream *stream,
 	    gboolean use_header,
@@ -213,14 +223,27 @@ got_command (GVfsReadStream *stream,
 {
   GVfsJob *job;
   GError *error;
+  GSeekType seek_type;
 
   g_print ("got_command %d %d %d %d\n", command, seq_nr, arg1, arg2);
+
+  if (stream->priv->current_job != NULL)
+    {
+      if (command != G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL)
+	{
+	  g_warning ("Ignored non-cancel request with outstanding request");
+	  return;
+	}
+
+      if (arg1 == stream->priv->current_job_seq_nr)
+	g_vfs_job_cancel (stream->priv->current_job);
+      return;
+    }
   
   job = NULL;
   switch (command)
     {
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ:
-      stream->priv->seq_nr = seq_nr;
       job = g_vfs_job_read_new (stream,
 				stream->priv->data,
 				arg1);
@@ -228,9 +251,24 @@ got_command (GVfsReadStream *stream,
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR:
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END:
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_SET:
+      seek_type = G_SEEK_SET;
+      if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END)
+	seek_type = G_SEEK_END;
+      else if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR)
+	seek_type = G_SEEK_CUR;
+      
+      stream->priv->seek_generation++;
+      job = g_vfs_job_seek_read_new (stream,
+				     stream->priv->data,
+				     seek_type,
+				     ((goffset)arg1) | (((goffset)arg2) << 32));
+      break;
+      
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL:
+      /* Ignore cancel with no outstanding job */
+      break;
+      
     default:
-      /* TODO */
       error = NULL;
       g_set_error (&error, G_VFS_ERROR,
 		   G_VFS_ERROR_INTERNAL_ERROR,
@@ -241,7 +279,11 @@ got_command (GVfsReadStream *stream,
     }
 
   if (job)
-    g_signal_emit (stream, signals[NEW_JOB], 0, job);
+    {
+      stream->priv->current_job = job;
+      stream->priv->current_job_seq_nr = seq_nr;
+      g_signal_emit (stream, signals[NEW_JOB], 0, job);
+    }
 }
 
 static void
@@ -286,6 +328,9 @@ command_read_cb (GInputStream *input_stream,
   seq_nr = g_ntohl (cmd->seq_nr);
   stream->priv->command_buffer_size = 0;
   got_command (stream, command, seq_nr, arg1, arg2);
+  
+  /* Request more commands, so can get cancel requests */
+  request_command (stream);
 }
 
 static void
@@ -310,8 +355,26 @@ g_vfs_read_stream_send_error (GVfsReadStream  *read_stream,
   char *data;
   gsize data_len;
   
-  data = g_error_to_daemon_reply (error, read_stream->priv->seq_nr, &data_len);
+  data = g_error_to_daemon_reply (error, read_stream->priv->current_job_seq_nr, &data_len);
   send_reply (read_stream, FALSE, data, data_len);
+}
+
+
+/* Might be called on an i/o thread
+ */
+void
+g_vfs_read_stream_send_seek_offset (GVfsReadStream  *read_stream,
+				    goffset offset)
+{
+  GVfsDaemonSocketProtocolReply *reply;
+  
+  reply = (GVfsDaemonSocketProtocolReply *)read_stream->priv->reply_buffer;
+  reply->type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS);
+  reply->seq_nr = g_htonl (read_stream->priv->current_job_seq_nr);
+  reply->arg1 = g_htonl (offset & 0xffffffff);
+  reply->arg2 = g_htonl (offset >> 32);
+
+  send_reply (read_stream, TRUE, NULL, 0);
 }
 
 /* Might be called on an i/o thread
@@ -325,9 +388,9 @@ g_vfs_read_stream_send_data (GVfsReadStream  *read_stream,
 
   reply = (GVfsDaemonSocketProtocolReply *)read_stream->priv->reply_buffer;
   reply->type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA);
-  reply->seq_nr = g_htonl (read_stream->priv->seq_nr);
+  reply->seq_nr = g_htonl (read_stream->priv->current_job_seq_nr);
   reply->arg1 = g_htonl (count);
-  reply->arg2 = g_htonl (0); /* TODO: seek generation */
+  reply->arg2 = g_htonl (read_stream->priv->seek_generation);
 
   send_reply (read_stream, TRUE, buffer, count);
 }

@@ -106,6 +106,13 @@ g_vfs_job_open_for_read_set_handle (GVfsJobOpenForRead *job,
   job->backend_handle = handle;
 }
 
+void
+g_vfs_job_open_for_read_set_can_seek (GVfsJobOpenForRead *job,
+				      gboolean            can_seek)
+{
+  job->can_seek = can_seek;
+}
+
 /* Might be called on an i/o thread */
 static DBusMessage *
 create_reply (GVfsJob *job,
@@ -119,6 +126,7 @@ create_reply (GVfsJob *job,
   int remote_fd;
   int fd_id;
   gboolean res;
+  dbus_bool_t can_seek;
 
   g_assert (open_job->backend_handle != NULL);
 
@@ -145,8 +153,10 @@ create_reply (GVfsJob *job,
   close (remote_fd);
 
   reply = dbus_message_new_method_return (message);
+  can_seek = open_job->can_seek;
   res = dbus_message_append_args (reply,
 				  DBUS_TYPE_UINT32, &fd_id,
+				  DBUS_TYPE_BOOLEAN, &can_seek,
 				  DBUS_TYPE_INVALID);
 
   g_vfs_read_stream_set_user_data (stream, open_job->backend_handle);

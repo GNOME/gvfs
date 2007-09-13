@@ -62,3 +62,18 @@ g_vfs_backend_read (GVfsBackend *backend,
   return class->read (backend, job, handle,
 		      buffer, bytes_requested);
 }
+
+gboolean
+g_vfs_backend_seek_on_read  (GVfsBackend        *backend,
+			     GVfsJobSeekRead    *job,
+			     GVfsHandle         *handle,
+			     goffset             offset,
+			     GSeekType           type)
+{
+  GVfsBackendClass *class;
+
+  class = G_VFS_BACKEND_GET_CLASS (backend);
+  
+  return class->seek_on_read (backend, job, handle,
+			      offset, type);
+}

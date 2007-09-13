@@ -47,7 +47,7 @@ struct _GVfsBackendClass
 			     char *buffer,
 			     gsize bytes_requested);
   gboolean (*seek_on_read)  (GVfsBackend *backend,
-			     GVfsJobReadSeek *job,
+			     GVfsJobSeekRead *job,
 			     GVfsHandle *handle,
 			     goffset    offset,
 			     GSeekType  type);
@@ -55,14 +55,19 @@ struct _GVfsBackendClass
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
 
-gboolean g_vfs_backend_open_for_read (GVfsBackend *backend,
-				     GVfsJobOpenForRead *job,
-				     char *filename);
-gboolean g_vfs_backend_read          (GVfsBackend *backend,
-				      GVfsJobRead *job,
-				      GVfsHandle *handle,
-				      char *buffer,
-				      gsize bytes_requested);
+gboolean g_vfs_backend_open_for_read (GVfsBackend        *backend,
+				      GVfsJobOpenForRead *job,
+				      char               *filename);
+gboolean g_vfs_backend_read          (GVfsBackend        *backend,
+				      GVfsJobRead        *job,
+				      GVfsHandle         *handle,
+				      char               *buffer,
+				      gsize               bytes_requested);
+gboolean g_vfs_backend_seek_on_read  (GVfsBackend        *backend,
+				      GVfsJobSeekRead    *job,
+				      GVfsHandle         *handle,
+				      goffset             offset,
+				      GSeekType           type);
 
 G_END_DECLS
 

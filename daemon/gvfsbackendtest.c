@@ -12,17 +12,23 @@
 #include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
+#include "gvfsjobseekread.h"
 
 G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_TYPE_VFS_BACKEND);
 
-static gboolean do_open_for_read (GVfsBackend  *backend,
+static gboolean do_open_for_read (GVfsBackend        *backend,
 				  GVfsJobOpenForRead *job,
 				  char               *filename);
-static gboolean do_read          (GVfsBackend  *backend,
+static gboolean do_read          (GVfsBackend        *backend,
 				  GVfsJobRead        *job,
 				  GVfsHandle         *handle,
 				  char               *buffer,
 				  gsize               bytes_requested);
+static gboolean do_seek_on_read  (GVfsBackend        *backend,
+				  GVfsJobSeekRead    *job,
+				  GVfsHandle         *handle,
+				  goffset             offset,
+				  GSeekType           type);
 
 static void
 g_vfs_backend_test_finalize (GObject *object)
@@ -45,6 +51,7 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
 
   backend_class->open_for_read = do_open_for_read;
   backend_class->read = do_read;
+  backend_class->seek_on_read = do_seek_on_read;
 }
 
 static void
@@ -66,7 +73,7 @@ open_idle_cb (gpointer data)
 {
   GVfsJobOpenForRead *job = data;
   int fd;
-  
+
   fd = g_open (job->filename, O_RDONLY);
   if (fd == -1)
     {
@@ -77,6 +84,7 @@ open_idle_cb (gpointer data)
     }
   else
     {
+      g_vfs_job_open_for_read_set_can_seek (job, TRUE);
       g_vfs_job_open_for_read_set_handle (job, GINT_TO_POINTER (fd));
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
@@ -90,6 +98,8 @@ do_open_for_read (GVfsBackend *backend,
 {
   GError *error;
 
+  g_print ("open_for_read (%s)\n", filename);
+  
   if (strcmp (filename, "/fail") == 0)
     {
       error = g_error_new (G_FILE_ERROR, G_FILE_ERROR_IO, "Test error");
@@ -113,6 +123,8 @@ do_read (GVfsBackend *backend,
   int fd;
   ssize_t res;
 
+  g_print ("read (%d)\n", bytes_requested);
+  
   fd = GPOINTER_TO_INT (handle);
 
   res = read (fd, buffer, bytes_requested);
@@ -127,6 +139,54 @@ do_read (GVfsBackend *backend,
   else
     {
       g_vfs_job_read_set_size (job, res);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+
+  return TRUE;
+}
+
+static gboolean
+do_seek_on_read (GVfsBackend *backend,
+		 GVfsJobSeekRead *job,
+		 GVfsHandle *handle,
+		 goffset    offset,
+		 GSeekType  type)
+{
+  int whence;
+  int fd;
+  off_t final_offset;
+
+  g_print ("seek_on_read (%d, %d)\n", (int)offset, type);
+
+  switch (type)
+    {
+    default:
+    case G_SEEK_SET:
+      whence = SEEK_SET;
+      break;
+    case G_SEEK_CUR:
+      whence = SEEK_CUR;
+      break;
+    case G_SEEK_END:
+      whence = SEEK_END;
+      break;
+    }
+      
+  
+  fd = GPOINTER_TO_INT (handle);
+
+  final_offset = lseek (fd, offset, whence);
+  
+  if (final_offset == (off_t)-1)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_FILE_ERROR,
+			g_file_error_from_errno (errno),
+			"Error seeking in file: %s",
+			g_strerror (errno));
+    }
+  else
+    {
+      g_vfs_job_seek_read_set_offset (job, offset);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
 

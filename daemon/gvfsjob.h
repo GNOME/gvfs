@@ -19,7 +19,7 @@ typedef struct _GVfsJobClass GVfsJobClass;
 /* Define these here to avoid circular includes */
 typedef struct _GVfsJobOpenForRead  GVfsJobOpenForRead;
 typedef struct _GVfsJobRead         GVfsJobRead;
-typedef struct _GVfsJobReadSeek     GVfsJobReadSeek;
+typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
 
 struct _GVfsJob
 {

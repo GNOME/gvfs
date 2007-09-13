@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include "gfile.h"
+#include "gseekable.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
 #include "gsocketinputstream.h"
@@ -155,6 +156,45 @@ cancel_thread (gpointer data)
   return NULL;
 }
 
+static void
+test_seek (void)
+{
+  GInputStream *in;
+  char buffer1[1025];
+  char buffer2[1025];
+  gssize res;
+  gboolean close_res;
+  GFile *file;
+  GSeekable *seekable;
+  GError *error;
+
+  file = g_file_get_for_uri ("foo:///etc/passwd");
+
+  error = NULL;
+  in = (GInputStream *)g_file_read (file);
+  seekable = G_SEEKABLE (in);
+
+  g_print ("offset: %d\n", (int)g_seekable_tell (seekable));
+  
+  res = g_input_stream_read (in, buffer1, 1024, NULL, NULL);
+  g_print ("read 1 res = %d\n", res);
+
+  g_print ("offset: %d\n", (int)g_seekable_tell (seekable));
+  
+  res = g_seekable_seek (seekable, 0, G_SEEK_SET, NULL, NULL);
+  g_print ("seek res = %d\n", res);
+
+  res = g_input_stream_read (in, buffer2, 1024, NULL, &error);
+  g_print ("read 2 res = %d\n", res);
+  if (res == -1)
+    g_print ("error: %s\n", error->message);
+
+  if (memcmp (buffer1, buffer2, 1024) != 0)
+    g_print ("Buffers differ\n");
+  
+  close_res = g_input_stream_close (in, NULL, NULL);
+  g_print ("close res: %d\n", close_res);
+}
 
 int
 main (int argc, char *argv[])
@@ -165,6 +205,9 @@ main (int argc, char *argv[])
   g_type_init ();
   g_thread_init (NULL);
 
+
+  test_seek ();
+  
   loop = g_main_loop_new (NULL, FALSE);
 
   if (1) {

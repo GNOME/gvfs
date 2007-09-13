@@ -255,6 +255,7 @@ handle_new_job_callback (GVfsReadStream *stream,
 			 GVfsDaemon *daemon)
 {
   g_print ("handle_new_job_callback() job=%p daemon=%p\n", job, daemon);
+  g_object_ref (job);
   start_or_queue_job (daemon, job);
 }
 

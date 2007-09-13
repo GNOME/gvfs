@@ -83,6 +83,7 @@ typedef struct {
   goffset ret_offset;
   
   gboolean sent_cancel;
+  gboolean sent_seek;
   
   guint32 seq_nr;
 } SeekOperation;
@@ -296,10 +297,19 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
       return FALSE;
     }
 
-  dbus_message_get_args (message, NULL,
-                         DBUS_TYPE_UINT32, &fd_id,
-                         DBUS_TYPE_BOOLEAN, &can_seek,
-                         DBUS_TYPE_INVALID);
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &can_seek,
+			      DBUS_TYPE_INVALID))
+    {
+      dbus_message_unref (reply);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Error in stream protocol: %s"), _("Invalid return value from open"));
+      return FALSE;
+    }
+  
+  dbus_message_unref (reply);
+      
   /* TODO: verify fd id */
   file->priv->fd = receive_fd (extra_fd);
   file->priv->can_seek = can_seek;
@@ -440,8 +450,9 @@ run_sync_state_machine (GUnixFileInputStream *file,
 	    }
 	  else
 	    {
+	      g_print ("io_error: %s\n", io_error->message);
 	      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-			   "Error in stream protocol: %s", io_error->message);
+			   _("Error in stream protocol: %s"), io_error->message);
 	      g_error_free (io_error);
 	      return FALSE;
 	    }
@@ -743,6 +754,9 @@ g_unix_file_input_stream_skip (GInputStream *stream,
   if (!g_unix_file_input_stream_open (file, error))
     return -1;
 
+  /* TODO: .. */
+  g_assert_not_reached ();
+  
   return 0;
 }
 
@@ -815,6 +829,7 @@ iterate_seek_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 			  op->offset >> 32,
 			  &op->seq_nr);
 	  op->state = SEEK_STATE_WROTE_REQUEST;
+	  op->sent_seek = FALSE;
 	  io_op->io_buffer = priv->output_buffer->str;
 	  io_op->io_size = priv->output_buffer->len;
 	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
@@ -831,6 +846,12 @@ iterate_seek_state_machine (GUnixFileInputStream *file, IOOperationData *io_op, 
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
+
+	  /* We weren't cancelled before first byte sent, so now we will send
+	   * the seek request. Increase the seek generation now. */
+	  if (!op->sent_seek)
+	    priv->seek_generation++;
+	  op->sent_seek = TRUE;
 	  
 	  if (io_op->io_res < priv->output_buffer->len)
 	    {
@@ -996,6 +1017,8 @@ g_unix_file_input_stream_seek (GFileInputStream *stream,
 
   file = G_UNIX_FILE_INPUT_STREAM (stream);
 
+  g_print ("g_unix_file_input_stream_seek\n");
+  
   if (!g_unix_file_input_stream_open (file, error))
     return -1;
 

@@ -314,11 +314,14 @@ g_input_stream_real_skip (GInputStream         *stream,
 			  GCancellable         *cancellable,
 			  GError              **error)
 {
+  GInputStreamClass *class;
   gssize ret;
   char *buffer;
 
+  class = G_INPUT_STREAM_GET_CLASS (stream);
+  
   buffer = g_malloc (count);
-  ret = g_input_stream_read (stream, buffer, count, cancellable, error);
+  ret = class->read (stream, buffer, count, cancellable, error);
   g_free (buffer);
 
   return ret;
