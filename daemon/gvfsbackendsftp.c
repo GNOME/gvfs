@@ -68,6 +68,9 @@ typedef struct {
 typedef struct {
   DataBuffer *raw_handle;
   goffset offset;
+  char *filename;
+  char *tempname;
+  gboolean make_backup;
 } SftpHandle;
 
 
@@ -1139,7 +1142,7 @@ try_mount (GVfsBackend *backend,
 }
 
 static int
-io_error_code_for_sftp_error (guint32 code)
+io_error_code_for_sftp_error (guint32 code, int failure_error)
 {
   int error_code;
   
@@ -1149,10 +1152,13 @@ io_error_code_for_sftp_error (guint32 code)
     {
     default:
     case SSH_FX_EOF:
-    case SSH_FX_FAILURE:
     case SSH_FX_BAD_MESSAGE:
     case SSH_FX_NO_CONNECTION:
     case SSH_FX_CONNECTION_LOST:
+      break;
+      
+    case SSH_FX_FAILURE:
+      error_code = failure_error;
       break;
       
     case SSH_FX_NO_SUCH_FILE:
@@ -1173,11 +1179,15 @@ io_error_code_for_sftp_error (guint32 code)
 static gboolean
 error_from_status (GVfsJob *job,
                    GDataInputStream *reply,
+                   int failure_error,
                    GError **error)
 {
   guint32 code;
   gint error_code;
   char *message;
+
+  if (failure_error == -1)
+    failure_error = G_IO_ERROR_FAILED;
   
   code = g_data_input_stream_get_uint32 (reply, NULL, NULL);
 
@@ -1186,7 +1196,7 @@ error_from_status (GVfsJob *job,
 
   if (error)
     {
-      error_code = io_error_code_for_sftp_error (code);
+      error_code = io_error_code_for_sftp_error (code, failure_error);
       message = read_string (reply, NULL);
       if (message == NULL)
         message = g_strdup ("Unknown reason");
@@ -1200,11 +1210,12 @@ error_from_status (GVfsJob *job,
 
 static void
 result_from_status (GVfsJob *job,
-                    GDataInputStream *reply)
+                    GDataInputStream *reply,
+                    int failure_error)
 {
   GError *error;
 
-  if (error_from_status (job, reply, &error))
+  if (error_from_status (job, reply, failure_error, &error))
     g_vfs_job_succeeded (job);
   else
     {
@@ -1415,6 +1426,8 @@ static void
 sftp_handle_free (SftpHandle *handle)
 {
   data_buffer_free (handle->raw_handle);
+  g_free (handle->filename);
+  g_free (handle->tempname);
   g_slice_free (SftpHandle, handle);
 }
 
@@ -1430,7 +1443,7 @@ open_for_read_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, -1);
       return;
     }
 
@@ -1485,7 +1498,7 @@ read_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, -1);
       return;
     }
 
@@ -1554,7 +1567,7 @@ seek_read_fstat_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, -1);
       return;
     }
 
@@ -1626,7 +1639,7 @@ close_reply (GVfsBackendSftp *backend,
              gpointer user_data)
 {
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply);
+    result_from_status (job, reply, -1);
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Invalid reply recieved"));
@@ -1688,7 +1701,7 @@ create_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, G_IO_ERROR_EXISTS);
       return;
     }
 
@@ -1739,7 +1752,7 @@ append_to_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, -1);
       return;
     }
 
@@ -1778,6 +1791,197 @@ try_append_to (GVfsBackend *backend,
   return TRUE;
 }
 
+typedef struct {
+  guint32 permissions;
+  char *tempname;
+  int temp_count;
+} ReplaceData;
+
+static void
+replace_data_free (ReplaceData *data)
+{
+  g_free (data->tempname);
+  g_slice_free (ReplaceData, data);
+}
+
+static void replace_create_temp (GVfsBackendSftp *backend,
+                                 GVfsJobOpenForWrite *job);
+
+static void
+replace_create_temp_reply (GVfsBackendSftp *backend,
+                           int reply_type,
+                           GDataInputStream *reply,
+                           guint32 len,
+                           GVfsJob *job,
+                           gpointer user_data)
+{
+  GVfsJobOpenForWrite *op_job;
+  SftpHandle *handle;
+  ReplaceData *data;
+  GError *error;
+  
+  op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+  data = G_VFS_JOB (job)->backend_data;
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      error = NULL;
+      if (error_from_status (job, reply, G_IO_ERROR_EXISTS, &error))
+        /* Open should not return OK */
+        g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Invalid reply recieved"));
+      else if (error->code == G_IO_ERROR_EXISTS)
+        {
+          /* It was *probably* the EXCL flag failing. I wish we had
+             an actual real error code for that, grumble */
+          g_error_free (error);
+
+          replace_create_temp (backend, op_job);
+        }
+      else
+        {
+          g_vfs_job_failed_from_error (job, error);
+          g_error_free (error);
+        }
+      return;
+    }
+
+  if (reply_type != SSH_FXP_HANDLE)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply recieved"));
+      return;
+    }
+
+  handle = sftp_handle_new (reply);
+  handle->filename = g_strdup (op_job->filename);
+  handle->tempname = g_strdup (data->tempname);
+  handle->make_backup = op_job->make_backup;
+  
+  g_vfs_job_open_for_write_set_handle (op_job, handle);
+  g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  
+  g_vfs_job_succeeded (job);
+}
+
+static void
+random_text (char *s)
+{
+  static const char letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  static const int NLETTERS = sizeof (letters) - 1;
+  static int counter = 0;
+
+  GTimeVal tv;
+  glong value;
+
+  /* Get some more or less random data.  */
+  g_get_current_time (&tv);
+  value = (tv.tv_usec ^ tv.tv_sec) + counter++;
+
+  /* Fill in the random bits.  */
+  s[0] = letters[value % NLETTERS];
+  value /= NLETTERS;
+  s[1] = letters[value % NLETTERS];
+  value /= NLETTERS;
+  s[2] = letters[value % NLETTERS];
+  value /= NLETTERS;
+  s[3] = letters[value % NLETTERS];
+  value /= NLETTERS;
+  s[4] = letters[value % NLETTERS];
+  value /= NLETTERS;
+  s[5] = letters[value % NLETTERS];
+}
+
+static void
+replace_create_temp (GVfsBackendSftp *backend,
+                     GVfsJobOpenForWrite *job)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+  char *dirname;
+  ReplaceData *data;
+  char basename[] = ".giosaveXXXXXX";
+
+  data = G_VFS_JOB (job)->backend_data;
+
+  data->temp_count++;
+
+  if (data->temp_count == 100)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), 
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Unable to create temporary file"));
+      return;
+    }
+  
+  g_free (data->tempname);
+  
+  dirname = g_path_get_dirname (job->filename);
+  random_text (basename + 8);
+  data->tempname = g_build_filename (dirname, basename, NULL);
+  g_free (dirname);
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_OPEN,
+                                &id);
+  put_string (command, data->tempname);
+  g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
+  g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL); /* Attr flags */
+  g_data_output_stream_put_uint32 (command, data->permissions, NULL, NULL);
+  queue_command_stream_and_free (op_backend, command, id, replace_create_temp_reply, G_VFS_JOB (job), NULL);
+}
+
+static void
+replace_stat_reply (GVfsBackendSftp *backend,
+                    int reply_type,
+                    GDataInputStream *reply,
+                    guint32 len,
+                    GVfsJob *job,
+                    gpointer user_data)
+{
+  GFileInfo *info;
+  GVfsJobOpenForWrite *op_job;
+  const char *current_etag;
+  guint32 permissions;
+  ReplaceData *data;
+
+  op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+
+  permissions = 0644;
+  
+  if (reply_type == SSH_FXP_ATTRS)
+    {
+      info = g_file_info_new ();
+      parse_attributes (backend, info, NULL,
+                        reply, NULL);
+
+      if (op_job->etag != NULL)
+        {
+          current_etag = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE);
+
+          if (current_etag == NULL ||
+              strcmp (op_job->etag, current_etag) != 0)
+            {
+              g_vfs_job_failed (job, 
+                                G_IO_ERROR, G_IO_ERROR_WRONG_ETAG,
+                                _("The file was externally modified"));
+              g_object_unref (info);
+              return;
+            }
+        }
+
+      if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_MODE))
+        permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE) & 0777;
+    }
+
+  data = g_slice_new0 (ReplaceData);
+  data->permissions = permissions;
+  g_vfs_job_set_backend_data (job, data, (GDestroyNotify)replace_data_free);
+
+  replace_create_temp (backend, op_job);    
+}
+
 static void
 replace_exclusive_reply (GVfsBackendSftp *backend,
                          int reply_type,
@@ -1786,17 +1990,21 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
                          GVfsJob *job,
                          gpointer user_data)
 {
+  GVfsJobOpenForWrite *op_job;
+  GDataOutputStream *command;
   SftpHandle *handle;
   GError *error;
-  
+  guint32 id;
+
+  op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   if (reply_type == SSH_FXP_STATUS)
     {
       error = NULL;
-      if (error_from_status (job, reply, &error))
+      if (error_from_status (job, reply, G_IO_ERROR_EXISTS, &error))
         /* Open should not return OK */
         g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Invalid reply recieved"));
-      else if (error->code == G_IO_ERROR_FAILED)
+      else if (error->code == G_IO_ERROR_EXISTS)
         {
           /* It was *probably* the EXCL flag failing. I wish we had
              an actual real error code for that, grumble */
@@ -1804,10 +2012,11 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
           
           /* Replace existing file code: */
           
-          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                            _("TODO: Replace not implemented yet"));
-          /* TODO: */
-          
+          command = new_command_stream (backend,
+                                        SSH_FXP_STAT,
+                                        &id);
+          put_string (command, op_job->filename);
+          queue_command_stream_and_free (backend, command, id, replace_stat_reply, G_VFS_JOB (job), NULL);
         }
       else
         {
@@ -1826,8 +2035,8 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
   
   handle = sftp_handle_new (reply);
   
-  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), handle);
-  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (job), TRUE);
+  g_vfs_job_open_for_write_set_handle (op_job, handle);
+  g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
   
   g_vfs_job_succeeded (job);
 }
@@ -1868,7 +2077,7 @@ write_reply (GVfsBackendSftp *backend,
   handle = user_data;
 
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply);
+    result_from_status (job, reply, -1);
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Invalid reply recieved"));
@@ -1923,7 +2132,7 @@ seek_write_fstat_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, -1);
       return;
     }
 
@@ -2205,7 +2414,7 @@ open_dir_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply);
+      result_from_status (job, reply, -1);
       return;
     }
 
@@ -2338,7 +2547,7 @@ get_info_stat_reply (GVfsBackendSftp *backend,
   data = job->backend_data;
 
   if (reply_type == SSH_FXP_STATUS)
-    error_from_status (job, reply, &data->stat_error);
+    error_from_status (job, reply, -1, &data->stat_error);
   else if (reply_type != SSH_FXP_ATTRS)
     g_set_error (&data->stat_error, G_IO_ERROR, G_IO_ERROR_FAILED,
                  _("Invalid reply recieved"));
@@ -2369,7 +2578,7 @@ get_info_lstat_reply (GVfsBackendSftp *backend,
   data = job->backend_data;
 
   if (reply_type == SSH_FXP_STATUS)
-    error_from_status (job, reply, &data->lstat_error);
+    error_from_status (job, reply, -1, &data->lstat_error);
   else if (reply_type != SSH_FXP_ATTRS)
     g_set_error (&data->lstat_error, G_IO_ERROR, G_IO_ERROR_FAILED,
                  _("Invalid reply recieved"));
