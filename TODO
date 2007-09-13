@@ -21,4 +21,4 @@ test outputstream (especially replace + backup) (and test everything else too)
 
 xattrs from fd
 
-
+getting selinux attrs slow...
