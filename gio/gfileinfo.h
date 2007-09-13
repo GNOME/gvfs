@@ -111,6 +111,14 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_OWNER_USER "owner:user"
 #define G_FILE_ATTRIBUTE_OWNER_GROUP "owner:group"
 
+
+/* File system info (for g_file_get_filesystem_info) */
+
+#define G_FILE_ATTRIBUTE_FS_SIZE "fs:size"
+#define G_FILE_ATTRIBUTE_FS_FREE "fs:free"
+#define G_FILE_ATTRIBUTE_FS_TYPE "fs:type"
+
+
 GType g_file_info_get_type (void) G_GNUC_CONST;
 
 GFileInfo *        g_file_info_new                       (void);

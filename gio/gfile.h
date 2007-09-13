@@ -65,6 +65,10 @@ struct _GFileIface
 					     GFileGetInfoFlags     flags,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  GFileInfo *         (*get_filesystem_info)(GFile                *file,
+					     const char           *attributes,
+					     GCancellable         *cancellable,
+					     GError              **error);
   /*                  (*get_info_async)     (GFile                *file.. */
   GFile *             (*set_display_name)   (GFile                *file,
 					     const char           *display_name,
@@ -211,6 +215,10 @@ GFileOutputStream *g_file_replace                    (GFile                  *fi
 GFileInfo *        g_file_get_info                   (GFile                  *file,
 						      const char             *attributes,
 						      GFileGetInfoFlags       flags,
+						      GCancellable           *cancellable,
+						      GError                **error);
+GFileInfo *        g_file_get_filesystem_info        (GFile                  *file,
+						      const char             *attributes,
 						      GCancellable           *cancellable,
 						      GError                **error);
 GFileEnumerator *  g_file_enumerate_children         (GFile                  *file,

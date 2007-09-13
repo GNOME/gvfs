@@ -6,9 +6,11 @@
 
 static char *attributes = NULL;
 static gboolean nofollow_symlinks = FALSE;
+static gboolean filesystem = FALSE;
 
 static GOptionEntry entries[] = 
 {
+	{ "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, "Get filesystem info", NULL },
 	{ "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, "The attributes to get", NULL },
 	{ "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, "Don't follow symlinks", NULL },
 	{ NULL }
@@ -70,6 +72,24 @@ escape_string (const char *in)
   return g_string_free (str, FALSE);
 }
 
+static void
+show_attributes (GFileInfo *info)
+{
+  char **attributes;
+  int i;
+  
+  attributes = g_file_info_list_attributes (info, NULL);
+  
+  g_print ("attributes:\n");
+  for (i = 0; attributes[i] != NULL; i++)
+    {
+      char *value;
+      value = g_file_info_get_attribute_as_string (info, attributes[i]);
+      g_print ("  %s: %s\n", attributes[i], value);
+      g_free (value);
+    }
+  g_strfreev (attributes);
+}
 
 static void
 show_info (GFileInfo *info)
@@ -77,13 +97,11 @@ show_info (GFileInfo *info)
   const char *name, *type;
   char *escaped;
   goffset size;
-  char **attributes;
-  int i;
 
   name = g_file_info_get_display_name (info);
   if (name)
     g_print ("display name: %s\n", name);
-
+  
   name = g_file_info_get_edit_name (info);
   if (name)
     g_print ("edit name: %s\n", name);
@@ -98,24 +116,14 @@ show_info (GFileInfo *info)
   
   type = type_to_string (g_file_info_get_file_type (info));
   g_print ("type: %s\n", type);
-
+  
   size = g_file_info_get_size (info);
   g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
-
+  
   if (g_file_info_get_flags (info) & G_FILE_FLAG_HIDDEN)
     g_print ("hidden\n");
-
-  attributes = g_file_info_list_attributes (info, NULL);
-
-  g_print ("attributes:\n");
-  for (i = 0; attributes[i] != NULL; i++)
-    {
-      char *value;
-      value = g_file_info_get_attribute_as_string (info, attributes[i]);
-      g_print ("  %s: %s\n", attributes[i], value);
-      g_free (value);
-    }
-  g_strfreev (attributes);
+  
+  show_attributes (info);
 }
 
 static void
@@ -136,7 +144,10 @@ get_info (GFile *file)
     flags |= G_FILE_GET_INFO_NOFOLLOW_SYMLINKS;
   
   error = NULL;
-  info = g_file_get_info (file, attributes, flags, NULL, &error);
+  if (filesystem)
+    info = g_file_get_filesystem_info (file, attributes, NULL, &error);
+  else
+    info = g_file_get_info (file, attributes, flags, NULL, &error);
 
   if (info == NULL)
     {
@@ -145,7 +156,10 @@ get_info (GFile *file)
       return;
     }
 
-  show_info (info);
+  if (filesystem)
+    show_attributes (info);
+  else
+    show_info (info);
 
   g_object_unref (info);
 }

@@ -34,8 +34,51 @@ CFLAGS=$saved_CFLAGS
 
 AC_CHECK_HEADERS([pwd.h])
 
-AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link)
+AC_CHECK_FUNCS(getc_unlocked readlink symlink chown lchown fchmod fchown link statvfs statfs)
 
+AC_CHECK_HEADERS(sys/vfs.h sys/mount.h sys/statfs.h sys/statvfs.h sys/param.h)
+			     
+dnl
+dnl if statfs() takes 2 arguments or 4 (Solaris)
+dnl
+if test "$ac_cv_func_statfs" = yes ; then
+  AC_MSG_CHECKING([number of arguments to statfs()])
+  AC_TRY_COMPILE([#include <unistd.h>
+  #ifdef HAVE_SYS_PARAM_H
+  #include <sys/param.h>
+  #endif
+  #ifdef HAVE_SYS_VFS_H
+  #include <sys/vfs.h>
+  #endif
+  #ifdef HAVE_SYS_MOUNT_H
+  #include <sys/mount.h>
+  #endif
+  #ifdef HAVE_SYS_STATFS_H
+  #include <sys/statfs.h>
+  #endif], [struct statfs st;
+  statfs(NULL, &st);],[
+    AC_MSG_RESULT([2])
+    AC_DEFINE(STATFS_ARGS, 2, [Number of arguments to statfs()])],[
+    AC_TRY_COMPILE([#include <unistd.h>
+  #ifdef HAVE_SYS_PARAM_H
+  #include <sys/param.h>
+  #endif
+  #ifdef HAVE_SYS_VFS_H
+  #include <sys/vfs.h>
+  #endif
+  #ifdef HAVE_SYS_MOUNT_H
+  #include <sys/mount.h>
+  #endif
+  #ifdef HAVE_SYS_STATFS_H
+  #include <sys/statfs.h>
+  #endif], [struct statfs st;
+  statfs(NULL, &st, sizeof (st), 0);],[
+      AC_MSG_RESULT([4])
+      AC_DEFINE(STATFS_ARGS, 4, [Number of arguments to statfs()])],[
+      AC_MSG_RESULT(unknown)
+      AC_MSG_ERROR([unable to determine number of arguments to statfs()])])])
+fi
+			     
 dnl Volume monitor stuff			     
 AC_CHECK_FUNCS(setmntent endmntent hasmntopt getmntinfo)
 AC_CHECK_HEADERS(mntent.h sys/mnttab.h sys/vfstab.h sys/cdio.h sys/mount.h sys/mntctl.h sys/vfs.h sys/vmount.h sys/sysctl.h fstab.h fnmatch.h util.h sys/sysmacros.h)

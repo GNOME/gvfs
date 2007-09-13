@@ -244,6 +244,28 @@ g_file_get_info (GFile *file,
   return (* iface->get_info) (file, attributes, flags, cancellable, error);
 }
 
+GFileInfo *
+g_file_get_filesystem_info (GFile *file,
+			    const char *attributes,
+			    GCancellable *cancellable,
+			    GError **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->get_filesystem_info) (file, attributes, cancellable, error);
+}
+
 GFileInputStream *
 g_file_read (GFile *file,
 	     GCancellable *cancellable,

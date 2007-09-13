@@ -8,6 +8,18 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if HAVE_SYS_STATVFS_H
+#include <sys/statvfs.h>
+#endif
+#if HAVE_SYS_VFS_H
+#include <sys/vfs.h>
+#elif HAVE_SYS_MOUNT_H
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#include <sys/mount.h>
+#endif
+
 #include "glocalfile.h"
 #include "glocalfileinfo.h"
 #include "glocalfileenumerator.h"
@@ -353,6 +365,173 @@ g_local_file_get_child_for_display_name (GFile        *file,
   return new_file;
 }
 
+#if HAVE_STATFS
+static const char *
+get_fs_type (long f_type)
+{
+
+  /* filesystem ids taken from linux manpage */
+  switch (f_type) {
+  case 0xadf5:
+    return "adfs";
+  case 0xADFF:
+    return "affs";
+  case 0x42465331:
+    return "befs";
+  case 0x1BADFACE:
+    return "bfs";
+  case 0xFF534D42:
+    return "cifs";
+  case 0x73757245:
+    return "coda";
+  case 0x012FF7B7:
+    return "coh";
+  case 0x28cd3d45:
+    return "cramfs";
+  case 0x1373:
+    return "devfs";
+  case 0x00414A53:
+    return "efs";
+  case 0x137D:
+    return "ext";
+  case 0xEF51:
+    return "ext2";
+  case 0xEF53:
+    return "ext3";
+  case 0x4244:
+    return "hfs";
+  case 0xF995E849:
+    return "hpfs";
+  case 0x958458f6:
+    return "hugetlbfs";
+  case 0x9660:
+    return "isofs";
+  case 0x72b6:
+    return "jffs2";
+  case 0x3153464a:
+    return "jfs";
+  case 0x137F:
+    return "minix";
+  case 0x138F:
+    return "minix2";
+  case 0x2468:
+    return "minix2";
+  case 0x2478:
+    return "minix22";
+  case 0x4d44:
+    return "msdos";
+  case 0x564c:
+    return "ncp";
+  case 0x6969:
+    return "nfs";
+  case 0x5346544e:
+    return "ntfs";
+  case 0x9fa1:
+    return "openprom";
+  case 0x9fa0:
+    return "proc";
+  case 0x002f:
+    return "qnx4";
+  case 0x52654973:
+    return "reiserfs";
+  case 0x7275:
+    return "romfs";
+  case 0x517B:
+    return "smb";
+  case 0x012FF7B6:
+    return "sysv2";
+  case 0x012FF7B5:
+    return "sysv4";
+  case 0x01021994:
+    return "tmpfs";
+  case 0x15013346:
+    return "udf";
+  case 0x00011954:
+    return "ufs";
+  case 0x9fa2:
+    return "usbdevice";
+  case 0xa501FCF5:
+    return "vxfs";
+  case 0x012FF7B4:
+    return "xenix";
+  case 0x58465342:
+    return "xfs";
+  case 0x012FD16D:
+    return "xiafs";
+  default:
+    return NULL;
+  }
+}
+#endif
+
+static GFileInfo *
+g_local_file_get_filesystem_info (GFile                *file,
+				  const char           *attributes,
+				  GCancellable         *cancellable,
+				  GError              **error)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  GFileInfo *info;
+  int statfs_result;
+  gboolean no_size;
+  guint64 block_size;
+#if HAVE_STATFS
+  struct statfs statfs_buffer;
+  const char *fstype;
+#elif HAVE_STATVFS
+  struct statvfs statfs_buffer;
+#endif
+	
+  no_size = FALSE;
+  
+#if HAVE_STATFS
+  
+#if STATFS_ARGS == 2
+  statfs_result = statfs (local->filename, &statfs_buffer);
+#elif STATFS_ARGS == 4
+  statfs_result = statfs (local->filename, &statfs_buffer,
+			  sizeof (statfs_buffer), 0);
+#endif
+  block_size = statfs_buffer.f_bsize;
+  
+#if defined(__linux__)
+  /* ncpfs does not know the amount of available and free space *
+   * assuming ncpfs is linux specific, if you are on a non-linux platform
+   * where ncpfs is available, please file a bug about it on bugzilla.gnome.org
+   */
+  if (statfs_buffer.f_bavail == 0 && statfs_buffer.f_bfree == 0 &&
+      /* linux/ncp_fs.h: NCP_SUPER_MAGIC == 0x564c */
+      statfs_buffer.f_type == 0x564c)
+    no_size = TRUE;
+#endif
+  
+#elif HAVE_STATVFS
+  statfs_result = statvfs (unescaped_path, &statfs_buffer);
+  block_size = statfs_buffer.f_frsize; 
+#endif
+
+  if (statfs_result == -1)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error getting filesystem info: %s"),
+		   g_strerror (errno));
+      return NULL;
+    }
+
+  info = g_file_info_new ();
+
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FS_FREE, block_size * statfs_buffer.f_bavail);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FS_SIZE, block_size * statfs_buffer.f_blocks);
+
+#if HAVE_STATFS
+  fstype = get_fs_type (statfs_buffer.f_type);
+  if (fstype)
+    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, fstype);
+#endif  
+
+  return info;
+}
 
 static GFile *
 g_local_file_set_display_name (GFile *file,
@@ -847,6 +1026,7 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->set_display_name = g_local_file_set_display_name;
   iface->enumerate_children = g_local_file_enumerate_children;
   iface->get_info = g_local_file_get_info;
+  iface->get_filesystem_info = g_local_file_get_filesystem_info;
   iface->set_attribute = g_local_file_set_attribute;
   iface->read = g_local_file_read;
   iface->append_to = g_local_file_append_to;
