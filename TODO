@@ -26,7 +26,7 @@ HAL implementation of VolumeMonitor
 
 Move GAppInfo to Gtk+
 
-Implement UNMOUNTED and PRE_UNMOUNT for file monitors
+Implement PRE_UNMOUNT for file monitors
 
 Add sort-priority file attribute so that e.g. volumes can be sorted not just by name
 
