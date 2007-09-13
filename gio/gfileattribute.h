@@ -21,6 +21,7 @@ typedef enum {
 typedef enum {
   G_FILE_ATTRIBUTE_FLAGS_NONE = 0,
   G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE = 1 << 0,
+  G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED = 1 << 1,
 } GFileAttributeFlags;
 
 /* Used by g_file_set_attributes_from_info */
