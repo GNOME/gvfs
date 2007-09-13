@@ -1121,7 +1121,7 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
 
   /* If file is dos-readonly, libsmbclient doesn't set S_IWUSR, we use this to
      trigger ACCESS_WRITE = FALSE: */
-  if (!(statbud->st_mode & S_IWUSR))
+  if (!(statbuf->st_mode & S_IWUSR))
     g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_ACCESS_WRITE, FALSE);
 
   /* Look at st_mode & S_IWUSR, not set => readonly */
@@ -1253,6 +1253,7 @@ do_enumerate (GVfsBackend *backend,
 		{
 		  info = g_file_info_new ();
 		  g_file_info_set_name (info, dirp->name);
+		  files = g_list_prepend (files, info);
 		}
 	      else
 		{
