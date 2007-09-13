@@ -2,6 +2,11 @@ How do we represent icons in the APIs?
 * Where: file-info, volumes/drives, mime info
 * should support list of themed icon names
 * should support win32 icons
+* should support custom icons (i.e. via http/dav)
+  encode data or have a reference to something you can download via gio???
+  file formats?
+* icons should be cachable, at specific *source* sizes (i.e. not the scaled image for the requested size)
+* loading icons must be done in gtk+, and requires extra info like the theme to use
 
 Work on GFile:
 * More async operations
