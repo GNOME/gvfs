@@ -322,9 +322,12 @@ run_in_thread (GIOJob *job,
   GSimpleAsyncResult *simple = data->simple;
 
   if (simple->handle_cancellation &&
-      g_cancellable_set_error_if_cancelled (c, simple))
+      g_cancellable_is_cancelled (c))
     {
-      /* PASS */
+       g_simple_async_result_set_error (simple,
+					G_IO_ERROR,
+					G_IO_ERROR_CANCELLED,
+                                       _("Operation was cancelled"));
     }
   else
     {
