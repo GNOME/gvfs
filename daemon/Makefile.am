@@ -25,7 +25,6 @@ libdaemon_la_SOURCES = \
 	gvfsbackend.c gvfsbackend.h \
 	gvfsreadchannel.c gvfsreadchannel.h \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
-	gvfsmountpoint.c gvfsmountpoint.h \
 	gvfsjob.c gvfsjob.h \
 	gvfsjobsource.c gvfsjobsource.h \
 	gvfsjobdbus.c gvfsjobdbus.h \

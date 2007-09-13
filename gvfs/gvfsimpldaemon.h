@@ -16,16 +16,9 @@ typedef struct _GVfsImplDaemon       GVfsImplDaemon;
 typedef struct _GVfsImplDaemonClass  GVfsImplDaemonClass;
 
 typedef struct {
-  volatile int ref_count;
-  gboolean is_mounted;
-  char *dbus_owner;
-  char *dbus_path;
-  char *method;
-  char *user;
-  char *host;
-  int port;
-  char *path;
-} GVfsMountpointInfo;
+  const char *bus_name;
+  const char *object_path;
+} GDaemonMountInfo;
 
 struct _GVfsImplDaemonClass
 {
@@ -35,9 +28,6 @@ struct _GVfsImplDaemonClass
 GType   g_vfs_impl_daemon_get_type  (void) G_GNUC_CONST;
 
 GVfsImplDaemon *g_vfs_impl_daemon_new (void);
-
-GVfsMountpointInfo *g_vfs_mountpoint_info_ref   (GVfsMountpointInfo *info);
-void                g_vfs_mountpoint_info_unref (GVfsMountpointInfo *info);
 
 G_END_DECLS
 

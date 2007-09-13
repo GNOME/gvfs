@@ -23,7 +23,7 @@ struct _GFileDaemonClass
 
 GType g_file_daemon_get_type (void) G_GNUC_CONST;
   
-GFile * g_file_daemon_new (GVfsMountpointInfo *mount,
+GFile * g_file_daemon_new (const GDaemonMountInfo *info,
 			   const char *path);
 
 G_END_DECLS

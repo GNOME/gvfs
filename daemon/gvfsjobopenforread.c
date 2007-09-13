@@ -15,6 +15,7 @@
 G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_TYPE_VFS_JOB_DBUS);
 
 static gboolean     start        (GVfsJob        *job);
+static void         finished     (GVfsJob        *job);
 static DBusMessage *create_reply (GVfsJob        *job,
 				  DBusConnection *connection,
 				  DBusMessage    *message);
@@ -46,6 +47,7 @@ g_vfs_job_open_for_read_class_init (GVfsJobOpenForReadClass *klass)
   
   gobject_class->finalize = g_vfs_job_open_for_read_finalize;
   job_class->start = start;
+  job_class->finished = finished;
   job_dbus_class->create_reply = create_reply;
 }
 
@@ -168,14 +170,11 @@ create_reply (GVfsJob *job,
   return reply;
 }
 
-GVfsReadChannel *
-g_vfs_job_open_for_read_steal_channel (GVfsJobOpenForRead *job)
+static void
+finished (GVfsJob *job)
 {
-  GVfsReadChannel *channel;
-  
-  channel = job->read_channel;
-  job->read_channel = NULL;
-  
-  return channel;
+  GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
+
+  g_signal_emit_by_name (job, "new-source", open_job->read_channel);
 
 }

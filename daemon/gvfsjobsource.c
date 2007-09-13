@@ -71,18 +71,6 @@ g_vfs_job_source_base_init (gpointer g_class)
     }      
 }
 
-/*
-gboolean
-g_vfs_job_source_is_native (GVfsJobSource *vfs_job_source)
-{
-  GVfsJobSourceIface *iface;
-
-  iface = G_VFS_JOB_SOURCE_GET_IFACE (vfs_job_source);
-
-  return (* iface->is_native) (vfs_job_source);
-}
-*/
-
 void
 g_vfs_job_source_new_job (GVfsJobSource *job_source,
 			  GVfsJob       *job)
@@ -94,15 +82,4 @@ void
 g_vfs_job_source_closed (GVfsJobSource *job_source)
 {
   g_signal_emit (job_source, signals[CLOSED], 0);
-}
-
-void
-g_vfs_job_source_reset (GVfsJobSource *job_source)
-{
-  GVfsJobSourceIface *iface;
-    
-  iface = G_VFS_JOB_SOURCE_GET_IFACE (job_source);
-
-  if (iface->reset)
-    (* iface->reset) (job_source);
 }

@@ -5,7 +5,6 @@
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <dbus/dbus.h>
-#include <gvfsmountpoint.h>
 
 G_BEGIN_DECLS
 
@@ -29,8 +28,8 @@ typedef gpointer GVfsBackendHandle;
 struct _GVfsBackend
 {
   GObject parent_instance;
-  GVfsMountpoint *mountpoint;
-  char *mountpoint_path;
+  char *object_path;
+  char *bus_name;
 };
 
 struct _GVfsBackendClass

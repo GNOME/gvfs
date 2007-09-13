@@ -20,8 +20,6 @@ struct _GVfsJobSourceIface
 
   /* Virtual Table: */
 
-  void (*reset) (GVfsJobSource *source);
-  
   /* Signals: */
 
   void (*new_job) (GVfsJobSource *source,
@@ -35,7 +33,6 @@ GType g_vfs_job_source_get_type (void) G_GNUC_CONST;
 void g_vfs_job_source_new_job (GVfsJobSource *job_source,
 			       GVfsJob       *job);
 void g_vfs_job_source_closed  (GVfsJobSource *job_source);
-void g_vfs_job_source_reset  (GVfsJobSource *job_source);
 
 
 G_END_DECLS

@@ -42,7 +42,6 @@ void             g_vfs_job_open_for_read_set_handle    (GVfsJobOpenForRead *job,
 							GVfsBackendHandle   handle);
 void             g_vfs_job_open_for_read_set_can_seek  (GVfsJobOpenForRead *job,
 							gboolean            can_seek);
-GVfsReadChannel *g_vfs_job_open_for_read_steal_channel (GVfsJobOpenForRead *job);
 
 G_END_DECLS
 

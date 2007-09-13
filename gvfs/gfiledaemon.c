@@ -18,7 +18,7 @@ struct _GFileDaemon
 {
   GObject parent_instance;
 
-  GVfsMountpointInfo *mount;
+  const GDaemonMountInfo *info;
   char *path;
 };
 
@@ -33,7 +33,6 @@ g_file_daemon_finalize (GObject *object)
 
   daemon_file = G_FILE_DAEMON (object);
 
-  g_vfs_mountpoint_info_unref (daemon_file->mount);
   g_free (daemon_file->path);
   
   if (G_OBJECT_CLASS (g_file_daemon_parent_class)->finalize)
@@ -54,7 +53,7 @@ g_file_daemon_init (GFileDaemon *daemon_file)
 }
 
 GFile *
-g_file_daemon_new (GVfsMountpointInfo *mount,
+g_file_daemon_new (const GDaemonMountInfo *info,
 		   const char *path)
 {
   GFileDaemon *daemon_file;
@@ -62,7 +61,7 @@ g_file_daemon_new (GVfsMountpointInfo *mount,
 
   daemon_file = g_object_new (G_TYPE_FILE_DAEMON, NULL);
   /* TODO: These should be construct only properties */
-  daemon_file->mount = g_vfs_mountpoint_info_ref (mount);
+  daemon_file->info = info;
   daemon_file->path = g_strdup (path);
 
   /* Remove any trailing slashes */
@@ -127,7 +126,7 @@ g_file_daemon_get_parent (GFile *file)
   parent_path[len] = 0;
 
   parent = g_object_new (G_TYPE_FILE_DAEMON, NULL);
-  parent->mount = g_vfs_mountpoint_info_ref (daemon_file->mount);
+  parent->info = daemon_file->info;
   parent->path = parent_path;
   
   return G_FILE (parent);
@@ -138,7 +137,7 @@ g_file_daemon_copy (GFile *file)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
 
-  return g_file_daemon_new (daemon_file->mount,
+  return g_file_daemon_new (daemon_file->info,
 			    daemon_file->path);
 }
 
@@ -152,7 +151,7 @@ g_file_daemon_get_child (GFile *file,
   GFile *child;
 
   path = g_build_filename (daemon_file->path, name, NULL);
-  child = g_file_daemon_new (daemon_file->mount, path);
+  child = g_file_daemon_new (daemon_file->info, path);
   g_free (path);
   
   return child;
@@ -269,8 +268,8 @@ g_file_daemon_read_async (GFile *file,
   DBusMessage *message;
   DBusMessageIter iter;
   
-  message = dbus_message_new_method_call (daemon_file->mount->dbus_owner,
-					  daemon_file->mount->dbus_path,
+  message = dbus_message_new_method_call (daemon_file->info->bus_name,
+					  daemon_file->info->object_path,
 					  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
 					  G_VFS_DBUS_OP_OPEN_FOR_READ);
   
@@ -278,7 +277,7 @@ g_file_daemon_read_async (GFile *file,
   if (!_g_dbus_message_iter_append_filename (&iter, daemon_file->path))
     g_error ("Out of memory appending filename");
 
-  _g_vfs_daemon_call_async (daemon_file->mount->dbus_owner,
+  _g_vfs_daemon_call_async (daemon_file->info->bus_name,
 			    message,
 			    context,
 			    callback, callback_data,
@@ -309,8 +308,8 @@ g_file_daemon_read (GFile *file,
       return NULL;
     }
 
-  message = dbus_message_new_method_call (daemon_file->mount->dbus_owner,
-					  daemon_file->mount->dbus_path,
+  message = dbus_message_new_method_call (daemon_file->info->bus_name,
+					  daemon_file->info->object_path,
 					  G_VFS_DBUS_MOUNTPOINT_INTERFACE,
 					  G_VFS_DBUS_OP_OPEN_FOR_READ);
   
@@ -322,7 +321,7 @@ g_file_daemon_read (GFile *file,
       return NULL;
     }
 
-  reply = _g_vfs_daemon_call_sync (daemon_file->mount->dbus_owner,
+  reply = _g_vfs_daemon_call_sync (daemon_file->info->bus_name,
 				   message,
 				   &connection,
 				   cancellable, error);

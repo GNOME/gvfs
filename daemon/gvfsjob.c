@@ -9,6 +9,7 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjob.h"
+#include "gvfsjobsource.h"
 
 G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
 
@@ -23,6 +24,7 @@ enum {
   CANCELLED,
   SEND_REPLY,
   FINISHED,
+  NEW_SOURCE,
   LAST_SIGNAL
 };
 
@@ -78,11 +80,19 @@ g_vfs_job_class_init (GVfsJobClass *klass)
   signals[FINISHED] =
     g_signal_new ("finished",
 		  G_TYPE_FROM_CLASS (gobject_class),
-		  G_SIGNAL_RUN_LAST,
+		  G_SIGNAL_RUN_FIRST,
 		  G_STRUCT_OFFSET (GVfsJobClass, finished),
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__VOID,
 		  G_TYPE_NONE, 0);
+  signals[NEW_SOURCE] =
+    g_signal_new ("new-source",
+		  G_TYPE_FROM_CLASS (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GVfsJobClass, new_source),
+		  NULL, NULL,
+		  g_cclosure_marshal_VOID__OBJECT,
+		  G_TYPE_NONE, 1, G_TYPE_VFS_JOB_SOURCE);
   signals[SEND_REPLY] =
     g_signal_new ("send-reply",
 		  G_TYPE_FROM_CLASS (gobject_class),

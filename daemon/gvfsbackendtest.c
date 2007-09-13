@@ -38,10 +38,10 @@ GVfsBackendTest *
 g_vfs_backend_test_new (void)
 {
   GVfsBackendTest *backend;
-  GVfsMountpoint mountpoint = { "foo", "", "", -1, "" };
 
   backend = g_object_new (G_TYPE_VFS_BACKEND_TEST,
-			  "mountpoint", &mountpoint,
+			  "object-path", "/org/gtk/vfs/mount/foo",
+			  "bus-name", "org.gtk.vfs.mount.foo",
 			  NULL);
   return backend;
 }

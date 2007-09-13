@@ -31,7 +31,7 @@ GetNameOwner - gets the owners name
 All info for mapping uri -> dbus name + remainder path is stored in config files read by the client at startup.
 
 Each "mountpoint" in a mountpoint daemon owns a name like "org.gtk.vfs.mount.smb.$server.$share".
-It also instantiates a Mountpoint interface at /org/gtk/vfs/mountpoint/smb.$server.$share which
+It also instantiates a Mountpoint interface at /org/gtk/vfs/mount/smb.$server.$share which
 listens to operations.
 
 Each daemon that contains at least one mountpoint also registers a org.gtk.vfs.Daemon interface
