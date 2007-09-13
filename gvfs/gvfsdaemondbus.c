@@ -12,6 +12,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "gvfserror.h"
+#include "gasynchelper.h"
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 
@@ -23,8 +24,16 @@ typedef struct {
 } ThreadLocalConnections;
 
 typedef struct {
+  int fd;
+  GetFdAsyncCallback callback;
+  gpointer callback_data;
+} OutstandingFD;
+
+typedef struct {
   int extra_fd;
   int extra_fd_count;
+  GHashTable *outstanding_fds;
+  GSource *extra_fd_source;
 } VfsConnectionData;
 
 typedef struct DBusSource DBusSource;
@@ -217,6 +226,12 @@ connection_data_free (gpointer p)
   VfsConnectionData *data = p;
   
   close (data->extra_fd);
+
+  if (data->extra_fd_source)
+    {
+      g_source_destroy (data->extra_fd_source);
+      g_source_unref (data->extra_fd_source);
+    }
   g_free (data);
 }
 
@@ -266,6 +281,7 @@ _g_dbus_connection_get_fd_sync (DBusConnection *connection,
   int fd;
 
   data = dbus_connection_get_data (connection , vfs_data_slot);
+  g_assert (data != NULL);
 
   /* I don't think we can get reorders here, can we?
    * Its a sync per-thread connection after all
@@ -278,6 +294,50 @@ _g_dbus_connection_get_fd_sync (DBusConnection *connection,
 
   return fd;
 }
+
+static void
+outstanding_fd_free (OutstandingFD *outstanding)
+{
+  if (outstanding->fd != -1)
+    close (outstanding->fd);
+
+  g_free (outstanding);
+}
+
+void
+_g_dbus_connection_get_fd_async (DBusConnection *connection,
+				 int fd_id,
+				 GetFdAsyncCallback callback,
+				 gpointer callback_data)
+{
+  VfsConnectionData *data;
+  OutstandingFD *outstanding_fd;
+  int fd;
+  
+  data = dbus_connection_get_data (connection, vfs_data_slot);
+  g_assert (data != NULL);
+
+  outstanding_fd = g_hash_table_lookup (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+
+  if (outstanding_fd)
+    {
+      fd = outstanding_fd->fd;
+      outstanding_fd->fd = -1;
+      g_hash_table_remove (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+      callback (fd, callback_data);
+    }
+  else
+    {
+      outstanding_fd = g_new0 (OutstandingFD, 1);
+      outstanding_fd->fd = -1;
+      outstanding_fd->callback = callback;
+      outstanding_fd->callback_data = callback_data;
+      g_hash_table_insert (data->outstanding_fds,
+			   GINT_TO_POINTER (fd_id),
+			   outstanding_fd);
+    }
+}
+
 
 typedef struct {
   char *mountpoint;
@@ -431,6 +491,41 @@ do_call_async (AsyncDBusCall *async_call)
 }
 
 static void
+accept_new_fd (VfsConnectionData *data,
+	       int fd)
+{
+  int new_fd;
+  int fd_id;
+  OutstandingFD *outstanding_fd;
+
+  
+  fd_id = data->extra_fd_count;
+  new_fd = receive_fd (data->extra_fd);
+  if (new_fd != -1)
+    {
+      data->extra_fd_count++;
+
+      outstanding_fd = g_hash_table_lookup (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+      
+      if (outstanding_fd)
+	{
+	  outstanding_fd->callback (new_fd, outstanding_fd->callback_data);
+	  g_hash_table_remove (data->outstanding_fds, GINT_TO_POINTER (fd_id));
+	}
+      else
+	{
+	  outstanding_fd = g_new0 (OutstandingFD, 1);
+	  outstanding_fd->fd = new_fd;
+	  outstanding_fd->callback = NULL;
+	  outstanding_fd->callback_data = NULL;
+	  g_hash_table_insert (data->outstanding_fds,
+			       GINT_TO_POINTER (fd_id),
+			       outstanding_fd);
+	}
+    }
+}
+
+static void
 async_get_connection_response (DBusPendingCall *pending,
 			       void            *data)
 {
@@ -454,11 +549,18 @@ async_get_connection_response (DBusPendingCall *pending,
   g_source_unref ((GSource *)async_call->get_connection_source);
   async_call->get_connection_source = NULL;
 
-  dbus_message_get_args (reply, NULL,
-			 DBUS_TYPE_STRING, &address1,
-			 DBUS_TYPE_STRING, &address2,
-			 DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &mountpoints, &n_mountpoints,
-			 DBUS_TYPE_INVALID);
+  dbus_error_init (&derror);
+  if (!dbus_message_get_args (reply, &derror,
+			      DBUS_TYPE_STRING, &address1,
+			      DBUS_TYPE_STRING, &address2,
+			      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &mountpoints, &n_mountpoints,
+			      DBUS_TYPE_INVALID))
+    {
+      _g_error_from_dbus (&derror, &async_call->io_error);
+      dbus_error_free (&derror);
+      async_dbus_call_finish (async_call, NULL);
+      return;
+    }
 
   /* I don't know of any way to do an async connect */
   error = NULL;
@@ -489,10 +591,20 @@ async_get_connection_response (DBusPendingCall *pending,
     }
   dbus_message_unref (reply);
 
-  connection_data = g_new (VfsConnectionData, 1);
+  connection_data = g_new0 (VfsConnectionData, 1);
   connection_data->extra_fd = extra_fd;
   connection_data->extra_fd_count = 0;
+  connection_data->outstanding_fds =
+    g_hash_table_new_full (g_direct_hash,
+			   g_direct_equal,
+			   NULL,
+			   (GDestroyNotify)outstanding_fd_free);
 
+  connection_data->extra_fd_source =
+    _g_fd_source_new (extra_fd, POLLIN, async_call->context, NULL);
+  g_source_set_callback (connection_data->extra_fd_source,
+			 (GSourceFunc)accept_new_fd, connection_data, NULL);
+  
   if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
     g_error ("Out of memory");
 
@@ -1375,9 +1487,10 @@ dbus_source_finalize (GSource *source)
   dbus_source->in_finalize = TRUE;
   
   G_LOCK (context_map);
-  g_hash_table_foreach_remove (context_map,
-			       remove_source_cb,
-			       dbus_source);
+  if (context_map)
+    g_hash_table_foreach_remove (context_map,
+				 remove_source_cb,
+				 dbus_source);
   G_UNLOCK (context_map);
 
   dbus_connection_close (dbus_source->connection);

@@ -184,6 +184,38 @@ g_file_daemon_get_info (GFile                *file,
   return NULL;
 }
 
+typedef struct {
+  GFile *file;
+  GFileReadCallback read_callback;
+  gpointer callback_data;
+  gboolean can_seek;
+} GetFDData;
+
+static void
+read_async_get_fd_cb (int fd,
+		      gpointer callback_data)
+{
+  GetFDData *data = callback_data;
+  GFileInputStream *stream;
+  GError *error;
+  
+  if (fd == -1)
+    {
+      error = NULL;
+      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Didn't get stream file descriptor"));
+      data->read_callback (data->file, NULL, data->callback_data, error);
+      g_error_free (error);
+    }
+  else
+    {
+      stream = g_file_input_stream_daemon_new (fd, data->can_seek);
+      data->read_callback (data->file, stream, data->callback_data, NULL);
+      g_object_unref (stream);
+    }
+  g_free (data);
+}
+
 static void
 read_async_cb (DBusMessage *reply,
 	       DBusConnection *connection,
@@ -198,8 +230,7 @@ read_async_cb (DBusMessage *reply,
   GError *error;
   guint32 fd_id;
   dbus_bool_t can_seek;
-  GFileInputStream *stream;
-  int fd;
+  GetFDData *get_fd_data;
   
   if (io_error != NULL)
     {
@@ -219,22 +250,14 @@ read_async_cb (DBusMessage *reply,
 	  g_error_free (error);
 	}
 
-      /* TODO: This should be async, otherwise we can't handle
-	 reordering and stuff */
-      fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
-      if (fd == -1)
-	{
-	  error = NULL;
-	  g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		       _("Didn't get stream file descriptor"));
-	  read_callback (file, NULL, op_callback_data, error);
-	  g_error_free (error);
-	  return;
-	}
-
-      stream = g_file_input_stream_daemon_new (fd, can_seek);
-      read_callback (file, stream, op_callback_data, error);
-      g_object_unref (stream);
+      get_fd_data = g_new0 (GetFDData, 1);
+      get_fd_data->file = file;
+      get_fd_data->read_callback = read_callback;
+      get_fd_data->callback_data = op_callback_data;
+      get_fd_data->can_seek = can_seek;
+      
+      _g_dbus_connection_get_fd_async (connection, fd_id,
+				       read_async_get_fd_cb, get_fd_data);
     }
 }
 
