@@ -1,5 +1,10 @@
 #include <config.h>
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
 #include "gvfsunixdbus.h"
 #include <gvfsdaemonprotocol.h>
 
@@ -8,7 +13,18 @@ typedef struct {
   GHashTable *connections;
 } ThreadLocalConnections;
 
+static gint32 vfs_data_slot = -1;
+
 static GStaticPrivate local_connections = G_STATIC_PRIVATE_INIT;
+
+static gpointer
+vfs_dbus_init (gpointer arg)
+{
+  if (!dbus_connection_allocate_data_slot (&vfs_data_slot))
+    g_error ("Unable to allocate data slot");
+
+  return NULL;
+}
 
 static void
 free_local_connections (ThreadLocalConnections *local)
@@ -79,15 +95,75 @@ append_escaped_bus_name (GString *s,
 }
 
 
-DBusConnection *
-_g_vfs_unix_get_connection_sync (const char *mountpoint)
+static int
+unix_socket_connect (const char *address)
 {
+  int fd;
+  const char *path;
+  size_t path_len;
+  struct sockaddr_un addr;
+  gboolean abstract;
+
+  fd = socket (PF_UNIX, SOCK_STREAM, 0);
+  if (fd == -1)
+    return -1;
+
+  if (g_str_has_prefix (address, "unix:abstract="))
+    {
+      path = address + strlen ("unix:abstract=");
+      abstract = TRUE;
+    }
+  else
+    {
+      path = address + strlen ("unix:path=");
+      abstract = FALSE;
+    }
+    
+  memset (&addr, 0, sizeof (addr));
+  addr.sun_family = AF_UNIX;
+  path_len = strlen (path);
+
+  if (abstract)
+    {
+      addr.sun_path[0] = '\0'; /* this is what says "use abstract" */
+      path_len++; /* Account for the extra nul byte added to the start of sun_path */
+
+      strncpy (&addr.sun_path[1], path, path_len);
+    }
+  else
+    {
+      strncpy (addr.sun_path, path, path_len);
+    }
+  
+  if (connect (fd, (struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
+    {      
+      close (fd);
+      return -1;
+    }
+
+  return fd;
+}
+
+static void
+close_wrapper (gpointer p)
+{
+  close (GPOINTER_TO_INT (p));
+}
+
+DBusConnection *
+_g_vfs_unix_get_connection_sync (const char *mountpoint,
+				 gint *fd)
+{
+  static GOnce once_init = G_ONCE_INIT;
   ThreadLocalConnections *local;
   DBusConnection *connection;
   DBusMessage *message, *reply;
   DBusError error;
   GString *bus_name;
-  char *address;
+  char *address1, *address2;
+  int extra_fd;
+
+  g_once (&once_init, vfs_dbus_init, NULL);
 
   local = g_static_private_get (&local_connections);
   if (local == NULL)
@@ -97,11 +173,15 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint)
 						  g_free, free_mount_connection);
       g_static_private_set (&local_connections, local, (GDestroyNotify)free_local_connections);
     }
-
+  
   connection = g_hash_table_lookup (local->connections, mountpoint);
   if (connection != NULL)
-    return connection;
-
+    {
+      if (fd)
+	*fd = GPOINTER_TO_INT (dbus_connection_get_data (connection , vfs_data_slot));
+      return connection;
+    }
+  
   if (local->bus == NULL)
     {
       dbus_error_init (&error);
@@ -122,7 +202,7 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint)
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_GET_CONNECTION);
   g_string_free (bus_name, TRUE);
-
+  
   dbus_error_init (&error);
   reply = dbus_connection_send_with_reply_and_block (local->bus, message, -1,
 						     &error);
@@ -137,23 +217,32 @@ _g_vfs_unix_get_connection_sync (const char *mountpoint)
     }
   
   dbus_message_get_args (reply, NULL,
-			 DBUS_TYPE_STRING, &address,
+			 DBUS_TYPE_STRING, &address1,
+			 DBUS_TYPE_STRING, &address2,
 			 DBUS_TYPE_INVALID);
 
+  extra_fd = unix_socket_connect (address2);
+  g_print ("extra fd: %d\n", extra_fd);
+
   dbus_error_init (&error);
-  connection = dbus_connection_open_private (address, &error);
+  connection = dbus_connection_open_private (address1, &error);
   if (!connection)
     {
       g_warning ("Failed to connect to peer-to-peer address (%s): %s",
-		 address, error.message);
+		 address1, error.message);
       dbus_message_unref (reply);
       dbus_error_free (&error);
       return NULL;
     }
   dbus_message_unref (reply);
 
+  if (!dbus_connection_set_data (connection, vfs_data_slot, GINT_TO_POINTER (extra_fd), close_wrapper))
+    g_error ("Out of memory");
+
   g_hash_table_insert (local->connections, g_strdup (mountpoint), connection);
 
+  if (fd)
+    *fd = extra_fd;
   return connection;
 }
 
