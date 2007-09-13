@@ -121,6 +121,35 @@ AC_CHECK_HEADERS([sys/inotify.h],
 
 AM_CONDITIONAL(HAVE_INOTIFY, [test "$inotify_support" = "yes"])
 
+dnl **********************
+dnl *** Checks for FAM ***
+dnl **********************
+
+should_disable_fam=no
+
+AC_ARG_ENABLE(fam, [  --disable-fam          build without enabling fam for file system monitoring],
+                         [
+                                if test "x$enable_fam" = "xno"; then
+                                        should_disable_fam=yes
+                                        echo "Not building FAM support"
+                                fi
+                         ]
+                         )
+fam_support=no
+FAM_LIBS=
+if test "x$should_disable_fam" = "xno"; then
+AC_CHECK_LIB(fam, FAMOpen,
+  [AC_CHECK_HEADERS(fam.h,
+    [AC_DEFINE(HAVE_FAM, [], [Define if we have FAM])
+     FAM_LIBS="-lfam"]
+     fam_support=yes,
+    AC_MSG_WARN(*** FAM support will not be built (header files not found) ***))],
+  AC_MSG_WARN(*** FAM support will not be built (FAM library not found) ***))
+AC_SUBST(FAM_LIBS)
+fi
+AM_CONDITIONAL(HAVE_FAM, [test "$fam_support" = "yes"])
+
+
 dnl ***********************
 dnl *** Check for xattr ***
 dnl ***********************
@@ -302,6 +331,7 @@ Makefile
 gio/Makefile
 gio/xdgmime/Makefile
 gio/inotify/Makefile
+gio/fam/Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
@@ -319,4 +349,5 @@ echo "
 	Samba support:	      $msg_samba
 	FUSE support:         $msg_fuse
 	inotify support:      $inotify_support
+	FAM support:          $fam_support
 "

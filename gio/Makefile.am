@@ -54,6 +54,11 @@ SUBDIRS += inotify
 platform_libadd += inotify/libinotify.la
 endif
 
+if HAVE_FAM
+SUBDIRS += fam
+platform_libadd += fam/libfam_helper.la
+endif
+
 if OS_UNIX
 appinfo_sources += gdesktopappinfo.c gdesktopappinfo.h
 platform_libadd += xdgmime/libxdgmime.la
@@ -135,7 +140,11 @@ if OS_WIN32
 no_undefined = -no-undefined
 endif
 
-libgio_la_LDFLAGS= -export-dynamic $(no_undefined)
+if HAVE_FAM
+fam_ldflags = $(FAM_LIBS)
+endif
+
+libgio_la_LDFLAGS= -export-dynamic $(no_undefined) $(fam_ldflags)
 
 gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
