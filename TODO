@@ -22,7 +22,6 @@ Implement PRE_UNMOUNT for file monitors, send it when unmounting
 
 Finalise the mimetype decision. Add fast version? See dfaure discussion on xdg list.
 Implement std:icon for local files. This is related to mimetype decisions (fast vs slow)
-Handle the conflicting globs (*.pcf) case and fallback to sniffing
 
 Use giomodules for fam volume monitor backend
 
