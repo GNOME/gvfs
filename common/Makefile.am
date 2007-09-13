@@ -19,6 +19,6 @@ libgvfscommon_la_SOURCES = 	\
 	gvfsmapuri.h \
 	$(NULL)
 
-ligvfsbcommon_la_LIBADD =	\
+ligvfscommon_la_LIBADD =	\
 	$(DBUS_LIBS) 	\
 	$(GLIB_LIBS)
