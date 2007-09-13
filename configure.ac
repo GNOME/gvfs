@@ -282,6 +282,7 @@ client/Makefile
 daemon/Makefile
 programs/Makefile
 po/Makefile.in
+gio.pc
 ])
 
 echo 
