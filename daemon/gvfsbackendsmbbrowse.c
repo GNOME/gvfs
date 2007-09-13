@@ -32,6 +32,8 @@ struct _GVfsBackendSmbBrowse
 {
   GVfsBackend parent_instance;
 
+  char *user;
+  char *domain;
   char *server;
   SMBCCTX *smb_context;
 
@@ -103,6 +105,10 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_SMB_BROWSE (object);
 
+  g_free (backend->user);
+  g_free (backend->domain);
+  g_free (backend->server);
+  
   g_mutex_free (backend->entries_lock);
 
   smbc_free_context (backend->smb_context, TRUE);
@@ -120,40 +126,52 @@ g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
   backend->entries_lock = g_mutex_new ();
 }
 
-/* Authentication callback function type (traditional method)
+/**
+ * Authentication callback function type (method that includes context)
  * 
  * Type for the the authentication function called by the library to
  * obtain authentication credentals
  *
+ * @param context   Pointer to the smb context
+ *
  * @param srv       Server being authenticated to
+ *
  * @param shr       Share being authenticated to
+ *
  * @param wg        Pointer to buffer containing a "hint" for the
  *                  workgroup to be authenticated.  Should be filled in
  *                  with the correct workgroup if the hint is wrong.
+ * 
  * @param wglen     The size of the workgroup buffer in bytes
+ *
  * @param un        Pointer to buffer containing a "hint" for the
  *                  user name to be use for authentication. Should be
  *                  filled in with the correct workgroup if the hint is
  *                  wrong.
+ * 
  * @param unlen     The size of the username buffer in bytes
+ *
  * @param pw        Pointer to buffer containing to which password 
  *                  copied
+ * 
  * @param pwlen     The size of the password buffer in bytes
  *           
  */
 static void
-auth_callback (const char *server_name, const char *share_name,
+auth_callback (SMBCCTX *context,
+	       const char *server_name, const char *share_name,
 	       char *domain_out, int domainmaxlen,
 	       char *username_out, int unmaxlen,
 	       char *password_out, int pwmaxlen)
 {
-  int len;
+  GVfsBackendSmbBrowse *backend;
 
-  len = strlen (server_name);
-  g_print ("auth_callback: %s %s\n", server_name, share_name);
+  backend = smbc_option_get (context, "user_data");
 
-  strncpy (domain_out, "", domainmaxlen);
-  strncpy (username_out, "", unmaxlen);
+  if (backend->domain)
+    strncpy (domain_out, backend->domain, domainmaxlen);
+  if (backend->user)
+    strncpy (username_out, backend->user, unmaxlen);
   strncpy (password_out, "", pwmaxlen);
 }
 
@@ -174,7 +192,6 @@ add_cached_server (SMBCCTX *context, SMBCSRV *new,
 		   const char *domain, const char *username)
 {
   CachedServer *cached_server;
-  g_print ("add_cached_server\n");
 
   cached_server = g_new (CachedServer, 1);
   cached_server->server_name = g_strdup (server_name);
@@ -220,7 +237,6 @@ remove_cached_server (SMBCCTX * context, SMBCSRV * server)
 
   return 1;
 }
-
 
 /* Look up a server in the cache system
  *
@@ -480,9 +496,13 @@ do_mount (GVfsBackend *backend,
 			"Failed to allocate smb context");
       return;
     }
+
+  smbc_option_set (smb_context, "user_data", backend);
   
   smb_context->debug = 0;
-  smb_context->callbacks.auth_fn 	      = auth_callback;
+  smb_context->callbacks.auth_fn = NULL;
+  smbc_option_set (smb_context, "auth_function",
+		   (void *) auth_callback);
   
   smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
   smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
@@ -527,6 +547,11 @@ do_mount (GVfsBackend *backend,
       g_mount_spec_set (browse_mount_spec, "server", op_backend->server);
     }
 
+  if (op_backend->user)
+    g_mount_spec_set (browse_mount_spec, "user", op_backend->user);
+  if (op_backend->domain)
+    g_mount_spec_set (browse_mount_spec, "domain", op_backend->domain);
+  
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
@@ -544,6 +569,7 @@ try_mount (GVfsBackend *backend,
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   const char *server;
+  const char *user, *domain;
 
   g_print ("try_mount\n");
   
@@ -561,6 +587,20 @@ try_mount (GVfsBackend *backend,
 	}
     }
 
+  user = g_mount_spec_get (mount_spec, "user");
+  domain = g_mount_spec_get (mount_spec, "domain");
+  
+  if (g_mount_source_get_is_automount (mount_source) &&
+      ((user != NULL) || (domain != NULL)))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_FILE_ERROR, G_FILE_ERROR_INVAL,
+			"Can't automount smb browsing with specified user or domain");
+      return TRUE;
+    }
+  
+  op_backend->user = g_strdup (user);
+  op_backend->domain = g_strdup (domain);
   op_backend->server = g_strdup (server);
   
   return FALSE;
