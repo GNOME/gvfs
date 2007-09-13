@@ -27,7 +27,8 @@ G_DEFINE_TYPE (GFileEnumeratorSimple, g_file_enumerator_simple, G_TYPE_FILE_ENUM
 
 static GFileInfo *g_file_enumerator_simple_next_file (GFileEnumerator  *enumerator,
 						      GError          **error);
-static void       g_file_enumerator_simple_stop      (GFileEnumerator  *enumerator);
+static gboolean   g_file_enumerator_simple_stop      (GFileEnumerator  *enumerator,
+						      GError          **error);
 
 
 static void
@@ -153,13 +154,16 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   return info;
 }
 
-static void
-g_file_enumerator_simple_stop (GFileEnumerator *enumerator)
+static gboolean
+g_file_enumerator_simple_stop (GFileEnumerator *enumerator,
+			       GError          **error)
 {
   GFileEnumeratorSimple *simple = G_FILE_ENUMERATOR_SIMPLE (enumerator);
 
   g_dir_close (simple->dir);
   simple->dir = NULL;
+
+  return TRUE;
 }
 
 

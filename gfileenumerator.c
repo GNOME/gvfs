@@ -7,7 +7,11 @@ G_DEFINE_TYPE (GFileEnumerator, g_file_enumerator, G_TYPE_OBJECT);
 struct _GFileEnumeratorPrivate {
   /* TODO: Should be public for subclasses? */
   guint stopped : 1;
+  guint pending : 1;
+  guint cancelled : 1;
   GMainContext *context;
+  gint io_job_id;
+  gpointer outstanding_callback;
 };
 
 static void
@@ -18,7 +22,7 @@ g_file_enumerator_finalize (GObject *object)
   enumerator = G_FILE_ENUMERATOR (object);
   
   if (!enumerator->priv->stopped)
-    g_file_enumerator_stop (enumerator);
+    g_file_enumerator_stop (enumerator, NULL);
 
   if (enumerator->priv->context)
     {
@@ -68,6 +72,7 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
 			     GError **error)
 {
   GFileEnumeratorClass *class;
+  GFileInfo *info;
   
   g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), NULL);
   g_return_val_if_fail (enumerator != NULL, NULL);
@@ -79,9 +84,20 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
       return NULL;
     }
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  if (enumerator->priv->pending)
+    {
+      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("File enumerator has outstanding operation"));
+      return NULL;
+    }
   
-  return (* class->next_file) (enumerator, error);
+  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+
+  enumerator->priv->pending = TRUE;
+  info = (* class->next_file) (enumerator, error);
+  enumerator->priv->pending = FALSE;
+  
+  return info;
 }
   
 /**
@@ -95,20 +111,33 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
  * is dropped, but you might want to call make sure resources
  * are released as early as possible.
  **/
-void
-g_file_enumerator_stop (GFileEnumerator *enumerator)
+gboolean
+g_file_enumerator_stop (GFileEnumerator *enumerator,
+			GError **error)
 {
   GFileEnumeratorClass *class;
 
-  g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
-  g_return_if_fail (enumerator != NULL);
+  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), FALSE);
+  g_return_val_if_fail (enumerator != NULL, FALSE);
   
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
 
-  if (!enumerator->priv->stopped)
-    (* class->stop) (enumerator);
+  if (enumerator->priv->stopped)
+    return TRUE;
   
+  if (enumerator->priv->pending)
+    {
+      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("File enumerator has outstanding operation"));
+      return FALSE;
+    }
+  
+  enumerator->priv->pending = TRUE;
+  (* class->stop) (enumerator, error);
+  enumerator->priv->pending = FALSE;
   enumerator->priv->stopped = TRUE;
+
+  return TRUE;
 }
 
 /**
@@ -162,6 +191,87 @@ g_file_enumerator_get_async_context (GFileEnumerator *enumerator)
   return enumerator->priv->context;
 }
 
+typedef struct {
+  GFileEnumerator        *enumerator;
+  int                     num_files;
+  GError                 *error;
+  GAsyncNextFilesCallback callback;
+  gpointer                data;
+  GDestroyNotify          notify;
+} NextAsyncResult;
+
+static gboolean
+call_next_async_result (gpointer data)
+{
+  NextAsyncResult *res = data;
+
+  if (res->callback)
+    res->callback (res->enumerator,
+		   NULL,
+		   res->num_files,
+		   res->data,
+		   res->error);
+
+  return FALSE;
+}
+
+static void
+next_async_result_free (gpointer data)
+{
+  NextAsyncResult *res = data;
+
+  if (res->notify)
+    res->notify (res->data);
+
+  if (res->error)
+    g_error_free (res->error);
+
+  g_object_unref (res->enumerator);
+  
+  g_free (res);
+}
+
+static void
+queue_next_async_result (GFileEnumerator *enumerator,
+			 int num_files,
+			 GError *error,
+			 GAsyncNextFilesCallback callback,
+			 gpointer data,
+			 GDestroyNotify notify)
+{
+  GSource *source;
+  NextAsyncResult *res;
+
+  res = g_new0 (NextAsyncResult, 1);
+
+  res->enumerator = g_object_ref (enumerator);
+  res->num_files = num_files;
+  res->error = error;
+  res->callback = callback;
+  res->data = data;
+  res->notify = notify;
+  
+  source = g_idle_source_new ();
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, call_next_async_result, res, next_async_result_free);
+  g_source_attach (source, g_file_enumerator_get_async_context (enumerator));
+  g_source_unref (source);
+}
+
+static void
+next_async_callback_wrapper (GFileEnumerator *enumerator,
+			     GFileInfo **files,
+			     int num_files,
+			     gpointer data,
+			     GError *error)
+{
+  GAsyncNextFilesCallback real_callback = enumerator->priv->outstanding_callback;
+
+  enumerator->priv->pending = FALSE;
+  (*real_callback) (enumerator, files, num_files, data, error);
+  g_object_unref (enumerator);
+}
+
 /**
  * g_file_enumerator_next_files_async:
  * @enumerator: a #GFileEnumerator.
@@ -197,15 +307,173 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
 				    GDestroyNotify          notify)
 {
   GFileEnumeratorClass *class;
+  GError *error;
 
   g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
   g_return_if_fail (enumerator != NULL);
+  g_return_if_fail (num_files < 0);
+
+  enumerator->priv->cancelled = FALSE;
+
+  if (num_files == 0)
+    {
+      queue_next_async_result (enumerator, 0, NULL,  callback, data, notify);
+      return;
+    }
   
+  if (enumerator->priv->stopped)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+		   _("File enumerator is already closed"));
+      queue_next_async_result (enumerator, -1, error,
+			       callback, data, notify);
+      return;
+    }
+  
+  if (enumerator->priv->pending)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("File enumerator has outstanding operation"));
+      queue_next_async_result (enumerator, -1, error,
+			       callback, data, notify);
+      return;
+    }
+
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
   
+  enumerator->priv->pending = TRUE;
+  enumerator->priv->outstanding_callback = callback;
+  g_object_ref (enumerator);
   (* class->next_files_async) (enumerator, num_files, io_priority, 
-			       callback, data, notify);
+			       next_async_callback_wrapper, data, notify);
 }
+
+
+typedef struct {
+  GFileEnumerator *             enumerator;
+  gboolean                      result;
+  GError *                      error;
+  GAsyncStopEnumeratingCallback callback;
+  gpointer                      data;
+  GDestroyNotify                notify;
+} StopAsyncResult;
+
+static gboolean
+call_stop_async_result (gpointer data)
+{
+  StopAsyncResult *res = data;
+
+  if (res->callback)
+    res->callback (res->enumerator,
+		   res->result,
+		   res->data,
+		   res->error);
+
+  return FALSE;
+}
+
+static void
+stop_async_result_free (gpointer data)
+{
+  StopAsyncResult *res = data;
+
+  if (res->notify)
+    res->notify (res->data);
+
+  if (res->error)
+    g_error_free (res->error);
+
+  g_object_unref (res->enumerator);
+  
+  g_free (res);
+}
+
+static void
+queue_stop_async_result (GFileEnumerator *enumerator,
+			 gboolean result,
+			 GError *error,
+			 GAsyncStopEnumeratingCallback callback,
+			 gpointer data,
+			 GDestroyNotify notify)
+{
+  GSource *source;
+  StopAsyncResult *res;
+
+  res = g_new0 (StopAsyncResult, 1);
+
+  res->enumerator = g_object_ref (enumerator);
+  res->result = result;
+  res->error = error;
+  res->callback = callback;
+  res->data = data;
+  res->notify = notify;
+  
+  source = g_idle_source_new ();
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, call_stop_async_result, res, stop_async_result_free);
+  g_source_attach (source, g_file_enumerator_get_async_context (enumerator));
+  g_source_unref (source);
+}
+
+static void
+stop_async_callback_wrapper (GFileEnumerator *enumerator,
+			     gboolean result,
+			     gpointer data,
+			     GError *error)
+{
+  GAsyncStopEnumeratingCallback real_callback = enumerator->priv->outstanding_callback;
+
+  enumerator->priv->pending = FALSE;
+  enumerator->priv->stopped = TRUE;
+  (*real_callback) (enumerator, result, data, error);
+  g_object_unref (enumerator);
+}
+
+void
+g_file_enumerator_stop_async (GFileEnumerator                *enumerator,
+			      int                             io_priority,
+			      GAsyncStopEnumeratingCallback   callback,
+			      gpointer                        data,
+			      GDestroyNotify                  notify)
+{
+  GFileEnumeratorClass *class;
+  GError *error;
+
+  g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
+
+  enumerator->priv->cancelled = FALSE;
+
+  if (enumerator->priv->stopped)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+		   _("File enumerator is already stopped"));
+      queue_stop_async_result (enumerator, FALSE, error,
+			       callback, data, notify);
+      return;
+    }
+  
+  if (enumerator->priv->pending)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("File enumerator has outstanding operation"));
+      queue_stop_async_result (enumerator, FALSE, error,
+			       callback, data, notify);
+      return;
+    }
+
+  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  
+  enumerator->priv->pending = TRUE;
+  enumerator->priv->outstanding_callback = callback;
+  g_object_ref (enumerator);
+  (* class->stop_async) (enumerator, io_priority,
+			 stop_async_callback_wrapper, data, notify);
+}
+
 
 /**
  * g_file_enumerator_cancel:
@@ -229,8 +497,46 @@ g_file_enumerator_cancel (GFileEnumerator  *enumerator)
 
   g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
   g_return_if_fail (enumerator != NULL);
+
+  enumerator->priv->cancelled = TRUE;
   
   class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
-  
   (* class->cancel) (enumerator);
+}
+
+gboolean
+g_file_enumerator_is_cancelled (GFileEnumerator *enumerator)
+{
+  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), TRUE);
+  g_return_val_if_fail (enumerator != NULL, TRUE);
+  
+  return enumerator->priv->cancelled;
+}
+
+gboolean
+g_file_enumerator_is_stopped (GFileEnumerator *enumerator)
+{
+  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), TRUE);
+  g_return_val_if_fail (enumerator != NULL, TRUE);
+  
+  return enumerator->priv->stopped;
+}
+  
+gboolean
+g_file_enumerator_has_pending (GFileEnumerator *enumerator)
+{
+  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), TRUE);
+  g_return_val_if_fail (enumerator != NULL, TRUE);
+  
+  return enumerator->priv->pending;
+}
+
+void
+g_file_enumerator_set_pending (GFileEnumerator              *enumerator,
+			       gboolean                   pending)
+{
+  g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
+  g_return_if_fail (enumerator != NULL);
+  
+  enumerator->priv->pending = pending;
 }
