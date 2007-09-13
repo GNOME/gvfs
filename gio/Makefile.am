@@ -102,6 +102,8 @@ libgio_la_SOURCES = 	\
 	gfileinfo.c \
 	gfileinputstream.c \
 	gfileoutputstream.c \
+	gfilterinputstream.c \
+	gfilteroutputstream.c \
 	ginputstream.c \
 	gioerror.c \
 	gioscheduler.c \
@@ -160,6 +162,8 @@ gvfsinclude_HEADERS = \
 	gfileinfo.h \
 	gfileinputstream.h \
 	gfileoutputstream.h \
+	gfilterinputstream.h \
+	gfilteroutputstream.h \
 	ginputstream.h \
 	gioerror.h \
 	gioscheduler.h \
