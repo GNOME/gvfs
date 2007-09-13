@@ -4,8 +4,6 @@
 #include <gvfsbackend.h>
 #include <gmountspec.h>
 
-#include <libsmbclient.h>
-
 G_BEGIN_DECLS
 
 #define G_TYPE_VFS_BACKEND_SMB         (g_vfs_backend_smb_get_type ())
@@ -17,23 +15,6 @@ G_BEGIN_DECLS
 
 typedef struct _GVfsBackendSmb        GVfsBackendSmb;
 typedef struct _GVfsBackendSmbClass   GVfsBackendSmbClass;
-
-struct _GVfsBackendSmb
-{
-  GVfsBackend parent_instance;
-
-  char *server;
-  char *share;
-  
-  SMBCCTX *smb_context;
-
-  /* Cache */
-  char *cached_server_name;
-  char *cached_share_name;
-  char *cached_domain;
-  char *cached_username;
-  SMBCSRV *cached_server;
-};
 
 struct _GVfsBackendSmbClass
 {

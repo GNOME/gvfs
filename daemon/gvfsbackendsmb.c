@@ -21,9 +21,28 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 
-G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_TYPE_VFS_BACKEND);
+#include <libsmbclient.h>
 
-static GVfsBackendSmb *smb_backend = NULL;
+struct _GVfsBackendSmb
+{
+  GVfsBackend parent_instance;
+
+  char *server;
+  char *share;
+  char *user;
+  char *domain;
+  
+  SMBCCTX *smb_context;
+
+  /* Cache */
+  char *cached_server_name;
+  char *cached_share_name;
+  char *cached_domain;
+  char *cached_username;
+  SMBCSRV *cached_server;
+};
+
+G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_TYPE_VFS_BACKEND);
 
 static void
 g_vfs_backend_smb_finalize (GObject *object)
@@ -34,6 +53,8 @@ g_vfs_backend_smb_finalize (GObject *object)
 
   g_free (backend->share);
   g_free (backend->server);
+  g_free (backend->user);
+  g_free (backend->domain);
   
   if (G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_smb_parent_class)->finalize) (object);
@@ -42,15 +63,15 @@ g_vfs_backend_smb_finalize (GObject *object)
 static void
 g_vfs_backend_smb_init (GVfsBackendSmb *backend)
 {
-  g_assert (smb_backend == NULL);
-  smb_backend = backend;
 }
 
-/* Authentication callback function type (traditional method)
+/**
+ * Authentication callback function type (method that includes context)
  * 
  * Type for the the authentication function called by the library to
  * obtain authentication credentals
  *
+ * @param context   Pointer to the smb context
  * @param srv       Server being authenticated to
  * @param shr       Share being authenticated to
  * @param wg        Pointer to buffer containing a "hint" for the
@@ -68,11 +89,21 @@ g_vfs_backend_smb_init (GVfsBackendSmb *backend)
  *           
  */
 static void
-auth_callback (const char *server_name, const char *share_name,
+auth_callback (SMBCCTX *context,
+	       const char *server_name, const char *share_name,
 	       char *domain_out, int domainmaxlen,
 	       char *username_out, int unmaxlen,
 	       char *password_out, int pwmaxlen)
 {
+  GVfsBackendSmb *backend;
+
+  backend = smbc_option_get (context, "user_data");
+
+  if (backend->domain)
+    strncpy (domain_out, backend->domain, domainmaxlen);
+  if (backend->user)
+    strncpy (username_out, backend->user, unmaxlen);
+  
   g_print ("auth_callback: %s %s\n", server_name, share_name);
 }
 
@@ -92,15 +123,18 @@ add_cached_server (SMBCCTX *context, SMBCSRV *new,
 		   const char *server_name, const char *share_name, 
 		   const char *domain, const char *username)
 {
-  g_print ("add_cached_server\n");
-  if (smb_backend->cached_server != NULL)
+  GVfsBackendSmb *backend;
+
+  backend = smbc_option_get (context, "user_data");
+  
+  if (backend->cached_server != NULL)
     return 1;
 
-  smb_backend->cached_server_name = g_strdup (server_name);
-  smb_backend->cached_share_name = g_strdup (share_name);
-  smb_backend->cached_domain = g_strdup (domain);
-  smb_backend->cached_username = g_strdup (username);
-  smb_backend->cached_server = new;
+  backend->cached_server_name = g_strdup (server_name);
+  backend->cached_share_name = g_strdup (share_name);
+  backend->cached_domain = g_strdup (domain);
+  backend->cached_username = g_strdup (username);
+  backend->cached_server = new;
 
   return 0;
 }
@@ -115,18 +149,21 @@ add_cached_server (SMBCCTX *context, SMBCSRV *new,
 static int
 remove_cached_server(SMBCCTX * context, SMBCSRV * server)
 {
-  g_print ("remove_cached_server\n");
-  if (smb_backend->cached_server == server)
+  GVfsBackendSmb *backend;
+
+  backend = smbc_option_get (context, "user_data");
+  
+  if (backend->cached_server == server)
     {
-      g_free (smb_backend->cached_server_name);
-      smb_backend->cached_server_name = NULL;
-      g_free (smb_backend->cached_share_name);
-      smb_backend->cached_share_name = NULL;
-      g_free (smb_backend->cached_domain);
-      smb_backend->cached_domain = NULL;
-      g_free (smb_backend->cached_username);
-      smb_backend->cached_username = NULL;
-      smb_backend->cached_server = NULL;
+      g_free (backend->cached_server_name);
+      backend->cached_server_name = NULL;
+      g_free (backend->cached_share_name);
+      backend->cached_share_name = NULL;
+      g_free (backend->cached_domain);
+      backend->cached_domain = NULL;
+      g_free (backend->cached_username);
+      backend->cached_username = NULL;
+      backend->cached_server = NULL;
       return 0;
     }
   return 1;
@@ -148,14 +185,18 @@ get_cached_server (SMBCCTX * context,
 		   const char *server_name, const char *share_name,
 		   const char *domain, const char *username)
 {
+  GVfsBackendSmb *backend;
+
+  backend = smbc_option_get (context, "user_data");
+
   g_print ("get_cached_server %s, %s\n", server_name, share_name);
   
-  if (smb_backend->cached_server != NULL &&
-      strcmp (smb_backend->cached_server_name, server_name) == 0 &&
-      strcmp (smb_backend->cached_share_name, share_name) == 0 &&
-      strcmp (smb_backend->cached_domain, domain) == 0 &&
-      strcmp (smb_backend->cached_username, username) == 0)
-    return smb_backend->cached_server;
+  if (backend->cached_server != NULL &&
+      strcmp (backend->cached_server_name, server_name) == 0 &&
+      strcmp (backend->cached_share_name, share_name) == 0 &&
+      strcmp (backend->cached_domain, domain) == 0 &&
+      strcmp (backend->cached_username, username) == 0)
+    return backend->cached_server;
 
   g_print ("get_cached_server -> miss\n");
   return NULL;
@@ -171,8 +212,12 @@ get_cached_server (SMBCCTX * context,
 static int
 purge_cached (SMBCCTX * context)
 {
-  if (smb_backend->cached_server)
-    remove_cached_server(context, smb_backend->cached_server);
+  GVfsBackendSmb *backend;
+  
+  backend = smbc_option_get (context, "user_data");
+
+  if (backend->cached_server)
+    remove_cached_server(context, backend->cached_server);
   
   return 0;
 }
@@ -272,9 +317,13 @@ do_mount (GVfsBackend *backend,
 			"Failed to allocate smb context");
       return;
     }
+  smbc_option_set (smb_context, "user_data", backend);
   
   smb_context->debug = 0;
-  smb_context->callbacks.auth_fn 	      = auth_callback;
+  
+  smb_context->callbacks.auth_fn = NULL;
+  smbc_option_set (smb_context, "auth_function",
+		   (void *) auth_callback);
   
   smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
   smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
@@ -310,9 +359,15 @@ do_mount (GVfsBackend *backend,
   display_name = g_strdup_printf ("%s on %s", op_backend->share, op_backend->server);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
+  
   smb_mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
   g_mount_spec_set (smb_mount_spec, "server", op_backend->server);
+  if (op_backend->user)
+    g_mount_spec_set (smb_mount_spec, "user", op_backend->user);
+  if (op_backend->domain)
+    g_mount_spec_set (smb_mount_spec, "domain", op_backend->domain);
+  
   g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
   g_mount_spec_unref (smb_mount_spec);
 
@@ -338,8 +393,7 @@ try_mount (GVfsBackend *backend,
 	   GMountSource *mount_source)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
-  const char *server;
-  const char *share;
+  const char *server, *share, *user, *domain;
 
   g_print ("try_mount\n");
   
@@ -353,10 +407,14 @@ try_mount (GVfsBackend *backend,
 			_("Invalid mount spec"));
       return TRUE;
     }
- 
 
+  user = g_mount_spec_get (mount_spec, "user");
+  domain = g_mount_spec_get (mount_spec, "domain");
+  
   op_backend->server = g_strdup (server);
   op_backend->share = g_strdup (share);
+  op_backend->user = g_strdup (user);
+  op_backend->domain = g_strdup (domain);
   
   return FALSE;
 }
