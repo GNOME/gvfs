@@ -7,7 +7,6 @@
 #include "gvfsdaemon.h"
 #include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>
-#include "mounttracker.h"
 #include "mount.h"
 
 int
@@ -50,8 +49,6 @@ main (int argc, char *argv[])
     return 1;
 
   mount_init ();
-  
-  g_mount_tracker_new ();
   
   loop = g_main_loop_new (NULL, FALSE);
 

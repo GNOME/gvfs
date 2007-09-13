@@ -74,7 +74,6 @@ libdaemon_la_SOURCES = \
         $(NULL)
 
 gvfs_daemon_SOURCES = \
-	mounttracker.c mounttracker.h \
 	mount.c mount.h \
 	main.c
 
