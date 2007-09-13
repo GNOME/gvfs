@@ -151,9 +151,22 @@ read_done (GInputStream *stream,
 }
 
 static void
+test_async_open_callback (GFile *file,
+			  GFileInputStream *stream,
+			  gpointer user_data,
+			  GError *error)
+{
+  AsyncData *data = user_data;
+  
+  g_print ("test_async_open_callback: %p\n", stream);
+  if (stream)
+    g_input_stream_read_async (G_INPUT_STREAM (stream), data->buffer, 1024, 0, read_done, data, data->c);
+}
+
+
+static void
 test_async (char *uri, gboolean dump)
 {
-  GInputStream *in;
   GFile *file;
   AsyncData *data = g_new0 (AsyncData, 1);
 
@@ -161,11 +174,7 @@ test_async (char *uri, gboolean dump)
   data->c = g_cancellable_new ();
 
   file = g_file_get_for_uri (uri);
-  in = (GInputStream *)g_file_read (file, NULL, NULL);
-  if (in == NULL)
-    return;
-  
-  g_input_stream_read_async (in, data->buffer, 1024, 0, read_done, data, data->c);
+  g_file_read_async (file, 0, test_async_open_callback, data, NULL, NULL);
 }
 
 static gboolean
@@ -290,6 +299,7 @@ main (int argc, char *argv[])
 
   if (0) test_out ();
 
+  g_print ("Starting mainloop\n");
   g_main_loop_run (loop);
   
   return 0;

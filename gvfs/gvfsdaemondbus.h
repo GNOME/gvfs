@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include <dbus/dbus.h>
+#include <gvfs/gcancellable.h>
 
 G_BEGIN_DECLS
 
@@ -16,6 +17,24 @@ gboolean        _g_error_from_dbus_message           (DBusMessage      *message,
 						      GError          **error);
 void            _g_error_from_dbus                   (DBusError        *derror,
 						      GError          **error);
+
+
+typedef void (*GVfsAsyncDBusCallback) (DBusMessage *reply,
+				       DBusConnection *conntection,
+				       GError *io_error,
+				       GCancellable *cancellable,
+				       gpointer op_callback,
+				       gpointer op_callback_data,
+				       gpointer callback_data);
+
+void _g_vfs_daemon_call_async (const char *mountpoint,
+			       DBusMessage *message,
+			       GMainContext *context,
+			       gpointer op_callback,
+			       gpointer op_callback_data,
+			       GVfsAsyncDBusCallback callback,
+			       gpointer callback_data,
+			       GCancellable *cancellable);
 
 G_END_DECLS
 

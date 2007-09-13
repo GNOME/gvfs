@@ -176,8 +176,93 @@ g_file_daemon_get_info (GFile                *file,
 			gboolean              follow_symlinks,
 			GError              **error)
 {
+ 
   /* TODO: implement */
   return NULL;
+}
+
+static void
+read_async_cb (DBusMessage *reply,
+	       DBusConnection *connection,
+	       GError *io_error,
+	       GCancellable *cancellable,
+	       gpointer op_callback,
+	       gpointer op_callback_data,
+	       gpointer callback_data)
+{
+  GFileReadCallback read_callback = op_callback;
+  GFile *file = callback_data;
+  GError *error;
+  guint32 fd_id;
+  dbus_bool_t can_seek;
+  GFileInputStream *stream;
+  int fd;
+  
+  if (io_error != NULL)
+    {
+      read_callback (file, NULL, op_callback_data, io_error);
+    }
+  else
+    {
+      if (!dbus_message_get_args (reply, NULL,
+				  DBUS_TYPE_UINT32, &fd_id,
+				  DBUS_TYPE_BOOLEAN, &can_seek,
+				  DBUS_TYPE_INVALID))
+	{
+	  error = NULL;
+	  g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       _("Invalid return value from open"));
+	  read_callback (file, NULL, op_callback_data, error);
+	  g_error_free (error);
+	}
+
+      /* TODO: This should be async, otherwise we can't handle
+	 reordering and stuff */
+      fd = _g_dbus_connection_get_fd_sync (connection, fd_id);
+      if (fd == -1)
+	{
+	  error = NULL;
+	  g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       _("Didn't get stream file descriptor"));
+	  read_callback (file, NULL, op_callback_data, error);
+	  g_error_free (error);
+	  return;
+	}
+
+      stream = g_file_input_stream_daemon_new (fd, can_seek);
+      read_callback (file, stream, op_callback_data, error);
+      g_object_unref (stream);
+    }
+}
+
+static void
+g_file_daemon_read_async (GFile *file,
+			  int io_priority,
+			  GFileReadCallback callback,
+			  gpointer callback_data,
+			  GMainContext *context,
+			  GCancellable *cancellable)
+{
+  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  DBusMessage *message;
+  DBusMessageIter iter;
+  
+  message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
+					  G_VFS_DBUS_DAEMON_PATH,
+					  G_VFS_DBUS_DAEMON_INTERFACE,
+					  G_VFS_DBUS_OP_OPEN_FOR_READ);
+  
+  dbus_message_iter_init_append (message, &iter);
+  if (!_g_dbus_message_iter_append_filename (&iter, daemon_file->filename))
+    g_error ("Out of memory appending filename");
+
+  _g_vfs_daemon_call_async (daemon_file->mountpoint,
+			    message,
+			    context,
+			    callback, callback_data,
+			    read_async_cb, file,
+			    cancellable);
+  dbus_message_unref (message);
 }
 
 static GFileInputStream *
@@ -310,4 +395,5 @@ g_file_daemon_file_iface_init (GFileIface *iface)
   iface->append_to = g_file_daemon_append_to;
   iface->create = g_file_daemon_create;
   iface->replace = g_file_daemon_replace;
+  iface->read_async = g_file_daemon_read_async;
 }

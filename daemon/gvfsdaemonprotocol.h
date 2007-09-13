@@ -10,6 +10,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_DAEMON_INTERFACE "org.gtk.vfs.Daemon"
 #define G_VFS_DBUS_OP_GET_CONNECTION "GetConnection"
 #define G_VFS_DBUS_OP_OPEN_FOR_READ "OpenForRead"
+#define G_VFS_DBUS_OP_CANCEL "Cancel"
 
 
 typedef struct {
