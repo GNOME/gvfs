@@ -131,7 +131,6 @@ g_daemon_file_new (GMountSpec *mount_spec,
   GDaemonFile *daemon_file;
 
   daemon_file = g_object_new (G_TYPE_DAEMON_FILE, NULL);
-  /* TODO: These should be construct only properties */
   daemon_file->mount_spec = g_mount_spec_ref (mount_spec);
   daemon_file->path = canonicalize_path (path);
  
