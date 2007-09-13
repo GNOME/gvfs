@@ -45,18 +45,57 @@ type_to_string (GFileType type)
     }
 }
 
+static char *
+escape_string (const char *in)
+{
+  GString *str;
+  static char *hex_digits = "0123456789abcdef";
+  char c;
+  
+
+  str = g_string_new ("");
+
+  while ((c = *in++) != 0)
+    {
+      if (c >= 32 && c <= 126 && c != '\\')
+	g_string_append_c (str, c);
+      else
+	{
+	  g_string_append (str, "\\x");
+	  g_string_append_c (str, hex_digits[(c >> 8) & 0xf]);
+	  g_string_append_c (str, hex_digits[c & 0xf]);
+	}
+    }
+
+  return g_string_free (str, FALSE);
+}
+
+
 static void
 show_info (GFileInfo *info)
 {
   const char *name, *type;
+  char *escaped;
   goffset size;
   GFileAttribute *attributes;
   int n_attributes, i;
 
+  name = g_file_info_get_display_name (info);
+  if (name)
+    g_print ("display name: %s\n", name);
+
+  name = g_file_info_get_edit_name (info);
+  if (name)
+    g_print ("edit name: %s\n", name);
+  
   name = g_file_info_get_name (info);
   if (name)
-    g_print ("name: %s\n", name);
-
+    {
+      escaped = escape_string (name);
+      g_print ("name: %s\n", escaped);
+      g_free (escaped);
+    }
+  
   type = type_to_string (g_file_info_get_file_type (info));
   g_print ("type: %s\n", type);
 
@@ -87,7 +126,10 @@ get_info (GFile *file)
   if (file == NULL)
     return;
 
-  request = G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME | G_FILE_INFO_SIZE | G_FILE_INFO_IS_HIDDEN;
+  request =
+    G_FILE_INFO_FILE_TYPE | G_FILE_INFO_NAME |
+    G_FILE_INFO_SIZE | G_FILE_INFO_IS_HIDDEN |
+    G_FILE_INFO_DISPLAY_NAME | G_FILE_INFO_EDIT_NAME;
   
   error = NULL;
   info = g_file_get_info (file, request, attributes, follow_symlinks, &error);
