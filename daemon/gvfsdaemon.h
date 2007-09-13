@@ -2,7 +2,7 @@
 #define __G_VFS_DAEMON_H__
 
 #include <glib-object.h>
-#include <gvfsreadrequest.h>
+#include <gvfsdaemonbackend.h>
 
 G_BEGIN_DECLS
 
@@ -30,12 +30,12 @@ struct _GVfsDaemonClass
 
   /* vtable */
   
-  GVfsReadRequest * (*read_file) (GVfsDaemon *daemon,
-				  const char *path,
-				  GError **error);
 };
 
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
+
+GVfsDaemon *g_vfs_daemon_new (const char *mountpoint,
+			      GVfsDaemonBackend *backend);
 
 gboolean g_vfs_daemon_is_active (GVfsDaemon *daemon);
 

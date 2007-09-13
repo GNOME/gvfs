@@ -28,6 +28,8 @@ struct _GVfsReadRequestClass
   GObjectClass parent_class;
 
   /* vtable */
+
+  void (*wants_data) (GVfsReadRequest *request);
 };
 
 GType g_vfs_read_request_get_type (void) G_GNUC_CONST;
@@ -36,6 +38,8 @@ GVfsReadRequest *g_vfs_read_request_new (GError **error);
 int g_vfs_read_request_get_fd (GVfsReadRequest *read_request);
 int g_vfs_read_request_get_remote_fd (GVfsReadRequest *read_request);
 void g_vfs_read_request_close_remote_fd (GVfsReadRequest *read_request);
+void g_vfs_read_request_set_filename (GVfsReadRequest *read_request,
+				      const char *filename);
 
 gboolean g_vfs_read_request_wants_data (GVfsReadRequest *read_request);
 gsize g_vfs_read_request_get_requested_size (GVfsReadRequest *read_request);

@@ -103,3 +103,9 @@ void
   request->priv->remote_fd = -1;
 }
 
+void
+g_vfs_read_request_set_filename (GVfsReadRequest *request,
+				 const char *filename)
+{
+  g_error ("TODO");
+}

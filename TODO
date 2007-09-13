@@ -18,3 +18,5 @@ getting selinux attrs is a bit slow, it does all sort of weird ops.
 Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion, etc)
 
 Make backend pluggable
+
+local file access through the daemon for remote X clients?

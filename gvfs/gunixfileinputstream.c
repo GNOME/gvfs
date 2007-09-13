@@ -155,7 +155,7 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   message = dbus_message_new_method_call ("org.gtk.vfs.Daemon",
 					  G_VFS_DBUS_DAEMON_PATH,
 					  G_VFS_DBUS_DAEMON_INTERFACE,
-					  G_VFS_DBUS_OP_READ_FILE);
+					  G_VFS_DBUS_OP_OPEN_FOR_READ);
 
   
   dbus_message_iter_init_append (message, &iter);

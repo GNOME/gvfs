@@ -21,6 +21,7 @@ enum {
 
 struct _GVfsDaemonPrivate
 {
+  GVfsDaemonBackend *backend;
   char *mountpoint;
   gboolean active;
 };
@@ -60,6 +61,7 @@ g_vfs_daemon_finalize (GObject *object)
   daemon = G_VFS_DAEMON (object);
 
   g_free (daemon->priv->mountpoint);
+  g_object_ref (daemon->priv->backend);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize) (object);
@@ -188,6 +190,20 @@ g_vfs_daemon_get_property (GObject    *object,
     }
 }
 
+GVfsDaemon *
+g_vfs_daemon_new (const char *mountpoint,
+		  GVfsDaemonBackend *backend)
+{
+  GVfsDaemon *daemon;
+
+  daemon = g_object_new (G_TYPE_VFS_DAEMON,
+			 "mountpoint", mountpoint,
+			 NULL);
+  daemon->priv->backend = g_object_ref (backend);
+
+  return daemon;
+}
+
 static int
 send_fd (int connection_fd, 
 	 int fd)
@@ -222,9 +238,9 @@ send_fd (int connection_fd,
 }
 
 static void
-daemon_handle_read_file (GVfsDaemon *daemon,
-			 DBusConnection *conn,
-			 DBusMessage *message)
+daemon_handle_open_for_read (GVfsDaemon *daemon,
+			     DBusConnection *conn,
+			     DBusMessage *message)
 {
   GVfsDaemonClass *class;
   DBusMessage *reply;
@@ -254,12 +270,8 @@ daemon_handle_read_file (GVfsDaemon *daemon,
       goto reply;
     }
 
-  path = g_strndup (path_data, path_len);
-
   error = NULL;
-  read_request = class->read_file (daemon, path, &error);
-  g_free (path);
-  
+  read_request = g_vfs_read_request_new (&error);
   if (read_request == NULL) 
     {
       reply = dbus_message_new_error_from_gerror (message, error);
@@ -267,6 +279,10 @@ daemon_handle_read_file (GVfsDaemon *daemon,
     } 
   else
     {
+      path = g_strndup (path_data, path_len);
+      g_vfs_read_request_set_filename (read_request, path);
+      g_free (path);
+
       reply = dbus_message_new_method_return (message);
     }
 
@@ -647,8 +663,8 @@ daemon_message_func (DBusConnection *conn,
     daemon_handle_get_connection (conn, message, daemon);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_DAEMON_INTERFACE,
-					G_VFS_DBUS_OP_READ_FILE))
-    daemon_handle_read_file (daemon, conn, message);
+					G_VFS_DBUS_OP_OPEN_FOR_READ))
+    daemon_handle_open_for_read (daemon, conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   
