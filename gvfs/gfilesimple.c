@@ -74,19 +74,19 @@ g_file_simple_new (const char *filename)
   return G_FILE (simple);
 }
 
-gboolean
+static gboolean
 g_file_simple_is_native (GFile *file)
 {
   return TRUE;
 }
 
-char *
+static char *
 g_file_simple_get_path (GFile *file)
 {
   return g_strdup (G_FILE_SIMPLE (file)->filename);
 }
 
-char *
+static char *
 g_file_simple_get_uri (GFile *file)
 {
   return g_filename_to_uri (G_FILE_SIMPLE (file)->filename, NULL, NULL);
@@ -125,7 +125,7 @@ name_is_valid_for_display (const char *string,
   return TRUE;
 }
 
-char *
+static char *
 g_file_simple_get_parse_name (GFile *file)
 {
   const char *filename;
@@ -184,7 +184,7 @@ g_file_simple_get_parse_name (GFile *file)
   return parse_name;
 }
 
-GFile *
+static GFile *
 g_file_simple_get_parent (GFile *file)
 {
   GFileSimple *simple = G_FILE_SIMPLE (file);
@@ -203,7 +203,7 @@ g_file_simple_get_parent (GFile *file)
   return parent;
 }
 
-GFile *
+static GFile *
 g_file_simple_copy (GFile *file)
 {
   GFileSimple *simple = G_FILE_SIMPLE (file);
@@ -212,7 +212,7 @@ g_file_simple_copy (GFile *file)
 }
 
 
-GFile *
+static GFile *
 g_file_simple_get_child (GFile *file,
 			 const char *name)
 {
@@ -228,7 +228,7 @@ g_file_simple_get_child (GFile *file,
   return child;
 }
 
-GFileEnumerator *
+static GFileEnumerator *
 g_file_simple_enumerate_children (GFile      *file,
 				  GFileInfoRequestFlags requested,
 				  const char *attributes,
@@ -240,7 +240,7 @@ g_file_simple_enumerate_children (GFile      *file,
 				       follow_symlinks);
 }
 
-GFileInfo *
+static GFileInfo *
 g_file_simple_get_info (GFile                *file,
 			GFileInfoRequestFlags requested,
 			const char           *attributes,
@@ -275,27 +275,27 @@ g_file_simple_get_info (GFile                *file,
   return info;
 }
 
-GFileInputStream *
+static GFileInputStream *
 g_file_simple_read (GFile *file)
 {
   return g_local_file_input_stream_new (G_FILE_SIMPLE (file)->filename);
 }
 
-GFileOutputStream *
+static GFileOutputStream *
 g_file_simple_append_to (GFile *file)
 {
   return g_local_file_output_stream_new (G_FILE_SIMPLE (file)->filename,
 					 G_OUTPUT_STREAM_OPEN_MODE_APPEND);
 }
 
-GFileOutputStream *
+static GFileOutputStream *
 g_file_simple_create (GFile *file)
 {
   return g_local_file_output_stream_new (G_FILE_SIMPLE (file)->filename,
 					 G_OUTPUT_STREAM_OPEN_MODE_CREATE);
 }
 
-GFileOutputStream *
+static GFileOutputStream *
 g_file_simple_replace (GFile *file,
 		       time_t mtime,
 		       gboolean  make_backup)

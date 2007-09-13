@@ -38,14 +38,14 @@ g_vfs_simple_new (void)
   return g_object_new (G_TYPE_VFS_SIMPLE, NULL);
 }
 
-GFile *
+static GFile *
 g_vfs_simple_get_file_for_path  (GVfs       *vfs,
 				 const char *path)
 {
   return g_file_simple_new (path);
 }
 
-GFile *
+static GFile *
 g_vfs_simple_get_file_for_uri   (GVfs       *vfs,
 				 const char *uri)
 {
@@ -59,7 +59,7 @@ g_vfs_simple_get_file_for_uri   (GVfs       *vfs,
     return NULL;
 }
 
-GFile *
+static GFile *
 g_vfs_simple_parse_name (GVfs       *vfs,
 			 const char *parse_name)
 {
