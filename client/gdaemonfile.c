@@ -920,6 +920,9 @@ g_daemon_file_replace (GFile *file,
 
   mode = 2;
   dbus_make_backup = make_backup;
+
+  if (etag == NULL)
+    etag = "";
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
