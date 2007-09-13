@@ -1154,7 +1154,7 @@ matcher_matches_id (GFileAttributeMatcher *matcher,
       sub_matchers = (SubMatcher *)matcher->more_sub_matchers->data;
       for (i = 0; i < matcher->more_sub_matchers->len; i++)
 	{
-	  if (matcher->sub_matchers[i].id == (id & matcher->sub_matchers[i].mask))
+	  if (sub_matchers[i].id == (id & sub_matchers[i].mask))
 	    return TRUE;
 	}
     }
@@ -1216,7 +1216,7 @@ g_file_attribute_matcher_enumerate_namespace (GFileAttributeMatcher *matcher,
       sub_matchers = (SubMatcher *)matcher->more_sub_matchers->data;
       for (i = 0; i < matcher->more_sub_matchers->len; i++)
 	{
-	  if (matcher->sub_matchers[i].id == ns_id)
+	  if (sub_matchers[i].id == ns_id)
 	    return TRUE;
 	}
     }
