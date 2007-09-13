@@ -38,6 +38,7 @@ typedef struct {
 GMountSpec *g_mount_spec_new               (const char      *type);
 GMountSpec *g_mount_spec_ref               (GMountSpec      *spec);
 void        g_mount_spec_unref             (GMountSpec      *spec);
+GMountSpec *g_mount_spec_get_unique_for    (GMountSpec      *spec);
 GMountSpec *g_mount_spec_copy              (GMountSpec      *spec);
 GMountSpec *g_mount_spec_from_dbus         (DBusMessageIter *iter);
 void        g_mount_spec_to_dbus           (DBusMessageIter *iter,

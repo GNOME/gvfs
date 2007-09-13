@@ -8,6 +8,9 @@
 #include "gdbusutils.h"
 #include "gmountspec.h"
 
+static GHashTable *unique_hash;
+G_LOCK_DEFINE_STATIC(unique_hash);
+
 static int
 item_compare (const void *_a, const void *_b)
 {
@@ -31,6 +34,31 @@ g_mount_spec_new (const char *type)
     g_mount_spec_set (spec, "type", type);
   
   return spec;
+}
+
+GMountSpec *
+g_mount_spec_get_unique_for (GMountSpec *spec)
+{
+  GMountSpec *unique_spec;
+  
+  G_LOCK (unique_hash);
+  
+  if (unique_hash == NULL)
+    unique_hash = g_hash_table_new (g_mount_spec_hash, (GEqualFunc)g_mount_spec_equal);
+
+  unique_spec = g_hash_table_lookup (unique_hash, spec);
+
+  if (unique_spec == NULL)
+    {
+      g_hash_table_insert (unique_hash, spec, spec);
+      unique_spec = spec;
+    }
+  
+  g_mount_spec_ref (unique_spec);
+  
+  G_UNLOCK (unique_hash);
+
+  return unique_spec;
 }
 
 void
@@ -126,6 +154,11 @@ g_mount_spec_unref (GMountSpec *spec)
 
   if (g_atomic_int_dec_and_test (&spec->ref_count))
     {
+      G_LOCK (unique_hash);
+      if (unique_hash != NULL)
+	g_hash_table_remove (unique_hash, spec);
+      G_UNLOCK (unique_hash);
+      
       g_free (spec->mount_prefix);
       for (i = 0; i < spec->items->len; i++)
 	{
