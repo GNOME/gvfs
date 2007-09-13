@@ -1090,3 +1090,56 @@ _g_dbus_connection_remove_from_main (DBusConnection *connection)
 				 NULL, NULL))
     _g_dbus_oom ();
 }
+
+void
+_g_dbus_message_iter_copy (DBusMessageIter *dest,
+			   DBusMessageIter *source)
+{
+  int type, element_type;
+  
+  while (dbus_message_iter_get_arg_type (source) != DBUS_TYPE_INVALID)
+    {
+      type = dbus_message_iter_get_arg_type (source);
+
+      if (dbus_type_is_basic (type))
+	{
+	  dbus_uint64_t value;
+	  dbus_message_iter_get_basic (source, &value);
+	  dbus_message_iter_append_basic (dest, type, &value);
+	}
+      else if (type == DBUS_TYPE_ARRAY)
+	{
+	  DBusMessageIter source_array, dest_array;
+	  void *value;
+	  int n_elements;
+	  char buf[2];
+	  
+	  element_type = dbus_message_iter_get_element_type (source);
+	  if (dbus_type_is_fixed (element_type))
+	    {
+	      buf[0] = element_type;
+	      buf[1] = '\0';
+	      
+	      dbus_message_iter_recurse (source, &source_array);
+	      dbus_message_iter_get_fixed_array (&source_array, &value, &n_elements);
+
+	      if (!dbus_message_iter_open_container (dest, DBUS_TYPE_ARRAY,
+						     buf, &dest_array))
+		_g_dbus_oom ();
+	      
+	      if (!dbus_message_iter_append_fixed_array (&dest_array,
+							 element_type,
+							 &value, n_elements))
+		_g_dbus_oom ();
+	      
+	      if (!dbus_message_iter_close_container (dest, &dest_array))
+		_g_dbus_oom ();
+	    }
+	  else
+	    g_error ("Unsupported array type %c in _g_dbus_message_iter_copy", element_type);
+	}
+      else
+	g_error ("Unsupported type %c in _g_dbus_message_iter_copy", type);
+    }
+  
+}

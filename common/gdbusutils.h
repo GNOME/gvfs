@@ -48,7 +48,10 @@ void         _g_dbus_connection_remove_from_main    (DBusConnection   *connectio
 GSource *    __g_fd_source_new                      (int               fd,
 						     gushort           events,
 						     GCancellable     *cancellable);
-void     _g_dbus_oom                                (void) G_GNUC_NORETURN;
+void         _g_dbus_message_iter_copy              (DBusMessageIter  *dest,
+						     DBusMessageIter  *source);
+void         _g_dbus_oom                            (void) G_GNUC_NORETURN;
+
 
 
 
