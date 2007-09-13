@@ -72,7 +72,7 @@ g_drive_get_name (GDrive *drive)
   return (* iface->get_name) (drive);
 }
 
-char *
+GIcon *
 g_drive_get_icon (GDrive *drive)
 {
   GDriveIface *iface;

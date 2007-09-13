@@ -7,6 +7,8 @@
 #include "gcontenttypeprivate.h"
 #include "gdesktopappinfo.h"
 #include "gioerror.h"
+#include "gthemedicon.h"
+#include "gfileicon.h"
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
@@ -311,13 +313,25 @@ g_desktop_app_info_get_description (GAppInfo *appinfo)
   return g_strdup (info->comment);
 }
 
-static char *
+static GIcon *
 g_desktop_app_info_get_icon (GAppInfo *appinfo)
 {
   GDesktopAppInfo *info = G_DESKTOP_APP_INFO (appinfo);
+  GFile *file;
+  GIcon *icon;
 
-  /* TODO: How to handle icons */
-  return g_strdup (info->icon);
+  if (info->icon == NULL)
+    return NULL;
+  
+  if (g_path_is_absolute (info->icon)) {
+    file = g_file_get_for_path (info->icon);
+    icon = g_file_icon_new (file);
+    g_object_unref (file);
+  } else {
+    icon = g_themed_icon_new (info->icon);
+  }
+    
+  return icon;
 }
 
 static char *

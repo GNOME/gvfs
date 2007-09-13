@@ -15,6 +15,7 @@ typedef struct  {
     guint64 uint64;
     char *string;
     GQuark quark;
+    GObject *obj;
   } value;
 } GFileAttributeValue;
 
@@ -163,6 +164,9 @@ free_attribute_value (GFileAttributeValue *value)
       if (value->type == G_FILE_ATTRIBUTE_TYPE_STRING ||
           value->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
 	g_free (value->value.string);
+      
+      if (value->type == G_FILE_ATTRIBUTE_TYPE_OBJECT)
+	  g_object_unref (value->value.obj);
 }
 
 static void
@@ -435,6 +439,18 @@ g_file_info_get_attribute_as_string (GFileInfo  *info,
   return str;
 }
 
+static GObject *
+get_object (GFileAttributeValue *value)
+{
+  if (value == NULL || value->type != G_FILE_ATTRIBUTE_TYPE_OBJECT)
+    {
+      if (value != NULL)
+	g_warning ("Invalid type in GFileInfo attribute");
+      return NULL;
+    }
+  return g_object_ref (value->value.obj);
+}
+
 static char *
 get_string (GFileAttributeValue *value)
 {
@@ -602,6 +618,14 @@ g_file_info_create_value_by_name (GFileInfo *info,
   attr_id = lookup_attribute (attribute);
 
   return g_file_info_create_value (info, attr_id);
+}
+
+static void
+set_object (GFileAttributeValue *value, GObject *obj)
+{
+  free_attribute_value (value);
+  value->type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
+  value->value.obj = g_object_ref (obj);
 }
 
 static void
@@ -784,17 +808,21 @@ g_file_info_get_edit_name (GFileInfo *info)
   return get_string (value);
 }
 
-const char *
+GIcon *
 g_file_info_get_icon (GFileInfo *info)
 {
   static guint32 attr = 0;
   GFileAttributeValue *value;
+  GObject *obj;
   
   if (attr == 0)
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ICON);
   
   value = g_file_info_find_value (info, attr);
-  return get_string (value);
+  obj = get_object (value);
+  if (G_IS_ICON (obj))
+    return G_ICON (obj);
+  return NULL;
 }
 
 const char *
@@ -929,8 +957,8 @@ g_file_info_set_edit_name (GFileInfo         *info,
 }
 
 void
-g_file_info_set_icon (GFileInfo         *info,
-		      const char        *icon)
+g_file_info_set_icon (GFileInfo   *info,
+		      GIcon       *icon)
 {
   static guint32 attr = 0;
   GFileAttributeValue *value;
@@ -939,7 +967,7 @@ g_file_info_set_icon (GFileInfo         *info,
     attr = lookup_attribute (G_FILE_ATTRIBUTE_STD_ICON);
   
   value = g_file_info_create_value (info, attr);
-  set_string (value, icon);
+  set_object (value, G_OBJECT (icon));
 }
 
 void

@@ -83,7 +83,7 @@ g_volume_get_name (GVolume *volume)
   return (* iface->get_name) (volume);
 }
 
-char *
+GIcon *
 g_volume_get_icon (GVolume *volume)
 {
   GVolumeIface *iface;

@@ -112,7 +112,7 @@ g_union_drive_get_name (GDrive *drive)
   return g_drive_get_name (union_drive->child_drive);
 }
 
-static char *
+static GIcon *
 g_union_drive_get_icon (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);

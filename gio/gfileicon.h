@@ -23,7 +23,7 @@ struct _GFileIconClass
 
 GType g_file_icon_get_type (void) G_GNUC_CONST;
   
-GFileIcon *g_file_icon_new (GFile *file);
+GIcon *g_file_icon_new (GFile *file);
 
 GFile *g_file_icon_get_file (GFileIcon *icon);
 

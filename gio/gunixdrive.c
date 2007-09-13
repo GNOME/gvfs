@@ -7,6 +7,7 @@
 #include "gunixdrive.h"
 #include "gunixvolume.h"
 #include "gdrivepriv.h"
+#include "gthemedicon.h"
 #include "gvolumemonitor.h"
 
 struct _GUnixDrive {
@@ -156,12 +157,12 @@ g_unix_drive_unset_volume (GUnixDrive     *drive,
     }
 }
 
-static char *
+static GIcon *
 g_unix_drive_get_icon (GDrive *drive)
 {
   GUnixDrive *unix_drive = G_UNIX_DRIVE (drive);
 
-  return g_strdup (unix_drive->icon);
+  return g_themed_icon_new (unix_drive->icon);
 }
 
 static char *

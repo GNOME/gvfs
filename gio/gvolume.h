@@ -27,7 +27,7 @@ struct _GVolumeIface
 
   GFile *  (*get_root)       (GVolume         *volume);
   char *   (*get_name)       (GVolume         *volume);
-  char *   (*get_icon)       (GVolume         *volume);
+  GIcon *  (*get_icon)       (GVolume         *volume);
   GDrive * (*get_drive)      (GVolume         *volume);
   gboolean (*can_unmount)    (GVolume         *volume);
   gboolean (*can_eject)      (GVolume         *volume);
@@ -50,7 +50,7 @@ GType g_volume_get_type (void) G_GNUC_CONST;
 
 GFile   *g_volume_get_root       (GVolume              *volume);
 char *   g_volume_get_name       (GVolume              *volume);
-char *   g_volume_get_icon       (GVolume              *volume);
+GIcon *  g_volume_get_icon       (GVolume              *volume);
 GDrive * g_volume_get_drive      (GVolume              *volume);
 gboolean g_volume_can_unmount    (GVolume              *volume);
 gboolean g_volume_can_eject      (GVolume              *volume);

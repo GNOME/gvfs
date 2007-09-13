@@ -215,7 +215,7 @@ g_union_volume_get_name (GVolume *volume)
   return g_strdup ("volume");
 }
 
-static char *
+static GIcon *
 g_union_volume_get_icon (GVolume *volume)
 {
   GUnionVolume *union_volume = G_UNION_VOLUME (volume);

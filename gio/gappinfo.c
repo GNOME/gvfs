@@ -106,7 +106,7 @@ g_app_info_set_as_default_for_type (GAppInfo    *appinfo,
   return (* iface->set_as_default_for_type) (appinfo, content_type, error);
 }
 
-char *
+GIcon *
 g_app_info_get_icon (GAppInfo *appinfo)
 {
   GAppInfoIface *iface;

@@ -9,6 +9,7 @@
 #include "gunixdrive.h"
 #include "gvolumepriv.h"
 #include "gvolumemonitor.h"
+#include "gthemedicon.h"
 
 struct _GUnixVolume {
   GObject parent;
@@ -276,12 +277,12 @@ g_unix_volume_get_root (GVolume *volume)
   return g_file_get_for_path (unix_volume->mountpoint);
 }
 
-static char *
+static GIcon *
 g_unix_volume_get_icon (GVolume *volume)
 {
   GUnixVolume *unix_volume = G_UNIX_VOLUME (volume);
 
-  return g_strdup (unix_volume->icon);
+  return g_themed_icon_new (unix_volume->icon);
 }
 
 static char *

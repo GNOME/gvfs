@@ -2,6 +2,7 @@
 #define __G_CONTENT_TYPE_H__
 
 #include <glib.h>
+#include <gio/gicon.h>
 
 G_BEGIN_DECLS
 
@@ -12,7 +13,7 @@ gboolean g_content_type_is_a              (const char   *type,
 gboolean g_content_type_is_unknown        (const char   *type);
 char *   g_content_type_get_description   (const char   *type);
 char *   g_content_type_get_mime_type     (const char   *type);
-char *   g_content_type_get_icon          (const char   *type);
+GIcon *  g_content_type_get_icon          (const char   *type);
 gboolean g_content_type_can_be_executable (const char   *type);
 
 char *   g_content_type_guess             (const char   *filename,

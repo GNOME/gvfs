@@ -51,7 +51,7 @@ g_file_icon_init (GFileIcon *file)
 {
 }
 
-GFileIcon *
+GIcon *
 g_file_icon_new (GFile *file)
 {
   GFileIcon *icon;
@@ -59,7 +59,7 @@ g_file_icon_new (GFile *file)
   icon = g_object_new (G_TYPE_FILE_ICON, NULL);
   icon->file = g_object_ref (file);
   
-  return icon;
+  return G_ICON (icon);
 }
 
 GFile *

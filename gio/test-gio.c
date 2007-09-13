@@ -417,7 +417,7 @@ static void
 volume_mounted (GVolumeMonitor *volume_monitor,
 		GVolume        *v)
 {
-  g_print ("Volume mounted %p: %s - %s\n", v,
+  g_print ("Volume mounted %p: %s - %p\n", v,
 	   g_volume_get_name (v), g_volume_get_icon (v));
 }
   
@@ -425,7 +425,7 @@ static void
 volume_pre_unmount (GVolumeMonitor *volume_monitor,
 		    GVolume	*v)
 {
-  g_print ("Volume_pre_unmount %p: %s - %s\n", v,
+  g_print ("Volume_pre_unmount %p: %s - %p\n", v,
 	   g_volume_get_name (v), g_volume_get_icon (v));
 }
 
@@ -433,7 +433,7 @@ static void
 volume_unmounted (GVolumeMonitor *volume_monitor,
 		  GVolume        *v)
 {
-  g_print ("Volume_unmounted %p: %s - %s\n", v,
+  g_print ("Volume_unmounted %p: %s - %p\n", v,
 	   g_volume_get_name (v), g_volume_get_icon (v));
 }
 
@@ -441,7 +441,7 @@ static void
 drive_connected (GVolumeMonitor *volume_monitor,
 		 GDrive	        *d)
 {
-  g_print ("Drive connected %p: %s - %s\n", d,
+  g_print ("Drive connected %p: %s - %p\n", d,
 	   g_drive_get_name (d), g_drive_get_icon (d));
 }
 
@@ -449,7 +449,7 @@ static void
 drive_disconnected (GVolumeMonitor *volume_monitor,
 		    GDrive         *d)
 {
-  g_print ("Drive disconnected %p: %s - %s\n", d,
+  g_print ("Drive disconnected %p: %s - %p\n", d,
 	   g_drive_get_name (d), g_drive_get_icon (d));
 }
 
@@ -467,7 +467,7 @@ test_volumes (void)
     {
       GDrive *d = l->data;
       
-      g_print ("Drive %p: %s - %s\n", d,
+      g_print ("Drive %p: %s - %p\n", d,
 	       g_drive_get_name (d), g_drive_get_icon (d));
     }
   g_list_foreach (drives, (GFunc)g_object_unref, NULL);
@@ -479,7 +479,7 @@ test_volumes (void)
     {
       GVolume *v = l->data;
       
-      g_print ("Volume %p: %s - %s\n", v,
+      g_print ("Volume %p: %s - %p\n", v,
 	       g_volume_get_name (v), g_volume_get_icon (v));
     }
   g_list_foreach (volumes, (GFunc)g_object_unref, NULL);

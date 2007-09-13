@@ -41,7 +41,7 @@ g_themed_icon_init (GThemedIcon *themed)
 {
 }
 
-GThemedIcon *
+GIcon *
 g_themed_icon_new (const char *iconname)
 {
   GThemedIcon *themed;
@@ -51,10 +51,10 @@ g_themed_icon_new (const char *iconname)
   themed->names[0] = g_strdup (iconname);
   themed->names[1] = NULL;
   
-  return themed;
+  return G_ICON (themed);
 }
 
-GThemedIcon *
+GIcon *
 g_themed_icon_new_from_names (char **iconnames)
 {
   GThemedIcon *themed;
@@ -62,7 +62,7 @@ g_themed_icon_new_from_names (char **iconnames)
   themed = g_object_new (G_TYPE_THEMED_ICON, NULL);
   themed->names = g_strdupv (iconnames);
   
-  return themed;
+  return G_ICON (themed);
 }
 
 char **

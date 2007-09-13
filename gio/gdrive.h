@@ -24,7 +24,7 @@ struct _GDriveIface
   /* Virtual Table */
   
   char *   (*get_name)    (GDrive         *drive);
-  char *   (*get_icon)    (GDrive         *drive);
+  GIcon *  (*get_icon)    (GDrive         *drive);
   GList *  (*get_volumes) (GDrive         *drive);
   gboolean (*is_automounted)(GDrive       *drive);
   gboolean (*can_mount)   (GDrive         *drive);
@@ -47,7 +47,7 @@ struct _GDriveIface
 GType g_drive_get_type (void) G_GNUC_CONST;
 
 char *   g_drive_get_name       (GDrive               *drive);
-char *   g_drive_get_icon       (GDrive               *drive);
+GIcon *  g_drive_get_icon       (GDrive               *drive);
 GList  * g_drive_get_volumes    (GDrive               *drive);
 gboolean g_drive_is_automounted (GDrive               *drive);
 gboolean g_drive_can_mount      (GDrive               *drive);

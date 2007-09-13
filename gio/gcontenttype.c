@@ -145,7 +145,7 @@ g_content_type_get_mime_type (const char   *type)
   return g_strdup ("application/octet-stream");
 }
 
-char *
+GIcon *
 g_content_type_get_icon (const char   *type)
 {
   /* TODO: How do we represent icons???
@@ -532,10 +532,10 @@ g_content_type_get_mime_type (const char   *type)
   return g_strdup (type);
 }
 
-char *
+GIcon *
 g_content_type_get_icon (const char   *type)
 {
-  /* TODO: How do we represent icons??? */
+  /* TODO: Implement */
   return NULL;
 }
 

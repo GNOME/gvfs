@@ -2,6 +2,7 @@
 #define __G_APP_INFO_H__
 
 #include <glib-object.h>
+#include <gio/gicon.h>
 
 G_BEGIN_DECLS
 
@@ -24,7 +25,7 @@ struct _GAppInfoIface
 					     GAppInfo                *appinfo2);
   char *              (*get_name)           (GAppInfo                *appinfo);
   char *              (*get_description)    (GAppInfo                *appinfo);
-  char *              (*get_icon)           (GAppInfo                *appinfo);
+  GIcon *             (*get_icon)           (GAppInfo                *appinfo);
   gboolean            (*launch)             (GAppInfo                *appinfo,
 					     GList                   *filenames,
 					     char                   **envp,
@@ -52,7 +53,7 @@ gboolean  g_app_info_equal                       (GAppInfo    *appinfo1,
 						  GAppInfo    *appinfo2);
 char *    g_app_info_get_name                    (GAppInfo    *appinfo);
 char *    g_app_info_get_description             (GAppInfo    *appinfo);
-char *    g_app_info_get_icon                    (GAppInfo    *appinfo);
+GIcon *   g_app_info_get_icon                    (GAppInfo    *appinfo);
 gboolean  g_app_info_launch                      (GAppInfo    *appinfo,
 						  GList       *filenames,
 						  char       **envp,

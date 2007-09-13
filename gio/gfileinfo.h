@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <gio/giotypes.h>
+#include <gio/gicon.h>
 
 G_BEGIN_DECLS
 
@@ -34,7 +35,8 @@ typedef enum {
   G_FILE_ATTRIBUTE_TYPE_UINT32,
   G_FILE_ATTRIBUTE_TYPE_INT32,
   G_FILE_ATTRIBUTE_TYPE_UINT64,
-  G_FILE_ATTRIBUTE_TYPE_INT64
+  G_FILE_ATTRIBUTE_TYPE_INT64,
+  G_FILE_ATTRIBUTE_TYPE_OBJECT
 } GFileAttributeType;
 
 typedef enum {
@@ -145,6 +147,8 @@ guint64            g_file_info_get_attribute_uint64      (GFileInfo  *info,
 							  const char *attribute);
 gint64             g_file_info_get_attribute_int64       (GFileInfo  *info,
 							  const char *attribute);
+GObject *          g_file_info_get_attribute_object      (GFileInfo  *info,
+							  GObject    *object);
 void               g_file_info_set_attribute_string      (GFileInfo  *info,
 							  const char *attribute,
 							  const char *value);
@@ -163,7 +167,9 @@ void               g_file_info_set_attribute_uint64      (GFileInfo  *info,
 void               g_file_info_set_attribute_int64       (GFileInfo  *info,
 							  const char *attribute,
 							  gint64      value);
-
+void               g_file_info_set_attribute_object      (GFileInfo  *info,
+							  const char *attribute,
+							  GObject    *value);
 
 /* Helper getters: */
 GFileType         g_file_info_get_file_type          (GFileInfo         *info);
@@ -171,7 +177,7 @@ GFileFlags        g_file_info_get_flags              (GFileInfo         *info);
 const char *      g_file_info_get_name               (GFileInfo         *info);
 const char *      g_file_info_get_display_name       (GFileInfo         *info);
 const char *      g_file_info_get_edit_name          (GFileInfo         *info);
-const char *      g_file_info_get_icon               (GFileInfo         *info);
+GIcon *           g_file_info_get_icon               (GFileInfo         *info);
 const char *      g_file_info_get_content_type       (GFileInfo         *info);
 goffset           g_file_info_get_size               (GFileInfo         *info);
 void              g_file_info_get_modification_time  (GFileInfo         *info,
@@ -190,7 +196,7 @@ void              g_file_info_set_display_name       (GFileInfo         *info,
 void              g_file_info_set_edit_name          (GFileInfo         *info,
 						      const char        *edit_name);
 void              g_file_info_set_icon               (GFileInfo         *info,
-						      const char        *icon);
+						      GIcon             *icon);
 void              g_file_info_set_content_type       (GFileInfo         *info,
 						      const char        *content_type);
 void              g_file_info_set_size               (GFileInfo         *info,
