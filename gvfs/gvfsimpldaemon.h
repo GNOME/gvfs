@@ -2,6 +2,7 @@
 #define __G_VFS_IMPL_DAEMON_H__
 
 #include <gvfs.h>
+#include <dbus/dbus.h>
 
 G_BEGIN_DECLS
 
@@ -27,7 +28,11 @@ struct _GVfsImplDaemonClass
 
 GType   g_vfs_impl_daemon_get_type  (void) G_GNUC_CONST;
 
-GVfsImplDaemon *g_vfs_impl_daemon_new (void);
+GVfsImplDaemon *g_vfs_impl_daemon_new       (void);
+DBusMessage *   _g_vfs_impl_daemon_new_call (GQuark      match_bus_name,
+					     const char *path,
+					     const char *op,
+					     char      **new_path);
 
 G_END_DECLS
 

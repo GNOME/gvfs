@@ -35,6 +35,10 @@ G_TYPE_VFS... -> G_VFS_TYPE...
 
 add _hash and _equal to GFile
 
+remove owners from bus_name_map when they fail
+
+Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
+
 FUTURE IDEAS:
 -------------
 

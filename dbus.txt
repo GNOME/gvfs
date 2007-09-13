@@ -11,3 +11,73 @@ Clients use GetNameOwner to map uri -> mountpoint name -> owner of name -> GetCo
 it can handle multiple mountpoints in each daemon. This can be cached, and NameOwnerChanged can be used
 to invalidate the cache.
 
+----------------------
+How we map URIs
+----------------------
+
+Mapping functions needed:
+uri to mount + path
+mount + path to uri
+root parent
+
+Mapping %m://%u@%h:%p/%f
+
+ftp:
+
+m_ftp.h_%h.p_%p.u_%u
+
+smb:
+
+smb://user@/ <-> smb-root.u_user
+smb:/// <-> smb-root; path = /
+smb:///foo <-> smb-root; path = /foo, type == link
+smb://foo/ <-> smb-browse; path = /foo
+smb://foo/server -> smb-browse; path = /foo/server, type == link
+smb://user@foo/ <-> smb-browse.u_user; path = /foo
+smb://user@foo:21/ <-> smb-browse.u_user.p_21; path = /foo
+smb://domain;user@foo:21/ <-> smb-browse.d_domain.u_user.p_21; path = /foo
+smb:///foo/share/blah <-> smb-share.h_foo.s_share, path = /blah
+
+m_smb-browse.u_%u   path includes hostname
+
+computer:
+
+m_computer
+
+network:
+
+m_network
+
+http:
+https:
+
+m_http(s),   username+path+port in path
+
+authentication (no mount)
+
+dav:
+davs:
+
+m_dav.h_%h.p_%p.u_%u.f_%f (f== path prefix)
+
+
+nfs.h_server.p_port.u_user.f_/opt/prefix
+
+Find it by using ListNames
+
+nfs:
+
+nfs.h_server.p_port.f_/opt/prefix
+
+Find it by using ListNames
+
+sftp:
+
+trash:
+---
+
+HowTo handle:
+
+uri query part
+filename encoding - paths are raw, get utf8 via get_display_name op. (What about IRIs? Try to do utf8 paths if possible?)
+automounting? - http? 

@@ -132,6 +132,65 @@ append_unescaped_dbus_name (GString *s,
     }
 }
 
+char *
+_g_dbus_unescape_bus_name (const char *escaped, const char *end)
+{
+  GString *s = g_string_new ("");
+  
+  if (end == NULL)
+    end = escaped + strlen (escaped);
+
+  append_unescaped_dbus_name (s, escaped, end);
+  return g_string_free (s, FALSE);
+}
+
+/* We use _ for escaping */
+#define VALID_INITIAL_BUS_NAME_CHARACTER(c)         \
+  ( ((c) >= 'A' && (c) <= 'Z') ||               \
+    ((c) >= 'a' && (c) <= 'z') ||               \
+   /*((c) == '_') || */((c) == '-'))
+#define VALID_BUS_NAME_CHARACTER(c)                 \
+  ( ((c) >= '0' && (c) <= '9') ||               \
+    ((c) >= 'A' && (c) <= 'Z') ||               \
+    ((c) >= 'a' && (c) <= 'z') ||               \
+   /*((c) == '_')||*/  ((c) == '-'))
+
+void
+_g_dbus_append_escaped_bus_name (GString *s,
+				 gboolean at_start,
+				 const char *unescaped)
+{
+  char c;
+  gboolean first;
+  static const gchar hex[16] = "0123456789ABCDEF";
+
+  while ((c = *unescaped++) != 0)
+    {
+      if (first && at_start)
+	{
+	  if (VALID_INITIAL_BUS_NAME_CHARACTER (c))
+	    {
+	      g_string_append_c (s, c);
+	      continue;
+	    }
+	}
+      else
+	{
+	  if (VALID_BUS_NAME_CHARACTER (c))
+	    {
+	      g_string_append_c (s, c);
+	      continue;
+	    }
+	}
+
+      first = FALSE;
+      g_string_append_c (s, '_');
+      g_string_append_c (s, hex[((guchar)c) >> 4]);
+      g_string_append_c (s, hex[((guchar)c) & 0xf]);
+    }
+}
+
+
 static int
 daemon_socket_connect (const char *address, GError **error)
 {
@@ -307,7 +366,7 @@ _g_dbus_connection_get_fd_async (DBusConnection *connection,
 
 
 typedef struct {
-  char *bus_name;
+  const char *bus_name;
   char *owner;
 
   DBusMessage *message;
@@ -345,7 +404,6 @@ async_dbus_call_finish (AsyncDBusCall *async_call,
       g_source_unref ((GSource *)async_call->dbus_source);
     }
  
-  g_free (async_call->bus_name);
   g_free (async_call->owner);
   dbus_message_unref (async_call->message);
   if (async_call->context)
@@ -801,8 +859,7 @@ do_find_owner_async (AsyncDBusCall *async_call)
 }
 
 void
-_g_vfs_daemon_call_async (const char *bus_name,
-			  DBusMessage *message,
+_g_vfs_daemon_call_async (DBusMessage *message,
 			  GMainContext *context,
 			  gpointer op_callback,
 			  gpointer op_callback_data,
@@ -815,7 +872,7 @@ _g_vfs_daemon_call_async (const char *bus_name,
   g_once (&once_init_dbus, vfs_dbus_init, NULL);
 
   async_call = g_new0 (AsyncDBusCall, 1);
-  async_call->bus_name = g_strdup (bus_name);
+  async_call->bus_name = dbus_message_get_destination (message);
   async_call->message = dbus_message_ref (message);
   if (context)
     async_call->context = g_main_context_ref (context);
@@ -826,7 +883,7 @@ _g_vfs_daemon_call_async (const char *bus_name,
   async_call->op_callback = op_callback;
   async_call->op_callback_data = op_callback_data;
 
-  async_call->owner = get_owner_for_bus_name (bus_name);
+  async_call->owner = get_owner_for_bus_name (async_call->bus_name);
   if (async_call->owner == NULL)
     {
       do_find_owner_async (async_call);
@@ -844,8 +901,7 @@ _g_vfs_daemon_call_async (const char *bus_name,
 }
 
 DBusMessage *
-_g_vfs_daemon_call_sync (const char *bus_name,
-			 DBusMessage *message,
+_g_vfs_daemon_call_sync (DBusMessage *message,
 			 DBusConnection **connection_out,
 			 GCancellable *cancellable,
 			 GError **error)
@@ -859,6 +915,8 @@ _g_vfs_daemon_call_sync (const char *bus_name,
   gboolean sent_cancel;
   DBusMessage *cancel_message;
   dbus_uint32_t serial;
+  const char *bus_name = dbus_message_get_destination (message);
+			 
 	    
   connection = get_connection_sync (bus_name, error);
   if (connection == NULL)
@@ -1249,6 +1307,54 @@ _g_error_from_dbus (DBusError *derror,
     }
 }
 
+
+GList *
+_g_dbus_bus_list_names_with_prefix_sync (DBusConnection *connection,
+					 const char *prefix,
+					 DBusError *error)
+{
+  DBusMessage *message, *reply;
+  DBusMessageIter iter, array;
+  GList *names;
+
+  g_return_val_if_fail (connection != NULL, NULL);
+  
+  message = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+                                          DBUS_PATH_DBUS,
+                                          DBUS_INTERFACE_DBUS,
+                                          "ListNames");
+  if (message == NULL)
+    return NULL;
+  
+  reply = dbus_connection_send_with_reply_and_block (connection, message, -1, error);
+  dbus_message_unref (message);
+  
+  if (reply == NULL)
+    return NULL;
+  
+  names = NULL;
+  
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_ARRAY) ||
+      (dbus_message_iter_get_element_type (&iter) != DBUS_TYPE_STRING))
+    goto out;
+
+  for (dbus_message_iter_recurse (&iter, &array);  
+       dbus_message_iter_get_arg_type (&array) == DBUS_TYPE_STRING;
+       dbus_message_iter_next (&array))
+    {
+      char *name;
+      dbus_message_iter_get_basic (&array, &name);
+      if (g_str_has_prefix (name, prefix))
+	names = g_list_prepend (names, g_strdup (name));
+    }
+
+  names = g_list_reverse (names);
+  
+ out:
+  dbus_message_unref (reply);
+  return names;
+}
 
 /*************************************************************************
  *                                                                       *

@@ -9,7 +9,7 @@ typedef struct {
   char *scheme;
   char *userinfo;
   char *host;
-  int port;
+  int port; /* -1 => not in uri */
   char *path;
   char *query;
   char *fragment;
