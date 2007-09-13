@@ -159,6 +159,8 @@ _g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *str)
 {
   DBusMessageIter array;
 
+  g_assert (str != NULL);
+  
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_TYPE_BYTE_AS_STRING,
@@ -476,9 +478,9 @@ _g_dbus_message_iter_get_args (DBusMessageIter *iter,
   dbus_bool_t res;
 
   va_start (var_args, first_arg_type);
-  res = _g_dbus_message_iter_get_args (iter, error,
-				       first_arg_type,
-				       var_args);
+  res = _g_dbus_message_iter_get_args_valist (iter, error,
+					      first_arg_type,
+					      var_args);
   va_end (var_args);
   return res;
 }
