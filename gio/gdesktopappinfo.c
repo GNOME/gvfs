@@ -300,8 +300,7 @@ g_desktop_app_info_get_name (GAppInfo *appinfo)
 
   if (info->name == NULL)
     return g_strdup (_("Unnamed"));
-  //return g_strdup (info->name);
-  return g_strdup_printf ("%s - %s", info->name, info->desktop_id);
+  return g_strdup (info->name);
 }
 
 static char *
