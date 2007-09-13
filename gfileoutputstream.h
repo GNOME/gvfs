@@ -29,8 +29,10 @@ struct _GFileOutputStreamClass
 {
   GOutputStreamClass parent_class;
 
-  GFileInfo *(*get_file_info) (GFileOutputStream *stream,
-			       GError          **error);
+  GFileInfo *(*get_file_info) (GFileOutputStream    *stream,
+			       GFileInfoRequestFlags requested,
+			       char                 *attributes,
+			       GError              **error);
     
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -43,16 +45,16 @@ struct _GFileOutputStreamClass
 GType g_file_output_stream_get_type (void) G_GNUC_CONST;
 
 
-GFileInfo *g_file_output_stream_get_file_info              (GFileOutputStream  *stream,
-							   GError           **error);
-void       g_file_output_stream_set_should_get_final_mtime (GFileOutputStream  *stream,
-							   gboolean           get_final_mtime);
-time_t     g_file_output_stream_get_final_mtime            (GFileOutputStream  *stream);
-
-gboolean   g_file_output_stream_get_should_get_final_mtime (GFileOutputStream  *stream);
-void       g_file_output_stream_set_final_mtime            (GFileOutputStream  *stream,
-							   time_t             final_mtime);
-
+GFileInfo *g_file_output_stream_get_file_info              (GFileOutputStream      *stream,
+							    GFileInfoRequestFlags   requested,
+							    char                   *attributes,
+							    GError                **error);
+void       g_file_output_stream_set_should_get_final_mtime (GFileOutputStream      *stream,
+							    gboolean                get_final_mtime);
+time_t     g_file_output_stream_get_final_mtime            (GFileOutputStream      *stream);
+gboolean   g_file_output_stream_get_should_get_final_mtime (GFileOutputStream      *stream);
+void       g_file_output_stream_set_final_mtime            (GFileOutputStream      *stream,
+							    time_t                  final_mtime);
 
 G_END_DECLS
 

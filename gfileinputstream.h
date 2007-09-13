@@ -29,8 +29,10 @@ struct _GFileInputStreamClass
 {
   GInputStreamClass parent_class;
 
-  GFileInfo *(*get_file_info) (GFileInputStream *stream,
-			       GError          **error);
+  GFileInfo *(*get_file_info) (GFileInputStream     *stream,
+			       GFileInfoRequestFlags requested,
+			       char                 *attributes,
+			       GError              **error);
     
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -42,8 +44,10 @@ struct _GFileInputStreamClass
 
 GType g_file_input_stream_get_type (void) G_GNUC_CONST;
 
-GFileInfo *g_file_input_stream_get_file_info (GFileInputStream  *stream,
-					      GError           **error);
+GFileInfo *g_file_input_stream_get_file_info (GFileInputStream     *stream,
+					      GFileInfoRequestFlags requested,
+					      char                 *attributes,
+					      GError              **error);
 
 G_END_DECLS
 

@@ -29,8 +29,10 @@ g_file_input_stream_init (GFileInputStream *stream)
 }
 
 GFileInfo *
-g_file_input_stream_get_file_info (GFileInputStream  *stream,
-				   GError           **error)
+g_file_input_stream_get_file_info (GFileInputStream     *stream,
+				   GFileInfoRequestFlags requested,
+				   char                 *attributes,
+				   GError              **error)
 {
   GFileInputStreamClass *class;
   GInputStream *input_stream;
@@ -61,7 +63,7 @@ g_file_input_stream_get_file_info (GFileInputStream  *stream,
   
   class = G_FILE_INPUT_STREAM_GET_CLASS (stream);
   if (class->get_file_info)
-    info = class->get_file_info (stream, error);
+    info = class->get_file_info (stream, requested, attributes, error);
   else
     g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
 		 _("Stream doesn't support get_file_info"));

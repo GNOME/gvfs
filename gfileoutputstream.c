@@ -30,8 +30,10 @@ g_file_output_stream_init (GFileOutputStream *stream)
 }
 
 GFileInfo *
-g_file_output_stream_get_file_info (GFileOutputStream  *stream,
-				    GError            **error)
+g_file_output_stream_get_file_info (GFileOutputStream      *stream,
+				    GFileInfoRequestFlags   requested,
+				    char                   *attributes,
+				    GError                **error)
 {
   GFileOutputStreamClass *class;
   GOutputStream *output_stream;
@@ -62,7 +64,7 @@ g_file_output_stream_get_file_info (GFileOutputStream  *stream,
   
   class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
   if (class->get_file_info)
-    info = class->get_file_info (stream, error);
+    info = class->get_file_info (stream, requested, attributes, error);
   else
     g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
 		 _("Stream doesn't support get_file_info"));

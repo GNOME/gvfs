@@ -66,8 +66,7 @@ typedef enum {
   G_FILE_INFO_ACCESS_RIGHTS  = 1 << 8,
   G_FILE_INFO_STAT_INFO      = 1 << 9,
   G_FILE_INFO_SYMLINK_TARGET = 1 << 10,
-  
-} GFileInfoFlags;
+} GFileInfoRequestFlags;
 
 GType g_file_info_get_type (void) G_GNUC_CONST;
   
