@@ -18,6 +18,12 @@ enum {
   PROP_0,
 };
 
+struct _GVfsReadRequestPrivate
+{
+  int fd;
+  int remote_fd;
+};
+
 static void
 g_vfs_read_request_finalize (GObject *object)
 {
@@ -25,11 +31,11 @@ g_vfs_read_request_finalize (GObject *object)
 
   read_request = G_VFS_READ_REQUEST (object);
   
-  if (read_request->fd != -1)
-    close (read_request->fd);
+  if (read_request->priv->fd != -1)
+    close (read_request->priv->fd);
   
-  if (read_request->remote_fd != -1)
-    close (read_request->remote_fd);
+  if (read_request->priv->remote_fd != -1)
+    close (read_request->priv->remote_fd);
   
   if (G_OBJECT_CLASS (g_vfs_read_request_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_read_request_parent_class)->finalize) (object);
@@ -39,6 +45,8 @@ static void
 g_vfs_read_request_class_init (GVfsReadRequestClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+  g_type_class_add_private (klass, sizeof (GVfsReadRequestPrivate));
   
   gobject_class->finalize = g_vfs_read_request_finalize;
 }
@@ -46,8 +54,11 @@ g_vfs_read_request_class_init (GVfsReadRequestClass *klass)
 static void
 g_vfs_read_request_init (GVfsReadRequest *request)
 {
-  request->fd = -1;
-  request->remote_fd = -1;
+  request->priv = G_TYPE_INSTANCE_GET_PRIVATE (request,
+					      G_TYPE_VFS_READ_REQUEST,
+					      GVfsReadRequestPrivate);
+  request->priv->fd = -1;
+  request->priv->remote_fd = -1;
 }
 
 GVfsReadRequest *
@@ -67,8 +78,8 @@ g_vfs_read_request_new (GError **error)
     }
 
   request = g_object_new (G_TYPE_VFS_READ_REQUEST, NULL);
-  request->fd = socket_fds[0];
-  request->remote_fd = socket_fds[1];
+  request->priv->fd = socket_fds[0];
+  request->priv->remote_fd = socket_fds[1];
 
   return request;
 }
@@ -76,19 +87,19 @@ g_vfs_read_request_new (GError **error)
 int
 g_vfs_read_request_get_fd (GVfsReadRequest *request)
 {
-  return request->fd;
+  return request->priv->fd;
 }
 
 int
  g_vfs_read_request_get_remote_fd (GVfsReadRequest *request)
 {
-  return request->remote_fd;
+  return request->priv->remote_fd;
 }
 
 void
  g_vfs_read_request_close_remote_fd (GVfsReadRequest *request)
 {
-  close (request->remote_fd);
-  request->remote_fd = -1;
+  close (request->priv->remote_fd);
+  request->priv->remote_fd = -1;
 }
 

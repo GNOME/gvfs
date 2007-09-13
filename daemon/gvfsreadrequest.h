@@ -14,13 +14,13 @@ G_BEGIN_DECLS
 
 typedef struct _GVfsReadRequest        GVfsReadRequest;
 typedef struct _GVfsReadRequestClass   GVfsReadRequestClass;
+typedef struct _GVfsReadRequestPrivate GVfsReadRequestPrivate;
 
 struct _GVfsReadRequest
 {
   GObject parent_instance;
 
-  int fd;
-  int remote_fd;
+  GVfsReadRequestPrivate *priv;
 };
 
 struct _GVfsReadRequestClass
@@ -36,6 +36,14 @@ GVfsReadRequest *g_vfs_read_request_new (GError **error);
 int g_vfs_read_request_get_fd (GVfsReadRequest *read_request);
 int g_vfs_read_request_get_remote_fd (GVfsReadRequest *read_request);
 void g_vfs_read_request_close_remote_fd (GVfsReadRequest *read_request);
+
+gboolean g_vfs_read_request_wants_data (GVfsReadRequest *read_request);
+gsize g_vfs_read_request_get_requested_size (GVfsReadRequest *read_request);
+void g_vfs_read_request_send_data (GVfsReadRequest *read_request, 
+				   char *data,
+				   gsize length);
+
+/* TODO: i/o priority? */
 
 G_END_DECLS
 
