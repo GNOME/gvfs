@@ -29,6 +29,8 @@ implement daemon write stream, maybe break out common parts of gvfsreadstream to
 
 implement seeks in local streams
 
+pass cancellable to async callbacks?
+
 FUTURE IDEAS:
 -------------
 
