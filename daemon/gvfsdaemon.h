@@ -41,8 +41,7 @@ void        g_vfs_daemon_add_job_source (GVfsDaemon                    *daemon,
 					 GVfsJobSource                 *job_source);
 void        g_vfs_daemon_queue_job      (GVfsDaemon                    *daemon,
 					 GVfsJob                       *job);
-gboolean    g_vfs_daemon_register_path  (GVfsDaemon                    *daemon,
-					 const char                    *path,
+char       *g_vfs_daemon_register_mount (GVfsDaemon                    *daemon,
 					 DBusObjectPathMessageFunction  callback,
 					 gpointer                       user_data);
 

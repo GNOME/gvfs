@@ -11,6 +11,7 @@
 #include <glib/gi18n.h>
 #include "mounttracker.h"
 #include "gdbusutils.h"
+#include "gmountspec.h"
 
 typedef struct {
   char *key;
@@ -26,8 +27,7 @@ typedef struct {
   char *object_path;
 
   /* Mount details */
-  char *mount_prefix;
-  KeyValue *spec;
+  GMountSpec *mount_spec;
 } VFSMount;
 
 struct _GMountTracker
@@ -60,22 +60,12 @@ find_vfs_mount (GMountTracker *tracker,
 static void
 vfs_mount_free (VFSMount *mount)
 {
-  int i;
   g_free (mount->display_name);
   g_free (mount->icon);
   g_free (mount->dbus_id);
   g_free (mount->object_path);
-  g_free (mount->mount_prefix);
-  if (mount->spec)
-    {
-      for (i = 0; mount->spec[i].key != NULL; i++)
-	{
-	  g_free (mount->spec[i].key);
-	  g_free (mount->spec[i].value);
-	}
-      g_free (mount->spec);
-    }
-	   
+  g_mount_spec_free (mount->mount_spec);
+  
   g_free (mount);
 }
 
@@ -103,57 +93,6 @@ g_mount_tracker_class_init (GMountTrackerClass *klass)
 }
 
 
-static int
-key_compare (const void *_a, const void *_b)
-{
-  const KeyValue *a = _a;
-  const KeyValue *b = _b;
-
-  return strcmp (a->key, b->key);
-}
-  
-static KeyValue *
-get_spec_from_dbus (DBusMessageIter *iter)
-{
-  KeyValue *spec;
-  int len, i;
-  DBusMessageIter array_iter, struct_iter;
-  const char *key;
-  char *value;
-  
-  len = 0;
-  dbus_message_iter_recurse (iter, &array_iter);
-  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
-    {
-      len++;
-      dbus_message_iter_next (&array_iter);
-    }
-
-  spec = g_new (KeyValue, len + 1);
-  i = 0;
-  dbus_message_iter_recurse (iter, &array_iter);
-  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
-    {
-      dbus_message_iter_recurse (&array_iter, &struct_iter);
-      if (_g_dbus_message_iter_get_args (&struct_iter, NULL,
-					 DBUS_TYPE_STRING, &key,
-					 G_DBUS_TYPE_CSTRING, &value,
-					 0))
-	{
-	  spec[i].key = g_strdup (key);
-	  spec[i].value = value; /* No dup */
-	  i++;
-	}
-      dbus_message_iter_next (&array_iter);
-    }
-  spec[i].key = NULL;
-
-  dbus_message_iter_next (iter);
-  
-  /* Sort on key */
-  qsort (spec, sizeof (KeyValue), i, key_compare);
-  return spec;
-}
 
 static void
 register_mount (GMountTracker *tracker,
@@ -165,7 +104,6 @@ register_mount (GMountTracker *tracker,
   DBusError error;
   const char *display_name, *icon, *obj_path, *id;
   DBusMessageIter iter;
-  char *mount_prefix;
 
   id = dbus_message_get_sender (message);
 
@@ -176,7 +114,6 @@ register_mount (GMountTracker *tracker,
 				     DBUS_TYPE_STRING, &display_name,
 				     DBUS_TYPE_STRING, &icon,
 				     DBUS_TYPE_OBJECT_PATH, &obj_path,
-				     G_DBUS_TYPE_CSTRING, &mount_prefix,
 				     0))
     {
       if (find_vfs_mount (tracker, id, obj_path) != NULL)
@@ -194,8 +131,7 @@ register_mount (GMountTracker *tracker,
 	  mount->icon = g_strdup (icon);
 	  mount->dbus_id = g_strdup (id);
 	  mount->object_path = g_strdup (obj_path);
-	  mount->mount_prefix = mount_prefix; /* No dup */
-	  mount->spec = get_spec_from_dbus (&iter);
+	  mount->mount_spec = g_mount_spec_from_dbus (&iter);
 	  
 	  tracker->mounts = g_list_prepend (tracker->mounts, mount);
 
@@ -248,7 +184,7 @@ g_mount_tracker_init (GMountTracker *tracker)
   
   conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
 
-  if (!dbus_connection_register_object_path (conn, "/org/gtk/gvfs/mounttracker",
+  if (!dbus_connection_register_object_path (conn, "/org/gtk/vfs/mounttracker",
 					     &tracker_dbus_vtable, tracker))
     _g_dbus_oom ();
 

@@ -22,7 +22,7 @@ enum {
 };
 
 typedef struct {
-  char *path;
+  char *obj_path;
   DBusObjectPathMessageFunction callback;
   gpointer data;
 } RegisteredPath;
@@ -37,6 +37,8 @@ struct _GVfsDaemonPrivate
   GHashTable *registered_paths;
   GList *jobs;
   GList *job_sources;
+
+  gint mount_counter;
 };
 
 typedef struct {
@@ -69,7 +71,7 @@ static DBusHandlerResult peer_to_peer_filter_func (DBusConnection *conn,
 static void
 registered_path_free (RegisteredPath *data)
 {
-  g_free (data->path);
+  g_free (data->obj_path);
   g_free (data);
 }
 
@@ -126,13 +128,13 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
 						 FALSE, NULL);
   /* TODO: verify thread_pool != NULL in a nicer way */
   g_assert (daemon->priv->thread_pool != NULL);
+
+  daemon->priv->mount_counter = 0;
   
   daemon->priv->jobs = NULL;
   daemon->priv->registered_paths =
-    g_hash_table_new_full (g_str_hash,
-			   g_str_equal,
-			   NULL,
-			   (GDestroyNotify)registered_path_free);
+    g_hash_table_new_full (g_str_hash, g_str_equal,
+			   NULL, (GDestroyNotify)registered_path_free);
 
   if (!dbus_connection_add_filter (daemon->priv->session_bus,
 				   daemon_message_func, daemon, NULL))
@@ -286,25 +288,25 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
   g_mutex_unlock (daemon->priv->lock);
 }
 
-gboolean
-g_vfs_daemon_register_path (GVfsDaemon                    *daemon,
-			    const char                    *path,
-			    DBusObjectPathMessageFunction  callback,
-			    gpointer                       user_data)
+char *
+g_vfs_daemon_register_mount (GVfsDaemon                    *daemon,
+			     DBusObjectPathMessageFunction  callback,
+			     gpointer                       user_data)
 {
   RegisteredPath *data;
+  int id;
 
-  if (g_hash_table_lookup (daemon->priv->registered_paths, path) != NULL)
-    return FALSE;
+  id = ++daemon->priv->mount_counter;
 
   data = g_new0 (RegisteredPath, 1);
-  data->path = g_strdup (path);
+  data->obj_path = g_strdup_printf ("/org/gtk/vfs/mount/%d", id);;
   data->callback = callback;
   data->data = user_data;
 
-  g_hash_table_insert (daemon->priv->registered_paths, data->path, data);
-  
-  return TRUE;
+  g_hash_table_insert (daemon->priv->registered_paths, data->obj_path,
+		       data);
+
+  return g_strdup (data->obj_path);
 }
 
 /* NOTE: Might be emitted on a thread */

@@ -6,6 +6,7 @@
 #include <gio/gfileinfo.h>
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
+#include <gmountspec.h>
 
 G_BEGIN_DECLS
 
@@ -32,7 +33,8 @@ struct _GVfsBackend
 {
   GObject parent_instance;
   char *object_path;
-  char *bus_name;
+  char *display_name;
+  GMountSpec *mount_spec;
 };
 
 struct _GVfsBackendClass

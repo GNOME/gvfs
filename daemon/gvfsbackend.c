@@ -1,5 +1,6 @@
 #include <config.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,11 +15,10 @@
 #include <gvfsjobopenforread.h>
 #include <gvfsjobgetinfo.h>
 #include <gvfsjobenumerate.h>
+#include <gdbusutils.h>
 
 enum {
   PROP_0,
-  PROP_OBJECT_PATH,
-  PROP_BUS_NAME,
 };
 
 /* TODO: Real P_() */
@@ -49,7 +49,9 @@ g_vfs_backend_finalize (GObject *object)
   backend = G_VFS_BACKEND (object);
 
   g_free (backend->object_path);
-  g_free (backend->bus_name);
+  g_free (backend->display_name);
+  if (backend->mount_spec)
+    g_mount_spec_free (backend->mount_spec);
   
   if (G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_parent_class)->finalize) (object);
@@ -69,24 +71,6 @@ g_vfs_backend_class_init (GVfsBackendClass *klass)
   gobject_class->finalize = g_vfs_backend_finalize;
   gobject_class->set_property = g_vfs_backend_set_property;
   gobject_class->get_property = g_vfs_backend_get_property;
-
-  g_object_class_install_property (gobject_class,
-				   PROP_OBJECT_PATH,
-				   g_param_spec_string ("object-path",
-							P_("Object path"),
-							P_("dbus object path for the mountpoint"),
-							"",
-							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
-  
-  g_object_class_install_property (gobject_class,
-				   PROP_BUS_NAME,
-				   g_param_spec_string ("bus-name",
-							P_("Bus name"),
-							P_("dbus bus name for the mountpoint"),
-							"",
-							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
 
 static void
@@ -100,18 +84,10 @@ g_vfs_backend_set_property (GObject         *object,
 			    const GValue    *value,
 			    GParamSpec      *pspec)
 {
-  GVfsBackend *backend = G_VFS_BACKEND (object);
+  /*GVfsBackend *backend = G_VFS_BACKEND (object);*/
   
   switch (prop_id)
     {
-    case PROP_OBJECT_PATH:
-      g_free (backend->object_path);
-      backend->object_path = g_value_dup_string (value);
-      break;
-    case PROP_BUS_NAME:
-      g_free (backend->bus_name);
-      backend->bus_name = g_value_dup_string (value);
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -124,16 +100,10 @@ g_vfs_backend_get_property (GObject    *object,
 			    GValue     *value,
 			    GParamSpec *pspec)
 {
-  GVfsBackend *backend = G_VFS_BACKEND (object);
+  /*GVfsBackend *backend = G_VFS_BACKEND (object);*/
   
   switch (prop_id)
     {
-    case PROP_OBJECT_PATH:
-      g_value_set_string (value, backend->object_path);
-      break;
-    case PROP_BUS_NAME:
-      g_value_set_string (value, backend->bus_name);
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -147,38 +117,12 @@ g_vfs_backend_constructor (GType                  type,
 {
   GObject *object;
   GVfsBackend *backend;
-  unsigned int flags;
-  DBusError error;
-  DBusConnection *conn;
-  int ret;
 
   object = (* G_OBJECT_CLASS (g_vfs_backend_parent_class)->constructor) (type,
 									 n_construct_properties,
 									 construct_params);
 
   backend = G_VFS_BACKEND (object);
-
-  if (backend->bus_name)
-    {
-      conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-      if (conn)
-	{
-	  flags = DBUS_NAME_FLAG_ALLOW_REPLACEMENT | DBUS_NAME_FLAG_DO_NOT_QUEUE;
-	  
-	  dbus_error_init (&error);
-	  ret = dbus_bus_request_name (conn, backend->bus_name, flags, &error);
-	  if (ret == -1)
-	    {
-	      g_printerr ("Failed to acquire bus name '%s': %s",
-			  backend->bus_name, error.message);
-	      dbus_error_free (&error);
-	    }
-	  else if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-	    g_printerr ("Unable to acquire bus name '%s'\n", backend->bus_name);
-
-	  dbus_connection_unref (conn);
-	}
-    }
   
   return object;
 }
@@ -221,8 +165,47 @@ void
 g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
 				    GVfsDaemon      *daemon)
 {
-  g_print ("registering %s with %p\n", backend->object_path, daemon);
+  DBusConnection *conn;
+  DBusMessage *message, *reply;
+  DBusMessageIter iter;
+  char *icon = "icon";
+  
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
-  g_vfs_daemon_register_path  (daemon, backend->object_path,
-			       backend_dbus_handler, backend);
+  backend->object_path = g_vfs_daemon_register_mount  (daemon,
+						       backend_dbus_handler,
+						       backend);
+  g_print ("registered backend at path %s\n", backend->object_path);
+
+  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+
+  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+					  "/org/gtk/vfs/mounttracker",
+					  "org.gtk.gvfs.MountTracker",
+					  "registerMount");
+  if (message == NULL)
+    _g_dbus_oom ();
+
+  if (!dbus_message_append_args (message,
+				 DBUS_TYPE_STRING, &backend->display_name,
+				 DBUS_TYPE_STRING, &icon,
+				 DBUS_TYPE_OBJECT_PATH, &backend->object_path,
+				 0))
+    _g_dbus_oom ();
+
+  dbus_message_iter_init_append (message, &iter);
+  g_mount_spec_to_dbus (&iter, backend->mount_spec);
+
+  dbus_message_set_auto_start (message, TRUE);
+  
+  reply = dbus_connection_send_with_reply_and_block (conn, message,
+						     -1, NULL);
+  if (reply == NULL ||
+      dbus_message_get_type (reply) == DBUS_MESSAGE_TYPE_ERROR)
+    {
+      /* TODO: handle better */
+      g_print ("failed to register mountpoint");
+      exit (1);
+    }
+
+  /* TODO: check result for ok */
 }

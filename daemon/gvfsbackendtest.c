@@ -41,13 +41,20 @@ g_vfs_backend_test_init (GVfsBackendTest *backend)
 GVfsBackendTest *
 g_vfs_backend_test_new (void)
 {
-  GVfsBackendTest *backend;
-
-  backend = g_object_new (G_TYPE_VFS_BACKEND_TEST,
-			  "object-path", "/org/gtk/vfs/mount/test",
-			  "bus-name", "org.gtk.vfs.mount.test",
+  GVfsBackendTest *test_backend;
+  GVfsBackend *backend;
+  
+  test_backend = g_object_new (G_TYPE_VFS_BACKEND_TEST,
 			  NULL);
-  return backend;
+
+  backend = G_VFS_BACKEND (test_backend);
+  
+  backend->display_name = g_strdup ("test");
+  backend->mount_spec = g_mount_spec_new ();
+  g_mount_spec_add_item (backend->mount_spec,
+			 "type", "test");
+  
+  return test_backend;
 }
 
 static gboolean 

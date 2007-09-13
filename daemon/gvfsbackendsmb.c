@@ -251,7 +251,7 @@ g_vfs_backend_smb_new (const char *server,
 		       const char *share)
 {
   GVfsBackendSmb *backend;
-  char *obj_path, *bus_name;
+  GVfsBackend *_backend;
   SMBCCTX *smb_context;
   int res;
   char *uri;
@@ -291,17 +291,22 @@ g_vfs_backend_smb_new (const char *server,
       return NULL;
     }
   
-  obj_path = g_strdup_printf (G_VFS_DBUS_MOUNTPOINT_PATH"smbshare/h_%s/f_%s", server, share);
-  bus_name = g_strdup_printf (G_VFS_DBUS_MOUNTPOINT_NAME"smbshare.h_%s.f_%s", server, share);
-  
   backend = g_object_new (G_TYPE_VFS_BACKEND_SMB,
-			  "object-path", obj_path,
-			  "bus-name", bus_name,
 			  NULL);
 
   backend->server = g_strdup (server);
   backend->share = g_strdup (share);
 
+  _backend = G_VFS_BACKEND (backend);
+  _backend->display_name = g_strdup_printf ("%s on %s", share, server);
+  _backend->mount_spec = g_mount_spec_new ();
+  g_mount_spec_add_item (_backend->mount_spec,
+			 "type", "smb-share");
+  g_mount_spec_add_item (_backend->mount_spec,
+			 "share", share);
+  g_mount_spec_add_item (_backend->mount_spec,
+			 "server", server);
+  
   smb_backend = backend;
   backend->smb_context = smb_context;
   

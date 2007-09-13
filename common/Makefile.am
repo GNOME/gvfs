@@ -11,6 +11,7 @@ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 libcommon_la_SOURCES = 	\
 	gsysutils.c gsysutils.h \
 	gdbusutils.c gdbusutils.h \
+	gmountspec.c gmountspec.h \
 	gvfsdaemonprotocol.h \
 	$(NULL)
 
