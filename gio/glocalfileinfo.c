@@ -31,6 +31,23 @@
 #include "gcontenttype.h"
 #include "gcontenttypeprivate.h"
 
+char *
+_g_local_file_info_create_etag (struct stat *statbuf)
+{
+  GTimeVal tv;
+  
+  tv.tv_sec = statbuf->st_mtime;
+#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
+  tv.tv_usec = statbuf->st_mtimensec / 1000;
+#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
+  tv.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
+#else
+  tv.tv_usec = 0;
+#endif
+
+  return g_strdup_printf ("%ld:%ld", tv.tv_sec, tv.tv_usec);
+}
+
 static gchar *
 read_link (const gchar *full_name)
 {
@@ -382,9 +399,9 @@ get_xattrs_from_fd (int fd,
 }
 
 void
-g_local_file_info_get_parent_info (const char             *dir,
-				   GFileAttributeMatcher  *attribute_matcher,
-				   GLocalParentFileInfo   *parent_info)
+_g_local_file_info_get_parent_info (const char             *dir,
+				    GFileAttributeMatcher  *attribute_matcher,
+				    GLocalParentFileInfo   *parent_info)
 {
   struct stat statbuf;
   int res;
@@ -469,10 +486,10 @@ get_access_rights (GFileAttributeMatcher *attribute_matcher,
 }
 
 static void
-set_info_from_stat (GFileInfo *info, struct stat *statbuf)
+set_info_from_stat (GFileInfo *info, struct stat *statbuf,
+		    GFileAttributeMatcher *attribute_matcher)
 {
   GFileType file_type;
-  GTimeVal t;
 
   file_type = G_FILE_TYPE_UNKNOWN;
 
@@ -496,16 +513,6 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
   g_file_info_set_file_type (info, file_type);
   g_file_info_set_size (info, statbuf->st_size);
 
-  t.tv_sec = statbuf->st_mtime;
-#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
-  t.tv_usec = statbuf->st_mtimensec / 1000;
-#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
-  t.tv_usec = statbuf->st_mtim.tv_nsec / 1000;
-#else
-  t.tv_usec = 0;
-#endif
-  g_file_info_set_modification_time (info, &t);
-
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE, statbuf->st_dev);
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_INODE, statbuf->st_ino);
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, statbuf->st_mode);
@@ -520,27 +527,44 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf)
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, statbuf->st_blocks);
 #endif
   
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, statbuf->st_mtime);
+#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, statbuf->st_mtimensec / 1000);
+#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, statbuf->st_mtim.tv_nsec / 1000);
+#endif
+  
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf->st_atime);
 #if defined (HAVE_STRUCT_STAT_ST_ATIMENSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atimensec / 1000);
 #elif defined (HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, statbuf->st_atim.tv_nsec / 1000);
 #endif
+  
   g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CHANGED, statbuf->st_ctime);
 #if defined (HAVE_STRUCT_STAT_ST_CTIMENSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctimensec / 1000);
 #elif defined (HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC)
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_CHANGED_USEC, statbuf->st_ctim.tv_nsec / 1000);
 #endif
+
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_ETAG_VALUE))
+    {
+      char *etag = _g_local_file_info_create_etag (statbuf);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);
+      g_free (etag);
+    }
+
 }
 
 GFileInfo *
-g_local_file_info_get (const char *basename,
-		       const char *path,
-		       GFileAttributeMatcher *attribute_matcher,
-		       GFileGetInfoFlags flags,
-		       GLocalParentFileInfo *parent_info,
-		       GError **error)
+_g_local_file_info_get (const char *basename,
+			const char *path,
+			GFileAttributeMatcher *attribute_matcher,
+			GFileGetInfoFlags flags,
+			GLocalParentFileInfo *parent_info,
+			GError **error)
 {
   GFileInfo *info;
   struct stat statbuf;
@@ -595,7 +619,7 @@ g_local_file_info_get (const char *basename,
 	}
     }
 
-  set_info_from_stat (info, &statbuf);
+  set_info_from_stat (info, &statbuf, attribute_matcher);
   
   if (basename != NULL && basename[0] == '.')
     file_flags |= G_FILE_FLAG_HIDDEN;
@@ -709,9 +733,9 @@ g_local_file_info_get (const char *basename,
 }
 
 GFileInfo *
-g_local_file_info_get_from_fd (int fd,
-			       char *attributes,
-			       GError **error)
+_g_local_file_info_get_from_fd (int fd,
+				char *attributes,
+				GError **error)
 {
   struct stat stat_buf;
   GFileAttributeMatcher *matcher;
@@ -728,9 +752,9 @@ g_local_file_info_get_from_fd (int fd,
 
   info = g_file_info_new ();
 
-  set_info_from_stat (info, &stat_buf);
-  
   matcher = g_file_attribute_matcher_new (attributes);
+  
+  set_info_from_stat (info, &stat_buf, matcher);
   
 #ifdef HAVE_SELINUX
   if (g_file_attribute_matcher_matches (matcher, "selinux:context") &&

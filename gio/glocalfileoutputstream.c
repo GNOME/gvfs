@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -18,7 +19,6 @@ G_DEFINE_TYPE (GLocalFileOutputStream, g_local_file_output_stream, G_TYPE_FILE_O
 /* Some of the file replacement code was based on the code from gedit,
  * relicenced to LGPL with permissions from the authors.
  */
-  
 
 #define BACKUP_EXTENSION "~"
 
@@ -26,6 +26,7 @@ struct _GLocalFileOutputStreamPrivate {
   char *tmp_filename;
   char *original_filename;
   char *backup_filename;
+  char *etag;
   int fd;
 };
 
@@ -53,6 +54,7 @@ g_local_file_output_stream_finalize (GObject *object)
   g_free (file->priv->tmp_filename);
   g_free (file->priv->original_filename);
   g_free (file->priv->backup_filename);
+  g_free (file->priv->etag);
   
   if (G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize) (object);
@@ -194,32 +196,17 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	}
     }
   
-  if (g_file_output_stream_get_should_get_final_mtime (G_FILE_OUTPUT_STREAM (stream)))
+  if (g_cancellable_is_cancelled (cancellable))
     {
-      if (g_cancellable_is_cancelled (cancellable))
-	{
-	  g_set_error (error,
-		       G_IO_ERROR,
-		       G_IO_ERROR_CANCELLED,
-		       _("Operation was cancelled"));
-	  goto err_out;
-	}
-      
-      if (fstat (file->priv->fd, &final_stat) == 0)
-	{
-	  GTimeVal tv;
-	  tv.tv_sec = final_stat.st_mtime;
-#if defined (HAVE_STRUCT_STAT_ST_MTIMENSEC)
-	  tv.tv_usec = final_stat.st_mtimensec / 1000;
-#elif defined (HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
-	  tv.tv_usec = final_stat.st_mtim.tv_nsec / 1000;
-#else
-	  tv.tv_usec = 0;
-#endif
-	  g_file_output_stream_set_final_mtime (G_FILE_OUTPUT_STREAM (stream),
-						&tv);
-	}
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      goto err_out;
     }
+      
+  if (fstat (file->priv->fd, &final_stat) == 0)
+    file->priv->etag = _g_local_file_info_create_etag (&final_stat);
 
   while (1)
     {
@@ -261,9 +248,9 @@ g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
       return NULL;
     }
   
-  return g_local_file_info_get_from_fd (file->priv->fd,
-					attributes,
-					error);
+  return _g_local_file_info_get_from_fd (file->priv->fd,
+					 attributes,
+					 error);
 }
 
 GFileOutputStream *
@@ -406,7 +393,7 @@ copy_file_data (gint     sfd,
 
 static int
 handle_overwrite_open (const char *filename,
-		       time_t original_mtime,
+		       const char *etag,
 		       gboolean create_backup,
 		       char **temp_filename,
 		       GCancellable *cancellable,
@@ -414,6 +401,7 @@ handle_overwrite_open (const char *filename,
 {
   int fd = -1;
   struct stat original_stat;
+  char *current_etag;
   gboolean is_symlink;
   int open_flags;
 
@@ -476,14 +464,19 @@ handle_overwrite_open (const char *filename,
       goto err_out;
     }
   
-  if (original_mtime != 0 &&
-      original_stat.st_mtime != original_mtime)
+  if (etag != NULL)
     {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_WRONG_MTIME,
-		   _("The file was externally modified"));
-      goto err_out;
+      current_etag = _g_local_file_info_create_etag (&original_stat);
+      if (strcmp (etag, current_etag) != 0)
+	{
+	  g_set_error (error,
+		       G_IO_ERROR,
+		       G_IO_ERROR_WRONG_ETAG,
+		       _("The file was externally modified"));
+	  g_free (current_etag);
+	  goto err_out;
+	}
+      g_free (current_etag);
     }
 
   /* We use two backup strategies.
@@ -660,7 +653,7 @@ handle_overwrite_open (const char *filename,
 
 GFileOutputStream *
 g_local_file_output_stream_replace (const char   *filename,
-				    time_t        original_mtime,
+				    const char   *etag,
 				    gboolean      create_backup,
 				    GCancellable *cancellable,
 				    GError      **error)
@@ -688,7 +681,7 @@ g_local_file_output_stream_replace (const char   *filename,
   if (fd == -1 && errno == EEXIST)
     {
       /* The file already exists */
-      fd = handle_overwrite_open (filename, original_mtime, create_backup, &temp_file,
+      fd = handle_overwrite_open (filename, etag, create_backup, &temp_file,
 				  cancellable, error);
       if (fd == -1)
 	return NULL;

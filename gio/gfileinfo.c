@@ -677,8 +677,8 @@ g_file_info_get_modification_time (GFileInfo *info,
   
   if (attr_mtime == 0)
     {
-      attr_mtime = lookup_attribute (G_FILE_ATTRIBUTE_STD_MTIME);
-      attr_mtime_usec = lookup_attribute (G_FILE_ATTRIBUTE_STD_MTIME_USEC);
+      attr_mtime = lookup_attribute (G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      attr_mtime_usec = lookup_attribute (G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC);
     }
   
   value = g_file_info_find_value (info, attr_mtime);
@@ -824,8 +824,8 @@ g_file_info_set_modification_time (GFileInfo         *info,
   
   if (attr_mtime == 0)
     {
-      attr_mtime = lookup_attribute (G_FILE_ATTRIBUTE_STD_MTIME);
-      attr_mtime_usec = lookup_attribute (G_FILE_ATTRIBUTE_STD_MTIME_USEC);
+      attr_mtime = lookup_attribute (G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      attr_mtime_usec = lookup_attribute (G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC);
     }
   
   value = g_file_info_create_value (info, attr_mtime);

@@ -52,9 +52,11 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_STD_CONTENT_TYPE "std:content_type"     /* string */
 #define G_FILE_ATTRIBUTE_STD_SIZE "std:size"                     /* uint64 */
 #define G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET "std:symlink_target" /* byte string */
-#define G_FILE_ATTRIBUTE_STD_MTIME "std:mtime"                   /* uint64 */
-#define G_FILE_ATTRIBUTE_STD_MTIME_USEC "std:mtime_usec"         /* uint32 */
 #define G_FILE_ATTRIBUTE_STD_TARGET_URI "std:target_uri"         /* string */
+
+/* Entity tags, used to avoid missing updates on save */
+
+#define G_FILE_ATTRIBUTE_ETAG_VALUE "etag:value"                 /* string */
 
 /* Calculated Access Rights for current user */
 
@@ -72,8 +74,10 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_MOUNTABLE_UNIX_DEVICE "mountable:unix_device" /* uint32 */
 #define G_FILE_ATTRIBUTE_MOUNTABLE_HAL_UDI "mountable:hal_udi"         /* string */
 
-/* Time attributes (sans mtime)*/
+/* Time attributes */
 
+#define G_FILE_ATTRIBUTE_TIME_MODIFIED "time:modified"              /* uint64 */
+#define G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC "time:modified_usec"    /* uint32 */
 #define G_FILE_ATTRIBUTE_TIME_ACCESS "time:access"               /* uint64 */
 #define G_FILE_ATTRIBUTE_TIME_ACCESS_USEC "time:access_usec"     /* uint32 */
 #define G_FILE_ATTRIBUTE_TIME_CHANGED "time:changed"             /* uint64 */

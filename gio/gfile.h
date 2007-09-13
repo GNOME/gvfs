@@ -96,7 +96,7 @@ struct _GFileIface
 					     GCancellable         *cancellable,
 					     GError               **error);
   GFileOutputStream * (*replace)            (GFile                *file,
-					     time_t                mtime,
+					     const char           *etag,
 					     gboolean              make_backup,
 					     GCancellable         *cancellable,
 					     GError              **error);
@@ -216,7 +216,7 @@ GFileOutputStream *     g_file_create                     (GFile                
 							   GCancellable               *cancellable,
 							   GError                    **error);
 GFileOutputStream *     g_file_replace                    (GFile                      *file,
-							   time_t                      mtime,
+							   const char                 *etag,
 							   gboolean                    make_backup,
 							   GCancellable               *cancellable,
 							   GError                    **error);
@@ -370,14 +370,14 @@ gboolean g_file_load_contents_finish    (GFile                *file,
 gboolean g_file_replace_contents        (GFile                *file,
 					 const char           *contents,
 					 gsize                 length,
-					 time_t                mtime,
+					 const char           *etag,
 					 gboolean              make_backup,
 					 GCancellable         *cancellable,
 					 GError              **error);
 void     g_file_replace_contents_async  (GFile                *file,
 					 const char           *contents,
 					 gsize                 length,
-					 time_t                mtime,
+					 const char           *etag,
 					 gboolean              make_backup,
 					 GCancellable         *cancellable,
 					 GAsyncReadyCallback   callback,

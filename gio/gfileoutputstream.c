@@ -24,8 +24,7 @@ G_DEFINE_TYPE_WITH_CODE (GFileOutputStream, g_file_output_stream, G_TYPE_OUTPUT_
 						g_file_output_stream_seekable_iface_init));
 
 struct _GFileOutputStreamPrivate {
-  guint get_final_mtime : 1;
-  GTimeVal final_mtime;
+  int dummy;
 };
 
 static void
@@ -103,43 +102,51 @@ g_file_output_stream_get_file_info (GFileOutputStream      *stream,
   return info;
 }
 
-void
-g_file_output_stream_set_should_get_final_mtime (GFileOutputStream  *stream,
-						 gboolean           get_final_mtime)
+char *
+g_file_output_stream_get_etag (GFileOutputStream  *stream,
+			       GCancellable       *cancellable,
+			       GError            **error)
 {
-  g_return_if_fail (G_IS_FILE_OUTPUT_STREAM (stream));
-  g_return_if_fail (stream != NULL);
+  GFileOutputStreamClass *class;
+  GOutputStream *output_stream;
+  char *etag;
+  
+  g_return_val_if_fail (G_IS_FILE_OUTPUT_STREAM (stream), NULL);
+  g_return_val_if_fail (stream != NULL, NULL);
+  
+  output_stream = G_OUTPUT_STREAM (stream);
+  
+  if (!g_output_stream_is_closed (output_stream))
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
+		   _("Stream isn't closed yet, can't get etag"));
+      return NULL;
+    }
 
-  stream->priv->get_final_mtime = get_final_mtime;
-}
-
-gboolean
-g_file_output_stream_get_should_get_final_mtime (GFileOutputStream  *stream)
-{
-  g_return_val_if_fail (G_IS_FILE_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (stream != NULL, FALSE);
-
-  return stream->priv->get_final_mtime;
-}
-
-void
-g_file_output_stream_get_final_mtime (GFileOutputStream  *stream,
-				      GTimeVal *final_mtime)
-{
-  g_return_if_fail (G_IS_FILE_OUTPUT_STREAM (stream));
-  g_return_if_fail (stream != NULL);
-
-  *final_mtime = stream->priv->final_mtime;
-}
-
-void
-g_file_output_stream_set_final_mtime (GFileOutputStream  *stream,
-				      GTimeVal *final_mtime)
-{
-  g_return_if_fail (G_IS_FILE_OUTPUT_STREAM (stream));
-  g_return_if_fail (stream != NULL);
-
-  stream->priv->final_mtime = *final_mtime;
+  if (g_output_stream_has_pending (output_stream))
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
+		   _("Stream has outstanding operation"));
+      return NULL;
+    }
+      
+  etag = NULL;
+  
+  g_output_stream_set_pending (output_stream, TRUE);
+  
+  if (cancellable)
+    g_push_current_cancellable (cancellable);
+  
+  class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
+  if (class->get_etag)
+    etag = class->get_etag (stream, cancellable, error);
+  
+  if (cancellable)
+    g_pop_current_cancellable (cancellable);
+  
+  g_output_stream_set_pending (output_stream, FALSE);
+  
+  return etag;
 }
 
 static goffset

@@ -878,7 +878,7 @@ do_replace (GVfsBackend *backend,
 	    {
 	      g_set_error (&error,
 			   G_IO_ERROR,
-			   G_IO_ERROR_WRONG_MTIME,
+			   G_IO_ERROR_WRONG_ETAG,
 			   _("The file was externally modified"));
 	      goto error;
 	    }

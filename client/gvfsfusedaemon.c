@@ -135,7 +135,7 @@ errno_from_error (GError *error)
       { G_IO_ERROR_PENDING,            EIO          },
       { G_IO_ERROR_READ_ONLY,          EACCES       },
       { G_IO_ERROR_CANT_CREATE_BACKUP, EIO          },
-      { G_IO_ERROR_WRONG_MTIME,        EIO          },
+      { G_IO_ERROR_WRONG_ETAG,         EIO          },
       { G_IO_ERROR_TIMED_OUT,          EIO          },
       { G_IO_ERROR_BUSY,               EBUSY        },
       { -1,                            -1           }
@@ -2018,7 +2018,7 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
       if (!error)
         {
           attr_value.u.uint64 = mtime;
-          g_file_set_attribute (file, G_FILE_ATTRIBUTE_STD_MTIME_USEC, &attr_value, 0, NULL, &error);
+          g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, &attr_value, 0, NULL, &error);
         }
 
       if (error)

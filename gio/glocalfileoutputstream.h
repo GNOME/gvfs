@@ -37,7 +37,7 @@ GFileOutputStream *g_local_file_output_stream_append  (const char    *filename,
 						       GCancellable  *cancellable,
 						       GError       **error);
 GFileOutputStream *g_local_file_output_stream_replace (const char    *filename,
-						       time_t         mtime,
+						       const char    *etag,
 						       gboolean       make_backup,
 						       GCancellable  *cancellable,
 						       GError       **error);

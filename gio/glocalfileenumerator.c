@@ -112,7 +112,7 @@ g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
 
   if (!local->got_parent_info)
     {
-      g_local_file_info_get_parent_info (local->filename, local->matcher, &local->parent_info);
+      _g_local_file_info_get_parent_info (local->filename, local->matcher, &local->parent_info);
       local->got_parent_info = TRUE;
     }
   
@@ -123,11 +123,11 @@ g_local_file_enumerator_next_file (GFileEnumerator *enumerator,
     return NULL;
 
   path = g_build_filename (local->filename, filename, NULL);
-  info = g_local_file_info_get (filename, path,
-				local->matcher,
-				local->flags,
-				&local->parent_info,
-				&my_error); 
+  info = _g_local_file_info_get (filename, path,
+				 local->matcher,
+				 local->flags,
+				 &local->parent_info,
+				 &my_error); 
   g_free (path);
   
   if (info == NULL)

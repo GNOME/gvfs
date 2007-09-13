@@ -590,12 +590,12 @@ g_local_file_get_info (GFile                *file,
   basename = g_path_get_basename (local->filename);
   
   dirname = g_path_get_dirname (local->filename);
-  g_local_file_info_get_parent_info (dirname, matcher, &parent_info);
+  _g_local_file_info_get_parent_info (dirname, matcher, &parent_info);
   g_free (dirname);
   
-  info = g_local_file_info_get (basename, local->filename,
-				matcher, flags, &parent_info,
-				error);
+  info = _g_local_file_info_get (basename, local->filename,
+				 matcher, flags, &parent_info,
+				 error);
   
   g_free (basename);
 
@@ -868,13 +868,13 @@ g_local_file_create (GFile *file,
 
 static GFileOutputStream *
 g_local_file_replace (GFile *file,
-		      time_t mtime,
+		      const char *etag,
 		      gboolean make_backup,
 		      GCancellable *cancellable,
 		      GError **error)
 {
   return g_local_file_output_stream_replace (G_LOCAL_FILE (file)->filename,
-					     mtime, make_backup,
+					     etag, make_backup,
 					     cancellable, error);
 }
 

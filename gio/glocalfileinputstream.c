@@ -216,7 +216,7 @@ g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
       return NULL;
     }
   
-  return g_local_file_info_get_from_fd (file->priv->fd,
-					attributes,
-					error);
+  return _g_local_file_info_get_from_fd (file->priv->fd,
+					 attributes,
+					 error);
 }

@@ -20,7 +20,7 @@ typedef struct _GFileOutputStreamPrivate  GFileOutputStreamPrivate;
 struct _GFileOutputStream
 {
   GOutputStream parent;
-
+  
   /*< private >*/
   GFileOutputStreamPrivate *priv;
 };
@@ -45,6 +45,9 @@ struct _GFileOutputStreamClass
 			       char                 *attributes,
 			       GCancellable         *cancellable,
 			       GError              **error);
+  char      *(*get_etag)      (GFileOutputStream    *stream,
+			       GCancellable         *cancellable,
+			       GError              **error);
     
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -57,17 +60,13 @@ struct _GFileOutputStreamClass
 GType g_file_output_stream_get_type (void) G_GNUC_CONST;
 
 
-GFileInfo *g_file_output_stream_get_file_info              (GFileOutputStream      *stream,
-							    char                   *attributes,
-							    GCancellable           *cancellable,
-							    GError                **error);
-void       g_file_output_stream_set_should_get_final_mtime (GFileOutputStream      *stream,
-							    gboolean                get_final_mtime);
-void       g_file_output_stream_get_final_mtime            (GFileOutputStream      *stream,
-							    GTimeVal               *mtime);
-gboolean   g_file_output_stream_get_should_get_final_mtime (GFileOutputStream      *stream);
-void       g_file_output_stream_set_final_mtime            (GFileOutputStream      *stream,
-							    GTimeVal               *final_mtime);
+GFileInfo *g_file_output_stream_get_file_info       (GFileOutputStream  *stream,
+						     char               *attributes,
+						     GCancellable       *cancellable,
+						     GError            **error);
+char *     g_file_output_stream_get_etag            (GFileOutputStream  *stream,
+						     GCancellable       *cancellable,
+						     GError            **error);
 
 G_END_DECLS
 

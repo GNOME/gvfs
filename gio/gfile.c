@@ -332,7 +332,7 @@ g_file_create (GFile *file,
 
 GFileOutputStream *
 g_file_replace (GFile *file,
-		time_t mtime,
+		const char *etag,
 		gboolean  make_backup,
 		GCancellable *cancellable,
 		GError **error)
@@ -350,7 +350,11 @@ g_file_replace (GFile *file,
   
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->replace) (file, mtime, make_backup, cancellable, error);
+  /* Handle empty tag string as NULL in consistent way. */
+  if (etag && *etag == 0)
+    etag = NULL;
+  
+  return (* iface->replace) (file, etag, make_backup, cancellable, error);
 }
 
 void
@@ -1562,7 +1566,7 @@ gboolean
 g_file_replace_contents (GFile                *file,
 			 const char           *contents,
 			 gsize                 length,
-			 time_t                mtime,
+			 const char           *etag,
 			 gboolean              make_backup,
 			 GCancellable         *cancellable,
 			 GError              **error)
@@ -1572,7 +1576,7 @@ g_file_replace_contents (GFile                *file,
   gssize res;
 
   out = g_file_replace (file,
-			mtime,
+			etag,
 			make_backup,
 			cancellable,
 			error);
