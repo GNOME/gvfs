@@ -92,9 +92,6 @@ GFileInfo *   g_file_enumerator_next_file         (GFileEnumerator              
 gboolean      g_file_enumerator_stop              (GFileEnumerator                *enumerator,
 						   GCancellable                   *cancellable,
 						   GError                        **error);
-void          g_file_enumerator_set_async_context (GFileEnumerator                *enumerator,
-						   GMainContext                   *context);
-GMainContext *g_file_enumerator_get_async_context (GFileEnumerator                *enumerator);
 void          g_file_enumerator_next_files_async  (GFileEnumerator                *enumerator,
 						   int                             num_files,
 						   int                             io_priority,

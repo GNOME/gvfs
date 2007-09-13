@@ -379,7 +379,6 @@ g_file_daemon_read_async (GFile *file,
 			  int io_priority,
 			  GFileReadCallback callback,
 			  gpointer callback_data,
-			  GMainContext *context,
 			  GCancellable *cancellable)
 {
   GFileDaemon *daemon_file = G_FILE_DAEMON (file);
@@ -392,7 +391,6 @@ g_file_daemon_read_async (GFile *file,
 				      0);
   /* TODO: handle nonmounted => message == NULL */
   _g_vfs_daemon_call_async (message,
-			    context,
 			    callback, callback_data,
 			    read_async_cb, file,
 			    cancellable);

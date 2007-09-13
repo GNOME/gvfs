@@ -149,9 +149,6 @@ gssize        g_input_stream_skip              (GInputStream              *strea
 gboolean      g_input_stream_close             (GInputStream              *stream,
 						GCancellable              *cancellable,
 						GError                   **error);
-void          g_input_stream_set_async_context (GInputStream              *stream,
-						GMainContext              *context);
-GMainContext *g_input_stream_get_async_context (GInputStream              *stream);
 void          g_input_stream_read_async        (GInputStream              *stream,
 						void                      *buffer,
 						gsize                      count,

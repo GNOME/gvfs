@@ -9,7 +9,6 @@ struct _GIOJob {
   gpointer data;
   GDestroyNotify destroy_notify;
   
-  GMainContext *callback_context;
   gint io_priority;
   GCancellable *cancellable;
 };
@@ -95,8 +94,6 @@ io_job_thread (gpointer       data,
 
   if (job->cancellable)
     g_object_unref (job->cancellable);
-  if (job->callback_context)
-    g_main_context_unref (job->callback_context);
   g_free (job);
 
   if (resort_jobs)
@@ -110,7 +107,6 @@ g_schedule_io_job (GIOJobFunc     job_func,
 		   gpointer       data,
 		   GDestroyNotify notify,
 		   gint           io_priority,
-		   GMainContext  *callback_context,
 		   GCancellable  *cancellable)
 {
   static GOnce once_init = G_ONCE_INIT;
@@ -121,9 +117,6 @@ g_schedule_io_job (GIOJobFunc     job_func,
   job->data = data;
   job->destroy_notify = notify;
   job->io_priority = io_priority;
-  job->callback_context = callback_context;
-  if (callback_context)
-    g_main_context_ref (callback_context);
     
   if (cancellable)
     job->cancellable = g_object_ref (cancellable);
@@ -244,7 +237,7 @@ g_io_job_send_to_mainloop (GIOJob        *job,
   if (block)
     g_mutex_lock (proxy->ack_lock);
 		  
-  id = g_source_attach (source, job->callback_context);
+  id = g_source_attach (source, NULL);
   g_source_unref (source);
 
   if (block) {

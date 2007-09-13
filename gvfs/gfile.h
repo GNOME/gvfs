@@ -67,7 +67,6 @@ struct _GFileIface
 					     int                   io_priority,
 					     GFileReadCallback     callback,
 					     gpointer              callback_data,
-					     GMainContext         *context,
 					     GCancellable         *cancellable);
 };
 
@@ -114,7 +113,6 @@ void               g_file_read_async         (GFile                  *file,
 					      int                     io_priority,
 					      GFileReadCallback       callback,
 					      gpointer                callback_data,
-					      GMainContext           *context,
 					      GCancellable           *cancellable);
 
 G_END_DECLS

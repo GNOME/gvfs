@@ -125,9 +125,6 @@ gboolean      g_output_stream_flush             (GOutputStream              *str
 gboolean      g_output_stream_close             (GOutputStream              *stream,
 						 GCancellable               *cancellable,
 						 GError                    **error);
-void          g_output_stream_set_async_context (GOutputStream              *stream,
-						 GMainContext               *context);
-GMainContext *g_output_stream_get_async_context (GOutputStream              *stream);
 void          g_output_stream_write_async       (GOutputStream              *stream,
 						 void                       *buffer,
 						 gsize                       count,

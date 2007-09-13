@@ -41,7 +41,6 @@ void         _g_dbus_connection_get_fd_async         (DBusConnection         *co
 						      GetFdAsyncCallback      callback,
 						      gpointer                callback_data);
 void         _g_vfs_daemon_call_async                (DBusMessage            *message,
-						      GMainContext           *context,
 						      gpointer                op_callback,
 						      gpointer                op_callback_data,
 						      GVfsAsyncDBusCallback   callback,
@@ -51,8 +50,7 @@ DBusMessage *_g_vfs_daemon_call_sync                 (DBusMessage            *me
 						      DBusConnection        **connection_out,
 						      GCancellable           *cancellable,
 						      GError                **error);
-void         _g_dbus_connection_setup_with_main      (DBusConnection         *connection,
-						      GMainContext           *context);
+void         _g_dbus_connection_setup_with_main      (DBusConnection         *connection);
 char *       _g_dbus_unescape_bus_name               (const char             *escaped,
 						      const char             *end);
 void         _g_dbus_append_escaped_bus_name         (GString                *string,

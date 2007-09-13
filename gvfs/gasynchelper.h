@@ -20,12 +20,10 @@ void     _g_queue_async_result (GAsyncResult    *result,
 				gpointer         async_object,
 				GError          *error,
 				gpointer         data,
-				GMainContext    *context,
 				GSourceFunc      source_func);
 
 GSource *_g_fd_source_new      (int              fd,
 				gushort          events,
-				GMainContext    *context,
 				GCancellable    *cancellable);
 
 G_END_DECLS

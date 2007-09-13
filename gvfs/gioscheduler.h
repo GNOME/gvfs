@@ -18,7 +18,6 @@ void g_schedule_io_job         (GIOJobFunc      job_func,
 				gpointer        data,
 				GDestroyNotify  notify,
 				gint            io_priority,
-				GMainContext   *callback_context,
 				GCancellable   *cancellable);
 void g_cancel_all_io_jobs      (void);
 

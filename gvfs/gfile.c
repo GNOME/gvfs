@@ -16,7 +16,6 @@ static void g_file_real_read_async (GFile                  *file,
 				    int                     io_priority,
 				    GFileReadCallback       callback,
 				    gpointer                callback_data,
-				    GMainContext           *context,
 				    GCancellable           *cancellable);
 
 GType
@@ -220,7 +219,6 @@ g_file_read_async (GFile                  *file,
 		   int                     io_priority,
 		   GFileReadCallback       callback,
 		   gpointer                callback_data,
-		   GMainContext           *context,
 		   GCancellable           *cancellable)
 {
   GFileIface *iface;
@@ -231,7 +229,6 @@ g_file_read_async (GFile                  *file,
 			 io_priority,
 			 callback,
 			 callback_data,
-			 context,
 			 cancellable);
 }
 
@@ -307,7 +304,6 @@ g_file_real_read_async (GFile                  *file,
 			int                     io_priority,
 			GFileReadCallback       callback,
 			gpointer                callback_data,
-			GMainContext           *context,
 			GCancellable           *cancellable)
 {
   ReadAsyncOp *op;
@@ -319,7 +315,7 @@ g_file_real_read_async (GFile                  *file,
   op->op.callback_data = callback_data;
   
   g_schedule_io_job (read_op_func, op, NULL, io_priority,
-		     context, cancellable);
+		     cancellable);
 }
 
 /********************************************

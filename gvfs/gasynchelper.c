@@ -20,7 +20,6 @@ _g_queue_async_result (GAsyncResult   *result,
 		       gpointer        async_object,
 		       GError         *error,
 		       gpointer        data,
-		       GMainContext   *context,
 		       GSourceFunc     source_func)
 {
   GSource *source;
@@ -34,7 +33,7 @@ _g_queue_async_result (GAsyncResult   *result,
   source = g_idle_source_new ();
   g_source_set_priority (source, G_PRIORITY_DEFAULT);
   g_source_set_callback (source, source_func, result, async_result_free);
-  g_source_attach (source, context);
+  g_source_attach (source, NULL);
   g_source_unref (source);
 }
 
@@ -105,25 +104,13 @@ static void
 fd_source_cancelled_cb (GCancellable *cancellable,
 			gpointer data)
 {
-  GMainContext *context = data;
-  
   /* Wake up the mainloop in case we're waiting on async calls with FDSource */
-  g_main_context_wakeup (context);
-}
-
-static void
-cancel_closure_notify (gpointer	 data,
-		       GClosure	*closure)
-{
-  GMainContext *context = data;
-  if (context)
-    g_main_context_unref (context);
+  g_main_context_wakeup (NULL);
 }
 
 GSource *
 _g_fd_source_new (int fd,
 		  gushort events,
-		  GMainContext *context,
 		  GCancellable *cancellable)
 {
   GSource *source;
@@ -139,14 +126,13 @@ _g_fd_source_new (int fd,
   fd_source->pollfd.events = events;
   g_source_add_poll (source, &fd_source->pollfd);
 
-  g_source_attach (source, context);
+  g_source_attach (source, NULL);
  
   if (cancellable)
     fd_source->cancelled_tag =
       g_signal_connect_data (cancellable, "cancelled",
 			     (GCallback)fd_source_cancelled_cb,
-			     context ? g_main_context_ref (context) : NULL,
-			     cancel_closure_notify,
+			     NULL, NULL,
 			     0);
   
   return source;

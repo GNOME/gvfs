@@ -10,7 +10,6 @@ struct _GFileEnumeratorPrivate {
   /* TODO: Should be public for subclasses? */
   guint stopped : 1;
   guint pending : 1;
-  GMainContext *context;
   gpointer outstanding_callback;
   GError *outstanding_error;
 };
@@ -37,12 +36,6 @@ g_file_enumerator_finalize (GObject *object)
   if (!enumerator->priv->stopped)
     g_file_enumerator_stop (enumerator, NULL, NULL);
 
-  if (enumerator->priv->context)
-    {
-      g_main_context_unref (enumerator->priv->context);
-      enumerator->priv->context = NULL;
-    }
-  
   if (G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize) (object);
 }
@@ -179,52 +172,6 @@ g_file_enumerator_stop (GFileEnumerator *enumerator,
   return TRUE;
 }
 
-/**
- * g_file_enumerator_set_async_context:
- * @enumerator: A #GFileEnumerator.
- * @context: a #GMainContext (if %NULL, the default context will be used)
- *
- * Set the mainloop @context to be used for asynchronous i/o.
- * If not set, or if set to %NULL the default context will be used.
- **/
-void
-g_file_enumerator_set_async_context (GFileEnumerator *enumerator,
-				     GMainContext *context)
-{
-  g_return_if_fail (G_IS_FILE_ENUMERATOR (enumerator));
-  g_return_if_fail (enumerator != NULL);
-  
-  if (enumerator->priv->context)
-    g_main_context_unref (enumerator->priv->context);
-  
-  enumerator->priv->context = context;
-  
-  if (context)
-    g_main_context_ref (context);
-}
-  
-/**
- * g_file_enumerator_get_async_context:
- * @enumerator: A #GFileEnumerator.
- *
- * Returns the mainloop used for async operation on this enumerator.
- * If you implement a enumerator you have to look at this to know what
- * context to use for async i/o. Returns NULL if the default
- * context is used.
- *
- * The context is set by the user by calling g_file_enumerator_set_async_context().
- *
- * Return value: A #GMainContext
- **/
-GMainContext *
-g_file_enumerator_get_async_context (GFileEnumerator *enumerator)
-{
-  g_return_val_if_fail (G_IS_FILE_ENUMERATOR (enumerator), NULL);
-  g_return_val_if_fail (enumerator != NULL, NULL);
-
-  return enumerator->priv->context;
-}
-
 typedef struct {
   GAsyncResult            generic;
   int                     num_files;
@@ -262,7 +209,6 @@ queue_next_async_result (GFileEnumerator *enumerator,
   
   _g_queue_async_result ((GAsyncResult *)res, enumerator,
 			 error, data,
-			 g_file_enumerator_get_async_context (enumerator),
 			 call_next_async_result);
 }
 
@@ -393,7 +339,6 @@ queue_stop_async_result (GFileEnumerator *enumerator,
 
   _g_queue_async_result ((GAsyncResult *)res, enumerator,
 			 error, data,
-			 g_file_enumerator_get_async_context (enumerator),
 			 call_stop_async_result);
 }
 
@@ -592,7 +537,6 @@ g_file_enumerator_real_next_files_async (GFileEnumerator              *enumerato
 		     op,
 		     NULL,
 		     io_priority,
-		     g_file_enumerator_get_async_context (enumerator),
 		     cancellable);
 }
 
@@ -659,6 +603,5 @@ g_file_enumerator_real_stop_async (GFileEnumerator              *enumerator,
 		     op,
 		     NULL,
 		     io_priority,
-		     g_file_enumerator_get_async_context (enumerator),
 		     cancellable);
 }

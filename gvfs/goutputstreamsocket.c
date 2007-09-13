@@ -284,7 +284,6 @@ g_output_stream_socket_write_async (GOutputStream      *stream,
 
   source = _g_fd_source_new (socket_stream->priv->fd,
 			     POLLOUT,
-			     g_output_stream_get_async_context (stream),
 			     cancellable);
   
   g_source_set_callback (source, (GSourceFunc)write_async_cb, data, write_async_data_free);
@@ -377,6 +376,6 @@ g_output_stream_socket_close_async (GOutputStream       *stream,
   
   idle = g_idle_source_new ();
   g_source_set_callback (idle, (GSourceFunc)close_async_cb, data, close_async_data_free);
-  g_source_attach (idle, g_output_stream_get_async_context (stream));
+  g_source_attach (idle, NULL);
   g_source_unref (idle);
 }

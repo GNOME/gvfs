@@ -46,15 +46,12 @@ static GHashTable *bus_name_map = NULL;
 
 G_LOCK_DEFINE_STATIC(bus_name_map);
 
-static DBusConnection *get_connection_for_main_context (GMainContext    *context,
-							const char      *owner);
-static DBusSource     *set_connection_for_main_context (GMainContext    *context,
-							const char      *owner,
-							DBusConnection  *connection);
-static void            dbus_source_destroy             (DBusSource      *dbus_source);
-static DBusConnection *get_connection_sync             (const char      *bus_name,
-							GError         **error);
-
+static DBusConnection *get_connection_for_owner             (const char      *owner);
+static DBusSource *    connection_setup_with_main_and_owner (DBusConnection  *connection,
+							     const char      *owner);
+static void            dbus_source_destroy                  (DBusSource      *dbus_source);
+static DBusConnection *get_connection_sync                  (const char      *bus_name,
+							     GError         **error);
 
 static gpointer
 vfs_dbus_init (gpointer arg)
@@ -379,7 +376,6 @@ typedef struct {
 
   DBusMessage *message;
   DBusConnection *connection;
-  GMainContext *context;
   GCancellable *cancellable;
 
   GVfsAsyncDBusCallback callback;
@@ -414,8 +410,6 @@ async_dbus_call_finish (AsyncDBusCall *async_call,
  
   g_free (async_call->owner);
   dbus_message_unref (async_call->message);
-  if (async_call->context)
-    g_main_context_unref (async_call->context);
   if (async_call->cancellable)
     g_object_unref (async_call->cancellable);
   if (async_call->io_error)
@@ -573,8 +567,7 @@ get_private_bus_async (AsyncDBusCall *async_call)
       
       /* Connect with mainloop */
       async_call->dbus_source =
-	set_connection_for_main_context (async_call->context, NULL,
-					 async_call->private_bus);
+	connection_setup_with_main_and_owner (async_call->private_bus, NULL);
 
       /* The connection is owned by the main context */
       dbus_connection_unref (async_call->private_bus);
@@ -686,7 +679,7 @@ async_get_connection_response (DBusPendingCall *pending,
 			   (GDestroyNotify)outstanding_fd_free);
 
   connection_data->extra_fd_source =
-    _g_fd_source_new (extra_fd, POLLIN, async_call->context, NULL);
+    _g_fd_source_new (extra_fd, POLLIN, NULL);
   g_source_set_callback (connection_data->extra_fd_source,
 			 (GSourceFunc)accept_new_fd, connection_data, NULL);
   
@@ -698,8 +691,7 @@ async_get_connection_response (DBusPendingCall *pending,
    * If so, just drop this connection and use that.
    */
   
-  existing_connection = get_connection_for_main_context (async_call->context,
-							 async_call->owner);
+  existing_connection = get_connection_for_owner (async_call->owner);
   if (existing_connection != NULL)
     {
       async_call->connection = existing_connection;
@@ -708,9 +700,8 @@ async_get_connection_response (DBusPendingCall *pending,
   else
     {  
       async_call->connection = connection;
-      source = set_connection_for_main_context (async_call->context,
-						async_call->owner,
-						connection);
+      source = connection_setup_with_main_and_owner (connection,
+						     async_call->owner);
       g_source_unref ((GSource *)source); /* Owned by context */
     }
   
@@ -811,7 +802,7 @@ async_get_name_owner_response (DBusPendingCall *pending,
 
   async_call->owner = g_strdup (owner);
 
-  async_call->connection = get_connection_for_main_context (async_call->context, async_call->owner);
+  async_call->connection = get_connection_for_owner (async_call->owner);
   if (async_call->connection == NULL)
     {
       open_connection_async (async_call);
@@ -868,7 +859,6 @@ do_find_owner_async (AsyncDBusCall *async_call)
 
 void
 _g_vfs_daemon_call_async (DBusMessage *message,
-			  GMainContext *context,
 			  gpointer op_callback,
 			  gpointer op_callback_data,
 			  GVfsAsyncDBusCallback callback,
@@ -882,8 +872,6 @@ _g_vfs_daemon_call_async (DBusMessage *message,
   async_call = g_new0 (AsyncDBusCall, 1);
   async_call->bus_name = dbus_message_get_destination (message);
   async_call->message = dbus_message_ref (message);
-  if (context)
-    async_call->context = g_main_context_ref (context);
   if (cancellable)
     async_call->cancellable = g_object_ref (cancellable);
   async_call->callback = callback;
@@ -898,7 +886,7 @@ _g_vfs_daemon_call_async (DBusMessage *message,
       return;
     }
     
-  async_call->connection = get_connection_for_main_context (context, async_call->owner);
+  async_call->connection = get_connection_for_owner (async_call->owner);
   if (async_call->connection == NULL)
     {
       open_connection_async (async_call);
@@ -1392,7 +1380,6 @@ struct DBusSource
   gboolean in_finalize;
   char *owner;
   DBusConnection *connection; /**< the dbus connection, owned */
-  GMainContext *context;      /**< the main context, not owed */
   GSList *ios;                /**< all IOHandler */
   GSList *timeouts;           /**< all TimeoutHandler */
 };
@@ -1411,27 +1398,8 @@ typedef struct
   DBusTimeout *timeout;
 } TimeoutHandler;
 
-static GHashTable *context_map = NULL;
-G_LOCK_DEFINE_STATIC(context_map);
-
-static guint
-dbus_source_hash (gconstpointer _key)
-{
-  const DBusSource *key = _key;
-  return g_str_hash (key->owner) ^ (guint)key->context;
-}
-  
-static gboolean
-dbus_source_equal (gconstpointer a,
-		   gconstpointer b)
-{
-  const DBusSource *aa = a;
-  const DBusSource *bb = b;
-  
-  return
-    strcmp (aa->owner, bb->owner) == 0 &&
-    aa->context == bb->context;
-}
+static GHashTable *owner_map = NULL;
+G_LOCK_DEFINE_STATIC(owner_map);
 
 static gboolean
 dbus_source_prepare (GSource *source,
@@ -1568,7 +1536,7 @@ dbus_source_add_watch (DBusSource *dbus_source,
   handler->watch = watch;
 
   handler->source = _g_fd_source_new (dbus_watch_get_fd (watch),
-				      condition, dbus_source->context, NULL);
+				      condition, NULL);
   g_source_set_callback (handler->source, (GSourceFunc) io_handler_dispatch, handler,
                          io_handler_source_finalized);
   g_source_unref (handler->source);
@@ -1660,7 +1628,7 @@ dbus_source_add_timeout (DBusSource *dbus_source,
   handler->source = g_timeout_source_new (dbus_timeout_get_interval (timeout));
   g_source_set_callback (handler->source, timeout_handler_dispatch, handler,
                          timeout_handler_source_finalized);
-  g_source_attach (handler->source, dbus_source->context);
+  g_source_attach (handler->source, NULL);
   g_source_unref (handler->source);
 
   /* handler->source is owned by the context here */
@@ -1757,7 +1725,7 @@ wakeup_main (void *data)
   DBusSource *source = data;
 
   if (!source->in_finalize)
-    g_main_context_wakeup (source->context);
+    g_main_context_wakeup (NULL);
 }
 
 static void
@@ -1770,11 +1738,11 @@ dbus_source_finalize (GSource *source)
 
   if (dbus_source->owner)
     {
-      G_LOCK (context_map);
-      if (context_map)
-	g_hash_table_remove (context_map,
-			     dbus_source);
-      G_UNLOCK (context_map);
+      G_LOCK (owner_map);
+      if (owner_map)
+	g_hash_table_remove (owner_map,
+			     dbus_source->owner);
+      G_UNLOCK (owner_map);
       g_free (dbus_source->owner);
     }
       
@@ -1816,31 +1784,22 @@ static const GSourceFuncs dbus_source_funcs = {
 };
 
 static DBusConnection *
-get_connection_for_main_context (GMainContext *context,
-				 const char *owner)
+get_connection_for_owner (const char *owner)
 {
   DBusConnection *connection;
-  DBusSource key;
   DBusSource *dbus_source;
 
-  if (context == NULL)
-    context = g_main_context_default ();
-  
   connection = NULL;
-  G_LOCK (context_map);
+  G_LOCK (owner_map);
   
-  if (context_map != NULL)
+  if (owner_map != NULL)
     {
-      key.owner = (char *)owner;
-      key.context = context;
-      
-      dbus_source = g_hash_table_lookup (context_map, &key);
+      dbus_source = g_hash_table_lookup (owner_map, owner);
       
       if (dbus_source)
 	connection = dbus_source->connection;
     }
-  
-  G_UNLOCK (context_map);
+  G_UNLOCK (owner_map);
   
   return connection;
 }
@@ -1858,21 +1817,17 @@ dbus_source_destroy (DBusSource *dbus_source)
 }
 
 static DBusSource *
-set_connection_for_main_context (GMainContext *context,
-				 const char *owner,
-				 DBusConnection *connection)
+connection_setup_with_main_and_owner (DBusConnection *connection,
+				      const char *owner)
 {
   DBusSource *dbus_source;
   
   g_assert (connection != NULL);
 
-  if (context == NULL)
-    context = g_main_context_default ();
- 
   dbus_source = (DBusSource *)
     g_source_new ((GSourceFuncs*)&dbus_source_funcs,
 		  sizeof (DBusSource));
-  dbus_source->context = context;
+  
   dbus_source->connection = dbus_connection_ref (connection);
   dbus_source->owner = g_strdup (owner);
   
@@ -1894,28 +1849,26 @@ set_connection_for_main_context (GMainContext *context,
 					    wakeup_main,
 					    dbus_source, NULL);
 
-  g_source_attach ((GSource *)dbus_source, context);
+  g_source_attach ((GSource *)dbus_source, NULL);
 
   if (owner)
     {
-      G_LOCK (context_map);
-      if (context_map == NULL)
-	context_map = g_hash_table_new_full (dbus_source_hash, dbus_source_equal,
-					     NULL, NULL);
-      g_hash_table_insert (context_map, dbus_source, dbus_source);
-      G_UNLOCK (context_map);
+      G_LOCK (owner_map);
+      if (owner_map == NULL)
+	owner_map = g_hash_table_new (g_str_hash, g_str_equal);
+      g_hash_table_insert (owner_map, dbus_source->owner, dbus_source);
+      G_UNLOCK (owner_map);
     }
 
   return dbus_source;
 }
 
 void
-_g_dbus_connection_setup_with_main (DBusConnection         *connection,
-				    GMainContext           *context)
+_g_dbus_connection_setup_with_main (DBusConnection *connection)
 {
   DBusSource *source;
   
-  source = set_connection_for_main_context (context, NULL, connection);
+  source = connection_setup_with_main_and_owner (connection, NULL);
   g_source_unref ((GSource *)source);
 }
 

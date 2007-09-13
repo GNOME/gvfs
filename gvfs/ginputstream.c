@@ -11,7 +11,6 @@ G_DEFINE_TYPE (GInputStream, g_input_stream, G_TYPE_OBJECT);
 struct _GInputStreamPrivate {
   guint closed : 1;
   guint pending : 1;
-  GMainContext *context;
   gpointer outstanding_callback;
 };
 
@@ -49,12 +48,6 @@ g_input_stream_finalize (GObject *object)
   if (!stream->priv->closed)
     g_input_stream_close (stream, NULL, NULL);
 
-  if (stream->priv->context)
-    {
-      g_main_context_unref (stream->priv->context);
-      stream->priv->context = NULL;
-    }
-  
   if (G_OBJECT_CLASS (g_input_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_input_stream_parent_class)->finalize) (object);
 }
@@ -396,52 +389,6 @@ g_input_stream_close (GInputStream  *stream,
   return res;
 }
 
-/**
- * g_input_stream_set_async_context:
- * @stream: A #GInputStream.
- * @context: a #GMainContext (if %NULL, the default context will be used)
- *
- * Set the mainloop @context to be used for asynchronous i/o.
- * If not set, or if set to %NULL the default context will be used.
- **/
-void
-g_input_stream_set_async_context (GInputStream *stream,
-				  GMainContext *context)
-{
-  g_return_if_fail (G_IS_INPUT_STREAM (stream));
-  g_return_if_fail (stream != NULL);
-
-  if (stream->priv->context)
-    g_main_context_unref (stream->priv->context);
-  
-  stream->priv->context = context;
-  
-  if (context)
-    g_main_context_ref (context);
-}
-  
-/**
- * g_input_stream_get_async_context:
- * @stream: A #GInputStream.
- *
- * Returns the mainloop used for async operation on this stream.
- * If you implement a stream you have to look at this to know what
- * context to use for async i/o. Returns NULL if the default
- * context is used.
- *
- * The context is set by the user by calling g_input_stream_set_async_context().
- *
- * Return value: A #GMainContext
- **/
-GMainContext *
-g_input_stream_get_async_context (GInputStream *stream)
-{
-  g_return_val_if_fail (G_IS_INPUT_STREAM (stream), NULL);
-  g_return_val_if_fail (stream != NULL, NULL);
-
-  return stream->priv->context;
-}
-
 typedef struct {
   GAsyncResult       generic;
   void              *buffer;
@@ -486,7 +433,6 @@ queue_read_async_result (GInputStream      *stream,
 
   _g_queue_async_result ((GAsyncResult *)res, stream,
 			 error, data,
-			 g_input_stream_get_async_context (stream),
 			 call_read_async_result);
 }
 
@@ -640,7 +586,6 @@ queue_skip_async_result (GInputStream      *stream,
 
   _g_queue_async_result ((GAsyncResult *)res, stream,
 			 error, data,
-			 g_input_stream_get_async_context (stream),
 			 call_skip_async_result);
 }
 
@@ -784,7 +729,6 @@ queue_close_async_result (GInputStream       *stream,
 
   _g_queue_async_result ((GAsyncResult *)res, stream,
 			 error, data,
-			 g_input_stream_get_async_context (stream),
 			 call_close_async_result);
 }
 
@@ -974,7 +918,6 @@ g_input_stream_real_read_async (GInputStream        *stream,
   op->op.data = data;
   
   g_schedule_io_job (read_op_func, op, NULL, io_priority,
-		     g_input_stream_get_async_context (stream),
 		     cancellable);
 }
 
@@ -1077,7 +1020,6 @@ g_input_stream_real_skip_async (GInputStream        *stream,
 			 op,
 			 NULL,
 			 io_priority,
-			 g_input_stream_get_async_context (stream),
 			 cancellable);
     }
   else
@@ -1157,6 +1099,5 @@ g_input_stream_real_close_async (GInputStream       *stream,
 		     op,
 		     NULL,
 		     io_priority,
-		     g_input_stream_get_async_context (stream),
 		     cancellable);
 }
