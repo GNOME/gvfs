@@ -82,7 +82,7 @@ const char *           g_file_info_get_mime_type         (GFileInfo         *inf
 GQuark                 g_file_info_get_mime_type_quark   (GFileInfo         *info);
 goffset                g_file_info_get_size              (GFileInfo         *info);
 time_t                 g_file_info_get_modification_time (GFileInfo         *info);
-const char *           g_file_info_get_link_target       (GFileInfo         *info);
+const char *           g_file_info_get_symlink_target    (GFileInfo         *info);
 GFileAccessRights      g_file_get_access_rights          (GFileInfo         *info);
 gboolean               g_file_info_can_read              (GFileInfo         *info);
 gboolean               g_file_info_can_write             (GFileInfo         *info);
