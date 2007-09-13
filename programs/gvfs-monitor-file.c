@@ -29,6 +29,9 @@ file_monitor_callback (GFileMonitor* monitor,
     case G_FILE_MONITOR_EVENT_CHANGED:
       g_print ("Event = CHANGED\n");
       break;
+    case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+      g_print ("Event = CHANGES_DONE_HINT\n");
+      break;
     case G_FILE_MONITOR_EVENT_DELETED:
       g_print ("Event = DELETED\n");
       break;
@@ -37,6 +40,9 @@ file_monitor_callback (GFileMonitor* monitor,
       break;
     case G_FILE_MONITOR_EVENT_UNMOUNTED:
       g_print ("Event = UNMOUNTED\n");
+      break;
+    case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
+      g_print ("Event = PRE_UNMOUNT\n");
       break;
     case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
       g_print ("Event = ATTRIB CHANGED\n");
