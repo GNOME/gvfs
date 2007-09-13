@@ -449,7 +449,7 @@ file_copy_fallback (GFile                  *source,
 	  g_error_free (my_error);
 	}
 	g_set_error (error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-		     _("Can't copy directory"));
+		     _("Can't recursively copy directory"));
 	return FALSE;
       }
     else
