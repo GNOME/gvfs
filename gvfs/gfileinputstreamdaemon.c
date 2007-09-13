@@ -117,8 +117,8 @@ struct _GFileInputStreamDaemonPrivate {
   InputState input_state;
   gsize input_block_size;
   int input_block_seek_generation;
-
   GString *input_buffer;
+  
   GString *output_buffer;
 };
 
@@ -439,7 +439,7 @@ run_sync_state_machine (GFileInputStreamDaemon *file,
 	}
       else
 	g_assert_not_reached ();
-      
+
       if (res == -1)
 	{
 	  if (error_is_cancel (io_error))
@@ -456,13 +456,18 @@ run_sync_state_machine (GFileInputStreamDaemon *file,
 	      return FALSE;
 	    }
 	}
+      else if (res == 0)
+	{
+	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		       _("Error in stream protocol: %s"), _("End of stream"));
+	  return FALSE;
+	}
       else
 	{
 	  io_data.io_res = res;
 	  io_data.io_cancelled = FALSE;
 	}
     }
-  while (io_op != STATE_OP_DONE);
 }
 
 /* read cycle:
@@ -655,12 +660,7 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 		op->state = READ_STATE_HANDLE_INPUT_BLOCK;
 		break;
 	      }
-	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS)
-	      {
-		/* Ignore when reading */
-	      }
-	    else
-	      g_assert_not_reached ();
+	    /* Ignore other reply types */
 	  }
 
 	  g_string_truncate (priv->input_buffer, 0);
@@ -983,8 +983,7 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 		g_string_truncate (priv->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
-	    else
-	      g_assert_not_reached ();
+	    /* Ignore other reply types */
 	  }
 
 	  g_string_truncate (priv->input_buffer, 0);
@@ -1001,10 +1000,8 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
       io_op->io_size = 0;
       io_op->io_res = 0;
       io_op->io_cancelled = FALSE;
- 
     }
 }
-
 
 static gboolean
 g_file_input_stream_daemon_seek (GFileInputStream *stream,
