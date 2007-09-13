@@ -8,10 +8,6 @@
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
-struct _GFilterOutputStreamPrivate {
-  int dummy;
-};
-
 enum {
   PROP_0,
   PROP_BASE_STREAM
@@ -78,8 +74,6 @@ g_filter_output_stream_class_init (GFilterOutputStreamClass *klass)
 {
   GObjectClass *object_class;
   GOutputStreamClass *ostream_class;
-
-  g_type_class_add_private (klass, sizeof (GFilterOutputStreamPrivate));
 
   object_class = G_OBJECT_CLASS (klass);
   object_class->get_property = g_filter_output_stream_get_property;
@@ -160,10 +154,8 @@ static void
 g_filter_output_stream_dispose (GObject *object)
 {
   GFilterOutputStream        *stream;
-  GFilterOutputStreamPrivate *priv;
 
   stream = G_FILTER_OUTPUT_STREAM (object);
-  priv = stream->priv;
 
   if (stream->base_stream)
     {
@@ -178,11 +170,7 @@ g_filter_output_stream_dispose (GObject *object)
 static void
 g_filter_output_stream_init (GFilterOutputStream *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream,
-                                              G_TYPE_FILTER_OUTPUT_STREAM,
-                                              GFilterOutputStreamPrivate);
 }
-
 
 GOutputStream *
 g_filter_output_stream_get_base_stream (GFilterOutputStream *stream)
