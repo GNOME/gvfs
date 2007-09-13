@@ -98,7 +98,7 @@ run (GVfsJob *job)
   GVfsJobMakeSymlink *op_job = G_VFS_JOB_MAKE_SYMLINK (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->delete == NULL)
+  if (class->make_symlink == NULL)
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Symlinks not supported by backend"));
@@ -117,7 +117,7 @@ try (GVfsJob *job)
   GVfsJobMakeSymlink *op_job = G_VFS_JOB_MAKE_SYMLINK (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->try_delete == NULL)
+  if (class->try_make_symlink == NULL)
     return FALSE;
   
   return class->try_make_symlink (op_job->backend,
