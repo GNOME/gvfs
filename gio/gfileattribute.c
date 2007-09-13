@@ -345,7 +345,8 @@ g_file_attribute_info_list_new (void)
   priv->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
   
   list_update_public (priv);
-  return FALSE;
+  
+  return (GFileAttributeInfoList *)priv;
 }
 
 GFileAttributeInfoList *
@@ -407,6 +408,9 @@ g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
 {
   int i;
 
+  if (list == NULL)
+    return G_FILE_ATTRIBUTE_TYPE_INVALID;
+  
   i = g_file_attribute_info_list_bsearch (list, name);
 
   if (i < list->n_infos && strcmp (list->infos[i].name, name) == 0)
