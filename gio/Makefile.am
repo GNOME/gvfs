@@ -68,6 +68,7 @@ libgio_la_SOURCES = 	\
 	gcancellable.c \
 	gcontenttype.c \
 	gcontenttypeprivate.h \
+	gdrive.c \
 	gfile.c \
 	gfileenumerator.c \
 	gfileinfo.c \
@@ -82,6 +83,8 @@ libgio_la_SOURCES = 	\
 	goutputstream.c \
 	gseekable.c \
 	gvfs.c \
+	gvolume.c \
+	gvolumemonitor.c \
 	$(appinfo_sources) \
 	$(socket_sources) \
 	$(local_sources) \
@@ -109,6 +112,7 @@ gvfsinclude_HEADERS = \
 	gappinfo.h \
 	gcancellable.h \
 	gcontenttype.h \
+	gdrive.h \
 	gfile.h \
 	gfileenumerator.h \
 	gfileinfo.h \
@@ -122,6 +126,8 @@ gvfsinclude_HEADERS = \
 	goutputstream.h \
 	gseekable.h \
 	gvfs.h \
+	gvolume.h \
+	gvolumemonitor.h \
 	$(NULL)
 
 noinst_PROGRAMS= \
