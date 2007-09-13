@@ -195,7 +195,7 @@ test_async (char *uri, gboolean dump)
   data->c = g_cancellable_new ();
 
   file = g_file_get_for_uri (uri);
-  g_file_read_async (file, 0, test_async_open_callback, data, NULL, data->c);
+  g_file_read_async (file, 0, test_async_open_callback, data, data->c);
   if (0) g_thread_create (cancel_thread, data->c, FALSE, NULL);
 }
 
@@ -223,14 +223,14 @@ test_seek (void)
   GError *error;
   GCancellable *c;
 
-  file = g_file_get_for_uri ("foo:///etc/passwd");
+  file = g_file_get_for_uri ("test:///etc/passwd");
 
   error = NULL;
   in = (GInputStream *)g_file_read (file, NULL, &error);
 
   if (in == NULL)
     {
-      g_print ("Can't find foo:///etc/passwd: %s\n", error->message);
+      g_print ("Can't find test:///etc/passwd: %s\n", error->message);
       g_error_free (error);
       return;
     }
@@ -307,8 +307,8 @@ main (int argc, char *argv[])
   
   file = g_file_get_for_path ("/tmp");
 
-  if (0) test_sync ("foo:///etc/passwd", FALSE);
-  if (1) test_async ("foo:///etc/passwd", TRUE);
+  if (0) test_sync ("test:///etc/passwd", FALSE);
+  if (1) test_async ("test:///etc/passwd", TRUE);
 
   if (0) test_out ();
 
