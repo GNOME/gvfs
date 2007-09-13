@@ -117,14 +117,15 @@ g_file_get_child (GFile *file,
 GFileEnumerator *
 g_file_enumerate_children (GFile *file,
 			   GFileInfoRequestFlags requested,
-			   const char *attributes)
+			   const char *attributes,
+			   gboolean follow_symlinks)
 			   
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->enumerate_children) (file, requested, attributes);
+  return (* iface->enumerate_children) (file, requested, attributes, follow_symlinks);
 }
 
 GFileInfo *
