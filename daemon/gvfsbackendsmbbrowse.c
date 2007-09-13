@@ -724,6 +724,8 @@ try_get_info (GVfsBackend *backend,
       g_vfs_job_get_info_set_info (job, requested & ~(G_FILE_INFO_DISPLAY_NAME|G_FILE_INFO_EDIT_NAME), info);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
+      
+      return TRUE;
     }
   
   if (cache_needs_updating (op_backend))
@@ -744,7 +746,7 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
   GList *files, *l;
   GFileInfo *info;
 
-  if (is_root (filename))
+  if (!is_root (filename))
     {
       GError *error = NULL;
       
