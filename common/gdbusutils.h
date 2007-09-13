@@ -10,7 +10,9 @@ G_BEGIN_DECLS
 typedef gboolean (*GFDSourceFunc) (gpointer data,
 				   GIOCondition condition,
 				   int fd);
-
+typedef void (*GAsyncDBusCallback) (DBusMessage *reply,
+				    GError *error,
+				    gpointer user_data);
 
 /* Only used internally, never on wire */
 #define G_DBUS_TYPE_CSTRING 1024
@@ -36,6 +38,8 @@ dbus_bool_t  _g_dbus_message_iter_get_args          (DBusMessageIter  *iter,
 						     ...);
 void         _g_error_from_dbus                     (DBusError        *derror,
 						     GError          **error);
+gboolean     _g_error_from_message                  (DBusMessage      *message,
+						     GError          **error);
 DBusMessage *_dbus_message_new_error_from_gerror    (DBusMessage      *message,
 						     GError           *error);
 char *       _g_dbus_unescape_bus_name              (const char       *escaped,
@@ -51,9 +55,10 @@ GSource *    __g_fd_source_new                      (int               fd,
 void         _g_dbus_message_iter_copy              (DBusMessageIter  *dest,
 						     DBusMessageIter  *source);
 void         _g_dbus_oom                            (void) G_GNUC_NORETURN;
-
-
-
+void        _g_dbus_connection_call_async           (DBusConnection *connection,
+						     DBusMessage *message,
+						     GAsyncDBusCallback callback,
+						     gpointer user_data);
 
 G_END_DECLS
 

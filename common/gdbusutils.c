@@ -6,6 +6,7 @@
 #include <glib/gi18n-lib.h>
 #include <gdbusutils.h>
 #include <gio/gcancellable.h>
+#include <gio/gvfserror.h>
 
 void
 _g_dbus_oom (void)
@@ -72,6 +73,23 @@ _dbus_message_new_error_from_gerror (DBusMessage *message,
   g_string_free (str, TRUE);
   return reply;
 }
+
+gboolean
+_g_error_from_message (DBusMessage      *message,
+		       GError          **error)
+{
+  DBusError derror;
+  
+  dbus_error_init (&derror);
+  if (dbus_set_error_from_message (&derror, message))
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      return TRUE;
+    }
+  return FALSE;
+}
+
 
 
 static void
@@ -1141,5 +1159,87 @@ _g_dbus_message_iter_copy (DBusMessageIter *dest,
       else
 	g_error ("Unsupported type %c in _g_dbus_message_iter_copy", type);
     }
+  
+}
+
+static dbus_int32_t async_call_slot = -1;
+
+static void
+async_call_reply (DBusPendingCall *pending,
+		  void            *user_data)
+{
+  DBusMessage *reply;
+  GError *error;
+  GAsyncDBusCallback callback;
+
+  reply = dbus_pending_call_steal_reply (pending);
+  callback = dbus_pending_call_get_data (pending, async_call_slot);
+  dbus_pending_call_unref (pending);
+  
+  error = NULL;
+  if (_g_error_from_message (reply, &error))
+    {
+      callback (NULL, error, user_data);
+      g_error_free (error);
+    }
+  else
+    callback (reply, NULL, user_data);
+  
+  dbus_message_unref (reply);
+}
+
+void
+_g_dbus_connection_call_async (DBusConnection *connection,
+			       DBusMessage *message,
+			       GAsyncDBusCallback callback,
+			       gpointer user_data)
+{
+  DBusPendingCall *pending_call;
+  DBusError derror;
+  
+  if (async_call_slot == -1)
+    {
+      if (!dbus_pending_call_allocate_data_slot (&async_call_slot))
+	_g_dbus_oom ();
+    }
+
+  if (connection == NULL)
+    {
+      dbus_error_init (&derror);
+      connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
+      if (connection == NULL)
+	{
+	  GError *error = NULL;
+	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
+		       "Can't open dbus connection");
+	  callback (NULL, error, user_data);
+	  g_error_free (error);
+	  return;
+	}
+    }
+
+  if (!dbus_connection_send_with_reply (connection, message, &pending_call, -1))
+    _g_dbus_oom ();
+  
+  if (pending_call == NULL)
+    {
+      GError *error = NULL;
+      g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   "Error while getting peer-to-peer dbus connection: %s",
+		   "Connection is closed");
+      callback (NULL, error, user_data);
+      g_error_free (error);
+      return;
+    }
+
+  if (!dbus_pending_call_set_data (pending_call,
+				   async_call_slot,
+				   callback, NULL))
+    _g_dbus_oom ();
+  
+  if (!dbus_pending_call_set_notify (pending_call,
+				     async_call_reply,
+				     user_data, NULL))
+    _g_dbus_oom ();
   
 }
