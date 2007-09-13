@@ -150,7 +150,6 @@ g_vfs_daemon_constructor (GType                  type,
   dbus_error_init (&error);
 
   ret = dbus_bus_request_name (conn, daemon->priv->mountpoint, 0, &error);
-  g_print ("ret: %d\n", ret);
   if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
     {
       g_printerr ("Failed to acquire vfs-daemon service: %s", error.message);

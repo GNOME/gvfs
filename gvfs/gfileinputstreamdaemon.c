@@ -24,6 +24,18 @@
 #define MAX_READ_SIZE (4*1024*1024)
 
 typedef enum {
+  INPUT_STATE_IN_REPLY_HEADER,
+  INPUT_STATE_IN_BLOCK,
+} InputState;
+
+typedef enum {
+  STATE_OP_DONE,
+  STATE_OP_READ,
+  STATE_OP_WRITE,
+  STATE_OP_SKIP,
+} StateOp;
+
+typedef enum {
   READ_STATE_INIT = 0,
   READ_STATE_WROTE_COMMAND,
   READ_STATE_HANDLE_INPUT,
@@ -32,29 +44,6 @@ typedef enum {
   READ_STATE_HANDLE_HEADER,
   READ_STATE_READ_BLOCK,
 } ReadState;
-
-typedef enum {
-  SEEK_STATE_INIT = 0,
-  SEEK_STATE_WROTE_REQUEST,
-  SEEK_STATE_HANDLE_INPUT,
-  SEEK_STATE_HANDLE_INPUT_BLOCK,
-  SEEK_STATE_SKIP_BLOCK,
-  SEEK_STATE_HANDLE_HEADER,
-} SeekState;
-
-
-typedef enum {
-  INPUT_STATE_IN_REPLY_HEADER,
-  INPUT_STATE_IN_BLOCK,
-} InputState;
-
-
-typedef enum {
-  STATE_OP_DONE,
-  STATE_OP_READ,
-  STATE_OP_WRITE,
-  STATE_OP_SKIP,
-} StateOp;
 
 typedef struct {
   ReadState state;
@@ -70,6 +59,15 @@ typedef struct {
   
   guint32 seq_nr;
 } ReadOperation;
+
+typedef enum {
+  SEEK_STATE_INIT = 0,
+  SEEK_STATE_WROTE_REQUEST,
+  SEEK_STATE_HANDLE_INPUT,
+  SEEK_STATE_HANDLE_INPUT_BLOCK,
+  SEEK_STATE_SKIP_BLOCK,
+  SEEK_STATE_HANDLE_HEADER,
+} SeekState;
 
 typedef struct {
   SeekState state;
@@ -87,6 +85,30 @@ typedef struct {
   
   guint32 seq_nr;
 } SeekOperation;
+
+typedef enum {
+  CLOSE_STATE_INIT = 0,
+  CLOSE_STATE_WROTE_REQUEST,
+  CLOSE_STATE_HANDLE_INPUT,
+  CLOSE_STATE_HANDLE_INPUT_BLOCK,
+  CLOSE_STATE_SKIP_BLOCK,
+  CLOSE_STATE_HANDLE_HEADER,
+} CloseState;
+
+typedef struct {
+  CloseState state;
+
+  /* Input */
+  
+  /* Output */
+  gboolean ret_val;
+  GError *ret_error;
+  
+  gboolean sent_cancel;
+  
+  guint32 seq_nr;
+} CloseOperation;
+
 
 typedef struct {
   gboolean cancelled;
@@ -554,7 +576,6 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 	  else
 	    {
 	      op->state = READ_STATE_SKIP_BLOCK;
-	      /* Reuse client buffer for skipping */
 	      io_op->io_buffer = NULL;
 	      io_op->io_size = priv->input_block_size;
 	      io_op->io_allow_cancel = !op->sent_cancel;
@@ -730,27 +751,227 @@ g_file_input_stream_daemon_skip (GInputStream *stream,
   return 0;
 }
 
+static StateOp
+iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, CloseOperation *op)
+{
+  GFileInputStreamDaemonPrivate *priv = file->priv;
+  gsize len;
+
+  while (TRUE)
+    {
+      switch (op->state)
+	{
+	  /* Initial state for read op */
+	case CLOSE_STATE_INIT:
+	  append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CLOSE,
+			  0, 0, &op->seq_nr);
+	  op->state = CLOSE_STATE_WROTE_REQUEST;
+	  io_op->io_buffer = priv->output_buffer->str;
+	  io_op->io_size = priv->output_buffer->len;
+	  io_op->io_allow_cancel = TRUE; /* Allow cancel before first byte of request sent */
+	  return STATE_OP_WRITE;
+
+	  /* wrote parts of output_buffer */
+	case CLOSE_STATE_WROTE_REQUEST:
+	  if (io_op->io_cancelled)
+	    {
+	      op->ret_val = FALSE;
+	      g_set_error (&op->ret_error,
+			   G_VFS_ERROR,
+			   G_VFS_ERROR_CANCELLED,
+			   _("Operation was cancelled"));
+	      return STATE_OP_DONE;
+	    }
+
+	  if (io_op->io_res < priv->output_buffer->len)
+	    {
+	      memcpy (priv->output_buffer->str,
+		      priv->output_buffer->str + io_op->io_res,
+		      priv->output_buffer->len - io_op->io_res);
+	      g_string_truncate (priv->output_buffer,
+				 priv->output_buffer->len - io_op->io_res);
+	      io_op->io_buffer = priv->output_buffer->str;
+	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_allow_cancel = FALSE;
+	      return STATE_OP_WRITE;
+	    }
+	  g_string_truncate (priv->output_buffer, 0);
+
+	  op->state = CLOSE_STATE_HANDLE_INPUT;
+	  break;
+
+	  /* No op */
+	case CLOSE_STATE_HANDLE_INPUT:
+	  if (io_op->cancelled && !op->sent_cancel)
+	    {
+	      op->sent_cancel = TRUE;
+	      append_request (file, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL,
+			      op->seq_nr, 0, NULL);
+	      op->state = CLOSE_STATE_WROTE_REQUEST;
+	      io_op->io_buffer = priv->output_buffer->str;
+	      io_op->io_size = priv->output_buffer->len;
+	      io_op->io_allow_cancel = FALSE;
+	      return STATE_OP_WRITE;
+	    }
+	  
+	  if (priv->input_state == INPUT_STATE_IN_BLOCK)
+	    {
+	      op->state = CLOSE_STATE_HANDLE_INPUT_BLOCK;
+	      break;
+	    }
+	  else if (priv->input_state == INPUT_STATE_IN_REPLY_HEADER)
+	    {
+	      op->state = CLOSE_STATE_HANDLE_HEADER;
+	      break;
+	    }
+	  g_assert_not_reached ();
+	  break;
+
+	  /* No op */
+	case CLOSE_STATE_HANDLE_INPUT_BLOCK:
+	  g_assert (priv->input_state == INPUT_STATE_IN_BLOCK);
+	  
+	  op->state = CLOSE_STATE_SKIP_BLOCK;
+	  io_op->io_buffer = NULL;
+	  io_op->io_size = priv->input_block_size;
+	  io_op->io_allow_cancel = !op->sent_cancel;
+	  return STATE_OP_SKIP;
+
+	  /* Read block data */
+	case CLOSE_STATE_SKIP_BLOCK:
+	  if (io_op->io_cancelled)
+	    {
+	      op->state = CLOSE_STATE_HANDLE_INPUT;
+	      break;
+	    }
+	  
+	  g_assert (io_op->io_res <= priv->input_block_size);
+	  priv->input_block_size -= io_op->io_res;
+	  
+	  if (priv->input_block_size == 0)
+	    priv->input_state = INPUT_STATE_IN_REPLY_HEADER;
+	  
+	  op->state = CLOSE_STATE_HANDLE_INPUT;
+	  break;
+	  
+	  /* read header data, (or manual io_len/res = 0) */
+	case CLOSE_STATE_HANDLE_HEADER:
+	  if (io_op->io_cancelled)
+	    {
+	      op->state = CLOSE_STATE_HANDLE_INPUT;
+	      break;
+	    }
+
+	  if (io_op->io_res > 0)
+	    {
+	      gsize unread_size = io_op->io_size - io_op->io_res;
+	      g_string_set_size (priv->input_buffer,
+				 priv->input_buffer->len - unread_size);
+	    }
+	  
+	  len = get_reply_header_missing_bytes (priv->input_buffer);
+	  if (len > 0)
+	    {
+	      gsize current_len = priv->input_buffer->len;
+	      g_string_set_size (priv->input_buffer,
+				 current_len + len);
+	      io_op->io_buffer = priv->input_buffer->str + current_len;
+	      io_op->io_size = len;
+	      io_op->io_allow_cancel = !op->sent_cancel;
+	      return STATE_OP_READ;
+	    }
+
+	  /* Got full header */
+
+	  {
+	    GVfsDaemonSocketProtocolReply reply;
+	    char *data;
+	    data = decode_reply (priv->input_buffer, &reply);
+
+	    if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR &&
+		reply.seq_nr == op->seq_nr)
+	      {
+		op->ret_val = FALSE;
+		decode_error (&reply, data, &op->ret_error);
+		g_string_truncate (priv->input_buffer, 0);
+		return STATE_OP_DONE;
+	      }
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_DATA)
+	      {
+		g_string_truncate (priv->input_buffer, 0);
+		priv->input_state = INPUT_STATE_IN_BLOCK;
+		priv->input_block_size = reply.arg1;
+		priv->input_block_seek_generation = reply.arg2;
+		op->state = CLOSE_STATE_HANDLE_INPUT_BLOCK;
+		break;
+	      }
+	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED)
+	      {
+		op->ret_val = TRUE;
+		g_string_truncate (priv->input_buffer, 0);
+		return STATE_OP_DONE;
+	      }
+	    /* Ignore other reply types */
+	  }
+
+	  g_string_truncate (priv->input_buffer, 0);
+	  
+	  /* This wasn't interesting, read next reply */
+	  op->state = CLOSE_STATE_HANDLE_HEADER;
+	  break;
+
+	default:
+	  g_assert_not_reached ();
+	}
+      
+      /* Clear io_op between non-op state switches */
+      io_op->io_size = 0;
+      io_op->io_res = 0;
+      io_op->io_cancelled = FALSE;
+    }
+}
+
+
 static gboolean
 g_file_input_stream_daemon_close (GInputStream *stream,
 				  GCancellable *cancellable,
 				  GError      **error)
 {
   GFileInputStreamDaemon *file;
-  GError *my_error;
+  CloseOperation op;
+  gboolean res;
 
   file = G_FILE_INPUT_STREAM_DAEMON (stream);
 
   if (file->priv->fd == -1)
     return TRUE;
 
-  my_error = NULL;
-  if (!g_output_stream_close (file->priv->command_stream, cancellable, error))
-    {
-      g_input_stream_close (file->priv->data_stream, cancellable, NULL);
-      return FALSE;
-    }
+  /* We need to do a full roundtrip to guarantee that the writes have
+     reached the disk. */
+
+  memset (&op, 0, sizeof (op));
+  op.state = CLOSE_STATE_INIT;
+
+  if (!run_sync_state_machine (file, (state_machine_iterator)iterate_close_state_machine,
+			       &op, cancellable, error))
+    return -1; /* IO Error */
+
+  if (op.ret_val == -1)
+    g_propagate_error (error, op.ret_error);
+  res = op.ret_val;
+
+  /* Return the first error, but close all streams */
+  if (res)
+    res = g_output_stream_close (file->priv->command_stream, cancellable, error);
+  else
+    g_output_stream_close (file->priv->command_stream, cancellable, NULL);
+    
+  if (res)
+    res = g_input_stream_close (file->priv->data_stream, NULL, error);
+  else
+    g_input_stream_close (file->priv->data_stream, NULL, NULL);
   
-  return g_input_stream_close (file->priv->data_stream, NULL, error);
+  return res;
 }
 
 static goffset

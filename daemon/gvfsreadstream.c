@@ -92,6 +92,8 @@ g_vfs_read_stream_finalize (GObject *object)
   
   if (read_stream->priv->remote_fd != -1)
     close (read_stream->priv->remote_fd);
+
+  g_assert (read_stream->priv->data == NULL);
   
   if (G_OBJECT_CLASS (g_vfs_read_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_read_stream_parent_class)->finalize) (object);
@@ -142,7 +144,8 @@ g_vfs_read_stream_connection_closed (GVfsReadStream *stream)
     return;
   stream->priv->connection_closed = TRUE;
   
-  if (stream->priv->current_job == NULL)
+  if (stream->priv->current_job == NULL &&
+      stream->priv->data != NULL)
     {
       stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->data);
       stream->priv->current_job_seq_nr = 0;
@@ -377,7 +380,10 @@ send_reply_cb (GOutputStream *output_stream,
   g_vfs_job_emit_finished (job);
 
   if (G_IS_VFS_JOB_CLOSE_READ (job))
-    g_signal_emit (stream, signals[CLOSED], 0);
+    {
+      g_signal_emit (stream, signals[CLOSED], 0);
+      stream->priv->data = NULL;
+    }
   else if (stream->priv->connection_closed)
     {
       stream->priv->current_job = g_vfs_job_close_read_new (stream, stream->priv->data);
