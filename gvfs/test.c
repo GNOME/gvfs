@@ -147,6 +147,15 @@ cancel_stream (gpointer data)
   return FALSE;
 }
 
+static gpointer
+cancel_thread (gpointer data)
+{
+  sleep (1);
+  g_input_stream_cancel (G_INPUT_STREAM (data));
+  return NULL;
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -158,24 +167,26 @@ main (int argc, char *argv[])
 
   loop = g_main_loop_new (NULL, FALSE);
 
-  if (0) {
+  if (1) {
     GInputStream *s;
     char *buffer;
-    //gssize res;
+    gssize res;
 
     buffer = g_malloc (1025);
     
     s = g_socket_input_stream_new (0, FALSE);
 
-    /*
-    res = g_input_stream_read (s, buffer, 128, NULL);
-    g_print ("res1: %d\n", res);
-    res = g_input_stream_read (s, buffer, 128, NULL);
-    g_print ("res2: %d\n", res);
-    */
+    if (1)
+      {
+	res = g_input_stream_read (s, buffer, 128, NULL);
+	g_print ("res1: %d\n", res);
+	g_thread_create(cancel_thread, s, FALSE, NULL);
+	res = g_input_stream_read (s, buffer, 128, NULL);
+	g_print ("res2: %d\n", res);
+      }
     
     g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, NULL);
-    g_timeout_add (1000, cancel_stream, s);
+    if (0) g_timeout_add (1000, cancel_stream, s);
     g_print ("main loop run\n");
     g_main_loop_run (loop);
     g_print ("main loop quit\n");
