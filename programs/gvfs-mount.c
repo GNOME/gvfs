@@ -10,8 +10,12 @@
 static int outstanding_mounts = 0;
 static GMainLoop *main_loop;
 
+
+static gboolean mount_mountable = FALSE;
+
 static GOptionEntry entries[] = 
 {
+	{ "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, "Mount as mountable", NULL },
 	{ NULL }
 };
 
@@ -74,6 +78,27 @@ ask_password_cb (GMountOperation *op,
 }
 
 static void
+mount_mountable_done_cb (GObject *object,
+			 GAsyncResult *res,
+			 gpointer user_data)
+{
+  GFile *target;
+  GError *error = NULL;
+  
+  target = g_file_mount_mountable_finish (G_FILE (object), res, &error);
+
+  if (target == NULL)
+    g_print ("Error mounting location: %s\n", error->message);
+  else
+    g_object_unref (target);
+  
+  outstanding_mounts--;
+  
+  if (outstanding_mounts == 0)
+    g_main_loop_quit (main_loop);
+}
+
+static void
 mount_done_cb (GObject *object,
 	       GAsyncResult *res,
 	       gpointer user_data)
@@ -92,6 +117,19 @@ mount_done_cb (GObject *object,
     g_main_loop_quit (main_loop);
 }
 
+static GMountOperation *
+new_mount_op (void)
+{
+  GMountOperation *op;
+  
+  op = g_mount_operation_new ();
+
+  g_signal_connect (op, "ask_password", (GCallback)ask_password_cb, NULL);
+
+  return op;
+}
+
+
 static void
 mount (GFile *file)
 {
@@ -100,11 +138,13 @@ mount (GFile *file)
   if (file == NULL)
     return;
 
-  op = g_mount_operation_new ();
+  op = new_mount_op ();
 
-  g_signal_connect (op, "ask_password", (GCallback)ask_password_cb, NULL);
-  
-  g_mount_for_location (file, op, NULL, mount_done_cb, op);
+  if (mount_mountable)
+    g_file_mount_mountable (file, op, NULL, mount_mountable_done_cb, op);
+  else
+    g_mount_for_location (file, op, NULL, mount_done_cb, op);
+    
   outstanding_mounts++;
 }
 

@@ -13,6 +13,7 @@
 #include <gio/gfile.h>
 
 #include "gvfsbackendsmbbrowse.h"
+#include "gvfsjobmountmountable.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
@@ -535,6 +536,35 @@ find_entry_unlocked (GVfsBackendSmbBrowse *backend,
   return found;
 }
 
+static GMountSpec *
+get_mount_spec_for_share (const char *server,
+			  const char *share)
+{
+  GMountSpec *mount_spec;
+  char *normalized;
+  
+  mount_spec = g_mount_spec_new ("smb-share");
+  normalized = normalize_smb_name (server, -1);
+  g_mount_spec_set (mount_spec, "server", normalized);
+  g_free (normalized);
+  normalized = normalize_smb_name (share, -1);
+  g_mount_spec_set (mount_spec, "share", normalized);
+  g_free (normalized);
+  
+  return mount_spec;
+}
+
+static gboolean
+is_root (const char *filename)
+{
+  const char *p;
+
+  p = filename;
+  while (*p == '/')
+    p++;
+
+  return *p == 0;
+}
 
 static gboolean
 has_name (GVfsBackendSmbBrowse *backend,
@@ -690,6 +720,94 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
+static void
+run_mount_mountable (GVfsBackendSmbBrowse *backend,
+		     GVfsJobMountMountable *job,
+		     const char *filename,
+		     GMountSource *mount_source)
+{
+  GFileInfo *info;
+  BrowseEntry *entry;
+  GError *error = NULL;
+  GMountSpec *mount_spec;
+
+  info = NULL;
+  g_mutex_lock (backend->entries_lock);
+  
+  entry = find_entry_unlocked (backend, filename);
+
+  if (entry)
+    {
+      if (backend->server != NULL &&
+	  entry->smbc_type == SMBC_FILE_SHARE)
+	{
+	  mount_spec = get_mount_spec_for_share (backend->server, entry->name);
+	  g_vfs_job_mount_mountable_set_target (job, mount_spec, "/", TRUE);
+	  g_mount_spec_unref (mount_spec);
+	}
+      else
+	g_set_error (&error,
+		     G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE,
+		     _("The file is not a mountable"));
+    }
+  else
+    g_set_error (&error,
+		 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+		 _("File doesn't exist"));
+      
+  g_mutex_unlock (backend->entries_lock);
+
+  if (error)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
+do_mount_mountable (GVfsBackend *backend,
+		    GVfsJobMountMountable *job,
+		    const char *filename,
+		    GMountSource *mount_source)
+{
+  GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
+
+  update_cache (op_backend);
+
+  run_mount_mountable (op_backend,
+		       job,
+		       filename,
+		       mount_source);
+}
+
+static gboolean
+try_mount_mountable (GVfsBackend *backend,
+		     GVfsJobMountMountable *job,
+		     const char *filename,
+		     GMountSource *mount_source)
+{
+  GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
+
+  if (is_root (filename))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE,
+			_("The file is not a mountable"));
+      return TRUE;
+    }
+  
+  if (cache_needs_updating (op_backend))
+    return FALSE;
+
+  run_mount_mountable (op_backend,
+		       job,
+		       filename,
+		       mount_source);
+  return TRUE;
+}
+
 static void 
 run_open_for_read (GVfsBackendSmbBrowse *backend,
 		    GVfsJobOpenForRead *job,
@@ -770,25 +888,12 @@ try_close_read (GVfsBackend *backend,
   return TRUE;
 }
 
-static gboolean
-is_root (const char *filename)
-{
-  const char *p;
-
-  p = filename;
-  while (*p == '/')
-    p++;
-
-  return *p == 0;
-}
-
 static GFileInfo *
 get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry)
 {
   GFileInfo *info;
   GMountSpec *mount_spec;
   GString *uri;
-  char *normalized;
   
   info = g_file_info_new ();
   g_file_info_set_name (info, entry->name);
@@ -809,13 +914,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry)
 	}
       else
 	{
-	  mount_spec = g_mount_spec_new ("smb-share");
-	  normalized = normalize_smb_name (backend->server, -1);
-	  g_mount_spec_set (mount_spec, "server", normalized);
-	  g_free (normalized);
-	  normalized = normalize_smb_name (entry->name, -1);
-	  g_mount_spec_set (mount_spec, "share", normalized);
-	  g_free (normalized);
+	  mount_spec = get_mount_spec_for_share (backend->server, entry->name);
 
 	  uri = g_string_new ("smb://");
 	  g_string_append_encoded (uri, backend->server, NULL, NULL);
@@ -1023,6 +1122,8 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
 
   backend_class->mount = do_mount;
   backend_class->try_mount = try_mount;
+  backend_class->mount_mountable = do_mount_mountable;
+  backend_class->try_mount_mountable = try_mount_mountable;
   backend_class->open_for_read = do_open_for_read;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;

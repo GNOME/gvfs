@@ -16,6 +16,7 @@
 #include <gvfsjobopenforwrite.h>
 #include <gvfsjobgetinfo.h>
 #include <gvfsjobenumerate.h>
+#include <gvfsjobmountmountable.h>
 #include <gdbusutils.h>
 
 enum {
@@ -267,6 +268,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE))
     job = g_vfs_job_open_for_write_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE))
+    job = g_vfs_job_mount_mountable_new (connection, message, backend);
 
   if (job)
     {

@@ -25,7 +25,8 @@ g_mount_spec_new (const char *type)
   spec = g_new0 (GMountSpec, 1);
   spec->ref_count = 1;
   spec->items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
-
+  spec->mount_prefix = g_strdup ("/");
+  
   if (type != NULL)
     g_mount_spec_set (spec, "type", type);
   
@@ -275,14 +276,16 @@ path_has_prefix (const char *path,
 		 const char *prefix)
 {
   int prefix_len;
-  
+
   if (prefix == NULL)
     return TRUE;
 
   prefix_len = strlen (prefix);
   
   if (strncmp (path, prefix, prefix_len) == 0 &&
-      (path[prefix_len] == 0 ||
+      (prefix_len == 0 || /* empty prefix always matches */
+       prefix[prefix_len - 1] == '/' || /* last char in prefix was a /, so it must be in path too */
+       path[prefix_len] == 0 ||
        path[prefix_len] == '/'))
     return TRUE;
   
@@ -360,3 +363,24 @@ g_mount_spec_get_type (GMountSpec *spec)
   return g_mount_spec_get (spec, "type");
 }
  
+char *
+g_mount_spec_to_string (GMountSpec *spec)
+{
+  GString *str;
+  int i;
+
+  if (spec == NULL)
+    return g_strdup ("(null)");
+
+  str = g_string_new ("");
+
+  for (i = 0; i < spec->items->len; i++)
+    {
+      GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
+
+      g_string_append_printf (str, "%s='%s',", item->key, item->value);
+    }
+  g_string_append_printf (str, "mount_prefix='%s'", spec->mount_prefix);
+
+  return g_string_free (str, FALSE);
+}

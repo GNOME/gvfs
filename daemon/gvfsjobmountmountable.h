@@ -24,6 +24,10 @@ struct _GVfsJobMountMountable
   GVfsBackend *backend;
   char *filename;
   GMountSource *mount_source;
+
+  char *target_filename;
+  GMountSpec *mount_spec;
+  gboolean must_mount_location;
 };
 
 struct _GVfsJobMountMountableClass
@@ -33,9 +37,13 @@ struct _GVfsJobMountMountableClass
 
 GType g_vfs_job_mount_mountable_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_mount_mountable_new (DBusConnection        *connection,
-					DBusMessage           *message,
-					GVfsBackend           *backend);
+GVfsJob *g_vfs_job_mount_mountable_new        (DBusConnection        *connection,
+					       DBusMessage           *message,
+					       GVfsBackend           *backend);
+void     g_vfs_job_mount_mountable_set_target (GVfsJobMountMountable *job,
+					       GMountSpec            *mount_spec,
+					       const char            *filename,
+					       gboolean               must_mount_location);
 
 G_END_DECLS
 

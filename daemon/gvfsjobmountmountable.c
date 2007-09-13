@@ -29,8 +29,12 @@ g_vfs_job_mount_mountable_finalize (GObject *object)
 
   if (job->mount_source)
     g_object_unref (job->mount_source);
+
+  if (job->mount_spec)
+    g_mount_spec_unref (job->mount_spec);
   
   g_free (job->filename);
+  g_free (job->target_filename);
   
   if (G_OBJECT_CLASS (g_vfs_job_mount_mountable_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_mount_mountable_parent_class)->finalize) (object);
@@ -98,6 +102,17 @@ g_vfs_job_mount_mountable_new (DBusConnection *connection,
   return G_VFS_JOB (job);
 }
 
+void
+g_vfs_job_mount_mountable_set_target (GVfsJobMountMountable *job,
+				      GMountSpec *mount_spec,
+				      const char *filename,
+				      gboolean must_mount_location)
+{
+  job->mount_spec = g_mount_spec_ref (mount_spec);
+  job->target_filename = g_strdup (filename);
+  job->must_mount_location = must_mount_location;
+}
+
 static void
 run (GVfsJob *job)
 {
@@ -131,13 +146,20 @@ create_reply (GVfsJob *job,
 	      DBusConnection *connection,
 	      DBusMessage *message)
 {
+  GVfsJobMountMountable *op_job = G_VFS_JOB_MOUNT_MOUNTABLE (job);
   DBusMessage *reply;
   DBusMessageIter iter;
+  dbus_bool_t must_mount;
 
   reply = dbus_message_new_method_return (message);
 
   dbus_message_iter_init_append (reply, &iter);
-  /* TODO: Add result here */
+  g_mount_spec_to_dbus (&iter, op_job->mount_spec);
+  must_mount = op_job->must_mount_location;
+  _g_dbus_message_append_args (reply,
+			       G_DBUS_TYPE_CSTRING, &op_job->target_filename,
+			       DBUS_TYPE_BOOLEAN, &must_mount,
+			       0);
   
   return reply;
 }

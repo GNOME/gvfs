@@ -852,6 +852,24 @@ g_daemon_file_replace (GFile *file,
   return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
+static void
+mount_mountable_location_mounted_cb (GObject *source_object,
+				     GAsyncResult *res,
+				     gpointer user_data)
+{
+  GSimpleAsyncResult *result = user_data;
+  GError *error = NULL;
+  
+  if (!g_mount_for_location_finish (G_FILE (source_object), res, &error))
+    {
+      g_simple_async_result_set_from_error (result, error);
+      g_error_free (error);
+    }
+
+  g_simple_async_result_complete (result);
+  g_object_unref (result);
+
+}
 
 static void
 mount_mountable_async_cb (DBusMessage *reply,
@@ -860,11 +878,12 @@ mount_mountable_async_cb (DBusMessage *reply,
 			  GCancellable *cancellable,
 			  gpointer callback_data)
 {
+  GMountOperation *mount_operation = callback_data;
   GMountSpec *mount_spec;
   char *path;
   DBusMessageIter iter;
-  g_simple_async_result_complete (result);
   GFile *file;
+  dbus_bool_t must_mount_location;
 
   path = NULL;
   
@@ -874,11 +893,13 @@ mount_mountable_async_cb (DBusMessage *reply,
   if (mount_spec == NULL ||
       !_g_dbus_message_iter_get_args (&iter, NULL,
 				      G_DBUS_TYPE_CSTRING, &path,
+				      DBUS_TYPE_BOOLEAN, &must_mount_location,
 				      0))
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
 				       _("Invalid return value from call"));
+      g_simple_async_result_complete (result);
     }
   else
     {
@@ -886,8 +907,19 @@ mount_mountable_async_cb (DBusMessage *reply,
       g_mount_spec_unref (mount_spec);
       g_free (path);
       g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
+
+      if (must_mount_location)
+	{
+	  g_mount_for_location (file,
+				mount_operation,
+				cancellable,
+				mount_mountable_location_mounted_cb,
+				g_object_ref (result));
+	  
+	}
+      else
+	g_simple_async_result_complete (result);
     }
-  g_simple_async_result_complete (result);
 }
 
 static void

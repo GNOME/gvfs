@@ -66,6 +66,9 @@ const char *g_mount_spec_get               (GMountSpec      *spec,
 					    const char      *key);
 const char *g_mount_spec_get_type          (GMountSpec      *spec);
 
+/* For debugging */
+char *      g_mount_spec_to_string         (GMountSpec      *spec);
+
 G_END_DECLS
 
 
