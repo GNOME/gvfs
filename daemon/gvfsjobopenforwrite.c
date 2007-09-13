@@ -247,6 +247,8 @@ create_reply (GVfsJob *job,
   g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
   open_job->backend_handle = NULL;
   open_job->write_channel = channel;
+
+  g_signal_emit_by_name (job, "new-source", open_job->write_channel);
   
   return reply;
 }
@@ -254,9 +256,4 @@ create_reply (GVfsJob *job,
 static void
 finished (GVfsJob *job)
 {
-  GVfsJobOpenForWrite *open_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
-
-  if (open_job->write_channel)
-    g_signal_emit_by_name (job, "new-source", open_job->write_channel);
-  
 }
