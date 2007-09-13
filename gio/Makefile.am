@@ -115,6 +115,8 @@ libgio_la_SOURCES = 	\
 	gmemoryoutputstream.c \
 	gmountoperation.c \
 	goutputstream.c \
+	gpollfilemonitor.c \
+	gpollfilemonitor.h \
 	gseekable.c \
 	gsimpleasyncresult.c \
 	gsimpleasyncresult.h \

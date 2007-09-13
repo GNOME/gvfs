@@ -10,6 +10,7 @@
 #include <glib/gi18n-lib.h>
 #include <glocalfile.h>
 #include "gsimpleasyncresult.h"
+#include "gpollfilemonitor.h"
 
 static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
@@ -64,6 +65,7 @@ static gboolean           g_file_real_set_attributes_from_info (GFile           
 								GFileGetInfoFlags     flags,
 								GCancellable         *cancellable,
 								GError              **error);
+static GFileMonitor*      g_file_real_monitor_file              (GFile               *file);
 
 GType
 g_file_get_type (void)
@@ -101,6 +103,7 @@ g_file_class_init (gpointer g_class,
 {
   GFileIface *iface = g_class;
 
+  iface->monitor_file = g_file_real_monitor_file;
   iface->get_info_async = g_file_real_get_info_async;
   iface->get_info_finish = g_file_real_get_info_finish;
   iface->read_async = g_file_real_read_async;
@@ -1500,6 +1503,12 @@ g_file_monitor_file (GFile *file)
   return (* iface->monitor_file) (file);
 }
 
+/* Fallback to polling */
+static GFileMonitor*
+g_file_real_monitor_file (GFile *file)
+{
+  return g_poll_file_monitor_new (file);
+}
 
 /********************************************
  *   Default implementation of async ops    *
