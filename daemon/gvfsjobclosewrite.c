@@ -64,6 +64,13 @@ g_vfs_job_close_write_new (GVfsWriteChannel *channel,
   return G_VFS_JOB (job);
 }
 
+void
+g_vfs_job_close_write_set_etag (GVfsJobCloseWrite *job,
+				const char *etag)
+{
+  job->etag = g_strdup (etag);
+}
+
 /* Might be called on an i/o thwrite */
 static void
 send_reply (GVfsJob *job)
@@ -75,7 +82,7 @@ send_reply (GVfsJob *job)
   if (job->failed)
     g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);
   else
-    g_vfs_write_channel_send_closed (op_job->channel);
+    g_vfs_write_channel_send_closed (op_job->channel, op_job->etag ? op_job->etag : "");
 }
 
 static void

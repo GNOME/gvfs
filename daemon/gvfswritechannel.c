@@ -156,7 +156,8 @@ g_vfs_write_channel_send_seek_offset (GVfsWriteChannel *write_channel,
 /* Might be called on an i/o thread
  */
 void
-g_vfs_write_channel_send_closed (GVfsWriteChannel *write_channel)
+g_vfs_write_channel_send_closed (GVfsWriteChannel *write_channel,
+				 const char       *etag)
 {
   GVfsDaemonSocketProtocolReply reply;
   GVfsChannel *channel;
@@ -166,9 +167,9 @@ g_vfs_write_channel_send_closed (GVfsWriteChannel *write_channel)
   reply.type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED);
   reply.seq_nr = g_htonl (g_vfs_channel_get_current_seq_nr (channel));
   reply.arg1 = g_htonl (0);
-  reply.arg2 = g_htonl (0);
+  reply.arg2 = g_htonl (strlen (etag));
 
-  g_vfs_channel_send_reply (channel, &reply, NULL, 0);
+  g_vfs_channel_send_reply (channel, &reply, etag, strlen (etag));
 }
 
 /* Might be called on an i/o thread

@@ -125,6 +125,9 @@ struct _GDaemonFileOutputStream {
   GString *input_buffer;
   
   GString *output_buffer;
+
+  char *etag;
+  
 };
 
 static gssize     g_daemon_file_output_stream_write         (GOutputStream              *stream,
@@ -137,6 +140,9 @@ static gboolean   g_daemon_file_output_stream_close         (GOutputStream      
 							     GError                    **error);
 static GFileInfo *g_daemon_file_output_stream_get_file_info (GFileOutputStream          *stream,
 							     char                       *attributes,
+							     GCancellable               *cancellable,
+							     GError                    **error);
+static char      *g_daemon_file_output_stream_get_etag      (GFileOutputStream          *stream,
 							     GCancellable               *cancellable,
 							     GError                    **error);
 static goffset    g_daemon_file_output_stream_tell          (GFileOutputStream          *stream);
@@ -182,6 +188,8 @@ g_daemon_file_output_stream_finalize (GObject *object)
 
   g_string_free (file->input_buffer, TRUE);
   g_string_free (file->output_buffer, TRUE);
+
+  g_free (file->etag);
   
   if (G_OBJECT_CLASS (g_daemon_file_output_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_file_output_stream_parent_class)->finalize) (object);
@@ -208,7 +216,7 @@ g_daemon_file_output_stream_class_init (GDaemonFileOutputStreamClass *klass)
   file_stream_class->can_seek = g_daemon_file_output_stream_can_seek;
   file_stream_class->seek = g_daemon_file_output_stream_seek;
   file_stream_class->get_file_info = g_daemon_file_output_stream_get_file_info;
-
+  file_stream_class->get_etag = g_daemon_file_output_stream_get_etag;
 }
 
 static void
@@ -278,8 +286,10 @@ get_reply_header_missing_bytes (GString *buffer)
 
   type = g_ntohl (reply->type);
   arg2 = g_ntohl (reply->arg2);
-  
-  if (type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR)
+
+  /* ERROR and CLOSED has extra data w/ len in arg2 */
+  if (type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR ||
+      type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED)
     return G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE + arg2 - buffer->len;
   return 0;
 }
@@ -679,6 +689,8 @@ iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	    else if (reply.type == G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED)
 	      {
 		op->ret_val = TRUE;
+		if (reply.arg2 > 0)
+		  file->etag = g_strndup (data, reply.arg2);
 		g_string_truncate (file->input_buffer, 0);
 		return STATE_OP_DONE;
 	      }
@@ -939,6 +951,23 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
     file->current_offset = op.ret_offset;
   
   return op.ret_val;
+}
+
+static char *
+g_daemon_file_output_stream_get_etag (GFileOutputStream     *stream,
+				      GCancellable         *cancellable,
+				      GError              **error)
+{
+  GDaemonFileOutputStream *file;
+
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
+
+  if (file->etag)
+    return file->etag;
+  
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+	       _("etag not supported on stream"));
+  return NULL;
 }
 
 static GFileInfo *

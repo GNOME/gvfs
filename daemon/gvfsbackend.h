@@ -134,12 +134,12 @@ struct _GVfsBackendClass
   gboolean (*try_replace)       (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
 				 const char *filename,
-				 time_t mtime,
+				 const char *etag,
 				 gboolean make_backup);
   void     (*replace)           (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
 				 const char *filename,
-				 time_t mtime,
+				 const char *etag,
 				 gboolean make_backup);
   void     (*close_write)       (GVfsBackend *backend,
 				 GVfsJobCloseWrite *job,

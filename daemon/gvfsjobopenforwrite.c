@@ -35,6 +35,7 @@ g_vfs_job_open_for_write_finalize (GObject *object)
     g_object_unref (job->write_channel);
   
   g_free (job->filename);
+  g_free (job->etag);
   
   if (G_OBJECT_CLASS (g_vfs_job_open_for_write_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_open_for_write_parent_class)->finalize) (object);
@@ -71,7 +72,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
   char *path;
   guint16 mode;
   dbus_bool_t make_backup;
-  guint64 mtime;
+  const char *etag;
 
   path = NULL;
   dbus_error_init (&derror);
@@ -79,7 +80,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
   if (!_g_dbus_message_iter_get_args (&iter, &derror, 
 				      G_DBUS_TYPE_CSTRING, &path,
 				      DBUS_TYPE_UINT16, &mode,
-				      DBUS_TYPE_UINT64, &mtime,
+				      DBUS_TYPE_STRING, &etag,
 				      DBUS_TYPE_BOOLEAN, &make_backup,
 				      0))
     {
@@ -100,7 +101,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
 
   job->filename = path;
   job->mode = mode;
-  job->mtime = (time_t)mtime;
+  job->etag = g_strdup (etag);
   job->make_backup = make_backup;
   job->backend = backend;
   
@@ -151,7 +152,7 @@ run (GVfsJob *job)
       class->replace (op_job->backend,
 		      op_job,
 		      op_job->filename,
-		      op_job->mtime,
+		      op_job->etag,
 		      op_job->make_backup);
     }
   else
@@ -187,7 +188,7 @@ try (GVfsJob *job)
       return class->try_replace (op_job->backend,
 				 op_job,
 				 op_job->filename,
-				 op_job->mtime,
+				 op_job->etag,
 				 op_job->make_backup);
     }
   else

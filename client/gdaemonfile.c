@@ -805,18 +805,19 @@ g_daemon_file_append_to (GFile *file,
   guint32 fd_id;
   dbus_bool_t can_seek;
   guint16 mode;
-  guint64 mtime, initial_offset;
+  guint64 initial_offset;
   dbus_bool_t make_backup;
+  char *etag;
 
   mode = 1;
-  mtime = 0;
+  etag = "";
   make_backup = FALSE;
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
-			     DBUS_TYPE_UINT64, &mtime,
+			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &make_backup,
 			     0);
   if (reply == NULL)
@@ -858,18 +859,19 @@ g_daemon_file_create (GFile *file,
   guint32 fd_id;
   dbus_bool_t can_seek;
   guint16 mode;
-  guint64 mtime, initial_offset;
+  guint64 initial_offset;
   dbus_bool_t make_backup;
+  char *etag;
 
   mode = 0;
-  mtime = 0;
+  etag = "";
   make_backup = FALSE;
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
-			     DBUS_TYPE_UINT64, &mtime,
+			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &make_backup,
 			     0);
   if (reply == NULL)
@@ -902,7 +904,7 @@ g_daemon_file_create (GFile *file,
 
 static GFileOutputStream *
 g_daemon_file_replace (GFile *file,
-		       time_t mtime,
+		       const char *etag,
 		       gboolean make_backup,
 		       GCancellable *cancellable,
 		       GError **error)
@@ -913,18 +915,17 @@ g_daemon_file_replace (GFile *file,
   guint32 fd_id;
   dbus_bool_t can_seek;
   guint16 mode;
-  guint64 dbus_mtime, initial_offset;
+  guint64 initial_offset;
   dbus_bool_t dbus_make_backup;
 
   mode = 2;
-  dbus_mtime = mtime;
   dbus_make_backup = make_backup;
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
 			     &connection, cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
-			     DBUS_TYPE_UINT64, &dbus_mtime,
+			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &dbus_make_backup,
 			     0);
   if (reply == NULL)

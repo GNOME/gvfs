@@ -29,7 +29,7 @@ struct _GVfsJobOpenForWrite
 
   GVfsJobOpenForWriteMode mode;
   char *filename;
-  time_t mtime;
+  char *etag;
   gboolean make_backup;
   
   GVfsBackend *backend;

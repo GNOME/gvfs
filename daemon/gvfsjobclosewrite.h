@@ -20,6 +20,7 @@ struct _GVfsJobCloseWrite
 {
   GVfsJob parent_instance;
 
+  char *etag;
   GVfsWriteChannel *channel;
   GVfsBackend *backend;
   GVfsBackendHandle handle;
@@ -35,6 +36,9 @@ GType g_vfs_job_close_write_get_type (void) G_GNUC_CONST;
 GVfsJob *g_vfs_job_close_write_new (GVfsWriteChannel   *channel,
 				    GVfsBackendHandle  handle,
 				    GVfsBackend       *backend);
+
+void     g_vfs_job_close_write_set_etag (GVfsJobCloseWrite *job,
+					 const char *etag);
 
 G_END_DECLS
 

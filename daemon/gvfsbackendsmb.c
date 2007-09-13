@@ -837,17 +837,23 @@ copy_file (GVfsBackendSmb *backend,
   return succeeded;
 }
 
+static char *
+create_etag (struct stat *statbuf)
+{
+  return g_strdup_printf ("%ld", statbuf->st_mtime);
+}
+
 static void
 do_replace (GVfsBackend *backend,
 	    GVfsJobOpenForWrite *job,
 	    const char *filename,
-	    time_t mtime,
+	    const char *etag,
 	    gboolean make_backup)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   struct stat original_stat;
   int res;
-  char *uri, *tmp_uri, *backup_uri;
+  char *uri, *tmp_uri, *backup_uri, *current_etag;
   SMBCFILE *file;
   GError *error = NULL;
   SmbWriteHandle *handle;
@@ -870,17 +876,23 @@ do_replace (GVfsBackend *backend,
     }
   else if (file == NULL && errno == EEXIST)
     {
-      if (mtime != 0)
+      if (etag != NULL)
 	{
 	  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &original_stat);
-	  if (res == 0 &&
-	      original_stat.st_mtime != mtime)
+	  
+	  if (res == 0)
 	    {
-	      g_set_error (&error,
-			   G_IO_ERROR,
-			   G_IO_ERROR_WRONG_ETAG,
-			   _("The file was externally modified"));
-	      goto error;
+	      current_etag = create_etag (&original_stat);
+	      if (strcmp (etag, current_etag) != 0)
+		{
+		  g_free (current_etag);
+		  g_set_error (&error,
+			       G_IO_ERROR,
+			       G_IO_ERROR_WRONG_ETAG,
+			       _("The file was externally modified"));
+		  goto error;
+		}
+	      g_free (current_etag);
 	    }
 	}
       
