@@ -42,7 +42,11 @@ Handle unmounted paths nicer in the API (i.e. an explicit not-mounted error)
 Don't export struct stat in API, its size depends on OS and lfs defines...
 
 Change all error handling to be more consistent and sane.
-
+ - better enums. Not use G_FILE?
+ - how to handle "error chaining"
+ - _g_error_from_message() helper?
+ - sane consistent not-mounted errors
+ 
 FUTURE IDEAS:
 -------------
 
