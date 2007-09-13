@@ -766,13 +766,13 @@ g_output_stream_set_pending (GOutputStream              *stream,
 /********************************************
  *   Default implementation of async ops    *
  ********************************************/
+
 typedef struct {
   GOutputStream     *stream;
   GError            *error;
   gpointer           data;
   GDestroyNotify     notify;
 } OutputStreamOp;
-
 
 static void
 output_stream_op_free (gpointer data)
@@ -788,6 +788,16 @@ output_stream_op_free (gpointer data)
   g_free (op);
 }
 
+static void
+output_stream_op_cancel (gpointer data)
+{
+  OutputStreamOp *op = data;
+  GOutputStreamClass *class;
+
+  class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+  if (class->cancel_sync)
+    class->cancel_sync (op->stream);
+}
 
 typedef struct {
   OutputStreamOp      op;
@@ -840,17 +850,6 @@ write_op_func (GIOJob *job,
 }
 
 static void
-write_op_cancel (gpointer data)
-{
-  WriteAsyncOp *op = data;
-  GOutputStreamClass *class;
-
-  class = G_OUTPUT_STREAM_GET_CLASS (op->op.stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->op.stream);
-}
-
-static void
 g_output_stream_real_write_async (GOutputStream       *stream,
 				  void                *buffer,
 				  gsize                count,
@@ -871,7 +870,7 @@ g_output_stream_real_write_async (GOutputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (write_op_func,
-					       write_op_cancel,
+					       output_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -926,17 +925,6 @@ flush_op_func (GIOJob *job,
 }
 
 static void
-flush_op_cancel (gpointer data)
-{
-  FlushAsyncOp *op = data;
-  GOutputStreamClass *class;
-
-  class = G_OUTPUT_STREAM_GET_CLASS (op->op.stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->op.stream);
-}
-
-static void
 g_output_stream_real_flush_async (GOutputStream       *stream,
 				  int                  io_priority,
 				  GAsyncFlushCallback  callback,
@@ -953,7 +941,7 @@ g_output_stream_real_flush_async (GOutputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (flush_op_func,
-					       flush_op_cancel,
+					       output_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -1005,17 +993,6 @@ close_op_func (GIOJob *job,
 }
 
 static void
-close_op_cancel (gpointer data)
-{
-  CloseAsyncOp *op = data;
-  GOutputStreamClass *class;
-
-  class = G_OUTPUT_STREAM_GET_CLASS (op->op.stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->op.stream);
-}
-
-static void
 g_output_stream_real_close_async (GOutputStream       *stream,
 				  int                  io_priority,
 				  GAsyncCloseOutputCallback callback,
@@ -1032,7 +1009,7 @@ g_output_stream_real_close_async (GOutputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (close_op_func,
-					       close_op_cancel,
+					       output_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,

@@ -864,6 +864,17 @@ input_stream_op_free (gpointer data)
   g_free (op);
 }
 
+static void
+input_stream_op_cancel (gpointer data)
+{
+  InputStreamOp *op = data;
+  GInputStreamClass *class;
+
+  class = G_INPUT_STREAM_GET_CLASS (op->stream);
+  if (class->cancel_sync)
+    class->cancel_sync (op->stream);
+}
+
 typedef struct {
   InputStreamOp      op;
   void              *buffer;
@@ -914,17 +925,6 @@ read_op_func (GIOJob *job,
 }
 
 static void
-read_op_cancel (gpointer data)
-{
-  ReadAsyncOp *op = data;
-  GInputStreamClass *class;
-
-  class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->op.stream);
-}
-
-static void
 g_input_stream_real_read_async (GInputStream        *stream,
 				void                *buffer,
 				gsize                count,
@@ -945,7 +945,7 @@ g_input_stream_real_read_async (GInputStream        *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (read_op_func,
-					       read_op_cancel,
+					       input_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -1000,17 +1000,6 @@ skip_op_func (GIOJob *job,
 }
 
 static void
-skip_op_cancel (gpointer data)
-{
-  SkipAsyncOp *op = data;
-  GInputStreamClass *class;
-
-  class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->op.stream);
-}
-
-static void
 g_input_stream_real_skip_async (GInputStream        *stream,
 				gsize                count,
 				int                  io_priority,
@@ -1029,7 +1018,7 @@ g_input_stream_real_skip_async (GInputStream        *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (skip_op_func,
-					       skip_op_cancel,
+					       input_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
@@ -1081,17 +1070,6 @@ close_op_func (GIOJob *job,
 }
 
 static void
-close_op_cancel (gpointer data)
-{
-  CloseAsyncOp *op = data;
-  GInputStreamClass *class;
-
-  class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
-  if (class->cancel_sync)
-    class->cancel_sync (op->op.stream);
-}
-
-static void
 g_input_stream_real_close_async (GInputStream       *stream,
 				 int                 io_priority,
 				 GAsyncCloseInputCallback callback,
@@ -1108,7 +1086,7 @@ g_input_stream_real_close_async (GInputStream       *stream,
   op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (close_op_func,
-					       close_op_cancel,
+					       input_stream_op_cancel,
 					       op,
 					       NULL,
 					       io_priority,
