@@ -42,7 +42,6 @@ typedef struct
 {
   GSource source;
   GPollFD pollfd;
-  GObject *object;
   GCancellable *cancellable;
   gulong cancelled_tag;
 } FDSource;
@@ -78,7 +77,7 @@ fd_source_dispatch (GSource     *source,
 
   g_assert (func != NULL);
 
-  (*func) (user_data, fd_source->object, fd_source->pollfd.fd);
+  (*func) (user_data, fd_source->pollfd.fd);
   return FALSE;
 }
 
@@ -93,7 +92,6 @@ fd_source_finalize (GSource *source)
 
   if (fd_source->cancellable)
     g_object_unref (fd_source->cancellable);
-  g_object_unref (fd_source->object);
 }
 
 static GSourceFuncs fd_source_funcs = {
@@ -124,8 +122,7 @@ cancel_closure_notify (gpointer	 data,
 }
 
 GSource *
-_g_fd_source_new (GObject *object,
-		  int fd,
+_g_fd_source_new (int fd,
 		  gushort events,
 		  GMainContext *context,
 		  GCancellable *cancellable)
@@ -136,7 +133,6 @@ _g_fd_source_new (GObject *object,
   source = g_source_new (&fd_source_funcs, sizeof (FDSource));
   fd_source = (FDSource *)source;
 
-  fd_source->object = g_object_ref (object);
   if (cancellable)
     fd_source->cancellable = g_object_ref (cancellable);
   

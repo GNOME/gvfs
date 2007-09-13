@@ -202,19 +202,16 @@ typedef struct {
   GAsyncReadCallback callback;
   gpointer user_data;
   GCancellable *cancellable;
+  GInputStreamSocket *stream;
 } ReadAsyncData;
 
 static void
 read_async_cb (ReadAsyncData *data,
-	       GInputStreamSocket *stream,
 	       int fd)
 {
-  GInputStreamSocket *socket_stream;
   GError *error = NULL;
   gssize count_read;
 
-  socket_stream = G_INPUT_STREAM_SOCKET (stream);
-  
   /* We know that we can read from fd once without blocking */
   while (1)
     {
@@ -227,7 +224,7 @@ read_async_cb (ReadAsyncData *data,
 	  count_read = -1;
 	  break;
 	}
-      count_read = read (socket_stream->priv->fd, data->buffer, data->count);
+      count_read = read (data->stream->priv->fd, data->buffer, data->count);
       if (count_read == -1)
 	{
 	  if (errno == EINTR)
@@ -241,7 +238,7 @@ read_async_cb (ReadAsyncData *data,
       break;
     }
 
-  data->callback (G_INPUT_STREAM (stream),
+  data->callback (G_INPUT_STREAM (data->stream),
 		  data->buffer,
 		  data->count,
 		  count_read,
@@ -280,9 +277,9 @@ g_input_stream_socket_read_async (GInputStream        *stream,
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
+  data->stream = socket_stream;
 
-  source = _g_fd_source_new (G_OBJECT (socket_stream),
-			     socket_stream->priv->fd,
+  source = _g_fd_source_new (socket_stream->priv->fd,
 			     POLLIN,
 			     g_input_stream_get_async_context (stream),
 			     cancellable);

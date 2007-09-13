@@ -12,8 +12,7 @@ typedef struct {
   gpointer       data;
 } GAsyncResult;
 
-typedef void (*GFDSourceFunc) (gpointer  data,
-			       GObject  *object,
+typedef void (*GFDSourceFunc) (gpointer data,
 			       int fd);
 
 void     _g_queue_async_result (GAsyncResult    *result,
@@ -23,8 +22,7 @@ void     _g_queue_async_result (GAsyncResult    *result,
 				GMainContext    *context,
 				GSourceFunc      source_func);
 
-GSource *_g_fd_source_new      (GObject         *object,
-				int              fd,
+GSource *_g_fd_source_new      (int              fd,
 				gushort          events,
 				GMainContext    *context,
 				GCancellable    *cancellable);

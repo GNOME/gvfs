@@ -202,19 +202,16 @@ typedef struct {
   GAsyncWriteCallback callback;
   gpointer user_data;
   GCancellable *cancellable;
+  GOutputStreamSocket *stream;
 } WriteAsyncData;
 
 static void
 write_async_cb (gpointer             _data,
-		GOutputStreamSocket  *stream,
 		int fd)
 {
-  GOutputStreamSocket *socket_stream;
   WriteAsyncData *data = _data;
   GError *error = NULL;
   gssize count_written;
-
-  socket_stream = G_OUTPUT_STREAM_SOCKET (stream);
 
   while (1)
     {
@@ -228,7 +225,7 @@ write_async_cb (gpointer             _data,
 	  break;
 	}
       
-      count_written = write (socket_stream->priv->fd, data->buffer, data->count);
+      count_written = write (data->stream->priv->fd, data->buffer, data->count);
       if (count_written == -1)
 	{
 	  if (errno == EINTR)
@@ -242,7 +239,7 @@ write_async_cb (gpointer             _data,
       break;
     }
 
-  data->callback (G_OUTPUT_STREAM (stream),
+  data->callback (G_OUTPUT_STREAM (data->stream),
 		  data->buffer,
 		  data->count,
 		  count_written,
@@ -281,9 +278,9 @@ g_output_stream_socket_write_async (GOutputStream      *stream,
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
+  data->stream = socket_stream;
 
-  source = _g_fd_source_new (G_OBJECT (socket_stream),
-			     socket_stream->priv->fd,
+  source = _g_fd_source_new (socket_stream->priv->fd,
 			     POLLOUT,
 			     g_output_stream_get_async_context (stream),
 			     cancellable);
