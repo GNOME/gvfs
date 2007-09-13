@@ -252,22 +252,15 @@ g_file_simple_get_info (GFile                *file,
   GFileAttributeMatcher *matcher;
   char *basename;
 
-  info = g_file_info_new ();
-
   matcher = g_file_attribute_matcher_new (attributes);
   
   basename = g_path_get_basename (simple->filename);
-  if (!g_file_info_simple_get (basename, simple->filename, info,
-			       requested, matcher, follow_symlinks,
-			       error))
-    {
-      /* Failed to get info (does not exist maybe) */
-      g_object_unref (info);
-      info = NULL;
-    }
-
+  
+  info = g_file_info_simple_get (basename, simple->filename,
+				 requested, matcher, follow_symlinks,
+				 error);
+  
   g_free (basename);
-    
 
   g_file_attribute_matcher_free (matcher);
 

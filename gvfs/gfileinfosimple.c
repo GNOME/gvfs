@@ -246,18 +246,20 @@ get_xattrs (const char *path,
     }
 }
 
-gboolean
+GFileInfo *
 g_file_info_simple_get (const char *basename,
 			const char *path,
-			GFileInfo *info,
 			GFileInfoRequestFlags requested,
 			GFileAttributeMatcher *attribute_matcher,
 			gboolean follow_symlinks,
 			GError **error)
 {
+  GFileInfo *info;
   struct stat statbuf;
   int res;
 
+  info = g_file_info_new ();
+  
   if (requested & G_FILE_INFO_NAME)
     g_file_info_set_name (info, basename);
 
@@ -270,7 +272,7 @@ g_file_info_simple_get (const char *basename,
   /* Avoid stat in trivial case */
   if ((requested & ~(G_FILE_INFO_NAME|G_FILE_INFO_IS_HIDDEN)) == 0 ||
       attribute_matcher == NULL)
-    return TRUE;
+    return info;
   
   if (follow_symlinks)
     res = stat (path, &statbuf);
@@ -279,12 +281,13 @@ g_file_info_simple_get (const char *basename,
   
   if (res == -1)
     {
+      g_object_unref (info);
       g_set_error (error,
 		   G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
 		   _("Error stating file '%s': %s"),
 		   path, g_strerror (errno));
-      return FALSE;
+      return NULL;
     }
   
   g_file_info_set_from_stat (info, requested, &statbuf);
@@ -324,7 +327,7 @@ g_file_info_simple_get (const char *basename,
   get_selinux_context (path, info, attribute_matcher, follow_symlinks);
   get_xattrs (path, info, attribute_matcher, follow_symlinks);
   
-  return TRUE;
+  return info;
 }
 
 
