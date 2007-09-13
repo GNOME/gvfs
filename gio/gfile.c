@@ -9,6 +9,7 @@
 #include "gioscheduler.h"
 #include <glib/gi18n-lib.h>
 #include <glocalfile.h>
+#include "gsimpleasyncresult.h"
 
 static void g_file_base_init (gpointer g_class);
 static void g_file_class_init (gpointer g_class,
@@ -952,17 +953,39 @@ g_mount_for_location (GFile                  *location,
 		      GAsyncReadyCallback     callback,
 		      gpointer                user_data)
 {
-  return g_vfs_mount_for_location (g_vfs_get (),
-				   location,
-				   mount_operation,
-				   callback, user_data);
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (location);
+
+  if (iface->mount_for_location == NULL)
+    {
+      g_simple_async_report_error_in_idle (G_OBJECT (location),
+					   callback, user_data,
+					   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+					   _("volume doesn't implement unmount"));
+      
+      return;
+    }
+  
+  return (* iface->mount_for_location) (location, mount_operation, callback, user_data);
 
 }
 
 gboolean
-g_mount_for_location_finish (GAsyncResult           *result,
+g_mount_for_location_finish (GFile                  *location,
+			     GAsyncResult           *result,
 			     GError                **error)
 {
-  return g_vfs_mount_for_location_finish (g_vfs_get (),
-					  result, error);
+  GFileIface *iface;
+
+  if (G_IS_SIMPLE_ASYNC_RESULT (result))
+    {
+      GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
+      if (g_simple_async_result_propagate_error (simple, error))
+	return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (location);
+
+  return (* iface->mount_for_location_finish) (location, result, error);
 }

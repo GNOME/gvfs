@@ -55,10 +55,6 @@ struct _GMountOperationClass
   gboolean (* ask_question) (GMountOperation *op,
 			     const char      *message,
 			     const char      *choices[]);
-  
-  void     (* done)         (GMountOperation *op,
-			     gboolean         succeeded,
-			     GError          *error);
 
   void     (* reply)        (GMountOperation *op,
 			     gboolean         abort);

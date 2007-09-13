@@ -147,6 +147,14 @@ struct _GFileIface
 						   GAsyncResult        *result,
 						   GError             **error);
 
+
+  void     (*mount_for_location)        (GFile *location,
+					 GMountOperation *mount_operation,
+					 GAsyncReadyCallback callback,
+					 gpointer user_data);
+  gboolean (*mount_for_location_finish) (GFile *location,
+					 GAsyncResult *result,
+					 GError **error);
   
   GDirectoryMonitor* (*monitor_dir)         (GFile                  *file);
 
@@ -281,7 +289,8 @@ void               g_mount_for_location              (GFile                  *lo
 						      GMountOperation        *mount_operation,
 						      GAsyncReadyCallback     callback,
 						      gpointer                user_data);
-gboolean           g_mount_for_location_finish       (GAsyncResult           *result,
+gboolean           g_mount_for_location_finish       (GFile                  *location,
+						      GAsyncResult           *result,
 						      GError                **error);
 void               g_file_mount_mountable            (GFile                  *file,
 						      GMountOperation        *mount_operation,

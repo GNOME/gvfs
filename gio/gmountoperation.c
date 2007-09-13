@@ -11,7 +11,6 @@ G_DEFINE_TYPE (GMountOperation, g_mount_operation, G_TYPE_OBJECT);
 enum {
   ASK_PASSWORD,
   ASK_QUESTION,
-  DONE,
   REPLY,
   LAST_SIGNAL
 };
@@ -120,17 +119,6 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  g_cclosure_marshal_VOID__BOOLEAN,
 		  G_TYPE_NONE, 1,
 		  G_TYPE_BOOLEAN);
-
-  signals[DONE] =
-    g_signal_new (I_("done"),
-		  G_TYPE_FROM_CLASS (gobject_class),
-		  G_SIGNAL_RUN_LAST,
-		  G_STRUCT_OFFSET (GMountOperationClass, done),
-		  NULL, NULL,
-		  _gvfs_marshal_VOID__BOOLEAN_POINTER,
-		  G_TYPE_NONE, 2,
-		  G_TYPE_BOOLEAN,
-		  G_TYPE_POINTER);
 }
 
 static void

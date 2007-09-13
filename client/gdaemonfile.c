@@ -15,6 +15,7 @@
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
 #include "gmountoperationdbus.h"
+#include <gio/gsimpleasyncresult.h>
 
 static void g_daemon_file_file_iface_init (GFileIface       *iface);
 
@@ -839,34 +840,65 @@ g_daemon_file_replace (GFile *file,
   return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
-/* 
+typedef struct {
+  GFile *file;
+  GMountOperation *mount_operation;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} MountData;
+
+static void g_daemon_file_mount_for_location (GFile *location,
+					      GMountOperation *mount_operation,
+					      GAsyncReadyCallback callback,
+					      gpointer user_data);
+
 static void
 mount_reply (DBusMessage *reply,
 	     GError *error,
 	     gpointer user_data)
 {
-  GMountOperation *op = user_data;
+  MountData *data = user_data;
+  GSimpleAsyncResult *res;
 
   if (reply == NULL)
-    g_signal_emit_by_name (op, "done", FALSE, error);
+    {
+      res = g_simple_async_result_new_from_error (G_OBJECT (data->file),
+						  data->callback,
+						  data->user_data,
+						  error);
+    }
+  else
+    {
+      res = g_simple_async_result_new (G_OBJECT (data->file),
+				       data->callback,
+				       data->user_data,
+				       g_daemon_file_mount_for_location);
+    }
+
+  g_simple_async_result_complete (res);
   
-  g_object_unref (op);
+  g_object_unref (data->file);
+  g_object_unref (data->mount_operation);
+  g_free (data);
 }
 
 static void
-g_daemon_file_mount (GFile *file,
-		     GMountOperation *mount_op)
+g_daemon_file_mount_for_location (GFile *location,
+				  GMountOperation *mount_operation,
+				  GAsyncReadyCallback callback,
+				  gpointer user_data)
 {
   GDaemonFile *daemon_file;
   DBusMessage *message;
   GMountSpec *spec;
   GMountSource *mount_source;
-
-  daemon_file = G_DAEMON_FILE (file);
+  MountData *data;
+  
+  daemon_file = G_DAEMON_FILE (location);
 
   spec = g_mount_spec_copy (daemon_file->mount_spec);
   g_mount_spec_set_mount_prefix (spec, daemon_file->path);
-  mount_source = g_mount_operation_dbus_wrap (mount_op, spec);
+  mount_source = g_mount_operation_dbus_wrap (mount_operation, spec);
   g_mount_spec_unref (spec);
   
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
@@ -876,13 +908,27 @@ g_daemon_file_mount (GFile *file,
   g_mount_source_to_dbus (mount_source, message);
   g_object_unref (mount_source);
 
+  data = g_new0 (MountData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+  data->file = g_object_ref (location);
+  data->mount_operation = g_object_ref (mount_operation);
+  
   _g_dbus_connection_call_async (NULL, message, -1,
-				 mount_reply, g_object_ref (mount_op));
+				 mount_reply, data);
  
   dbus_message_unref (message);
 }
 
-*/
+static gboolean
+g_daemon_file_mount_for_location_finish (GFile                  *location,
+					 GAsyncResult           *result,
+					 GError                **error)
+{
+  /* Errors handled in generic code */
+  return TRUE;
+}
+
 
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
@@ -904,4 +950,6 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->create = g_daemon_file_create;
   iface->replace = g_daemon_file_replace;
   iface->read_async = g_daemon_file_read_async;
+  iface->mount_for_location = g_daemon_file_mount_for_location;
+  iface->mount_for_location_finish = g_daemon_file_mount_for_location_finish;
 }
