@@ -1,6 +1,8 @@
 #include <config.h>
 
 #include <unistd.h>
+#include <errno.h>
+#include <glib/gi18n-lib.h>
 
 #include "gfileinfosimple.h"
 
@@ -30,24 +32,33 @@ read_link (const gchar *full_name)
 	}
 }
 
-void
+gboolean
 g_file_info_simple_get (const char *path,
 			GFileInfo *info,
 			GFileInfoRequestFlags requested,
 			const char *attributes,
-			gboolean follow_symlinks)
+			gboolean follow_symlinks,
+			GError **error)
 {
   struct stat statbuf;
+  int res;
 
-  if (requested && G_FILE_INFO_REQUEST_FLAGS_FROM_STAT_MASK)
+  if (follow_symlinks)
+    res = stat (path, &statbuf);
+  else
+    res = lstat (path, &statbuf);
+  
+  if (res == -1)
     {
-      if (follow_symlinks)
-	stat (path, &statbuf);
-      else
-	lstat (path, &statbuf);
-      
-      g_file_info_set_from_stat (info, requested, &statbuf);
+      g_set_error (error,
+		   G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error stating file '%s': %s"),
+		   path, g_strerror (errno));
+      return FALSE;
     }
+  
+  g_file_info_set_from_stat (info, requested, &statbuf);
   
   if (requested && G_FILE_INFO_SYMLINK_TARGET)
     {
@@ -80,4 +91,6 @@ g_file_info_simple_get (const char *path,
     {
       /* TODO */
     }
+
+  return TRUE;
 }

@@ -259,8 +259,14 @@ g_file_simple_get_info (GFile                *file,
       g_free (basename);
     }
 
-  g_file_info_simple_get (simple->filename, info,
-			  requested, attributes, follow_symlinks);
+  if (!g_file_info_simple_get (simple->filename, info,
+			       requested, attributes, follow_symlinks,
+			       error))
+    {
+      /* Failed to get info (does not exist maybe) */
+      g_object_unref (info);
+      info = NULL;
+    }
   
   return info;
 }

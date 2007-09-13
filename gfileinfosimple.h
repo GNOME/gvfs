@@ -5,11 +5,12 @@
 
 G_BEGIN_DECLS
 
-void g_file_info_simple_get (const char *path,
-			     GFileInfo *info,
-			     GFileInfoRequestFlags requested,
-			     const char *attributes,
-			     gboolean follow_symlinks);
+gboolean g_file_info_simple_get (const char *path,
+				 GFileInfo *info,
+				 GFileInfoRequestFlags requested,
+				 const char *attributes,
+				 gboolean follow_symlinks,
+				 GError **error);
 
 G_END_DECLS
 

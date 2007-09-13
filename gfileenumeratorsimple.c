@@ -102,11 +102,12 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   if (!g_file_enumerator_simple_open_dir (simple, error))
     return NULL;
 
+ next_file:
+  
   filename = g_dir_read_name (simple->dir);
   if (filename == NULL)
     {
-      if (error)
-	*error = NULL;
+      g_propagate_error (error, NULL);
       return NULL;
     }
 
@@ -117,14 +118,36 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   if (simple->requested != G_FILE_INFO_NAME ||
       simple->attributes != NULL)
     {
+      gboolean res;
+      GError *my_error = NULL;
+      
       path = g_build_filename (simple->filename, filename, NULL);
-      
-      g_file_info_simple_get (path, info,
-			      simple->requested,
-			      simple->attributes,
-			      simple->follow_symlinks);
-      
+      res = g_file_info_simple_get (path, info,
+				    simple->requested,
+				    simple->attributes,
+				    simple->follow_symlinks,
+				    &my_error); 
       g_free (path);
+      
+      if (!res)
+	{
+	  /* Failed to get info */
+	  
+	  g_object_unref (info);
+	  info = NULL;
+	  
+	  /* If the file does not exist there might have been a race where
+	   * the file was removed between the readdir and the stat, so we
+	   * ignore the file. */
+	  if (my_error->domain == G_FILE_ERROR &&
+	      my_error->code == G_FILE_ERROR_NOENT)
+	    {
+	      g_error_free (my_error);
+	      goto next_file;
+	    }
+	  else
+	    g_propagate_error (error, my_error);
+	}
     }
 
   return info;
