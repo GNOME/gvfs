@@ -5,6 +5,7 @@
 #include "gfile.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
+#include "gsocketinputstream.h"
 
 static void
 test_out ()
@@ -139,6 +140,12 @@ test_async (char *filename, gboolean dump)
   g_input_stream_read_async (in, buffer, 1024, 0, read_done, buffer, NULL);
 }
 
+static gboolean
+cancel_stream (gpointer data)
+{
+  g_input_stream_cancel (G_INPUT_STREAM (data));
+  return FALSE;
+}
 
 int
 main (int argc, char *argv[])
@@ -148,6 +155,32 @@ main (int argc, char *argv[])
 
   g_type_init ();
   g_thread_init (NULL);
+
+  loop = g_main_loop_new (NULL, FALSE);
+
+  if (0) {
+    GInputStream *s;
+    char *buffer;
+    //gssize res;
+
+    buffer = g_malloc (1025);
+    
+    s = g_socket_input_stream_new (0, FALSE);
+
+    /*
+    res = g_input_stream_read (s, buffer, 128, NULL);
+    g_print ("res1: %d\n", res);
+    res = g_input_stream_read (s, buffer, 128, NULL);
+    g_print ("res2: %d\n", res);
+    */
+    
+    g_input_stream_read_async (s, buffer, 128, 0, read_done, buffer, NULL);
+    g_timeout_add (1000, cancel_stream, s);
+    g_print ("main loop run\n");
+    g_main_loop_run (loop);
+    g_print ("main loop quit\n");
+  }
+
   
   file = g_file_get_for_path ("/tmp");
 
@@ -155,8 +188,6 @@ main (int argc, char *argv[])
   if (1) test_async ("/etc/passwd", TRUE);
 
   test_out ();
-
-  loop = g_main_loop_new (NULL, FALSE);
 
   g_main_loop_run (loop);
   

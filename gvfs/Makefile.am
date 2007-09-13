@@ -52,6 +52,8 @@ libgvfs_la_SOURCES = 	\
 	gfileinfo.c \
 	gfileinputstream.c \
 	gfileoutputstream.c \
+	gsocketinputstream.c \
+	gsocketinputstream.h \
 	ginputstream.c \
 	gioscheduler.c \
 	gmountoperation.c \

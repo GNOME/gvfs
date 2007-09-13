@@ -88,7 +88,7 @@ g_local_file_input_stream_new (const char *filename)
 
 static gboolean
 g_local_file_input_stream_open (GLocalFileInputStream *file,
-			  GError      **error)
+				GError      **error)
 {
   if (file->priv->fd != -1)
     return TRUE;
