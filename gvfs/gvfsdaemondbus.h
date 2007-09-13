@@ -11,8 +11,6 @@ int             _g_dbus_connection_get_fd_sync       (DBusConnection   *conn,
 						      int               fd_id);
 gboolean        _g_dbus_message_iter_append_filename (DBusMessageIter  *iter,
 						      const char       *filename);
-gboolean        _g_error_from_dbus_message           (DBusMessage      *message,
-						      GError          **error);
 void            _g_error_from_dbus                   (DBusError        *derror,
 						      GError          **error);
 
