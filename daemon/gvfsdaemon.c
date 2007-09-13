@@ -221,25 +221,38 @@ send_fd (int connection_fd,
 }
 
 static void
-daemon_handle_read_file (DBusConnection *conn,
+daemon_handle_read_file (GVfsDaemon *daemon,
+			 DBusConnection *conn,
 			 DBusMessage *message)
 {
+  GVfsDaemonClass *class;
   DBusMessage *reply;
-  char *str = "YAY";
+  const char *path;
   int fd;
-  int socket_fds[2];
-  int ret;
+  int socket_fd;
+  
+  class = G_VFS_DAEMON_GET_CLASS (daemon);
+  
+  if (!dbus_message_get_args (message, NULL, 
+			      DBUS_TYPE_STRING, &path,
+			      0))
+    {
+      g_warning ("Wrong types in read_file call");
+      return;
+    }
 
   reply = dbus_message_new_method_return (message);
-  dbus_message_append_args (reply,
-			    DBUS_TYPE_STRING, &str,
-			    DBUS_TYPE_INVALID);
+  socket_fd = -1;
+  class->read_file (daemon, reply, path, &socket_fd);
+
   dbus_connection_send (conn, reply, NULL);
   dbus_message_unref (reply);
 
-  ret = socketpair (AF_UNIX, SOCK_STREAM, 0, socket_fds);
-  fd = GPOINTER_TO_INT (dbus_connection_get_data (conn, extra_fd_slot));
-  send_fd (fd, socket_fds[0]);
+  if (socket_fd != -1)
+    {
+      fd = GPOINTER_TO_INT (dbus_connection_get_data (conn, extra_fd_slot));
+      send_fd (fd, socket_fd);
+    }
 }
 
 static void
@@ -606,7 +619,7 @@ daemon_message_func (DBusConnection *conn,
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_DAEMON_INTERFACE,
 					G_VFS_DBUS_OP_READ_FILE))
-    daemon_handle_read_file (conn, message);
+    daemon_handle_read_file (daemon, conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   

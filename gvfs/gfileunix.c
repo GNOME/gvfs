@@ -233,6 +233,13 @@ g_file_unix_read (GFile *file)
 					  G_VFS_DBUS_DAEMON_INTERFACE,
 					  G_VFS_DBUS_OP_READ_FILE);
 
+  
+  /* TODO: strings are utf8, filenames are not */
+  if (!dbus_message_append_args (message, 
+				 DBUS_TYPE_STRING, &unix_file->filename,
+				 0))
+      g_error ("Out of memory");
+
   dbus_error_init (&error);
   reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
 						     &error);

@@ -28,6 +28,11 @@ struct _GVfsDaemonClass
   GObjectClass parent_class;
 
   /* vtable */
+
+  void (*read_file) (GVfsDaemon *daemon,
+		     DBusMessage *reply,
+		     const char *path,
+		     int *fd_out);
 };
 
 GType g_vfs_daemon_get_type (void) G_GNUC_CONST;
