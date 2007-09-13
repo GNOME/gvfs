@@ -108,7 +108,7 @@ register_mount (GMountTracker *tracker,
   id = dbus_message_get_sender (message);
 
   dbus_message_iter_init (message, &iter);
-  
+
   if (_g_dbus_message_iter_get_args (&iter,
 				     &error,
 				     DBUS_TYPE_STRING, &display_name,
@@ -120,7 +120,7 @@ register_mount (GMountTracker *tracker,
 	reply = dbus_message_new_error (message,
 					DBUS_ERROR_INVALID_ARGS,
 					"Mountpoint Already registered");
-      else if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_ARRAY)
+      else if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT)
 	reply = dbus_message_new_error (message,
 					DBUS_ERROR_INVALID_ARGS,
 					"No mount spec");
