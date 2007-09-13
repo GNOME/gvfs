@@ -530,9 +530,9 @@ file_copy_fallback (GFile                  *source,
    source    dest    flags   res
     -        *       *       G_IO_ERROR_NOT_FOUND
     file     -       *       ok
-    file     file    0       G_IO_ERROR_EXISTS
+    file     *       0       G_IO_ERROR_EXISTS
     file     file    overwr  ok
-    file     dir     *       G_IO_ERROR_IS_DIRECTORY
+    file     dir     overwr  G_IO_ERROR_IS_DIRECTORY
     
     dir      -       *       G_IO_ERROR_WOULD_RECURSE
     dir      *       0       G_IO_ERROR_EXISTS
@@ -591,9 +591,9 @@ g_file_copy (GFile                  *source,
    source    dest    flags   res
     -        *       *       G_IO_ERROR_NOT_FOUND
     file     -       *       ok
-    file     file    0       G_IO_ERROR_EXISTS
+    file     *       0       G_IO_ERROR_EXISTS
     file     file    overwr  ok
-    file     dir     *       G_IO_ERROR_IS_DIRECTORY
+    file     dir     overwr  G_IO_ERROR_IS_DIRECTORY
     
     dir      -       *       ok || G_IO_ERROR_WOULD_RECURSE
     dir      *       0       G_IO_ERROR_EXISTS

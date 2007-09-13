@@ -1386,25 +1386,50 @@ g_local_file_move (GFile                *source,
   GLocalFile *local_source = G_LOCAL_FILE (source);
   GLocalFile *local_destination = G_LOCAL_FILE (destination);
   struct stat statbuf;
-  gboolean destination_exist;
-  char *backup_name; 
+  gboolean destination_exist, source_is_dir;
+  char *backup_name;
+  int res;
+  int errsv;
 
-  destination_exist = FALSE;
-  if ((flags & G_FILE_COPY_OVERWRITE) == 0 ||
-      (flags & G_FILE_COPY_BACKUP))
+  res = g_lstat (local_source->filename, &statbuf);
+  if (res == -1)
     {
-      if (!(g_stat (local_destination->filename, &statbuf) == -1 &&
-	    errno == ENOENT))
-	destination_exist = TRUE;
-    }
-
-  if ((flags & G_FILE_COPY_OVERWRITE) == 0 && destination_exist)
-    {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_EXISTS,
-		   _("Target file already exists"));
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error moving file: %s"),
+		   g_strerror (errno));
       return FALSE;
+    }
+  else
+    source_is_dir = S_ISDIR (statbuf.st_mode);
+  
+  destination_exist = FALSE;
+  res = g_lstat (local_destination->filename, &statbuf);
+  errsv = errno;
+  if (res == 0)
+    {
+      destination_exist = TRUE; /* Target file exists */
+
+      if (flags & G_FILE_COPY_OVERWRITE)
+	{
+	  /* Always fail on dirs, even with overwrite */
+	  if (S_ISDIR (statbuf.st_mode))
+	    {
+	      g_set_error (error,
+			   G_IO_ERROR,
+			   G_IO_ERROR_IS_DIRECTORY,
+			   _("Can't move over directory"));
+	      return FALSE;
+	    }
+	}
+      else
+	{
+	  g_set_error (error,
+		       G_IO_ERROR,
+		       G_IO_ERROR_EXISTS,
+		       _("Target file already exists"));
+	  return FALSE;
+	}
     }
   
   if (flags & G_FILE_COPY_BACKUP && destination_exist)
@@ -1420,17 +1445,32 @@ g_local_file_move (GFile                *source,
 	  return FALSE;
 	}
       g_free (backup_name);
+      destination_exist = FALSE; /* It did, but no more */
     }
 
+  if (source_is_dir && destination_exist && (flags & G_FILE_COPY_OVERWRITE))
+    {
+      /* Source is a dir, destination exists (and is not a dir, because that would have failed
+	 earlier), and we're overwriting. Manually remove the target so we can do the rename. */
+      res = unlink (local_destination->filename);
+      if (res == -1)
+	{
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errno),
+		       _("Error removing target file: %s"),
+		       g_strerror (errno));
+	  return FALSE;
+	}
+    }
+  
   if (rename (local_source->filename, local_destination->filename) == -1)
     {
       if (errno == EXDEV)
 	goto fallback;
-      else
-	g_set_error (error, G_IO_ERROR,
-		     g_io_error_from_errno (errno),
-		     _("Error moving file: %s"),
-		     g_strerror (errno));
+      g_set_error (error, G_IO_ERROR,
+		   g_io_error_from_errno (errno),
+		   _("Error moving file: %s"),
+		   g_strerror (errno));
       return FALSE;
 
     }
