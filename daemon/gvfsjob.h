@@ -8,8 +8,8 @@ G_BEGIN_DECLS
 #define G_VFS_TYPE_JOB         (g_vfs_job_get_type ())
 #define G_VFS_JOB(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB, GVfsJob))
 #define G_VFS_JOB_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB, GVfsJobClass))
-#define G_IS_VFS_JOB(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB))
-#define G_IS_VFS_JOB_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB))
+#define G_VFS_IS_JOB(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB))
+#define G_VFS_IS_JOB_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB))
 #define G_VFS_JOB_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB, GVfsJobClass))
 
 typedef struct _GVfsJob        GVfsJob;

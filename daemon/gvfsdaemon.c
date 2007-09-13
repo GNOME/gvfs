@@ -874,7 +874,7 @@ daemon_message_func (DBusConnection *conn,
 	    {
 	      GVfsJob *job = l->data;
 	      
-	      if (G_IS_VFS_JOB_DBUS (job) &&
+	      if (G_VFS_IS_JOB_DBUS (job) &&
 		  g_vfs_job_dbus_is_serial (G_VFS_JOB_DBUS (job),
 					    conn, serial))
 		{

@@ -10,8 +10,8 @@ G_BEGIN_DECLS
 #define G_VFS_TYPE_JOB_DBUS         (g_vfs_job_dbus_get_type ())
 #define G_VFS_JOB_DBUS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB_DBUS, GVfsJobDBus))
 #define G_VFS_JOB_DBUS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB_DBUS, GVfsJobDBusClass))
-#define G_IS_VFS_JOB_DBUS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_DBUS))
-#define G_IS_VFS_JOB_DBUS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_DBUS))
+#define G_VFS_IS_JOB_DBUS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_DBUS))
+#define G_VFS_IS_JOB_DBUS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_DBUS))
 #define G_VFS_JOB_DBUS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB_DBUS, GVfsJobDBusClass))
 
 typedef struct _GVfsJobDBus        GVfsJobDBus;

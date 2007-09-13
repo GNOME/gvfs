@@ -11,8 +11,8 @@ G_BEGIN_DECLS
 #define G_VFS_TYPE_JOB_MOUNT         (g_vfs_job_mount_get_type ())
 #define G_VFS_JOB_MOUNT(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB_MOUNT, GVfsJobMount))
 #define G_VFS_JOB_MOUNT_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB_MOUNT, GVfsJobMountClass))
-#define G_IS_VFS_JOB_MOUNT(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_MOUNT))
-#define G_IS_VFS_JOB_MOUNT_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_MOUNT))
+#define G_VFS_IS_JOB_MOUNT(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_MOUNT))
+#define G_VFS_IS_JOB_MOUNT_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_MOUNT))
 #define G_VFS_JOB_MOUNT_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB_MOUNT, GVfsJobMountClass))
 
 typedef struct _GVfsJobMountClass   GVfsJobMountClass;

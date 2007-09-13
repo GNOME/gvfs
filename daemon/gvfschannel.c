@@ -504,8 +504,8 @@ send_reply_cb (GOutputStream *output_stream,
   channel->priv->current_job = NULL;
   g_vfs_job_emit_finished (job);
 
-  if (G_IS_VFS_JOB_CLOSE_READ (job) ||
-      G_IS_VFS_JOB_CLOSE_WRITE (job))
+  if (G_VFS_IS_JOB_CLOSE_READ (job) ||
+      G_VFS_IS_JOB_CLOSE_WRITE (job))
     {
       g_vfs_job_source_closed (G_VFS_JOB_SOURCE (channel));
       channel->priv->backend_handle = NULL;

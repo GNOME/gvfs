@@ -11,8 +11,8 @@ G_BEGIN_DECLS
 #define G_VFS_TYPE_DAEMON         (g_vfs_daemon_get_type ())
 #define G_VFS_DAEMON(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_DAEMON, GVfsDaemon))
 #define G_VFS_DAEMON_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_DAEMON, GVfsDaemonClass))
-#define G_IS_VFS_DAEMON(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_DAEMON))
-#define G_IS_VFS_DAEMON_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_DAEMON))
+#define G_VFS_IS_DAEMON(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_DAEMON))
+#define G_VFS_IS_DAEMON_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_DAEMON))
 #define G_VFS_DAEMON_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_DAEMON, GVfsDaemonClass))
 
 typedef struct _GVfsDaemon        GVfsDaemon;

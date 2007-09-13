@@ -10,8 +10,8 @@ G_BEGIN_DECLS
 #define G_VFS_TYPE_JOB_READ         (g_vfs_job_read_get_type ())
 #define G_VFS_JOB_READ(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB_READ, GVfsJobRead))
 #define G_VFS_JOB_READ_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB_READ, GVfsJobReadClass))
-#define G_IS_VFS_JOB_READ(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_READ))
-#define G_IS_VFS_JOB_READ_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_READ))
+#define G_VFS_IS_JOB_READ(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_READ))
+#define G_VFS_IS_JOB_READ_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_READ))
 #define G_VFS_JOB_READ_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB_READ, GVfsJobReadClass))
 
 typedef struct _GVfsJobReadClass   GVfsJobReadClass;
