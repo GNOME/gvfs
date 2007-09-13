@@ -2,7 +2,7 @@
 #define __G_VFS_DAEMON_H__
 
 #include <glib-object.h>
-#include <gvfsdaemonbackend.h>
+#include <gvfsreadhandle.h>
 
 G_BEGIN_DECLS
 
@@ -17,10 +17,14 @@ typedef struct _GVfsDaemon        GVfsDaemon;
 typedef struct _GVfsDaemonClass   GVfsDaemonClass;
 typedef struct _GVfsDaemonPrivate GVfsDaemonPrivate;
 
+/* Placed here to fix circular ref problems in headers */
+typedef struct _GVfsDaemonBackend GVfsDaemonBackend;
+
 struct _GVfsDaemon
 {
   GObject parent_instance;
 
+  GVfsDaemonBackend *backend;
   GVfsDaemonPrivate *priv;
 };
 
@@ -38,6 +42,9 @@ GVfsDaemon *g_vfs_daemon_new (const char *mountpoint,
 			      GVfsDaemonBackend *backend);
 
 gboolean g_vfs_daemon_is_active (GVfsDaemon *daemon);
+void g_vfs_daemon_register_read_handle (GVfsDaemon *daemon,
+					GVfsReadHandle *handle);
+
 
 G_END_DECLS
 

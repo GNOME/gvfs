@@ -1,18 +1,168 @@
 #include <config.h>
 
+#include <unistd.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
+#include <glib/gthread.h>
+#include <glib/gi18n.h>
 #include "gvfsdaemonutils.h"
+
+static gint32 extra_fd_slot = -1;
+static GStaticMutex extra_lock = G_STATIC_MUTEX_INIT;
+
+typedef struct {
+  int extra_fd;
+  int fd_count;
+} ConnectionExtra;
+
+/* We use _ for escaping, so its not valid */
+#define VALID_INITIAL_NAME_CHARACTER(c)         \
+  ( ((c) >= 'A' && (c) <= 'Z') ||               \
+    ((c) >= 'a' && (c) <= 'z') )
+#define VALID_NAME_CHARACTER(c)                 \
+  ( ((c) >= '0' && (c) <= '9') ||               \
+    ((c) >= 'A' && (c) <= 'Z') ||               \
+    ((c) >= 'a' && (c) <= 'z'))
+
+
+static void
+append_escaped_name (GString *s,
+		     const char *unescaped)
+{
+  char c;
+  gboolean first;
+  static const gchar hex[16] = "0123456789ABCDEF";
+
+  while ((c = *unescaped++) != 0)
+    {
+      if (first)
+	{
+	  if (VALID_INITIAL_NAME_CHARACTER (c))
+	    {
+	      g_string_append_c (s, c);
+	      continue;
+	    }
+	}
+      else
+	{
+	  if (VALID_NAME_CHARACTER (c))
+	    {
+	      g_string_append_c (s, c);
+	      continue;
+	    }
+	}
+
+      first = FALSE;
+      g_string_append_c (s, '_');
+      g_string_append_c (s, hex[((guchar)c) >> 4]);
+      g_string_append_c (s, hex[((guchar)c) & 0xf]);
+    }
+}
 
 DBusMessage *
 dbus_message_new_error_from_gerror (DBusMessage *message,
 				    GError *error)
 {
-  char *error_name;
   DBusMessage *reply;
-    
-  error_name = g_strdup_printf ("org.glib.GError.%s.%d",
-				g_quark_to_string (error->domain),
-				error->code);
-  reply = dbus_message_new_error (message, error_name, error->message);
-  g_free (error_name);
+  GString *str;
+
+  str = g_string_new ("org.glib.GError.");
+  append_escaped_name (str, g_quark_to_string (error->domain));
+  g_string_append_printf (str, ".c%d", error->code);
+  reply = dbus_message_new_error (message, str->str, error->message);
+  g_string_free (str, TRUE);
   return reply;
+}
+
+static void
+free_extra (gpointer p)
+{
+  ConnectionExtra *extra = p;
+  close (extra->extra_fd);
+  g_free (extra);
+}
+
+void
+dbus_connection_add_fd_send_fd (DBusConnection *connection,
+				int extra_fd)
+{
+  ConnectionExtra *extra;
+
+  if (extra_fd_slot == -1 && 
+      !dbus_connection_allocate_data_slot (&extra_fd_slot))
+    g_error ("Unable to allocate data slot");
+
+  extra = g_new0 (ConnectionExtra, 1);
+  extra->extra_fd = extra_fd;
+  
+  if (!dbus_connection_set_data (connection, extra_fd_slot, extra, free_extra))
+    g_error ("Out of memory");
+}
+
+static int
+send_fd (int connection_fd, 
+	 int fd)
+{
+  struct msghdr msg;
+  struct iovec vec;
+  char buf[1] = {'x'};
+  char ccmsg[CMSG_SPACE (sizeof (fd))];
+  struct cmsghdr *cmsg;
+  int ret;
+  
+  msg.msg_name = NULL;
+  msg.msg_namelen = 0;
+
+  vec.iov_base = buf;
+  vec.iov_len = 1;
+  msg.msg_iov = &vec;
+  msg.msg_iovlen = 1;
+  msg.msg_control = ccmsg;
+  msg.msg_controllen = sizeof (ccmsg);
+  cmsg = CMSG_FIRSTHDR (&msg);
+  cmsg->cmsg_level = SOL_SOCKET;
+  cmsg->cmsg_type = SCM_RIGHTS;
+  cmsg->cmsg_len = CMSG_LEN (sizeof(fd));
+  *(int*)CMSG_DATA (cmsg) = fd;
+  msg.msg_controllen = cmsg->cmsg_len;
+  msg.msg_flags = 0;
+
+  ret = sendmsg (connection_fd, &msg, 0);
+  g_print ("sendmesg ret: %d\n", ret);
+  return ret;
+}
+
+gboolean 
+dbus_connection_send_fd (DBusConnection *connection,
+			 int fd, 
+			 int *fd_id,
+			 GError **error)
+{
+  ConnectionExtra *extra;
+  
+  g_assert (extra_fd_slot != -1);
+
+  extra = dbus_connection_get_data (connection, extra_fd_slot);
+
+  g_assert (extra != NULL);
+
+  g_static_mutex_lock (&extra_lock);
+
+  if (send_fd (extra->extra_fd, fd) == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error sending fd: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+
+  *fd_id = extra->fd_count++;
+
+  g_static_mutex_unlock (&extra_lock);
+
+  return TRUE;
 }

@@ -144,6 +144,7 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   int extra_fd;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
+  guint32 fd_id;
 
   if (file->priv->fd != -1)
     return TRUE;
@@ -170,27 +171,18 @@ g_unix_file_input_stream_open (GUnixFileInputStream *file,
   reply = dbus_connection_send_with_reply_and_block (connection, message, -1,
 						     &derror);
   dbus_message_unref (message);
-      
   if (!reply)
     {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   "Error calling ReadFile: %s",
-		   derror.message);
+      _g_error_from_dbus (&derror, error);
       dbus_error_free (&derror);
       return FALSE;
     }
 
-  /* TODO: handle errors created with dbus_message_new_error? 
-   * dbus_message_is_error() ? 
-   */
-  if (_g_error_from_dbus_message (reply, error))
-    {
-      dbus_message_unref (reply);
-      return FALSE;
-    }
-  
   /* No args in reply, only fd */
- 
+  dbus_message_get_args (message, NULL,
+                         DBUS_TYPE_UINT32, &fd_id,
+                         DBUS_TYPE_INVALID);
+  /* TODO: verify fd id */
   file->priv->fd = receive_fd (extra_fd);
   g_print ("new fd: %d\n", file->priv->fd);
   return TRUE;

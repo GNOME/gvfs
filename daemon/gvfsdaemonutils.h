@@ -3,12 +3,17 @@
 
 #include <glib-object.h>
 #include <dbus/dbus.h>
-#include <gvfsreadrequest.h>
 
 G_BEGIN_DECLS
 
 DBusMessage *dbus_message_new_error_from_gerror (DBusMessage *message,
 						 GError *error);
+void         dbus_connection_add_fd_send_fd     (DBusConnection *connection,
+						 int extra_fd);
+gboolean     dbus_connection_send_fd            (DBusConnection *connection,
+						 int fd, 
+						 int *fd_id,
+						 GError **error);
 
 G_END_DECLS
 

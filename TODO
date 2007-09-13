@@ -20,3 +20,7 @@ Add GFilterOutput/InputStream and derivates (buffered, data, charset conversion,
 Make backend pluggable
 
 local file access through the daemon for remote X clients?
+
+-------------
+
+continue on GVfsJobOpenForRead, especially the return part

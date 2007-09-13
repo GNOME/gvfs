@@ -1,8 +1,9 @@
 #ifndef __G_VFS_DAEMON_BACKEND_H__
 #define __G_VFS_DAEMON_BACKEND_H__
 
-#include <gvfsjob.h>
 #include <gvfs/gvfstypes.h>
+#include <gvfsdaemon.h>
+#include <gvfsjob.h>
 
 G_BEGIN_DECLS
 
@@ -13,7 +14,7 @@ G_BEGIN_DECLS
 #define G_IS_VFS_DAEMON_BACKEND_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS_DAEMON_BACKEND))
 #define G_VFS_DAEMON_BACKEND_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS_DAEMON_BACKEND, GVfsDaemonBackendClass))
 
-typedef struct _GVfsDaemonBackend        GVfsDaemonBackend;
+/* GVfsDaemonBackend defined in gvfsdaemon.h to fix circular defines */
 typedef struct _GVfsDaemonBackendClass   GVfsDaemonBackendClass;
 
 typedef gpointer GVfsHandle;

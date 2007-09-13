@@ -11,6 +11,7 @@
 #include <gvfsdaemon.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
+#include <gvfsjobopenforread.h>
 
 G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
 
@@ -21,12 +22,15 @@ enum {
 
 struct _GVfsDaemonPrivate
 {
-  GVfsDaemonBackend *backend;
+  GMutex *lock; /* protects the parts that are accessed by multiple threads */
   char *mountpoint;
   gboolean active;
-};
 
-static gint32 extra_fd_slot = -1;
+  GQueue *pending_jobs; 
+  GQueue *jobs; /* protected by lock */
+  guint queued_job_start; /* protected by lock */
+  GList *read_handles; /* protected by lock */
+};
 
 static void g_vfs_daemon_get_property (GObject    *object,
 				       guint       prop_id,
@@ -60,8 +64,15 @@ g_vfs_daemon_finalize (GObject *object)
 
   daemon = G_VFS_DAEMON (object);
 
+  g_assert (daemon->priv->jobs->head == NULL);
+  g_assert (daemon->priv->pending_jobs->head == NULL);
+  g_queue_free (daemon->priv->jobs);
+  g_queue_free (daemon->priv->pending_jobs);
+
+  g_object_unref (daemon->backend);
+  g_mutex_free (daemon->priv->lock);
+
   g_free (daemon->priv->mountpoint);
-  g_object_ref (daemon->priv->backend);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize) (object);
@@ -79,9 +90,6 @@ g_vfs_daemon_class_init (GVfsDaemonClass *klass)
   gobject_class->get_property = g_vfs_daemon_get_property;
   gobject_class->constructor = g_vfs_daemon_constructor;
 
-  if (!dbus_connection_allocate_data_slot (&extra_fd_slot))
-    g_error ("Unable to allocate data slot");
-
   g_object_class_install_property (gobject_class,
 				   PROP_MOUNTPOINT,
 				   g_param_spec_string ("mountpoint",
@@ -90,7 +98,6 @@ g_vfs_daemon_class_init (GVfsDaemonClass *klass)
 							NULL,
 							G_PARAM_READWRITE | 
 							G_PARAM_CONSTRUCT_ONLY));
-
 }
 
 static void
@@ -99,6 +106,9 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
   daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE (daemon,
 					      G_TYPE_VFS_DAEMON,
 					      GVfsDaemonPrivate);
+  daemon->priv->lock = g_mutex_new ();
+  daemon->priv->jobs = g_queue_new ();
+  daemon->priv->pending_jobs = g_queue_new ();
 }
 
 static GObject*
@@ -199,11 +209,12 @@ g_vfs_daemon_new (const char *mountpoint,
   daemon = g_object_new (G_TYPE_VFS_DAEMON,
 			 "mountpoint", mountpoint,
 			 NULL);
-  daemon->priv->backend = g_object_ref (backend);
+  daemon->backend = g_object_ref (backend);
 
   return daemon;
 }
 
+#ifdef COMMENTED_OUT
 static int
 send_fd (int connection_fd, 
 	 int fd)
@@ -237,38 +248,6 @@ send_fd (int connection_fd,
   return ret;
 }
 
-static void
-daemon_handle_open_for_read (GVfsDaemon *daemon,
-			     DBusConnection *conn,
-			     DBusMessage *message)
-{
-  GVfsDaemonClass *class;
-  DBusMessage *reply;
-  DBusError derror;
-  const char *path_data;
-  int path_len;
-  char *path;
-  int fd;
-  GError *error;
-  GVfsReadRequest *read_request;
-  
-  class = G_VFS_DAEMON_GET_CLASS (daemon);
-  
-  dbus_error_init (&derror);
-  
-  read_request = NULL;
-
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-			      0))
-    {
-      reply = dbus_message_new_error (message,
-				      derror.name,
-                                      derror.message);
-      dbus_error_free (&derror);
-      goto reply;
-    }
 
   error = NULL;
   read_request = g_vfs_read_request_new (&error);
@@ -279,9 +258,6 @@ daemon_handle_open_for_read (GVfsDaemon *daemon,
     } 
   else
     {
-      path = g_strndup (path_data, path_len);
-      g_vfs_read_request_set_filename (read_request, path);
-      g_free (path);
 
       reply = dbus_message_new_method_return (message);
     }
@@ -298,12 +274,69 @@ daemon_handle_open_for_read (GVfsDaemon *daemon,
       
       /* TODO: Add request to table, etc */
     }
+#endif
+
+static gboolean
+start_jobs_at_idle (gpointer data)
+{
+  GVfsDaemon *daemon = data;
+  GList *l, *next;
+  GVfsJob *job;
+
+  g_mutex_lock (daemon->priv->lock);
+  daemon->priv->queued_job_start = 0;
+  g_mutex_unlock (daemon->priv->lock);
+
+  l = daemon->priv->pending_jobs->head;
+  while (l != NULL)
+    {
+      job = l->data;
+      next = l->next;
+
+      if (g_vfs_job_start (job))
+	g_queue_delete_link (daemon->priv->pending_jobs, l);
+      
+      l = next;
+    }
+  
+  return FALSE;
+}
+
+/* Called with lock held */
+static void
+queue_start_jobs_at_idle (GVfsDaemon *daemon)
+{
+  if (daemon->priv->queued_job_start == 0)
+    daemon->priv->queued_job_start = g_idle_add (start_jobs_at_idle, daemon);
+}
+
+/* NOTE: Might be emitted on a thread */
+static void
+job_finished_callback (GVfsJob *job, 
+		       GVfsDaemon *daemon)
+{
+  g_mutex_lock (daemon->priv->lock);
+  g_queue_remove (daemon->priv->jobs, job);
+  queue_start_jobs_at_idle (daemon);
+  g_mutex_unlock (daemon->priv->lock);
+  g_object_unref (job);
 }
 
 static void
-close_wrapper (gpointer p)
+start_or_queue_job (GVfsDaemon *daemon,
+		    GVfsJob *job)
 {
-  close (GPOINTER_TO_INT (p));
+  g_mutex_lock (daemon->priv->lock);
+  g_queue_push_tail (daemon->priv->jobs, job);
+  g_mutex_unlock (daemon->priv->lock);
+  g_signal_connect (job, "finished", (GCallback)job_finished_callback, daemon);
+  
+  /* Can we start the job immediately */
+  if (!g_vfs_job_start (job))
+    {
+      /* Didn't start, queue as pending */
+      g_queue_push_tail (daemon->priv->pending_jobs, job);
+    }
 }
 
 static void
@@ -323,9 +356,7 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
       g_printerr ("Failed to register object with new dbus peer connection.\n");
     }
 
-  if (!dbus_connection_set_data (dbus_conn, extra_fd_slot, GINT_TO_POINTER (extra_fd), close_wrapper))
-    g_error ("Out of memory");
-  
+  dbus_connection_add_fd_send_fd (dbus_conn, extra_fd);
 }
 
 #ifdef __linux__
@@ -620,6 +651,7 @@ daemon_handle_get_connection (DBusConnection *conn,
   g_io_channel_unref (channel);
     
   reply = dbus_message_new_method_return (message);
+  /* TODO: Check OOM */
   dbus_message_append_args (reply,
 			    DBUS_TYPE_STRING, &address1,
 			    DBUS_TYPE_STRING, &address2,
@@ -656,7 +688,9 @@ daemon_message_func (DBusConnection *conn,
 		     gpointer        data)
 {
   GVfsDaemon *daemon = data;
-
+  GVfsJob *job;
+  
+  job = NULL;
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_DAEMON_INTERFACE,
 				   G_VFS_DBUS_OP_GET_CONNECTION))
@@ -664,10 +698,13 @@ daemon_message_func (DBusConnection *conn,
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_DAEMON_INTERFACE,
 					G_VFS_DBUS_OP_OPEN_FOR_READ))
-    daemon_handle_open_for_read (daemon, conn, message);
+    job = g_vfs_job_open_for_read_new (daemon, conn, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   
+  if (job)
+    start_or_queue_job (daemon, job);
+
   return DBUS_HANDLER_RESULT_HANDLED;
 }
 
@@ -676,3 +713,16 @@ gboolean
 {
   return daemon->priv->active;
 }
+
+
+/* Calling this on a thread is allowed */
+void
+g_vfs_daemon_register_read_handle (GVfsDaemon *daemon,
+				   GVfsReadHandle *handle)
+{
+  g_mutex_lock (daemon->priv->lock);
+  daemon->priv->read_handles = g_list_append (daemon->priv->read_handles,
+					      handle);
+  g_mutex_unlock (daemon->priv->lock);
+}
+

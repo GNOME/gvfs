@@ -49,6 +49,29 @@ free_mount_connection (gpointer data)
   dbus_connection_unref (conn);
 }
 
+static void
+append_unescaped_dbus_name (GString *s,
+			    const char *escaped,
+			    const char *end)
+{
+  guchar c;
+
+  while (escaped < end)
+    {
+      c = *escaped++;
+      if (c == '_' &&
+	  escaped < end)
+	{
+	  c = g_ascii_xdigit_value (*escaped++) << 4;
+
+	  if (escaped < end)
+	    c |= g_ascii_xdigit_value (*escaped++);
+	}
+      g_string_append_c (s, c);
+    }
+}
+
+
 /* We use _ for escaping */
 #define VALID_INITIAL_BUS_NAME_CHARACTER(c)         \
   ( ((c) >= 'A' && (c) <= 'Z') ||               \
@@ -273,48 +296,42 @@ _g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filenam
   return TRUE;
 }
 
-gboolean
-_g_error_from_dbus_message (DBusMessage *message, GError **error)
+void
+_g_error_from_dbus (DBusError *derror, 
+		    GError **error)
 {
-  const char *str;
-  const char *name;
-  char *m, *gerror_name, *end;
+  const char *name, *end;;
+  char *m;
+  GString *str;
   GQuark domain;
   int code;
 
-  if (dbus_message_get_type (message) != DBUS_MESSAGE_TYPE_ERROR)
-    return FALSE;
-
-  str = NULL;
-  dbus_message_get_args (message, NULL,
-                         DBUS_TYPE_STRING, &str,
-                         DBUS_TYPE_INVALID);
-
-
-  name = dbus_message_get_error_name (message);
-  if (g_str_has_prefix (name, "org.glib.GError."))
+  if (g_str_has_prefix (derror->name, "org.glib.GError."))
     {
-      gerror_name = g_strdup (name + strlen ("org.glib.GError."));
-      end = strchr (gerror_name, '.');
-      if (end)
-	*end++ = 0;
+      domain = 0;
+      code = 0;
 
-      domain = g_quark_from_string (gerror_name);
-      g_free (gerror_name);
-
+      name = derror->name + strlen ("org.glib.GError.");
+      end = strchr (name, '.');
       if (end)
-	code = atoi (end);
+	{
+	  str = g_string_new (NULL);
+	  append_unescaped_dbus_name (str, name, end);
+	  domain = g_quark_from_string (str->str);
+	  g_string_free (str, TRUE);
+
+	  end++; /* skip . */
+	  if (*end++ == 'c')
+	    code = atoi (end);
+	}
       
-      g_set_error (error, domain, code, str);
+      g_set_error (error, domain, code, "%s", derror->message);
     }
   /* TODO: Special case other types, like DBUS_ERROR_NO_MEMORY etc? */
   else
     {
-      m = g_strdup_printf ("DBus error %s: %s", name, str);
-      g_set_error (error, G_FILE_ERROR,
-		   G_FILE_ERROR_IO, m);
-
+      m = g_strdup_printf ("DBus error %s: %s", derror->name, derror->message);
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO, "%s", m);
+      g_free (m);
     }
-
-  return TRUE;
 }

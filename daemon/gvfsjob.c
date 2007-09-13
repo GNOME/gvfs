@@ -10,10 +10,11 @@
 #include <glib/gi18n.h>
 #include "gvfsjob.h"
 
-G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_VFS_JOB);
+G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
 
 enum {
-  CANCEL,
+  CANCELLED,
+  FINISHED,
   LAST_SIGNAL
 };
 
@@ -40,11 +41,19 @@ g_vfs_job_class_init (GVfsJobClass *klass)
   
   gobject_class->finalize = g_vfs_job_finalize;
 
-  signals[CANCEL] =
-    g_signal_new ("done",
+  signals[CANCELLED] =
+    g_signal_new ("cancelled",
 		  G_TYPE_FROM_CLASS (gobject_class),
 		  G_SIGNAL_RUN_LAST,
-		  G_STRUCT_OFFSET (GVfsJobClass, cancel),
+		  G_STRUCT_OFFSET (GVfsJobClass, cancelled),
+		  NULL, NULL,
+		  g_cclosure_marshal_VOID__VOID,
+		  G_TYPE_NONE, 0);
+  signals[FINISHED] =
+    g_signal_new ("finished",
+		  G_TYPE_FROM_CLASS (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GVfsJobClass, finished),
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__VOID,
 		  G_TYPE_NONE, 0);
@@ -56,6 +65,15 @@ g_vfs_job_init (GVfsJob *job)
 {
 }
 
+gboolean
+g_vfs_job_start (GVfsJob *job)
+{
+  GVfsJobClass *class;
+
+  class = G_VFS_JOB_GET_CLASS (job);
+  return class->start (job);
+}
+
 void
 g_vfs_job_cancel (GVfsJob *job)
 {
@@ -63,16 +81,75 @@ g_vfs_job_cancel (GVfsJob *job)
     return;
 
   job->cancelled = TRUE;
-  g_signal_emit (job, signals[CANCEL], 0);
+  g_signal_emit (job, signals[CANCELLED], 0);
+}
+
+static void 
+g_vfs_job_send_reply (GVfsJob *job)
+{
+  GVfsJobClass *class;
+
+  class = G_VFS_JOB_GET_CLASS (job);
+  class->send_reply (job);
 }
 
 void
-g_vfs_job_set_failed (GVfsJob *job,
-		      GError *error)
+g_vfs_job_failed (GVfsJob *job,
+		  GQuark         domain,
+		  gint           code,
+		  const gchar   *format,
+		  ...)
+{
+  va_list args;
+  char *message;
+
+  if (job->failed)
+    return;
+
+  job->failed = TRUE;
+
+  va_start (args, format);
+  message = g_strdup_vprintf (format, args);
+  va_end (args);
+
+  job->error = g_error_new (domain, code, message);
+  g_free (message);
+
+  g_vfs_job_send_reply (job);
+}
+
+void
+g_vfs_job_failed_from_error (GVfsJob *job,
+			     GError *error)
 {
   if (job->failed)
     return;
 
   job->failed = TRUE;
   job->error = g_error_copy (error);
+  g_vfs_job_send_reply (job);
+}
+
+void
+g_vfs_job_succeeded (GVfsJob *job)
+{
+  job->failed = FALSE;
+  g_vfs_job_send_reply (job);
+}
+
+
+gboolean
+g_vfs_job_is_finished (GVfsJob *job)
+{
+  return job->finished;
+}
+
+/* Might be called on an i/o thread */
+void
+g_vfs_job_emit_finished (GVfsJob *job)
+{
+  g_assert (!job->finished);
+  
+  job->finished = TRUE;
+  g_signal_emit (job, signals[FINISHED], 0);
 }

@@ -37,7 +37,9 @@ main (int argc, char *argv[])
   GMainLoop *loop;
   GVfsDaemon *daemon;
   GVfsDaemonBackendTest *backend;
-  
+
+  g_thread_init (NULL);
+
   g_type_init ();
 
   if (!init_dbus ())
