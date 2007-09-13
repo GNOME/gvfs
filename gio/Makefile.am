@@ -96,6 +96,7 @@ libgio_la_SOURCES = 	\
 	gdirectorymonitor.c \
 	gdrive.c \
 	gdrivepriv.h \
+	gdummyfile.c \
 	gfile.c \
 	gfileenumerator.c \
 	gfileicon.c \
@@ -168,6 +169,7 @@ gvfsinclude_HEADERS = \
 	gcontenttype.h \
 	gdirectorymonitor.h \
 	gdrive.h \
+	gdummyfile.h \
 	gfile.h \
 	gfileenumerator.h \
 	gfileicon.h \

@@ -1,6 +1,7 @@
 #include <config.h>
 #include "glocalvfs.h"
 #include "glocalfile.h"
+#include <gio/gdummyfile.h>
 
 struct _GLocalVfs
 {
@@ -52,7 +53,7 @@ g_local_vfs_get_file_for_uri   (GVfs       *vfs,
   if (path != NULL)
     file = g_local_file_new (path);
   else
-    file = NULL;
+    file = g_dummy_file_new (uri);
 
   g_free (path);
 

@@ -6,6 +6,7 @@
 #include "gdaemonfile.h"
 #include <gio/glocalvfs.h>
 #include <gio/giomodule.h>
+#include <gio/gdummyfile.h>
 #include <gvfsdaemonprotocol.h>
 #include <gmodule.h>
 #include "gvfsdaemondbus.h"
@@ -245,7 +246,7 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
   
   decoded = _g_decode_uri (uri);
   if (decoded == NULL)
-    return NULL;
+    return g_dummy_file_new (uri);
 
   if (strcmp (decoded->scheme, "file") == 0)
     file = g_daemon_vfs_get_file_for_path (vfs, decoded->path);
