@@ -105,6 +105,7 @@ struct _GFileInfoClass
 /* Owner attributes */
 
 #define G_FILE_ATTRIBUTE_OWNER_USER "owner:user"                 /* string */
+#define G_FILE_ATTRIBUTE_OWNER_USER_REAL "owner:user_real"       /* string */
 #define G_FILE_ATTRIBUTE_OWNER_GROUP "owner:group"               /* string */
 
 /* File system info (for g_file_get_filesystem_info) */

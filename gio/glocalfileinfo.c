@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <pwd.h>
+#include <grp.h>
 #ifdef HAVE_SELINUX
 #include <selinux/selinux.h>
 #endif
@@ -31,6 +33,17 @@
 #include "gioerror.h"
 #include "gcontenttype.h"
 #include "gcontenttypeprivate.h"
+
+typedef struct {
+  char *user_name;
+  char *real_name;
+} UidData;
+
+G_LOCK_DEFINE_STATIC (uid_cache);
+GHashTable *uid_cache = NULL;
+
+G_LOCK_DEFINE_STATIC (gid_cache);
+GHashTable *gid_cache = NULL;
 
 char *
 _g_local_file_info_create_etag (struct stat *statbuf)
@@ -801,6 +814,197 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf,
 
 }
 
+static char *
+make_valid_utf8 (const char *name)
+{
+  GString *string;
+  const gchar *remainder, *invalid;
+  gint remaining_bytes, valid_bytes;
+  
+  string = NULL;
+  remainder = name;
+  remaining_bytes = strlen (name);
+  
+  while (remaining_bytes != 0) 
+    {
+      if (g_utf8_validate (remainder, remaining_bytes, &invalid)) 
+	break;
+      valid_bytes = invalid - remainder;
+    
+      if (string == NULL) 
+	string = g_string_sized_new (remaining_bytes);
+
+      g_string_append_len (string, remainder, valid_bytes);
+      /* append U+FFFD REPLACEMENT CHARACTER */
+      g_string_append (string, "\357\277\275");
+      
+      remaining_bytes -= valid_bytes + 1;
+      remainder = invalid + 1;
+    }
+  
+  if (string == NULL)
+    return g_strdup (name);
+  
+  g_string_append (string, remainder);
+
+  g_assert (g_utf8_validate (string->str, -1, NULL));
+  
+  return g_string_free (string, FALSE);
+}
+
+static char *
+convert_pwd_string_to_utf8 (char *pwd_str)
+{
+  char *utf8_string;
+  
+  if (!g_utf8_validate (pwd_str, -1, NULL))
+    {
+      utf8_string = g_locale_to_utf8 (pwd_str, -1, NULL, NULL, NULL);
+      if (utf8_string == NULL)
+	utf8_string = make_valid_utf8 (pwd_str);
+    }
+  else 
+    utf8_string = g_strdup (pwd_str);
+  
+  return utf8_string;
+}
+
+static void
+uid_data_free (UidData *data)
+{
+  g_free (data->user_name);
+  g_free (data->real_name);
+  g_free (data);
+}
+
+/* called with lock held */
+static UidData *
+lookup_uid_data (uid_t uid)
+{
+  UidData *data;
+  char buffer[4096];
+  struct passwd pwbuf;
+  struct passwd *pwbufp;
+  char *gecos, *comma;
+  
+  if (uid_cache == NULL)
+    uid_cache = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify)uid_data_free);
+
+  data = g_hash_table_lookup (uid_cache, GINT_TO_POINTER (uid));
+
+  if (data)
+    return data;
+
+  data = g_new0 (UidData, 1);
+
+  getpwuid_r (uid, &pwbuf, buffer, sizeof(buffer), &pwbufp);
+
+  if (pwbufp != NULL)
+    {
+      if (pwbufp->pw_name != NULL && pwbufp->pw_name[0] != 0)
+	data->user_name = convert_pwd_string_to_utf8 (pwbufp->pw_name);
+
+      gecos = pwbufp->pw_gecos;
+
+      if (gecos)
+	{
+	  comma = strchr (gecos, ',');
+	  if (comma)
+	    *comma = 0;
+	  data->real_name = convert_pwd_string_to_utf8 (gecos);
+	}
+    }
+
+  /* Default fallbacks */
+  if (data->real_name == NULL)
+    {
+      if (data->user_name != NULL)
+	data->real_name = g_strdup (data->user_name);
+      else
+	data->real_name = g_strdup_printf("user #%d", (int)uid);
+    }
+  
+  if (data->user_name == NULL)
+    data->user_name = g_strdup_printf("%d", (int)uid);
+  
+  g_hash_table_replace (uid_cache, GINT_TO_POINTER (uid), data);
+  
+  return data;
+}
+
+static char *
+get_username_from_uid (uid_t uid)
+{
+  char *res;
+  UidData *data;
+  
+  G_LOCK (uid_cache);
+  data = lookup_uid_data (uid);
+  res = g_strdup (data->user_name);  
+  G_UNLOCK (uid_cache);
+
+  return res;
+}
+
+static char *
+get_realname_from_uid (uid_t uid)
+{
+  char *res;
+  UidData *data;
+  
+  G_LOCK (uid_cache);
+  data = lookup_uid_data (uid);
+  res = g_strdup (data->real_name);  
+  G_UNLOCK (uid_cache);
+  
+  return res;
+}
+
+
+/* called with lock held */
+static char *
+lookup_gid_name (gid_t gid)
+{
+  char *name;
+  char buffer[4096];
+  struct group gbuf;
+  struct group *gbufp;
+  
+  if (gid_cache == NULL)
+    gid_cache = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify)g_free);
+
+  name = g_hash_table_lookup (gid_cache, GINT_TO_POINTER (gid));
+
+  if (name)
+    return name;
+
+  getgrgid_r (gid, &gbuf, buffer, sizeof(buffer), &gbufp);
+
+  if (gbufp != NULL &&
+      gbufp->gr_name != NULL &&
+      gbufp->gr_name[0] != 0)
+    name = convert_pwd_string_to_utf8 (gbufp->gr_name);
+  else
+    name = g_strdup_printf("%d", (int)gid);
+  
+  g_hash_table_replace (gid_cache, GINT_TO_POINTER (gid), name);
+  
+  return name;
+}
+
+static char *
+get_groupname_from_gid (gid_t gid)
+{
+  char *res;
+  char *name;
+  
+  G_LOCK (gid_cache);
+  name = lookup_gid_name (gid);
+  res = g_strdup (name);  
+  G_UNLOCK (gid_cache);
+  return res;
+}
+
 GFileInfo *
 _g_local_file_info_get (const char *basename,
 			const char *path,
@@ -968,6 +1172,37 @@ _g_local_file_info_get (const char *basename,
       /* TODO */
     }
 
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_OWNER_USER))
+    {
+      char *name;
+      
+      name = get_username_from_uid (statbuf.st_uid);
+      if (name)
+	g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER, name);
+    }
+
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_OWNER_USER_REAL))
+    {
+      char *name;
+      
+      name = get_realname_from_uid (statbuf.st_uid);
+      if (name)
+	g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_USER_REAL, name);
+    }
+  
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_OWNER_GROUP))
+    {
+      char *name;
+      
+      name = get_groupname_from_gid (statbuf.st_gid);
+      if (name)
+	g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_OWNER_GROUP, name);
+    }
+
+  
   get_access_rights (attribute_matcher, info, path, &statbuf, parent_info);
   
   get_selinux_context (path, info, attribute_matcher, (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS) == 0);
