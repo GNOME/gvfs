@@ -18,6 +18,7 @@
 #include "gvfsjobseekread.h"
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobwrite.h"
+#include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobgetinfo.h"
@@ -1043,8 +1044,12 @@ do_close_write (GVfsBackend *backend,
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   SmbWriteHandle *handle = _handle;
+  struct stat stat_at_close;
+  int stat_res;
   ssize_t res;
 
+  stat_res = op_backend->smb_context->fstat (op_backend->smb_context, handle->file, &stat_at_close);
+  
   res = op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
 
   if (res == -1)
@@ -1055,7 +1060,7 @@ do_close_write (GVfsBackend *backend,
 	op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
       goto out;
     }
-  
+
   if (handle->tmp_uri)
     {
       if (handle->backup_uri)
@@ -1082,6 +1087,14 @@ do_close_write (GVfsBackend *backend,
 	  g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
 	  goto out;
 	}
+    }
+  
+  if (stat_res == 0)
+    {
+      char *etag;
+      etag = create_etag (&stat_at_close);
+      g_vfs_job_close_write_set_etag (job, etag);
+      g_free (etag);
     }
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
