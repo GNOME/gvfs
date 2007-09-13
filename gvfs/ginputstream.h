@@ -171,6 +171,9 @@ void          g_input_stream_close_async       (GInputStream              *strea
 						GAsyncCloseInputCallback   callback,
 						gpointer                   data,
 						GDestroyNotify             notify);
+
+/* For implementations: */
+
 void          g_input_stream_cancel            (GInputStream              *stream);
 gboolean      g_input_stream_is_cancelled      (GInputStream              *stream);
 gboolean      g_input_stream_is_closed         (GInputStream              *stream);
