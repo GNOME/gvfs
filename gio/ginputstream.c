@@ -414,6 +414,18 @@ async_ready_callback_wrapper (GObject *source_object,
 }
 
 static void
+async_ready_close_callback_wrapper (GObject *source_object,
+				    GAsyncResult *res,
+				    gpointer      user_data)
+{
+  GInputStream *stream = G_INPUT_STREAM (source_object);
+
+  stream->priv->pending = FALSE;
+  stream->priv->closed = TRUE;
+  (*stream->priv->outstanding_callback) (source_object, res, user_data);
+  g_object_unref (stream);
+}
+static void
 report_error (GInputStream *stream,
 	      GAsyncReadyCallback callback,
 	      gpointer user_data,
@@ -737,7 +749,7 @@ g_input_stream_close_async (GInputStream       *stream,
   stream->priv->outstanding_callback = callback;
   g_object_ref (stream);
   class->close_async (stream, io_priority, cancellable,
-		      async_ready_callback_wrapper, user_data);
+		      async_ready_close_callback_wrapper, user_data);
 }
 
 gboolean
