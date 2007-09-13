@@ -77,6 +77,30 @@ g_mount_source_new_dbus (const char                *dbus_id,
   return source;
 }
 
+void
+g_mount_source_to_dbus (GMountSource *source,
+			DBusMessage *message)
+{
+  dbus_bool_t automount;
+  DBusMessageIter iter;
+  
+  g_assert (source->dbus_id != NULL);
+  g_assert (source->obj_path != NULL);
+  g_assert (source->mount_spec != NULL);
+
+  automount = source->is_automount;
+  if (!dbus_message_append_args (message,
+				 DBUS_TYPE_STRING, &source->dbus_id,
+				 DBUS_TYPE_OBJECT_PATH, &source->obj_path,
+				 DBUS_TYPE_BOOLEAN, &automount,
+				 0))
+    _g_dbus_oom ();
+  
+  dbus_message_iter_init_append (message, &iter);
+  g_mount_spec_to_dbus (&iter, spec);
+}
+
+
 GMountSource *
 g_mount_source_new_null (GMountSpec *spec)
 {
@@ -307,3 +331,123 @@ g_mount_source_request_mount_spec_async (GMountSource *source,
 				 request_mount_spec_reply, data);
   dbus_message_unref (message);
 }
+
+typedef struct {
+  GMutex *mutex;
+  GCond *cond;
+  gboolean handled;
+  gboolean aborted;
+  char *password;
+  char *username;
+  char *domain;
+} AskPasswordData;
+
+static void
+ask_password_reply (DBusMessage *reply,
+		    GError *error,
+		    gpointer _data)
+{
+  AskPasswordData *data = _data;
+  dbus_bool_t handled, aborted, anonymous;
+  guint32 password_save;
+  const char *password, *username, *domain;
+  DBusMessageIter iter;
+
+  if (reply == NULL)
+    {
+      data->aborted = TRUE;
+    }
+  else
+    {
+      dbus_message_iter_init (reply, &iter);
+      if (!_g_dbus_message_iter_get_args (&iter, NULL,
+					  DBUS_TYPE_BOOLEAN, &handled,
+					  DBUS_TYPE_BOOLEAN, &aborted,
+					  DBUS_TYPE_STRING, &password,
+					  DBUS_TYPE_STRING, &username,
+					  DBUS_TYPE_STRING, &domain,
+					  DBUS_TYPE_BOOLEAN, &anonymous,
+					  DBUS_TYPE_UINT32, &password_save,
+					  0))
+	data->aborted = TRUE;
+      else
+	{
+	  data->handled = handled;
+	  data->aborted = aborted;
+
+	  data->password = g_strdup (password);
+	  data->username = g_strdup (username);
+	  data->domain = g_strdup (domain);
+
+	  /* TODO: handle more args */
+	}
+    }
+
+  /* Wake up sync call thread */
+  g_mutex_lock (data->mutex);
+  g_cond_signal (data->cond);
+  g_mutex_unlock (data->mutex);
+}
+
+gboolean
+g_mount_source_ask_password (GMountSource *source,
+			     const char *message_string,
+			     const char *default_user,
+			     const char *default_domain,
+			     GPasswordFlags flags,
+			     gboolean *aborted,
+			     char **password_out,
+			     char **user_out,
+			     char **domain_out)
+{
+  DBusMessage *message;
+  guint32 flags_as_int;
+  AskPasswordData data = {0};
+
+  if (source->dbus_id == NULL)
+    return FALSE;
+
+  if (message_string == NULL)
+    message_string = "";
+  if (default_user == NULL)
+    default_user = "";
+  if (default_domain == NULL)
+    default_domain = "";
+
+  flags_as_int = flags;
+  
+  message = dbus_message_new_method_call (source->dbus_id,
+					  source->obj_path,
+					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					  "askPassword");
+  
+  _g_dbus_message_append_args (message,
+			       DBUS_TYPE_STRING, &message_string,
+			       DBUS_TYPE_STRING, &default_user,
+			       DBUS_TYPE_STRING, &default_domain,
+			       DBUS_TYPE_UINT32, &flags_as_int,
+			       0);
+
+  data.mutex = g_mutex_new ();
+  data.cond = g_cond_new ();
+
+  g_mutex_lock (data.mutex);
+  
+  _g_dbus_connection_call_async (NULL, message, -1,
+				 ask_password_reply, &data);
+  dbus_message_unref (message);
+  
+  g_cond_wait(data.cond, data.mutex);
+  g_mutex_unlock (data.mutex);
+
+  g_cond_free (data.cond);
+  g_mutex_free (data.mutex);
+
+  *aborted = data.aborted;
+  *password_out = data.password;
+  *user_out = data.username;
+  *domain_out = data.domain;
+  
+  return data.handled;
+}
+

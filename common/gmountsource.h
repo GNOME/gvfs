@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <gmountspec.h>
+#include <gio/gmountoperation.h>
 
 G_BEGIN_DECLS
 
@@ -33,6 +34,8 @@ GMountSource *g_mount_source_new_dbus                 (const char               
 						       const char                *obj_path,
 						       GMountSpec                *spec);
 GMountSource *g_mount_source_new_null                 (GMountSpec                *spec);
+void          g_mount_source_to_dbus                  (GMountSource              *source,
+						       DBusMessage               *message);
 GMountSpec *  g_mount_source_request_mount_spec       (GMountSource              *source,
 						       GError                   **error);
 void          g_mount_source_request_mount_spec_async (GMountSource              *source,
@@ -44,6 +47,17 @@ void          g_mount_source_failed                   (GMountSource             
 void          g_mount_source_set_is_automount         (GMountSource              *source,
 						       gboolean                   is_automount);
 gboolean      g_mount_source_get_is_automount         (GMountSource              *source);
+gboolean      g_mount_source_ask_password             (GMountSource              *mount_source,
+						       const char                *message,
+						       const char                *initial_user,
+						       const char                *initial_domain,
+						       GPasswordFlags             flags,
+						       gboolean                  *aborted,
+						       char                     **password_out,
+						       char                     **user_out,
+						       char                     **domain_out);
+
+
 
 G_END_DECLS
 
