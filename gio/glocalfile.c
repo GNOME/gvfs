@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include "gfilelocal.h"
+#include "glocalfile.h"
 #include "gfileinfolocal.h"
 #include "gfileenumeratorlocal.h"
 #include "gfileinputstreamlocal.h"
@@ -15,53 +15,53 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-static void g_file_local_file_iface_init (GFileIface       *iface);
+static void g_local_file_file_iface_init (GFileIface       *iface);
 
-struct _GFileLocal
+struct _GLocalFile
 {
   GObject parent_instance;
 
   char *filename;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GFileLocal, g_file_local, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GLocalFile, g_local_file, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE,
-						g_file_local_file_iface_init))
+						g_local_file_file_iface_init))
 
 static void
-g_file_local_finalize (GObject *object)
+g_local_file_finalize (GObject *object)
 {
-  GFileLocal *local;
+  GLocalFile *local;
 
-  local = G_FILE_LOCAL (object);
+  local = G_LOCAL_FILE (object);
 
   g_free (local->filename);
   
-  if (G_OBJECT_CLASS (g_file_local_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_local_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_local_file_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_local_file_parent_class)->finalize) (object);
 }
 
 static void
-g_file_local_class_init (GFileLocalClass *klass)
+g_local_file_class_init (GLocalFileClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   
-  gobject_class->finalize = g_file_local_finalize;
+  gobject_class->finalize = g_local_file_finalize;
 }
 
 static void
-g_file_local_init (GFileLocal *local)
+g_local_file_init (GLocalFile *local)
 {
 }
 
 GFile *
-g_file_local_new (const char *filename)
+g_local_file_new (const char *filename)
 {
-  GFileLocal *local;
+  GLocalFile *local;
   char *non_root;
   int len;
 
-  local = g_object_new (G_TYPE_FILE_LOCAL, NULL);
+  local = g_object_new (G_TYPE_LOCAL_FILE, NULL);
   local->filename = g_strdup (filename);
 
   /* Remove any trailing slashes */
@@ -81,21 +81,21 @@ g_file_local_new (const char *filename)
 }
 
 static gboolean
-g_file_local_is_native (GFile *file)
+g_local_file_is_native (GFile *file)
 {
   return TRUE;
 }
 
 static char *
-g_file_local_get_path (GFile *file)
+g_local_file_get_path (GFile *file)
 {
-  return g_strdup (G_FILE_LOCAL (file)->filename);
+  return g_strdup (G_LOCAL_FILE (file)->filename);
 }
 
 static char *
-g_file_local_get_uri (GFile *file)
+g_local_file_get_uri (GFile *file)
 {
-  return g_filename_to_uri (G_FILE_LOCAL (file)->filename, NULL, NULL);
+  return g_filename_to_uri (G_LOCAL_FILE (file)->filename, NULL, NULL);
 }
 
 static gboolean
@@ -132,7 +132,7 @@ name_is_valid_for_display (const char *string,
 }
 
 static char *
-g_file_local_get_parse_name (GFile *file)
+g_local_file_get_parse_name (GFile *file)
 {
   const char *filename;
   char *parse_name;
@@ -142,7 +142,7 @@ g_file_local_get_parse_name (GFile *file)
   gboolean free_utf8_filename;
   gboolean is_valid_utf8;
 
-  filename = G_FILE_LOCAL (file)->filename;
+  filename = G_LOCAL_FILE (file)->filename;
   if (get_filename_charset (&charset))
     {
       utf8_filename = (char *)filename;
@@ -191,9 +191,9 @@ g_file_local_get_parse_name (GFile *file)
 }
 
 static GFile *
-g_file_local_get_parent (GFile *file)
+g_local_file_get_parent (GFile *file)
 {
-  GFileLocal *local = G_FILE_LOCAL (file);
+  GLocalFile *local = G_LOCAL_FILE (file);
   const char *non_root;
   char *dirname;
   GFile *parent;
@@ -204,57 +204,57 @@ g_file_local_get_parent (GFile *file)
     return NULL;
 
   dirname = g_path_get_dirname (local->filename);
-  parent = g_file_local_new (dirname);
+  parent = g_local_file_new (dirname);
   g_free (dirname);
   return parent;
 }
 
 static GFile *
-g_file_local_copy (GFile *file)
+g_local_file_copy (GFile *file)
 {
-  GFileLocal *local = G_FILE_LOCAL (file);
+  GLocalFile *local = G_LOCAL_FILE (file);
 
-  return g_file_local_new (local->filename);
+  return g_local_file_new (local->filename);
 }
 
 
 static GFile *
-g_file_local_get_child (GFile *file,
+g_local_file_get_child (GFile *file,
 			const char *name)
 {
-  GFileLocal *local = G_FILE_LOCAL (file);
+  GLocalFile *local = G_LOCAL_FILE (file);
   char *filename;
   GFile *child;
 
   filename = g_build_filename (local->filename, name, NULL);
 
-  child = g_file_local_new (filename);
+  child = g_local_file_new (filename);
   g_free (filename);
   
   return child;
 }
 
 static GFileEnumerator *
-g_file_local_enumerate_children (GFile      *file,
+g_local_file_enumerate_children (GFile      *file,
 				 const char *attributes,
 				 GFileGetInfoFlags flags,
 				 GCancellable *cancellable,
 				 GError **error)
 {
-  GFileLocal *local = G_FILE_LOCAL (file);
+  GLocalFile *local = G_LOCAL_FILE (file);
   return g_file_enumerator_local_new (local->filename,
 				      attributes, flags,
 				      cancellable, error);
 }
 
 static GFileInfo *
-g_file_local_get_info (GFile                *file,
+g_local_file_get_info (GFile                *file,
 		       const char           *attributes,
 		       GFileGetInfoFlags     flags,
 		       GCancellable         *cancellable,
 		       GError              **error)
 {
-  GFileLocal *local = G_FILE_LOCAL (file);
+  GLocalFile *local = G_LOCAL_FILE (file);
   GFileInfo *info;
   GFileAttributeMatcher *matcher;
   char *basename;
@@ -275,11 +275,11 @@ g_file_local_get_info (GFile                *file,
 }
 
 static GFileInputStream *
-g_file_local_read (GFile *file,
+g_local_file_read (GFile *file,
 		   GCancellable *cancellable,
 		   GError **error)
 {
-  GFileLocal *local = G_FILE_LOCAL (file);
+  GLocalFile *local = G_LOCAL_FILE (file);
   int fd;
   
   if (g_cancellable_is_cancelled (cancellable))
@@ -305,37 +305,37 @@ g_file_local_read (GFile *file,
 }
 
 static GFileOutputStream *
-g_file_local_append_to (GFile *file,
+g_local_file_append_to (GFile *file,
 			GCancellable *cancellable,
 			GError **error)
 {
-  return g_file_output_stream_local_append (G_FILE_LOCAL (file)->filename,
+  return g_file_output_stream_local_append (G_LOCAL_FILE (file)->filename,
 					    cancellable, error);
 }
 
 static GFileOutputStream *
-g_file_local_create (GFile *file,
+g_local_file_create (GFile *file,
 		     GCancellable *cancellable,
 		     GError **error)
 {
-  return g_file_output_stream_local_create (G_FILE_LOCAL (file)->filename,
+  return g_file_output_stream_local_create (G_LOCAL_FILE (file)->filename,
 					    cancellable, error);
 }
 
 static GFileOutputStream *
-g_file_local_replace (GFile *file,
+g_local_file_replace (GFile *file,
 		      time_t mtime,
 		      gboolean make_backup,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  return g_file_output_stream_local_replace (G_FILE_LOCAL (file)->filename,
+  return g_file_output_stream_local_replace (G_LOCAL_FILE (file)->filename,
 					     mtime, make_backup,
 					     cancellable, error);
 }
 
 static void
-g_file_local_mount (GFile *file,
+g_local_file_mount (GFile *file,
 		    GMountOperation *mount_operation)
 {
   /* Always just ok... */
@@ -343,20 +343,20 @@ g_file_local_mount (GFile *file,
 }
 
 static void
-g_file_local_file_iface_init (GFileIface *iface)
+g_local_file_file_iface_init (GFileIface *iface)
 {
-  iface->copy = g_file_local_copy;
-  iface->is_native = g_file_local_is_native;
-  iface->get_path = g_file_local_get_path;
-  iface->get_uri = g_file_local_get_uri;
-  iface->get_parse_name = g_file_local_get_parse_name;
-  iface->get_parent = g_file_local_get_parent;
-  iface->get_child = g_file_local_get_child;
-  iface->enumerate_children = g_file_local_enumerate_children;
-  iface->get_info = g_file_local_get_info;
-  iface->read = g_file_local_read;
-  iface->append_to = g_file_local_append_to;
-  iface->create = g_file_local_create;
-  iface->replace = g_file_local_replace;
-  iface->mount = g_file_local_mount;
+  iface->copy = g_local_file_copy;
+  iface->is_native = g_local_file_is_native;
+  iface->get_path = g_local_file_get_path;
+  iface->get_uri = g_local_file_get_uri;
+  iface->get_parse_name = g_local_file_get_parse_name;
+  iface->get_parent = g_local_file_get_parent;
+  iface->get_child = g_local_file_get_child;
+  iface->enumerate_children = g_local_file_enumerate_children;
+  iface->get_info = g_local_file_get_info;
+  iface->read = g_local_file_read;
+  iface->append_to = g_local_file_append_to;
+  iface->create = g_local_file_create;
+  iface->replace = g_local_file_replace;
+  iface->mount = g_local_file_mount;
 }

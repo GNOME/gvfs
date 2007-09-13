@@ -26,8 +26,8 @@ local_sources = \
 	gfileenumeratorlocal.h \
 	gfileinfolocal.c \
 	gfileinfolocal.h \
-	gfilelocal.c \
-	gfilelocal.h \
+	glocalfile.c \
+	glocalfile.h \
 	gfileinputstreamlocal.c \
 	gfileinputstreamlocal.h \
 	gfileoutputstreamlocal.c \

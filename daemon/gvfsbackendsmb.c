@@ -11,7 +11,6 @@
 #include <glib/gi18n.h>
 #include <gio/gvfserror.h>
 #include <gio/gfile.h>
-#include <gio/gfilelocal.h>
 
 #include "gvfsbackendsmb.h"
 #include "gvfsjobopenforread.h"

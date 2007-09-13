@@ -1,6 +1,6 @@
 #include <config.h>
 #include "gvfslocal.h"
-#include "gfilelocal.h"
+#include "glocalfile.h"
 
 static void g_vfs_local_class_init     (GVfsLocalClass *class);
 static void g_vfs_local_vfs_iface_init (GVfsIface       *iface);
@@ -47,7 +47,7 @@ static GFile *
 g_vfs_local_get_file_for_path  (GVfs       *vfs,
 				const char *path)
 {
-  return g_file_local_new (path);
+  return g_local_file_new (path);
 }
 
 static GFile *
@@ -60,7 +60,7 @@ g_vfs_local_get_file_for_uri   (GVfs       *vfs,
   path = g_filename_from_uri (uri, NULL, NULL);
 
   if (path != NULL)
-    file = g_file_local_new (path);
+    file = g_local_file_new (path);
   else
     file = NULL;
 
@@ -84,7 +84,7 @@ g_vfs_local_parse_name (GVfs       *vfs,
   else
     filename = g_filename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
     
-  file = g_file_local_new (filename);
+  file = g_local_file_new (filename);
   g_free (filename);
 
   return file;
