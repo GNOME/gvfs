@@ -481,6 +481,7 @@ g_local_file_get_filesystem_info (GFile                *file,
 #elif HAVE_STATVFS
   struct statvfs statfs_buffer;
 #endif
+  GFileAttributeMatcher *attribute_matcher;
 	
   no_size = FALSE;
   
@@ -521,15 +522,25 @@ g_local_file_get_filesystem_info (GFile                *file,
 
   info = g_file_info_new ();
 
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FS_FREE, block_size * statfs_buffer.f_bavail);
-  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FS_SIZE, block_size * statfs_buffer.f_blocks);
+  attribute_matcher = g_file_attribute_matcher_new (attributes);
+  
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_FS_FREE))
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FS_FREE, block_size * statfs_buffer.f_bavail);
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_FS_SIZE))
+    g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FS_SIZE, block_size * statfs_buffer.f_blocks);
 
 #if HAVE_STATFS
   fstype = get_fs_type (statfs_buffer.f_type);
-  if (fstype)
+  if (fstype &&
+      g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_FS_TYPE))
     g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, fstype);
 #endif  
 
+  g_file_attribute_matcher_unref (attribute_matcher);
+  
   return info;
 }
 
