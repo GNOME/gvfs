@@ -362,8 +362,8 @@ g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
   list_update_public (new);
   for (i = 0; i < list->n_infos; i++)
     {
-      new->public.infos[i] = list->infos[i];
-      new->public.infos[i].name = strdup (new->public.infos[i].name);
+      new->public.infos[i].name = g_strdup (list->infos[i].name);
+      new->public.infos[i].type = list->infos[i].type;
     }
   
   return (GFileAttributeInfoList *)new;
