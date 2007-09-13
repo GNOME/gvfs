@@ -83,7 +83,7 @@ get_default_vfs (gpointer arg)
   int max_prio;
   GType (*casted_get_type)(void);
 
-  use_this = g_getenv ("G_IO_VFS");
+  use_this = g_getenv ("GIO_USE_VFS");
   
   /* Ensure GLocalVfs type is availible
      the cast is required to avoid any G_GNUC_CONST optimizations */
