@@ -2979,6 +2979,40 @@ try_make_symlink (GVfsBackend *backend,
 }
 
 static void
+make_directory_reply (GVfsBackendSftp *backend,
+                      int reply_type,
+                      GDataInputStream *reply,
+                      guint32 len,
+                      GVfsJob *job,
+                      gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1); 
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+}
+
+static gboolean
+try_make_directory (GVfsBackend *backend,
+                    GVfsJobMakeDirectory *job,
+                    const char *filename)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_MKDIR,
+                                &id);
+  put_string (command, filename);
+  
+  queue_command_stream_and_free (op_backend, command, id, make_directory_reply, G_VFS_JOB (job), NULL);
+
+  return TRUE;
+}
+
+static void
 delete_remove_reply (GVfsBackendSftp *backend,
                      int reply_type,
                      GDataInputStream *reply,
@@ -3092,5 +3126,6 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_seek_on_write = try_seek_on_write;
   backend_class->try_move = try_move;
   backend_class->try_make_symlink = try_make_symlink;
+  backend_class->try_make_directory = try_make_directory;
   backend_class->try_delete = try_delete;
 }
