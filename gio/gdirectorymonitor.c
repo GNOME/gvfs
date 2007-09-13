@@ -61,9 +61,8 @@ g_directory_monitor_class_init (GDirectoryMonitorClass *klass)
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GDirectoryMonitorClass, changed),
 		  NULL, NULL,
-		  _gvfs_marshal_VOID__OBJECT_OBJECT_OBJECT_INT,
-		  G_TYPE_NONE,4,
-		  G_TYPE_FILE,
+		  _gvfs_marshal_VOID__OBJECT_OBJECT_INT,
+		  G_TYPE_NONE,3,
 		  G_TYPE_FILE,
 		  G_TYPE_FILE,
 		  G_TYPE_INT);
@@ -94,10 +93,9 @@ g_directory_monitor_cancel (GDirectoryMonitor* monitor)
 
 void
 g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
-				GFile *parent,
 				GFile *child,
 				GFile *other_file,
 				GDirectoryMonitorEvent event_type)
 {
-  g_signal_emit (monitor, signals[CHANGED], 0, parent, child, other_file, event_type);
+  g_signal_emit (monitor, signals[CHANGED], 0, child, other_file, event_type);
 }

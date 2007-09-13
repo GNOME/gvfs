@@ -423,6 +423,7 @@ async_ready_close_callback_wrapper (GObject *source_object,
   (*stream->priv->outstanding_callback) (source_object, res, user_data);
   g_object_unref (stream);
 }
+
 static void
 report_error (GInputStream *stream,
 	      GAsyncReadyCallback callback,

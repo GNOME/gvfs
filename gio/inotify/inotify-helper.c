@@ -164,7 +164,7 @@ static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 	{
 		GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
 		g_directory_monitor_emit_event (monitor, 
-						parent, child, NULL, eflags);
+						child, NULL, eflags);
 	} else if (G_IS_FILE_MONITOR(sub->user_data))
 	{
 		GFileMonitor* monitor = G_FILE_MONITOR(sub->user_data);
@@ -208,8 +208,7 @@ static void ih_not_missing_callback (inotify_sub *sub)
 	if (G_IS_DIRECTORY_MONITOR(sub->user_data))
 	{
 		GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
-		g_directory_monitor_emit_event (monitor, 
-						parent, child, NULL, eflags);
+		g_directory_monitor_emit_event (monitor, child, NULL, eflags);
 	} else if (G_IS_FILE_MONITOR(sub->user_data))
 	{
 		GFileMonitor* monitor = G_FILE_MONITOR(sub->user_data);

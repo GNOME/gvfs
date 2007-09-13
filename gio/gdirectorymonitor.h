@@ -39,7 +39,6 @@ struct _GDirectoryMonitorClass
   
   /* Signals */
   void (* changed) (GDirectoryMonitor* monitor,
-		    GFile* parent,
 		    GFile* child,
 		    GFile* other_file,
 		    GDirectoryMonitorEvent event_type);

@@ -18,13 +18,11 @@ static GOptionEntry entries[] = {
 
 static gboolean
 dir_monitor_callback (GDirectoryMonitor* monitor,
-		      GFile* parent,
 		      GFile* child,
 		      GFile* other_file,
 		      GDirectoryMonitorEvent eflags)
 {
   g_print ("Directory Monitor Event:\n");
-  g_print ("Parent = %s\n", g_file_get_parse_name (parent));
   g_print ("Child = %s\n", g_file_get_parse_name (child));
   switch (eflags)
     {
