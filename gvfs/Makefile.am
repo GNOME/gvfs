@@ -63,10 +63,13 @@ libgvfs_la_SOURCES = 	\
 	$(marshal_sources) \
 	$(NULL)
 
+$(libgvfs_la_OBJECTS): $(marshal_sources)
+
 libgvfs_la_LIBADD = \
 	$(SELINUX_LIBS) \
 	$(DBUS_LIBS) \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	$(XATTR_LIBS)
 
 gvfsincludedir=$(includedir)/gvfs/
 gvfsinclude_HEADERS = \

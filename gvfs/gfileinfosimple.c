@@ -8,7 +8,9 @@
 #endif
 
 #include <sys/types.h>
-#include <attr/xattr.h>
+#ifdef HAVE_XATTR
+#include <sys/xattr.h>
+#endif
 
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
@@ -74,6 +76,8 @@ get_selinux_context (const char *path,
   }
 #endif
 }
+
+#ifdef HAVE_XATTR
 
 static gboolean
 valid_char (char c)
@@ -183,12 +187,15 @@ get_one_xattr (const char *path,
     g_free (value_p);
 }
 
+#endif /* defined HAVE_XATTR */
+
 static void
 get_xattrs (const char *path,
 	    GFileInfo *info,
 	    GFileAttributeMatcher *matcher,
 	    gboolean follow_symlinks)
 {
+#ifdef HAVE_XATTR
   gboolean all;
   gsize list_size;
   ssize_t list_res_size;
@@ -245,8 +252,10 @@ get_xattrs (const char *path,
       while ((attr = g_file_attribute_matcher_enumerate_next (matcher)) != NULL)
 	get_one_xattr (path, info, attr, follow_symlinks);
     }
+#endif /* defined HAVE_XATTR */
 }
 
+#ifdef HAVE_XATTR
 static void
 get_one_xattr_from_fd (int fd,
 		       GFileInfo *info,
@@ -289,12 +298,14 @@ get_one_xattr_from_fd (int fd,
   if (value_p != value)
     g_free (value_p);
 }
+#endif /* defined HAVE_XATTR */
 
 static void
 get_xattrs_from_fd (int fd,
 		    GFileInfo *info,
 		    GFileAttributeMatcher *matcher)
 {
+#ifdef HAVE_XATTR
   gboolean all;
   gsize list_size;
   ssize_t list_res_size;
@@ -345,6 +356,7 @@ get_xattrs_from_fd (int fd,
       while ((attr = g_file_attribute_matcher_enumerate_next (matcher)) != NULL)
 	get_one_xattr_from_fd (fd, info, attr);
     }
+#endif /* defined HAVE_XATTR */
 }
 
 static GFileAccessRights

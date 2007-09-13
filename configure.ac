@@ -60,6 +60,23 @@ if test "x$enable_selinux" != "xno"; then
 fi
 AC_SUBST(SELINUX_LIBS)
 
+dnl ***********************
+dnl *** Check for xattr ***
+dnl ***********************
+AC_ARG_ENABLE(xattr, [  --disable-xattr           build without xattr support])
+msg_xattr=no
+XATTR_LIBS=
+if test "x$enable_xattr" != "xno"; then
+
+ AC_CHECK_LIB(c, getxattr,
+   [AC_CHECK_HEADERS(attr/xattr.h,
+     [AC_DEFINE(HAVE_XATTR, 1, [Define to 1 if xattr is available])
+      XATTR_LIBS="-lattr"
+      msg_xattr=yes])
+   ])
+fi
+AC_SUBST(XATTR_LIBS)
+
 dnl ==========================================================================
 	
 dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
