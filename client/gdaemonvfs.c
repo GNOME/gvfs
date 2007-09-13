@@ -1,21 +1,21 @@
 #include <config.h>
 #include <string.h>
 #include <dbus/dbus.h>
-#include "gvfsimpldaemon.h"
+#include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
-#include "gfiledaemon.h"
-#include "gfiledaemonlocal.h"
+#include "gdaemonfile.h"
+#include "glocaldaemonfile.h"
 #include <gio/glocalvfs.h>
 #include <gvfsdaemonprotocol.h>
 #include "gvfsdaemondbus.h"
 #include "gdbusutils.h"
 #include "gmountspec.h"
 
-static void g_vfs_impl_daemon_class_init     (GVfsImplDaemonClass *class);
-static void g_vfs_impl_daemon_vfs_iface_init (GVfsIface       *iface);
-static void g_vfs_impl_daemon_finalize       (GObject         *object);
+static void g_daemon_vfs_class_init     (GDaemonVfsClass *class);
+static void g_daemon_vfs_vfs_iface_init (GVfsIface       *iface);
+static void g_daemon_vfs_finalize       (GObject         *object);
 
-struct _GVfsImplDaemon
+struct _GDaemonVfs
 {
   GObject parent;
 
@@ -25,28 +25,28 @@ struct _GVfsImplDaemon
   GList *mount_cache;
 };
 
-static GVfsImplDaemon *the_vfs = NULL;
+static GDaemonVfs *the_vfs = NULL;
 G_LOCK_DEFINE_STATIC(mount_cache);
 
-G_DEFINE_TYPE_WITH_CODE (GVfsImplDaemon, g_vfs_impl_daemon, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GDaemonVfs, g_daemon_vfs, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS,
-						g_vfs_impl_daemon_vfs_iface_init))
+						g_daemon_vfs_vfs_iface_init))
  
 static void
-g_vfs_impl_daemon_class_init (GVfsImplDaemonClass *class)
+g_daemon_vfs_class_init (GDaemonVfsClass *class)
 {
   GObjectClass *object_class;
   
   object_class = (GObjectClass *) class;
 
-  object_class->finalize = g_vfs_impl_daemon_finalize;
+  object_class->finalize = g_daemon_vfs_finalize;
 }
 
 static void
-g_vfs_impl_daemon_finalize (GObject *object)
+g_daemon_vfs_finalize (GObject *object)
 {
   /* must chain up */
-  G_OBJECT_CLASS (g_vfs_impl_daemon_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
 }
 
 static void
@@ -175,7 +175,7 @@ get_mountspec_from_uri (GDecodedUri *uri,
 }
 
 static void
-g_vfs_impl_daemon_init (GVfsImplDaemon *vfs)
+g_daemon_vfs_init (GDaemonVfs *vfs)
 {
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
@@ -191,36 +191,36 @@ g_vfs_impl_daemon_init (GVfsImplDaemon *vfs)
     _g_dbus_connection_integrate_with_main (vfs->bus);
 }
 
-GVfsImplDaemon *
-g_vfs_impl_daemon_new (void)
+GDaemonVfs *
+g_daemon_vfs_new (void)
 {
-  return g_object_new (G_TYPE_VFS_IMPL_DAEMON, NULL);
+  return g_object_new (G_TYPE_DAEMON_VFS, NULL);
 }
 
 static GFile *
-g_vfs_impl_daemon_get_file_for_path (GVfs       *vfs,
+g_daemon_vfs_get_file_for_path (GVfs       *vfs,
 				     const char *path)
 {
   GFile *file;
 
   /* TODO: detect fuse paths and convert to daemon vfs GFiles */
   
-  file = g_vfs_get_file_for_path (G_VFS_IMPL_DAEMON (vfs)->wrapped_vfs, path);
+  file = g_vfs_get_file_for_path (G_DAEMON_VFS (vfs)->wrapped_vfs, path);
   
-  return g_file_daemon_local_new (file);
+  return g_local_daemon_file_new (file);
 }
 
 static GFile *
-g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
+g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
 				    const char *uri)
 {
-  GVfsImplDaemon *daemon_vfs;
+  GDaemonVfs *daemon_vfs;
   GFile *file, *wrapped;
   GDecodedUri *decoded;
   GMountSpec *spec;
   char *path;
 
-  daemon_vfs = G_VFS_IMPL_DAEMON (vfs);
+  daemon_vfs = G_DAEMON_VFS (vfs);
   
   decoded = _g_decode_uri (uri);
   if (decoded == NULL)
@@ -228,13 +228,13 @@ g_vfs_impl_daemon_get_file_for_uri (GVfs       *vfs,
 
   if (strcmp (decoded->scheme, "file") == 0)
     {
-      wrapped = g_vfs_impl_daemon_get_file_for_path  (vfs, decoded->path);
-      file = g_file_daemon_local_new (wrapped);
+      wrapped = g_daemon_vfs_get_file_for_path  (vfs, decoded->path);
+      file = g_local_daemon_file_new (wrapped);
     }
   else
     {
       get_mountspec_from_uri (decoded, &spec, &path);
-      file = g_file_daemon_new (spec, path);
+      file = g_daemon_file_new (spec, path);
       g_mount_spec_unref (spec);
       g_free (path);
     }
@@ -428,7 +428,7 @@ async_get_mount_info_response (DBusMessage *reply,
 }
 
 void
-_g_vfs_impl_daemon_get_mount_info_async (GMountSpec *spec,
+_g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
 					 const char *path,
 					 GMountInfoLookupCallback callback,
 					 gpointer user_data)
@@ -470,7 +470,7 @@ _g_vfs_impl_daemon_get_mount_info_async (GMountSpec *spec,
 
 
 GMountInfo *
-_g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
+_g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
 					const char *path,
 					GError **error)
 {
@@ -520,7 +520,7 @@ _g_vfs_impl_daemon_get_mount_info_sync (GMountSpec *spec,
 }
 
 static GFile *
-g_vfs_impl_daemon_parse_name (GVfs       *vfs,
+g_daemon_vfs_parse_name (GVfs       *vfs,
 			      const char *parse_name)
 {
   GFile *file;
@@ -529,23 +529,23 @@ g_vfs_impl_daemon_parse_name (GVfs       *vfs,
   if (g_path_is_absolute (parse_name))
     {
       path = g_filename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
-      file = g_vfs_impl_daemon_get_file_for_path  (vfs, path);
+      file = g_daemon_vfs_get_file_for_path  (vfs, path);
       g_free (path);
     }
   else
     {
-      file = g_vfs_impl_daemon_get_file_for_uri (vfs, parse_name);
+      file = g_daemon_vfs_get_file_for_uri (vfs, parse_name);
     }
 
   return file;
 }
 
 static void
-g_vfs_impl_daemon_vfs_iface_init (GVfsIface *iface)
+g_daemon_vfs_vfs_iface_init (GVfsIface *iface)
 {
-  iface->get_file_for_path = g_vfs_impl_daemon_get_file_for_path;
-  iface->get_file_for_uri = g_vfs_impl_daemon_get_file_for_uri;
-  iface->parse_name = g_vfs_impl_daemon_parse_name;
+  iface->get_file_for_path = g_daemon_vfs_get_file_for_path;
+  iface->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
+  iface->parse_name = g_daemon_vfs_parse_name;
 }
 
 /* Module API */
@@ -555,5 +555,5 @@ GVfs * create_vfs (void);
 GVfs *
 create_vfs (void)
 {
-  return G_VFS (g_vfs_impl_daemon_new ());
+  return G_VFS (g_daemon_vfs_new ());
 }

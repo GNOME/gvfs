@@ -13,13 +13,13 @@ modules_LTLIBRARIES = libgvfsdbus.la
 
 libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = 	\
-	gvfsimpldaemon.c gvfsimpldaemon.h \
-	gfiledaemon.c gfiledaemon.h \
-	gfiledaemonlocal.c gfiledaemonlocal.h \
+	gdaemonvfs.c gdaemonvfs.h \
+	gdaemonfile.c gdaemonfile.h \
+	glocaldaemonfile.c glocaldaemonfile.h \
 	gvfsuriutils.c gvfsuriutils.h \
-	gfileinputstreamdaemon.c gfileinputstreamdaemon.h \
-	gfileoutputstreamdaemon.c gfileoutputstreamdaemon.h \
-	gfileenumeratordaemon.c gfileenumeratordaemon.h \
+	gdaemonfileinputstream.c gdaemonfileinputstream.h \
+	gdaemonfileoutputstream.c gdaemonfileoutputstream.h \
+	gdaemonfileenumerator.c gdaemonfileenumerator.h \
 	gvfsdaemondbus.c \
 	$(NULL)
 

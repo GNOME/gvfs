@@ -6,19 +6,19 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include "gfiledaemon.h"
+#include "gdaemonfile.h"
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
-#include <gfileinputstreamdaemon.h>
-#include <gfileoutputstreamdaemon.h>
-#include <gfileenumeratordaemon.h>
+#include <gdaemonfileinputstream.h>
+#include <gdaemonfileoutputstream.h>
+#include <gdaemonfileenumerator.h>
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
 #include "gmountoperationdbus.h"
 
-static void g_file_daemon_file_iface_init (GFileIface       *iface);
+static void g_daemon_file_file_iface_init (GFileIface       *iface);
 
-struct _GFileDaemon
+struct _GDaemonFile
 {
   GObject parent_instance;
 
@@ -26,45 +26,45 @@ struct _GFileDaemon
   char *path;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GFileDaemon, g_file_daemon, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GDaemonFile, g_daemon_file, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_FILE,
-						g_file_daemon_file_iface_init))
+						g_daemon_file_file_iface_init))
 
 static void
-g_file_daemon_finalize (GObject *object)
+g_daemon_file_finalize (GObject *object)
 {
-  GFileDaemon *daemon_file;
+  GDaemonFile *daemon_file;
 
-  daemon_file = G_FILE_DAEMON (object);
+  daemon_file = G_DAEMON_FILE (object);
 
   g_mount_spec_unref (daemon_file->mount_spec);
   g_free (daemon_file->path);
   
-  if (G_OBJECT_CLASS (g_file_daemon_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_daemon_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_daemon_file_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_daemon_file_parent_class)->finalize) (object);
 }
 
 static void
-g_file_daemon_class_init (GFileDaemonClass *klass)
+g_daemon_file_class_init (GDaemonFileClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   
-  gobject_class->finalize = g_file_daemon_finalize;
+  gobject_class->finalize = g_daemon_file_finalize;
 }
 
 static void
-g_file_daemon_init (GFileDaemon *daemon_file)
+g_daemon_file_init (GDaemonFile *daemon_file)
 {
 }
 
 GFile *
-g_file_daemon_new (GMountSpec *mount_spec,
+g_daemon_file_new (GMountSpec *mount_spec,
 		   const char *path)
 {
-  GFileDaemon *daemon_file;
+  GDaemonFile *daemon_file;
   int len;
 
-  daemon_file = g_object_new (G_TYPE_FILE_DAEMON, NULL);
+  daemon_file = g_object_new (G_TYPE_DAEMON_FILE, NULL);
   /* TODO: These should be construct only properties */
   daemon_file->mount_spec = g_mount_spec_ref (mount_spec);
   daemon_file->path = g_strdup (path);
@@ -81,37 +81,37 @@ g_file_daemon_new (GMountSpec *mount_spec,
 }
 
 static gboolean
-g_file_daemon_is_native (GFile *file)
+g_daemon_file_is_native (GFile *file)
 {
   return FALSE;
 }
 
 static char *
-g_file_daemon_get_path (GFile *file)
+g_daemon_file_get_path (GFile *file)
 {
   return NULL;
 }
 
 static char *
-g_file_daemon_get_uri (GFile *file)
+g_daemon_file_get_uri (GFile *file)
 {
   /* TODO: implement to-uri */
   return NULL;
 }
 
 static char *
-g_file_daemon_get_parse_name (GFile *file)
+g_daemon_file_get_parse_name (GFile *file)
 {
   /* TODO: implement to-iri */
   return NULL;
 }
 
 static GFile *
-g_file_daemon_get_parent (GFile *file)
+g_daemon_file_get_parent (GFile *file)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   const char *path;
-  GFileDaemon *parent;
+  GDaemonFile *parent;
   const char *base;
   char *parent_path;
   gsize len;    
@@ -130,7 +130,7 @@ g_file_daemon_get_parent (GFile *file)
   g_memmove (parent_path, path, len);
   parent_path[len] = 0;
 
-  parent = g_object_new (G_TYPE_FILE_DAEMON, NULL);
+  parent = g_object_new (G_TYPE_DAEMON_FILE, NULL);
   parent->mount_spec = g_mount_spec_ref (daemon_file->mount_spec);
   parent->path = parent_path;
   
@@ -138,25 +138,25 @@ g_file_daemon_get_parent (GFile *file)
 }
 
 static GFile *
-g_file_daemon_copy (GFile *file)
+g_daemon_file_copy (GFile *file)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
 
-  return g_file_daemon_new (daemon_file->mount_spec,
+  return g_daemon_file_new (daemon_file->mount_spec,
 			    daemon_file->path);
 }
 
 
 static GFile *
-g_file_daemon_get_child (GFile *file,
+g_daemon_file_get_child (GFile *file,
 			 const char *name)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   char *path;
   GFile *child;
 
   path = g_build_filename (daemon_file->path, name, NULL);
-  child = g_file_daemon_new (daemon_file->mount_spec, path);
+  child = g_daemon_file_new (daemon_file->mount_spec, path);
   g_free (path);
   
   return child;
@@ -171,15 +171,15 @@ do_sync_path_call (GFile *file,
 		   int first_arg_type,
 		   ...)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   DBusMessage *message, *reply;
   GMountInfo *mount_info;
   const char *path;
   va_list var_args;
 
-  mount_info = _g_vfs_impl_daemon_get_mount_info_sync (daemon_file->mount_spec,
-						       daemon_file->path,
-						       error);
+  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
+						  daemon_file->path,
+						  error);
   if (mount_info == NULL)
     return NULL;
   
@@ -279,7 +279,7 @@ do_async_path_call_callback (GMountInfo *mount_info,
 			     GError *error)
 {
   AsyncPathCall *data = _data;
-  GFileDaemon *daemon_file = G_FILE_DAEMON (data->file);
+  GDaemonFile *daemon_file = G_DAEMON_FILE (data->file);
   const char *path;
   DBusMessage *message;
   DBusMessageIter arg_source, arg_dest;
@@ -329,7 +329,7 @@ do_async_path_call (GFile *file,
 		    int first_arg_type,
 		    ...)
 {
-  GFileDaemon *daemon_file = G_FILE_DAEMON (file);
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   va_list var_args;
   GError *error;
   AsyncPathCall *data;
@@ -361,15 +361,15 @@ do_async_path_call (GFile *file,
     }
   
   
-  _g_vfs_impl_daemon_get_mount_info_async (daemon_file->mount_spec,
-					   daemon_file->path,
-					   do_async_path_call_callback,
-					   data);
+  _g_daemon_vfs_get_mount_info_async (daemon_file->mount_spec,
+				      daemon_file->path,
+				      do_async_path_call_callback,
+				      data);
 }
 
 
 static GFileEnumerator *
-g_file_daemon_enumerate_children (GFile      *file,
+g_daemon_file_enumerate_children (GFile      *file,
 				  const char *attributes,
 				  GFileGetInfoFlags flags,
 				  GCancellable *cancellable,
@@ -378,11 +378,11 @@ g_file_daemon_enumerate_children (GFile      *file,
   DBusMessage *reply;
   dbus_uint32_t flags_dbus;
   char *obj_path;
-  GFileEnumeratorDaemon *enumerator;
+  GDaemonFileEnumerator *enumerator;
   DBusConnection *connection;
 
-  enumerator = g_file_enumerator_daemon_new ();
-  obj_path = g_file_enumerator_daemon_get_object_path (enumerator);
+  enumerator = g_daemon_file_enumerator_new ();
+  obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
 						       
   if (attributes == NULL)
     attributes = "";
@@ -402,7 +402,7 @@ g_file_daemon_enumerate_children (GFile      *file,
 
   dbus_message_unref (reply);
 
-  g_file_enumerator_daemon_set_sync_connection (enumerator, connection);
+  g_daemon_file_enumerator_set_sync_connection (enumerator, connection);
   
   return G_FILE_ENUMERATOR (enumerator);
 
@@ -414,7 +414,7 @@ g_file_daemon_enumerate_children (GFile      *file,
 }
 
 static GFileInfo *
-g_file_daemon_get_info (GFile                *file,
+g_daemon_file_get_info (GFile                *file,
 			const char           *attributes,
 			GFileGetInfoFlags     flags,
 			GCancellable         *cancellable,
@@ -479,7 +479,7 @@ read_async_get_fd_cb (int fd,
     }
   else
     {
-      stream = g_file_input_stream_daemon_new (fd, data->can_seek);
+      stream = g_daemon_file_input_stream_new (fd, data->can_seek);
       data->read_callback (data->file, stream, data->callback_data, NULL);
       g_object_unref (stream);
     }
@@ -532,7 +532,7 @@ read_async_cb (DBusMessage *reply,
 }
 
 static void
-g_file_daemon_read_async (GFile *file,
+g_daemon_file_read_async (GFile *file,
 			  int io_priority,
 			  GFileReadCallback callback,
 			  gpointer callback_data,
@@ -547,7 +547,7 @@ g_file_daemon_read_async (GFile *file,
 }
 
 static GFileInputStream *
-g_file_daemon_read (GFile *file,
+g_daemon_file_read (GFile *file,
 		    GCancellable *cancellable,
 		    GError **error)
 {
@@ -585,11 +585,11 @@ g_file_daemon_read (GFile *file,
       return NULL;
     }
   
-  return g_file_input_stream_daemon_new (fd, can_seek);
+  return g_daemon_file_input_stream_new (fd, can_seek);
 }
 
 static GFileOutputStream *
-g_file_daemon_append_to (GFile *file,
+g_daemon_file_append_to (GFile *file,
 			 GCancellable *cancellable,
 			 GError **error)
 {
@@ -638,11 +638,11 @@ g_file_daemon_append_to (GFile *file,
       return NULL;
     }
   
-  return g_file_output_stream_daemon_new (fd, can_seek, initial_offset);
+  return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
 static GFileOutputStream *
-g_file_daemon_create (GFile *file,
+g_daemon_file_create (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
@@ -691,11 +691,11 @@ g_file_daemon_create (GFile *file,
       return NULL;
     }
   
-  return g_file_output_stream_daemon_new (fd, can_seek, initial_offset);
+  return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
 static GFileOutputStream *
-g_file_daemon_replace (GFile *file,
+g_daemon_file_replace (GFile *file,
 		       time_t mtime,
 		       gboolean make_backup,
 		       GCancellable *cancellable,
@@ -746,7 +746,7 @@ g_file_daemon_replace (GFile *file,
       return NULL;
     }
   
-  return g_file_output_stream_daemon_new (fd, can_seek, initial_offset);
+  return g_daemon_file_output_stream_new (fd, can_seek, initial_offset);
 }
 
 static void
@@ -763,15 +763,15 @@ mount_reply (DBusMessage *reply,
 }
 
 static void
-g_file_daemon_mount (GFile *file,
+g_daemon_file_mount (GFile *file,
 		     GMountOperation *mount_op)
 {
-  GFileDaemon *daemon_file;
+  GDaemonFile *daemon_file;
   DBusMessage *message;
   GMountSpec *spec;
   GMountSource *mount_source;
 
-  daemon_file = G_FILE_DAEMON (file);
+  daemon_file = G_DAEMON_FILE (file);
 
   spec = g_mount_spec_copy (daemon_file->mount_spec);
   g_mount_spec_set_mount_prefix (spec, daemon_file->path);
@@ -793,21 +793,21 @@ g_file_daemon_mount (GFile *file,
 
 
 static void
-g_file_daemon_file_iface_init (GFileIface *iface)
+g_daemon_file_file_iface_init (GFileIface *iface)
 {
-  iface->copy = g_file_daemon_copy;
-  iface->is_native = g_file_daemon_is_native;
-  iface->get_path = g_file_daemon_get_path;
-  iface->get_uri = g_file_daemon_get_uri;
-  iface->get_parse_name = g_file_daemon_get_parse_name;
-  iface->get_parent = g_file_daemon_get_parent;
-  iface->get_child = g_file_daemon_get_child;
-  iface->enumerate_children = g_file_daemon_enumerate_children;
-  iface->get_info = g_file_daemon_get_info;
-  iface->read = g_file_daemon_read;
-  iface->append_to = g_file_daemon_append_to;
-  iface->create = g_file_daemon_create;
-  iface->replace = g_file_daemon_replace;
-  iface->read_async = g_file_daemon_read_async;
-  iface->mount = g_file_daemon_mount;
+  iface->copy = g_daemon_file_copy;
+  iface->is_native = g_daemon_file_is_native;
+  iface->get_path = g_daemon_file_get_path;
+  iface->get_uri = g_daemon_file_get_uri;
+  iface->get_parse_name = g_daemon_file_get_parse_name;
+  iface->get_parent = g_daemon_file_get_parent;
+  iface->get_child = g_daemon_file_get_child;
+  iface->enumerate_children = g_daemon_file_enumerate_children;
+  iface->get_info = g_daemon_file_get_info;
+  iface->read = g_daemon_file_read;
+  iface->append_to = g_daemon_file_append_to;
+  iface->create = g_daemon_file_create;
+  iface->replace = g_daemon_file_replace;
+  iface->read_async = g_daemon_file_read_async;
+  iface->mount = g_daemon_file_mount;
 }

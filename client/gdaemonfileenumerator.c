@@ -4,7 +4,7 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
-#include <gfileenumeratordaemon.h>
+#include <gdaemonfileenumerator.h>
 #include <gio/gfileinfo.h>
 #include <gvfsdaemondbus.h>
 #include <gvfsdaemonprotocol.h>
@@ -16,7 +16,7 @@ volatile gint path_counter = 1;
 
 G_LOCK_DEFINE_STATIC(infos);
 
-struct _GFileEnumeratorDaemon
+struct _GDaemonFileEnumerator
 {
   GFileEnumerator parent;
 
@@ -29,27 +29,27 @@ struct _GFileEnumeratorDaemon
   
 };
 
-G_DEFINE_TYPE (GFileEnumeratorDaemon, g_file_enumerator_daemon, G_TYPE_FILE_ENUMERATOR);
+G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUMERATOR);
 
-static GFileInfo *       g_file_enumerator_daemon_next_file   (GFileEnumerator  *enumerator,
+static GFileInfo *       g_daemon_file_enumerator_next_file   (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,
 							       GError          **error);
-static gboolean          g_file_enumerator_daemon_stop        (GFileEnumerator  *enumerator,
+static gboolean          g_daemon_file_enumerator_stop        (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,
 							       GError          **error);
-static DBusHandlerResult g_file_enumerator_daemon_dbus_filter (DBusConnection   *connection,
+static DBusHandlerResult g_daemon_file_enumerator_dbus_filter (DBusConnection   *connection,
 							       DBusMessage      *message,
 							       void             *user_data);
 
 static void
-g_file_enumerator_daemon_finalize (GObject *object)
+g_daemon_file_enumerator_finalize (GObject *object)
 {
-  GFileEnumeratorDaemon *daemon;
+  GDaemonFileEnumerator *daemon;
   char *path;
 
-  daemon = G_FILE_ENUMERATOR_DAEMON (object);
+  daemon = G_DAEMON_FILE_ENUMERATOR (object);
 
-  path = g_file_enumerator_daemon_get_object_path (daemon);
+  path = g_daemon_file_enumerator_get_object_path (daemon);
   _g_dbus_unregister_vfs_filter (path);
   g_free (path);
 
@@ -59,52 +59,52 @@ g_file_enumerator_daemon_finalize (GObject *object)
   if (daemon->sync_connection)
     dbus_connection_unref (daemon->sync_connection);
   
-  if (G_OBJECT_CLASS (g_file_enumerator_daemon_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_enumerator_daemon_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_daemon_file_enumerator_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_daemon_file_enumerator_parent_class)->finalize) (object);
 }
 
 
 static void
-g_file_enumerator_daemon_class_init (GFileEnumeratorDaemonClass *klass)
+g_daemon_file_enumerator_class_init (GDaemonFileEnumeratorClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GFileEnumeratorClass *enumerator_class = G_FILE_ENUMERATOR_CLASS (klass);
   
-  gobject_class->finalize = g_file_enumerator_daemon_finalize;
+  gobject_class->finalize = g_daemon_file_enumerator_finalize;
 
-  enumerator_class->next_file = g_file_enumerator_daemon_next_file;
-  enumerator_class->stop = g_file_enumerator_daemon_stop;
+  enumerator_class->next_file = g_daemon_file_enumerator_next_file;
+  enumerator_class->stop = g_daemon_file_enumerator_stop;
 }
 
 static void
-g_file_enumerator_daemon_init (GFileEnumeratorDaemon *daemon)
+g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 {
   char *path;
   
   daemon->id = g_atomic_int_exchange_and_add (&path_counter, 1);
 
-  path = g_file_enumerator_daemon_get_object_path (daemon);
-  _g_dbus_register_vfs_filter (path, g_file_enumerator_daemon_dbus_filter,
+  path = g_daemon_file_enumerator_get_object_path (daemon);
+  _g_dbus_register_vfs_filter (path, g_daemon_file_enumerator_dbus_filter,
 			       G_OBJECT (daemon));
   g_free (path);
 }
 
-GFileEnumeratorDaemon *
-g_file_enumerator_daemon_new (void)
+GDaemonFileEnumerator *
+g_daemon_file_enumerator_new (void)
 {
-  GFileEnumeratorDaemon *daemon;
+  GDaemonFileEnumerator *daemon;
 
-  daemon = g_object_new (G_TYPE_FILE_ENUMERATOR_DAEMON, NULL);
+  daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR, NULL);
   
   return daemon;
 }
 
 static DBusHandlerResult
-g_file_enumerator_daemon_dbus_filter (DBusConnection     *connection,
+g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
 				      DBusMessage        *message,
 				      void               *user_data)
 {
-  GFileEnumeratorDaemon *enumerator = user_data;
+  GDaemonFileEnumerator *enumerator = user_data;
   const char *member;
   DBusMessageIter iter, array_iter;
   GList *infos;
@@ -152,24 +152,24 @@ g_file_enumerator_daemon_dbus_filter (DBusConnection     *connection,
 }
 
 char  *
-g_file_enumerator_daemon_get_object_path (GFileEnumeratorDaemon *enumerator)
+g_daemon_file_enumerator_get_object_path (GDaemonFileEnumerator *enumerator)
 {
   return g_strdup_printf (OBJ_PATH_PREFIX"%d", enumerator->id);
 }
 
 void
-g_file_enumerator_daemon_set_sync_connection (GFileEnumeratorDaemon *enumerator,
+g_daemon_file_enumerator_set_sync_connection (GDaemonFileEnumerator *enumerator,
 					      DBusConnection        *connection)
 {
   enumerator->sync_connection = dbus_connection_ref (connection);
 }
 
 static GFileInfo *
-g_file_enumerator_daemon_next_file (GFileEnumerator *enumerator,
+g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
 				    GCancellable     *cancellable,
 				    GError **error)
 {
-  GFileEnumeratorDaemon *daemon = G_FILE_ENUMERATOR_DAEMON (enumerator);
+  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator);
   GFileInfo *info;
   gboolean done;
   
@@ -204,11 +204,11 @@ g_file_enumerator_daemon_next_file (GFileEnumerator *enumerator,
 }
 
 static gboolean
-g_file_enumerator_daemon_stop (GFileEnumerator *enumerator,
+g_daemon_file_enumerator_stop (GFileEnumerator *enumerator,
 			      GCancellable     *cancellable,
 			      GError          **error)
 {
-  /*GFileEnumeratorDaemon *daemon = G_FILE_ENUMERATOR_DAEMON (enumerator); */
+  /*GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator); */
 
   return TRUE;
 }

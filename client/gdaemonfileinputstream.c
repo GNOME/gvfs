@@ -14,7 +14,7 @@
 #include <glib/gi18n-lib.h>
 #include <gio/gvfserror.h>
 #include <gio/gseekable.h>
-#include "gfileinputstreamdaemon.h"
+#include "gdaemonfileinputstream.h"
 #include "gvfsdaemondbus.h"
 #include <gio/gsocketinputstream.h>
 #include <gio/gsocketoutputstream.h>
@@ -121,9 +121,9 @@ typedef struct {
   gboolean io_cancelled;
 } IOOperationData;
 
-typedef StateOp (*state_machine_iterator) (GFileInputStreamDaemon *file, IOOperationData *io_op, gpointer data);
+typedef StateOp (*state_machine_iterator) (GDaemonFileInputStream *file, IOOperationData *io_op, gpointer data);
 
-struct _GFileInputStreamDaemon {
+struct _GDaemonFileInputStream {
   GFileInputStream parent;
 
   GOutputStream *command_stream;
@@ -142,57 +142,57 @@ struct _GFileInputStreamDaemon {
   GString *output_buffer;
 };
 
-static gssize     g_file_input_stream_daemon_read          (GInputStream              *stream,
+static gssize     g_daemon_file_input_stream_read          (GInputStream              *stream,
 							    void                      *buffer,
 							    gsize                      count,
 							    GCancellable              *cancellable,
 							    GError                   **error);
-static gssize     g_file_input_stream_daemon_skip          (GInputStream              *stream,
+static gssize     g_daemon_file_input_stream_skip          (GInputStream              *stream,
 							    gsize                      count,
 							    GCancellable              *cancellable,
 							    GError                   **error);
-static gboolean   g_file_input_stream_daemon_close         (GInputStream              *stream,
+static gboolean   g_daemon_file_input_stream_close         (GInputStream              *stream,
 							    GCancellable              *cancellable,
 							    GError                   **error);
-static GFileInfo *g_file_input_stream_daemon_get_file_info (GFileInputStream          *stream,
+static GFileInfo *g_daemon_file_input_stream_get_file_info (GFileInputStream          *stream,
 							    char                      *attributes,
 							    GCancellable              *cancellable,
 							    GError                   **error);
-static goffset    g_file_input_stream_daemon_tell          (GFileInputStream          *stream);
-static gboolean   g_file_input_stream_daemon_can_seek      (GFileInputStream          *stream);
-static gboolean   g_file_input_stream_daemon_seek          (GFileInputStream          *stream,
+static goffset    g_daemon_file_input_stream_tell          (GFileInputStream          *stream);
+static gboolean   g_daemon_file_input_stream_can_seek      (GFileInputStream          *stream);
+static gboolean   g_daemon_file_input_stream_seek          (GFileInputStream          *stream,
 							    goffset                    offset,
 							    GSeekType                  type,
 							    GCancellable              *cancellable,
 							    GError                   **error);
-static void       g_file_input_stream_daemon_read_async    (GInputStream              *stream,
+static void       g_daemon_file_input_stream_read_async    (GInputStream              *stream,
 							    void                      *buffer,
 							    gsize                      count,
 							    int                        io_priority,
 							    GAsyncReadCallback         callback,
 							    gpointer                   data,
 							    GCancellable              *cancellable);
-static void       g_file_input_stream_daemon_skip_async    (GInputStream              *stream,
+static void       g_daemon_file_input_stream_skip_async    (GInputStream              *stream,
 							    gsize                      count,
 							    int                        io_priority,
 							    GAsyncSkipCallback         callback,
 							    gpointer                   data,
 							    GCancellable              *cancellable);
-static void       g_file_input_stream_daemon_close_async   (GInputStream              *stream,
+static void       g_daemon_file_input_stream_close_async   (GInputStream              *stream,
 							    int                        io_priority,
 							    GAsyncCloseInputCallback   callback,
 							    gpointer                   data,
 							    GCancellable              *cancellable);
 
-G_DEFINE_TYPE (GFileInputStreamDaemon, g_file_input_stream_daemon,
+G_DEFINE_TYPE (GDaemonFileInputStream, g_daemon_file_input_stream,
 	       G_TYPE_FILE_INPUT_STREAM)
 
 static void
-g_file_input_stream_daemon_finalize (GObject *object)
+g_daemon_file_input_stream_finalize (GObject *object)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   
-  file = G_FILE_INPUT_STREAM_DAEMON (object);
+  file = G_DAEMON_FILE_INPUT_STREAM (object);
 
   if (file->command_stream)
     g_object_unref (file->command_stream);
@@ -202,48 +202,48 @@ g_file_input_stream_daemon_finalize (GObject *object)
   g_string_free (file->input_buffer, TRUE);
   g_string_free (file->output_buffer, TRUE);
   
-  if (G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_daemon_file_input_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_daemon_file_input_stream_parent_class)->finalize) (object);
 }
 
 static void
-g_file_input_stream_daemon_class_init (GFileInputStreamDaemonClass *klass)
+g_daemon_file_input_stream_class_init (GDaemonFileInputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
   GFileInputStreamClass *file_stream_class = G_FILE_INPUT_STREAM_CLASS (klass);
   
-  gobject_class->finalize = g_file_input_stream_daemon_finalize;
+  gobject_class->finalize = g_daemon_file_input_stream_finalize;
 
-  stream_class->read = g_file_input_stream_daemon_read;
-  if (0) stream_class->skip = g_file_input_stream_daemon_skip;
-  stream_class->close = g_file_input_stream_daemon_close;
+  stream_class->read = g_daemon_file_input_stream_read;
+  if (0) stream_class->skip = g_daemon_file_input_stream_skip;
+  stream_class->close = g_daemon_file_input_stream_close;
   
-  stream_class->read_async = g_file_input_stream_daemon_read_async;
-  if (0) stream_class->skip_async = g_file_input_stream_daemon_skip_async;
-  stream_class->close_async = g_file_input_stream_daemon_close_async;
+  stream_class->read_async = g_daemon_file_input_stream_read_async;
+  if (0) stream_class->skip_async = g_daemon_file_input_stream_skip_async;
+  stream_class->close_async = g_daemon_file_input_stream_close_async;
   
-  file_stream_class->tell = g_file_input_stream_daemon_tell;
-  file_stream_class->can_seek = g_file_input_stream_daemon_can_seek;
-  file_stream_class->seek = g_file_input_stream_daemon_seek;
-  file_stream_class->get_file_info = g_file_input_stream_daemon_get_file_info;
+  file_stream_class->tell = g_daemon_file_input_stream_tell;
+  file_stream_class->can_seek = g_daemon_file_input_stream_can_seek;
+  file_stream_class->seek = g_daemon_file_input_stream_seek;
+  file_stream_class->get_file_info = g_daemon_file_input_stream_get_file_info;
 
 }
 
 static void
-g_file_input_stream_daemon_init (GFileInputStreamDaemon *info)
+g_daemon_file_input_stream_init (GDaemonFileInputStream *info)
 {
   info->output_buffer = g_string_new ("");
   info->input_buffer = g_string_new ("");
 }
 
 GFileInputStream *
-g_file_input_stream_daemon_new (int fd,
+g_daemon_file_input_stream_new (int fd,
 				gboolean can_seek)
 {
-  GFileInputStreamDaemon *stream;
+  GDaemonFileInputStream *stream;
 
-  stream = g_object_new (G_TYPE_FILE_INPUT_STREAM_DAEMON, NULL);
+  stream = g_object_new (G_TYPE_DAEMON_FILE_INPUT_STREAM, NULL);
 
   stream->command_stream = g_socket_output_stream_new (fd, FALSE);
   stream->data_stream = g_socket_input_stream_new (fd, TRUE);
@@ -261,7 +261,7 @@ error_is_cancel (GError *error)
 }
 
 static void
-append_request (GFileInputStreamDaemon *stream, guint32 command,
+append_request (GDaemonFileInputStream *stream, guint32 command,
 		guint32 arg1, guint32 arg2, guint32 *seq_nr)
 {
   GVfsDaemonSocketProtocolRequest cmd;
@@ -325,7 +325,7 @@ decode_error (GVfsDaemonSocketProtocolReply *reply, char *data, GError **error)
 
 
 static gboolean
-run_sync_state_machine (GFileInputStreamDaemon *file,
+run_sync_state_machine (GDaemonFileInputStream *file,
 			state_machine_iterator iterator,
 			gpointer data,
 			GCancellable *cancellable,
@@ -414,7 +414,7 @@ run_sync_state_machine (GFileInputStreamDaemon *file,
  */
 
 static StateOp
-iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, ReadOperation *op)
+iterate_read_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op, ReadOperation *op)
 {
   gsize len;
 
@@ -637,16 +637,16 @@ iterate_read_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 }
 
 static gssize
-g_file_input_stream_daemon_read (GInputStream *stream,
+g_daemon_file_input_stream_read (GInputStream *stream,
 				 void         *buffer,
 				 gsize         count,
 				 GCancellable *cancellable,
 				 GError      **error)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   ReadOperation op;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
   if (g_cancellable_is_cancelled (cancellable))
     {
@@ -679,14 +679,14 @@ g_file_input_stream_daemon_read (GInputStream *stream,
 }
 
 static gssize
-g_file_input_stream_daemon_skip (GInputStream *stream,
+g_daemon_file_input_stream_skip (GInputStream *stream,
 				 gsize         count,
 				 GCancellable *cancellable,
 				 GError      **error)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
   
   /* TODO: implement skip */
   g_assert_not_reached ();
@@ -695,7 +695,7 @@ g_file_input_stream_daemon_skip (GInputStream *stream,
 }
 
 static StateOp
-iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, CloseOperation *op)
+iterate_close_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op, CloseOperation *op)
 {
   gsize len;
 
@@ -875,15 +875,15 @@ iterate_close_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_o
 
 
 static gboolean
-g_file_input_stream_daemon_close (GInputStream *stream,
+g_daemon_file_input_stream_close (GInputStream *stream,
 				  GCancellable *cancellable,
 				  GError      **error)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   CloseOperation op;
   gboolean res;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
   /* We need to do a full roundtrip to guarantee that the writes have
      reached the disk. */
@@ -916,27 +916,27 @@ g_file_input_stream_daemon_close (GInputStream *stream,
 }
 
 static goffset
-g_file_input_stream_daemon_tell (GFileInputStream *stream)
+g_daemon_file_input_stream_tell (GFileInputStream *stream)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
   
   return file->current_offset;
 }
 
 static gboolean
-g_file_input_stream_daemon_can_seek (GFileInputStream *stream)
+g_daemon_file_input_stream_can_seek (GFileInputStream *stream)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
   return file->can_seek;
 }
 
 static StateOp
-iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op, SeekOperation *op)
+iterate_seek_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op, SeekOperation *op)
 {
   gsize len;
   guint32 request;
@@ -1132,16 +1132,16 @@ iterate_seek_state_machine (GFileInputStreamDaemon *file, IOOperationData *io_op
 }
 
 static gboolean
-g_file_input_stream_daemon_seek (GFileInputStream *stream,
+g_daemon_file_input_stream_seek (GFileInputStream *stream,
 				 goffset offset,
 				 GSeekType type,
 				 GCancellable *cancellable,
 				 GError **error)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   SeekOperation op;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
   if (!file->can_seek)
     {
@@ -1177,14 +1177,14 @@ g_file_input_stream_daemon_seek (GFileInputStream *stream,
 }
 
 static GFileInfo *
-g_file_input_stream_daemon_get_file_info (GFileInputStream     *stream,
+g_daemon_file_input_stream_get_file_info (GFileInputStream     *stream,
 					  char                 *attributes,
 					  GCancellable         *cancellable,
 					  GError              **error)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
   return NULL;
 }
@@ -1203,7 +1203,7 @@ typedef void (*AsyncIteratorDone) (GInputStream *stream,
 
 struct AsyncIterator {
   AsyncIteratorDone done_cb;
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   GCancellable *cancellable;
   IOOperationData io_data;
   state_machine_iterator iterator;
@@ -1307,7 +1307,7 @@ static void
 async_iterate (AsyncIterator *iterator)
 {
   IOOperationData *io_data = &iterator->io_data;
-  GFileInputStreamDaemon *file = iterator->file;
+  GDaemonFileInputStream *file = iterator->file;
   StateOp io_op;
   
   io_data->cancelled =
@@ -1352,7 +1352,7 @@ async_iterate (AsyncIterator *iterator)
 }
 
 static void
-run_async_state_machine (GFileInputStreamDaemon *file,
+run_async_state_machine (GDaemonFileInputStream *file,
 			 state_machine_iterator iterator_cb,
 			 gpointer iterator_data,
 			 int io_priority,
@@ -1414,7 +1414,7 @@ async_read_done (GInputStream *stream,
 }
 
 static void
-g_file_input_stream_daemon_read_async  (GInputStream        *stream,
+g_daemon_file_input_stream_read_async  (GInputStream        *stream,
 					void               *buffer,
 					gsize               count,
 					int                 io_priority,
@@ -1422,11 +1422,11 @@ g_file_input_stream_daemon_read_async  (GInputStream        *stream,
 					gpointer            data,
 					GCancellable       *cancellable)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   AsyncIterator *iterator;
   ReadOperation *op;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
   
   /* Limit for sanity and to avoid 32bit overflow */
   if (count > MAX_READ_SIZE)
@@ -1449,7 +1449,7 @@ g_file_input_stream_daemon_read_async  (GInputStream        *stream,
 }
 
 static void
-g_file_input_stream_daemon_skip_async  (GInputStream        *stream,
+g_daemon_file_input_stream_skip_async  (GInputStream        *stream,
 					gsize               count,
 					int                 io_priority,
 					GAsyncSkipCallback  callback,
@@ -1465,13 +1465,13 @@ async_close_done (GInputStream *stream,
 		  gpointer callback_data,
 		  GError *io_error)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   CloseOperation *op;
   gboolean result;
   GError *error;
   GCancellable *cancellable = NULL; /* TODO: get cancellable */
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
   
   op = op_data;
 
@@ -1508,17 +1508,17 @@ async_close_done (GInputStream *stream,
 }
 
 static void
-g_file_input_stream_daemon_close_async (GInputStream        *stream,
+g_daemon_file_input_stream_close_async (GInputStream        *stream,
 					int                  io_priority,
 					GAsyncCloseInputCallback callback,
 					gpointer            data,
 					GCancellable       *cancellable)
 {
-  GFileInputStreamDaemon *file;
+  GDaemonFileInputStream *file;
   AsyncIterator *iterator;
   CloseOperation *op;
 
-  file = G_FILE_INPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
   
   op = g_new0 (CloseOperation, 1);
   op->state = CLOSE_STATE_INIT;

@@ -14,7 +14,7 @@
 #include <glib/gi18n-lib.h>
 #include <gio/gvfserror.h>
 #include <gio/gseekable.h>
-#include "gfileoutputstreamdaemon.h"
+#include "gdaemonfileoutputstream.h"
 #include "gvfsdaemondbus.h"
 #include <gio/gsocketinputstream.h>
 #include <gio/gsocketoutputstream.h>
@@ -108,9 +108,9 @@ typedef struct {
   gboolean io_cancelled;
 } IOOperationData;
 
-typedef StateOp (*state_machine_iterator) (GFileOutputStreamDaemon *file, IOOperationData *io_op, gpointer data);
+typedef StateOp (*state_machine_iterator) (GDaemonFileOutputStream *file, IOOperationData *io_op, gpointer data);
 
-struct _GFileOutputStreamDaemon {
+struct _GDaemonFileOutputStream {
   GFileOutputStream parent;
 
   GOutputStream *command_stream;
@@ -126,47 +126,47 @@ struct _GFileOutputStreamDaemon {
   GString *output_buffer;
 };
 
-static gssize     g_file_output_stream_daemon_write         (GOutputStream              *stream,
+static gssize     g_daemon_file_output_stream_write         (GOutputStream              *stream,
 							     void                       *buffer,
 							     gsize                       count,
 							     GCancellable               *cancellable,
 							     GError                    **error);
-static gboolean   g_file_output_stream_daemon_close         (GOutputStream              *stream,
+static gboolean   g_daemon_file_output_stream_close         (GOutputStream              *stream,
 							     GCancellable               *cancellable,
 							     GError                    **error);
-static GFileInfo *g_file_output_stream_daemon_get_file_info (GFileOutputStream          *stream,
+static GFileInfo *g_daemon_file_output_stream_get_file_info (GFileOutputStream          *stream,
 							     char                       *attributes,
 							     GCancellable               *cancellable,
 							     GError                    **error);
-static goffset    g_file_output_stream_daemon_tell          (GFileOutputStream          *stream);
-static gboolean   g_file_output_stream_daemon_can_seek      (GFileOutputStream          *stream);
-static gboolean   g_file_output_stream_daemon_seek          (GFileOutputStream          *stream,
+static goffset    g_daemon_file_output_stream_tell          (GFileOutputStream          *stream);
+static gboolean   g_daemon_file_output_stream_can_seek      (GFileOutputStream          *stream);
+static gboolean   g_daemon_file_output_stream_seek          (GFileOutputStream          *stream,
 							     goffset                     offset,
 							     GSeekType                   type,
 							     GCancellable               *cancellable,
 							     GError                    **error);
-static void       g_file_output_stream_daemon_write_async   (GOutputStream              *stream,
+static void       g_daemon_file_output_stream_write_async   (GOutputStream              *stream,
 							     void                       *buffer,
 							     gsize                       count,
 							     int                         io_priority,
 							     GAsyncWriteCallback         callback,
 							     gpointer                    data,
 							     GCancellable               *cancellable);
-static void       g_file_output_stream_daemon_close_async   (GOutputStream              *stream,
+static void       g_daemon_file_output_stream_close_async   (GOutputStream              *stream,
 							     int                         io_priority,
 							     GAsyncCloseOutputCallback   callback,
 							     gpointer                    data,
 							     GCancellable               *cancellable);
 
-G_DEFINE_TYPE (GFileOutputStreamDaemon, g_file_output_stream_daemon,
+G_DEFINE_TYPE (GDaemonFileOutputStream, g_daemon_file_output_stream,
 	       G_TYPE_FILE_OUTPUT_STREAM)
 
 static void
-g_file_output_stream_daemon_finalize (GObject *object)
+g_daemon_file_output_stream_finalize (GObject *object)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   
-  file = G_FILE_OUTPUT_STREAM_DAEMON (object);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (object);
 
   if (file->command_stream)
     g_object_unref (file->command_stream);
@@ -176,47 +176,47 @@ g_file_output_stream_daemon_finalize (GObject *object)
   g_string_free (file->input_buffer, TRUE);
   g_string_free (file->output_buffer, TRUE);
   
-  if (G_OBJECT_CLASS (g_file_output_stream_daemon_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_output_stream_daemon_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_daemon_file_output_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_daemon_file_output_stream_parent_class)->finalize) (object);
 }
 
 static void
-g_file_output_stream_daemon_class_init (GFileOutputStreamDaemonClass *klass)
+g_daemon_file_output_stream_class_init (GDaemonFileOutputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
   GFileOutputStreamClass *file_stream_class = G_FILE_OUTPUT_STREAM_CLASS (klass);
   
-  gobject_class->finalize = g_file_output_stream_daemon_finalize;
+  gobject_class->finalize = g_daemon_file_output_stream_finalize;
 
-  stream_class->write = g_file_output_stream_daemon_write;
-  stream_class->close = g_file_output_stream_daemon_close;
+  stream_class->write = g_daemon_file_output_stream_write;
+  stream_class->close = g_daemon_file_output_stream_close;
   
-  stream_class->write_async = g_file_output_stream_daemon_write_async;
-  stream_class->close_async = g_file_output_stream_daemon_close_async;
+  stream_class->write_async = g_daemon_file_output_stream_write_async;
+  stream_class->close_async = g_daemon_file_output_stream_close_async;
   
-  file_stream_class->tell = g_file_output_stream_daemon_tell;
-  file_stream_class->can_seek = g_file_output_stream_daemon_can_seek;
-  file_stream_class->seek = g_file_output_stream_daemon_seek;
-  file_stream_class->get_file_info = g_file_output_stream_daemon_get_file_info;
+  file_stream_class->tell = g_daemon_file_output_stream_tell;
+  file_stream_class->can_seek = g_daemon_file_output_stream_can_seek;
+  file_stream_class->seek = g_daemon_file_output_stream_seek;
+  file_stream_class->get_file_info = g_daemon_file_output_stream_get_file_info;
 
 }
 
 static void
-g_file_output_stream_daemon_init (GFileOutputStreamDaemon *info)
+g_daemon_file_output_stream_init (GDaemonFileOutputStream *info)
 {
   info->output_buffer = g_string_new ("");
   info->input_buffer = g_string_new ("");
 }
 
 GFileOutputStream *
-g_file_output_stream_daemon_new (int fd,
+g_daemon_file_output_stream_new (int fd,
 				 gboolean can_seek,
 				 goffset initial_offset)
 {
-  GFileOutputStreamDaemon *stream;
+  GDaemonFileOutputStream *stream;
 
-  stream = g_object_new (G_TYPE_FILE_OUTPUT_STREAM_DAEMON, NULL);
+  stream = g_object_new (G_TYPE_DAEMON_FILE_OUTPUT_STREAM, NULL);
 
   stream->command_stream = g_socket_output_stream_new (fd, FALSE);
   stream->data_stream = g_socket_input_stream_new (fd, TRUE);
@@ -235,7 +235,7 @@ error_is_cancel (GError *error)
 }
 
 static void
-append_request (GFileOutputStreamDaemon *stream, guint32 command,
+append_request (GDaemonFileOutputStream *stream, guint32 command,
 		guint32 arg1, guint32 arg2, guint32 data_len, guint32 *seq_nr)
 {
   GVfsDaemonSocketProtocolRequest cmd;
@@ -299,7 +299,7 @@ decode_error (GVfsDaemonSocketProtocolReply *reply, char *data, GError **error)
 
 
 static gboolean
-run_sync_state_machine (GFileOutputStreamDaemon *file,
+run_sync_state_machine (GDaemonFileOutputStream *file,
 			state_machine_iterator iterator,
 			gpointer data,
 			GCancellable *cancellable,
@@ -388,7 +388,7 @@ run_sync_state_machine (GFileOutputStreamDaemon *file,
  */
 
 static StateOp
-iterate_write_state_machine (GFileOutputStreamDaemon *file, IOOperationData *io_op, WriteOperation *op)
+iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_op, WriteOperation *op)
 {
   gsize len;
 
@@ -530,16 +530,16 @@ iterate_write_state_machine (GFileOutputStreamDaemon *file, IOOperationData *io_
 }
 
 static gssize
-g_file_output_stream_daemon_write (GOutputStream *stream,
+g_daemon_file_output_stream_write (GOutputStream *stream,
 				   void         *buffer,
 				   gsize         count,
 				   GCancellable *cancellable,
 				   GError      **error)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   WriteOperation op;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
   if (g_cancellable_is_cancelled (cancellable))
     {
@@ -572,7 +572,7 @@ g_file_output_stream_daemon_write (GOutputStream *stream,
 }
 
 static StateOp
-iterate_close_state_machine (GFileOutputStreamDaemon *file, IOOperationData *io_op, CloseOperation *op)
+iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_op, CloseOperation *op)
 {
   gsize len;
 
@@ -695,15 +695,15 @@ iterate_close_state_machine (GFileOutputStreamDaemon *file, IOOperationData *io_
 
 
 static gboolean
-g_file_output_stream_daemon_close (GOutputStream *stream,
+g_daemon_file_output_stream_close (GOutputStream *stream,
 				  GCancellable *cancellable,
 				  GError      **error)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   CloseOperation op;
   gboolean res;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
   /* We need to do a full roundtrip to guarantee that the writes have
      reached the disk. */
@@ -736,27 +736,27 @@ g_file_output_stream_daemon_close (GOutputStream *stream,
 }
 
 static goffset
-g_file_output_stream_daemon_tell (GFileOutputStream *stream)
+g_daemon_file_output_stream_tell (GFileOutputStream *stream)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
   
   return file->current_offset;
 }
 
 static gboolean
-g_file_output_stream_daemon_can_seek (GFileOutputStream *stream)
+g_daemon_file_output_stream_can_seek (GFileOutputStream *stream)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
   return file->can_seek;
 }
 
 static StateOp
-iterate_seek_state_machine (GFileOutputStreamDaemon *file, IOOperationData *io_op, SeekOperation *op)
+iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_op, SeekOperation *op)
 {
   gsize len;
   guint32 request;
@@ -888,16 +888,16 @@ iterate_seek_state_machine (GFileOutputStreamDaemon *file, IOOperationData *io_o
 }
 
 static gboolean
-g_file_output_stream_daemon_seek (GFileOutputStream *stream,
+g_daemon_file_output_stream_seek (GFileOutputStream *stream,
 				 goffset offset,
 				 GSeekType type,
 				 GCancellable *cancellable,
 				 GError **error)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   SeekOperation op;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
   if (!file->can_seek)
     {
@@ -933,14 +933,14 @@ g_file_output_stream_daemon_seek (GFileOutputStream *stream,
 }
 
 static GFileInfo *
-g_file_output_stream_daemon_get_file_info (GFileOutputStream     *stream,
+g_daemon_file_output_stream_get_file_info (GFileOutputStream     *stream,
 					   char                 *attributes,
 					   GCancellable         *cancellable,
 					   GError              **error)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
   return NULL;
 }
@@ -959,7 +959,7 @@ typedef void (*AsyncIteratorDone) (GOutputStream *stream,
 
 struct AsyncIterator {
   AsyncIteratorDone done_cb;
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   GCancellable *cancellable;
   IOOperationData io_data;
   state_machine_iterator iterator;
@@ -1063,7 +1063,7 @@ static void
 async_iterate (AsyncIterator *iterator)
 {
   IOOperationData *io_data = &iterator->io_data;
-  GFileOutputStreamDaemon *file = iterator->file;
+  GDaemonFileOutputStream *file = iterator->file;
   StateOp io_op;
   
   io_data->cancelled =
@@ -1108,7 +1108,7 @@ async_iterate (AsyncIterator *iterator)
 }
 
 static void
-run_async_state_machine (GFileOutputStreamDaemon *file,
+run_async_state_machine (GDaemonFileOutputStream *file,
 			 state_machine_iterator iterator_cb,
 			 gpointer iterator_data,
 			 int io_priority,
@@ -1170,7 +1170,7 @@ async_write_done (GOutputStream *stream,
 }
 
 static void
-g_file_output_stream_daemon_write_async  (GOutputStream      *stream,
+g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
 					  void               *buffer,
 					  gsize               count,
 					  int                 io_priority,
@@ -1178,11 +1178,11 @@ g_file_output_stream_daemon_write_async  (GOutputStream      *stream,
 					  gpointer            data,
 					  GCancellable       *cancellable)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   AsyncIterator *iterator;
   WriteOperation *op;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
   
   /* Limit for sanity and to avoid 32bit overflow */
   if (count > MAX_WRITE_SIZE)
@@ -1211,13 +1211,13 @@ async_close_done (GOutputStream *stream,
 		  gpointer callback_data,
 		  GError *io_error)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   CloseOperation *op;
   gboolean result;
   GError *error;
   GCancellable *cancellable = NULL; /* TODO: get cancellable */
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
   
   op = op_data;
 
@@ -1254,17 +1254,17 @@ async_close_done (GOutputStream *stream,
 }
 
 static void
-g_file_output_stream_daemon_close_async (GOutputStream        *stream,
+g_daemon_file_output_stream_close_async (GOutputStream        *stream,
 					int                  io_priority,
 					GAsyncCloseOutputCallback callback,
 					gpointer            data,
 					GCancellable       *cancellable)
 {
-  GFileOutputStreamDaemon *file;
+  GDaemonFileOutputStream *file;
   AsyncIterator *iterator;
   CloseOperation *op;
 
-  file = G_FILE_OUTPUT_STREAM_DAEMON (stream);
+  file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
   
   op = g_new0 (CloseOperation, 1);
   op->state = CLOSE_STATE_INIT;
