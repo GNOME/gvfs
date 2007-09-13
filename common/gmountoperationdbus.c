@@ -29,6 +29,8 @@ g_mount_operation_dbus_finalize (GObject *object)
 
   operation = G_MOUNT_OPERATION_DBUS (object);
 
+  dbus_connection_unregister_object_path (operation->connection,
+					  operation->obj_path);
   g_free (operation->obj_path);
   dbus_connection_unref (operation->connection);
   
