@@ -2,29 +2,19 @@
 #include "glocalvfs.h"
 #include "glocalfile.h"
 
-static void g_local_vfs_class_init     (GLocalVfsClass *class);
-static void g_local_vfs_vfs_iface_init (GVfsIface       *iface);
-static void g_local_vfs_finalize       (GObject         *object);
-
 struct _GLocalVfs
 {
-  GObject parent;
+  GVfs parent;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GLocalVfs, g_local_vfs, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS,
-						g_local_vfs_vfs_iface_init))
- 
-static void
-g_local_vfs_class_init (GLocalVfsClass *class)
+struct _GLocalVfsClass
 {
-  GObjectClass *object_class;
+  GVfsClass parent_class;
   
-  object_class = (GObjectClass *) class;
+};
 
-  object_class->finalize = g_local_vfs_finalize;
-}
-
+G_DEFINE_TYPE (GLocalVfs, g_local_vfs, G_TYPE_VFS)
+ 
 static void
 g_local_vfs_finalize (GObject *object)
 {
@@ -103,11 +93,20 @@ g_local_vfs_get_priority (GVfs *vfs)
 }
 
 static void
-g_local_vfs_vfs_iface_init (GVfsIface *iface)
+g_local_vfs_class_init (GLocalVfsClass *class)
 {
-  iface->get_name = g_local_vfs_get_name;
-  iface->get_priority = g_local_vfs_get_priority;
-  iface->get_file_for_path = g_local_vfs_get_file_for_path;
-  iface->get_file_for_uri = g_local_vfs_get_file_for_uri;
-  iface->parse_name = g_local_vfs_parse_name;
+  GObjectClass *object_class;
+  GVfsClass *vfs_class;
+  
+  object_class = (GObjectClass *) class;
+
+  object_class->finalize = g_local_vfs_finalize;
+
+  vfs_class = G_VFS_CLASS (class);
+  
+  vfs_class->get_name = g_local_vfs_get_name;
+  vfs_class->get_priority = g_local_vfs_get_priority;
+  vfs_class->get_file_for_path = g_local_vfs_get_file_for_path;
+  vfs_class->get_file_for_uri = g_local_vfs_get_file_for_uri;
+  vfs_class->parse_name = g_local_vfs_parse_name;
 }

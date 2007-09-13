@@ -12,15 +12,8 @@ G_BEGIN_DECLS
 #define G_IS_LOCAL_VFS_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_LOCAL_VFS))
 #define G_LOCAL_VFS_GET_CLASS(obj)		(G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_LOCAL_VFS, GLocalVfsClass))
 
-
 typedef struct _GLocalVfs       GLocalVfs;
 typedef struct _GLocalVfsClass  GLocalVfsClass;
-
-struct _GLocalVfsClass
-{
-  GObjectClass parent_class;
-  
-};
 
 GType   g_local_vfs_get_type  (void) G_GNUC_CONST;
 

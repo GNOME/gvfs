@@ -7,17 +7,23 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_VFS           (g_vfs_get_type ())
-#define G_VFS(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_VFS, GVfs))
-#define G_IS_VFS(obj)	     (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_VFS))
-#define G_VFS_GET_IFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_VFS, GVfsIface))
+#define G_TYPE_VFS         (g_vfs_get_type ())
+#define G_VFS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VFS, GVfs))
+#define G_VFS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VFS, GVfsClass))
+#define G_VFS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS, GVfsClass))
+#define G_IS_VFS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VFS))
+#define G_IS_VFS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS))
 
 typedef struct _GVfs         GVfs; /* Dummy typedef */
-typedef struct _GVfsIface    GVfsIface;
+typedef struct _GVfsClass    GVfsClass;
 
-struct _GVfsIface
+struct _GVfs {
+  GObject parent;
+};
+
+struct _GVfsClass
 {
-  GTypeInterface g_iface;
+  GObjectClass parent_class;
 
   /* Virtual Table */
 
@@ -43,7 +49,6 @@ GFile *     g_vfs_parse_name        (GVfs       *vfs,
 				     const char *parse_name);
 
 GVfs *      g_vfs_get_default       (void);
-GVfs *      g_vfs_get_by_name       (const char *name);
 
 G_END_DECLS
 

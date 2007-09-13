@@ -1,110 +1,131 @@
 #include <config.h>
+#include <string.h>
 #include <gmodule.h>
 #include "gvfs.h"
 #include "glocalvfs.h"
+#include "giomodule.h"
 #include <glib/gi18n-lib.h>
 
-static void g_vfs_base_init (gpointer g_class);
+G_DEFINE_TYPE (GVfs, g_vfs, G_TYPE_OBJECT);
 
-GType
-g_vfs_get_type (void)
+static void
+g_vfs_class_init (GVfsClass *klass)
 {
-  static GType vfs_type = 0;
-
-  if (! vfs_type)
-    {
-      static const GTypeInfo vfs_info =
-      {
-        sizeof (GVfsIface), /* class_size */
-	g_vfs_base_init,   /* base_init */
-	NULL,		/* base_finalize */
-	NULL,
-	NULL,		/* class_finalize */
-	NULL,		/* class_data */
-	0,
-	0,              /* n_preallocs */
-	NULL
-      };
-
-      vfs_type =
-	g_type_register_static (G_TYPE_INTERFACE, I_("GVfs"),
-				&vfs_info, 0);
-
-      g_type_interface_add_prerequisite (vfs_type, G_TYPE_OBJECT);
-    }
-
-  return vfs_type;
 }
 
 static void
-g_vfs_base_init (gpointer g_class)
+g_vfs_init (GVfs *vfs)
 {
+}
+
+const char *
+g_vfs_get_name (GVfs *vfs)
+{
+  GVfsClass *class;
+
+  class = G_VFS_GET_CLASS (vfs);
+
+  return (* class->get_name) (vfs);
+}
+
+int
+g_vfs_get_priority (GVfs *vfs)
+{
+  GVfsClass *class;
+
+  class = G_VFS_GET_CLASS (vfs);
+
+  return (* class->get_priority) (vfs);
 }
 
 GFile *
 g_vfs_get_file_for_path (GVfs *vfs,
 			 const char *path)
 {
-  GVfsIface *iface;
+  GVfsClass *class;
 
-  iface = G_VFS_GET_IFACE (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
-  return (* iface->get_file_for_path) (vfs, path);
+  return (* class->get_file_for_path) (vfs, path);
 }
 
 GFile *
 g_vfs_get_file_for_uri  (GVfs *vfs,
 			 const char *uri)
 {
-  GVfsIface *iface;
+  GVfsClass *class;
 
-  iface = G_VFS_GET_IFACE (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
-  return (* iface->get_file_for_uri) (vfs, uri);
+  return (* class->get_file_for_uri) (vfs, uri);
 }
 
 GFile *
 g_vfs_parse_name (GVfs *vfs,
 		  const char *parse_name)
 {
-  GVfsIface *iface;
+  GVfsClass *class;
 
-  iface = G_VFS_GET_IFACE (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
-  return (* iface->parse_name) (vfs, parse_name);
+  return (* class->parse_name) (vfs, parse_name);
 }
 
 static gpointer
 get_default_vfs (gpointer arg)
 {
-#ifdef G_OS_UNIX
-  GModule *module;
-  char *path;
-  GVfs *vfs;
-  GVfs *(*create_vfs) (void);
+  GType local_type;
+  GType *vfs_impls;
+  int i;
+  guint n_vfs_impls;
+  const char *use_this;
+  GVfs *vfs, *max_prio_vfs;
+  int max_prio;
+  GType (*casted_get_type)(void);
 
-  if (g_getenv ("VFS_USE_LOCAL") != NULL)
-    return g_local_vfs_new ();
+  use_this = g_getenv ("G_IO_VFS");
+  
+  /* Ensure GLocalVfs type is availible
+     the cast is required to avoid any G_GNUC_CONST optimizations */
+  casted_get_type = g_local_vfs_get_type;
+  local_type = casted_get_type ();
+  
+  /* Ensure vfs in modules loaded */
+  g_io_modules_ensure_loaded ();
 
-  if (g_module_supported ())
+  vfs_impls = g_type_children (G_TYPE_VFS, &n_vfs_impls);
+
+  max_prio = G_MININT;
+  max_prio_vfs = NULL;
+  for (i = 0; i < n_vfs_impls; i++)
     {
-      /* TODO: Don't hardcode module name */
-      path = g_module_build_path (GIO_MODULE_DIR, "libgvfsdbus.so");
-      module = g_module_open (path, G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
-      g_free (path);
+      vfs = g_object_new (vfs_impls[i], NULL);
 
-      if (module == NULL) {
-	g_warning ("Cannot load module `%s' (%s)", path, g_module_error ());
-      } else if (g_module_symbol (module, "create_vfs", (gpointer *)&create_vfs))
+      if (use_this && strcmp (g_vfs_get_name (vfs), use_this) == 0)
 	{
-	  vfs = create_vfs ();
-	  if (vfs)
-	    return vfs;
+	  max_prio = G_MAXINT;
+	  if (max_prio_vfs)
+	    g_object_unref (max_prio_vfs);
+	  max_prio_vfs = g_object_ref (vfs);
 	}
-    }
-#endif
 
-  return g_local_vfs_new ();
+      if (max_prio < g_vfs_get_priority (vfs))
+	{
+	  max_prio = g_vfs_get_priority (vfs);
+	  if (max_prio_vfs)
+	    g_object_unref (max_prio_vfs);
+	  max_prio_vfs = g_object_ref (vfs);
+	}
+
+      g_object_unref (vfs);
+    }
+  
+  g_free (vfs_impls);
+
+  /* We should at least have gotten the local implementation */
+  g_assert (max_prio_vfs != NULL);
+
+  return max_prio_vfs;
 }
 
 GVfs *

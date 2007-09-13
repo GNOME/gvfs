@@ -5,6 +5,7 @@
 #include "gvfsuriutils.h"
 #include "gdaemonfile.h"
 #include <gio/glocalvfs.h>
+#include <gio/giomodule.h>
 #include <gvfsdaemonprotocol.h>
 #include <gmodule.h>
 #include "gvfsdaemondbus.h"
@@ -12,13 +13,20 @@
 #include "gmountspec.h"
 #include "gvfsmapuri.h"
 
+#define G_TYPE_DAEMON_VFS		(g_daemon_vfs_type)
+#define G_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_DAEMON_VFS, GDaemonVfs))
+#define G_DAEMON_VFS_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), G_TYPE_DAEMON_VFS, GDaemonVfsClass))
+#define G_IS_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_DAEMON_VFS))
+#define G_IS_DAEMON_VFS_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_DAEMON_VFS))
+#define G_DAEMON_VFS_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_DAEMON_VFS, GDaemonVfsClass))
+
 static void g_daemon_vfs_class_init     (GDaemonVfsClass *class);
-static void g_daemon_vfs_vfs_iface_init (GVfsIface       *iface);
 static void g_daemon_vfs_finalize       (GObject         *object);
+static void g_daemon_vfs_init           (GDaemonVfs      *vfs);
 
 struct _GDaemonVfs
 {
-  GObject parent;
+  GVfs parent;
 
   DBusConnection *bus;
   
@@ -29,21 +37,41 @@ struct _GDaemonVfs
   GHashTable *to_uri_hash;
 };
 
+struct _GDaemonVfsClass
+{
+  GVfsClass parent_class;
+};
+
+static GType g_daemon_vfs_type = 0;
 static GDaemonVfs *the_vfs = NULL;
+static GObjectClass *g_daemon_vfs_parent_class = NULL;
+
 G_LOCK_DEFINE_STATIC(mount_cache);
 
-G_DEFINE_TYPE_WITH_CODE (GDaemonVfs, g_daemon_vfs, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS,
-						g_daemon_vfs_vfs_iface_init))
- 
-static void
-g_daemon_vfs_class_init (GDaemonVfsClass *class)
+GType
+g_daemon_vfs_get_type (GTypeModule *module)
 {
-  GObjectClass *object_class;
-  
-  object_class = (GObjectClass *) class;
+  if (!g_daemon_vfs_type)
+    {
+      static const GTypeInfo type_info =
+	{
+	  sizeof (GDaemonVfsClass),
+	  (GBaseInitFunc) NULL,
+	  (GBaseFinalizeFunc) NULL,
+	  (GClassInitFunc) g_daemon_vfs_class_init,
+	  NULL,           /* class_finalize */
+	  NULL,           /* class_data     */
+	  sizeof (GDaemonVfs),
+	  0,              /* n_preallocs    */
+	  (GInstanceInitFunc) g_daemon_vfs_init
+	};
 
-  object_class->finalize = g_daemon_vfs_finalize;
+      g_daemon_vfs_type =
+        g_type_module_register_type (module, G_TYPE_VFS,
+                                     "GDaemonVfs", &type_info, 0);
+    }
+  
+  return g_daemon_vfs_type;
 }
 
 static void
@@ -55,6 +83,11 @@ g_daemon_vfs_finalize (GObject *object)
 
   g_hash_table_destroy (vfs->from_uri_hash);
   g_hash_table_destroy (vfs->to_uri_hash);
+
+  g_object_unref (vfs->wrapped_vfs);
+
+  if (vfs->bus)
+    dbus_connection_unref (vfs->bus);
   
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
@@ -575,21 +608,36 @@ g_daemon_vfs_get_priority (GVfs *vfs)
 }
 
 static void
-g_daemon_vfs_vfs_iface_init (GVfsIface *iface)
+g_daemon_vfs_class_init (GDaemonVfsClass *class)
 {
-  iface->get_name = g_daemon_vfs_get_name;
-  iface->get_priority = g_daemon_vfs_get_priority;
-  iface->get_file_for_path = g_daemon_vfs_get_file_for_path;
-  iface->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
-  iface->parse_name = g_daemon_vfs_parse_name;
+  GObjectClass *object_class;
+  GVfsClass *vfs_class;
+  
+  object_class = (GObjectClass *) class;
+
+  g_daemon_vfs_parent_class = g_type_class_peek_parent (class);
+  
+  object_class->finalize = g_daemon_vfs_finalize;
+
+  vfs_class = G_VFS_CLASS (class);
+  vfs_class->get_name = g_daemon_vfs_get_name;
+  vfs_class->get_priority = g_daemon_vfs_get_priority;
+  vfs_class->get_file_for_path = g_daemon_vfs_get_file_for_path;
+  vfs_class->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
+  vfs_class->parse_name = g_daemon_vfs_parse_name;
 }
 
 /* Module API */
 
 GVfs * create_vfs (void);
 
-GVfs *
-create_vfs (void)
+void
+g_io_module_load (GIOModule *module)
 {
-  return G_VFS (g_daemon_vfs_new ());
+  g_daemon_vfs_get_type (G_TYPE_MODULE (module));
+}
+
+void
+g_io_module_unload (GIOModule   *module)
+{
 }
