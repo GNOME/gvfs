@@ -18,18 +18,23 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED "mounted"
 #define G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED "unmounted"
 
+/* Each mount (there might be several in a daemon) implements one of these interfaces
+   for standard i/o operations */
 #define G_VFS_DBUS_MOUNT_INTERFACE "org.gtk.vfs.Mount"
 #define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ "OpenForRead"
 #define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE "OpenForWrite"
 #define G_VFS_DBUS_MOUNT_OP_GET_INFO "GetInfo"
 #define G_VFS_DBUS_MOUNT_OP_ENUMERATE "Enumerate"
 
+/* mount daemons that support mounting more mounts implement this,
+   and set the dbus name in the mountable description file */
 #define G_VFS_DBUS_MOUNTABLE_INTERFACE "org.gtk.vfs.Mountable"
 #define G_VFS_DBUS_MOUNTABLE_PATH "/org/gtk/vfs/mountable"
 #define G_VFS_DBUS_MOUNTABLE_OP_MOUNT "mount"
 
 #define G_VFS_DBUS_ERROR_SOCKET_FAILED "org.gtk.vfs.Error.SocketFailed"
 
+/* Each daemon (main and for mounts) implement this. */
 #define G_VFS_DBUS_DAEMON_INTERFACE "org.gtk.vfs.Daemon"
 #define G_VFS_DBUS_DAEMON_PATH "/org/gtk/vfs/Daemon"
 #define G_VFS_DBUS_OP_GET_CONNECTION "GetConnection"
