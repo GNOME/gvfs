@@ -129,6 +129,8 @@ const char *       g_file_info_get_attribute_string      (GFileInfo  *info,
 							  const char *attribute);
 const char *       g_file_info_get_attribute_byte_string (GFileInfo  *info,
 							  const char *attribute);
+gboolean           g_file_info_get_attribute_boolean     (GFileInfo  *info,
+							  const char *attribute);
 guint32            g_file_info_get_attribute_uint32      (GFileInfo  *info,
 							  const char *attribute);
 gint32             g_file_info_get_attribute_int32       (GFileInfo  *info,
@@ -149,6 +151,9 @@ void               g_file_info_set_attribute_string      (GFileInfo  *info,
 void               g_file_info_set_attribute_byte_string (GFileInfo  *info,
 							  const char *attribute,
 							  const char *value);
+void               g_file_info_set_attribute_boolean     (GFileInfo  *info,
+							  const char *attribute,
+							  gboolean    value);
 void               g_file_info_set_attribute_uint32      (GFileInfo  *info,
 							  const char *attribute,
 							  guint32     value);

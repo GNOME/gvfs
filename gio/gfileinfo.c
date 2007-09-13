@@ -375,6 +375,16 @@ g_file_info_get_attribute_byte_string (GFileInfo  *info,
   return g_file_attribute_value_get_byte_string (value);
 }
 
+gboolean
+g_file_info_get_attribute_boolean (GFileInfo  *info,
+				   const char *attribute)
+{
+  GFileAttributeValue *value;
+
+  value = g_file_info_find_value_by_name (info, attribute);
+  return g_file_attribute_value_get_boolean (value);
+}
+
 guint32
 g_file_info_get_attribute_uint32 (GFileInfo  *info,
 				  const char *attribute)
@@ -492,6 +502,17 @@ g_file_info_set_attribute_byte_string (GFileInfo  *info,
 
   value = g_file_info_create_value_by_name (info, attribute);
   g_file_attribute_value_set_byte_string (value, attr_value);
+}
+
+void
+g_file_info_set_attribute_boolean (GFileInfo  *info,
+				   const char *attribute,
+				   gboolean attr_value)
+{
+  GFileAttributeValue *value;
+
+  value = g_file_info_create_value_by_name (info, attribute);
+  g_file_attribute_value_set_boolean (value, attr_value);
 }
 
 void
