@@ -456,7 +456,7 @@ run_sync_state_machine (GFileInputStreamDaemon *file,
 	      return FALSE;
 	    }
 	}
-      else if (res == 0)
+      else if (res == 0 && io_data.io_size != 0)
 	{
 	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		       _("Error in stream protocol: %s"), _("End of stream"));
