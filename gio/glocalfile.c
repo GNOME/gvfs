@@ -542,6 +542,7 @@ g_local_file_set_display_name (GFile *file,
   GLocalFile *local, *new_local;
   GFile *new_file;
   struct stat statbuf;
+  int errsv;
   
   new_file = g_file_get_child_for_display_name  (file, display_name, error);
   if (new_file == NULL)
@@ -561,10 +562,19 @@ g_local_file_set_display_name (GFile *file,
 
   if (rename (local->filename, new_local->filename) == -1)
     {
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error renaming file: %s"),
-		   g_strerror (errno));
+      errsv = errno;
+
+      if (errsv == EINVAL)
+	/* We can't get a rename file into itself error herer,
+	   so this must be an invalid filename, on e.g. FAT */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error renaming file: %s"),
+		     g_strerror (errsv));
       g_object_unref (new_file);
       return NULL;
     }
@@ -1366,10 +1376,18 @@ g_local_file_make_directory (GFile *file,
   
   if (g_mkdir (local->filename, 0755) == -1)
     {
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error removing file: %s"),
-		   g_strerror (errno));
+      int errsv = errno;
+
+      if (errsv == EINVAL)
+	/* This must be an invalid filename, on e.g. FAT */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error removing file: %s"),
+		     g_strerror (errsv));
       return FALSE;
     }
   
@@ -1387,10 +1405,18 @@ g_local_file_make_symbolic_link (GFile *file,
   
   if (symlink (local->filename, symlink_value) == -1)
     {
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error making symbolic link: %s"),
-		   g_strerror (errno));
+      int errsv = errno;
+
+      if (errsv == EINVAL)
+	/* This must be an invalid filename, on e.g. FAT */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error making symbolic link: %s"),
+		     g_strerror (errsv));
       return FALSE;
     }
   return TRUE;
@@ -1504,12 +1530,22 @@ g_local_file_move (GFile                *source,
   
   if (rename (local_source->filename, local_destination->filename) == -1)
     {
-      if (errno == EXDEV)
+      int errsv = errno;
+      if (errsv == EXDEV)
 	goto fallback;
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error moving file: %s"),
-		   g_strerror (errno));
+
+      if (errsv == EINVAL)
+	/* This must be an invalid filename, on e.g. FAT, or
+	   we're trying to move the file into itself...
+	   We return invalid filename for both... */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error moving file: %s"),
+		     g_strerror (errsv));
       return FALSE;
 
     }

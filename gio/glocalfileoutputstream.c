@@ -300,10 +300,18 @@ g_local_file_output_stream_create  (const char   *filename,
 	       0666);
   if (fd == -1)
     {
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error opening file '%s': %s"),
-		   filename, g_strerror (errno));
+      int errsv = errno;
+
+      if (errsv == EINVAL)
+	/* This must be an invalid filename, on e.g. FAT */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error opening file '%s': %s"),
+		     filename, g_strerror (errsv));
       return NULL;
     }
   
@@ -334,10 +342,18 @@ g_local_file_output_stream_append  (const char   *filename,
 	       0666);
   if (fd == -1)
     {
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error opening file '%s': %s"),
-		   filename, g_strerror (errno));
+      int errsv = errno;
+
+      if (errsv == EINVAL)
+	/* This must be an invalid filename, on e.g. FAT */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error opening file '%s': %s"),
+		     filename, g_strerror (errsv));
       return NULL;
     }
   
@@ -713,10 +729,18 @@ g_local_file_output_stream_replace (const char   *filename,
     }
   else if (fd == -1)
     {
-      g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   _("Error opening file '%s': %s"),
-		   filename, g_strerror (errno));
+      int errsv = errno;
+
+      if (errsv == EINVAL)
+	/* This must be an invalid filename, on e.g. FAT */
+	g_set_error (error, G_IO_ERROR,
+		     G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid filename"));
+      else
+	g_set_error (error, G_IO_ERROR,
+		     g_io_error_from_errno (errsv),
+		     _("Error opening file '%s': %s"),
+		     filename, g_strerror (errsv));
       return NULL;
     }
   
