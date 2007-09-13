@@ -153,9 +153,9 @@ fam_helper_startup (void)
 }
 
 fam_sub*
-fam_sub_add (const gchar* pathname,
-             gboolean directory,
-	     gpointer user_data)
+_fam_sub_add (const gchar* pathname,
+	      gboolean directory,
+	      gpointer user_data)
 {
   if (!fam_helper_startup ())
     return NULL;
@@ -185,7 +185,7 @@ fam_sub_add (const gchar* pathname,
 }
 
 gboolean
-fam_sub_cancel (fam_sub* sub)
+_fam_sub_cancel (fam_sub* sub)
 {
   if (sub->cancelled)
     return TRUE;
@@ -208,3 +208,11 @@ fam_sub_cancel (fam_sub* sub)
   
   return TRUE;
 }
+
+void
+_fam_sub_free (fam_sub* sub)
+{
+  g_free (sub->pathname);
+  g_free (sub);
+}
+
