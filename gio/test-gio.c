@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <glib.h>
 #include "gfile.h"
@@ -10,6 +11,7 @@
 #include "glocalfileoutputstream.h"
 #include "gsocketinputstream.h"
 #include "gappinfo.h"
+#include "gcontenttype.h"
 
 static gpointer
 cancel_thread (gpointer data)
@@ -294,6 +296,23 @@ compare_apps (gconstpointer  _a,
 static void
 test_appinfo (void)
 {
+#ifdef G_OS_WIN32
+  g_print (".aiff is_a .aiff: %d\n", g_content_type_is_a (".aiff", ".aiff"));
+  g_print (".aiff is_a .gif: %d\n", g_content_type_is_a (".aiff", ".gif"));
+  g_print (".aiff is_a text: %d\n", g_content_type_is_a (".aiff", "text"));
+  g_print (".aiff is_a audio: %d\n", g_content_type_is_a (".aiff", "audio"));
+
+  g_print (".aiff descr: %s\n", g_content_type_get_description (".aiff"));
+  g_print (".gif descr: %s\n", g_content_type_get_description (".gif"));
+  g_print (".jpeg descr: %s\n", g_content_type_get_description (".jpeg"));
+  
+  g_print (".aiff mimetype: %s\n", g_content_type_get_mime_type (".aiff"));
+  g_print (".gif mimetype: %s\n", g_content_type_get_mime_type (".gif"));
+  g_print (".jpeg mimetype: %s\n", g_content_type_get_mime_type (".jpeg"));
+  g_print ("* mimetype: %s\n", g_content_type_get_mime_type ("*"));
+  g_print ("image mimetype: %s\n", g_content_type_get_mime_type ("image"));
+#endif
+  
 #if 0
   GList *infos, *l;
   GAppInfo *info;

@@ -8,8 +8,6 @@
 #include <stdio.h>
 
 #include "gcontenttypeprivate.h"
-#define XDG_PREFIX _gio_xdg
-#include "xdgmime/xdgmime.h"
 
 /* A content type is a platform specific string that defines the type
    of a file. On unix it is a mime type, on win32 it is an extension string
@@ -19,27 +17,73 @@
 
 #ifdef G_OS_WIN32
 
+#include <windows.h>
+
 gboolean
-g_content_type_equals (const char   *type1,
-		       const char   *type2)
+g_content_type_equals (const char *type1,
+		       const char *type2)
 {
   g_return_val_if_fail (type1 != NULL, FALSE);
   g_return_val_if_fail (type2 != NULL, FALSE);
 
-  /* TODO */
-  return FALSE;
+  return strcmp (type1, type2) == 0;
+}
+
+static char *
+get_registry_classes_key (const char *subdir,
+			  const wchar_t *key_name)
+{
+  wchar_t *wc_key;
+  HKEY reg_key = NULL;
+  DWORD key_type;
+  DWORD nbytes;
+  char *value_utf8;
+
+  value_utf8 = NULL;
+  
+  nbytes = 0;
+  wc_key = g_utf8_to_utf16 (subdir, -1, NULL, NULL, NULL);
+  if (RegOpenKeyExW (HKEY_CLASSES_ROOT, wc_key, 0,
+		     KEY_QUERY_VALUE, &reg_key) == ERROR_SUCCESS &&
+      RegQueryValueExW (reg_key, key_name, 0,
+			&key_type, NULL, &nbytes) == ERROR_SUCCESS &&
+      key_type == REG_SZ)
+    {
+      wchar_t *wc_temp = g_new (wchar_t, (nbytes+1)/2 + 1);
+      RegQueryValueExW (reg_key, key_name, 0,
+			&key_type, (LPBYTE) wc_temp, &nbytes);
+      wc_temp[nbytes/2] = '\0';
+      value_utf8 = g_utf16_to_utf8 (wc_temp, -1, NULL, NULL, NULL);
+      g_free (wc_temp);
+    }
+  g_free (wc_key);
+  
+  if (reg_key != NULL)
+    RegCloseKey (reg_key);
+
+  return value_utf8;
 }
 
 gboolean
 g_content_type_is_a (const char   *type,
 		     const char   *supertype)
 {
+  gboolean res;
+  char *value_utf8;
+
   g_return_val_if_fail (type != NULL, FALSE);
   g_return_val_if_fail (supertype != NULL, FALSE);
 
-  /* TODO */
+  if (strcmp (type, supertype) == 0)
+    return TRUE;
 
-  return FALSE;
+  res = FALSE;
+  value_utf8 = get_registry_classes_key (type, L"PerceivedType");
+  if (value_utf8 && strcmp (value_utf8, supertype) == 0)
+    res = TRUE;
+  g_free (value_utf8);
+  
+  return res;
 }
 
 gboolean
@@ -51,15 +95,39 @@ g_content_type_is_unknown (const char *type)
 char *
 g_content_type_get_description (const char *type)
 {
-  /* TODO */
-  return NULL;
+  char *progid;
+  char *description;
+
+  progid = get_registry_classes_key (type, NULL);
+  if (progid)
+    {
+      description = get_registry_classes_key (progid, NULL);
+      g_free (progid);
+
+      if (description)
+	return description;
+    }
+
+  if (g_content_type_is_unknown (type))
+    return g_strdup (_("Unknown type"));
+  return g_strdup_printf (_("%s type"));
 }
 
 char *
 g_content_type_get_mime_type (const char   *type)
 {
-  /* TODO */
-  return NULL;
+  char *mime;
+
+  mime = get_registry_classes_key (type, L"Content Type");
+  if (mime)
+    return mime;
+  else if (g_content_type_is_unknown (type))
+    return g_strdup ("application/octet-stream");
+  else if (*type == '.')
+    return g_strdup_printf ("application/x-ext-%s", type+1);
+  /* TODO: Map "image" to "image/ *", etc? */
+
+  return g_strdup ("application/octet-stream");
 }
 
 char *
@@ -128,6 +196,9 @@ g_get_registered_content_types (void)
 }
 
 #else /* !G_OS_WIN32 - Unix specific version */
+
+#define XDG_PREFIX _gio_xdg
+#include "xdgmime/xdgmime.h"
 
 /* We lock this mutex whenever we modify global state in this module.  */
 G_LOCK_DEFINE_STATIC (gio_xdgmime);

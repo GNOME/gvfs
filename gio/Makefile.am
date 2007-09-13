@@ -46,7 +46,7 @@ platform_libadd =
 appinfo_sources =
 
 if OS_UNIX
-appinfo_sources = gdesktopappinfo.c gdesktopappinfo.h
+appinfo_sources += gdesktopappinfo.c gdesktopappinfo.h
 platform_libadd += xdgmime/libxdgmime.la
 socket_sources = \
 	gsocketinputstream.c \
@@ -119,12 +119,12 @@ gvfsinclude_HEADERS = \
 	$(NULL)
 
 noinst_PROGRAMS= \
-	test
+	test-gio
 
-test_SOURCES = \
-	test.c
+test_gio_SOURCES = \
+	test-gio.c
 
-test_LDADD = \
+test_gio_LDADD = \
 	libgio.la \
 	$(GLIB_LIBS)
 
