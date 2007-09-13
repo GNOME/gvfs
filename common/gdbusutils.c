@@ -177,7 +177,8 @@ _g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *str)
 {
   DBusMessageIter array;
 
-  g_assert (str != NULL);
+  if (str == NULL)
+    str = "";
   
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_ARRAY,
