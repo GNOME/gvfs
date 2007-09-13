@@ -74,7 +74,7 @@ gvfs_daemon_LDADD = $(libraries)
 gvfs_daemon_test_SOURCES = \
 	gvfsbackendtest.c gvfsbackendtest.h \
 	daemon-main.c daemon-main.h \
-	test.c
+	daemon-main-generic.c 
 
 gvfs_daemon_test_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendtest.h \
@@ -86,7 +86,7 @@ gvfs_daemon_test_LDADD = $(libraries)
 gvfs_daemon_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h \
 	daemon-main.c daemon-main.h \
-	smb.c
+	daemon-main-generic.c 
 
 gvfs_daemon_smb_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
