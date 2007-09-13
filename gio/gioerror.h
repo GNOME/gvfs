@@ -18,7 +18,6 @@ GQuark          g_io_error_quark      (void);
 typedef enum
 {
   G_IO_ERROR_FAILED,
-  G_IO_ERROR_INTERNAL_ERROR,
   G_IO_ERROR_NOT_FOUND,
   G_IO_ERROR_EXISTS,
   G_IO_ERROR_IS_DIRECTORY,

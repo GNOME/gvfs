@@ -136,7 +136,7 @@ send_sync_and_unref (DBusMessage *message,
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INTERNAL_ERROR,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Can't open dbus connection");
       dbus_message_unref (message);
       return NULL;

@@ -370,7 +370,7 @@ mount_op_done (GMountOperationDBus *op_dbus,
 				     code, error_message);
       else
 	{
-	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INTERNAL_ERROR,
+	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       "Can't parse mount error: %s", derror.message);
 	  dbus_error_free (&derror);
 	}
