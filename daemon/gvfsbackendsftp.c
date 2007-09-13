@@ -1208,7 +1208,7 @@ error_from_status (GVfsJob *job,
   return FALSE;
 }
 
-static void
+static gboolean
 result_from_status (GVfsJob *job,
                     GDataInputStream *reply,
                     int failure_error)
@@ -1216,12 +1216,16 @@ result_from_status (GVfsJob *job,
   GError *error;
 
   if (error_from_status (job, reply, failure_error, &error))
-    g_vfs_job_succeeded (job);
+    {
+      g_vfs_job_succeeded (job);
+      return TRUE;
+    }
   else
     {
       g_vfs_job_failed_from_error (job, error);
       g_error_free (error);
     }
+  return FALSE;
 }
 
 static void
@@ -1631,6 +1635,53 @@ try_seek_on_read (GVfsBackend *backend,
 }
 
 static void
+close_deleted_file (GVfsBackendSftp *backend,
+                    int reply_type,
+                    GDataInputStream *reply,
+                    guint32 len,
+                    GVfsJob *job,
+                    gpointer user_data)
+{
+  /* TODO */
+}
+
+static void
+close_moved_file (GVfsBackendSftp *backend,
+                  int reply_type,
+                  GDataInputStream *reply,
+                  guint32 len,
+                  GVfsJob *job,
+                  gpointer user_data)
+{
+  /* TODO */
+}
+
+static void
+close_deleted_backup (GVfsBackendSftp *backend,
+                      int reply_type,
+                      GDataInputStream *reply,
+                      guint32 len,
+                      GVfsJob *job,
+                      gpointer user_data)
+{
+  SftpHandle *handle;
+  GDataOutputStream *command;
+  char *backup_name;
+  guint32 id;
+
+  handle = user_data;
+  
+  command = new_command_stream (backend,
+                                SSH_FXP_RENAME,
+                                &id);
+  backup_name = g_strconcat (handle->filename, "~", NULL);
+  put_string (command, handle->filename);
+  put_string (command, backup_name);
+  g_free (backup_name);
+  queue_command_stream_and_free (backend, command, id, close_moved_file, G_VFS_JOB (job), handle);
+}
+
+static void
 close_reply (GVfsBackendSftp *backend,
              int reply_type,
              GDataInputStream *reply,
@@ -1638,11 +1689,66 @@ close_reply (GVfsBackendSftp *backend,
              GVfsJob *job,
              gpointer user_data)
 {
+  GDataOutputStream *command;
+  guint32 id;
+  GError *error;
+  gboolean res;
+  char *backup_name;
+  SftpHandle *handle;
+
+  handle = user_data;
+
+  error = NULL;
+  res = FALSE;
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply, -1);
+    res = error_from_status (job, reply, -1, &error);
   else
-    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("Invalid reply recieved"));
+    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                 _("Invalid reply recieved"));
+
+  if (res)
+    {
+      if (handle->tempname)
+        {
+          if (handle->make_backup)
+            {
+              command = new_command_stream (backend,
+                                            SSH_FXP_REMOVE,
+                                            &id);
+              backup_name = g_strconcat (handle->filename, "~", NULL);
+              put_string (command, backup_name);
+              g_free (backup_name);
+              queue_command_stream_and_free (backend, command, id, close_deleted_backup, G_VFS_JOB (job), handle);
+            }
+          else
+            {
+              command = new_command_stream (backend,
+                                            SSH_FXP_REMOVE,
+                                            &id);
+              put_string (command, handle->filename);
+              queue_command_stream_and_free (backend, command, id, close_deleted_file, G_VFS_JOB (job), handle);
+            }
+        }
+      
+      g_vfs_job_succeeded (job);
+    }
+  else
+    {
+      /* The close failed, remove any temporary files */
+      if (handle->tempname)
+        {
+          command = new_command_stream (backend,
+                                        SSH_FXP_REMOVE,
+                                        &id);
+          put_string (command, handle->tempname);
+          queue_command_stream_and_free (backend, command, id, NULL, G_VFS_JOB (job), NULL);
+        }
+      
+      g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
+    }
+  
+  sftp_handle_free (handle);
 }
 
 static gboolean
@@ -1652,17 +1758,15 @@ try_close_read (GVfsBackend *backend,
 {
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
+  guint32 id;
 
   command = new_command_stream (op_backend,
                                 SSH_FXP_CLOSE,
                                 &id);
   put_data_buffer (command, handle->raw_handle);
 
-  sftp_handle_free (handle);
-  
-  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -1682,9 +1786,7 @@ try_close_write (GVfsBackend *backend,
                                 &id);
   put_data_buffer (command, handle->raw_handle);
 
-  sftp_handle_free (handle);
-  
-  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
