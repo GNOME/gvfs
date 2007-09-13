@@ -350,7 +350,7 @@ try_mount (GVfsBackend *backend,
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_FILE_ERROR, G_FILE_ERROR_INVAL,
 			_("Invalid mount spec"));
-      return FALSE;
+      return TRUE;
     }
  
 

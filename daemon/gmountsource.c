@@ -131,6 +131,10 @@ g_mount_source_done (GMountSource *source)
 {
   dbus_bool_t succeeded_dbus = TRUE;
   DBusMessage *message;
+
+  /* Fail gracefully if no source specified */
+  if (source == NULL)
+    return;
   
   if (source->dbus_id == NULL)
     return;
@@ -154,6 +158,10 @@ g_mount_source_failed (GMountSource *source,
   DBusMessage *message;
   const char *domain;
   guint32 code;
+
+  /* Fail gracefully if no source specified */
+  if (source == NULL)
+    return;
   
   if (source->dbus_id == NULL)
     {

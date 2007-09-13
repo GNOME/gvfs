@@ -73,18 +73,21 @@ gvfs_daemon_LDADD = $(libraries)
 
 gvfs_daemon_test_SOURCES = \
 	gvfsbackendtest.c gvfsbackendtest.h \
+	daemon-main.c daemon-main.h \
 	test.c
 
 gvfs_daemon_test_LDADD = $(libraries)
 
 gvfs_daemon_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h \
+	daemon-main.c daemon-main.h \
 	smb.c
 
 gvfs_daemon_smb_LDADD = $(SAMBA_LIBS) $(libraries)
 
 gvfs_daemon_smb_browse_SOURCES = \
 	gvfsbackendsmbbrowse.c gvfsbackendsmbbrowse.h \
+	daemon-main.c daemon-main.h \
 	smbbrowse.c
 
 gvfs_daemon_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
