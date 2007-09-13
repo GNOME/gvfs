@@ -19,11 +19,11 @@ struct _GUnixVolume {
   char *mountpoint;
 };
 
-static void g_unix_volue_volume_iface_init (GVolumeIface *iface);
+static void g_unix_volume_volume_iface_init (GVolumeIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GUnixVolume, g_unix_volume, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_VOLUME,
-						g_unix_volue_volume_iface_init))
+						g_unix_volume_volume_iface_init))
 
 
 static void
@@ -357,7 +357,7 @@ g_unix_volume_eject_finish (GVolume *volume,
 }
 
 static void
-g_unix_volue_volume_iface_init (GVolumeIface *iface)
+g_unix_volume_volume_iface_init (GVolumeIface *iface)
 {
   iface->get_root = g_unix_volume_get_root;
   iface->get_name = g_unix_volume_get_name;
