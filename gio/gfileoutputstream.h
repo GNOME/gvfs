@@ -36,6 +36,11 @@ struct _GFileOutputStreamClass
 			       GSeekType             type,
 			       GCancellable         *cancellable,
 			       GError              **error);
+  gboolean   (*can_truncate)  (GFileOutputStream    *stream);
+  gboolean   (*truncate)      (GFileOutputStream    *stream,
+			       goffset               size,
+			       GCancellable         *cancellable,
+			       GError              **error);
   GFileInfo *(*get_file_info) (GFileOutputStream    *stream,
 			       char                 *attributes,
 			       GCancellable         *cancellable,
