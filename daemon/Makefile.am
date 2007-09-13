@@ -15,7 +15,7 @@ noinst_LTLIBRARIES=libdaemon.la
 libraries =						\
 	$(top_builddir)/gio/libgio.la			\
 	libdaemon.la					\
-	$(top_builddir)/common/libcommon.la		\
+	$(top_builddir)/common/libgvfscommon.la		\
 	$(GLIB_LIBS) $(DBUS_LIBS)
 
 # D-BUS service file

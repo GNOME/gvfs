@@ -6,9 +6,11 @@
 #include "gdaemonfile.h"
 #include <gio/glocalvfs.h>
 #include <gvfsdaemonprotocol.h>
+#include <gmodule.h>
 #include "gvfsdaemondbus.h"
 #include "gdbusutils.h"
 #include "gmountspec.h"
+#include "gvfsmapuri.h"
 
 static void g_daemon_vfs_class_init     (GDaemonVfsClass *class);
 static void g_daemon_vfs_vfs_iface_init (GVfsIface       *iface);
@@ -22,6 +24,10 @@ struct _GDaemonVfs
   
   GVfs *wrapped_vfs;
   GList *mount_cache;
+
+
+  GHashTable *from_uri_hash;
+  GHashTable *to_uri_hash;
 };
 
 static GDaemonVfs *the_vfs = NULL;
@@ -44,37 +50,29 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 static void
 g_daemon_vfs_finalize (GObject *object)
 {
+  GDaemonVfs *vfs;
+
+  vfs = G_DAEMON_VFS (object);
+
+  g_hash_table_destroy (vfs->from_uri_hash);
+  g_hash_table_destroy (vfs->to_uri_hash);
+  
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
 }
 
-static char *
-normalize_smb_name (const char *name, gssize len)
-{
-  gboolean valid_utf8;
-
-  valid_utf8 = g_utf8_validate (name, len, NULL);
-  
-  if (valid_utf8)
-    return g_utf8_casefold (name, len);
-  else
-    return g_ascii_strdown (name, len);
-}
-
 static void
-get_mountspec_from_uri (GDecodedUri *uri,
+get_mountspec_from_uri (GDaemonVfs *vfs,
+			GDecodedUri *uri,
 			GMountSpec **spec_out,
 			char **path_out)
 {
   GMountSpec *spec;
-  char *path, *tmp;
-  const char *p;
-  const char *share, *share_end;
+  char *path;
+  g_mountspec_from_uri_func func;
   
   /* TODO: Share MountSpec objects between files (its refcounted) */
 
-  /* TODO: Make less hardcoded */
-  
   spec = NULL;
   
   if (strcmp (uri->scheme, "test") == 0)
@@ -82,112 +80,88 @@ get_mountspec_from_uri (GDecodedUri *uri,
       spec = g_mount_spec_new ("test");
       path = g_strdup (uri->path);
     }
-  else if (strcmp (uri->scheme, "smb") == 0)
+  else
     {
-      if (uri->host == NULL || strlen (uri->host) == 0)
-	{
-	  /* uri form: smb:/// or smb:///$path */
-	  spec = g_mount_spec_new ("smb-network");
-	  if (uri->path == NULL || *uri->path == 0)
-	    path = g_strdup ("/");
-	  else
-	    path = g_strdup (uri->path);
-	}
-      else
-	{
-	  /* host set */
-	  p = uri->path;
-	  while (p && *p == '/')
-	    p++;
-
-	  if (p == NULL || *p == 0)
-	    {
-	      /* uri form: smb://$host/ */
-	      spec = g_mount_spec_new ("smb-server");
-	      tmp = normalize_smb_name (uri->host, -1);
-	      g_mount_spec_set  (spec, "server", tmp);
-	      g_free (tmp);
-	      path = g_strdup ("/");
-	    }
-	  else
-	    {
-	      share = p;
-	      share_end = strchr (share, '/');
-	      if (share_end == NULL)
-		share_end = share + strlen (share);
-
-	      p = share_end;
-	      
-	      while (*p == '/')
-		p++;
-
-	      if (*p == 0)
-		{
-		  /* uri form: smb://$host/$share/
-		   * Here we special case smb-server files by adding "_." to the names in the uri */
-		  if (share[0] == '_' && share[1] == '.')
-		    {
-		      spec = g_mount_spec_new ("smb-server");
-		      tmp = normalize_smb_name (uri->host, -1);
-		      g_mount_spec_set  (spec, "server", tmp);
-		      g_free (tmp);
-		      tmp = normalize_smb_name (share + 2, share_end - (share + 2));
-		      path = g_strconcat ("/", tmp, NULL);
-		      g_free (tmp);
-		    }
-		  else
-		    {
-		      spec = g_mount_spec_new ("smb-share");
-		      tmp = normalize_smb_name (uri->host, -1);
-		      g_mount_spec_set  (spec, "server", tmp);
-		      g_free (tmp);
-		      tmp = normalize_smb_name (share, share_end - share);
-		      g_mount_spec_set  (spec, "share", tmp);
-		      g_free (tmp);
-		      path = g_strdup ("/");
-		    }
-		}
-	      else
-		{
-		  spec = g_mount_spec_new ("smb-share");
-		  
-		  tmp = normalize_smb_name (uri->host, -1);
-		  g_mount_spec_set  (spec, "server", tmp);
-		  g_free (tmp);
-
-		  tmp = normalize_smb_name (share, share_end - share);
-		  g_mount_spec_set  (spec, "share", tmp);
-		  g_free (tmp);
-
-		  path = g_strconcat ("/", p, NULL);
-		}
-	    }
-	}
-      if (uri->userinfo)
-	{
-	  const char *user = uri->userinfo;
-	  p = strchr (uri->userinfo, ';');
-	  if (p)
-	    {
-	      if (p != user)
-		g_mount_spec_set_with_len  (spec, "domain", user, p - user);
-	      user = p + 1;
-	    }
-	  if (*user != 0)
-	    g_mount_spec_set  (spec, "user", user);
-	}
-    }
-
-  if (spec == NULL)
-    {
-      tmp = g_strdup_printf ("unknown-%s", uri->scheme);
-      spec = g_mount_spec_new (tmp);
-      g_free (tmp);
-      path = g_strdup (uri->path);
+      func = g_hash_table_lookup (vfs->from_uri_hash, uri->scheme);
+      if (func)
+	func (uri, &spec, &path);
     }
   
+  if (spec == NULL)
+    {
+      spec = g_mount_spec_new (uri->scheme);
+      path = g_strdup (uri->path);
+    }
+
   *spec_out = spec;
   *path_out = path;
+}
+
+static void
+load_vfs_module (GDaemonVfs *vfs,
+		 const char *filename)
+{
+  GModule *module;
+  gpointer ptr;
+  
+  module = g_module_open (filename, G_MODULE_BIND_LOCAL);
+  if (module)
+    {
+      if (g_module_symbol (module, G_STRINGIFY(G_VFS_MAP_FROM_URI_TABLE_NAME), &ptr))
+	{
+	  GVfsMapFromUri *from_uri_table = ptr;
+
+	  while (from_uri_table->scheme != NULL)
+	    {
+	      g_print ("from %s: %p\n", from_uri_table->scheme, from_uri_table->func);
+	      g_hash_table_insert (vfs->from_uri_hash,
+				   from_uri_table->scheme, from_uri_table->func);
+	      from_uri_table++;
+	    }
+	}
+	  
+      if (g_module_symbol (module, G_STRINGIFY(G_VFS_MAP_TO_URI_TABLE_NAME), &ptr))
+	{
+	  GVfsMapToUri *to_uri_table = ptr;
+	  
+	  while (to_uri_table->mount_type != NULL)
+	    {
+	      g_print ("to %s: %p\n", to_uri_table->mount_type, to_uri_table->func);
+	      g_hash_table_insert (vfs->to_uri_hash,
+				   to_uri_table->mount_type, to_uri_table->func);
+	      to_uri_table++;
+	    }
+	}
+    }
+}
+
+static void
+load_vfs_module_dir (GDaemonVfs *vfs,
+		     const char *dirname)
+{
+  GDir *dir;
+  
+  dir = g_dir_open (dirname, 0, NULL);
+  if (dir)
+    {
+      const char *name;
+      
+      while ((name = g_dir_read_name (dir)))
+	{
+	  if (g_str_has_suffix (name, "." G_MODULE_SUFFIX))
+	    {
+	      char *filename;
+	      
+	      filename = g_build_filename (dirname, 
+					   name, 
+					   NULL);
+	      load_vfs_module (vfs, filename);
+	      g_free (filename);
+	    }
+	}
+      
+      g_dir_close (dir);
+    }
 }
 
 static void
@@ -195,6 +169,9 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 {
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
+
+  vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
+  vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
   
   vfs->wrapped_vfs = g_local_vfs_new ();
 
@@ -205,6 +182,9 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 
   if (vfs->bus)
     _g_dbus_connection_integrate_with_main (vfs->bus);
+
+					 
+  load_vfs_module_dir (vfs, GVFS_MODULE_DIR);
 }
 
 GDaemonVfs *
@@ -242,7 +222,7 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
     file = g_daemon_vfs_get_file_for_path (vfs, decoded->path);
   else
     {
-      get_mountspec_from_uri (decoded, &spec, &path);
+      get_mountspec_from_uri (daemon_vfs, decoded, &spec, &path);
       file = g_daemon_file_new (spec, path);
       g_mount_spec_unref (spec);
       g_free (path);
@@ -253,6 +233,37 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
   return file;
 }
 
+GDecodedUri *
+_g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
+				     char *path)
+{
+  GDecodedUri *uri;
+  const char *type;
+  g_mountspec_to_uri_func func;
+
+  uri = g_new0 (GDecodedUri, 1);
+  uri->port = -1;
+
+  type = g_mount_spec_get_type (spec);
+  if (type == NULL)
+    {
+      uri->scheme = g_strdup ("unknown");
+      uri->path = g_strdup (path);
+      return uri;
+    }
+
+  func = g_hash_table_lookup (the_vfs->to_uri_hash, type);
+  if (func)
+    func (spec, path, uri);
+
+  if (uri->scheme == NULL)
+    {
+      uri->scheme = g_strdup (type);
+      uri->path = g_strdup (path);
+    }
+  
+  return uri;
+}
 
 static GMountRef *
 mount_ref_ref (GMountRef *ref)
@@ -260,7 +271,6 @@ mount_ref_ref (GMountRef *ref)
   g_atomic_int_inc (&ref->ref_count);
   return ref;
 }
-
 
 void
 _g_mount_ref_unref (GMountRef *ref)
@@ -533,7 +543,7 @@ _g_daemon_vfs_get_mount_ref_sync (GMountSpec *spec,
 
 static GFile *
 g_daemon_vfs_parse_name (GVfs       *vfs,
-			      const char *parse_name)
+			 const char *parse_name)
 {
   GFile *file;
   char *path;

@@ -1,6 +1,6 @@
 NULL =
 
-noinst_LTLIBRARIES=libcommon.la
+lib_LTLIBRARIES=libgvfscommon.la
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
@@ -8,7 +8,7 @@ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
-libcommon_la_SOURCES = 	\
+libgvfscommon_la_SOURCES = 	\
 	gsysutils.c gsysutils.h \
 	gdbusutils.c gdbusutils.h \
 	gmountspec.c gmountspec.h \
@@ -16,8 +16,9 @@ libcommon_la_SOURCES = 	\
 	gmountsource.c gmountsource.h \
 	gmounttracker.c gmounttracker.h \
 	gvfsdaemonprotocol.h \
+	gvfsmapuri.h \
 	$(NULL)
 
-libcommon_la_LIBADD =	\
+ligvfsbcommon_la_LIBADD =	\
 	$(DBUS_LIBS) 	\
 	$(GLIB_LIBS)

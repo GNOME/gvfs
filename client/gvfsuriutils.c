@@ -81,6 +81,17 @@ _g_decoded_uri_free (GDecodedUri *decoded)
 }
 
 GDecodedUri *
+_g_decoded_uri_new (void)
+{
+  GDecodedUri *uri;
+
+  uri = g_new0 (GDecodedUri, 1);
+  uri->port = -1;
+
+  return uri;
+}
+
+GDecodedUri *
 _g_decode_uri (const char *uri)
 {
   GDecodedUri *decoded;
@@ -115,8 +126,7 @@ _g_decode_uri (const char *uri)
 	return NULL;
     }
 
-  decoded = g_new0 (GDecodedUri, 1);
-  decoded->port = -1;
+  decoded = _g_decoded_uri_new ();
   
   decoded->scheme = g_malloc (p - uri);
   out = decoded->scheme;
@@ -248,44 +258,65 @@ is_valid (char c, const char *reserved_chars_allowed)
   return FALSE;
 }
 
+static gboolean 
+gunichar_ok (gunichar c)
+{
+  return
+    (c != (gunichar) -2) &&
+    (c != (gunichar) -1);
+}
+  
 static void
 g_string_append_encoded (GString *string, const char *encoded,
-			 const char *reserved_chars_allowed)
+			 const char *reserved_chars_allowed,
+			 gboolean allow_utf8)
 {
-  char c;
+  unsigned char c;
+  const char *end;
   static const gchar hex[16] = "0123456789ABCDEF";
+
+  end = encoded + strlen (encoded);
   
-  while ((c = *encoded++) != 0)
+  while ((c = *encoded) != 0)
     {
-      if (is_valid (c, reserved_chars_allowed))
-	g_string_append_c (string, c);
+      if (c >= 0x80 && allow_utf8 &&
+	  gunichar_ok (g_utf8_get_char_validated (encoded, end - encoded)))
+	{
+	  int len = g_utf8_skip [c];
+	  g_string_append_len (string, encoded, len);
+	  encoded += len;
+	}
+      else if (is_valid (c, reserved_chars_allowed))
+	{
+	  g_string_append_c (string, c);
+	  encoded++;
+	}
       else
 	{
 	  g_string_append_c (string, '%');
 	  g_string_append_c (string, hex[((guchar)c) >> 4]);
 	  g_string_append_c (string, hex[((guchar)c) & 0xf]);
+	  encoded++;
 	}
     }
 }
 
 char *
-_g_encode_uri (GDecodedUri *decoded)
+_g_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
 {
   GString *uri;
 
   uri = g_string_new (NULL);
 
   g_string_append (uri, decoded->scheme);
-  g_string_append_c (uri, ':');
+  g_string_append (uri, "://");
 
   if (decoded->host != NULL)
     {
-      g_string_append (uri, "//");
-      
       if (decoded->userinfo)
 	{
 	  /* userinfo    = *( unreserved / pct-encoded / sub-delims / ":" ) */
-	  g_string_append_encoded (uri, decoded->userinfo, SUB_DELIM_CHARS ":");
+	  g_string_append_encoded (uri, decoded->userinfo, SUB_DELIM_CHARS ":", allow_utf8);
 	  g_string_append_c (uri, '@');
 	}
       
@@ -298,7 +329,7 @@ _g_encode_uri (GDecodedUri *decoded)
 	}
     }
 
-  g_string_append_encoded (uri, decoded->path, SUB_DELIM_CHARS ":@/");
+  g_string_append_encoded (uri, decoded->path, SUB_DELIM_CHARS ":@/", allow_utf8);
   
   if (decoded->query)
     {

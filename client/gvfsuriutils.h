@@ -15,9 +15,12 @@ typedef struct {
   char *fragment;
 } GDecodedUri;
 
-char *       _g_encode_uri       (GDecodedUri *decoded);
+char *       _g_encode_uri       (GDecodedUri *decoded,
+				  gboolean     allow_utf8);
 void         _g_decoded_uri_free (GDecodedUri *decoded);
 GDecodedUri *_g_decode_uri       (const char  *uri);
+GDecodedUri *_g_decoded_uri_new  (void);
+
 
 G_END_DECLS
 

@@ -4,6 +4,7 @@
 #include <gio/gvfs.h>
 #include <dbus/dbus.h>
 #include "gmountspec.h"
+#include "gvfsuriutils.h"
 
 G_BEGIN_DECLS
 
@@ -37,16 +38,19 @@ GType   g_daemon_vfs_get_type  (void) G_GNUC_CONST;
 
 GDaemonVfs *g_daemon_vfs_new (void);
 
-void        _g_daemon_vfs_get_mount_ref_async (GMountSpec               *spec,
-					       const char               *path,
-					       GMountRefLookupCallback   callback,
-					       gpointer                  user_data);
-GMountRef  *_g_daemon_vfs_get_mount_ref_sync  (GMountSpec               *spec,
-					       const char               *path,
-					       GError                  **error);
-const char *_g_mount_ref_resolve_path         (GMountRef                *ref,
-					       const char               *path);
-void        _g_mount_ref_unref                (GMountRef                *ref);
+GDecodedUri *_g_daemon_vfs_get_uri_for_mountspec (GMountSpec               *spec,
+						  char                     *path);
+void         _g_daemon_vfs_get_mount_ref_async   (GMountSpec               *spec,
+						  const char               *path,
+						  GMountRefLookupCallback   callback,
+						  gpointer                  user_data);
+GMountRef  * _g_daemon_vfs_get_mount_ref_sync    (GMountSpec               *spec,
+						  const char               *path,
+						  GError                  **error);
+const char * _g_mount_ref_resolve_path           (GMountRef                *ref,
+						  const char               *path);
+void         _g_mount_ref_unref                  (GMountRef                *ref);
+
 
 G_END_DECLS
 
