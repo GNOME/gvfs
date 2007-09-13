@@ -42,6 +42,8 @@ gedit uses attr_copy_fd in libattr to copy xattrs
 handle attributes in atomic save backup copy
 GFileCopyFlags could have a FAIL_ON_ATTRIBUTE_COPY?
 
+Make copy handle things like symlinks
+
 Set owner:user, owner:group for local files
 
 gvfs:
