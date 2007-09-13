@@ -37,7 +37,7 @@ GSimpleAsyncResult *g_simple_async_result_new_error        (GObject             
 							    gpointer                 user_data,
 							    GQuark                   domain,
 							    gint                     code,
-							    const gchar             *format,
+							    const char              *format,
 							    ...) G_GNUC_PRINTF (6, 7);
 GSimpleAsyncResult *g_simple_async_result_new_from_error   (GObject                 *source_object,
 							    GAsyncReadyCallback      callback,
@@ -75,12 +75,12 @@ gboolean            g_simple_async_result_propagate_error  (GSimpleAsyncResult  
 void                g_simple_async_result_set_error        (GSimpleAsyncResult      *simple,
 							    GQuark                   domain,
 							    gint                     code,
-							    const gchar             *format,
+							    const char              *format,
 							    ...) G_GNUC_PRINTF (4, 5);
 void                g_simple_async_result_set_error_va     (GSimpleAsyncResult      *simple,
 							    GQuark                   domain,
 							    gint                     code,
-							    const gchar             *format,
+							    const char              *format,
 							    va_list                  args);
 
 void g_simple_async_report_error_in_idle (GObject *object,
@@ -88,7 +88,7 @@ void g_simple_async_report_error_in_idle (GObject *object,
 					  gpointer user_data,
 					  GQuark         domain,
 					  gint           code,
-					  const gchar   *format,
+					  const char    *format,
 					  ...);
 
 G_END_DECLS

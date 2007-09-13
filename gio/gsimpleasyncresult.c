@@ -114,7 +114,7 @@ g_simple_async_result_new_error (GObject *source_object,
 				 gpointer user_data,
 				 GQuark         domain,
 				 gint           code,
-				 const gchar   *format,
+				 const char    *format,
 				 ...)
 {
   GSimpleAsyncResult *simple;
@@ -232,7 +232,7 @@ g_simple_async_result_set_from_error (GSimpleAsyncResult *simple,
 static GError* 
 _g_error_new_valist (GQuark         domain,
                     gint           code,
-                    const gchar   *format,
+                    const char    *format,
                     va_list        args)
 {
   GError *error;
@@ -250,7 +250,7 @@ void
 g_simple_async_result_set_error_va (GSimpleAsyncResult *simple,
 				    GQuark         domain,
 				    gint           code,
-				    const gchar   *format,
+				    const char    *format,
 				    va_list        args)
 {
   simple->error = _g_error_new_valist (domain, code, format, args);
@@ -262,7 +262,7 @@ void
 g_simple_async_result_set_error (GSimpleAsyncResult *simple,
 				 GQuark         domain,
 				 gint           code,
-				 const gchar   *format,
+				 const char    *format,
 				 ...)
 {
   va_list args;
@@ -361,7 +361,7 @@ g_simple_async_report_error_in_idle (GObject *object,
 				     gpointer user_data,
 				     GQuark         domain,
 				     gint           code,
-				     const gchar   *format,
+				     const char    *format,
 				     ...)
 {
   GSimpleAsyncResult *simple;
