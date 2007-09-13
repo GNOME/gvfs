@@ -59,6 +59,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobsource.c gvfsjobsource.h \
 	gvfsjobdbus.c gvfsjobdbus.h \
 	gvfsjobmount.c gvfsjobmount.h \
+	gvfsjobmountmountable.c gvfsjobmountmountable.h \
 	gvfsjobopenforread.c gvfsjobopenforread.h \
 	gvfsjobread.c gvfsjobread.h \
 	gvfsjobseekread.c gvfsjobseekread.h \

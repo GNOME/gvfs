@@ -23,17 +23,18 @@ typedef struct _GVfsBackend        GVfsBackend;
 typedef struct _GVfsBackendPrivate GVfsBackendPrivate;
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 
-typedef struct _GVfsJobMount        GVfsJobMount;
-typedef struct _GVfsJobOpenForRead  GVfsJobOpenForRead;
-typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
-typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
-typedef struct _GVfsJobRead         GVfsJobRead;
-typedef struct _GVfsJobOpenForWrite GVfsJobOpenForWrite;
-typedef struct _GVfsJobWrite        GVfsJobWrite;
-typedef struct _GVfsJobSeekWrite    GVfsJobSeekWrite;
-typedef struct _GVfsJobCloseWrite   GVfsJobCloseWrite;
-typedef struct _GVfsJobGetInfo      GVfsJobGetInfo;
-typedef struct _GVfsJobEnumerate    GVfsJobEnumerate;
+typedef struct _GVfsJobMount           GVfsJobMount;
+typedef struct _GVfsJobMountMountable  GVfsJobMountMountable;
+typedef struct _GVfsJobOpenForRead     GVfsJobOpenForRead;
+typedef struct _GVfsJobSeekRead        GVfsJobSeekRead;
+typedef struct _GVfsJobCloseRead       GVfsJobCloseRead;
+typedef struct _GVfsJobRead            GVfsJobRead;
+typedef struct _GVfsJobOpenForWrite    GVfsJobOpenForWrite;
+typedef struct _GVfsJobWrite           GVfsJobWrite;
+typedef struct _GVfsJobSeekWrite       GVfsJobSeekWrite;
+typedef struct _GVfsJobCloseWrite      GVfsJobCloseWrite;
+typedef struct _GVfsJobGetInfo         GVfsJobGetInfo;
+typedef struct _GVfsJobEnumerate       GVfsJobEnumerate;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -68,6 +69,14 @@ struct _GVfsBackendClass
 				 GMountSpec *mount_spec,
 				 GMountSource *mount_source,
 				 gboolean is_automount);
+  void     (*mount_mountable)   (GVfsBackend *backend,
+				 GVfsJobMountMountable *job,
+				 const char *filename,
+				 GMountSource *mount_source);
+  gboolean (*try_mount_mountable)(GVfsBackend *backend,
+				 GVfsJobMountMountable *job,
+				 const char *filename,
+				 GMountSource *mount_source);
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);
