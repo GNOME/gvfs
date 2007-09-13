@@ -4,8 +4,6 @@ Implement the rest of g_file_info_simple_get
 
 Add Seekable support to LocalFile streams
 
-add selinux support to test extension code
-
 Work on GFile
 
 Use G_FILE_ERRORS and g_file_error_from_errno:
