@@ -19,7 +19,7 @@ typedef struct _GIOModuleClass GIOModuleClass;
 GType      g_io_module_get_type (void) G_GNUC_CONST;
 GIOModule *g_io_module_new      (const gchar *filename);
 
-void       g_io_modules_ensure_loaded (void);
+void       g_io_modules_ensure_loaded (const char *directory);
 
 /* API for the modules to implement */
 void        g_io_module_load     (GIOModule   *module);

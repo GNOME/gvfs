@@ -130,19 +130,18 @@ is_valid_module_name (const gchar *basename)
 #endif
 }
 
-static GList *loaded_modules;
-
-static gpointer
-load_modules (gpointer arg)
+static GList *
+load_modules (const char *dirname)
 {
   const gchar *name;
   GDir        *dir;
   GError      *error = NULL;
+  GList *modules;
 
   if (!g_module_supported ())
     return NULL;
 
-  dir = g_dir_open (GIO_MODULE_DIR, 0, &error);
+  dir = g_dir_open (dirname, 0, &error);
 
   if (!dir)
     {
@@ -151,6 +150,7 @@ load_modules (gpointer arg)
       return NULL;
     }
 
+  modules = NULL;
   while ((name = g_dir_read_name (dir)))
     {
       if (is_valid_module_name (name))
@@ -158,7 +158,7 @@ load_modules (gpointer arg)
           GIOModule *module;
           gchar     *path;
 
-          path = g_build_filename (GIO_MODULE_DIR, name, NULL);
+          path = g_build_filename (dirname, name, NULL);
           module = g_io_module_new (path);
 
           if (!g_type_module_use (G_TYPE_MODULE (module)))
@@ -168,22 +168,41 @@ load_modules (gpointer arg)
               g_free (path);
               continue;
             }
-
+	  
           g_free (path);
 
           g_type_module_unuse (G_TYPE_MODULE (module));
-
-          loaded_modules = g_list_prepend (loaded_modules, module);
+	  
+          modules = g_list_prepend (modules, module);
         }
     }
   
   g_dir_close (dir);
+
+  return modules;
 }
 
-void
-g_io_modules_ensure_loaded (void)
-{
-  static GOnce once_init = G_ONCE_INIT;
+G_LOCK_DEFINE_STATIC (loaded_dirs);
+static GHashTable *loaded_dirs = NULL;
 
-  g_once (&once_init, load_modules, NULL);
+void
+g_io_modules_ensure_loaded (const char *directory)
+{
+  GList *modules;
+  
+  G_LOCK (loaded_dirs);
+
+  if (loaded_dirs == NULL)
+    loaded_dirs = g_hash_table_new (g_str_hash, g_str_equal);
+
+  if (g_hash_table_lookup_extended (loaded_dirs, directory,
+				    NULL, NULL))
+    {
+      modules = load_modules (directory);
+      g_hash_table_insert (loaded_dirs,
+			   g_strdup (directory),
+			   modules);
+    }
+  
+  G_UNLOCK (loaded_dirs);
 }

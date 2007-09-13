@@ -91,7 +91,7 @@ get_default_vfs (gpointer arg)
   local_type = casted_get_type ();
   
   /* Ensure vfs in modules loaded */
-  g_io_modules_ensure_loaded ();
+  g_io_modules_ensure_loaded (GIO_MODULE_DIR);
 
   vfs_impls = g_type_children (G_TYPE_VFS, &n_vfs_impls);
 

@@ -419,7 +419,7 @@ g_union_volume_monitor_init (GUnionVolumeMonitor *union_monitor)
 #endif
   
   /* Ensure vfs in modules loaded */
-  g_io_modules_ensure_loaded ();
+  g_io_modules_ensure_loaded (GIO_MODULE_DIR);
   
 
   monitors = g_type_children (G_TYPE_VOLUME_MONITOR, &n_monitors);
