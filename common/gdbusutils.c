@@ -1162,30 +1162,67 @@ _g_dbus_message_iter_copy (DBusMessageIter *dest,
   
 }
 
-static dbus_int32_t async_call_slot = -1;
+typedef struct {
+  GAsyncDBusCallback callback;
+  gpointer user_data;
+  
+  /* protected by async_call lock: */
+  gboolean ran;  /* the pending_call reply handler ran */
+  gboolean idle; /* we queued an idle */
+
+  /* only used for idle */
+  DBusPendingCall *pending;
+} AsyncDBusCallData;
+
+/* Lock to protect the data for working around racecondition
+   between send_with_reply and pending_set_notify */
+G_LOCK_DEFINE_STATIC(async_call);
 
 static void
-async_call_reply (DBusPendingCall *pending,
-		  void            *user_data)
+handle_async_reply (DBusPendingCall *pending,
+		    AsyncDBusCallData *data)
 {
   DBusMessage *reply;
   GError *error;
-  GAsyncDBusCallback callback;
+  
+  g_print ("handle_async_reply\n");
 
   reply = dbus_pending_call_steal_reply (pending);
-  callback = dbus_pending_call_get_data (pending, async_call_slot);
-  dbus_pending_call_unref (pending);
   
   error = NULL;
   if (_g_error_from_message (reply, &error))
     {
-      callback (NULL, error, user_data);
+      data->callback (NULL, error, data->user_data);
       g_error_free (error);
     }
   else
-    callback (reply, NULL, user_data);
-  
+    data->callback (reply, NULL, data->user_data);
+
   dbus_message_unref (reply);
+}
+
+static void
+async_call_reply (DBusPendingCall *pending,
+		  void            *_data)
+{
+  AsyncDBusCallData *data = _data;
+
+  G_LOCK (async_call);
+  if (data->idle)
+    return;
+  data->ran = TRUE;
+  G_UNLOCK (async_call);
+
+  handle_async_reply (pending, data);
+}
+
+static gboolean
+idle_async_callback (void *_data)
+{
+  AsyncDBusCallData *data = _data;
+  handle_async_reply (data->pending, data);
+  dbus_pending_call_unref (data->pending);
+  return FALSE;
 }
 
 void
@@ -1194,15 +1231,12 @@ _g_dbus_connection_call_async (DBusConnection *connection,
 			       GAsyncDBusCallback callback,
 			       gpointer user_data)
 {
+  AsyncDBusCallData *data;
   DBusPendingCall *pending_call;
   DBusError derror;
-  
-  if (async_call_slot == -1)
-    {
-      if (!dbus_pending_call_allocate_data_slot (&async_call_slot))
-	_g_dbus_oom ();
-    }
 
+  g_print ("_g_dbus_connection_call_async\n");
+  
   if (connection == NULL)
     {
       dbus_error_init (&derror);
@@ -1232,14 +1266,32 @@ _g_dbus_connection_call_async (DBusConnection *connection,
       return;
     }
 
-  if (!dbus_pending_call_set_data (pending_call,
-				   async_call_slot,
-				   callback, NULL))
-    _g_dbus_oom ();
-  
+  data = g_new0 (AsyncDBusCallData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+    
+  g_print ("set_notify %p\n", pending_call);
   if (!dbus_pending_call_set_notify (pending_call,
 				     async_call_reply,
-				     user_data, NULL))
+				     data, g_free))
     _g_dbus_oom ();
+
+
+  /* All this is required to work around a race condition between
+   * send_with_reply and pending_call_set_notify :/
+   */
+  G_LOCK (async_call);
+
+  if (dbus_pending_call_get_completed (pending_call) &&
+      !data->ran)
+    {
+      data->idle = TRUE;
+      data->pending = dbus_pending_call_ref (pending_call);
+      g_idle_add (idle_async_callback, data);
+    }
+    
+  G_UNLOCK (async_call);
+    
   
+  dbus_pending_call_unref (pending_call);
 }
