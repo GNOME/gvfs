@@ -1301,7 +1301,6 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
                         gpointer user_data)
 {
   char *name;
-  GList l = { NULL };
   GFileInfo *info;
   ReadDirData *data;
 
@@ -1316,8 +1315,7 @@ read_dir_symlink_reply (GVfsBackendSftp *backend,
       
       parse_attributes (backend, info, reply);
 
-      l.data = info;
-      g_vfs_job_enumerate_add_infos (G_VFS_JOB_ENUMERATE (job), &l);
+      g_vfs_job_enumerate_add_info (G_VFS_JOB_ENUMERATE (job), info);
       
       g_object_unref (info);
     }
@@ -1380,41 +1378,30 @@ read_dir_reply (GVfsBackendSftp *backend,
       g_free (longname);
       
       parse_attributes (backend, info, reply);
-      if (strcmp (".", name) == 0 ||
-          strcmp ("..", name) == 0)
+      
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
+          ! (enum_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
         {
-          g_object_unref (info);
-          info = NULL;
-        }
-      else if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
-               ! (enum_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
-        {
-          /* Default (at least for openssl) is for readdir to not follow, and this was a
-             symlink, so we need to manually follow it */
+          /* Default (at least for openssh) is for readdir to not follow symlinks.
+             This was a symlink, and follow links was requested, so we need to manually follow it */
           command = new_command_stream (backend,
                                         SSH_FXP_STAT,
                                         &id);
           abs_name = g_build_filename (enum_job->filename, name, NULL);
           put_string (command, abs_name);
           g_free (abs_name);
+          
           queue_command_stream_and_free (backend, command, id, read_dir_symlink_reply, G_VFS_JOB (job), name);
-          g_object_unref (info);
-          info = NULL;
+          
           name = NULL; /* Owned by get_info_symlink_reply */
           data->outstanding_requests ++;
         }
-      
-      if (info)
-        infos = g_list_prepend (infos, info);
-      
+      else if (strcmp (".", name) != 0 &&
+               strcmp ("..", name) != 0)
+        g_vfs_job_enumerate_add_info (enum_job, info);
+        
+      g_object_unref (info);
       g_free (name);
-    }
-
-  if (infos)
-    {
-      g_vfs_job_enumerate_add_infos (enum_job, infos);
-      g_list_foreach (infos, (GFunc)g_object_unref, NULL);
-      g_list_free (infos);
     }
 
   command = new_command_stream (backend,
