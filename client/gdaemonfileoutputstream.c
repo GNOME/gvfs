@@ -963,7 +963,7 @@ g_daemon_file_output_stream_get_etag (GFileOutputStream     *stream,
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
   if (file->etag)
-    return file->etag;
+    return g_strdup (file->etag);
   
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 	       _("etag not supported on stream"));
