@@ -1324,7 +1324,7 @@ g_daemon_file_make_symbolic_link (GFile *file,
 			     G_DBUS_TYPE_CSTRING, &symlink_value,
 			     0);
   if (reply == NULL)
-    return NULL;
+    return FALSE;
 
   dbus_message_unref (reply);
   return TRUE;
