@@ -18,6 +18,8 @@
 #include <gvfsjobgetfsinfo.h>
 #include <gvfsjobsetdisplayname.h>
 #include <gvfsjobenumerate.h>
+#include <gvfsjobdelete.h>
+#include <gvfsjobtrash.h>
 #include <gvfsjobmountmountable.h>
 #include <gdbusutils.h>
 
@@ -282,6 +284,14 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME))
     job = g_vfs_job_set_display_name_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_DELETE))
+    job = g_vfs_job_delete_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_TRASH))
+    job = g_vfs_job_trash_new (connection, message, backend);
 
   if (job)
     {

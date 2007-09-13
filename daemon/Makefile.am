@@ -72,6 +72,8 @@ libdaemon_la_SOURCES = \
 	gvfsjobgetfsinfo.c gvfsjobgetfsinfo.h \
 	gvfsjobenumerate.c gvfsjobenumerate.h \
 	gvfsjobsetdisplayname.c gvfsjobsetdisplayname.h \
+	gvfsjobtrash.c gvfsjobtrash.h \
+	gvfsjobdelete.c gvfsjobdelete.h \
 	gvfsdaemonprotocol.c \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
