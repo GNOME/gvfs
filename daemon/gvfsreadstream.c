@@ -27,13 +27,13 @@ enum {
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
-
 struct _GVfsReadStreamPrivate
 {
   int fd;
   int remote_fd;
   
-  gpointer data;
+  gpointer data; /* user data, i.e. GVfsHandle */
+  GVfsJob *job;
 };
 
 static void
@@ -127,7 +127,7 @@ g_vfs_read_stream_new (GError **error)
 }
 
 int
- g_vfs_read_stream_steal_remote_fd (GVfsReadStream *stream)
+g_vfs_read_stream_steal_remote_fd (GVfsReadStream *stream)
 {
   int fd;
   fd = stream->priv->remote_fd;
