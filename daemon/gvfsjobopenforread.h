@@ -2,10 +2,9 @@
 #define __G_VFS_JOB_OPEN_FOR_READ_H__
 
 #include <dbus/dbus.h>
-#include <gvfsjob.h>
+#include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
-#include <gvfsreadstream.h>
-
+#include <gvfsreadchannel.h>
 
 G_BEGIN_DECLS
 
@@ -21,31 +20,29 @@ typedef struct _GVfsJobOpenForReadClass   GVfsJobOpenForReadClass;
 
 struct _GVfsJobOpenForRead
 {
-  GVfsJob parent_instance;
+  GVfsJobDBus parent_instance;
 
-  DBusConnection *connection;
-  DBusMessage *message;
   char *filename;
   GVfsBackendHandle backend_handle;
   gboolean can_seek;
-  GVfsReadStream *read_stream;
+  GVfsReadChannel *read_channel;
 };
 
 struct _GVfsJobOpenForReadClass
 {
-  GVfsJobClass parent_class;
+  GVfsJobDBusClass parent_class;
 };
 
 GType g_vfs_job_open_for_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *       g_vfs_job_open_for_read_new          (DBusConnection     *connection,
-						      DBusMessage        *message,
-						      GVfsBackend        *backend);
-void            g_vfs_job_open_for_read_set_handle   (GVfsJobOpenForRead *job,
-						      GVfsBackendHandle   handle);
-void            g_vfs_job_open_for_read_set_can_seek (GVfsJobOpenForRead *job,
-						      gboolean            can_seek);
-GVfsReadStream *g_vfs_job_open_for_read_steal_stream (GVfsJobOpenForRead *job);
+GVfsJob *        g_vfs_job_open_for_read_new           (DBusConnection     *connection,
+							DBusMessage        *message,
+							GVfsBackend        *backend);
+void             g_vfs_job_open_for_read_set_handle    (GVfsJobOpenForRead *job,
+							GVfsBackendHandle   handle);
+void             g_vfs_job_open_for_read_set_can_seek  (GVfsJobOpenForRead *job,
+							gboolean            can_seek);
+GVfsReadChannel *g_vfs_job_open_for_read_steal_channel (GVfsJobOpenForRead *job);
 
 G_END_DECLS
 

@@ -8,14 +8,16 @@
 #include <glib.h>
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
-#include "gvfsreadstream.h"
+#include "gvfsreadchannel.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_TYPE_VFS_JOB);
+G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_TYPE_VFS_JOB_DBUS);
 
-static gboolean start (GVfsJob *job);
-static void send_reply (GVfsJob *job);
+static gboolean     start        (GVfsJob        *job);
+static DBusMessage *create_reply (GVfsJob        *job,
+				  DBusConnection *connection,
+				  DBusMessage    *message);
 
 static void
 g_vfs_job_open_for_read_finalize (GObject *object)
@@ -24,16 +26,10 @@ g_vfs_job_open_for_read_finalize (GObject *object)
 
   job = G_VFS_JOB_OPEN_FOR_READ (object);
 
-  if (job->message)
-    dbus_message_unref (job->message);
+  /* TODO: manage backend_handle if not put in read channel */
 
-  if (job->connection)
-    dbus_connection_unref (job->connection);
-  
-  /* TODO: manage backend_handle if not put in readstream */
-
-  if (job->read_stream)
-    g_object_unref (job->read_stream);
+  if (job->read_channel)
+    g_object_unref (job->read_channel);
   
   g_free (job->filename);
   
@@ -46,11 +42,11 @@ g_vfs_job_open_for_read_class_init (GVfsJobOpenForReadClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsJobClass *job_class = G_VFS_JOB_CLASS (klass);
+  GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
   
   gobject_class->finalize = g_vfs_job_open_for_read_finalize;
-
   job_class->start = start;
-  job_class->send_reply = send_reply;
+  job_dbus_class->create_reply = create_reply;
 }
 
 static void
@@ -84,12 +80,12 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
       return NULL;
     }
 
-  job = g_object_new (G_TYPE_VFS_JOB_OPEN_FOR_READ, NULL);
+  job = g_object_new (G_TYPE_VFS_JOB_OPEN_FOR_READ,
+		      "backend", backend,
+		      "message", message,
+		      "connection", connection,
+		      NULL);
 
-  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
-  
-  job->connection = dbus_connection_ref (connection);
-  job->message = dbus_message_ref (message);
   job->filename = g_strndup (path_data, path_len);
   
   return G_VFS_JOB (job);
@@ -126,7 +122,7 @@ create_reply (GVfsJob *job,
 	      DBusMessage *message)
 {
   GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
-  GVfsReadStream *stream;
+  GVfsReadChannel *channel;
   DBusMessage *reply;
   GError *error;
   int remote_fd;
@@ -137,15 +133,15 @@ create_reply (GVfsJob *job,
   g_assert (open_job->backend_handle != NULL);
 
   error = NULL;
-  stream = g_vfs_read_stream_new (job->backend, &error);
-  if (stream == NULL)
+  channel = g_vfs_read_channel_new (job->backend, &error);
+  if (channel == NULL)
     {
       reply = dbus_message_new_error_from_gerror (message, error);
       g_error_free (error);
       return reply;
     }
 
-  remote_fd = g_vfs_read_stream_steal_remote_fd (stream);
+  remote_fd = g_vfs_read_channel_steal_remote_fd (channel);
   if (!dbus_connection_send_fd (connection, 
 				remote_fd,
 				&fd_id, &error))
@@ -153,7 +149,7 @@ create_reply (GVfsJob *job,
       close (remote_fd);
       reply = dbus_message_new_error_from_gerror (message, error);
       g_error_free (error);
-      g_object_unref (stream);
+      g_object_unref (channel);
       return reply;
     }
   close (remote_fd);
@@ -165,42 +161,21 @@ create_reply (GVfsJob *job,
 				  DBUS_TYPE_BOOLEAN, &can_seek,
 				  DBUS_TYPE_INVALID);
 
-  g_vfs_read_stream_set_backend_handle (stream, open_job->backend_handle);
+  g_vfs_read_channel_set_backend_handle (channel, open_job->backend_handle);
   open_job->backend_handle = NULL;
-  open_job->read_stream = stream;
+  open_job->read_channel = channel;
   
   return reply;
 }
 
-/* Might be called on an i/o thread */
-static void
-send_reply (GVfsJob *job)
+GVfsReadChannel *
+g_vfs_job_open_for_read_steal_channel (GVfsJobOpenForRead *job)
 {
-  GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
-  DBusMessage *reply;
+  GVfsReadChannel *channel;
   
-  if (job->failed) 
-    reply = dbus_message_new_error_from_gerror (open_job->message, job->error);
-  else
-    reply = create_reply (job, open_job->connection, open_job->message);
- 
-  g_assert (reply != NULL);
-
-  /* Queues reply (threadsafely), actually sends it in mainloop */
-  dbus_connection_send (open_job->connection, reply, NULL);
-  dbus_message_unref (reply);
-
-  g_vfs_job_emit_finished (job);
-}
-
-GVfsReadStream *
-g_vfs_job_open_for_read_steal_stream (GVfsJobOpenForRead *job)
-{
-  GVfsReadStream *stream;
+  channel = job->read_channel;
+  job->read_channel = NULL;
   
-  stream = job->read_stream;
-  job->read_stream = NULL;
-  
-  return stream;
+  return channel;
 
 }

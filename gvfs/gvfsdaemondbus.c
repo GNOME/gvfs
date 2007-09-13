@@ -396,6 +396,7 @@ async_dbus_response (DBusPendingCall *pending,
 {
   AsyncDBusCall *async_call = data;
   DBusMessage *reply;
+  DBusError derror;
 
   if (async_call->cancelled_tag)
     g_signal_handler_disconnect (async_call->cancellable,
@@ -404,7 +405,15 @@ async_dbus_response (DBusPendingCall *pending,
   reply = dbus_pending_call_steal_reply (pending);
   dbus_pending_call_unref (pending);
 
-  async_dbus_call_finish (async_call, reply);
+  dbus_error_init (&derror);
+  if (dbus_set_error_from_message (&derror, reply))
+    {
+      _g_error_from_dbus (&derror, &async_call->io_error);
+      dbus_error_free (&derror);
+      async_dbus_call_finish (async_call, NULL);
+    }
+  else
+    async_dbus_call_finish (async_call, reply);
   
   dbus_message_unref (reply);
 }
@@ -833,6 +842,7 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
 	  
 	  if (!sent_cancel && g_cancellable_is_cancelled (cancellable))
 	    {
+	      g_print ("Sending cancel\n");
 	      sent_cancel = TRUE;
 	      serial = dbus_message_get_serial (message);
 	      cancel_message =
@@ -866,6 +876,9 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
 
       reply = dbus_pending_call_steal_reply (pending);
       dbus_pending_call_unref (pending);
+
+      g_print ("reply: %p, is_error: %d\n", reply,
+	       dbus_message_get_type (reply) == DBUS_MESSAGE_TYPE_ERROR);
     }
   else
     {
@@ -883,6 +896,14 @@ _g_vfs_daemon_call_sync (const char *mountpoint,
 
   if (connection_out)
     *connection_out = connection;
+
+  if (dbus_set_error_from_message (&derror, reply))
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      dbus_message_unref (reply);
+      return NULL;
+    }
   
   return reply;
 }
@@ -950,6 +971,13 @@ get_connection_sync (const char *mountpoint,
       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
 		   "Error while getting peer-to-peer dbus connection: %s",
 		   derror.message);
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  if (dbus_set_error_from_message (&derror, reply))
+    {
+      _g_error_from_dbus (&derror, error);
       dbus_error_free (&derror);
       return NULL;
     }

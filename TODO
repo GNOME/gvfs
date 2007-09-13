@@ -29,9 +29,9 @@ implement seeks in local streams
 
 pass cancellable to async callbacks?
 
-handle Cancel signal on daemon side
-
 rename glib lib from gvfs to gio (since it has more than gvfs)
+
+G_TYPE_VFS... -> G_VFS_TYPE...
 
 FUTURE IDEAS:
 -------------

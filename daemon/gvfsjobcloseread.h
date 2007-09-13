@@ -3,7 +3,7 @@
 
 #include <gvfsjob.h>
 #include <gvfsbackend.h>
-#include <gvfsreadstream.h>
+#include <gvfsreadchannel.h>
 
 G_BEGIN_DECLS
 
@@ -21,7 +21,7 @@ struct _GVfsJobCloseRead
 {
   GVfsJob parent_instance;
 
-  GVfsReadStream *stream;
+  GVfsReadChannel *channel;
   GVfsBackendHandle handle;
 };
 
@@ -32,7 +32,7 @@ struct _GVfsJobCloseReadClass
 
 GType g_vfs_job_close_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_close_read_new (GVfsReadStream    *stream,
+GVfsJob *g_vfs_job_close_read_new (GVfsReadChannel   *channel,
 				   GVfsBackendHandle  handle,
 				   GVfsBackend       *backend);
 

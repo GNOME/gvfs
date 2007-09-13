@@ -7,7 +7,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
-#include "gvfsreadstream.h"
+#include "gvfsreadchannel.h"
 #include "gvfsjobread.h"
 #include "gvfsdaemonutils.h"
 
@@ -23,7 +23,7 @@ g_vfs_job_read_finalize (GObject *object)
 
   job = G_VFS_JOB_READ (object);
 
-  g_object_unref (job->stream);
+  g_object_unref (job->channel);
   g_free (job->buffer);
   
   if (G_OBJECT_CLASS (g_vfs_job_read_parent_class)->finalize)
@@ -48,18 +48,18 @@ g_vfs_job_read_init (GVfsJobRead *job)
 }
 
 GVfsJob *
-g_vfs_job_read_new (GVfsReadStream *stream,
+g_vfs_job_read_new (GVfsReadChannel *channel,
 		    GVfsBackendHandle handle,
 		    gsize bytes_requested,
 		    GVfsBackend *backend)
 {
   GVfsJobRead *job;
   
-  job = g_object_new (G_TYPE_VFS_JOB_READ, NULL);
-
-  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
+  job = g_object_new (G_TYPE_VFS_JOB_READ,
+		      "backend", backend,
+		      NULL);
   
-  job->stream = g_object_ref (stream);
+  job->channel = g_object_ref (channel);
   job->handle = handle;
   job->buffer = g_malloc (bytes_requested);
   job->bytes_requested = bytes_requested;
@@ -75,12 +75,12 @@ send_reply (GVfsJob *job)
   g_print ("job_read send reply, %d bytes\n", op_job->data_count);
 
   if (job->failed)
-    g_vfs_read_stream_send_error (op_job->stream, job->error);
+    g_vfs_read_channel_send_error (op_job->channel, job->error);
   else
     {
-      g_vfs_read_stream_send_data (op_job->stream,
-				   op_job->buffer,
-				   op_job->data_count);
+      g_vfs_read_channel_send_data (op_job->channel,
+				    op_job->buffer,
+				    op_job->data_count);
     }
 }
 

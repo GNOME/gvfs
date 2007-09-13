@@ -8,6 +8,15 @@
 #include "gfileoutputstreamlocal.h"
 #include "ginputstreamsocket.h"
 
+static gpointer
+cancel_thread (gpointer data)
+{
+  sleep (1);
+  g_print ("cancel_thread GO!\n");
+  g_cancellable_cancel (G_CANCELLABLE (data));
+  return NULL;
+}
+
 static void
 test_out ()
 {
@@ -73,15 +82,22 @@ test_sync (char *uri, gboolean dump)
   gssize res;
   gboolean close_res;
   GCancellable *c;
+  GError *error;
 
   g_print ("> test_sync %s\n", uri);
 
   c = g_cancellable_new ();
   
   file = g_file_get_for_uri (uri);
-  in = (GInputStream *)g_file_read (file, c, NULL);
+  if (0) g_thread_create (cancel_thread, c, FALSE, NULL);
+  error = NULL;
+  in = (GInputStream *)g_file_read (file, c, &error);
+  g_print ("input stream: %p\n", in);
   if (in == NULL)
-    goto out;
+    {
+      g_print ("open error %d: %s\n", error->code, error->message);
+      goto out;
+    }
 
   while (1)
     {
@@ -164,6 +180,8 @@ test_async_open_callback (GFile *file,
   g_print ("test_async_open_callback: %p\n", stream);
   if (stream)
     g_input_stream_read_async (G_INPUT_STREAM (stream), data->buffer, 1024, 0, read_done, data, data->c);
+  else
+    g_print ("%s\n", error->message);
 }
 
 
@@ -177,7 +195,8 @@ test_async (char *uri, gboolean dump)
   data->c = g_cancellable_new ();
 
   file = g_file_get_for_uri (uri);
-  g_file_read_async (file, 0, test_async_open_callback, data, NULL, NULL);
+  g_file_read_async (file, 0, test_async_open_callback, data, NULL, data->c);
+  if (0) g_thread_create (cancel_thread, data->c, FALSE, NULL);
 }
 
 static gboolean
@@ -189,15 +208,6 @@ cancel_cancellable_cb (gpointer data)
   g_object_unref (cancellable);
   
   return FALSE;
-}
-
-static gpointer
-cancel_thread (gpointer data)
-{
-  sleep (1);
-  g_print ("cancel_thread GO!\n");
-  g_cancellable_cancel (G_CANCELLABLE (data));
-  return NULL;
 }
 
 static void

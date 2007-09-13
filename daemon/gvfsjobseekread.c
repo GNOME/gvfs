@@ -7,7 +7,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
-#include "gvfsreadstream.h"
+#include "gvfsreadchannel.h"
 #include "gvfsjobseekread.h"
 #include "gvfsdaemonutils.h"
 
@@ -22,7 +22,7 @@ g_vfs_job_seek_read_finalize (GObject *object)
   GVfsJobSeekRead *job;
 
   job = G_VFS_JOB_SEEK_READ (object);
-  g_object_unref (job->stream);
+  g_object_unref (job->channel);
 
   if (G_OBJECT_CLASS (g_vfs_job_seek_read_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_seek_read_parent_class)->finalize) (object);
@@ -46,7 +46,7 @@ g_vfs_job_seek_read_init (GVfsJobSeekRead *job)
 }
 
 GVfsJob *
-g_vfs_job_seek_read_new (GVfsReadStream *stream,
+g_vfs_job_seek_read_new (GVfsReadChannel *channel,
 			 GVfsBackendHandle handle,
 			 GSeekType seek_type,
 			 goffset offset,
@@ -54,11 +54,11 @@ g_vfs_job_seek_read_new (GVfsReadStream *stream,
 {
   GVfsJobSeekRead *job;
   
-  job = g_object_new (G_TYPE_VFS_JOB_SEEK_READ, NULL);
-
-  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
+  job = g_object_new (G_TYPE_VFS_JOB_SEEK_READ,
+		      "backend", backend,
+		      NULL);
   
-  job->stream = g_object_ref (stream);
+  job->channel = g_object_ref (channel);
   job->handle = handle;
   job->requested_offset = offset;
   job->seek_type = seek_type;
@@ -75,11 +75,11 @@ send_reply (GVfsJob *job)
   g_print ("job_seek_read send reply, pos %d\n", (int)op_job->final_offset);
 
   if (job->failed)
-    g_vfs_read_stream_send_error (op_job->stream, job->error);
+    g_vfs_read_channel_send_error (op_job->channel, job->error);
   else
     {
-      g_vfs_read_stream_send_seek_offset (op_job->stream,
-					  op_job->final_offset);
+      g_vfs_read_channel_send_seek_offset (op_job->channel,
+					   op_job->final_offset);
     }
 }
 

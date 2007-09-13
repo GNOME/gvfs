@@ -9,8 +9,17 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include "gvfsjob.h"
+#include "gvfsbackend.h"
 
 G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
+
+/* TODO: Real P_() */
+#define P_(_x) (_x)
+
+enum {
+  PROP_0,
+  PROP_BACKEND,
+};
 
 enum {
   CANCELLED,
@@ -20,6 +29,15 @@ enum {
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
+
+static void g_vfs_job_get_property (GObject    *object,
+				    guint       prop_id,
+				    GValue     *value,
+				    GParamSpec *pspec);
+static void g_vfs_job_set_property (GObject         *object,
+				    guint            prop_id,
+				    const GValue    *value,
+				    GParamSpec      *pspec);
 
 static void
 g_vfs_job_finalize (GObject *object)
@@ -41,6 +59,8 @@ g_vfs_job_class_init (GVfsJobClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   
   gobject_class->finalize = g_vfs_job_finalize;
+  gobject_class->set_property = g_vfs_job_set_property;
+  gobject_class->get_property = g_vfs_job_get_property;
 
   signals[CANCELLED] =
     g_signal_new ("cancelled",
@@ -67,6 +87,14 @@ g_vfs_job_class_init (GVfsJobClass *klass)
 		  g_cclosure_marshal_VOID__VOID,
 		  G_TYPE_NONE, 0);
 
+  g_object_class_install_property (gobject_class,
+				   PROP_BACKEND,
+				   g_param_spec_object ("backend",
+							P_("VFS Backend"),
+							P_("The implementation for this job operartion."),
+							G_TYPE_VFS_BACKEND,
+							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
 
 static void
@@ -74,11 +102,42 @@ g_vfs_job_init (GVfsJob *job)
 {
 }
 
-void
-g_vfs_job_set_backend (GVfsJob     *job,
-		       GVfsBackend *backend)
+static void
+g_vfs_job_set_property (GObject         *object,
+			guint            prop_id,
+			const GValue    *value,
+			GParamSpec      *pspec)
 {
-  job->backend = backend;
+  GVfsJob *job = G_VFS_JOB (object);
+  
+  switch (prop_id)
+    {
+    case PROP_BACKEND:
+      job->backend = g_value_get_object (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
+g_vfs_job_get_property (GObject    *object,
+			guint       prop_id,
+			GValue     *value,
+			GParamSpec *pspec)
+{
+  GVfsJob *job = G_VFS_JOB (object);
+
+  switch (prop_id)
+    {
+    case PROP_BACKEND:
+      g_value_set_object (value, job->backend);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
 }
 
 gboolean
@@ -156,6 +215,12 @@ gboolean
 g_vfs_job_is_finished (GVfsJob *job)
 {
   return job->finished;
+}
+
+gboolean
+g_vfs_job_is_cancelled (GVfsJob *job)
+{
+  return job->cancelled;
 }
 
 /* Might be called on an i/o thread */

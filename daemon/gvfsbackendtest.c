@@ -50,6 +50,14 @@ open_idle_cb (gpointer data)
   GVfsJobOpenForRead *job = data;
   int fd;
 
+  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_VFS_ERROR,
+			G_VFS_ERROR_CANCELLED,
+			_("Operation was cancelled"));
+      return FALSE;
+    }
+  
   fd = g_open (job->filename, O_RDONLY);
   if (fd == -1)
     {
@@ -65,6 +73,19 @@ open_idle_cb (gpointer data)
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   return FALSE;
+}
+
+static void
+open_read_cancelled_cb (GVfsJob *job, gpointer data)
+{
+  guint tag = GPOINTER_TO_INT (data);
+
+  g_print ("open_read_cancelled_cb\n");
+  
+  if (g_source_remove (tag))
+    g_vfs_job_failed (job, G_VFS_ERROR,
+		      G_VFS_ERROR_CANCELLED,
+		      _("Operation was cancelled"));
 }
 
 static gboolean 
@@ -84,7 +105,8 @@ do_open_for_read (GVfsBackend *backend,
     }
   else
     {
-      g_idle_add (open_idle_cb, job);
+      guint tag = g_timeout_add (0, open_idle_cb, job);
+      g_signal_connect (job, "cancelled", (GCallback)open_read_cancelled_cb, GINT_TO_POINTER (tag));
       return TRUE;
     }
 }

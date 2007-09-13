@@ -52,6 +52,7 @@ struct _GVfsJobClass
 GType g_vfs_job_get_type (void) G_GNUC_CONST;
 
 gboolean g_vfs_job_is_finished       (GVfsJob     *job);
+gboolean g_vfs_job_is_cancelled      (GVfsJob     *job);
 void     g_vfs_job_cancel            (GVfsJob     *job);
 gboolean g_vfs_job_start             (GVfsJob     *job);
 void     g_vfs_job_emit_finished     (GVfsJob     *job);
@@ -63,8 +64,6 @@ void     g_vfs_job_failed            (GVfsJob     *job,
 void     g_vfs_job_failed_from_error (GVfsJob     *job,
 				      GError      *error);
 void     g_vfs_job_succeeded         (GVfsJob     *job);
-void     g_vfs_job_set_backend       (GVfsJob     *job,
-				      GVfsBackend *backend);
 
 G_END_DECLS
 

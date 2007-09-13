@@ -7,7 +7,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
-#include "gvfsreadstream.h"
+#include "gvfsreadchannel.h"
 #include "gvfsjobcloseread.h"
 #include "gvfsdaemonutils.h"
 
@@ -22,7 +22,7 @@ g_vfs_job_close_read_finalize (GObject *object)
   GVfsJobCloseRead *job;
 
   job = G_VFS_JOB_CLOSE_READ (object);
-  g_object_unref (job->stream);
+  g_object_unref (job->channel);
 
   if (G_OBJECT_CLASS (g_vfs_job_close_read_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_close_read_parent_class)->finalize) (object);
@@ -46,17 +46,17 @@ g_vfs_job_close_read_init (GVfsJobCloseRead *job)
 }
 
 GVfsJob *
-g_vfs_job_close_read_new (GVfsReadStream *stream,
+g_vfs_job_close_read_new (GVfsReadChannel *channel,
 			  GVfsBackendHandle handle,
 			  GVfsBackend *backend)
 {
   GVfsJobCloseRead *job;
   
-  job = g_object_new (G_TYPE_VFS_JOB_CLOSE_READ, NULL);
+  job = g_object_new (G_TYPE_VFS_JOB_CLOSE_READ,
+		      "backend", backend,
+		      NULL);
 
-  g_vfs_job_set_backend (G_VFS_JOB (job), backend);
-  
-  job->stream = g_object_ref (stream);
+  job->channel = g_object_ref (channel);
   job->handle = handle;
   
   return G_VFS_JOB (job);
@@ -71,9 +71,9 @@ send_reply (GVfsJob *job)
   g_print ("job_close_read send reply\n");
 
   if (job->failed)
-    g_vfs_read_stream_send_error (op_job->stream, job->error);
+    g_vfs_read_channel_send_error (op_job->channel, job->error);
   else
-    g_vfs_read_stream_send_closed (op_job->stream);
+    g_vfs_read_channel_send_closed (op_job->channel);
 }
 
 static gboolean

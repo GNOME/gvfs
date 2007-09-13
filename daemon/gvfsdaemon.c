@@ -29,7 +29,7 @@ struct _GVfsDaemonPrivate
   GQueue *pending_jobs; 
   GQueue *jobs; /* protected by lock */
   guint queued_job_start; /* protected by lock */
-  GList *read_streams; /* protected by lock */
+  GList *read_channels; /* protected by lock */
 };
 
 typedef struct {
@@ -236,7 +236,7 @@ queue_start_jobs_at_idle (GVfsDaemon *daemon)
 }
 
 static void
-handle_new_job_callback (GVfsReadStream *stream,
+handle_new_job_callback (GVfsReadChannel *channel,
 			 GVfsJob *job,
 			 GVfsDaemon *daemon)
 {
@@ -246,14 +246,14 @@ handle_new_job_callback (GVfsReadStream *stream,
 }
 
 static void
-handle_read_stream_closed_callback (GVfsReadStream *stream,
-				    GVfsDaemon *daemon)
+handle_read_channel_closed_callback (GVfsReadChannel *channel,
+				     GVfsDaemon *daemon)
 {
   g_mutex_lock (daemon->priv->lock);
   
-  daemon->priv->read_streams = g_list_remove (daemon->priv->read_streams, stream);
-  g_signal_handlers_disconnect_by_func (stream, (GCallback)handle_new_job_callback, daemon);
-  g_object_unref (stream);
+  daemon->priv->read_channels = g_list_remove (daemon->priv->read_channels, channel);
+  g_signal_handlers_disconnect_by_func (channel, (GCallback)handle_new_job_callback, daemon);
+  g_object_unref (channel);
   
   g_mutex_unlock (daemon->priv->lock);
 }
@@ -272,17 +272,17 @@ job_finished_callback (GVfsJob *job,
   if (G_IS_VFS_JOB_OPEN_FOR_READ (job))
     {
       GVfsJobOpenForRead *open_job = G_VFS_JOB_OPEN_FOR_READ (job);
-      GVfsReadStream *stream;
+      GVfsReadChannel *channel;
       
-      stream = g_vfs_job_open_for_read_steal_stream (open_job);
+      channel = g_vfs_job_open_for_read_steal_channel (open_job);
 
-      if (stream)
+      if (channel)
 	{
-	  g_print ("Got new read stream %p for daemon %p\n", stream, daemon);
-	  daemon->priv->read_streams = g_list_append (daemon->priv->read_streams,
-						      stream);
-	  g_signal_connect (stream, "new_job", (GCallback)handle_new_job_callback, daemon);
-	  g_signal_connect (stream, "closed", (GCallback)handle_read_stream_closed_callback, daemon);
+	  g_print ("Got new read channel %p for daemon %p\n", channel, daemon);
+	  daemon->priv->read_channels = g_list_append (daemon->priv->read_channels,
+						       channel);
+	  g_signal_connect (channel, "new_job", (GCallback)handle_new_job_callback, daemon);
+	  g_signal_connect (channel, "closed", (GCallback)handle_read_channel_closed_callback, daemon);
 	}
     }
   
@@ -741,6 +741,46 @@ daemon_message_func (DBusConnection *conn,
       return DBUS_HANDLER_RESULT_HANDLED;
     }
 
+  if (dbus_message_is_method_call (message,
+				   G_VFS_DBUS_DAEMON_INTERFACE,
+				   G_VFS_DBUS_OP_CANCEL))
+    {
+      GList *l;
+      dbus_uint32_t serial;
+      GVfsJob *job_to_cancel = NULL;
+      
+      g_print ("Got cancel dbus call\n");
+
+      if (dbus_message_get_args (message, NULL, 
+				 DBUS_TYPE_UINT32, &serial,
+				 DBUS_TYPE_INVALID))
+	{
+	  g_mutex_lock (daemon->priv->lock);
+	  for (l = daemon->priv->jobs->head; l != NULL; l = l->next)
+	    {
+	      GVfsJob *job = l->data;
+	      
+	      if (G_IS_VFS_JOB_DBUS (job) &&
+		  g_vfs_job_dbus_is_serial (G_VFS_JOB_DBUS (job),
+					    conn, serial))
+		{
+		  job_to_cancel = g_object_ref (job);
+		  break;
+		}
+	    }
+	  g_mutex_unlock (daemon->priv->lock);
+
+
+	  if (job_to_cancel)
+	    {
+	      g_vfs_job_cancel (job_to_cancel);
+	      g_object_unref (job_to_cancel);
+	    }
+	}
+      
+      return DBUS_HANDLER_RESULT_HANDLED;
+    }
+  
   backend = NULL;
   dest = dbus_message_get_destination (message);
   if (dest != NULL)

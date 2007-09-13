@@ -3,7 +3,7 @@
 
 #include <gvfsjob.h>
 #include <gvfsbackend.h>
-#include <gvfsreadstream.h>
+#include <gvfsreadchannel.h>
 
 G_BEGIN_DECLS
 
@@ -21,7 +21,7 @@ struct _GVfsJobSeekRead
 {
   GVfsJob parent_instance;
 
-  GVfsReadStream *stream;
+  GVfsReadChannel *channel;
   GVfsBackendHandle handle;
   GSeekType seek_type;
   goffset requested_offset;
@@ -35,7 +35,7 @@ struct _GVfsJobSeekReadClass
 
 GType g_vfs_job_seek_read_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_seek_read_new (GVfsReadStream    *stream,
+GVfsJob *g_vfs_job_seek_read_new (GVfsReadChannel   *channel,
 				  GVfsBackendHandle  handle,
 				  GSeekType          seek_type,
 				  goffset            offset,
