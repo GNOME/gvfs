@@ -346,7 +346,7 @@ g_vfs_backend_smb_new (GMountSpec *spec,
 static void 
 do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
-		  char *filename)
+		  const char *filename)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
@@ -487,7 +487,7 @@ do_close_read (GVfsBackend *backend,
 static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
-	     char *filename,
+	     const char *filename,
 	     GFileInfoRequestFlags requested,
 	     const char *attributes,
 	     gboolean follow_symlinks)
@@ -518,7 +518,7 @@ do_get_info (GVfsBackend *backend,
 static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
-	      char *filename,
+	      const char *filename,
 	      GFileInfoRequestFlags requested,
 	      const char *attributes,
 	      gboolean follow_symlinks)

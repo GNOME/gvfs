@@ -102,7 +102,7 @@ open_read_cancelled_cb (GVfsJob *job, gpointer data)
 static gboolean 
 try_open_for_read (GVfsBackend *backend,
 		   GVfsJobOpenForRead *job,
-		   char *filename)
+		   const char *filename)
 {
   GError *error;
 
@@ -242,7 +242,7 @@ do_close_read (GVfsBackend *backend,
 static void
 do_get_info (GVfsBackend *backend,
 	     GVfsJobGetInfo *job,
-	     char *filename,
+	     const char *filename,
 	     GFileInfoRequestFlags requested,
 	     const char *attributes,
 	     gboolean follow_symlinks)
@@ -274,7 +274,7 @@ do_get_info (GVfsBackend *backend,
 static gboolean
 try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
-	       char *filename,
+	       const char *filename,
 	       GFileInfoRequestFlags requested,
 	       const char *attributes,
 	       gboolean follow_symlinks)

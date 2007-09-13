@@ -53,10 +53,10 @@ struct _GVfsBackendClass
 
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
-				 char *filename);
+				 const char *filename);
   gboolean (*try_open_for_read) (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
-				 char *filename);
+				 const char *filename);
   void     (*close_read)        (GVfsBackend *backend,
 				 GVfsJobCloseRead *job,
 				 GVfsBackendHandle handle);
@@ -85,25 +85,25 @@ struct _GVfsBackendClass
 				 GSeekType  type);
   void     (*get_info)          (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
-				 char *filename,
+				 const char *filename,
 				 GFileInfoRequestFlags requested,
 				 const char *attributes,
 				 gboolean follow_symlinks);
   gboolean (*try_get_info)      (GVfsBackend *backend,
 				 GVfsJobGetInfo *job,
-				 char *filename,
+				 const char *filename,
 				 GFileInfoRequestFlags requested,
 				 const char *attributes,
 				 gboolean follow_symlinks);
   void     (*enumerate)         (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
-				 char *filename,
+				 const char *filename,
 				 GFileInfoRequestFlags requested,
 				 const char *attributes,
 				 gboolean follow_symlinks);
   gboolean (*try_enumerate)     (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
-				 char *filename,
+				 const char *filename,
 				 GFileInfoRequestFlags requested,
 				 const char *attributes,
 				 gboolean follow_symlinks);
