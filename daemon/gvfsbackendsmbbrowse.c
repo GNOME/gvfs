@@ -19,11 +19,14 @@
 #include "gvfsjobgetinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gmounttracker.h"
 #include <libsmbclient.h>
 
 typedef struct {
   unsigned int smbc_type;
   char *name;
+  char *name_normalized;
+  char *name_utf8;
   char *comment;
 } BrowseEntry;
 
@@ -43,6 +46,7 @@ struct _GVfsBackendSmbBrowse
 };
 
 static GHashTable *server_cache = NULL;
+static GMountTracker *mount_tracker = NULL;
 
 typedef struct {
   char *server_name;
@@ -52,6 +56,61 @@ typedef struct {
 } CachedServer;
 
 G_DEFINE_TYPE (GVfsBackendSmbBrowse, g_vfs_backend_smb_browse, G_VFS_TYPE_BACKEND);
+
+static char *
+normalize_smb_name_helper (const char *name, gssize len, gboolean valid_utf8)
+{
+  if (valid_utf8)
+    return g_utf8_casefold (name, len);
+  else
+    return g_ascii_strdown (name, len);
+}
+
+static char *
+normalize_smb_name (const char *name, gssize len)
+{
+  gboolean valid_utf8;
+
+  valid_utf8 = g_utf8_validate (name, len, NULL);
+  return normalize_smb_name_helper (name, len, valid_utf8);
+}
+
+static char *
+smb_name_to_utf8 (const char *name, gboolean *valid_utf8_out)
+{
+  GString *string;
+  const gchar *remainder, *invalid;
+  gint remaining_bytes, valid_bytes;
+  gboolean valid_utf8;
+      
+  remainder = name;
+  remaining_bytes = strlen (name);
+  valid_utf8 = TRUE;
+  
+  string = g_string_sized_new (remaining_bytes);
+  while (remaining_bytes != 0) 
+    {
+      if (g_utf8_validate (remainder, remaining_bytes, &invalid)) 
+	break;
+      valid_utf8 = FALSE;
+      
+      valid_bytes = invalid - remainder;
+      
+      g_string_append_len (string, remainder, valid_bytes);
+      /* append U+FFFD REPLACEMENT CHARACTER */
+      g_string_append (string, "\357\277\275");
+      
+      remaining_bytes -= valid_bytes + 1;
+      remainder = invalid + 1;
+    }
+  
+  g_string_append (string, remainder);
+  
+  if (valid_utf8_out)
+    *valid_utf8_out = valid_utf8;
+  
+  return g_string_free (string, FALSE);
+}
 
 static void
 browse_entry_free (BrowseEntry *entry)
@@ -123,6 +182,9 @@ static void
 g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
 {
   backend->entries_lock = g_mutex_new ();
+
+  if (mount_tracker == NULL)
+    mount_tracker = g_mount_tracker_new ();
 }
 
 /**
@@ -372,12 +434,15 @@ update_cache (GVfsBackendSmbBrowse *backend)
 	      strcmp (dirp->name, "..") != 0)
 	    {
 	      BrowseEntry *entry = g_new (BrowseEntry, 1);
+	      gboolean valid_utf8;
 
 	      g_print ("added %s to cache\n", dirp->name);
 	      
 	      entry->smbc_type = dirp->smbc_type;
 	      entry->name = g_strdup (dirp->name);
-	      entry->comment = g_strdup (dirp->comment);
+	      entry->name_utf8 = smb_name_to_utf8 (dirp->name, &valid_utf8);
+	      entry->name_normalized = normalize_smb_name_helper (dirp->name, -1, valid_utf8);
+	      entry->comment = smb_name_to_utf8 (dirp->comment, NULL);
 	      
 	      entries = g_list_prepend (entries, entry);
 	    }
@@ -412,11 +477,12 @@ static BrowseEntry *
 find_entry_unlocked (GVfsBackendSmbBrowse *backend,
 		     const char *filename)
 {
-  BrowseEntry *entry;
+  BrowseEntry *entry, *found;
   GList *l;
   char *end;
   int len;
-  
+  char *normalized;
+
   while (*filename == '/')
     filename++;
 
@@ -434,14 +500,39 @@ find_entry_unlocked (GVfsBackendSmbBrowse *backend,
   else
     len = strlen (filename);
 
+  /* First look for an exact filename match */
+  found = NULL;
   for (l = backend->entries; l != NULL; l = l->next)
     {
       entry = l->data;
       
-      if (strncmp (filename, entry->name, len) == 0)
-	return entry;
+      if (strncmp (filename, entry->name, len) == 0 &&
+	  strlen (entry->name) == len)
+	{
+	  found = entry;
+	  break;
+	}
     }
-  return NULL;
+
+  if (found == NULL)
+    {
+      /* That failed, try normalizing the filename */
+      normalized = normalize_smb_name (filename, len);
+      
+      for (l = backend->entries; l != NULL; l = l->next)
+	{
+	  entry = l->data;
+	  
+	  if (strcmp (normalized, entry->name_normalized) == 0)
+	    {
+	      found = entry;
+	      break;
+	    }
+	}
+      g_free (normalized);
+    }
+  
+  return found;
 }
 
 
@@ -691,6 +782,81 @@ is_root (const char *filename)
   return *p == 0;
 }
 
+static GFileInfo *
+get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry)
+{
+  GFileInfo *info;
+  GMountSpec *mount_spec;
+  GString *uri;
+  char *normalized;
+  
+  info = g_file_info_new ();
+  g_file_info_set_name (info, entry->name);
+  g_file_info_set_display_name (info, entry->name_utf8);
+  g_file_info_set_edit_name (info, entry->name_utf8);
+  g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
+
+  mount_spec = NULL;
+  if (backend->server)
+    {
+      /* browsing server/workgroup */
+      if (entry->smbc_type == SMBC_WORKGROUP ||
+	  entry->smbc_type == SMBC_SERVER)
+	{
+	  uri = g_string_new ("smb://");
+	  g_string_append_encoded (uri, entry->name, NULL, NULL);
+	  g_string_append_c (uri, '/');
+	}
+      else
+	{
+	  mount_spec = g_mount_spec_new ("smb-share");
+	  normalized = normalize_smb_name (backend->server, -1);
+	  g_mount_spec_set (mount_spec, "server", normalized);
+	  g_free (normalized);
+	  normalized = normalize_smb_name (entry->name, -1);
+	  g_mount_spec_set (mount_spec, "share", normalized);
+	  g_free (normalized);
+
+	  uri = g_string_new ("smb://");
+	  g_string_append_encoded (uri, backend->server, NULL, NULL);
+	  g_string_append_c (uri, '/');
+	  g_string_append_encoded (uri, entry->name, NULL, NULL);
+	}
+    }
+  else
+    {
+      /* browsing network */
+      uri = g_string_new ("smb://");
+      g_string_append_encoded (uri, entry->name, NULL, NULL);
+      g_string_append_c (uri, '/');
+
+      /* these are auto-mounted, so no CAN_MOUNT/UNMOUNT */
+    }
+
+  if (mount_spec)
+    {
+      g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
+      if (g_mount_tracker_has_mount_spec (mount_tracker, mount_spec))
+	{
+	  g_file_info_set_attribute_int32 (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, 0);
+	  g_file_info_set_attribute_int32 (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, 1);
+	}
+      else
+	{
+	  g_file_info_set_attribute_int32 (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, 1);
+	  g_file_info_set_attribute_int32 (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, 0);
+	}
+      g_mount_spec_unref (mount_spec);
+    }
+  else
+    g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
+    
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STD_TARGET_URI, uri->str);
+  g_string_free (uri, TRUE);
+  
+  return info;
+}
+
 static void
 run_get_info (GVfsBackendSmbBrowse *backend,
 	      GVfsJobGetInfo *job,
@@ -707,11 +873,7 @@ run_get_info (GVfsBackendSmbBrowse *backend,
 
   if (entry)
     {
-      info = g_file_info_new ();
-      g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
-      g_file_info_set_name (info, entry->name);
-      /* TODO: Is this always UTF8? */
-      g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
+      info = get_file_info_from_entry (backend, entry);
     }
       
   g_mutex_unlock (backend->entries_lock);
@@ -805,11 +967,7 @@ run_enumerate (GVfsBackendSmbBrowse *backend,
     {
       BrowseEntry *entry = l->data;
 
-      info = g_file_info_new ();
-      g_file_info_set_file_type (info, G_FILE_TYPE_MOUNTABLE);
-      g_file_info_set_name (info, entry->name);
-      /* TODO: Is this always in utf8??? */
-      g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
+      info = get_file_info_from_entry (backend, entry);
 
       files = g_list_prepend (files, info);
     }
