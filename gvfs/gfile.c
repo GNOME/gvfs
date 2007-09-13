@@ -1,4 +1,7 @@
 #include <config.h>
+#include <string.h>
+#include <sys/types.h>
+#include <pwd.h>
 #include "gfile.h"
 #include "gvfs.h"
 #include <glib/gi18n-lib.h>
@@ -205,4 +208,98 @@ g_file_parse_name (const char *parse_name)
 {
   return g_vfs_parse_name (g_vfs_get (),
 			   parse_name);
+}
+
+static gboolean
+is_valid_scheme_character (char c)
+{
+	return g_ascii_isalnum (c) || c == '+' || c == '-' || c == '.';
+}
+
+static gboolean
+has_valid_scheme (const char *uri)
+{
+	const char *p;
+
+	p = uri;
+
+	if (!is_valid_scheme_character (*p)) {
+		return FALSE;
+	}
+
+	do {
+		p++;
+	} while (is_valid_scheme_character (*p));
+
+	return *p == ':';
+}
+
+static char *
+expand_initial_tilde (const char *path)
+{
+#ifndef G_OS_WIN32
+	char *slash_after_user_name, *user_name;
+	struct passwd *passwd_file_entry;
+
+	g_return_val_if_fail (path != NULL, NULL);
+
+	if (path[0] != '~') {
+		return g_strdup (path);
+	}
+	
+	if (path[1] == '/' || path[1] == '\0') {
+		return g_strconcat (g_get_home_dir (), &path[1], NULL);
+	}
+
+	slash_after_user_name = strchr (&path[1], '/');
+	if (slash_after_user_name == NULL) {
+		user_name = g_strdup (&path[1]);
+	} else {
+		user_name = g_strndup (&path[1],
+				       slash_after_user_name - &path[1]);
+	}
+	passwd_file_entry = getpwnam (user_name);
+	g_free (user_name);
+
+	if (passwd_file_entry == NULL || passwd_file_entry->pw_dir == NULL) {
+		return g_strdup (path);
+	}
+
+	return g_strconcat (passwd_file_entry->pw_dir,
+			    slash_after_user_name,
+			    NULL);
+#else
+	return g_strdup (path);
+#endif
+}
+
+
+GFile *
+g_file_get_for_commandline_arg (const char *arg)
+{
+  GFile *file;
+  char *filename;
+  char *current_dir;
+  
+  g_return_val_if_fail (arg != NULL, NULL);
+  
+  if (g_path_is_absolute (arg))
+    return g_file_get_for_path (arg);
+
+  if (has_valid_scheme (arg))
+    return g_file_get_for_uri (arg);
+    
+  if (*arg == '~')
+    filename = expand_initial_tilde (arg);
+  else
+    {
+      current_dir = g_get_current_dir ();
+      filename = g_build_filename (current_dir, arg, NULL);
+      g_free (current_dir);
+    }
+  
+  file = g_file_get_for_path (filename);
+  g_free (filename);
+  
+  return file;
 }
