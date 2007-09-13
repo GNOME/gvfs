@@ -416,18 +416,8 @@ g_local_file_delete (GFile *file,
 		     GError **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  int res;
   
-  res = g_unlink (local->filename);
-
-  /* Linux returns EISDIR in the case of unlinking a directory.
-     Posix specifies that the unlink of the directorey may succeed,
-     otherwise it should return EPERM */
-  if (res == -1 &&
-      (errno == EISDIR || errno == EPERM))
-    res = g_rmdir (local->filename);
-
-  if (res == -1)
+  if (g_remove (local->filename) == -1)
     {
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
