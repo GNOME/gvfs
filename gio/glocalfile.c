@@ -640,6 +640,46 @@ get_byte_string (const GFileAttributeValue *value,
 }
 #endif
 
+static GFileAttributeInfoList *
+g_local_file_query_settable_attributes (GFile                      *file,
+					GCancellable               *cancellable,
+					GError                    **error)
+{
+  GFileAttributeInfoList *list;
+
+  list = g_file_attribute_info_list_new ();
+
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_MODE,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_UID,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_GID,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32);
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET,
+				  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING);
+
+  
+  return list;
+}
+
+static GFileAttributeInfoList *
+g_local_file_query_writable_namespaces (GFile                      *file,
+					GCancellable               *cancellable,
+					GError                    **error)
+{
+  GFileAttributeInfoList *list;
+
+  list = g_file_attribute_info_list_new ();
+
+  /* TODO: Add xattrs as we make them settable */
+  
+  return list;
+}
+
 static gboolean
 g_local_file_set_attribute (GFile *file,
 			    const char *attribute,
@@ -773,7 +813,8 @@ g_local_file_set_attribute (GFile *file,
     }
   #endif
   
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Copy not supported");
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+	       _("Setting attribute %s not supported"), attribute);
   return FALSE;
 }
 
@@ -1525,6 +1566,8 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->enumerate_children = g_local_file_enumerate_children;
   iface->get_info = g_local_file_get_info;
   iface->get_filesystem_info = g_local_file_get_filesystem_info;
+  iface->query_settable_attributes = g_local_file_query_settable_attributes;
+  iface->query_writable_namespaces = g_local_file_query_writable_namespaces;
   iface->set_attribute = g_local_file_set_attribute;
   iface->read = g_local_file_read;
   iface->append_to = g_local_file_append_to;
