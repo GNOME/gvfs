@@ -8,13 +8,6 @@ Add Seekable support to LocalFile streams
 
 Work on GFile
 
-Use G_FILE_ERRORS and g_file_error_from_errno:
-  g_set_error (error,
-	       G_FILE_ERROR,
-	       g_file_error_from_errno (errno),
-	       _("Error opening directory '%s': %s"),
-	       path, g_strerror (errno));
-
 add get_file_info_async for FileStreams 
 
 test outputstream (especially replace + backup) (and test everything else too)

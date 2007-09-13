@@ -436,8 +436,7 @@ g_file_info_simple_get (const char *basename,
   if (res == -1)
     {
       g_object_unref (info);
-      g_set_error (error,
-		   G_FILE_ERROR,
+      g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
 		   _("Error stating file '%s': %s"),
 		   path, g_strerror (errno));
@@ -497,7 +496,10 @@ g_file_info_simple_get_from_fd (int fd,
   
   if (fstat (fd, &stat_buf) == -1)
     {
-      g_vfs_error_from_errno (error, errno);
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error stating file descriptor: %s"),
+		   g_strerror (errno));
       return NULL;
     }
 

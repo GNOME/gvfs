@@ -95,7 +95,10 @@ g_local_file_input_stream_open (GLocalFileInputStream *file,
   
   file->priv->fd = g_open (file->priv->filename, O_RDONLY, 0);
   if (file->priv->fd == -1)
-    g_vfs_error_from_errno (error, errno);
+    g_set_error (error, G_FILE_ERROR,
+		 g_file_error_from_errno (errno),
+		 _("Error opening file %s: %s"),
+		 file->priv->filename, g_strerror (errno));
 
   return file->priv->fd != -1;
 }
@@ -132,7 +135,10 @@ g_local_file_input_stream_read (GInputStream *stream,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error reading from file '%s': %s"),
+		       file->priv->filename, g_strerror (errno));
 	}
       
       break;
@@ -157,14 +163,20 @@ g_local_file_input_stream_skip (GInputStream *stream,
   start = lseek (file->priv->fd, 0, SEEK_CUR);
   if (start == -1)
     {
-      g_vfs_error_from_errno (error, errno);
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error seeking in file '%s': %s"),
+		   file->priv->filename, g_strerror (errno));
       return -1;
     }
   
   res = lseek (file->priv->fd, count, SEEK_CUR);
   if (res == -1)
     {
-      g_vfs_error_from_errno (error, errno);
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error seeking in file '%s': %s"),
+		   file->priv->filename, g_strerror (errno));
       return -1;
     }
 
@@ -200,7 +212,10 @@ g_local_file_input_stream_close (GInputStream *stream,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error closing file '%s': %s"),
+		       file->priv->filename, g_strerror (errno));
 	}
       break;
     }

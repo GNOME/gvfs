@@ -140,7 +140,10 @@ copy_file_data (gint     sfd,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error reading from file': %s"),
+		       g_strerror (errno));
 	  ret = FALSE;
 	  break;
 	}
@@ -156,7 +159,10 @@ copy_file_data (gint     sfd,
 	      if (errno == EINTR)
 		continue;
 	      
-	      g_vfs_error_from_errno (error, errno);
+	      g_set_error (error, G_FILE_ERROR,
+			   g_file_error_from_errno (errno),
+			   _("Error writing to file: %s"),
+			   g_strerror (errno));
 	      ret = FALSE;
 	      break;
 	    }
@@ -209,13 +215,19 @@ handle_overwrite_open (GLocalFileOutputStream *file,
     
   if (fd == -1)
     {
-      g_vfs_error_from_errno (error, errno);
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error opening file '%s': %s"),
+		   file->priv->filename, g_strerror (errno));
       goto err_out;
     }
   
   if (fstat (fd, &original_stat) != 0) 
     {
-      g_vfs_error_from_errno (error, errno);
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error stating file '%s': %s"),
+		   file->priv->filename, g_strerror (errno));
       goto err_out;
     }
 
@@ -224,8 +236,8 @@ handle_overwrite_open (GLocalFileOutputStream *file,
     {
       if (S_ISDIR (original_stat.st_mode))
 	g_set_error (error,
-		     G_VFS_ERROR,
-		     G_VFS_ERROR_IS_DIRECTORY,
+		     G_FILE_ERROR,
+		     G_FILE_ERROR_ISDIR,
 		     _("Target file is a directory"));
       else
 	g_set_error (error,
@@ -362,7 +374,10 @@ handle_overwrite_open (GLocalFileOutputStream *file,
       /* Seek back to the start of the file after the backup copy */
       if (lseek (fd, 0, SEEK_SET) == -1)
 	{
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error seeking in file: %s"),
+		       g_strerror (errno));
 	  goto err_out;
 	}
     }
@@ -370,7 +385,10 @@ handle_overwrite_open (GLocalFileOutputStream *file,
   /* Truncate the file at the start */
   if (ftruncate (fd, 0) == -1)
     {
-      g_vfs_error_from_errno (error, errno);
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error truncating file: %s"),
+		   g_strerror (errno));
       goto err_out;
     }
     
@@ -398,14 +416,20 @@ g_local_file_output_stream_open (GLocalFileOutputStream *file,
 			       O_CREAT | O_EXCL | O_WRONLY,
 			       0666);
       if (file->priv->fd == -1)
-	g_vfs_error_from_errno (error, errno);
+	g_set_error (error, G_FILE_ERROR,
+		     g_file_error_from_errno (errno),
+		     _("Error opening file '%s': %s"),
+		     file->priv->filename, g_strerror (errno));
       break;
     case G_OUTPUT_STREAM_OPEN_MODE_APPEND:
       file->priv->fd = g_open (file->priv->filename,
 			       O_CREAT | O_APPEND | O_WRONLY,
 			       0666);
       if (file->priv->fd == -1)
-	g_vfs_error_from_errno (error, errno);
+	g_set_error (error, G_FILE_ERROR,
+		     g_file_error_from_errno (errno),
+		     _("Error opening file '%s': %s"),
+		     file->priv->filename, g_strerror (errno));
       break;
     case G_OUTPUT_STREAM_OPEN_MODE_REPLACE:
       /* If the file doesn't exist, create it */
@@ -419,12 +443,15 @@ g_local_file_output_stream_open (GLocalFileOutputStream *file,
 	  handle_overwrite_open (file, error);
 	}
       else if (file->priv->fd == -1)
-	g_vfs_error_from_errno (error, errno);
+	g_set_error (error, G_FILE_ERROR,
+		     g_file_error_from_errno (errno),
+		     _("Error opening file '%s': %s"),
+		     file->priv->filename, g_strerror (errno));
       break;
     default:
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_INVALID_ARGUMENT,
+		   G_FILE_ERROR,
+		   G_FILE_ERROR_INVAL,
 		   _("Invalid open mode"));
     }
 
@@ -463,7 +490,10 @@ g_local_file_output_stream_write (GOutputStream *stream,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error writing to file '%s': %s"),
+		       file->priv->filename, g_strerror (errno));
 	}
       
       break;
@@ -500,7 +530,10 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	  /* create original -> backup link, the original is then renamed over */
 	  if (link (file->priv->filename, backup_filename) != 0)
 	    {
-	      g_vfs_error_from_errno (error, errno);
+	      g_set_error (error, G_FILE_ERROR,
+			   g_file_error_from_errno (errno),
+			   _("Error creating backup link: %s"),
+			   g_strerror (errno));
 	      g_free (backup_filename);
 	      goto err_out;
 	    }
@@ -509,7 +542,10 @@ g_local_file_output_stream_close (GOutputStream *stream,
       /* tmp -> original */
       if (rename (file->priv->tmp_filename, file->priv->filename) != 0)
 	{
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error renamining temporary file: %s"),
+		       g_strerror (errno));
 	  goto err_out;
 	}
     }
@@ -538,7 +574,10 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	  if (errno == EINTR)
 	    continue;
 	  
-	  g_vfs_error_from_errno (error, errno);
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error closing file: %s"),
+		       g_strerror (errno));
 	}
       break;
     }
