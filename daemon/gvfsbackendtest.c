@@ -10,11 +10,14 @@
 #include <glib/gstdio.h>
 #include <gvfs/gvfserror.h>
 #include <glib/gi18n.h>
+#include <gvfs/gfile.h>
+#include <gvfs/gfilelocal.h>
 
 #include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
+#include "gvfsjobgetinfo.h"
 
 G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_TYPE_VFS_BACKEND);
 
@@ -234,6 +237,38 @@ do_close_read (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+do_get_info (GVfsBackend *backend,
+	     GVfsJobGetInfo *job,
+	     char *filename,
+	     GFileInfoRequestFlags requested,
+	     const char *attributes,
+	     gboolean follow_symlinks)
+{
+  GFile *file;
+  GFileInfo *info;
+  GError *error;
+
+  file = g_file_local_new (filename);
+
+  error = NULL;
+  info = g_file_get_info (file, requested, attributes, follow_symlinks,
+			  NULL, &error);
+
+  if (info)
+    {
+      g_vfs_job_get_info_set_info (job, requested, info);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+
+  g_object_unref (info);
+  g_object_unref (file);
+  
+  return TRUE;
+}
+
 static void
 g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
 {
@@ -246,4 +281,5 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
+  backend_class->get_info = do_get_info;
 }

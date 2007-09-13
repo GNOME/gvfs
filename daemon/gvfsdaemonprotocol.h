@@ -1,6 +1,8 @@
 #ifndef __G_VFS_DAEMON_PROTOCOL_H__
 #define __G_VFS_DAEMON_PROTOCOL_H__
 
+#include <gvfs/gfileinfo.h>
+
 G_BEGIN_DECLS
 
 #define G_VFS_DBUS_DAEMON_NAME "org.gtk.vfs.Daemon"
@@ -64,6 +66,11 @@ typedef struct {
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR    1
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS 2
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED   3
+
+char *g_dbus_get_file_info_signature (GFileInfoRequestFlags  requested);
+void  g_dbus_append_file_info        (DBusMessageIter       *iter,
+				      GFileInfoRequestFlags  requested,
+				      GFileInfo             *file_info);
 
 G_END_DECLS
 

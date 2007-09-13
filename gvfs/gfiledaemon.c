@@ -208,6 +208,8 @@ g_file_daemon_get_info (GFile                *file,
   DBusMessage *reply;
   guint32 requested_32;
   dbus_bool_t follow_symlinks_dbus;
+  DBusMessageIter iter;
+  GFileInfo *info;
 
   requested_32 = (guint32)requested;
   if (attributes == NULL)
@@ -223,18 +225,26 @@ g_file_daemon_get_info (GFile                *file,
   if (reply == NULL)
     return NULL;
 
-  if (!dbus_message_get_args (reply, NULL,
-			      DBUS_TYPE_INVALID))
-    {
-      dbus_message_unref (reply);
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   _("Invalid return value from open"));
-      return NULL;
-    }
+  info = NULL;
   
-  dbus_message_unref (reply);
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_UINT32))
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Invalid return value from get_info"));
+      goto out;
+    }
 
-  return NULL;
+  dbus_message_iter_get_basic (&iter, &requested_32);
+  
+  if (!dbus_message_iter_next (&iter))
+    goto out;
+  
+  info = _g_dbus_get_file_info (&iter, requested_32, error);
+
+ out:
+  dbus_message_unref (reply);
+  return info;
 }
 
 typedef struct {

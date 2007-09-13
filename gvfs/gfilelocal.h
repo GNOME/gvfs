@@ -1,7 +1,7 @@
 #ifndef __G_FILE_LOCAL_H__
 #define __G_FILE_LOCAL_H__
 
-#include <gfile.h>
+#include <gvfs/gfile.h>
 
 G_BEGIN_DECLS
 

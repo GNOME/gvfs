@@ -4,6 +4,7 @@
 #include <glib.h>
 #include <dbus/dbus.h>
 #include <gvfs/gcancellable.h>
+#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 
@@ -57,6 +58,9 @@ char *       _g_dbus_unescape_bus_name               (const char             *es
 void         _g_dbus_append_escaped_bus_name         (GString                *string,
 						      gboolean                at_start,
 						      const char             *unescaped);
+GFileInfo *  _g_dbus_get_file_info                   (DBusMessageIter        *iter,
+						      GFileInfoRequestFlags   requested,
+						      GError                **error);
 
 G_END_DECLS
 

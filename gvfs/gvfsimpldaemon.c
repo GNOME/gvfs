@@ -381,10 +381,10 @@ _g_vfs_impl_daemon_new_path_call (GQuark match_bus_name,
   DBusMessage *message;
 
   va_start (var_args, first_arg_type);
-  message = _g_vfs_impl_daemon_new_path_call (match_bus_name,
-					      path, op, 
-					      first_arg_type,
-					      var_args);
+  message = _g_vfs_impl_daemon_new_path_call_valist (match_bus_name,
+						     path, op, 
+						     first_arg_type,
+						     var_args);
   va_end (var_args);
   return message;
 }

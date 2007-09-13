@@ -783,6 +783,8 @@ daemon_message_func (DBusConnection *conn,
   RegisteredPath *registered_path;
   const char *path;
 
+  g_print ("daemon_message_func\n");
+  
   if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameLost"))
     {
       char *name;

@@ -2044,3 +2044,198 @@ _g_dbus_message_append_args (DBusMessage *message,
   va_end (var_args);
 }
 
+GFileInfo *
+_g_dbus_get_file_info (DBusMessageIter *iter,
+		       GFileInfoRequestFlags requested,
+		       GError **error)
+{
+  GFileInfo *info;
+  DBusMessageIter struct_iter, array_iter;
+
+  info = g_file_info_new ();
+
+  if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_STRUCT)
+    goto error;
+
+  dbus_message_iter_recurse (iter, &struct_iter);
+
+  if (requested & G_FILE_INFO_FILE_TYPE)
+    {
+      guint16 type;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT16)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &type);
+
+      g_file_info_set_file_type (info, type);
+
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_NAME)
+    {
+      char *str;
+      const char *data;
+      int len;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_ARRAY ||
+	  dbus_message_iter_get_element_type (&struct_iter) != DBUS_TYPE_BYTE)
+	goto error;
+
+      dbus_message_iter_recurse (&struct_iter, &array_iter);
+      dbus_message_iter_get_fixed_array (&array_iter, &data, &len);
+      str = g_strndup (data, len);
+      g_file_info_set_name (info, str);
+      g_free (str);
+      
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_DISPLAY_NAME)
+    {
+      const char *str;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &str);
+      
+      g_file_info_set_display_name (info, str);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_EDIT_NAME)
+    {
+      const char *str;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &str);
+      
+      g_file_info_set_edit_name (info, str);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_ICON)
+    {
+      const char *str;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &str);
+      
+      g_file_info_set_icon (info, str);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_MIME_TYPE)
+    {
+      const char *str;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_STRING)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &str);
+      
+      g_file_info_set_mime_type (info, str);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_SIZE)
+    {
+      guint64 size;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT64)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &size);
+      
+      g_file_info_set_size (info, size);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_MODIFICATION_TIME)
+    {
+      guint64 time;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT64)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &time);
+      
+      g_file_info_set_modification_time (info, time);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_ACCESS_RIGHTS)
+    {
+      guint32 rights;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT32)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &rights);
+      
+      g_file_info_set_access_rights (info, rights);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_STAT_INFO)
+    {
+      guint32 tmp;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_UINT32)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &tmp);
+      
+      /* TODO: implement statinfo */
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_SYMLINK_TARGET)
+    {
+      char *str;
+      const char *data;
+      int len;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_ARRAY ||
+	  dbus_message_iter_get_element_type (&struct_iter) != DBUS_TYPE_BYTE)
+	goto error;
+
+      dbus_message_iter_recurse (&struct_iter, &array_iter);
+      dbus_message_iter_get_fixed_array (&array_iter, &data, &len);
+      str = g_strndup (data, len);
+      g_file_info_set_symlink_target (info, str);
+      g_free (str);
+      
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  if (requested & G_FILE_INFO_IS_HIDDEN)
+    {
+      dbus_bool_t is_hidden;
+      
+      if (dbus_message_iter_get_arg_type (&struct_iter) != DBUS_TYPE_BOOLEAN)
+	goto error;
+
+      dbus_message_iter_get_basic (&struct_iter, &is_hidden);
+      
+      g_file_info_set_is_hidden (info, is_hidden);
+      dbus_message_iter_next (&struct_iter);
+    }
+
+  /* TODO: Attributes */
+
+  dbus_message_iter_next (iter);
+  return info;
+
+ error:
+  g_object_unref (info);
+  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+	       _("Invalid file info format"));
+  return NULL;
+}

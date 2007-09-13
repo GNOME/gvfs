@@ -5,6 +5,7 @@
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <dbus/dbus.h>
+#include <gvfs/gfileinfo.h>
 
 G_BEGIN_DECLS
 
@@ -22,6 +23,7 @@ typedef struct _GVfsJobOpenForRead  GVfsJobOpenForRead;
 typedef struct _GVfsJobSeekRead     GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead    GVfsJobCloseRead;
 typedef struct _GVfsJobRead         GVfsJobRead;
+typedef struct _GVfsJobGetInfo      GVfsJobGetInfo;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -62,29 +64,41 @@ struct _GVfsBackendClass
 			     GVfsBackendHandle handle,
 			     goffset    offset,
 			     GSeekType  type);
+  gboolean (*get_info)      (GVfsBackend *backend,
+			     GVfsJobGetInfo *job,
+			     char *filename,
+			     GFileInfoRequestFlags requested,
+			     const char *attributes,
+			     gboolean follow_symlinks);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
 
-gboolean g_vfs_backend_open_for_read (GVfsBackend        *backend,
-				      GVfsJobOpenForRead *job,
-				      char               *filename);
-gboolean g_vfs_backend_close_read    (GVfsBackend        *backend,
-				      GVfsJobCloseRead   *job,
-				      GVfsBackendHandle   handle);
-gboolean g_vfs_backend_read          (GVfsBackend        *backend,
-				      GVfsJobRead        *job,
-				      GVfsBackendHandle   handle,
-				      char               *buffer,
-				      gsize               bytes_requested);
-gboolean g_vfs_backend_seek_on_read  (GVfsBackend        *backend,
-				      GVfsJobSeekRead    *job,
-				      GVfsBackendHandle   handle,
-				      goffset             offset,
-				      GSeekType           type);
+gboolean g_vfs_backend_open_for_read        (GVfsBackend           *backend,
+					     GVfsJobOpenForRead    *job,
+					     char                  *filename);
+gboolean g_vfs_backend_close_read           (GVfsBackend           *backend,
+					     GVfsJobCloseRead      *job,
+					     GVfsBackendHandle      handle);
+gboolean g_vfs_backend_read                 (GVfsBackend           *backend,
+					     GVfsJobRead           *job,
+					     GVfsBackendHandle      handle,
+					     char                  *buffer,
+					     gsize                  bytes_requested);
+gboolean g_vfs_backend_seek_on_read         (GVfsBackend           *backend,
+					     GVfsJobSeekRead       *job,
+					     GVfsBackendHandle      handle,
+					     goffset                offset,
+					     GSeekType              type);
+gboolean g_vfs_backend_get_info             (GVfsBackend           *backend,
+					     GVfsJobGetInfo        *job,
+					     char                  *filename,
+					     GFileInfoRequestFlags  requested,
+					     const char            *attributes,
+					     gboolean               follow_symlinks);
+void     g_vfs_backend_register_with_daemon (GVfsBackend           *backend,
+					     GVfsDaemon            *daemon);
 
-void  g_vfs_backend_register_with_daemon (GVfsBackend     *backend,
-					  GVfsDaemon      *daemon);
 
 G_END_DECLS
 

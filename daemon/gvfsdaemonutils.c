@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -18,6 +19,13 @@ typedef struct {
   int extra_fd;
   int fd_count;
 } ConnectionExtra;
+
+void
+g_dbus_oom (void)
+{
+  g_error ("DBus failed with out of memory error");
+  exit (1);
+}
 
 /* We use _ for escaping, so its not valid */
 #define VALID_INITIAL_NAME_CHARACTER(c)         \
@@ -157,7 +165,7 @@ dbus_connection_add_fd_send_fd (DBusConnection *connection,
   extra->extra_fd = extra_fd;
   
   if (!dbus_connection_set_data (connection, extra_fd_slot, extra, free_extra))
-    g_error ("Out of memory");
+    g_dbus_oom ();
 }
 
 static int
@@ -266,7 +274,7 @@ g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)
 }
 
 void
-_g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filename)
+_g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *filename)
 {
   DBusMessageIter array;
 
@@ -277,13 +285,13 @@ _g_dbus_message_iter_append_filename (DBusMessageIter *iter, const char *filenam
 					 DBUS_TYPE_ARRAY,
 					 DBUS_TYPE_BYTE_AS_STRING,
 					 &array))
-    g_error ("out of memory");
+    g_dbus_oom ();
 
   if (!dbus_message_iter_append_fixed_array (&array,
 					     DBUS_TYPE_BYTE,
 					     &filename, strlen (filename)))
-    g_error ("out of memory");
+    g_dbus_oom ();
 
   if (!dbus_message_iter_close_container (iter, &array))
-    g_error ("out of memory");
+    g_dbus_oom ();
 }
