@@ -409,7 +409,7 @@ g_file_info_remove_attribute (GFileInfo  *info,
     }
 }
 
-const GFileAttributeValue *
+GFileAttributeValue *
 g_file_info_get_attribute (GFileInfo  *info,
 			   const char *attribute)
   

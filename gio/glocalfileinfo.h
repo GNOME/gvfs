@@ -32,6 +32,11 @@ gboolean   _g_local_file_info_set_attribute   (char                       *filen
 					       GFileGetInfoFlags           flags,
 					       GCancellable               *cancellable,
 					       GError                    **error);
+gboolean   _g_local_file_info_set_attributes  (char                       *filename,
+					       GFileInfo                  *info,
+					       GFileGetInfoFlags           flags,
+					       GCancellable               *cancellable,
+					       GError                    **error);
 
 G_END_DECLS
 

@@ -1352,3 +1352,117 @@ _g_local_file_info_set_attribute (char *filename,
 	       _("Setting attribute %s not supported"), attribute);
   return FALSE;
 }
+
+gboolean
+_g_local_file_info_set_attributes  (char                       *filename,
+				    GFileInfo                  *info,
+				    GFileGetInfoFlags           flags,
+				    GCancellable               *cancellable,
+				    GError                    **error)
+{
+  GFileAttributeValue *value, *uid, *gid;
+  GFileAttributeValue *mtime, *mtime_usec, *atime, *atime_usec;
+  GFileAttributeStatus status;
+  gboolean res;
+  
+  /* Handles setting multiple specified data in a single set, and takes care
+     of ordering restrictions when setting attributes */
+
+  res = TRUE;
+
+  /* Set symlink first, since this recreates the file */
+#ifdef HAVE_SYMLINK
+  value = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET);
+  if (value)
+    {
+      if (!set_symlink (filename, value, error))
+	{
+	  value->status = G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING;
+	  res = FALSE;
+	  /* Don't set error multiple times */
+	  error = NULL;
+	}
+      else
+	value->status = G_FILE_ATTRIBUTE_STATUS_SET;
+	
+    }
+#endif
+
+#ifdef HAVE_CHOWN
+  /* Group uid and gid setting into one call
+   * Change ownership before permissions, since ownership changes can
+     change permissions (e.g. setuid)
+   */
+  uid = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID);
+  gid = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_UNIX_GID);
+  
+  if (uid || gid)
+    {
+      if (!set_unix_uid_gid (filename, uid, gid, flags, error))
+	{
+	  status = G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING;
+	  res = FALSE;
+	  /* Don't set error multiple times */
+	  error = NULL;
+	}
+      else
+	status = G_FILE_ATTRIBUTE_STATUS_SET;
+      if (uid)
+	uid->status = status;
+      if (gid)
+	gid->status = status;
+    }
+#endif
+  
+  value = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_UNIX_MODE);
+  if (value)
+    {
+      if (!set_unix_mode (filename, value, error))
+	{
+	  value->status = G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING;
+	  res = FALSE;
+	  /* Don't set error multiple times */
+	  error = NULL;
+	}
+      else
+	value->status = G_FILE_ATTRIBUTE_STATUS_SET;
+	
+    }
+
+#ifdef HAVE_UTIMES
+  /* Group all time settings into one call
+   * Change times as the last thing to avoid it changing due to metadata changes
+   */
+  
+  mtime = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
+  mtime_usec = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC);
+  atime = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_TIME_ACCESS);
+  atime_usec = g_file_info_get_attribute (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC);
+
+  if (mtime || mtime_usec || atime || atime_usec)
+    {
+      if (!set_mtime_atime (filename, mtime, mtime_usec, atime, atime_usec, error))
+	{
+	  status = G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING;
+	  res = FALSE;
+	  /* Don't set error multiple times */
+	  error = NULL;
+	}
+      else
+	status = G_FILE_ATTRIBUTE_STATUS_SET;
+      
+      if (mtime)
+	mtime->status = status;
+      if (mtime_usec)
+	mtime_usec->status = status;
+      if (atime)
+	atime->status = status;
+      if (atime_usec)
+	atime_usec->status = status;
+    }
+#endif
+
+  /* xattrs are handled by default callback */
+
+  return res;
+}

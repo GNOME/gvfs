@@ -129,7 +129,7 @@ GFileAttributeType g_file_info_get_attribute_type        (GFileInfo  *info,
 							  const char *attribute);
 void               g_file_info_remove_attribute          (GFileInfo  *info,
 							  const char *attribute);
-const GFileAttributeValue * g_file_info_get_attribute         (GFileInfo  *info,
+GFileAttributeValue * g_file_info_get_attribute          (GFileInfo  *info,
 							  const char *attribute);
 const char *       g_file_info_get_attribute_string      (GFileInfo  *info,
 							  const char *attribute);
