@@ -6,6 +6,13 @@ static void g_vfs_simple_class_init     (GVfsSimpleClass *class);
 static void g_vfs_simple_vfs_iface_init (GVfsIface       *iface);
 static void g_vfs_simple_finalize       (GObject         *object);
 
+struct _GVfsSimple
+{
+  GObject parent;
+
+  
+};
+
 G_DEFINE_TYPE_WITH_CODE (GVfsSimple, g_vfs_simple, G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_VFS,
 						g_vfs_simple_vfs_iface_init))
@@ -32,7 +39,7 @@ g_vfs_simple_init (GVfsSimple *vfs)
 {
 }
 
-GVfsSimple *
+GVfs *
 g_vfs_simple_new (void)
 {
   return g_object_new (G_TYPE_VFS_SIMPLE, NULL);
@@ -50,13 +57,18 @@ g_vfs_simple_get_file_for_uri   (GVfs       *vfs,
 				 const char *uri)
 {
   char *path;
+  GFile *file;
 
   path = g_filename_from_uri (uri, NULL, NULL);
 
   if (path != NULL)
-    return g_file_simple_new (path);
+    file = g_file_simple_new (path);
   else
-    return NULL;
+    file = NULL;
+
+  g_free (path);
+
+  return file;
 }
 
 static GFile *

@@ -16,13 +16,6 @@ G_BEGIN_DECLS
 typedef struct _GVfsSimple       GVfsSimple;
 typedef struct _GVfsSimpleClass  GVfsSimpleClass;
 
-struct _GVfsSimple
-{
-  GObject parent;
-
-  
-};
-
 struct _GVfsSimpleClass
 {
   GObjectClass parent_class;
@@ -31,7 +24,7 @@ struct _GVfsSimpleClass
 
 GType   g_vfs_simple_get_type  (void) G_GNUC_CONST;
 
-GVfsSimple *g_vfs_simple_new (void);
+GVfs *g_vfs_simple_new (void);
 
 
 G_END_DECLS
