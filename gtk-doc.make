@@ -1,0 +1,1 @@
+/gnome/head/INSTALL/share/gtk-doc/data/gtk-doc.make
