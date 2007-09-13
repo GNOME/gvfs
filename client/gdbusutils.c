@@ -402,10 +402,11 @@ fd_source_cancelled_cb (GCancellable *cancellable,
   g_main_context_wakeup (NULL);
 }
 
+/* Two __ to avoid conflict with gio version */
 GSource *
-_g_fd_source_new (int fd,
-		  gushort events,
-		  GCancellable *cancellable)
+__g_fd_source_new (int fd,
+		   gushort events,
+		   GCancellable *cancellable)
 {
   GSource *source;
   FDSource *fd_source;
@@ -420,8 +421,6 @@ _g_fd_source_new (int fd,
   fd_source->pollfd.events = events;
   g_source_add_poll (source, &fd_source->pollfd);
 
-  g_source_attach (source, NULL);
- 
   if (cancellable)
     fd_source->cancelled_tag =
       g_signal_connect_data (cancellable, "cancelled",
@@ -590,12 +589,13 @@ dbus_source_add_watch (DBusSource *dbus_source,
   handler->dbus_source = dbus_source;
   handler->watch = watch;
 
-  handler->source = _g_fd_source_new (dbus_watch_get_fd (watch),
-				      condition, NULL);
+  handler->source = __g_fd_source_new (dbus_watch_get_fd (watch),
+				       condition, NULL);
   g_source_set_callback (handler->source,
 			 (GSourceFunc) io_handler_dispatch, handler,
                          NULL);
-  
+  g_source_attach (handler->source, NULL);
+ 
   dbus_source->ios = g_slist_prepend (dbus_source->ios, handler);
   dbus_watch_set_data (watch, handler,
 		       (DBusFreeFunction)io_handler_free);

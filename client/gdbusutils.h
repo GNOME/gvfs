@@ -35,7 +35,7 @@ void     _g_dbus_append_escaped_bus_name        (GString          *string,
 						 const char       *unescaped);
 void     _g_dbus_connection_integrate_with_main (DBusConnection   *connection);
 void     _g_dbus_connection_remove_from_main    (DBusConnection   *connection);
-GSource *_g_fd_source_new                       (int               fd,
+GSource *__g_fd_source_new                      (int               fd,
 						 gushort           events,
 						 GCancellable     *cancellable);
 void     _g_dbus_oom                            (void) G_GNUC_NORETURN;

@@ -242,10 +242,11 @@ setup_async_fd_receive (VfsConnectionData *connection_data)
   
   
   connection_data->extra_fd_source =
-    _g_fd_source_new (connection_data->extra_fd, POLLIN, NULL);
+    __g_fd_source_new (connection_data->extra_fd, POLLIN, NULL);
   g_source_set_callback (connection_data->extra_fd_source,
 			 (GSourceFunc)async_connection_accept_new_fd,
 			 connection_data, NULL);
+  g_source_attach (connection_data->extra_fd_source, NULL);
 }
 
 int
