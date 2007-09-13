@@ -21,7 +21,7 @@ struct _GLocalDirectoryMonitorClass {
 
 GType g_local_directory_monitor_get_type (void) G_GNUC_CONST;
 
-GDirectoryMonitor* g_local_directory_monitor_start (const char* dirname);
+GDirectoryMonitor* g_local_directory_monitor_new (const char* dirname);
 
 G_END_DECLS
 

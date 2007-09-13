@@ -1492,7 +1492,7 @@ static GDirectoryMonitor*
 g_local_file_monitor_dir (GFile* file)
 {
   GLocalFile* local_file = G_LOCAL_FILE(file);
-  return g_local_directory_monitor_start (local_file->filename);
+  return g_local_directory_monitor_new (local_file->filename);
 }
 
 static GFileMonitor*
@@ -1502,7 +1502,7 @@ g_local_file_monitor_file (GFile* file)
   GFileMonitor *monitor;
   GFileIface* default_iface;
 
-  monitor = g_local_file_monitor_start (local_file->filename);
+  monitor = g_local_file_monitor_new (local_file->filename);
 
   if (monitor)
     return monitor;

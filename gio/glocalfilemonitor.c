@@ -68,7 +68,7 @@ g_local_file_monitor_init (GLocalFileMonitor* local_monitor)
 }
 
 GFileMonitor*
-g_local_file_monitor_start (const char* pathname)
+g_local_file_monitor_new (const char* pathname)
 {
   GLocalFileMonitor* local_monitor;
   LocalMonitorBackend backend;
