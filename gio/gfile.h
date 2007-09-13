@@ -27,11 +27,15 @@ typedef enum {
   G_FILE_COPY_ALL_METADATA = (1<<3),
 } GFileCopyFlags;
 
+typedef enum  {
+  G_FILE_MONITOR_FLAGS_NONE = 0,
+  G_FILE_MONITOR_FLAGS_MONITOR_MOUNTS = (1<<0)
+} GFileMonitorFlags;
+
 typedef struct _GFile         		GFile; /* Dummy typedef */
 typedef struct _GFileIface    		GFileIface;
 typedef struct _GDirectoryMonitor       GDirectoryMonitor;
 typedef struct _GFileMonitor            GFileMonitor;
-typedef enum _GFileMonitorFlags GFileMonitorFlags;
 
 typedef void (*GFileProgressCallback) (goffset current_num_bytes,
 				       goffset total_num_bytes,
