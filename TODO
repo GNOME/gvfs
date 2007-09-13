@@ -55,14 +55,7 @@ Return G_IO_ERROR_INVALID_FILENAME on local file operations on FAT with invalid 
 
 Make built-in uri parsers link into gvfs shared lib instead of using a module
 
-test everything
-
-Add something like:
-GFileAttributes *  g_file_query_attributes           (GFile                  *file,
-						      GCancellable           *cancellable,
-						      GError                **error);
-Returns writable attributes supportable.
-Use this to copy xattrs in general move fallback.
+Finish general attribute copy in gfile.c move fallback.
 
 Get rid of std:flags, split it up to avoid problems with unknow flag values
 Set owner:user, owner:group for local files
