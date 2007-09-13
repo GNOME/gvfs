@@ -403,10 +403,59 @@ file_copy_fallback (GFile                  *source,
   gssize n_read, n_written;
   goffset total_size, current_size;
   GFileInfo *info;
+  GError *my_error;
+  GFileType file_type;
 
-  in = (GInputStream *)g_file_read (source, cancellable, error);
-  if (in == NULL)
+  my_error = NULL;
+  in = (GInputStream *)g_file_read (source, cancellable, &my_error);
+  if (in == NULL) {
+    if (my_error->domain == G_IO_ERROR && my_error->code == G_IO_ERROR_IS_DIRECTORY)
+      {
+	g_error_free (my_error);
+	my_error = NULL;
+	
+	/* The source is a directory, don't fail with WOULD_RECURSE immediately, as
+	   that is less useful to the app. Better check for errors on the target instead. */
+	
+	info = g_file_get_info (destination, G_FILE_ATTRIBUTE_STD_TYPE,
+				G_FILE_GET_INFO_NOFOLLOW_SYMLINKS,
+				cancellable, &my_error);
+	if (info != NULL) {
+	  file_type = g_file_info_get_file_type (info);
+	  g_object_unref (info);
+
+	  if (flags & G_FILE_COPY_OVERWRITE)
+	    {
+	      if (file_type == G_FILE_TYPE_DIRECTORY)
+		{
+		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+			     _("Can't copy over directory"));
+		  return FALSE;
+		}
+	    }
+	  else
+	    {
+	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS,
+			   _("Target file exists"));
+	      return FALSE;
+	    }
+	} else {
+	  /* Error getting info from target, return that error (except for NOT_FOUND, which is no error here) */
+	  if (my_error->domain != G_IO_ERROR && my_error->code != G_IO_ERROR_NOT_FOUND)
+	    {
+	      g_propagate_error (error, my_error);
+	      return FALSE;
+	    }
+	  g_error_free (my_error);
+	}
+	g_set_error (error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+		     _("Can't copy directory"));
+	return FALSE;
+      }
+    else
+      g_propagate_error (error, my_error);
     return FALSE;
+  }
 
   total_size = 0;
   current_size = 0;
@@ -419,7 +468,6 @@ file_copy_fallback (GFile                  *source,
       total_size = g_file_info_get_size (info);
       g_object_unref (info);
     }
-
   
   if (flags & G_FILE_COPY_OVERWRITE)
     out = (GOutputStream *)g_file_replace (destination, 0, flags & G_FILE_COPY_BACKUP, cancellable, error);
