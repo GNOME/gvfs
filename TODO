@@ -13,14 +13,8 @@ Use G_FILE_ERRORS and g_file_error_from_errno:
 	       _("Error opening directory '%s': %s"),
 	       path, g_strerror (errno));
 
-autoconfize
-
 write command line apps: ls, cat, stat
 
 add get_file_info_async for FileStreams 
 
 test outputstream (especially replace + backup) (and test everything else too)
-
-support extended attributes for local files
-
-
