@@ -1014,7 +1014,7 @@ _g_local_file_info_get_from_fd (int fd,
   get_xattrs_from_fd (fd, TRUE, info, matcher);
   get_xattrs_from_fd (fd, FALSE, info, matcher);
   
-  g_file_attribute_matcher_free (matcher);
+  g_file_attribute_matcher_unref (matcher);
   
   return info;
 }

@@ -46,7 +46,7 @@ g_local_file_enumerator_finalize (GObject *object)
   local = G_LOCAL_FILE_ENUMERATOR (object);
 
   g_free (local->filename);
-  g_file_attribute_matcher_free (local->matcher);
+  g_file_attribute_matcher_unref (local->matcher);
   if (local->dir)
     {
       g_dir_close (local->dir);

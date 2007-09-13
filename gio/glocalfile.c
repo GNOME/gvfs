@@ -609,7 +609,7 @@ g_local_file_get_info (GFile                *file,
   
   g_free (basename);
 
-  g_file_attribute_matcher_free (matcher);
+  g_file_attribute_matcher_unref (matcher);
 
   return info;
 }

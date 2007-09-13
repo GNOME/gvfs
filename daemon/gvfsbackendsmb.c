@@ -1216,7 +1216,7 @@ do_get_info (GVfsBackend *backend,
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (info);
       
-      g_file_attribute_matcher_free (matcher);
+      g_file_attribute_matcher_unref (matcher);
     }
   else
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
@@ -1366,7 +1366,7 @@ do_enumerate (GVfsBackend *backend,
 	}
     }
       
-  g_file_attribute_matcher_free (matcher);
+  g_file_attribute_matcher_unref (matcher);
 
   res = op_backend->smb_context->closedir (op_backend->smb_context, dir);
 

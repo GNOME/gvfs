@@ -215,7 +215,8 @@ void              g_file_info_set_symlink_target     (GFileInfo         *info,
 						      const char        *symlink_target);
 
 GFileAttributeMatcher *g_file_attribute_matcher_new            (const char            *attributes);
-void                   g_file_attribute_matcher_free           (GFileAttributeMatcher *matcher);
+GFileAttributeMatcher *g_file_attribute_matcher_ref            (GFileAttributeMatcher *matcher);
+void                   g_file_attribute_matcher_unref          (GFileAttributeMatcher *matcher);
 gboolean               g_file_attribute_matcher_matches        (GFileAttributeMatcher *matcher,
 								const char            *full_name);
 gboolean               g_file_attribute_matcher_matches_only   (GFileAttributeMatcher *matcher,

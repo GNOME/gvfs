@@ -900,6 +900,7 @@ struct _GFileAttributeMatcher {
   /* Interator */
   guint32 iterator_ns;
   int iterator_pos;
+  int ref;
 };
 
 static void
@@ -957,6 +958,7 @@ g_file_attribute_matcher_new (const char *attributes)
     return NULL;
 
   matcher = g_malloc0 (sizeof (GFileAttributeMatcher));
+  matcher->ref = 1;
 
   split = g_strsplit (attributes, ",", -1);
 
@@ -995,16 +997,30 @@ g_file_attribute_matcher_new (const char *attributes)
   return matcher;
 }
 
+GFileAttributeMatcher *
+g_file_attribute_matcher_ref (GFileAttributeMatcher *matcher)
+{
+  if (matcher)
+    matcher->ref++;
+  
+  return matcher;
+}
+
 void
-g_file_attribute_matcher_free (GFileAttributeMatcher *matcher)
+g_file_attribute_matcher_unref (GFileAttributeMatcher *matcher)
 {
   if (matcher == NULL)
     return;
- 
-  if (matcher->more_sub_matchers)
-    g_array_free (matcher->more_sub_matchers, TRUE);
-  
-  g_free (matcher);
+
+  matcher->ref--;
+
+  if (matcher->ref == 0)
+    {
+      if (matcher->more_sub_matchers)
+	g_array_free (matcher->more_sub_matchers, TRUE);
+      
+      g_free (matcher);
+    }
 }
 
 gboolean
