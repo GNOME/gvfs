@@ -113,7 +113,6 @@ load_vfs_module (GDaemonVfs *vfs,
 
 	  while (from_uri_table->scheme != NULL)
 	    {
-	      g_print ("from %s: %p\n", from_uri_table->scheme, from_uri_table->func);
 	      g_hash_table_insert (vfs->from_uri_hash,
 				   from_uri_table->scheme, from_uri_table->func);
 	      from_uri_table++;
@@ -126,7 +125,6 @@ load_vfs_module (GDaemonVfs *vfs,
 	  
 	  while (to_uri_table->mount_type != NULL)
 	    {
-	      g_print ("to %s: %p\n", to_uri_table->mount_type, to_uri_table->func);
 	      g_hash_table_insert (vfs->to_uri_hash,
 				   to_uri_table->mount_type, to_uri_table->func);
 	      to_uri_table++;
