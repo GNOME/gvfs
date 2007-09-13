@@ -412,7 +412,6 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
   return NULL;
 }
 
-
 GFileAttributeInfoList *
 _g_dbus_get_attribute_info_list (DBusMessageIter *iter,
 				 GError **error)
@@ -453,4 +452,47 @@ _g_dbus_get_attribute_info_list (DBusMessageIter *iter,
     }
 
   return list;
+}
+
+void
+_g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
+				    GFileAttributeInfoList  *list)
+{
+  DBusMessageIter array_iter, struct_iter;
+  int i;
+  dbus_uint32_t dbus_type;
+
+  if (!dbus_message_iter_open_container (iter,
+					 DBUS_TYPE_ARRAY,
+					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+					 DBUS_TYPE_STRING_AS_STRING	
+					 DBUS_TYPE_UINT32_AS_STRING	
+					 DBUS_STRUCT_END_CHAR_AS_STRING,
+					 &array_iter))
+    _g_dbus_oom ();
+
+  for (i = 0; i < list->n_infos; i++)
+    {
+      if (!dbus_message_iter_open_container (&array_iter,
+					     DBUS_TYPE_STRUCT,
+					     DBUS_TYPE_STRING_AS_STRING
+					     DBUS_TYPE_UINT32_AS_STRING,
+					     &struct_iter))
+	_g_dbus_oom ();
+
+      if (!dbus_message_iter_append_basic (&struct_iter,
+					   DBUS_TYPE_STRING, &list->infos[i].name))
+	_g_dbus_oom ();
+      
+      dbus_type = list->infos[i].type;
+      if (!dbus_message_iter_append_basic (&struct_iter,
+					   DBUS_TYPE_UINT32, &dbus_type))
+	_g_dbus_oom ();
+      
+      if (!dbus_message_iter_close_container (&array_iter, &struct_iter))
+	_g_dbus_oom ();
+    }
+  
+  if (!dbus_message_iter_close_container (iter, &array_iter))
+    _g_dbus_oom ();
 }

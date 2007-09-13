@@ -79,6 +79,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobmakedirectory.c gvfsjobmakedirectory.h \
 	gvfsjobmakesymlink.c gvfsjobmakesymlink.h \
 	gvfsjobsetattribute.c gvfsjobsetattribute.h \
+	gvfsjobqueryattributes.c gvfsjobqueryattributes.h \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
 

@@ -22,6 +22,7 @@
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobgetinfo.h"
 #include "gvfsjobgetfsinfo.h"
+#include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 
@@ -1203,6 +1204,30 @@ do_get_fs_info (GVfsBackend *backend,
   g_object_unref (info);
 }
 
+
+static gboolean
+try_query_settable_attributes (GVfsBackend *backend,
+			       GVfsJobQueryAttributes *job,
+			       const char *filename)
+{
+  GFileAttributeInfoList *list;
+
+  list = g_file_attribute_info_list_new ();
+
+  /* TODO: Add all settable attributes here */
+  /*
+  g_file_attribute_info_list_add (list,
+				  "smb:test",
+				  G_FILE_ATTRIBUTE_TYPE_UINT32);
+  */
+
+  g_vfs_job_query_attributes_set_list (job, list);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  g_file_attribute_info_list_free (list);
+  return TRUE;
+}
+
 static void
 do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
@@ -1573,4 +1598,5 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->delete = do_delete;
   backend_class->make_directory = do_make_directory;
   backend_class->move = do_move;
+  backend_class->try_query_settable_attributes = try_query_settable_attributes;
 }

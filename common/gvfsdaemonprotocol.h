@@ -145,8 +145,10 @@ gboolean   _g_dbus_get_file_attribute            (DBusMessageIter            *it
 GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter            *iter,
 						  GError                    **error);
 
-GFileAttributeInfoList *_g_dbus_get_attribute_info_list (DBusMessageIter *iter,
-							 GError **error);
+GFileAttributeInfoList *_g_dbus_get_attribute_info_list    (DBusMessageIter         *iter,
+							    GError                 **error);
+void                    _g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
+							    GFileAttributeInfoList  *list);
 
 G_END_DECLS
 

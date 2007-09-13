@@ -26,6 +26,7 @@
 #include <gvfsjobcopy.h>
 #include <gvfsjobmove.h>
 #include <gvfsjobsetattribute.h>
+#include <gvfsjobqueryattributes.h>
 #include <gdbusutils.h>
 
 enum {
@@ -329,6 +330,14 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE))
     job = g_vfs_job_set_attribute_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES))
+    job = g_vfs_job_query_attributes_new (connection, message, backend, FALSE);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES))
+    job = g_vfs_job_query_attributes_new (connection, message, backend, TRUE);
 
   if (job)
     {

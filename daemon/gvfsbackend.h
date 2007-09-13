@@ -44,6 +44,7 @@ typedef struct _GVfsJobMakeSymlink     GVfsJobMakeSymlink;
 typedef struct _GVfsJobCopy            GVfsJobCopy;
 typedef struct _GVfsJobMove            GVfsJobMove;
 typedef struct _GVfsJobSetAttribute    GVfsJobSetAttribute;
+typedef struct _GVfsJobQueryAttributes GVfsJobQueryAttributes;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -268,6 +269,18 @@ struct _GVfsBackendClass
 				 const char *attribute,
 				 GFileAttributeValue *value,
 				 GFileGetInfoFlags flags);
+  void (*query_settable_attributes)         (GVfsBackend *backend,
+					     GVfsJobQueryAttributes *job,
+					     const char *filename);
+  gboolean (*try_query_settable_attributes) (GVfsBackend *backend,
+					     GVfsJobQueryAttributes *job,
+					     const char *filename);
+  void (*query_writable_namespaces)         (GVfsBackend *backend,
+					     GVfsJobQueryAttributes *job,
+					     const char *filename);
+  gboolean (*try_query_writable_namespaces) (GVfsBackend *backend,
+					     GVfsJobQueryAttributes *job,
+					     const char *filename);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
