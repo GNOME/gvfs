@@ -691,7 +691,7 @@ async_get_connection_response (DBusPendingCall *pending,
 			 (GSourceFunc)accept_new_fd, connection_data, NULL);
   
   if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
-    g_error ("Out of memory");
+    oom ();
 
   /* Maybe we already had a connection? This happens if we requested
    * the same owner several times in parallel.
@@ -1254,7 +1254,7 @@ get_connection_sync (const char *bus_name,
   connection_data->extra_fd_count = 0;
 
   if (!dbus_connection_set_data (connection, vfs_data_slot, connection_data, connection_data_free))
-    g_error ("Out of memory");
+    oom ();
 
   g_hash_table_insert (local->connections, g_strdup (owner), connection);
 
@@ -1881,14 +1881,14 @@ set_connection_for_main_context (GMainContext *context,
                                             remove_watch,
                                             watch_toggled,
                                             dbus_source, NULL))
-    goto nomem;
+    oom ();
 
   if (!dbus_connection_set_timeout_functions (connection,
                                               add_timeout,
                                               remove_timeout,
                                               timeout_toggled,
                                               dbus_source, NULL))
-    goto nomem;
+    oom ();
     
   dbus_connection_set_wakeup_main_function (connection,
 					    wakeup_main,
@@ -1907,10 +1907,6 @@ set_connection_for_main_context (GMainContext *context,
     }
 
   return dbus_source;
-  
- nomem:
-  g_error ("Not enough memory to set up DBusConnection for use with GLib");
-  return NULL;
 }
 
 void
