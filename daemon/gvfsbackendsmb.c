@@ -1399,6 +1399,34 @@ do_make_directory (GVfsBackend *backend,
 }
 
 static void
+do_move (GVfsBackend *backend,
+	 GVfsJobCopy *job,
+	 const char *source,
+	 const char *destination,
+	 GFileCopyFlags flags,
+	 GFileProgressCallback progress_callback,
+	 gpointer progress_callback_data)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  char *source_uri, *dest_uri;
+  int res, errsv;
+  
+  source_uri = create_smb_uri (op_backend->server, op_backend->share, source);
+  dest_uri = create_smb_uri (op_backend->server, op_backend->share, destination);
+  
+  res = op_backend->smb_context->rename (op_backend->smb_context, source_uri,
+					 op_backend->smb_context, dest_uri);
+  errsv = errno;
+  g_free (source_uri);
+  g_free (dest_uri);
+
+  if (res != 0)
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static void
 g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1424,4 +1452,5 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->delete = do_delete;
   backend_class->make_directory = do_make_directory;
+  backend_class->move = do_move;
 }
