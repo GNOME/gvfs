@@ -823,7 +823,7 @@ dbus_message_function (DBusConnection  *connection,
   res = DBUS_HANDLER_RESULT_HANDLED;
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				   "registerMount"))
+				   G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT))
     register_mount (connection, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,

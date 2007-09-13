@@ -287,9 +287,9 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   DBusMessageIter iter;
   
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-					  "/org/gtk/vfs/mounttracker",
-					  "org.gtk.gvfs.MountTracker",
-					  "registerMount");
+					  G_VFS_DBUS_MOUNTTRACKER_PATH,
+					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					  G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT);
   if (message == NULL)
     _g_dbus_oom ();
 
