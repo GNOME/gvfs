@@ -16,6 +16,7 @@
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include "gdbusutils.h"
+#include "gsysutils.h"
 
 #define DBUS_TIMEOUT_DEFAULT 30 * 1000 /* 1/2 min */
 
@@ -175,42 +176,6 @@ connection_data_free (gpointer p)
   g_free (data);
 }
 
-/* receive a file descriptor over file descriptor fd */
-static int 
-receive_fd (int connection_fd)
-{
-  struct msghdr msg;
-  struct iovec iov;
-  char buf[1];
-  int rv;
-  char ccmsg[CMSG_SPACE (sizeof(int))];
-  struct cmsghdr *cmsg;
-
-  iov.iov_base = buf;
-  iov.iov_len = 1;
-  msg.msg_name = 0;
-  msg.msg_namelen = 0;
-  msg.msg_iov = &iov;
-  msg.msg_iovlen = 1;
-  msg.msg_control = ccmsg;
-  msg.msg_controllen = sizeof (ccmsg);
-  
-  rv = recvmsg (connection_fd, &msg, 0);
-  if (rv == -1) 
-    {
-      perror ("recvmsg");
-      return -1;
-    }
-
-  cmsg = CMSG_FIRSTHDR (&msg);
-  if (!cmsg->cmsg_type == SCM_RIGHTS) {
-    g_warning("got control message of unknown type %d", 
-	      cmsg->cmsg_type);
-    return -1;
-  }
-
-  return *(int*)CMSG_DATA(cmsg);
-}
 
 static void
 accept_new_fd (VfsConnectionData *data,
@@ -223,7 +188,7 @@ accept_new_fd (VfsConnectionData *data,
 
   
   fd_id = data->extra_fd_count;
-  new_fd = receive_fd (data->extra_fd);
+  new_fd = _g_socket_receive_fd (data->extra_fd);
   if (new_fd != -1)
     {
       data->extra_fd_count++;
@@ -355,61 +320,6 @@ free_mount_connection (gpointer data)
   dbus_connection_unref (conn);
 }
 
-static int
-daemon_socket_connect (const char *address, GError **error)
-{
-  int fd;
-  const char *path;
-  size_t path_len;
-  struct sockaddr_un addr;
-  gboolean abstract;
-
-  fd = socket (PF_UNIX, SOCK_STREAM, 0);
-  if (fd == -1)
-    {
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   _("Error connecting to daemon: %s"), g_strerror (errno));
-      return -1;
-    }
-
-  if (g_str_has_prefix (address, "unix:abstract="))
-    {
-      path = address + strlen ("unix:abstract=");
-      abstract = TRUE;
-    }
-  else
-    {
-      path = address + strlen ("unix:path=");
-      abstract = FALSE;
-    }
-    
-  memset (&addr, 0, sizeof (addr));
-  addr.sun_family = AF_UNIX;
-  path_len = strlen (path);
-
-  if (abstract)
-    {
-      addr.sun_path[0] = '\0'; /* this is what says "use abstract" */
-      path_len++; /* Account for the extra nul byte added to the start of sun_path */
-
-      strncpy (&addr.sun_path[1], path, path_len);
-    }
-  else
-    {
-      strncpy (addr.sun_path, path, path_len);
-    }
-  
-  if (connect (fd, (struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
-    {      
-      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
-		   _("Error connecting to daemon: %s"), g_strerror (errno));
-      close (fd);
-      return -1;
-    }
-
-  return fd;
-}
-
 int
 _g_dbus_connection_get_fd_sync (DBusConnection *connection,
 				int fd_id)
@@ -425,7 +335,7 @@ _g_dbus_connection_get_fd_sync (DBusConnection *connection,
    */
   g_assert (fd_id == data->extra_fd_count);
   
-  fd = receive_fd (data->extra_fd);
+  fd = _g_socket_receive_fd (data->extra_fd);
   if (fd != -1)
     data->extra_fd_count++;
 
@@ -697,9 +607,12 @@ async_get_connection_response (DBusPendingCall *pending,
 
   /* I don't know of any way to do an async connect */
   error = NULL;
-  extra_fd = daemon_socket_connect (address2, &async_call->io_error);
+  extra_fd = _g_socket_connect (address2, &error);
   if (extra_fd == -1)
     {
+      g_set_error (&async_call->io_error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Error connecting to daemon: %s"), error->message);
+      g_error_free (error);
       dbus_message_unref (reply);
       async_dbus_call_finish (async_call, NULL);
       return;
@@ -1170,6 +1083,7 @@ get_connection_sync (const char *bus_name,
 {
   DBusConnection *bus;
   ThreadLocalConnections *local;
+  GError *local_error;
   DBusConnection *connection;
   DBusMessage *message, *reply;
   DBusError derror;
@@ -1250,9 +1164,13 @@ get_connection_sync (const char *bus_name,
 			 DBUS_TYPE_STRING, &address2,
 			 DBUS_TYPE_INVALID);
 
-  extra_fd = daemon_socket_connect (address2, error);
+  local_error = NULL;
+  extra_fd = _g_socket_connect (address2, &local_error);
   if (extra_fd == -1)
     {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_IO,
+		   _("Error connecting to daemon: %s"), local_error->message);
+      g_error_free (local_error);
       dbus_message_unref (reply);
       g_free (owner);
       return NULL;

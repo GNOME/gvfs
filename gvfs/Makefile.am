@@ -36,6 +36,7 @@ local_sources = \
 	$(NULL)
 
 daemon_sources = \
+	gsysutils.c gsysutils.h \
 	gdbusutils.c gdbusutils.h \
 	gvfsimpldaemon.c gvfsimpldaemon.h \
 	gfiledaemon.c gfiledaemon.h \
