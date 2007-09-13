@@ -40,9 +40,9 @@ g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
 
   g_object_class_install_property (object_class,
                                    PROP_BASE_STREAM,
-                                   g_param_spec_object ("base_class",
-                                                         P_("The Filter Base Class"),
-                                                         P_("The underlying base class the io ops will be done on"),
+                                   g_param_spec_object ("base-stream",
+                                                         P_("The Filter Base Stream"),
+                                                         P_("The underlying base stream the io ops will be done on"),
                                                          G_TYPE_INPUT_STREAM,
                                                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | 
                                                          G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));

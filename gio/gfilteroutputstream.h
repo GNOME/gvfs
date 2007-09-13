@@ -21,6 +21,9 @@ struct _GFilterOutputStream
 {
   GOutputStream parent;
 
+  /*< private >*/
+  GFilterOutputStreamPrivate *priv;
+
   /*< protected >*/
   GOutputStream *base_stream;
 };

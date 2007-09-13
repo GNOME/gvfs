@@ -90,6 +90,7 @@ libgio_la_SOURCES = 	\
 	gappinfo.c \
 	gasynchelper.c \
 	gasynchelper.h \
+	gbufferedoutputstream.c \
 	gcancellable.c \
 	gcontenttype.c \
 	gcontenttypeprivate.h \
@@ -152,6 +153,7 @@ gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
 	gasyncresult.h \
 	gappinfo.h \
+	gbufferedoutputstream.h \
 	gcancellable.h \
 	gcontenttype.h \
 	gdirectorymonitor.h \
