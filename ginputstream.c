@@ -843,16 +843,33 @@ g_input_stream_set_pending (GInputStream              *stream,
  *   Default implementation of async ops    *
  ********************************************/
 
+typedef struct {
+  GInputStream     *stream;
+  GError            *error;
+  gpointer           data;
+  GDestroyNotify     notify;
+} InputStreamOp;
+
+static void
+input_stream_op_free (gpointer data)
+{
+  InputStreamOp *op = data;
+
+  if (op->notify)
+    op->notify (op->data);
+
+  if (op->error)
+    g_error_free (op->error);
+
+  g_free (op);
+}
 
 typedef struct {
-  GInputStream      *stream;
+  InputStreamOp      op;
   void              *buffer;
   gsize              count_requested;
   gssize             count_read;
-  GError            *error;
   GAsyncReadCallback callback;
-  gpointer           data;
-  GDestroyNotify     notify;
 } ReadAsyncOp;
 
 static void
@@ -860,29 +877,14 @@ read_op_report (gpointer data)
 {
   ReadAsyncOp *op = data;
 
-  op->callback (op->stream,
+  op->callback (op->op.stream,
 		op->buffer,
 		op->count_requested,
 		op->count_read,
-		op->data,
-		op->error);
+		op->op.data,
+		op->op.error);
 
 }
-
-static void
-read_op_free (gpointer data)
-{
-  ReadAsyncOp *op = data;
-
-  if (op->error)
-    g_error_free (op->error);
-
-  if (op->notify)
-    op->notify (op->data);
-
-  g_free (op);
-}
-
 
 static void
 read_op_func (GIOJob *job,
@@ -894,20 +896,20 @@ read_op_func (GIOJob *job,
   if (g_io_job_is_cancelled (job))
     {
       op->count_read = -1;
-      g_set_error (&op->error,
+      g_set_error (&op->op.error,
 		   G_VFS_ERROR,
 		   G_VFS_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else
     {
-      class = G_INPUT_STREAM_GET_CLASS (op->stream);
-      op->count_read = class->read (op->stream, op->buffer, op->count_requested, &op->error);
+      class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
+      op->count_read = class->read (op->op.stream, op->buffer, op->count_requested, &op->op.error);
     }
 
   g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, read_op_report,
-			     op, read_op_free,
+			     op, input_stream_op_free,
 			     FALSE);
 }
 
@@ -917,9 +919,9 @@ read_op_cancel (gpointer data)
   ReadAsyncOp *op = data;
   GInputStreamClass *class;
 
-  class = G_INPUT_STREAM_GET_CLASS (op->stream);
+  class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
   if (class->cancel_sync)
-    class->cancel_sync (op->stream);
+    class->cancel_sync (op->op.stream);
 }
 
 static void
@@ -935,12 +937,12 @@ g_input_stream_real_read_async (GInputStream        *stream,
 
   op = g_new0 (ReadAsyncOp, 1);
 
-  op->stream = stream;
+  op->op.stream = stream;
   op->buffer = buffer;
   op->count_requested = count;
   op->callback = callback;
-  op->data = data;
-  op->notify = notify;
+  op->op.data = data;
+  op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (read_op_func,
 					       read_op_cancel,
@@ -951,13 +953,10 @@ g_input_stream_real_read_async (GInputStream        *stream,
 }
 
 typedef struct {
-  GInputStream      *stream;
+  InputStreamOp      op;
   gsize              count_requested;
   gssize             count_skipped;
-  GError            *error;
   GAsyncSkipCallback callback;
-  gpointer           data;
-  GDestroyNotify     notify;
 } SkipAsyncOp;
 
 static void
@@ -965,28 +964,13 @@ skip_op_report (gpointer data)
 {
   SkipAsyncOp *op = data;
 
-  op->callback (op->stream,
+  op->callback (op->op.stream,
 		op->count_requested,
 		op->count_skipped,
-		op->data,
-		op->error);
+		op->op.data,
+		op->op.error);
 
 }
-
-static void
-skip_op_free (gpointer data)
-{
-  SkipAsyncOp *op = data;
-
-  if (op->error)
-    g_error_free (op->error);
-
-  if (op->notify)
-    op->notify (op->data);
-
-  g_free (op);
-}
-
 
 static void
 skip_op_func (GIOJob *job,
@@ -998,20 +982,20 @@ skip_op_func (GIOJob *job,
   if (g_io_job_is_cancelled (job))
     {
       op->count_skipped = -1;
-      g_set_error (&op->error,
+      g_set_error (&op->op.error,
 		   G_VFS_ERROR,
 		   G_VFS_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else
     {
-      class = G_INPUT_STREAM_GET_CLASS (op->stream);
-      op->count_skipped = class->skip (op->stream, op->count_requested, &op->error);
+      class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
+      op->count_skipped = class->skip (op->op.stream, op->count_requested, &op->op.error);
     }
 
   g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, skip_op_report,
-			     op, skip_op_free,
+			     op, input_stream_op_free,
 			     FALSE);
 }
 
@@ -1021,9 +1005,9 @@ skip_op_cancel (gpointer data)
   SkipAsyncOp *op = data;
   GInputStreamClass *class;
 
-  class = G_INPUT_STREAM_GET_CLASS (op->stream);
+  class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
   if (class->cancel_sync)
-    class->cancel_sync (op->stream);
+    class->cancel_sync (op->op.stream);
 }
 
 static void
@@ -1038,11 +1022,11 @@ g_input_stream_real_skip_async (GInputStream        *stream,
 
   op = g_new0 (SkipAsyncOp, 1);
 
-  op->stream = stream;
+  op->op.stream = stream;
   op->count_requested = count;
   op->callback = callback;
-  op->data = data;
-  op->notify = notify;
+  op->op.data = data;
+  op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (skip_op_func,
 					       skip_op_cancel,
@@ -1052,14 +1036,10 @@ g_input_stream_real_skip_async (GInputStream        *stream,
 					       g_input_stream_get_async_context (stream));
 }
 
-
 typedef struct {
-  GInputStream      *stream;
+  InputStreamOp      op;
   gboolean           res;
-  GError            *error;
   GAsyncCloseInputCallback callback;
-  gpointer           data;
-  GDestroyNotify     notify;
 } CloseAsyncOp;
 
 static void
@@ -1067,26 +1047,11 @@ close_op_report (gpointer data)
 {
   CloseAsyncOp *op = data;
 
-  op->callback (op->stream,
+  op->callback (op->op.stream,
 		op->res,
-		op->data,
-		op->error);
+		op->op.data,
+		op->op.error);
 }
-
-static void
-close_op_free (gpointer data)
-{
-  CloseAsyncOp *op = data;
-
-  if (op->error)
-    g_error_free (op->error);
-
-  if (op->notify)
-    op->notify (op->data);
-
-  g_free (op);
-}
-
 
 static void
 close_op_func (GIOJob *job,
@@ -1098,20 +1063,20 @@ close_op_func (GIOJob *job,
   if (g_io_job_is_cancelled (job))
     {
       op->res = FALSE;
-      g_set_error (&op->error,
+      g_set_error (&op->op.error,
 		   G_VFS_ERROR,
 		   G_VFS_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else
     {
-      class = G_INPUT_STREAM_GET_CLASS (op->stream);
-      op->res = class->close (op->stream, &op->error);
+      class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
+      op->res = class->close (op->op.stream, &op->op.error);
     }
 
   g_io_job_mark_done (job);
   g_io_job_send_to_mainloop (job, close_op_report,
-			     op, close_op_free,
+			     op, input_stream_op_free,
 			     FALSE);
 }
 
@@ -1121,9 +1086,9 @@ close_op_cancel (gpointer data)
   CloseAsyncOp *op = data;
   GInputStreamClass *class;
 
-  class = G_INPUT_STREAM_GET_CLASS (op->stream);
+  class = G_INPUT_STREAM_GET_CLASS (op->op.stream);
   if (class->cancel_sync)
-    class->cancel_sync (op->stream);
+    class->cancel_sync (op->op.stream);
 }
 
 static void
@@ -1137,10 +1102,10 @@ g_input_stream_real_close_async (GInputStream       *stream,
 
   op = g_new0 (CloseAsyncOp, 1);
 
-  op->stream = stream;
+  op->op.stream = stream;
   op->callback = callback;
-  op->data = data;
-  op->notify = notify;
+  op->op.data = data;
+  op->op.notify = notify;
   
   stream->priv->io_job_id = g_schedule_io_job (close_op_func,
 					       close_op_cancel,
