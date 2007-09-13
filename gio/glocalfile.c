@@ -614,42 +614,6 @@ g_local_file_get_info (GFile                *file,
   return info;
 }
 
-static gboolean
-get_uint32 (const GFileAttributeValue *value,
-	    guint32 *val_out,
-	    GError **error)
-{
-  if (value->type != G_FILE_ATTRIBUTE_TYPE_UINT32)
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		   _("Invalid attribute type (uint32 expected)"));
-      return FALSE;
-    }
-
-  *val_out = value->u.uint32;
-  
-  return TRUE;
-}
-
-#if defined(HAVE_SYMLINK)
-static gboolean
-get_byte_string (const GFileAttributeValue *value,
-		 const char **val_out,
-		 GError **error)
-{
-  if (value->type != G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		   _("Invalid attribute type (byte string expected)"));
-      return FALSE;
-    }
-
-  *val_out = value->u.string;
-  
-  return TRUE;
-}
-#endif
-
 static GFileAttributeInfoList *
 g_local_file_query_settable_attributes (GFile                      *file,
 					GCancellable               *cancellable,
@@ -703,132 +667,12 @@ g_local_file_set_attribute (GFile *file,
 {
   GLocalFile *local = G_LOCAL_FILE (file);
 
-  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
-    {
-      guint32 val;
-
-      if (!get_uint32 (value, &val, error))
-	  return FALSE;
-
-      if (g_chmod (local->filename, val) == -1)
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting permissions: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-      return TRUE;
-    }
-#ifdef HAVE_CHOWN
-  else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0)
-    {
-      int res;
-      guint32 val;
-
-      if (!get_uint32 (value, &val, error))
-	  return FALSE;
-
-      if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
-	res = lchown (local->filename, val, -1);
-      else
-	res = chown (local->filename, val, -1);
-	
-      if (res == -1)
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting owner: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-      return TRUE;
-    }
-#endif
-#ifdef HAVE_CHOWN
-  else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
-    {
-      int res;
-      guint32 val;
-
-      if (!get_uint32 (value, &val, error))
-	  return FALSE;
-
-      if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
-	res = lchown (local->filename, -1, val);
-      else
-	res = chown (local->filename, -1, val);
-	
-      if (res == -1)
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting owner: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-      return TRUE;
-    }
-#endif
-#ifdef HAVE_SYMLINK
-  else if (strcmp (attribute, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET) == 0)
-    {
-      const char *val;
-      struct stat statbuf;
-
-      if (!get_byte_string (value, &val, error))
-	  return FALSE;
-      
-      
-      if (val == NULL)
-	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-		       _("symlink must be non-NULL"));
-	  return FALSE;
-	}
-
-      if (g_lstat (local->filename, &statbuf))
-	{
-	  g_set_error (error, G_IO_ERROR,
-		       g_io_error_from_errno (errno),
-		       _("Error setting symlink: %s"),
-		       g_strerror (errno));
-	  return FALSE;
-	}
-
-	if (!S_ISLNK (statbuf.st_mode))
-	  {
-	  g_set_error (error, G_IO_ERROR,
-		       G_IO_ERROR_NOT_SYMBOLIC_LINK,
-		       _("Error setting symlink: file is not a symlink"));
-	  return FALSE;
-	}
-
-	if (g_unlink (local->filename))
-	  {
-	    g_set_error (error, G_IO_ERROR,
-			 g_io_error_from_errno (errno),
-			 _("Error setting symlink: %s"),
-			 g_strerror (errno));
-	    return FALSE;
-	  }
-
-	if (symlink (local->filename, val) != 0)
-	  {
-	    g_set_error (error, G_IO_ERROR,
-			 g_io_error_from_errno (errno),
-			 _("Error setting symlink: %s"),
-			 g_strerror (errno));
-	    return FALSE;
-	  }
-	
-	return TRUE;
-    }
-  #endif
-  
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-	       _("Setting attribute %s not supported"), attribute);
-  return FALSE;
+  return _g_local_file_info_set_attribute (local->filename,
+					   attribute,
+					   value,
+					   flags,
+					   cancellable,
+					   error);
 }
 
 static GFileInputStream *

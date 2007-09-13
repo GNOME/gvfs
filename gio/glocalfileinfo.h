@@ -13,19 +13,25 @@ typedef struct {
   int owner;
 } GLocalParentFileInfo;
 
-void       _g_local_file_info_get_parent_info (const char             *dir,
-					       GFileAttributeMatcher  *attribute_matcher,
-					       GLocalParentFileInfo   *parent_info);
-GFileInfo *_g_local_file_info_get             (const char             *basename,
-					       const char             *path,
-					       GFileAttributeMatcher  *attribute_matcher,
-					       GFileGetInfoFlags       flags,
-					       GLocalParentFileInfo   *parent_info,
-					       GError                **error);
-GFileInfo *_g_local_file_info_get_from_fd     (int                     fd,
-					       char                   *attributes,
-					       GError                **error);
-char *     _g_local_file_info_create_etag     (struct stat            *statbuf);
+void       _g_local_file_info_get_parent_info (const char                 *dir,
+					       GFileAttributeMatcher      *attribute_matcher,
+					       GLocalParentFileInfo       *parent_info);
+GFileInfo *_g_local_file_info_get             (const char                 *basename,
+					       const char                 *path,
+					       GFileAttributeMatcher      *attribute_matcher,
+					       GFileGetInfoFlags           flags,
+					       GLocalParentFileInfo       *parent_info,
+					       GError                    **error);
+GFileInfo *_g_local_file_info_get_from_fd     (int                         fd,
+					       char                       *attributes,
+					       GError                    **error);
+char *     _g_local_file_info_create_etag     (struct stat                *statbuf);
+gboolean   _g_local_file_info_set_attribute   (char                       *filename,
+					       const char                 *attribute,
+					       const GFileAttributeValue  *value,
+					       GFileGetInfoFlags           flags,
+					       GCancellable               *cancellable,
+					       GError                    **error);
 
 G_END_DECLS
 
