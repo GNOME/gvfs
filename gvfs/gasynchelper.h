@@ -2,6 +2,7 @@
 #define __G_ASYNC_HELPER_H__
 
 #include <glib-object.h>
+#include "gcancellable.h"
 
 G_BEGIN_DECLS
 
@@ -12,15 +13,23 @@ typedef struct {
   GDestroyNotify destroy_notify;
 } GAsyncResult;
 
-void
-_g_queue_async_result (GAsyncResult   *result,
-		       gpointer        async_object,
-		       GError         *error,
-		       gpointer        data,
-		       GDestroyNotify  destroy_notify,
-		       GMainContext   *context,
-		       GSourceFunc     source_func);
- 
+typedef void (*GFDSourceFunc) (gpointer  data,
+			       GObject  *object,
+			       int fd);
+
+void     _g_queue_async_result (GAsyncResult    *result,
+				gpointer         async_object,
+				GError          *error,
+				gpointer         data,
+				GDestroyNotify   destroy_notify,
+				GMainContext    *context,
+				GSourceFunc      source_func);
+
+GSource *_g_fd_source_new      (GObject         *object,
+				int              fd,
+				gushort          events,
+				GMainContext    *context,
+				GCancellable    *cancellable);
 
 G_END_DECLS
 
