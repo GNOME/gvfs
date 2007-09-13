@@ -9,6 +9,7 @@
 #include <glib/gthread.h>
 #include <glib/gi18n.h>
 #include "gvfsdaemonutils.h"
+#include "gvfsdaemonprotocol.h"
 
 static gint32 extra_fd_slot = -1;
 static GStaticMutex extra_lock = G_STATIC_MUTEX_INIT;
@@ -173,3 +174,36 @@ dbus_connection_send_fd (DBusConnection *connection,
 
   return TRUE;
 }
+
+char *
+g_error_to_daemon_reply (GError *error, gsize *len_out)
+{
+  char *buffer;
+  const char *domain;
+  gsize domain_len, message_len;
+  GVfsDaemonSocketProtocolReply *reply;
+  gsize len;
+  
+  domain = g_quark_to_string (error->domain);
+  domain_len = strlen (domain);
+  message_len = strlen (error->message);
+
+  len = G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE +
+    domain_len + 1 + message_len + 1;
+  buffer = g_malloc (len);
+
+  reply = (GVfsDaemonSocketProtocolReply *)buffer;
+  reply->type = G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_ERROR;
+  reply->arg1 = error->code;
+  reply->arg2 = domain_len + 1 + message_len + 1;
+
+  memcpy (buffer + G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
+	  domain, domain_len + 1);
+  memcpy (buffer + G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE + domain_len + 1,
+	  error->message, message_len + 1);
+  
+  *len_out = len;
+  
+  return buffer;
+}
+
