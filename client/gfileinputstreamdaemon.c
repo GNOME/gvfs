@@ -200,6 +200,9 @@ g_file_input_stream_daemon_finalize (GObject *object)
     g_object_unref (file->command_stream);
   if (file->data_stream)
     g_object_unref (file->data_stream);
+
+  g_string_free (file->input_buffer, TRUE);
+  g_string_free (file->output_buffer, TRUE);
   
   if (G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_input_stream_daemon_parent_class)->finalize) (object);
