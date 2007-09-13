@@ -316,7 +316,8 @@ g_input_stream_real_skip (GInputStream         *stream,
   char *buffer;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
-  
+
+  /* TODO: Skip fallback uses too much memory, should do multiple calls */
   buffer = g_malloc (count);
   ret = class->read (stream, buffer, count, cancellable, error);
   g_free (buffer);
@@ -1048,31 +1049,86 @@ skip_op_func (GIOJob *job,
 			     FALSE);
 }
 
+typedef struct {
+  char *buffer;
+  gpointer user_data;
+  GAsyncSkipCallback callback;
+  GDestroyNotify notify;
+} SkipFallbackAsyncData;
+
+static void
+skip_callback_wrapper (GInputStream *stream,
+		       void         *buffer,
+		       gsize         count_requested,
+		       gssize        count_skipped,
+		       gpointer      _data,
+		       GError       *error)
+{
+  SkipFallbackAsyncData *data = _data;
+
+  data->callback (stream, count_requested, count_skipped, data->user_data, error);
+}
+
+static void
+skip_notify_wrapper (gpointer _data)
+{
+  SkipFallbackAsyncData *data = _data;
+
+  if (data->notify)
+    data->notify (data->user_data);
+  
+  g_free (data->buffer);
+  g_free (data);
+}
+
 static void
 g_input_stream_real_skip_async (GInputStream        *stream,
 				gsize                count,
 				int                  io_priority,
 				GAsyncSkipCallback   callback,
-				gpointer             data,
+				gpointer             user_data,
 				GDestroyNotify       notify,
 				GCancellable        *cancellable)
 {
+  GInputStreamClass *class;
   SkipAsyncOp *op;
+  SkipFallbackAsyncData *data;
 
-  op = g_new0 (SkipAsyncOp, 1);
+  class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  op->op.stream = stream;
-  op->count_requested = count;
-  op->callback = callback;
-  op->op.data = data;
-  op->op.notify = notify;
-  
-  g_schedule_io_job (skip_op_func,
-		     op,
-		     NULL,
-		     io_priority,
-		     g_input_stream_get_async_context (stream),
-		     cancellable);
+  if (class->read_async == g_input_stream_real_read_async)
+    {
+      /* Read is thread-using async fallback. Make skip use
+       * threads too, so that we can use a possible sync skip
+       * implementation. */
+      op = g_new0 (SkipAsyncOp, 1);
+      
+      op->op.stream = stream;
+      op->count_requested = count;
+      op->callback = callback;
+      op->op.data = user_data;
+      op->op.notify = notify;
+      
+      g_schedule_io_job (skip_op_func,
+			 op,
+			 NULL,
+			 io_priority,
+			 g_input_stream_get_async_context (stream),
+			 cancellable);
+    }
+  else
+    {
+      /* TODO: Skip fallback uses too much memory, should do multiple calls */
+      /* Custom async read function, lets use that. */
+      data = g_new (SkipFallbackAsyncData, 1);
+      data->buffer = g_malloc (count);
+      data->notify = notify;
+      data->callback = callback;
+      data->user_data = user_data;
+      class->read_async (stream, data->buffer, count, io_priority,
+			 skip_callback_wrapper, data, skip_notify_wrapper, cancellable);
+    }
+
 }
 
 typedef struct {
