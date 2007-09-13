@@ -411,3 +411,46 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 	       _("Invalid file info format"));
   return NULL;
 }
+
+
+GFileAttributeInfoList *
+_g_dbus_get_attribute_info_list (DBusMessageIter *iter,
+				 GError **error)
+{
+  GFileAttributeInfoList *list;
+  DBusMessageIter array_iter, struct_iter;
+  const char *name;
+  dbus_uint32_t type;
+  
+  if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_ARRAY ||
+      dbus_message_iter_get_element_type (iter) != DBUS_TYPE_STRUCT)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Invalid attribute info list content"));
+      return NULL;
+    }
+
+  list = g_file_attribute_info_list_new ();
+
+  dbus_message_iter_recurse (iter, &array_iter);
+  while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
+    {
+      dbus_message_iter_recurse (&array_iter, &struct_iter);
+
+      if (dbus_message_iter_get_arg_type (&struct_iter) == DBUS_TYPE_STRING)
+	{
+	  dbus_message_iter_get_basic (&struct_iter, &name);
+	  dbus_message_iter_next (&struct_iter);
+	  
+	  if (dbus_message_iter_get_arg_type (&struct_iter) == DBUS_TYPE_UINT32)
+	    {
+	      dbus_message_iter_get_basic (&struct_iter, &type);
+	      g_file_attribute_info_list_add (list, name, type);
+	    }
+	}
+  
+      dbus_message_iter_next (&array_iter);
+    }
+
+  return list;
+}

@@ -1330,6 +1330,55 @@ g_daemon_file_make_symbolic_link (GFile *file,
   return TRUE;
 }
 
+static GFileAttributeInfoList *
+g_daemon_file_query_settable_attributes (GFile                      *file,
+					 GCancellable               *cancellable,
+					 GError                    **error)
+{
+  DBusMessage *reply;
+  GFileAttributeInfoList *list;
+  DBusMessageIter iter;
+
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES,
+			     NULL, cancellable, error,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  dbus_message_iter_init (reply, &iter);
+  list = _g_dbus_get_attribute_info_list (&iter, error);
+  
+  dbus_message_unref (reply);
+  
+  return list;
+}
+
+static GFileAttributeInfoList *
+g_daemon_file_query_writable_namespaces (GFile                      *file,
+					 GCancellable               *cancellable,
+					 GError                    **error)
+{
+  DBusMessage *reply;
+  GFileAttributeInfoList *list;
+  DBusMessageIter iter;
+
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES,
+			     NULL, cancellable, error,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+  dbus_message_iter_init (reply, &iter);
+  list = _g_dbus_get_attribute_info_list (&iter, error);
+  
+  dbus_message_unref (reply);
+  
+  return list;
+
+}
+
 static gboolean
 g_daemon_file_set_attribute (GFile *file,
 			     const char *attribute,
@@ -1534,6 +1583,8 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->make_directory = g_daemon_file_make_directory;
   iface->copy = g_daemon_file_copy;
   iface->move = g_daemon_file_move;
+  iface->query_settable_attributes = g_daemon_file_query_settable_attributes;
+  iface->query_writable_namespaces = g_daemon_file_query_writable_namespaces;
   iface->set_attribute = g_daemon_file_set_attribute;
   iface->make_symbolic_link = g_daemon_file_make_symbolic_link;
 }

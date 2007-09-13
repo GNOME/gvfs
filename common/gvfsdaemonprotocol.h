@@ -35,6 +35,8 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_COPY "Copy"
 #define G_VFS_DBUS_MOUNT_OP_MOVE "Move"
 #define G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE "SetAttribute"
+#define G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES "QuerySettableAttributes"
+#define G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES "QueryWritableNamespaces"
 
 /* Progress callback interface for copy and move */
 #define G_VFS_DBUS_PROGRESS_INTERFACE "org.gtk.vfs.Progress"
@@ -142,6 +144,9 @@ gboolean   _g_dbus_get_file_attribute            (DBusMessageIter            *it
 						  GFileAttributeValue        *value);
 GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter            *iter,
 						  GError                    **error);
+
+GFileAttributeInfoList *_g_dbus_get_attribute_info_list (DBusMessageIter *iter,
+							 GError **error);
 
 G_END_DECLS
 
