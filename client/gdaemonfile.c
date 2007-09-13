@@ -1213,6 +1213,45 @@ g_daemon_file_get_filesystem_info (GFile                *file,
 }
 
 static GFile *
+g_daemon_file_get_child_for_display_name (GFile        *file,
+					  const char   *display_name,
+					  GError      **error)
+{
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+  GMountRef *mount_ref;
+  char *basename;
+  GFile *child;
+
+  mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
+						daemon_file->path,
+						NULL);
+
+
+  if (mount_ref && mount_ref->prefered_filename_encoding)
+    {
+      basename = g_convert (display_name, -1,
+			    mount_ref->prefered_filename_encoding,
+			    "UTF-8",
+			    NULL, NULL,
+			    NULL);
+      if (basename == NULL)
+	{
+	  g_set_error (error, G_IO_ERROR,
+		       G_IO_ERROR_INVALID_FILENAME,
+		       _("Invalid filename %s"), display_name);
+	  return NULL;
+	}
+      
+      child = g_file_get_child (file, basename);
+      g_free (basename);
+    }
+  else
+    child = g_file_get_child (file, display_name);
+  
+  return child;
+}
+
+static GFile *
 g_daemon_file_set_display_name (GFile *file,
 				const char *display_name,
 				GCancellable *cancellable,
@@ -1569,6 +1608,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_parse_name = g_daemon_file_get_parse_name;
   iface->get_parent = g_daemon_file_get_parent;
   iface->resolve_relative = g_daemon_file_resolve_relative;
+  iface->get_child_for_display_name = g_daemon_file_get_child_for_display_name;
   iface->enumerate_children = g_daemon_file_enumerate_children;
   iface->get_info = g_daemon_file_get_info;
   iface->read = g_daemon_file_read;
