@@ -9,7 +9,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gio/gfile.h>
 #include <gio/glocalfile.h>
 
@@ -65,8 +65,8 @@ open_idle_cb (gpointer data)
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_VFS_ERROR,
-			G_VFS_ERROR_CANCELLED,
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+			G_IO_ERROR_CANCELLED,
 			_("Operation was cancelled"));
       return FALSE;
     }
@@ -96,8 +96,8 @@ open_read_cancelled_cb (GVfsJob *job, gpointer data)
   g_print ("open_read_cancelled_cb\n");
   
   if (g_source_remove (tag))
-    g_vfs_job_failed (job, G_VFS_ERROR,
-		      G_VFS_ERROR_CANCELLED,
+    g_vfs_job_failed (job, G_IO_ERROR,
+		      G_IO_ERROR_CANCELLED,
 		      _("Operation was cancelled"));
 }
 
@@ -157,8 +157,8 @@ read_cancelled_cb (GVfsJob *job, gpointer data)
   guint tag = GPOINTER_TO_INT (job->backend_data);
 
   g_source_remove (tag);
-  g_vfs_job_failed (job, G_VFS_ERROR,
-		    G_VFS_ERROR_CANCELLED,
+  g_vfs_job_failed (job, G_IO_ERROR,
+		    G_IO_ERROR_CANCELLED,
 		    _("Operation was cancelled"));
 }
 

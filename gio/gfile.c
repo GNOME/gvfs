@@ -213,8 +213,8 @@ g_file_enumerate_children (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -237,8 +237,8 @@ g_file_get_info (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -258,8 +258,8 @@ g_file_read (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -279,8 +279,8 @@ g_file_append_to (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -300,8 +300,8 @@ g_file_create (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -323,8 +323,8 @@ g_file_replace (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -457,8 +457,8 @@ g_file_copy (GFile                  *source,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -475,7 +475,7 @@ g_file_copy (GFile                  *source,
 	  if (res)
 	    return TRUE;
 	  
-	  if (my_error->domain != G_VFS_ERROR || my_error->code != G_VFS_ERROR_NOT_SUPPORTED)
+	  if (my_error->domain != G_IO_ERROR || my_error->code != G_IO_ERROR_NOT_SUPPORTED)
 	    {
 	      g_propagate_error (error, my_error);
 	      return FALSE;
@@ -504,8 +504,8 @@ g_file_move (GFile                  *source,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -522,7 +522,7 @@ g_file_move (GFile                  *source,
 	  if (res)
 	    return TRUE;
 	  
-	  if (my_error->domain != G_VFS_ERROR || my_error->code != G_VFS_ERROR_NOT_SUPPORTED)
+	  if (my_error->domain != G_IO_ERROR || my_error->code != G_IO_ERROR_NOT_SUPPORTED)
 	    {
 	      g_propagate_error (error, my_error);
 	      return FALSE;
@@ -548,8 +548,8 @@ g_file_make_directory (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -570,8 +570,8 @@ g_file_make_symbolic_link (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -591,8 +591,8 @@ g_file_delete (GFile *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -614,8 +614,8 @@ g_file_set_display_name (GFile                  *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -639,8 +639,8 @@ g_file_set_attribute (GFile                  *file,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }
@@ -791,8 +791,8 @@ read_op_func (GIOJob *job,
     {
       op->res_stream = NULL;
       g_set_error (&op->op.error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else

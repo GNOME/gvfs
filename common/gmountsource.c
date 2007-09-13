@@ -2,7 +2,7 @@
 
 #include <gmountsource.h>
 #include <gdbusutils.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gvfsdaemonprotocol.h>
 
 struct _GMountSource
@@ -136,7 +136,7 @@ send_sync_and_unref (DBusMessage *message,
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INTERNAL_ERROR,
 		   "Can't open dbus connection");
       dbus_message_unref (message);
       return NULL;

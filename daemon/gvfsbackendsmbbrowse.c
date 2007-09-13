@@ -9,7 +9,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gio/gfile.h>
 
 #include "gvfsbackendsmbbrowse.h"

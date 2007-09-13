@@ -342,8 +342,8 @@ g_local_file_get_child_for_display_name (GFile        *file,
   basename = g_filename_from_utf8 (display_name, -1, NULL, NULL, NULL);
   if (basename == NULL)
     {
-      g_set_error (error, G_VFS_ERROR,
-		   G_VFS_ERROR_INVALID_FILENAME,
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_INVALID_FILENAME,
 		   _("Invalid filename %s"), display_name);
       return NULL;
     }
@@ -562,8 +562,8 @@ g_local_file_set_attribute (GFile *file,
 
 	if (!S_ISLNK (statbuf.st_mode))
 	  {
-	  g_set_error (error, G_VFS_ERROR,
-		       G_VFS_ERROR_NOT_SYMBOLIC_LINK,
+	  g_set_error (error, G_IO_ERROR,
+		       G_IO_ERROR_NOT_SYMBOLIC_LINK,
 		       _("Error setting symlink: file is not a symlink"));
 	  return FALSE;
 	}
@@ -589,7 +589,7 @@ g_local_file_set_attribute (GFile *file,
 	return TRUE;
     }
   
-  g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED, "Copy not supported");
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Copy not supported");
   return FALSE;
 }
 
@@ -714,7 +714,7 @@ g_local_file_copy (GFile                *source,
 		   GError              **error)
 {
   /* Fall back to default copy */
-  g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED, "Copy not supported");
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Copy not supported");
   return FALSE;
 }
 
@@ -757,8 +757,8 @@ g_local_file_move (GFile                *source,
       if (rename (local_destination->filename, backup_name) == -1)
 	{
       	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANT_CREATE_BACKUP,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANT_CREATE_BACKUP,
 		       _("Backup file creation failed"));
 	  g_free (backup_name);
 	  return FALSE;

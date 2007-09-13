@@ -24,7 +24,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "glocalfileinfo.h"
-#include "gvfserror.h"
+#include "gioerror.h"
 
 static gchar *
 read_link (const gchar *full_name)

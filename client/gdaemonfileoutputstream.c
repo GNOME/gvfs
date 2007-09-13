@@ -12,7 +12,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gio/gseekable.h>
 #include "gdaemonfileoutputstream.h"
 #include "gvfsdaemondbus.h"
@@ -230,8 +230,8 @@ static gboolean
 error_is_cancel (GError *error)
 {
   return error != NULL &&
-    error->domain == G_VFS_ERROR &&
-    error->code == G_VFS_ERROR_CANCELLED;
+    error->domain == G_IO_ERROR &&
+    error->code == G_IO_ERROR_CANCELLED;
 }
 
 static void
@@ -412,8 +412,8 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	    {
 	      op->ret_val = -1;
 	      g_set_error (&op->ret_error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
+			   G_IO_ERROR,
+			   G_IO_ERROR_CANCELLED,
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -544,8 +544,8 @@ g_daemon_file_output_stream_write (GOutputStream *stream,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return -1;
     }
@@ -596,8 +596,8 @@ iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	    {
 	      op->ret_val = FALSE;
 	      g_set_error (&op->ret_error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
+			   G_IO_ERROR,
+			   G_IO_ERROR_CANCELLED,
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -789,8 +789,8 @@ iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_o
 	    {
 	      op->ret_val = -1;
 	      g_set_error (&op->ret_error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
+			   G_IO_ERROR,
+			   G_IO_ERROR_CANCELLED,
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -901,7 +901,7 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
 
   if (!file->can_seek)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		   _("Seek not supported on stream"));
       return FALSE;
     }
@@ -909,8 +909,8 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return FALSE;
     }

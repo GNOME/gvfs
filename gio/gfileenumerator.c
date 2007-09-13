@@ -89,14 +89,14 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
   
   if (enumerator->priv->stopped)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Enumerator is stopped"));
       return NULL;
     }
 
   if (enumerator->priv->pending)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("File enumerator has outstanding operation"));
       return NULL;
     }
@@ -130,7 +130,7 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Releases all resources used by this enumerator, making the
- * enumerator return %G_VFS_ERROR_CLOSED on all calls.
+ * enumerator return %G_IO_ERROR_CLOSED on all calls.
  *
  * This will be automatically called when the last reference
  * is dropped, but you might want to call make sure resources
@@ -153,7 +153,7 @@ g_file_enumerator_stop (GFileEnumerator *enumerator,
   
   if (enumerator->priv->pending)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("File enumerator has outstanding operation"));
       return FALSE;
     }
@@ -243,10 +243,10 @@ next_async_callback_wrapper (GFileEnumerator *enumerator,
  * or at the end of the enumerator. In case of a partial error the callback will
  * be called with any succeeding items and no error, and on the next request the
  * error will be reported. If a request is cancelled the callback will be called
- * with %G_VFS_ERROR_CANCELLED.
+ * with %G_IO_ERROR_CANCELLED.
  *
  * During an async request no other sync and async calls are allowed, and will
- * result in %G_VFS_ERROR_PENDING errors. 
+ * result in %G_IO_ERROR_PENDING errors. 
  *
  * Any outstanding i/o request with higher priority (lower numerical value) will
  * be executed before an outstanding request with lower priority. Default
@@ -276,7 +276,7 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
   if (enumerator->priv->stopped)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("File enumerator is already closed"));
       queue_next_async_result (enumerator, -1, error,
 			       callback, data);
@@ -286,7 +286,7 @@ g_file_enumerator_next_files_async (GFileEnumerator        *enumerator,
   if (enumerator->priv->pending)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("File enumerator has outstanding operation"));
       queue_next_async_result (enumerator, -1, error,
 			       callback, data);
@@ -371,7 +371,7 @@ g_file_enumerator_stop_async (GFileEnumerator                *enumerator,
   if (enumerator->priv->stopped)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("File enumerator is already stopped"));
       queue_stop_async_result (enumerator, FALSE, error,
 			       callback, data);
@@ -381,7 +381,7 @@ g_file_enumerator_stop_async (GFileEnumerator                *enumerator,
   if (enumerator->priv->pending)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("File enumerator has outstanding operation"));
       queue_stop_async_result (enumerator, FALSE, error,
 			       callback, data);
@@ -483,8 +483,8 @@ next_op_func (GIOJob *job,
 	{
 	  info = NULL;
 	  g_set_error (&op->op.error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	}
       else
@@ -569,8 +569,8 @@ stop_op_func (GIOJob *job,
     {
       op->result = FALSE;
       g_set_error (&op->op.error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else 

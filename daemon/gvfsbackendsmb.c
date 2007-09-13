@@ -9,7 +9,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gio/gfile.h>
 
 #include "gvfsbackendsmb.h"
@@ -592,7 +592,7 @@ do_seek_on_read (GVfsBackend *backend,
       break;
     default:
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Unsupported seek type"));
       return;
     }
@@ -872,8 +872,8 @@ do_replace (GVfsBackend *backend,
 	      original_stat.st_mtime != mtime)
 	    {
 	      g_set_error (&error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_WRONG_MTIME,
+			   G_IO_ERROR,
+			   G_IO_ERROR_WRONG_MTIME,
 			   _("The file was externally modified"));
 	      goto error;
 	    }
@@ -901,13 +901,13 @@ do_replace (GVfsBackend *backend,
 		{
 		  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
 		    g_set_error (&error,
-				 G_VFS_ERROR,
-				 G_VFS_ERROR_CANCELLED,
+				 G_IO_ERROR,
+				 G_IO_ERROR_CANCELLED,
 				 _("Operation was cancelled"));
 		  else
 		    g_set_error (&error,
-				 G_VFS_ERROR,
-				 G_VFS_ERROR_CANT_CREATE_BACKUP,
+				 G_IO_ERROR,
+				 G_IO_ERROR_CANT_CREATE_BACKUP,
 				 _("Backup file creation failed"));
 		  goto error;
 		}
@@ -1001,7 +1001,7 @@ do_seek_on_write (GVfsBackend *backend,
       break;
     default:
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Unsupported seek type"));
       return;
     }
@@ -1049,7 +1049,7 @@ do_close_write (GVfsBackend *backend,
 	    {
 	      op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
 	      g_vfs_job_failed (G_VFS_JOB (job),
-				G_VFS_ERROR, G_VFS_ERROR_CANT_CREATE_BACKUP,
+				G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
 				_("Backup file creation failed: %d"), errno);
 	      goto out;
 	    }

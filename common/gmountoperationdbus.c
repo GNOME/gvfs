@@ -5,7 +5,7 @@
 #include <dbus/dbus.h>
 
 #include <gio/gvfstypes.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
@@ -370,7 +370,7 @@ mount_op_done (GMountOperationDBus *op_dbus,
 				     code, error_message);
       else
 	{
-	  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
+	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INTERNAL_ERROR,
 		       "Can't parse mount error: %s", derror.message);
 	  dbus_error_free (&derror);
 	}

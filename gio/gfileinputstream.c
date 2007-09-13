@@ -68,14 +68,14 @@ g_file_input_stream_get_file_info (GFileInputStream     *stream,
   
   if (g_input_stream_is_closed (input_stream))
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       return NULL;
     }
   
   if (g_input_stream_has_pending (input_stream))
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       return NULL;
     }
@@ -91,7 +91,7 @@ g_file_input_stream_get_file_info (GFileInputStream     *stream,
   if (class->get_file_info)
     info = class->get_file_info (stream, attributes, cancellable, error);
   else
-    g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		 _("Stream doesn't support get_file_info"));
 
   if (cancellable)
@@ -158,21 +158,21 @@ g_file_input_stream_seek (GSeekable  *seekable,
 
   if (g_input_stream_is_closed (input_stream))
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       return FALSE;
     }
   
   if (g_input_stream_has_pending (input_stream))
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       return FALSE;
     }
   
   if (!class->seek)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		   _("Seek not supported on stream"));
       return FALSE;
     }
@@ -204,7 +204,7 @@ g_file_input_stream_truncate (GSeekable  *seekable,
 			      GCancellable  *cancellable,
 			      GError    **error)
 {
-  g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 	       _("Truncate not allowed on input stream"));
   return FALSE;
 }

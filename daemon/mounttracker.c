@@ -13,7 +13,7 @@
 #include "gdbusutils.h"
 #include "gmountspec.h"
 #include "gvfsdaemonprotocol.h"
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gmountoperationdbus.h>
 #include <mount.h>
 
@@ -252,7 +252,7 @@ automount_done (GMountOperation *op,
   if (!succeeded)
     {
       GError *mount_error = NULL;
-      g_set_error (&mount_error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+      g_set_error (&mount_error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
 		   _("Automount failed: %s"), error->message);
       reply = _dbus_message_new_error_from_gerror (data->message, mount_error);
       g_error_free (mount_error);
@@ -311,7 +311,7 @@ maybe_automount (GMountTracker *tracker,
   else
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
 		   (mountable == NULL) ?
 		   _("Location is not mountable") :
 		   _("Location is not mounted"));
@@ -457,7 +457,7 @@ mount (GMountTracker *tracker,
 	  if (mount != NULL)
 	    {
 	      error = NULL;
-	      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_ALREADY_MOUNTED,
+	      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_ALREADY_MOUNTED,
 			   _("Location is already mounted"));
 	      reply = _dbus_message_new_error_from_gerror (message, error);
 	      g_error_free (error);
@@ -471,7 +471,7 @@ mount (GMountTracker *tracker,
 	      else
 		{
 		  error = NULL;
-		  g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_NOT_MOUNTED,
+		  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
 			       _("Location is not mountable"));
 		  reply = _dbus_message_new_error_from_gerror (message, error);
 		  g_error_free (error);

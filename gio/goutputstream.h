@@ -3,7 +3,7 @@
 
 #include <glib-object.h>
 #include <gio/gvfstypes.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gio/gcancellable.h>
 
 G_BEGIN_DECLS
@@ -43,7 +43,7 @@ typedef void (*GAsyncFlushCallback)  (GOutputStream *stream,
  *
  * The callback is always called, even if the operation was cancelled.
  * If the operation was cancelled @result will be %FALSE, and @error
- * will be %G_VFS_ERROR_CANCELLED.
+ * will be %G_IO_ERROR_CANCELLED.
  **/
 typedef void (*GAsyncCloseOutputCallback)  (GOutputStream *stream,
 					    gboolean      result,

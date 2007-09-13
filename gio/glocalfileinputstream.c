@@ -9,7 +9,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
-#include "gvfserror.h"
+#include "gioerror.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileinfo.h"
 
@@ -101,8 +101,8 @@ g_local_file_input_stream_read (GInputStream *stream,
       if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  break;
 	}
@@ -138,8 +138,8 @@ g_local_file_input_stream_skip (GInputStream *stream,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return -1;
     }
@@ -209,8 +209,8 @@ g_local_file_input_stream_get_file_info (GFileInputStream     *stream,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }

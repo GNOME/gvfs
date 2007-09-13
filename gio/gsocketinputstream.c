@@ -11,7 +11,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
-#include "gvfserror.h"
+#include "gioerror.h"
 #include "gsocketinputstream.h"
 #include "gcancellable.h"
 #include "gasynchelper.h"
@@ -143,8 +143,8 @@ g_socket_input_stream_read (GInputStream *stream,
       if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  break;
 	}
@@ -219,8 +219,8 @@ read_async_cb (ReadAsyncData *data,
       if (g_cancellable_is_cancelled (data->cancellable))
 	{
 	  g_set_error (&error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  count_read = -1;
 	  break;

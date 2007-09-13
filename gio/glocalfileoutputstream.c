@@ -9,7 +9,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
-#include "gvfserror.h"
+#include "gioerror.h"
 #include "glocalfileoutputstream.h"
 #include "glocalfileinfo.h"
 
@@ -99,8 +99,8 @@ g_local_file_output_stream_write (GOutputStream *stream,
       if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  return -1;
 	}
@@ -144,8 +144,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
 	  if (g_cancellable_is_cancelled (cancellable))
 	    {
 	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANCELLED,
+			   G_IO_ERROR,
+			   G_IO_ERROR_CANCELLED,
 			   _("Operation was cancelled"));
 	      goto err_out;
 	    }
@@ -165,8 +165,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
       if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  goto err_out;
 	}
@@ -187,8 +187,8 @@ g_local_file_output_stream_close (GOutputStream *stream,
       if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  goto err_out;
 	}
@@ -243,8 +243,8 @@ g_local_file_output_stream_get_file_info (GFileOutputStream     *stream,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -265,8 +265,8 @@ g_local_file_output_stream_create  (const char   *filename,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -299,8 +299,8 @@ g_local_file_output_stream_append  (const char   *filename,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -458,8 +458,8 @@ handle_overwrite_open (const char *filename,
 		     _("Target file is a directory"));
       else
 	g_set_error (error,
-		     G_VFS_ERROR,
-		     G_VFS_ERROR_NOT_REGULAR_FILE,
+		     G_IO_ERROR,
+		     G_IO_ERROR_NOT_REGULAR_FILE,
 		     _("Target file is not a regular file"));
       goto err_out;
     }
@@ -468,8 +468,8 @@ handle_overwrite_open (const char *filename,
       original_stat.st_mtime != original_mtime)
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_WRONG_MTIME,
+		   G_IO_ERROR,
+		   G_IO_ERROR_WRONG_MTIME,
 		   _("The file was externally modified"));
       goto err_out;
     }
@@ -528,8 +528,8 @@ handle_overwrite_open (const char *filename,
       if (unlink (backup_filename) == -1 && errno != ENOENT)
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANT_CREATE_BACKUP,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANT_CREATE_BACKUP,
 		       _("Backup file creation failed"));
 	  g_free (backup_filename);
 	  goto err_out;
@@ -542,8 +542,8 @@ handle_overwrite_open (const char *filename,
       if (bfd == -1)
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANT_CREATE_BACKUP,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANT_CREATE_BACKUP,
 		       _("Backup file creation failed"));
 	  g_free (backup_filename);
 	  goto err_out;
@@ -560,8 +560,8 @@ handle_overwrite_open (const char *filename,
 		      ((original_stat.st_mode & 07) << 3)) != 0)
 	    {
 	      g_set_error (error,
-			   G_VFS_ERROR,
-			   G_VFS_ERROR_CANT_CREATE_BACKUP,
+			   G_IO_ERROR,
+			   G_IO_ERROR_CANT_CREATE_BACKUP,
 			   _("Backup file creation failed"));
 	      unlink (backup_filename);
 	      close (bfd);
@@ -573,8 +573,8 @@ handle_overwrite_open (const char *filename,
       if (!copy_file_data (fd, bfd, NULL))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANT_CREATE_BACKUP,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANT_CREATE_BACKUP,
 		       _("Backup file creation failed"));
 	  unlink (backup_filename);
 	  close (bfd);
@@ -628,8 +628,8 @@ g_local_file_output_stream_replace (const char   *filename,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }

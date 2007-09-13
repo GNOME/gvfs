@@ -11,7 +11,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include "gdbusutils.h"
@@ -544,8 +544,8 @@ async_get_connection_response (DBusMessage *reply,
   if (g_cancellable_is_cancelled (async_call->cancellable))
     {
       g_set_error (&async_call->io_error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       async_call_finish (async_call, NULL);
       return;
@@ -624,8 +624,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }
@@ -640,8 +640,8 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
       return NULL;
     }

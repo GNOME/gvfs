@@ -96,7 +96,7 @@ g_input_stream_init (GInputStream *stream)
  *
  * If @cancellable is not NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
- * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned. If an
+ * was cancelled, the error G_IO_ERROR_CANCELLED will be returned. If an
  * operation was partially finished when the operation was cancelled the
  * partial result will be returned, without an error.
  *
@@ -130,14 +130,14 @@ g_input_stream_read  (GInputStream  *stream,
 
   if (stream->priv->closed)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       return -1;
     }
   
   if (stream->priv->pending)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       return -1;
     }
@@ -146,7 +146,7 @@ g_input_stream_read  (GInputStream  *stream,
 
   if (class->read == NULL) 
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_INTERNAL_ERROR,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INTERNAL_ERROR,
 		   _("Input stream doesn't implement read"));
       return -1;
     }
@@ -238,7 +238,7 @@ g_input_stream_read_all (GInputStream              *stream,
  *
  * If @cancellable is not NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
- * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned. If an
+ * was cancelled, the error G_IO_ERROR_CANCELLED will be returned. If an
  * operation was partially finished when the operation was finished the
  * partial result will be returned, without an error.
  *
@@ -268,14 +268,14 @@ g_input_stream_skip (GInputStream         *stream,
   
   if (stream->priv->closed)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       return -1;
     }
 
   if (stream->priv->pending)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       return -1;
     }
@@ -322,7 +322,7 @@ g_input_stream_real_skip (GInputStream         *stream,
  *
  * Closes the stream, releasing resources related to it.
  *
- * Once the stream is closed, all other operations will return %G_VFS_ERROR_CLOSED.
+ * Once the stream is closed, all other operations will return %G_IO_ERROR_CLOSED.
  * Closing a stream multiple times will not return an error.
  *
  * Streams will be automatically closed when the last reference
@@ -335,12 +335,12 @@ g_input_stream_real_skip (GInputStream         *stream,
  *
  * On failure the first error that happened will be reported, but the close
  * operation will finish as much as possible. A stream that failed to
- * close will still return %G_VFS_ERROR_CLOSED all operations. Still, it
+ * close will still return %G_IO_ERROR_CLOSED all operations. Still, it
  * is important to check and report the error to the user.
  *
  * If @cancellable is not NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
- * was cancelled, the error G_VFS_ERROR_CANCELLED will be returned.
+ * was cancelled, the error G_IO_ERROR_CANCELLED will be returned.
  * Cancelling a close will still leave the stream closed, but some streams
  * can use a faster close that doesn't block to e.g. check errors. 
  *
@@ -364,7 +364,7 @@ g_input_stream_close (GInputStream  *stream,
 
   if (stream->priv->pending)
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       return FALSE;
     }
@@ -466,7 +466,7 @@ read_async_callback_wrapper (GInputStream *stream,
  * giving the results.
  *
  * During an async request no other sync and async calls are allowed, and will
- * result in %G_VFS_ERROR_PENDING errors. 
+ * result in %G_IO_ERROR_PENDING errors. 
  *
  * A value of @count larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
  *
@@ -520,7 +520,7 @@ g_input_stream_read_async (GInputStream        *stream,
   if (stream->priv->closed)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       queue_read_async_result (stream, buffer, count, -1, error,
 			       callback, data);
@@ -530,7 +530,7 @@ g_input_stream_read_async (GInputStream        *stream,
   if (stream->priv->pending)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       queue_read_async_result (stream, buffer, count, -1, error,
 			       callback, data);
@@ -616,7 +616,7 @@ skip_async_callback_wrapper (GInputStream *stream,
  * giving the results.
  *
  * During an async request no other sync and async calls are allowed, and will
- * result in %G_VFS_ERROR_PENDING errors. 
+ * result in %G_IO_ERROR_PENDING errors. 
  *
  * A value of @count larger than %G_MAXSSIZE will cause a %G_FILE_ERROR_INVAL error.
  *
@@ -668,7 +668,7 @@ g_input_stream_skip_async (GInputStream        *stream,
   if (stream->priv->closed)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       queue_skip_async_result (stream, count, -1, error,
 			       callback, data);
@@ -678,7 +678,7 @@ g_input_stream_skip_async (GInputStream        *stream,
   if (stream->priv->pending)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       queue_skip_async_result (stream, count, -1, error,
 			       callback, data);
@@ -785,7 +785,7 @@ g_input_stream_close_async (GInputStream       *stream,
   if (stream->priv->pending)
     {
       error = NULL;
-      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       queue_close_async_result (stream, FALSE, error,
 				callback, data);
@@ -882,8 +882,8 @@ read_op_func (GIOJob *job,
     {
       op->count_read = -1;
       g_set_error (&op->op.error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else
@@ -953,8 +953,8 @@ skip_op_func (GIOJob *job,
     {
       op->count_skipped = -1;
       g_set_error (&op->op.error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else
@@ -1065,8 +1065,8 @@ close_op_func (GIOJob *job,
     {
       op->res = FALSE;
       g_set_error (&op->op.error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
 		   _("Operation was cancelled"));
     }
   else

@@ -3,7 +3,7 @@
 
 #include <glib-object.h>
 #include <gio/gvfstypes.h>
-#include <gio/gvfserror.h>
+#include <gio/gioerror.h>
 #include <gio/gcancellable.h>
 
 G_BEGIN_DECLS
@@ -41,7 +41,7 @@ typedef struct _GInputStreamPrivate  GInputStreamPrivate;
  * 
  * The callback is always called, even if the operation was cancelled.
  * If the operation was cancelled @count_read will be -1, and @error
- * will be %G_VFS_ERROR_CANCELLED.
+ * will be %G_IO_ERROR_CANCELLED.
  **/
 typedef void (*GAsyncReadCallback)  (GInputStream *stream,
 				     void         *buffer,
@@ -67,7 +67,7 @@ typedef void (*GAsyncSkipCallback)  (GInputStream *stream,
  *
  * The callback is always called, even if the operation was cancelled.
  * If the operation was cancelled @result will be %FALSE, and @error
- * will be %G_VFS_ERROR_CANCELLED.
+ * will be %G_IO_ERROR_CANCELLED.
  **/
 typedef void (*GAsyncCloseInputCallback)  (GInputStream *stream,
 					   gboolean      result,

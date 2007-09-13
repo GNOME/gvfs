@@ -42,14 +42,14 @@ g_file_output_stream_get_file_info (GFileOutputStream      *stream,
   
   if (g_output_stream_is_closed (output_stream))
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
 		   _("Stream is already closed"));
       return NULL;
     }
   
   if (g_output_stream_has_pending (output_stream))
     {
-      g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
 		   _("Stream has outstanding operation"));
       return NULL;
     }
@@ -65,7 +65,7 @@ g_file_output_stream_get_file_info (GFileOutputStream      *stream,
   if (class->get_file_info)
     info = class->get_file_info (stream, attributes, cancellable, error);
   else
-    g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED,
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		 _("Stream doesn't support get_file_info"));
   
   if (cancellable)

@@ -58,7 +58,7 @@ libgio_la_SOURCES = 	\
 	goutputstream.c \
 	gvfs.c \
 	gvfs.h \
-	gvfserror.c \
+	gioerror.c \
 	$(local_sources) \
 	$(daemon_sources) \
 	$(marshal_sources) \
@@ -82,7 +82,7 @@ gvfsinclude_HEADERS = \
 	gioscheduler.h \
 	goutputstream.h \
 	gseekable.h \
-	gvfserror.h \
+	gioerror.h \
 	gvfstypes.h \
 	$(NULL)
 

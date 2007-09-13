@@ -11,7 +11,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
-#include "gvfserror.h"
+#include "gioerror.h"
 #include "gsocketoutputstream.h"
 #include "gcancellable.h"
 #include "gasynchelper.h"
@@ -143,8 +143,8 @@ g_socket_output_stream_write (GOutputStream *stream,
       if (g_cancellable_is_cancelled (cancellable))
 	{
 	  g_set_error (error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  break;
 	}
@@ -218,8 +218,8 @@ write_async_cb (WriteAsyncData *data,
       if (g_cancellable_is_cancelled (data->cancellable))
 	{
 	  g_set_error (&error,
-		       G_VFS_ERROR,
-		       G_VFS_ERROR_CANCELLED,
+		       G_IO_ERROR,
+		       G_IO_ERROR_CANCELLED,
 		       _("Operation was cancelled"));
 	  count_written = -1;
 	  break;

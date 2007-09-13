@@ -123,8 +123,8 @@ write_channel_handle_request (GVfsChannel *channel,
       break;
       
     default:
-      g_set_error (error, G_VFS_ERROR,
-		   G_VFS_ERROR_INTERNAL_ERROR,
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_INTERNAL_ERROR,
 		   "Unknown stream command %d\n", command);
       break;
     }
