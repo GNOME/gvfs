@@ -1171,10 +1171,10 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf,
       g_file_info_set_is_hidden (info, TRUE);
     
     if (statbuf->st_mode & S_IXUSR)
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_ARCHIVE, TRUE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_IS_ARCHIVE, TRUE);
     
     if (statbuf->st_mode & S_IXGRP)
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_SYSTEM, TRUE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_DOS_IS_SYSTEM, TRUE);
   }
 
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_ETAG_VALUE))

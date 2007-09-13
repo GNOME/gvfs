@@ -94,8 +94,8 @@ struct _GFileInfoClass
 
 /* DOS specific attributes */
 
-#define G_FILE_ATTRIBUTE_DOS_ARCHIVE "dos:archive"               /* boolean */
-#define G_FILE_ATTRIBUTE_DOS_SYSTEM "dos:system"                 /* boolean */
+#define G_FILE_ATTRIBUTE_DOS_IS_ARCHIVE "dos:is_archive"         /* boolean */
+#define G_FILE_ATTRIBUTE_DOS_IS_SYSTEM "dos:is_system"           /* boolean */
 
 /* Owner attributes */
 
