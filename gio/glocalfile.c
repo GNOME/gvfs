@@ -661,7 +661,6 @@ g_local_file_query_settable_attributes (GFile                      *file,
   g_file_attribute_info_list_add (list,
 				  G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET,
 				  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING);
-
   
   return list;
 }
@@ -1528,7 +1527,7 @@ g_local_file_move (GFile                *source,
       chmod (local_destination->filename, statbuf.st_mode);
     }
 
-  /* TODO: Inherit xattrs */
+  /* TODO: Inherit xattrs, acls, selinux context, etc */
   
   return g_file_delete (source, cancellable, error);
 }

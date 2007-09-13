@@ -612,6 +612,8 @@ g_file_move (GFile                  *source,
   GFileIface *iface;
   GError *my_error;
   gboolean res;
+  GFileAttributeInfoList *list;
+  GFileInfo *info;
 
   if (g_cancellable_is_cancelled (cancellable))
     {
@@ -646,6 +648,50 @@ g_file_move (GFile                  *source,
 		    progress_callback, progress_callback_data,
 		    error))
     return FALSE;
+
+  info = g_file_get_info (source, "*", 0, cancellable, NULL);
+
+  if (info != NULL)
+    {
+      const GFileAttributeValue *value;
+      int i;
+      
+      list = g_file_query_settable_attributes (destination, cancellable, NULL);
+      if (list)
+	{
+	  for (i = 0; i < list->n_infos; i++)
+	    {
+	      const char *name = list->infos[i].name;
+
+	      /* Symlink target is already copied in copy */
+	      if (strcmp (name, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET) == 0)
+		continue;
+
+	      /* TODO: What about order, e,g. must change uid + gid before mode.. */
+	      
+	      value = g_file_info_get_attribute (info, 
+						 name);
+
+	      /* Ignore errors */
+	      g_file_set_attribute (destination,
+				    name, value,
+				    0, cancellable,
+				    NULL);
+	      
+	    }
+	  g_file_attribute_info_list_free (list);      
+	}
+      
+      list = g_file_query_writable_namespaces (destination, cancellable, NULL);  
+      if (list)
+	{
+	  /* TODO: Try to list and copy writable namespaces */
+	  
+	  g_file_attribute_info_list_free (list);      
+	}
+      
+      g_object_unref (info);
+    }
 
   return g_file_delete (source, cancellable, error);
 }
