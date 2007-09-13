@@ -2,8 +2,8 @@
 #define __G_VOLUME_MONITOR_H__
 
 #include <glib-object.h>
-#include <gvolume.h>
-#include <gdrive.h>
+#include <gio/gvolume.h>
+#include <gio/gdrive.h>
 
 G_BEGIN_DECLS
 
