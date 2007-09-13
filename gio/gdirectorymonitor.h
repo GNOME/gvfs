@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include <gio/giotypes.h>
 #include <gio/gfile.h>
+#include <gio/gfilemonitor.h>
 
 G_BEGIN_DECLS
 
@@ -13,14 +14,6 @@ G_BEGIN_DECLS
 #define G_IS_DIRECTORY_MONITOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DIRECTORY_MONITOR))
 #define G_IS_DIRECTORY_MONITOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_DIRECTORY_MONITOR))
 #define G_DIRECTORY_MONITOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_DIRECTORY_MONITOR, GDirectoryMonitorClass))
-
-typedef enum {
-  G_DIRECTORY_MONITOR_EVENT_CHANGED,
-  G_DIRECTORY_MONITOR_EVENT_DELETED,
-  G_DIRECTORY_MONITOR_EVENT_CREATED,
-  G_DIRECTORY_MONITOR_EVENT_ATTRIBUTE_CHANGED,
-  G_DIRECTORY_MONITOR_EVENT_UNMOUNTED
-} GDirectoryMonitorEvent;
 
 typedef struct _GDirectoryMonitorClass	 GDirectoryMonitorClass;
 typedef struct _GDirectoryMonitorPrivate GDirectoryMonitorPrivate;
@@ -39,9 +32,9 @@ struct _GDirectoryMonitorClass
   
   /* Signals */
   void (* changed) (GDirectoryMonitor* monitor,
-		    GFile* child,
-		    GFile* other_file,
-		    GDirectoryMonitorEvent event_type);
+		    GFile *child,
+		    GFile *other_file,
+		    GFileMonitorEvent event_type);
   
   /* Virtual Table */
   gboolean	(*cancel)(GDirectoryMonitor* monitor);

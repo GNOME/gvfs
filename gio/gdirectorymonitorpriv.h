@@ -8,7 +8,7 @@ G_BEGIN_DECLS
 void g_directory_monitor_emit_event (GDirectoryMonitor      *monitor,
 				     GFile                  *child,
 				     GFile                  *other_file,
-				     GDirectoryMonitorEvent  event_type);
+				     GFileMonitorEvent       event_type);
 
 G_END_DECLS
 

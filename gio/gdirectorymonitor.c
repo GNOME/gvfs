@@ -95,7 +95,7 @@ void
 g_directory_monitor_emit_event (GDirectoryMonitor *monitor,
 				GFile *child,
 				GFile *other_file,
-				GDirectoryMonitorEvent event_type)
+				GFileMonitorEvent event_type)
 {
   g_signal_emit (monitor, signals[CHANGED], 0, child, other_file, event_type);
 }

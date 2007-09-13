@@ -20,25 +20,31 @@ static gboolean
 dir_monitor_callback (GDirectoryMonitor* monitor,
 		      GFile* child,
 		      GFile* other_file,
-		      GDirectoryMonitorEvent eflags)
+		      GFileMonitorEvent eflags)
 {
   g_print ("Directory Monitor Event:\n");
   g_print ("Child = %s\n", g_file_get_parse_name (child));
   switch (eflags)
     {
-    case G_DIRECTORY_MONITOR_EVENT_CHANGED:
+    case G_FILE_MONITOR_EVENT_CHANGED:
       g_print ("Event = CHANGED\n");
       break;
-    case G_DIRECTORY_MONITOR_EVENT_DELETED:
+    case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+      g_print ("Event = CHANGES_DONE_HINT\n");
+      break;
+    case G_FILE_MONITOR_EVENT_DELETED:
       g_print ("Event = DELETED\n");
       break;
-    case G_DIRECTORY_MONITOR_EVENT_CREATED:
+    case G_FILE_MONITOR_EVENT_CREATED:
       g_print ("Event = CREATED\n");
       break;
-    case G_DIRECTORY_MONITOR_EVENT_UNMOUNTED:
+    case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
+      g_print ("Event = PRE_UNMOUNT\n");
+      break;
+    case G_FILE_MONITOR_EVENT_UNMOUNTED:
       g_print ("Event = UNMOUNTED\n");
       break;
-    case G_DIRECTORY_MONITOR_EVENT_ATTRIBUTE_CHANGED:
+    case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
       g_print ("Event = ATTRIB CHANGED\n");
       break;
     }

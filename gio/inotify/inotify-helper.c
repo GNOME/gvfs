@@ -67,7 +67,7 @@ static void ih_not_missing_callback (inotify_sub *sub);
  */
 G_LOCK_DEFINE (inotify_lock);
 
-static GDirectoryMonitorEvent ih_mask_to_EventFlags (guint32 mask);
+static GFileMonitorEvent ih_mask_to_EventFlags (guint32 mask);
 
 /**
  * Initializes the inotify backend.  This must be called before
@@ -145,7 +145,7 @@ _ih_sub_cancel (inotify_sub * sub)
 static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 {
 	gchar *fullpath;
-	GDirectoryMonitorEvent eflags;
+	GFileMonitorEvent eflags;
 	GFile* parent;
 	GFile* child;
 
@@ -181,7 +181,7 @@ static void ih_event_callback (ik_event_t *event, inotify_sub *sub)
 static void ih_not_missing_callback (inotify_sub *sub)
 {
 	gchar *fullpath;
-	GDirectoryMonitorEvent eflags;
+	GFileMonitorEvent eflags;
 	guint32 mask;
 	GFile* parent;
 	GFile* child;
@@ -221,30 +221,30 @@ static void ih_not_missing_callback (inotify_sub *sub)
 }
 
 /* Transforms a inotify event to a GVFS event. */
-static GDirectoryMonitorEvent
+static GFileMonitorEvent
 ih_mask_to_EventFlags (guint32 mask)
 {
 	mask &= ~IN_ISDIR;
 	switch (mask)
 	{
 	case IN_MODIFY:
-		return G_DIRECTORY_MONITOR_EVENT_CHANGED;
+		return G_FILE_MONITOR_EVENT_CHANGED;
 	break;
 	case IN_ATTRIB:
-		return G_DIRECTORY_MONITOR_EVENT_ATTRIBUTE_CHANGED;
+		return G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED;
 	break;
 	case IN_MOVE_SELF:
 	case IN_MOVED_FROM:
 	case IN_DELETE:
 	case IN_DELETE_SELF:
-		return G_DIRECTORY_MONITOR_EVENT_DELETED;
+		return G_FILE_MONITOR_EVENT_DELETED;
 	break;
 	case IN_CREATE:
 	case IN_MOVED_TO:
-		return G_DIRECTORY_MONITOR_EVENT_CREATED;
+		return G_FILE_MONITOR_EVENT_CREATED;
 	break;
 	case IN_UNMOUNT:
-		return G_DIRECTORY_MONITOR_EVENT_UNMOUNTED;
+		return G_FILE_MONITOR_EVENT_UNMOUNTED;
 	case IN_Q_OVERFLOW:
 	case IN_OPEN:
 	case IN_CLOSE_WRITE:

@@ -41,26 +41,6 @@ fam_event_to_file_monitor_event (enum FAMCodes code)
 
 }
 
-static GDirectoryMonitorEvent
-fam_event_to_dir_monitor_event (enum FAMCodes code)
-{
-	switch (code)
-	{
-	case FAMChanged:
-		return G_DIRECTORY_MONITOR_EVENT_CHANGED;
-	break;
-	case FAMDeleted:
-		return G_DIRECTORY_MONITOR_EVENT_DELETED;
-	break;
-	case FAMCreated:
-		return G_DIRECTORY_MONITOR_EVENT_CREATED;
-	break;
-	default:
-		return -1;
-	break;
-	}
-}
-
 static gboolean
 fam_do_iter_unlocked (void)
 {
@@ -92,7 +72,7 @@ fam_do_iter_unlocked (void)
 		if (sub->directory)
 		{
 			GDirectoryMonitor* monitor = G_DIRECTORY_MONITOR(sub->user_data);
-			GDirectoryMonitorEvent eflags = fam_event_to_dir_monitor_event (ev.code);
+			GFileMonitorEvent eflags = fam_event_to_file_monitor_event (ev.code);
 			gchar* path = NULL;
 
 			/* unsupported event */
