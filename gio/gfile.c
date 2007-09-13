@@ -637,6 +637,34 @@ g_file_delete (GFile *file,
   return (* iface->delete_file) (file, cancellable, error);
 }
 
+gboolean
+g_file_trash (GFile *file,
+	      GCancellable *cancellable,
+	      GError **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  if (iface->trash == NULL)
+    {
+      g_set_error (error,
+		   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		   _("Trash not supported"));
+      return FALSE;
+    }
+  
+  return (* iface->trash) (file, cancellable, error);
+}
 
 GFile *
 g_file_set_display_name (GFile                  *file,

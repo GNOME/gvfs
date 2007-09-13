@@ -98,6 +98,9 @@ struct _GFileIface
   gboolean            (*delete_file)        (GFile                *file,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  gboolean            (*trash)              (GFile                *file,
+					     GCancellable         *cancellable,
+					     GError              **error);
   gboolean            (*make_directory)     (GFile                *file,
 					     GCancellable         *cancellable,
 					     GError              **error);
@@ -231,6 +234,9 @@ GFile             *g_file_set_display_name           (GFile                  *fi
 						      GCancellable           *cancellable,
 						      GError                **error);
 gboolean           g_file_delete                     (GFile                  *file,
+						      GCancellable           *cancellable,
+						      GError                **error);
+gboolean           g_file_trash                      (GFile                  *file,
 						      GCancellable           *cancellable,
 						      GError                **error);
 gboolean           g_file_copy                       (GFile                  *source,
