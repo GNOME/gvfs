@@ -17,9 +17,8 @@
 #include <gio/goutputstreamsocket.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
-#include <gvfsjobread.h>
-#include <gvfsjobseekread.h>
 #include <gvfsjobcloseread.h>
+#include <gvfsjobclosewrite.h>
 
 static void g_vfs_channel_job_source_iface_init (GVfsJobSourceIface *iface);
 
@@ -208,7 +207,7 @@ static void
 g_vfs_channel_connection_closed (GVfsChannel *channel)
 {
   GVfsChannelClass *class;
-  
+
   if (channel->priv->connection_closed)
     return;
   channel->priv->connection_closed = TRUE;
@@ -248,8 +247,6 @@ got_request (GVfsChannel *channel,
   arg1 = g_ntohl (request->arg1);
   arg2 = g_ntohl (request->arg2);
   seq_nr = g_ntohl (request->seq_nr);
-
-  g_print ("got_command %d %d %d %d\n", command, seq_nr, arg1, arg2);
 
   job = NULL;
   
@@ -459,8 +456,6 @@ send_reply_cb (GOutputStream *output_stream,
   GVfsChannelClass *class;
   GVfsJob *job;
 
-  g_print ("send_reply_cb: %d\n", bytes_written);
-
   if (bytes_written <= 0)
     {
       g_vfs_channel_connection_closed (channel);
@@ -509,7 +504,8 @@ send_reply_cb (GOutputStream *output_stream,
   channel->priv->current_job = NULL;
   g_vfs_job_emit_finished (job);
 
-  if (G_IS_VFS_JOB_CLOSE_READ (job))
+  if (G_IS_VFS_JOB_CLOSE_READ (job) ||
+      G_IS_VFS_JOB_CLOSE_WRITE (job))
     {
       g_vfs_job_source_closed (G_VFS_JOB_SOURCE (channel));
       channel->priv->backend_handle = NULL;
@@ -517,7 +513,7 @@ send_reply_cb (GOutputStream *output_stream,
   else if (channel->priv->connection_closed)
     {
       class = G_VFS_CHANNEL_GET_CLASS (channel);
-      
+
       channel->priv->current_job = class->close (channel);
       channel->priv->current_job_seq_nr = 0;
       g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
