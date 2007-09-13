@@ -290,7 +290,7 @@ static void ip_wd_delete (gpointer data, gpointer user_data)
 	ip_watched_dir_free (dir);
 }
 
-static void ip_event_dispatch (GList *dir_list, ik_event_t *event)
+static void ip_event_dispatch (GList *dir_list, GList* pair_dir_list, ik_event_t *event)
 {
 	GList *dirl;
 
@@ -330,12 +330,50 @@ static void ip_event_dispatch (GList *dir_list, ik_event_t *event)
 			event_callback (event, sub);
 		}
 	}
+
+	if (!event->pair)
+		return;
+
+	for (dirl = pair_dir_list; dirl; dirl = dirl->next)
+	{
+		GList *subl;
+		ip_watched_dir_t *dir = dirl->data;
+
+		for (subl = dir->subs; subl; subl = subl->next)
+		{
+			inotify_sub *sub = subl->data;
+
+			/* If the subscription and the event
+			 * contain a filename and they don't
+			 * match, we don't deliver this event.
+			 */
+			if (sub->filename &&
+			    event->pair->name &&
+			    strcmp(sub->filename, event->pair->name))
+				continue;
+
+			/* If the subscription has a filename
+			 * but this event doesn't, we don't
+			 * deliever this event.
+			 */
+			if (sub->filename && !event->pair->name)
+				continue;
+
+			/* FIXME: We might need to synthesize
+			 * DELETE/UNMOUNT events when
+			 * the filename doesn't match
+			 */
+
+			event_callback (event->pair, sub);
+		}
+	}
 }
 
 static void
 ip_event_callback (ik_event_t *event)
 {
-	GList *dir_list = NULL;
+	GList* dir_list = NULL;
+	GList* pair_dir_list = NULL;
 
 	dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER(event->wd));
 
@@ -345,8 +383,11 @@ ip_event_callback (ik_event_t *event)
 		return;
 	}
 
+	if (event->pair)
+		pair_dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER(event->pair->wd));
+
 	if (event->mask & IP_INOTIFY_MASK)
-		ip_event_dispatch (dir_list, event);
+		ip_event_dispatch (dir_list, pair_dir_list, event);
 
 	/* We have to manage the missing list
 	 * when we get an event that means the

@@ -30,6 +30,8 @@ g_local_file_monitor_finalize (GObject* object)
 
   if (local_monitor->dirname)
     g_free (local_monitor->dirname);
+  if (local_monitor->filename)
+    g_free (local_monitor->filename);
   
   if (G_OBJECT_CLASS (g_local_file_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_local_file_monitor_parent_class)->finalize) (object);
@@ -64,6 +66,7 @@ g_local_file_monitor_init (GLocalFileMonitor* local_monitor)
 {
   local_monitor->private   = NULL;
   local_monitor->dirname   = NULL;
+  local_monitor->filename  = NULL;
   local_monitor->cancelled = FALSE;
 }
 
