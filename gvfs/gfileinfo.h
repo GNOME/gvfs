@@ -34,8 +34,9 @@ typedef enum {
 typedef enum {
   G_FILE_ACCESS_CAN_READ = 1 << 1,
   G_FILE_ACCESS_CAN_WRITE = 1 << 2,
-  G_FILE_ACCESS_CAN_DELETE = 1 << 3,
-  G_FILE_ACCESS_CAN_RENAME = 1 << 4,
+  G_FILE_ACCESS_CAN_EXECUTE = 1 << 3,
+  G_FILE_ACCESS_CAN_DELETE = 1 << 4,
+  G_FILE_ACCESS_CAN_RENAME = 1 << 5,
 } GFileAccessRights;
 
 struct _GFileInfo

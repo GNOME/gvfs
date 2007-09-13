@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <attr/xattr.h>
 
+#include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
 #include "gfileinfosimple.h"
@@ -346,6 +347,59 @@ get_xattrs_from_fd (int fd,
     }
 }
 
+static GFileAccessRights
+get_access_rights (const gchar *path)
+{
+  GFileAccessRights rights;
+  
+  /* FIXME: should check errno after calling access because we don't
+   * want to set valid_fields if something bad happened during one
+   * of the access calls
+   */
+  rights = 0;
+  
+#ifdef G_OS_WIN32
+  if (g_access (path, R_OK) == 0) {
+    rights |= G_FILE_ACCESS_CAN_READ;
+  }
+  if (g_access (path, W_OK) == 0) {
+    rights |= G_FILE_ACCESS_CAN_WRITE;
+  }
+  if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE)) {
+    rights |= G_FILE_ACCESS_CAN_EXECUTE;
+  }
+#else
+  /* Try to minimize the nr of access calls. We rely on read almost
+   * always being allowed in normal cases to keep down the number of
+   * calls needed
+   */
+  if (g_access (path, R_OK|W_OK) == 0) {
+    rights |= G_FILE_ACCESS_CAN_READ | G_FILE_ACCESS_CAN_WRITE;
+    if (g_access (path, X_OK) == 0) {
+      rights |= G_FILE_ACCESS_CAN_EXECUTE;
+    }
+  } else if (g_access (path, R_OK|X_OK) == 0) {
+    rights |= G_FILE_ACCESS_CAN_READ | G_FILE_ACCESS_CAN_EXECUTE;
+  } else {
+    if (g_access (path, R_OK) == 0) {
+      rights |= G_FILE_ACCESS_CAN_READ;
+    } else {
+      if (g_access (path, W_OK) == 0) {
+	rights |= G_FILE_ACCESS_CAN_WRITE;
+      }
+      if (g_access (path, X_OK) == 0) {
+	rights |= G_FILE_ACCESS_CAN_EXECUTE;
+      }
+    }
+  }
+#endif
+
+  /* TODO: Handle can_rename and can_delete */
+  
+  return rights;
+}
+
+
 GFileInfo *
 g_file_info_simple_get (const char *basename,
 			const char *path,
@@ -401,7 +455,8 @@ g_file_info_simple_get (const char *basename,
 
   if (requested & G_FILE_INFO_ACCESS_RIGHTS)
     {
-      /* TODO */
+      GFileAccessRights rights = get_access_rights (path);
+      g_file_info_set_access_rights (info, rights);
     }
   
   if (requested & G_FILE_INFO_DISPLAY_NAME)
