@@ -14,10 +14,6 @@ Work on GFile:
    copy
    move
 
-Implement the rest of the mountable GDaemonFile ops:
-   unmount_mountable
-   eject_mountable
-
 Add more filter streams: data reading, conversion (with general converter interface)
 
 is-slow marking for e.g. thumbnailing? How would you know this though?
@@ -37,6 +33,10 @@ Don't hardcode the libgvfsdbus.so name, instead have some generic pluggable syst
 gvfs:
 ====
 	
+Implement the rest of the mountable GDaemonFile ops:
+   unmount_mountable
+   eject_mountable
+
 implement readahead in GVFSReadStream, time difference
 
 implement seek & truncate
