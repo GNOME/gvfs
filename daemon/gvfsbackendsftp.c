@@ -47,6 +47,17 @@ typedef enum {
   SFTP_VENDOR_SSH
 } SFTPClientVendor;
 
+typedef void (*ReplyCallback) (GVfsBackendSftp *backend,
+			       int reply_type,
+			       GDataInputStream *reply,
+			       guint32 len,
+			       gpointer user_data);
+
+typedef struct {
+  ReplyCallback callback;
+  gpointer data;
+} ExpectedReply;
+
 struct _GVfsBackendSftp
 {
   GVfsBackend parent_instance;
@@ -79,10 +90,6 @@ struct _GVfsBackendSftp
   int mount_try;
   gboolean mount_try_again;
 };
-
-typedef void (*ReplyCallback) (GVfsBackendSftp *backend,
-			       GDataInputStream *data,
-			       guint32 len);
 
 G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
 
@@ -152,7 +159,7 @@ g_vfs_backend_sftp_finalize (GObject *object)
 static void
 g_vfs_backend_sftp_init (GVfsBackendSftp *backend)
 {
-  backend->expected_replies = g_hash_table_new (NULL, NULL);
+  backend->expected_replies = g_hash_table_new_full (NULL, NULL, NULL, g_free);
 }
 
 static void
@@ -317,19 +324,50 @@ spawn_ssh (GVfsBackend *backend,
   return TRUE;
 }
 
+static guint32
+get_new_id (GVfsBackendSftp *backend)
+{
+  return backend->current_id++;
+}
+
 static GDataOutputStream *
-new_command_stream (void)
+new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
 {
   GOutputStream *mem_stream;
   GDataOutputStream *data_stream;
+  guint32 id;
 
   mem_stream = g_memory_output_stream_new (NULL);
   data_stream = g_data_output_stream_new (mem_stream);
   g_object_unref (mem_stream);
 
-  g_data_output_stream_put_int32 (data_stream, 0, NULL, NULL);
-
+  g_data_output_stream_put_int32 (data_stream, 0, NULL, NULL); /* LEN */
+  g_data_output_stream_put_byte (data_stream, type, NULL, NULL);
+  if (type != SSH_FXP_INIT)
+    {
+      id = get_new_id (backend);
+      g_data_output_stream_put_uint32 (data_stream, id, NULL, NULL);
+      if (id_out)
+	*id_out = id;
+    }
+  
   return data_stream;
+}
+
+static GByteArray *
+get_data_from_command_stream (GDataOutputStream *command_stream)
+{
+  GOutputStream *mem_stream;
+  GByteArray *array;
+  guint32 *len_ptr;
+  
+  mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));
+  array = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
+
+  len_ptr = (guint32 *)array->data;
+  *len_ptr = GUINT32_TO_BE (array->len - 4);
+  
+  return array;
 }
 
 static gboolean
@@ -338,17 +376,11 @@ send_command_sync (GOutputStream *out_stream,
 		   GCancellable *cancellable,
 		   GError **error)
 {
-  GOutputStream *mem_stream;
   GByteArray *array;
-  guint32 *len_ptr;
   gsize bytes_written;
   gboolean res;
   
-  mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));
-  array = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
-
-  len_ptr = (guint32 *)array->data;
-  *len_ptr = GUINT32_TO_BE (array->len - 4);
+  array = get_data_from_command_stream (command_stream);
 
   res = g_output_stream_write_all (out_stream,
 				   array->data, array->len,
@@ -434,6 +466,13 @@ read_reply_sync (GVfsBackend *backend, gsize *len_out, GError **error)
   g_byte_array_free (array, FALSE);
   
   return make_reply_stream (data, len);
+}
+
+static void
+put_string (GDataOutputStream *stream, const char *str)
+{
+  g_data_output_stream_put_uint32 (stream, strlen (str), NULL, NULL);
+  g_data_output_stream_put_string (stream, str, NULL, NULL);
 }
 
 static char *
@@ -621,8 +660,9 @@ read_reply_async_got_data  (GObject *source_object,
   GVfsBackendSftp *backend = user_data;
   gssize res;
   GDataInputStream *reply;
-  ReplyCallback callback;
+  ExpectedReply *expected_reply;
   guint32 id;
+  int type;
 
   res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, NULL);
 
@@ -646,17 +686,17 @@ read_reply_async_got_data  (GObject *source_object,
   reply = make_reply_stream (backend->reply, backend->reply_size);
   backend->reply = NULL;
 
+  type = g_data_input_stream_get_byte (reply, NULL, NULL);
   id = g_data_input_stream_get_uint32 (reply, NULL, NULL);
   
-  callback = g_hash_table_lookup (backend->expected_replies, GINT_TO_POINTER (id));
-  if (callback)
+  expected_reply = g_hash_table_lookup (backend->expected_replies, GINT_TO_POINTER (id));
+  if (expected_reply)
     {
-      callback (backend, reply, backend->reply_size);
-      
+      (expected_reply->callback) (backend, type, reply, backend->reply_size, expected_reply->data);
       g_hash_table_remove (backend->expected_replies, GINT_TO_POINTER (id));
     }
   else
-    g_warning ("Got unhandled reply of size %d\n", backend->reply_size);
+    g_warning ("Got unhandled reply of size %d for id %d\n", backend->reply_size, id);
 
   g_object_unref (reply);
 
@@ -686,14 +726,14 @@ read_reply_async_got_len  (GObject *source_object,
   if (backend->reply_size_read < 4)
     {
       g_input_stream_read_async (backend->reply_stream,
-				 &backend->reply_size, 4 - backend->reply_size_read,
+				 &backend->reply_size + backend->reply_size_read, 4 - backend->reply_size_read,
 				 0, NULL, read_reply_async_got_len, backend);
       return;
     }
   backend->reply_size = GUINT32_FROM_BE (backend->reply_size);
 
   backend->reply_size_read = 0;
-  backend->reply = g_malloc (backend->reply_size_read);
+  backend->reply = g_malloc (backend->reply_size);
   g_input_stream_read_async (backend->reply_stream,
 			     backend->reply, backend->reply_size,
 			     0, NULL, read_reply_async_got_data, backend);
@@ -772,25 +812,38 @@ send_command (GVfsBackendSftp *backend)
 static void
 expect_reply (GVfsBackendSftp *backend,
 	      guint32 id,
-	      ReplyCallback callback)
+	      ReplyCallback callback,
+	      gpointer user_data)
 {
-  g_hash_table_insert (backend->expected_replies, GINT_TO_POINTER (id), callback);
+  ExpectedReply *expected;
+
+  expected = g_new (ExpectedReply, 1);
+  expected->callback = callback;
+  expected->data = user_data;
+
+  g_hash_table_replace (backend->expected_replies, GINT_TO_POINTER (id), expected);
 }
 
 static void
 queue_command (GVfsBackendSftp *backend,
-	       GByteArray *data)
+	       GDataOutputStream *command_stream,
+	       guint32 id,
+	       ReplyCallback callback,
+	       gpointer user_data)
 {
+  GByteArray *array;
   gboolean first;
 
+  array = get_data_from_command_stream (command_stream);
+  
   first = backend->command_queue == NULL;
 
-  backend->command_queue = g_list_append (backend->command_queue, data);
-
+  backend->command_queue = g_list_append (backend->command_queue, array);
+  expect_reply (backend, id, callback, user_data);
+  
   if (first)
     send_command (backend);
 }
-
 
 static void
 do_mount (GVfsBackend *backend,
@@ -830,7 +883,7 @@ do_mount (GVfsBackend *backend,
 
   so = g_socket_output_stream_new (stdin_fd, TRUE);
 
-  ds = new_command_stream ();
+  ds = new_command_stream (op_backend, SSH_FXP_INIT, NULL);
   g_data_output_stream_put_byte (ds,
 				 SSH_FXP_INIT, NULL, NULL);
   g_data_output_stream_put_int32 (ds,
@@ -857,7 +910,7 @@ do_mount (GVfsBackend *backend,
   is = g_socket_input_stream_new (stderr_fd, TRUE);
   op_backend->error_stream = g_data_input_stream_new (is);
   g_object_unref (is);
-
+  
   reply = read_reply_sync (backend, NULL, NULL);
   if (reply == NULL)
     {
@@ -866,7 +919,7 @@ do_mount (GVfsBackend *backend,
       g_error_free (error);
       return;
     }
-
+  
   if (g_data_input_stream_get_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
     {
       g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
@@ -879,7 +932,6 @@ do_mount (GVfsBackend *backend,
 
   while ((extension_name = read_string (reply, NULL)) != NULL)
     {
-      g_print ("Extension name: %s\n", extension_name);
       extension_data = read_string (reply, NULL);
       if (extension_data)
 	{
@@ -900,6 +952,8 @@ do_mount (GVfsBackend *backend,
 
   g_vfs_backend_set_mount_spec (backend, sftp_mount_spec);
   g_mount_spec_unref (sftp_mount_spec);
+
+  g_print ("succeeded with sftp mount\n");
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -948,6 +1002,37 @@ try_mount (GVfsBackend *backend,
 
 
 static void
+get_info_reply (GVfsBackendSftp *backend,
+		int reply_type,
+		GDataInputStream *reply,
+		guint32 len,
+		gpointer user_data)
+{
+  g_print ("get_info_reply, %d\n", len);
+}
+
+static gboolean
+try_get_info (GVfsBackend *backend,
+	      GVfsJobGetInfo *job,
+	      const char *filename,
+	      GFileGetInfoFlags flags,
+	      GFileInfo *info,
+	      GFileAttributeMatcher *attribute_matcher)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  guint32 id;
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend, SSH_FXP_STAT, &id);
+  put_string (command, filename);
+  
+  queue_command (op_backend, command, id, get_info_reply, job);
+
+  return TRUE;
+}
+
+
+static void
 g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -957,4 +1042,5 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 
   backend_class->mount = do_mount;
   backend_class->try_mount = try_mount;
+  backend_class->try_get_info = try_get_info;
 }
