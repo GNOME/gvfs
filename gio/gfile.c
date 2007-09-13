@@ -235,6 +235,17 @@ g_file_read_async (GFile                  *file,
 			 cancellable);
 }
 
+void
+g_file_mount (GFile *file,
+	      GMountOperation *mount_operation)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  (* iface->mount) (file, mount_operation);
+}
+
 /********************************************
  *   Default implementation of async ops    *
  ********************************************/

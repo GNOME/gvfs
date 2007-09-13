@@ -338,6 +338,14 @@ g_file_local_replace (GFile *file,
 }
 
 static void
+g_file_local_mount (GFile *file,
+		    GMountOperation *mount_operation)
+{
+  /* Always just ok... */
+  g_signal_emit_by_name (mount_operation, "done", TRUE, NULL);
+}
+
+static void
 g_file_local_file_iface_init (GFileIface *iface)
 {
   iface->copy = g_file_local_copy;
@@ -353,4 +361,5 @@ g_file_local_file_iface_init (GFileIface *iface)
   iface->append_to = g_file_local_append_to;
   iface->create = g_file_local_create;
   iface->replace = g_file_local_replace;
+  iface->mount = g_file_local_mount;
 }

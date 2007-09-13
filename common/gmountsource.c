@@ -97,9 +97,20 @@ g_mount_source_to_dbus (GMountSource *source,
     _g_dbus_oom ();
   
   dbus_message_iter_init_append (message, &iter);
-  g_mount_spec_to_dbus (&iter, spec);
+  g_mount_spec_to_dbus (&iter, source->mount_spec);
 }
 
+const char *
+g_mount_source_get_dbus_id (GMountSource *mount_source)
+{
+  return mount_source->dbus_id;
+}
+
+const char *
+g_mount_source_get_obj_path (GMountSource *mount_source)
+{
+  return mount_source->obj_path;
+}
 
 GMountSource *
 g_mount_source_new_null (GMountSpec *spec)
@@ -404,6 +415,10 @@ g_mount_source_ask_password (GMountSource *source,
   guint32 flags_as_int;
   AskPasswordData data = {0};
 
+  *password_out = NULL;
+  *user_out = NULL;
+  *domain_out = NULL;
+  
   if (source->dbus_id == NULL)
     return FALSE;
 

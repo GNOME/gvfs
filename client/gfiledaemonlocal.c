@@ -174,6 +174,13 @@ g_file_daemon_local_replace (GFile *file,
 }
 
 static void
+g_file_daemon_local_mount (GFile *file,
+			   GMountOperation *mount_op)
+{
+  return g_file_mount (G_FILE_DAEMON_LOCAL (file)->wrapped, mount_op);
+}
+
+static void
 g_file_daemon_local_file_iface_init (GFileIface *iface)
 {
   iface->copy = g_file_daemon_local_copy;
@@ -189,4 +196,5 @@ g_file_daemon_local_file_iface_init (GFileIface *iface)
   iface->append_to = g_file_daemon_local_append_to;
   iface->create = g_file_daemon_local_create;
   iface->replace = g_file_daemon_local_replace;
+  iface->mount = g_file_daemon_local_mount;
 }

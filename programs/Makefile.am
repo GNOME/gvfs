@@ -11,6 +11,7 @@ libraries =						\
 	$(GLIB_LIBS)
 
 bin_PROGRAMS =					\
+	gvfs-mount				\
 	gvfs-cat				\
 	gvfs-ls					\
 	gvfs-info				\
@@ -24,3 +25,6 @@ gvfs_info_LDADD = $(libraries)
 
 gvfs_ls_SOURCES = gvfs-ls.c
 gvfs_ls_LDADD = $(libraries)
+
+gvfs_mount_SOURCES = gvfs-mount.c
+gvfs_mount_LDADD = $(libraries)

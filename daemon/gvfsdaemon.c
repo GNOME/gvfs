@@ -779,13 +779,12 @@ daemon_start_mount (GVfsDaemon *daemon,
   GMountSource *mount_source;
   dbus_bool_t automount;
 
-  dbus_id = dbus_message_get_sender (message);
-  
   dbus_message_iter_init (message, &iter);
 
   mount_spec = NULL;
   dbus_error_init (&derror);
   if (!_g_dbus_message_iter_get_args (&iter, &derror,
+				      DBUS_TYPE_STRING, &dbus_id,
 				      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      DBUS_TYPE_BOOLEAN, &automount,
 				      0))

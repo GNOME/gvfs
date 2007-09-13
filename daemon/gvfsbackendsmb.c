@@ -34,6 +34,14 @@ struct _GVfsBackendSmb
   
   SMBCCTX *smb_context;
 
+  char *last_user;
+  char *last_domain;
+  char *last_password;
+  
+  GMountSource *mount_source; /* Only used/set during mount */
+  int mount_try;
+  gboolean mount_try_again;
+  
   /* Cache */
   char *cached_server_name;
   char *cached_share_name;
@@ -96,15 +104,91 @@ auth_callback (SMBCCTX *context,
 	       char *password_out, int pwmaxlen)
 {
   GVfsBackendSmb *backend;
+  char *ask_password, *ask_user, *ask_domain;
+  gboolean handled, abort;
 
   backend = smbc_option_get (context, "user_data");
 
+  strncpy (password_out, "", pwmaxlen);
+  
   if (backend->domain)
     strncpy (domain_out, backend->domain, domainmaxlen);
   if (backend->user)
     strncpy (username_out, backend->user, unmaxlen);
+
+  if (backend->mount_source == NULL)
+    {
+      /* Not during mount, use last password */
+      if (backend->last_user)
+	strncpy (username_out, backend->last_user, unmaxlen);
+      if (backend->last_domain)
+	strncpy (domain_out, backend->last_domain, domainmaxlen);
+      if (backend->last_password)
+	strncpy (password_out, backend->last_password, pwmaxlen);
+      
+      return;
+    }
   
-  g_print ("auth_callback: %s %s\n", server_name, share_name);
+  if (backend->mount_try == 0 &&
+      backend->user == NULL &&
+      backend->domain == NULL)
+    {
+      /* Try anon login */
+      strncpy (username_out, "", unmaxlen);
+      strncpy (password_out, "", pwmaxlen);
+      /* Try again if anon login fails */
+      backend->mount_try_again = TRUE;
+    }
+  else
+    {
+      GPasswordFlags flags = G_PASSWORD_FLAGS_NEED_PASSWORD;
+      char *message;
+      
+      if (backend->domain == NULL)
+	flags |= G_PASSWORD_FLAGS_NEED_DOMAIN;
+      if (backend->user == NULL)
+	flags |= G_PASSWORD_FLAGS_NEED_USERNAME;
+
+      message = g_strdup_printf (_("Password required for share %s on %s"),
+				 server_name, share_name);
+      handled = g_mount_source_ask_password (backend->mount_source,
+					     message,
+					     username_out,
+					     domain_out,
+					     flags,
+					     &abort,
+					     &ask_password,
+					     &ask_user,
+					     &ask_domain);
+      g_free (message);
+      if (!handled)
+	goto out;
+      
+      if (abort)
+	{
+	  strncpy (username_out, "ABORT", unmaxlen);
+	  strncpy (password_out, "", pwmaxlen);
+	  goto out;
+	}
+
+      /* Try again if this fails */
+      backend->mount_try_again = TRUE;
+
+      strncpy (password_out, ask_password, pwmaxlen);
+      if (ask_user && *ask_user)
+	strncpy (username_out, ask_user, unmaxlen);
+      if (ask_domain && *ask_domain)
+	strncpy (domain_out, ask_domain, domainmaxlen);
+
+    out:
+      g_free (ask_password);
+      g_free (ask_user);
+      g_free (ask_domain);
+    }
+
+  backend->last_user = g_strdup (username_out);
+  backend->last_domain = g_strdup (domain_out);
+  backend->last_password = g_strdup (password_out);
 }
 
 /* Add a server to the cache system
@@ -189,8 +273,6 @@ get_cached_server (SMBCCTX * context,
 
   backend = smbc_option_get (context, "user_data");
 
-  g_print ("get_cached_server %s, %s\n", server_name, share_name);
-  
   if (backend->cached_server != NULL &&
       strcmp (backend->cached_server_name, server_name) == 0 &&
       strcmp (backend->cached_share_name, share_name) == 0 &&
@@ -198,7 +280,6 @@ get_cached_server (SMBCCTX * context,
       strcmp (backend->cached_username, username) == 0)
     return backend->cached_server;
 
-  g_print ("get_cached_server -> miss\n");
   return NULL;
 }
 
@@ -307,8 +388,6 @@ do_mount (GVfsBackend *backend,
   char *display_name;
   GMountSpec *smb_mount_spec;
 
-  g_print ("do_mount\n");
-  
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
     {
@@ -337,7 +416,7 @@ do_mount (GVfsBackend *backend,
   smb_context->flags |= SMB_CTX_FLAG_USE_KERBEROS | SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS;
 #endif
 #if defined(SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON)
-  //smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
+  smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
 #endif
 #endif
 
@@ -372,10 +451,32 @@ do_mount (GVfsBackend *backend,
   g_mount_spec_unref (smb_mount_spec);
 
   uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
-  res = smb_context->stat (smb_context, uri, &st);
+
+  op_backend->mount_source = mount_source;
+  op_backend->mount_try = 0;
+
+  do
+    {
+      op_backend->mount_try_again = FALSE;
+      
+      res = smb_context->stat (smb_context, uri, &st);
+      
+      if (res == 0 ||
+	  (errno != EACCES && errno != EPERM))
+	break;
+      
+      op_backend->mount_try ++;      
+    }
+  while (op_backend->mount_try_again);
+  
   g_free (uri);
+  
+  op_backend->mount_source = NULL;
+
   if (res != 0)
     {
+      /* TODO: Error from errno? */
+      op_backend->mount_source = NULL;
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_FILE_ERROR, G_FILE_ERROR_IO,
 			"Failed to mount smb share");
@@ -383,7 +484,6 @@ do_mount (GVfsBackend *backend,
     }
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  g_print ("finished mount\n");
 }
 
 static gboolean
@@ -395,8 +495,6 @@ try_mount (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   const char *server, *share, *user, *domain;
 
-  g_print ("try_mount\n");
-  
   server = g_mount_spec_get (mount_spec, "server");
   share = g_mount_spec_get (mount_spec, "share");
 

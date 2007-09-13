@@ -6,6 +6,7 @@
 #include <gio/gfileenumerator.h>
 #include <gio/gfileinputstream.h>
 #include <gio/gfileoutputstream.h>
+#include <gio/gmountoperation.h>
 
 G_BEGIN_DECLS
 
@@ -70,6 +71,10 @@ struct _GFileIface
 					     GFileReadCallback     callback,
 					     gpointer              callback_data,
 					     GCancellable         *cancellable);
+
+  void               (*mount)               (GFile                  *file,
+					     GMountOperation        *mount_operation);
+
 };
 
 GType g_file_get_type (void) G_GNUC_CONST;
@@ -118,6 +123,10 @@ void               g_file_read_async         (GFile                  *file,
 					      GFileReadCallback       callback,
 					      gpointer                callback_data,
 					      GCancellable           *cancellable);
+
+
+void               g_file_mount              (GFile                  *file,
+					      GMountOperation        *mount_operation);
 
 G_END_DECLS
 

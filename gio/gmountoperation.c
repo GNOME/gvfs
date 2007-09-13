@@ -192,7 +192,7 @@ g_mount_operation_set_anonymous (GMountOperation *op,
 const char *
 g_mount_operation_get_domain (GMountOperation *op)
 {
-  return op->priv->password;
+  return op->priv->domain;
 }
 
 void

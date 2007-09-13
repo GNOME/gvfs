@@ -13,6 +13,7 @@ libcommon_la_SOURCES = 	\
 	gdbusutils.c gdbusutils.h \
 	gmountspec.c gmountspec.h \
 	gmountoperationdbus.c gmountoperation.h \
+	gmountsource.c gmountsource.h \
 	gvfsdaemonprotocol.h \
 	$(NULL)
 

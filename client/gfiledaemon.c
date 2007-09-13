@@ -13,6 +13,7 @@
 #include <gfileenumeratordaemon.h>
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
+#include "gmountoperationdbus.h"
 
 static void g_file_daemon_file_iface_init (GFileIface       *iface);
 
@@ -640,6 +641,49 @@ g_file_daemon_replace (GFile *file,
 }
 
 static void
+mount_reply (DBusMessage *reply,
+	     GError *error,
+	     gpointer user_data)
+{
+  GMountOperation *op = user_data;
+
+  if (reply == NULL)
+    g_signal_emit_by_name (op, "done", FALSE, error);
+  
+  g_object_unref (op);
+}
+
+static void
+g_file_daemon_mount (GFile *file,
+		     GMountOperation *mount_op)
+{
+  GFileDaemon *daemon_file;
+  DBusMessage *message;
+  GMountSpec *spec;
+  GMountSource *mount_source;
+
+  daemon_file = G_FILE_DAEMON (file);
+
+  spec = g_mount_spec_copy (daemon_file->mount_spec);
+  g_mount_spec_set_mount_prefix (spec, daemon_file->path);
+  mount_source = g_mount_operation_dbus_wrap (mount_op, spec);
+  g_mount_spec_unref (spec);
+  
+  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+					  G_VFS_DBUS_MOUNTTRACKER_PATH,
+					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					  G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT);
+  g_mount_source_to_dbus (mount_source, message);
+  g_object_unref (mount_source);
+
+  _g_dbus_connection_call_async (NULL, message, -1,
+				 mount_reply, g_object_ref (mount_op));
+ 
+  dbus_message_unref (message);
+}
+
+
+static void
 g_file_daemon_file_iface_init (GFileIface *iface)
 {
   iface->copy = g_file_daemon_copy;
@@ -656,4 +700,5 @@ g_file_daemon_file_iface_init (GFileIface *iface)
   iface->create = g_file_daemon_create;
   iface->replace = g_file_daemon_replace;
   iface->read_async = g_file_daemon_read_async;
+  iface->mount = g_file_daemon_mount;
 }
