@@ -19,6 +19,7 @@
 #include <gio/gsocketoutputstream.h>
 #include <gio/gmemoryoutputstream.h>
 #include <gio/gmemoryinputstream.h>
+#include <gio/gcontenttype.h>
 
 #include "gvfsbackendsftp.h"
 #include "gvfsjobopenforread.h"
@@ -1205,7 +1206,9 @@ parse_attributes (GVfsBackendSftp *backend,
   guint32 flags;
   GFileType type;
   guint32 uid, gid;
+  guint32 mode;
   gboolean has_uid;
+  char *mimetype;
   
   flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
 
@@ -1214,7 +1217,7 @@ parse_attributes (GVfsBackendSftp *backend,
 
   if (basename != NULL && basename[strlen (basename) -1] == '~')
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_BACKUP, TRUE);
-  
+
   if (flags & SSH_FILEXFER_ATTR_SIZE)
     {
       guint64 size = g_data_input_stream_get_uint64 (reply, NULL, NULL);
@@ -1233,37 +1236,68 @@ parse_attributes (GVfsBackendSftp *backend,
     }
 
   type = G_FILE_TYPE_UNKNOWN;
-  
+
   if (flags & SSH_FILEXFER_ATTR_PERMISSIONS)
     {
-      guint32 v;
-      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
-      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, v);
+      mode = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, mode);
 
-      if (S_ISREG (v))
+      mimetype = NULL;
+      if (S_ISREG (mode))
         type = G_FILE_TYPE_REGULAR;
-      else if (S_ISDIR (v))
-        type = G_FILE_TYPE_DIRECTORY;
-      else if (S_ISFIFO (v) ||
-               S_ISSOCK (v) ||
-               S_ISCHR (v) ||
-               S_ISBLK (v))
-        type = G_FILE_TYPE_SPECIAL;
-      else if (S_ISLNK (v))
+      else if (S_ISDIR (mode))
+        {
+          type = G_FILE_TYPE_DIRECTORY;
+          mimetype = "inode/directory";
+        }
+      else if (S_ISFIFO (mode))
+        {
+          type = G_FILE_TYPE_SPECIAL;
+          mimetype = "inode/fifo";
+        }
+      else if (S_ISSOCK (mode))
+        {
+          type = G_FILE_TYPE_SPECIAL;
+          mimetype = "inode/socket";
+        }
+      else if (S_ISCHR (mode))
+        {
+          type = G_FILE_TYPE_SPECIAL;
+          mimetype = "inode/chardevice";
+        }
+      else if (S_ISBLK (mode))
+        {
+          type = G_FILE_TYPE_SPECIAL;
+          mimetype = "inode/blockdevice";
+        }
+      else if (S_ISLNK (mode))
         {
           type = G_FILE_TYPE_SYMBOLIC_LINK;
           g_file_info_set_is_symlink (info, TRUE);
+          mimetype = "inode/symlink";
         }
 
+      if (mimetype)
+        g_file_info_set_content_type (info, mimetype);
+      else if (basename)
+        {
+          mimetype = g_content_type_guess (basename, NULL, 0, NULL);
+          g_file_info_set_content_type (info, mimetype);
+          g_free (mimetype);
+        }
+      else
+        g_file_info_set_content_type (info, "application/octet-stream");
+      
       if (has_uid && backend->my_uid != (guint32)-1)
         {
           if (uid == backend->my_uid)
-            set_access_attributes (info, (v >> 6) & 0x7);
+            set_access_attributes (info, (mode >> 6) & 0x7);
           else if (gid == backend->my_gid)
-            set_access_attributes (info, (v >> 3) & 0x7);
+            set_access_attributes (info, (mode >> 3) & 0x7);
           else
-            set_access_attributes (info, (v >> 0) & 0x7);
+            set_access_attributes (info, (mode >> 0) & 0x7);
         }
+
     }
 
   g_file_info_set_file_type (info, type);
