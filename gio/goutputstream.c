@@ -47,11 +47,22 @@ g_output_stream_finalize (GObject *object)
 
   stream = G_OUTPUT_STREAM (object);
   
+  if (G_OBJECT_CLASS (g_output_stream_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_output_stream_parent_class)->finalize) (object);
+}
+
+static void
+g_output_stream_dispose (GObject *object)
+{
+  GOutputStream *stream;
+
+  stream = G_OUTPUT_STREAM (object);
+  
   if (!stream->priv->closed)
     g_output_stream_close (stream, NULL, NULL);
   
-  if (G_OBJECT_CLASS (g_output_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_output_stream_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_output_stream_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_output_stream_parent_class)->dispose) (object);
 }
 
 static void
@@ -62,6 +73,7 @@ g_output_stream_class_init (GOutputStreamClass *klass)
   g_type_class_add_private (klass, sizeof (GOutputStreamPrivate));
   
   gobject_class->finalize = g_output_stream_finalize;
+  gobject_class->dispose = g_output_stream_dispose;
   
   klass->write_async = g_output_stream_real_write_async;
   klass->write_finish = g_output_stream_real_write_finish;

@@ -60,6 +60,21 @@ g_input_stream_finalize (GObject *object)
 }
 
 static void
+g_input_stream_dispose (GObject *object)
+{
+  GInputStream *stream;
+
+  stream = G_INPUT_STREAM (object);
+  
+  if (!stream->priv->closed)
+    g_input_stream_close (stream, NULL, NULL);
+  
+  if (G_OBJECT_CLASS (g_input_stream_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_input_stream_parent_class)->dispose) (object);
+}
+
+
+static void
 g_input_stream_class_init (GInputStreamClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -67,6 +82,7 @@ g_input_stream_class_init (GInputStreamClass *klass)
   g_type_class_add_private (klass, sizeof (GInputStreamPrivate));
   
   gobject_class->finalize = g_input_stream_finalize;
+  gobject_class->dispose = g_input_stream_dispose;
   
   klass->skip = g_input_stream_real_skip;
   klass->read_async = g_input_stream_real_read_async;

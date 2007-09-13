@@ -9,7 +9,7 @@
 #define P_(_x) (_x)
 
 struct _GFilterOutputStreamPrivate {
-  gboolean is_disposed;
+  int dummy;
 };
 
 enum {
@@ -165,19 +165,11 @@ g_filter_output_stream_dispose (GObject *object)
   stream = G_FILTER_OUTPUT_STREAM (object);
   priv = stream->priv;
 
-  if (priv->is_disposed)
-    return;
-
-  priv->is_disposed = TRUE;
-
-  /* We force a close of this stream here because the
-   * finalize vfunction of the output stream will also
-   * close the stream if it was left open BUT then *
-   * all resource will already be free'd (especially the 
-   * base_stream object which happens right here) */
-  g_output_stream_close (G_OUTPUT_STREAM (stream), NULL, NULL);
-
-  g_object_unref (stream->base_stream);
+  if (stream->base_stream)
+    {
+      g_object_unref (stream->base_stream);
+      stream->base_stream = NULL;
+    }
 
   G_OBJECT_CLASS (g_filter_output_stream_parent_class)->dispose (object);
 }
