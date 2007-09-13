@@ -129,9 +129,14 @@ typedef struct {
   DBUS_STRUCT_END_CHAR_AS_STRING 
 
 
-char *g_dbus_get_file_info_signature (void);
-void  g_dbus_append_file_info        (DBusMessageIter       *iter,
-				      GFileInfo             *file_info);
+char  *g_dbus_get_file_info_signature       (void);
+gchar *g_dbus_type_from_file_attribute_type (GFileAttributeType     type);
+void   g_dbus_append_file_attribute         (DBusMessageIter       *iter,
+					     const char            *attribute,
+					     GFileAttributeType     type,
+					     gconstpointer          value);
+void   g_dbus_append_file_info              (DBusMessageIter       *iter,
+					     GFileInfo             *file_info);
 
 G_END_DECLS
 

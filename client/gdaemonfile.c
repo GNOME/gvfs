@@ -276,23 +276,17 @@ g_daemon_file_resolve_relative (GFile *file,
 }
 
 static DBusMessage *
-do_sync_path_call (GFile *file,
-		   const char *op,
-		   DBusConnection **connection_out,
-		   GCancellable *cancellable,
-		   GError **error,
-		   int first_arg_type,
-		   ...)
+create_empty_message (GFile *file,
+		      const char *op)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  DBusMessage *message, *reply;
+  DBusMessage *message;
   GMountRef *mount_ref;
   const char *path;
-  va_list var_args;
 
   mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
 						daemon_file->path,
-						error);
+						NULL);
   if (mount_ref == NULL)
     return NULL;
   
@@ -306,6 +300,26 @@ do_sync_path_call (GFile *file,
 				    daemon_file->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
+  _g_mount_ref_unref (mount_ref);
+  return message;
+}
+
+static DBusMessage *
+do_sync_path_call (GFile *file,
+		   const char *op,
+		   DBusConnection **connection_out,
+		   GCancellable *cancellable,
+		   GError **error,
+		   int first_arg_type,
+		   ...)
+{
+  DBusMessage *message, *reply;
+  va_list var_args;
+
+  message = create_empty_message (file, op);
+  if (!message)
+    return NULL;
+
   va_start (var_args, first_arg_type);
   _g_dbus_message_append_args_valist (message,
 				      first_arg_type,
@@ -318,8 +332,6 @@ do_sync_path_call (GFile *file,
 				   cancellable, error);
   dbus_message_unref (message);
 
-  _g_mount_ref_unref (mount_ref);
-  
   return reply;
 }
 
@@ -1298,6 +1310,51 @@ g_daemon_file_make_directory (GFile *file,
   return TRUE;
 }
 
+static gboolean
+g_daemon_file_set_attribute (GFile *file,
+			     const char *attribute,
+			     GFileAttributeType type,
+			     gconstpointer value_ptr,
+			     GFileGetInfoFlags flags,
+			     GCancellable *cancellable,
+			     GError **error)
+{
+#if 0
+  GDaemonFile *daemon_file;
+  DBusMessage *message, *reply;
+  DBusMessageIter iter;
+  dbus_uint32_t flags_dbus;
+
+  daemon_file = G_DAEMON_FILE (file);
+
+  message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE);
+  if (!message)
+    return FALSE;
+
+  dbus_message_iter_init_append (message, &iter);
+
+  flags_dbus = flags;
+  dbus_message_iter_append_basic (&iter,
+				  DBUS_TYPE_UINT32,
+				  &flags_dbus);
+
+
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE,
+			     NULL, cancellable, error,
+			     DBUS_TYPE_STRING, &attribute,
+			     DBUS_TYPE_UINT, &type,
+			     DBUS_TYPE_UINT32, &flags_dbus,
+			     g_dbus_type_from_file_attribute_type (type), &value,
+			     0);
+  if (reply == NULL)
+    return FALSE;
+
+  dbus_message_unref (reply);
+#endif
+  return TRUE;
+}
+
 struct ProgressCallbackData {
   GFileProgressCallback progress_callback;
   gpointer progress_callback_data;
@@ -1462,4 +1519,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->make_directory = g_daemon_file_make_directory;
   iface->copy = g_daemon_file_copy;
   iface->move = g_daemon_file_move;
+  iface->set_attribute = g_daemon_file_set_attribute;
 }
