@@ -1167,7 +1167,6 @@ async_write_done (GOutputStream *stream,
   GSimpleAsyncResult *simple;
   WriteOperation *op;
   gssize count_written;
-  gssize *count_written_p;
   GError *error;
 
   op = op_data;
@@ -1183,12 +1182,11 @@ async_write_done (GOutputStream *stream,
       error = op->ret_error;
     }
 
-  count_written_p = g_new (gssize, 1);
-  *count_written_p = count_written;
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback, user_data,
-				      g_daemon_file_output_stream_write_async,
-				      count_written_p, g_free);
+				      g_daemon_file_output_stream_write_async);
+
+  g_simple_async_result_set_op_res_gssize (simple, count_written);
 
   if (count_written == -1)
     g_simple_async_result_set_from_error (simple, error);
@@ -1243,13 +1241,13 @@ g_daemon_file_output_stream_write_finish (GOutputStream             *stream,
 					  GError                   **error)
 {
   GSimpleAsyncResult *simple;
-  gssize *nwritten;
+  gssize nwritten;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
   g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_output_stream_write_async);
   
-  nwritten = g_simple_async_result_get_op_data (simple);
-  return *nwritten;
+  nwritten = g_simple_async_result_get_op_res_gssize (simple);
+  return nwritten;
 }
 
 static void
@@ -1293,8 +1291,7 @@ async_close_done (GOutputStream *stream,
   
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback, user_data,
-				      g_daemon_file_output_stream_close_async,
-				      NULL, NULL);
+				      g_daemon_file_output_stream_close_async);
 
   if (!result)
     g_simple_async_result_set_from_error (simple, error);

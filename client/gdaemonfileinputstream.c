@@ -1418,7 +1418,6 @@ async_read_done (GInputStream *stream,
 {
   ReadOperation *op;
   gssize count_read;
-  gssize *count_read_p;
   GError *error;
   GSimpleAsyncResult *simple;
 
@@ -1435,12 +1434,11 @@ async_read_done (GInputStream *stream,
       error = op->ret_error;
     }
 
-  count_read_p = g_new (gssize, 1);
-  *count_read_p = count_read;
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback, user_data,
-				      g_daemon_file_input_stream_read_async,
-				      count_read_p, g_free);
+				      g_daemon_file_input_stream_read_async);
+  
+  g_simple_async_result_set_op_res_gssize (simple, count_read);
 
   if (count_read == -1)
     g_simple_async_result_set_from_error (simple, error);
@@ -1495,13 +1493,13 @@ g_daemon_file_input_stream_read_finish (GInputStream              *stream,
 					GError                   **error)
 {
   GSimpleAsyncResult *simple;
-  gssize *nread;
+  gssize nread;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
   g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_input_stream_read_async);
   
-  nread = g_simple_async_result_get_op_data (simple);
-  return *nread;
+  nread = g_simple_async_result_get_op_res_gssize (simple);
+  return nread;
 }
 
 
@@ -1568,8 +1566,7 @@ async_close_done (GInputStream *stream,
 
   simple = g_simple_async_result_new (G_OBJECT (stream),
 				      callback, user_data,
-				      g_daemon_file_input_stream_read_async,
-				      NULL, NULL);
+				      g_daemon_file_input_stream_read_async);
 
   if (!result)
     g_simple_async_result_set_from_error (simple, error);
