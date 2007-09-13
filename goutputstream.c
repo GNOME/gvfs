@@ -1,33 +1,39 @@
 #include <config.h>
-#include "goutputstream.h"
 #include <glib/gi18n-lib.h>
+
+#include "goutputstream.h"
+#include "gioscheduler.h"
 
 G_DEFINE_TYPE (GOutputStream, g_output_stream, G_TYPE_OBJECT);
 
 static GObjectClass *parent_class = NULL;
 
 struct _GOutputStreamPrivate {
-  /* TODO: Should be public for subclasses? */
   guint closed : 1;
   guint pending : 1;
   guint cancelled : 1;
   GMainContext *context;
+  gint io_job_id;
 };
 
-static guint  g_output_stream_real_write_async (GOutputStream        *stream,
-						void                 *buffer,
-						gsize                 count,
-						int                   io_priority,
-						GAsyncWriteCallback    callback,
-						gpointer              data,
-						GDestroyNotify        notify);
-static guint  g_output_stream_real_close_async (GOutputStream         *stream,
-						GAsyncCloseCallback   callback,
-						gpointer              data,
-						GDestroyNotify        notify);
-static void   g_output_stream_real_cancel      (GOutputStream         *stream,
-					       guint                 tag);
-
+static void g_output_stream_real_write_async (GOutputStream             *stream,
+					      void                      *buffer,
+					      gsize                      count,
+					      int                        io_priority,
+					      GAsyncWriteCallback        callback,
+					      gpointer                   data,
+					      GDestroyNotify             notify);
+static void g_output_stream_real_flush_async (GOutputStream             *stream,
+					      int                        io_priority,
+					      GAsyncFlushCallback        callback,
+					      gpointer                   data,
+					      GDestroyNotify             notify);
+static void g_output_stream_real_close_async (GOutputStream             *stream,
+					      int                        io_priority,
+					      GAsyncCloseOutputCallback  callback,
+					      gpointer                   data,
+					      GDestroyNotify             notify);
+static void g_output_stream_real_cancel      (GOutputStream             *stream);
 
 static void
 g_output_stream_finalize (GObject *object)
@@ -39,6 +45,12 @@ g_output_stream_finalize (GObject *object)
   if (!stream->priv->closed)
     g_output_stream_close (stream, NULL);
   
+  if (stream->priv->context)
+    {
+      g_main_context_unref (stream->priv->context);
+      stream->priv->context = NULL;
+    }
+
   if (G_OBJECT_CLASS (parent_class)->finalize)
     (*G_OBJECT_CLASS (parent_class)->finalize) (object);
 }
@@ -55,6 +67,7 @@ g_output_stream_class_init (GOutputStreamClass *klass)
   gobject_class->finalize = g_output_stream_finalize;
   
   klass->write_async = g_output_stream_real_write_async;
+  klass->flush_async = g_output_stream_real_flush_async;
   klass->close_async = g_output_stream_real_close_async;
   klass->cancel = g_output_stream_real_cancel;
 }
@@ -96,6 +109,7 @@ g_output_stream_write (GOutputStream *stream,
 		       GError       **error)
 {
   GOutputStreamClass *class;
+  gssize res;
 
   g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), -1);
   g_return_val_if_fail (stream != NULL, -1);
@@ -134,7 +148,11 @@ g_output_stream_write (GOutputStream *stream,
       return -1;
     }
   
-  return class->write (stream, buffer, count, error);
+  stream->priv->pending = TRUE;
+  res = class->write (stream, buffer, count, error);
+  stream->priv->pending = FALSE;
+  
+  return res; 
 }
 
 /**
@@ -143,6 +161,7 @@ g_output_stream_write (GOutputStream *stream,
  * @error: location to store the error occuring, or %NULL to ignore
  *
  * Flushed any outstanding buffers in the stream. Will block during the operation.
+ * Closing the stream will implicitly cause a flush.
  *
  * This function is optional for inherited classes.
  *
@@ -153,6 +172,7 @@ g_output_stream_flush (GOutputStream    *stream,
 		       GError          **error)
 {
   GOutputStreamClass *class;
+  gboolean res;
 
   g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), FALSE);
   g_return_val_if_fail (stream != NULL, FALSE);
@@ -172,11 +192,14 @@ g_output_stream_flush (GOutputStream    *stream,
     }
   
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
-
+  
+  stream->priv->pending = TRUE;
+  res = TRUE;
   if (class->flush)
-    return class->flush (stream, error);
-  else
-    return TRUE;
+    res = class->flush (stream, error);
+  stream->priv->pending = FALSE;
+
+  return res;
 }
 
 /**
@@ -199,6 +222,10 @@ g_output_stream_flush (GOutputStream    *stream,
  * Some streams might keep the backing store of the stream (e.g. a file descriptor)
  * open after the stream is closed. See the documentation for the individual
  * stream for details.
+ *
+ * On failure the first error that happened will be reported, but the close
+ * operation will finish as much as possible. A stream that failed to
+ * close will still return %G_VFS_ERROR_CLOSED all operations.
  * 
  * Return value: %TRUE on success, %FALSE on failure
  **/
@@ -223,14 +250,28 @@ g_output_stream_close (GOutputStream  *stream,
 		   _("Stream has outstanding operation"));
       return FALSE;
     }
+
+  res = g_output_stream_flush (stream, error);
+
+  stream->priv->pending = TRUE;
   
-  res = TRUE;
+  if (!res)
+    {
+      /* flushing caused the error that we want to return,
+       * but we still want to close the underlying stream if possible
+       */
+      if (class->close)
+	class->close (stream, NULL);
+    }
+  else
+    {
+      res = TRUE;
+      if (class->close)
+	res = class->close (stream, error);
+    }
   
-  if (class->close)
-    res = class->close (stream, error);
-  
-  if (res)
-    stream->priv->closed = TRUE;
+  stream->priv->closed = TRUE;
+  stream->priv->pending = FALSE;
   
   return res;
 }
@@ -286,6 +327,80 @@ g_output_stream_get_async_context (GOutputStream *stream)
   return stream->priv->context;
 }
 
+typedef struct {
+  GOutputStream      *stream;
+  void               *buffer;
+  gsize               bytes_requested;
+  gssize              bytes_written;
+  GError             *error;
+  GAsyncWriteCallback callback;
+  gpointer            data;
+  GDestroyNotify      notify;
+} WriteAsyncResult;
+
+static gboolean
+call_write_async_result (gpointer data)
+{
+  WriteAsyncResult *res = data;
+
+  if (res->callback)
+    res->callback (res->stream,
+		   res->buffer,
+		   res->bytes_requested,
+		   res->bytes_written,
+		   res->data,
+		   res->error);
+
+  return FALSE;
+}
+
+static void
+write_async_result_free (gpointer data)
+{
+  WriteAsyncResult *res = data;
+
+  if (res->notify)
+    res->notify (res->data);
+
+  if (res->error)
+    g_error_free (res->error);
+
+  g_object_unref (res->stream);
+  
+  g_free (res);
+}
+
+static void
+queue_write_async_result (GOutputStream      *stream,
+			  void               *buffer,
+			  gsize               bytes_requested,
+			  gssize              bytes_written,
+			  GError             *error,
+			  GAsyncWriteCallback callback,
+			  gpointer            data,
+			  GDestroyNotify      notify)
+{
+  GSource *source;
+  WriteAsyncResult *res;
+
+  res = g_new0 (WriteAsyncResult, 1);
+
+  res->stream = g_object_ref (stream);
+  res->buffer = buffer;
+  res->bytes_requested = bytes_requested;
+  res->bytes_written = bytes_written;
+  res->error = error;
+  res->callback = callback;
+  res->data = data;
+  res->notify = notify;
+  
+  source = g_idle_source_new ();
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, call_write_async_result, res, write_async_result_free);
+  g_source_attach (source, g_output_stream_get_async_context (stream));
+  g_source_unref (source);
+}
+
 /**
  * g_output_stream_write_async:
  * @stream: A #GOutputStream.
@@ -316,10 +431,8 @@ g_output_stream_get_async_context (GOutputStream *stream)
  * The asyncronous methods have a default fallback that uses threads to implement
  * asynchronicity, so they are optional for inheriting classes. However, if you
  * override one you must override all.
- *
- * Return value: A tag that can be passed to g_output_stream_cancel()
  **/
-guint
+void
 g_output_stream_write_async (GOutputStream        *stream,
 			     void                *buffer,
 			     gsize                count,
@@ -329,14 +442,228 @@ g_output_stream_write_async (GOutputStream        *stream,
 			     GDestroyNotify       notify)
 {
   GOutputStreamClass *class;
+  GError *error;
 
-  g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), 0);
-  g_return_val_if_fail (stream != NULL, 0);
-  g_return_val_if_fail (buffer != NULL, 0);
+  g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
+  g_return_if_fail (stream != NULL);
+  g_return_if_fail (buffer != NULL);
+
+  stream->priv->cancelled = FALSE;
   
+  if (count == 0)
+    {
+      queue_write_async_result (stream, buffer, count, 0, NULL,
+				callback, data, notify);
+      return;
+    }
+
+  if (((gssize) count) < 0)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_INVALID_ARGUMENT,
+		   _("Too large count value passed to g_input_stream_read_async"));
+      queue_write_async_result (stream, buffer, count, -1, error,
+				callback, data, notify);
+      return;
+    }
+
+  if (stream->priv->closed)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+		   _("Stream is already closed"));
+      queue_write_async_result (stream, buffer, count, -1, error,
+				callback, data, notify);
+      return;
+    }
+  
+  if (stream->priv->pending)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("Stream has outstanding operation"));
+      queue_write_async_result (stream, buffer, count, -1, error,
+				callback, data, notify);
+      return;
+    }
+
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
+  stream->priv->pending = TRUE;
   return class->write_async (stream, buffer, count, io_priority, callback, data, notify);
+}
+
+typedef struct {
+  GOutputStream      *stream;
+  gboolean            result;
+  GError             *error;
+  GAsyncFlushCallback callback;
+  gpointer            data;
+  GDestroyNotify      notify;
+} FlushAsyncResult;
+
+static gboolean
+call_flush_async_result (gpointer data)
+{
+  FlushAsyncResult *res = data;
+
+  if (res->callback)
+    res->callback (res->stream,
+		   res->result,
+		   res->data,
+		   res->error);
+
+  return FALSE;
+}
+
+static void
+flush_async_result_free (gpointer data)
+{
+  FlushAsyncResult *res = data;
+
+  if (res->notify)
+    res->notify (res->data);
+
+  if (res->error)
+    g_error_free (res->error);
+
+  g_object_unref (res->stream);
+  
+  g_free (res);
+}
+
+static void
+queue_flush_async_result (GOutputStream      *stream,
+			  gboolean            result,
+			  GError             *error,
+			  GAsyncFlushCallback callback,
+			  gpointer            data,
+			  GDestroyNotify      notify)
+{
+  GSource *source;
+  FlushAsyncResult *res;
+
+  res = g_new0 (FlushAsyncResult, 1);
+
+  res->stream = g_object_ref (stream);
+  res->result = result;
+  res->error = error;
+  res->callback = callback;
+  res->data = data;
+  res->notify = notify;
+  
+  source = g_idle_source_new ();
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, call_flush_async_result, res, flush_async_result_free);
+  g_source_attach (source, g_output_stream_get_async_context (stream));
+  g_source_unref (source);
+}
+
+void
+g_output_stream_flush_async (GOutputStream       *stream,
+			     int                  io_priority,
+			     GAsyncFlushCallback  callback,
+			     gpointer             data,
+			     GDestroyNotify       notify)
+{
+  GOutputStreamClass *class;
+  GError *error;
+
+  g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
+  g_return_if_fail (stream != NULL);
+
+  stream->priv->cancelled = FALSE;
+  
+  if (stream->priv->closed)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_CLOSED,
+		   _("Stream is already closed"));
+      queue_flush_async_result (stream, FALSE, error,
+				callback, data, notify);
+      return;
+    }
+  
+  if (stream->priv->pending)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("Stream has outstanding operation"));
+      queue_flush_async_result (stream, FALSE, error,
+				callback, data, notify);
+      return;
+    }
+
+  class = G_OUTPUT_STREAM_GET_CLASS (stream);
+
+  stream->priv->pending = TRUE;
+  return class->flush_async (stream, io_priority, callback, data, notify);
+}
+
+typedef struct {
+  GOutputStream       *stream;
+  gboolean            result;
+  GError             *error;
+  GAsyncCloseOutputCallback callback;
+  gpointer            data;
+  GDestroyNotify      notify;
+} CloseAsyncResult;
+
+static gboolean
+call_close_async_result (gpointer data)
+{
+  CloseAsyncResult *res = data;
+
+  if (res->callback)
+    res->callback (res->stream,
+		   res->result,
+		   res->data,
+		   res->error);
+
+  return FALSE;
+}
+
+static void
+close_async_result_free (gpointer data)
+{
+  CloseAsyncResult *res = data;
+
+  if (res->notify)
+    res->notify (res->data);
+
+  if (res->error)
+    g_error_free (res->error);
+  
+  g_object_unref (res->stream);
+  
+  g_free (res);
+}
+
+static void
+queue_close_async_result (GOutputStream       *stream,
+			  gboolean            result,
+			  GError             *error,
+			  GAsyncCloseOutputCallback callback,
+			  gpointer            data,
+			  GDestroyNotify      notify)
+{
+  GSource *source;
+  CloseAsyncResult *res;
+
+  res = g_new0 (CloseAsyncResult, 1);
+
+  res->stream = g_object_ref (stream);
+  res->result = result;
+  res->error = error;
+  res->callback = callback;
+  res->data = data;
+  res->notify = notify;
+  
+  source = g_idle_source_new ();
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, call_close_async_result, res, close_async_result_free);
+  g_source_attach (source, g_output_stream_get_async_context (stream));
+  g_source_unref (source);
 }
 
 /**
@@ -354,30 +681,47 @@ g_output_stream_write_async (GOutputStream        *stream,
  * The asyncronous methods have a default fallback that uses threads to implement
  * asynchronicity, so they are optional for inheriting classes. However, if you
  * override one you must override all.
- *
- * Return value: A tag that can be passed to g_output_stream_cancel()
  **/
-guint
+void
 g_output_stream_close_async (GOutputStream       *stream,
-			    GAsyncCloseCallback callback,
-			    gpointer            data,
-			    GDestroyNotify      notify)
+			     int                  io_priority,
+			     GAsyncCloseOutputCallback callback,
+			     gpointer            data,
+			     GDestroyNotify      notify)
 {
   GOutputStreamClass *class;
+  GError *error;
 
-  g_return_val_if_fail (G_IS_OUTPUT_STREAM (stream), 0);
-  g_return_val_if_fail (stream != NULL, 0);
+  g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
+  g_return_if_fail (stream != NULL);
+  
+  stream->priv->cancelled = FALSE;
+  
+  if (stream->priv->closed)
+    {
+      queue_close_async_result (stream, TRUE, NULL,
+				callback, data, notify);
+      return;
+    }
+
+  if (stream->priv->pending)
+    {
+      error = NULL;
+      g_set_error (&error, G_VFS_ERROR, G_VFS_ERROR_PENDING,
+		   _("Stream has outstanding operation"));
+      queue_close_async_result (stream, FALSE, error,
+				callback, data, notify);
+      return;
+    }
   
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
-
-  return class->close_async (stream, callback, data, notify);
+  stream->priv->pending = TRUE;
+  return class->close_async (stream, io_priority, callback, data, notify);
 }
-
 
 /**
  * g_output_stream_cancel:
  * @stream: A #GOutputStream.
- * @tag: a value returned from an async request
  *
  * Tries to cancel an outstanding request for the stream. If it
  * succeeds the outstanding request callback will be called with
@@ -394,8 +738,7 @@ g_output_stream_close_async (GOutputStream       *stream,
  * override one you must override all.
  **/
 void
-g_output_stream_cancel (GOutputStream   *stream,
-		       guint           tag)
+g_output_stream_cancel (GOutputStream   *stream)
 {
   GOutputStreamClass *class;
 
@@ -404,7 +747,9 @@ g_output_stream_cancel (GOutputStream   *stream,
   
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
-  class->cancel (stream, tag);
+  stream->priv->cancelled = TRUE;
+  
+  class->cancel (stream);
 }
 
 
@@ -416,33 +761,329 @@ g_output_stream_is_cancelled (GOutputStream *stream)
   
   return stream->priv->cancelled;
 }
-static guint
-g_output_stream_real_write_async (GOutputStream   *stream,
-				  void                *buffer,
-				  gsize                count,
-				  int                  io_priority,
-				  GAsyncWriteCallback   callback,
-				  gpointer             data,
-				  GDestroyNotify       notify)
-{
-  g_error ("TODO");
-  return 0;
-}
 
-static guint
-g_output_stream_real_close_async (GOutputStream       *stream,
-				  GAsyncCloseCallback callback,
-				  gpointer            data,
-				  GDestroyNotify      notify)
+/********************************************
+ *   Default implementation of async ops    *
+ ********************************************/
+
+typedef struct {
+  GOutputStream      *stream;
+  void              *buffer;
+  gsize              count_requested;
+  gssize             count_written;
+  GError            *error;
+  GAsyncWriteCallback callback;
+  gpointer           data;
+  GDestroyNotify     notify;
+} WriteAsyncOp;
+
+static void
+write_op_report (gpointer data)
 {
-  g_error ("TODO");
-  return 0;
+  WriteAsyncOp *op = data;
+
+  op->stream->priv->pending = FALSE;
+
+  op->callback (op->stream,
+		op->buffer,
+		op->count_requested,
+		op->count_written,
+		op->data,
+		op->error);
+
 }
 
 static void
-g_output_stream_real_cancel (GOutputStream   *stream,
-			     guint           tag)
+write_op_free (gpointer data)
 {
-  g_error ("TODO");
+  WriteAsyncOp *op = data;
+
+  g_object_unref (op->stream);
+
+  if (op->error)
+    g_error_free (op->error);
+
+  if (op->notify)
+    op->notify (op->data);
+
+  g_free (op);
+}
+
+
+static void
+write_op_func (GIOJob *job,
+	       gpointer data)
+{
+  WriteAsyncOp *op = data;
+  GOutputStreamClass *class;
+
+  if (g_io_job_is_cancelled (job))
+    {
+      op->count_written = -1;
+      g_set_error (&op->error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+    }
+  else
+    {
+      class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+      op->count_written = class->write (op->stream, op->buffer, op->count_requested, &op->error);
+    }
+
+  g_io_job_mark_done (job);
+  g_io_job_send_to_mainloop (job, write_op_report,
+			     op, write_op_free,
+			     FALSE);
+}
+
+static void
+write_op_cancel (gpointer data)
+{
+  WriteAsyncOp *op = data;
+  GOutputStreamClass *class;
+
+  class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+  if (class->cancel_sync)
+    class->cancel_sync (op->stream);
+}
+
+static void
+g_output_stream_real_write_async (GOutputStream       *stream,
+				  void                *buffer,
+				  gsize                count,
+				  int                  io_priority,
+				  GAsyncWriteCallback  callback,
+				  gpointer             data,
+				  GDestroyNotify       notify)
+{
+  WriteAsyncOp *op;
+
+  op = g_new0 (WriteAsyncOp, 1);
+
+  op->stream = g_object_ref (stream);
+  op->buffer = buffer;
+  op->count_requested = count;
+  op->callback = callback;
+  op->data = data;
+  op->notify = notify;
+  
+  stream->priv->io_job_id = g_schedule_io_job (write_op_func,
+					       write_op_cancel,
+					       op,
+					       NULL,
+					       io_priority,
+					       g_output_stream_get_async_context (stream));
+}
+
+typedef struct {
+  GOutputStream      *stream;
+  gboolean            result;
+  GError             *error;
+  GAsyncFlushCallback callback;
+  gpointer            data;
+  GDestroyNotify      notify;
+} FlushAsyncOp;
+
+static void
+flush_op_report (gpointer data)
+{
+  FlushAsyncOp *op = data;
+
+  op->stream->priv->pending = FALSE;
+
+  op->callback (op->stream,
+		op->result,
+		op->data,
+		op->error);
+
+}
+
+static void
+flush_op_free (gpointer data)
+{
+  FlushAsyncOp *op = data;
+
+  g_object_unref (op->stream);
+
+  if (op->error)
+    g_error_free (op->error);
+
+  if (op->notify)
+    op->notify (op->data);
+
+  g_free (op);
+}
+
+
+static void
+flush_op_func (GIOJob *job,
+	      gpointer data)
+{
+  FlushAsyncOp *op = data;
+  GOutputStreamClass *class;
+
+  if (g_io_job_is_cancelled (job))
+    {
+      op->result = FALSE;
+      g_set_error (&op->error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+    }
+  else
+    {
+      class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+      op->result = TRUE;
+      if (class->flush)
+	op->result = class->flush (op->stream, &op->error);
+    }
+
+  g_io_job_mark_done (job);
+  g_io_job_send_to_mainloop (job, flush_op_report,
+			     op, flush_op_free,
+			     FALSE);
+}
+
+static void
+flush_op_cancel (gpointer data)
+{
+  FlushAsyncOp *op = data;
+  GOutputStreamClass *class;
+
+  class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+  if (class->cancel_sync)
+    class->cancel_sync (op->stream);
+}
+
+static void
+g_output_stream_real_flush_async (GOutputStream       *stream,
+				  int                  io_priority,
+				  GAsyncFlushCallback  callback,
+				  gpointer             data,
+				  GDestroyNotify       notify)
+{
+  FlushAsyncOp *op;
+
+  op = g_new0 (FlushAsyncOp, 1);
+
+  op->stream = g_object_ref (stream);
+  op->callback = callback;
+  op->data = data;
+  op->notify = notify;
+  
+  stream->priv->io_job_id = g_schedule_io_job (flush_op_func,
+					       flush_op_cancel,
+					       op,
+					       NULL,
+					       io_priority,
+					       g_output_stream_get_async_context (stream));
+}
+
+typedef struct {
+  GOutputStream     *stream;
+  gboolean           res;
+  GError            *error;
+  GAsyncCloseOutputCallback callback;
+  gpointer           data;
+  GDestroyNotify     notify;
+} CloseAsyncOp;
+
+static void
+close_op_report (gpointer data)
+{
+  CloseAsyncOp *op = data;
+
+  op->stream->priv->pending = FALSE;
+
+  op->callback (op->stream,
+		op->res,
+		op->data,
+		op->error);
+}
+
+static void
+close_op_free (gpointer data)
+{
+  CloseAsyncOp *op = data;
+
+  g_object_unref (op->stream);
+
+  if (op->error)
+    g_error_free (op->error);
+
+  if (op->notify)
+    op->notify (op->data);
+
+  g_free (op);
+}
+
+
+static void
+close_op_func (GIOJob *job,
+	      gpointer data)
+{
+  CloseAsyncOp *op = data;
+  GOutputStreamClass *class;
+
+  if (g_io_job_is_cancelled (job))
+    {
+      op->res = FALSE;
+      g_set_error (&op->error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+    }
+  else
+    {
+      class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+      op->res = class->close (op->stream, &op->error);
+    }
+
+  g_io_job_mark_done (job);
+  g_io_job_send_to_mainloop (job, close_op_report,
+			     op, close_op_free,
+			     FALSE);
+}
+
+static void
+close_op_cancel (gpointer data)
+{
+  CloseAsyncOp *op = data;
+  GOutputStreamClass *class;
+
+  class = G_OUTPUT_STREAM_GET_CLASS (op->stream);
+  if (class->cancel_sync)
+    class->cancel_sync (op->stream);
+}
+
+static void
+g_output_stream_real_close_async (GOutputStream       *stream,
+				  int                  io_priority,
+				  GAsyncCloseOutputCallback callback,
+				  gpointer            data,
+				  GDestroyNotify      notify)
+{
+  CloseAsyncOp *op;
+
+  op = g_new0 (CloseAsyncOp, 1);
+
+  op->stream = g_object_ref (stream);
+  op->callback = callback;
+  op->data = data;
+  op->notify = notify;
+  
+  stream->priv->io_job_id = g_schedule_io_job (close_op_func,
+					       close_op_cancel,
+					       op,
+					       NULL,
+					       io_priority,
+					       g_output_stream_get_async_context (stream));
+}
+
+static void
+g_output_stream_real_cancel (GOutputStream   *stream)
+{
+  g_cancel_io_job (stream->priv->io_job_id);
 }
 

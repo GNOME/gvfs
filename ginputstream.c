@@ -35,7 +35,7 @@ static void   g_input_stream_real_skip_async  (GInputStream         *stream,
 					       GDestroyNotify        notify);
 static void   g_input_stream_real_close_async (GInputStream         *stream,
 					       int                   io_priority,
-					       GAsyncCloseCallback   callback,
+					       GAsyncCloseInputCallback   callback,
 					       gpointer              data,
 					       GDestroyNotify        notify);
 static void   g_input_stream_real_cancel      (GInputStream         *stream);
@@ -253,6 +253,10 @@ g_input_stream_real_skip (GInputStream         *stream,
  * Some streams might keep the backing store of the stream (e.g. a file descriptor)
  * open after the stream is closed. See the documentation for the individual
  * stream for details.
+ *
+ * On failure the first error that happened will be reported, but the close
+ * operation will finish as much as possible. A stream that failed to
+ * close will still return %G_VFS_ERROR_CLOSED all operations.
  * 
  * Return value: %TRUE on success, %FALSE on failure
  **/
@@ -285,8 +289,7 @@ g_input_stream_close (GInputStream  *stream,
   if (class->close)
     res = class->close (stream, error);
   
-  if (res)
-    stream->priv->closed = TRUE;
+  stream->priv->closed = TRUE;
   
   stream->priv->pending = FALSE;
 
@@ -509,6 +512,7 @@ g_input_stream_read_async (GInputStream        *stream,
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   
+  stream->priv->pending = TRUE;
   class->read_async (stream, buffer, count, io_priority, callback, data, notify);
 }
 
@@ -668,6 +672,7 @@ g_input_stream_skip_async (GInputStream        *stream,
     }
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
+  stream->priv->pending = TRUE;
   class->skip_async (stream, count, io_priority, callback, data, notify);
 }
 
@@ -676,7 +681,7 @@ typedef struct {
   GInputStream       *stream;
   gboolean            result;
   GError             *error;
-  GAsyncCloseCallback callback;
+  GAsyncCloseInputCallback callback;
   gpointer            data;
   GDestroyNotify      notify;
 } CloseAsyncResult;
@@ -715,7 +720,7 @@ static void
 queue_close_async_result (GInputStream       *stream,
 			  gboolean            result,
 			  GError             *error,
-			  GAsyncCloseCallback callback,
+			  GAsyncCloseInputCallback callback,
 			  gpointer            data,
 			  GDestroyNotify      notify)
 {
@@ -758,7 +763,7 @@ queue_close_async_result (GInputStream       *stream,
 void
 g_input_stream_close_async (GInputStream       *stream,
 			    int                 io_priority,
-			    GAsyncCloseCallback callback,
+			    GAsyncCloseInputCallback callback,
 			    gpointer            data,
 			    GDestroyNotify      notify)
 {
@@ -788,6 +793,7 @@ g_input_stream_close_async (GInputStream       *stream,
     }
   
   class = G_INPUT_STREAM_GET_CLASS (stream);
+  stream->priv->pending = TRUE;
   class->close_async (stream, io_priority, callback, data, notify);
 }
 
@@ -834,6 +840,10 @@ g_input_stream_is_cancelled (GInputStream *stream)
   return stream->priv->cancelled;
 }
 
+
+/********************************************
+ *   Default implementation of async ops    *
+ ********************************************/
 
 
 typedef struct {
@@ -938,7 +948,6 @@ g_input_stream_real_read_async (GInputStream        *stream,
   op->data = data;
   op->notify = notify;
   
-  stream->priv->pending = TRUE;
   stream->priv->io_job_id = g_schedule_io_job (read_op_func,
 					       read_op_cancel,
 					       op,
@@ -1045,7 +1054,6 @@ g_input_stream_real_skip_async (GInputStream        *stream,
   op->data = data;
   op->notify = notify;
   
-  stream->priv->pending = TRUE;
   stream->priv->io_job_id = g_schedule_io_job (skip_op_func,
 					       skip_op_cancel,
 					       op,
@@ -1059,7 +1067,7 @@ typedef struct {
   GInputStream      *stream;
   gboolean           res;
   GError            *error;
-  GAsyncCloseCallback callback;
+  GAsyncCloseInputCallback callback;
   gpointer           data;
   GDestroyNotify     notify;
 } CloseAsyncOp;
@@ -1135,7 +1143,7 @@ close_op_cancel (gpointer data)
 static void
 g_input_stream_real_close_async (GInputStream       *stream,
 				 int                 io_priority,
-				 GAsyncCloseCallback callback,
+				 GAsyncCloseInputCallback callback,
 				 gpointer            data,
 				 GDestroyNotify      notify)
 {
@@ -1148,7 +1156,6 @@ g_input_stream_real_close_async (GInputStream       *stream,
   op->data = data;
   op->notify = notify;
   
-  stream->priv->pending = TRUE;
   stream->priv->io_job_id = g_schedule_io_job (close_op_func,
 					       close_op_cancel,
 					       op,

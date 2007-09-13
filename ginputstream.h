@@ -56,7 +56,7 @@ typedef void (*GAsyncSkipCallback)  (GInputStream *stream,
 				     GError       *error);
 
 /**
- * GAsyncCloseCallback:
+ * GAsyncCloseInputCallback:
  * @stream: a #GInputStream
  * @result: %TRUE on success, %FALSE otherwis
  * @error: the error, if result is %FALSE, otherwise %NULL
@@ -68,10 +68,10 @@ typedef void (*GAsyncSkipCallback)  (GInputStream *stream,
  * If the operation was cancelled @result will be %FALSE, and @error
  * will be %G_VFS_ERROR_CANCELLED.
  **/
-typedef void (*GAsyncCloseCallback)  (GInputStream *stream,
-				      gboolean      result,
-				      gpointer      data,
-				      GError       *error);
+typedef void (*GAsyncCloseInputCallback)  (GInputStream *stream,
+					   gboolean      result,
+					   gpointer      data,
+					   GError       *error);
 
 struct _GInputStream
 {
@@ -113,7 +113,7 @@ struct _GInputStreamClass
 			   GDestroyNotify      notify);
   void    (* close_async) (GInputStream        *stream,
 			   int                  io_priority,
-			   GAsyncCloseCallback callback,
+			   GAsyncCloseInputCallback callback,
 			   gpointer            data,
 			   GDestroyNotify      notify);
   void     (* cancel)     (GInputStream       *stream);
@@ -131,41 +131,39 @@ struct _GInputStreamClass
 
 GType g_input_stream_get_type (void) G_GNUC_CONST;
 
-gssize        g_input_stream_read              (GInputStream         *stream,
-						void                 *buffer,
-						gsize                 count,
-						GError              **error);
-gssize        g_input_stream_skip              (GInputStream         *stream,
-						gsize                 count,
-						GError              **error);
-gboolean      g_input_stream_close             (GInputStream         *stream,
-						GError              **error);
+gssize        g_input_stream_read              (GInputStream              *stream,
+						void                      *buffer,
+						gsize                      count,
+						GError                   **error);
+gssize        g_input_stream_skip              (GInputStream              *stream,
+						gsize                      count,
+						GError                   **error);
+gboolean      g_input_stream_close             (GInputStream              *stream,
+						GError                   **error);
+void          g_input_stream_set_async_context (GInputStream              *stream,
+						GMainContext              *context);
+GMainContext *g_input_stream_get_async_context (GInputStream              *stream);
+void          g_input_stream_read_async        (GInputStream              *stream,
+						void                      *buffer,
+						gsize                      count,
+						int                        io_priority,
+						GAsyncReadCallback         callback,
+						gpointer                   data,
+						GDestroyNotify             notify);
+void          g_input_stream_skip_async        (GInputStream              *stream,
+						gsize                      count,
+						int                        io_priority,
+						GAsyncSkipCallback         callback,
+						gpointer                   data,
+						GDestroyNotify             notify);
+void          g_input_stream_close_async       (GInputStream              *stream,
+						int                        io_priority,
+						GAsyncCloseInputCallback   callback,
+						gpointer                   data,
+						GDestroyNotify             notify);
+void          g_input_stream_cancel            (GInputStream              *stream);
+gboolean      g_input_stream_is_cancelled      (GInputStream              *stream);
 
-void          g_input_stream_set_async_context (GInputStream         *stream,
-						GMainContext         *context);
-GMainContext *g_input_stream_get_async_context (GInputStream         *stream);
-void          g_input_stream_read_async        (GInputStream         *stream,
-						void                 *buffer,
-						gsize                 count,
-						int                   io_priority,
-						GAsyncReadCallback    callback,
-						gpointer              data,
-						GDestroyNotify        notify);
-void          g_input_stream_skip_async        (GInputStream         *stream,
-						gsize                 count,
-						int                   io_priority,
-						GAsyncSkipCallback    callback,
-						gpointer              data,
-						GDestroyNotify        notify);
-void          g_input_stream_close_async       (GInputStream         *stream,
-						int                   io_priority,
-						GAsyncCloseCallback   callback,
-						gpointer              data,
-						GDestroyNotify        notify);
-void          g_input_stream_cancel            (GInputStream         *stream);
-
-
-gboolean      g_input_stream_is_cancelled      (GInputStream         *stream);
 
 G_END_DECLS
 

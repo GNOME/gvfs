@@ -3,7 +3,7 @@
 
 #include <glib-object.h>
 #include <gvfstypes.h>
-#include <ginputstream.h>
+#include <gvfserror.h>
 
 G_BEGIN_DECLS
 
@@ -19,11 +19,36 @@ typedef struct _GOutputStreamClass    GOutputStreamClass;
 typedef struct _GOutputStreamPrivate  GOutputStreamPrivate;
 
 typedef void (*GAsyncWriteCallback)  (GOutputStream *stream,
-				      void               *buffer,
-				      gssize             bytes_requested,
-				      gssize             bytes_writen,
-				      gpointer            data,
-				      GError             *error);
+				      void          *buffer,
+				      gsize          bytes_requested,
+				      gssize         bytes_written,
+				      gpointer       data,
+				      GError        *error);
+
+typedef void (*GAsyncFlushCallback)  (GOutputStream *stream,
+				      gboolean       result,
+				      gpointer       data,
+				      GError        *error);
+
+
+/**
+ * GAsyncCloseOutputCallback:
+ * @stream: a #GOutputStream
+ * @result: %TRUE on success, %FALSE otherwis
+ * @error: the error, if result is %FALSE, otherwise %NULL
+ *
+ * This callback is called when an asychronous close operation
+ * is finished. 
+ *
+ * The callback is always called, even if the operation was cancelled.
+ * If the operation was cancelled @result will be %FALSE, and @error
+ * will be %G_VFS_ERROR_CANCELLED.
+ **/
+typedef void (*GAsyncCloseOutputCallback)  (GOutputStream *stream,
+					    gboolean      result,
+					    gpointer      data,
+					    GError       *error);
+
 
 struct _GOutputStream
 {
@@ -51,22 +76,27 @@ struct _GOutputStreamClass
 
   /* Async ops: (optional in derived classes) */
 
-  guint    (* write_async) (GOutputStream       *stream,
+  void     (* write_async) (GOutputStream       *stream,
 			    void                *buffer,
 			    gsize                count,
 			    int                  io_priority,
 			    GAsyncWriteCallback  callback,
 			    gpointer             data,
 			    GDestroyNotify       notify);
-  guint    (* close_async) (GOutputStream       *stream,
-			    GAsyncCloseCallback  callback,
+  void     (* flush_async) (GOutputStream       *stream,
+			    int                  io_priority,
+			    GAsyncFlushCallback  callback,
 			    gpointer             data,
 			    GDestroyNotify       notify);
-  void     (* cancel)      (GOutputStream       *stream,
-			    guint                tag);
+  void     (* close_async) (GOutputStream       *stream,
+			    int                  io_priority,
+			    GAsyncCloseOutputCallback callback,
+			    gpointer             data,
+			    GDestroyNotify       notify);
+  void     (* cancel)      (GOutputStream       *stream);
 
   /* Optional cancel wakeup if using default async ops */
-  void     (* cancel_sync) (GInputStream  *stream);
+  void     (* cancel_sync) (GOutputStream  *stream);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -78,34 +108,36 @@ struct _GOutputStreamClass
 
 GType g_output_stream_get_type (void) G_GNUC_CONST;
   
-
-gssize        g_output_stream_write             (GOutputStream        *stream,
-						 void                 *buffer,
-						 gsize                 count,
-						 GError              **error);
-gboolean      g_output_stream_flush             (GOutputStream        *stream,
-						 GError              **error);
-gboolean      g_output_stream_close             (GOutputStream        *stream,
-						 GError              **error);
-void          g_output_stream_set_async_context (GOutputStream        *stream,
-						 GMainContext         *context);
-GMainContext *g_output_stream_get_async_context (GOutputStream        *stream);
-guint         g_output_stream_write_async       (GOutputStream        *stream,
-						 void                 *buffer,
-						 gsize                 count,
-						 int                   io_priority,
-						 GAsyncWriteCallback   callback,
-						 gpointer              data,
-						 GDestroyNotify        notify);
-guint         g_output_stream_close_async       (GOutputStream        *stream,
-						 GAsyncCloseCallback   callback,
-						 gpointer              data,
-						 GDestroyNotify        notify);
-void          g_output_stream_cancel            (GOutputStream        *stream,
-						 guint                 tag);
-
-gboolean      g_output_stream_is_cancelled      (GOutputStream        *stream);
-
+gssize        g_output_stream_write             (GOutputStream              *stream,
+						 void                       *buffer,
+						 gsize                       count,
+						 GError                    **error);
+gboolean      g_output_stream_flush             (GOutputStream              *stream,
+						 GError                    **error);
+gboolean      g_output_stream_close             (GOutputStream              *stream,
+						 GError                    **error);
+void          g_output_stream_set_async_context (GOutputStream              *stream,
+						 GMainContext               *context);
+GMainContext *g_output_stream_get_async_context (GOutputStream              *stream);
+void          g_output_stream_write_async       (GOutputStream              *stream,
+						 void                       *buffer,
+						 gsize                       count,
+						 int                         io_priority,
+						 GAsyncWriteCallback         callback,
+						 gpointer                    data,
+						 GDestroyNotify              notify);
+void          g_output_stream_flush_async       (GOutputStream              *stream,
+						 int                         io_priority,
+						 GAsyncFlushCallback         callback,
+						 gpointer                    data,
+						 GDestroyNotify              notify);
+void          g_output_stream_close_async       (GOutputStream              *stream,
+						 int                         io_priority,
+						 GAsyncCloseOutputCallback   callback,
+						 gpointer                    data,
+						 GDestroyNotify              notify);
+void          g_output_stream_cancel            (GOutputStream              *stream);
+gboolean      g_output_stream_is_cancelled      (GOutputStream              *stream);
 
 G_END_DECLS
 

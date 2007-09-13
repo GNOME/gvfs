@@ -1,9 +1,3 @@
-
-streams:
-
-InputStream <- FileInputStream (adds fstat + last_mtime) <- LocalFileInputStream
-	
-
 type: File, Folder, Symlink, Shortcut, Mountable, special (fifo, socket, chardec, blockdev)
 flags: hidden, 	
 GFileInfo {
