@@ -198,6 +198,15 @@ g_file_enumerate_children (GFile *file,
 {
   GFileIface *iface;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->enumerate_children) (file, attributes, flags,
@@ -213,6 +222,15 @@ g_file_get_info (GFile *file,
 {
   GFileIface *iface;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->get_info) (file, attributes, flags, cancellable, error);
@@ -224,6 +242,15 @@ g_file_read (GFile *file,
 	     GError **error)
 {
   GFileIface *iface;
+  
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
 
   iface = G_FILE_GET_IFACE (file);
 
@@ -237,6 +264,15 @@ g_file_append_to (GFile *file,
 {
   GFileIface *iface;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->append_to) (file, cancellable, error);
@@ -249,6 +285,15 @@ g_file_create (GFile *file,
 {
   GFileIface *iface;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->create) (file, cancellable, error);
@@ -263,6 +308,15 @@ g_file_replace (GFile *file,
 {
   GFileIface *iface;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return NULL;
+    }
+  
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->replace) (file, mtime, make_backup, cancellable, error);
@@ -388,6 +442,15 @@ g_file_copy (GFile                  *source,
   GError *my_error;
   gboolean res;
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
   if (G_OBJECT_TYPE (source) == G_OBJECT_TYPE (destination))
     {
       iface = G_FILE_GET_IFACE (source);
@@ -413,6 +476,76 @@ g_file_copy (GFile                  *source,
 			     error);
 }
 
+gboolean
+g_file_move (GFile                  *source,
+	     GFile                  *destination,
+	     GFileCopyFlags          flags,
+	     GCancellable           *cancellable,
+	     GFileProgressCallback   progress_callback,
+	     gpointer                progress_callback_data,
+	     GError                **error)
+{
+  GFileIface *iface;
+  GError *my_error;
+  gboolean res;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  if (G_OBJECT_TYPE (source) == G_OBJECT_TYPE (destination))
+    {
+      iface = G_FILE_GET_IFACE (source);
+
+      if (iface->move)
+	{
+	  my_error = NULL;
+	  res = (* iface->move) (source, destination, flags, cancellable, progress_callback, progress_callback_data, &my_error);
+	  
+	  if (res)
+	    return TRUE;
+	  
+	  if (my_error->domain != G_VFS_ERROR || my_error->code != G_VFS_ERROR_NOT_SUPPORTED)
+	    {
+	      g_propagate_error (error, my_error);
+	      return FALSE;
+	    }
+	}
+    }
+
+  if (!g_file_copy (source, destination, flags, cancellable,
+		    progress_callback, progress_callback_data,
+		    error))
+    return FALSE;
+
+  return g_file_delete (source, cancellable, error);
+}
+
+gboolean
+g_file_delete (GFile *file,
+	       GCancellable *cancellable,
+	       GError **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->delete_file) (file, cancellable, error);
+}
 
 void
 g_file_mount (GFile *file,

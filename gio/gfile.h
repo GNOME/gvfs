@@ -79,7 +79,17 @@ struct _GFileIface
 					     gboolean              make_backup,
 					     GCancellable         *cancellable,
 					     GError              **error);
+  gboolean            (*delete_file)        (GFile                *file,
+					     GCancellable         *cancellable,
+					     GError              **error);
   gboolean            (*copy)               (GFile                *source,
+					     GFile                *destination,
+					     GFileCopyFlags        flags,
+					     GCancellable         *cancellable,
+					     GFileProgressCallback progress_callback,
+					     gpointer              progress_callback_data,
+					     GError              **error);
+  gboolean            (*move)               (GFile                *source,
 					     GFile                *destination,
 					     GFileCopyFlags        flags,
 					     GCancellable         *cancellable,
@@ -150,7 +160,17 @@ void               g_file_read_async         (GFile                  *file,
 					      GCancellable           *cancellable);
 
 
+gboolean           g_file_delete             (GFile                  *file,
+					      GCancellable           *cancellable,
+					      GError                **error);
 gboolean           g_file_copy               (GFile                  *source,
+					      GFile                  *destination,
+					      GFileCopyFlags          flags,
+					      GCancellable           *cancellable,
+					      GFileProgressCallback   progress_callback,
+					      gpointer                progress_callback_data,
+					      GError                **error);
+gboolean           g_file_move               (GFile                  *source,
 					      GFile                  *destination,
 					      GFileCopyFlags          flags,
 					      GCancellable           *cancellable,

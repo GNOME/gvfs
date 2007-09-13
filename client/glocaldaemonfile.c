@@ -198,6 +198,47 @@ g_local_daemon_file_replace (GFile *file,
   return g_file_replace (G_LOCAL_DAEMON_FILE (file)->wrapped, mtime, make_backup, cancellable, error);
 }
 
+static gboolean
+g_local_daemon_file_copy (GFile                *source,
+			  GFile                *destination,
+			  GFileCopyFlags        flags,
+			  GCancellable         *cancellable,
+			  GFileProgressCallback progress_callback,
+			  gpointer              progress_callback_data,
+			  GError              **error)
+{
+  return g_file_copy (G_LOCAL_DAEMON_FILE (source)->wrapped,
+		      G_LOCAL_DAEMON_FILE (destination)->wrapped,
+		      flags, cancellable,
+		      progress_callback, progress_callback_data,
+		      error);
+}
+
+static gboolean
+g_local_daemon_file_move (GFile                *source,
+			  GFile                *destination,
+			  GFileCopyFlags        flags,
+			  GCancellable         *cancellable,
+			  GFileProgressCallback progress_callback,
+			  gpointer              progress_callback_data,
+			  GError              **error)
+{
+  return g_file_move (G_LOCAL_DAEMON_FILE (source)->wrapped,
+		      G_LOCAL_DAEMON_FILE (destination)->wrapped,
+		      flags, cancellable,
+		      progress_callback, progress_callback_data,
+		      error);
+}
+
+
+static gboolean
+g_local_daemon_file_delete (GFile *file,
+			    GCancellable *cancellable,
+			    GError **error)
+{
+  return g_file_delete (G_LOCAL_DAEMON_FILE (file)->wrapped, cancellable, error);
+}
+
 static void
 g_local_daemon_file_mount (GFile *file,
 			   GMountOperation *mount_op)
@@ -224,5 +265,8 @@ g_local_daemon_file_file_iface_init (GFileIface *iface)
   iface->append_to = g_local_daemon_file_append_to;
   iface->create = g_local_daemon_file_create;
   iface->replace = g_local_daemon_file_replace;
+  iface->delete_file = g_local_daemon_file_delete;
+  iface->copy = g_local_daemon_file_copy;
+  iface->move = g_local_daemon_file_move;
   iface->mount = g_local_daemon_file_mount;
 }

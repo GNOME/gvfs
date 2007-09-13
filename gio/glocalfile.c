@@ -5,6 +5,8 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "glocalfile.h"
 #include "glocalfileinfo.h"
@@ -364,15 +366,6 @@ g_local_file_read (GFile *file,
   GLocalFile *local = G_LOCAL_FILE (file);
   int fd;
   
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      g_set_error (error,
-		   G_VFS_ERROR,
-		   G_VFS_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
-      return NULL;
-    }
-
   fd = g_open (local->filename, O_RDONLY, 0);
   if (fd == -1)
     {
@@ -416,6 +409,132 @@ g_local_file_replace (GFile *file,
 					     cancellable, error);
 }
 
+
+static gboolean
+g_local_file_delete (GFile *file,
+		     GCancellable *cancellable,
+		     GError **error)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  int res;
+  
+  res = g_unlink (local->filename);
+
+  /* Linux returns EISDIR in the case of unlinking a directory.
+     Posix specifies that the unlink of the directorey may succeed,
+     otherwise it should return EPERM */
+  if (res == -1 &&
+      (errno == EISDIR || errno == EPERM))
+    res = g_rmdir (local->filename);
+
+  if (res == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error removing file %s: %s"),
+		   local->filename, g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
+static gboolean
+g_local_file_copy (GFile                *source,
+		   GFile                *destination,
+		   GFileCopyFlags        flags,
+		   GCancellable         *cancellable,
+		   GFileProgressCallback progress_callback,
+		   gpointer              progress_callback_data,
+		   GError              **error)
+{
+  /* Fall back to default copy */
+  g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED, "Copy not supported");
+  return FALSE;
+}
+
+static gboolean
+g_local_file_move (GFile                *source,
+		   GFile                *destination,
+		   GFileCopyFlags        flags,
+		   GCancellable         *cancellable,
+		   GFileProgressCallback progress_callback,
+		   gpointer              progress_callback_data,
+		   GError              **error)
+{
+  GLocalFile *local_source = G_LOCAL_FILE (source);
+  GLocalFile *local_destination = G_LOCAL_FILE (destination);
+  struct stat statbuf;
+  gboolean destination_exist;
+  char *backup_name; 
+
+  destination_exist = FALSE;
+  if ((flags & G_FILE_COPY_OVERWRITE) == 0 ||
+      (flags & G_FILE_COPY_BACKUP))
+    {
+      if (!(g_stat (local_destination->filename, &statbuf) == -1 &&
+	    errno == ENOENT))
+	destination_exist = TRUE;
+    }
+
+  if ((flags & G_FILE_COPY_OVERWRITE) == 0 && destination_exist)
+    {
+      g_set_error (error,
+		   G_FILE_ERROR,
+		   G_FILE_ERROR_EXIST,
+		   _("Target file already exists"));
+      return FALSE;
+    }
+  
+  if (flags & G_FILE_COPY_BACKUP && destination_exist)
+    {
+      backup_name = g_strconcat (local_destination->filename, "~", NULL);
+      if (rename (local_destination->filename, backup_name) == -1)
+	{
+      	  g_set_error (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_CANT_CREATE_BACKUP,
+		       _("Backup file creation failed"));
+	  g_free (backup_name);
+	  return FALSE;
+	}
+      g_free (backup_name);
+    }
+
+  if (rename (local_source->filename, local_destination->filename) == -1)
+    {
+      if (errno == EXDEV)
+	goto fallback;
+      else
+	g_set_error (error, G_FILE_ERROR,
+		     g_file_error_from_errno (errno),
+		     _("Error moving file: %s"),
+		     g_strerror (errno));
+      return FALSE;
+
+    }
+  return TRUE;
+
+ fallback:
+
+  if (!g_file_copy (source, destination, G_FILE_COPY_OVERWRITE, cancellable,
+		    progress_callback, progress_callback_data,
+		    error))
+    return FALSE;
+
+  /* Try to inherit source permissions, etc */
+  if (g_stat (local_source->filename, &statbuf) != -1)
+    {
+      chown (local_destination->filename, statbuf.st_uid, statbuf.st_gid);
+      chmod (local_destination->filename, statbuf.st_mode);
+    }
+
+  /* TODO: Inherit xattrs */
+  
+  return g_file_delete (source, cancellable, error);
+}
+
+
 static void
 g_local_file_mount (GFile *file,
 		    GMountOperation *mount_operation)
@@ -443,5 +562,8 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->append_to = g_local_file_append_to;
   iface->create = g_local_file_create;
   iface->replace = g_local_file_replace;
+  iface->delete_file = g_local_file_delete;
+  iface->copy = g_local_file_copy;
+  iface->move = g_local_file_move;
   iface->mount = g_local_file_mount;
 }
