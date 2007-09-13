@@ -178,6 +178,18 @@ g_file_get_child (GFile *file,
 }
 
 GFile *
+g_file_get_child_for_display_name (GFile *file,
+				   const char *display_name,
+				   GError **error)
+{
+  GFileIface *iface;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->get_child_for_display_name) (file, display_name, error);
+}
+
+GFile *
 g_file_resolve_relative (GFile *file,
 			 const char *relative_path)
 {
@@ -548,6 +560,28 @@ g_file_make_directory (GFile *file,
 }
 
 gboolean
+g_file_make_symbolic_link (GFile *file,
+			   const char *symlink_value,
+			   GCancellable *cancellable,
+			   GError **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->make_symbolic_link) (file, symlink_value, cancellable, error);
+}
+
+gboolean
 g_file_delete (GFile *file,
 	       GCancellable *cancellable,
 	       GError **error)
@@ -566,6 +600,132 @@ g_file_delete (GFile *file,
   iface = G_FILE_GET_IFACE (file);
 
   return (* iface->delete_file) (file, cancellable, error);
+}
+
+
+GFile *
+g_file_set_display_name (GFile                  *file,
+			 const char             *display_name,
+			 GCancellable           *cancellable,
+			 GError                **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->set_display_name) (file, display_name, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute (GFile                  *file,
+		      const char             *attribute,
+		      GFileAttributeType      type,
+		      gconstpointer           value,
+		      GFileGetInfoFlags       flags,
+		      GCancellable           *cancellable,
+		      GError                **error)
+{
+  GFileIface *iface;
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error (error,
+		   G_VFS_ERROR,
+		   G_VFS_ERROR_CANCELLED,
+		   _("Operation was cancelled"));
+      return FALSE;
+    }
+  
+  iface = G_FILE_GET_IFACE (file);
+
+  return (* iface->set_attribute) (file, attribute, type, value, flags, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute_string (GFile                  *file,
+			     const char             *attribute,
+			     const char             *value,
+			     GFileGetInfoFlags       flags,
+			     GCancellable           *cancellable,
+			     GError                **error)
+{
+  return g_file_set_attribute (file, attribute,
+			       G_FILE_ATTRIBUTE_TYPE_STRING,
+			       value, flags, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute_byte_string  (GFile                  *file,
+				   const char             *attribute,
+				   const char             *value,
+				   GFileGetInfoFlags       flags,
+				   GCancellable           *cancellable,
+				   GError                **error)
+{
+  return g_file_set_attribute (file, attribute,
+			       G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
+			       value, flags, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute_uint32 (GFile                  *file,
+			     const char             *attribute,
+			     guint32                 value,
+			     GFileGetInfoFlags       flags,
+			     GCancellable           *cancellable,
+			     GError                **error)
+{
+  return g_file_set_attribute (file, attribute,
+			       G_FILE_ATTRIBUTE_TYPE_UINT32,
+			       &value, flags, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute_int32 (GFile                  *file,
+			    const char             *attribute,
+			    const char             *value,
+			    GFileGetInfoFlags       flags,
+			    GCancellable           *cancellable,
+			    GError                **error)
+{
+  return g_file_set_attribute (file, attribute,
+			       G_FILE_ATTRIBUTE_TYPE_INT32,
+			       &value, flags, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute_uint64 (GFile                  *file,
+			     const char             *attribute,
+			     guint64                 value,
+			     GFileGetInfoFlags       flags,
+			     GCancellable           *cancellable,
+			     GError                **error)
+{
+  return g_file_set_attribute (file, attribute,
+			       G_FILE_ATTRIBUTE_TYPE_UINT64,
+			       &value, flags, cancellable, error);
+}
+
+gboolean
+g_file_set_attribute_int64 (GFile                  *file,
+			    const char             *attribute,
+			    gint64                  value,
+			    GFileGetInfoFlags       flags,
+			    GCancellable           *cancellable,
+			    GError                **error)
+{
+  return g_file_set_attribute (file, attribute,
+			       G_FILE_ATTRIBUTE_TYPE_INT64,
+			       &value, flags, cancellable, error);
 }
 
 void

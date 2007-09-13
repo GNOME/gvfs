@@ -319,7 +319,7 @@ g_local_file_resolve_relative (GFile *file,
 }
 
 static GFileEnumerator *
-g_local_file_enumerate_children (GFile      *file,
+g_local_file_enumerate_children (GFile *file,
 				 const char *attributes,
 				 GFileGetInfoFlags flags,
 				 GCancellable *cancellable,
@@ -329,6 +329,73 @@ g_local_file_enumerate_children (GFile      *file,
   return g_local_file_enumerator_new (local->filename,
 				      attributes, flags,
 				      cancellable, error);
+}
+
+static GFile *
+g_local_file_get_child_for_display_name (GFile        *file,
+					 const char   *display_name,
+					 GError      **error)
+{
+  GFile *parent, *new_file;
+  char *basename;
+
+  basename = g_filename_from_utf8 (display_name, -1, NULL, NULL, NULL);
+  if (basename == NULL)
+    {
+      g_set_error (error, G_VFS_ERROR,
+		   G_VFS_ERROR_INVALID_FILENAME,
+		   _("Invalid filename %s"), display_name);
+      return NULL;
+    }
+
+  parent = g_file_get_parent (file);
+  new_file = g_file_get_child (file, basename);
+  g_object_unref (parent);
+  g_free (basename);
+  
+  return new_file;
+}
+
+
+static GFile *
+g_local_file_set_display_name (GFile *file,
+			       const char *display_name,
+			       GCancellable *cancellable,
+			       GError **error)
+{
+  GLocalFile *local, *new_local;
+  GFile *new_file;
+  struct stat statbuf;
+  
+  new_file = g_file_get_child_for_display_name  (file, display_name, error);
+  if (new_file == NULL)
+    return NULL;
+  
+  local = G_LOCAL_FILE (file);
+  new_local = G_LOCAL_FILE (new_file);
+  
+  g_stat (new_local->filename, &statbuf);
+
+  if (!(g_stat (new_local->filename, &statbuf) == -1 &&
+	errno == ENOENT))
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   G_FILE_ERROR_EXIST,
+		   _("Can't rename file, filename already exist"));
+      return NULL;
+    }
+
+  if (rename (local->filename, new_local->filename) == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error renaming file: %s"),
+		   g_strerror (errno));
+      g_object_unref (new_file);
+      return NULL;
+    }
+  
+  return new_file;
 }
 
 static GFileInfo *
@@ -358,6 +425,174 @@ g_local_file_get_info (GFile                *file,
   return info;
 }
 
+static gboolean
+get_uint32 (GFileAttributeType type,
+	    gconstpointer value,
+	    guint32 *val_out,
+	    GError **error)
+{
+  if (type != G_FILE_ATTRIBUTE_TYPE_UINT32)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		   _("Invalid attribute type (uint32 expected)"));
+      return FALSE;
+    }
+
+  *val_out = *(guint32 *)value;
+  
+  return TRUE;
+}
+
+static gboolean
+get_byte_string (GFileAttributeType type,
+		 gconstpointer value,
+		 const char **val_out,
+		 GError **error)
+{
+  if (type != G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
+    {
+      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		   _("Invalid attribute type (byte string expected)"));
+      return FALSE;
+    }
+
+  *val_out = (const char *)value;
+  
+  return TRUE;
+}
+
+
+static gboolean
+g_local_file_set_attribute (GFile *file,
+			    const char *attribute,
+			    GFileAttributeType type,
+			    gconstpointer value,
+			    GFileGetInfoFlags flags,
+			    GCancellable *cancellable,
+			    GError **error)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  int res;
+
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+    {
+      guint32 val;
+
+      if (!get_uint32 (type, value, &val, error))
+	  return FALSE;
+
+      if (g_chmod (local->filename, val) == -1)
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error setting permissions: %s"),
+		       g_strerror (errno));
+	  return FALSE;
+	}
+      return TRUE;
+    }
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_UID) == 0)
+    {
+      guint32 val;
+
+      if (!get_uint32 (type, value, &val, error))
+	  return FALSE;
+
+      if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+	res = lchown (local->filename, val, -1);
+      else
+	res = chown (local->filename, val, -1);
+	
+      if (res == -1)
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error setting owner: %s"),
+		       g_strerror (errno));
+	  return FALSE;
+	}
+      return TRUE;
+    }
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_GID) == 0)
+    {
+      guint32 val;
+
+      if (!get_uint32 (type, value, &val, error))
+	  return FALSE;
+
+      if (flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+	res = lchown (local->filename, -1, val);
+      else
+	res = chown (local->filename, -1, val);
+	
+      if (res == -1)
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error setting owner: %s"),
+		       g_strerror (errno));
+	  return FALSE;
+	}
+      return TRUE;
+    }
+  else if (strcmp (attribute, G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET) == 0)
+    {
+      const char *val;
+      struct stat statbuf;
+
+      if (!get_byte_string (type, value, &val, error))
+	  return FALSE;
+      
+      
+      if (val == NULL)
+	{
+	  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+		       _("symlink must be non-NULL"));
+	  return FALSE;
+	}
+
+      if (g_lstat (local->filename, &statbuf))
+	{
+	  g_set_error (error, G_FILE_ERROR,
+		       g_file_error_from_errno (errno),
+		       _("Error setting symlink: %s"),
+		       g_strerror (errno));
+	  return FALSE;
+	}
+
+	if (!S_ISLNK (statbuf.st_mode))
+	  {
+	  g_set_error (error, G_VFS_ERROR,
+		       G_VFS_ERROR_NOT_SYMBOLIC_LINK,
+		       _("Error setting symlink: file is not a symlink"));
+	  return FALSE;
+	}
+
+	if (g_unlink (local->filename))
+	  {
+	    g_set_error (error, G_FILE_ERROR,
+			 g_file_error_from_errno (errno),
+			 _("Error setting symlink: %s"),
+			 g_strerror (errno));
+	    return FALSE;
+	  }
+
+	if (symlink (local->filename, val) != 0)
+	  {
+	    g_set_error (error, G_FILE_ERROR,
+			 g_file_error_from_errno (errno),
+			 _("Error setting symlink: %s"),
+			 g_strerror (errno));
+	    return FALSE;
+	  }
+	
+	return TRUE;
+    }
+  
+  g_set_error (error, G_VFS_ERROR, G_VFS_ERROR_NOT_SUPPORTED, "Copy not supported");
+  return FALSE;
+}
+
 static GFileInputStream *
 g_local_file_read (GFile *file,
 		   GCancellable *cancellable,
@@ -371,8 +606,8 @@ g_local_file_read (GFile *file,
     {
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
-		   _("Error opening file %s: %s"),
-		   local->filename, g_strerror (errno));
+		   _("Error opening file: %s"),
+		   g_strerror (errno));
       return NULL;
     }
   
@@ -421,8 +656,8 @@ g_local_file_delete (GFile *file,
     {
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
-		   _("Error removing file %s: %s"),
-		   local->filename, g_strerror (errno));
+		   _("Error removing file: %s"),
+		   g_strerror (errno));
       return FALSE;
     }
   
@@ -440,13 +675,34 @@ g_local_file_make_directory (GFile *file,
     {
       g_set_error (error, G_FILE_ERROR,
 		   g_file_error_from_errno (errno),
-		   _("Error removing file %s: %s"),
-		   local->filename, g_strerror (errno));
+		   _("Error removing file: %s"),
+		   g_strerror (errno));
       return FALSE;
     }
   
   return TRUE;
 }
+
+static gboolean
+g_local_file_make_symbolic_link (GFile *file,
+				 const char *symlink_value,
+				 GCancellable *cancellable,
+				 GError **error)
+{
+  GLocalFile *local = G_LOCAL_FILE (file);
+  
+  if (symlink (local->filename, symlink_value) == -1)
+    {
+      g_set_error (error, G_FILE_ERROR,
+		   g_file_error_from_errno (errno),
+		   _("Error making symbolic link: %s"),
+		   g_strerror (errno));
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
 
 static gboolean
 g_local_file_copy (GFile                *source,
@@ -565,14 +821,18 @@ g_local_file_file_iface_init (GFileIface *iface)
   iface->get_parse_name = g_local_file_get_parse_name;
   iface->get_parent = g_local_file_get_parent;
   iface->resolve_relative = g_local_file_resolve_relative;
+  iface->get_child_for_display_name = g_local_file_get_child_for_display_name;
+  iface->set_display_name = g_local_file_set_display_name;
   iface->enumerate_children = g_local_file_enumerate_children;
   iface->get_info = g_local_file_get_info;
+  iface->set_attribute = g_local_file_set_attribute;
   iface->read = g_local_file_read;
   iface->append_to = g_local_file_append_to;
   iface->create = g_local_file_create;
   iface->replace = g_local_file_replace;
   iface->delete_file = g_local_file_delete;
   iface->make_directory = g_local_file_make_directory;
+  iface->make_symbolic_link = g_local_file_make_symbolic_link;
   iface->copy = g_local_file_copy;
   iface->move = g_local_file_move;
   iface->mount = g_local_file_mount;
