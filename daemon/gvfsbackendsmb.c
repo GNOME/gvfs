@@ -19,6 +19,7 @@
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobwrite.h"
 #include "gvfsjobseekwrite.h"
+#include "gvfsjobsetdisplayname.h"
 #include "gvfsjobgetinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
@@ -1319,6 +1320,45 @@ do_enumerate (GVfsBackend *backend,
 }
 
 static void
+do_set_display_name (GVfsBackend *backend,
+		     GVfsJobSetDisplayName *job,
+		     const char *filename,
+		     const char *display_name)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  char *from_uri, *to_uri;
+  char *dirname, *new_path;
+  int res, errsv;
+
+  dirname = g_path_get_basename (filename);
+
+  /* TODO: display name is in utf8, atm we assume libsmb uris
+     are in utf8, but this might not be true if the user changed
+     the smb.conf file. Can we check this and convert? */
+
+  new_path = g_build_filename (dirname, display_name, NULL);
+  g_free (dirname);
+  
+  from_uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  to_uri = create_smb_uri (op_backend->server, op_backend->share, new_path);
+  
+  res = op_backend->smb_context->rename (op_backend->smb_context, from_uri,
+					 op_backend->smb_context, to_uri);
+  errsv = errno;
+  g_free (from_uri);
+  g_free (to_uri);
+
+  if (res != 0)
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+  else
+    {
+      g_vfs_job_set_display_name_set_new_path (job, new_path);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  g_free (new_path);
+}
+
+static void
 g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1341,4 +1381,5 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->get_info = do_get_info;
   backend_class->get_fs_info = do_get_fs_info;
   backend_class->enumerate = do_enumerate;
+  backend_class->set_display_name = do_set_display_name;
 }

@@ -674,6 +674,15 @@ g_file_set_display_name (GFile                  *file,
 {
   GFileIface *iface;
 
+  if (strchr (display_name, '/') != NULL)
+    {
+      g_set_error (error,
+		   G_IO_ERROR,
+		   G_IO_ERROR_INVALID_ARGUMENT,
+		   _("File names cannot contain '/'"));
+      return FALSE;
+    }
+  
   if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error (error,

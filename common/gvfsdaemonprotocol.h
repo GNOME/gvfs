@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_GET_FILESYSTEM_INFO "GetFilesystemInfo"
 #define G_VFS_DBUS_MOUNT_OP_ENUMERATE "Enumerate"
 #define G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE "MountMountable"
+#define G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME "SetDisplayName"
 
 /* mount daemons that support mounting more mounts implement this,
    and set the dbus name in the mountable description file */

@@ -1083,7 +1083,6 @@ g_daemon_file_mount_for_location_finish (GFile                  *location,
   return TRUE;
 }
 
-
 static GFileInfo *
 g_daemon_file_get_filesystem_info (GFile                *file,
 				   const char           *attributes,
@@ -1091,7 +1090,6 @@ g_daemon_file_get_filesystem_info (GFile                *file,
 				   GError              **error)
 {
   DBusMessage *reply;
-  dbus_uint32_t flags_dbus;
   DBusMessageIter iter;
   GFileInfo *info;
 
@@ -1122,6 +1120,45 @@ g_daemon_file_get_filesystem_info (GFile                *file,
   return info;
 }
 
+static GFile *
+g_daemon_file_set_display_name (GFile *file,
+				const char *display_name,
+				GCancellable *cancellable,
+				GError **error)
+{
+  GDaemonFile *daemon_file;
+  DBusMessage *reply;
+  DBusMessageIter iter;
+  char *new_path;
+
+  daemon_file = G_DAEMON_FILE (file);
+  
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME,
+			     NULL, cancellable, error,
+			     DBUS_TYPE_STRING, &display_name,
+			     0);
+  if (reply == NULL)
+    return NULL;
+
+
+  if (!dbus_message_iter_init (reply, &iter) ||
+      !_g_dbus_message_iter_get_args (&iter, NULL,
+				      G_DBUS_TYPE_CSTRING, &new_path,
+				      0))
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Invalid return value from get_filesystem_info"));
+      goto out;
+    }
+
+  file = g_daemon_file_new (daemon_file->mount_spec, new_path);
+  g_free (new_path);
+
+ out:
+  dbus_message_unref (reply);
+  return file;
+}
 
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
@@ -1149,4 +1186,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->mount_mountable = g_daemon_file_mount_mountable;
   iface->mount_mountable_finish = g_daemon_file_mount_mountable_finish;
   iface->get_filesystem_info = g_daemon_file_get_filesystem_info;
+  iface->set_display_name = g_daemon_file_set_display_name;
 }

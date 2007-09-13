@@ -36,6 +36,7 @@ typedef struct _GVfsJobCloseWrite      GVfsJobCloseWrite;
 typedef struct _GVfsJobGetInfo         GVfsJobGetInfo;
 typedef struct _GVfsJobGetFsInfo       GVfsJobGetFsInfo;
 typedef struct _GVfsJobEnumerate       GVfsJobEnumerate;
+typedef struct _GVfsJobSetDisplayName  GVfsJobSetDisplayName;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -186,6 +187,14 @@ struct _GVfsBackendClass
 				 const char *filename,
 				 const char *attributes,
 				 GFileGetInfoFlags flags);
+  void     (*set_display_name)  (GVfsBackend *backend,
+				 GVfsJobSetDisplayName *job,
+				 const char *filename,
+				 const char *display_name);
+  gboolean (*try_set_display_name) (GVfsBackend *backend,
+				    GVfsJobSetDisplayName *job,
+				    const char *filename,
+				    const char *display_name);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
