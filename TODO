@@ -54,6 +54,10 @@ mount daemons should re-register when new owner for vfs daemon
 remove dbus-gmain.[ch]? We have no server integration in common/ atm
 
 gvfserror => gioerror?
+
+handle setting xattrs
+
+handle non-ascii/utf8 xattr names by escaping
   
 FUTURE IDEAS:
 -------------
