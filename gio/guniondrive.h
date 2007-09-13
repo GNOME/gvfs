@@ -22,13 +22,9 @@ struct _GUnionDriveClass {
 
 GType g_union_drive_get_type (void) G_GNUC_CONST;
 
-GUnionDrive *g_union_drive_new                   (GDrive         *drive,
-						  GVolumeMonitor *monitor);
-void         g_union_drive_add_drive             (GUnionDrive    *union_drive,
-						  GDrive         *drive,
-						  GVolumeMonitor *monitor);
-gboolean     g_union_drive_remove_drive          (GUnionDrive    *union_drive,
-						  GDrive         *drive);
+GUnionDrive *g_union_drive_new                   (GVolumeMonitor *union_monitor,
+						  GDrive         *child_drive,
+						  GVolumeMonitor *child_monitor);
 gboolean     g_union_drive_has_child_drive       (GUnionDrive    *union_drive,
 						  GDrive         *child_drive);
 GDrive *     g_union_drive_get_child_for_monitor (GUnionDrive    *union_drive,

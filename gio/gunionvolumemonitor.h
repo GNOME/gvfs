@@ -22,6 +22,11 @@ struct _GUnionVolumeMonitorClass {
 
 GType g_union_volume_monitor_get_type (void) G_GNUC_CONST;
 
+GList * g_union_volume_monitor_convert_volumes (GUnionVolumeMonitor *monitor,
+						GList               *child_volumes);
+GDrive *g_union_volume_monitor_convert_drive   (GUnionVolumeMonitor *monitor,
+						GDrive              *child_drive);
+
 G_END_DECLS
 
 #endif /* __G_UNION_VOLUME_MONITOR_H__ */

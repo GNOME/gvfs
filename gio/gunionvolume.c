@@ -3,6 +3,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include "gunionvolume.h"
+#include "gunionvolumemonitor.h"
 #include "gvolumepriv.h"
 
 typedef struct {
@@ -12,6 +13,7 @@ typedef struct {
 
 struct _GUnionVolume {
   GObject parent;
+  GVolumeMonitor *union_monitor;
 
   GList *child_volumes;
 };
@@ -32,6 +34,9 @@ g_union_volume_finalize (GObject *object)
   
   volume = G_UNION_VOLUME (object);
 
+  if (volume->union_monitor)
+    g_object_remove_weak_pointer (G_OBJECT (volume->union_monitor), (gpointer *)&volume->union_monitor);
+  
   for (l = volume->child_volumes; l != NULL; l = l->next)
     {
       child = l->data;
@@ -61,7 +66,8 @@ g_union_volume_init (GUnionVolume *union_volume)
 }
 
 GUnionVolume *
-g_union_volume_new (GVolume        *child_volume,
+g_union_volume_new (GVolumeMonitor *union_monitor,
+		    GVolume        *child_volume,
 		    GVolumeMonitor *child_monitor)
 {
   GUnionVolume *volume;
@@ -69,6 +75,10 @@ g_union_volume_new (GVolume        *child_volume,
   
   volume = g_object_new (G_TYPE_UNION_VOLUME, NULL);
 
+  volume->union_monitor = union_monitor;
+  g_object_add_weak_pointer (G_OBJECT (volume->union_monitor),
+			     (gpointer *)&volume->union_monitor);
+  
   child = g_new (ChildVolume, 1);
   child->volume = g_object_ref (child_volume);
   child->monitor = g_object_ref (child_monitor);
@@ -137,7 +147,7 @@ g_union_volume_get_child_for_monitor (GUnionVolume   *union_volume,
 	return g_object_ref (child->volume);
     }
   
-  return FALSE;
+  return NULL;
 }
 
 gboolean
@@ -219,11 +229,20 @@ g_union_volume_get_drive (GVolume *volume)
 {
   GUnionVolume *union_volume = G_UNION_VOLUME (volume);
   ChildVolume *child;
+  GDrive *child_drive, *union_drive;
 
   if (union_volume->child_volumes)
     {
       child = union_volume->child_volumes->data;
-      return g_volume_get_drive (child->volume);
+      child_drive = g_volume_get_drive (child->volume);
+      union_drive = NULL;
+      if (child_drive)
+	{
+	  union_drive = g_union_volume_monitor_convert_drive (G_UNION_VOLUME_MONITOR (union_volume->union_monitor),
+							      child_drive);
+	  g_object_unref (child_drive);
+	}
+      return union_drive;
     }
   return NULL;
 }

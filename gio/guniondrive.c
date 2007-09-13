@@ -3,17 +3,24 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include "guniondrive.h"
+#include "gunionvolumemonitor.h"
 #include "gdrivepriv.h"
 
-typedef struct {
-  GDrive *drive;
-  GVolumeMonitor *monitor;
-} ChildDrive;
+/* In general we don't expect collisions in drives
+ * between HAL and unix-mounts. Either you use HAL to
+ * enumerate removable devices, or user-mountable
+ * entries in fstab. So, we don't merge drives, saving
+ * considerable complexity, at the cost of having double
+ * drives in weird cases (and these two drives would have
+ * the same volume).
+ */
 
 struct _GUnionDrive {
   GObject parent;
+  GVolumeMonitor *union_monitor;
 
-  GList *child_drives;
+  GDrive *child_drive;
+  GVolumeMonitor *child_monitor;
 };
 
 static void g_union_volue_drive_iface_init (GDriveIface *iface);
@@ -26,20 +33,14 @@ static void
 g_union_drive_finalize (GObject *object)
 {
   GUnionDrive *drive;
-  ChildDrive *child;
-  GList *l;
   
   drive = G_UNION_DRIVE (object);
-
-  for (l = drive->child_drives; l != NULL; l = l->next)
-    {
-      child = l->data;
-
-      g_object_unref (child->drive);
-      g_object_unref (child->monitor);
-      g_free (child);
-    }
-  g_list_free (drive->child_drives);
+  
+  if (drive->union_monitor)
+    g_object_remove_weak_pointer (G_OBJECT (drive->union_monitor), (gpointer *)&drive->union_monitor);
+  
+  g_object_unref (drive->child_drive);
+  g_object_unref (drive->child_monitor);
   
   if (G_OBJECT_CLASS (g_union_drive_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_union_drive_parent_class)->finalize) (object);
@@ -53,105 +54,46 @@ g_union_drive_class_init (GUnionDriveClass *klass)
   gobject_class->finalize = g_union_drive_finalize;
 }
 
-
 static void
 g_union_drive_init (GUnionDrive *union_drive)
 {
 }
 
 GUnionDrive *
-g_union_drive_new (GDrive *child_drive,
-		    GVolumeMonitor *child_monitor)
+g_union_drive_new (GVolumeMonitor *union_monitor,
+		   GDrive *child_drive,
+		   GVolumeMonitor *child_monitor)
 {
   GUnionDrive *drive;
-  ChildDrive *child;
   
   drive = g_object_new (G_TYPE_UNION_DRIVE, NULL);
 
-  child = g_new (ChildDrive, 1);
-  child->drive = g_object_ref (child_drive);
-  child->monitor = g_object_ref (child_monitor);
-
-  drive->child_drives = g_list_prepend (drive->child_drives, child);
+  drive->union_monitor = union_monitor;
+  g_object_add_weak_pointer (G_OBJECT (drive->union_monitor),
+			     (gpointer *)&drive->union_monitor);
+  
+  drive->child_drive = g_object_ref (child_drive);
+  drive->child_monitor = g_object_ref (child_monitor);
 
   return drive;
-}
-
-void
-g_union_drive_add_drive (GUnionDrive *union_drive,
-			 GDrive *child_drive,
-			 GVolumeMonitor *child_monitor)
-{
-  ChildDrive *child;
-  
-  child = g_new (ChildDrive, 1);
-  child->drive = g_object_ref (child_drive);
-  child->monitor = g_object_ref (child_monitor);
-
-  union_drive->child_drives = g_list_prepend (union_drive->child_drives, child);
-
-  g_signal_emit_by_name (union_drive, "changed");
-}
-
-gboolean
-g_union_drive_remove_drive (GUnionDrive *union_drive,
-			    GDrive *child_drive)
-{
-  GList *l;
-  ChildDrive *child;
-
-  for (l = union_drive->child_drives; l != NULL; l = l->next)
-    {
-      child = l->data;
-
-      if (child->drive == child_drive)
-	{
-	  union_drive->child_drives = g_list_delete_link (union_drive->child_drives, l);
-	  g_object_unref (child->drive);
-	  g_object_unref (child->monitor);
-	  g_free (child);
-	  
-	  g_signal_emit_by_name (union_drive, "changed");
-	  
-	  return union_drive->child_drives == NULL;
-	}
-    }
-  
-  return FALSE;
 }
 
 GDrive *
 g_union_drive_get_child_for_monitor (GUnionDrive *union_drive,
 				     GVolumeMonitor *child_monitor)
 {
-  GList *l;
-  ChildDrive *child;
+  if (union_drive->child_monitor == child_monitor)
+    return g_object_ref (union_drive->child_drive);
   
-  for (l = union_drive->child_drives; l != NULL; l = l->next)
-    {
-      child = l->data;
-
-      if (child->monitor == child_monitor)
-	return g_object_ref (child->drive);
-    }
-  
-  return FALSE;
+  return NULL;
 }
 
 gboolean
 g_union_drive_has_child_drive (GUnionDrive *union_drive,
 			       GDrive *child_drive)
 {
-  GList *l;
-  ChildDrive *child;
-
-  for (l = union_drive->child_drives; l != NULL; l = l->next)
-    {
-      child = l->data;
-
-      if (child->drive == child_drive)
-	return TRUE;
-    }
+  if (union_drive->child_drive == child_drive)
+    return TRUE;
   
   return FALSE;
 }
@@ -160,104 +102,59 @@ static char *
 g_union_drive_get_name (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_get_name (child->drive);
-    }
-  return g_strdup ("drive");
+  return g_drive_get_name (union_drive->child_drive);
 }
 
 static char *
 g_union_drive_get_icon (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_get_icon (child->drive);
-    }
-  return NULL;
+  return g_drive_get_icon (union_drive->child_drive);
 }
 
 static gboolean
 g_union_drive_is_automounted (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_is_automounted (child->drive);
-    }
-  return FALSE;
+  return g_drive_is_automounted (union_drive->child_drive);
 }
 
 static GList *
 g_union_drive_get_volumes (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
+  GList *child_volumes, *union_volumes;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_get_volumes (child->drive);
-    }
-  return NULL;
+  if (union_drive->union_monitor == NULL)
+    return NULL;
+  
+  child_volumes = g_drive_get_volumes (union_drive->child_drive);
+
+  union_volumes =
+    g_union_volume_monitor_convert_volumes (G_UNION_VOLUME_MONITOR (union_drive->union_monitor),
+					    child_volumes);
+  g_list_foreach (child_volumes, (GFunc)g_object_unref, NULL);
+  g_list_free (child_volumes);
+  return union_volumes;
 }
 
 static gboolean
 g_union_drive_can_mount (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_can_mount (child->drive);
-    }
-  return FALSE;
+  return g_drive_can_mount (union_drive->child_drive);
 }
 
 static gboolean
 g_union_drive_can_eject (GDrive *drive)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_can_eject (child->drive);
-    }
-  return FALSE;
-}
-
-typedef struct {
-  GVolumeCallback callback;
-  gpointer user_data;
-} VolData;
-
-static gboolean
-error_on_idle (gpointer _data)
-{
-  VolData *data = _data;
-  GError *error = NULL;
-
-  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("Operation not supported"));
-
-  if (data->callback)
-    data->callback (error, data->user_data);
-
-  g_free (data);
-  return FALSE;
+  return g_drive_can_eject (union_drive->child_drive);
 }
 
 static void
@@ -267,21 +164,10 @@ g_union_drive_mount (GDrive         *drive,
 		     gpointer        user_data)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
-  VolData *data;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_mount (child->drive,
-			    mount_operation,
-			    callback, user_data);
-    }
-
-  data = g_new0 (VolData, 1);
-  data->callback = callback;
-  data->user_data = user_data;
-  g_idle_add (error_on_idle, data);
+  return g_drive_mount (union_drive->child_drive,
+			mount_operation,
+			callback, user_data);
 }
 
 static void
@@ -290,20 +176,9 @@ g_union_drive_eject (GDrive         *drive,
 		     gpointer        user_data)
 {
   GUnionDrive *union_drive = G_UNION_DRIVE (drive);
-  ChildDrive *child;
-  VolData *data;
 
-  if (union_drive->child_drives)
-    {
-      child = union_drive->child_drives->data;
-      return g_drive_eject (child->drive,
-			     callback, user_data);
-    }
-  
-  data = g_new0 (VolData, 1);
-  data->callback = callback;
-  data->user_data = user_data;
-  g_idle_add (error_on_idle, data);
+  return g_drive_eject (union_drive->child_drive,
+			callback, user_data);
 }
 
 static void

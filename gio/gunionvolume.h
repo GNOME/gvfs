@@ -22,7 +22,8 @@ struct _GUnionVolumeClass {
 
 GType g_union_volume_get_type (void) G_GNUC_CONST;
 
-GUnionVolume *g_union_volume_new                   (GVolume        *volume,
+GUnionVolume *g_union_volume_new                   (GVolumeMonitor *union_monitor,
+						    GVolume        *volume,
 						    GVolumeMonitor *monitor);
 void          g_union_volume_add_volume            (GUnionVolume   *union_volume,
 						    GVolume        *volume,

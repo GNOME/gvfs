@@ -6,6 +6,7 @@
 #include <glib/gi18n-lib.h>
 #include "gunionvolumemonitor.h"
 #include "gunionvolume.h"
+#include "guniondrive.h"
 #include "gvolumepriv.h"
 #ifdef G_OS_UNIX
 #include "gunixvolumemonitor.h"
@@ -130,7 +131,7 @@ add_child_volume (GUnionVolumeMonitor *union_monitor,
       g_free (platform_id);
     }
 
-  union_volume = g_union_volume_new (child_volume, child_monitor);
+  union_volume = g_union_volume_new (G_VOLUME_MONITOR (union_monitor), child_volume, child_monitor);
   union_monitor->volumes = g_list_prepend (union_monitor->volumes,
 					   union_volume);
   g_signal_emit_by_name (union_monitor,
@@ -306,11 +307,58 @@ g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
     }
 }
 
+GList *
+g_union_volume_monitor_convert_volumes (GUnionVolumeMonitor *monitor,
+					GList *child_volumes)
+{
+  GList *union_volumes, *l, *p;
+
+  union_volumes = 0;
+  for (l = child_volumes; l != NULL; l = l->next)
+    {
+      GVolume *child_volume = l->data;
+      for (p = monitor->volumes; p != NULL; p = p->next)
+	{
+	  GUnionVolume *union_volume = p->data;
+
+	  if (g_union_volume_has_child_volume (union_volume, child_volume))
+	    {
+	      union_volumes = g_list_prepend (union_volumes,
+					      g_object_ref (union_volume));
+	      break;
+	    }
+
+	}
+    }
+
+  return union_volumes;
+}
+
+GDrive *
+g_union_volume_monitor_convert_drive (GUnionVolumeMonitor *monitor,
+				      GDrive *child_drive)
+{
+  GList *p;
+
+  for (p = monitor->drives; p != NULL; p = p->next)
+    {
+      GUnionDrive *union_drive = p->data;
+      
+      if (g_union_drive_has_child_drive (union_drive, child_drive))
+	return g_object_ref (union_drive);
+    }
+
+  return NULL;
+}
+
 static void
 g_union_volume_monitor_init (GUnionVolumeMonitor *union_monitor)
 {
 #ifdef G_OS_UNIX
-  g_union_volume_monitor_add_monitor (union_monitor, g_unix_volume_monitor_new ());
+  GVolumeMonitor *monitor;
+  monitor = g_unix_volume_monitor_new ();
+  g_union_volume_monitor_add_monitor (union_monitor, monitor);
+  g_object_unref (monitor);
 #endif
 }
 
