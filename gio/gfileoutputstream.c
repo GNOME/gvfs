@@ -152,59 +152,65 @@ g_file_output_stream_get_etag (GFileOutputStream  *stream,
   return etag;
 }
 
-static goffset
-g_file_output_stream_seekable_tell (GSeekable *seekable)
+goffset
+g_file_output_stream_tell (GFileOutputStream  *stream)
 {
-  GFileOutputStream *file;
   GFileOutputStreamClass *class;
   goffset offset;
 
-  file = G_FILE_OUTPUT_STREAM (seekable);
-  class = G_FILE_OUTPUT_STREAM_GET_CLASS (file);
+  class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
 
   offset = 0;
   if (class->tell)
-    offset = class->tell (file);
+    offset = class->tell (stream);
 
   return offset;
 }
 
-static gboolean
-g_file_output_stream_seekable_can_seek (GSeekable *seekable)
+static goffset
+g_file_output_stream_seekable_tell (GSeekable *seekable)
 {
-  GFileOutputStream *file;
+  return g_file_output_stream_tell (G_FILE_OUTPUT_STREAM (seekable));
+}
+
+gboolean
+g_file_output_stream_can_seek (GFileOutputStream  *stream)
+{
   GFileOutputStreamClass *class;
   gboolean can_seek;
 
-  file = G_FILE_OUTPUT_STREAM (seekable);
-  class = G_FILE_OUTPUT_STREAM_GET_CLASS (file);
+  class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
 
   can_seek = FALSE;
   if (class->seek)
     {
       can_seek = TRUE;
       if (class->can_seek)
-	can_seek = class->can_seek (file);
+	can_seek = class->can_seek (stream);
     }
   
   return can_seek;
 }
 
 static gboolean
-g_file_output_stream_seekable_seek (GSeekable  *seekable,
-				    goffset     offset,
-				    GSeekType   type,
-				    GCancellable  *cancellable,
-				    GError    **error)
+g_file_output_stream_seekable_can_seek (GSeekable *seekable)
 {
-  GFileOutputStream *file;
+  return g_file_output_stream_can_seek (G_FILE_OUTPUT_STREAM (seekable));
+}
+
+gboolean
+g_file_output_stream_seek (GFileOutputStream  *stream,
+			   goffset             offset,
+			   GSeekType           type,
+			   GCancellable       *cancellable,
+			   GError            **error)
+{
   GFileOutputStreamClass *class;
   GOutputStream *output_stream;
   gboolean res;
 
-  output_stream = G_OUTPUT_STREAM (seekable);
-  file = G_FILE_OUTPUT_STREAM (seekable);
-  class = G_FILE_OUTPUT_STREAM_GET_CLASS (file);
+  output_stream = G_OUTPUT_STREAM (stream);
+  class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
 
   if (g_output_stream_is_closed (output_stream))
     {
@@ -232,7 +238,7 @@ g_file_output_stream_seekable_seek (GSeekable  *seekable,
   if (cancellable)
     g_push_current_cancellable (cancellable);
   
-  res = class->seek (file, offset, type, cancellable, error);
+  res = class->seek (stream, offset, type, cancellable, error);
   
   if (cancellable)
     g_pop_current_cancellable (cancellable);
@@ -243,40 +249,54 @@ g_file_output_stream_seekable_seek (GSeekable  *seekable,
 }
 
 static gboolean
-g_file_output_stream_seekable_can_truncate (GSeekable  *seekable)
+g_file_output_stream_seekable_seek (GSeekable  *seekable,
+				    goffset     offset,
+				    GSeekType   type,
+				    GCancellable  *cancellable,
+				    GError    **error)
 {
-  GFileOutputStream *file;
+  return g_file_output_stream_seek (G_FILE_OUTPUT_STREAM (seekable),
+				    offset, type, cancellable, error);
+}
+
+gboolean
+g_file_output_stream_can_truncate (GFileOutputStream  *stream)
+{
   GFileOutputStreamClass *class;
   gboolean can_truncate;
 
-  file = G_FILE_OUTPUT_STREAM (seekable);
-  class = G_FILE_OUTPUT_STREAM_GET_CLASS (file);
+  class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
 
   can_truncate = FALSE;
   if (class->truncate)
     {
       can_truncate = TRUE;
       if (class->can_truncate)
-	can_truncate = class->can_truncate (file);
+	can_truncate = class->can_truncate (stream);
     }
   
   return can_truncate;
 }
 
 static gboolean
-g_file_output_stream_seekable_truncate (GSeekable     *seekable,
-					goffset        size,
-					GCancellable  *cancellable,
-					GError       **error)
+g_file_output_stream_seekable_can_truncate (GSeekable  *seekable)
 {
-  GFileOutputStream *file;
+  return g_file_output_stream_can_truncate (G_FILE_OUTPUT_STREAM (seekable));
+}
+
+
+gboolean
+g_file_output_stream_truncate (GFileOutputStream  *stream,
+			       goffset             size,
+			       GCancellable       *cancellable,
+			       GError            **error)
+{
   GFileOutputStreamClass *class;
   GOutputStream *output_stream;
   gboolean res;
 
-  output_stream = G_OUTPUT_STREAM (seekable);
-  file = G_FILE_OUTPUT_STREAM (seekable);
-  class = G_FILE_OUTPUT_STREAM_GET_CLASS (file);
+  output_stream = G_OUTPUT_STREAM (stream);
+  class = G_FILE_OUTPUT_STREAM_GET_CLASS (stream);
 
   if (g_output_stream_is_closed (output_stream))
     {
@@ -304,7 +324,7 @@ g_file_output_stream_seekable_truncate (GSeekable     *seekable,
   if (cancellable)
     g_push_current_cancellable (cancellable);
   
-  res = class->truncate (file, size, cancellable, error);
+  res = class->truncate (stream, size, cancellable, error);
   
   if (cancellable)
     g_pop_current_cancellable (cancellable);
@@ -312,4 +332,14 @@ g_file_output_stream_seekable_truncate (GSeekable     *seekable,
   g_output_stream_set_pending (output_stream, FALSE);
   
   return res;
+}
+
+static gboolean
+g_file_output_stream_seekable_truncate (GSeekable     *seekable,
+					goffset        size,
+					GCancellable  *cancellable,
+					GError       **error)
+{
+  return g_file_output_stream_truncate (G_FILE_OUTPUT_STREAM (seekable),
+					size, cancellable, error);
 }
