@@ -120,7 +120,7 @@ struct _GFileInfoClass
 #define G_FILE_ATTRIBUTE_FS_FREE "fs:free"
 #define G_FILE_ATTRIBUTE_FS_TYPE "fs:type"
 
-#define G_FILE_ATTRIBUTE_FS_TYPE "gvfs:backend"
+#define G_FILE_ATTRIBUTE_GVFS_BACKEND "gvfs:backend"
 
 GType g_file_info_get_type (void) G_GNUC_CONST;
 
