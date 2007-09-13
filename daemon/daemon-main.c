@@ -146,7 +146,7 @@ daemon_main (int argc,
 	    _g_error_from_dbus (&derror, &error);
 	  else
 	    g_set_error (&error, G_FILE_ERROR, G_FILE_ERROR_IO,
-			 "smb-browser already running");
+			 "mountpoint for %s already running", mountable_name);
 	  g_mount_source_failed (mount_source, error);
 	  exit (1);
 	}
