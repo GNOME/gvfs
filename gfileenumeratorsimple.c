@@ -16,10 +16,12 @@ struct _GFileEnumeratorSimple
 {
   GFileEnumerator parent;
 
+  GFileAttributeMatcher matcher;
   GDir *dir;
   char *filename;
   GFileInfoRequestFlags requested;
   char *attributes;
+  gboolean wants_attributes;
   gboolean follow_symlinks;
 };
 
@@ -39,7 +41,7 @@ g_file_enumerator_simple_finalize (GObject *object)
   simple = G_FILE_ENUMERATOR_SIMPLE (object);
 
   g_free (simple->filename);
-  g_free (simple->attributes);
+  g_file_attribute_matcher_cleanup (&simple->matcher);
   
   if (G_OBJECT_CLASS (g_file_enumerator_simple_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_enumerator_simple_parent_class)->finalize) (object);
@@ -75,7 +77,8 @@ g_file_enumerator_simple_new (const char *filename,
 
   simple->filename = g_strdup (filename);
   simple->requested = requested;
-  simple->attributes = g_strdup (attributes);
+  g_file_attribute_matcher_init (&simple->matcher, attributes);
+  simple->wants_attributes = attributes != NULL;
   simple->follow_symlinks = follow_symlinks;
   
   return G_FILE_ENUMERATOR (simple);
@@ -116,8 +119,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   g_file_info_set_name (info, filename);
   
   /* Avoid stat in trivial case */
-  if (simple->requested != G_FILE_INFO_NAME ||
-      simple->attributes != NULL)
+  if (simple->requested != G_FILE_INFO_NAME || simple->wants_attributes)
     {
       gboolean res;
       GError *my_error = NULL;
@@ -125,7 +127,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
       path = g_build_filename (simple->filename, filename, NULL);
       res = g_file_info_simple_get (path, info,
 				    simple->requested,
-				    simple->attributes,
+				    &simple->matcher,
 				    simple->follow_symlinks,
 				    &my_error); 
       g_free (path);

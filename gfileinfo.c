@@ -459,3 +459,136 @@ g_file_info_set_attributes (GFileInfo *info,
 			       attributes[i].value);
   }
 }
+
+
+void
+g_file_attribute_matcher_init (GFileAttributeMatcher *matcher,
+			       const char            *attributes)
+{
+  char **split;
+  char *colon;
+  int i;
+  int num_ns, num_fn;
+  GQuark full_name_q, namespace_q;
+  GArray *full_name_array, *namespace_array;
+  
+
+  memset (matcher, 0, sizeof (GFileAttributeMatcher));
+
+  if (attributes == NULL)
+    return;
+  
+  split = g_strsplit (attributes, ",", -1);
+
+  num_ns = 0;
+  num_fn = 0;
+
+  full_name_array = NULL;
+  namespace_array = NULL;
+  
+  for (i = 0; split[i] != NULL; i++)
+    {
+      if (strcmp (split[i], "*") == 0)
+	{
+	  matcher->all = TRUE;
+	}
+      else
+	{
+	  colon = strchr (split[i], ':');
+
+	  if (colon != NULL)
+	    {
+	      full_name_q = g_quark_from_string (split[i]);
+	      *colon = 0;
+
+	      if (num_fn < 3)
+		matcher->full_names[num_fn++] = full_name_q;
+	      else
+		{
+		  if (full_name_array == NULL)
+		    full_name_array = g_array_new (TRUE, FALSE, sizeof (GQuark));
+		  g_array_append_val (full_name_array, full_name_q);
+		}
+	    }
+	  namespace_q = g_quark_from_string (split[i]);
+
+	  if (num_ns < 3)
+	    matcher->namespaces[num_ns++] = namespace_q;
+	  else
+	    {
+	      if (namespace_array == NULL)
+		namespace_array = g_array_new (TRUE, FALSE, sizeof (GQuark));
+	      g_array_append_val(namespace_array, namespace_q);
+	    }
+	}
+    }
+
+  if (namespace_array != NULL)
+    matcher->more_namespaces = (GQuark *)g_array_free (namespace_array, FALSE);
+
+  if (full_name_array != NULL)
+    matcher->more_full_names = (GQuark *)g_array_free (full_name_array, FALSE);
+
+  g_strfreev (split);
+}
+
+void
+g_file_attribute_matcher_cleanup (GFileAttributeMatcher *matcher)
+{
+  g_free (matcher->more_namespaces);
+  g_free (matcher->more_full_names);
+}
+
+gboolean
+g_file_attribute_matcher_matches (GFileAttributeMatcher *matcher,
+				  const char            *namespace,
+				  const char            *full_name)
+{
+  return g_file_attribute_matcher_matches_q (matcher,
+					     g_quark_from_string (namespace),
+					     g_quark_from_string (full_name));
+}
+
+gboolean
+g_file_attribute_matcher_matches_q (GFileAttributeMatcher *matcher,
+				    GQuark                 namespace,
+				    GQuark                 full_name)
+{
+  int i;
+  
+  if (matcher->all)
+    return TRUE;
+
+  for (i = 0; matcher->namespaces[i] != 0 && i < 3; i++)
+    {
+      if (matcher->namespaces[i] == namespace)
+	return TRUE;
+    }
+
+  if (matcher->more_namespaces)
+    {
+      for (i = 0; matcher->more_namespaces[i] != 0; i++)
+	{
+	  if (matcher->more_namespaces[i] == namespace)
+	    return TRUE;
+	}
+    }
+
+  for (i = 0; matcher->full_names[i] != 0 && i < 3; i++)
+    {
+      if (matcher->full_names[i] == full_name)
+	return TRUE;
+    }
+
+  if (matcher->more_full_names)
+    {
+      for (i = 0; matcher->more_full_names[i] != 0; i++)
+	{
+	  if (matcher->more_full_names[i] == full_name)
+	    return TRUE;
+	}
+    }
+  
+  return FALSE;
+}
+

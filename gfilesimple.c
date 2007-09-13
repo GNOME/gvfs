@@ -249,6 +249,7 @@ g_file_simple_get_info (GFile                *file,
 {
   GFileSimple *simple = G_FILE_SIMPLE (file);
   GFileInfo *info;
+  GFileAttributeMatcher matcher;
 
   info = g_file_info_new ();
 
@@ -259,8 +260,10 @@ g_file_simple_get_info (GFile                *file,
       g_free (basename);
     }
 
+  g_file_attribute_matcher_init (&matcher, attributes);
+  
   if (!g_file_info_simple_get (simple->filename, info,
-			       requested, attributes, follow_symlinks,
+			       requested, &matcher, follow_symlinks,
 			       error))
     {
       /* Failed to get info (does not exist maybe) */
@@ -268,6 +271,7 @@ g_file_simple_get_info (GFile                *file,
       info = NULL;
     }
   
+  g_file_attribute_matcher_cleanup (&matcher);
   return info;
 }
 

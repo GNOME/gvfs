@@ -8,7 +8,7 @@ G_BEGIN_DECLS
 gboolean g_file_info_simple_get (const char *path,
 				 GFileInfo *info,
 				 GFileInfoRequestFlags requested,
-				 const char *attributes,
+				 GFileAttributeMatcher *attribute_matcher,
 				 gboolean follow_symlinks,
 				 GError **error);
 

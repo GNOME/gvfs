@@ -19,6 +19,7 @@ typedef struct _GFileInfo        GFileInfo;
 typedef struct _GFileInfoClass   GFileInfoClass;
 typedef struct _GFileInfoPrivate GFileInfoPrivate;
 typedef struct _GFileAttribute   GFileAttribute;
+typedef struct _GFileAttributeMatcher GFileAttributeMatcher;
 
 typedef enum {
   G_FILE_TYPE_UNKNOWN = 0,
@@ -52,6 +53,14 @@ struct _GFileInfoClass
 struct _GFileAttribute {
   char *attribute;
   char *value;
+};
+
+struct _GFileAttributeMatcher {
+  gboolean all;
+  GQuark namespaces[3];
+  GQuark *more_namespaces;
+  GQuark full_names[3];
+  GQuark *more_full_names;
 };
 
 typedef enum {
@@ -125,6 +134,17 @@ void                   g_file_info_set_attributes        (GFileInfo         *inf
 void                   g_file_info_set_from_stat         (GFileInfo         *info,
 							  GFileInfoRequestFlags requested,
 							  const struct stat *statbuf);
+
+void     g_file_attribute_matcher_init      (GFileAttributeMatcher *matcher,
+					     const char            *attributes);
+void     g_file_attribute_matcher_cleanup   (GFileAttributeMatcher *matcher);
+gboolean g_file_attribute_matcher_matches   (GFileAttributeMatcher *matcher,
+					     const char            *namespace,
+					     const char            *full_name);
+gboolean g_file_attribute_matcher_matches_q (GFileAttributeMatcher *matcher,
+					     GQuark                 namespace,
+					     GQuark                 full_name);
+
 
 G_END_DECLS
 
