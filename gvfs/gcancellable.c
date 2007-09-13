@@ -9,7 +9,8 @@ struct _GCancellable
 {
   GObject parent_instance;
 
-  gboolean cancelled;
+  guint cancelled : 1;
+  guint allocated_pipe : 1;
   int cancel_pipe[2];
 };
 
@@ -58,7 +59,7 @@ set_fd_nonblocking (int fd)
 }
 
 static void
-g_cancellable_init (GCancellable *cancellable)
+g_cancellable_open_pipe (GCancellable *cancellable)
 {
   if (pipe (cancellable->cancel_pipe) == 0)
     {
@@ -68,11 +69,13 @@ g_cancellable_init (GCancellable *cancellable)
       set_fd_nonblocking (cancellable->cancel_pipe[0]);
       set_fd_nonblocking (cancellable->cancel_pipe[1]);
     }
-  else
-    {
-      cancellable->cancel_pipe[0] = -1;
-      cancellable->cancel_pipe[1] = -1;
-    }
+}
+
+static void
+g_cancellable_init (GCancellable *cancellable)
+{
+  cancellable->cancel_pipe[0] = -1;
+  cancellable->cancel_pipe[1] = -1;
 }
 
 GCancellable *
@@ -144,9 +147,21 @@ g_cancellable_is_cancelled (GCancellable *cancellable)
 int
 g_cancellable_get_fd (GCancellable *cancellable)
 {
+  int fd;
   if (cancellable == NULL)
     return -1;
-  return cancellable->cancel_pipe[0];
+  
+  G_LOCK(cancellable);
+  if (!cancellable->allocated_pipe)
+    {
+      cancellable->allocated_pipe = TRUE;
+      g_cancellable_open_pipe (cancellable);
+    }
+  
+  fd = cancellable->cancel_pipe[0];
+  G_UNLOCK(cancellable);
+  
+  return fd;
 }
 
 /* This is safe to call from another thread */
