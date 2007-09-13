@@ -61,6 +61,7 @@ Finish general attribute copy in gfile.c move fallback.
 Get rid of std:flags, split it up to avoid problems with unknow flag values
 Add std:is_backup flags
 Set owner:user, owner:group for local files
+Think about atomic updates of several attributes.
 
 document create time vs change time vs mtime, etc
 
