@@ -113,7 +113,13 @@ g_io_error_from_errno (gint err_no)
       return G_IO_ERROR_TIMED_OUT;
       break;
 #endif
-      
+
+#ifdef EBUSY
+    case EBUSY:
+      return G_IO_ERROR_BUSY;
+      break;
+#endif
+
     default:
       return G_IO_ERROR_FAILED;
       break;

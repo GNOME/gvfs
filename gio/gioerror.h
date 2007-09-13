@@ -43,6 +43,7 @@ typedef enum
   G_IO_ERROR_WRONG_MTIME,
   G_IO_ERROR_TIMED_OUT,
   G_IO_ERROR_WOULD_RECURSE,
+  G_IO_ERROR_BUSY,
 } GIOErrorEnum;
 
 GIOErrorEnum g_io_error_from_errno (gint err_no);
