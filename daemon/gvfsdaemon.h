@@ -19,13 +19,6 @@ typedef struct _GVfsDaemon        GVfsDaemon;
 typedef struct _GVfsDaemonClass   GVfsDaemonClass;
 typedef struct _GVfsDaemonPrivate GVfsDaemonPrivate;
 
-struct _GVfsDaemon
-{
-  GObject parent_instance;
-
-  GVfsDaemonPrivate *priv;
-};
-
 struct _GVfsDaemonClass
 {
   GObjectClass parent_class;

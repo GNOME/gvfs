@@ -16,8 +16,6 @@
 #include <gvfsjobmount.h>
 #include <gdbusutils.h>
 
-G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
-
 enum {
   PROP_0,
 };
@@ -28,8 +26,10 @@ typedef struct {
   gpointer data;
 } RegisteredPath;
 
-struct _GVfsDaemonPrivate
+struct _GVfsDaemon
 {
+  GObject parent_instance;
+
   GMutex *lock;
   gboolean main_daemon;
 
@@ -56,20 +56,23 @@ typedef struct {
   DBusConnection *conn;
 } NewConnectionData;
 
-static void g_vfs_daemon_get_property (GObject    *object,
-				       guint       prop_id,
-				       GValue     *value,
-				       GParamSpec *pspec);
-static void g_vfs_daemon_set_property (GObject         *object,
-				       guint            prop_id,
-				       const GValue    *value,
-				       GParamSpec      *pspec);
-static DBusHandlerResult daemon_message_func      (DBusConnection *conn,
-						   DBusMessage    *message,
-						   gpointer        data);
-static DBusHandlerResult peer_to_peer_filter_func (DBusConnection *conn,
-						   DBusMessage    *message,
-						   gpointer        data);
+static void              g_vfs_daemon_get_property (GObject        *object,
+						    guint           prop_id,
+						    GValue         *value,
+						    GParamSpec     *pspec);
+static void              g_vfs_daemon_set_property (GObject        *object,
+						    guint           prop_id,
+						    const GValue   *value,
+						    GParamSpec     *pspec);
+static DBusHandlerResult daemon_message_func       (DBusConnection *conn,
+						    DBusMessage    *message,
+						    gpointer        data);
+static DBusHandlerResult peer_to_peer_filter_func  (DBusConnection *conn,
+						    DBusMessage    *message,
+						    gpointer        data);
+
+
+G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
 
 static void
 registered_path_free (RegisteredPath *data)
@@ -85,10 +88,10 @@ g_vfs_daemon_finalize (GObject *object)
 
   daemon = G_VFS_DAEMON (object);
 
-  g_assert (daemon->priv->jobs == NULL);
+  g_assert (daemon->jobs == NULL);
 
-  g_hash_table_destroy (daemon->priv->registered_paths);
-  g_mutex_free (daemon->priv->lock);
+  g_hash_table_destroy (daemon->registered_paths);
+  g_mutex_free (daemon->lock);
 
   if (G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_daemon_parent_class)->finalize) (object);
@@ -98,8 +101,6 @@ static void
 g_vfs_daemon_class_init (GVfsDaemonClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-  
-  g_type_class_add_private (klass, sizeof (GVfsDaemonPrivate));
   
   gobject_class->finalize = g_vfs_daemon_finalize;
   gobject_class->set_property = g_vfs_daemon_set_property;
@@ -120,26 +121,23 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
 {
   gint max_threads = 1; /* TODO: handle max threads */
   
-  daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE (daemon,
-					      G_TYPE_VFS_DAEMON,
-					      GVfsDaemonPrivate);
-  daemon->priv->lock = g_mutex_new ();
-  daemon->priv->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-  daemon->priv->thread_pool = g_thread_pool_new (job_handler_callback,
-						 daemon,
-						 max_threads,
-						 FALSE, NULL);
+  daemon->lock = g_mutex_new ();
+  daemon->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  daemon->thread_pool = g_thread_pool_new (job_handler_callback,
+					   daemon,
+					   max_threads,
+					   FALSE, NULL);
   /* TODO: verify thread_pool != NULL in a nicer way */
-  g_assert (daemon->priv->thread_pool != NULL);
+  g_assert (daemon->thread_pool != NULL);
 
-  daemon->priv->mount_counter = 0;
+  daemon->mount_counter = 0;
   
-  daemon->priv->jobs = NULL;
-  daemon->priv->registered_paths =
+  daemon->jobs = NULL;
+  daemon->registered_paths =
     g_hash_table_new_full (g_str_hash, g_str_equal,
 			   NULL, (GDestroyNotify)registered_path_free);
 
-  if (!dbus_connection_add_filter (daemon->priv->session_bus,
+  if (!dbus_connection_add_filter (daemon->session_bus,
 				   daemon_message_func, daemon, NULL))
     _g_dbus_oom ();
 }
@@ -205,7 +203,7 @@ g_vfs_daemon_new (gboolean main_daemon, gboolean replace)
   dbus_connection_setup_with_g_main (conn, NULL);
   
   daemon = g_object_new (G_TYPE_VFS_DAEMON, NULL);
-  daemon->priv->main_daemon = main_daemon;
+  daemon->main_daemon = main_daemon;
 
   /* Request name only after we've installed the message filter */
   if (main_daemon)
@@ -253,18 +251,18 @@ exit_at_idle (gpointer data)
 static void
 daemon_unschedule_exit (GVfsDaemon *daemon)
 {
-  if (daemon->priv->exit_tag != 0)
+  if (daemon->exit_tag != 0)
     {
-      g_source_remove (daemon->priv->exit_tag);
-      daemon->priv->exit_tag = 0;
+      g_source_remove (daemon->exit_tag);
+      daemon->exit_tag = 0;
     }
 }
 
 static void
 daemon_schedule_exit (GVfsDaemon *daemon)
 {
-  if (daemon->priv->exit_tag == 0)
-    daemon->priv->exit_tag = g_timeout_add (1000, exit_at_idle, daemon);
+  if (daemon->exit_tag == 0)
+    daemon->exit_tag = g_timeout_add (1000, exit_at_idle, daemon);
 }
 
 static void
@@ -279,9 +277,9 @@ static void
 job_source_closed_callback (GVfsJobSource *job_source,
 			    GVfsDaemon *daemon)
 {
-  g_mutex_lock (daemon->priv->lock);
+  g_mutex_lock (daemon->lock);
   
-  daemon->priv->job_sources = g_list_remove (daemon->priv->job_sources,
+  daemon->job_sources = g_list_remove (daemon->job_sources,
 					     job_source);
   
   g_signal_handlers_disconnect_by_func (job_source,
@@ -293,10 +291,10 @@ job_source_closed_callback (GVfsJobSource *job_source,
   
   g_object_unref (job_source);
 
-  if (daemon->priv->job_sources == NULL)
+  if (daemon->job_sources == NULL)
     daemon_schedule_exit (daemon);
   
-  g_mutex_unlock (daemon->priv->lock);
+  g_mutex_unlock (daemon->lock);
 }
 
 void
@@ -305,19 +303,19 @@ g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
 {
   g_print ("Added new job source %p (%s)\n", job_source, g_type_name_from_instance ((gpointer)job_source));
   
-  g_mutex_lock (daemon->priv->lock);
+  g_mutex_lock (daemon->lock);
 
   daemon_unschedule_exit (daemon);
   
   g_object_ref (job_source);
-  daemon->priv->job_sources = g_list_append (daemon->priv->job_sources,
+  daemon->job_sources = g_list_append (daemon->job_sources,
 					     job_source);
   g_signal_connect (job_source, "new_job",
 		    (GCallback)job_source_new_job_callback, daemon);
   g_signal_connect (job_source, "closed",
 		    (GCallback)job_source_closed_callback, daemon);
   
-  g_mutex_unlock (daemon->priv->lock);
+  g_mutex_unlock (daemon->lock);
 }
 
 /* This registers a dbus callback on *all* connections, client and session bus */
@@ -334,7 +332,7 @@ g_vfs_daemon_register_path (GVfsDaemon *daemon,
   data->callback = callback;
   data->data = user_data;
 
-  g_hash_table_insert (daemon->priv->registered_paths, data->obj_path,
+  g_hash_table_insert (daemon->registered_paths, data->obj_path,
 		       data);
 }
 
@@ -342,7 +340,7 @@ void
 g_vfs_daemon_unregister_path (GVfsDaemon *daemon,
 			      const char *obj_path)
 {
-  g_hash_table_remove (daemon->priv->registered_paths, obj_path);
+  g_hash_table_remove (daemon->registered_paths, obj_path);
 }
 
 /* NOTE: Might be emitted on a thread */
@@ -367,9 +365,9 @@ job_finished_callback (GVfsJob *job,
 					(GCallback)job_finished_callback,
 					daemon);
 
-  g_mutex_lock (daemon->priv->lock);
-  daemon->priv->jobs = g_list_remove (daemon->priv->jobs, job);
-  g_mutex_unlock (daemon->priv->lock);
+  g_mutex_lock (daemon->lock);
+  daemon->jobs = g_list_remove (daemon->jobs, job);
+  g_mutex_unlock (daemon->lock);
   
   g_object_unref (job);
 }
@@ -384,15 +382,15 @@ g_vfs_daemon_queue_job (GVfsDaemon *daemon,
   g_signal_connect (job, "finished", (GCallback)job_finished_callback, daemon);
   g_signal_connect (job, "new_source", (GCallback)job_new_source_callback, daemon);
   
-  g_mutex_lock (daemon->priv->lock);
-  daemon->priv->jobs = g_list_prepend (daemon->priv->jobs, job);
-  g_mutex_unlock (daemon->priv->lock);
+  g_mutex_lock (daemon->lock);
+  daemon->jobs = g_list_prepend (daemon->jobs, job);
+  g_mutex_unlock (daemon->lock);
   
   /* Can we start the job immediately / async */
   if (!g_vfs_job_try (job))
     {
       /* Couldn't finish / run async, queue worker thread */
-      g_thread_pool_push (daemon->priv->thread_pool, job, NULL); /* TODO: Check error */
+      g_thread_pool_push (daemon->thread_pool, job, NULL); /* TODO: Check error */
     }
 }
 
@@ -788,7 +786,7 @@ daemon_message_func (DBusConnection *conn,
 	  strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0)
 	{
 	  /* Someone else got the name (i.e. someone used --replace), exit */
-	  if (daemon->priv->main_daemon)
+	  if (daemon->main_daemon)
 	    exit (1);
 	}
     }
@@ -815,8 +813,8 @@ daemon_message_func (DBusConnection *conn,
 				 DBUS_TYPE_UINT32, &serial,
 				 DBUS_TYPE_INVALID))
 	{
-	  g_mutex_lock (daemon->priv->lock);
-	  for (l = daemon->priv->jobs; l != NULL; l = l->next)
+	  g_mutex_lock (daemon->lock);
+	  for (l = daemon->jobs; l != NULL; l = l->next)
 	    {
 	      GVfsJob *job = l->data;
 	      
@@ -828,7 +826,7 @@ daemon_message_func (DBusConnection *conn,
 		  break;
 		}
 	    }
-	  g_mutex_unlock (daemon->priv->lock);
+	  g_mutex_unlock (daemon->lock);
 
 
 	  if (job_to_cancel)
@@ -844,7 +842,7 @@ daemon_message_func (DBusConnection *conn,
   path = dbus_message_get_path (message);
   registered_path = NULL;
   if (path != NULL)
-    registered_path = g_hash_table_lookup (daemon->priv->registered_paths, path);
+    registered_path = g_hash_table_lookup (daemon->registered_paths, path);
   
   if (registered_path)
     return registered_path->callback (conn, message, registered_path->data);
@@ -902,7 +900,7 @@ mount_got_spec (GMountSource *mount_source,
       return;
     }
 
-  obj_path = g_strdup_printf ("/org/gtk/vfs/mount/%d", ++daemon->priv->mount_counter);
+  obj_path = g_strdup_printf ("/org/gtk/vfs/mount/%d", ++daemon->mount_counter);
   backend = g_object_new (backend_type,
 			  "daemon", daemon,
 			  "object_path", obj_path,
