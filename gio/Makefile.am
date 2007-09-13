@@ -70,6 +70,9 @@ platform_libadd += -lshlwapi
 endif
 
 libgio_la_SOURCES = 	\
+	gasyncresult.c \
+	gsimpleasyncresult.c \
+	gsimpleasyncresult.h \
 	gappinfo.c \
 	gasynchelper.c \
 	gasynchelper.h \
@@ -124,6 +127,7 @@ libgio_la_LDFLAGS= -export-dynamic $(no_undefined)
 
 gvfsincludedir=$(includedir)/gio/
 gvfsinclude_HEADERS = \
+	gasyncresult.h \
 	gappinfo.h \
 	gcancellable.h \
 	gcontenttype.h \
