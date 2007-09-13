@@ -17,14 +17,6 @@ G_BEGIN_DECLS
 
 typedef struct _GVfsReadChannel        GVfsReadChannel;
 typedef struct _GVfsReadChannelClass   GVfsReadChannelClass;
-typedef struct _GVfsReadChannelPrivate GVfsReadChannelPrivate;
-
-struct _GVfsReadChannel
-{
-  GObject parent_instance;
-
-  GVfsReadChannelPrivate *priv;
-};
 
 struct _GVfsReadChannelClass
 {
