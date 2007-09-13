@@ -1160,11 +1160,12 @@ do_get_info (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   struct stat st = {0};
   char *uri;
-  int res;
+  int res, saved_errno;
   GFileInfo *info;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
+  saved_errno = errno;
   g_free (uri);
 
   if (res == 0)
@@ -1178,7 +1179,8 @@ do_get_info (GVfsBackend *backend,
       g_object_unref (info);
     }
   else
-    g_vfs_job_failed_from_error (G_VFS_JOB (job), NULL); /* TODO */
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
+
 }
 
 static void
