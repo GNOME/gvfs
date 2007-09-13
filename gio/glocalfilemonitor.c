@@ -17,7 +17,6 @@ typedef enum {
   BACKEND_NONE,
   BACKEND_INOTIFY,
   BACKEND_FAM,
-  BACKEND_POLL
 } LocalMonitorBackend;
 
 struct _GLocalFileMonitor
@@ -116,8 +115,13 @@ g_local_file_monitor_start (const char* pathname)
 #endif
   
   local_monitor->active_backend = backend;
-  
-  return G_FILE_MONITOR(local_monitor);
+
+
+  if (backend != BACKEND_NONE)
+    return G_FILE_MONITOR (local_monitor);
+
+  g_object_unref (local_monitor);
+  return NULL;
 }
 
 static gboolean
@@ -151,6 +155,6 @@ g_local_file_monitor_cancel (GFileMonitor* monitor)
 	}
     }
 #endif
-  
+
   return TRUE;
 }

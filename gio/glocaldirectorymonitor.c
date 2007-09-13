@@ -17,7 +17,6 @@ typedef enum {
   BACKEND_NONE,
   BACKEND_INOTIFY,
   BACKEND_FAM,
-  BACKEND_POLL
 } LocalMonitorBackend;
 
 struct _GLocalDirectoryMonitor
@@ -106,8 +105,12 @@ g_local_directory_monitor_start (const char* dirname)
 #endif
   
   local_monitor->dirname = g_strdup (dirname);
-  
-  return G_DIRECTORY_MONITOR (local_monitor);
+
+  if (backend != BACKEND_NONE)
+    return G_DIRECTORY_MONITOR (local_monitor);
+
+  g_object_unref (local_monitor);
+  return NULL;
 }
 
 static gboolean
