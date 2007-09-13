@@ -261,7 +261,6 @@ queue_start_jobs_at_idle (GVfsDaemon *daemon)
     daemon->priv->queued_job_start = g_idle_add (start_jobs_at_idle, daemon);
 }
 
-
 static void
 handle_new_job_callback (GVfsReadStream *stream,
 			 GVfsJob *job,
@@ -270,6 +269,19 @@ handle_new_job_callback (GVfsReadStream *stream,
   g_print ("handle_new_job_callback() job=%p daemon=%p\n", job, daemon);
   g_object_ref (job);
   start_or_queue_job (daemon, job);
+}
+
+static void
+handle_read_stream_closed_callback (GVfsReadStream *stream,
+				    GVfsDaemon *daemon)
+{
+  g_mutex_lock (daemon->priv->lock);
+  
+  daemon->priv->read_streams = g_list_remove (daemon->priv->read_streams, stream);
+  g_signal_handlers_disconnect_by_func (stream, (GCallback)handle_new_job_callback, daemon);
+  g_object_unref (stream);
+  
+  g_mutex_unlock (daemon->priv->lock);
 }
 
 /* NOTE: Might be emitted on a thread */
@@ -296,6 +308,7 @@ job_finished_callback (GVfsJob *job,
 	  daemon->priv->read_streams = g_list_append (daemon->priv->read_streams,
 						      stream);
 	  g_signal_connect (stream, "new_job", (GCallback)handle_new_job_callback, daemon);
+	  g_signal_connect (stream, "closed", (GCallback)handle_read_stream_closed_callback, daemon);
 	}
     }
   

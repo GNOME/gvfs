@@ -28,6 +28,7 @@ enum {
 
 enum {
   NEW_JOB,
+  CLOSED,
   LAST_SIGNAL
 };
 
@@ -43,6 +44,7 @@ typedef struct
 
 struct _GVfsReadStreamPrivate
 {
+  gboolean closed;
   GInputStream *command_stream;
   GOutputStream *reply_stream;
   int remote_fd;
@@ -57,7 +59,7 @@ struct _GVfsReadStreamPrivate
   char reply_buffer[G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE];
   int reply_buffer_pos;
   
-  char *output_data;
+  char *output_data; /* Owned by job */
   gsize output_data_size;
   gsize output_data_pos;
 };
@@ -69,6 +71,8 @@ g_vfs_read_stream_finalize (GObject *object)
 {
   GVfsReadStream *read_stream;
 
+  g_print ("*****g_vfs_read_stream_finalize\n");
+  
   read_stream = G_VFS_READ_STREAM (object);
 
   if (read_stream->priv->current_job)
@@ -112,6 +116,15 @@ g_vfs_read_stream_class_init (GVfsReadStreamClass *klass)
 		  g_cclosure_marshal_VOID__POINTER,
 		  G_TYPE_NONE, 1, G_TYPE_VFS_JOB);
   
+  signals[CLOSED] =
+    g_signal_new ("closed",
+		  G_TYPE_FROM_CLASS (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  G_STRUCT_OFFSET (GVfsReadStreamClass, closed),
+		  NULL, NULL,
+		  g_cclosure_marshal_VOID__VOID,
+		  G_TYPE_NONE, 0);
+  
 }
 
 static void
@@ -123,110 +136,14 @@ g_vfs_read_stream_init (GVfsReadStream *stream)
   stream->priv->remote_fd = -1;
 }
 
-
 static void
-send_reply_cb (GOutputStream *output_stream,
-	       void          *buffer,
-	       gsize          bytes_requested,
-	       gssize         bytes_written,
-	       gpointer       data,
-	       GError        *error)
+g_vfs_read_stream_close (GVfsReadStream *stream)
 {
-  GVfsReadStream *stream = data;
-
-  g_print ("send_reply_cb: %d\n", bytes_written);
-
-  if (bytes_written <= 0)
-    {
-      g_object_unref (stream);
-      /* TODO: handle errors */
-      g_assert_not_reached ();
-      return;
-    }
-
-  if (stream->priv->reply_buffer_pos < G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
-    {
-      stream->priv->reply_buffer_pos += bytes_written;
-
-      /* Write more of reply header if needed */
-      if (stream->priv->reply_buffer_pos < G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
-	{
-	  g_output_stream_write_async (stream->priv->reply_stream,
-				       stream->priv->reply_buffer + stream->priv->reply_buffer_pos,
-				       G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE - stream->priv->reply_buffer_pos,
-				       0,
-				       send_reply_cb, stream,
-				       NULL);  
-	  return;
-	}
-      bytes_written = 0;
-    }
-
-  stream->priv->output_data_pos += bytes_written;
-
-  /* Write more of output_data if needed */
-  if (stream->priv->output_data != NULL &&
-      stream->priv->output_data_pos < stream->priv->output_data_size)
-    {
-      g_output_stream_write_async (stream->priv->reply_stream,
-				   stream->priv->output_data + stream->priv->output_data_pos,
-				   stream->priv->output_data_size - stream->priv->output_data_pos,
-				   0,
-				   send_reply_cb, stream,
-				   NULL);
-      return;
-    }
-
-  /* Sent full reply */
-  g_free (stream->priv->output_data);
-  stream->priv->output_data = NULL;
-  
-  g_vfs_job_emit_finished (stream->priv->current_job);
-  g_object_unref (stream->priv->current_job);
-  stream->priv->current_job = NULL;
-  g_print ("Sent reply\n");
-  
-  g_object_unref (stream);
-}
-
-/* Might be called on an i/o thread
- * Takes ownership of data */
-static void
-send_reply (GVfsReadStream *stream,
-	    gboolean use_header,
-	    char *data,
-	    gsize data_len)
-{
-  
-  stream->priv->output_data = data;
-  stream->priv->output_data_size = data_len;
-  stream->priv->output_data_pos = 0;
-
-  /* Don't finalize the ReadStream while there is an outstanding async operation */
   g_object_ref (stream);
-  if (use_header)
-    {
-      stream->priv->reply_buffer_pos = 0;
-
-      g_output_stream_write_async (stream->priv->reply_stream,
-				   stream->priv->reply_buffer,
-				   G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
-				   0,
-				   send_reply_cb, stream,
-				   NULL);  
-    }
-  else
-    {
-      stream->priv->reply_buffer_pos = G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE;
-
-      g_output_stream_write_async (stream->priv->reply_stream,
-				   stream->priv->output_data,
-				   stream->priv->output_data_size,
-				   0,
-				   send_reply_cb, stream,
-				   NULL);  
-
-    }
+  if (!stream->priv->closed)
+    g_signal_emit (stream, signals[CLOSED], 0);
+  stream->priv->closed = TRUE;
+  g_object_unref (stream);
 }
 
 static void
@@ -317,6 +234,7 @@ command_read_cb (GInputStream *input_stream,
 
   if (reader->read_stream == NULL)
     {
+      /* ReadStream was finalized */
       g_object_unref (reader->command_stream);
       g_free (reader);
       return;
@@ -324,7 +242,10 @@ command_read_cb (GInputStream *input_stream,
   
   if (count_read <= 0)
     {
-      /* TODO: Handle errors (eof..) */
+      reader->read_stream->priv->request_reader = NULL;
+      g_vfs_read_stream_close (reader->read_stream);
+      g_object_unref (reader->command_stream);
+      g_free (reader);
       return;
     }
 
@@ -383,6 +304,107 @@ start_request_reader (GVfsReadStream *stream)
 			     NULL);
 
   stream->priv->request_reader = reader;
+}
+
+
+static void
+send_reply_cb (GOutputStream *output_stream,
+	       void          *buffer,
+	       gsize          bytes_requested,
+	       gssize         bytes_written,
+	       gpointer       data,
+	       GError        *error)
+{
+  GVfsReadStream *stream = data;
+  GVfsJob *job;
+
+  g_print ("send_reply_cb: %d\n", bytes_written);
+
+  if (bytes_written <= 0)
+    {
+      g_vfs_read_stream_close (stream);
+      goto error_out;
+    }
+
+  if (stream->priv->reply_buffer_pos < G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
+    {
+      stream->priv->reply_buffer_pos += bytes_written;
+
+      /* Write more of reply header if needed */
+      if (stream->priv->reply_buffer_pos < G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE)
+	{
+	  g_output_stream_write_async (stream->priv->reply_stream,
+				       stream->priv->reply_buffer + stream->priv->reply_buffer_pos,
+				       G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE - stream->priv->reply_buffer_pos,
+				       0,
+				       send_reply_cb, stream,
+				       NULL);  
+	  return;
+	}
+      bytes_written = 0;
+    }
+
+  stream->priv->output_data_pos += bytes_written;
+
+  /* Write more of output_data if needed */
+  if (stream->priv->output_data != NULL &&
+      stream->priv->output_data_pos < stream->priv->output_data_size)
+    {
+      g_output_stream_write_async (stream->priv->reply_stream,
+				   stream->priv->output_data + stream->priv->output_data_pos,
+				   stream->priv->output_data_size - stream->priv->output_data_pos,
+				   0,
+				   send_reply_cb, stream,
+				   NULL);
+      return;
+    }
+
+ error_out:
+  
+  /* Sent full reply */
+  stream->priv->output_data = NULL;
+
+  job = stream->priv->current_job;
+  stream->priv->current_job = NULL;
+  g_vfs_job_emit_finished (job);
+  g_object_unref (job);
+  g_print ("Sent reply\n");
+}
+
+/* Might be called on an i/o thread */
+static void
+send_reply (GVfsReadStream *stream,
+	    gboolean use_header,
+	    char *data,
+	    gsize data_len)
+{
+  
+  stream->priv->output_data = data;
+  stream->priv->output_data_size = data_len;
+  stream->priv->output_data_pos = 0;
+
+  if (use_header)
+    {
+      stream->priv->reply_buffer_pos = 0;
+
+      g_output_stream_write_async (stream->priv->reply_stream,
+				   stream->priv->reply_buffer,
+				   G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE,
+				   0,
+				   send_reply_cb, stream,
+				   NULL);  
+    }
+  else
+    {
+      stream->priv->reply_buffer_pos = G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SIZE;
+
+      g_output_stream_write_async (stream->priv->reply_stream,
+				   stream->priv->output_data,
+				   stream->priv->output_data_size,
+				   0,
+				   send_reply_cb, stream,
+				   NULL);  
+    }
 }
 
 /* Might be called on an i/o thread

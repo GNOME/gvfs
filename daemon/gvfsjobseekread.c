@@ -22,6 +22,7 @@ g_vfs_job_seek_read_finalize (GObject *object)
   GVfsJobSeekRead *job;
 
   job = G_VFS_JOB_SEEK_READ (object);
+  g_object_unref (job->stream);
 
   if (G_OBJECT_CLASS (g_vfs_job_seek_read_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_seek_read_parent_class)->finalize) (object);
@@ -54,7 +55,7 @@ g_vfs_job_seek_read_new (GVfsReadStream *stream,
   
   job = g_object_new (G_TYPE_VFS_JOB_SEEK_READ, NULL);
 
-  job->stream = stream; /* TODO: ref? */
+  job->stream = g_object_ref (stream);
   job->handle = handle;
   job->requested_offset = offset;
   job->seek_type = seek_type;

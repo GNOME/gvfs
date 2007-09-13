@@ -33,6 +33,7 @@ struct _GVfsReadStreamClass
 
   void (*new_job) (GVfsReadStream *stream,
 		   GVfsJob *job);
+  void (*closed)  (GVfsReadStream *stream);
 };
 
 GType g_vfs_read_stream_get_type (void) G_GNUC_CONST;

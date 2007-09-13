@@ -23,6 +23,7 @@ g_vfs_job_read_finalize (GObject *object)
 
   job = G_VFS_JOB_READ (object);
 
+  g_object_unref (job->stream);
   g_free (job->buffer);
   
   if (G_OBJECT_CLASS (g_vfs_job_read_parent_class)->finalize)
@@ -55,7 +56,7 @@ g_vfs_job_read_new (GVfsReadStream *stream,
   
   job = g_object_new (G_TYPE_VFS_JOB_READ, NULL);
 
-  job->stream = stream; /* TODO: ref? */
+  job->stream = g_object_ref (stream);
   job->handle = handle;
   job->buffer = g_malloc (bytes_requested);
   job->bytes_requested = bytes_requested;
@@ -77,7 +78,6 @@ send_reply (GVfsJob *job)
       g_vfs_read_stream_send_data (op_job->stream,
 				   op_job->buffer,
 				   op_job->data_count);
-      op_job->buffer = NULL;
     }
 }
 
