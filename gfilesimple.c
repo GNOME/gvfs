@@ -4,6 +4,7 @@
 
 #include "gfilesimple.h"
 #include "gfileinfosimple.h"
+#include "gfileenumeratorsimple.h"
 #include "glocalfileinputstream.h"
 #include "glocalfileoutputstream.h"
 #include <glib/gi18n-lib.h>
@@ -233,8 +234,10 @@ g_file_simple_enumerate_children (GFile      *file,
 				  const char *attributes,
 				  gboolean follow_symlinks)
 {
-  /* TODO */
-  return NULL;
+  GFileSimple *simple = G_FILE_SIMPLE (file);
+  return g_file_enumerator_simple_new (simple->filename,
+				       requested, attributes,
+				       follow_symlinks);
 }
 
 GFileInfo *

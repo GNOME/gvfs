@@ -1,7 +1,7 @@
 #ifndef __G_FILE_ENUMERATOR_SIMPLE_H__
 #define __G_FILE_ENUMERATOR_SIMPLE_H__
 
-#include <genumeratorsimple.h>
+#include <gfileenumerator.h>
 #include <gfileinfo.h>
 
 G_BEGIN_DECLS

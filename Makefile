@@ -7,6 +7,7 @@ CFILES=gfileinfo.c ginputstream.c goutputstream.c \
 	glocalfileoutputstream.c gioscheduler.c\
 	gfileinputstream.c gfileoutputstream.c \
 	gvfssimple.c gfilesimple.c gfileinfosimple.c \
+	gfileenumeratorsimple.c 
 
 
 HFILES=gfileinfo.h ginputstream.h goutputstream.h\
@@ -15,6 +16,7 @@ HFILES=gfileinfo.h ginputstream.h goutputstream.h\
 	glocalfileoutputstream.h gioscheduler.h\
 	gfileinputstream.h gfileoutputstream.h\
 	gvfssimple.h gfilesimple.h gfileinfosimple.h \
+	gfileenumeratorsimple.h \
 	gvfstypes.h
 
 test: test.c $(CFILES) $(HFILES) Makefile

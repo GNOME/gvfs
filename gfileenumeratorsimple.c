@@ -5,8 +5,6 @@
 #include <gfileenumeratorsimple.h>
 #include <gfileinfosimple.h>
 
-G_DEFINE_TYPE (GFileEnumeratorSimple, g_file_enumerator_simple, G_TYPE_FILE_ENUMERATOR);
-
   /* TODO:
    *  It would be nice to use the dirent->d_type to check file type without
    *  needing to stat each files on linux and other systems that support it.
@@ -25,6 +23,13 @@ struct _GFileEnumeratorSimple
   gboolean follow_symlinks;
 };
 
+G_DEFINE_TYPE (GFileEnumeratorSimple, g_file_enumerator_simple, G_TYPE_FILE_ENUMERATOR);
+
+static GFileInfo *g_file_enumerator_simple_next_file (GFileEnumerator  *enumerator,
+						      GError          **error);
+static void       g_file_enumerator_simple_stop      (GFileEnumerator  *enumerator);
+
+
 static void
 g_file_enumerator_simple_finalize (GObject *object)
 {
@@ -34,9 +39,6 @@ g_file_enumerator_simple_finalize (GObject *object)
 
   g_free (simple->filename);
   g_free (simple->attributes);
-  
-  if (simple->open_error)
-    g_error_free (simple->open_error);
   
   if (G_OBJECT_CLASS (g_file_enumerator_simple_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_file_enumerator_simple_parent_class)->finalize) (object);
@@ -50,6 +52,9 @@ g_file_enumerator_simple_class_init (GFileEnumeratorSimpleClass *klass)
   GFileEnumeratorClass *enumerator_class = G_FILE_ENUMERATOR_CLASS (klass);
   
   gobject_class->finalize = g_file_enumerator_simple_finalize;
+
+  enumerator_class->next_file = g_file_enumerator_simple_next_file;
+  enumerator_class->stop = g_file_enumerator_simple_stop;
 }
 
 static void
@@ -72,7 +77,7 @@ g_file_enumerator_simple_new (const char *filename,
   simple->attributes = g_strdup (attributes);
   simple->follow_symlinks = follow_symlinks;
   
-  return G_FILE_ENUMERATOR_SIMPLE (simple);
+  return G_FILE_ENUMERATOR (simple);
 }
 
 static gboolean
@@ -81,11 +86,11 @@ g_file_enumerator_simple_open_dir (GFileEnumeratorSimple *simple, GError **error
   if (simple->dir != NULL)
     return TRUE;
   
-  simple->dir = g_dir_open (simple->filename, error);
+  simple->dir = g_dir_open (simple->filename, 0, error);
   return simple->dir != NULL;
 }
 
-GFileInfo *
+static GFileInfo *
 g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
 				    GError **error)
 {
@@ -102,7 +107,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
     {
       if (error)
 	*error = NULL;
-      return NULL
+      return NULL;
     }
 
   info = g_file_info_new ();
@@ -115,7 +120,9 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
       path = g_build_filename (simple->filename, filename, NULL);
       
       g_file_info_simple_get (path, info,
-			      requested, attributes, follow_symlinks);
+			      simple->requested,
+			      simple->attributes,
+			      simple->follow_symlinks);
       
       g_free (path);
     }
@@ -123,7 +130,7 @@ g_file_enumerator_simple_next_file (GFileEnumerator *enumerator,
   return info;
 }
 
-void
+static void
 g_file_enumerator_simple_stop (GFileEnumerator *enumerator)
 {
   GFileEnumeratorSimple *simple = G_FILE_ENUMERATOR_SIMPLE (enumerator);
