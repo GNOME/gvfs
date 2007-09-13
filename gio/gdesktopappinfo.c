@@ -1,6 +1,8 @@
 #include <config.h>
 
 #include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #include "gcontenttypeprivate.h"
 #include "gdesktopappinfo.h"
@@ -116,7 +118,8 @@ g_desktop_app_info_new_from_filename (const char *filename,
   char *type;
   char *try_exec;
 
-  *hidden = FALSE;
+  if (hidden)
+    *hidden = FALSE;
   
   key_file = g_key_file_new ();
   
@@ -145,7 +148,8 @@ g_desktop_app_info_new_from_filename (const char *filename,
 
   if (g_key_file_get_boolean (key_file, "Desktop Entry", "Hidden", NULL))
     {
-      *hidden = TRUE;
+      if (hidden)
+	*hidden = TRUE;
       return NULL;
     }
 
@@ -796,6 +800,7 @@ g_desktop_app_info_set_as_default_for_type (GAppInfo    *appinfo,
   g_strfreev (list);
   
   data = g_key_file_to_data (key_file, &data_size, error);
+  g_key_file_free (key_file);
   if (data == NULL)
     {
       g_free (filename);
@@ -811,6 +816,166 @@ g_desktop_app_info_set_as_default_for_type (GAppInfo    *appinfo,
   
   return res;
 }
+
+static void
+update_program_done (GPid     pid,
+		     gint     status,
+		     gpointer data)
+{
+  /* Did the application exit correctly */
+  if (WIFEXITED (status) &&
+      WEXITSTATUS (status) == 0)
+    {
+      /* Here we could clean out any caches in use */
+    }
+}
+
+static void
+run_update_command (char *command,
+		    char *subdir)
+{
+	char *argv[3] = {
+		NULL,
+		NULL
+	};
+	GPid pid = 0;
+	GError *error = NULL;
+
+	argv[0] = command;
+	argv[1] = g_build_filename (g_get_user_data_dir (), subdir, NULL);
+
+	if (g_spawn_async ("/", argv,
+			   NULL,       /* envp */
+			   G_SPAWN_SEARCH_PATH |
+			   G_SPAWN_STDOUT_TO_DEV_NULL |
+			   G_SPAWN_STDERR_TO_DEV_NULL |
+			   G_SPAWN_DO_NOT_REAP_CHILD,
+			   NULL, NULL, /* No setup function */
+			   &pid,
+			   NULL)) 
+	  g_child_watch_add (pid, update_program_done, NULL);
+	else
+	  {
+	    /* If we get an error at this point, it's quite likely the user doesn't
+	     * have an installed copy of either 'update-mime-database' or
+	     * 'update-desktop-database'.  I don't think we want to popup an error
+	     * dialog at this point, so we just do a g_warning to give the user a
+	     * chance of debugging it.
+	     */
+	    g_warning ("%s", error->message);
+	  }
+	
+	g_free (argv[1]);
+}
+
+
+GAppInfo *
+g_app_info_create_from_commandline (const char *commandline,
+				    const char *application_name,
+				    GError **error)
+{
+  GKeyFile *key_file;
+  char *dirname;
+  char **split;
+  char *basename, *exec, *filename, *comment;
+  char *data, *desktop_id;
+  gsize data_size;
+  int fd;
+  GDesktopAppInfo *info;
+  gboolean res;
+  
+  dirname = g_build_filename (g_get_user_data_dir (), "applications", NULL);
+
+  if (!ensure_dir (dirname))
+    {
+      /* TODO: Should ensure dirname is UTF8 in error message */
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Can't create user applications dir (%s)"), dirname);
+      g_free (dirname);
+      return NULL;
+    }
+  
+  key_file = g_key_file_new ();
+
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "Encoding", "UTF-8");
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "Version", "1.0");
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "Type", "Application");
+
+  exec = g_strconcat (commandline, " %f", NULL);
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "Exec", exec);
+  g_free (exec);
+  
+  split = g_strsplit (commandline, " ", 2);
+  basename = g_path_get_basename (split[0]);
+  g_strfreev (split);
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "Name", application_name?application_name:basename);
+
+  comment = g_strdup_printf (_("Custom definition for %s"), basename);
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "Comment", comment);
+  g_free (comment);
+  
+  g_key_file_set_string (key_file, "Desktop Entry",
+			 "NoDisplay", "true");
+
+  data = g_key_file_to_data (key_file, &data_size, error);
+  g_key_file_free (key_file);
+  if (data == NULL)
+    {
+      g_free (dirname);
+      g_free (basename);
+      return NULL;
+    }
+
+
+  desktop_id = g_strdup_printf ("userapp-%s-XXXXXX.desktop", basename);
+  g_free (basename);
+  filename = g_build_filename (dirname, desktop_id, NULL);
+  g_free (desktop_id);
+  g_free (dirname);
+  
+  fd = g_mkstemp (filename);
+  if (fd == -1)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Can't create user desktop file"));
+      g_free (filename);
+      g_free (data);
+      return NULL;
+    }
+
+  desktop_id = g_path_get_basename (filename);
+
+  close (fd);
+  
+  res = g_file_set_contents (filename, data, data_size, error);
+  if (!res)
+    {
+      g_free (desktop_id);
+      g_free (filename);
+      return NULL;
+    }
+
+  run_update_command ("update-desktop-database", "applications");
+  
+  info = g_desktop_app_info_new_from_filename (filename, NULL);
+  g_free (filename);
+  if (info == NULL) 
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		 _("Can't load just created desktop file"));
+  else
+    info->desktop_id = g_strdup (desktop_id);
+    
+  g_free (desktop_id);
+  
+  return G_APP_INFO (info);
+}
+
 
 static void
 g_desktop_app_info_iface_init (GAppInfoIface *iface)

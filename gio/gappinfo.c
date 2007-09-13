@@ -51,13 +51,6 @@ g_app_info_base_init (gpointer g_class)
 }
 
 GAppInfo *
-g_app_info_create_from_commandline (const char *commandline)
-{
-  /* TODO */
-  return NULL;
-}
-
-GAppInfo *
 g_app_info_dup (GAppInfo *appinfo)
 {
   GAppInfoIface *iface;

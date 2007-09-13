@@ -289,7 +289,18 @@ test_appinfo (void)
 {
   GList *infos, *l;
   GAppInfo *info;
+  GError *error = NULL;
 
+  if (0)
+    {
+      info = g_app_info_create_from_commandline ("/usr/bin/ls -l",
+						 NULL, &error);
+      if (info == NULL)
+	g_print ("error: %s\n", error->message);
+      else
+	g_print ("new info - %p: %s\n", info, g_app_info_get_name (info));
+    }
+  
   info = g_get_default_app_info_for_type ("text/html");
   g_print ("default html - %p: %s\n", info, g_app_info_get_name (info));
 

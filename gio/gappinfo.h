@@ -44,7 +44,9 @@ struct _GAppInfoIface
 
 GType g_app_info_get_type (void) G_GNUC_CONST;
 
-GAppInfo *g_app_info_create_from_commandline     (const char  *commandline);
+GAppInfo *g_app_info_create_from_commandline     (const char  *commandline,
+						  const char  *application_name,
+						  GError **error);
 GAppInfo *g_app_info_dup                         (GAppInfo    *appinfo);
 gboolean  g_app_info_equal                       (GAppInfo    *appinfo1,
 						  GAppInfo    *appinfo2);
@@ -71,7 +73,9 @@ GList *   g_get_all_app_info                     (void);
 GList *   g_get_all_app_info_for_type            (const char  *content_type);
 GAppInfo *g_get_default_app_info_for_type        (const char  *content_type);
 
-
+/* TODO: Possibly missing operations:
+   create new content type from extension
+*/
 
 
 G_END_DECLS
