@@ -73,25 +73,25 @@ g_file_get_uri (GFile *file)
 
 
 char *
-g_file_get_absolute_display_name (GFile *file)
+g_file_get_parse_name (GFile *file)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  return (* iface->get_absolute_display_name) (file);
+  return (* iface->get_parse_name) (file);
 }
 
-void
-g_file_set_keep_open (GFile *file,
-		      gboolean keep_open)
+GFile *
+g_file_copy (GFile *file)
 {
   GFileIface *iface;
 
   iface = G_FILE_GET_IFACE (file);
 
-  (* iface->set_keep_open) (file, keep_open);
+  return (* iface->copy) (file);
 }
+
 
 GFile *
 g_file_get_parent (GFile *file)

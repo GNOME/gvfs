@@ -1,5 +1,6 @@
 #include <config.h>
 #include "gvfssimple.h"
+#include "gfilesimple.h"
 
 static void g_vfs_simple_class_init     (GVfsSimpleClass *class);
 static void g_vfs_simple_vfs_iface_init (GVfsIface       *iface);
@@ -41,7 +42,7 @@ GFile *
 g_vfs_simple_get_file_for_path  (GVfs       *vfs,
 				 const char *path)
 {
-  return NULL;
+  return g_file_simple_new (path);
 }
 
 GFile *
@@ -53,16 +54,30 @@ g_vfs_simple_get_file_for_uri   (GVfs       *vfs,
   path = g_filename_from_uri (uri, NULL, NULL);
 
   if (path != NULL)
-    return g_vfs_simple_get_file_for_path (vfs, path);
+    return g_file_simple_new (path);
   else
     return NULL;
 }
-  
+
 GFile *
 g_vfs_simple_parse_name (GVfs       *vfs,
 			 const char *parse_name)
 {
-  return NULL;
+  GFile *file;
+  char *filename;
+  
+  g_return_val_if_fail (G_IS_VFS (vfs), NULL);
+  g_return_val_if_fail (parse_name != NULL, NULL);
+
+  if (g_ascii_strncasecmp ("file:", parse_name, 5))
+    filename = g_filename_from_uri (parse_name, NULL, NULL);
+  else
+    filename = g_filename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
+    
+  file = g_file_simple_new (filename);
+  g_free (filename);
+
+  return file;
 }
 
 static void

@@ -23,28 +23,27 @@ struct _GFileIface
 
   /* Virtual Table */
 
-  gboolean            (*is_native)                 (GFile                *file);
-  char *              (*get_path)                  (GFile                *file);
-  char *              (*get_uri)                   (GFile                *file);
-  char *              (*get_absolute_display_name) (GFile                *file);
-  void                (*set_keep_open)             (GFile                *file,
-						    gboolean              keep_open);
-  GFile *             (*get_parent)                (GFile                *file);
-  GFile *             (*get_child)                 (GFile                *file,
-						    const char           *name);
-  GFileEnumerator *   (*enumerate_children)        (GFile                *file,
-						    GFileInfoRequestFlags requested,
-						    const char           *attributes);
-  GFileInfo *         (*get_info)                  (GFile                *file,
-						    GFileInfoRequestFlags requested,
-						    const char           *attributes);
-  /*                  (*get_info_async)            (GFile                *file.. */
-  GFileInputStream *  (*read)                      (GFile                *file);
-  GFileOutputStream * (*append_to)                 (GFile                *file);
-  GFileOutputStream * (*create)                    (GFile                *file);
-  GFileOutputStream * (*replace)                   (GFile                *file,
-						    time_t                mtime,
-						    gboolean              make_backup);
+  GFile *             (*copy)               (GFile                *file);
+  gboolean            (*is_native)          (GFile                *file);
+  char *              (*get_path)           (GFile                *file);
+  char *              (*get_uri)            (GFile                *file);
+  char *              (*get_parse_name)     (GFile                *file);
+  GFile *             (*get_parent)         (GFile                *file);
+  GFile *             (*get_child)          (GFile                *file,
+					     const char           *name);
+  GFileEnumerator *   (*enumerate_children) (GFile                *file,
+					     GFileInfoRequestFlags requested,
+					     const char           *attributes);
+  GFileInfo *         (*get_info)           (GFile                *file,
+					     GFileInfoRequestFlags requested,
+					     const char           *attributes);
+  /*                  (*get_info_async)     (GFile                *file.. */
+  GFileInputStream *  (*read)               (GFile                *file);
+  GFileOutputStream * (*append_to)          (GFile                *file);
+  GFileOutputStream * (*create)             (GFile                *file);
+  GFileOutputStream * (*replace)            (GFile                *file,
+					     time_t                mtime,
+					     gboolean              make_backup);
 };
 
 GType g_file_get_type (void) G_GNUC_CONST;
@@ -53,12 +52,11 @@ GFile *g_file_get_for_path  (const char *path);
 GFile *g_file_get_for_uri   (const char *uri);
 GFile *g_file_parse_name    (const char *parse_name);
 
+GFile *            g_file_copy              (GFile                 *file);
 gboolean           g_file_is_native          (GFile                 *file);
 char *             g_file_get_path           (GFile                 *file);
 char *             g_file_get_uri            (GFile                 *file);
 char *             g_file_get_parse_name     (GFile                 *file);
-void               g_file_set_keep_open      (GFile                 *file,
-					      gboolean               keep_open);
 GFile *            g_file_get_parent         (GFile                 *file);
 GFile *            g_file_get_child          (GFile                 *file,
 					      const char            *name);
