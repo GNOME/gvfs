@@ -1,3 +1,8 @@
+2007-09-14  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Add etag support for close on write
+
 I stopped tracked changes here. Look at "git log" instead.
 		
 2006-09-28  Alexander Larsson  <alexl@redhat.com>

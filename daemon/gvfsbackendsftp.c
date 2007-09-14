@@ -27,6 +27,7 @@
 #include "gvfsjobseekread.h"
 #include "gvfsjobopenforwrite.h"
 #include "gvfsjobwrite.h"
+#include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobgetinfo.h"
@@ -1814,12 +1815,12 @@ close_deleted_backup (GVfsBackendSftp *backend,
 }
 
 static void
-close_reply (GVfsBackendSftp *backend,
-             int reply_type,
-             GDataInputStream *reply,
-             guint32 len,
-             GVfsJob *job,
-             gpointer user_data)
+close_write_reply (GVfsBackendSftp *backend,
+                   int reply_type,
+                   GDataInputStream *reply,
+                   guint32 len,
+                   GVfsJob *job,
+                   gpointer user_data)
 {
   GDataOutputStream *command;
   guint32 id;
@@ -1881,24 +1882,35 @@ close_reply (GVfsBackendSftp *backend,
     }
 }
 
-static gboolean
-try_close_read (GVfsBackend *backend,
-                GVfsJobCloseRead *job,
-                GVfsBackendHandle _handle)
+static void
+close_write_fstat_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job,
+                        gpointer user_data)
 {
-  SftpHandle *handle = _handle;
-  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  SftpHandle *handle = user_data;
   GDataOutputStream *command;
+  GFileInfo *info;
+  const char *etag;
   guint32 id;
-
-  command = new_command_stream (op_backend,
-                                SSH_FXP_CLOSE,
-                                &id);
+  
+  if (reply_type == SSH_FXP_ATTRS)
+    {
+      info = g_file_info_new ();
+      parse_attributes (backend, info, NULL,
+                        reply, NULL);
+      etag = g_file_info_get_etag (info);
+      if (etag)
+        g_vfs_job_close_write_set_etag (G_VFS_JOB_CLOSE_WRITE (job), etag);
+      g_object_unref (info);
+    }
+  
+  command = new_command_stream (backend, SSH_FXP_CLOSE, &id);
   put_data_buffer (command, handle->raw_handle);
 
-  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), handle);
-
-  return TRUE;
+  queue_command_stream_and_free (backend, command, id, close_write_reply, G_VFS_JOB (job), handle);
 }
 
 static gboolean
@@ -1911,12 +1923,49 @@ try_close_write (GVfsBackend *backend,
   guint32 id;
   GDataOutputStream *command;
 
-  command = new_command_stream (op_backend,
-                                SSH_FXP_CLOSE,
-                                &id);
+  command = new_command_stream (op_backend, SSH_FXP_FSTAT, &id);
   put_data_buffer (command, handle->raw_handle);
 
-  queue_command_stream_and_free (op_backend, command, id, close_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, id, close_write_fstat_reply, G_VFS_JOB (job), handle);
+
+  return TRUE;
+}
+
+
+static void
+close_read_reply (GVfsBackendSftp *backend,
+                  int reply_type,
+                  GDataInputStream *reply,
+                  guint32 len,
+                  GVfsJob *job,
+                  gpointer user_data)
+{
+  SftpHandle *handle;
+
+  handle = user_data;
+
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1);
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply recieved"));
+  sftp_handle_free (handle);
+}
+
+static gboolean
+try_close_read (GVfsBackend *backend,
+                GVfsJobCloseRead *job,
+                GVfsBackendHandle _handle)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+
+  command = new_command_stream (op_backend, SSH_FXP_CLOSE, &id);
+  put_data_buffer (command, handle->raw_handle);
+
+  queue_command_stream_and_free (op_backend, command, id, close_read_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
