@@ -1,5 +1,11 @@
 2007-09-14  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfileoutputstream.c:
+        (g_daemon_file_output_stream_get_etag):
+	Update to new get_etag API.
+
+2007-09-14  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsftp.c:
 	Add etag support for close on write
 

@@ -142,9 +142,7 @@ static GFileInfo *g_daemon_file_output_stream_get_file_info (GFileOutputStream  
 							     char                       *attributes,
 							     GCancellable               *cancellable,
 							     GError                    **error);
-static char      *g_daemon_file_output_stream_get_etag      (GFileOutputStream          *stream,
-							     GCancellable               *cancellable,
-							     GError                    **error);
+static char      *g_daemon_file_output_stream_get_etag      (GFileOutputStream          *stream);
 static goffset    g_daemon_file_output_stream_tell          (GFileOutputStream          *stream);
 static gboolean   g_daemon_file_output_stream_can_seek      (GFileOutputStream          *stream);
 static gboolean   g_daemon_file_output_stream_seek          (GFileOutputStream          *stream,
@@ -942,20 +940,13 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
 }
 
 static char *
-g_daemon_file_output_stream_get_etag (GFileOutputStream     *stream,
-				      GCancellable         *cancellable,
-				      GError              **error)
+g_daemon_file_output_stream_get_etag (GFileOutputStream     *stream)
 {
   GDaemonFileOutputStream *file;
 
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 
-  if (file->etag)
-    return g_strdup (file->etag);
-  
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-	       _("etag not supported on stream"));
-  return NULL;
+  return g_strdup (file->etag);
 }
 
 static GFileInfo *
