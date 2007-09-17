@@ -223,7 +223,7 @@ look_for_stderr_errors (GVfsBackend *backend, GError **error)
 
   while (1)
     {
-      line = g_data_input_stream_get_line (op_backend->error_stream, NULL, NULL, NULL);
+      line = g_data_input_stream_read_line (op_backend->error_stream, NULL, NULL, NULL);
       
       if (line == NULL)
 	{
@@ -546,7 +546,7 @@ read_string (GDataInputStream *stream, gsize *len_out)
   GError *error;
 
   error = NULL;
-  len = g_data_input_stream_get_uint32 (stream, NULL, &error);
+  len = g_data_input_stream_read_uint32 (stream, NULL, &error);
   if (error)
     {
       g_error_free (error);
@@ -759,8 +759,8 @@ read_reply_async_got_data  (GObject *source_object,
   reply = make_reply_stream (backend->reply, backend->reply_size);
   backend->reply = NULL;
 
-  type = g_data_input_stream_get_byte (reply, NULL, NULL);
-  id = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  type = g_data_input_stream_read_byte (reply, NULL, NULL);
+  id = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   expected_reply = g_hash_table_lookup (backend->expected_replies, GINT_TO_POINTER (id));
   if (expected_reply)
@@ -971,8 +971,8 @@ get_uid_sync (GVfsBackendSftp *backend)
   if (reply == NULL)
     return FALSE;
   
-  type = g_data_input_stream_get_byte (reply, NULL, NULL);
-  id = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  type = g_data_input_stream_read_byte (reply, NULL, NULL);
+  id = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   /* On error, set uid to -1 and ignore */
   backend->my_uid = (guint32)-1;
@@ -1066,7 +1066,7 @@ do_mount (GVfsBackend *backend,
       return;
     }
   
-  if (g_data_input_stream_get_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
+  if (g_data_input_stream_read_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
     {
       g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1074,7 +1074,7 @@ do_mount (GVfsBackend *backend,
       return;
     }
   
-  op_backend->protocol_version = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  op_backend->protocol_version = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   while ((extension_name = read_string (reply, NULL)) != NULL)
     {
@@ -1202,7 +1202,7 @@ error_from_status (GVfsJob *job,
   if (failure_error == -1)
     failure_error = G_IO_ERROR_FAILED;
   
-  code = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  code = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   if (code == SSH_FX_OK)
     return TRUE;
@@ -1268,7 +1268,7 @@ parse_attributes (GVfsBackendSftp *backend,
   gboolean has_uid, free_mimetype;
   char *mimetype;
   
-  flags = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  flags = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   if (basename != NULL && basename[0] == '.')
     g_file_info_set_is_hidden (info, TRUE);
@@ -1278,7 +1278,7 @@ parse_attributes (GVfsBackendSftp *backend,
 
   if (flags & SSH_FILEXFER_ATTR_SIZE)
     {
-      guint64 size = g_data_input_stream_get_uint64 (reply, NULL, NULL);
+      guint64 size = g_data_input_stream_read_uint64 (reply, NULL, NULL);
       g_file_info_set_size (info, size);
     }
 
@@ -1287,9 +1287,9 @@ parse_attributes (GVfsBackendSftp *backend,
   if (flags & SSH_FILEXFER_ATTR_UIDGID)
     {
       has_uid = TRUE;
-      uid = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      uid = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, uid);
-      gid = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      gid = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, gid);
     }
 
@@ -1297,7 +1297,7 @@ parse_attributes (GVfsBackendSftp *backend,
 
   if (flags & SSH_FILEXFER_ATTR_PERMISSIONS)
     {
-      mode = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      mode = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE, mode);
 
       mimetype = NULL;
@@ -1372,9 +1372,9 @@ parse_attributes (GVfsBackendSftp *backend,
       guint32 v;
       char *etag;
       
-      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      v = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, v);
-      v = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      v = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, v);
 
       etag = g_strdup_printf ("%lu", (long unsigned int)v);
@@ -1386,7 +1386,7 @@ parse_attributes (GVfsBackendSftp *backend,
     {
       guint32 count, i;
       char *name, *val;
-      count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       for (i = 0; i < count; i++)
         {
           name = read_string (reply, NULL);
@@ -1526,7 +1526,7 @@ read_reply (GVfsBackendSftp *backend,
       return;
     }
   
-  count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   if (!g_input_stream_read_all (G_INPUT_STREAM (reply),
                                 G_VFS_JOB_READ (job)->buffer, count,
@@ -2511,7 +2511,7 @@ read_dir_readlink_reply (GVfsBackendSftp *backend,
 
   if (reply_type == SSH_FXP_NAME)
     {
-      count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       target = read_string (reply, NULL);
       if (target)
         {
@@ -2636,7 +2636,7 @@ read_dir_reply (GVfsBackendSftp *backend,
     }
 
   infos = NULL;
-  count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+  count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
   for (i = 0; i < count; i++)
     {
       GFileInfo *info;
@@ -2896,7 +2896,7 @@ get_info_readlink_reply (GVfsBackendSftp *backend,
 
   if (reply_type == SSH_FXP_NAME)
     {
-      count = g_data_input_stream_get_uint32 (reply, NULL, NULL);
+      count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
       data->symlink_target = read_string (reply, NULL);
     }
 
