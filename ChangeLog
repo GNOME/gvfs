@@ -1,5 +1,29 @@
 2007-09-17  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+        * client/gvfsfusedaemon.c:
+        * common/gvfsdaemonprotocol.h:
+        * daemon/Makefile.am:
+        * daemon/gvfsbackend.[ch]:
+        * daemon/gvfsbackendftp.c:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+        * daemon/gvfsbackendtest.c:
+        * daemon/gvfsjobenumerate.h:
+        * daemon/gvfsjobgetfsinfo.[ch]: Removed.
+        * daemon/gvfsjobgetinfo.[ch]: Removed.
+        * daemon/gvfsjobqueryfsinfo.[ch]: Added.
+        * daemon/gvfsjobqueryinfo.[ch]: Added.
+        * daemon/gvfsjobsetattribute.[ch]:
+        * test/benchmark-gvfs-big-files.c:
+        * test/benchmark-gvfs-small-files.c:
+	Update with the get_info -> query_info rename in gio
+
+2007-09-17  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsftp.c:
 	Update to new GDataInputStream function names 
 

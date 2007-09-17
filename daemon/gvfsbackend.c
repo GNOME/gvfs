@@ -14,8 +14,8 @@
 #include "gvfsdaemonprotocol.h"
 #include <gvfsjobopenforread.h>
 #include <gvfsjobopenforwrite.h>
-#include <gvfsjobgetinfo.h>
-#include <gvfsjobgetfsinfo.h>
+#include <gvfsjobqueryinfo.h>
+#include <gvfsjobqueryfsinfo.h>
 #include <gvfsjobsetdisplayname.h>
 #include <gvfsjobenumerate.h>
 #include <gvfsjobdelete.h>
@@ -292,12 +292,12 @@ backend_dbus_handler (DBusConnection  *connection,
     job = g_vfs_job_open_for_read_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_GET_INFO))
-    job = g_vfs_job_get_info_new (connection, message, backend);
+					G_VFS_DBUS_MOUNT_OP_QUERY_INFO))
+    job = g_vfs_job_query_info_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_GET_FILESYSTEM_INFO))
-    job = g_vfs_job_get_fs_info_new (connection, message, backend);
+					G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO))
+    job = g_vfs_job_query_fs_info_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_ENUMERATE))

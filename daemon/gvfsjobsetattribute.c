@@ -67,7 +67,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   const gchar *filename = NULL;
   gint filename_len;
   GFileAttributeValue value = G_FILE_ATTRIBUTE_VALUE_INIT;
-  GFileGetInfoFlags flags;
+  GFileQueryInfoFlags flags;
   gchar *attribute;
   dbus_uint32_t flags_u32 = 0;
   

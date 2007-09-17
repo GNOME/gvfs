@@ -22,8 +22,8 @@
 #include "gvfsjobwrite.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
-#include "gvfsjobgetinfo.h"
-#include "gvfsjobgetfsinfo.h"
+#include "gvfsjobqueryinfo.h"
+#include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
@@ -321,11 +321,11 @@ do_close_write (GVfsBackend *backend,
 }
 
 static void
-do_get_info (GVfsBackend *backend,
-	     GVfsJobGetInfo *job,
-	     const char *filename,
-	     const char *attributes,
-	     GFileGetInfoFlags flags)
+do_query_info (GVfsBackend *backend,
+               GVfsJobQueryInfo *job,
+               const char *filename,
+               const char *attributes,
+               GFileQueryInfoFlags flags)
 {
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
@@ -333,10 +333,10 @@ do_get_info (GVfsBackend *backend,
 }
 
 static void
-do_get_fs_info (GVfsBackend *backend,
-		GVfsJobGetFsInfo *job,
-		const char *filename,
-		const char *attributes)
+do_query_fs_info (GVfsBackend *backend,
+                  GVfsJobQueryFsInfo *job,
+                  const char *filename,
+                  const char *attributes)
 {
   /* TODO */
 }
@@ -353,10 +353,10 @@ try_query_settable_attributes (GVfsBackend *backend,
 
 static void
 do_enumerate (GVfsBackend *backend,
-	      GVfsJobEnumerate *job,
-	      const char *filename,
-	      const char *attributes,
-	      GFileGetInfoFlags flags)
+              GVfsJobEnumerate *job,
+              const char *filename,
+              const char *attributes,
+              GFileQueryInfoFlags flags)
 {
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
@@ -365,9 +365,9 @@ do_enumerate (GVfsBackend *backend,
 
 static void
 do_set_display_name (GVfsBackend *backend,
-		     GVfsJobSetDisplayName *job,
-		     const char *filename,
-		     const char *display_name)
+                     GVfsJobSetDisplayName *job,
+                     const char *filename,
+                     const char *display_name)
 {
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
@@ -428,8 +428,8 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->close_write = do_close_write;
-  backend_class->get_info = do_get_info;
-  backend_class->get_fs_info = do_get_fs_info;
+  backend_class->query_info = do_query_info;
+  backend_class->query_fs_info = do_query_fs_info;
   backend_class->enumerate = do_enumerate;
   backend_class->set_display_name = do_set_display_name;
   backend_class->delete = do_delete;

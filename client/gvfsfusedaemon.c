@@ -827,7 +827,7 @@ getattr_for_file (GFile *file, struct stat *sbuf)
   GError    *error  = NULL;
   gint       result = 0;
 
-  file_info = g_file_get_info (file, "*", 0, NULL, &error);
+  file_info = g_file_query_info (file, "*", 0, NULL, &error);
 
   if (file_info)
     {
@@ -1042,7 +1042,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
       GFileInfo *file_info;
       GError    *error = NULL;
 
-      file_info = g_file_get_info (file, "*", 0, NULL, &error);
+      file_info = g_file_query_info (file, "*", 0, NULL, &error);
 
       if (file_info)
         {
@@ -1118,7 +1118,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
       GFileInfo *file_info;
       GError    *error = NULL;
 
-      file_info = g_file_get_info (file, "*", 0, NULL, &error);
+      file_info = g_file_query_info (file, "*", 0, NULL, &error);
 
       if (file_info)
         {
@@ -1738,7 +1738,7 @@ vfs_rmdir (const gchar *path)
     {
       GFileInfo *file_info;
 
-      file_info = g_file_get_info (file, "*", 0, NULL, &error);
+      file_info = g_file_query_info (file, "*", 0, NULL, &error);
       if (file_info)
         {
           if (g_file_info_get_file_type (file_info) == G_FILE_TYPE_DIRECTORY)
@@ -1941,7 +1941,7 @@ vfs_access (const gchar *path, gint mode)
     {
       GFileInfo *file_info;
 
-      file_info = g_file_get_info (file, "*", 0, NULL, &error);
+      file_info = g_file_query_info (file, "*", 0, NULL, &error);
       if (file_info)
         {
           if ((mode & R_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) &&

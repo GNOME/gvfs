@@ -8,11 +8,11 @@
 #include <glib.h>
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
-#include "gvfsjobgetfsinfo.h"
+#include "gvfsjobqueryfsinfo.h"
 #include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
-G_DEFINE_TYPE (GVfsJobGetFsInfo, g_vfs_job_get_fs_info, G_VFS_TYPE_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobQueryFsInfo, g_vfs_job_query_fs_info, G_VFS_TYPE_JOB_DBUS);
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
@@ -21,45 +21,45 @@ static DBusMessage *create_reply (GVfsJob        *job,
 				  DBusMessage    *message);
 
 static void
-g_vfs_job_get_fs_info_finalize (GObject *object)
+g_vfs_job_query_fs_info_finalize (GObject *object)
 {
-  GVfsJobGetFsInfo *job;
+  GVfsJobQueryFsInfo *job;
 
-  job = G_VFS_JOB_GET_FS_INFO (object);
+  job = G_VFS_JOB_QUERY_FS_INFO (object);
 
   g_object_unref (job->file_info);
   
   g_free (job->filename);
   g_file_attribute_matcher_unref (job->attribute_matcher);
   
-  if (G_OBJECT_CLASS (g_vfs_job_get_fs_info_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_vfs_job_get_fs_info_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_vfs_job_query_fs_info_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_vfs_job_query_fs_info_parent_class)->finalize) (object);
 }
 
 static void
-g_vfs_job_get_fs_info_class_init (GVfsJobGetFsInfoClass *klass)
+g_vfs_job_query_fs_info_class_init (GVfsJobQueryFsInfoClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsJobClass *job_class = G_VFS_JOB_CLASS (klass);
   GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
   
-  gobject_class->finalize = g_vfs_job_get_fs_info_finalize;
+  gobject_class->finalize = g_vfs_job_query_fs_info_finalize;
   job_class->run = run;
   job_class->try = try;
   job_dbus_class->create_reply = create_reply;
 }
 
 static void
-g_vfs_job_get_fs_info_init (GVfsJobGetFsInfo *job)
+g_vfs_job_query_fs_info_init (GVfsJobQueryFsInfo *job)
 {
 }
 
 GVfsJob *
-g_vfs_job_get_fs_info_new (DBusConnection *connection,
+g_vfs_job_query_fs_info_new (DBusConnection *connection,
 			   DBusMessage *message,
 			   GVfsBackend *backend)
 {
-  GVfsJobGetFsInfo *job;
+  GVfsJobQueryFsInfo *job;
   DBusMessage *reply;
   DBusError derror;
   int path_len;
@@ -82,7 +82,7 @@ g_vfs_job_get_fs_info_new (DBusConnection *connection,
       return NULL;
     }
 
-  job = g_object_new (G_VFS_TYPE_JOB_GET_FS_INFO,
+  job = g_object_new (G_VFS_TYPE_JOB_QUERY_FS_INFO,
 		      "message", message,
 		      "connection", connection,
 		      NULL);
@@ -100,17 +100,17 @@ g_vfs_job_get_fs_info_new (DBusConnection *connection,
 static void
 run (GVfsJob *job)
 {
-  GVfsJobGetFsInfo *op_job = G_VFS_JOB_GET_FS_INFO (job);
+  GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->get_fs_info == NULL)
+  if (class->query_fs_info == NULL)
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Operation not supported by backend"));
       return;
     }
   
-  class->get_fs_info (op_job->backend,
+  class->query_fs_info (op_job->backend,
 		      op_job,
 		      op_job->filename,
 		      op_job->file_info,
@@ -120,13 +120,13 @@ run (GVfsJob *job)
 static gboolean
 try (GVfsJob *job)
 {
-  GVfsJobGetFsInfo *op_job = G_VFS_JOB_GET_FS_INFO (job);
+  GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->try_get_fs_info == NULL)
+  if (class->try_query_fs_info == NULL)
     return FALSE;
   
-  return class->try_get_fs_info (op_job->backend,
+  return class->try_query_fs_info (op_job->backend,
 				 op_job,
 				 op_job->filename,
 				 op_job->file_info,
@@ -139,7 +139,7 @@ create_reply (GVfsJob *job,
 	      DBusConnection *connection,
 	      DBusMessage *message)
 {
-  GVfsJobGetFsInfo *op_job = G_VFS_JOB_GET_FS_INFO (job);
+  GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
   DBusMessage *reply;
   DBusMessageIter iter;
   const char *type;

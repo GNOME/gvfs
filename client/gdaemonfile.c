@@ -567,7 +567,7 @@ do_async_path_call (GFile *file,
 static GFileEnumerator *
 g_daemon_file_enumerate_children (GFile      *file,
 				  const char *attributes,
-				  GFileGetInfoFlags flags,
+				  GFileQueryInfoFlags flags,
 				  GCancellable *cancellable,
 				  GError **error)
 {
@@ -610,11 +610,11 @@ g_daemon_file_enumerate_children (GFile      *file,
 }
 
 static GFileInfo *
-g_daemon_file_get_info (GFile                *file,
-			const char           *attributes,
-			GFileGetInfoFlags     flags,
-			GCancellable         *cancellable,
-			GError              **error)
+g_daemon_file_query_info (GFile                *file,
+			  const char           *attributes,
+			  GFileQueryInfoFlags     flags,
+			  GCancellable         *cancellable,
+			  GError              **error)
 {
   DBusMessage *reply;
   dbus_uint32_t flags_dbus;
@@ -625,7 +625,7 @@ g_daemon_file_get_info (GFile                *file,
     attributes = "";
   flags_dbus = flags;
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_GET_INFO,
+			     G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
 			     NULL, cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags,
@@ -651,11 +651,11 @@ g_daemon_file_get_info (GFile                *file,
 }
 
 static void
-get_info_async_cb (DBusMessage *reply,
-		   DBusConnection *connection,
-		   GSimpleAsyncResult *result,
-		   GCancellable *cancellable,
-		   gpointer callback_data)
+query_info_async_cb (DBusMessage *reply,
+		     DBusConnection *connection,
+		     GSimpleAsyncResult *result,
+		     GCancellable *cancellable,
+		     gpointer callback_data)
 {
   DBusMessageIter iter;
   GFileInfo *info;
@@ -668,7 +668,7 @@ get_info_async_cb (DBusMessage *reply,
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from get_info"));
+				       _("Invalid return value from query_info"));
       g_simple_async_result_complete (result);
       return;
     }
@@ -688,28 +688,28 @@ get_info_async_cb (DBusMessage *reply,
 }
 
 static void
-g_daemon_file_get_info_async (GFile                      *file,
-			      const char                 *attributes,
-			      GFileGetInfoFlags           flags,
-			      int                         io_priority,
-			      GCancellable               *cancellable,
-			      GAsyncReadyCallback         callback,
-			      gpointer                    user_data)
+g_daemon_file_query_info_async (GFile                      *file,
+				const char                 *attributes,
+				GFileQueryInfoFlags           flags,
+				int                         io_priority,
+				GCancellable               *cancellable,
+				GAsyncReadyCallback         callback,
+				gpointer                    user_data)
 {
   do_async_path_call (file,
-		      G_VFS_DBUS_MOUNT_OP_GET_INFO,
+		      G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
 		      cancellable,
 		      callback, user_data,
-		      get_info_async_cb, NULL, NULL,
+		      query_info_async_cb, NULL, NULL,
 		      DBUS_TYPE_STRING, &attributes,
 		      DBUS_TYPE_UINT32, &flags,
 		      0);
 }
 
 static GFileInfo *
-g_daemon_file_get_info_finish (GFile                      *file,
-			       GAsyncResult               *res,
-			       GError                    **error)
+g_daemon_file_query_info_finish (GFile                      *file,
+				 GAsyncResult               *res,
+				 GError                    **error)
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
   GFileInfo *info;
@@ -1236,10 +1236,10 @@ g_daemon_file_mount_for_location_finish (GFile                  *location,
 }
 
 static GFileInfo *
-g_daemon_file_get_filesystem_info (GFile                *file,
-				   const char           *attributes,
-				   GCancellable         *cancellable,
-				   GError              **error)
+g_daemon_file_query_filesystem_info (GFile                *file,
+				     const char           *attributes,
+				     GCancellable         *cancellable,
+				     GError              **error)
 {
   DBusMessage *reply;
   DBusMessageIter iter;
@@ -1248,7 +1248,7 @@ g_daemon_file_get_filesystem_info (GFile                *file,
   if (attributes == NULL)
     attributes = "";
   reply = do_sync_path_call (file, 
-			     G_VFS_DBUS_MOUNT_OP_GET_FILESYSTEM_INFO,
+			     G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO,
 			     NULL, cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     0);
@@ -1339,7 +1339,7 @@ g_daemon_file_set_display_name (GFile *file,
 				      0))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from get_filesystem_info"));
+		   _("Invalid return value from query_filesystem_info"));
       goto out;
     }
 
@@ -1487,7 +1487,7 @@ static gboolean
 g_daemon_file_set_attribute (GFile *file,
 			     const char *attribute,
 			     const GFileAttributeValue *value,
-			     GFileGetInfoFlags flags,
+			     GFileQueryInfoFlags flags,
 			     GCancellable *cancellable,
 			     GError **error)
 {
@@ -1670,9 +1670,9 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->resolve_relative = g_daemon_file_resolve_relative;
   iface->get_child_for_display_name = g_daemon_file_get_child_for_display_name;
   iface->enumerate_children = g_daemon_file_enumerate_children;
-  iface->get_info = g_daemon_file_get_info;
-  iface->get_info_async = g_daemon_file_get_info_async;
-  iface->get_info_finish = g_daemon_file_get_info_finish;
+  iface->query_info = g_daemon_file_query_info;
+  iface->query_info_async = g_daemon_file_query_info_async;
+  iface->query_info_finish = g_daemon_file_query_info_finish;
   iface->read = g_daemon_file_read;
   iface->append_to = g_daemon_file_append_to;
   iface->create = g_daemon_file_create;
@@ -1683,7 +1683,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->mount_for_location_finish = g_daemon_file_mount_for_location_finish;
   iface->mount_mountable = g_daemon_file_mount_mountable;
   iface->mount_mountable_finish = g_daemon_file_mount_mountable_finish;
-  iface->get_filesystem_info = g_daemon_file_get_filesystem_info;
+  iface->query_filesystem_info = g_daemon_file_query_filesystem_info;
   iface->set_display_name = g_daemon_file_set_display_name;
   iface->delete_file = g_daemon_file_delete;
   iface->trash = g_daemon_file_trash;

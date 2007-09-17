@@ -25,7 +25,7 @@ struct _GVfsJobEnumerate
   char *filename;
   char *object_path;
   GFileAttributeMatcher *attribute_matcher;
-  GFileGetInfoFlags flags;
+  GFileQueryInfoFlags flags;
 
   DBusMessage *building_infos;
   DBusMessageIter building_iter;

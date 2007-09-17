@@ -21,8 +21,8 @@
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
-#include "gvfsjobgetinfo.h"
-#include "gvfsjobgetfsinfo.h"
+#include "gvfsjobqueryinfo.h"
+#include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
@@ -1186,12 +1186,12 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf,
 }
 
 static void
-do_get_info (GVfsBackend *backend,
-	     GVfsJobGetInfo *job,
-	     const char *filename,
-	     GFileGetInfoFlags flags,
-	     GFileInfo *info,
-	     GFileAttributeMatcher *matcher)
+do_query_info (GVfsBackend *backend,
+	       GVfsJobQueryInfo *job,
+	       const char *filename,
+	       GFileQueryInfoFlags flags,
+	       GFileInfo *info,
+	       GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   struct stat st = {0};
@@ -1215,11 +1215,11 @@ do_get_info (GVfsBackend *backend,
 }
 
 static void
-do_get_fs_info (GVfsBackend *backend,
-		GVfsJobGetFsInfo *job,
-		const char *filename,
-		GFileInfo *info,
-		GFileAttributeMatcher *attribute_matcher)
+do_query_fs_info (GVfsBackend *backend,
+		  GVfsJobQueryFsInfo *job,
+		  const char *filename,
+		  GFileInfo *info,
+		  GFileAttributeMatcher *attribute_matcher)
 {
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, "cifs");
   
@@ -1255,7 +1255,7 @@ do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      const char *filename,
 	      GFileAttributeMatcher *matcher,
-	      GFileGetInfoFlags flags)
+	      GFileQueryInfoFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   struct stat st;
@@ -1606,8 +1606,8 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
   backend_class->close_write = do_close_write;
-  backend_class->get_info = do_get_info;
-  backend_class->get_fs_info = do_get_fs_info;
+  backend_class->query_info = do_query_info;
+  backend_class->query_fs_info = do_query_fs_info;
   backend_class->enumerate = do_enumerate;
   backend_class->set_display_name = do_set_display_name;
   backend_class->delete = do_delete;

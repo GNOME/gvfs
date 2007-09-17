@@ -70,8 +70,8 @@ libdaemon_la_SOURCES = \
 	gvfsjobwrite.c gvfsjobwrite.h \
 	gvfsjobseekwrite.c gvfsjobseekwrite.h \
 	gvfsjobclosewrite.c gvfsjobclosewrite.h \
-	gvfsjobgetinfo.c gvfsjobgetinfo.h \
-	gvfsjobgetfsinfo.c gvfsjobgetfsinfo.h \
+	gvfsjobqueryinfo.c gvfsjobqueryinfo.h \
+	gvfsjobqueryfsinfo.c gvfsjobqueryfsinfo.h \
 	gvfsjobenumerate.c gvfsjobenumerate.h \
 	gvfsjobsetdisplayname.c gvfsjobsetdisplayname.h \
 	gvfsjobtrash.c gvfsjobtrash.h \

@@ -138,7 +138,7 @@ static gssize     g_daemon_file_output_stream_write         (GOutputStream      
 static gboolean   g_daemon_file_output_stream_close         (GOutputStream              *stream,
 							     GCancellable               *cancellable,
 							     GError                    **error);
-static GFileInfo *g_daemon_file_output_stream_get_file_info (GFileOutputStream          *stream,
+static GFileInfo *g_daemon_file_output_stream_query_info    (GFileOutputStream          *stream,
 							     char                       *attributes,
 							     GCancellable               *cancellable,
 							     GError                    **error);
@@ -213,7 +213,7 @@ g_daemon_file_output_stream_class_init (GDaemonFileOutputStreamClass *klass)
   file_stream_class->tell = g_daemon_file_output_stream_tell;
   file_stream_class->can_seek = g_daemon_file_output_stream_can_seek;
   file_stream_class->seek = g_daemon_file_output_stream_seek;
-  file_stream_class->get_file_info = g_daemon_file_output_stream_get_file_info;
+  file_stream_class->query_info = g_daemon_file_output_stream_query_info;
   file_stream_class->get_etag = g_daemon_file_output_stream_get_etag;
 }
 
@@ -950,10 +950,10 @@ g_daemon_file_output_stream_get_etag (GFileOutputStream     *stream)
 }
 
 static GFileInfo *
-g_daemon_file_output_stream_get_file_info (GFileOutputStream     *stream,
-					   char                 *attributes,
-					   GCancellable         *cancellable,
-					   GError              **error)
+g_daemon_file_output_stream_query_info (GFileOutputStream     *stream,
+					char                 *attributes,
+					GCancellable         *cancellable,
+					GError              **error)
 {
   GDaemonFileOutputStream *file;
 

@@ -17,7 +17,7 @@
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
-#include "gvfsjobgetinfo.h"
+#include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 #include "gmounttracker.h"
@@ -954,11 +954,11 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
 }
 
 static void
-run_get_info (GVfsBackendSmbBrowse *backend,
-	      GVfsJobGetInfo *job,
-	      const char *filename,
-	      GFileInfo *info,
-	      GFileAttributeMatcher *matcher)
+run_query_info (GVfsBackendSmbBrowse *backend,
+		GVfsJobQueryInfo *job,
+		const char *filename,
+		GFileInfo *info,
+		GFileAttributeMatcher *matcher)
 {
   BrowseEntry *entry;
 
@@ -980,28 +980,28 @@ run_get_info (GVfsBackendSmbBrowse *backend,
 }
 
 static void
-do_get_info (GVfsBackend *backend,
-	     GVfsJobGetInfo *job,
-	     const char *filename,
-	     GFileGetInfoFlags flags,
-	     GFileInfo *info,
-	     GFileAttributeMatcher *matcher)
+do_query_info (GVfsBackend *backend,
+	       GVfsJobQueryInfo *job,
+	       const char *filename,
+	       GFileQueryInfoFlags flags,
+	       GFileInfo *info,
+	       GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
   update_cache (op_backend);
 
-  run_get_info (op_backend, job, filename, info, matcher);
+  run_query_info (op_backend, job, filename, info, matcher);
 }
 
 
 static gboolean
-try_get_info (GVfsBackend *backend,
-	      GVfsJobGetInfo *job,
-	      const char *filename,
-	      GFileGetInfoFlags flags,
-	      GFileInfo *info,
-	      GFileAttributeMatcher *matcher)
+try_query_info (GVfsBackend *backend,
+		GVfsJobQueryInfo *job,
+		const char *filename,
+		GFileQueryInfoFlags flags,
+		GFileInfo *info,
+		GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
@@ -1017,7 +1017,7 @@ try_get_info (GVfsBackend *backend,
   if (cache_needs_updating (op_backend))
     return FALSE;
 
-  run_get_info (op_backend, job, filename, info, matcher);
+  run_query_info (op_backend, job, filename, info, matcher);
   
   return TRUE;
 }
@@ -1074,7 +1074,7 @@ do_enumerate (GVfsBackend *backend,
 	      GVfsJobEnumerate *job,
 	      const char *filename,
 	      GFileAttributeMatcher *matcher,
-	      GFileGetInfoFlags flags)
+	      GFileQueryInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   
@@ -1088,7 +1088,7 @@ try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
 	       const char *filename,
 	       GFileAttributeMatcher *matcher,
-	       GFileGetInfoFlags flags)
+	       GFileQueryInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
@@ -1117,8 +1117,8 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_close_read = try_close_read;
-  backend_class->get_info = do_get_info;
-  backend_class->try_get_info = try_get_info;
+  backend_class->query_info = do_query_info;
+  backend_class->try_query_info = try_query_info;
   backend_class->enumerate = do_enumerate;
   backend_class->try_enumerate = try_enumerate;
 }

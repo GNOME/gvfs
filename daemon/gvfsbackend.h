@@ -33,8 +33,8 @@ typedef struct _GVfsJobOpenForWrite    GVfsJobOpenForWrite;
 typedef struct _GVfsJobWrite           GVfsJobWrite;
 typedef struct _GVfsJobSeekWrite       GVfsJobSeekWrite;
 typedef struct _GVfsJobCloseWrite      GVfsJobCloseWrite;
-typedef struct _GVfsJobGetInfo         GVfsJobGetInfo;
-typedef struct _GVfsJobGetFsInfo       GVfsJobGetFsInfo;
+typedef struct _GVfsJobQueryInfo       GVfsJobQueryInfo;
+typedef struct _GVfsJobQueryFsInfo     GVfsJobQueryFsInfo;
 typedef struct _GVfsJobEnumerate       GVfsJobEnumerate;
 typedef struct _GVfsJobSetDisplayName  GVfsJobSetDisplayName;
 typedef struct _GVfsJobTrash           GVfsJobTrash;
@@ -167,25 +167,25 @@ struct _GVfsBackendClass
 				 GVfsBackendHandle handle,
 				 goffset    offset,
 				 GSeekType  type);
-  void     (*get_info)          (GVfsBackend *backend,
-				 GVfsJobGetInfo *job,
+  void     (*query_info)        (GVfsBackend *backend,
+				 GVfsJobQueryInfo *job,
 				 const char *filename,
-				 GFileGetInfoFlags flags,
+				 GFileQueryInfoFlags flags,
 				 GFileInfo *info,
 				 GFileAttributeMatcher *attribute_matcher);
-  gboolean (*try_get_info)      (GVfsBackend *backend,
-				 GVfsJobGetInfo *job,
+  gboolean (*try_query_info)    (GVfsBackend *backend,
+				 GVfsJobQueryInfo *job,
 				 const char *filename,
-				 GFileGetInfoFlags flags,
+				 GFileQueryInfoFlags flags,
 				 GFileInfo *info,
 				 GFileAttributeMatcher *attribute_matcher);
-  void     (*get_fs_info)       (GVfsBackend *backend,
-				 GVfsJobGetFsInfo *job,
+  void     (*query_fs_info)     (GVfsBackend *backend,
+				 GVfsJobQueryFsInfo *job,
 				 const char *filename,
 				 GFileInfo *info,
 				 GFileAttributeMatcher *attribute_matcher);
-  gboolean (*try_get_fs_info)   (GVfsBackend *backend,
-				 GVfsJobGetFsInfo *job,
+  gboolean (*try_query_fs_info) (GVfsBackend *backend,
+				 GVfsJobQueryFsInfo *job,
 				 const char *filename,
 				 GFileInfo *info,
 				 GFileAttributeMatcher *attribute_matcher);
@@ -193,12 +193,12 @@ struct _GVfsBackendClass
 				 GVfsJobEnumerate *job,
 				 const char *filename,
 				 GFileAttributeMatcher *attribute_matcher,
-				 GFileGetInfoFlags flags);
+				 GFileQueryInfoFlags flags);
   gboolean (*try_enumerate)     (GVfsBackend *backend,
 				 GVfsJobEnumerate *job,
 				 const char *filename,
 				 GFileAttributeMatcher *attribute_matcher,
-				 GFileGetInfoFlags flags);
+				 GFileQueryInfoFlags flags);
   void     (*set_display_name)  (GVfsBackend *backend,
 				 GVfsJobSetDisplayName *job,
 				 const char *filename,
@@ -266,13 +266,13 @@ struct _GVfsBackendClass
 				 const char *filename,
 				 const char *attribute,
 				 GFileAttributeValue *value,
-				 GFileGetInfoFlags flags);
+				 GFileQueryInfoFlags flags);
   gboolean (*try_set_attribute) (GVfsBackend *backend,
 				 GVfsJobSetAttribute *set_attribute,
 				 const char *filename,
 				 const char *attribute,
 				 GFileAttributeValue *value,
-				 GFileGetInfoFlags flags);
+				 GFileQueryInfoFlags flags);
   void (*query_settable_attributes)         (GVfsBackend *backend,
 					     GVfsJobQueryAttributes *job,
 					     const char *filename);

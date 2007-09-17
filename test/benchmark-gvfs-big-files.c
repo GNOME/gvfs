@@ -25,7 +25,7 @@ is_dir (GFile *file)
   GFileInfo *info;
   gboolean res;
   
-  info = g_file_get_info (file, G_FILE_ATTRIBUTE_STD_TYPE, 0, NULL, NULL);
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STD_TYPE, 0, NULL, NULL);
   res = info && g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
   if (info)
     g_object_unref (info);

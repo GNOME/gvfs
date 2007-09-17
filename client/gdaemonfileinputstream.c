@@ -155,7 +155,7 @@ static gssize     g_daemon_file_input_stream_skip          (GInputStream        
 static gboolean   g_daemon_file_input_stream_close         (GInputStream         *stream,
 							    GCancellable         *cancellable,
 							    GError              **error);
-static GFileInfo *g_daemon_file_input_stream_get_file_info (GFileInputStream     *stream,
+static GFileInfo *g_daemon_file_input_stream_query_info    (GFileInputStream     *stream,
 							    char                 *attributes,
 							    GCancellable         *cancellable,
 							    GError              **error);
@@ -243,7 +243,7 @@ g_daemon_file_input_stream_class_init (GDaemonFileInputStreamClass *klass)
   file_stream_class->tell = g_daemon_file_input_stream_tell;
   file_stream_class->can_seek = g_daemon_file_input_stream_can_seek;
   file_stream_class->seek = g_daemon_file_input_stream_seek;
-  file_stream_class->get_file_info = g_daemon_file_input_stream_get_file_info;
+  file_stream_class->query_info = g_daemon_file_input_stream_query_info;
 
 }
 
@@ -1182,10 +1182,10 @@ g_daemon_file_input_stream_seek (GFileInputStream *stream,
 }
 
 static GFileInfo *
-g_daemon_file_input_stream_get_file_info (GFileInputStream     *stream,
-					  char                 *attributes,
-					  GCancellable         *cancellable,
-					  GError              **error)
+g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
+				       char                 *attributes,
+				       GCancellable         *cancellable,
+				       GError              **error)
 {
   GDaemonFileInputStream *file;
 

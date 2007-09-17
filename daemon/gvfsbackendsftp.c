@@ -30,9 +30,9 @@
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
-#include "gvfsjobgetinfo.h"
+#include "gvfsjobqueryinfo.h"
 #include "gvfsjobdelete.h"
-#include "gvfsjobgetfsinfo.h"
+#include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
@@ -2654,7 +2654,7 @@ read_dir_reply (GVfsBackendSftp *backend,
       parse_attributes (backend, info, name, reply, enum_job->attribute_matcher);
       
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK &&
-          ! (enum_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
+          ! (enum_job->flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS))
         {
           /* Default (at least for openssh) is for readdir to not follow symlinks.
              This was a symlink, and follow links was requested, so we need to manually follow it */
@@ -2730,7 +2730,7 @@ try_enumerate (GVfsBackend *backend,
                GVfsJobEnumerate *job,
                const char *filename,
                GFileAttributeMatcher *attribute_matcher,
-               GFileGetInfoFlags flags)
+               GFileQueryInfoFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
@@ -2757,10 +2757,10 @@ typedef struct {
   GError *stat_error;
   char *symlink_target;
   int cb_count;
-} GetInfoData;
+} QueryInfoData;
 
 static void
-get_info_data_free (GetInfoData *data)
+query_info_data_free (QueryInfoData *data)
 {
   if (data->lstat_info)
     g_object_unref (data->lstat_info);
@@ -2773,15 +2773,15 @@ get_info_data_free (GetInfoData *data)
 
   g_free (data->symlink_target);
   
-  g_slice_free (GetInfoData, data);
+  g_slice_free (QueryInfoData, data);
 }
 
 static void
-get_info_finish (GVfsBackendSftp *backend,
-                 GVfsJob *job)
+query_info_finish (GVfsBackendSftp *backend,
+                   GVfsJob *job)
 {
-  GVfsJobGetInfo *op_job;
-  GetInfoData *data;
+  GVfsJobQueryInfo *op_job;
+  QueryInfoData *data;
 
   data = job->backend_data;
 
@@ -2792,8 +2792,8 @@ get_info_finish (GVfsBackendSftp *backend,
       return;
     }
 
-  op_job = G_VFS_JOB_GET_INFO (job);
-  if (op_job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS)
+  op_job = G_VFS_JOB_QUERY_INFO (job);
+  if (op_job->flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
     {
       g_file_info_copy_into (data->lstat_info,
                              op_job->file_info);
@@ -2820,7 +2820,7 @@ get_info_finish (GVfsBackendSftp *backend,
 }               
 
 static void
-get_info_stat_reply (GVfsBackendSftp *backend,
+query_info_stat_reply (GVfsBackendSftp *backend,
                      int reply_type,
                      GDataInputStream *reply,
                      guint32 len,
@@ -2828,7 +2828,7 @@ get_info_stat_reply (GVfsBackendSftp *backend,
                      gpointer user_data)
 {
   char *basename;
-  GetInfoData *data;
+  QueryInfoData *data;
 
   data = job->backend_data;
 
@@ -2840,26 +2840,26 @@ get_info_stat_reply (GVfsBackendSftp *backend,
   else
     {
       data->stat_info = g_file_info_new ();
-      basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
+      basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
       parse_attributes (backend, data->stat_info, basename,
-                        reply, G_VFS_JOB_GET_INFO (job)->attribute_matcher);
+                        reply, G_VFS_JOB_QUERY_INFO (job)->attribute_matcher);
       g_free (basename);
     }
 
   if (--data->cb_count == 0)
-    get_info_finish (backend, job);
+    query_info_finish (backend, job);
 }
 
 static void
-get_info_lstat_reply (GVfsBackendSftp *backend,
-                      int reply_type,
-                      GDataInputStream *reply,
-                      guint32 len,
-                      GVfsJob *job,
-                      gpointer user_data)
+query_info_lstat_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job,
+                        gpointer user_data)
 {
   char *basename;
-  GetInfoData *data;
+  QueryInfoData *data;
 
   data = job->backend_data;
 
@@ -2871,25 +2871,25 @@ get_info_lstat_reply (GVfsBackendSftp *backend,
   else
     {
       data->lstat_info = g_file_info_new ();
-      basename = g_path_get_basename (G_VFS_JOB_GET_INFO (job)->filename);
+      basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
       parse_attributes (backend, data->lstat_info, basename,
-                        reply, G_VFS_JOB_GET_INFO (job)->attribute_matcher);
+                        reply, G_VFS_JOB_QUERY_INFO (job)->attribute_matcher);
       g_free (basename);
     }
 
   if (--data->cb_count == 0)
-    get_info_finish (backend, job);
+    query_info_finish (backend, job);
 }
 
 static void
-get_info_readlink_reply (GVfsBackendSftp *backend,
-                         int reply_type,
-                         GDataInputStream *reply,
-                         guint32 len,
-                         GVfsJob *job,
-                         gpointer user_data)
+query_info_readlink_reply (GVfsBackendSftp *backend,
+                           int reply_type,
+                           GDataInputStream *reply,
+                           guint32 len,
+                           GVfsJob *job,
+                           gpointer user_data)
 {
-  GetInfoData *data;
+  QueryInfoData *data;
   guint32 count;
 
   data = job->backend_data;
@@ -2901,33 +2901,33 @@ get_info_readlink_reply (GVfsBackendSftp *backend,
     }
 
   if (--data->cb_count == 0)
-    get_info_finish (backend, job);
+    query_info_finish (backend, job);
 }
 
 static gboolean
-try_get_info (GVfsBackend *backend,
-              GVfsJobGetInfo *job,
-              const char *filename,
-              GFileGetInfoFlags flags,
-              GFileInfo *info,
-              GFileAttributeMatcher *matcher)
+try_query_info (GVfsBackend *backend,
+                GVfsJobQueryInfo *job,
+                const char *filename,
+                GFileQueryInfoFlags flags,
+                GFileInfo *info,
+                GFileAttributeMatcher *matcher)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
   GDataOutputStream *command;
-  GetInfoData *data;
+  QueryInfoData *data;
 
-  data = g_slice_new0 (GetInfoData);
-  g_vfs_job_set_backend_data  (G_VFS_JOB (job), data, (GDestroyNotify)get_info_data_free);
+  data = g_slice_new0 (QueryInfoData);
+  g_vfs_job_set_backend_data  (G_VFS_JOB (job), data, (GDestroyNotify)query_info_data_free);
   
   data->cb_count = 1;
   command = new_command_stream (op_backend,
                                 SSH_FXP_LSTAT,
                                 &id);
   put_string (command, filename);
-  queue_command_stream_and_free (op_backend, command, id, get_info_lstat_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, id, query_info_lstat_reply, G_VFS_JOB (job), NULL);
 
-  if (! (job->flags & G_FILE_GET_INFO_NOFOLLOW_SYMLINKS))
+  if (! (job->flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS))
     {
       data->cb_count++;
       
@@ -2935,7 +2935,7 @@ try_get_info (GVfsBackend *backend,
                                     SSH_FXP_STAT,
                                     &id);
       put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, get_info_stat_reply, G_VFS_JOB (job), NULL);
+      queue_command_stream_and_free (op_backend, command, id, query_info_stat_reply, G_VFS_JOB (job), NULL);
     }
 
   if (g_file_attribute_matcher_matches (job->attribute_matcher,
@@ -2947,7 +2947,7 @@ try_get_info (GVfsBackend *backend,
                                     SSH_FXP_READLINK,
                                     &id);
       put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, get_info_readlink_reply, G_VFS_JOB (job), NULL);
+      queue_command_stream_and_free (op_backend, command, id, query_info_readlink_reply, G_VFS_JOB (job), NULL);
     }
   
   return TRUE;
@@ -3221,7 +3221,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_seek_on_read = try_seek_on_read;
   backend_class->try_close_read = try_close_read;
   backend_class->try_close_write = try_close_write;
-  backend_class->try_get_info = try_get_info;
+  backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_create = try_create;
   backend_class->try_append_to = try_append_to;
