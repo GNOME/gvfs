@@ -1,5 +1,10 @@
 2007-09-25  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/mount.c:
+	Return NOT_SUPPORTED error for unsupported uri types
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
         * client/gvfsfusedaemon.c:
         * daemon/gvfsbackendsmbbrowse.c:
 	Update for G_IO_ERROR_NOT_MOUNTABLE_FILE name change

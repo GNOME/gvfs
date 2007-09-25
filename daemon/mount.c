@@ -618,14 +618,16 @@ maybe_automount (GMountSpec *spec,
       mountable_mount (mountable, spec, mount_source, TRUE, automount_done, data);
       g_object_unref (mount_source);
     }
+  else if (mountable != NULL)
+    reply = _dbus_message_new_gerror (message,
+				      G_IO_ERROR,
+				      G_IO_ERROR_NOT_MOUNTED,
+				      _("The specified location is not mounted"));
   else
-    {
-      reply = _dbus_message_new_gerror (message,
-					G_IO_ERROR, G_IO_ERROR_NOT_MOUNTED,
-					(mountable == NULL) ?
-					_("Location is not mountable") :
-					_("Location is not mounted"));
-    }
+    reply = _dbus_message_new_gerror (message,
+				      G_IO_ERROR,
+				      G_IO_ERROR_NOT_SUPPORTED,
+				      _("The specified location is not supported"));
   
   return reply;
 }
