@@ -1,5 +1,14 @@
 2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
 
+	* client/gdaemonfile.c: (g_daemon_file_resolve_relative_path),
+	(g_daemon_file_file_iface_init):
+	* test/benchmark-gvfs-big-files.c: (create_file):
+	* test/benchmark-gvfs-small-files.c: (create_file):
+	Update for API change in GIO. g_file_resolve_relative was renamed
+	to g_file_resolve_relative_path.
+
+2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
+
 	* common/gmountspec.c: (g_mount_spec_to_dbus_with_path):
 	* common/gvfsdaemonprotocol.c: (_g_dbus_append_file_attribute),
 	(_g_dbus_append_file_info), (_g_dbus_append_attribute_info_list):

@@ -45,7 +45,7 @@ create_file (GFile *base_dir)
 
   pid = getpid ();
   scratch_name = g_strdup_printf ("gvfs-benchmark-scratch-%d", pid);
-  scratch_file = g_file_resolve_relative (base_dir, scratch_name);
+  scratch_file = g_file_resolve_relative_path (base_dir, scratch_name);
   g_free (scratch_name);
 
   if (!scratch_file)

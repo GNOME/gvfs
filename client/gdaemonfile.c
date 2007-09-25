@@ -247,7 +247,7 @@ g_daemon_file_equal (GFile *file1,
 }
 
 static GFile *
-g_daemon_file_resolve_relative (GFile *file,
+g_daemon_file_resolve_relative_path (GFile *file,
 				const char *relative_path)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
@@ -1667,7 +1667,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_uri = g_daemon_file_get_uri;
   iface->get_parse_name = g_daemon_file_get_parse_name;
   iface->get_parent = g_daemon_file_get_parent;
-  iface->resolve_relative = g_daemon_file_resolve_relative;
+  iface->resolve_relative_path = g_daemon_file_resolve_relative_path;
   iface->get_child_for_display_name = g_daemon_file_get_child_for_display_name;
   iface->enumerate_children = g_daemon_file_enumerate_children;
   iface->query_info = g_daemon_file_query_info;
