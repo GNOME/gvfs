@@ -16,6 +16,7 @@
 #include <gio/gfileicon.h>
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
+#include <gdaemonvfs.h>
 #include "gdbusutils.h"
 #include "gsysutils.h"
 
@@ -564,7 +565,8 @@ open_connection_async (AsyncDBusCall *async_call)
     _g_dbus_oom ();
 
 
-  _g_dbus_connection_call_async (NULL, get_connection_message,
+  _g_dbus_connection_call_async (_g_daemon_vfs_get_async_bus (),
+				 get_connection_message,
 				 G_VFS_DBUS_TIMEOUT_MSECS,
 				 async_get_connection_response,
 				 async_call);

@@ -12,6 +12,14 @@ enum {
   LAST_SIGNAL
 };
 
+enum {
+  PROP_0,
+  PROP_CONNECTION
+};
+
+/* TODO: Real P_() */
+#define P_(_x) (_x)
+
 static guint signals[LAST_SIGNAL] = { 0 };
 
 struct _GMountTracker
@@ -20,15 +28,25 @@ struct _GMountTracker
 
   GMutex *lock;
   GList *mounts;
+  DBusConnection *connection;
 };
 
 G_DEFINE_TYPE (GMountTracker, g_mount_tracker, G_TYPE_OBJECT);
 
-static DBusHandlerResult g_mount_tracker_filter_func (DBusConnection *conn,
-						      DBusMessage    *message,
-						      gpointer        data);
-
-
+static DBusHandlerResult g_mount_tracker_filter_func  (DBusConnection        *conn,
+						       DBusMessage           *message,
+						       gpointer               data);
+static GObject*          g_mount_tracker_constructor  (GType                  type,
+						       guint                  n_construct_properties,
+						       GObjectConstructParam *construct_params);
+static void              g_mount_tracker_set_property (GObject               *object,
+						       guint                  prop_id,
+						       const GValue          *value,
+						       GParamSpec            *pspec);
+static void              g_mount_tracker_get_property (GObject               *object,
+						       guint                  prop_id,
+						       GValue                *value,
+						       GParamSpec            *pspec);
 
 gboolean
 g_mount_info_equal (GMountInfo *info1,
@@ -108,7 +126,6 @@ static void
 g_mount_tracker_finalize (GObject *object)
 {
   GMountTracker *tracker;
-  DBusConnection *conn;
 
   tracker = G_MOUNT_TRACKER (object);
 
@@ -118,26 +135,21 @@ g_mount_tracker_finalize (GObject *object)
 		  (GFunc)g_mount_info_free, NULL);
   g_list_free (tracker->mounts);
 
-  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-  if (conn)
-    {
-      dbus_connection_remove_filter (conn, g_mount_tracker_filter_func, tracker);
+  dbus_connection_remove_filter (tracker->connection, g_mount_tracker_filter_func, tracker);
 
 
-      dbus_bus_remove_match (conn,
-			     "sender='"G_VFS_DBUS_DAEMON_NAME"',"
-			     "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
-			     "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED"'",
-			     NULL);
-      dbus_bus_remove_match (conn,
-			     "sender='"G_VFS_DBUS_DAEMON_NAME"',"
-			     "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
-			     "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED"'",
-			     NULL);
-      
-      dbus_connection_unref (conn);
-    }      
-
+  dbus_bus_remove_match (tracker->connection,
+			 "sender='"G_VFS_DBUS_DAEMON_NAME"',"
+			 "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
+			 "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED"'",
+			 NULL);
+  dbus_bus_remove_match (tracker->connection,
+			 "sender='"G_VFS_DBUS_DAEMON_NAME"',"
+			 "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
+			 "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED"'",
+			 NULL);
+  
+  dbus_connection_unref (tracker->connection);
   
   if (G_OBJECT_CLASS (g_mount_tracker_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_mount_tracker_parent_class)->finalize) (object);
@@ -149,6 +161,9 @@ g_mount_tracker_class_init (GMountTrackerClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   
   gobject_class->finalize = g_mount_tracker_finalize;
+  gobject_class->constructor = g_mount_tracker_constructor;
+  gobject_class->set_property = g_mount_tracker_set_property;
+  gobject_class->get_property = g_mount_tracker_get_property;
 
   signals[MOUNTED] = g_signal_new (I_("mounted"),
 				   G_TYPE_MOUNT_TRACKER,
@@ -165,7 +180,57 @@ g_mount_tracker_class_init (GMountTrackerClass *klass)
 				     NULL, NULL,
 				     g_cclosure_marshal_VOID__POINTER,
 				     G_TYPE_NONE, 1, G_TYPE_POINTER);
+
+  g_object_class_install_property (gobject_class,
+				   PROP_CONNECTION,
+				   g_param_spec_pointer ("connection",
+							 P_("DBus connection"),
+							 P_("The dbus connection to use for ipc."),
+							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
   
+}
+
+static void
+g_mount_tracker_set_property (GObject         *object,
+			      guint            prop_id,
+			      const GValue    *value,
+			      GParamSpec      *pspec)
+{
+  GMountTracker *tracker = G_MOUNT_TRACKER (object);
+  
+  switch (prop_id)
+    {
+    case PROP_CONNECTION:
+      if (tracker->connection)
+	dbus_connection_unref (tracker->connection);
+      tracker->connection = NULL;
+      if (g_value_get_pointer (value))
+	tracker->connection = dbus_connection_ref (g_value_get_pointer (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
+g_mount_tracker_get_property (GObject    *object,
+			      guint       prop_id,
+			      GValue     *value,
+			      GParamSpec *pspec)
+{
+  GMountTracker *tracker = G_MOUNT_TRACKER (object);
+  
+  switch (prop_id)
+    {
+    case PROP_CONNECTION:
+      g_value_set_pointer (value, tracker->connection);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
 }
 
 static GList *
@@ -295,67 +360,87 @@ g_mount_tracker_filter_func (DBusConnection *conn,
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
+/* Called after construction when the construct properties (like connection) are set */
+static void
+init_connection (GMountTracker *tracker)
+{
+  DBusMessage *message;
+  DBusPendingCall *pending;
+
+  if (tracker->connection == NULL)
+    tracker->connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+				  G_VFS_DBUS_MOUNTTRACKER_PATH,
+				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				  G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS);
+  if (message == NULL)
+    _g_dbus_oom ();
+  
+  dbus_message_set_auto_start (message, TRUE);
+  
+  if (!dbus_connection_send_with_reply (tracker->connection, message,
+					&pending,
+					G_VFS_DBUS_TIMEOUT_MSECS))
+    _g_dbus_oom ();
+  
+  dbus_message_unref (message);
+  
+  if (pending != NULL)
+    {
+      if (!dbus_pending_call_set_notify (pending,
+					 list_mounts_reply,
+					 g_object_ref (tracker), g_object_unref))
+	_g_dbus_oom ();
+    }
+  
+  dbus_connection_add_filter (tracker->connection, g_mount_tracker_filter_func, tracker, NULL);
+      
+  dbus_bus_add_match (tracker->connection,
+		      "sender='"G_VFS_DBUS_DAEMON_NAME"',"
+		      "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
+		      "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED"'",
+		      NULL);
+  dbus_bus_add_match (tracker->connection,
+		      "sender='"G_VFS_DBUS_DAEMON_NAME"',"
+		      "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
+		      "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED"'",
+		      NULL);
+}
 
 static void
 g_mount_tracker_init (GMountTracker *tracker)
 {
-  DBusConnection *conn;
-  DBusMessage *message;
-  DBusPendingCall *pending;
-
   tracker->lock = g_mutex_new ();
-  
-  conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-  if (conn)
-    {
-      message =
-	dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
-				      G_VFS_DBUS_MOUNTTRACKER_PATH,
-				      G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				      G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS);
-      if (message == NULL)
-	_g_dbus_oom ();
-	
-      dbus_message_set_auto_start (message, TRUE);
+}
 
-      if (!dbus_connection_send_with_reply (conn, message,
-					    &pending,
-					    G_VFS_DBUS_TIMEOUT_MSECS))
-	_g_dbus_oom ();
-  
-      dbus_message_unref (message);
-  
-      if (pending != NULL)
-	{
-	  if (!dbus_pending_call_set_notify (pending,
-					     list_mounts_reply,
-					     g_object_ref (tracker), g_object_unref))
-	    _g_dbus_oom ();
-	}
 
-      dbus_connection_add_filter (conn, g_mount_tracker_filter_func, tracker, NULL);
-      
-      dbus_bus_add_match (conn,
-			  "sender='"G_VFS_DBUS_DAEMON_NAME"',"
-			  "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
-			  "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED"'",
-			  NULL);
-      dbus_bus_add_match (conn,
-			  "sender='"G_VFS_DBUS_DAEMON_NAME"',"
-			  "interface='"G_VFS_DBUS_MOUNTTRACKER_INTERFACE"',"
-			  "member='"G_VFS_DBUS_MOUNTTRACKER_SIGNAL_UNMOUNTED"'",
-			  NULL);
-      
-      dbus_connection_unref (conn);
-    }
+static GObject*
+g_mount_tracker_constructor (GType                  type,
+			     guint                  n_construct_properties,
+			     GObjectConstructParam *construct_params)
+{
+  GObject *object;
+  GMountTracker *tracker;
+
+  object = (* G_OBJECT_CLASS (g_mount_tracker_parent_class)->constructor) (type,
+									   n_construct_properties,
+									   construct_params);
+  
+  tracker = G_MOUNT_TRACKER (object);
+  
+  init_connection (tracker);
+  
+  return object;
 }
 
 GMountTracker *
-g_mount_tracker_new (void)
+g_mount_tracker_new (DBusConnection *connection)
 {
   GMountTracker *tracker;
 
-  tracker = g_object_new (G_TYPE_MOUNT_TRACKER, NULL);
+  tracker = g_object_new (G_TYPE_MOUNT_TRACKER, "connection", connection, NULL);
   
   return tracker;
 }

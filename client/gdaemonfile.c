@@ -1100,7 +1100,7 @@ g_daemon_file_mount_mountable (GFile               *file,
   GMountSource *mount_source;
   const char *dbus_id, *obj_path;
   
-  mount_source = g_mount_operation_dbus_wrap (mount_operation);
+  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
   
   dbus_id = g_mount_source_get_dbus_id (mount_source);
   obj_path = g_mount_source_get_obj_path (mount_source);
@@ -1207,7 +1207,7 @@ g_daemon_file_mount_for_location (GFile *location,
   g_mount_spec_to_dbus (&iter, spec);
   g_mount_spec_unref (spec);
 
-  mount_source = g_mount_operation_dbus_wrap (mount_operation);
+  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
   g_mount_source_to_dbus (mount_source, message);
   g_object_unref (mount_source);
 
@@ -1219,7 +1219,8 @@ g_daemon_file_mount_for_location (GFile *location,
     data->mount_operation = g_object_ref (mount_operation);
 
   /* TODO: Ignoring cancellable here */
-  _g_dbus_connection_call_async (NULL, message,
+  _g_dbus_connection_call_async (_g_daemon_vfs_get_async_bus (),
+				 message,
 				 G_VFS_DBUS_MOUNT_TIMEOUT_MSECS,
 				 mount_reply, data);
  

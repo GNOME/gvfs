@@ -185,7 +185,7 @@ g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
   backend->entries_lock = g_mutex_new ();
 
   if (mount_tracker == NULL)
-    mount_tracker = g_mount_tracker_new ();
+    mount_tracker = g_mount_tracker_new (NULL);
 }
 
 /**

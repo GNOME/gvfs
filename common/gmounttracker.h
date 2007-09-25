@@ -41,7 +41,7 @@ gboolean    g_mount_info_equal (GMountInfo *info1,
 GMountInfo *g_mount_info_dup   (GMountInfo *info);
 void        g_mount_info_free  (GMountInfo *info);
 
-GMountTracker *g_mount_tracker_new                (void);
+GMountTracker *g_mount_tracker_new                (DBusConnection *connection);
 GList *        g_mount_tracker_list_mounts        (GMountTracker *tracker);
 GMountInfo *   g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
 						   GMountSpec    *mount_spec);

@@ -2130,7 +2130,7 @@ vfs_init (struct fuse_conn_info *conn)
   /* Initializes D-Bus and other VFS necessities */
   gvfs = G_VFS (g_daemon_vfs_new ());
 
-  mount_tracker = g_mount_tracker_new ();
+  mount_tracker = g_mount_tracker_new (NULL);
 
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
   subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);

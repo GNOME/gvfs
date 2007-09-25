@@ -10,7 +10,8 @@
 
 G_BEGIN_DECLS
 
-GMountSource *g_mount_operation_dbus_wrap (GMountOperation *op);
+GMountSource *g_mount_operation_dbus_wrap (GMountOperation *op,
+					   DBusConnection *connection);
 
 G_END_DECLS
 

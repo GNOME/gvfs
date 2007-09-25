@@ -28,7 +28,7 @@ struct _GDaemonVfs
 {
   GVfs parent;
 
-  DBusConnection *bus;
+  DBusConnection *async_bus;
   
   GVfs *wrapped_vfs;
   GList *mount_cache;
@@ -84,8 +84,11 @@ g_daemon_vfs_finalize (GObject *object)
   g_hash_table_destroy (vfs->from_uri_hash);
   g_hash_table_destroy (vfs->to_uri_hash);
 
-  if (vfs->bus)
-    dbus_connection_unref (vfs->bus);
+  if (vfs->async_bus)
+    {
+      dbus_connection_close (vfs->async_bus);
+      dbus_connection_unref (vfs->async_bus);
+    }
   
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
@@ -165,10 +168,10 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   if (g_thread_supported ())
     dbus_threads_init_default ();
   
-  vfs->bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
 
-  if (vfs->bus)
-    _g_dbus_connection_integrate_with_main (vfs->bus);
+  if (vfs->async_bus)
+    _g_dbus_connection_integrate_with_main (vfs->async_bus);
 
   g_io_modules_ensure_loaded (GVFS_MODULE_DIR);
 
@@ -514,7 +517,7 @@ _g_daemon_vfs_get_mount_ref_async (GMountSpec *spec,
   data->callback = callback;
   data->user_data = user_data;
   
-  _g_dbus_connection_call_async (the_vfs->bus, message, 2000,
+  _g_dbus_connection_call_async (the_vfs->async_bus, message, 2000,
 				 async_get_mount_ref_response,
 				 data);
   
@@ -591,6 +594,12 @@ g_daemon_vfs_parse_name (GVfs       *vfs,
     }
 
   return file;
+}
+
+DBusConnection *
+_g_daemon_vfs_get_async_bus (void)
+{
+  return the_vfs->async_bus;
 }
 
 static const char *

@@ -97,7 +97,7 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 static void
 g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
 {
-  daemon_monitor->mount_tracker = g_mount_tracker_new ();
+  daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus ());
 
   g_signal_connect_swapped (daemon_monitor->mount_tracker, "mounted",
 			    (GCallback) mount_added, daemon_monitor);

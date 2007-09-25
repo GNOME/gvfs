@@ -44,7 +44,8 @@ g_mount_operation_dbus_free (GMountOperationDBus *op_dbus)
 }
 
 GMountSource *
-g_mount_operation_dbus_wrap (GMountOperation *op)
+g_mount_operation_dbus_wrap (GMountOperation *op,
+			     DBusConnection *connection)
 {
   GMountOperationDBus *op_dbus;
   static int mount_id = 0;
@@ -59,7 +60,7 @@ g_mount_operation_dbus_wrap (GMountOperation *op)
   op_dbus = g_new0 (GMountOperationDBus, 1);
   
   op_dbus->op = op;
-  op_dbus->connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  op_dbus->connection = dbus_connection_ref (connection);
   op_dbus->obj_path = g_strdup_printf ("/org/gtk/gvfs/mountop/%d", mount_id++);
   if (op_dbus->connection)
     {
