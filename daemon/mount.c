@@ -129,12 +129,7 @@ vfs_mount_to_dbus (VfsMount *mount,
   
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_STRUCT,
-					 DBUS_TYPE_STRING_AS_STRING
-					 DBUS_TYPE_STRING_AS_STRING
-					 DBUS_TYPE_STRING_AS_STRING
-					 DBUS_TYPE_STRING_AS_STRING
-					 DBUS_TYPE_OBJECT_PATH_AS_STRING
-					 G_MOUNT_SPEC_TYPE_AS_STRING,
+					 NULL,
 					 &struct_iter))
     _g_dbus_oom ();
   

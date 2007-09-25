@@ -1,3 +1,13 @@
+2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* common/gmountspec.c: (g_mount_spec_to_dbus_with_path):
+	* common/gvfsdaemonprotocol.c: (_g_dbus_append_file_attribute),
+	(_g_dbus_append_file_info), (_g_dbus_append_attribute_info_list):
+	* daemon/mount.c: (vfs_mount_to_dbus):
+	Don't pass the contained signature when creating a DBus struct. Since
+	DBus 1.1.0 this will lead to an assertion. The signature will filled
+	automatically while adding values to the struct.
+
 2007-09-17  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:

@@ -232,7 +232,7 @@ g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
 
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_STRUCT,
-					 G_MOUNT_SPEC_INNER_TYPE_AS_STRING,
+					 NULL,
 					 &spec_iter))
     _g_dbus_oom ();
 
@@ -250,7 +250,7 @@ g_mount_spec_to_dbus_with_path (DBusMessageIter *iter,
 
       if (!dbus_message_iter_open_container (&array_iter,
 					     DBUS_TYPE_STRUCT,
-					     G_MOUNT_SPEC_ITEM_INNER_TYPE_AS_STRING,
+					     NULL,
 					     &item_iter))
 	_g_dbus_oom ();
 
