@@ -1,5 +1,14 @@
 2007-09-25  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gvfsdaemondbus.c:
+	Clear VfsConnectionData on creation
+	(fixes read of uninitialized data on thread shutdown)
+	
+        * daemon/sftp.mount.in:
+	Correct the type to "sftp"
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/mount.c:
 	Return NOT_SUPPORTED error for unsupported uri types
 

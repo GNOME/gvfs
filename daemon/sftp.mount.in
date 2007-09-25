@@ -1,4 +1,4 @@
 [Mount]
-Type=ftp
+Type=sftp
 Exec=@libexecdir@/gvfs-daemon-sftp
 AutoMount=false

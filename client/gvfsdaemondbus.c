@@ -160,7 +160,7 @@ vfs_connection_setup (DBusConnection *connection,
 {
   VfsConnectionData *connection_data;
   
-  connection_data = g_new (VfsConnectionData, 1);
+  connection_data = g_new0 (VfsConnectionData, 1);
   connection_data->extra_fd = extra_fd;
   connection_data->extra_fd_count = 0;
 
