@@ -84,8 +84,6 @@ g_daemon_vfs_finalize (GObject *object)
   g_hash_table_destroy (vfs->from_uri_hash);
   g_hash_table_destroy (vfs->to_uri_hash);
 
-  g_object_unref (vfs->wrapped_vfs);
-
   if (vfs->bus)
     dbus_connection_unref (vfs->bus);
   

@@ -1,5 +1,11 @@
 2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
 
+	* client/gdaemonvfs.c: (g_daemon_vfs_finalize):
+	Don't unref wrapped_vfs as it's just a pointer to the single instance
+	return value of g_vfs_get_local().
+
+2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
+
 	* client/gdaemonfile.c: (g_daemon_file_resolve_relative_path),
 	(g_daemon_file_file_iface_init):
 	* test/benchmark-gvfs-big-files.c: (create_file):
