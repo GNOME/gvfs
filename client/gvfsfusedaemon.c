@@ -120,7 +120,7 @@ errno_from_error (GError *error)
       { G_IO_ERROR_NOT_EMPTY,          ENOTEMPTY    },
       { G_IO_ERROR_NOT_REGULAR_FILE,   EIO          },
       { G_IO_ERROR_NOT_SYMBOLIC_LINK,  EIO          },
-      { G_IO_ERROR_NOT_MOUNTABLE,      EIO          },
+      { G_IO_ERROR_NOT_MOUNTABLE_FILE, EIO          },
       { G_IO_ERROR_FILENAME_TOO_LONG,  ENAMETOOLONG },
       { G_IO_ERROR_INVALID_FILENAME,   EIO          },
       { G_IO_ERROR_TOO_MANY_LINKS,     ELOOP        },

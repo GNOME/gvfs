@@ -1,5 +1,11 @@
 2007-09-25  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gvfsfusedaemon.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+	Update for G_IO_ERROR_NOT_MOUNTABLE_FILE name change
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountoperationdbus.[ch]:
         * common/gmounttracker.[ch]:
 	Pass in DBusConnection to use instead of using default one

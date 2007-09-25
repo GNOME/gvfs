@@ -747,7 +747,7 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
 	}
       else
 	g_set_error (&error,
-		     G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE,
+		     G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE_FILE,
 		     _("The file is not a mountable"));
     }
   else
@@ -793,7 +793,7 @@ try_mount_mountable (GVfsBackend *backend,
   if (is_root (filename))
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE,
+			G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE_FILE,
 			_("The file is not a mountable"));
       return TRUE;
     }
