@@ -1,3 +1,9 @@
+2007-09-27  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* daemon/gvfsbackendftp.c: (do_replace), (do_query_info),
+	(do_query_fs_info), (do_enumerate):
+	Update signatures for API changes in gio.
+
 2007-09-25  Alexander Larsson  <alexl@redhat.com>
 
         * client/gvfsdaemondbus.c:

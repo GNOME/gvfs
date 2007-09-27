@@ -268,7 +268,7 @@ static void
 do_replace (GVfsBackend *backend,
 	    GVfsJobOpenForWrite *job,
 	    const char *filename,
-	    time_t mtime,
+	    const char *etag,
 	    gboolean make_backup)
 {
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
@@ -324,8 +324,9 @@ static void
 do_query_info (GVfsBackend *backend,
                GVfsJobQueryInfo *job,
                const char *filename,
-               const char *attributes,
-               GFileQueryInfoFlags flags)
+               GFileQueryInfoFlags flags,
+               GFileInfo *info,
+               GFileAttributeMatcher *attribute_matcher)
 {
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
@@ -336,7 +337,8 @@ static void
 do_query_fs_info (GVfsBackend *backend,
                   GVfsJobQueryFsInfo *job,
                   const char *filename,
-                  const char *attributes)
+                  GFileInfo *info,
+                  GFileAttributeMatcher *attribute_matcher)
 {
   /* TODO */
 }
@@ -355,7 +357,7 @@ static void
 do_enumerate (GVfsBackend *backend,
               GVfsJobEnumerate *job,
               const char *filename,
-              const char *attributes,
+              GFileAttributeMatcher *attribute_matcher,
               GFileQueryInfoFlags flags)
 {
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
