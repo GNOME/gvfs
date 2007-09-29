@@ -39,11 +39,11 @@ GTK_DOC_CHECK
 DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.13.8 gthread-2.0 gobject-2.0 gmodule-no-export-2.0 gio-standalone)
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.13.8 gthread-2.0 gobject-2.0 gmodule-no-export-2.0 gio-2.0)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-PKG_CHECK_MODULES(DBUS, dbus-1)
+PKG_CHECK_MODULES(DBUS, dbus-1 dbus-glib-main-1)
 AC_SUBST(DBUS_CFLAGS)
 AC_SUBST(DBUS_LIBS)
 
@@ -229,7 +229,6 @@ client/Makefile
 daemon/Makefile
 test/Makefile
 po/Makefile.in
-gio-standalone.pc
 ])
 
 echo 

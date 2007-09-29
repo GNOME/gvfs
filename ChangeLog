@@ -1,3 +1,8 @@
+2007-09-29  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* configure.ac: Update to the new pkg-config filename.
+	* gio-standalone.pc.in: Remove pkg-config file that belongs to gio.
+
 2007-09-27  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* daemon/gvfsbackendftp.c: (do_replace), (do_query_info),
