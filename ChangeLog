@@ -1,5 +1,9 @@
 2007-09-29  Sebastian Dröge  <slomo@circular-chaos.org>
 
+	* configure.ac: Revert accidentally included local change.
+
+2007-09-29  Sebastian Dröge  <slomo@circular-chaos.org>
+
 	* configure.ac: Update to the new pkg-config filename.
 	* gio-standalone.pc.in: Remove pkg-config file that belongs to gio.
 
