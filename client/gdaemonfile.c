@@ -857,6 +857,7 @@ g_daemon_file_read (GFile *file,
 
 static GFileOutputStream *
 g_daemon_file_append_to (GFile *file,
+			 GFileCreateFlags flags,
 			 GCancellable *cancellable,
 			 GError **error)
 {
@@ -911,6 +912,7 @@ g_daemon_file_append_to (GFile *file,
 
 static GFileOutputStream *
 g_daemon_file_create (GFile *file,
+		      GFileCreateFlags flags,
 		      GCancellable *cancellable,
 		      GError **error)
 {
@@ -967,6 +969,7 @@ static GFileOutputStream *
 g_daemon_file_replace (GFile *file,
 		       const char *etag,
 		       gboolean make_backup,
+		       GFileCreateFlags flags,
 		       GCancellable *cancellable,
 		       GError **error)
 {

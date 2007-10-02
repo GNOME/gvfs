@@ -3,7 +3,6 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <dbus/dbus.h>
-#include <dbus-gmain.h>
 #include "gvfsdaemon.h"
 #include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>

@@ -11,7 +11,6 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <glib/gi18n.h>
-#include <dbus-gmain.h>
 #include <gvfswritechannel.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>

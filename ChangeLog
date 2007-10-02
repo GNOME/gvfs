@@ -1,3 +1,17 @@
+2007-10-02  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/gdaemonfile.c: (g_daemon_file_append_to),
+	(g_daemon_file_create), (g_daemon_file_replace):
+	* test/benchmark-gvfs-big-files.c: (create_file):
+	* test/benchmark-gvfs-small-files.c: (create_file): Update to API
+	changes in gio.
+
+	* daemon/gvfschannel.c:
+	* daemon/gvfsreadchannel.c:
+	* daemon/gvfswritechannel.c:
+	* daemon/main.c:
+	Drop unecessary includes.
+
 2007-09-29  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* configure.ac: Revert accidentally included local change.
