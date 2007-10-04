@@ -23,6 +23,7 @@ struct _GVfsJobQueryInfo
 
   GVfsBackend *backend;
   char *filename;
+  char *attributes;
   GFileAttributeMatcher *attribute_matcher;
   GFileQueryInfoFlags flags;
 

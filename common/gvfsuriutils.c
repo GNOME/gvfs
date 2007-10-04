@@ -32,6 +32,9 @@ g_uri_unescape_string (const gchar *escaped_string,
   if (escaped_string == NULL)
     return NULL;
 
+  if (escaped_string_end == NULL)
+    escaped_string_end = escaped_string + strlen (escaped_string);
+  
   result = g_malloc (escaped_string_end - escaped_string + 1);
 	
   out = result;

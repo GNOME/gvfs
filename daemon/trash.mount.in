@@ -1,0 +1,5 @@
+[Mount]
+Type=trash
+Exec=@libexecdir@/gvfs-daemon-trash
+AutoMount=true
+

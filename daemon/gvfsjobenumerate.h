@@ -24,6 +24,7 @@ struct _GVfsJobEnumerate
   GVfsBackend *backend;
   char *filename;
   char *object_path;
+  char *attributes;
   GFileAttributeMatcher *attribute_matcher;
   GFileQueryInfoFlags flags;
 

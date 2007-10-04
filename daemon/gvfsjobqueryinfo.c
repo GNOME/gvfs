@@ -31,6 +31,7 @@ g_vfs_job_query_info_finalize (GObject *object)
   g_object_unref (job->file_info);
   
   g_free (job->filename);
+  g_free (job->attributes);
   g_file_attribute_matcher_unref (job->attribute_matcher);
   
   if (G_OBJECT_CLASS (g_vfs_job_query_info_parent_class)->finalize)
@@ -92,6 +93,7 @@ g_vfs_job_query_info_new (DBusConnection *connection,
 
   job->filename = g_strndup (path_data, path_len);
   job->backend = backend;
+  job->attributes = g_strdup (attributes);
   job->attribute_matcher = g_file_attribute_matcher_new (attributes);
   job->flags = flags;
 

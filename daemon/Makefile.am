@@ -34,10 +34,10 @@ EXTRA_DIST = gvfs-daemon.service.in
 
 DISTCLEANFILES = gvfs-daemon.service
 
-libexec_PROGRAMS=gvfs-daemon gvfs-daemon-ftp gvfs-daemon-sftp
+libexec_PROGRAMS=gvfs-daemon gvfs-daemon-ftp gvfs-daemon-sftp gvfs-daemon-trash
 
-mount_in_files = ftp.mount.in sftp.mount.in
-mount_DATA = ftp.mount sftp.mount
+mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in
+mount_DATA = ftp.mount sftp.mount  trash.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -156,3 +156,16 @@ gvfs_daemon_sftp_CPPFLAGS = \
 	-DBACKEND_TYPES='"sftp", G_VFS_TYPE_BACKEND_SFTP,'
 
 gvfs_daemon_sftp_LDADD = $(libraries)
+
+gvfs_daemon_trash_SOURCES = \
+	gvfsbackendtrash.c gvfsbackendtrash.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfs_daemon_trash_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendtrash.h \
+	-DDEFAULT_BACKEND_TYPE=trash \
+	-DMAX_JOB_THREADS=10 \
+	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,'
+
+gvfs_daemon_trash_LDADD = $(libraries)

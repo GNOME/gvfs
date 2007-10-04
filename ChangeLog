@@ -1,5 +1,24 @@
 2007-10-04  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gvfsuriutils.c:
+        (g_uri_unescape_string):
+	Allow NULL end pointer
+
+        * daemon/gvfsjob.[ch]:
+	Add cancellable to GVfsJob for backends that want one
+	
+        * daemon/gvfsjobenumerate.[ch]:
+        * daemon/gvfsjobqueryinfo.[ch]:
+	Also store attribute in string form.
+	Needed if you want to pass it on into gio.
+	
+        * daemon/Makefile.am:
+        * daemon/gvfsbackendtrash.[ch]:
+        * daemon/trash.mount.in: Added.
+	Added trash backend
+
+2007-10-04  Alexander Larsson  <alexl@redhat.com>
+
         * TODO:
         * client/gdaemonfile.c:
         * client/gvfsfusedaemon.c:

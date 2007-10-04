@@ -57,6 +57,8 @@ g_vfs_job_finalize (GObject *object)
 
   if (job->backend_data_destroy)
     job->backend_data_destroy (job->backend_data);
+
+  g_object_unref (job->cancellable);
   
   if (G_OBJECT_CLASS (g_vfs_job_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_parent_class)->finalize) (object);
@@ -111,6 +113,8 @@ static void
 g_vfs_job_init (GVfsJob *job)
 {
   job->priv = G_TYPE_INSTANCE_GET_PRIVATE (job, G_VFS_TYPE_JOB, GVfsJobPrivate);
+
+  job->cancellable = g_cancellable_new ();
   
 }
 
@@ -182,6 +186,7 @@ g_vfs_job_cancel (GVfsJob *job)
 
   job->cancelled = TRUE;
   g_signal_emit (job, signals[CANCELLED], 0);
+  g_cancellable_cancel (job->cancellable);
 }
 
 static void 

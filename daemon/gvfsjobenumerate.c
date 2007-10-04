@@ -29,6 +29,7 @@ g_vfs_job_enumerate_finalize (GObject *object)
   job = G_VFS_JOB_ENUMERATE (object);
 
   g_free (job->filename);
+  g_free (job->attributes);
   g_file_attribute_matcher_unref (job->attribute_matcher);
   g_free (job->object_path);
   
@@ -95,6 +96,7 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   job->object_path = g_strdup (obj_path);
   job->filename = g_strndup (path_data, path_len);
   job->backend = backend;
+  job->attributes = g_strdup (attributes);
   job->attribute_matcher = g_file_attribute_matcher_new (attributes);
   job->flags = flags;
   
