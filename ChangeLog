@@ -1,3 +1,18 @@
+2007-10-04  Alexander Larsson  <alexl@redhat.com>
+
+        * TODO:
+        * client/gdaemonfile.c:
+        * client/gvfsfusedaemon.c:
+        * daemon/gvfsbackend.h:
+        * daemon/gvfsbackendftp.c:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsjobopenforwrite.[ch]:
+        * test/benchmark-gvfs-big-files.c:
+        * test/benchmark-gvfs-small-files.c:
+	Add GFileCreateFlags flag to open for write.
+	No actual backend support yet though.
+
 2007-10-02  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* client/gdaemonfile.c: (g_daemon_file_append_to),

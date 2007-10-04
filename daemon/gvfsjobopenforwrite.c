@@ -73,6 +73,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
   guint16 mode;
   dbus_bool_t make_backup;
   const char *etag;
+  guint32 flags;
 
   path = NULL;
   dbus_error_init (&derror);
@@ -82,6 +83,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
 				      DBUS_TYPE_UINT16, &mode,
 				      DBUS_TYPE_STRING, &etag,
 				      DBUS_TYPE_BOOLEAN, &make_backup,
+				      DBUS_TYPE_UINT32, &flags,
 				      0))
     {
       reply = dbus_message_new_error (message,
@@ -104,6 +106,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
   if (*etag != 0)
     job->etag = g_strdup (etag);
   job->make_backup = make_backup;
+  job->flags = flags;
   job->backend = backend;
   
   return G_VFS_JOB (job);
@@ -126,7 +129,8 @@ run (GVfsJob *job)
       
       class->create (op_job->backend,
 		     op_job,
-		     op_job->filename);
+		     op_job->filename,
+		     op_job->flags);
     }
   else if (op_job->mode == OPEN_FOR_WRITE_APPEND)
     {
@@ -139,7 +143,8 @@ run (GVfsJob *job)
       
       class->append_to (op_job->backend,
 			op_job,
-			op_job->filename);
+			op_job->filename,
+			op_job->flags);
     }
   else if (op_job->mode == OPEN_FOR_WRITE_REPLACE)
     {
@@ -154,7 +159,8 @@ run (GVfsJob *job)
 		      op_job,
 		      op_job->filename,
 		      op_job->etag,
-		      op_job->make_backup);
+		      op_job->make_backup,
+		      op_job->flags);
     }
   else
     g_assert_not_reached (); /* Handled in try */
@@ -172,7 +178,8 @@ try (GVfsJob *job)
 	return FALSE;
       return class->try_create (op_job->backend,
 				op_job,
-				op_job->filename);
+				op_job->filename,
+				op_job->flags);
     }
   else if (op_job->mode == OPEN_FOR_WRITE_APPEND)
     {
@@ -180,7 +187,8 @@ try (GVfsJob *job)
 	return FALSE;
       return class->try_append_to (op_job->backend,
 				   op_job,
-				   op_job->filename);
+				   op_job->filename,
+				   op_job->flags);
     }
   else if (op_job->mode == OPEN_FOR_WRITE_REPLACE)
     {
@@ -190,7 +198,8 @@ try (GVfsJob *job)
 				 op_job,
 				 op_job->filename,
 				 op_job->etag,
-				 op_job->make_backup);
+				 op_job->make_backup,
+				 op_job->flags);
     }
   else
     {

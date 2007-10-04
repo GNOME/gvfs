@@ -28,3 +28,5 @@ mount daemons should re-register when new owner for vfs daemon.
 
 Make built-in uri parsers link into gvfs shared lib instead of using a module
  (smb is a shared lib atm to make sure that works)
+
+Implement GFileCreateFlags in backends as possible

@@ -869,11 +869,13 @@ g_daemon_file_append_to (GFile *file,
   guint16 mode;
   guint64 initial_offset;
   dbus_bool_t make_backup;
+  guint32 dbus_flags;
   char *etag;
 
   mode = 1;
   etag = "";
   make_backup = FALSE;
+  dbus_flags = flags;
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
@@ -881,6 +883,7 @@ g_daemon_file_append_to (GFile *file,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &make_backup,
+			     DBUS_TYPE_UINT32, &dbus_flags,
 			     0);
   if (reply == NULL)
     return NULL;
@@ -925,10 +928,12 @@ g_daemon_file_create (GFile *file,
   guint64 initial_offset;
   dbus_bool_t make_backup;
   char *etag;
+  guint32 dbus_flags;
 
   mode = 0;
   etag = "";
   make_backup = FALSE;
+  dbus_flags = flags;
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
@@ -936,6 +941,7 @@ g_daemon_file_create (GFile *file,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &make_backup,
+			     DBUS_TYPE_UINT32, &dbus_flags,
 			     0);
   if (reply == NULL)
     return NULL;
@@ -981,9 +987,11 @@ g_daemon_file_replace (GFile *file,
   guint16 mode;
   guint64 initial_offset;
   dbus_bool_t dbus_make_backup;
+  guint32 dbus_flags;
 
   mode = 2;
   dbus_make_backup = make_backup;
+  dbus_flags = flags;
 
   if (etag == NULL)
     etag = "";
@@ -994,6 +1002,7 @@ g_daemon_file_replace (GFile *file,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &dbus_make_backup,
+			     DBUS_TYPE_UINT32, &dbus_flags,
 			     0);
   if (reply == NULL)
     return NULL;

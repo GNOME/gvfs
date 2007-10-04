@@ -1010,7 +1010,7 @@ setup_output_stream (GFile *file, FileHandle *fh)
 
   if (!fh->stream)
     {
-      fh->stream = g_file_append_to (file, NULL, &error);
+      fh->stream = g_file_append_to (file, 0, NULL, &error);
       if (fh->stream)
         fh->pos = g_seekable_tell (G_SEEKABLE (fh->stream));
     }
@@ -1135,7 +1135,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
               error = NULL;
             }
 
-          file_output_stream = g_file_create (file, NULL, &error);
+          file_output_stream = g_file_create (file, 0, NULL, &error);
           if (file_output_stream)
             {
               FileHandle *fh = get_or_create_file_handle_for_path (path);
@@ -1810,7 +1810,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
               g_object_unref (fh->stream);
               fh->stream = NULL;
 
-              fh->stream = g_file_replace (file, 0, FALSE, NULL, &error);
+              fh->stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
             }
           else
             {
@@ -1859,11 +1859,11 @@ vfs_truncate (const gchar *path, off_t size)
 
       if (size == 0)
         {
-          file_output_stream = g_file_replace (file, 0, FALSE, NULL, &error);
+          file_output_stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
         }
       else
         {
-          file_output_stream = g_file_append_to (file, NULL, &error);
+          file_output_stream = g_file_append_to (file, 0, NULL, &error);
           if (file_output_stream)
               g_seekable_truncate (G_SEEKABLE (file_output_stream), size, NULL, &error);
         }

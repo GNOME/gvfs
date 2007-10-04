@@ -2003,7 +2003,8 @@ create_reply (GVfsBackendSftp *backend,
 static gboolean
 try_create (GVfsBackend *backend,
             GVfsJobOpenForWrite *job,
-            const char *filename)
+            const char *filename,
+            GFileCreateFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
@@ -2054,7 +2055,8 @@ append_to_reply (GVfsBackendSftp *backend,
 static gboolean
 try_append_to (GVfsBackend *backend,
                GVfsJobOpenForWrite *job,
-               const char *filename)
+               const char *filename,
+               GFileCreateFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
@@ -2327,7 +2329,8 @@ try_replace (GVfsBackend *backend,
              GVfsJobOpenForWrite *job,
              const char *filename,
              const char *etag,
-             gboolean make_backup)
+             gboolean make_backup,
+             GFileCreateFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;

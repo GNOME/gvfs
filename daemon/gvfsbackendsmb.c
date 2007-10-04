@@ -650,7 +650,8 @@ smb_write_handle_free (SmbWriteHandle *handle)
 static void
 do_create (GVfsBackend *backend,
 	   GVfsJobOpenForWrite *job,
-	   const char *filename)
+	   const char *filename,
+	   GFileCreateFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
@@ -678,7 +679,8 @@ do_create (GVfsBackend *backend,
 static void
 do_append_to (GVfsBackend *backend,
 	      GVfsJobOpenForWrite *job,
-	      const char *filename)
+	      const char *filename,
+	      GFileCreateFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
@@ -849,7 +851,8 @@ do_replace (GVfsBackend *backend,
 	    GVfsJobOpenForWrite *job,
 	    const char *filename,
 	    const char *etag,
-	    gboolean make_backup)
+	    gboolean make_backup,
+	    GFileCreateFlags flags)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   struct stat original_stat;

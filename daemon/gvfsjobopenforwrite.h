@@ -31,6 +31,7 @@ struct _GVfsJobOpenForWrite
   char *filename;
   char *etag;
   gboolean make_backup;
+  GFileCreateFlags flags;
   
   GVfsBackend *backend;
   GVfsBackendHandle backend_handle;

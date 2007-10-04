@@ -121,26 +121,32 @@ struct _GVfsBackendClass
 				 GSeekType  type);
   gboolean (*try_create)        (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
-				 const char *filename);
+				 const char *filename,
+				 GFileCreateFlags flags);
   void     (*create)            (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
-				 const char *filename);
+				 const char *filename,
+				 GFileCreateFlags flags);
   gboolean (*try_append_to)     (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
-				 const char *filename);
+				 const char *filename,
+				 GFileCreateFlags flags);
   void     (*append_to)         (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
-				 const char *filename);
+				 const char *filename,
+				 GFileCreateFlags flags);
   gboolean (*try_replace)       (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
 				 const char *filename,
 				 const char *etag,
-				 gboolean make_backup);
+				 gboolean make_backup,
+				 GFileCreateFlags flags);
   void     (*replace)           (GVfsBackend *backend,
 				 GVfsJobOpenForWrite *job,
 				 const char *filename,
 				 const char *etag,
-				 gboolean make_backup);
+				 gboolean make_backup,
+				 GFileCreateFlags flags);
   void     (*close_write)       (GVfsBackend *backend,
 				 GVfsJobCloseWrite *job,
 				 GVfsBackendHandle handle);
