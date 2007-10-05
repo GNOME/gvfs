@@ -1,3 +1,8 @@
+2007-10-05  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendtrash.c:
+        Add delete support to trash
+
 2007-10-04  Alexander Larsson  <alexl@redhat.com>
 
         * common/gvfsuriutils.c:

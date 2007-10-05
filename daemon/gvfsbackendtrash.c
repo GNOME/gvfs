@@ -785,6 +785,51 @@ do_delete (GVfsBackend *backend,
            GVfsJobDelete *job,
            const char *filename)
 {
+  char *trashdir, *topdir, *relative_path, *trashfile;
+  
+  if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      G_IO_ERROR_PERMISSION_DENIED,
+                      _("Can't delete trash"));
+  else
+    {
+      GFile *file;
+      GError *error; 
+      char *path, *info_filename, *info_path;
+
+      path = g_build_filename (trashdir, "files", trashfile, relative_path, NULL);
+      file = g_file_new_for_path (path);
+      g_free (path);
+      
+      error = NULL;
+      if (g_file_delete (file,
+                         G_VFS_JOB (job)->cancellable,
+                         &error))
+        {
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+
+          if (relative_path == NULL)
+            {
+              info_filename = g_strconcat (trashfile, ".trashinfo", NULL);
+              info_path = g_build_filename (trashdir, "info", info_filename, NULL);
+              g_free (info_filename);
+              g_unlink (info_path);
+              g_free (info_path);
+            }
+        }
+      else
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+        }
+      
+      g_object_unref (file);
+  
+      g_free (trashdir);
+      g_free (trashfile);
+      g_free (relative_path);
+      g_free (topdir);
+    }
 }
 
 static void
