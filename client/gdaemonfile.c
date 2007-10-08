@@ -11,6 +11,7 @@
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonfileinputstream.h>
 #include <gdaemonfileoutputstream.h>
+#include <gdaemondirectorymonitor.h>
 #include <gdaemonfileenumerator.h>
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
@@ -267,6 +268,7 @@ g_daemon_file_resolve_relative_path (GFile *file,
 static DBusMessage *
 create_empty_message (GFile *file,
 		      const char *op,
+		      GMountRef **mount_ref_out,
 		      GError **error)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
@@ -279,6 +281,9 @@ create_empty_message (GFile *file,
 						error);
   if (mount_ref == NULL)
     return NULL;
+
+  if (mount_ref_out)
+    *mount_ref_out = _g_mount_ref_ref (mount_ref);
   
   message =
     dbus_message_new_method_call (mount_ref->dbus_id,
@@ -297,6 +302,7 @@ create_empty_message (GFile *file,
 static DBusMessage *
 do_sync_path_call (GFile *file,
 		   const char *op,
+		   GMountRef **mount_ref_out,
 		   DBusConnection **connection_out,
 		   GCancellable *cancellable,
 		   GError **error,
@@ -306,7 +312,7 @@ do_sync_path_call (GFile *file,
   DBusMessage *message, *reply;
   va_list var_args;
 
-  message = create_empty_message (file, op, error);
+  message = create_empty_message (file, op, mount_ref_out, error);
   if (!message)
     return NULL;
 
@@ -585,7 +591,8 @@ g_daemon_file_enumerate_children (GFile      *file,
   flags_dbus = flags;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_ENUMERATE,
-			     &connection, cancellable, error,
+			     NULL, &connection,
+			     cancellable, error,
 			     DBUS_TYPE_STRING, &obj_path,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags_dbus,
@@ -626,7 +633,8 @@ g_daemon_file_query_info (GFile                *file,
   flags_dbus = flags;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags,
 			     0);
@@ -826,7 +834,8 @@ g_daemon_file_read (GFile *file,
 
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ,
-			     &connection, cancellable, error,
+			     NULL, &connection,
+			     cancellable, error,
 			     0);
   if (reply == NULL)
     return NULL;
@@ -879,7 +888,8 @@ g_daemon_file_append_to (GFile *file,
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-			     &connection, cancellable, error,
+			     NULL, &connection,
+			     cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &make_backup,
@@ -937,7 +947,8 @@ g_daemon_file_create (GFile *file,
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-			     &connection, cancellable, error,
+			     NULL, &connection,
+			     cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &make_backup,
@@ -998,7 +1009,8 @@ g_daemon_file_replace (GFile *file,
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
-			     &connection, cancellable, error,
+			     NULL, &connection,
+			     cancellable, error,
 			     DBUS_TYPE_UINT16, &mode,
 			     DBUS_TYPE_STRING, &etag,
 			     DBUS_TYPE_BOOLEAN, &dbus_make_backup,
@@ -1262,7 +1274,8 @@ g_daemon_file_query_filesystem_info (GFile                *file,
     attributes = "";
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     0);
   if (reply == NULL)
@@ -1339,7 +1352,8 @@ g_daemon_file_set_display_name (GFile *file,
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     DBUS_TYPE_STRING, &display_name,
 			     0);
   if (reply == NULL)
@@ -1376,7 +1390,8 @@ g_daemon_file_delete (GFile *file,
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_DELETE,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     0);
   if (reply == NULL)
     return FALSE;
@@ -1397,7 +1412,8 @@ g_daemon_file_trash (GFile *file,
   
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_TRASH,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     0);
   if (reply == NULL)
     return FALSE;
@@ -1418,7 +1434,8 @@ g_daemon_file_make_directory (GFile *file,
 
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     0);
   if (reply == NULL)
     return FALSE;
@@ -1437,7 +1454,8 @@ g_daemon_file_make_symbolic_link (GFile *file,
 
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_MAKE_SYMBOLIC_LINK,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     G_DBUS_TYPE_CSTRING, &symlink_value,
 			     0);
   if (reply == NULL)
@@ -1458,7 +1476,8 @@ g_daemon_file_query_settable_attributes (GFile                      *file,
 
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     0);
   if (reply == NULL)
     return NULL;
@@ -1482,7 +1501,8 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
 
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES,
-			     NULL, cancellable, error,
+			     NULL, NULL,
+			     cancellable, error,
 			     0);
   if (reply == NULL)
     return NULL;
@@ -1511,7 +1531,7 @@ g_daemon_file_set_attribute (GFile *file,
 
   daemon_file = G_DAEMON_FILE (file);
 
-  message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE, error);
+  message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE, NULL, error);
   if (!message)
     return FALSE;
 
@@ -1668,6 +1688,53 @@ g_daemon_file_move (GFile                  *source,
   return TRUE;
 }
 
+static GDirectoryMonitor*
+g_daemon_file_monitor_dir (GFile* file,
+			   GFileMonitorFlags flags,
+			   GCancellable *cancellable)
+{
+  GDirectoryMonitor *monitor;
+  char *obj_path;
+  dbus_uint32_t flags_dbus;
+  GMountRef *mount_ref;
+  DBusMessage *reply;
+
+  flags_dbus = flags;
+
+  mount_ref = NULL;
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR,
+			     &mount_ref, NULL,
+			     cancellable, NULL,
+			     DBUS_TYPE_UINT32, &flags_dbus,
+			     0);
+  
+  if (reply == NULL)
+    {
+      if (mount_ref)
+	_g_mount_ref_unref (mount_ref);
+      return NULL;
+    }
+  
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_OBJECT_PATH, &obj_path,
+			      DBUS_TYPE_INVALID))
+    {
+      _g_mount_ref_unref (mount_ref);
+      dbus_message_unref (reply);
+      g_warning ("Invalid return value from monitor_dir");
+      return NULL;
+    }
+  
+  monitor = g_daemon_directory_monitor_new (mount_ref->dbus_id,
+					    obj_path);
+  
+  _g_mount_ref_unref (mount_ref);
+  dbus_message_unref (reply);
+  
+  return monitor;
+}
+
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
@@ -1707,4 +1774,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->query_writable_namespaces = g_daemon_file_query_writable_namespaces;
   iface->set_attribute = g_daemon_file_set_attribute;
   iface->make_symbolic_link = g_daemon_file_make_symbolic_link;
+  iface->monitor_dir = g_daemon_file_monitor_dir;
 }

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_QUERY_INFO "QueryInfo"
 #define G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO "QueryFilesystemInfo"
 #define G_VFS_DBUS_MOUNT_OP_ENUMERATE "Enumerate"
+#define G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR "CreateDirectoryMonitor"
 #define G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE "MountMountable"
 #define G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME "SetDisplayName"
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
@@ -71,6 +72,14 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_ENUMERATOR_INTERFACE "org.gtk.vfs.Enumerator"
 #define G_VFS_DBUS_ENUMERATOR_OP_DONE "Done"
 #define G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO "GotInfo"
+
+#define G_VFS_DBUS_MONITOR_INTERFACE "org.gtk.vfs.Monitor"
+#define G_VFS_DBUS_MONITOR_OP_SUBSCRIBE "Subscribe"
+#define G_VFS_DBUS_MONITOR_OP_UNSUBSCRIBE "Unsubscribe"
+
+#define G_VFS_DBUS_MONITOR_CLIENT_INTERFACE "org.gtk.vfs.MonitorClient"
+#define G_VFS_DBUS_MONITOR_CLIENT_OP_CHANGED "Changed"
+
 
 /* Mounts time out in 10 minutes, since they can be slow, with auth, etc */
 #define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*10)

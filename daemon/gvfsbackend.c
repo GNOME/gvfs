@@ -23,6 +23,7 @@
 #include <gvfsjobmountmountable.h>
 #include <gvfsjobmakedirectory.h>
 #include <gvfsjobmakesymlink.h>
+#include <gvfsjobcreatemonitor.h>
 #include <gvfsjobcopy.h>
 #include <gvfsjobmove.h>
 #include <gvfsjobsetattribute.h>
@@ -231,6 +232,13 @@ g_vfs_backend_constructor (GType                  type,
   return object;
 }
 
+GVfsDaemon *
+g_vfs_backend_get_daemon (GVfsBackend *backend)
+{
+  return backend->priv->daemon;
+}
+
+
 void
 g_vfs_backend_set_display_name (GVfsBackend *backend,
 				const char *display_name)
@@ -350,6 +358,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES))
     job = g_vfs_job_query_attributes_new (connection, message, backend, TRUE);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR))
+    job = g_vfs_job_create_monitor_new (connection, message, backend, TRUE);
 
   if (job)
     {

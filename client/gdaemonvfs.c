@@ -407,8 +407,8 @@ g_daemon_vfs_get_supported_uri_schemes (GVfs *vfs)
   return (const gchar * const *) G_DAEMON_VFS (vfs)->supported_uri_schemes;
 }
 
-static GMountRef *
-mount_ref_ref (GMountRef *ref)
+GMountRef *
+_g_mount_ref_ref (GMountRef *ref)
 {
   g_atomic_int_inc (&ref->ref_count);
   return ref;
@@ -466,7 +466,7 @@ lookup_mount_ref_in_cache_locked (GMountSpec *spec,
 
       if (g_mount_spec_match_with_path (mount_ref->spec, spec, path))
 	{
-	  ref = mount_ref_ref (mount_ref);
+	  ref = _g_mount_ref_ref (mount_ref);
 	  break;
 	}
     }
@@ -559,7 +559,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
       the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, ref);
     }
 
-  mount_ref_ref (ref);
+  _g_mount_ref_ref (ref);
 
   G_UNLOCK (mount_cache);
 

@@ -20,6 +20,7 @@ vfssources = \
 	gdaemonfileinputstream.c gdaemonfileinputstream.h \
 	gdaemonfileoutputstream.c gdaemonfileoutputstream.h \
 	gdaemonfileenumerator.c gdaemonfileenumerator.h \
+	gdaemondirectorymonitor.c gdaemondirectorymonitor.h \
 	gvfsdaemondbus.c \
 	$(NULL)
 

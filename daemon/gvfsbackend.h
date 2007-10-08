@@ -45,6 +45,7 @@ typedef struct _GVfsJobCopy            GVfsJobCopy;
 typedef struct _GVfsJobMove            GVfsJobMove;
 typedef struct _GVfsJobSetAttribute    GVfsJobSetAttribute;
 typedef struct _GVfsJobQueryAttributes GVfsJobQueryAttributes;
+typedef struct _GVfsJobCreateMonitor   GVfsJobCreateMonitor;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -279,6 +280,22 @@ struct _GVfsBackendClass
 				 const char *attribute,
 				 GFileAttributeValue *value,
 				 GFileQueryInfoFlags flags);
+  void     (*create_dir_monitor)(GVfsBackend *backend,
+				 GVfsJobCreateMonitor *job,
+				 const char *filename,
+				 GFileMonitorFlags flags);
+  gboolean (*try_create_dir_monitor) (GVfsBackend *backend,
+				      GVfsJobCreateMonitor *job,
+				      const char *filename,
+				      GFileMonitorFlags flags);
+  void     (*create_file_monitor)(GVfsBackend *backend,
+				  GVfsJobCreateMonitor *job,
+				  const char *filename,
+				  GFileMonitorFlags flags);
+  gboolean (*try_create_file_monitor) (GVfsBackend *backend,
+				       GVfsJobCreateMonitor *job,
+				       const char *filename,
+				       GFileMonitorFlags flags);
   void (*query_settable_attributes)         (GVfsBackend *backend,
 					     GVfsJobQueryAttributes *job,
 					     const char *filename);
@@ -311,7 +328,7 @@ void        g_vfs_backend_register_mount                 (GVfsBackend        *ba
 							  GAsyncDBusCallback  callback,
 							  gpointer            user_data);
 const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);
-
+GVfsDaemon *g_vfs_backend_get_daemon                     (GVfsBackend        *backend);
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_H__ */

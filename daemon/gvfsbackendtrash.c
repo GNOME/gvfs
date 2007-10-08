@@ -19,6 +19,7 @@
 #include "gvfsuriutils.h"
 
 #include "gvfsbackendtrash.h"
+#include "gvfsmonitor.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
@@ -32,6 +33,7 @@
 #include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
+#include "gvfsjobcreatemonitor.h"
 #include "gvfsdaemonprotocol.h"
 
 
@@ -39,6 +41,7 @@ struct _GVfsBackendTrash
 {
   GVfsBackend parent_instance;
 
+  GMountSpec *mount_spec;
 };
 
 
@@ -220,6 +223,9 @@ g_vfs_backend_trash_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_TRASH (object);
 
+  g_mount_spec_unref (backend->mount_spec);
+
+  
   if (G_OBJECT_CLASS (g_vfs_backend_trash_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_trash_parent_class)->finalize) (object);
 }
@@ -234,8 +240,7 @@ g_vfs_backend_trash_init (GVfsBackendTrash *trash_backend)
 
   mount_spec = g_mount_spec_new ("trash");
   g_vfs_backend_set_mount_spec (backend, mount_spec);
-  g_mount_spec_unref (mount_spec);
-  
+  trash_backend->mount_spec = mount_spec;
 }
 
 static gboolean
@@ -832,6 +837,139 @@ do_delete (GVfsBackend *backend,
     }
 }
 
+typedef struct {
+  GVfsMonitor *vfs_monitor;
+  GObject *monitor;
+  GFile *base_file;
+  char *base_path;
+  GMountSpec *mount_spec;
+} MonitorProxy;
+
+static void
+monitor_proxy_free (MonitorProxy *proxy)
+{
+  g_object_unref (proxy->monitor);
+  g_object_unref (proxy->base_file);
+  g_mount_spec_unref (proxy->mount_spec);
+  g_free (proxy->base_path);
+  g_free (proxy);
+}
+
+static char *
+proxy_get_trash_path (MonitorProxy *proxy,
+                      GFile *file)
+{
+  char *file_path, *basename;
+  
+  if (g_file_equal (file, proxy->base_file))
+    file_path = g_strdup (proxy->base_path);
+  else
+    {
+      basename = g_file_get_relative_path (proxy->base_file, file);
+      file_path = g_build_filename (proxy->base_path, basename, NULL);
+      g_free (basename);
+    }
+
+  return file_path;
+}
+
+static void
+proxy_changed (GFileMonitor* monitor,
+               GFile* file,
+               GFile* other_file,
+               GFileMonitorEvent event_type,
+               MonitorProxy *proxy)
+{
+  GMountSpec *file_spec;
+  char *file_path;
+  GMountSpec *other_file_spec;
+  char *other_file_path;
+
+  file_spec = proxy->mount_spec;
+  file_path = proxy_get_trash_path (proxy, file);
+
+  if (other_file)
+    {
+      other_file_spec = proxy->mount_spec;
+      other_file_path = proxy_get_trash_path (proxy, other_file);
+    }
+  else
+    {
+      other_file_spec = NULL;
+      other_file_path = NULL;
+    }
+  
+  g_vfs_monitor_emit_event (proxy->vfs_monitor,
+                            event_type,
+                            file_spec, file_path,
+                            other_file_spec, other_file_path);
+
+  g_free (file_path);
+  g_free (other_file_path);
+}
+
+static void
+do_create_dir_monitor (GVfsBackend *backend,
+                       GVfsJobCreateMonitor *job,
+                       const char *filename,
+                       GFileMonitorFlags flags)
+{
+  char *trashdir, *topdir, *relative_path, *trashfile;
+  
+  if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
+    {
+      /* The trash:/// root */
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        "trash: notification not supported yet");
+    }
+  else
+    {
+      GFile *file;
+      char *path;
+      GDirectoryMonitor *monitor;
+      MonitorProxy *proxy;
+      
+      path = g_build_filename (trashdir, "files", trashfile, relative_path, NULL);
+      file = g_file_new_for_path (path);
+      g_free (path);
+
+      monitor = g_file_monitor_directory (file,
+                                          flags,
+                                          G_VFS_JOB (job)->cancellable);
+      
+      if (monitor)
+        {
+          proxy = g_new0 (MonitorProxy, 1); 
+          proxy->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+          proxy->monitor = G_OBJECT (monitor);
+          proxy->base_path = g_strdup (filename);
+          proxy->base_file = g_object_ref (file);
+          proxy->mount_spec = g_mount_spec_ref (G_VFS_BACKEND_TRASH (backend)->mount_spec);
+          
+          g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy, (GDestroyNotify) monitor_proxy_free);
+          g_signal_connect (monitor, "changed", G_CALLBACK (proxy_changed), proxy);
+
+          g_vfs_job_create_monitor_set_obj_path (job,
+                                                 g_vfs_monitor_get_object_path (proxy->vfs_monitor));
+
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+        }
+      else
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _("Trash directory notification not supported"));
+        }
+      g_object_unref (file);
+  
+      g_free (trashdir);
+      g_free (trashfile);
+      g_free (relative_path);
+      g_free (topdir);
+    }
+}
+
 static void
 g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
 {
@@ -848,4 +986,5 @@ g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
   backend_class->query_info = do_query_info;
   backend_class->enumerate = do_enumerate;
   backend_class->delete = do_delete;
+  backend_class->create_dir_monitor = do_create_dir_monitor;
 }

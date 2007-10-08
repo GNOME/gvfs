@@ -12,7 +12,7 @@
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/client/enumerator/"
 
 /* atomic */
-volatile gint path_counter = 1;
+static volatile gint path_counter = 1;
 
 G_LOCK_DEFINE_STATIC(infos);
 
@@ -117,6 +117,7 @@ g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
       G_LOCK (infos);
       enumerator->done = TRUE;
       G_UNLOCK (infos);
+      return DBUS_HANDLER_RESULT_HANDLED;
     }
   else if (strcmp (member, G_VFS_DBUS_ENUMERATOR_OP_GOT_INFO) == 0)
     {
@@ -146,6 +147,7 @@ g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
       G_LOCK (infos);
       enumerator->infos = g_list_concat (enumerator->infos, infos);
       G_UNLOCK (infos);
+      return DBUS_HANDLER_RESULT_HANDLED;
     }
 
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;

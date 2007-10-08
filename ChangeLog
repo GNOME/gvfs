@@ -1,3 +1,36 @@
+2007-10-08  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gvfsdaemonprotocol.h:
+	Add defines for monitoring
+	
+        * client/Makefile.am:
+        * client/gdaemondirectorymonitor.[ch]: 
+        * client/gdaemonfilemonitor.[ch]:
+        * client/gdaemonfile.c:
+	Add daemon directory monitor and initial work on file monitor
+	
+        * client/gdaemonfileenumerator.c:
+	Make path_counter private
+	Return DBUS_HANDLER_RESULT_HANDLED when handling messages.
+	
+        * client/gdaemonvfs.[ch]:
+	Make _g_mount_ref_ref "public"
+	
+        * client/gvfsdaemondbus.c:
+	Handle NULL callbacks for async calls
+	
+        * daemon/Makefile.am:
+        * daemon/gvfsbackend.[ch]:
+        * daemon/gvfsjobcreatemonitor.[ch]:
+	Add create_dir_monitor and create_file_monitor.
+	Add g_vfs_backend_get_daemon
+	
+        * daemon/gvfsmonitor.[ch]:
+	Helper code for monitors
+	
+        * daemon/gvfsbackendtrash.c:
+	Implement directory monitor for trash dirs
+
 2007-10-08  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* client/gdaemonvfs.c: (g_daemon_vfs_finalize),

@@ -366,9 +366,10 @@ static void
 async_call_finish (AsyncDBusCall *async_call,
 		   DBusMessage *reply)
 {
-  async_call->callback (reply, async_call->connection,
-			async_call->io_error, 
-			async_call->callback_data);
+  if (async_call->callback)
+    async_call->callback (reply, async_call->connection,
+			  async_call->io_error, 
+			  async_call->callback_data);
 
   if (async_call->connection)
     dbus_connection_unref (async_call->connection);

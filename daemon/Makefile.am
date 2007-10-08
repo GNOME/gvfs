@@ -56,6 +56,7 @@ libdaemon_la_SOURCES = \
 	gvfschannel.c gvfschannel.h \
 	gvfsreadchannel.c gvfsreadchannel.h \
 	gvfswritechannel.c gvfswritechannel.h \
+	gvfsmonitor.c gvfsmonitor.h \
 	gvfsdaemonutils.c gvfsdaemonutils.h \
 	gvfsjob.c gvfsjob.h \
 	gvfsjobsource.c gvfsjobsource.h \
@@ -82,6 +83,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobmakesymlink.c gvfsjobmakesymlink.h \
 	gvfsjobsetattribute.c gvfsjobsetattribute.h \
 	gvfsjobqueryattributes.c gvfsjobqueryattributes.h \
+	gvfsjobcreatemonitor.c gvfsjobcreatemonitor.h \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
 
