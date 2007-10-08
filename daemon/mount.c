@@ -820,6 +820,43 @@ mount_location (DBusConnection *connection,
   
 }
 
+static void
+list_mount_types (DBusConnection *connection,
+		  DBusMessage *message)
+{
+  VfsMountable *mountable;
+  DBusMessage *reply;
+  DBusMessageIter iter, array_iter;
+  GList *l;
+
+  reply = dbus_message_new_method_return (message);
+  if (reply == NULL)
+    _g_dbus_oom ();
+
+  dbus_message_iter_init_append (reply, &iter);
+
+  
+  if (!dbus_message_iter_open_container (&iter,
+					 DBUS_TYPE_ARRAY,
+					 DBUS_TYPE_STRING_AS_STRING,
+					 &array_iter))
+    _g_dbus_oom ();
+
+  for (l = mountables; l != NULL; l = l->next)
+    {
+      mountable = l->data;
+      if (!dbus_message_iter_append_basic (&array_iter,
+            DBUS_TYPE_STRING,
+	    &mountable->type))
+        _g_dbus_oom ();
+    }
+
+  if (!dbus_message_iter_close_container (&iter, &array_iter))
+    _g_dbus_oom ();
+  
+  dbus_connection_send (connection, reply, NULL);
+}
+
 static DBusHandlerResult
 dbus_message_function (DBusConnection  *connection,
 		       DBusMessage     *message,
@@ -844,6 +881,10 @@ dbus_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION))
     mount_location (connection, message);
+  else if (dbus_message_is_method_call (message,
+  					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNT_TYPES))
+    list_mount_types (connection, message);
   else
     res = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   
@@ -913,3 +954,4 @@ mount_init (void)
       dbus_error_free (&error);
     }
 }
+

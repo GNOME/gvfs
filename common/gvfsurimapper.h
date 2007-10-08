@@ -27,32 +27,36 @@ struct _GVfsUriMapperClass
 
   /* Virtual Table */
 
-  const char ** (*get_handled_schemes)     (GVfsUriMapper *mapper);
-  gboolean      (*from_uri)                (GVfsUriMapper *mapper,
-					    const char *uri,
-					    GMountSpec **spec_out,
-					    char **path_out);
+  const char * const * (*get_handled_schemes)     (GVfsUriMapper *mapper);
+  gboolean             (*from_uri)                (GVfsUriMapper *mapper,
+					           const char *uri,
+					           GMountSpec **spec_out,
+					           char **path_out);
   
-  const char ** (*get_handled_mount_types) (GVfsUriMapper *mapper);
-  char *        (*to_uri)                  (GVfsUriMapper *mapper,
-					    GMountSpec *spec,
-					    char *path,
-					    gboolean allow_utf8);
+  const char * const * (*get_handled_mount_types) (GVfsUriMapper *mapper);
+  char *               (*to_uri)                  (GVfsUriMapper *mapper,
+					           GMountSpec *spec,
+					           char *path,
+					           gboolean allow_utf8);
+  char *               (*to_uri_scheme)           (GVfsUriMapper *mapper,
+                                                   GMountSpec *spec);
 };
 
 GType g_vfs_uri_mapper_get_type (void) G_GNUC_CONST;
 
-const char **g_vfs_uri_mapper_get_handled_schemes     (GVfsUriMapper  *mapper);
-gboolean     g_vfs_uri_mapper_from_uri                (GVfsUriMapper  *mapper,
-						       const char     *uri,
-						       GMountSpec    **spec_out,
-						       char          **path_out);
+const char * const * g_vfs_uri_mapper_get_handled_schemes  (GVfsUriMapper  *mapper);
+gboolean             g_vfs_uri_mapper_from_uri             (GVfsUriMapper  *mapper,
+						            const char     *uri,
+						            GMountSpec    **spec_out,
+						            char          **path_out);
 
-const char **g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper);
-char *       g_vfs_uri_mapper_to_uri                  (GVfsUriMapper  *mapper,
-						       GMountSpec     *spec,
-						       char           *path,
-						       gboolean        allow_utf8);
+const char * const * g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper);
+char *               g_vfs_uri_mapper_to_uri                  (GVfsUriMapper  *mapper,
+						               GMountSpec     *spec,
+						               char           *path,
+						               gboolean        allow_utf8);
+char *               g_vfs_uri_mapper_to_uri_scheme           (GVfsUriMapper  *mapper,
+                                                               GMountSpec     *spec);
 
 G_END_DECLS
 

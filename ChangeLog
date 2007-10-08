@@ -1,3 +1,18 @@
+2007-10-08  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/gdaemonvfs.c: (g_daemon_vfs_finalize),
+	(g_daemon_vfs_init), (fill_supported_uri_schemes),
+	(g_daemon_vfs_get_supported_uri_schemes),
+	(g_daemon_vfs_class_init):
+	* client/smburi.c: (smb_to_uri_scheme),
+	(g_vfs_uri_mapper_smb_class_init):
+	* common/gvfsdaemonprotocol.h:
+	* common/gvfsurimapper.c: (g_vfs_uri_mapper_to_uri_scheme):
+	* common/gvfsurimapper.h:
+	* daemon/mount.c: (list_mount_types), (dbus_message_function):
+	Implement get_supported_uri_schemes method and add a GVfsUriMapper
+	method to map a mount spec to an URI scheme.
+
 2007-10-05  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendtrash.c:

@@ -80,7 +80,7 @@ normalize_smb_name (const char *name, gssize len)
     return g_ascii_strdown (name, len);
 }
 
-static const char **
+static const char * const *
 smb_get_handled_schemes (GVfsUriMapper *mapper)
 {
   static const char *schemes[] = {
@@ -206,7 +206,7 @@ smb_from_uri (GVfsUriMapper *mapper,
   return spec != NULL;
 }
 
-static const char **
+static const char * const *
 smb_get_handled_mount_types (GVfsUriMapper *mapper)
 {
   static const char *types[] = {
@@ -267,6 +267,18 @@ smb_to_uri (GVfsUriMapper *mapper,
   return s;
 }
 
+static gchar *
+smb_to_uri_scheme (GVfsUriMapper *mapper,
+                   GMountSpec *spec)
+{
+  const gchar *type = g_mount_spec_get_type (spec);
+  if (strcmp ("smb-network", type) == 0 ||
+      strcmp ("smb-server", type) == 0 ||
+      strcmp ("smb-share", type) == 0)
+    return g_strdup ("smb");
+  else
+    return NULL;
+}
 
 static void
 g_vfs_uri_mapper_smb_class_init (GVfsUriMapperSmbClass *class)
@@ -281,4 +293,5 @@ g_vfs_uri_mapper_smb_class_init (GVfsUriMapperSmbClass *class)
   mapper_class->from_uri = smb_from_uri;
   mapper_class->get_handled_mount_types = smb_get_handled_mount_types;
   mapper_class->to_uri = smb_to_uri;
+  mapper_class->to_uri_scheme = smb_to_uri_scheme;
 }

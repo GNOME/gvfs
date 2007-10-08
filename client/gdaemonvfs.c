@@ -35,6 +35,8 @@ struct _GDaemonVfs
 
   GHashTable *from_uri_hash;
   GHashTable *to_uri_hash;
+
+  gchar **supported_uri_schemes;
 };
 
 struct _GDaemonVfsClass
@@ -84,12 +86,15 @@ g_daemon_vfs_finalize (GObject *object)
   g_hash_table_destroy (vfs->from_uri_hash);
   g_hash_table_destroy (vfs->to_uri_hash);
 
+  g_strfreev (vfs->supported_uri_schemes);
+
   if (vfs->async_bus)
     {
       dbus_connection_close (vfs->async_bus);
       dbus_connection_unref (vfs->async_bus);
     }
-  
+
+
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
 }
@@ -156,7 +161,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 {
   GType *mappers;
   guint n_mappers;
-  const char **schemes, **mount_types;
+  const char * const *schemes, * const *mount_types;
   GVfsUriMapper *mapper;
   int i;
   
@@ -287,6 +292,119 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
     }
   
   return uri;
+}
+
+static void
+fill_supported_uri_schemes (GDaemonVfs *vfs)
+{
+  DBusConnection *connection;
+  DBusMessage *message, *reply;
+  DBusError error;
+  DBusMessageIter iter, array_iter;
+  gint i, count;
+  GList *l, *list = NULL;
+
+  connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+
+  
+  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+                                          G_VFS_DBUS_MOUNTTRACKER_PATH,
+					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					  G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNT_TYPES);
+
+  if (message == NULL)
+    _g_dbus_oom ();
+  
+  dbus_message_set_auto_start (message, TRUE);
+  
+  dbus_error_init (&error);
+  reply = dbus_connection_send_with_reply_and_block (connection,
+                                                     message,
+						     G_VFS_DBUS_TIMEOUT_MSECS,
+						     &error);
+  dbus_message_unref (message);
+
+  if (dbus_error_is_set (&error))
+    {
+      dbus_error_free (&error);
+      dbus_connection_unref (connection);
+      return;
+    }
+
+  if (reply == NULL)
+    _g_dbus_oom ();
+
+  dbus_message_iter_init (reply, &iter);
+  g_assert (dbus_message_iter_get_element_type (&iter) == DBUS_TYPE_STRING);
+
+  dbus_message_iter_recurse (&iter, &array_iter);
+  
+  count = 0;
+  do
+    {
+      gchar *type, *scheme = NULL;
+      GVfsUriMapper *mapper = NULL;
+      GMountSpec *spec;
+      gboolean new = TRUE;
+
+      dbus_message_iter_get_basic (&array_iter, &type);
+
+      spec = g_mount_spec_new (type);
+
+      mapper = g_hash_table_lookup (vfs->to_uri_hash, type);
+    
+      if (mapper)
+        scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, spec);
+
+      if (scheme == NULL)
+        scheme = g_strdup (type);
+
+      for (l = list; l != NULL; l = l->next)
+        {
+          if (strcmp (l->data, scheme) == 0)
+            {
+              new = FALSE;
+              break;
+            }
+        }
+
+      if (new)
+        {
+          list = g_list_prepend (list, scheme);
+          count++;
+        }
+      else
+        {
+          g_free (scheme);
+        }
+
+      g_mount_spec_unref (spec);
+    }
+  while (dbus_message_iter_next (&array_iter));
+
+  dbus_message_unref (reply);
+  dbus_connection_unref (connection);
+
+  list = g_list_prepend (list, g_strdup ("file"));
+  list = g_list_sort (list, (GCompareFunc) strcmp);
+
+  vfs->supported_uri_schemes = g_new0 (gchar *, count + 2);
+
+  for (i = 0, l = list; l != NULL; l = l->next, i++)
+    vfs->supported_uri_schemes[i] = l->data;
+
+  g_list_free (list);
+}
+
+static const gchar * const *
+g_daemon_vfs_get_supported_uri_schemes (GVfs *vfs)
+{
+  GDaemonVfs *daemon_vfs = G_DAEMON_VFS (vfs);
+
+  if (!daemon_vfs->supported_uri_schemes)
+    fill_supported_uri_schemes (daemon_vfs);
+    
+  return (const gchar * const *) G_DAEMON_VFS (vfs)->supported_uri_schemes;
 }
 
 static GMountRef *
@@ -631,6 +749,7 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
   vfs_class->get_priority = g_daemon_vfs_get_priority;
   vfs_class->get_file_for_path = g_daemon_vfs_get_file_for_path;
   vfs_class->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
+  vfs_class->get_supported_uri_schemes = g_daemon_vfs_get_supported_uri_schemes;
   vfs_class->parse_name = g_daemon_vfs_parse_name;
 }
 

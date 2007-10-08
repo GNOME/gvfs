@@ -15,7 +15,7 @@ g_vfs_uri_mapper_init (GVfsUriMapper *vfs)
 {
 }
 
-const char **
+const char * const *
 g_vfs_uri_mapper_get_handled_schemes (GVfsUriMapper  *mapper)
 {
   GVfsUriMapperClass *class;
@@ -39,7 +39,7 @@ g_vfs_uri_mapper_from_uri (GVfsUriMapper  *mapper,
   return (* class->from_uri) (mapper, uri, spec_out, path_out);
 }
 
-const char **
+const char * const *
 g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper)
 {
   GVfsUriMapperClass *class;
@@ -61,3 +61,15 @@ g_vfs_uri_mapper_to_uri (GVfsUriMapper  *mapper,
   
   return (* class->to_uri) (mapper, spec, path, allow_utf8);
 }
+
+char *
+g_vfs_uri_mapper_to_uri_scheme (GVfsUriMapper  *mapper,
+                                GMountSpec     *spec)
+{
+  GVfsUriMapperClass *class;
+  
+  class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
+  
+  return (* class->to_uri_scheme) (mapper, spec);
+}
+						       
