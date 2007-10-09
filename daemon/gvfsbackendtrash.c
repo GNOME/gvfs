@@ -13,8 +13,8 @@
 #include <glib/gi18n.h>
 #include <gio/gioerror.h>
 #include <gio/gfile.h>
-#include <gio/gvolumemonitor.h>
 #include <gio/gthemedicon.h>
+#include <gio/gunixmounts.h>
 
 #include "gvfsuriutils.h"
 
@@ -580,12 +580,10 @@ static void
 enumerate_root (GVfsBackend *backend,
                 GVfsJobEnumerate *job)
 {
-  GVolumeMonitor *monitor;
-  GList *volumes, *l;
-  GVolume *volume;
-  GFile *topdir_file;
-  char *topdir;
+  GList *mounts, *l;
+  const char *topdir;
   char *home_trash;
+  GUnixMount *mount;
 
   /* Always succeeds */
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -594,35 +592,18 @@ enumerate_root (GVfsBackend *backend,
   enumerate_root_trashdir (backend, job, g_get_user_data_dir (), home_trash);
   g_free (home_trash);
 
-  monitor = g_volume_monitor_get ();
-
-
-  volumes = g_volume_monitor_get_mounted_volumes (monitor);
-
-  for (l = volumes; l != NULL; l = l->next)
+  mounts = g_get_unix_mounts ();
+  for (l = mounts; l != NULL; l = l->next)
     {
-      volume = l->data;
-
-      topdir_file = g_volume_get_root (volume);
-      if (topdir_file)
-        {
-          if (g_file_is_native (topdir_file))
-            {
-              topdir = g_file_get_path (topdir_file);
-
-              if (topdir)
-                enumerate_root_topdir (backend, job, topdir);
-              
-              g_free (topdir);
-            }
-
-          g_object_unref (topdir_file);
-        }
+      mount = l->data;
       
-      g_object_unref (volume);
+      topdir = g_unix_mount_get_mount_path (mount);
+      if (topdir)
+        enumerate_root_topdir (backend, job, topdir);
+      
+      g_unix_mount_free (mount);
     }
-  g_list_free (volumes);
-
+  g_list_free (mounts);
   
   g_vfs_job_enumerate_done (job);
 }
