@@ -12,6 +12,7 @@
 #include <gdaemonfileinputstream.h>
 #include <gdaemonfileoutputstream.h>
 #include <gdaemondirectorymonitor.h>
+#include <gdaemonfilemonitor.h>
 #include <gdaemonfileenumerator.h>
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
@@ -1735,6 +1736,53 @@ g_daemon_file_monitor_dir (GFile* file,
   return monitor;
 }
 
+static GFileMonitor*
+g_daemon_file_monitor_file (GFile* file,
+			    GFileMonitorFlags flags,
+			    GCancellable *cancellable)
+{
+  GFileMonitor *monitor;
+  char *obj_path;
+  dbus_uint32_t flags_dbus;
+  GMountRef *mount_ref;
+  DBusMessage *reply;
+
+  flags_dbus = flags;
+
+  mount_ref = NULL;
+  reply = do_sync_path_call (file, 
+			     G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR,
+			     &mount_ref, NULL,
+			     cancellable, NULL,
+			     DBUS_TYPE_UINT32, &flags_dbus,
+			     0);
+  
+  if (reply == NULL)
+    {
+      if (mount_ref)
+	_g_mount_ref_unref (mount_ref);
+      return NULL;
+    }
+  
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_OBJECT_PATH, &obj_path,
+			      DBUS_TYPE_INVALID))
+    {
+      _g_mount_ref_unref (mount_ref);
+      dbus_message_unref (reply);
+      g_warning ("Invalid return value from monitor_dir");
+      return NULL;
+    }
+  
+  monitor = g_daemon_file_monitor_new (mount_ref->dbus_id,
+				       obj_path);
+  
+  _g_mount_ref_unref (mount_ref);
+  dbus_message_unref (reply);
+  
+  return monitor;
+}
+
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
@@ -1775,4 +1823,5 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->set_attribute = g_daemon_file_set_attribute;
   iface->make_symbolic_link = g_daemon_file_make_symbolic_link;
   iface->monitor_dir = g_daemon_file_monitor_dir;
+  iface->monitor_file = g_daemon_file_monitor_file;
 }

@@ -54,13 +54,17 @@ escape_pathname (const char *dir)
   char *d, *res;
   int count;
   char c;
-  
+
+  /* Skip initial slashes, we don't need those since they are always there */
+  while (*dir == '/')
+    dir++;
+
+  /* Underscores are doubled, count them */
   count = 0;
   p = dir;
   while (*p)
     {
-      if (*p == '%' ||
-          *p == '/')
+      if (*p == '_')
         count++;
       p++;
     }
@@ -72,15 +76,19 @@ escape_pathname (const char *dir)
   while (*p)
     {
       c = *p++;
-      if (c == '%')
+      if (c == '_')
         {
-          *d++ = '%';
-          *d++ = '%';
+          *d++ = '_';
+          *d++ = '_';
         }
       else if (c == '/')
         {
-          *d++ = '%';
-          *d++ = 's';
+          *d++ = '_';
+          
+          /* Skip consecutive slashes, they are unnecessary,
+             and break our escaping */
+          while (*p == '/')
+            p++;
         }
       else
         *d++ = c;
@@ -100,25 +108,29 @@ unescape_pathname (const char *escaped_dir, int len)
   if (len == -1)
     len = strlen (escaped_dir);
   
-  dir = g_malloc (len + 1);
+  dir = g_malloc (len + 1 + 1);
 
   p = escaped_dir;
   d = dir;
+  *d++ = '/';
   end = p + len;
   while (p < end)
     {
       c = *p++;
-      if (c == '%')
+      if (c == '_')
         {
           if (p == end)
-            *d++ = '%';
+            *d++ = '_';
           else
             {
-              c = *p++;
-              if (c == 's')
-                *d++ = '/';
+              c = *(p+1);
+              if (c == '_')
+                {
+                  p++;
+                  *d++ = '_';
+                }
               else
-                *d++ = '%';
+                *d++ = '/';
             }
         }
       else
@@ -952,6 +964,68 @@ do_create_dir_monitor (GVfsBackend *backend,
 }
 
 static void
+do_create_file_monitor (GVfsBackend *backend,
+                        GVfsJobCreateMonitor *job,
+                        const char *filename,
+                        GFileMonitorFlags flags)
+{
+  char *trashdir, *topdir, *relative_path, *trashfile;
+  
+  if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
+    {
+      /* The trash:/// root */
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        "trash: notification not supported yet");
+    }
+  else
+    {
+      GFile *file;
+      char *path;
+      GFileMonitor *monitor;
+      MonitorProxy *proxy;
+      
+      path = g_build_filename (trashdir, "files", trashfile, relative_path, NULL);
+      file = g_file_new_for_path (path);
+      g_free (path);
+
+      monitor = g_file_monitor_file (file,
+                                     flags,
+                                     G_VFS_JOB (job)->cancellable);
+      
+      if (monitor)
+        {
+          proxy = g_new0 (MonitorProxy, 1); 
+          proxy->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+          proxy->monitor = G_OBJECT (monitor);
+          proxy->base_path = g_strdup (filename);
+          proxy->base_file = g_object_ref (file);
+          proxy->mount_spec = g_mount_spec_ref (G_VFS_BACKEND_TRASH (backend)->mount_spec);
+          
+          g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy, (GDestroyNotify) monitor_proxy_free);
+          g_signal_connect (monitor, "changed", G_CALLBACK (proxy_changed), proxy);
+
+          g_vfs_job_create_monitor_set_obj_path (job,
+                                                 g_vfs_monitor_get_object_path (proxy->vfs_monitor));
+
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+        }
+      else
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _("Trash directory notification not supported"));
+        }
+      g_object_unref (file);
+  
+      g_free (trashdir);
+      g_free (trashfile);
+      g_free (relative_path);
+      g_free (topdir);
+    }
+}
+
+static void
 g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -968,4 +1042,5 @@ g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
   backend_class->enumerate = do_enumerate;
   backend_class->delete = do_delete;
   backend_class->create_dir_monitor = do_create_dir_monitor;
+  backend_class->create_file_monitor = do_create_file_monitor;
 }

@@ -362,6 +362,10 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR))
     job = g_vfs_job_create_monitor_new (connection, message, backend, TRUE);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR))
+    job = g_vfs_job_create_monitor_new (connection, message, backend, FALSE);
 
   if (job)
     {

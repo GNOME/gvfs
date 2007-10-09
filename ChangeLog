@@ -1,5 +1,20 @@
 2007-10-09  Alexander Larsson  <alexl@redhat.com>
 
+        * client/Makefile.am:
+        * client/gdaemonfile.c:
+        * client/gdaemonfilemonitor.[ch]:
+	Implement file monitor in client
+	
+        * common/gvfsdaemonprotocol.h:
+        * daemon/gvfsbackend.c:
+	Implement file monitor in daemon
+	
+        * daemon/gvfsbackendtrash.c:
+	Implement file monitor in trash backend
+	Make trash filename escaping nicer
+
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
         * configure.ac:
 	Pull in gio-unix-2.0
 	

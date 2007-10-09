@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO "QueryFilesystemInfo"
 #define G_VFS_DBUS_MOUNT_OP_ENUMERATE "Enumerate"
 #define G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR "CreateDirectoryMonitor"
+#define G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR "CreateFileMonitor"
 #define G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE "MountMountable"
 #define G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME "SetDisplayName"
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
