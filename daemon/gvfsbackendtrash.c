@@ -125,8 +125,13 @@ unescape_pathname (const char *escaped_dir, int len)
     len = strlen (escaped_dir);
 
   /* If first char is _ this is a homedir trash file */
-  if (*escaped_dir == '_')
-    return g_build_filename (g_get_user_data_dir (), "Trash", escaped_dir + 1, NULL);
+  if (len > 1 && *escaped_dir == '_')
+    {
+      char *trashname;
+      trashname = g_strndup (escaped_dir + 1, len - 1);
+      return g_build_filename (g_get_user_data_dir (), "Trash", trashname, NULL);
+      g_free (trashname);
+    }
   
   dir = g_malloc (len + 1 + 1);
 

@@ -1,6 +1,11 @@
 2007-10-09  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendtrash.c:
+	Correctly handle len arg in unescape_pathname
+	
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendtrash.c:
 	Nicer filenames for things in the home trash.
 	This is the common case, so lets make them look nice.
 
