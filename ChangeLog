@@ -1,5 +1,11 @@
 2007-10-09  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendtrash.c:
+	Check for trash dirs in fork to avoid getting stuck
+	on e.g. hanged nfs dirs
+
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
         * client/Makefile.am:
         * client/gdaemonfile.c:
         * client/gdaemonfilemonitor.[ch]:

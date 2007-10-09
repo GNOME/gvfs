@@ -4,6 +4,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -226,6 +227,233 @@ decode_path (const char *filename, char **trashdir, char **trashfile, char **rel
   else
     *relative_path = NULL;
   return TRUE;
+}
+
+typedef enum {
+  HAS_SYSTEM_DIR = 1<<0,
+  HAS_USER_DIR = 1<<1,
+} TopdirInfo;
+
+static TopdirInfo
+check_topdir (const char *topdir)
+{
+  TopdirInfo res;
+  struct stat statbuf;
+  char *sysadmin_dir, *sysadmin_dir_uid;
+  char *user_trash_basename, *user_trash;
+
+  res = 0;
+  
+  sysadmin_dir = g_build_filename (topdir, ".Trash", NULL);
+  if (lstat (sysadmin_dir, &statbuf) == 0 &&
+      S_ISDIR (statbuf.st_mode) &&
+      statbuf.st_mode & S_ISVTX)
+    {
+      /* We have a valid sysadmin .Trash dir, look for uid subdir */
+      sysadmin_dir_uid = g_strdup_printf ("%s/%d", sysadmin_dir, getuid());
+      
+      if (lstat (sysadmin_dir_uid, &statbuf) == 0 &&
+          S_ISDIR (statbuf.st_mode) &&
+          statbuf.st_uid == getuid())
+        res |= HAS_SYSTEM_DIR;
+      
+      g_free (sysadmin_dir_uid);
+    }
+  g_free (sysadmin_dir);
+
+  user_trash_basename =  g_strdup_printf (".Trash-%d", getuid());
+  user_trash = g_build_filename (topdir, user_trash_basename, NULL);
+  g_free (user_trash_basename);
+  
+  if (lstat (user_trash, &statbuf) == 0 &&
+      S_ISDIR (statbuf.st_mode) &&
+      statbuf.st_uid == getuid())
+    res |= HAS_USER_DIR;
+
+  g_free (user_trash);
+
+  return res;
+}
+
+static gboolean
+wait_for_fd_with_timeout (int fd, int timeout_secs)
+{
+  int res;
+          
+  do
+    {
+#ifdef HAVE_POLL
+      struct pollfd poll_fd;
+      poll_fd.fd = fd;
+      poll_fd.events = POLLIN;
+      res = poll (&poll_fd, 1, timeout_secs * 1000);
+#else
+      struct timeval tv;
+      fd_set read_fds;
+      
+      tv.tv_sec = timeout_secs;
+      tv.tv_usec = 0;
+      
+      FD_ZERO(&read_fds);
+      FD_SET(fd, &read_fds);
+      
+      res = select (fd + 1, &read_fds, NULL, NULL, &tv);
+#endif
+    } while (res == -1 && errno == EINTR);
+  
+  return res > 0;
+}
+
+/* We do this convoluted fork + pipe thing to avoid hanging
+   on e.g stuck NFS mounts, which is somewhat common since
+   we're basically stat:ing all mounted filesystems */
+static GList *
+get_topdir_info (GList *topdirs)
+{
+	GList *result = NULL;
+
+	while (topdirs)
+    {
+      guint32 topdir_info = 0;
+      pid_t pid;
+      int pipes[2];
+      int status;
+      
+      if (pipe (pipes) == -1)
+        goto error;
+      
+      pid = fork ();
+      if (pid == -1)
+        {
+          close (pipes[0]);
+          close (pipes[1]);
+          goto error;
+        }
+      
+      if (pid == 0)
+        {
+          /* Child */
+          close (pipes[0]);
+          
+          /* Fork an intermediate child that immediately exits
+           * so we can waitpid it. This means the final process
+           * will get owned by init and not go zombie.
+           */
+          pid = fork ();
+          
+          if (pid == 0)
+            {
+              /* Grandchild */
+              while (topdirs)
+                {
+                  guint32 info;
+                  info = check_topdir ((char *)topdirs->data);
+                  write (pipes[1], (char *)&info, sizeof (guint32));
+                  topdirs = topdirs->next;
+                }
+            }
+          close (pipes[1]);
+          _exit (0);
+          g_assert_not_reached ();
+        }
+      
+      /* Parent */
+      close (pipes[1]);
+
+      /* Wait for the intermidate process to die */
+    retry_waitpid:
+      if (waitpid (pid, &status, 0) < 0)
+        {
+          if (errno == EINTR)
+            goto retry_waitpid;
+          else if (errno == ECHILD)
+            ; /* do nothing, child already reaped */
+          else
+            g_warning ("waitpid() should not fail in get_topdir_info");
+        }
+      
+      while (topdirs)
+        {
+          if (!wait_for_fd_with_timeout (pipes[0], 3) ||
+              read (pipes[0], (char *)&topdir_info, sizeof (guint32)) != sizeof (guint32))
+            break;
+          
+          result = g_list_prepend (result, GUINT_TO_POINTER (topdir_info));
+          topdirs = topdirs->next;
+        }
+      
+      close (pipes[0]);
+      
+    error:
+      if (topdirs)
+        {
+          topdir_info = 0;
+          result = g_list_prepend (result, GUINT_TO_POINTER (topdir_info));
+          topdirs = topdirs->next;
+        }
+    }
+  
+	return g_list_reverse (result);
+}
+
+static GList *
+list_trash_dirs (void)
+{
+  GList *mounts, *l, *li;
+  const char *topdir;
+  char *home_trash;
+  GUnixMount *mount;
+  GList *dirs;
+  GList *topdirs;
+  GList *topdirs_info;
+
+  dirs = NULL;
+  
+  home_trash = g_build_filename (g_get_user_data_dir (), "Trash", NULL);
+  if (g_file_test (home_trash, G_FILE_TEST_IS_DIR))
+    dirs = g_list_prepend (dirs, home_trash);
+  else
+    g_free (home_trash);
+
+  topdirs = NULL;
+  mounts = g_get_unix_mounts ();
+  for (l = mounts; l != NULL; l = l->next)
+    {
+      mount = l->data;
+      
+      topdir = g_unix_mount_get_mount_path (mount);
+      topdirs = g_list_prepend (topdirs, g_strdup (topdir));
+      
+      g_unix_mount_free (mount);
+    }
+  g_list_free (mounts);
+
+  topdirs_info = get_topdir_info (topdirs);
+
+  for (l = topdirs, li = topdirs_info; l != NULL && li != NULL; l = l->next, li = li->next)
+    {
+      topdir = l->data;
+      TopdirInfo info = GPOINTER_TO_UINT (li->data);
+      char *basename, *trashdir;
+
+      if (info & HAS_SYSTEM_DIR)
+        {
+          basename = g_strdup_printf ("%d", getuid());
+          trashdir = g_build_filename (topdir, ".Trash", basename, NULL);
+          g_free (basename);
+          dirs = g_list_prepend (dirs, trashdir);
+        }
+      
+      if (info & HAS_USER_DIR)
+        {
+          basename = g_strdup_printf (".Trash-%d", getuid());
+          trashdir = g_build_filename (topdir, basename, NULL);
+          g_free (basename);
+          dirs = g_list_prepend (dirs, trashdir);
+        }
+    }
+
+  return g_list_reverse (dirs);
 }
 
 static void
@@ -546,76 +774,29 @@ enumerate_root_trashdir (GVfsBackend *backend,
     }
 }
 
-
-static void
-enumerate_root_topdir (GVfsBackend *backend,
-                       GVfsJobEnumerate *job,
-                       const char *topdir)
-{
-  struct stat statbuf;
-  char *sysadmin_dir, *sysadmin_dir_uid;
-  char *user_trash_basename, *user_trash;
-
-  /* TODO: This stats all filesystems. It should take more care to not get locked up
-     on e.g. hanged nfs mounts. See gnome-vfs-unix-mounts.c for some code to handle this. */ 
-
-  sysadmin_dir = g_build_filename (topdir, ".Trash", NULL);
-  if (lstat (sysadmin_dir, &statbuf) == 0 &&
-      S_ISDIR (statbuf.st_mode) &&
-      statbuf.st_mode & S_ISVTX)
-    {
-      /* We have a valid sysadmin .Trash dir, look for uid subdir */
-      sysadmin_dir_uid = g_strdup_printf ("%s/%d", sysadmin_dir, getuid());
-      
-      if (lstat (sysadmin_dir_uid, &statbuf) == 0 &&
-          S_ISDIR (statbuf.st_mode) &&
-          statbuf.st_uid == getuid())
-        enumerate_root_trashdir (backend, job, topdir, sysadmin_dir_uid);
-      
-      g_free (sysadmin_dir_uid);
-    }
-  g_free (sysadmin_dir);
-
-  user_trash_basename =  g_strdup_printf (".Trash-%d", getuid());
-  user_trash = g_build_filename (topdir, user_trash_basename, NULL);
-  g_free (user_trash_basename);
-  
-  if (lstat (user_trash, &statbuf) == 0 &&
-      S_ISDIR (statbuf.st_mode) &&
-      statbuf.st_uid == getuid())
-    enumerate_root_trashdir (backend, job, topdir, user_trash);
-
-  g_free (user_trash);
-}
-
 static void
 enumerate_root (GVfsBackend *backend,
                 GVfsJobEnumerate *job)
 {
-  GList *mounts, *l;
-  const char *topdir;
-  char *home_trash;
-  GUnixMount *mount;
+  GList *trashdirs, *l;
+  char *trashdir;
+  char *topdir;
 
   /* Always succeeds */
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  
-  home_trash = g_build_filename (g_get_user_data_dir (), "Trash", NULL);
-  enumerate_root_trashdir (backend, job, g_get_user_data_dir (), home_trash);
-  g_free (home_trash);
 
-  mounts = g_get_unix_mounts ();
-  for (l = mounts; l != NULL; l = l->next)
+  trashdirs = list_trash_dirs ();
+  
+  for (l = trashdirs; l != NULL; l = l->next)
     {
-      mount = l->data;
-      
-      topdir = g_unix_mount_get_mount_path (mount);
-      if (topdir)
-        enumerate_root_topdir (backend, job, topdir);
-      
-      g_unix_mount_free (mount);
+      trashdir = l->data;
+      topdir = get_top_dir_for_trash_dir (trashdir);
+
+      enumerate_root_trashdir (backend, job, topdir, trashdir);
+      g_free (trashdir);
+      g_free (topdir);
     }
-  g_list_free (mounts);
+  g_list_free (trashdirs);
   
   g_vfs_job_enumerate_done (job);
 }
