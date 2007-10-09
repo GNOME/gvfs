@@ -55,6 +55,21 @@ escape_pathname (const char *dir)
   char *d, *res;
   int count;
   char c;
+  const char *basename;
+  const char *user_data_dir;
+
+  /* Special case the homedir trash to get nice filenames for that */
+  user_data_dir = g_get_user_data_dir ();
+  if (g_str_has_prefix (dir, user_data_dir) &&
+      (g_str_has_prefix (dir + strlen (user_data_dir), "/Trash/")))
+    {
+      basename = dir + strlen (user_data_dir) + strlen ("/Trash/");
+
+      res = g_malloc (strlen (basename) + 2);
+      res[0] = '_';
+      strcpy (res + 1, basename);
+      return res;
+    }
 
   /* Skip initial slashes, we don't need those since they are always there */
   while (*dir == '/')
@@ -108,6 +123,10 @@ unescape_pathname (const char *escaped_dir, int len)
 
   if (len == -1)
     len = strlen (escaped_dir);
+
+  /* If first char is _ this is a homedir trash file */
+  if (*escaped_dir == '_')
+    return g_build_filename (g_get_user_data_dir (), "Trash", escaped_dir + 1, NULL);
   
   dir = g_malloc (len + 1 + 1);
 
