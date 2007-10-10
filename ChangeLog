@@ -1,6 +1,11 @@
 2007-10-10  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendtrash.c:
+	Support file monitor on trash:/// (for icon)
+
+2007-10-10  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendtrash.c:
 	Add support for directory monitor on root dir
 
 2007-10-09  Alexander Larsson  <alexl@redhat.com>

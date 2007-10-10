@@ -82,6 +82,7 @@ struct _GVfsBackendTrash
   GList *top_files; /* Files in toplevel dir */
 
   /* All these are protected by the root_monitor lock */
+  GVfsMonitor *file_vfs_monitor;
   GVfsMonitor *vfs_monitor;
   GList *trash_dir_monitors; /* GDirectoryMonitor objects */
   GUnixMountMonitor *mount_monitor;
@@ -742,7 +743,7 @@ set_trash_files (gpointer _data)
   char *name;
   GList *added;
   GList *removed;
-  GVfsMonitor *vfs_monitor;
+  GVfsMonitor *vfs_monitor, *file_vfs_monitor;
 
   trash_backend = G_VFS_BACKEND_TRASH (data->backend);
   
@@ -752,6 +753,10 @@ set_trash_files (gpointer _data)
   vfs_monitor = NULL;
   if (trash_backend->vfs_monitor)
     vfs_monitor = g_object_ref (trash_backend->vfs_monitor);
+  
+  file_vfs_monitor = NULL;
+  if (trash_backend->file_vfs_monitor)
+    file_vfs_monitor = g_object_ref (trash_backend->file_vfs_monitor);
   G_UNLOCK (root_monitor);
 
   if (vfs_monitor)
@@ -825,10 +830,24 @@ set_trash_files (gpointer _data)
                                     G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
                                     trash_backend->mount_spec, "/",
                                     NULL, NULL);
-          /* TODO: Update file monitor for root too */
         }
       
       g_object_unref (vfs_monitor);
+    }
+
+  if (file_vfs_monitor)
+    {
+      if ((trash_backend->top_files == NULL && data->names != NULL) ||
+          (trash_backend->top_files != NULL && data->names == NULL))
+        {
+          /* "fullness" changed => icon change */
+          g_vfs_monitor_emit_event (file_vfs_monitor,
+                                    G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
+                                    trash_backend->mount_spec, "/",
+                                    NULL, NULL);
+        }
+      
+      g_object_unref (file_vfs_monitor);
     }
 
   g_list_foreach (trash_backend->top_files, (GFunc)g_free, NULL);
@@ -1522,6 +1541,7 @@ do_create_dir_monitor (GVfsBackend *backend,
 
   if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
     {
+      /* The trash:/// root */
       vfs_monitor = do_create_root_monitor (backend);
       
       g_vfs_job_create_monitor_set_obj_path (job,
@@ -1583,14 +1603,27 @@ do_create_file_monitor (GVfsBackend *backend,
                         const char *filename,
                         GFileMonitorFlags flags)
 {
+  GVfsBackendTrash *trash_backend;
   char *trashdir, *topdir, *relative_path, *trashfile;
+  GVfsMonitor *vfs_monitor;
+
+  trash_backend = G_VFS_BACKEND_TRASH (backend);
   
   if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
     {
       /* The trash:/// root */
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                        G_IO_ERROR_NOT_SUPPORTED,
-                        "trash: notification not supported yet");
+      G_LOCK (root_monitor);
+      if (trash_backend->file_vfs_monitor == NULL)
+        trash_backend->file_vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+
+      vfs_monitor = g_object_ref (trash_backend->file_vfs_monitor);
+      g_object_add_weak_pointer (G_OBJECT (vfs_monitor), (gpointer *)&trash_backend->file_vfs_monitor);
+      G_UNLOCK (root_monitor);
+      
+      g_vfs_job_create_monitor_set_obj_path (job,
+                                             g_vfs_monitor_get_object_path (vfs_monitor));
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_object_unref (vfs_monitor);
     }
   else
     {
