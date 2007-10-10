@@ -37,16 +37,67 @@
 #include "gvfsjobcreatemonitor.h"
 #include "gvfsdaemonprotocol.h"
 
+/* This is an implementation of the read side of the freedesktop trash specification.
+   For more details on that, see: http://www.freedesktop.org/wiki/Specifications/trash-spec
+
+   It supplies the virtual trash: location that contains the merged contents of all the
+   trash directories currently mounted on the system. In order to not have filename
+   conflicts in the toplevel trash: directory (as files in different trash dirs can have
+   the same name) we encode the filenames in the toplevel in a way such that:
+   1) There are no conflicts
+   2) You can know from the filename itself which trash directory it came from
+   3) Files in the trash in your homedir look "nicest"
+   This is handled by escape_pathname() and unescape_pathname()
+
+   This should be pretty straightforward, but there are two complications:
+
+   * When looking for trash directories we need to look in the root of all mounted
+     filesystems. This is problematic, beacuse it means as soon as there is at least
+     one hanged NFS mount the whole process will block until that comes back. This
+     is pretty common on some kinds of machines. We avoid this by forking and doing the
+     stats in a child process.
+
+   * Monitoring the root directory is complicated, as its spread over many directories
+     that all have to be monitored. Furthermore, directories can be added/removed
+     at any time if something is mounted/unmounted, and in the case of unmounts we
+     need to generate deleted events for the files we lost. So, we need to keep track
+     of the current contents of the trash dirs.
+
+     The solution used is to keep a list of all the files currently in the toplevel
+     directory, and then whenever we re-scan that we send out events based on changes
+     from the old list to the new list. And, in addition to user read-dirs we re-scan
+     the toplevel when filesystems are mounted/unmounted and when files are added/deleted
+     in currently monitored trash directories.
+ */ 
+
+
 
 struct _GVfsBackendTrash
 {
   GVfsBackend parent_instance;
 
   GMountSpec *mount_spec;
+
+  /* This is only set on the main thread */
+  GList *top_files; /* Files in toplevel dir */
+
+  /* All these are protected by the root_monitor lock */
+  GVfsMonitor *vfs_monitor;
+  GList *trash_dir_monitors; /* GDirectoryMonitor objects */
+  GUnixMountMonitor *mount_monitor;
+  gboolean trash_file_update_running;
+  gboolean trash_file_update_scheduled;
+  gboolean trash_file_update_monitors_scheduled;
 };
 
+G_LOCK_DEFINE_STATIC(root_monitor);
 
 G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND);
+
+static void   schedule_update_trash_files (GVfsBackendTrash *backend,
+                                           gboolean          update_trash_dirs);
+static GList *enumerate_root              (GVfsBackend      *backend,
+                                           GVfsJobEnumerate *job);
 
 static char *
 escape_pathname (const char *dir)
@@ -256,6 +307,7 @@ decode_path (const char *filename, char **trashdir, char **trashfile, char **rel
 typedef enum {
   HAS_SYSTEM_DIR = 1<<0,
   HAS_USER_DIR = 1<<1,
+  HAS_TRASH_FILES = 1<<1,
 } TopdirInfo;
 
 static TopdirInfo
@@ -279,7 +331,12 @@ check_topdir (const char *topdir)
       if (lstat (sysadmin_dir_uid, &statbuf) == 0 &&
           S_ISDIR (statbuf.st_mode) &&
           statbuf.st_uid == getuid())
-        res |= HAS_SYSTEM_DIR;
+        {
+          res |= HAS_SYSTEM_DIR;
+
+          if (statbuf.st_nlink != 2)
+            res |= HAS_TRASH_FILES;
+        }
       
       g_free (sysadmin_dir_uid);
     }
@@ -292,7 +349,12 @@ check_topdir (const char *topdir)
   if (lstat (user_trash, &statbuf) == 0 &&
       S_ISDIR (statbuf.st_mode) &&
       statbuf.st_uid == getuid())
-    res |= HAS_USER_DIR;
+    {
+      res |= HAS_USER_DIR;
+      
+      if (statbuf.st_nlink != 2)
+        res |= HAS_TRASH_FILES;
+    }
 
   g_free (user_trash);
 
@@ -430,12 +492,20 @@ list_trash_dirs (void)
   GList *dirs;
   GList *topdirs;
   GList *topdirs_info;
+  struct stat statbuf;
+  gboolean has_trash_files;
 
   dirs = NULL;
+  has_trash_files = FALSE;
   
   home_trash = g_build_filename (g_get_user_data_dir (), "Trash", NULL);
-  if (g_file_test (home_trash, G_FILE_TEST_IS_DIR))
-    dirs = g_list_prepend (dirs, home_trash);
+  if (lstat (home_trash, &statbuf) == 0 &&
+      S_ISDIR (statbuf.st_mode))
+    {
+      dirs = g_list_prepend (dirs, home_trash);
+      if (statbuf.st_nlink != 2)
+        has_trash_files = TRUE;;
+    }
   else
     g_free (home_trash);
 
@@ -475,6 +545,9 @@ list_trash_dirs (void)
           g_free (basename);
           dirs = g_list_prepend (dirs, trashdir);
         }
+
+      if (info & HAS_TRASH_FILES)
+        has_trash_files = TRUE;
     }
 
   return g_list_reverse (dirs);
@@ -507,15 +580,20 @@ g_vfs_backend_trash_init (GVfsBackendTrash *trash_backend)
   trash_backend->mount_spec = mount_spec;
 }
 
-static gboolean
-try_mount (GVfsBackend *backend,
-           GVfsJobMount *job,
-           GMountSpec *mount_spec,
-           GMountSource *mount_source,
-           gboolean is_automount)
+static void
+do_mount (GVfsBackend *backend,
+          GVfsJobMount *job,
+          GMountSpec *mount_spec,
+          GMountSource *mount_source,
+          gboolean is_automount)
 {
+  GVfsBackendTrash *trash_backend = G_VFS_BACKEND_TRASH (backend);
+  GList *names;
+
+  names = enumerate_root (backend, NULL);
+  trash_backend->top_files = g_list_sort (names, (GCompareFunc)strcmp);
+  
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  return TRUE;
  }
 
 static void
@@ -649,6 +727,131 @@ do_close_read (GVfsBackend *backend,
 
 }
 
+typedef struct {
+  GVfsBackend *backend;
+  GList *names;
+} SetHasTrashFilesData;
+
+static gboolean
+set_trash_files (gpointer _data)
+{
+  GVfsBackendTrash *trash_backend;
+  SetHasTrashFilesData *data = _data;
+  GList *new, *old, *l;
+  int cmp;
+  char *name;
+  GList *added;
+  GList *removed;
+  GVfsMonitor *vfs_monitor;
+
+  trash_backend = G_VFS_BACKEND_TRASH (data->backend);
+  
+  data->names = g_list_sort (data->names, (GCompareFunc)strcmp);
+ 
+  G_LOCK (root_monitor);
+  vfs_monitor = NULL;
+  if (trash_backend->vfs_monitor)
+    vfs_monitor = g_object_ref (trash_backend->vfs_monitor);
+  G_UNLOCK (root_monitor);
+
+  if (vfs_monitor)
+    {
+      added = NULL;
+      removed = NULL;
+      
+      old = trash_backend->top_files;
+      new = data->names;
+      
+      while (new != NULL || old != NULL)
+        {
+          if (new == NULL)
+            {
+              /* old deleted */
+              removed = g_list_prepend (removed, old->data);
+              old = old->next;
+            }
+          else if (old == NULL)
+            {
+              /* new added */
+              added = g_list_prepend (added, new->data);
+              new = new->next;
+            }
+          else if ((cmp = strcmp (new->data, old->data)) == 0)
+            {
+              old = old->next;
+              new = new->next;
+            }
+          else if (cmp < 0)
+            {
+              /* new added */
+              added = g_list_prepend (added, new->data);
+              new = new->next;
+            }
+          else if (cmp > 0)
+            {
+              /* old deleted */
+              removed = g_list_prepend (removed, old->data);
+              old = old->next;
+            }
+        }
+
+      for (l = removed; l != NULL; l = l->next)
+        {
+          name = g_strconcat ("/", l->data, NULL);
+          g_vfs_monitor_emit_event (vfs_monitor,
+                                    G_FILE_MONITOR_EVENT_DELETED,
+                                    trash_backend->mount_spec, name,
+                                    NULL, NULL);
+          g_free (name);
+        }
+      g_list_free (removed);
+      
+      for (l = added; l != NULL; l = l->next)
+        {
+          name = g_strconcat ("/", l->data, NULL);
+          g_vfs_monitor_emit_event (vfs_monitor,
+                                    G_FILE_MONITOR_EVENT_CREATED,
+                                    trash_backend->mount_spec, name,
+                                    NULL, NULL);
+          g_free (name);
+        }
+      g_list_free (added);
+      
+      if ((trash_backend->top_files == NULL && data->names != NULL) ||
+          (trash_backend->top_files != NULL && data->names == NULL))
+        {
+          /* "fullness" changed => icon change */
+          g_vfs_monitor_emit_event (vfs_monitor,
+                                    G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
+                                    trash_backend->mount_spec, "/",
+                                    NULL, NULL);
+          /* TODO: Update file monitor for root too */
+        }
+      
+      g_object_unref (vfs_monitor);
+    }
+
+  g_list_foreach (trash_backend->top_files, (GFunc)g_free, NULL);
+  g_list_free (trash_backend->top_files);
+
+  trash_backend->top_files = data->names;
+  
+  g_free (data);
+  
+  return FALSE;
+}
+static void
+queue_set_trash_files (GVfsBackend *backend,
+                       GList *names)
+{
+  SetHasTrashFilesData *data;
+
+  data = g_new (SetHasTrashFilesData, 1);
+  data->backend = backend;
+  data->names = names;
+  g_idle_add (set_trash_files, data);
+}
+
 static void
 add_extra_trash_info (GFileInfo *file_info,
                       const char *topdir,
@@ -742,7 +945,8 @@ static void
 enumerate_root_trashdir (GVfsBackend *backend,
                          GVfsJobEnumerate *job,
                          const char *topdir,
-                         const char *trashdir)
+                         const char *trashdir,
+                         GList **names)
 { 
   GFile *file, *files_file;
   GFileEnumerator *enumerator;
@@ -757,9 +961,9 @@ enumerate_root_trashdir (GVfsBackend *backend,
   files_file = g_file_get_child (file, "files");
   enumerator =
     g_file_enumerate_children (files_file,
-                               job->attributes,
-                               job->flags,
-                               G_VFS_JOB (job)->cancellable,
+                               job ? job->attributes : G_FILE_ATTRIBUTE_STD_NAME,
+                               job ? job->flags : 0,
+                               job ? G_VFS_JOB (job)->cancellable : NULL,
                                NULL);
   g_object_unref (files_file);
   g_object_unref (file);
@@ -767,7 +971,7 @@ enumerate_root_trashdir (GVfsBackend *backend,
   if (enumerator)
     {
       while ((info = g_file_enumerator_next_file (enumerator,
-                                                  G_VFS_JOB (job)->cancellable,
+                                                  job ? G_VFS_JOB (job)->cancellable : NULL,
                                                   NULL)) != NULL)
         {
           name = g_file_info_get_name (info);
@@ -785,44 +989,48 @@ enumerate_root_trashdir (GVfsBackend *backend,
           new_name_escaped = escape_pathname (new_name);
           g_free (new_name);
           g_file_info_set_name (info, new_name_escaped);
-          g_free (new_name_escaped);
-          
-          g_vfs_job_enumerate_add_info   (job, info);
+
+          *names = g_list_prepend (*names, new_name_escaped); /* Takes over ownership */
+
+          if (job)
+            g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (info);
         }
       
       g_file_enumerator_close (enumerator,
-                               G_VFS_JOB (job)->cancellable,
+                               job ? G_VFS_JOB (job)->cancellable : NULL,
                                NULL);
       g_object_unref (enumerator);
     }
 }
 
-static void
+static GList *
 enumerate_root (GVfsBackend *backend,
                 GVfsJobEnumerate *job)
 {
   GList *trashdirs, *l;
   char *trashdir;
   char *topdir;
-
-  /* Always succeeds */
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+  GList *names;
 
   trashdirs = list_trash_dirs ();
-  
+
+  names = NULL;
   for (l = trashdirs; l != NULL; l = l->next)
     {
       trashdir = l->data;
       topdir = get_top_dir_for_trash_dir (trashdir);
 
-      enumerate_root_trashdir (backend, job, topdir, trashdir);
+      enumerate_root_trashdir (backend, job, topdir, trashdir, &names);
       g_free (trashdir);
       g_free (topdir);
     }
   g_list_free (trashdirs);
-  
-  g_vfs_job_enumerate_done (job);
+
+  if (job)
+    g_vfs_job_enumerate_done (job);
+
+  return names;
 }
 
 static void
@@ -833,9 +1041,16 @@ do_enumerate (GVfsBackend *backend,
               GFileQueryInfoFlags flags)
 {
   char *trashdir, *topdir, *relative_path, *trashfile;
+  GList *names;
 
   if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
-    enumerate_root (backend, job);
+    {
+      /* Always succeeds */
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      
+      names = enumerate_root (backend, job);
+      queue_set_trash_files (backend, names);
+    }
   else
     {
       GFile *file;
@@ -909,8 +1124,11 @@ do_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, _("Trashcan"));
       g_file_info_set_content_type (info, "inode/directory");
 
-      /* TODO: Add -full version? */
-      icon = g_themed_icon_new ("user-trash");
+      if (G_VFS_BACKEND_TRASH (backend)->top_files != NULL)
+        icon = g_themed_icon_new ("user-trash-full");
+      else
+        icon = g_themed_icon_new ("user-trash");
+        
       /*TODO: Crashes: g_file_info_set_icon (info, icon); */
       g_object_unref (icon);
       
@@ -1107,19 +1325,210 @@ proxy_changed (GFileMonitor* monitor,
 }
 
 static void
+trash_dir_changed (GDirectoryMonitor      *monitor,
+                   GFile                  *child,
+                   GFile                  *other_file,
+                   GFileMonitorEvent       event_type,
+                   GVfsBackendTrash       *backend)
+{
+  if (event_type == G_FILE_MONITOR_EVENT_DELETED ||
+      event_type == G_FILE_MONITOR_EVENT_CREATED)
+    schedule_update_trash_files (backend, FALSE);
+}
+
+static void
+update_trash_dir_monitors (GVfsBackendTrash *backend)
+{
+  GFile *file;
+  char *trashdir;
+  GDirectoryMonitor *monitor;
+  GList *monitors, *l, *trashdirs;
+
+  /* Remove old monitors */
+
+  G_LOCK (root_monitor);
+  monitors = backend->trash_dir_monitors;
+  backend->trash_dir_monitors = NULL;
+  G_UNLOCK (root_monitor);
+  
+  for (l = monitors; l != NULL; l = l->next)
+    {
+      monitor = l->data;
+      g_object_unref (monitor);
+    }
+  
+  g_list_free (monitors);
+
+  monitors = NULL;
+
+  /* Add new ones for all trash dirs */
+  
+  trashdirs = list_trash_dirs ();
+  for (l = trashdirs; l != NULL; l = l->next)
+    {
+      char *filesdir;
+      
+      trashdir = l->data;
+      
+      filesdir = g_build_filename (trashdir, "files", NULL);
+      file = g_file_new_for_path (filesdir);
+      g_free (filesdir);
+      monitor = g_file_monitor_directory (file, 0, NULL);
+      g_object_unref (file);
+      
+      if (monitor)
+        {
+          g_signal_connect (monitor, "changed", G_CALLBACK (trash_dir_changed), backend);
+          monitors = g_list_prepend (monitors, monitor);
+        }
+      g_free (trashdir);
+    }
+  
+  g_list_free (trashdirs);
+
+  G_LOCK (root_monitor);
+  backend->trash_dir_monitors = g_list_concat (backend->trash_dir_monitors, monitors);
+  G_UNLOCK (root_monitor);
+}
+
+
+static gpointer
+update_trash_files_in_thread (GVfsBackendTrash *backend)
+{
+  GList *names;
+  gboolean do_monitors;
+
+  G_LOCK (root_monitor);
+  backend->trash_file_update_running = TRUE;
+  backend->trash_file_update_scheduled = FALSE;
+  do_monitors = backend->trash_file_update_monitors_scheduled;
+  backend->trash_file_update_monitors_scheduled = FALSE;
+  G_UNLOCK (root_monitor);
+
+ loop:
+  if (do_monitors)
+    update_trash_dir_monitors (backend);
+  
+  names = enumerate_root (G_VFS_BACKEND (backend), NULL);
+  queue_set_trash_files (G_VFS_BACKEND (backend), names);
+
+  G_LOCK (root_monitor);
+  if (backend->trash_file_update_scheduled)
+    {
+      backend->trash_file_update_scheduled = FALSE;
+      do_monitors = backend->trash_file_update_monitors_scheduled;
+      backend->trash_file_update_monitors_scheduled = FALSE;
+      G_UNLOCK (root_monitor);
+      goto loop;
+    }
+  
+  backend->trash_file_update_running = FALSE;
+  G_UNLOCK (root_monitor);
+  
+  return NULL;
+  
+}
+
+static void
+schedule_update_trash_files (GVfsBackendTrash *backend,
+                             gboolean update_trash_dirs)
+{
+  G_LOCK (root_monitor);
+
+  backend->trash_file_update_scheduled = TRUE;
+  backend->trash_file_update_monitors_scheduled |= update_trash_dirs;
+  
+  if (!backend->trash_file_update_running)
+    g_thread_create ((GThreadFunc)update_trash_files_in_thread, backend, FALSE, NULL);
+      
+  G_UNLOCK (root_monitor);
+}
+
+static void
+mounts_changed (GUnixMountMonitor *mount_monitor,
+                GVfsBackendTrash *backend)
+{
+  schedule_update_trash_files (backend, TRUE);
+}
+
+static void
+vfs_monitor_gone 	(gpointer      data,
+                   GObject      *where_the_object_was)
+{
+  GVfsBackendTrash *backend;
+
+  backend = G_VFS_BACKEND_TRASH (data);
+  
+  G_LOCK (root_monitor);
+  g_assert ((void *)backend->vfs_monitor == (void *)where_the_object_was);
+  backend->vfs_monitor = NULL;
+  g_object_unref (backend->mount_monitor);
+  backend->mount_monitor = NULL;
+
+  g_list_foreach (backend->trash_dir_monitors, (GFunc)g_object_unref, NULL);
+  g_list_free (backend->trash_dir_monitors);
+  backend->trash_dir_monitors = NULL;
+
+  backend->trash_file_update_scheduled = FALSE;
+  backend->trash_file_update_monitors_scheduled = FALSE;
+  
+  G_UNLOCK (root_monitor);
+}
+
+static GVfsMonitor *
+do_create_root_monitor (GVfsBackend *backend)
+{
+  GVfsBackendTrash *trash_backend;
+  GVfsMonitor *vfs_monitor;
+  gboolean created;
+
+  trash_backend = G_VFS_BACKEND_TRASH (backend);
+  
+  created = FALSE;
+  G_LOCK (root_monitor);
+  if (trash_backend->vfs_monitor == NULL)
+    {
+      trash_backend->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+      created = TRUE;
+    }
+  
+  vfs_monitor = g_object_ref (trash_backend->vfs_monitor);
+  G_UNLOCK (root_monitor);
+  
+  if (created)
+    {
+      update_trash_dir_monitors (trash_backend);
+      trash_backend->mount_monitor = g_unix_mount_monitor_new ();
+      g_signal_connect (trash_backend->mount_monitor,
+                        "mounts_changed", G_CALLBACK (mounts_changed), backend);
+      
+      g_object_weak_ref (G_OBJECT (vfs_monitor),
+                         vfs_monitor_gone,
+                         backend);
+      
+    }
+  
+  return vfs_monitor;
+}
+
+static void
 do_create_dir_monitor (GVfsBackend *backend,
                        GVfsJobCreateMonitor *job,
                        const char *filename,
                        GFileMonitorFlags flags)
 {
   char *trashdir, *topdir, *relative_path, *trashfile;
-  
+  GVfsMonitor *vfs_monitor;
+
   if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
     {
-      /* The trash:/// root */
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                        G_IO_ERROR_NOT_SUPPORTED,
-                        "trash: notification not supported yet");
+      vfs_monitor = do_create_root_monitor (backend);
+      
+      g_vfs_job_create_monitor_set_obj_path (job,
+                                             g_vfs_monitor_get_object_path (vfs_monitor));
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+      
+      g_object_unref (vfs_monitor);
     }
   else
     {
@@ -1238,7 +1647,7 @@ g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
   
   gobject_class->finalize = g_vfs_backend_trash_finalize;
 
-  backend_class->try_mount = try_mount;
+  backend_class->mount = do_mount;
   backend_class->open_for_read = do_open_for_read;
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
