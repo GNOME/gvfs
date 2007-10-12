@@ -1,3 +1,9 @@
+2007-10-12  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsdaemon.c:
+	Build fixes
+	Patch from Milosz Derezynski <internalerror@gmail.com>
+
 2007-10-10  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendtrash.c:

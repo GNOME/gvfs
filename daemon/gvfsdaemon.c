@@ -2,12 +2,15 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/errno.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <glib-object.h>
 #include <dbus-gmain.h>
 #include <gvfsdaemon.h>
