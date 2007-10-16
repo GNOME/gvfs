@@ -1,3 +1,14 @@
+2007-10-16  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gvfsdaemonprotocol.[ch]:
+	Make sending icons actually work
+	
+        * daemon/gvfsbackendtrash.c:
+	Set icon for toplevel
+	
+        * daemon/gvfsmonitor.c:
+        Initialize error before call
+
 2007-10-12  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsdaemon.c:

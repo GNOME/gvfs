@@ -144,7 +144,7 @@ typedef struct {
   DBUS_STRUCT_END_CHAR_AS_STRING 
 
 
-gchar     *_g_dbus_type_from_file_attribute_type (GFileAttributeType          type);
+const char*_g_dbus_type_from_file_attribute_type (GFileAttributeType          type);
 void       _g_dbus_append_file_attribute         (DBusMessageIter            *iter,
 						  const char                 *attribute,
 						  const GFileAttributeValue  *value);

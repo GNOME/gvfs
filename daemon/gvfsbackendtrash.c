@@ -1148,7 +1148,7 @@ do_query_info (GVfsBackend *backend,
       else
         icon = g_themed_icon_new ("user-trash");
         
-      /*TODO: Crashes: g_file_info_set_icon (info, icon); */
+      g_file_info_set_icon (info, icon);
       g_object_unref (icon);
       
       g_file_info_set_attribute_boolean (info,

@@ -141,6 +141,7 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 					G_VFS_DBUS_MONITOR_INTERFACE,
 					G_VFS_DBUS_MONITOR_OP_UNSUBSCRIBE))
     {
+      dbus_error_init (&derror);
       if (!dbus_message_get_args (message, &derror, 
 				  DBUS_TYPE_OBJECT_PATH, &object_path,
 				  0))
