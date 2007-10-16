@@ -1,5 +1,11 @@
 2007-10-16  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        (g_daemon_file_get_parent):
+	Fix get_parent to handle files that are in the root directory
+
+2007-10-16  Alexander Larsson  <alexl@redhat.com>
+
         * common/gvfsdaemonprotocol.[ch]:
 	Make sending icons actually work
 	

@@ -200,7 +200,8 @@ g_daemon_file_get_parent (GFile *file)
 
   path = daemon_file->path;
   base = strrchr (path, '/');
-  if (base == NULL || base == path)
+  if (base == NULL ||
+      *(base+1) == 0)
     return NULL;
 
   while (base > path && *base == '/')
