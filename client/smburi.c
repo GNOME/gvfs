@@ -235,6 +235,7 @@ smb_to_uri (GVfsUriMapper *mapper,
   type = g_mount_spec_get_type (spec);
 
   uri->scheme = g_strdup ("smb");
+  uri->port = -1;
   
   if (strcmp (type, "smb-network") == 0)
     {
