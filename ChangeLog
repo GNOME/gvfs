@@ -1,5 +1,16 @@
 2007-10-19  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonvfs.[ch]:
+        * client/gdaemonvolume.c:
+        * client/gdaemonvolumemonitor.[ch]:
+	Implement using DEFINE_DYNAMIC_TYPE
+	Actually register GDaemonVolumeMonitor in giomodule
+	
+        * common/gmounttracker.c:
+	Update to the on-dbus format for mounts
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
 	* client/smburi.c (smb_to_uri):
 	No port by default
 

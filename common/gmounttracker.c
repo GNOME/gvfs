@@ -89,10 +89,11 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   DBusMessageIter struct_iter;
   GMountInfo *info;
   GMountSpec *mount_spec;
-  gchar *display_name;
-  gchar *icon;
-  gchar *dbus_id;
-  gchar *obj_path;
+  char *display_name;
+  char *icon;
+  char *prefered_filename_encoding;
+  char *dbus_id;
+  char *obj_path;
 
   if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_STRUCT)
     return NULL;
@@ -102,6 +103,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   if (!_g_dbus_message_iter_get_args (&struct_iter, NULL,
 				      DBUS_TYPE_STRING, &display_name,
 				      DBUS_TYPE_STRING, &icon,
+				      DBUS_TYPE_STRING, &prefered_filename_encoding,
 				      DBUS_TYPE_STRING, &dbus_id,
 				      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      0))

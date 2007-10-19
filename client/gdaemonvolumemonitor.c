@@ -15,16 +15,18 @@ struct _GDaemonVolumeMonitor {
   GList *volumes;
 };
 
-G_DEFINE_TYPE (GDaemonVolumeMonitor, g_daemon_volume_monitor, G_TYPE_VOLUME_MONITOR);
+G_DEFINE_DYNAMIC_TYPE (GDaemonVolumeMonitor, g_daemon_volume_monitor, G_TYPE_VOLUME_MONITOR);
 
 static GList *
 get_mounted_volumes (GVolumeMonitor *volume_monitor)
 {
   GDaemonVolumeMonitor *monitor;
   GList *l;
-  
+
   monitor = G_DAEMON_VOLUME_MONITOR (volume_monitor);
 
+  g_print ("get_mounted_volumes (daemon): %d\n", g_list_length (monitor->volumes));
+  
   l = g_list_copy (monitor->volumes);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
@@ -97,12 +99,26 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 static void
 g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
 {
+  GList *mounts, *l;
+  GDaemonVolume *volume;
+  
   daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus ());
 
   g_signal_connect_swapped (daemon_monitor->mount_tracker, "mounted",
 			    (GCallback) mount_added, daemon_monitor);
   g_signal_connect_swapped (daemon_monitor->mount_tracker, "unmounted",
 			    (GCallback) mount_removed, daemon_monitor);
+
+  /* Initialize with current list */
+  mounts = g_mount_tracker_list_mounts (daemon_monitor->mount_tracker);
+
+  g_print ("Number of mounts: %d\n", g_list_length (mounts));
+  for (l = mounts; l != NULL; l = l->next) {
+    volume = g_daemon_volume_new (G_VOLUME_MONITOR (daemon_monitor), l->data);
+    daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
+  }
+  
+  g_list_free (mounts);
 }
 
 static void
@@ -122,6 +138,11 @@ g_daemon_volume_monitor_finalize (GObject *object)
   
   if (G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize) (object);
+}
+
+static void
+g_daemon_volume_monitor_class_finalize (GDaemonVolumeMonitorClass *klass)
+{
 }
 
 static void
@@ -146,3 +167,8 @@ g_daemon_volume_monitor_new (void)
   return G_VOLUME_MONITOR (monitor);
 }
 
+void
+g_daemon_volume_monitor_register_types (GTypeModule *module)
+{
+  g_daemon_volume_monitor_register_type (G_TYPE_MODULE (module));
+}

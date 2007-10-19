@@ -23,7 +23,7 @@ typedef void (*GMountRefLookupCallback) (GMountRef *mount_ref,
 					 gpointer data,
 					 GError *error);
 
-GType   g_daemon_vfs_get_type  (GTypeModule *module);
+GType   g_daemon_vfs_get_type  (void);
 
 GDaemonVfs *g_daemon_vfs_new (void);
 

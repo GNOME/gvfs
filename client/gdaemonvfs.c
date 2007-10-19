@@ -12,17 +12,15 @@
 #include "gdbusutils.h"
 #include "gmountspec.h"
 #include "gvfsurimapper.h"
+#include "gdaemonvolumemonitor.h"
 
-#define G_TYPE_DAEMON_VFS		(g_daemon_vfs_type)
+#define G_TYPE_DAEMON_VFS		(g_daemon_vfs_get_type ())
 #define G_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_DAEMON_VFS, GDaemonVfs))
 #define G_DAEMON_VFS_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), G_TYPE_DAEMON_VFS, GDaemonVfsClass))
 #define G_IS_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_DAEMON_VFS))
 #define G_IS_DAEMON_VFS_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_DAEMON_VFS))
 #define G_DAEMON_VFS_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_DAEMON_VFS, GDaemonVfsClass))
 
-static void g_daemon_vfs_class_init     (GDaemonVfsClass *class);
-static void g_daemon_vfs_finalize       (GObject         *object);
-static void g_daemon_vfs_init           (GDaemonVfs      *vfs);
 
 struct _GDaemonVfs
 {
@@ -44,37 +42,12 @@ struct _GDaemonVfsClass
   GVfsClass parent_class;
 };
 
-static GType g_daemon_vfs_type = 0;
+G_DEFINE_DYNAMIC_TYPE (GDaemonVfs, g_daemon_vfs, G_TYPE_VFS);
+
 static GDaemonVfs *the_vfs = NULL;
-static GObjectClass *g_daemon_vfs_parent_class = NULL;
 
 G_LOCK_DEFINE_STATIC(mount_cache);
 
-GType
-g_daemon_vfs_get_type (GTypeModule *module)
-{
-  if (!g_daemon_vfs_type)
-    {
-      static const GTypeInfo type_info =
-	{
-	  sizeof (GDaemonVfsClass),
-	  (GBaseInitFunc) NULL,
-	  (GBaseFinalizeFunc) NULL,
-	  (GClassInitFunc) g_daemon_vfs_class_init,
-	  NULL,           /* class_finalize */
-	  NULL,           /* class_data     */
-	  sizeof (GDaemonVfs),
-	  0,              /* n_preallocs    */
-	  (GInstanceInitFunc) g_daemon_vfs_init
-	};
-
-      g_daemon_vfs_type =
-        g_type_module_register_type (module, G_TYPE_VFS,
-                                     "GDaemonVfs", &type_info, 0);
-    }
-  
-  return g_daemon_vfs_type;
-}
 
 static void
 g_daemon_vfs_finalize (GObject *object)
@@ -733,6 +706,11 @@ g_daemon_vfs_get_priority (GVfs *vfs)
 }
 
 static void
+g_daemon_vfs_class_finalize (GDaemonVfsClass *klass)
+{
+}
+
+static void
 g_daemon_vfs_class_init (GDaemonVfsClass *class)
 {
   GObjectClass *object_class;
@@ -758,7 +736,8 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 void
 g_io_module_load (GIOModule *module)
 {
-  g_daemon_vfs_get_type (G_TYPE_MODULE (module));
+  g_daemon_vfs_register_type (G_TYPE_MODULE (module));
+  g_daemon_volume_monitor_register_types (G_TYPE_MODULE (module));
 }
 
 void

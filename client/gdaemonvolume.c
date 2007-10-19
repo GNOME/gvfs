@@ -130,8 +130,8 @@ g_daemon_volume_unmount (GVolume         *volume,
 
 static gboolean
 g_daemon_volume_unmount_finish (GVolume *volume,
-			      GAsyncResult *result,
-			      GError **error)
+				GAsyncResult *result,
+				GError **error)
 {
   return TRUE;
 }
