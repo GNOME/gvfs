@@ -451,7 +451,7 @@ do_mount (GVfsBackend *backend,
   display_name = g_strdup_printf (_("%s on %s"), op_backend->share, op_backend->server);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
-  g_vfs_backend_set_icon (backend, "folder-remote");
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
   
   smb_mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
@@ -1110,7 +1110,8 @@ do_close_write (GVfsBackend *backend,
 }
 
 static void
-set_info_from_stat (GFileInfo *info,
+set_info_from_stat (GVfsBackendSmb *backend,
+		    GFileInfo *info,
 		    struct stat *statbuf,
 		    const char *basename,
 		    GFileAttributeMatcher *matcher)
@@ -1119,6 +1120,37 @@ set_info_from_stat (GFileInfo *info,
   GTimeVal t;
   GIcon *icon;
   char *content_type;
+  char *display_name;
+
+
+  if (basename != NULL &&
+      g_file_attribute_matcher_matches (matcher,
+                                        G_FILE_ATTRIBUTE_STD_DISPLAY_NAME))
+    {
+      if (strcmp (basename, "/") == 0)
+	display_name = g_strdup_printf (_("%s on %s"), backend->share, backend->server);
+      else
+	display_name = g_filename_display_name (basename);
+      
+      if (strstr (display_name, "\357\277\275") != NULL)
+        {
+          char *p = display_name;
+          display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
+          g_free (p);
+        }
+      g_file_info_set_display_name (info, display_name);
+      g_free (display_name);
+    }
+  
+  if (basename != NULL &&
+      g_file_attribute_matcher_matches (matcher,
+                                        G_FILE_ATTRIBUTE_STD_EDIT_NAME))
+    {
+      char *edit_name = g_filename_display_name (basename);
+      g_file_info_set_edit_name (info, edit_name);
+      g_free (edit_name);
+    }
+
   
   file_type = G_FILE_TYPE_UNKNOWN;
 
@@ -1160,7 +1192,10 @@ set_info_from_stat (GFileInfo *info,
       if (S_ISDIR(statbuf->st_mode))
 	{
 	  content_type = g_strdup ("inode/directory");
-	  icon = g_themed_icon_new ("folder");
+	  if (strcmp (basename, "/") == 0)
+	    icon = g_themed_icon_new ("folder-remote");
+	  else
+	    icon = g_themed_icon_new ("folder");
 	}
       else
 	{
@@ -1280,7 +1315,7 @@ do_query_info (GVfsBackend *backend,
   if (res == 0)
     {
       basename = g_path_get_basename (filename);
-      set_info_from_stat (info, &st, basename, matcher);
+      set_info_from_stat (op_backend, info, &st, basename, matcher);
       g_free (basename);
       
       g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1406,7 +1441,7 @@ do_enumerate (GVfsBackend *backend,
 		      info = g_file_info_new ();
 		      g_file_info_set_name (info, dirp->name);
 		      
-		      set_info_from_stat (info, &st, dirp->name, matcher);
+		      set_info_from_stat (op_backend, info, &st, dirp->name, matcher);
 		      files = g_list_prepend (files, info);
 		    }
 		}

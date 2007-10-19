@@ -575,7 +575,7 @@ g_vfs_backend_trash_init (GVfsBackendTrash *trash_backend)
   GMountSpec *mount_spec;
   
   g_vfs_backend_set_display_name (backend, _("Trashcan"));
-  g_vfs_backend_set_icon (backend, "user-trash");
+  g_vfs_backend_set_icon_name (backend, "user-trash");
 
   mount_spec = g_mount_spec_new ("trash");
   g_vfs_backend_set_mount_spec (backend, mount_spec);

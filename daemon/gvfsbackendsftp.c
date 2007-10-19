@@ -1013,6 +1013,7 @@ do_mount (GVfsBackend *backend,
   gboolean res;
   GMountSpec *sftp_mount_spec;
   char *extension_name, *extension_data;
+  char *display_name;
 
   args = setup_ssh_commandline (backend);
 
@@ -1107,6 +1108,12 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, sftp_mount_spec);
   g_mount_spec_unref (sftp_mount_spec);
 
+  display_name = g_strdup_printf (_("sftp on %s"), op_backend->host);
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
+
+  
   g_print ("succeeded with sftp mount\n");
   
   g_vfs_job_succeeded (G_VFS_JOB (job));

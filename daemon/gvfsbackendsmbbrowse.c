@@ -673,7 +673,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   if (icon)
-    g_vfs_backend_set_icon (backend, icon);
+    g_vfs_backend_set_icon_name (backend, icon);
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
   g_mount_spec_unref (browse_mount_spec);
 
@@ -1026,11 +1026,21 @@ try_query_info (GVfsBackend *backend,
 		GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
+  const char *icon_name;
+  GIcon *icon;
 
   if (is_root (filename))
     {
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
+      g_file_info_set_display_name (info, g_vfs_backend_get_display_name (backend));
+      icon_name = g_vfs_backend_get_icon_name (backend);
+      if (icon_name)
+	{
+	  icon = g_themed_icon_new (icon_name);
+	  g_file_info_set_icon (info, icon);
+	  g_object_unref (icon);
+	}
       g_vfs_job_succeeded (G_VFS_JOB (job));
       
       return TRUE;

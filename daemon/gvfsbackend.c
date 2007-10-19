@@ -250,8 +250,8 @@ g_vfs_backend_set_display_name (GVfsBackend *backend,
 }
 
 void
-g_vfs_backend_set_icon (GVfsBackend *backend,
-			const char *icon)
+g_vfs_backend_set_icon_name (GVfsBackend *backend,
+			     const char *icon)
 {
   g_free (backend->priv->icon);
   backend->priv->icon = g_strdup (icon);
@@ -287,6 +287,18 @@ g_vfs_backend_get_backend_type (GVfsBackend *backend)
   if (backend->priv->mount_spec)
     return g_mount_spec_get_type (backend->priv->mount_spec);
   return NULL;
+}
+
+const char *
+g_vfs_backend_get_display_name (GVfsBackend *backend)
+{
+  return backend->priv->display_name;
+}
+
+const char *
+g_vfs_backend_get_icon_name (GVfsBackend *backend)
+{
+  return backend->priv->icon;
 }
 
 static DBusHandlerResult

@@ -1,5 +1,21 @@
 2007-10-19  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackend.[ch]:
+	Rename set_icon -> set_icon_name
+	Add getter for icon_name and display_name
+	
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+	Update for API changes
+	Set display name for in fileinfo
+
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendtrash.c:
+	Update for API changes
+
+	
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         (g_daemon_file_hash): Faster hash, since mount_spec is unique
         (g_daemon_file_equal): Compare mount spec too
