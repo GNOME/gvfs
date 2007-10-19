@@ -25,8 +25,6 @@ get_mounted_volumes (GVolumeMonitor *volume_monitor)
 
   monitor = G_DAEMON_VOLUME_MONITOR (volume_monitor);
 
-  g_print ("get_mounted_volumes (daemon): %d\n", g_list_length (monitor->volumes));
-  
   l = g_list_copy (monitor->volumes);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
@@ -112,7 +110,6 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
   /* Initialize with current list */
   mounts = g_mount_tracker_list_mounts (daemon_monitor->mount_tracker);
 
-  g_print ("Number of mounts: %d\n", g_list_length (mounts));
   for (l = mounts; l != NULL; l = l->next) {
     volume = g_daemon_volume_new (G_VOLUME_MONITOR (daemon_monitor), l->data);
     daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
