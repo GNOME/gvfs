@@ -322,6 +322,8 @@ void        g_vfs_backend_set_icon                       (GVfsBackend        *ba
 							  const char         *icon);
 void        g_vfs_backend_set_prefered_filename_encoding (GVfsBackend        *backend,
 							  const char         *prefered_filename_encoding);
+void        g_vfs_backend_set_user_visible               (GVfsBackend        *backend,
+							  gboolean            user_visible);
 void        g_vfs_backend_set_mount_spec                 (GVfsBackend        *backend,
 							  GMountSpec         *mount_spec);
 void        g_vfs_backend_register_mount                 (GVfsBackend        *backend,

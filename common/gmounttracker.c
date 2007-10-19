@@ -89,6 +89,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   DBusMessageIter struct_iter;
   GMountInfo *info;
   GMountSpec *mount_spec;
+  dbus_bool_t user_visible;
   char *display_name;
   char *icon;
   char *prefered_filename_encoding;
@@ -101,11 +102,12 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   dbus_message_iter_recurse (iter, &struct_iter);
     
   if (!_g_dbus_message_iter_get_args (&struct_iter, NULL,
+				      DBUS_TYPE_STRING, &dbus_id,
+				      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      DBUS_TYPE_STRING, &display_name,
 				      DBUS_TYPE_STRING, &icon,
 				      DBUS_TYPE_STRING, &prefered_filename_encoding,
-				      DBUS_TYPE_STRING, &dbus_id,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
+				      DBUS_TYPE_BOOLEAN, &user_visible,
 				      0))
     return NULL;
 
@@ -119,6 +121,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   info->dbus_id = g_strdup (dbus_id);
   info->object_path = g_strdup (obj_path);
   info->mount_spec = mount_spec;
+  info->user_visible = user_visible;
 
   return info;
 }

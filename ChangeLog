@@ -1,5 +1,20 @@
 2007-10-19  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gmounttracker.[ch]:
+        * client/gdaemonvfs.c:
+        * daemon/mount.c:
+	Add user_visible to mount info
+	Reorder args so that new stuff comes at the end
+	
+        * daemon/gvfsbackend.[ch]:
+	Add user_visible setting
+	Fix up various setters that set the wrong variable
+	
+        * daemon/gvfsbackendtrash.c:
+	Add icon and better display name
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonvfs.[ch]:
         * client/gdaemonvolume.c:
         * client/gdaemonvolumemonitor.[ch]:

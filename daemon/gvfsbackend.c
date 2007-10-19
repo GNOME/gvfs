@@ -44,6 +44,7 @@ struct _GVfsBackendPrivate
   char *display_name;
   char *icon;
   char *prefered_filename_encoding;
+  gboolean user_visible;
   GMountSpec *mount_spec;
 };
 
@@ -165,6 +166,7 @@ g_vfs_backend_init (GVfsBackend *backend)
   backend->priv->icon = g_strdup ("");
   backend->priv->prefered_filename_encoding = g_strdup ("");
   backend->priv->display_name = g_strdup ("");
+  backend->priv->user_visible = TRUE;
 }
 
 static void
@@ -252,7 +254,7 @@ g_vfs_backend_set_icon (GVfsBackend *backend,
 			const char *icon)
 {
   g_free (backend->priv->icon);
-  backend->priv->display_name = g_strdup (icon);
+  backend->priv->icon = g_strdup (icon);
 }
 
 void
@@ -260,7 +262,14 @@ g_vfs_backend_set_prefered_filename_encoding (GVfsBackend  *backend,
 					      const char *prefered_filename_encoding)
 {
   g_free (backend->priv->prefered_filename_encoding);
-  backend->priv->display_name = g_strdup (prefered_filename_encoding);
+  backend->priv->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
+}
+
+void
+g_vfs_backend_set_user_visible (GVfsBackend  *backend,
+				gboolean user_visible)
+{
+  backend->priv->user_visible = user_visible;
 }
 
 void
@@ -384,6 +393,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 {
   DBusMessage *message;
   DBusMessageIter iter;
+  dbus_bool_t user_visible;
   
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  G_VFS_DBUS_MOUNTTRACKER_PATH,
@@ -392,11 +402,13 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   if (message == NULL)
     _g_dbus_oom ();
 
+  user_visible = backend->priv->user_visible;
   if (!dbus_message_append_args (message,
+				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
 				 DBUS_TYPE_STRING, &backend->priv->display_name,
 				 DBUS_TYPE_STRING, &backend->priv->icon,
 				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
-				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
+				 DBUS_TYPE_BOOLEAN, &user_visible,
 				 0))
     _g_dbus_oom ();
 

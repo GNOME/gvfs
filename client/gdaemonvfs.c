@@ -470,6 +470,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
   const char *display_name, *icon, *obj_path, *dbus_id, *prefered_filename_encoding;
   GMountSpec *mount_spec;
   GList *l;
+  dbus_bool_t user_visible;
 
   if (_g_error_from_message (reply, error))
     return NULL;
@@ -481,11 +482,12 @@ handler_lookup_mount_reply (DBusMessage *reply,
 
   if (!_g_dbus_message_iter_get_args (&struct_iter,
 				      &derror,
+				      DBUS_TYPE_STRING, &dbus_id,
+				      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      DBUS_TYPE_STRING, &display_name,
 				      DBUS_TYPE_STRING, &icon,
 				      DBUS_TYPE_STRING, &prefered_filename_encoding,
-				      DBUS_TYPE_STRING, &dbus_id,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
+				      DBUS_TYPE_BOOLEAN, &user_visible,
 				      0))
     {
       _g_error_from_dbus (&derror, error);

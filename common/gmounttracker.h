@@ -21,6 +21,7 @@ typedef struct {
   char *icon;
   char *dbus_id;
   char *object_path;
+  gboolean user_visible;
   GMountSpec *mount_spec;
 } GMountInfo;
 
