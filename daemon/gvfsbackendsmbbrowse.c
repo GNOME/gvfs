@@ -10,6 +10,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gioerror.h>
+#include <gio/gthemedicon.h>
 #include <gio/gfile.h>
 
 #include "gvfsbackendsmbbrowse.h"
@@ -597,6 +598,7 @@ do_mount (GVfsBackend *backend,
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   SMBCCTX *smb_context;
   char *display_name;
+  char *icon;
   GMountSpec *browse_mount_spec;
 
   g_print ("do_mount\n");
@@ -647,17 +649,20 @@ do_mount (GVfsBackend *backend,
     }
 
   op_backend->smb_context = smb_context;
-  
+
+  icon = NULL;
   if (op_backend->server == NULL)
     {
-      display_name = g_strdup ("smb network");
+      display_name = g_strdup (_("Windows Network"));
       browse_mount_spec = g_mount_spec_new ("smb-network");
+      icon = "network-workgroup";
     }
   else
     {
-      display_name = g_strdup_printf ("smb share %s", op_backend->server);
+      display_name = g_strdup_printf (_("Windows shares on %s"), op_backend->server);
       browse_mount_spec = g_mount_spec_new ("smb-server");
       g_mount_spec_set (browse_mount_spec, "server", op_backend->server);
+      icon = "network-server";
     }
 
   if (op_backend->user)
@@ -667,6 +672,8 @@ do_mount (GVfsBackend *backend,
   
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
+  if (icon)
+    g_vfs_backend_set_icon (backend, icon);
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
   g_mount_spec_unref (browse_mount_spec);
 
@@ -893,6 +900,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
 {
   GMountSpec *mount_spec;
   GString *uri;
+  GIcon *icon;
   
   g_file_info_set_name (info, entry->name);
   g_file_info_set_display_name (info, entry->name_utf8);
@@ -900,6 +908,20 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
   g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_VIRTUAL, TRUE);
 
+  icon = NULL;
+  if (entry->smbc_type == SMBC_WORKGROUP)
+    icon = g_themed_icon_new ("network-workgroup");
+  else if (entry->smbc_type == SMBC_SERVER)
+    icon = g_themed_icon_new ("network-server");
+  else
+    icon = g_themed_icon_new ("folder-remote");
+
+  if (icon)
+    {
+      g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+    }
+  
   mount_spec = NULL;
   if (backend->server)
     {

@@ -236,7 +236,7 @@ g_daemon_file_hash (GFile *file)
 
   return
     g_str_hash (daemon_file->path) ^
-    g_mount_spec_hash (daemon_file->mount_spec);
+    (guint32)daemon_file->mount_spec;  /* We have unique mount_spec objects so hash directly on it */
 }
 
 static gboolean
@@ -246,7 +246,8 @@ g_daemon_file_equal (GFile *file1,
   GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
   GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
 
-  return g_str_equal (daemon_file1->path, daemon_file2->path);
+  return daemon_file1->mount_spec == daemon_file2->mount_spec && 
+    g_str_equal (daemon_file1->path, daemon_file2->path);
 }
 
 static GFile *

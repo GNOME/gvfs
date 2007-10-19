@@ -1,5 +1,16 @@
 2007-10-19  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        (g_daemon_file_hash): Faster hash, since mount_spec is unique
+        (g_daemon_file_equal): Compare mount spec too
+	
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+	Set volume display names and icons
+	Set content type and icon for files
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmounttracker.[ch]:
         * client/gdaemonvfs.c:
         * daemon/mount.c:

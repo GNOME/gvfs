@@ -11,6 +11,8 @@
 #include <glib/gi18n.h>
 #include <gio/gioerror.h>
 #include <gio/gfile.h>
+#include <gio/gcontenttype.h>
+#include <gio/gthemedicon.h>
 
 #include "gvfsbackendsmb.h"
 #include "gvfsjobopenforread.h"
@@ -446,9 +448,10 @@ do_mount (GVfsBackend *backend,
 
   op_backend->smb_context = smb_context;
 
-  display_name = g_strdup_printf ("%s on %s", op_backend->share, op_backend->server);
+  display_name = g_strdup_printf (_("%s on %s"), op_backend->share, op_backend->server);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
+  g_vfs_backend_set_icon (backend, "folder-remote");
   
   smb_mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
@@ -1107,12 +1110,16 @@ do_close_write (GVfsBackend *backend,
 }
 
 static void
-set_info_from_stat (GFileInfo *info, struct stat *statbuf,
+set_info_from_stat (GFileInfo *info,
+		    struct stat *statbuf,
+		    const char *basename,
 		    GFileAttributeMatcher *matcher)
 {
   GFileType file_type;
   GTimeVal t;
-
+  GIcon *icon;
+  char *content_type;
+  
   file_type = G_FILE_TYPE_UNKNOWN;
 
   if (S_ISREG (statbuf->st_mode))
@@ -1143,6 +1150,69 @@ set_info_from_stat (GFileInfo *info, struct stat *statbuf,
 #endif
   g_file_info_set_modification_time (info, &t);
 
+
+  if (g_file_attribute_matcher_matches (matcher,
+					G_FILE_ATTRIBUTE_STD_CONTENT_TYPE) ||
+      g_file_attribute_matcher_matches (matcher,
+					G_FILE_ATTRIBUTE_STD_ICON))
+    {
+      icon = NULL;
+      if (S_ISDIR(statbuf->st_mode))
+	{
+	  content_type = g_strdup ("inode/directory");
+	  icon = g_themed_icon_new ("folder");
+	}
+      else
+	{
+	  content_type = g_content_type_guess (basename, NULL, 0, NULL);
+	  
+	  if (content_type)
+	    {
+	      char *mimetype_icon, *generic_mimetype_icon, *type_icon, *p;
+	      char *icon_names[3];
+	      int i;
+
+	      mimetype_icon = g_strdup (content_type);
+	      g_strdelimit (mimetype_icon, "/", '-');
+	      
+	      p = strchr (content_type, '/');
+	      if (p == NULL)
+		p = content_type + strlen (content_type);
+	      
+	      generic_mimetype_icon = g_malloc (p - content_type + strlen ("-x-generic") + 1);
+	      memcpy (generic_mimetype_icon, content_type, p - content_type);
+	      memcpy (generic_mimetype_icon + (p - content_type), "-x-generic", strlen ("-x-generic"));
+	      generic_mimetype_icon[(p - content_type) + strlen ("-x-generic")] = 0;
+	      
+	      type_icon = "text-x-generic";
+	      
+	      i = 0;
+	      icon_names[i++] = mimetype_icon;
+	      icon_names[i++] = generic_mimetype_icon;
+	      if (strcmp (generic_mimetype_icon, type_icon) != 0 &&
+		  strcmp (mimetype_icon, type_icon) != 0) 
+		icon_names[i++] = type_icon;
+	      
+	      icon = g_themed_icon_new_from_names (icon_names, i);
+	      
+	      g_free (mimetype_icon);
+	      g_free (generic_mimetype_icon);
+	    }
+	}
+      
+      if (content_type)
+	{
+	  g_file_info_set_content_type (info, content_type);
+	  g_free (content_type);
+	}
+      
+      if (icon)
+	{
+	  g_file_info_set_icon (info, icon);
+	  g_object_unref (icon);
+	}
+  }
+  
   /* Don't trust n_link, uid, gid, etc returned from libsmb, its just made up.
      These are ok though: */
 
@@ -1200,6 +1270,7 @@ do_query_info (GVfsBackend *backend,
   struct stat st = {0};
   char *uri;
   int res, saved_errno;
+  char *basename;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
@@ -1208,7 +1279,9 @@ do_query_info (GVfsBackend *backend,
 
   if (res == 0)
     {
-      set_info_from_stat (info, &st, matcher);
+      basename = g_path_get_basename (filename);
+      set_info_from_stat (info, &st, basename, matcher);
+      g_free (basename);
       
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
@@ -1333,7 +1406,7 @@ do_enumerate (GVfsBackend *backend,
 		      info = g_file_info_new ();
 		      g_file_info_set_name (info, dirp->name);
 		      
-		      set_info_from_stat (info, &st, matcher);
+		      set_info_from_stat (info, &st, dirp->name, matcher);
 		      files = g_list_prepend (files, info);
 		    }
 		}
