@@ -237,7 +237,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
     {
       GString *string = g_string_new ("unknown://");
       if (path)
-	g_string_append_uri_encoded (string,
+	g_string_append_uri_escaped (string,
 				     path,
 				     "!$&'()*+,;=:@/",
 				     allow_utf8);
@@ -256,7 +256,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
       g_string_append (string, type);
       g_string_append (string, "://");
       if (path)
-	g_string_append_uri_encoded (string,
+	g_string_append_uri_escaped (string,
 				     path,
 				     "!$&'()*+,;=:@/",
 				     allow_utf8);
@@ -673,13 +673,12 @@ g_daemon_vfs_parse_name (GVfs       *vfs,
 			 const char *parse_name)
 {
   GFile *file;
-  char *path;
   
-  if (g_path_is_absolute (parse_name))
+  if (g_path_is_absolute (parse_name) ||
+      *parse_name == '~')
     {
-      path = g_filename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
-      file = g_daemon_vfs_get_file_for_path  (vfs, path);
-      g_free (path);
+      /* TODO: detect fuse paths and convert to daemon vfs GFiles ? */
+      file = g_vfs_parse_name (G_DAEMON_VFS (vfs)->wrapped_vfs, parse_name);
     }
   else
     {

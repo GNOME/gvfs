@@ -3,71 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-static int
-unescape_character (const char *scanner)
-{
-  int first_digit;
-  int second_digit;
-  
-  first_digit = g_ascii_xdigit_value (*scanner++);
-  if (first_digit < 0)
-    return -1;
-
-  second_digit = g_ascii_xdigit_value (*scanner++);
-  if (second_digit < 0)
-    return -1;
-
-  return (first_digit << 4) | second_digit;
-}
-
-char *
-g_uri_unescape_string (const gchar *escaped_string,
-		       const gchar *escaped_string_end,
-		       const gchar *illegal_characters)
-{
-  const gchar *in;
-  gchar *out, *result;
-  gint character;
-  
-  if (escaped_string == NULL)
-    return NULL;
-
-  if (escaped_string_end == NULL)
-    escaped_string_end = escaped_string + strlen (escaped_string);
-  
-  result = g_malloc (escaped_string_end - escaped_string + 1);
-	
-  out = result;
-  for (in = escaped_string; in < escaped_string_end; in++) {
-    character = *in;
-    if (*in == '%') {
-      in++;
-      if (escaped_string_end - in < 2)
-	{
-	  g_free (result);
-	  return NULL;
-	}
-      
-      character = unescape_character (in);
-      
-      /* Check for an illegal character. We consider '\0' illegal here. */
-      if (character <= 0 ||
-	  (illegal_characters != NULL &&
-	   strchr (illegal_characters, (char)character) != NULL))
-	{
-	  g_free (result);
-	  return NULL;
-	}
-      in++; /* The other char will be eaten in the loop header */
-    }
-    *out++ = (char)character;
-  }
-  
-  *out = '\0';
-  g_assert (out - result <= strlen (escaped_string));
-  return result;
-}
-
 void
 g_decoded_uri_free (GDecodedUri *decoded)
 {
@@ -92,42 +27,6 @@ g_decoded_uri_new (void)
   uri->port = -1;
 
   return uri;
-}
-
-char *
-g_uri_get_scheme (const char *uri)
-{
-  const char *p;
-  char c;
-
-  /* From RFC 3986 Decodes:
-   * URI         = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
-   */ 
-
-  p = uri;
-  
-  /* Decode scheme:
-     scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
-  */
-
-  if (!g_ascii_isalpha (*p))
-    return NULL;
-
-  while (1)
-    {
-      c = *p++;
-
-      if (c == ':')
-	break;
-      
-      if (!(g_ascii_isalnum(c) ||
-	    c == '+' ||
-	    c == '-' ||
-	    c == '.'))
-	return NULL;
-    }
-
-  return g_strndup (uri, p - uri - 1);
 }
 
 GDecodedUri *
@@ -238,7 +137,7 @@ g_decode_uri (const char *uri)
       if (userinfo_end)
 	{
 	  userinfo_start = authority_start;
-	  decoded->userinfo = g_uri_unescape_string (userinfo_start, userinfo_end, NULL);
+	  decoded->userinfo = g_uri_unescape_segment (userinfo_start, userinfo_end, NULL);
 	  if (decoded->userinfo == NULL)
 	    {
 	      g_decoded_uri_free (decoded);
@@ -267,7 +166,7 @@ g_decode_uri (const char *uri)
       hier_part_start = authority_end;
     }
 
-  decoded->path = g_uri_unescape_string (hier_part_start, hier_part_end, "/");
+  decoded->path = g_uri_unescape_segment (hier_part_start, hier_part_end, "/");
 
   if (decoded->path == NULL)
     {
@@ -276,68 +175,6 @@ g_decode_uri (const char *uri)
     }
   
   return decoded;
-}
-
-#define SUB_DELIM_CHARS  "!$&'()*+,;="
-
-static gboolean
-is_valid (char c, const char *reserved_chars_allowed)
-{
-  if (g_ascii_isalnum (c) ||
-      c == '-' ||
-      c == '.' ||
-      c == '_' ||
-      c == '~')
-    return TRUE;
-
-  if (reserved_chars_allowed &&
-      strchr (reserved_chars_allowed, c) != NULL)
-    return TRUE;
-  
-  return FALSE;
-}
-
-static gboolean 
-gunichar_ok (gunichar c)
-{
-  return
-    (c != (gunichar) -2) &&
-    (c != (gunichar) -1);
-}
-  
-void
-g_string_append_uri_encoded (GString *string, const char *encoded,
-			     const char *reserved_chars_allowed,
-			     gboolean allow_utf8)
-{
-  unsigned char c;
-  const char *end;
-  static const gchar hex[16] = "0123456789ABCDEF";
-
-  end = encoded + strlen (encoded);
-  
-  while ((c = *encoded) != 0)
-    {
-      if (c >= 0x80 && allow_utf8 &&
-	  gunichar_ok (g_utf8_get_char_validated (encoded, end - encoded)))
-	{
-	  int len = g_utf8_skip [c];
-	  g_string_append_len (string, encoded, len);
-	  encoded += len;
-	}
-      else if (is_valid (c, reserved_chars_allowed))
-	{
-	  g_string_append_c (string, c);
-	  encoded++;
-	}
-      else
-	{
-	  g_string_append_c (string, '%');
-	  g_string_append_c (string, hex[((guchar)c) >> 4]);
-	  g_string_append_c (string, hex[((guchar)c) & 0xf]);
-	  encoded++;
-	}
-    }
 }
 
 char *
@@ -355,7 +192,8 @@ g_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
       if (decoded->userinfo)
 	{
 	  /* userinfo    = *( unreserved / pct-encoded / sub-delims / ":" ) */
-	  g_string_append_uri_encoded (uri, decoded->userinfo, SUB_DELIM_CHARS ":", allow_utf8);
+	  g_string_append_uri_escaped (uri, decoded->userinfo,
+				       G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO, allow_utf8);
 	  g_string_append_c (uri, '@');
 	}
       
@@ -368,7 +206,7 @@ g_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
 	}
     }
 
-  g_string_append_uri_encoded (uri, decoded->path, SUB_DELIM_CHARS ":@/", allow_utf8);
+  g_string_append_uri_escaped (uri, decoded->path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH, allow_utf8);
   
   if (decoded->query)
     {

@@ -912,7 +912,7 @@ add_extra_trash_info (GFileInfo *file_info,
       orig_path_key = g_key_file_get_string (keyfile, "Trash Info", "Path", NULL);
       if (orig_path_key)
         {
-          orig_path_unescaped = g_uri_unescape_string (orig_path_key, NULL, "");
+          orig_path_unescaped = g_uri_unescape_string (orig_path_key, "");
 
           if (orig_path_unescaped)
             {

@@ -1,3 +1,11 @@
+2007-10-22  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonvfs.c:
+        * common/gvfsuriutils.[ch]:
+        * daemon/gvfsbackendtrash.c:
+	Update to use the gurifuncs.h from gio.
+	Fix filename parsing to handle ~/x
+
 2007-10-19  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackend.[ch]:
