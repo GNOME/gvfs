@@ -8,7 +8,7 @@ INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
 module_flags = -export_dynamic -avoid-version -module -no-undefined
-giomodulesdir = $(libdir)/gio/gvfs-modules
+giomodulesdir = $(libdir)/gio/modules
 
 ## Common to dynamic and static client libs
 
