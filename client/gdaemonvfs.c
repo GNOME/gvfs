@@ -123,8 +123,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   if (spec == NULL)
     return FALSE;
 
-  *spec_out = g_mount_spec_get_unique_for (spec);
-  g_mount_spec_unref (spec);
+  *spec_out = spec;
   *path_out = path;
   
   return TRUE;

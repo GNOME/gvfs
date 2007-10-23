@@ -33,6 +33,7 @@ typedef struct {
   volatile int ref_count;
   GArray *items;
   char *mount_prefix;
+  gboolean is_unique;
 } GMountSpec;
 
 GMountSpec *g_mount_spec_new               (const char      *type);

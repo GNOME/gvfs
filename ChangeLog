@@ -1,5 +1,14 @@
 2007-10-23  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        * client/gdaemonvfs.c:
+        * common/gmountspec.[ch]:
+	Ensure GDaemonFile mount specs are actually unique.
+	When a non-unique mount spec was finalized any unique
+	version of the same was removed from the hashtable.
+
+2007-10-23  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonvfs.c:
         (_g_daemon_vfs_get_uri_for_mountspec):
 	Better handling for default types.

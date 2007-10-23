@@ -133,7 +133,7 @@ g_daemon_file_new (GMountSpec *mount_spec,
   GDaemonFile *daemon_file;
 
   daemon_file = g_object_new (G_TYPE_DAEMON_FILE, NULL);
-  daemon_file->mount_spec = g_mount_spec_ref (mount_spec);
+  daemon_file->mount_spec = g_mount_spec_get_unique_for (mount_spec);
   daemon_file->path = canonicalize_path (path);
  
   return G_FILE (daemon_file);
@@ -252,7 +252,7 @@ g_daemon_file_equal (GFile *file1,
 
 static GFile *
 g_daemon_file_resolve_relative_path (GFile *file,
-				const char *relative_path)
+				     const char *relative_path)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   char *path;
