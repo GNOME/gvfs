@@ -1,5 +1,6 @@
 #include <config.h>
 #include <string.h>
+#include <stdlib.h>
 #include <dbus/dbus.h>
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
@@ -252,16 +253,25 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
 
   if (uri == NULL)
     {
-      GString *string = g_string_new ("");
-      g_string_append (string, type);
-      g_string_append (string, "://");
-      if (path)
-	g_string_append_uri_escaped (string,
-				     path,
-				     "!$&'()*+,;=:@/",
-				     allow_utf8);
+      GDecodedUri decoded;
+      const char *port;
+
+      memset (&decoded, 0, sizeof (decoded));
+      decoded.port = -1;
       
-      uri = g_string_free (string, FALSE);
+      decoded.scheme = (char *)type;
+      decoded.host = (char *)g_mount_spec_get (spec, "host");
+      decoded.userinfo = (char *)g_mount_spec_get (spec, "user");
+      port = g_mount_spec_get (spec, "port");
+      if (port != NULL)
+	decoded.port = atoi (port);
+
+      if (path == NULL)
+	decoded.path = "/";
+      else
+	decoded.path = path;
+      
+      uri = g_encode_uri (&decoded, FALSE);
     }
   
   return uri;
