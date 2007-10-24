@@ -204,8 +204,9 @@ g_mount_source_ask_password (GMountSource *source,
   data.cond = g_cond_new ();
 
   g_mutex_lock (data.mutex);
-  
-  _g_dbus_connection_call_async (NULL, message, -1,
+
+  /* 30 minute timeout */
+  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
 				 ask_password_reply, &data);
   dbus_message_unref (message);
   

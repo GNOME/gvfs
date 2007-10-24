@@ -1,5 +1,11 @@
 2007-10-24  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gmountsource.c:
+        (g_mount_source_ask_password):
+	Increase password dialog timeout to 30 minutes
+
+2007-10-24  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountspec.c:
         (g_mount_spec_set_mount_prefix):
 	Actually assign the mount_prefix in the GMountSpec
