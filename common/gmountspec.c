@@ -70,7 +70,7 @@ g_mount_spec_set_mount_prefix  (GMountSpec      *spec,
 				const char      *mount_prefix)
 {
   g_free (spec->mount_prefix);
-  mount_prefix = g_strdup (mount_prefix);
+  spec->mount_prefix = g_strdup (mount_prefix);
 }
 
 

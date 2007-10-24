@@ -1,3 +1,9 @@
+2007-10-24  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gmountspec.c:
+        (g_mount_spec_set_mount_prefix):
+	Actually assign the mount_prefix in the GMountSpec
+
 2007-10-23  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* client/Makefile.am:
