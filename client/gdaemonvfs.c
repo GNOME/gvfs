@@ -276,6 +276,26 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
   return uri;
 }
 
+gboolean
+_g_daemon_vfs_mountspec_has_uri_scheme (GMountSpec               *spec,
+					const char               *uri_scheme)
+{
+  const char *type, *scheme;
+  GVfsUriMapper *mapper;
+
+  type = g_mount_spec_get_type (spec);
+  mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
+
+  scheme = NULL;
+  if (mapper)
+    scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, spec);
+  
+  if (scheme == NULL)
+    scheme = type;
+
+  return g_ascii_strcasecmp (scheme, uri_scheme) == 0;
+}
+
 static void
 fill_supported_uri_schemes (GDaemonVfs *vfs)
 {
@@ -324,7 +344,8 @@ fill_supported_uri_schemes (GDaemonVfs *vfs)
   count = 0;
   do
     {
-      gchar *type, *scheme = NULL;
+      gchar *type;
+      const char *scheme = NULL;
       GVfsUriMapper *mapper = NULL;
       GMountSpec *spec;
       gboolean new = TRUE;
@@ -339,7 +360,7 @@ fill_supported_uri_schemes (GDaemonVfs *vfs)
         scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, spec);
 
       if (scheme == NULL)
-        scheme = g_strdup (type);
+        scheme = type;
 
       for (l = list; l != NULL; l = l->next)
         {
@@ -352,12 +373,8 @@ fill_supported_uri_schemes (GDaemonVfs *vfs)
 
       if (new)
         {
-          list = g_list_prepend (list, scheme);
+          list = g_list_prepend (list, g_strdup (scheme));
           count++;
-        }
-      else
-        {
-          g_free (scheme);
         }
 
       g_mount_spec_unref (spec);

@@ -268,15 +268,16 @@ smb_to_uri (GVfsUriMapper *mapper,
   return s;
 }
 
-static gchar *
+static const char *
 smb_to_uri_scheme (GVfsUriMapper *mapper,
                    GMountSpec *spec)
 {
   const gchar *type = g_mount_spec_get_type (spec);
+  
   if (strcmp ("smb-network", type) == 0 ||
       strcmp ("smb-server", type) == 0 ||
       strcmp ("smb-share", type) == 0)
-    return g_strdup ("smb");
+    return "smb";
   else
     return NULL;
 }

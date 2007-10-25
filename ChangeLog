@@ -1,3 +1,14 @@
+2007-10-25  Alexander Larsson  <alexl@redhat.com>
+
+        * client/smburi.c:
+        * common/gvfsurimapper.[ch]:
+	Make to_uri_scheme return const string.
+	
+        * client/gdaemonfile.[ch]:
+        * client/gdaemonvfs.[ch]:
+        Add _g_daemon_vfs_mountspec_has_uri_scheme and use it to
+	implement g_file_has_uri_scheme
+
 2007-10-24  Alexander Larsson  <alexl@redhat.com>
 
         * common/gmountsource.c:

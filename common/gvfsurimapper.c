@@ -62,7 +62,7 @@ g_vfs_uri_mapper_to_uri (GVfsUriMapper  *mapper,
   return (* class->to_uri) (mapper, spec, path, allow_utf8);
 }
 
-char *
+const char *
 g_vfs_uri_mapper_to_uri_scheme (GVfsUriMapper  *mapper,
                                 GMountSpec     *spec)
 {

@@ -145,6 +145,16 @@ g_daemon_file_is_native (GFile *file)
   return FALSE;
 }
 
+static gboolean
+g_daemon_file_has_uri_scheme (GFile *file,
+			      const char *uri_scheme)
+{
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+  
+  return _g_daemon_vfs_mountspec_has_uri_scheme (daemon_file->mount_spec,
+						 uri_scheme);
+}
+
 static char *
 g_daemon_file_get_basename (GFile *file)
 {
@@ -1792,6 +1802,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->hash = g_daemon_file_hash;
   iface->equal = g_daemon_file_equal;
   iface->is_native = g_daemon_file_is_native;
+  iface->has_uri_scheme = g_daemon_file_has_uri_scheme;
   iface->get_basename = g_daemon_file_get_basename;
   iface->get_path = g_daemon_file_get_path;
   iface->get_uri = g_daemon_file_get_uri;

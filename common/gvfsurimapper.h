@@ -38,7 +38,7 @@ struct _GVfsUriMapperClass
 					           GMountSpec *spec,
 					           char *path,
 					           gboolean allow_utf8);
-  char *               (*to_uri_scheme)           (GVfsUriMapper *mapper,
+  const char *         (*to_uri_scheme)           (GVfsUriMapper *mapper,
                                                    GMountSpec *spec);
 };
 
@@ -55,7 +55,7 @@ char *               g_vfs_uri_mapper_to_uri                  (GVfsUriMapper  *m
 						               GMountSpec     *spec,
 						               char           *path,
 						               gboolean        allow_utf8);
-char *               g_vfs_uri_mapper_to_uri_scheme           (GVfsUriMapper  *mapper,
+const char *         g_vfs_uri_mapper_to_uri_scheme           (GVfsUriMapper  *mapper,
                                                                GMountSpec     *spec);
 
 G_END_DECLS
