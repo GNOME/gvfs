@@ -17,6 +17,7 @@ typedef struct {
   char *object_path;
   GMountSpec *spec;
   char *prefered_filename_encoding; /* NULL -> UTF8 */
+  char *fuse_mountpoint;
 } GMountRef;
 
 typedef void (*GMountRefLookupCallback) (GMountRef *mount_ref,

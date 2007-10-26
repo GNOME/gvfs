@@ -95,6 +95,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   char *prefered_filename_encoding;
   char *dbus_id;
   char *obj_path;
+  char *fuse_mountpoint;
 
   if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_STRUCT)
     return NULL;
@@ -108,9 +109,13 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
 				      DBUS_TYPE_STRING, &icon,
 				      DBUS_TYPE_STRING, &prefered_filename_encoding,
 				      DBUS_TYPE_BOOLEAN, &user_visible,
+				      G_DBUS_TYPE_CSTRING, &fuse_mountpoint,
 				      0))
     return NULL;
 
+  g_free (fuse_mountpoint);
+  
+  
   mount_spec = g_mount_spec_from_dbus (&struct_iter);
   if (mount_spec == NULL)
     return NULL;
@@ -122,7 +127,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   info->object_path = g_strdup (obj_path);
   info->mount_spec = mount_spec;
   info->user_visible = user_visible;
-
+  
   return info;
 }
 

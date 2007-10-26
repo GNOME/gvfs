@@ -175,7 +175,36 @@ g_daemon_file_get_basename (GFile *file)
 static char *
 g_daemon_file_get_path (GFile *file)
 {
-  return NULL;
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+  GMountRef *mount_ref;
+  const char *rel_path;
+  char *path;
+
+  /* This is a sync i/o call, which is a bit unfortunate, as
+   * this is supposed to be a fast call. However, in almost all
+   * cases this will be cached.
+   */
+  
+  mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
+						daemon_file->path,
+						NULL);
+
+  if (mount_ref == NULL)
+    return NULL;
+
+  path = NULL;
+  
+  if (mount_ref->fuse_mountpoint)
+    {
+      rel_path = daemon_file->path +
+	strlen (mount_ref->spec->mount_prefix);
+
+      path = g_build_filename (mount_ref->fuse_mountpoint, rel_path, NULL);
+    }
+  
+  _g_mount_ref_unref (mount_ref);
+  
+  return path;
 }
 
 static char *

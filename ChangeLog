@@ -1,5 +1,25 @@
 2007-10-26  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gvfsdaemonprotocol.h:
+	Add registerFuse call
+	
+        * client/gvfsfusedaemon.c:
+	Register with vfs daemon
+	Exit (and unmount) if daemon dies
+	
+        * daemon/mount.c:
+	Hand out fuse mountpaths when availible.
+	
+        * client/gdaemonvfs.[ch]:
+        * common/gmounttracker.c:
+	Handle sent fuse mountpath
+	
+        * client/gdaemonfile.c:
+	Implement g_daemon_file_get_path using fuse
+	if availible.
+
+2007-10-26  Alexander Larsson  <alexl@redhat.com>
+
         * client/Makefile.am:
         * client/gvfsfusedaemon.c:
 	Update fuse daemon to use the giomodule instead of

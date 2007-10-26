@@ -6,11 +6,15 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <sys/vfs.h>
 #include <sys/time.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include <errno.h>
+#include <signal.h>
+
+#include <dbus/dbus.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -22,6 +26,10 @@
 #include <gio/gseekable.h>
 #include <gio/gioerror.h>
 #include <gio/gvolumemonitor.h>
+
+/* stuff from common/ */
+#include <gvfsdaemonprotocol.h>
+#include <gdbusutils.h>
 
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
@@ -277,6 +285,7 @@ mount_record_new (GVolume *volume)
   
   mount_record->root = g_volume_get_root (volume);
   name = g_volume_get_name (volume);
+  /* Keep in sync with gvfs daemon mount tracker */
   mount_record->name = g_uri_escape_string (name, "+@#$., ", TRUE);
   g_free (name);
   mount_record->creation_time = time (NULL);
@@ -1971,11 +1980,44 @@ subthread_main (gpointer data)
   return NULL;
 }
 
-void g_io_module_load (GIOModule *module);
+static DBusHandlerResult
+dbus_filter_func (DBusConnection *connection,
+                  DBusMessage    *message,
+                  void           *data)
+{
+	if (dbus_message_is_signal (message,
+                              DBUS_INTERFACE_DBUS,
+                              "NameOwnerChanged"))
+    {
+      const char *service, *old_owner, *new_owner;
+      
+      dbus_message_get_args (message,
+                             NULL,
+                             DBUS_TYPE_STRING, &service,
+                             DBUS_TYPE_STRING, &old_owner,
+                             DBUS_TYPE_STRING, &new_owner,
+                             DBUS_TYPE_INVALID);
+      
+      /* Handle monitor owner going away */
+      if (service != NULL &&
+          strcmp (G_VFS_DBUS_DAEMON_NAME, service) == 0 &&
+          *new_owner == 0)
+        {
+          /* The daemon died, unmount */
+          kill (getpid(), SIGHUP);
+        }
+    }
+	
+	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
 
 static gpointer
 vfs_init (struct fuse_conn_info *conn)
 {
+	DBusConnection *dbus_conn;
+  DBusMessage *message;
+	DBusError error;
   GVfs *vfs;
   
   daemon_creation_time = time (NULL);
@@ -1986,10 +2028,42 @@ vfs_init (struct fuse_conn_info *conn)
   global_fh_table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                            g_free, (GDestroyNotify) file_handle_free);
 
+	dbus_error_init (&error);
+
+	dbus_conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
+  if (dbus_conn == NULL)
+    {
+      g_printerr ("Failed to connect to the D-BUS daemon: %s\n",
+                  error.message);
+      dbus_error_free (&error);
+      return NULL;
+    }
+
+  _g_dbus_connection_integrate_with_main (dbus_conn);
+
+	dbus_bus_add_match (dbus_conn,
+                      "type='signal',sender='" DBUS_SERVICE_DBUS "',"
+                      "interface='" DBUS_INTERFACE_DBUS "',"
+                      "member='NameOwnerChanged',"
+                      "arg0='"G_VFS_DBUS_DAEMON_NAME"'",
+                      NULL);
+	dbus_connection_add_filter (dbus_conn,
+                              dbus_filter_func,
+                              NULL,
+                              NULL);
+
+  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+                                          G_VFS_DBUS_MOUNTTRACKER_PATH,
+                                          G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+                                          G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_FUSE);
+  dbus_message_set_auto_start (message, TRUE);
+  dbus_connection_send (dbus_conn, message, NULL);
+  dbus_connection_flush (dbus_conn);
+  
   gvfs = g_vfs_get_default ();
   
   volume_monitor = g_object_new (g_type_from_name ("GDaemonVolumeMonitor"), NULL);
-
+  
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
   subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);
 

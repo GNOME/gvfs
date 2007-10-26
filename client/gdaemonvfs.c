@@ -493,7 +493,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
   DBusError derror;
   GMountRef *ref;
   DBusMessageIter iter, struct_iter;
-  const char *display_name, *icon, *obj_path, *dbus_id, *prefered_filename_encoding;
+  const char *display_name, *icon, *obj_path, *dbus_id, *prefered_filename_encoding, *fuse_mountpoint;
   GMountSpec *mount_spec;
   GList *l;
   dbus_bool_t user_visible;
@@ -514,6 +514,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
 				      DBUS_TYPE_STRING, &icon,
 				      DBUS_TYPE_STRING, &prefered_filename_encoding,
 				      DBUS_TYPE_BOOLEAN, &user_visible,
+				      G_DBUS_TYPE_CSTRING, &fuse_mountpoint,
 				      0))
     {
       _g_error_from_dbus (&derror, error);
@@ -524,6 +525,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
   mount_spec = g_mount_spec_from_dbus (&struct_iter);
   if (mount_spec == NULL)
     {
+      g_free (fuse_mountpoint);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   "Error while getting mount info: %s",
 		   "Invalid reply");
@@ -556,14 +558,17 @@ handler_lookup_mount_reply (DBusMessage *reply,
       ref->spec = g_mount_spec_ref (mount_spec);
       if (prefered_filename_encoding != NULL && *prefered_filename_encoding != 0) 
 	ref->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
-
+      if (fuse_mountpoint != NULL && *fuse_mountpoint != 0) 
+	ref->fuse_mountpoint = g_strdup (fuse_mountpoint);
+      
       the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, ref);
     }
 
   _g_mount_ref_ref (ref);
 
   G_UNLOCK (mount_cache);
-
+  
+  g_free (fuse_mountpoint);
   g_mount_spec_unref (mount_spec);
 
   return ref;

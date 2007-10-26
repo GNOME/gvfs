@@ -39,6 +39,8 @@ typedef void (*MountCallback) (VfsMountable *mountable,
 static GList *mountables = NULL;
 static GList *mounts = NULL;
 
+static gboolean fuse_availible;
+
 static void lookup_mount (DBusConnection *connection,
 			  DBusMessage *message,
 			  gboolean do_automount);
@@ -128,6 +130,7 @@ vfs_mount_to_dbus (VfsMount *mount,
 {
   DBusMessageIter struct_iter;
   dbus_bool_t user_visible;
+  char *fuse_mountpoint;
   
   if (!dbus_message_iter_open_container (iter,
 					 DBUS_TYPE_STRUCT,
@@ -167,6 +170,22 @@ vfs_mount_to_dbus (VfsMount *mount,
     _g_dbus_oom ();
 	      
   
+  fuse_mountpoint = NULL;
+  if (fuse_availible)
+    {
+      char *fs_name;
+      
+      /* Keep in sync with fuse daemon */
+      fs_name = g_uri_escape_string (mount->display_name, "+@#$., ", TRUE);
+      
+      fuse_mountpoint = g_build_filename (g_get_home_dir(), ".gvfs", fs_name, NULL);
+    }
+  
+  if (fuse_mountpoint == NULL)
+    fuse_mountpoint = g_strdup ("");
+  
+  _g_dbus_message_iter_append_cstring (&struct_iter, fuse_mountpoint);
+
   g_mount_spec_to_dbus (&struct_iter, mount->mount_spec);
 
   if (!dbus_message_iter_close_container (iter, &struct_iter))
@@ -710,6 +729,7 @@ list_mounts (DBusConnection *connection,
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_BOOLEAN_AS_STRING
+					   DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
  					   G_MOUNT_SPEC_TYPE_AS_STRING
 					 DBUS_STRUCT_END_CHAR_AS_STRING,
 					 &array_iter))
@@ -879,7 +899,11 @@ dbus_message_function (DBusConnection  *connection,
   res = DBUS_HANDLER_RESULT_HANDLED;
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-				   G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT))
+				   G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_FUSE))
+    fuse_availible = TRUE;
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT))
     register_mount (connection, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
