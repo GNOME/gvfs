@@ -674,6 +674,7 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
   if (icon)
     g_vfs_backend_set_icon_name (backend, icon);
+  g_vfs_backend_set_user_visible (backend, FALSE);  
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
   g_mount_spec_unref (browse_mount_spec);
 

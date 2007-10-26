@@ -1,5 +1,18 @@
 2007-10-26  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonvolumemonitor.c:
+	Don't show not user visible mounts
+
+        * daemon/mount.c:
+	Don't give fuse mounts for non visible mounts
+	(as they don't get mounted)
+	
+        * daemon/gvfsbackendsmbbrowse.c:
+        * daemon/gvfsbackendtrash.c:
+	Mark as not user visible
+	
+2007-10-26  Alexander Larsson  <alexl@redhat.com>
+
         * common/gvfsdaemonprotocol.h:
 	Add registerFuse call
 	

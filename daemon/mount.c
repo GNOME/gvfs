@@ -171,7 +171,7 @@ vfs_mount_to_dbus (VfsMount *mount,
 	      
   
   fuse_mountpoint = NULL;
-  if (fuse_availible)
+  if (fuse_availible && mount->user_visible)
     {
       char *fs_name;
       
