@@ -57,13 +57,6 @@ libsmb_la_LIBADD = \
 
 if USE_FUSE
 
-## Static client lib for FUSE daemon
-
-noinst_LTLIBRARIES = libgvfsdbusfuse.la
-
-libgvfsdbusfuse_la_SOURCES = $(vfssources)
-libgvfsdbusfuse_la_LIBADD  = $(vfslibs)
-
 ## FUSE daemon
 
 libexec_PROGRAMS = gvfs-fuse-daemon
@@ -80,7 +73,6 @@ gvfs_fuse_daemon_CFLAGS = \
 
 gvfs_fuse_daemon_LDADD = \
 	$(top_builddir)/common/libgvfscommon.la \
-	$(top_builddir)/client/libgvfsdbusfuse.la \
 	$(GLIB_LIBS) $(DBUS_LIBS) $(FUSE_LIBS)
 
 endif

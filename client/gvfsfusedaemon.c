@@ -15,12 +15,13 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib/gprintf.h>
+#include <gio/giomodule.h>
 
-#include "gdaemonvfs.h"
-#include "gdaemonfile.h"
-#include <gmounttracker.h>
+#include <gio/gvfs.h>
+#include <gio/gurifuncs.h>
 #include <gio/gseekable.h>
 #include <gio/gioerror.h>
+#include <gio/gvolumemonitor.h>
 
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
@@ -30,36 +31,31 @@
 #define GET_FILE_HANDLE(fi)     (GUINT_TO_POINTER ((guint) (fi)->fh))
 #define SET_FILE_HANDLE(fi, fh) ((fi)->fh = (guint64) GPOINTER_TO_UINT (fh))
 
-typedef struct
-{
-  time_t      creation_time;
-  GMountInfo *info;
-}
-MountRecord;
+typedef struct {
+  time_t creation_time;
+  char *name;
+  GFile *root;
+} MountRecord;
 
-typedef enum
-{
+typedef enum {
   FILE_OP_NONE,
   FILE_OP_READ,
   FILE_OP_WRITE
-}
-FileOp;
+} FileOp;
 
-typedef struct
-{
+typedef struct {
   GMutex   *mutex;
   FileOp    op;
   gpointer  stream;
   gint      length;
   size_t    pos;
-}
-FileHandle;
+} FileHandle;
 
 static GThread       *subthread           = NULL;
 static GMainLoop     *subthread_main_loop = NULL;
 static GVfs          *gvfs                = NULL;
 
-static GMountTracker *mount_tracker       = NULL;
+static GVolumeMonitor *volume_monitor     = NULL;
 
 /* Contains pointers to MountRecord */
 static GList         *mount_list          = NULL;
@@ -83,28 +79,31 @@ debug_print (const gchar *message, ...)
 
   static FILE *debug_fhd = NULL;
   va_list      var_args;
+  char *file;
 
   if (!debug_fhd)
-    debug_fhd = fopen ("/home/hpj/vfs.debug", "at");
+    {
+      file = g_build_filename (g_get_home_dir (), "vfs.debug", NULL);
+      debug_fhd = fopen (file, "at");
+      g_free (file);
+    }
 
   if (!debug_fhd)
     return;
-
+  
   va_start (var_args, message);
   g_vfprintf (debug_fhd, message, var_args);
   va_end (var_args);
-
+  
   fflush (debug_fhd);
 
 #endif
 }
 
-typedef struct
-{
+typedef struct {
   gint gioerror;
   gint errno_value;
-}
-ErrorMap;
+} ErrorMap;
 
 static gint
 errno_from_error (GError *error)
@@ -175,18 +174,18 @@ file_handle_close_stream (FileHandle *file_handle)
     {
       switch (file_handle->op)
         {
-          case FILE_OP_READ:
-            g_input_stream_close (file_handle->stream, NULL, NULL);
-            break;
-
-          case FILE_OP_WRITE:
-            g_output_stream_close (file_handle->stream, NULL, NULL);
-            break;
-
-          default:
-            g_assert_not_reached ();
+        case FILE_OP_READ:
+          g_input_stream_close (file_handle->stream, NULL, NULL);
+          break;
+          
+        case FILE_OP_WRITE:
+          g_output_stream_close (file_handle->stream, NULL, NULL);
+          break;
+          
+        default:
+          g_assert_not_reached ();
         }
-
+      
       g_object_unref (file_handle->stream);
       file_handle->stream = NULL;
       file_handle->op = FILE_OP_NONE;
@@ -269,22 +268,27 @@ free_file_handle_for_path (const gchar *path)
 }
 
 static MountRecord *
-mount_record_new (GMountInfo *mount_info)
+mount_record_new (GVolume *volume)
 {
   MountRecord *mount_record;
+  char *name;
 
   mount_record = g_new (MountRecord, 1);
-
-  mount_record->info          = mount_info;
+  
+  mount_record->root = g_volume_get_root (volume);
+  name = g_volume_get_name (volume);
+  mount_record->name = g_uri_escape_string (name, "+@#$., ", TRUE);
+  g_free (name);
   mount_record->creation_time = time (NULL);
-
+  
   return mount_record;
 }
 
 static void
 mount_record_free (MountRecord *mount_record)
 {
-  g_mount_info_free (mount_record->info);
+  g_object_unref (mount_record->root);
+  g_free (mount_record->name);
   g_free (mount_record);
 }
 
@@ -308,36 +312,91 @@ mount_list_free (void)
   mount_list = NULL;
 }
 
-#if 0
+static gboolean
+mount_record_for_volume_exists (GVolume *volume)
+{
+  GList *l;
+  GFile *root;
+  gboolean res;
+
+  g_assert (volume != NULL);
+
+  root = g_volume_get_root (volume);
+
+  res = FALSE;
+  
+  mount_list_lock ();
+
+  for (l = mount_list; l != NULL; l = l->next)
+    {
+      MountRecord *this_mount_record = l->data;
+      
+      if (g_file_equal (root, this_mount_record->root))
+        {
+          res = TRUE;
+          break;
+        }
+    }
+
+  mount_list_unlock ();
+
+  g_object_unref (root);
+  
+  return res;
+}
+
+static GFile *
+mount_record_find_root_by_mount_name (const gchar *mount_name)
+{
+  GList       *l;
+  GFile *root;
+
+  g_assert (mount_name != NULL);
+
+  root = NULL;
+  
+  mount_list_lock ();
+
+  for (l = mount_list; l != NULL; l = l->next)
+    {
+      MountRecord *mount_record = l->data;
+
+      if (strcmp (mount_name, mount_record->name) == 0)
+        {
+          root = g_object_ref (mount_record->root);
+          break;
+        }
+    }
+
+  mount_list_unlock ();
+
+  return root;
+}
 
 static void
 mount_list_update (void)
 {
-  GList *tracker_list;
+  GList *volumes;
   GList *l;
 
-  tracker_list = g_mount_tracker_list_mounts (mount_tracker);
+  volumes = g_volume_monitor_get_mounted_volumes (volume_monitor);
 
-  for (l = tracker_list; l; l = g_list_next (l))
+  for (l = volumes; l != NULL; l = l->next)
     {
-      GMountInfo *this_mount_info = l->data;
+      GVolume *volume = l->data;
 
-      if (!mount_record_find_by_mount_spec (this_mount_info->mount_spec))
+      if (!mount_record_for_volume_exists (volume))
         {
           mount_list_lock ();
-          mount_list = g_list_prepend (mount_list, mount_record_new (this_mount_info));
+          mount_list = g_list_prepend (mount_list, mount_record_new (volume));
           mount_list_unlock ();
         }
-      else
-        {
-          g_mount_info_free (this_mount_info);
-        }
+      
+      g_object_unref (volume);
     }
-
-  g_list_free (tracker_list);
+  
+  g_list_free (volumes);
 }
-
-#endif
 
 #if 0
 
@@ -416,267 +475,44 @@ file_info_get_attribute_as_uint (GFileInfo *file_info, const gchar *attribute)
 static gboolean
 path_is_mount_list (const gchar *path)
 {
-  return strcmp (path, "/") ? FALSE : TRUE;
+  while (*path == '/')
+    path++;
+
+  return *path == 0;
 }
 
-static gchar
-nibble_to_ascii (guint value)
-{
-  gchar c;
-
-  g_assert (value < 16);
-
-  if (value < 10)
-    c = '0' + value;
-  else
-    c = 'a' + value - 10;
-
-  return c;
-}
-
-static gchar *
-escape_to_uri_syntax (const gchar *string, const gchar *allowed_characters)
-{
-  gchar *escaped_string;
-  gint   i;
-  gint   j = 0;
-
-  if (!string)
-    return NULL;
-
-  if (!allowed_characters)
-    allowed_characters = "";
-
-  escaped_string = g_malloc (strlen (string) * 3 + 1);
-
-  for (i = 0; string [i]; i++)
-  {
-    guchar c = string [i];
-
-    if (strchr (allowed_characters, c))
-    {
-      escaped_string [j++] = c;
-      continue;
-    }
-
-    escaped_string [j++] = '%';
-    escaped_string [j++] = nibble_to_ascii (c >> 4);
-    escaped_string [j++] = nibble_to_ascii (c & 0x0f);
-  }
-
-  escaped_string [j] = '\0';
-  escaped_string = g_realloc (escaped_string, j + 1);
-
-  return escaped_string;
-}
-
-static gchar *
-escape_fs_name (const gchar *name)
-{
-  return escape_to_uri_syntax (name, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+@#$., ");
-}
-
-#if 0
-
-static gchar *
-escape_uri_component (const gchar *uri_component)
-{
-  return escape_to_uri_syntax (uri_component, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/_-+., ");
-}
-
-#endif
-
-static MountRecord *
-mount_record_find_by_mount_spec (GMountSpec *mount_spec)
-{
-  MountRecord *mount_record = NULL;
-  GList       *l;
-
-  g_assert (mount_spec != NULL);
-
-  mount_list_lock ();
-
-  for (l = mount_list; !mount_record && l; l = g_list_next (l))
-    {
-      MountRecord *this_mount_record = l->data;
-      GMountSpec  *this_mount_spec   = this_mount_record->info->mount_spec;
-
-      if (g_mount_spec_equal (mount_spec, this_mount_spec))
-        mount_record = this_mount_record;
-    }
-
-  mount_list_unlock ();
-
-  return mount_record;
-}
-
-static gchar *
-mount_info_to_mount_name (GMountInfo *mount_info)
-{
-  g_assert (mount_info != NULL);
-
-  return escape_fs_name (mount_info->display_name);
-}
-
-static MountRecord *
-mount_record_find_by_mount_name (const gchar *mount_name)
-{
-  MountRecord *mount_record = NULL;
-  GList       *l;
-
-  g_assert (mount_name != NULL);
-
-  mount_list_lock ();
-
-  for (l = mount_list; !mount_record && l; l = g_list_next (l))
-    {
-      MountRecord *this_mount_record = l->data;
-      GMountInfo  *this_mount_info   = this_mount_record->info;
-      gchar       *this_mount_name   = mount_info_to_mount_name (this_mount_info);
-
-      g_assert (this_mount_name != NULL);
-
-      if (!strcmp (mount_name, this_mount_name))
-        mount_record = this_mount_record;
-
-      g_free (this_mount_name);
-    }
-
-  mount_list_unlock ();
-
-  return mount_record;
-}
-
-#if 0
-
-static gchar *
-mount_spec_to_uri (GMountSpec *mount_spec)
-{
-  const gchar *type;
-  gchar       *uri = NULL;
-
-  type = g_mount_spec_get (mount_spec, "type");
-  if (!type)
-    return NULL;
-
-  if (!strcmp (type, "smb-share"))
-    {
-      gchar *server = escape_uri_component (g_mount_spec_get (mount_spec, "server"));
-      gchar *share  = escape_uri_component (g_mount_spec_get (mount_spec, "share"));
-      gchar *domain = escape_uri_component (g_mount_spec_get (mount_spec, "domain"));
-      gchar *user   = escape_uri_component (g_mount_spec_get (mount_spec, "user"));
-
-      if (server && share)
-        {
-          uri = g_strdup_printf ("smb://%s%s%s%s%s/%s",
-                                 domain ? domain : "",
-                                 domain ? ";"    : "",
-                                 user   ? user   : "",
-                                 user   ? "@"    : "",
-                                 server,
-                                 share);
-        }
-
-      g_free (server);
-      g_free (share);
-      g_free (domain);
-      g_free (user);
-    }
-
-  return uri;
-}
-
-#endif
-
-static gboolean
-path_to_mount_record_and_path (const gchar *full_path, MountRecord **mount_record, gchar **mount_path)
-{
-  MountRecord *mount_record_internal;
-  gchar       *mount_path_internal = NULL;
-  gchar       *mount_name;
-  const gchar *s1;
-  const gchar *s2;
-  gboolean    success = FALSE;
-
-  s1 = full_path;
-  if (*s1 == '/')
-    s1++;
-
-  if (*s1)
-    {
-      s2 = strchr (s1, '/');
-      if (!s2)
-        s2 = s1 + strlen (s1);
-
-      mount_name = g_strndup (s1, s2 - s1);
-      mount_record_internal = mount_record_find_by_mount_name (mount_name);
-      g_free (mount_name);
-
-      if (mount_record_internal)
-        {
-          if (mount_record)
-            *mount_record = mount_record_internal;
-
-          if (*s2)
-            {
-              /* s2 is at the initial '/' of the mount subpath */
-              mount_path_internal = g_strdup (s2);
-            }
-          else
-            {
-              /* No subpath specified; we want the mount's root */
-              mount_path_internal = g_strdup ("/");
-            }
-
-          if (mount_path)
-            *mount_path = mount_path_internal;
-
-          success = TRUE;
-        }
-    }
-
-  return success;
-}
-
-static GFile *
-file_from_mount_record_and_path (MountRecord *mount_record, const gchar *path)
-{
-#if 0
-  gchar *mount_uri;
-  gchar *base_uri;
-  gchar *escaped_path;
-#endif
-  GFile *file;
-
-  file = g_daemon_file_new (mount_record->info->mount_spec, path);
-
-#if 0
-  mount_uri = mount_spec_to_uri (mount_record->info->mount_spec);
-  escaped_path = escape_uri_component (path);
-  base_uri = g_strconcat (mount_uri, escaped_path, NULL);
-  file = g_file_new_for_uri (base_uri);
-
-  g_free (mount_uri);
-  g_free (escaped_path);
-  g_free (base_uri);
-#endif
-
-  g_assert (file != NULL);
-
-  return file;
-}
 
 static GFile *
 file_from_full_path (const gchar *path)
 {
-  MountRecord *mount_record;
-  gchar       *mount_path;
-  GFile       *file = NULL;
+  gchar *mount_name;
+  GFile *file = NULL;
+  const gchar *s1, *s2;
+  GFile *root;
 
-  if (path_to_mount_record_and_path (path, &mount_record, &mount_path))
+  file = NULL;
+  
+  s1 = path;
+  while (*s1 == '/')
+    s1++;
+  
+  if (*s1)
     {
-      file = file_from_mount_record_and_path (mount_record, mount_path);
-      g_free (mount_path);
+      s2 = strchr (s1, '/');
+      if (s2 == NULL)
+        s2 = s1 + strlen (s1);
+      
+      mount_name = g_strndup (s1, s2 - s1);
+      root = mount_record_find_root_by_mount_name (mount_name);
+      g_free (mount_name);
+      
+      if (root)
+        {
+          while (*s2 == '/')
+            s2++;
+          file = g_file_resolve_relative_path (root, s2);
+          g_object_unref (root);
+        }
     }
 
   return file;
@@ -1037,7 +873,9 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
 
   debug_print ("vfs_open: %s\n", path);
 
-  if ((file = file_from_full_path (path)))
+  if (path_is_mount_list (path))
+    result = -EISDIR;
+  else if ((file = file_from_full_path (path)))
     {
       GFileInfo *file_info;
       GError    *error = NULL;
@@ -1113,6 +951,8 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 
   debug_print ("vfs_create: %s\n", path);
 
+  if (path_is_mount_list (path))
+    result = -EEXIST;
   if ((file = file_from_full_path (path)))
     {
       GFileInfo *file_info;
@@ -1449,9 +1289,8 @@ vfs_flush (const gchar *path, struct fuse_file_info *fi)
 static gint
 vfs_opendir (const gchar *path, struct fuse_file_info *fi)
 {
-  MountRecord *mount_record;
-  gchar       *mount_path;
-  gint         result = 0;
+  GFile *file;
+  gint result = 0;
 
   debug_print ("vfs_opendir: %s\n", path);
 
@@ -1459,13 +1298,13 @@ vfs_opendir (const gchar *path, struct fuse_file_info *fi)
     {
       /* Mount list */
     }
-  else if (path_to_mount_record_and_path (path, &mount_record, &mount_path))
+  else if ((file = file_from_full_path (path)) != NULL)
     {
       /* Submount */
 
       /* TODO: Check that path exists */
 
-      g_free (mount_path);
+      g_object_unref (file);
     }
   else
     {
@@ -1542,12 +1381,9 @@ vfs_readdir (const gchar *path, gpointer buf, fuse_fill_dir_t filler, off_t offs
 
       for (l = mount_list; l; l = g_list_next (l))
         {
-          MountRecord *this_mount_record = l->data;
-          gchar       *mount_name;
+          MountRecord *mount_record = l->data;
 
-          mount_name = mount_info_to_mount_name (this_mount_record->info);
-          filler (buf, mount_name, NULL, 0);
-          g_free (mount_name);
+          filler (buf, mount_record->name, NULL, 0);
         }
 
       mount_list_unlock ();
@@ -2068,14 +1904,15 @@ vfs_chmod (const gchar *path, mode_t mode)
 }
 
 static void
-mount_tracker_mounted_cb (GMountTracker *tracer, GMountInfo *mount_info)
+mount_tracker_mounted_cb (GVolumeMonitor *volume_monitor,
+                          GVolume        *volume)
 {
   MountRecord *mount_record;
 
-  mount_record = mount_record_find_by_mount_spec (mount_info->mount_spec);
-  g_assert (mount_record == NULL);
+  if (mount_record_for_volume_exists (volume))
+    return;
 
-  mount_record = mount_record_new (g_mount_info_dup (mount_info));
+  mount_record = mount_record_new (volume);
 
   mount_list_lock ();
   mount_list = g_list_prepend (mount_list, mount_record);
@@ -2083,42 +1920,64 @@ mount_tracker_mounted_cb (GMountTracker *tracer, GMountInfo *mount_info)
 }
 
 static void
-mount_tracker_unmounted_cb (GMountTracker *tracer, GMountInfo *mount_info)
+mount_tracker_unmounted_cb (GVolumeMonitor *volume_monitor,
+                            GVolume        *volume)
 {
-  MountRecord *mount_record;
+  GFile *root;
+  GList *l;
 
-  mount_record = mount_record_find_by_mount_spec (mount_info->mount_spec);
-  g_assert (mount_record != NULL);
-
+  root = g_volume_get_root (volume);
+  
   mount_list_lock ();
-  mount_list = g_list_remove (mount_list, mount_record);
+  
+  root = g_volume_get_root (volume);
+
+  for (l = mount_list; l != NULL; l = l->next)
+    {
+      MountRecord *mount_record = l->data;
+      
+      if (g_file_equal (root, mount_record->root))
+        {
+          mount_list = g_list_delete_link (mount_list, l);
+          mount_record_free (mount_record);
+          break;
+        }
+    }
+      
   mount_list_unlock ();
 
-  mount_record_free (mount_record);
+  g_object_unref (root);
 }
 
 static gpointer
 subthread_main (gpointer data)
 {
-  g_signal_connect (mount_tracker, "mounted", (GCallback) mount_tracker_mounted_cb, NULL);
-  g_signal_connect (mount_tracker, "unmounted", (GCallback) mount_tracker_unmounted_cb, NULL);
+  
+  mount_list_update ();
+  
+  g_signal_connect (volume_monitor, "volume_mounted", (GCallback) mount_tracker_mounted_cb, NULL);
+  g_signal_connect (volume_monitor, "volume_unmounted", (GCallback) mount_tracker_unmounted_cb, NULL);
 
   g_main_loop_run (subthread_main_loop);
 
-  g_signal_handlers_disconnect_by_func (mount_tracker, mount_tracker_mounted_cb, NULL);
-  g_signal_handlers_disconnect_by_func (mount_tracker, mount_tracker_unmounted_cb, NULL);
+  g_signal_handlers_disconnect_by_func (volume_monitor, mount_tracker_mounted_cb, NULL);
+  g_signal_handlers_disconnect_by_func (volume_monitor, mount_tracker_unmounted_cb, NULL);
 
   g_main_loop_unref (subthread_main_loop);
 
-  g_object_unref (mount_tracker);
-  mount_tracker = NULL;
+  g_object_unref (volume_monitor);
+  volume_monitor = NULL;
 
   return NULL;
 }
 
+void g_io_module_load (GIOModule *module);
+
 static gpointer
 vfs_init (struct fuse_conn_info *conn)
 {
+  GVfs *vfs;
+  
   daemon_creation_time = time (NULL);
   daemon_uid = getuid ();
   daemon_gid = getgid ();
@@ -2127,10 +1986,9 @@ vfs_init (struct fuse_conn_info *conn)
   global_fh_table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                            g_free, (GDestroyNotify) file_handle_free);
 
-  /* Initializes D-Bus and other VFS necessities */
-  gvfs = G_VFS (g_daemon_vfs_new ());
-
-  mount_tracker = g_mount_tracker_new (NULL);
+  gvfs = g_vfs_get_default ();
+  
+  volume_monitor = g_object_new (g_type_from_name ("GDaemonVolumeMonitor"), NULL);
 
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
   subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);
@@ -2197,135 +2055,3 @@ main (gint argc, gchar *argv [])
 
   return fuse_main (argc, argv, &vfs_oper, NULL /* user data */);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
-
-#define MOUNT_NAME_SEPARATOR_S ":"
-
-static gchar *
-generate_options_string (const gchar *first_option_to_omit, ...)
-{
-  va_list vargs;
-
-  va_start (first_option_to_omit, &vargs);
-
-  va_end ();
-}
-
-static gchar *
-mount_spec_to_mount_name (GMountSpec *mount_spec)
-{
-  const gchar *type;
-
-  GDecodedUri *decoded_uri;
-  gchar       *mount_name;
-  gchar       *temp;
-
-  type = g_mount_spec_get (mount_spec, "type");
-  if (!type)
-    return NULL;
-
-  if (!strcmp (type, "smb-share"))
-    {
-      const gchar *server;
-      const gchar *share;
-
-      server = g_mount_spec_get (mount_spec, "server");
-      share = g_mount_spec_get (mount_spec, "share");
-
-      if (server && share)
-        {
-          mount_name = g_strjoin (MOUNT_NAME_SEPARATOR_S,
-                                  type,
-                                  server,
-                                  share,
-                                  NULL);
-        }
-    }
-
-
-
-
-
-
-
-  /* TODO: Escape all strings */
-
-  decoded_uri = _g_decode_uri (uri);
-  g_assert (decoded_uri != NULL);
-
-  mount_name = g_strjoin (":",
-                          decoded_uri->scheme,
-                          decoded_uri->host,
-                          decoded_uri->path,
-                          NULL);
-
-  if (decoded_uri->query)
-  {
-    temp = g_strjoin ("?",
-                      mount_name,
-                      decoded_uri->query,
-                      NULL);
-
-    g_free (mount_name);
-    mount_name = temp;
-  }
-
-  if (decoded_uri->fragment)
-  {
-    temp = g_strjoin ("#",
-                      mount_name,
-                      decoded_uri->fragment,
-                      NULL);
-
-    g_free (mount_name);
-    mount_name = temp;
-  }
-
-  if (decoded_uri->port != -1)
-  {
-    gchar *port_opt_str;
-
-    port_opt_str = g_strdup_printf ("port=%d", decoded_uri->port);
-
-    temp = g_strjoin (":",
-                      mount_name,
-                      port_opt_str,
-                      NULL);
-
-    g_free (mount_name);
-    mount_name = temp;
-  }
-
-  if (decoded_uri->userinfo)
-  {
-    gchar *user_opt_str;
-
-    user_opt_str = g_strdup_printf ("user=%s", decoded_uri->userinfo);
-
-    temp = g_strjoin (":",
-                      mount_name,
-                      user_opt_str,
-                      NULL);
-
-    g_free (mount_name);
-    mount_name = temp;
-  }
-
-  return mount_name;
-}
-
-#endif
-

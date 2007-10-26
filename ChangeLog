@@ -1,3 +1,12 @@
+2007-10-26  Alexander Larsson  <alexl@redhat.com>
+
+        * client/Makefile.am:
+        * client/gvfsfusedaemon.c:
+	Update fuse daemon to use the giomodule instead of
+	linking to a copy of the code. The old way was
+	problematic with the module code being a dynamic
+	type in the module and not in the fuse daemon.
+
 2007-10-25  Alexander Larsson  <alexl@redhat.com>
 
         * client/smburi.c:
