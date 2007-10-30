@@ -422,7 +422,8 @@ init_connection (GMountTracker *tracker)
 static void
 g_mount_tracker_init (GMountTracker *tracker)
 {
-  tracker->lock = g_mutex_new ();
+  if (g_thread_supported ())
+    tracker->lock = g_mutex_new ();
 }
 
 
@@ -461,7 +462,8 @@ g_mount_tracker_list_mounts (GMountTracker *tracker)
   GList *res, *l;
   GMountInfo *copy;
 
-  g_mutex_lock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_lock (tracker->lock);
   
   res = NULL;
   for (l = tracker->mounts; l != NULL; l = l->next)
@@ -470,7 +472,8 @@ g_mount_tracker_list_mounts (GMountTracker *tracker)
       res = g_list_prepend (res, copy);
     }
 
-  g_mutex_unlock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_unlock (tracker->lock);
   
   return g_list_reverse (res);
 }
@@ -482,7 +485,8 @@ g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
   GList *l;
   GMountInfo *info, *found;
 
-  g_mutex_lock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_lock (tracker->lock);
 
   found = NULL;
   for (l = tracker->mounts; l != NULL; l = l->next)
@@ -496,7 +500,8 @@ g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
 	}
     }
 
-  g_mutex_unlock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_unlock (tracker->lock);
   
   return found;
 }
@@ -510,7 +515,8 @@ g_mount_tracker_has_mount_spec (GMountTracker *tracker,
   GMountInfo *info;
   gboolean found;
 
-  g_mutex_lock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_lock (tracker->lock);
 
   found = FALSE;
   for (l = tracker->mounts; l != NULL; l = l->next)
@@ -524,7 +530,8 @@ g_mount_tracker_has_mount_spec (GMountTracker *tracker,
 	}
     }
 
-  g_mutex_unlock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_unlock (tracker->lock);
   
   return found;
 }

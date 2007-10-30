@@ -142,7 +142,7 @@ create_reply (GVfsJob *job,
   GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
   DBusMessage *reply;
   DBusMessageIter iter;
-  const char *type;
+  const char *type, *name;
 
   reply = dbus_message_new_method_return (message);
 
@@ -154,6 +154,12 @@ create_reply (GVfsJob *job,
     g_file_info_set_attribute_string (op_job->file_info,
 				      G_FILE_ATTRIBUTE_GVFS_BACKEND,
 				      type);
+
+  name = g_vfs_backend_get_display_name (op_job->backend);
+  if (name)
+    g_file_info_set_attribute_string (op_job->file_info,
+				      G_FILE_ATTRIBUTE_FS_VOLUME_NAME,
+				      name);
   
   _g_dbus_append_file_info (&iter, 
 			    op_job->file_info);

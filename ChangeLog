@@ -1,3 +1,11 @@
+2007-10-30  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gmounttracker.c:
+	Handle threads not being initialized
+	
+        * daemon/gvfsjobqueryfsinfo.c:
+	Set volume name
+
 2007-10-26  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonvolumemonitor.c:
