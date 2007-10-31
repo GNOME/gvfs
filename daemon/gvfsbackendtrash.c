@@ -511,7 +511,7 @@ list_trash_dirs (void)
     g_free (home_trash);
 
   topdirs = NULL;
-  mounts = g_get_unix_mounts ();
+  mounts = g_get_unix_mounts (NULL);
   for (l = mounts; l != NULL; l = l->next)
     {
       mount = l->data;
