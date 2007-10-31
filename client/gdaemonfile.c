@@ -290,6 +290,53 @@ g_daemon_file_equal (GFile *file1,
     g_str_equal (daemon_file1->path, daemon_file2->path);
 }
 
+
+static const char *
+match_prefix (const char *path, const char *prefix)
+{
+  int prefix_len;
+
+  prefix_len = strlen (prefix);
+  if (strncmp (path, prefix, prefix_len) != 0)
+    return NULL;
+  return path + prefix_len;
+}
+
+static gboolean
+g_daemon_file_contains_file (GFile *parent,
+			     GFile *descendant)
+{
+  GDaemonFile *parent_daemon = G_DAEMON_FILE (parent);
+  GDaemonFile *descendant_daemon = G_DAEMON_FILE (descendant);
+  const char *remainder;
+
+  if (descendant_daemon->mount_spec != parent_daemon->mount_spec)
+    return FALSE;
+  
+  remainder = match_prefix (descendant_daemon->path, parent_daemon->path);
+  if (remainder != NULL && *remainder == '/')
+    return TRUE;
+  return FALSE;
+}
+
+static char *
+g_daemon_file_get_relative_path (GFile *parent,
+				 GFile *descendant)
+{
+  GDaemonFile *parent_daemon = G_DAEMON_FILE (parent);
+  GDaemonFile *descendant_daemon = G_DAEMON_FILE (descendant);
+  const char *remainder;
+
+  if (descendant_daemon->mount_spec != parent_daemon->mount_spec)
+    return NULL;
+  
+  remainder = match_prefix (descendant_daemon->path, parent_daemon->path);
+  
+  if (remainder != NULL && *remainder == '/')
+    return g_strdup (remainder + 1);
+  return NULL;
+}
+
 static GFile *
 g_daemon_file_resolve_relative_path (GFile *file,
 				     const char *relative_path)
@@ -1868,6 +1915,8 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_uri = g_daemon_file_get_uri;
   iface->get_parse_name = g_daemon_file_get_parse_name;
   iface->get_parent = g_daemon_file_get_parent;
+  iface->contains_file = g_daemon_file_contains_file;
+  iface->get_relative_path = g_daemon_file_get_relative_path;
   iface->resolve_relative_path = g_daemon_file_resolve_relative_path;
   iface->get_child_for_display_name = g_daemon_file_get_child_for_display_name;
   iface->enumerate_children = g_daemon_file_enumerate_children;

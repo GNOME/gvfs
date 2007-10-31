@@ -1,5 +1,10 @@
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+	Implement contains_file and get_relative_path
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackend.[ch]:	
         Add g_vfs_backend_get_mount_spec
 	
