@@ -155,12 +155,6 @@ create_reply (GVfsJob *job,
 				      G_FILE_ATTRIBUTE_GVFS_BACKEND,
 				      type);
 
-  name = g_vfs_backend_get_display_name (op_job->backend);
-  if (name)
-    g_file_info_set_attribute_string (op_job->file_info,
-				      G_FILE_ATTRIBUTE_FS_VOLUME_NAME,
-				      name);
-  
   _g_dbus_append_file_info (&iter, 
 			    op_job->file_info);
   

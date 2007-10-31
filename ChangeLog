@@ -1,5 +1,10 @@
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsjobqueryfsinfo.c:
+	Remove volume name attribute
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendtrash.c:
 	Update to new API
 	
