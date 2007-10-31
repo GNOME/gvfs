@@ -29,7 +29,7 @@ g_daemon_volume_finalize (GObject *object)
   
   volume = G_DAEMON_VOLUME (object);
 
-  g_mount_info_free (volume->mount_info);
+  g_mount_info_unref (volume->mount_info);
   
   if (G_OBJECT_CLASS (g_daemon_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_parent_class)->finalize) (object);
@@ -55,7 +55,7 @@ g_daemon_volume_new (GVolumeMonitor *volume_monitor,
   GDaemonVolume *volume;
 
   volume = g_object_new (G_TYPE_DAEMON_VOLUME, NULL);
-  volume->mount_info = mount_info;
+  volume->mount_info = g_mount_info_ref (mount_info);
 
   return volume;
 }

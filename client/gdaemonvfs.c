@@ -14,6 +14,7 @@
 #include "gmountspec.h"
 #include "gvfsurimapper.h"
 #include "gdaemonvolumemonitor.h"
+#include <glib/gi18n-lib.h>
 
 #define G_TYPE_DAEMON_VFS		(g_daemon_vfs_get_type ())
 #define G_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_DAEMON_VFS, GDaemonVfs))
@@ -406,97 +407,51 @@ g_daemon_vfs_get_supported_uri_schemes (GVfs *vfs)
   return (const gchar * const *) G_DAEMON_VFS (vfs)->supported_uri_schemes;
 }
 
-GMountRef *
-_g_mount_ref_ref (GMountRef *ref)
+static GMountInfo *
+lookup_mount_info_in_cache_locked (GMountSpec *spec,
+				   const char *path)
 {
-  g_atomic_int_inc (&ref->ref_count);
-  return ref;
-}
-
-void
-_g_mount_ref_unref (GMountRef *ref)
-{
-  if (g_atomic_int_dec_and_test (&ref->ref_count))
-    {
-      g_free (ref->dbus_id);
-      g_free (ref->object_path);
-      g_mount_spec_unref (ref->spec);
-      g_free (ref->prefered_filename_encoding);
-      g_free (ref);
-    }
-}
-
-const char *
-_g_mount_ref_resolve_path (GMountRef *ref,
-			   const char *path)
-{
-  const char *new_path;
-  int len;
-
-  if (ref->spec->mount_prefix != NULL &&
-      ref->spec->mount_prefix[0] != 0)
-    {
-      len = strlen (ref->spec->mount_prefix);
-      if (ref->spec->mount_prefix[len-1] == '/')
-	len--;
-      new_path = path + len;
-    }
-  else
-    new_path = path;
-
-  if (new_path == NULL ||
-      new_path[0] == 0)
-    new_path = "/";
-
-  return new_path;
-}
-
-static GMountRef *
-lookup_mount_ref_in_cache_locked (GMountSpec *spec,
-				  const char *path)
-{
-  GMountRef *ref;
+  GMountInfo *info;
   GList *l;
 
-  ref = NULL;
+  info = NULL;
   for (l = the_vfs->mount_cache; l != NULL; l = l->next)
     {
-      GMountRef *mount_ref = l->data;
+      GMountInfo *mount_info = l->data;
 
-      if (g_mount_spec_match_with_path (mount_ref->spec, spec, path))
+      if (g_mount_spec_match_with_path (mount_info->mount_spec, spec, path))
 	{
-	  ref = _g_mount_ref_ref (mount_ref);
+	  info = g_mount_info_ref (mount_info);
 	  break;
 	}
     }
   
-  return ref;
+  return info;
 }
 
-static GMountRef *
-lookup_mount_ref_in_cache (GMountSpec *spec,
+static GMountInfo *
+lookup_mount_info_in_cache (GMountSpec *spec,
 			   const char *path)
 {
-  GMountRef *ref;
+  GMountInfo *info;
 
   G_LOCK (mount_cache);
-  ref = lookup_mount_ref_in_cache_locked (spec, path);
+  info = lookup_mount_info_in_cache_locked (spec, path);
   G_UNLOCK (mount_cache);
 
-  return ref;
+  return info;
 }
 
-static GMountRef *
+static GMountInfo *
 handler_lookup_mount_reply (DBusMessage *reply,
 			    GError **error)
 {
   DBusError derror;
-  GMountRef *ref;
-  DBusMessageIter iter, struct_iter;
-  const char *display_name, *icon, *obj_path, *dbus_id, *prefered_filename_encoding, *fuse_mountpoint;
-  GMountSpec *mount_spec;
+  GMountInfo *info;
+  DBusMessageIter iter;
   GList *l;
-  dbus_bool_t user_visible;
+  gboolean in_cache;
+  
 
   if (_g_error_from_message (reply, error))
     return NULL;
@@ -504,88 +459,53 @@ handler_lookup_mount_reply (DBusMessage *reply,
   dbus_error_init (&derror);
   dbus_message_iter_init (reply, &iter);
 
-  dbus_message_iter_recurse (&iter, &struct_iter);
-
-  if (!_g_dbus_message_iter_get_args (&struct_iter,
-				      &derror,
-				      DBUS_TYPE_STRING, &dbus_id,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
-				      DBUS_TYPE_STRING, &display_name,
-				      DBUS_TYPE_STRING, &icon,
-				      DBUS_TYPE_STRING, &prefered_filename_encoding,
-				      DBUS_TYPE_BOOLEAN, &user_visible,
-				      G_DBUS_TYPE_CSTRING, &fuse_mountpoint,
-				      0))
+  info = g_mount_info_from_dbus (&iter);
+  if (info == NULL)
     {
-      _g_error_from_dbus (&derror, error);
-      dbus_error_free (&derror);
-      return NULL;
-    }
-
-  mount_spec = g_mount_spec_from_dbus (&struct_iter);
-  if (mount_spec == NULL)
-    {
-      g_free (fuse_mountpoint);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   "Error while getting mount info: %s",
+		   _("Error while getting mount info: %s"),
 		   "Invalid reply");
       return NULL;
     }
 
   G_LOCK (mount_cache);
-  
-  ref = NULL;
+
+  in_cache = FALSE;
   /* Already in cache from other thread? */
   for (l = the_vfs->mount_cache; l != NULL; l = l->next)
     {
-      GMountRef *mount_ref = l->data;
+      GMountInfo *cached_info = l->data;
       
-      if (strcmp (mount_ref->dbus_id, dbus_id) == 0 &&
-	  strcmp (mount_ref->object_path, obj_path) == 0)
+      if (g_mount_info_equal (info, cached_info))
 	{
-	  ref = mount_ref;
+	  in_cache = TRUE;
+	  g_mount_info_unref (info);
+	  info = g_mount_info_ref (cached_info);
 	  break;
 	}
     }
 
   /* No, lets add it to the cache */
-  if (ref == NULL)
-    {
-      ref = g_new0 (GMountRef, 1);
-      ref->ref_count = 1;
-      ref->dbus_id = g_strdup (dbus_id);
-      ref->object_path = g_strdup (obj_path);
-      ref->spec = g_mount_spec_ref (mount_spec);
-      if (prefered_filename_encoding != NULL && *prefered_filename_encoding != 0) 
-	ref->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
-      if (fuse_mountpoint != NULL && *fuse_mountpoint != 0) 
-	ref->fuse_mountpoint = g_strdup (fuse_mountpoint);
-      
-      the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, ref);
-    }
-
-  _g_mount_ref_ref (ref);
+  if (!in_cache)
+    the_vfs->mount_cache = g_list_prepend (the_vfs->mount_cache, g_mount_info_ref (info));
 
   G_UNLOCK (mount_cache);
   
-  g_free (fuse_mountpoint);
-  g_mount_spec_unref (mount_spec);
-
-  return ref;
+  return info;
 }
 
 typedef struct {
-  GMountRefLookupCallback callback;
+  GMountInfoLookupCallback callback;
   gpointer user_data;
-} GetMountRefData;
+} GetMountInfoData;
 
 static void
-async_get_mount_ref_response (DBusMessage *reply,
-			      GError *io_error,
-			      void *_data)
+async_get_mount_info_response (DBusMessage *reply,
+			       GError *io_error,
+			       void *_data)
 {
-  GetMountRefData *data = _data;
-  GMountRef *ref;
+  GetMountInfoData *data = _data;
+  GMountInfo *info;
   GError *error;
 
   if (reply == NULL)
@@ -593,12 +513,12 @@ async_get_mount_ref_response (DBusMessage *reply,
   else
     {
       error = NULL;
-      ref = handler_lookup_mount_reply (reply, &error);
+      info = handler_lookup_mount_reply (reply, &error);
 
-      data->callback (ref, data->user_data, error);
+      data->callback (info, data->user_data, error);
 
-      if (ref)
-	_g_mount_ref_unref (ref);
+      if (info)
+	g_mount_info_unref (info);
 
       if (error)
 	g_error_free (error);
@@ -608,22 +528,22 @@ async_get_mount_ref_response (DBusMessage *reply,
 }
 
 void
-_g_daemon_vfs_get_mount_ref_async (GMountSpec *spec,
-				   const char *path,
-				   GMountRefLookupCallback callback,
-				   gpointer user_data)
+_g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
+				    const char *path,
+				    GMountInfoLookupCallback callback,
+				    gpointer user_data)
 {
-  GMountRef *ref;
-  GetMountRefData *data;
+  GMountInfo *info;
+  GetMountInfoData *data;
   DBusMessage *message;
   DBusMessageIter iter;
   
-  ref = lookup_mount_ref_in_cache (spec, path);
+  info = lookup_mount_info_in_cache (spec, path);
 
-  if (ref != NULL)
+  if (info != NULL)
     {
-      callback (ref, user_data, NULL);
-      _g_mount_ref_unref (ref);
+      callback (info, user_data, NULL);
+      g_mount_info_unref (info);
       return;
     }
 
@@ -637,33 +557,33 @@ _g_daemon_vfs_get_mount_ref_async (GMountSpec *spec,
   dbus_message_iter_init_append (message, &iter);
   g_mount_spec_to_dbus_with_path (&iter, spec, path);
 
-  data = g_new0 (GetMountRefData, 1);
+  data = g_new0 (GetMountInfoData, 1);
   data->callback = callback;
   data->user_data = user_data;
   
   _g_dbus_connection_call_async (the_vfs->async_bus, message, 2000,
-				 async_get_mount_ref_response,
+				 async_get_mount_info_response,
 				 data);
   
   dbus_message_unref (message);
 }
 
 
-GMountRef *
-_g_daemon_vfs_get_mount_ref_sync (GMountSpec *spec,
-				  const char *path,
-				  GError **error)
+GMountInfo *
+_g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
+				   const char *path,
+				   GError **error)
 {
-  GMountRef *ref;
+  GMountInfo *info;
   DBusConnection *conn;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
   DBusError derror;
 	
-  ref = lookup_mount_ref_in_cache (spec, path);
+  info = lookup_mount_info_in_cache (spec, path);
 
-  if (ref != NULL)
-    return ref;
+  if (info != NULL)
+    return info;
   
   conn = _g_dbus_connection_get_sync (NULL, error);
   if (conn == NULL)
@@ -692,11 +612,11 @@ _g_daemon_vfs_get_mount_ref_sync (GMountSpec *spec,
       return NULL;
     }
 
-  ref = handler_lookup_mount_reply (reply, error);
+  info = handler_lookup_mount_reply (reply, error);
 
   dbus_message_unref (reply);
   
-  return ref;
+  return info;
 }
 
 static GFile *

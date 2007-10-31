@@ -63,27 +63,68 @@ g_mount_info_dup (GMountInfo *info)
   GMountInfo *copy;
 
   copy = g_new (GMountInfo, 1);
+  copy->ref_count = 1;
   copy->display_name = g_strdup (info->display_name);
   copy->icon = g_strdup (info->icon);
   copy->dbus_id = g_strdup (info->dbus_id);
   copy->object_path = g_strdup (info->object_path);
   copy->mount_spec = g_mount_spec_copy (info->mount_spec);
+  copy->user_visible = info->user_visible;
+  copy->prefered_filename_encoding = g_strdup (info->prefered_filename_encoding);
+  copy->fuse_mountpoint = g_strdup (info->fuse_mountpoint);
   
   return copy;
 }
 
-void
-g_mount_info_free (GMountInfo *info)
+GMountInfo *
+g_mount_info_ref (GMountInfo *info)
 {
-  g_free (info->display_name);
-  g_free (info->icon);
-  g_free (info->dbus_id);
-  g_free (info->object_path);
-  g_mount_spec_unref (info->mount_spec);
-  g_free (info);
+  g_atomic_int_inc (&info->ref_count);
+  return info;
 }
 
-static GMountInfo *
+void
+g_mount_info_unref (GMountInfo *info)
+{
+  if (g_atomic_int_dec_and_test (&info->ref_count))
+    {
+      g_free (info->display_name);
+      g_free (info->icon);
+      g_free (info->dbus_id);
+      g_free (info->object_path);
+      g_mount_spec_unref (info->mount_spec);
+      g_free (info->prefered_filename_encoding);
+      g_free (info->fuse_mountpoint);
+      g_free (info);
+    }
+}
+
+const char *
+g_mount_info_resolve_path (GMountInfo *info,
+			   const char *path)
+{
+  const char *new_path;
+  int len;
+
+  if (info->mount_spec->mount_prefix != NULL &&
+      info->mount_spec->mount_prefix[0] != 0)
+    {
+      len = strlen (info->mount_spec->mount_prefix);
+      if (info->mount_spec->mount_prefix[len-1] == '/')
+	len--;
+      new_path = path + len;
+    }
+  else
+    new_path = path;
+
+  if (new_path == NULL ||
+      new_path[0] == 0)
+    new_path = "/";
+
+  return new_path;
+}
+
+GMountInfo *
 g_mount_info_from_dbus (DBusMessageIter *iter)
 {
   DBusMessageIter struct_iter;
@@ -117,16 +158,21 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   
   
   mount_spec = g_mount_spec_from_dbus (&struct_iter);
-  if (mount_spec == NULL)
+  if (mount_spec == NULL) {
+    g_free (fuse_mountpoint);
     return NULL;
+  }
 
   info = g_new0 (GMountInfo, 1);
+  info->ref_count = 1;
   info->display_name = g_strdup (display_name);
   info->icon = g_strdup (icon);
   info->dbus_id = g_strdup (dbus_id);
   info->object_path = g_strdup (obj_path);
   info->mount_spec = mount_spec;
   info->user_visible = user_visible;
+  info->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
+  info->fuse_mountpoint = fuse_mountpoint;
   
   return info;
 }
@@ -142,7 +188,7 @@ g_mount_tracker_finalize (GObject *object)
   g_mutex_free (tracker->lock);
   
   g_list_foreach (tracker->mounts,
-		  (GFunc)g_mount_info_free, NULL);
+		  (GFunc)g_mount_info_unref, NULL);
   g_list_free (tracker->mounts);
 
   dbus_connection_remove_filter (tracker->connection, g_mount_tracker_filter_func, tracker);
@@ -268,7 +314,7 @@ g_mount_tracker_add_mount (GMountTracker *tracker,
   if (g_mount_tracker_find (tracker, info))
     return;
 
-  tracker->mounts = g_list_prepend (tracker->mounts, g_mount_info_dup (info));
+  tracker->mounts = g_list_prepend (tracker->mounts, g_mount_info_ref (info));
 
   g_mutex_unlock (tracker->lock);
   
@@ -298,7 +344,7 @@ g_mount_tracker_remove_mount (GMountTracker *tracker,
   g_mutex_unlock (tracker->lock);
 
   g_signal_emit (tracker, signals[UNMOUNTED], 0, old_info);
-  g_mount_info_free (old_info);
+  g_mount_info_unref (old_info);
 }
 
 static void
@@ -323,7 +369,7 @@ list_mounts_reply (DBusPendingCall *pending,
       if (info)
 	{
 	  g_mount_tracker_add_mount (tracker, info);
-	  g_mount_info_free (info);
+	  g_mount_info_unref (info);
 	}
     }
   while (dbus_message_iter_next (&array_iter));
@@ -350,7 +396,7 @@ g_mount_tracker_filter_func (DBusConnection *conn,
       if (info)
 	{
 	  g_mount_tracker_add_mount (tracker, info);
-	  g_mount_info_free (info);
+	  g_mount_info_unref (info);
 	}
     }
   else if (dbus_message_is_signal (message,
@@ -363,7 +409,7 @@ g_mount_tracker_filter_func (DBusConnection *conn,
       if (info)
 	{
 	  g_mount_tracker_remove_mount (tracker, info);
-	  g_mount_info_free (info);
+	  g_mount_info_unref (info);
 	}
     }
     
@@ -468,7 +514,7 @@ g_mount_tracker_list_mounts (GMountTracker *tracker)
   res = NULL;
   for (l = tracker->mounts; l != NULL; l = l->next)
     {
-      copy = g_mount_info_dup (l->data);
+      copy = g_mount_info_ref (l->data);
       res = g_list_prepend (res, copy);
     }
 
@@ -495,7 +541,7 @@ g_mount_tracker_find_by_mount_spec (GMountTracker *tracker,
 
       if (g_mount_spec_equal (info->mount_spec, mount_spec))
 	{
-	  found = g_mount_info_dup (info);
+	  found = g_mount_info_ref (info);
 	  break;
 	}
     }

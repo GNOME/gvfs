@@ -17,11 +17,14 @@ typedef struct _GMountTracker        GMountTracker;
 typedef struct _GMountTrackerClass   GMountTrackerClass;
 
 typedef struct {
+  volatile int ref_count;
   char *display_name;
   char *icon;
   char *dbus_id;
   char *object_path;
   gboolean user_visible;
+  char *prefered_filename_encoding; /* NULL -> UTF8 */
+  char *fuse_mountpoint;
   GMountSpec *mount_spec;
 } GMountInfo;
 
@@ -37,10 +40,15 @@ struct _GMountTrackerClass
 
 GType g_mount_tracker_get_type (void) G_GNUC_CONST;
 
-gboolean    g_mount_info_equal (GMountInfo *info1,
-				GMountInfo *info2);
-GMountInfo *g_mount_info_dup   (GMountInfo *info);
-void        g_mount_info_free  (GMountInfo *info);
+gboolean    g_mount_info_equal        (GMountInfo *info1,
+				       GMountInfo *info2);
+GMountInfo *g_mount_info_ref          (GMountInfo *info);
+GMountInfo *g_mount_info_dup          (GMountInfo *info);
+void        g_mount_info_unref        (GMountInfo *info);
+const char *g_mount_info_resolve_path (GMountInfo *info,
+				       const char *path);
+
+GMountInfo * g_mount_info_from_dbus (DBusMessageIter *iter);
 
 GMountTracker *g_mount_tracker_new                (DBusConnection *connection);
 GList *        g_mount_tracker_list_mounts        (GMountTracker *tracker);

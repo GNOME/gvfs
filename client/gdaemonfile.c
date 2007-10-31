@@ -176,7 +176,7 @@ static char *
 g_daemon_file_get_path (GFile *file)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  GMountRef *mount_ref;
+  GMountInfo *mount_info;
   const char *rel_path;
   char *path;
 
@@ -185,24 +185,24 @@ g_daemon_file_get_path (GFile *file)
    * cases this will be cached.
    */
   
-  mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
-						daemon_file->path,
-						NULL);
+  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
+						  daemon_file->path,
+						  NULL);
 
-  if (mount_ref == NULL)
+  if (mount_info == NULL)
     return NULL;
 
   path = NULL;
   
-  if (mount_ref->fuse_mountpoint)
+  if (mount_info->fuse_mountpoint)
     {
       rel_path = daemon_file->path +
-	strlen (mount_ref->spec->mount_prefix);
+	strlen (mount_info->mount_spec->mount_prefix);
 
-      path = g_build_filename (mount_ref->fuse_mountpoint, rel_path, NULL);
+      path = g_build_filename (mount_info->fuse_mountpoint, rel_path, NULL);
     }
   
-  _g_mount_ref_unref (mount_ref);
+  g_mount_info_unref (mount_info);
   
   return path;
 }
@@ -310,41 +310,41 @@ g_daemon_file_resolve_relative_path (GFile *file,
 static DBusMessage *
 create_empty_message (GFile *file,
 		      const char *op,
-		      GMountRef **mount_ref_out,
+		      GMountInfo **mount_info_out,
 		      GError **error)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   DBusMessage *message;
-  GMountRef *mount_ref;
+  GMountInfo *mount_info;
   const char *path;
 
-  mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
-						daemon_file->path,
-						error);
-  if (mount_ref == NULL)
+  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
+						  daemon_file->path,
+						  error);
+  if (mount_info == NULL)
     return NULL;
 
-  if (mount_ref_out)
-    *mount_ref_out = _g_mount_ref_ref (mount_ref);
+  if (mount_info_out)
+    *mount_info_out = g_mount_info_ref (mount_info);
   
   message =
-    dbus_message_new_method_call (mount_ref->dbus_id,
-				  mount_ref->object_path,
+    dbus_message_new_method_call (mount_info->dbus_id,
+				  mount_info->object_path,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  op);
 
-  path = _g_mount_ref_resolve_path (mount_ref,
+  path = g_mount_info_resolve_path (mount_info,
 				    daemon_file->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
-  _g_mount_ref_unref (mount_ref);
+  g_mount_info_unref (mount_info);
   return message;
 }
 
 static DBusMessage *
 do_sync_path_call (GFile *file,
 		   const char *op,
-		   GMountRef **mount_ref_out,
+		   GMountInfo **mount_info_out,
 		   DBusConnection **connection_out,
 		   GCancellable *cancellable,
 		   GError **error,
@@ -354,7 +354,7 @@ do_sync_path_call (GFile *file,
   DBusMessage *message, *reply;
   va_list var_args;
 
-  message = create_empty_message (file, op, mount_ref_out, error);
+  message = create_empty_message (file, op, mount_info_out, error);
   if (!message)
     return NULL;
 
@@ -389,23 +389,23 @@ do_sync_2_path_call (GFile *file1,
   GDaemonFile *daemon_file1 = G_DAEMON_FILE (file1);
   GDaemonFile *daemon_file2 = G_DAEMON_FILE (file2);
   DBusMessage *message, *reply;
-  GMountRef *mount_ref1, *mount_ref2;
+  GMountInfo *mount_info1, *mount_info2;
   const char *path1, *path2;
   va_list var_args;
 
-  mount_ref1 = _g_daemon_vfs_get_mount_ref_sync (daemon_file1->mount_spec,
-						 daemon_file1->path,
-						 error);
-  if (mount_ref1 == NULL)
+  mount_info1 = _g_daemon_vfs_get_mount_info_sync (daemon_file1->mount_spec,
+						   daemon_file1->path,
+						   error);
+  if (mount_info1 == NULL)
     return NULL;
 
-  mount_ref2 = _g_daemon_vfs_get_mount_ref_sync (daemon_file2->mount_spec,
-						 daemon_file2->path,
-						 error);
-  if (mount_ref2 == NULL)
+  mount_info2 = _g_daemon_vfs_get_mount_info_sync (daemon_file2->mount_spec,
+						   daemon_file2->path,
+						   error);
+  if (mount_info2 == NULL)
     return NULL;
 
-  if (mount_ref1 != mount_ref2)
+  if (mount_info1 != mount_info2)
     {
       /* For copy this will cause the fallback code to be involved */
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
@@ -414,16 +414,16 @@ do_sync_2_path_call (GFile *file1,
     }
   
   message =
-    dbus_message_new_method_call (mount_ref1->dbus_id,
-				  mount_ref1->object_path,
+    dbus_message_new_method_call (mount_info1->dbus_id,
+				  mount_info1->object_path,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  op);
 
-  path1 = _g_mount_ref_resolve_path (mount_ref1,
+  path1 = g_mount_info_resolve_path (mount_info1,
 				     daemon_file1->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path1, 0);
 
-  path2 = _g_mount_ref_resolve_path (mount_ref1,
+  path2 = g_mount_info_resolve_path (mount_info2,
 				     daemon_file2->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path2, 0);
 
@@ -441,8 +441,8 @@ do_sync_2_path_call (GFile *file1,
 				   cancellable, error);
   dbus_message_unref (message);
 
-  _g_mount_ref_unref (mount_ref1);
-  _g_mount_ref_unref (mount_ref2);
+  g_mount_info_unref (mount_info1);
+  g_mount_info_unref (mount_info2);
   
   return reply;
 }
@@ -514,7 +514,7 @@ async_path_call_done (DBusMessage *reply,
 }
 
 static void
-do_async_path_call_callback (GMountRef *mount_ref,
+do_async_path_call_callback (GMountInfo *mount_info,
 			     gpointer _data,
 			     GError *error)
 {
@@ -533,12 +533,12 @@ do_async_path_call_callback (GMountRef *mount_ref,
     }
 
   message =
-    dbus_message_new_method_call (mount_ref->dbus_id,
-				  mount_ref->object_path,
+    dbus_message_new_method_call (mount_info->dbus_id,
+				  mount_info->object_path,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  data->op);
   
-  path = _g_mount_ref_resolve_path (mount_ref, daemon_file->path);
+  path = g_mount_info_resolve_path (mount_info, daemon_file->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path, 0);
 
   /* Append more args from data->args */
@@ -605,7 +605,7 @@ do_async_path_call (GFile *file,
     }
   
   
-  _g_daemon_vfs_get_mount_ref_async (daemon_file->mount_spec,
+  _g_daemon_vfs_get_mount_info_async (daemon_file->mount_spec,
 				     daemon_file->path,
 				     do_async_path_call_callback,
 				     data);
@@ -1340,25 +1340,40 @@ g_daemon_file_query_filesystem_info (GFile                *file,
   return info;
 }
 
+static GVolume *
+g_daemon_file_find_enclosing_volume (GFile *file,
+				     GCancellable *cancellable,
+				     GError **error)
+{
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+
+  return NULL;
+  /*
+  GMountInfo *mount_info;
+  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file1->mount_spec,
+						daemon_file1->path,
+						error);*/
+}
+
 static GFile *
 g_daemon_file_get_child_for_display_name (GFile        *file,
 					  const char   *display_name,
 					  GError      **error)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-  GMountRef *mount_ref;
+  GMountInfo *mount_info;
   char *basename;
   GFile *child;
 
-  mount_ref = _g_daemon_vfs_get_mount_ref_sync (daemon_file->mount_spec,
+  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
 						daemon_file->path,
 						NULL);
 
 
-  if (mount_ref && mount_ref->prefered_filename_encoding)
+  if (mount_info && mount_info->prefered_filename_encoding)
     {
       basename = g_convert (display_name, -1,
-			    mount_ref->prefered_filename_encoding,
+			    mount_info->prefered_filename_encoding,
 			    "UTF-8",
 			    NULL, NULL,
 			    NULL);
@@ -1738,23 +1753,23 @@ g_daemon_file_monitor_dir (GFile* file,
   GDirectoryMonitor *monitor;
   char *obj_path;
   dbus_uint32_t flags_dbus;
-  GMountRef *mount_ref;
+  GMountInfo *mount_info;
   DBusMessage *reply;
 
   flags_dbus = flags;
 
-  mount_ref = NULL;
+  mount_info = NULL;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR,
-			     &mount_ref, NULL,
+			     &mount_info, NULL,
 			     cancellable, NULL,
 			     DBUS_TYPE_UINT32, &flags_dbus,
 			     0);
   
   if (reply == NULL)
     {
-      if (mount_ref)
-	_g_mount_ref_unref (mount_ref);
+      if (mount_info)
+	g_mount_info_unref (mount_info);
       return NULL;
     }
   
@@ -1762,16 +1777,16 @@ g_daemon_file_monitor_dir (GFile* file,
 			      DBUS_TYPE_OBJECT_PATH, &obj_path,
 			      DBUS_TYPE_INVALID))
     {
-      _g_mount_ref_unref (mount_ref);
+      g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
       g_warning ("Invalid return value from monitor_dir");
       return NULL;
     }
   
-  monitor = g_daemon_directory_monitor_new (mount_ref->dbus_id,
+  monitor = g_daemon_directory_monitor_new (mount_info->dbus_id,
 					    obj_path);
   
-  _g_mount_ref_unref (mount_ref);
+  g_mount_info_unref (mount_info);
   dbus_message_unref (reply);
   
   return monitor;
@@ -1785,23 +1800,23 @@ g_daemon_file_monitor_file (GFile* file,
   GFileMonitor *monitor;
   char *obj_path;
   dbus_uint32_t flags_dbus;
-  GMountRef *mount_ref;
+  GMountInfo *mount_info;
   DBusMessage *reply;
 
   flags_dbus = flags;
 
-  mount_ref = NULL;
+  mount_info = NULL;
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR,
-			     &mount_ref, NULL,
+			     &mount_info, NULL,
 			     cancellable, NULL,
 			     DBUS_TYPE_UINT32, &flags_dbus,
 			     0);
   
   if (reply == NULL)
     {
-      if (mount_ref)
-	_g_mount_ref_unref (mount_ref);
+      if (mount_info)
+	g_mount_info_unref (mount_info);
       return NULL;
     }
   
@@ -1809,16 +1824,16 @@ g_daemon_file_monitor_file (GFile* file,
 			      DBUS_TYPE_OBJECT_PATH, &obj_path,
 			      DBUS_TYPE_INVALID))
     {
-      _g_mount_ref_unref (mount_ref);
+      g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
       g_warning ("Invalid return value from monitor_dir");
       return NULL;
     }
   
-  monitor = g_daemon_file_monitor_new (mount_ref->dbus_id,
+  monitor = g_daemon_file_monitor_new (mount_info->dbus_id,
 				       obj_path);
   
-  _g_mount_ref_unref (mount_ref);
+  g_mount_info_unref (mount_info);
   dbus_message_unref (reply);
   
   return monitor;
@@ -1843,6 +1858,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->query_info = g_daemon_file_query_info;
   iface->query_info_async = g_daemon_file_query_info_async;
   iface->query_info_finish = g_daemon_file_query_info_finish;
+  iface->find_enclosing_volume = g_daemon_file_find_enclosing_volume;
   iface->read = g_daemon_file_read;
   iface->append_to = g_daemon_file_append_to;
   iface->create = g_daemon_file_create;

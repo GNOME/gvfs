@@ -1,5 +1,17 @@
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gmounttracker.[ch]:
+	Add all mount info to GMountInfo
+	Make it refcounted
+	
+        * client/gdaemonvfs.[ch]:
+        * client/gdaemonfile.c:
+        * client/gdaemonvolumemonitor.c:
+	Remove GMountRef, replacing its use with
+	GMountInfo
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsjobqueryfsinfo.c:
 	Remove volume name attribute
 
