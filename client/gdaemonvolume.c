@@ -65,14 +65,6 @@ g_daemon_volume_get_mount_info (GDaemonVolume *volume)
   return volume->mount_info;
 }
 
-static char *
-g_daemon_volume_get_platform_id (GVolume *volume)
-{
-  /* TODO */
-
-  return NULL;
-}
-
 static GFile *
 g_daemon_volume_get_root (GVolume *volume)
 {
@@ -164,5 +156,4 @@ g_daemon_volume_volume_iface_init (GVolumeIface *iface)
   iface->unmount_finish = g_daemon_volume_unmount_finish;
   iface->eject = g_daemon_volume_eject;
   iface->eject_finish = g_daemon_volume_eject_finish;
-  iface->get_platform_id = g_daemon_volume_get_platform_id;
 }

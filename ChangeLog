@@ -1,5 +1,10 @@
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
+	* client/gdaemonvolume.c:
+	Remove get_platform_id
+	
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
 	Implement find_enclosing_volume
 	
