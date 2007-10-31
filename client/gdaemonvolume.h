@@ -23,8 +23,7 @@ struct _GDaemonVolumeClass {
 
 GType g_daemon_volume_get_type (void) G_GNUC_CONST;
 
-GDaemonVolume *g_daemon_volume_new            (GVolumeMonitor *volume_monitor,
-					       GMountInfo *mount_info);
+GDaemonVolume *g_daemon_volume_new            (GMountInfo *mount_info);
 
 GMountInfo    *g_daemon_volume_get_mount_info (GDaemonVolume *volume);
 

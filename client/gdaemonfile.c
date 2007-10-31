@@ -8,6 +8,7 @@
 
 #include "gdaemonfile.h"
 #include "gvfsdaemondbus.h"
+#include "gdaemonvolume.h"
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonfileinputstream.h>
 #include <gdaemonfileoutputstream.h>
@@ -1346,13 +1347,28 @@ g_daemon_file_find_enclosing_volume (GFile *file,
 				     GError **error)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
-
-  return NULL;
-  /*
   GMountInfo *mount_info;
-  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file1->mount_spec,
-						daemon_file1->path,
-						error);*/
+  GDaemonVolume *volume;
+  
+  mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
+						  daemon_file->path,
+						  error);
+  if (mount_info == NULL)
+    return NULL;
+
+  if (mount_info->user_visible)
+    {
+      volume = g_daemon_volume_new (mount_info);
+      g_mount_info_unref (mount_info);
+      
+      if (volume)
+	return G_VOLUME (volume);
+    }
+
+  g_set_error (error, G_IO_ERROR,
+	       G_IO_ERROR_NOT_FOUND,
+	       _("Containing volume does not exist"));
+  return NULL;
 }
 
 static GFile *

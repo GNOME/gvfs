@@ -49,8 +49,7 @@ g_daemon_volume_init (GDaemonVolume *daemon_volume)
 }
 
 GDaemonVolume *
-g_daemon_volume_new (GVolumeMonitor *volume_monitor,
-		     GMountInfo *mount_info)
+g_daemon_volume_new (GMountInfo *mount_info)
 {
   GDaemonVolume *volume;
 

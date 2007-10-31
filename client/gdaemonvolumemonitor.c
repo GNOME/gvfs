@@ -75,7 +75,7 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 
   if (mount_info->user_visible)
     {
-      volume = g_daemon_volume_new (G_VOLUME_MONITOR (daemon_monitor), mount_info);
+      volume = g_daemon_volume_new (mount_info);
       daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
       g_signal_emit_by_name (daemon_monitor, "volume_mounted", volume);
     }
@@ -119,7 +119,7 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
     info = l->data;
     if (info->user_visible)
       {
-	volume = g_daemon_volume_new (G_VOLUME_MONITOR (daemon_monitor), info);
+	volume = g_daemon_volume_new (info);
 	daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
       }
     

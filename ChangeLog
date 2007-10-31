@@ -1,5 +1,15 @@
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+	Implement find_enclosing_volume
+	
+        * client/gdaemonvolume.[ch]:
+        * client/gdaemonvolumemonitor.c:
+	No need to pass volume monitor when
+	createing volumes
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmounttracker.[ch]:
 	Add all mount info to GMountInfo
 	Make it refcounted
