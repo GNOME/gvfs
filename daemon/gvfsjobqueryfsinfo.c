@@ -56,8 +56,8 @@ g_vfs_job_query_fs_info_init (GVfsJobQueryFsInfo *job)
 
 GVfsJob *
 g_vfs_job_query_fs_info_new (DBusConnection *connection,
-			   DBusMessage *message,
-			   GVfsBackend *backend)
+			     DBusMessage *message,
+			     GVfsBackend *backend)
 {
   GVfsJobQueryFsInfo *job;
   DBusMessage *reply;
@@ -111,10 +111,10 @@ run (GVfsJob *job)
     }
   
   class->query_fs_info (op_job->backend,
-		      op_job,
-		      op_job->filename,
-		      op_job->file_info,
-		      op_job->attribute_matcher);
+			op_job,
+			op_job->filename,
+			op_job->file_info,
+			op_job->attribute_matcher);
 }
 
 static gboolean

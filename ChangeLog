@@ -1,5 +1,16 @@
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackend.[ch]:	
+        Add g_vfs_backend_get_mount_spec
+	
+        * daemon/gvfsjobqueryfsinfo.c:
+	Fix indentation
+	
+        * daemon/gvfsjobqueryinfo.c:
+	Implement id:fs attribute
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
 	* client/gdaemonvolume.c:
 	Remove get_platform_id
 	

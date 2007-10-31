@@ -58,8 +58,8 @@ g_vfs_job_query_info_init (GVfsJobQueryInfo *job)
 
 GVfsJob *
 g_vfs_job_query_info_new (DBusConnection *connection,
-			DBusMessage *message,
-			GVfsBackend *backend)
+			  DBusMessage *message,
+			  GVfsBackend *backend)
 {
   GVfsJobQueryInfo *job;
   DBusMessage *reply;
@@ -134,11 +134,11 @@ try (GVfsJob *job)
     return FALSE;
 
   return class->try_query_info (op_job->backend,
-			      op_job,
-			      op_job->filename,
-			      op_job->flags,
-			      op_job->file_info,
-			      op_job->attribute_matcher);
+				op_job,
+				op_job->filename,
+				op_job->flags,
+				op_job->file_info,
+				op_job->attribute_matcher);
 }
 
 /* Might be called on an i/o thread */
@@ -150,11 +150,27 @@ create_reply (GVfsJob *job,
   GVfsJobQueryInfo *op_job = G_VFS_JOB_QUERY_INFO (job);
   DBusMessage *reply;
   DBusMessageIter iter;
+  GMountSpec *spec;
+  char *id;
 
   reply = dbus_message_new_method_return (message);
 
   dbus_message_iter_init_append (reply, &iter);
 
+  if (g_file_attribute_matcher_matches (op_job->attribute_matcher,
+					G_FILE_ATTRIBUTE_ID_FS))
+    {
+      spec = g_vfs_backend_get_mount_spec (op_job->backend);
+      if (spec)
+	{
+	  id = g_mount_spec_to_string (spec);
+	  g_file_info_set_attribute_string (op_job->file_info,
+					    G_FILE_ATTRIBUTE_ID_FS,
+					    id);
+	  g_free (id);
+	}
+    }
+  
   _g_dbus_append_file_info (&iter, 
 			   op_job->file_info);
   

@@ -301,6 +301,14 @@ g_vfs_backend_get_icon_name (GVfsBackend *backend)
   return backend->priv->icon;
 }
 
+GMountSpec *
+g_vfs_backend_get_mount_spec (GVfsBackend *backend)
+{
+  return backend->priv->mount_spec;
+}
+
+
+
 static DBusHandlerResult
 backend_dbus_handler (DBusConnection  *connection,
 		      DBusMessage     *message,
