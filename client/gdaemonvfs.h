@@ -23,8 +23,7 @@ GDaemonVfs *g_daemon_vfs_new (void);
 char *          _g_daemon_vfs_get_uri_for_mountspec    (GMountSpec               *spec,
 							char                     *path,
 							gboolean                  allow_utf8);
-gboolean        _g_daemon_vfs_mountspec_has_uri_scheme (GMountSpec               *spec,
-							const char               *uri_scheme);
+const char *    _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec               *spec);
 void            _g_daemon_vfs_get_mount_info_async     (GMountSpec               *spec,
 							const char               *path,
 							GMountInfoLookupCallback  callback,

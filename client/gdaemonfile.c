@@ -151,9 +151,21 @@ g_daemon_file_has_uri_scheme (GFile *file,
 			      const char *uri_scheme)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+  const char *scheme;
+
+  scheme = _g_daemon_vfs_mountspec_get_uri_scheme (daemon_file->mount_spec);
+  return g_ascii_strcasecmp (scheme, uri_scheme) == 0;
+}
+
+static char *
+g_daemon_file_get_uri_scheme (GFile *file)
+{
+  GDaemonFile *daemon_file = G_DAEMON_FILE (file);
+  const char *scheme;
+
+  scheme = _g_daemon_vfs_mountspec_get_uri_scheme (daemon_file->mount_spec);
   
-  return _g_daemon_vfs_mountspec_has_uri_scheme (daemon_file->mount_spec,
-						 uri_scheme);
+  return g_strdup (scheme);
 }
 
 static char *

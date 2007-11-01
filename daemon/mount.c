@@ -9,6 +9,7 @@
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
+#include <gio/gurifuncs.h>
 #include <gio/gioerror.h>
 
 typedef struct {

@@ -277,9 +277,8 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
   return uri;
 }
 
-gboolean
-_g_daemon_vfs_mountspec_has_uri_scheme (GMountSpec               *spec,
-					const char               *uri_scheme)
+const char *
+_g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
 {
   const char *type, *scheme;
   GVfsUriMapper *mapper;
@@ -294,8 +293,9 @@ _g_daemon_vfs_mountspec_has_uri_scheme (GMountSpec               *spec,
   if (scheme == NULL)
     scheme = type;
 
-  return g_ascii_strcasecmp (scheme, uri_scheme) == 0;
+  return scheme;
 }
+
 
 static void
 fill_supported_uri_schemes (GDaemonVfs *vfs)

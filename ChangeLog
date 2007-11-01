@@ -1,3 +1,12 @@
+2007-11-01  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * client/gdaemonvfs.[ch]:
+	Implement get_uri_scheme
+	
+        * daemon/mount.c:
+	Add needed includes
+
 2007-10-31  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
