@@ -1,3 +1,11 @@
+2007-11-01  Christian Kellner  <gicmo@gnome.org>
+
+	* client/*.[ch]:
+	* common/*.[ch]:
+	* daemon/*.[ch]:
+	* test/*.[ch]:
+	Add copyright information to source files.
+
 2007-11-01  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
