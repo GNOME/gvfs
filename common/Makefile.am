@@ -12,7 +12,7 @@ libgvfscommon_la_SOURCES = 	\
 	gsysutils.c gsysutils.h \
 	gdbusutils.c gdbusutils.h \
 	gmountspec.c gmountspec.h \
-	gmountoperationdbus.c gmountoperation.h \
+	gmountoperationdbus.c gmountoperationdbus.h \
 	gmountsource.c gmountsource.h \
 	gmounttracker.c gmounttracker.h \
 	gvfsdaemonprotocol.c gvfsdaemonprotocol.h \
