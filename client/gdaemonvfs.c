@@ -91,7 +91,6 @@ g_daemon_vfs_finalize (GObject *object)
       dbus_connection_unref (vfs->async_bus);
     }
 
-
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
 }
@@ -138,6 +137,8 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	    }
 	  
 	  path = g_strdup (decoded->path);
+
+	  g_decoded_uri_free (decoded);
 	}
     }
   
