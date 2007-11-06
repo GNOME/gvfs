@@ -1,5 +1,12 @@
 2007-11-06  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.0.1 ===
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
         * client/Makefile.am:
         * daemon/Makefile.am:
         * test/Makefile.am:
