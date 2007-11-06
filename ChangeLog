@@ -1,3 +1,10 @@
+2007-11-06  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* configure.ac:
+	* daemon/gvfsdaemonutils.c: (dbus_connection_send_fd):
+	* daemon/mount.c: (vfs_mount_to_dbus), (dbus_message_function):
+	Fix typo: availible -> available.
+
 2007-11-06  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:

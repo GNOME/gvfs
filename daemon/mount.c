@@ -62,7 +62,7 @@ typedef void (*MountCallback) (VfsMountable *mountable,
 static GList *mountables = NULL;
 static GList *mounts = NULL;
 
-static gboolean fuse_availible;
+static gboolean fuse_available;
 
 static void lookup_mount (DBusConnection *connection,
 			  DBusMessage *message,
@@ -194,7 +194,7 @@ vfs_mount_to_dbus (VfsMount *mount,
 	      
   
   fuse_mountpoint = NULL;
-  if (fuse_availible && mount->user_visible)
+  if (fuse_available && mount->user_visible)
     {
       char *fs_name;
       
@@ -923,7 +923,7 @@ dbus_message_function (DBusConnection  *connection,
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 				   G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_FUSE))
-    fuse_availible = TRUE;
+    fuse_available = TRUE;
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT))
