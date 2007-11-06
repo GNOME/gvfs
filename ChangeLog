@@ -1,3 +1,11 @@
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gmountoperationdbus.c:
+        * common/gmounttracker.c:
+        * daemon/gvfsbackend.h:
+        * daemon/gvfschannel.h:
+	Remove use of old giotypes.h header
+
 2007-11-03  Paolo Borelli  <pborelli@katamail.com>
 
 	* client/gdaemonvfs.c (get_mountspec_from_uri):

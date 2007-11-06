@@ -41,6 +41,7 @@ enum {
 
 /* TODO: Real P_() */
 #define P_(_x) (_x)
+#define I_(string) g_intern_static_string (string)
 
 static guint signals[LAST_SIGNAL] = { 0 };
 

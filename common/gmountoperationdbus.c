@@ -26,7 +26,8 @@
 
 #include <dbus/dbus.h>
 
-#include <gio/giotypes.h>
+#define I_(string) g_intern_static_string (string)
+
 #include <gio/gioerror.h>
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
