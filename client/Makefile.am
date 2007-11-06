@@ -1,6 +1,7 @@
 NULL =
 
-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
+INCLUDES = -I$(top_srcdir) \
+	-I$(top_srcdir)/client \
 	-I$(top_srcdir)/common \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
@@ -22,7 +23,7 @@ vfssources = \
 	gdaemonfileenumerator.c gdaemonfileenumerator.h \
 	gdaemondirectorymonitor.c gdaemondirectorymonitor.h \
 	gdaemonfilemonitor.c gdaemonfilemonitor.h \
-	gvfsdaemondbus.c \
+	gvfsdaemondbus.c gvfsdaemondbus.h\
 	$(NULL)
 
 vfslibs = \

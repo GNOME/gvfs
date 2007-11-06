@@ -30,10 +30,6 @@ service_DATA = gvfs-daemon.service
 
 mountdir = $(sysconfdir)/gvfs/mounts
 
-EXTRA_DIST = gvfs-daemon.service.in
-
-DISTCLEANFILES = gvfs-daemon.service
-
 libexec_PROGRAMS=gvfs-daemon gvfs-daemon-ftp gvfs-daemon-sftp gvfs-daemon-trash
 
 mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in
@@ -44,6 +40,11 @@ mount_in_files += smb.mount.in smb-browse.mount.in
 mount_DATA += smb.mount smb-browse.mount
 libexec_PROGRAMS += gvfs-daemon-smb-browse gvfs-daemon-smb
 endif
+
+EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files)
+
+DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
+
 
 noinst_PROGRAMS =				\
 	gvfs-daemon-test			\
@@ -145,6 +146,7 @@ gvfs_daemon_ftp_CPPFLAGS = \
 gvfs_daemon_ftp_LDADD = $(libraries)
 
 gvfs_daemon_sftp_SOURCES = \
+	sftp.h \
 	gvfsbackendsftp.c gvfsbackendsftp.h \
 	pty_open.c pty_open.h \
 	daemon-main.c daemon-main.h \

@@ -15,3 +15,5 @@ noinst_PROGRAMS = \
 	benchmark-posix-small-files   \
 	benchmark-posix-big-files     \
 	$(NULL)
+
+EXTRA_DIST = benchmark-common.c

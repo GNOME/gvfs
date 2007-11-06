@@ -1,5 +1,12 @@
 2007-11-06  Alexander Larsson  <alexl@redhat.com>
 
+        * client/Makefile.am:
+        * daemon/Makefile.am:
+        * test/Makefile.am:
+	Fix make distcheck
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         (g_daemon_file_file_iface_init):
 	Actually export get_uri_scheme
