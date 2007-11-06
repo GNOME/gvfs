@@ -1944,6 +1944,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->equal = g_daemon_file_equal;
   iface->is_native = g_daemon_file_is_native;
   iface->has_uri_scheme = g_daemon_file_has_uri_scheme;
+  iface->get_uri_scheme = g_daemon_file_get_uri_scheme;
   iface->get_basename = g_daemon_file_get_basename;
   iface->get_path = g_daemon_file_get_path;
   iface->get_uri = g_daemon_file_get_uri;

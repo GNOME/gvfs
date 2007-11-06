@@ -1,5 +1,15 @@
 2007-11-06  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        (g_daemon_file_file_iface_init):
+	Actually export get_uri_scheme
+	
+        * client/gdaemonfileinputstream.c:
+        (g_daemon_file_input_stream_query_info):
+	Set NOT_SUPPORTED error
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountoperationdbus.c:
         * common/gmounttracker.c:
         * daemon/gvfsbackend.h:

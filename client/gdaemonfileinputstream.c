@@ -1235,6 +1235,8 @@ g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("The query info operation is not supported"));
+  
   return NULL;
 }
 
