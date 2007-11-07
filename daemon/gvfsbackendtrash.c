@@ -549,9 +549,9 @@ list_trash_dirs (void)
 
   for (l = topdirs, li = topdirs_info; l != NULL && li != NULL; l = l->next, li = li->next)
     {
-      topdir = l->data;
       TopdirInfo info = GPOINTER_TO_UINT (li->data);
       char *basename, *trashdir;
+      topdir = l->data;
 
       if (info & HAS_SYSTEM_DIR)
         {

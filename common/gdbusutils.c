@@ -574,7 +574,7 @@ void
 _g_error_from_dbus (DBusError *derror, 
 		    GError **error)
 {
-  const char *name, *end;;
+  const char *name, *end;
   GString *str;
   GQuark domain;
   int code;

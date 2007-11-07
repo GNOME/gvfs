@@ -305,7 +305,7 @@ try_enumerate (GVfsBackend *backend,
 	       GFileAttributeMatcher *matcher,
 	       GFileQueryInfoFlags flags)
 {
-  GFileInfo *info1, *info2;;
+  GFileInfo *info1, *info2;
   GList *l;
 
   g_print ("try_enumerate (%s)\n", filename);
