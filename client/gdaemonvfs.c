@@ -80,8 +80,11 @@ g_daemon_vfs_finalize (GObject *object)
 
   vfs = G_DAEMON_VFS (object);
 
-  g_hash_table_destroy (vfs->from_uri_hash);
-  g_hash_table_destroy (vfs->to_uri_hash);
+  if (vfs->from_uri_hash)
+    g_hash_table_destroy (vfs->from_uri_hash);
+  
+  if (vfs->to_uri_hash)
+    g_hash_table_destroy (vfs->to_uri_hash);
 
   g_strfreev (vfs->supported_uri_schemes);
 
@@ -91,6 +94,9 @@ g_daemon_vfs_finalize (GObject *object)
       dbus_connection_unref (vfs->async_bus);
     }
 
+  if (vfs->wrapped_vfs)
+    g_object_unref (vfs->wrapped_vfs);
+  
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
 }
@@ -165,15 +171,17 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
 
-  vfs->wrapped_vfs = g_vfs_get_local ();
-
   if (g_thread_supported ())
     dbus_threads_init_default ();
   
   vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
 
-  if (vfs->async_bus)
-    _g_dbus_connection_integrate_with_main (vfs->async_bus);
+  if (vfs->async_bus == NULL)
+    return;
+  
+  vfs->wrapped_vfs = g_vfs_get_local ();
+
+  _g_dbus_connection_integrate_with_main (vfs->async_bus);
 
   g_io_modules_ensure_loaded (GVFS_MODULE_DIR);
 
@@ -668,16 +676,11 @@ _g_daemon_vfs_get_async_bus (void)
   return the_vfs->async_bus;
 }
 
-static const char *
-g_daemon_vfs_get_name (GVfs *vfs)
+static gboolean
+g_daemon_vfs_is_active (GVfs *vfs)
 {
-  return "gvfs";
-}
-
-static int
-g_daemon_vfs_get_priority (GVfs *vfs)
-{
-  return 10;
+  GDaemonVfs *daemon_vfs = G_DAEMON_VFS (vfs);
+  return daemon_vfs->async_bus != NULL;
 }
 
 static void
@@ -698,8 +701,11 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
   object_class->finalize = g_daemon_vfs_finalize;
 
   vfs_class = G_VFS_CLASS (class);
-  vfs_class->get_name = g_daemon_vfs_get_name;
-  vfs_class->get_priority = g_daemon_vfs_get_priority;
+
+  vfs_class->name = "gvfs";
+  vfs_class->priority = 10;
+  
+  vfs_class->is_active = g_daemon_vfs_is_active;
   vfs_class->get_file_for_path = g_daemon_vfs_get_file_for_path;
   vfs_class->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
   vfs_class->get_supported_uri_schemes = g_daemon_vfs_get_supported_uri_schemes;
