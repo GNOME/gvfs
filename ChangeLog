@@ -1,3 +1,9 @@
+2007-11-07  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* daemon/gvfsbackendsftp.c:
+	Update g_memory_output_stream_set_free_on_close() to
+	g_memory_output_stream_set_free_data().
+
 2007-11-07  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonvfs.c:

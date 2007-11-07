@@ -430,14 +430,14 @@ new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
 }
 
 static GByteArray *
-get_data_from_command_stream (GDataOutputStream *command_stream, gboolean free_on_close)
+get_data_from_command_stream (GDataOutputStream *command_stream, gboolean free_data)
 {
   GOutputStream *mem_stream;
   GByteArray *array;
   guint32 *len_ptr;
   
   mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));
-  g_memory_output_stream_set_free_on_close (G_MEMORY_OUTPUT_STREAM (mem_stream), free_on_close);
+  g_memory_output_stream_set_free_data (G_MEMORY_OUTPUT_STREAM (mem_stream), free_data);
   array = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
 
   len_ptr = (guint32 *)array->data;
