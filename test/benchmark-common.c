@@ -184,7 +184,7 @@ G_GNUC_UNUSED static void
 benchmark_start_wallclock_timer (gint n_seconds)
 {
   benchmark_is_running = TRUE;
-  signal (SIGALRM, (sig_t) benchmark_timeout);
+  signal (SIGALRM, benchmark_timeout);
   alarm (n_seconds);
 }
 
@@ -198,7 +198,7 @@ benchmark_start_cpu_timer (gint n_seconds)
   memset (&itv, 0, sizeof (itv));
   itv.it_value.tv_sec = n_seconds;
 
-  signal (SIGPROF, (sig_t) benchmark_timeout);
+  signal (SIGPROF, benchmark_timeout);
   setitimer (ITIMER_PROF, &itv, NULL);
 }
 

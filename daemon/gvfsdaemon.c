@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/errno.h>
+#include <errno.h>
 #include <sys/un.h>
 #include <unistd.h>
 #include <string.h>

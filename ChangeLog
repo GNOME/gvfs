@@ -1,3 +1,11 @@
+2007-11-08  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsdaemon.c:
+        * daemon/gvfsjobmove.c:
+        * test/benchmark-common.c:
+	Fixes for solaris build.
+	Patches from Damien Carbery
+
 2007-11-07  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* daemon/gvfsbackendsftp.c:
