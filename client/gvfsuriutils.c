@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 void
-g_decoded_uri_free (GDecodedUri *decoded)
+g_vfs_decoded_uri_free (GDecodedUri *decoded)
 {
   if (decoded == NULL)
     return;
@@ -41,7 +41,7 @@ g_decoded_uri_free (GDecodedUri *decoded)
 }
 
 GDecodedUri *
-g_decoded_uri_new (void)
+g_vfs_decoded_uri_new (void)
 {
   GDecodedUri *uri;
 
@@ -52,7 +52,7 @@ g_decoded_uri_new (void)
 }
 
 GDecodedUri *
-g_decode_uri (const char *uri)
+g_vfs_decode_uri (const char *uri)
 {
   GDecodedUri *decoded;
   const char *p, *in, *hier_part_start, *hier_part_end, *query_start, *fragment_start;
@@ -86,7 +86,7 @@ g_decode_uri (const char *uri)
 	return NULL;
     }
 
-  decoded = g_decoded_uri_new ();
+  decoded = g_vfs_decoded_uri_new ();
   
   decoded->scheme = g_malloc (p - uri);
   out = decoded->scheme;
@@ -162,7 +162,7 @@ g_decode_uri (const char *uri)
 	  decoded->userinfo = g_uri_unescape_segment (userinfo_start, userinfo_end, NULL);
 	  if (decoded->userinfo == NULL)
 	    {
-	      g_decoded_uri_free (decoded);
+	      g_vfs_decoded_uri_free (decoded);
 	      return NULL;
 	    }
 	  host_start = userinfo_end + 1;
@@ -192,7 +192,7 @@ g_decode_uri (const char *uri)
 
   if (decoded->path == NULL)
     {
-      g_decoded_uri_free (decoded);
+      g_vfs_decoded_uri_free (decoded);
       return NULL;
     }
   
@@ -200,7 +200,7 @@ g_decode_uri (const char *uri)
 }
 
 char *
-g_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
+g_vfs_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
 {
   GString *uri;
 

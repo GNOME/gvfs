@@ -8,10 +8,15 @@ INCLUDES = -I$(top_srcdir) \
 	-DGVFS_MODULE_DIR=\"$(libdir)/gvfs/modules\"	\
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
-module_flags = -export_dynamic -avoid-version -module -no-undefined
+module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_vfs_.*|g_io_module_load|g_io_module_unload'
 giomodulesdir = $(libdir)/gio/modules
 
 ## Common to dynamic and static client libs
+
+gvfsclientincludedir=$(includedir)/gvfs-client/gvfs/
+gvfsclientinclude_HEADERS = \
+	gvfsuriutils.h gvfsurimapper.h \
+	$(NULL)
 
 vfssources = \
 	gdaemonvfs.c gdaemonvfs.h \
@@ -23,11 +28,13 @@ vfssources = \
 	gdaemonfileenumerator.c gdaemonfileenumerator.h \
 	gdaemondirectorymonitor.c gdaemondirectorymonitor.h \
 	gdaemonfilemonitor.c gdaemonfilemonitor.h \
-	gvfsdaemondbus.c gvfsdaemondbus.h\
+	gvfsdaemondbus.c gvfsdaemondbus.h \
+	gvfsuriutils.c gvfsuriutils.h \
+	gvfsurimapper.c gvfsurimapper.h \
 	$(NULL)
 
 vfslibs = \
-	$(top_builddir)/common/libgvfscommon.la \
+	$(top_builddir)/common/libgvfscommon-noin.la \
 	$(DBUS_LIBS) \
 	$(GLIB_LIBS) \
 	$(NULL)
@@ -51,7 +58,7 @@ libsmb_la_SOURCES = 	\
 	$(NULL)
 
 libsmb_la_LIBADD = \
-	$(top_builddir)/common/libgvfscommon.la	\
+	libgvfsdbus.la	\
 	$(GLIB_LIBS) \
 	$(NULL)
 

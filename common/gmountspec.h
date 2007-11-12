@@ -59,6 +59,8 @@ typedef struct {
 } GMountSpec;
 
 GMountSpec *g_mount_spec_new               (const char      *type);
+GMountSpec *g_mount_spec_new_from_data     (GArray          *items,
+					    char            *mount_prefix);
 GMountSpec *g_mount_spec_ref               (GMountSpec      *spec);
 void        g_mount_spec_unref             (GMountSpec      *spec);
 GMountSpec *g_mount_spec_get_unique_for    (GMountSpec      *spec);

@@ -38,11 +38,11 @@ typedef struct {
   char *fragment;
 } GDecodedUri;
 
-char *       g_encode_uri                (GDecodedUri *decoded,
-					  gboolean     allow_utf8);
-void         g_decoded_uri_free          (GDecodedUri *decoded);
-GDecodedUri *g_decode_uri                (const char  *uri);
-GDecodedUri *g_decoded_uri_new           (void);
+char *       g_vfs_encode_uri                (GDecodedUri *decoded,
+					      gboolean     allow_utf8);
+void         g_vfs_decoded_uri_free          (GDecodedUri *decoded);
+GDecodedUri *g_vfs_decode_uri                (const char  *uri);
+GDecodedUri *g_vfs_decoded_uri_new           (void);
 
 
 G_END_DECLS

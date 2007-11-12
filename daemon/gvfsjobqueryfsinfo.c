@@ -164,7 +164,7 @@ create_reply (GVfsJob *job,
   GVfsJobQueryFsInfo *op_job = G_VFS_JOB_QUERY_FS_INFO (job);
   DBusMessage *reply;
   DBusMessageIter iter;
-  const char *type, *name;
+  const char *type;
 
   reply = dbus_message_new_method_return (message);
 

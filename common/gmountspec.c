@@ -59,6 +59,22 @@ g_mount_spec_new (const char *type)
 }
 
 GMountSpec *
+g_mount_spec_new_from_data (GArray *items,
+			    char *mount_prefix)
+{
+  GMountSpec *spec;
+
+  spec = g_new0 (GMountSpec, 1);
+  spec->ref_count = 1;
+  spec->items = items;
+  spec->mount_prefix = mount_prefix;
+
+  g_array_sort (spec->items, item_compare);
+  
+  return spec;
+}
+
+GMountSpec *
 g_mount_spec_get_unique_for (GMountSpec *spec)
 {
   GMountSpec *unique_spec;
@@ -118,22 +134,23 @@ g_mount_spec_set_with_len (GMountSpec *spec,
 {
   int i;
   char *value_copy;
-  
+
+  if (value_len == -1)
+    value_copy = g_strdup (value);
+  else
+    value_copy = g_strndup (value, value_len);
+
   for (i = 0; i < spec->items->len; i++)
     {
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
       if (strcmp (item->key, key) == 0)
 	{
 	  g_free (item->value);
-	  item->value = g_strdup (value);
+	  item->value = value_copy;
 	  return;
 	}
     }
 
-  if (value_len == -1)
-    value_copy = g_strdup (value);
-  else
-    value_copy = g_strndup (value, value_len);
   add_item (spec, key, value_copy);
   g_array_sort (spec->items, item_compare);
 }

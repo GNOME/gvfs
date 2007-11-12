@@ -2040,7 +2040,6 @@ vfs_init (struct fuse_conn_info *conn)
 	DBusConnection *dbus_conn;
   DBusMessage *message;
 	DBusError error;
-  GVfs *vfs;
   
   daemon_creation_time = time (NULL);
   daemon_uid = getuid ();

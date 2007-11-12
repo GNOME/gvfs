@@ -111,20 +111,34 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   char *path;
   GVfsUriMapper *mapper;
   char *scheme;
-
+  GVfsUriMountInfo *info;
+  
   scheme = g_uri_get_scheme (uri);
   if (scheme == NULL)
     return FALSE;
   
   spec = NULL;
+  path = NULL;
   
   mapper = g_hash_table_lookup (vfs->from_uri_hash, scheme);
-  if (mapper == NULL ||
-      !g_vfs_uri_mapper_from_uri (mapper, uri, &spec, &path))
+  
+  if (mapper)
+    {
+      info = g_vfs_uri_mapper_from_uri (mapper, uri);
+      if (info != NULL)
+	{
+	  spec = g_mount_spec_new_from_data (info->keys, NULL);
+	  path = info->path;
+	  /* We took over ownership, custom free: */
+	  g_free (info);
+	}
+    }
+  
+  if (spec == NULL)
     {
       GDecodedUri *decoded;
       
-      decoded = g_decode_uri (uri);
+      decoded = g_vfs_decode_uri (uri);
       if (decoded)
 	{
 	  spec = g_mount_spec_new (decoded->scheme);
@@ -144,7 +158,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	  
 	  path = g_strdup (decoded->path);
 
-	  g_decoded_uri_free (decoded);
+	  g_vfs_decoded_uri_free (decoded);
 	}
     }
   
@@ -280,7 +294,12 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
   uri = NULL;
   mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
   if (mapper)
-    uri = g_vfs_uri_mapper_to_uri (mapper, spec, path, allow_utf8);
+    {
+      GVfsUriMountInfo info;
+      info.keys = spec->items;
+      info.path = path;
+      uri = g_vfs_uri_mapper_to_uri (mapper, &info, allow_utf8);
+    }
 
   if (uri == NULL)
     {
@@ -302,7 +321,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
       else
 	decoded.path = path;
       
-      uri = g_encode_uri (&decoded, FALSE);
+      uri = g_vfs_encode_uri (&decoded, FALSE);
     }
   
   return uri;
@@ -319,14 +338,20 @@ _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
 
   scheme = NULL;
   if (mapper)
-    scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, spec);
+    {
+      GVfsUriMountInfo info;
+      
+      info.keys = spec->items;
+      info.path = "/";
+      
+      scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, &info);
+    }
   
   if (scheme == NULL)
     scheme = type;
-
+  
   return scheme;
 }
-
 
 static void
 fill_supported_uri_schemes (GDaemonVfs *vfs)
@@ -389,7 +414,14 @@ fill_supported_uri_schemes (GDaemonVfs *vfs)
       mapper = g_hash_table_lookup (vfs->to_uri_hash, type);
     
       if (mapper)
-        scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, spec);
+	{
+	  GVfsUriMountInfo info;
+	  
+	  info.keys = spec->items;
+	  info.path = "/";
+	  
+	  scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, &info);
+	}
 
       if (scheme == NULL)
         scheme = type;
