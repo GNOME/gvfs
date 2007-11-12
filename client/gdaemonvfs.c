@@ -746,11 +746,16 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 
 /* Module API */
 
+void g_vfs_uri_mapper_smb_register (GIOModule *module);
+
 void
 g_io_module_load (GIOModule *module)
 {
   g_daemon_vfs_register_type (G_TYPE_MODULE (module));
   g_daemon_volume_monitor_register_types (G_TYPE_MODULE (module));
+
+  g_vfs_uri_mapper_register (module);
+  g_vfs_uri_mapper_smb_register (module);
 }
 
 void

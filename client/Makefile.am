@@ -18,6 +18,10 @@ gvfsclientinclude_HEADERS = \
 	gvfsuriutils.h gvfsurimapper.h \
 	$(NULL)
 
+URI_PARSER_SOURCES = \
+	smburi.c \
+	$(NULL)
+
 vfssources = \
 	gdaemonvfs.c gdaemonvfs.h \
 	gdaemonvolume.c gdaemonvolume.h \
@@ -31,6 +35,7 @@ vfssources = \
 	gvfsdaemondbus.c gvfsdaemondbus.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gvfsurimapper.c gvfsurimapper.h \
+	$(URI_PARSER_SOURCES) \
 	$(NULL)
 
 vfslibs = \
@@ -46,22 +51,6 @@ giomodules_LTLIBRARIES = libgvfsdbus.la
 libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = $(vfssources)
 libgvfsdbus_la_LIBADD  = $(vfslibs)
-
-## Uri parser modules
-
-libvfsmodulesdir = $(libdir)/gvfs/modules
-libvfsmodules_LTLIBRARIES = libsmb.la
-
-libsmb_la_LDFLAGS = $(module_flags)
-libsmb_la_SOURCES = 	\
-	smburi.c \
-	$(NULL)
-
-libsmb_la_LIBADD = \
-	libgvfsdbus.la	\
-	$(GLIB_LIBS) \
-	$(NULL)
-
 
 if USE_FUSE
 

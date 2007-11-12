@@ -24,6 +24,7 @@
 #define __G_VFS_URI_MAPPER_H__
 
 #include <glib-object.h>
+#include <gio/giomodule.h>
 
 G_BEGIN_DECLS
 
@@ -69,7 +70,8 @@ struct _GVfsUriMapperClass
 					           GVfsUriMountInfo *mount_info);
 };
 
-GType g_vfs_uri_mapper_get_type (void) G_GNUC_CONST;
+GType g_vfs_uri_mapper_get_type (void);
+void g_vfs_uri_mapper_register (GIOModule *module);
 
 GVfsUriMountInfo *g_vfs_uri_mount_info_new          (const char       *type);
 void              g_vfs_uri_mount_info_free         (GVfsUriMountInfo *info);

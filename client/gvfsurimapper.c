@@ -25,7 +25,13 @@
 #include <gmodule.h>
 #include "gvfsurimapper.h"
 
-G_DEFINE_TYPE (GVfsUriMapper, g_vfs_uri_mapper, G_TYPE_OBJECT);
+G_DEFINE_DYNAMIC_TYPE (GVfsUriMapper, g_vfs_uri_mapper, G_TYPE_OBJECT);
+
+void
+g_vfs_uri_mapper_register (GIOModule *module)
+{
+  g_vfs_uri_mapper_register_type (G_TYPE_MODULE (module));
+}
 
 GVfsUriMountInfo *
 g_vfs_uri_mount_info_new (const char *type)
@@ -127,6 +133,10 @@ g_vfs_uri_mount_info_set (GVfsUriMountInfo *info,
 }
 
 
+static void
+g_vfs_uri_mapper_class_finalize (GVfsUriMapperClass *klass)
+{
+}
 
 static void
 g_vfs_uri_mapper_class_init (GVfsUriMapperClass *klass)

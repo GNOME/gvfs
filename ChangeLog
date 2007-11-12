@@ -1,5 +1,16 @@
 2007-11-12  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gvfsurimapper.[ch]:
+	Make this class dynamic
+	
+        * client/Makefile.am:
+        * client/gdaemonvfs.c:
+        * client/smburi.c:
+	Build smb uri mapper into module
+	(this avoids extra .so files)
+
+2007-11-12  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountspec.[ch]:
         (g_mount_spec_new_from_data):
         (g_mount_spec_set_with_len):
