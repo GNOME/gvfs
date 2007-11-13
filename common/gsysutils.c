@@ -25,6 +25,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <stdio.h>
+#include <string.h>
+#include <strings.h>
 #include <errno.h>
 #include <unistd.h>
 #include <gio/gioerror.h>

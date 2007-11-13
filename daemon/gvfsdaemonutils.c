@@ -22,6 +22,8 @@
 
 #include <config.h>
 
+#include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>

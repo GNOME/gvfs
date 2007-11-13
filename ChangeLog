@@ -1,3 +1,14 @@
+2007-11-13  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gsysutils.c:
+        * daemon/gvfschannel.c:
+        * daemon/gvfsdaemonutils.c:
+        * daemon/gvfsjobcopy.c:
+        * daemon/gvfsmonitor.c:
+        * daemon/gvfswritechannel.c:
+	Add required includes for solaris
+	Patch from Damien Carbery
+
 2007-11-12  Alexander Larsson  <alexl@redhat.com>
 
         * client/gvfsurimapper.[ch]:
