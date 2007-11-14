@@ -95,6 +95,9 @@ _g_socket_receive_fd (int socket_fd)
     }
 
   cmsg = CMSG_FIRSTHDR (&msg);
+  if (cmsg == NULL)
+    return -1;
+  
   if (!cmsg->cmsg_type == SCM_RIGHTS) {
     g_warning("got control message of unknown type %d", 
 	      cmsg->cmsg_type);

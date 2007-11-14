@@ -46,6 +46,7 @@
 typedef struct {
   int extra_fd;
   int extra_fd_count;
+  char *async_dbus_id;
   
   /* Only used for async connections */
   GHashTable *outstanding_fds;
@@ -127,16 +128,35 @@ vfs_connection_filter (DBusConnection     *connection,
   DBusHandlerResult res;
   DBusHandleMessageFunction callback;
   GObject *data;
+  VfsConnectionData *connection_data;
+  const char *path;
 
   callback = NULL;
   data = NULL;
+
+  if (dbus_message_is_signal (message,
+			      DBUS_INTERFACE_LOCAL,
+			      "Disconnected"))
+    {
+      connection_data = dbus_connection_get_data (connection, vfs_data_slot);
+      if (connection_data->async_dbus_id)
+	{
+	  _g_daemon_vfs_invalidate_dbus_id (connection_data->async_dbus_id);
+	  G_LOCK (async_map);
+	  g_hash_table_remove (async_map, connection_data->async_dbus_id);
+	  G_UNLOCK (async_map);
+	}
+      
+      return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
   
+  path = dbus_message_get_path (message);
   G_LOCK (obj_path_map);
-  if (obj_path_map)
+  if (obj_path_map && path)
     {
       entry = g_hash_table_lookup (obj_path_map,
-				   dbus_message_get_path (message));
-
+				   path);
+      
       if (entry)
 	{
 	  callback = entry->callback;
@@ -160,8 +180,9 @@ static void
 connection_data_free (gpointer p)
 {
   VfsConnectionData *data = p;
-  
-  close (data->extra_fd);
+
+  if (data->extra_fd != -1)
+    close (data->extra_fd);
 
   if (data->extra_fd_source)
     {
@@ -171,6 +192,8 @@ connection_data_free (gpointer p)
 
   if (data->outstanding_fds)
     g_hash_table_destroy (data->outstanding_fds);
+
+  g_free (data->async_dbus_id);
   
   g_free (data);
 }
@@ -181,7 +204,7 @@ vfs_connection_setup (DBusConnection *connection,
 		      gboolean async)
 {
   VfsConnectionData *connection_data;
-  
+
   connection_data = g_new0 (VfsConnectionData, 1);
   connection_data->extra_fd = extra_fd;
   connection_data->extra_fd_count = 0;
@@ -223,6 +246,16 @@ async_connection_accept_new_fd (VfsConnectionData *data,
   int new_fd;
   int fd_id;
   OutstandingFD *outstanding_fd;
+
+  if (condition & G_IO_HUP)
+    {
+      close (data->extra_fd);
+      data->extra_fd = -1;
+      g_source_destroy (data->extra_fd_source);
+      g_source_unref (data->extra_fd_source);
+      data->extra_fd_source = NULL;
+      return;
+    }
   
   fd_id = data->extra_fd_count;
   new_fd = _g_socket_receive_fd (data->extra_fd);
@@ -261,7 +294,7 @@ setup_async_fd_receive (VfsConnectionData *connection_data)
   
   
   connection_data->extra_fd_source =
-    __g_fd_source_new (connection_data->extra_fd, POLLIN, NULL);
+    __g_fd_source_new (connection_data->extra_fd, POLLIN|POLLERR, NULL);
   g_source_set_callback (connection_data->extra_fd_source,
 			 (GSourceFunc)async_connection_accept_new_fd,
 			 connection_data, NULL);
@@ -357,7 +390,12 @@ close_and_unref_connection (void *data)
 static void
 set_connection_for_async (DBusConnection *connection, const char *dbus_id)
 {
+  VfsConnectionData *data;
+  
   G_LOCK (async_map);
+  data = dbus_connection_get_data (connection, vfs_data_slot);
+  data->async_dbus_id = g_strdup (dbus_id);
+
   if (async_map == NULL)
     async_map = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, close_and_unref_connection);
       
@@ -846,10 +884,19 @@ _g_dbus_connection_get_sync (const char *dbus_id,
     connection = g_hash_table_lookup (local->connections, dbus_id);
   
   if (connection != NULL)
-    return connection;
+    {
+      if (!dbus_connection_get_is_connected (connection))
+	{
+	  _g_daemon_vfs_invalidate_dbus_id (dbus_id);
+	  g_hash_table_remove (local->connections, dbus_id);
+	  return NULL;
+	}
+      else
+	return connection;
+    }
 
   dbus_error_init (&derror);
-  
+
   if (local->session_bus == NULL)
     {
       bus = dbus_bus_get_private (DBUS_BUS_SESSION, &derror);

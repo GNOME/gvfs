@@ -22,6 +22,7 @@
 
 #include <config.h>
 #include <string.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <dbus/dbus.h>
 #include "gdaemonvfs.h"
@@ -182,16 +183,28 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   GVfsUriMapper *mapper;
   int i;
   
-  g_assert (the_vfs == NULL);
-  the_vfs = vfs;
-
-  if (g_thread_supported ())
-    dbus_threads_init_default ();
-  
   vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
 
   if (vfs->async_bus == NULL)
-    return;
+    return; /* Not supported, return here and return false in vfs_is_active() */
+
+  g_assert (the_vfs == NULL);
+  the_vfs = vfs;
+  
+  if (g_thread_supported ())
+    dbus_threads_init_default ();
+
+  /* We disable SIGPIPE globally. This is sort of bad
+     for s library to do since its a global resource.
+     However, without this there is no way to be able
+     to handle mount daemons dying without client apps
+     crashing, which is much worse.
+
+     I blame Unix, there really should be a portable
+     way to do this on all unixes, but there isn't,
+     even for somewhat modern ones like solaris.
+  */
+  signal (SIGPIPE, SIG_IGN);
   
   vfs->wrapped_vfs = g_vfs_get_local ();
 
@@ -504,6 +517,30 @@ lookup_mount_info_in_cache (GMountSpec *spec,
 
   return info;
 }
+
+void
+_g_daemon_vfs_invalidate_dbus_id (const char *dbus_id)
+{
+  GMountInfo *info;
+  GList *l, *next;
+
+  G_LOCK (mount_cache);
+  info = NULL;
+  for (l = the_vfs->mount_cache; l != NULL; l = next)
+    {
+      GMountInfo *mount_info = l->data;
+      next = l->next;
+
+      if (strcmp (mount_info->dbus_id, dbus_id) == 0)
+	{
+	  the_vfs->mount_cache = g_list_delete_link (the_vfs->mount_cache, l);
+	  g_mount_info_unref (mount_info);
+	}
+    }
+  
+  G_UNLOCK (mount_cache);
+}
+
 
 static GMountInfo *
 handler_lookup_mount_reply (DBusMessage *reply,

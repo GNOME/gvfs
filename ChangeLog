@@ -1,3 +1,21 @@
+2007-11-14  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonvfs.[ch]:
+        * client/gvfsdaemondbus.c:
+	Make sure we somewhat cleanly handle the
+	various dbus daemons going down. By somewhat
+	I mean that no problem should be persistant
+	even if you might get some transient error
+	messages.
+
+	Unfortunately the only way to be able to cleanly
+	handle this involves globally ignoring SIGPIPE.
+	What can I say, unix sucks.
+	
+        * common/gsysutils.c:
+        (_g_socket_receive_fd):
+	Handle errors if e.g. the fd is closed
+
 2007-11-13  Alexander Larsson  <alexl@redhat.com>
 
         * common/gsysutils.c:

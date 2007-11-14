@@ -53,6 +53,7 @@ void            _g_daemon_vfs_get_mount_info_async     (GMountSpec              
 GMountInfo *    _g_daemon_vfs_get_mount_info_sync      (GMountSpec               *spec,
 							const char               *path,
 							GError                  **error);
+void            _g_daemon_vfs_invalidate_dbus_id       (const char               *dbus_id);
 DBusConnection *_g_daemon_vfs_get_async_bus            (void);
 
 
