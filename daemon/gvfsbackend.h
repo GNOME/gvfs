@@ -45,6 +45,7 @@ typedef struct _GVfsBackendPrivate GVfsBackendPrivate;
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 
 typedef struct _GVfsJobMount           GVfsJobMount;
+typedef struct _GVfsJobUnmount         GVfsJobUnmount;
 typedef struct _GVfsJobMountMountable  GVfsJobMountMountable;
 typedef struct _GVfsJobOpenForRead     GVfsJobOpenForRead;
 typedef struct _GVfsJobSeekRead        GVfsJobSeekRead;
@@ -91,6 +92,10 @@ struct _GVfsBackendClass
    * A NULL here means operation not supported 
    */
 
+  void     (*unmount)           (GVfsBackend *backend,
+				 GVfsJobUnmount *job);
+  gboolean (*try_unmount)       (GVfsBackend *backend,
+				 GVfsJobUnmount *job);
   void     (*mount)             (GVfsBackend *backend,
 				 GVfsJobMount *job,
 				 GMountSpec *mount_spec,
@@ -348,6 +353,9 @@ void        g_vfs_backend_set_user_visible               (GVfsBackend        *ba
 void        g_vfs_backend_set_mount_spec                 (GVfsBackend        *backend,
 							  GMountSpec         *mount_spec);
 void        g_vfs_backend_register_mount                 (GVfsBackend        *backend,
+							  GAsyncDBusCallback  callback,
+							  gpointer            user_data);
+void        g_vfs_backend_unregister_mount               (GVfsBackend        *backend,
 							  GAsyncDBusCallback  callback,
 							  gpointer            user_data);
 const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);

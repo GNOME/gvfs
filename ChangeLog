@@ -1,5 +1,21 @@
 2007-11-14  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gvfsdaemonprotocol.h:
+	Add unmount operation and
+	unregister mount mounttracker call
+	
+        * client/gdaemonvolume.c:
+	Implement client side of unmount
+	
+        * daemon/Makefile.am:
+        * daemon/gvfsjobunmount.[ch]: Added.
+	Add unmount job type
+	
+        * daemon/gvfsbackend.[ch]:
+	Implement unmount
+
+2007-11-14  Alexander Larsson  <alexl@redhat.com>
+
         * common/gdbusutils.c:
 	Handle NULL callback in _g_dbus_connection_call_async
 	

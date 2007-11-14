@@ -347,6 +347,10 @@ backend_dbus_handler (DBusConnection  *connection,
   
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_MOUNT_INTERFACE,
+				   G_VFS_DBUS_MOUNT_OP_UNMOUNT))
+    job = g_vfs_job_unmount_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+				   G_VFS_DBUS_MOUNT_INTERFACE,
 				   G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ))
     job = g_vfs_job_open_for_read_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
@@ -458,6 +462,32 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   g_mount_spec_to_dbus (&iter, backend->priv->mount_spec);
 
   dbus_message_set_auto_start (message, TRUE);
+
+  _g_dbus_connection_call_async (NULL, message, -1, 
+				 callback, user_data);
+  dbus_message_unref (message);
+}
+
+void
+g_vfs_backend_unregister_mount (GVfsBackend *backend,
+				GAsyncDBusCallback callback,
+				gpointer user_data)
+{
+  DBusMessage *message;
+  DBusMessageIter iter;
+  dbus_bool_t user_visible;
+  
+  message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+					  G_VFS_DBUS_MOUNTTRACKER_PATH,
+					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					  G_VFS_DBUS_MOUNTTRACKER_OP_UNREGISTER_MOUNT);
+  if (message == NULL)
+    _g_dbus_oom ();
+
+  if (!dbus_message_append_args (message,
+				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
+				 0))
+    _g_dbus_oom ();
 
   _g_dbus_connection_call_async (NULL, message, -1, 
 				 callback, user_data);

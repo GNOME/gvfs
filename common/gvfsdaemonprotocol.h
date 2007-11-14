@@ -15,6 +15,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNTTRACKER_OP_MOUNT_LOCATION "mountLocation"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS "listMounts"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_MOUNT "registerMount"
+#define G_VFS_DBUS_MOUNTTRACKER_OP_UNREGISTER_MOUNT "unregisterMount"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNT_TYPES "listMountTypes"
 #define G_VFS_DBUS_MOUNTTRACKER_OP_REGISTER_FUSE "registerFuse"
 #define G_VFS_DBUS_MOUNTTRACKER_SIGNAL_MOUNTED "mounted"
@@ -23,6 +24,7 @@ G_BEGIN_DECLS
 /* Each mount (there might be several in a daemon) implements one of these interfaces
    for standard i/o operations */
 #define G_VFS_DBUS_MOUNT_INTERFACE "org.gtk.vfs.Mount"
+#define G_VFS_DBUS_MOUNT_OP_UNMOUNT "Unmount"
 #define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ "OpenForRead"
 #define G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE "OpenForWrite"
 #define G_VFS_DBUS_MOUNT_OP_QUERY_INFO "QueryInfo"

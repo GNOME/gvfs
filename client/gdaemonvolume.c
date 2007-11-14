@@ -26,10 +26,13 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
+#include <gio/gthemedicon.h>
+#include <gio/gsimpleasyncresult.h>
 #include "gdaemonvolumemonitor.h"
 #include "gdaemonvolume.h"
+#include "gvfsdaemondbus.h"
 #include "gdaemonfile.h"
-#include "gio/gthemedicon.h"
+#include "gvfsdaemonprotocol.h"
 
 struct _GDaemonVolume {
   GObject     parent;
@@ -114,31 +117,64 @@ g_daemon_volume_get_name (GVolume *volume)
 static GDrive *
 g_daemon_volume_get_drive (GVolume *volume)
 {
-  /* TODO */
-
   return NULL;
 }
 
 static gboolean
 g_daemon_volume_can_unmount (GVolume *volume)
 {
-  /* TODO */
   return TRUE;
 }
 
 static gboolean
 g_daemon_volume_can_eject (GVolume *volume)
 {
-  /* TODO */
   return FALSE;
 }
 
 static void
-g_daemon_volume_unmount (GVolume         *volume,
-		       GAsyncReadyCallback callback,
-		       gpointer         user_data)
+unmount_reply (DBusMessage *reply,
+	       DBusConnection *connection,
+	       GError *io_error,
+	       gpointer _data)
 {
-  /* TODO */
+  GSimpleAsyncResult *result = _data;
+
+  if (io_error != NULL)
+    g_simple_async_result_set_from_error (result, io_error);
+  
+  g_simple_async_result_complete (result);
+  g_object_unref (result);
+}
+
+static void
+g_daemon_volume_unmount (GVolume *volume,
+			 GCancellable *cancellable,
+			 GAsyncReadyCallback callback,
+			 gpointer         user_data)
+{
+  GDaemonVolume *daemon_volume = G_DAEMON_VOLUME (volume);
+  DBusMessage *message;
+  GMountInfo *mount_info;
+  GSimpleAsyncResult *res;
+
+  mount_info = daemon_volume->mount_info;
+  
+  message =
+    dbus_message_new_method_call (mount_info->dbus_id,
+				  mount_info->object_path,
+				  G_VFS_DBUS_MOUNT_INTERFACE,
+				  G_VFS_DBUS_MOUNT_OP_UNMOUNT);
+
+  res = g_simple_async_result_new (G_OBJECT (volume),
+				   callback, user_data,
+				   g_daemon_volume_unmount);
+  
+  _g_vfs_daemon_call_async (message,
+			    unmount_reply, res,
+			    cancellable);
+  
+  dbus_message_unref (message);
 }
 
 static gboolean
@@ -149,21 +185,6 @@ g_daemon_volume_unmount_finish (GVolume *volume,
   return TRUE;
 }
 
-static void
-g_daemon_volume_eject (GVolume         *volume,
-		     GAsyncReadyCallback callback,
-		     gpointer         user_data)
-{
-  /* TODO */
-}
-
-static gboolean
-g_daemon_volume_eject_finish (GVolume *volume,
-			    GAsyncResult *result,
-			    GError **error)
-{
-  return TRUE;
-}
 
 static void
 g_daemon_volume_volume_iface_init (GVolumeIface *iface)
@@ -176,6 +197,4 @@ g_daemon_volume_volume_iface_init (GVolumeIface *iface)
   iface->can_eject = g_daemon_volume_can_eject;
   iface->unmount = g_daemon_volume_unmount;
   iface->unmount_finish = g_daemon_volume_unmount_finish;
-  iface->eject = g_daemon_volume_eject;
-  iface->eject_finish = g_daemon_volume_eject_finish;
 }

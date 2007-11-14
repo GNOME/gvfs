@@ -1,0 +1,166 @@
+/* GIO - GLib Input, Output and Streaming Library
+ * 
+ * Copyright (C) 2006-2007 Red Hat, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ * Author: Alexander Larsson <alexl@redhat.com>
+ */
+
+#include <config.h>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
+#include <glib.h>
+#include <dbus/dbus.h>
+#include <glib/gi18n.h>
+#include "gvfsjobunmount.h"
+#include "gdbusutils.h"
+#include "gvfsdaemonprotocol.h"
+
+G_DEFINE_TYPE (GVfsJobUnmount, g_vfs_job_unmount, G_VFS_TYPE_JOB_DBUS);
+
+static void     run        (GVfsJob *job);
+static gboolean try        (GVfsJob *job);
+static void     send_reply (GVfsJob *job);
+static DBusMessage *create_reply (GVfsJob *job,
+				  DBusConnection *connection,
+				  DBusMessage *message);
+
+static void
+g_vfs_job_unmount_finalize (GObject *object)
+{
+  GVfsJobUnmount *job;
+
+  job = G_VFS_JOB_UNMOUNT (object);
+
+  if (G_OBJECT_CLASS (g_vfs_job_unmount_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_vfs_job_unmount_parent_class)->finalize) (object);
+}
+
+static void
+g_vfs_job_unmount_class_init (GVfsJobUnmountClass *klass)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GVfsJobClass *job_class = G_VFS_JOB_CLASS (klass);
+  GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
+  
+  gobject_class->finalize = g_vfs_job_unmount_finalize;
+  job_class->run = run;
+  job_class->try = try;
+  job_class->send_reply = send_reply;
+
+  job_dbus_class->create_reply = create_reply;
+
+}
+
+static void
+g_vfs_job_unmount_init (GVfsJobUnmount *job)
+{
+}
+
+GVfsJob *
+g_vfs_job_unmount_new (DBusConnection *connection,
+		       DBusMessage *message,
+		       GVfsBackend *backend)
+{
+  GVfsJobUnmount *job;
+
+  g_print ("g_vfs_job_unmount_new request: %p\n", message);
+  
+  job = g_object_new (G_VFS_TYPE_JOB_UNMOUNT,
+		      "message", message,
+		      "connection", connection,
+		      NULL);
+
+  job->backend = backend;
+  
+  return G_VFS_JOB (job);
+}
+
+static void
+run (GVfsJob *job)
+{
+  GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->unmount == NULL)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			_("Operation not supported by backend"));
+      return;
+    }
+  
+  class->unmount (op_job->backend,
+		  op_job);
+}
+
+static gboolean
+try (GVfsJob *job)
+{
+  GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+
+  if (class->try_unmount == NULL)
+    return FALSE;
+
+  return class->try_unmount (op_job->backend,
+			     op_job);
+}
+
+static void
+unregister_mount_callback (DBusMessage *unmount_reply,
+			   GError *error,
+			   gpointer user_data)
+{
+  GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
+
+  g_print ("unregister_mount_callback, unmount_reply: %p, error: %p\n", unmount_reply, error);
+
+  (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
+
+  /* Unlink job source from daemon */
+  g_vfs_job_source_closed (G_VFS_JOB_SOURCE (op_job->backend));
+}
+
+/* Might be called on an i/o thread */
+static void
+send_reply (GVfsJob *job)
+{
+  GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
+
+  g_print ("send_reply, failed: %d\n", job->failed);
+  
+  g_vfs_backend_unregister_mount (op_job->backend,
+				  unregister_mount_callback,
+				  job);
+}
+
+/* Might be called on an i/o thread */
+static DBusMessage *
+create_reply (GVfsJob *job,
+	      DBusConnection *connection,
+	      DBusMessage *message)
+{
+  DBusMessage *reply;
+
+  reply = dbus_message_new_method_return (message);
+
+  return reply;
+}
