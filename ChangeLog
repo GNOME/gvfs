@@ -1,5 +1,13 @@
 2007-11-14  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gdbusutils.c:
+	Handle NULL callback in _g_dbus_connection_call_async
+	
+        * daemon/gvfsdaemon.c:
+	Re-register backends with new main daemons
+
+2007-11-14  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonvfs.[ch]:
         * client/gvfsdaemondbus.c:
 	Make sure we somewhat cleanly handle the

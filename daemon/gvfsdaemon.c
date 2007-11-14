@@ -146,6 +146,7 @@ static void
 g_vfs_daemon_init (GVfsDaemon *daemon)
 {
   gint max_threads = 1; /* TODO: handle max threads */
+  DBusError error;
   
   daemon->lock = g_mutex_new ();
   daemon->session_bus = dbus_bus_get (DBUS_BUS_SESSION, NULL);
@@ -163,6 +164,20 @@ g_vfs_daemon_init (GVfsDaemon *daemon)
     g_hash_table_new_full (g_str_hash, g_str_equal,
 			   NULL, (GDestroyNotify)registered_path_free);
 
+  dbus_error_init (&error);
+  dbus_bus_add_match (daemon->session_bus,
+		      "type='signal',"		      
+		      "interface='org.freedesktop.DBus',"
+		      "member='NameOwnerChanged',"
+		      "arg0='"G_VFS_DBUS_DAEMON_NAME"'",
+		      &error);
+  
+  if (dbus_error_is_set (&error))
+    {
+      g_warning ("Failed to add dbus match: %s\n", error.message);
+      dbus_error_free (&error);
+    }
+  
   if (!dbus_connection_add_filter (daemon->session_bus,
 				   daemon_message_func, daemon, NULL))
     _g_dbus_oom ();
@@ -323,6 +338,22 @@ job_source_closed_callback (GVfsJobSource *job_source,
 
   if (daemon->job_sources == NULL)
     daemon_schedule_exit (daemon);
+  
+  g_mutex_unlock (daemon->lock);
+}
+
+static void
+g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
+{
+  GList *l;
+  
+  g_mutex_lock (daemon->lock);
+
+  for (l = daemon->job_sources; l != NULL; l = l->next)
+    {
+      if (G_VFS_IS_BACKEND (l->data))
+	g_vfs_backend_register_mount (l->data, NULL, NULL);
+    }
   
   g_mutex_unlock (daemon->lock);
 }
@@ -850,6 +881,8 @@ daemon_message_func (DBusConnection *conn,
   GVfsDaemon *daemon = data;
   RegisteredPath *registered_path;
   const char *path;
+  char *name;
+  char *old_owner, *new_owner;
 
   path = dbus_message_get_path (message);
   if (path == NULL)
@@ -857,7 +890,6 @@ daemon_message_func (DBusConnection *conn,
   
   if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameLost"))
     {
-      char *name;
       if (dbus_message_get_args (message, NULL,
 				 DBUS_TYPE_STRING, &name,
 				 DBUS_TYPE_INVALID) &&
@@ -868,7 +900,24 @@ daemon_message_func (DBusConnection *conn,
 	    exit (1);
 	}
     }
-  
+  else if (dbus_message_is_signal (message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
+    {
+      if (dbus_message_get_args (message, NULL,
+				 DBUS_TYPE_STRING, &name,
+				 DBUS_TYPE_STRING, &old_owner,
+				 DBUS_TYPE_STRING, &new_owner,
+				 DBUS_TYPE_INVALID) &&
+	  strcmp (name, G_VFS_DBUS_DAEMON_NAME) == 0 &&
+	  *new_owner != 0 &&
+	  !daemon->main_daemon)
+	{
+	  /* There is a new owner. Register mounts with it */
+	  g_vfs_daemon_re_register_job_sources (daemon);
+	}
+      
+    }
+
+
   if (dbus_message_is_method_call (message,
 				   G_VFS_DBUS_DAEMON_INTERFACE,
 				   G_VFS_DBUS_OP_GET_CONNECTION))

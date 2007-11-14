@@ -1237,11 +1237,15 @@ handle_async_reply (DBusPendingCall *pending,
   error = NULL;
   if (_g_error_from_message (reply, &error))
     {
-      data->callback (NULL, error, data->user_data);
+      if (data->callback)
+	data->callback (NULL, error, data->user_data);
       g_error_free (error);
     }
   else
-    data->callback (reply, NULL, data->user_data);
+    {
+      if (data->callback)
+	data->callback (reply, NULL, data->user_data);
+    }
 
   dbus_message_unref (reply);
 }
@@ -1275,7 +1279,8 @@ async_call_error_at_idle (gpointer _data)
 {
   AsyncDBusCallData *data = _data;
 
-  data->callback (NULL, data->io_error, data->user_data);
+  if (data->callback)
+    data->callback (NULL, data->io_error, data->user_data);
 
   g_error_free (data->io_error);
   g_free (data);
