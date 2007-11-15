@@ -1,6 +1,13 @@
 2007-11-15  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.0.2 ===
+
+2007-11-15  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
 	Require gio 0.1.2
 
 	* NEWS:
