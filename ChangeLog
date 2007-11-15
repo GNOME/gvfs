@@ -1,5 +1,13 @@
 2007-11-15  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Require gio 0.1.2
+
+	* NEWS:
+	Update for release
+
+2007-11-15  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/Makefile.am:
         * daemon/ftp.mount.in:
         * daemon/gvfs-daemon.service.in:

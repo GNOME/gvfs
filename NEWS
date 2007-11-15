@@ -1,0 +1,13 @@
+Major changes in 0.0.2:
+* Updated to work win gio-standalone 0.1.2
+* Build fixes on various platforms
+* Don't link client lib to libgvfscommon.so
+* Change how the uri mapper works
+* Integrate standard uri mappers (i.e. smb) into client libs
+  (You might need to remove $prefix/lib/gvfs/modules/libsmb.so
+   from an older version if you install this)
+* Cleanly handle when gvfs daemons die, without
+  crashing the app
+* Implement unmounting
+* Rename master daemon to "gvfsd" and mount daemons to
+  names like "gvfsd-sftp".
