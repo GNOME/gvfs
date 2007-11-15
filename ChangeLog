@@ -1,3 +1,15 @@
+2007-11-15  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/Makefile.am:
+        * daemon/ftp.mount.in:
+        * daemon/gvfs-daemon.service.in:
+        * daemon/sftp.mount.in:
+        * daemon/smb-browse.mount.in:
+        * daemon/smb.mount.in:
+        * daemon/trash.mount.in:
+	Rename gvfs daemon processes to start
+	with "gvfsd". This is shorter and nicer.
+
 2007-11-14  Alexander Larsson  <alexl@redhat.com>
 
         * common/gvfsdaemonprotocol.h:

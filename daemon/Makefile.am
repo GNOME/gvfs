@@ -30,7 +30,7 @@ service_DATA = gvfs-daemon.service
 
 mountdir = $(sysconfdir)/gvfs/mounts
 
-libexec_PROGRAMS=gvfs-daemon gvfs-daemon-ftp gvfs-daemon-sftp gvfs-daemon-trash
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash
 
 mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in
 mount_DATA = ftp.mount sftp.mount  trash.mount
@@ -38,7 +38,7 @@ mount_DATA = ftp.mount sftp.mount  trash.mount
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
 mount_DATA += smb.mount smb-browse.mount
-libexec_PROGRAMS += gvfs-daemon-smb-browse gvfs-daemon-smb
+libexec_PROGRAMS += gvfsd-smb-browse gvfsd-smb
 endif
 
 EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files)
@@ -47,9 +47,8 @@ DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
 
 
 noinst_PROGRAMS =				\
-	gvfs-daemon-test			\
+	gvfsd-test			\
 	$(NULL)
-
 
 libdaemon_la_SOURCES = \
 	gvfsdaemon.c gvfsdaemon.h \
@@ -89,88 +88,88 @@ libdaemon_la_SOURCES = \
 	dbus-gmain.h dbus-gmain.c \
         $(NULL)
 
-gvfs_daemon_SOURCES = \
+gvfsd_SOURCES = \
 	mount.c mount.h \
 	main.c
 
-gvfs_daemon_LDADD = $(libraries)
+gvfsd_LDADD = $(libraries)
 
-gvfs_daemon_test_SOURCES = \
+gvfsd_test_SOURCES = \
 	gvfsbackendtest.c gvfsbackendtest.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
-gvfs_daemon_test_CPPFLAGS = \
+gvfsd_test_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendtest.h \
 	-DDEFAULT_BACKEND_TYPE=test \
 	-DBACKEND_TYPES='"test", G_VFS_TYPE_BACKEND_TEST,'
 
-gvfs_daemon_test_LDADD = $(libraries)
+gvfsd_test_LDADD = $(libraries)
 
-gvfs_daemon_smb_SOURCES = \
+gvfsd_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
-gvfs_daemon_smb_CPPFLAGS = \
+gvfsd_smb_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
 	-DDEFAULT_BACKEND_TYPE=smb-share \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"smb-share", G_VFS_TYPE_BACKEND_SMB,'
 
-gvfs_daemon_smb_LDADD = $(SAMBA_LIBS) $(libraries)
+gvfsd_smb_LDADD = $(SAMBA_LIBS) $(libraries)
 
-gvfs_daemon_smb_browse_SOURCES = \
+gvfsd_smb_browse_SOURCES = \
 	gvfsbackendsmbbrowse.c gvfsbackendsmbbrowse.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
-gvfs_daemon_smb_browse_CPPFLAGS = \
+gvfsd_smb_browse_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
-gvfs_daemon_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
+gvfsd_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
 
-gvfs_daemon_ftp_SOURCES = \
+gvfsd_ftp_SOURCES = \
 	gvfsbackendftp.c gvfsbackendftp.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
-gvfs_daemon_ftp_CPPFLAGS = \
+gvfsd_ftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendftp.h \
 	-DDEFAULT_BACKEND_TYPE=ftp \
 	-DMAX_JOB_THREADS=1 \
 	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP,'
 
-gvfs_daemon_ftp_LDADD = $(libraries)
+gvfsd_ftp_LDADD = $(libraries)
 
-gvfs_daemon_sftp_SOURCES = \
+gvfsd_sftp_SOURCES = \
 	sftp.h \
 	gvfsbackendsftp.c gvfsbackendsftp.h \
 	pty_open.c pty_open.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
-gvfs_daemon_sftp_CPPFLAGS = \
+gvfsd_sftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsftp.h \
 	-DDEFAULT_BACKEND_TYPE=sftp \
 	-DMAX_JOB_THREADS=1 \
 	-DSSH_PROGRAM=\"$(SSH_PROGRAM)\"	\
 	-DBACKEND_TYPES='"sftp", G_VFS_TYPE_BACKEND_SFTP,'
 
-gvfs_daemon_sftp_LDADD = $(libraries)
+gvfsd_sftp_LDADD = $(libraries)
 
-gvfs_daemon_trash_SOURCES = \
+gvfsd_trash_SOURCES = \
 	gvfsbackendtrash.c gvfsbackendtrash.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 
-gvfs_daemon_trash_CPPFLAGS = \
+gvfsd_trash_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendtrash.h \
 	-DDEFAULT_BACKEND_TYPE=trash \
 	-DMAX_JOB_THREADS=10 \
 	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,'
 
-gvfs_daemon_trash_LDADD = $(libraries)
+gvfsd_trash_LDADD = $(libraries)

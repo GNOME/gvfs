@@ -1,4 +1,4 @@
 [Mount]
 Type=smb-share
-Exec=@libexecdir@/gvfs-daemon-smb
+Exec=@libexecdir@/gvfsd-smb
 AutoMount=false
