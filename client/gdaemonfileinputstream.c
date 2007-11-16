@@ -69,14 +69,14 @@
 
 typedef enum {
   INPUT_STATE_IN_REPLY_HEADER,
-  INPUT_STATE_IN_BLOCK,
+  INPUT_STATE_IN_BLOCK
 } InputState;
 
 typedef enum {
   STATE_OP_DONE,
   STATE_OP_READ,
   STATE_OP_WRITE,
-  STATE_OP_SKIP,
+  STATE_OP_SKIP
 } StateOp;
 
 typedef enum {
@@ -86,7 +86,7 @@ typedef enum {
   READ_STATE_HANDLE_INPUT_BLOCK,
   READ_STATE_SKIP_BLOCK,
   READ_STATE_HANDLE_HEADER,
-  READ_STATE_READ_BLOCK,
+  READ_STATE_READ_BLOCK
 } ReadState;
 
 typedef struct {
@@ -110,7 +110,7 @@ typedef enum {
   SEEK_STATE_HANDLE_INPUT,
   SEEK_STATE_HANDLE_INPUT_BLOCK,
   SEEK_STATE_SKIP_BLOCK,
-  SEEK_STATE_HANDLE_HEADER,
+  SEEK_STATE_HANDLE_HEADER
 } SeekState;
 
 typedef struct {
@@ -136,7 +136,7 @@ typedef enum {
   CLOSE_STATE_HANDLE_INPUT,
   CLOSE_STATE_HANDLE_INPUT_BLOCK,
   CLOSE_STATE_SKIP_BLOCK,
-  CLOSE_STATE_HANDLE_HEADER,
+  CLOSE_STATE_HANDLE_HEADER
 } CloseState;
 
 typedef struct {
@@ -1215,7 +1215,7 @@ g_daemon_file_input_stream_seek (GFileInputStream *stream,
   
   if (!run_sync_state_machine (file, (state_machine_iterator)iterate_seek_state_machine,
 			       &op, cancellable, error))
-    return -1; /* IO Error */
+    return FALSE; /* IO Error */
 
   if (!op.ret_val)
     g_propagate_error (error, op.ret_error);

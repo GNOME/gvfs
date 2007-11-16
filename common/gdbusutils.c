@@ -1070,7 +1070,7 @@ wakeup_main (void *data)
 static const GSourceFuncs dbus_source_funcs = {
   dbus_source_prepare,
   dbus_source_check,
-  dbus_source_dispatch,
+  dbus_source_dispatch
 };
 
 /* Called when the connection dies or when we're unintegrating from mainloop */

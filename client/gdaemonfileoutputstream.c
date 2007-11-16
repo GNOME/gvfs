@@ -49,14 +49,14 @@ typedef enum {
   STATE_OP_DONE,
   STATE_OP_READ,
   STATE_OP_WRITE,
-  STATE_OP_SKIP,
+  STATE_OP_SKIP
 } StateOp;
 
 typedef enum {
   WRITE_STATE_INIT = 0,
   WRITE_STATE_WROTE_COMMAND,
   WRITE_STATE_SEND_DATA,
-  WRITE_STATE_HANDLE_INPUT,
+  WRITE_STATE_HANDLE_INPUT
 } WriteState;
 
 typedef struct {
@@ -79,7 +79,7 @@ typedef struct {
 typedef enum {
   SEEK_STATE_INIT = 0,
   SEEK_STATE_WROTE_REQUEST,
-  SEEK_STATE_HANDLE_INPUT,
+  SEEK_STATE_HANDLE_INPUT
 } SeekState;
 
 typedef struct {
@@ -101,7 +101,7 @@ typedef struct {
 typedef enum {
   CLOSE_STATE_INIT = 0,
   CLOSE_STATE_WROTE_REQUEST,
-  CLOSE_STATE_HANDLE_INPUT,
+  CLOSE_STATE_HANDLE_INPUT
 } CloseState;
 
 typedef struct {
@@ -951,7 +951,7 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
   
   if (!run_sync_state_machine (file, (state_machine_iterator)iterate_seek_state_machine,
 			       &op, cancellable, error))
-    return -1; /* IO Error */
+    return FALSE; /* IO Error */
 
   if (!op.ret_val)
     g_propagate_error (error, op.ret_error);

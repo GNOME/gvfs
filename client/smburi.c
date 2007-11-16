@@ -85,7 +85,7 @@ smb_from_uri (GVfsUriMapper *mapper,
 
   uri = g_vfs_decode_uri (uri_str);
   if (uri == NULL)
-    return FALSE;
+    return NULL;
   
   if (uri->host == NULL || strlen (uri->host) == 0)
     {

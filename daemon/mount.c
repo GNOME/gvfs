@@ -952,7 +952,7 @@ dbus_message_function (DBusConnection  *connection,
 
 struct DBusObjectPathVTable tracker_dbus_vtable = {
   NULL,
-  dbus_message_function,
+  dbus_message_function
 };
 
 

@@ -134,9 +134,9 @@ read_file (GFile *scratch_file)
 static void
 delete_file (GFile *scratch_file)
 {
+#if 0
   GError *error = NULL;
 
-#if 0
   /* Enable when GDaemonFile supports delete */
 
   if (!g_file_delete (scratch_file, NULL, &error))

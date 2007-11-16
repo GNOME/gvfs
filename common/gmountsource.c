@@ -189,7 +189,7 @@ g_mount_source_ask_password (GMountSource *source,
 {
   DBusMessage *message;
   guint32 flags_as_int;
-  AskPasswordData data = {0};
+  AskPasswordData data = {NULL};
 
   if (password_out)
     *password_out = NULL;

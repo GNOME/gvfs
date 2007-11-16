@@ -492,7 +492,7 @@ do_sync_2_path_call (GFile *file1,
       /* For copy this will cause the fallback code to be involved */
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		   _("Operation not supported, files on different mounts"));
-      return FALSE;
+      return NULL;
     }
   
   message =

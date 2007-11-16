@@ -84,8 +84,9 @@ do_mount (GVfsBackend *backend,
 	  GMountSource *mount_source,
 	  gboolean is_automount)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -98,7 +99,9 @@ try_mount (GVfsBackend *backend,
 	   GMountSource *mount_source,
 	   gboolean is_automount)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
+#endif
   const char *server, *share, *user, *domain;
 
   server = g_mount_spec_get (mount_spec, "server");
@@ -132,11 +135,11 @@ do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
 		  const char *filename)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
   /* TODO */
 
-#if 0
   if (file == NULL)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
@@ -155,11 +158,11 @@ do_read (GVfsBackend *backend,
 	 char *buffer,
 	 gsize bytes_requested)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
   /* TODO */
 
-#if 0
   if (res == -1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
@@ -178,9 +181,9 @@ do_seek_on_read (GVfsBackend *backend,
 		 goffset    offset,
 		 GSeekType  type)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
-#if 0
   switch (type)
     {
     case G_SEEK_SET:
@@ -218,11 +221,11 @@ do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
   /* TODO */
 
-#if 0
   if (res == -1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
 #endif
@@ -236,11 +239,11 @@ do_create (GVfsBackend *backend,
            const char *filename,
            GFileCreateFlags flags)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
   /* TODO */
 
-#if 0
   if (file == NULL)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
@@ -261,11 +264,11 @@ do_append_to (GVfsBackend *backend,
               const char *filename,
               GFileCreateFlags flags)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
   /* TODO */
 
-#if 0
   if (file == NULL)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
@@ -296,8 +299,9 @@ do_replace (GVfsBackend *backend,
             gboolean make_backup,
             GFileCreateFlags flags)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -308,11 +312,11 @@ do_write (GVfsBackend *backend,
 	  char *buffer,
 	  gsize buffer_size)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 
   /* TODO */
 
-#if 0
   if (res == -1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
@@ -330,8 +334,9 @@ do_seek_on_write (GVfsBackend *backend,
 		  goffset    offset,
 		  GSeekType  type)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -340,8 +345,9 @@ do_close_write (GVfsBackend *backend,
 		GVfsJobCloseWrite *job,
 		GVfsBackendHandle _handle)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -353,8 +359,9 @@ do_query_info (GVfsBackend *backend,
                GFileInfo *info,
                GFileAttributeMatcher *attribute_matcher)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -385,8 +392,9 @@ do_enumerate (GVfsBackend *backend,
               GFileAttributeMatcher *attribute_matcher,
               GFileQueryInfoFlags flags)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -396,8 +404,9 @@ do_set_display_name (GVfsBackend *backend,
                      const char *filename,
                      const char *display_name)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -406,8 +415,9 @@ do_delete (GVfsBackend *backend,
 	   GVfsJobDelete *job,
 	   const char *filename)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -416,8 +426,9 @@ do_make_directory (GVfsBackend *backend,
 		   GVfsJobMakeDirectory *job,
 		   const char *filename)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 
@@ -430,8 +441,9 @@ do_move (GVfsBackend *backend,
 	 GFileProgressCallback progress_callback,
 	 gpointer progress_callback_data)
 {
+#if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
-
+#endif
   /* TODO */
 }
 

@@ -41,7 +41,7 @@ G_DEFINE_TYPE (GVfsJobDBus, g_vfs_job_dbus, G_VFS_TYPE_JOB);
 enum {
   PROP_0,
   PROP_MESSAGE,
-  PROP_CONNECTION,
+  PROP_CONNECTION
 };
 
 static void send_reply                  (GVfsJob      *job);

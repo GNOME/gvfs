@@ -40,7 +40,7 @@ G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
 #define P_(_x) (_x)
 
 enum {
-  PROP_0,
+  PROP_0
 };
 
 enum {

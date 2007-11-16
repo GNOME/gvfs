@@ -43,7 +43,7 @@
 #include <gdbusutils.h>
 
 enum {
-  PROP_0,
+  PROP_0
 };
 
 typedef struct {

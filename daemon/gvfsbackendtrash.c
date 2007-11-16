@@ -329,7 +329,7 @@ decode_path (const char *filename, char **trashdir, char **trashfile, char **rel
 typedef enum {
   HAS_SYSTEM_DIR = 1<<0,
   HAS_USER_DIR = 1<<1,
-  HAS_TRASH_FILES = 1<<1,
+  HAS_TRASH_FILES = 1<<1
 } TopdirInfo;
 
 static TopdirInfo

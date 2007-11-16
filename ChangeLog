@@ -1,3 +1,24 @@
+2007-11-16  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+        * client/smburi.c:
+        * common/gdbusutils.c:
+        * common/gmountsource.c:
+        * daemon/gvfsbackendftp.c:
+        * daemon/gvfsbackendtrash.c:
+        * daemon/gvfsdaemon.c:
+        * daemon/gvfsjob.c:
+        * daemon/gvfsjobdbus.c:
+        * daemon/gvfsjobopenforwrite.h:
+        * daemon/mount.c:
+        * daemon/pty_open.c:
+        * test/benchmark-gvfs-big-files.c:
+        * test/benchmark-gvfs-small-files.c:
+        * test/benchmark-posix-small-files.c:
+	Code cleanups from Kjartan Maraas.
+
 2007-11-15  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
