@@ -3019,6 +3019,8 @@ try_move (GVfsBackend *backend,
                                 &id);
   put_string (command, source);
   put_string (command, destination);
+
+  /* This fails if the target exists, we then fallback to default implementation */
   
   queue_command_stream_and_free (op_backend, command, id, move_reply, G_VFS_JOB (job), NULL);
 

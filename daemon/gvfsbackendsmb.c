@@ -1638,8 +1638,8 @@ do_move (GVfsBackend *backend,
 	    {
 	      g_vfs_job_failed (G_VFS_JOB (job),
 				G_IO_ERROR,
-				G_IO_ERROR_IS_DIRECTORY,
-				_("Can't move over directory"));
+				G_IO_ERROR_WOULD_MERGE,
+				_("Can't move directory over directory"));
 	      g_free (source_uri);
 	      g_free (dest_uri);
 	      return;

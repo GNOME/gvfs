@@ -1,3 +1,11 @@
+2007-11-20  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Add comment
+	
+        * daemon/gvfsbackendsmb.c:
+	Support new WOULD_MERGE error code
+
 2007-11-16  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
