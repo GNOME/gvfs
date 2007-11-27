@@ -5,6 +5,7 @@ SUBDIRS = \
 	client \
 	daemon \
 	po   \
+	programs \
 	test \
 	$(NULL)
 

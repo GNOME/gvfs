@@ -228,6 +228,7 @@ Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
+programs/Makefile
 test/Makefile
 po/Makefile.in
 ])

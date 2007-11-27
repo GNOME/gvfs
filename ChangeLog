@@ -1,3 +1,21 @@
+2007-11-27  Alexander Larsson  <alexl@redhat.com>
+
+        * Makefile.am:
+        * configure.ac:
+        * programs/Makefile.am:
+        * programs/gvfs-cat.c:
+        * programs/gvfs-copy.c:
+        * programs/gvfs-info.c:
+        * programs/gvfs-ls.c:
+        * programs/gvfs-monitor-dir.c:
+        * programs/gvfs-monitor-file.c:
+        * programs/gvfs-mount.c:
+        * programs/gvfs-move.c:
+        * programs/gvfs-rm.c:
+        * programs/gvfs-save.c:
+        * programs/gvfs-trash.c:
+	Moved the gio tools from gio-standalone
+
 2007-11-20  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:
