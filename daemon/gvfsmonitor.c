@@ -35,8 +35,8 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 #include <gvfsmonitor.h>
-#include <gio/gsocketinputstream.h>
-#include <gio/gsocketoutputstream.h>
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobcloseread.h>

@@ -42,6 +42,7 @@
 #include <gvfsjobenumerate.h>
 #include <gvfsjobdelete.h>
 #include <gvfsjobtrash.h>
+#include <gvfsjobunmount.h>
 #include <gvfsjobmountmountable.h>
 #include <gvfsjobmakedirectory.h>
 #include <gvfsjobmakesymlink.h>
@@ -474,8 +475,6 @@ g_vfs_backend_unregister_mount (GVfsBackend *backend,
 				gpointer user_data)
 {
   DBusMessage *message;
-  DBusMessageIter iter;
-  dbus_bool_t user_visible;
   
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  G_VFS_DBUS_MOUNTTRACKER_PATH,

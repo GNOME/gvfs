@@ -38,7 +38,7 @@
 #include <gio/gfile.h>
 #include <gio/gthemedicon.h>
 #include <gio/gunixmounts.h>
-#include <gio/gurifuncs.h>
+#include <glib/gurifuncs.h>
 
 #include "gvfsbackendtrash.h"
 #include "gvfsmonitor.h"

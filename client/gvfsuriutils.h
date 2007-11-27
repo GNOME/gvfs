@@ -24,7 +24,7 @@
 #define __G_VFS_URI_UTILS_H__
 
 #include <glib.h>
-#include <gio/gurifuncs.h>
+#include <glib/gurifuncs.h>
 
 G_BEGIN_DECLS
 

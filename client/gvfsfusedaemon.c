@@ -44,7 +44,7 @@
 #include <gio/giomodule.h>
 
 #include <gio/gvfs.h>
-#include <gio/gurifuncs.h>
+#include <glib/gurifuncs.h>
 #include <gio/gseekable.h>
 #include <gio/gioerror.h>
 #include <gio/gvolumemonitor.h>

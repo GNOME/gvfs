@@ -35,8 +35,8 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 #include <gvfsreadchannel.h>
-#include <gio/gsocketinputstream.h>
-#include <gio/gsocketoutputstream.h>
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobcloseread.h>
@@ -177,8 +177,8 @@ g_vfs_channel_init (GVfsChannel *channel)
     g_warning ("Error creating socket pair: %d\n", errno);
   else
     {
-      channel->priv->command_stream = g_socket_input_stream_new (socket_fds[0], TRUE);
-      channel->priv->reply_stream = g_socket_output_stream_new (socket_fds[0], FALSE);
+      channel->priv->command_stream = g_unix_input_stream_new (socket_fds[0], TRUE);
+      channel->priv->reply_stream = g_unix_output_stream_new (socket_fds[0], FALSE);
       channel->priv->remote_fd = socket_fds[1];
       
       start_request_reader (channel);

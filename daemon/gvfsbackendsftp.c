@@ -37,8 +37,8 @@
 #include <gio/gfile.h>
 #include <gio/gdatainputstream.h>
 #include <gio/gdataoutputstream.h>
-#include <gio/gsocketinputstream.h>
-#include <gio/gsocketoutputstream.h>
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
 #include <gio/gmemoryoutputstream.h>
 #include <gio/gmemoryinputstream.h>
 #include <gio/gcontenttype.h>
@@ -627,8 +627,8 @@ handle_login (GVfsBackend *backend,
   else
     prompt_fd = tty_fd;
 
-  prompt_stream = g_socket_input_stream_new (prompt_fd, FALSE);
-  reply_stream = g_socket_output_stream_new (tty_fd, FALSE);
+  prompt_stream = g_unix_input_stream_new (prompt_fd, FALSE);
+  reply_stream = g_unix_output_stream_new (tty_fd, FALSE);
 
   ret_val = TRUE;
   while (1)
@@ -1053,7 +1053,7 @@ do_mount (GVfsBackend *backend,
   
   g_strfreev (args);
 
-  op_backend->command_stream = g_socket_output_stream_new (stdin_fd, TRUE);
+  op_backend->command_stream = g_unix_output_stream_new (stdin_fd, TRUE);
 
   command = new_command_stream (op_backend, SSH_FXP_INIT, NULL);
   g_data_output_stream_put_int32 (command,
@@ -1073,10 +1073,10 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  op_backend->reply_stream = g_socket_input_stream_new (stdout_fd, TRUE);
+  op_backend->reply_stream = g_unix_input_stream_new (stdout_fd, TRUE);
 
   make_fd_nonblocking (stderr_fd);
-  is = g_socket_input_stream_new (stderr_fd, TRUE);
+  is = g_unix_input_stream_new (stderr_fd, TRUE);
   op_backend->error_stream = g_data_input_stream_new (is);
   g_object_unref (is);
   
