@@ -270,9 +270,9 @@ g_daemon_file_input_stream_class_init (GDaemonFileInputStreamClass *klass)
   
   gobject_class->finalize = g_daemon_file_input_stream_finalize;
 
-  stream_class->read = g_daemon_file_input_stream_read;
+  stream_class->read_fn = g_daemon_file_input_stream_read;
   if (0) stream_class->skip = g_daemon_file_input_stream_skip;
-  stream_class->close = g_daemon_file_input_stream_close;
+  stream_class->close_fn = g_daemon_file_input_stream_close;
   
   stream_class->read_async = g_daemon_file_input_stream_read_async;
   stream_class->read_finish = g_daemon_file_input_stream_read_finish;

@@ -224,8 +224,8 @@ g_daemon_file_output_stream_class_init (GDaemonFileOutputStreamClass *klass)
   
   gobject_class->finalize = g_daemon_file_output_stream_finalize;
 
-  stream_class->write = g_daemon_file_output_stream_write;
-  stream_class->close = g_daemon_file_output_stream_close;
+  stream_class->write_fn = g_daemon_file_output_stream_write;
+  stream_class->close_fn = g_daemon_file_output_stream_close;
   
   stream_class->write_async = g_daemon_file_output_stream_write_async;
   stream_class->write_finish = g_daemon_file_output_stream_write_finish;

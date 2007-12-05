@@ -1959,7 +1959,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->query_info_async = g_daemon_file_query_info_async;
   iface->query_info_finish = g_daemon_file_query_info_finish;
   iface->find_enclosing_volume = g_daemon_file_find_enclosing_volume;
-  iface->read = g_daemon_file_read;
+  iface->read_fn = g_daemon_file_read;
   iface->append_to = g_daemon_file_append_to;
   iface->create = g_daemon_file_create;
   iface->replace = g_daemon_file_replace;
