@@ -209,7 +209,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 
   _g_dbus_connection_integrate_with_main (vfs->async_bus);
 
-  g_io_modules_ensure_loaded (GVFS_MODULE_DIR);
+  g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
 
   vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
   vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);

@@ -1,5 +1,11 @@
 2007-12-05  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonvfs.c:
+        (g_daemon_vfs_init):
+	Use the new API to load the modules
+
+2007-12-05  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         * client/gdaemonfileenumerator.c:
         * client/gdaemonfileinputstream.c:
