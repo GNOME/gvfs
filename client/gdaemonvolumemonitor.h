@@ -38,6 +38,7 @@ typedef struct _GDaemonVolumeMonitor GDaemonVolumeMonitor;
 typedef struct _GDaemonVolumeMonitorClass GDaemonVolumeMonitorClass;
 
 /* Forward definitions */
+typedef struct _GDaemonMount GDaemonMount;
 typedef struct _GDaemonVolume GDaemonVolume;
 typedef struct _GDaemonDrive GDaemonDrive;
 

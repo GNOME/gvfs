@@ -298,15 +298,15 @@ free_file_handle_for_path (const gchar *path)
 }
 
 static MountRecord *
-mount_record_new (GVolume *volume)
+mount_record_new (GMount *mount)
 {
   MountRecord *mount_record;
   char *name;
 
   mount_record = g_new (MountRecord, 1);
   
-  mount_record->root = g_volume_get_root (volume);
-  name = g_volume_get_name (volume);
+  mount_record->root = g_mount_get_root (mount);
+  name = g_mount_get_name (mount);
   /* Keep in sync with gvfs daemon mount tracker */
   mount_record->name = g_uri_escape_string (name, "+@#$., ", TRUE);
   g_free (name);
@@ -344,15 +344,15 @@ mount_list_free (void)
 }
 
 static gboolean
-mount_record_for_volume_exists (GVolume *volume)
+mount_record_for_mount_exists (GMount *mount)
 {
   GList *l;
   GFile *root;
   gboolean res;
 
-  g_assert (volume != NULL);
+  g_assert (mount != NULL);
 
-  root = g_volume_get_root (volume);
+  root = g_mount_get_root (mount);
 
   res = FALSE;
   
@@ -407,26 +407,26 @@ mount_record_find_root_by_mount_name (const gchar *mount_name)
 static void
 mount_list_update (void)
 {
-  GList *volumes;
+  GList *mounts;
   GList *l;
 
-  volumes = g_volume_monitor_get_mounted_volumes (volume_monitor);
+  mounts = g_volume_monitor_get_mounts (volume_monitor);
 
-  for (l = volumes; l != NULL; l = l->next)
+  for (l = mounts; l != NULL; l = l->next)
     {
-      GVolume *volume = l->data;
+      GMount *mount = l->data;
 
-      if (!mount_record_for_volume_exists (volume))
+      if (!mount_record_for_mount_exists (mount))
         {
           mount_list_lock ();
-          mount_list = g_list_prepend (mount_list, mount_record_new (volume));
+          mount_list = g_list_prepend (mount_list, mount_record_new (mount));
           mount_list_unlock ();
         }
       
-      g_object_unref (volume);
+      g_object_unref (mount);
     }
   
-  g_list_free (volumes);
+  g_list_free (mounts);
 }
 
 #if 0
@@ -1936,14 +1936,14 @@ vfs_chmod (const gchar *path, mode_t mode)
 
 static void
 mount_tracker_mounted_cb (GVolumeMonitor *volume_monitor,
-                          GVolume        *volume)
+                          GMount         *mount)
 {
   MountRecord *mount_record;
 
-  if (mount_record_for_volume_exists (volume))
+  if (mount_record_for_mount_exists (mount))
     return;
 
-  mount_record = mount_record_new (volume);
+  mount_record = mount_record_new (mount);
 
   mount_list_lock ();
   mount_list = g_list_prepend (mount_list, mount_record);
@@ -1952,16 +1952,16 @@ mount_tracker_mounted_cb (GVolumeMonitor *volume_monitor,
 
 static void
 mount_tracker_unmounted_cb (GVolumeMonitor *volume_monitor,
-                            GVolume        *volume)
+                            GMount         *mount)
 {
   GFile *root;
   GList *l;
 
-  root = g_volume_get_root (volume);
+  root = g_mount_get_root (mount);
   
   mount_list_lock ();
   
-  root = g_volume_get_root (volume);
+  root = g_mount_get_root (mount);
 
   for (l = mount_list; l != NULL; l = l->next)
     {
@@ -1986,8 +1986,8 @@ subthread_main (gpointer data)
   
   mount_list_update ();
   
-  g_signal_connect (volume_monitor, "volume_mounted", (GCallback) mount_tracker_mounted_cb, NULL);
-  g_signal_connect (volume_monitor, "volume_unmounted", (GCallback) mount_tracker_unmounted_cb, NULL);
+  g_signal_connect (volume_monitor, "mount_added", (GCallback) mount_tracker_mounted_cb, NULL);
+  g_signal_connect (volume_monitor, "mount_removed", (GCallback) mount_tracker_unmounted_cb, NULL);
 
   g_main_loop_run (subthread_main_loop);
 

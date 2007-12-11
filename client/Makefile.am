@@ -24,7 +24,7 @@ URI_PARSER_SOURCES = \
 
 vfssources = \
 	gdaemonvfs.c gdaemonvfs.h \
-	gdaemonvolume.c gdaemonvolume.h \
+	gdaemonmount.c gdaemonmount.h \
 	gdaemonvolumemonitor.c gdaemonvolumemonitor.h \
 	gdaemonfile.c gdaemonfile.h \
 	gdaemonfileinputstream.c gdaemonfileinputstream.h \

@@ -30,7 +30,7 @@
 
 #include "gdaemonfile.h"
 #include "gvfsdaemondbus.h"
-#include "gdaemonvolume.h"
+#include "gdaemonmount.h"
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonfileinputstream.h>
 #include <gdaemonfileoutputstream.h>
@@ -1422,14 +1422,14 @@ g_daemon_file_query_filesystem_info (GFile                *file,
   return info;
 }
 
-static GVolume *
-g_daemon_file_find_enclosing_volume (GFile *file,
-				     GCancellable *cancellable,
-				     GError **error)
+static GMount *
+g_daemon_file_find_enclosing_mount (GFile *file,
+                                    GCancellable *cancellable,
+                                    GError **error)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   GMountInfo *mount_info;
-  GDaemonVolume *volume;
+  GDaemonMount *mount;
   
   mount_info = _g_daemon_vfs_get_mount_info_sync (daemon_file->mount_spec,
 						  daemon_file->path,
@@ -1439,16 +1439,16 @@ g_daemon_file_find_enclosing_volume (GFile *file,
 
   if (mount_info->user_visible)
     {
-      volume = g_daemon_volume_new (mount_info);
+      mount = g_daemon_mount_new (mount_info);
       g_mount_info_unref (mount_info);
       
-      if (volume)
-	return G_VOLUME (volume);
+      if (mount)
+	return G_MOUNT (mount);
     }
 
   g_set_error (error, G_IO_ERROR,
 	       G_IO_ERROR_NOT_FOUND,
-	       _("Containing volume does not exist"));
+	       _("Containing mount does not exist"));
   return NULL;
 }
 
@@ -1958,7 +1958,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->query_info = g_daemon_file_query_info;
   iface->query_info_async = g_daemon_file_query_info_async;
   iface->query_info_finish = g_daemon_file_query_info_finish;
-  iface->find_enclosing_volume = g_daemon_file_find_enclosing_volume;
+  iface->find_enclosing_mount = g_daemon_file_find_enclosing_mount;
   iface->read_fn = g_daemon_file_read;
   iface->append_to = g_daemon_file_append_to;
   iface->create = g_daemon_file_create;

@@ -27,30 +27,37 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include "gdaemonvolumemonitor.h"
-#include "gdaemonvolume.h"
+#include "gdaemonmount.h"
 #include "gmounttracker.h"
 
 struct _GDaemonVolumeMonitor {
   GVolumeMonitor parent;
 
   GMountTracker *mount_tracker;
-  GList *volumes;
+  GList *mounts;
 };
 
 G_DEFINE_DYNAMIC_TYPE (GDaemonVolumeMonitor, g_daemon_volume_monitor, G_TYPE_VOLUME_MONITOR);
 
 static GList *
-get_mounted_volumes (GVolumeMonitor *volume_monitor)
+get_mounts (GVolumeMonitor *volume_monitor)
 {
   GDaemonVolumeMonitor *monitor;
   GList *l;
 
   monitor = G_DAEMON_VOLUME_MONITOR (volume_monitor);
 
-  l = g_list_copy (monitor->volumes);
+  l = g_list_copy (monitor->mounts);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
   return l;
+}
+
+static GList *
+get_volumes (GVolumeMonitor *volume_monitor)
+{
+  /* TODO: Can daemon mounts have volumes? */
+  return NULL;
 }
 
 static GList *
@@ -60,35 +67,35 @@ get_connected_drives (GVolumeMonitor *volume_monitor)
   return NULL;
 }
 
-static GDaemonVolume *
-find_volume_by_mount_info (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
+static GDaemonMount *
+find_mount_by_mount_info (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
-  GDaemonVolume *found_volume = NULL;
+  GDaemonMount *found_mount = NULL;
   GList         *l;
 
-  for (l = daemon_monitor->volumes; l; l = g_list_next (l))
+  for (l = daemon_monitor->mounts; l; l = g_list_next (l))
     {
-      GDaemonVolume *existing_volume = l->data;
-      GMountInfo    *existing_mount_info;
+      GDaemonMount *existing_mount = l->data;
+      GMountInfo   *existing_mount_info;
 
-      existing_mount_info = g_daemon_volume_get_mount_info (existing_volume);
+      existing_mount_info = g_daemon_mount_get_mount_info (existing_mount);
       if (g_mount_info_equal (mount_info, existing_mount_info))
 	{
-	  found_volume = existing_volume;
+	  found_mount = existing_mount;
 	  break;
 	}
     }
 
-  return found_volume;
+  return found_mount;
 }
 
 static void
 mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
-  GDaemonVolume *volume;
+  GDaemonMount *mount;
 
-  volume = find_volume_by_mount_info (daemon_monitor, mount_info);
-  if (volume)
+  mount = find_mount_by_mount_info (daemon_monitor, mount_info);
+  if (mount)
     {
       g_warning (G_STRLOC ": Mount was added twice!");
       return;
@@ -97,34 +104,34 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 
   if (mount_info->user_visible)
     {
-      volume = g_daemon_volume_new (mount_info);
-      daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
-      g_signal_emit_by_name (daemon_monitor, "volume_mounted", volume);
+      mount = g_daemon_mount_new (mount_info);
+      daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
+      g_signal_emit_by_name (daemon_monitor, "mount_added", mount);
     }
 }
 
 static void
 mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
-  GDaemonVolume *volume;
+  GDaemonMount *mount;
 
-  volume = find_volume_by_mount_info (daemon_monitor, mount_info);
-  if (!volume)
+  mount = find_mount_by_mount_info (daemon_monitor, mount_info);
+  if (!mount)
     {
       g_warning (G_STRLOC ": An unknown mount was removed!");
       return;
     }
 
-  daemon_monitor->volumes = g_list_remove (daemon_monitor->volumes, volume);
-  g_signal_emit_by_name (daemon_monitor, "volume_unmounted", volume);
-  g_object_unref (volume);
+  daemon_monitor->mounts = g_list_remove (daemon_monitor->mounts, mount);
+  g_signal_emit_by_name (daemon_monitor, "mount_removed", mount);
+  g_object_unref (mount);
 }
 
 static void
 g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
 {
   GList *mounts, *l;
-  GDaemonVolume *volume;
+  GDaemonMount *mount;
   GMountInfo *info;
   
   daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus ());
@@ -141,8 +148,8 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
     info = l->data;
     if (info->user_visible)
       {
-	volume = g_daemon_volume_new (info);
-	daemon_monitor->volumes = g_list_prepend (daemon_monitor->volumes, volume);
+	mount = g_daemon_mount_new (info);
+	daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
       }
     
     g_mount_info_unref (info);
@@ -163,8 +170,8 @@ g_daemon_volume_monitor_finalize (GObject *object)
 
   g_object_unref (monitor->mount_tracker);
 
-  g_list_foreach (monitor->volumes, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->volumes);
+  g_list_foreach (monitor->mounts, (GFunc)g_object_unref, NULL);
+  g_list_free (monitor->mounts);
   
   if (G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize) (object);
@@ -183,7 +190,8 @@ g_daemon_volume_monitor_class_init (GDaemonVolumeMonitorClass *klass)
   
   gobject_class->finalize = g_daemon_volume_monitor_finalize;
 
-  monitor_class->get_mounted_volumes = get_mounted_volumes;
+  monitor_class->get_mounts = get_mounts;
+  monitor_class->get_volumes = get_volumes;
   monitor_class->get_connected_drives = get_connected_drives;
 }
 

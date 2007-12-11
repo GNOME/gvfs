@@ -1,3 +1,21 @@
+2007-12-11  David Zeuthen  <davidz@redhat.com>
+
+	Update for API changes in gio trunk.
+
+	* client/Makefile.am:
+	* client/gdaemonfile.c: (g_daemon_file_find_enclosing_mount),
+	(g_daemon_file_file_iface_init):
+	* client/gdaemonvolumemonitor.c: (get_mounts), (get_volumes),
+	(find_mount_by_mount_info), (mount_added), (mount_removed),
+	(g_daemon_volume_monitor_init), (g_daemon_volume_monitor_finalize),
+	(g_daemon_volume_monitor_class_init):
+	* client/gdaemonvolumemonitor.h:
+	* client/gvfsfusedaemon.c: (mount_record_new),
+	(mount_record_for_mount_exists), (mount_list_update),
+	(mount_tracker_mounted_cb), (mount_tracker_unmounted_cb),
+	(subthread_main):
+	* daemon/gvfsbackendtrash.c: (list_trash_dirs):
+
 2007-12-05  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonvfs.c:

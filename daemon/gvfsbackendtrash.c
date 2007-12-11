@@ -510,7 +510,7 @@ list_trash_dirs (void)
   GList *mounts, *l, *li;
   const char *topdir;
   char *home_trash;
-  GUnixMount *mount;
+  GUnixMountEntry *mount;
   GList *dirs;
   GList *topdirs;
   GList *topdirs_info;
