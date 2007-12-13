@@ -1,3 +1,9 @@
+2007-12-13  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * programs/gvfs-mount.c:
+	Update for g_mount_for_location to g_file_mount_enclosing_volume change.
+
 2007-12-11  David Zeuthen  <davidz@redhat.com>
 
 	Update for API changes in gio trunk.

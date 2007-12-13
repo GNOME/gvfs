@@ -1176,7 +1176,7 @@ mount_mountable_location_mounted_cb (GObject *source_object,
   GSimpleAsyncResult *result = user_data;
   GError *error = NULL;
   
-  if (!g_mount_for_location_finish (G_FILE (source_object), res, &error))
+  if (!g_file_mount_enclosing_location_finish (G_FILE (source_object), res, &error))
     {
       g_simple_async_result_set_from_error (result, error);
       g_error_free (error);
@@ -1226,11 +1226,11 @@ mount_mountable_async_cb (DBusMessage *reply,
 
       if (must_mount_location)
 	{
-	  g_mount_for_location (file,
-				mount_operation,
-				cancellable,
-				mount_mountable_location_mounted_cb,
-				g_object_ref (result));
+	  g_file_mount_enclosing_volume (file,
+					 mount_operation,
+					 cancellable,
+					 mount_mountable_location_mounted_cb,
+					 g_object_ref (result));
 	  
 	}
       else
@@ -1291,11 +1291,11 @@ typedef struct {
   gpointer user_data;
 } MountData;
 
-static void g_daemon_file_mount_for_location (GFile *location,
-					      GMountOperation *mount_operation,
-					      GCancellable *cancellable,
-					      GAsyncReadyCallback callback,
-					      gpointer user_data);
+static void g_daemon_file_mount_enclosing_volume (GFile *location,
+						  GMountOperation *mount_operation,
+						  GCancellable *cancellable,
+						  GAsyncReadyCallback callback,
+						  gpointer user_data);
 
 static void
 mount_reply (DBusMessage *reply,
@@ -1317,7 +1317,7 @@ mount_reply (DBusMessage *reply,
       res = g_simple_async_result_new (G_OBJECT (data->file),
 				       data->callback,
 				       data->user_data,
-				       g_daemon_file_mount_for_location);
+				       g_daemon_file_mount_enclosing_volume);
     }
 
   g_simple_async_result_complete (res);
@@ -1329,11 +1329,11 @@ mount_reply (DBusMessage *reply,
 }
 
 static void
-g_daemon_file_mount_for_location (GFile *location,
-				  GMountOperation *mount_operation,
-				  GCancellable *cancellable,
-				  GAsyncReadyCallback callback,
-				  gpointer user_data)
+g_daemon_file_mount_enclosing_volume (GFile *location,
+				      GMountOperation *mount_operation,
+				      GCancellable *cancellable,
+				      GAsyncReadyCallback callback,
+				      gpointer user_data)
 {
   GDaemonFile *daemon_file;
   DBusMessage *message;
@@ -1376,9 +1376,9 @@ g_daemon_file_mount_for_location (GFile *location,
 }
 
 static gboolean
-g_daemon_file_mount_for_location_finish (GFile                  *location,
-					 GAsyncResult           *result,
-					 GError                **error)
+g_daemon_file_mount_enclosing_volume_finish (GFile                  *location,
+					     GAsyncResult           *result,
+					     GError                **error)
 {
   /* Errors handled in generic code */
   return TRUE;
@@ -1965,8 +1965,8 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->replace = g_daemon_file_replace;
   iface->read_async = g_daemon_file_read_async;
   iface->read_finish = g_daemon_file_read_finish;
-  iface->mount_for_location = g_daemon_file_mount_for_location;
-  iface->mount_for_location_finish = g_daemon_file_mount_for_location_finish;
+  iface->mount_enclosing_volume = g_daemon_file_mount_enclosing_volume;
+  iface->mount_enclosing_volume_finish = g_daemon_file_mount_enclosing_volume_finish;
   iface->mount_mountable = g_daemon_file_mount_mountable;
   iface->mount_mountable_finish = g_daemon_file_mount_mountable_finish;
   iface->query_filesystem_info = g_daemon_file_query_filesystem_info;

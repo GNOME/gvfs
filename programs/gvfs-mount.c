@@ -128,7 +128,7 @@ mount_done_cb (GObject *object,
   gboolean succeeded;
   GError *error = NULL;
 
-  succeeded = g_mount_for_location_finish (G_FILE (object), res, &error);
+  succeeded = g_file_mount_enclosing_volume_finish (G_FILE (object), res, &error);
 
   if (!succeeded)
     g_print ("Error mounting location: %s\n", error->message);
@@ -165,7 +165,7 @@ mount (GFile *file)
   if (mount_mountable)
     g_file_mount_mountable (file, op, NULL, mount_mountable_done_cb, op);
   else
-    g_mount_for_location (file, op, NULL, mount_done_cb, op);
+    g_file_mount_enclosing_volume (file, op, NULL, mount_done_cb, op);
     
   outstanding_mounts++;
 }
