@@ -34,7 +34,7 @@
 #include <glib/gthread.h>
 #include <glib/gi18n.h>
 
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 #include "gdbusutils.h"
 #include "gsysutils.h"
 #include "gvfsdaemonutils.h"

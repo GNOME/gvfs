@@ -24,7 +24,7 @@
 #define __G_DAEMON_VOLUME_MONITOR_H__
 
 #include <glib-object.h>
-#include <gio/gvolumemonitor.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

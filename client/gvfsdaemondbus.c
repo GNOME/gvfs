@@ -33,9 +33,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#include <gio/gioerror.h>
-#include <gio/gthemedicon.h>
-#include <gio/gfileicon.h>
+#include <gio/gio.h>
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonvfs.h>

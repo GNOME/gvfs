@@ -26,8 +26,7 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
-#include <gio/gthemedicon.h>
-#include <gio/gsimpleasyncresult.h>
+#include <gio/gio.h>
 #include "gdaemonvolumemonitor.h"
 #include "gdaemonmount.h"
 #include "gvfsdaemondbus.h"

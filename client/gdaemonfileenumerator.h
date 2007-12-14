@@ -23,8 +23,7 @@
 #ifndef __G_DAEMON_FILE_ENUMERATOR_H__
 #define __G_DAEMON_FILE_ENUMERATOR_H__
 
-#include <gio/gfileenumerator.h>
-#include <gio/gfileinfo.h>
+#include <gio/gio.h>
 #include <dbus/dbus.h>
 
 G_BEGIN_DECLS

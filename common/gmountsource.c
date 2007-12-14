@@ -24,7 +24,7 @@
 
 #include <gmountsource.h>
 #include <gdbusutils.h>
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
 
 struct _GMountSource

@@ -27,8 +27,7 @@
 
 #include <glib/gi18n-lib.h>
 #include <gdbusutils.h>
-#include <gio/gcancellable.h>
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 
 void
 _g_dbus_oom (void)

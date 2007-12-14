@@ -29,7 +29,7 @@
 #include <string.h>
 
 #include <glib.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 static gboolean progress = FALSE;
 static gboolean interactive = FALSE;

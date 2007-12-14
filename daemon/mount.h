@@ -24,7 +24,7 @@
 #define __MOUNT_H__
 
 #include <glib-object.h>
-#include <gio/gmountoperation.h>
+#include <gio/gio.h>
 #include <gmountsource.h>
 
 G_BEGIN_DECLS

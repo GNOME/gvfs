@@ -27,8 +27,7 @@
 #include <glib/gi18n-lib.h>
 #include <gvfsdaemonprotocol.h>
 #include <gdbusutils.h>
-#include <gio/gthemedicon.h>
-#include <gio/gfileicon.h>
+#include <gio/gio.h>
 
 static const char *
 get_object_signature (GObject *obj)

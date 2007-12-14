@@ -31,9 +31,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gioerror.h>
-#include <gio/gfile.h>
-#include <gio/gvfs.h>
+#include <gio/gio.h>
 
 #include "gvfsbackendtest.h"
 #include "gvfsjobopenforread.h"

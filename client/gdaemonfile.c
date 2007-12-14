@@ -40,7 +40,7 @@
 #include <glib/gi18n-lib.h>
 #include "gdbusutils.h"
 #include "gmountoperationdbus.h"
-#include <gio/gsimpleasyncresult.h>
+#include <gio/gio.h>
 
 static void g_daemon_file_file_iface_init (GFileIface       *iface);
 

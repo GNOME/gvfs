@@ -29,7 +29,7 @@
 #include <strings.h>
 #include <errno.h>
 #include <unistd.h>
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 
 #include <glib/gi18n-lib.h>
 

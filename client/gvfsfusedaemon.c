@@ -41,13 +41,9 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib/gprintf.h>
-#include <gio/giomodule.h>
+#include <gio/gio.h>
 
-#include <gio/gvfs.h>
 #include <glib/gurifuncs.h>
-#include <gio/gseekable.h>
-#include <gio/gioerror.h>
-#include <gio/gvolumemonitor.h>
 
 /* stuff from common/ */
 #include <gvfsdaemonprotocol.h>

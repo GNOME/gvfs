@@ -24,7 +24,7 @@
 #define __G_VFS_JOB_H__
 
 #include <glib-object.h>
-#include <gio/gcancellable.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

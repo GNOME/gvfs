@@ -23,7 +23,7 @@
 #ifndef __G_VFS_JOB_QUERY_INFO_H__
 #define __G_VFS_JOB_QUERY_INFO_H__
 
-#include <gio/gfileinfo.h>
+#include <gio/gio.h>
 #include <gvfsjob.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>

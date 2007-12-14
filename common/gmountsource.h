@@ -25,7 +25,7 @@
 
 #include <glib-object.h>
 #include <gmountspec.h>
-#include <gio/gmountoperation.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

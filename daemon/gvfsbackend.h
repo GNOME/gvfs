@@ -24,8 +24,7 @@
 #define __G_VFS_BACKEND_H__
 
 #include <dbus/dbus.h>
-#include <gio/gfileinfo.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 #include <gvfsdaemon.h>
 #include <gvfsjob.h>
 #include <gmountspec.h>

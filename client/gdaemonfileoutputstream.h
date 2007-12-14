@@ -23,7 +23,7 @@
 #ifndef __G_DAEMON_FILE_OUTPUT_STREAM_H__
 #define __G_DAEMON_FILE_OUTPUT_STREAM_H__
 
-#include <gio/gfileoutputstream.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

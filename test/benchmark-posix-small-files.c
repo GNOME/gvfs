@@ -34,7 +34,7 @@
 #include <fcntl.h>
 
 #include <glib.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 #define BENCHMARK_UNIT_NAME "posix-big-file"
 

@@ -31,7 +31,7 @@
 #include <string.h>
 
 #include <glib.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 #define BENCHMARK_UNIT_NAME "gvfs-big-file"
 

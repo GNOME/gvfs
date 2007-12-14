@@ -31,9 +31,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gioerror.h>
-#include <gio/gthemedicon.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 #include "gvfsbackendsmbbrowse.h"
 #include "gvfsjobmountmountable.h"

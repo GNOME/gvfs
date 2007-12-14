@@ -27,7 +27,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include <gdaemonfileenumerator.h>
-#include <gio/gfileinfo.h>
+#include <gio/gio.h>
 #include <gvfsdaemondbus.h>
 #include <gvfsdaemonprotocol.h>
 

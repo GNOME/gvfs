@@ -1,7 +1,7 @@
 #ifndef __G_VFS_DAEMON_PROTOCOL_H__
 #define __G_VFS_DAEMON_PROTOCOL_H__
 
-#include <gio/gfileinfo.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

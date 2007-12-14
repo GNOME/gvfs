@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 
 #include <glib-object.h>
-#include <gio/gmountoperation.h>
+#include <gio/gio.h>
 #include <gmountspec.h>
 #include <gmountsource.h>
 

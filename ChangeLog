@@ -1,3 +1,82 @@
+2007-12-14  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemondirectorymonitor.c:
+        * client/gdaemondirectorymonitor.h:
+        * client/gdaemonfile.c:
+        * client/gdaemonfile.h:
+        * client/gdaemonfileenumerator.c:
+        * client/gdaemonfileenumerator.h:
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileinputstream.h:
+        * client/gdaemonfilemonitor.c:
+        * client/gdaemonfilemonitor.h:
+        * client/gdaemonfileoutputstream.c:
+        * client/gdaemonfileoutputstream.h:
+        * client/gdaemonmount.c:
+        * client/gdaemonmount.h:
+        * client/gdaemonvfs.c:
+        * client/gdaemonvfs.h:
+        * client/gdaemonvolumemonitor.h:
+        * client/gvfsdaemondbus.c:
+        * client/gvfsdaemondbus.h:
+        * client/gvfsfusedaemon.c:
+        * client/gvfsurimapper.h:
+        * client/smburi.c:
+        * common/gdbusutils.c:
+        * common/gdbusutils.h:
+        * common/gmountoperationdbus.c:
+        * common/gmountoperationdbus.h:
+        * common/gmountsource.c:
+        * common/gmountsource.h:
+        * common/gsysutils.c:
+        * common/gvfsdaemonprotocol.c:
+        * common/gvfsdaemonprotocol.h:
+        * daemon/gvfsbackend.h:
+        * daemon/gvfsbackendftp.c:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+        * daemon/gvfsbackendtest.c:
+        * daemon/gvfsbackendtrash.c:
+        * daemon/gvfsdaemonutils.c:
+        * daemon/gvfsjob.c:
+        * daemon/gvfsjob.h:
+        * daemon/gvfsjobcopy.h:
+        * daemon/gvfsjobcreatemonitor.h:
+        * daemon/gvfsjobdelete.h:
+        * daemon/gvfsjobenumerate.h:
+        * daemon/gvfsjobmakedirectory.h:
+        * daemon/gvfsjobmakesymlink.h:
+        * daemon/gvfsjobmount.h:
+        * daemon/gvfsjobmountmountable.h:
+        * daemon/gvfsjobmove.h:
+        * daemon/gvfsjobqueryattributes.h:
+        * daemon/gvfsjobqueryfsinfo.h:
+        * daemon/gvfsjobqueryinfo.h:
+        * daemon/gvfsjobsetattribute.h:
+        * daemon/gvfsjobsetdisplayname.h:
+        * daemon/gvfsjobtrash.h:
+        * daemon/gvfsjobunmount.h:
+        * daemon/gvfsmonitor.h:
+        * daemon/mount.c:
+        * daemon/mount.h:
+        * programs/gvfs-cat.c:
+        * programs/gvfs-copy.c:
+        * programs/gvfs-info.c:
+        * programs/gvfs-ls.c:
+        * programs/gvfs-monitor-dir.c:
+        * programs/gvfs-monitor-file.c:
+        * programs/gvfs-mount.c:
+        * programs/gvfs-move.c:
+        * programs/gvfs-rm.c:
+        * programs/gvfs-save.c:
+        * programs/gvfs-trash.c:
+        * test/benchmark-gvfs-big-files.c:
+        * test/benchmark-gvfs-small-files.c:
+        * test/benchmark-posix-big-files.c:
+        * test/benchmark-posix-small-files.c:
+	Only use <gio/gio.h> include 
+
 2007-12-13  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:

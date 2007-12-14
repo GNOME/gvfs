@@ -24,7 +24,7 @@
 #define __G_DAEMON_DIRECTORY_MONITOR_H__
 
 #include <glib-object.h>
-#include <gio/gdirectorymonitor.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

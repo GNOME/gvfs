@@ -23,7 +23,7 @@
 #ifndef __G_DAEMON_FILE_INPUT_STREAM_H__
 #define __G_DAEMON_FILE_INPUT_STREAM_H__
 
-#include <gio/gfileinputstream.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

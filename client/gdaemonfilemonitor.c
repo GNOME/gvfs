@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "gdaemonfilemonitor.h"
-#include <gio/gfilemonitor.h>
+#include <gio/gio.h>
 #include <gvfsdaemondbus.h>
 #include <gvfsdaemonprotocol.h>
 #include "gdbusutils.h"

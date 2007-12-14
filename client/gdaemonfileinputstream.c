@@ -56,13 +56,9 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
-#include <gio/gioerror.h>
-#include <gio/gseekable.h>
+#include <gio/gio.h>
 #include "gdaemonfileinputstream.h"
 #include "gvfsdaemondbus.h"
-#include <gio/gunixinputstream.h>
-#include <gio/gunixoutputstream.h>
-#include <gio/gsimpleasyncresult.h>
 #include <gvfsdaemonprotocol.h>
 
 #define MAX_READ_SIZE (4*1024*1024)

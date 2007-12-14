@@ -25,7 +25,7 @@
 #include <glib.h>
 #include <locale.h>
 #include <string.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 static char *attributes = NULL;
 static gboolean show_hidden = FALSE;

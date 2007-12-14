@@ -30,7 +30,7 @@
 #include <glib.h>
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 #include "gvfsjob.h"
 #include "gvfsjobsource.h"
 

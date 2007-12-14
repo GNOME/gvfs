@@ -33,15 +33,9 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gioerror.h>
-#include <gio/gfile.h>
-#include <gio/gdatainputstream.h>
-#include <gio/gdataoutputstream.h>
+#include <gio/gio.h>
 #include <gio/gunixinputstream.h>
 #include <gio/gunixoutputstream.h>
-#include <gio/gmemoryoutputstream.h>
-#include <gio/gmemoryinputstream.h>
-#include <gio/gcontenttype.h>
 
 #include "gvfsbackendsftp.h"
 #include "gvfsjobopenforread.h"

@@ -24,7 +24,7 @@
 #define __G_DAEMON_FILE_MONITOR_H__
 
 #include <glib-object.h>
-#include <gio/gfilemonitor.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

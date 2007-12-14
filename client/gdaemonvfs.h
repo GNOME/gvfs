@@ -23,7 +23,7 @@
 #ifndef __G_DAEMON_VFS_H__
 #define __G_DAEMON_VFS_H__
 
-#include <gio/gvfs.h>
+#include <gio/gio.h>
 #include <dbus/dbus.h>
 #include "gmountspec.h"
 #include "gmounttracker.h"

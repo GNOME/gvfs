@@ -24,7 +24,7 @@
 #define __G_VFS_MONITOR_H__
 
 #include <glib-object.h>
-#include <gio/gfilemonitor.h>
+#include <gio/gio.h>
 #include <gmountspec.h>
 #include <gvfsdaemon.h>
 

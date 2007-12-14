@@ -24,7 +24,7 @@
 #define __G_DAEMON_MOUNT_H__
 
 #include <glib-object.h>
-#include <gio/gmount.h>
+#include <gio/gio.h>
 #include "gdaemonvfs.h"
 #include "gdaemonvolumemonitor.h"
 #include "gmounttracker.h"

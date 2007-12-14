@@ -24,8 +24,7 @@
 
 #include <glib.h>
 #include <locale.h>
-#include <gio/gfile.h>
-
+#include <gio/gio.h>
 
 static GOptionEntry entries[] = 
 {

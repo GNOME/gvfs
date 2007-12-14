@@ -23,7 +23,7 @@
 #ifndef __G_DAEMON_FILE_H__
 #define __G_DAEMON_FILE_H__
 
-#include <gio/gfile.h>
+#include <gio/gio.h>
 #include "gdaemonvfs.h"
 #include "gmountspec.h"
 

@@ -28,7 +28,7 @@
 #include <errno.h>
 
 #include <glib.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 static GOptionEntry entries[] = 
 {

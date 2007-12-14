@@ -28,7 +28,7 @@
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
 #include "gdaemonfile.h"
-#include <gio/giomodule.h>
+#include <gio/gio.h>
 #include <gvfsdaemonprotocol.h>
 #include <gmodule.h>
 #include "gvfsdaemondbus.h"

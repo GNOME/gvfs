@@ -25,7 +25,7 @@
 
 #include <glib.h>
 #include <dbus/dbus.h>
-#include <gio/gcancellable.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

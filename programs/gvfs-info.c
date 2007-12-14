@@ -24,7 +24,7 @@
 
 #include <glib.h>
 #include <locale.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 static char *attributes = NULL;
 static gboolean nofollow_symlinks = FALSE;

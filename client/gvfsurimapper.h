@@ -24,7 +24,7 @@
 #define __G_VFS_URI_MAPPER_H__
 
 #include <glib-object.h>
-#include <gio/giomodule.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 

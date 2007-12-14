@@ -27,7 +27,7 @@
 
 #include <glib.h>
 #include <locale.h>
-#include <gio/gfile.h>
+#include <gio/gio.h>
 
 static int outstanding_mounts = 0;
 static GMainLoop *main_loop;

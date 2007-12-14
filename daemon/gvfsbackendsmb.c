@@ -31,10 +31,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
-#include <gio/gioerror.h>
-#include <gio/gfile.h>
-#include <gio/gcontenttype.h>
-#include <gio/gthemedicon.h>
+#include <gio/gio.h>
 
 #include "gvfsbackendsmb.h"
 #include "gvfsjobopenforread.h"

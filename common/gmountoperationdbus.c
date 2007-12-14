@@ -28,7 +28,7 @@
 
 #define I_(string) g_intern_static_string (string)
 
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 #include "gmountoperationdbus.h"
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"

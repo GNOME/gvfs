@@ -32,7 +32,7 @@
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
 #include <glib/gurifuncs.h>
-#include <gio/gioerror.h>
+#include <gio/gio.h>
 
 typedef struct {
   char *display_name;
