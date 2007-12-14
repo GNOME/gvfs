@@ -219,7 +219,7 @@ attribute_type_to_string (GFileAttributeType type)
 }
 
 static char *
-attribute_flags_to_string (GFileAttributeFlags flags)
+attribute_flags_to_string (GFileAttributeInfoFlags flags)
 {
   GString *s;
   int i;
@@ -229,11 +229,11 @@ attribute_flags_to_string (GFileAttributeFlags flags)
     char *descr;
   } flag_descr[] = {
     {
-      G_FILE_ATTRIBUTE_FLAGS_COPY_WITH_FILE,
+      G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE,
       "Copy with file"
     },
     {
-      G_FILE_ATTRIBUTE_FLAGS_COPY_WHEN_MOVED,
+      G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED,
       "Keep with file when moved"
     }
   };

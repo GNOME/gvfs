@@ -60,7 +60,7 @@ gboolean      g_mount_source_ask_password             (GMountSource             
 						       const char                *message,
 						       const char                *initial_user,
 						       const char                *initial_domain,
-						       GPasswordFlags             flags,
+						       GAskPasswordFlags          flags,
 						       gboolean                  *aborted,
 						       char                     **password_out,
 						       char                     **user_out,

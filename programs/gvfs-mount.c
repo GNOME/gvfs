@@ -68,26 +68,26 @@ ask_password_cb (GMountOperation *op,
 		 const char      *message,
 		 const char      *default_user,
 		 const char      *default_domain,
-		 GPasswordFlags   flags)
+		 GAskPasswordFlags flags)
 {
   char *s;
   g_print ("%s\n", message);
 
-  if (flags & G_PASSWORD_FLAGS_NEED_USERNAME)
+  if (flags & G_ASK_PASSWORD_NEED_USERNAME)
     {
       s = prompt_for ("User", default_user);
       g_mount_operation_set_username (op, s);
       g_free (s);
     }
   
-  if (flags & G_PASSWORD_FLAGS_NEED_DOMAIN)
+  if (flags & G_ASK_PASSWORD_NEED_DOMAIN)
     {
       s = prompt_for ("Domain", default_domain);
       g_mount_operation_set_domain (op, s);
       g_free (s);
     }
   
-  if (flags & G_PASSWORD_FLAGS_NEED_PASSWORD)
+  if (flags & G_ASK_PASSWORD_NEED_PASSWORD)
     {
       s = prompt_for ("Password", NULL);
       g_mount_operation_set_password (op, s);

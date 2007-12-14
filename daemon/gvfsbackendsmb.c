@@ -168,13 +168,13 @@ auth_callback (SMBCCTX *context,
     }
   else
     {
-      GPasswordFlags flags = G_PASSWORD_FLAGS_NEED_PASSWORD;
+      GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
       char *message;
       
       if (backend->domain == NULL)
-	flags |= G_PASSWORD_FLAGS_NEED_DOMAIN;
+	flags |= G_ASK_PASSWORD_NEED_DOMAIN;
       if (backend->user == NULL)
-	flags |= G_PASSWORD_FLAGS_NEED_USERNAME;
+	flags |= G_ASK_PASSWORD_NEED_USERNAME;
 
       message = g_strdup_printf (_("Password required for share %s on %s"),
 				 server_name, share_name);

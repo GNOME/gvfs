@@ -1176,7 +1176,7 @@ mount_mountable_location_mounted_cb (GObject *source_object,
   GSimpleAsyncResult *result = user_data;
   GError *error = NULL;
   
-  if (!g_file_mount_enclosing_location_finish (G_FILE (source_object), res, &error))
+  if (!g_file_mount_enclosing_volume_finish (G_FILE (source_object), res, &error))
     {
       g_simple_async_result_set_from_error (result, error);
       g_error_free (error);

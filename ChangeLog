@@ -1,5 +1,21 @@
 2007-12-14  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        * common/gmountsource.c:
+        * common/gmountsource.h:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * programs/gvfs-info.c:
+        * programs/gvfs-monitor-dir.c:
+        * programs/gvfs-monitor-file.c:
+        * programs/gvfs-mount.c:
+        * programs/gvfs-save.c:
+        * test/benchmark-gvfs-big-files.c:
+        * test/benchmark-gvfs-small-files.c:
+	Update to new gio flag enum types/values
+
+2007-12-14  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemondirectorymonitor.c:
         * client/gdaemondirectorymonitor.h:
         * client/gdaemonfile.c:

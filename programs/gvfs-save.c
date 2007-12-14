@@ -62,7 +62,7 @@ save (GFile *file)
 
   error = NULL;
 
-  flags = priv ? G_FILE_CREATE_FLAGS_PRIVATE : G_FILE_CREATE_FLAGS_NONE;
+  flags = priv ? G_FILE_CREATE_PRIVATE : G_FILE_CREATE_NONE;
 
   if (create)
     out = (GOutputStream *)g_file_create (file, flags, NULL, &error);
