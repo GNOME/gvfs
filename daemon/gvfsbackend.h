@@ -297,13 +297,15 @@ struct _GVfsBackendClass
 				 GVfsJobSetAttribute *set_attribute,
 				 const char *filename,
 				 const char *attribute,
-				 GFileAttributeValue *value,
+				 GFileAttributeType type,
+				 gpointer value_p,
 				 GFileQueryInfoFlags flags);
   gboolean (*try_set_attribute) (GVfsBackend *backend,
 				 GVfsJobSetAttribute *set_attribute,
 				 const char *filename,
 				 const char *attribute,
-				 GFileAttributeValue *value,
+				 GFileAttributeType type,
+				 gpointer value_p,
 				 GFileQueryInfoFlags flags);
   void     (*create_dir_monitor)(GVfsBackend *backend,
 				 GVfsJobCreateMonitor *job,

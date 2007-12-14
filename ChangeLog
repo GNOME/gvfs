@@ -1,6 +1,20 @@
 2007-12-14  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
+        * client/gdaemonfileinputstream.c:
+        * client/gvfsfusedaemon.c:
+        * common/gvfsdaemonprotocol.c:
+        * common/gvfsdaemonprotocol.h:
+        * daemon/gvfsbackend.h:
+        * daemon/gvfsjobsetattribute.c:
+        * daemon/gvfsjobsetattribute.h:
+        * programs/gvfs-info.c:
+        * programs/gvfs-ls.c:
+	Update for gio API changes (removal of GFileAttributeValue).
+
+2007-12-14  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
         * common/gmountsource.c:
         * common/gmountsource.h:
         * daemon/gvfsbackendsftp.c:

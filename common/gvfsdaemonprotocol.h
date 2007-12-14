@@ -147,15 +147,28 @@ typedef struct {
   DBUS_STRUCT_END_CHAR_AS_STRING 
 
 
+typedef union {
+  gboolean boolean;
+  guint32 uint32;
+  guint64 uint64;
+  gpointer ptr;
+} GDbusAttributeValue;
+
+void       _g_dbus_attribute_value_destroy       (GFileAttributeType          type,
+						  GDbusAttributeValue        *value);
+gpointer   _g_dbus_attribute_as_pointer          (GFileAttributeType          type,
+						  GDbusAttributeValue        *value);
 const char*_g_dbus_type_from_file_attribute_type (GFileAttributeType          type);
 void       _g_dbus_append_file_attribute         (DBusMessageIter            *iter,
 						  const char                 *attribute,
-						  const GFileAttributeValue  *value);
+						  GFileAttributeType          type,
+						  gpointer                    value_p);
 void       _g_dbus_append_file_info              (DBusMessageIter            *iter,
 						  GFileInfo                  *file_info);
 gboolean   _g_dbus_get_file_attribute            (DBusMessageIter            *iter,
 						  gchar                     **attribute,
-						  GFileAttributeValue        *value);
+						  GFileAttributeType         *type,
+						  GDbusAttributeValue        *value);
 GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter            *iter,
 						  GError                    **error);
 

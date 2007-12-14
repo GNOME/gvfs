@@ -1673,7 +1673,8 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
 static gboolean
 g_daemon_file_set_attribute (GFile *file,
 			     const char *attribute,
-			     const GFileAttributeValue *value,
+			     GFileAttributeType    type,
+			     gpointer              value_p,
 			     GFileQueryInfoFlags flags,
 			     GCancellable *cancellable,
 			     GError **error)
@@ -1696,7 +1697,7 @@ g_daemon_file_set_attribute (GFile *file,
 				  DBUS_TYPE_UINT32,
 				  &flags_dbus);
 
-  _g_dbus_append_file_attribute (&iter, attribute, value);
+  _g_dbus_append_file_attribute (&iter, attribute, type, value_p);
 
   reply = _g_vfs_daemon_call_sync (message,
 				   NULL,

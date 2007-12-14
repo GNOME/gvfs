@@ -1855,7 +1855,6 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
 
   if (file)
     {
-      GFileAttributeValue attr_value = G_FILE_ATTRIBUTE_VALUE_INIT;
       guint64 atime;
       guint64 mtime;
 
@@ -1873,15 +1872,15 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
           mtime = atime;
         }
 
-      attr_value.type = G_FILE_ATTRIBUTE_TYPE_UINT64;
-
-      attr_value.u.uint64 = atime;
-      g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, &attr_value, 0, NULL, &error);
+      g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
+                            G_FILE_ATTRIBUTE_TYPE_UINT64, &atime,
+                            0, NULL, &error);
 
       if (!error)
         {
-          attr_value.u.uint64 = mtime;
-          g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, &attr_value, 0, NULL, &error);
+          g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+                                G_FILE_ATTRIBUTE_TYPE_UINT64, &mtime,
+                                0, NULL, &error);
         }
 
       if (error)

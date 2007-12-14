@@ -57,6 +57,8 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include <gio/gio.h>
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
 #include "gdaemonfileinputstream.h"
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>

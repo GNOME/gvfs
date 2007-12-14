@@ -92,7 +92,6 @@ show_info (GFileInfo *info)
   attributes = g_file_info_list_attributes (info, NULL);
   for (i = 0 ; attributes[i] != NULL; i++)
     {
-      GFileAttributeValue *val;
       char *val_as_string;
 
       if (strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_NAME) == 0 ||
@@ -107,8 +106,7 @@ show_info (GFileInfo *info)
 	}
       else
 	g_print (" ");
-      val = g_file_info_get_attribute (info, attributes[i]);
-      val_as_string = g_file_attribute_value_as_string (val);
+      val_as_string = g_file_info_get_attribute_as_string (info, attributes[i]);
       g_print ("%s=%s", attributes[i], val_as_string);
       g_free (val_as_string);
     }

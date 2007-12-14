@@ -52,7 +52,8 @@ g_vfs_job_set_attribute_finalize (GObject *object)
 
   g_free (job->filename);
   g_free (job->attribute);
-  g_file_attribute_value_clear (&job->value);
+  _g_dbus_attribute_value_destroy (job->type,
+				   &job->value);
   
   if (G_OBJECT_CLASS (g_vfs_job_set_attribute_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_set_attribute_parent_class)->finalize) (object);
@@ -74,7 +75,7 @@ g_vfs_job_set_attribute_class_init (GVfsJobSetAttributeClass *klass)
 static void
 g_vfs_job_set_attribute_init (GVfsJobSetAttribute *job)
 {
-  job->value.type = G_FILE_ATTRIBUTE_TYPE_INVALID;
+  job->type = G_FILE_ATTRIBUTE_TYPE_INVALID;
 }
 
 GVfsJob *
@@ -88,10 +89,11 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   DBusError derror;
   const gchar *filename = NULL;
   gint filename_len;
-  GFileAttributeValue value = G_FILE_ATTRIBUTE_VALUE_INIT;
   GFileQueryInfoFlags flags;
   gchar *attribute;
   dbus_uint32_t flags_u32 = 0;
+  GFileAttributeType type;
+  GDbusAttributeValue value;
   
   dbus_error_init (&derror);
 
@@ -114,7 +116,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
 
   flags = flags_u32;
 
-  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, &value)))
+  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, &type, &value)))
     {
       reply = dbus_message_new_error (message,
 				      DBUS_ERROR_FAILED,
@@ -134,6 +136,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   job->filename = g_strndup (filename, filename_len);
   job->attribute = attribute;
   job->value = value;
+  job->type = type;
   job->flags = flags;
 
   return G_VFS_JOB (job);
@@ -156,7 +159,8 @@ run (GVfsJob *job)
 			op_job,
 			op_job->filename,
 			op_job->attribute,
-			&op_job->value,
+			op_job->type,
+			_g_dbus_attribute_as_pointer (op_job->type, &op_job->value),
 			op_job->flags);
 }
 
@@ -173,7 +177,8 @@ try (GVfsJob *job)
 				   op_job,
 				   op_job->filename,
 				   op_job->attribute,
-				   &op_job->value,
+				   op_job->type,
+				   _g_dbus_attribute_as_pointer (op_job->type, &op_job->value),
 				   op_job->flags);
 }
 
