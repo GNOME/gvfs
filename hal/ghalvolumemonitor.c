@@ -775,7 +775,7 @@ update_mounts (GHalVolumeMonitor *monitor)
   GHalVolume *volume;
   const char *mount_path;
   
-  new_mounts = g_get_unix_mounts (NULL);
+  new_mounts = g_unix_mounts_get (NULL);
   
   new_mounts = g_list_sort (new_mounts, (GCompareFunc) g_unix_mount_compare);
   

@@ -22,9 +22,10 @@
 
 #include <config.h>
 #include <stdlib.h>
-#include <dbus/dbus-glib-lowlevel.h>
 #include <string.h>
 #include <sys/time.h>
+
+#include <gdbusutils.h>
 
 #include "hal-pool.h"
 #include "hal-marshal.h"
@@ -245,7 +246,10 @@ hal_pool_new (const char *cap_only)
   pool = NULL;
   
   dbus_error_init (&error);
-  dbus_connection = dbus_bus_get (DBUS_BUS_SYSTEM, &error);
+  /* see discussion on gtk-devel-list (Subject: Re: gvfs hal volume monitoring backend) on 
+   * why this is private
+   */
+  dbus_connection = dbus_bus_get_private (DBUS_BUS_SYSTEM, &error);
   if (dbus_error_is_set (&error))
     {
       dbus_error_free (&error);
@@ -257,8 +261,8 @@ hal_pool_new (const char *cap_only)
     {
       goto out;
     }
-  
-  dbus_connection_setup_with_g_main (dbus_connection, NULL);
+
+  _g_dbus_connection_integrate_with_main (dbus_connection);
   libhal_ctx_set_dbus_connection (hal_ctx, dbus_connection);
   
   if (!libhal_ctx_init (hal_ctx, &error))

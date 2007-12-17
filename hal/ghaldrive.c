@@ -348,6 +348,7 @@ g_hal_drive_new (GVolumeMonitor       *volume_monitor,
 
   drive = g_object_new (G_TYPE_HAL_DRIVE, NULL);
   drive->volume_monitor = volume_monitor;
+  g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(drive->volume_monitor));
   drive->device_path = g_strdup (hal_device_get_property_string (device, "block.device"));
   drive->device = g_object_ref (device);
   drive->pool = g_object_ref (pool);

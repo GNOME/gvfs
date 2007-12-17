@@ -27,16 +27,24 @@ libgiohal_volume_monitor_la_SOURCES =				\
 	ghalvolumemonitor.c	ghalvolumemonitor.h	\
 	$(NULL)
 
-libgiohal_volume_monitor_la_CFLAGS =				\
+libgiohal_volume_monitor_la_CFLAGS =		\
 	-DG_LOG_DOMAIN=\"GVFS-Hal\"		\
+	-I$(top_srcdir)/common                  \
 	$(GLIB_CFLAGS)                          \
 	$(HAL_CFLAGS)                           \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DG_DISABLE_DEPRECATED			\
 	$(NULL)
 
-libgiohal_volume_monitor_la_LDFLAGS = $(module_flags)
-libgiohal_volume_monitor_la_LIBADD  = $(GLIB_LIBS) $(HAL_LIBS)
+libgiohal_volume_monitor_la_LDFLAGS = \
+	$(module_flags)               \
+	$(NULL)
+
+libgiohal_volume_monitor_la_LIBADD  =		     \
+	$(GLIB_LIBS)                                 \
+	$(HAL_LIBS)                                  \
+	$(top_builddir)/common/libgvfscommon-noin.la \
+	$(NULL)
 
 clean-local:
 	rm -f *~ *.loT $(BUILT_SOURCES)

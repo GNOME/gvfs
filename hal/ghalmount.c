@@ -409,6 +409,7 @@ g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
   
   mount = g_object_new (G_TYPE_HAL_MOUNT, NULL);
   mount->volume_monitor = volume_monitor;
+  g_object_add_weak_pointer (G_OBJECT (mount->volume_monitor), (gpointer) &(mount->volume_monitor));
   mount->device_path = g_strdup (hal_device_get_property_string (device, "block.device"));
   mount->mount_path = g_strdup ("/");
   mount->device = g_object_ref (device);
@@ -480,6 +481,7 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
 
   mount = g_object_new (G_TYPE_HAL_MOUNT, NULL);
   mount->volume_monitor = volume_monitor;
+  g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(mount->volume_monitor));
   mount->device_path = g_strdup (g_unix_mount_get_device_path (mount_entry));
   mount->mount_path = g_strdup (g_unix_mount_get_mount_path (mount_entry));
   mount->device = NULL;

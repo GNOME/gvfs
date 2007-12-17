@@ -1,5 +1,19 @@
 2007-12-17  David Zeuthen  <davidz@redhat.com>
 
+	* hal/ghalvolumemonitor.c (update_mounts): g_get_unix_mounts()
+	was renamed to g_unix_mounts_get() in gio
+
+	* hal/hal-pool.c, Makefile.am: Instead of dbus-glib-1, use the
+	function _g_dbus_connection_integrate_with_main() for mainloop
+	integration.
+
+	* hal/ghalmount.h, hal/ghalvolume.h, hal/ghaldrive.h: Use a weak
+	pointer for the volume monitor
+
+	* configure.ac: Don't require dbus-glib-1 for the hal vm backend
+
+2007-12-17  David Zeuthen  <davidz@redhat.com>
+
 	* client/gdaemonmount.c (g_daemon_mount_mount_iface_init): Fix typo
 	with setting the can_eject() function
 
