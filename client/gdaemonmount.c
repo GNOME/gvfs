@@ -197,23 +197,6 @@ g_daemon_mount_unmount_finish (GMount *mount,
 }
 
 static void
-g_daemon_mount_eject (GMount *mount,
-                      GCancellable *cancellable,
-                      GAsyncReadyCallback callback,
-                      gpointer         user_data)
-{
-}
-
-static gboolean
-g_daemon_mount_eject_finish (GMount *mount,
-                             GAsyncResult *result,
-                             GError **error)
-{
-  return TRUE;
-}
-
-
-static void
 g_daemon_mount_mount_iface_init (GMountIface *iface)
 {
   iface->get_root = g_daemon_mount_get_root;
@@ -226,6 +209,6 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->can_unmount = g_daemon_mount_can_eject;
   iface->unmount = g_daemon_mount_unmount;
   iface->unmount_finish = g_daemon_mount_unmount_finish;
-  iface->eject = g_daemon_mount_eject;
-  iface->eject_finish = g_daemon_mount_eject_finish;
+  iface->eject = NULL; /* Not supported */
+  iface->eject_finish = NULL; /* Not supported */
 }

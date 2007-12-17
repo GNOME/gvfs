@@ -1,3 +1,8 @@
+2007-12-17  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c (g_daemon_mount_mount_iface_init):
+	Eject not supported. Make vtable NULL.
+
 2007-12-14  David Zeuthen  <davidz@redhat.com>
 
 	* Makefile.am:
