@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_HAL_VOLUME_MONITOR        (_g_hal_volume_monitor_get_type ())
+#define G_TYPE_HAL_VOLUME_MONITOR        (g_hal_volume_monitor_get_type ())
 #define G_HAL_VOLUME_MONITOR(o)          (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_HAL_VOLUME_MONITOR, GHalVolumeMonitor))
 #define G_HAL_VOLUME_MONITOR_CLASS(k)    (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_HAL_VOLUME_MONITOR, GHalVolumeMonitorClass))
 #define G_IS_HAL_VOLUME_MONITOR(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_HAL_VOLUME_MONITOR))
@@ -50,15 +50,15 @@ struct _GHalVolumeMonitorClass {
 
 };
 
-GType _g_hal_volume_monitor_get_type (void) G_GNUC_CONST;
+GType g_hal_volume_monitor_get_type (void) G_GNUC_CONST;
 
-GVolumeMonitor *_g_hal_volume_monitor_new                         (void);
-GHalVolume    * _g_hal_volume_monitor_lookup_volume_for_mount_path (GHalVolumeMonitor *monitor,
-                                                                    const char         *mount_path);
+GVolumeMonitor *g_hal_volume_monitor_new                         (void);
+GHalVolume     *g_hal_volume_monitor_lookup_volume_for_mount_path (GHalVolumeMonitor *monitor,
+                                                                   const char         *mount_path);
 
-void _g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor);
+void g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor);
 
-void g_hal_volume_monitor_register (GIOModule *module);
+void g_hal_volume_monitor_register   (GIOModule *module);
 
 G_END_DECLS
 

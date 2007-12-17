@@ -55,10 +55,16 @@ struct _GHalVolume {
 
 static void g_hal_volume_volume_iface_init (GVolumeIface *iface);
 
-#define g_hal_volume_get_type _g_hal_volume_get_type
-G_DEFINE_TYPE_WITH_CODE (GHalVolume, g_hal_volume, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (G_TYPE_VOLUME,
-						g_hal_volume_volume_iface_init))
+#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
+  const GInterfaceInfo g_implement_interface_info = { \
+    (GInterfaceInitFunc) iface_init, NULL, NULL \
+  }; \
+  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
+}
+
+G_DEFINE_DYNAMIC_TYPE_EXTENDED (GHalVolume, g_hal_volume, G_TYPE_OBJECT, 0,
+                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_VOLUME,
+                                                                g_hal_volume_volume_iface_init))
 
 static void
 g_hal_volume_finalize (GObject *object)
@@ -68,10 +74,10 @@ g_hal_volume_finalize (GObject *object)
   volume = G_HAL_VOLUME (object);
 
   if (volume->mount != NULL)
-    _g_hal_mount_unset_volume (volume->mount, volume);
+    g_hal_mount_unset_volume (volume->mount, volume);
 
   if (volume->drive != NULL)
-    _g_hal_drive_unset_volume (volume->drive, volume);
+    g_hal_drive_unset_volume (volume->drive, volume);
   
   g_free (volume->mount_path);
   g_free (volume->device_path);
@@ -97,11 +103,14 @@ g_hal_volume_class_init (GHalVolumeClass *klass)
 }
 
 static void
-g_hal_volume_init (GHalVolume *hal_volume)
+g_hal_volume_class_finalize (GHalVolumeClass *klass)
 {
 }
 
-
+static void
+g_hal_volume_init (GHalVolume *hal_volume)
+{
+}
 
 const static struct {
         const char *disc_type;
@@ -152,7 +161,7 @@ get_disc_name (const char *disc_type, gboolean is_blank)
 #define GIGABYTE_FACTOR (1000.0 * 1000.0 * 1000.0)
 
 static char *
-_format_size_for_display (guint64 size)
+format_size_for_display (guint64 size)
 {
   char *str;
   gdouble displayed_size;
@@ -177,7 +186,7 @@ _format_size_for_display (guint64 size)
 }
 
 static void
-_do_update_from_hal (GHalVolume *mv)
+do_update_from_hal (GHalVolume *mv)
 {
   const char *drive_type;
   const char *drive_bus;
@@ -219,7 +228,7 @@ _do_update_from_hal (GHalVolume *mv)
       name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
     }
   } else {
-    name = _format_size_for_display (volume_size);
+    name = format_size_for_display (volume_size);
   }
 
   mv->name = name;
@@ -232,7 +241,7 @@ _do_update_from_hal (GHalVolume *mv)
 }
 
 static void
-_update_from_hal (GHalVolume *mv, gboolean emit_changed)
+update_from_hal (GHalVolume *mv, gboolean emit_changed)
 {
   char *old_name;
   char *old_icon;
@@ -245,7 +254,7 @@ _update_from_hal (GHalVolume *mv, gboolean emit_changed)
   g_free (mv->name);
   g_free (mv->icon);
   g_free (mv->mount_path);
-  _do_update_from_hal (mv);
+  do_update_from_hal (mv);
 
   if (emit_changed)
     {
@@ -280,11 +289,11 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
   GHalVolume *hal_volume = G_HAL_VOLUME (user_data);
   
   //g_warning ("hal modifying %s (property %s changed)", hal_volume->device_path, key);
-  _update_from_hal (hal_volume, TRUE);
+  update_from_hal (hal_volume, TRUE);
 }
 
 static void
-_compute_uuid (GHalVolume *volume)
+compute_uuid (GHalVolume *volume)
 {
   const char *fs_uuid;
   const char *fs_label;
@@ -312,10 +321,10 @@ _compute_uuid (GHalVolume *volume)
 }
 
 GHalVolume *
-_g_hal_volume_new (GVolumeMonitor  *volume_monitor,
-                   HalDevice       *device,
-                   HalPool         *pool,
-                   GHalDrive       *drive)
+g_hal_volume_new (GVolumeMonitor  *volume_monitor,
+                  HalDevice       *device,
+                  HalPool         *pool,
+                  GHalDrive       *drive)
 {
   GHalVolume *volume;
   HalDevice *drive_device;
@@ -339,13 +348,13 @@ _g_hal_volume_new (GVolumeMonitor  *volume_monitor,
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   
-  _compute_uuid (volume);
-  _update_from_hal (volume, FALSE);
+  compute_uuid (volume);
+  update_from_hal (volume, FALSE);
 
   /* need to do this last */
   volume->drive = drive;
   if (drive != NULL)
-    _g_hal_drive_set_volume (drive, volume);
+    g_hal_drive_set_volume (drive, volume);
   
   return volume;
 }
@@ -356,30 +365,30 @@ _g_hal_volume_new (GVolumeMonitor  *volume_monitor,
  * 
  **/
 void
-_g_hal_volume_removed (GHalVolume *volume)
+g_hal_volume_removed (GHalVolume *volume)
 {
   if (volume->mount != NULL)
     {
-      _g_hal_mount_unset_volume (volume->mount, volume);
+      g_hal_mount_unset_volume (volume->mount, volume);
       volume->mount = NULL;
     }
 
   if (volume->drive != NULL)
     {
-      _g_hal_drive_unset_volume (volume->drive, volume);
+      g_hal_drive_unset_volume (volume->drive, volume);
       volume->drive = NULL;
     }
 }
 
 void
-_g_hal_volume_set_mount (GHalVolume  *volume,
-                                     GHalMount *mount)
+g_hal_volume_set_mount (GHalVolume  *volume,
+                        GHalMount *mount)
 {
   if (volume->mount == mount)
     return;
   
   if (volume->mount != NULL)
-    _g_hal_mount_unset_volume (volume->mount, volume);
+    g_hal_mount_unset_volume (volume->mount, volume);
   
   volume->mount = mount;
   
@@ -390,8 +399,8 @@ _g_hal_volume_set_mount (GHalVolume  *volume,
 }
  
 void
-_g_hal_volume_unset_mount (GHalVolume  *volume,
-                           GHalMount *mount)
+g_hal_volume_unset_mount (GHalVolume  *volume,
+                          GHalMount *mount)
 {
   if (volume->mount == mount)
     {
@@ -404,14 +413,14 @@ _g_hal_volume_unset_mount (GHalVolume  *volume,
 }
 
 void
-_g_hal_volume_set_drive (GHalVolume  *volume,
-                                   GHalDrive *drive)
+g_hal_volume_set_drive (GHalVolume  *volume,
+                        GHalDrive *drive)
 {
   if (volume->drive == drive)
     return;
   
   if (volume->drive != NULL)
-    _g_hal_drive_unset_volume (volume->drive, volume);
+    g_hal_drive_unset_volume (volume->drive, volume);
   
   volume->drive = drive;
   
@@ -422,8 +431,8 @@ _g_hal_volume_set_drive (GHalVolume  *volume,
 }
 
 void
-_g_hal_volume_unset_drive (GHalVolume  *volume,
-                                     GHalDrive *drive)
+g_hal_volume_unset_drive (GHalVolume  *volume,
+                          GHalDrive *drive)
 {
   if (volume->drive == drive)
     {
@@ -491,10 +500,9 @@ g_hal_volume_get_mount (GVolume *volume)
   return NULL;
 }
 
-
 gboolean
-_g_hal_volume_has_mount_path (GHalVolume *volume,
-                              const char  *mount_path)
+g_hal_volume_has_mount_path (GHalVolume *volume,
+                             const char  *mount_path)
 {
   if (volume->mount_path != NULL)
     return strcmp (volume->mount_path, mount_path) == 0;
@@ -502,8 +510,8 @@ _g_hal_volume_has_mount_path (GHalVolume *volume,
 }
 
 gboolean
-_g_hal_volume_has_udi (GHalVolume  *volume,
-                       const char  *udi)
+g_hal_volume_has_udi (GHalVolume  *volume,
+                      const char  *udi)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   if (hal_volume->device != NULL)
@@ -512,8 +520,8 @@ _g_hal_volume_has_udi (GHalVolume  *volume,
 }
 
 gboolean
-_g_hal_volume_has_uuid (GHalVolume  *volume,
-                        const char  *uuid)
+g_hal_volume_has_uuid (GHalVolume  *volume,
+                       const char  *uuid)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   if (hal_volume->uuid != NULL)
@@ -537,7 +545,7 @@ spawn_cb (GPid pid, gint status, gpointer user_data)
   /* ensure that the #GHalMount corrosponding to the #GHalVolume we've
    * mounted is made available before returning to the user
    */
-  _g_hal_volume_monitor_force_update (G_HAL_VOLUME_MONITOR (G_HAL_VOLUME (data->object)->volume_monitor));
+  g_hal_volume_monitor_force_update (G_HAL_VOLUME_MONITOR (G_HAL_VOLUME (data->object)->volume_monitor));
   
   /* TODO: how do we report an error back to the caller while telling
    * him that we already have shown an error dialog to the user?
@@ -655,4 +663,10 @@ g_hal_volume_volume_iface_init (GVolumeIface *iface)
   iface->mount_finish = g_hal_volume_mount_finish;
   iface->eject = g_hal_volume_eject;
   iface->eject_finish = g_hal_volume_eject_finish;
+}
+
+void 
+g_hal_volume_register (GIOModule *module)
+{
+  g_hal_volume_register_type (G_TYPE_MODULE (module));
 }

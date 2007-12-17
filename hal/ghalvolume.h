@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_HAL_VOLUME        (_g_hal_volume_get_type ())
+#define G_TYPE_HAL_VOLUME        (g_hal_volume_get_type ())
 #define G_HAL_VOLUME(o)          (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_HAL_VOLUME, GHalVolume))
 #define G_HAL_VOLUME_CLASS(k)    (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_HAL_VOLUME, GHalVolumeClass))
 #define G_IS_HAL_VOLUME(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_HAL_VOLUME))
@@ -43,31 +43,32 @@ struct _GHalVolumeClass {
    GObjectClass parent_class;
 };
 
-GType _g_hal_volume_get_type (void) G_GNUC_CONST;
+GType g_hal_volume_get_type (void) G_GNUC_CONST;
+void  g_hal_volume_register (GIOModule *module);
 
-GHalVolume *_g_hal_volume_new            (GVolumeMonitor   *volume_monitor,
-                                          HalDevice        *device,
-                                          HalPool          *pool,
-                                          GHalDrive        *drive);
+GHalVolume *g_hal_volume_new            (GVolumeMonitor   *volume_monitor,
+					 HalDevice        *device,
+					 HalPool          *pool,
+					 GHalDrive        *drive);
 
-gboolean    _g_hal_volume_has_mount_path (GHalVolume       *volume,
-                                          const char       *mount_path);
-gboolean    _g_hal_volume_has_udi        (GHalVolume       *volume,
-                                          const char       *udi);
-gboolean    _g_hal_volume_has_uuid       (GHalVolume       *volume,
-                                          const char       *uuid);
+gboolean    g_hal_volume_has_mount_path (GHalVolume       *volume,
+					 const char       *mount_path);
+gboolean    g_hal_volume_has_udi        (GHalVolume       *volume,
+					 const char       *udi);
+gboolean    g_hal_volume_has_uuid       (GHalVolume       *volume,
+					 const char       *uuid);
 
-void        _g_hal_volume_set_mount      (GHalVolume       *volume,
-                                          GHalMount        *mount);
-void        _g_hal_volume_unset_mount    (GHalVolume       *volume,
-                                          GHalMount        *mount);
+void        g_hal_volume_set_mount      (GHalVolume       *volume,
+					 GHalMount        *mount);
+void        g_hal_volume_unset_mount    (GHalVolume       *volume,
+					 GHalMount        *mount);
 
-void        _g_hal_volume_set_drive      (GHalVolume       *volume,
-                                          GHalDrive        *drive);
-void        _g_hal_volume_unset_drive    (GHalVolume       *volume,
-                                          GHalDrive        *drive);
+void        g_hal_volume_set_drive      (GHalVolume       *volume,
+					 GHalDrive        *drive);
+void        g_hal_volume_unset_drive    (GHalVolume       *volume,
+					 GHalDrive        *drive);
 
-void        _g_hal_volume_removed        (GHalVolume       *volume);
+void        g_hal_volume_removed        (GHalVolume       *volume);
 
 G_END_DECLS
 

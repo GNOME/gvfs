@@ -60,6 +60,7 @@ struct _HalPoolClass
 };
 
 GType            hal_pool_get_type                            (void);
+void             hal_pool_register                            (GIOModule    *module);
 HalPool *        hal_pool_new                                 (const char   *cap_only);
 LibHalContext *  hal_pool_get_hal_ctx                         (HalPool      *pool);
 DBusConnection * hal_pool_get_dbus_connection                 (HalPool      *pool);

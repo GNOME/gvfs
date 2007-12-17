@@ -47,7 +47,7 @@ struct _HalPoolPrivate
   GHashTable *devices;
 };
 
-G_DEFINE_TYPE (HalPool, hal_pool, G_TYPE_OBJECT);
+G_DEFINE_DYNAMIC_TYPE (HalPool, hal_pool, G_TYPE_OBJECT);
 
 static void
 hal_pool_finalize (HalPool *pool)
@@ -72,6 +72,8 @@ hal_pool_class_init (HalPoolClass *klass)
   
   obj_class->finalize = (GObjectFinalizeFunc) hal_pool_finalize;
 
+  g_type_class_ref (HAL_TYPE_DEVICE);
+  
   signals[DEVICE_ADDED] =
     g_signal_new ("device_added",
                   G_TYPE_FROM_CLASS (klass),
@@ -105,6 +107,12 @@ hal_pool_class_init (HalPoolClass *klass)
 }
 
 static void
+hal_pool_class_finalize (HalPoolClass *klass)
+{
+  g_type_class_unref (g_type_class_peek (HAL_TYPE_DEVICE));
+}
+
+static void
 hal_pool_init (HalPool *pool)
 {
   pool->priv = g_new0 (HalPoolPrivate, 1);
@@ -134,6 +142,7 @@ hal_pool_add_device_by_udi (HalPool *pool,
     }
 }
 
+#ifdef HAVE_HAL_FAST_INIT
 static void
 hal_pool_add_device_by_udi_and_properties (HalPool *pool, 
                                            char *udi, 
@@ -157,6 +166,7 @@ hal_pool_add_device_by_udi_and_properties (HalPool *pool,
         }
     }
 }
+#endif
 
 static void
 _hal_device_added (LibHalContext *hal_ctx, const char *udi)
@@ -228,7 +238,9 @@ hal_pool_new (const char *cap_only)
   LibHalContext *hal_ctx;
   DBusError error;
   DBusConnection *dbus_connection;
+#ifdef HAVE_HAL_FAST_INIT
   LibHalPropertySet **properties;
+#endif
   
   pool = NULL;
   
@@ -389,4 +401,10 @@ hal_pool_find_by_capability (HalPool *pool, const char *capability)
   
  out:
   return devices;
+}
+
+void 
+hal_pool_register (GIOModule *module)
+{
+  hal_pool_register_type (G_TYPE_MODULE (module));
 }

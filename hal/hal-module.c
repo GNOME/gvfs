@@ -27,21 +27,27 @@
 #include <gio/gio.h>
 
 #include "ghalvolumemonitor.h"
+#include "ghalvolume.h"
+#include "ghalmount.h"
+#include "ghaldrive.h"
+#include "hal-pool.h"
+#include "hal-device.h"
 
 void
 g_io_module_load (GIOModule *module)
 {
+  hal_device_register (module);
+  hal_pool_register (module);
+  g_hal_drive_register (module);
+  g_hal_mount_register (module);
+  g_hal_volume_register (module);
   g_hal_volume_monitor_register (module);
-  g_warning ("loaded");
-
-  /* TODO: Since dynamic types need some fixing we want to make ourselves resident; I couldn't
-   *       figure out how to get a GModule from GIOModule so do this hack until then
-   */
-  g_type_module_use (G_TYPE_MODULE (module));
+ 
+  //g_warning ("hal loaded");
 }
 
 void
 g_io_module_unload (GIOModule *module)
 {
-  g_warning ("unloaded");
+  //g_warning ("hal unloaded");
 }

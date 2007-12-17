@@ -1,5 +1,17 @@
 2007-12-17  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghaldrive.[ch]:
+        * hal/ghalmount.[ch]:
+        * hal/ghalvolume.[ch]:
+        * hal/ghalvolumemonitor.[ch]:
+        * hal/hal-device.[ch]:
+        * hal/hal-module.c:
+        * hal/hal-pool.[ch]:
+	Make types dynamic and update to support volume monitor
+	backend name and is_supported().
+
+2007-12-17  Alexander Larsson  <alexl@redhat.com>
+
 	* client/gdaemonmount.c (g_daemon_mount_mount_iface_init):
 	Eject not supported. Make vtable NULL.
 

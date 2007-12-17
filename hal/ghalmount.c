@@ -60,11 +60,15 @@ struct _GHalMount {
 
 static void g_hal_mount_mount_iface_init (GMountIface *iface);
 
-#define g_hal_mount_get_type _g_hal_mount_get_type
-G_DEFINE_TYPE_WITH_CODE (GHalMount, g_hal_mount, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_MOUNT,
-						g_hal_mount_mount_iface_init))
-
+#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
+  const GInterfaceInfo g_implement_interface_info = { \
+    (GInterfaceInitFunc) iface_init, NULL, NULL \
+  }; \
+  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
+}
+G_DEFINE_DYNAMIC_TYPE_EXTENDED (GHalMount, g_hal_mount, G_TYPE_OBJECT, 0, 
+                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_MOUNT,
+                                                                g_hal_mount_mount_iface_init))
 
 static void
 g_hal_mount_finalize (GObject *object)
@@ -74,7 +78,7 @@ g_hal_mount_finalize (GObject *object)
   mount = G_HAL_MOUNT (object);
 
   if (mount->volume != NULL)
-    _g_hal_volume_unset_mount (mount->volume, mount);
+    g_hal_volume_unset_mount (mount->volume, mount);
 
   g_free (mount->device_path);
   g_free (mount->mount_path);
@@ -106,6 +110,11 @@ g_hal_mount_class_init (GHalMountClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = g_hal_mount_finalize;
+}
+
+static void
+g_hal_mount_class_finalize (GHalMountClass *klass)
+{
 }
 
 static void
@@ -176,7 +185,7 @@ get_disc_name (const char *disc_type, gboolean is_blank)
 #define GIGABYTE_FACTOR (1000.0 * 1000.0 * 1000.0)
 
 static char *
-_format_size_for_display (guint64 size)
+format_size_for_display (guint64 size)
 {
   char *str;
   gdouble displayed_size;
@@ -201,7 +210,7 @@ _format_size_for_display (guint64 size)
 }
 
 static void
-_do_update_from_hal (GHalMount *m)
+do_update_from_hal (GHalMount *m)
 {
   HalDevice *volume;
   HalDevice *drive;
@@ -279,7 +288,7 @@ _do_update_from_hal (GHalMount *m)
       name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
     }
   } else {
-    name = _format_size_for_display (volume_size);
+    name = format_size_for_display (volume_size);
   }
 
   if (m->override_name != NULL)
@@ -304,7 +313,7 @@ _do_update_from_hal (GHalMount *m)
 
 
 static void
-_update_from_hal (GHalMount *m, gboolean emit_changed)
+update_from_hal (GHalMount *m, gboolean emit_changed)
 {
   char *old_name;
   GIcon *old_icon;
@@ -315,7 +324,7 @@ _update_from_hal (GHalMount *m, gboolean emit_changed)
   g_free (m->name);
   if (m->icon != NULL)
     g_object_unref (m->icon);
-  _do_update_from_hal (m);
+  do_update_from_hal (m);
 
   if (emit_changed)
     {
@@ -340,11 +349,11 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
   GHalMount *hal_mount = G_HAL_MOUNT (user_data);
   
   //g_warning ("mounthal modifying %s (property %s changed)", hal_mount->device_path, key);
-  _update_from_hal (hal_mount, TRUE);
+  update_from_hal (hal_mount, TRUE);
 }
 
 static void
-_compute_uuid (GHalMount *mount)
+compute_uuid (GHalMount *mount)
 {
   const char *fs_uuid;
   const char *fs_label;
@@ -373,14 +382,14 @@ _compute_uuid (GHalMount *mount)
 
 
 GHalMount *
-_g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
-                                    HalDevice         *device,
-                                    GFile             *override_root,
-                                    const char        *override_name,
-                                    GIcon             *override_icon,
-                                    gboolean           cannot_unmount,
-                                    HalPool           *pool,
-                                    GHalVolume        *volume)
+g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
+                                   HalDevice         *device,
+                                   GFile             *override_root,
+                                   const char        *override_name,
+                                   GIcon             *override_icon,
+                                   gboolean           cannot_unmount,
+                                   HalPool           *pool,
+                                   GHalVolume        *volume)
 {
   HalDevice *drive_device;
   const char *storage_udi;
@@ -412,13 +421,13 @@ _g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, mount, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, mount, 0);
 
-  _compute_uuid (mount);
-  _update_from_hal (mount, FALSE);
+  compute_uuid (mount);
+  update_from_hal (mount, FALSE);
 
   /* need to do this last */
   mount->volume = volume;
   if (volume != NULL)
-    _g_hal_volume_set_mount (volume, mount);
+    g_hal_volume_set_mount (volume, mount);
 
   return mount;
 
@@ -427,7 +436,7 @@ _g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
 }
 
 void 
-_g_hal_mount_override_name (GHalMount *mount, const char *name)
+g_hal_mount_override_name (GHalMount *mount, const char *name)
 {
   if (mount->override_name != NULL)
     g_free (mount->override_name);
@@ -437,11 +446,11 @@ _g_hal_mount_override_name (GHalMount *mount, const char *name)
   else
     mount->override_name = NULL;
 
-  _update_from_hal (mount, TRUE);
+  update_from_hal (mount, TRUE);
 }
 
 void
-_g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
+g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
 {
   if (mount->override_icon != NULL)
     g_object_unref (mount->override_icon);
@@ -451,14 +460,14 @@ _g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
   else
     mount->override_icon = NULL;
 
-  _update_from_hal (mount, TRUE);
+  update_from_hal (mount, TRUE);
 }
 
 GHalMount *
-_g_hal_mount_new (GVolumeMonitor       *volume_monitor,
-                  GUnixMountEntry      *mount_entry,
-                  HalPool              *pool,
-                  GHalVolume           *volume)
+g_hal_mount_new (GVolumeMonitor       *volume_monitor,
+                 GUnixMountEntry      *mount_entry,
+                 HalPool              *pool,
+                 GHalVolume           *volume)
 {
   HalDevice *device;
   HalDevice *drive_device;
@@ -506,8 +515,8 @@ _g_hal_mount_new (GVolumeMonitor       *volume_monitor,
           g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, mount, 0);
           g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, mount, 0);
           
-          _compute_uuid (mount);
-          _update_from_hal (mount, FALSE);
+          compute_uuid (mount);
+          update_from_hal (mount, FALSE);
           
           goto was_hal;
         }
@@ -523,17 +532,17 @@ _g_hal_mount_new (GVolumeMonitor       *volume_monitor,
   /* need to do this last */
   mount->volume = volume;
   if (volume != NULL)
-    _g_hal_volume_set_mount (volume, mount);
+    g_hal_volume_set_mount (volume, mount);
 
   return mount;
 }
 
 void
-_g_hal_mount_unmounted (GHalMount *mount)
+g_hal_mount_unmounted (GHalMount *mount)
 {
   if (mount->volume != NULL)
     {
-      _g_hal_volume_unset_mount (mount->volume, mount);
+      g_hal_volume_unset_mount (mount->volume, mount);
       mount->volume = NULL;
       g_signal_emit_by_name (mount, "changed");
       /* there's really no need to emit volume_changed on the volume monitor 
@@ -542,7 +551,7 @@ _g_hal_mount_unmounted (GHalMount *mount)
 }
 
 void
-_g_hal_mount_unset_volume (GHalMount *mount,
+g_hal_mount_unset_volume (GHalMount *mount,
                                        GHalVolume  *volume)
 {
   if (mount->volume == volume)
@@ -591,7 +600,7 @@ g_hal_mount_get_name (GMount *mount)
 }
 
 gboolean
-_g_hal_mount_has_uuid (GHalMount         *mount,
+g_hal_mount_has_uuid (GHalMount         *mount,
                        const char        *uuid)
 {
   if (mount->uuid == NULL)
@@ -600,15 +609,15 @@ _g_hal_mount_has_uuid (GHalMount         *mount,
 }
 
 gboolean
-_g_hal_mount_has_mount_path (GHalMount *mount,
-                             const char  *mount_path)
+g_hal_mount_has_mount_path (GHalMount *mount,
+                            const char  *mount_path)
 {
   return strcmp (mount->mount_path, mount_path) == 0;
 }
 
 gboolean
-_g_hal_mount_has_udi (GHalMount *mount,
-                      const char  *udi)
+g_hal_mount_has_udi (GHalMount *mount,
+                     const char  *udi)
 {
   if (mount->device == NULL)
     return FALSE;
@@ -879,3 +888,8 @@ g_hal_mount_mount_iface_init (GMountIface *iface)
   iface->eject_finish = g_hal_mount_eject_finish;
 }
 
+void 
+g_hal_mount_register (GIOModule *module)
+{
+  g_hal_mount_register_type (G_TYPE_MODULE (module));
+}

@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_HAL_DRIVE        (_g_hal_drive_get_type ())
+#define G_TYPE_HAL_DRIVE        (g_hal_drive_get_type ())
 #define G_HAL_DRIVE(o)          (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_HAL_DRIVE, GHalDrive))
 #define G_HAL_DRIVE_CLASS(k)    (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_HAL_DRIVE, GHalDriveClass))
 #define G_IS_HAL_DRIVE(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_HAL_DRIVE))
@@ -43,22 +43,23 @@ struct _GHalDriveClass {
    GObjectClass parent_class;
 };
 
-GType _g_hal_drive_get_type (void) G_GNUC_CONST;
+GType g_hal_drive_get_type (void) G_GNUC_CONST;
+void  g_hal_drive_register (GIOModule *module);
 
-GHalDrive *_g_hal_drive_new    (GVolumeMonitor   *volume_monitor,
-                                HalDevice        *device,
-                                HalPool          *pool);
+GHalDrive *g_hal_drive_new    (GVolumeMonitor   *volume_monitor,
+			       HalDevice        *device,
+			       HalPool          *pool);
 
-gboolean _g_hal_drive_has_udi  (GHalDrive        *drive, 
-                                const char       *udi);
+gboolean g_hal_drive_has_udi  (GHalDrive        *drive, 
+			       const char       *udi);
 
-void _g_hal_drive_set_volume   (GHalDrive        *drive, 
-                                GHalVolume       *volume);
+void g_hal_drive_set_volume   (GHalDrive        *drive, 
+			       GHalVolume       *volume);
 
-void _g_hal_drive_unset_volume (GHalDrive        *drive, 
-                                GHalVolume       *volume);
+void g_hal_drive_unset_volume (GHalDrive        *drive, 
+			       GHalVolume       *volume);
 
-void _g_hal_drive_disconnected (GHalDrive        *drive);
+void g_hal_drive_disconnected (GHalDrive        *drive);
 
 char *_drive_get_icon          (HalDevice *d);
 

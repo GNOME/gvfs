@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_HAL_MOUNT        (_g_hal_mount_get_type ())
+#define G_TYPE_HAL_MOUNT        (g_hal_mount_get_type ())
 #define G_HAL_MOUNT(o)          (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_HAL_MOUNT, GHalMount))
 #define G_HAL_MOUNT_CLASS(k)    (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_HAL_MOUNT, GHalMountClass))
 #define G_IS_HAL_MOUNT(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_HAL_MOUNT))
@@ -43,33 +43,34 @@ struct _GHalMountClass {
    GObjectClass parent_class;
 };
 
-GType _g_hal_mount_get_type (void) G_GNUC_CONST;
+GType g_hal_mount_get_type (void) G_GNUC_CONST;
+void  g_hal_mount_register (GIOModule *module);
 
-GHalMount *  _g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
-                                                 HalDevice         *device,
-                                                 GFile             *override_root,
-                                                 const char        *override_name,
-                                                 GIcon             *override_icon,
-                                                 gboolean           cannot_unmount,
-                                                 HalPool           *pool,
-                                                 GHalVolume        *volume);
-GHalMount *  _g_hal_mount_new                   (GVolumeMonitor    *volume_monitor,
-                                                 GUnixMountEntry   *mount_entry,
-                                                 HalPool           *pool,
-                                                 GHalVolume        *volume);
-gboolean     _g_hal_mount_has_mount_path        (GHalMount         *mount,
-                                                 const char        *mount_path);
-gboolean     _g_hal_mount_has_udi               (GHalMount         *mount,
-                                                 const char        *udi);
-gboolean     _g_hal_mount_has_uuid              (GHalMount         *mount,
-                                                 const char        *uuid);
-void         _g_hal_mount_unset_volume          (GHalMount         *mount,
-                                                 GHalVolume        *volume);
-void         _g_hal_mount_unmounted             (GHalMount         *mount);
-void         _g_hal_mount_override_name         (GHalMount         *mount,
-                                                 const char        *name);
-void         _g_hal_mount_override_icon         (GHalMount         *mount,
-                                                 GIcon             *icon);
+GHalMount *  g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
+						HalDevice         *device,
+						GFile             *override_root,
+						const char        *override_name,
+						GIcon             *override_icon,
+						gboolean           cannot_unmount,
+						HalPool           *pool,
+						GHalVolume        *volume);
+GHalMount *  g_hal_mount_new                   (GVolumeMonitor    *volume_monitor,
+						GUnixMountEntry   *mount_entry,
+						HalPool           *pool,
+						GHalVolume        *volume);
+gboolean     g_hal_mount_has_mount_path        (GHalMount         *mount,
+						const char        *mount_path);
+gboolean     g_hal_mount_has_udi               (GHalMount         *mount,
+						const char        *udi);
+gboolean     g_hal_mount_has_uuid              (GHalMount         *mount,
+						const char        *uuid);
+void         g_hal_mount_unset_volume          (GHalMount         *mount,
+						GHalVolume        *volume);
+void         g_hal_mount_unmounted             (GHalMount         *mount);
+void         g_hal_mount_override_name         (GHalMount         *mount,
+						const char        *name);
+void         g_hal_mount_override_icon         (GHalMount         *mount,
+						GIcon             *icon);
 
 G_END_DECLS
 

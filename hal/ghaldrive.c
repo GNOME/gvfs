@@ -58,11 +58,16 @@ struct _GHalDrive {
 
 static void g_hal_drive_drive_iface_init (GDriveIface *iface);
 
-#define g_hal_drive_get_type _g_hal_drive_get_type
-G_DEFINE_TYPE_WITH_CODE (GHalDrive, g_hal_drive, G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (G_TYPE_DRIVE,
-						g_hal_drive_drive_iface_init))
+#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
+  const GInterfaceInfo g_implement_interface_info = { \
+    (GInterfaceInitFunc) iface_init, NULL, NULL \
+  }; \
+  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
+}
 
+G_DEFINE_DYNAMIC_TYPE_EXTENDED (GHalDrive, g_hal_drive, G_TYPE_OBJECT, 0,
+                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_DRIVE,
+                                                                g_hal_drive_drive_iface_init))
 
 static void
 g_hal_drive_finalize (GObject *object)
@@ -75,7 +80,7 @@ g_hal_drive_finalize (GObject *object)
   for (l = drive->volumes; l != NULL; l = l->next)
     {
       GHalVolume *volume = l->data;
-      _g_hal_volume_unset_drive (volume, drive);
+      g_hal_volume_unset_drive (volume, drive);
     }
 
   g_free (drive->device_path);
@@ -97,6 +102,11 @@ g_hal_drive_class_init (GHalDriveClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = g_hal_drive_finalize;
+}
+
+static void
+g_hal_drive_class_finalize (GHalDriveClass *klass)
+{
 }
 
 static void
@@ -330,7 +340,7 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
 }
 
 GHalDrive *
-_g_hal_drive_new (GVolumeMonitor       *volume_monitor,
+g_hal_drive_new (GVolumeMonitor       *volume_monitor,
                   HalDevice            *device,
                   HalPool              *pool)
 {
@@ -353,19 +363,19 @@ _g_hal_drive_new (GVolumeMonitor       *volume_monitor,
 }
 
 void 
-_g_hal_drive_disconnected (GHalDrive *drive)
+g_hal_drive_disconnected (GHalDrive *drive)
 {
   GList *l;
 
   for (l = drive->volumes; l != NULL; l = l->next)
     {
       GHalVolume *volume = l->data;
-      _g_hal_volume_unset_drive (volume, drive);
+      g_hal_volume_unset_drive (volume, drive);
     }
 }
 
 void 
-_g_hal_drive_set_volume (GHalDrive *drive, 
+g_hal_drive_set_volume (GHalDrive *drive, 
                          GHalVolume *volume)
 {
 
@@ -381,7 +391,7 @@ _g_hal_drive_set_volume (GHalDrive *drive,
 }
 
 void 
-_g_hal_drive_unset_volume (GHalDrive *drive, 
+g_hal_drive_unset_volume (GHalDrive *drive, 
                            GHalVolume *volume)
 {
   GList *l;
@@ -399,7 +409,7 @@ _g_hal_drive_unset_volume (GHalDrive *drive,
 }
 
 gboolean 
-_g_hal_drive_has_udi (GHalDrive *drive, const char *udi)
+g_hal_drive_has_udi (GHalDrive *drive, const char *udi)
 {
   return strcmp (udi, hal_device_get_udi (drive->device)) == 0;
 }
@@ -686,4 +696,10 @@ g_hal_drive_drive_iface_init (GDriveIface *iface)
   iface->eject_finish = g_hal_drive_eject_finish;
   iface->poll_for_media = g_hal_drive_poll_for_media;
   iface->poll_for_media_finish = g_hal_drive_poll_for_media_finish;
+}
+
+void 
+g_hal_drive_register (GIOModule *module)
+{
+  g_hal_drive_register_type (G_TYPE_MODULE (module));
 }
