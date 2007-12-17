@@ -1,3 +1,17 @@
+2007-12-14  David Zeuthen  <davidz@redhat.com>
+
+	* Makefile.am:
+	* client/gdaemonmount.c: (g_daemon_mount_get_uuid),
+	(g_daemon_mount_can_eject), (g_daemon_mount_eject),
+	(g_daemon_mount_eject_finish), (g_daemon_mount_mount_iface_init):
+	* client/gdaemonvolumemonitor.c: (get_volume_for_uuid),
+	(get_mount_for_uuid), (g_daemon_volume_monitor_class_init):
+	* configure.ac:
+	* hal/*: new files
+
+	Update to latest gio API changes and add the HAL backend for
+	volume monitoring.
+
 2007-12-14  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:

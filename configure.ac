@@ -100,6 +100,33 @@ AC_SUBST(FUSE_CFLAGS)
 
 AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
 
+dnl **********************
+dnl *** Check for HAL ***
+dnl **********************
+AC_ARG_ENABLE(hal, [  --disable-hal           build without HAL support])
+msg_hal=no
+have_hal_fast_init=no
+HAL_LIBS=
+HAL_CFLAGS=
+
+if test "x$enable_hal" != "xno"; then
+  PKG_CHECK_EXISTS(hal >= 0.5.9 dbus-glib-1, msg_hal=yes)
+
+  if test "x$msg_hal" == "xyes"; then
+    PKG_CHECK_MODULES(HAL, hal >= 0.5.9 dbus-glib-1)
+    AC_DEFINE(HAVE_HAL, 1, [Define to 1 if HAL is available])
+    AC_CHECK_LIB(hal, libhal_get_all_devices_with_properties, have_hal_fast_init=yes)
+    if test "x$have_hal_fast_init" == "xyes"; then
+      AC_DEFINE(HAVE_HAL_FAST_INIT, 1, [Define to 1 if libhal_get_all_devices_with_properties is available])
+    fi
+  fi
+fi
+
+AC_SUBST(HAL_LIBS)
+AC_SUBST(HAL_CFLAGS)
+
+AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
+
 dnl ==========================================================================
 dnl Samba 3.0
 
@@ -228,6 +255,7 @@ Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
+hal/Makefile
 programs/Makefile
 test/Makefile
 po/Makefile.in
@@ -236,6 +264,7 @@ po/Makefile.in
 echo 
 echo "gvfs configuration summary:"
 echo "
-	Samba support:	      $msg_samba
-	FUSE support:         $msg_fuse
+	Samba support:	              $msg_samba
+	FUSE support:                 $msg_fuse
+	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)
 "

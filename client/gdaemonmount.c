@@ -113,6 +113,12 @@ g_daemon_mount_get_name (GMount *mount)
   return g_strdup (daemon_mount->mount_info->display_name);
 }
 
+static char *
+g_daemon_mount_get_uuid (GMount *mount)
+{
+  return NULL;
+}
+
 static GVolume *
 g_daemon_mount_get_volume (GMount *mount)
 {
@@ -129,6 +135,12 @@ static gboolean
 g_daemon_mount_can_unmount (GMount *mount)
 {
   return TRUE;
+}
+
+static gboolean
+g_daemon_mount_can_eject (GMount *mount)
+{
+  return FALSE;
 }
 
 static void
@@ -184,6 +196,22 @@ g_daemon_mount_unmount_finish (GMount *mount,
   return TRUE;
 }
 
+static void
+g_daemon_mount_eject (GMount *mount,
+                      GCancellable *cancellable,
+                      GAsyncReadyCallback callback,
+                      gpointer         user_data)
+{
+}
+
+static gboolean
+g_daemon_mount_eject_finish (GMount *mount,
+                             GAsyncResult *result,
+                             GError **error)
+{
+  return TRUE;
+}
+
 
 static void
 g_daemon_mount_mount_iface_init (GMountIface *iface)
@@ -191,9 +219,13 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->get_root = g_daemon_mount_get_root;
   iface->get_name = g_daemon_mount_get_name;
   iface->get_icon = g_daemon_mount_get_icon;
+  iface->get_uuid = g_daemon_mount_get_uuid;
   iface->get_volume = g_daemon_mount_get_volume;
   iface->get_drive = g_daemon_mount_get_drive;
   iface->can_unmount = g_daemon_mount_can_unmount;
+  iface->can_unmount = g_daemon_mount_can_eject;
   iface->unmount = g_daemon_mount_unmount;
   iface->unmount_finish = g_daemon_mount_unmount_finish;
+  iface->eject = g_daemon_mount_eject;
+  iface->eject_finish = g_daemon_mount_eject_finish;
 }
