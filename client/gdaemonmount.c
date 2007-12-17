@@ -206,7 +206,7 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->get_volume = g_daemon_mount_get_volume;
   iface->get_drive = g_daemon_mount_get_drive;
   iface->can_unmount = g_daemon_mount_can_unmount;
-  iface->can_unmount = g_daemon_mount_can_eject;
+  iface->can_eject = g_daemon_mount_can_eject;
   iface->unmount = g_daemon_mount_unmount;
   iface->unmount_finish = g_daemon_mount_unmount_finish;
   iface->eject = NULL; /* Not supported */
