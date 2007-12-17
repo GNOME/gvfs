@@ -1,3 +1,8 @@
+2007-12-17  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendtrash.c: (list_trash_dirs):
+	Fix build, renamed g_get_unix_mounts to g_unix_mounts_get
+
 2007-12-17  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghaldrive.[ch]:
