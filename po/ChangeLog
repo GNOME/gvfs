@@ -1,5 +1,10 @@
 2007-12-18  Luca Ferretti  <elle.uca@libero.it>
 
+	* POTFILES.in: revert previous commit: gvfs is not using
+	intltool. The question is: should it???
+
+2007-12-18  Luca Ferretti  <elle.uca@libero.it>
+
 	* POTFILES.in: prepend "[encoding: UTF-8]" to make 
 	intltool-update happy.
 

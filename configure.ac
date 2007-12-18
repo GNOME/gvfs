@@ -51,12 +51,26 @@ AC_SUBST(DBUS_LIBS)
 AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
 DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
-	
+
+dnl ****************************
+dnl *** Checks for gettext   ***
+dnl ****************************
+
 GETTEXT_PACKAGE=gvfs
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
 AC_SUBST(GETTEXT_PACKAGE)
 
+ALL_LINGUAS="it"
+
 AM_GLIB_GNU_GETTEXT
+
+LIBS="$LIBS $INTLLIBS"
+
+AM_GLIB_DEFINE_LOCALEDIR(GVFS_LOCALEDIR)
+
+dnl ****************************
+dnl *** Checks for ssh stuff ***
+dnl ****************************
 
 AC_PATH_PROG(SSH_PROGRAM, ssh, "ssh")
 

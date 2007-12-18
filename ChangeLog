@@ -1,3 +1,9 @@
+2007-12-18  Luca Ferretti  <elle.uca@libero.it>
+
+	* configure.ac: Add ALL_LINGUAS and definition for GVFS_LOCALEDIR;
+	the second one is unused by now, but could be needed, so all
+	l10n stuff in this file should be OK.
+
 2007-12-17  David Zeuthen  <davidz@redhat.com>
 
 	* hal/ghalvolumemonitor.c (update_mounts): g_get_unix_mounts()

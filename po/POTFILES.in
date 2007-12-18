@@ -1,4 +1,3 @@
-[encoding: UTF-8]
 client/gdaemonfile.c
 client/gdaemonfileinputstream.c
 client/gdaemonfileoutputstream.c
