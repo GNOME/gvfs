@@ -1,5 +1,11 @@
 2007-12-18  Luca Ferretti  <elle.uca@libero.it>
 
+	* POTFILES.in: remove duplicate entries and add missing files
+	[recentrly added: daemon/gvfsjobunmount.c hal/ghaldrive.c 
+	hal/ghalmount.c hal/ghalvolume.c hal/ghalvolumemonitor.c]
+
+2007-12-18  Luca Ferretti  <elle.uca@libero.it>
+
 	* it.po: Added Italian translation.
 
 === gvfs 0.0.2 ===
