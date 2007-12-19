@@ -28,6 +28,7 @@
 #include <glib/gi18n-lib.h>
 #include "gdaemonvolumemonitor.h"
 #include "gdaemonmount.h"
+#include "gdaemonvfs.h"
 #include "gmounttracker.h"
 
 struct _GDaemonVolumeMonitor {
@@ -151,7 +152,7 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
   GDaemonMount *mount;
   GMountInfo *info;
   GVolume *volume;
-  
+
   daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus ());
 
   g_signal_connect_swapped (daemon_monitor->mount_tracker, "mounted",
@@ -188,9 +189,9 @@ g_daemon_volume_monitor_finalize (GObject *object)
 
   g_signal_handlers_disconnect_by_func (monitor->mount_tracker, mount_added, monitor);
   g_signal_handlers_disconnect_by_func (monitor->mount_tracker, mount_removed, monitor);
-
+  
   g_object_unref (monitor->mount_tracker);
-
+  
   g_list_foreach (monitor->mounts, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->mounts);
   
@@ -203,6 +204,24 @@ g_daemon_volume_monitor_class_finalize (GDaemonVolumeMonitorClass *klass)
 {
 }
 
+static gboolean
+is_supported (void)
+{
+  GVfs *vfs;
+  gboolean res;
+
+
+  res = FALSE;
+
+  /* Don't do anything if the default vfs is not DAEMON_VFS */
+  vfs = g_vfs_get_default ();
+  
+  if (vfs != NULL && G_IS_DAEMON_VFS (vfs))
+    res = TRUE;
+
+  return res;
+}
+
 static void
 g_daemon_volume_monitor_class_init (GDaemonVolumeMonitorClass *klass)
 {
@@ -211,6 +230,7 @@ g_daemon_volume_monitor_class_init (GDaemonVolumeMonitorClass *klass)
   
   gobject_class->finalize = g_daemon_volume_monitor_finalize;
 
+  monitor_class->is_supported = is_supported;
   monitor_class->get_mounts = get_mounts;
   monitor_class->get_volumes = get_volumes;
   monitor_class->get_connected_drives = get_connected_drives;

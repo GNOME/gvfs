@@ -89,8 +89,6 @@ g_hal_volume_monitor_finalize (GObject *object)
 {
   GHalVolumeMonitor *monitor;
 
-  g_warning ("finalizing hal vm");
-  
   the_volume_monitor = NULL;
 
   monitor = G_HAL_VOLUME_MONITOR (object);
@@ -465,11 +463,11 @@ g_hal_volume_monitor_class_init (GHalVolumeMonitorClass *klass)
   monitor_class->get_volume_for_uuid = get_volume_for_uuid;
   monitor_class->get_mount_for_uuid = get_mount_for_uuid;
   monitor_class->adopt_orphan_mount = adopt_orphan_mount;
+  monitor_class->is_supported = is_supported;
 
   native_class->priority = 1;
   native_class->name = "hal";
   native_class->get_mount_for_mount_path = get_mount_for_mount_path;
-  native_class->is_supported = is_supported;
 }
 
 /**

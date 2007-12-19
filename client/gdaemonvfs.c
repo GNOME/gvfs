@@ -38,13 +38,6 @@
 #include "gdaemonvolumemonitor.h"
 #include <glib/gi18n-lib.h>
 
-#define G_TYPE_DAEMON_VFS		(g_daemon_vfs_get_type ())
-#define G_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_DAEMON_VFS, GDaemonVfs))
-#define G_DAEMON_VFS_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), G_TYPE_DAEMON_VFS, GDaemonVfsClass))
-#define G_IS_DAEMON_VFS(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_DAEMON_VFS))
-#define G_IS_DAEMON_VFS_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_DAEMON_VFS))
-#define G_DAEMON_VFS_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_DAEMON_VFS, GDaemonVfsClass))
-
 
 struct _GDaemonVfs
 {
@@ -180,6 +173,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   guint n_mappers;
   const char * const *schemes, * const *mount_types;
   GVfsUriMapper *mapper;
+  GList *modules;
   int i;
   
   vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
@@ -209,7 +203,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 
   _g_dbus_connection_integrate_with_main (vfs->async_bus);
 
-  g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
+  modules = g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
 
   vfs->from_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
   vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
@@ -228,7 +222,10 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
       for (i = 0; mount_types != NULL && mount_types[i] != NULL; i++)
 	g_hash_table_insert (vfs->to_uri_hash, (char *)mount_types[i], mapper);
     }
-  
+
+  /* The above should have ref:ed the modules anyway */
+  g_list_foreach (modules, g_type_module_unuse, NULL);
+  g_list_free (modules);
   g_free (mappers);
 }
 

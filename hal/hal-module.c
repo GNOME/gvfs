@@ -42,12 +42,9 @@ g_io_module_load (GIOModule *module)
   g_hal_mount_register (module);
   g_hal_volume_register (module);
   g_hal_volume_monitor_register (module);
- 
-  //g_warning ("hal loaded");
-}
+ }
 
 void
 g_io_module_unload (GIOModule *module)
 {
-  //g_warning ("hal unloaded");
 }

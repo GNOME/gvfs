@@ -1,3 +1,16 @@
+2007-12-19  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonvfs.[ch]:
+        * client/gdaemonvolumemonitor.c:
+        * hal/ghalvolumemonitor.c:
+        * hal/hal-module.c:
+	Remove spew
+	Update for new APIs
+	Don't use GDaemonVolumeMonitor if not using GDaemonVfs.
+	
+        * hal/hal-pool.c:
+	Close custom dbus connection before unrefing
+
 2007-12-19  David Zeuthen  <davidz@redhat.com>
 
 	Add the cdda:// backend for Compact Disc Digital Audio discs.

@@ -61,6 +61,7 @@ hal_pool_finalize (HalPool *pool)
                          "interface='org.freedesktop.Hal.Device',"
                          "sender='org.freedesktop.Hal'", NULL);
   libhal_ctx_shutdown (pool->priv->hal_ctx, NULL);
+  dbus_connection_close (pool->priv->dbus_connection);
   dbus_connection_unref (pool->priv->dbus_connection);
   
   if (G_OBJECT_CLASS (hal_pool_parent_class)->finalize)
