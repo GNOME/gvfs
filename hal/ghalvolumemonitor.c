@@ -420,6 +420,35 @@ is_supported (void)
   return pool != NULL;
 }
 
+static GVolume *
+adopt_orphan_mount (GMount *mount)
+{
+  GList *l;
+  GFile *mount_root;
+  GVolume *ret;
+
+  if (the_volume_monitor == NULL)
+    return NULL;
+
+  ret = NULL;
+  mount_root = g_mount_get_root (mount);
+
+  /* right now we only support discs as foreign mounts */
+  for (l = the_volume_monitor->disc_volumes; l != NULL; l = l->next)
+    {
+      GHalVolume *volume = l->data;
+      if (g_hal_volume_has_foreign_mount_root (volume, mount_root))
+        {
+          g_hal_volume_adopt_foreign_mount (volume, mount);
+          ret = g_object_ref (volume);
+          break;
+        }
+    }
+
+  g_object_unref (mount_root);
+  return ret;
+}
+
 static void
 g_hal_volume_monitor_class_init (GHalVolumeMonitorClass *klass)
 {
@@ -435,6 +464,7 @@ g_hal_volume_monitor_class_init (GHalVolumeMonitorClass *klass)
   monitor_class->get_connected_drives = get_connected_drives;
   monitor_class->get_volume_for_uuid = get_volume_for_uuid;
   monitor_class->get_mount_for_uuid = get_mount_for_uuid;
+  monitor_class->adopt_orphan_mount = adopt_orphan_mount;
 
   native_class->priority = 1;
   native_class->name = "hal";
@@ -735,6 +765,7 @@ update_volumes (GHalVolumeMonitor *monitor)
           g_hal_volume_removed (volume);
           monitor->volumes = g_list_remove (monitor->volumes, volume);
           g_signal_emit_by_name (monitor, "volume_removed", volume);
+          g_signal_emit_by_name (volume, "removed");
           g_object_unref (volume);
         }
     }
@@ -749,7 +780,7 @@ update_volumes (GHalVolumeMonitor *monitor)
           drive = find_drive_by_udi (monitor, hal_device_get_property_string (d, "block.storage_device"));
 
           //g_warning ("hal adding vol %s (drive %p)", hal_device_get_property_string (d, "block.device"), drive);
-          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, drive);
+          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, drive);
           if (volume != NULL)
             {
               monitor->volumes = g_list_prepend (monitor->volumes, volume);
@@ -794,6 +825,7 @@ update_mounts (GHalVolumeMonitor *monitor)
 	  g_hal_mount_unmounted (mount);
 	  monitor->mounts = g_list_remove (monitor->mounts, mount);
 	  g_signal_emit_by_name (monitor, "mount_removed", mount);
+	  g_signal_emit_by_name (mount, "unmounted");
 	  g_object_unref (mount);
 	}
     }
@@ -874,6 +906,7 @@ update_discs (GHalVolumeMonitor *monitor)
 	  g_hal_mount_unmounted (mount);
 	  monitor->disc_mounts = g_list_remove (monitor->disc_mounts, mount);
 	  g_signal_emit_by_name (monitor, "mount_removed", mount);
+	  g_signal_emit_by_name (mount, "unmounted");
 	  g_object_unref (mount);
         }
 
@@ -883,6 +916,7 @@ update_discs (GHalVolumeMonitor *monitor)
 	  g_hal_volume_removed (volume);
 	  monitor->disc_volumes = g_list_remove (monitor->disc_volumes, volume);
 	  g_signal_emit_by_name (monitor, "volume_removed", volume);
+	  g_signal_emit_by_name (volume, "removed");
 	  g_object_unref (volume);
         }
     }
@@ -898,65 +932,51 @@ update_discs (GHalVolumeMonitor *monitor)
       drive = find_drive_by_udi (monitor, drive_udi);
       if (drive != NULL)
         {
-          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, drive);
-          if (volume != NULL)
+          if (hal_device_get_property_bool (d, "volume.disc.is_blank"))
             {
-              if (hal_device_get_property_bool (d, "volume.disc.is_blank"))
+              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, drive);
+              if (volume != NULL)
                 {
                   GFile *file;
-
                   file = g_file_new_for_uri ("burn:///");
-
-                  mount = g_hal_mount_new_for_hal_device (G_VOLUME_MONITOR (monitor), 
-                                                           d, 
-                                                           file,
-                                                           NULL,
-                                                           NULL,
-                                                           TRUE,
-                                                           monitor->pool,
-                                                           volume);
-
-                  g_object_unref (file);
-                }
-              else
-                {
-                  char *uri;
-                  char *encoded_device_file;
-                  GFile *file;
-                  GIcon *icon;
-
-                  encoded_device_file = g_uri_escape_string (hal_device_get_property_string (d, "block.device"),
-                                                             NULL, FALSE);
-                  uri = g_strdup_printf ("cdda://%s/", encoded_device_file);
-                  file = g_file_new_for_uri (uri);
-
-                  icon = g_themed_icon_new ("media-optical-audio");
-
                   mount = g_hal_mount_new_for_hal_device (G_VOLUME_MONITOR (monitor), 
                                                           d, 
                                                           file,
-                                                          /* TODO: Connect to web service to get disc name */
-                                                          _("Audio Disc"),
-                                                          icon,
+                                                          NULL,
+                                                          NULL,
                                                           TRUE,
                                                           monitor->pool,
                                                           volume);
-                  g_object_unref (icon);
                   g_object_unref (file);
-                  g_free (encoded_device_file);
-                  g_free (uri);
                 }
+            }
+          else
+            {
+              char *uri;
+              char *device_basename;
+              GFile *foreign_mount_root;
 
+              /* the gvfsd-cdda backend uses URI's like these */
+              device_basename = g_path_get_basename (hal_device_get_property_string (d, "block.device"));
+              uri = g_strdup_printf ("cdda://%s", device_basename);
+              foreign_mount_root = g_file_new_for_uri (uri);
+              g_free (device_basename);
+              g_free (uri);
+
+              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, foreign_mount_root, drive);
+              g_object_unref (foreign_mount_root);
+              mount = NULL;
+            }
+
+          if (volume != NULL)
+            {
+              monitor->disc_volumes = g_list_prepend (monitor->disc_volumes, volume);
+              g_signal_emit_by_name (monitor, "volume_added", volume);
+              
               if (mount != NULL)
                 {
-                  monitor->disc_volumes = g_list_prepend (monitor->disc_volumes, volume);
-                  g_signal_emit_by_name (monitor, "volume_added", volume);
                   monitor->disc_mounts = g_list_prepend (monitor->disc_mounts, mount);
                   g_signal_emit_by_name (monitor, "mount_added", mount);
-                }
-              else
-                {
-                  g_object_unref (volume);
                 }
             }
         }
@@ -964,8 +984,7 @@ update_discs (GHalVolumeMonitor *monitor)
 
   g_list_free (added);
   g_list_free (removed);
-  g_list_foreach (monitor->last_optical_disc_devices,
-		  (GFunc)g_object_unref, NULL);
+  g_list_foreach (monitor->last_optical_disc_devices, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->last_optical_disc_devices);
   monitor->last_optical_disc_devices = new_optical_disc_devices;
 }

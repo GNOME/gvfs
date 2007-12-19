@@ -41,6 +41,7 @@ typedef struct _GMountTrackerClass   GMountTrackerClass;
 typedef struct {
   volatile int ref_count;
   char *display_name;
+  char *stable_name;
   char *icon;
   char *dbus_id;
   char *object_path;

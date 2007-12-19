@@ -91,6 +91,9 @@ g_hal_drive_finalize (GObject *object)
 
   g_free (drive->name);
   g_free (drive->icon);
+
+  if (drive->volume_monitor != NULL)
+    g_object_remove_weak_pointer (G_OBJECT (drive->volume_monitor), (gpointer) &(drive->volume_monitor));
   
   if (G_OBJECT_CLASS (g_hal_drive_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_hal_drive_parent_class)->finalize) (object);
@@ -331,6 +334,15 @@ _update_from_hal (GHalDrive *d, gboolean emit_changed)
 }
 
 static void
+hal_condition (HalDevice *device, const char *name, const char *detail, gpointer user_data)
+{
+  GHalDrive *hal_drive = G_HAL_DRIVE (user_data);
+
+  if (strcmp (name, "EjectPressed") == 0)
+    g_signal_emit_by_name (hal_drive, "eject-button");
+}
+
+static void
 hal_changed (HalDevice *device, const char *key, gpointer user_data)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (user_data);
@@ -357,6 +369,7 @@ g_hal_drive_new (GVolumeMonitor       *volume_monitor,
   drive->icon = g_strdup_printf ("drive-removable-media");
 
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, drive, 0);
+  g_signal_connect_object (device, "hal_condition", (GCallback) hal_condition, drive, 0);
 
   _update_from_hal (drive, FALSE);
 
@@ -498,27 +511,37 @@ spawn_cb (GPid pid, gint status, gpointer user_data)
 {
   SpawnOp *data = user_data;
   GSimpleAsyncResult *simple;
-  
-  /* TODO: how do we report an error back to the caller while telling
-   * him that we already have shown an error dialog to the user?
-   *
-   * G_IO_ERROR_FAILED_NO_UI or something?
-   */
 
-  simple = g_simple_async_result_new (data->object,
-                                      data->callback,
-                                      data->user_data,
-                                      NULL);
+
+  if (WEXITSTATUS (status) != 0)
+    {
+      GError *error;
+      error = g_error_new_literal (G_IO_ERROR, 
+                                   G_IO_ERROR_FAILED_HANDLED,
+                                   "You are not supposed to show G_IO_ERROR_FAILED_HANDLED in the UI");
+      simple = g_simple_async_result_new_from_error (data->object,
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_error_free (error);
+    }
+  else
+    {
+      simple = g_simple_async_result_new (data->object,
+                                          data->callback,
+                                          data->user_data,
+                                          NULL);
+    }
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
   g_free (data);
 }
 
 static void
-g_hal_drive_eject (GDrive              *drive,
-                   GCancellable        *cancellable,
-                   GAsyncReadyCallback  callback,
-                   gpointer             user_data)
+g_hal_drive_eject_do (GDrive              *drive,
+                      GCancellable        *cancellable,
+                      GAsyncReadyCallback  callback,
+                      gpointer             user_data)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
   SpawnOp *data;
@@ -556,6 +579,135 @@ g_hal_drive_eject (GDrive              *drive,
   }
   
   g_child_watch_add (child_pid, spawn_cb, data);
+}
+
+
+typedef struct {
+  GDrive *drive;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+  GCancellable *cancellable;
+
+  GList *pending_mounts;
+} UnmountMountsOp;
+
+static void
+free_unmount_mounts_op (UnmountMountsOp *data)
+{
+  GList *l;
+
+  for (l = data->pending_mounts; l != NULL; l = l->next)
+    {
+      GMount *mount = l->data;
+      g_object_unref (mount);
+    }
+  g_list_free (data->pending_mounts);
+}
+
+static void _eject_unmount_mounts (UnmountMountsOp *data);
+
+static void
+_eject_unmount_mounts_cb (GObject *source_object,
+                          GAsyncResult *res,
+                          gpointer user_data)
+{
+  UnmountMountsOp *data = user_data;
+  GMount *mount = G_MOUNT (source_object);
+  GSimpleAsyncResult *simple;
+  GError *error = NULL;
+
+  if (!g_mount_unmount_finish (mount, res, &error))
+    {
+      /* make the error dialog more targeted to the drive.. unless the user has already seen a dialog */
+      if (error->code != G_IO_ERROR_FAILED_HANDLED)
+        {
+          g_error_free (error);
+          error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY, 
+                               _("Failed to eject media; one or more volumes on the media are busy."));
+        }
+      
+      /* unmount failed; need to fail the whole eject operation */
+      simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_error_free (error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+
+      free_unmount_mounts_op (data);
+    }
+  else
+    {
+
+      g_warning ("successfully unmount %p", mount);
+
+      /* move on to the next mount.. */
+      _eject_unmount_mounts (data);
+    }
+
+  g_object_unref (mount);
+}
+
+static void
+_eject_unmount_mounts (UnmountMountsOp *data)
+{
+  GMount *mount;
+
+  if (data->pending_mounts == NULL)
+    {
+
+      g_warning ("all pending mounts done; ejecting drive");
+
+      g_hal_drive_eject_do (data->drive,
+                            data->cancellable,
+                            data->callback,
+                            data->user_data);
+      g_free (data);
+    }
+  else
+    {
+      mount = data->pending_mounts->data;
+      data->pending_mounts = g_list_remove (data->pending_mounts, mount);
+
+      g_warning ("unmounting %p", mount);
+
+      g_mount_unmount (mount,
+                       data->cancellable,
+                       _eject_unmount_mounts_cb,
+                       data);
+    }
+}
+
+static void
+g_hal_drive_eject (GDrive              *drive,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
+{
+  GHalDrive *hal_drive = G_HAL_DRIVE (drive);
+  UnmountMountsOp *data;
+  GList *l;
+
+  /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
+
+  data = g_new0 (UnmountMountsOp, 1);
+  data->drive = drive;
+  data->cancellable = cancellable;
+  data->callback = callback;
+  data->user_data = user_data;
+
+  for (l = hal_drive->volumes; l != NULL; l = l->next)
+    {
+      GHalVolume *volume = l->data;
+      GMount *mount; /* the mount may be foreign; cannot assume GHalMount */
+
+      mount = g_volume_get_mount (G_VOLUME (volume));
+      if (mount != NULL)
+        data->pending_mounts = g_list_prepend (data->pending_mounts, g_object_ref (mount));
+    }
+
+  _eject_unmount_mounts (data);
 }
 
 static gboolean

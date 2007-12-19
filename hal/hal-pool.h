@@ -57,6 +57,7 @@ struct _HalPoolClass
   void (*device_added) (HalPool *pool, HalDevice *device);
   void (*device_removed) (HalPool *pool, HalDevice *device);
   void (*device_property_changed) (HalPool *pool, HalDevice *device, const char *key);
+  void (*device_condition) (HalPool *pool, HalDevice *device, const char *name, const char *detail);
 };
 
 GType            hal_pool_get_type                            (void);

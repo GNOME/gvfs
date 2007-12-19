@@ -34,10 +34,12 @@ static GMainLoop *main_loop;
 
 
 static gboolean mount_mountable = FALSE;
+static gboolean mount_unmount = FALSE;
 
 static GOptionEntry entries[] = 
 {
 	{ "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, "Mount as mountable", NULL },
+        { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, "Unmount", NULL},
 	{ NULL }
 };
 
@@ -170,6 +172,48 @@ mount (GFile *file)
   outstanding_mounts++;
 }
 
+static void
+unmount_done_cb (GObject *object,
+                 GAsyncResult *res,
+                 gpointer user_data)
+{
+  gboolean succeeded;
+  GError *error = NULL;
+
+  succeeded = g_mount_unmount_finish (G_MOUNT (object), res, &error);
+
+  g_object_unref (G_MOUNT (object));
+
+  if (!succeeded)
+    g_print ("Error unmounting mount: %s\n", error->message);
+  
+  outstanding_mounts--;
+  
+  if (outstanding_mounts == 0)
+    g_main_loop_quit (main_loop);
+}
+
+static void
+unmount (GFile *file)
+{
+  GMount *mount;
+  GError *error = NULL;
+
+  if (file == NULL)
+    return;
+
+  mount = g_file_find_enclosing_mount (file, NULL, &error);
+  if (mount == NULL)
+    {
+      g_print ("Error finding enclosing mount: %s\n", error->message);
+      return;
+    }
+
+  g_mount_unmount (mount, NULL, unmount_done_cb, NULL);
+
+  outstanding_mounts++;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -193,8 +237,11 @@ main (int argc, char *argv[])
       
       for (i = 1; i < argc; i++) {
 	file = g_file_new_for_commandline_arg (argv[i]);
-	mount (file);
-	g_object_unref (file);
+        if (mount_unmount)
+  	  unmount (file);
+        else
+  	  mount (file);
+        g_object_unref (file);
       }
     }
 

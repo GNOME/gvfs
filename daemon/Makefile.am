@@ -30,10 +30,10 @@ service_DATA = gvfs-daemon.service
 
 mountdir = $(sysconfdir)/gvfs/mounts
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-cdda
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in
-mount_DATA = ftp.mount sftp.mount  trash.mount
+mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in cdda.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount cdda.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -173,3 +173,17 @@ gvfsd_trash_CPPFLAGS = \
 	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,'
 
 gvfsd_trash_LDADD = $(libraries)
+
+gvfsd_cdda_SOURCES = \
+	gvfsbackendcdda.c gvfsbackendcdda.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_cdda_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendcdda.h \
+	-DDEFAULT_BACKEND_TYPE=cdda \
+	-DMAX_JOB_THREADS=1 \
+	$(CDDA_CFLAGS) \
+	-DBACKEND_TYPES='"cdda", G_VFS_TYPE_BACKEND_CDDA,'
+
+gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS)

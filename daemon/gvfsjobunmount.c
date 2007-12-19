@@ -129,14 +129,16 @@ unregister_mount_callback (DBusMessage *unmount_reply,
 			   GError *error,
 			   gpointer user_data)
 {
+  GVfsBackend *backend;
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
 
   g_print ("unregister_mount_callback, unmount_reply: %p, error: %p\n", unmount_reply, error);
 
+  backend = op_job->backend;
   (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
 
   /* Unlink job source from daemon */
-  g_vfs_job_source_closed (G_VFS_JOB_SOURCE (op_job->backend));
+  g_vfs_job_source_closed (G_VFS_JOB_SOURCE (backend));
 }
 
 /* Might be called on an i/o thread */
@@ -146,10 +148,13 @@ send_reply (GVfsJob *job)
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
 
   g_print ("send_reply, failed: %d\n", job->failed);
-  
-  g_vfs_backend_unregister_mount (op_job->backend,
-				  unregister_mount_callback,
-				  job);
+
+  if (job->failed)
+    (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
+  else
+    g_vfs_backend_unregister_mount (op_job->backend,
+                                    unregister_mount_callback,
+                                    job);
 }
 
 /* Might be called on an i/o thread */

@@ -45,9 +45,12 @@ struct _GDaemonMountClass {
 
 GType g_daemon_mount_get_type (void) G_GNUC_CONST;
 
-GDaemonMount *g_daemon_mount_new            (GMountInfo *mount_info);
+GDaemonMount *g_daemon_mount_new            (GMountInfo     *mount_info,
+                                             GVolumeMonitor *volume_monitor);
 
 GMountInfo   *g_daemon_mount_get_mount_info (GDaemonMount *mount);
+
+void          g_daemon_mount_set_foreign_volume (GDaemonMount *mount, GVolume *foreign_volume);
 
 G_END_DECLS
 

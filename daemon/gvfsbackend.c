@@ -65,6 +65,7 @@ struct _GVfsBackendPrivate
   char *object_path;
   
   char *display_name;
+  char *stable_name;
   char *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
@@ -138,6 +139,7 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->object_path);
   
   g_free (backend->priv->display_name);
+  g_free (backend->priv->stable_name);
   g_free (backend->priv->icon);
   g_free (backend->priv->prefered_filename_encoding);
   if (backend->priv->mount_spec)
@@ -189,6 +191,7 @@ g_vfs_backend_init (GVfsBackend *backend)
   backend->priv->icon = g_strdup ("");
   backend->priv->prefered_filename_encoding = g_strdup ("");
   backend->priv->display_name = g_strdup ("");
+  backend->priv->stable_name = g_strdup ("");
   backend->priv->user_visible = TRUE;
 }
 
@@ -272,6 +275,28 @@ g_vfs_backend_set_display_name (GVfsBackend *backend,
   backend->priv->display_name = g_strdup (display_name);
 }
 
+/**
+ * g_vfs_backend_set_stable_name:
+ * @backend: backend
+ * @stable_name: the stable name
+ *
+ * For filesystems that can change the name during the lifetime
+ * of the filesystem this can be uses to set a separate stable
+ * name. This is used for instance as the directory representing
+ * the mounted file system in the standard UNIX file system
+ * namespace.
+ *
+ * If this function isn't called, the value passed to
+ * g_vfs_backend_set_display_name() will be used instead.
+ **/
+void
+g_vfs_backend_set_stable_name (GVfsBackend        *backend,
+			       const char         *stable_name)
+{
+  g_free (backend->priv->stable_name);
+  backend->priv->stable_name = g_strdup (stable_name);
+}
+
 void
 g_vfs_backend_set_icon_name (GVfsBackend *backend,
 			     const char *icon)
@@ -316,6 +341,12 @@ const char *
 g_vfs_backend_get_display_name (GVfsBackend *backend)
 {
   return backend->priv->display_name;
+}
+
+const char *
+g_vfs_backend_get_stable_name (GVfsBackend *backend)
+{
+  return backend->priv->stable_name;
 }
 
 const char *
@@ -438,6 +469,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 			      GAsyncDBusCallback callback,
 			      gpointer user_data)
 {
+  const char *stable_name;
   DBusMessage *message;
   DBusMessageIter iter;
   dbus_bool_t user_visible;
@@ -449,10 +481,16 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   if (message == NULL)
     _g_dbus_oom ();
 
+  if (backend->priv->stable_name != NULL)
+   stable_name = backend->priv->stable_name;
+  else
+   stable_name = backend->priv->display_name;
+
   user_visible = backend->priv->user_visible;
   if (!dbus_message_append_args (message,
 				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
 				 DBUS_TYPE_STRING, &backend->priv->display_name,
+				 DBUS_TYPE_STRING, &stable_name,
 				 DBUS_TYPE_STRING, &backend->priv->icon,
 				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
 				 DBUS_TYPE_BOOLEAN, &user_visible,

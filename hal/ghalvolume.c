@@ -49,6 +49,13 @@ struct _GHalVolume {
   HalDevice *device;
   HalDevice *drive_device;
 
+  /* set on creation if we won't create a GHalMount object ourselves
+   * and instead except to adopt one, with the given mount root,
+   * via adopt_orphan_mount() 
+   */
+  GFile *foreign_mount_root;
+  GMount *foreign_mount;
+
   char *name;
   char *icon;
 };
@@ -86,6 +93,15 @@ g_hal_volume_finalize (GObject *object)
     g_object_unref (volume->device);
   if (volume->drive_device != NULL)
     g_object_unref (volume->drive_device);
+
+  if (volume->foreign_mount_root != NULL)
+    g_object_unref (volume->foreign_mount_root);
+
+  if (volume->foreign_mount != NULL)
+    g_object_unref (volume->foreign_mount);
+
+  if (volume->volume_monitor != NULL)
+    g_object_remove_weak_pointer (G_OBJECT (volume->volume_monitor), (gpointer) &(volume->volume_monitor));
 
   g_free (volume->name);
   g_free (volume->icon);
@@ -216,20 +232,27 @@ do_update_from_hal (GHalVolume *mv)
   volume_disc_is_blank = hal_device_get_property_bool (volume, "volume.disc.is_blank");
   volume_disc_type = hal_device_get_property_string (volume, "volume.disc.type");
 
-  if (volume_fs_label != NULL && strlen (volume_fs_label) > 0) {
-    name = g_strdup (volume_fs_label);
-  } else if (volume_is_disc) {
-    if (volume_disc_has_audio) {
-      if (volume_disc_has_data)
-        name = g_strdup (_("Mixed Audio/Data Disc"));
-      else
-        name = g_strdup (_("Audio Disc"));
-    } else {
-      name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
+  if (volume_is_disc && volume_disc_has_audio && mv->foreign_mount_root != NULL)
+    {
+      name = g_strdup (_("Audio Disc"));
     }
-  } else {
-    name = format_size_for_display (volume_size);
-  }
+  else
+    {
+      if (volume_fs_label != NULL && strlen (volume_fs_label) > 0) {
+        name = g_strdup (volume_fs_label);
+      } else if (volume_is_disc) {
+        if (volume_disc_has_audio) {
+          if (volume_disc_has_data)
+            name = g_strdup (_("Mixed Audio/Data Disc"));
+          else
+            name = g_strdup (_("Audio Disc"));
+        } else {
+          name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
+        }
+      } else {
+        name = format_size_for_display (volume_size);
+      }
+    }
 
   mv->name = name;
   mv->icon = _drive_get_icon (drive); /* use the drive icon since we're unmounted */
@@ -321,10 +344,11 @@ compute_uuid (GHalVolume *volume)
 }
 
 GHalVolume *
-g_hal_volume_new (GVolumeMonitor  *volume_monitor,
-                  HalDevice       *device,
-                  HalPool         *pool,
-                  GHalDrive       *drive)
+g_hal_volume_new (GVolumeMonitor   *volume_monitor,
+                  HalDevice        *device,
+                  HalPool          *pool,
+                  GFile            *foreign_mount_root,
+                  GHalDrive        *drive)
 {
   GHalVolume *volume;
   HalDevice *drive_device;
@@ -345,6 +369,7 @@ g_hal_volume_new (GVolumeMonitor  *volume_monitor,
   volume->device_path = g_strdup (hal_device_get_property_string (device, "block.device"));
   volume->device = g_object_ref (device);
   volume->drive_device = g_object_ref (drive_device);
+  volume->foreign_mount_root = foreign_mount_root != NULL ? g_object_ref (foreign_mount_root) : NULL;
   
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
@@ -495,6 +520,9 @@ g_hal_volume_get_mount (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
 
+  if (hal_volume->foreign_mount != NULL)
+    return g_object_ref (hal_volume->foreign_mount);
+
   if (hal_volume->mount != NULL)
     return g_object_ref (hal_volume->mount);
 
@@ -530,6 +558,44 @@ g_hal_volume_has_uuid (GHalVolume  *volume,
   return FALSE;
 }
 
+static void
+foreign_mount_unmounted (GMount *mount, gpointer user_data)
+{
+  GHalVolume *volume = G_HAL_VOLUME (user_data);
+  if (volume->foreign_mount == mount)
+    g_hal_volume_adopt_foreign_mount (volume, NULL);
+}
+
+void
+g_hal_volume_adopt_foreign_mount (GHalVolume *volume, GMount *foreign_mount)
+{
+  if (volume->foreign_mount != NULL)
+    g_object_unref (volume->foreign_mount);
+
+  if (foreign_mount != NULL)
+    {
+      volume->foreign_mount =  g_object_ref (foreign_mount);
+      g_signal_connect_object (foreign_mount, "unmounted", (GCallback) foreign_mount_unmounted, volume, 0);
+    }
+  else
+    volume->foreign_mount =  NULL;
+
+  g_signal_emit_by_name (volume, "changed");
+  if (volume->volume_monitor != NULL)
+    g_signal_emit_by_name (volume->volume_monitor, "volume_changed", volume);
+}
+
+gboolean
+g_hal_volume_has_foreign_mount_root (GHalVolume       *volume,
+                                     GFile            *mount_root)
+{
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+  if (hal_volume->foreign_mount_root != NULL)
+    return g_file_equal (hal_volume->foreign_mount_root, mount_root);
+  return FALSE;
+}
+
+
 typedef struct {
   GObject *object;
   GAsyncReadyCallback callback;
@@ -547,17 +613,27 @@ spawn_cb (GPid pid, gint status, gpointer user_data)
    * mounted is made available before returning to the user
    */
   g_hal_volume_monitor_force_update (G_HAL_VOLUME_MONITOR (G_HAL_VOLUME (data->object)->volume_monitor));
-  
-  /* TODO: how do we report an error back to the caller while telling
-   * him that we already have shown an error dialog to the user?
-   *
-   * G_IO_ERROR_FAILED_NO_UI or something?
-   */
 
-  simple = g_simple_async_result_new (data->object,
-                                      data->callback,
-                                      data->user_data,
-                                      NULL);
+  if (WEXITSTATUS (status) != 0)
+    {
+      GError *error;
+      error = g_error_new_literal (G_IO_ERROR, 
+                                   G_IO_ERROR_FAILED_HANDLED,
+                                   "You are not supposed to show G_IO_ERROR_FAILED_HANDLED in the UI");
+      simple = g_simple_async_result_new_from_error (data->object,
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_error_free (error);
+    }
+  else
+    {
+      simple = g_simple_async_result_new (data->object,
+                                          data->callback,
+                                          data->user_data,
+                                          NULL);
+    }
+
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
   g_free (data);
@@ -604,48 +680,120 @@ spawn_do (GVolume             *volume,
   g_child_watch_add (child_pid, spawn_cb, data);
 }
 
+typedef struct
+{
+  GHalVolume *enclosing_volume;
+  GAsyncReadyCallback  callback;
+  gpointer user_data;
+} ForeignMountOp;
+
 static void
-g_hal_volume_mount (GVolume    *volume,
+mount_foreign_callback (GObject *source_object,
+                        GAsyncResult *res,
+                        gpointer user_data)
+{
+  ForeignMountOp *data = user_data;
+  data->callback (G_OBJECT (data->enclosing_volume), res, data->user_data);
+  g_free (data);
+}
+
+static void
+g_hal_volume_mount (GVolume             *volume,
                     GMountOperation     *mount_operation,
                     GCancellable        *cancellable,
                     GAsyncReadyCallback  callback,
                     gpointer             user_data)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  char *argv[] = {"gnome-mount", "-b", "-d", NULL, NULL};
 
-  argv[3] = hal_volume->device_path;
+  if (hal_volume->foreign_mount_root != NULL)
+    {
+      ForeignMountOp *data;
 
-  spawn_do (volume, cancellable, callback, user_data, argv);
+      data = g_new0 (ForeignMountOp, 1);
+      data->enclosing_volume = hal_volume;
+      data->callback = callback;
+      data->user_data = user_data;
+
+      g_file_mount_enclosing_volume (hal_volume->foreign_mount_root, 
+                                     mount_operation, 
+                                     cancellable, 
+                                     mount_foreign_callback, 
+                                     data);
+    }
+  else
+    {
+      char *argv[] = {"gnome-mount", "-b", "-d", NULL, NULL};
+      argv[3] = hal_volume->device_path;
+      spawn_do (volume, cancellable, callback, user_data, argv);
+    }
 }
 
 static gboolean
-g_hal_volume_mount_finish (GVolume        *volume,
+g_hal_volume_mount_finish (GVolume       *volume,
                            GAsyncResult  *result,
                            GError       **error)
 {
-  return TRUE;
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+
+  if (hal_volume->foreign_mount_root != NULL)
+    {
+      return g_file_mount_enclosing_volume_finish (hal_volume->foreign_mount_root, result, error);
+    }
+  else
+    {
+      return TRUE;
+    }
+}
+
+typedef struct {
+  GObject *object;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} EjectWrapperOp;
+
+static void
+eject_wrapper_callback (GObject *source_object,
+                        GAsyncResult *res,
+                        gpointer user_data)
+{
+  EjectWrapperOp *data  = user_data;
+  data->callback (data->object, res, data->user_data);
+  g_free (data);
 }
 
 static void
-g_hal_volume_eject (GVolume             *volume,
-                    GCancellable        *cancellable,
-                    GAsyncReadyCallback  callback,
-                    gpointer             user_data)
+g_hal_volume_eject (GVolume              *volume,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  char *argv[] = {"gnome-mount", "-e", "-b", "-d", NULL, NULL};
 
-  argv[4] = hal_volume->device_path;
+  g_warning ("hal_volume_eject");
 
-  spawn_do (volume, cancellable, callback, user_data, argv);
+  if (hal_volume->drive != NULL)
+    {
+      EjectWrapperOp *data;
+      data = g_new0 (EjectWrapperOp, 1);
+      data->object = G_OBJECT (volume);
+      data->callback = callback;
+      data->user_data = user_data;
+      g_drive_eject (G_DRIVE (hal_volume->drive), cancellable, eject_wrapper_callback, data);
+    }
 }
 
 static gboolean
-g_hal_volume_eject_finish (GVolume       *volume,
-                           GAsyncResult  *result,
-                           GError       **error)
+g_hal_volume_eject_finish (GVolume        *volume,
+                          GAsyncResult  *result,
+                          GError       **error)
 {
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+
+  if (hal_volume->drive != NULL)
+    {
+      return g_drive_eject_finish (G_DRIVE (hal_volume->drive), result, error);
+    }
   return TRUE;
 }
 

@@ -55,6 +55,7 @@ struct _HalDeviceClass
   
   /* signals */
   void (*hal_property_changed) (HalDevice *device, const char *key);
+  void (*hal_condition) (HalDevice *device, const char *name, const char *detail);
 };
 
 

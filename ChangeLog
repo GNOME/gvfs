@@ -1,3 +1,79 @@
+2007-12-19  David Zeuthen  <davidz@redhat.com>
+
+	Add the cdda:// backend for Compact Disc Digital Audio discs.
+
+	Allow a backend to specify the fuse name directly instead of
+	using the display name
+
+	Make GDaemonVolumeMonitor and GDaemonMount use the new
+	adopt_orphan_mount() function on GVolumeMonitor in gio. Also,
+	since a GMount now can be associated with a GVolume, implement
+	eject().
+
+	Add a new gvfs-less program.
+
+	Make gvfs-mount capable of unmounting as well.
+
+	HAL backend changes: attempt to unmount all mounts from
+	enclosing volumes and fail the ejection if one of the unmount
+	operations fails. Use new adopt_orphan_mount() from gio to
+	adopt cdda:// volumes for audio discs. Emit the 'eject-button'
+	signal on GDrive. Various other fixes.
+
+	* client/gdaemonfile.c: (g_daemon_file_find_enclosing_mount):
+	* client/gdaemonmount.c: (g_daemon_mount_finalize),
+	(g_daemon_mount_new), (g_daemon_mount_get_volume),
+	(g_daemon_mount_get_drive), (g_daemon_mount_can_eject),
+	(foreign_volume_removed), (g_daemon_mount_set_foreign_volume),
+	(eject_wrapper_callback), (g_daemon_mount_eject),
+	(g_daemon_mount_eject_finish), (g_daemon_mount_mount_iface_init):
+	* client/gdaemonmount.h:
+	* client/gdaemonvolumemonitor.c: (mount_added), (mount_removed),
+	(g_daemon_volume_monitor_init):
+	* client/gvfsfusedaemon.c: (file_handle_close_stream),
+	(free_file_handle_for_path), (mount_record_new):
+	* common/gmounttracker.c: (g_mount_info_dup), (g_mount_info_unref),
+	(g_mount_info_from_dbus):
+	* common/gmounttracker.h:
+	* configure.ac:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.c: (g_vfs_backend_finalize),
+	(g_vfs_backend_init), (g_vfs_backend_set_fuse_name),
+	(g_vfs_backend_get_fuse_name), (g_vfs_backend_register_mount):
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsjobunmount.c: (unregister_mount_callback),
+	(send_reply):
+	* daemon/mount.c: (vfs_mount_free), (vfs_mount_to_dbus),
+	(register_mount), (list_mounts):
+	* hal/ghaldrive.c: (g_hal_drive_finalize), (hal_condition),
+	(g_hal_drive_new), (spawn_cb), (g_hal_drive_eject_do),
+	(free_unmount_mounts_op), (_eject_unmount_mounts_cb),
+	(_eject_unmount_mounts), (g_hal_drive_eject):
+	* hal/ghalmount.c: (g_hal_mount_finalize), (unmount_cb),
+	(unmount_read_error), (unmount_do), (g_hal_mount_unmount),
+	(eject_wrapper_callback), (g_hal_mount_eject),
+	(g_hal_mount_eject_finish):
+	* hal/ghalvolume.c: (g_hal_volume_finalize), (do_update_from_hal),
+	(g_hal_volume_new), (g_hal_volume_get_mount),
+	(foreign_mount_unmounted), (g_hal_volume_adopt_foreign_mount),
+	(g_hal_volume_has_foreign_mount_root), (spawn_cb),
+	(mount_foreign_callback), (g_hal_volume_mount),
+	(g_hal_volume_mount_finish), (eject_wrapper_callback),
+	(g_hal_volume_eject), (g_hal_volume_eject_finish):
+	* hal/ghalvolume.h:
+	* hal/ghalvolumemonitor.c: (adopt_orphan_mount),
+	(g_hal_volume_monitor_class_init), (update_volumes),
+	(update_mounts), (update_discs):
+	* hal/hal-device.c: (hal_device_class_init),
+	(_hal_device_hal_condition):
+	* hal/hal-device.h:
+	* hal/hal-marshal.list:
+	* hal/hal-pool.c: (hal_pool_class_init), (_hal_condition),
+	(hal_pool_new):
+	* hal/hal-pool.h:
+	* programs/Makefile.am:
+	* programs/gvfs-mount.c: (unmount_done_cb), (unmount), (main):
+
 2007-12-18  Luca Ferretti  <elle.uca@libero.it>
 
 	* configure.ac: Add ALL_LINGUAS and definition for GVFS_LOCALEDIR;

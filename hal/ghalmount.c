@@ -99,6 +99,9 @@ g_hal_mount_finalize (GObject *object)
 
   if (mount->override_root != NULL)
     g_object_unref (mount->override_root);
+
+  if (mount->volume_monitor != NULL)
+    g_object_remove_weak_pointer (G_OBJECT (mount->volume_monitor), (gpointer) &(mount->volume_monitor));
   
   if (G_OBJECT_CLASS (g_hal_mount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_hal_mount_parent_class)->finalize) (object);
@@ -689,12 +692,12 @@ typedef struct {
   guint error_channel_source_id;
   GString *error_string;
   gboolean using_legacy;
-} EjectUnmountOp;
+} UnmountOp;
 
 static void 
-eject_unmount_cb (GPid pid, gint status, gpointer user_data)
+unmount_cb (GPid pid, gint status, gpointer user_data)
 {
-  EjectUnmountOp *data = user_data;
+  UnmountOp *data = user_data;
   GSimpleAsyncResult *simple;
 
   if (WEXITSTATUS (status) != 0)
@@ -713,15 +716,15 @@ eject_unmount_cb (GPid pid, gint status, gpointer user_data)
         }
       else
         {
-          /* TODO: how do we report an error back to the caller while telling
-           * him that we already have shown an error dialog to the user?
-           *
-           * G_IO_ERROR_FAILED_NO_UI or something?
-           */
-          simple = g_simple_async_result_new (data->object,
-                                              data->callback,
-                                              data->user_data,
-                                              NULL);
+          GError *error;
+          error = g_error_new_literal (G_IO_ERROR, 
+                                       G_IO_ERROR_FAILED_HANDLED,
+                                       "You are not supposed to show G_IO_ERROR_FAILED_HANDLED in the UI");
+          simple = g_simple_async_result_new_from_error (data->object,
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+          g_error_free (error);
         }
     }
   else
@@ -744,13 +747,13 @@ eject_unmount_cb (GPid pid, gint status, gpointer user_data)
 }
 
 static gboolean
-eject_unmount_read_error (GIOChannel *channel,
+unmount_read_error (GIOChannel *channel,
                           GIOCondition condition,
                           gpointer user_data)
 {
   char *str;
   gsize str_len;
-  EjectUnmountOp *data = user_data;
+  UnmountOp *data = user_data;
 
   g_io_channel_read_to_end (channel, &str, &str_len, NULL);
   g_string_append (data->error_string, str);
@@ -759,18 +762,18 @@ eject_unmount_read_error (GIOChannel *channel,
 }
 
 static void
-eject_unmount_do (GMount               *mount,
+unmount_do (GMount               *mount,
                   GCancellable         *cancellable,
                   GAsyncReadyCallback   callback,
                   gpointer              user_data,
                   char                **argv,
                   gboolean              using_legacy)
 {
-  EjectUnmountOp *data;
+  UnmountOp *data;
   GPid child_pid;
   GError *error;
 
-  data = g_new0 (EjectUnmountOp, 1);
+  data = g_new0 (UnmountOp, 1);
   data->object = G_OBJECT (mount);
   data->callback = callback;
   data->user_data = user_data;
@@ -802,8 +805,8 @@ eject_unmount_do (GMount               *mount,
   }
   data->error_string = g_string_new ("");
   data->error_channel = g_io_channel_unix_new (data->error_fd);
-  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, eject_unmount_read_error, data);
-  g_child_watch_add (child_pid, eject_unmount_cb, data);
+  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, unmount_read_error, data);
+  g_child_watch_add (child_pid, unmount_cb, data);
 }
 
 
@@ -829,15 +832,31 @@ g_hal_mount_unmount (GMount             *mount,
       argv[2] = NULL;
     }
 
-  eject_unmount_do (mount, cancellable, callback, user_data, argv, using_legacy);
+  unmount_do (mount, cancellable, callback, user_data, argv, using_legacy);
 }
 
 static gboolean
 g_hal_mount_unmount_finish (GMount       *mount,
-			      GAsyncResult  *result,
-			      GError       **error)
+                            GAsyncResult  *result,
+                            GError       **error)
 {
   return TRUE;
+}
+
+typedef struct {
+  GObject *object;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} EjectWrapperOp;
+
+static void
+eject_wrapper_callback (GObject *source_object,
+                        GAsyncResult *res,
+                        gpointer user_data)
+{
+  EjectWrapperOp *data  = user_data;
+  data->callback (data->object, res, data->user_data);
+  g_free (data);
 }
 
 static void
@@ -847,22 +866,21 @@ g_hal_mount_eject (GMount              *mount,
                    gpointer             user_data)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
-  char *argv[] = {"gnome-mount", "-e", "-b", "-d", NULL, NULL};
-  gboolean using_legacy = FALSE;
+  GDrive *drive;
 
-  if (hal_mount->device != NULL)
+  if (hal_mount->volume != NULL)
     {
-      argv[4] = hal_mount->device_path;
+      drive = g_volume_get_drive (G_VOLUME (hal_mount->volume));
+      if (drive != NULL)
+        {
+          EjectWrapperOp *data;
+          data = g_new0 (EjectWrapperOp, 1);
+          data->object = G_OBJECT (mount);
+          data->callback = callback;
+          data->user_data = user_data;
+          g_drive_eject (drive, cancellable, eject_wrapper_callback, data);
+        }
     }
-  else
-    {
-      using_legacy = TRUE;
-      argv[0] = "eject";
-      argv[1] = hal_mount->mount_path;
-      argv[2] = NULL;
-    }
-
-  eject_unmount_do (mount, cancellable, callback, user_data, argv, using_legacy);
 }
 
 static gboolean
@@ -870,6 +888,15 @@ g_hal_mount_eject_finish (GMount        *mount,
                           GAsyncResult  *result,
                           GError       **error)
 {
+  GHalMount *hal_mount = G_HAL_MOUNT (mount);
+  GDrive *drive;
+
+  if (hal_mount->volume != NULL)
+    {
+      drive = g_volume_get_drive (G_VOLUME (hal_mount->volume));
+      if (drive != NULL)
+        return g_drive_eject_finish (drive, result, error);
+    }
   return TRUE;
 }
 

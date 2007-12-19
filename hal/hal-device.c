@@ -23,6 +23,7 @@
 #include <config.h>
 #include <glib/gi18n.h>
 #include "hal-device.h"
+#include "hal-marshal.h"
 
 struct _HalDevicePrivate
 {
@@ -33,6 +34,7 @@ struct _HalDevicePrivate
 
 enum {
   HAL_PROPERTY_CHANGED,
+  HAL_CONDITION,
   LAST_SIGNAL
 };
 
@@ -66,6 +68,17 @@ hal_device_class_init (HalDeviceClass *klass)
                   NULL, NULL,
                   g_cclosure_marshal_VOID__STRING,
                   G_TYPE_NONE, 1,
+                  G_TYPE_STRING);
+
+  signals[HAL_CONDITION] =
+    g_signal_new ("hal_condition",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (HalDeviceClass, hal_condition),
+                  NULL, NULL,
+                  hal_marshal_VOID__STRING_STRING,
+                  G_TYPE_NONE, 2,
+                  G_TYPE_STRING,
                   G_TYPE_STRING);
 }
 
@@ -233,6 +246,9 @@ void
 _hal_device_hal_property_changed (HalDevice *device, const char *key);
 
 void
+_hal_device_hal_condition (HalDevice *device, const char *name, const char *detail);
+
+void
 _hal_device_hal_property_changed (HalDevice *device, const char *key)
 {
   LibHalPropertySet *new_props;
@@ -244,6 +260,12 @@ _hal_device_hal_property_changed (HalDevice *device, const char *key)
       device->priv->properties = new_props;
       g_signal_emit (device, signals[HAL_PROPERTY_CHANGED], 0, key);
     }
+}
+
+void
+_hal_device_hal_condition (HalDevice *device, const char *name, const char *detail)
+{
+  g_signal_emit (device, signals[HAL_CONDITION], 0, name, detail);
 }
 
 const char *

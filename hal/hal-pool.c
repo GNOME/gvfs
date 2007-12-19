@@ -34,6 +34,7 @@ enum {
   DEVICE_ADDED,
   DEVICE_REMOVED,
   DEVICE_PROPERTY_CHANGED,
+  DEVICE_CONDITION,
   LAST_SIGNAL
 };
 
@@ -104,6 +105,18 @@ hal_pool_class_init (HalPoolClass *klass)
                   hal_marshal_VOID__OBJECT_STRING,
                   G_TYPE_NONE, 2,
                   HAL_TYPE_DEVICE,
+                  G_TYPE_STRING);
+
+  signals[DEVICE_CONDITION] =
+    g_signal_new ("device_condition",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (HalPoolClass, device_condition),
+                  NULL, NULL,
+                  hal_marshal_VOID__OBJECT_STRING_STRING,
+                  G_TYPE_NONE, 3,
+                  HAL_TYPE_DEVICE,
+                  G_TYPE_STRING,
                   G_TYPE_STRING);
 }
 
@@ -197,6 +210,9 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
 void
 _hal_device_hal_property_changed (HalDevice *device, const char *key);
 
+void
+_hal_device_hal_condition (HalDevice *device, const char *name, const char *detail);
+
 static void
 _hal_property_modified (LibHalContext *ctx,
                         const char *udi,
@@ -214,6 +230,25 @@ _hal_property_modified (LibHalContext *ctx,
     {
       _hal_device_hal_property_changed (device, key);
       g_signal_emit (pool, signals[DEVICE_PROPERTY_CHANGED], 0, device, key);
+    }
+}
+
+static void
+_hal_condition (LibHalContext *ctx,
+                const char *udi,
+                const char *condition_name,
+                const char *condition_detail)
+{
+  HalPool *pool;
+  HalDevice *device;
+  
+  pool = HAL_POOL (libhal_ctx_get_user_data (ctx));
+  
+  device = hal_pool_get_device_by_udi (pool, udi);
+  if (device != NULL)
+    {
+      _hal_device_hal_condition (device, condition_name, condition_detail);
+      g_signal_emit (pool, signals[DEVICE_CONDITION], 0, device, condition_name, condition_detail);
     }
 }
 
@@ -287,6 +322,7 @@ hal_pool_new (const char *cap_only)
   libhal_ctx_set_device_added (hal_ctx, _hal_device_added);
   libhal_ctx_set_device_removed (hal_ctx, _hal_device_removed);
   libhal_ctx_set_device_property_modified (hal_ctx, _hal_property_modified);
+  libhal_ctx_set_device_condition (hal_ctx, _hal_condition);
   libhal_ctx_set_user_data (hal_ctx, pool);
 
 #ifdef HAVE_HAL_FAST_INIT

@@ -49,6 +49,7 @@ void  g_hal_volume_register (GIOModule *module);
 GHalVolume *g_hal_volume_new            (GVolumeMonitor   *volume_monitor,
 					 HalDevice        *device,
 					 HalPool          *pool,
+                                         GFile            *foreign_mount_root,
 					 GHalDrive        *drive);
 
 gboolean    g_hal_volume_has_mount_path (GHalVolume       *volume,
@@ -57,6 +58,12 @@ gboolean    g_hal_volume_has_udi        (GHalVolume       *volume,
 					 const char       *udi);
 gboolean    g_hal_volume_has_uuid       (GHalVolume       *volume,
 					 const char       *uuid);
+
+gboolean    g_hal_volume_has_foreign_mount_root (GHalVolume       *volume,
+                                                 GFile            *mount_root);
+
+void        g_hal_volume_adopt_foreign_mount (GHalVolume *volume, 
+                                              GMount *foreign_mount);
 
 void        g_hal_volume_set_mount      (GHalVolume       *volume,
 					 GHalMount        *mount);

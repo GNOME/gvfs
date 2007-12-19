@@ -46,6 +46,7 @@
 #include <glib/gurifuncs.h>
 
 /* stuff from common/ */
+#include <gdaemonmount.h>
 #include <gvfsdaemonprotocol.h>
 #include <gdbusutils.h>
 
@@ -196,6 +197,7 @@ file_handle_new (void)
 static void
 file_handle_close_stream (FileHandle *file_handle)
 {
+  debug_print ("file_handle_close_stream\n");
   if (file_handle->stream)
     {
       switch (file_handle->op)
@@ -285,7 +287,7 @@ free_file_handle_for_path (const gchar *path)
   if (fh)
     {
       g_static_mutex_lock (&global_mutex);
-      g_hash_table_remove (global_fh_table, fh);
+      g_hash_table_remove (global_fh_table, path);
       g_static_mutex_unlock (&global_mutex);
       return TRUE;
     }
@@ -302,7 +304,12 @@ mount_record_new (GMount *mount)
   mount_record = g_new (MountRecord, 1);
   
   mount_record->root = g_mount_get_root (mount);
-  name = g_mount_get_name (mount);
+  name = g_object_get_data (mount, "g-stable-name");
+  if (name != NULL)
+    name = g_strdup (name);
+  else
+    name = g_mount_get_name (mount);
+
   /* Keep in sync with gvfs daemon mount tracker */
   mount_record->name = g_uri_escape_string (name, "+@#$., ", TRUE);
   g_free (name);

@@ -1439,7 +1439,7 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 
   if (mount_info->user_visible)
     {
-      mount = g_daemon_mount_new (mount_info);
+      mount = g_daemon_mount_new (mount_info, NULL);
       g_mount_info_unref (mount_info);
       
       if (mount)

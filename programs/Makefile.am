@@ -23,6 +23,10 @@ bin_PROGRAMS =				\
 	gvfs-monitor-dir		\
 	$(NULL)
 
+bin_SCRIPTS =				\
+	gvfs-less			\
+	$(NULL)
+
 gvfs_cat_SOURCES = gvfs-cat.c
 gvfs_cat_LDADD = $(libraries)
 

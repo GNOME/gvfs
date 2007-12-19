@@ -36,6 +36,7 @@
 
 typedef struct {
   char *display_name;
+  char *stable_name;
   char *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
@@ -138,6 +139,7 @@ static void
 vfs_mount_free (VfsMount *mount)
 {
   g_free (mount->display_name);
+  g_free (mount->stable_name);
   g_free (mount->icon);
   g_free (mount->prefered_filename_encoding);
   g_free (mount->dbus_id);
@@ -175,6 +177,11 @@ vfs_mount_to_dbus (VfsMount *mount,
 				       DBUS_TYPE_STRING,
 				       &mount->display_name))
     _g_dbus_oom ();
+
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &mount->stable_name))
+    _g_dbus_oom ();
   
   if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_STRING,
@@ -199,14 +206,14 @@ vfs_mount_to_dbus (VfsMount *mount,
       char *fs_name;
       
       /* Keep in sync with fuse daemon */
-      fs_name = g_uri_escape_string (mount->display_name, "+@#$., ", TRUE);
+      fs_name = g_uri_escape_string (mount->stable_name, "+@#$., ", TRUE);
       
       fuse_mountpoint = g_build_filename (g_get_home_dir(), ".gvfs", fs_name, NULL);
     }
   
   if (fuse_mountpoint == NULL)
     fuse_mountpoint = g_strdup ("");
-  
+
   _g_dbus_message_iter_append_cstring (&struct_iter, fuse_mountpoint);
 
   g_mount_spec_to_dbus (&struct_iter, mount->mount_spec);
@@ -551,7 +558,7 @@ register_mount (DBusConnection *connection,
   VfsMount *mount;
   DBusMessage *reply;
   DBusError error;
-  const char *display_name, *icon, *obj_path, *id, *prefered_filename_encoding;
+  const char *display_name, *stable_name, *icon, *obj_path, *id, *prefered_filename_encoding;
   dbus_bool_t user_visible;
   DBusMessageIter iter;
   GMountSpec *mount_spec;
@@ -565,6 +572,7 @@ register_mount (DBusConnection *connection,
 				     &error,
 				     DBUS_TYPE_OBJECT_PATH, &obj_path,
 				     DBUS_TYPE_STRING, &display_name,
+                                     DBUS_TYPE_STRING, &stable_name,
 				     DBUS_TYPE_STRING, &icon,
 				     DBUS_TYPE_STRING, &prefered_filename_encoding,
 				     DBUS_TYPE_BOOLEAN, &user_visible,
@@ -577,7 +585,7 @@ register_mount (DBusConnection *connection,
       else if ((mount_spec = g_mount_spec_from_dbus (&iter)) == NULL)
 	reply = dbus_message_new_error (message,
 					DBUS_ERROR_INVALID_ARGS,
-					  "Error in mount spec");
+                                        "Error in mount spec");
       else if (match_vfs_mount (mount_spec) != NULL)
 	reply = dbus_message_new_error (message,
 					DBUS_ERROR_INVALID_ARGS,
@@ -586,6 +594,7 @@ register_mount (DBusConnection *connection,
 	{
 	  mount = g_new0 (VfsMount, 1);
 	  mount->display_name = g_strdup (display_name);
+          mount->stable_name = g_strdup (stable_name);
 	  mount->icon = g_strdup (icon);
 	  mount->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
 	  mount->user_visible = user_visible;
@@ -748,6 +757,7 @@ list_mounts (DBusConnection *connection,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_OBJECT_PATH_AS_STRING
+					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
