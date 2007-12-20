@@ -593,10 +593,10 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
           stbuf->f_flag = 0;  /* Ignored by FUSE */
           stbuf->f_namemax = 1024;
 
-          if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FS_SIZE))
-            stbuf->f_blocks = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FS_SIZE) / 4096;
-          if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FS_FREE))
-            stbuf->f_bfree = stbuf->f_bavail = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FS_FREE) / 4096;
+          if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE))
+            stbuf->f_blocks = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) / 4096;
+          if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE))
+            stbuf->f_bfree = stbuf->f_bavail = g_file_info_get_attribute_uint64 (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE) / 4096;
         }
       else if (error)
         {
@@ -1359,7 +1359,7 @@ readdir_for_file (GFile *base_file, gpointer buf, fuse_fill_dir_t filler)
 
   g_assert (base_file != NULL);
 
-  enumerator = g_file_enumerate_children (base_file, G_FILE_ATTRIBUTE_STD_NAME, 0, NULL, &error);
+  enumerator = g_file_enumerate_children (base_file, G_FILE_ATTRIBUTE_STANDARD_NAME, 0, NULL, &error);
   if (!enumerator)
     {
       gint result;

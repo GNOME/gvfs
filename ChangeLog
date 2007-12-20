@@ -1,5 +1,20 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gvfsfusedaemon.c:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+        * daemon/gvfsbackendtrash.c:
+        * daemon/gvfsjobqueryinfo.c:
+        * programs/gvfs-copy.c:
+        * programs/gvfs-ls.c:
+        * programs/gvfs-move.c:
+        * test/benchmark-gvfs-big-files.c:
+        * test/benchmark-gvfs-small-files.c:
+	Update to new file attribute names
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonmount.c:
         * hal/ghaldrive.c:
         * hal/ghalmount.c:

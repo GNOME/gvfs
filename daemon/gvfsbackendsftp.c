@@ -1297,7 +1297,7 @@ parse_attributes (GVfsBackendSftp *backend,
     g_file_info_set_is_hidden (info, TRUE);
 
   if (basename != NULL && basename[strlen (basename) -1] == '~')
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_BACKUP, TRUE);
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_BACKUP, TRUE);
 
   if (flags & SSH_FILEXFER_ATTR_SIZE)
     {
@@ -1371,7 +1371,7 @@ parse_attributes (GVfsBackendSftp *backend,
         }
       
       g_file_info_set_content_type (info, mimetype);
-      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STD_FAST_CONTENT_TYPE, mimetype);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
       
       if (free_mimetype)
         g_free (mimetype);
@@ -1426,7 +1426,7 @@ parse_attributes (GVfsBackendSftp *backend,
    */
   if (basename != NULL &&
       g_file_attribute_matcher_matches (attribute_matcher,
-                                        G_FILE_ATTRIBUTE_STD_DISPLAY_NAME))
+                                        G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
     {
       char *display_name = g_filename_display_name (basename);
       
@@ -1442,7 +1442,7 @@ parse_attributes (GVfsBackendSftp *backend,
   
   if (basename != NULL &&
       g_file_attribute_matcher_matches (attribute_matcher,
-                                        G_FILE_ATTRIBUTE_STD_EDIT_NAME))
+                                        G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
     {
       char *edit_name = g_filename_display_name (basename);
       g_file_info_set_edit_name (info, edit_name);
@@ -2569,7 +2569,7 @@ read_dir_got_stat_info (GVfsBackendSftp *backend,
   enum_job = G_VFS_JOB_ENUMERATE (job);
 
   if (g_file_attribute_matcher_matches (enum_job->attribute_matcher,
-                                        G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET))
+                                        G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET))
     {
       data->outstanding_requests++;
       command = new_command_stream (backend,
@@ -2965,7 +2965,7 @@ try_query_info (GVfsBackend *backend,
     }
 
   if (g_file_attribute_matcher_matches (job->attribute_matcher,
-                                        G_FILE_ATTRIBUTE_STD_SYMLINK_TARGET))
+                                        G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET))
     {
       data->cb_count++;
       

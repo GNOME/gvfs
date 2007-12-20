@@ -1001,7 +1001,7 @@ enumerate_root_trashdir (GVfsBackend *backend,
   files_file = g_file_get_child (file, "files");
   enumerator =
     g_file_enumerate_children (files_file,
-                               job ? job->attributes : G_FILE_ATTRIBUTE_STD_NAME,
+                               job ? job->attributes : G_FILE_ATTRIBUTE_STANDARD_NAME,
                                job ? job->flags : 0,
                                job ? G_VFS_JOB (job)->cancellable : NULL,
                                NULL);
@@ -1173,7 +1173,7 @@ do_query_info (GVfsBackend *backend,
       g_object_unref (icon);
       
       g_file_info_set_attribute_boolean (info,
-                                         G_FILE_ATTRIBUTE_STD_IS_VIRTUAL,
+                                         G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL,
                                          TRUE);
       g_file_info_set_attribute_boolean (info,
                                          G_FILE_ATTRIBUTE_ACCESS_CAN_READ,

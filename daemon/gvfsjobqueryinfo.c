@@ -180,14 +180,14 @@ create_reply (GVfsJob *job,
   dbus_message_iter_init_append (reply, &iter);
 
   if (g_file_attribute_matcher_matches (op_job->attribute_matcher,
-					G_FILE_ATTRIBUTE_ID_FS))
+					G_FILE_ATTRIBUTE_ID_FILESYSTEM))
     {
       spec = g_vfs_backend_get_mount_spec (op_job->backend);
       if (spec)
 	{
 	  id = g_mount_spec_to_string (spec);
 	  g_file_info_set_attribute_string (op_job->file_info,
-					    G_FILE_ATTRIBUTE_ID_FS,
+					    G_FILE_ATTRIBUTE_ID_FILESYSTEM,
 					    id);
 	  g_free (id);
 	}

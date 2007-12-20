@@ -94,9 +94,9 @@ show_info (GFileInfo *info)
     {
       char *val_as_string;
 
-      if (strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_NAME) == 0 ||
-	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_SIZE) == 0 ||
-	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STD_TYPE) == 0)
+      if (strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_NAME) == 0 ||
+	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_SIZE) == 0 ||
+	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_TYPE) == 0)
 	continue;
 
       if (first_attr)
@@ -175,7 +175,9 @@ main (int argc, char *argv[])
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
 
-  attributes = g_strconcat (G_FILE_ATTRIBUTE_STD_NAME "," G_FILE_ATTRIBUTE_STD_TYPE "," G_FILE_ATTRIBUTE_STD_SIZE,
+  attributes = g_strconcat (G_FILE_ATTRIBUTE_STANDARD_NAME ","
+			    G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+			    G_FILE_ATTRIBUTE_STANDARD_SIZE,
 			    attributes != NULL ? "," : "",
 			    attributes,
 			    NULL);

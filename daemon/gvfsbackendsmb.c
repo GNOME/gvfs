@@ -1144,7 +1144,7 @@ set_info_from_stat (GVfsBackendSmb *backend,
 
   if (basename != NULL &&
       g_file_attribute_matcher_matches (matcher,
-                                        G_FILE_ATTRIBUTE_STD_DISPLAY_NAME))
+                                        G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
     {
       if (strcmp (basename, "/") == 0)
 	display_name = g_strdup_printf (_("%s on %s"), backend->share, backend->server);
@@ -1163,7 +1163,7 @@ set_info_from_stat (GVfsBackendSmb *backend,
   
   if (basename != NULL &&
       g_file_attribute_matcher_matches (matcher,
-                                        G_FILE_ATTRIBUTE_STD_EDIT_NAME))
+                                        G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
     {
       char *edit_name = g_filename_display_name (basename);
       g_file_info_set_edit_name (info, edit_name);
@@ -1203,9 +1203,9 @@ set_info_from_stat (GVfsBackendSmb *backend,
 
 
   if (g_file_attribute_matcher_matches (matcher,
-					G_FILE_ATTRIBUTE_STD_CONTENT_TYPE) ||
+					G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE) ||
       g_file_attribute_matcher_matches (matcher,
-					G_FILE_ATTRIBUTE_STD_ICON))
+					G_FILE_ATTRIBUTE_STANDARD_ICON))
     {
       icon = NULL;
       if (S_ISDIR(statbuf->st_mode))
@@ -1351,7 +1351,7 @@ do_query_fs_info (GVfsBackend *backend,
 		  GFileInfo *info,
 		  GFileAttributeMatcher *attribute_matcher)
 {
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FS_TYPE, "cifs");
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -1445,7 +1445,7 @@ do_enumerate (GVfsBackend *backend,
 				       SUB_DELIM_CHARS ":@/");
 
 	      if (matcher == NULL ||
-		  g_file_attribute_matcher_matches_only (matcher, G_FILE_ATTRIBUTE_STD_NAME))
+		  g_file_attribute_matcher_matches_only (matcher, G_FILE_ATTRIBUTE_STANDARD_NAME))
 		{
 		  info = g_file_info_new ();
 		  g_file_info_set_name (info, dirp->name);

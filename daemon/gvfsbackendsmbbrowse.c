@@ -927,7 +927,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
   g_file_info_set_display_name (info, entry->name_utf8);
   g_file_info_set_edit_name (info, entry->name_utf8);
   g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STD_IS_VIRTUAL, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
 
   icon = NULL;
   if (entry->smbc_type == SMBC_WORKGROUP)
@@ -992,7 +992,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
   else
     g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
     
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STD_TARGET_URI, uri->str);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, uri->str);
   g_string_free (uri, TRUE);
 }
 
