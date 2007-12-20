@@ -99,7 +99,6 @@ rm -rf autom4te.cache
 touch README INSTALL
 
 libtoolize --force || exit $?
-glib-gettextize -f || exit $?
 gtkdocize || exit $?
 
 $ACLOCAL $ACLOCAL_FLAGS || exit $?

@@ -59,3 +59,5 @@ gvfs_monitor_dir_LDADD = $(libraries)
 
 gvfs_monitor_file_SOURCES = gvfs-monitor-file.c
 gvfs_monitor_file_LDADD = $(libraries)
+
+EXTRA_DIST=gvfs-less

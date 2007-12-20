@@ -1,5 +1,13 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+        * autogen.sh:
+	Don't run gettextize
+	
+        * programs/Makefile.am:
+	dist gvfs-less
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/main.c:
 	Fix translated "".
 	

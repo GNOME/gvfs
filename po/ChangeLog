@@ -1,3 +1,10 @@
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+        * Makefile.in.in: Added.
+        * POTFILES.in:
+        * it.po:
+	Add Makefile.in.in
+
 2007-12-18  Luca Ferretti  <elle.uca@libero.it>
 
 	* POTFILES.in: revert previous commit: gvfs is not using
