@@ -1,5 +1,14 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonmount.c:
+        * hal/ghaldrive.c:
+        * hal/ghalmount.c:
+        * hal/ghalvolume.c:
+        * programs/gvfs-mount.c:
+	Update to new unmount flag api
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfileinputstream.c:
         * client/gdaemonfileoutputstream.c:
         * client/gdaemonvfs.c:

@@ -764,9 +764,10 @@ eject_wrapper_callback (GObject *source_object,
 
 static void
 g_hal_volume_eject (GVolume              *volume,
-                   GCancellable        *cancellable,
-                   GAsyncReadyCallback  callback,
-                   gpointer             user_data)
+                    GMountUnmountFlags   flags,
+                    GCancellable        *cancellable,
+                    GAsyncReadyCallback  callback,
+                    gpointer             user_data)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
 
@@ -779,7 +780,7 @@ g_hal_volume_eject (GVolume              *volume,
       data->object = G_OBJECT (volume);
       data->callback = callback;
       data->user_data = user_data;
-      g_drive_eject (G_DRIVE (hal_volume->drive), cancellable, eject_wrapper_callback, data);
+      g_drive_eject (G_DRIVE (hal_volume->drive), flags, cancellable, eject_wrapper_callback, data);
     }
 }
 

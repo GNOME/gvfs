@@ -587,6 +587,7 @@ typedef struct {
   GAsyncReadyCallback callback;
   gpointer user_data;
   GCancellable *cancellable;
+  GMountUnmountFlags flags;
 
   GList *pending_mounts;
 } UnmountMountsOp;
@@ -673,6 +674,7 @@ _eject_unmount_mounts (UnmountMountsOp *data)
       g_warning ("unmounting %p", mount);
 
       g_mount_unmount (mount,
+                       data->flags,
                        data->cancellable,
                        _eject_unmount_mounts_cb,
                        data);
@@ -681,6 +683,7 @@ _eject_unmount_mounts (UnmountMountsOp *data)
 
 static void
 g_hal_drive_eject (GDrive              *drive,
+                   GMountUnmountFlags   flags,
                    GCancellable        *cancellable,
                    GAsyncReadyCallback  callback,
                    gpointer             user_data)
@@ -696,6 +699,7 @@ g_hal_drive_eject (GDrive              *drive,
   data->cancellable = cancellable;
   data->callback = callback;
   data->user_data = user_data;
+  data->flags = flags;
 
   for (l = hal_drive->volumes; l != NULL; l = l->next)
     {

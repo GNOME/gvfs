@@ -32,6 +32,7 @@
 #include "gvfsdaemondbus.h"
 #include "gdaemonfile.h"
 #include "gvfsdaemonprotocol.h"
+#include "gdbusutils.h"
 
 struct _GDaemonMount {
   GObject     parent;
@@ -210,23 +211,28 @@ unmount_reply (DBusMessage *reply,
 
 static void
 g_daemon_mount_unmount (GMount *mount,
-			 GCancellable *cancellable,
-			 GAsyncReadyCallback callback,
-			 gpointer         user_data)
+			GMountUnmountFlags flags,
+			GCancellable *cancellable,
+			GAsyncReadyCallback callback,
+			gpointer         user_data)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   DBusMessage *message;
   GMountInfo *mount_info;
   GSimpleAsyncResult *res;
+  guint32 dbus_flags;
 
   mount_info = daemon_mount->mount_info;
-  
+
   message =
     dbus_message_new_method_call (mount_info->dbus_id,
 				  mount_info->object_path,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  G_VFS_DBUS_MOUNT_OP_UNMOUNT);
 
+  dbus_flags = flags;
+  _g_dbus_message_append_args (message, DBUS_TYPE_UINT32, &dbus_flags, 0);
+  
   res = g_simple_async_result_new (G_OBJECT (mount),
 				   callback, user_data,
 				   g_daemon_mount_unmount);
@@ -264,6 +270,7 @@ eject_wrapper_callback (GObject *source_object,
 
 static void
 g_daemon_mount_eject (GMount              *mount,
+		      GMountUnmountFlags   flags,
                       GCancellable        *cancellable,
                       GAsyncReadyCallback  callback,
                       gpointer             user_data)
@@ -281,15 +288,15 @@ g_daemon_mount_eject (GMount              *mount,
           data->object = G_OBJECT (mount);
           data->callback = callback;
           data->user_data = user_data;
-          g_drive_eject (drive, cancellable, eject_wrapper_callback, data);
+          g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
         }
     }
 }
 
 static gboolean
 g_daemon_mount_eject_finish (GMount        *mount,
-                          GAsyncResult  *result,
-                          GError       **error)
+			     GAsyncResult  *result,
+			     GError       **error)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   GDrive *drive;

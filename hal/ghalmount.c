@@ -811,7 +811,8 @@ unmount_do (GMount               *mount,
 
 
 static void
-g_hal_mount_unmount (GMount             *mount,
+g_hal_mount_unmount (GMount              *mount,
+                     GMountUnmountFlags   flags,
                      GCancellable        *cancellable,
                      GAsyncReadyCallback  callback,
                      gpointer             user_data)
@@ -861,6 +862,7 @@ eject_wrapper_callback (GObject *source_object,
 
 static void
 g_hal_mount_eject (GMount              *mount,
+                   GMountUnmountFlags   flags,
                    GCancellable        *cancellable,
                    GAsyncReadyCallback  callback,
                    gpointer             user_data)
@@ -878,7 +880,7 @@ g_hal_mount_eject (GMount              *mount,
           data->object = G_OBJECT (mount);
           data->callback = callback;
           data->user_data = user_data;
-          g_drive_eject (drive, cancellable, eject_wrapper_callback, data);
+          g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
         }
     }
 }

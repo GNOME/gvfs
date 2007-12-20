@@ -209,7 +209,7 @@ unmount (GFile *file)
       return;
     }
 
-  g_mount_unmount (mount, NULL, unmount_done_cb, NULL);
+  g_mount_unmount (mount, 0, NULL, unmount_done_cb, NULL);
 
   outstanding_mounts++;
 }
