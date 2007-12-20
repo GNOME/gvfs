@@ -1,5 +1,13 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+	* NEWS:
+	Update for release
+
+	* configure.ac:
+	Bump version to 0.1.0
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
         * autogen.sh:
 	Don't run gettextize
 	
