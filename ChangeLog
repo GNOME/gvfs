@@ -1,5 +1,13 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/main.c:
+	Fix translated "".
+	
+        * hal/ghaldrive.c:
+	Encode +/- as utf8 c escapes
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac:
 	Require glib 2.15.0
 	
