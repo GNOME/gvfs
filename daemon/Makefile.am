@@ -30,15 +30,21 @@ service_DATA = gvfs-daemon.service
 
 mountdir = $(sysconfdir)/gvfs/mounts
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-cdda
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in cdda.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount cdda.mount
+mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
 mount_DATA += smb.mount smb-browse.mount
 libexec_PROGRAMS += gvfsd-smb-browse gvfsd-smb
+endif
+
+if USE_CDDA
+mount_in_files += cdda.mount.in
+mount_DATA += cdda.mount
+libexec_PROGRAMS += gvfsd-cdda
 endif
 
 EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files)

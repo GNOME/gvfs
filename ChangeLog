@@ -1,3 +1,9 @@
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/Makefile.am:
+	Build without cdda.
+	Patch from nf2@scheinwelt.at
+
 2007-12-19  David Zeuthen  <davidz@redhat.com>
 
 	Add missing files from previous patch.
