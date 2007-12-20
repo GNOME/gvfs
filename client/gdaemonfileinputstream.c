@@ -430,7 +430,10 @@ run_sync_state_machine (GDaemonFileInputStream *file,
 				       &io_error);
 	}
       else
-	g_assert_not_reached ();
+	{
+	  res = 0;
+	  g_assert_not_reached ();
+	}
 
       if (res == -1)
 	{

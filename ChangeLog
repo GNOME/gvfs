@@ -1,5 +1,13 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+        * client/gdaemonvfs.c:
+        * client/gvfsfusedaemon.c:
+	Fix warnings
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/Makefile.am:
 	Build without cdda.
 	Patch from nf2@scheinwelt.at

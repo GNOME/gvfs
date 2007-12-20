@@ -35,6 +35,8 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 #include <gio/gio.h>
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
 #include "gdaemonfileoutputstream.h"
 #include "gvfsdaemondbus.h"
 #include <gvfsdaemonprotocol.h>
@@ -380,7 +382,10 @@ run_sync_state_machine (GDaemonFileOutputStream *file,
 				       &io_error);
 	}
       else
-	g_assert_not_reached ();
+	{
+	  res = 0;
+	  g_assert_not_reached ();
+	}
 
       if (res == -1)
 	{

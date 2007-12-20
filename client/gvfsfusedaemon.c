@@ -304,7 +304,7 @@ mount_record_new (GMount *mount)
   mount_record = g_new (MountRecord, 1);
   
   mount_record->root = g_mount_get_root (mount);
-  name = g_object_get_data (mount, "g-stable-name");
+  name = g_object_get_data (G_OBJECT (mount), "g-stable-name");
   if (name != NULL)
     name = g_strdup (name);
   else
