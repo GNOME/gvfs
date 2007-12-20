@@ -1,5 +1,10 @@
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Require glib 2.15.0
+	
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
         * client/gvfsfusedaemon.c:
         * daemon/gvfsbackendsftp.c:
         * daemon/gvfsbackendsmb.c:
