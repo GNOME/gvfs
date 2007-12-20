@@ -1,3 +1,17 @@
+2007-12-19  David Zeuthen  <davidz@redhat.com>
+
+	Add missing files from previous patch.
+
+	* daemon/cdda.mount.in:
+	* daemon/gvfsbackendcdda.c: (g_vfs_backend_cdda_finalize),
+	(g_vfs_backend_cdda_init), (do_mount), (try_mount), (do_unmount),
+	(get_track_num_from_name), (free_read_handle), (create_header),
+	(do_open_for_read), (paranoia_callback), (do_read),
+	(do_seek_on_read), (do_close_read), (set_info_for_track),
+	(do_query_info), (do_enumerate), (g_vfs_backend_cdda_class_init):
+	* daemon/gvfsbackendcdda.h:
+	* programs/gvfs-less:
+
 2007-12-19  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonvfs.[ch]:
