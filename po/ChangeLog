@@ -1,3 +1,5 @@
+=== gvfs 0.1.0 ===
+
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
         * Makefile.in.in: Added.
