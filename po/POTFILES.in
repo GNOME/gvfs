@@ -1,5 +1,6 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
+[encoding: UTF-8]
 client/gdaemonfile.c
 client/gdaemonfileinputstream.c
 client/gdaemonfileoutputstream.c
@@ -10,6 +11,7 @@ common/gsysutils.c
 common/gvfsdaemonprotocol.c
 daemon/daemon-main.c
 daemon/gvfsbackend.c
+daemon/gvfsbackendcdda.c
 daemon/gvfsbackendftp.c
 daemon/gvfsbackendsftp.c
 daemon/gvfsbackendsmb.c
