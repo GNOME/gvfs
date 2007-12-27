@@ -1,3 +1,8 @@
+2007-12-27  Alexander Larsson  <alexl@redhat.com>
+
+        * POTFILES.in:
+	Remove intltool option, since we don't use intltool.
+
 2007-12-21  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* POTFILES.in: Add missing file.
