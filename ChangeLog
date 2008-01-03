@@ -1,5 +1,11 @@
 2008-01-03  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghalvolumemonitor.c:
+	Handle pool finalizing on unloads of hal module
+	(#507037)
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsftp.c:
 	Return icons
 	

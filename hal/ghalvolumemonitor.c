@@ -84,6 +84,15 @@ static void update_discs             (GHalVolumeMonitor *monitor);
 #define g_hal_volume_monitor_get_type g_hal_volume_monitor_get_type
 G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR);
 
+static HalPool *
+get_hal_pool (void)
+{
+  if (pool == NULL)
+    pool = hal_pool_new ("block");
+  
+  return pool;
+}
+
 static void
 g_hal_volume_monitor_finalize (GObject *object)
 {
@@ -355,9 +364,6 @@ g_hal_volume_monitor_constructor (GType                  type,
 
   object = NULL;
 
-  /* Created by is_supported */
-  g_assert (pool != NULL);
-
   /* Invoke parent constructor. */
   klass = G_HAL_VOLUME_MONITOR_CLASS (g_type_class_peek (G_TYPE_HAL_VOLUME_MONITOR));
   parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
@@ -366,7 +372,7 @@ g_hal_volume_monitor_constructor (GType                  type,
                                       construct_properties);
 
   monitor = G_HAL_VOLUME_MONITOR (object);
-  monitor->pool = g_object_ref (pool);
+  monitor->pool = g_object_ref (get_hal_pool ());
 
   monitor->mount_monitor = g_unix_mount_monitor_new ();
 
@@ -414,8 +420,7 @@ g_hal_volume_monitor_class_finalize (GHalVolumeMonitorClass *klass)
 static gboolean
 is_supported (void)
 {
-  pool = hal_pool_new ("block");
-  return pool != NULL;
+  return get_hal_pool() != NULL;
 }
 
 static GVolume *
