@@ -1286,7 +1286,7 @@ parse_attributes (GVfsBackendSftp *backend,
                   GFileInfo *info,
                   const char *basename,
                   GDataInputStream *reply,
-                  GFileAttributeMatcher *attribute_matcher)
+                  GFileAttributeMatcher *matcher)
 {
   guint32 flags;
   GFileType type;
@@ -1294,6 +1294,7 @@ parse_attributes (GVfsBackendSftp *backend,
   guint32 mode;
   gboolean has_uid, free_mimetype;
   char *mimetype;
+  GIcon *icon;
   
   flags = g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
@@ -1377,6 +1378,55 @@ parse_attributes (GVfsBackendSftp *backend,
       g_file_info_set_content_type (info, mimetype);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
       
+      if (g_file_attribute_matcher_matches (matcher,
+                                            G_FILE_ATTRIBUTE_STANDARD_ICON))
+        {
+          icon = NULL;
+          if (S_ISDIR(mode))
+            icon = g_themed_icon_new ("folder-remote");
+          else if (mimetype)
+            {
+              char *mimetype_icon, *generic_mimetype_icon, *type_icon, *p;
+              char *icon_names[3];
+              int i;
+              
+              mimetype_icon = g_strdup (mimetype);
+              g_strdelimit (mimetype_icon, "/", '-');
+              
+              p = strchr (mimetype, '/');
+              if (p == NULL)
+                p = mimetype + strlen (mimetype);
+              
+              generic_mimetype_icon = g_malloc (p - mimetype + strlen ("-x-generic") + 1);
+              memcpy (generic_mimetype_icon, mimetype, p - mimetype);
+              memcpy (generic_mimetype_icon + (p - mimetype), "-x-generic", strlen ("-x-generic"));
+              generic_mimetype_icon[(p - mimetype) + strlen ("-x-generic")] = 0;
+              
+              type_icon = "text-x-generic";
+              
+              i = 0;
+              icon_names[i++] = mimetype_icon;
+              icon_names[i++] = generic_mimetype_icon;
+              if (strcmp (generic_mimetype_icon, type_icon) != 0 &&
+                  strcmp (mimetype_icon, type_icon) != 0) 
+                icon_names[i++] = type_icon;
+
+              g_print ("basename: %s, icons: %s...\n", basename, icon_names[0]);
+              
+              icon = g_themed_icon_new_from_names (icon_names, i);
+              
+              g_free (mimetype_icon);
+              g_free (generic_mimetype_icon);
+              
+            }
+          else
+            icon = g_themed_icon_new ("text-x-generic");
+
+          g_file_info_set_icon (info, icon);
+          g_object_unref (icon);
+        }
+
+
       if (free_mimetype)
         g_free (mimetype);
       
@@ -1429,7 +1479,7 @@ parse_attributes (GVfsBackendSftp *backend,
    * the remote charset encoding
    */
   if (basename != NULL &&
-      g_file_attribute_matcher_matches (attribute_matcher,
+      g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
     {
       char *display_name = g_filename_display_name (basename);
@@ -1445,7 +1495,7 @@ parse_attributes (GVfsBackendSftp *backend,
     }
   
   if (basename != NULL &&
-      g_file_attribute_matcher_matches (attribute_matcher,
+      g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
     {
       char *edit_name = g_filename_display_name (basename);
