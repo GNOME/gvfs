@@ -1400,9 +1400,9 @@ parse_attributes (GVfsBackendSftp *backend,
       char *etag;
       
       v = g_data_input_stream_read_uint32 (reply, NULL, NULL);
-      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, v);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, v);
       v = g_data_input_stream_read_uint32 (reply, NULL, NULL);
-      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, v);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, v);
 
       etag = g_strdup_printf ("%lu", (long unsigned int)v);
       g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE, etag);

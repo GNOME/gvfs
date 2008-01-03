@@ -1,6 +1,11 @@
 2008-01-03  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:
+	Use right types for file times (#506494)
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
 	Don't return errors on EOF (#506493)
 
 2008-01-03  Alexander Larsson  <alexl@redhat.com>
