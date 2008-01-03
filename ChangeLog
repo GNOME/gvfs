@@ -1,5 +1,12 @@
 2008-01-03  Alexander Larsson  <alexl@redhat.com>
 
+        * Makefile.am:
+        * mkinstalldirs: Added.
+	Added mkinstalldirs to svn and EXTRA_DIST ase
+	we now don't gettextize in autogen.
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
         * hal/ghaldrive.c:
         (_drive_get_description):
 	Fix plus/minus utf8 string.
