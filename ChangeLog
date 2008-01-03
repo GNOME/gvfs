@@ -1,5 +1,10 @@
 2008-01-03  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsftp.c:
+	Don't return errors on EOF (#506493)
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
         * Makefile.am:
         * mkinstalldirs: Added.
 	Added mkinstalldirs to svn and EXTRA_DIST ase
