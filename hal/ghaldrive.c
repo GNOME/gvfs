@@ -156,7 +156,7 @@ _drive_get_description (HalDevice *d)
         second = _("DVD\xc2\xb1R");
       if (hal_device_get_property_bool (d, "storage.cdrom.dvdrw") &&
           hal_device_get_property_bool (d, "storage.cdrom.dvdplusrw"))
-        second = _("DVDxc2\xb1RW");
+        second = _("DVD\xc2\xb1RW");
       if (hal_device_get_property_bool (d, "storage.cdrom.hddvd"))
         second = _("HDDVD");
       if (hal_device_get_property_bool (d, "storage.cdrom.hddvdr"))

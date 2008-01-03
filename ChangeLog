@@ -1,3 +1,10 @@
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+        * hal/ghaldrive.c:
+        (_drive_get_description):
+	Fix plus/minus utf8 string.
+	Patch from Luca Ferretti.
+
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
