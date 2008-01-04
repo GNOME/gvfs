@@ -1,3 +1,8 @@
+2008-01-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* daemon/Makefile.am: Install the .mount files
+	in /usr/share/gvfs/mounts, not in /etc/gvfs/mounts
+
 2008-01-03  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalvolumemonitor.c:

@@ -1,5 +1,7 @@
 NULL =
 
+mountdir = $(datadir)/gvfs/mounts
+
 INCLUDES =					\
 	$(SAMBA_CFLAGS)                         \
 	-I$(top_srcdir)				\
@@ -7,7 +9,7 @@ INCLUDES =					\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
-	-DMOUNTABLE_DIR=\"$(sysconfdir)/gvfs/mounts/\" \
+	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
 	-DG_DISABLE_DEPRECATED
 
 noinst_LTLIBRARIES=libdaemon.la
@@ -27,8 +29,6 @@ service_DATA = gvfs-daemon.service
 
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
-
-mountdir = $(sysconfdir)/gvfs/mounts
 
 libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash
 
