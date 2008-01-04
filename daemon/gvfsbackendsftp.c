@@ -493,9 +493,7 @@ make_reply_stream (guint8 *data, gsize len)
   GInputStream *mem_stream;
   GDataInputStream *data_stream;
   
-  mem_stream = g_memory_input_stream_from_data (data, len);
-  g_memory_input_stream_set_free_data (G_MEMORY_INPUT_STREAM (mem_stream), TRUE);
-
+  mem_stream = g_memory_input_stream_new_from_data (data, len, g_free);
   data_stream = g_data_input_stream_new (mem_stream);
   g_object_unref (mem_stream);
   
