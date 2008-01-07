@@ -406,7 +406,7 @@ new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
   GDataOutputStream *data_stream;
   guint32 id;
 
-  mem_stream = g_memory_output_stream_new (NULL);
+  mem_stream = g_memory_output_stream_new (NULL, 0, g_realloc, NULL);
   data_stream = g_data_output_stream_new (mem_stream);
   g_object_unref (mem_stream);
 
@@ -423,42 +423,48 @@ new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
   return data_stream;
 }
 
-static GByteArray *
-get_data_from_command_stream (GDataOutputStream *command_stream, gboolean free_data)
+static gpointer
+get_data_from_command_stream (GDataOutputStream *command_stream, gsize *len)
 {
   GOutputStream *mem_stream;
+  gpointer data;
   GByteArray *array;
   guint32 *len_ptr;
   
   mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));
-  g_memory_output_stream_set_free_data (G_MEMORY_OUTPUT_STREAM (mem_stream), free_data);
-  array = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
+  data = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
+  *len = g_memory_output_stream_get_size (G_MEMORY_OUTPUT_STREAM (mem_stream));
 
-  len_ptr = (guint32 *)array->data;
-  *len_ptr = GUINT32_TO_BE (array->len - 4);
+  len_ptr = (guint32 *)data;
+  *len_ptr = GUINT32_TO_BE (*len - 4);
   
-  return array;
+  return data;
 }
 
 static gboolean
-send_command_sync (GVfsBackendSftp *backend,
-                   GDataOutputStream *command_stream,
-                   GCancellable *cancellable,
-                   GError **error)
+send_command_sync_and_unref_command (GVfsBackendSftp *backend,
+                                     GDataOutputStream *command_stream,
+                                     GCancellable *cancellable,
+                                     GError **error)
 {
-  GByteArray *array;
+  gpointer data;
+  gsize len;
   gsize bytes_written;
   gboolean res;
   
-  array = get_data_from_command_stream (command_stream, TRUE);
+  data = get_data_from_command_stream (command_stream, &len);
 
   res = g_output_stream_write_all (backend->command_stream,
-                                   array->data, array->len,
+                                   data, len,
                                    &bytes_written,
                                    cancellable, error);
   
   if (error == NULL && !res)
     g_warning ("Ignored send_command error\n");
+
+  g_free (data);
+  g_object_unref (command_stream);
+
   return res;
 }
 
@@ -955,13 +961,14 @@ queue_command_stream_and_free (GVfsBackendSftp *backend,
                                GVfsJob *job,
                                gpointer user_data)
 {
-  GByteArray *array;
+  gpointer data;
+  gsize len;
   DataBuffer *buffer;
-  array = get_data_from_command_stream (command_stream, FALSE);
+
+  data = get_data_from_command_stream (command_stream, &len);
   
-  buffer = data_buffer_new (array->data, array->len);
+  buffer = data_buffer_new (data, len);
   g_object_unref (command_stream);
-  g_byte_array_free (array, FALSE);
   
   expect_reply (backend, id, callback, job, user_data);
   queue_command_buffer (backend, buffer);
@@ -978,8 +985,7 @@ get_uid_sync (GVfsBackendSftp *backend)
   
   command = new_command_stream (backend, SSH_FXP_STAT, NULL);
   put_string (command, ".");
-  send_command_sync (backend, command, NULL, NULL);
-  g_object_unref (command);
+  send_command_sync_and_unref_command (backend, command, NULL, NULL);
 
   reply = read_reply_sync (backend, NULL, NULL);
   if (reply == NULL)
@@ -1050,8 +1056,7 @@ do_mount (GVfsBackend *backend,
   command = new_command_stream (op_backend, SSH_FXP_INIT, NULL);
   g_data_output_stream_put_int32 (command,
                                   SSH_FILEXFER_VERSION, NULL, NULL);
-  send_command_sync (op_backend, command, NULL, NULL);
-  g_object_unref (command);
+  send_command_sync_and_unref_command (op_backend, command, NULL, NULL);
 
   if (tty_fd == -1)
     res = wait_for_reply (backend, stdout_fd, &error);
