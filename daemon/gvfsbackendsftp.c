@@ -1132,9 +1132,6 @@ do_mount (GVfsBackend *backend,
   g_free (display_name);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
 
-  
-  g_print ("succeeded with sftp mount\n");
-  
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
@@ -1414,8 +1411,6 @@ parse_attributes (GVfsBackendSftp *backend,
                   strcmp (mimetype_icon, type_icon) != 0) 
                 icon_names[i++] = type_icon;
 
-              g_print ("basename: %s, icons: %s...\n", basename, icon_names[0]);
-              
               icon = g_themed_icon_new_from_names (icon_names, i);
               
               g_free (mimetype_icon);
