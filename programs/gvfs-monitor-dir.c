@@ -37,7 +37,7 @@ static GOptionEntry entries[] = {
 };
 
 static gboolean
-dir_monitor_callback (GDirectoryMonitor* monitor,
+dir_monitor_callback (GFileMonitor* monitor,
 		      GFile* child,
 		      GFile* other_file,
 		      GFileMonitorEvent eflags)
@@ -80,7 +80,7 @@ dir_monitor_callback (GDirectoryMonitor* monitor,
 int
 main (int argc, char *argv[])
 {
-  GDirectoryMonitor* dmonitor;
+  GFileMonitor* dmonitor;
   GError *error;
   GOptionContext *context;
   GFile *file;

@@ -30,7 +30,6 @@ vfssources = \
 	gdaemonfileinputstream.c gdaemonfileinputstream.h \
 	gdaemonfileoutputstream.c gdaemonfileoutputstream.h \
 	gdaemonfileenumerator.c gdaemonfileenumerator.h \
-	gdaemondirectorymonitor.c gdaemondirectorymonitor.h \
 	gdaemonfilemonitor.c gdaemonfilemonitor.h \
 	gvfsdaemondbus.c gvfsdaemondbus.h \
 	gvfsuriutils.c gvfsuriutils.h \

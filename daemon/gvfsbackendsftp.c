@@ -406,7 +406,7 @@ new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
   GDataOutputStream *data_stream;
   guint32 id;
 
-  mem_stream = g_memory_output_stream_new (NULL, 0, g_realloc, NULL);
+  mem_stream = g_memory_output_stream_new (NULL, 0, (GReallocFunc)g_realloc, NULL);
   data_stream = g_data_output_stream_new (mem_stream);
   g_object_unref (mem_stream);
 
@@ -428,7 +428,6 @@ get_data_from_command_stream (GDataOutputStream *command_stream, gsize *len)
 {
   GOutputStream *mem_stream;
   gpointer data;
-  GByteArray *array;
   guint32 *len_ptr;
   
   mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));

@@ -103,7 +103,7 @@ struct _GVfsBackendTrash
   /* All these are protected by the root_monitor lock */
   GVfsMonitor *file_vfs_monitor;
   GVfsMonitor *vfs_monitor;
-  GList *trash_dir_monitors; /* GDirectoryMonitor objects */
+  GList *trash_dir_monitors; /* GFileMonitor objects */
   GUnixMountMonitor *mount_monitor;
   gboolean trash_file_update_running;
   gboolean trash_file_update_scheduled;
@@ -1365,7 +1365,7 @@ proxy_changed (GFileMonitor* monitor,
 }
 
 static void
-trash_dir_changed (GDirectoryMonitor      *monitor,
+trash_dir_changed (GFileMonitor           *monitor,
                    GFile                  *child,
                    GFile                  *other_file,
                    GFileMonitorEvent       event_type,
@@ -1381,7 +1381,7 @@ update_trash_dir_monitors (GVfsBackendTrash *backend)
 {
   GFile *file;
   char *trashdir;
-  GDirectoryMonitor *monitor;
+  GFileMonitor *monitor;
   GList *monitors, *l, *trashdirs;
 
   /* Remove old monitors */
@@ -1575,7 +1575,7 @@ do_create_dir_monitor (GVfsBackend *backend,
     {
       GFile *file;
       char *path;
-      GDirectoryMonitor *monitor;
+      GFileMonitor *monitor;
       MonitorProxy *proxy;
       
       path = g_build_filename (trashdir, "files", trashfile, relative_path, NULL);

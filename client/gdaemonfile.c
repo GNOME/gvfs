@@ -34,7 +34,6 @@
 #include <gvfsdaemonprotocol.h>
 #include <gdaemonfileinputstream.h>
 #include <gdaemonfileoutputstream.h>
-#include <gdaemondirectorymonitor.h>
 #include <gdaemonfilemonitor.h>
 #include <gdaemonfileenumerator.h>
 #include <glib/gi18n-lib.h>
@@ -1843,12 +1842,12 @@ g_daemon_file_move (GFile                  *source,
   return TRUE;
 }
 
-static GDirectoryMonitor*
+static GFileMonitor*
 g_daemon_file_monitor_dir (GFile* file,
 			   GFileMonitorFlags flags,
 			   GCancellable *cancellable)
 {
-  GDirectoryMonitor *monitor;
+  GFileMonitor *monitor;
   char *obj_path;
   dbus_uint32_t flags_dbus;
   GMountInfo *mount_info;
@@ -1881,8 +1880,8 @@ g_daemon_file_monitor_dir (GFile* file,
       return NULL;
     }
   
-  monitor = g_daemon_directory_monitor_new (mount_info->dbus_id,
-					    obj_path);
+  monitor = g_daemon_file_monitor_new (mount_info->dbus_id,
+				       obj_path);
   
   g_mount_info_unref (mount_info);
   dbus_message_unref (reply);
