@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-20 16:04+0100\n"
+"POT-Creation-Date: 2008-01-08 16:16+0100\n"
 "PO-Revision-Date: 2007-12-17 10:53+0100\n"
 "Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -14,56 +14,56 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: client/gdaemonfile.c:494
+#: client/gdaemonfile.c:493
 #, c-format
 msgid "Operation not supported, files on different mounts"
 msgstr "Operazione non supportata, file su mount differenti"
 
-#: client/gdaemonfile.c:774
+#: client/gdaemonfile.c:773
 #, c-format
 msgid "Invalid return value from get_info"
 msgstr "Valore di ritorno non valido da get_info"
 
-#: client/gdaemonfile.c:803
+#: client/gdaemonfile.c:802
 msgid "Invalid return value from query_info"
 msgstr "Valore di ritorno non valido da query_info"
 
-#: client/gdaemonfile.c:872
+#: client/gdaemonfile.c:871
 msgid "Couldn't get stream file descriptor"
 msgstr "Impossibile ottenere il descrittore di file dello stream"
 
-#: client/gdaemonfile.c:904 client/gdaemonfile.c:974 client/gdaemonfile.c:1033
-#: client/gdaemonfile.c:1092 client/gdaemonfile.c:1154
+#: client/gdaemonfile.c:903 client/gdaemonfile.c:973 client/gdaemonfile.c:1032
+#: client/gdaemonfile.c:1091 client/gdaemonfile.c:1153
 #, c-format
 msgid "Invalid return value from open"
 msgstr "Valore di ritorno non valido da open"
 
-#: client/gdaemonfile.c:984 client/gdaemonfile.c:1043
-#: client/gdaemonfile.c:1102 client/gdaemonfile.c:1164
+#: client/gdaemonfile.c:983 client/gdaemonfile.c:1042
+#: client/gdaemonfile.c:1101 client/gdaemonfile.c:1163
 #, c-format
 msgid "Didn't get stream file descriptor"
 msgstr ""
 
-#: client/gdaemonfile.c:1217
+#: client/gdaemonfile.c:1216
 msgid "Invalid return value from call"
 msgstr "Valore di ritorno non valido da call"
 
-#: client/gdaemonfile.c:1414
+#: client/gdaemonfile.c:1413
 #, c-format
 msgid "Invalid return value from get_filesystem_info"
 msgstr "Valore di ritorno non valido da get_filesystem_info"
 
-#: client/gdaemonfile.c:1451
+#: client/gdaemonfile.c:1450
 #, c-format
 msgid "Containing mount does not exist"
 msgstr ""
 
-#: client/gdaemonfile.c:1481
+#: client/gdaemonfile.c:1480
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nome di file «%s» non valido"
 
-#: client/gdaemonfile.c:1523
+#: client/gdaemonfile.c:1522
 #, c-format
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Valore di ritorno non valido da query_filesystem_info"
@@ -145,7 +145,68 @@ msgstr ""
 msgid "error starting mount daemon"
 msgstr ""
 
-#: daemon/gvfsbackendftp.c:113 daemon/gvfsbackendsftp.c:1164
+#: daemon/gvfsbackendcdda.c:145 daemon/gvfsbackendcdda.c:211
+#, c-format
+msgid "No drive specified"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:157
+#, c-format
+msgid "Cannot find drive %s"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:167
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:173
+#, c-format
+msgid "Audio Disc on %s"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:174 daemon/gvfsbackendcdda.c:675
+#: hal/ghalmount.c:289 hal/ghalvolume.c:237 hal/ghalvolume.c:248
+#, c-format
+msgid "Audio Disc"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:235
+#, c-format
+msgid "File system is busy: %d open files"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:425
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:531
+#, c-format
+msgid "Error from paranoia on drive %s"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:594
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr ""
+
+#: daemon/gvfsbackendcdda.c:691
+#, fuzzy, c-format
+msgid "No such file"
+msgstr "Non è un file normale"
+
+#: daemon/gvfsbackendcdda.c:698
+#, fuzzy, c-format
+msgid "The file does not exist"
+msgstr "Il file non esiste"
+
+#: daemon/gvfsbackendcdda.c:705
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr ""
+
+#: daemon/gvfsbackendftp.c:113 daemon/gvfsbackendsftp.c:1163
 #: daemon/gvfsbackendsmb.c:539
 msgid "Invalid mount spec"
 msgstr ""
@@ -195,76 +256,76 @@ msgstr ""
 msgid "Unable to spawn ssh program: %s"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:484 daemon/gvfsbackendsftp.c:643
+#: daemon/gvfsbackendsftp.c:489 daemon/gvfsbackendsftp.c:646
 #, c-format
 msgid "Timed out when logging in"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:691
+#: daemon/gvfsbackendsftp.c:694
 msgid "Enter passphrase for key"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:693
+#: daemon/gvfsbackendsftp.c:696
 msgid "Enter password"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:705
+#: daemon/gvfsbackendsftp.c:708
 #, c-format
 msgid "Password dialog cancelled"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:721
+#: daemon/gvfsbackendsftp.c:724
 #, c-format
 msgid "Can't send password"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:1088 daemon/gvfsbackendsftp.c:1111
+#: daemon/gvfsbackendsftp.c:1090 daemon/gvfsbackendsftp.c:1113
 #, c-format
 msgid "Protocol error"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:1127
+#: daemon/gvfsbackendsftp.c:1129
 #, c-format
 msgid "sftp on %s"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:1154
+#: daemon/gvfsbackendsftp.c:1153
 msgid "Unable to find supported ssh command"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:1436 daemon/gvfsbackendsmb.c:1157
+#: daemon/gvfsbackendsftp.c:1487 daemon/gvfsbackendsmb.c:1157
 #: daemon/gvfsbackendtrash.c:947
 msgid " (invalid encoding)"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:1493 daemon/gvfsbackendsftp.c:1548
-#: daemon/gvfsbackendsftp.c:1559 daemon/gvfsbackendsftp.c:1617
-#: daemon/gvfsbackendsftp.c:1707 daemon/gvfsbackendsftp.c:1736
-#: daemon/gvfsbackendsftp.c:1784 daemon/gvfsbackendsftp.c:1863
-#: daemon/gvfsbackendsftp.c:1974 daemon/gvfsbackendsftp.c:2015
-#: daemon/gvfsbackendsftp.c:2067 daemon/gvfsbackendsftp.c:2138
-#: daemon/gvfsbackendsftp.c:2158 daemon/gvfsbackendsftp.c:2312
-#: daemon/gvfsbackendsftp.c:2338 daemon/gvfsbackendsftp.c:2395
-#: daemon/gvfsbackendsftp.c:2454 daemon/gvfsbackendsftp.c:2736
-#: daemon/gvfsbackendsftp.c:2865 daemon/gvfsbackendsftp.c:2896
-#: daemon/gvfsbackendsftp.c:2995 daemon/gvfsbackendsftp.c:3036
-#: daemon/gvfsbackendsftp.c:3089 daemon/gvfsbackendsftp.c:3125
-#: daemon/gvfsbackendsftp.c:3159 daemon/gvfsbackendsftp.c:3174
-#: daemon/gvfsbackendsftp.c:3193
+#: daemon/gvfsbackendsftp.c:1544 daemon/gvfsbackendsftp.c:1599
+#: daemon/gvfsbackendsftp.c:1610 daemon/gvfsbackendsftp.c:1668
+#: daemon/gvfsbackendsftp.c:1758 daemon/gvfsbackendsftp.c:1787
+#: daemon/gvfsbackendsftp.c:1835 daemon/gvfsbackendsftp.c:1914
+#: daemon/gvfsbackendsftp.c:2025 daemon/gvfsbackendsftp.c:2066
+#: daemon/gvfsbackendsftp.c:2118 daemon/gvfsbackendsftp.c:2189
+#: daemon/gvfsbackendsftp.c:2209 daemon/gvfsbackendsftp.c:2363
+#: daemon/gvfsbackendsftp.c:2389 daemon/gvfsbackendsftp.c:2446
+#: daemon/gvfsbackendsftp.c:2505 daemon/gvfsbackendsftp.c:2787
+#: daemon/gvfsbackendsftp.c:2916 daemon/gvfsbackendsftp.c:2947
+#: daemon/gvfsbackendsftp.c:3046 daemon/gvfsbackendsftp.c:3087
+#: daemon/gvfsbackendsftp.c:3140 daemon/gvfsbackendsftp.c:3176
+#: daemon/gvfsbackendsftp.c:3210 daemon/gvfsbackendsftp.c:3225
+#: daemon/gvfsbackendsftp.c:3244
 #, c-format
 msgid "Invalid reply recieved"
 msgstr ""
 
-#: daemon/gvfsbackendsftp.c:1805
+#: daemon/gvfsbackendsftp.c:1856
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Errore nel creare il file di backup: %s"
 
-#: daemon/gvfsbackendsftp.c:2220
+#: daemon/gvfsbackendsftp.c:2271
 msgid "Unable to create temporary file"
 msgstr "Impossibile creare il file temporaneo"
 
-#: daemon/gvfsbackendsftp.c:2274 daemon/gvfsbackendsmb.c:918
+#: daemon/gvfsbackendsftp.c:2325 daemon/gvfsbackendsmb.c:918
 #, c-format
 msgid "The file was externally modified"
 msgstr ""
@@ -501,7 +562,7 @@ msgid "DVD±R"
 msgstr ""
 
 #: hal/ghaldrive.c:159
-msgid "DVDxc2RW"
+msgid "DVD±RW"
 msgstr ""
 
 #: hal/ghaldrive.c:161
@@ -758,8 +819,4 @@ msgstr ""
 
 #: hal/ghalmount.c:287 hal/ghalvolume.c:246
 msgid "Mixed Audio/Data Disc"
-msgstr ""
-
-#: hal/ghalmount.c:289 hal/ghalvolume.c:237 hal/ghalvolume.c:248
-msgid "Audio Disc"
 msgstr ""

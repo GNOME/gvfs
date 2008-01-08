@@ -1,3 +1,10 @@
+Major changes in 0.1.1:
+* Use gio from glib (glib 2.15.1 required)
+* Fix translation issues
+* Fix various sftp backend issues
+* Move .mount files to /usr/share/gvfs/mounts
+* Add initial computer:/// backend
+
 Major changes in 0.1.0:
 * Use gio from glib (glib 2.15.0 required)
 * Update to API changes in gio
