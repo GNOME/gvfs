@@ -30,10 +30,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount
+mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount computer.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -70,6 +70,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobmount.c gvfsjobmount.h \
 	gvfsjobunmount.c gvfsjobunmount.h \
 	gvfsjobmountmountable.c gvfsjobmountmountable.h \
+	gvfsjobunmountmountable.c gvfsjobunmountmountable.h \
 	gvfsjobopenforread.c gvfsjobopenforread.h \
 	gvfsjobread.c gvfsjobread.h \
 	gvfsjobseekread.c gvfsjobseekread.h \
@@ -179,6 +180,19 @@ gvfsd_trash_CPPFLAGS = \
 	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,'
 
 gvfsd_trash_LDADD = $(libraries)
+
+gvfsd_computer_SOURCES = \
+	gvfsbackendcomputer.c gvfsbackendcomputer.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_computer_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendcomputer.h \
+	-DDEFAULT_BACKEND_TYPE=computer \
+	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"computer", G_VFS_TYPE_BACKEND_COMPUTER,'
+
+gvfsd_computer_LDADD = $(libraries)
 
 gvfsd_cdda_SOURCES = \
 	gvfsbackendcdda.c gvfsbackendcdda.h \

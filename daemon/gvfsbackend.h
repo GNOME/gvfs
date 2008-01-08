@@ -46,6 +46,7 @@ typedef struct _GVfsBackendClass   GVfsBackendClass;
 typedef struct _GVfsJobMount           GVfsJobMount;
 typedef struct _GVfsJobUnmount         GVfsJobUnmount;
 typedef struct _GVfsJobMountMountable  GVfsJobMountMountable;
+typedef struct _GVfsJobUnmountMountable GVfsJobUnmountMountable;
 typedef struct _GVfsJobOpenForRead     GVfsJobOpenForRead;
 typedef struct _GVfsJobSeekRead        GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead       GVfsJobCloseRead;
@@ -113,6 +114,18 @@ struct _GVfsBackendClass
 				 GVfsJobMountMountable *job,
 				 const char *filename,
 				 GMountSource *mount_source);
+  void     (*unmount_mountable) (GVfsBackend *backend,
+				 GVfsJobUnmountMountable *job,
+				 const char *filename);
+  gboolean (*try_unmount_mountable)(GVfsBackend *backend,
+				 GVfsJobUnmountMountable *job,
+				 const char *filename);
+  void     (*eject_mountable)   (GVfsBackend *backend,
+				 GVfsJobUnmountMountable *job,
+				 const char *filename);
+  gboolean (*try_eject_mountable)(GVfsBackend *backend,
+				 GVfsJobUnmountMountable *job,
+				 const char *filename);
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);

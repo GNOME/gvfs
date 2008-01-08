@@ -1,3 +1,14 @@
+2008-01-08  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/Makefile.am:
+        * daemon/computer.mount.in:
+        * daemon/gvfsbackendcomputer.[ch]:
+	Add initial computer backend
+	
+        * daemon/gvfsbackend.h:
+        * daemon/gvfsjobunmountmountable.[ch]:
+	Add umount_mountable calls
+
 2008-01-07  Alexander Larsson  <alexl@redhat.com>
 
         * client/Makefile.am:
