@@ -1,3 +1,8 @@
+2008-01-09  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c (_g_daemon_vfs_get_mount_info_sync):
+	Better error return on not mounted.
+
 2008-01-09  Luca Ferretti  <elle.uca@libero.it>
 
 	* Makefile.am:
