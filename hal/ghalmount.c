@@ -310,7 +310,7 @@ do_update_from_hal (GHalMount *m)
     }
   else
     {
-      m->icon = g_themed_icon_new (icon_name);
+      m->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
     }
 }
 

@@ -433,7 +433,7 @@ g_hal_drive_get_icon (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
 
-  return g_themed_icon_new (hal_drive->icon);
+  return g_themed_icon_new_with_default_fallbacks (hal_drive->icon);
 }
 
 static char *

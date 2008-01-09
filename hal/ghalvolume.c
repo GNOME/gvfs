@@ -474,7 +474,7 @@ static GIcon *
 g_hal_volume_get_icon (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  return g_themed_icon_new (hal_volume->icon);
+  return g_themed_icon_new_with_default_fallbacks (hal_volume->icon);
 }
 
 static char *

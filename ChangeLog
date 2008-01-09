@@ -1,5 +1,12 @@
 2008-01-09  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghaldrive.c:
+        * hal/ghalmount.c:
+        * hal/ghalvolume.c:
+	Use default fallbacks for icons
+
+2008-01-09  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountsource.[ch]:
 	Add g_mount_source_get_operation() that lets
 	you handle a remote GMountSource as if it
