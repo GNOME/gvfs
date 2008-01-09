@@ -52,20 +52,37 @@ DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
 dnl ****************************
+dnl *** Checks for intltool  ***
+dnl ****************************
+
+AC_PROG_INTLTOOL([0.31.0])
+GETTEXT_PACKAGE=gvfs
+
+ALL_LINGUAS="it nb"
+
+AC_SUBST([GETTEXT_PACKAGE])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The gettext domain name])
+AM_GLIB_GNU_GETTEXT
+
+dnl ****************************
 dnl *** Checks for gettext   ***
 dnl ****************************
 
-GETTEXT_PACKAGE=gvfs
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
-AC_SUBST(GETTEXT_PACKAGE)
+dnl *** disabled by now, using intltool ***
+dnl *** we'll revert when glib-gettexttize will be able
+dnl *** to manage [enconding: UTF-8] in POTIFILES.in
 
-ALL_LINGUAS="it"
+dnl GETTEXT_PACKAGE=gvfs
+dnl AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain name])
+dnl AC_SUBST(GETTEXT_PACKAGE)
 
-AM_GLIB_GNU_GETTEXT
+dnl ALL_LINGUAS=""
 
-LIBS="$LIBS $INTLLIBS"
+dnl AM_GLIB_GNU_GETTEXT
 
-AM_GLIB_DEFINE_LOCALEDIR(GVFS_LOCALEDIR)
+dnl LIBS="$LIBS $INTLLIBS"
+
+dnl AM_GLIB_DEFINE_LOCALEDIR(GVFS_LOCALEDIR)
 
 dnl ****************************
 dnl *** Checks for ssh stuff ***

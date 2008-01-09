@@ -29,6 +29,14 @@ if $have_libtool ; then : ; else
 	DIE=1
 fi
 
+(intltoolize --version) < /dev/null > /dev/null 2>&1 || {
+	echo
+	echo "You must have intltool installed to compile $PROJECT."
+	echo "Install the appropriate package for your distribution,"
+	echo "or get the source tarball at http://ftp.gnome.org/pub/GNOME/sources/intltool"
+	DIE=1
+}
+
 (gtkdocize --version) < /dev/null > /dev/null 2>&1 || {
 	echo
 	echo "You must have gtk-doc installed to compile $PROJECT."
@@ -99,6 +107,7 @@ rm -rf autom4te.cache
 touch README INSTALL
 
 libtoolize --force || exit $?
+intltoolize --force --copy --automake || exit $?
 gtkdocize || exit $?
 
 $ACLOCAL $ACLOCAL_FLAGS || exit $?

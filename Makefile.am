@@ -12,4 +12,15 @@ SUBDIRS = \
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
-EXTRA_DIST = mkinstalldirs
+EXTRA_DIST = \
+	MAINTAINERS		\
+	intltool-extract.in	\
+	intltool-merge.in	\
+	intltool-update.in	\
+	$(NULL)
+
+DISTCLEANFILES = \
+	intltool-extract	\
+	intltool-merge		\
+	intltool-update		\
+	$(NULL)
