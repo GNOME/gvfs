@@ -1,5 +1,24 @@
 2008-01-09  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gmountsource.[ch]:
+	Add g_mount_source_get_operation() that lets
+	you handle a remote GMountSource as if it
+	was a GMountOperation.
+	
+        * common/gmountoperationdbus.c:
+        * programs/gvfs-mount.c:
+	Update to new GMountOperation APIs
+	
+        * client/gdaemonfile.c:
+        * daemon/gvfsjobmountmountable.[ch]:
+	Also let you return target by uri, as not all
+	targets are from gvfs.
+	
+        * daemon/gvfsbackendcomputer.c:
+	Initial cut at mount_mountable
+
+2008-01-09  Alexander Larsson  <alexl@redhat.com>
+
 	* client/gdaemonvfs.c (_g_daemon_vfs_get_mount_info_sync):
 	Better error return on not mounted.
 

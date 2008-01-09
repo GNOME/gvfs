@@ -65,7 +65,7 @@ prompt_for (const char *prompt, const char *default_value)
   return g_strdup (data);
 }
 
-static gboolean
+static void
 ask_password_cb (GMountOperation *op,
 		 const char      *message,
 		 const char      *default_user,
@@ -96,9 +96,7 @@ ask_password_cb (GMountOperation *op,
       g_free (s);
     }
 
-  g_mount_operation_reply (op, FALSE);
-
-  return TRUE;
+  g_mount_operation_reply (op, G_MOUNT_OPERATION_HANDLED);
 }
 
 static void

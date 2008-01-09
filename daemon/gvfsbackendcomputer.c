@@ -48,6 +48,7 @@
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
+#include "gvfsjobmountmountable.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobdelete.h"
 #include "gvfsjobqueryfsinfo.h"
@@ -718,6 +719,51 @@ try_create_dir_monitor (GVfsBackend *backend,
   return TRUE;
 }
 
+static void
+mount_volume_cb (GObject *source_object,
+                 GAsyncResult *res,
+                 gpointer user_data)
+{
+  GVfsJobMountMountable *job = user_data;
+  GError *error;
+  GMount *mount;
+  GVolume *volume;
+  GFile *root;
+  char *uri;
+  
+  volume = G_VOLUME (source_object);
+
+  /* TODO: We're leaking the GMountOperation here */
+  
+  error = NULL;
+  if (g_volume_mount_finish (volume, res, &error))
+    {
+      mount = g_volume_get_mount (volume);
+
+      if (mount)
+        {
+          root = g_mount_get_root (mount);
+          uri = g_file_get_uri (root);
+          g_vfs_job_mount_mountable_set_target_uri (job,
+                                                    uri,
+                                                    FALSE);
+          g_free (uri);
+          g_object_unref (root);
+          g_object_unref (mount);
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+        }
+      else
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                          G_IO_ERROR_FAILED,
+                          _("Can't find mount for mounted volume"));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
 static gboolean
 try_mount_mountable (GVfsBackend *backend,
                      GVfsJobMountMountable *job,
@@ -725,6 +771,7 @@ try_mount_mountable (GVfsBackend *backend,
                      GMountSource *mount_source)
 {
   ComputerFile *file;
+  GMountOperation *mount_op;
 
   file = lookup (G_VFS_BACKEND_COMPUTER (backend),
                  G_VFS_JOB (job), filename);
@@ -735,22 +782,22 @@ try_mount_mountable (GVfsBackend *backend,
                       _("Can't open directory"));
   else if (file != NULL)
     {
-#if 0
       if (file->volume)
         {
-          /* TODO: Implement */
+          mount_op = g_mount_source_get_operation (mount_source);
           g_volume_mount (file->volume,
-                          GMountOperation      *mount_operation,
-                          GCancellable         *cancellable,
-                          GAsyncReadyCallback   callback,
-                          gpointer              user_data);
+                          mount_op,
+                          G_VFS_JOB (job)->cancellable,
+                          mount_volume_cb,
+                          job);
         }
+#if 0
       else if (file->drive)
         {
           /* TODO: Poll for media? */
         }
-      else
 #endif
+      else
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
@@ -788,4 +835,5 @@ g_vfs_backend_computer_class_init (GVfsBackendComputerClass *klass)
   backend_class->try_query_info = try_query_info;
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_create_dir_monitor = try_create_dir_monitor;
+  backend_class->try_mount_mountable = try_mount_mountable;
 }

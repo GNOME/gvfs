@@ -135,6 +135,15 @@ g_vfs_job_mount_mountable_set_target (GVfsJobMountMountable *job,
   job->must_mount_location = must_mount_location;
 }
 
+void
+g_vfs_job_mount_mountable_set_target_uri (GVfsJobMountMountable *job,
+					  const char *uri,
+					  gboolean must_mount_location)
+{
+  job->target_uri = g_strdup (uri);
+  job->must_mount_location = must_mount_location;
+}
+
 static void
 run (GVfsJob *job)
 {
@@ -178,17 +187,30 @@ create_reply (GVfsJob *job,
   GVfsJobMountMountable *op_job = G_VFS_JOB_MOUNT_MOUNTABLE (job);
   DBusMessage *reply;
   DBusMessageIter iter;
-  dbus_bool_t must_mount;
+  dbus_bool_t must_mount, is_uri;
 
   reply = dbus_message_new_method_return (message);
 
-  dbus_message_iter_init_append (reply, &iter);
-  g_mount_spec_to_dbus (&iter, op_job->mount_spec);
   must_mount = op_job->must_mount_location;
-  _g_dbus_message_append_args (reply,
-			       G_DBUS_TYPE_CSTRING, &op_job->target_filename,
-			       DBUS_TYPE_BOOLEAN, &must_mount,
-			       0);
+  is_uri = op_job->target_uri != NULL;
+  if (is_uri)
+    {
+      _g_dbus_message_append_args (reply,
+				   DBUS_TYPE_BOOLEAN, &is_uri,
+				   G_DBUS_TYPE_CSTRING, &op_job->target_uri,
+				   DBUS_TYPE_BOOLEAN, &must_mount,
+				   0);
+    }
+  else
+    {
+      _g_dbus_message_append_args (reply,
+				   DBUS_TYPE_BOOLEAN, &is_uri,
+				   G_DBUS_TYPE_CSTRING, &op_job->target_filename,
+				   DBUS_TYPE_BOOLEAN, &must_mount,
+				   0);
+      dbus_message_iter_init_append (reply, &iter);
+      g_mount_spec_to_dbus (&iter, op_job->mount_spec);
+    }
   
   return reply;
 }

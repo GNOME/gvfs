@@ -68,6 +68,8 @@ gboolean      g_mount_source_ask_password             (GMountSource             
 const char *  g_mount_source_get_dbus_id              (GMountSource              *mount_source);
 const char *  g_mount_source_get_obj_path             (GMountSource              *mount_source);
 
+GMountOperation *g_mount_source_get_operation         (GMountSource              *mount_source);
+
 G_END_DECLS
 
 #endif /* __G_MOUNT_SOURCE_H__ */

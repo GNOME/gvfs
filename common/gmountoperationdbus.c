@@ -156,18 +156,20 @@ mount_op_send_reply (GMountOperationDBus *op_dbus,
 
 static void
 ask_password_reply (GMountOperation *op,
-		    gboolean abort,
+		    GMountOperationResult result,
 		    gpointer data)
 {
   DBusMessage *reply = data;
   const char *username, *password, *domain;
   dbus_bool_t anonymous;
   guint32 password_save;
-  dbus_bool_t handled = TRUE;
-  dbus_bool_t abort_dbus = abort;
+  dbus_bool_t handled, abort_dbus;
   GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
+
+  handled = (result != G_MOUNT_OPERATION_UNHANDLED);
+  abort_dbus = (result == G_MOUNT_OPERATION_ABORTED);
   
   password = g_mount_operation_get_password (op);
   if (password == NULL)
@@ -238,31 +240,24 @@ mount_op_ask_password (GMountOperationDBus *op_dbus,
 			 message_string,
 			 default_user,
 			 default_domain,
-			 flags,
-			 &res);
-
-  if (!res)
-    {
-      _g_dbus_message_append_args (reply,
-				   DBUS_TYPE_BOOLEAN, &handled,
-				   0);
-      mount_op_send_reply (op_dbus, reply);
-    }
+			 flags);
 }
 
 static void
 ask_question_reply (GMountOperation *op,
-		    gboolean abort,
+		    GMountOperationResult result,
 		    gpointer data)
 {
   DBusMessage *reply = data;
   guint32 choice;
-  dbus_bool_t handled = TRUE;
-  dbus_bool_t abort_dbus = abort;
+  dbus_bool_t handled, abort_dbus;
   GMountOperationDBus *op_dbus;
 
   op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
 
+  handled = (result != G_MOUNT_OPERATION_UNHANDLED);
+  abort_dbus = (result == G_MOUNT_OPERATION_ABORTED);
+  
   choice = g_mount_operation_get_choice (op);
 
   _g_dbus_message_append_args (reply,

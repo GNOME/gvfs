@@ -1198,15 +1198,14 @@ mount_mountable_async_cb (DBusMessage *reply,
   char *path;
   DBusMessageIter iter;
   GFile *file;
-  dbus_bool_t must_mount_location;
+  dbus_bool_t must_mount_location, is_uri;
 
   path = NULL;
-  
+
   dbus_message_iter_init (reply, &iter);
-  mount_spec = g_mount_spec_from_dbus (&iter);
   
-  if (mount_spec == NULL ||
-      !_g_dbus_message_iter_get_args (&iter, NULL,
+  if (!_g_dbus_message_iter_get_args (&iter, NULL,
+				      DBUS_TYPE_BOOLEAN, &is_uri,
 				      G_DBUS_TYPE_CSTRING, &path,
 				      DBUS_TYPE_BOOLEAN, &must_mount_location,
 				      0))
@@ -1215,26 +1214,44 @@ mount_mountable_async_cb (DBusMessage *reply,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
 				       _("Invalid return value from call"));
       g_simple_async_result_complete (result);
+
+      return;
+    }
+
+  if (is_uri)
+    {
+      file = g_file_new_for_uri (path);
     }
   else
     {
+      mount_spec = g_mount_spec_from_dbus (&iter);
+      if (mount_spec == NULL)
+	{
+	  g_simple_async_result_set_error (result,
+					   G_IO_ERROR, G_IO_ERROR_FAILED,
+					   _("Invalid return value from call"));
+	  g_simple_async_result_complete (result);
+	  return;
+	}
+      
       file = g_daemon_file_new (mount_spec, path);
       g_mount_spec_unref (mount_spec);
-      g_free (path);
-      g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
-
-      if (must_mount_location)
-	{
-	  g_file_mount_enclosing_volume (file,
-					 mount_operation,
-					 cancellable,
-					 mount_mountable_location_mounted_cb,
-					 g_object_ref (result));
-	  
-	}
-      else
-	g_simple_async_result_complete (result);
     }
+  
+  g_free (path);
+  g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
+
+  if (must_mount_location)
+    {
+      g_file_mount_enclosing_volume (file,
+				     mount_operation,
+				     cancellable,
+				     mount_mountable_location_mounted_cb,
+				     g_object_ref (result));
+      
+    }
+  else
+    g_simple_async_result_complete (result);
 }
 
 static void

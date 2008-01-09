@@ -47,6 +47,7 @@ struct _GVfsJobMountMountable
   char *filename;
   GMountSource *mount_source;
 
+  char *target_uri;
   char *target_filename;
   GMountSpec *mount_spec;
   gboolean must_mount_location;
@@ -66,6 +67,9 @@ void     g_vfs_job_mount_mountable_set_target (GVfsJobMountMountable *job,
 					       GMountSpec            *mount_spec,
 					       const char            *filename,
 					       gboolean               must_mount_location);
+void     g_vfs_job_mount_mountable_set_target_uri (GVfsJobMountMountable *job,
+						   const char            *uri,
+						   gboolean               must_mount_location);
 
 G_END_DECLS
 
