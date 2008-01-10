@@ -1,3 +1,12 @@
+2008-01-11  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Initial attempt of writing the http backend. Not much
+	there yet only a stub.
+
 2008-01-10  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackend.h:

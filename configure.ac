@@ -51,6 +51,10 @@ AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory f
 DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
+PKG_CHECK_MODULES(HTTP, libsoup-2.2)
+AC_SUBST(HTTP_CFLAGS)
+AC_SUBST(HTTP_LIBS)
+
 dnl ****************************
 dnl *** Checks for intltool  ***
 dnl ****************************

@@ -30,7 +30,7 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-localtest
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-http gvfsd-trash gvfsd-computer gvfsd-localtest
 
 mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in localtest.mount.in
 mount_DATA = ftp.mount sftp.mount trash.mount computer.mount localtest.mount
@@ -219,3 +219,17 @@ gvfsd_cdda_CPPFLAGS = \
 	-DBACKEND_TYPES='"cdda", G_VFS_TYPE_BACKEND_CDDA,'
 
 gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS)
+
+gvfsd_http_SOURCES = \
+	gvfsbackendhttp.c gvfsbackendhttp.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_http_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendhttp.h \
+	-DDEFAULT_BACKEND_TYPE=http \
+	-DMAX_JOB_THREADS=1 \
+	$(HTTP_CFLAGS) \
+	-DBACKEND_TYPES='"http", G_VFS_TYPE_BACKEND_HTTP,'
+
+gvfsd_http_LDADD = $(libraries) $(HTTP_LIBS)
