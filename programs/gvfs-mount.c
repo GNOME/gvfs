@@ -35,12 +35,16 @@ static GMainLoop *main_loop;
 
 static gboolean mount_mountable = FALSE;
 static gboolean mount_unmount = FALSE;
+static gboolean mount_list = FALSE;
+static gboolean mount_list_info = FALSE;
 
 static GOptionEntry entries[] = 
 {
-	{ "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, "Mount as mountable", NULL },
-        { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, "Unmount", NULL},
-	{ NULL }
+  { "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, "Mount as mountable", NULL },
+  { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, "Unmount", NULL},
+  { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, "List", NULL},
+  { "list-info", 'i', 0, G_OPTION_ARG_NONE, &mount_list_info, "List extra information", NULL},
+  { NULL }
 };
 
 static char *
@@ -212,6 +216,184 @@ unmount (GFile *file)
   outstanding_mounts++;
 }
 
+/* =============== list mounts ================== */
+
+static gboolean
+iterate_gmain_timeout_function (gpointer data)
+{
+  g_main_loop_quit (main_loop);
+  return FALSE;
+}
+
+static void
+iterate_gmain()
+{
+  g_timeout_add (500, iterate_gmain_timeout_function, NULL);  
+  g_main_loop_run (main_loop);
+}
+
+
+static void
+list_mounts (GList *mounts,
+	     int indent,
+	     gboolean only_with_no_volume)
+{
+  GList *l;
+  int c;
+  GMount *mount;
+  GVolume *volume;
+  char *name, *uuid, *uri;
+  GFile *root;
+  
+  for (c = 0, l = mounts; l != NULL; l = l->next, c++)
+    {
+      mount = (GMount *) l->data;
+      
+      if (only_with_no_volume)
+	{
+	  volume = g_mount_get_volume (mount);
+	  if (volume != NULL)
+	    {
+	      g_object_unref (volume);
+	      continue;
+	    }
+	}
+
+      name = g_mount_get_name (mount);
+      root = g_mount_get_root (mount);
+      uri = g_file_get_uri (root);
+      
+      g_print ("%*sMount(%d): %s -> %s\n", indent, "", c, name, uri);
+
+      if (mount_list_info)
+	{
+	  uuid = g_mount_get_uuid (mount);
+	  if (uuid)
+	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
+	  g_print ("%*scan_unmount=%d\n", indent + 2, "", g_mount_can_unmount (mount));
+	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_mount_can_eject (mount));
+	  g_free (uuid);
+	}
+      
+      g_object_unref (root);
+      g_free (name);
+      g_free (uri);
+    }  
+}
+
+
+
+static void
+list_volumes (GList *volumes,
+	      int indent,
+	      gboolean only_with_no_drive)
+{
+  GList *l, *mounts;
+  int c;
+  GMount *mount;
+  GVolume *volume;
+  GDrive *drive;
+  char *name;
+  char *uuid;
+  
+  for (c = 0, l = volumes; l != NULL; l = l->next, c++)
+    {
+      volume = (GVolume *) l->data;
+      
+      if (only_with_no_drive)
+	{
+	  drive = g_volume_get_drive (volume);
+	  if (drive != NULL)
+	    {
+	      g_object_unref (drive);
+	      continue;
+	    }
+	}
+      
+      name = g_volume_get_name (volume);
+      
+      g_print ("%*sVolume(%d): %s\n", indent, "", c, name);
+      g_free (name);
+
+      if (mount_list_info)
+	{
+	  uuid = g_volume_get_uuid (volume);
+	  if (uuid)
+	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
+	  g_print ("%*scan_mount=%d\n", indent + 2, "", g_volume_can_mount (volume));
+	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_volume_can_eject (volume));
+	  g_free (uuid);
+	}
+      
+      mount = g_volume_get_mount (volume);
+      mounts = g_list_prepend (NULL, mount);
+      list_mounts (mounts, indent + 2, FALSE);
+      g_object_unref (mount);
+      g_list_free (mounts);
+    }  
+}
+
+static void
+list_drives (GList *drives,
+	     int indent)
+{
+  GList *volumes, *l;
+  int c;
+  GDrive *drive;
+  char *name;
+  
+  for (c = 0, l = drives; l != NULL; l = l->next, c++)
+    {
+      drive = (GDrive *) l->data;
+      name = g_drive_get_name (drive);
+      
+      g_print ("%*sDrive(%d): %s\n", indent, "", c, name);
+      g_free (name);
+
+      if (mount_list_info)
+	{
+	  g_print ("%*sis_media_removable=%d\n", indent + 2, "", g_drive_is_media_removable (drive));
+	  g_print ("%*shas_media=%d\n", indent + 2, "", g_drive_has_media (drive));
+	  g_print ("%*sis_media_check_automatic=%d\n", indent + 2, "", g_drive_is_media_check_automatic (drive));
+	  g_print ("%*scan_poll_for_media=%d\n", indent + 2, "", g_drive_can_poll_for_media (drive));
+	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_drive_can_eject (drive));
+	}
+      
+      volumes = g_drive_get_volumes (drive);
+      list_volumes (volumes, indent + 2, FALSE);
+      g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
+      g_list_free (volumes);
+    }
+}
+
+
+static void
+list_monitor_items()
+{
+  GVolumeMonitor *volume_monitor;
+  GList *drives, *volumes, *mounts;
+
+  volume_monitor = g_volume_monitor_get();
+  
+  /* populate gvfs network mounts */
+  iterate_gmain();
+
+  drives = g_volume_monitor_get_connected_drives (volume_monitor);
+  list_drives (drives, 0);
+  g_list_foreach (drives, (GFunc)g_object_unref, NULL);
+  g_list_free (drives);
+  
+  volumes = g_volume_monitor_get_volumes (volume_monitor);
+  list_volumes (volumes, 0, TRUE);
+  g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
+  g_list_free (volumes);
+  
+  mounts = g_volume_monitor_get_mounts (volume_monitor);
+  list_mounts (mounts, 0, TRUE);
+  g_list_foreach (mounts, (GFunc)g_object_unref, NULL);
+  g_list_free (mounts);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -228,23 +410,25 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+
+  main_loop = g_main_loop_new (NULL, FALSE);
   
-  if (argc > 1)
+  if (mount_list)
+    list_monitor_items ();
+  else if (argc > 1)
     {
       int i;
       
       for (i = 1; i < argc; i++) {
 	file = g_file_new_for_commandline_arg (argv[i]);
-        if (mount_unmount)
-  	  unmount (file);
-        else
-  	  mount (file);
-        g_object_unref (file);
+	if (mount_unmount)
+	  unmount (file);
+	else
+	  mount (file);
+	g_object_unref (file);
       }
     }
-
-  main_loop = g_main_loop_new (NULL, FALSE);
-
+  
   if (outstanding_mounts > 0)
     g_main_loop_run (main_loop);
   

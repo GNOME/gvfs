@@ -386,18 +386,25 @@ list_mounts_reply (DBusPendingCall *pending,
   dbus_pending_call_unref (pending);
 
   b = dbus_message_iter_init (reply, &iter);
-  dbus_message_iter_recurse (&iter, &array_iter);
-
-  do
+  if (b && dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_ARRAY)
     {
-      info = g_mount_info_from_dbus (&array_iter);
-      if (info)
-	{
-	  g_mount_tracker_add_mount (tracker, info);
-	  g_mount_info_unref (info);
-	}
+      dbus_message_iter_recurse (&iter, &array_iter);
+    
+      do
+        {
+          info = g_mount_info_from_dbus (&array_iter);
+          if (info)
+    	{
+    	  g_mount_tracker_add_mount (tracker, info);
+    	  g_mount_info_unref (info);
+    	}
+        }
+      while (dbus_message_iter_next (&array_iter));
     }
-  while (dbus_message_iter_next (&array_iter));
+  else
+    {
+      /* list_mounts_reply problem - gvfsd not running? */
+    }
   
   dbus_message_unref (reply);
 }
