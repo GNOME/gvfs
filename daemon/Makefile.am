@@ -30,10 +30,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-localtest
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount computer.mount
+mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in localtest.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount computer.mount localtest.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -112,6 +112,18 @@ gvfsd_test_CPPFLAGS = \
 	-DBACKEND_TYPES='"test", G_VFS_TYPE_BACKEND_TEST,'
 
 gvfsd_test_LDADD = $(libraries)
+
+gvfsd_localtest_SOURCES = \
+	gvfsbackendlocaltest.c gvfsbackendlocaltest.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_localtest_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendlocaltest.h \
+	-DDEFAULT_BACKEND_TYPE=localtest \
+	-DBACKEND_TYPES='"localtest", G_VFS_TYPE_BACKEND_LOCALTEST,'
+
+gvfsd_localtest_LDADD = $(libraries)
 
 gvfsd_smb_SOURCES = \
 	gvfsbackendsmb.c gvfsbackendsmb.h \
