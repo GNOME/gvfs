@@ -264,8 +264,8 @@ update_from_files (GVfsBackendComputer *backend,
               filename = g_strconcat ("/", new->filename, NULL);
               g_vfs_monitor_emit_event (backend->root_monitor,
                                         G_FILE_MONITOR_EVENT_CHANGED,
-                                        backend->mount_spec, filename,
-                                        NULL, NULL);
+                                        filename,
+                                        NULL);
               g_free (filename);
             }
           
@@ -277,8 +277,8 @@ update_from_files (GVfsBackendComputer *backend,
           filename = g_strconcat ("/", old->filename, NULL);
           g_vfs_monitor_emit_event (backend->root_monitor,
                                     G_FILE_MONITOR_EVENT_DELETED,
-                                    backend->mount_spec, filename,
-                                    NULL, NULL);
+                                    filename,
+                                    NULL);
           g_free (filename);
           oldl = oldl->next;
         }
@@ -287,8 +287,8 @@ update_from_files (GVfsBackendComputer *backend,
           filename = g_strconcat ("/", new->filename, NULL);
           g_vfs_monitor_emit_event (backend->root_monitor,
                                     G_FILE_MONITOR_EVENT_CREATED,
-                                    backend->mount_spec, filename,
-                                    NULL, NULL);
+                                    filename,
+                                    NULL);
           g_free (filename);
           newl = newl->next;
         }
@@ -518,7 +518,7 @@ try_mount (GVfsBackend *backend,
                            backend,
                            NULL, 0);
 
-  computer_backend->root_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+  computer_backend->root_monitor = g_vfs_monitor_new (backend);
   
   recompute_files (computer_backend);
 

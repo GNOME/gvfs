@@ -826,8 +826,8 @@ set_trash_files (gpointer _data)
           name = g_strconcat ("/", l->data, NULL);
           g_vfs_monitor_emit_event (vfs_monitor,
                                     G_FILE_MONITOR_EVENT_DELETED,
-                                    trash_backend->mount_spec, name,
-                                    NULL, NULL);
+                                    name,
+                                    NULL);
           g_free (name);
         }
       g_list_free (removed);
@@ -837,8 +837,8 @@ set_trash_files (gpointer _data)
           name = g_strconcat ("/", l->data, NULL);
           g_vfs_monitor_emit_event (vfs_monitor,
                                     G_FILE_MONITOR_EVENT_CREATED,
-                                    trash_backend->mount_spec, name,
-                                    NULL, NULL);
+                                    name,
+                                    NULL);
           g_free (name);
         }
       g_list_free (added);
@@ -849,8 +849,8 @@ set_trash_files (gpointer _data)
           /* "fullness" changed => icon change */
           g_vfs_monitor_emit_event (vfs_monitor,
                                     G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
-                                    trash_backend->mount_spec, "/",
-                                    NULL, NULL);
+                                    "/",
+                                    NULL);
         }
       
       g_object_unref (vfs_monitor);
@@ -864,8 +864,8 @@ set_trash_files (gpointer _data)
           /* "fullness" changed => icon change */
           g_vfs_monitor_emit_event (file_vfs_monitor,
                                     G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
-                                    trash_backend->mount_spec, "/",
-                                    NULL, NULL);
+                                    "/",
+                                    NULL);
         }
       
       g_object_unref (file_vfs_monitor);
@@ -1298,7 +1298,6 @@ typedef struct {
   GObject *monitor;
   GFile *base_file;
   char *base_path;
-  GMountSpec *mount_spec;
 } MonitorProxy;
 
 static void
@@ -1306,7 +1305,6 @@ monitor_proxy_free (MonitorProxy *proxy)
 {
   g_object_unref (proxy->monitor);
   g_object_unref (proxy->base_file);
-  g_mount_spec_unref (proxy->mount_spec);
   g_free (proxy->base_path);
   g_free (proxy);
 }
@@ -1336,29 +1334,20 @@ proxy_changed (GFileMonitor* monitor,
                GFileMonitorEvent event_type,
                MonitorProxy *proxy)
 {
-  GMountSpec *file_spec;
   char *file_path;
-  GMountSpec *other_file_spec;
   char *other_file_path;
 
-  file_spec = proxy->mount_spec;
   file_path = proxy_get_trash_path (proxy, file);
 
   if (other_file)
-    {
-      other_file_spec = proxy->mount_spec;
-      other_file_path = proxy_get_trash_path (proxy, other_file);
-    }
+    other_file_path = proxy_get_trash_path (proxy, other_file);
   else
-    {
-      other_file_spec = NULL;
-      other_file_path = NULL;
-    }
+    other_file_path = NULL;
   
   g_vfs_monitor_emit_event (proxy->vfs_monitor,
                             event_type,
-                            file_spec, file_path,
-                            other_file_spec, other_file_path);
+                            file_path,
+                            other_file_path);
 
   g_free (file_path);
   g_free (other_file_path);
@@ -1528,7 +1517,7 @@ do_create_root_monitor (GVfsBackend *backend)
   G_LOCK (root_monitor);
   if (trash_backend->vfs_monitor == NULL)
     {
-      trash_backend->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+      trash_backend->vfs_monitor = g_vfs_monitor_new (backend);
       created = TRUE;
     }
   
@@ -1589,11 +1578,10 @@ do_create_dir_monitor (GVfsBackend *backend,
       if (monitor)
         {
           proxy = g_new0 (MonitorProxy, 1); 
-          proxy->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+          proxy->vfs_monitor = g_vfs_monitor_new (backend);
           proxy->monitor = G_OBJECT (monitor);
           proxy->base_path = g_strdup (filename);
           proxy->base_file = g_object_ref (file);
-          proxy->mount_spec = g_mount_spec_ref (G_VFS_BACKEND_TRASH (backend)->mount_spec);
           
           g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy,
                                   (GDestroyNotify) monitor_proxy_free);
@@ -1637,7 +1625,7 @@ do_create_file_monitor (GVfsBackend *backend,
       /* The trash:/// root */
       G_LOCK (root_monitor);
       if (trash_backend->file_vfs_monitor == NULL)
-        trash_backend->file_vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+        trash_backend->file_vfs_monitor = g_vfs_monitor_new (backend);
 
       vfs_monitor = trash_backend->file_vfs_monitor;
       g_object_add_weak_pointer (G_OBJECT (vfs_monitor), (gpointer *)&trash_backend->file_vfs_monitor);
@@ -1665,11 +1653,10 @@ do_create_file_monitor (GVfsBackend *backend,
       if (monitor)
         {
           proxy = g_new0 (MonitorProxy, 1); 
-          proxy->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+          proxy->vfs_monitor = g_vfs_monitor_new (backend);
           proxy->monitor = G_OBJECT (monitor);
           proxy->base_path = g_strdup (filename);
           proxy->base_file = g_object_ref (file);
-          proxy->mount_spec = g_mount_spec_ref (G_VFS_BACKEND_TRASH (backend)->mount_spec);
           
           g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy, (GDestroyNotify) monitor_proxy_free);
           g_signal_connect (monitor, "changed", G_CALLBACK (proxy_changed), proxy);

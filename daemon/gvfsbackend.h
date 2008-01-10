@@ -376,7 +376,7 @@ void        g_vfs_backend_unregister_mount               (GVfsBackend        *ba
 							  gpointer            user_data);
 const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);
 const char *g_vfs_backend_get_display_name               (GVfsBackend        *backend);
-const char *g_vfs_backend_get_stable_name                  (GVfsBackend        *backend);
+const char *g_vfs_backend_get_stable_name                (GVfsBackend        *backend);
 const char *g_vfs_backend_get_icon_name                  (GVfsBackend        *backend);
 GMountSpec *g_vfs_backend_get_mount_spec                 (GVfsBackend        *backend);
 GVfsDaemon *g_vfs_backend_get_daemon                     (GVfsBackend        *backend);

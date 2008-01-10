@@ -1,5 +1,13 @@
 2008-01-10  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackend.h:
+        * daemon/gvfsmonitor.[ch]:
+        * daemon/gvfsbackendcomputer.c:
+        * daemon/gvfsbackendtrash.c:
+	Make GVfsMonitor API simpler for users.
+
+2008-01-10  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsmonitor.c:
 	Remove freeing of initial ref after delay.
 

@@ -25,8 +25,7 @@
 
 #include <glib-object.h>
 #include <gio/gio.h>
-#include <gmountspec.h>
-#include <gvfsdaemon.h>
+#include <gvfsbackend.h>
 
 G_BEGIN_DECLS
 
@@ -56,13 +55,11 @@ struct _GVfsMonitorClass
 
 GType g_vfs_monitor_get_type (void) G_GNUC_CONST;
 
-GVfsMonitor* g_vfs_monitor_new             (GVfsDaemon        *daemon);
+GVfsMonitor* g_vfs_monitor_new             (GVfsBackend       *backend);
 const char * g_vfs_monitor_get_object_path (GVfsMonitor       *monitor);
 void         g_vfs_monitor_emit_event      (GVfsMonitor       *monitor,
 					    GFileMonitorEvent  event_type,
-					    GMountSpec        *file_spec,
 					    const char        *file_path,
-					    GMountSpec        *other_file_spec,
 					    const char        *other_file_path);
 
 G_END_DECLS

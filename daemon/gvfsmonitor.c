@@ -47,6 +47,9 @@
 /* TODO: Real P_() */
 #define P_(_x) (_x)
 
+
+/* TODO: Handle a connection dying and unregister its subscription */
+
 typedef struct {
   DBusConnection *connection;
   char *id;
@@ -56,6 +59,8 @@ typedef struct {
 struct _GVfsMonitorPrivate
 {
   GVfsDaemon *daemon;
+  GVfsBackend *backend; /* weak ref */
+  GMountSpec *mount_spec;
   char *object_path;
   GList *subscribers;
 };
@@ -65,6 +70,25 @@ static volatile gint path_counter = 1;
 
 G_DEFINE_TYPE (GVfsMonitor, g_vfs_monitor, G_TYPE_OBJECT)
 
+static void unsubscribe (GVfsMonitor *monitor,
+			 Subscriber *subscriber);
+
+static void
+backend_died (GVfsMonitor *monitor,
+	      GObject     *old_backend)
+{
+  Subscriber *subscriber;
+  GList *l;
+  
+  monitor->priv->backend = NULL;
+
+  while (monitor->priv->subscribers != NULL)
+    {
+      subscriber = l->data;
+      unsubscribe (monitor, subscriber);
+    }
+}
+
 static void
 g_vfs_monitor_finalize (GObject *object)
 {
@@ -72,10 +96,17 @@ g_vfs_monitor_finalize (GObject *object)
 
   monitor = G_VFS_MONITOR (object);
 
+  if (monitor->priv->backend)
+    g_object_weak_unref (G_OBJECT (monitor->priv->backend),
+			 (GWeakNotify)backend_died,
+			 monitor);
+
   g_vfs_daemon_unregister_path (monitor->priv->daemon, monitor->priv->object_path);
+  g_object_unref (monitor->priv->daemon);
+
+  g_mount_spec_unref (monitor->priv->mount_spec);
   
   g_free (monitor->priv->object_path);
-  g_object_unref (monitor->priv->daemon);
   
   if (G_OBJECT_CLASS (g_vfs_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_monitor_parent_class)->finalize) (object);
@@ -99,10 +130,36 @@ g_vfs_monitor_init (GVfsMonitor *monitor)
   monitor->priv = G_TYPE_INSTANCE_GET_PRIVATE (monitor,
 					       G_TYPE_VFS_MONITOR,
 					       GVfsMonitorPrivate);
-
   
   id = g_atomic_int_exchange_and_add (&path_counter, 1);
   monitor->priv->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
+}
+
+static gboolean
+matches_subscriber (Subscriber *subscriber,
+		    DBusConnection *connection,
+		    const char *object_path,
+		    const char *dbus_id)
+{
+  return (subscriber->connection == connection &&
+	  strcmp (subscriber->object_path, object_path) == 0 &&
+	  ((dbus_id == NULL && subscriber->id == NULL) ||
+	   (dbus_id != NULL && subscriber->id != NULL &&
+	    strcmp (subscriber->id, dbus_id) == 0)));
+}
+
+static void
+unsubscribe (GVfsMonitor *monitor,
+	     Subscriber *subscriber)
+{
+  dbus_connection_unref (subscriber->connection);
+  g_free (subscriber->id);
+  g_free (subscriber->object_path);
+  g_free (subscriber);
+  g_object_unref (monitor);
+  
+  monitor->priv->subscribers = g_list_remove (monitor->priv->subscribers, subscriber);
+  
 }
 
 static DBusHandlerResult
@@ -161,8 +218,6 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 	  dbus_error_free (&derror);
 	  
 	  dbus_connection_send (connection, reply, NULL);
-
-	  /* TODO: Handle connection dying and unregister subscription */
 	}
       else
 	{
@@ -170,19 +225,12 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 	    {
 	      subscriber = l->data;
 
-	      if (subscriber->connection == connection &&
-		  strcmp (subscriber->object_path, object_path) == 0 &&
-		  ((dbus_message_get_sender (message) == NULL && subscriber->id == NULL) ||
-		   (dbus_message_get_sender (message) != NULL && subscriber->id != NULL &&
-		    strcmp (subscriber->id, dbus_message_get_sender (message)) == 0)))
+	      if (matches_subscriber (subscriber,
+				      connection,
+				      object_path,
+				      dbus_message_get_sender (message)))
 		{
-		  dbus_connection_unref (subscriber->connection);
-		  g_free (subscriber->id);
-		  g_free (subscriber->object_path);
-		  g_free (subscriber);
-		  g_object_unref (monitor);
-
-		  monitor->priv->subscribers = g_list_delete_link (monitor->priv->subscribers, l);
+		  unsubscribe (monitor, subscriber);
 		  break;
 		}
 	    }
@@ -196,15 +244,23 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 }
 
 GVfsMonitor *
-g_vfs_monitor_new (GVfsDaemon *daemon)
+g_vfs_monitor_new (GVfsBackend *backend)
 {
   GVfsMonitor *monitor;
+  GVfsDaemon *daemon;
   
   monitor = g_object_new (G_TYPE_VFS_MONITOR, NULL);
 
-  monitor->priv->daemon = g_object_ref (daemon);
+  monitor->priv->backend = backend;
 
-  g_vfs_daemon_register_path (daemon,
+  g_object_weak_ref (G_OBJECT (backend),
+		     (GWeakNotify)backend_died,
+		     monitor);
+  
+  monitor->priv->daemon = g_object_ref (g_vfs_backend_get_daemon (backend));
+  monitor->priv->mount_spec = g_mount_spec_ref (g_vfs_backend_get_mount_spec (backend));
+
+  g_vfs_daemon_register_path (monitor->priv->daemon,
 			      monitor->priv->object_path,
 			      vfs_monitor_message_callback,
 			      monitor);
@@ -221,9 +277,7 @@ g_vfs_monitor_get_object_path (GVfsMonitor *monitor)
 void
 g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
 			  GFileMonitorEvent  event_type,
-			  GMountSpec        *file_spec,
 			  const char        *file_path,
-			  GMountSpec        *other_file_spec,
 			  const char        *other_file_path)
 {
   GList *l;
@@ -247,12 +301,12 @@ g_vfs_monitor_emit_event (GVfsMonitor       *monitor,
       dbus_message_iter_append_basic (&iter,
 				      DBUS_TYPE_UINT32,
 				      &event_type_dbus);
-      g_mount_spec_to_dbus (&iter, file_spec);
+      g_mount_spec_to_dbus (&iter, monitor->priv->mount_spec);
       _g_dbus_message_iter_append_cstring (&iter, file_path);
 
-      if (other_file_spec && other_file_path)
+      if (other_file_path)
 	{
-	  g_mount_spec_to_dbus (&iter, other_file_spec);
+	  g_mount_spec_to_dbus (&iter, monitor->priv->mount_spec);
 	  _g_dbus_message_iter_append_cstring (&iter, other_file_path);
 	}
 
