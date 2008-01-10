@@ -50,7 +50,8 @@ g_vfs_job_create_monitor_finalize (GObject *object)
   job = G_VFS_JOB_CREATE_MONITOR (object);
   
   g_free (job->filename);
-  g_free (job->object_path);
+  if (job->monitor)
+    g_object_unref (job->monitor);
   
   if (G_OBJECT_CLASS (g_vfs_job_create_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_create_monitor_parent_class)->finalize) (object);
@@ -120,10 +121,10 @@ g_vfs_job_create_monitor_new (DBusConnection *connection,
 }
 
 void
-g_vfs_job_create_monitor_set_obj_path (GVfsJobCreateMonitor *job,
-				       const char           *object_path)
+g_vfs_job_create_monitor_set_monitor (GVfsJobCreateMonitor *job,
+				      GVfsMonitor *monitor)
 {
-  job->object_path = g_strdup (object_path);
+  job->monitor = g_object_ref (monitor);
 }
 
 static void
@@ -201,6 +202,19 @@ try (GVfsJob *job)
     }
 }
 
+static gboolean
+unref_monitor_timeout (gpointer data)
+{
+  GVfsMonitor *monitor = data;
+
+  /* Unref the refcount for the VfsMonitor that we returned.
+     If we didn't get an initial subscriber this is where we free the
+     monitor */
+  g_object_unref (monitor);
+  
+  return FALSE;
+}
+
 /* Might be called on an i/o thread */
 static DBusMessage *
 create_reply (GVfsJob *job,
@@ -210,12 +224,22 @@ create_reply (GVfsJob *job,
   GVfsJobCreateMonitor *op_job = G_VFS_JOB_CREATE_MONITOR (job);
   DBusMessage *reply;
   DBusMessageIter iter;
+  const char *obj_path;
 
   reply = dbus_message_new_method_return (message);
+
+  /* Keep the monitor alive for at least 5 seconds
+     to allow for a subscribe call to come in and bump
+     the refcount */
+  g_object_ref (op_job->monitor);
+  g_timeout_add (5000,
+		 unref_monitor_timeout,
+		 op_job->monitor);
   
+  obj_path = g_vfs_monitor_get_object_path (op_job->monitor);
   dbus_message_iter_init_append (reply, &iter);
   _g_dbus_message_append_args (reply,
-			       DBUS_TYPE_OBJECT_PATH, &op_job->object_path,
+			       DBUS_TYPE_OBJECT_PATH, &obj_path,
 			       0);
   
   return reply;

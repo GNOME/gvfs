@@ -105,20 +105,6 @@ g_vfs_monitor_init (GVfsMonitor *monitor)
   monitor->priv->object_path = g_strdup_printf (OBJ_PATH_PREFIX"%d", id);
 }
 
-static gboolean
-vfs_monitor_initial_unref (gpointer data)
-{
-  GVfsMonitor *monitor = data;
-
-  /* Unref the initial refcount for the VfsMonitor. If we
-     didn't get an initial subscriber this is where we free the
-     monitor */
-     
-  g_object_unref (monitor);
-  
-  return FALSE;
-}
-
 static DBusHandlerResult
 vfs_monitor_message_callback (DBusConnection  *connection,
 			      DBusMessage     *message,
@@ -223,10 +209,6 @@ g_vfs_monitor_new (GVfsDaemon *daemon)
 			      vfs_monitor_message_callback,
 			      monitor);
 
-  g_timeout_add (5000,
-		 vfs_monitor_initial_unref,
-		 monitor);
-
   return monitor;  
 }
 
@@ -235,7 +217,6 @@ g_vfs_monitor_get_object_path (GVfsMonitor *monitor)
 {
   return monitor->priv->object_path;
 }
-
 
 void
 g_vfs_monitor_emit_event (GVfsMonitor       *monitor,

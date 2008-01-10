@@ -27,6 +27,7 @@
 #include <gvfsjob.h>
 #include <gvfsjobdbus.h>
 #include <gvfsbackend.h>
+#include <gvfsmonitor.h>
 
 G_BEGIN_DECLS
 
@@ -47,8 +48,8 @@ struct _GVfsJobCreateMonitor
   GVfsBackend *backend;
   char *filename;
   GFileMonitorFlags flags;
-  
-  char *object_path;
+
+  GVfsMonitor *monitor;
 };
 
 struct _GVfsJobCreateMonitorClass
@@ -58,12 +59,12 @@ struct _GVfsJobCreateMonitorClass
 
 GType g_vfs_job_create_monitor_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_create_monitor_new          (DBusConnection       *connection,
-						DBusMessage          *message,
-						GVfsBackend          *backend,
-						gboolean              is_directory);
-void     g_vfs_job_create_monitor_set_obj_path (GVfsJobCreateMonitor *job,
-						const char           *object_path);
+GVfsJob *g_vfs_job_create_monitor_new         (DBusConnection       *connection,
+					       DBusMessage          *message,
+					       GVfsBackend          *backend,
+					       gboolean              is_directory);
+void     g_vfs_job_create_monitor_set_monitor (GVfsJobCreateMonitor *job,
+					       GVfsMonitor          *monitor);
 
 G_END_DECLS
 

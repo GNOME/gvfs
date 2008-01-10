@@ -1,5 +1,20 @@
 2008-01-10  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsmonitor.c:
+	Remove freeing of initial ref after delay.
+
+        * daemon/gvfsjobcreatemonitor.[ch]:
+	Set the monitor as result here, not only the obj path.
+	Nicer and allows better lifetime handling.
+	If returning a obj ref, keep the monitor alive for
+	some time to allow a subscribe request.
+	
+        * daemon/gvfsbackendcomputer.c:
+        * daemon/gvfsbackendtrash.c:
+	Update to the new APIs
+
+2008-01-10  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmounttracker.c:
 	Handle error reply from list_mounts.
 

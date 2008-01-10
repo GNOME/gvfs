@@ -1532,7 +1532,7 @@ do_create_root_monitor (GVfsBackend *backend)
       created = TRUE;
     }
   
-  vfs_monitor = g_object_ref (trash_backend->vfs_monitor);
+  vfs_monitor = trash_backend->vfs_monitor;
   G_UNLOCK (root_monitor);
   
   if (created)
@@ -1565,8 +1565,8 @@ do_create_dir_monitor (GVfsBackend *backend,
       /* The trash:/// root */
       vfs_monitor = do_create_root_monitor (backend);
       
-      g_vfs_job_create_monitor_set_obj_path (job,
-                                             g_vfs_monitor_get_object_path (vfs_monitor));
+      g_vfs_job_create_monitor_set_monitor (job,
+                                            vfs_monitor);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       
       g_object_unref (vfs_monitor);
@@ -1595,11 +1595,13 @@ do_create_dir_monitor (GVfsBackend *backend,
           proxy->base_file = g_object_ref (file);
           proxy->mount_spec = g_mount_spec_ref (G_VFS_BACKEND_TRASH (backend)->mount_spec);
           
-          g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy, (GDestroyNotify) monitor_proxy_free);
+          g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy,
+                                  (GDestroyNotify) monitor_proxy_free);
           g_signal_connect (monitor, "changed", G_CALLBACK (proxy_changed), proxy);
 
-          g_vfs_job_create_monitor_set_obj_path (job,
-                                                 g_vfs_monitor_get_object_path (proxy->vfs_monitor));
+          g_vfs_job_create_monitor_set_monitor (job,
+                                                proxy->vfs_monitor);
+          g_object_unref (proxy->vfs_monitor);
 
           g_vfs_job_succeeded (G_VFS_JOB (job));
         }
@@ -1637,12 +1639,11 @@ do_create_file_monitor (GVfsBackend *backend,
       if (trash_backend->file_vfs_monitor == NULL)
         trash_backend->file_vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
 
-      vfs_monitor = g_object_ref (trash_backend->file_vfs_monitor);
+      vfs_monitor = trash_backend->file_vfs_monitor;
       g_object_add_weak_pointer (G_OBJECT (vfs_monitor), (gpointer *)&trash_backend->file_vfs_monitor);
       G_UNLOCK (root_monitor);
       
-      g_vfs_job_create_monitor_set_obj_path (job,
-                                             g_vfs_monitor_get_object_path (vfs_monitor));
+      g_vfs_job_create_monitor_set_monitor (job, vfs_monitor);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (vfs_monitor);
     }
@@ -1673,8 +1674,9 @@ do_create_file_monitor (GVfsBackend *backend,
           g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy, (GDestroyNotify) monitor_proxy_free);
           g_signal_connect (monitor, "changed", G_CALLBACK (proxy_changed), proxy);
 
-          g_vfs_job_create_monitor_set_obj_path (job,
-                                                 g_vfs_monitor_get_object_path (proxy->vfs_monitor));
+          g_vfs_job_create_monitor_set_monitor (job,
+                                                proxy->vfs_monitor);
+          g_object_unref (proxy->vfs_monitor);
 
           g_vfs_job_succeeded (G_VFS_JOB (job));
         }

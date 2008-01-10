@@ -712,8 +712,8 @@ try_create_dir_monitor (GVfsBackend *backend,
       return TRUE;
     }
   
-  g_vfs_job_create_monitor_set_obj_path (job,
-                                         g_vfs_monitor_get_object_path (computer_backend->root_monitor));
+  g_vfs_job_create_monitor_set_monitor (job,
+                                        computer_backend->root_monitor);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   return TRUE;
