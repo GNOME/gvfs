@@ -116,16 +116,20 @@ struct _GVfsBackendClass
 				 GMountSource *mount_source);
   void     (*unmount_mountable) (GVfsBackend *backend,
 				 GVfsJobUnmountMountable *job,
-				 const char *filename);
+				 const char *filename,
+				 GMountUnmountFlags flags);
   gboolean (*try_unmount_mountable)(GVfsBackend *backend,
-				 GVfsJobUnmountMountable *job,
-				 const char *filename);
+				    GVfsJobUnmountMountable *job,
+				    const char *filename,
+				    GMountUnmountFlags flags);
   void     (*eject_mountable)   (GVfsBackend *backend,
 				 GVfsJobUnmountMountable *job,
-				 const char *filename);
+				 const char *filename,
+				 GMountUnmountFlags flags);
   gboolean (*try_eject_mountable)(GVfsBackend *backend,
-				 GVfsJobUnmountMountable *job,
-				 const char *filename);
+				  GVfsJobUnmountMountable *job,
+				  const char *filename,
+				  GMountUnmountFlags flags);
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);

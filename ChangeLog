@@ -1,3 +1,30 @@
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * common/gvfsdaemonprotocol.h:
+	Implement unmount_mountable and eject_mountable
+	on client side.
+	
+        * common/gmountoperationdbus.c:
+	Fix warnings
+	
+        * daemon/gvfsbackend.[ch]:
+        * daemon/gvfsjobunmountmountable.[ch]:
+	Add unmount_mountable and eject_mountable in daemon.
+	
+        * daemon/gvfsbackendcomputer.c:
+	Implement unmount_mountable and eject_mountable
+
+        * daemon/gvfsbackendlocaltest.c:
+	Update to latest API
+	
+        * daemon/gvfsbackendsftp.c:
+	Fix indentation
+	
+        * daemon/gvfsjobunmount.c:
+	Always allow unmount if unmount is not
+	implemented.
+
 2008-01-11  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac:

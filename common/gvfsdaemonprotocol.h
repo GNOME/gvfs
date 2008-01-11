@@ -33,6 +33,8 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR "CreateDirectoryMonitor"
 #define G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR "CreateFileMonitor"
 #define G_VFS_DBUS_MOUNT_OP_MOUNT_MOUNTABLE "MountMountable"
+#define G_VFS_DBUS_MOUNT_OP_UNMOUNT_MOUNTABLE "UnountMountable"
+#define G_VFS_DBUS_MOUNT_OP_EJECT_MOUNTABLE "EjectMountable"
 #define G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME "SetDisplayName"
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
 #define G_VFS_DBUS_MOUNT_OP_TRASH "Trash"

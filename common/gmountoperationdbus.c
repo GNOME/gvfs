@@ -201,12 +201,10 @@ mount_op_ask_password (GMountOperationDBus *op_dbus,
 		       DBusMessage *message)
 {
   const char *message_string, *default_user, *default_domain;
-  dbus_bool_t handled = FALSE;
   guint32 flags;
   DBusMessageIter iter;
   DBusMessage *reply;
   DBusError error;
-  gboolean res;
 
   reply = NULL;
 

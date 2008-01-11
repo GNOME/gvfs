@@ -844,8 +844,8 @@ read_reply_async (GVfsBackendSftp *backend)
 {
   backend->reply_size_read = 0;
   g_input_stream_read_async (backend->reply_stream,
-			     &backend->reply_size, 4,
-			     0, NULL, read_reply_async_got_len, backend);
+                             &backend->reply_size, 4,
+                             0, NULL, read_reply_async_got_len, backend);
 }
 
 static void send_command (GVfsBackendSftp *backend);

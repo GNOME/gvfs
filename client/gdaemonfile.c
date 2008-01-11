@@ -821,19 +821,22 @@ query_info_async_cb (DBusMessage *reply,
 static void
 g_daemon_file_query_info_async (GFile                      *file,
 				const char                 *attributes,
-				GFileQueryInfoFlags           flags,
+				GFileQueryInfoFlags         flags,
 				int                         io_priority,
 				GCancellable               *cancellable,
 				GAsyncReadyCallback         callback,
 				gpointer                    user_data)
 {
+  guint32 dbus_flags;
+
+  dbus_flags = flags;
   do_async_path_call (file,
 		      G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
 		      cancellable,
 		      callback, user_data,
 		      query_info_async_cb, NULL, NULL,
 		      DBUS_TYPE_STRING, &attributes,
-		      DBUS_TYPE_UINT32, &flags,
+		      DBUS_TYPE_UINT32, &dbus_flags,
 		      0);
 }
 
@@ -1299,6 +1302,83 @@ g_daemon_file_mount_mountable_finish (GFile               *file,
   
   return NULL;
 }
+
+static void
+eject_mountable_async_cb (DBusMessage *reply,
+			  DBusConnection *connection,
+			  GSimpleAsyncResult *result,
+			  GCancellable *cancellable,
+			  gpointer callback_data)
+{
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_eject_mountable (GFile               *file,
+			       GMountUnmountFlags   flags,
+			       GCancellable        *cancellable,
+			       GAsyncReadyCallback  callback,
+			       gpointer             user_data)
+{
+  guint32 dbus_flags;
+
+  dbus_flags = flags;
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_EJECT_MOUNTABLE,
+		      cancellable,
+		      callback, user_data,
+		      eject_mountable_async_cb,
+		      NULL, NULL,
+		      DBUS_TYPE_UINT32, &dbus_flags,
+		      0);
+}
+
+static gboolean
+g_daemon_file_eject_mountable_finish (GFile               *file,
+				      GAsyncResult        *result,
+				      GError             **error)
+{
+  return TRUE;
+}
+
+static void
+unmount_mountable_async_cb (DBusMessage *reply,
+			    DBusConnection *connection,
+			    GSimpleAsyncResult *result,
+			    GCancellable *cancellable,
+			    gpointer callback_data)
+{
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_unmount_mountable (GFile               *file,
+				 GMountUnmountFlags   flags,
+				 GCancellable        *cancellable,
+				 GAsyncReadyCallback  callback,
+				 gpointer             user_data)
+{
+  guint32 dbus_flags;
+
+  dbus_flags = flags;
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_UNMOUNT_MOUNTABLE,
+		      cancellable,
+		      callback, user_data,
+		      eject_mountable_async_cb,
+		      NULL, NULL,
+		      DBUS_TYPE_UINT32, &dbus_flags,
+		      0);
+}
+
+static gboolean
+g_daemon_file_unmount_mountable_finish (GFile               *file,
+					GAsyncResult        *result,
+					GError             **error)
+{
+  return TRUE;
+}
+
 
 typedef struct {
   GFile *file;
@@ -1986,6 +2066,10 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->mount_enclosing_volume_finish = g_daemon_file_mount_enclosing_volume_finish;
   iface->mount_mountable = g_daemon_file_mount_mountable;
   iface->mount_mountable_finish = g_daemon_file_mount_mountable_finish;
+  iface->unmount_mountable = g_daemon_file_unmount_mountable;
+  iface->unmount_mountable_finish = g_daemon_file_unmount_mountable_finish;
+  iface->eject_mountable = g_daemon_file_eject_mountable;
+  iface->eject_mountable_finish = g_daemon_file_eject_mountable_finish;
   iface->query_filesystem_info = g_daemon_file_query_filesystem_info;
   iface->set_display_name = g_daemon_file_set_display_name;
   iface->delete_file = g_daemon_file_delete;

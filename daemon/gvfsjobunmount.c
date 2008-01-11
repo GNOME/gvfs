@@ -100,13 +100,6 @@ run (GVfsJob *job)
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->unmount == NULL)
-    {
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			_("Operation not supported by backend"));
-      return;
-    }
-  
   class->unmount (op_job->backend,
 		  op_job);
 }
@@ -118,7 +111,16 @@ try (GVfsJob *job)
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
   if (class->try_unmount == NULL)
-    return FALSE;
+    {
+      if (class->unmount == NULL)
+	{
+	  /* If unmount is not implemented we always succeed */
+	  g_vfs_job_succeeded (G_VFS_JOB (job));
+	  return TRUE;
+	}
+  
+      return FALSE;
+    }
 
   return class->try_unmount (op_job->backend,
 			     op_job);

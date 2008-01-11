@@ -705,7 +705,6 @@ do_set_attribute (GVfsBackend *backend,
 typedef struct {
   GVfsMonitor *vfs_monitor;
   GObject *monitor;
-  GMountSpec *mount_spec;
 } MonitorProxy;
 
 static void
@@ -713,7 +712,6 @@ monitor_proxy_free (MonitorProxy *proxy)
 {
   g_print ("(II) monitor_proxy_free \n");
   g_object_unref (proxy->monitor);
-  g_mount_spec_unref (proxy->mount_spec);
   g_free (proxy);
 }
 
@@ -724,31 +722,26 @@ proxy_changed (GFileMonitor* monitor,
                GFileMonitorEvent event_type,
                MonitorProxy *proxy)
 {
-  GMountSpec *file_spec;
   char *file_path;
-  GMountSpec *other_file_spec;
   char *other_file_path;
 
-  file_spec = proxy->mount_spec;
   file_path = g_file_get_path (file);
   g_print ("(II) monitor_proxy_changed: file_path = '%s' \n", file_path);
 
   if (other_file)
     {
-      other_file_spec = proxy->mount_spec;
       other_file_path = g_file_get_path (other_file);
-	  g_print ("(II) monitor_proxy_changed: other_file_path == '%s' \n", other_file_path);
+      g_print ("(II) monitor_proxy_changed: other_file_path == '%s' \n", other_file_path);
     }
   else
     {
-      other_file_spec = NULL;
       other_file_path = NULL;
     }
   
   g_vfs_monitor_emit_event (proxy->vfs_monitor,
                             event_type,
-                            file_spec, file_path,
-                            other_file_spec, other_file_path);
+                            file_path,
+                            other_file_path);
 
   g_free (file_path);
   g_free (other_file_path);
@@ -775,17 +768,19 @@ create_dir_file_monitor (GVfsBackend *backend,
   if (monitor)
     {
       proxy = g_new0 (MonitorProxy, 1); 
-      proxy->vfs_monitor = g_vfs_monitor_new (g_vfs_backend_get_daemon (backend));
+      proxy->vfs_monitor = g_vfs_monitor_new (backend);
       proxy->monitor = monitor;
-      proxy->mount_spec = g_mount_spec_ref (op_backend->mount_spec);
       
-      g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy", proxy, (GDestroyNotify) monitor_proxy_free);  //* hmm?
+      g_object_set_data_full (G_OBJECT (proxy->vfs_monitor), "monitor-proxy",
+			      proxy, (GDestroyNotify) monitor_proxy_free);  //* hmm?
       g_signal_connect (monitor, "changed", G_CALLBACK (proxy_changed), proxy);
 
-      g_vfs_job_create_monitor_set_obj_path (job, g_vfs_monitor_get_object_path (proxy->vfs_monitor));
-
-	  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_CREATE_DIR_MONITOR);
-	  g_print ("(II) create_dir_file_monitor success. \n");
+      g_vfs_job_create_monitor_set_monitor (job, proxy->vfs_monitor);
+      
+      g_object_unref (proxy->vfs_monitor);
+      
+      inject_error (backend, G_VFS_JOB (job), GVFS_JOB_CREATE_DIR_MONITOR);
+      g_print ("(II) create_dir_file_monitor success. \n");
     }
   else
     {

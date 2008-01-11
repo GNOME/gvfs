@@ -328,7 +328,7 @@ recompute_files (GVfsBackendComputer *backend)
             {
               volume = ll->data;
 
-              file = g_slice_new (ComputerFile);
+              file = g_slice_new0 (ComputerFile);
               file->drive = g_object_ref (drive);
               file->volume = volume; /* Takes ref */
               file->mount = g_volume_get_mount (volume);
@@ -614,6 +614,8 @@ file_info_from_file (ComputerFile *file,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT, file->can_eject);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
 }
 
 static gboolean
@@ -779,7 +781,7 @@ try_mount_mountable (GVfsBackend *backend,
   if (file == &root)
     g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                       G_IO_ERROR_NOT_MOUNTABLE_FILE,
-                      _("Can't open directory"));
+                      _("Not a mountable file"));
   else if (file != NULL)
     {
       if (file->volume)
@@ -808,18 +810,178 @@ try_mount_mountable (GVfsBackend *backend,
   return TRUE;
 }
 
+static void
+unmount_mount_cb (GObject *source_object,
+		  GAsyncResult *res,
+		  gpointer user_data)
+{
+  GVfsJobMountMountable *job = user_data;
+  GError *error;
+  GMount *mount;
+  
+  mount = G_MOUNT (source_object);
+
+  error = NULL;
+  if (g_mount_unmount_finish (mount, res, &error))
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+
 static gboolean
 try_unmount_mountable (GVfsBackend *backend,
-                       GVfsJobMountMountable *job,
-                       const char *filename)
+		       GVfsJobUnmountMountable *job,
+		       const char *filename,
+		       GMountUnmountFlags flags)
 {
+  ComputerFile *file;
+
+  file = lookup (G_VFS_BACKEND_COMPUTER (backend),
+                 G_VFS_JOB (job), filename);
+  
+  if (file == &root)
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      G_IO_ERROR_NOT_MOUNTABLE_FILE,
+                      _("Not a mountable file"));
+  else if (file != NULL)
+    {
+      if (file->mount)
+        {
+          g_mount_unmount (file->mount,
+                         flags,
+                         G_VFS_JOB (job)->cancellable,
+                         unmount_mount_cb,
+                         job);
+        }
+      else
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _("Can't unmount file"));
+        }
+    }
+  
+  return TRUE;
+}
+
+static void
+eject_mount_cb (GObject *source_object,
+                GAsyncResult *res,
+                gpointer user_data)
+{
+  GVfsJobMountMountable *job = user_data;
+  GError *error;
+  GMount *mount;
+  
+  mount = G_MOUNT (source_object);
+
+  error = NULL;
+  if (g_mount_eject_finish (mount, res, &error))
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+static void
+eject_volume_cb (GObject *source_object,
+                 GAsyncResult *res,
+                 gpointer user_data)
+{
+  GVfsJobMountMountable *job = user_data;
+  GError *error;
+  GVolume *volume;
+  
+  volume = G_VOLUME (source_object);
+
+  error = NULL;
+  if (g_volume_eject_finish (volume, res, &error))
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+
+static void
+eject_drive_cb (GObject *source_object,
+                GAsyncResult *res,
+                gpointer user_data)
+{
+  GVfsJobMountMountable *job = user_data;
+  GError *error;
+  GDrive *drive;
+  
+  drive = G_DRIVE (source_object);
+
+  error = NULL;
+  if (g_drive_eject_finish (drive, res, &error))
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
 }
 
 static gboolean
 try_eject_mountable (GVfsBackend *backend,
-                     GVfsJobMountMountable *job,
-                     const char *filename)
+                     GVfsJobUnmountMountable *job,
+                     const char *filename,
+                     GMountUnmountFlags flags)
 {
+  ComputerFile *file;
+
+  file = lookup (G_VFS_BACKEND_COMPUTER (backend),
+                 G_VFS_JOB (job), filename);
+  
+  if (file == &root)
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      G_IO_ERROR_NOT_MOUNTABLE_FILE,
+                      _("Not a mountable file"));
+  else if (file != NULL)
+    {
+      if (file->mount)
+        {
+          g_mount_eject (file->mount,
+                         flags,
+                         G_VFS_JOB (job)->cancellable,
+                         eject_mount_cb,
+                         job);
+        }
+      else if (file->volume)
+        {
+          g_volume_eject (file->volume,
+                          flags,
+                          G_VFS_JOB (job)->cancellable,
+                          eject_volume_cb,
+                          job);
+        }
+      else if (file->drive)
+        {
+          g_drive_eject (file->drive,
+                         flags,
+                         G_VFS_JOB (job)->cancellable,
+                         eject_drive_cb,
+                         job);
+        }
+      else
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _("Can't eject file"));
+        }
+    }
+  
+  return TRUE;
 }
 
 static void
@@ -836,4 +998,6 @@ g_vfs_backend_computer_class_init (GVfsBackendComputerClass *klass)
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_create_dir_monitor = try_create_dir_monitor;
   backend_class->try_mount_mountable = try_mount_mountable;
+  backend_class->try_unmount_mountable = try_unmount_mountable;
+  backend_class->try_eject_mountable = try_eject_mountable;
 }

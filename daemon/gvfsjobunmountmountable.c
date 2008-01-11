@@ -84,7 +84,7 @@ g_vfs_job_unmount_mountable_new (DBusConnection *connection,
   DBusMessageIter iter;
   DBusError derror;
   char *path;
-  const char *dbus_id, *obj_path;
+  guint32 flags;
   
   dbus_error_init (&derror);
   dbus_message_iter_init (message, &iter);
@@ -92,8 +92,7 @@ g_vfs_job_unmount_mountable_new (DBusConnection *connection,
   path = NULL;
   if (!_g_dbus_message_iter_get_args (&iter, &derror, 
 				      G_DBUS_TYPE_CSTRING, &path,
-				      DBUS_TYPE_STRING, &dbus_id,
-				      DBUS_TYPE_OBJECT_PATH, &obj_path,
+				      DBUS_TYPE_UINT32, &flags,
 				      0))
     {
       g_free (path);
@@ -114,6 +113,7 @@ g_vfs_job_unmount_mountable_new (DBusConnection *connection,
   job->filename = path;
   job->backend = backend;
   job->eject = eject;
+  job->flags = flags;
   
   return G_VFS_JOB (job);
 }
@@ -135,7 +135,8 @@ run (GVfsJob *job)
       
       class->eject_mountable (op_job->backend,
 			      op_job,
-			      op_job->filename);
+			      op_job->filename,
+			      op_job->flags);
     }
   else
     {
@@ -148,7 +149,8 @@ run (GVfsJob *job)
       
       class->unmount_mountable (op_job->backend,
 				op_job,
-				op_job->filename);
+				op_job->filename,
+				op_job->flags);
     }
 }
 
@@ -165,7 +167,8 @@ try (GVfsJob *job)
       
       return class->try_eject_mountable (op_job->backend,
 					 op_job,
-					 op_job->filename);
+					 op_job->filename,
+					 op_job->flags);
     }
   else
     {
@@ -174,7 +177,8 @@ try (GVfsJob *job)
       
       return class->try_unmount_mountable (op_job->backend,
 					   op_job,
-					   op_job->filename);
+					   op_job->filename,
+					   op_job->flags);
     }
 }
 
