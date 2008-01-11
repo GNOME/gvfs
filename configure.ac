@@ -62,7 +62,7 @@ dnl ****************************
 AC_PROG_INTLTOOL([0.31.0])
 GETTEXT_PACKAGE=gvfs
 
-ALL_LINGUAS="ar it nb"
+ALL_LINGUAS="ar es it nb"
 
 AC_SUBST([GETTEXT_PACKAGE])
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The gettext domain name])
