@@ -683,6 +683,9 @@ try_query_info (GVfsBackend *backend,
       icon = g_themed_icon_new ("gnome-fs-client");
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
     }
   else if (file != NULL)
     file_info_from_file (file, info);

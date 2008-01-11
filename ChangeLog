@@ -1,5 +1,10 @@
 2008-01-11  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendcomputer.c:
+	Set can't write info on the root.
+
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
 	* programs/gvfs-mount.c (list_volumes):
 	Fix crash if no mount in volume.
 
