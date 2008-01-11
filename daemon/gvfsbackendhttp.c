@@ -70,6 +70,12 @@ g_vfs_backend_http_finalize (GObject *object)
 
   backend = G_VFS_BACKEND_HTTP (object);
 
+  if (backend->mount_base)
+    soup_uri_free (backend->mount_base);
+
+  soup_session_abort (backend->session);
+  g_object_unref (backend->session);
+
   if (G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize) (object);
 }
@@ -77,7 +83,9 @@ g_vfs_backend_http_finalize (GObject *object)
 static void
 g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
-  g_vfs_backend_set_user_visible (backend, FALSE);  
+  g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
+
+  backend->session = soup_session_async_new ();
 }
 
 static gboolean
@@ -90,7 +98,7 @@ try_mount (GVfsBackend  *backend,
   GVfsBackendHttp *op_backend;
   const char      *uri_str;
   SoupUri         *uri;
-  GMountSpec *real_mount_spec;
+  GMountSpec      *real_mount_spec;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
 
@@ -116,9 +124,6 @@ try_mount (GVfsBackend  *backend,
   
   op_backend->mount_base = uri;
 
-  op_backend->session = soup_session_async_new_with_options (SOUP_SESSION_ASYNC_CONTEXT,
-                                                             g_main_context_default (),
-                                                             NULL);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   return TRUE;
 }
@@ -161,6 +166,28 @@ open_for_read_ready (GObject      *source_object,
   g_vfs_job_succeeded (job);
 }
 
+static SoupUri *
+uri_for_filename (GVfsBackendHttp *op_backend, const char *filename)
+{
+  SoupUri *uri;
+  char *path;
+
+  uri = soup_uri_copy (op_backend->mount_base);
+
+  /* "/" means "whatever mount_base is" */
+  if (!strcmp (filename, "/"))
+    return uri;
+
+  /* Otherwise, we append filename to mount_base (which is assumed to
+   * be a directory in this case).
+   */
+  path = g_build_filename (uri->path, filename, NULL);
+  g_free (uri->path);
+  uri->path = path;
+
+  return uri;
+}
+
 static gboolean 
 try_open_for_read (GVfsBackend        *backend,
                    GVfsJobOpenForRead *job,
@@ -172,9 +199,10 @@ try_open_for_read (GVfsBackend        *backend,
   SoupMessage     *msg;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = soup_uri_new_with_base (op_backend->mount_base, filename);
+  uri = uri_for_filename (op_backend, filename);
 
   msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
+  soup_uri_free (uri);
   soup_message_add_header (msg->request_headers, "User-Agent", "gvfs/" VERSION);
 
   stream = soup_input_stream_new (op_backend->session, msg);

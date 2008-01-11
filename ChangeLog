@@ -1,5 +1,16 @@
 2008-01-11  Dan Winship  <danw@gnome.org>
 
+	* daemon/gvfsbackendhttp.c (g_vfs_backend_http_finalize): cleanup
+	(g_vfs_backend_http_init): move session creation here. Don't
+	explicitly set ASYNC_CONTEXT to g_main_context_default() because
+	that trips up SoupInputStream.
+	(uri_for_filename): create a SoupUri corresponding to a filename.
+	In particular, "/" corresponds to mount_base, not the result of
+	combining mount_base with "/".
+	(try_open_for_read): use uri_for_filename, free the result.
+
+2008-01-11  Dan Winship  <danw@gnome.org>
+
 	* daemon/soup-input-stream.c (soup_input_stream_send)
 	(wrapper_callback, soup_input_stream_send_async): Fix for changes
 	to g_input_stream_set_pending() since I wrote this.
