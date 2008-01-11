@@ -422,17 +422,10 @@ soup_input_stream_send (GInputStream *stream,
   g_return_val_if_fail (SOUP_IS_INPUT_STREAM (stream), FALSE);
   priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
 
-  if (g_input_stream_has_pending (stream))
-    {
-      /* FIXME: should get this error message from gio */
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
-		   "Stream has outstanding operation");
+  if (!g_input_stream_set_pending (stream, error))
       return FALSE;
-    }
-
-  g_input_stream_set_pending (stream, TRUE);
   result = soup_input_stream_send_internal (stream, cancellable, error);
-  g_input_stream_set_pending (stream, FALSE);
+  g_input_stream_clear_pending (stream);
 
   return result;
 }
@@ -495,7 +488,7 @@ wrapper_callback (GObject *source_object, GAsyncResult *res,
   GInputStream *stream = G_INPUT_STREAM (source_object);
   SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
 
-  g_input_stream_set_pending (stream, FALSE);
+  g_input_stream_clear_pending (stream);
   if (priv->outstanding_callback)
     (*priv->outstanding_callback) (source_object, res, user_data);
   priv->outstanding_callback = NULL;
@@ -605,21 +598,20 @@ soup_input_stream_send_async (GInputStream        *stream,
 			      gpointer             user_data)
 {
   SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
+  GError *error = NULL;
 
   g_return_if_fail (SOUP_IS_INPUT_STREAM (stream));
   priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
 
-  if (g_input_stream_has_pending (stream))
+  if (!g_input_stream_set_pending (stream, &error))
     {
-      /* FIXME: should get this error message from gio */
-      g_simple_async_report_error_in_idle (G_OBJECT (stream),
-					   callback,
-					   user_data,
-					   G_IO_ERROR, G_IO_ERROR_PENDING,
-					   "Stream has outstanding operation");
+      g_simple_async_report_gerror_in_idle (G_OBJECT (stream),
+					    callback,
+					    user_data,
+					    error);
+      g_error_free (error);
       return;
     }
-  g_input_stream_set_pending (stream, TRUE);
   soup_input_stream_send_async_internal (stream, io_priority, cancellable,
 					 callback, user_data);
 }

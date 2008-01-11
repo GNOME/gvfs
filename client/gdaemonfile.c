@@ -309,7 +309,7 @@ g_daemon_file_hash (GFile *file)
 
   return
     g_str_hash (daemon_file->path) ^
-    (guint32)daemon_file->mount_spec;  /* We have unique mount_spec objects so hash directly on it */
+    G_POINTER_TO_UINT (daemon_file->mount_spec);  /* We have unique mount_spec objects so hash directly on it */
 }
 
 static gboolean

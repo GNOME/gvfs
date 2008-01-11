@@ -1,3 +1,11 @@
+2008-01-11  Dan Winship  <danw@gnome.org>
+
+	* daemon/soup-input-stream.c (soup_input_stream_send)
+	(wrapper_callback, soup_input_stream_send_async): Fix for changes
+	to g_input_stream_set_pending() since I wrote this.
+
+	* client/gdaemonfile.c (g_daemon_file_hash): x86_64 fix.
+
 2008-01-11  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendhttp.c:
