@@ -1,5 +1,10 @@
 2008-01-11  Alexander Larsson  <alexl@redhat.com>
 
+	* programs/gvfs-mount.c (list_volumes):
+	Fix crash if no mount in volume.
+
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         * common/gvfsdaemonprotocol.h:
 	Implement unmount_mountable and eject_mountable

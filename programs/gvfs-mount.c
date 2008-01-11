@@ -326,10 +326,13 @@ list_volumes (GList *volumes,
 	}
       
       mount = g_volume_get_mount (volume);
-      mounts = g_list_prepend (NULL, mount);
-      list_mounts (mounts, indent + 2, FALSE);
-      g_object_unref (mount);
-      g_list_free (mounts);
+      if (mount)
+	{
+	  mounts = g_list_prepend (NULL, mount);
+	  list_mounts (mounts, indent + 2, FALSE);
+	  g_list_free (mounts);
+	  g_object_unref (mount);
+	}
     }  
 }
 
