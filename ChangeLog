@@ -1,3 +1,7 @@
+2008-01-11  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
+
+	* configure.ac: Added "eu" (Basque) to ALL_LINGUAS.
+
 2008-01-11  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendcomputer.c:
