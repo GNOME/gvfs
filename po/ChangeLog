@@ -1,3 +1,8 @@
+2008-01-11  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* POTFILES.in: Add missing file.
+	* nb.po: Updated Norwegian bokmål translation.
+
 2008-01-10  Djihed Afifi <djihed@gmail.com> 
 
 	* ar.po: Added Arabic Translation.
