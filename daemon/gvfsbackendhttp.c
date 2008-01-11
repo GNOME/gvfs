@@ -77,6 +77,7 @@ g_vfs_backend_http_finalize (GObject *object)
 static void
 g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
+  g_vfs_backend_set_user_visible (backend, FALSE);  
 }
 
 static gboolean
@@ -89,6 +90,7 @@ try_mount (GVfsBackend  *backend,
   GVfsBackendHttp *op_backend;
   const char      *uri_str;
   SoupUri         *uri;
+  GMountSpec *real_mount_spec;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
 
@@ -108,6 +110,10 @@ try_mount (GVfsBackend  *backend,
       return TRUE;
     }
 
+  real_mount_spec = g_mount_spec_new ("http");
+  g_mount_spec_set (real_mount_spec, "uri", uri_str);
+  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  
   op_backend->mount_base = uri;
 
   op_backend->session = soup_session_async_new_with_options (SOUP_SESSION_ASYNC_CONTEXT,

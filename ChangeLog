@@ -1,3 +1,9 @@
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendhttp.c:
+	Make http mount not user visible.
+	Set backend mount spec in try_mount.
+
 2008-01-11  Christian Kellner  <gicmo@gnome.org>
 
 	* client/gdaemonvfs.c:
