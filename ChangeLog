@@ -1,3 +1,26 @@
+2008-01-11  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonvfs.c:
+	Fix the double use of a counter variable inside nested loops.
+
+	* client/Makefile.am:
+	* client/httpuri.c:
+	UriMapper added, which is needed for plain http method.
+	
+	* configure.ac:
+	Check for libsoup version >= 2.2.104
+
+	* daemon/gvfsbackendhttp.c:
+	Initial implementation of plain http methods.
+
+	* daemon/Makefile.am:
+	* daemon/http.mount.in:
+	Added.
+
+	* daemon/soup-input-stream.c:
+	* daemon/soup-input-stream.h:
+	Import of Dan Winship's libsoup based streaming classes.
+
 2008-01-11  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
 
 	* configure.ac: Added "eu" (Basque) to ALL_LINGUAS.

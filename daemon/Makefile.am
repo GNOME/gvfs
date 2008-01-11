@@ -32,8 +32,8 @@ service_DATA = gvfs-daemon.service
 
 libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-http gvfsd-trash gvfsd-computer gvfsd-localtest
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in localtest.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount computer.mount localtest.mount
+mount_in_files = ftp.mount.in sftp.mount.in http.mount.in trash.mount.in computer.mount.in localtest.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount http.mount computer.mount localtest.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -221,6 +221,7 @@ gvfsd_cdda_CPPFLAGS = \
 gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS)
 
 gvfsd_http_SOURCES = \
+	soup-input-stream.c soup-input-stream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 

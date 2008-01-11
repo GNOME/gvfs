@@ -209,18 +209,20 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   vfs->to_uri_hash = g_hash_table_new (g_str_hash, g_str_equal);
   
   mappers = g_type_children (G_VFS_TYPE_URI_MAPPER, &n_mappers);
+
   for (i = 0; i < n_mappers; i++)
     {
+      int j;
       mapper = g_object_new (mappers[i], NULL);
 
       schemes = g_vfs_uri_mapper_get_handled_schemes (mapper);
 
-      for (i = 0; schemes != NULL && schemes[i] != NULL; i++)
-	g_hash_table_insert (vfs->from_uri_hash, (char *)schemes[i], mapper);
+      for (j = 0; schemes != NULL && schemes[j] != NULL; j++)
+	g_hash_table_insert (vfs->from_uri_hash, (char *)schemes[j], mapper);
       
       mount_types = g_vfs_uri_mapper_get_handled_mount_types (mapper);
-      for (i = 0; mount_types != NULL && mount_types[i] != NULL; i++)
-	g_hash_table_insert (vfs->to_uri_hash, (char *)mount_types[i], mapper);
+      for (j = 0; mount_types != NULL && mount_types[j] != NULL; j++)
+	g_hash_table_insert (vfs->to_uri_hash, (char *)mount_types[j], mapper);
     }
 
   /* The above should have ref:ed the modules anyway */
@@ -780,6 +782,7 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 /* Module API */
 
 void g_vfs_uri_mapper_smb_register (GIOModule *module);
+void g_vfs_uri_mapper_http_register (GIOModule *module);
 
 void
 g_io_module_load (GIOModule *module)
@@ -789,6 +792,7 @@ g_io_module_load (GIOModule *module)
 
   g_vfs_uri_mapper_register (module);
   g_vfs_uri_mapper_smb_register (module);
+  g_vfs_uri_mapper_http_register (module);
 }
 
 void
