@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-09 10:56+0000\n"
-"PO-Revision-Date: 2008-01-11 13:44+0100\n"
+"POT-Creation-Date: 2008-01-11 12:53+0000\n"
+"PO-Revision-Date: 2008-01-12 09:28+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,9 @@ msgstr ""
 
 #: ../client/gdaemonfile.c:493
 msgid "Operation not supported, files on different mounts"
-msgstr "La operación no está soportada, los archivos están en diferentes puntos de montaje"
+msgstr ""
+"La operación no está soportada, los archivos están en diferentes puntos de "
+"montaje"
 
 #: ../client/gdaemonfile.c:773
 msgid "Invalid return value from get_info"
@@ -29,39 +31,39 @@ msgstr "get_info devolvió un valor no válido"
 msgid "Invalid return value from query_info"
 msgstr "query_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:871
+#: ../client/gdaemonfile.c:874
 msgid "Couldn't get stream file descriptor"
 msgstr "No se pudo obtener el descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:903 ../client/gdaemonfile.c:973
-#: ../client/gdaemonfile.c:1032 ../client/gdaemonfile.c:1091
-#: ../client/gdaemonfile.c:1153
+#: ../client/gdaemonfile.c:906 ../client/gdaemonfile.c:976
+#: ../client/gdaemonfile.c:1035 ../client/gdaemonfile.c:1094
+#: ../client/gdaemonfile.c:1156
 msgid "Invalid return value from open"
 msgstr "open devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:983 ../client/gdaemonfile.c:1042
-#: ../client/gdaemonfile.c:1101 ../client/gdaemonfile.c:1163
+#: ../client/gdaemonfile.c:986 ../client/gdaemonfile.c:1045
+#: ../client/gdaemonfile.c:1104 ../client/gdaemonfile.c:1166
 msgid "Didn't get stream file descriptor"
 msgstr "No se obtuvo un descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:1216
+#: ../client/gdaemonfile.c:1218 ../client/gdaemonfile.c:1235
 msgid "Invalid return value from call"
 msgstr "call devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:1413
+#: ../client/gdaemonfile.c:1510
 msgid "Invalid return value from get_filesystem_info"
 msgstr "get_filesystem_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:1450
+#: ../client/gdaemonfile.c:1547
 msgid "Containing mount does not exist"
 msgstr "El punto de montaje contenido no existe"
 
-#: ../client/gdaemonfile.c:1480
+#: ../client/gdaemonfile.c:1577
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nombre de archivo no válido %s"
 
-#: ../client/gdaemonfile.c:1522
+#: ../client/gdaemonfile.c:1619
 msgid "Invalid return value from query_filesystem_info"
 msgstr "query_filesystem_info devolvió un valor no válido"
 
@@ -203,32 +205,48 @@ msgstr "El archivo no existe"
 msgid "The file does not exist or isn't an audio track"
 msgstr "El archivo no existe o no es una pista de sonido"
 
-#: ../daemon/gvfsbackendcomputer.c:178 ../daemon/gvfsbackendcomputer.c:679
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:682
 msgid "Computer"
 msgstr "Equipo"
 
-#: ../daemon/gvfsbackendcomputer.c:560 ../daemon/gvfsbackendsmbbrowse.c:784
+#: ../daemon/gvfsbackendcomputer.c:561 ../daemon/gvfsbackendsmbbrowse.c:784
 #: ../daemon/gvfsbackendsmbbrowse.c:851 ../daemon/gvfsbackendsmbbrowse.c:1022
 #: ../daemon/gvfsbackendsmbbrowse.c:1096
 msgid "File doesn't exist"
 msgstr "El archivo no existe"
 
-#: ../daemon/gvfsbackendcomputer.c:578 ../daemon/gvfsbackendcomputer.c:735
-#: ../daemon/gvfsbackendtrash.c:631
+#: ../daemon/gvfsbackendcomputer.c:579 ../daemon/gvfsbackendtrash.c:631
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
 
-#: ../daemon/gvfsbackendcomputer.c:582 ../daemon/gvfsbackendcomputer.c:710
+#: ../daemon/gvfsbackendcomputer.c:583 ../daemon/gvfsbackendcomputer.c:716
 msgid "Can't open mountable file"
 msgstr ""
 
-#: ../daemon/gvfsbackendcomputer.c:637
+#: ../daemon/gvfsbackendcomputer.c:640
 msgid "Can't enumerate non-directory"
 msgstr ""
 
-#: ../daemon/gvfsbackendcomputer.c:757
+#: ../daemon/gvfsbackendcomputer.c:763
+msgid "Can't find mount for mounted volume"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:787 ../daemon/gvfsbackendcomputer.c:852
+#: ../daemon/gvfsbackendcomputer.c:952
+msgid "Not a mountable file"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:809
 msgid "Can't mount file"
 msgstr "No se puede montar el archivo"
+
+#: ../daemon/gvfsbackendcomputer.c:867
+msgid "Can't unmount file"
+msgstr "No se puede desmontar el archivo"
+
+#: ../daemon/gvfsbackendcomputer.c:983
+msgid "Can't eject file"
+msgstr "No se puede expulsar el archivo"
 
 #: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1163
 #: ../daemon/gvfsbackendsmb.c:539
@@ -341,10 +359,18 @@ msgstr "No se pudo crear el archivo temporal"
 msgid "The file was externally modified"
 msgstr "El archivo se modificó externamente"
 
+#: ../daemon/gvfsbackendlocaltest.c:103
+msgid "Injected error"
+msgstr ""
+
+#: ../daemon/gvfsbackendlocaltest.c:790
+msgid "Directory notification not supported"
+msgstr ""
+
 #: ../daemon/gvfsbackendsmb.c:179
 #, c-format
 msgid "Password required for share %s on %s"
-msgstr ""
+msgstr "Se requiere contraseña para la compartición %s en %s"
 
 #: ../daemon/gvfsbackendsmb.c:428
 msgid "Failed to allocate smb context"
@@ -352,7 +378,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendsmb.c:463
 msgid "Failed to initialize smb context"
-msgstr ""
+msgstr "Falló al inicializar el contexto smb"
 
 #: ../daemon/gvfsbackendsmb.c:470 ../daemon/gvfsbackendsmb.c:1150
 #, c-format
@@ -361,7 +387,7 @@ msgstr "%s en %s"
 
 #: ../daemon/gvfsbackendsmb.c:515
 msgid "Failed to mount smb share"
-msgstr ""
+msgstr "Falló al montar la compartición smb"
 
 #: ../daemon/gvfsbackendsmb.c:954 ../daemon/gvfsbackendsmb.c:1667
 msgid "Backup file creation failed"
@@ -370,12 +396,12 @@ msgstr "Falló la creación del archivo de respaldo"
 #: ../daemon/gvfsbackendsmb.c:1100
 #, c-format
 msgid "Backup file creation failed: %d"
-msgstr ""
+msgstr "Falló la creación del archivo de respaldo: %d"
 
 #: ../daemon/gvfsbackendsmb.c:1553
 #, c-format
 msgid "Error deleting file: %s"
-msgstr ""
+msgstr "Error al borrar el archivo: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1615
 #, c-format
@@ -397,7 +423,7 @@ msgstr "Error al eliminar el archivo destino: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1711
 msgid "Can't recursively move directory"
-msgstr ""
+msgstr "No se puede mover un directorio recursivamente"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:676
 msgid "Windows Network"
@@ -406,7 +432,7 @@ msgstr "Red de Windows"
 #: ../daemon/gvfsbackendsmbbrowse.c:682
 #, c-format
 msgid "Windows shares on %s"
-msgstr ""
+msgstr "Comparticiones Windows en %s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:779 ../daemon/gvfsbackendsmbbrowse.c:825
 msgid "The file is not a mountable"
@@ -418,17 +444,17 @@ msgstr "No es un archivo regular"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1092
 msgid "Not a directory"
-msgstr ""
+msgstr "No es un directorio"
 
 #: ../daemon/gvfsbackendtrash.c:596 ../daemon/gvfsbackendtrash.c:1164
 msgid "Trashcan"
-msgstr ""
+msgstr "Papelera de reciclaje"
 
 #: ../daemon/gvfsbackendtrash.c:1254
 msgid "Can't delete trash"
-msgstr ""
+msgstr "No se puede borrar la papelera"
 
-#: ../daemon/gvfsbackendtrash.c:1610 ../daemon/gvfsbackendtrash.c:1685
+#: ../daemon/gvfsbackendtrash.c:1600 ../daemon/gvfsbackendtrash.c:1674
 msgid "Trash directory notification not supported"
 msgstr ""
 
@@ -438,7 +464,7 @@ msgstr ""
 #: ../daemon/gvfsdaemon.c:733
 #, c-format
 msgid "Failed to accept client: %s"
-msgstr ""
+msgstr "Falló al aceptar el cliente: %s"
 
 #: ../daemon/gvfsdaemon.c:486 ../daemon/gvfsdaemon.c:733
 msgid "accept of extra fd failed"
@@ -446,11 +472,11 @@ msgstr ""
 
 #: ../daemon/gvfsdaemon.c:495
 msgid "object registration failed"
-msgstr ""
+msgstr "falló el registro del objeto"
 
 #: ../daemon/gvfsdaemon.c:1030
 msgid "Invalid backend type"
-msgstr ""
+msgstr "Tipo de backend no válido"
 
 #: ../daemon/gvfsdaemonutils.c:92
 msgid "No fd passing socket available"
@@ -462,11 +488,11 @@ msgid "Error sending fd: %s"
 msgstr ""
 
 #: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
-#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:139
-#: ../daemon/gvfsjobcreatemonitor.c:150 ../daemon/gvfsjobcreatemonitor.c:173
-#: ../daemon/gvfsjobcreatemonitor.c:191 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
 #: ../daemon/gvfsjobenumerate.c:225 ../daemon/gvfsjobmakedirectory.c:122
-#: ../daemon/gvfsjobmount.c:105 ../daemon/gvfsjobmountmountable.c:147
+#: ../daemon/gvfsjobmount.c:105 ../daemon/gvfsjobmountmountable.c:156
 #: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
 #: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
 #: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
@@ -474,14 +500,14 @@ msgstr ""
 #: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
 #: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
 #: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmount.c:106 ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:145 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
 msgid "Operation not supported by backend"
 msgstr ""
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
-msgstr ""
+msgstr "El backend no soporta enlaces simbólicos"
 
 #: ../daemon/gvfsjobsetattribute.c:123
 msgid "Failed to demarshal message"
