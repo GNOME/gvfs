@@ -272,6 +272,39 @@ try_read (GVfsBackend        *backend,
   return TRUE;
 }
 
+static gboolean
+try_seek_on_read (GVfsBackend *backend,
+                  GVfsJobSeekRead *job,
+                  GVfsBackendHandle handle,
+                  goffset    offset,
+                  GSeekType  type)
+{
+  GVfsBackendHttp *op_backend;
+  GInputStream    *stream;
+  GError          *error = NULL;
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+  stream = G_INPUT_STREAM (handle);
+
+  if (!g_seekable_seek (G_SEEKABLE (stream), offset, type,
+                        G_VFS_JOB (job)->cancellable, &error))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        error->domain,
+                        error->code,
+                        error->message);
+      g_error_free (error);
+      return FALSE;
+    }
+  else
+    {
+      g_vfs_job_seek_read_set_offset (job, g_seekable_tell (G_SEEKABLE (stream)));
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+
+  return TRUE;
+}
+
 /* *** read_close () *** */
 static void
 close_read_ready (GObject      *source_object,
@@ -350,6 +383,7 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
   backend_class->try_mount         = try_mount;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read          = try_read;
+  backend_class->try_seek_on_read  = try_seek_on_read;
   backend_class->try_close_read    = try_close_read;
   backend_class->try_query_info    = try_query_info;
 

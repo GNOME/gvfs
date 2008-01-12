@@ -1,5 +1,12 @@
 2008-01-11  Dan Winship  <danw@gnome.org>
 
+	* daemon/soup-input-stream.c: implement GSeekable (a bit hackishly
+	due to a bug in libsoup 2.2.x)
+
+	* daemon/gvfsbackendhttp.c (try_seek_on_read): implement
+
+2008-01-11  Dan Winship  <danw@gnome.org>
+
 	* daemon/gvfsbackendhttp.c (g_vfs_backend_http_finalize): cleanup
 	(g_vfs_backend_http_init): move session creation here. Don't
 	explicitly set ASYNC_CONTEXT to g_main_context_default() because

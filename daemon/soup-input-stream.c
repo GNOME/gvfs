@@ -29,7 +29,11 @@
 
 #include "soup-input-stream.h"
 
-G_DEFINE_TYPE (SoupInputStream, soup_input_stream, G_TYPE_INPUT_STREAM);
+static void soup_input_stream_seekable_iface_init (GSeekableIface *seekable_iface);
+
+G_DEFINE_TYPE_WITH_CODE (SoupInputStream, soup_input_stream, G_TYPE_INPUT_STREAM,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
+						soup_input_stream_seekable_iface_init));
 
 typedef void (*SoupInputStreamCallback) (GInputStream *);
 
@@ -38,6 +42,7 @@ typedef struct {
   GMainContext *async_context;
   SoupMessage *msg;
   gboolean got_headers;
+  goffset offset;
 
   GCancellable *cancellable;
   GSource *cancel_watch;
@@ -85,6 +90,21 @@ static gboolean soup_input_stream_close_finish (GInputStream         *stream,
 						GAsyncResult         *result,
 						GError              **error);
 
+static goffset  soup_input_stream_tell         (GSeekable            *seekable);
+  
+static gboolean soup_input_stream_can_seek     (GSeekable            *seekable);
+static gboolean soup_input_stream_seek         (GSeekable            *seekable,
+						goffset               offset,
+						GSeekType             type,
+						GCancellable         *cancellable,
+						GError              **error);
+  
+static gboolean soup_input_stream_can_truncate (GSeekable            *seekable);
+static gboolean soup_input_stream_truncate     (GSeekable            *seekable,
+						goffset               offset,
+						GCancellable         *cancellable,
+						GError              **error);
+
 static void soup_input_stream_got_headers (SoupMessage *msg, gpointer stream);
 static void soup_input_stream_got_chunk (SoupMessage *msg, gpointer stream);
 static void soup_input_stream_finished (SoupMessage *msg, gpointer stream);
@@ -125,6 +145,16 @@ soup_input_stream_class_init (SoupInputStreamClass *klass)
   stream_class->read_finish = soup_input_stream_read_finish;
   stream_class->close_async = soup_input_stream_close_async;
   stream_class->close_finish = soup_input_stream_close_finish;
+}
+
+static void
+soup_input_stream_seekable_iface_init (GSeekableIface *seekable_iface)
+{
+  seekable_iface->tell = soup_input_stream_tell;
+  seekable_iface->can_seek = soup_input_stream_can_seek;
+  seekable_iface->seek = soup_input_stream_seek;
+  seekable_iface->can_truncate = soup_input_stream_can_truncate;
+  seekable_iface->truncate_fn = soup_input_stream_truncate;
 }
 
 static void
@@ -237,6 +267,7 @@ soup_input_stream_got_chunk (SoupMessage *msg, gpointer stream)
 
       memcpy (priv->caller_buffer + priv->caller_nread, chunk, nread);
       priv->caller_nread += nread;
+      priv->offset += nread;
       chunk += nread;
       chunk_size -= nread;
     }
@@ -369,6 +400,8 @@ read_from_leftover (SoupInputStreamPrivate *priv,
       memcpy (buffer, priv->leftover_buffer + priv->leftover_offset, nread);
       priv->leftover_offset += nread;
     }
+
+  priv->offset += nread;
   return nread;
 }
 
@@ -766,6 +799,93 @@ soup_input_stream_close_finish (GInputStream  *stream,
 {
   /* Failures handled in generic close_finish code */
   return TRUE;
+}
+
+static goffset
+soup_input_stream_tell (GSeekable *seekable)
+{
+  SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (seekable);
+
+  return priv->offset;
+}
+
+static gboolean
+soup_input_stream_can_seek (GSeekable *seekable)
+{
+  return TRUE;
+}
+
+extern void soup_message_io_cleanup (SoupMessage *msg);
+
+static gboolean
+soup_input_stream_seek (GSeekable     *seekable,
+			goffset        offset,
+			GSeekType      type,
+			GCancellable  *cancellable,
+			GError       **error)
+{
+  GInputStream *stream = G_INPUT_STREAM (seekable);
+  SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (seekable);
+  char *range;
+
+  if (!g_input_stream_set_pending (stream, error))
+      return FALSE;
+
+  if (priv->msg->status != SOUP_MESSAGE_STATUS_FINISHED)
+    soup_session_cancel_message (priv->session, priv->msg);
+
+  switch (type)
+    {
+    case G_SEEK_CUR:
+      offset += priv->offset;
+      /* fall through */
+
+    case G_SEEK_SET:
+      range = g_strdup_printf ("bytes=%"G_GUINT64_FORMAT"-", (guint64)offset);
+      priv->offset = offset;
+      break;
+
+    case G_SEEK_END:
+      /* FIXME: we could send "bytes=-offset", but unless we know the
+       * Content-Length, we wouldn't be able to answer a tell() properly.
+       * We could find the Content-Length by doing a HEAD...
+       */
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		   "G_SEEK_END not currently supported");
+      break;
+
+    default:
+      g_return_val_if_reached (FALSE);
+    }
+
+  soup_message_remove_header (priv->msg->request_headers, "Range");
+  soup_message_add_header (priv->msg->request_headers, "Range", range);
+  g_free (range);
+
+  soup_session_cancel_message (priv->session, priv->msg);
+  soup_message_io_cleanup (priv->msg);
+  g_object_ref (priv->msg);
+  soup_session_queue_message (priv->session, priv->msg, NULL, NULL);
+
+  g_input_stream_clear_pending (stream);
+  return TRUE;
+}
+  
+static gboolean
+soup_input_stream_can_truncate (GSeekable *seekable)
+{
+  return FALSE;
+}
+
+static gboolean
+soup_input_stream_truncate (GSeekable     *seekable,
+			    goffset        offset,
+			    GCancellable  *cancellable,
+			    GError       **error)
+{
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+	       "Truncate not allowed on input stream");
+  return FALSE;
 }
 
 GQuark
