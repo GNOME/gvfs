@@ -14,6 +14,7 @@ daemon/gvfsbackend.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c
 daemon/gvfsbackendftp.c
+daemon/gvfsbackendhttp.c
 daemon/gvfsbackendsftp.c
 daemon/gvfsbackendlocaltest.c
 daemon/gvfsbackendsmb.c
