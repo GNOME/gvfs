@@ -1,5 +1,9 @@
 2008-01-12  Luca Ferretti  <elle.uca@libero.it>
 
+	* it.po: Updated Italian translation.
+
+2008-01-12  Luca Ferretti  <elle.uca@libero.it>
+
 	* POTFILES.in: Added new gvfsbackendhttp.c
 
 2008-01-12  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
