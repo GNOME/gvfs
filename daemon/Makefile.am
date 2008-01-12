@@ -228,6 +228,7 @@ gvfsd_http_SOURCES = \
 
 gvfsd_http_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendhttp.h \
+	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.http \
 	-DDEFAULT_BACKEND_TYPE=http \
 	-DMAX_JOB_THREADS=1 \
 	$(HTTP_CFLAGS) \

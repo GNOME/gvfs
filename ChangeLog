@@ -1,3 +1,9 @@
+2008-01-12  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/Makefile.am:
+	Set the http daemon dbus busname so that multiple mounts
+	work in the same process.
+
 2008-01-11  Dan Winship  <danw@gnome.org>
 
 	* daemon/soup-input-stream.c: implement GSeekable (a bit hackishly
