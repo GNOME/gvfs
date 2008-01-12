@@ -1,3 +1,7 @@
+2008-01-12  Leonid Kanter <leon@asplinux.ru>
+
+	* configure.ac: Added "ru" (Russian) to ALL_LINGUAS.
+
 2008-01-12  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/Makefile.am:
