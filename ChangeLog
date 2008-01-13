@@ -1,3 +1,22 @@
+2008-01-13  Christian Kellner <gicmo@gnome.org>
+
+	* client/httpuri.c: 
+	Also handle dav uris in the http mapper.
+
+	* daemon/dav.mount.in:
+	* daemon/Makefile.am:
+	Add the new dav backend.
+
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/gvfsbackendhttp.h:
+	Implement a utility function so dav and http
+	backend can share uri from filename creation.
+
+	* daemon/gvfsbackenddav.c: 
+	First attempt to write the dav backend as a subclass of http.
+	Mount, QueryInfo, Enumerate should work and Read is provided
+	by the base class.
+
 2008-01-12  Leonid Kanter <leon@asplinux.ru>
 
 	* configure.ac: Added "ru" (Russian) to ALL_LINGUAS.
