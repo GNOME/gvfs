@@ -30,10 +30,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-http gvfsd-trash gvfsd-computer gvfsd-localtest
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-http gvfsd-dav gvfsd-trash gvfsd-computer gvfsd-localtest
 
-mount_in_files = ftp.mount.in sftp.mount.in http.mount.in trash.mount.in computer.mount.in localtest.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount http.mount computer.mount localtest.mount
+mount_in_files = ftp.mount.in sftp.mount.in http.mount.in dav.mount.in trash.mount.in computer.mount.in localtest.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount http.mount dav.mount computer.mount localtest.mount
 
 if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -235,3 +235,20 @@ gvfsd_http_CPPFLAGS = \
 	-DBACKEND_TYPES='"http", G_VFS_TYPE_BACKEND_HTTP,'
 
 gvfsd_http_LDADD = $(libraries) $(HTTP_LIBS)
+
+gvfsd_dav_SOURCES = \
+	soup-input-stream.c soup-input-stream.h \
+	gvfsbackendhttp.c gvfsbackendhttp.h \
+	gvfsbackenddav.c gvfsbackenddav.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_dav_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackenddav.h \
+	-DDEFAULT_BACKEND_TYPE=dav \
+	-DMAX_JOB_THREADS=1 \
+	$(HTTP_CFLAGS) \
+	-DBACKEND_TYPES='"dav", G_VFS_TYPE_BACKEND_DAV,'
+
+gvfsd_dav_LDADD = $(libraries) $(HTTP_LIBS)
+

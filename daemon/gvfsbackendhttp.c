@@ -53,13 +53,7 @@
 #include "soup-input-stream.h"
 
 
-struct _GVfsBackendHttp
-{
-  GVfsBackend parent_instance;
 
-  SoupUri     *mount_base;
-  SoupSession *session;
-};
 
 G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND);
 
@@ -87,6 +81,31 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 
   backend->session = soup_session_async_new ();
 }
+
+SoupUri *
+g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename)
+{
+  GVfsBackendHttp *op_backend;
+  SoupUri         *uri;
+  char            *path;
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+  uri = soup_uri_copy (op_backend->mount_base);
+
+  /* "/" means "whatever mount_base is" */
+  if (!strcmp (filename, "/"))
+    return uri;
+
+  /* Otherwise, we append filename to mount_base (which is assumed to
+   * be a directory in this case).
+   */
+  path = g_build_path ("/", uri->path, filename, NULL);
+  g_free (uri->path);
+  uri->path = path;
+
+  return uri;
+}
+
 
 static gboolean
 try_mount (GVfsBackend  *backend,
@@ -120,7 +139,7 @@ try_mount (GVfsBackend  *backend,
 
   real_mount_spec = g_mount_spec_new ("http");
   g_mount_spec_set (real_mount_spec, "uri", uri_str);
-  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  g_vfs_backend_set_mount_spec (backend, real_mount_spec);
   
   op_backend->mount_base = uri;
 
@@ -166,28 +185,6 @@ open_for_read_ready (GObject      *source_object,
   g_vfs_job_succeeded (job);
 }
 
-static SoupUri *
-uri_for_filename (GVfsBackendHttp *op_backend, const char *filename)
-{
-  SoupUri *uri;
-  char *path;
-
-  uri = soup_uri_copy (op_backend->mount_base);
-
-  /* "/" means "whatever mount_base is" */
-  if (!strcmp (filename, "/"))
-    return uri;
-
-  /* Otherwise, we append filename to mount_base (which is assumed to
-   * be a directory in this case).
-   */
-  path = g_build_filename (uri->path, filename, NULL);
-  g_free (uri->path);
-  uri->path = path;
-
-  return uri;
-}
-
 static gboolean 
 try_open_for_read (GVfsBackend        *backend,
                    GVfsJobOpenForRead *job,
@@ -199,7 +196,7 @@ try_open_for_read (GVfsBackend        *backend,
   SoupMessage     *msg;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = uri_for_filename (op_backend, filename);
+  uri = g_vfs_backend_uri_for_filename (backend, filename);
 
   msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
   soup_uri_free (uri);
