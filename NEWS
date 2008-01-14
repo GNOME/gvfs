@@ -1,3 +1,12 @@
+Major changes in 0.1.2:
+* Switch to intltool fro translation setup
+* Update to latest gio APIS
+* Add mount list option to gvfs-mount
+* Specify fallback icons in hal backend
+* Implement more of computer: backend
+* Initial http backend
+* Fix get_relative_path bug on root paths
+
 Major changes in 0.1.1:
 * Use gio from glib (glib 2.15.1 required)
 * Fix translation issues
