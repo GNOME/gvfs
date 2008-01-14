@@ -13,6 +13,7 @@ daemon/daemon-main.c
 daemon/gvfsbackend.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c
+daemon/gvfsbackenddav.c
 daemon/gvfsbackendftp.c
 daemon/gvfsbackendhttp.c
 daemon/gvfsbackendsftp.c
