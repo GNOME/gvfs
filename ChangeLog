@@ -1,5 +1,10 @@
 2008-01-14  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac (DISTCHECK_CONFIGURE_FLAGS):
+	Require glib 2.15.2
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         * daemon/gvfsbackendlocaltest.c:
         * daemon/gvfsbackendtrash.c:
