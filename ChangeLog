@@ -1,3 +1,16 @@
+2008-01-13  Dan Winship  <danw@gnome.org>
+
+	* client/httpuri.c (http_from_uri): fix
+
+	* daemon/soup-output-stream.c: Initial SoupOutputStream; still
+	works like gnome-vfs http did, by storing all the writes in memory
+	until close.
+
+	* daemon/gvfsbackendhttp.c (try_create, try_replace): Implement.
+	For now we need to do HEAD-then-PUT, but we may later be able to
+	do a single PUT with "Expect: 100-continue".
+	(try_write, try_close_write): Implement.
+
 2008-01-13  Christian Kellner <gicmo@gnome.org>
 
 	* client/httpuri.c: 

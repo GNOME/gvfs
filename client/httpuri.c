@@ -109,7 +109,6 @@ http_from_uri (GVfsUriMapper *mapper,
 
       path = uri->path;
       uri->path = NULL;
-      info->mount_prefix = g_strdup (path);
       g_vfs_decoded_uri_free (uri);
     }
 

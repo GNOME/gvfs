@@ -222,6 +222,7 @@ gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS)
 
 gvfsd_http_SOURCES = \
 	soup-input-stream.c soup-input-stream.h \
+	soup-output-stream.c soup-output-stream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
@@ -238,6 +239,7 @@ gvfsd_http_LDADD = $(libraries) $(HTTP_LIBS)
 
 gvfsd_dav_SOURCES = \
 	soup-input-stream.c soup-input-stream.h \
+	soup-output-stream.c soup-output-stream.h \
 	gvfsbackendhttp.c gvfsbackendhttp.h \
 	gvfsbackenddav.c gvfsbackenddav.h \
 	daemon-main.c daemon-main.h \
