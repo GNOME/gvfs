@@ -1,3 +1,9 @@
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+        * client/httpuri.c:
+        (http_to_uri_scheme):
+	Fix some crashes
+	
 2008-01-13  Dan Winship  <danw@gnome.org>
 
 	* client/httpuri.c (http_from_uri): fix

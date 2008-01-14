@@ -192,7 +192,7 @@ http_to_uri_scheme (GVfsUriMapper    *mapper,
   gboolean     is_ssl;
 
   ssl = g_vfs_uri_mount_info_get (info, "ssl");
-  type = g_vfs_uri_mount_info_get (info, "ssl");
+  type = g_vfs_uri_mount_info_get (info, "type");
   
   if (strcmp (type, "dav") == 0)
      is_dav = TRUE;
@@ -201,16 +201,18 @@ http_to_uri_scheme (GVfsUriMapper    *mapper,
   else
      return NULL; 
 
-  is_ssl = strcmp (ssl, "true") == 0;
-
+  is_ssl =
+    ssl != NULL &&
+    strcmp (ssl, "true") == 0;
+  
   if (is_dav && is_ssl)
-      return "davs";
+    return "davs";
   else if (is_dav && !is_ssl)
-      return "dav";
+    return "dav";
   else if (!is_dav && is_ssl)
-      return "https";
+    return "https";
   else
-      return "http";
+    return "http";
 }
 
 static void
