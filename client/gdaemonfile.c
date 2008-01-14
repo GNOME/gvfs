@@ -332,6 +332,14 @@ match_prefix (const char *path, const char *prefix)
   prefix_len = strlen (prefix);
   if (strncmp (path, prefix, prefix_len) != 0)
     return NULL;
+
+  /* Handle the case where prefix is the root, so that
+   * the IS_DIR_SEPRARATOR check below works */
+  if (prefix_len > 0 &&
+      prefix[prefix_len-1] == '/')
+    prefix_len--;
+  
+  
   return path + prefix_len;
 }
 
