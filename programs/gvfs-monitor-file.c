@@ -93,7 +93,7 @@ main (int argc, char *argv[])
   if (argc > 1)
     {
       file = g_file_new_for_commandline_arg (argv[1]);
-      fmonitor = g_file_monitor_file (file, G_FILE_MONITOR_WATCH_MOUNTS, NULL);
+      fmonitor = g_file_monitor_file (file, G_FILE_MONITOR_WATCH_MOUNTS, NULL, NULL);
       g_signal_connect (fmonitor, "changed", (GCallback)file_monitor_callback, NULL);
     }
   

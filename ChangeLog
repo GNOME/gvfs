@@ -1,6 +1,15 @@
 2008-01-14  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
+        * daemon/gvfsbackendlocaltest.c:
+        * daemon/gvfsbackendtrash.c:
+        * programs/gvfs-monitor-dir.c:
+        * programs/gvfs-monitor-file.c:
+	Update to new gio API
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
         (match_prefix):
 	Handle root correctly in g_file_get_relative_path (#508719)
 

@@ -98,7 +98,7 @@ main (int argc, char *argv[])
   if (argc > 1)
     {
       file = g_file_new_for_commandline_arg (argv[1]);
-      dmonitor = g_file_monitor_directory (file, G_FILE_MONITOR_WATCH_MOUNTS, NULL);
+      dmonitor = g_file_monitor_directory (file, G_FILE_MONITOR_WATCH_MOUNTS, NULL, NULL);
       if (dmonitor != NULL)
 	g_signal_connect (dmonitor, "changed", (GCallback)dir_monitor_callback, NULL);
       else

@@ -1950,7 +1950,8 @@ g_daemon_file_move (GFile                  *source,
 static GFileMonitor*
 g_daemon_file_monitor_dir (GFile* file,
 			   GFileMonitorFlags flags,
-			   GCancellable *cancellable)
+			   GCancellable *cancellable,
+			   GError **error)
 {
   GFileMonitor *monitor;
   char *obj_path;
@@ -1964,7 +1965,7 @@ g_daemon_file_monitor_dir (GFile* file,
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_CREATE_DIR_MONITOR,
 			     &mount_info, NULL,
-			     cancellable, NULL,
+			     cancellable, error,
 			     DBUS_TYPE_UINT32, &flags_dbus,
 			     0);
   
@@ -1981,7 +1982,8 @@ g_daemon_file_monitor_dir (GFile* file,
     {
       g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
-      g_warning ("Invalid return value from monitor_dir");
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Invalid return value from monitor_dir"));
       return NULL;
     }
   
@@ -1997,7 +1999,8 @@ g_daemon_file_monitor_dir (GFile* file,
 static GFileMonitor*
 g_daemon_file_monitor_file (GFile* file,
 			    GFileMonitorFlags flags,
-			    GCancellable *cancellable)
+			    GCancellable *cancellable,
+			    GError **error)
 {
   GFileMonitor *monitor;
   char *obj_path;
@@ -2011,7 +2014,7 @@ g_daemon_file_monitor_file (GFile* file,
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_CREATE_FILE_MONITOR,
 			     &mount_info, NULL,
-			     cancellable, NULL,
+			     cancellable, error,
 			     DBUS_TYPE_UINT32, &flags_dbus,
 			     0);
   
@@ -2028,7 +2031,8 @@ g_daemon_file_monitor_file (GFile* file,
     {
       g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
-      g_warning ("Invalid return value from monitor_dir");
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		   _("Invalid return value from monitor_file"));
       return NULL;
     }
   

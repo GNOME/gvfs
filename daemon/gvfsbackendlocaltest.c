@@ -762,8 +762,8 @@ create_dir_file_monitor (GVfsBackend *backend,
   GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
   
-  if (is_dir_monitor) monitor = G_OBJECT(g_file_monitor_directory (file, flags, G_VFS_JOB (job)->cancellable));
-  else monitor = G_OBJECT(g_file_monitor_file (file, flags, G_VFS_JOB (job)->cancellable));
+  if (is_dir_monitor) monitor = G_OBJECT(g_file_monitor_directory (file, flags, G_VFS_JOB (job)->cancellable, NULL));
+  else monitor = G_OBJECT(g_file_monitor_file (file, flags, G_VFS_JOB (job)->cancellable, NULL));
 	  
   if (monitor)
     {

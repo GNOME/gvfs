@@ -1402,7 +1402,7 @@ update_trash_dir_monitors (GVfsBackendTrash *backend)
       filesdir = g_build_filename (trashdir, "files", NULL);
       file = g_file_new_for_path (filesdir);
       g_free (filesdir);
-      monitor = g_file_monitor_directory (file, 0, NULL);
+      monitor = g_file_monitor_directory (file, 0, NULL, NULL);
       g_object_unref (file);
       
       if (monitor)
@@ -1573,7 +1573,8 @@ do_create_dir_monitor (GVfsBackend *backend,
 
       monitor = g_file_monitor_directory (file,
                                           flags,
-                                          G_VFS_JOB (job)->cancellable);
+                                          G_VFS_JOB (job)->cancellable,
+					  NULL);
       
       if (monitor)
         {
@@ -1648,7 +1649,8 @@ do_create_file_monitor (GVfsBackend *backend,
 
       monitor = g_file_monitor_file (file,
                                      flags,
-                                     G_VFS_JOB (job)->cancellable);
+                                     G_VFS_JOB (job)->cancellable,
+				     NULL);
       
       if (monitor)
         {
