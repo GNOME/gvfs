@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-14 13:58+0000\n"
-"PO-Revision-Date: 2008-01-14 15:50+0100\n"
+"POT-Creation-Date: 2008-01-14 15:01+0000\n"
+"PO-Revision-Date: 2008-01-14 17:13+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,55 +17,63 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:493
+#: ../client/gdaemonfile.c:501
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "La operación no está soportada, los archivos están en diferentes puntos de "
 "montaje"
 
-#: ../client/gdaemonfile.c:773
+#: ../client/gdaemonfile.c:781
 msgid "Invalid return value from get_info"
 msgstr "get_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:802
+#: ../client/gdaemonfile.c:810
 msgid "Invalid return value from query_info"
 msgstr "query_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:874
+#: ../client/gdaemonfile.c:882
 msgid "Couldn't get stream file descriptor"
 msgstr "No se pudo obtener el descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:906 ../client/gdaemonfile.c:976
-#: ../client/gdaemonfile.c:1035 ../client/gdaemonfile.c:1094
-#: ../client/gdaemonfile.c:1156
+#: ../client/gdaemonfile.c:914 ../client/gdaemonfile.c:984
+#: ../client/gdaemonfile.c:1043 ../client/gdaemonfile.c:1102
+#: ../client/gdaemonfile.c:1164
 msgid "Invalid return value from open"
 msgstr "open devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:986 ../client/gdaemonfile.c:1045
-#: ../client/gdaemonfile.c:1104 ../client/gdaemonfile.c:1166
+#: ../client/gdaemonfile.c:994 ../client/gdaemonfile.c:1053
+#: ../client/gdaemonfile.c:1112 ../client/gdaemonfile.c:1174
 msgid "Didn't get stream file descriptor"
 msgstr "No se obtuvo un descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:1218 ../client/gdaemonfile.c:1235
+#: ../client/gdaemonfile.c:1226 ../client/gdaemonfile.c:1243
 msgid "Invalid return value from call"
 msgstr "call devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:1510
+#: ../client/gdaemonfile.c:1518
 msgid "Invalid return value from get_filesystem_info"
 msgstr "get_filesystem_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:1547
+#: ../client/gdaemonfile.c:1555
 msgid "Containing mount does not exist"
 msgstr "El punto de montaje contenido no existe"
 
-#: ../client/gdaemonfile.c:1577
+#: ../client/gdaemonfile.c:1585
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nombre de archivo no válido %s"
 
-#: ../client/gdaemonfile.c:1619
+#: ../client/gdaemonfile.c:1627
 msgid "Invalid return value from query_filesystem_info"
 msgstr "query_filesystem_info devolvió un valor no válido"
+
+#: ../client/gdaemonfile.c:1986
+msgid "Invalid return value from monitor_dir"
+msgstr "El valor devuelto por monitor_dir no es válido"
+
+#: ../client/gdaemonfile.c:2035
+msgid "Invalid return value from monitor_file"
+msgstr "El valor devuelto por monitor_file no es válido"
 
 #: ../client/gdaemonfileinputstream.c:449
 #: ../client/gdaemonfileinputstream.c:457
@@ -491,7 +499,7 @@ msgstr "Papelera de reciclaje"
 msgid "Can't delete trash"
 msgstr "No se puede borrar la papelera"
 
-#: ../daemon/gvfsbackendtrash.c:1600 ../daemon/gvfsbackendtrash.c:1674
+#: ../daemon/gvfsbackendtrash.c:1601 ../daemon/gvfsbackendtrash.c:1676
 msgid "Trash directory notification not supported"
 msgstr "No se soporta la notificación de la papelera"
 
