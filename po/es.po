@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-12 08:38+0000\n"
-"PO-Revision-Date: 2008-01-13 14:00+0100\n"
+"POT-Creation-Date: 2008-01-14 13:58+0000\n"
+"PO-Revision-Date: 2008-01-14 15:50+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -229,7 +229,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendcomputer.c:763
 msgid "Can't find mount for mounted volume"
-msgstr ""
+msgstr "No se puede encontrar montaje para el volumen montado"
 
 #: ../daemon/gvfsbackendcomputer.c:787 ../daemon/gvfsbackendcomputer.c:852
 #: ../daemon/gvfsbackendcomputer.c:952
@@ -248,15 +248,64 @@ msgstr "No se puede desmontar el archivo"
 msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
-#: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1163
+#: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:587
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "Error HTTP: %s"
+
+#: ../daemon/gvfsbackenddav.c:167
+msgid "Could not parse response"
+msgstr "No se pudo analizar la respuesta"
+
+#: ../daemon/gvfsbackenddav.c:176
+msgid "Empty response"
+msgstr "Respuesta vacía"
+
+#: ../daemon/gvfsbackenddav.c:183
+msgid "Unexpected reply from server"
+msgstr "Respuesta inesperada del servidor"
+
+#: ../daemon/gvfsbackenddav.c:448
+#, c-format
+msgid "Enter password for %s"
+msgstr "Introduzca la contraseña para %s"
+
+#: ../daemon/gvfsbackenddav.c:591
+msgid "Not a WebDAV enabled share"
+msgstr "No es una compartición activada WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:679 ../daemon/gvfsbackendftp.c:113
+#: ../daemon/gvfsbackendhttp.c:137 ../daemon/gvfsbackendsftp.c:1163
 #: ../daemon/gvfsbackendsmb.c:539
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
+
+#: ../daemon/gvfsbackenddav.c:753
+msgid "Response invalid"
+msgstr "Respuesta no válida"
+
+#: ../daemon/gvfsbackenddav.c:782 ../daemon/gvfsbackenddav.c:896
+msgid "Could not create request"
+msgstr "No se pudo crear la petición"
 
 #: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:624
 #: ../daemon/gvfsbackendsmb.c:1048
 msgid "Unsupported seek type"
 msgstr "Tipo de búsqueda no soportado"
+
+#: ../daemon/gvfsbackendhttp.c:371 ../daemon/gvfsbackendsmb.c:1650
+msgid "Target file already exists"
+msgstr "El archivo destino ya existe"
+
+#: ../daemon/gvfsbackendhttp.c:445 ../daemon/gvfsbackendsftp.c:2325
+#: ../daemon/gvfsbackendsmb.c:918
+msgid "The file was externally modified"
+msgstr "El archivo se modificó externamente"
+
+#: ../daemon/gvfsbackendhttp.c:476 ../daemon/gvfsbackendsmb.c:954
+#: ../daemon/gvfsbackendsmb.c:1667
+msgid "Backup file creation failed"
+msgstr "Falló la creación del archivo de respaldo"
 
 #: ../daemon/gvfsbackendsftp.c:249
 msgid "ssh program unexpectedly exited"
@@ -355,10 +404,6 @@ msgstr "Error al crear el archivo de respaldo: %s"
 msgid "Unable to create temporary file"
 msgstr "No se pudo crear el archivo temporal"
 
-#: ../daemon/gvfsbackendsftp.c:2325 ../daemon/gvfsbackendsmb.c:918
-msgid "The file was externally modified"
-msgstr "El archivo se modificó externamente"
-
 #: ../daemon/gvfsbackendlocaltest.c:103
 msgid "Injected error"
 msgstr "Error inyectado"
@@ -389,10 +434,6 @@ msgstr "%s en %s"
 msgid "Failed to mount smb share"
 msgstr "Falló al montar la compartición smb"
 
-#: ../daemon/gvfsbackendsmb.c:954 ../daemon/gvfsbackendsmb.c:1667
-msgid "Backup file creation failed"
-msgstr "Falló la creación del archivo de respaldo"
-
 #: ../daemon/gvfsbackendsmb.c:1100
 #, c-format
 msgid "Backup file creation failed: %d"
@@ -411,10 +452,6 @@ msgstr "Error al mover el archivo: %s"
 #: ../daemon/gvfsbackendsmb.c:1639
 msgid "Can't move directory over directory"
 msgstr "No se puede mover un directorio sobre un directoro"
-
-#: ../daemon/gvfsbackendsmb.c:1650
-msgid "Target file already exists"
-msgstr "El archivo destino ya existe"
 
 #: ../daemon/gvfsbackendsmb.c:1687
 #, c-format
@@ -458,22 +495,6 @@ msgstr "No se puede borrar la papelera"
 msgid "Trash directory notification not supported"
 msgstr "No se soporta la notificación de la papelera"
 
-#. The fd connection failed, abort the whole thing
-#. Didn't accept a dbus connection, and there is no need for one now
-#: ../daemon/gvfsdaemon.c:486 ../daemon/gvfsdaemon.c:495
-#: ../daemon/gvfsdaemon.c:733
-#, c-format
-msgid "Failed to accept client: %s"
-msgstr "Falló al aceptar el cliente: %s"
-
-#: ../daemon/gvfsdaemon.c:486 ../daemon/gvfsdaemon.c:733
-msgid "accept of extra fd failed"
-msgstr ""
-
-#: ../daemon/gvfsdaemon.c:495
-msgid "object registration failed"
-msgstr "falló el registro del objeto"
-
 #: ../daemon/gvfsdaemon.c:1030
 msgid "Invalid backend type"
 msgstr "Tipo de backend no válido"
@@ -485,7 +506,7 @@ msgstr ""
 #: ../daemon/gvfsdaemonutils.c:102
 #, c-format
 msgid "Error sending fd: %s"
-msgstr ""
+msgstr "Error al enviar el descriptor de archivo: %s"
 
 #: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
 #: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
@@ -686,7 +707,7 @@ msgstr "Unidad de almacenamiento masivo"
 
 #: ../hal/ghaldrive.c:627
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
+msgstr "Falló al expulsar el medio, uno o más volúmenes están ocupados en el medio."
 
 #: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:137
 msgid "CD-ROM Disc"
@@ -829,17 +850,17 @@ msgstr "Disco virgen"
 #: ../hal/ghalmount.c:199 ../hal/ghalvolume.c:188
 #, c-format
 msgid "%.1f kB Media"
-msgstr ""
+msgstr "Medio de %.1f kiB"
 
 #: ../hal/ghalmount.c:204 ../hal/ghalvolume.c:193
 #, c-format
 msgid "%.1f MB Media"
-msgstr ""
+msgstr "Medio de %.1f MiB"
 
 #: ../hal/ghalmount.c:209 ../hal/ghalvolume.c:198
 #, c-format
 msgid "%.1f GB Media"
-msgstr ""
+msgstr "Medio de %.1f GiB"
 
 #: ../hal/ghalmount.c:287 ../hal/ghalvolume.c:246
 msgid "Mixed Audio/Data Disc"
