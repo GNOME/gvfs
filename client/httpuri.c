@@ -70,17 +70,14 @@ http_from_uri (GVfsUriMapper *mapper,
 	      const char     *uri_str)
 {
   GVfsUriMountInfo *info;
-  gboolean          ssl;
-  char             *path;
+  char *path;
+  gboolean ssl;
 
   if (!g_ascii_strncasecmp (uri_str, "http", 4))
     {
-      ssl = !g_ascii_strncasecmp (uri_str, "https", 5);
       info = g_vfs_uri_mount_info_new ("http");
-      path = g_strdup ("/");
-
       g_vfs_uri_mount_info_set (info, "uri", uri_str);
-
+      path = g_strdup ("/");
     }
   else
     {
@@ -93,6 +90,7 @@ http_from_uri (GVfsUriMapper *mapper,
 
       info = g_vfs_uri_mount_info_new ("dav");
       ssl = !g_ascii_strcasecmp (uri->scheme, "davs");
+      g_vfs_uri_mount_info_set (info, "ssl", ssl ? "true" : "false");
 
       if (uri->host && *uri->host)
           g_vfs_uri_mount_info_set (info, "host", uri->host);
@@ -109,13 +107,12 @@ http_from_uri (GVfsUriMapper *mapper,
 
       path = uri->path;
       uri->path = NULL;
+      
       g_vfs_decoded_uri_free (uri);
     }
 
 
   info->path = path;
-  g_vfs_uri_mount_info_set (info, "ssl", ssl ? "true" : "false");
-
   return info;
 }
 

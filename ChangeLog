@@ -1,6 +1,12 @@
 2008-01-14  Alexander Larsson  <alexl@redhat.com>
 
         * client/httpuri.c:
+        (http_from_uri):
+	Only set "ssl" key in dav case.
+	
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+        * client/httpuri.c:
         (http_to_uri_scheme):
 	Fix some crashes
 	
