@@ -483,7 +483,7 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
   if (data->fd == -1)
     {
       /* The fd connection failed, abort the whole thing */
-      g_warning (_("Failed to accept client: %s"), _("accept of extra fd failed"));
+      g_warning ("Failed to accept client: %s", "accept of extra fd failed");
       dbus_connection_unref (dbus_conn);
       goto error_out;
     }
@@ -492,7 +492,7 @@ daemon_peer_connection_setup (GVfsDaemon *daemon,
   if (!dbus_connection_add_filter (dbus_conn, peer_to_peer_filter_func, daemon, NULL) ||
       !dbus_connection_add_filter (dbus_conn, daemon_message_func, daemon, NULL))
     {
-      g_warning (_("Failed to accept client: %s"), _("object registration failed"));
+      g_warning ("Failed to accept client: %s", "object registration failed");
       dbus_connection_unref (dbus_conn);
       close (data->fd);
       goto error_out;
@@ -730,7 +730,7 @@ accept_new_fd_client (GIOChannel  *channel,
   else if (data->fd == -1)
     {
       /* Didn't accept a dbus connection, and there is no need for one now */
-      g_warning (_("Failed to accept client: %s"), _("accept of extra fd failed"));
+      g_warning ("Failed to accept client: %s", "accept of extra fd failed");
       dbus_server_disconnect (data->server);
       dbus_server_unref (data->server);
       new_connection_data_free (data);
