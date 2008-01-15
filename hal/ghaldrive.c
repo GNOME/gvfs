@@ -347,7 +347,7 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (user_data);
   
-  //g_warning ("volhal modifying %s (property %s changed)", hal_drive->device_path, key);
+  /*g_warning ("volhal modifying %s (property %s changed)", hal_drive->device_path, key);*/
   _update_from_hal (hal_drive, TRUE);
 }
 
@@ -641,7 +641,7 @@ _eject_unmount_mounts_cb (GObject *source_object,
   else
     {
 
-      g_warning ("successfully unmount %p", mount);
+      /*g_warning ("successfully unmounted %p", mount);*/
 
       /* move on to the next mount.. */
       _eject_unmount_mounts (data);
@@ -658,7 +658,7 @@ _eject_unmount_mounts (UnmountMountsOp *data)
   if (data->pending_mounts == NULL)
     {
 
-      g_warning ("all pending mounts done; ejecting drive");
+      /*g_warning ("all pending mounts done; ejecting drive");*/
 
       g_hal_drive_eject_do (data->drive,
                             data->cancellable,
@@ -671,7 +671,7 @@ _eject_unmount_mounts (UnmountMountsOp *data)
       mount = data->pending_mounts->data;
       data->pending_mounts = g_list_remove (data->pending_mounts, mount);
 
-      g_warning ("unmounting %p", mount);
+      /*g_warning ("unmounting %p", mount);*/
 
       g_mount_unmount (mount,
                        data->flags,
@@ -707,7 +707,7 @@ g_hal_drive_eject (GDrive              *drive,
       GMount *mount; /* the mount may be foreign; cannot assume GHalMount */
 
       mount = g_volume_get_mount (G_VOLUME (volume));
-      if (mount != NULL)
+      if (mount != NULL && g_mount_can_unmount (mount))
         data->pending_mounts = g_list_prepend (data->pending_mounts, g_object_ref (mount));
     }
 
@@ -794,7 +794,7 @@ g_hal_drive_poll_for_media (GDrive              *drive,
   data->user_data = user_data;
   data->cancellable = cancellable;
 
-  //g_warning ("Rescanning udi %s", hal_device_get_udi (hal_drive->device));
+  /*g_warning ("Rescanning udi %s", hal_device_get_udi (hal_drive->device));*/
   
   con = hal_pool_get_dbus_connection (hal_drive->pool);
   
@@ -832,7 +832,7 @@ g_hal_drive_poll_for_media_finish (GDrive        *drive,
                                    GAsyncResult  *result,
                                    GError       **error)
 {
-  //g_warning ("poll finish");
+  /*g_warning ("poll finish");*/
   return TRUE;
 }
 

@@ -336,7 +336,7 @@ hal_changed (HalPool    *pool,
 {
   GHalVolumeMonitor *monitor = G_HAL_VOLUME_MONITOR (user_data);
   
-  //g_warning ("hal changed");
+  /*g_warning ("hal changed");*/
   
   update_drives (monitor);
   update_volumes (monitor);
@@ -360,7 +360,7 @@ g_hal_volume_monitor_constructor (GType                  type,
       return object;
     }
 
-  //g_warning ("creating hal vm");
+  /*g_warning ("creating hal vm");*/
 
   object = NULL;
 
@@ -551,6 +551,23 @@ g_hal_volume_monitor_lookup_volume_for_mount_path (GHalVolumeMonitor *monitor,
   return NULL;
 }
 
+static GHalVolume *
+g_hal_volume_monitor_lookup_volume_for_device_path (GHalVolumeMonitor *monitor,
+                                                    const char         *device_path)
+{
+  GList *l;
+
+  for (l = monitor->volumes; l != NULL; l = l->next)
+    {
+      GHalVolume *volume = l->data;
+
+      if (g_hal_volume_has_device_path (volume, device_path))
+	return volume;
+    }
+  
+  return NULL;
+}
+
 
 
 static GHalMount *
@@ -651,7 +668,7 @@ _should_volume_be_ignored (HalDevice *d)
   
   if (volume_fsusage == NULL)
     {
-      //g_warning ("no volume.fsusage property. Refusing to ignore");
+      /*g_warning ("no volume.fsusage property. Refusing to ignore");*/
       return FALSE;
     }
 
@@ -696,7 +713,7 @@ update_drives (GHalVolumeMonitor *monitor)
       drive = find_drive_by_udi (monitor, hal_device_get_udi (d));
       if (drive != NULL)
         {
-          //g_warning ("hal removing drive %s", hal_device_get_property_string (d, "block.device"));
+          /*g_warning ("hal removing drive %s", hal_device_get_property_string (d, "block.device"));*/
           g_hal_drive_disconnected (drive);
           monitor->drives = g_list_remove (monitor->drives, drive);
           g_signal_emit_by_name (monitor, "drive_disconnected", drive);
@@ -711,7 +728,7 @@ update_drives (GHalVolumeMonitor *monitor)
       drive = find_drive_by_udi (monitor, hal_device_get_udi (d));
       if (drive == NULL)
         {
-          //g_warning ("hal adding drive %s", hal_device_get_property_string (d, "block.device"));
+          /*g_warning ("hal adding drive %s", hal_device_get_property_string (d, "block.device"));*/
           drive = g_hal_drive_new (G_VOLUME_MONITOR (monitor), d, monitor->pool);
           if (drive != NULL)
             {
@@ -764,7 +781,7 @@ update_volumes (GHalVolumeMonitor *monitor)
       volume = find_volume_by_udi (monitor, hal_device_get_udi (d));
       if (volume != NULL)
         {
-          //g_warning ("hal removing vol %s", hal_device_get_property_string (d, "block.device"));
+          /*g_warning ("hal removing vol %s", hal_device_get_property_string (d, "block.device"));*/
           g_hal_volume_removed (volume);
           monitor->volumes = g_list_remove (monitor->volumes, volume);
           g_signal_emit_by_name (monitor, "volume_removed", volume);
@@ -782,8 +799,8 @@ update_volumes (GHalVolumeMonitor *monitor)
         {
           drive = find_drive_by_udi (monitor, hal_device_get_property_string (d, "block.storage_device"));
 
-          //g_warning ("hal adding vol %s (drive %p)", hal_device_get_property_string (d, "block.device"), drive);
-          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, drive);
+          /*g_warning ("hal adding vol %s (drive %p)", hal_device_get_property_string (d, "block.device"), drive);*/
+          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, TRUE, drive);
           if (volume != NULL)
             {
               monitor->volumes = g_list_prepend (monitor->volumes, volume);
@@ -807,6 +824,7 @@ update_mounts (GHalVolumeMonitor *monitor)
   GList *l;
   GHalMount *mount;
   GHalVolume *volume;
+  const char *device_path;
   const char *mount_path;
   
   new_mounts = g_unix_mounts_get (NULL);
@@ -822,7 +840,7 @@ update_mounts (GHalVolumeMonitor *monitor)
       GUnixMountEntry *mount_entry = l->data;
       
       mount = find_mount_by_mount_path (monitor, g_unix_mount_get_mount_path (mount_entry));
-      //g_warning ("hal removing mount %s (%p)", g_unix_mount_get_device_path (mount_entry), mount);
+      /*g_warning ("hal removing mount %s (%p)", g_unix_mount_get_device_path (mount_entry), mount);*/
       if (mount)
 	{
 	  g_hal_mount_unmounted (mount);
@@ -837,10 +855,14 @@ update_mounts (GHalVolumeMonitor *monitor)
     {
       GUnixMountEntry *mount_entry = l->data;
 
+      device_path = g_unix_mount_get_device_path (mount_entry);
       mount_path = g_unix_mount_get_mount_path (mount_entry);
-      volume = g_hal_volume_monitor_lookup_volume_for_mount_path (monitor, mount_path);
+      volume = g_hal_volume_monitor_lookup_volume_for_device_path (monitor, device_path);
+      if (volume == NULL) {
+        volume = g_hal_volume_monitor_lookup_volume_for_mount_path (monitor, mount_path);
+      }
 
-      //g_warning ("hal adding mount %s (vol %p)", g_unix_mount_get_device_path (mount_entry), volume);
+      /*g_warning ("hal adding mount %s (vol %p)", g_unix_mount_get_device_path (mount_entry), volume);*/
       mount = g_hal_mount_new (G_VOLUME_MONITOR (monitor), mount_entry, monitor->pool, volume);
       if (mount)
 	{
@@ -865,7 +887,7 @@ update_discs (GHalVolumeMonitor *monitor)
   GList *l, *ll;
   GHalDrive *drive;
   GHalVolume *volume;
-  GHalMount *mount;
+  GHalMount *mount = NULL;
   const char *udi;
   const char *drive_udi;
 
@@ -901,7 +923,7 @@ update_discs (GHalVolumeMonitor *monitor)
       HalDevice *d = l->data;
 
       udi = hal_device_get_udi (d);
-      //g_warning ("audio/blank disc removing %s", udi);
+      /*g_warning ("audio/blank disc removing %s", udi);*/
 
       mount = find_disc_mount_by_udi (monitor, udi);
       if (mount != NULL)
@@ -929,7 +951,7 @@ update_discs (GHalVolumeMonitor *monitor)
       HalDevice *d = l->data;
 
       udi = hal_device_get_udi (d);
-      //g_warning ("audio/blank disc adding %s", udi);
+      /*g_warning ("audio/blank disc adding %s", udi);*/
 
       drive_udi = hal_device_get_property_string (d, "block.storage_device");
       drive = find_drive_by_udi (monitor, drive_udi);
@@ -937,7 +959,8 @@ update_discs (GHalVolumeMonitor *monitor)
         {
           if (hal_device_get_property_bool (d, "volume.disc.is_blank"))
             {
-              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, drive);
+              /* burn:/// is not mountable ... */
+              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, FALSE, drive);
               if (volume != NULL)
                 {
                   GFile *file;
@@ -966,7 +989,7 @@ update_discs (GHalVolumeMonitor *monitor)
               g_free (device_basename);
               g_free (uri);
 
-              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, foreign_mount_root, drive);
+              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, foreign_mount_root, TRUE, drive);
               g_object_unref (foreign_mount_root);
               mount = NULL;
             }

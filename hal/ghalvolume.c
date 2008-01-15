@@ -55,6 +55,7 @@ struct _GHalVolume {
    */
   GFile *foreign_mount_root;
   GMount *foreign_mount;
+  gboolean is_mountable;
 
   char *name;
   char *icon;
@@ -311,7 +312,7 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (user_data);
   
-  //g_warning ("hal modifying %s (property %s changed)", hal_volume->device_path, key);
+  /*g_warning ("hal modifying %s (property %s changed)", hal_volume->device_path, key);*/
   update_from_hal (hal_volume, TRUE);
 }
 
@@ -348,6 +349,7 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
                   HalDevice        *device,
                   HalPool          *pool,
                   GFile            *foreign_mount_root,
+                  gboolean          is_mountable,
                   GHalDrive        *drive)
 {
   GHalVolume *volume;
@@ -370,6 +372,7 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
   volume->device = g_object_ref (device);
   volume->drive_device = g_object_ref (drive_device);
   volume->foreign_mount_root = foreign_mount_root != NULL ? g_object_ref (foreign_mount_root) : NULL;
+  volume->is_mountable = is_mountable;
   
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
@@ -494,7 +497,8 @@ g_hal_volume_get_uuid (GVolume *volume)
 static gboolean
 g_hal_volume_can_mount (GVolume *volume)
 {
-  return TRUE;
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+  return hal_volume->is_mountable;
 }
 
 static gboolean
@@ -535,6 +539,15 @@ g_hal_volume_has_mount_path (GHalVolume *volume,
 {
   if (volume->mount_path != NULL)
     return strcmp (volume->mount_path, mount_path) == 0;
+  return FALSE;
+}
+
+gboolean
+g_hal_volume_has_device_path (GHalVolume *volume,
+                              const char  *device_path)
+{
+  if (volume->device_path != NULL)
+    return strcmp (volume->device_path, device_path) == 0;
   return FALSE;
 }
 
@@ -706,6 +719,11 @@ g_hal_volume_mount (GVolume             *volume,
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
 
+  /*g_warning ("hal_volume_mount (can_mount=%d foreign=%p device_path=%s)", 
+              g_hal_volume_can_mount (volume),
+              hal_volume->foreign_mount_root,
+              hal_volume->device_path);*/
+
   if (hal_volume->foreign_mount_root != NULL)
     {
       ForeignMountOp *data;
@@ -723,8 +741,11 @@ g_hal_volume_mount (GVolume             *volume,
     }
   else
     {
-      char *argv[] = {"gnome-mount", "-b", "-d", NULL, NULL};
+      char *argv[] = {"gnome-mount", "-b", "-d", NULL, NULL, NULL};
       argv[3] = hal_volume->device_path;
+      /* ask for no dialogs if mount_operation is NULL */
+      if (mount_operation == NULL)
+        argv[4] = "-n";
       spawn_do (volume, cancellable, callback, user_data, argv);
     }
 }
@@ -771,7 +792,7 @@ g_hal_volume_eject (GVolume              *volume,
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
 
-  g_warning ("hal_volume_eject");
+  /*g_warning ("hal_volume_eject");*/
 
   if (hal_volume->drive != NULL)
     {

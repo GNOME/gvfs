@@ -50,10 +50,13 @@ GHalVolume *g_hal_volume_new            (GVolumeMonitor   *volume_monitor,
 					 HalDevice        *device,
 					 HalPool          *pool,
                                          GFile            *foreign_mount_root,
+                                         gboolean          is_mountable,
 					 GHalDrive        *drive);
 
 gboolean    g_hal_volume_has_mount_path (GHalVolume       *volume,
 					 const char       *mount_path);
+gboolean    g_hal_volume_has_device_path (GHalVolume       *volume,
+                                          const char       *device_path);
 gboolean    g_hal_volume_has_udi        (GHalVolume       *volume,
 					 const char       *udi);
 gboolean    g_hal_volume_has_uuid       (GHalVolume       *volume,

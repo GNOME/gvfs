@@ -1,3 +1,18 @@
+2008-01-15  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghaldrive.c: (_eject_unmount_mounts_cb),
+	(_eject_unmount_mounts), (g_hal_drive_eject):
+	* hal/ghalvolume.c: (g_hal_volume_new), (g_hal_volume_can_mount),
+	(g_hal_volume_has_device_path), (g_hal_volume_mount),
+	(g_hal_volume_eject):
+	* hal/ghalvolume.h:
+	* hal/ghalvolumemonitor.c:
+	(g_hal_volume_monitor_lookup_volume_for_device_path),
+	(update_volumes), (update_mounts), (update_discs):
+	Fix debug spew and use try device path before mount path to tie
+	volume and mount objects together. Also fix some issues with
+	mounting and unmounting.
+	
 2008-01-15  Daniel Nylander <po@danielnylander.se>
 
 	* configure.ac: Added sv to ALL_LINGUAS.
