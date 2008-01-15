@@ -1552,7 +1552,9 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 
   g_set_error (error, G_IO_ERROR,
 	       G_IO_ERROR_NOT_FOUND,
-	       _("Containing mount does not exist"));
+  /* translators: this is an error message when there is no user visible "mount" object
+     corresponding to a particular path/uri */
+	       _("Could not find enclosing mount"));
   return NULL;
 }
 

@@ -171,8 +171,12 @@ _drive_get_description (HalDevice *d)
         second = _("Blu-ray-RE");
       
       if (second != NULL) {
+        /* translators: This wis something like "CD-ROM/DVD Drive" or
+           "CD-RW/Blue-ray Drive" depending on the properties of the drive */
         s = g_strdup_printf (_("%s/%s Drive"), first, second);
       } else {
+        /* translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+           depending on the properties of the drive */
         s = g_strdup_printf (_("%s Drive"), first);
       }
     } 

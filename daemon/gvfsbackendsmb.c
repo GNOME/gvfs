@@ -176,8 +176,9 @@ auth_callback (SMBCCTX *context,
       if (backend->user == NULL)
 	flags |= G_ASK_PASSWORD_NEED_USERNAME;
 
+      /* translators: First %s is a share name, second is a server name */
       message = g_strdup_printf (_("Password required for share %s on %s"),
-				 server_name, share_name);
+				 share_name, server_name);
       handled = g_mount_source_ask_password (backend->mount_source,
 					     message,
 					     username_out,
@@ -425,7 +426,7 @@ do_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Failed to allocate smb context"));
+			_("Internal Error (%s)"), "Failed to allocate smb context");
       return;
     }
   smbc_option_set (smb_context, "user_data", backend);
@@ -460,13 +461,14 @@ do_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Failed to initialize smb context"));
+			_("Internal Error (%s)"), "Failed to initialize smb context");
       smbc_free_context (smb_context, FALSE);
       return;
     }
 
   op_backend->smb_context = smb_context;
 
+  /* Translators: This is "<sharename> on <servername>" and is used as name for an SMB share */
   display_name = g_strdup_printf (_("%s on %s"), op_backend->share, op_backend->server);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
@@ -512,7 +514,8 @@ do_mount (GVfsBackend *backend,
       op_backend->mount_source = NULL;
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_FAILED,
-			_("Failed to mount smb share"));
+			/* translators: We tried to mount a windows (samba) share, but failed */
+			_("Failed to mount Windows share"));
       return;
     }
   

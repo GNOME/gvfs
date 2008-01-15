@@ -592,7 +592,8 @@ g_vfs_backend_trash_init (GVfsBackendTrash *trash_backend)
 {
   GVfsBackend *backend = G_VFS_BACKEND (trash_backend);
   GMountSpec *mount_spec;
-  
+
+  /* translators: This is the name of the backend */
   g_vfs_backend_set_display_name (backend, _("Trashcan"));
   g_vfs_backend_set_icon_name (backend, "user-trash");
   g_vfs_backend_set_user_visible (backend, FALSE);  

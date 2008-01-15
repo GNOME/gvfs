@@ -1126,6 +1126,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, sftp_mount_spec);
   g_mount_spec_unref (sftp_mount_spec);
 
+  /* Translators: This is the name of an sftp share, like "sftp on <hostname>" */
   display_name = g_strdup_printf (_("sftp on %s"), op_backend->host);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
@@ -1160,7 +1161,7 @@ try_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			_("Invalid mount spec"));
+			_("No hostname specified"));
       return TRUE;
     }
 

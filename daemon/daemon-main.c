@@ -53,7 +53,7 @@ daemon_init (void)
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
     {
-      g_printerr (_("Error connecting dbus: %s\n"), derror.message);
+      g_printerr (_("Error connecting to D-Bus: %s\n"), derror.message);
       dbus_error_free (&derror);
       exit (1);
     }

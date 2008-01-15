@@ -110,7 +110,7 @@ try_mount (GVfsBackend *backend,
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			_("Invalid mount spec"));
+			_("No hostname specified"));
       return TRUE;
     }
 

@@ -1,5 +1,21 @@
 2008-01-15  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        * daemon/daemon-main.c:
+        * daemon/gvfsbackendcdda.c:
+        * daemon/gvfsbackendcomputer.c:
+        * daemon/gvfsbackendftp.c:
+        * daemon/gvfsbackendlocaltest.c:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+        * daemon/gvfsbackendtrash.c:
+        * daemon/gvfsjobsetattribute.c:
+        * hal/ghaldrive.c:
+	Clean up strings and add translator comments
+
+2008-01-15  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendcomputer.c:
         (recompute_files):
 	Fix crash (#508236)

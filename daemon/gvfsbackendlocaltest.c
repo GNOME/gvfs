@@ -100,7 +100,7 @@ inject_error (GVfsBackend *backend,
 	  g_print ("(II) inject_error: BANG! injecting error... \n");
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			_("Injected error"));
+			"Injected error");
   } else g_vfs_job_succeeded (job); 
 }
 
@@ -784,7 +784,7 @@ create_dir_file_monitor (GVfsBackend *backend,
     }
   else
     {
-	  g_print ("  (EE) create_dir_file_monitor: monitor == NULL \n");
+      g_print ("  (EE) create_dir_file_monitor: monitor == NULL \n");
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
                         _("Directory notification not supported"));

@@ -679,6 +679,8 @@ do_mount (GVfsBackend *backend,
     }
   else
     {
+      /* translators: Name for the location that lists the smb shares
+	 availible on a server (%s is the name of the server) */
       display_name = g_strdup_printf (_("Windows shares on %s"), op_backend->server);
       browse_mount_spec = g_mount_spec_new ("smb-server");
       g_mount_spec_set (browse_mount_spec, "server", op_backend->server);

@@ -170,6 +170,7 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
+  /* Translator: %s is the device the disc is inserted into */
   fuse_name = g_strdup_printf (_("Audio Disc on %s"), host);
   display_name = g_strdup_printf (_("Audio Disc"));
   g_vfs_backend_set_stable_name (backend, fuse_name);
@@ -232,7 +233,10 @@ do_unmount (GVfsBackend *backend,
   if (cdda_backend->num_open_files > 0)
     {
       error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY, 
-                           _("File system is busy: %d open files"), cdda_backend->num_open_files);
+                           ngettext ("File system is busy: %d open file",
+                                     "File system is busy: %d open files",
+                                     cdda_backend->num_open_files),
+                           cdda_backend->num_open_files);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       return;
     }
@@ -528,7 +532,8 @@ do_read (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             g_io_error_from_errno (errno),
-                            _("Error from paranoia on drive %s"), cdda_backend->device_path);
+                            /* Translators: paranoia is the name of the cd audio reading library */
+                            _("Error from 'paranoia' on drive %s"), cdda_backend->device_path);
           return;
         }
 

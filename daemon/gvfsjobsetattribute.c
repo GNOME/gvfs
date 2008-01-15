@@ -120,7 +120,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
     {
       reply = dbus_message_new_error (message,
 				      DBUS_ERROR_FAILED,
-                                      _("Failed to demarshal message"));
+                                      _("Invalid dbus message"));
       dbus_error_free (&derror);
 
       dbus_connection_send (connection, reply, NULL);

@@ -638,7 +638,7 @@ try_enumerate (GVfsBackend *backend,
       if (file != NULL)
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                           G_IO_ERROR_NOT_DIRECTORY,
-                          _("Can't enumerate non-directory"));
+                          _("The file is not a directory"));
       return TRUE;
     }
 
@@ -761,7 +761,7 @@ mount_volume_cb (GObject *source_object,
       else
         g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                           G_IO_ERROR_FAILED,
-                          _("Can't find mount for mounted volume"));
+                          _("Internal error: %s"), "No mount object for mounted volume");
     }
   else
     {
