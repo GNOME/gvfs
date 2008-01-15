@@ -1,3 +1,10 @@
+2008-01-15  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendcomputer.c:
+        (recompute_files):
+	Fix crash (#508236)
+	Patch from Joe Marcus Clarke
+
 2008-01-15  David Zeuthen  <davidz@redhat.com>
 
 	* hal/ghaldrive.c: (_eject_unmount_mounts_cb),

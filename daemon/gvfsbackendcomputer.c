@@ -418,6 +418,7 @@ recompute_files (GVfsBackendComputer *backend)
           file->icon = g_volume_get_icon (file->volume);
           file->display_name = g_volume_get_name (file->volume);
           file->can_mount = g_volume_can_mount (file->volume);
+          file->root = NULL;
           file->can_eject = g_volume_can_eject (file->volume);
         }
       else /* drive */
