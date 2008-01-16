@@ -7,8 +7,13 @@ SUBDIRS = \
 	po   \
 	programs \
 	test \
-	hal \
 	$(NULL)
+
+if USE_HAL
+
+SUBDIRS += hal
+
+endif
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 

@@ -1,3 +1,8 @@
+2008-01-16  Frederic Crozat  <fcrozat@mandriva.com>
+
+	* Makefile.am: Only build hal module when hal support is
+	enabled (#509693).
+
 2008-01-15  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
