@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-15 11:16+0000\n"
-"PO-Revision-Date: 2008-01-15 14:17+0100\n"
+"POT-Creation-Date: 2008-01-16 16:02+0000\n"
+"PO-Revision-Date: 2008-01-16 17:36+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -268,42 +268,46 @@ msgstr "No se puede desmontar el archivo"
 msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
-#: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:587
+#: ../daemon/gvfsbackenddav.c:198 ../daemon/gvfsbackenddav.c:566
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Error HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:167
+#: ../daemon/gvfsbackenddav.c:210
 msgid "Could not parse response"
 msgstr "No se pudo analizar la respuesta"
 
-#: ../daemon/gvfsbackenddav.c:176
+#: ../daemon/gvfsbackenddav.c:219
 msgid "Empty response"
 msgstr "Respuesta vacía"
 
-#: ../daemon/gvfsbackenddav.c:183
+#: ../daemon/gvfsbackenddav.c:226
 msgid "Unexpected reply from server"
 msgstr "Respuesta inesperada del servidor"
 
-#: ../daemon/gvfsbackenddav.c:448
+#: ../daemon/gvfsbackenddav.c:478
+msgid "WebDAV share"
+msgstr "Compartición WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:480
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introduzca la contraseña para %s"
 
-#: ../daemon/gvfsbackenddav.c:591
+#: ../daemon/gvfsbackenddav.c:570
 msgid "Not a WebDAV enabled share"
 msgstr "No es una compartición activada WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:679 ../daemon/gvfsbackendhttp.c:137
+#: ../daemon/gvfsbackenddav.c:655 ../daemon/gvfsbackendhttp.c:185
 #: ../daemon/gvfsbackendsmb.c:542
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: ../daemon/gvfsbackenddav.c:753
+#: ../daemon/gvfsbackenddav.c:728
 msgid "Response invalid"
 msgstr "Respuesta no válida"
 
-#: ../daemon/gvfsbackenddav.c:782 ../daemon/gvfsbackenddav.c:896
+#: ../daemon/gvfsbackenddav.c:757 ../daemon/gvfsbackenddav.c:872
 msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
@@ -316,16 +320,16 @@ msgstr "No se especificó un nombre de servidor"
 msgid "Unsupported seek type"
 msgstr "Tipo de búsqueda no soportado"
 
-#: ../daemon/gvfsbackendhttp.c:371 ../daemon/gvfsbackendsmb.c:1653
+#: ../daemon/gvfsbackendhttp.c:415 ../daemon/gvfsbackendsmb.c:1653
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendhttp.c:445 ../daemon/gvfsbackendsftp.c:2326
+#: ../daemon/gvfsbackendhttp.c:485 ../daemon/gvfsbackendsftp.c:2326
 #: ../daemon/gvfsbackendsmb.c:921
 msgid "The file was externally modified"
 msgstr "El archivo se modificó externamente"
 
-#: ../daemon/gvfsbackendhttp.c:476 ../daemon/gvfsbackendsmb.c:957
+#: ../daemon/gvfsbackendhttp.c:516 ../daemon/gvfsbackendsmb.c:957
 #: ../daemon/gvfsbackendsmb.c:1670
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
