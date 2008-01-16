@@ -96,9 +96,6 @@ sm_has_header (SoupMessage *msg, const char *header)
   return soup_message_headers_get (msg->response_headers, header) != NULL;
 }
 
-/* ************************************************************************* */
-/*  */
-
 static inline void
 send_message (GVfsBackend         *backend,
               SoupMessage         *message, 
@@ -111,25 +108,84 @@ send_message (GVfsBackend         *backend,
                               callback, user_data);
 }
 
-static inline SoupMessage *
-message_new_from_filename (GVfsBackend *backend,
-                           const char  *method,
-                           const char  *filename)
+static char *
+path_get_parent_dir (const char *path)
 {
-  SoupMessage *msg;
-  SoupURI     *uri;
+    char   *parent;
+    size_t  len;
 
-  uri = g_vfs_backend_uri_for_filename (backend, filename);
-  msg = soup_message_new_from_uri (method, uri);
-  soup_uri_free (uri);
+    if ((len = strlen (path)) < 1)
+      return NULL;
 
-  soup_message_headers_append (msg->request_headers,
-                           "User-Agent", "gvfs/" VERSION);
-  return msg;
+    /* maybe this should be while, but then again
+     * I should be reading the uri rfc and see 
+     * what the deal was with multiple slashes */
+
+    if (path[len - 1] == '/')
+      len--;
+
+    parent = g_strrstr_len (path, len, "/");
+
+    if (parent == NULL)
+      return NULL;
+
+    return g_strndup (path, (parent - path) + 1);
+}
+
+static char *
+uri_get_basename (const char *uri_str)
+{
+    const char *parent;
+    const char *path;
+    char       *to_free;
+    char       *basename;
+    size_t      len;
+
+    if (uri_str == NULL || *uri_str == '\0')
+      return NULL;
+
+    path =  uri_str;
+
+    /* remove any leading slashes */
+    while (*path == '/' || *path == ' ')
+        path++;
+
+    len = strlen (path);
+
+    if (len == 0)
+      return g_strdup ("/");
+
+    /* remove any trailing slashes */
+    while (path[len - 1] == '/' || path[len - 1] == ' ')
+        len--;
+
+    parent = g_strrstr_len (path, len, "/");
+
+    if (parent)
+      {
+        parent++; /* skip the found / char */
+        to_free = g_strndup (parent, (len - (parent - path)));
+      }
+    else
+      to_free = g_strndup (path, len);
+
+    basename = soup_uri_decode (to_free);
+    g_free (to_free);
+
+    return basename;
 }
 
 /* ************************************************************************* */
 /*  */
+
+static inline gboolean
+node_has_name (xmlNodePtr node, const char *name)
+{
+  g_return_val_if_fail (node != NULL, FALSE);
+
+  return ! strcmp ((char *) node->name, name);
+}
+
 static xmlDocPtr
 multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
 {
@@ -278,24 +334,12 @@ multistatus_parse_response (xmlDocPtr    doc,
       else if (! strcmp ((char *) node->name, "href"))
         {
           xmlChar *text;
-          char    *path;
-          char    *p;
-          size_t   len;
 
-          /* FIXME: redo this (quickly hacked together) */
           text = xmlNodeGetContent (node);
-          path = (char *) text;
-
-          if ((len = strlen (path)) > 1)
-            {
-              if (path[len - 1] == '/')
-                len--;
-            }
-
-          p = g_strrstr_len (path, len, "/");
-
-          name = g_strndup (p + 1, (len - (p - path + 1)));
+          name = uri_get_basename ((char *) text);
+          xmlFree (text);
         }
+
       else if (! strcmp ((char *) node->name, "propstat"))
         {
           xmlNodePtr  iter;
@@ -407,35 +451,36 @@ create_propfind_request (GFileAttributeMatcher *matcher, gulong *size)
 
 /* ************************************************************************* */
 /*  */
-
 static void
-do_authentication (SoupSession *session,
+soup_authenticate (SoupSession *session,
                    SoupMessage *msg,
-                   gchar       *auth_type,
-                   gchar       *auth_realm,
-                   char       **username,
-                   char       **password,
-                   gboolean     is_reprompt,
-                   gpointer     user_data)
+	           SoupAuth    *auth,
+                   gboolean     retrying,
+                   gpointer     data)
 {
   GVfsBackendDav *backend;
   GVfsJobMount   *job;
   SoupURI        *mount_base;
   gboolean        res;
   gboolean        aborted;
+  const char     *auth_realm;
   char           *prompt;
   char           *new_password;
   char           *new_user;
 
-  job = G_VFS_JOB_MOUNT (user_data);
+  job = G_VFS_JOB_MOUNT (data);
   backend = G_VFS_BACKEND_DAV (job->backend);
   mount_base = G_VFS_BACKEND_HTTP (backend)->mount_base;
 
-  new_user = new_password = NULL;
+  auth_realm = soup_auth_get_realm (auth);
+
+  if (auth_realm == NULL)
+    auth_realm = _("WebDAV share");
+
   prompt = g_strdup_printf (_("Enter password for %s"), auth_realm);
 
-  g_print ("+ authenticate \n");
-
+  new_user = new_password = NULL;
+  
   res = g_mount_source_ask_password (backend->mount_source,
                                      prompt,
                                      mount_base->user,
@@ -446,60 +491,14 @@ do_authentication (SoupSession *session,
                                      &new_password,
                                      &new_user,
                                      NULL);
-
   if (res && !aborted)
     {
-      g_print ("Setting u/p\n");
-      *username = new_user;
-      *password = new_password;
+      soup_auth_authenticate (auth, new_user, new_password);
     }
-  else
-   {
-     g_free (new_user);
-     g_free (new_password);
-   }
 
+  g_free (new_user);
+  g_free (new_password);
   g_free (prompt);
-
-  g_print ("- authenticate \n");
-}
-
-static void 
-authenticate (SoupSession *session,
-              SoupMessage *msg,
-              gchar       *auth_type,
-              gchar       *auth_realm,
-              char       **username,
-              char       **password,
-              gpointer     user_data)
-{
-  do_authentication (session,
-                     msg,
-                     auth_type,
-                     auth_realm,
-                     username,
-                     password,
-                     FALSE,
-                     user_data);
-}
-
-static void 
-reauthenticate (SoupSession *session,
-                SoupMessage *msg,
-                gchar       *auth_type,
-                gchar       *auth_realm,
-                gpointer     username,
-                gpointer     password,
-                gpointer     user_data)
-{
-  do_authentication (session,
-                     msg,
-                     auth_type,
-                     auth_realm,
-                     username,
-                     password,
-                     TRUE,
-                     user_data);
 }
 
 static void discover_mount_root_ready (SoupSession *session,
@@ -545,27 +544,18 @@ discover_mount_root_ready (SoupSession *session,
 
   if (is_success && is_dav)
     {
-      char *parent, *path;
-      size_t len;
+      backend->last_good_path = mount_base->path;
+      mount_base->path = path_get_parent_dir (mount_base->path);
 
-      path = backend->last_good_path = mount_base->path;
-      mount_base->path = NULL;
-
-      if ((len = strlen (path)) > 1)
+      if (mount_base->path)
         {
-          if (path[len - 1] == '/')
-           len--;
-
-          parent = g_strrstr_len (path, len, "/");
-          mount_base->path = g_strndup (path, (parent - path) + 1);
           discover_mount_root (backend, job);
           return;
-        }
-      
+        } 
     }
 
   /* we have reached the end of paths we are allowed to
-   * chdir up to */
+   * chdir up to (or couldn't chdir up at all) */
   
   /* check if we at all have a good path */
   if (backend->last_good_path == NULL)
@@ -623,10 +613,7 @@ mount (GVfsBackend  *backend,
   session = G_VFS_BACKEND_HTTP (backend)->session;
 
   g_signal_connect (session, "authenticate",
-                    G_CALLBACK (authenticate), job);
-
-  g_signal_connect (session, "reauthenticate",
-                    G_CALLBACK (reauthenticate), job);
+                    G_CALLBACK (soup_authenticate), job);
 
   op_backend->mount_source = mount_source;
   discover_mount_root (op_backend, job);

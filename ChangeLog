@@ -1,5 +1,12 @@
 2008-01-16  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackenddav.c:	
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	A few cleanups.
+
+2008-01-16  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackenddav.c: 
 	* daemon/gvfsbackendhttp.c:
 	* daemon/gvfsbackendhttp.h:
@@ -11,6 +18,7 @@
 	* daemon/Makefile.am:
 	Make building of http optional (and depend on wether
 	libsoup is found or not)
+	Patch from Dan Winship.
 
 2008-01-16  Frederic Crozat  <fcrozat@mandriva.com>
 

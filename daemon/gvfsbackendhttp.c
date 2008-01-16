@@ -54,8 +54,6 @@
 #include "soup-output-stream.h"
 
 
-
-
 G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND);
 
 static void
@@ -106,7 +104,57 @@ g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename)
 
   return uri;
 }
+/* ************************************************************************* */
+/* public utility functions */
 
+SoupMessage *
+message_new_from_uri (const char *method,
+                      SoupURI    *uri)
+{
+  SoupMessage *msg;
+
+  msg = soup_message_new_from_uri (method, uri);
+
+  /* Add standard headers */
+  soup_message_headers_append (msg->request_headers,
+                           "User-Agent", "gvfs/" VERSION);
+  return msg;
+}
+
+SoupMessage *
+message_new_from_filename (GVfsBackend *backend,
+                           const char  *method,
+                           const char  *filename)
+{
+  GVfsBackendHttp *op_backend;
+  SoupMessage     *msg;
+  SoupURI         *uri;
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+  uri = soup_uri_copy (op_backend->mount_base);
+
+  uri = g_vfs_backend_uri_for_filename (backend, filename);
+  msg = message_new_from_uri (method, uri);
+
+  /* "/" means "whatever mount_base is" */
+  if (strcmp (filename, "/"))
+    {
+      char *path;
+      /* Otherwise, we append filename to mount_base (which is assumed to
+       * be a directory in this case).
+       */
+
+      path = g_build_path ("/", uri->path, filename, NULL);
+      soup_uri_set_path (uri, path);
+      g_free (path);
+    }
+  
+  soup_uri_free (uri);
+  return msg;
+}
+
+/* ************************************************************************* */
+/* virtual functions overrides */
 
 static gboolean
 try_mount (GVfsBackend  *backend,
@@ -193,15 +241,10 @@ try_open_for_read (GVfsBackend        *backend,
 {
   GVfsBackendHttp *op_backend;
   GInputStream    *stream;
-  SoupURI         *uri;
   SoupMessage     *msg;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = g_vfs_backend_uri_for_filename (backend, filename);
-
-  msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
-  soup_uri_free (uri);
-  soup_message_headers_append (msg->request_headers, "User-Agent", "gvfs/" VERSION);
+  msg = message_new_from_filename (backend, "GET", filename);
 
   stream = soup_input_stream_new (op_backend->session, msg);
   g_object_unref (msg);
@@ -374,9 +417,8 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
     }
   /* FIXME: other errors */
 
-  put_msg = soup_message_new_from_uri (SOUP_METHOD_PUT,
-                                       soup_message_get_uri (msg));
-  soup_message_headers_append (put_msg->request_headers, "User-Agent", "gvfs/" VERSION);
+  put_msg = message_new_from_uri ("PUT", soup_message_get_uri (msg));
+
   soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
   stream = soup_output_stream_new (op_backend->session, put_msg, -1);
   g_object_unref (put_msg);
@@ -392,7 +434,6 @@ try_create (GVfsBackend *backend,
             GFileCreateFlags flags)
 {
   GVfsBackendHttp *op_backend;
-  SoupURI         *uri;
   SoupMessage     *msg;
 
   /* FIXME: if SoupOutputStream supported chunked requests, we could
@@ -400,11 +441,8 @@ try_create (GVfsBackend *backend,
    */
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = g_vfs_backend_uri_for_filename (backend, filename);
 
-  msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
-  soup_uri_free (uri);
-  soup_message_headers_append (msg->request_headers, "User-Agent", "gvfs/" VERSION);
+  msg = message_new_from_filename (backend, "HEAD", filename);
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
   soup_session_queue_message (op_backend->session, msg,
@@ -420,8 +458,8 @@ open_for_replace_succeeded (GVfsBackendHttp *op_backend, GVfsJob *job,
   SoupMessage     *put_msg;
   GOutputStream   *stream;
 
-  put_msg = soup_message_new_from_uri (SOUP_METHOD_PUT, uri);
-  soup_message_headers_append (put_msg->request_headers, "User-Agent", "gvfs/" VERSION);
+  put_msg = message_new_from_uri (SOUP_METHOD_PUT, uri);
+
   if (etag)
     soup_message_headers_append (put_msg->request_headers, "If-Match", etag);
 
@@ -479,11 +517,13 @@ try_replace (GVfsBackend *backend,
       return TRUE;
     }
 
+
+
   uri = g_vfs_backend_uri_for_filename (backend, filename);
 
   if (etag)
     {
-      SoupMessage     *msg;
+      SoupMessage *msg;
 
       msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
       soup_uri_free (uri);
