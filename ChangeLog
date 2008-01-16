@@ -1,3 +1,17 @@
+2008-01-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	* daemon/soup-input-stream.c:
+	* daemon/soup-output-stream.c:
+	Port to libsoup-2.4.
+
+	* configure.ac:
+	* daemon/Makefile.am:
+	Make building of http optional (and depend on wether
+	libsoup is found or not)
+
 2008-01-16  Frederic Crozat  <fcrozat@mandriva.com>
 
 	* Makefile.am: Only build hal module when hal support is

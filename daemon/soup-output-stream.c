@@ -38,6 +38,7 @@ typedef struct {
   SoupSession *session;
   GMainContext *async_context;
   SoupMessage *msg;
+  gboolean finished;
 
   goffset size, offset;
   GByteArray *ba;
@@ -184,7 +185,7 @@ soup_output_stream_cancelled (GIOChannel *chan, GIOCondition condition,
 
   priv->cancel_watch = NULL;
 
-  soup_message_io_pause (priv->msg);
+  soup_session_pause_message (priv->session, priv->msg);
   if (priv->cancelled_cb)
     priv->cancelled_cb (stream);
 
@@ -198,9 +199,8 @@ soup_output_stream_prepare_for_io (GOutputStream *stream, GCancellable *cancella
   int cancel_fd;
 
   /* Move the buffer to the SoupMessage */
-  priv->msg->request.body = (char *)priv->ba->data;
-  priv->msg->request.length = priv->ba->len;
-  priv->msg->request.owner = SOUP_BUFFER_SYSTEM_OWNED;
+  soup_message_body_append (priv->msg->request_body, SOUP_MEMORY_TAKE,
+			    priv->ba->data, priv->ba->len);
   g_byte_array_free (priv->ba, FALSE);
   priv->ba = NULL;
 
@@ -281,8 +281,7 @@ soup_output_stream_close (GOutputStream  *stream,
   }
 
   soup_output_stream_prepare_for_io (stream, cancellable);
-  while (priv->msg->status != SOUP_MESSAGE_STATUS_FINISHED &&
-	 !g_cancellable_is_cancelled (cancellable))
+  while (!priv->finished && !g_cancellable_is_cancelled (cancellable))
     g_main_context_iteration (priv->async_context, TRUE);
   soup_output_stream_done_io (stream);
 
@@ -369,6 +368,8 @@ static void
 soup_output_stream_finished (SoupMessage *msg, gpointer stream)
 {
   SoupOutputStreamPrivate *priv = SOUP_OUTPUT_STREAM_GET_PRIVATE (stream);
+
+  priv->finished = TRUE;
 
   g_signal_handlers_disconnect_by_func (priv->msg, G_CALLBACK (soup_output_stream_finished), stream);
   close_async_done (stream);

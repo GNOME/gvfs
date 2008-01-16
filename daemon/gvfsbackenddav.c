@@ -35,8 +35,6 @@
 #include <gio/gio.h>
 
 #include <libsoup/soup.h>
-#include <libsoup/soup-headers.h>
-#include <libsoup/soup-uri.h>
 
 /* LibXML2 includes */
 #include <libxml/parser.h>
@@ -95,28 +93,17 @@ g_vfs_backend_dav_init (GVfsBackendDav *backend)
 static inline gboolean
 sm_has_header (SoupMessage *msg, const char *header)
 {
-  return soup_message_get_header (msg->response_headers, header) != NULL;
-}
-
-static inline guint
-soup_protocol_default_port (SoupProtocol proto)
-{
-	if (proto == SOUP_PROTOCOL_HTTP)
-		return 80;
-	else if (proto == SOUP_PROTOCOL_HTTPS)
-		return 443;
-	else
-		return 0;
+  return soup_message_headers_get (msg->response_headers, header) != NULL;
 }
 
 /* ************************************************************************* */
 /*  */
 
 static inline void
-send_message (GVfsBackend           *backend,
-              SoupMessage           *message, 
-              SoupMessageCallbackFn  callback,
-              gpointer               user_data)
+send_message (GVfsBackend         *backend,
+              SoupMessage         *message, 
+              SoupSessionCallback  callback,
+              gpointer             user_data)
 {
 
   soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session,
@@ -130,13 +117,13 @@ message_new_from_filename (GVfsBackend *backend,
                            const char  *filename)
 {
   SoupMessage *msg;
-  SoupUri     *uri;
+  SoupURI     *uri;
 
   uri = g_vfs_backend_uri_for_filename (backend, filename);
   msg = soup_message_new_from_uri (method, uri);
   soup_uri_free (uri);
 
-  soup_message_add_header (msg->request_headers,
+  soup_message_headers_append (msg->request_headers,
                            "User-Agent", "gvfs/" VERSION);
   return msg;
 }
@@ -156,8 +143,8 @@ multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
       return NULL;
     }
 
-  doc = xmlReadMemory (msg->response.body,
-                       msg->response.length,
+  doc = xmlReadMemory (msg->response_body->data,
+                       msg->response_body->length,
                        "response.xml",
                        NULL,
                        0);
@@ -271,7 +258,7 @@ mulitstatus_parse_prop_node (xmlDocPtr doc, xmlNodePtr prop)
 static GFileInfo *
 multistatus_parse_response (xmlDocPtr    doc,
                             xmlNodePtr   resp,
-                            SoupUri     *base)
+                            SoupURI     *base)
 {
   GFileInfo  *info;
   xmlNodePtr  node;
@@ -433,7 +420,7 @@ do_authentication (SoupSession *session,
 {
   GVfsBackendDav *backend;
   GVfsJobMount   *job;
-  SoupUri        *mount_base;
+  SoupURI        *mount_base;
   gboolean        res;
   gboolean        aborted;
   char           *prompt;
@@ -515,7 +502,8 @@ reauthenticate (SoupSession *session,
                      user_data);
 }
 
-static void discover_mount_root_ready (SoupMessage *msg,
+static void discover_mount_root_ready (SoupSession *session,
+                                       SoupMessage *msg,
                                        gpointer     user_data);
 static void
 discover_mount_root (GVfsBackendDav *backend, GVfsJobMount *job)
@@ -523,25 +511,26 @@ discover_mount_root (GVfsBackendDav *backend, GVfsJobMount *job)
   GVfsBackendHttp *http_backend;
   SoupMessage     *msg;
   SoupSession     *session;
-  SoupUri         *mount_base;
+  SoupURI         *mount_base;
 
   http_backend = G_VFS_BACKEND_HTTP (backend);
   mount_base = http_backend->mount_base;
   session = http_backend->session;
 
   msg = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-  soup_message_add_header (msg->request_headers, "User-Agent", "gvfs/" VERSION);
+  soup_message_headers_append (msg->request_headers, "User-Agent", "gvfs/" VERSION);
   soup_session_queue_message (session, msg, discover_mount_root_ready, job);
 }
 
 static void
-discover_mount_root_ready (SoupMessage *msg,
+discover_mount_root_ready (SoupSession *session,
+                           SoupMessage *msg,
                            gpointer     user_data)
 {
   GVfsBackendDav *backend;
   GVfsJobMount   *job;
   GMountSpec     *mount_spec;
-  SoupUri        *mount_base;
+  SoupURI        *mount_base;
   gboolean        is_success;
   gboolean        is_dav;
 
@@ -599,9 +588,9 @@ discover_mount_root_ready (SoupMessage *msg,
   if (mount_base->user)
     g_mount_spec_set (mount_spec, "user", mount_base->user);
 
-  if (mount_base->protocol == SOUP_PROTOCOL_HTTP)
+  if (mount_base->scheme == SOUP_URI_SCHEME_HTTP)
     g_mount_spec_set (mount_spec, "ssl", "false");
-  else if (mount_base->protocol == SOUP_PROTOCOL_HTTPS)
+  else if (mount_base->scheme == SOUP_URI_SCHEME_HTTPS)
     g_mount_spec_set (mount_spec, "ssl", "true");
 
   g_free (mount_base->path);
@@ -652,7 +641,7 @@ try_mount (GVfsBackend  *backend,
            gboolean      is_automount)
 {
   GVfsBackendDav *op_backend;
-  SoupUri        *uri;
+  SoupURI        *uri;
   const char     *host;
   const char     *user;
   const char     *port;
@@ -681,22 +670,20 @@ try_mount (GVfsBackend  *backend,
       return TRUE;
     }
 
-  uri = g_new0 (SoupUri, 1);
+  uri = soup_uri_new (NULL);
 
   if (ssl != NULL && (strcmp (ssl, "true") == 0))
-    uri->protocol = SOUP_PROTOCOL_HTTPS;
+    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTPS);
   else
-    uri->protocol = SOUP_PROTOCOL_HTTP;
-  
-  uri->user = g_strdup (user);
+    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTP);
+
+  soup_uri_set_user (uri, user);
 
   if (port && (port_num = atoi (port)))
-    uri->port = port_num;
-  else
-    uri->port = soup_protocol_default_port (uri->protocol);
+    soup_uri_set_port (uri, port_num);
 
-  uri->host = g_strdup (host);
-  uri->path = g_strdup (mount_spec->mount_prefix);
+  soup_uri_set_host (uri, host);
+  soup_uri_set_path (uri, mount_spec->mount_prefix);
 
   G_VFS_BACKEND_HTTP (backend)->mount_base = uri; 
 
@@ -704,12 +691,13 @@ try_mount (GVfsBackend  *backend,
 }
 
 static void
-query_info_ready (SoupMessage *msg,
+query_info_ready (SoupSession *session,
+                  SoupMessage *msg,
                   gpointer     user_data)
 {
   GVfsBackendDav    *backend;
   GVfsJobQueryInfo  *job;
-  SoupUri           *base;
+  SoupURI           *base;
   GFileInfo         *info;
   GError            *error;
   xmlDocPtr          doc;
@@ -789,7 +777,7 @@ try_query_info (GVfsBackend           *backend,
       return TRUE;
     }
 
-  soup_message_add_header (msg->request_headers, "Depth", "0");
+  soup_message_headers_append (msg->request_headers, "Depth", "0");
 
   /* RFC 4437 */
   if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
@@ -797,11 +785,11 @@ try_query_info (GVfsBackend           *backend,
   else
       redirect_header = "T";
 
-  soup_message_add_header (msg->request_headers,
+  soup_message_headers_append (msg->request_headers,
                            "Apply-To-Redirect-Ref", redirect_header);
 
   soup_message_set_request (msg, "application/xml",
-                            SOUP_BUFFER_SYSTEM_OWNED,
+                            SOUP_MEMORY_TAKE,
                             request,
                             len);
 
@@ -814,12 +802,13 @@ try_query_info (GVfsBackend           *backend,
 
 
 static void
-enumerate_ready (SoupMessage *msg,
+enumerate_ready (SoupSession *session,
+                 SoupMessage *msg,
                  gpointer     user_data)
 {
   GVfsBackendDav    *backend;
   GVfsJobEnumerate  *job;
-  SoupUri           *base;
+  SoupURI           *base;
   GFileInfo         *info;
   GError            *error;
   xmlDocPtr          doc;
@@ -903,7 +892,7 @@ try_enumerate (GVfsBackend           *backend,
       return TRUE;
     }
 
-  soup_message_add_header (msg->request_headers, "Depth", "1");
+  soup_message_headers_append (msg->request_headers, "Depth", "1");
 
   /* RFC 4437 */
   if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
@@ -911,11 +900,11 @@ try_enumerate (GVfsBackend           *backend,
   else
       redirect_header = "T";
 
-  soup_message_add_header (msg->request_headers,
+  soup_message_headers_append (msg->request_headers,
                            "Apply-To-Redirect-Ref", redirect_header);
 
   soup_message_set_request (msg, "application/xml",
-                            SOUP_BUFFER_SYSTEM_OWNED,
+                            SOUP_MEMORY_TAKE,
                             request,
                             len);
 

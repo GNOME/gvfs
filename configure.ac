@@ -51,9 +51,7 @@ AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory f
 DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
-PKG_CHECK_MODULES(HTTP, libsoup-2.2 >= 2.2.104)
-AC_SUBST(HTTP_CFLAGS)
-AC_SUBST(HTTP_LIBS)
+
 
 dnl ****************************
 dnl *** Checks for intltool  ***
@@ -111,6 +109,27 @@ if test x$have_socketpair = x1 ; then
 fi
 
 AC_SEARCH_LIBS(login_tty, util, [AC_DEFINE([HAVE_LOGIN_TTY],[],[Whether login_tty is available])])
+
+dnl **************************************************
+dnl *** Check if we should build with http backend ***
+dnl **************************************************
+AC_ARG_ENABLE(http, [  --disable-http           build without http/dav backend])
+msg_http=no
+HTTP_CFLAGS=
+HTTP_LIBS=
+
+if test "x$enable_http" != "xno"; then
+  PKG_CHECK_EXISTS(libsoup-2.4 >= 2.3.0, msg_http=yes)
+
+  if test "x$msg_http" == "xyes"; then
+    PKG_CHECK_MODULES(HTTP, libsoup-2.4)
+    AC_DEFINE(HAVE_HTTP, 1, [Define to 1 if http/dav is going to be built])
+  fi
+fi
+
+AC_SUBST(HTTP_CFLAGS)
+AC_SUBST(HTTP_LIBS)
+AM_CONDITIONAL(HAVE_HTTP, [test "$msg_http" = "yes"])
 
 dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
@@ -320,6 +339,7 @@ po/Makefile.in
 echo 
 echo "gvfs configuration summary:"
 echo "
+        HTTP/WebDAV support           $msg_http
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda

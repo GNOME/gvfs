@@ -48,12 +48,12 @@ struct _GVfsBackendHttp
 {
   GVfsBackend parent_instance;
 
-  SoupUri     *mount_base;
+  SoupURI     *mount_base;
   SoupSession *session;
 };
 
 GType        g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
-SoupUri *    g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename);
+SoupURI *    g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename);
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_HTTP_H__ */
