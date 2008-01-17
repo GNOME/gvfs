@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-16 16:02+0000\n"
-"PO-Revision-Date: 2008-01-16 17:36+0100\n"
+"POT-Creation-Date: 2008-01-17 12:23+0000\n"
+"PO-Revision-Date: 2008-01-17 15:28+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,63 +17,63 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:501
+#: ../client/gdaemonfile.c:508 ../client/gdaemonfile.c:1900
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "La operación no está soportada, los archivos están en diferentes puntos de "
 "montaje"
 
-#: ../client/gdaemonfile.c:781
+#: ../client/gdaemonfile.c:793
 msgid "Invalid return value from get_info"
 msgstr "get_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:810
+#: ../client/gdaemonfile.c:822
 msgid "Invalid return value from query_info"
 msgstr "query_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:882
+#: ../client/gdaemonfile.c:894
 msgid "Couldn't get stream file descriptor"
 msgstr "No se pudo obtener el descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:914 ../client/gdaemonfile.c:984
-#: ../client/gdaemonfile.c:1043 ../client/gdaemonfile.c:1102
-#: ../client/gdaemonfile.c:1164
+#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176
 msgid "Invalid return value from open"
 msgstr "open devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:994 ../client/gdaemonfile.c:1053
-#: ../client/gdaemonfile.c:1112 ../client/gdaemonfile.c:1174
+#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
 msgid "Didn't get stream file descriptor"
 msgstr "No se obtuvo un descriptor del archivo de flujo"
 
-#: ../client/gdaemonfile.c:1226 ../client/gdaemonfile.c:1243
+#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
 msgid "Invalid return value from call"
 msgstr "call devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:1518
+#: ../client/gdaemonfile.c:1530
 msgid "Invalid return value from get_filesystem_info"
 msgstr "get_filesystem_info devolvió un valor no válido"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1557
+#: ../client/gdaemonfile.c:1569
 msgid "Could not find enclosing mount"
 msgstr "No se pudo encontrar el punto de montaje adjunto"
 
-#: ../client/gdaemonfile.c:1587
+#: ../client/gdaemonfile.c:1599
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nombre de archivo no válido %s"
 
-#: ../client/gdaemonfile.c:1629
+#: ../client/gdaemonfile.c:1641
 msgid "Invalid return value from query_filesystem_info"
 msgstr "query_filesystem_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:1988
+#: ../client/gdaemonfile.c:2049
 msgid "Invalid return value from monitor_dir"
 msgstr "El valor devuelto por monitor_dir no es válido"
 
-#: ../client/gdaemonfile.c:2037
+#: ../client/gdaemonfile.c:2098
 msgid "Invalid return value from monitor_file"
 msgstr "El valor devuelto por monitor_file no es válido"
 
@@ -185,7 +185,7 @@ msgid "Audio Disc on %s"
 msgstr "Disco de sonido en %s"
 
 #: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:680
-#: ../hal/ghalmount.c:289 ../hal/ghalvolume.c:238 ../hal/ghalvolume.c:249
+#: ../hal/ghalmount.c:289 ../hal/ghalvolume.c:243 ../hal/ghalvolume.c:259
 msgid "Audio Disc"
 msgstr "Disco de sonido"
 
@@ -238,7 +238,7 @@ msgstr "El archivo no existe"
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
 
-#: ../daemon/gvfsbackendcomputer.c:584 ../daemon/gvfsbackendcomputer.c:717
+#: ../daemon/gvfsbackendcomputer.c:584 ../daemon/gvfsbackendcomputer.c:718
 msgid "Can't open mountable file"
 msgstr "No se puede abrir el archivo montable"
 
@@ -246,25 +246,25 @@ msgstr "No se puede abrir el archivo montable"
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
 
-#: ../daemon/gvfsbackendcomputer.c:764
+#: ../daemon/gvfsbackendcomputer.c:765
 #, c-format
 msgid "Internal error: %s"
 msgstr "Error interno: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:788 ../daemon/gvfsbackendcomputer.c:853
-#: ../daemon/gvfsbackendcomputer.c:953
+#: ../daemon/gvfsbackendcomputer.c:789 ../daemon/gvfsbackendcomputer.c:854
+#: ../daemon/gvfsbackendcomputer.c:954
 msgid "Not a mountable file"
 msgstr "No es un archivo montable"
 
-#: ../daemon/gvfsbackendcomputer.c:810
+#: ../daemon/gvfsbackendcomputer.c:811
 msgid "Can't mount file"
 msgstr "No se puede montar el archivo"
 
-#: ../daemon/gvfsbackendcomputer.c:868
+#: ../daemon/gvfsbackendcomputer.c:869
 msgid "Can't unmount file"
 msgstr "No se puede desmontar el archivo"
 
-#: ../daemon/gvfsbackendcomputer.c:984
+#: ../daemon/gvfsbackendcomputer.c:985
 msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
@@ -878,22 +878,47 @@ msgstr "Disco"
 msgid "Blank Disc"
 msgstr "Disco virgen"
 
-#: ../hal/ghalmount.c:199 ../hal/ghalvolume.c:189
+#: ../hal/ghalmount.c:199
 #, c-format
 msgid "%.1f kB Media"
 msgstr "Medio de %.1f kiB"
 
-#: ../hal/ghalmount.c:204 ../hal/ghalvolume.c:194
+#: ../hal/ghalmount.c:204
 #, c-format
 msgid "%.1f MB Media"
 msgstr "Medio de %.1f MiB"
 
-#: ../hal/ghalmount.c:209 ../hal/ghalvolume.c:199
+#: ../hal/ghalmount.c:209
 #, c-format
 msgid "%.1f GB Media"
 msgstr "Medio de %.1f GiB"
 
-#: ../hal/ghalmount.c:287 ../hal/ghalvolume.c:247
+#: ../hal/ghalmount.c:287 ../hal/ghalvolume.c:257
 msgid "Mixed Audio/Data Disc"
 msgstr "Disco de sonido y datos"
+
+#: ../hal/ghalvolume.c:189
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kiB"
+
+#: ../hal/ghalvolume.c:194
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MiB"
+
+#: ../hal/ghalvolume.c:199
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GiB"
+
+#: ../hal/ghalvolume.c:249
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "Datos cifrados %s"
+
+#: ../hal/ghalvolume.c:265
+#, c-format
+msgid "%s Media"
+msgstr "Soporte %s"
 
