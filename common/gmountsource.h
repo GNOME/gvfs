@@ -65,6 +65,23 @@ gboolean      g_mount_source_ask_password             (GMountSource             
 						       char                     **password_out,
 						       char                     **user_out,
 						       char                     **domain_out);
+
+void          g_mount_source_ask_password_async       (GMountSource              *mount_source,
+						       const char                *message,
+						       const char                *initial_user,
+						       const char                *initial_domain,
+						       GAskPasswordFlags          flags,
+                                                       GAsyncReadyCallback        callback,
+                                                       gpointer                   user_data);
+
+gboolean     g_mount_source_ask_password_finish       (GMountSource              *source,
+                                                       GAsyncResult              *result,
+                                                       gboolean                  *aborted,
+                                                       char                     **password_out,
+                                                       char                     **user_out,
+                                                       char                     **domain_out);
+
+
 const char *  g_mount_source_get_dbus_id              (GMountSource              *mount_source);
 const char *  g_mount_source_get_obj_path             (GMountSource              *mount_source);
 

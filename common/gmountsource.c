@@ -122,33 +122,55 @@ g_mount_source_get_obj_path (GMountSource *mount_source)
 typedef struct AskPasswordData AskPasswordData;
 
 struct AskPasswordData {
-  void (*callback)(AskPasswordData *data);
+
+  /* results: */
+  gboolean  aborted;
+  char     *password;
+  char     *username;
+  char     *domain;
+};
+
+typedef struct AskPasswordSyncData AskPasswordSyncData;
+
+struct AskPasswordSyncData {
+
   /* For sync calls */
   GMutex *mutex;
   GCond *cond;
-  /* For async calls */
-  GMountOperation *op;
 
   /* results: */
-  gboolean handled;
-  gboolean aborted;
-  char *password;
-  char *username;
-  char *domain;
-} ;
+  GAsyncResult *result;
+};
 
 static void
-ask_password_reply (DBusMessage *reply,
-		    GError *error,
-		    gpointer _data)
+ask_password_data_free (gpointer _data)
 {
-  AskPasswordData *data = _data;
+  AskPasswordData *data = (AskPasswordData *) _data;
+  g_free (data->password);
+  g_free (data->username);
+  g_free (data->domain);
+  g_free (data);
+}
+
+/* the callback from dbus -> main thread */
+static void
+ask_password_reply (DBusMessage *reply,
+		    GError      *error,
+		    gpointer     _data)
+{
+  GSimpleAsyncResult *result;
+  AskPasswordData *data;
   dbus_bool_t handled, aborted, anonymous;
   guint32 password_save;
   const char *password, *username, *domain;
   DBusMessageIter iter;
 
-  data->handled = TRUE;
+  result = G_SIMPLE_ASYNC_RESULT (_data);
+  handled = TRUE;
+  
+  data = g_new0 (AskPasswordData, 1);
+  g_simple_async_result_set_op_res_gpointer (result, data, ask_password_data_free);
+
   if (reply == NULL)
     {
       data->aborted = TRUE;
@@ -168,7 +190,6 @@ ask_password_reply (DBusMessage *reply,
 	data->aborted = TRUE;
       else
 	{
-	  data->handled = handled;
 	  data->aborted = aborted;
 
 	  data->password = g_strdup (password);
@@ -179,38 +200,35 @@ ask_password_reply (DBusMessage *reply,
 	}
     }
 
-  data->callback (data);
+  if (handled == FALSE)
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, NULL);
+    }
+
+  g_simple_async_result_complete (result);
 }
 
-static gboolean
-password_non_handled_in_idle (gpointer _data)
+void
+g_mount_source_ask_password_async (GMountSource              *source,
+                                   const char                *message_string,
+                                   const char                *default_user,
+                                   const char                *default_domain,
+                                   GAskPasswordFlags          flags,
+                                   GAsyncReadyCallback        callback,
+                                   gpointer                   user_data)
 {
-  AskPasswordData *data = _data;
-
-  data->callback (data);
-  return FALSE;
-}
-
-static void
-g_mount_source_ask_password_async (GMountSource *source,
-				   const char *message_string,
-				   const char *default_user,
-				   const char *default_domain,
-				   GAskPasswordFlags flags,
-				   AskPasswordData *data)
-{
+  GSimpleAsyncResult *result;
   DBusMessage *message;
   guint32 flags_as_int;
+ 
 
   /* If no dbus id specified, reply that we weren't handled */
   if (source->dbus_id[0] == 0)
-    {
-      data->handled = FALSE;
-      
-      g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
-		       password_non_handled_in_idle,
-		       data,
-		       NULL);
+    { 
+      g_simple_async_report_error_in_idle (G_OBJECT (source),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_FAILED, NULL); 
       return;
     }
 
@@ -235,16 +253,72 @@ g_mount_source_ask_password_async (GMountSource *source,
 			       DBUS_TYPE_UINT32, &flags_as_int,
 			       0);
 
+  result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
+                                      g_mount_source_ask_password_async);
   /* 30 minute timeout */
   _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
-				 ask_password_reply, data);
+				 ask_password_reply, result);
   dbus_message_unref (message);
+
+}
+
+gboolean
+g_mount_source_ask_password_finish (GMountSource  *source,
+                                    GAsyncResult  *result,
+                                    gboolean      *aborted,
+                                    char         **password_out,
+                                    char         **user_out,
+                                    char         **domain_out)
+{
+  AskPasswordData *data;
+  GSimpleAsyncResult *simple;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+
+  if (g_simple_async_result_propagate_error (simple, NULL))
+    return FALSE;
+
+  data = (AskPasswordData *) g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (aborted)
+    *aborted = data->aborted;
+
+  if (password_out)
+    {
+      *password_out = data->password;
+      data->password = NULL;
+    }
+
+  if (user_out)
+    {
+      *user_out = data->username;
+      data->username = NULL;
+    }
+
+  if (domain_out)
+    {
+      *domain_out = data->domain;
+      data->domain = NULL;
+    }
+
+  return TRUE;
 }
 
 
 static void
-ask_password_reply_sync (AskPasswordData *data)
+ask_password_reply_sync  (GObject *source_object,
+                          GAsyncResult *res,
+                          gpointer user_data)
 {
+  GMountSource *source;
+  AskPasswordSyncData *data;
+
+  source = G_MOUNT_SOURCE (source_object);
+
+  data = (AskPasswordSyncData *) user_data;
+
+  data->result = g_object_ref (res);
+
   /* Wake up sync call thread */
   g_mutex_lock (data->mutex);
   g_cond_signal (data->cond);
@@ -257,13 +331,15 @@ g_mount_source_ask_password (GMountSource *source,
 			     const char *default_user,
 			     const char *default_domain,
 			     GAskPasswordFlags flags,
-			     gboolean *aborted,
+			     gboolean *aborted_out,
 			     char **password_out,
 			     char **user_out,
 			     char **domain_out)
 {
-  AskPasswordData data = {NULL};
-
+  char *password, *username, *domain;
+  gboolean handled, aborted;
+  AskPasswordSyncData data = {NULL};
+  
   if (password_out)
     *password_out = NULL;
   if (user_out)
@@ -273,17 +349,17 @@ g_mount_source_ask_password (GMountSource *source,
   
   data.mutex = g_mutex_new ();
   data.cond = g_cond_new ();
-  data.callback = ask_password_reply_sync;
 
   g_mutex_lock (data.mutex);
 
 
   g_mount_source_ask_password_async (source,
-				     message_string,
-				     default_user,
-				     default_domain,
-				     flags,
-				     &data);
+                                     message_string,
+                                     default_user,
+                                     default_domain,
+                                     flags,
+                                     ask_password_reply_sync,
+                                     &data);
   
   g_cond_wait(data.cond, data.mutex);
   g_mutex_unlock (data.mutex);
@@ -291,52 +367,80 @@ g_mount_source_ask_password (GMountSource *source,
   g_cond_free (data.cond);
   g_mutex_free (data.mutex);
 
-  if (aborted)
-    *aborted = data.aborted;
+
+  handled = g_mount_source_ask_password_finish (source,
+                                                data.result,
+                                                &aborted,
+                                                &password,
+                                                &username,
+                                                &domain);
+  g_object_unref (data.result);
+
+  if (aborted_out)
+    *aborted_out = aborted;
+
   if (password_out)
-    *password_out = data.password;
+    *password_out = password;
   else
-    g_free (data.password);
+    g_free (password);
+
   if (user_out)
-    *user_out = data.username;
+    *user_out = username;
   else
-    g_free (data.username);
+    g_free (username);
+
   if (domain_out)
-    *domain_out = data.domain;
+    *domain_out = domain;
   else
-    g_free (data.domain);
+    g_free (domain);
   
-  return data.handled;
+  return handled;
 }
 
 static void
-ask_password_reply_async (AskPasswordData *data)
+op_ask_password_reply (GObject *source_object,
+                       GAsyncResult *res,
+                       gpointer user_data)
 {
   GMountOperationResult result;
+  GMountOperation *op;
+  GMountSource *source;
+  gboolean handled, aborted;
+  char *username;
+  char *password;
+  char *domain;
 
-  if (!data->handled)
+  source = G_MOUNT_SOURCE (source_object);
+  op = G_MOUNT_OPERATION (user_data);
+  username = NULL;
+  password = NULL;
+  domain = NULL;
+
+  handled = g_mount_source_ask_password_finish (source,
+                                                res,
+                                                &aborted,
+                                                &username,
+                                                &password,
+                                                &domain);
+
+  if (!handled)
     result = G_MOUNT_OPERATION_UNHANDLED;
-  else if (data->aborted)
+  else if (aborted)
     result = G_MOUNT_OPERATION_ABORTED;
   else
     {
       result = G_MOUNT_OPERATION_HANDLED;
 
-      if (data->password)
-	g_mount_operation_set_password (data->op,
-					data->password);
-      if (data->username)
-	g_mount_operation_set_username (data->op,
-					data->username);
-      if (data->domain)
-	g_mount_operation_set_domain (data->op,
-				      data->domain);
+      if (password)
+	g_mount_operation_set_password (op, password);
+      if (username)
+	g_mount_operation_set_username (op, username);
+      if (domain)
+	g_mount_operation_set_domain (op, domain);
     }
   
-  g_mount_operation_reply (data->op, result);
-
-  g_object_unref (data->op);
-  g_free (data);
+  g_mount_operation_reply (op, result);
+  g_object_unref (op);
 }
 
 static gboolean
@@ -347,18 +451,13 @@ op_ask_password (GMountOperation *op,
 		 GAskPasswordFlags flags,
 		 GMountSource *mount_source)
 {
-  AskPasswordData *data;
-
-  data = g_new0 (AskPasswordData, 1);
-  data->callback = ask_password_reply_async;
-  data->op = g_object_ref (op);
-  
   g_mount_source_ask_password_async (mount_source,
 				     message,
 				     default_user,
 				     default_domain,
-				     flags,
-				     data);
+                                     flags,
+				     op_ask_password_reply,
+				     g_object_ref (op));
   return TRUE;
 }
 

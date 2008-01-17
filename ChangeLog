@@ -1,3 +1,17 @@
+2008-01-17  Christian Kellner  <gicmo@gnome.org>
+
+	* common/gmountsource.c:
+	* common/gmountsource.h:
+	Make g_mount_source_ask_password_async () public and add
+	g_mount_source_ask_password_finish (). 
+
+	* daemon/gvfsbackenddav.c: 
+	Use g_mount_source_ask_password_async instead of the sync
+	version so we don't hang during auth. Few cleanups.
+
+	* programs/gvfs-mount.c: 
+	Don't echo the password, if possible.
+
 2008-01-17  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalvolume.c:

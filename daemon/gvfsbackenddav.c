@@ -64,9 +64,6 @@ struct _GVfsBackendDav
 {
   GVfsBackendHttp parent_instance;
 
-  /* Only used during mount: */
-  char         *last_good_path;
-  GMountSource *mount_source;
 };
 
 G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP);
@@ -187,9 +184,12 @@ node_has_name (xmlNodePtr node, const char *name)
 }
 
 static xmlDocPtr
-multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
+parse_xml (SoupMessage  *msg,
+           xmlNodePtr   *root,
+           const char   *name,
+           GError      **error)
 {
-  xmlDocPtr  doc;
+ xmlDocPtr  doc;
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -220,7 +220,7 @@ multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
       return NULL;
     }
 
-  if (strcmp ((char *) (*root)->name, "multistatus"))
+  if (strcmp ((char *) (*root)->name, name))
     {
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                      _("Unexpected reply from server"));
@@ -229,6 +229,14 @@ multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
 
   return doc;
 }
+
+
+static xmlDocPtr
+multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
+{
+    return parse_xml (msg, root, "multistatus", error);
+}
+
 
 static GFileType
 parse_resourcetype (xmlNodePtr rt)
@@ -256,57 +264,80 @@ parse_resourcetype (xmlNodePtr rt)
   return type;
 }
 
+static const char *
+node_get_content (xmlNodePtr node)
+{
+    if (node == NULL)
+      return NULL;
+
+    switch (node->type)
+      {
+        case XML_ELEMENT_NODE:
+          return node_get_content (node->children);
+          break;
+        case XML_TEXT_NODE:
+          return (const char *) node->content;
+          break;
+        default:
+          return NULL;
+      }
+    return NULL;
+}
+
 static GFileInfo *
 mulitstatus_parse_prop_node (xmlDocPtr doc, xmlNodePtr prop)
 {
   GFileInfo  *info;
   xmlNodePtr  node;
+  const char *text;
+  GTimeVal    tv;
 
   info = g_file_info_new ();
+
 
   for (node = prop->children; node; node = node->next)
     {
      if (node->type != XML_ELEMENT_NODE ||
-          node->name == NULL)
+         node->name == NULL)
         {
           continue;
         }
-     else if (!strcmp ((char *) node->name, "resourcetype"))
+
+     text = node_get_content (node);
+
+     if (node_has_name (node, "resourcetype"))
         {
            GFileType type = parse_resourcetype (node);
            g_file_info_set_file_type (info, type);
         }
-     else if (!strcmp ((char *) node->name, "displayname"))
+     else if (node_has_name (node, "displayname"))
         {
-          xmlChar *text;
-          text = xmlNodeGetContent (node);
-          g_file_info_set_display_name (info, (char *) text);
-          xmlFree (text);
+          g_file_info_set_display_name (info, text);
         }
-     else if (!strcmp ((char *) node->name, "getetag"))
+     else if (node_has_name (node, "getetag"))
         {
-
+          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE,
+                                            text);
         }
-     else if (!strcmp ((char *) node->name, "creationdate"))
+     else if (node_has_name (node, "creationdate"))
         {
-          
+            
         }
-     else if (!strcmp ((char *) node->name, "getcontenttype"))
+     else if (node_has_name (node, "getcontenttype"))
         {
-          xmlChar *text;
-          text = xmlNodeGetContent (node);
-          g_file_info_set_content_type (info, (char *) text);
-          xmlFree (text);
+          g_file_info_set_content_type (info, text);
         }
-     else if (!strcmp ((char *) node->name, "getcontentlength"))
+     else if (node_has_name (node, "getcontentlength"))
         {
-          gint64 size; 
-          xmlChar *text;
-          text = xmlNodeGetContent (node);
-          size = g_ascii_strtoll ((char *) text, NULL, 10);
-          xmlFree (text);
+          gint64 size;
+          size = g_ascii_strtoll (text, NULL, 10);
           g_file_info_set_size (info, size);
         }
+     else if (node_has_name (node, "getlastmodified"))
+       {
+           if (g_time_val_from_iso8601 (text, &tv))
+             g_file_info_set_modification_time (info, &tv);
+       }
     }
   return info;
 }
@@ -333,11 +364,10 @@ multistatus_parse_response (xmlDocPtr    doc,
         }
       else if (! strcmp ((char *) node->name, "href"))
         {
-          xmlChar *text;
+          const char *text;
 
-          text = xmlNodeGetContent (node);
-          name = uri_get_basename ((char *) text);
-          xmlFree (text);
+          text = node_get_content (node); 
+          name = uri_get_basename (text);
         }
 
       else if (! strcmp ((char *) node->name, "propstat"))
@@ -449,76 +479,157 @@ create_propfind_request (GFileAttributeMatcher *matcher, gulong *size)
     return res;
 }
 
+
 /* ************************************************************************* */
 /*  */
+
+typedef struct _MountOpData {
+
+  SoupSession  *session;
+  GMountSource *mount_source;
+
+  char         *last_good_path;
+
+  /* general authentication */
+
+  SoupMessage *message;
+  SoupAuth    *auth;
+
+     /* for server authentication */
+  char *username;
+  char *password;
+  char *last_realm;
+
+     /* for proxy authentication */
+  char *proxy_user;
+  char *proxy_password;
+
+} MountOpData;
+
+static void
+mount_op_data_free (gpointer _data)
+{
+  MountOpData *data;
+
+  data = (MountOpData *) _data;
+  
+  g_free (data->last_good_path);
+  
+  if (data->mount_source)
+    g_object_unref (data->mount_source);
+  
+  if (data->message)
+    g_object_unref (data->message);
+  
+  if (data->auth)
+    g_object_unref (data->auth);
+  
+  g_free (data->username);
+  g_free (data->password);
+  g_free (data->last_realm);
+  g_free (data->proxy_user);
+  g_free (data->proxy_password);
+
+  g_free (data);
+}
+
+static void
+ask_password_ready (GObject      *source_object,
+                    GAsyncResult *result,
+                    gpointer      user_data)
+{
+  MountOpData *data;
+  char        *username;
+  char        *password;
+  gboolean     aborted;
+  gboolean     res;
+
+  data = (MountOpData *) user_data;
+  username = password = NULL;
+
+  res = g_mount_source_ask_password_finish (data->mount_source,
+                                            result,
+                                            &aborted,
+                                            &password,
+                                            &username,
+                                            NULL);
+
+  if (res && !aborted)
+    soup_auth_authenticate (data->auth, username, password);
+
+  soup_session_unpause_message (data->session, data->message);
+
+  g_free (username);
+  g_free (password);
+
+  g_object_unref (data->message);
+  g_object_unref (data->auth);
+  
+  data->message = NULL;
+  data->auth = NULL;
+}
+
 static void
 soup_authenticate (SoupSession *session,
                    SoupMessage *msg,
 	           SoupAuth    *auth,
                    gboolean     retrying,
-                   gpointer     data)
+                   gpointer     user_data)
 {
-  GVfsBackendDav *backend;
-  GVfsJobMount   *job;
-  SoupURI        *mount_base;
-  gboolean        res;
-  gboolean        aborted;
-  const char     *auth_realm;
+  MountOpData    *data;
+  const char     *username;
+  const char     *password;
   char           *prompt;
-  char           *new_password;
-  char           *new_user;
 
-  job = G_VFS_JOB_MOUNT (data);
-  backend = G_VFS_BACKEND_DAV (job->backend);
-  mount_base = G_VFS_BACKEND_HTTP (backend)->mount_base;
+  data = (MountOpData *) user_data;
 
-  auth_realm = soup_auth_get_realm (auth);
+  if (soup_auth_is_for_proxy (auth))
+    {
+      username = data->proxy_user;
+      password = retrying ? NULL : data->proxy_password;
+    }
+  else
+    {
+      username = data->username;
+      password = retrying ? NULL : data->password;
+    }
 
-  if (auth_realm == NULL)
-    auth_realm = _("WebDAV share");
+  if (username && password)
+    {
+      soup_auth_authenticate (auth, username, password);
+      return;
+    }
 
-  prompt = g_strdup_printf (_("Enter password for %s"), auth_realm);
+  if (soup_auth_is_for_proxy (auth))
+    {
+      prompt = g_strdup (_("Please enter proxy password"));
+    }
+  else
+    {
+      const char *auth_realm;
 
-  new_user = new_password = NULL;
-  
-  res = g_mount_source_ask_password (backend->mount_source,
+      auth_realm = soup_auth_get_realm (auth);
+
+      if (auth_realm == NULL)
+        auth_realm = _("WebDAV share");
+
+      prompt = g_strdup_printf (_("Enter password for %s"), auth_realm);
+    }
+
+  data->auth = g_object_ref (auth);
+  data->message = g_object_ref (msg);
+
+  soup_session_pause_message (data->session, msg);
+
+  g_mount_source_ask_password_async (data->mount_source,
                                      prompt,
-                                     mount_base->user,
+                                     username,
                                      NULL,
                                      G_ASK_PASSWORD_NEED_PASSWORD |
                                      G_ASK_PASSWORD_NEED_USERNAME,
-                                     &aborted,
-                                     &new_password,
-                                     &new_user,
-                                     NULL);
-  if (res && !aborted)
-    {
-      soup_auth_authenticate (auth, new_user, new_password);
-    }
-
-  g_free (new_user);
-  g_free (new_password);
+                                     ask_password_ready,
+                                     data);
   g_free (prompt);
-}
-
-static void discover_mount_root_ready (SoupSession *session,
-                                       SoupMessage *msg,
-                                       gpointer     user_data);
-static void
-discover_mount_root (GVfsBackendDav *backend, GVfsJobMount *job)
-{
-  GVfsBackendHttp *http_backend;
-  SoupMessage     *msg;
-  SoupSession     *session;
-  SoupURI         *mount_base;
-
-  http_backend = G_VFS_BACKEND_HTTP (backend);
-  mount_base = http_backend->mount_base;
-  session = http_backend->session;
-
-  msg = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-  soup_message_headers_append (msg->request_headers, "User-Agent", "gvfs/" VERSION);
-  soup_session_queue_message (session, msg, discover_mount_root_ready, job);
 }
 
 static void
@@ -528,6 +639,7 @@ discover_mount_root_ready (SoupSession *session,
 {
   GVfsBackendDav *backend;
   GVfsJobMount   *job;
+  MountOpData    *data;
   GMountSpec     *mount_spec;
   SoupURI        *mount_base;
   gboolean        is_success;
@@ -536,6 +648,7 @@ discover_mount_root_ready (SoupSession *session,
   job = G_VFS_JOB_MOUNT (user_data);
   backend = G_VFS_BACKEND_DAV (job->backend);
   mount_base = G_VFS_BACKEND_HTTP (backend)->mount_base;
+  data = (MountOpData *) G_VFS_JOB (job)->backend_data;
 
   is_success = SOUP_STATUS_IS_SUCCESSFUL (msg->status_code);
   is_dav = sm_has_header (msg, "DAV");
@@ -544,12 +657,16 @@ discover_mount_root_ready (SoupSession *session,
 
   if (is_success && is_dav)
     {
-      backend->last_good_path = mount_base->path;
+
+      data->last_good_path = mount_base->path;
       mount_base->path = path_get_parent_dir (mount_base->path);
 
       if (mount_base->path)
         {
-          discover_mount_root (backend, job);
+          SoupMessage *msg;
+          msg = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+          soup_session_queue_message (session, msg, 
+                                      discover_mount_root_ready, job);
           return;
         } 
     }
@@ -558,7 +675,7 @@ discover_mount_root_ready (SoupSession *session,
    * chdir up to (or couldn't chdir up at all) */
   
   /* check if we at all have a good path */
-  if (backend->last_good_path == NULL)
+  if (data->last_good_path == NULL)
     {
       if (!is_success) 
         g_vfs_job_failed (G_VFS_JOB (job),
@@ -572,7 +689,11 @@ discover_mount_root_ready (SoupSession *session,
       return;
     }
 
+  g_free (mount_base->path);
+  mount_base->path = data->last_good_path;
+  data->last_good_path = NULL;
   mount_spec = g_mount_spec_new ("dav"); 
+  
   g_mount_spec_set (mount_spec, "host", mount_base->host);
 
   if (mount_base->user)
@@ -583,41 +704,14 @@ discover_mount_root_ready (SoupSession *session,
   else if (mount_base->scheme == SOUP_URI_SCHEME_HTTPS)
     g_mount_spec_set (mount_spec, "ssl", "true");
 
-  g_free (mount_base->path);
-  mount_base->path = backend->last_good_path;
-
   g_mount_spec_set_mount_prefix (mount_spec, mount_base->path);
-  g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
   g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "folder-remote");
 
+  g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
   g_mount_spec_unref (mount_spec);
+
   g_print ("- discover_mount_root_ready success: %s \n", mount_base->path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
-}
-
-
-
-static void
-mount (GVfsBackend  *backend,
-       GVfsJobMount *job,
-       GMountSpec   *mount_spec,
-       GMountSource *mount_source,
-       gboolean      is_automount)
-{
-  GVfsBackendDav *op_backend;
-  SoupSession    *session;
-
-  g_print ("+ mount\n");
-
-  op_backend = G_VFS_BACKEND_DAV (backend);
-  session = G_VFS_BACKEND_HTTP (backend)->session;
-
-  g_signal_connect (session, "authenticate",
-                    G_CALLBACK (soup_authenticate), job);
-
-  op_backend->mount_source = mount_source;
-  discover_mount_root (op_backend, job);
-  g_print ("- mount\n");
 }
 
 static gboolean
@@ -628,6 +722,9 @@ try_mount (GVfsBackend  *backend,
            gboolean      is_automount)
 {
   GVfsBackendDav *op_backend;
+  MountOpData    *data;
+  SoupSession    *session;
+  SoupMessage    *msg;
   SoupURI        *uri;
   const char     *host;
   const char     *user;
@@ -635,11 +732,7 @@ try_mount (GVfsBackend  *backend,
   const char     *ssl;
   guint           port_num;
 
-  /* We have to override this method since the http backend
-   * has its own try_mount and we don't want that to be used.
-   * We also need to do the dav mounting stuff inside a
-   * thread since the auth callback from soup is getting
-   * called in the main thread otherwise and we would block */
+  g_print ("+ mount\n");
 
   op_backend = G_VFS_BACKEND_DAV (backend);
 
@@ -672,9 +765,24 @@ try_mount (GVfsBackend  *backend,
   soup_uri_set_host (uri, host);
   soup_uri_set_path (uri, mount_spec->mount_prefix);
 
+  session = G_VFS_BACKEND_HTTP (backend)->session;
   G_VFS_BACKEND_HTTP (backend)->mount_base = uri; 
 
-  return FALSE;
+  msg = message_new_from_uri (SOUP_METHOD_OPTIONS, uri);
+  soup_session_queue_message (session, msg, discover_mount_root_ready, job);
+
+  data = g_new0 (MountOpData, 1);
+  data->session = g_object_ref (session);
+  data->mount_source = g_object_ref (mount_source);
+  data->username = g_strdup (user);
+
+  g_signal_connect (session, "authenticate",
+                    G_CALLBACK (soup_authenticate), data);
+
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), data, mount_op_data_free);
+
+  g_print ("- mount\n");
+  return TRUE;
 }
 
 static void
@@ -784,8 +892,8 @@ try_query_info (GVfsBackend           *backend,
   return TRUE;
 }
 
-/* *** enumerate *** */
 
+/* *** enumerate *** */
 
 
 static void
@@ -888,7 +996,7 @@ try_enumerate (GVfsBackend           *backend,
       redirect_header = "T";
 
   soup_message_headers_append (msg->request_headers,
-                           "Apply-To-Redirect-Ref", redirect_header);
+                               "Apply-To-Redirect-Ref", redirect_header);
 
   soup_message_set_request (msg, "application/xml",
                             SOUP_MEMORY_TAKE,
@@ -912,7 +1020,6 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   gobject_class->finalize  = g_vfs_backend_dav_finalize;
 
   backend_class = G_VFS_BACKEND_CLASS (klass); 
-  backend_class->mount             = mount;
   backend_class->try_mount         = try_mount;
   backend_class->try_query_info    = try_query_info;
   backend_class->try_enumerate     = try_enumerate;

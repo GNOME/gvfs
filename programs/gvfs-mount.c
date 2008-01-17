@@ -29,6 +29,12 @@
 #include <locale.h>
 #include <gio/gio.h>
 
+#ifdef HAVE_TERMIOS_H
+#include <termios.h>
+#endif
+
+#define STDIN_FILENO 0
+
 static int outstanding_mounts = 0;
 static GMainLoop *main_loop;
 
@@ -48,8 +54,14 @@ static GOptionEntry entries[] =
 };
 
 static char *
-prompt_for (const char *prompt, const char *default_value)
+prompt_for (const char *prompt, const char *default_value, gboolean echo)
 {
+#ifdef HAVE_TERMIOS_H
+  struct termios term_attr; 
+  int old_flags;
+  int res;
+  gboolean restore_flags;
+#endif
   char data[256];
   int len;
 
@@ -59,7 +71,31 @@ prompt_for (const char *prompt, const char *default_value)
     g_print ("%s: ", prompt);
 
   data[0] = 0;
+
+#ifdef HAVE_TERMIOS_H
+  restore_flags = FALSE;
+  if (!echo && (res = tcgetattr (STDIN_FILENO, &term_attr)) == 0)
+    {
+      old_flags = term_attr.c_lflag; 
+      term_attr.c_lflag &= ~ECHO;
+      restore_flags = TRUE;
+      
+      if (tcsetattr (STDIN_FILENO, TCSAFLUSH, &term_attr) != 0)
+        g_print ("Warning! Password will be echoed");
+    }
+
+#endif
+
   fgets(data, sizeof (data), stdin);
+  
+#ifdef HAVE_TERMIOS_H
+  if (restore_flags)
+    {
+      term_attr.c_lflag = old_flags;
+      tcsetattr (STDIN_FILENO, TCSAFLUSH, &term_attr);
+    }
+#endif
+
   len = strlen (data);
   if (len > 0 && data[len-1] == '\n')
     data[len-1] = 0;
@@ -81,21 +117,21 @@ ask_password_cb (GMountOperation *op,
 
   if (flags & G_ASK_PASSWORD_NEED_USERNAME)
     {
-      s = prompt_for ("User", default_user);
+      s = prompt_for ("User", default_user, TRUE);
       g_mount_operation_set_username (op, s);
       g_free (s);
     }
   
   if (flags & G_ASK_PASSWORD_NEED_DOMAIN)
     {
-      s = prompt_for ("Domain", default_domain);
+      s = prompt_for ("Domain", default_domain, TRUE);
       g_mount_operation_set_domain (op, s);
       g_free (s);
     }
   
   if (flags & G_ASK_PASSWORD_NEED_PASSWORD)
     {
-      s = prompt_for ("Password", NULL);
+      s = prompt_for ("Password", NULL, FALSE);
       g_mount_operation_set_password (op, s);
       g_free (s);
     }
