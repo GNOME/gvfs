@@ -485,6 +485,8 @@ create_propfind_request (GFileAttributeMatcher *matcher, gulong *size)
 
 typedef struct _MountOpData {
 
+  gulong        signal_id;
+
   SoupSession  *session;
   GMountSource *mount_source;
 
@@ -710,6 +712,8 @@ discover_mount_root_ready (SoupSession *session,
   g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
   g_mount_spec_unref (mount_spec);
 
+  g_signal_handler_disconnect (session, data->signal_id);
+
   g_print ("- discover_mount_root_ready success: %s \n", mount_base->path);
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -776,8 +780,8 @@ try_mount (GVfsBackend  *backend,
   data->mount_source = g_object_ref (mount_source);
   data->username = g_strdup (user);
 
-  g_signal_connect (session, "authenticate",
-                    G_CALLBACK (soup_authenticate), data);
+  data->signal_id = g_signal_connect (session, "authenticate",
+                                      G_CALLBACK (soup_authenticate), data);
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), data, mount_op_data_free);
 

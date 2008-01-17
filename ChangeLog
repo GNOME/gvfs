@@ -1,5 +1,12 @@
 2008-01-17  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackenddav.c: 
+	Disconnect signal handler, since the data struct we pass
+	into the signal handler will be invalid after the mount
+	is finished.
+
+2008-01-17  Christian Kellner  <gicmo@gnome.org>
+
 	* common/gmountsource.c:
 	* common/gmountsource.h:
 	Make g_mount_source_ask_password_async () public and add
