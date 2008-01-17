@@ -658,7 +658,7 @@ hal_device_compare (HalDevice *a, HalDevice *b)
 }
 
 static gboolean
-_should_volume_be_ignored (HalDevice *d)
+_should_volume_be_ignored (HalPool *pool, HalDevice *d)
 {
   gboolean volume_ignore;
   const char *volume_fsusage;
@@ -678,6 +678,19 @@ _should_volume_be_ignored (HalDevice *d)
   if (strcmp (volume_fsusage, "filesystem") != 0)
     {
       /* no file system on the volume... blank and audio discs are handled in update_discs() */
+
+      /* TODO: davidz: LUKS stuff needs more work; turn off for now */
+#if 0
+      /* check if it's a LUKS crypto volume */
+      if (strcmp (volume_fsusage, "crypto") == 0)
+        {
+          if (strcmp (hal_device_get_property_string (d, "volume.fstype"), "crypto_LUKS") == 0)
+            {
+              return FALSE;
+            }
+        }
+#endif
+      
       return TRUE;
     }
 
@@ -763,7 +776,7 @@ update_volumes (GHalVolumeMonitor *monitor)
     {
       ll = l->next;
       HalDevice *d = l->data;
-      if (_should_volume_be_ignored (d))
+      if (_should_volume_be_ignored (monitor->pool, d))
         new_volume_devices = g_list_delete_link (new_volume_devices, l);
     }
 

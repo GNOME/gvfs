@@ -186,17 +186,17 @@ format_size_for_display (guint64 size)
   if (size < MEGABYTE_FACTOR)
     {
       displayed_size = (double) size / KILOBYTE_FACTOR;
-      str = g_strdup_printf (_("%.1f kB Media"), displayed_size);
+      str = g_strdup_printf (_("%.1f kB"), displayed_size);
     } 
   else if (size < GIGABYTE_FACTOR)
     {
       displayed_size = (double) size / MEGABYTE_FACTOR;
-      str = g_strdup_printf (_("%.1f MB Media"), displayed_size);
+      str = g_strdup_printf (_("%.1f MB"), displayed_size);
     } 
   else 
     {
       displayed_size = (double) size / GIGABYTE_FACTOR;
-      str = g_strdup_printf (_("%.1f GB Media"), displayed_size);
+      str = g_strdup_printf (_("%.1f GB"), displayed_size);
     }
   
   return str;
@@ -215,9 +215,12 @@ do_update_from_hal (GHalVolume *mv)
   gboolean volume_disc_has_data;
   const char *volume_disc_type;
   gboolean volume_disc_is_blank;
+  const char *volume_fsusage;
+  const char *volume_fstype;
   HalDevice *volume;
   HalDevice *drive;
   char *name;
+  char *size;
 
   volume = mv->device;
   drive = mv->drive_device;
@@ -232,6 +235,8 @@ do_update_from_hal (GHalVolume *mv)
   volume_disc_has_data = hal_device_get_property_bool (volume, "volume.disc.has_data");
   volume_disc_is_blank = hal_device_get_property_bool (volume, "volume.disc.is_blank");
   volume_disc_type = hal_device_get_property_string (volume, "volume.disc.type");
+  volume_fsusage = hal_device_get_property_string (volume, "volume.fsusage");
+  volume_fstype = hal_device_get_property_string (volume, "volume.fstype");
 
   if (volume_is_disc && volume_disc_has_audio && mv->foreign_mount_root != NULL)
     {
@@ -239,19 +244,27 @@ do_update_from_hal (GHalVolume *mv)
     }
   else
     {
-      if (volume_fs_label != NULL && strlen (volume_fs_label) > 0) {
-        name = g_strdup (volume_fs_label);
-      } else if (volume_is_disc) {
-        if (volume_disc_has_audio) {
-          if (volume_disc_has_data)
-            name = g_strdup (_("Mixed Audio/Data Disc"));
-          else
-            name = g_strdup (_("Audio Disc"));
-        } else {
-          name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
-        }
+      if (strcmp (volume_fsusage, "crypto") == 0 && strcmp (volume_fstype, "crypto_LUKS") == 0) {
+        size = format_size_for_display (volume_size);
+        name = g_strdup_printf (_("%s Encrypted Data"), size);
+        g_free (size);
       } else {
-        name = format_size_for_display (volume_size);
+        if (volume_fs_label != NULL && strlen (volume_fs_label) > 0) {
+          name = g_strdup (volume_fs_label);
+        } else if (volume_is_disc) {
+          if (volume_disc_has_audio) {
+            if (volume_disc_has_data)
+              name = g_strdup (_("Mixed Audio/Data Disc"));
+            else
+              name = g_strdup (_("Audio Disc"));
+          } else {
+            name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
+          }
+        } else {
+          size = format_size_for_display (volume_size);
+          name = g_strdup_printf (_("%s Media"), size);
+          g_free (size);
+        }
       }
     }
 
@@ -262,6 +275,18 @@ do_update_from_hal (GHalVolume *mv)
     mv->mount_path = g_strdup (hal_device_get_property_string (volume, "volume.mount_point"));
   else
     mv->mount_path = NULL;
+
+  g_object_set_data_full (G_OBJECT (mv), 
+                          "hal-storage-device-capabilities",
+                          g_strdupv (hal_device_get_property_strlist (mv->drive_device, "info.capabilities")),
+                          (GDestroyNotify) g_strfreev);
+
+  if (volume_disc_type != NULL && strlen (volume_disc_type) == 0)
+    volume_disc_type = NULL;
+  g_object_set_data_full (G_OBJECT (mv), 
+                          "hal-volume.disc.type",
+                          g_strdup (volume_disc_type),
+                          (GDestroyNotify) g_free);
 }
 
 static void

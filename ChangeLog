@@ -1,5 +1,11 @@
 2008-01-17  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghalvolume.c:
+        * hal/ghalvolumemonitor.c:
+	Initial work on LUKS, from david.
+
+2008-01-17  Alexander Larsson  <alexl@redhat.com>
+
         * common/gvfsdaemonprotocol.h:
         * client/gdaemonfile.c:
 	Add upload operation (requires latest glib)
