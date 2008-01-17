@@ -440,6 +440,10 @@ backend_dbus_handler (DBusConnection  *connection,
     job = g_vfs_job_copy_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_UPLOAD))
+    job = g_vfs_job_upload_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_MOVE))
     job = g_vfs_job_move_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,

@@ -687,6 +687,7 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+      g_file_info_set_content_type (info, "inode/directory");
     }
   else if (file != NULL)
     file_info_from_file (file, info);

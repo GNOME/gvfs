@@ -30,10 +30,10 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-localtest
+libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in localtest.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount computer.mount localtest.mount
+mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
+mount_DATA = ftp.mount sftp.mount trash.mount computer.mount burn.mount localtest.mount
 
 if HAVE_HTTP
 mount_in_files += http.mount.in dav.mount.in 
@@ -92,6 +92,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobtrash.c gvfsjobtrash.h \
 	gvfsjobdelete.c gvfsjobdelete.h \
 	gvfsjobcopy.c gvfsjobcopy.h \
+	gvfsjobupload.c gvfsjobupload.h \
 	gvfsjobmove.c gvfsjobmove.h \
 	gvfsjobmakedirectory.c gvfsjobmakedirectory.h \
 	gvfsjobmakesymlink.c gvfsjobmakesymlink.h \
@@ -211,6 +212,19 @@ gvfsd_computer_CPPFLAGS = \
 	-DBACKEND_TYPES='"computer", G_VFS_TYPE_BACKEND_COMPUTER,'
 
 gvfsd_computer_LDADD = $(libraries)
+
+gvfsd_burn_SOURCES = \
+	gvfsbackendburn.c gvfsbackendburn.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_burn_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendburn.h \
+	-DDEFAULT_BACKEND_TYPE=burn \
+	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"burn", G_VFS_TYPE_BACKEND_BURN,'
+
+gvfsd_burn_LDADD = $(libraries)
 
 gvfsd_cdda_SOURCES = \
 	gvfsbackendcdda.c gvfsbackendcdda.h \

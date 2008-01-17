@@ -488,20 +488,28 @@ do_sync_2_path_call (GFile *file1,
   if (mount_info1 == NULL)
     return NULL;
 
-  mount_info2 = _g_daemon_vfs_get_mount_info_sync (daemon_file2->mount_spec,
-						   daemon_file2->path,
-						   error);
-  if (mount_info2 == NULL)
-    return NULL;
-
-  if (mount_info1 != mount_info2)
+  mount_info2 = NULL;
+  if (daemon_file2)
     {
-      /* For copy this will cause the fallback code to be involved */
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported, files on different mounts"));
-      return NULL;
+      mount_info2 = _g_daemon_vfs_get_mount_info_sync (daemon_file2->mount_spec,
+						       daemon_file2->path,
+						       error);
+      if (mount_info2 == NULL)
+	{
+	  g_mount_info_unref (mount_info1);
+	  return NULL;
+	}
+
+      if (mount_info1 != mount_info2)
+	{
+	  g_mount_info_unref (mount_info1);
+	  /* For copy this will cause the fallback code to be involved */
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		       _("Operation not supported, files on different mounts"));
+	  return NULL;
+	}
     }
-  
+      
   message =
     dbus_message_new_method_call (mount_info1->dbus_id,
 				  mount_info1->object_path,
@@ -512,16 +520,19 @@ do_sync_2_path_call (GFile *file1,
 				     daemon_file1->path);
   _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path1, 0);
 
-  path2 = g_mount_info_resolve_path (mount_info2,
-				     daemon_file2->path);
-  _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path2, 0);
-
+  if (daemon_file2)
+    {
+      path2 = g_mount_info_resolve_path (mount_info2,
+					 daemon_file2->path);
+      _g_dbus_message_append_args (message, G_DBUS_TYPE_CSTRING, &path2, 0);
+    }
+  
   va_start (var_args, first_arg_type);
   _g_dbus_message_append_args_valist (message,
 				      first_arg_type,
 				      var_args);
   va_end (var_args);
-
+  
   reply = _g_vfs_daemon_call_sync (message,
 				   connection_out,
 				   callback_obj_path,
@@ -531,7 +542,8 @@ do_sync_2_path_call (GFile *file1,
   dbus_message_unref (message);
 
   g_mount_info_unref (mount_info1);
-  g_mount_info_unref (mount_info2);
+  if (mount_info2)
+    g_mount_info_unref (mount_info2);
   
   return reply;
 }
@@ -1858,13 +1870,38 @@ g_daemon_file_copy (GFile                  *source,
 {
   GDaemonFile *daemon_source, *daemon_dest;
   DBusMessage *reply;
+  char *local_path;
   char *obj_path, *dbus_obj_path;
   dbus_uint32_t flags_dbus;
   struct ProgressCallbackData data;
 
-  daemon_source = G_DAEMON_FILE (source);
+  if (!G_IS_DAEMON_FILE (destination))
+    {
+      /* Fall back to default move */
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");
+      return FALSE;
+    }
   daemon_dest = G_DAEMON_FILE (destination);
 
+  if (G_IS_DAEMON_FILE (source))
+    {
+      daemon_source = G_DAEMON_FILE (source);
+      local_path = NULL;
+    }
+  else
+    {
+      daemon_source = NULL;
+      local_path = g_file_get_path (source);
+
+      if (local_path == NULL)
+	{
+	  /* This will cause the fallback code to be involved */
+	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		       _("Operation not supported, files on different mounts"));
+	  return FALSE;
+	}
+    }
+  
   if (progress_callback)
     {
       obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
@@ -1881,13 +1918,29 @@ g_daemon_file_copy (GFile                  *source,
   data.progress_callback_data = progress_callback_data;
 
   flags_dbus = flags;
-  reply = do_sync_2_path_call (source, destination, 
-			       G_VFS_DBUS_MOUNT_OP_COPY,
-			       obj_path, progress_callback_message, &data,
-			       NULL, cancellable, error,
-			       DBUS_TYPE_UINT32, &flags_dbus,
-			       DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-			       0);
+  
+  if (daemon_source)
+    {
+      reply = do_sync_2_path_call (source, destination, 
+				   G_VFS_DBUS_MOUNT_OP_COPY,
+				   obj_path, progress_callback_message, &data,
+				   NULL, cancellable, error,
+				   DBUS_TYPE_UINT32, &flags_dbus,
+				   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+				   0);
+    }
+  else
+    {
+      reply = do_sync_2_path_call (destination, NULL, 
+				   G_VFS_DBUS_MOUNT_OP_UPLOAD,
+				   obj_path, progress_callback_message, &data,
+				   NULL, cancellable, error,
+				   G_DBUS_TYPE_CSTRING, &local_path,
+				   DBUS_TYPE_UINT32, &flags_dbus,
+				   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+				   0);
+      g_free (local_path);
+    }
 
   g_free (obj_path);
 
@@ -1913,6 +1966,14 @@ g_daemon_file_move (GFile                  *source,
   dbus_uint32_t flags_dbus;
   struct ProgressCallbackData data;
 
+  if (!G_DAEMON_FILE (source) ||
+      !G_DAEMON_FILE (destination))
+    {
+      /* Fall back to default move */
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");
+      return FALSE;
+    }
+  
   daemon_source = G_DAEMON_FILE (source);
   daemon_dest = G_DAEMON_FILE (destination);
 
