@@ -58,6 +58,7 @@ g_mount_spec_new (const char *type)
   return spec;
 }
 
+/* Takes ownership of passed in data */
 GMountSpec *
 g_mount_spec_new_from_data (GArray *items,
 			    char *mount_prefix)
@@ -67,7 +68,10 @@ g_mount_spec_new_from_data (GArray *items,
   spec = g_new0 (GMountSpec, 1);
   spec->ref_count = 1;
   spec->items = items;
-  spec->mount_prefix = mount_prefix;
+  if (mount_prefix == NULL)
+    spec->mount_prefix = g_strdup ("/");
+  else
+    spec->mount_prefix = mount_prefix;
 
   g_array_sort (spec->items, item_compare);
   

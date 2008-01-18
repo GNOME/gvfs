@@ -1,3 +1,10 @@
+2008-01-18  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gmountspec.c:
+        (g_mount_spec_new_from_data):
+	Ensure that mount_prefix is never NULL. It
+	should be "/" in that case.
+
 2008-01-18  Luca Ferretti  <elle.uca@libero.it>
 
 	* programs/Makefile.am:
