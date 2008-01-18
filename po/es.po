@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-17 12:23+0000\n"
-"PO-Revision-Date: 2008-01-17 15:28+0100\n"
+"POT-Creation-Date: 2008-01-18 10:07+0000\n"
+"PO-Revision-Date: 2008-01-18 12:04+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -268,7 +268,7 @@ msgstr "No se puede desmontar el archivo"
 msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
-#: ../daemon/gvfsbackenddav.c:198 ../daemon/gvfsbackenddav.c:566
+#: ../daemon/gvfsbackenddav.c:198 ../daemon/gvfsbackenddav.c:685
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Error HTTP: %s"
@@ -285,29 +285,33 @@ msgstr "Respuesta vacía"
 msgid "Unexpected reply from server"
 msgstr "Respuesta inesperada del servidor"
 
-#: ../daemon/gvfsbackenddav.c:478
+#: ../daemon/gvfsbackenddav.c:607
+msgid "Please enter proxy password"
+msgstr "Introduzca la contraseña del proxy"
+
+#: ../daemon/gvfsbackenddav.c:616
 msgid "WebDAV share"
 msgstr "Compartición WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:480
+#: ../daemon/gvfsbackenddav.c:618
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introduzca la contraseña para %s"
 
-#: ../daemon/gvfsbackenddav.c:570
+#: ../daemon/gvfsbackenddav.c:689
 msgid "Not a WebDAV enabled share"
 msgstr "No es una compartición activada WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:655 ../daemon/gvfsbackendhttp.c:185
+#: ../daemon/gvfsbackenddav.c:752 ../daemon/gvfsbackendhttp.c:185
 #: ../daemon/gvfsbackendsmb.c:542
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: ../daemon/gvfsbackenddav.c:728
+#: ../daemon/gvfsbackenddav.c:840
 msgid "Response invalid"
 msgstr "Respuesta no válida"
 
-#: ../daemon/gvfsbackenddav.c:757 ../daemon/gvfsbackenddav.c:872
+#: ../daemon/gvfsbackenddav.c:869 ../daemon/gvfsbackenddav.c:984
 msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
@@ -921,4 +925,79 @@ msgstr "Datos cifrados %s"
 #, c-format
 msgid "%s Media"
 msgstr "Soporte %s"
+
+#: ../hal/ghalvolume.c:307
+msgid "Camera"
+msgstr "Cámara"
+
+#: ../hal/ghalvolume.c:314
+#, c-format
+msgid "%s Camera"
+msgstr "Cámara %s"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:59
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: error al abrir el archivo: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:82
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, error al escribir en stdout"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:94
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: error al leer: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:112
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s:error al cerrar: %s\n"
+
+#: ../programs/gvfs-cat.c:137
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "UBICACIÓN... - concatenar las UBICACIONES con una salida estándar."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:142
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+"Concatenar archivos en ubicaciones e imprimirlos en la salida estándar. Funciona igual que "
+"la utilidad tradicional «cat», pero usando la ubicación gvfs en lugar de los archivos "
+"locales: por ejemplo, puede usar algo como smb://servidor/recurso/archivo.txt "
+"como una ubicación para concatenar."
+
+#: ../programs/gvfs-cat.c:149
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+"Nota: use una tibería a traes de «cat» si necesita las opciones de formateo tales como -n, -T u "
+"otras."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:164
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: faltan ubicaciones"
+
+#: ../programs/gvfs-cat.c:166
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "Intente «%s --help» para obtener más información."
 
