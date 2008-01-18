@@ -42,7 +42,7 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 struct _HalPoolPrivate
 {
-  char *cap_only;
+  char **cap_only;
   
   DBusConnection *dbus_connection;
   LibHalContext *hal_ctx;
@@ -54,7 +54,7 @@ G_DEFINE_DYNAMIC_TYPE (HalPool, hal_pool, G_TYPE_OBJECT);
 static void
 hal_pool_finalize (HalPool *pool)
 {
-  g_free (pool->priv->cap_only);
+  g_strfreev (pool->priv->cap_only);
 
   dbus_bus_remove_match (pool->priv->dbus_connection,
                          "type='signal',"
@@ -134,6 +134,25 @@ hal_pool_init (HalPool *pool)
   pool->priv->hal_ctx = NULL;
 }
 
+static gboolean
+has_cap_only (HalPool *pool, HalDevice *device)
+{
+  unsigned int n;
+
+  if (pool->priv->cap_only)
+    return TRUE;
+
+  for (n = 0; pool->priv->cap_only[n] != NULL; n++)
+    {
+      if (hal_device_has_capability (device, pool->priv->cap_only[n]))
+        {
+          return TRUE;
+        }
+    }
+
+  return FALSE;
+}
+
 static void
 hal_pool_add_device_by_udi (HalPool *pool, 
                             const char *udi, 
@@ -144,7 +163,7 @@ hal_pool_add_device_by_udi (HalPool *pool,
   
   if (device != NULL)
     {
-      if (pool->priv->cap_only != NULL && !hal_device_has_capability (device, pool->priv->cap_only))
+      if (!has_cap_only (pool, device))
         {
           g_object_unref (device);
         } 
@@ -169,7 +188,7 @@ hal_pool_add_device_by_udi_and_properties (HalPool *pool,
   
   if (device != NULL)
     {
-      if (pool->priv->cap_only != NULL && !hal_device_has_capability (device, pool->priv->cap_only))
+      if (!has_cap_only (pool, device))
         {
           g_object_unref (device);
         } 
@@ -266,7 +285,7 @@ hal_pool_get_dbus_connection (HalPool *pool)
 }
 
 HalPool *
-hal_pool_new (const char *cap_only)
+hal_pool_new (char **cap_only)
 {
   int i;
   char **devices;
@@ -311,7 +330,7 @@ hal_pool_new (const char *cap_only)
   pool->priv->dbus_connection = dbus_connection;
   pool->priv->hal_ctx = hal_ctx;
   pool->priv->devices = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
-  pool->priv->cap_only = g_strdup (cap_only);
+  pool->priv->cap_only = g_strdupv (cap_only);
   
   /* Gah, unfortunately we have to watch all devices as HAL's PropertyModified signal
    * doesn't include the capabilities...

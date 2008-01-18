@@ -289,6 +289,36 @@ do_update_from_hal (GHalVolume *mv)
                           (GDestroyNotify) g_free);
 }
 
+#ifdef _WITH_GPHOTO2
+static void
+do_update_from_hal_for_camera (GHalVolume *v)
+{
+  const char *vendor;
+  const char *product;
+
+  vendor = hal_device_get_property_string (v->drive_device, "usb_device.vendor");
+  product = hal_device_get_property_string (v->drive_device, "usb_device.product");
+
+  if (vendor == NULL)
+    {
+      if (product != NULL)
+        v->name = g_strdup (product);
+      else
+        v->name = g_strdup (_("Camera"));
+    }
+  else
+    {
+      if (product != NULL)
+        v->name = g_strdup_printf ("%s %s", vendor, product);
+      else
+        v->name = g_strdup_printf (_("%s Camera"), vendor);
+    }
+
+  v->icon = g_strdup ("camera");
+  v->mount_path = NULL;
+}
+#endif
+
 static void
 update_from_hal (GHalVolume *mv, gboolean emit_changed)
 {
@@ -303,7 +333,14 @@ update_from_hal (GHalVolume *mv, gboolean emit_changed)
   g_free (mv->name);
   g_free (mv->icon);
   g_free (mv->mount_path);
-  do_update_from_hal (mv);
+#ifdef _WITH_GPHOTO2
+  if (hal_device_has_capability (mv->device, "camera"))
+    do_update_from_hal_for_camera (mv);
+  else
+    do_update_from_hal (mv);
+#else
+    do_update_from_hal (mv);
+#endif
 
   if (emit_changed)
     {
@@ -380,20 +417,53 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
   GHalVolume *volume;
   HalDevice *drive_device;
   const char *storage_udi;
+  const char *device_path;
       
-  storage_udi = hal_device_get_property_string (device, "block.storage_device");
-  if (storage_udi == NULL)
-    return NULL;
+  if (hal_device_has_capability (device, "block"))
+    {
+      storage_udi = hal_device_get_property_string (device, "block.storage_device");
+      if (storage_udi == NULL)
+        return NULL;
       
-  drive_device = hal_pool_get_device_by_udi (pool, storage_udi);
-  if (drive_device == NULL)
-    return NULL;
-  
+      drive_device = hal_pool_get_device_by_udi (pool, storage_udi);
+      if (drive_device == NULL)
+        return NULL;
+      
+      device_path = hal_device_get_property_string (device, "block.device");
+    }
+#ifdef _WITH_GPHOTO2
+  else if (hal_device_has_capability (device, "camera"))
+    {
+      /* OK, so we abuse storage_udi and drive_device for the USB main
+       * device that holds this interface... 
+       */
+      storage_udi = hal_device_get_property_string (device, "info.parent");
+      if (storage_udi == NULL)
+        return NULL;
+      
+      drive_device = hal_pool_get_device_by_udi (pool, storage_udi);
+      if (drive_device == NULL)
+        return NULL;
+
+      /* TODO: other OS'es? Will address this with DK aka HAL 2.0 */
+      device_path = hal_device_get_property_string (drive_device, "linux.device_file");
+      if (strlen (device_path) == 0)
+        device_path = NULL;
+
+      if (foreign_mount_root == NULL)
+        return NULL;
+    }
+#endif
+  else
+    {
+      return NULL;
+    }
+
   volume = g_object_new (G_TYPE_HAL_VOLUME, NULL);
   volume->volume_monitor = volume_monitor;
   g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(volume->volume_monitor));
   volume->mount_path = NULL;
-  volume->device_path = g_strdup (hal_device_get_property_string (device, "block.device"));
+  volume->device_path = g_strdup (device_path);
   volume->device = g_object_ref (device);
   volume->drive_device = g_object_ref (drive_device);
   volume->foreign_mount_root = foreign_mount_root != NULL ? g_object_ref (foreign_mount_root) : NULL;

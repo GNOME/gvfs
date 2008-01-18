@@ -1,3 +1,23 @@
+2008-01-18  David Zeuthen  <davidz@redhat.com>
+
+	The volume monitor bits of gphoto2 support. The actual backend
+	will follow later. Right now the code is only enabled on Linux,
+	need trivial changes to work on other operating systems.
+
+	* hal/ghalvolume.c: (do_update_from_hal_for_camera),
+	(update_from_hal), (g_hal_volume_new):
+	* hal/ghalvolumemonitor.c: (get_hal_pool),
+	(g_hal_volume_monitor_finalize), (get_volumes),
+	(mountpoints_changed), (mounts_changed),
+	(g_hal_volume_monitor_force_update), (hal_changed),
+	(g_hal_volume_monitor_constructor), (find_camera_volume_by_udi),
+	(update_cameras):
+	* hal/ghalvolumemonitor.h:
+	* hal/hal-pool.c: (hal_pool_finalize), (has_cap_only),
+	(hal_pool_add_device_by_udi),
+	(hal_pool_add_device_by_udi_and_properties), (hal_pool_new):
+	* hal/hal-pool.h:
+
 2008-01-17  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c: 

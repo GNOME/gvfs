@@ -54,6 +54,7 @@ struct _GHalVolumeMonitor {
 
   HalPool *pool;
 
+  GList *last_camera_devices;;
   GList *last_optical_disc_devices;
   GList *last_drive_devices;
   GList *last_volume_devices;
@@ -67,6 +68,9 @@ struct _GHalVolumeMonitor {
   /* we keep volumes/mounts for blank and audio discs separate to handle e.g. mixed discs properly */
   GList *disc_volumes;
   GList *disc_mounts;
+
+  /* Digital cameras (e.g. gphoto2) are kept here */
+  GList *camera_volumes;
 };
 
 static void mountpoints_changed      (GUnixMountMonitor  *mount_monitor,
@@ -80,6 +84,7 @@ static void update_drives            (GHalVolumeMonitor *monitor);
 static void update_volumes           (GHalVolumeMonitor *monitor);
 static void update_mounts            (GHalVolumeMonitor *monitor);
 static void update_discs             (GHalVolumeMonitor *monitor);
+static void update_cameras           (GHalVolumeMonitor *monitor);
 
 #define g_hal_volume_monitor_get_type g_hal_volume_monitor_get_type
 G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR);
@@ -87,8 +92,10 @@ G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VO
 static HalPool *
 get_hal_pool (void)
 {
+  char *cap_only[] = {"block", "camera", NULL};
+
   if (pool == NULL)
-    pool = hal_pool_new ("block");
+    pool = hal_pool_new (cap_only);
   
   return pool;
 }
@@ -109,6 +116,8 @@ g_hal_volume_monitor_finalize (GObject *object)
   g_object_unref (monitor->mount_monitor);
   g_object_unref (monitor->pool);
 
+  g_list_foreach (monitor->last_camera_devices, (GFunc)g_object_unref, NULL);
+  g_list_free (monitor->last_optical_disc_devices);
   g_list_foreach (monitor->last_optical_disc_devices, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->last_optical_disc_devices);
   g_list_foreach (monitor->last_drive_devices, (GFunc)g_object_unref, NULL);
@@ -131,6 +140,8 @@ g_hal_volume_monitor_finalize (GObject *object)
   g_list_free (monitor->disc_volumes);
   g_list_foreach (monitor->disc_mounts, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->disc_mounts);
+  g_list_foreach (monitor->camera_volumes, (GFunc)g_object_unref, NULL);
+  g_list_free (monitor->camera_volumes);
   
   if (G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->finalize) (object);
@@ -163,6 +174,8 @@ get_volumes (GVolumeMonitor *volume_monitor)
 
   l = g_list_copy (monitor->volumes);
   ll = g_list_copy (monitor->disc_volumes);
+  l = g_list_concat (l, ll);
+  ll = g_list_copy (monitor->camera_volumes);
   l = g_list_concat (l, ll);
 
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
@@ -306,6 +319,7 @@ mountpoints_changed (GUnixMountMonitor *mount_monitor,
   update_volumes (monitor);
   update_mounts (monitor);
   update_discs (monitor);
+  update_cameras (monitor);
 }
 
 static void
@@ -318,6 +332,7 @@ mounts_changed (GUnixMountMonitor *mount_monitor,
   update_volumes (monitor);
   update_mounts (monitor);
   update_discs (monitor);
+  update_cameras (monitor);
 }
 
 void 
@@ -327,6 +342,7 @@ g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor)
   update_volumes (monitor);
   update_mounts (monitor);
   update_discs (monitor);
+  update_cameras (monitor);
 }
 
 static void
@@ -342,6 +358,7 @@ hal_changed (HalPool    *pool,
   update_volumes (monitor);
   update_mounts (monitor);
   update_discs (monitor);
+  update_cameras (monitor);
 }
 
 static GObject *
@@ -396,6 +413,7 @@ g_hal_volume_monitor_constructor (GType                  type,
   update_volumes (monitor);
   update_mounts (monitor);
   update_discs (monitor);
+  update_cameras (monitor);
 
   the_volume_monitor = monitor;
 
@@ -650,6 +668,24 @@ find_disc_volume_by_udi (GHalVolumeMonitor *monitor, const char *udi)
   
   return NULL;
 }
+
+#ifdef _WITH_GPHOTO2
+static GHalVolume *
+find_camera_volume_by_udi (GHalVolumeMonitor *monitor, const char *udi)
+{
+  GList *l;
+
+  for (l = monitor->camera_volumes; l != NULL; l = l->next)
+    {
+      GHalVolume *volume = l->data;
+
+      if (g_hal_volume_has_udi (volume, udi))
+	return volume;
+    }
+  
+  return NULL;
+}
+#endif
 
 static gint
 hal_device_compare (HalDevice *a, HalDevice *b)
@@ -1026,6 +1062,90 @@ update_discs (GHalVolumeMonitor *monitor)
   g_list_foreach (monitor->last_optical_disc_devices, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->last_optical_disc_devices);
   monitor->last_optical_disc_devices = new_optical_disc_devices;
+}
+
+static void
+update_cameras (GHalVolumeMonitor *monitor)
+{
+#ifdef _WITH_GPHOTO2
+  GList *new_camera_devices;
+  GList *removed, *added;
+  GList *l, *ll;
+  GHalVolume *volume;
+  const char *udi;
+
+  new_camera_devices = hal_pool_find_by_capability (monitor->pool, "camera");
+  for (l = new_camera_devices; l != NULL; l = ll)
+    {
+      ll = l->next;
+      HalDevice *d = l->data;
+      /*g_warning ("got %s", hal_device_get_udi (d));*/
+      if (! hal_device_get_property_bool (d, "camera.libgphoto2.support"))
+        {
+          /*g_warning ("ignoring %s", hal_device_get_udi (d));*/
+          /* filter out everything that isn't supported by libgphoto2 */
+          new_camera_devices = g_list_delete_link (new_camera_devices, l);
+        }
+    }
+  g_list_foreach (new_camera_devices, (GFunc) g_object_ref, NULL);
+
+  new_camera_devices = g_list_sort (new_camera_devices, (GCompareFunc) hal_device_compare);
+  diff_sorted_lists (monitor->last_camera_devices,
+                     new_camera_devices, (GCompareFunc) hal_device_compare,
+                     &added, &removed);
+
+  for (l = removed; l != NULL; l = l->next)
+    {
+      HalDevice *d = l->data;
+
+      udi = hal_device_get_udi (d);
+      /*g_warning ("camera removing %s", udi);*/
+
+      volume = find_camera_volume_by_udi (monitor, udi);
+      if (volume != NULL)
+        {
+	  g_hal_volume_removed (volume);
+	  monitor->camera_volumes = g_list_remove (monitor->camera_volumes, volume);
+	  g_signal_emit_by_name (monitor, "volume_removed", volume);
+	  g_signal_emit_by_name (volume, "removed");
+	  g_object_unref (volume);
+        }
+    }
+  
+  for (l = added; l != NULL; l = l->next)
+    {
+      HalDevice *d = l->data;
+      char *uri;
+      GFile *foreign_mount_root;
+      int usb_bus_num;
+      int usb_device_num;
+
+      usb_bus_num = hal_device_get_property_int (d, "usb.bus_number");
+      usb_device_num = hal_device_get_property_int (d, "usb.linux.device_number");
+
+      uri = g_strdup_printf ("gphoto2://usb:%03d,%03d", usb_bus_num, usb_device_num);
+      /*g_warning ("uri is '%s'", uri);*/
+      foreign_mount_root = g_file_new_for_uri (uri);
+      g_free (uri);
+
+      udi = hal_device_get_udi (d);
+      /*g_warning ("camera adding %s", udi);*/
+
+      volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, foreign_mount_root, TRUE, NULL);
+      g_object_unref (foreign_mount_root);
+      if (volume != NULL)
+        {
+          monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
+          g_signal_emit_by_name (monitor, "volume_added", volume);
+        }
+    }
+
+  g_list_free (added);
+  g_list_free (removed);
+  g_list_foreach (monitor->last_camera_devices, (GFunc)g_object_unref, NULL);
+  g_list_free (monitor->last_camera_devices);
+  monitor->last_camera_devices = new_camera_devices;
+#endif
 }
 
 void 
