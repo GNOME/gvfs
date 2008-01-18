@@ -57,3 +57,4 @@ hal/ghaldrive.c
 hal/ghalmount.c
 hal/ghalvolume.c
 hal/ghalvolumemonitor.c
+programs/gvfs-cat.c

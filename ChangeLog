@@ -1,3 +1,10 @@
+2008-01-18  Luca Ferretti  <elle.uca@libero.it>
+
+	* programs/Makefile.am:
+	* programs/gvfs-cat.c: (cat), (main):
+	Add i18n/l10n to gvfs-cat, plus indentation. For details see
+	http://mail.gnome.org/archives/gnome-vfs-list/2008-January/msg00020.html
+
 2008-01-18  David Zeuthen  <davidz@redhat.com>
 
 	The volume monitor bits of gphoto2 support. The actual backend

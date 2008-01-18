@@ -1,30 +1,31 @@
 NULL =
 
-INCLUDES =				\
-	-I$(top_srcdir)			\
-	-I$(top_builddir)		\
-	$(GLIB_CFLAGS) 			\
+INCLUDES =					\
+	-I$(top_srcdir)				\
+	-I$(top_builddir)			\
+	$(GLIB_CFLAGS) 				\
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DG_DISABLE_DEPRECATED
 
-libraries =				\
+libraries =					\
 	$(GLIB_LIBS)
 
-bin_PROGRAMS =				\
-	gvfs-mount			\
-	gvfs-cat			\
-	gvfs-save			\
-	gvfs-ls				\
-	gvfs-info			\
-	gvfs-trash			\
-	gvfs-rm				\
-	gvfs-copy			\
-	gvfs-move			\
-	gvfs-monitor-file		\
-	gvfs-monitor-dir		\
+bin_PROGRAMS =					\
+	gvfs-mount				\
+	gvfs-cat				\
+	gvfs-save				\
+	gvfs-ls					\
+	gvfs-info				\
+	gvfs-trash				\
+	gvfs-rm					\
+	gvfs-copy				\
+	gvfs-move				\
+	gvfs-monitor-file			\
+	gvfs-monitor-dir			\
 	$(NULL)
 
-bin_SCRIPTS =				\
-	gvfs-less			\
+bin_SCRIPTS =					\
+	gvfs-less				\
 	$(NULL)
 
 gvfs_cat_SOURCES = gvfs-cat.c
