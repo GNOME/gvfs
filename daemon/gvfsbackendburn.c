@@ -468,7 +468,7 @@ try_open_for_read (GVfsBackend *backend,
   
   if (stream)
     {
-      g_vfs_job_open_for_read_set_can_seek (job, g_file_input_stream_can_seek (stream));
+      g_vfs_job_open_for_read_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
       g_vfs_job_open_for_read_set_handle (job, stream);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
@@ -520,10 +520,10 @@ do_seek_on_read (GVfsBackend *backend,
   GFileInputStream *stream = _handle;
   
   error = NULL;
-  if (g_file_input_stream_seek (stream, offset, type,
-                                G_VFS_JOB (job)->cancellable, &error))
+  if (g_seekable_seek (G_SEEKABLE (stream), offset, type,
+                       G_VFS_JOB (job)->cancellable, &error))
     {
-      g_vfs_job_seek_read_set_offset (job, g_file_input_stream_tell(stream));
+      g_vfs_job_seek_read_set_offset (job, g_seekable_tell (G_SEEKABLE (stream)));
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   else

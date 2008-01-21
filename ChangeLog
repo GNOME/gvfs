@@ -1,5 +1,25 @@
 2008-01-21  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+        * client/sftpuri.c:
+        * common/gmounttracker.c:
+        * daemon/gvfsmonitor.c:
+        * daemon/gvfsbackend.c:
+	Fix warnings
+	
+        * daemon/gvfsbackendburn.c:
+        * daemon/gvfsbackendlocaltest.c:
+        * daemon/gvfsbackendtrash.c:
+	Update to latest gio API (removal of
+	duplicate GSeekable calls).
+	
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+	
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
         * NEWS:
 	Update for release
 	

@@ -446,7 +446,6 @@ static void
 init_connection (GMountTracker *tracker)
 {
   DBusMessage *message, *reply;
-  DBusPendingCall *pending;
 
   if (tracker->connection == NULL)
     tracker->connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);

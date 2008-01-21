@@ -1385,7 +1385,7 @@ g_daemon_file_unmount_mountable (GFile               *file,
 		      G_VFS_DBUS_MOUNT_OP_UNMOUNT_MOUNTABLE,
 		      cancellable,
 		      callback, user_data,
-		      eject_mountable_async_cb,
+		      unmount_mountable_async_cb,
 		      NULL, NULL,
 		      DBUS_TYPE_UINT32, &dbus_flags,
 		      0);

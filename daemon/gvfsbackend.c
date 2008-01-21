@@ -48,6 +48,7 @@
 #include <gvfsjobmakedirectory.h>
 #include <gvfsjobmakesymlink.h>
 #include <gvfsjobcreatemonitor.h>
+#include <gvfsjobupload.h>
 #include <gvfsjobcopy.h>
 #include <gvfsjobmove.h>
 #include <gvfsjobsetattribute.h>

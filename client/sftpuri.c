@@ -110,7 +110,6 @@ sftp_to_uri (GVfsUriMapper *mapper,
 	     GVfsUriMountInfo *info,
 	     gboolean allow_utf8)
 {
-  char *s;
   GDecodedUri uri;
   const char *port;
 

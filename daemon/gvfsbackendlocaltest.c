@@ -755,8 +755,6 @@ create_dir_file_monitor (GVfsBackend *backend,
 				      GFileMonitorFlags flags,
 				      const gboolean is_dir_monitor)
 {
-  GVfsBackendLocalTest *op_backend = G_VFS_BACKEND_LOCALTEST (backend);
-
   GObject *monitor;
   MonitorProxy *proxy;
   GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
@@ -840,7 +838,7 @@ do_open_for_read (GVfsBackend *backend,
 	  error = NULL;
 	  stream = g_file_read (file, G_VFS_JOB (job)->cancellable, &error);
 	  if (stream) {
-	      g_vfs_job_open_for_read_set_can_seek (job, g_file_input_stream_can_seek(stream));
+	    g_vfs_job_open_for_read_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
 	      g_vfs_job_open_for_read_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_OPEN_FOR_READ);
 		  g_print ("(II) try_open_for_read success. \n");
@@ -895,8 +893,8 @@ do_seek_on_read (GVfsBackend *backend,
   g_assert(stream != NULL);
   
   error = NULL;
-  if (g_file_input_stream_seek (stream, offset, type, G_VFS_JOB (job)->cancellable, &error)) {
-      g_vfs_job_seek_read_set_offset (job, g_file_input_stream_tell(stream));
+  if (g_seekable_seek (G_SEEKABLE (stream), offset, type, G_VFS_JOB (job)->cancellable, &error)) {
+    g_vfs_job_seek_read_set_offset (job, g_seekable_tell (G_SEEKABLE (stream)));
 	  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_SEEK_ON_READ);
 	  g_print ("(II) try_seek_on_read success. \n");
   } else  {
@@ -947,12 +945,12 @@ do_append_to (GVfsBackend *backend,
 	  stream = g_file_append_to (file, flags, G_VFS_JOB (job)->cancellable, &error);
 	  if (stream) {
 		  //  Should seek at the end of the file here
-		  if ((g_file_output_stream_seek (stream, 0, G_SEEK_END, G_VFS_JOB (job)->cancellable, &error)) && (! error))
-			  g_vfs_job_open_for_write_set_initial_offset (job, g_file_output_stream_tell(stream));
+	    if ((g_seekable_seek (G_SEEKABLE (stream), 0, G_SEEK_END, G_VFS_JOB (job)->cancellable, &error)) && (! error))
+	      g_vfs_job_open_for_write_set_initial_offset (job, g_seekable_tell (G_SEEKABLE (stream)));
 		  else
 			  g_print ("  (EE) try_append_to: error during g_file_output_stream_seek(), error: %s \n", error->message);
 
-	      g_vfs_job_open_for_write_set_can_seek (job, g_file_output_stream_can_seek(stream));
+	    g_vfs_job_open_for_write_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
 	      g_vfs_job_open_for_write_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_APPEND_TO);
 
@@ -984,7 +982,7 @@ do_create (GVfsBackend *backend,
 	  error = NULL;
 	  stream = g_file_create (file, flags, G_VFS_JOB (job)->cancellable, &error);
 	  if (stream) {
-	      g_vfs_job_open_for_write_set_can_seek (job, g_file_output_stream_can_seek(stream));
+	    g_vfs_job_open_for_write_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
 	      g_vfs_job_open_for_write_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_CREATE);
 		  g_print ("(II) try_create success. \n");
@@ -1017,7 +1015,7 @@ do_replace (GVfsBackend *backend,
 	  error = NULL;
 	  stream = g_file_replace (file, etag, make_backup, flags, G_VFS_JOB (job)->cancellable, &error);
 	  if (stream) {
-	      g_vfs_job_open_for_write_set_can_seek (job, g_file_output_stream_can_seek(stream));
+	    g_vfs_job_open_for_write_set_can_seek (job, g_seekable_can_seek (G_SEEKABLE (stream)));
 	      g_vfs_job_open_for_write_set_handle (job, stream);
 		  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_REPLACE);
 		  g_print ("(II) try_replace success. \n");
@@ -1072,8 +1070,8 @@ do_seek_on_write (GVfsBackend *backend,
   g_assert(stream != NULL);
   
   error = NULL;
-  if (g_file_output_stream_seek (stream, offset, type, G_VFS_JOB (job)->cancellable, &error)) {
-	  g_vfs_job_seek_write_set_offset (job, g_file_output_stream_tell(stream));
+  if (g_seekable_seek (G_SEEKABLE (stream), offset, type, G_VFS_JOB (job)->cancellable, &error)) {
+    g_vfs_job_seek_write_set_offset (job, g_seekable_tell(G_SEEKABLE(stream)));
 	  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_SEEK_ON_WRITE);
 	  g_print ("(II) try_seek_on_write success. \n");
   } else  {

@@ -78,13 +78,12 @@ backend_died (GVfsMonitor *monitor,
 	      GObject     *old_backend)
 {
   Subscriber *subscriber;
-  GList *l;
   
   monitor->priv->backend = NULL;
 
   while (monitor->priv->subscribers != NULL)
     {
-      subscriber = l->data;
+      subscriber = monitor->priv->subscribers->data;
       unsubscribe (monitor, subscriber);
     }
 }
@@ -247,7 +246,6 @@ GVfsMonitor *
 g_vfs_monitor_new (GVfsBackend *backend)
 {
   GVfsMonitor *monitor;
-  GVfsDaemon *daemon;
   
   monitor = g_object_new (G_TYPE_VFS_MONITOR, NULL);
 
