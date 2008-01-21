@@ -129,49 +129,6 @@ path_get_parent_dir (const char *path)
     return g_strndup (path, (parent - path) + 1);
 }
 
-static char *
-uri_get_basename (const char *uri_str)
-{
-    const char *parent;
-    const char *path;
-    char       *to_free;
-    char       *basename;
-    size_t      len;
-
-    if (uri_str == NULL || *uri_str == '\0')
-      return NULL;
-
-    path =  uri_str;
-
-    /* remove any leading slashes */
-    while (*path == '/' || *path == ' ')
-        path++;
-
-    len = strlen (path);
-
-    if (len == 0)
-      return g_strdup ("/");
-
-    /* remove any trailing slashes */
-    while (path[len - 1] == '/' || path[len - 1] == ' ')
-        len--;
-
-    parent = g_strrstr_len (path, len, "/");
-
-    if (parent)
-      {
-        parent++; /* skip the found / char */
-        to_free = g_strndup (parent, (len - (parent - path)));
-      }
-    else
-      to_free = g_strndup (path, len);
-
-    basename = soup_uri_decode (to_free);
-    g_free (to_free);
-
-    return basename;
-}
-
 /* ************************************************************************* */
 /*  */
 
@@ -362,7 +319,7 @@ multistatus_parse_response (xmlDocPtr    doc,
         {
           continue;
         }
-      else if (! strcmp ((char *) node->name, "href"))
+      else if (node_has_name (node, "href"))
         {
           const char *text;
 
@@ -370,7 +327,7 @@ multistatus_parse_response (xmlDocPtr    doc,
           name = uri_get_basename (text);
         }
 
-      else if (! strcmp ((char *) node->name, "propstat"))
+      else if (node_has_name (node, "propstat"))
         {
           xmlNodePtr  iter;
           xmlNodePtr  prop;
@@ -385,11 +342,11 @@ multistatus_parse_response (xmlDocPtr    doc,
                 if (node->type != XML_ELEMENT_NODE ||
                     node->name == NULL)
                     continue;
-                else if (! strcmp ((char *) iter->name, "status"))
+                else if (node_has_name (iter, "status"))
                   {
                     status_text = xmlNodeGetContent (iter);
                   }
-                else if (! strcmp ((char *) iter->name, "prop"))
+                else if (node_has_name (iter, "prop"))
                   {
                     prop = iter;
                   }
@@ -402,7 +359,6 @@ multistatus_parse_response (xmlDocPtr    doc,
             {
               if (status_text)
                 xmlFree (status_text);
-
               continue;
             } 
 
@@ -424,6 +380,7 @@ multistatus_parse_response (xmlDocPtr    doc,
   
   if (info && name)
     {
+      /* FIXME: that is *not* the name, since its not relative */
       g_file_info_set_name (info, name);
       g_file_info_set_edit_name (info, name);
     }

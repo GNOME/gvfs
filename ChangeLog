@@ -1,3 +1,13 @@
+2008-01-21  Christian Kellner  <gicmo@gnome.org>
+
+
+	* daemon/gvfsbackenddav.c:
+	Small cleanups.
+
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/gvfsbackendhttp.h:
+	Implement query_info for plain http.
+
 2008-01-21  Alexander Larsson  <alexl@redhat.com>
 
         * client/Makefile.am:

@@ -104,6 +104,230 @@ g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename)
 
   return uri;
 }
+
+char *
+uri_get_basename (const char *uri_str)
+{
+    const char *parent;
+    const char *path;
+    char       *to_free;
+    char       *basename;
+    size_t      len;
+
+    if (uri_str == NULL || *uri_str == '\0')
+      return NULL;
+
+    path =  uri_str;
+
+    /* remove any leading slashes */
+    while (*path == '/' || *path == ' ')
+        path++;
+
+    len = strlen (path);
+
+    if (len == 0)
+      return g_strdup ("/");
+
+    /* remove any trailing slashes */
+    while (path[len - 1] == '/' || path[len - 1] == ' ')
+        len--;
+
+    parent = g_strrstr_len (path, len, "/");
+
+    if (parent)
+      {
+        parent++; /* skip the found / char */
+        to_free = g_strndup (parent, (len - (parent - path)));
+      }
+    else
+      to_free = g_strndup (path, len);
+
+    basename = soup_uri_decode (to_free);
+    g_free (to_free);
+
+    return basename;
+}
+
+/* ************************************************************************* */
+/*  */
+
+typedef void (*StatCallback) (GFileInfo *info, gpointer user_data, GError *error);
+
+typedef struct _StatData {
+
+  StatCallback callback;
+  gpointer     user_data;
+
+  GFileQueryInfoFlags    flags;
+  GFileAttributeMatcher *matcher;
+
+} StatData;
+
+
+static void
+gvfs_error_from_http_status (GError **error, guint status_code, const char *message)
+{
+  switch (status_code) {
+
+    case SOUP_STATUS_NOT_FOUND:
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                   message);
+      break;
+
+    case SOUP_STATUS_UNAUTHORIZED:
+    case SOUP_STATUS_PAYMENT_REQUIRED:
+    case SOUP_STATUS_FORBIDDEN:
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                   _("HTTP Client Error: %s"), message);
+      break;
+    default:
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   _("HTTP Error: %s"), message);
+  }
+}
+
+static void 
+stat_location_ready (SoupSession *session,
+                     SoupMessage *msg,
+                     gpointer     user_data)
+{
+  GFileInfo  *info;
+  StatData   *data;
+  GError     *error;
+  const char *text;
+
+  data  = (StatData *) user_data; 
+  info  = NULL;
+  error = NULL;
+
+  if (SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+    {
+      char          *basename;
+      const SoupURI *uri;
+
+      info = g_file_info_new ();
+
+      uri = soup_message_get_uri (msg);
+      basename = uri_get_basename (uri->path);
+      
+      g_print ("basename:%s\n", basename);
+
+      /* read http/1.1 rfc, until then we copy the local files
+       * behaviour */ 
+      if (basename != NULL &&
+          g_file_attribute_matcher_matches (data->matcher,
+                                            G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
+        {
+          char *display_name = g_filename_display_name (basename);
+
+          if (strstr (display_name, "\357\277\275") != NULL)
+            {
+              char *p = display_name;
+              display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
+              g_free (p);
+            }
+
+          g_file_info_set_display_name (info, display_name);
+          g_free (display_name);
+        }
+
+      if (basename != NULL &&
+          g_file_attribute_matcher_matches (data->matcher,
+                                            G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
+        {
+          char *edit_name = g_filename_display_name (basename);
+          g_file_info_set_edit_name (info, edit_name);
+          g_free (edit_name);
+        } 
+
+      g_free (basename);
+
+      text = soup_message_headers_get (msg->response_headers,
+                                       "Content-Length");
+      if (text)
+        {
+          guint64 size = g_ascii_strtoull (text, NULL, 10);
+          g_file_info_set_size (info, size);
+        }
+
+
+      text = soup_message_headers_get (msg->response_headers,
+                                       "Content-Type");
+      if (text)
+        {
+          char *p = strchr (text, ';');
+
+          if (p != NULL)
+            {
+              char *tmp = g_strndup (text, p - text);
+              g_file_info_set_content_type (info, tmp);
+              g_free (tmp);
+            }
+          else
+            g_file_info_set_content_type (info, text);
+        }
+
+
+      text = soup_message_headers_get (msg->response_headers,
+                                       "Last-Modified");
+      if (text)
+        {
+          GTimeVal tv;
+          if (g_time_val_from_iso8601 (text, &tv))
+            g_file_info_set_modification_time (info, &tv);
+        }
+
+      text = soup_message_headers_get (msg->response_headers,
+                                       "ETag");
+      if (text)
+        {
+          g_file_info_set_attribute_string (info,
+                                            G_FILE_ATTRIBUTE_ETAG_VALUE,
+                                            text);
+        }
+    }
+  else
+    {
+      gvfs_error_from_http_status (&error, msg->status_code,
+                                   msg->reason_phrase);
+    }
+
+  data->callback (info, data->user_data, error);
+  
+  if (error)
+    g_error_free (error);
+
+  g_free (data);
+}
+
+static void
+stat_location (GVfsBackend           *backend,
+               const char            *filename,
+               GFileQueryInfoFlags    flags,
+               GFileAttributeMatcher *attribute_matcher,
+               StatCallback           callback,
+               gpointer               user_data)
+{
+  GVfsBackendHttp *op_backend;
+  StatData        *data;
+  SoupMessage     *msg;
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+
+  msg = message_new_from_filename (backend, "HEAD", filename);
+
+  data = g_new0 (StatData, 1);
+
+  data->user_data = user_data;
+  data->callback = callback;
+  data->flags = flags;
+  data->matcher = attribute_matcher;
+
+
+  soup_session_queue_message (op_backend->session, msg,
+                              stat_location_ready, data);
+}
+
 /* ************************************************************************* */
 /* public utility functions */
 
@@ -181,8 +405,8 @@ try_mount (GVfsBackend  *backend,
   if (uri == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			_("Invalid mount spec"));
+                        G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                        _("Invalid mount spec"));
       return TRUE;
     }
 
@@ -648,6 +872,27 @@ try_close_write (GVfsBackend *backend,
 }
 
 /* *** query_info () *** */
+
+static void 
+query_info_ready (GFileInfo *info,
+                  gpointer   user_data,
+                  GError    *error)
+{
+  GVfsJobQueryInfo *job;
+
+  job = G_VFS_JOB_QUERY_INFO (user_data);
+
+  if (info == NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      return;
+    }
+  
+  g_file_info_copy_into (info, job->file_info);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+
 static gboolean
 try_query_info (GVfsBackend           *backend,
                 GVfsJobQueryInfo      *job,
@@ -656,7 +901,12 @@ try_query_info (GVfsBackend           *backend,
                 GFileInfo             *info,
                 GFileAttributeMatcher *attribute_matcher)
 {
-
+  stat_location (backend, 
+                 filename,
+                 flags,
+                 attribute_matcher, 
+                 query_info_ready,
+                 job);
   return TRUE;
 }
 
