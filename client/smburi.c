@@ -181,6 +181,8 @@ smb_from_uri (GVfsUriMapper *mapper,
 	g_vfs_uri_mount_info_set  (info, "user", user);
     }
 
+  g_vfs_decoded_uri_free (uri);
+  
   return info;
 }
 

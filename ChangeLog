@@ -1,5 +1,16 @@
 2008-01-21  Alexander Larsson  <alexl@redhat.com>
 
+        * client/Makefile.am:
+        * client/gdaemonvfs.c:
+        * client/sftpuri.c: Added.
+	Added sftp uri mapper that aliases ssh: to sftp: (#509860)
+	
+        * client/smburi.c:
+        (smb_from_uri):
+	Fix leak.
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmounttracker.c:
 	Do the initial mount tracker call sync so that
 	the volume monitor is populated with the current
