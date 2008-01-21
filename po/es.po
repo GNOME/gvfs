@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-18 10:07+0000\n"
-"PO-Revision-Date: 2008-01-18 12:04+0100\n"
+"POT-Creation-Date: 2008-01-21 14:47+0000\n"
+"PO-Revision-Date: 2008-01-21 17:39+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <<gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -164,6 +164,62 @@ msgstr "el punto de montaje para %s ya se está usando"
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
+#: ../daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr "Grabar"
+
+#: ../daemon/gvfsbackendburn.c:376
+msgid "Unable to create temporary directory"
+msgstr "No se pudo crear el directorio temporal"
+
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:671
+#: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
+#: ../daemon/gvfsbackendburn.c:782
+msgid "No such file or directory"
+msgstr "El archivo o directorio no existe"
+
+#: ../daemon/gvfsbackendburn.c:425
+msgid "Directory not empty"
+msgstr "El directorio no está vacío"
+
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:894
+msgid "Can't copy file over directory"
+msgstr "No se puede copiar un archivo sobre un directorio"
+
+#: ../daemon/gvfsbackendburn.c:650
+msgid "CD Burner"
+msgstr "Grabador de CD"
+
+#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:641
+msgid "The file is not a directory"
+msgstr "El archivo no es un directorio"
+
+#: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
+#: ../daemon/gvfsbackendburn.c:914
+msgid "File exists"
+msgstr "El archivo ya existe"
+
+#: ../daemon/gvfsbackendburn.c:842
+msgid "No such file or directory in target path"
+msgstr "El archivo o directorio no existe en la ruta de destino"
+
+#: ../daemon/gvfsbackendburn.c:865
+msgid "Can't copy directory over directory"
+msgstr "No se puede copiar un directorio sobre otro directorio"
+
+#: ../daemon/gvfsbackendburn.c:874
+msgid "Target file exists"
+msgstr "El archivo destino ya existe"
+
+#: ../daemon/gvfsbackendburn.c:881
+msgid "Can't recursively copy directory"
+msgstr "No se puede copiar recursivamente un directorio"
+
+#: ../daemon/gvfsbackendburn.c:940
+msgid "Not supported"
+msgstr "No soportado"
+
 #: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
 msgid "No drive specified"
 msgstr "No se especificó una unidad"
@@ -242,10 +298,6 @@ msgstr "No se puede abrir el directorio"
 msgid "Can't open mountable file"
 msgstr "No se puede abrir el archivo montable"
 
-#: ../daemon/gvfsbackendcomputer.c:641
-msgid "The file is not a directory"
-msgstr "El archivo no es un directorio"
-
 #: ../daemon/gvfsbackendcomputer.c:765
 #, c-format
 msgid "Internal error: %s"
@@ -268,50 +320,51 @@ msgstr "No se puede desmontar el archivo"
 msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
-#: ../daemon/gvfsbackenddav.c:198 ../daemon/gvfsbackenddav.c:685
+#: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:642
+#: ../daemon/gvfsbackendhttp.c:185
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Error HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:210
+#: ../daemon/gvfsbackenddav.c:167
 msgid "Could not parse response"
 msgstr "No se pudo analizar la respuesta"
 
-#: ../daemon/gvfsbackenddav.c:219
+#: ../daemon/gvfsbackenddav.c:176
 msgid "Empty response"
 msgstr "Respuesta vacía"
 
-#: ../daemon/gvfsbackenddav.c:226
+#: ../daemon/gvfsbackenddav.c:183
 msgid "Unexpected reply from server"
 msgstr "Respuesta inesperada del servidor"
 
-#: ../daemon/gvfsbackenddav.c:607
+#: ../daemon/gvfsbackenddav.c:564
 msgid "Please enter proxy password"
 msgstr "Introduzca la contraseña del proxy"
 
-#: ../daemon/gvfsbackenddav.c:616
+#: ../daemon/gvfsbackenddav.c:573
 msgid "WebDAV share"
 msgstr "Compartición WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:618
+#: ../daemon/gvfsbackenddav.c:575
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introduzca la contraseña para %s"
 
-#: ../daemon/gvfsbackenddav.c:689
+#: ../daemon/gvfsbackenddav.c:646
 msgid "Not a WebDAV enabled share"
 msgstr "No es una compartición activada WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:752 ../daemon/gvfsbackendhttp.c:185
+#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:409
 #: ../daemon/gvfsbackendsmb.c:542
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: ../daemon/gvfsbackenddav.c:840
+#: ../daemon/gvfsbackenddav.c:797
 msgid "Response invalid"
 msgstr "Respuesta no válida"
 
-#: ../daemon/gvfsbackenddav.c:869 ../daemon/gvfsbackenddav.c:984
+#: ../daemon/gvfsbackenddav.c:826 ../daemon/gvfsbackenddav.c:941
 msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
@@ -324,19 +377,33 @@ msgstr "No se especificó un nombre de servidor"
 msgid "Unsupported seek type"
 msgstr "Tipo de búsqueda no soportado"
 
-#: ../daemon/gvfsbackendhttp.c:415 ../daemon/gvfsbackendsmb.c:1653
+#: ../daemon/gvfsbackendhttp.c:181
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "Error HTTP en el cliente: %s"
+
+#: ../daemon/gvfsbackendhttp.c:226 ../daemon/gvfsbackendsftp.c:1488
+#: ../daemon/gvfsbackendsmb.c:1160 ../daemon/gvfsbackendtrash.c:948
+msgid " (invalid encoding)"
+msgstr " (codificación no válida)"
+
+#: ../daemon/gvfsbackendhttp.c:639 ../daemon/gvfsbackendsmb.c:1653
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendhttp.c:485 ../daemon/gvfsbackendsftp.c:2326
+#: ../daemon/gvfsbackendhttp.c:709 ../daemon/gvfsbackendsftp.c:2326
 #: ../daemon/gvfsbackendsmb.c:921
 msgid "The file was externally modified"
 msgstr "El archivo se modificó externamente"
 
-#: ../daemon/gvfsbackendhttp.c:516 ../daemon/gvfsbackendsmb.c:957
+#: ../daemon/gvfsbackendhttp.c:740 ../daemon/gvfsbackendsmb.c:957
 #: ../daemon/gvfsbackendsmb.c:1670
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
+
+#: ../daemon/gvfsbackendlocaltest.c:790
+msgid "Directory notification not supported"
+msgstr "No se soporta la notificación de directorios"
 
 #: ../daemon/gvfsbackendsftp.c:249
 msgid "ssh program unexpectedly exited"
@@ -405,11 +472,6 @@ msgstr "sftp en %s"
 msgid "Unable to find supported ssh command"
 msgstr "No se pudo encontrar el comando ssh soportado"
 
-#: ../daemon/gvfsbackendsftp.c:1488 ../daemon/gvfsbackendsmb.c:1160
-#: ../daemon/gvfsbackendtrash.c:948
-msgid " (invalid encoding)"
-msgstr " (codificación no válida)"
-
 #: ../daemon/gvfsbackendsftp.c:1545 ../daemon/gvfsbackendsftp.c:1600
 #: ../daemon/gvfsbackendsftp.c:1611 ../daemon/gvfsbackendsftp.c:1669
 #: ../daemon/gvfsbackendsftp.c:1759 ../daemon/gvfsbackendsftp.c:1788
@@ -435,10 +497,6 @@ msgstr "Error al crear el archivo de respaldo: %s"
 #: ../daemon/gvfsbackendsftp.c:2272
 msgid "Unable to create temporary file"
 msgstr "No se pudo crear el archivo temporal"
-
-#: ../daemon/gvfsbackendlocaltest.c:790
-msgid "Directory notification not supported"
-msgstr "No se soporta la notificación de directorios"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:180
@@ -488,7 +546,7 @@ msgstr "Error al eliminar el archivo destino: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1714
 msgid "Can't recursively move directory"
-msgstr "No se puede mover un directorio recursivamente"
+msgstr "No se puede mover recursivamente un directorio"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:676
 msgid "Windows Network"
@@ -532,7 +590,7 @@ msgstr "Tipo de backend no válido"
 
 #: ../daemon/gvfsdaemonutils.c:92
 msgid "No fd passing socket available"
-msgstr ""
+msgstr "No hay un socket disponible para pasar el descriptor de archivo"
 
 #: ../daemon/gvfsdaemonutils.c:102
 #, c-format
@@ -553,7 +611,8 @@ msgstr "Error al enviar el descriptor de archivo: %s"
 #: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
 #: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
 #: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -565,36 +624,40 @@ msgstr "El backend no soporta enlaces simbólicos"
 msgid "Invalid dbus message"
 msgstr "Mensaje de D-Bus no válido"
 
-#: ../daemon/main.c:42
+#: ../daemon/main.c:44
 msgid "Replace old daemon."
 msgstr "Reemplace el demonio antiguo."
 
-#: ../daemon/main.c:48
+#: ../daemon/main.c:45
+msgid "Don't start fuse."
+msgstr "No iniciar fuse."
+
+#: ../daemon/main.c:51
 msgid "GVFS Daemon"
 msgstr "Demonio GVFS"
 
-#: ../daemon/mount.c:361
+#: ../daemon/mount.c:372
 msgid "Invalid arguments from spawned child"
 msgstr "Argumentos no válidos para el hijo lanzado"
 
-#: ../daemon/mount.c:642
+#: ../daemon/mount.c:662
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Falló automount: %s"
 
-#: ../daemon/mount.c:687
+#: ../daemon/mount.c:707
 msgid "The specified location is not mounted"
 msgstr "La ubicación especificada no está montada"
 
-#: ../daemon/mount.c:692
+#: ../daemon/mount.c:712
 msgid "The specified location is not supported"
 msgstr "La ubicación especificada no está soportada"
 
-#: ../daemon/mount.c:855
+#: ../daemon/mount.c:875
 msgid "Location is already mounted"
 msgstr "La ubicación ya está montada"
 
-#: ../daemon/mount.c:863
+#: ../daemon/mount.c:883
 msgid "Location is not mountable"
 msgstr "La ubicación no es montable"
 
@@ -976,18 +1039,18 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
-"Concatenar archivos en ubicaciones e imprimirlos en la salida estándar. Funciona igual que "
-"la utilidad tradicional «cat», pero usando la ubicación gvfs en lugar de los archivos "
-"locales: por ejemplo, puede usar algo como smb://servidor/recurso/archivo.txt "
-"como una ubicación para concatenar."
+"Concatenar archivos en ubicaciones e imprimirlos en la salida estándar. "
+"Funciona igual que la utilidad tradicional «cat», pero usando la ubicación "
+"gvfs en lugar de los archivos locales: por ejemplo, puede usar algo como "
+"smb://servidor/recurso/archivo.txt como una ubicación para concatenar."
 
 #: ../programs/gvfs-cat.c:149
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
-"Nota: use una tibería a traes de «cat» si necesita las opciones de formateo tales como -n, -T u "
-"otras."
+"Nota: use una tibería a traes de «cat» si necesita las opciones de formateo "
+"tales como -n, -T u otras."
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
