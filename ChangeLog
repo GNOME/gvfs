@@ -1,3 +1,11 @@
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gmounttracker.c:
+	Do the initial mount tracker call sync so that
+	the volume monitor is populated with the current
+	status after construction. This is more in-line
+	with what apps expect.
+
 2008-01-18  Alexander Larsson  <alexl@redhat.com>
 
         * common/gmountspec.c:

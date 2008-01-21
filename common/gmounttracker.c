@@ -373,17 +373,12 @@ g_mount_tracker_remove_mount (GMountTracker *tracker,
 }
 
 static void
-list_mounts_reply (DBusPendingCall *pending,
-		   void            *_data)
+list_mounts_reply (GMountTracker *tracker,
+		   DBusMessage *reply)
 {
-  GMountTracker *tracker = _data;
   DBusMessageIter iter, array_iter;
   GMountInfo *info;
-  DBusMessage *reply;
   gboolean b;
-
-  reply = dbus_pending_call_steal_reply (pending);
-  dbus_pending_call_unref (pending);
 
   b = dbus_message_iter_init (reply, &iter);
   if (b && dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_ARRAY)
@@ -405,8 +400,6 @@ list_mounts_reply (DBusPendingCall *pending,
     {
       /* list_mounts_reply problem - gvfsd not running? */
     }
-  
-  dbus_message_unref (reply);
 }
 
 static DBusHandlerResult
@@ -452,7 +445,7 @@ g_mount_tracker_filter_func (DBusConnection *conn,
 static void
 init_connection (GMountTracker *tracker)
 {
-  DBusMessage *message;
+  DBusMessage *message, *reply;
   DBusPendingCall *pending;
 
   if (tracker->connection == NULL)
@@ -468,19 +461,15 @@ init_connection (GMountTracker *tracker)
   
   dbus_message_set_auto_start (message, TRUE);
   
-  if (!dbus_connection_send_with_reply (tracker->connection, message,
-					&pending,
-					G_VFS_DBUS_TIMEOUT_MSECS))
-    _g_dbus_oom ();
-  
+  reply = dbus_connection_send_with_reply_and_block (tracker->connection, message,
+						     G_VFS_DBUS_TIMEOUT_MSECS,
+						     NULL);
   dbus_message_unref (message);
   
-  if (pending != NULL)
+  if (reply != NULL)
     {
-      if (!dbus_pending_call_set_notify (pending,
-					 list_mounts_reply,
-					 g_object_ref (tracker), g_object_unref))
-	_g_dbus_oom ();
+      list_mounts_reply (tracker, reply);
+      dbus_message_unref (reply);
     }
   
   dbus_connection_add_filter (tracker->connection, g_mount_tracker_filter_func, tracker, NULL);
