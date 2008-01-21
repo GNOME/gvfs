@@ -1,3 +1,14 @@
+Major changes in 0.1.3:
+* Various fixes to hal volume monitor
+* Make gvfsd reload config on SIGUSR1
+* Updates to http/dav backends
+* Port http backend to libsoup 2.4.
+* Initial burn:/// backend
+* Add ssh: alias for sftp:
+* Fix fuse mount
+* Automount fuse on startup of daemon
+* Various bugfixes
+
 Major changes in 0.1.2:
 * Switch to intltool fro translation setup
 * Update to latest gio APIS

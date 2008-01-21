@@ -9,6 +9,7 @@ INCLUDES =					\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
+	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
 	-DG_DISABLE_DEPRECATED
 

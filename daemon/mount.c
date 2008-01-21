@@ -497,8 +497,6 @@ read_mountable_config (void)
 			  mountable->dbus_name = g_key_file_get_string (keyfile, "Mount", "DBusName", NULL);
 			  mountable->automount = g_key_file_get_boolean (keyfile, "Mount", "AutoMount", NULL);
 			  
-
-			  g_print ("Mountables type=%s\n", mountable->type);
 			  mountables = g_list_prepend (mountables, mountable);
 			}
 		    }

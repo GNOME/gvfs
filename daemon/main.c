@@ -24,6 +24,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <dbus/dbus.h>
 #include "gvfsdaemon.h"
 #include "gvfsbackendtest.h"
@@ -36,10 +37,12 @@ main (int argc, char *argv[])
   GMainLoop *loop;
   GVfsDaemon *daemon;
   gboolean replace;
+  gboolean no_fuse;
   GError *error;
   GOptionContext *context;
   const GOptionEntry options[] = {
     { "replace", 'r', 0, G_OPTION_ARG_NONE, &replace,  N_("Replace old daemon."), NULL },
+    { "no-fuse", 0, 0, G_OPTION_ARG_NONE, &no_fuse,  N_("Don't start fuse."), NULL },
     { NULL }
   };
 
@@ -53,6 +56,7 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
 
   replace = FALSE;
+  no_fuse = FALSE;
   error = NULL;
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -73,7 +77,34 @@ main (int argc, char *argv[])
   
   loop = g_main_loop_new (NULL, FALSE);
 
-  g_print ("Entering mainloop\n");
+
+#ifdef HAVE_FUSE
+  if (!no_fuse)
+    {
+      char *fuse_path;
+      char *argv[3];
+      
+      fuse_path = g_build_filename (g_get_home_dir (), ".gvfs", NULL);
+      
+      if (!g_file_test (fuse_path, G_FILE_TEST_EXISTS))
+	g_mkdir (fuse_path, 0700);
+      
+      argv[0] = LIBEXEC_DIR "/gvfs-fuse-daemon";
+      argv[1] = fuse_path;
+      argv[2] = NULL;
+      
+      g_spawn_async (NULL,
+		     argv,
+		     NULL,
+		     G_SPAWN_STDOUT_TO_DEV_NULL |
+		     G_SPAWN_STDERR_TO_DEV_NULL, 
+		     NULL, NULL,
+		     NULL, NULL);
+      
+      g_free (fuse_path);
+    }
+#endif
+  
   g_main_loop_run (loop);
   
   return 0;
