@@ -11,13 +11,14 @@ common/gsysutils.c
 common/gvfsdaemonprotocol.c
 daemon/daemon-main.c
 daemon/gvfsbackend.c
+daemon/gvfsbackendburn.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c
 daemon/gvfsbackenddav.c
 daemon/gvfsbackendftp.c
 daemon/gvfsbackendhttp.c
-daemon/gvfsbackendsftp.c
 daemon/gvfsbackendlocaltest.c
+daemon/gvfsbackendsftp.c
 daemon/gvfsbackendsmb.c
 daemon/gvfsbackendsmbbrowse.c
 daemon/gvfsbackendtest.c
@@ -50,6 +51,7 @@ daemon/gvfsjobsetdisplayname.c
 daemon/gvfsjobtrash.c
 daemon/gvfsjobunmount.c
 daemon/gvfsjobunmountmountable.c
+daemon/gvfsjobupload.c
 daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
