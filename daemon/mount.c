@@ -23,6 +23,8 @@
 #include <config.h>
 
 #include <string.h>
+#include <unistd.h>
+#include <signal.h>
 
 #include <glib.h>
 #include <dbus/dbus.h>
@@ -133,6 +135,15 @@ lookup_mountable (GMountSpec *spec)
     return NULL;
 
   return find_mountable (type);
+}
+
+static void
+vfs_mountable_free (VfsMountable *mountable)
+{
+  g_free (mountable->type);
+  g_free (mountable->exec);
+  g_free (mountable->dbus_name);
+  g_free (mountable);
 }
 
 static void
@@ -486,6 +497,8 @@ read_mountable_config (void)
 			  mountable->dbus_name = g_key_file_get_string (keyfile, "Mount", "DBusName", NULL);
 			  mountable->automount = g_key_file_get_boolean (keyfile, "Mount", "AutoMount", NULL);
 			  
+
+			  g_print ("Mountables type=%s\n", mountable->type);
 			  mountables = g_list_prepend (mountables, mountable);
 			}
 		    }
@@ -498,6 +511,15 @@ read_mountable_config (void)
     }
 }
 
+static void
+re_read_mountable_config (void)
+{
+  g_list_foreach (mountables, (GFunc)vfs_mountable_free, NULL);
+  g_list_free (mountables);
+  mountables = NULL;
+
+  read_mountable_config ();
+}
 
 /************************************************************************
  * Support for keeping track of active mounts                           *
@@ -992,14 +1014,51 @@ mount_tracker_filter_func (DBusConnection *conn,
 }
 
 
+static int reload_pipes[2];
+
+static void
+sigusr1_handler (int sig)
+{
+  while (write (reload_pipes[1], "a", 1) != 1)
+    ;
+}
+
+static gboolean
+reload_pipes_cb (GIOChannel *io,
+		 GIOCondition condition,
+		 gpointer data)
+{
+  char a;
+  
+  while (read (reload_pipes[0], &a, 1) != 1)
+    ;
+
+  re_read_mountable_config ();
+  
+  return TRUE;
+}
+
 void
 mount_init (void)
 {
   DBusConnection *conn;
   DBusError error;
+  struct sigaction sa;
+  GIOChannel *io;
   
   read_mountable_config ();
 
+  if (pipe (reload_pipes) != -1)
+    {
+      io = g_io_channel_unix_new (reload_pipes[0]);
+      g_io_add_watch (io, G_IO_IN, reload_pipes_cb, NULL);
+      
+      sa.sa_handler = sigusr1_handler;
+      sigemptyset (&sa.sa_mask);
+      sa.sa_flags = 0;
+      sigaction (SIGUSR1, &sa, NULL);
+    }
+  
   conn = dbus_bus_get (DBUS_BUS_SESSION, NULL);
 
   if (!dbus_connection_register_object_path (conn, G_VFS_DBUS_MOUNTTRACKER_PATH,
