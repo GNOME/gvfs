@@ -53,7 +53,7 @@
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
 
-#define DEBUG_ENABLED 1
+#define DEBUG_ENABLED 0
 
 #define GET_FILE_HANDLE(fi)     (GUINT_TO_POINTER ((guint) (fi)->fh))
 #define SET_FILE_HANDLE(fi, fh) ((fi)->fh = (guint64) GPOINTER_TO_UINT (fh))
@@ -305,7 +305,7 @@ mount_record_new (GMount *mount)
   
   mount_record->root = g_mount_get_root (mount);
   name = g_object_get_data (G_OBJECT (mount), "g-stable-name");
-  if (name != NULL)
+  if (name != NULL && *name != 0)
     name = g_strdup (name);
   else
     name = g_mount_get_name (mount);

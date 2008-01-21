@@ -1,5 +1,11 @@
 2008-01-21  Alexander Larsson  <alexl@redhat.com>
 
+	* client/gvfsfusedaemon.c:
+	Fix error with the names of the root items the
+	fuse mount.
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/mount.c:
 	Reload the list of mountables on SIGUSR1
 
