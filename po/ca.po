@@ -1,0 +1,1132 @@
+# Catalan translation of gvfs.
+# Copyright (C) 2008, Free Software Foundation Inc.
+# This file is distributed under the same license as the gvfs package.
+# Gil Forcada <gilforcada@guifi.net>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-01-22 20:56+0100\n"
+"PO-Revision-Date: 2008-01-22 21:02+0100\n"
+"Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
+"Language-Team: Catalan <tradgnome@softcatala.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../client/gdaemonfile.c:508 ../client/gdaemonfile.c:1900
+#, c-format
+msgid "Operation not supported, files on different mounts"
+msgstr ""
+"L'operació no està implementada. Els fitxers estan en diferents punts de "
+"muntatge"
+
+#: ../client/gdaemonfile.c:793
+#, c-format
+msgid "Invalid return value from get_info"
+msgstr "«get_info» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfile.c:822
+msgid "Invalid return value from query_info"
+msgstr "«query_info» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfile.c:894
+msgid "Couldn't get stream file descriptor"
+msgstr "No s'ha pogut obtenir el descriptor de fitxer del flux"
+
+#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176
+#, c-format
+msgid "Invalid return value from open"
+msgstr "«open» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
+#, c-format
+msgid "Didn't get stream file descriptor"
+msgstr "No s'ha obtingut el descriptor de fitxer del flux"
+
+#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
+msgid "Invalid return value from call"
+msgstr "«call» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfile.c:1530
+#, c-format
+msgid "Invalid return value from get_filesystem_info"
+msgstr "«get_filesystem_info» ha retornat un valor no vàlid"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1569
+#, c-format
+msgid "Could not find enclosing mount"
+msgstr "No s'ha pogut trobar el punt de muntatge de tancament"
+
+#: ../client/gdaemonfile.c:1599
+#, c-format
+msgid "Invalid filename %s"
+msgstr "El nom de fitxer %s no és vàlid"
+
+#: ../client/gdaemonfile.c:1641
+#, c-format
+msgid "Invalid return value from query_filesystem_info"
+msgstr "«query_filesystem_info» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfile.c:2049
+#, c-format
+msgid "Invalid return value from monitor_dir"
+msgstr "monitor_dir» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfile.c:2098
+#, c-format
+msgid "Invalid return value from monitor_file"
+msgstr "«monitor_file» ha retornat un valor no vàlid"
+
+#: ../client/gdaemonfileinputstream.c:449
+#: ../client/gdaemonfileinputstream.c:457
+#: ../client/gdaemonfileinputstream.c:1302
+#: ../client/gdaemonfileinputstream.c:1312
+#: ../client/gdaemonfileoutputstream.c:401
+#: ../client/gdaemonfileoutputstream.c:409
+#: ../client/gdaemonfileoutputstream.c:1046
+#: ../client/gdaemonfileoutputstream.c:1056
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "Error en el protocol del flux: %s"
+
+#: ../client/gdaemonfileinputstream.c:457
+#: ../client/gdaemonfileinputstream.c:1312
+#: ../client/gdaemonfileoutputstream.c:409
+#: ../client/gdaemonfileoutputstream.c:1056
+msgid "End of stream"
+msgstr "Final del flux"
+
+#: ../client/gdaemonfileinputstream.c:517
+#: ../client/gdaemonfileinputstream.c:673
+#: ../client/gdaemonfileinputstream.c:780
+#: ../client/gdaemonfileinputstream.c:1030
+#: ../client/gdaemonfileoutputstream.c:457
+#: ../client/gdaemonfileoutputstream.c:635
+#: ../client/gdaemonfileoutputstream.c:830 ../daemon/gvfsbackendsmb.c:952
+#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:122
+#: ../daemon/gvfsbackendtest.c:183
+#, c-format
+msgid "Operation was cancelled"
+msgstr "S'ha cancel·lat l'operació"
+
+#: ../client/gdaemonfileinputstream.c:1205
+#: ../client/gdaemonfileoutputstream.c:941
+#, c-format
+msgid "Seek not supported on stream"
+msgstr "No està implementada la cerca en el flux"
+
+#: ../client/gdaemonfileinputstream.c:1239
+#, c-format
+msgid "The query info operation is not supported"
+msgstr "No està implementada l'operació de consulta d'informació"
+
+#: ../client/gdaemonvfs.c:566
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr ""
+"S'ha produït un error en obtenir la informació del punt de muntatge: %s"
+
+#: ../client/gvfsdaemondbus.c:559 ../client/gvfsdaemondbus.c:946
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "S'ha produït un error en connectar-se al dimoni: %s"
+
+#: ../common/gsysutils.c:125
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "S'ha produït un error en crear el sòcol: %s"
+
+#: ../common/gsysutils.c:161
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "S'ha produït un error en connectar-se al sòcol: %s"
+
+#: ../common/gvfsdaemonprotocol.c:516
+#, c-format
+msgid "Invalid file info format"
+msgstr "El format d'informació del fitxer no és vàlid"
+
+#: ../common/gvfsdaemonprotocol.c:533
+#, c-format
+msgid "Invalid attribute info list content"
+msgstr "El contingut de la llista d'informació dels atributs no és vàlid"
+
+#: ../daemon/daemon-main.c:56
+#, c-format
+msgid "Error connecting to D-Bus: %s\n"
+msgstr "S'ha produït un error en connectar-se al D-Bus: %s\n"
+
+#: ../daemon/daemon-main.c:177
+#, c-format
+msgid "Error connecting dbus: %s\n"
+msgstr "S'ha produït un error en connectar-se al D-Bus: %s\n"
+
+#: ../daemon/daemon-main.c:211
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "ja s'està fent servir el punt de muntatge %s"
+
+#: ../daemon/daemon-main.c:222
+msgid "error starting mount daemon"
+msgstr "s'ha produït un error en iniciar el dimoni de muntatge"
+
+#: ../daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr "Grava"
+
+#: ../daemon/gvfsbackendburn.c:376
+msgid "Unable to create temporary directory"
+msgstr "No s'ha pogut crear un directori temporal"
+
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:671
+#: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
+#: ../daemon/gvfsbackendburn.c:782
+msgid "No such file or directory"
+msgstr "No existeix el fitxer o directori"
+
+#: ../daemon/gvfsbackendburn.c:425
+msgid "Directory not empty"
+msgstr "El directori no és buit"
+
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:894
+msgid "Can't copy file over directory"
+msgstr "No es pot copiar el fitxer al directori"
+
+#: ../daemon/gvfsbackendburn.c:650
+msgid "CD Burner"
+msgstr "Gravadora de CD"
+
+#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:641
+msgid "The file is not a directory"
+msgstr "El fitxer no és un directori"
+
+#: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
+#: ../daemon/gvfsbackendburn.c:914
+msgid "File exists"
+msgstr "Existeix el fitxer"
+
+#: ../daemon/gvfsbackendburn.c:842
+msgid "No such file or directory in target path"
+msgstr "No existeix el fitxer o directori en el camí objectiu"
+
+#: ../daemon/gvfsbackendburn.c:865
+msgid "Can't copy directory over directory"
+msgstr "No es pot copiar el directori al directori"
+
+#: ../daemon/gvfsbackendburn.c:874
+msgid "Target file exists"
+msgstr "Ja existeix el fitxer de destinació"
+
+#: ../daemon/gvfsbackendburn.c:881
+msgid "Can't recursively copy directory"
+msgstr "No es pot copiar el directori de forma recursiva"
+
+#: ../daemon/gvfsbackendburn.c:940
+msgid "Not supported"
+msgstr "No és implementat"
+
+#: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
+#, c-format
+msgid "No drive specified"
+msgstr "No s'ha especificat la unitat"
+
+#: ../daemon/gvfsbackendcdda.c:157
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "No s'ha pogut trobar la unitat %s"
+
+#: ../daemon/gvfsbackendcdda.c:167
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "La unitat %s no conté fitxers d'àudio"
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:174
+#, c-format
+msgid "Audio Disc on %s"
+msgstr "Disc d'àudio a %s"
+
+#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:680
+#: ../hal/ghalmount.c:289 ../hal/ghalvolume.c:243 ../hal/ghalvolume.c:259
+#, c-format
+msgid "Audio Disc"
+msgstr "Disc d'àudio"
+
+#: ../daemon/gvfsbackendcdda.c:236
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "El sistema de fitxers està ocupat: %d fitxer obert"
+msgstr[1] "El sistema de fitxers està ocupat: %d fitxers oberts"
+
+#: ../daemon/gvfsbackendcdda.c:429
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "No hi ha el fitxer %s en la unitat %s"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:536
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr "S'ha produït un error del «paranoia» en la unitat %s"
+
+#: ../daemon/gvfsbackendcdda.c:599
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "S'ha produït un error en cercar en el flux de la unitat %s"
+
+#: ../daemon/gvfsbackendcdda.c:696
+#, c-format
+msgid "No such file"
+msgstr "No hi ha cap fitxer"
+
+#: ../daemon/gvfsbackendcdda.c:703
+#, c-format
+msgid "The file does not exist"
+msgstr "No existeix el fitxer"
+
+#: ../daemon/gvfsbackendcdda.c:710
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "No existeix el fitxer, o bé, no és una pista d'àudio"
+
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:683
+msgid "Computer"
+msgstr "Ordinador"
+
+#: ../daemon/gvfsbackendcomputer.c:562 ../daemon/gvfsbackendsmbbrowse.c:786
+#: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
+#: ../daemon/gvfsbackendsmbbrowse.c:1098
+#, c-format
+msgid "File doesn't exist"
+msgstr "No existeix el fitxer"
+
+#: ../daemon/gvfsbackendcomputer.c:580 ../daemon/gvfsbackendtrash.c:632
+msgid "Can't open directory"
+msgstr "No es pot obrir el directori"
+
+#: ../daemon/gvfsbackendcomputer.c:584 ../daemon/gvfsbackendcomputer.c:718
+msgid "Can't open mountable file"
+msgstr "No es pot obrir el fitxer muntable"
+
+#: ../daemon/gvfsbackendcomputer.c:765
+#, c-format
+msgid "Internal error: %s"
+msgstr "Error intern: %s"
+
+#: ../daemon/gvfsbackendcomputer.c:789 ../daemon/gvfsbackendcomputer.c:854
+#: ../daemon/gvfsbackendcomputer.c:954
+msgid "Not a mountable file"
+msgstr "No és un fitxer muntable"
+
+#: ../daemon/gvfsbackendcomputer.c:811
+msgid "Can't mount file"
+msgstr "No es pot muntar el fitxer"
+
+#: ../daemon/gvfsbackendcomputer.c:869
+msgid "Can't unmount file"
+msgstr "No es pot desmuntar el fitxer"
+
+#: ../daemon/gvfsbackendcomputer.c:985
+msgid "Can't eject file"
+msgstr "No es pot expulsar el fitxer"
+
+#: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:642
+#: ../daemon/gvfsbackendhttp.c:185
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "Error HTTP: %s"
+
+#: ../daemon/gvfsbackenddav.c:167
+#, c-format
+msgid "Could not parse response"
+msgstr "No s'ha pogut analitzar la resposta"
+
+#: ../daemon/gvfsbackenddav.c:176
+#, c-format
+msgid "Empty response"
+msgstr "Resposta buida"
+
+#: ../daemon/gvfsbackenddav.c:183
+#, c-format
+msgid "Unexpected reply from server"
+msgstr "Resposta inesperada del servidor"
+
+#: ../daemon/gvfsbackenddav.c:564
+msgid "Please enter proxy password"
+msgstr "Introduïu la contrasenya del servidor intermediari"
+
+#: ../daemon/gvfsbackenddav.c:573
+msgid "WebDAV share"
+msgstr "Recurs compartit de WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:575
+#, c-format
+msgid "Enter password for %s"
+msgstr "Introduïu la contrasenya per a %s"
+
+#: ../daemon/gvfsbackenddav.c:646
+msgid "Not a WebDAV enabled share"
+msgstr "No és un recurs compartit habilitat per a WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:409
+#: ../daemon/gvfsbackendsmb.c:542
+msgid "Invalid mount spec"
+msgstr "Especificació de muntatge no vàlida"
+
+#: ../daemon/gvfsbackenddav.c:797
+msgid "Response invalid"
+msgstr "Resposta no vàlida"
+
+#: ../daemon/gvfsbackenddav.c:826 ../daemon/gvfsbackenddav.c:941
+msgid "Could not create request"
+msgstr "No s'ha pogut crear la sol·licitud"
+
+#: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1164
+msgid "No hostname specified"
+msgstr "No s'ha especificat el nom de la màquina"
+
+#: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:627
+#: ../daemon/gvfsbackendsmb.c:1051
+msgid "Unsupported seek type"
+msgstr "Tipus de cerca no implementada"
+
+#: ../daemon/gvfsbackendhttp.c:181
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "Error en el client HTTP: %s"
+
+#: ../daemon/gvfsbackendhttp.c:226 ../daemon/gvfsbackendsftp.c:1489
+#: ../daemon/gvfsbackendsmb.c:1160 ../daemon/gvfsbackendtrash.c:948
+msgid " (invalid encoding)"
+msgstr " (codificació incorrecta)"
+
+#: ../daemon/gvfsbackendhttp.c:639 ../daemon/gvfsbackendsmb.c:1653
+msgid "Target file already exists"
+msgstr "Ja existeix el fitxer de destinació"
+
+#: ../daemon/gvfsbackendhttp.c:709 ../daemon/gvfsbackendsftp.c:2416
+#: ../daemon/gvfsbackendsmb.c:921
+#, c-format
+msgid "The file was externally modified"
+msgstr "S'ha modificat el fitxer des d'un altre programa"
+
+#: ../daemon/gvfsbackendhttp.c:740 ../daemon/gvfsbackendsmb.c:957
+#: ../daemon/gvfsbackendsmb.c:1670
+#, c-format
+msgid "Backup file creation failed"
+msgstr "No s'ha pogut crear el fitxer de còpia de seguretat"
+
+#: ../daemon/gvfsbackendlocaltest.c:788
+msgid "Directory notification not supported"
+msgstr "No està implementada la notificació del directori"
+
+#: ../daemon/gvfsbackendsftp.c:249
+#, c-format
+msgid "ssh program unexpectedly exited"
+msgstr "el programa SSH ha sortit inesperadament"
+
+#: ../daemon/gvfsbackendsftp.c:257
+#, c-format
+msgid "Permission denied"
+msgstr "Permís denegat"
+
+#: ../daemon/gvfsbackendsftp.c:264
+#, c-format
+msgid "Hostname not known"
+msgstr "Es desconeix el nom de l'ordinador"
+
+#: ../daemon/gvfsbackendsftp.c:271
+#, c-format
+msgid "No route to host"
+msgstr "No hi ha cap ruta fins a l'ordinador"
+
+#: ../daemon/gvfsbackendsftp.c:278
+#, c-format
+msgid "Connection refused by server"
+msgstr "El servidor ha rebutjat la connexió"
+
+#: ../daemon/gvfsbackendsftp.c:285
+#, c-format
+msgid "Host key verification failed"
+msgstr "Ha fallat la verificació de la clau de l'ordinador"
+
+#: ../daemon/gvfsbackendsftp.c:370
+#, c-format
+msgid "Unable to spawn ssh program"
+msgstr "No s'ha pogut engendrar el programa SSH"
+
+#: ../daemon/gvfsbackendsftp.c:386
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "No s'ha pogut engendrar el programa SSH: %s"
+
+#: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:646
+#, c-format
+msgid "Timed out when logging in"
+msgstr "Ha expirat el temps d'identificació"
+
+#: ../daemon/gvfsbackendsftp.c:694
+msgid "Enter passphrase for key"
+msgstr "Introduïu la contrasenya per a la clau"
+
+#: ../daemon/gvfsbackendsftp.c:696
+msgid "Enter password"
+msgstr "Introduïu la contrasenya"
+
+#: ../daemon/gvfsbackendsftp.c:708
+#, c-format
+msgid "Password dialog cancelled"
+msgstr "S'ha cancel·lat el diàleg de contrasenya"
+
+#: ../daemon/gvfsbackendsftp.c:724
+#, c-format
+msgid "Can't send password"
+msgstr "No s'ha pogut enviar la contrasenya"
+
+#: ../daemon/gvfsbackendsftp.c:1090 ../daemon/gvfsbackendsftp.c:1113
+#, c-format
+msgid "Protocol error"
+msgstr "Error en el protocol"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1130
+#, c-format
+msgid "sftp on %s"
+msgstr "sftp a %s"
+
+#: ../daemon/gvfsbackendsftp.c:1154
+msgid "Unable to find supported ssh command"
+msgstr "No s'ha pogut trobar l'ordre de SSH implementada"
+
+#: ../daemon/gvfsbackendsftp.c:1554
+msgid "File is directory"
+msgstr "El fitxer és un directori"
+
+#: ../daemon/gvfsbackendsftp.c:1563
+msgid "Failure"
+msgstr "Fallada"
+
+#: ../daemon/gvfsbackendsftp.c:1628 ../daemon/gvfsbackendsftp.c:1690
+#: ../daemon/gvfsbackendsftp.c:1701 ../daemon/gvfsbackendsftp.c:1759
+#: ../daemon/gvfsbackendsftp.c:1849 ../daemon/gvfsbackendsftp.c:1878
+#: ../daemon/gvfsbackendsftp.c:1926 ../daemon/gvfsbackendsftp.c:2005
+#: ../daemon/gvfsbackendsftp.c:2116 ../daemon/gvfsbackendsftp.c:2157
+#: ../daemon/gvfsbackendsftp.c:2209 ../daemon/gvfsbackendsftp.c:2280
+#: ../daemon/gvfsbackendsftp.c:2300 ../daemon/gvfsbackendsftp.c:2454
+#: ../daemon/gvfsbackendsftp.c:2480 ../daemon/gvfsbackendsftp.c:2537
+#: ../daemon/gvfsbackendsftp.c:2596 ../daemon/gvfsbackendsftp.c:2878
+#: ../daemon/gvfsbackendsftp.c:3007 ../daemon/gvfsbackendsftp.c:3038
+#: ../daemon/gvfsbackendsftp.c:3137 ../daemon/gvfsbackendsftp.c:3178
+#: ../daemon/gvfsbackendsftp.c:3231 ../daemon/gvfsbackendsftp.c:3267
+#: ../daemon/gvfsbackendsftp.c:3301 ../daemon/gvfsbackendsftp.c:3316
+#: ../daemon/gvfsbackendsftp.c:3335
+#, c-format
+msgid "Invalid reply recieved"
+msgstr "S'ha rebut una resposta no vàlida"
+
+#: ../daemon/gvfsbackendsftp.c:1947
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "S'ha produït un error en crear el fitxer de còpia de seguretat: %s"
+
+#: ../daemon/gvfsbackendsftp.c:2362
+msgid "Unable to create temporary file"
+msgstr "No s'ha pogut crear un fitxer temporal"
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:180
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "Es requereix contrasenya per al recurs compartit %s a %s"
+
+#: ../daemon/gvfsbackendsmb.c:429 ../daemon/gvfsbackendsmb.c:464
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Error intern (%s)"
+
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1153
+#, c-format
+msgid "%s on %s"
+msgstr "%s a %s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:518
+msgid "Failed to mount Windows share"
+msgstr "No s'ha pogut muntar el recurs compartit de Windows"
+
+#: ../daemon/gvfsbackendsmb.c:1103
+#, c-format
+msgid "Backup file creation failed: %d"
+msgstr "No s'ha pogut crear el fitxer de còpia de seguretat: %d"
+
+#: ../daemon/gvfsbackendsmb.c:1556
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "S'ha produït un error en suprimir el fitxer: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1618
+#, c-format
+msgid "Error moving file: %s"
+msgstr "S'ha produït un error en moure el fitxer: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1642
+msgid "Can't move directory over directory"
+msgstr "No es pot moure el directori al directori"
+
+#: ../daemon/gvfsbackendsmb.c:1690
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "S'ha produït un error en suprimir el fitxer objectiu: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1714
+msgid "Can't recursively move directory"
+msgstr "No es pot moure el directori de forma recursiva"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:676
+msgid "Windows Network"
+msgstr "Xarxa de Windows"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:684
+#, c-format
+msgid "Windows shares on %s"
+msgstr "Recursos compartits de Windows a %s"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:781 ../daemon/gvfsbackendsmbbrowse.c:827
+#, c-format
+msgid "The file is not a mountable"
+msgstr "El fitxer no es pot muntar"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:849
+msgid "Not a regular file"
+msgstr "No és un fitxer normal"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1094
+msgid "Not a directory"
+msgstr "No és un directori"
+
+#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1165
+msgid "Trashcan"
+msgstr "Paperera"
+
+#: ../daemon/gvfsbackendtrash.c:1255
+msgid "Can't delete trash"
+msgstr "No es pot suprimir la paperera"
+
+#: ../daemon/gvfsbackendtrash.c:1602 ../daemon/gvfsbackendtrash.c:1677
+msgid "Trash directory notification not supported"
+msgstr "No està implementada la notificació del directori de la paperera"
+
+#: ../daemon/gvfsdaemon.c:1030
+msgid "Invalid backend type"
+msgstr "Tipus de rerefons no vàlid"
+
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "No fd passing socket available"
+msgstr "No hi ha cap sòcol de passada de descriptor de fitxer disponible"
+
+#: ../daemon/gvfsdaemonutils.c:102
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "S'ha produït un error en enviar el descriptor de fitxer: %s"
+
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:225 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:105 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:137
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "El rerefons no ha implementat l'operació"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "El rerefons no ha implementat els enllaços simbòlics"
+
+#: ../daemon/gvfsjobsetattribute.c:123
+msgid "Invalid dbus message"
+msgstr "El missatge del D-Bus no és vàlid"
+
+#: ../daemon/main.c:44
+msgid "Replace old daemon."
+msgstr "Substitueix el dimoni anterior."
+
+#: ../daemon/main.c:45
+msgid "Don't start fuse."
+msgstr "No iniciïs el FUSE."
+
+#: ../daemon/main.c:51
+msgid "GVFS Daemon"
+msgstr "Dimoni del GVFS"
+
+#: ../daemon/mount.c:372
+#, c-format
+msgid "Invalid arguments from spawned child"
+msgstr "Arguments no vàlids del fill engendrat"
+
+#: ../daemon/mount.c:662
+#, c-format
+msgid "Automount failed: %s"
+msgstr "Ha fallat el muntatge automàtic: %s"
+
+#: ../daemon/mount.c:707
+msgid "The specified location is not mounted"
+msgstr "No està muntada la ubicació especificada"
+
+#: ../daemon/mount.c:712
+msgid "The specified location is not supported"
+msgstr "No se sap gestionar la ubicació especificada"
+
+#: ../daemon/mount.c:875
+msgid "Location is already mounted"
+msgstr "Ja està muntada la ubicació"
+
+#: ../daemon/mount.c:883
+msgid "Location is not mountable"
+msgstr "La ubicació no és pot muntar"
+
+#: ../hal/ghaldrive.c:135
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../hal/ghaldrive.c:137
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../hal/ghaldrive.c:139
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../hal/ghaldrive.c:143
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../hal/ghaldrive.c:145
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../hal/ghaldrive.c:147
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../hal/ghaldrive.c:149
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../hal/ghaldrive.c:151
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../hal/ghaldrive.c:153
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../hal/ghaldrive.c:156
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../hal/ghaldrive.c:159
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../hal/ghaldrive.c:161
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../hal/ghaldrive.c:163
+msgid "HDDVD-r"
+msgstr "HDDVD-r"
+
+#: ../hal/ghaldrive.c:165
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../hal/ghaldrive.c:167
+msgid "Blu-ray"
+msgstr "Blu-ray"
+
+#: ../hal/ghaldrive.c:169
+msgid "Blu-ray-R"
+msgstr "Blu-ray-R"
+
+#: ../hal/ghaldrive.c:171
+msgid "Blu-ray-RE"
+msgstr "Blu-ray-RE"
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../hal/ghaldrive.c:176
+#, c-format
+msgid "%s/%s Drive"
+msgstr "Unitat %s/%s"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../hal/ghaldrive.c:180
+#, c-format
+msgid "%s Drive"
+msgstr "Unitat %s"
+
+#: ../hal/ghaldrive.c:184
+msgid "Floppy Drive"
+msgstr "Unitat de disquet"
+
+#: ../hal/ghaldrive.c:190
+msgid "Software RAID Drive"
+msgstr "Unitat de RAID per programari"
+
+#: ../hal/ghaldrive.c:192
+msgid "USB Drive"
+msgstr "Unitat USB"
+
+#: ../hal/ghaldrive.c:194
+msgid "ATA Drive"
+msgstr "Unitat ATA"
+
+#: ../hal/ghaldrive.c:196
+msgid "SCSI Drive"
+msgstr "Unitat SCSI"
+
+#: ../hal/ghaldrive.c:198
+msgid "FireWire Drive"
+msgstr "Unitat FireWire"
+
+#: ../hal/ghaldrive.c:202
+msgid "Tape Drive"
+msgstr "Unitat de cinta"
+
+#: ../hal/ghaldrive.c:204
+msgid "CompactFlash Drive"
+msgstr "Unitat CompactFlash"
+
+#: ../hal/ghaldrive.c:206
+msgid "MemoryStick Drive"
+msgstr "Unitat MemoryStick"
+
+#: ../hal/ghaldrive.c:208
+msgid "SmartMedia Drive"
+msgstr "Unitat SmartMedia"
+
+#: ../hal/ghaldrive.c:210
+msgid "SD/MMC Drive"
+msgstr "Unitat SD/MMC"
+
+#: ../hal/ghaldrive.c:212
+msgid "Zip Drive"
+msgstr "Unitat Zip"
+
+#: ../hal/ghaldrive.c:214
+msgid "Jaz Drive"
+msgstr "Unitat Jaz"
+
+#: ../hal/ghaldrive.c:216
+msgid "Thumb Drive"
+msgstr "Unitat Thumb"
+
+#: ../hal/ghaldrive.c:219
+msgid "Mass Storage Drive"
+msgstr "Unitat de memòria de massa"
+
+#: ../hal/ghaldrive.c:631
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"No s'ha pogut expulsar el medi. Alguns dels volums del suport estan ocupats."
+
+#: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
+msgid "CD-ROM Disc"
+msgstr "Disc CD-ROM"
+
+#: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
+msgid "Blank CD-ROM Disc"
+msgstr "Disc CD-ROM en blanc"
+
+#: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
+msgid "CD-R Disc"
+msgstr "Disc CD-R"
+
+#: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
+msgid "Blank CD-R Disc"
+msgstr "Disc CD-R en blanc"
+
+#: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
+msgid "CD-RW Disc"
+msgstr "Disc CD-RW"
+
+#: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
+msgid "Blank CD-RW Disc"
+msgstr "Disc CD-RW en blanc"
+
+#: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
+#: ../hal/ghalvolume.c:143
+msgid "DVD-ROM Disc"
+msgstr "Disc DVD-ROM"
+
+#: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
+#: ../hal/ghalvolume.c:143
+msgid "Blank DVD-ROM Disc"
+msgstr "Disc DVD-ROM en blanc"
+
+#: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
+msgid "DVD-RAM Disc"
+msgstr "Disc DVD-RAM"
+
+#: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
+msgid "Blank DVD-RAM Disc"
+msgstr "Disc DVD-RAM en blanc"
+
+#: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
+msgid "DVD-RW Disc"
+msgstr "Disc DVD-RW"
+
+#: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
+msgid "Blank DVD-RW Disc"
+msgstr "Disc DVD-RW en blanc"
+
+#: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
+msgid "DVD+R Disc"
+msgstr "Disc DVD+R"
+
+#: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
+msgid "Blank DVD+R Disc"
+msgstr "Disc DVD+R en blanc"
+
+#: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
+msgid "DVD+RW Disc"
+msgstr "Disc DVD+RW"
+
+#: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
+msgid "Blank DVD+RW Disc"
+msgstr "Disc DVD+RW en blanc"
+
+#: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
+msgid "DVD+R DL Disc"
+msgstr "Disc DVD+R DL"
+
+#: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
+msgid "Blank DVD+R DL Disc"
+msgstr "Disc DVD+R DL en blanc"
+
+#: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
+msgid "Blu-Ray Disc"
+msgstr "Disc Blu-Ray"
+
+#: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
+msgid "Blank Blu-Ray Disc"
+msgstr "Disc Blu-Ray en blanc"
+
+#: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
+msgid "Blu-Ray R Disc"
+msgstr "Disc Blu-Ray R"
+
+#: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
+msgid "Blank Blu-Ray R Disc"
+msgstr "Disc Blu-Ray R en blanc"
+
+#: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
+msgid "Blu-Ray RW Disc"
+msgstr "Disc Blu-Ray RW"
+
+#: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Disc Blu-Ray RW en blanc"
+
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
+msgid "HD DVD Disc"
+msgstr "Disc HD DVD"
+
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
+msgid "Blank HD DVD Disc"
+msgstr "Disc HD DVD en blanc"
+
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
+msgid "HD DVD-R Disc"
+msgstr "Disc HD DVD-R"
+
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
+msgid "Blank HD DVD-R Disc"
+msgstr "Disc HD DVD-R en blanc"
+
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
+msgid "HD DVD-RW Disc"
+msgstr "Disc HD DVD-RW"
+
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
+msgid "Blank HD DVD-RW Disc"
+msgstr "Disc HD DVD-RW en blanc"
+
+#: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
+msgid "MO Disc"
+msgstr "Disc MO"
+
+#: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
+msgid "Blank MO Disc"
+msgstr "Disc MO en blanc"
+
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
+msgid "Disc"
+msgstr "Disc"
+
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
+msgid "Blank Disc"
+msgstr "Disc en blanc"
+
+#: ../hal/ghalmount.c:199
+#, c-format
+msgid "%.1f kB Media"
+msgstr "Suport de %.1f kB"
+
+#: ../hal/ghalmount.c:204
+#, c-format
+msgid "%.1f MB Media"
+msgstr "Suport de %.1f MB"
+
+#: ../hal/ghalmount.c:209
+#, c-format
+msgid "%.1f GB Media"
+msgstr "Suport de %.1f GB"
+
+#: ../hal/ghalmount.c:287 ../hal/ghalvolume.c:257
+msgid "Mixed Audio/Data Disc"
+msgstr "Disc mesclat d'àudio i dades"
+
+#: ../hal/ghalvolume.c:189
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kB"
+
+#: ../hal/ghalvolume.c:194
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: ../hal/ghalvolume.c:199
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#: ../hal/ghalvolume.c:249
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s dades xifrades"
+
+#: ../hal/ghalvolume.c:265
+#, c-format
+msgid "%s Media"
+msgstr "Medi %s"
+
+#: ../hal/ghalvolume.c:307
+msgid "Camera"
+msgstr "Càmera"
+
+#: ../hal/ghalvolume.c:314
+#, c-format
+msgid "%s Camera"
+msgstr "Càmera %s"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:59
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: s'ha produït un error en obir el fitxer: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:82
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, s'ha produït un error en escriure a la sortida estàndard"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:94
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: s'ha produït un error en llegir: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:112
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s:error en tancar: %s\n"
+
+#: ../programs/gvfs-cat.c:137
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "UBICACIÓ... - concatena UBICACIONS a la sortida estàndard."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:142
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+"Concatena fitxers a les ubicacions i imprimeix a la sortida estàndard. "
+"Funciona de la mateixa manera que l'eina «cat» de sempre, però utilitza "
+"l'ubicació del gvfs enlloc de fitxers locals: per exemple, podeu fer servir "
+"com a ubicació per a concatenar coses com smb://servidor/recurs/fitxer.txt."
+
+#: ../programs/gvfs-cat.c:149
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+"Nota: utilitzeu un conducte a través del «cat» si necessiteu les seves "
+"opcions de formatació com -n, -T o d'altres."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:164
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: manquen les ubicacions"
+
+#: ../programs/gvfs-cat.c:166
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "Per a més informació proveu «%s --help»."
+
+#~ msgid "Containing mount does not exist"
+#~ msgstr "No existeix el punt de muntatge contenidor"
+
+#~ msgid "Failed to allocate smb context"
+#~ msgstr "No s'ha pogut ubicar el context de SMB"
+
+#~ msgid "Failed to initialize smb context"
+#~ msgstr "No s'ha pogut inicialitzar el context de SMB"
+
+#~ msgid "Failed to accept client: %s"
+#~ msgstr "No s'ha pogut acceptar el client: %s"
+
+#~ msgid "accept of extra fd failed"
+#~ msgstr "ha fallat l'acceptació d'un descriptor de fitxer extra"
+
+#~ msgid "object registration failed"
+#~ msgstr "ha fallat el registre de l'objecte"
