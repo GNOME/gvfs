@@ -242,49 +242,49 @@ look_for_stderr_errors (GVfsBackend *backend, GError **error)
       line = g_data_input_stream_read_line (op_backend->error_stream, NULL, NULL, NULL);
       
       if (line == NULL)
-	{
-	  /* Error (real or WOULDBLOCK) or EOF */
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_FAILED,
-		       _("ssh program unexpectedly exited"));
-	  return;
-	}
-
+        {
+          /* Error (real or WOULDBLOCK) or EOF */
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_FAILED,
+                       _("ssh program unexpectedly exited"));
+          return;
+        }
+      
       if (strstr (line, "Permission denied") != NULL)
-	{
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-		       _("Permission denied"));
-	  return;
-	}
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                       _("Permission denied"));
+          return;
+        }
       else if (strstr (line, "Name or service not known") != NULL)
-	{
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
-		       _("Hostname not known"));
-	  return;
-	}
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+                       _("Hostname not known"));
+          return;
+        }
       else if (strstr (line, "No route to host") != NULL)
-	{
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
-		       _("No route to host"));
-	  return;
-	}
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+                       _("No route to host"));
+          return;
+        }
       else if (strstr (line, "Connection refused") != NULL)
-	{
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-		       _("Connection refused by server"));
-	  return;
-	}
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                       _("Connection refused by server"));
+          return;
+        }
       else if (strstr (line, "Host key verification failed") != NULL) 
-	{
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_FAILED,
-		       _("Host key verification failed"));
-	  return;
-	}
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_FAILED,
+                       _("Host key verification failed"));
+          return;
+        }
       
       g_free (line);
     }
@@ -382,8 +382,8 @@ spawn_ssh (GVfsBackend *backend,
 				 stdin_fd, stdout_fd, stderr_fd, &my_error))
     {
       g_set_error (error,
-		   G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Unable to spawn ssh program: %s"), my_error->msg);
+                   G_IO_ERROR, G_IO_ERROR_FAILED,
+                   _("Unable to spawn ssh program: %s"), my_error->msg);
       g_error_free (my_error);
       return FALSE;
     }
@@ -1255,6 +1255,7 @@ result_from_status (GVfsJob *job,
 {
   GError *error;
 
+  error = NULL;
   if (error_from_status (job, reply, failure_error, allowed_sftp_error, &error))
     {
       g_vfs_job_succeeded (job);
@@ -1524,6 +1525,46 @@ sftp_handle_free (SftpHandle *handle)
 }
 
 static void
+open_stat_reply (GVfsBackendSftp *backend,
+                 int reply_type,
+                 GDataInputStream *reply,
+                 guint32 len,
+                 GVfsJob *job,
+                 gpointer user_data)
+{
+  if (g_vfs_job_is_finished (job))
+    {
+      /* Handled in stat reply */
+      return;
+    }
+  
+  if (reply_type == SSH_FXP_ATTRS)
+    {
+      GFileType type;
+      GFileInfo *info = g_file_info_new ();
+      
+      parse_attributes (backend, info, NULL,
+                        reply, NULL);
+      type = g_file_info_get_file_type (info);
+      g_object_unref (info);
+      
+      if (type == G_FILE_TYPE_DIRECTORY)
+        {
+          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                            _("File is directory"));
+          return;
+        }
+    }
+
+  if (GPOINTER_TO_INT (G_VFS_JOB(job)->backend_data) == 1)
+    {
+      /* We ran the read_reply and it was a generic failure */
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Failure"));
+    }
+}
+
+static void
 open_for_read_reply (GVfsBackendSftp *backend,
                      int reply_type,
                      GDataInputStream *reply,
@@ -1532,10 +1573,52 @@ open_for_read_reply (GVfsBackendSftp *backend,
                      gpointer user_data)
 {
   SftpHandle *handle;
+  GError *error;
+
+  if (g_vfs_job_is_finished (job))
+    {
+      /* Handled in stat reply */
+
+      /* Normally this should not happen as we
+         sent an is_dir error. But i guess we can
+         race */
+      if (reply_type == SSH_FXP_HANDLE)
+        {
+          GDataOutputStream *command;
+          DataBuffer *handle;
+          guint32 id;
+
+          handle = read_data_buffer (reply);
+          
+          command = new_command_stream (backend, SSH_FXP_CLOSE, &id);
+          put_data_buffer (command, handle);
+          queue_command_stream_and_free (backend, command, id, NULL, G_VFS_JOB (job), NULL);
+
+          data_buffer_free (handle);
+        }
+      
+      return;
+    }
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply, -1, -1);
+      error = NULL;
+      if (error_from_status (job,
+                             reply,
+                             -1,
+                             SSH_FX_FAILURE,
+                             &error))
+        {
+          /* Unknown failure type, mark that we got this and
+             return result from stat result */
+          G_VFS_JOB(job)->backend_data = GINT_TO_POINTER (1);
+        }
+      else
+        {
+          g_vfs_job_failed_from_error (job, error);
+          g_error_free (error);
+        }
+      
       return;
     }
 
@@ -1553,7 +1636,6 @@ open_for_read_reply (GVfsBackendSftp *backend,
   g_vfs_job_succeeded (job);
 }
 
-
 static gboolean
 try_open_for_read (GVfsBackend *backend,
                    GVfsJobOpenForRead *job,
@@ -1562,6 +1644,14 @@ try_open_for_read (GVfsBackend *backend,
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   guint32 id;
   GDataOutputStream *command;
+
+  G_VFS_JOB(job)->backend_data = GINT_TO_POINTER (0);
+  
+  command = new_command_stream (op_backend,
+                                SSH_FXP_STAT,
+                                &id);
+  put_string (command, filename);
+  queue_command_stream_and_free (op_backend, command, id, open_stat_reply, G_VFS_JOB (job), NULL);
 
   command = new_command_stream (op_backend,
                                 SSH_FXP_OPEN,
