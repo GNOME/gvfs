@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-21 14:47+0000\n"
-"PO-Revision-Date: 2008-01-21 17:39+0100\n"
+"POT-Creation-Date: 2008-01-22 12:04+0000\n"
+"PO-Revision-Date: 2008-01-22 20:46+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
-"Language-Team: Español <<gnome-es-list@gnome.org>\n"
+"Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -382,7 +382,7 @@ msgstr "Tipo de búsqueda no soportado"
 msgid "HTTP Client Error: %s"
 msgstr "Error HTTP en el cliente: %s"
 
-#: ../daemon/gvfsbackendhttp.c:226 ../daemon/gvfsbackendsftp.c:1488
+#: ../daemon/gvfsbackendhttp.c:226 ../daemon/gvfsbackendsftp.c:1489
 #: ../daemon/gvfsbackendsmb.c:1160 ../daemon/gvfsbackendtrash.c:948
 msgid " (invalid encoding)"
 msgstr " (codificación no válida)"
@@ -391,7 +391,7 @@ msgstr " (codificación no válida)"
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendhttp.c:709 ../daemon/gvfsbackendsftp.c:2326
+#: ../daemon/gvfsbackendhttp.c:709 ../daemon/gvfsbackendsftp.c:2416
 #: ../daemon/gvfsbackendsmb.c:921
 msgid "The file was externally modified"
 msgstr "El archivo se modificó externamente"
@@ -401,7 +401,7 @@ msgstr "El archivo se modificó externamente"
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
-#: ../daemon/gvfsbackendlocaltest.c:790
+#: ../daemon/gvfsbackendlocaltest.c:788
 msgid "Directory notification not supported"
 msgstr "No se soporta la notificación de directorios"
 
@@ -472,29 +472,37 @@ msgstr "sftp en %s"
 msgid "Unable to find supported ssh command"
 msgstr "No se pudo encontrar el comando ssh soportado"
 
-#: ../daemon/gvfsbackendsftp.c:1545 ../daemon/gvfsbackendsftp.c:1600
-#: ../daemon/gvfsbackendsftp.c:1611 ../daemon/gvfsbackendsftp.c:1669
-#: ../daemon/gvfsbackendsftp.c:1759 ../daemon/gvfsbackendsftp.c:1788
-#: ../daemon/gvfsbackendsftp.c:1836 ../daemon/gvfsbackendsftp.c:1915
-#: ../daemon/gvfsbackendsftp.c:2026 ../daemon/gvfsbackendsftp.c:2067
-#: ../daemon/gvfsbackendsftp.c:2119 ../daemon/gvfsbackendsftp.c:2190
-#: ../daemon/gvfsbackendsftp.c:2210 ../daemon/gvfsbackendsftp.c:2364
-#: ../daemon/gvfsbackendsftp.c:2390 ../daemon/gvfsbackendsftp.c:2447
-#: ../daemon/gvfsbackendsftp.c:2506 ../daemon/gvfsbackendsftp.c:2788
-#: ../daemon/gvfsbackendsftp.c:2917 ../daemon/gvfsbackendsftp.c:2948
-#: ../daemon/gvfsbackendsftp.c:3047 ../daemon/gvfsbackendsftp.c:3088
-#: ../daemon/gvfsbackendsftp.c:3141 ../daemon/gvfsbackendsftp.c:3177
-#: ../daemon/gvfsbackendsftp.c:3211 ../daemon/gvfsbackendsftp.c:3226
-#: ../daemon/gvfsbackendsftp.c:3245
+#: ../daemon/gvfsbackendsftp.c:1554
+msgid "File is directory"
+msgstr "El archivo es un directorio"
+
+#: ../daemon/gvfsbackendsftp.c:1563
+msgid "Failure"
+msgstr "Fallo"
+
+#: ../daemon/gvfsbackendsftp.c:1628 ../daemon/gvfsbackendsftp.c:1690
+#: ../daemon/gvfsbackendsftp.c:1701 ../daemon/gvfsbackendsftp.c:1759
+#: ../daemon/gvfsbackendsftp.c:1849 ../daemon/gvfsbackendsftp.c:1878
+#: ../daemon/gvfsbackendsftp.c:1926 ../daemon/gvfsbackendsftp.c:2005
+#: ../daemon/gvfsbackendsftp.c:2116 ../daemon/gvfsbackendsftp.c:2157
+#: ../daemon/gvfsbackendsftp.c:2209 ../daemon/gvfsbackendsftp.c:2280
+#: ../daemon/gvfsbackendsftp.c:2300 ../daemon/gvfsbackendsftp.c:2454
+#: ../daemon/gvfsbackendsftp.c:2480 ../daemon/gvfsbackendsftp.c:2537
+#: ../daemon/gvfsbackendsftp.c:2596 ../daemon/gvfsbackendsftp.c:2878
+#: ../daemon/gvfsbackendsftp.c:3007 ../daemon/gvfsbackendsftp.c:3038
+#: ../daemon/gvfsbackendsftp.c:3137 ../daemon/gvfsbackendsftp.c:3178
+#: ../daemon/gvfsbackendsftp.c:3231 ../daemon/gvfsbackendsftp.c:3267
+#: ../daemon/gvfsbackendsftp.c:3301 ../daemon/gvfsbackendsftp.c:3316
+#: ../daemon/gvfsbackendsftp.c:3335
 msgid "Invalid reply recieved"
 msgstr "Se recibió una respuesta no válida"
 
-#: ../daemon/gvfsbackendsftp.c:1857
+#: ../daemon/gvfsbackendsftp.c:1947
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Error al crear el archivo de respaldo: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2272
+#: ../daemon/gvfsbackendsftp.c:2362
 msgid "Unable to create temporary file"
 msgstr "No se pudo crear el archivo temporal"
 
