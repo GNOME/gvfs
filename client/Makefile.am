@@ -53,6 +53,12 @@ libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = $(vfssources)
 libgvfsdbus_la_LIBADD  = $(vfslibs)
 
+noinst_PROGRAMS = test-uri-utils
+
+test_uri_utils_SOURCES = test-uri-utils.c gvfsuriutils.c gvfsuriutils.h
+test_uri_utils_LDADD = $(vfslibs)
+test_uri_utils_CFLAGS = $(INCLUDES)
+
 if USE_FUSE
 
 ## FUSE daemon

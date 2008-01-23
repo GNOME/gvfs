@@ -170,7 +170,23 @@ g_vfs_decode_uri (const char *uri)
       else
 	host_start = authority_start;
 
-      port_start = memchr (host_start, ':', authority_end - host_start);
+      /* We should handle hostnames in brackets, as those are used by IPv6 URIs
+       * See http://tools.ietf.org/html/rfc2732 */
+      if (*host_start == '[')
+        {
+	  host_end = memchr (host_start, ']', authority_end - host_start);
+	  if (host_end == NULL)
+	    {
+	      g_vfs_decoded_uri_free (decoded);
+	      return NULL;
+	    }
+	  port_start = memchr (host_end, ':', authority_end - host_start);
+        }
+      else
+        {
+	  port_start = memchr (host_start, ':', authority_end - host_start);
+	}
+
       if (port_start)
 	{
 	  host_end = port_start++;
