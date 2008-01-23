@@ -1,3 +1,7 @@
+2008-01-24  Gil Forcada  <gforcada@gnome.org>
+
+	* ca.po: Fixed translation to pass msgfmt -cv.
+
 2008-01-22  Gil Forcada  <gforcada@gnome.org>
 
 	* ca.po: Added Catalan translation with lots of help from David Planella.

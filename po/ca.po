@@ -7,13 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-22 20:56+0100\n"
-"PO-Revision-Date: 2008-01-22 21:02+0100\n"
+"POT-Creation-Date: 2008-01-24 00:43+0100\n"
+"PO-Revision-Date: 2008-01-24 00:44+0100\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: ../client/gdaemonfile.c:508 ../client/gdaemonfile.c:1900
 #, c-format
