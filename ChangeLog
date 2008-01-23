@@ -1,3 +1,9 @@
+2008-01-23  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendtrash.c:
+        (add_extra_trash_info):
+	Use :: to delimit namespace for trash attributes
+
 2008-01-22  Gil Forcada  <gforcada@gnome.org>
 
 	* configure.ac: Added ca to ALL_LINUGAS.

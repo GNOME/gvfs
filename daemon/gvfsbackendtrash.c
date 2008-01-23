@@ -961,7 +961,7 @@ add_extra_trash_info (GFileInfo *file_info,
 
               
               g_file_info_set_attribute_byte_string (file_info,
-                                                     "trash:orig_path",
+                                                     "trash::orig_path",
                                                      orig_path);
               g_free (orig_path);
               g_free (orig_path_unescaped);
@@ -974,7 +974,7 @@ add_extra_trash_info (GFileInfo *file_info,
       date = g_key_file_get_string (keyfile, "Trash Info", "DeletionDate", NULL);
       if (date && g_utf8_validate (date, -1, NULL))
         g_file_info_set_attribute_string (file_info,
-                                          "trash:deletion_date",
+                                          "trash::deletion_date",
                                           date);
       g_free (date);
     }
