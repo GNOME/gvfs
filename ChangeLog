@@ -1,3 +1,8 @@
+2008-01-24  Bastien Nocera  <hadess@hadess.net>
+
+	* programs/Makefile.am:
+	* programs/gvfs-mkdir.c: (main): Add a test mkdir program
+
 2008-01-23  Bastien Nocera  <hadess@hadess.net>
 
 	* client/test-uri-utils.c: (main):

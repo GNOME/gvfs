@@ -22,6 +22,7 @@ bin_PROGRAMS =					\
 	gvfs-move				\
 	gvfs-monitor-file			\
 	gvfs-monitor-dir			\
+	gvfs-mkdir				\
 	$(NULL)
 
 bin_SCRIPTS =					\
@@ -60,5 +61,8 @@ gvfs_monitor_dir_LDADD = $(libraries)
 
 gvfs_monitor_file_SOURCES = gvfs-monitor-file.c
 gvfs_monitor_file_LDADD = $(libraries)
+
+gvfs_mkdir_SOURCES = gvfs-mkdir.c
+gvfs_mkdir_LDADD = $(libraries)
 
 EXTRA_DIST=gvfs-less
