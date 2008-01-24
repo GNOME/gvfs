@@ -843,6 +843,42 @@ g_hal_drive_poll_for_media_finish (GDrive        *drive,
   return TRUE;
 }
 
+static char *
+g_hal_drive_get_identifier (GDrive              *drive,
+                             const char          *kind)
+{
+  GHalDrive *hal_drive = G_HAL_DRIVE (drive);
+
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_HAL_UDI) == 0)
+    return g_strdup (hal_device_get_udi (hal_drive->device));
+  
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+    return g_strdup (hal_drive->device_path);
+  
+  return NULL;
+}
+
+static char **
+g_hal_drive_enumerate_identifiers (GDrive *drive)
+{
+  GHalDrive *hal_drive = G_HAL_DRIVE (drive);
+  GPtrArray *res;
+
+  res = g_ptr_array_new ();
+
+  g_ptr_array_add (res,
+                   g_strdup (G_VOLUME_IDENTIFIER_KIND_HAL_UDI));
+
+  if (hal_drive->device_path && *hal_drive->device_path != 0)
+    g_ptr_array_add (res,
+                     g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
+    
+
+  /* Null-terminate */
+  g_ptr_array_add (res, NULL);
+  
+  return g_ptr_array_free (res, FALSE);
+}
 
 static void
 g_hal_drive_drive_iface_init (GDriveIface *iface)
@@ -860,6 +896,8 @@ g_hal_drive_drive_iface_init (GDriveIface *iface)
   iface->eject_finish = g_hal_drive_eject_finish;
   iface->poll_for_media = g_hal_drive_poll_for_media;
   iface->poll_for_media_finish = g_hal_drive_poll_for_media_finish;
+  iface->get_identifier = g_hal_drive_get_identifier;
+  iface->enumerate_identifiers = g_hal_drive_enumerate_identifiers;
 }
 
 void 

@@ -727,7 +727,6 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
   gboolean all_volumes_ignored, got_volumes;
 
   drive_udi = hal_device_get_udi (d);
-  g_print ("should_drive_be_ignored %s\n", drive_udi);
   
   volumes = hal_pool_find_by_capability (pool, "volume");
 
@@ -736,7 +735,6 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
   for (l = volumes; l != NULL; l = l->next)
     {
       HalDevice *volume_dev = l->data;
-      g_print ("volume udi: %s\n", hal_device_get_udi (volume_dev));
       if (strcmp (drive_udi, hal_device_get_property_string (volume_dev, "block.storage_device")) == 0)
         {
           got_volumes = TRUE;
@@ -748,9 +746,6 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
         }
     }
 
-  g_print ("got_volumes: %d, all_ignored: %d\n",
-           got_volumes, all_volumes_ignored);
-  
   return got_volumes && all_volumes_ignored;
 }
 

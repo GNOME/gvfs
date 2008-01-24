@@ -908,6 +908,59 @@ g_hal_volume_eject_finish (GVolume        *volume,
   return TRUE;
 }
 
+static char *
+g_hal_volume_get_identifier (GVolume              *volume,
+                             const char          *kind)
+{
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_HAL_UDI) == 0)
+    return g_strdup (hal_device_get_udi (hal_volume->device));
+  
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+    return g_strdup (hal_volume->device_path);
+  
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
+    return g_strdup (hal_device_get_property_string (hal_volume->device, "volume.label"));
+  
+  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
+    return g_strdup (hal_device_get_property_string (hal_volume->device, "volume.uuid"));
+  
+  return NULL;
+}
+
+static char **
+g_hal_volume_enumerate_identifiers (GVolume *volume)
+{
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+  GPtrArray *res;
+  const char *label, *uuid;
+
+  res = g_ptr_array_new ();
+
+  g_ptr_array_add (res,
+                   g_strdup (G_VOLUME_IDENTIFIER_KIND_HAL_UDI));
+
+  if (hal_volume->device_path && *hal_volume->device_path != 0)
+    g_ptr_array_add (res,
+                     g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
+    
+  label = hal_device_get_property_string (hal_volume->device, "volume.label");
+  uuid = hal_device_get_property_string (hal_volume->device, "volume.uuid");
+  
+  if (label && *label != 0)
+    g_ptr_array_add (res,
+                     g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
+
+  if (uuid && *uuid != 0)
+    g_ptr_array_add (res,
+                     g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
+
+  /* Null-terminate */
+  g_ptr_array_add (res, NULL);
+  
+  return g_ptr_array_free (res, FALSE);
+}
 
 static void
 g_hal_volume_volume_iface_init (GVolumeIface *iface)
@@ -923,6 +976,8 @@ g_hal_volume_volume_iface_init (GVolumeIface *iface)
   iface->mount_finish = g_hal_volume_mount_finish;
   iface->eject = g_hal_volume_eject;
   iface->eject_finish = g_hal_volume_eject_finish;
+  iface->get_identifier = g_hal_volume_get_identifier;
+  iface->enumerate_identifiers = g_hal_volume_enumerate_identifiers;
 }
 
 void 

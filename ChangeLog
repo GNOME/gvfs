@@ -1,5 +1,17 @@
 2008-01-24  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghalvolumemonitor.c:
+	Remove debug spew.
+	
+        * hal/ghaldrive.c:
+        * hal/ghalvolume.c:
+	Implement identifier getters
+	
+        * programs/gvfs-mount.c:
+	Show identifiers
+
+2008-01-24  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsdaemon.c:
 	Indentation fix
 	

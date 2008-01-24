@@ -325,12 +325,13 @@ list_volumes (GList *volumes,
 	      gboolean only_with_no_drive)
 {
   GList *l, *mounts;
-  int c;
+  int c, i;
   GMount *mount;
   GVolume *volume;
   GDrive *drive;
   char *name;
   char *uuid;
+  char **ids;
   
   for (c = 0, l = volumes; l != NULL; l = l->next, c++)
     {
@@ -353,6 +354,20 @@ list_volumes (GList *volumes,
 
       if (mount_list_info)
 	{
+	  ids = g_volume_enumerate_identifiers (volume);
+	  if (ids && ids[0] != NULL)
+	    {
+	      g_print ("%*sids:\n", indent+2, "");
+	      for (i = 0; ids[i] != NULL; i++)
+		{
+		  char *id = g_volume_get_identifier (volume,
+						      ids[i]);
+		  g_print ("%*s %s: '%s'\n", indent+2, "", ids[i], id);
+		  g_free (id);
+		}
+	    }
+	  g_strfreev (ids);
+	  
 	  uuid = g_volume_get_uuid (volume);
 	  if (uuid)
 	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
@@ -377,9 +392,10 @@ list_drives (GList *drives,
 	     int indent)
 {
   GList *volumes, *l;
-  int c;
+  int c, i;
   GDrive *drive;
   char *name;
+  char **ids;
   
   for (c = 0, l = drives; l != NULL; l = l->next, c++)
     {
@@ -388,9 +404,23 @@ list_drives (GList *drives,
       
       g_print ("%*sDrive(%d): %s\n", indent, "", c, name);
       g_free (name);
-
+      
       if (mount_list_info)
 	{
+	  ids = g_drive_enumerate_identifiers (drive);
+	  if (ids && ids[0] != NULL)
+	    {
+	      g_print ("%*sids:\n", indent+2, "");
+	      for (i = 0; ids[i] != NULL; i++)
+		{
+		  char *id = g_drive_get_identifier (drive,
+						     ids[i]);
+		  g_print ("%*s %s: '%s'\n", indent+2, "", ids[i], id);
+		  g_free (id);
+		}
+	    }
+	  g_strfreev (ids);
+
 	  g_print ("%*sis_media_removable=%d\n", indent + 2, "", g_drive_is_media_removable (drive));
 	  g_print ("%*shas_media=%d\n", indent + 2, "", g_drive_has_media (drive));
 	  g_print ("%*sis_media_check_automatic=%d\n", indent + 2, "", g_drive_is_media_check_automatic (drive));
