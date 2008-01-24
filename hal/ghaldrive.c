@@ -170,15 +170,18 @@ _drive_get_description (HalDevice *d)
       if (hal_device_get_property_bool (d, "storage.cdrom.bdre"))
         second = _("Blu-ray-RE");
       
-      if (second != NULL) {
-        /* translators: This wis something like "CD-ROM/DVD Drive" or
-           "CD-RW/Blue-ray Drive" depending on the properties of the drive */
-        s = g_strdup_printf (_("%s/%s Drive"), first, second);
-      } else {
-        /* translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
-           depending on the properties of the drive */
-        s = g_strdup_printf (_("%s Drive"), first);
-      }
+      if (second != NULL)
+        {
+          /* translators: This wis something like "CD-ROM/DVD Drive" or
+             "CD-RW/Blue-ray Drive" depending on the properties of the drive */
+          s = g_strdup_printf (_("%s/%s Drive"), first, second);
+        }
+      else
+        {
+          /* translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+             depending on the properties of the drive */
+          s = g_strdup_printf (_("%s Drive"), first);
+        }
     } 
   else if (strcmp (drive_type, "floppy") == 0)
     s = g_strdup (_("Floppy Drive"));
@@ -357,8 +360,8 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
 
 GHalDrive *
 g_hal_drive_new (GVolumeMonitor       *volume_monitor,
-                  HalDevice            *device,
-                  HalPool              *pool)
+                 HalDevice            *device,
+                 HalPool              *pool)
 {
   GHalDrive *drive;
 

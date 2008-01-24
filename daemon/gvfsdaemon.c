@@ -325,7 +325,7 @@ job_source_closed_callback (GVfsJobSource *job_source,
   g_mutex_lock (daemon->lock);
   
   daemon->job_sources = g_list_remove (daemon->job_sources,
-					     job_source);
+				       job_source);
   
   g_signal_handlers_disconnect_by_func (job_source,
 					(GCallback)job_source_new_job_callback,

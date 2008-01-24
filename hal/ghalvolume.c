@@ -130,29 +130,29 @@ g_hal_volume_init (GHalVolume *hal_volume)
 }
 
 const static struct {
-        const char *disc_type;
-        const char *icon_name;
-        char *ui_name;
-        char *ui_name_blank;
+  const char *disc_type;
+  const char *icon_name;
+  char *ui_name;
+  char *ui_name_blank;
 } disc_data[] = {
-        {"cd_rom",        "media-optical-cd-rom", N_("CD-ROM Disc"), N_("Blank CD-ROM Disc")},
-        {"cd_r",          "media-optical-cd-r", N_("CD-R Disc"), N_("Blank CD-R Disc")},
-        {"cd_rw",         "media-optical-cd-rw", N_("CD-RW Disc"), N_("Blank CD-RW Disc")},
-        {"dvd_rom",       "media-optical-dvd-rom", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-        {"dvd_ram",       "media-optical-dvd-ram", N_("DVD-RAM Disc"), N_("Blank DVD-RAM Disc")},
-        {"dvd_r",         "media-optical-dvd-r", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-        {"dvd_rw",        "media-optical-dvd-rw", N_("DVD-RW Disc"), N_("Blank DVD-RW Disc")},
-        {"dvd_plus_r",    "media-optical-dvd-r-plus", N_("DVD+R Disc"), N_("Blank DVD+R Disc")},
-        {"dvd_plus_rw",   "media-optical-dvd-rw-plus",  N_("DVD+RW Disc"), N_("Blank DVD+RW Disc")},
-        {"dvd_plus_r_dl", "media-optical-dvd-dl-r-plus", N_("DVD+R DL Disc"), N_("Blank DVD+R DL Disc")},
-        {"bd_rom",        "media-optical-bd-rom", N_("Blu-Ray Disc"), N_("Blank Blu-Ray Disc")},
-        {"bd_r",          "media-optical-bd-r", N_("Blu-Ray R Disc"), N_("Blank Blu-Ray R Disc")},
-        {"bd_re",         "media-optical-bd-re", N_("Blu-Ray RW Disc"), N_("Blank Blu-Ray RW Disc")},
-        {"hddvd_rom",     "media-optical-hddvd-rom", N_("HD DVD Disc"), N_("Blank HD DVD Disc")},
-        {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
-        {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
-        {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
-        {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")},
+  {"cd_rom",        "media-optical-cd-rom", N_("CD-ROM Disc"), N_("Blank CD-ROM Disc")},
+  {"cd_r",          "media-optical-cd-r", N_("CD-R Disc"), N_("Blank CD-R Disc")},
+  {"cd_rw",         "media-optical-cd-rw", N_("CD-RW Disc"), N_("Blank CD-RW Disc")},
+  {"dvd_rom",       "media-optical-dvd-rom", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
+  {"dvd_ram",       "media-optical-dvd-ram", N_("DVD-RAM Disc"), N_("Blank DVD-RAM Disc")},
+  {"dvd_r",         "media-optical-dvd-r", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
+  {"dvd_rw",        "media-optical-dvd-rw", N_("DVD-RW Disc"), N_("Blank DVD-RW Disc")},
+  {"dvd_plus_r",    "media-optical-dvd-r-plus", N_("DVD+R Disc"), N_("Blank DVD+R Disc")},
+  {"dvd_plus_rw",   "media-optical-dvd-rw-plus",  N_("DVD+RW Disc"), N_("Blank DVD+RW Disc")},
+  {"dvd_plus_r_dl", "media-optical-dvd-dl-r-plus", N_("DVD+R DL Disc"), N_("Blank DVD+R DL Disc")},
+  {"bd_rom",        "media-optical-bd-rom", N_("Blu-Ray Disc"), N_("Blank Blu-Ray Disc")},
+  {"bd_r",          "media-optical-bd-r", N_("Blu-Ray R Disc"), N_("Blank Blu-Ray R Disc")},
+  {"bd_re",         "media-optical-bd-re", N_("Blu-Ray RW Disc"), N_("Blank Blu-Ray RW Disc")},
+  {"hddvd_rom",     "media-optical-hddvd-rom", N_("HD DVD Disc"), N_("Blank HD DVD Disc")},
+  {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
+  {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
+  {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
+  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")},
 };
 
 static const char *
@@ -239,33 +239,38 @@ do_update_from_hal (GHalVolume *mv)
   volume_fstype = hal_device_get_property_string (volume, "volume.fstype");
 
   if (volume_is_disc && volume_disc_has_audio && mv->foreign_mount_root != NULL)
-    {
-      name = g_strdup (_("Audio Disc"));
-    }
+    name = g_strdup (_("Audio Disc"));
   else
     {
-      if (strcmp (volume_fsusage, "crypto") == 0 && strcmp (volume_fstype, "crypto_LUKS") == 0) {
-        size = format_size_for_display (volume_size);
-        name = g_strdup_printf (_("%s Encrypted Data"), size);
-        g_free (size);
-      } else {
-        if (volume_fs_label != NULL && strlen (volume_fs_label) > 0) {
-          name = g_strdup (volume_fs_label);
-        } else if (volume_is_disc) {
-          if (volume_disc_has_audio) {
-            if (volume_disc_has_data)
-              name = g_strdup (_("Mixed Audio/Data Disc"));
-            else
-              name = g_strdup (_("Audio Disc"));
-          } else {
-            name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
-          }
-        } else {
+      if (strcmp (volume_fsusage, "crypto") == 0 && strcmp (volume_fstype, "crypto_LUKS") == 0)
+        {
           size = format_size_for_display (volume_size);
-          name = g_strdup_printf (_("%s Media"), size);
+          name = g_strdup_printf (_("%s Encrypted Data"), size);
           g_free (size);
         }
-      }
+      else
+        {
+          if (volume_fs_label != NULL && strlen (volume_fs_label) > 0)
+            name = g_strdup (volume_fs_label);
+          else if (volume_is_disc)
+            {
+              if (volume_disc_has_audio)
+                {
+                  if (volume_disc_has_data)
+                    name = g_strdup (_("Mixed Audio/Data Disc"));
+                  else
+                    name = g_strdup (_("Audio Disc"));
+                }
+              else
+                name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
+            }
+          else
+            {
+              size = format_size_for_display (volume_size);
+              name = g_strdup_printf (_("%s Media"), size);
+              g_free (size);
+            }
+        }
     }
 
   mv->name = name;
@@ -339,7 +344,7 @@ update_from_hal (GHalVolume *mv, gboolean emit_changed)
   else
     do_update_from_hal (mv);
 #else
-    do_update_from_hal (mv);
+  do_update_from_hal (mv);
 #endif
 
   if (emit_changed)
@@ -392,18 +397,12 @@ compute_uuid (GHalVolume *volume)
   if (strlen (fs_uuid) == 0)
     {
       if (strlen (fs_label) == 0)
-        {
-          volume->uuid = NULL;
-        }
+        volume->uuid = NULL;
       else
-        {
-          volume->uuid = g_strdup (fs_label);
-        }
+        volume->uuid = g_strdup (fs_label);
     }
   else
-    {
-      volume->uuid = g_strdup (fs_uuid);
-    }
+    volume->uuid = g_strdup (fs_uuid);
 }
 
 GHalVolume *
@@ -772,18 +771,19 @@ spawn_do (GVolume             *volume,
                       NULL,         /* child_setup */
                       NULL,         /* user_data for child_setup */
                       &child_pid,
-                      &error)) {
-    GSimpleAsyncResult *simple;
-    simple = g_simple_async_result_new_from_error (data->object,
-                                                   data->callback,
-                                                   data->user_data,
-                                                   error);
-    g_simple_async_result_complete (simple);
-    g_object_unref (simple);
-    g_error_free (error);
-    g_free (data);
-    return;
-  }
+                      &error))
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_from_error (data->object,
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+      g_error_free (error);
+      g_free (data);
+      return;
+    }
   
   g_child_watch_add (child_pid, spawn_cb, data);
 }
@@ -853,13 +853,9 @@ g_hal_volume_mount_finish (GVolume       *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
 
   if (hal_volume->foreign_mount_root != NULL)
-    {
-      return g_file_mount_enclosing_volume_finish (hal_volume->foreign_mount_root, result, error);
-    }
-  else
-    {
-      return TRUE;
-    }
+    return g_file_mount_enclosing_volume_finish (hal_volume->foreign_mount_root, result, error);
+  
+  return TRUE;
 }
 
 typedef struct {
@@ -908,9 +904,7 @@ g_hal_volume_eject_finish (GVolume        *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
 
   if (hal_volume->drive != NULL)
-    {
-      return g_drive_eject_finish (G_DRIVE (hal_volume->drive), result, error);
-    }
+    return g_drive_eject_finish (G_DRIVE (hal_volume->drive), result, error);
   return TRUE;
 }
 

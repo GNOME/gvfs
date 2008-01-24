@@ -139,17 +139,12 @@ has_cap_only (HalPool *pool, HalDevice *device)
 {
   unsigned int n;
 
-  if (pool->priv->cap_only)
-    return TRUE;
-
-  for (n = 0; pool->priv->cap_only[n] != NULL; n++)
+  for (n = 0; pool->priv->cap_only != NULL && pool->priv->cap_only[n] != NULL; n++)
     {
       if (hal_device_has_capability (device, pool->priv->cap_only[n]))
-        {
-          return TRUE;
-        }
+        return TRUE;
     }
-
+  
   return FALSE;
 }
 
@@ -159,14 +154,12 @@ hal_pool_add_device_by_udi (HalPool *pool,
                             gboolean emit_signal)
 {
   HalDevice *device;
-  device = hal_device_new_from_udi (pool->priv->hal_ctx, udi);
   
+  device = hal_device_new_from_udi (pool->priv->hal_ctx, udi);
   if (device != NULL)
     {
       if (!has_cap_only (pool, device))
-        {
-          g_object_unref (device);
-        } 
+        g_object_unref (device);
       else 
         {
           g_hash_table_insert (pool->priv->devices, g_strdup (udi), device);
@@ -184,14 +177,12 @@ hal_pool_add_device_by_udi_and_properties (HalPool *pool,
                                            gboolean emit_signal)
 {
   HalDevice *device;
-  device = hal_device_new_from_udi_and_properties (pool->priv->hal_ctx, udi, properties);
   
+  device = hal_device_new_from_udi_and_properties (pool->priv->hal_ctx, udi, properties);
   if (device != NULL)
     {
       if (!has_cap_only (pool, device))
-        {
-          g_object_unref (device);
-        } 
+        g_object_unref (device);
       else 
         {
           g_hash_table_insert (pool->priv->devices, g_strdup (udi), device);
@@ -314,6 +305,8 @@ hal_pool_new (char **cap_only)
   hal_ctx = libhal_ctx_new ();
   if (hal_ctx == NULL)
     {
+      dbus_connection_close (dbus_connection);
+      dbus_connection_unref (dbus_connection);
       goto out;
     }
 
@@ -322,6 +315,8 @@ hal_pool_new (char **cap_only)
   
   if (!libhal_ctx_init (hal_ctx, &error))
     {
+      dbus_connection_close (dbus_connection);
+      dbus_connection_unref (dbus_connection);
       dbus_error_free (&error);
       goto out;
     }
@@ -357,7 +352,7 @@ hal_pool_new (char **cap_only)
                                               NULL))
     {
       for (i = 0; i < num_devices; i++)
-          hal_pool_add_device_by_udi_and_properties (pool, devices[i], properties[i], FALSE);
+        hal_pool_add_device_by_udi_and_properties (pool, devices[i], properties[i], FALSE);
       /* _add_device_by_udi_and_properties steals the given parameters */
       free (devices);
       free (properties);

@@ -1,3 +1,24 @@
+2008-01-24  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsdaemon.c:
+	Indentation fix
+	
+        * hal/ghaldrive.[ch]:
+        * hal/hal-device.c:
+        * hal/ghalvolume.c:
+        * hal/ghalmount.c:
+	Clean up coding style
+	
+        * hal/ghalvolumemonitor.[ch]:
+	Clean up coding style
+	Don't show drives if we're ignoring all their
+	volumes (and there are volumes)
+	
+        * hal/hal-pool.c:
+	Clean up coding style
+	Actually look at cap_only.
+	Free private dbus_connection on error
+
 2008-01-24  Bastien Nocera  <hadess@hadess.net>
 
 	* programs/Makefile.am:

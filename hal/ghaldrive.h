@@ -46,22 +46,17 @@ struct _GHalDriveClass {
 GType g_hal_drive_get_type (void) G_GNUC_CONST;
 void  g_hal_drive_register (GIOModule *module);
 
-GHalDrive *g_hal_drive_new    (GVolumeMonitor   *volume_monitor,
-			       HalDevice        *device,
-			       HalPool          *pool);
-
-gboolean g_hal_drive_has_udi  (GHalDrive        *drive, 
-			       const char       *udi);
-
-void g_hal_drive_set_volume   (GHalDrive        *drive, 
-			       GHalVolume       *volume);
-
-void g_hal_drive_unset_volume (GHalDrive        *drive, 
-			       GHalVolume       *volume);
-
-void g_hal_drive_disconnected (GHalDrive        *drive);
-
-char *_drive_get_icon          (HalDevice *d);
+GHalDrive *g_hal_drive_new          (GVolumeMonitor *volume_monitor,
+				     HalDevice      *device,
+				     HalPool        *pool);
+gboolean   g_hal_drive_has_udi      (GHalDrive      *drive,
+				     const char     *udi);
+void       g_hal_drive_set_volume   (GHalDrive      *drive,
+				     GHalVolume     *volume);
+void       g_hal_drive_unset_volume (GHalDrive      *drive,
+				     GHalVolume     *volume);
+void       g_hal_drive_disconnected (GHalDrive      *drive);
+char *     _drive_get_icon          (HalDevice      *d);
 
 G_END_DECLS
 

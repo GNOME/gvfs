@@ -126,29 +126,29 @@ g_hal_mount_init (GHalMount *hal_mount)
 }
 
 const static struct {
-        const char *disc_type;
-        const char *icon_name;
-        char *ui_name;
-        char *ui_name_blank;
+  const char *disc_type;
+  const char *icon_name;
+  char *ui_name;
+  char *ui_name_blank;
 } disc_data[] = {
-        {"cd_rom",        "media-optical-cd-rom", N_("CD-ROM Disc"), N_("Blank CD-ROM Disc")},
-        {"cd_r",          "media-optical-cd-r", N_("CD-R Disc"), N_("Blank CD-R Disc")},
-        {"cd_rw",         "media-optical-cd-rw", N_("CD-RW Disc"), N_("Blank CD-RW Disc")},
-        {"dvd_rom",       "media-optical-dvd-rom", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-        {"dvd_ram",       "media-optical-dvd-ram", N_("DVD-RAM Disc"), N_("Blank DVD-RAM Disc")},
-        {"dvd_r",         "media-optical-dvd-r", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-        {"dvd_rw",        "media-optical-dvd-rw", N_("DVD-RW Disc"), N_("Blank DVD-RW Disc")},
-        {"dvd_plus_r",    "media-optical-dvd-r-plus", N_("DVD+R Disc"), N_("Blank DVD+R Disc")},
-        {"dvd_plus_rw",   "media-optical-dvd-rw-plus",  N_("DVD+RW Disc"), N_("Blank DVD+RW Disc")},
-        {"dvd_plus_r_dl", "media-optical-dvd-dl-r-plus", N_("DVD+R DL Disc"), N_("Blank DVD+R DL Disc")},
-        {"bd_rom",        "media-optical-bd-rom", N_("Blu-Ray Disc"), N_("Blank Blu-Ray Disc")},
-        {"bd_r",          "media-optical-bd-r", N_("Blu-Ray R Disc"), N_("Blank Blu-Ray R Disc")},
-        {"bd_re",         "media-optical-bd-re", N_("Blu-Ray RW Disc"), N_("Blank Blu-Ray RW Disc")},
-        {"hddvd_rom",     "media-optical-hddvd-rom", N_("HD DVD Disc"), N_("Blank HD DVD Disc")},
-        {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
-        {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
-        {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
-        {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")},
+  {"cd_rom",        "media-optical-cd-rom", N_("CD-ROM Disc"), N_("Blank CD-ROM Disc")},
+  {"cd_r",          "media-optical-cd-r", N_("CD-R Disc"), N_("Blank CD-R Disc")},
+  {"cd_rw",         "media-optical-cd-rw", N_("CD-RW Disc"), N_("Blank CD-RW Disc")},
+  {"dvd_rom",       "media-optical-dvd-rom", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
+  {"dvd_ram",       "media-optical-dvd-ram", N_("DVD-RAM Disc"), N_("Blank DVD-RAM Disc")},
+  {"dvd_r",         "media-optical-dvd-r", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
+  {"dvd_rw",        "media-optical-dvd-rw", N_("DVD-RW Disc"), N_("Blank DVD-RW Disc")},
+  {"dvd_plus_r",    "media-optical-dvd-r-plus", N_("DVD+R Disc"), N_("Blank DVD+R Disc")},
+  {"dvd_plus_rw",   "media-optical-dvd-rw-plus",  N_("DVD+RW Disc"), N_("Blank DVD+RW Disc")},
+  {"dvd_plus_r_dl", "media-optical-dvd-dl-r-plus", N_("DVD+R DL Disc"), N_("Blank DVD+R DL Disc")},
+  {"bd_rom",        "media-optical-bd-rom", N_("Blu-Ray Disc"), N_("Blank Blu-Ray Disc")},
+  {"bd_r",          "media-optical-bd-r", N_("Blu-Ray R Disc"), N_("Blank Blu-Ray R Disc")},
+  {"bd_re",         "media-optical-bd-re", N_("Blu-Ray RW Disc"), N_("Blank Blu-Ray RW Disc")},
+  {"hddvd_rom",     "media-optical-hddvd-rom", N_("HD DVD Disc"), N_("Blank HD DVD Disc")},
+  {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
+  {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
+  {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
+  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")},
 };
 
 static const char *
@@ -246,22 +246,24 @@ do_update_from_hal (GHalMount *m)
   volume_disc_is_blank = hal_device_get_property_bool (volume, "volume.disc.is_blank");
   volume_disc_type = hal_device_get_property_string (volume, "volume.disc.type");
   
-  //g_warning ("drive_type='%s'", drive_type);
-  //g_warning ("drive_bus='%s'", drive_bus);
-  //g_warning ("drive_uses_removable_media=%d", drive_uses_removable_media);
+  /*g_warning ("drive_type='%s'", drive_type); */
+  /*g_warning ("drive_bus='%s'", drive_bus); */
+  /*g_warning ("drive_uses_removable_media=%d", drive_uses_removable_media); */
   
-  if (strcmp (drive_type, "disk") == 0) {
-    if (strcmp (drive_bus, "ide") == 0)
-      icon_name = "drive-harddisk-ata";
-    else if (strcmp (drive_bus, "scsi") == 0)
-      icon_name = "drive-harddisk-scsi";
-    else if (strcmp (drive_bus, "ieee1394") == 0)
-      icon_name = "drive-harddisk-ieee1394";
-    else if (strcmp (drive_bus, "usb") == 0)
-      icon_name = "drive-harddisk-usb";
-    else
-      icon_name = "drive-harddisk";
-  } else if (strcmp (drive_type, "cdrom") == 0)
+  if (strcmp (drive_type, "disk") == 0)
+    {
+      if (strcmp (drive_bus, "ide") == 0)
+        icon_name = "drive-harddisk-ata";
+      else if (strcmp (drive_bus, "scsi") == 0)
+        icon_name = "drive-harddisk-scsi";
+      else if (strcmp (drive_bus, "ieee1394") == 0)
+        icon_name = "drive-harddisk-ieee1394";
+      else if (strcmp (drive_bus, "usb") == 0)
+        icon_name = "drive-harddisk-usb";
+      else
+        icon_name = "drive-harddisk";
+    }
+  else if (strcmp (drive_type, "cdrom") == 0)
     icon_name = g_strdup (get_disc_icon (volume_disc_type));
   else if (strcmp (drive_type, "floppy") == 0)
     icon_name = "media-floppy";
@@ -279,20 +281,22 @@ do_update_from_hal (GHalMount *m)
     icon_name = "drive-harddisk";
 
   
-  if (volume_fs_label != NULL && strlen (volume_fs_label) > 0) {
+  if (volume_fs_label != NULL && strlen (volume_fs_label) > 0)
     name = g_strdup (volume_fs_label);
-  } else if (volume_is_disc) {
-    if (volume_disc_has_audio) {
-      if (volume_disc_has_data)
-        name = g_strdup (_("Mixed Audio/Data Disc"));
+  else if (volume_is_disc)
+    {
+      if (volume_disc_has_audio)
+        {
+          if (volume_disc_has_data)
+            name = g_strdup (_("Mixed Audio/Data Disc"));
+          else
+            name = g_strdup (_("Audio Disc"));
+        }
       else
-        name = g_strdup (_("Audio Disc"));
-    } else {
-      name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
+        name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
     }
-  } else {
+  else
     name = format_size_for_display (volume_size);
-  }
 
   if (m->override_name != NULL)
     {
@@ -300,18 +304,12 @@ do_update_from_hal (GHalMount *m)
       g_free (name);
     }
   else
-    {
-      m->name = name;
-    }
+    m->name = name;
 
   if (m->override_icon != NULL)
-    {
-      m->icon = g_object_ref (m->override_icon);
-    }
+    m->icon = g_object_ref (m->override_icon);
   else
-    {
-      m->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
-    }
+    m->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
 }
 
 
@@ -351,7 +349,7 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (user_data);
   
-  //g_warning ("mounthal modifying %s (property %s changed)", hal_mount->device_path, key);
+  /*g_warning ("mounthal modifying %s (property %s changed)", hal_mount->device_path, key); */
   update_from_hal (hal_mount, TRUE);
 }
 
@@ -369,18 +367,12 @@ compute_uuid (GHalMount *mount)
   if (strlen (fs_uuid) == 0)
     {
       if (strlen (fs_label) == 0)
-        {
-          mount->uuid = NULL;
-        }
+        mount->uuid = NULL;
       else
-        {
-          mount->uuid = g_strdup (fs_label);
-        }
+        mount->uuid = g_strdup (fs_label);
     }
   else
-    {
-      mount->uuid = g_strdup (fs_uuid);
-    }
+    mount->uuid = g_strdup (fs_uuid);
 }
 
 
@@ -402,13 +394,13 @@ g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
   if (storage_udi == NULL)
     goto fail;
   
-  //g_warning ("storage_udi = %s", storage_udi);
+  /* g_warning ("storage_udi = %s", storage_udi); */
   
   drive_device = hal_pool_get_device_by_udi (pool, storage_udi);
   if (drive_device == NULL)
     goto fail;
   
-  //g_warning ("drive_device = %p", drive_device);
+  /* g_warning ("drive_device = %p", drive_device); */
   
   mount = g_object_new (G_TYPE_HAL_MOUNT, NULL);
   mount->volume_monitor = volume_monitor;
@@ -497,22 +489,22 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
                                                              "volume",
                                                              "block.device",
                                                              mount->device_path);
-      //g_warning ("device = %p for %s", device, mount->device_path);
+      /* g_warning ("device = %p for %s", device, mount->device_path); */
       if (device != NULL)
         {      
-          //g_warning ("udi = %s", hal_device_get_udi (device));
-
+          /* g_warning ("udi = %s", hal_device_get_udi (device)); */
+          
           storage_udi = hal_device_get_property_string (device, "block.storage_device");
           if (storage_udi == NULL)
             goto not_hal;
 
-          //g_warning ("storage_udi = %s", storage_udi);
+          /* g_warning ("storage_udi = %s", storage_udi); */
           
           drive_device = hal_pool_get_device_by_udi (pool, storage_udi);
           if (drive_device == NULL)
             goto not_hal;
 
-          //g_warning ("drive_device = %p", drive_device);
+          /* g_warning ("drive_device = %p", drive_device); */
           
           mount->device = g_object_ref (device);
           mount->drive_device = g_object_ref (drive_device);
@@ -791,18 +783,19 @@ unmount_do (GMount               *mount,
                                  NULL,           /* standard_input */
                                  NULL,           /* standard_output */
                                  &(data->error_fd),
-                                 &error)) {
-    GSimpleAsyncResult *simple;
-    simple = g_simple_async_result_new_from_error (data->object,
-                                                   data->callback,
-                                                   data->user_data,
-                                                   error);
-    g_simple_async_result_complete (simple);
-    g_object_unref (simple);
-    g_error_free (error);
-    g_free (data);
-    return;
-  }
+                                 &error))
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_from_error (data->object,
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+      g_error_free (error);
+      g_free (data);
+      return;
+    }
   data->error_string = g_string_new ("");
   data->error_channel = g_io_channel_unix_new (data->error_fd);
   data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, unmount_read_error, data);
@@ -822,9 +815,7 @@ g_hal_mount_unmount (GMount              *mount,
   gboolean using_legacy = FALSE;
 
   if (hal_mount->device != NULL)
-    {
-      argv[4] = hal_mount->device_path;
-    }
+    argv[4] = hal_mount->device_path;
   else
     {
       using_legacy = TRUE;

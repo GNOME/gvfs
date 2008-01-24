@@ -97,6 +97,7 @@ const char *
 hal_device_get_property_string (HalDevice *device, const char *key)
 {
   const char *ret;
+  
   ret = libhal_ps_get_string (device->priv->properties, key);
   if (ret != NULL)
     return ret;
@@ -134,6 +135,7 @@ hal_device_get_property_strlist (HalDevice *device, const char *key)
 {
   static char * empty[1] = {NULL};
   char **ret;
+  
   ret = (char **) libhal_ps_get_strlist (device->priv->properties, key);
   if (ret != NULL)
     return (char **) ret;
@@ -153,12 +155,14 @@ hal_device_has_capability (HalDevice *device, const char *capability)
   caps = hal_device_get_property_strlist (device, "info.capabilities");
   if (caps == NULL)
     goto out;
+  
   for (n = 0; caps[n] != NULL; n++)
     {
-      if (g_ascii_strcasecmp (caps[n], capability) == 0) {
-        ret = TRUE;
-        break;
-      }
+      if (g_ascii_strcasecmp (caps[n], capability) == 0)
+        {
+          ret = TRUE;
+          break;
+        }
     }
   
  out:
@@ -175,7 +179,8 @@ hal_device_has_interface (HalDevice *device, const char *interface)
   ret = FALSE;
   ifs = hal_device_get_property_strlist (device, "info.interfaces");
   if (ifs == NULL)
-          goto out;
+    goto out;
+  
   for (n = 0; ifs[n] != NULL; n++)
     {
       if (g_ascii_strcasecmp (ifs[n], interface) == 0)
@@ -186,7 +191,7 @@ hal_device_has_interface (HalDevice *device, const char *interface)
     }
 
 out:
-        return ret;
+  return ret;
 }
 
 gboolean
@@ -200,14 +205,16 @@ hal_device_has_property (HalDevice *device, const char *key)
     goto out;
   
   libhal_psi_init (&it, device->priv->properties);
+  
   while (libhal_psi_has_more (&it))
     {
-      char *pkey;
-      pkey = libhal_psi_get_key (&it);
-      if (pkey != NULL && g_ascii_strcasecmp (pkey, key) == 0) {
-        ret = TRUE;
-        break;
-      }
+      char *pkey = libhal_psi_get_key (&it);
+      
+      if (pkey != NULL && g_ascii_strcasecmp (pkey, key) == 0)
+        {
+          ret = TRUE;
+          break;
+        }
       libhal_psi_next (&it);
     }
   

@@ -57,13 +57,14 @@ struct _GHalVolumeMonitorClass {
 
 GType g_hal_volume_monitor_get_type (void) G_GNUC_CONST;
 
-GVolumeMonitor *g_hal_volume_monitor_new                         (void);
+GVolumeMonitor *g_hal_volume_monitor_new                          (void);
 GHalVolume     *g_hal_volume_monitor_lookup_volume_for_mount_path (GHalVolumeMonitor *monitor,
-                                                                   const char         *mount_path);
+                                                                   const char        *mount_path);
 
-void g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor);
+void            g_hal_volume_monitor_force_update                 (GHalVolumeMonitor *monitor);
 
-void g_hal_volume_monitor_register   (GIOModule *module);
+void            g_hal_volume_monitor_register                     (GIOModule         *module);
+
 
 G_END_DECLS
 
