@@ -1,5 +1,10 @@
 2008-01-24  Alexander Larsson  <alexl@redhat.com>
 
+        * configure.ac:
+	Update intltool req for po/LINGUAS
+
+2008-01-24  Alexander Larsson  <alexl@redhat.com>
+
         * hal/ghalvolumemonitor.c:
 	Remove debug spew.
 	
