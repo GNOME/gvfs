@@ -1,3 +1,7 @@
+2008-01-24  Luca Ferretti  <elle.uca@libero.it>
+
+	* it.po: Updated Italian translation.
+
 2008-01-24  Gil Forcada  <gforcada@gnome.org>
 
 	* ca.po: Fixed translation to pass msgfmt -cv.
