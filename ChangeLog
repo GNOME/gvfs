@@ -1,3 +1,9 @@
+2008-01-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* daemon/gvfsbackendsmbbrowse.c
+	(get_file_info_from_entry): Replace : by :: in 
+	smb::comment, too.
+
 2008-01-24  Alexander Larsson  <alexl@redhat.com>
 
         * configure.ac:

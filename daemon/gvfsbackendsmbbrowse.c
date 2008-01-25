@@ -928,7 +928,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
   g_file_info_set_name (info, entry->name);
   g_file_info_set_display_name (info, entry->name_utf8);
   g_file_info_set_edit_name (info, entry->name_utf8);
-  g_file_info_set_attribute_string (info, "smb:comment", entry->comment);
+  g_file_info_set_attribute_string (info, "smb::comment", entry->comment);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
 
   icon = NULL;
