@@ -1,3 +1,8 @@
+2008-01-25  I. Felix <ifelix@svn.gnome.org>
+
+	* ta.po:  Tamil Translation updated by Thangamani Arul
+	* LINGUAS: Added Tamil (ta) to The List of Languages.
+
 2008-01-24  Alexander Larsson  <alexl@redhat.com>
 
         * LINGUAS: Added.
