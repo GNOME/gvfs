@@ -1,3 +1,8 @@
+2008-01-26  Duarte Loreto <happyguy_pt@hotmail.com>
+
+	* pt.po: Added Portuguese translation.
+	* LINGUAS: Added Portuguese (pt) to list.
+
 2008-01-26  Matej Urbančič <mateju@svn.gnome.org>
 
 	* sl.po:  Added Slovenian translation
