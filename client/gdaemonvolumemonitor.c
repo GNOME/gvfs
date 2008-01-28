@@ -252,4 +252,8 @@ void
 g_daemon_volume_monitor_register_types (GTypeModule *module)
 {
   g_daemon_volume_monitor_register_type (G_TYPE_MODULE (module));
+  g_io_extension_point_implement (G_VOLUME_MONITOR_EXTENSION_POINT_NAME,
+				  G_TYPE_DAEMON_VOLUME_MONITOR,
+				  "gvfs",
+				  0);
 }

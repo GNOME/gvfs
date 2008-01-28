@@ -1966,8 +1966,8 @@ g_daemon_file_move (GFile                  *source,
   dbus_uint32_t flags_dbus;
   struct ProgressCallbackData data;
 
-  if (!G_DAEMON_FILE (source) ||
-      !G_DAEMON_FILE (destination))
+  if (!G_IS_DAEMON_FILE (source) ||
+      !G_IS_DAEMON_FILE (destination))
     {
       /* Fall back to default move */
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");

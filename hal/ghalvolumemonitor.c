@@ -1183,4 +1183,8 @@ void
 g_hal_volume_monitor_register (GIOModule *module)
 {
   g_hal_volume_monitor_register_type (G_TYPE_MODULE (module));
+  g_io_extension_point_implement (G_NATIVE_VOLUME_MONITOR_EXTENSION_POINT_NAME,
+				  G_TYPE_HAL_VOLUME_MONITOR,
+				  "hal",
+				  1);
 }

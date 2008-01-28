@@ -769,9 +769,6 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 
   vfs_class = G_VFS_CLASS (class);
 
-  vfs_class->name = "gvfs";
-  vfs_class->priority = 10;
-  
   vfs_class->is_active = g_daemon_vfs_is_active;
   vfs_class->get_file_for_path = g_daemon_vfs_get_file_for_path;
   vfs_class->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
@@ -791,6 +788,11 @@ g_io_module_load (GIOModule *module)
   g_daemon_vfs_register_type (G_TYPE_MODULE (module));
   g_daemon_volume_monitor_register_types (G_TYPE_MODULE (module));
 
+  g_io_extension_point_implement (G_VFS_EXTENSION_POINT_NAME,
+				  G_TYPE_DAEMON_VFS,
+				  "gvfs",
+				  10);
+  
   g_vfs_uri_mapper_register (module);
   g_vfs_uri_mapper_smb_register (module);
   g_vfs_uri_mapper_sftp_register (module);
