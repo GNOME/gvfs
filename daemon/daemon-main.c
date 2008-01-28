@@ -44,6 +44,12 @@ daemon_init (void)
 {
   DBusConnection *connection;
   DBusError derror;
+
+  setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
   
   dbus_threads_init_default ();
   g_thread_init (NULL);
@@ -53,7 +59,8 @@ daemon_init (void)
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
     {
-      g_printerr (_("Error connecting to D-Bus: %s\n"), derror.message);
+      g_printerr (_("Error connecting to D-Bus: %s"), derror.message);
+      g_printerr ("\n");
       dbus_error_free (&derror);
       exit (1);
     }
@@ -71,7 +78,8 @@ send_spawned (DBusConnection *connection, gboolean succeeded, char *error_messag
   if (spawner_id == NULL || spawner_path == NULL)
     {
       if (!succeeded)
-	g_print ("Error: %s\n", error_message);
+      g_printerr (_("Error: %s"), error_message);
+      g_printerr ("_\n");
       return;
     }
   
@@ -103,7 +111,8 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
     {
       if (argc < 4)
 	{
-	  g_printerr ("Usage: %s --spawner dbus-id object_path\n", argv[0]);
+	  g_printerr (_("Usage: %s --spawner dbus-id object_path"), argv[0]);
+          g_printerr ("\n");
 	  exit (1);
 	}
 
@@ -126,7 +135,8 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 	  p = strchr (argv[i], '=');
 	  if (p == NULL || p[1] == 0 || p == argv[i])
 	    {
-	      g_printerr ("Usage: %s key=value key=value ...\n", argv[0]);
+ 	      g_printerr (_("Usage: %s key=value key=value ..."), argv[0]);
+              g_printerr ("\n");
 	      exit (1);
 	    }
 	  
@@ -141,8 +151,10 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 
       if (!found_type)
 	{
-	  g_printerr ("No mount type specified\n");
-	  g_printerr ("Usage: %s key=value key=value ...\n", argv[0]);
+	  g_printerr (_("No mount type specified"));
+          g_printerr ("\n");
+	  g_printerr (_("Usage: %s key=value key=value ..."), argv[0]);
+          g_printerr ("\n");
 	  exit (1);
 	}
     }
@@ -174,7 +186,8 @@ daemon_main (int argc,
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
     {
-      g_printerr (_("Error connecting dbus: %s\n"), derror.message);
+      g_printerr (_("Error connecting to D-Bus: %s"), derror.message);
+      g_printerr ("\n");
       dbus_error_free (&derror);
       exit (1);
     }

@@ -1,3 +1,11 @@
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/Makefile.am:
+        * daemon/daemon-main.c:
+        * daemon/main.c:
+	Enable translations for daemons and some l10n
+	fixes. Patch from Luca Ferretti.
+
 2008-01-24  Matthias Clasen  <mclasen@redhat.com>
 
 	* daemon/gvfsbackendsmbbrowse.c

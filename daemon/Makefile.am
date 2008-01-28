@@ -11,6 +11,7 @@ INCLUDES =					\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
 	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DG_DISABLE_DEPRECATED
 
 noinst_LTLIBRARIES=libdaemon.la

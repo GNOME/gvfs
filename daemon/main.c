@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
@@ -46,12 +48,18 @@ main (int argc, char *argv[])
     { NULL }
   };
 
+  setlocale (LC_ALL, "");
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
+  
   g_thread_init (NULL);
   
   g_set_application_name (_("GVFS Daemon"));
   context = g_option_context_new ("");
 
-  g_option_context_set_summary (context, "Main daemon for GVFS");
+  g_option_context_set_summary (context, _("Main daemon for GVFS"));
   
   g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
 
@@ -60,7 +68,13 @@ main (int argc, char *argv[])
   error = NULL;
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
-      g_print ("%s, use --help for usage\n", error->message);
+      /* Translators: the first %s is the application name, */
+      /* the second %s is the error message                 */
+      g_printerr (_("%s: %s"), g_get_application_name(), error->message);
+      g_printerr ("\n");
+      g_printerr (_("Try \"%s --help\" for more information."),
+                  g_get_prgname ());
+      g_printerr ("\n");
       g_error_free (error);
       return 1;
     }
