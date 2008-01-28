@@ -1,5 +1,11 @@
 2008-01-28  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendlocaltest.c:
+        * programs/gvfs-cat.c:
+	C89 fixes from Jens Granseuer (#511838)
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/Makefile.am:
         * daemon/daemon-main.c:
         * daemon/main.c:

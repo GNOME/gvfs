@@ -177,14 +177,16 @@ G_DEFINE_TYPE (GVfsBackendLocalTest, g_vfs_backend_localtest, G_VFS_TYPE_BACKEND
 static void
 g_vfs_backend_localtest_init (GVfsBackendLocalTest *backend)
 {
-	//  Nothing in there
+	const char *c;
+
+	/*  Nothing in there */
 	g_print ("(II) g_vfs_backend_localtest_init \n");
 
-	//  env var conversion
+	/*  env var conversion */
 	backend->errorneous = -1;
 	backend->inject_op_types = -1;
 	
-	const char *c = g_getenv("GVFS_ERRORNEOUS");
+	c = g_getenv("GVFS_ERRORNEOUS");
 	if (c) {
 		backend->errorneous = g_ascii_strtoll(c, NULL, 0);
 		g_print ("(II) g_vfs_backend_localtest_init: setting 'errorneous' to '%d' \n", backend->errorneous);
@@ -202,9 +204,10 @@ g_vfs_backend_localtest_init (GVfsBackendLocalTest *backend)
 static void
 g_vfs_backend_localtest_finalize (GObject *object)
 {
+	GVfsBackendLocalTest *backend;
+
 	g_print ("(II) g_vfs_backend_localtest_finalize \n");
 
-	GVfsBackendLocalTest *backend;
 	backend = G_VFS_BACKEND_LOCALTEST (object);
 
     if (backend->test)
@@ -250,9 +253,11 @@ do_mount (GVfsBackend *backend,
 static void
 do_unmount (GVfsBackend *backend, GVfsJobUnmount *job)
 {
+  GVfsBackendLocalTest *op_backend;
+
   g_print ("(II) try_umount \n");
 
-  GVfsBackendLocalTest *op_backend = G_VFS_BACKEND_LOCALTEST (backend);
+  op_backend = G_VFS_BACKEND_LOCALTEST (backend);
   g_mount_spec_unref (op_backend->mount_spec);
   inject_error (backend, G_VFS_JOB (job), GVFS_JOB_UNMOUNT);
 }
@@ -275,13 +280,13 @@ do_enumerate (GVfsBackend *backend,
                GFileAttributeMatcher *attribute_matcher,
                GFileQueryInfoFlags flags)
 {
-  g_print ("(II) try_enumerate (filename = %s) \n", filename);
-
   GFile *file;
   GFileInfo *info;
   GError *error;
   GFileEnumerator *enumerator;
   
+  g_print ("(II) try_enumerate (filename = %s) \n", filename);
+
   file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
@@ -332,10 +337,13 @@ do_query_info (GVfsBackend *backend,
                 GFileInfo *info,
                 GFileAttributeMatcher *matcher)
 {
+  GFile *file;
+  GFileInfo *info2;
+
   g_print ("(II) try_query_info (filename = %s) \n", filename);
   
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
-  GFileInfo *info2 = get_g_file_info_from_local (filename, file, "*", flags, G_VFS_JOB (job));
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  info2 = get_g_file_info_from_local (filename, file, "*", flags, G_VFS_JOB (job));
 
   if (info2) {
       g_file_info_copy_into (info2, info);
@@ -355,11 +363,13 @@ do_query_fs_info (GVfsBackend *backend,
 		  GFileInfo *info,
 		  GFileAttributeMatcher *attribute_matcher)
 {
-  g_print ("(II) try_query_fs_info (filename = %s) \n", filename);
-
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
   GFileInfo *info2;
   GError *error;
+
+  g_print ("(II) try_query_fs_info (filename = %s) \n", filename);
+
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
 
   if (file) {
 	  error = NULL;  
@@ -385,11 +395,13 @@ do_query_settable_attributes (GVfsBackend *backend,
 					     GVfsJobQueryAttributes *job,
 					     const char *filename)
 {
-  g_print ("(II) try_query_settable_attributes (filename = '%s') \n", filename);
-
   GFileAttributeInfoList *attr_list;
   GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
+
+  g_print ("(II) try_query_settable_attributes (filename = '%s') \n", filename);
+
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -413,11 +425,13 @@ do_query_writable_namespaces (GVfsBackend *backend,
 					     GVfsJobQueryAttributes *job,
 					     const char *filename)
 {
-  g_print ("(II) try_query_writable_namespaces (filename = '%s') \n", filename);
-
   GFileAttributeInfoList *attr_list;
   GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
+
+  g_print ("(II) try_query_writable_namespaces (filename = '%s') \n", filename);
+
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -450,10 +464,12 @@ do_make_directory (GVfsBackend *backend,
                     GVfsJobMakeDirectory *job,
                     const char *filename)
 {
+  GError *error;
+  GFile *file;
+
   g_print ("(II) try_make_directory (filename = %s) \n", filename);
 
-  GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -476,10 +492,12 @@ do_delete (GVfsBackend *backend,
             GVfsJobDelete *job,
             const char *filename)
 {
+  GError *error;
+  GFile *file;
+
   g_print ("(II) try_delete (filename = %s) \n", filename);
 
-  GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -502,10 +520,12 @@ do_trash (GVfsBackend *backend,
 			GVfsJobTrash *job,
             const char *filename)
 {
+  GError *error;
+  GFile *file;
+
   g_print ("(II) try_trash (filename = %s) \n", filename);
 
-  GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -529,10 +549,12 @@ do_make_symlink (GVfsBackend *backend,
                   const char *filename,
                   const char *symlink_value)
 {
+  GError *error;
+  GFile *file;
+
   g_print ("(II) try_make_symlink ('%s' --> '%s') \n", filename, symlink_value);
 
-  GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -559,11 +581,11 @@ do_copy (GVfsBackend *backend,
 		 GFileProgressCallback progress_callback,
 		 gpointer progress_callback_data)
 {
-  g_print ("(II) try_copy '%s' --> '%s' \n", source, destination);
-	  
   GFile *src_file, *dst_file;
   GError *error;
   
+  g_print ("(II) try_copy '%s' --> '%s' \n", source, destination);
+	  
   src_file = get_g_file_from_local (source, G_VFS_JOB (job));
   dst_file = get_g_file_from_local (destination, G_VFS_JOB (job));
   g_assert(src_file != NULL);
@@ -595,11 +617,11 @@ do_move (GVfsBackend *backend,
           GFileProgressCallback progress_callback,
           gpointer progress_callback_data)
 {
-  g_print ("(II) try_move '%s' --> '%s' \n", source, destination);
-	  
   GFile *src_file, *dst_file;
   GError *error;
   
+  g_print ("(II) try_move '%s' --> '%s' \n", source, destination);
+	  
   src_file = get_g_file_from_local (source, G_VFS_JOB (job));
   dst_file = get_g_file_from_local (destination, G_VFS_JOB (job));
   g_assert(src_file != NULL);
@@ -629,10 +651,12 @@ do_set_display_name (GVfsBackend *backend,
                       const char *filename,
                       const char *display_name)
 {
+  GError *error;
+  GFile *file;
+
   g_print ("(II) try_set_display_name '%s' --> '%s' \n", filename, display_name);
 
-  GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -670,10 +694,12 @@ do_set_attribute (GVfsBackend *backend,
 		 gpointer value_p,
 		 GFileQueryInfoFlags flags)
 {
+  GError *error;
+  GFile *file;
+
   g_print ("(II) try_set_attribute (filename = '%s', attribute = '%s') \n", filename, attribute);
 
-  GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (set_attribute));
+  file = get_g_file_from_local (filename, G_VFS_JOB (set_attribute));
   g_assert(file != NULL);
 
   if (file) {
@@ -827,11 +853,13 @@ do_open_for_read (GVfsBackend *backend,
                    GVfsJobOpenForRead *job,
                    const char *filename)
 {
-  g_print ("(II) try_open_for_read (filename = '%s') \n", filename);
-  
   GFileInputStream *stream;
   GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
+
+  g_print ("(II) try_open_for_read (filename = '%s') \n", filename);
+  
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -859,15 +887,17 @@ do_read (GVfsBackend *backend,
           char *buffer,
           gsize bytes_requested)
 {
+  GError *error;
+  GFileInputStream *stream = _handle;
+  gssize s;
+
   g_print ("(II) try_read (handle = '%lx', buffer = '%lx', bytes_requested = %ld) \n", 
 		  (long int)_handle, (long int)buffer, (long int)bytes_requested);
 
-  GError *error;
-  GFileInputStream *stream = _handle;
   g_assert(stream != NULL);
   
   error = NULL;
-  gssize s = g_input_stream_read (G_INPUT_STREAM(stream), buffer, bytes_requested, G_VFS_JOB (job)->cancellable, &error); 
+  s = g_input_stream_read (G_INPUT_STREAM(stream), buffer, bytes_requested, G_VFS_JOB (job)->cancellable, &error); 
   if (s >= 0) {
       g_vfs_job_read_set_size (job, s);
 	  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_READ);
@@ -886,10 +916,11 @@ do_seek_on_read (GVfsBackend *backend,
                   goffset    offset,
                   GSeekType  type)
 {
-  g_print ("(II) try_seek_on_read (handle = '%lx', offset = %ld) \n", (long int)_handle, (long int)offset);
-
   GError *error;
   GFileInputStream *stream = _handle;
+
+  g_print ("(II) try_seek_on_read (handle = '%lx', offset = %ld) \n", (long int)_handle, (long int)offset);
+
   g_assert(stream != NULL);
   
   error = NULL;
@@ -909,10 +940,11 @@ do_close_read (GVfsBackend *backend,
                 GVfsJobCloseRead *job,
                 GVfsBackendHandle _handle)
 {
-  g_print ("(II) try_close_read (handle = '%lx') \n", (long int)_handle);
-
   GError *error;
   GFileInputStream *stream = _handle;
+
+  g_print ("(II) try_close_read (handle = '%lx') \n", (long int)_handle);
+
   g_assert(stream != NULL);
   
   error = NULL;
@@ -933,11 +965,13 @@ do_append_to (GVfsBackend *backend,
                const char *filename,
                GFileCreateFlags flags)
 {
-  g_print ("(II) try_append_to (filename = %s) \n", filename);
-
   GFileOutputStream *stream;
   GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
+
+  g_print ("(II) try_append_to (filename = %s) \n", filename);
+
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -971,11 +1005,13 @@ do_create (GVfsBackend *backend,
             const char *filename,
             GFileCreateFlags flags)
 {
-  g_print ("(II) try_create (filename = %s) \n", filename);
-
   GFileOutputStream *stream;
   GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
+
+  g_print ("(II) try_create (filename = %s) \n", filename);
+
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -1004,11 +1040,13 @@ do_replace (GVfsBackend *backend,
              gboolean make_backup,
              GFileCreateFlags flags)
 {
-  g_print ("(II) try_replace (filename = '%s', etag = '%s') \n", filename, etag);
-
   GFileOutputStream *stream;
   GError *error;
-  GFile *file = get_g_file_from_local (filename, G_VFS_JOB (job));
+  GFile *file;
+
+  g_print ("(II) try_replace (filename = '%s', etag = '%s') \n", filename, etag);
+
+  file = get_g_file_from_local (filename, G_VFS_JOB (job));
   g_assert(file != NULL);
 
   if (file) {
@@ -1036,15 +1074,17 @@ do_write (GVfsBackend *backend,
            char *buffer,
            gsize buffer_size)
 {
+  GError *error;
+  GFileOutputStream *stream = _handle;
+  gssize s;
+
   g_print ("(II) try_write (handle = '%lx', buffer = '%lx', buffer_size = %ld) \n", 
 		  (long int)_handle, (long int)buffer, (long int)buffer_size);
 
-  GError *error;
-  GFileOutputStream *stream = _handle;
   g_assert(stream != NULL);
   
   error = NULL;
-  gssize s = g_output_stream_write (G_OUTPUT_STREAM(stream), buffer, buffer_size, G_VFS_JOB (job)->cancellable, &error); 
+  s = g_output_stream_write (G_OUTPUT_STREAM(stream), buffer, buffer_size, G_VFS_JOB (job)->cancellable, &error); 
   if (s >= 0) {
 	  g_vfs_job_write_set_written_size (job, s);
 	  inject_error (backend, G_VFS_JOB (job), GVFS_JOB_WRITE);
@@ -1063,10 +1103,11 @@ do_seek_on_write (GVfsBackend *backend,
                    goffset    offset,
                    GSeekType  type)
 {
-  g_print ("(II) try_seek_on_write (handle = '%lx', offset = %ld) \n", (long int)_handle, (long int)offset);
-
   GError *error;
   GFileOutputStream *stream = _handle;
+
+  g_print ("(II) try_seek_on_write (handle = '%lx', offset = %ld) \n", (long int)_handle, (long int)offset);
+
   g_assert(stream != NULL);
   
   error = NULL;
@@ -1086,10 +1127,11 @@ do_close_write (GVfsBackend *backend,
                  GVfsJobCloseWrite *job,
                  GVfsBackendHandle _handle)
 {
-  g_print ("(II) try_close_write (handle = '%lx') \n", (long int)_handle);
-
   GError *error;
   GFileOutputStream *stream = _handle;
+
+  g_print ("(II) try_close_write (handle = '%lx') \n", (long int)_handle);
+
   g_assert(stream != NULL);
   
   error = NULL;

@@ -122,6 +122,7 @@ main (int argc, char *argv[])
   GOptionContext *context = NULL;
   GFile *file;
   gchar *summary;
+  int i;
 
   setlocale (LC_ALL, "");
 
@@ -169,7 +170,7 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  int i = 0;
+  i = 0;
 
   do
     {
