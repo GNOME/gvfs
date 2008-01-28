@@ -1,5 +1,10 @@
 2008-01-28  Alexander Larsson  <alexl@redhat.com>
 
+	* NEWS:
+	Update for release
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
 	* hal/hal-device.c:
 	Use gi18n-lib.h, not gi18n.h in client side code.
 

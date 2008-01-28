@@ -1,3 +1,11 @@
+Major changes in 0.1.5:
+* Update to work with latest glib
+* Fix sftp error handling on reading directories
+* Use correct file info attribute name style
+* Add gvfs-mkdir app
+* hal: Don't show drives if all volumes are hidden
+* Enable translations
+
 Major changes in 0.1.4:
 * Update to work with latest glib
 * Fix compiler warnings
