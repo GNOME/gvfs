@@ -1,5 +1,10 @@
 2008-01-28  Alexander Larsson  <alexl@redhat.com>
 
+	* hal/hal-device.c:
+	Use gi18n-lib.h, not gi18n.h in client side code.
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
 	* client/gdaemonfile.c (g_daemon_file_move):
 	Fix typo G_DAEMON_FILE -> G_IS_DAEMON_FILE
 
