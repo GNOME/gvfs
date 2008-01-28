@@ -32,6 +32,7 @@
 #include "gvfsbackendtest.h"
 #include <gvfsdaemonprotocol.h>
 #include "mount.h"
+#include <locale.h>
 
 int
 main (int argc, char *argv[])

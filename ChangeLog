@@ -1,5 +1,11 @@
 2008-01-28  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/daemon-main.c:
+        * daemon/main.c:
+	Include locate.h for setlocale
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
 	* NEWS:
 	Update for release
 

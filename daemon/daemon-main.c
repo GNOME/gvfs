@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include <glib.h>
 #include <dbus/dbus.h>
