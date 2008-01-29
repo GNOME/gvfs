@@ -1,5 +1,15 @@
 2008-01-29  Alexander Larsson  <alexl@redhat.com>
 
+        * Makefile.am:
+        * configure.ac:
+        * gconf/Makefile.am: Added.
+        * gconf/gapplookupgconf.[ch]: Added.
+        * gconf/gconf-module.c: Added.
+	Add gconf based implementation of
+	g_app_info_get_default_for_uri_scheme ()
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
 	* hal/ghalvolumemonitor.c (g_hal_volume_monitor_class_init):
 	Remove setting prio/name
 

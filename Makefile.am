@@ -4,15 +4,14 @@ SUBDIRS = \
 	common \
 	client \
 	daemon \
+	gconf \
 	po   \
 	programs \
 	test \
 	$(NULL)
 
 if USE_HAL
-
 SUBDIRS += hal
-
 endif
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc

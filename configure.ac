@@ -174,6 +174,28 @@ AC_SUBST(FUSE_CFLAGS)
 AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
 
 dnl **********************
+dnl *** Check for GConf ***
+dnl **********************
+AC_ARG_ENABLE(gconf, [  --disable-gconf           build without GConf support])
+msg_gconf=no
+GCONF_LIBS=
+GCONF_CFLAGS=
+
+if test "x$enable_gconf" != "xno"; then
+  PKG_CHECK_EXISTS(gconf-2.0, msg_gconf=yes)
+
+  if test "x$msg_gconf" == "xyes"; then
+    PKG_CHECK_MODULES(GCONF, gconf-2.0)
+    AC_DEFINE(HAVE_GCONF, 1, [Define to 1 if GConf is available])
+  fi
+fi
+
+AC_SUBST(GCONF_LIBS)
+AC_SUBST(GCONF_CFLAGS)
+
+AM_CONDITIONAL(USE_GCONF, [test "$msg_gconf" = "yes"])
+
+dnl **********************
 dnl *** Check for HAL ***
 dnl **********************
 AC_ARG_ENABLE(hal, [  --disable-hal           build without HAL support])
@@ -329,6 +351,7 @@ common/Makefile
 client/Makefile
 daemon/Makefile
 hal/Makefile
+gconf/Makefile
 programs/Makefile
 test/Makefile
 po/Makefile.in
@@ -341,5 +364,6 @@ echo "
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
+        GConf support:                $msg_gconf
 	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)
 "
