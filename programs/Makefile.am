@@ -13,6 +13,7 @@ libraries =					\
 bin_PROGRAMS =					\
 	gvfs-mount				\
 	gvfs-cat				\
+	gvfs-open				\
 	gvfs-save				\
 	gvfs-ls					\
 	gvfs-info				\
@@ -31,6 +32,9 @@ bin_SCRIPTS =					\
 
 gvfs_cat_SOURCES = gvfs-cat.c
 gvfs_cat_LDADD = $(libraries)
+
+gvfs_open_SOURCES = gvfs-open.c
+gvfs_open_LDADD = $(libraries)
 
 gvfs_copy_SOURCES = gvfs-copy.c
 gvfs_copy_LDADD = $(libraries)

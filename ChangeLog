@@ -1,6 +1,15 @@
 2008-01-29  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
+	Require glib 2.15.5 for g_file_query_default_handler ().
+
+        * programs/Makefile.am:
+        * programs/gvfs-open.c:
+	Added gvfs-open app
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
 	Post release version bump
 
 === gvfs 0.1.6 ===
