@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-28 10:54+0000\n"
-"PO-Revision-Date: 2008-01-28 14:35+0100\n"
+"POT-Creation-Date: 2008-01-29 15:01+0000\n"
+"PO-Revision-Date: 2008-01-29 16:39+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -145,36 +145,36 @@ msgstr "Formato de información del archivo no válido"
 msgid "Invalid attribute info list content"
 msgstr ""
 
-#: ../daemon/daemon-main.c:62 ../daemon/daemon-main.c:189
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Error al conectar con D-Bus: %s"
 
-#: ../daemon/daemon-main.c:81
+#: ../daemon/daemon-main.c:82
 #, c-format
 msgid "Error: %s"
 msgstr "Error: %s"
 
-#: ../daemon/daemon-main.c:114
+#: ../daemon/daemon-main.c:115
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Uso: %s --spawner dbus-id ruta_del_objeto"
 
-#: ../daemon/daemon-main.c:138 ../daemon/daemon-main.c:156
+#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Uso: %s clave=valor clave=valor …"
 
-#: ../daemon/daemon-main.c:154
+#: ../daemon/daemon-main.c:155
 msgid "No mount type specified"
 msgstr "No se especificó el tipo de montaje"
 
-#: ../daemon/daemon-main.c:224
+#: ../daemon/daemon-main.c:225
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "el punto de montaje para %s ya se está usando"
 
-#: ../daemon/daemon-main.c:235
+#: ../daemon/daemon-main.c:236
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
@@ -415,7 +415,7 @@ msgstr "El archivo se modificó externamente"
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
-#: ../daemon/gvfsbackendlocaltest.c:788
+#: ../daemon/gvfsbackendlocaltest.c:814
 msgid "Directory notification not supported"
 msgstr "No se soporta la notificación de directorios"
 
@@ -646,30 +646,30 @@ msgstr "El backend no soporta enlaces simbólicos"
 msgid "Invalid dbus message"
 msgstr "Mensaje de D-Bus no válido"
 
-#: ../daemon/main.c:46
+#: ../daemon/main.c:47
 msgid "Replace old daemon."
 msgstr "Reemplace el demonio antiguo."
 
-#: ../daemon/main.c:47
+#: ../daemon/main.c:48
 msgid "Don't start fuse."
 msgstr "No iniciar fuse."
 
-#: ../daemon/main.c:59
+#: ../daemon/main.c:60
 msgid "GVFS Daemon"
 msgstr "Demonio GVFS"
 
-#: ../daemon/main.c:62
+#: ../daemon/main.c:63
 msgid "Main daemon for GVFS"
 msgstr "Demonio principal para GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:73
+#: ../daemon/main.c:74
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:75 ../programs/gvfs-cat.c:166
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:128
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Intente «%s --help» para obtener más información."
@@ -1064,13 +1064,13 @@ msgstr "%s: %s: error al leer: %s\n"
 msgid "%s: %s:error closing: %s\n"
 msgstr "%s: %s:error al cerrar: %s\n"
 
-#: ../programs/gvfs-cat.c:137
+#: ../programs/gvfs-cat.c:138
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
 msgstr "UBICACIÓN… - concatenar las UBICACIONES con una salida estándar."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:142
+#: ../programs/gvfs-cat.c:143
 msgid ""
 "Concatenate files at locations and print to the standard output. Works just "
 "like the traditional cat utility, but using gvfs location instead local "
@@ -1082,7 +1082,7 @@ msgstr ""
 "gvfs en lugar de los archivos locales: por ejemplo, puede usar algo como "
 "smb://servidor/recurso/archivo.txt como una ubicación para concatenar."
 
-#: ../programs/gvfs-cat.c:149
+#: ../programs/gvfs-cat.c:150
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
@@ -1092,8 +1092,36 @@ msgstr ""
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:164
+#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:126
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: faltan ubicaciones"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:64
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: error al abrir la ubicación: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:77
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: error al lanzar la aplicación: %s\n"
+
+#: ../programs/gvfs-open.c:108
+msgid "FILES... - open FILES with registered application."
+msgstr "ARCHIVOS… - abre ARCHIVOS con la aplicación registrada."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:112
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
+"Abre el/los archivo/s con la aplicación predeterminada registrada para manejar el "
+"tipo de archivo."
 
