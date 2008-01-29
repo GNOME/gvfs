@@ -468,8 +468,6 @@ g_hal_volume_monitor_class_init (GHalVolumeMonitorClass *klass)
   monitor_class->adopt_orphan_mount = adopt_orphan_mount;
   monitor_class->is_supported = is_supported;
 
-  native_class->priority = 1;
-  native_class->name = "hal";
   native_class->get_mount_for_mount_path = get_mount_for_mount_path;
 }
 

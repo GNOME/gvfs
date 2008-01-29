@@ -1,5 +1,10 @@
 2008-01-29  Alexander Larsson  <alexl@redhat.com>
 
+	* hal/ghalvolumemonitor.c (g_hal_volume_monitor_class_init):
+	Remove setting prio/name
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac:
 	Require glib 2.15.5 for g_file_query_default_handler ().
 
