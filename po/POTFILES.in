@@ -60,3 +60,4 @@ hal/ghalmount.c
 hal/ghalvolume.c
 hal/ghalvolumemonitor.c
 programs/gvfs-cat.c
+programs/gvfs-open.c
