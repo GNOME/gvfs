@@ -37,20 +37,20 @@ libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-bur
 mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
 mount_DATA = ftp.mount sftp.mount trash.mount computer.mount burn.mount localtest.mount
 
-if HAVE_HTTP
 mount_in_files += http.mount.in dav.mount.in 
+if HAVE_HTTP
 mount_DATA += http.mount dav.mount  
 libexec_PROGRAMS += gvfsd-http gvfsd-dav
 endif
 
-if HAVE_SAMBA
 mount_in_files += smb.mount.in smb-browse.mount.in
+if HAVE_SAMBA
 mount_DATA += smb.mount smb-browse.mount
 libexec_PROGRAMS += gvfsd-smb-browse gvfsd-smb
 endif
 
-if USE_CDDA
 mount_in_files += cdda.mount.in
+if USE_CDDA
 mount_DATA += cdda.mount
 libexec_PROGRAMS += gvfsd-cdda
 endif
