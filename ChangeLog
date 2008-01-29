@@ -1,5 +1,8 @@
 2008-01-29  Alexander Larsson  <alexl@redhat.com>
 
+	* NEWS:
+	Update for release
+
         * daemon/Makefile.am:
 	Always dist all .mount.in files
 	

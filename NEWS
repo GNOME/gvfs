@@ -1,3 +1,6 @@
+Major changes in 0.1.6:
+* Add files missing in the released 0.1.5 tarball
+
 Major changes in 0.1.5:
 * Update to work with latest glib
 * Fix sftp error handling on reading directories
