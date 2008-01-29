@@ -1,3 +1,9 @@
+2008-01-29  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendlocaltest.c:
+	Fixed error handling in do_enumerate ()
+	More cleanup
+
 2008-01-29  Alexander Larsson  <alexl@redhat.com>
 
         * Makefile.am:
