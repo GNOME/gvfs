@@ -495,7 +495,8 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   if (message == NULL)
     _g_dbus_oom ();
 
-  if (backend->priv->stable_name != NULL)
+  if (backend->priv->stable_name != NULL &&
+      *backend->priv->stable_name != 0)
    stable_name = backend->priv->stable_name;
   else
    stable_name = backend->priv->display_name;

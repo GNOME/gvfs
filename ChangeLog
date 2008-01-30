@@ -1,3 +1,9 @@
+2008-01-30  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackend.c:
+        (g_vfs_backend_register_mount):
+	Correctly detect unset stable name
+
 2008-01-29  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendlocaltest.c:
