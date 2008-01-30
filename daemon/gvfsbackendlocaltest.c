@@ -68,7 +68,7 @@
 /* TODO:
  *  Bugs: 
  *   - unmounting ?
- *   - copy dialog still visible after try_copy() finished successfully
+ *   - copy dialog still visible after try_copy() finished successfully  --> temporarily disabled do_copy ()
  * 
  * 
  *  Conceptual:
@@ -1236,7 +1236,8 @@ g_vfs_backend_localtest_class_init (GVfsBackendLocalTestClass *klass)
   backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
-  backend_class->copy = do_copy;
+/*  -- disabled, read/write operations can handle copy correctly  */  
+/*   backend_class->copy = do_copy; */ 
   backend_class->move = do_move;
   backend_class->make_symlink = do_make_symlink;
   backend_class->make_directory = do_make_directory;
