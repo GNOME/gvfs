@@ -677,16 +677,18 @@ file_info_get_stat_mode (GFileInfo *file_info)
         break;
     }
 
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ)
-      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
+  if (file_type == G_FILE_TYPE_DIRECTORY ||
+      !g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) ||
+      g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
     unix_mode |= S_IRUSR;
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE)
-      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) ||
+      g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
     unix_mode |= S_IWUSR;
-  if (!g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE)
-      || g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
+  if (file_type == G_FILE_TYPE_DIRECTORY ||
+      !g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE) ||
+      g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
     unix_mode |= S_IXUSR;
-
+  
   return unix_mode;
 }
 
@@ -707,11 +709,6 @@ getattr_for_file (GFile *file, struct stat *sbuf)
       sbuf->st_size = g_file_info_get_size (file_info);
       sbuf->st_uid = daemon_uid;
       sbuf->st_gid = daemon_gid;
-
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_UID))
-        sbuf->st_uid = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_UID);
-      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_GID))
-        sbuf->st_gid = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_GID);
 
       g_file_info_get_modification_time (file_info, &mod_time);
       sbuf->st_mtime = mod_time.tv_sec;
@@ -777,7 +774,7 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
     {
       /* Mount list */
 
-      sbuf->st_mode = S_IFDIR | 0555;                   /* mode_t    protection */
+      sbuf->st_mode = S_IFDIR | 0500;                   /* mode_t    protection */
       sbuf->st_nlink = 2 + g_list_length (mount_list);  /* nlink_t   number of hard links */
       sbuf->st_atime = daemon_creation_time;
       sbuf->st_mtime = daemon_creation_time;
@@ -1815,11 +1812,11 @@ vfs_access (const gchar *path, gint mode)
       if (file_info)
         {
           if ((mode & R_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ) &&
-                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))) ||
+                               !g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))) ||
               (mode & W_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE) &&
-                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))) ||
+                               !g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))) ||
               (mode & X_OK && (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE) &&
-                               !g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))))
+                               !g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))))
             result = -EACCES;
 
           g_object_unref (file_info);

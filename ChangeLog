@@ -1,5 +1,13 @@
 2008-01-30  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gvfsfusedaemon.c:
+	Set read and execute privs for all directories.
+	Fix up type when reading can-read etc attributes.
+	Don't use uid/gid in the fuse mount. The
+	uid/gid doesn't make sense locally anyway.
+
+2008-01-30  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackend.c:
         (g_vfs_backend_register_mount):
 	Correctly detect unset stable name
