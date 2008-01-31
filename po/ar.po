@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD.ar\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-31 08:09+0000\n"
-"PO-Revision-Date: 2008-01-26 20:29+0200\n"
+"POT-Creation-Date: 2008-01-31 22:50+0000\n"
+"PO-Revision-Date: 2008-02-01 00:22+0200\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,73 +21,72 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: ../client/gdaemonfile.c:508 ../client/gdaemonfile.c:1900
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1856
 #, c-format
 msgid "Operation not supported, files on different mounts"
 msgstr "العملية غير مدعومة، ملفات على نقاط وصْل مختلفة"
 
-#: ../client/gdaemonfile.c:793
+#: ../client/gdaemonfile.c:749
 #, c-format
 msgid "Invalid return value from get_info"
 msgstr "قيمة مرتجعة غير صحيحة من get_info"
 
-#: ../client/gdaemonfile.c:822
+#: ../client/gdaemonfile.c:778
 msgid "Invalid return value from query_info"
 msgstr "قيمة مرتجعة غير صحيحة من query_info"
 
-#: ../client/gdaemonfile.c:894
+#: ../client/gdaemonfile.c:850
 msgid "Couldn't get stream file descriptor"
-msgstr "تعذر جلب واصِف ملف التيار"
+msgstr "تعذر جلب واصِف ملف الدفْق"
 
-#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176
+#: ../client/gdaemonfile.c:882 ../client/gdaemonfile.c:952
+#: ../client/gdaemonfile.c:1011 ../client/gdaemonfile.c:1070
+#: ../client/gdaemonfile.c:1132
 #, c-format
 msgid "Invalid return value from open"
-msgstr "قيمة غير صحيحة للتيار من \"افتح\""
+msgstr "قيمة غير صحيحة للدفْق من \"افتح\""
 
-#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:962 ../client/gdaemonfile.c:1021
+#: ../client/gdaemonfile.c:1080 ../client/gdaemonfile.c:1142
 #, c-format
 msgid "Didn't get stream file descriptor"
-msgstr "لم أحصل على واصِف ملف التيار"
+msgstr "لم أحصل على واصِف ملف الدفْق"
 
-#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
-#, fuzzy
+#: ../client/gdaemonfile.c:1194 ../client/gdaemonfile.c:1211
 msgid "Invalid return value from call"
-msgstr "غير صحيح قيمة من"
+msgstr "قيمة مُرتجعة غير صحيحة من النداء"
 
-#: ../client/gdaemonfile.c:1530
-#, fuzzy, c-format
+#: ../client/gdaemonfile.c:1486
+#, c-format
 msgid "Invalid return value from get_filesystem_info"
-msgstr "غير صحيح قيمة من"
+msgstr "قيمة مُرتجعة غير صحيحة من get_filesystem_info"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1569
+#: ../client/gdaemonfile.c:1525
 #, c-format
 msgid "Could not find enclosing mount"
-msgstr ""
+msgstr "تعذّر العثور على نقطة الضم الحاوية"
 
-#: ../client/gdaemonfile.c:1599
-#, fuzzy, c-format
+#: ../client/gdaemonfile.c:1555
+#, c-format
 msgid "Invalid filename %s"
-msgstr "[اسم ملف غير صالح]"
+msgstr "اسم ملف غير صالح %s"
 
-#: ../client/gdaemonfile.c:1641
-#, fuzzy, c-format
+#: ../client/gdaemonfile.c:1597
+#, c-format
 msgid "Invalid return value from query_filesystem_info"
-msgstr "غير صحيح قيمة من"
+msgstr "قيمة مُرتجعة غير صحيحة من query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2049
-#, fuzzy, c-format
+#: ../client/gdaemonfile.c:2005
+#, c-format
 msgid "Invalid return value from monitor_dir"
-msgstr "قيمة غير صحيحة للتيار من \"افتح\""
+msgstr "قيمة مُرتجعة غير صحيحة من monitor_dir"
 
-#: ../client/gdaemonfile.c:2098
-#, fuzzy, c-format
+#: ../client/gdaemonfile.c:2054
+#, c-format
 msgid "Invalid return value from monitor_file"
-msgstr "قيمة غير صحيحة للتيار من \"افتح\""
+msgstr "قيمة مُرتجعة غير صحيحة من monitor_file"
 
 #: ../client/gdaemonfileinputstream.c:449
 #: ../client/gdaemonfileinputstream.c:457
@@ -97,19 +96,16 @@ msgstr "قيمة غير صحيحة للتيار من \"افتح\""
 #: ../client/gdaemonfileoutputstream.c:409
 #: ../client/gdaemonfileoutputstream.c:1046
 #: ../client/gdaemonfileoutputstream.c:1056
-#, fuzzy, c-format
+#, c-format
 msgid "Error in stream protocol: %s"
-msgstr ""
-"خطأ في الميفاق:\n"
-"بيانات غير معروفة !"
+msgstr "خطأ في برتوكول الدفْق: %s"
 
 #: ../client/gdaemonfileinputstream.c:457
 #: ../client/gdaemonfileinputstream.c:1312
 #: ../client/gdaemonfileoutputstream.c:409
 #: ../client/gdaemonfileoutputstream.c:1056
-#, fuzzy
 msgid "End of stream"
-msgstr "نهاية إرسال غير متوقعة!"
+msgstr "نهاية الدفْق"
 
 #: ../client/gdaemonfileinputstream.c:517
 #: ../client/gdaemonfileinputstream.c:673
@@ -120,461 +116,426 @@ msgstr "نهاية إرسال غير متوقعة!"
 #: ../client/gdaemonfileoutputstream.c:830 ../daemon/gvfsbackendsmb.c:952
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:122
 #: ../daemon/gvfsbackendtest.c:183
-#, fuzzy, c-format
+#, c-format
 msgid "Operation was cancelled"
-msgstr "تم إلغاء العملية من طرف المستخدم."
+msgstr "أُلغيت العملية"
 
 #: ../client/gdaemonfileinputstream.c:1205
 #: ../client/gdaemonfileoutputstream.c:941
-#, fuzzy, c-format
+#, c-format
 msgid "Seek not supported on stream"
-msgstr "لا يمكن الطباعة من خلال هذه الطابعة"
+msgstr "لا يُدعم الالتماس على الدفْق"
 
 #: ../client/gdaemonfileinputstream.c:1239
-#, fuzzy, c-format
+#, c-format
 msgid "The query info operation is not supported"
-msgstr "هو ليس"
+msgstr "لا تُدعم عملية استعلام المعلومات"
 
-#: ../client/gdaemonvfs.c:566
-#, fuzzy, c-format
+#: ../client/gdaemonvfs.c:603
+#, c-format
 msgid "Error while getting mount info: %s"
-msgstr "خطأ while s"
+msgstr "خطأ أثناء جلب معلومات الوصْل: %s"
 
 #: ../client/gvfsdaemondbus.c:559 ../client/gvfsdaemondbus.c:946
-#, fuzzy, c-format
+#, c-format
 msgid "Error connecting to daemon: %s"
-msgstr "خطأ بالاتّصال بشبكة ردهات..."
+msgstr "خطأ أثناء الاتصال بالخادم: %s"
 
 #: ../common/gsysutils.c:125
-#, fuzzy, c-format
+#, c-format
 msgid "Error creating socket: %s"
-msgstr "خطأ عند إنشاء الدليل '%s' :  %s "
+msgstr "خطأ أثناء إنشاء المقبس: %s"
 
 #: ../common/gsysutils.c:161
-#, fuzzy, c-format
+#, c-format
 msgid "Error connecting to socket: %s"
-msgstr "خطأ بالاتّصال بشبكة ردهات..."
+msgstr "خطأ أثناء الاتصال بالمقبس: %s"
 
 #: ../common/gvfsdaemonprotocol.c:516
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid file info format"
-msgstr "نمط الملف غير صحيح."
+msgstr "تنسيق ملف معلومات غير صحيح."
 
 #: ../common/gvfsdaemonprotocol.c:533
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid attribute info list content"
-msgstr "غير صحيح وصف قائمة"
+msgstr "محتوى قائمة خواص غير صحيح"
 
 #: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
-#, fuzzy, c-format
+#, c-format
 msgid "Error connecting to D-Bus: %s"
-msgstr "خطأ بالاتّصال بشبكة ردهات..."
+msgstr "خطأ أثناء الاتصال بـ D-Bus: %s"
 
 #: ../daemon/daemon-main.c:82
-#, fuzzy, c-format
+#, c-format
 msgid "Error: %s"
-msgstr "حدث خطأ أثناء إرسال الدردشة."
+msgstr "خطأ: %s"
 
 #: ../daemon/daemon-main.c:115
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
-msgstr ""
+msgstr "الاستخدام: ‪%s --spawner dbus-id object_path‬"
 
 #: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
 #, c-format
 msgid "Usage: %s key=value key=value ..."
-msgstr ""
+msgstr "الاستخدام: ‪%s key=value key=value ...‬"
 
 #: ../daemon/daemon-main.c:155
-#, fuzzy, c-format
+#, c-format
 msgid "No mount type specified"
-msgstr "لم يحدّد عنوان"
+msgstr "لم يُحدّد وصْل"
 
 #: ../daemon/daemon-main.c:225
-#, fuzzy, c-format
+#, c-format
 msgid "mountpoint for %s already running"
-msgstr "GDM يعمل بالفعل. إلغاء!"
+msgstr "نقطة الوصل %s تعمل مسبقا"
 
 #: ../daemon/daemon-main.c:236
-#, fuzzy
 msgid "error starting mount daemon"
-msgstr ""
-"خطأ عند تشغيل جني مدير الأحجام لجنوم:\n"
-"%s"
+msgstr "خطأ أثناء بدأ خادم الوصْل"
 
 #: ../daemon/gvfsbackendburn.c:346
 msgid "Burn"
-msgstr ""
+msgstr "اكتب"
 
 #: ../daemon/gvfsbackendburn.c:376
-#, fuzzy
 msgid "Unable to create temporary directory"
-msgstr "لا يمكن إنشاء ملف مصدر"
+msgstr "تعذّر إنشاء المجلد المؤقت"
 
 #: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:671
 #: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
 #: ../daemon/gvfsbackendburn.c:782
-#, fuzzy
 msgid "No such file or directory"
-msgstr "لايوجد مثل هذا الملف او المجلد"
+msgstr "ليس ثمّة ملف أو مجلد"
 
 #: ../daemon/gvfsbackendburn.c:425
 msgid "Directory not empty"
-msgstr ""
+msgstr "الدليل غير فارغ"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:894
-#, fuzzy
 msgid "Can't copy file over directory"
-msgstr "لا يمكنك التنقل هنا!"
+msgstr "لا يمكن نسخ ملف على مجلد"
 
 #: ../daemon/gvfsbackendburn.c:650
 msgid "CD Burner"
-msgstr ""
+msgstr "ناسخ الاسطوانات"
 
 #: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:641
-#, fuzzy
 msgid "The file is not a directory"
-msgstr "لا يمكن قراءة الملف."
+msgstr "الملف ليس مُجلّدا"
 
 #: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
 #: ../daemon/gvfsbackendburn.c:914
-#, fuzzy
 msgid "File exists"
-msgstr "الدّليل غير موجود"
+msgstr "الملف موجود"
 
 #: ../daemon/gvfsbackendburn.c:842
 msgid "No such file or directory in target path"
-msgstr ""
+msgstr "ليس ثمّة ملف أو مجلد في المسار المقصود"
 
 #: ../daemon/gvfsbackendburn.c:865
-#, fuzzy
 msgid "Can't copy directory over directory"
-msgstr "لا يمكنك التنقل هنا!"
+msgstr "لا يمكن نسخ دليل على دليل"
 
 #: ../daemon/gvfsbackendburn.c:874
-#, fuzzy
 msgid "Target file exists"
-msgstr ""
-"الملف \"%s\" موجود مسبقاً\n"
-".\n"
-"%s"
+msgstr "الملف الهدف موجود مسبّقا"
 
 #: ../daemon/gvfsbackendburn.c:881
-#, fuzzy
 msgid "Can't recursively copy directory"
-msgstr "لا يمكنك التنقل هنا!"
+msgstr "تعذّر النسخ التتابعي للدليل "
 
 #: ../daemon/gvfsbackendburn.c:940
 msgid "Not supported"
-msgstr ""
+msgstr "ليس مدعومًا"
 
 #: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
-#, fuzzy, c-format
+#, c-format
 msgid "No drive specified"
-msgstr "لم يحدّد عنوان"
+msgstr "لم يحدّد أي مشغّل"
 
 #: ../daemon/gvfsbackendcdda.c:157
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot find drive %s"
-msgstr "لا يمكنني ايجاد المستضيف"
+msgstr "تعذّر إيجاد المُشغّل %s"
 
 #: ../daemon/gvfsbackendcdda.c:167
-#, fuzzy, c-format
+#, c-format
 msgid "Drive %s does not contain audio files"
-msgstr "مشغّل s ليس صوت ملفات"
+msgstr "لا يحتوي المشغل %s على ملفات صوت"
 
 #. Translator: %s is the device the disc is inserted into
 #: ../daemon/gvfsbackendcdda.c:174
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Disc on %s"
-msgstr "افتح قرص صوتي %s"
+msgstr "قرص صوتي على %s"
 
 #: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:680
 #: ../hal/ghalmount.c:293 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:262
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Disc"
 msgstr "قرص صوتي"
 
 #: ../daemon/gvfsbackendcdda.c:236
-#, fuzzy, c-format
+#, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] "ملف هو d افتح ملفات"
-msgstr[1] "ملف هو d افتح ملفات"
-msgstr[2] "ملف هو d افتح ملفات"
-msgstr[3] "ملف هو d افتح ملفات"
-msgstr[4] "ملف هو d افتح ملفات"
-msgstr[5] "ملف هو d افتح ملفات"
+msgstr[0] "نظام الملفات مشغول: لا ملفات مفتوحة"
+msgstr[1] "نظام الملفات مشغول: ملف واحد مفتوح"
+msgstr[2] "نظام الملفات مشغول: ملفين مفتوحين"
+msgstr[3] "نظام الملفات مشغول: %Id ملفات مفتوحة"
+msgstr[4] "نظام الملفات مشغول: %Id ملفا مفتوحا"
+msgstr[5] "نظام الملفات مشغول: %Id ملف مفتوح"
 
 #: ../daemon/gvfsbackendcdda.c:429
-#, fuzzy, c-format
+#, c-format
 msgid "No such file %s on drive %s"
-msgstr "لايوجد مثل هذا الملف او المجلد"
+msgstr "ليس ثمّة ملف %s على المشغّل %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
 #: ../daemon/gvfsbackendcdda.c:536
-#, fuzzy, c-format
+#, c-format
 msgid "Error from 'paranoia' on drive %s"
-msgstr "حدث خطأ خلال تنفيد %s على السّوّاقة %s."
+msgstr "خطأ من 'paranoia' على المشغّل %s"
 
 #: ../daemon/gvfsbackendcdda.c:599
-#, fuzzy, c-format
+#, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr "خطأ في يعمل s"
+msgstr "خطأ أثناء الالتماس في الدفق على المشغّل %s"
 
 #: ../daemon/gvfsbackendcdda.c:696
-#, fuzzy, c-format
+#, c-format
 msgid "No such file"
-msgstr "لا ملف كهذا"
+msgstr "ليس ثمّة ملف"
 
 #: ../daemon/gvfsbackendcdda.c:703
-#, fuzzy, c-format
+#, c-format
 msgid "The file does not exist"
-msgstr "الملف غير موجود."
+msgstr "الملف غير موجود"
 
 #: ../daemon/gvfsbackendcdda.c:710
-#, fuzzy, c-format
+#, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr "ملفّ ليس t صوت"
+msgstr "الملف غير موجود أو ليس مقطعا صوتيا"
 
 #: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:683
-#, fuzzy
 msgid "Computer"
 msgstr "الحاسوب"
 
 #: ../daemon/gvfsbackendcomputer.c:562 ../daemon/gvfsbackendsmbbrowse.c:786
 #: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
 #: ../daemon/gvfsbackendsmbbrowse.c:1098
-#, fuzzy, c-format
+#, c-format
 msgid "File doesn't exist"
-msgstr "الدّليل غير موجود"
+msgstr "الملف غير موجود"
 
 #: ../daemon/gvfsbackendcomputer.c:580 ../daemon/gvfsbackendtrash.c:632
-#, fuzzy
 msgid "Can't open directory"
-msgstr "إفتح الدليل الهدف"
+msgstr "تعذّر فتح الدّليل"
 
 #: ../daemon/gvfsbackendcomputer.c:584 ../daemon/gvfsbackendcomputer.c:718
-#, fuzzy
 msgid "Can't open mountable file"
-msgstr "لا يمكن فتح الملف"
+msgstr "تعذّر فتح الملف القابل للوصْل"
 
 #: ../daemon/gvfsbackendcomputer.c:765
 #, c-format
 msgid "Internal error: %s"
-msgstr ""
+msgstr "خطأ داخلي: %s"
 
 #: ../daemon/gvfsbackendcomputer.c:789 ../daemon/gvfsbackendcomputer.c:854
 #: ../daemon/gvfsbackendcomputer.c:954
-#, fuzzy
 msgid "Not a mountable file"
-msgstr "لا يمكن فتح الملف"
+msgstr "لا ملف قابل للوصْل"
 
 #: ../daemon/gvfsbackendcomputer.c:811
-#, fuzzy
 msgid "Can't mount file"
-msgstr "لا يمكن حفظ الملف: %s\n"
+msgstr "تعذّر وصْل الملف"
 
 #: ../daemon/gvfsbackendcomputer.c:869
-#, fuzzy
 msgid "Can't unmount file"
-msgstr "لا يمكن حفظ الملف: %s\n"
+msgstr "تعذّر فصْل الملف"
 
 #: ../daemon/gvfsbackendcomputer.c:985
-#, fuzzy
 msgid "Can't eject file"
-msgstr "لا يمكن حفظ الملف: %s\n"
+msgstr "تعذّر إخراج الملف"
 
 #: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:642
-#: ../daemon/gvfsbackendhttp.c:185
+#: ../daemon/gvfsbackendhttp.c:184
 #, c-format
 msgid "HTTP Error: %s"
-msgstr ""
+msgstr "خطأ HTTP‬: ‫%s‪"
 
 #: ../daemon/gvfsbackenddav.c:167
 #, c-format
 msgid "Could not parse response"
-msgstr ""
+msgstr "تعذّر تحليل الاستجابة"
 
 #: ../daemon/gvfsbackenddav.c:176
 #, c-format
 msgid "Empty response"
-msgstr ""
+msgstr "استجابة خالية"
 
 #: ../daemon/gvfsbackenddav.c:183
 #, c-format
 msgid "Unexpected reply from server"
-msgstr ""
+msgstr "ردّ غير متوقّع من الخادم"
 
 #: ../daemon/gvfsbackenddav.c:564
-#, fuzzy
 msgid "Please enter proxy password"
-msgstr "أدخل كلمة السر"
+msgstr "رجاءً أدخل كلمة سر الوسيط"
 
 #: ../daemon/gvfsbackenddav.c:573
 msgid "WebDAV share"
-msgstr ""
+msgstr "مشاركة WebDAV"
 
 #: ../daemon/gvfsbackenddav.c:575
-#, fuzzy, c-format
+#, c-format
 msgid "Enter password for %s"
-msgstr "أدخل كلمة السر"
+msgstr "أدخل كلمة سر %s"
 
 #: ../daemon/gvfsbackenddav.c:646
 msgid "Not a WebDAV enabled share"
-msgstr ""
+msgstr "ليس مشاركة WebDAV مفعّلة"
 
-#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:409
+#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:395
 #: ../daemon/gvfsbackendsmb.c:542
-#, fuzzy
 msgid "Invalid mount spec"
-msgstr "نقطة تجهيز غير صالحة"
+msgstr "وصف وصْل خطأ"
 
 #: ../daemon/gvfsbackenddav.c:797
 msgid "Response invalid"
-msgstr ""
+msgstr "رد غير سليم"
 
 #: ../daemon/gvfsbackenddav.c:826 ../daemon/gvfsbackenddav.c:941
 msgid "Could not create request"
-msgstr ""
+msgstr "تعذّر إنشاء الطلب"
 
 #: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1164
-#, fuzzy
 msgid "No hostname specified"
-msgstr "لم يحدّد عنوان"
+msgstr "لم يحدّد اسم مستضيف"
 
 #: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:627
 #: ../daemon/gvfsbackendsmb.c:1051
-#, fuzzy
 msgid "Unsupported seek type"
-msgstr "نوع رسوم متحرّكة غير مدعوم"
+msgstr "نوع التماس غير مدعوم"
 
-#: ../daemon/gvfsbackendhttp.c:181
+#: ../daemon/gvfsbackendhttp.c:180
 #, c-format
 msgid "HTTP Client Error: %s"
-msgstr ""
+msgstr "خطأ عميل ‪HTTP‬: ‫%s"
 
-#: ../daemon/gvfsbackendhttp.c:226 ../daemon/gvfsbackendsftp.c:1489
+#: ../daemon/gvfsbackendhttp.c:225 ../daemon/gvfsbackendsftp.c:1489
 #: ../daemon/gvfsbackendsmb.c:1160 ../daemon/gvfsbackendtrash.c:948
-#, fuzzy
 msgid " (invalid encoding)"
-msgstr "%s: ترميز غير سليم. \n"
+msgstr "  (ترميز غير سليم)"
 
-#: ../daemon/gvfsbackendhttp.c:639 ../daemon/gvfsbackendsmb.c:1653
-#, fuzzy
+#: ../daemon/gvfsbackendhttp.c:633 ../daemon/gvfsbackendsmb.c:1653
 msgid "Target file already exists"
-msgstr ""
-"الملف \"%s\" موجود مسبقاً\n"
-".\n"
-"%s"
+msgstr "الملف الهدف موجود مسبقًا"
 
-#: ../daemon/gvfsbackendhttp.c:709 ../daemon/gvfsbackendsftp.c:2416
+#: ../daemon/gvfsbackendhttp.c:703 ../daemon/gvfsbackendsftp.c:2416
 #: ../daemon/gvfsbackendsmb.c:921
-#, fuzzy, c-format
+#, c-format
 msgid "The file was externally modified"
-msgstr "التاريخ الذي فيه عدل الملف."
+msgstr "عُدّل الملف خارجيّا"
 
-#: ../daemon/gvfsbackendhttp.c:740 ../daemon/gvfsbackendsmb.c:957
+#: ../daemon/gvfsbackendhttp.c:734 ../daemon/gvfsbackendsmb.c:957
 #: ../daemon/gvfsbackendsmb.c:1670
-#, fuzzy, c-format
+#, c-format
 msgid "Backup file creation failed"
-msgstr "فشل إنشاء الملف المؤقّت."
+msgstr "فشل إنشاء الملف الاحتياطية"
 
 #: ../daemon/gvfsbackendlocaltest.c:853
-#, fuzzy
 msgid "Directory notification not supported"
-msgstr "المهملات دليل ليس"
+msgstr "تنبيه المجلد غير مدعوم"
 
 #: ../daemon/gvfsbackendsftp.c:249
-#, fuzzy, c-format
+#, c-format
 msgid "ssh program unexpectedly exited"
-msgstr "خرج برنامج 'seahorse-agent' بدون نجاح."
+msgstr "خرج برنامج ssh بصورة غير متوقّعة"
 
 #: ../daemon/gvfsbackendsftp.c:257
-#, fuzzy, c-format
+#, c-format
 msgid "Permission denied"
 msgstr "رُفض التّصريح"
 
 #: ../daemon/gvfsbackendsftp.c:264
-#, fuzzy, c-format
+#, c-format
 msgid "Hostname not known"
-msgstr "لم تقم بتحديد اسم مضيف."
+msgstr "اسم المستضيف مجهول"
 
 #: ../daemon/gvfsbackendsftp.c:271
-#, fuzzy, c-format
+#, c-format
 msgid "No route to host"
-msgstr "No route to host"
+msgstr "لا توجيه للمستضيف"
 
 #: ../daemon/gvfsbackendsftp.c:278
-#, fuzzy, c-format
+#, c-format
 msgid "Connection refused by server"
-msgstr "تمّ رفض الطّلب من قبل هذا الخادم."
+msgstr "رفض الخادم الاتصال"
 
 #: ../daemon/gvfsbackendsftp.c:285
-#, fuzzy, c-format
+#, c-format
 msgid "Host key verification failed"
-msgstr "فشل الاتصال بالمضيف '%s': %s "
+msgstr "فشل التحقق من مفتاح الخادم"
 
 #: ../daemon/gvfsbackendsftp.c:370
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to spawn ssh program"
-msgstr "الاحداثيات الخاصة للعبور لبرنامج SHH"
+msgstr "فشل تشعيب برنامج ssh"
 
 #: ../daemon/gvfsbackendsftp.c:386
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to spawn ssh program: %s"
-msgstr "الاحداثيات الخاصة للعبور لبرنامج SHH"
+msgstr "فشل تشعيب برنامج ‪ssh‬: ‫%s"
 
 #: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:646
-#, fuzzy, c-format
+#, c-format
 msgid "Timed out when logging in"
-msgstr "في"
+msgstr "انتهت المهلة أثناء الولوج"
 
 #: ../daemon/gvfsbackendsftp.c:694
-#, fuzzy
 msgid "Enter passphrase for key"
-msgstr "استيراد المفتاح. ادخل عبارة السر"
+msgstr "أدخل عبارة سر المفتاح"
 
 #: ../daemon/gvfsbackendsftp.c:696
-#, fuzzy
 msgid "Enter password"
 msgstr "أدخل كلمة السر"
 
 #: ../daemon/gvfsbackendsftp.c:708
-#, fuzzy, c-format
+#, c-format
 msgid "Password dialog cancelled"
-msgstr "تمّ إلغاء الحوار\n"
+msgstr "أُلغِي حوار كلمة السر"
 
 #: ../daemon/gvfsbackendsftp.c:724
-#, fuzzy, c-format
+#, c-format
 msgid "Can't send password"
-msgstr "أرسل لي كلمة مروري"
+msgstr "تعذّر إرسال كلمة السر"
 
 #: ../daemon/gvfsbackendsftp.c:1090 ../daemon/gvfsbackendsftp.c:1113
-#, fuzzy, c-format
+#, c-format
 msgid "Protocol error"
-msgstr "خطا في البروتوكول"
+msgstr "خطأ بروتوكول"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
 #: ../daemon/gvfsbackendsftp.c:1130
-#, fuzzy, c-format
+#, c-format
 msgid "sftp on %s"
-msgstr "استماع على:"
+msgstr "‏sftp على %s"
 
 #: ../daemon/gvfsbackendsftp.c:1154
-#, fuzzy
 msgid "Unable to find supported ssh command"
-msgstr "إلى ابحث"
+msgstr "تعذّر إيجاد أمر ssh مدعوم"
 
 #: ../daemon/gvfsbackendsftp.c:1554
-#, fuzzy
 msgid "File is directory"
-msgstr "ليس دليلا"
+msgstr "الملف دليل"
 
 #: ../daemon/gvfsbackendsftp.c:1563
 msgid "Failure"
-msgstr ""
+msgstr "فشل"
 
 #: ../daemon/gvfsbackendsftp.c:1628 ../daemon/gvfsbackendsftp.c:1690
 #: ../daemon/gvfsbackendsftp.c:1701 ../daemon/gvfsbackendsftp.c:1759
@@ -590,129 +551,119 @@ msgstr ""
 #: ../daemon/gvfsbackendsftp.c:3231 ../daemon/gvfsbackendsftp.c:3267
 #: ../daemon/gvfsbackendsftp.c:3301 ../daemon/gvfsbackendsftp.c:3316
 #: ../daemon/gvfsbackendsftp.c:3335
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid reply recieved"
-msgstr "رُد على ال_كل"
+msgstr "استُلِم رد غير سليم"
 
 #: ../daemon/gvfsbackendsftp.c:1947
-#, fuzzy, c-format
+#, c-format
 msgid "Error creating backup file: %s"
-msgstr "خطأ في إنشاء الملف المضغوط zip"
+msgstr "خطأ في إنشاء الملف الاحتياطي: %s"
 
 #: ../daemon/gvfsbackendsftp.c:2362
-#, fuzzy
 msgid "Unable to create temporary file"
-msgstr "لا يمكن إنشاء ملف مصدر"
+msgstr "تعذّر إنشاء الملف المؤقت"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:180
-#, fuzzy, c-format
+#, c-format
 msgid "Password required for share %s on %s"
-msgstr "كلمة السر مطلوبة لتوثّق \"vnc\""
+msgstr "كلمة السر مطلوبة لمشاركة %s على %s"
 
 #: ../daemon/gvfsbackendsmb.c:429 ../daemon/gvfsbackendsmb.c:464
 #, c-format
 msgid "Internal Error (%s)"
-msgstr ""
+msgstr "خطأ داخلي (%s)"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1153
-#, fuzzy, c-format
+#, c-format
 msgid "%s on %s"
-msgstr "%s على %s"
+msgstr "‏%s على %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:518
-#, fuzzy
 msgid "Failed to mount Windows share"
-msgstr "أدخل مشاركة SMB للاستعمال."
+msgstr "فشل وصْل مشاركة ويندوز"
 
 #: ../daemon/gvfsbackendsmb.c:1103
-#, fuzzy, c-format
+#, c-format
 msgid "Backup file creation failed: %d"
-msgstr "فشل إنشاء الملف المؤقّت."
+msgstr "فشل إنشاء الملف الاحتياطي: %Id"
 
 #: ../daemon/gvfsbackendsmb.c:1556
-#, fuzzy, c-format
+#, c-format
 msgid "Error deleting file: %s"
-msgstr "خطأ أثناء حذف الملف '%s':  %s"
+msgstr "خطأ أثناء حذف الملف: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1618
-#, fuzzy, c-format
+#, c-format
 msgid "Error moving file: %s"
-msgstr "خطأ أثناء فتح الملف %s"
+msgstr "خطأ أثناء نقل الملف: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1642
-#, fuzzy
 msgid "Can't move directory over directory"
-msgstr "لا يمكنك التنقل هنا!"
+msgstr "لا يمكن نقل دليل على دليل"
 
 #: ../daemon/gvfsbackendsmb.c:1690
-#, fuzzy, c-format
+#, c-format
 msgid "Error removing target file: %s"
-msgstr "فشل في إزالة الملف الأصلي."
+msgstr "خطأ في إزالة الملف الهدف: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1714
-#, fuzzy
 msgid "Can't recursively move directory"
-msgstr "لا يمكنك التنقل هنا!"
+msgstr "تعذّر نقل المجلد تتابعيا"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:676
-#, fuzzy
 msgid "Windows Network"
 msgstr "شبكة ويندوز"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
 #: ../daemon/gvfsbackendsmbbrowse.c:684
-#, fuzzy, c-format
+#, c-format
 msgid "Windows shares on %s"
-msgstr "على هذا الحاسوب"
+msgstr "مشاركات ويندوز على %s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:781 ../daemon/gvfsbackendsmbbrowse.c:827
-#, fuzzy, c-format
+#, c-format
 msgid "The file is not a mountable"
-msgstr "لا يمكن قراءة الملف."
+msgstr "الملف ليس قابلا للوصل"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:849
-#, fuzzy
 msgid "Not a regular file"
 msgstr "ليس ملفا اعتياديا"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1094
-#, fuzzy
 msgid "Not a directory"
 msgstr "ليس دليلا"
 
 #. translators: This is the name of the backend
 #: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1165
 msgid "Trashcan"
-msgstr ""
+msgstr "سلة المهملات"
 
 #: ../daemon/gvfsbackendtrash.c:1255
-#, fuzzy
 msgid "Can't delete trash"
-msgstr "ا_حذف من المهملات"
+msgstr "تعذّر حذف المهملات"
 
 #: ../daemon/gvfsbackendtrash.c:1602 ../daemon/gvfsbackendtrash.c:1677
-#, fuzzy
 msgid "Trash directory notification not supported"
-msgstr "المهملات دليل ليس"
+msgstr "تنبيه مجلد المهملات غير مدعوم"
 
 #: ../daemon/gvfsdaemon.c:1030
-#, fuzzy
 msgid "Invalid backend type"
-msgstr "نوع نقل غير سليم  '%d'"
+msgstr "نوع خلفية غير سليم"
 
 #: ../daemon/gvfsdaemonutils.c:92
-#, fuzzy, c-format
+#, c-format
 msgid "No fd passing socket available"
-msgstr "لا متوفّر"
+msgstr ""
 
 #: ../daemon/gvfsdaemonutils.c:102
-#, fuzzy, c-format
+#, c-format
 msgid "Error sending fd: %s"
-msgstr "حدث خطأ أثناء إرسال الدردشة."
+msgstr ""
 
 #: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
 #: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
@@ -730,515 +681,440 @@ msgstr "حدث خطأ أثناء إرسال الدردشة."
 #: ../daemon/gvfsjobunmountmountable.c:132
 #: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
 #: ../daemon/gvfsjobwrite.c:120
-#, fuzzy
 msgid "Operation not supported by backend"
-msgstr "لا يدعم هذا الخادم STLS"
+msgstr "لا تدعم الخلفية هذا العملية"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
-#, fuzzy
 msgid "Symlinks not supported by backend"
-msgstr "لا يدعم هذا الخادم STLS"
+msgstr "لا تدعم الخلفية الوصلات الرمزية"
 
 #: ../daemon/gvfsjobsetattribute.c:123
-#, fuzzy
 msgid "Invalid dbus message"
-msgstr "نقطة تجهيز غير صالحة"
+msgstr "رسالة dbus غير سليمة"
 
 #: ../daemon/main.c:47
-#, fuzzy
 msgid "Replace old daemon."
-msgstr "ابدأ خادم بيجل"
+msgstr "استبدل الخادم القديم."
 
 #: ../daemon/main.c:48
 msgid "Don't start fuse."
-msgstr ""
+msgstr "لا تبدأ fuse."
 
 #: ../daemon/main.c:60
-#, fuzzy
 msgid "GVFS Daemon"
-msgstr "NO-DAEMON"
+msgstr "خادم GVFS"
 
 #: ../daemon/main.c:63
 msgid "Main daemon for GVFS"
-msgstr ""
+msgstr "خادم GVFS الرئيسي"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
 #: ../daemon/main.c:74
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s"
-msgstr "%s على %s"
+msgstr "%s: %s"
 
 #: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:128
 #, c-format
 msgid "Try \"%s --help\" for more information."
-msgstr ""
+msgstr "جرّب ‪\"%s --help\"‬ لمزيد من المعلومات."
 
 #: ../daemon/mount.c:372
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid arguments from spawned child"
-msgstr "غير صحيح من ابن"
+msgstr "معطيات غير سليمة من الابن المُشعّب"
 
 #: ../daemon/mount.c:662
-#, fuzzy, c-format
+#, c-format
 msgid "Automount failed: %s"
-msgstr "فشل الاختبار %d"
+msgstr "فشل الفصْل: %s"
 
 #: ../daemon/mount.c:707
-#, fuzzy
 msgid "The specified location is not mounted"
-msgstr "الموقع المدخل ليس سليماً."
+msgstr "المكان المحدد ليس موصولا"
 
 #: ../daemon/mount.c:712
-#, fuzzy
 msgid "The specified location is not supported"
-msgstr "البروتوكول “%s” غير مدعوم"
+msgstr "الموقع المحدد ليس مدعوما"
 
 #: ../daemon/mount.c:875
-#, fuzzy
 msgid "Location is already mounted"
-msgstr "{0} موجود في القائمة مسبقاً"
+msgstr "المكان موصول من قبْل"
 
 #: ../daemon/mount.c:883
-#, fuzzy
 msgid "Location is not mountable"
-msgstr "ليس %s موقعا سليما."
+msgstr "المكان ليس قابلا للوصْل"
 
 #: ../hal/ghaldrive.c:135
-#, fuzzy
 msgid "CD-ROM"
-msgstr "قرص مدمج"
+msgstr "اسطوانة"
 
 #: ../hal/ghaldrive.c:137
-#, fuzzy
 msgid "CD-R"
-msgstr "CD-R"
+msgstr "قارئ اسطوانات"
 
 #: ../hal/ghaldrive.c:139
-#, fuzzy
 msgid "CD-RW"
-msgstr "CD-RW"
+msgstr "ناسخ اسطوانات"
 
 #: ../hal/ghaldrive.c:143
-#, fuzzy
 msgid "DVD-ROM"
 msgstr "DVD-ROM"
 
 #: ../hal/ghaldrive.c:145
-#, fuzzy
 msgid "DVD+R"
 msgstr "DVD+R"
 
 #: ../hal/ghaldrive.c:147
-#, fuzzy
 msgid "DVD+RW"
 msgstr "DVD+RW"
 
 #: ../hal/ghaldrive.c:149
-#, fuzzy
 msgid "DVD-R"
 msgstr "DVD-R"
 
 #: ../hal/ghaldrive.c:151
-#, fuzzy
 msgid "DVD-RW"
 msgstr "DVD-RW"
 
 #: ../hal/ghaldrive.c:153
-#, fuzzy
 msgid "DVD-RAM"
 msgstr "DVD-RAM"
 
 #: ../hal/ghaldrive.c:156
-#, fuzzy
 msgid "DVD±R"
 msgstr "DVD±R"
 
 #: ../hal/ghaldrive.c:159
-#, fuzzy
 msgid "DVD±RW"
 msgstr "DVD±RW"
 
 #: ../hal/ghaldrive.c:161
 msgid "HDDVD"
-msgstr ""
+msgstr "HDDVD"
 
 #: ../hal/ghaldrive.c:163
-#, fuzzy
 msgid "HDDVD-r"
-msgstr "r"
+msgstr "HDDVD-r"
 
 #: ../hal/ghaldrive.c:165
-#, fuzzy
 msgid "HDDVD-RW"
-msgstr "CD-RW"
+msgstr "HDDVD-RW"
 
 #: ../hal/ghaldrive.c:167
-#, fuzzy
 msgid "Blu-ray"
-msgstr "_لوحة الخَرْج:"
+msgstr "Blu-ray"
 
 #: ../hal/ghaldrive.c:169
-#, fuzzy
 msgid "Blu-ray-R"
-msgstr "_لوحة الخَرْج:"
+msgstr "Blu-ray-R"
 
 #: ../hal/ghaldrive.c:171
-#, fuzzy
 msgid "Blu-ray-RE"
-msgstr "ت_ذكر كلمة المرور"
+msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
 #: ../hal/ghaldrive.c:177
-#, fuzzy, c-format
+#, c-format
 msgid "%s/%s Drive"
-msgstr "%s/%s مشغل"
+msgstr "مشغّل ‪%s/%s‬"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
 #: ../hal/ghaldrive.c:183
-#, fuzzy, c-format
+#, c-format
 msgid "%s Drive"
-msgstr "%s مشغل"
+msgstr "مشغّل %s"
 
 #: ../hal/ghaldrive.c:187
-#, fuzzy
 msgid "Floppy Drive"
 msgstr "مشغل أقراص مرنة"
 
 #: ../hal/ghaldrive.c:193
-#, fuzzy
 msgid "Software RAID Drive"
-msgstr "مُكوّن RAID برامجي"
+msgstr "مُشغّل RAID برمجي"
 
 #: ../hal/ghaldrive.c:195
-#, fuzzy
 msgid "USB Drive"
 msgstr "مشغل USB"
 
 #: ../hal/ghaldrive.c:197
-#, fuzzy
 msgid "ATA Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغّل ATA"
 
 #: ../hal/ghaldrive.c:199
-#, fuzzy
 msgid "SCSI Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغّل SCSI"
 
 #: ../hal/ghaldrive.c:201
-#, fuzzy
 msgid "FireWire Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغّل FireWire"
 
 #: ../hal/ghaldrive.c:205
-#, fuzzy
 msgid "Tape Drive"
-msgstr "قارئ الأشرطة"
+msgstr "قارئ أشرطة"
 
 #: ../hal/ghaldrive.c:207
-#, fuzzy
 msgid "CompactFlash Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغّل فلاش مضغوط"
 
 #: ../hal/ghaldrive.c:209
-#, fuzzy
 msgid "MemoryStick Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغل قلم ذاكرة"
 
 #: ../hal/ghaldrive.c:211
-#, fuzzy
 msgid "SmartMedia Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغّل SmartMedia"
 
 #: ../hal/ghaldrive.c:213
-#, fuzzy
 msgid "SD/MMC Drive"
-msgstr "SD/MMC مشغل"
+msgstr "مشغّل SD/MMC"
 
 #: ../hal/ghaldrive.c:215
-#, fuzzy
 msgid "Zip Drive"
-msgstr "قرص Zip"
+msgstr "مشغّل Zip"
 
 #: ../hal/ghaldrive.c:217
-#, fuzzy
 msgid "Jaz Drive"
-msgstr "مشغل جاز"
+msgstr "مشغل Jaz"
 
 #: ../hal/ghaldrive.c:219
-#, fuzzy
 msgid "Thumb Drive"
-msgstr "السواقة مفتوحة"
+msgstr "مشغل قلم"
 
 #: ../hal/ghaldrive.c:222
-#, fuzzy
 msgid "Mass Storage Drive"
-msgstr "المشغل مشغول"
+msgstr "مشغل تخزين عام"
 
 #: ../hal/ghaldrive.c:634
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "فشل إلى وسائط يعمل وسائط."
+msgstr "فشل إخراج الوسيط، واحد أو أكثر من الأجزاء على الوسيط مشغول."
 
 #: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
-#, fuzzy
 msgid "CD-ROM Disc"
-msgstr "CD-ROM قرص"
+msgstr "اسطوانة"
 
 #: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
-#, fuzzy
 msgid "Blank CD-ROM Disc"
-msgstr "فارغ CD-RW قرص"
+msgstr "اسطوانة فارغة"
 
 #: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
-#, fuzzy
 msgid "CD-R Disc"
-msgstr "CD-R قرص"
+msgstr "اسطوانة قراءة"
 
 #: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
-#, fuzzy
 msgid "Blank CD-R Disc"
-msgstr "فارغ CD-R قرص"
+msgstr "اسطوانة قراءة فارغة"
 
 #: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
-#, fuzzy
 msgid "CD-RW Disc"
-msgstr "CD-RW قرص"
+msgstr "اسطوانة إعادة كتابة"
 
 #: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
-#, fuzzy
 msgid "Blank CD-RW Disc"
-msgstr "فارغ CD-RW قرص"
+msgstr "اسطوانة إعادة كتابة فارغة"
 
 #: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
 #: ../hal/ghalvolume.c:143
-#, fuzzy
 msgid "DVD-ROM Disc"
-msgstr "DVD-ROM قرص"
+msgstr "قرص DVD-ROM"
 
 #: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
 #: ../hal/ghalvolume.c:143
-#, fuzzy
 msgid "Blank DVD-ROM Disc"
-msgstr "فارغ DVD-RAM قرص"
+msgstr "قرص DVD-RAM فارغ"
 
 #: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
-#, fuzzy
 msgid "DVD-RAM Disc"
-msgstr "DVD-RAM قرص"
+msgstr "قرص DVD-RAM"
 
 #: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
-#, fuzzy
 msgid "Blank DVD-RAM Disc"
-msgstr "فارغ DVD-RAM قرص"
+msgstr "قرص DVD-RAM فارغ"
 
 #: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
-#, fuzzy
 msgid "DVD-RW Disc"
-msgstr "DVD-RW قرص"
+msgstr "قرص DVD-RW"
 
 #: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
-#, fuzzy
 msgid "Blank DVD-RW Disc"
-msgstr "فارغ DVD-RW قرص"
+msgstr "قرص DVD-RW فارغ"
 
 #: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
-#, fuzzy
 msgid "DVD+R Disc"
-msgstr "DVD+R قرص"
+msgstr "قرص DVD+R"
 
 #: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
-#, fuzzy
 msgid "Blank DVD+R Disc"
-msgstr "فارغ DVD+R قرص"
+msgstr "قرص DVD+R فارغ"
 
 #: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
-#, fuzzy
 msgid "DVD+RW Disc"
-msgstr "DVD+RW قرص"
+msgstr "قرص DVD+RW فارغ"
 
 #: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
-#, fuzzy
 msgid "Blank DVD+RW Disc"
-msgstr "فارغ DVD+RW قرص"
+msgstr "قرص DVD+RW فارغ"
 
 #: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
-#, fuzzy
 msgid "DVD+R DL Disc"
-msgstr "DVD-ROM قرص"
+msgstr "قرص DVD-ROM"
 
 #: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
-#, fuzzy
 msgid "Blank DVD+R DL Disc"
-msgstr "فارغ DVD-RAM قرص"
+msgstr "قرص DVD-RAM فارغ"
 
 #: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
-#, fuzzy
 msgid "Blu-Ray Disc"
-msgstr "افتح قرص صوتي %s"
+msgstr "قرص Blu-Ray"
 
 #: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
-#, fuzzy
 msgid "Blank Blu-Ray Disc"
-msgstr "تم إدراج قرص فارغ."
+msgstr "قرص Blu-Ray فارغ"
 
 #: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
-#, fuzzy
 msgid "Blu-Ray R Disc"
-msgstr "افتح قرص صوتي %s"
+msgstr "قرص Blu-Ray R"
 
 #: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
-#, fuzzy
 msgid "Blank Blu-Ray R Disc"
-msgstr "تم إدراج قرص فارغ."
+msgstr "قرص Blu-Ray R فارغ"
 
 #: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
-#, fuzzy
 msgid "Blu-Ray RW Disc"
-msgstr "فارغ CD-RW قرص"
+msgstr "قرص Blu-Ray RW"
 
 #: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
-#, fuzzy
 msgid "Blank Blu-Ray RW Disc"
-msgstr "فارغ"
+msgstr "قرص Blu-Ray RW فارغ"
 
 #: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
-#, fuzzy
 msgid "HD DVD Disc"
-msgstr "DVD-ROM قرص"
+msgstr "قرص HD DVD"
 
 #: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
-#, fuzzy
 msgid "Blank HD DVD Disc"
-msgstr "فارغ DVD-RAM قرص"
+msgstr "قرص HD DVD فارغ"
 
 #: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
-#, fuzzy
 msgid "HD DVD-R Disc"
-msgstr "DVD-ROM قرص"
+msgstr "قرص HD DVD-R"
 
 #: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
-#, fuzzy
 msgid "Blank HD DVD-R Disc"
-msgstr "فارغ DVD-RAM قرص"
+msgstr "قرص HD DVD-R فارغ"
 
 #: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
-#, fuzzy
 msgid "HD DVD-RW Disc"
-msgstr "فارغ DVD-RW قرص"
+msgstr "قرص HD DVD-RW"
 
 #: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
-#, fuzzy
 msgid "Blank HD DVD-RW Disc"
 msgstr "قرص HD DVD-RW فارغ"
 
 #: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
-#, fuzzy
 msgid "MO Disc"
-msgstr "هوية القرص"
+msgstr "قرص MO"
 
 #: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
-#, fuzzy
 msgid "Blank MO Disc"
-msgstr "أدرج قرص فارغ"
+msgstr "قرص MO فارغ"
 
 #: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
-#, fuzzy
 msgid "Disc"
-msgstr "القرص"
+msgstr "قرص"
 
 #: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
-#, fuzzy
 msgid "Blank Disc"
-msgstr "أدرج قرص فارغ"
+msgstr "قرص فارغ"
 
 #: ../hal/ghalmount.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f kB Media"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "وسيط %I.1f ك.بايت"
 
 #: ../hal/ghalmount.c:204
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f MB Media"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "وسيط %I.1f م.بايت"
 
 #: ../hal/ghalmount.c:209
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f GB Media"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "وسيط %I.1f ج.بايت"
 
 #: ../hal/ghalmount.c:291 ../hal/ghalvolume.c:260
-#, fuzzy
 msgid "Mixed Audio/Data Disc"
 msgstr "قرص صوت و بيانات مختلط"
 
 #: ../hal/ghalvolume.c:189
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f kB"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "%I.1f ك.بايت"
 
 #: ../hal/ghalvolume.c:194
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f MB"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "%I.1f م.بايت"
 
 #: ../hal/ghalvolume.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f GB"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "%I.1f ج.بايت"
 
 #: ../hal/ghalvolume.c:248
 #, c-format
 msgid "%s Encrypted Data"
-msgstr ""
+msgstr "%s بيانات معمّاة"
 
 #: ../hal/ghalvolume.c:270
-#, fuzzy, c-format
+#, c-format
 msgid "%s Media"
-msgstr "وصلة مستقلة عن الوسيط"
+msgstr "%s وسائط"
 
 #: ../hal/ghalvolume.c:312
 msgid "Camera"
-msgstr ""
+msgstr "آلة تصوير"
 
 #: ../hal/ghalvolume.c:319
 #, c-format
 msgid "%s Camera"
-msgstr ""
+msgstr "%s آلة تصوير"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:59
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s: error opening file: %s\n"
-msgstr "خطأ أثناء فتح الملف %s"
+msgstr "‏%s: %s: خطأ في فتح الملف: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
 #: ../programs/gvfs-cat.c:82
 #, c-format
 msgid "%s: %s, error writing to stdout"
-msgstr ""
+msgstr "‏%s: %s، خطأ في الكتابة إلى الخرج اقياسي"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:94
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s: error reading: %s\n"
-msgstr "حدث خطأ أثناء إرسال الدردشة."
+msgstr "‏%s: %s، خطأ في قراءة: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:112
 #, c-format
 msgid "%s: %s:error closing: %s\n"
-msgstr ""
+msgstr "‏%s: %s: خطأ في غلق: %s\n"
 
 #: ../programs/gvfs-cat.c:138
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr ""
+msgstr "أماكن... - جمّع الأماكن إلى الخرج القياسي"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1249,37 +1125,41 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
+"جمّع الملفات في الأماكن واطبعهم إلى الخرج القياسي. يعمل كأدات cat التقليدية، "
+"لكن باستخدام أماكن gvfs بدلا من الملفات المحلية. مثلا يمكنك استخدام شيء مثل "
+"smb://server/resource/file.txt كمكان لتجميعه."
 
 #: ../programs/gvfs-cat.c:150
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
+"ملاحظة: مرر إلى cat إذا كانت تريد خياراته التنسيقية مثل ‪-n‬، ‪-T‬، أو غيرها."
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
 #: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:126
 #, c-format
 msgid "%s: missing locations"
-msgstr ""
+msgstr "‏%s: لا أماكن"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-open.c:64
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s: error opening location: %s\n"
-msgstr "خطأ أثناء فتح الملف %s"
+msgstr "‏%s: %s: خطأ أثناء فتح المكان: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-open.c:77
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s: error launching application: %s\n"
-msgstr "خطأ أثناء فتح الملف %s"
+msgstr "‏%s: %s: خطأ أثناء بدأ التطبيق: %s\n"
 
 #: ../programs/gvfs-open.c:108
 msgid "FILES... - open FILES with registered application."
-msgstr ""
+msgstr "ملف... - افتح الملفات بالبرنامج المسجل"
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1287,48 +1167,4 @@ msgstr ""
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
-msgstr ""
-
-#, fuzzy
-#~ msgid "Error connecting dbus: %s\n"
-#~ msgstr "خطأ بالاتّصال بشبكة ردهات..."
-
-#, fuzzy
-#~ msgid "Containing mount does not exist"
-#~ msgstr "دفتر العناوين غير موجود"
-
-#, fuzzy
-#~ msgid "Can't enumerate non-directory"
-#~ msgstr "لايمكن الكتابة إلى الدليل الهدف"
-
-#, fuzzy
-#~ msgid "Can't find mount for mounted volume"
-#~ msgstr "t ابحث for شدة الصوت"
-
-#, fuzzy
-#~ msgid "Failed to allocate smb context"
-#~ msgstr ""
-#~ "فشل إعراب سياق alchemist: \n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Failed to initialize smb context"
-#~ msgstr ""
-#~ "فشل إعراب سياق alchemist: \n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid "Failed to accept client: %s"
-#~ msgstr "فشل تشغيل عميل gconf."
-
-#, fuzzy
-#~ msgid "accept of extra fd failed"
-#~ msgstr "من"
-
-#, fuzzy
-#~ msgid "object registration failed"
-#~ msgstr "فشل تسجيل %s إلى %s"
-
-#, fuzzy
-#~ msgid "Failed to demarshal message"
-#~ msgstr "فشل جلب الرّسالة"
+msgstr "افتح ملف(ات) بالبرنامج المبدئي المسجل لمعالجة هذا النوع من الملفات."
