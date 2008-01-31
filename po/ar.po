@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD.ar\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-27 15:58+0000\n"
+"POT-Creation-Date: 2008-01-31 08:09+0000\n"
 "PO-Revision-Date: 2008-01-26 20:29+0200\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
@@ -165,22 +165,37 @@ msgstr "نمط الملف غير صحيح."
 msgid "Invalid attribute info list content"
 msgstr "غير صحيح وصف قائمة"
 
-#: ../daemon/daemon-main.c:56
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
 #, fuzzy, c-format
-msgid "Error connecting to D-Bus: %s\n"
+msgid "Error connecting to D-Bus: %s"
 msgstr "خطأ بالاتّصال بشبكة ردهات..."
 
-#: ../daemon/daemon-main.c:177
+#: ../daemon/daemon-main.c:82
 #, fuzzy, c-format
-msgid "Error connecting dbus: %s\n"
-msgstr "خطأ بالاتّصال بشبكة ردهات..."
+msgid "Error: %s"
+msgstr "حدث خطأ أثناء إرسال الدردشة."
 
-#: ../daemon/daemon-main.c:211
+#: ../daemon/daemon-main.c:115
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr ""
+
+#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr ""
+
+#: ../daemon/daemon-main.c:155
+#, fuzzy, c-format
+msgid "No mount type specified"
+msgstr "لم يحدّد عنوان"
+
+#: ../daemon/daemon-main.c:225
 #, fuzzy, c-format
 msgid "mountpoint for %s already running"
 msgstr "GDM يعمل بالفعل. إلغاء!"
 
-#: ../daemon/daemon-main.c:222
+#: ../daemon/daemon-main.c:236
 #, fuzzy
 msgid "error starting mount daemon"
 msgstr ""
@@ -466,7 +481,7 @@ msgstr "التاريخ الذي فيه عدل الملف."
 msgid "Backup file creation failed"
 msgstr "فشل إنشاء الملف المؤقّت."
 
-#: ../daemon/gvfsbackendlocaltest.c:788
+#: ../daemon/gvfsbackendlocaltest.c:853
 #, fuzzy
 msgid "Directory notification not supported"
 msgstr "المهملات دليل ليس"
@@ -729,19 +744,35 @@ msgstr "لا يدعم هذا الخادم STLS"
 msgid "Invalid dbus message"
 msgstr "نقطة تجهيز غير صالحة"
 
-#: ../daemon/main.c:44
+#: ../daemon/main.c:47
 #, fuzzy
 msgid "Replace old daemon."
 msgstr "ابدأ خادم بيجل"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:48
 msgid "Don't start fuse."
 msgstr ""
 
-#: ../daemon/main.c:51
+#: ../daemon/main.c:60
 #, fuzzy
 msgid "GVFS Daemon"
 msgstr "NO-DAEMON"
+
+#: ../daemon/main.c:63
+msgid "Main daemon for GVFS"
+msgstr ""
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:74
+#, fuzzy, c-format
+msgid "%s: %s"
+msgstr "%s على %s"
+
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:128
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr ""
 
 #: ../daemon/mount.c:372
 #, fuzzy, c-format
@@ -1205,13 +1236,13 @@ msgstr "حدث خطأ أثناء إرسال الدردشة."
 msgid "%s: %s:error closing: %s\n"
 msgstr ""
 
-#: ../programs/gvfs-cat.c:137
+#: ../programs/gvfs-cat.c:138
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
 msgstr ""
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:142
+#: ../programs/gvfs-cat.c:143
 msgid ""
 "Concatenate files at locations and print to the standard output. Works just "
 "like the traditional cat utility, but using gvfs location instead local "
@@ -1219,7 +1250,7 @@ msgid ""
 "as location to concatenate."
 msgstr ""
 
-#: ../programs/gvfs-cat.c:149
+#: ../programs/gvfs-cat.c:150
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
@@ -1227,15 +1258,40 @@ msgstr ""
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:164
+#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:126
 #, c-format
 msgid "%s: missing locations"
 msgstr ""
 
-#: ../programs/gvfs-cat.c:166
-#, c-format
-msgid "Try \"%s --help\" for more information."
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:64
+#, fuzzy, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "خطأ أثناء فتح الملف %s"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:77
+#, fuzzy, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "خطأ أثناء فتح الملف %s"
+
+#: ../programs/gvfs-open.c:108
+msgid "FILES... - open FILES with registered application."
 msgstr ""
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:112
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
+
+#, fuzzy
+#~ msgid "Error connecting dbus: %s\n"
+#~ msgstr "خطأ بالاتّصال بشبكة ردهات..."
 
 #, fuzzy
 #~ msgid "Containing mount does not exist"
