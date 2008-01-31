@@ -465,3 +465,63 @@ g_mount_spec_to_string (GMountSpec *spec)
 
   return g_string_free (str, FALSE);
 }
+
+char *
+g_mount_spec_canonicalize_path (const char *path)
+{
+  char *canon, *start, *p, *q;
+
+  if (*path != '/')
+    canon = g_strconcat ("/", path, NULL);
+  else
+    canon = g_strdup (path);
+
+  /* Skip initial slash */
+  start = canon + 1;
+
+  p = start;
+  while (*p != 0)
+    {
+      if (p[0] == '.' && (p[1] == 0 || p[1] == '/'))
+	{
+	  memmove (p, p+1, strlen (p+1)+1);
+	}
+      else if (p[0] == '.' && p[1] == '.' && (p[2] == 0 || p[2] == '/'))
+	{
+	  q = p + 2;
+	  /* Skip previous separator */
+	  p = p - 2;
+	  if (p < start)
+	    p = start;
+	  while (p > start && *p != '/')
+	    p--;
+	  if (*p == '/')
+	    p++;
+	  memmove (p, q, strlen (q)+1);
+	}
+      else
+	{
+	  /* Skip until next separator */
+	  while (*p != 0 && *p != '/')
+	    p++;
+
+	  /* Keep one separator */
+	  if (*p != 0)
+	    p++;
+	}
+
+      /* Remove additional separators */
+      q = p;
+      while (*q && *q == '/')
+	q++;
+
+      if (p != q)
+	memmove (p, q, strlen (q)+1);
+    }
+
+  /* Remove trailing slashes */
+  if (p > start && *(p-1) == '/')
+    *(p-1) = 0;
+  
+  return canon;
+}

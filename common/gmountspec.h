@@ -95,6 +95,8 @@ const char *g_mount_spec_get_type          (GMountSpec      *spec);
 /* For debugging */
 char *      g_mount_spec_to_string         (GMountSpec      *spec);
 
+char *      g_mount_spec_canonicalize_path (const char      *path);
+
 G_END_DECLS
 
 
