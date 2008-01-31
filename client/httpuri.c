@@ -67,17 +67,28 @@ http_get_handled_schemes (GVfsUriMapper *mapper)
 
 static GVfsUriMountInfo *
 http_from_uri (GVfsUriMapper *mapper,
-	      const char     *uri_str)
+	       const char     *uri_str)
 {
   GVfsUriMountInfo *info;
   char *path;
   gboolean ssl;
 
+  path = NULL;
   if (!g_ascii_strncasecmp (uri_str, "http", 4))
     {
+      GDecodedUri *uri;
+
+      uri = g_vfs_decode_uri (uri_str);
+
       info = g_vfs_uri_mount_info_new ("http");
       g_vfs_uri_mount_info_set (info, "uri", uri_str);
-      path = g_strdup ("/");
+      
+      if (uri)
+	{
+	  path = uri->path;
+	  uri->path = NULL;
+	  g_vfs_decoded_uri_free (uri);
+	}
     }
   else
     {
@@ -114,6 +125,60 @@ http_from_uri (GVfsUriMapper *mapper,
 
   info->path = path;
   return info;
+}
+
+static GVfsUriMountInfo *
+http_get_mount_info_for_path (GVfsUriMapper *mapper,
+			      GVfsUriMountInfo *info,
+			      const char *new_path)
+{
+  const char *type;
+
+  type = g_vfs_uri_mount_info_get (info, "type");
+
+  if (strcmp (type, "http") == 0)
+    {
+      const char *uri_str;
+      char *new_uri;
+      GDecodedUri *uri;
+      GVfsUriMountInfo *new_info;
+
+      uri_str = g_vfs_uri_mount_info_get (info, "uri");
+
+      uri = g_vfs_decode_uri (uri_str);
+
+      if (uri == NULL)
+	return NULL;
+
+      if (strcmp (uri->path, new_path) == 0)
+	{
+	  g_vfs_decoded_uri_free (uri);
+	  return NULL;
+	}
+
+      g_free (uri->path);
+      uri->path = g_strdup (new_path);
+
+      g_free (uri->query);
+      uri->query = NULL;
+
+      g_free (uri->fragment);
+      uri->fragment = NULL;
+
+      new_info = g_vfs_uri_mount_info_new ("http");
+
+      new_uri = g_vfs_encode_uri (uri, TRUE);
+      g_vfs_uri_mount_info_set (new_info, "uri", new_uri);
+      g_free (new_uri);
+
+      uri->path = NULL;
+
+      g_vfs_decoded_uri_free (uri);
+
+      return new_info;
+    }
+  else
+    return NULL;
 }
 
 static const char * const *
@@ -228,6 +293,7 @@ g_vfs_uri_mapper_http_class_init (GVfsUriMapperHttpClass *class)
   mapper_class = G_VFS_URI_MAPPER_CLASS (class);
   mapper_class->get_handled_schemes     = http_get_handled_schemes;
   mapper_class->from_uri                = http_from_uri;
+  mapper_class->get_mount_info_for_path = http_get_mount_info_for_path;
   mapper_class->get_handled_mount_types = http_get_handled_mount_types;
   mapper_class->to_uri                  = http_to_uri;
   mapper_class->to_uri_scheme           = http_to_uri_scheme;

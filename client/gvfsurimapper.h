@@ -42,6 +42,7 @@ struct _GVfsUriMapper {
   GObject parent;
 };
 
+/* Keep in sync with GMountSpecItem */
 typedef struct {
   char *key;
   char *value;
@@ -61,7 +62,10 @@ struct _GVfsUriMapperClass
   const char * const * (*get_handled_schemes)     (GVfsUriMapper *mapper);
   GVfsUriMountInfo *   (*from_uri)                (GVfsUriMapper *mapper,
 					           const char *uri);
-  
+  GVfsUriMountInfo *   (*get_mount_info_for_path) (GVfsUriMapper *mapper,
+						   GVfsUriMountInfo *mount_info,
+					           const char *new_path);
+
   const char * const * (*get_handled_mount_types) (GVfsUriMapper *mapper);
   char *               (*to_uri)                  (GVfsUriMapper *mapper,
 					           GVfsUriMountInfo *mount_info,
@@ -88,6 +92,9 @@ void              g_vfs_uri_mount_info_set_with_len (GVfsUriMountInfo *info,
 const char * const *g_vfs_uri_mapper_get_handled_schemes     (GVfsUriMapper    *mapper);
 GVfsUriMountInfo *  g_vfs_uri_mapper_from_uri                (GVfsUriMapper    *mapper,
 							      const char       *uri);
+GVfsUriMountInfo *  g_vfs_uri_mapper_get_mount_info_for_path (GVfsUriMapper    *mapper,
+							      GVfsUriMountInfo *mount_info,
+							      const char       *new_path);
 
 const char * const *g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper    *mapper);
 char *              g_vfs_uri_mapper_to_uri                  (GVfsUriMapper    *mapper,

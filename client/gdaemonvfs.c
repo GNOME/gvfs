@@ -122,7 +122,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	{
 	  spec = g_mount_spec_new_from_data (info->keys, NULL);
 	  path = info->path;
-	  /* We took over ownership, custom free: */
+	  /* We took over ownership of info parts, custom free: */
 	  g_free (info);
 	}
     }
@@ -280,6 +280,43 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
 
   /* Dummy file */
   return g_vfs_get_file_for_uri (G_DAEMON_VFS (vfs)->wrapped_vfs, uri);
+}
+
+GMountSpec *
+_g_daemon_vfs_get_mount_spec_for_path (GMountSpec *spec,
+				       const char *path,
+				       const char *new_path)
+{
+  const char *type;
+  GVfsUriMapper *mapper;
+  GMountSpec *new_spec;
+
+  type = g_mount_spec_get_type (spec);
+
+  if (type == NULL)
+    return g_mount_spec_ref (spec);
+  
+  new_spec = NULL;
+  mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
+  if (mapper)
+    {
+      GVfsUriMountInfo info, *new_info;
+      info.keys = spec->items;
+      info.path = (char *)path;
+      new_info = g_vfs_uri_mapper_get_mount_info_for_path (mapper, &info, new_path);
+      if (new_info != NULL)
+	{
+	  new_spec = g_mount_spec_new_from_data (new_info->keys, NULL);
+	  /* We took over ownership of parts of new_info, custom free: */
+	  g_free (new_info->path);
+	  g_free (new_info);
+	}
+    }
+
+  if (new_spec == NULL)
+    new_spec = g_mount_spec_ref (spec);
+
+  return new_spec;
 }
 
 char *

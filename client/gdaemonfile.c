@@ -88,66 +88,6 @@ g_daemon_file_init (GDaemonFile *daemon_file)
 {
 }
 
-static char *
-canonicalize_path (const char *path)
-{
-  char *canon, *start, *p, *q;
-
-  if (*path != '/')
-    canon = g_strconcat ("/", path, NULL);
-  else
-    canon = g_strdup (path);
-
-  /* Skip initial slash */
-  start = canon + 1;
-
-  p = start;
-  while (*p != 0)
-    {
-      if (p[0] == '.' && (p[1] == 0 || p[1] == '/'))
-	{
-	  memmove (p, p+1, strlen (p+1)+1);
-	}
-      else if (p[0] == '.' && p[1] == '.' && (p[2] == 0 || p[2] == '/'))
-	{
-	  q = p + 2;
-	  /* Skip previous separator */
-	  p = p - 2;
-	  if (p < start)
-	    p = start;
-	  while (p > start && *p != '/')
-	    p--;
-	  if (*p == '/')
-	    p++;
-	  memmove (p, q, strlen (q)+1);
-	}
-      else
-	{
-	  /* Skip until next separator */
-	  while (*p != 0 && *p != '/')
-	    p++;
-
-	  /* Keep one separator */
-	  if (*p != 0)
-	    p++;
-	}
-
-      /* Remove additional separators */
-      q = p;
-      while (*q && *q == '/')
-	q++;
-
-      if (p != q)
-	memmove (p, q, strlen (q)+1);
-    }
-
-  /* Remove trailing slashes */
-  if (p > start && *(p-1) == '/')
-    *(p-1) = 0;
-  
-  return canon;
-}
-
 GFile *
 g_daemon_file_new (GMountSpec *mount_spec,
 		   const char *path)
@@ -156,7 +96,7 @@ g_daemon_file_new (GMountSpec *mount_spec,
 
   daemon_file = g_object_new (G_TYPE_DAEMON_FILE, NULL);
   daemon_file->mount_spec = g_mount_spec_get_unique_for (mount_spec);
-  daemon_file->path = canonicalize_path (path);
+  daemon_file->path = g_mount_spec_canonicalize_path (path);
  
   return G_FILE (daemon_file);
 }
@@ -262,11 +202,28 @@ g_daemon_file_get_parse_name (GFile *file)
 }
 
 static GFile *
+new_file_for_new_path (GDaemonFile *daemon_file,
+		       const char *new_path)
+{
+  GFile *new_file;
+  GMountSpec *new_spec;
+
+  new_spec = _g_daemon_vfs_get_mount_spec_for_path (daemon_file->mount_spec,
+						    daemon_file->path,
+						    new_path);
+
+  new_file = g_daemon_file_new (new_spec, new_path);
+  g_mount_spec_unref (new_spec);
+
+  return new_file;
+}
+
+static GFile *
 g_daemon_file_get_parent (GFile *file)
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   const char *path;
-  GDaemonFile *parent;
+  GFile *parent;
   const char *base;
   char *parent_path;
   gsize len;    
@@ -286,11 +243,10 @@ g_daemon_file_get_parent (GFile *file)
   g_memmove (parent_path, path, len);
   parent_path[len] = 0;
 
-  parent = g_object_new (G_TYPE_DAEMON_FILE, NULL);
-  parent->mount_spec = g_mount_spec_ref (daemon_file->mount_spec);
-  parent->path = parent_path;
+  parent = new_file_for_new_path (daemon_file, parent_path);
+  g_free (parent_path);
   
-  return G_FILE (parent);
+  return parent;
 }
 
 static GFile *
@@ -387,10 +343,10 @@ g_daemon_file_resolve_relative_path (GFile *file,
   GFile *child;
 
   if (*relative_path == '/')
-    return g_daemon_file_new (daemon_file->mount_spec, relative_path);
-  
+    return new_file_for_new_path (daemon_file, relative_path);
+
   path = g_build_path ("/", daemon_file->path, relative_path, NULL);
-  child = g_daemon_file_new (daemon_file->mount_spec, path);
+  child = new_file_for_new_path (daemon_file, path);
   g_free (path);
   
   return child;
@@ -1642,7 +1598,7 @@ g_daemon_file_set_display_name (GFile *file,
       goto out;
     }
 
-  file = g_daemon_file_new (daemon_file->mount_spec, new_path);
+  file = new_file_for_new_path (daemon_file, new_path);
   g_free (new_path);
 
  out:

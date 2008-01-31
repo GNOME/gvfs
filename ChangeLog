@@ -1,5 +1,28 @@
 2008-01-31  Alexander Larsson  <alexl@redhat.com>
 
+	Implement uri navigation for http uris (#509341)
+	
+        * client/gvfsurimapper.[ch]:
+        Add get_mount_info_for_path method for mount types
+	like ssh that change MountInfo as the path changes.
+	
+        * client/httpuri.c:
+	Implement get_mount_info_for_path.
+	For http, set the path from the uri.
+	The will be removed on i/o by the corresponding
+	path being in the mount_prefix.
+	
+        * daemon/gvfsbackendhttp.c:
+	Set mount_prefix to path from uri.
+	Remove unused code in message_new_from_filename
+
+        * client/gdaemonfile.c:
+        * client/gdaemonvfs.[ch]:
+	Use the new uri mapper function to change GMountInfo
+	as the path changes.
+	
+2008-01-31  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountspec.[ch]:
         Add shared path canonicalization:
 	g_mount_spec_canonicalize_path()

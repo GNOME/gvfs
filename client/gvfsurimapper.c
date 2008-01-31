@@ -170,6 +170,21 @@ g_vfs_uri_mapper_from_uri (GVfsUriMapper  *mapper,
   return (* class->from_uri) (mapper, uri);
 }
 
+GVfsUriMountInfo *
+g_vfs_uri_mapper_get_mount_info_for_path (GVfsUriMapper    *mapper,
+					  GVfsUriMountInfo *info,
+					  const char       *new_path)
+{
+  GVfsUriMapperClass *class;
+
+  class = G_VFS_URI_MAPPER_GET_CLASS (mapper);
+
+  if (class->get_mount_info_for_path != NULL)
+    return (* class->get_mount_info_for_path) (mapper, info, new_path);
+  else
+    return NULL;
+}
+
 const char * const *
 g_vfs_uri_mapper_get_handled_mount_types (GVfsUriMapper  *mapper)
 {

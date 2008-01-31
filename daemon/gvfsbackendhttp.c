@@ -35,7 +35,6 @@
 #include <gio/gio.h>
 
 #include <libsoup/soup.h>
-
 #include "gvfsbackendhttp.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
@@ -355,24 +354,10 @@ message_new_from_filename (GVfsBackend *backend,
   SoupURI         *uri;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  uri = soup_uri_copy (op_backend->mount_base);
 
   uri = g_vfs_backend_uri_for_filename (backend, filename);
   msg = message_new_from_uri (method, uri);
 
-  /* "/" means "whatever mount_base is" */
-  if (strcmp (filename, "/"))
-    {
-      char *path;
-      /* Otherwise, we append filename to mount_base (which is assumed to
-       * be a directory in this case).
-       */
-
-      path = g_build_path ("/", uri->path, filename, NULL);
-      soup_uri_set_path (uri, path);
-      g_free (path);
-    }
-  
   soup_uri_free (uri);
   return msg;
 }
@@ -389,6 +374,7 @@ try_mount (GVfsBackend  *backend,
 {
   GVfsBackendHttp *op_backend;
   const char      *uri_str;
+  char            *path;
   SoupURI         *uri;
   GMountSpec      *real_mount_spec;
 
@@ -412,6 +398,15 @@ try_mount (GVfsBackend  *backend,
 
   real_mount_spec = g_mount_spec_new ("http");
   g_mount_spec_set (real_mount_spec, "uri", uri_str);
+
+  if (uri->path != NULL)
+    {
+      path = g_uri_unescape_string (uri->path, "/");
+      g_free (real_mount_spec->mount_prefix);
+      real_mount_spec->mount_prefix = g_mount_spec_canonicalize_path (path);
+      g_free (path);
+    }
+  
   g_vfs_backend_set_mount_spec (backend, real_mount_spec);
   
   op_backend->mount_base = uri;
@@ -439,7 +434,6 @@ open_for_read_ready (GObject      *source_object,
   res = soup_input_stream_send_finish (stream,
                                        result,
                                        &error);
-
   if (res == FALSE)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
