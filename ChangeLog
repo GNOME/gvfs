@@ -1,3 +1,8 @@
+2008-01-31  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/soup-input-stream.c:
+	Handle errors in send_finish.
+
 2008-01-30  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendlocaltest.c:
