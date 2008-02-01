@@ -48,11 +48,12 @@ get_default_appinfo_for_file (GFile *file,
 }
 
 static void
-open (GFile *file)
+open (GFile *file, char *arg_string)
 {
   GAppInfo *app;
   GError *error;
-  GList *l;
+  GList l = {NULL};
+  gboolean res;
 
   error = NULL;
   app = g_file_query_default_handler (file, NULL, &error);
@@ -67,19 +68,32 @@ open (GFile *file)
       return;
     }
 
-  l = g_list_prepend (NULL, file);
+  if (g_file_is_native (file))
+    {
+      /* For normal files, pass in the canonicalized GFile as path */
+      l.data = file;
+      res = g_app_info_launch (app, &l,
+			       NULL, &error);
+    }
+  else
+    {
+      /* However, for uris, use the original string, as it might be
+	 modified by passing throught GFile (e.g. mailto: links)
+      */
+      l.data = arg_string;
+      res = g_app_info_launch_uris (app, &l,
+				    NULL, &error);
+    }
   
-  if (!g_app_info_launch (app, l,
-			  NULL, &error))
+  if (!res)
     {
       /* Translators: the first %s is the program name, the second one  */
       /* is the URI of the file, the third is the error message.        */
       g_printerr (_("%s: %s: error launching application: %s\n"),
-                  g_get_prgname (), g_file_get_uri (file), error->message);
-      g_error_free (error);
+		  g_get_prgname (), g_file_get_uri (file), error->message);
+	  g_error_free (error);
     }
-
-  g_list_free (l);
+  
   g_object_unref (app);
 
   return;
@@ -136,7 +150,7 @@ main (int argc, char *argv[])
   do
     {
       file = g_file_new_for_commandline_arg (locations[i]);
-      open (file);
+      open (file, locations[i]);
       g_object_unref (file);
     }
   while (locations[++i] != NULL);

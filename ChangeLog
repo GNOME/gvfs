@@ -1,3 +1,9 @@
+2008-02-01  Alexander Larsson  <alexl@redhat.com>
+
+        * programs/gvfs-open.c:
+	Pass on uris unmodified to avoid roundtripping
+	through GFile which can be destructive.
+
 2008-01-31  Alexander Larsson  <alexl@redhat.com>
 
 	Implement uri navigation for http uris (#509341)
