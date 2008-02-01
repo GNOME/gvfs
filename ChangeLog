@@ -1,5 +1,11 @@
 2008-02-01  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsreadchannel.c:
+	Request larger buffers than the client requested
+	so for better network efficiency. (#512472)
+
+2008-02-01  Alexander Larsson  <alexl@redhat.com>
+
         * programs/gvfs-open.c:
 	Pass on uris unmodified to avoid roundtripping
 	through GFile which can be destructive.

@@ -44,6 +44,7 @@ struct _GVfsReadChannel
 {
   GVfsChannel parent_instance;
 
+  guint read_count;
   int seek_generation;
 };
 
@@ -94,6 +95,32 @@ read_channel_close (GVfsChannel *channel)
 				   g_vfs_channel_get_backend (channel));
 } 
 
+/* Always request large chunks. Its very inefficient
+   to do network requests for smaller chunks. */
+static guint32
+modify_read_size (GVfsReadChannel *channel,
+		  guint32 requested_size)
+{
+  guint32 real_size;
+  
+  if (channel->read_count <= 1)
+    real_size = 16*1024;
+  else if (channel->read_count <= 2)
+    real_size = 32*1024;
+  else
+    real_size = 64*1024;
+  
+  if (requested_size > real_size)
+    real_size = requested_size;
+
+  /* Don't do ridicoulously large requests as this
+     is just stupid on the network */
+  if (real_size > 512 * 1024)
+    real_size = 512 * 1024;
+
+  return real_size;
+}
+
 static GVfsJob *
 read_channel_handle_request (GVfsChannel *channel,
 			     guint32 command,
@@ -118,9 +145,10 @@ read_channel_handle_request (GVfsChannel *channel,
   switch (command)
     {
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_READ:
+      read_channel->read_count++;
       job = g_vfs_job_read_new (read_channel,
 				backend_handle,
-				arg1,
+				modify_read_size (read_channel, arg1),
 				backend);
       break;
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CLOSE:
@@ -137,6 +165,7 @@ read_channel_handle_request (GVfsChannel *channel,
       else if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR)
 	seek_type = G_SEEK_CUR;
       
+      read_channel->read_count = 0;
       read_channel->seek_generation++;
       job = g_vfs_job_seek_read_new (read_channel,
 				     backend_handle,
