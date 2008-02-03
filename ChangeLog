@@ -1,3 +1,9 @@
+2008-02-03  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackendhttp.c:
+	Move write logic (replace, create) to the dav backend.
+
 2008-02-01  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsreadchannel.c:

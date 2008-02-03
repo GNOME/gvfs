@@ -58,7 +58,7 @@
 #include "gvfsdaemonprotocol.h"
 
 #include "soup-input-stream.h"
-
+#include "soup-output-stream.h"
 
 struct _GVfsBackendDav
 {
@@ -531,7 +531,7 @@ ask_password_ready (GObject      *source_object,
 static void
 soup_authenticate (SoupSession *session,
                    SoupMessage *msg,
-	           SoupAuth    *auth,
+                   SoupAuth    *auth,
                    gboolean     retrying,
                    gpointer     user_data)
 {
@@ -837,12 +837,12 @@ try_query_info (GVfsBackend           *backend,
 
   /* RFC 4437 */
   if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-      redirect_header = "F";
+    redirect_header = "F";
   else
-      redirect_header = "T";
+    redirect_header = "T";
 
   soup_message_headers_append (msg->request_headers,
-                           "Apply-To-Redirect-Ref", redirect_header);
+                               "Apply-To-Redirect-Ref", redirect_header);
 
   soup_message_set_request (msg, "application/xml",
                             SOUP_MEMORY_TAKE,
@@ -971,6 +971,259 @@ try_enumerate (GVfsBackend           *backend,
 /* ************************************************************************* */
 /*  */
 
+/* *** create () *** */
+static void
+try_create_tested_existence (SoupSession *session, SoupMessage *msg,
+                             gpointer user_data)
+{
+  GVfsJob *job = G_VFS_JOB (user_data);
+  GVfsBackendHttp *op_backend = job->backend_data;
+  GOutputStream   *stream;
+  SoupMessage     *put_msg;
+
+  if (SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+    {
+      g_vfs_job_failed (job,
+                        G_IO_ERROR,
+                        G_IO_ERROR_EXISTS,
+                        _("Target file already exists"));
+      return;
+    }
+  /* FIXME: other errors */
+
+  put_msg = message_new_from_uri ("PUT", soup_message_get_uri (msg));
+
+  soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
+  stream = soup_output_stream_new (op_backend->session, put_msg, -1);
+  g_object_unref (put_msg);
+
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
+  g_vfs_job_succeeded (job);
+}  
+
+static gboolean
+try_create (GVfsBackend *backend,
+            GVfsJobOpenForWrite *job,
+            const char *filename,
+            GFileCreateFlags flags)
+{
+  GVfsBackendHttp *op_backend;
+  SoupMessage     *msg;
+
+  /* FIXME: if SoupOutputStream supported chunked requests, we could
+   * use a PUT with "If-None-Match: *" and "Expect: 100-continue"
+   */
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+
+  msg = message_new_from_filename (backend, "HEAD", filename);
+
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
+  soup_session_queue_message (op_backend->session, msg,
+                              try_create_tested_existence, job);
+  return TRUE;
+}
+
+/* *** replace () *** */
+static void
+open_for_replace_succeeded (GVfsBackendHttp *op_backend, GVfsJob *job,
+                            SoupURI *uri, const char *etag)
+{
+  SoupMessage     *put_msg;
+  GOutputStream   *stream;
+
+  put_msg = message_new_from_uri (SOUP_METHOD_PUT, uri);
+
+  if (etag)
+    soup_message_headers_append (put_msg->request_headers, "If-Match", etag);
+
+  stream = soup_output_stream_new (op_backend->session, put_msg, -1);
+  g_object_unref (put_msg);
+
+  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (job), stream);
+  g_vfs_job_succeeded (job);
+}
+
+static void
+try_replace_checked_etag (SoupSession *session, SoupMessage *msg,
+                          gpointer user_data)
+{
+  GVfsJob *job = G_VFS_JOB (user_data);
+  GVfsBackendHttp *op_backend = job->backend_data;
+
+  if (msg->status_code == SOUP_STATUS_PRECONDITION_FAILED)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_WRONG_ETAG,
+                        _("The file was externally modified"));
+      return;
+    }
+  /* FIXME: other errors */
+
+  open_for_replace_succeeded (op_backend, job, soup_message_get_uri (msg),
+                              soup_message_headers_get (msg->request_headers, "If-Match"));
+}  
+
+static gboolean
+try_replace (GVfsBackend *backend,
+             GVfsJobOpenForWrite *job,
+             const char *filename,
+             const char *etag,
+             gboolean make_backup,
+             GFileCreateFlags flags)
+{
+  GVfsBackendHttp *op_backend;
+  SoupURI         *uri;
+
+  /* FIXME: if SoupOutputStream supported chunked requests, we could
+   * use a PUT with "If-Match: ..." and "Expect: 100-continue"
+   */
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+
+  if (make_backup)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_CANT_CREATE_BACKUP,
+                        _("Backup file creation failed"));
+      return TRUE;
+    }
+
+
+
+  uri = g_vfs_backend_uri_for_filename (backend, filename);
+
+  if (etag)
+    {
+      SoupMessage *msg;
+
+      msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
+      soup_uri_free (uri);
+      soup_message_headers_append (msg->request_headers, "User-Agent", "gvfs/" VERSION);
+      soup_message_headers_append (msg->request_headers, "If-Match", etag);
+
+      g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
+      soup_session_queue_message (op_backend->session, msg,
+                                  try_replace_checked_etag, job);
+      return TRUE;
+    }
+
+  open_for_replace_succeeded (op_backend, G_VFS_JOB (job), uri, NULL);
+  soup_uri_free (uri);
+  return TRUE;
+}
+
+/* *** write () *** */
+static void
+write_ready (GObject      *source_object,
+             GAsyncResult *result,
+             gpointer      user_data)
+{
+  GOutputStream *stream;
+  GVfsJob       *job;
+  GError        *error;
+  gssize         nwrote;
+
+  stream = G_OUTPUT_STREAM (source_object); 
+  error  = NULL;
+  job    = G_VFS_JOB (user_data);
+
+  nwrote = g_output_stream_write_finish (stream, result, &error);
+
+  if (nwrote < 0)
+   {
+     g_vfs_job_failed (G_VFS_JOB (job),
+                       error->domain,
+                       error->code,
+                       error->message);
+
+     g_error_free (error);
+     return;
+   }
+
+  g_vfs_job_write_set_written_size (G_VFS_JOB_WRITE (job), nwrote);
+  g_vfs_job_succeeded (job);
+}
+
+static gboolean
+try_write (GVfsBackend *backend,
+           GVfsJobWrite *job,
+           GVfsBackendHandle handle,
+           char *buffer,
+           gsize buffer_size)
+{
+  GVfsBackendHttp *op_backend;
+  GOutputStream   *stream;
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+  stream = G_OUTPUT_STREAM (handle);
+
+  g_output_stream_write_async (stream,
+                               buffer,
+                               buffer_size,
+                               G_PRIORITY_DEFAULT,
+                               G_VFS_JOB (job)->cancellable,
+                               write_ready,
+                               job);
+  return TRUE;
+}
+
+/* *** close_write () *** */
+static void
+close_write_ready (GObject      *source_object,
+                   GAsyncResult *result,
+                   gpointer      user_data)
+{
+  GOutputStream *stream;
+  GVfsJob       *job;
+  GError        *error;
+  gboolean       res;
+
+  job = G_VFS_JOB (user_data);
+  stream = G_OUTPUT_STREAM (source_object);
+  res = g_output_stream_close_finish (stream,
+                                      result,
+                                      &error);
+  if (res == FALSE)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        error->domain,
+                        error->code,
+                        error->message);
+
+      g_error_free (error);
+    }
+  else
+    g_vfs_job_succeeded (job);
+
+  g_object_unref (stream);
+}
+
+static gboolean
+try_close_write (GVfsBackend *backend,
+                 GVfsJobCloseWrite *job,
+                 GVfsBackendHandle handle)
+{
+  GVfsBackendHttp *op_backend;
+  GOutputStream   *stream;
+
+  op_backend = G_VFS_BACKEND_HTTP (backend);
+  stream = G_OUTPUT_STREAM (handle);
+
+  g_output_stream_close_async (stream,
+                               G_PRIORITY_DEFAULT,
+                               G_VFS_JOB (job)->cancellable,
+                               close_write_ready,
+                               job);
+
+  return TRUE;
+}
+
+/* ************************************************************************* */
+/*  */
+
 static void
 g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
 {
@@ -981,7 +1234,13 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   gobject_class->finalize  = g_vfs_backend_dav_finalize;
 
   backend_class = G_VFS_BACKEND_CLASS (klass); 
+
   backend_class->try_mount         = try_mount;
   backend_class->try_query_info    = try_query_info;
   backend_class->try_enumerate     = try_enumerate;
+  backend_class->try_create        = try_create;
+  backend_class->try_replace       = try_replace;
+  backend_class->try_write         = try_write;
+  backend_class->try_close_write   = try_close_write;
+
 }
