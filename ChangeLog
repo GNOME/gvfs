@@ -1,5 +1,17 @@
 2008-02-04  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gvfsdaemonprotocol.h:
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+        * daemon/gvfsreadchannel.c:
+        * daemon/gvfswritechannel.c:
+	Remove SEEK_CUR from channel protocol. This
+	doesn't work with readahead, and can be converted
+	to a SEEK_SET since we know the file position on
+	the client side.
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfileinputstream.c:
         * client/gdaemonfileoutputstream.c:
 	Init seq_nr to 1 so that seq_nr 0 is special

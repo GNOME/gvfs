@@ -128,14 +128,11 @@ write_channel_handle_request (GVfsChannel *channel,
 				       backend_handle,
 				       backend);
       break;
-    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR:
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END:
     case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_SET:
       seek_type = G_SEEK_SET;
       if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END)
 	seek_type = G_SEEK_END;
-      else if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR)
-	seek_type = G_SEEK_CUR;
       
       job = g_vfs_job_seek_write_new (write_channel,
 				      backend_handle,

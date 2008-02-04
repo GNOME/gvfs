@@ -806,7 +806,7 @@ iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_o
 	case SEEK_STATE_INIT:
 	  request = G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_SET;
 	  if (op->seek_type == G_SEEK_CUR)
-	    request = G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_CUR;
+	    op->offset = file->current_offset + op->offset;
 	  else if (op->seek_type == G_SEEK_END)
 	    request = G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END;
 	  append_request (file, request,
