@@ -61,6 +61,8 @@ struct _GVfsChannelClass
 			      gpointer data,
 			      gsize data_len,
 			      GError **error);
+  GVfsJob *(*readahead)      (GVfsChannel *channel,
+			      GVfsJob *job);
 };
 
 GType g_vfs_channel_get_type (void) G_GNUC_CONST;

@@ -294,6 +294,7 @@ g_daemon_file_input_stream_init (GDaemonFileInputStream *info)
 {
   info->output_buffer = g_string_new ("");
   info->input_buffer = g_string_new ("");
+  info->seq_nr = 1;
 }
 
 GFileInputStream *

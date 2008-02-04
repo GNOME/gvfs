@@ -1,3 +1,14 @@
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+	Init seq_nr to 1 so that seq_nr 0 is special
+	(used for e.g. readahead ops)
+	
+        * daemon/gvfschannel.[ch]:
+        * daemon/gvfsreadchannel.c:
+	Implement readahead.
+
 2008-02-03  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c:

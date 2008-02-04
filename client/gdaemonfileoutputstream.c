@@ -242,6 +242,7 @@ g_daemon_file_output_stream_init (GDaemonFileOutputStream *info)
 {
   info->output_buffer = g_string_new ("");
   info->input_buffer = g_string_new ("");
+  info->seq_nr = 1;
 }
 
 GFileOutputStream *

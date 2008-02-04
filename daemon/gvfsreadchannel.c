@@ -59,6 +59,8 @@ static GVfsJob *read_channel_handle_request (GVfsChannel  *channel,
 					     gpointer      data,
 					     gsize         data_len,
 					     GError      **error);
+static GVfsJob *read_channel_readahead      (GVfsChannel  *channel,
+					     GVfsJob       *job);
   
 static void
 g_vfs_read_channel_finalize (GObject *object)
@@ -80,6 +82,7 @@ g_vfs_read_channel_class_init (GVfsReadChannelClass *klass)
   gobject_class->finalize = g_vfs_read_channel_finalize;
   channel_class->close = read_channel_close;
   channel_class->handle_request = read_channel_handle_request;
+  channel_class->readahead = read_channel_readahead;
 }
 
 static void
@@ -185,6 +188,35 @@ read_channel_handle_request (GVfsChannel *channel,
   g_free (data);
   return job;
 }
+
+static GVfsJob *
+read_channel_readahead (GVfsChannel  *channel,
+			GVfsJob       *job)
+{
+  GVfsJob *readahead_job;
+  GVfsReadChannel *read_channel;
+  GVfsJobRead *read_job;
+
+  readahead_job = NULL;
+  if (!job->failed &&
+      G_VFS_IS_JOB_READ (job))
+    {
+      read_job = G_VFS_JOB_READ (job);
+      read_channel = G_VFS_READ_CHANNEL (channel);
+
+      if (read_job->data_count != 0)
+	{
+	  read_channel->read_count++;
+	  readahead_job = g_vfs_job_read_new (read_channel,
+					      g_vfs_channel_get_backend_handle (channel),
+					      modify_read_size (read_channel, 8192),
+					      g_vfs_channel_get_backend (channel));
+	}
+    }
+  
+  return readahead_job;
+}
+
 
 /* Might be called on an i/o thread
  */
