@@ -108,7 +108,7 @@ g_vfs_job_make_symlink_new (DBusConnection *connection,
 		      NULL);
 
   job->filename = g_strndup (path_data, path_len);
-  job->symlink_value = g_strndup (path_data, path_len);
+  job->symlink_value = g_strndup (symlink_data, symlink_len);
   job->backend = backend;
   
   return G_VFS_JOB (job);
