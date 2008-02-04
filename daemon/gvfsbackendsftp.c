@@ -3008,9 +3008,20 @@ query_info_stat_reply (GVfsBackendSftp *backend,
   else
     {
       data->stat_info = g_file_info_new ();
-      basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
+      basename = NULL;
+      if (strcmp (G_VFS_JOB_QUERY_INFO (job)->filename, "/") != 0)
+        basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
       parse_attributes (backend, data->stat_info, basename,
                         reply, G_VFS_JOB_QUERY_INFO (job)->attribute_matcher);
+      if (basename == NULL)
+        {
+          char *name;
+
+          /* Translators: This is the name of the root of an sftp share, like "/ on <hostname>" */
+          name = g_strdup_printf (_("/ on %s"), G_VFS_BACKEND_SFTP (backend)->host);
+          g_file_info_set_display_name (data->stat_info, name);
+          g_free (name);
+        }
       g_free (basename);
     }
 
@@ -3039,9 +3050,20 @@ query_info_lstat_reply (GVfsBackendSftp *backend,
   else
     {
       data->lstat_info = g_file_info_new ();
-      basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
+      basename = NULL;
+      if (strcmp (G_VFS_JOB_QUERY_INFO (job)->filename, "/") != 0)
+        basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
       parse_attributes (backend, data->lstat_info, basename,
                         reply, G_VFS_JOB_QUERY_INFO (job)->attribute_matcher);
+      if (basename == NULL)
+        {
+          char *name;
+          
+          /* Translators: This is the name of the root of an sftp share, like "/ on <hostname>" */
+          name = g_strdup_printf (_("/ on %s"), G_VFS_BACKEND_SFTP (backend)->host);
+          g_file_info_set_display_name (data->lstat_info, name);
+          g_free (name);
+        }
       g_free (basename);
     }
 
