@@ -1,5 +1,12 @@
 2008-02-04  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsdaemonutils.c:
+        * hal/ghalvolume.c:
+	Cleanup i18n strings (#510192)
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
         * common/gvfsdaemonprotocol.h:
         * client/gdaemonfileinputstream.c:
         * client/gdaemonfileoutputstream.c:

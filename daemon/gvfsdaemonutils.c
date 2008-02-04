@@ -89,7 +89,7 @@ dbus_connection_send_fd (DBusConnection *connection,
     {
       g_set_error (error, G_IO_ERROR,
 		   G_IO_ERROR_FAILED,
-		   _("No fd passing socket available"));
+		   _("Internal Error (%s)"), "No fd passing socket available");
       return FALSE;
     }
 

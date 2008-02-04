@@ -245,6 +245,7 @@ do_update_from_hal (GHalVolume *mv)
       if (strcmp (volume_fsusage, "crypto") == 0 && strcmp (volume_fstype, "crypto_LUKS") == 0)
         {
           size = format_size_for_display (volume_size);
+          /* Translators: %s is the size of the volume (e.g. 512 MB) */
           name = g_strdup_printf (_("%s Encrypted Data"), size);
           g_free (size);
         }
@@ -267,6 +268,7 @@ do_update_from_hal (GHalVolume *mv)
           else
             {
               size = format_size_for_display (volume_size);
+              /* Translators: %s is the size of the volume (e.g. 512 MB) */
               name = g_strdup_printf (_("%s Media"), size);
               g_free (size);
             }
