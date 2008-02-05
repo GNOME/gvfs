@@ -135,7 +135,8 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (!mount)
     {
-      g_warning (G_STRLOC ": An unknown mount was removed!");
+      if (mount_info->user_visible)
+	g_warning (G_STRLOC ": An unknown mount was removed!");
       return;
     }
 

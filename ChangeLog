@@ -1,5 +1,10 @@
 2008-02-05  Alexander Larsson  <alexl@redhat.com>
 
+	* client/gdaemonvolumemonitor.c (mount_removed):
+	Don't spew warnings when hidden mounts are unmounted.
+	
+2008-02-05  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendtrash.c:
         (do_query_info):
 	Correctly set the name for toplevel items.
