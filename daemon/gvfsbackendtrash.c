@@ -1162,6 +1162,7 @@ do_query_info (GVfsBackend *backend,
     {
       /* The trash:/// root */
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+      g_file_info_set_name (info, "/");
       g_file_info_set_display_name (info, _("Trashcan"));
       g_file_info_set_content_type (info, "inode/directory");
 
@@ -1201,6 +1202,7 @@ do_query_info (GVfsBackend *backend,
       char *path;
       GError *error; 
       char *info_dir;
+      char *basename;
      
       path = g_build_filename (trashdir, "files", trashfile, relative_path, NULL);
       file = g_file_new_for_path (path);
@@ -1218,6 +1220,10 @@ do_query_info (GVfsBackend *backend,
         {
           g_file_info_copy_into (local_info, info);
 
+          basename = g_path_get_basename (filename);
+          g_file_info_set_name (info, basename);
+          g_free (basename);
+      
           info_dir = g_build_filename (trashdir, "info", NULL);
           add_extra_trash_info (info,
                                 topdir,
