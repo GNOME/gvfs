@@ -1144,6 +1144,8 @@ set_info_from_stat (GVfsBackendSmb *backend,
   char *content_type;
   char *display_name;
 
+  if (basename) 
+    g_file_info_set_name (info, basename);
 
   if (basename != NULL &&
       g_file_attribute_matcher_matches (matcher,
@@ -1461,8 +1463,6 @@ do_enumerate (GVfsBackend *backend,
 		  if (stat_res == 0)
 		    {
 		      info = g_file_info_new ();
-		      g_file_info_set_name (info, dirp->name);
-		      
 		      set_info_from_stat (op_backend, info, &st, dirp->name, matcher);
 		      files = g_list_prepend (files, info);
 		    }

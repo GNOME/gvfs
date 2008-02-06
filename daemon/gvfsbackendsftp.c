@@ -1302,6 +1302,11 @@ parse_attributes (GVfsBackendSftp *backend,
   if (basename != NULL && basename[0] == '.')
     g_file_info_set_is_hidden (info, TRUE);
 
+  if (basename != NULL)
+    g_file_info_set_name (info, basename);
+  else
+    g_file_info_set_name (info, "/");
+  
   if (basename != NULL && basename[strlen (basename) -1] == '~')
     g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_BACKUP, TRUE);
 
@@ -1477,20 +1482,32 @@ parse_attributes (GVfsBackendSftp *backend,
    * do better, since there is no way in this version of sftp to find out
    * the remote charset encoding
    */
-  if (basename != NULL &&
-      g_file_attribute_matcher_matches (matcher,
+  if (g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
     {
-      char *display_name = g_filename_display_name (basename);
-      
-      if (strstr (display_name, "\357\277\275") != NULL)
+      if (basename != NULL)
         {
-          char *p = display_name;
-          display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
-          g_free (p);
+          char *display_name = g_filename_display_name (basename);
+          
+          if (strstr (display_name, "\357\277\275") != NULL)
+            {
+              char *p = display_name;
+              display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
+              g_free (p);
+            }
+          g_file_info_set_display_name (info, display_name);
+          g_free (display_name);
         }
-      g_file_info_set_display_name (info, display_name);
-      g_free (display_name);
+      else
+        {
+          char *name;
+
+          
+          /* Translators: This is the name of the root of an sftp share, like "/ on <hostname>" */
+          name = g_strdup_printf (_("/ on %s"), G_VFS_BACKEND_SFTP (backend)->host);
+          g_file_info_set_display_name (info, name);
+          g_free (name);
+        }
     }
   
   if (basename != NULL &&
@@ -3013,15 +3030,6 @@ query_info_stat_reply (GVfsBackendSftp *backend,
         basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
       parse_attributes (backend, data->stat_info, basename,
                         reply, G_VFS_JOB_QUERY_INFO (job)->attribute_matcher);
-      if (basename == NULL)
-        {
-          char *name;
-
-          /* Translators: This is the name of the root of an sftp share, like "/ on <hostname>" */
-          name = g_strdup_printf (_("/ on %s"), G_VFS_BACKEND_SFTP (backend)->host);
-          g_file_info_set_display_name (data->stat_info, name);
-          g_free (name);
-        }
       g_free (basename);
     }
 
@@ -3055,15 +3063,6 @@ query_info_lstat_reply (GVfsBackendSftp *backend,
         basename = g_path_get_basename (G_VFS_JOB_QUERY_INFO (job)->filename);
       parse_attributes (backend, data->lstat_info, basename,
                         reply, G_VFS_JOB_QUERY_INFO (job)->attribute_matcher);
-      if (basename == NULL)
-        {
-          char *name;
-          
-          /* Translators: This is the name of the root of an sftp share, like "/ on <hostname>" */
-          name = g_strdup_printf (_("/ on %s"), G_VFS_BACKEND_SFTP (backend)->host);
-          g_file_info_set_display_name (data->lstat_info, name);
-          g_free (name);
-        }
       g_free (basename);
     }
 

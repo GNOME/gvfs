@@ -1,3 +1,10 @@
+2008-02-06  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+	Ensure name is set in query_info (#511601)
+	Clean up setting display name of /
+
 2008-02-05  Alexander Larsson  <alexl@redhat.com>
 
 	* client/gdaemonvolumemonitor.c (mount_removed):
