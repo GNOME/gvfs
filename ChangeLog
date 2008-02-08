@@ -1,5 +1,13 @@
 2008-02-08  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendcomputer.c:
+	Add "filesystem" to computer:
+	
+        * hal/ghalmount.c:
+	Remove spew
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
         * hal/ghalmount.c:
 	Try to find cdrom icons from autorun.inf.
 	Based on patch from John Millikin

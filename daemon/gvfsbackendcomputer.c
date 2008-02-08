@@ -459,6 +459,15 @@ recompute_files (GVfsBackendComputer *backend)
       g_free (basename);
       file->filename = filename;
     }
+  
+  file = g_slice_new0 (ComputerFile);
+  file->filename = g_strdup ("root.link");
+  file->display_name = g_strdup (_("Filesystem"));
+  file->icon = g_themed_icon_new ("drive-harddisk");
+  file->root = g_file_new_for_path ("/");
+  file->prio = 0;
+  
+  files = g_list_prepend (files, file);
 
   files = g_list_sort (files, (GCompareFunc)sort_file_by_filename);
 
@@ -817,8 +826,8 @@ try_mount_mountable (GVfsBackend *backend,
 
 static void
 unmount_mount_cb (GObject *source_object,
-		  GAsyncResult *res,
-		  gpointer user_data)
+                  GAsyncResult *res,
+                  gpointer user_data)
 {
   GVfsJobMountMountable *job = user_data;
   GError *error;

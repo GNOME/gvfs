@@ -227,7 +227,6 @@ on_icon_file_located (GObject *source_object, GAsyncResult *res,
   icon = g_file_icon_new (icon_file);
   g_object_unref (icon_file);
 
-  g_print ("Found new cdrom icon %p\n", icon);
   g_hal_mount_override_icon (data->mount, icon);
   g_object_unref (icon);
   
@@ -475,8 +474,6 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
   char *old_name;
   GIcon *old_icon;
 
-  g_print ("update from hal %s, emit_changed: %d\n", m->name, emit_changed);
-  
   old_name = g_strdup (m->name);
   old_icon = m->icon != NULL ? g_object_ref (m->icon) : NULL;
 
@@ -485,12 +482,6 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
     g_object_unref (m->icon);
   do_update_from_hal (m);
 
-  g_print ("new icon type = %s\n",
-           g_type_name_from_instance (m->icon));
-  if (m->override_icon)
-    g_print ("new override icon type = %s\n",
-             g_type_name_from_instance (m->override_icon));
-  
   if (emit_changed)
     {
       if (old_name == NULL || 
@@ -498,7 +489,6 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
           strcmp (old_name, m->name) != 0 ||
           (! g_icon_equal (old_icon, m->icon)))
         {
-          g_print ("emitting changed\n");
           g_signal_emit_by_name (m, "changed");
           if (m->volume_monitor != NULL)
             g_signal_emit_by_name (m->volume_monitor, "mount_changed", m);
