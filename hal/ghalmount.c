@@ -53,10 +53,23 @@ struct _GHalMount {
   GIcon *override_icon;
   GFile *override_root;
   gboolean cannot_unmount;
+  gboolean searched_for_icon;
 
   HalDevice *device;
   HalDevice *drive_device;
 };
+
+static GFile *
+_g_find_file_insensitive_finish (GFile        *parent,
+                                 GAsyncResult *result,
+                                 GError      **error);
+
+static void
+_g_find_file_insensitive_async (GFile              *parent,
+                                const gchar        *name,
+                                GCancellable       *cancellable,
+                                GAsyncReadyCallback callback,
+                                gpointer            user_data);
 
 static void g_hal_mount_mount_iface_init (GMountIface *iface);
 
@@ -182,6 +195,143 @@ get_disc_name (const char *disc_type, gboolean is_blank)
     return disc_data[n].ui_name;
 }
 
+typedef struct _MountIconSearchData
+{
+  GHalMount *mount;
+  GFile *root;
+} MountIconSearchData;
+
+static void
+clear_icon_search_data (MountIconSearchData *data)
+{
+  if (data->mount)
+    g_object_unref (data->mount);
+  if (data->root)
+    g_object_unref (data->root);
+  g_free (data);
+}
+
+static void
+on_icon_file_located (GObject *source_object, GAsyncResult *res,
+                      gpointer user_data)
+{
+  GFile *icon_file;
+  GIcon *icon;
+  MountIconSearchData *data = (MountIconSearchData *) (user_data);
+  
+  icon_file = _g_find_file_insensitive_finish (G_FILE (source_object),
+                                               res, NULL);
+  
+  /* TODO: check if the file actually exists? */
+
+  icon = g_file_icon_new (icon_file);
+  g_object_unref (icon_file);
+
+  g_print ("Found new cdrom icon %p\n", icon);
+  g_hal_mount_override_icon (data->mount, icon);
+  g_object_unref (icon);
+  
+  clear_icon_search_data (data);
+}
+
+static void
+on_autorun_loaded (GObject *source_object, GAsyncResult *res,
+                   gpointer user_data)
+{
+  gchar *content, *relative_icon_path = NULL;
+  gsize content_length;
+  MountIconSearchData *data = (MountIconSearchData *) (user_data);
+  
+  if (g_file_load_contents_finish (G_FILE (source_object), res, &content,
+                                   &content_length, NULL, NULL))
+    {
+      /* Scan through for an "icon=" line. Can't use GKeyFile,
+       * because .inf files aren't always valid key files
+       **/
+      GRegex *icon_regex;
+      GMatchInfo *match_info;
+      
+      /* [^,] is because sometimes the icon= line
+       * has a comma at the end
+       **/
+      icon_regex = g_regex_new ("icon=([^,\\r\\n]+)",
+                                G_REGEX_CASELESS, 0, NULL);
+      g_regex_match (icon_regex, content, 0,
+                     &match_info);
+      
+      /* Even if there are multiple matches, pick only the
+       * first.
+       **/
+      if (g_match_info_matches (match_info))
+        {
+          gchar *chr;
+          gchar *word = g_match_info_fetch (match_info, 1);
+          
+          /* Replace '\' with '/' */
+          while ((chr = strchr (word, '\\')) != NULL)
+            *chr = '/';
+          
+          /* If the file name's not valid UTF-8,
+           * don't even try to load it
+           **/
+          if (g_utf8_validate (word, -1, NULL))
+            relative_icon_path = word;
+          else
+            g_free (word);
+        }
+      
+      g_match_info_free (match_info);
+      
+      g_regex_unref (icon_regex);
+      g_free (content);
+    }
+  
+  if (relative_icon_path)
+    {
+      _g_find_file_insensitive_async (data->root,
+                                      relative_icon_path,
+                                      NULL, on_icon_file_located,
+                                      data);
+      
+      g_free (relative_icon_path);
+    }
+  else
+    clear_icon_search_data (data);
+}
+
+static void
+on_autorun_located (GObject *source_object, GAsyncResult *res,
+                    gpointer user_data)
+{
+  GFile *autorun_path;
+  MountIconSearchData *data = (MountIconSearchData *) (user_data);
+  
+  autorun_path = _g_find_file_insensitive_finish (G_FILE (source_object),
+                                                  res, NULL);
+  if (autorun_path)
+    g_file_load_contents_async (autorun_path, NULL, on_autorun_loaded, data);
+  else
+    clear_icon_search_data (data);
+  
+  g_object_unref (autorun_path);
+}
+
+static void
+_g_find_mount_icon (GHalMount *m)
+{
+  MountIconSearchData *search_data;
+  
+  m->searched_for_icon = TRUE;
+	
+  search_data = g_new (MountIconSearchData, 1);
+  search_data->mount = g_object_ref (m);
+  search_data->root = g_mount_get_root (G_MOUNT (m));
+  
+  _g_find_file_insensitive_async (search_data->root,
+                                  "autorun.inf",
+                                  NULL, on_autorun_located,
+                                  search_data);
+}
 
 #define KILOBYTE_FACTOR 1000.0
 #define MEGABYTE_FACTOR (1000.0 * 1000.0)
@@ -310,6 +460,12 @@ do_update_from_hal (GHalMount *m)
     m->icon = g_object_ref (m->override_icon);
   else
     m->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+    
+  /* If this is a CD-ROM, begin searching for an icon specified in
+   * autorun.inf.
+  **/
+  if (strcmp (drive_type, "cdrom") == 0 && !m->searched_for_icon)
+    _g_find_mount_icon (m);
 }
 
 
@@ -319,6 +475,8 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
   char *old_name;
   GIcon *old_icon;
 
+  g_print ("update from hal %s, emit_changed: %d\n", m->name, emit_changed);
+  
   old_name = g_strdup (m->name);
   old_icon = m->icon != NULL ? g_object_ref (m->icon) : NULL;
 
@@ -327,6 +485,12 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
     g_object_unref (m->icon);
   do_update_from_hal (m);
 
+  g_print ("new icon type = %s\n",
+           g_type_name_from_instance (m->icon));
+  if (m->override_icon)
+    g_print ("new override icon type = %s\n",
+             g_type_name_from_instance (m->override_icon));
+  
   if (emit_changed)
     {
       if (old_name == NULL || 
@@ -334,6 +498,7 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
           strcmp (old_name, m->name) != 0 ||
           (! g_icon_equal (old_icon, m->icon)))
         {
+          g_print ("emitting changed\n");
           g_signal_emit_by_name (m, "changed");
           if (m->volume_monitor != NULL)
             g_signal_emit_by_name (m->volume_monitor, "mount_changed", m);
@@ -451,7 +616,7 @@ g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
   if (mount->override_icon != NULL)
     g_object_unref (mount->override_icon);
 
-  if (icon == NULL)
+  if (icon != NULL)
     mount->override_icon = g_object_ref (icon);
   else
     mount->override_icon = NULL;
@@ -915,3 +1080,260 @@ g_hal_mount_register (GIOModule *module)
 {
   g_hal_mount_register_type (G_TYPE_MODULE (module));
 }
+
+#define INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK 100
+ 
+static void
+enumerated_children_callback (GObject *source_object, GAsyncResult *res,
+                              gpointer user_data);
+ 
+static void
+more_files_callback (GObject *source_object, GAsyncResult *res,
+                     gpointer user_data);
+
+typedef struct _InsensitiveFileSearchData
+{
+	GFile *root;
+	gchar *original_path;
+	gchar **split_path;
+	gint index;
+	GFileEnumerator *enumerator;
+	GFile *current_file;
+	
+	GCancellable *cancellable;
+	GAsyncReadyCallback callback;
+	gpointer user_data;
+} InsensitiveFileSearchData;
+
+static void
+_g_find_file_insensitive_async (GFile              *parent,
+                                const gchar        *name,
+                                GCancellable       *cancellable,
+                                GAsyncReadyCallback callback,
+                                gpointer            user_data)
+{
+  InsensitiveFileSearchData *data;
+  
+  g_return_if_fail (g_utf8_validate (name, -1, NULL));
+
+  data = g_new (InsensitiveFileSearchData, 1);
+  data->root = g_object_ref (parent);
+  data->original_path = g_strdup (name);
+  data->split_path = g_strsplit (name, G_DIR_SEPARATOR_S, -1);
+  data->index = 0;
+  data->enumerator = NULL;
+  data->current_file = g_object_ref (parent);
+  data->cancellable = cancellable;
+  data->callback = callback;
+  data->user_data = user_data;
+
+  /* Skip any empty components due to multiple slashes */
+  while (data->split_path[data->index] != NULL &&
+         *data->split_path[data->index] == 0)
+    data->index++;
+  
+  g_file_enumerate_children_async (data->current_file,
+                                   G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                   0, G_PRIORITY_DEFAULT, cancellable,
+                                   enumerated_children_callback, data);
+}
+
+static void
+clear_find_file_insensitive_state (InsensitiveFileSearchData *data)
+{
+  if (data->root)
+    g_object_unref (data->root);
+  if (data->original_path)
+    g_free (data->original_path);
+  if (data->split_path)
+    g_strfreev (data->split_path);
+  if (data->enumerator)
+    g_object_unref (data->enumerator);
+  if (data->current_file)
+    g_object_unref (data->current_file);
+  g_free (data);
+}
+
+static void
+enumerated_children_callback (GObject *source_object, GAsyncResult *res,
+                              gpointer user_data)
+{
+  GFileEnumerator *enumerator;
+  InsensitiveFileSearchData *data = (InsensitiveFileSearchData *) (user_data);
+  
+  enumerator = g_file_enumerate_children_finish (G_FILE (source_object),
+                                                 res, NULL);
+  
+  if (enumerator == NULL)
+    {
+      GSimpleAsyncResult *simple;
+      GFile *file;
+      
+      simple = g_simple_async_result_new (G_OBJECT (data->root),
+                                          data->callback,
+                                          data->user_data,
+                                          _g_find_file_insensitive_async);
+      
+      file = g_file_get_child (data->root, data->original_path);
+      
+      g_simple_async_result_set_op_res_gpointer (simple, g_object_ref (file), g_object_unref);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      clear_find_file_insensitive_state (data);
+      return;
+    }
+  
+  data->enumerator = enumerator;
+  g_file_enumerator_next_files_async (enumerator,
+                                      INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK,
+                                      G_PRIORITY_DEFAULT,
+                                      data->cancellable,
+                                      more_files_callback,
+                                      data);
+}
+
+static void
+more_files_callback (GObject *source_object, GAsyncResult *res,
+                     gpointer user_data)
+{
+  InsensitiveFileSearchData *data = (InsensitiveFileSearchData *) (user_data);
+  GList *files, *l;
+  gchar *filename = NULL, *component, *case_folded_name,
+    *name_collation_key;
+  gboolean end_of_files;
+  
+  files = g_file_enumerator_next_files_finish (data->enumerator,
+                                               res, NULL);
+  
+  end_of_files = files == NULL;
+  
+  component = data->split_path[data->index];
+  g_return_if_fail (component != NULL);
+  
+  case_folded_name = g_utf8_casefold (component, -1);
+  name_collation_key = g_utf8_collate_key (case_folded_name, -1);
+  g_free (case_folded_name);
+  
+  for (l = files; l != NULL; l = l->next)
+    {
+      GFileInfo *info;
+      const gchar *this_name;
+      
+      info = l->data;
+      this_name = g_file_info_get_name (info);
+      
+      if (g_utf8_validate (this_name, -1, NULL))
+        {
+          gchar *case_folded, *key;
+          case_folded = g_utf8_casefold (this_name, -1);
+          key = g_utf8_collate_key (case_folded, -1);
+          g_free (case_folded);
+          
+          if (strcmp (key, name_collation_key) == 0)
+            filename = g_strdup (this_name);
+          g_free (key);
+        }
+      if (filename)
+        break;
+    }
+
+  g_list_foreach (files, (GFunc)g_object_unref, NULL);
+  g_list_free (files);
+  g_free (name_collation_key);
+  
+  if (filename)
+    {
+      GFile *next_file;
+      
+      g_object_unref (data->enumerator);
+      data->enumerator = NULL;
+      
+      /* Set the current file and continue searching */
+      next_file = g_file_get_child (data->current_file, filename);
+      g_free (filename);
+      g_object_unref (data->current_file);
+      data->current_file = next_file;
+      
+      data->index++;
+      /* Skip any empty components due to multiple slashes */
+      while (data->split_path[data->index] != NULL &&
+             *data->split_path[data->index] == 0)
+        data->index++;
+      
+      if (data->split_path[data->index] == NULL)
+       {
+          /* Search is complete, file was found */
+          GSimpleAsyncResult *simple;
+          
+          simple = g_simple_async_result_new (G_OBJECT (data->root),
+                                              data->callback,
+                                              data->user_data,
+                                              _g_find_file_insensitive_async);
+          
+          g_simple_async_result_set_op_res_gpointer (simple, g_object_ref (data->current_file), g_object_unref);
+          g_simple_async_result_complete_in_idle (simple);
+          g_object_unref (simple);
+          clear_find_file_insensitive_state (data);
+          return;
+        }
+      
+      /* Continue searching down the tree */
+      g_file_enumerate_children_async (data->current_file,
+                                       G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                       0, G_PRIORITY_DEFAULT,
+                                       data->cancellable,
+                                       enumerated_children_callback,
+                                       data);
+      return;
+    }
+  
+  if (end_of_files)
+    {
+      /* Could not find the given file, abort the search */
+      GSimpleAsyncResult *simple;
+      GFile *file;
+      
+      g_object_unref (data->enumerator);
+      data->enumerator = NULL;
+      
+      simple = g_simple_async_result_new (G_OBJECT (data->root),
+                                          data->callback,
+                                          data->user_data,
+                                          _g_find_file_insensitive_async);
+      
+      file = g_file_get_child (data->root, data->original_path);
+      g_simple_async_result_set_op_res_gpointer (simple, file, g_object_unref);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      clear_find_file_insensitive_state (data);
+      return;
+    }
+  
+  /* Continue enumerating */
+  g_file_enumerator_next_files_async (data->enumerator,
+                                      INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK,
+                                      G_PRIORITY_DEFAULT,
+                                      data->cancellable,
+                                      more_files_callback,
+                                      data);
+}
+
+static GFile *
+_g_find_file_insensitive_finish (GFile        *parent,
+                                 GAsyncResult *result,
+                                 GError      **error)
+{
+  GSimpleAsyncResult *simple;
+  GFile *file;
+  
+  g_return_val_if_fail (G_IS_SIMPLE_ASYNC_RESULT (result), NULL);
+  
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  
+  if (g_simple_async_result_propagate_error (simple, error))
+    return NULL;
+  
+  file = G_FILE (g_simple_async_result_get_op_res_gpointer (simple));
+  return g_object_ref (file);
+}
+
