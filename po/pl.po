@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-07 22:40+0100\n"
-"PO-Revision-Date: 2008-02-07 14:40+0100\n"
+"POT-Creation-Date: 2008-02-08 20:51+0100\n"
+"PO-Revision-Date: 2008-02-08 19:28+0100\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Tomasz Dominikowski (Aviary.pl) <dominikowski@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -150,12 +150,12 @@ msgstr "Wystąpił błąd podczas tworzenia wtyczki: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Błąd podczas łączenia z wtyczką: %s"
 
-#: ../common/gvfsdaemonprotocol.c:516
+#: ../common/gvfsdaemonprotocol.c:515
 #, c-format
 msgid "Invalid file info format"
 msgstr "Niepoprawny format informacji o pliku"
 
-#: ../common/gvfsdaemonprotocol.c:533
+#: ../common/gvfsdaemonprotocol.c:532
 #, c-format
 msgid "Invalid attribute info list content"
 msgstr "Niepoprawny atrybut zawartości "
@@ -221,7 +221,7 @@ msgstr "Nie można skopiować pliku na folder"
 msgid "CD Burner"
 msgstr "Nagrywarka CD"
 
-#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:641
+#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:650
 msgid "The file is not a directory"
 msgstr "Plik nie jest folderem"
 
@@ -272,7 +272,7 @@ msgid "Audio Disc on %s"
 msgstr "Płyta CD-Audio w %s"
 
 #: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:680
-#: ../hal/ghalmount.c:293 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
+#: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
 #, c-format
 msgid "Audio Disc"
 msgstr "Płyta CD-Audio"
@@ -316,44 +316,48 @@ msgstr "Plik nie istnieje"
 msgid "The file does not exist or isn't an audio track"
 msgstr "Plik nie istnieje lub nie jest ścieżką dźwiękową"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:683
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
 msgid "Computer"
 msgstr "Komputer"
 
-#: ../daemon/gvfsbackendcomputer.c:562 ../daemon/gvfsbackendsmbbrowse.c:786
+#: ../daemon/gvfsbackendcomputer.c:465
+msgid "Filesystem"
+msgstr "System plików"
+
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:786
 #: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
 #: ../daemon/gvfsbackendsmbbrowse.c:1098
 #, c-format
 msgid "File doesn't exist"
 msgstr "Plik nie istnieje"
 
-#: ../daemon/gvfsbackendcomputer.c:580 ../daemon/gvfsbackendtrash.c:632
+#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:632
 msgid "Can't open directory"
 msgstr "Nie można otworzyć katalogu"
 
-#: ../daemon/gvfsbackendcomputer.c:584 ../daemon/gvfsbackendcomputer.c:718
+#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:727
 msgid "Can't open mountable file"
 msgstr "Nie można otworzyć montowalnego pliku"
 
-#: ../daemon/gvfsbackendcomputer.c:765
+#: ../daemon/gvfsbackendcomputer.c:774
 #, c-format
 msgid "Internal error: %s"
 msgstr "Błąd wewnętrzny: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:789 ../daemon/gvfsbackendcomputer.c:854
-#: ../daemon/gvfsbackendcomputer.c:954
+#: ../daemon/gvfsbackendcomputer.c:798 ../daemon/gvfsbackendcomputer.c:863
+#: ../daemon/gvfsbackendcomputer.c:963
 msgid "Not a mountable file"
 msgstr "To nie jest montowalny plik"
 
-#: ../daemon/gvfsbackendcomputer.c:811
+#: ../daemon/gvfsbackendcomputer.c:820
 msgid "Can't mount file"
 msgstr "Nie można zamontować pliku"
 
-#: ../daemon/gvfsbackendcomputer.c:869
+#: ../daemon/gvfsbackendcomputer.c:878
 msgid "Can't unmount file"
 msgstr "Nie można odmontować pliku"
 
-#: ../daemon/gvfsbackendcomputer.c:985
+#: ../daemon/gvfsbackendcomputer.c:994
 msgid "Can't eject file"
 msgstr "Nie można wysunąć pliku"
 
@@ -439,7 +443,7 @@ msgid "HTTP Client Error: %s"
 msgstr "Błąd klienta HTTP: %s"
 
 #: ../daemon/gvfsbackendhttp.c:504 ../daemon/gvfsbackendsftp.c:1495
-#: ../daemon/gvfsbackendsmb.c:1162 ../daemon/gvfsbackendtrash.c:948
+#: ../daemon/gvfsbackendsmb.c:1162 ../daemon/gvfsbackendtrash.c:951
 msgid " (invalid encoding)"
 msgstr " (niepoprawne kodowanie)"
 
@@ -642,15 +646,15 @@ msgid "Not a directory"
 msgstr "To nie jest folder"
 
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1166
+#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1169
 msgid "Trashcan"
 msgstr "Kosz"
 
-#: ../daemon/gvfsbackendtrash.c:1261
+#: ../daemon/gvfsbackendtrash.c:1267
 msgid "Can't delete trash"
 msgstr "Nie można opróżnić kosza"
 
-#: ../daemon/gvfsbackendtrash.c:1608 ../daemon/gvfsbackendtrash.c:1683
+#: ../daemon/gvfsbackendtrash.c:1614 ../daemon/gvfsbackendtrash.c:1689
 msgid "Trash directory notification not supported"
 msgstr "Powiadamianie folderu kosza nie jest obsługiwane"
 
@@ -856,19 +860,19 @@ msgstr "Napęd taśmowy"
 
 #: ../hal/ghaldrive.c:207
 msgid "CompactFlash Drive"
-msgstr "Czytnik CompactFlash"
+msgstr "Karta CompactFlash"
 
 #: ../hal/ghaldrive.c:209
 msgid "MemoryStick Drive"
-msgstr "Czytnik MemoryStick"
+msgstr "Karta MemoryStick"
 
 #: ../hal/ghaldrive.c:211
 msgid "SmartMedia Drive"
-msgstr "Czytnik SmartMedia"
+msgstr "Karta SmartMedia"
 
 #: ../hal/ghaldrive.c:213
 msgid "SD/MMC Drive"
-msgstr "Czytnik SD/MMC"
+msgstr "Karta SD/MMC"
 
 #: ../hal/ghaldrive.c:215
 msgid "Zip Drive"
@@ -892,160 +896,160 @@ msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "Wysunięcie nośnika nieudane; jeden lub więcej woluminów w nośniku są zajęte."
 
-#: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
 msgid "CD-ROM Disc"
 msgstr "Płyta CD-ROM"
 
-#: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
 msgid "Blank CD-ROM Disc"
 msgstr "Pusta płyta CD-ROM"
 
-#: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
 msgid "CD-R Disc"
 msgstr "Płyta CD-R"
 
-#: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
 msgid "Blank CD-R Disc"
 msgstr "Pusta płyta CD-R"
 
-#: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
 msgid "CD-RW Disc"
 msgstr "Płyta CD-RW"
 
-#: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
 msgid "Blank CD-RW Disc"
 msgstr "Pusta płyta CD-RW"
 
-#: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
 #: ../hal/ghalvolume.c:143
 msgid "DVD-ROM Disc"
 msgstr "Płyta DVD-ROM"
 
-#: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
 #: ../hal/ghalvolume.c:143
 msgid "Blank DVD-ROM Disc"
 msgstr "Pusta płyta DVD-ROM"
 
-#: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
 msgid "DVD-RAM Disc"
 msgstr "Płyta DVD-RAM"
 
-#: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
 msgid "Blank DVD-RAM Disc"
 msgstr "Pusta płyta DVD-RAM"
 
-#: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
 msgid "DVD-RW Disc"
 msgstr "Płyta DVD-RW"
 
-#: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
 msgid "Blank DVD-RW Disc"
 msgstr "Pusta płyta DVD-RW"
 
-#: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
 msgid "DVD+R Disc"
 msgstr "Płyta DVD+R"
 
-#: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
 msgid "Blank DVD+R Disc"
 msgstr "Pusta płyta DVD+R"
 
-#: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
 msgid "DVD+RW Disc"
 msgstr "Płyta DVD+RW"
 
-#: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
 msgid "Blank DVD+RW Disc"
 msgstr "Pusta płyta DVD+RW"
 
-#: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
 msgid "DVD+R DL Disc"
 msgstr "Płyta DVD+R DL"
 
-#: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
 msgid "Blank DVD+R DL Disc"
 msgstr "Pusta płyta DVD+R DL"
 
-#: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
 msgid "Blu-Ray Disc"
 msgstr "Płyta Blu-Ray"
 
-#: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
 msgid "Blank Blu-Ray Disc"
 msgstr "Pusta płyta Blu-Ray"
 
-#: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
 msgid "Blu-Ray R Disc"
 msgstr "Płyta Blu-Ray R"
 
-#: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
 msgid "Blank Blu-Ray R Disc"
 msgstr "Pusta płyta Blu-Ray R"
 
-#: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
 msgid "Blu-Ray RW Disc"
 msgstr "Płyta Blu-Ray RW"
 
-#: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
 msgid "Blank Blu-Ray RW Disc"
 msgstr "Pusta płyta Blu-Ray RW"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
 msgid "HD DVD Disc"
 msgstr "Płyta HD DVD"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
 msgid "Blank HD DVD Disc"
 msgstr "Pusta płyta HD-DVD"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
 msgid "HD DVD-R Disc"
 msgstr "Płyta HD DVD-R"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
 msgid "Blank HD DVD-R Disc"
 msgstr "Pusta płyta HD DVD-R"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
 msgid "HD DVD-RW Disc"
 msgstr "Płyta HD DVD-RW"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
 msgid "Blank HD DVD-RW Disc"
 msgstr "Pusta płyta HD DVD-RW"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
 msgid "MO Disc"
 msgstr "Płyta MO"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
 msgid "Blank MO Disc"
 msgstr "Pusta płyta MO"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
 msgid "Disc"
 msgstr "Płyta"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
 msgid "Blank Disc"
 msgstr "Pusta płyta"
 
-#: ../hal/ghalmount.c:199
+#: ../hal/ghalmount.c:348
 #, c-format
 msgid "%.1f kB Media"
 msgstr "Nośnik %.1f kB"
 
-#: ../hal/ghalmount.c:204
+#: ../hal/ghalmount.c:353
 #, c-format
 msgid "%.1f MB Media"
 msgstr "Nośnik %.1f MB"
 
-#: ../hal/ghalmount.c:209
+#: ../hal/ghalmount.c:358
 #, c-format
 msgid "%.1f GB Media"
 msgstr "Nośnik %.1f GB"
 
-#: ../hal/ghalmount.c:291 ../hal/ghalvolume.c:261
+#: ../hal/ghalmount.c:440 ../hal/ghalvolume.c:261
 msgid "Mixed Audio/Data Disc"
 msgstr "Mieszana płyta CD-Audio/Dane"
 
