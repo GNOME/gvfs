@@ -1,5 +1,10 @@
 2008-02-08  Alexander Larsson  <alexl@redhat.com>
 
+	* daemon/gvfsbackendtrash.c:
+	Always set CAN_TRASH to false
+	
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/gvfsbackendtrash.c (unescape_pathname):
 	Handle unescaping __ correctly (#514040)
 

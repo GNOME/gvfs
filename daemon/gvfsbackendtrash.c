@@ -917,6 +917,9 @@ add_extra_trash_info (GFileInfo *file_info,
   g_file_info_set_attribute_boolean (file_info,
                                      G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME,
                                      FALSE);
+  g_file_info_set_attribute_boolean (file_info,
+                                     G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH,
+                                     FALSE);
   
   /* But we can delete */
   g_file_info_set_attribute_boolean (file_info,
@@ -1188,6 +1191,9 @@ do_query_info (GVfsBackend *backend,
                                          FALSE);
       g_file_info_set_attribute_boolean (info,
                                          G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE,
+                                         FALSE);
+      g_file_info_set_attribute_boolean (info,
+                                         G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH,
                                          FALSE);
       g_file_info_set_attribute_boolean (info,
                                          G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME,
