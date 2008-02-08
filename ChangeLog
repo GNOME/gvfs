@@ -1,5 +1,10 @@
 2008-02-08  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghalvolume.c:
+        Implement g_volume_should_automount.
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendcomputer.c:
 	Add "filesystem" to computer:
 	

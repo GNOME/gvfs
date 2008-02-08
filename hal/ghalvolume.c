@@ -606,6 +606,15 @@ g_hal_volume_can_eject (GVolume *volume)
   return FALSE;
 }
 
+static gboolean
+g_hal_volume_should_automount (GVolume *volume)
+{
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+  /* TODO: For now, just never automount things that are not
+     local. Need to figure out a better approach later. */
+  return hal_volume->foreign_mount == NULL;
+}
+
 static GDrive *
 g_hal_volume_get_drive (GVolume *volume)
 {
@@ -974,6 +983,7 @@ g_hal_volume_volume_iface_init (GVolumeIface *iface)
   iface->get_mount = g_hal_volume_get_mount;
   iface->can_mount = g_hal_volume_can_mount;
   iface->can_eject = g_hal_volume_can_eject;
+  iface->should_automount = g_hal_volume_should_automount;
   iface->mount_fn = g_hal_volume_mount;
   iface->mount_finish = g_hal_volume_mount_finish;
   iface->eject = g_hal_volume_eject;
