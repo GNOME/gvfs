@@ -32,36 +32,36 @@
 static const char *
 get_object_signature (GObject *obj)
 {
-      if (G_IS_THEMED_ICON (obj))
-	{
-	  return
-	    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-	      DBUS_TYPE_UINT32_AS_STRING
-	      DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING
-	    DBUS_STRUCT_END_CHAR_AS_STRING;
-	}
-      else if (G_IS_FILE_ICON (obj))
-	{
-	  GFile *file;
-	  char *path;
-
-	  file = g_file_icon_get_file (G_FILE_ICON (obj));
-
-	  path = g_file_get_path (file);
-	  if (path)
-	    {
-	      g_free (path);
-	      return
-		DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-		  DBUS_TYPE_UINT32_AS_STRING
-		  DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
-		DBUS_STRUCT_END_CHAR_AS_STRING;
-	    }
-	}
+  if (G_IS_THEMED_ICON (obj))
+    {
       return
 	DBUS_STRUCT_BEGIN_CHAR_AS_STRING
 	  DBUS_TYPE_UINT32_AS_STRING
+	  DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING
 	DBUS_STRUCT_END_CHAR_AS_STRING;
+	}
+  else if (G_IS_FILE_ICON (obj))
+    {
+      GFile *file;
+      char *path;
+      
+      file = g_file_icon_get_file (G_FILE_ICON (obj));
+      
+      path = g_file_get_path (file);
+      if (path)
+	{
+	  g_free (path);
+	  return
+	    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+	      DBUS_TYPE_UINT32_AS_STRING
+	      DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
+	    DBUS_STRUCT_END_CHAR_AS_STRING;
+	}
+    }
+  return
+    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+      DBUS_TYPE_UINT32_AS_STRING
+    DBUS_STRUCT_END_CHAR_AS_STRING;
 }
 
 static void
@@ -144,7 +144,6 @@ append_object (DBusMessageIter *iter, GObject *obj)
 					       DBUS_TYPE_UINT32, &v_uint32))
 	    _g_dbus_oom ();
 	}
-      g_object_unref (file);
     }
   else
     {

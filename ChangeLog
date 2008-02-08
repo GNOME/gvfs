@@ -1,5 +1,11 @@
 2008-02-08  Alexander Larsson  <alexl@redhat.com>
 
+	* common/gvfsdaemonprotocol.c:
+	Fix up indentation
+	Don't unref file from g_file_icon_get_file().
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/gvfsbackendtrash.c:
 	Always set CAN_TRASH to false
 	
