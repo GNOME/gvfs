@@ -219,7 +219,7 @@ unescape_pathname (const char *escaped_dir, int len)
             *d++ = '_';
           else
             {
-              c = *(p+1);
+              c = *p;
               if (c == '_')
                 {
                   p++;
