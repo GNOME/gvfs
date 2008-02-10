@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 0.1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-27 15:32+0100\n"
-"PO-Revision-Date: 2008-01-27 15:38+0100\n"
+"POT-Creation-Date: 2008-02-11 00:46+0100\n"
+"PO-Revision-Date: 2008-02-11 00:50+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -15,117 +15,117 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:508 ../client/gdaemonfile.c:1900
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1856
 #, c-format
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 
-#: ../client/gdaemonfile.c:793
+#: ../client/gdaemonfile.c:749
 #, c-format
 msgid "Invalid return value from get_info"
 msgstr ""
 
-#: ../client/gdaemonfile.c:822
+#: ../client/gdaemonfile.c:778
 msgid "Invalid return value from query_info"
 msgstr ""
 
-#: ../client/gdaemonfile.c:894
+#: ../client/gdaemonfile.c:850
 msgid "Couldn't get stream file descriptor"
 msgstr ""
 
-#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176
+#: ../client/gdaemonfile.c:882 ../client/gdaemonfile.c:952
+#: ../client/gdaemonfile.c:1011 ../client/gdaemonfile.c:1070
+#: ../client/gdaemonfile.c:1132
 #, c-format
 msgid "Invalid return value from open"
 msgstr ""
 
-#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:962 ../client/gdaemonfile.c:1021
+#: ../client/gdaemonfile.c:1080 ../client/gdaemonfile.c:1142
 #, c-format
 msgid "Didn't get stream file descriptor"
 msgstr ""
 
-#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
+#: ../client/gdaemonfile.c:1194 ../client/gdaemonfile.c:1211
 msgid "Invalid return value from call"
 msgstr ""
 
-#: ../client/gdaemonfile.c:1530
+#: ../client/gdaemonfile.c:1486
 #, c-format
 msgid "Invalid return value from get_filesystem_info"
 msgstr ""
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1569
+#: ../client/gdaemonfile.c:1525
 #, c-format
 msgid "Could not find enclosing mount"
 msgstr "Kan ikke finne omsluttende montering"
 
-#: ../client/gdaemonfile.c:1599
+#: ../client/gdaemonfile.c:1555
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Ugyldig filnavn %s"
 
-#: ../client/gdaemonfile.c:1641
+#: ../client/gdaemonfile.c:1597
 #, c-format
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Ugyldig returverdi fra query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2049
+#: ../client/gdaemonfile.c:2005
 #, c-format
 msgid "Invalid return value from monitor_dir"
 msgstr "Ugyldig returverdi fra monitor_dir"
 
-#: ../client/gdaemonfile.c:2098
+#: ../client/gdaemonfile.c:2054
 #, c-format
 msgid "Invalid return value from monitor_file"
 msgstr "Ugyldig returverdi fra monitor_file"
 
-#: ../client/gdaemonfileinputstream.c:449
-#: ../client/gdaemonfileinputstream.c:457
-#: ../client/gdaemonfileinputstream.c:1302
-#: ../client/gdaemonfileinputstream.c:1312
-#: ../client/gdaemonfileoutputstream.c:401
-#: ../client/gdaemonfileoutputstream.c:409
-#: ../client/gdaemonfileoutputstream.c:1046
-#: ../client/gdaemonfileoutputstream.c:1056
+#: ../client/gdaemonfileinputstream.c:450
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1303
+#: ../client/gdaemonfileinputstream.c:1313
+#: ../client/gdaemonfileoutputstream.c:402
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1047
+#: ../client/gdaemonfileoutputstream.c:1057
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Feil i protokoll for strøm: %s"
 
-#: ../client/gdaemonfileinputstream.c:457
-#: ../client/gdaemonfileinputstream.c:1312
-#: ../client/gdaemonfileoutputstream.c:409
-#: ../client/gdaemonfileoutputstream.c:1056
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1313
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1057
 msgid "End of stream"
 msgstr "Slutt på strømmen"
 
-#: ../client/gdaemonfileinputstream.c:517
-#: ../client/gdaemonfileinputstream.c:673
-#: ../client/gdaemonfileinputstream.c:780
-#: ../client/gdaemonfileinputstream.c:1030
-#: ../client/gdaemonfileoutputstream.c:457
-#: ../client/gdaemonfileoutputstream.c:635
-#: ../client/gdaemonfileoutputstream.c:830 ../daemon/gvfsbackendsmb.c:952
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:781
+#: ../client/gdaemonfileinputstream.c:1031
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendsmb.c:952
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:122
-#: ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:298
 #, c-format
 msgid "Operation was cancelled"
 msgstr "Operasjonen ble avbrutt"
 
-#: ../client/gdaemonfileinputstream.c:1205
-#: ../client/gdaemonfileoutputstream.c:941
+#: ../client/gdaemonfileinputstream.c:1206
+#: ../client/gdaemonfileoutputstream.c:942
 #, c-format
 msgid "Seek not supported on stream"
 msgstr "Søking ikke støttet på strøm"
 
-#: ../client/gdaemonfileinputstream.c:1239
+#: ../client/gdaemonfileinputstream.c:1240
 #, c-format
 msgid "The query info operation is not supported"
 msgstr ""
 
-#: ../client/gdaemonvfs.c:566
+#: ../client/gdaemonvfs.c:603
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr ""
@@ -145,97 +145,112 @@ msgstr ""
 msgid "Error connecting to socket: %s"
 msgstr ""
 
-#: ../common/gvfsdaemonprotocol.c:516
+#: ../common/gvfsdaemonprotocol.c:515
 #, c-format
 msgid "Invalid file info format"
 msgstr "Ugyldig format for filinformasjon"
 
-#: ../common/gvfsdaemonprotocol.c:533
+#: ../common/gvfsdaemonprotocol.c:532
 #, c-format
 msgid "Invalid attribute info list content"
 msgstr ""
 
-#: ../daemon/daemon-main.c:56
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
 #, c-format
-msgid "Error connecting to D-Bus: %s\n"
-msgstr "Feil under tilkobling til D-Bus: %s\n"
+msgid "Error connecting to D-Bus: %s"
+msgstr "Feil under tilkobling til D-Bus: %s"
 
-#: ../daemon/daemon-main.c:177
+#: ../daemon/daemon-main.c:82
 #, c-format
-msgid "Error connecting dbus: %s\n"
-msgstr ""
+msgid "Error: %s"
+msgstr "Feil: %s"
 
-#: ../daemon/daemon-main.c:211
+#: ../daemon/daemon-main.c:115
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "Bruk %s --spawner dbus-id objekt_sti"
+
+#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "Bruk: %s key=verdi key=verdi..."
+
+#: ../daemon/daemon-main.c:155
+#, c-format
+msgid "No mount type specified"
+msgstr "Ingen monteringstype oppgitt"
+
+#: ../daemon/daemon-main.c:225
 #, c-format
 msgid "mountpoint for %s already running"
-msgstr ""
+msgstr "monteringspunkt for %s kjører allerede"
 
-#: ../daemon/daemon-main.c:222
+#: ../daemon/daemon-main.c:236
 msgid "error starting mount daemon"
-msgstr ""
+msgstr "feil under oppstart av monteringstjenesten"
 
-#: ../daemon/gvfsbackendburn.c:346
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:347
 msgid "Burn"
 msgstr "Brenn"
 
-#: ../daemon/gvfsbackendburn.c:376
+#: ../daemon/gvfsbackendburn.c:377
 msgid "Unable to create temporary directory"
 msgstr "Kan ikke opprette midlertidig katalog"
 
-#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:671
-#: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
-#: ../daemon/gvfsbackendburn.c:782
-#, fuzzy
+#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
+#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
+#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
+#: ../daemon/gvfsbackendburn.c:784
 msgid "No such file or directory"
-msgstr "Fil %s finnes ikke på lager %s"
+msgstr "Filen eller katalogen finnes ikke"
 
-#: ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackendburn.c:426
 msgid "Directory not empty"
 msgstr "Katalogen er ikke tom"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:894
-#, fuzzy
+#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:896
 msgid "Can't copy file over directory"
-msgstr "Kan ikke flytte katalog over katalog"
+msgstr "Kan ikke kopiere fil over katalog"
 
-#: ../daemon/gvfsbackendburn.c:650
-msgid "CD Burner"
-msgstr ""
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "CD/DVD-oppretting"
 
-#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:641
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
 msgid "The file is not a directory"
 msgstr "Filen er ikke en katalog"
 
-#: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
-#: ../daemon/gvfsbackendburn.c:914
+#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
+#: ../daemon/gvfsbackendburn.c:916
 msgid "File exists"
 msgstr "Filen eksisterer"
 
-#: ../daemon/gvfsbackendburn.c:842
+#: ../daemon/gvfsbackendburn.c:844
 msgid "No such file or directory in target path"
-msgstr ""
+msgstr "Fil eller katalog finnes ikke i målsti"
 
-#: ../daemon/gvfsbackendburn.c:865
+#: ../daemon/gvfsbackendburn.c:867
 msgid "Can't copy directory over directory"
 msgstr "Kan ikke kopiere katalog over katalog"
 
-#: ../daemon/gvfsbackendburn.c:874
+#: ../daemon/gvfsbackendburn.c:876
 msgid "Target file exists"
 msgstr "Målfilen eksisterer"
 
-#: ../daemon/gvfsbackendburn.c:881
+#: ../daemon/gvfsbackendburn.c:883
 msgid "Can't recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
 
-#: ../daemon/gvfsbackendburn.c:940
+#: ../daemon/gvfsbackendburn.c:942
 msgid "Not supported"
 msgstr "Ikke støttet"
 
 #: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
 #, c-format
 msgid "No drive specified"
-msgstr ""
+msgstr "Ingen stasjon oppgitt"
 
 #: ../daemon/gvfsbackendcdda.c:157
 #, c-format
@@ -245,7 +260,7 @@ msgstr "Kan ikke finne stasjon %s"
 #: ../daemon/gvfsbackendcdda.c:167
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr ""
+msgstr "Stasjon %s inneholder ikke lydfiler"
 
 #. Translator: %s is the device the disc is inserted into
 #: ../daemon/gvfsbackendcdda.c:174
@@ -254,7 +269,7 @@ msgid "Audio Disc on %s"
 msgstr "Lyd-plate på %s"
 
 #: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:680
-#: ../hal/ghalmount.c:293 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:262
+#: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
 #, c-format
 msgid "Audio Disc"
 msgstr "Lyd-plate"
@@ -297,49 +312,53 @@ msgstr "Filen eksisterer ikke"
 msgid "The file does not exist or isn't an audio track"
 msgstr "Filen eksisterer ikke eller er ikke et lydspor"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:683
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
 msgid "Computer"
 msgstr "Datamaskin"
 
-#: ../daemon/gvfsbackendcomputer.c:562 ../daemon/gvfsbackendsmbbrowse.c:786
+#: ../daemon/gvfsbackendcomputer.c:465
+msgid "Filesystem"
+msgstr "Filsystem"
+
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:786
 #: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
 #: ../daemon/gvfsbackendsmbbrowse.c:1098
 #, c-format
 msgid "File doesn't exist"
 msgstr "Filen eksisterer ikke"
 
-#: ../daemon/gvfsbackendcomputer.c:580 ../daemon/gvfsbackendtrash.c:632
+#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:632
 msgid "Can't open directory"
 msgstr "Kan ikke åpne katalog"
 
-#: ../daemon/gvfsbackendcomputer.c:584 ../daemon/gvfsbackendcomputer.c:718
+#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:727
 msgid "Can't open mountable file"
 msgstr "Kan ikke åpne monterbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:765
+#: ../daemon/gvfsbackendcomputer.c:774
 #, c-format
 msgid "Internal error: %s"
 msgstr "Intern feil: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:789 ../daemon/gvfsbackendcomputer.c:854
-#: ../daemon/gvfsbackendcomputer.c:954
+#: ../daemon/gvfsbackendcomputer.c:798 ../daemon/gvfsbackendcomputer.c:863
+#: ../daemon/gvfsbackendcomputer.c:963
 msgid "Not a mountable file"
 msgstr "Ikke en monterbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:811
+#: ../daemon/gvfsbackendcomputer.c:820
 msgid "Can't mount file"
 msgstr "Kan ikke montere fil"
 
-#: ../daemon/gvfsbackendcomputer.c:869
+#: ../daemon/gvfsbackendcomputer.c:878
 msgid "Can't unmount file"
 msgstr "Kan ikke avmontere fil"
 
-#: ../daemon/gvfsbackendcomputer.c:985
+#: ../daemon/gvfsbackendcomputer.c:994
 msgid "Can't eject file"
 msgstr "Kan ikke løse ut fil"
 
 #: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:642
-#: ../daemon/gvfsbackendhttp.c:185
+#: ../daemon/gvfsbackendhttp.c:170
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP-feil: %s"
@@ -360,9 +379,8 @@ msgid "Unexpected reply from server"
 msgstr "Uventet svar fra tjener"
 
 #: ../daemon/gvfsbackenddav.c:564
-#, fuzzy
 msgid "Please enter proxy password"
-msgstr "Skriv inn passord"
+msgstr "Skriv inn passord for proxy"
 
 #: ../daemon/gvfsbackenddav.c:573
 #, fuzzy
@@ -378,7 +396,7 @@ msgstr "Skriv inn passord for %s"
 msgid "Not a WebDAV enabled share"
 msgstr "Ressursen støtter ikke WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:409
+#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:239
 #: ../daemon/gvfsbackendsmb.c:542
 msgid "Invalid mount spec"
 msgstr "Ugyldige monteringsspesifikasjon"
@@ -391,6 +409,22 @@ msgstr "Ugyldig svar"
 msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
+#: ../daemon/gvfsbackenddav.c:989 ../daemon/gvfsbackendsmb.c:1653
+msgid "Target file already exists"
+msgstr "Målfilen eksisterer allerede"
+
+#: ../daemon/gvfsbackenddav.c:1059 ../daemon/gvfsbackendsftp.c:2433
+#: ../daemon/gvfsbackendsmb.c:921
+#, c-format
+msgid "The file was externally modified"
+msgstr "Filen er endret eksternt"
+
+#: ../daemon/gvfsbackenddav.c:1090 ../daemon/gvfsbackendsmb.c:957
+#: ../daemon/gvfsbackendsmb.c:1670
+#, c-format
+msgid "Backup file creation failed"
+msgstr "Oppretting av sikkerhetskopi feilet"
+
 #: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1164
 msgid "No hostname specified"
 msgstr "Ingen vertsnavn oppgitt"
@@ -400,33 +434,17 @@ msgstr "Ingen vertsnavn oppgitt"
 msgid "Unsupported seek type"
 msgstr "Søketype ikke støttet"
 
-#: ../daemon/gvfsbackendhttp.c:181
-#, fuzzy, c-format
+#: ../daemon/gvfsbackendhttp.c:166
+#, c-format
 msgid "HTTP Client Error: %s"
-msgstr "HTTP-feil: %s"
+msgstr "HTTP-klientfeil: %s"
 
-#: ../daemon/gvfsbackendhttp.c:226 ../daemon/gvfsbackendsftp.c:1489
-#: ../daemon/gvfsbackendsmb.c:1160 ../daemon/gvfsbackendtrash.c:948
+#: ../daemon/gvfsbackendhttp.c:504 ../daemon/gvfsbackendsftp.c:1495
+#: ../daemon/gvfsbackendsmb.c:1162 ../daemon/gvfsbackendtrash.c:951
 msgid " (invalid encoding)"
 msgstr " (ugyldig koding)"
 
-#: ../daemon/gvfsbackendhttp.c:639 ../daemon/gvfsbackendsmb.c:1653
-msgid "Target file already exists"
-msgstr "Målfilen eksisterer allerede"
-
-#: ../daemon/gvfsbackendhttp.c:709 ../daemon/gvfsbackendsftp.c:2416
-#: ../daemon/gvfsbackendsmb.c:921
-#, c-format
-msgid "The file was externally modified"
-msgstr "Filen er endret eksternt"
-
-#: ../daemon/gvfsbackendhttp.c:740 ../daemon/gvfsbackendsmb.c:957
-#: ../daemon/gvfsbackendsmb.c:1670
-#, c-format
-msgid "Backup file creation failed"
-msgstr "Oppretting av sikkerhetskopi feilet"
-
-#: ../daemon/gvfsbackendlocaltest.c:788
+#: ../daemon/gvfsbackendlocaltest.c:853
 #, fuzzy
 msgid "Directory notification not supported"
 msgstr "Operasjonen ikke tillatt av motoren"
@@ -509,38 +527,44 @@ msgstr "sftp på %s"
 msgid "Unable to find supported ssh command"
 msgstr "Kan ikke finne støttet ssh-kommando"
 
-#: ../daemon/gvfsbackendsftp.c:1554
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1507
+#, c-format
+msgid "/ on %s"
+msgstr "/ på %s"
+
+#: ../daemon/gvfsbackendsftp.c:1571
 msgid "File is directory"
 msgstr "Filen er en katalog"
 
-#: ../daemon/gvfsbackendsftp.c:1563
+#: ../daemon/gvfsbackendsftp.c:1580
 msgid "Failure"
 msgstr "Feil"
 
-#: ../daemon/gvfsbackendsftp.c:1628 ../daemon/gvfsbackendsftp.c:1690
-#: ../daemon/gvfsbackendsftp.c:1701 ../daemon/gvfsbackendsftp.c:1759
-#: ../daemon/gvfsbackendsftp.c:1849 ../daemon/gvfsbackendsftp.c:1878
-#: ../daemon/gvfsbackendsftp.c:1926 ../daemon/gvfsbackendsftp.c:2005
-#: ../daemon/gvfsbackendsftp.c:2116 ../daemon/gvfsbackendsftp.c:2157
-#: ../daemon/gvfsbackendsftp.c:2209 ../daemon/gvfsbackendsftp.c:2280
-#: ../daemon/gvfsbackendsftp.c:2300 ../daemon/gvfsbackendsftp.c:2454
-#: ../daemon/gvfsbackendsftp.c:2480 ../daemon/gvfsbackendsftp.c:2537
-#: ../daemon/gvfsbackendsftp.c:2596 ../daemon/gvfsbackendsftp.c:2878
-#: ../daemon/gvfsbackendsftp.c:3007 ../daemon/gvfsbackendsftp.c:3038
-#: ../daemon/gvfsbackendsftp.c:3137 ../daemon/gvfsbackendsftp.c:3178
-#: ../daemon/gvfsbackendsftp.c:3231 ../daemon/gvfsbackendsftp.c:3267
-#: ../daemon/gvfsbackendsftp.c:3301 ../daemon/gvfsbackendsftp.c:3316
-#: ../daemon/gvfsbackendsftp.c:3335
+#: ../daemon/gvfsbackendsftp.c:1645 ../daemon/gvfsbackendsftp.c:1707
+#: ../daemon/gvfsbackendsftp.c:1718 ../daemon/gvfsbackendsftp.c:1776
+#: ../daemon/gvfsbackendsftp.c:1866 ../daemon/gvfsbackendsftp.c:1895
+#: ../daemon/gvfsbackendsftp.c:1943 ../daemon/gvfsbackendsftp.c:2022
+#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2174
+#: ../daemon/gvfsbackendsftp.c:2226 ../daemon/gvfsbackendsftp.c:2297
+#: ../daemon/gvfsbackendsftp.c:2317 ../daemon/gvfsbackendsftp.c:2471
+#: ../daemon/gvfsbackendsftp.c:2497 ../daemon/gvfsbackendsftp.c:2554
+#: ../daemon/gvfsbackendsftp.c:2613 ../daemon/gvfsbackendsftp.c:2895
+#: ../daemon/gvfsbackendsftp.c:3024 ../daemon/gvfsbackendsftp.c:3057
+#: ../daemon/gvfsbackendsftp.c:3158 ../daemon/gvfsbackendsftp.c:3199
+#: ../daemon/gvfsbackendsftp.c:3252 ../daemon/gvfsbackendsftp.c:3288
+#: ../daemon/gvfsbackendsftp.c:3322 ../daemon/gvfsbackendsftp.c:3337
+#: ../daemon/gvfsbackendsftp.c:3356
 #, c-format
-msgid "Invalid reply recieved"
+msgid "Invalid reply received"
 msgstr "Ugyldig svar mottatt"
 
-#: ../daemon/gvfsbackendsftp.c:1947
+#: ../daemon/gvfsbackendsftp.c:1964
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Feil under oppretting av sikkerhetskopi: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2362
+#: ../daemon/gvfsbackendsftp.c:2379
 msgid "Unable to create temporary file"
 msgstr "Kan ikke opprette midlertidig fil"
 
@@ -551,12 +575,13 @@ msgid "Password required for share %s on %s"
 msgstr "Passord kreves for delt ressurs %s på %s"
 
 #: ../daemon/gvfsbackendsmb.c:429 ../daemon/gvfsbackendsmb.c:464
-#, fuzzy, c-format
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
 msgid "Internal Error (%s)"
-msgstr "Ekstern %s"
+msgstr "Intern feil (%s)"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1153
+#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1155
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
@@ -620,15 +645,16 @@ msgid "Not a directory"
 msgstr "Ikke en katalog"
 
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1165
-msgid "Trashcan"
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1170
+msgid "Trash"
 msgstr "Papirkurv"
 
-#: ../daemon/gvfsbackendtrash.c:1255
+#: ../daemon/gvfsbackendtrash.c:1268
 msgid "Can't delete trash"
 msgstr "Kan ikke slette søppel"
 
-#: ../daemon/gvfsbackendtrash.c:1602 ../daemon/gvfsbackendtrash.c:1677
+#: ../daemon/gvfsbackendtrash.c:1615 ../daemon/gvfsbackendtrash.c:1690
 msgid "Trash directory notification not supported"
 msgstr ""
 
@@ -636,11 +662,6 @@ msgstr ""
 #, fuzzy
 msgid "Invalid backend type"
 msgstr "Ugyldige parametere"
-
-#: ../daemon/gvfsdaemonutils.c:92
-#, c-format
-msgid "No fd passing socket available"
-msgstr ""
 
 #: ../daemon/gvfsdaemonutils.c:102
 #, c-format
@@ -671,21 +692,36 @@ msgid "Symlinks not supported by backend"
 msgstr "Symbolske lenker er ikke støttet av motoren"
 
 #: ../daemon/gvfsjobsetattribute.c:123
-#, fuzzy
 msgid "Invalid dbus message"
-msgstr "Ugyldige monteringsspesifikasjon"
+msgstr "Ugyldig dbus-melding"
 
-#: ../daemon/main.c:44
+#: ../daemon/main.c:47
 msgid "Replace old daemon."
 msgstr ""
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:48
 msgid "Don't start fuse."
-msgstr ""
+msgstr "Ikke start fuse."
 
-#: ../daemon/main.c:51
+#: ../daemon/main.c:60
 msgid "GVFS Daemon"
 msgstr "GVFS-tjeneste"
+
+#: ../daemon/main.c:63
+msgid "Main daemon for GVFS"
+msgstr ""
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:74
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:142
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr ""
 
 #: ../daemon/mount.c:372
 #, c-format
@@ -861,203 +897,205 @@ msgstr ""
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 
-#: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
 msgid "CD-ROM Disc"
 msgstr "CD-ROM-plate"
 
-#: ../hal/ghalmount.c:134 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
 msgid "Blank CD-ROM Disc"
 msgstr "Tom CD-ROM plate"
 
-#: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
 msgid "CD-R Disc"
 msgstr "CD-R plate"
 
-#: ../hal/ghalmount.c:135 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
 msgid "Blank CD-R Disc"
 msgstr "Tom CD-R plate"
 
-#: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
 msgid "CD-RW Disc"
 msgstr "CD-RW plate"
 
-#: ../hal/ghalmount.c:136 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
 msgid "Blank CD-RW Disc"
 msgstr "Tom CD-RW plate"
 
-#: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
 #: ../hal/ghalvolume.c:143
 msgid "DVD-ROM Disc"
 msgstr "DVD-ROM plate"
 
-#: ../hal/ghalmount.c:137 ../hal/ghalmount.c:139 ../hal/ghalvolume.c:141
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
 #: ../hal/ghalvolume.c:143
 msgid "Blank DVD-ROM Disc"
 msgstr "Tom DVD-ROM plate"
 
-#: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
 msgid "DVD-RAM Disc"
 msgstr "DVD-RAM plate"
 
-#: ../hal/ghalmount.c:138 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
 msgid "Blank DVD-RAM Disc"
 msgstr "Tom DVD-RAM plate"
 
-#: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
 msgid "DVD-RW Disc"
 msgstr "DVD-RW plate"
 
-#: ../hal/ghalmount.c:140 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
 msgid "Blank DVD-RW Disc"
 msgstr "Tom DVD-RW plate"
 
-#: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
 msgid "DVD+R Disc"
 msgstr "DVD+R plate"
 
-#: ../hal/ghalmount.c:141 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
 msgid "Blank DVD+R Disc"
 msgstr "Tom DVD+R plate"
 
-#: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
 msgid "DVD+RW Disc"
 msgstr "DVD+RW plate"
 
-#: ../hal/ghalmount.c:142 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
 msgid "Blank DVD+RW Disc"
 msgstr "Tom DVD+RW plate"
 
-#: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
 msgid "DVD+R DL Disc"
 msgstr "DVD+R DL plate"
 
-#: ../hal/ghalmount.c:143 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
 msgid "Blank DVD+R DL Disc"
 msgstr "Tom DVD+R DL plate"
 
-#: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
 msgid "Blu-Ray Disc"
 msgstr "Blu-Ray plate"
 
-#: ../hal/ghalmount.c:144 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
 msgid "Blank Blu-Ray Disc"
 msgstr "Tom Blu-Ray plate"
 
-#: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
 msgid "Blu-Ray R Disc"
 msgstr "Blu-Ray R plate"
 
-#: ../hal/ghalmount.c:145 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
 msgid "Blank Blu-Ray R Disc"
 msgstr "Tom Blu-Ray R plate"
 
-#: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
 msgid "Blu-Ray RW Disc"
 msgstr "Blu-Ray RW plate"
 
-#: ../hal/ghalmount.c:146 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
 msgid "Blank Blu-Ray RW Disc"
 msgstr "Tom Blu-Ray RW plate"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
 msgid "HD DVD Disc"
 msgstr "HD DVD plate"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
 msgid "Blank HD DVD Disc"
 msgstr "Tom HD-DVD plate"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
 msgid "HD DVD-R Disc"
 msgstr "HD DVD-R plate"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
 msgid "Blank HD DVD-R Disc"
 msgstr "Tom HD DVD-R plate"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
 msgid "HD DVD-RW Disc"
 msgstr "HD DVD-RW plate"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
 msgid "Blank HD DVD-RW Disc"
 msgstr "Tom HD DVD-RW plate"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
 msgid "MO Disc"
 msgstr "MO-plate"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
 msgid "Blank MO Disc"
 msgstr "Tom MO plate"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
 msgid "Disc"
 msgstr "Disk"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
 msgid "Blank Disc"
 msgstr "Tom disk"
 
-#: ../hal/ghalmount.c:199
+#: ../hal/ghalmount.c:348
 #, c-format
 msgid "%.1f kB Media"
 msgstr "%.1f kB medie"
 
-#: ../hal/ghalmount.c:204
+#: ../hal/ghalmount.c:353
 #, c-format
 msgid "%.1f MB Media"
 msgstr "%.1f MB medie"
 
-#: ../hal/ghalmount.c:209
+#: ../hal/ghalmount.c:358
 #, c-format
 msgid "%.1f GB Media"
 msgstr "%.1f GB medie"
 
-#: ../hal/ghalmount.c:291 ../hal/ghalvolume.c:260
+#: ../hal/ghalmount.c:440 ../hal/ghalvolume.c:261
 msgid "Mixed Audio/Data Disc"
 msgstr "Blandet lyd- og dataplate"
 
 #: ../hal/ghalvolume.c:189
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f kB"
-msgstr "%.1f kB medie"
+msgstr "%.1f kB"
 
 #: ../hal/ghalvolume.c:194
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f MB"
-msgstr "%.1f MB medie"
+msgstr "%.1f MB"
 
 #: ../hal/ghalvolume.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "%.1f GB"
-msgstr "%.1f GB medie"
+msgstr "%.1f GB"
 
-#: ../hal/ghalvolume.c:248
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:249
 #, c-format
 msgid "%s Encrypted Data"
-msgstr ""
+msgstr "%s krypterte data"
 
-#: ../hal/ghalvolume.c:270
-#, fuzzy, c-format
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:272
+#, c-format
 msgid "%s Media"
-msgstr "%.1f kB medie"
+msgstr "%s medie"
 
-#: ../hal/ghalvolume.c:312
+#: ../hal/ghalvolume.c:314
 msgid "Camera"
 msgstr "Kamera"
 
-#: ../hal/ghalvolume.c:319
-#, fuzzy, c-format
+#: ../hal/ghalvolume.c:321
+#, c-format
 msgid "%s Camera"
-msgstr "Kamera"
+msgstr "%s kamera"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:59
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s: error opening file: %s\n"
-msgstr "Feil under flytting av fil: %s"
+msgstr "%s: %s feil ved åpning av fil: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
@@ -1080,13 +1118,13 @@ msgstr ""
 msgid "%s: %s:error closing: %s\n"
 msgstr ""
 
-#: ../programs/gvfs-cat.c:137
+#: ../programs/gvfs-cat.c:138
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
 msgstr ""
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:142
+#: ../programs/gvfs-cat.c:143
 msgid ""
 "Concatenate files at locations and print to the standard output. Works just "
 "like the traditional cat utility, but using gvfs location instead local "
@@ -1094,7 +1132,7 @@ msgid ""
 "as location to concatenate."
 msgstr ""
 
-#: ../programs/gvfs-cat.c:149
+#: ../programs/gvfs-cat.c:150
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
@@ -1102,842 +1140,34 @@ msgstr ""
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:164
+#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:140
 #, c-format
 msgid "%s: missing locations"
 msgstr ""
 
-#: ../programs/gvfs-cat.c:166
-#, c-format
-msgid "Try \"%s --help\" for more information."
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:65
+#, fuzzy, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "Feil under flytting av fil: %s"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:92
+#, fuzzy, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "Feil under flytting av fil: %s"
+
+#: ../programs/gvfs-open.c:122
+msgid "FILES... - open FILES with registered application."
 msgstr ""
 
-#, fuzzy
-#~ msgid "Can't enumerate non-directory"
-#~ msgstr "Kan ikke åpne katalog"
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:126
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
 
-#~ msgid "Can't find mount for mounted volume"
-#~ msgstr "Kan ikke finne montering for montert volum"
-
-#, fuzzy
-#~ msgid "Failed to allocate smb context"
-#~ msgstr "Feil ved start av kommando"
-
-#, fuzzy
-#~ msgid "Failed to accept client: %s"
-#~ msgstr "Feil ved start av kommando"
-
-#, fuzzy
-#~ msgid "Failed to demarshal message"
-#~ msgstr "Feil ved start av kommando"
-
-#~ msgid "AFFS Volume"
-#~ msgstr "AFFS-volum"
-
-#~ msgid "AFS Network Volume"
-#~ msgstr "AFS nettverksvolum"
-
-#~ msgid "Auto-detected Volume"
-#~ msgstr "Automatisk gjenkjent volum"
-
-#~ msgid "CD-ROM Drive"
-#~ msgstr "CD-ROM stasjon"
-
-#~ msgid "CD Digital Audio"
-#~ msgstr "Digital lyd-CD"
-
-#~ msgid "Hardware Device Volume"
-#~ msgstr "Volum på maskinvareenhet"
-
-#~ msgid "EncFS Volume"
-#~ msgstr "EncFS-volum"
-
-#~ msgid "Ext2 Linux Volume"
-#~ msgstr "Ext2 Linux-volum"
-
-#~ msgid "Ext3 Linux Volume"
-#~ msgstr "Ext3 Linux-volum"
-
-#~ msgid "MSDOS Volume"
-#~ msgstr "MSDOS-volum"
-
-#~ msgid "BSD Volume"
-#~ msgstr "BSD-volum"
-
-#~ msgid "FUSE Volume"
-#~ msgstr "FUSE-volum"
-
-#~ msgid "MacOS Volume"
-#~ msgstr "MacOS-volum"
-
-#~ msgid "CDROM Volume"
-#~ msgstr "CD-ROM-volum"
-
-#~ msgid "Hsfs CDROM Volume"
-#~ msgstr "Hsfs CD-ROM-volum"
-
-#~ msgid "JFS Volume"
-#~ msgstr "JFS-volum"
-
-#~ msgid "Windows NT Volume"
-#~ msgstr "Windows NT-volum"
-
-#~ msgid "System Volume"
-#~ msgstr "Systemvolum"
-
-#~ msgid "Memory Volume"
-#~ msgstr "Minnevolum"
-
-#~ msgid "Minix Volume"
-#~ msgstr "Minix-volum"
-
-#~ msgid "NFS Network Volume"
-#~ msgstr "NFS nettverksvolum"
-
-#~ msgid "Netware Volume"
-#~ msgstr "Netware-volum"
-
-#~ msgid "Reiser4 Linux Volume"
-#~ msgstr "Reiser4 Linux-volum"
-
-#~ msgid "ReiserFS Linux Volume"
-#~ msgstr "ReiserFS Linux-volum"
-
-#~ msgid "SuperMount Volume"
-#~ msgstr "SuperMount-volum"
-
-#~ msgid "DVD Volume"
-#~ msgstr "DVD-volum"
-
-#~ msgid "Solaris/BSD Volume"
-#~ msgstr "Silaris/BSD-volum"
-
-#~ msgid "Udfs Solaris Volume"
-#~ msgstr "Udfs Solaris-volum"
-
-#~ msgid "Pcfs Solaris Volume"
-#~ msgstr "Pcfs Solaris-volum"
-
-#~ msgid "Sun SAM-QFS Volume"
-#~ msgstr "Sun SAM-QFS-volum"
-
-#~ msgid "Temporary Volume"
-#~ msgstr "Midlertidig volum"
-
-#~ msgid "Enhanced DOS Volume"
-#~ msgstr "Forbedret DOS-volum"
-
-#~ msgid "Windows VFAT Volume"
-#~ msgstr "Windows VFAT-volum"
-
-#~ msgid "Xenix Volume"
-#~ msgstr "Xenix-volum"
-
-#~ msgid "XFS Linux Volume"
-#~ msgstr "XFS Linux-volum"
-
-#~ msgid "XIAFS Volume"
-#~ msgstr "XIAFS-volum"
-
-#~ msgid "CIFS Volume"
-#~ msgstr "CIFS-volum"
-
-#~ msgid "Unknown"
-#~ msgstr "Ukjent"
-
-#~ msgid "%s Volume"
-#~ msgstr "%s-volum"
-
-#~ msgid "Pen Drive"
-#~ msgstr "Pennestasjon"
-
-#~ msgid "%s %s Music Player"
-#~ msgstr "%s %s musikkavspiller"
-
-#~ msgid "%s %s Digital Camera"
-#~ msgstr "%s %s digitalt kamera"
-
-#~ msgid "%s Removable Volume"
-#~ msgstr "%s avtagbart volum"
-
-#~ msgid "Volume"
-#~ msgstr "Volum"
-
-#~ msgid "Unknown operation type %u"
-#~ msgstr "Ukjent type operasjon %u"
-
-#~ msgid "Cannot create pipe for open GIOChannel: %s"
-#~ msgstr "Kan ikke opprette rør for åpen GIOChannel: %s"
-
-#~ msgid "Unknown job kind %u"
-#~ msgstr "Ukjent type jobb %u"
-
-#~ msgid "Operation stopped"
-#~ msgstr "Stoppet operasjonen"
-
-#~ msgid ""
-#~ "Deprecated function.  User modifications to the MIME database are no "
-#~ "longer supported."
-#~ msgstr ""
-#~ "Utgått funksjonskall. Brukerendringer i MIME-databasen er ikke støttet "
-#~ "lengre."
-
-#~ msgid "More parsing errors will be ignored."
-#~ msgstr "Flere fortolkningsfeil vil bli ignorert."
-
-#~ msgid "No error"
-#~ msgstr "Ingen feil"
-
-#~ msgid "File not found"
-#~ msgstr "Fil ikke funnet"
-
-#~ msgid "Generic error"
-#~ msgstr "Ordinær feil"
-
-#~ msgid "I/O error"
-#~ msgstr "I/U-feil"
-
-#~ msgid "Data corrupted"
-#~ msgstr "Korrupt data"
-
-#~ msgid "Format not valid"
-#~ msgstr "Ugyldig format"
-
-#~ msgid "Bad file handle"
-#~ msgstr "Ugyldig filhåndtak"
-
-#~ msgid "File too big"
-#~ msgstr "Filen er for stor"
-
-#~ msgid "Read-only file system"
-#~ msgstr "Skrivebeskyttet filsystem"
-
-#~ msgid "Invalid URI"
-#~ msgstr "Ugyldig URI"
-
-#~ msgid "File not open"
-#~ msgstr "Filen er ikke åpen"
-
-#~ msgid "Open mode not valid"
-#~ msgstr "Ugyldig åpningsmodus"
-
-#~ msgid "Too many open files"
-#~ msgstr "For mange åpne filer"
-
-#~ msgid "Operation in progress"
-#~ msgstr "Operasjonen er under fremgang"
-
-#~ msgid "Operation interrupted"
-#~ msgstr "Operasjonen avbrutt"
-
-#~ msgid "Looping links encountered"
-#~ msgstr "Lenker i løkke funnet"
-
-#~ msgid "Not enough memory"
-#~ msgstr "Ikke nok minne"
-
-#~ msgid "Host not found"
-#~ msgstr "Verten ikke funnet"
-
-#~ msgid "Host has no address"
-#~ msgstr "Verten har ingen adresse"
-
-#~ msgid "Login failed"
-#~ msgstr "Innlogging feilet"
-
-#~ msgid "Directory busy"
-#~ msgstr "Katalogen opptatt"
-
-#~ msgid "Too many links"
-#~ msgstr "For mange lenker"
-
-#~ msgid "Read only file system"
-#~ msgstr "Skrivebeskyttet filsystem"
-
-#~ msgid "Not on the same file system"
-#~ msgstr "Ikke på samme filsystem"
-
-#~ msgid "Name too long"
-#~ msgstr "Navnet er for langt"
-
-#~ msgid "Service not available"
-#~ msgstr "Tjeneste ikke tilgjengelig"
-
-#~ msgid "Request obsoletes service's data"
-#~ msgstr "Forespørsel ugyldiggjør tjenestens data"
-
-#~ msgid "No default action associated"
-#~ msgstr "Ingen forvalgt handling asossiert"
-
-#~ msgid "No handler for URL scheme"
-#~ msgstr "Ingen håndterer for URK-schema"
-
-#~ msgid "Error parsing command line"
-#~ msgstr "Feil under lesing av kommandolinjen"
-
-#~ msgid "Error launching command"
-#~ msgstr "Feil under oppstart av kommando"
-
-#~ msgid "Timeout reached"
-#~ msgstr "Tidsavbrudd nådd"
-
-#~ msgid "Nameserver error"
-#~ msgstr "Feil med navnetjener"
-
-#~ msgid "The resource is locked"
-#~ msgstr "Ressursen er låst"
-
-#~ msgid "Function call deprecated"
-#~ msgstr "Utgått funksjonskall"
-
-#~ msgid "Not a symbolic link"
-#~ msgstr "Ikke en symbolsk lenke"
-
-#~ msgid "Unknown error"
-#~ msgstr "Ukjent feil"
-
-#~ msgid "%u byte"
-#~ msgid_plural "%u bytes"
-#~ msgstr[0] "%u byte"
-#~ msgstr[1] "%u bytes"
-
-#~ msgid "Floppy"
-#~ msgstr "Diskett"
-
-#~ msgid "CD-ROM/DVD-ROM"
-#~ msgstr "CD-ROM/DVD-ROM"
-
-#~ msgid "CD-ROM/DVD-RAM"
-#~ msgstr "CD-ROM/DVD-RAM"
-
-#~ msgid "CD-ROM/DVD-R"
-#~ msgstr "CD-ROM/DVD-R"
-
-#~ msgid "CD-ROM/DVD-RW"
-#~ msgstr "CD-ROM/DVD-RW"
-
-#~ msgid "CD-R/DVD-ROM"
-#~ msgstr "CD-R/DVD-ROM"
-
-#~ msgid "CD-R/DVD-RAM"
-#~ msgstr "CD-R/DVD-RAM"
-
-#~ msgid "CD-R/DVD-R"
-#~ msgstr "CD-R/DVD-R"
-
-#~ msgid "CD-R/DVD-RW"
-#~ msgstr "CD-R/DVD-RW"
-
-#~ msgid "CD-RW/DVD-ROM"
-#~ msgstr "CD-RW/DVD-ROM"
-
-#~ msgid "CD-RW/DVD-RAM"
-#~ msgstr "CD-RW/DVD-RAM"
-
-#~ msgid "CD-RW/DVD-R"
-#~ msgstr "CD-RW/DVD-R"
-
-#~ msgid "CD-RW/DVD-RW"
-#~ msgstr "CD-RW/DVD-RW"
-
-#~ msgid "IEEE1394 Drive"
-#~ msgstr "IEEE1394-disk"
-
-#~ msgid "CF"
-#~ msgstr "CF"
-
-#~ msgid "SD/MMC"
-#~ msgstr "SD/MMC"
-
-#~ msgid "Memory Stick"
-#~ msgstr "Minnestokk"
-
-#~ msgid "Smart Media"
-#~ msgstr "Smart Media"
-
-#~ msgid "Root Volume"
-#~ msgstr "Rotvolum"
-
-#~ msgid "Audio CD"
-#~ msgstr "Lyd-CD"
-
-#~ msgid "Unknown volume"
-#~ msgstr "Ukjent volum"
-
-#~ msgid "Network server"
-#~ msgstr "Nettverkstjener"
-
-#~ msgid ""
-#~ "Unable to mount the floppy drive. There is probably no floppy in the "
-#~ "drive."
-#~ msgstr ""
-#~ "Kan ikke montere disketten. Det er mulig at det ikke står en diskett i "
-#~ "stasjonen."
-
-#~ msgid ""
-#~ "Unable to mount the volume. There is probably no media in the device."
-#~ msgstr "Kan ikke montere volumet. Muligvis ingen media i enheten."
-
-#~ msgid ""
-#~ "Unable to mount the floppy drive. The floppy is probably in a format that "
-#~ "cannot be mounted."
-#~ msgstr ""
-#~ "Kan ikke montere diskettstasjonen. Disketten er sannsynligvis i et format "
-#~ "som ikke kan monteres."
-
-#~ msgid ""
-#~ "Unable to mount the volume. If this is an encrypted drive, then the wrong "
-#~ "password or key was used."
-#~ msgstr ""
-#~ "Kan ikke montere volumet. Hvis dette er en kryptert stasjon ble feil "
-#~ "passord eller nøkkel brukt."
-
-#~ msgid ""
-#~ "Unable to mount the selected volume. The volume is probably in a format "
-#~ "that cannot be mounted."
-#~ msgstr ""
-#~ "Kan ikke montere valgt volum. Volumet er sannsynligvis i et format som "
-#~ "ikke kan monteres."
-
-#~ msgid "Unable to mount the selected floppy drive."
-#~ msgstr "Kan ikke montere valgt diskettstasjon."
-
-#~ msgid "Unable to mount the selected volume."
-#~ msgstr "Kan ikke montere valgt volum."
-
-#~ msgid ""
-#~ "Unable to unmount the selected volume. The volume is in use by one or "
-#~ "more programs."
-#~ msgstr ""
-#~ "Kan ikke montere valgt volum. Volumet er sannsynligvis i bruk av ett "
-#~ "eller flere programmer."
-
-#~ msgid "Unable to unmount the selected volume."
-#~ msgstr "Kan ikke avmontere valgt volum."
-
-#~ msgid "Failed to read data from child process %d (%s)"
-#~ msgstr "Feil under lesing av data fra underprosess %d (%s)"
-
-#~ msgid "Couldn't run mount process in a pty"
-#~ msgstr "Kunne ikke kjøre monteringsprogram i en pty"
-
-#~ msgid "Unexpected error in select() reading data from a child process (%s)"
-#~ msgstr "Uventet feil i select() under lesing av data fra underprosess (%s)"
-
-#~ msgid "Unexpected error in waitpid() (%s)"
-#~ msgstr "Uventet feil i waitpid() (%s)"
-
-#~ msgid "Unable to eject media"
-#~ msgstr "Kan ikke løse ut media"
-
-#~ msgid "Unable to unmount connected server"
-#~ msgstr "Kan ikke avmontere tilkoblet tjener"
-
-#~ msgid "Network"
-#~ msgstr "Nettverk"
-
-#~ msgid "Home"
-#~ msgstr "Hjem"
-
-#~ msgid "Filesystem"
-#~ msgstr "Filsystem"
-
-#~ msgid "Unknown GnomeVFSSeekPosition %d"
-#~ msgstr "Ukjent GnomeVFSSeekPosition %d"
-
-#~ msgid "The identity of the remote computer (%s) is unknown."
-#~ msgstr "Identiteten for den eksterne datamaskinen (%s) er ukjent."
-
-#~ msgid ""
-#~ "This happens when you log in to a computer the first time.\n"
-#~ "\n"
-#~ "The identity sent by the remote computer is %s. If you want to be "
-#~ "absolutely sure it is safe to continue, contact the system administrator."
-#~ msgstr ""
-#~ "Dette skjer når du logger inn på en datamaskin første gang.\n"
-#~ "\n"
-#~ "Identiteten som sendes av den eksterne datamaskinen er %s. Hvid du vil "
-#~ "være helt sikker på at det er trygt å fortsette kontakt "
-#~ "systemadministrator."
-
-#~ msgid "Log In Anyway"
-#~ msgstr "Logg inn likevel"
-
-#~ msgid "Cancel Login"
-#~ msgstr "Avbryt pålogging"
-
-#~ msgid "Didn't find a valid settings file at %s\n"
-#~ msgstr "Fant ikke gyldig fil med innstillinger i %s\n"
-
-#~ msgid "Use the %s environment variable to specify a different location.\n"
-#~ msgstr "Bruk miljøvariabelen %s for å spesifisere en annen lokasjon.\n"
-
-#~ msgid "Your HTTP Proxy requires you to log in.\n"
-#~ msgstr "Din HTTP-proxy krever at du logger inn.\n"
-
-#~ msgid ""
-#~ "You must log in to access \"%s\".\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Du må logge inn for å aksessere «%s».\n"
-#~ "%s"
-
-#~ msgid "Your password will be transmitted unencrypted."
-#~ msgstr "Passordet vil overføres ukryptert."
-
-#~ msgid "Your password will be transmitted encrypted."
-#~ msgstr "Passordet vil overføres kryptert."
-
-#~ msgid "You must log in to access %s domain %s\n"
-#~ msgstr "Du må logge inn for å aksessere %s domene %s\n"
-
-#~ msgid "You must log in to access %s\n"
-#~ msgstr "Du må logge inn for å aksessere %s\n"
-
-#~ msgid "Default component viewer application"
-#~ msgstr "Forvalgt applikasjon for visning av komponent"
-
-#~ msgid "Default terminal application"
-#~ msgstr "Forvalgt terminalapplikasjon"
-
-#~ msgid "Exec argument for default terminal"
-#~ msgstr "Kjøringsargument for forvalgt terminal"
-
-#~ msgid ""
-#~ "The application to use for viewing files that require a component to view "
-#~ "them. The parameter %s will be replaced by the file's URIs, the parameter "
-#~ "%c will be replaced by the component IID."
-#~ msgstr ""
-#~ "Applikasjon som skal brukes for å vise filer som krever en komponent for "
-#~ "visning. Parameteren %s vil erstattes med filens URIer, parameteren %c "
-#~ "vil erstattes med komponentens IID."
-
-#~ msgid ""
-#~ "The default terminal application to use for applications that require a "
-#~ "terminal."
-#~ msgstr ""
-#~ "Forvalgt terminalprogram som skal brukes for programmer som krever en "
-#~ "terminal."
-
-#~ msgid "The exec argument to use for the default terminal application."
-#~ msgstr "Kjøringsargument som skal brukes for forvalgt terminalprogram."
-
-#~ msgid "Run the command in a terminal"
-#~ msgstr "Kjør kommandoen i en terminal"
-
-#~ msgid "The command used to handle \"aim\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «aim»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"callto\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «callto»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"ghelp\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «ghelp»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"h323\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «h323»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"http\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «http»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"https\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «https»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"info\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «info»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"mailto\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «mailto»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"man\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «man»-URLer, hvis aktivert."
-
-#~ msgid "The command used to handle \"trash\" URLs, if enabled."
-#~ msgstr "Kommando som brukes til å håndtere «trash»-URLer, hvis aktivert."
-
-#~ msgid "The handler for \"aim\" URLs"
-#~ msgstr "Håndterer for «aim»-URLer"
-
-#~ msgid "The handler for \"callto\" URLs"
-#~ msgstr "Håndterer for «callto»-URLer"
-
-#~ msgid "The handler for \"ghelp\" URLs"
-#~ msgstr "Håndterer for «ghelp»-URLer"
-
-#~ msgid "The handler for \"h323\" URLs"
-#~ msgstr "Håndterer for «h323»-URLer"
-
-#~ msgid "The handler for \"http\" URLs"
-#~ msgstr "Håndterer for «http»-URLer"
-
-#~ msgid "The handler for \"https\" URLs"
-#~ msgstr "Håndterer for «https»-URLer"
-
-#~ msgid "The handler for \"info\" URLs"
-#~ msgstr "Håndterer for «info»-URLer"
-
-#~ msgid "The handler for \"mailto\" URLs"
-#~ msgstr "Håndterer for «mailto»-URLer"
-
-#~ msgid "The handler for \"man\" URLs"
-#~ msgstr "Håndterer for «man»-URLer"
-
-#~ msgid "The handler for \"trash\" URLs"
-#~ msgstr "Håndterer for «papirkurv»-URLer"
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"aim"
-#~ "\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «aim»-URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle "
-#~ "\"callto\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «callto»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"ghelp"
-#~ "\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «ghelp»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"h323"
-#~ "\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «h323»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"http"
-#~ "\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «http»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"https"
-#~ "\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «https»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"info"
-#~ "\" URLs."
-#~ msgstr ""
-#~ " True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «info»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle "
-#~ "\"mailto\" URLs."
-#~ msgstr ""
-#~ " True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «mailto»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"man"
-#~ "\" URLs."
-#~ msgstr ""
-#~ " True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «man»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command specified in the \"command\" key should handle \"trash"
-#~ "\" URLs."
-#~ msgstr ""
-#~ "True hvis programmet oppgitt i «command»-nøkkelen skal håndtere «trash»-"
-#~ "URLer."
-
-#~ msgid ""
-#~ "True if the command used to handle this type of URL should be run in a "
-#~ "terminal."
-#~ msgstr ""
-#~ "True hvis programmet for å håndtere denne type URL skal kjøres i en "
-#~ "terminal."
-
-#~ msgid "Whether the specified command should handle \"aim\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «aim»-URLer"
-
-#~ msgid "Whether the specified command should handle \"callto\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «callto»-URLer"
-
-#~ msgid "Whether the specified command should handle \"ghelp\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «ghelp»-URLer"
-
-#~ msgid "Whether the specified command should handle \"h323\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «h323»-URLer"
-
-#~ msgid "Whether the specified command should handle \"http\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «http»-URLer"
-
-#~ msgid "Whether the specified command should handle \"https\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «https»-URLer"
-
-#~ msgid "Whether the specified command should handle \"info\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «info»-URLer"
-
-#~ msgid "Whether the specified command should handle \"mailto\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «mailto»-URLer"
-
-#~ msgid "Whether the specified command should handle \"man\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «man»-URLer"
-
-#~ msgid "Whether the specified command should handle \"trash\" URLs"
-#~ msgstr "Om oppgitt kommando skal håndtere «trash»-URLer"
-
-#~ msgid ""
-#~ "Comma separated list of DNS-SD domains that should be visible in the "
-#~ "\"network:///\" location."
-#~ msgstr ""
-#~ "Kommaseparert liste med DNS-SD-domener som skal være synlige i lokasjonen "
-#~ "«network:///»."
-
-#~ msgid "Extra domains to look for DNS-SD services in"
-#~ msgstr "Ekstra domener som skal sjekkes for DNS-SD-tjenester"
-
-#~ msgid "How to display local DNS-SD service"
-#~ msgstr "Hvordan vises lokale DNS-SD-tjenester"
-
-#~ msgid "Possible values are \"merged\", \"separate\" and \"disabled\"."
-#~ msgstr "Mulige verdier er «merged», «separate» og «disabled»."
-
-#~ msgid "Authenticate proxy server connections"
-#~ msgstr "Autentiser forbindelser til proxytjener"
-
-#~ msgid "Automatic proxy configuration URL"
-#~ msgstr "URL for automatisk konfigurasjon av proxy"
-
-#~ msgid "Enables the proxy settings when accessing HTTP over the Internet."
-#~ msgstr "Aktiverer proxy-innstillinger ved aksess via HTTP til Internett."
-
-#~ msgid "FTP proxy host name"
-#~ msgstr "Vertsnavn for FTP-proxy"
-
-#~ msgid "FTP proxy port"
-#~ msgstr "Port for FTP-proxy"
-
-#~ msgid "HTTP proxy host name"
-#~ msgstr "Vertsnavn for HTTP-proxy"
-
-#~ msgid "HTTP proxy port"
-#~ msgstr "Port for HTTP-proxy"
-
-#~ msgid "HTTP proxy username"
-#~ msgstr "Brukernavn for HTTP-proxy"
-
-#~ msgid ""
-#~ "If true, then connections to the proxy server require authentication. The "
-#~ "username/password combo is defined by \"/system/http_proxy/"
-#~ "authentication_user\" and \"/system/http_proxy/authentication_password\"."
-#~ msgstr ""
-#~ "Hvis sann vil tilkoblinger til proxytjener kreve autentisering. "
-#~ "Brukernavn/passord-kombinasjonen er definert i «/system/http_proxy/"
-#~ "authentication_user» og «/system/http_proxy/authentication_password»."
-
-#~ msgid "Non-proxy hosts"
-#~ msgstr "Verter som ikke skal bruke proxy"
-
-#~ msgid "Password to pass as authentication when doing HTTP proxying."
-#~ msgstr "Passord som skal oppgis ved autentisering for bruk av HTTP-proxy."
-
-#~ msgid "Proxy configuration mode"
-#~ msgstr "Konfigurasjonsmodus for proxy"
-
-#~ msgid "SOCKS proxy host name"
-#~ msgstr "Vertsnavn for SOCKS-proxy"
-
-#~ msgid "SOCKS proxy port"
-#~ msgstr "Port for SOCKS-proxy"
-
-#~ msgid "Secure HTTP proxy host name"
-#~ msgstr "Vertsnavn for HTTPS-proxy"
-
-#~ msgid "Secure HTTP proxy port"
-#~ msgstr "Port for HTTPS-proxy"
-
-#~ msgid ""
-#~ "Select the proxy configuration mode. Supported values are \"none\", "
-#~ "\"manual\", \"auto\"."
-#~ msgstr ""
-#~ "Velg konfigurasjonsmodus for proxy. Verdier som er støttet er «none», "
-#~ "«manual», «auto»."
-
-#~ msgid "The machine name to proxy FTP through."
-#~ msgstr "Maskinnavn for FTP-proxy."
-
-#~ msgid "The machine name to proxy HTTP through."
-#~ msgstr "Maskinnavn for HTTP-proxy."
-
-#~ msgid "The machine name to proxy secure HTTP through."
-#~ msgstr "Maskinnavn for HTTPS-proxy."
-
-#~ msgid "The machine name to proxy socks through."
-#~ msgstr "Maskinnavn for SOCKS-proxy."
-
-#~ msgid ""
-#~ "The port on the machine defined by \"/system/http_proxy/host\" that you "
-#~ "proxy through."
-#~ msgstr ""
-#~ "Port på maskinen som brukes som proxy og er definert i «/system/http_proxy/"
-#~ "host»."
-
-#~ msgid ""
-#~ "The port on the machine defined by \"/system/proxy/ftp_host\" that you "
-#~ "proxy through."
-#~ msgstr ""
-#~ "Port på maskinen som brukes som proxy og er definert i «/system/proxy/"
-#~ "ftp_host»."
-
-#~ msgid ""
-#~ "The port on the machine defined by \"/system/proxy/secure_host\" that you "
-#~ "proxy through."
-#~ msgstr ""
-#~ "Port på maskinen som brukes som proxy og er definert i «/system/proxy/"
-#~ "secure_host»."
-
-#~ msgid ""
-#~ "The port on the machine defined by \"/system/proxy/socks_host\" that you "
-#~ "proxy through."
-#~ msgstr ""
-#~ "Port på maskinen som brukes som proxy og er definert i «/system/proxy/"
-#~ "socks_host»."
-
-#~ msgid ""
-#~ "This key contains a list of hosts which are connected to directly, rather "
-#~ "than via the proxy (if it is active). The values can be hostnames, "
-#~ "domains (using an initial wildcard like *.foo.com), IP host addresses "
-#~ "(both IPv4 and IPv6) and network addresses with a netmask (something like "
-#~ "192.168.0.0/24)."
-#~ msgstr ""
-#~ "Denne nøkkelen inneholder en liste med verter som har direkte forbindelse "
-#~ "i stedet for å gå via proxy (hvis denne er aktiv). Verdiene kan være "
-#~ "vertsnavn, domener (med jokertegn som *.domene.no), IP-adresse for verten "
-#~ "(både IPv4 og IPv6) og nettverksadresser med en nettmaske (som "
-#~ "192.168.0.0/24)."
-
-#~ msgid "URL that provides proxy configuration values."
-#~ msgstr "URL som oppgir verdier for konfigurasjon av proxy."
-
-#~ msgid "Use HTTP proxy"
-#~ msgstr "Bruk HTTP-proxy"
-
-#~ msgid "User name to pass as authentication when doing HTTP proxying."
-#~ msgstr ""
-#~ "Brukernavn som skal oppgis som autentisering ved bruk av HTTP-proxy."
-
-#~ msgid "SMB workgroup"
-#~ msgstr "SMB-arbeidsgruppe"
-
-#~ msgid ""
-#~ "The Windows networking workgroup or domain that the user is part of. In "
-#~ "order for a new workgroup to fully take effect the user may need to log "
-#~ "out and log back in."
-#~ msgstr ""
-#~ "Arbeidsgruppe eller domene brukeren er del av i Windows-nettverket. "
-#~ "Brukeren må logge ut for at endringer skal tre i kraft."
