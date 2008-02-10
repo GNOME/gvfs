@@ -1,3 +1,13 @@
+2008-02-10  Luca Ferretti  <elle.uca@libero.it>
+
+	* daemon/gvfsbackendburn.c: (g_vfs_backend_burn_init),
+	(file_info_from_node):
+	Rename burn:// with old "CD/DVD Creator" name.
+
+	* daemon/gvfsbackendtrash.c: (g_vfs_backend_trash_init),
+	(do_query_info):
+	Rename trash:// with old "Trash" name.
+
 2008-02-08  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalvolume.c:

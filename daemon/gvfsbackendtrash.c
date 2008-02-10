@@ -594,7 +594,7 @@ g_vfs_backend_trash_init (GVfsBackendTrash *trash_backend)
   GMountSpec *mount_spec;
 
   /* translators: This is the name of the backend */
-  g_vfs_backend_set_display_name (backend, _("Trashcan"));
+  g_vfs_backend_set_display_name (backend, _("Trash"));
   g_vfs_backend_set_icon_name (backend, "user-trash");
   g_vfs_backend_set_user_visible (backend, FALSE);  
 
@@ -1166,7 +1166,8 @@ do_query_info (GVfsBackend *backend,
       /* The trash:/// root */
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
-      g_file_info_set_display_name (info, _("Trashcan"));
+      /* Translators: this is the display name of the backend */
+      g_file_info_set_display_name (info, _("Trash"));
       g_file_info_set_content_type (info, "inode/directory");
 
       if (G_VFS_BACKEND_TRASH (backend)->top_files != NULL)

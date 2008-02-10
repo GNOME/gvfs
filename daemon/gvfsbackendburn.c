@@ -343,6 +343,7 @@ g_vfs_backend_burn_init (GVfsBackendBurn *burn_backend)
   GVfsBackend *backend = G_VFS_BACKEND (burn_backend);
   GMountSpec *mount_spec;
   
+  /* Translators: This is the name of the backend */
   g_vfs_backend_set_display_name (backend, _("Burn"));
   g_vfs_backend_set_icon_name (backend, "gnome-fs-client");
   g_vfs_backend_set_user_visible (backend, FALSE);
@@ -647,7 +648,8 @@ file_info_from_node (VirtualNode *node,
   else
     {
       g_file_info_set_name (info, "/");
-      g_file_info_set_display_name (info, _("CD Burner"));
+      /* Translators: this is the display name of the backend */
+      g_file_info_set_display_name (info, _("CD/DVD Creator"));
     }
 }
 
