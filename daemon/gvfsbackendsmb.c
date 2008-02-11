@@ -1518,7 +1518,7 @@ do_set_display_name (GVfsBackend *backend,
   char *dirname, *new_path;
   int res, errsv;
 
-  dirname = g_path_get_basename (filename);
+  dirname = g_path_get_dirname (filename);
 
   /* TODO: display name is in utf8, atm we assume libsmb uris
      are in utf8, but this might not be true if the user changed

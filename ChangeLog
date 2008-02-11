@@ -1,5 +1,12 @@
 2008-02-11  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsmb.c:
+        (do_set_display_name):
+	Fix typo: get_dirname, not get_basename.
+	Fixes renames on smb (#514126)
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsftp.c:
 	Set new path in set_display name.
 	
