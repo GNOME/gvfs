@@ -1,3 +1,16 @@
+Major changes in 0.1.7:
+* Update for gio API changes
+* Add gconf based implementation of
+  g_app_info_get_default_for_uri_scheme
+* Fix crashes
+* Allow navigation with http uris
+* Better file read performance with readahead and
+  large block reads
+* Lots of bugs fixed in trash backend
+* Pick up cdrom icons from autorun.inf
+* Add "filesystem" file to computer://
+* Fix renaming in sftp and smb
+
 Major changes in 0.1.6:
 * Add files missing in the released 0.1.5 tarball
 
