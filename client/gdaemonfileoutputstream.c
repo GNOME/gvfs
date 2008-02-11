@@ -332,6 +332,7 @@ decode_error (GVfsDaemonSocketProtocolReply *reply, char *data, GError **error)
   g_set_error (error,
 	       g_quark_from_string (data),
 	       reply->arg1,
+               "%s",
 	       data + strlen (data) + 1);
 }
 
@@ -455,7 +456,8 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
+			   "%s",
+                           _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
 	  
@@ -633,6 +635,7 @@ iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
+                           "%s",
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -828,6 +831,7 @@ iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_o
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
+                           "%s",
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -939,7 +943,7 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
   if (!file->can_seek)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Seek not supported on stream"));
+		   "%s", _("Seek not supported on stream"));
       return FALSE;
     }
   

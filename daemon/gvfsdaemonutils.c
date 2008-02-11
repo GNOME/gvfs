@@ -97,10 +97,12 @@ dbus_connection_send_fd (DBusConnection *connection,
 
   if (_g_socket_send_fd (extra->extra_fd, fd) == -1)
     {
+      int errsv = errno;
+
       g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
+		   g_io_error_from_errno (errsv),
 		   _("Error sending fd: %s"),
-		   g_strerror (errno));
+		   g_strerror (errsv));
       g_static_mutex_unlock (&extra_lock);
       return FALSE;
     }

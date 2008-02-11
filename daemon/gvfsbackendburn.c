@@ -824,10 +824,12 @@ try_upload (GVfsBackend *backend,
   
   if (g_stat (local_path, &stat_buf) == -1)
     {
+      int errsv = errno;
+
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,
-                        g_io_error_from_errno (errno),
-                        g_strerror (errno));
+                        g_io_error_from_errno (errsv),
+                        "%s", g_strerror (errsv));
       return TRUE;
     }
 

@@ -142,7 +142,7 @@ do_mount (GVfsBackend *backend,
   //g_warning ("host=%s", host);
   if (host == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No drive specified"));
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("No drive specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -209,7 +209,7 @@ try_mount (GVfsBackend *backend,
   //g_warning ("tm host=%s", host);
   if (host == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No drive specified"));
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("No drive specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return TRUE;
@@ -530,8 +530,10 @@ do_read (GVfsBackend *backend,
 
       if (readbuf == NULL)
         {
+          int errsv = errno;
+
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                            g_io_error_from_errno (errno),
+                            g_io_error_from_errno (errsv),
                             /* Translators: paranoia is the name of the cd audio reading library */
                             _("Error from 'paranoia' on drive %s"), cdda_backend->device_path);
           return;

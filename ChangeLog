@@ -1,6 +1,28 @@
 2008-02-11  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+        * common/gsysutils.c:
+        * common/gvfsdaemonprotocol.c:
+        * daemon/gvfsbackendburn.c:
+        * daemon/gvfsbackendcdda.c:
+        * daemon/gvfsbackenddav.c:
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+        * daemon/gvfsbackendtest.c:
+        * daemon/gvfsdaemonutils.c:
+        * daemon/gvfsjob.c:
+        * daemon/mount.c:
+        * daemon/pty_open.c:
+	Save errno befor making other calls.
+	Be safe when calling g_set_error()
+	Patch from Christian Persch (#514822)
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
         * daemon/gvfsbackendcomputer.c:
         * hal/ghalvolume.c:
         * programs/gvfs-mount.c:

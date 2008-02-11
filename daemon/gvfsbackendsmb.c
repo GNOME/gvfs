@@ -898,9 +898,11 @@ do_replace (GVfsBackend *backend,
 					O_CREAT|O_WRONLY|O_EXCL, 0);
   if (file == NULL && errno != EEXIST)
     {
+      int errsv = errno;
+
       g_set_error (&error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   g_strerror (errno));
+		   g_io_error_from_errno (errsv),
+		   "%s", g_strerror (errsv));
       goto error;
     }
   else if (file == NULL && errno == EEXIST)
@@ -918,7 +920,8 @@ do_replace (GVfsBackend *backend,
 		  g_set_error (&error,
 			       G_IO_ERROR,
 			       G_IO_ERROR_WRONG_ETAG,
-			       _("The file was externally modified"));
+			       "%s",
+                               _("The file was externally modified"));
 		  goto error;
 		}
 	      g_free (current_etag);
@@ -949,11 +952,13 @@ do_replace (GVfsBackend *backend,
 		    g_set_error (&error,
 				 G_IO_ERROR,
 				 G_IO_ERROR_CANCELLED,
+                                 "%s",
 				 _("Operation was cancelled"));
 		  else
 		    g_set_error (&error,
 				 G_IO_ERROR,
 				 G_IO_ERROR_CANT_CREATE_BACKUP,
+                                 "%s",
 				 _("Backup file creation failed"));
 		  goto error;
 		}
@@ -965,9 +970,11 @@ do_replace (GVfsBackend *backend,
 						O_CREAT|O_WRONLY|O_TRUNC, 0);
 	  if (file == NULL)
 	    {
+              int errsv = errno;
+
 	      g_set_error (&error, G_IO_ERROR,
-			   g_io_error_from_errno (errno),
-			   g_strerror (errno));
+			   g_io_error_from_errno (errsv),
+			   "%s", g_strerror (errsv));
 	      goto error;
 	    }
 	}
@@ -1097,10 +1104,12 @@ do_close_write (GVfsBackend *backend,
 						 op_backend->smb_context, handle->backup_uri);
 	  if (res ==  -1)
 	    {
+              int errsv = errno;
+
 	      op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
 	      g_vfs_job_failed (G_VFS_JOB (job),
 				G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
-				_("Backup file creation failed: %d"), errno);
+				_("Backup file creation failed: %s"), g_strerror (errsv));
 	      goto out;
 	    }
 	}
@@ -1409,10 +1418,12 @@ do_enumerate (GVfsBackend *backend,
 
   if (dir == NULL)
     {
+      int errsv = errno;
+
       error = NULL;
       g_set_error (&error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
-		   g_strerror (errno));
+		   g_io_error_from_errno (errsv),
+		   "%s", g_strerror (errsv));
       goto error;
     }
 
@@ -1550,11 +1561,13 @@ do_delete (GVfsBackend *backend,
   res = op_backend->smb_context->stat (op_backend->smb_context, uri, &statbuf);
   if (res == -1)
     {
+      errsv = errno;
+
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR,
-			g_io_error_from_errno (errno),
+			g_io_error_from_errno (errsv),
 			_("Error deleting file: %s"),
-			g_strerror (errno));
+			g_strerror (errsv));
       g_free (uri);
       return;
     }
@@ -1612,11 +1625,13 @@ do_move (GVfsBackend *backend,
   res = op_backend->smb_context->stat (op_backend->smb_context, source_uri, &statbuf);
   if (res == -1)
     {
+      errsv = errno;
+
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR,
-			g_io_error_from_errno (errno),
+			g_io_error_from_errno (errsv),
 			_("Error moving file: %s"),
-			g_strerror (errno));
+			g_strerror (errsv));
       g_free (source_uri);
       return;
     }

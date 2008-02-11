@@ -263,7 +263,7 @@ g_vfs_job_failed_from_errno (GVfsJob     *job,
   
   g_set_error (&error, G_IO_ERROR,
 	       g_io_error_from_errno (errno_arg),
-	       g_strerror (errno_arg));
+	       "%s", g_strerror (errno_arg));
   g_vfs_job_failed_from_error (job, error);
   g_error_free (error);
 }

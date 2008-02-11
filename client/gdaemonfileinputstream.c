@@ -380,7 +380,8 @@ decode_error (GVfsDaemonSocketProtocolReply *reply, char *data, GError **error)
   g_set_error (error,
 	       g_quark_from_string (data),
 	       reply->arg1,
-	       data + strlen (data) + 1);
+               "%s",
+               data + strlen (data) + 1);
 }
 
 
@@ -515,7 +516,7 @@ iterate_read_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
-			   _("Operation was cancelled"));
+			   "%s", _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
 	  
@@ -671,6 +672,7 @@ iterate_read_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
+                           "%s",
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -778,6 +780,7 @@ iterate_close_state_machine (GDaemonFileInputStream *file, IOOperationData *io_o
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
+                           "%s",
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -1028,6 +1031,7 @@ iterate_seek_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op
 	      g_set_error (&op->ret_error,
 			   G_IO_ERROR,
 			   G_IO_ERROR_CANCELLED,
+                           "%s",
 			   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
@@ -1203,7 +1207,7 @@ g_daemon_file_input_stream_seek (GFileInputStream *stream,
   if (!file->can_seek)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Seek not supported on stream"));
+		   "%s", _("Seek not supported on stream"));
       return FALSE;
     }
   
@@ -1237,7 +1241,7 @@ g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
 
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("The query info operation is not supported"));
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "%s", _("The query info operation is not supported"));
   
   return NULL;
 }

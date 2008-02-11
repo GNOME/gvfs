@@ -95,10 +95,12 @@ open_idle_cb (gpointer data)
   fd = g_open (job->filename, O_RDONLY);
   if (fd == -1)
     {
+      int errsv = errno;
+
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-			g_io_error_from_errno (errno),
+			g_io_error_from_errno (errsv),
 			"Error opening file %s: %s",
-			job->filename, g_strerror (errno));
+			job->filename, g_strerror (errsv));
     }
   else
     {
@@ -158,10 +160,12 @@ read_idle_cb (gpointer data)
 
   if (res == -1)
     {
+      int errsv = errno;
+
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-			g_io_error_from_errno (errno),
+			g_io_error_from_errno (errsv),
 			"Error reading from file: %s",
-			g_strerror (errno));
+			g_strerror (errsv));
     }
   else
     {
@@ -235,10 +239,12 @@ do_seek_on_read (GVfsBackend *backend,
   
   if (final_offset == (off_t)-1)
     {
+      int errsv = errno;
+
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-			g_io_error_from_errno (errno),
+			g_io_error_from_errno (errsv),
 			"Error seeking in file: %s",
-			g_strerror (errno));
+			g_strerror (errsv));
     }
   else
     {

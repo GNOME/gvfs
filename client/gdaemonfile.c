@@ -461,7 +461,7 @@ do_sync_2_path_call (GFile *file1,
 	  g_mount_info_unref (mount_info1);
 	  /* For copy this will cause the fallback code to be involved */
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		       _("Operation not supported, files on different mounts"));
+		       "%s", _("Operation not supported, files on different mounts"));
 	  return NULL;
 	}
     }
@@ -746,7 +746,7 @@ g_daemon_file_query_info (GFile                *file,
       (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from get_info"));
+		   "%s", _("Invalid return value from get_info"));
       goto out;
     }
 
@@ -949,7 +949,7 @@ g_daemon_file_read (GFile *file,
     {
       dbus_message_unref (reply);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from open"));
+		   "%s", _("Invalid return value from open"));
       return NULL;
     }
   
@@ -959,7 +959,7 @@ g_daemon_file_read (GFile *file,
   if (fd == -1)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Didn't get stream file descriptor"));
+		   "%s", _("Didn't get stream file descriptor"));
       return NULL;
     }
   
@@ -1008,7 +1008,7 @@ g_daemon_file_append_to (GFile *file,
     {
       dbus_message_unref (reply);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from open"));
+		   "%s", _("Invalid return value from open"));
       return NULL;
     }
   
@@ -1018,7 +1018,7 @@ g_daemon_file_append_to (GFile *file,
   if (fd == -1)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Didn't get stream file descriptor"));
+		   "%s", _("Didn't get stream file descriptor"));
       return NULL;
     }
   
@@ -1067,7 +1067,7 @@ g_daemon_file_create (GFile *file,
     {
       dbus_message_unref (reply);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from open"));
+		   "%s", _("Invalid return value from open"));
       return NULL;
     }
   
@@ -1077,7 +1077,7 @@ g_daemon_file_create (GFile *file,
   if (fd == -1)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Didn't get stream file descriptor"));
+		   "%s", _("Didn't get stream file descriptor"));
       return NULL;
     }
   
@@ -1129,7 +1129,7 @@ g_daemon_file_replace (GFile *file,
     {
       dbus_message_unref (reply);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from open"));
+		   "%s", _("Invalid return value from open"));
       return NULL;
     }
   
@@ -1139,7 +1139,7 @@ g_daemon_file_replace (GFile *file,
   if (fd == -1)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Didn't get stream file descriptor"));
+		   "%s", _("Didn't get stream file descriptor"));
       return NULL;
     }
   
@@ -1487,7 +1487,7 @@ g_daemon_file_query_filesystem_info (GFile                *file,
       (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from get_filesystem_info"));
+		   "%s", _("Invalid return value from get_filesystem_info"));
       goto out;
     }
 
@@ -1526,7 +1526,7 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 	       G_IO_ERROR_NOT_FOUND,
   /* translators: this is an error message when there is no user visible "mount" object
      corresponding to a particular path/uri */
-	       _("Could not find enclosing mount"));
+	       "%s", _("Could not find enclosing mount"));
   return NULL;
 }
 
@@ -1598,7 +1598,7 @@ g_daemon_file_set_display_name (GFile *file,
 				      0))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from query_filesystem_info"));
+		   "%s", _("Invalid return value from query_filesystem_info"));
       goto out;
     }
 
@@ -1838,7 +1838,7 @@ g_daemon_file_copy (GFile                  *source,
   if (!G_IS_DAEMON_FILE (destination))
     {
       /* Fall back to default move */
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "%s", "Move not supported");
       return FALSE;
     }
   daemon_dest = G_DAEMON_FILE (destination);
@@ -1857,7 +1857,7 @@ g_daemon_file_copy (GFile                  *source,
 	{
 	  /* This will cause the fallback code to be involved */
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		       _("Operation not supported, files on different mounts"));
+		       "%s", _("Operation not supported, files on different mounts"));
 	  return FALSE;
 	}
     }
@@ -1930,7 +1930,7 @@ g_daemon_file_move (GFile                  *source,
       !G_IS_DAEMON_FILE (destination))
     {
       /* Fall back to default move */
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "%s", "Move not supported");
       return FALSE;
     }
   
@@ -2006,7 +2006,7 @@ g_daemon_file_monitor_dir (GFile* file,
       g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from monitor_dir"));
+		   "%s", _("Invalid return value from monitor_dir"));
       return NULL;
     }
   
@@ -2055,7 +2055,7 @@ g_daemon_file_monitor_file (GFile* file,
       g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid return value from monitor_file"));
+		   "%s", _("Invalid return value from monitor_file"));
       return NULL;
     }
   

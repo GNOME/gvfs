@@ -348,7 +348,7 @@ _pty_run_on_pty(int fd, gboolean login,
 #ifdef HAVE_UTMP_H
 	/* This sets stdin, stdout, stderr to the socket */	
 	if (login && login_tty (fd) == -1) {
-		g_printerr ("mount child process login_tty failed: %s\n", strerror (errno));
+		g_printerr ("mount child process login_tty failed: %s\n", g_strerror (errno));
 		return -1;
 	}
 #endif

@@ -120,10 +120,12 @@ _g_socket_connect (const char *address,
   fd = socket (PF_UNIX, SOCK_STREAM, 0);
   if (fd == -1)
     {
+      int errsv = errno;
+
       g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
+		   g_io_error_from_errno (errsv),
 		   _("Error creating socket: %s"),
-		   g_strerror (errno));
+		   g_strerror (errsv));
       return -1;
     }
   
@@ -156,10 +158,12 @@ _g_socket_connect (const char *address,
   
   if (connect (fd, (struct sockaddr*) &addr, G_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
     {      
+      int errsv = errno;
+
       g_set_error (error, G_IO_ERROR,
-		   g_io_error_from_errno (errno),
+		   g_io_error_from_errno (errsv),
 		   _("Error connecting to socket: %s"),
-		   g_strerror (errno));
+		   g_strerror (errsv));
       close (fd);
       return -1;
     }

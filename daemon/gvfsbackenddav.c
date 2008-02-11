@@ -164,7 +164,7 @@ parse_xml (SoupMessage  *msg,
   if (doc == NULL)
     { 
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   _("Could not parse response"));
+                   "%s", _("Could not parse response"));
       return NULL;
     }
 
@@ -173,14 +173,14 @@ parse_xml (SoupMessage  *msg,
   if (doc == NULL)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   _("Empty response"));
+                   "%s", _("Empty response"));
       return NULL;
     }
 
   if (strcmp ((char *) (*root)->name, name))
     {
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                     _("Unexpected reply from server"));
+                     "%s", _("Unexpected reply from server"));
       return NULL;
     }
 
