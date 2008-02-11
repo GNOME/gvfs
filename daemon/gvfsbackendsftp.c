@@ -3193,7 +3193,7 @@ set_display_name_reply (GVfsBackendSftp *backend,
                         gpointer user_data)
 {
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply, -1, -1); 
+    result_from_status (job, reply, -1, -1);
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Invalid reply received"));
@@ -3222,6 +3222,9 @@ try_set_display_name (GVfsBackend *backend,
   new_name = g_build_filename (dirname, basename, NULL);
   g_free (dirname);
   g_free (basename);
+
+  g_vfs_job_set_display_name_set_new_path (job,
+                                           new_name);
   
   command = new_command_stream (op_backend,
                                 SSH_FXP_RENAME,

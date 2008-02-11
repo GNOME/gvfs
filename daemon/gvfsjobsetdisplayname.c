@@ -170,6 +170,8 @@ create_reply (GVfsJob *job,
 
   dbus_message_iter_init_append (reply, &iter);
 
+  g_assert (op_job->new_path != NULL);
+  
   _g_dbus_message_iter_append_cstring (&iter, op_job->new_path);
   
   return reply;

@@ -1,5 +1,13 @@
 2008-02-11  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsftp.c:
+	Set new path in set_display name.
+	
+        * daemon/gvfsjobsetdisplayname.c:
+	Assert that new_path is set
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         * client/gdaemonfileinputstream.c:
         * client/gdaemonfileoutputstream.c:
