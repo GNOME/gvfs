@@ -203,9 +203,9 @@ mount (GFile *file)
   op = new_mount_op ();
 
   if (mount_mountable)
-    g_file_mount_mountable (file, op, NULL, mount_mountable_done_cb, op);
+    g_file_mount_mountable (file, 0, op, NULL, mount_mountable_done_cb, op);
   else
-    g_file_mount_enclosing_volume (file, op, NULL, mount_done_cb, op);
+    g_file_mount_enclosing_volume (file, 0, op, NULL, mount_done_cb, op);
     
   outstanding_mounts++;
 }

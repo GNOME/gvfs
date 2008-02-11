@@ -1,3 +1,15 @@
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * daemon/gvfsbackendcomputer.c:
+        * hal/ghalvolume.c:
+        * programs/gvfs-mount.c:
+	Update for the new mount flag argument.
+	
+        * hal/ghaldrive.c:
+        * programs/gvfs-open.c:
+	Fix warnings
+
 2008-02-10  Luca Ferretti  <elle.uca@libero.it>
 
 	* daemon/gvfsbackendburn.c: (g_vfs_backend_burn_init),

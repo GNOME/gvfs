@@ -40,13 +40,6 @@ static GOptionEntry entries[] = {
   {NULL}
 };
 
-static GAppInfo *
-get_default_appinfo_for_file (GFile *file,
-			      GCancellable *cancellable,
-			      GError **error)
-{
-}
-
 static void
 open (GFile *file, char *arg_string)
 {

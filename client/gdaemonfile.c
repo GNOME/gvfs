@@ -1223,6 +1223,7 @@ mount_mountable_async_cb (DBusMessage *reply,
   if (must_mount_location)
     {
       g_file_mount_enclosing_volume (file,
+				     0,
 				     mount_operation,
 				     cancellable,
 				     mount_mountable_location_mounted_cb,
@@ -1235,6 +1236,7 @@ mount_mountable_async_cb (DBusMessage *reply,
 
 static void
 g_daemon_file_mount_mountable (GFile               *file,
+			       GMountMountFlags     flags,
 			       GMountOperation     *mount_operation,
 			       GCancellable        *cancellable,
 			       GAsyncReadyCallback  callback,
@@ -1364,6 +1366,7 @@ typedef struct {
 } MountData;
 
 static void g_daemon_file_mount_enclosing_volume (GFile *location,
+						  GMountMountFlags flags,
 						  GMountOperation *mount_operation,
 						  GCancellable *cancellable,
 						  GAsyncReadyCallback callback,
@@ -1402,6 +1405,7 @@ mount_reply (DBusMessage *reply,
 
 static void
 g_daemon_file_mount_enclosing_volume (GFile *location,
+				      GMountMountFlags  flags,
 				      GMountOperation *mount_operation,
 				      GCancellable *cancellable,
 				      GAsyncReadyCallback callback,

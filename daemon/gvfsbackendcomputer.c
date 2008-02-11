@@ -802,6 +802,7 @@ try_mount_mountable (GVfsBackend *backend,
         {
           mount_op = g_mount_source_get_operation (mount_source);
           g_volume_mount (file->volume,
+                          0,
                           mount_op,
                           G_VFS_JOB (job)->cancellable,
                           mount_volume_cb,

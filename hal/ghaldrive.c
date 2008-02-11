@@ -877,7 +877,7 @@ g_hal_drive_enumerate_identifiers (GDrive *drive)
   /* Null-terminate */
   g_ptr_array_add (res, NULL);
   
-  return g_ptr_array_free (res, FALSE);
+  return (char **)g_ptr_array_free (res, FALSE);
 }
 
 static void

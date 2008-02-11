@@ -818,6 +818,7 @@ mount_foreign_callback (GObject *source_object,
 
 static void
 g_hal_volume_mount (GVolume             *volume,
+                    GMountMountFlags     flags,
                     GMountOperation     *mount_operation,
                     GCancellable        *cancellable,
                     GAsyncReadyCallback  callback,
@@ -839,7 +840,8 @@ g_hal_volume_mount (GVolume             *volume,
       data->callback = callback;
       data->user_data = user_data;
 
-      g_file_mount_enclosing_volume (hal_volume->foreign_mount_root, 
+      g_file_mount_enclosing_volume (hal_volume->foreign_mount_root,
+                                     0,
                                      mount_operation, 
                                      cancellable, 
                                      mount_foreign_callback, 
@@ -970,7 +972,7 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   /* Null-terminate */
   g_ptr_array_add (res, NULL);
   
-  return g_ptr_array_free (res, FALSE);
+  return (char **)g_ptr_array_free (res, FALSE);
 }
 
 static void
