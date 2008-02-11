@@ -905,7 +905,7 @@ add_extra_trash_info (GFileInfo *file_info,
   char *orig_path, *orig_path_key, *orig_path_unescaped, *date;
   GKeyFile *keyfile;
   char *display_name;
-
+  char *desc;
 
   /* Override all writability */
   g_file_info_set_attribute_boolean (file_info,
@@ -950,8 +950,18 @@ add_extra_trash_info (GFileInfo *file_info,
                   char *p = display_name;
                   display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
                   g_free (p);
+                  
+                  g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, NULL);
                 }
+              else
+                g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, display_name);
+                
               g_file_info_set_display_name (file_info, display_name);
+
+              desc = g_strdup_printf (_("%s (in trash)"), display_name);
+              g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_DESCRIPTION, desc);
+              g_free (desc);
+              
               g_free (display_name);
               
               

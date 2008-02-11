@@ -1,5 +1,11 @@
 2008-02-11  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendtrash.c:
+	Set the correct copy name.
+	Set description.
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsmb.c:
         (do_set_display_name):
 	Fix typo: get_dirname, not get_basename.
