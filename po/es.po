@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-08 15:05+0000\n"
-"PO-Revision-Date: 2008-02-10 17:05+0100\n"
+"POT-Creation-Date: 2008-02-10 20:57+0000\n"
+"PO-Revision-Date: 2008-02-11 11:39+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -178,59 +178,61 @@ msgstr "el punto de montaje para %s ya se está usando"
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
-#: ../daemon/gvfsbackendburn.c:346
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:347
 msgid "Burn"
 msgstr "Grabar"
 
-#: ../daemon/gvfsbackendburn.c:376
+#: ../daemon/gvfsbackendburn.c:377
 msgid "Unable to create temporary directory"
 msgstr "No se pudo crear el directorio temporal"
 
-#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:671
-#: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
-#: ../daemon/gvfsbackendburn.c:782
+#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
+#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
+#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
+#: ../daemon/gvfsbackendburn.c:784
 msgid "No such file or directory"
 msgstr "El archivo o directorio no existe"
 
-#: ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackendburn.c:426
 msgid "Directory not empty"
 msgstr "El directorio no está vacío"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:894
+#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:896
 msgid "Can't copy file over directory"
 msgstr "No se puede copiar un archivo sobre un directorio"
 
-#: ../daemon/gvfsbackendburn.c:650
-msgid "CD Burner"
-msgstr "Grabador de CD"
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "Creador de CD/DVD"
 
-#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
 
-#: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
-#: ../daemon/gvfsbackendburn.c:914
+#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
+#: ../daemon/gvfsbackendburn.c:916
 msgid "File exists"
 msgstr "El archivo ya existe"
 
-#: ../daemon/gvfsbackendburn.c:842
+#: ../daemon/gvfsbackendburn.c:844
 msgid "No such file or directory in target path"
 msgstr "El archivo o directorio no existe en la ruta de destino"
 
-#: ../daemon/gvfsbackendburn.c:865
+#: ../daemon/gvfsbackendburn.c:867
 msgid "Can't copy directory over directory"
 msgstr "No se puede copiar un directorio sobre otro directorio"
 
-#: ../daemon/gvfsbackendburn.c:874
+#: ../daemon/gvfsbackendburn.c:876
 msgid "Target file exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendburn.c:881
+#: ../daemon/gvfsbackendburn.c:883
 msgid "Can't recursively copy directory"
 msgstr "No se puede copiar recursivamente un directorio"
 
-#: ../daemon/gvfsbackendburn.c:940
+#: ../daemon/gvfsbackendburn.c:942
 msgid "Not supported"
 msgstr "No soportado"
 
@@ -605,15 +607,16 @@ msgid "Not a directory"
 msgstr "No es un directorio"
 
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1169
-msgid "Trashcan"
-msgstr "Papelera de reciclaje"
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1170
+msgid "Trash"
+msgstr "Papelera"
 
-#: ../daemon/gvfsbackendtrash.c:1267
+#: ../daemon/gvfsbackendtrash.c:1268
 msgid "Can't delete trash"
 msgstr "No se puede borrar la papelera"
 
-#: ../daemon/gvfsbackendtrash.c:1614 ../daemon/gvfsbackendtrash.c:1689
+#: ../daemon/gvfsbackendtrash.c:1615 ../daemon/gvfsbackendtrash.c:1690
 msgid "Trash directory notification not supported"
 msgstr "No se soporta la notificación de la papelera"
 
