@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-08 20:51+0100\n"
-"PO-Revision-Date: 2008-02-08 19:28+0100\n"
+"POT-Creation-Date: 2008-02-12 23:00+0100\n"
+"PO-Revision-Date: 2008-02-12 00:09+0100\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Tomasz Dominikowski (Aviary.pl) <dominikowski@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -19,14 +19,12 @@ msgstr ""
 "X-Poedit-Language: Polish\n"
 "X-Poedit-Country: Poland\n"
 
-#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1856
-#, c-format
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1860
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "Nieobsługiwana operacja, pliki znajdują się na różnych punktach montowania"
 
 #: ../client/gdaemonfile.c:749
-#, c-format
 msgid "Invalid return value from get_info"
 msgstr "Niepoprawna wartość zwrotna od get_info"
 
@@ -41,13 +39,11 @@ msgstr "Nie można uzyskać opisu pliku strumienia"
 #: ../client/gdaemonfile.c:882 ../client/gdaemonfile.c:952
 #: ../client/gdaemonfile.c:1011 ../client/gdaemonfile.c:1070
 #: ../client/gdaemonfile.c:1132
-#, c-format
 msgid "Invalid return value from open"
 msgstr "Niepoprawna wartość zwrotna od open"
 
 #: ../client/gdaemonfile.c:962 ../client/gdaemonfile.c:1021
 #: ../client/gdaemonfile.c:1080 ../client/gdaemonfile.c:1142
-#, c-format
 msgid "Didn't get stream file descriptor"
 msgstr "Nie otrzymano opisu pliku strumienia"
 
@@ -55,78 +51,70 @@ msgstr "Nie otrzymano opisu pliku strumienia"
 msgid "Invalid return value from call"
 msgstr "Niepoprawna wartość zwrotna od call"
 
-#: ../client/gdaemonfile.c:1486
-#, c-format
+#: ../client/gdaemonfile.c:1490
 msgid "Invalid return value from get_filesystem_info"
 msgstr "Niepoprawna wartość zwrotna od get_filesystem_info"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1525
-#, c-format
+#: ../client/gdaemonfile.c:1529
 msgid "Could not find enclosing mount"
 msgstr "Nie można odnaleźć zawartego punktu montowania"
 
-#: ../client/gdaemonfile.c:1555
+#: ../client/gdaemonfile.c:1559
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Niepoprawna nazwa pliku %s"
 
-#: ../client/gdaemonfile.c:1597
-#, c-format
+#: ../client/gdaemonfile.c:1601
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Niepoprawna wartość zwrotna od query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2005
-#, c-format
+#: ../client/gdaemonfile.c:2009
 msgid "Invalid return value from monitor_dir"
 msgstr "Niepoprawna wartość zwrotna od monitor_dir"
 
-#: ../client/gdaemonfile.c:2054
-#, c-format
+#: ../client/gdaemonfile.c:2058
 msgid "Invalid return value from monitor_file"
 msgstr "Niepoprawna wartość zwrotna od monitor_file"
 
-#: ../client/gdaemonfileinputstream.c:450
-#: ../client/gdaemonfileinputstream.c:458
-#: ../client/gdaemonfileinputstream.c:1303
-#: ../client/gdaemonfileinputstream.c:1313
-#: ../client/gdaemonfileoutputstream.c:402
-#: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1047
-#: ../client/gdaemonfileoutputstream.c:1057
+#: ../client/gdaemonfileinputstream.c:451
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1307
+#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileoutputstream.c:403
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1051
+#: ../client/gdaemonfileoutputstream.c:1061
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Błąd w protokole strumienia: %s"
 
-#: ../client/gdaemonfileinputstream.c:458
-#: ../client/gdaemonfileinputstream.c:1313
-#: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1057
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1061
 msgid "End of stream"
 msgstr "Koniec strumienia"
 
-#: ../client/gdaemonfileinputstream.c:518
-#: ../client/gdaemonfileinputstream.c:674
-#: ../client/gdaemonfileinputstream.c:781
-#: ../client/gdaemonfileinputstream.c:1031
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendsmb.c:952
-#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:122
-#: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:298
-#, c-format
+#: ../client/gdaemonfileinputstream.c:519
+#: ../client/gdaemonfileinputstream.c:676
+#: ../client/gdaemonfileinputstream.c:784
+#: ../client/gdaemonfileinputstream.c:1035
+#: ../client/gdaemonfileoutputstream.c:460
+#: ../client/gdaemonfileoutputstream.c:639
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:956
+#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:298
 msgid "Operation was cancelled"
 msgstr "Działanie zostało anulowane"
 
-#: ../client/gdaemonfileinputstream.c:1206
-#: ../client/gdaemonfileoutputstream.c:942
-#, c-format
+#: ../client/gdaemonfileinputstream.c:1210
+#: ../client/gdaemonfileoutputstream.c:946
 msgid "Seek not supported on stream"
 msgstr "Wyszukiwanie nie jest obsługiwane w strumieniu"
 
-#: ../client/gdaemonfileinputstream.c:1240
-#, c-format
+#: ../client/gdaemonfileinputstream.c:1244
 msgid "The query info operation is not supported"
 msgstr "Działanie query info nie jest obsługiwane"
 
@@ -140,23 +128,21 @@ msgstr "Wystąpił błąd podczas uzyskiwania informacji o montowaniu: %s"
 msgid "Error connecting to daemon: %s"
 msgstr "Wystąpił błąd podczas łączenia z usługą: %s"
 
-#: ../common/gsysutils.c:125
+#: ../common/gsysutils.c:127
 #, c-format
 msgid "Error creating socket: %s"
 msgstr "Wystąpił błąd podczas tworzenia wtyczki: %s"
 
-#: ../common/gsysutils.c:161
+#: ../common/gsysutils.c:165
 #, c-format
 msgid "Error connecting to socket: %s"
 msgstr "Błąd podczas łączenia z wtyczką: %s"
 
 #: ../common/gvfsdaemonprotocol.c:515
-#, c-format
 msgid "Invalid file info format"
 msgstr "Niepoprawny format informacji o pliku"
 
 #: ../common/gvfsdaemonprotocol.c:532
-#, c-format
 msgid "Invalid attribute info list content"
 msgstr "Niepoprawny atrybut zawartości "
 
@@ -194,64 +180,65 @@ msgstr "punkt montowania dla %s już uruchomiony"
 msgid "error starting mount daemon"
 msgstr "błąd podczas uruchamiania usługi montowania"
 
-#: ../daemon/gvfsbackendburn.c:346
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:347
 msgid "Burn"
 msgstr "Zapisz"
 
-#: ../daemon/gvfsbackendburn.c:376
+#: ../daemon/gvfsbackendburn.c:377
 msgid "Unable to create temporary directory"
 msgstr "Nie można utworzyć tymczasowego folderu"
 
-#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:671
-#: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
-#: ../daemon/gvfsbackendburn.c:782
+#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
+#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
+#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
+#: ../daemon/gvfsbackendburn.c:784
 msgid "No such file or directory"
 msgstr "Nie ma takiego pliku lub folderu"
 
-#: ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackendburn.c:426
 msgid "Directory not empty"
 msgstr "Folder nie jest pusty"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:894
+#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:898
 msgid "Can't copy file over directory"
 msgstr "Nie można skopiować pliku na folder"
 
-#: ../daemon/gvfsbackendburn.c:650
-msgid "CD Burner"
-msgstr "Nagrywarka CD"
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "Asystent CD/DVD"
 
-#: ../daemon/gvfsbackendburn.c:679 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
 msgid "The file is not a directory"
 msgstr "Plik nie jest folderem"
 
-#: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
-#: ../daemon/gvfsbackendburn.c:914
+#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
+#: ../daemon/gvfsbackendburn.c:918
 msgid "File exists"
 msgstr "Plik istnieje"
 
-#: ../daemon/gvfsbackendburn.c:842
+#: ../daemon/gvfsbackendburn.c:846
 msgid "No such file or directory in target path"
 msgstr "Nie ma takiego pliku lub folderu w ścieżce docelowej"
 
-#: ../daemon/gvfsbackendburn.c:865
+#: ../daemon/gvfsbackendburn.c:869
 msgid "Can't copy directory over directory"
 msgstr "Nie można skopiować folderu na folderze"
 
-#: ../daemon/gvfsbackendburn.c:874
+#: ../daemon/gvfsbackendburn.c:878
 msgid "Target file exists"
 msgstr "Plik docelowy istnieje"
 
-#: ../daemon/gvfsbackendburn.c:881
+#: ../daemon/gvfsbackendburn.c:885
 msgid "Can't recursively copy directory"
 msgstr "Nie można rekursywnie skopiować folderu"
 
-#: ../daemon/gvfsbackendburn.c:940
+#: ../daemon/gvfsbackendburn.c:944
 msgid "Not supported"
 msgstr "Nieobsługiwane"
 
 #: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
-#, c-format
 msgid "No drive specified"
 msgstr "Nie określono napędu"
 
@@ -271,7 +258,7 @@ msgstr "Napęd %s nie zawiera ścieżek dźwiękowych"
 msgid "Audio Disc on %s"
 msgstr "Płyta CD-Audio w %s"
 
-#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:680
+#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:682
 #: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
 #, c-format
 msgid "Audio Disc"
@@ -291,27 +278,27 @@ msgid "No such file %s on drive %s"
 msgstr "Nie ma pliku %s w napędzie %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:536
+#: ../daemon/gvfsbackendcdda.c:538
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Błąd od \"paranoia\" w napędzie %s"
 
-#: ../daemon/gvfsbackendcdda.c:599
+#: ../daemon/gvfsbackendcdda.c:601
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Błąd podczas wyszukiwania w strumieniu w napędzie %s"
 
-#: ../daemon/gvfsbackendcdda.c:696
+#: ../daemon/gvfsbackendcdda.c:698
 #, c-format
 msgid "No such file"
 msgstr "Nie ma takiego pliku"
 
-#: ../daemon/gvfsbackendcdda.c:703
+#: ../daemon/gvfsbackendcdda.c:705
 #, c-format
 msgid "The file does not exist"
 msgstr "Plik nie istnieje"
 
-#: ../daemon/gvfsbackendcdda.c:710
+#: ../daemon/gvfsbackendcdda.c:712
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Plik nie istnieje lub nie jest ścieżką dźwiękową"
@@ -327,7 +314,6 @@ msgstr "System plików"
 #: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:786
 #: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
 #: ../daemon/gvfsbackendsmbbrowse.c:1098
-#, c-format
 msgid "File doesn't exist"
 msgstr "Plik nie istnieje"
 
@@ -344,20 +330,20 @@ msgstr "Nie można otworzyć montowalnego pliku"
 msgid "Internal error: %s"
 msgstr "Błąd wewnętrzny: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:798 ../daemon/gvfsbackendcomputer.c:863
-#: ../daemon/gvfsbackendcomputer.c:963
+#: ../daemon/gvfsbackendcomputer.c:798 ../daemon/gvfsbackendcomputer.c:864
+#: ../daemon/gvfsbackendcomputer.c:964
 msgid "Not a mountable file"
 msgstr "To nie jest montowalny plik"
 
-#: ../daemon/gvfsbackendcomputer.c:820
+#: ../daemon/gvfsbackendcomputer.c:821
 msgid "Can't mount file"
 msgstr "Nie można zamontować pliku"
 
-#: ../daemon/gvfsbackendcomputer.c:878
+#: ../daemon/gvfsbackendcomputer.c:879
 msgid "Can't unmount file"
 msgstr "Nie można odmontować pliku"
 
-#: ../daemon/gvfsbackendcomputer.c:994
+#: ../daemon/gvfsbackendcomputer.c:995
 msgid "Can't eject file"
 msgstr "Nie można wysunąć pliku"
 
@@ -368,17 +354,14 @@ msgid "HTTP Error: %s"
 msgstr "Błąd HTTP: %s"
 
 #: ../daemon/gvfsbackenddav.c:167
-#, c-format
 msgid "Could not parse response"
 msgstr "Nie można przetworzyć odpowiedzi"
 
 #: ../daemon/gvfsbackenddav.c:176
-#, c-format
 msgid "Empty response"
 msgstr "Pusta odpowiedź"
 
 #: ../daemon/gvfsbackenddav.c:183
-#, c-format
 msgid "Unexpected reply from server"
 msgstr "Nieoczekiwana odpowiedź od serwera"
 
@@ -412,19 +395,17 @@ msgstr "Niepoprawna odpowiedź"
 msgid "Could not create request"
 msgstr "Nie można utworzyć żądania"
 
-#: ../daemon/gvfsbackenddav.c:989 ../daemon/gvfsbackendsmb.c:1653
+#: ../daemon/gvfsbackenddav.c:989 ../daemon/gvfsbackendsmb.c:1668
 msgid "Target file already exists"
 msgstr "Plik docelowy już istnieje"
 
 #: ../daemon/gvfsbackenddav.c:1059 ../daemon/gvfsbackendsftp.c:2433
-#: ../daemon/gvfsbackendsmb.c:921
-#, c-format
+#: ../daemon/gvfsbackendsmb.c:924
 msgid "The file was externally modified"
 msgstr "Plik został zmodyfikowany z zewnątrz"
 
-#: ../daemon/gvfsbackenddav.c:1090 ../daemon/gvfsbackendsmb.c:957
-#: ../daemon/gvfsbackendsmb.c:1670
-#, c-format
+#: ../daemon/gvfsbackenddav.c:1090 ../daemon/gvfsbackendsmb.c:962
+#: ../daemon/gvfsbackendsmb.c:1685
 msgid "Backup file creation failed"
 msgstr "Utworzenie kopii zapasowej pliku nieudane"
 
@@ -433,7 +414,7 @@ msgid "No hostname specified"
 msgstr "Nie podano nazwy hosta"
 
 #: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:627
-#: ../daemon/gvfsbackendsmb.c:1051
+#: ../daemon/gvfsbackendsmb.c:1058
 msgid "Unsupported seek type"
 msgstr "Typ wyszukiwania nieobsługiwany"
 
@@ -443,7 +424,7 @@ msgid "HTTP Client Error: %s"
 msgstr "Błąd klienta HTTP: %s"
 
 #: ../daemon/gvfsbackendhttp.c:504 ../daemon/gvfsbackendsftp.c:1495
-#: ../daemon/gvfsbackendsmb.c:1162 ../daemon/gvfsbackendtrash.c:951
+#: ../daemon/gvfsbackendsmb.c:1171 ../daemon/gvfsbackendtrash.c:951
 msgid " (invalid encoding)"
 msgstr " (niepoprawne kodowanie)"
 
@@ -452,37 +433,30 @@ msgid "Directory notification not supported"
 msgstr "Powiadamianie folderów nie jest obsługiwane"
 
 #: ../daemon/gvfsbackendsftp.c:249
-#, c-format
 msgid "ssh program unexpectedly exited"
 msgstr "program ssh nieoczekiwanie zakończył pracę"
 
 #: ../daemon/gvfsbackendsftp.c:257
-#, c-format
 msgid "Permission denied"
 msgstr "Dostęp zabroniony"
 
 #: ../daemon/gvfsbackendsftp.c:264
-#, c-format
 msgid "Hostname not known"
 msgstr "Nazwa hosta jest nieznana"
 
 #: ../daemon/gvfsbackendsftp.c:271
-#, c-format
 msgid "No route to host"
 msgstr "Brak ścieżki do hosta"
 
 #: ../daemon/gvfsbackendsftp.c:278
-#, c-format
 msgid "Connection refused by server"
 msgstr "Odmowa połączenia z serwerem"
 
 #: ../daemon/gvfsbackendsftp.c:285
-#, c-format
 msgid "Host key verification failed"
 msgstr "Uwierzytelnienie klucza hosta nieudane"
 
 #: ../daemon/gvfsbackendsftp.c:370
-#, c-format
 msgid "Unable to spawn ssh program"
 msgstr "Nie można uruchomić programu ssh"
 
@@ -492,7 +466,6 @@ msgid "Unable to spawn ssh program: %s"
 msgstr "Nie można uruchomić programu ssh: %s"
 
 #: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:646
-#, c-format
 msgid "Timed out when logging in"
 msgstr "Przekroczono czas oczekiwania podczas logowania do"
 
@@ -505,17 +478,14 @@ msgid "Enter password"
 msgstr "Proszę wprowadzić hasło"
 
 #: ../daemon/gvfsbackendsftp.c:708
-#, c-format
 msgid "Password dialog cancelled"
 msgstr "Okno dialogowe hasła anulowane"
 
 #: ../daemon/gvfsbackendsftp.c:724
-#, c-format
 msgid "Can't send password"
 msgstr "Nie można wysłać hasła"
 
 #: ../daemon/gvfsbackendsftp.c:1090 ../daemon/gvfsbackendsftp.c:1113
-#, c-format
 msgid "Protocol error"
 msgstr "Błąd protokołu"
 
@@ -554,10 +524,9 @@ msgstr "Błąd"
 #: ../daemon/gvfsbackendsftp.c:2613 ../daemon/gvfsbackendsftp.c:2895
 #: ../daemon/gvfsbackendsftp.c:3024 ../daemon/gvfsbackendsftp.c:3057
 #: ../daemon/gvfsbackendsftp.c:3158 ../daemon/gvfsbackendsftp.c:3199
-#: ../daemon/gvfsbackendsftp.c:3252 ../daemon/gvfsbackendsftp.c:3288
-#: ../daemon/gvfsbackendsftp.c:3322 ../daemon/gvfsbackendsftp.c:3337
-#: ../daemon/gvfsbackendsftp.c:3356
-#, c-format
+#: ../daemon/gvfsbackendsftp.c:3255 ../daemon/gvfsbackendsftp.c:3291
+#: ../daemon/gvfsbackendsftp.c:3325 ../daemon/gvfsbackendsftp.c:3340
+#: ../daemon/gvfsbackendsftp.c:3359
 msgid "Invalid reply received"
 msgstr "Otrzymano niepoprawną odpowiedź"
 
@@ -583,7 +552,7 @@ msgid "Internal Error (%s)"
 msgstr "Błąd wewnętrzny (%s)"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1155
+#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1164
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
@@ -593,31 +562,31 @@ msgstr "%s na %s"
 msgid "Failed to mount Windows share"
 msgstr "Zamontowanie zasobu Windows nieudane"
 
-#: ../daemon/gvfsbackendsmb.c:1103
+#: ../daemon/gvfsbackendsmb.c:1112
 #, c-format
-msgid "Backup file creation failed: %d"
-msgstr "Utworzenie pliku kopii zapasowej nieudane: %d"
+msgid "Backup file creation failed: %s"
+msgstr "Utworzenie pliku kopii zapasowej nieudane: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1556
+#: ../daemon/gvfsbackendsmb.c:1569
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Błąd podczas usuwania pliku: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1618
+#: ../daemon/gvfsbackendsmb.c:1633
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Błąd podczas przenoszenia pliku: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1642
+#: ../daemon/gvfsbackendsmb.c:1657
 msgid "Can't move directory over directory"
 msgstr "Nie można przenieść folderu na folder"
 
-#: ../daemon/gvfsbackendsmb.c:1690
+#: ../daemon/gvfsbackendsmb.c:1705
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Błąd podczas usuwania pliku docelowego: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1714
+#: ../daemon/gvfsbackendsmb.c:1729
 msgid "Can't recursively move directory"
 msgstr "Nie można rekursywnie przenieść folderu"
 
@@ -633,7 +602,6 @@ msgid "Windows shares on %s"
 msgstr "Zasoby Windows na %s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:781 ../daemon/gvfsbackendsmbbrowse.c:827
-#, c-format
 msgid "The file is not a mountable"
 msgstr "Plik nie jest montowalny"
 
@@ -646,15 +614,21 @@ msgid "Not a directory"
 msgstr "To nie jest folder"
 
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1169
-msgid "Trashcan"
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1180
+msgid "Trash"
 msgstr "Kosz"
 
-#: ../daemon/gvfsbackendtrash.c:1267
+#: ../daemon/gvfsbackendtrash.c:961
+#, c-format
+msgid "%s (in trash)"
+msgstr "%s (w koszu)"
+
+#: ../daemon/gvfsbackendtrash.c:1278
 msgid "Can't delete trash"
 msgstr "Nie można opróżnić kosza"
 
-#: ../daemon/gvfsbackendtrash.c:1614 ../daemon/gvfsbackendtrash.c:1689
+#: ../daemon/gvfsbackendtrash.c:1625 ../daemon/gvfsbackendtrash.c:1700
 msgid "Trash directory notification not supported"
 msgstr "Powiadamianie folderu kosza nie jest obsługiwane"
 
@@ -662,7 +636,7 @@ msgstr "Powiadamianie folderu kosza nie jest obsługiwane"
 msgid "Invalid backend type"
 msgstr "Niepoprawny typ mechanizmu przetwarzającego"
 
-#: ../daemon/gvfsdaemonutils.c:102
+#: ../daemon/gvfsdaemonutils.c:104
 #, c-format
 msgid "Error sending fd: %s"
 msgstr "Błąd podczas wysyłania fd: %s"
@@ -717,13 +691,12 @@ msgstr "Główna usługa dla GVFS"
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:142
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:135
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Więcej informacji: \"%s --help\""
 
 #: ../daemon/mount.c:372
-#, c-format
 msgid "Invalid arguments from spawned child"
 msgstr "Niepoprawne argumenty od utworzonego elementu zależnego"
 
@@ -1145,35 +1118,38 @@ msgstr ""
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:133
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: brakujące położenia"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:65
+#: ../programs/gvfs-open.c:58
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
 msgstr "%s: %s: błąd podczas otwierania położenia: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:92
+#: ../programs/gvfs-open.c:85
 #, c-format
 msgid "%s: %s: error launching application: %s\n"
 msgstr "%s: %s: błąd podczas uruchamiania aplikacji: %s\n"
 
-#: ../programs/gvfs-open.c:122
+#: ../programs/gvfs-open.c:115
 msgid "FILES... - open FILES with registered application."
 msgstr "PLIKI... - otwiera PLIKi za pomocą zarejestrowanej aplikacji."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:126
+#: ../programs/gvfs-open.c:119
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
 "Otwiera plik(i) za pomocą domyślnej aplikacji zarejestrowanej do obsługi "
 "danego typu pliku."
+
+#~ msgid "CD Burner"
+#~ msgstr "Nagrywarka CD"
