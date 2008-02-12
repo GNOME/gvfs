@@ -118,7 +118,7 @@ g_hal_volume_monitor_finalize (GObject *object)
   g_object_unref (monitor->pool);
 
   g_list_foreach (monitor->last_camera_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_optical_disc_devices);
+  g_list_free (monitor->last_camera_devices);
   g_list_foreach (monitor->last_optical_disc_devices, (GFunc)g_object_unref, NULL);
   g_list_free (monitor->last_optical_disc_devices);
   g_list_foreach (monitor->last_drive_devices, (GFunc)g_object_unref, NULL);

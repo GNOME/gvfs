@@ -1,3 +1,8 @@
+2008-02-12  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c (g_hal_volume_monitor_finalize):
+	Don't double free list optical disc list.
+
 2008-02-11  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
