@@ -99,6 +99,7 @@ struct _GVfsBackendTrash
 
   /* This is only set on the main thread */
   GList *top_files; /* Files in toplevel dir */
+  guint num_top_files;
 
   /* All these are protected by the root_monitor lock */
   GVfsMonitor *file_vfs_monitor;
@@ -614,6 +615,7 @@ do_mount (GVfsBackend *backend,
   GList *names;
 
   names = enumerate_root (backend, NULL);
+  trash_backend->num_top_files = g_list_length (names);
   trash_backend->top_files = g_list_sort (names, (GCompareFunc)strcmp);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -758,18 +760,23 @@ typedef struct {
 static gboolean
 set_trash_files (gpointer _data)
 {
+  GVfsMonitor *vfs_monitor, *file_vfs_monitor;
   GVfsBackendTrash *trash_backend;
   SetHasTrashFilesData *data = _data;
-  GList *new, *old, *l;
-  int cmp;
-  char *name;
-  GList *added;
-  GList *removed;
-  GVfsMonitor *vfs_monitor, *file_vfs_monitor;
+  GList *new_list, *old_list;
+  guint old_count, new_count;
 
   trash_backend = G_VFS_BACKEND_TRASH (data->backend);
-  
-  data->names = g_list_sort (data->names, (GCompareFunc)strcmp);
+  new_list = g_list_sort (data->names, (GCompareFunc)strcmp);
+  g_slice_free (SetHasTrashFilesData, data);
+
+  old_list = trash_backend->top_files;
+  old_count = trash_backend->num_top_files;
+
+  /* do the replacement now, before we send notifications.  */
+  new_count = g_list_length (new_list);
+  trash_backend->num_top_files = new_count;
+  trash_backend->top_files = new_list;
  
   G_LOCK (root_monitor);
   vfs_monitor = NULL;
@@ -783,11 +790,16 @@ set_trash_files (gpointer _data)
 
   if (vfs_monitor)
     {
+      GList *added, *removed;
+      GList *new, *old, *l;
+      char *name;
+      int cmp;
+
       added = NULL;
       removed = NULL;
-      
-      old = trash_backend->top_files;
-      new = data->names;
+
+      new = new_list;
+      old = old_list;
       
       while (new != NULL || old != NULL)
         {
@@ -844,10 +856,10 @@ set_trash_files (gpointer _data)
         }
       g_list_free (added);
       
-      if ((trash_backend->top_files == NULL && data->names != NULL) ||
-          (trash_backend->top_files != NULL && data->names == NULL))
+      if (new_count != old_count)
         {
-          /* "fullness" changed => icon change */
+          /* trash::item-count changed. */
+          /* icon change only ever occurs when item-count also changes */
           g_vfs_monitor_emit_event (vfs_monitor,
                                     G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
                                     "/",
@@ -859,10 +871,10 @@ set_trash_files (gpointer _data)
 
   if (file_vfs_monitor)
     {
-      if ((trash_backend->top_files == NULL && data->names != NULL) ||
-          (trash_backend->top_files != NULL && data->names == NULL))
+      if (new_count != old_count)
         {
-          /* "fullness" changed => icon change */
+          /* trash::item-count changed. */
+          /* icon change only ever occurs when item-count also changes */
           g_vfs_monitor_emit_event (file_vfs_monitor,
                                     G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
                                     "/",
@@ -872,12 +884,8 @@ set_trash_files (gpointer _data)
       g_object_unref (file_vfs_monitor);
     }
 
-  g_list_foreach (trash_backend->top_files, (GFunc)g_free, NULL);
-  g_list_free (trash_backend->top_files);
-
-  trash_backend->top_files = data->names;
-  
-  g_free (data);
+  g_list_foreach (old_list, (GFunc)g_free, NULL);
+  g_list_free (old_list);
   
   return FALSE;
 }
@@ -887,7 +895,7 @@ queue_set_trash_files (GVfsBackend *backend,
 {
   SetHasTrashFilesData *data;
 
-  data = g_new (SetHasTrashFilesData, 1);
+  data = g_slice_new (SetHasTrashFilesData);
   data->backend = backend;
   data->names = names;
   g_idle_add (set_trash_files, data);
@@ -1173,6 +1181,8 @@ do_query_info (GVfsBackend *backend,
 
   if (!decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir))
     {
+      GVfsBackendTrash *trash_backend = G_VFS_BACKEND_TRASH (backend);
+
       /* The trash:/// root */
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
@@ -1180,14 +1190,14 @@ do_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, _("Trash"));
       g_file_info_set_content_type (info, "inode/directory");
 
-      if (G_VFS_BACKEND_TRASH (backend)->top_files != NULL)
+      if (trash_backend->top_files != NULL)
         icon = g_themed_icon_new ("user-trash-full");
       else
         icon = g_themed_icon_new ("user-trash");
         
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
-      
+     
       g_file_info_set_attribute_boolean (info,
                                          G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL,
                                          TRUE);
@@ -1209,6 +1219,9 @@ do_query_info (GVfsBackend *backend,
       g_file_info_set_attribute_boolean (info,
                                          G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME,
                                          FALSE);
+      g_file_info_set_attribute_uint32 (info,
+                                        G_FILE_ATTRIBUTE_TRASH_ITEM_COUNT,
+                                        trash_backend->num_top_files);
       
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }

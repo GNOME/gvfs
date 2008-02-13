@@ -1,3 +1,9 @@
+2008-02-13  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/gvfsbackendtrash.c:
+	Keep track of the number of top level items in the trash.
+	Expose this value via the trash::item-count attribute.
+
 2008-02-13  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalmount.c:
