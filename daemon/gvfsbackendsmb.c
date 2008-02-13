@@ -587,6 +587,12 @@ do_read (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   ssize_t res;
 
+  /* For some reason requests of 65536 bytes broke for me (returned 0)
+   * Maybe some smb protocol limit
+   */
+  if (bytes_requested > 65535)
+    bytes_requested = 65535;
+  
   res = op_backend->smb_context->read (op_backend->smb_context, (SMBCFILE *)handle, buffer, bytes_requested);
 
   if (res == -1)

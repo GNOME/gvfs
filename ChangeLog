@@ -1,3 +1,9 @@
+2008-02-13  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsmb.c (do_read):
+	Limit smb reads to 65535 bytes to avoid issues on
+	large reads.
+
 2008-02-13  Ryan Lortie  <desrt@desrt.ca>
 
 	* daemon/gvfsbackendtrash.c:
