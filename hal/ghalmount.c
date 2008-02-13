@@ -614,6 +614,22 @@ g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
   update_from_hal (mount, TRUE);
 }
 
+static gboolean
+should_ignore_non_hal (GUnixMountEntry *mount_entry)
+{
+  const char *fs_type;
+  
+  fs_type = g_unix_mount_get_fs_type (mount_entry);
+
+  /* We don't want to report nfs mounts. They are
+     generally internal things, and cause a lot
+     of pain with autofs and autorun */
+  if (strcmp (fs_type, "nfs") == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
 GHalMount *
 g_hal_mount_new (GVolumeMonitor       *volume_monitor,
                  GUnixMountEntry      *mount_entry,
@@ -624,8 +640,8 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
   HalDevice *drive_device;
   const char *storage_udi;
   GHalMount *mount;
-  
-  /* No volume for mount: Ignore internal things */
+
+  /* If no volume for mount - Ignore internal things */
   if (volume == NULL && g_unix_mount_is_system_internal (mount_entry))
     return NULL;
 
@@ -676,6 +692,12 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
 
  not_hal:
 
+  if (volume != NULL || should_ignore_non_hal (mount_entry))
+    {
+      g_object_unref (mount);
+      return NULL;
+    }
+  
   mount->name = g_unix_mount_guess_name (mount_entry);
   mount->icon = g_unix_mount_guess_icon (mount_entry);
 
