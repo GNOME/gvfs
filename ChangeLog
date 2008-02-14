@@ -1,3 +1,10 @@
+2008-02-14  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfschannel.c:
+        Fix case where current_job has died (NULL) but
+	the current_job_seq_nr was left and matched
+	a sent cancel op. (#515959)
+
 2008-02-13  Alexander Larsson  <alexl@redhat.com>
 
 	* daemon/gvfsbackendsmb.c (do_read):

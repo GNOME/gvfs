@@ -343,7 +343,8 @@ got_request (GVfsChannel *channel,
 
   if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL)
     {
-      if (arg1 == channel->priv->current_job_seq_nr)
+      if (arg1 == channel->priv->current_job_seq_nr &&
+	  channel->priv->current_job != NULL)
 	g_vfs_job_cancel (channel->priv->current_job);
       else
 	{
