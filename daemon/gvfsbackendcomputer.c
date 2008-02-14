@@ -697,11 +697,14 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
       g_file_info_set_content_type (info, "inode/directory");
+
+      g_vfs_job_succeeded (G_VFS_JOB (job));
     }
   else if (file != NULL)
-    file_info_from_file (file, info);
-
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+    {
+      file_info_from_file (file, info);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
   
   return TRUE;
 }
@@ -722,9 +725,11 @@ try_create_dir_monitor (GVfsBackend *backend,
 
   if (file != &root)
     {
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                        G_IO_ERROR_NOT_SUPPORTED,
-                        _("Can't open mountable file"));
+      if (file != NULL)
+        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                          G_IO_ERROR_NOT_SUPPORTED,
+                          _("Can't open mountable file"));
+      
       return TRUE;
     }
   

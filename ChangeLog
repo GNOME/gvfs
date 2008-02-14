@@ -1,5 +1,11 @@
 2008-02-14  Alexander Larsson  <alexl@redhat.com>
 
+	* daemon/gvfsbackendcomputer.c:
+	If lookup returns NULL it already set the error.
+	Handle this in all callers.
+
+2008-02-14  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/Makefile.am:
 	Disable install of ftp.mount for now
 
