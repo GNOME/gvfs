@@ -1,5 +1,10 @@
 2008-02-14  Alexander Larsson  <alexl@redhat.com>
 
+	* daemon/Makefile.am:
+	Disable install of ftp.mount for now
+
+2008-02-14  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfschannel.c:
         Fix case where current_job has died (NULL) but
 	the current_job_seq_nr was left and matched

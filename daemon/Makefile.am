@@ -35,7 +35,8 @@ service_DATA = gvfs-daemon.service
 libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest
 
 mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
-mount_DATA = ftp.mount sftp.mount trash.mount computer.mount burn.mount localtest.mount
+mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount
+# Disabled until the implementation is working: ftp.mount
 
 mount_in_files += http.mount.in dav.mount.in 
 if HAVE_HTTP
