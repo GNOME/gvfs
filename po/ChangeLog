@@ -1,3 +1,8 @@
+2008-02-14  Rahul Bhalerao <b.rahul.pm@gmail.com>
+
+	* mr.po: Added Marathi translations by Sandeep Shedmake.
+	* LINGUAS: Added an entry for Marathi (mr).
+
 2008-02-14  Duarte Loreto <happyguy_pt@hotmail.com>
 
 	* pt.po: Updated Portuguese translation.
