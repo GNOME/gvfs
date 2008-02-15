@@ -744,7 +744,7 @@ g_daemon_file_query_info (GFile                *file,
 			     cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags,
-			     uri != NULL ? DBUS_TYPE_STRING : 0, &uri,
+			     DBUS_TYPE_STRING, &uri,
 			     0);
 
   g_free (uri);
@@ -816,6 +816,9 @@ g_daemon_file_query_info_async (GFile                      *file,
 				gpointer                    user_data)
 {
   guint32 dbus_flags;
+  char *uri;
+
+  uri = g_file_get_uri (file);
 
   dbus_flags = flags;
   do_async_path_call (file,
@@ -825,7 +828,10 @@ g_daemon_file_query_info_async (GFile                      *file,
 		      query_info_async_cb, NULL, NULL,
 		      DBUS_TYPE_STRING, &attributes,
 		      DBUS_TYPE_UINT32, &dbus_flags,
+		      DBUS_TYPE_STRING, &uri,
 		      0);
+
+  g_free (uri);
 }
 
 static GFileInfo *

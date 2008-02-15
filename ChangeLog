@@ -1,6 +1,11 @@
 2008-02-15  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
+	Pass uri in query_info_async too.
+
+2008-02-15  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
 	Pass an optional uri to query_info and enumerate
 	
         * daemon/gvfsbackend.[ch]:
