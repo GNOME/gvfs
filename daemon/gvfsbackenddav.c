@@ -130,7 +130,7 @@ path_get_parent_dir (const char *path)
 }
 
 /* ************************************************************************* */
-/*  */
+/* generic xml parsing functions */
 
 static inline gboolean
 node_has_name (xmlNodePtr node, const char *name)
@@ -140,85 +140,39 @@ node_has_name (xmlNodePtr node, const char *name)
   return ! strcmp ((char *) node->name, name);
 }
 
-static xmlDocPtr
-parse_xml (SoupMessage  *msg,
-           xmlNodePtr   *root,
-           const char   *name,
-           GError      **error)
+static inline gboolean
+node_has_name_ns (xmlNodePtr node, const char *name, const char *ns_href)
 {
- xmlDocPtr  doc;
+  gboolean has_name;
+  gboolean has_ns;
 
-  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
-    {
-      
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   _("HTTP Error: %s"), msg->reason_phrase);
-      return NULL;
-    }
+  g_return_val_if_fail (node != NULL, FALSE);
 
-  doc = xmlReadMemory (msg->response_body->data,
-                       msg->response_body->length,
-                       "response.xml",
-                       NULL,
-                       0);
-  if (doc == NULL)
-    { 
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   "%s", _("Could not parse response"));
-      return NULL;
-    }
+  has_name = has_ns = TRUE;
 
-  *root = xmlDocGetRootElement (doc);
+  if (name)
+    has_name = node->name && ! strcmp ((char *) node->name, name);
 
-  if (doc == NULL)
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   "%s", _("Empty response"));
-      return NULL;
-    }
+  if (ns_href)
+    has_ns = node->ns && node->ns->href &&
+      ! g_ascii_strcasecmp ((char *) node->ns->href, ns_href);
 
-  if (strcmp ((char *) (*root)->name, name))
-    {
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                     "%s", _("Unexpected reply from server"));
-      return NULL;
-    }
+  return has_name && has_ns;
+}
 
-  return doc;
+static inline gboolean
+node_is_element (xmlNodePtr node)
+{
+  return node->type == XML_ELEMENT_NODE && node->name != NULL;
 }
 
 
-static xmlDocPtr
-multistatus_parse_xml (SoupMessage *msg, xmlNodePtr *root, GError **error)
+static inline gboolean
+node_is_element_with_name (xmlNodePtr node, const char *name)
 {
-    return parse_xml (msg, root, "multistatus", error);
-}
-
-
-static GFileType
-parse_resourcetype (xmlNodePtr rt)
-{
-  xmlNodePtr node;
-  GFileType  type;
-
-  for (node = rt->children; node; node = node->next)
-    { 
-      if (node->type == XML_ELEMENT_NODE &&
-          node->name != NULL)
-          break;
-    }
-
-  if (node == NULL)
-    return G_FILE_TYPE_REGULAR;
-
-  if (! strcmp ((char *) node->name, "collection"))
-    type = G_FILE_TYPE_DIRECTORY;
-  else if (! strcmp ((char *) node->name, "redirectref"))
-    type = G_FILE_TYPE_SYMBOLIC_LINK;
-  else
-    type = G_FILE_TYPE_UNKNOWN;
-
-  return type;
+  return node->type == XML_ELEMENT_NODE &&
+    node->name != NULL && 
+    ! strcmp ((char *) node->name, name);
 }
 
 static const char *
@@ -241,199 +195,516 @@ node_get_content (xmlNodePtr node)
     return NULL;
 }
 
-static GFileInfo *
-mulitstatus_parse_prop_node (xmlDocPtr doc, xmlNodePtr prop)
+typedef struct _xmlNodeIter {
+
+  xmlNodePtr cur_node;
+  xmlNodePtr next_node;
+
+  const char *name;
+  const char *ns_href;
+
+  void       *user_data;
+
+} xmlNodeIter;
+
+static xmlNodePtr
+xml_node_iter_next (xmlNodeIter *iter)
 {
-  GFileInfo  *info;
-  xmlNodePtr  node;
-  const char *text;
-  GTimeVal    tv;
+  xmlNodePtr node;
 
-  info = g_file_info_new ();
-
-
-  for (node = prop->children; node; node = node->next)
+  while ((node = iter->next_node))
     {
-     if (node->type != XML_ELEMENT_NODE ||
-         node->name == NULL)
-        {
-          continue;
-        }
+      iter->next_node = node->next;
 
-     text = node_get_content (node);
-
-     if (node_has_name (node, "resourcetype"))
-        {
-           GFileType type = parse_resourcetype (node);
-           g_file_info_set_file_type (info, type);
-        }
-     else if (node_has_name (node, "displayname"))
-        {
-          g_file_info_set_display_name (info, text);
-        }
-     else if (node_has_name (node, "getetag"))
-        {
-          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE,
-                                            text);
-        }
-     else if (node_has_name (node, "creationdate"))
-        {
-            
-        }
-     else if (node_has_name (node, "getcontenttype"))
-        {
-          g_file_info_set_content_type (info, text);
-        }
-     else if (node_has_name (node, "getcontentlength"))
-        {
-          gint64 size;
-          size = g_ascii_strtoll (text, NULL, 10);
-          g_file_info_set_size (info, size);
-        }
-     else if (node_has_name (node, "getlastmodified"))
-       {
-           if (g_time_val_from_iso8601 (text, &tv))
-             g_file_info_set_modification_time (info, &tv);
-       }
+      if (node->type == XML_ELEMENT_NODE) {
+        if (node_has_name_ns (node, iter->name, iter->ns_href))
+          break;
+      }
     }
-  return info;
+
+  iter->cur_node = node;
+  return node;
 }
 
-static GFileInfo *
-multistatus_parse_response (xmlDocPtr    doc,
-                            xmlNodePtr   resp,
-                            SoupURI     *base)
+static void *
+xml_node_iter_get_user_data (xmlNodeIter *iter)
 {
-  GFileInfo  *info;
-  xmlNodePtr  node;
-  char       *name;
-  gboolean    res;
- 
-  info = NULL;
-  name = NULL;
+  return iter->user_data;
+}
 
-  for (node = resp->children; node; node = node->next)
+static xmlNodePtr
+xml_node_iter_get_current (xmlNodeIter *iter)
+{
+  return iter->cur_node;
+}
+
+static xmlDocPtr
+parse_xml (SoupMessage  *msg,
+           xmlNodePtr   *root,
+           const char   *name,
+           GError      **error)
+{
+ xmlDocPtr  doc;
+
+  if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      if (node->type != XML_ELEMENT_NODE ||
-          node->name == NULL)
+      
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   _("HTTP Error: %s"), msg->reason_phrase);
+      return NULL;
+    }
+
+  doc = xmlReadMemory (msg->response_body->data,
+                       msg->response_body->length,
+                       "response.xml",
+                       NULL,
+                       XML_PARSE_NOWARNING |
+                       XML_PARSE_NOBLANKS |
+                       XML_PARSE_NSCLEAN |
+                       XML_PARSE_NOCDATA |
+                       XML_PARSE_COMPACT);
+  if (doc == NULL)
+    { 
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   "%s", _("Could not parse response"));
+      return NULL;
+    }
+
+  *root = xmlDocGetRootElement (doc);
+
+  if (*root == NULL || (*root)->children == NULL)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   "%s", _("Empty response"));
+      return NULL;
+    }
+
+  if (strcmp ((char *) (*root)->name, name))
+    {
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                     "%s", _("Unexpected reply from server"));
+      return NULL;
+    }
+
+  return doc;
+}
+
+/* ************************************************************************* */
+/* Multistatus parsing code */
+
+typedef struct _Multistatus Multistatus;
+typedef struct _MsResponse MsResponse;
+typedef struct _MsPropstat MsPropstat;
+
+struct _Multistatus {
+
+  xmlDocPtr  doc;
+  xmlNodePtr root;
+
+  const SoupURI *target;
+
+};
+
+struct _MsResponse {
+
+  Multistatus *multistatus;
+
+  xmlNodePtr  href;
+  xmlNodePtr  first_propstat;
+};
+
+struct _MsPropstat {
+
+  Multistatus *multistatus;
+
+  xmlNodePtr   prop_node;
+  guint        status_code;
+
+};
+
+
+static gboolean
+multistatus_parse (SoupMessage *msg, Multistatus *multistatus, GError **error)
+{
+  xmlDocPtr  doc;
+  xmlNodePtr root;
+
+  doc = parse_xml (msg, &root, "multistatus", error);
+
+  if (doc == NULL)
+    return FALSE;
+
+  multistatus->doc = doc;
+  multistatus->root = root;
+  multistatus->target = soup_message_get_uri (msg);
+
+  return TRUE;
+}
+
+static void
+multistatus_free (Multistatus *multistatus)
+{
+  xmlFreeDoc (multistatus->doc);
+}
+
+static void
+multistatus_get_response_iter (Multistatus *multistatus, xmlNodeIter *iter)
+{
+  iter->cur_node = multistatus->root->children;
+  iter->next_node = multistatus->root->children;
+  iter->name = "response";
+  iter->ns_href = "DAV:";
+  iter->user_data = multistatus;
+}
+
+static gboolean
+multistatus_get_response (xmlNodeIter *resp_iter, MsResponse *response)
+{
+  Multistatus *multistatus;
+  xmlNodePtr   resp_node;
+  xmlNodePtr   iter;
+  xmlNodePtr   href;
+  xmlNodePtr   propstat;
+
+  multistatus = xml_node_iter_get_user_data (resp_iter);
+  resp_node = xml_node_iter_get_current (resp_iter);
+
+  if (resp_node == NULL)
+    return FALSE;
+
+  propstat = NULL;
+  href = NULL;
+
+  for (iter = resp_node->children; iter; iter = iter->next)
+    {
+      if (! node_is_element (iter))
         {
           continue;
         }
-      else if (node_has_name (node, "href"))
+      else if (node_has_name_ns (iter, "href", "DAV:"))
+        {
+          href = iter;
+        }
+      else if (node_has_name_ns (iter, "propstat", "DAV:"))
+        {
+          if (propstat == NULL)
+            propstat = iter;
+        }
+
+      if (href && propstat)
+        break;
+    }
+
+  if (href == NULL)
+    return FALSE;
+
+  response->href = href;
+  response->multistatus = multistatus;
+  response->first_propstat = propstat;
+
+  return resp_node != NULL;
+}
+
+static char *
+ms_response_get_basename (MsResponse *response)
+{
+  const char *text;
+  text = node_get_content (response->href);
+
+  return uri_get_basename (text);
+
+}
+
+static gboolean
+ms_response_is_target (MsResponse *response)
+{
+  const char    *text;
+  const char    *path;
+  const SoupURI *target;
+  SoupURI       *uri;
+  gboolean       res;
+
+  res = FALSE;
+  uri = NULL;
+  path = NULL;
+  target = response->multistatus->target;
+  text = node_get_content (response->href);
+
+  if (text == NULL)
+    return FALSE;
+
+  if (*text == '/')
+    {
+      path = text;
+    }
+  else if (!g_ascii_strncasecmp (text, "http", 4))
+    {
+      uri = soup_uri_new (text);
+      path = uri->path;
+    }
+
+  if (path)
+    res = g_str_equal (path, target->path);
+
+  if (uri)
+    soup_uri_free (uri);
+  
+  return res;
+}
+
+static void
+ms_response_get_propstat_iter (MsResponse *response, xmlNodeIter *iter)
+{
+  iter->cur_node = response->first_propstat;
+  iter->next_node = response->first_propstat;
+  iter->name = "propstat";
+  iter->ns_href = "DAV:"; 
+  iter->user_data = response;
+}
+
+static guint
+ms_response_get_propstat (xmlNodeIter *cur_node, MsPropstat *propstat)
+{
+  MsResponse *response;
+  xmlNodePtr  pstat_node;
+  xmlNodePtr  iter;
+  xmlNodePtr  prop;
+  xmlNodePtr  status;
+  const char *status_text;
+  gboolean    res;
+  guint       code;
+
+  response = xml_node_iter_get_user_data (cur_node);
+  pstat_node = xml_node_iter_get_current (cur_node);
+
+  if (pstat_node == NULL)
+    return 0;
+
+  status = NULL;
+  prop = NULL;
+
+  for (iter = pstat_node->children; iter; iter = iter->next)
+    {
+      if (!node_is_element (iter))
+        {
+          continue;
+        }
+      else if (node_has_name_ns (iter, "status", "DAV:"))
+        {
+          status = iter;
+        }
+      else if (node_has_name_ns (iter, "prop", "DAV:"))
+        {
+          prop = iter;
+        }
+
+      if (status && prop)
+        break;
+    }
+
+  status_text = node_get_content (status);
+
+  if (status_text == NULL || prop == NULL)
+    return 0;
+
+  res = soup_headers_parse_status_line ((char *) status_text,
+                                        NULL,
+                                        &code,
+                                        NULL);
+
+  if (res == FALSE)
+    return 0;
+
+  propstat->prop_node = prop;
+  propstat->status_code = code;
+  propstat->multistatus = response->multistatus;
+
+  return code;
+}
+
+static GFileType
+parse_resourcetype (xmlNodePtr rt)
+{
+  xmlNodePtr node;
+  GFileType  type;
+
+  for (node = rt->children; node; node = node->next)
+    { 
+      if (node_is_element (node))
+          break;
+    }
+
+  if (node == NULL)
+    return G_FILE_TYPE_REGULAR;
+
+  if (! strcmp ((char *) node->name, "collection"))
+    type = G_FILE_TYPE_DIRECTORY;
+  else if (! strcmp ((char *) node->name, "redirectref"))
+    type = G_FILE_TYPE_SYMBOLIC_LINK;
+  else
+    type = G_FILE_TYPE_UNKNOWN;
+
+  return type;
+}
+
+static void
+ms_response_to_file_info (MsResponse *response,
+                          GFileInfo  *info)
+{
+  xmlNodeIter iter;
+  MsPropstat  propstat;
+  xmlNodePtr  node;
+  guint       status;
+  char       *basename;
+
+  basename = ms_response_get_basename (response);
+  g_file_info_set_name (info, basename);
+  g_file_info_set_edit_name (info, basename);
+  g_free (basename);
+
+  ms_response_get_propstat_iter (response, &iter);
+
+  while (xml_node_iter_next (&iter))
+    {
+      status = ms_response_get_propstat (&iter, &propstat);
+
+      if (! SOUP_STATUS_IS_SUCCESSFUL (status))
+        continue;
+
+      for (node = propstat.prop_node->children; node; node = node->next)
         {
           const char *text;
+          GTimeVal    tv;
 
-          text = node_get_content (node); 
-          name = uri_get_basename (text);
-        }
+          if (! node_is_element (node))
+            continue; /* FIXME: check namespace, parse user data nodes*/
 
-      else if (node_has_name (node, "propstat"))
-        {
-          xmlNodePtr  iter;
-          xmlNodePtr  prop;
-          xmlChar    *status_text;
-          guint       code;
+          text = node_get_content (node);
 
-          status_text = NULL;
-          prop = NULL;
-        
-          for (iter = node->children; iter; iter = iter->next)
+          if (node_has_name (node, "resourcetype"))
             {
-                if (node->type != XML_ELEMENT_NODE ||
-                    node->name == NULL)
-                    continue;
-                else if (node_has_name (iter, "status"))
-                  {
-                    status_text = xmlNodeGetContent (iter);
-                  }
-                else if (node_has_name (iter, "prop"))
-                  {
-                    prop = iter;
-                  }
-
-                if (status_text && prop)
-                  break;
+              GFileType type = parse_resourcetype (node);
+              g_file_info_set_file_type (info, type);
             }
-
-          if (status_text == NULL || prop == NULL)
+          else if (node_has_name (node, "displayname"))
             {
-              if (status_text)
-                xmlFree (status_text);
-              continue;
-            } 
+              g_file_info_set_display_name (info, text);
+            }
+          else if (node_has_name (node, "getetag"))
+            {
+              g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE,
+                                                text);
+            }
+          else if (node_has_name (node, "creationdate"))
+            {
+              if (! g_time_val_from_iso8601 (text, &tv))
+                continue;
 
-          res = soup_headers_parse_status_line ((char *) status_text,
-                                                NULL,
-                                                &code,
-                                                NULL);
-          xmlFree (status_text);
+              g_file_info_set_attribute_uint64 (info,
+                                                G_FILE_ATTRIBUTE_TIME_CREATED,
+                                                tv.tv_sec);
 
-          if (res == FALSE || !SOUP_STATUS_IS_SUCCESSFUL (code))
-            continue;
+              g_file_info_set_attribute_uint64 (info,
+                                                G_FILE_ATTRIBUTE_TIME_CREATED_USEC,
+                                                tv.tv_usec);
+            }
+          else if (node_has_name (node, "getcontenttype"))
+            {
+              g_file_info_set_content_type (info, text);
+            }
+          else if (node_has_name (node, "getcontentlength"))
+            {
+              gint64 size;
+              size = g_ascii_strtoll (text, NULL, 10);
+              g_file_info_set_size (info, size);
+            }
+          else if (node_has_name (node, "getlastmodified"))
+            {
+              if (g_time_val_from_iso8601 (text, &tv))
+                g_file_info_set_modification_time (info, &tv);
+            }
+        }
+    }
+}
 
-          info = mulitstatus_parse_prop_node (doc, prop); 
+static GFileType
+ms_response_to_file_type (MsResponse *response)
+{
+  xmlNodeIter prop_iter;
+  MsPropstat  propstat;
+  GFileType   file_type;
+  guint       status;
+
+  file_type = G_FILE_TYPE_UNKNOWN;
+
+  ms_response_get_propstat_iter (response, &prop_iter);
+  while (xml_node_iter_next (&prop_iter))
+    {
+      xmlNodePtr iter;
+
+      status = ms_response_get_propstat (&prop_iter, &propstat);
+
+      if (! SOUP_STATUS_IS_SUCCESSFUL (status))
+        continue;
+
+      for (iter = propstat.prop_node->children; iter; iter = iter->next)
+        {
+          if (node_is_element (iter) &&
+              node_has_name_ns (iter, "resourcetype", "DAV:"))
+            break;
+        }
+
+      if (iter)
+        {
+          file_type = parse_resourcetype (iter);
+          break;
         }
     }
 
-  /* after this loop we should have a non-null info object
-   * and the right name */
-  
-  if (info && name)
-    {
-      /* FIXME: that is *not* the name, since its not relative */
-      g_file_info_set_name (info, name);
-      g_file_info_set_edit_name (info, name);
-    }
-  else
-    {
-      if (info)
-        g_object_unref (info);
-      
-      g_free (name);
-      info = NULL;
-    }
-
-  return info;
+  return file_type;
 }
 
 static char *
 create_propfind_request (GFileAttributeMatcher *matcher, gulong *size)
 {
-    xmlOutputBufferPtr   buf;
-    xmlNodePtr           node;
-    xmlNodePtr           root;
-    xmlDocPtr            doc;
-    xmlNsPtr             nsdav;
-    char                *res;
+  xmlOutputBufferPtr   buf;
+  xmlNodePtr           node;
+  xmlNodePtr           root;
+  xmlDocPtr            doc;
+  xmlNsPtr             nsdav;
+  char                *res;
 
-    doc = xmlNewDoc ((xmlChar *) "1.0");
-    root = xmlNewNode (NULL, (xmlChar *) "propfind");
-    nsdav = xmlNewNs (root, (xmlChar *) "DAV:", (xmlChar *) "D");
-    xmlSetNs (root, nsdav);
+  doc = xmlNewDoc ((xmlChar *) "1.0");
+  root = xmlNewNode (NULL, (xmlChar *) "propfind");
+  nsdav = xmlNewNs (root, (xmlChar *) "DAV:", (xmlChar *) "D");
+  xmlSetNs (root, nsdav);
 
-    node = xmlNewTextChild (root, nsdav, (xmlChar *) "prop", NULL);
+  node = xmlNewTextChild (root, nsdav, (xmlChar *) "prop", NULL);
 
-    /* FIXME: we should just ask for properties that 
-     * the matcher tells us to ask for
-     * nota bene: <D:reftarget/>  */
-    xmlNewTextChild (node, nsdav, (xmlChar *) "resourcetype", NULL);
-    xmlNewTextChild (node, nsdav, (xmlChar *) "displayname", NULL);
-    xmlNewTextChild (node, nsdav, (xmlChar *) "getetag", NULL);
-    xmlNewTextChild (node, nsdav, (xmlChar *) "getlastmodified", NULL);
-    xmlNewTextChild (node, nsdav, (xmlChar *) "creationdate", NULL);
-    xmlNewTextChild (node, nsdav, (xmlChar *) "getcontenttype", NULL);
-    xmlNewTextChild (node, nsdav, (xmlChar *) "getcontentlength", NULL);
 
-    buf = xmlAllocOutputBuffer (NULL);
-    xmlNodeDumpOutput (buf, doc, root, 0, 1, NULL);
-    xmlOutputBufferFlush (buf);
 
-    res = g_strndup ((char *) buf->buffer->content, buf->buffer->use);
-    *size = buf->buffer->use;
 
-    xmlOutputBufferClose (buf);
-    xmlFreeDoc (doc);
-    return res;
+  /* FIXME: we should just ask for properties that 
+   * the matcher tells us to ask for
+   * nota bene: <D:reftarget/>  */
+  xmlNewTextChild (node, nsdav, (xmlChar *) "resourcetype", NULL);
+  xmlNewTextChild (node, nsdav, (xmlChar *) "displayname", NULL);
+  xmlNewTextChild (node, nsdav, (xmlChar *) "getetag", NULL);
+  xmlNewTextChild (node, nsdav, (xmlChar *) "getlastmodified", NULL);
+  xmlNewTextChild (node, nsdav, (xmlChar *) "creationdate", NULL);
+  xmlNewTextChild (node, nsdav, (xmlChar *) "getcontenttype", NULL);
+  xmlNewTextChild (node, nsdav, (xmlChar *) "getcontentlength", NULL);
+
+  buf = xmlAllocOutputBuffer (NULL);
+  xmlNodeDumpOutput (buf, doc, root, 0, 1, NULL);
+  xmlOutputBufferFlush (buf);
+
+  res = g_strndup ((char *) buf->buffer->content, buf->buffer->use);
+  *size = buf->buffer->use;
+
+  xmlOutputBufferClose (buf);
+  xmlFreeDoc (doc);
+  return res;
 }
 
 
@@ -540,6 +811,8 @@ soup_authenticate (SoupSession *session,
   const char     *password;
   char           *prompt;
 
+  g_print ("+ soup_authenticate \n");
+
   data = (MountOpData *) user_data;
 
   if (soup_auth_is_for_proxy (auth))
@@ -588,6 +861,7 @@ soup_authenticate (SoupSession *session,
                                      G_ASK_PASSWORD_NEED_USERNAME,
                                      ask_password_ready,
                                      data);
+  g_print ("- soup_authenticate \n");
   g_free (prompt);
 }
 
@@ -753,51 +1027,51 @@ query_info_ready (SoupSession *session,
 {
   GVfsBackendDav    *backend;
   GVfsJobQueryInfo  *job;
+  Multistatus        ms;
+  xmlNodeIter        iter;
   SoupURI           *base;
-  GFileInfo         *info;
+  gboolean           res;
   GError            *error;
-  xmlDocPtr          doc;
-  xmlNodePtr         root;
-  xmlNodePtr         node;
  
   job     = G_VFS_JOB_QUERY_INFO (user_data);
   backend = G_VFS_BACKEND_DAV (job->backend);
   base    = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error   = NULL;
-  info    = NULL;
 
-  doc = multistatus_parse_xml (msg, &root, &error);
+  res = multistatus_parse (msg, &ms, &error);
 
-  if (doc == NULL)
+  if (res == FALSE)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
 
-  for (node = root->children; node; node = node->next)
+  res = FALSE;
+  multistatus_get_response_iter (&ms, &iter);
+
+  while (xml_node_iter_next (&iter))
     {
-      if (node->type != XML_ELEMENT_NODE ||
-          node->name == NULL ||
-          strcmp ((char *) node->name, "response"))
+      MsResponse response;
+
+      if (! multistatus_get_response (&iter, &response))
         continue;
 
-      info = multistatus_parse_response (doc, node, base);
+      if (ms_response_is_target (&response))
+        {
+          ms_response_to_file_info (&response, job->file_info);
+          res = TRUE;
+        }
     }
 
-  if (info)
-    {
-        g_file_info_copy_into (info, job->file_info);
+  if (res)
         g_vfs_job_succeeded (G_VFS_JOB (job));
-    }
   else
-    {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,G_IO_ERROR_FAILED,
                         _("Response invalid"));
-    }
 
-  xmlFreeDoc (doc);
+  multistatus_free (&ms);
 }
 
 /* *** query_info () *** */
@@ -864,57 +1138,51 @@ enumerate_ready (SoupSession *session,
 {
   GVfsBackendDav    *backend;
   GVfsJobEnumerate  *job;
+  Multistatus        ms;
+  xmlNodeIter        iter;
+  gboolean           res;
   SoupURI           *base;
-  GFileInfo         *info;
   GError            *error;
-  xmlDocPtr          doc;
-  xmlNodePtr         root;
-  xmlNodePtr         node;
+
  
   job     = G_VFS_JOB_ENUMERATE (user_data);
   backend = G_VFS_BACKEND_DAV (job->backend);
   base    = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error   = NULL;
-  info    = NULL;
+  
+  res = multistatus_parse (msg, &ms, &error);
 
-  doc = multistatus_parse_xml (msg, &root, &error);
-
-  if (doc == NULL)
+  if (res == FALSE)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
 
-  for (node = root->children; node; node = node->next)
+  multistatus_get_response_iter (&ms, &iter);
+
+  while (xml_node_iter_next (&iter))
     {
-      GFileInfo *info;
-      const char *fn;
+      MsResponse  response;
+      const char *basename;
+      GFileInfo  *info;
 
-      if (node->type != XML_ELEMENT_NODE ||
-          node->name == NULL ||
-          strcmp ((char *) node->name, "response"))
+      if (! multistatus_get_response (&iter, &response))
         continue;
 
-      info = multistatus_parse_response (doc, node, base);
+      basename = ms_response_get_basename (&response);
 
-      if (info == NULL)
+      if (ms_response_is_target (&response))
         continue;
-      
-      fn = g_file_info_get_name (info);
 
-      if (fn == NULL || g_str_equal (job->filename, fn))
-        {
-          g_object_unref (info);
-          continue;
-        }
-
-        g_vfs_job_enumerate_add_info (job, info);
+      info = g_file_info_new ();
+      ms_response_to_file_info (&response, info);
+      g_vfs_job_enumerate_add_info (job, info);
     }
 
   g_vfs_job_succeeded (G_VFS_JOB (job)); /* should that be called earlier? */
   g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
-  xmlFreeDoc (doc);
+  multistatus_free (&ms);
 }
 
 static gboolean
