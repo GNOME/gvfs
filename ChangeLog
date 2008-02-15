@@ -1,3 +1,8 @@
+2008-02-15  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendhttp.c: (g_vfs_backend_uri_for_filename):
+	Escape the filename.
+
 2008-02-14  Alexander Larsson  <alexl@redhat.com>
 
 	* daemon/gvfsbackendcomputer.c:

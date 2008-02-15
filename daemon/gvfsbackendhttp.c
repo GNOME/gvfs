@@ -97,7 +97,9 @@ g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename)
    * be a directory in this case).
    */
   path = g_build_path ("/", uri->path, filename, NULL);
-  soup_uri_set_path (uri, path);
+  g_free (uri->path);
+  uri->path = g_uri_escape_string (path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
+                                   FALSE);
   g_free (path);
 
   return uri;
