@@ -54,6 +54,7 @@ g_vfs_job_enumerate_finalize (GObject *object)
   g_free (job->attributes);
   g_file_attribute_matcher_unref (job->attribute_matcher);
   g_free (job->object_path);
+  g_free (job->uri);
   
   if (G_OBJECT_CLASS (g_vfs_job_enumerate_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_enumerate_parent_class)->finalize) (object);
@@ -89,17 +90,19 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   int path_len;
   const char *obj_path;
   const char *path_data;
-  char *attributes;
+  char *attributes, *uri;
   dbus_uint32_t flags;
+  DBusMessageIter iter;
   
+  dbus_message_iter_init (message, &iter);
   dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-			      DBUS_TYPE_STRING, &obj_path,
-			      DBUS_TYPE_STRING, &attributes,
-			      DBUS_TYPE_UINT32, &flags,
-			      0))
+  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
+				      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
+				      &path_data, &path_len,
+				      DBUS_TYPE_STRING, &obj_path,
+				      DBUS_TYPE_STRING, &attributes,
+				      DBUS_TYPE_UINT32, &flags,
+				      0))
     {
       reply = dbus_message_new_error (message,
 				      derror.name,
@@ -109,6 +112,12 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
       dbus_connection_send (connection, reply, NULL);
       return NULL;
     }
+
+  /* Optional uri arg for thumbnail info */
+  if (!_g_dbus_message_iter_get_args (&iter, NULL,
+				      DBUS_TYPE_STRING, &uri,
+				      0))
+    uri = NULL;
 
   job = g_object_new (G_VFS_TYPE_JOB_ENUMERATE,
 		      "message", message,
@@ -121,6 +130,7 @@ g_vfs_job_enumerate_new (DBusConnection *connection,
   job->attributes = g_strdup (attributes);
   job->attribute_matcher = g_file_attribute_matcher_new (attributes);
   job->flags = flags;
+  job->uri = g_strdup (uri);
   
   return G_VFS_JOB (job);
 }
@@ -143,6 +153,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
 			      GFileInfo *info)
 {
   DBusMessage *message, *orig_message;
+  char *uri, *escaped_name;
   
   if (job->building_infos == NULL)
     {
@@ -166,7 +177,27 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
       job->n_building_infos = 0;
     }
 
+  
+
+  uri = NULL;
+  if (job->uri != NULL &&
+      g_file_info_get_name (info) != NULL)
+    {
+      escaped_name = g_uri_escape_string (g_file_info_get_name (info),
+					  G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
+					  FALSE);
+      uri = g_build_filename (job->uri, escaped_name);
+      g_free (escaped_name);
+    }
+  
+  g_vfs_backend_add_auto_info (job->backend,
+			       job->attribute_matcher,
+			       info,
+			       uri);
+  g_free (uri);
+
   g_file_info_set_attribute_mask (info, job->attribute_matcher);
+  
   _g_dbus_append_file_info (&job->building_array_iter, info);
   job->n_building_infos++;
 

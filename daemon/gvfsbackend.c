@@ -363,7 +363,71 @@ g_vfs_backend_get_mount_spec (GVfsBackend *backend)
   return backend->priv->mount_spec;
 }
 
+static void
+get_thumbnail_attributes (const char *uri,
+                          GFileInfo  *info)
+{
+  GChecksum *checksum;
+  char *filename;
+  char *basename;
 
+  checksum = g_checksum_new (G_CHECKSUM_MD5);
+  g_checksum_update (checksum, (const guchar *) uri, strlen (uri));
+
+  basename = g_strconcat (g_checksum_get_string (checksum), ".png", NULL);
+  g_checksum_free (checksum);
+
+  filename = g_build_filename (g_get_home_dir (),
+                               ".thumbnails", "normal", basename,
+                               NULL);
+
+  if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
+    g_file_info_set_attribute_byte_string (info, G_FILE_ATTRIBUTE_THUMBNAIL_PATH, filename);
+  else
+    {
+      g_free (filename);
+      filename = g_build_filename (g_get_home_dir (),
+                                   ".thumbnails", "fail",
+                                   "gnome-thumbnail-factory",
+                                   basename,
+                                   NULL);
+      
+      if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
+	g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_THUMBNAILING_FAILED, TRUE);
+    }
+  g_free (basename);
+  g_free (filename);
+}
+
+void
+g_vfs_backend_add_auto_info (GVfsBackend *backend,
+			     GFileAttributeMatcher *matcher,
+			     GFileInfo *info,
+			     const char *uri)
+{
+  GMountSpec *spec;
+  char *id;
+  
+  if (g_file_attribute_matcher_matches (matcher,
+					G_FILE_ATTRIBUTE_ID_FILESYSTEM))
+    {
+      spec = g_vfs_backend_get_mount_spec (backend);
+      if (spec)
+	{
+	  id = g_mount_spec_to_string (spec);
+	  g_file_info_set_attribute_string (info,
+					    G_FILE_ATTRIBUTE_ID_FILESYSTEM,
+					    id);
+	  g_free (id);
+	}
+    }
+
+  if (uri != NULL &&
+      g_file_attribute_matcher_matches (matcher,
+					G_FILE_ATTRIBUTE_THUMBNAIL_PATH))
+    get_thumbnail_attributes (uri, info);
+  
+}
 
 static DBusHandlerResult
 backend_dbus_handler (DBusConnection  *connection,

@@ -49,6 +49,7 @@ struct _GVfsJobEnumerate
   char *attributes;
   GFileAttributeMatcher *attribute_matcher;
   GFileQueryInfoFlags flags;
+  char *uri;
 
   DBusMessage *building_infos;
   DBusMessageIter building_iter;

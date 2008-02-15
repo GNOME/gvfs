@@ -48,6 +48,7 @@ struct _GVfsJobQueryInfo
   char *attributes;
   GFileAttributeMatcher *attribute_matcher;
   GFileQueryInfoFlags flags;
+  char *uri;
 
   GFileInfo *file_info;
 };

@@ -681,10 +681,14 @@ g_daemon_file_enumerate_children (GFile      *file,
   char *obj_path;
   GDaemonFileEnumerator *enumerator;
   DBusConnection *connection;
+  char *uri;
 
   enumerator = g_daemon_file_enumerator_new ();
   obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
-						       
+
+
+  uri = g_file_get_uri (file);
+  
   if (attributes == NULL)
     attributes = "";
   flags_dbus = flags;
@@ -695,8 +699,9 @@ g_daemon_file_enumerate_children (GFile      *file,
 			     DBUS_TYPE_STRING, &obj_path,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags_dbus,
+			     DBUS_TYPE_STRING, &uri,
 			     0);
-  
+  g_free (uri);
   g_free (obj_path);
 
   if (reply == NULL)
@@ -718,7 +723,7 @@ g_daemon_file_enumerate_children (GFile      *file,
 static GFileInfo *
 g_daemon_file_query_info (GFile                *file,
 			  const char           *attributes,
-			  GFileQueryInfoFlags     flags,
+			  GFileQueryInfoFlags   flags,
 			  GCancellable         *cancellable,
 			  GError              **error)
 {
@@ -726,6 +731,9 @@ g_daemon_file_query_info (GFile                *file,
   dbus_uint32_t flags_dbus;
   DBusMessageIter iter;
   GFileInfo *info;
+  char *uri;
+
+  uri = g_file_get_uri (file);
 
   if (attributes == NULL)
     attributes = "";
@@ -736,7 +744,11 @@ g_daemon_file_query_info (GFile                *file,
 			     cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
 			     DBUS_TYPE_UINT32, &flags,
+			     uri != NULL ? DBUS_TYPE_STRING : 0, &uri,
 			     0);
+
+  g_free (uri);
+  
   if (reply == NULL)
     return NULL;
 

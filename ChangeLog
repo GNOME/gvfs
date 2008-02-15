@@ -1,3 +1,17 @@
+2008-02-15  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+	Pass an optional uri to query_info and enumerate
+	
+        * daemon/gvfsbackend.[ch]:
+	Add automatic info filling, implement thumbnail
+	checking if uri passed in.
+	
+	* daemon/gvfsjobenumerate.[ch]:
+        * daemon/gvfsjobqueryinfo.[ch]:
+	Get optional uri argument.
+	Call automatic backend info filling.
+
 2008-02-15  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackendhttp.c: (g_vfs_backend_uri_for_filename):

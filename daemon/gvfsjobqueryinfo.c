@@ -55,6 +55,7 @@ g_vfs_job_query_info_finalize (GObject *object)
   g_free (job->filename);
   g_free (job->attributes);
   g_file_attribute_matcher_unref (job->attribute_matcher);
+  g_free (job->uri);
   
   if (G_OBJECT_CLASS (g_vfs_job_query_info_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_query_info_parent_class)->finalize) (object);
@@ -89,15 +90,19 @@ g_vfs_job_query_info_new (DBusConnection *connection,
   int path_len;
   const char *path_data;
   char *attributes;
+  char *uri;
   dbus_uint32_t flags;
+  DBusMessageIter iter;
+
+  dbus_message_iter_init (message, &iter);
   
   dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
-			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-			      &path_data, &path_len,
-			      DBUS_TYPE_STRING, &attributes,
-			      DBUS_TYPE_UINT32, &flags,
-			      0))
+  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
+				      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
+				      &path_data, &path_len,
+				      DBUS_TYPE_STRING, &attributes,
+				      DBUS_TYPE_UINT32, &flags,
+				      0))
     {
       reply = dbus_message_new_error (message,
 				      derror.name,
@@ -108,6 +113,12 @@ g_vfs_job_query_info_new (DBusConnection *connection,
       return NULL;
     }
 
+  /* Optional uri arg for thumbnail info */
+  if (!_g_dbus_message_iter_get_args (&iter, NULL,
+				      DBUS_TYPE_STRING, &uri,
+				      0))
+    uri = NULL;
+  
   job = g_object_new (G_VFS_TYPE_JOB_QUERY_INFO,
 		      "message", message,
 		      "connection", connection,
@@ -118,6 +129,7 @@ g_vfs_job_query_info_new (DBusConnection *connection,
   job->attributes = g_strdup (attributes);
   job->attribute_matcher = g_file_attribute_matcher_new (attributes);
   job->flags = flags;
+  job->uri = g_strdup (uri);
 
   job->file_info = g_file_info_new ();
   g_file_info_set_attribute_mask (job->file_info, job->attribute_matcher);
@@ -139,11 +151,11 @@ run (GVfsJob *job)
     }
   
   class->query_info (op_job->backend,
-		   op_job,
-		   op_job->filename,
-		   op_job->flags,
-		   op_job->file_info,
-		   op_job->attribute_matcher);
+		     op_job,
+		     op_job->filename,
+		     op_job->flags,
+		     op_job->file_info,
+		     op_job->attribute_matcher);
 }
 
 static gboolean
@@ -172,29 +184,18 @@ create_reply (GVfsJob *job,
   GVfsJobQueryInfo *op_job = G_VFS_JOB_QUERY_INFO (job);
   DBusMessage *reply;
   DBusMessageIter iter;
-  GMountSpec *spec;
-  char *id;
 
   reply = dbus_message_new_method_return (message);
 
   dbus_message_iter_init_append (reply, &iter);
 
-  if (g_file_attribute_matcher_matches (op_job->attribute_matcher,
-					G_FILE_ATTRIBUTE_ID_FILESYSTEM))
-    {
-      spec = g_vfs_backend_get_mount_spec (op_job->backend);
-      if (spec)
-	{
-	  id = g_mount_spec_to_string (spec);
-	  g_file_info_set_attribute_string (op_job->file_info,
-					    G_FILE_ATTRIBUTE_ID_FILESYSTEM,
-					    id);
-	  g_free (id);
-	}
-    }
+  g_vfs_backend_add_auto_info (op_job->backend,
+			       op_job->attribute_matcher,
+			       op_job->file_info,
+			       op_job->uri);
   
   _g_dbus_append_file_info (&iter, 
-			   op_job->file_info);
+			    op_job->file_info);
   
   return reply;
 }

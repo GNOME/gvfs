@@ -399,6 +399,12 @@ const char *g_vfs_backend_get_stable_name                (GVfsBackend        *ba
 const char *g_vfs_backend_get_icon_name                  (GVfsBackend        *backend);
 GMountSpec *g_vfs_backend_get_mount_spec                 (GVfsBackend        *backend);
 GVfsDaemon *g_vfs_backend_get_daemon                     (GVfsBackend        *backend);
+
+void        g_vfs_backend_add_auto_info                  (GVfsBackend           *backend,
+							  GFileAttributeMatcher *matcher,
+							  GFileInfo             *info,
+							  const char            *uri);
+
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_H__ */
