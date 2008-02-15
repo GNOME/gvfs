@@ -186,7 +186,7 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
       escaped_name = g_uri_escape_string (g_file_info_get_name (info),
 					  G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
 					  FALSE);
-      uri = g_build_filename (job->uri, escaped_name);
+      uri = g_build_filename (job->uri, escaped_name, NULL);
       g_free (escaped_name);
     }
   
