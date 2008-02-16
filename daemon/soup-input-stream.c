@@ -207,7 +207,6 @@ soup_input_stream_new (SoupSession *session, SoupMessage *msg)
   SoupInputStream *stream;
   SoupInputStreamPrivate *priv;
 
-  g_return_val_if_fail (SOUP_IS_SESSION_ASYNC (session), NULL);
   g_return_val_if_fail (SOUP_IS_MESSAGE (msg), NULL);
 
   stream = g_object_new (SOUP_TYPE_INPUT_STREAM, NULL);

@@ -1,3 +1,12 @@
+2008-02-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/soup-input-stream.c:
+	* daemon/soup-output-stream.c:
+	Use SoupSessionSync instead of SoupSessionAsync and 
+	convert SoupStreams and authentication logic.
+
 2008-02-15  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsjobenumerate.c:

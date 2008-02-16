@@ -76,7 +76,7 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
-  backend->session = soup_session_async_new ();
+  backend->session = soup_session_sync_new ();
 }
 
 SoupURI *

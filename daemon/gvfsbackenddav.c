@@ -720,11 +720,6 @@ typedef struct _MountOpData {
 
   char         *last_good_path;
 
-  /* general authentication */
-
-  SoupMessage *message;
-  SoupAuth    *auth;
-
      /* for server authentication */
   char *username;
   char *password;
@@ -748,12 +743,6 @@ mount_op_data_free (gpointer _data)
   if (data->mount_source)
     g_object_unref (data->mount_source);
   
-  if (data->message)
-    g_object_unref (data->message);
-  
-  if (data->auth)
-    g_object_unref (data->auth);
-  
   g_free (data->username);
   g_free (data->password);
   g_free (data->last_realm);
@@ -764,56 +753,27 @@ mount_op_data_free (gpointer _data)
 }
 
 static void
-ask_password_ready (GObject      *source_object,
-                    GAsyncResult *result,
-                    gpointer      user_data)
-{
-  MountOpData *data;
-  char        *username;
-  char        *password;
-  gboolean     aborted;
-  gboolean     res;
-
-  data = (MountOpData *) user_data;
-  username = password = NULL;
-
-  res = g_mount_source_ask_password_finish (data->mount_source,
-                                            result,
-                                            &aborted,
-                                            &password,
-                                            &username,
-                                            NULL);
-
-  if (res && !aborted)
-    soup_auth_authenticate (data->auth, username, password);
-
-  soup_session_unpause_message (data->session, data->message);
-
-  g_free (username);
-  g_free (password);
-
-  g_object_unref (data->message);
-  g_object_unref (data->auth);
-  
-  data->message = NULL;
-  data->auth = NULL;
-}
-
-static void
 soup_authenticate (SoupSession *session,
                    SoupMessage *msg,
                    SoupAuth    *auth,
                    gboolean     retrying,
                    gpointer     user_data)
 {
-  MountOpData    *data;
-  const char     *username;
-  const char     *password;
-  char           *prompt;
+  MountOpData *data;
+  const char  *username;
+  const char  *password;
+  gboolean     res;
+  gboolean     aborted;
+  char        *new_username;
+  char        *new_password;
+  char        *prompt;
 
   g_print ("+ soup_authenticate \n");
 
   data = (MountOpData *) user_data;
+
+  new_username = NULL;
+  new_password = NULL;
 
   if (soup_auth_is_for_proxy (auth))
     {
@@ -848,19 +808,25 @@ soup_authenticate (SoupSession *session,
       prompt = g_strdup_printf (_("Enter password for %s"), auth_realm);
     }
 
-  data->auth = g_object_ref (auth);
-  data->message = g_object_ref (msg);
-
   soup_session_pause_message (data->session, msg);
 
-  g_mount_source_ask_password_async (data->mount_source,
+  res = g_mount_source_ask_password (data->mount_source,
                                      prompt,
                                      username,
                                      NULL,
                                      G_ASK_PASSWORD_NEED_PASSWORD |
                                      G_ASK_PASSWORD_NEED_USERNAME,
-                                     ask_password_ready,
-                                     data);
+                                     &aborted,
+                                     &new_password,
+                                     &new_username, 
+                                     NULL);
+  if (res && !aborted)
+    soup_auth_authenticate (auth, new_username, new_password);
+
+  g_free (new_password);
+  g_free (new_username);
+
+
   g_print ("- soup_authenticate \n");
   g_free (prompt);
 }
