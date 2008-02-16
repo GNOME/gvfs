@@ -2,7 +2,7 @@
 
 	* daemon/gvfsjobenumerate.c:
 	Fix a little crasher (NULL terminate g_build_filename) that
-	was introduced by the optional uri addition chate to enumerate.
+	was introduced by the optional uri addition change to enumerate.
 
 2008-02-15  Christian Kellner  <gicmo@gnome.org>
 
