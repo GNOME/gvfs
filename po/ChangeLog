@@ -1,3 +1,7 @@
+2008-02-17  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* nl.po: Added Dutch translation by Wouter Bolsterlee.
+
 2008-02-17  Djihed Afifi <djihed@gmail.com> 
 
 	* ar.po: Updated Arabic Translation by Djihed Afifi.
@@ -35,8 +39,8 @@
 2008-02-13  Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
 
 	* LINGUAS: add zh_HK zh_TW
-        * zh_HK.po: Added Traditional Chinese translation(Hong Kong).
-        * zh_TW.po: Added Traditional Chinese translation(Taiwan).
+	* zh_HK.po: Added Traditional Chinese translation(Hong Kong).
+	* zh_TW.po: Added Traditional Chinese translation(Taiwan).
 
 2008-02-13  Ilkka Tuohela <hile@iki.fi>
 
@@ -78,7 +82,7 @@
 
 2008-02-09  Hendrik Brandt  <heb@gnome-de.org>
 
-        * de.po: Updated German translation.
+	* de.po: Updated German translation.
 
 2008-02-09  Gabor Kelemen  <kelemeng@gnome.hu>
 
@@ -189,7 +193,7 @@
 
 2008-01-24  Alexander Larsson  <alexl@redhat.com>
 
-        * LINGUAS: Added.
+	* LINGUAS: Added.
 
 2008-01-24  Luca Ferretti  <elle.uca@libero.it>
 
@@ -209,7 +213,7 @@
 
 2008-01-22  Johannes Schmid <jhs@gnome.org>
 
-        * de.po: Updated German translation
+	* de.po: Updated German translation
 
 2008-01-21  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
 
@@ -321,7 +325,7 @@
 
 2007-12-27  Alexander Larsson  <alexl@redhat.com>
 
-        * POTFILES.in:
+	* POTFILES.in:
 	Remove intltool option, since we don't use intltool.
 
 2007-12-21  Kjartan Maraas  <kmaraas@gnome.org>
@@ -333,9 +337,9 @@
 
 2007-12-20  Alexander Larsson  <alexl@redhat.com>
 
-        * Makefile.in.in: Added.
-        * POTFILES.in:
-        * it.po:
+	* Makefile.in.in: Added.
+	* POTFILES.in:
+	* it.po:
 	Add Makefile.in.in
 
 2007-12-18  Luca Ferretti  <elle.uca@libero.it>
@@ -367,7 +371,7 @@
 
 2007-11-06  Alexander Larsson  <alexl@redhat.com>
 
-        * POTFILES.in:
+	* POTFILES.in:
 	Added all source files
 	
 
