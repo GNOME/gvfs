@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-17 16:13+0100\n"
+"POT-Creation-Date: 2008-02-17 21:13+0100\n"
 "PO-Revision-Date: 2008-02-17 21:12+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
@@ -1054,7 +1054,8 @@ msgstr "Media van %s"
 msgid "Camera"
 msgstr "Camera"
 
-#: ../hal/ghalvolume.c:321
+#. Translators: %s is the camera vendor
+#: ../hal/ghalvolume.c:322
 #, c-format
 msgid "%s Camera"
 msgstr "%s-camera"
@@ -1080,9 +1081,9 @@ msgstr "%s: %s, schrijffout op ‘stdout’"
 msgid "%s: %s: error reading: %s\n"
 msgstr "%s: %s: leesfout: %s\n"
 
+# Er moet een spatie in het origineel bij (Wouter Bolsterlee)
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-# Er moet een spatie in het origineel bij (Wouter Bolsterlee)
 #: ../programs/gvfs-cat.c:112
 #, c-format
 msgid "%s: %s:error closing: %s\n"
@@ -1101,18 +1102,22 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
-"Bestanden op bepaalde locaties achter elkaar weergeven en op de standaarduitvoer tonen. Dit werkt net als het ‘cat’-programma, maar gebruikt gvfs-locaties in plaats van lokale bestanden. U kunt bijvoorbeeld iets als ‘smb://server/map/naar/bestand.txt’ gebruiken als locatie."
+"Bestanden op bepaalde locaties achter elkaar weergeven en op de "
+"standaarduitvoer tonen. Dit werkt net als het ‘cat’-programma, maar gebruikt "
+"gvfs-locaties in plaats van lokale bestanden. U kunt bijvoorbeeld iets als "
+"‘smb://server/map/naar/bestand.txt’ gebruiken als locatie."
 
 #: ../programs/gvfs-cat.c:150
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
-"Let op: gebruik een ‘pipe’ als u opmaakopties zoals ‘-n’ of ‘-T’ wilt gebruiken."
+"Let op: gebruik een ‘pipe’ als u opmaakopties zoals ‘-n’ of ‘-T’ wilt "
+"gebruiken."
 
+# Vrij vertaald (Wouter Bolsterlee)
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-# Vrij vertaald (Wouter Bolsterlee)
 #: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:133
 #, c-format
 msgid "%s: missing locations"
@@ -1143,4 +1148,5 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
-"Een of meerdere bestanden met de standaardtoepassing voor dit bestandstype openen."
+"Een of meerdere bestanden met de standaardtoepassing voor dit bestandstype "
+"openen."
