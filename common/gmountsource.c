@@ -124,10 +124,11 @@ typedef struct AskPasswordData AskPasswordData;
 struct AskPasswordData {
 
   /* results: */
-  gboolean  aborted;
-  char     *password;
-  char     *username;
-  char     *domain;
+  gboolean       aborted;
+  char          *password;
+  char          *username;
+  char          *domain;
+  GPasswordSave  password_save;
 };
 
 typedef struct AskPasswordSyncData AskPasswordSyncData;
@@ -195,6 +196,7 @@ ask_password_reply (DBusMessage *reply,
 	  data->password = g_strdup (password);
 	  data->username = g_strdup (username);
 	  data->domain = g_strdup (domain);
+	  data->password_save = (GPasswordSave)password_save;
 
 	  /* TODO: handle more args */
 	}
@@ -268,7 +270,8 @@ g_mount_source_ask_password_finish (GMountSource  *source,
                                     gboolean      *aborted,
                                     char         **password_out,
                                     char         **user_out,
-                                    char         **domain_out)
+                                    char         **domain_out,
+				    GPasswordSave *password_save_out)
 {
   AskPasswordData *data;
   GSimpleAsyncResult *simple;
@@ -301,6 +304,9 @@ g_mount_source_ask_password_finish (GMountSource  *source,
       data->domain = NULL;
     }
 
+  if (password_save_out)
+    *password_save_out = data->password_save;  
+  
   return TRUE;
 }
 
@@ -334,9 +340,11 @@ g_mount_source_ask_password (GMountSource *source,
 			     gboolean *aborted_out,
 			     char **password_out,
 			     char **user_out,
-			     char **domain_out)
+			     char **domain_out,
+			     GPasswordSave *password_save_out)
 {
   char *password, *username, *domain;
+  GPasswordSave password_save;
   gboolean handled, aborted;
   AskPasswordSyncData data = {NULL};
   
@@ -373,7 +381,8 @@ g_mount_source_ask_password (GMountSource *source,
                                                 &aborted,
                                                 &password,
                                                 &username,
-                                                &domain);
+                                                &domain,
+						&password_save);
   g_object_unref (data.result);
 
   if (aborted_out)
@@ -393,6 +402,9 @@ g_mount_source_ask_password (GMountSource *source,
     *domain_out = domain;
   else
     g_free (domain);
+
+  if (password_save_out)
+    *password_save_out = password_save;
   
   return handled;
 }
@@ -409,6 +421,7 @@ op_ask_password_reply (GObject *source_object,
   char *username;
   char *password;
   char *domain;
+  GPasswordSave password_save;
 
   source = G_MOUNT_SOURCE (source_object);
   op = G_MOUNT_OPERATION (user_data);
@@ -421,7 +434,8 @@ op_ask_password_reply (GObject *source_object,
                                                 &aborted,
                                                 &username,
                                                 &password,
-                                                &domain);
+                                                &domain,
+						&password_save);
 
   if (!handled)
     result = G_MOUNT_OPERATION_UNHANDLED;
@@ -437,6 +451,7 @@ op_ask_password_reply (GObject *source_object,
 	g_mount_operation_set_username (op, username);
       if (domain)
 	g_mount_operation_set_domain (op, domain);
+      g_mount_operation_set_password_save (op, password_save);
     }
   
   g_mount_operation_reply (op, result);

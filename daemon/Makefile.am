@@ -8,6 +8,7 @@ INCLUDES =					\
 	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
+	$(KEYRING_CFLAGS)			\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
 	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
@@ -19,7 +20,7 @@ noinst_LTLIBRARIES=libdaemon.la
 libraries =						\
 	libdaemon.la					\
 	$(top_builddir)/common/libgvfscommon.la		\
-	$(GLIB_LIBS) $(DBUS_LIBS)
+	$(GLIB_LIBS) $(DBUS_LIBS) $(KEYRING_LIBS)
 
 # D-BUS service file
 %.service: %.service.in ../config.log
@@ -103,6 +104,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobqueryattributes.c gvfsjobqueryattributes.h \
 	gvfsjobcreatemonitor.c gvfsjobcreatemonitor.h \
 	dbus-gmain.h dbus-gmain.c \
+	gvfskeyring.h gvfskeyring.c \
         $(NULL)
 
 gvfsd_SOURCES = \

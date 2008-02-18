@@ -818,7 +818,8 @@ soup_authenticate (SoupSession *session,
                                      G_ASK_PASSWORD_NEED_USERNAME,
                                      &aborted,
                                      &new_password,
-                                     &new_username, 
+                                     &new_username,
+                                     NULL,
                                      NULL);
   if (res && !aborted)
     soup_auth_authenticate (auth, new_username, new_password);

@@ -64,7 +64,8 @@ gboolean      g_mount_source_ask_password             (GMountSource             
 						       gboolean                  *aborted,
 						       char                     **password_out,
 						       char                     **user_out,
-						       char                     **domain_out);
+						       char                     **domain_out,
+						       GPasswordSave             *password_save_out);
 
 void          g_mount_source_ask_password_async       (GMountSource              *mount_source,
 						       const char                *message,
@@ -79,7 +80,8 @@ gboolean     g_mount_source_ask_password_finish       (GMountSource             
                                                        gboolean                  *aborted,
                                                        char                     **password_out,
                                                        char                     **user_out,
-                                                       char                     **domain_out);
+                                                       char                     **domain_out,
+						       GPasswordSave             *password_save_out);
 
 
 const char *  g_mount_source_get_dbus_id              (GMountSource              *mount_source);

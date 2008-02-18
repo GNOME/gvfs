@@ -187,7 +187,8 @@ auth_callback (SMBCCTX *context,
 					     &abort,
 					     &ask_password,
 					     &ask_user,
-					     &ask_domain);
+					     &ask_domain,
+					     NULL);
       g_free (message);
       if (!handled)
 	goto out;

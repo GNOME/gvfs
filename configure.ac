@@ -222,6 +222,28 @@ AC_SUBST(HAL_CFLAGS)
 
 AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
 
+dnl *******************************
+dnl *** Check for GNOME Keyring ***
+dnl *******************************
+AC_ARG_ENABLE(KEYRING, [  --disable-keyring           build without GNOME Keyring support])
+msg_keyring=no
+KEYRING_LIBS=
+KEYRING_CFLAGS=
+
+if test "x$enable_keyring" != "xno"; then
+  PKG_CHECK_EXISTS(gnome-keyring-1, msg_keyring=yes)
+
+  if test "x$msg_keyring" == "xyes"; then
+    PKG_CHECK_MODULES(KEYRING, gnome-keyring-1)
+    AC_DEFINE(HAVE_KEYRING, 1, [Define to 1 if GNOME Keyring is available])
+  fi
+fi
+
+AC_SUBST(KEYRING_LIBS)
+AC_SUBST(KEYRING_CFLAGS)
+
+AM_CONDITIONAL(USE_KEYRING, [test "$msg_keyring" = "yes"])
+
 dnl ==========================================================================
 dnl Samba 3.0
 
@@ -366,4 +388,5 @@ echo "
         CDDA support:                 $msg_cdda
         GConf support:                $msg_gconf
 	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)
+	GNOME Keyring support:        $msg_keyring
 "

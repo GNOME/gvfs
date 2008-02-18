@@ -1,3 +1,25 @@
+2008-02-18  Alexander Larsson  <alexl@redhat.com>
+
+        * configure.ac:
+	Detect gnome-keyring
+	
+        * common/gmountsource.[ch]:
+	Add password out to ask_password
+	
+        * daemon/Makefile.am:
+        * daemon/gvfskeyring.[ch]:
+	Helper code for keyring support
+	
+        * daemon/gvfsbackendsftp.c:
+	Add keyring support
+	
+        * daemon/gvfsbackenddav.c:
+        * daemon/gvfsbackendsmb.c:
+	Update to api changes
+
+	This is the initial work on keyring support (#511517)
+	Patch from Carlos Garcia Campos
+
 2008-02-16  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c:

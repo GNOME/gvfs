@@ -52,6 +52,7 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfskeyring.h"
 #include "sftp.h"
 #include "pty_open.h"
 
@@ -617,6 +618,7 @@ handle_login (GVfsBackend *backend,
   gboolean aborted = FALSE;
   gboolean ret_val;
   char *new_password = NULL;
+  GPasswordSave password_save;
   gsize bytes_written;
   
   if (op_backend->client_vendor == SFTP_VENDOR_SSH) 
@@ -689,27 +691,49 @@ handle_login (GVfsBackend *backend,
 	  g_str_has_suffix (buffer, "Password:")  ||
 	  g_str_has_prefix (buffer, "Enter passphrase for key"))
 	{
-	  if (!g_mount_source_ask_password (mount_source,
-					    g_str_has_prefix (buffer, "Enter passphrase for key") ?
-					    _("Enter passphrase for key")
-					    :
-					    _("Enter password"),
-					    op_backend->user,
-					    NULL,
-					    G_ASK_PASSWORD_NEED_PASSWORD,
-					    &aborted,
-					    &new_password,
-					    NULL,
-					    NULL) ||
-	      aborted)
-	    {
-	      g_set_error (error,
-			   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-			   "%s", _("Password dialog cancelled"));
-	      ret_val = FALSE;
-	      break;
-	    }
-	  
+    if (!g_vfs_keyring_lookup_password (op_backend->user,
+                                        op_backend->host,
+                                        NULL,
+                                        "sftp",
+                                        NULL,
+                                        NULL,
+                                        &new_password))
+      {
+        GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
+
+        if (g_vfs_keyring_is_available ())
+          flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+        
+        if (!g_mount_source_ask_password (mount_source,
+                                          g_str_has_prefix (buffer, "Enter passphrase for key") ?
+                                          _("Enter passphrase for key")
+                                          :
+                                          _("Enter password"),
+                                          op_backend->user,
+                                          NULL,
+                                          flags,
+                                          &aborted,
+                                          &new_password,
+                                          NULL,
+                                          NULL,
+                                          &password_save) ||
+            aborted)
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                       "%s", _("Password dialog cancelled"));
+          ret_val = FALSE;
+          break;
+        }
+        
+        g_vfs_keyring_save_password (op_backend->user,
+                                     op_backend->host,
+                                     NULL,
+                                     "sftp",
+                                     new_password,
+                                     password_save);
+      }
+
 	  if (!g_output_stream_write_all (reply_stream,
 					  new_password, strlen (new_password),
 					  &bytes_written,
