@@ -1,7 +1,8 @@
 2008-02-18  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalmount.c:
-	Cleanups of case insensitive search.
+	Cleanups of case insensitive search. (#154549)
+	patch from John Millikin.
 
 2008-02-18  Alexander Larsson  <alexl@redhat.com>
 
