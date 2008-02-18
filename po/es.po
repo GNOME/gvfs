@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-11 14:28+0000\n"
-"PO-Revision-Date: 2008-02-11 22:14+0100\n"
+"POT-Creation-Date: 2008-02-11 21:23+0000\n"
+"PO-Revision-Date: 2008-02-18 20:50+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -277,7 +277,7 @@ msgstr "El archivo %s no existe en la unidad %s"
 #: ../daemon/gvfsbackendcdda.c:538
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
-msgstr "Error de «paranoia »en la unidad %s"
+msgstr "Error de «paranoia» en la unidad %s"
 
 #: ../daemon/gvfsbackendcdda.c:601
 #, c-format
@@ -572,7 +572,7 @@ msgstr "Error al mover el archivo: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1657
 msgid "Can't move directory over directory"
-msgstr "No se puede mover un directorio sobre un directoro"
+msgstr "No se puede mover un directorio sobre un directorio"
 
 #: ../daemon/gvfsbackendsmb.c:1705
 #, c-format
@@ -687,7 +687,7 @@ msgstr "%s: %s"
 #: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:135
 #, c-format
 msgid "Try \"%s --help\" for more information."
-msgstr "Intente «%s --help» para obtener más información."
+msgstr "Intente \"%s --help\" para obtener más información."
 
 #: ../daemon/mount.c:372
 msgid "Invalid arguments from spawned child"
@@ -1001,7 +1001,7 @@ msgstr "Disco virgen"
 #: ../hal/ghalmount.c:348
 #, c-format
 msgid "%.1f kB Media"
-msgstr "Medio de %.1f kiB"
+msgstr "Medio de %.1f KiB"
 
 #: ../hal/ghalmount.c:353
 #, c-format
@@ -1020,7 +1020,7 @@ msgstr "Disco de sonido y datos"
 #: ../hal/ghalvolume.c:189
 #, c-format
 msgid "%.1f kB"
-msgstr "%.1f kiB"
+msgstr "%.1f KiB"
 
 #: ../hal/ghalvolume.c:194
 #, c-format
