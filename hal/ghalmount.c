@@ -1103,6 +1103,11 @@ static void
 more_files_callback (GObject *source_object, GAsyncResult *res,
                      gpointer user_data);
 
+static void
+find_file_insensitive_exists_callback (GObject *source_object,
+                                       GAsyncResult *res,
+                                       gpointer user_data);
+
 typedef struct _InsensitiveFileSearchData
 {
 	GFile *root;
@@ -1125,29 +1130,21 @@ _g_find_file_insensitive_async (GFile              *parent,
                                 gpointer            user_data)
 {
   InsensitiveFileSearchData *data;
+  GFile *direct_file = g_file_get_child (parent, name);
   
-  g_return_if_fail (g_utf8_validate (name, -1, NULL));
-
   data = g_new (InsensitiveFileSearchData, 1);
-  data->root = g_object_ref (parent);
-  data->original_path = g_strdup (name);
-  data->split_path = g_strsplit (name, G_DIR_SEPARATOR_S, -1);
-  data->index = 0;
-  data->enumerator = NULL;
-  data->current_file = g_object_ref (parent);
   data->cancellable = cancellable;
   data->callback = callback;
   data->user_data = user_data;
-
-  /* Skip any empty components due to multiple slashes */
-  while (data->split_path[data->index] != NULL &&
-         *data->split_path[data->index] == 0)
-    data->index++;
+  data->root = g_object_ref (parent);
+  data->original_path = g_strdup (name);
   
-  g_file_enumerate_children_async (data->current_file,
-                                   G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                   0, G_PRIORITY_DEFAULT, cancellable,
-                                   enumerated_children_callback, data);
+  g_file_query_info_async (direct_file, G_FILE_ATTRIBUTE_STANDARD_TYPE,
+			   G_FILE_QUERY_INFO_NONE, G_PRIORITY_DEFAULT,
+			   cancellable,
+			   find_file_insensitive_exists_callback, data);
+  
+  
 }
 
 static void
@@ -1164,6 +1161,52 @@ clear_find_file_insensitive_state (InsensitiveFileSearchData *data)
   if (data->current_file)
     g_object_unref (data->current_file);
   g_free (data);
+}
+
+static void
+find_file_insensitive_exists_callback (GObject *source_object,
+                                       GAsyncResult *res,
+                                       gpointer user_data)
+{
+  GFileInfo *info;
+  InsensitiveFileSearchData *data = (InsensitiveFileSearchData *) (user_data);
+  
+  /* The file exists and can be found with the given path, no need to search. */
+  if ((info = g_file_query_info_finish (G_FILE (source_object), res, NULL)))
+    {
+      GSimpleAsyncResult *simple;
+      
+      simple = g_simple_async_result_new (G_OBJECT (data->root),
+                                          data->callback,
+                                          data->user_data,
+                                          _g_find_file_insensitive_async);
+      
+      g_simple_async_result_set_op_res_gpointer (simple, g_object_ref (source_object), g_object_unref);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      clear_find_file_insensitive_state (data);
+    }
+  
+  else
+    {
+      data->split_path = g_strsplit (data->original_path, G_DIR_SEPARATOR_S, -1);
+      data->index = 0;
+      data->enumerator = NULL;
+      data->current_file = g_object_ref (data->root);
+      
+      /* Skip any empty components due to multiple slashes */
+      while (data->split_path[data->index] != NULL &&
+             *data->split_path[data->index] == 0)
+        data->index++;
+      
+      g_file_enumerate_children_async (data->current_file,
+                                       G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                       0, G_PRIORITY_DEFAULT,
+                                       data->cancellable,
+                                       enumerated_children_callback, data);
+    }
+  
+  g_object_unref (source_object);
 }
 
 static void
@@ -1212,7 +1255,7 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
   GList *files, *l;
   gchar *filename = NULL, *component, *case_folded_name,
     *name_collation_key;
-  gboolean end_of_files;
+  gboolean end_of_files, is_utf8;
   
   files = g_file_enumerator_next_files_finish (data->enumerator,
                                                res, NULL);
@@ -1222,29 +1265,44 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
   component = data->split_path[data->index];
   g_return_if_fail (component != NULL);
   
-  case_folded_name = g_utf8_casefold (component, -1);
-  name_collation_key = g_utf8_collate_key (case_folded_name, -1);
-  g_free (case_folded_name);
+  is_utf8 = (g_utf8_validate (component, -1, NULL));
+  if (is_utf8)
+    {
+      case_folded_name = g_utf8_casefold (component, -1);
+      name_collation_key = g_utf8_collate_key (case_folded_name, -1);
+      g_free (case_folded_name);
+    }
+  
+  else
+    {
+      name_collation_key = g_ascii_strdown (component, -1);
+    }
   
   for (l = files; l != NULL; l = l->next)
     {
       GFileInfo *info;
       const gchar *this_name;
+      gchar *key;
       
       info = l->data;
       this_name = g_file_info_get_name (info);
       
-      if (g_utf8_validate (this_name, -1, NULL))
+      if (is_utf8 && g_utf8_validate (this_name, -1, NULL))
         {
-          gchar *case_folded, *key;
+          gchar *case_folded;
           case_folded = g_utf8_casefold (this_name, -1);
           key = g_utf8_collate_key (case_folded, -1);
           g_free (case_folded);
-          
-          if (strcmp (key, name_collation_key) == 0)
-            filename = g_strdup (this_name);
-          g_free (key);
         }
+      else
+        {
+          key = g_ascii_strdown (this_name, -1);
+        }
+      
+      if (strcmp (key, name_collation_key) == 0)
+          filename = g_strdup (this_name);
+      g_free (key);
+      
       if (filename)
         break;
     }
@@ -1257,6 +1315,10 @@ more_files_callback (GObject *source_object, GAsyncResult *res,
     {
       GFile *next_file;
       
+      g_file_enumerator_close_async (data->enumerator,
+                                     G_PRIORITY_DEFAULT,
+                                     data->cancellable,
+                                     NULL, NULL);
       g_object_unref (data->enumerator);
       data->enumerator = NULL;
       
