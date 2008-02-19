@@ -620,6 +620,7 @@ handle_login (GVfsBackend *backend,
   char *new_password = NULL;
   GPasswordSave password_save;
   gsize bytes_written;
+  gboolean password_in_keyring = FALSE;
   
   if (op_backend->client_vendor == SFTP_VENDOR_SSH) 
     prompt_fd = stderr_fd;
@@ -640,34 +641,36 @@ handle_login (GVfsBackend *backend,
       tv.tv_usec = 0;
       
       ret = select (MAX (stdout_fd, prompt_fd)+1, &ifds, NULL, NULL, &tv);
-  
+      
       if (ret <= 0)
-	{
-	  g_set_error (error,
-		       G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
-		       "%s", _("Timed out when logging in"));
-	  ret_val = FALSE;
-	  break;
-	}
+        {
+          g_set_error (error,
+                       G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
+                       "%s", _("Timed out when logging in"));
+          ret_val = FALSE;
+          break;
+        }
       
       if (FD_ISSET (stdout_fd, &ifds))
-	break; /* Got reply to initial INIT request */
-  
+        break; /* Got reply to initial INIT request */
+      
       g_assert (FD_ISSET (prompt_fd, &ifds));
-  
-
+      
+      
       len = g_input_stream_read (prompt_stream,
-				 buffer, sizeof (buffer) - 1,
-				 NULL, error);
-
+                                 buffer, sizeof (buffer) - 1,
+                                 NULL, error);
+      
       if (len == -1)
-	{
-	  ret_val = FALSE;
-	  break;
-	}
+        {
+          ret_val = FALSE;
+          break;
+        }
       
       buffer[len] = 0;
 
+      password_save = G_PASSWORD_SAVE_NEVER;
+      
       /*
        * If the input URI contains a username
        *     if the input URI contains a password, we attempt one login and return GNOME_VFS_ERROR_ACCESS_DENIED on failure.
@@ -687,74 +690,82 @@ handle_login (GVfsBackend *backend,
        * for user and keyring input.
        */
       if (g_str_has_suffix (buffer, "password: ") ||
-	  g_str_has_suffix (buffer, "Password: ") ||
-	  g_str_has_suffix (buffer, "Password:")  ||
-	  g_str_has_prefix (buffer, "Enter passphrase for key"))
-	{
-    if (!g_vfs_keyring_lookup_password (op_backend->user,
-                                        op_backend->host,
-                                        NULL,
-                                        "sftp",
-                                        NULL,
-                                        NULL,
-                                        &new_password))
-      {
-        GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
-
-        if (g_vfs_keyring_is_available ())
-          flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
-        
-        if (!g_mount_source_ask_password (mount_source,
-                                          g_str_has_prefix (buffer, "Enter passphrase for key") ?
-                                          _("Enter passphrase for key")
-                                          :
-                                          _("Enter password"),
-                                          op_backend->user,
-                                          NULL,
-                                          flags,
-                                          &aborted,
-                                          &new_password,
-                                          NULL,
-                                          NULL,
-                                          &password_save) ||
-            aborted)
+          g_str_has_suffix (buffer, "Password: ") ||
+          g_str_has_suffix (buffer, "Password:")  ||
+          g_str_has_prefix (buffer, "Enter passphrase for key"))
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                       "%s", _("Password dialog cancelled"));
-          ret_val = FALSE;
-          break;
+          /* If password is in keyring at this point is because it failed */
+          if (password_in_keyring ||
+              !g_vfs_keyring_lookup_password (op_backend->user,
+                                              op_backend->host,
+                                              NULL,
+                                              "sftp",
+                                              NULL,
+                                              NULL,
+                                              &new_password))
+            {
+              GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
+              
+              if (g_vfs_keyring_is_available ())
+                flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+              
+              if (!g_mount_source_ask_password (mount_source,
+                                                g_str_has_prefix (buffer, "Enter passphrase for key") ?
+                                                _("Enter passphrase for key")
+                                                :
+                                                _("Enter password"),
+                                                op_backend->user,
+                                                NULL,
+                                                flags,
+                                                &aborted,
+                                                &new_password,
+                                                NULL,
+                                                NULL,
+                                                &password_save) ||
+                  aborted)
+                {
+                  g_set_error (error,
+                               G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                               "%s", _("Password dialog cancelled"));
+                  ret_val = FALSE;
+                  break;
+                }
+            }
+          else
+            password_in_keyring = TRUE;
+          
+          if (!g_output_stream_write_all (reply_stream,
+                                          new_password, strlen (new_password),
+                                          &bytes_written,
+                                          NULL, NULL) ||
+              !g_output_stream_write_all (reply_stream,
+                                          "\n", 1,
+                                          &bytes_written,
+                                          NULL, NULL))
+            {
+              g_set_error (error,
+                           G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                           "%s", _("Can't send password"));
+              ret_val = FALSE;
+              break;
+            }
         }
-        
-        g_vfs_keyring_save_password (op_backend->user,
-                                     op_backend->host,
-                                     NULL,
-                                     "sftp",
-                                     new_password,
-                                     password_save);
-      }
-
-	  if (!g_output_stream_write_all (reply_stream,
-					  new_password, strlen (new_password),
-					  &bytes_written,
-					  NULL, NULL) ||
-	      !g_output_stream_write_all (reply_stream,
-					  "\n", 1,
-					  &bytes_written,
-					  NULL, NULL))
-	    {
-	      g_set_error (error,
-			   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-			   "%s", _("Can't send password"));
-	      ret_val = FALSE;
-	      break;
-	    }
-	}
       else if (g_str_has_prefix (buffer, "The authenticity of host '") ||
-	       strstr (buffer, "Key fingerprint:") != NULL)
-	{
-	  /* TODO: Handle these messages */
-	}
+               strstr (buffer, "Key fingerprint:") != NULL)
+        {
+          /* TODO: Handle these messages */
+        }
+    }
+  
+  if (ret_val)
+    {
+      /* Login succeed, save password in keyring */
+      g_vfs_keyring_save_password (op_backend->user,
+                                   op_backend->host,
+                                   NULL,
+                                   "sftp",
+                                   new_password,
+                                   password_save);
     }
 
   g_object_unref (prompt_stream);
