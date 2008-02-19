@@ -1004,7 +1004,6 @@ get_uid_sync (GVfsBackendSftp *backend)
   GDataInputStream *reply;
   GFileInfo *info;
   int type;
-  guint32 id;
   
   command = new_command_stream (backend, SSH_FXP_STAT, NULL);
   put_string (command, ".");
@@ -1015,7 +1014,7 @@ get_uid_sync (GVfsBackendSftp *backend)
     return FALSE;
   
   type = g_data_input_stream_read_byte (reply, NULL, NULL);
-  id = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+  /*id =*/ (void) g_data_input_stream_read_uint32 (reply, NULL, NULL);
 
   /* On error, set uid to -1 and ignore */
   backend->my_uid = (guint32)-1;
@@ -2712,7 +2711,6 @@ read_dir_readlink_reply (GVfsBackendSftp *backend,
                          gpointer user_data)
 {
   ReadDirData *data;
-  guint32 count;
   GFileInfo *info = user_data;
   char *target;
 
@@ -2720,7 +2718,8 @@ read_dir_readlink_reply (GVfsBackendSftp *backend,
 
   if (reply_type == SSH_FXP_NAME)
     {
-      count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+      /* count = */ (void) g_data_input_stream_read_uint32 (reply, NULL, NULL);
+      
       target = read_string (reply, NULL);
       if (target)
         {

@@ -147,10 +147,10 @@ get_default_for_uri_scheme (GDesktopAppInfoLookup *lookup,
 
       if (enabled)
         {
-          if (g_str_has_suffix (command, "\"\%s\"") ||
-              g_str_has_suffix (command, "\'\%s\'"))
+          if (g_str_has_suffix (command, "\"%s\"") ||
+              g_str_has_suffix (command, "\'%s\'"))
             command[strlen (command) - 4] = 0;
-          else if (g_str_has_suffix (command, "\%s"))
+          else if (g_str_has_suffix (command, "%s"))
             command[strlen (command) - 2] = 0;
 
           flags = G_APP_INFO_CREATE_SUPPORTS_URIS;

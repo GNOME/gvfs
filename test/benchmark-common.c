@@ -67,6 +67,7 @@ static gint benchmark_run (gint argc, gchar *argv []);
 GList    *benchmark_data_plots = NULL;
 gboolean  benchmark_is_running = FALSE;
 
+#if 0
 static void
 benchmark_begin_data_plot (const gchar *name, const gchar *x_unit, const gchar *y_unit)
 {
@@ -122,6 +123,8 @@ benchmark_add_data_point (gdouble x, gdouble y)
 
   g_array_append_val (data_set->points, data_point);
 }
+
+#endif
 
 static void
 benchmark_end (void)

@@ -201,8 +201,9 @@ unescape_pathname (const char *escaped_dir, int len)
     {
       char *trashname;
       trashname = g_strndup (escaped_dir + 1, len - 1);
-      return g_build_filename (g_get_user_data_dir (), "Trash", trashname, NULL);
+      dir = g_build_filename (g_get_user_data_dir (), "Trash", trashname, NULL);
       g_free (trashname);
+      return dir;
     }
   
   dir = g_malloc (len + 1 + 1);
@@ -553,7 +554,7 @@ list_trash_dirs (void)
 
       if (info & HAS_SYSTEM_DIR)
         {
-          basename = g_strdup_printf ("%d", getuid());
+          basename = g_strdup_printf ("%u", getuid());
           trashdir = g_build_filename (topdir, ".Trash", basename, NULL);
           g_free (basename);
           dirs = g_list_prepend (dirs, trashdir);
@@ -561,7 +562,7 @@ list_trash_dirs (void)
       
       if (info & HAS_USER_DIR)
         {
-          basename = g_strdup_printf (".Trash-%d", getuid());
+          basename = g_strdup_printf (".Trash-%u", getuid());
           trashdir = g_build_filename (topdir, basename, NULL);
           g_free (basename);
           dirs = g_list_prepend (dirs, trashdir);
