@@ -1,0 +1,1149 @@
+# translation of tr.po to Turkish
+# Turkish translation of gvfs.
+# Copyright (C) 2008 THE gvfs'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gvfs package.
+#
+#
+# <>, 2008.
+# Baris Cicek <baris@teamforce.name.tr>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: tr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-02-19 13:52+0200\n"
+"PO-Revision-Date: 2008-02-19 13:52+0200\n"
+"Last-Translator: Baris Cicek <baris@teamforce.name.tr>\n"
+"Language-Team: Turkish <gnome-turk@gnome.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=1; plural=0;\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1862
+msgid "Operation not supported, files on different mounts"
+msgstr "Dosyalar farklı bağlantılar üzerinde olduğundan işlem desteklenmiyor"
+
+#: ../client/gdaemonfile.c:758
+msgid "Invalid return value from get_info"
+msgstr "get_info geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfile.c:787
+msgid "Invalid return value from query_info"
+msgstr "query_info geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfile.c:865
+msgid "Couldn't get stream file descriptor"
+msgstr "Akış dosyası belirteci alınamadı"
+
+#: ../client/gdaemonfile.c:897 ../client/gdaemonfile.c:967
+#: ../client/gdaemonfile.c:1026 ../client/gdaemonfile.c:1085
+#: ../client/gdaemonfile.c:1147
+msgid "Invalid return value from open"
+msgstr "open geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfile.c:977 ../client/gdaemonfile.c:1036
+#: ../client/gdaemonfile.c:1095 ../client/gdaemonfile.c:1157
+msgid "Didn't get stream file descriptor"
+msgstr "Akış dosyası belirteci alınmadı"
+
+#: ../client/gdaemonfile.c:1209 ../client/gdaemonfile.c:1226
+msgid "Invalid return value from call"
+msgstr "call geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfile.c:1505
+msgid "Invalid return value from get_filesystem_info"
+msgstr "get_filesystem_info geçersiz bir değer döndürdü"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1544
+msgid "Could not find enclosing mount"
+msgstr "Kapsanılan bağlantı bulunamadı"
+
+#: ../client/gdaemonfile.c:1574
+#, c-format
+msgid "Invalid filename %s"
+msgstr "Geçersiz dosya adı %s"
+
+#: ../client/gdaemonfile.c:1616
+msgid "Invalid return value from query_filesystem_info"
+msgstr "query_filesystem_info geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfile.c:2007
+msgid "Invalid return value from monitor_dir"
+msgstr "monitor_dir geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfile.c:2056
+msgid "Invalid return value from monitor_file"
+msgstr "monitor_file geçersiz bir değer döndürdü"
+
+#: ../client/gdaemonfileinputstream.c:451
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1304
+#: ../client/gdaemonfileinputstream.c:1314
+#: ../client/gdaemonfileoutputstream.c:403
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1052
+#: ../client/gdaemonfileoutputstream.c:1062
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "Akış protokolünde hata oluştu: %s"
+
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1314
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1062
+msgid "End of stream"
+msgstr "Akış sonu"
+
+#: ../client/gdaemonfileinputstream.c:519
+#: ../client/gdaemonfileinputstream.c:676
+#: ../client/gdaemonfileinputstream.c:785
+#: ../client/gdaemonfileinputstream.c:1036
+#: ../client/gdaemonfileoutputstream.c:460
+#: ../client/gdaemonfileoutputstream.c:639
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:963
+#: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
+#: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
+msgid "Operation was cancelled"
+msgstr "İşlem iptal edildi"
+
+#: ../client/gdaemonfileinputstream.c:1211
+#: ../client/gdaemonfileoutputstream.c:946
+msgid "Seek not supported on stream"
+msgstr "Akış üzerinde atlama desteklenmiyor"
+
+#: ../client/gdaemonfileinputstream.c:1241
+msgid "The query info operation is not supported"
+msgstr "Sorgu bilgisi işlemi desteklenmiyor"
+
+#: ../client/gdaemonvfs.c:601
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "Bağlanma bilgileri alınırken hata oluştu: %s"
+
+#: ../client/gvfsdaemondbus.c:559 ../client/gvfsdaemondbus.c:946
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "Servise bağlanırken hata oluştu: %s"
+
+#: ../common/gsysutils.c:127
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "Soket oluşturulurken hata oluştu: %s"
+
+#: ../common/gsysutils.c:165
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "Sokete bağlanırken hata oluştu: %s"
+
+#: ../common/gvfsdaemonprotocol.c:515
+msgid "Invalid file info format"
+msgstr "Geçersiz dosya bilgi biçimi "
+
+#: ../common/gvfsdaemonprotocol.c:532
+msgid "Invalid attribute info list content"
+msgstr "Geçersiz öznitelik bilgi listesi içeriği"
+
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr "D-Bus'a bağlanırken hata oluştu: %s"
+
+#: ../daemon/daemon-main.c:82
+#, c-format
+msgid "Error: %s"
+msgstr "Hata: %s"
+
+#: ../daemon/daemon-main.c:115
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "Kullanım: %s ---spawner dbus-id nesne_yolu"
+
+#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "Kullanım: %s anahtar=değer anahtar=değer ..."
+
+#: ../daemon/daemon-main.c:155
+#, c-format
+msgid "No mount type specified"
+msgstr "Belirtilmiş bağlama türü yok"
+
+#: ../daemon/daemon-main.c:225
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "%s için bağlama noktası zaten çalışıyor"
+
+#: ../daemon/daemon-main.c:236
+msgid "error starting mount daemon"
+msgstr "bağlama servisi başlatılırken hata"
+
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:347
+msgid "Burn"
+msgstr "Yazdır"
+
+#: ../daemon/gvfsbackendburn.c:377
+msgid "Unable to create temporary directory"
+msgstr "Geçiçi dizin oluşturulamadı"
+
+#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
+#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
+#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
+#: ../daemon/gvfsbackendburn.c:784
+msgid "No such file or directory"
+msgstr "Böyle dosya ya da dizin yok"
+
+#: ../daemon/gvfsbackendburn.c:426
+msgid "Directory not empty"
+msgstr "Dizin boş değil"
+
+#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:898
+msgid "Can't copy file over directory"
+msgstr "Dizin üstüne dosya kopyalanamıyor"
+
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "CD/DVD Oluşturucu"
+
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+msgid "The file is not a directory"
+msgstr "Dosya bir dizin değil"
+
+#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
+#: ../daemon/gvfsbackendburn.c:918
+msgid "File exists"
+msgstr "Dosya mevcut"
+
+#: ../daemon/gvfsbackendburn.c:846
+msgid "No such file or directory in target path"
+msgstr "Hedef yolda böyle dosya ya da dizin yoktur"
+
+#: ../daemon/gvfsbackendburn.c:869
+msgid "Can't copy directory over directory"
+msgstr "Dizin üstüne dizin kopyalanamıyor"
+
+#: ../daemon/gvfsbackendburn.c:878
+msgid "Target file exists"
+msgstr "Hedef dosya mevcut"
+
+#: ../daemon/gvfsbackendburn.c:885
+msgid "Can't recursively copy directory"
+msgstr "Dizin iç içe kopyalanamıyor"
+
+#: ../daemon/gvfsbackendburn.c:944
+msgid "Not supported"
+msgstr "Desteklenmiyor"
+
+#: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
+msgid "No drive specified"
+msgstr "Sürücü belirtilmemiş"
+
+#: ../daemon/gvfsbackendcdda.c:157
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "%s sürücüsü bulunamıyor"
+
+#: ../daemon/gvfsbackendcdda.c:167
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "Sürücü %s ses dosyaları içermiyor"
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:174
+#, c-format
+msgid "Audio Disc on %s"
+msgstr "%s üzerinde Ses Diski"
+
+#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:682
+#: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
+#, c-format
+msgid "Audio Disc"
+msgstr "Ses Diski"
+
+#: ../daemon/gvfsbackendcdda.c:236
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "Dosya sistemi meşgul: %d açık dosya"
+
+#: ../daemon/gvfsbackendcdda.c:429
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "%2$s sürücüsü üzerinde %1$s dosyası yok"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:538
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr "%s sürücüsünde 'paranoia' kaynaklı hata oluştu"
+
+#: ../daemon/gvfsbackendcdda.c:601
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "%s sürücüsünde akışta atlama hatası"
+
+#: ../daemon/gvfsbackendcdda.c:698
+#, c-format
+msgid "No such file"
+msgstr "Böyle dosya yok"
+
+#: ../daemon/gvfsbackendcdda.c:705
+#, c-format
+msgid "The file does not exist"
+msgstr "Dosya mevcut değil"
+
+#: ../daemon/gvfsbackendcdda.c:712
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "Dosya mevcut değil ya da bir ses parçası değil"
+
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
+msgid "Computer"
+msgstr "Bilgisayar"
+
+#: ../daemon/gvfsbackendcomputer.c:465
+msgid "Filesystem"
+msgstr "Dosya sistemi"
+
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:784
+#: ../daemon/gvfsbackendsmbbrowse.c:851 ../daemon/gvfsbackendsmbbrowse.c:1022
+#: ../daemon/gvfsbackendsmbbrowse.c:1096
+msgid "File doesn't exist"
+msgstr "Dosya mevcut değil"
+
+#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:635
+msgid "Can't open directory"
+msgstr "Dizin açılamıyor"
+
+#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:731
+msgid "Can't open mountable file"
+msgstr "Bağlanılabilir dosya açılamıyor"
+
+#: ../daemon/gvfsbackendcomputer.c:779
+#, c-format
+msgid "Internal error: %s"
+msgstr "Dahili hata: %s"
+
+#: ../daemon/gvfsbackendcomputer.c:803 ../daemon/gvfsbackendcomputer.c:869
+#: ../daemon/gvfsbackendcomputer.c:969
+msgid "Not a mountable file"
+msgstr "Bağlanılabilir bir dosya değil"
+
+#: ../daemon/gvfsbackendcomputer.c:826
+msgid "Can't mount file"
+msgstr "Dosya bağlanamıyor"
+
+#: ../daemon/gvfsbackendcomputer.c:884
+msgid "Can't unmount file"
+msgstr "Dosya bağlantısı kaldırılamıyor"
+
+#: ../daemon/gvfsbackendcomputer.c:1000
+msgid "Can't eject file"
+msgstr "Dosya çıkartılamıyor"
+
+#: ../daemon/gvfsbackenddav.c:248 ../daemon/gvfsbackenddav.c:878
+#: ../daemon/gvfsbackendhttp.c:172
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "HTTP Hatası: %s"
+
+#: ../daemon/gvfsbackenddav.c:264
+msgid "Could not parse response"
+msgstr "Cevap ayrıştırılamadı"
+
+#: ../daemon/gvfsbackenddav.c:273
+msgid "Empty response"
+msgstr "Boş cevap"
+
+#: ../daemon/gvfsbackenddav.c:280
+msgid "Unexpected reply from server"
+msgstr "Sunucudan beklenilmeyen yanıt"
+
+#: ../daemon/gvfsbackenddav.c:792
+msgid "Please enter proxy password"
+msgstr "Lütfen vekil sunucu parolasını girin"
+
+#: ../daemon/gvfsbackenddav.c:801
+msgid "WebDAV share"
+msgstr "WebDAV paylaşımı"
+
+#: ../daemon/gvfsbackenddav.c:803
+#, c-format
+msgid "Enter password for %s"
+msgstr "%s için parolayı girin"
+
+#: ../daemon/gvfsbackenddav.c:882
+msgid "Not a WebDAV enabled share"
+msgstr "Paylaşımı etkinleştirilmiş bir WebDAV yok"
+
+#: ../daemon/gvfsbackenddav.c:942 ../daemon/gvfsbackendhttp.c:238
+#: ../daemon/gvfsbackendsmb.c:543
+msgid "Invalid mount spec"
+msgstr "Geçersiz bağlama belirtimi"
+
+#: ../daemon/gvfsbackenddav.c:1031
+msgid "Response invalid"
+msgstr "Geçersiz cevap"
+
+#: ../daemon/gvfsbackenddav.c:1059 ../daemon/gvfsbackenddav.c:1168
+msgid "Could not create request"
+msgstr "İstek oluşturulamadı"
+
+#: ../daemon/gvfsbackenddav.c:1216 ../daemon/gvfsbackendsmb.c:1675
+msgid "Target file already exists"
+msgstr "Hedef dosya zaten mevcut"
+
+#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2456
+#: ../daemon/gvfsbackendsmb.c:931
+msgid "The file was externally modified"
+msgstr "Dosya harici olarak değiştirilmiş"
+
+#: ../daemon/gvfsbackenddav.c:1317 ../daemon/gvfsbackendsmb.c:969
+#: ../daemon/gvfsbackendsmb.c:1692
+msgid "Backup file creation failed"
+msgstr "Yedek dosyası oluşturma başarısız oldu"
+
+#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1187
+msgid "No hostname specified"
+msgstr "Makine adı belirtilmemiş"
+
+#: ../daemon/gvfsbackendftp.c:197 ../daemon/gvfsbackendsmb.c:634
+#: ../daemon/gvfsbackendsmb.c:1065
+msgid "Unsupported seek type"
+msgstr "Atlama türü desteklenmiyor"
+
+#: ../daemon/gvfsbackendhttp.c:168
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "HTTP İstemci Hatası: %s"
+
+#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1518
+#: ../daemon/gvfsbackendsmb.c:1178 ../daemon/gvfsbackendtrash.c:960
+msgid " (invalid encoding)"
+msgstr ".(geçersiz kodlama)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr "Dizin bildirimi desteklenmiyor"
+
+#: ../daemon/gvfsbackendsftp.c:250
+msgid "ssh program unexpectedly exited"
+msgstr "ssh programından beklenilmeyen çıkış"
+
+#: ../daemon/gvfsbackendsftp.c:258
+msgid "Permission denied"
+msgstr "İzin verilmedi"
+
+#: ../daemon/gvfsbackendsftp.c:265
+msgid "Hostname not known"
+msgstr "Makine adı bilinmiyor"
+
+#: ../daemon/gvfsbackendsftp.c:272
+msgid "No route to host"
+msgstr "Makineye ulaşılamıyor"
+
+#: ../daemon/gvfsbackendsftp.c:279
+msgid "Connection refused by server"
+msgstr "Bağlantı sunucu tarafından reddedildi"
+
+#: ../daemon/gvfsbackendsftp.c:286
+msgid "Host key verification failed"
+msgstr "Makine anahtarının onaylanması başarısız oldu"
+
+#: ../daemon/gvfsbackendsftp.c:371
+msgid "Unable to spawn ssh program"
+msgstr "ssh programı yeniden başlatılamadı"
+
+#: ../daemon/gvfsbackendsftp.c:387
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "ssh programı yeniden başlatılamadı: %s"
+
+#: ../daemon/gvfsbackendsftp.c:490 ../daemon/gvfsbackendsftp.c:648
+msgid "Timed out when logging in"
+msgstr "Giriş yapılırken zaman aşımına uğradı"
+
+#: ../daemon/gvfsbackendsftp.c:709
+msgid "Enter passphrase for key"
+msgstr "Anahtar için parola metnini girin"
+
+#: ../daemon/gvfsbackendsftp.c:711
+msgid "Enter password"
+msgstr "Parolayı girin"
+
+#: ../daemon/gvfsbackendsftp.c:724
+msgid "Password dialog cancelled"
+msgstr "Parola penceresi iptal edildi"
+
+#: ../daemon/gvfsbackendsftp.c:748
+msgid "Can't send password"
+msgstr "Parola gönderilemiyor"
+
+#: ../daemon/gvfsbackendsftp.c:1113 ../daemon/gvfsbackendsftp.c:1136
+msgid "Protocol error"
+msgstr "Protokol hatası"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1153
+#, c-format
+msgid "sftp on %s"
+msgstr "%s üzerinde sftp"
+
+#: ../daemon/gvfsbackendsftp.c:1177
+msgid "Unable to find supported ssh command"
+msgstr "Desteknelen ssh komut komutu bulunamadı"
+
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1530
+#, c-format
+msgid "/ on %s"
+msgstr "%s üzerinde /"
+
+#: ../daemon/gvfsbackendsftp.c:1594
+msgid "File is directory"
+msgstr "Dosya bir dizin"
+
+#: ../daemon/gvfsbackendsftp.c:1603
+msgid "Failure"
+msgstr "Başarısız"
+
+#: ../daemon/gvfsbackendsftp.c:1668 ../daemon/gvfsbackendsftp.c:1730
+#: ../daemon/gvfsbackendsftp.c:1741 ../daemon/gvfsbackendsftp.c:1799
+#: ../daemon/gvfsbackendsftp.c:1889 ../daemon/gvfsbackendsftp.c:1918
+#: ../daemon/gvfsbackendsftp.c:1966 ../daemon/gvfsbackendsftp.c:2045
+#: ../daemon/gvfsbackendsftp.c:2156 ../daemon/gvfsbackendsftp.c:2197
+#: ../daemon/gvfsbackendsftp.c:2249 ../daemon/gvfsbackendsftp.c:2320
+#: ../daemon/gvfsbackendsftp.c:2340 ../daemon/gvfsbackendsftp.c:2494
+#: ../daemon/gvfsbackendsftp.c:2520 ../daemon/gvfsbackendsftp.c:2577
+#: ../daemon/gvfsbackendsftp.c:2636 ../daemon/gvfsbackendsftp.c:2916
+#: ../daemon/gvfsbackendsftp.c:3045 ../daemon/gvfsbackendsftp.c:3078
+#: ../daemon/gvfsbackendsftp.c:3179 ../daemon/gvfsbackendsftp.c:3220
+#: ../daemon/gvfsbackendsftp.c:3276 ../daemon/gvfsbackendsftp.c:3312
+#: ../daemon/gvfsbackendsftp.c:3346 ../daemon/gvfsbackendsftp.c:3361
+#: ../daemon/gvfsbackendsftp.c:3380
+msgid "Invalid reply received"
+msgstr "Geçersiz cevap alındı"
+
+#: ../daemon/gvfsbackendsftp.c:1987
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "Yedek dosya oluşturulurken hata: %s"
+
+#: ../daemon/gvfsbackendsftp.c:2402
+msgid "Unable to create temporary file"
+msgstr "Geçici dosya oluşturulamadı"
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:180
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "%2$s üzerinde %1$s paylaşımı için parola gerekli"
+
+#: ../daemon/gvfsbackendsmb.c:430 ../daemon/gvfsbackendsmb.c:465
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Dahili Hata (%s)"
+
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendsmb.c:473 ../daemon/gvfsbackendsmb.c:1171
+#, c-format
+msgid "%s on %s"
+msgstr "%2$s üzerinde %1$s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:519
+msgid "Failed to mount Windows share"
+msgstr "Windows paylaşımı bağlama başarısız oldu"
+
+#: ../daemon/gvfsbackendsmb.c:1119
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "Yedek dosyası oluşturma başarısız: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1576
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Dosya silinirken hata: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1640
+#, c-format
+msgid "Error moving file: %s"
+msgstr "Dosya taşınırken hata: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1664
+msgid "Can't move directory over directory"
+msgstr "Dizin üstüne dizin taşınamıyor"
+
+#: ../daemon/gvfsbackendsmb.c:1712
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "Hedef dosya silinirken hata: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1736
+msgid "Can't recursively move directory"
+msgstr "Dizin iç içe taşınamıyor"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:676
+msgid "Windows Network"
+msgstr "Windows Ağı"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:684
+#, c-format
+msgid "Windows shares on %s"
+msgstr "%s üzerindeki Windows paylaşımları"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:779 ../daemon/gvfsbackendsmbbrowse.c:825
+msgid "The file is not a mountable"
+msgstr "Dosya bağlanılabilir değil"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:847
+msgid "Not a regular file"
+msgstr "Düzenli bir dosya değil"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1092
+msgid "Not a directory"
+msgstr "Bir dizin değil"
+
+#. translators: This is the name of the backend
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:599 ../daemon/gvfsbackendtrash.c:1188
+msgid "Trash"
+msgstr "Çöp"
+
+#: ../daemon/gvfsbackendtrash.c:970
+#, c-format
+msgid "%s (in trash)"
+msgstr "%s (çöpte)"
+
+#: ../daemon/gvfsbackendtrash.c:1289
+msgid "Can't delete trash"
+msgstr "Çöp silinemiyor"
+
+#: ../daemon/gvfsbackendtrash.c:1636 ../daemon/gvfsbackendtrash.c:1711
+msgid "Trash directory notification not supported"
+msgstr "Çöp dizin bildirimi desteklenmiyor"
+
+#: ../daemon/gvfsdaemon.c:1032
+msgid "Invalid backend type"
+msgstr "Geçersiz arkayüz türü"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "fd gönderilirken hata: %s"
+
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:105 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "Arkayüz tarafından işlem desteklenmiyor"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "Arkayüz tarafından sembolik bağlar desteklenmiyor"
+
+#: ../daemon/gvfsjobsetattribute.c:123
+msgid "Invalid dbus message"
+msgstr "Geçersiz dbus mesajı"
+
+#: ../daemon/main.c:47
+msgid "Replace old daemon."
+msgstr "Eski servisin yerine kondu."
+
+#: ../daemon/main.c:48
+msgid "Don't start fuse."
+msgstr "fuse'ü başlatma."
+
+#: ../daemon/main.c:60
+msgid "GVFS Daemon"
+msgstr "GVFS Servisi"
+
+#: ../daemon/main.c:63
+msgid "Main daemon for GVFS"
+msgstr "GVFS için ana servis"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:74
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:135
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "Daha fazla bilgi için \"%s --help\" deneyin."
+
+#: ../daemon/mount.c:372
+msgid "Invalid arguments from spawned child"
+msgstr "Yeniden başlatılan alt süreçler için geçersiz parametreler"
+
+#: ../daemon/mount.c:662
+#, c-format
+msgid "Automount failed: %s"
+msgstr "Kendiliğinden bağlama başarısız oldu: %s"
+
+#: ../daemon/mount.c:707
+msgid "The specified location is not mounted"
+msgstr "Belirtilen konum bağlanmamış"
+
+#: ../daemon/mount.c:712
+msgid "The specified location is not supported"
+msgstr "Belirtilen konum desteklenmiyor"
+
+#: ../daemon/mount.c:875
+msgid "Location is already mounted"
+msgstr "Konum zaten bağlanmış"
+
+#: ../daemon/mount.c:883
+msgid "Location is not mountable"
+msgstr "Konum bağlanılabilir değil"
+
+#: ../hal/ghaldrive.c:135
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../hal/ghaldrive.c:137
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../hal/ghaldrive.c:139
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../hal/ghaldrive.c:143
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../hal/ghaldrive.c:145
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../hal/ghaldrive.c:147
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../hal/ghaldrive.c:149
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../hal/ghaldrive.c:151
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../hal/ghaldrive.c:153
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../hal/ghaldrive.c:156
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../hal/ghaldrive.c:159
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../hal/ghaldrive.c:161
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../hal/ghaldrive.c:163
+msgid "HDDVD-r"
+msgstr "HDDVD-r"
+
+#: ../hal/ghaldrive.c:165
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../hal/ghaldrive.c:167
+msgid "Blu-ray"
+msgstr "Blu-ray"
+
+#: ../hal/ghaldrive.c:169
+msgid "Blu-ray-R"
+msgstr "Blu-ray-R"
+
+#: ../hal/ghaldrive.c:171
+msgid "Blu-ray-RE"
+msgstr "Blu-ray-RE"
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../hal/ghaldrive.c:177
+#, c-format
+msgid "%s/%s Drive"
+msgstr "%s/%s Sürücü"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../hal/ghaldrive.c:183
+#, c-format
+msgid "%s Drive"
+msgstr "%s Sürücü"
+
+#: ../hal/ghaldrive.c:187
+msgid "Floppy Drive"
+msgstr "Disket Sürücü"
+
+#: ../hal/ghaldrive.c:193
+msgid "Software RAID Drive"
+msgstr "Yazılımsal RAID Sürücü"
+
+#: ../hal/ghaldrive.c:195
+msgid "USB Drive"
+msgstr "USB Sürücü"
+
+#: ../hal/ghaldrive.c:197
+msgid "ATA Drive"
+msgstr "ATA Sürücü"
+
+#: ../hal/ghaldrive.c:199
+msgid "SCSI Drive"
+msgstr "SCSI Sürücü"
+
+#: ../hal/ghaldrive.c:201
+msgid "FireWire Drive"
+msgstr "FireWire Sürücü"
+
+#: ../hal/ghaldrive.c:205
+msgid "Tape Drive"
+msgstr "Bant Sürücü"
+
+#: ../hal/ghaldrive.c:207
+msgid "CompactFlash Drive"
+msgstr "CompactFlash Sürücüsü"
+
+#: ../hal/ghaldrive.c:209
+msgid "MemoryStick Drive"
+msgstr "MemoryStick Sürücü"
+
+#: ../hal/ghaldrive.c:211
+msgid "SmartMedia Drive"
+msgstr "SmartMedia Sürücü"
+
+#: ../hal/ghaldrive.c:213
+msgid "SD/MMC Drive"
+msgstr "SD/MMC Sürücü"
+
+#: ../hal/ghaldrive.c:215
+msgid "Zip Drive"
+msgstr "Zip Sürücü"
+
+#: ../hal/ghaldrive.c:217
+msgid "Jaz Drive"
+msgstr "Jaz Sürücü"
+
+#: ../hal/ghaldrive.c:219
+msgid "Thumb Drive"
+msgstr "Thumb Sürücü"
+
+#: ../hal/ghaldrive.c:222
+msgid "Mass Storage Drive"
+msgstr "Depolama Aygıtı Sürücü"
+
+#: ../hal/ghaldrive.c:634
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"Ortamı çıkartma başarısız; ortam üzerinde bir ya da daha fazla sistem meşgul."
+
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+msgid "CD-ROM Disc"
+msgstr "CD-ROM Diski"
+
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+msgid "Blank CD-ROM Disc"
+msgstr "Boş CD-ROM Diski"
+
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+msgid "CD-R Disc"
+msgstr "CD-R Diski"
+
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+msgid "Blank CD-R Disc"
+msgstr "Boş CD-R Diski"
+
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+msgid "CD-RW Disc"
+msgstr "CD-RW Diski"
+
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+msgid "Blank CD-RW Disc"
+msgstr "Boş CD-RW Diski"
+
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
+#: ../hal/ghalvolume.c:143
+msgid "DVD-ROM Disc"
+msgstr "DVD-ROM Diski"
+
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
+#: ../hal/ghalvolume.c:143
+msgid "Blank DVD-ROM Disc"
+msgstr "Boş DVD-ROM Diski"
+
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+msgid "DVD-RAM Disc"
+msgstr "DVD-RAM Diski"
+
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+msgid "Blank DVD-RAM Disc"
+msgstr "Boş DVD-RAM Diski"
+
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+msgid "DVD-RW Disc"
+msgstr "DVD-RW Diski"
+
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+msgid "Blank DVD-RW Disc"
+msgstr "Boş DVD-RW·Diski"
+
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+msgid "DVD+R Disc"
+msgstr "DVD+R Diski"
+
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+msgid "Blank DVD+R Disc"
+msgstr "Boş DVD+R Diski"
+
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+msgid "DVD+RW Disc"
+msgstr "DVD+RW Diski"
+
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+msgid "Blank DVD+RW Disc"
+msgstr "Boş DVD+RW Diski"
+
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL Diski"
+
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+msgid "Blank DVD+R DL Disc"
+msgstr "Boş DVD+R DL Diski"
+
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+msgid "Blu-Ray Disc"
+msgstr "Blu-Ray Diski"
+
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+msgid "Blank Blu-Ray Disc"
+msgstr "Boş Blu-Ray Diski"
+
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+msgid "Blu-Ray R Disc"
+msgstr "Blu-Ray R Diski"
+
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+msgid "Blank Blu-Ray R Disc"
+msgstr "Boş Blu-Ray R Diski"
+
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+msgid "Blu-Ray RW Disc"
+msgstr "Blu-Ray RW Diski"
+
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Boş Blu-Ray RW Diski"
+
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+msgid "HD DVD Disc"
+msgstr "HD DVD Diski"
+
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+msgid "Blank HD DVD Disc"
+msgstr "Boş HD DVD Diski"
+
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+msgid "HD DVD-R Disc"
+msgstr "HD DVD-R Diski"
+
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+msgid "Blank HD DVD-R Disc"
+msgstr "Boş HD DVD-R Diski"
+
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+msgid "HD DVD-RW Disc"
+msgstr "HD DVD-RW Diski"
+
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+msgid "Blank HD DVD-RW Disc"
+msgstr "Boş HD DVD-RW Diski"
+
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+msgid "MO Disc"
+msgstr "MO Diski"
+
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+msgid "Blank MO Disc"
+msgstr "Boş MO Diski"
+
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+msgid "Disc"
+msgstr "Disk"
+
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+msgid "Blank Disc"
+msgstr "Boş Disk"
+
+#: ../hal/ghalmount.c:348
+#, c-format
+msgid "%.1f kB Media"
+msgstr "%.1f kB Ortam"
+
+#: ../hal/ghalmount.c:353
+#, c-format
+msgid "%.1f MB Media"
+msgstr "%.1f MB Ortam"
+
+#: ../hal/ghalmount.c:358
+#, c-format
+msgid "%.1f GB Media"
+msgstr "% 1f GB Ortam"
+
+#: ../hal/ghalmount.c:440 ../hal/ghalvolume.c:261
+msgid "Mixed Audio/Data Disc"
+msgstr "Karışık Ses/Veri Diski"
+
+#: ../hal/ghalvolume.c:189
+#, c-format
+msgid "%.1f kB"
+msgstr "% 1f kB"
+
+#: ../hal/ghalvolume.c:194
+#, c-format
+msgid "%.1f MB"
+msgstr "% 1f MB"
+
+#: ../hal/ghalvolume.c:199
+#, c-format
+msgid "%.1f GB"
+msgstr "% 1f GB"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:249
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s Şifreli Veri"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:272
+#, c-format
+msgid "%s Media"
+msgstr "%s Ortam"
+
+#: ../hal/ghalvolume.c:314
+msgid "Camera"
+msgstr "Fotoğraf Makinası"
+
+#: ../hal/ghalvolume.c:321
+#, c-format
+msgid "%s Camera"
+msgstr "%s Fotoğraf Makinası"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:59
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: dosya açılırken hata: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:82
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, stdout'a yazılırken hata"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:94
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: okuma hatası: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:112
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s:kapatma hatası: %s\n"
+
+#: ../programs/gvfs-cat.c:138
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "KONUM... - standart çıktıya KONUMLAR ile '-' birleştirilir."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:143
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+"Konumlardaki dosyalar birleştirilir ve standart çıktıya yazılır. Geleneksel "
+"cat aracı gibi çalışır, fakat yerel dosyalar yerine gvfs yeri kullanılır: "
+"örneğin yer olarak birleştirmede smb://sunucu/kaynak/dosya.txt gibi bir şeyi "
+"kullanabilirsiniz."
+
+#: ../programs/gvfs-cat.c:150
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+"Not: eğer biçimleme seçenekleri -n, -T ya da diğerlerine ihtiyaç "
+"duyuyorsanız sadece cat'e borulayın."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:133
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: eksik konumlar"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:58
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: konum açılırken hata: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:85
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: uygulama başlatılırken hata: %s\n"
+
+#: ../programs/gvfs-open.c:115
+msgid "FILES... - open FILES with registered application."
+msgstr "DOSYALAR... - kayıtlı uygulamayla DOSYALAR açılır."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:119
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
+"Dosya türünü işlemek için kayıtlı öntanımlı uygulama ile dosya(lar) açılır."

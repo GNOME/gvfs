@@ -1,3 +1,8 @@
+2008-02-19 Baris Cicek <baris@teamforce.name.tr>
+
+	* tr.po: Added Turkish translation from Anil Karadag
+	* LINGUAS: Added tr (Turkish)
+	
 2008-02-11  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
 
 	* es.po: Updated Spanish translation, fixed typos thanks to Ignacio
