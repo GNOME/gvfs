@@ -35,7 +35,7 @@
 #include "gdbusutils.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_VFS_TYPE_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobOpenForRead, g_vfs_job_open_for_read, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
@@ -177,7 +177,6 @@ create_reply (GVfsJob *job,
   GError *error;
   int remote_fd;
   int fd_id;
-  gboolean res;
   dbus_bool_t can_seek;
 
   g_assert (open_job->backend_handle != NULL);
@@ -200,10 +199,10 @@ create_reply (GVfsJob *job,
 
   reply = dbus_message_new_method_return (message);
   can_seek = open_job->can_seek;
-  res = dbus_message_append_args (reply,
-				  DBUS_TYPE_UINT32, &fd_id,
-				  DBUS_TYPE_BOOLEAN, &can_seek,
-				  DBUS_TYPE_INVALID);
+  dbus_message_append_args (reply,
+			    DBUS_TYPE_UINT32, &fd_id,
+			    DBUS_TYPE_BOOLEAN, &can_seek,
+			    DBUS_TYPE_INVALID);
 
   g_vfs_channel_set_backend_handle (G_VFS_CHANNEL (channel), open_job->backend_handle);
   open_job->backend_handle = NULL;

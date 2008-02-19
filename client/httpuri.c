@@ -214,10 +214,10 @@ http_to_uri (GVfsUriMapper    *mapper,
     }
   else
     {
-      GDecodedUri *uri;
+      GDecodedUri *decoded_uri;
       int          port_num;
 
-      uri = g_new0 (GDecodedUri, 1);
+      decoded_uri = g_new0 (GDecodedUri, 1);
 
       ssl  = g_vfs_uri_mount_info_get (info, "ssl");
       host = g_vfs_uri_mount_info_get (info, "host");
@@ -225,20 +225,20 @@ http_to_uri (GVfsUriMapper    *mapper,
       port = g_vfs_uri_mount_info_get (info, "port");
 
       if (ssl && strcmp (ssl, "true") == 0)
-          uri->scheme = g_strdup ("davs");
+          decoded_uri->scheme = g_strdup ("davs");
       else
-          uri->scheme = g_strdup ("dav");
+          decoded_uri->scheme = g_strdup ("dav");
 
-      uri->host = g_strdup (host);
-      uri->userinfo = g_strdup (user);
+      decoded_uri->host = g_strdup (host);
+      decoded_uri->userinfo = g_strdup (user);
       
       if (port && (port_num = atoi (port)))
-          uri->port = port_num;
+          decoded_uri->port = port_num;
 
-      uri->path = g_strdup (info->path);
+      decoded_uri->path = g_strdup (info->path);
 
-      res = g_vfs_encode_uri (uri, allow_utf8);
-      g_vfs_decoded_uri_free (uri);
+      res = g_vfs_encode_uri (decoded_uri, allow_utf8);
+      g_vfs_decoded_uri_free (decoded_uri);
     }
 
   return res;
@@ -285,11 +285,8 @@ g_vfs_uri_mapper_http_class_finalize (GVfsUriMapperHttpClass *klass)
 static void
 g_vfs_uri_mapper_http_class_init (GVfsUriMapperHttpClass *class)
 {
-  GObjectClass       *object_class;
   GVfsUriMapperClass *mapper_class;
   
-  object_class = (GObjectClass *) class;
-
   mapper_class = G_VFS_URI_MAPPER_CLASS (class);
   mapper_class->get_handled_schemes     = http_get_handled_schemes;
   mapper_class->from_uri                = http_from_uri;

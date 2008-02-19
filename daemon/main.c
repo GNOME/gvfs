@@ -97,19 +97,19 @@ main (int argc, char *argv[])
   if (!no_fuse)
     {
       char *fuse_path;
-      char *argv[3];
+      char *argv2[3];
       
       fuse_path = g_build_filename (g_get_home_dir (), ".gvfs", NULL);
       
       if (!g_file_test (fuse_path, G_FILE_TEST_EXISTS))
 	g_mkdir (fuse_path, 0700);
       
-      argv[0] = LIBEXEC_DIR "/gvfs-fuse-daemon";
-      argv[1] = fuse_path;
-      argv[2] = NULL;
+      argv2[0] = LIBEXEC_DIR "/gvfs-fuse-daemon";
+      argv2[1] = fuse_path;
+      argv2[2] = NULL;
       
       g_spawn_async (NULL,
-		     argv,
+		     argv2,
 		     NULL,
 		     G_SPAWN_STDOUT_TO_DEV_NULL |
 		     G_SPAWN_STDERR_TO_DEV_NULL, 

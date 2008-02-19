@@ -33,7 +33,7 @@ static void soup_input_stream_seekable_iface_init (GSeekableIface *seekable_ifac
 
 G_DEFINE_TYPE_WITH_CODE (SoupInputStream, soup_input_stream, G_TYPE_INPUT_STREAM,
 			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
-						soup_input_stream_seekable_iface_init));
+						soup_input_stream_seekable_iface_init))
 
 typedef void (*SoupInputStreamCallback) (GInputStream *);
 
@@ -121,9 +121,7 @@ soup_input_stream_finalize (GObject *object)
   g_signal_handlers_disconnect_by_func (priv->msg, G_CALLBACK (soup_input_stream_got_chunk), stream);
   g_signal_handlers_disconnect_by_func (priv->msg, G_CALLBACK (soup_input_stream_finished), stream);
   g_object_unref (priv->msg);
-
-  if (priv->leftover_buffer)
-    g_free (priv->leftover_buffer);
+  g_free (priv->leftover_buffer);
 
   if (G_OBJECT_CLASS (soup_input_stream_parent_class)->finalize)
     (*G_OBJECT_CLASS (soup_input_stream_parent_class)->finalize) (object);
@@ -459,11 +457,9 @@ soup_input_stream_send (GInputStream *stream,
 			GCancellable *cancellable,
 			GError      **error)
 {
-  SoupInputStreamPrivate *priv;
   gboolean result;
 
   g_return_val_if_fail (SOUP_IS_INPUT_STREAM (stream), FALSE);
-  priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
 
   if (!g_input_stream_set_pending (stream, error))
       return FALSE;
@@ -646,11 +642,9 @@ soup_input_stream_send_async (GInputStream        *stream,
 			      GAsyncReadyCallback  callback,
 			      gpointer             user_data)
 {
-  SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
   GError *error = NULL;
 
   g_return_if_fail (SOUP_IS_INPUT_STREAM (stream));
-  priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
 
   if (!g_input_stream_set_pending (stream, &error))
     {

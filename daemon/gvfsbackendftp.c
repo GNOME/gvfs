@@ -58,15 +58,11 @@ struct _GVfsBackendFtp
   gboolean mount_try_again;
 };
 
-G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
 
 static void
 g_vfs_backend_ftp_finalize (GObject *object)
 {
-  GVfsBackendFtp *backend;
-
-  backend = G_VFS_BACKEND_FTP (object);
-
   if (G_OBJECT_CLASS (g_vfs_backend_ftp_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_ftp_parent_class)->finalize) (object);
 }
@@ -101,7 +97,7 @@ try_mount (GVfsBackend *backend,
 #if 0
   GVfsBackendFtp *op_backend = G_VFS_BACKEND_FTP (backend);
 #endif
-  const char *server, *share, *user, *domain;
+  const char *server, *share; /* *domain, *user; */
 
   server = g_mount_spec_get (mount_spec, "server");
   share = g_mount_spec_get (mount_spec, "share");
@@ -113,9 +109,10 @@ try_mount (GVfsBackend *backend,
 			_("No hostname specified"));
       return TRUE;
     }
-
+#if 0
   user = g_mount_spec_get (mount_spec, "user");
   domain = g_mount_spec_get (mount_spec, "domain");
+#endif
 
   /* TODO */
 

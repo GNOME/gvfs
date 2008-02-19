@@ -34,7 +34,7 @@
 #include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
-G_DEFINE_TYPE (GVfsJobUnmount, g_vfs_job_unmount, G_VFS_TYPE_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobUnmount, g_vfs_job_unmount, G_VFS_TYPE_JOB_DBUS)
 
 static void     run        (GVfsJob *job);
 static gboolean try        (GVfsJob *job);
@@ -46,10 +46,6 @@ static DBusMessage *create_reply (GVfsJob *job,
 static void
 g_vfs_job_unmount_finalize (GObject *object)
 {
-  GVfsJobUnmount *job;
-
-  job = G_VFS_JOB_UNMOUNT (object);
-
   if (G_OBJECT_CLASS (g_vfs_job_unmount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_unmount_parent_class)->finalize) (object);
 }

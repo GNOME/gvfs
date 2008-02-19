@@ -113,7 +113,7 @@ struct _GVfsBackendTrash
 
 G_LOCK_DEFINE_STATIC(root_monitor);
 
-G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND)
 
 static void   schedule_update_trash_files (GVfsBackendTrash *backend,
                                            gboolean          update_trash_dirs);
@@ -253,7 +253,7 @@ get_top_dir_for_trash_dir (const char *trash_dir)
       return g_path_get_dirname (trash_dir);
     }
   
-  user_trash_basename =  g_strdup_printf (".Trash-%d", getuid());
+  user_trash_basename =  g_strdup_printf (".Trash-%u", getuid());
   if (strcmp (basename, user_trash_basename) == 0)
     {
       g_free (user_trash_basename);
@@ -262,7 +262,7 @@ get_top_dir_for_trash_dir (const char *trash_dir)
     }
   g_free (user_trash_basename);
 
-  user_sys_dir = g_strdup_printf ("%d", getuid());
+  user_sys_dir = g_strdup_printf ("%u", getuid());
   if (strcmp (basename, user_sys_dir) == 0)
     {
       g_free (user_sys_dir);
@@ -347,7 +347,7 @@ check_topdir (const char *topdir)
       statbuf.st_mode & S_ISVTX)
     {
       /* We have a valid sysadmin .Trash dir, look for uid subdir */
-      sysadmin_dir_uid = g_strdup_printf ("%s/%d", sysadmin_dir, getuid());
+      sysadmin_dir_uid = g_strdup_printf ("%s/%u", sysadmin_dir, getuid());
       
       if (lstat (sysadmin_dir_uid, &statbuf) == 0 &&
           S_ISDIR (statbuf.st_mode) &&
@@ -363,7 +363,7 @@ check_topdir (const char *topdir)
     }
   g_free (sysadmin_dir);
 
-  user_trash_basename =  g_strdup_printf (".Trash-%d", getuid());
+  user_trash_basename =  g_strdup_printf (".Trash-%u", getuid());
   user_trash = g_build_filename (topdir, user_trash_basename, NULL);
   g_free (user_trash_basename);
   
@@ -1118,7 +1118,6 @@ do_enumerate (GVfsBackend *backend,
       GFile *file;
       GFileEnumerator *enumerator;
       GFileInfo *info;
-      const char *name;
       char *dir;
       GError *error;
 
@@ -1142,8 +1141,6 @@ do_enumerate (GVfsBackend *backend,
                                                       G_VFS_JOB (job)->cancellable,
                                                       NULL)) != NULL)
             {
-              name = g_file_info_get_name (info);
-              
               g_vfs_job_enumerate_add_info   (job, info);
               g_object_unref (info);
             }

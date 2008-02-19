@@ -98,7 +98,7 @@ static DBusHandlerResult peer_to_peer_filter_func  (DBusConnection *conn,
 						    gpointer        data);
 
 
-G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT);
+G_DEFINE_TYPE (GVfsDaemon, g_vfs_daemon, G_TYPE_OBJECT)
 
 static void
 registered_path_free (RegisteredPath *data)
@@ -189,10 +189,11 @@ g_vfs_daemon_set_property (GObject         *object,
 			   const GValue    *value,
 			   GParamSpec      *pspec)
 {
+#if 0
   GVfsDaemon *daemon;
   
   daemon = G_VFS_DAEMON (object);
-  
+#endif
   switch (prop_id)
     {
     default:
@@ -207,10 +208,11 @@ g_vfs_daemon_get_property (GObject    *object,
 			   GValue     *value,
 			   GParamSpec *pspec)
 {
+#if 0
   GVfsDaemon *daemon;
   
   daemon = G_VFS_DAEMON (object);
-
+#endif
   switch (prop_id)
     {
     default:

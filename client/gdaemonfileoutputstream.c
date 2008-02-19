@@ -983,10 +983,11 @@ g_daemon_file_output_stream_query_info (GFileOutputStream     *stream,
 					GCancellable         *cancellable,
 					GError              **error)
 {
+#if 0
   GDaemonFileOutputStream *file;
 
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
-
+#endif
   return NULL;
 }
 
@@ -1246,7 +1247,6 @@ g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
 					  gpointer            data)
 {
   GDaemonFileOutputStream *file;
-  AsyncIterator *iterator;
   WriteOperation *op;
 
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
@@ -1260,8 +1260,6 @@ g_daemon_file_output_stream_write_async  (GOutputStream      *stream,
   op->buffer = buffer;
   op->buffer_size = count;
 
-  iterator = g_new0 (AsyncIterator, 1);
-  
   run_async_state_machine (file,
 			   (state_machine_iterator)iterate_write_state_machine,
 			   op,
@@ -1349,7 +1347,6 @@ g_daemon_file_output_stream_close_async (GOutputStream     *stream,
 					gpointer            data)
 {
   GDaemonFileOutputStream *file;
-  AsyncIterator *iterator;
   CloseOperation *op;
 
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
@@ -1357,14 +1354,12 @@ g_daemon_file_output_stream_close_async (GOutputStream     *stream,
   op = g_new0 (CloseOperation, 1);
   op->state = CLOSE_STATE_INIT;
 
-  iterator = g_new0 (AsyncIterator, 1);
-  
   run_async_state_machine (file,
 			   (state_machine_iterator)iterate_close_state_machine,
 			   op, io_priority,
-			   (gpointer)callback, data,
+			   (GAsyncReadyCallback)callback, data,
 			   cancellable,
-			   (gpointer)async_close_done);
+			   (AsyncIteratorDone)async_close_done);
 }
 
 static gboolean

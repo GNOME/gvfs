@@ -54,7 +54,7 @@ struct _GHalVolumeMonitor {
 
   HalPool *pool;
 
-  GList *last_camera_devices;;
+  GList *last_camera_devices;
   GList *last_optical_disc_devices;
   GList *last_drive_devices;
   GList *last_volume_devices;
@@ -88,7 +88,7 @@ static void update_discs             (GHalVolumeMonitor *monitor);
 static void update_cameras           (GHalVolumeMonitor *monitor);
 
 #define g_hal_volume_monitor_get_type g_hal_volume_monitor_get_type
-G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR);
+G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR)
 
 static HalPool *
 get_hal_pool (void)

@@ -51,7 +51,7 @@ struct _GDaemonFileEnumerator
   
 };
 
-G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUMERATOR);
+G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUMERATOR)
 
 static GFileInfo *       g_daemon_file_enumerator_next_file   (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,

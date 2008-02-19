@@ -35,7 +35,7 @@
 #include "gvfsdaemonprotocol.h"
 #include "gvfsjobsetattribute.h"
 
-G_DEFINE_TYPE (GVfsJobSetAttribute, g_vfs_job_set_attribute, G_VFS_TYPE_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobSetAttribute, g_vfs_job_set_attribute, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);

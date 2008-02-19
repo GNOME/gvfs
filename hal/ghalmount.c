@@ -138,7 +138,7 @@ g_hal_mount_init (GHalMount *hal_mount)
 {
 }
 
-const static struct {
+static const struct {
   const char *disc_type;
   const char *icon_name;
   char *ui_name;
@@ -161,7 +161,7 @@ const static struct {
   {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
   {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
   {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
-  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")},
+  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")}
 };
 
 static const char *
@@ -589,8 +589,7 @@ g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
 void 
 g_hal_mount_override_name (GHalMount *mount, const char *name)
 {
-  if (mount->override_name != NULL)
-    g_free (mount->override_name);
+  g_free (mount->override_name);
 
   if (name != NULL)
     mount->override_name = g_strdup (name);
@@ -1152,8 +1151,7 @@ clear_find_file_insensitive_state (InsensitiveFileSearchData *data)
 {
   if (data->root)
     g_object_unref (data->root);
-  if (data->original_path)
-    g_free (data->original_path);
+  g_free (data->original_path);
   if (data->split_path)
     g_strfreev (data->split_path);
   if (data->enumerator)

@@ -226,7 +226,7 @@ _g_dbus_type_from_file_attribute_type (GFileAttributeType type)
       break;
     default:
       dbus_type = NULL;
-      g_warning ("Invalid attribute type %d, ignoring\n", type);
+      g_warning ("Invalid attribute type %u, ignoring\n", type);
       break;
     }
 

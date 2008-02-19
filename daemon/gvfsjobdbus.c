@@ -33,7 +33,7 @@
 #include "gvfsjobdbus.h"
 #include "gdbusutils.h"
 
-G_DEFINE_TYPE (GVfsJobDBus, g_vfs_job_dbus, G_VFS_TYPE_JOB);
+G_DEFINE_TYPE (GVfsJobDBus, g_vfs_job_dbus, G_VFS_TYPE_JOB)
 
 /* TODO: Real P_() */
 #define P_(_x) (_x)

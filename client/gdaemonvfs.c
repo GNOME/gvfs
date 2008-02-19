@@ -59,7 +59,7 @@ struct _GDaemonVfsClass
   GVfsClass parent_class;
 };
 
-G_DEFINE_DYNAMIC_TYPE (GDaemonVfs, g_daemon_vfs, G_TYPE_VFS);
+G_DEFINE_DYNAMIC_TYPE (GDaemonVfs, g_daemon_vfs, G_TYPE_VFS)
 
 static GDaemonVfs *the_vfs = NULL;
 
@@ -558,11 +558,9 @@ lookup_mount_info_in_cache (GMountSpec *spec,
 void
 _g_daemon_vfs_invalidate_dbus_id (const char *dbus_id)
 {
-  GMountInfo *info;
   GList *l, *next;
 
   G_LOCK (mount_cache);
-  info = NULL;
   for (l = the_vfs->mount_cache; l != NULL; l = next)
     {
       GMountInfo *mount_info = l->data;

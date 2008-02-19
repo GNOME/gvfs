@@ -33,7 +33,6 @@ void
 _g_dbus_oom (void)
 {
   g_error ("DBus failed with out of memory error");
-  exit(1);
 }
 
 /* We use _ for escaping, so its not valid */
@@ -915,7 +914,7 @@ dbus_source_add_watch (DBusSource *dbus_source,
   handler->dbus_source = dbus_source;
   handler->watch = watch;
 
-  handler->source = __g_fd_source_new (dbus_watch_get_fd (watch),
+  handler->source = __g_fd_source_new (dbus_watch_get_unix_fd (watch),
 				       condition, NULL);
   g_source_set_callback (handler->source,
 			 (GSourceFunc) io_handler_dispatch, handler,

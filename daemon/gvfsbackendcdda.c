@@ -91,7 +91,7 @@ struct _GVfsBackendCdda
   int num_open_files;
 };
 
-G_DEFINE_TYPE (GVfsBackendCdda, g_vfs_backend_cdda, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendCdda, g_vfs_backend_cdda, G_VFS_TYPE_BACKEND)
 
 static void
 g_vfs_backend_cdda_finalize (GObject *object)

@@ -33,7 +33,7 @@
 #include "gvfsjobclosewrite.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobCloseWrite, g_vfs_job_close_write, G_VFS_TYPE_JOB);
+G_DEFINE_TYPE (GVfsJobCloseWrite, g_vfs_job_close_write, G_VFS_TYPE_JOB)
 
 static void run (GVfsJob *job);
 static gboolean try (GVfsJob *job);

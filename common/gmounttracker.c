@@ -54,7 +54,7 @@ struct _GMountTracker
   DBusConnection *connection;
 };
 
-G_DEFINE_TYPE (GMountTracker, g_mount_tracker, G_TYPE_OBJECT);
+G_DEFINE_TYPE (GMountTracker, g_mount_tracker, G_TYPE_OBJECT)
 
 static DBusHandlerResult g_mount_tracker_filter_func  (DBusConnection        *conn,
 						       DBusMessage           *message,

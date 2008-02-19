@@ -629,7 +629,6 @@ do_async_path_call (GFile *file,
 {
   GDaemonFile *daemon_file = G_DAEMON_FILE (file);
   va_list var_args;
-  GError *error;
   AsyncPathCall *data;
 
   data = g_new0 (AsyncPathCall, 1);
@@ -646,8 +645,6 @@ do_async_path_call (GFile *file,
   data->callback_data = callback_data;
   data->notify = notify;
   
-  error = NULL;
-
   if (first_arg_type != 0)
     {
       data->args = dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_CALL);
@@ -743,7 +740,7 @@ g_daemon_file_query_info (GFile                *file,
 			     NULL, NULL,
 			     cancellable, error,
 			     DBUS_TYPE_STRING, &attributes,
-			     DBUS_TYPE_UINT32, &flags,
+			     DBUS_TYPE_UINT32, &flags_dbus,
 			     DBUS_TYPE_STRING, &uri,
 			     0);
 
@@ -1633,11 +1630,8 @@ g_daemon_file_delete (GFile *file,
 		      GCancellable *cancellable,
 		      GError **error)
 {
-  GDaemonFile *daemon_file;
   DBusMessage *reply;
 
-  daemon_file = G_DAEMON_FILE (file);
-  
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_DELETE,
 			     NULL, NULL,
@@ -1655,11 +1649,8 @@ g_daemon_file_trash (GFile *file,
 		     GCancellable *cancellable,
 		     GError **error)
 {
-  GDaemonFile *daemon_file;
   DBusMessage *reply;
 
-  daemon_file = G_DAEMON_FILE (file);
-  
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_TRASH,
 			     NULL, NULL,
@@ -1677,10 +1668,7 @@ g_daemon_file_make_directory (GFile *file,
 			      GCancellable *cancellable,
 			      GError **error)
 {
-  GDaemonFile *daemon_file;
   DBusMessage *reply;
-
-  daemon_file = G_DAEMON_FILE (file);
 
   reply = do_sync_path_call (file, 
 			     G_VFS_DBUS_MOUNT_OP_MAKE_DIRECTORY,
@@ -1775,12 +1763,9 @@ g_daemon_file_set_attribute (GFile *file,
 			     GCancellable *cancellable,
 			     GError **error)
 {
-  GDaemonFile *daemon_file;
   DBusMessage *message, *reply;
   DBusMessageIter iter;
   dbus_uint32_t flags_dbus;
-
-  daemon_file = G_DAEMON_FILE (file);
 
   message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE, NULL, error);
   if (!message)
@@ -1846,7 +1831,7 @@ g_daemon_file_copy (GFile                  *source,
 		    gpointer                progress_callback_data,
 		    GError                **error)
 {
-  GDaemonFile *daemon_source, *daemon_dest;
+  GDaemonFile *daemon_source;
   DBusMessage *reply;
   char *local_path;
   char *obj_path, *dbus_obj_path;
@@ -1859,7 +1844,6 @@ g_daemon_file_copy (GFile                  *source,
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "%s", "Move not supported");
       return FALSE;
     }
-  daemon_dest = G_DAEMON_FILE (destination);
 
   if (G_IS_DAEMON_FILE (source))
     {
@@ -1938,7 +1922,6 @@ g_daemon_file_move (GFile                  *source,
 		    gpointer                progress_callback_data,
 		    GError                **error)
 {
-  GDaemonFile *daemon_source, *daemon_dest;
   DBusMessage *reply;
   char *obj_path, *dbus_obj_path;
   dbus_uint32_t flags_dbus;
@@ -1952,9 +1935,6 @@ g_daemon_file_move (GFile                  *source,
       return FALSE;
     }
   
-  daemon_source = G_DAEMON_FILE (source);
-  daemon_dest = G_DAEMON_FILE (destination);
-
   if (progress_callback)
     {
       obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);

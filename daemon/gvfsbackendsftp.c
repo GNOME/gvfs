@@ -144,7 +144,7 @@ static void parse_attributes (GVfsBackendSftp *backend,
                               GFileAttributeMatcher *attribute_matcher);
 
 
-G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND)
 
 static void
 data_buffer_free (DataBuffer *buffer)
@@ -814,7 +814,7 @@ read_reply_async_got_data  (GObject *source_object,
       g_hash_table_remove (backend->expected_replies, GINT_TO_POINTER (id));
     }
   else
-    g_warning ("Got unhandled reply of size %d for id %d\n", backend->reply_size, id);
+    g_warning ("Got unhandled reply of size %"G_GUINT32_FORMAT" for id %"G_GUINT32_FORMAT"\n", backend->reply_size, id);
 
   g_object_unref (reply);
 
@@ -1626,16 +1626,16 @@ open_for_read_reply (GVfsBackendSftp *backend,
       if (reply_type == SSH_FXP_HANDLE)
         {
           GDataOutputStream *command;
-          DataBuffer *handle;
+          DataBuffer *bhandle;
           guint32 id;
 
-          handle = read_data_buffer (reply);
+          bhandle = read_data_buffer (reply);
           
           command = new_command_stream (backend, SSH_FXP_CLOSE, &id);
-          put_data_buffer (command, handle);
+          put_data_buffer (command, bhandle);
           queue_command_stream_and_free (backend, command, id, NULL, G_VFS_JOB (job), NULL);
 
-          data_buffer_free (handle);
+          data_buffer_free (bhandle);
         }
       
       return;
@@ -2817,7 +2817,6 @@ read_dir_reply (GVfsBackendSftp *backend,
   GVfsJobEnumerate *enum_job;
   guint32 count;
   int i;
-  GList *infos;
   guint32 id;
   GDataOutputStream *command;
   ReadDirData *data;
@@ -2844,7 +2843,6 @@ read_dir_reply (GVfsBackendSftp *backend,
       return;
     }
 
-  infos = NULL;
   count = g_data_input_stream_read_uint32 (reply, NULL, NULL);
   for (i = 0; i < count; i++)
     {

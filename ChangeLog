@@ -1,3 +1,13 @@
+2008-02-19  Alexander Larsson  <alexl@redhat.com>
+
+	* lots of *.c files:
+	Code cleanup from Kjartan:
+	Removes unused code/variables.
+	Uses right printf types
+	Uses non-deprecated dbus calls.
+	Removes spurious ; and ,
+	deleted extra checks for NULL for g_free
+
 2008-02-18  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalmount.c:

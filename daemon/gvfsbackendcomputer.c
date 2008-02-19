@@ -89,7 +89,7 @@ struct _GVfsBackendComputer
   GMountSpec *mount_spec;
 };
 
-G_DEFINE_TYPE (GVfsBackendComputer, g_vfs_backend_computer, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendComputer, g_vfs_backend_computer, G_VFS_TYPE_BACKEND)
 
 static void
 computer_file_free (ComputerFile *file)

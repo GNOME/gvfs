@@ -291,7 +291,7 @@ connection_setup_add_watch (ConnectionSetup *cs,
   handler->cs = cs;
   handler->watch = watch;
   
-  channel = g_io_channel_unix_new (dbus_watch_get_fd (watch));
+  channel = g_io_channel_unix_new (dbus_watch_get_unix_fd (watch));
   
   handler->source = g_io_create_watch (channel, condition);
   g_source_set_callback (handler->source, (GSourceFunc) io_handler_dispatch, handler,

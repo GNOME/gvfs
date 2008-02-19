@@ -40,7 +40,7 @@ enum {
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_DYNAMIC_TYPE (HalDevice, hal_device, G_TYPE_OBJECT);
+G_DEFINE_DYNAMIC_TYPE (HalDevice, hal_device, G_TYPE_OBJECT)
 
 static void
 hal_device_finalize (HalDevice *device)

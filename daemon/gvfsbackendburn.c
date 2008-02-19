@@ -94,7 +94,7 @@ struct _GVfsBackendBurn
   GMountSpec *mount_spec;
 };
 
-G_DEFINE_TYPE (GVfsBackendBurn, g_vfs_backend_burn, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendBurn, g_vfs_backend_burn, G_VFS_TYPE_BACKEND)
 
 
 static void virtual_node_unref (VirtualNode *node);
@@ -886,7 +886,7 @@ try_upload (GVfsBackend *backend,
       return TRUE;
     }
 
-  g_print ("file: %p, overwrite: %d\n", file, flags & G_FILE_COPY_OVERWRITE);
+  g_print ("file: %p, overwrite: %u\n", file, flags & G_FILE_COPY_OVERWRITE);
   if (file != NULL)
     {
       if (flags & G_FILE_COPY_OVERWRITE)

@@ -174,7 +174,7 @@ get_g_file_info_from_local (const char *filename, GFile *file,
  * 
  */
 
-G_DEFINE_TYPE (GVfsBackendLocalTest, g_vfs_backend_localtest, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendLocalTest, g_vfs_backend_localtest, G_VFS_TYPE_BACKEND)
 
 static void
 g_vfs_backend_localtest_init (GVfsBackendLocalTest *backend)
@@ -599,7 +599,7 @@ do_make_symlink (GVfsBackend *backend,
   }
 }
 
-
+#if 0
 static void
 do_copy (GVfsBackend *backend,
  		 GVfsJobCopy *job,
@@ -636,7 +636,7 @@ do_copy (GVfsBackend *backend,
 	  g_print ("  (EE) try_copy: file == NULL \n");
   }
 }
-
+#endif
 
 static void
 do_move (GVfsBackend *backend,

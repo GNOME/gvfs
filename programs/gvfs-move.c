@@ -63,7 +63,7 @@ show_progress (goffset current_num_bytes,
 	       goffset total_num_bytes,
 	       gpointer user_data)
 {
-  g_print ("progress %"G_GUINT64_FORMAT"/%"G_GUINT64_FORMAT"\n",
+  g_print ("progress %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT"\n",
 	   current_num_bytes, total_num_bytes);
 }
 

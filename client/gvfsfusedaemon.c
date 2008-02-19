@@ -1315,7 +1315,7 @@ vfs_flush (const gchar *path, struct fuse_file_info *fi)
   debug_print ("vfs_flush: %s\n", path);
 
   return 0;
-};
+}
 
 static gint
 vfs_opendir (const gchar *path, struct fuse_file_info *fi)

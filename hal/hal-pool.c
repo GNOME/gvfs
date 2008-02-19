@@ -49,7 +49,7 @@ struct _HalPoolPrivate
   GHashTable *devices;
 };
 
-G_DEFINE_DYNAMIC_TYPE (HalPool, hal_pool, G_TYPE_OBJECT);
+G_DEFINE_DYNAMIC_TYPE (HalPool, hal_pool, G_TYPE_OBJECT)
 
 static void
 hal_pool_finalize (HalPool *pool)

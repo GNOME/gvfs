@@ -52,7 +52,7 @@
 #include "soup-input-stream.h"
 
 
-G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendHttp, g_vfs_backend_http, G_VFS_TYPE_BACKEND)
 
 static void
 g_vfs_backend_http_finalize (GObject *object)
@@ -195,11 +195,8 @@ message_new_from_filename (GVfsBackend *backend,
                            const char  *method,
                            const char  *filename)
 {
-  GVfsBackendHttp *op_backend;
   SoupMessage     *msg;
   SoupURI         *uri;
-
-  op_backend = G_VFS_BACKEND_HTTP (backend);
 
   uri = g_vfs_backend_uri_for_filename (backend, filename);
   msg = message_new_from_uri (method, uri);
@@ -361,10 +358,8 @@ try_read (GVfsBackend        *backend,
           char               *buffer,
           gsize               bytes_requested)
 {
-  GVfsBackendHttp *op_backend;
   GInputStream    *stream;
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
   stream = G_INPUT_STREAM (handle);
 
   g_input_stream_read_async (stream,
@@ -384,11 +379,9 @@ try_seek_on_read (GVfsBackend *backend,
                   goffset    offset,
                   GSeekType  type)
 {
-  GVfsBackendHttp *op_backend;
   GInputStream    *stream;
   GError          *error = NULL;
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
   stream = G_INPUT_STREAM (handle);
 
   if (!g_seekable_seek (G_SEEKABLE (stream), offset, type,
@@ -446,10 +439,8 @@ try_close_read (GVfsBackend       *backend,
                 GVfsJobCloseRead  *job,
                 GVfsBackendHandle  handle)
 {
-  GVfsBackendHttp *op_backend;
   GInputStream    *stream;
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
   stream = G_INPUT_STREAM (handle);
 
   g_input_stream_close_async (stream,
@@ -457,7 +448,6 @@ try_close_read (GVfsBackend       *backend,
                               G_VFS_JOB (job)->cancellable,
                               close_read_ready,
                               job);
-
   return TRUE;
 }
 

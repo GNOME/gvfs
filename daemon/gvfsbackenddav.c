@@ -66,15 +66,11 @@ struct _GVfsBackendDav
 
 };
 
-G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP);
+G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP)
 
 static void
 g_vfs_backend_dav_finalize (GObject *object)
 {
-  GVfsBackendDav *backend;
-
-  backend = G_VFS_BACKEND_DAV (object);
-
   if (G_OBJECT_CLASS (g_vfs_backend_dav_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_dav_parent_class)->finalize) (object);
 }
@@ -192,7 +188,6 @@ node_get_content (xmlNodePtr node)
         default:
           return NULL;
       }
-    return NULL;
 }
 
 typedef struct _xmlNodeIter {
@@ -863,9 +858,9 @@ discover_mount_root_ready (SoupSession *session,
 
       if (mount_base->path)
         {
-          SoupMessage *msg;
-          msg = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-          soup_session_queue_message (session, msg, 
+          SoupMessage *message;
+          message = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+          soup_session_queue_message (session, message, 
                                       discover_mount_root_ready, job);
           return;
         } 
@@ -923,7 +918,6 @@ try_mount (GVfsBackend  *backend,
            GMountSource *mount_source,
            gboolean      is_automount)
 {
-  GVfsBackendDav *op_backend;
   MountOpData    *data;
   SoupSession    *session;
   SoupMessage    *msg;
@@ -935,8 +929,6 @@ try_mount (GVfsBackend  *backend,
   guint           port_num;
 
   g_print ("+ mount\n");
-
-  op_backend = G_VFS_BACKEND_DAV (backend);
 
   host = g_mount_spec_get (mount_spec, "host");
   user = g_mount_spec_get (mount_spec, "user");
@@ -1389,10 +1381,8 @@ try_write (GVfsBackend *backend,
            char *buffer,
            gsize buffer_size)
 {
-  GVfsBackendHttp *op_backend;
   GOutputStream   *stream;
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
   stream = G_OUTPUT_STREAM (handle);
 
   g_output_stream_write_async (stream,
@@ -1441,10 +1431,8 @@ try_close_write (GVfsBackend *backend,
                  GVfsJobCloseWrite *job,
                  GVfsBackendHandle handle)
 {
-  GVfsBackendHttp *op_backend;
   GOutputStream   *stream;
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
   stream = G_OUTPUT_STREAM (handle);
 
   g_output_stream_close_async (stream,

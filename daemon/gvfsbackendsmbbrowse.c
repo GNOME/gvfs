@@ -77,7 +77,7 @@ typedef struct {
   char *username;
 } CachedServer;
 
-G_DEFINE_TYPE (GVfsBackendSmbBrowse, g_vfs_backend_smb_browse, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendSmbBrowse, g_vfs_backend_smb_browse, G_VFS_TYPE_BACKEND)
 
 static char *
 normalize_smb_name_helper (const char *name, gssize len, gboolean valid_utf8)
@@ -447,7 +447,7 @@ update_cache (GVfsBackendSmbBrowse *backend)
 	{
 	  unsigned int dirlen;
 
-	  g_print ("type: %d, name: %s\n", dirp->smbc_type, dirp->name);
+	  g_print ("type: %u, name: %s\n", dirp->smbc_type, dirp->name);
 	  
 	  if (dirp->smbc_type != SMBC_IPC_SHARE &&
 	      dirp->smbc_type != SMBC_COMMS_SHARE &&
@@ -756,12 +756,10 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
 		     const char *filename,
 		     GMountSource *mount_source)
 {
-  GFileInfo *info;
   BrowseEntry *entry;
   GError *error = NULL;
   GMountSpec *mount_spec;
 
-  info = NULL;
   g_mutex_lock (backend->entries_lock);
   
   entry = find_entry_unlocked (backend, filename);

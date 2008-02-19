@@ -35,7 +35,7 @@ struct _GMountSource
   char *obj_path;
 };
 
-G_DEFINE_TYPE (GMountSource, g_mount_source, G_TYPE_OBJECT);
+G_DEFINE_TYPE (GMountSource, g_mount_source, G_TYPE_OBJECT)
 
 static void
 g_mount_source_finalize (GObject *object)
@@ -316,10 +316,7 @@ ask_password_reply_sync  (GObject *source_object,
                           GAsyncResult *res,
                           gpointer user_data)
 {
-  GMountSource *source;
   AskPasswordSyncData *data;
-
-  source = G_MOUNT_SOURCE (source_object);
 
   data = (AskPasswordSyncData *) user_data;
 

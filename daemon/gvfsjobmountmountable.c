@@ -34,7 +34,7 @@
 #include "gdbusutils.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobMountMountable, g_vfs_job_mount_mountable, G_VFS_TYPE_JOB_DBUS);
+G_DEFINE_TYPE (GVfsJobMountMountable, g_vfs_job_mount_mountable, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);

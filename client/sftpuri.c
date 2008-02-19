@@ -147,10 +147,8 @@ g_vfs_uri_mapper_sftp_class_finalize (GVfsUriMapperSftpClass *klass)
 static void
 g_vfs_uri_mapper_sftp_class_init (GVfsUriMapperSftpClass *class)
 {
-  GObjectClass *object_class;
   GVfsUriMapperClass *mapper_class;
   
-  object_class = (GObjectClass *) class;
   mapper_class = G_VFS_URI_MAPPER_CLASS (class);
   mapper_class->get_handled_schemes = sftp_get_handled_schemes;
   mapper_class->from_uri = sftp_from_uri;

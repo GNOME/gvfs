@@ -269,10 +269,8 @@ g_vfs_uri_mapper_smb_class_finalize (GVfsUriMapperSmbClass *klass)
 static void
 g_vfs_uri_mapper_smb_class_init (GVfsUriMapperSmbClass *class)
 {
-  GObjectClass *object_class;
   GVfsUriMapperClass *mapper_class;
   
-  object_class = (GObjectClass *) class;
   mapper_class = G_VFS_URI_MAPPER_CLASS (class);
   mapper_class->get_handled_schemes = smb_get_handled_schemes;
   mapper_class->from_uri = smb_from_uri;

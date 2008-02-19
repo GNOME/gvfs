@@ -38,7 +38,7 @@ struct _GDaemonVolumeMonitor {
   GList *mounts;
 };
 
-G_DEFINE_DYNAMIC_TYPE (GDaemonVolumeMonitor, g_daemon_volume_monitor, G_TYPE_VOLUME_MONITOR);
+G_DEFINE_DYNAMIC_TYPE (GDaemonVolumeMonitor, g_daemon_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
 static GList *
 get_mounts (GVolumeMonitor *volume_monitor)

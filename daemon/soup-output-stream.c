@@ -30,7 +30,7 @@
 #include "soup-output-stream.h"
 #include "soup-input-stream.h"
 
-G_DEFINE_TYPE (SoupOutputStream, soup_output_stream, G_TYPE_OUTPUT_STREAM);
+G_DEFINE_TYPE (SoupOutputStream, soup_output_stream, G_TYPE_OUTPUT_STREAM)
 
 typedef void (*SoupOutputStreamCallback) (GOutputStream *);
 
@@ -266,7 +266,7 @@ soup_output_stream_write (GOutputStream  *stream,
   return count;
 }
 
-static gboolean
+static int
 soup_output_stream_close (GOutputStream  *stream,
 			  GCancellable   *cancellable,
 			  GError        **error)

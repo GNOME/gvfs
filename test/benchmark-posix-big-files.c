@@ -62,10 +62,8 @@ static gchar *
 create_file (const gchar *base_dir)
 {
   gchar         *scratch_file;
-  gchar         *scratch_name;
   gint           output_fd;
   gint           pid;
-  GError        *error = NULL;
   gchar          buffer [BUFFER_SIZE];
   gint           i;
 
@@ -110,7 +108,6 @@ static void
 read_file (const gchar *scratch_file)
 {
   gint          input_fd;
-  GError       *error = NULL;
   gint          i;
 
   input_fd = open (scratch_file, O_RDONLY);
@@ -146,8 +143,6 @@ read_file (const gchar *scratch_file)
 static void
 delete_file (const gchar *scratch_file)
 {
-  GError *error = NULL;
-
   if (unlink (scratch_file) < 0)
     {
       g_printerr ("Failed to delete scratch file: %s\n", strerror (errno));

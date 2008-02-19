@@ -743,10 +743,11 @@ g_daemon_file_input_stream_skip (GInputStream *stream,
 				 GCancellable *cancellable,
 				 GError      **error)
 {
+#if 0
   GDaemonFileInputStream *file;
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
-  
+#endif  
   /* TODO: implement skip */
   g_assert_not_reached ();
   
@@ -1237,10 +1238,6 @@ g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
 				       GCancellable         *cancellable,
 				       GError              **error)
 {
-  GDaemonFileInputStream *file;
-
-  file = G_DAEMON_FILE_INPUT_STREAM (stream);
-
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "%s", _("The query info operation is not supported"));
   
   return NULL;
@@ -1502,7 +1499,6 @@ g_daemon_file_input_stream_read_async  (GInputStream        *stream,
 					gpointer            user_data)
 {
   GDaemonFileInputStream *file;
-  AsyncIterator *iterator;
   ReadOperation *op;
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
@@ -1516,8 +1512,6 @@ g_daemon_file_input_stream_read_async  (GInputStream        *stream,
   op->buffer = buffer;
   op->buffer_size = count;
 
-  iterator = g_new0 (AsyncIterator, 1);
-  
   run_async_state_machine (file,
 			   (state_machine_iterator)iterate_read_state_machine,
 			   op,
@@ -1628,7 +1622,6 @@ g_daemon_file_input_stream_close_async (GInputStream       *stream,
 					gpointer            data)
 {
   GDaemonFileInputStream *file;
-  AsyncIterator *iterator;
   CloseOperation *op;
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
@@ -1636,8 +1629,6 @@ g_daemon_file_input_stream_close_async (GInputStream       *stream,
   op = g_new0 (CloseOperation, 1);
   op->state = CLOSE_STATE_INIT;
 
-  iterator = g_new0 (AsyncIterator, 1);
-  
   run_async_state_machine (file,
 			   (state_machine_iterator)iterate_close_state_machine,
 			   op, io_priority,

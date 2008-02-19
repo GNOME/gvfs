@@ -77,7 +77,7 @@ struct _GVfsBackendSmb
   SMBCSRV *cached_server;
 };
 
-G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_VFS_TYPE_BACKEND)
 
 static void
 g_vfs_backend_smb_finalize (GObject *object)

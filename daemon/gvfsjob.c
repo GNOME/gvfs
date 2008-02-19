@@ -34,7 +34,7 @@
 #include "gvfsjob.h"
 #include "gvfsjobsource.h"
 
-G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT);
+G_DEFINE_TYPE (GVfsJob, g_vfs_job, G_TYPE_OBJECT)
 
 /* TODO: Real P_() */
 #define P_(_x) (_x)

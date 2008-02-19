@@ -40,15 +40,11 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 
-G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_VFS_TYPE_BACKEND);
+G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_VFS_TYPE_BACKEND)
 
 static void
 g_vfs_backend_test_finalize (GObject *object)
 {
-  GVfsBackendTest *backend;
-
-  backend = G_VFS_BACKEND_TEST (object);
-  
   if (G_OBJECT_CLASS (g_vfs_backend_test_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_test_parent_class)->finalize) (object);
 }
@@ -196,7 +192,7 @@ try_read (GVfsBackend *backend,
 {
   guint tag;
 
-  g_print ("read (%"G_GSSIZE_FORMAT")\n", bytes_requested);
+  g_print ("read (%"G_GSIZE_FORMAT")\n", bytes_requested);
 
   tag = g_timeout_add (0, read_idle_cb, job);
   G_VFS_JOB (job)->backend_data = GINT_TO_POINTER (tag);
@@ -216,7 +212,7 @@ do_seek_on_read (GVfsBackend *backend,
   int fd;
   off_t final_offset;
 
-  g_print ("seek_on_read (%d, %d)\n", (int)offset, type);
+  g_print ("seek_on_read (%d, %u)\n", (int)offset, type);
 
   switch (type)
     {

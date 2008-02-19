@@ -59,7 +59,6 @@ prompt_for (const char *prompt, const char *default_value, gboolean echo)
 #ifdef HAVE_TERMIOS_H
   struct termios term_attr; 
   int old_flags;
-  int res;
   gboolean restore_flags;
 #endif
   char data[256];
@@ -74,7 +73,7 @@ prompt_for (const char *prompt, const char *default_value, gboolean echo)
 
 #ifdef HAVE_TERMIOS_H
   restore_flags = FALSE;
-  if (!echo && (res = tcgetattr (STDIN_FILENO, &term_attr)) == 0)
+  if (!echo && tcgetattr (STDIN_FILENO, &term_attr) == 0)
     {
       old_flags = term_attr.c_lflag; 
       term_attr.c_lflag &= ~ECHO;

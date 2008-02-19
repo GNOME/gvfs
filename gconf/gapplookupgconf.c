@@ -56,10 +56,6 @@ G_DEFINE_DYNAMIC_TYPE_EXTENDED (GAppLookupGConf, g_app_lookup_gconf, G_TYPE_OBJE
 static void
 g_app_lookup_gconf_finalize (GObject *object)
 {
-  GAppLookupGConf *lookup;
-
-  lookup = G_APP_LOOKUP_GCONF (object);
-  
   if (G_OBJECT_CLASS (g_app_lookup_gconf_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_app_lookup_gconf_parent_class)->finalize) (object);
 }
@@ -70,7 +66,6 @@ g_app_lookup_gconf_constructor (GType                  type,
                                 GObjectConstructParam *construct_properties)
 {
   GObject *object;
-  GAppLookupGConf *lookup;
   GAppLookupGConfClass *klass;
   GObjectClass *parent_class;  
 
@@ -82,8 +77,6 @@ g_app_lookup_gconf_constructor (GType                  type,
   object = parent_class->constructor (type,
                                       n_construct_properties,
                                       construct_properties);
-
-  lookup = G_APP_LOOKUP_GCONF (object);
 
   return object;
 }

@@ -129,7 +129,7 @@ g_hal_volume_init (GHalVolume *hal_volume)
 {
 }
 
-const static struct {
+static const struct {
   const char *disc_type;
   const char *icon_name;
   char *ui_name;
@@ -152,7 +152,7 @@ const static struct {
   {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
   {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
   {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
-  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")},
+  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")}
 };
 
 static const char *

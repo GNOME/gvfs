@@ -33,7 +33,7 @@
 #include "gvfsjobseekwrite.h"
 #include "gvfsdaemonutils.h"
 
-G_DEFINE_TYPE (GVfsJobSeekWrite, g_vfs_job_seek_write, G_VFS_TYPE_JOB);
+G_DEFINE_TYPE (GVfsJobSeekWrite, g_vfs_job_seek_write, G_VFS_TYPE_JOB)
 
 static void     run        (GVfsJob *job);
 static gboolean try        (GVfsJob *job);

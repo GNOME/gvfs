@@ -25,7 +25,7 @@
 #include <gmodule.h>
 #include "gvfsurimapper.h"
 
-G_DEFINE_DYNAMIC_TYPE (GVfsUriMapper, g_vfs_uri_mapper, G_TYPE_OBJECT);
+G_DEFINE_DYNAMIC_TYPE (GVfsUriMapper, g_vfs_uri_mapper, G_TYPE_OBJECT)
 
 void
 g_vfs_uri_mapper_register (GIOModule *module)

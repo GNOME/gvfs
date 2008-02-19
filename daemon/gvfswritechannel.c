@@ -28,7 +28,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <unistd.h>
 #include <fcntl.h>
 
 #include <glib.h>
@@ -61,10 +60,6 @@ static GVfsJob *write_channel_handle_request (GVfsChannel  *channel,
 static void
 g_vfs_write_channel_finalize (GObject *object)
 {
-  GVfsWriteChannel *write_channel;
-
-  write_channel = G_VFS_WRITE_CHANNEL (object);
-  
   if (G_OBJECT_CLASS (g_vfs_write_channel_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_write_channel_parent_class)->finalize) (object);
 }
@@ -144,7 +139,7 @@ write_channel_handle_request (GVfsChannel *channel,
     default:
       g_set_error (error, G_IO_ERROR,
 		   G_IO_ERROR_FAILED,
-		   "Unknown stream command %d\n", command);
+		   "Unknown stream command %"G_GINT32_FORMAT"\n", command);
       break;
     }
 
