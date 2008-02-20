@@ -825,7 +825,7 @@ handle_login (GVfsBackend *backend,
 				       "This happens when you log in to a computer the first time.\n\n"
 				       "The identity sent by the remote computer is %s. "
 				       "If you want to be absolutely sure it is safe to continue, "
-				       "contact the systema dministrator."),
+				       "contact the system administrator."),
 				     hostname ? hostname : op_backend->host, fingerprint);
 
 	  g_free (hostname);
