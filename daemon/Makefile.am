@@ -57,6 +57,12 @@ mount_DATA += cdda.mount
 libexec_PROGRAMS += gvfsd-cdda
 endif
 
+mount_in_files += network.mount.in
+if USE_GCONF
+mount_DATA += network.mount
+libexec_PROGRAMS += gvfsd-network
+endif
+
 EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files)
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
@@ -217,6 +223,20 @@ gvfsd_computer_CPPFLAGS = \
 	-DBACKEND_TYPES='"computer", G_VFS_TYPE_BACKEND_COMPUTER,'
 
 gvfsd_computer_LDADD = $(libraries)
+
+gvfsd_network_SOURCES = \
+	gvfsbackendnetwork.c gvfsbackendnetwork.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_network_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendnetwork.h \
+	-DDEFAULT_BACKEND_TYPE=network \
+	-DMAX_JOB_THREADS=1 \
+	$(GCONF_CFLAGS) \
+	-DBACKEND_TYPES='"network", G_VFS_TYPE_BACKEND_NETWORK,'
+
+gvfsd_network_LDADD = $(libraries) $(GCONF_LIBS)
 
 gvfsd_burn_SOURCES = \
 	gvfsbackendburn.c gvfsbackendburn.h \
