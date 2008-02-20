@@ -79,8 +79,10 @@ send_spawned (DBusConnection *connection, gboolean succeeded, char *error_messag
   if (spawner_id == NULL || spawner_path == NULL)
     {
       if (!succeeded)
-      g_printerr (_("Error: %s"), error_message);
-      g_printerr ("_\n");
+	{
+	  g_printerr (_("Error: %s"), error_message);
+	  g_printerr ("\n");
+	}
       return;
     }
   
