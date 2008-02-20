@@ -152,9 +152,10 @@ gvfsd_smb_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmb.h \
 	-DDEFAULT_BACKEND_TYPE=smb-share \
 	-DMAX_JOB_THREADS=1 \
+	$(GCONF_CFLAGS) \
 	-DBACKEND_TYPES='"smb-share", G_VFS_TYPE_BACKEND_SMB,'
 
-gvfsd_smb_LDADD = $(SAMBA_LIBS) $(libraries)
+gvfsd_smb_LDADD = $(SAMBA_LIBS) $(GCONF_LIBS) $(libraries)
 
 gvfsd_smb_browse_SOURCES = \
 	gvfsbackendsmbbrowse.c gvfsbackendsmbbrowse.h \
@@ -165,9 +166,10 @@ gvfsd_smb_browse_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendsmbbrowse.h \
 	-DMOUNTABLE_DBUS_NAME=org.gtk.vfs.mountpoint.smb_browse \
 	-DMAX_JOB_THREADS=1 \
+	$(GCONF_CFLAGS) \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
-gvfsd_smb_browse_LDADD = $(SAMBA_LIBS) $(libraries)
+gvfsd_smb_browse_LDADD = $(SAMBA_LIBS)  $(GCONF_LIBS) $(libraries)
 
 gvfsd_ftp_SOURCES = \
 	gvfsbackendftp.c gvfsbackendftp.h \

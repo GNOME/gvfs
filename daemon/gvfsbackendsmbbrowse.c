@@ -44,6 +44,16 @@
 #include "gmounttracker.h"
 #include <libsmbclient.h>
 
+#ifdef HAVE_GCONF
+#include <gconf/gconf-client.h>
+#endif
+
+/* We load a default workgroup from gconf */
+#define PATH_GCONF_GNOME_VFS_SMB_WORKGROUP "/system/smb/workgroup"
+
+/* The magic "default workgroup" hostname */
+#define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
+
 typedef struct {
   unsigned int smbc_type;
   char *name;
@@ -59,6 +69,7 @@ struct _GVfsBackendSmbBrowse
   char *user;
   char *domain;
   char *server;
+  char *mounted_server; /* server or DEFAULT_WORKGROUP_NAME */
   SMBCCTX *smb_context;
 
   GMutex *entries_lock;
@@ -66,6 +77,8 @@ struct _GVfsBackendSmbBrowse
   GList *entries;
   int entry_errno;
 };
+
+static char *default_workgroup = NULL;
 
 static GHashTable *server_cache = NULL;
 static GMountTracker *mount_tracker = NULL;
@@ -187,6 +200,7 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
 
   g_free (backend->user);
   g_free (backend->domain);
+  g_free (backend->mounted_server);
   g_free (backend->server);
   
   g_mutex_free (backend->entries_lock);
@@ -426,8 +440,6 @@ update_cache (GVfsBackendSmbBrowse *backend)
       g_string_append_c (uri, '/');
     }
   
-  g_print ("update_cache: %s\n", uri->str);
-
   dir = backend->smb_context->opendir (backend->smb_context, uri->str);
   g_string_free (uri, TRUE);
   if (dir == NULL)
@@ -447,8 +459,6 @@ update_cache (GVfsBackendSmbBrowse *backend)
 	{
 	  unsigned int dirlen;
 
-	  g_print ("type: %u, name: %s\n", dirp->smbc_type, dirp->name);
-	  
 	  if (dirp->smbc_type != SMBC_IPC_SHARE &&
 	      dirp->smbc_type != SMBC_COMMS_SHARE &&
 	      dirp->smbc_type != SMBC_PRINTER_SHARE &&
@@ -458,8 +468,6 @@ update_cache (GVfsBackendSmbBrowse *backend)
 	      BrowseEntry *entry = g_new (BrowseEntry, 1);
 	      gboolean valid_utf8;
 
-	      g_print ("added %s to cache\n", dirp->name);
-	      
 	      entry->smbc_type = dirp->smbc_type;
 	      entry->name = g_strdup (dirp->name);
 	      entry->name_utf8 = smb_name_to_utf8 (dirp->name, &valid_utf8);
@@ -621,8 +629,6 @@ do_mount (GVfsBackend *backend,
   char *icon;
   GMountSpec *browse_mount_spec;
 
-  g_print ("do_mount\n");
-  
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
     {
@@ -643,6 +649,11 @@ do_mount (GVfsBackend *backend,
   smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
   smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
   smb_context->callbacks.purge_cached_fn      = purge_cached;
+
+  /* libsmbclient frees this on it's own, so make sure 
+   * to use simple system malloc */
+  if (default_workgroup != NULL)
+    smb_context->workgroup = strdup (default_workgroup);
   
   smb_context->flags = 0;
   
@@ -670,6 +681,13 @@ do_mount (GVfsBackend *backend,
 
   op_backend->smb_context = smb_context;
 
+  /* Convert DEFAULT_WORKGROUP_NAME to real domain */
+  if (op_backend->mounted_server != NULL &&
+      g_ascii_strcasecmp (op_backend->mounted_server, DEFAULT_WORKGROUP_NAME) == 0)
+    op_backend->server = g_strdup (smb_context->workgroup);
+  else
+    op_backend->server = g_strdup (op_backend->mounted_server);
+
   icon = NULL;
   if (op_backend->server == NULL)
     {
@@ -683,7 +701,7 @@ do_mount (GVfsBackend *backend,
 	 availible on a server (%s is the name of the server) */
       display_name = g_strdup_printf (_("Windows shares on %s"), op_backend->server);
       browse_mount_spec = g_mount_spec_new ("smb-server");
-      g_mount_spec_set (browse_mount_spec, "server", op_backend->server);
+      g_mount_spec_set (browse_mount_spec, "server", op_backend->mounted_server);
       icon = "network-server";
     }
 
@@ -701,7 +719,6 @@ do_mount (GVfsBackend *backend,
   g_mount_spec_unref (browse_mount_spec);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  g_print ("finished mount\n");
 }
 
 static gboolean
@@ -715,8 +732,6 @@ try_mount (GVfsBackend *backend,
   const char *server;
   const char *user, *domain;
 
-  g_print ("try_mount\n");
-  
   if (strcmp (g_mount_spec_get_type (mount_spec), "smb-network") == 0)
     server = NULL;
   else
@@ -733,7 +748,7 @@ try_mount (GVfsBackend *backend,
 
   user = g_mount_spec_get (mount_spec, "user");
   domain = g_mount_spec_get (mount_spec, "domain");
-  
+
   if (is_automount &&
       ((user != NULL) || (domain != NULL)))
     {
@@ -745,7 +760,7 @@ try_mount (GVfsBackend *backend,
   
   op_backend->user = g_strdup (user);
   op_backend->domain = g_strdup (domain);
-  op_backend->server = g_strdup (server);
+  op_backend->mounted_server = g_strdup (server);
   
   return FALSE;
 }
@@ -1158,6 +1173,9 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
+#ifdef HAVE_GCONF
+  GConfClient *gclient;
+#endif
   
   gobject_class->finalize = g_vfs_backend_smb_browse_finalize;
 
@@ -1174,4 +1192,23 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
   backend_class->try_query_info = try_query_info;
   backend_class->enumerate = do_enumerate;
   backend_class->try_enumerate = try_enumerate;
+
+#ifdef HAVE_GCONF
+  gclient = gconf_client_get_default ();
+  if (gclient)
+    {
+      char *workgroup;
+      
+      workgroup = gconf_client_get_string (gclient, 
+					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
+
+      if (workgroup && workgroup[0])
+	default_workgroup = workgroup;
+      else
+	g_free (workgroup);
+      
+      g_object_unref (gclient);
+    }
+#endif
+
 }

@@ -48,6 +48,13 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 
+#ifdef HAVE_GCONF
+#include <gconf/gconf-client.h>
+#endif
+
+/* We load a default workgroup from gconf */
+#define PATH_GCONF_GNOME_VFS_SMB_WORKGROUP "/system/smb/workgroup"
+
 #include <libsmbclient.h>
 
 struct _GVfsBackendSmb
@@ -76,6 +83,8 @@ struct _GVfsBackendSmb
   char *cached_username;
   SMBCSRV *cached_server;
 };
+
+static char *default_workgroup = NULL;
 
 G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_VFS_TYPE_BACKEND)
 
@@ -442,6 +451,11 @@ do_mount (GVfsBackend *backend,
   smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
   smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
   smb_context->callbacks.purge_cached_fn      = purge_cached;
+ 
+  /* libsmbclient frees this on it's own, so make sure 
+   * to use simple system malloc */
+  if (default_workgroup != NULL)
+    smb_context->workgroup = strdup (default_workgroup);
   
   smb_context->flags = 0;
   
@@ -1746,6 +1760,9 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
+#ifdef HAVE_GCONF
+  GConfClient *gclient;
+#endif
   
   gobject_class->finalize = g_vfs_backend_smb_finalize;
 
@@ -1769,4 +1786,23 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->make_directory = do_make_directory;
   backend_class->move = do_move;
   backend_class->try_query_settable_attributes = try_query_settable_attributes;
+
+#ifdef HAVE_GCONF
+  gclient = gconf_client_get_default ();
+  if (gclient)
+    {
+      char *workgroup;
+      
+      workgroup = gconf_client_get_string (gclient, 
+					   PATH_GCONF_GNOME_VFS_SMB_WORKGROUP, NULL);
+
+      if (workgroup && workgroup[0])
+	default_workgroup = workgroup;
+      else
+	g_free (workgroup);
+      
+      g_object_unref (gclient);
+    }
+#endif
+
 }

@@ -1,5 +1,15 @@
 2008-02-20  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/Makefile.am:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsbackendsmbbrowse.c:
+	If gconf availible, initialize default workgroup
+	from gconf.
+	Handle X-GNOME-DEFAULT-WORKGROUP special case
+	to list the current workgroup
+
+2008-02-20  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/daemon-main.c (send_spawned):
 	Fix "_" spew.
 	
