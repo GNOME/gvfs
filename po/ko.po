@@ -1,0 +1,1142 @@
+# gvfs korean translation.
+# This file is distributed under the same license as the gvfs package.
+# Young-Ho Cha <ganadist@gmail.com>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs 0.1.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-02-19 14:23+0900\n"
+"PO-Revision-Date: 2008-02-20 09:58+0900\n"
+"Last-Translator: Young-Ho Cha <ganadist@gmail.com>\n"
+"Language-Team: GNOME Korea <gnome-kr-hackers@lists.kldp.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1878
+msgid "Operation not supported, files on different mounts"
+msgstr "동작이 지원되지 않습니 파일들이 각각 다른 다"
+
+#: ../client/gdaemonfile.c:761
+msgid "Invalid return value from get_info"
+msgstr "get_info에서 잘못된 반환값"
+
+#: ../client/gdaemonfile.c:790
+msgid "Invalid return value from query_info"
+msgstr "query_info에서 잘못된 반환값"
+
+#: ../client/gdaemonfile.c:868
+msgid "Couldn't get stream file descriptor"
+msgstr "파일 기술자 스트림을 얻을 수 없습니다"
+
+#: ../client/gdaemonfile.c:900 ../client/gdaemonfile.c:970
+#: ../client/gdaemonfile.c:1029 ../client/gdaemonfile.c:1088
+#: ../client/gdaemonfile.c:1150
+msgid "Invalid return value from open"
+msgstr "열기에서 잘못된 반환값"
+
+#: ../client/gdaemonfile.c:980 ../client/gdaemonfile.c:1039
+#: ../client/gdaemonfile.c:1098 ../client/gdaemonfile.c:1160
+msgid "Didn't get stream file descriptor"
+msgstr "파일 기술자 스트림을 얻을 수 없습니다"
+
+#: ../client/gdaemonfile.c:1212 ../client/gdaemonfile.c:1229
+msgid "Invalid return value from call"
+msgstr "호출에서 잘못된 반환값"
+
+#: ../client/gdaemonfile.c:1508
+msgid "Invalid return value from get_filesystem_info"
+msgstr "get_filesystem_info에서 잘못된 반환값"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1547
+msgid "Could not find enclosing mount"
+msgstr "둘러싸인 마운트를 찾을 수 없습니다"
+
+#: ../client/gdaemonfile.c:1577
+#, c-format
+msgid "Invalid filename %s"
+msgstr "잘못된 파일이름 %s"
+
+#: ../client/gdaemonfile.c:1619
+msgid "Invalid return value from query_filesystem_info"
+msgstr "query_filesystem_info에서 잘못된 반환값"
+
+#: ../client/gdaemonfile.c:2027
+msgid "Invalid return value from monitor_dir"
+msgstr "monitor_dir에서 잘못된 반환값"
+
+#: ../client/gdaemonfile.c:2076
+msgid "Invalid return value from monitor_file"
+msgstr "monitor_file에서 잘못된 반환값"
+
+#: ../client/gdaemonfileinputstream.c:451
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1307
+#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileoutputstream.c:403
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1051
+#: ../client/gdaemonfileoutputstream.c:1061
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "스트림 프로토콜의 오류: %s"
+
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1061
+msgid "End of stream"
+msgstr "스트림의 끝"
+
+#: ../client/gdaemonfileinputstream.c:519
+#: ../client/gdaemonfileinputstream.c:676
+#: ../client/gdaemonfileinputstream.c:784
+#: ../client/gdaemonfileinputstream.c:1035
+#: ../client/gdaemonfileoutputstream.c:460
+#: ../client/gdaemonfileoutputstream.c:639
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:963
+#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:298
+msgid "Operation was cancelled"
+msgstr "동작이 취소되었습니다"
+
+#: ../client/gdaemonfileinputstream.c:1210
+#: ../client/gdaemonfileoutputstream.c:946
+msgid "Seek not supported on stream"
+msgstr "스트림에서 찾기가 지원되지 않습니다"
+
+#: ../client/gdaemonfileinputstream.c:1244
+msgid "The query info operation is not supported"
+msgstr "정보 잘의 동작이 지원되지 않습니다"
+
+#: ../client/gdaemonvfs.c:603
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "마운트 정보를 얻는 중 오류: %s"
+
+#: ../client/gvfsdaemondbus.c:559 ../client/gvfsdaemondbus.c:946
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "데몬에 연결하는 데 오류: %s"
+
+#: ../common/gsysutils.c:127
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "소켓을 만드는 데 오류: %s"
+
+#: ../common/gsysutils.c:165
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "소켓에 연결하는 데 오류: %s"
+
+#: ../common/gvfsdaemonprotocol.c:515
+msgid "Invalid file info format"
+msgstr "잘못된 파일 정보 형식"
+
+#: ../common/gvfsdaemonprotocol.c:532
+msgid "Invalid attribute info list content"
+msgstr "잘못된 속성 정보 목록 내용"
+
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr "D-Bus에 연결하는 데 오류: %s"
+
+#: ../daemon/daemon-main.c:82
+#, c-format
+msgid "Error: %s"
+msgstr "오류: %s"
+
+#: ../daemon/daemon-main.c:115
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "사용법: %s --spawner dbus-id object_path"
+
+#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "사용법: %s 키=값 키=값 ..."
+
+#: ../daemon/daemon-main.c:155
+#, c-format
+msgid "No mount type specified"
+msgstr "마운트 형식이 지정되지 않았습니다"
+
+#: ../daemon/daemon-main.c:225
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "%s의 마운트 위치에 이미 실행중입니다"
+
+#: ../daemon/daemon-main.c:236
+msgid "error starting mount daemon"
+msgstr "마운트 데몬 시작하는 데 오류"
+
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:347
+msgid "Burn"
+msgstr "굽기"
+
+#: ../daemon/gvfsbackendburn.c:377
+msgid "Unable to create temporary directory"
+msgstr "임시 디렉토리를 만들 수 없습니다"
+
+#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
+#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
+#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
+#: ../daemon/gvfsbackendburn.c:784
+msgid "No such file or directory"
+msgstr "그런 파일이나 디렉토리가 없습니다"
+
+#: ../daemon/gvfsbackendburn.c:426
+msgid "Directory not empty"
+msgstr "디렉토리가 비어있지 않습니다"
+
+#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:898
+msgid "Can't copy file over directory"
+msgstr "디렉토리에 파일을 복사할 수 없습니다"
+
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "CD/DVD 굽기"
+
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+msgid "The file is not a directory"
+msgstr "파일이 디렉토리가 아닙니다"
+
+#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
+#: ../daemon/gvfsbackendburn.c:918
+msgid "File exists"
+msgstr "파일이 있습니다"
+
+#: ../daemon/gvfsbackendburn.c:846
+msgid "No such file or directory in target path"
+msgstr "해당 경로에 파일이나 디렉토리가 없습니다"
+
+#: ../daemon/gvfsbackendburn.c:869
+msgid "Can't copy directory over directory"
+msgstr "디렉토리에 디렉토리를 복사할 수 없습니다"
+
+#: ../daemon/gvfsbackendburn.c:878
+msgid "Target file exists"
+msgstr "해당 파일이 있습니다"
+
+#: ../daemon/gvfsbackendburn.c:885
+msgid "Can't recursively copy directory"
+msgstr "디렉토리를 되풀이해서 복사할 수 없습니다"
+
+#: ../daemon/gvfsbackendburn.c:944
+msgid "Not supported"
+msgstr "지원되지 않음"
+
+#: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
+msgid "No drive specified"
+msgstr "드라이브가 지정되지 않음"
+
+#: ../daemon/gvfsbackendcdda.c:157
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "드라이브 %s(을)를 찾을 수 없습니다"
+
+#: ../daemon/gvfsbackendcdda.c:167
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "드라이브 %s에 음악 파일이 포함되지 않았습니다"
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:174
+#, c-format
+msgid "Audio Disc on %s"
+msgstr "%s의 음악 디스크"
+
+#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:682
+#: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
+#, c-format
+msgid "Audio Disc"
+msgstr "음악 디스크"
+
+#: ../daemon/gvfsbackendcdda.c:236
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "파일시스템이 사용 중입니다: %d개의 파일이 열림"
+
+#: ../daemon/gvfsbackendcdda.c:429
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "드라이브 %2$s에 %1$s 같은 파일이 없습니다"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:538
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr "드라이브 %s에서 'paranoia'의 오류"
+
+#: ../daemon/gvfsbackendcdda.c:601
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "드라이브 %s에서 스트림 찾는데 오류"
+
+#: ../daemon/gvfsbackendcdda.c:698
+#, c-format
+msgid "No such file"
+msgstr "그런 파일이 없습니다"
+
+#: ../daemon/gvfsbackendcdda.c:705
+#, c-format
+msgid "The file does not exist"
+msgstr "파일이 없습니다"
+
+#: ../daemon/gvfsbackendcdda.c:712
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "파일이 없거나 음악 트랙이 아닙니다."
+
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
+msgid "Computer"
+msgstr "컴퓨터"
+
+#: ../daemon/gvfsbackendcomputer.c:465
+msgid "Filesystem"
+msgstr "파일시스템"
+
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:786
+#: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
+#: ../daemon/gvfsbackendsmbbrowse.c:1098
+msgid "File doesn't exist"
+msgstr "파일이 없습니다"
+
+#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:634
+msgid "Can't open directory"
+msgstr "디렉토리를 열 수 없습니다"
+
+#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:731
+msgid "Can't open mountable file"
+msgstr "마운트 가능한 파일을 열 수 없습니다"
+
+#: ../daemon/gvfsbackendcomputer.c:779
+#, c-format
+msgid "Internal error: %s"
+msgstr "내부 오류: %s"
+
+#: ../daemon/gvfsbackendcomputer.c:803 ../daemon/gvfsbackendcomputer.c:869
+#: ../daemon/gvfsbackendcomputer.c:969
+msgid "Not a mountable file"
+msgstr "마운트 할 수 없는 파일"
+
+#: ../daemon/gvfsbackendcomputer.c:826
+msgid "Can't mount file"
+msgstr "파일을 마운트할 수 없습니다"
+
+#: ../daemon/gvfsbackendcomputer.c:884
+msgid "Can't unmount file"
+msgstr "파일을 마운트 해제할 수 없습니다"
+
+#: ../daemon/gvfsbackendcomputer.c:1000
+msgid "Can't eject file"
+msgstr "파일을 꺼낼 수 없습니다"
+
+#: ../daemon/gvfsbackenddav.c:253 ../daemon/gvfsbackenddav.c:883
+#: ../daemon/gvfsbackendhttp.c:172
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "HTTP 오류: %s"
+
+#: ../daemon/gvfsbackenddav.c:269
+msgid "Could not parse response"
+msgstr "응답을 분석할 수 없습니다"
+
+#: ../daemon/gvfsbackenddav.c:278
+msgid "Empty response"
+msgstr "비어있는 응답"
+
+#: ../daemon/gvfsbackenddav.c:285
+msgid "Unexpected reply from server"
+msgstr "서버에서 예측하지 못한 응답"
+
+#: ../daemon/gvfsbackenddav.c:797
+msgid "Please enter proxy password"
+msgstr "프록시 비밀번호를 입력하십시오"
+
+#: ../daemon/gvfsbackenddav.c:806
+msgid "WebDAV share"
+msgstr "웹 공유"
+
+#: ../daemon/gvfsbackenddav.c:808
+#, c-format
+msgid "Enter password for %s"
+msgstr "%s의 비밀번호를 입력하십시오"
+
+#: ../daemon/gvfsbackenddav.c:887
+msgid "Not a WebDAV enabled share"
+msgstr "웹 공유 디렉토리가 아닙니다"
+
+#: ../daemon/gvfsbackenddav.c:950 ../daemon/gvfsbackendhttp.c:241
+#: ../daemon/gvfsbackendsmb.c:543
+msgid "Invalid mount spec"
+msgstr "잘못된 마운트 spec 파일"
+
+#: ../daemon/gvfsbackenddav.c:1039
+msgid "Response invalid"
+msgstr "잘못된 응답"
+
+#: ../daemon/gvfsbackenddav.c:1067 ../daemon/gvfsbackenddav.c:1176
+msgid "Could not create request"
+msgstr "요청을 만들 수 없습니다"
+
+#: ../daemon/gvfsbackenddav.c:1224 ../daemon/gvfsbackendsmb.c:1675
+msgid "Target file already exists"
+msgstr "해당 파일이 이미 있습니다"
+
+#: ../daemon/gvfsbackenddav.c:1294 ../daemon/gvfsbackendsftp.c:2457
+#: ../daemon/gvfsbackendsmb.c:931
+msgid "The file was externally modified"
+msgstr "파일이 외부에서 수정되었습니다"
+
+#: ../daemon/gvfsbackenddav.c:1325 ../daemon/gvfsbackendsmb.c:969
+#: ../daemon/gvfsbackendsmb.c:1692
+msgid "Backup file creation failed"
+msgstr "예비 파일 만드는데 실패했습니다"
+
+#: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1188
+msgid "No hostname specified"
+msgstr "호스트 이름이 지정되지 않았습니다"
+
+#: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:634
+#: ../daemon/gvfsbackendsmb.c:1065
+msgid "Unsupported seek type"
+msgstr "지원하지 않는 찾기 형식"
+
+#: ../daemon/gvfsbackendhttp.c:168
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "HTTP 클라이언트 오류: %s"
+
+#: ../daemon/gvfsbackendhttp.c:506 ../daemon/gvfsbackendsftp.c:1519
+#: ../daemon/gvfsbackendsmb.c:1178 ../daemon/gvfsbackendtrash.c:959
+msgid " (invalid encoding)"
+msgstr " (잘못된 인코딩)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr "디렉토리 알림이 지원되지 않습니다"
+
+#: ../daemon/gvfsbackendsftp.c:250
+msgid "ssh program unexpectedly exited"
+msgstr "ssh 프로그램이 예상치 않게 종료되었습니다"
+
+#: ../daemon/gvfsbackendsftp.c:258
+msgid "Permission denied"
+msgstr "허가권이 거부되었습니다"
+
+#: ../daemon/gvfsbackendsftp.c:265
+msgid "Hostname not known"
+msgstr "호스트 이름을 알 수 없습니다"
+
+#: ../daemon/gvfsbackendsftp.c:272
+msgid "No route to host"
+msgstr "호스트의 경로를 찾을 수 없습니다"
+
+#: ../daemon/gvfsbackendsftp.c:279
+msgid "Connection refused by server"
+msgstr "서버에서 연결이 거부되었습니다"
+
+#: ../daemon/gvfsbackendsftp.c:286
+msgid "Host key verification failed"
+msgstr "호스트 키 확인이 실패했습니다"
+
+#: ../daemon/gvfsbackendsftp.c:371
+msgid "Unable to spawn ssh program"
+msgstr "ssh프로그램을 실행할 수 없습니다"
+
+#: ../daemon/gvfsbackendsftp.c:387
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "ssh프로그램을 실행할 수 없습니다: %s"
+
+#: ../daemon/gvfsbackendsftp.c:490 ../daemon/gvfsbackendsftp.c:648
+msgid "Timed out when logging in"
+msgstr "로그인 할 때 시간제한이 걸렸습니다"
+
+#: ../daemon/gvfsbackendsftp.c:709
+msgid "Enter passphrase for key"
+msgstr "ssh키 비밀번호를 입력하십시오"
+
+#: ../daemon/gvfsbackendsftp.c:711
+msgid "Enter password"
+msgstr "비밀번호를 입력하십시오"
+
+#: ../daemon/gvfsbackendsftp.c:724
+msgid "Password dialog cancelled"
+msgstr "비밀번호 입력 대화상자가 취소되었습니다"
+
+#: ../daemon/gvfsbackendsftp.c:748
+msgid "Can't send password"
+msgstr "비밀번호를 보낼 수 없습니다"
+
+#: ../daemon/gvfsbackendsftp.c:1114 ../daemon/gvfsbackendsftp.c:1137
+msgid "Protocol error"
+msgstr "프로토콜 오류"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1154
+#, c-format
+msgid "sftp on %s"
+msgstr "%s의 sftp"
+
+#: ../daemon/gvfsbackendsftp.c:1178
+msgid "Unable to find supported ssh command"
+msgstr "지원되는 ssh 명령을 찾을 수 없습니다"
+
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1531
+#, c-format
+msgid "/ on %s"
+msgstr "%s의 /"
+
+#: ../daemon/gvfsbackendsftp.c:1595
+msgid "File is directory"
+msgstr "파일이 디렉토리입니다"
+
+#: ../daemon/gvfsbackendsftp.c:1604
+msgid "Failure"
+msgstr "실패"
+
+#: ../daemon/gvfsbackendsftp.c:1669 ../daemon/gvfsbackendsftp.c:1731
+#: ../daemon/gvfsbackendsftp.c:1742 ../daemon/gvfsbackendsftp.c:1800
+#: ../daemon/gvfsbackendsftp.c:1890 ../daemon/gvfsbackendsftp.c:1919
+#: ../daemon/gvfsbackendsftp.c:1967 ../daemon/gvfsbackendsftp.c:2046
+#: ../daemon/gvfsbackendsftp.c:2157 ../daemon/gvfsbackendsftp.c:2198
+#: ../daemon/gvfsbackendsftp.c:2250 ../daemon/gvfsbackendsftp.c:2321
+#: ../daemon/gvfsbackendsftp.c:2341 ../daemon/gvfsbackendsftp.c:2495
+#: ../daemon/gvfsbackendsftp.c:2521 ../daemon/gvfsbackendsftp.c:2578
+#: ../daemon/gvfsbackendsftp.c:2637 ../daemon/gvfsbackendsftp.c:2919
+#: ../daemon/gvfsbackendsftp.c:3048 ../daemon/gvfsbackendsftp.c:3081
+#: ../daemon/gvfsbackendsftp.c:3182 ../daemon/gvfsbackendsftp.c:3223
+#: ../daemon/gvfsbackendsftp.c:3279 ../daemon/gvfsbackendsftp.c:3315
+#: ../daemon/gvfsbackendsftp.c:3349 ../daemon/gvfsbackendsftp.c:3364
+#: ../daemon/gvfsbackendsftp.c:3383
+msgid "Invalid reply received"
+msgstr "잘못된 응답을 받았습니다"
+
+#: ../daemon/gvfsbackendsftp.c:1988
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "예비 파일을 만드는 중 오류: %s"
+
+#: ../daemon/gvfsbackendsftp.c:2403
+msgid "Unable to create temporary file"
+msgstr "임시 파일을 만들 수 없습니다"
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:180
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "%2$s 의 %1$s에 연결하려면 비밀번호가 필요합니다"
+
+#: ../daemon/gvfsbackendsmb.c:430 ../daemon/gvfsbackendsmb.c:465
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "내부 오류 (%s)"
+
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendsmb.c:473 ../daemon/gvfsbackendsmb.c:1171
+#, c-format
+msgid "%s on %s"
+msgstr "%2$s 의 %1$s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:519
+msgid "Failed to mount Windows share"
+msgstr "윈도 공유를 마운트 하는데 실패했습니다"
+
+#: ../daemon/gvfsbackendsmb.c:1119
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "예비 파일을 만드는데 실패했습니다: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1576
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "파일을 지우는데 오류: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1640
+#, c-format
+msgid "Error moving file: %s"
+msgstr "파일을 옮기는 데 오류: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1664
+msgid "Can't move directory over directory"
+msgstr "디렉토리에 디렉토리를 옮길 수 없습니다"
+
+#: ../daemon/gvfsbackendsmb.c:1712
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "해당 파일을 지우는 데 오류: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1736
+msgid "Can't recursively move directory"
+msgstr "디렉토리를 되풀이해서 옮길 수 없습니다"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:676
+msgid "Windows Network"
+msgstr "윈도 네트워크"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:684
+#, c-format
+msgid "Windows shares on %s"
+msgstr "%s의 윈도 공유"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:781 ../daemon/gvfsbackendsmbbrowse.c:827
+msgid "The file is not a mountable"
+msgstr "파일을 마운트할 수 없습니다"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:849
+msgid "Not a regular file"
+msgstr "보통 파일이 아닙니다"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1094
+msgid "Not a directory"
+msgstr "디렉토리가 아닙니다"
+
+#. translators: This is the name of the backend
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:598 ../daemon/gvfsbackendtrash.c:1190
+msgid "Trash"
+msgstr "휴지통"
+
+#: ../daemon/gvfsbackendtrash.c:969
+#, c-format
+msgid "%s (in trash)"
+msgstr "(휴지통에 있는) %s"
+
+#: ../daemon/gvfsbackendtrash.c:1291
+msgid "Can't delete trash"
+msgstr "휴지통은 지울 수 없습니다"
+
+#: ../daemon/gvfsbackendtrash.c:1638 ../daemon/gvfsbackendtrash.c:1713
+msgid "Trash directory notification not supported"
+msgstr "휴지통 디렉토리 알림이 지원되지 않습니다"
+
+#: ../daemon/gvfsdaemon.c:1030
+msgid "Invalid backend type"
+msgstr "잘못된 백엔드 형식"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "fd를 보내는 데 오류: %s"
+
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:105 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "백엔드에서 지원하는 동작이 아닙니다"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "백엔드에서 symlink를 지원하지 않습니다"
+
+#: ../daemon/gvfsjobsetattribute.c:123
+msgid "Invalid dbus message"
+msgstr "잘못된 dbus 메세지"
+
+#: ../daemon/main.c:47
+msgid "Replace old daemon."
+msgstr "이전 데몬을 바꿉니다"
+
+#: ../daemon/main.c:48
+msgid "Don't start fuse."
+msgstr "fuse를 시작하지 않습니다"
+
+#: ../daemon/main.c:60
+msgid "GVFS Daemon"
+msgstr "GVFS 데몬"
+
+#: ../daemon/main.c:63
+msgid "Main daemon for GVFS"
+msgstr "GVFS 기본 데몬"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:74
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:135
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "더 많은 정보를 보려면 \"%s --help\"를 사용하십시오."
+
+#: ../daemon/mount.c:372
+msgid "Invalid arguments from spawned child"
+msgstr "생성된 자식에서 잘못된 인자"
+
+#: ../daemon/mount.c:662
+#, c-format
+msgid "Automount failed: %s"
+msgstr "자동 마운트 실패: %s"
+
+#: ../daemon/mount.c:707
+msgid "The specified location is not mounted"
+msgstr "지정한 위치는 마운트되지 않았습니다"
+
+#: ../daemon/mount.c:712
+msgid "The specified location is not supported"
+msgstr "지정한 위치가 지원되지 않습니다"
+
+#: ../daemon/mount.c:875
+msgid "Location is already mounted"
+msgstr "위치가 이미 마운트되어 있습니다"
+
+#: ../daemon/mount.c:883
+msgid "Location is not mountable"
+msgstr "위치가 마운트 가능하지 않습니다"
+
+#: ../hal/ghaldrive.c:135
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../hal/ghaldrive.c:137
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../hal/ghaldrive.c:139
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../hal/ghaldrive.c:143
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../hal/ghaldrive.c:145
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../hal/ghaldrive.c:147
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../hal/ghaldrive.c:149
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../hal/ghaldrive.c:151
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../hal/ghaldrive.c:153
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../hal/ghaldrive.c:156
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../hal/ghaldrive.c:159
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../hal/ghaldrive.c:161
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../hal/ghaldrive.c:163
+msgid "HDDVD-r"
+msgstr "HDDVD-r"
+
+#: ../hal/ghaldrive.c:165
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../hal/ghaldrive.c:167
+msgid "Blu-ray"
+msgstr "블루레이"
+
+#: ../hal/ghaldrive.c:169
+msgid "Blu-ray-R"
+msgstr "블루레이-R"
+
+#: ../hal/ghaldrive.c:171
+msgid "Blu-ray-RE"
+msgstr "블루레이-RE"
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../hal/ghaldrive.c:177
+#, c-format
+msgid "%s/%s Drive"
+msgstr "%s/%s 드라이브"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../hal/ghaldrive.c:183
+#, c-format
+msgid "%s Drive"
+msgstr "%s 드라이브"
+
+#: ../hal/ghaldrive.c:187
+msgid "Floppy Drive"
+msgstr "플로피 드라이브"
+
+#: ../hal/ghaldrive.c:193
+msgid "Software RAID Drive"
+msgstr "소프트웨어 레이드 드라이브"
+
+#: ../hal/ghaldrive.c:195
+msgid "USB Drive"
+msgstr "USB 드라이브"
+
+#: ../hal/ghaldrive.c:197
+msgid "ATA Drive"
+msgstr "ATA 드라이브"
+
+#: ../hal/ghaldrive.c:199
+msgid "SCSI Drive"
+msgstr "SCSI 드라이브"
+
+#: ../hal/ghaldrive.c:201
+msgid "FireWire Drive"
+msgstr "FireWire 드라이브"
+
+#: ../hal/ghaldrive.c:205
+msgid "Tape Drive"
+msgstr "테이프 드라이브"
+
+#: ../hal/ghaldrive.c:207
+msgid "CompactFlash Drive"
+msgstr "CF 드라이브"
+
+#: ../hal/ghaldrive.c:209
+msgid "MemoryStick Drive"
+msgstr "메모리스틱 드라이브"
+
+#: ../hal/ghaldrive.c:211
+msgid "SmartMedia Drive"
+msgstr "스마트미디어 드라이브"
+
+#: ../hal/ghaldrive.c:213
+msgid "SD/MMC Drive"
+msgstr "SD/MMC 드라이브"
+
+#: ../hal/ghaldrive.c:215
+msgid "Zip Drive"
+msgstr "Zip 드라이브"
+
+#: ../hal/ghaldrive.c:217
+msgid "Jaz Drive"
+msgstr "Jaz 드라이브"
+
+#: ../hal/ghaldrive.c:219
+msgid "Thumb Drive"
+msgstr "USB 메모리"
+
+#: ../hal/ghaldrive.c:222
+msgid "Mass Storage Drive"
+msgstr "대용량 저장장치 드라이브"
+
+#: ../hal/ghaldrive.c:634
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "미디어 꺼내기 실패: 미디어의 볼륨이 사용중입니다."
+
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+msgid "CD-ROM Disc"
+msgstr "CD-ROM 디스크"
+
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+msgid "Blank CD-ROM Disc"
+msgstr "빈 CD-ROM 디스크"
+
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+msgid "CD-R Disc"
+msgstr "CD-R 디스크"
+
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+msgid "Blank CD-R Disc"
+msgstr "빈 CD-R 디스크"
+
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+msgid "CD-RW Disc"
+msgstr "CD-RW 디스크"
+
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+msgid "Blank CD-RW Disc"
+msgstr "빈 CD-RW 디스크"
+
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
+#: ../hal/ghalvolume.c:143
+msgid "DVD-ROM Disc"
+msgstr "DVD-ROM 디스크"
+
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
+#: ../hal/ghalvolume.c:143
+msgid "Blank DVD-ROM Disc"
+msgstr "빈 DVD-ROM 디스크"
+
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+msgid "DVD-RAM Disc"
+msgstr "DVD-RAM 디스크"
+
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+msgid "Blank DVD-RAM Disc"
+msgstr "빈 DVD-RAM 디스크"
+
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+msgid "DVD-RW Disc"
+msgstr "DVD-RW 디스크"
+
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+msgid "Blank DVD-RW Disc"
+msgstr "빈 DVD-RW 디스크"
+
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+msgid "DVD+R Disc"
+msgstr "DVD+R 디스크"
+
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+msgid "Blank DVD+R Disc"
+msgstr "빈 DVD+R 디스크"
+
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+msgid "DVD+RW Disc"
+msgstr "DVD+RW 디스크"
+
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+msgid "Blank DVD+RW Disc"
+msgstr "빈 DVD+RW 디스크"
+
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL 디스크"
+
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+msgid "Blank DVD+R DL Disc"
+msgstr "빈 DVD+R DL 디스크"
+
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+msgid "Blu-Ray Disc"
+msgstr "블루레이 디스크"
+
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+msgid "Blank Blu-Ray Disc"
+msgstr "빈 블루레이 디스크"
+
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+msgid "Blu-Ray R Disc"
+msgstr "블루레이 R 디스크"
+
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+msgid "Blank Blu-Ray R Disc"
+msgstr "블루레이 R 디스크"
+
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+msgid "Blu-Ray RW Disc"
+msgstr "블루레이 RW 디스크"
+
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+msgid "Blank Blu-Ray RW Disc"
+msgstr "빈 블루레이 RW 디스크"
+
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+msgid "HD DVD Disc"
+msgstr "HD DVD 디스크"
+
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+msgid "Blank HD DVD Disc"
+msgstr "빈 HD DVD 디스크"
+
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+msgid "HD DVD-R Disc"
+msgstr "HD DVD-R 디스크"
+
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+msgid "Blank HD DVD-R Disc"
+msgstr "빈 HD DVD-R 디스크"
+
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+msgid "HD DVD-RW Disc"
+msgstr "HD DVD-RW 디스크"
+
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+msgid "Blank HD DVD-RW Disc"
+msgstr "빈 HD DVD-RW 디스크"
+
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+msgid "MO Disc"
+msgstr "광자기 디스크"
+
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+msgid "Blank MO Disc"
+msgstr "빈 광자기 디스크"
+
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+msgid "Disc"
+msgstr "디스크"
+
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+msgid "Blank Disc"
+msgstr "빈 디스크"
+
+#: ../hal/ghalmount.c:348
+#, c-format
+msgid "%.1f kB Media"
+msgstr "%.1f kB 미디어"
+
+#: ../hal/ghalmount.c:353
+#, c-format
+msgid "%.1f MB Media"
+msgstr "%.1f MB 미디어"
+
+#: ../hal/ghalmount.c:358
+#, c-format
+msgid "%.1f GB Media"
+msgstr "%.1f GB 미디어"
+
+#: ../hal/ghalmount.c:440 ../hal/ghalvolume.c:261
+msgid "Mixed Audio/Data Disc"
+msgstr "오디오와 데이터가 섞인 디스크"
+
+#: ../hal/ghalvolume.c:189
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kB"
+
+#: ../hal/ghalvolume.c:194
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: ../hal/ghalvolume.c:199
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:249
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s 암호화된 자료"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:272
+#, c-format
+msgid "%s Media"
+msgstr "%s 미디어"
+
+#: ../hal/ghalvolume.c:314
+msgid "Camera"
+msgstr "카메라"
+
+#: ../hal/ghalvolume.c:321
+#, c-format
+msgid "%s Camera"
+msgstr "%s 카메라"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:59
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: 파일 여는데 오류: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:82
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, 표준 출력으로 쓰는데 오류"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:94
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: 읽는 데 오류: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:112
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s:닫는 중 오류: %s\n"
+
+#: ../programs/gvfs-cat.c:138
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "LOCATION... - 위치에 있는 파일들을 합쳐서 표준출력으로 출력합니다."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:143
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+"지정한 위치의 파일을 합쳐서 표준출력으로 출력합니다. 전통적인 cat 도구처럼 "
+"동작합니다만, 로컬 파일대신 gvfs위치를 사용합니다: 합쳐질 파일 위치를 "
+"smb://server/resource/file.txt 같은 것으로 사용할 수 있습니다."
+
+#: ../programs/gvfs-cat.c:150
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+"알림: -n, -T, 등과 같은 형식 출력 옵션이 필요하면 파이프를 통해서 "
+"cat과 같이 실행하십시오."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:133
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: 위치를 입력하지 않았습니다"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:58
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: 위치 열기 오류: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:85
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: 프로그램 실행 오류: %s\n"
+
+#: ../programs/gvfs-open.c:115
+msgid "FILES... - open FILES with registered application."
+msgstr "FILES... - 등록된 프로그램으로 파일을 엽니다."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:119
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
+"파일의 형식을 처리하는 등록된 기본 프로그램으로 파일을 엽니다."
