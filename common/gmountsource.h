@@ -83,6 +83,25 @@ gboolean     g_mount_source_ask_password_finish       (GMountSource             
                                                        char                     **domain_out,
 						       GPasswordSave             *password_save_out);
 
+gboolean      g_mount_source_ask_question             (GMountSource              *mount_source,
+						       const char                *message,
+						       const char               **choices,
+						       gint                       n_choices,
+						       gboolean                  *aborted,
+						       gint                      *choice_out);
+
+void          g_mount_source_ask_question_async       (GMountSource              *mount_source,
+						       const char                *message,
+						       const char               **choices,
+						       gint                       n_choices,
+                                                       GAsyncReadyCallback        callback,
+                                                       gpointer                   user_data);
+
+gboolean     g_mount_source_ask_question_finish       (GMountSource              *source,
+                                                       GAsyncResult              *result,
+                                                       gboolean                  *aborted,
+						       gint                      *choice_out);
+
 
 const char *  g_mount_source_get_dbus_id              (GMountSource              *mount_source);
 const char *  g_mount_source_get_obj_path             (GMountSource              *mount_source);

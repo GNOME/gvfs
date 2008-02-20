@@ -601,6 +601,64 @@ read_data_buffer (GDataInputStream *stream)
 }
 
 static gboolean
+get_hostname_and_fingerprint_from_line (const gchar *buffer,
+                                        gchar      **hostname_out,
+                                        gchar      **fingerprint_out)
+{
+  gchar *pos;
+  gchar *startpos;
+  gchar *endpos;
+  gchar *hostname = NULL;
+  gchar *fingerprint = NULL;
+  
+  if (g_str_has_prefix (buffer, "The authenticity of host '"))
+    {
+      /* OpenSSH */
+      pos = strchr (&buffer[26], '\'');
+      if (pos == NULL)
+        return FALSE;
+
+      hostname = g_strndup (&buffer[26], pos - (&buffer[26]));
+
+      startpos = strstr (pos, " key fingerprint is ");
+      if (startpos == NULL)
+        {
+          g_free (hostname);
+          return FALSE;
+        }
+
+      startpos = startpos + 20;
+      endpos = strchr (startpos, '.');
+      if (endpos == NULL)
+        {
+          g_free (hostname);
+          return FALSE;
+        }
+      
+      fingerprint = g_strndup (startpos, endpos - startpos);
+    }
+  else if (strstr (buffer, "Key fingerprint:") != NULL)
+    {
+      /* SSH.com*/
+      startpos = strstr (buffer, "Key fingerprint:");
+      if (startpos == NULL)
+        {
+          g_free (hostname);
+          return FALSE;
+        }
+      
+      startpos = startpos + 18;
+      endpos = strchr (startpos, '\r');
+      fingerprint = g_strndup (startpos, endpos - startpos);
+    }
+
+  *hostname_out = hostname;
+  *fingerprint_out = fingerprint;
+
+  return TRUE;
+}
+
+static gboolean
 handle_login (GVfsBackend *backend,
               GMountSource *mount_source,
               int tty_fd, int stdout_fd, int stderr_fd,
@@ -753,8 +811,61 @@ handle_login (GVfsBackend *backend,
       else if (g_str_has_prefix (buffer, "The authenticity of host '") ||
                strstr (buffer, "Key fingerprint:") != NULL)
         {
-          /* TODO: Handle these messages */
-        }
+	  const gchar *choices[] = {_("Log In Anyway"), _("Cancel Login")};
+	  const gchar *v_choices = (const gchar *)choices;
+	  const gchar *choice_string;
+	  gchar *hostname = NULL;
+	  gchar *fingerprint = NULL;
+	  gint choice;
+	  gchar *message;
+
+	  get_hostname_and_fingerprint_from_line (buffer, &hostname, &fingerprint);
+
+	  message = g_strdup_printf (_("The identity of the remote computer (%s) is unknown.\n"
+				       "This happens when you log in to a computer the first time.\n\n"
+				       "The identity sent by the remote computer is %s. "
+				       "If you want to be absolutely sure it is safe to continue, "
+				       "contact the systema dministrator."),
+				     hostname ? hostname : op_backend->host, fingerprint);
+
+	  g_free (hostname);
+	  g_free (fingerprint);
+
+	  if (!g_mount_source_ask_question (mount_source,
+					    message,
+					    &v_choices,
+					    2,
+					    &aborted,
+					    &choice) || 
+	      aborted)
+	    {
+	      g_set_error (error,
+			   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+			   "%s", _("Login dialog cancelled"));
+	      g_free (message);
+	      ret_val = FALSE;
+	      break;
+	    }
+	  g_free (message); 
+
+	  choice_string = (choice == 0) ? "yes" : "no";
+	  if (!g_output_stream_write_all (reply_stream,
+					  choice_string,
+					  strlen (choice_string),
+					  &bytes_written,
+					  NULL, NULL) ||
+	      !g_output_stream_write_all (reply_stream,
+					  "\n", 1,
+					  &bytes_written,
+					  NULL, NULL))
+	    {
+	      g_set_error (error,
+			   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+			   "%s", _("Can't send host identity confirmation"));
+	      ret_val = FALSE;
+	      break;
+	    }
+	}
     }
   
   if (ret_val)

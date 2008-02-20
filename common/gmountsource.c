@@ -131,9 +131,9 @@ struct AskPasswordData {
   GPasswordSave  password_save;
 };
 
-typedef struct AskPasswordSyncData AskPasswordSyncData;
+typedef struct AskSyncData AskSyncData;
 
-struct AskPasswordSyncData {
+struct AskSyncData {
 
   /* For sync calls */
   GMutex *mutex;
@@ -312,13 +312,13 @@ g_mount_source_ask_password_finish (GMountSource  *source,
 
 
 static void
-ask_password_reply_sync  (GObject *source_object,
-                          GAsyncResult *res,
-                          gpointer user_data)
+ask_reply_sync  (GObject *source_object,
+		 GAsyncResult *res,
+		 gpointer user_data)
 {
-  AskPasswordSyncData *data;
+  AskSyncData *data;
 
-  data = (AskPasswordSyncData *) user_data;
+  data = (AskSyncData *) user_data;
 
   data->result = g_object_ref (res);
 
@@ -343,7 +343,7 @@ g_mount_source_ask_password (GMountSource *source,
   char *password, *username, *domain;
   GPasswordSave password_save;
   gboolean handled, aborted;
-  AskPasswordSyncData data = {NULL};
+  AskSyncData data = {NULL};
   
   if (password_out)
     *password_out = NULL;
@@ -363,7 +363,7 @@ g_mount_source_ask_password (GMountSource *source,
                                      default_user,
                                      default_domain,
                                      flags,
-                                     ask_password_reply_sync,
+                                     ask_reply_sync,
                                      &data);
   
   g_cond_wait(data.cond, data.mutex);
@@ -473,6 +473,224 @@ op_ask_password (GMountOperation *op,
   return TRUE;
 }
 
+typedef struct AskQuestionData AskQuestionData;
+
+struct AskQuestionData {
+
+  /* results: */
+  gboolean aborted;
+  guint32  choice;
+};
+
+/* the callback from dbus -> main thread */
+static void
+ask_question_reply (DBusMessage *reply,
+		    GError      *error,
+		    gpointer     _data)
+{
+  GSimpleAsyncResult *result;
+  AskQuestionData *data;
+  dbus_bool_t handled, aborted;
+  guint32 choice;
+  DBusMessageIter iter;
+
+  result = G_SIMPLE_ASYNC_RESULT (_data);
+  handled = TRUE;
+  
+  data = g_new0 (AskQuestionData, 1);
+  g_simple_async_result_set_op_res_gpointer (result, data, g_free);
+
+  if (reply == NULL)
+    {
+      data->aborted = TRUE;
+    }
+  else
+    {
+      dbus_message_iter_init (reply, &iter);
+      if (!_g_dbus_message_iter_get_args (&iter, NULL,
+					  DBUS_TYPE_BOOLEAN, &handled,
+					  DBUS_TYPE_BOOLEAN, &aborted,
+					  DBUS_TYPE_UINT32, &choice,
+					  0))
+	data->aborted = TRUE;
+      else
+	{
+	  data->aborted = aborted;
+	  data->choice = choice;
+	}
+    }
+
+  if (handled == FALSE)
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, NULL);
+    }
+
+  g_simple_async_result_complete (result);
+}
+
+gboolean
+g_mount_source_ask_question (GMountSource *source,
+			     const char   *message,
+			     const char  **choices,
+			     gint          n_choices,
+			     gboolean     *aborted_out,
+			     gint         *choice_out)
+{
+  gint choice;
+  gboolean handled, aborted;
+  AskSyncData data = {NULL};
+  
+  data.mutex = g_mutex_new ();
+  data.cond = g_cond_new ();
+
+  g_mutex_lock (data.mutex);
+
+  g_mount_source_ask_question_async (source,
+                                     message,
+				     choices,
+				     n_choices,
+                                     ask_reply_sync,
+                                     &data);
+  
+  g_cond_wait(data.cond, data.mutex);
+  g_mutex_unlock (data.mutex);
+
+  g_cond_free (data.cond);
+  g_mutex_free (data.mutex);
+
+  handled = g_mount_source_ask_question_finish (source,
+                                                data.result,
+                                                &aborted,
+                                                &choice);
+  
+  g_object_unref (data.result);
+
+  if (aborted_out)
+    *aborted_out = aborted;
+
+  if (choice_out)
+    *choice_out = choice;
+  
+  return handled;	
+}
+
+void
+g_mount_source_ask_question_async (GMountSource       *source,
+				   const char         *message_string,
+				   const char        **choices,
+				   gint                n_choices,
+				   GAsyncReadyCallback callback,
+				   gpointer            user_data)
+{
+  GSimpleAsyncResult *result;
+  DBusMessage *message;
+
+  /* If no dbus id specified, reply that we weren't handled */
+  if (source->dbus_id[0] == 0)
+    { 
+      g_simple_async_report_error_in_idle (G_OBJECT (source),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_FAILED, NULL); 
+      return;
+    }
+
+  if (message_string == NULL)
+    message_string = "";
+  
+  message = dbus_message_new_method_call (source->dbus_id,
+					  source->obj_path,
+					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					  G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION);
+
+  _g_dbus_message_append_args (message,
+			       DBUS_TYPE_STRING, &message_string,
+			       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
+			       choices, n_choices,
+			       0);
+
+  result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
+                                      g_mount_source_ask_question_async);
+  /* 30 minute timeout */
+  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
+				 ask_question_reply, result);
+  dbus_message_unref (message);
+	
+}
+
+gboolean
+g_mount_source_ask_question_finish (GMountSource *source,
+				    GAsyncResult *result,
+				    gboolean     *aborted,
+				    gint         *choice_out)
+{
+  AskQuestionData *data;
+  GSimpleAsyncResult *simple;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+
+  if (g_simple_async_result_propagate_error (simple, NULL))
+    return FALSE;
+
+  data = (AskQuestionData *) g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (aborted)
+    *aborted = data->aborted;
+
+  if (choice_out)
+    *choice_out = data->choice;
+
+  return TRUE;	
+}
+
+static void
+op_ask_question_reply (GObject      *source_object,
+                       GAsyncResult *res,
+                       gpointer      user_data)
+{
+  GMountOperationResult result;
+  GMountOperation *op;
+  GMountSource *source;
+  gboolean handled, aborted;
+  gint choice;
+
+  source = G_MOUNT_SOURCE (source_object);
+  op = G_MOUNT_OPERATION (user_data);
+
+  handled = g_mount_source_ask_question_finish (source,
+                                                res,
+                                                &aborted,
+						&choice);
+
+  if (!handled)
+    result = G_MOUNT_OPERATION_UNHANDLED;
+  else if (aborted)
+    result = G_MOUNT_OPERATION_ABORTED;
+  else
+    {
+      result = G_MOUNT_OPERATION_HANDLED;
+      g_mount_operation_set_choice (op, choice);
+    }
+  
+  g_mount_operation_reply (op, result);
+  g_object_unref (op);
+}
+
+static gboolean
+op_ask_question (GMountOperation *op,
+		 const char      *message,
+		 const char     **choices,
+		 gint             n_choices,
+		 GMountSource    *mount_source)
+{
+  g_mount_source_ask_question_async (mount_source,
+				     message,
+				     choices,
+				     n_choices,
+				     op_ask_question_reply,
+				     g_object_ref (op));
+  return TRUE;
+}
 
 GMountOperation *
 g_mount_source_get_operation (GMountSource *mount_source)
@@ -486,6 +704,7 @@ g_mount_source_get_operation (GMountSource *mount_source)
 
 
   g_signal_connect (op, "ask_password", (GCallback)op_ask_password, mount_source);
+  g_signal_connect (op, "ask_question", (GCallback)op_ask_question, mount_source);
 
   return op;
 }
