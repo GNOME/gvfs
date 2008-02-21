@@ -1,5 +1,11 @@
 2008-02-21  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac (DISTCHECK_CONFIGURE_FLAGS):
+	Require latest glib for the contains_file
+	change.
+
+2008-02-21  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfile.c:
         (g_daemon_file_prefix_matches):
         (g_daemon_file_file_iface_init):
