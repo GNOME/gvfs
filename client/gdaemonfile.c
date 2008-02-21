@@ -300,8 +300,8 @@ match_prefix (const char *path, const char *prefix)
 }
 
 static gboolean
-g_daemon_file_contains_file (GFile *parent,
-			     GFile *descendant)
+g_daemon_file_prefix_matches (GFile *parent,
+			      GFile *descendant)
 {
   GDaemonFile *parent_daemon = G_DAEMON_FILE (parent);
   GDaemonFile *descendant_daemon = G_DAEMON_FILE (descendant);
@@ -2080,7 +2080,7 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->get_uri = g_daemon_file_get_uri;
   iface->get_parse_name = g_daemon_file_get_parse_name;
   iface->get_parent = g_daemon_file_get_parent;
-  iface->contains_file = g_daemon_file_contains_file;
+  iface->prefix_matches = g_daemon_file_prefix_matches;
   iface->get_relative_path = g_daemon_file_get_relative_path;
   iface->resolve_relative_path = g_daemon_file_resolve_relative_path;
   iface->get_child_for_display_name = g_daemon_file_get_child_for_display_name;

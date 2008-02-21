@@ -1,3 +1,10 @@
+2008-02-21  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        (g_daemon_file_prefix_matches):
+        (g_daemon_file_file_iface_init):
+	Update for the contains_file rename in gio.
+
 2008-02-20  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/Makefile.am:
