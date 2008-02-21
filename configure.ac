@@ -203,12 +203,13 @@ msg_hal=no
 have_hal_fast_init=no
 HAL_LIBS=
 HAL_CFLAGS=
+HAL_REQUIRED=0.5.10
 
 if test "x$enable_hal" != "xno"; then
-  PKG_CHECK_EXISTS(hal >= 0.5.9, msg_hal=yes)
+  PKG_CHECK_EXISTS([hal >= $HAL_REQUIRED], msg_hal=yes)
 
   if test "x$msg_hal" == "xyes"; then
-    PKG_CHECK_MODULES(HAL, hal >= 0.5.9)
+    PKG_CHECK_MODULES([HAL],[hal >= $HAL_REQUIRED])
     AC_DEFINE(HAVE_HAL, 1, [Define to 1 if HAL is available])
     AC_CHECK_LIB(hal, libhal_get_all_devices_with_properties, have_hal_fast_init=yes)
     if test "x$have_hal_fast_init" == "xyes"; then
