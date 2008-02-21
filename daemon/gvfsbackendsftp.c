@@ -676,7 +676,7 @@ handle_login (GVfsBackend *backend,
   gboolean aborted = FALSE;
   gboolean ret_val;
   char *new_password = NULL;
-  GPasswordSave password_save;
+  GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   gsize bytes_written;
   gboolean password_in_keyring = FALSE;
   
@@ -727,8 +727,6 @@ handle_login (GVfsBackend *backend,
       
       buffer[len] = 0;
 
-      password_save = G_PASSWORD_SAVE_NEVER;
-      
       /*
        * If the input URI contains a username
        *     if the input URI contains a password, we attempt one login and return GNOME_VFS_ERROR_ACCESS_DENIED on failure.
