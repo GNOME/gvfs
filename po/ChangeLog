@@ -1,3 +1,8 @@
+2008-02-21  Theppitak Karoonboonyanan  <thep@linux.thai.net>
+
+	* LINGUAS: Added th (Thai).
+	* th.po: Added Thai translation.
+
 2008-02-21  Gil Forcada  <gforcada@gnome.org>
 
 	* ca.po: Updated Catalan translation.
