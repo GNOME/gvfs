@@ -1,6 +1,11 @@
 2008-02-21  Carlos Garcia Campos  <carlosgc@gnome.org>
 
 	* daemon/gvfsbackendsftp.c: (handle_login):
+	Fix memory leak.
+	
+2008-02-21  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login):
 	Fix password save flags initialization.
 	
 2008-02-21  Alexander Larsson  <alexl@redhat.com>

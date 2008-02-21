@@ -764,6 +764,8 @@ handle_login (GVfsBackend *backend,
               
               if (g_vfs_keyring_is_available ())
                 flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+
+              g_free (new_password);
               
               if (!g_mount_source_ask_password (mount_source,
                                                 g_str_has_prefix (buffer, "Enter passphrase for key") ?
@@ -877,6 +879,7 @@ handle_login (GVfsBackend *backend,
                                    password_save);
     }
 
+  g_free (new_password);
   g_object_unref (prompt_stream);
   g_object_unref (reply_stream);
   return ret_val;
