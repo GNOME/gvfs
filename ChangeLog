@@ -1,5 +1,10 @@
 2008-02-22  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/dns-sd.mount.in:
+	Correct type and exec name
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmounttracker.c:
 	Unlock lock if returning early.
 
