@@ -18,6 +18,7 @@ daemon/gvfsbackenddav.c
 daemon/gvfsbackendftp.c
 daemon/gvfsbackendhttp.c
 daemon/gvfsbackendlocaltest.c
+daemon/gvfsbackendnetwork.c
 daemon/gvfsbackendsftp.c
 daemon/gvfsbackendsmb.c
 daemon/gvfsbackendsmbbrowse.c
