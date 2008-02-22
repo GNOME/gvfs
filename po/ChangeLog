@@ -13,6 +13,10 @@
 
 2008-02-22  Jonh Wendell  <jwendell@gnome.org>
 
+	* pt_BR: Updated Brazilian Portuguese translation.
+
+2008-02-22  Jonh Wendell  <jwendell@gnome.org>
+
 	* POTFILES.in: Added daemon/gvfsbackendnetwork.c
 	* po/: Added some files to the svn ignore list
 
