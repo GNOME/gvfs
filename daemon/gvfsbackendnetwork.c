@@ -39,6 +39,11 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsmonitor.h"
 
+/**
+ * TODO: Support monitoring the directories that are monitored
+ *       so we see new dns-sd files, etc.
+ */
+
 #define PATH_GCONF_GVFS_SMB "/system/smb"
 #define PATH_GCONF_GVFS_SMB_WORKGROUP "/system/smb/workgroup"
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
