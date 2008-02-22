@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-21 14:28+0200\n"
-"PO-Revision-Date: 2008-02-21 14:32+0200\n"
+"POT-Creation-Date: 2008-02-23 00:11+0200\n"
+"PO-Revision-Date: 2008-02-23 00:12+0200\n"
 "Last-Translator: Ihar Hrachyshka <booxter@lacinka.org>\n"
 "Language-Team: Belarusian Latin <i18n@mova.org>\n"
 "MIME-Version: 1.0\n"
@@ -117,7 +117,7 @@ msgstr "Pieraskok nie padtrymlivajecca dla strumienia"
 msgid "The query info operation is not supported"
 msgstr "Aperacyja zapytu źviestak nie padtrymlivajecca"
 
-#: ../client/gdaemonvfs.c:601
+#: ../client/gdaemonvfs.c:604
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Pamyłka padčas atrymańnia źviestak ab mantavańni: %s"
@@ -208,6 +208,7 @@ msgid "CD/DVD Creator"
 msgstr "Stvaralnik CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendnetwork.c:521
 msgid "The file is not a directory"
 msgstr "Fajł nie źjaŭlajecca kataloham"
 
@@ -305,9 +306,9 @@ msgstr "Kamputar"
 msgid "Filesystem"
 msgstr "Fajłavaja systema"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
-#: ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendnetwork.c:474
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
+#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
 msgstr "Fajł nie isnuje"
 
@@ -393,7 +394,7 @@ msgstr "Niemahčyma stvaryć zapyt"
 msgid "Target file already exists"
 msgstr "Metavy fajł užo isnuje"
 
-#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2579
+#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2623
 #: ../daemon/gvfsbackendsmb.c:945
 msgid "The file was externally modified"
 msgstr "Fajł byŭ źmienieny zvonku"
@@ -403,7 +404,7 @@ msgstr "Fajł byŭ źmienieny zvonku"
 msgid "Backup file creation failed"
 msgstr "Nie ŭdałosia stvaryć zapasnuju kopiju fajłu"
 
-#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1310
+#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1354
 msgid "No hostname specified"
 msgstr "Nazva hostu nie akreślenaja"
 
@@ -417,7 +418,7 @@ msgstr "Hety typ pieraskoku nie padtrymlivajecca"
 msgid "HTTP Client Error: %s"
 msgstr "Pamyłka klijenta HTTP: %s"
 
-#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1641
+#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1685
 #: ../daemon/gvfsbackendsmb.c:1192 ../daemon/gvfsbackendtrash.c:960
 msgid " (invalid encoding)"
 msgstr " (niapravilnaje kadavańnie)"
@@ -426,68 +427,87 @@ msgstr " (niapravilnaje kadavańnie)"
 msgid "Directory notification not supported"
 msgstr "Infarmavańnie dla katalohu nie padtrymlivajecca"
 
-#: ../daemon/gvfsbackendsftp.c:250
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:259 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Sietka Windows"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:339
+msgid "Local network"
+msgstr "Lakalnaja sietka"
+
+#: ../daemon/gvfsbackendnetwork.c:560 ../daemon/gvfsbackendnetwork.c:695
+#: ../daemon/gvfsbackendnetwork.c:696
+msgid "Network"
+msgstr "Sietka"
+
+#: ../daemon/gvfsbackendnetwork.c:613
+msgid "Can't monitor file or directory."
+msgstr "Niemahčyma nazirać za fajłam ci kataloham."
+
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "Prahrama \"ssh\" niečakana vyjšła"
 
-#: ../daemon/gvfsbackendsftp.c:258
+#: ../daemon/gvfsbackendsftp.c:259
 msgid "Permission denied"
 msgstr "Nie staje dazvołu"
 
-#: ../daemon/gvfsbackendsftp.c:265
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "Nieviadomaja nazva hostu"
 
-#: ../daemon/gvfsbackendsftp.c:272
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "Niama šlachu da hostu"
 
-#: ../daemon/gvfsbackendsftp.c:279
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "Server admoviŭ spałučeńniu"
 
-#: ../daemon/gvfsbackendsftp.c:286
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "Nie ŭdałosia spraŭdzić kluč hostu"
 
-#: ../daemon/gvfsbackendsftp.c:371
+#: ../daemon/gvfsbackendsftp.c:372
 msgid "Unable to spawn ssh program"
 msgstr "Niemahčyma ŭklučyć prahramu \"ssh\""
 
-#: ../daemon/gvfsbackendsftp.c:387
+#: ../daemon/gvfsbackendsftp.c:388
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Niemahčyma ŭklučyć prahramu \"ssh\": %s"
 
-#: ../daemon/gvfsbackendsftp.c:490 ../daemon/gvfsbackendsftp.c:707
+#: ../daemon/gvfsbackendsftp.c:491 ../daemon/gvfsbackendsftp.c:709
 msgid "Timed out when logging in"
 msgstr "Skončyŭsia termin čakańnia ŭvachodu"
 
-#: ../daemon/gvfsbackendsftp.c:772
+#: ../daemon/gvfsbackendsftp.c:776
 msgid "Enter passphrase for key"
 msgstr "Uviadzi parol dla kluča"
 
-#: ../daemon/gvfsbackendsftp.c:774
+#: ../daemon/gvfsbackendsftp.c:778
 msgid "Enter password"
 msgstr "Uviadzi parol"
 
-#: ../daemon/gvfsbackendsftp.c:787
+#: ../daemon/gvfsbackendsftp.c:791
 msgid "Password dialog cancelled"
 msgstr "Dyjaloh uvodu parolu anulavany"
 
-#: ../daemon/gvfsbackendsftp.c:806
+#: ../daemon/gvfsbackendsftp.c:838
 msgid "Can't send password"
 msgstr "Niemahčyma dasłać parol"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Log In Anyway"
 msgstr "Usia adno ŭvajdzi"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Cancel Login"
 msgstr "Anuluj uvachod"
 
-#: ../daemon/gvfsbackendsftp.c:824
+#: ../daemon/gvfsbackendsftp.c:856
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -499,68 +519,69 @@ msgstr ""
 "Identyfikacyjnyja źviestki addalenaha kamputara (%s) nieviadomyja.\n"
 "Tak zdarajecca, kali ty ŭvachodziš na kamputar upieršyniu.\n"
 "\n"
-"Addaleny kamputar identyfikuje siabie jak %s. Kali ty chočaš całkam upeŭnicca ŭ "
-"biaśpiečnaści takoha spałučeńnia, spytaj pra heta ŭ systemnaha administratara."
+"Addaleny kamputar identyfikuje siabie jak %s. Kali ty chočaš całkam "
+"upeŭnicca ŭ biaśpiečnaści takoha spałučeńnia, spytaj pra heta ŭ systemnaha "
+"administratara."
 
-#: ../daemon/gvfsbackendsftp.c:844
+#: ../daemon/gvfsbackendsftp.c:876
 msgid "Login dialog cancelled"
 msgstr "Dyjaloh uvachodu anulavany"
 
-#: ../daemon/gvfsbackendsftp.c:864
+#: ../daemon/gvfsbackendsftp.c:896
 msgid "Can't send host identity confirmation"
 msgstr "Niemahčyma vysłać źviestki akreśleńnia hostu"
 
-#: ../daemon/gvfsbackendsftp.c:1236 ../daemon/gvfsbackendsftp.c:1259
+#: ../daemon/gvfsbackendsftp.c:1280 ../daemon/gvfsbackendsftp.c:1303
 msgid "Protocol error"
 msgstr "Pamyłka pratakołu"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1276
+#: ../daemon/gvfsbackendsftp.c:1320
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp na %s"
 
-#: ../daemon/gvfsbackendsftp.c:1300
+#: ../daemon/gvfsbackendsftp.c:1344
 msgid "Unable to find supported ssh command"
 msgstr "Niemahčyma znajści prydatnaha zahadu \"ssh\""
 
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1653
+#: ../daemon/gvfsbackendsftp.c:1697
 #, c-format
 msgid "/ on %s"
 msgstr "/ na %s"
 
-#: ../daemon/gvfsbackendsftp.c:1717
+#: ../daemon/gvfsbackendsftp.c:1761
 msgid "File is directory"
 msgstr "Fajł źjaŭlajecca kataloham"
 
-#: ../daemon/gvfsbackendsftp.c:1726
+#: ../daemon/gvfsbackendsftp.c:1770
 msgid "Failure"
 msgstr "Pamyłka"
 
-#: ../daemon/gvfsbackendsftp.c:1791 ../daemon/gvfsbackendsftp.c:1853
-#: ../daemon/gvfsbackendsftp.c:1864 ../daemon/gvfsbackendsftp.c:1922
-#: ../daemon/gvfsbackendsftp.c:2012 ../daemon/gvfsbackendsftp.c:2041
-#: ../daemon/gvfsbackendsftp.c:2089 ../daemon/gvfsbackendsftp.c:2168
-#: ../daemon/gvfsbackendsftp.c:2279 ../daemon/gvfsbackendsftp.c:2320
-#: ../daemon/gvfsbackendsftp.c:2372 ../daemon/gvfsbackendsftp.c:2443
-#: ../daemon/gvfsbackendsftp.c:2463 ../daemon/gvfsbackendsftp.c:2617
-#: ../daemon/gvfsbackendsftp.c:2643 ../daemon/gvfsbackendsftp.c:2700
-#: ../daemon/gvfsbackendsftp.c:2759 ../daemon/gvfsbackendsftp.c:3039
-#: ../daemon/gvfsbackendsftp.c:3168 ../daemon/gvfsbackendsftp.c:3201
-#: ../daemon/gvfsbackendsftp.c:3302 ../daemon/gvfsbackendsftp.c:3343
-#: ../daemon/gvfsbackendsftp.c:3399 ../daemon/gvfsbackendsftp.c:3435
-#: ../daemon/gvfsbackendsftp.c:3469 ../daemon/gvfsbackendsftp.c:3484
-#: ../daemon/gvfsbackendsftp.c:3503
+#: ../daemon/gvfsbackendsftp.c:1835 ../daemon/gvfsbackendsftp.c:1897
+#: ../daemon/gvfsbackendsftp.c:1908 ../daemon/gvfsbackendsftp.c:1966
+#: ../daemon/gvfsbackendsftp.c:2056 ../daemon/gvfsbackendsftp.c:2085
+#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2212
+#: ../daemon/gvfsbackendsftp.c:2323 ../daemon/gvfsbackendsftp.c:2364
+#: ../daemon/gvfsbackendsftp.c:2416 ../daemon/gvfsbackendsftp.c:2487
+#: ../daemon/gvfsbackendsftp.c:2507 ../daemon/gvfsbackendsftp.c:2661
+#: ../daemon/gvfsbackendsftp.c:2687 ../daemon/gvfsbackendsftp.c:2744
+#: ../daemon/gvfsbackendsftp.c:2803 ../daemon/gvfsbackendsftp.c:3083
+#: ../daemon/gvfsbackendsftp.c:3212 ../daemon/gvfsbackendsftp.c:3245
+#: ../daemon/gvfsbackendsftp.c:3346 ../daemon/gvfsbackendsftp.c:3387
+#: ../daemon/gvfsbackendsftp.c:3443 ../daemon/gvfsbackendsftp.c:3479
+#: ../daemon/gvfsbackendsftp.c:3513 ../daemon/gvfsbackendsftp.c:3528
+#: ../daemon/gvfsbackendsftp.c:3547
 msgid "Invalid reply received"
 msgstr "Atrymany niapravilny adkaz"
 
-#: ../daemon/gvfsbackendsftp.c:2110
+#: ../daemon/gvfsbackendsftp.c:2154
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Pamyłka stvareńnia zapasnoj kopii fajłu: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2525
+#: ../daemon/gvfsbackendsftp.c:2569
 msgid "Unable to create temporary file"
 msgstr "Niemahčyma stvaryć časovy fajł"
 
@@ -614,10 +635,6 @@ msgstr "Pamyłka vydaleńnia metavaha fajłu: %s"
 #: ../daemon/gvfsbackendsmb.c:1750
 msgid "Can't recursively move directory"
 msgstr "Niemahčyma rekursiŭna pieranieści kataloh"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:694
-msgid "Windows Network"
-msgstr "Sietka Windows"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
