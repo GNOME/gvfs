@@ -333,15 +333,21 @@ static void
 g_mount_tracker_add_mount (GMountTracker *tracker,
 			   GMountInfo *info)
 {
-  g_mutex_lock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_lock (tracker->lock);
   
   /* Don't add multiple times */
   if (g_mount_tracker_find (tracker, info))
-    return;
+    {
+      if (tracker->lock)
+	g_mutex_unlock (tracker->lock);
+      return;
+    }
 
   tracker->mounts = g_list_prepend (tracker->mounts, g_mount_info_ref (info));
 
-  g_mutex_unlock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_unlock (tracker->lock);
   
   g_signal_emit (tracker, signals[MOUNTED], 0, info);
 }
@@ -353,20 +359,25 @@ g_mount_tracker_remove_mount (GMountTracker *tracker,
   GList *l;
   GMountInfo *old_info;
 
-  g_mutex_lock (tracker->lock);
-  
+  if (tracker->lock)
+    g_mutex_lock (tracker->lock);
   
   l = g_mount_tracker_find (tracker, info);
   
   /* Don't remove multiple times */
   if (l == NULL)
-    return;
+    {
+      if (tracker->lock)
+	g_mutex_unlock (tracker->lock);
+      return;
+    }
 
   old_info = l->data;
   
   tracker->mounts = g_list_delete_link (tracker->mounts, l);
   
-  g_mutex_unlock (tracker->lock);
+  if (tracker->lock)
+    g_mutex_unlock (tracker->lock);
 
   g_signal_emit (tracker, signals[UNMOUNTED], 0, old_info);
   g_mount_info_unref (old_info);

@@ -1,5 +1,10 @@
 2008-02-22  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gmounttracker.c:
+	Unlock lock if returning early.
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
         * configure.ac:
         * daemon/Makefile.am:
         * daemon/dns-sd.mount.in:
