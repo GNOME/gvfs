@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-22 08:59+0300\n"
+"POT-Creation-Date: 2008-02-22 17:40+0300\n"
 "PO-Revision-Date: 2008-02-11 17:08+0300\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
@@ -113,7 +113,7 @@ msgstr "Virta ei tue siirtymistä"
 msgid "The query info operation is not supported"
 msgstr "Tämä tietokysely ei ole tuettu"
 
-#: ../client/gdaemonvfs.c:601
+#: ../client/gdaemonvfs.c:604
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Virhe haettaessa tietoja liitospisteestä: %s"
@@ -205,6 +205,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD-luontityökalu"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendnetwork.c:516
 msgid "The file is not a directory"
 msgstr "Tiedosto ei ole kansio"
 
@@ -305,9 +306,9 @@ msgstr "Tietokone"
 msgid "Filesystem"
 msgstr "Tiedostojärjestelmä"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
-#: ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendnetwork.c:469
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
+#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
 msgstr "Tiedostoa ei ole olemassa"
 
@@ -393,7 +394,7 @@ msgstr "Pyyntöä ei voitu luoda"
 msgid "Target file already exists"
 msgstr "Kohdetiedosto on jo olemassa"
 
-#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2579
+#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2623
 #: ../daemon/gvfsbackendsmb.c:945
 msgid "The file was externally modified"
 msgstr "Tiedostoa muokattiin muualta"
@@ -403,7 +404,7 @@ msgstr "Tiedostoa muokattiin muualta"
 msgid "Backup file creation failed"
 msgstr "Varmuuskopiotiedoston luonti epäonnistui"
 
-#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1310
+#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1354
 msgid "No hostname specified"
 msgstr "Verkkonimeä ei annettu"
 
@@ -417,7 +418,7 @@ msgstr "Siirtymistyyppi ei ole tuettu"
 msgid "HTTP Client Error: %s"
 msgstr "HTTP-asiakkaan virhe: %s"
 
-#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1641
+#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1685
 #: ../daemon/gvfsbackendsmb.c:1192 ../daemon/gvfsbackendtrash.c:960
 msgid " (invalid encoding)"
 msgstr " (virheellinen koodaus)"
@@ -426,68 +427,87 @@ msgstr " (virheellinen koodaus)"
 msgid "Directory notification not supported"
 msgstr "Kansioiden huomautukset eivät ole tuettu"
 
-#: ../daemon/gvfsbackendsftp.c:250
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:254 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Windows-verkko"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:334
+msgid "Local network"
+msgstr "Paikallisverkko"
+
+#: ../daemon/gvfsbackendnetwork.c:555 ../daemon/gvfsbackendnetwork.c:690
+#: ../daemon/gvfsbackendnetwork.c:691
+msgid "Network"
+msgstr "Verkko"
+
+#: ../daemon/gvfsbackendnetwork.c:608
+msgid "Can't monitor file or directory."
+msgstr "Tiedostoa tai kansiota ei voi tarkkailla."
+
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "Ohjelma ssh sulkeutui odottamatta"
 
-#: ../daemon/gvfsbackendsftp.c:258
+#: ../daemon/gvfsbackendsftp.c:259
 msgid "Permission denied"
 msgstr "Lupa evätty"
 
-#: ../daemon/gvfsbackendsftp.c:265
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "Verkkonimi tuntematon"
 
-#: ../daemon/gvfsbackendsftp.c:272
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "Ei reittiä palvelimelle"
 
-#: ../daemon/gvfsbackendsftp.c:279
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "Palvelin kieltäytyi yhteydestä"
 
-#: ../daemon/gvfsbackendsftp.c:286
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "Palvelimen avaimen vahvistus epäonnistui"
 
-#: ../daemon/gvfsbackendsftp.c:371
+#: ../daemon/gvfsbackendsftp.c:372
 msgid "Unable to spawn ssh program"
 msgstr "Ohjelmaa ssh ei voi käynnistää"
 
-#: ../daemon/gvfsbackendsftp.c:387
+#: ../daemon/gvfsbackendsftp.c:388
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Ohjelmaa ssh ei voi käynnistää: %s"
 
-#: ../daemon/gvfsbackendsftp.c:490 ../daemon/gvfsbackendsftp.c:707
+#: ../daemon/gvfsbackendsftp.c:491 ../daemon/gvfsbackendsftp.c:709
 msgid "Timed out when logging in"
 msgstr "Aikakatkaisu kirjauduttaessa"
 
-#: ../daemon/gvfsbackendsftp.c:772
+#: ../daemon/gvfsbackendsftp.c:776
 msgid "Enter passphrase for key"
 msgstr "Syötä avaimen salalause"
 
-#: ../daemon/gvfsbackendsftp.c:774
+#: ../daemon/gvfsbackendsftp.c:778
 msgid "Enter password"
 msgstr "Syötä salasana"
 
-#: ../daemon/gvfsbackendsftp.c:787
+#: ../daemon/gvfsbackendsftp.c:791
 msgid "Password dialog cancelled"
 msgstr "Salasanakysely keskeytettiin"
 
-#: ../daemon/gvfsbackendsftp.c:806
+#: ../daemon/gvfsbackendsftp.c:838
 msgid "Can't send password"
 msgstr "Salasanaa ei voitu lähettää"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Log In Anyway"
 msgstr "Kirjaudu joka tapauksessa"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Cancel Login"
 msgstr "Peru kirjautuminen"
 
-#: ../daemon/gvfsbackendsftp.c:824
+#: ../daemon/gvfsbackendsftp.c:856
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -498,69 +518,68 @@ msgid ""
 msgstr ""
 "Palvelimen \"%s\" identiteettiä ei voitu vahvistaa.\n"
 "Tämä tapahtuu, kun kirjaudut palvelimelle ensimmäistä kertaa.\n"
-"Palvelimen lähettämää tunniste on %s. jos haluat olla täysin "
-"varma, että yhdistäminen on turvallista, ota yhteyttää palvelimen "
-"ylläpitäjään."
+"Palvelimen lähettämää tunniste on %s. jos haluat olla täysin varma, että "
+"yhdistäminen on turvallista, ota yhteyttää palvelimen ylläpitäjään."
 
-#: ../daemon/gvfsbackendsftp.c:844
+#: ../daemon/gvfsbackendsftp.c:876
 msgid "Login dialog cancelled"
 msgstr "Kirjautumisikkuna peruttiin"
 
-#: ../daemon/gvfsbackendsftp.c:864
+#: ../daemon/gvfsbackendsftp.c:896
 msgid "Can't send host identity confirmation"
 msgstr "Palvelimen tunnistusvahvistusta ei voi lähettää"
 
-#: ../daemon/gvfsbackendsftp.c:1236 ../daemon/gvfsbackendsftp.c:1259
+#: ../daemon/gvfsbackendsftp.c:1280 ../daemon/gvfsbackendsftp.c:1303
 msgid "Protocol error"
 msgstr "Protokollavirhe"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1276
+#: ../daemon/gvfsbackendsftp.c:1320
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp palvelimella %s"
 
-#: ../daemon/gvfsbackendsftp.c:1300
+#: ../daemon/gvfsbackendsftp.c:1344
 msgid "Unable to find supported ssh command"
 msgstr "Tuettua ssh-komentoa ei löydy"
 
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1653
+#: ../daemon/gvfsbackendsftp.c:1697
 #, c-format
 msgid "/ on %s"
 msgstr "/ palvelimella %s"
 
-#: ../daemon/gvfsbackendsftp.c:1717
+#: ../daemon/gvfsbackendsftp.c:1761
 msgid "File is directory"
 msgstr "Tiedosto on kansio"
 
-#: ../daemon/gvfsbackendsftp.c:1726
+#: ../daemon/gvfsbackendsftp.c:1770
 msgid "Failure"
 msgstr "Virhe"
 
-#: ../daemon/gvfsbackendsftp.c:1791 ../daemon/gvfsbackendsftp.c:1853
-#: ../daemon/gvfsbackendsftp.c:1864 ../daemon/gvfsbackendsftp.c:1922
-#: ../daemon/gvfsbackendsftp.c:2012 ../daemon/gvfsbackendsftp.c:2041
-#: ../daemon/gvfsbackendsftp.c:2089 ../daemon/gvfsbackendsftp.c:2168
-#: ../daemon/gvfsbackendsftp.c:2279 ../daemon/gvfsbackendsftp.c:2320
-#: ../daemon/gvfsbackendsftp.c:2372 ../daemon/gvfsbackendsftp.c:2443
-#: ../daemon/gvfsbackendsftp.c:2463 ../daemon/gvfsbackendsftp.c:2617
-#: ../daemon/gvfsbackendsftp.c:2643 ../daemon/gvfsbackendsftp.c:2700
-#: ../daemon/gvfsbackendsftp.c:2759 ../daemon/gvfsbackendsftp.c:3039
-#: ../daemon/gvfsbackendsftp.c:3168 ../daemon/gvfsbackendsftp.c:3201
-#: ../daemon/gvfsbackendsftp.c:3302 ../daemon/gvfsbackendsftp.c:3343
-#: ../daemon/gvfsbackendsftp.c:3399 ../daemon/gvfsbackendsftp.c:3435
-#: ../daemon/gvfsbackendsftp.c:3469 ../daemon/gvfsbackendsftp.c:3484
-#: ../daemon/gvfsbackendsftp.c:3503
+#: ../daemon/gvfsbackendsftp.c:1835 ../daemon/gvfsbackendsftp.c:1897
+#: ../daemon/gvfsbackendsftp.c:1908 ../daemon/gvfsbackendsftp.c:1966
+#: ../daemon/gvfsbackendsftp.c:2056 ../daemon/gvfsbackendsftp.c:2085
+#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2212
+#: ../daemon/gvfsbackendsftp.c:2323 ../daemon/gvfsbackendsftp.c:2364
+#: ../daemon/gvfsbackendsftp.c:2416 ../daemon/gvfsbackendsftp.c:2487
+#: ../daemon/gvfsbackendsftp.c:2507 ../daemon/gvfsbackendsftp.c:2661
+#: ../daemon/gvfsbackendsftp.c:2687 ../daemon/gvfsbackendsftp.c:2744
+#: ../daemon/gvfsbackendsftp.c:2803 ../daemon/gvfsbackendsftp.c:3083
+#: ../daemon/gvfsbackendsftp.c:3212 ../daemon/gvfsbackendsftp.c:3245
+#: ../daemon/gvfsbackendsftp.c:3346 ../daemon/gvfsbackendsftp.c:3387
+#: ../daemon/gvfsbackendsftp.c:3443 ../daemon/gvfsbackendsftp.c:3479
+#: ../daemon/gvfsbackendsftp.c:3513 ../daemon/gvfsbackendsftp.c:3528
+#: ../daemon/gvfsbackendsftp.c:3547
 msgid "Invalid reply received"
 msgstr "Saatiin virheellinen vastaus"
 
-#: ../daemon/gvfsbackendsftp.c:2110
+#: ../daemon/gvfsbackendsftp.c:2154
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Virhe luotaessa varmuuskopiotiedostoa: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2525
+#: ../daemon/gvfsbackendsftp.c:2569
 msgid "Unable to create temporary file"
 msgstr "Virhe luotaessa väliaikaistiedostoa"
 
@@ -614,10 +633,6 @@ msgstr "Virhe poistettaessa kohdetiedostoa: %s"
 #: ../daemon/gvfsbackendsmb.c:1750
 msgid "Can't recursively move directory"
 msgstr "Kansiota ei voi siirtää rekursiivisesti"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:694
-msgid "Windows Network"
-msgstr "Windows-verkko"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
