@@ -1,3 +1,8 @@
+2008-02-22  Takeshi AIHANA <takeshi.aihana@gmail.com>
+
+	* LINGUAS: Added 'ja' (Japanese).
+	* ja.po: Added Japanese translation.
+
 2008-02-22  Jonh Wendell  <jwendell@gnome.org>
 
 	* POTFILES.in: Added daemon/gvfsbackendnetwork.c
