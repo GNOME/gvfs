@@ -119,6 +119,8 @@ network_file_free (NetworkFile *file)
   g_slice_free (NetworkFile, file);
 }
 
+/* Assumes file_name is equal and compares for
+   metadata changes */
 static gboolean
 network_file_equal (NetworkFile *a,
                     NetworkFile *b)
@@ -126,20 +128,12 @@ network_file_equal (NetworkFile *a,
   if (!g_icon_equal (a->icon, b->icon))
     return FALSE;
 
-  if ((a->file_name != NULL && b->file_name != NULL) &&
-      (a->file_name != NULL && b->file_name == NULL) ||
-      (a->file_name == NULL && b->file_name != NULL))
-    return FALSE;
-
-  if (strcmp (a->file_name, b->file_name) != 0)
-    return FALSE;
-
-  if ((a->display_name != NULL && b->display_name != NULL) &&
-      (a->display_name != NULL && b->display_name == NULL) ||
+  if ((a->display_name != NULL && b->display_name == NULL) ||
       (a->display_name == NULL && b->display_name != NULL))
     return FALSE;
 
-  if (strcmp (a->display_name, b->display_name) != 0)
+  if ((a->display_name != NULL && b->display_name != NULL) &&
+      strcmp (a->display_name, b->display_name) != 0)
     return FALSE;
 
   return TRUE;

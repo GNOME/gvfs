@@ -11,6 +11,11 @@
 2008-02-22  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendnetwork.c:
+	Fix up network_file_equal.
+	
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendnetwork.c:
 	Update the network backend to use inline files and
 	remove the default workgroup link. Also add dns-sd
 	support (not used yet). (#509600)
