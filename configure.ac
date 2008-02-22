@@ -130,6 +130,23 @@ AC_SUBST(HTTP_LIBS)
 AM_CONDITIONAL(HAVE_HTTP, [test "$msg_http" = "yes"])
 
 dnl **************************************************
+dnl *** Check if we should build with DNS-SD backend ***
+dnl **************************************************
+AM_CONDITIONAL(HAVE_AVAHI, false)
+			  
+AC_ARG_ENABLE(avahi, [  --disable-avahi     build without avahi support])
+msg_avahi=no
+if test "x$enable_avahi" != "xno"; then
+	PKG_CHECK_MODULES(AVAHI, avahi-glib >= 0.6 avahi-client >= 0.6,
+		  	[AM_CONDITIONAL(HAVE_AVAHI, true)
+		   	AC_DEFINE(HAVE_AVAHI, [], [Set if we can use avahi])]
+                        msg_avahi=yes,
+	          	[AM_CONDITIONAL(HAVE_AVAHI, false)])
+	AC_SUBST(AVAHI_CFLAGS)
+	AC_SUBST(AVAHI_LIBS)
+fi
+
+dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
 dnl **************************************************
 AC_ARG_ENABLE(cdda, [  --disable-cdda           build without CDDA backend])
@@ -388,6 +405,7 @@ echo "
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
         GConf support:                $msg_gconf
+        DNS-SD support:               $msg_avahi
 	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)
 	GNOME Keyring support:        $msg_keyring
 "

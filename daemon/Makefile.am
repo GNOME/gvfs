@@ -63,6 +63,12 @@ mount_DATA += network.mount
 libexec_PROGRAMS += gvfsd-network
 endif
 
+mount_in_files += dns-sd.mount.in
+if HAVE_AVAHI
+mount_DATA += dns-sd.mount
+libexec_PROGRAMS += gvfsd-dnssd
+endif
+
 EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files)
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
@@ -239,6 +245,21 @@ gvfsd_network_CPPFLAGS = \
 	-DBACKEND_TYPES='"network", G_VFS_TYPE_BACKEND_NETWORK,'
 
 gvfsd_network_LDADD = $(libraries) $(GCONF_LIBS)
+
+gvfsd_dnssd_SOURCES = \
+	gvfsbackenddnssd.c gvfsbackenddnssd.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_dnssd_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackenddnssd.h \
+	-DDEFAULT_BACKEND_TYPE=dns-sd \
+	-DMAX_JOB_THREADS=1 \
+	$(AVAHI_CFLAGS) \
+	-DBACKEND_TYPES='"dns-sd", G_VFS_TYPE_BACKEND_DNS_SD,'
+
+gvfsd_dnssd_LDADD = $(libraries) $(AVAHI_LIBS)
+
 
 gvfsd_burn_SOURCES = \
 	gvfsbackendburn.c gvfsbackendburn.h \
