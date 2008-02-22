@@ -1,5 +1,11 @@
 2008-02-22  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendnetwork.c:
+        (g_vfs_backend_network_init):
+	Fix up dns-sd method name and gconf directory.
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/dns-sd.mount.in:
 	Correct type and exec name
 

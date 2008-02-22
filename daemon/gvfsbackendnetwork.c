@@ -43,7 +43,7 @@
 #define PATH_GCONF_GVFS_SMB_WORKGROUP "/system/smb/workgroup"
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
 
-#define PATH_GCONF_GVFS_DNS_SD "/system/dns_sd/"
+#define PATH_GCONF_GVFS_DNS_SD "/system/dns_sd"
 #define PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL "/system/dns_sd/display_local"
 #define PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS "/system/dns_sd/extra_domains"
 
@@ -634,7 +634,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
       if (strcmp(supported_vfs[i], "smb") == 0)
 	network_backend->have_smb = TRUE;
 
-      if (strcmp(supported_vfs[i], "dnssd") == 0)
+      if (strcmp(supported_vfs[i], "dns-sd") == 0)
         network_backend->have_dnssd = TRUE;
     }
 
