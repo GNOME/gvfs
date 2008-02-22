@@ -1,3 +1,8 @@
+2008-02-22  Amanpreet Singh Alam <apreet.alam@gmail.com>
+
+	* pa.po: Punjabi Translation Added
+	* LINGUAS: 'pa' Added to list
+
 2008-02-22 Arangel Angov <arangel@linux.net.mk>
 
         * mk.po: Updated Macedonian translation.
