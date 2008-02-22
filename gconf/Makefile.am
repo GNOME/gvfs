@@ -20,6 +20,7 @@ libgiogconf_la_CFLAGS =		\
 	$(GLIB_CFLAGS)                          \
 	$(GCONF_CFLAGS)                         \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DG_DISABLE_DEPRECATED			\
 	$(NULL)
 

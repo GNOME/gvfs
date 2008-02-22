@@ -33,6 +33,7 @@ libgiohal_volume_monitor_la_CFLAGS =		\
 	$(GLIB_CFLAGS)                          \
 	$(HAL_CFLAGS)                           \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DG_DISABLE_DEPRECATED			\
 	$(NULL)
 

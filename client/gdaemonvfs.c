@@ -175,7 +175,10 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   GVfsUriMapper *mapper;
   GList *modules;
   int i;
-  
+
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+
   vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
 
   if (vfs->async_bus == NULL)

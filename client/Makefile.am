@@ -6,6 +6,7 @@ INCLUDES = -I$(top_srcdir) \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DGVFS_MODULE_DIR=\"$(libdir)/gvfs/modules\"	\
+	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
 module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_vfs_.*|g_io_module_load|g_io_module_unload'

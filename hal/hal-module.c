@@ -22,7 +22,10 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
+#include <config.h>
+
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <gmodule.h>
 #include <gio/gio.h>
 
@@ -36,6 +39,9 @@
 void
 g_io_module_load (GIOModule *module)
 {
+  bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+
   hal_device_register (module);
   hal_pool_register (module);
   g_hal_drive_register (module);

@@ -1,3 +1,13 @@
+2007-02-22  Christian Neumair  <cneumair@gnome.org>
+
+	* gconf/gconf-module.c: (g_io_module_load):
+	* gconf/Makefile.am:
+	* hal/hal-module.c: (g_io_module_load):
+	* hal/Makefile.am:
+	* client/gdaemonvfs.c: (g_daemon_vfs_init):
+	* client/Makefile.am:
+	Bind to GVFS text domain. Fixes #517892.
+
 2008-02-22  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendnetwork.c:
