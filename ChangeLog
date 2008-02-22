@@ -1,3 +1,8 @@
+2008-02-22  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login), (do_mount):
+	Ask for the username in the sftp login when it's not provided.
+	
 2008-02-21  Christian Persch  <chpe@gnome.org>
 
 	* configure.ac: Update hal req to 0.5.10. Bug #515779.

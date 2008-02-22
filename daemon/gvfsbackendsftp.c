@@ -109,6 +109,7 @@ struct _GVfsBackendSftp
   char *host;
   gboolean user_specified;
   char *user;
+  char *tmp_password;
 
   guint32 my_uid;
   guint32 my_gid;
@@ -676,6 +677,7 @@ handle_login (GVfsBackend *backend,
   gboolean aborted = FALSE;
   gboolean ret_val;
   char *new_password = NULL;
+  char *new_user = NULL;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   gsize bytes_written;
   gboolean password_in_keyring = FALSE;
@@ -751,19 +753,21 @@ handle_login (GVfsBackend *backend,
           g_str_has_prefix (buffer, "Enter passphrase for key"))
         {
           /* If password is in keyring at this point is because it failed */
-          if (password_in_keyring ||
+	  if (!op_backend->tmp_password && (password_in_keyring ||
               !g_vfs_keyring_lookup_password (op_backend->user,
                                               op_backend->host,
                                               NULL,
                                               "sftp",
                                               NULL,
                                               NULL,
-                                              &new_password))
+                                              &new_password)))
             {
               GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
               
               if (g_vfs_keyring_is_available ())
                 flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+	      if (!op_backend->user_specified)
+	        flags |= G_ASK_PASSWORD_NEED_USERNAME;
 
               g_free (new_password);
               
@@ -777,7 +781,7 @@ handle_login (GVfsBackend *backend,
                                                 flags,
                                                 &aborted,
                                                 &new_password,
-                                                NULL,
+                                                &new_user,
                                                 NULL,
                                                 &password_save) ||
                   aborted)
@@ -789,8 +793,36 @@ handle_login (GVfsBackend *backend,
                   break;
                 }
             }
+	  else if (op_backend->tmp_password)
+	    {
+	      /* I already a have a password of a previous login attempt
+	       * that failed because the user provided a new user name
+	       */
+	      new_password = op_backend->tmp_password;
+	      op_backend->tmp_password = NULL;
+	    }
           else
             password_in_keyring = TRUE;
+
+	  if (new_user && strcmp (new_user, op_backend->user) != 0)
+	    {
+	      g_free (op_backend->user);
+	      op_backend->user = new_user;
+	      
+	      g_free (op_backend->tmp_password);
+	      op_backend->tmp_password = new_password;
+	      new_password = NULL;
+	      
+	      g_set_error (error,
+			   G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+			   "Invalid user name");
+	      ret_val = FALSE;
+	      break;
+	    }
+	  else if (new_user)
+	    {
+	      g_free (new_user);
+	    }
           
           if (!g_output_stream_write_all (reply_stream,
                                           new_password, strlen (new_password),
@@ -1210,8 +1242,20 @@ do_mount (GVfsBackend *backend,
   
   if (!res)
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      if (error->code == G_IO_ERROR_INVALID_ARGUMENT)
+        {
+	  /* New username provided by the user,
+	   * we need to re-spawn the ssh command
+	   */
+	  g_error_free (error);
+	  do_mount (backend, job, mount_spec, mount_source, is_automount);
+	}
+      else
+        {
+	  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+	  g_error_free (error);
+	}
+      
       return;
     }
 
