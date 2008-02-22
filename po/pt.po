@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.22\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-20 22:50+0000\n"
-"PO-Revision-Date: 2008-02-20 22:55+0000\n"
+"POT-Creation-Date: 2008-02-22 22:26+0000\n"
+"PO-Revision-Date: 2008-02-22 22:30+0000\n"
 "Last-Translator: Duarte Loreto <happyguy_pt@hotmail.com>\n"
 "Language-Team: Portuguese <gnome_pt@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -114,7 +114,7 @@ msgstr "Fluxo não suporta procura"
 msgid "The query info operation is not supported"
 msgstr "A operação de consulta de informação não é suportada"
 
-#: ../client/gdaemonvfs.c:601
+#: ../client/gdaemonvfs.c:604
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Erro ao obter informação de montagem: %s"
@@ -205,6 +205,7 @@ msgid "CD/DVD Creator"
 msgstr "Criador de CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendnetwork.c:521
 msgid "The file is not a directory"
 msgstr "O ficheiro não é um directório"
 
@@ -301,9 +302,9 @@ msgstr "Computador"
 msgid "Filesystem"
 msgstr "Sistema de Ficheiros"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
-#: ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendnetwork.c:474
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
+#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
 msgstr "Ficheiro não existe"
 
@@ -389,7 +390,7 @@ msgstr "Incapaz de criar pedido"
 msgid "Target file already exists"
 msgstr "Já existe o ficheiro de destino"
 
-#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2578
+#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2623
 #: ../daemon/gvfsbackendsmb.c:945
 msgid "The file was externally modified"
 msgstr "O ficheiro foi alterado externamente"
@@ -399,7 +400,7 @@ msgstr "O ficheiro foi alterado externamente"
 msgid "Backup file creation failed"
 msgstr "Falha ao criar o ficheiro de cópia de segurança"
 
-#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1309
+#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1354
 msgid "No hostname specified"
 msgstr "Nenhum nome de máquina especificado"
 
@@ -413,7 +414,7 @@ msgstr "Tipo de procura não suportado"
 msgid "HTTP Client Error: %s"
 msgstr "Erro de Cliente HTTP: %s"
 
-#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1640
+#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1685
 #: ../daemon/gvfsbackendsmb.c:1192 ../daemon/gvfsbackendtrash.c:960
 msgid " (invalid encoding)"
 msgstr " (codificação inválida)"
@@ -422,68 +423,87 @@ msgstr " (codificação inválida)"
 msgid "Directory notification not supported"
 msgstr "Notificação de directório não suportada"
 
-#: ../daemon/gvfsbackendsftp.c:250
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:259 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Rede Windows"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:339
+msgid "Local network"
+msgstr "Rede local"
+
+#: ../daemon/gvfsbackendnetwork.c:560 ../daemon/gvfsbackendnetwork.c:695
+#: ../daemon/gvfsbackendnetwork.c:696
+msgid "Network"
+msgstr "Rede"
+
+#: ../daemon/gvfsbackendnetwork.c:613
+msgid "Can't monitor file or directory."
+msgstr "Incapaz de monitorizar um ficheiro ou um directório."
+
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "Aplicação ssh terminou inesperadamente"
 
-#: ../daemon/gvfsbackendsftp.c:258
+#: ../daemon/gvfsbackendsftp.c:259
 msgid "Permission denied"
 msgstr "Permissão negada"
 
-#: ../daemon/gvfsbackendsftp.c:265
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "Nome de máquina desconhecido"
 
-#: ../daemon/gvfsbackendsftp.c:272
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "Nenhum caminho para a máquina"
 
-#: ../daemon/gvfsbackendsftp.c:279
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "Ligação recusada pelo servidor"
 
-#: ../daemon/gvfsbackendsftp.c:286
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "Falha na verificação da chave da máquina"
 
-#: ../daemon/gvfsbackendsftp.c:371
+#: ../daemon/gvfsbackendsftp.c:372
 msgid "Unable to spawn ssh program"
 msgstr "Incapaz de iniciar aplicação ssh"
 
-#: ../daemon/gvfsbackendsftp.c:387
+#: ../daemon/gvfsbackendsftp.c:388
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Incapaz de iniciar aplicação ssh: %s"
 
-#: ../daemon/gvfsbackendsftp.c:490 ../daemon/gvfsbackendsftp.c:707
+#: ../daemon/gvfsbackendsftp.c:491 ../daemon/gvfsbackendsftp.c:709
 msgid "Timed out when logging in"
 msgstr "Tempo expirou ao iniciar sessão"
 
-#: ../daemon/gvfsbackendsftp.c:772
+#: ../daemon/gvfsbackendsftp.c:776
 msgid "Enter passphrase for key"
 msgstr "Introduza a frase-senha para a chave"
 
-#: ../daemon/gvfsbackendsftp.c:774
+#: ../daemon/gvfsbackendsftp.c:778
 msgid "Enter password"
 msgstr "Introduza a senha"
 
-#: ../daemon/gvfsbackendsftp.c:787
+#: ../daemon/gvfsbackendsftp.c:791
 msgid "Password dialog cancelled"
 msgstr "Diálogo de senha cancelado"
 
-#: ../daemon/gvfsbackendsftp.c:806
+#: ../daemon/gvfsbackendsftp.c:838
 msgid "Can't send password"
 msgstr "Incapaz de enviar a senha"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Log In Anyway"
 msgstr "Ainda Assim Iniciar Sessão"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Cancel Login"
 msgstr "Cancelar o Início de Sessão"
 
-#: ../daemon/gvfsbackendsftp.c:824
+#: ../daemon/gvfsbackendsftp.c:856
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -498,65 +518,65 @@ msgstr ""
 "A identidade enviada pelo computador remoto é %s. Caso queira ter a certeza "
 "absoluta de que é seguro prosseguir, contacto o administrador de sistemas."
 
-#: ../daemon/gvfsbackendsftp.c:844
+#: ../daemon/gvfsbackendsftp.c:876
 msgid "Login dialog cancelled"
 msgstr "Diálogo de início de sessão cancelado"
 
-#: ../daemon/gvfsbackendsftp.c:864
+#: ../daemon/gvfsbackendsftp.c:896
 msgid "Can't send host identity confirmation"
 msgstr "Incapaz de enviar a confirmação de identidade da máquina"
 
-#: ../daemon/gvfsbackendsftp.c:1235 ../daemon/gvfsbackendsftp.c:1258
+#: ../daemon/gvfsbackendsftp.c:1280 ../daemon/gvfsbackendsftp.c:1303
 msgid "Protocol error"
 msgstr "Erro de protocolo"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1275
+#: ../daemon/gvfsbackendsftp.c:1320
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp em %s"
 
-#: ../daemon/gvfsbackendsftp.c:1299
+#: ../daemon/gvfsbackendsftp.c:1344
 msgid "Unable to find supported ssh command"
 msgstr "Incapaz de encontrar comando ssh suportado"
 
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1652
+#: ../daemon/gvfsbackendsftp.c:1697
 #, c-format
 msgid "/ on %s"
 msgstr "/ em %s"
 
-#: ../daemon/gvfsbackendsftp.c:1716
+#: ../daemon/gvfsbackendsftp.c:1761
 msgid "File is directory"
 msgstr "Ficheiro é um directório"
 
-#: ../daemon/gvfsbackendsftp.c:1725
+#: ../daemon/gvfsbackendsftp.c:1770
 msgid "Failure"
 msgstr "Falha"
 
-#: ../daemon/gvfsbackendsftp.c:1790 ../daemon/gvfsbackendsftp.c:1852
-#: ../daemon/gvfsbackendsftp.c:1863 ../daemon/gvfsbackendsftp.c:1921
-#: ../daemon/gvfsbackendsftp.c:2011 ../daemon/gvfsbackendsftp.c:2040
-#: ../daemon/gvfsbackendsftp.c:2088 ../daemon/gvfsbackendsftp.c:2167
-#: ../daemon/gvfsbackendsftp.c:2278 ../daemon/gvfsbackendsftp.c:2319
-#: ../daemon/gvfsbackendsftp.c:2371 ../daemon/gvfsbackendsftp.c:2442
-#: ../daemon/gvfsbackendsftp.c:2462 ../daemon/gvfsbackendsftp.c:2616
-#: ../daemon/gvfsbackendsftp.c:2642 ../daemon/gvfsbackendsftp.c:2699
-#: ../daemon/gvfsbackendsftp.c:2758 ../daemon/gvfsbackendsftp.c:3038
-#: ../daemon/gvfsbackendsftp.c:3167 ../daemon/gvfsbackendsftp.c:3200
-#: ../daemon/gvfsbackendsftp.c:3301 ../daemon/gvfsbackendsftp.c:3342
-#: ../daemon/gvfsbackendsftp.c:3398 ../daemon/gvfsbackendsftp.c:3434
-#: ../daemon/gvfsbackendsftp.c:3468 ../daemon/gvfsbackendsftp.c:3483
-#: ../daemon/gvfsbackendsftp.c:3502
+#: ../daemon/gvfsbackendsftp.c:1835 ../daemon/gvfsbackendsftp.c:1897
+#: ../daemon/gvfsbackendsftp.c:1908 ../daemon/gvfsbackendsftp.c:1966
+#: ../daemon/gvfsbackendsftp.c:2056 ../daemon/gvfsbackendsftp.c:2085
+#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2212
+#: ../daemon/gvfsbackendsftp.c:2323 ../daemon/gvfsbackendsftp.c:2364
+#: ../daemon/gvfsbackendsftp.c:2416 ../daemon/gvfsbackendsftp.c:2487
+#: ../daemon/gvfsbackendsftp.c:2507 ../daemon/gvfsbackendsftp.c:2661
+#: ../daemon/gvfsbackendsftp.c:2687 ../daemon/gvfsbackendsftp.c:2744
+#: ../daemon/gvfsbackendsftp.c:2803 ../daemon/gvfsbackendsftp.c:3083
+#: ../daemon/gvfsbackendsftp.c:3212 ../daemon/gvfsbackendsftp.c:3245
+#: ../daemon/gvfsbackendsftp.c:3346 ../daemon/gvfsbackendsftp.c:3387
+#: ../daemon/gvfsbackendsftp.c:3443 ../daemon/gvfsbackendsftp.c:3479
+#: ../daemon/gvfsbackendsftp.c:3513 ../daemon/gvfsbackendsftp.c:3528
+#: ../daemon/gvfsbackendsftp.c:3547
 msgid "Invalid reply received"
 msgstr "Recebida uma resposta inválida"
 
-#: ../daemon/gvfsbackendsftp.c:2109
+#: ../daemon/gvfsbackendsftp.c:2154
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Erro ao criar ficheiro de cópia de segurança: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2524
+#: ../daemon/gvfsbackendsftp.c:2569
 msgid "Unable to create temporary file"
 msgstr "Incapaz de criar o ficheiro temporário"
 
@@ -610,10 +630,6 @@ msgstr "Erro ao remover o ficheiro de destino: %s"
 #: ../daemon/gvfsbackendsmb.c:1750
 msgid "Can't recursively move directory"
 msgstr "Incapaz de mover directório recursivamente"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:694
-msgid "Windows Network"
-msgstr "Rede Windows"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
