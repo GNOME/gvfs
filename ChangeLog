@@ -1,3 +1,8 @@
+2008-02-22  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c: (recompute_files):
+        Fix typo so we generate correct dns-sd links.
+
 2008-02-22  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendnetwork.c:

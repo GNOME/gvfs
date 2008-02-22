@@ -315,7 +315,7 @@ recompute_files (GVfsBackendNetwork *backend)
             while (info != NULL)
               {
                 file_name = g_strconcat("dnssd-domain-", g_file_info_get_name (info), NULL);
-                link_uri = g_strconcat("dnssd://", g_file_info_get_name (info), NULL);
+                link_uri = g_strconcat("dns-sd://", g_file_info_get_name (info), NULL);
                 file = network_file_new (file_name, 
                                          g_file_info_get_display_name (info), 
                                          link_uri, 
