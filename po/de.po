@@ -3,16 +3,15 @@
 # This file is distributed under the same license as the gvfs package.
 # Andre Klapper <ak-47@gmx.net>, 2008.
 # Hendrik Brandt <heb@gnome-de.org>, 2008.
-# Andre Klapper <ak-47@gmx.net>, 2008.
-# Hedrik Brandt <heb@gnome-de.org>, 2008.
+# 
 # 
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-22 11:15+0100\n"
-"PO-Revision-Date: 2008-02-22 16:20+0100\n"
+"POT-Creation-Date: 2008-02-23 23:14+0100\n"
+"PO-Revision-Date: 2008-02-23 23:17+0100\n"
 "Last-Translator: Hendrik Brandt <heb@gnome-de.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -120,7 +119,7 @@ msgstr "Durchsuchen im Datenstrom wird nicht unterstützt"
 msgid "The query info operation is not supported"
 msgstr "Das Abfragen von Informationen wird nicht unterstützt"
 
-#: ../client/gdaemonvfs.c:601
+#: ../client/gdaemonvfs.c:604
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Fehler beim Abfragen von Informationen zum Speicherort: %s"
@@ -212,6 +211,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD-Ersteller"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendnetwork.c:521
 msgid "The file is not a directory"
 msgstr "Die Datei ist kein Ordner"
 
@@ -312,9 +312,9 @@ msgstr "Rechner"
 msgid "Filesystem"
 msgstr "Dateisystem"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
-#: ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendnetwork.c:474
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
+#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
 msgstr "Datei existiert nicht"
 
@@ -433,6 +433,25 @@ msgstr " (ungültige Kodierung)"
 msgid "Directory notification not supported"
 msgstr "Ordnerbenachrichtigung wird nicht unterstützt"
 
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:259 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Windows-Netzwerk"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:339
+msgid "Local network"
+msgstr "Lokales Netzwerk"
+
+#: ../daemon/gvfsbackendnetwork.c:560 ../daemon/gvfsbackendnetwork.c:695
+#: ../daemon/gvfsbackendnetwork.c:696
+msgid "Network"
+msgstr "Netzwerk"
+
+#: ../daemon/gvfsbackendnetwork.c:613
+msgid "Can't monitor file or directory."
+msgstr "Datei oder Ordner kann nicht überwacht werden."
+
 #: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "Das SSH-Programm wurde unerwartet beendet"
@@ -502,11 +521,13 @@ msgid ""
 "\n"
 "The identity sent by the remote computer is %s. If you want to be absolutely "
 "sure it is safe to continue, contact the system administrator."
-msgstr "Die Identität des entfernten Rechners (%s) ist unbekannt.\n"
+msgstr ""
+"Die Identität des entfernten Rechners (%s) ist unbekannt.\n"
 "Dies ist der Fall, wenn Sie sich das erste Mal an einem Rechner anmelden.\n"
 "\n"
-"Die vom entfernten Rechner übermittelte Identität ist %s. Wenn Sie vor dem Fortfahren "
-"absolut sicher gehen wollen, dann kontaktieren Sie Ihren Systemadministrator."
+"Die vom entfernten Rechner übermittelte Identität ist %s. Wenn Sie vor dem "
+"Fortfahren absolut sicher gehen wollen, dann kontaktieren Sie Ihren "
+"Systemadministrator."
 
 #: ../daemon/gvfsbackendsftp.c:876
 msgid "Login dialog cancelled"
@@ -620,10 +641,6 @@ msgstr "Fehler beim Löschen der Zieldatei: %s"
 #: ../daemon/gvfsbackendsmb.c:1750
 msgid "Can't recursively move directory"
 msgstr "Ordner kann nicht rekursiv verschoben werden"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:694
-msgid "Windows Network"
-msgstr "Windows-Netzwerk"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
