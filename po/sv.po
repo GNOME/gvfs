@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-20 19:11+0100\n"
-"PO-Revision-Date: 2008-02-20 19:14+0100\n"
+"POT-Creation-Date: 2008-02-22 12:58+0100\n"
+"PO-Revision-Date: 2008-02-22 12:58+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgstr "Sökning stöds inte i strömmen"
 msgid "The query info operation is not supported"
 msgstr "Frågeåtgärden stöds inte"
 
-#: ../client/gdaemonvfs.c:601
+#: ../client/gdaemonvfs.c:604
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Fel vid hämtning av monteringsinformation: %s"
@@ -223,6 +223,7 @@ msgstr "Cd/dvd-skapare"
 
 #: ../daemon/gvfsbackendburn.c:681
 #: ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendnetwork.c:521
 msgid "The file is not a directory"
 msgstr "Filen är inte en katalog"
 
@@ -330,6 +331,7 @@ msgid "Filesystem"
 msgstr "Filsystem"
 
 #: ../daemon/gvfsbackendcomputer.c:571
+#: ../daemon/gvfsbackendnetwork.c:474
 #: ../daemon/gvfsbackendsmbbrowse.c:799
 #: ../daemon/gvfsbackendsmbbrowse.c:866
 #: ../daemon/gvfsbackendsmbbrowse.c:1037
@@ -427,7 +429,7 @@ msgid "Target file already exists"
 msgstr "Målfilen finns redan"
 
 #: ../daemon/gvfsbackenddav.c:1286
-#: ../daemon/gvfsbackendsftp.c:2578
+#: ../daemon/gvfsbackendsftp.c:2623
 #: ../daemon/gvfsbackendsmb.c:945
 msgid "The file was externally modified"
 msgstr "Filen blev externt ändrad"
@@ -439,7 +441,7 @@ msgid "Backup file creation failed"
 msgstr "Skapandet av säkerhetskopia misslyckades"
 
 #: ../daemon/gvfsbackendftp.c:109
-#: ../daemon/gvfsbackendsftp.c:1309
+#: ../daemon/gvfsbackendsftp.c:1354
 msgid "No hostname specified"
 msgstr "Inget värdnamn angivet"
 
@@ -455,7 +457,7 @@ msgid "HTTP Client Error: %s"
 msgstr "HTTP-klientfel: %s"
 
 #: ../daemon/gvfsbackendhttp.c:496
-#: ../daemon/gvfsbackendsftp.c:1640
+#: ../daemon/gvfsbackendsftp.c:1685
 #: ../daemon/gvfsbackendsmb.c:1192
 #: ../daemon/gvfsbackendtrash.c:960
 msgid " (invalid encoding)"
@@ -465,69 +467,90 @@ msgstr " (ogiltig kodning)"
 msgid "Directory notification not supported"
 msgstr "Notifiering för katalog stöds inte"
 
-#: ../daemon/gvfsbackendsftp.c:250
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:259
+#: ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Windows-nätverk"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:339
+msgid "Local network"
+msgstr "Lokalt nätverk"
+
+#: ../daemon/gvfsbackendnetwork.c:560
+#: ../daemon/gvfsbackendnetwork.c:695
+#: ../daemon/gvfsbackendnetwork.c:696
+msgid "Network"
+msgstr "Nätverk"
+
+#: ../daemon/gvfsbackendnetwork.c:613
+msgid "Can't monitor file or directory."
+msgstr "Kan inte övervaka fil eller katalog."
+
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "ssh-programmet avslutades oväntat"
 
-#: ../daemon/gvfsbackendsftp.c:258
+#: ../daemon/gvfsbackendsftp.c:259
 msgid "Permission denied"
 msgstr "Åtkomst nekas"
 
-#: ../daemon/gvfsbackendsftp.c:265
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "Värdnamnet är inte känt"
 
-#: ../daemon/gvfsbackendsftp.c:272
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "Ingen väg till värd"
 
-#: ../daemon/gvfsbackendsftp.c:279
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "Anslutningen nekades av server"
 
-#: ../daemon/gvfsbackendsftp.c:286
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "Verifiering av värdnyckel misslyckades"
 
-#: ../daemon/gvfsbackendsftp.c:371
+#: ../daemon/gvfsbackendsftp.c:372
 msgid "Unable to spawn ssh program"
 msgstr "Kunde inte starta ssh-program"
 
-#: ../daemon/gvfsbackendsftp.c:387
+#: ../daemon/gvfsbackendsftp.c:388
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Kunde inte starta ssh-program: %s"
 
-#: ../daemon/gvfsbackendsftp.c:490
-#: ../daemon/gvfsbackendsftp.c:707
+#: ../daemon/gvfsbackendsftp.c:491
+#: ../daemon/gvfsbackendsftp.c:709
 msgid "Timed out when logging in"
 msgstr "Tidsgräns överstigen vid inloggning"
 
-#: ../daemon/gvfsbackendsftp.c:772
+#: ../daemon/gvfsbackendsftp.c:776
 msgid "Enter passphrase for key"
 msgstr "Ange lösenfras för nyckel"
 
-#: ../daemon/gvfsbackendsftp.c:774
+#: ../daemon/gvfsbackendsftp.c:778
 msgid "Enter password"
 msgstr "Ange lösenord"
 
-#: ../daemon/gvfsbackendsftp.c:787
+#: ../daemon/gvfsbackendsftp.c:791
 msgid "Password dialog cancelled"
 msgstr "Lösenordsdialogen avbröts"
 
-#: ../daemon/gvfsbackendsftp.c:806
+#: ../daemon/gvfsbackendsftp.c:838
 msgid "Can't send password"
 msgstr "Kan inte skicka lösenord"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Log In Anyway"
 msgstr "Logga in ändå"
 
-#: ../daemon/gvfsbackendsftp.c:814
+#: ../daemon/gvfsbackendsftp.c:846
 msgid "Cancel Login"
 msgstr "Avbryt inloggning"
 
-#: ../daemon/gvfsbackendsftp.c:824
+#: ../daemon/gvfsbackendsftp.c:856
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -540,79 +563,79 @@ msgstr ""
 "\n"
 "Identiteten som skickades av fjärrdatorn är %s.  Du bör kontakta systemadministratören om du vill vara absolut säker på identiteten."
 
-#: ../daemon/gvfsbackendsftp.c:844
+#: ../daemon/gvfsbackendsftp.c:876
 msgid "Login dialog cancelled"
 msgstr "Inloggningsdialogen avbröts"
 
-#: ../daemon/gvfsbackendsftp.c:864
+#: ../daemon/gvfsbackendsftp.c:896
 msgid "Can't send host identity confirmation"
 msgstr "Kan inte skicka värdidentitetsbekräftelse"
 
-#: ../daemon/gvfsbackendsftp.c:1235
-#: ../daemon/gvfsbackendsftp.c:1258
+#: ../daemon/gvfsbackendsftp.c:1280
+#: ../daemon/gvfsbackendsftp.c:1303
 msgid "Protocol error"
 msgstr "Protokollfel"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1275
+#: ../daemon/gvfsbackendsftp.c:1320
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp på %s"
 
-#: ../daemon/gvfsbackendsftp.c:1299
+#: ../daemon/gvfsbackendsftp.c:1344
 msgid "Unable to find supported ssh command"
 msgstr "Kunde inte hitta ssh-kommando som stöds"
 
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1652
+#: ../daemon/gvfsbackendsftp.c:1697
 #, c-format
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: ../daemon/gvfsbackendsftp.c:1716
+#: ../daemon/gvfsbackendsftp.c:1761
 msgid "File is directory"
 msgstr "Filen är en katalog"
 
-#: ../daemon/gvfsbackendsftp.c:1725
+#: ../daemon/gvfsbackendsftp.c:1770
 msgid "Failure"
 msgstr "Fel"
 
-#: ../daemon/gvfsbackendsftp.c:1790
-#: ../daemon/gvfsbackendsftp.c:1852
-#: ../daemon/gvfsbackendsftp.c:1863
-#: ../daemon/gvfsbackendsftp.c:1921
-#: ../daemon/gvfsbackendsftp.c:2011
-#: ../daemon/gvfsbackendsftp.c:2040
-#: ../daemon/gvfsbackendsftp.c:2088
-#: ../daemon/gvfsbackendsftp.c:2167
-#: ../daemon/gvfsbackendsftp.c:2278
-#: ../daemon/gvfsbackendsftp.c:2319
-#: ../daemon/gvfsbackendsftp.c:2371
-#: ../daemon/gvfsbackendsftp.c:2442
-#: ../daemon/gvfsbackendsftp.c:2462
-#: ../daemon/gvfsbackendsftp.c:2616
-#: ../daemon/gvfsbackendsftp.c:2642
-#: ../daemon/gvfsbackendsftp.c:2699
-#: ../daemon/gvfsbackendsftp.c:2758
-#: ../daemon/gvfsbackendsftp.c:3038
-#: ../daemon/gvfsbackendsftp.c:3167
-#: ../daemon/gvfsbackendsftp.c:3200
-#: ../daemon/gvfsbackendsftp.c:3301
-#: ../daemon/gvfsbackendsftp.c:3342
-#: ../daemon/gvfsbackendsftp.c:3398
-#: ../daemon/gvfsbackendsftp.c:3434
-#: ../daemon/gvfsbackendsftp.c:3468
-#: ../daemon/gvfsbackendsftp.c:3483
-#: ../daemon/gvfsbackendsftp.c:3502
+#: ../daemon/gvfsbackendsftp.c:1835
+#: ../daemon/gvfsbackendsftp.c:1897
+#: ../daemon/gvfsbackendsftp.c:1908
+#: ../daemon/gvfsbackendsftp.c:1966
+#: ../daemon/gvfsbackendsftp.c:2056
+#: ../daemon/gvfsbackendsftp.c:2085
+#: ../daemon/gvfsbackendsftp.c:2133
+#: ../daemon/gvfsbackendsftp.c:2212
+#: ../daemon/gvfsbackendsftp.c:2323
+#: ../daemon/gvfsbackendsftp.c:2364
+#: ../daemon/gvfsbackendsftp.c:2416
+#: ../daemon/gvfsbackendsftp.c:2487
+#: ../daemon/gvfsbackendsftp.c:2507
+#: ../daemon/gvfsbackendsftp.c:2661
+#: ../daemon/gvfsbackendsftp.c:2687
+#: ../daemon/gvfsbackendsftp.c:2744
+#: ../daemon/gvfsbackendsftp.c:2803
+#: ../daemon/gvfsbackendsftp.c:3083
+#: ../daemon/gvfsbackendsftp.c:3212
+#: ../daemon/gvfsbackendsftp.c:3245
+#: ../daemon/gvfsbackendsftp.c:3346
+#: ../daemon/gvfsbackendsftp.c:3387
+#: ../daemon/gvfsbackendsftp.c:3443
+#: ../daemon/gvfsbackendsftp.c:3479
+#: ../daemon/gvfsbackendsftp.c:3513
+#: ../daemon/gvfsbackendsftp.c:3528
+#: ../daemon/gvfsbackendsftp.c:3547
 msgid "Invalid reply received"
 msgstr "Ogiltigt svar togs emot"
 
-#: ../daemon/gvfsbackendsftp.c:2109
+#: ../daemon/gvfsbackendsftp.c:2154
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Fel vid skapande av säkerhetskopia: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2524
+#: ../daemon/gvfsbackendsftp.c:2569
 msgid "Unable to create temporary file"
 msgstr "Kunde inte skapa temporärfil"
 
@@ -668,10 +691,6 @@ msgstr "Fel vid borttagning av målfil: %s"
 #: ../daemon/gvfsbackendsmb.c:1750
 msgid "Can't recursively move directory"
 msgstr "Kan inte flytta katalog rekursivt"
-
-#: ../daemon/gvfsbackendsmbbrowse.c:694
-msgid "Windows Network"
-msgstr "Windows-nätverk"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
