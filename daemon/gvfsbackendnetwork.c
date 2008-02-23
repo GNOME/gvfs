@@ -343,8 +343,8 @@ recompute_files (GVfsBackendNetwork *backend)
 
     /* If gconf setting "/system/dns_sd/extra_domains" is set to a list of domains:
      * links to dns-sd://$domain/ */
-    if (backend->current_workgroup == NULL ||
-       backend->current_workgroup[0] == 0)
+    if (backend->extra_domains != NULL &&
+       backend->extra_domains[0] != 0)
       {
         char **domains;
         int i;
