@@ -416,7 +416,7 @@ msgstr "dns-sd"
 
 #: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:613
 msgid "Can't monitor file or directory."
-msgstr "Kan bestand of map niet monitoren"
+msgstr "Kan bestand of map niet monitoren."
 
 #. TODO: Names, etc
 #: ../daemon/gvfsbackenddnssd.c:687
