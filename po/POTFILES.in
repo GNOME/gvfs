@@ -15,6 +15,7 @@ daemon/gvfsbackendburn.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c
 daemon/gvfsbackenddav.c
+daemon/gvfsbackenddnssd.c
 daemon/gvfsbackendftp.c
 daemon/gvfsbackendhttp.c
 daemon/gvfsbackendlocaltest.c
