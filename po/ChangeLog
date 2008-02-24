@@ -1,5 +1,9 @@
 2008-02-24  Wouter Bolsterlee  <wbolster@svn.gnome.org>
 
+	* nl.po: Updated Dutch translation by Wouter Bolsterlee.
+
+2008-02-24  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
 	* POTFILES.in: Add missing file to POTFILES.in. This
 	string freeze break was approved by the Gnome i18n team.
 
@@ -64,7 +68,7 @@
 
 2008-02-22 Arangel Angov <arangel@linux.net.mk>
 
-        * mk.po: Updated Macedonian translation.
+	* mk.po: Updated Macedonian translation.
 
 2008-02-21  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
 
@@ -108,7 +112,7 @@
 2008-02-11  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
 
 	* es.po: Updated Spanish translation, fixed typos thanks to Ignacio
-	  Casal Quinteiro.
+	Casal Quinteiro.
 
 2008-02-19  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

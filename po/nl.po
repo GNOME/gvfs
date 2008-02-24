@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-17 21:13+0100\n"
-"PO-Revision-Date: 2008-02-17 21:12+0100\n"
+"POT-Creation-Date: 2008-02-24 20:57+0100\n"
+"PO-Revision-Date: 2008-02-24 20:57+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,105 +17,105 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1878
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1862
 msgid "Operation not supported, files on different mounts"
 msgstr "Bewerking niet ondersteund; bestanden op verschillende koppelpunten"
 
-#: ../client/gdaemonfile.c:761
+#: ../client/gdaemonfile.c:758
 msgid "Invalid return value from get_info"
 msgstr "Ongeldig resultaat van ‘get_info’"
 
-#: ../client/gdaemonfile.c:790
+#: ../client/gdaemonfile.c:787
 msgid "Invalid return value from query_info"
 msgstr "Ongeldig resultaat van ‘query_info’"
 
-#: ../client/gdaemonfile.c:868
+#: ../client/gdaemonfile.c:865
 msgid "Couldn't get stream file descriptor"
 msgstr "Kon ‘stream file descriptor’ niet verkrijgen"
 
-#: ../client/gdaemonfile.c:900 ../client/gdaemonfile.c:970
-#: ../client/gdaemonfile.c:1029 ../client/gdaemonfile.c:1088
-#: ../client/gdaemonfile.c:1150
+#: ../client/gdaemonfile.c:897 ../client/gdaemonfile.c:967
+#: ../client/gdaemonfile.c:1026 ../client/gdaemonfile.c:1085
+#: ../client/gdaemonfile.c:1147
 msgid "Invalid return value from open"
 msgstr "Ongeldig resultaat van ‘open’"
 
-#: ../client/gdaemonfile.c:980 ../client/gdaemonfile.c:1039
-#: ../client/gdaemonfile.c:1098 ../client/gdaemonfile.c:1160
+#: ../client/gdaemonfile.c:977 ../client/gdaemonfile.c:1036
+#: ../client/gdaemonfile.c:1095 ../client/gdaemonfile.c:1157
 msgid "Didn't get stream file descriptor"
 msgstr "Kon ‘stream file descriptor’ niet verkrijgen"
 
-#: ../client/gdaemonfile.c:1212 ../client/gdaemonfile.c:1229
+#: ../client/gdaemonfile.c:1209 ../client/gdaemonfile.c:1226
 msgid "Invalid return value from call"
 msgstr "Ongeldig resultaat van aanroep"
 
-#: ../client/gdaemonfile.c:1508
+#: ../client/gdaemonfile.c:1505
 msgid "Invalid return value from get_filesystem_info"
 msgstr "Ongeldig resultaat van ‘get_filesystem_info’"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1547
+#: ../client/gdaemonfile.c:1544
 msgid "Could not find enclosing mount"
 msgstr "Kon omvattend koppelpunt niet vinden"
 
-#: ../client/gdaemonfile.c:1577
+#: ../client/gdaemonfile.c:1574
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Ongeldige bestandsnaam: ‘%s’"
 
-#: ../client/gdaemonfile.c:1619
+#: ../client/gdaemonfile.c:1616
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Ongeldig resultaat van ‘query_filesystem_info’"
 
-#: ../client/gdaemonfile.c:2027
+#: ../client/gdaemonfile.c:2007
 msgid "Invalid return value from monitor_dir"
 msgstr "Ongeldig resultaat van ‘monitor_dir’"
 
-#: ../client/gdaemonfile.c:2076
+#: ../client/gdaemonfile.c:2056
 msgid "Invalid return value from monitor_file"
 msgstr "Ongeldig resultaat van ‘monitor_file’"
 
 #: ../client/gdaemonfileinputstream.c:451
 #: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1307
-#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileinputstream.c:1304
+#: ../client/gdaemonfileinputstream.c:1314
 #: ../client/gdaemonfileoutputstream.c:403
 #: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1051
-#: ../client/gdaemonfileoutputstream.c:1061
+#: ../client/gdaemonfileoutputstream.c:1052
+#: ../client/gdaemonfileoutputstream.c:1062
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Fout in stream-protocol: %s"
 
 #: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileinputstream.c:1314
 #: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1061
+#: ../client/gdaemonfileoutputstream.c:1062
 msgid "End of stream"
 msgstr "Einde van stream"
 
 #: ../client/gdaemonfileinputstream.c:519
 #: ../client/gdaemonfileinputstream.c:676
-#: ../client/gdaemonfileinputstream.c:784
-#: ../client/gdaemonfileinputstream.c:1035
+#: ../client/gdaemonfileinputstream.c:785
+#: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:962
-#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:298
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:977
+#: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
+#: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
 msgid "Operation was cancelled"
 msgstr "Bewerking is geannuleerd"
 
-#: ../client/gdaemonfileinputstream.c:1210
+#: ../client/gdaemonfileinputstream.c:1211
 #: ../client/gdaemonfileoutputstream.c:946
 msgid "Seek not supported on stream"
 msgstr "Zoeken in stream niet ondersteund"
 
-#: ../client/gdaemonfileinputstream.c:1244
+#: ../client/gdaemonfileinputstream.c:1241
 msgid "The query info operation is not supported"
 msgstr "Bewerking voor informatieopvraag wordt niet ondersteund"
 
-#: ../client/gdaemonvfs.c:603
+#: ../client/gdaemonvfs.c:604
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Kon koppelingsinfo niet verkrijgen: %s"
@@ -143,37 +143,37 @@ msgstr "Ongeldig formaat bestandsinformatie"
 msgid "Invalid attribute info list content"
 msgstr "Ongeldige inhoud in eigenschappenlijst"
 
-#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:192
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Fout bij verbinden met D-Bus: %s"
 
-#: ../daemon/daemon-main.c:82
+#: ../daemon/daemon-main.c:83
 #, c-format
 msgid "Error: %s"
 msgstr "Fout: %s"
 
-#: ../daemon/daemon-main.c:115
+#: ../daemon/daemon-main.c:117
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Gebruik: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
+#: ../daemon/daemon-main.c:141 ../daemon/daemon-main.c:159
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Gebruik: %s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:155
+#: ../daemon/daemon-main.c:157
 #, c-format
 msgid "No mount type specified"
 msgstr "Geen koppeltype opgegeven"
 
-#: ../daemon/daemon-main.c:225
+#: ../daemon/daemon-main.c:227
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "koppelpunt voor %s reeds actief"
 
-#: ../daemon/daemon-main.c:236
+#: ../daemon/daemon-main.c:238
 msgid "error starting mount daemon"
 msgstr "fout bij starten van koppelvoorziening"
 
@@ -207,6 +207,7 @@ msgid "CD/DVD Creator"
 msgstr "Cd/dvd branden"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:521
 msgid "The file is not a directory"
 msgstr "Het bestand is geen map"
 
@@ -307,13 +308,14 @@ msgstr "Computer"
 msgid "Filesystem"
 msgstr "Bestandssysteem"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:786
-#: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
-#: ../daemon/gvfsbackendsmbbrowse.c:1098
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendnetwork.c:474 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
 msgstr "Bestand bestaat niet"
 
-#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:634
+#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:635
 msgid "Can't open directory"
 msgstr "Kan map niet openen"
 
@@ -343,76 +345,95 @@ msgstr "Kan bestand niet ontkoppelen"
 msgid "Can't eject file"
 msgstr "Kan bestand niet uitwerpen"
 
-#: ../daemon/gvfsbackenddav.c:253 ../daemon/gvfsbackenddav.c:882
+#: ../daemon/gvfsbackenddav.c:248 ../daemon/gvfsbackenddav.c:878
 #: ../daemon/gvfsbackendhttp.c:172
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP-fout: %s"
 
-#: ../daemon/gvfsbackenddav.c:269
+#: ../daemon/gvfsbackenddav.c:264
 msgid "Could not parse response"
 msgstr "Kan antwoord niet verwerken"
 
-#: ../daemon/gvfsbackenddav.c:278
+#: ../daemon/gvfsbackenddav.c:273
 msgid "Empty response"
 msgstr "Leeg antwoord"
 
-#: ../daemon/gvfsbackenddav.c:285
+#: ../daemon/gvfsbackenddav.c:280
 msgid "Unexpected reply from server"
 msgstr "Onverwacht antwoord van server"
 
-#: ../daemon/gvfsbackenddav.c:797
+#: ../daemon/gvfsbackenddav.c:792
 msgid "Please enter proxy password"
 msgstr "Voer uw proxy-wachtwoord in"
 
 # Vrij vertaald (Wouter Bolsterlee)
-#: ../daemon/gvfsbackenddav.c:806
+#: ../daemon/gvfsbackenddav.c:801
 msgid "WebDAV share"
 msgstr "WebDAV-map"
 
-#: ../daemon/gvfsbackenddav.c:808
+#: ../daemon/gvfsbackenddav.c:803
 #, c-format
 msgid "Enter password for %s"
 msgstr "Voer wachtwoord voor %s in"
 
-#: ../daemon/gvfsbackenddav.c:886
+#: ../daemon/gvfsbackenddav.c:882
 msgid "Not a WebDAV enabled share"
 msgstr "Geen WebDAV- schijf"
 
-#: ../daemon/gvfsbackenddav.c:949 ../daemon/gvfsbackendhttp.c:241
-#: ../daemon/gvfsbackendsmb.c:542
+#: ../daemon/gvfsbackenddav.c:942 ../daemon/gvfsbackendhttp.c:238
+#: ../daemon/gvfsbackendsmb.c:557
 msgid "Invalid mount spec"
 msgstr "Ongeldige aankoppelspecificatie"
 
-#: ../daemon/gvfsbackenddav.c:1038
+#: ../daemon/gvfsbackenddav.c:1031
 msgid "Response invalid"
 msgstr "Ongeldig antwoord"
 
-#: ../daemon/gvfsbackenddav.c:1066 ../daemon/gvfsbackenddav.c:1175
+#: ../daemon/gvfsbackenddav.c:1059 ../daemon/gvfsbackenddav.c:1168
 msgid "Could not create request"
 msgstr "Kon aanvraag niet aanmaken"
 
-#: ../daemon/gvfsbackenddav.c:1223 ../daemon/gvfsbackendsmb.c:1674
+#: ../daemon/gvfsbackenddav.c:1216 ../daemon/gvfsbackendsmb.c:1689
 msgid "Target file already exists"
 msgstr "Doelbestand bestaat al"
 
 # Vrij vertaald (Wouter Bolsterlee)
-#: ../daemon/gvfsbackenddav.c:1293 ../daemon/gvfsbackendsftp.c:2433
-#: ../daemon/gvfsbackendsmb.c:930
+#: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2623
+#: ../daemon/gvfsbackendsmb.c:945
 msgid "The file was externally modified"
 msgstr "Het bestand is tussentijds gewijzigd"
 
-#: ../daemon/gvfsbackenddav.c:1324 ../daemon/gvfsbackendsmb.c:968
-#: ../daemon/gvfsbackendsmb.c:1691
+#: ../daemon/gvfsbackenddav.c:1317 ../daemon/gvfsbackendsmb.c:983
+#: ../daemon/gvfsbackendsmb.c:1706
 msgid "Backup file creation failed"
 msgstr "Aanmaken reservekopie"
 
-#: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1164
+#. TODO: Name
+#: ../daemon/gvfsbackenddnssd.c:433
+msgid "dns-sd"
+msgstr "dns-sd"
+
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:613
+msgid "Can't monitor file or directory."
+msgstr "Kan bestand of map niet monitoren"
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:687
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:560
+#: ../daemon/gvfsbackendnetwork.c:695 ../daemon/gvfsbackendnetwork.c:696
+msgid "Network"
+msgstr "Netwerk"
+
+#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1354
 msgid "No hostname specified"
 msgstr "Geen hostnaam opgegeven"
 
-#: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:633
-#: ../daemon/gvfsbackendsmb.c:1064
+#: ../daemon/gvfsbackendftp.c:197 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendsmb.c:1079
 msgid "Unsupported seek type"
 msgstr "Niet ondersteund zoektype"
 
@@ -421,8 +442,8 @@ msgstr "Niet ondersteund zoektype"
 msgid "HTTP Client Error: %s"
 msgstr "HTTP-clientfout: %s"
 
-#: ../daemon/gvfsbackendhttp.c:506 ../daemon/gvfsbackendsftp.c:1495
-#: ../daemon/gvfsbackendsmb.c:1177 ../daemon/gvfsbackendtrash.c:959
+#: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1685
+#: ../daemon/gvfsbackendsmb.c:1192 ../daemon/gvfsbackendtrash.c:960
 msgid " (invalid encoding)"
 msgstr " (ongeldige codering)"
 
@@ -430,207 +451,245 @@ msgstr " (ongeldige codering)"
 msgid "Directory notification not supported"
 msgstr "Mapwijzigingsmeldingen niet ondersteund"
 
-#: ../daemon/gvfsbackendsftp.c:249
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:259 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Windows-netwerk"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:339
+msgid "Local network"
+msgstr "Lokaal netwerk"
+
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "SSH-programma werd onverwacht afgesloten"
 
-#: ../daemon/gvfsbackendsftp.c:257
+#: ../daemon/gvfsbackendsftp.c:259
 msgid "Permission denied"
 msgstr "Toegang geweiger"
 
-#: ../daemon/gvfsbackendsftp.c:264
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "Hostnaam onbekend"
 
-#: ../daemon/gvfsbackendsftp.c:271
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "Geen route naar host"
 
-#: ../daemon/gvfsbackendsftp.c:278
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "Verbinding geweigerd door server"
 
-#: ../daemon/gvfsbackendsftp.c:285
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "Controle van hostsleutel mislukt"
 
-#: ../daemon/gvfsbackendsftp.c:370
+#: ../daemon/gvfsbackendsftp.c:372
 msgid "Unable to spawn ssh program"
 msgstr "Kon SSH-programma niet starten"
 
-#: ../daemon/gvfsbackendsftp.c:386
+#: ../daemon/gvfsbackendsftp.c:388
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Kon SSH-programma niet starten: %s"
 
-#: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:646
+#: ../daemon/gvfsbackendsftp.c:491 ../daemon/gvfsbackendsftp.c:709
 msgid "Timed out when logging in"
 msgstr "Wachttijd voor aanmelden overschreven"
 
-#: ../daemon/gvfsbackendsftp.c:694
+#: ../daemon/gvfsbackendsftp.c:776
 msgid "Enter passphrase for key"
 msgstr "Voer wachtwoordzin voor sleutel in"
 
-#: ../daemon/gvfsbackendsftp.c:696
+#: ../daemon/gvfsbackendsftp.c:778
 msgid "Enter password"
 msgstr "Voer wachtwoord in"
 
-#: ../daemon/gvfsbackendsftp.c:708
+#: ../daemon/gvfsbackendsftp.c:791
 msgid "Password dialog cancelled"
 msgstr "Wachtwoordvenster geannuleerd"
 
-#: ../daemon/gvfsbackendsftp.c:724
+#: ../daemon/gvfsbackendsftp.c:838
 msgid "Can't send password"
 msgstr "Kon wachtwoord niet zenden"
 
-#: ../daemon/gvfsbackendsftp.c:1090 ../daemon/gvfsbackendsftp.c:1113
+#: ../daemon/gvfsbackendsftp.c:846
+msgid "Log In Anyway"
+msgstr "Toch aanmelden"
+
+#: ../daemon/gvfsbackendsftp.c:846
+msgid "Cancel Login"
+msgstr "Aanmelden annuleren"
+
+#: ../daemon/gvfsbackendsftp.c:856
+#, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
+msgstr ""
+"De identiteit van de computer op afstand (%s) is onbekend.\n"
+"Dit gebeurt wanneer u zich voor de eerste keer bij een computer aanmeldt.\n"
+"\n"
+"De identiteit die door de computer op afstand is verzonden is %s. Indien u "
+"absoluut zeker wilt weten of het veilig is om door te gaan, neem dan contact "
+"op met de systeembeheerder."
+
+#: ../daemon/gvfsbackendsftp.c:876
+msgid "Login dialog cancelled"
+msgstr "Aanmeldvenster geannuleerd"
+
+#: ../daemon/gvfsbackendsftp.c:896
+msgid "Can't send host identity confirmation"
+msgstr "Kan informatie over host-identiteit niet zenden"
+
+#: ../daemon/gvfsbackendsftp.c:1280 ../daemon/gvfsbackendsftp.c:1303
 msgid "Protocol error"
 msgstr "Protocolfout"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1130
+#: ../daemon/gvfsbackendsftp.c:1320
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp op %s"
 
-#: ../daemon/gvfsbackendsftp.c:1154
+#: ../daemon/gvfsbackendsftp.c:1344
 msgid "Unable to find supported ssh command"
 msgstr "Kon geen ondersteund SSH-programma vinden"
 
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1507
+#: ../daemon/gvfsbackendsftp.c:1697
 #, c-format
 msgid "/ on %s"
 msgstr "/ op %s"
 
-#: ../daemon/gvfsbackendsftp.c:1571
+#: ../daemon/gvfsbackendsftp.c:1761
 msgid "File is directory"
 msgstr "Bestand is een map"
 
-#: ../daemon/gvfsbackendsftp.c:1580
+#: ../daemon/gvfsbackendsftp.c:1770
 msgid "Failure"
 msgstr "Mislukt"
 
-#: ../daemon/gvfsbackendsftp.c:1645 ../daemon/gvfsbackendsftp.c:1707
-#: ../daemon/gvfsbackendsftp.c:1718 ../daemon/gvfsbackendsftp.c:1776
-#: ../daemon/gvfsbackendsftp.c:1866 ../daemon/gvfsbackendsftp.c:1895
-#: ../daemon/gvfsbackendsftp.c:1943 ../daemon/gvfsbackendsftp.c:2022
-#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2174
-#: ../daemon/gvfsbackendsftp.c:2226 ../daemon/gvfsbackendsftp.c:2297
-#: ../daemon/gvfsbackendsftp.c:2317 ../daemon/gvfsbackendsftp.c:2471
-#: ../daemon/gvfsbackendsftp.c:2497 ../daemon/gvfsbackendsftp.c:2554
-#: ../daemon/gvfsbackendsftp.c:2613 ../daemon/gvfsbackendsftp.c:2895
-#: ../daemon/gvfsbackendsftp.c:3024 ../daemon/gvfsbackendsftp.c:3057
-#: ../daemon/gvfsbackendsftp.c:3158 ../daemon/gvfsbackendsftp.c:3199
-#: ../daemon/gvfsbackendsftp.c:3255 ../daemon/gvfsbackendsftp.c:3291
-#: ../daemon/gvfsbackendsftp.c:3325 ../daemon/gvfsbackendsftp.c:3340
-#: ../daemon/gvfsbackendsftp.c:3359
+#: ../daemon/gvfsbackendsftp.c:1835 ../daemon/gvfsbackendsftp.c:1897
+#: ../daemon/gvfsbackendsftp.c:1908 ../daemon/gvfsbackendsftp.c:1966
+#: ../daemon/gvfsbackendsftp.c:2056 ../daemon/gvfsbackendsftp.c:2085
+#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2212
+#: ../daemon/gvfsbackendsftp.c:2323 ../daemon/gvfsbackendsftp.c:2364
+#: ../daemon/gvfsbackendsftp.c:2416 ../daemon/gvfsbackendsftp.c:2487
+#: ../daemon/gvfsbackendsftp.c:2507 ../daemon/gvfsbackendsftp.c:2661
+#: ../daemon/gvfsbackendsftp.c:2687 ../daemon/gvfsbackendsftp.c:2744
+#: ../daemon/gvfsbackendsftp.c:2803 ../daemon/gvfsbackendsftp.c:3083
+#: ../daemon/gvfsbackendsftp.c:3212 ../daemon/gvfsbackendsftp.c:3245
+#: ../daemon/gvfsbackendsftp.c:3346 ../daemon/gvfsbackendsftp.c:3387
+#: ../daemon/gvfsbackendsftp.c:3443 ../daemon/gvfsbackendsftp.c:3479
+#: ../daemon/gvfsbackendsftp.c:3513 ../daemon/gvfsbackendsftp.c:3528
+#: ../daemon/gvfsbackendsftp.c:3547
 msgid "Invalid reply received"
 msgstr "Ongeldig antwoord ontvangen"
 
-#: ../daemon/gvfsbackendsftp.c:1964
+#: ../daemon/gvfsbackendsftp.c:2154
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Fout bij maken reservekopie: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2379
+#: ../daemon/gvfsbackendsftp.c:2569
 msgid "Unable to create temporary file"
 msgstr "Kon tijdelijk bestand niet maken"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:180
+#: ../daemon/gvfsbackendsmb.c:189
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Wachtwoord benodigd voor gedeelde map %s op %s"
 
-#: ../daemon/gvfsbackendsmb.c:429 ../daemon/gvfsbackendsmb.c:464
+#: ../daemon/gvfsbackendsmb.c:439 ../daemon/gvfsbackendsmb.c:479
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Interne fout (%s)"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1170
+#: ../daemon/gvfsbackendsmb.c:487 ../daemon/gvfsbackendsmb.c:1185
 #, c-format
 msgid "%s on %s"
 msgstr "%s op %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:518
+#: ../daemon/gvfsbackendsmb.c:533
 msgid "Failed to mount Windows share"
 msgstr "Kon gedeelde Windows-map niet aankoppelen"
 
-#: ../daemon/gvfsbackendsmb.c:1118
+#: ../daemon/gvfsbackendsmb.c:1133
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Kon reservekopiebestand niet maken: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1575
+#: ../daemon/gvfsbackendsmb.c:1590
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Fout bij verwijderen van bestand: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1639
+#: ../daemon/gvfsbackendsmb.c:1654
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Fout bij verplaatsen van bestand: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1663
+#: ../daemon/gvfsbackendsmb.c:1678
 msgid "Can't move directory over directory"
 msgstr "Kan map niet over andere map heen verplaatsen"
 
-#: ../daemon/gvfsbackendsmb.c:1711
+#: ../daemon/gvfsbackendsmb.c:1726
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Fout bij verwijderen doelbestand: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1735
+#: ../daemon/gvfsbackendsmb.c:1750
 msgid "Can't recursively move directory"
 msgstr "Kan map niet recursief verplaatsen"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:676
-msgid "Windows Network"
-msgstr "Windows-netwerk"
-
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:684
+#: ../daemon/gvfsbackendsmbbrowse.c:702
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Gedeelde Windows-mappen op %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:781 ../daemon/gvfsbackendsmbbrowse.c:827
+#: ../daemon/gvfsbackendsmbbrowse.c:794 ../daemon/gvfsbackendsmbbrowse.c:840
 msgid "The file is not a mountable"
 msgstr "Het bestand is niet aankoppelbaar"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:849
+#: ../daemon/gvfsbackendsmbbrowse.c:862
 msgid "Not a regular file"
 msgstr "Geen normaal bestand"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1094
+#: ../daemon/gvfsbackendsmbbrowse.c:1107
 msgid "Not a directory"
 msgstr "Geen map"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:598 ../daemon/gvfsbackendtrash.c:1190
+#: ../daemon/gvfsbackendtrash.c:599 ../daemon/gvfsbackendtrash.c:1188
 msgid "Trash"
 msgstr "Prullenbak"
 
-#: ../daemon/gvfsbackendtrash.c:969
+#: ../daemon/gvfsbackendtrash.c:970
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (in prullenbak)"
 
-#: ../daemon/gvfsbackendtrash.c:1291
+#: ../daemon/gvfsbackendtrash.c:1289
 msgid "Can't delete trash"
 msgstr "Kan prullenbak niet legen"
 
-#: ../daemon/gvfsbackendtrash.c:1638 ../daemon/gvfsbackendtrash.c:1713
+#: ../daemon/gvfsbackendtrash.c:1636 ../daemon/gvfsbackendtrash.c:1711
 msgid "Trash directory notification not supported"
 msgstr "Prullenbakwijzigingsmeldingen niet ondersteund"
 
-#: ../daemon/gvfsdaemon.c:1030
+#: ../daemon/gvfsdaemon.c:1032
 msgid "Invalid backend type"
 msgstr "Ongeldig backend-type"
 
