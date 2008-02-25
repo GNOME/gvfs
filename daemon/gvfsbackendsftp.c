@@ -24,6 +24,7 @@
 
 #include <config.h>
 
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -658,6 +659,38 @@ get_hostname_and_fingerprint_from_line (const gchar *buffer,
   return TRUE;
 }
 
+static const gchar *
+get_authtype_from_password_line (const char *password_line)
+{
+  return g_str_has_prefix (password_line, "Enter passphrase for key") ?
+	  "publickey" : "password";
+}
+
+static char *
+get_object_from_password_line (const char *password_line)
+{
+  char *chr, *ptr, *object = NULL;
+
+  if (g_str_has_prefix (password_line, "Enter passphrase for key"))
+    {
+      ptr = strchr (password_line, '\'');
+      if (ptr != NULL)
+        {
+	  ptr += 1;
+	  chr = strchr (ptr, '\'');
+	  if (chr != NULL)
+	    {
+	      object = g_strndup (ptr, chr - ptr);
+	    }
+	  else
+	    {
+	      object = g_strdup (ptr);
+	    }
+	}
+    }
+  return object;
+}
+
 static gboolean
 handle_login (GVfsBackend *backend,
               GMountSource *mount_source,
@@ -680,6 +713,8 @@ handle_login (GVfsBackend *backend,
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   gsize bytes_written;
   gboolean password_in_keyring = FALSE;
+  const gchar *authtype = NULL;
+  gchar *object = NULL;
   
   if (op_backend->client_vendor == SFTP_VENDOR_SSH) 
     prompt_fd = stderr_fd;
@@ -751,12 +786,21 @@ handle_login (GVfsBackend *backend,
           g_str_has_suffix (buffer, "Password:")  ||
           g_str_has_prefix (buffer, "Enter passphrase for key"))
         {
+	  authtype = get_authtype_from_password_line (buffer);
+	  object = get_object_from_password_line (buffer);
+
           /* If password is in keyring at this point is because it failed */
 	  if (!op_backend->tmp_password && (password_in_keyring ||
               !g_vfs_keyring_lookup_password (op_backend->user,
                                               op_backend->host,
                                               NULL,
                                               "sftp",
+					      object,
+					      authtype,
+					      op_backend->port != -1 ?
+					      op_backend->port
+					      :
+					      0,
                                               NULL,
                                               NULL,
                                               &new_password)))
@@ -906,10 +950,17 @@ handle_login (GVfsBackend *backend,
                                    op_backend->host,
                                    NULL,
                                    "sftp",
+				   object,
+				   authtype,
+				   op_backend->port != -1 ?
+				   op_backend->port
+				   :
+				   0, 
                                    new_password,
                                    password_save);
     }
 
+  g_free (object);
   g_free (new_password);
   g_object_unref (prompt_stream);
   g_object_unref (reply_stream);

@@ -1,3 +1,14 @@
+2008-02-25  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	Update to gvfskeyring api changes
+
+	* daemon/gvfskeyring.c:
+	* daemon/gvfskeyring.h:
+	Add object, authtype and port parameters for both save and
+	lookup. 
+	
 2008-02-25  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c: 

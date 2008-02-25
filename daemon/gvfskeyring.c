@@ -33,7 +33,7 @@ gboolean
 g_vfs_keyring_is_available (void)
 {
 #ifdef HAVE_KEYRING
-	return gnome_keyring_is_available ();
+  return gnome_keyring_is_available ();
 #else
   return FALSE;
 #endif
@@ -44,35 +44,38 @@ g_vfs_keyring_lookup_password (const gchar *username,
                                const gchar *host,
                                const gchar *domain,
                                const gchar *protocol,
+			       const gchar *object,
+			       const gchar *authtype,
+			       guint32      port, 
                                gchar      **username_out,
                                gchar      **domain_out,
                                gchar      **password_out)
 {
 #ifdef HAVE_KEYRING
-	GnomeKeyringNetworkPasswordData *pwd_data;
-	GnomeKeyringResult               result;
-	GList                           *plist;
+  GnomeKeyringNetworkPasswordData *pwd_data;
+  GnomeKeyringResult               result;
+  GList                           *plist;
 
-	if (!gnome_keyring_is_available ())
-		return FALSE;
+  if (!gnome_keyring_is_available ())
+    return FALSE;
 
-	result = gnome_keyring_find_network_password_sync (
+  result = gnome_keyring_find_network_password_sync (
     username,
     domain,
     host,
-    NULL,
+    object,
     protocol,
-    NULL,
-    0,
+    authtype,
+    port,
     &plist);
   
-	if (result != GNOME_KEYRING_RESULT_OK || plist == NULL)
-		return FALSE;
+  if (result != GNOME_KEYRING_RESULT_OK || plist == NULL)
+    return FALSE;
 
-	/* We use the first result, which is the least specific match */
-	pwd_data = (GnomeKeyringNetworkPasswordData *)plist->data;
+  /* We use the first result, which is the least specific match */
+  pwd_data = (GnomeKeyringNetworkPasswordData *)plist->data;
 
-	*password_out = g_strdup (pwd_data->password);
+  *password_out = g_strdup (pwd_data->password);
 
   if (username_out)
     *username_out = g_strdup (pwd_data->user);
@@ -80,9 +83,9 @@ g_vfs_keyring_lookup_password (const gchar *username,
   if (domain_out)
     *domain_out = g_strdup (pwd_data->domain);
       
-	gnome_keyring_network_password_list_free (plist);
-
-	return TRUE;
+  gnome_keyring_network_password_list_free (plist);
+  
+  return TRUE;
 #else
   return FALSE;
 #endif /* HAVE_KEYRING */
@@ -93,6 +96,9 @@ g_vfs_keyring_save_password (const gchar  *username,
                              const gchar  *host,
                              const gchar  *domain,
                              const gchar  *protocol,
+			     const gchar  *object,
+			     const gchar  *authtype,
+			     guint32       port,
                              const gchar  *password,
                              GPasswordSave flags)
 {
@@ -101,8 +107,8 @@ g_vfs_keyring_save_password (const gchar  *username,
   const gchar       *keyring;
   guint32            item_id;
   
-	if (!gnome_keyring_is_available ())
-		return FALSE;
+  if (!gnome_keyring_is_available ())
+    return FALSE;
 
   if (flags == G_PASSWORD_SAVE_NEVER)
     return FALSE;
@@ -114,10 +120,10 @@ g_vfs_keyring_save_password (const gchar  *username,
     username,
     domain,
     host,
-    NULL,
+    object,
     protocol,
-    NULL,
-    0,
+    authtype,
+    port,
     password,
     &item_id);
 
