@@ -53,7 +53,14 @@ struct _GVfsBackendHttp
 };
 
 GType        g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
-SoupURI *    g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename);
+SoupURI *    g_vfs_backend_uri_for_filename (GVfsBackend *backend,
+                                             const char  *filename,
+                                             gboolean     is_dir);
+
+SoupMessage * message_new_from_filename_full (GVfsBackend *backend,
+                                              const char  *method,
+                                              const char  *filename,
+                                              gboolean     is_dir);
 
 SoupMessage * message_new_from_filename     (GVfsBackend *backend,
                                              const char  *method,

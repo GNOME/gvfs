@@ -79,8 +79,11 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   backend->session = soup_session_sync_new ();
 }
 
+
 SoupURI *
-g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename)
+g_vfs_backend_uri_for_filename (GVfsBackend *backend,
+                                const char  *filename,
+                                gboolean     is_dir)
 {
   GVfsBackendHttp *op_backend;
   SoupURI         *uri;
@@ -95,8 +98,15 @@ g_vfs_backend_uri_for_filename (GVfsBackend *backend, const char *filename)
 
   /* Otherwise, we append filename to mount_base (which is assumed to
    * be a directory in this case).
+   *
+   * Add a "/" in cases where it is likely that the url is going
+   * to be a directory to avoid redirections
    */
-  path = g_build_path ("/", uri->path, filename, NULL);
+  if (is_dir == FALSE || g_str_has_suffix (filename, "/"))
+    path = g_build_path ("/", uri->path, filename, NULL);
+  else
+    path = g_build_path ("/", uri->path, filename, "/", NULL);
+
   g_free (uri->path);
   uri->path = g_uri_escape_string (path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
                                    FALSE);
@@ -191,19 +201,31 @@ message_new_from_uri (const char *method,
 }
 
 SoupMessage *
-message_new_from_filename (GVfsBackend *backend,
-                           const char  *method,
-                           const char  *filename)
+message_new_from_filename_full (GVfsBackend *backend,
+                                const char  *method,
+                                const char  *filename,
+                                gboolean     is_dir)
 {
   SoupMessage     *msg;
   SoupURI         *uri;
 
-  uri = g_vfs_backend_uri_for_filename (backend, filename);
+  uri = g_vfs_backend_uri_for_filename (backend, filename, is_dir);
   msg = message_new_from_uri (method, uri);
 
   soup_uri_free (uri);
   return msg;
 }
+
+
+SoupMessage *
+message_new_from_filename (GVfsBackend *backend,
+                           const char  *method,
+                           const char  *filename)
+{ 
+  return message_new_from_filename_full (backend, method, filename, FALSE);
+}
+
+
 
 /* ************************************************************************* */
 /* virtual functions overrides */

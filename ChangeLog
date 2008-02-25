@@ -1,3 +1,19 @@
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	- Port the mount operation to use the sync i/op.
+	- Keep the auth information around so we can use them again in
+	the case that a subpath requires different authentication. This
+	is needed since libsoup will forgot all auth after a 401.
+	- Ignore trailing slashes in ms_response_is_target ().
+	- Add an initial version of make_directory ().
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/gvfsbackendhttp.h:
+	Add message_new_from_filename_full which will add a trailing "/"
+	if is_dir is true. (Saves uneccesary redirects in some cases)
+
+	Various bits and pieces came from Yann Rouillard.
+
 2008-02-25  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsmb.c:

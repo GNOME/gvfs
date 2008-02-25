@@ -60,10 +60,33 @@
 #include "soup-input-stream.h"
 #include "soup-output-stream.h"
 
+typedef struct _MountAuthInfo MountAuthInfo;
+
+static void mount_auth_info_free (MountAuthInfo *info);
+
+struct _MountAuthInfo {
+
+  SoupSession  *session;
+  GMountSource *mount_source;
+
+     /* for server authentication */
+  char *username;
+  char *password;
+  char *last_realm;
+
+     /* for proxy authentication */
+  char *proxy_user;
+  char *proxy_password;
+
+};
+
+
+
 struct _GVfsBackendDav
 {
   GVfsBackendHttp parent_instance;
 
+  MountAuthInfo auth_info;
 };
 
 G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP)
@@ -71,6 +94,12 @@ G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP)
 static void
 g_vfs_backend_dav_finalize (GObject *object)
 {
+  GVfsBackendDav *dav_backend;
+
+  dav_backend = G_VFS_BACKEND_DAV (object);
+
+  mount_auth_info_free (&(dav_backend->auth_info));
+  
   if (G_OBJECT_CLASS (g_vfs_backend_dav_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_dav_parent_class)->finalize) (object);
 }
@@ -104,25 +133,25 @@ send_message (GVfsBackend         *backend,
 static char *
 path_get_parent_dir (const char *path)
 {
-    char   *parent;
-    size_t  len;
+  char   *parent;
+  size_t  len;
 
-    if ((len = strlen (path)) < 1)
-      return NULL;
+  if ((len = strlen (path)) < 1)
+    return NULL;
 
-    /* maybe this should be while, but then again
-     * I should be reading the uri rfc and see 
-     * what the deal was with multiple slashes */
+  /* maybe this should be while, but then again
+   * I should be reading the uri rfc and see 
+   * what the deal was with multiple slashes */
 
-    if (path[len - 1] == '/')
-      len--;
+  if (path[len - 1] == '/')
+    len--;
 
-    parent = g_strrstr_len (path, len, "/");
+  parent = g_strrstr_len (path, len, "/");
 
-    if (parent == NULL)
-      return NULL;
+  if (parent == NULL)
+    return NULL;
 
-    return g_strndup (path, (parent - path) + 1);
+  return g_strndup (path, (parent - path) + 1);
 }
 
 /* ************************************************************************* */
@@ -419,11 +448,11 @@ ms_response_is_target (MsResponse *response)
   SoupURI       *uri;
   gboolean       res;
 
-  res = FALSE;
-  uri = NULL;
-  path = NULL;
+  res    = FALSE;
+  uri    = NULL;
+  path   = NULL;
   target = response->multistatus->target;
-  text = node_get_content (response->href);
+  text   = node_get_content (response->href);
 
   if (text == NULL)
     return FALSE;
@@ -439,7 +468,21 @@ ms_response_is_target (MsResponse *response)
     }
 
   if (path)
-    res = g_str_equal (path, target->path);
+    {
+      size_t len_path, len_target;
+
+      len_path = strlen (path);
+      len_target = strlen (target->path);
+
+      while (path[len_path - 1] == '/')
+        len_path--;
+
+      while (path[len_target - 1] == '/')
+        len_target--;
+
+      if (len_path == len_target)
+        res = ! g_ascii_strncasecmp (path, target->path, len_path);
+    }
 
   if (uri)
     soup_uri_free (uri);
@@ -551,6 +594,8 @@ ms_response_to_file_info (MsResponse *response,
   xmlNodePtr  node;
   guint       status;
   char       *basename;
+  const char *text;
+  GTimeVal    tv;
 
   basename = ms_response_get_basename (response);
   g_file_info_set_name (info, basename);
@@ -558,7 +603,6 @@ ms_response_to_file_info (MsResponse *response,
   g_free (basename);
 
   ms_response_get_propstat_iter (response, &iter);
-
   while (xml_node_iter_next (&iter))
     {
       status = ms_response_get_propstat (&iter, &propstat);
@@ -568,9 +612,6 @@ ms_response_to_file_info (MsResponse *response,
 
       for (node = propstat.prop_node->children; node; node = node->next)
         {
-          const char *text;
-          GTimeVal    tv;
-
           if (! node_is_element (node))
             continue; /* FIXME: check namespace, parse user data nodes*/
 
@@ -598,10 +639,6 @@ ms_response_to_file_info (MsResponse *response,
               g_file_info_set_attribute_uint64 (info,
                                                 G_FILE_ATTRIBUTE_TIME_CREATED,
                                                 tv.tv_sec);
-
-              g_file_info_set_attribute_uint64 (info,
-                                                G_FILE_ATTRIBUTE_TIME_CREATED_USEC,
-                                                tv.tv_usec);
             }
           else if (node_has_name (node, "getcontenttype"))
             {
@@ -659,82 +696,102 @@ ms_response_to_file_type (MsResponse *response)
   return file_type;
 }
 
-static char *
-create_propfind_request (GFileAttributeMatcher *matcher, gulong *size)
+#define PROPSTAT_XML_BEGIN                        \
+  "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" \
+  " <D:propfind xmlns:D=\"DAV:\">\n"
+
+#define PROPSTAT_XML_ALLPROP "  <D:allprop/>\n"
+#define PROPSTAT_XML_PROP_BEGIN "  <D:prop>\n"
+#define PROPSTAT_XML_PROP_END   "  </D:prop>\n"
+
+#define PROPSTAT_XML_END                          \
+  " </D:propfind>"
+
+typedef struct _PropName {
+  
+  const char *name;
+  const char *namespace;
+
+} PropName;
+
+static SoupMessage *
+propfind_request_new (GVfsBackend     *backend,
+                      const char      *filename,
+                      guint            depth,
+                      const PropName  *properties)
 {
-  xmlOutputBufferPtr   buf;
-  xmlNodePtr           node;
-  xmlNodePtr           root;
-  xmlDocPtr            doc;
-  xmlNsPtr             nsdav;
-  char                *res;
+  SoupMessage *msg;
+  const char  *header_depth;
+  GString     *body;
 
-  doc = xmlNewDoc ((xmlChar *) "1.0");
-  root = xmlNewNode (NULL, (xmlChar *) "propfind");
-  nsdav = xmlNewNs (root, (xmlChar *) "DAV:", (xmlChar *) "D");
-  xmlSetNs (root, nsdav);
+  msg = message_new_from_filename_full (backend, SOUP_METHOD_PROPFIND,
+                                        filename, (depth > 0));
 
-  node = xmlNewTextChild (root, nsdav, (xmlChar *) "prop", NULL);
+  if (msg == NULL)
+    return NULL;
 
+  if (depth == 0)
+    header_depth = "0";
+  else if (depth == 1)
+    header_depth = "1";
+  else
+    header_depth = "infinity";
 
+  soup_message_headers_append (msg->request_headers, "Depth", header_depth);
 
+  body = g_string_new (PROPSTAT_XML_BEGIN);
 
-  /* FIXME: we should just ask for properties that 
-   * the matcher tells us to ask for
-   * nota bene: <D:reftarget/>  */
-  xmlNewTextChild (node, nsdav, (xmlChar *) "resourcetype", NULL);
-  xmlNewTextChild (node, nsdav, (xmlChar *) "displayname", NULL);
-  xmlNewTextChild (node, nsdav, (xmlChar *) "getetag", NULL);
-  xmlNewTextChild (node, nsdav, (xmlChar *) "getlastmodified", NULL);
-  xmlNewTextChild (node, nsdav, (xmlChar *) "creationdate", NULL);
-  xmlNewTextChild (node, nsdav, (xmlChar *) "getcontenttype", NULL);
-  xmlNewTextChild (node, nsdav, (xmlChar *) "getcontentlength", NULL);
+  if (properties != NULL)
+    {
+      const PropName *prop;
 
-  buf = xmlAllocOutputBuffer (NULL);
-  xmlNodeDumpOutput (buf, doc, root, 0, 1, NULL);
-  xmlOutputBufferFlush (buf);
+      for (prop = properties; prop->name; prop++)
+        {
+          if (prop->namespace != NULL)
+            g_string_append (body, "<%s xmlns=\"%s\"/>");
+          else
+            g_string_append (body, "<D:%s/>");
+        }
+    }
+  else
+    g_string_append (body, PROPSTAT_XML_ALLPROP);
+    
 
-  res = g_strndup ((char *) buf->buffer->content, buf->buffer->use);
-  *size = buf->buffer->use;
+  g_string_append (body, PROPSTAT_XML_END);
 
-  xmlOutputBufferClose (buf);
-  xmlFreeDoc (doc);
-  return res;
+  soup_message_set_request (msg, "application/xml",
+                            SOUP_MEMORY_TAKE,
+                            body->str,
+                            body->len);
+
+  g_string_free (body, FALSE);
+
+  return msg;
 }
 
+static void
+message_add_apply_to_redirect_header (SoupMessage         *msg,
+                                      GFileQueryInfoFlags  flags)
+{
+  const char  *header_redirect;
 
+  /* RFC 4437 */
+  if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
+      header_redirect = "F";
+  else
+      header_redirect = "T";
+
+  soup_message_headers_append (msg->request_headers,
+                               "Apply-To-Redirect-Ref", header_redirect);
+}
 /* ************************************************************************* */
 /*  */
 
-typedef struct _MountOpData {
 
-  gulong        signal_id;
-
-  SoupSession  *session;
-  GMountSource *mount_source;
-
-  char         *last_good_path;
-
-     /* for server authentication */
-  char *username;
-  char *password;
-  char *last_realm;
-
-     /* for proxy authentication */
-  char *proxy_user;
-  char *proxy_password;
-
-} MountOpData;
 
 static void
-mount_op_data_free (gpointer _data)
+mount_auth_info_free (MountAuthInfo *data)
 {
-  MountOpData *data;
-
-  data = (MountOpData *) _data;
-  
-  g_free (data->last_good_path);
-  
   if (data->mount_source)
     g_object_unref (data->mount_source);
   
@@ -744,28 +801,52 @@ mount_op_data_free (gpointer _data)
   g_free (data->proxy_user);
   g_free (data->proxy_password);
 
-  g_free (data);
 }
 
 static void
-soup_authenticate (SoupSession *session,
-                   SoupMessage *msg,
-                   SoupAuth    *auth,
-                   gboolean     retrying,
-                   gpointer     user_data)
+soup_authenticate_from_data (SoupSession *session,
+                             SoupMessage *msg,
+                             SoupAuth    *auth,
+                             gboolean     retrying,
+                             gpointer     user_data)
 {
-  MountOpData *data;
-  const char  *username;
-  const char  *password;
-  gboolean     res;
-  gboolean     aborted;
-  char        *new_username;
-  char        *new_password;
-  char        *prompt;
+  MountAuthInfo  *data;
 
-  g_print ("+ soup_authenticate \n");
+  g_print ("+ soup_authenticate_from_data (%s) \n",
+           retrying ? "retrying" : "first auth");
 
-  data = (MountOpData *) user_data;
+  data = (MountAuthInfo *) user_data;
+
+  if (retrying)
+    return;
+
+  if (soup_auth_is_for_proxy (auth))
+    soup_auth_authenticate (auth, data->proxy_user, data->proxy_password);
+  else
+    soup_auth_authenticate (auth, data->username, data->password);
+
+}
+
+static void
+soup_authenticate_interactive (SoupSession *session,
+                               SoupMessage *msg,
+                               SoupAuth    *auth,
+                               gboolean     retrying,
+                               gpointer     user_data)
+{
+  MountAuthInfo  *data;
+  const char     *username;
+  const char     *password;
+  gboolean        res;
+  gboolean        aborted;
+  char           *new_username;
+  char           *new_password;
+  char           *prompt;
+
+  g_print ("+ soup_authenticate_interactive (%s) \n",
+           retrying ? "retrying" : "first auth");
+
+  data = (MountAuthInfo *) user_data;
 
   new_username = NULL;
   new_password = NULL;
@@ -803,8 +884,6 @@ soup_authenticate (SoupSession *session,
       prompt = g_strdup_printf (_("Enter password for %s"), auth_realm);
     }
 
-  soup_session_pause_message (data->session, msg);
-
   res = g_mount_source_ask_password (data->mount_source,
                                      prompt,
                                      username,
@@ -816,117 +895,77 @@ soup_authenticate (SoupSession *session,
                                      &new_username,
                                      NULL,
                                      NULL);
-  if (res && !aborted)
+
+  if (res && !aborted) {
+
     soup_auth_authenticate (auth, new_username, new_password);
 
-  g_free (new_password);
-  g_free (new_username);
+    if (soup_auth_is_for_proxy (auth))
+      {
+        g_free (data->proxy_user);
+        g_free (data->proxy_password);
 
+        data->proxy_password = new_password;
+        data->proxy_user = new_username;
+      }
+    else
+      {
+        g_free (data->username);
+        g_free (data->password);
+
+        data->username = new_username;
+        data->password = new_password;
+      }
+  }
 
   g_print ("- soup_authenticate \n");
   g_free (prompt);
 }
 
-static void
-discover_mount_root_ready (SoupSession *session,
-                           SoupMessage *msg,
-                           gpointer     user_data)
+static inline GMountSpec *
+g_mount_spec_dup_known (GMountSpec *spec)
 {
-  GVfsBackendDav *backend;
-  GVfsJobMount   *job;
-  MountOpData    *data;
-  GMountSpec     *mount_spec;
-  SoupURI        *mount_base;
-  gboolean        is_success;
-  gboolean        is_dav;
+  static const char *known_keys[] = {"host", "user", "port", "ssl", NULL};
+  GMountSpec *new_spec;
+  const char **iter;
+  const char *value;
+  const char *type;
 
-  job = G_VFS_JOB_MOUNT (user_data);
-  backend = G_VFS_BACKEND_DAV (job->backend);
-  mount_base = G_VFS_BACKEND_HTTP (backend)->mount_base;
-  data = (MountOpData *) G_VFS_JOB (job)->backend_data;
+  type = g_mount_spec_get_type (spec);
+  new_spec = g_mount_spec_new (type);
 
-  is_success = SOUP_STATUS_IS_SUCCESSFUL (msg->status_code);
-  is_dav = sm_has_header (msg, "DAV");
-  
-  g_print ("+ discover_mount_root_ready \n");
-
-  if (is_success && is_dav)
+  for (iter = known_keys; *iter; iter++)
     {
+      value = g_mount_spec_get (spec, *iter);
 
-      data->last_good_path = mount_base->path;
-      mount_base->path = path_get_parent_dir (mount_base->path);
-
-      if (mount_base->path)
-        {
-          SoupMessage *message;
-          message = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
-          soup_session_queue_message (session, message, 
-                                      discover_mount_root_ready, job);
-          return;
-        } 
+      if (value)
+        g_mount_spec_set (new_spec, *iter, value);
     }
 
-  /* we have reached the end of paths we are allowed to
-   * chdir up to (or couldn't chdir up at all) */
-  
-  /* check if we at all have a good path */
-  if (data->last_good_path == NULL)
-    {
-      if (!is_success) 
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR,G_IO_ERROR_FAILED,
-                          _("HTTP Error: %s"), msg->reason_phrase);
-      else
-        g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR,G_IO_ERROR_FAILED,
-                          _("Not a WebDAV enabled share"));
-
-      return;
-    }
-
-  g_free (mount_base->path);
-  mount_base->path = data->last_good_path;
-  data->last_good_path = NULL;
-  mount_spec = g_mount_spec_new ("dav"); 
-  
-  g_mount_spec_set (mount_spec, "host", mount_base->host);
-
-  if (mount_base->user)
-    g_mount_spec_set (mount_spec, "user", mount_base->user);
-
-  if (mount_base->scheme == SOUP_URI_SCHEME_HTTP)
-    g_mount_spec_set (mount_spec, "ssl", "false");
-  else if (mount_base->scheme == SOUP_URI_SCHEME_HTTPS)
-    g_mount_spec_set (mount_spec, "ssl", "true");
-
-  g_mount_spec_set_mount_prefix (mount_spec, mount_base->path);
-  g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "folder-remote");
-
-  g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
-  g_mount_spec_unref (mount_spec);
-
-  g_signal_handler_disconnect (session, data->signal_id);
-
-  g_print ("- discover_mount_root_ready success: %s \n", mount_base->path);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return new_spec;
 }
 
-static gboolean
-try_mount (GVfsBackend  *backend,
-           GVfsJobMount *job,
-           GMountSpec   *mount_spec,
-           GMountSource *mount_source,
-           gboolean      is_automount)
+static void
+do_mount (GVfsBackend  *backend,
+          GVfsJobMount *job,
+          GMountSpec   *mount_spec,
+          GMountSource *mount_source,
+          gboolean      is_automount)
 {
-  MountOpData    *data;
+  MountAuthInfo  *info;
   SoupSession    *session;
   SoupMessage    *msg;
-  SoupURI        *uri;
+  SoupURI        *mount_base;
   const char     *host;
   const char     *user;
   const char     *port;
   const char     *ssl;
   guint           port_num;
+  gulong          signal_id;
+  guint           status;
+  gboolean        is_success;
+  gboolean        is_dav;
+  char           *last_good_path;
 
   g_print ("+ mount\n");
 
@@ -941,63 +980,135 @@ try_mount (GVfsBackend  *backend,
                         G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                         _("Invalid mount spec"));
       
-      return TRUE;
+      return;
     }
 
-  uri = soup_uri_new (NULL);
+  mount_base = soup_uri_new (NULL);
 
   if (ssl != NULL && (strcmp (ssl, "true") == 0))
-    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTPS);
+    soup_uri_set_scheme (mount_base, SOUP_URI_SCHEME_HTTPS);
   else
-    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTP);
+    soup_uri_set_scheme (mount_base, SOUP_URI_SCHEME_HTTP);
 
-  soup_uri_set_user (uri, user);
+  soup_uri_set_user (mount_base, user);
 
   if (port && (port_num = atoi (port)))
-    soup_uri_set_port (uri, port_num);
+    soup_uri_set_port (mount_base, port_num);
 
-  soup_uri_set_host (uri, host);
-  soup_uri_set_path (uri, mount_spec->mount_prefix);
+  soup_uri_set_host (mount_base, host);
+  soup_uri_set_path (mount_base, mount_spec->mount_prefix);
 
   session = G_VFS_BACKEND_HTTP (backend)->session;
-  G_VFS_BACKEND_HTTP (backend)->mount_base = uri; 
+  G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base; 
 
-  msg = message_new_from_uri (SOUP_METHOD_OPTIONS, uri);
-  soup_session_queue_message (session, msg, discover_mount_root_ready, job);
+  info = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
+  info->mount_source = g_object_ref (mount_source);
+  info->username = g_strdup (user);
 
-  data = g_new0 (MountOpData, 1);
-  data->session = g_object_ref (session);
-  data->mount_source = g_object_ref (mount_source);
-  data->username = g_strdup (user);
+  signal_id = g_signal_connect (session, "authenticate",
+                                G_CALLBACK (soup_authenticate_interactive),
+                                info);
 
-  data->signal_id = g_signal_connect (session, "authenticate",
-                                      G_CALLBACK (soup_authenticate), data);
+  last_good_path = NULL;
+  msg = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
 
-  g_vfs_job_set_backend_data (G_VFS_JOB (job), data, mount_op_data_free);
+  do {
+    status = soup_session_send_message (session, msg);
 
+    is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
+    is_dav = sm_has_header (msg, "DAV");
+
+    soup_message_headers_clear (msg->response_headers);
+    soup_message_body_truncate (msg->response_body);
+
+    if (is_success && is_dav)
+      {
+        g_free (last_good_path);
+        last_good_path = mount_base->path;
+        mount_base->path = path_get_parent_dir (mount_base->path);
+        soup_message_set_uri (msg, mount_base);
+      }
+
+  } while (is_success && is_dav);
+
+  /* we have reached the end of paths we are allowed to
+   * chdir up to (or couldn't chdir up at all) */
+
+  /* check if we at all have a good path */
+  if (last_good_path == NULL) 
+    {
+      if (!is_success) 
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR,G_IO_ERROR_FAILED,
+                          _("HTTP Error: %s"), msg->reason_phrase);
+      else
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR,G_IO_ERROR_FAILED,
+                          _("Not a WebDAV enabled share"));
+      return;
+    }
+
+  /* Set the working path in mount path */
+  g_free (mount_base->path);
+  mount_base->path = last_good_path;
+
+  /* dup the mountspec, but only copy known fields */
+  mount_spec = g_mount_spec_dup_known (mount_spec);
+  g_mount_spec_set_mount_prefix (mount_spec, mount_base->path);
+
+  g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
+  g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "folder-remote");
+
+  /* cleanup */
+  g_mount_spec_unref (mount_spec);
+  g_object_unref (msg);
+
+  /* switch the signal handler */
+  g_signal_handler_disconnect (session, signal_id);
+  g_signal_connect (session, "authenticate",
+                    G_CALLBACK (soup_authenticate_from_data),
+                    info);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
   g_print ("- mount\n");
-  return TRUE;
 }
 
+/* *** query_info () *** */
 static void
-query_info_ready (SoupSession *session,
-                  SoupMessage *msg,
-                  gpointer     user_data)
+do_query_info (GVfsBackend           *backend,
+               GVfsJobQueryInfo      *job,
+               const char            *filename,
+               GFileQueryInfoFlags    flags,
+               GFileInfo             *info,
+               GFileAttributeMatcher *matcher)
 {
-  GVfsBackendDav    *backend;
-  GVfsJobQueryInfo  *job;
-  Multistatus        ms;
-  xmlNodeIter        iter;
-  SoupURI           *base;
-  gboolean           res;
-  GError            *error;
- 
-  job     = G_VFS_JOB_QUERY_INFO (user_data);
-  backend = G_VFS_BACKEND_DAV (job->backend);
+  SoupMessage *msg;
+  Multistatus  ms;
+  xmlNodeIter  iter;
+  SoupURI     *base;
+  gboolean     res;
+  GError      *error;
+
   base    = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error   = NULL;
 
+  msg = propfind_request_new (backend, filename, 0, NULL);
+
+  if (msg == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,G_IO_ERROR_FAILED,
+                        _("Could not create request"));
+      
+      return;
+    }
+
+  message_add_apply_to_redirect_header (msg, flags);
+
+  soup_session_send_message (G_VFS_BACKEND_HTTP (backend)->session, msg);
+
   res = multistatus_parse (msg, &ms, &error);
+  g_object_unref (msg);
 
   if (res == FALSE)
     {
@@ -1023,93 +1134,55 @@ query_info_ready (SoupSession *session,
         }
     }
 
-  if (res)
-        g_vfs_job_succeeded (G_VFS_JOB (job));
-  else
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,G_IO_ERROR_FAILED,
-                        _("Response invalid"));
-
   multistatus_free (&ms);
+
+  if (res)
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+  else
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR,G_IO_ERROR_FAILED,
+                      _("Response invalid"));
+
 }
 
-/* *** query_info () *** */
-static gboolean
-try_query_info (GVfsBackend           *backend,
-                GVfsJobQueryInfo      *job,
-                const char            *filename,
-                GFileQueryInfoFlags    flags,
-                GFileInfo             *info,
-                GFileAttributeMatcher *attribute_matcher)
+
+/* *** enumerate *** */
+static void
+do_enumerate (GVfsBackend           *backend,
+              GVfsJobEnumerate      *job,
+              const char            *filename,
+              GFileAttributeMatcher *matcher,
+              GFileQueryInfoFlags    flags)
 {
-  SoupMessage *msg;
-  gulong       len;
-  char        *request;
-  char        *redirect_header;
+  GVfsBackendHttp *backend_http;
+  SoupMessage     *msg;
+  Multistatus      ms;
+  xmlNodeIter      iter;
+  gboolean         res;
+  SoupURI         *base;
+  GError          *error;
+ 
+  backend_http = G_VFS_BACKEND_HTTP (backend);
+  base         = backend_http->mount_base;
+  error        = NULL;
 
-  len = 0;
-  msg = message_new_from_filename (backend, "PROPFIND", filename);
+  msg = propfind_request_new (backend, filename, 1, NULL);
 
-  request = create_propfind_request (attribute_matcher, &len);
-
-  if (request == NULL || msg == NULL)
+  if (msg == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR,G_IO_ERROR_FAILED,
                         _("Could not create request"));
       
-
-      if (msg)
-          g_object_unref (msg);
-
-      g_free (request);
-      return TRUE;
+      return;
     }
 
-  soup_message_headers_append (msg->request_headers, "Depth", "0");
+  message_add_apply_to_redirect_header (msg, flags);
 
-  /* RFC 4437 */
-  if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-    redirect_header = "F";
-  else
-    redirect_header = "T";
+  soup_session_send_message (backend_http->session, msg);
 
-  soup_message_headers_append (msg->request_headers,
-                               "Apply-To-Redirect-Ref", redirect_header);
-
-  soup_message_set_request (msg, "application/xml",
-                            SOUP_MEMORY_TAKE,
-                            request,
-                            len);
-
-  send_message (backend, msg, query_info_ready, job);
-  return TRUE;
-}
-
-
-/* *** enumerate *** */
-
-
-static void
-enumerate_ready (SoupSession *session,
-                 SoupMessage *msg,
-                 gpointer     user_data)
-{
-  GVfsBackendDav    *backend;
-  GVfsJobEnumerate  *job;
-  Multistatus        ms;
-  xmlNodeIter        iter;
-  gboolean           res;
-  SoupURI           *base;
-  GError            *error;
-
- 
-  job     = G_VFS_JOB_ENUMERATE (user_data);
-  backend = G_VFS_BACKEND_DAV (job->backend);
-  base    = G_VFS_BACKEND_HTTP (backend)->mount_base;
-  error   = NULL;
-  
   res = multistatus_parse (msg, &ms, &error);
+  g_object_unref (msg);
 
   if (res == FALSE)
     {
@@ -1139,60 +1212,10 @@ enumerate_ready (SoupSession *session,
       g_vfs_job_enumerate_add_info (job, info);
     }
 
+  multistatus_free (&ms);
+
   g_vfs_job_succeeded (G_VFS_JOB (job)); /* should that be called earlier? */
   g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
-  multistatus_free (&ms);
-}
-
-static gboolean
-try_enumerate (GVfsBackend           *backend,
-               GVfsJobEnumerate      *job,
-               const char            *filename,
-               GFileAttributeMatcher *attribute_matcher,
-               GFileQueryInfoFlags    flags)
-{
-  SoupMessage *msg;
-  gulong       len;
-  char        *request;
-  char        *redirect_header;
-
-  len = 0;
-  msg = message_new_from_filename (backend, "PROPFIND", filename);
-
-  request = create_propfind_request (attribute_matcher, &len);
-
-  if (request == NULL || msg == NULL)
-    {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,G_IO_ERROR_FAILED,
-                        _("Could not create request"));
-      
-
-      if (msg)
-          g_object_unref (msg);
-
-      g_free (request);
-      return TRUE;
-    }
-
-  soup_message_headers_append (msg->request_headers, "Depth", "1");
-
-  /* RFC 4437 */
-  if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-      redirect_header = "F";
-  else
-      redirect_header = "T";
-
-  soup_message_headers_append (msg->request_headers,
-                               "Apply-To-Redirect-Ref", redirect_header);
-
-  soup_message_set_request (msg, "application/xml",
-                            SOUP_MEMORY_TAKE,
-                            request,
-                            len);
-
-  send_message (backend, msg, enumerate_ready, job);
-  return TRUE;
 }
 
 /* ************************************************************************* */
@@ -1320,7 +1343,7 @@ try_replace (GVfsBackend *backend,
 
 
 
-  uri = g_vfs_backend_uri_for_filename (backend, filename);
+  uri = g_vfs_backend_uri_for_filename (backend, filename, FALSE);
 
   if (etag)
     {
@@ -1328,7 +1351,6 @@ try_replace (GVfsBackend *backend,
 
       msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
       soup_uri_free (uri);
-      soup_message_headers_append (msg->request_headers, "User-Agent", "gvfs/" VERSION);
       soup_message_headers_append (msg->request_headers, "If-Match", etag);
 
       g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
@@ -1444,6 +1466,31 @@ try_close_write (GVfsBackend *backend,
   return TRUE;
 }
 
+static void
+do_make_directory (GVfsBackend          *backend,
+                   GVfsJobMakeDirectory *job,
+                   const char           *filename)
+{
+  SoupMessage     *msg;
+  guint            status;
+  char            *to_free;
+
+  msg = message_new_from_filename_full (backend, "MKCOL", filename, TRUE);
+
+  status = soup_session_send_message (G_VFS_BACKEND_HTTP (backend)->session, msg);
+
+  /* TODO: error reporting sucks */
+  if (! SOUP_STATUS_IS_SUCCESSFUL (status))
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR,G_IO_ERROR_FAILED,
+                      _("HTTP Error: %s"), msg->reason_phrase);
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  g_object_unref (msg);
+}
+
+
 /* ************************************************************************* */
 /*  */
 
@@ -1458,12 +1505,14 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
 
   backend_class = G_VFS_BACKEND_CLASS (klass); 
 
-  backend_class->try_mount         = try_mount;
-  backend_class->try_query_info    = try_query_info;
-  backend_class->try_enumerate     = try_enumerate;
+  backend_class->try_mount         = NULL;
+  backend_class->mount             = do_mount;
+  backend_class->try_query_info    = NULL;
+  backend_class->query_info        = do_query_info;
+  backend_class->enumerate         = do_enumerate;
   backend_class->try_create        = try_create;
   backend_class->try_replace       = try_replace;
   backend_class->try_write         = try_write;
   backend_class->try_close_write   = try_close_write;
-
+  backend_class->make_directory    = do_make_directory;
 }
