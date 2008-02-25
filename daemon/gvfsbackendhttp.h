@@ -70,6 +70,9 @@ SoupMessage * message_new_from_filename     (GVfsBackend *backend,
 SoupMessage * message_new_from_uri          (const char *method,
                                              SoupURI *uri);
 char *        uri_get_basename              (const char *uri_str);
+
+guint         http_error_code_from_status   (guint status);
+
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_HTTP_H__ */

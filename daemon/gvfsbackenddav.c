@@ -867,6 +867,53 @@ stat_location_finish (SoupMessage *msg,
   return res;
 }
 
+static gboolean
+stat_location (GVfsBackend    *backend,
+               const SoupURI  *uri,
+               GFileType      *target_type,
+               guint          *num_children,
+               GError        **error)
+{
+  SoupSession *session;
+  SoupMessage *msg;
+  guint        status;
+  gboolean     count_children;
+  gboolean     res;
+
+  session = G_VFS_BACKEND_HTTP (backend)->session;
+
+  count_children = num_children != NULL;
+
+  msg = stat_location_begin (uri, count_children);
+
+  if (msg == NULL)
+    return FALSE;
+
+  status = soup_session_send_message (session, msg);
+
+  if (status != 207)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   http_error_code_from_status (status),
+                   msg->reason_phrase);
+
+      return FALSE;
+    }
+
+  res = stat_location_finish (msg, target_type, num_children);
+
+  if (res == FALSE)
+    {
+      g_set_error (error, 
+                   G_IO_ERROR, G_IO_ERROR_FAILED,
+                   _("Response invalid"));
+    }
+
+  return res;
+}
+
+
 /* ************************************************************************* */
 /*  */
 
@@ -1586,7 +1633,6 @@ do_make_directory (GVfsBackend          *backend,
 {
   SoupMessage     *msg;
   guint            status;
-  char            *to_free;
 
   msg = message_new_from_filename_full (backend, "MKCOL", filename, TRUE);
 
@@ -1595,7 +1641,7 @@ do_make_directory (GVfsBackend          *backend,
   /* TODO: error reporting sucks */
   if (! SOUP_STATUS_IS_SUCCESSFUL (status))
     g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR,G_IO_ERROR_FAILED,
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("HTTP Error: %s"), msg->reason_phrase);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1603,6 +1649,55 @@ do_make_directory (GVfsBackend          *backend,
   g_object_unref (msg);
 }
 
+static void
+do_delete (GVfsBackend   *backend,
+           GVfsJobDelete *job,
+           const char    *filename)
+{
+  SoupSession *session;
+  SoupMessage *msg;
+  SoupURI     *uri;
+  GFileType    file_type;
+  gboolean     res;
+  guint        num_children;
+  guint        status;
+  GError      *error;
+
+  error = NULL;
+  session = G_VFS_BACKEND_HTTP (backend)->session;
+
+  uri = g_vfs_backend_uri_for_filename (backend, filename, FALSE);
+  res = stat_location (backend, uri, &file_type, &num_children, &error);
+
+  if (res == FALSE)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      return;
+    }
+
+  if (file_type == G_FILE_TYPE_DIRECTORY && num_children)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_EMPTY,
+                        _("Directory not empty"));
+      return;
+    }
+
+  msg = soup_message_new_from_uri (SOUP_METHOD_DELETE, uri);
+
+  status = soup_session_send_message (session, msg);
+
+  if (!SOUP_STATUS_IS_SUCCESSFUL (status))
+    g_vfs_job_failed (G_VFS_JOB (job),
+                      G_IO_ERROR_NOT_EMPTY,
+                      http_error_code_from_status (status),
+                      msg->reason_phrase);
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  soup_uri_free (uri);
+  g_object_unref (msg);
+}
 
 /* ************************************************************************* */
 /*  */
@@ -1628,4 +1723,5 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->try_write         = try_write;
   backend_class->try_close_write   = try_close_write;
   backend_class->make_directory    = do_make_directory;
+  backend_class->delete            = do_delete;
 }

@@ -165,6 +165,34 @@ uri_get_basename (const char *uri_str)
 
 /* ************************************************************************* */
 /*  */
+guint
+http_error_code_from_status (guint status)
+{
+  switch (status) {
+
+  case SOUP_STATUS_CANT_RESOLVE:
+  case SOUP_STATUS_CANT_RESOLVE_PROXY:
+    return G_IO_ERROR_HOST_NOT_FOUND;
+
+  case SOUP_STATUS_CANCELLED:
+    return G_IO_ERROR_CANCELLED;
+
+  case SOUP_STATUS_UNAUTHORIZED:
+  case SOUP_STATUS_PAYMENT_REQUIRED:
+  case SOUP_STATUS_FORBIDDEN:
+    return G_IO_ERROR_PERMISSION_DENIED;
+
+  case SOUP_STATUS_NOT_FOUND:
+  case SOUP_STATUS_GONE:
+    return G_IO_ERROR_NOT_FOUND;    
+
+  case SOUP_STATUS_GATEWAY_TIMEOUT:
+    return G_IO_ERROR_TIMED_OUT;
+  }
+
+  return G_IO_ERROR_FAILED;
+}
+
 
 static void
 g_vfs_job_failed_from_http_status (GVfsJob *job, guint status_code, const char *message)

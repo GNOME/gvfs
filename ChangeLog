@@ -1,6 +1,24 @@
 2008-02-25  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c: 
+	Initial take on implementing delete.
+
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Add http_error_code_from_status helper function.
+
+2008-02-25  Christian Kellner,,,  <gicmo@gnome.org>
+
+	reviewed by: <delete if not using a buddy>
+
+	* daemon/gvfsbackenddav.c: (stat_location), (do_make_directory),
+	(do_delete), (g_vfs_backend_dav_class_init):
+	* daemon/gvfsbackendhttp.c: (http_error_code_from_status):
+	* daemon/gvfsbackendhttp.h:
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
 	Also check if the URL is a directory by doing a PROPFIND in
 	addition to the OPTIONS. That will also force authentication
 	since some servers (e.g. Zope) allow OPTIONS without doing
