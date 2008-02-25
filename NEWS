@@ -1,3 +1,20 @@
+Major changes in 0.1.8:
+* Update for gio API changes
+* Add gphoto2 backend
+* Add network: and dns-sd: backend support
+* Http and webdav backend updates
+* Keyring support
+* Fix crashes and deadlocks
+* Add trash::item-count attribute to trash:///
+* Fix smb reads > 65535 bytes breaking on some servers
+* Fix cancellation race in reading
+* Fill in thumbnail info for backends
+* sftp: Handle host identity changes
+* Enable translations everywhere
+* Add bash completion support for command line apps
+* Fix handling of blank cds and audio cds
+* Support port in sftp uris
+
 Major changes in 0.1.7:
 * Update for gio API changes
 * Add gconf based implementation of

@@ -76,4 +76,4 @@ gvfs_monitor_file_LDADD = $(libraries)
 gvfs_mkdir_SOURCES = gvfs-mkdir.c
 gvfs_mkdir_LDADD = $(libraries)
 
-EXTRA_DIST=gvfs-less
+EXTRA_DIST=gvfs-less gvfs-bash-completion.sh
