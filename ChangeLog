@@ -1,3 +1,9 @@
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendnetwork.c:
+	Add monitoring of inlined locations. (#509600)
+	Patch from A. Walton
+
 2008-02-22  A. Walton  <awalton@svn.gnome.org>
 
 	* daemon/gvfsbackendnetwork.c: (recompute_files):

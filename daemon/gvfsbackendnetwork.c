@@ -39,11 +39,6 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsmonitor.h"
 
-/**
- * TODO: Support monitoring the directories that are monitored
- *       so we see new dns-sd files, etc.
- */
-
 #define PATH_GCONF_GVFS_SMB "/system/smb"
 #define PATH_GCONF_GVFS_SMB_WORKGROUP "/system/smb/workgroup"
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
@@ -78,11 +73,13 @@ struct _GVfsBackendNetwork
   /* SMB Stuff */
   gboolean have_smb;
   char *current_workgroup;
+  GFileMonitor *smb_monitor;
 
   /* DNS-SD Stuff */
   gboolean have_dnssd;
   NetworkLocalSetting local_setting;
   char *extra_domains;
+  GFileMonitor *dnssd_monitor;
 
   /* Icons */
   GIcon *workgroup_icon; /* GThemedIcon = "network-workgroup" */
@@ -196,7 +193,7 @@ update_from_files (GVfsBackendNetwork *backend,
         {
           new = newl->data;
           old = oldl->data;
-          cmp = sort_file_by_file_name(old, new);
+          cmp = sort_file_by_file_name (old, new);
         }
       
       if (cmp == 0)
@@ -240,17 +237,27 @@ update_from_files (GVfsBackendNetwork *backend,
 }
 
 static void
+notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+                            GFileMonitorEvent event_type, gpointer user_data);
+
+static void
+notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+                          GFileMonitorEvent event_type, gpointer user_data);
+
+static void
 recompute_files (GVfsBackendNetwork *backend)
 {
   GFile *server_file;
   GFileEnumerator *enumer;
   GFileInfo *info;
+  GFileMonitor *monitor;
+  GError *error;
   GList *files;
   NetworkFile *file;
   char *file_name, *link_uri;
 
   files = NULL;
-
+  error = NULL;
   if (backend->have_smb) 
     {
       char *workgroup;
@@ -266,8 +273,31 @@ recompute_files (GVfsBackendNetwork *backend)
       else 
         workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);    
 
-      /* children of current workgroup */
       server_file = g_file_new_for_uri (workgroup);
+
+      /* recreate monitor if our workgroup changed or we don't have a monitor */
+      if (backend->smb_monitor == NULL)
+        {
+          monitor = g_file_monitor_directory (server_file, G_FILE_MONITOR_NONE, NULL, &error);
+          if (monitor) 
+            {
+              g_signal_connect (monitor, "changed", 
+                                (GCallback)notify_smb_files_changed, (gpointer)backend); 
+              /* takes ref */
+              backend->smb_monitor = monitor;
+            }
+          else
+            {
+	      char *uri = g_file_get_uri (server_file);
+              g_warning ("Couldn't create directory monitor on %s. Error: %s", 
+			 uri, error->message);
+	      g_free (uri);
+              g_error_free (error);
+              error = NULL;
+            }
+        }
+
+      /* children of current workgroup */
       enumer = g_file_enumerate_children (server_file, 
                                           "standard::name,standard::display-name", 
                                           G_FILE_QUERY_INFO_NONE, 
@@ -285,53 +315,73 @@ recompute_files (GVfsBackendNetwork *backend)
                                        backend->server_icon);
               files = g_list_prepend (files, file);
 
-              g_free(link_uri);
-              g_free(file_name);
-              g_object_unref(info);
+              g_free (link_uri);
+              g_free (file_name);
+              g_object_unref (info);
               info = g_file_enumerator_next_file (enumer, NULL, NULL);
             }
         }
     
-      g_file_enumerator_close(enumer, NULL, NULL);
-      g_object_unref(enumer);
-      g_object_unref(server_file);
+      g_file_enumerator_close (enumer, NULL, NULL);
+      g_object_unref (enumer);
+      g_object_unref (server_file);
 
-      g_free(workgroup);
+      g_free (workgroup);
     }
 
   if (backend->have_dnssd)
     {
+      server_file = g_file_new_for_uri ("dns-sd://local/");
+      /* create directory monitor if we haven't already */
+      if (backend->dnssd_monitor == NULL)
+	{
+	  monitor = g_file_monitor_directory (server_file, G_FILE_MONITOR_NONE, NULL, &error);
+	  if (monitor) 
+	    {
+	      g_signal_connect (monitor, "changed", 
+				(GCallback)notify_dnssd_local_changed, (gpointer)backend); 
+	      /* takes ref */
+	      backend->dnssd_monitor = monitor;
+	    }
+	  else
+	    {
+	      char *uri = g_file_get_uri(server_file);
+	      g_warning ("Couldn't create directory monitor on %s. Error: %s", 
+			 uri, error->message);
+	      g_free (uri);
+	      g_error_free (error);
+	    }
+	}
+      
       if (backend->local_setting == NETWORK_LOCAL_MERGED)
         {
           /* "merged": add local domains to network:/// */
-          server_file = g_file_new_for_uri ("dns-sd://local/");
           enumer = g_file_enumerate_children (server_file, 
                                               "standard::name,standard::display-name", 
                                               G_FILE_QUERY_INFO_NONE, 
                                               NULL, NULL);
-        if (enumer != NULL)
-          {
-            info = g_file_enumerator_next_file (enumer, NULL, NULL);
-            while (info != NULL)
-              {
-                file_name = g_strconcat("dnssd-domain-", g_file_info_get_name (info), NULL);
-                link_uri = g_strconcat("dns-sd://", g_file_info_get_name (info), NULL);
-                file = network_file_new (file_name, 
-                                         g_file_info_get_display_name (info), 
-                                         link_uri, 
-                                         backend->server_icon);
-                files = g_list_prepend (files, file);
-
-                g_free(link_uri);
-                g_free(file_name);
-                g_object_unref(info);
-                info = g_file_enumerator_next_file (enumer, NULL, NULL);
-              }
-           }
-    
-          g_file_enumerator_close(enumer, NULL, NULL);
-          g_object_unref(enumer);
-          g_object_unref(server_file);
+          if (enumer != NULL)
+            {
+              info = g_file_enumerator_next_file (enumer, NULL, NULL);
+              while (info != NULL)
+                {
+                  file_name = g_strconcat("dnssd-domain-", g_file_info_get_name (info), NULL);
+                  link_uri = g_strconcat("dns-sd://local/", g_file_info_get_name (info), NULL);
+                  file = network_file_new (file_name, 
+					   g_file_info_get_display_name (info), 
+					   link_uri, 
+					   backend->server_icon);
+                  files = g_list_prepend (files, file);
+		  
+                  g_free (link_uri);
+                  g_free (file_name);
+                  g_object_unref (info);
+                  info = g_file_enumerator_next_file (enumer, NULL, NULL);
+                }
+            }
+	  
+          g_file_enumerator_close (enumer, NULL, NULL);
+          g_object_unref (enumer);
         }
       else
         {
@@ -340,31 +390,33 @@ recompute_files (GVfsBackendNetwork *backend)
 				   "dns-sd://local/", backend->workgroup_icon);
           files = g_list_prepend (files, file);   
         }
-
-    /* If gconf setting "/system/dns_sd/extra_domains" is set to a list of domains:
-     * links to dns-sd://$domain/ */
-    if (backend->extra_domains != NULL &&
-       backend->extra_domains[0] != 0)
-      {
-        char **domains;
-        int i;
-        domains = g_strsplit (backend->extra_domains, ",", 0);
-        for (i=0; domains[i] != NULL; i++)
-          {
-            file_name = g_strconcat("dnssd-domain-", domains[i], NULL);
-            link_uri = g_strconcat("dns-sd://", domains[i], "/", NULL);
-            file = network_file_new (file_name,
-                                     domains[i],
-                                     link_uri,
-                                     backend->server_icon);
-            files = g_list_prepend (files, file);   
-            g_free(link_uri);
-            g_free(file_name);
-          }
-        g_strfreev (domains);
-      } 
-    } 
-
+      
+      g_object_unref (server_file);
+      
+      /* If gconf setting "/system/dns_sd/extra_domains" is set to a list of domains:
+       * links to dns-sd://$domain/ */
+      if (backend->extra_domains != NULL &&
+	  backend->extra_domains[0] != 0)
+	{
+	  char **domains;
+	  int i;
+	  domains = g_strsplit (backend->extra_domains, ",", 0);
+	  for (i=0; domains[i] != NULL; i++)
+	    {
+	      file_name = g_strconcat("dnssd-domain-", domains[i], NULL);
+	      link_uri = g_strconcat("dns-sd://", domains[i], "/", NULL);
+	      file = network_file_new (file_name,
+				       domains[i],
+				       link_uri,
+				       backend->server_icon);
+	      files = g_list_prepend (files, file);   
+	      g_free (link_uri);
+	      g_free (file_name);
+	    }
+	  g_strfreev (domains);
+	}
+    }
+  
   update_from_files (backend, files);
 }
 
@@ -379,6 +431,63 @@ idle_add_recompute (GVfsBackendNetwork *backend)
 }
 
 static void
+notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+                          GFileMonitorEvent event_type, gpointer user_data)
+{
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
+  switch (event_type)
+    {
+    case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
+    case G_FILE_MONITOR_EVENT_CREATED:
+    case G_FILE_MONITOR_EVENT_DELETED:
+      if (backend->idle_tag == 0)
+        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+      break;
+    case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
+    case G_FILE_MONITOR_EVENT_UNMOUNTED:
+      /* in either event, our smb backend is/will be gone. */
+      if (backend->idle_tag == 0)
+        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+      
+      /* stop monitoring as the backend's gone. */
+      g_file_monitor_cancel (backend->smb_monitor);
+      g_object_unref (backend->smb_monitor);
+      backend->smb_monitor = NULL;
+      break;
+    default:
+      break;
+    }
+}
+
+static void
+notify_dnssd_local_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
+                            GFileMonitorEvent event_type, gpointer user_data)
+{
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
+  switch (event_type)
+    {
+    case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
+    case G_FILE_MONITOR_EVENT_CREATED:
+    case G_FILE_MONITOR_EVENT_DELETED:
+      if (backend->idle_tag == 0)
+        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+      break;
+    case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
+    case G_FILE_MONITOR_EVENT_UNMOUNTED:
+      /* in either event, our dns-sd backend is/will be gone. */
+      if (backend->idle_tag == 0)
+        backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+      /* stop monitoring as the backend's gone. */
+      g_file_monitor_cancel (backend->dnssd_monitor);
+      g_object_unref (backend->dnssd_monitor);
+      backend->dnssd_monitor = NULL;
+      break;
+    default:
+      break;
+    }
+}
+
+static void
 notify_gconf_dnssd_domains_changed (GConfClient *client,
 				    guint        cnxn_id,
 				    GConfEntry  *entry,
@@ -389,13 +498,12 @@ notify_gconf_dnssd_domains_changed (GConfClient *client,
   extra_domains = gconf_client_get_string (client, 
                                            PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS, NULL);
 
-  g_free(backend->extra_domains);
+  g_free (backend->extra_domains);
   backend->extra_domains = extra_domains;
 
-  if (backend->idle_tag != 0)
-    g_source_remove (backend->idle_tag);
-  
-  backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+  /* don't re-issue recomputes if we've already queued one. */
+  if (backend->idle_tag == 0)
+    backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
 }
 
 static void
@@ -411,12 +519,11 @@ notify_gconf_dnssd_display_local_changed (GConfClient *client,
                                            PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL, NULL);
 
   backend->local_setting = parse_network_local_setting (display_local);
-  g_free(display_local);
+  g_free (display_local);
 
-  if (backend->idle_tag != 0)
-    g_source_remove (backend->idle_tag);
-  
-  backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+  /* don't re-issue recomputes if we've already queued one. */
+  if (backend->idle_tag == 0)
+    backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
 }
 
 static void
@@ -431,14 +538,20 @@ notify_gconf_smb_workgroup_changed (GConfClient *client,
   current_workgroup = gconf_client_get_string (client,
 					       PATH_GCONF_GVFS_SMB_WORKGROUP, NULL);
 
-  g_free(backend->current_workgroup);
+  g_free (backend->current_workgroup);
   backend->current_workgroup = current_workgroup;
 
-  if (backend->idle_tag != 0)
-    g_source_remove (backend->idle_tag);
-  
-  backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+  /* cancel the smb monitor */
+  g_signal_handlers_disconnect_by_func (backend->smb_monitor,
+					notify_smb_files_changed,
+					backend->smb_monitor);
+  g_file_monitor_cancel (backend->smb_monitor);
+  g_object_unref (backend->smb_monitor);
+  backend->smb_monitor = NULL;
 
+  /* don't re-issue recomputes if we've already queued one. */
+  if (backend->idle_tag == 0)
+    backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
 }
 
 static NetworkFile *
@@ -490,7 +603,7 @@ file_info_from_file (NetworkFile *file,
     g_file_info_set_icon (info, file->icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
-  g_file_info_set_size(info, 0);
+  g_file_info_set_size (info, 0);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
@@ -591,8 +704,10 @@ try_mount (GVfsBackend *backend,
   return TRUE;
 }
 
-/* handles both file and dir monitors, 
- * as we really don't "support" (e.g. fire events for) either, yet. */
+/* handles both file and dir monitors
+ * for now we only fire events on the root directory.
+ * are individual file monitors needed for this backend?
+ */
 static gboolean
 try_create_monitor (GVfsBackend *backend,
                     GVfsJobCreateMonitor *job,
@@ -634,6 +749,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   supported_vfs = g_vfs_get_supported_uri_schemes (g_vfs_get_default ());
 
   network_backend->have_smb = FALSE;
+  network_backend->have_dnssd = FALSE;
   for (i=0; supported_vfs[i]!=NULL; i++)
     {
       if (strcmp(supported_vfs[i], "smb") == 0)
@@ -679,7 +795,7 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
       if (display_local != NULL && display_local[0] != 0)
          network_backend->local_setting = parse_network_local_setting (display_local);
 
-      g_free(display_local);
+      g_free (display_local);
       network_backend->extra_domains = extra_domains;
 
       gconf_client_notify_add (gconf_client, PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS, 
