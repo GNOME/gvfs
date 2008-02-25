@@ -47,6 +47,7 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfskeyring.h"
 
 #ifdef HAVE_GCONF
 #include <gconf/gconf-client.h>
@@ -75,6 +76,9 @@ struct _GVfsBackendSmb
   GMountSource *mount_source; /* Only used/set during mount */
   int mount_try;
   gboolean mount_try_again;
+	
+  gboolean password_in_keyring;
+  GPasswordSave password_save;
   
   /* Cache */
   char *cached_server_name;
@@ -177,36 +181,55 @@ auth_callback (SMBCCTX *context,
     }
   else
     {
-      GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
-      char *message;
-      
-      if (backend->domain == NULL)
-	flags |= G_ASK_PASSWORD_NEED_DOMAIN;
-      if (backend->user == NULL)
-	flags |= G_ASK_PASSWORD_NEED_USERNAME;
+      gboolean in_keyring = FALSE;
 
-      /* translators: First %s is a share name, second is a server name */
-      message = g_strdup_printf (_("Password required for share %s on %s"),
-				 share_name, server_name);
-      handled = g_mount_source_ask_password (backend->mount_source,
-					     message,
-					     username_out,
-					     domain_out,
-					     flags,
-					     &abort,
-					     &ask_password,
-					     &ask_user,
-					     &ask_domain,
-					     NULL);
-      g_free (message);
-      if (!handled)
-	goto out;
+      if (!backend->password_in_keyring)
+        {
+	  in_keyring = g_vfs_keyring_lookup_password (backend->user,
+						      backend->server,
+						      backend->domain,
+						      "smb",
+						      &ask_user,
+						      &ask_domain,
+						      &ask_password);
+	  backend->password_in_keyring = in_keyring;
+	}
       
-      if (abort)
-	{
-	  strncpy (username_out, "ABORT", unmaxlen);
-	  strncpy (password_out, "", pwmaxlen);
-	  goto out;
+      if (!in_keyring)
+        {
+	  GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
+	  char *message;
+      
+	  if (g_vfs_keyring_is_available ())
+	    flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+	  if (backend->domain == NULL)
+	    flags |= G_ASK_PASSWORD_NEED_DOMAIN;
+	  if (backend->user == NULL)
+	    flags |= G_ASK_PASSWORD_NEED_USERNAME;
+
+	  /* translators: First %s is a share name, second is a server name */
+	  message = g_strdup_printf (_("Password required for share %s on %s"),
+				     share_name, server_name);
+	  handled = g_mount_source_ask_password (backend->mount_source,
+						 message,
+						 username_out,
+						 domain_out,
+						 flags,
+						 &abort,
+						 &ask_password,
+						 &ask_user,
+						 &ask_domain,
+						 &(backend->password_save));
+	  g_free (message);
+	  if (!handled)
+	    goto out;
+      
+	  if (abort)
+	    {
+	      strncpy (username_out, "ABORT", unmaxlen);
+	      strncpy (password_out, "", pwmaxlen);
+	      goto out;
+	    }
 	}
 
       /* Try again if this fails */
@@ -504,6 +527,7 @@ do_mount (GVfsBackend *backend,
 
   op_backend->mount_source = mount_source;
   op_backend->mount_try = 0;
+  op_backend->password_save = G_PASSWORD_SAVE_NEVER;
 
   do
     {
@@ -533,6 +557,13 @@ do_mount (GVfsBackend *backend,
 			_("Failed to mount Windows share"));
       return;
     }
+
+  g_vfs_keyring_save_password (op_backend->last_user,
+			       op_backend->server,
+			       op_backend->last_domain,
+			       "smb",
+			       op_backend->last_password,
+			       op_backend->password_save);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }

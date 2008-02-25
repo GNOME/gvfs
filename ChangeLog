@@ -1,5 +1,11 @@
 2008-02-25  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsmb.c:
+	Support gnome-keyring (#511517)
+	Patch from Carlos Garcia Campos
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/gvfsbackendnetwork.c (recompute_files):
 	Fix spelling inconsistency "Network" vs "network" (#518487)
 	
