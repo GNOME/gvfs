@@ -57,6 +57,12 @@ mount_DATA += cdda.mount
 libexec_PROGRAMS += gvfsd-cdda
 endif
 
+mount_in_files += gphoto2.mount.in
+if USE_GPHOTO2
+mount_DATA += gphoto2.mount
+libexec_PROGRAMS += gvfsd-gphoto2
+endif
+
 mount_in_files += network.mount.in
 if USE_GCONF
 mount_DATA += network.mount
@@ -283,10 +289,24 @@ gvfsd_cdda_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendcdda.h \
 	-DDEFAULT_BACKEND_TYPE=cdda \
 	-DMAX_JOB_THREADS=1 \
-	$(CDDA_CFLAGS) \
+	$(CDDA_CFLAGS) $(HAL_CFLAGS) \
 	-DBACKEND_TYPES='"cdda", G_VFS_TYPE_BACKEND_CDDA,'
 
-gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS)
+gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS)
+
+gvfsd_gphoto2_SOURCES = \
+	gvfsbackendgphoto2.c gvfsbackendgphoto2.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_gphoto2_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendgphoto2.h \
+	-DDEFAULT_BACKEND_TYPE=gphoto2 \
+	-DMAX_JOB_THREADS=1 \
+	$(GPHOTO2_CFLAGS) $(HAL_CFLAGS) \
+	-DBACKEND_TYPES='"gphoto2", G_VFS_TYPE_BACKEND_GPHOTO2,'
+
+gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
 
 gvfsd_http_SOURCES = \
 	soup-input-stream.c soup-input-stream.h \

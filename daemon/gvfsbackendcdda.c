@@ -34,10 +34,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+#include <libhal.h>
+#include <dbus/dbus.h>
 
 #include "gvfsbackendcdda.h"
 #include "gvfsjobopenforread.h"
@@ -46,15 +49,15 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 
+/* see this bug http://bugzilla.gnome.org/show_bug.cgi?id=518284 */
+#define _I18N_LATER(x) x
+
 #define DO_NOT_WANT_PARANOIA_COMPATIBILITY
 #include <cdio/paranoia.h>
 
 /* TODO:
  *
  * - GVFS integration
- *   - Need to unmount ourselves when the backing media is removed
- *   - Need to have some way of making our resulting GDaemonMount object (in the client address space)
- *     be associated with the GVolume (probably stems from the HAL volume monitor).. both ways
  *   - g_vfs_backend_set_display_name() needs to work post mount
  *
  * - Metadata
@@ -86,6 +89,12 @@ struct _GVfsBackendCdda
 {
   GVfsBackend parent_instance;
 
+  DBusConnection *dbus_connection;
+  LibHalContext *hal_ctx;
+  char *hal_udi;
+
+  guint64 size;
+
   char *device_path;
   cdrom_drive_t *drive;
   int num_open_files;
@@ -94,13 +103,80 @@ struct _GVfsBackendCdda
 G_DEFINE_TYPE (GVfsBackendCdda, g_vfs_backend_cdda, G_VFS_TYPE_BACKEND)
 
 static void
+release_device (GVfsBackendCdda *cdda_backend)
+{
+  g_free (cdda_backend->device_path);
+  cdda_backend->device_path = NULL;
+
+  if (cdda_backend->drive != NULL)
+    {
+      cdio_cddap_close (cdda_backend->drive);
+      cdda_backend->drive = NULL;
+    }
+}
+
+static void
+find_udi_for_device (GVfsBackendCdda *cdda_backend)
+{
+  int num_devices;
+  char **devices;
+  int n;
+
+  cdda_backend->hal_udi = NULL;
+
+  devices = libhal_manager_find_device_string_match (cdda_backend->hal_ctx,
+                                                     "block.device",
+                                                     cdda_backend->device_path,
+                                                     &num_devices,
+                                                     NULL);
+  if (devices != NULL)
+    {
+      for (n = 0; n < num_devices && cdda_backend->hal_udi == NULL; n++)
+        {
+          char *udi = devices[n];
+          LibHalPropertySet *ps;
+
+          ps = libhal_device_get_all_properties (cdda_backend->hal_ctx, udi, NULL);
+          if (ps != NULL)
+            {
+              if (libhal_ps_get_bool (ps, "block.is_volume"))
+                {
+                  cdda_backend->hal_udi = g_strdup (udi);
+                  cdda_backend->size = libhal_ps_get_uint64 (ps, "volume.size");
+                }                
+            }
+                  
+          libhal_free_property_set (ps);
+        }
+    }
+  libhal_free_string_array (devices);
+
+  /*g_warning ("found udi '%s'", cdda_backend->hal_udi);*/
+}
+
+static void
+_hal_device_removed (LibHalContext *hal_ctx, const char *udi)
+{
+  GVfsBackendCdda *cdda_backend;
+
+  cdda_backend = G_VFS_BACKEND_CDDA (libhal_ctx_get_user_data (hal_ctx));
+
+  if (cdda_backend->hal_udi != NULL && strcmp (udi, cdda_backend->hal_udi) == 0)
+    {
+      /*g_warning ("we have been removed!");*/
+      /* TODO: need a cleaner way to force unmount ourselves */
+      exit (1);
+    }
+}
+
+static void
 g_vfs_backend_cdda_finalize (GObject *object)
 {
   GVfsBackendCdda *cdda_backend = G_VFS_BACKEND_CDDA (object);
 
   //g_warning ("finalizing %p", object);
 
-  g_free (cdda_backend->device_path);
+  release_device (cdda_backend);
 
   if (G_OBJECT_CLASS (g_vfs_backend_cdda_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_cdda_parent_class)->finalize) (object);
@@ -135,8 +211,51 @@ do_mount (GVfsBackend *backend,
   GVfsBackendCdda *cdda_backend = G_VFS_BACKEND_CDDA (backend);
   GError *error = NULL;
   GMountSpec *cdda_mount_spec;
+  DBusError dbus_error;
 
   //g_warning ("do_mount %p", cdda_backend);
+
+  /* setup libhal */
+
+  dbus_error_init (&dbus_error);
+  cdda_backend->dbus_connection = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_error);
+  if (dbus_error_is_set (&dbus_error))
+    {
+      release_device (cdda_backend);
+      dbus_error_free (&dbus_error);
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _I18N_LATER("Cannot connect to the system bus"));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+  
+  cdda_backend->hal_ctx = libhal_ctx_new ();
+  if (cdda_backend->hal_ctx == NULL)
+    {
+      release_device (cdda_backend);
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _I18N_LATER("Cannot create libhal context"));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+
+  _g_dbus_connection_integrate_with_main (cdda_backend->dbus_connection);
+  libhal_ctx_set_dbus_connection (cdda_backend->hal_ctx, cdda_backend->dbus_connection);
+  
+  if (!libhal_ctx_init (cdda_backend->hal_ctx, &dbus_error))
+    {
+      release_device (cdda_backend);
+      dbus_error_free (&dbus_error);
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _I18N_LATER("Cannot initialize libhal"));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+
+  libhal_ctx_set_device_removed (cdda_backend->hal_ctx, _hal_device_removed);
+  libhal_ctx_set_user_data (cdda_backend->hal_ctx, cdda_backend);
+
+  /* setup libcdio */
 
   host = g_mount_spec_get (mount_spec, "host");
   //g_warning ("host=%s", host);
@@ -145,10 +264,13 @@ do_mount (GVfsBackend *backend,
       g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("No drive specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      release_device (cdda_backend);
       return;
     }
 
   cdda_backend->device_path = g_strdup_printf ("/dev/%s", host);
+
+  find_udi_for_device (cdda_backend);
 
   cdda_backend->drive = cdio_cddap_identify (cdda_backend->device_path, 0, NULL);
   if (cdda_backend->drive == NULL)
@@ -157,6 +279,7 @@ do_mount (GVfsBackend *backend,
                    _("Cannot find drive %s"), cdda_backend->device_path);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      release_device (cdda_backend);
       return;
     }
 
@@ -167,11 +290,12 @@ do_mount (GVfsBackend *backend,
                    _("Drive %s does not contain audio files"), cdda_backend->device_path);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      release_device (cdda_backend);
       return;
     }
 
   /* Translator: %s is the device the disc is inserted into */
-  fuse_name = g_strdup_printf (_("Audio Disc on %s"), host);
+  fuse_name = g_strdup_printf (_("cdda mount on %s"), host);
   display_name = g_strdup_printf (_("Audio Disc"));
   g_vfs_backend_set_stable_name (backend, fuse_name);
   g_vfs_backend_set_display_name (backend, display_name);
@@ -241,14 +365,11 @@ do_unmount (GVfsBackend *backend,
       return;
     }
 
-  if (cdda_backend->drive != NULL)
-    {
-      //g_warning ("closed drive %p", backend);
-      cdio_cddap_close (cdda_backend->drive);
-    }
+  release_device (cdda_backend);
   
-  //g_warning ("unmounted %p", backend);
   g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  //g_warning ("unmounted %p", backend);
 }
 
 /* returns -1 if we couldn't map */
@@ -766,6 +887,33 @@ do_enumerate (GVfsBackend *backend,
 }
 
 static void
+do_query_fs_info (GVfsBackend *backend,
+		  GVfsJobQueryFsInfo *job,
+		  const char *filename,
+		  GFileInfo *info,
+		  GFileAttributeMatcher *attribute_matcher)
+{
+  GVfsBackendCdda *cdda_backend = G_VFS_BACKEND_CDDA (backend);
+
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cdda");
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
+
+  if (cdda_backend->size > 0)
+    {
+      g_file_info_set_attribute_uint64 (info, 
+                                        G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, 
+                                        cdda_backend->size);
+    }
+  g_file_info_set_attribute_uint64 (info, 
+                                    G_FILE_ATTRIBUTE_FILESYSTEM_FREE, 
+                                    0);
+  
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+
+static void
 g_vfs_backend_cdda_class_init (GVfsBackendCddaClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -781,5 +929,6 @@ g_vfs_backend_cdda_class_init (GVfsBackendCddaClass *klass)
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
   backend_class->query_info = do_query_info;
+  backend_class->query_fs_info = do_query_fs_info;
   backend_class->enumerate = do_enumerate;
 }

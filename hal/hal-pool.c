@@ -137,11 +137,17 @@ hal_pool_init (HalPool *pool)
 static gboolean
 has_cap_only (HalPool *pool, HalDevice *device)
 {
+  const char *subsys;
   unsigned int n;
 
   for (n = 0; pool->priv->cap_only != NULL && pool->priv->cap_only[n] != NULL; n++)
     {
       if (hal_device_has_capability (device, pool->priv->cap_only[n]))
+        return TRUE;
+
+      subsys = hal_device_get_property_string (device, "info.subsystem");
+
+      if (subsys != NULL && strcmp (subsys, pool->priv->cap_only[n]) == 0)
         return TRUE;
     }
   

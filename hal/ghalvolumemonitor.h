@@ -29,11 +29,6 @@
 #include <gio/gio.h>
 #include <gio/gunixmounts.h>
 
-/* TODO: need to use different properties on HAL for other OS's (!) */
-#ifdef __linux__
-#define _WITH_GPHOTO2
-#endif
-
 G_BEGIN_DECLS
 
 #define G_TYPE_HAL_VOLUME_MONITOR        (g_hal_volume_monitor_get_type ())

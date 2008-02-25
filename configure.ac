@@ -240,6 +240,43 @@ AC_SUBST(HAL_CFLAGS)
 
 AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
 
+dnl *************************
+dnl *** Check for gphoto2 ***
+dnl *************************
+AC_ARG_ENABLE(hal, [  --disable-gphoto2           build without gphoto2 support])
+msg_gphoto2=no
+GPHOTO2_LIBS=
+GPHOTO2_CFLAGS=
+
+if test "x$enable_gphoto2" != "xno"; then
+  PKG_CHECK_EXISTS(libgphoto2, msg_gphoto2=yes)
+
+  # Need OS tweaks in hal volume monitor backend
+  case "$host" in
+    *-linux*)
+      use_gphoto2=yes
+      ;;
+    *)
+      use_gphoto2=no
+      ;;
+  esac
+
+  if test "x$msg_gphoto2" == "xyes"; then
+    if test "x$use_gphoto2" == "xyes"; then
+      PKG_CHECK_MODULES(GPHOTO2, libgphoto2)
+      AC_DEFINE(HAVE_GPHOTO2, 1, [Define to 1 if gphoto2 is available])
+    else
+      AC_MSG_WARN([Not building with gphoto2 support. Need OS tweaks in hal volume monitor.])
+      msg_gphoto2=no
+    fi
+  fi
+fi
+
+AC_SUBST(GPHOTO2_LIBS)
+AC_SUBST(GPHOTO2_CFLAGS)
+
+AM_CONDITIONAL(USE_GPHOTO2, [test "$msg_gphoto2" = "yes"])
+
 dnl *******************************
 dnl *** Check for GNOME Keyring ***
 dnl *******************************
@@ -404,6 +441,7 @@ echo "
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
+        Gphoto2 support:              $msg_gphoto2
         GConf support:                $msg_gconf
         DNS-SD support:               $msg_avahi
 	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)

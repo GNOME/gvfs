@@ -1530,7 +1530,12 @@ g_daemon_file_find_enclosing_mount (GFile *file,
 
   if (mount_info->user_visible)
     {
-      mount = g_daemon_mount_new (mount_info, NULL);
+      /* if we have a daemon volume monitor then return one of it's mounts */
+      mount = g_daemon_volume_monitor_find_mount_by_mount_info (mount_info);
+      if (mount == NULL)
+        {
+          mount = g_daemon_mount_new (mount_info, NULL);
+        }
       g_mount_info_unref (mount_info);
       
       if (mount)

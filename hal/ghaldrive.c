@@ -123,11 +123,18 @@ _drive_get_description (HalDevice *d)
   char *s = NULL;
   const char *drive_type;
   const char *drive_bus;
+  const char *name_from_hal;
 
   drive_type = hal_device_get_property_string (d, "storage.drive_type");
   drive_bus = hal_device_get_property_string (d, "storage.bus");
+  name_from_hal = hal_device_get_property_string (d, "info.desktop.name");
 
-  if (strcmp (drive_type, "cdrom") == 0)
+  
+  if (strlen (name_from_hal) > 0)
+    {
+      s = g_strdup (name_from_hal);
+    }
+  else if (strcmp (drive_type, "cdrom") == 0)
     {
       const char *first;
       const char *second;
@@ -230,22 +237,34 @@ _drive_get_icon (HalDevice *d)
   char *s = NULL;
   const char *drive_type;
   const char *drive_bus;
+  const char *icon_from_hal;
+  gboolean is_audio_player;
 
   drive_type = hal_device_get_property_string (d, "storage.drive_type");
   drive_bus = hal_device_get_property_string (d, "storage.bus");
-  
-  if (strcmp (drive_type, "disk") == 0) {
-    if (strcmp (drive_bus, "ide") == 0)
-      s = g_strdup ("drive-removable-media-ata");
-    else if (strcmp (drive_bus, "scsi") == 0)
-      s = g_strdup ("drive-removable-media-scsi");
-    else if (strcmp (drive_bus, "ieee1394") == 0)
-      s = g_strdup ("drive-removable-media-ieee1394");
-    else if (strcmp (drive_bus, "usb") == 0)
-      s = g_strdup ("drive-removable-media-usb");
-    else
-      s = g_strdup ("drive-removable-media");
-  }
+  is_audio_player = hal_device_has_capability (d, "portable_audio_player");
+  icon_from_hal = hal_device_get_property_string (d, "info.desktop.icon");
+
+  if (strlen (icon_from_hal) > 0)
+    {
+      s = g_strdup (icon_from_hal);
+    }
+  else if (is_audio_player)
+    {
+      s = g_strdup ("multimedia-player");
+  } else if (strcmp (drive_type, "disk") == 0)
+    {
+      if (strcmp (drive_bus, "ide") == 0)
+        s = g_strdup ("drive-removable-media-ata");
+      else if (strcmp (drive_bus, "scsi") == 0)
+        s = g_strdup ("drive-removable-media-scsi");
+      else if (strcmp (drive_bus, "ieee1394") == 0)
+        s = g_strdup ("drive-removable-media-ieee1394");
+      else if (strcmp (drive_bus, "usb") == 0)
+        s = g_strdup ("drive-removable-media-usb");
+      else
+        s = g_strdup ("drive-removable-media");
+    }
   else if (strcmp (drive_type, "cdrom") == 0)
     {
       /* TODO: maybe there's a better heuristic than this */

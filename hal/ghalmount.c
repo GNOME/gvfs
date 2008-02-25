@@ -284,8 +284,9 @@ on_autorun_loaded (GObject *source_object, GAsyncResult *res,
       g_regex_unref (icon_regex);
       g_free (content);
     }
-  
-  if (relative_icon_path)
+
+  /* some autorun.in points to the .exe file for the icon; make sure we avoid using that */
+  if (relative_icon_path && !g_str_has_suffix (relative_icon_path, ".exe"))
     {
       _g_find_file_insensitive_async (data->root,
                                       relative_icon_path,
@@ -322,7 +323,7 @@ _g_find_mount_icon (GHalMount *m)
   
   m->searched_for_icon = TRUE;
 	
-  search_data = g_new (MountIconSearchData, 1);
+  search_data = g_new0 (MountIconSearchData, 1);
   search_data->mount = g_object_ref (m);
   search_data->root = g_mount_get_root (G_MOUNT (m));
   
@@ -366,10 +367,8 @@ do_update_from_hal (GHalMount *m)
 {
   HalDevice *volume;
   HalDevice *drive;
-
   char *name;
   const char *icon_name;
-
   const char *drive_type;
   const char *drive_bus;
   gboolean drive_uses_removable_media;
@@ -380,6 +379,13 @@ do_update_from_hal (GHalMount *m)
   gboolean volume_disc_has_data;
   const char *volume_disc_type;
   gboolean volume_disc_is_blank;
+  gboolean is_audio_player;
+  const char *icon_from_hal;
+  const char *volume_icon_from_hal;
+  const char *name_from_hal;
+  const char *volume_name_from_hal;
+  gboolean is_crypto;
+  gboolean is_crypto_cleartext;
 
   volume = m->device;
   drive = m->drive_device;
@@ -394,12 +400,44 @@ do_update_from_hal (GHalMount *m)
   volume_disc_has_data = hal_device_get_property_bool (volume, "volume.disc.has_data");
   volume_disc_is_blank = hal_device_get_property_bool (volume, "volume.disc.is_blank");
   volume_disc_type = hal_device_get_property_string (volume, "volume.disc.type");
-  
+  is_audio_player = hal_device_has_capability (drive, "portable_audio_player");
+  icon_from_hal = hal_device_get_property_string (drive, "info.desktop.icon");
+  volume_icon_from_hal = hal_device_get_property_string (volume, "info.desktop.icon");
+  name_from_hal = hal_device_get_property_string (drive, "info.desktop.name");
+  volume_name_from_hal = hal_device_get_property_string (volume, "info.desktop.name");
+
+  is_crypto = FALSE;
+  is_crypto_cleartext = FALSE;
+  if (strcmp (hal_device_get_property_string (volume, "volume.fsusage"), "crypto") == 0)
+    {
+      is_crypto = TRUE;
+    }
+  if (strlen (hal_device_get_property_string (volume, "volume.crypto_luks.clear.backing_volume")) > 0)
+    {
+      is_crypto_cleartext = TRUE;
+    }
+
   /*g_warning ("drive_type='%s'", drive_type); */
   /*g_warning ("drive_bus='%s'", drive_bus); */
   /*g_warning ("drive_uses_removable_media=%d", drive_uses_removable_media); */
-  
-  if (strcmp (drive_type, "disk") == 0)
+
+  if (strlen (volume_icon_from_hal) > 0)
+    {
+      icon_name = volume_icon_from_hal;
+    }
+  else if (strlen (icon_from_hal) > 0)
+    {
+      icon_name = icon_from_hal;
+    }
+  else if (is_audio_player)
+    {
+      icon_name = "multimedia-player";
+    }
+  else if (is_crypto || is_crypto_cleartext)
+    {
+      icon_name = "media-encrypted";
+    }
+  else if (strcmp (drive_type, "disk") == 0)
     {
       if (strcmp (drive_bus, "ide") == 0)
         icon_name = "drive-harddisk-ata";
@@ -430,7 +468,15 @@ do_update_from_hal (GHalMount *m)
     icon_name = "drive-harddisk";
 
   
-  if (volume_fs_label != NULL && strlen (volume_fs_label) > 0)
+  if (strlen (volume_name_from_hal) > 0)
+    {
+      name = g_strdup (volume_name_from_hal);
+    }
+  else if (strlen (name_from_hal) > 0)
+    {
+      name = g_strdup (name_from_hal);
+    }
+  else if (volume_fs_label != NULL && strlen (volume_fs_label) > 0)
     name = g_strdup (volume_fs_label);
   else if (volume_is_disc)
     {
@@ -613,22 +659,6 @@ g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
   update_from_hal (mount, TRUE);
 }
 
-static gboolean
-should_ignore_non_hal (GUnixMountEntry *mount_entry)
-{
-  const char *fs_type;
-  
-  fs_type = g_unix_mount_get_fs_type (mount_entry);
-
-  /* We don't want to report nfs mounts. They are
-     generally internal things, and cause a lot
-     of pain with autofs and autorun */
-  if (strcmp (fs_type, "nfs") == 0)
-    return TRUE;
-
-  return FALSE;
-}
-
 GHalMount *
 g_hal_mount_new (GVolumeMonitor       *volume_monitor,
                  GUnixMountEntry      *mount_entry,
@@ -641,7 +671,7 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
   GHalMount *mount;
 
   /* If no volume for mount - Ignore internal things */
-  if (volume == NULL && g_unix_mount_is_system_internal (mount_entry))
+  if (volume == NULL && !g_unix_mount_guess_should_display (mount_entry))
     return NULL;
 
   mount = g_object_new (G_TYPE_HAL_MOUNT, NULL);
@@ -691,7 +721,7 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
 
  not_hal:
 
-  if (volume != NULL || should_ignore_non_hal (mount_entry))
+  if (volume != NULL)
     {
       g_object_unref (mount);
       return NULL;
@@ -1131,7 +1161,7 @@ _g_find_file_insensitive_async (GFile              *parent,
   InsensitiveFileSearchData *data;
   GFile *direct_file = g_file_get_child (parent, name);
   
-  data = g_new (InsensitiveFileSearchData, 1);
+  data = g_new0 (InsensitiveFileSearchData, 1);
   data->cancellable = cancellable;
   data->callback = callback;
   data->user_data = user_data;

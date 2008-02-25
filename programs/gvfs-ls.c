@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
@@ -29,11 +31,17 @@
 
 static char *attributes = NULL;
 static gboolean show_hidden = FALSE;
+static gboolean show_mounts = FALSE;
+static gboolean show_long = FALSE;
+static char *show_completions = NULL;
 
 static GOptionEntry entries[] = 
 {
 	{ "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, "The attributes to get", NULL },
 	{ "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, "Show hidden files", NULL },
+        { "long", 'l', 0, G_OPTION_ARG_NONE, &show_long, "Use a long listing format", NULL },
+        { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, "Show completions", NULL}, 
+        { "show-mounts", 'm', 0, G_OPTION_ARG_NONE, &show_mounts, "Show mounts", NULL },
 	{ NULL }
 };
 
@@ -86,7 +94,10 @@ show_info (GFileInfo *info)
 
   size = g_file_info_get_size (info);
   type = type_to_string (g_file_info_get_file_type (info));
-  g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", name, (guint64)size, type);
+  if (show_long)
+    g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", name, (guint64)size, type);
+  else
+    g_print ("%s", name);
 
   first_attr = TRUE;
   attributes = g_file_info_list_attributes (info, NULL);
@@ -94,9 +105,11 @@ show_info (GFileInfo *info)
     {
       char *val_as_string;
 
-      if (strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_NAME) == 0 ||
+      if (!show_long ||
+          strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_NAME) == 0 ||
 	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_SIZE) == 0 ||
-	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_TYPE) == 0)
+	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_TYPE) == 0 ||
+	  strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN) == 0)
 	continue;
 
       if (first_attr)
@@ -130,7 +143,7 @@ list (GFile *file)
   enumerator = g_file_enumerate_children (file, attributes, 0, NULL, &error);
   if (enumerator == NULL)
     {
-      g_print ("Error: %s\n", error->message);
+      g_printerr ("Error: %s\n", error->message);
       g_error_free (error);
       error = NULL;
       return;
@@ -145,17 +158,155 @@ list (GFile *file)
 
   if (error)
     {
-      g_print ("Error: %s\n", error->message);
+      g_printerr ("Error: %s\n", error->message);
       g_error_free (error);
       error = NULL;
     }
 	 
   if (!g_file_enumerator_close (enumerator, NULL, &error))
     {
-      g_print ("Error closing enumerator: %s\n", error->message);
+      g_printerr ("Error closing enumerator: %s\n", error->message);
       g_error_free (error);
       error = NULL;
     }
+}
+
+static void
+print_mounts (const char *prefix)
+{
+  GList *l;
+  GList *mounts;
+  GVolumeMonitor *volume_monitor;
+
+  volume_monitor = g_volume_monitor_get ();
+  
+  mounts = g_volume_monitor_get_mounts (volume_monitor);
+  if (mounts != NULL)
+    {
+      for (l = mounts; l != NULL; l = l->next)
+        {
+          GMount *mount = l->data;
+          GFile *mount_root;
+          char *uri;
+          
+          mount_root = g_mount_get_root (mount);
+          uri = g_file_get_uri (mount_root);
+          if (prefix == NULL ||
+              g_str_has_prefix (uri, prefix))
+            g_print ("%s\n", uri);
+          g_free (uri);
+          g_object_unref (mount_root);
+          g_object_unref (mount);
+        }
+      g_list_free (mounts);
+    }
+  g_object_unref (volume_monitor);
+
+  if (prefix == NULL || g_str_has_prefix ("file:///", prefix))
+    g_print ("file:///\n");
+}
+
+static void
+show_completed_file (GFile *hit,
+                     gboolean is_dir,
+                     const char *arg)
+{
+  char *display, *cwd;
+  GFile *cwd_f;
+  
+  if (g_file_is_native (hit))
+    {
+      cwd = g_get_current_dir ();
+      cwd_f = g_file_new_for_path (cwd);
+      g_free (cwd);
+
+      if (g_file_has_prefix (hit, cwd_f) &&
+          !g_path_is_absolute (arg))
+        display = g_file_get_relative_path (cwd_f, hit);
+      else
+        display = g_file_get_path (hit);
+      g_object_unref (cwd_f);
+    }
+  else
+    display = g_file_get_uri (hit);
+  
+  g_print ("%s%s\n", display, (is_dir)?"/":"");
+  g_free (display);
+}
+  
+static void
+print_completions (const char *arg)
+{
+  GFile *f;
+  GFile *parent;
+  char *basename;
+
+  f = g_file_new_for_commandline_arg (arg);
+  
+  if (g_str_has_suffix (arg, "/") ||
+      *arg == 0)
+    {
+      parent = g_object_ref (f);
+      basename = g_strdup ("");
+    }
+  else
+    {
+      parent = g_file_get_parent (f);
+      basename = g_file_get_basename (f);
+    }
+
+  if (parent == NULL ||
+      !g_file_query_exists (parent, NULL))
+    {
+      GMount *mount;
+      mount = g_file_find_enclosing_mount (f, NULL, NULL);
+      if (mount == NULL)
+        {
+          print_mounts (arg);
+          goto out;
+        }
+      g_object_unref (mount);
+    }
+  
+  if (parent != NULL)
+    {
+      GFileEnumerator *enumerator;
+      enumerator = g_file_enumerate_children (parent, 
+                                              G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                              G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                              0, 
+                                              NULL, 
+                                              NULL);
+      if (enumerator != NULL)
+        {
+          GFileInfo *info;
+          
+          while ((info = g_file_enumerator_next_file (enumerator, NULL, NULL)) != NULL)
+            {
+              const char *name;
+              GFileType type;
+              
+              name = g_file_info_get_name (info);
+              type = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_STANDARD_TYPE);
+              if (name != NULL && g_str_has_prefix (name, basename))
+                {
+                  GFile *entry;
+                  char *entry_uri;
+                  
+                  entry = g_file_get_child (parent, name);
+                  show_completed_file (entry, type == G_FILE_TYPE_DIRECTORY, arg);
+                  g_object_unref (entry);
+                }
+              g_object_unref (info);
+            }
+          g_file_enumerator_close (enumerator, NULL, NULL);
+        }
+      g_object_unref (parent);
+    }
+
+ out:
+  g_object_unref (f);
+  g_free (basename);
 }
 
 int
@@ -175,12 +326,30 @@ main (int argc, char *argv[])
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
 
+  if (attributes != NULL)
+    {
+      /* asking for attributes implies -l; otherwise it won't get shown */
+      show_long = TRUE;
+    }
+
   attributes = g_strconcat (G_FILE_ATTRIBUTE_STANDARD_NAME ","
 			    G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-			    G_FILE_ATTRIBUTE_STANDARD_SIZE,
+			    G_FILE_ATTRIBUTE_STANDARD_SIZE ","
+			    G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
 			    attributes != NULL ? "," : "",
 			    attributes,
 			    NULL);
+
+  if (show_mounts)
+    {
+      print_mounts (NULL);
+      return 0;
+    }
+  else if (show_completions != NULL)
+    {
+      print_completions (show_completions);
+      return 0;
+    }
   
   if (argc > 1)
     {

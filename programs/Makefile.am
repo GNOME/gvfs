@@ -16,6 +16,7 @@ bin_PROGRAMS =					\
 	gvfs-open				\
 	gvfs-save				\
 	gvfs-ls					\
+	gvfs-tree				\
 	gvfs-info				\
 	gvfs-trash				\
 	gvfs-rm					\
@@ -29,6 +30,9 @@ bin_PROGRAMS =					\
 bin_SCRIPTS =					\
 	gvfs-less				\
 	$(NULL)
+
+profiledir = $(sysconfdir)/profile.d
+profile_SCRIPTS = gvfs-bash-completion.sh
 
 gvfs_cat_SOURCES = gvfs-cat.c
 gvfs_cat_LDADD = $(libraries)
@@ -53,6 +57,9 @@ gvfs_rm_LDADD = $(libraries)
 
 gvfs_ls_SOURCES = gvfs-ls.c
 gvfs_ls_LDADD = $(libraries)
+
+gvfs_tree_SOURCES = gvfs-tree.c
+gvfs_tree_LDADD = $(libraries)
 
 gvfs_move_SOURCES = gvfs-move.c
 gvfs_move_LDADD = $(libraries)

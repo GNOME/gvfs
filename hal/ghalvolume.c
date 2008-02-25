@@ -56,6 +56,7 @@ struct _GHalVolume {
   GFile *foreign_mount_root;
   GMount *foreign_mount;
   gboolean is_mountable;
+  gboolean ignore_automount;
 
   char *name;
   char *icon;
@@ -202,6 +203,36 @@ format_size_for_display (guint64 size)
   return str;
 }
 
+static char **
+dupv_and_uniqify (char **str_array)
+{
+  int n, m, o;
+  int len;
+  char **result;
+
+  result = g_strdupv (str_array);
+  len = g_strv_length (result);
+
+  for (n = 0; n < len; n++)
+    {
+      char *s = result[n];
+      for (m = n + 1; m < len; m++)
+        {
+          char *p = result[m];
+          if (strcmp (s, p) == 0)
+            {
+              for (o = m + 1; o < len; o++)
+                result[o - 1] = result[o];
+              len--;
+              result[len] = NULL;
+              m--;
+            }
+        }
+    }
+
+  return result;
+}
+
 static void
 do_update_from_hal (GHalVolume *mv)
 {
@@ -221,6 +252,8 @@ do_update_from_hal (GHalVolume *mv)
   HalDevice *drive;
   char *name;
   char *size;
+  gboolean is_crypto;
+  gboolean is_crypto_cleartext;
 
   volume = mv->device;
   drive = mv->drive_device;
@@ -237,6 +270,17 @@ do_update_from_hal (GHalVolume *mv)
   volume_disc_type = hal_device_get_property_string (volume, "volume.disc.type");
   volume_fsusage = hal_device_get_property_string (volume, "volume.fsusage");
   volume_fstype = hal_device_get_property_string (volume, "volume.fstype");
+
+  is_crypto = FALSE;
+  is_crypto_cleartext = FALSE;
+  if (strcmp (hal_device_get_property_string (volume, "volume.fsusage"), "crypto") == 0)
+    {
+      is_crypto = TRUE;
+    }
+  if (strlen (hal_device_get_property_string (volume, "volume.crypto_luks.clear.backing_volume")) > 0)
+    {
+      is_crypto_cleartext = TRUE;
+    }
 
   if (volume_is_disc && volume_disc_has_audio && mv->foreign_mount_root != NULL)
     name = g_strdup (_("Audio Disc"));
@@ -276,7 +320,11 @@ do_update_from_hal (GHalVolume *mv)
     }
 
   mv->name = name;
-  mv->icon = _drive_get_icon (drive); /* use the drive icon since we're unmounted */
+
+  if (is_crypto || is_crypto_cleartext)
+    mv->icon = g_strdup ("drive-encrypted");
+  else
+    mv->icon = _drive_get_icon (drive); /* use the drive icon since we're unmounted */
 
   if (hal_device_get_property_bool (volume, "volume.is_mounted"))
     mv->mount_path = g_strdup (hal_device_get_property_string (volume, "volume.mount_point"));
@@ -285,7 +333,7 @@ do_update_from_hal (GHalVolume *mv)
 
   g_object_set_data_full (G_OBJECT (mv), 
                           "hal-storage-device-capabilities",
-                          g_strdupv (hal_device_get_property_strlist (mv->drive_device, "info.capabilities")),
+                          dupv_and_uniqify (hal_device_get_property_strlist (mv->drive_device, "info.capabilities")),
                           (GDestroyNotify) g_strfreev);
 
   if (volume_disc_type != NULL && strlen (volume_disc_type) == 0)
@@ -296,33 +344,81 @@ do_update_from_hal (GHalVolume *mv)
                           (GDestroyNotify) g_free);
 }
 
-#ifdef _WITH_GPHOTO2
+#ifdef HAVE_GPHOTO2
 static void
 do_update_from_hal_for_camera (GHalVolume *v)
 {
   const char *vendor;
   const char *product;
+  const char *icon_from_hal;
+  const char *name_from_hal;
+  gboolean is_audio_player;
 
   vendor = hal_device_get_property_string (v->drive_device, "usb_device.vendor");
   product = hal_device_get_property_string (v->drive_device, "usb_device.product");
+  icon_from_hal = hal_device_get_property_string (v->device, "info.desktop.icon");
+  name_from_hal = hal_device_get_property_string (v->device, "info.desktop.name");
 
-  if (vendor == NULL)
+  is_audio_player = hal_device_has_capability (v->device, "portable_audio_player");
+
+  v->name = NULL;
+  if (strlen (name_from_hal) > 0)
+    {
+      v->name = g_strdup (name_from_hal);
+    }
+  else if (vendor == NULL)
     {
       if (product != NULL)
         v->name = g_strdup (product);
-      else
-        v->name = g_strdup (_("Camera"));
     }
   else
     {
       if (product != NULL)
-        v->name = g_strdup_printf ("%s %s", vendor, product);
+        {
+          v->name = g_strdup_printf ("%s %s", vendor, product);
+        }
       else
-        v->name = g_strdup_printf (_("%s Camera"), vendor);
+        {
+          if (is_audio_player)
+            {
+              v->name = g_strdup_printf (_("%s Audio Player"), vendor);
+            }
+          else
+            {
+              v->name = g_strdup_printf (_("%s Camera"), vendor);
+            }
+        }
+    }
+  if (v->name == NULL)
+    {
+      if (is_audio_player)
+        {
+          v->name = g_strdup (_("Audio Player"));
+        }
+      else
+        {
+          v->name = g_strdup (_("Camera"));
+        }
     }
 
-  v->icon = g_strdup ("camera");
+  if (strlen (icon_from_hal) > 0)
+    {
+      v->icon = g_strdup (icon_from_hal);
+    }
+  else if (is_audio_player)
+    {
+      v->icon = g_strdup ("multimedia-player");
+    }
+  else
+    {
+      v->icon = g_strdup ("camera");
+    }
   v->mount_path = NULL;
+
+  g_object_set_data_full (G_OBJECT (v), 
+                          "hal-storage-device-capabilities",
+                          dupv_and_uniqify (hal_device_get_property_strlist (v->device, "info.capabilities")),
+                          (GDestroyNotify) g_strfreev);
 }
 #endif
 
@@ -340,8 +436,10 @@ update_from_hal (GHalVolume *mv, gboolean emit_changed)
   g_free (mv->name);
   g_free (mv->icon);
   g_free (mv->mount_path);
-#ifdef _WITH_GPHOTO2
-  if (hal_device_has_capability (mv->device, "camera"))
+#ifdef HAVE_GPHOTO2
+  if (hal_device_has_capability (mv->device, "camera") || 
+      (hal_device_has_capability (mv->device, "portable_audio_player") &&
+       hal_device_get_property_bool (mv->device, "camera.libgphoto2.support")))
     do_update_from_hal_for_camera (mv);
   else
     do_update_from_hal (mv);
@@ -432,9 +530,12 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
       
       device_path = hal_device_get_property_string (device, "block.device");
     }
-#ifdef _WITH_GPHOTO2
-  else if (hal_device_has_capability (device, "camera"))
+#ifdef HAVE_GPHOTO2
+  else if (hal_device_has_capability (device, "camera") ||
+           (hal_device_has_capability (device, "portable_audio_player") &&
+            hal_device_get_property_bool (device, "camera.libgphoto2.support")))
     {
+
       /* OK, so we abuse storage_udi and drive_device for the USB main
        * device that holds this interface... 
        */
@@ -469,10 +570,11 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
   volume->drive_device = g_object_ref (drive_device);
   volume->foreign_mount_root = foreign_mount_root != NULL ? g_object_ref (foreign_mount_root) : NULL;
   volume->is_mountable = is_mountable;
+  volume->ignore_automount = ! hal_device_is_recently_plugged_in (device);
   
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
-  
+
   compute_uuid (volume);
   update_from_hal (volume, FALSE);
 
@@ -610,9 +712,7 @@ static gboolean
 g_hal_volume_should_automount (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  /* TODO: For now, just never automount things that are not
-     local. Need to figure out a better approach later. */
-  return hal_volume->foreign_mount == NULL;
+  return ! (hal_volume->ignore_automount);
 }
 
 static GDrive *
@@ -754,6 +854,7 @@ spawn_cb (GPid pid, gint status, gpointer user_data)
 
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
+  g_object_unref (data->object);
   g_free (data);
 }
 
@@ -769,7 +870,7 @@ spawn_do (GVolume             *volume,
   GError *error;
 
   data = g_new0 (SpawnOp, 1);
-  data->object = G_OBJECT (volume);
+  data->object = g_object_ref (volume);
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
@@ -789,6 +890,7 @@ spawn_do (GVolume             *volume,
                                                      data->callback,
                                                      data->user_data,
                                                      error);
+      g_object_unref (data->object);
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
       g_error_free (error);
@@ -902,7 +1004,7 @@ g_hal_volume_eject (GVolume              *volume,
     {
       EjectWrapperOp *data;
       data = g_new0 (EjectWrapperOp, 1);
-      data->object = G_OBJECT (volume);
+      data->object = g_object_ref (volume);
       data->callback = callback;
       data->user_data = user_data;
       g_drive_eject (G_DRIVE (hal_volume->drive), flags, cancellable, eject_wrapper_callback, data);

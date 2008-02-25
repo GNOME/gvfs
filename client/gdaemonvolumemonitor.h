@@ -25,6 +25,7 @@
 
 #include <glib-object.h>
 #include <gio/gio.h>
+#include "gmounttracker.h"
 
 G_BEGIN_DECLS
 
@@ -51,6 +52,8 @@ GType g_daemon_volume_monitor_get_type (void) G_GNUC_CONST;
 void g_daemon_volume_monitor_register_types (GTypeModule *type_module);
 
 GVolumeMonitor *g_daemon_volume_monitor_new (void);
+
+GDaemonMount *g_daemon_volume_monitor_find_mount_by_mount_info (GMountInfo *mount_info);
 
 G_END_DECLS
 

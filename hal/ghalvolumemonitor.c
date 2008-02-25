@@ -93,7 +93,7 @@ G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VO
 static HalPool *
 get_hal_pool (void)
 {
-  char *cap_only[] = {"block", "camera", NULL};
+  char *cap_only[] = {"block", "camera", "portable_audio_player", "usb_device", NULL};
 
   if (pool == NULL)
     pool = hal_pool_new (cap_only);
@@ -433,7 +433,7 @@ adopt_orphan_mount (GMount *mount)
   ret = NULL;
   mount_root = g_mount_get_root (mount);
 
-  /* right now we only support discs as foreign mounts */
+  /* cdda:// as foreign mounts */
   for (l = the_volume_monitor->disc_volumes; l != NULL; l = l->next)
     {
       GHalVolume *volume = l->data;
@@ -442,9 +442,24 @@ adopt_orphan_mount (GMount *mount)
         {
           g_hal_volume_adopt_foreign_mount (volume, mount);
           ret = g_object_ref (volume);
-          break;
+          goto found;
         }
     }
+
+  /* gphoto2:// as foreign mounts */
+  for (l = the_volume_monitor->camera_volumes; l != NULL; l = l->next)
+    {
+      GHalVolume *volume = l->data;
+      
+      if (g_hal_volume_has_foreign_mount_root (volume, mount_root))
+        {
+          g_hal_volume_adopt_foreign_mount (volume, mount);
+          ret = g_object_ref (volume);
+          goto found;
+        }
+    }
+
+ found:
   
   g_object_unref (mount_root);
   return ret;
@@ -647,7 +662,7 @@ find_disc_volume_by_udi (GHalVolumeMonitor *monitor, const char *udi)
   return NULL;
 }
 
-#ifdef _WITH_GPHOTO2
+#ifdef HAVE_GPHOTO2
 static GHalVolume *
 find_camera_volume_by_udi (GHalVolumeMonitor *monitor, const char *udi)
 {
@@ -693,18 +708,25 @@ should_volume_be_ignored (HalPool *pool, HalDevice *d)
     {
       /* no file system on the volume... blank and audio discs are handled in update_discs() */
 
-      /* TODO: davidz: LUKS stuff needs more work; turn off for now */
-#if 0
       /* check if it's a LUKS crypto volume */
       if (strcmp (volume_fsusage, "crypto") == 0)
         {
           if (strcmp (hal_device_get_property_string (d, "volume.fstype"), "crypto_LUKS") == 0)
             {
-              return FALSE;
+              HalDevice *cleartext_device;
+
+              /* avoid showing cryptotext volume if it's corresponding cleartext volume is available */
+              cleartext_device = hal_pool_get_device_by_capability_and_string (pool,
+                                                                               "block",
+                                                                               "volume.crypto_luks.clear.backing_volume",
+                                                                               hal_device_get_udi (d));
+              
+              if (cleartext_device == NULL)
+                {
+                  return FALSE;
+                }
             }
         }
-#endif
-      
       return TRUE;
     }
 
@@ -724,8 +746,12 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
   const char *drive_udi;
   gboolean all_volumes_ignored, got_volumes;
 
+  /* never ignore drives with removable media */
+  if (hal_device_get_property_bool (d, "storage.removable"))
+    return FALSE;
+
   drive_udi = hal_device_get_udi (d);
-  
+
   volumes = hal_pool_find_by_capability (pool, "volume");
 
   all_volumes_ignored = TRUE;
@@ -736,7 +762,9 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
       if (strcmp (drive_udi, hal_device_get_property_string (volume_dev, "block.storage_device")) == 0)
         {
           got_volumes = TRUE;
-          if (!should_volume_be_ignored (pool, volume_dev))
+          if (!should_volume_be_ignored (pool, volume_dev) ||
+              hal_device_get_property_bool (volume_dev, "volume.disc.has_audio") ||
+              hal_device_get_property_bool (volume_dev, "volume.disc.is_blank"))
             {
               all_volumes_ignored = FALSE;
               break;
@@ -879,7 +907,12 @@ update_volumes (GHalVolumeMonitor *monitor)
           drive = find_drive_by_udi (monitor, hal_device_get_property_string (d, "block.storage_device"));
           
           /*g_warning ("hal adding vol %s (drive %p)", hal_device_get_property_string (d, "block.device"), drive);*/
-          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, TRUE, drive);
+          volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), 
+                                     d, 
+                                     monitor->pool, 
+                                     NULL, 
+                                     TRUE, 
+                                     drive);
           if (volume != NULL)
             {
               monitor->volumes = g_list_prepend (monitor->volumes, volume);
@@ -1038,7 +1071,11 @@ update_discs (GHalVolumeMonitor *monitor)
           mount = NULL;
           if (hal_device_get_property_bool (d, "volume.disc.is_blank"))
             {
-              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, NULL, FALSE, drive);
+              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), 
+                                         d, monitor->pool, 
+                                         NULL, 
+                                         FALSE, 
+                                         drive);
               if (volume != NULL)
                 {
                   GFile *root;
@@ -1067,7 +1104,12 @@ update_discs (GHalVolumeMonitor *monitor)
               g_free (device_basename);
               g_free (uri);
 
-              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, foreign_mount_root, TRUE, drive);
+              volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), 
+                                         d, 
+                                         monitor->pool, 
+                                         foreign_mount_root, 
+                                         TRUE, 
+                                         drive);
               g_object_unref (foreign_mount_root);
               mount = NULL;
             }
@@ -1096,14 +1138,29 @@ update_discs (GHalVolumeMonitor *monitor)
 static void
 update_cameras (GHalVolumeMonitor *monitor)
 {
-#ifdef _WITH_GPHOTO2
+#ifdef HAVE_GPHOTO2
   GList *new_camera_devices;
+  GList *new_mpt_devices;
   GList *removed, *added;
   GList *l, *ll;
   GHalVolume *volume;
   const char *udi;
 
+  new_mpt_devices = hal_pool_find_by_capability (monitor->pool, "portable_audio_player");
+  for (l = new_mpt_devices; l != NULL; l = ll)
+    {
+      HalDevice *d = l->data;
+      ll = l->next;
+      if (! hal_device_get_property_bool (d, "camera.libgphoto2.support"))
+        {
+          /*g_warning ("ignoring %s", hal_device_get_udi (d));*/
+          /* filter out everything that isn't supported by libgphoto2 */
+          new_mpt_devices = g_list_delete_link (new_mpt_devices, l);
+        }
+    }
+
   new_camera_devices = hal_pool_find_by_capability (monitor->pool, "camera");
+  new_camera_devices = g_list_concat (new_camera_devices, new_mpt_devices);
   for (l = new_camera_devices; l != NULL; l = ll)
     {
       HalDevice *d = l->data;
@@ -1152,7 +1209,7 @@ update_cameras (GHalVolumeMonitor *monitor)
       usb_bus_num = hal_device_get_property_int (d, "usb.bus_number");
       usb_device_num = hal_device_get_property_int (d, "usb.linux.device_number");
 
-      uri = g_strdup_printf ("gphoto2://usb:%03d,%03d", usb_bus_num, usb_device_num);
+      uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]", usb_bus_num, usb_device_num);
       /*g_warning ("uri is '%s'", uri);*/
       foreign_mount_root = g_file_new_for_uri (uri);
       g_free (uri);
@@ -1160,7 +1217,12 @@ update_cameras (GHalVolumeMonitor *monitor)
       udi = hal_device_get_udi (d);
       /*g_warning ("camera adding %s", udi);*/
 
-      volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), d, monitor->pool, foreign_mount_root, TRUE, NULL);
+      volume = g_hal_volume_new (G_VOLUME_MONITOR (monitor), 
+                                 d, 
+                                 monitor->pool, 
+                                 foreign_mount_root, 
+                                 TRUE, 
+                                 NULL);
       g_object_unref (foreign_mount_root);
       if (volume != NULL)
         {

@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
@@ -31,6 +33,9 @@
 #include "gdaemonvfs.h"
 #include "gmounttracker.h"
 
+static GStaticRecMutex _the_daemon_volume_monitor_mutex = G_STATIC_REC_MUTEX_INIT;
+static GDaemonVolumeMonitor *_the_daemon_volume_monitor;
+
 struct _GDaemonVolumeMonitor {
   GVolumeMonitor parent;
 
@@ -46,10 +51,14 @@ get_mounts (GVolumeMonitor *volume_monitor)
   GDaemonVolumeMonitor *monitor;
   GList *l;
 
+  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+
   monitor = G_DAEMON_VOLUME_MONITOR (volume_monitor);
 
   l = g_list_copy (monitor->mounts);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
+
+  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
 
   return l;
 }
@@ -103,17 +112,42 @@ find_mount_by_mount_info (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *moun
   return found_mount;
 }
 
+GDaemonMount *
+g_daemon_volume_monitor_find_mount_by_mount_info (GMountInfo *mount_info)
+{
+  GDaemonMount *daemon_mount;
+
+  if (_the_daemon_volume_monitor == NULL)
+    {
+      return NULL;
+    }
+
+  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+
+  daemon_mount = find_mount_by_mount_info (_the_daemon_volume_monitor, mount_info);
+  if (daemon_mount != NULL)
+    {
+      g_object_ref (daemon_mount);
+    }
+
+  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
+
+  return daemon_mount;
+}
+
 static void
 mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
   GDaemonMount *mount;
   GVolume *volume;
 
+  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (mount)
     {
       g_warning (G_STRLOC ": Mount was added twice!");
-      return;
+      goto out;
     }
 
   if (mount_info->user_visible)
@@ -125,6 +159,9 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
       daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
       g_signal_emit_by_name (daemon_monitor, "mount_added", mount);
     }
+
+ out:
+  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
 }
 
 static void
@@ -132,18 +169,23 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
   GDaemonMount *mount;
 
+  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (!mount)
     {
       if (mount_info->user_visible)
 	g_warning (G_STRLOC ": An unknown mount was removed!");
-      return;
+      goto out;
     }
 
   daemon_monitor->mounts = g_list_remove (daemon_monitor->mounts, mount);
   g_signal_emit_by_name (daemon_monitor, "mount_removed", mount);
   g_signal_emit_by_name (mount, "unmounted");
   g_object_unref (mount);
+
+ out:
+  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
 }
 
 static void
@@ -153,6 +195,8 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
   GDaemonMount *mount;
   GMountInfo *info;
   GVolume *volume;
+
+  _the_daemon_volume_monitor = daemon_monitor;
 
   daemon_monitor->mount_tracker = g_mount_tracker_new (_g_daemon_vfs_get_async_bus ());
 
@@ -186,6 +230,8 @@ g_daemon_volume_monitor_finalize (GObject *object)
 {
   GDaemonVolumeMonitor *monitor;
   
+  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+
   monitor = G_DAEMON_VOLUME_MONITOR (object);
 
   g_signal_handlers_disconnect_by_func (monitor->mount_tracker, mount_added, monitor);
@@ -198,6 +244,10 @@ g_daemon_volume_monitor_finalize (GObject *object)
   
   if (G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize) (object);
+
+  _the_daemon_volume_monitor = NULL;
+
+  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
 }
 
 static void
@@ -210,7 +260,6 @@ is_supported (void)
 {
   GVfs *vfs;
   gboolean res;
-
 
   res = FALSE;
 

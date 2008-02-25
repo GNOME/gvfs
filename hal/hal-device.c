@@ -30,6 +30,7 @@ struct _HalDevicePrivate
   LibHalContext *hal_ctx;
   LibHalPropertySet *properties;
   char *udi;
+  GTimeVal time_added;
 };
 
 enum {
@@ -91,6 +92,7 @@ static void
 hal_device_init (HalDevice *device)
 {
   device->priv = g_new0 (HalDevicePrivate, 1);
+  g_get_current_time (&(device->priv->time_added));
 }
 
 const char *
@@ -291,4 +293,18 @@ void
 hal_device_register (GIOModule *module)
 {
   hal_device_register_type (G_TYPE_MODULE (module));
+}
+
+gboolean
+hal_device_is_recently_plugged_in (HalDevice *device)
+{
+  GTimeVal now;
+  glong delta_msec;
+
+  g_get_current_time (&now);
+
+  delta_msec = (now.tv_sec - device->priv->time_added.tv_sec) * 1000  + 
+    (now.tv_usec - device->priv->time_added.tv_usec) / 1000;
+
+  return delta_msec < 2000;
 }

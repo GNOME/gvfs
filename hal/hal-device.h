@@ -91,4 +91,6 @@ gboolean            hal_device_has_capability              (HalDevice         *d
 gboolean            hal_device_has_interface               (HalDevice         *device,
                                                             const char        *interface);
 
+gboolean            hal_device_is_recently_plugged_in      (HalDevice         *device);
+
 #endif /* HAL_DEVICE_H */

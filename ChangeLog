@@ -1,3 +1,50 @@
+2008-02-24  David Zeuthen  <davidz@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonvolumemonitor.c:
+	* client/gdaemonvolumemonitor.h: Prefer to return a GDaemonMount
+	from an existing GDaemonVolumeMonitor rather than rolling our own
+	for GDaemonFile's g_file_find_enclosing_mount()
+	implementation. This is to ensure that g_mount_get_volume() will
+	work properly with mounts that are adopted by GVolume objects from
+	other volume monitors.
+
+	* configure.ac: Check for libgphoto2
+
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendcdda.c: Use HAL to detect when the disc is
+	removed and then forcibly unmount the mount. Report size of
+	disc. Hint the file manager to preview files.
+
+	* hal/ghaldrive.c:
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	* hal/ghalvolumemonitor.c:
+	* hal/ghalvolumemonitor.h:
+	* hal/hal-pool.c: Ensure that audio and blank CD's are
+	displayed (#514139).  Read info.desktop.[icon|name] properties
+	from hal and use these if found. Use proper icon for audio players
+	and make the gphoto2 detection support it as well. Also check for
+	subsystem when filtering on hal capabilities. Also revert the
+	commit to ignore NFS mounts as gio will now only report an user
+	visible mount if it's in /media or $HOME. Make LUKS encrypted
+	volumes work.
+
+	* daemon/Makefile.am:
+	* daemon/gphoto2.mount.in:
+	* daemon/gvfsbackendgphoto2.c:
+	Land the gphoto2 backend.
+
+	* programs/Makefile.am:
+	* programs/gvfs-ls.c: Make the --hidden option work. Default
+	to short listing and add a --long option. Implement new options
+	--show-completions and --show-mounts that can be used for
+	shell completions.
+	* programs/gvfs-tree.c: New program
+	* programs/gvfs-bash-completion.sh: Bash completion for gvfs;
+	uses the new --show-completions and --show-mounts options in
+	gvfs-ls.
+
 2008-02-25  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendnetwork.c:
