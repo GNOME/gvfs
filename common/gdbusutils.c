@@ -896,6 +896,7 @@ dbus_source_add_watch (DBusSource *dbus_source,
   guint flags;
   GIOCondition condition;
   IOHandler *handler;
+  int fd;
 
   if (!dbus_watch_get_enabled (watch))
     return;
@@ -914,8 +915,13 @@ dbus_source_add_watch (DBusSource *dbus_source,
   handler->dbus_source = dbus_source;
   handler->watch = watch;
 
-  handler->source = __g_fd_source_new (dbus_watch_get_unix_fd (watch),
-				       condition, NULL);
+#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+  fd = dbus_watch_get_unix_fd (watch);
+#else
+  fd = dbus_watch_get_fd (watch);
+#endif
+    
+  handler->source = __g_fd_source_new (fd, condition, NULL);
   g_source_set_callback (handler->source,
 			 (GSourceFunc) io_handler_dispatch, handler,
                          NULL);

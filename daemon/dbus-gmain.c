@@ -273,6 +273,7 @@ connection_setup_add_watch (ConnectionSetup *cs,
   GIOCondition condition;
   GIOChannel *channel;
   IOHandler *handler;
+  int fd;
   
   if (!dbus_watch_get_enabled (watch))
     return;
@@ -291,7 +292,12 @@ connection_setup_add_watch (ConnectionSetup *cs,
   handler->cs = cs;
   handler->watch = watch;
   
-  channel = g_io_channel_unix_new (dbus_watch_get_unix_fd (watch));
+#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+  fd = dbus_watch_get_unix_fd (watch);
+#else
+  fd = dbus_watch_get_fd (watch);
+#endif
+  channel = g_io_channel_unix_new (fd);
   
   handler->source = g_io_create_watch (channel, condition);
   g_source_set_callback (handler->source, (GSourceFunc) io_handler_dispatch, handler,
