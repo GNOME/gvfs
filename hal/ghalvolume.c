@@ -381,10 +381,12 @@ do_update_from_hal_for_camera (GHalVolume *v)
         {
           if (is_audio_player)
             {
+              /* Translators: %s is the device vendor */
               v->name = g_strdup_printf (_("%s Audio Player"), vendor);
             }
           else
             {
+              /* Translators: %s is the device vendor */
               v->name = g_strdup_printf (_("%s Camera"), vendor);
             }
         }
