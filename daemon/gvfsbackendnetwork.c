@@ -386,7 +386,7 @@ recompute_files (GVfsBackendNetwork *backend)
       else
         {
           /* "separate": a link to dns-sd://local/ */
-          file = network_file_new ("dnssd-local", _("Local network"), 
+          file = network_file_new ("dnssd-local", _("Local Network"), 
 				   "dns-sd://local/", backend->workgroup_icon);
           files = g_list_prepend (files, file);   
         }

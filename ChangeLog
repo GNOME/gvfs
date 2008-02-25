@@ -1,5 +1,10 @@
 2008-02-25  Alexander Larsson  <alexl@redhat.com>
 
+	* daemon/gvfsbackendnetwork.c (recompute_files):
+	Fix spelling inconsistency "Network" vs "network" (#518487)
+	
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
 	* client/gdaemonvfs.c (get_mountspec_from_uri):
 	g_uri_get_scheme -> g_uri_parse_scheme
 
