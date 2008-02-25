@@ -1,6 +1,15 @@
 2008-02-25  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c: 
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Add a SoupSessionAsync to be used for SoupInputStream doesn't
+	yet work with SoupSessionSync. Also make sure we share
+	authentication.
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
 	- Port the mount operation to use the sync i/op.
 	- Keep the auth information around so we can use them again in
 	the case that a subpath requires different authentication. This

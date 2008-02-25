@@ -67,6 +67,10 @@ g_vfs_backend_http_finalize (GObject *object)
   soup_session_abort (backend->session);
   g_object_unref (backend->session);
 
+  soup_session_abort (backend->session_async);
+  g_object_unref (backend->session_async);
+
+
   if (G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize) (object);
 }
@@ -77,6 +81,7 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
   backend->session = soup_session_sync_new ();
+  backend->session_async = soup_session_async_new ();
 }
 
 
@@ -226,7 +231,6 @@ message_new_from_filename (GVfsBackend *backend,
 }
 
 
-
 /* ************************************************************************* */
 /* virtual functions overrides */
 
@@ -329,7 +333,7 @@ try_open_for_read (GVfsBackend        *backend,
   op_backend = G_VFS_BACKEND_HTTP (backend);
   msg = message_new_from_filename (backend, "GET", filename);
 
-  stream = soup_input_stream_new (op_backend->session, msg);
+  stream = soup_input_stream_new (op_backend->session_async, msg);
   g_object_unref (msg);
 
   soup_input_stream_send_async (stream,

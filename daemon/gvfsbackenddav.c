@@ -1069,6 +1069,13 @@ do_mount (GVfsBackend  *backend,
                     G_CALLBACK (soup_authenticate_from_data),
                     info);
 
+  /* also auth the workaround async session we need for SoupInputStream */
+  g_signal_connect (G_VFS_BACKEND_HTTP (backend)->session_async, "authenticate",
+                    G_CALLBACK (soup_authenticate_from_data),
+                    info);
+
+
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_print ("- mount\n");
 }
