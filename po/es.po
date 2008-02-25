@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-24 19:40+0000\n"
-"PO-Revision-Date: 2008-02-25 00:19+0100\n"
+"POT-Creation-Date: 2008-02-25 14:22+0000\n"
+"PO-Revision-Date: 2008-02-25 15:35+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1862
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1867
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "La operación no está soportada, los archivos están en diferentes puntos de "
@@ -56,24 +56,24 @@ msgstr "get_filesystem_info devolvió un valor no válido"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1544
+#: ../client/gdaemonfile.c:1549
 msgid "Could not find enclosing mount"
 msgstr "No se pudo encontrar el punto de montaje adjunto"
 
-#: ../client/gdaemonfile.c:1574
+#: ../client/gdaemonfile.c:1579
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Nombre de archivo no válido %s"
 
-#: ../client/gdaemonfile.c:1616
+#: ../client/gdaemonfile.c:1621
 msgid "Invalid return value from query_filesystem_info"
 msgstr "query_filesystem_info devolvió un valor no válido"
 
-#: ../client/gdaemonfile.c:2007
+#: ../client/gdaemonfile.c:2012
 msgid "Invalid return value from monitor_dir"
 msgstr "El valor devuelto por monitor_dir no es válido"
 
-#: ../client/gdaemonfile.c:2056
+#: ../client/gdaemonfile.c:2061
 msgid "Invalid return value from monitor_file"
 msgstr "El valor devuelto por monitor_file no es válido"
 
@@ -102,7 +102,7 @@ msgstr "Final de flujo"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:977
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:1008
 #: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
 #: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
 msgid "Operation was cancelled"
@@ -209,7 +209,7 @@ msgid "CD/DVD Creator"
 msgstr "Creador de CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:521
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:634
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
 
@@ -238,66 +238,66 @@ msgstr "No se puede copiar recursivamente un directorio"
 msgid "Not supported"
 msgstr "No soportado"
 
-#: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
+#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:336
 msgid "No drive specified"
 msgstr "No se especificó una unidad"
 
-#: ../daemon/gvfsbackendcdda.c:157
+#: ../daemon/gvfsbackendcdda.c:279
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "No se pudo encontrar la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:167
+#: ../daemon/gvfsbackendcdda.c:290
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "La unidad %s no contiene archivos de sonido"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:174
+#: ../daemon/gvfsbackendcdda.c:298
 #, c-format
-msgid "Audio Disc on %s"
-msgstr "Disco de sonido en %s"
+msgid "cdda mount on %s"
+msgstr "CDDA montado en %s"
 
-#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:682
-#: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
+#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendcdda.c:803
+#: ../hal/ghalmount.c:488 ../hal/ghalvolume.c:286 ../hal/ghalvolume.c:307
 #, c-format
 msgid "Audio Disc"
 msgstr "Disco de sonido"
 
-#: ../daemon/gvfsbackendcdda.c:236
+#: ../daemon/gvfsbackendcdda.c:360
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "El sistema de archivos está ocupado: %d archivo abierto"
 msgstr[1] "El sistema de archivos está ocupado: %d archivos abiertos"
 
-#: ../daemon/gvfsbackendcdda.c:429
+#: ../daemon/gvfsbackendcdda.c:550
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "El archivo %s no existe en la unidad %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:538
+#: ../daemon/gvfsbackendcdda.c:659
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Error de «paranoia» en la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:601
+#: ../daemon/gvfsbackendcdda.c:722
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Error al buscar en el flujo en la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:698
+#: ../daemon/gvfsbackendcdda.c:819
 #, c-format
 msgid "No such file"
 msgstr "No existe el archivo"
 
-#: ../daemon/gvfsbackendcdda.c:705
+#: ../daemon/gvfsbackendcdda.c:826
 #, c-format
 msgid "The file does not exist"
 msgstr "El archivo no existe"
 
-#: ../daemon/gvfsbackendcdda.c:712
+#: ../daemon/gvfsbackendcdda.c:833
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "El archivo no existe o no es una pista de sonido"
@@ -311,7 +311,7 @@ msgid "Filesystem"
 msgstr "Sistema de archivos"
 
 #: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendnetwork.c:474 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendnetwork.c:587 ../daemon/gvfsbackendsmbbrowse.c:799
 #: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
 #: ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
@@ -383,7 +383,7 @@ msgid "Not a WebDAV enabled share"
 msgstr "No es una compartición activada WebDAV"
 
 #: ../daemon/gvfsbackenddav.c:942 ../daemon/gvfsbackendhttp.c:238
-#: ../daemon/gvfsbackendsmb.c:557
+#: ../daemon/gvfsbackendsmb.c:588
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
@@ -395,17 +395,17 @@ msgstr "Respuesta no válida"
 msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
-#: ../daemon/gvfsbackenddav.c:1216 ../daemon/gvfsbackendsmb.c:1689
+#: ../daemon/gvfsbackenddav.c:1216 ../daemon/gvfsbackendsmb.c:1720
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
 
 #: ../daemon/gvfsbackenddav.c:1286 ../daemon/gvfsbackendsftp.c:2623
-#: ../daemon/gvfsbackendsmb.c:945
+#: ../daemon/gvfsbackendsmb.c:976
 msgid "The file was externally modified"
 msgstr "El archivo se modificó externamente"
 
-#: ../daemon/gvfsbackenddav.c:1317 ../daemon/gvfsbackendsmb.c:983
-#: ../daemon/gvfsbackendsmb.c:1706
+#: ../daemon/gvfsbackenddav.c:1317 ../daemon/gvfsbackendsmb.c:1014
+#: ../daemon/gvfsbackendsmb.c:1737
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
@@ -414,7 +414,7 @@ msgstr "Falló la creación del archivo de respaldo"
 msgid "dns-sd"
 msgstr "dns-sd"
 
-#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:613
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:728
 msgid "Can't monitor file or directory."
 msgstr "No se puede monitorizar el archivo o directorio."
 
@@ -423,8 +423,8 @@ msgstr "No se puede monitorizar el archivo o directorio."
 msgid "Dns-SD"
 msgstr "DNS-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:560
-#: ../daemon/gvfsbackendnetwork.c:695 ../daemon/gvfsbackendnetwork.c:696
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:673
+#: ../daemon/gvfsbackendnetwork.c:811 ../daemon/gvfsbackendnetwork.c:812
 msgid "Network"
 msgstr "Red"
 
@@ -432,10 +432,44 @@ msgstr "Red"
 msgid "No hostname specified"
 msgstr "No se especificó un nombre de servidor"
 
-#: ../daemon/gvfsbackendftp.c:197 ../daemon/gvfsbackendsmb.c:648
-#: ../daemon/gvfsbackendsmb.c:1079
+#: ../daemon/gvfsbackendftp.c:197 ../daemon/gvfsbackendsmb.c:679
+#: ../daemon/gvfsbackendsmb.c:1110
 msgid "Unsupported seek type"
 msgstr "Tipo de búsqueda no soportado"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:234
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "Cámara digital (%s)"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:379 ../hal/ghalvolume.c:390
+#, c-format
+msgid "%s Camera"
+msgstr "Cámara %s"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:382 ../hal/ghalvolume.c:385
+#, c-format
+msgid "%s Audio Player"
+msgstr "Reproductor de sonido %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:391 ../hal/ghalvolume.c:402
+msgid "Camera"
+msgstr "Cámara"
+
+#: ../daemon/gvfsbackendgphoto2.c:393 ../hal/ghalvolume.c:398
+msgid "Audio Player"
+msgstr "Reproductor de sonido"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:613
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "gphoto2 montado en %s"
 
 #: ../daemon/gvfsbackendhttp.c:168
 #, c-format
@@ -443,7 +477,7 @@ msgid "HTTP Client Error: %s"
 msgstr "Error HTTP en el cliente: %s"
 
 #: ../daemon/gvfsbackendhttp.c:496 ../daemon/gvfsbackendsftp.c:1685
-#: ../daemon/gvfsbackendsmb.c:1192 ../daemon/gvfsbackendtrash.c:960
+#: ../daemon/gvfsbackendsmb.c:1223 ../daemon/gvfsbackendtrash.c:960
 msgid " (invalid encoding)"
 msgstr " (codificación no válida)"
 
@@ -452,13 +486,13 @@ msgid "Directory notification not supported"
 msgstr "No se soporta la notificación de directorios"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:259 ../daemon/gvfsbackendsmbbrowse.c:694
+#: ../daemon/gvfsbackendnetwork.c:266 ../daemon/gvfsbackendsmbbrowse.c:694
 msgid "Windows Network"
 msgstr "Red de Windows"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:339
-msgid "Local network"
+#: ../daemon/gvfsbackendnetwork.c:389
+msgid "Local Network"
 msgstr "Red local"
 
 #: ../daemon/gvfsbackendsftp.c:251
@@ -601,53 +635,53 @@ msgid "Unable to create temporary file"
 msgstr "No se pudo crear el archivo temporal"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:189
+#: ../daemon/gvfsbackendsmb.c:211
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Se requiere contraseña para la compartición %s en %s"
 
-#: ../daemon/gvfsbackendsmb.c:439 ../daemon/gvfsbackendsmb.c:479
+#: ../daemon/gvfsbackendsmb.c:462 ../daemon/gvfsbackendsmb.c:502
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Error interno (%s)"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:487 ../daemon/gvfsbackendsmb.c:1185
+#: ../daemon/gvfsbackendsmb.c:510 ../daemon/gvfsbackendsmb.c:1216
 #, c-format
 msgid "%s on %s"
 msgstr "%s en %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:533
+#: ../daemon/gvfsbackendsmb.c:557
 msgid "Failed to mount Windows share"
 msgstr "Falló al montar la compartición Windows"
 
-#: ../daemon/gvfsbackendsmb.c:1133
+#: ../daemon/gvfsbackendsmb.c:1164
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Falló la creación del archivo de respaldo: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1590
+#: ../daemon/gvfsbackendsmb.c:1621
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Error al borrar el archivo: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1654
+#: ../daemon/gvfsbackendsmb.c:1685
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Error al mover el archivo: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1678
+#: ../daemon/gvfsbackendsmb.c:1709
 msgid "Can't move directory over directory"
 msgstr "No se puede mover un directorio sobre un directorio"
 
-#: ../daemon/gvfsbackendsmb.c:1726
+#: ../daemon/gvfsbackendsmb.c:1757
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Error al eliminar el archivo destino: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1750
+#: ../daemon/gvfsbackendsmb.c:1781
 msgid "Can't recursively move directory"
 msgstr "No se puede mover recursivamente un directorio"
 
@@ -778,345 +812,336 @@ msgstr "La ubicación ya está montada"
 msgid "Location is not mountable"
 msgstr "La ubicación no es montable"
 
-#: ../hal/ghaldrive.c:135
+#: ../hal/ghaldrive.c:142
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: ../hal/ghaldrive.c:137
+#: ../hal/ghaldrive.c:144
 msgid "CD-R"
 msgstr "CD-R"
 
-#: ../hal/ghaldrive.c:139
+#: ../hal/ghaldrive.c:146
 msgid "CD-RW"
 msgstr "CD-RW"
 
-#: ../hal/ghaldrive.c:143
+#: ../hal/ghaldrive.c:150
 msgid "DVD-ROM"
 msgstr "DVD-ROM"
 
-#: ../hal/ghaldrive.c:145
+#: ../hal/ghaldrive.c:152
 msgid "DVD+R"
 msgstr "DVD+R"
 
-#: ../hal/ghaldrive.c:147
+#: ../hal/ghaldrive.c:154
 msgid "DVD+RW"
 msgstr "DVD+RW"
 
-#: ../hal/ghaldrive.c:149
+#: ../hal/ghaldrive.c:156
 msgid "DVD-R"
 msgstr "DVD-R"
 
-#: ../hal/ghaldrive.c:151
+#: ../hal/ghaldrive.c:158
 msgid "DVD-RW"
 msgstr "DVD-RW"
 
-#: ../hal/ghaldrive.c:153
+#: ../hal/ghaldrive.c:160
 msgid "DVD-RAM"
 msgstr "DVD-RAM"
 
-#: ../hal/ghaldrive.c:156
+#: ../hal/ghaldrive.c:163
 msgid "DVD±R"
 msgstr "DVD±R"
 
-#: ../hal/ghaldrive.c:159
+#: ../hal/ghaldrive.c:166
 msgid "DVD±RW"
 msgstr "DVD±RW"
 
-#: ../hal/ghaldrive.c:161
+#: ../hal/ghaldrive.c:168
 msgid "HDDVD"
 msgstr "HDDVD"
 
-#: ../hal/ghaldrive.c:163
+#: ../hal/ghaldrive.c:170
 msgid "HDDVD-r"
 msgstr "HDDVD-r"
 
-#: ../hal/ghaldrive.c:165
+#: ../hal/ghaldrive.c:172
 msgid "HDDVD-RW"
 msgstr "HDDVD-RW"
 
-#: ../hal/ghaldrive.c:167
+#: ../hal/ghaldrive.c:174
 msgid "Blu-ray"
 msgstr "Blu-ray"
 
-#: ../hal/ghaldrive.c:169
+#: ../hal/ghaldrive.c:176
 msgid "Blu-ray-R"
 msgstr "Blu-ray-R"
 
-#: ../hal/ghaldrive.c:171
+#: ../hal/ghaldrive.c:178
 msgid "Blu-ray-RE"
 msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: ../hal/ghaldrive.c:177
+#: ../hal/ghaldrive.c:184
 #, c-format
 msgid "%s/%s Drive"
 msgstr "Unidad %s/%s"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
-#: ../hal/ghaldrive.c:183
+#: ../hal/ghaldrive.c:190
 #, c-format
 msgid "%s Drive"
 msgstr "Unidad %s"
 
-#: ../hal/ghaldrive.c:187
+#: ../hal/ghaldrive.c:194
 msgid "Floppy Drive"
 msgstr "Disquete"
 
-#: ../hal/ghaldrive.c:193
+#: ../hal/ghaldrive.c:200
 msgid "Software RAID Drive"
 msgstr "Unidad RAID por software"
 
-#: ../hal/ghaldrive.c:195
+#: ../hal/ghaldrive.c:202
 msgid "USB Drive"
 msgstr "Unidad USB"
 
-#: ../hal/ghaldrive.c:197
+#: ../hal/ghaldrive.c:204
 msgid "ATA Drive"
 msgstr "Unidad ATA"
 
-#: ../hal/ghaldrive.c:199
+#: ../hal/ghaldrive.c:206
 msgid "SCSI Drive"
 msgstr "Unidad SCSI"
 
-#: ../hal/ghaldrive.c:201
+#: ../hal/ghaldrive.c:208
 msgid "FireWire Drive"
 msgstr "Unidad FireWire"
 
-#: ../hal/ghaldrive.c:205
+#: ../hal/ghaldrive.c:212
 msgid "Tape Drive"
 msgstr "Unidad de cinta"
 
-#: ../hal/ghaldrive.c:207
+#: ../hal/ghaldrive.c:214
 msgid "CompactFlash Drive"
 msgstr "Unidad CompactFlash"
 
-#: ../hal/ghaldrive.c:209
+#: ../hal/ghaldrive.c:216
 msgid "MemoryStick Drive"
 msgstr "Unidad MemoryStick"
 
-#: ../hal/ghaldrive.c:211
+#: ../hal/ghaldrive.c:218
 msgid "SmartMedia Drive"
 msgstr "Unidad SmartMedia"
 
-#: ../hal/ghaldrive.c:213
+#: ../hal/ghaldrive.c:220
 msgid "SD/MMC Drive"
 msgstr "Unidad SD/MMC"
 
-#: ../hal/ghaldrive.c:215
+#: ../hal/ghaldrive.c:222
 msgid "Zip Drive"
 msgstr "Unidad Zip"
 
-#: ../hal/ghaldrive.c:217
+#: ../hal/ghaldrive.c:224
 msgid "Jaz Drive"
 msgstr "Unidad Jaz"
 
-#: ../hal/ghaldrive.c:219
+#: ../hal/ghaldrive.c:226
 msgid "Thumb Drive"
 msgstr "Unidad Thumb"
 
-#: ../hal/ghaldrive.c:222
+#: ../hal/ghaldrive.c:229
 msgid "Mass Storage Drive"
 msgstr "Unidad de almacenamiento masivo"
 
-#: ../hal/ghaldrive.c:634
+#: ../hal/ghaldrive.c:653
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "Falló al expulsar el medio, uno o más volúmenes están ocupados en el medio."
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:139
 msgid "CD-ROM Disc"
 msgstr "Disco CD-ROM"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:139
 msgid "Blank CD-ROM Disc"
 msgstr "Disco CD-ROM virgen"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:140
 msgid "CD-R Disc"
 msgstr "Disco CD-R"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:140
 msgid "Blank CD-R Disc"
 msgstr "Disco CD-R virgen"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:141
 msgid "CD-RW Disc"
 msgstr "Disco CD-RW"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:141
 msgid "Blank CD-RW Disc"
 msgstr "Disco CD-RW virgen"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
-#: ../hal/ghalvolume.c:143
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:142
+#: ../hal/ghalvolume.c:144
 msgid "DVD-ROM Disc"
 msgstr "Disco DVD-ROM"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
-#: ../hal/ghalvolume.c:143
+#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:142
+#: ../hal/ghalvolume.c:144
 msgid "Blank DVD-ROM Disc"
 msgstr "Disco DVD-ROM virgen"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:143
 msgid "DVD-RAM Disc"
 msgstr "Disco DVD-RAM"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:143
 msgid "Blank DVD-RAM Disc"
 msgstr "Disco DVD-RAM virgen"
 
-#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:145
 msgid "DVD-RW Disc"
 msgstr "Disco DVD-RW"
 
-#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:145
 msgid "Blank DVD-RW Disc"
 msgstr "Disco DVD-RW virgen"
 
-#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:146
 msgid "DVD+R Disc"
 msgstr "Disco DVD+R"
 
-#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:146
 msgid "Blank DVD+R Disc"
 msgstr "Disco DVD+R virgen"
 
-#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:147
 msgid "DVD+RW Disc"
 msgstr "Disco DVD+RW"
 
-#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:147
 msgid "Blank DVD+RW Disc"
 msgstr "Disco DVD+RW virgen"
 
-#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:148
 msgid "DVD+R DL Disc"
 msgstr "Disco DVD+R DL"
 
-#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:148
 msgid "Blank DVD+R DL Disc"
 msgstr "Disco DVD+R DL virgen"
 
-#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:149
 msgid "Blu-Ray Disc"
 msgstr "Disco Blu-Ray"
 
-#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:149
 msgid "Blank Blu-Ray Disc"
 msgstr "Disco Blu-Ray virgen"
 
-#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:150
 msgid "Blu-Ray R Disc"
 msgstr "Disco Blu-Ray R"
 
-#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:150
 msgid "Blank Blu-Ray R Disc"
 msgstr "Disco Blu-Ray R virgen"
 
-#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:151
 msgid "Blu-Ray RW Disc"
 msgstr "Disco Blu-Ray RW"
 
-#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:151
 msgid "Blank Blu-Ray RW Disc"
 msgstr "Disco Blu-Ray RW virgen"
 
-#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:152
 msgid "HD DVD Disc"
 msgstr "Disco HD DVD"
 
-#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:152
 msgid "Blank HD DVD Disc"
 msgstr "Disco DVD HD virgen"
 
-#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:153
 msgid "HD DVD-R Disc"
 msgstr "Disco HD DVD-R"
 
-#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:153
 msgid "Blank HD DVD-R Disc"
 msgstr "Disco HD DVD-R virgen"
 
-#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:154
 msgid "HD DVD-RW Disc"
 msgstr "Disco DVD-RW"
 
-#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:154
 msgid "Blank HD DVD-RW Disc"
 msgstr "Disco HD DVD-RW virgen"
 
-#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:155
 msgid "MO Disc"
 msgstr "Disco MO"
 
-#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:155
 msgid "Blank MO Disc"
 msgstr "Disco MO virgen"
 
-#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:156
 msgid "Disc"
 msgstr "Disco"
 
-#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:156
 msgid "Blank Disc"
 msgstr "Disco virgen"
 
-#: ../hal/ghalmount.c:348
+#: ../hal/ghalmount.c:349
 #, c-format
 msgid "%.1f kB Media"
 msgstr "Medio de %.1f KiB"
 
-#: ../hal/ghalmount.c:353
+#: ../hal/ghalmount.c:354
 #, c-format
 msgid "%.1f MB Media"
 msgstr "Medio de %.1f MiB"
 
-#: ../hal/ghalmount.c:358
+#: ../hal/ghalmount.c:359
 #, c-format
 msgid "%.1f GB Media"
 msgstr "Medio de %.1f GiB"
 
-#: ../hal/ghalmount.c:440 ../hal/ghalvolume.c:261
+#: ../hal/ghalmount.c:486 ../hal/ghalvolume.c:305
 msgid "Mixed Audio/Data Disc"
 msgstr "Disco de sonido y datos"
 
-#: ../hal/ghalvolume.c:189
+#: ../hal/ghalvolume.c:190
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f KiB"
 
-#: ../hal/ghalvolume.c:194
+#: ../hal/ghalvolume.c:195
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MiB"
 
-#: ../hal/ghalvolume.c:199
+#: ../hal/ghalvolume.c:200
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GiB"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../hal/ghalvolume.c:249
+#: ../hal/ghalvolume.c:293
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "Datos cifrados %s"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../hal/ghalvolume.c:272
+#: ../hal/ghalvolume.c:316
 #, c-format
 msgid "%s Media"
 msgstr "Soporte %s"
-
-#: ../hal/ghalvolume.c:314
-msgid "Camera"
-msgstr "Cámara"
-
-#: ../hal/ghalvolume.c:321
-#, c-format
-msgid "%s Camera"
-msgstr "Cámara %s"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
