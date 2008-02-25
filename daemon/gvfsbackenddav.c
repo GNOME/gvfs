@@ -136,15 +136,13 @@ path_get_parent_dir (const char *path)
   char   *parent;
   size_t  len;
 
-  if ((len = strlen (path)) < 1)
-    return NULL;
+  len = strlen (path);
 
-  /* maybe this should be while, but then again
-   * I should be reading the uri rfc and see 
-   * what the deal was with multiple slashes */
-
-  if (path[len - 1] == '/')
+  while (len > 0 && path[len - 1] == '/')
     len--;
+
+  if (len == 0)
+    return NULL;
 
   parent = g_strrstr_len (path, len, "/");
 
@@ -714,6 +712,7 @@ typedef struct _PropName {
 
 } PropName;
 
+
 static SoupMessage *
 propfind_request_new (GVfsBackend     *backend,
                       const char      *filename,
@@ -784,10 +783,92 @@ message_add_apply_to_redirect_header (SoupMessage         *msg,
   soup_message_headers_append (msg->request_headers,
                                "Apply-To-Redirect-Ref", header_redirect);
 }
+
+static SoupMessage *
+stat_location_begin (const SoupURI  *uri,
+                     gboolean        count_children)
+{
+  SoupMessage       *msg;
+  const char        *depth;
+  static const char *stat_profind_body =
+    PROPSTAT_XML_BEGIN
+    PROPSTAT_XML_PROP_BEGIN
+    "<D:resourcetype/>\n"
+    PROPSTAT_XML_PROP_END
+    PROPSTAT_XML_END;
+
+  msg = soup_message_new_from_uri (SOUP_METHOD_PROPFIND, uri);
+
+  if (count_children)
+    depth = "1";
+  else
+    depth = "0";
+
+  soup_message_headers_append (msg->request_headers, "Depth", depth);
+
+  soup_message_set_request (msg, "application/xml",
+                            SOUP_MEMORY_STATIC,
+                            stat_profind_body,
+                            strlen (stat_profind_body));
+  return msg;
+}
+
+static gboolean
+stat_location_finish (SoupMessage *msg,
+                      GFileType   *target_type,
+                      guint       *num_children)
+{
+  Multistatus  ms;
+  xmlNodeIter  iter;
+  gboolean     res;
+  GError      *error;
+  guint        child_count;
+  GFileType    file_type;
+
+  if (msg->status_code != 207)
+    return FALSE;
+
+  res = multistatus_parse (msg, &ms, &error);
+
+  if (res == FALSE)
+    return FALSE;
+
+  res = FALSE;
+  child_count = 0;
+  file_type = G_FILE_TYPE_UNKNOWN;
+
+  multistatus_get_response_iter (&ms, &iter);
+  while (xml_node_iter_next (&iter))
+    {
+      MsResponse response;
+
+      if (! multistatus_get_response (&iter, &response))
+        continue;
+
+      if (ms_response_is_target (&response))
+        {
+          file_type = ms_response_to_file_type (&response);
+          res = TRUE;
+        }
+      else
+        child_count++;
+    }
+
+  if (res)
+    {
+      if (target_type)
+        *target_type = file_type;
+
+      if (num_children)
+        *num_children = child_count;
+    }
+
+  multistatus_free (&ms);
+  return res;
+}
+
 /* ************************************************************************* */
 /*  */
-
-
 
 static void
 mount_auth_info_free (MountAuthInfo *data)
@@ -954,7 +1035,8 @@ do_mount (GVfsBackend  *backend,
 {
   MountAuthInfo  *info;
   SoupSession    *session;
-  SoupMessage    *msg;
+  SoupMessage    *msg_opts;
+  SoupMessage    *msg_stat;
   SoupURI        *mount_base;
   const char     *host;
   const char     *user;
@@ -965,6 +1047,7 @@ do_mount (GVfsBackend  *backend,
   guint           status;
   gboolean        is_success;
   gboolean        is_dav;
+  gboolean        res;
   char           *last_good_path;
 
   g_print ("+ mount\n");
@@ -1010,26 +1093,43 @@ do_mount (GVfsBackend  *backend,
                                 info);
 
   last_good_path = NULL;
-  msg = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+  msg_opts = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+  msg_stat = stat_location_begin (mount_base, FALSE);
 
   do {
-    status = soup_session_send_message (session, msg);
+    status = soup_session_send_message (session, msg_opts);
 
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
-    is_dav = sm_has_header (msg, "DAV");
+    is_dav = is_success && sm_has_header (msg_opts, "DAV");
 
-    soup_message_headers_clear (msg->response_headers);
-    soup_message_body_truncate (msg->response_body);
+    soup_message_headers_clear (msg_opts->response_headers);
+    soup_message_body_truncate (msg_opts->response_body);
 
-    if (is_success && is_dav)
+    if (is_dav)
       {
-        g_free (last_good_path);
-        last_good_path = mount_base->path;
+        GFileType file_type;
+        SoupURI *cur_uri;
+        
+        cur_uri = soup_message_get_uri (msg_opts);
+        soup_message_set_uri (msg_stat, cur_uri);
+
+        soup_session_send_message (session, msg_stat);
+        res = stat_location_finish (msg_stat, &file_type, NULL);
+
+        if (res && file_type == G_FILE_TYPE_DIRECTORY)
+          {
+            g_free (last_good_path);
+            last_good_path = mount_base->path;
+          }
+
         mount_base->path = path_get_parent_dir (mount_base->path);
-        soup_message_set_uri (msg, mount_base);
+        soup_message_set_uri (msg_opts, mount_base);
+
+        soup_message_headers_clear (msg_stat->response_headers);
+        soup_message_body_truncate (msg_stat->response_body);
       }
 
-  } while (is_success && is_dav);
+  } while (is_dav && mount_base->path != NULL);
 
   /* we have reached the end of paths we are allowed to
    * chdir up to (or couldn't chdir up at all) */
@@ -1039,12 +1139,17 @@ do_mount (GVfsBackend  *backend,
     {
       if (!is_success) 
         g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR,G_IO_ERROR_FAILED,
-                          _("HTTP Error: %s"), msg->reason_phrase);
+                          G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("HTTP Error: %s"), msg_opts->reason_phrase);
+      else if (!is_dav)
+        g_vfs_job_failed (G_VFS_JOB (job),
+                          G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Not a WebDAV enabled share"));
       else
         g_vfs_job_failed (G_VFS_JOB (job),
-                          G_IO_ERROR,G_IO_ERROR_FAILED,
+                          G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Not a WebDAV enabled share"));
+      /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
       return;
     }
 
@@ -1056,12 +1161,13 @@ do_mount (GVfsBackend  *backend,
   mount_spec = g_mount_spec_dup_known (mount_spec);
   g_mount_spec_set_mount_prefix (mount_spec, mount_base->path);
 
-  g_vfs_backend_set_mount_spec (G_VFS_BACKEND (backend), mount_spec);
-  g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "folder-remote");
+  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
 
   /* cleanup */
   g_mount_spec_unref (mount_spec);
-  g_object_unref (msg);
+  g_object_unref (msg_opts);
+  g_object_unref (msg_stat);
 
   /* switch the signal handler */
   g_signal_handler_disconnect (session, signal_id);
@@ -1102,7 +1208,7 @@ do_query_info (GVfsBackend           *backend,
   if (msg == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,G_IO_ERROR_FAILED,
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Could not create request"));
       
       return;
@@ -1146,7 +1252,7 @@ do_query_info (GVfsBackend           *backend,
     g_vfs_job_succeeded (G_VFS_JOB (job));
   else
     g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR,G_IO_ERROR_FAILED,
+                      G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Response invalid"));
 
 }
@@ -1177,7 +1283,7 @@ do_enumerate (GVfsBackend           *backend,
   if (msg == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR,G_IO_ERROR_FAILED,
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
                         _("Could not create request"));
       
       return;

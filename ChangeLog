@@ -1,3 +1,11 @@
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Also check if the URL is a directory by doing a PROPFIND in
+	addition to the OPTIONS. That will also force authentication
+	since some servers (e.g. Zope) allow OPTIONS without doing
+	authentication.
+
 2008-02-25  Alexander Larsson  <alexl@redhat.com>
 
         * client/sftpuri.c:
@@ -7,8 +15,6 @@
 	Support ports. (#518504)
 
 2008-02-25  Christian Kellner  <gicmo@gnome.org>
-
-	reviewed by:
 
 	* daemon/gvfsbackenddav.c:
 	Keep the SoupMessage around for as long as Multistatus is
