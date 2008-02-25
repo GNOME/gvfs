@@ -1,5 +1,13 @@
 2008-02-25  Christian Kellner  <gicmo@gnome.org>
 
+	reviewed by:
+
+	* daemon/gvfsbackenddav.c:
+	Keep the SoupMessage around for as long as Multistatus is
+	valid.
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackenddav.c: 
 	* daemon/gvfsbackendhttp.c:
 	* daemon/gvfsbackendhttp.h:

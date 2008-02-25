@@ -1074,8 +1074,6 @@ do_mount (GVfsBackend  *backend,
                     G_CALLBACK (soup_authenticate_from_data),
                     info);
 
-
-
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_print ("- mount\n");
 }
@@ -1115,12 +1113,12 @@ do_query_info (GVfsBackend           *backend,
   soup_session_send_message (G_VFS_BACKEND_HTTP (backend)->session, msg);
 
   res = multistatus_parse (msg, &ms, &error);
-  g_object_unref (msg);
 
   if (res == FALSE)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      g_object_unref (msg);
       return;
     }
 
@@ -1142,6 +1140,7 @@ do_query_info (GVfsBackend           *backend,
     }
 
   multistatus_free (&ms);
+  g_object_unref (msg);
 
   if (res)
     g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1189,12 +1188,12 @@ do_enumerate (GVfsBackend           *backend,
   soup_session_send_message (backend_http->session, msg);
 
   res = multistatus_parse (msg, &ms, &error);
-  g_object_unref (msg);
 
   if (res == FALSE)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
+      g_object_unref (msg);
       return;
     }
 
@@ -1220,6 +1219,7 @@ do_enumerate (GVfsBackend           *backend,
     }
 
   multistatus_free (&ms);
+  g_object_unref (msg);
 
   g_vfs_job_succeeded (G_VFS_JOB (job)); /* should that be called earlier? */
   g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (job));
