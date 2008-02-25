@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.22\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-22 22:26+0000\n"
-"PO-Revision-Date: 2008-02-22 22:30+0000\n"
+"POT-Creation-Date: 2008-02-25 09:52+0000\n"
+"PO-Revision-Date: 2008-02-25 09:55+0000\n"
 "Last-Translator: Duarte Loreto <happyguy_pt@hotmail.com>\n"
 "Language-Team: Portuguese <gnome_pt@yahoogroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -205,7 +205,7 @@ msgid "CD/DVD Creator"
 msgstr "Criador de CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
-#: ../daemon/gvfsbackendnetwork.c:521
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:634
 msgid "The file is not a directory"
 msgstr "O ficheiro não é um directório"
 
@@ -302,9 +302,10 @@ msgstr "Computador"
 msgid "Filesystem"
 msgstr "Sistema de Ficheiros"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendnetwork.c:474
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
-#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendnetwork.c:587 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 msgid "File doesn't exist"
 msgstr "Ficheiro não existe"
 
@@ -400,6 +401,25 @@ msgstr "O ficheiro foi alterado externamente"
 msgid "Backup file creation failed"
 msgstr "Falha ao criar o ficheiro de cópia de segurança"
 
+#. TODO: Name
+#: ../daemon/gvfsbackenddnssd.c:433
+msgid "dns-sd"
+msgstr "dns-sd"
+
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:728
+msgid "Can't monitor file or directory."
+msgstr "Incapaz de monitorizar um ficheiro ou um directório."
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:687
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:673
+#: ../daemon/gvfsbackendnetwork.c:811 ../daemon/gvfsbackendnetwork.c:812
+msgid "Network"
+msgstr "Rede"
+
 #: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1354
 msgid "No hostname specified"
 msgstr "Nenhum nome de máquina especificado"
@@ -424,23 +444,14 @@ msgid "Directory notification not supported"
 msgstr "Notificação de directório não suportada"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:259 ../daemon/gvfsbackendsmbbrowse.c:694
+#: ../daemon/gvfsbackendnetwork.c:266 ../daemon/gvfsbackendsmbbrowse.c:694
 msgid "Windows Network"
 msgstr "Rede Windows"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:339
+#: ../daemon/gvfsbackendnetwork.c:389
 msgid "Local network"
 msgstr "Rede local"
-
-#: ../daemon/gvfsbackendnetwork.c:560 ../daemon/gvfsbackendnetwork.c:695
-#: ../daemon/gvfsbackendnetwork.c:696
-msgid "Network"
-msgstr "Rede"
-
-#: ../daemon/gvfsbackendnetwork.c:613
-msgid "Can't monitor file or directory."
-msgstr "Incapaz de monitorizar um ficheiro ou um directório."
 
 #: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
