@@ -106,7 +106,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   char *scheme;
   GVfsUriMountInfo *info;
   
-  scheme = g_uri_get_scheme (uri);
+  scheme = g_uri_parse_scheme (uri);
   if (scheme == NULL)
     return FALSE;
   

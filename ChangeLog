@@ -1,3 +1,8 @@
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c (get_mountspec_from_uri):
+	g_uri_get_scheme -> g_uri_parse_scheme
+
 2008-02-25  Wouter Bolsterlee  <wbolster@svn.gnome.org>
 
 	* hal/ghalvolume.c (do_update_from_hal_for_camera): Add
