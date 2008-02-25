@@ -107,6 +107,7 @@ struct _GVfsBackendSftp
 
   SFTPClientVendor client_vendor;
   char *host;
+  int port;
   gboolean user_specified;
   char *user;
   char *tmp_password;
@@ -320,13 +321,11 @@ setup_ssh_commandline (GVfsBackend *backend)
   else if (op_backend->client_vendor == SFTP_VENDOR_SSH)
     args[last_arg++] = g_strdup ("-x");
 
-  /* TODO: Support port 
-  if (port != 0)
+  if (op_backend->port != -1)
     {
       args[last_arg++] = g_strdup ("-p");
-      args[last_arg++] = g_strdup_printf ("%d", port);
+      args[last_arg++] = g_strdup_printf ("%d", op_backend->port);
     }
-  */
     
 
   args[last_arg++] = g_strdup ("-l");
@@ -1312,6 +1311,13 @@ do_mount (GVfsBackend *backend,
   if (op_backend->user_specified)
     g_mount_spec_set (sftp_mount_spec, "user", op_backend->user);
   g_mount_spec_set (sftp_mount_spec, "host", op_backend->host);
+  if (op_backend->port != -1)
+    {
+      char *v;
+      v = g_strdup_printf ("%d", op_backend->port);
+      g_mount_spec_set (sftp_mount_spec, "port", v);
+      g_free (v);
+    }
 
   g_vfs_backend_set_mount_spec (backend, sftp_mount_spec);
   g_mount_spec_unref (sftp_mount_spec);
@@ -1333,7 +1339,7 @@ try_mount (GVfsBackend *backend,
            gboolean is_automount)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  const char *user, *host;
+  const char *user, *host, *port;
 
   op_backend->client_vendor = get_sftp_client_vendor ();
 
@@ -1355,6 +1361,15 @@ try_mount (GVfsBackend *backend,
       return TRUE;
     }
 
+  port = g_mount_spec_get (mount_spec, "port");
+  op_backend->port = -1;
+  if (port != NULL)
+    {
+      int p = atoi (port);
+      if (p != 22)
+        op_backend->port = p;
+    }
+  
   user = g_mount_spec_get (mount_spec, "user");
 
   op_backend->host = g_strdup (host);

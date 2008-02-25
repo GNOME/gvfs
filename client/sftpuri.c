@@ -81,7 +81,7 @@ sftp_from_uri (GVfsUriMapper *mapper,
   if (uri->userinfo && *uri->userinfo)
     g_vfs_uri_mount_info_set (info, "user", uri->userinfo);
   
-  if (uri->port != -1)
+  if (uri->port != -1 && uri->port != 22)
     {
       char *port = g_strdup_printf ("%d", uri->port);
       g_vfs_uri_mount_info_set (info, "port", port);
@@ -122,7 +122,14 @@ sftp_to_uri (GVfsUriMapper *mapper,
   
   port = g_vfs_uri_mount_info_get (info, "port");
   if (port != NULL)
-    uri.port = atoi (port);
+    {
+      uri.port = atoi (port);
+      /* Kinda lame, but we want to alias port 22 and not-specified port
+       * so they are the same mount
+       */
+      if (uri.port == 22)
+	uri.port = -1;
+    }
 
   if (info->path == NULL)
     uri.path = "/";

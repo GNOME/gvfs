@@ -1,3 +1,11 @@
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+        * client/sftpuri.c:
+	Make sure both no-port and port 22 refer to the same mount.
+	
+        * daemon/gvfsbackendsftp.c:
+	Support ports. (#518504)
+
 2008-02-25  Christian Kellner  <gicmo@gnome.org>
 
 	reviewed by:
