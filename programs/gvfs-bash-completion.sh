@@ -31,11 +31,7 @@ __gvfs_multiple_uris() {
     local IFS=$'\n'
     local cur="${COMP_WORDS[COMP_CWORD]}"
 
-    if [ "$cur" = "" ] ; then
-        COMPREPLY=($(compgen -W "$(gvfs-ls --show-mounts)" -- $cur))
-    else
-        COMPREPLY=($(compgen -W "$(gvfs-ls --show-completions $cur)" -- $cur))
-    fi
+    COMPREPLY=($(compgen -W '$(gvfs-ls --show-completions "$cur")' -- ""))
 }
 
 ####################################################################################################

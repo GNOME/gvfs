@@ -1,5 +1,11 @@
 2008-02-26  Alexander Larsson  <alexl@redhat.com>
 
+        * programs/gvfs-bash-completion.sh:
+        * programs/gvfs-ls.c:
+	Better completion
+
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/gvfsjobmount.c (run):
 	No need to ref backend specifically now, as
 	the core refs the job and the job refs the

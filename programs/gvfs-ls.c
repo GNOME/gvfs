@@ -31,7 +31,6 @@
 
 static char *attributes = NULL;
 static gboolean show_hidden = FALSE;
-static gboolean show_mounts = FALSE;
 static gboolean show_long = FALSE;
 static char *show_completions = NULL;
 
@@ -41,7 +40,6 @@ static GOptionEntry entries[] =
 	{ "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, "Show hidden files", NULL },
         { "long", 'l', 0, G_OPTION_ARG_NONE, &show_long, "Use a long listing format", NULL },
         { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, "Show completions", NULL}, 
-        { "show-mounts", 'm', 0, G_OPTION_ARG_NONE, &show_mounts, "Show mounts", NULL },
 	{ NULL }
 };
 
@@ -206,13 +204,45 @@ print_mounts (const char *prefix)
     g_print ("file:///\n");
 }
 
+static char*
+shell_quote (const gchar *unquoted_string)
+{
+  const gchar *p;
+  GString *dest;
+
+  dest = g_string_new ("");
+
+  p = unquoted_string;
+
+  while (*p)
+    {
+      if (*p == ' ')
+        g_string_append (dest, "\\ ");
+      else if (*p == '\n')
+        g_string_append (dest, "^J");
+      else if (*p == '\\')
+        g_string_append (dest, "\\\\");
+      else if (*p == '\'')
+        g_string_append (dest, "\\'");
+      else if (*p == '"')
+        g_string_append (dest, "\\\"");
+      else
+        g_string_append_c (dest, *p);
+
+      ++p;
+    }
+
+  return g_string_free (dest, FALSE);
+}
+
 static void
 show_completed_file (GFile *hit,
                      gboolean is_dir,
                      const char *arg)
 {
-  char *display, *cwd;
+  char *path, *cwd, *display, *t;
   GFile *cwd_f;
+  GFile *home;
   
   if (g_file_is_native (hit))
     {
@@ -220,12 +250,27 @@ show_completed_file (GFile *hit,
       cwd_f = g_file_new_for_path (cwd);
       g_free (cwd);
 
-      if (g_file_has_prefix (hit, cwd_f) &&
-          !g_path_is_absolute (arg))
-        display = g_file_get_relative_path (cwd_f, hit);
+      home = g_file_new_for_path (g_get_home_dir ());
+
+      if ((g_file_has_prefix (hit, home) ||
+           g_file_equal (hit, home)) &&
+          arg[0] == '~')
+        {
+          t = g_file_get_relative_path (home, hit);
+          path = g_strconcat ("~", (t != NULL) ? "/": "", t, NULL);
+          g_free (t);
+        }
+      else if (g_file_has_prefix (hit, cwd_f) &&
+               !g_path_is_absolute (arg))
+        path = g_file_get_relative_path (cwd_f, hit);
       else
-        display = g_file_get_path (hit);
+        path = g_file_get_path (hit);
+
       g_object_unref (cwd_f);
+      g_object_unref (home);
+      
+      display = shell_quote (path);
+      g_free (path);
     }
   else
     display = g_file_get_uri (hit);
@@ -233,18 +278,29 @@ show_completed_file (GFile *hit,
   g_print ("%s%s\n", display, (is_dir)?"/":"");
   g_free (display);
 }
-  
+
 static void
 print_completions (const char *arg)
 {
   GFile *f;
   GFile *parent;
   char *basename;
-
-  f = g_file_new_for_commandline_arg (arg);
+  char *unescaped, *t;
   
-  if (g_str_has_suffix (arg, "/") ||
-      *arg == 0)
+  unescaped = g_shell_unquote (arg, NULL);
+  if (unescaped == NULL)
+    unescaped = g_strdup (arg);
+  
+  if (*unescaped == '~')
+    {
+      t = unescaped;
+      unescaped = g_strconcat (g_get_home_dir(), t+1, NULL);
+      g_free (t);
+    }
+    
+  f = g_file_new_for_commandline_arg (unescaped);
+  
+  if (g_str_has_suffix (arg, "/") || *arg == 0)
     {
       parent = g_object_ref (f);
       basename = g_strdup ("");
@@ -256,16 +312,15 @@ print_completions (const char *arg)
     }
 
   if (parent == NULL ||
+      strchr (arg, '/') == NULL ||
       !g_file_query_exists (parent, NULL))
     {
       GMount *mount;
       mount = g_file_find_enclosing_mount (f, NULL, NULL);
       if (mount == NULL)
-        {
-          print_mounts (arg);
-          goto out;
-        }
-      g_object_unref (mount);
+        print_mounts (unescaped);
+      else
+        g_object_unref (mount);
     }
   
   if (parent != NULL)
@@ -291,7 +346,6 @@ print_completions (const char *arg)
               if (name != NULL && g_str_has_prefix (name, basename))
                 {
                   GFile *entry;
-                  char *entry_uri;
                   
                   entry = g_file_get_child (parent, name);
                   show_completed_file (entry, type == G_FILE_TYPE_DIRECTORY, arg);
@@ -304,9 +358,9 @@ print_completions (const char *arg)
       g_object_unref (parent);
     }
 
- out:
   g_object_unref (f);
   g_free (basename);
+  g_free (unescaped);
 }
 
 int
@@ -340,12 +394,7 @@ main (int argc, char *argv[])
 			    attributes,
 			    NULL);
 
-  if (show_mounts)
-    {
-      print_mounts (NULL);
-      return 0;
-    }
-  else if (show_completions != NULL)
+  if (show_completions != NULL)
     {
       print_completions (show_completions);
       return 0;
