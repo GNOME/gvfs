@@ -43,6 +43,8 @@
 #include <libxml/xpathInternals.h>
 
 #include "gvfsbackenddav.h"
+#include "gvfskeyring.h"
+
 #include "gvfsjobmount.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
@@ -60,23 +62,28 @@
 #include "soup-input-stream.h"
 #include "soup-output-stream.h"
 
-typedef struct _MountAuthInfo MountAuthInfo;
+typedef struct _MountAuthData MountAuthData;
 
-static void mount_auth_info_free (MountAuthInfo *info);
+static void mount_auth_info_free (MountAuthData *info);
 
-struct _MountAuthInfo {
+typedef struct _AuthInfo {
+
+   /* for server authentication */
+    char          *username;
+    char          *password;
+    char          *realm;
+
+    GPasswordSave  pw_save;
+
+} AuthInfo;
+
+struct _MountAuthData {
 
   SoupSession  *session;
   GMountSource *mount_source;
 
-     /* for server authentication */
-  char *username;
-  char *password;
-  char *last_realm;
-
-     /* for proxy authentication */
-  char *proxy_user;
-  char *proxy_password;
+  AuthInfo server_auth;
+  AuthInfo proxy_auth;
 
 };
 
@@ -86,7 +93,7 @@ struct _GVfsBackendDav
 {
   GVfsBackendHttp parent_instance;
 
-  MountAuthInfo auth_info;
+  MountAuthData auth_info;
 };
 
 G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP)
@@ -918,16 +925,17 @@ stat_location (GVfsBackend    *backend,
 /*  */
 
 static void
-mount_auth_info_free (MountAuthInfo *data)
+mount_auth_info_free (MountAuthData *data)
 {
   if (data->mount_source)
     g_object_unref (data->mount_source);
   
-  g_free (data->username);
-  g_free (data->password);
-  g_free (data->last_realm);
-  g_free (data->proxy_user);
-  g_free (data->proxy_password);
+  g_free (data->server_auth.username);
+  g_free (data->server_auth.password);
+  g_free (data->server_auth.realm);
+  
+  g_free (data->proxy_auth.username);
+  g_free (data->proxy_auth.password);
 
 }
 
@@ -938,21 +946,23 @@ soup_authenticate_from_data (SoupSession *session,
                              gboolean     retrying,
                              gpointer     user_data)
 {
-  MountAuthInfo  *data;
+  MountAuthData *data;
+  AuthInfo      *info;
 
   g_print ("+ soup_authenticate_from_data (%s) \n",
            retrying ? "retrying" : "first auth");
 
-  data = (MountAuthInfo *) user_data;
-
   if (retrying)
     return;
 
-  if (soup_auth_is_for_proxy (auth))
-    soup_auth_authenticate (auth, data->proxy_user, data->proxy_password);
-  else
-    soup_auth_authenticate (auth, data->username, data->password);
+  data = (MountAuthData *) user_data;
 
+  if (soup_auth_is_for_proxy (auth))
+    info = &data->proxy_auth;
+  else
+    info = &data->server_auth;
+
+  soup_auth_authenticate (auth, info->username, info->password);
 }
 
 static void
@@ -962,92 +972,146 @@ soup_authenticate_interactive (SoupSession *session,
                                gboolean     retrying,
                                gpointer     user_data)
 {
-  MountAuthInfo  *data;
-  const char     *username;
-  const char     *password;
-  gboolean        res;
-  gboolean        aborted;
-  char           *new_username;
-  char           *new_password;
-  char           *prompt;
+  MountAuthData     *data;
+  AuthInfo          *info;
+  GAskPasswordFlags  pw_ask_flags;
+  GPasswordSave      pw_save;
+  const char        *realm;
+  gboolean           res;
+  gboolean           aborted;
+  gboolean           is_proxy;
+  gboolean           have_auth;
+  char              *new_username;
+  char              *new_password;
+  char              *prompt;
 
   g_print ("+ soup_authenticate_interactive (%s) \n",
            retrying ? "retrying" : "first auth");
 
-  data = (MountAuthInfo *) user_data;
+  data = (MountAuthData *) user_data;
 
   new_username = NULL;
   new_password = NULL;
+  realm        = NULL;
+  pw_ask_flags = G_ASK_PASSWORD_NEED_PASSWORD;
 
-  if (soup_auth_is_for_proxy (auth))
-    {
-      username = data->proxy_user;
-      password = retrying ? NULL : data->proxy_password;
-    }
+  is_proxy = soup_auth_is_for_proxy (auth);
+  realm    = soup_auth_get_realm (auth);
+
+  if (is_proxy)
+    info = &(data->proxy_auth);
   else
+    info = &(data->server_auth);
+
+  if (realm && info->realm == NULL)
+    info->realm = g_strdup (realm);
+  else if (realm && info->realm && !g_str_equal (realm, info->realm))
+    return;
+
+  have_auth = info->username && info->password;
+
+  if (have_auth == FALSE && g_vfs_keyring_is_available ())
     {
-      username = data->username;
-      password = retrying ? NULL : data->password;
+      const SoupURI *uri; 
+      SoupURI       *uri_free = NULL;
+
+      pw_ask_flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+
+      if (is_proxy)
+        {
+          g_object_get (session, SOUP_SESSION_PROXY_URI, &uri_free, NULL);
+          uri = uri_free;
+        }
+      else
+        uri = soup_message_get_uri (msg);
+
+      res = g_vfs_keyring_lookup_password (info->username,
+                                           uri->host,
+                                           NULL,
+                                           "http",
+                                           realm,
+                                           is_proxy ? "proxy" : "basic",
+                                           uri->port,
+                                           &new_username,
+                                           NULL,
+                                           &new_password);
+
+      if (res == TRUE)
+        {
+          have_auth = TRUE;
+          g_free (info->username);
+          g_free (info->password);
+          info->username = new_username;
+          info->password = new_password;
+        }
+
+      if (uri_free)
+        soup_uri_free (uri_free);
     }
 
-  if (username && password)
+  if (retrying == FALSE && have_auth)
     {
-      soup_auth_authenticate (auth, username, password);
+      soup_auth_authenticate (auth, info->username, info->password);
       return;
     }
 
-  if (soup_auth_is_for_proxy (auth))
+  if (is_proxy == FALSE)
     {
-      prompt = g_strdup (_("Please enter proxy password"));
+      if (realm == NULL)
+        realm = _("WebDAV share");
+
+      prompt = g_strdup_printf (_("Enter password for %s"), realm);
     }
   else
-    {
-      const char *auth_realm;
+    prompt = g_strdup (_("Please enter proxy password"));
 
-      auth_realm = soup_auth_get_realm (auth);
-
-      if (auth_realm == NULL)
-        auth_realm = _("WebDAV share");
-
-      prompt = g_strdup_printf (_("Enter password for %s"), auth_realm);
-    }
+  if (info->username == NULL)
+    pw_ask_flags |= G_ASK_PASSWORD_NEED_USERNAME;
 
   res = g_mount_source_ask_password (data->mount_source,
                                      prompt,
-                                     username,
+                                     info->username,
                                      NULL,
-                                     G_ASK_PASSWORD_NEED_PASSWORD |
-                                     G_ASK_PASSWORD_NEED_USERNAME,
+                                     pw_ask_flags, 
                                      &aborted,
                                      &new_password,
                                      &new_username,
                                      NULL,
-                                     NULL);
+                                     &pw_save);
 
-  if (res && !aborted) {
+  if (res && !aborted)
+    {
+      soup_auth_authenticate (auth, new_username, new_password);
 
-    soup_auth_authenticate (auth, new_username, new_password);
-
-    if (soup_auth_is_for_proxy (auth))
-      {
-        g_free (data->proxy_user);
-        g_free (data->proxy_password);
-
-        data->proxy_password = new_password;
-        data->proxy_user = new_username;
-      }
-    else
-      {
-        g_free (data->username);
-        g_free (data->password);
-
-        data->username = new_username;
-        data->password = new_password;
-      }
-  }
+      g_free (info->username);
+      g_free (info->password);
+      info->username = new_username;
+      info->password = new_password;
+      info->pw_save  = pw_save;
+    }
+  else
+    soup_session_cancel_message (session, msg, SOUP_STATUS_CANCELLED);
 
   g_print ("- soup_authenticate \n");
   g_free (prompt);
+}
+
+static void
+keyring_save_authinfo (AuthInfo *info,
+                       SoupURI  *uri,
+                       gboolean  is_proxy)
+{
+  const char *type = is_proxy ? "proxy" : "basic";
+
+  g_vfs_keyring_save_password (info->username,
+                               uri->host,
+                               NULL,
+                               "http",
+                               info->realm,
+                               type,
+                               uri->port,
+                               info->password,
+                               info->pw_save);
 }
 
 static inline GMountSpec *
@@ -1080,7 +1144,7 @@ do_mount (GVfsBackend  *backend,
           GMountSource *mount_source,
           gboolean      is_automount)
 {
-  MountAuthInfo  *info;
+  MountAuthData  *data;
   SoupSession    *session;
   SoupMessage    *msg_opts;
   SoupMessage    *msg_stat;
@@ -1093,7 +1157,7 @@ do_mount (GVfsBackend  *backend,
   gulong          signal_id;
   guint           status;
   gboolean        is_success;
-  gboolean        is_dav;
+  gboolean        is_webdav;
   gboolean        res;
   char           *last_good_path;
 
@@ -1131,13 +1195,15 @@ do_mount (GVfsBackend  *backend,
   session = G_VFS_BACKEND_HTTP (backend)->session;
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base; 
 
-  info = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
-  info->mount_source = g_object_ref (mount_source);
-  info->username = g_strdup (user);
+  data = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
+  data->mount_source = g_object_ref (mount_source);
+  data->server_auth.username = g_strdup (user);
+  data->server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
+  data->proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
 
   signal_id = g_signal_connect (session, "authenticate",
                                 G_CALLBACK (soup_authenticate_interactive),
-                                info);
+                                data);
 
   last_good_path = NULL;
   msg_opts = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
@@ -1147,12 +1213,12 @@ do_mount (GVfsBackend  *backend,
     status = soup_session_send_message (session, msg_opts);
 
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
-    is_dav = is_success && sm_has_header (msg_opts, "DAV");
+    is_webdav = is_success && sm_has_header (msg_opts, "DAV");
 
     soup_message_headers_clear (msg_opts->response_headers);
     soup_message_body_truncate (msg_opts->response_body);
 
-    if (is_dav)
+    if (is_webdav)
       {
         GFileType file_type;
         SoupURI *cur_uri;
@@ -1176,7 +1242,7 @@ do_mount (GVfsBackend  *backend,
         soup_message_body_truncate (msg_stat->response_body);
       }
 
-  } while (is_dav && mount_base->path != NULL);
+  } while (is_webdav && mount_base->path != NULL);
 
   /* we have reached the end of paths we are allowed to
    * chdir up to (or couldn't chdir up at all) */
@@ -1184,11 +1250,13 @@ do_mount (GVfsBackend  *backend,
   /* check if we at all have a good path */
   if (last_good_path == NULL) 
     {
+
+      /* TODO: set correct error in case of cancellation */
       if (!is_success) 
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("HTTP Error: %s"), msg_opts->reason_phrase);
-      else if (!is_dav)
+      else if (!is_webdav)
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Not a WebDAV enabled share"));
@@ -1199,6 +1267,12 @@ do_mount (GVfsBackend  *backend,
       /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
       return;
     }
+
+  /* Success! We are mounted */	
+  /* Save the auth info in the keyring */
+
+  keyring_save_authinfo (&(data->server_auth), mount_base, FALSE);
+  /* TODO: save proxy auth */
 
   /* Set the working path in mount path */
   g_free (mount_base->path);
@@ -1220,12 +1294,12 @@ do_mount (GVfsBackend  *backend,
   g_signal_handler_disconnect (session, signal_id);
   g_signal_connect (session, "authenticate",
                     G_CALLBACK (soup_authenticate_from_data),
-                    info);
+                    data);
 
   /* also auth the workaround async session we need for SoupInputStream */
   g_signal_connect (G_VFS_BACKEND_HTTP (backend)->session_async, "authenticate",
                     G_CALLBACK (soup_authenticate_from_data),
-                    info);
+                    data);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
   g_print ("- mount\n");
