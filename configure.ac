@@ -120,7 +120,7 @@ if test "x$enable_http" != "xno"; then
   PKG_CHECK_EXISTS(libsoup-2.4 >= 2.3.0, msg_http=yes)
 
   if test "x$msg_http" == "xyes"; then
-    PKG_CHECK_MODULES(HTTP, libsoup-2.4)
+    PKG_CHECK_MODULES(HTTP, libsoup-2.4 libxml-2.0)
     AC_DEFINE(HAVE_HTTP, 1, [Define to 1 if http/dav is going to be built])
   fi
 fi

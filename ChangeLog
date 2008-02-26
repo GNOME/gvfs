@@ -1,3 +1,8 @@
+2008-02-26  Yanko Kaneti  <yaneti@declera.com>
+
+	* configure.ac: explicitly depend on libxml-2.0 
+	for building the dav backend.
+
 2008-02-26  Benjamin Otte  <otte@gnome.org>
 
 	* common/gmountsource.c: (ask_password_reply),
