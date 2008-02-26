@@ -243,7 +243,7 @@ AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
 dnl *************************
 dnl *** Check for gphoto2 ***
 dnl *************************
-AC_ARG_ENABLE(hal, [  --disable-gphoto2           build without gphoto2 support])
+AC_ARG_ENABLE(gphoto2, [  --disable-gphoto2           build without gphoto2 support])
 msg_gphoto2=no
 GPHOTO2_LIBS=
 GPHOTO2_CFLAGS=
