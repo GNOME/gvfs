@@ -1,5 +1,12 @@
 2008-02-26  Benjamin Otte  <otte@gnome.org>
 
+	* common/gmountsource.c: (ask_password_reply),
+	(g_mount_source_ask_password_async), (ask_question_reply),
+	(g_mount_source_ask_question_async):
+	make errors say "Internal Error" instead of failing
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsjobmount.c: (run), (try):
 	use ref/unref pair to stop backend from going away when the mount
 	fails

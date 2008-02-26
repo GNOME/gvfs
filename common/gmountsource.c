@@ -204,7 +204,7 @@ ask_password_reply (DBusMessage *reply,
 
   if (handled == FALSE)
     {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, NULL);
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
     }
 
   g_simple_async_result_complete (result);
@@ -230,7 +230,8 @@ g_mount_source_ask_password_async (GMountSource              *source,
       g_simple_async_report_error_in_idle (G_OBJECT (source),
 					   callback,
 					   user_data,
-					   G_IO_ERROR, G_IO_ERROR_FAILED, NULL); 
+					   G_IO_ERROR, G_IO_ERROR_FAILED, 
+					   "Internal Error"); 
       return;
     }
 
@@ -522,7 +523,7 @@ ask_question_reply (DBusMessage *reply,
 
   if (handled == FALSE)
     {
-      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, NULL);
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
     }
 
   g_simple_async_result_complete (result);
@@ -591,7 +592,8 @@ g_mount_source_ask_question_async (GMountSource       *source,
       g_simple_async_report_error_in_idle (G_OBJECT (source),
 					   callback,
 					   user_data,
-					   G_IO_ERROR, G_IO_ERROR_FAILED, NULL); 
+					   G_IO_ERROR, G_IO_ERROR_FAILED, 
+					   "Internal Error"); 
       return;
     }
 
