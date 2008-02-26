@@ -188,7 +188,16 @@ g_vfs_job_run (GVfsJob *job)
   GVfsJobClass *class;
 
   class = G_VFS_JOB_GET_CLASS (job);
+
+  /* Ensure that the job lives durint the whole
+   * lifetime of the call, as it may disappear when
+   * we call g_vfs_job_succeed/fail()
+   */
+  g_object_ref (job);
+  
   class->run (job);
+  
+  g_object_unref (job);
 }
 
 gboolean
@@ -197,7 +206,16 @@ g_vfs_job_try (GVfsJob *job)
   GVfsJobClass *class;
 
   class = G_VFS_JOB_GET_CLASS (job);
+  
+  /* Ensure that the job lives durint the whole
+   * lifetime of the call, as it may disappear when
+   * we call g_vfs_job_succeed/fail()
+   */
+  g_object_ref (job);
+  
   return class->try (job);
+  
+  g_object_unref (job);
 }
 
 void

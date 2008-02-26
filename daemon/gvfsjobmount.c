@@ -49,6 +49,7 @@ g_vfs_job_mount_finalize (GObject *object)
 
   g_mount_spec_unref (job->mount_spec);
   g_object_unref (job->mount_source);
+  g_object_unref (job->backend);
   
   if (G_OBJECT_CLASS (g_vfs_job_mount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_mount_parent_class)->finalize) (object);
@@ -86,7 +87,9 @@ g_vfs_job_mount_new (GMountSpec *spec,
   job->mount_spec = g_mount_spec_ref (spec);
   job->mount_source = g_object_ref (source);
   job->is_automount = is_automount;
-  job->backend = backend;
+  /* Ref the backend so we're sure its alive
+     during the whole job request. */
+  job->backend = g_object_ref (backend);
   if (request)
     job->request = dbus_message_ref (request);
   

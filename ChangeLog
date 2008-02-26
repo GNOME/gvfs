@@ -1,3 +1,13 @@
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsjob.c:
+        (g_vfs_job_run):
+        (g_vfs_job_try):
+	Ref job while calling out.
+	
+        * daemon/gvfsjobmount.c:
+	Own ref to backend while job is alive.
+
 2008-02-26  Carlos Garcia Campos  <carlosgc@gnome.org>
 
 	* daemon/gvfsbackendsmb.c: (auth_callback):
