@@ -97,7 +97,8 @@ static void
 run (GVfsJob *job)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackend *backend = op_job->backend;
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (backend);
 
   if (class->mount == NULL)
     {
@@ -106,27 +107,34 @@ run (GVfsJob *job)
       return;
     }
   
-  class->mount (op_job->backend,
+  g_object_ref (backend);
+  class->mount (backend,
 		op_job,
 		op_job->mount_spec,
 		op_job->mount_source,
 		op_job->is_automount);
+  g_object_unref (backend);
 }
 
 static gboolean
 try (GVfsJob *job)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (job);
-  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
+  GVfsBackend *backend = op_job->backend;
+  GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (backend);
+  gboolean result;
 
   if (class->try_mount == NULL)
     return FALSE;
 
-  return class->try_mount (op_job->backend,
-			   op_job,
-			   op_job->mount_spec,
-			   op_job->mount_source,
-			   op_job->is_automount);
+  g_object_ref (backend);
+  result = class->try_mount (backend,
+			     op_job,
+			     op_job->mount_spec,
+			     op_job->mount_source,
+			     op_job->is_automount);
+  g_object_unref (backend);
+  return result;
 }
 
 static void

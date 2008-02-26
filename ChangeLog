@@ -1,5 +1,11 @@
 2008-02-26  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsjobmount.c: (run), (try):
+	use ref/unref pair to stop backend from going away when the mount
+	fails
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsjobmount.c: (mount_failed):
 	no g_warning for failed monts, please
 
