@@ -1,5 +1,10 @@
 2008-02-26  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackenddav.c: (do_delete):
+	Correct error domain in case delete failed.
+
+2008-02-26  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackenddav.c:
 	Redo authentication and implement keyring support. Based
 	on a patch by Carlos Garcia Campos.

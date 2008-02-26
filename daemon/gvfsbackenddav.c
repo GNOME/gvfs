@@ -1763,7 +1763,7 @@ do_delete (GVfsBackend   *backend,
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
     g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR_NOT_EMPTY,
+                      G_IO_ERROR,
                       http_error_code_from_status (status),
                       msg->reason_phrase);
   else
