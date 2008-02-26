@@ -1,3 +1,8 @@
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonvolumemonitor.c:
+	Use standard lock instead of recursive lock.
+
 2008-02-25  David Zeuthen  <davidz@redhat.com>
 
 	* configure.ac: fix typo in AC_ARG_ENABLE for gphoto2

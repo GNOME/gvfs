@@ -33,7 +33,8 @@
 #include "gdaemonvfs.h"
 #include "gmounttracker.h"
 
-static GStaticRecMutex _the_daemon_volume_monitor_mutex = G_STATIC_REC_MUTEX_INIT;
+G_LOCK_DEFINE_STATIC(_the_daemon_volume_monitor);
+
 static GDaemonVolumeMonitor *_the_daemon_volume_monitor;
 
 struct _GDaemonVolumeMonitor {
@@ -51,14 +52,14 @@ get_mounts (GVolumeMonitor *volume_monitor)
   GDaemonVolumeMonitor *monitor;
   GList *l;
 
-  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+  G_LOCK (_the_daemon_volume_monitor);
 
   monitor = G_DAEMON_VOLUME_MONITOR (volume_monitor);
 
   l = g_list_copy (monitor->mounts);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
-  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
+  G_UNLOCK (_the_daemon_volume_monitor);
 
   return l;
 }
@@ -122,7 +123,7 @@ g_daemon_volume_monitor_find_mount_by_mount_info (GMountInfo *mount_info)
       return NULL;
     }
 
-  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+  G_LOCK (_the_daemon_volume_monitor);
 
   daemon_mount = find_mount_by_mount_info (_the_daemon_volume_monitor, mount_info);
   if (daemon_mount != NULL)
@@ -130,7 +131,7 @@ g_daemon_volume_monitor_find_mount_by_mount_info (GMountInfo *mount_info)
       g_object_ref (daemon_mount);
     }
 
-  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
+  G_UNLOCK (_the_daemon_volume_monitor);
 
   return daemon_mount;
 }
@@ -141,7 +142,7 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   GDaemonMount *mount;
   GVolume *volume;
 
-  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+  G_LOCK (_the_daemon_volume_monitor);
 
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (mount)
@@ -161,7 +162,7 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
     }
 
  out:
-  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
+  G_UNLOCK (_the_daemon_volume_monitor);
 }
 
 static void
@@ -169,7 +170,7 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
   GDaemonMount *mount;
 
-  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+  G_LOCK (_the_daemon_volume_monitor);
 
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (!mount)
@@ -185,7 +186,7 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   g_object_unref (mount);
 
  out:
-  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
+  G_UNLOCK (_the_daemon_volume_monitor);
 }
 
 static void
@@ -230,7 +231,7 @@ g_daemon_volume_monitor_finalize (GObject *object)
 {
   GDaemonVolumeMonitor *monitor;
   
-  g_static_rec_mutex_lock (&_the_daemon_volume_monitor_mutex);
+  G_LOCK (_the_daemon_volume_monitor);
 
   monitor = G_DAEMON_VOLUME_MONITOR (object);
 
@@ -247,7 +248,7 @@ g_daemon_volume_monitor_finalize (GObject *object)
 
   _the_daemon_volume_monitor = NULL;
 
-  g_static_rec_mutex_unlock (&_the_daemon_volume_monitor_mutex);
+  G_UNLOCK (_the_daemon_volume_monitor);
 }
 
 static void
