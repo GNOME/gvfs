@@ -94,7 +94,7 @@ void     g_vfs_job_failed            (GVfsJob     *job,
 				      const gchar *format,
 				      ...) G_GNUC_PRINTF (4, 5);
 void     g_vfs_job_failed_from_error (GVfsJob     *job,
-				      GError      *error);
+				      const GError*error);
 void     g_vfs_job_failed_from_errno (GVfsJob     *job,
 				      gint         errno_arg);
 void     g_vfs_job_succeeded         (GVfsJob     *job);

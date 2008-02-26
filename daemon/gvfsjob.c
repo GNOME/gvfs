@@ -244,8 +244,8 @@ g_vfs_job_failed (GVfsJob *job,
 }
 
 void
-g_vfs_job_failed_from_error (GVfsJob *job,
-			     GError *error)
+g_vfs_job_failed_from_error (GVfsJob *     job,
+			     const GError *error)
 {
   if (job->failed)
     return;
