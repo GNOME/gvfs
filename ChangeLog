@@ -1,5 +1,10 @@
 2008-02-26  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsjobmount.c: (mount_failed):
+	no g_warning for failed monts, please
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsjob.c: (g_vfs_job_failed_from_error):
 	* daemon/gvfsjob.h:
 	make the error argument const

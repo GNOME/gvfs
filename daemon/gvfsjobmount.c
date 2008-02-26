@@ -150,7 +150,7 @@ mount_failed (GVfsJobMount *op_job, GError *error)
 	}
     }
   else
-    g_warning ("Mount failed: %s\n", error->message);
+    g_print ("Mount failed: %s\n", error->message);
 
   backend = g_object_ref (op_job->backend);
   g_vfs_job_emit_finished (G_VFS_JOB (op_job));
