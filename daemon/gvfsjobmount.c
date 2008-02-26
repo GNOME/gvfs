@@ -110,13 +110,11 @@ run (GVfsJob *job)
       return;
     }
   
-  g_object_ref (backend);
   class->mount (backend,
 		op_job,
 		op_job->mount_spec,
 		op_job->mount_source,
 		op_job->is_automount);
-  g_object_unref (backend);
 }
 
 static gboolean
@@ -130,13 +128,11 @@ try (GVfsJob *job)
   if (class->try_mount == NULL)
     return FALSE;
 
-  g_object_ref (backend);
   result = class->try_mount (backend,
 			     op_job,
 			     op_job->mount_spec,
 			     op_job->mount_source,
 			     op_job->is_automount);
-  g_object_unref (backend);
   return result;
 }
 
