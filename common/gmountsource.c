@@ -274,15 +274,15 @@ g_mount_source_ask_password_finish (GMountSource  *source,
                                     char         **domain_out,
 				    GPasswordSave *password_save_out)
 {
-  AskPasswordData *data;
+  AskPasswordData *data, def = { TRUE, };
   GSimpleAsyncResult *simple;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
 
   if (g_simple_async_result_propagate_error (simple, NULL))
-    return FALSE;
-
-  data = (AskPasswordData *) g_simple_async_result_get_op_res_gpointer (simple);
+    data = &def;
+  else
+    data = (AskPasswordData *) g_simple_async_result_get_op_res_gpointer (simple);
 
   if (aborted)
     *aborted = data->aborted;
@@ -308,7 +308,7 @@ g_mount_source_ask_password_finish (GMountSource  *source,
   if (password_save_out)
     *password_save_out = data->password_save;  
   
-  return TRUE;
+  return data != &def;
 }
 
 

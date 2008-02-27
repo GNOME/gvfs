@@ -1,3 +1,8 @@
+2008-02-27  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountsource.c: (g_mount_source_ask_password_finish):
+	Set out parameters even in error case.
+
 2008-02-26  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c: (do_delete):
