@@ -823,7 +823,7 @@ do_query_info (GVfsBackend *backend,
 
       if (track_num > cdda_backend->drive->tracks)
         {
-          error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("The file does not exist"));
+          error = g_error_new (G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("File doesn't exist"));
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           return;
         }

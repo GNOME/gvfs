@@ -1,3 +1,10 @@
+2008-02-27  Luca Ferretti  <elle.uca@libero.it>
+
+	* daemon/gvfsbackendcdda.c: (do_query_info):
+	Make "file don't exist" message conform to other backends;
+	no, it isn't a string freeze break, the message yet exists
+	elsewhere.
+
 2008-02-27  Benjamin Otte  <otte@gnome.org>
 
 	* common/gmountsource.c: (g_mount_source_ask_question_finish):
