@@ -1,5 +1,10 @@
 2008-02-27  Benjamin Otte  <otte@gnome.org>
 
+	* common/gmountsource.c: (g_mount_source_ask_question_finish):
+	Set out parameters for questions, too.
+
+2008-02-27  Benjamin Otte  <otte@gnome.org>
+
 	* common/gmountsource.c: (g_mount_source_ask_password_finish):
 	Set out parameters even in error case.
 

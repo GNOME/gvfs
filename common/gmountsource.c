@@ -626,15 +626,15 @@ g_mount_source_ask_question_finish (GMountSource *source,
 				    gboolean     *aborted,
 				    gint         *choice_out)
 {
-  AskQuestionData *data;
+  AskQuestionData *data, def= { FALSE, };
   GSimpleAsyncResult *simple;
 
   simple = G_SIMPLE_ASYNC_RESULT (result);
 
   if (g_simple_async_result_propagate_error (simple, NULL))
-    return FALSE;
-
-  data = (AskQuestionData *) g_simple_async_result_get_op_res_gpointer (simple);
+    data = &def;
+  else
+    data = (AskQuestionData *) g_simple_async_result_get_op_res_gpointer (simple);
 
   if (aborted)
     *aborted = data->aborted;
@@ -642,7 +642,7 @@ g_mount_source_ask_question_finish (GMountSource *source,
   if (choice_out)
     *choice_out = data->choice;
 
-  return TRUE;	
+  return data != &def;	
 }
 
 static void
