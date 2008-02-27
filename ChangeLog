@@ -1,3 +1,8 @@
+2008-02-27  Benjamin Otte  <otte@gnome.org>
+
+	* programs/gvfs-mount.c: (prompt_for):
+	don't mess up my terminal when entering passwords
+
 2008-02-27  Bastien Nocera  <hadess@hadess.net>
 
 	* client/test-uri-utils.c: add test for obex URIs

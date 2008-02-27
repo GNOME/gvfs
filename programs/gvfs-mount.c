@@ -98,6 +98,9 @@ prompt_for (const char *prompt, const char *default_value, gboolean echo)
   len = strlen (data);
   if (len > 0 && data[len-1] == '\n')
     data[len-1] = 0;
+
+  if (!echo)
+    g_print ("\n");
   
   if (*data == 0 && default_value)
     return g_strdup (default_value);
