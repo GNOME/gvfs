@@ -8,6 +8,7 @@ INCLUDES =					\
 	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
+	$(OBEXFTP_CFLAGS) $(XML_CFLAGS)		\
 	$(KEYRING_CFLAGS)			\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
 	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
@@ -69,13 +70,27 @@ mount_DATA += network.mount
 libexec_PROGRAMS += gvfsd-network
 endif
 
+mount_in_files += obexftp.mount.in
+if USE_OBEXFTP
+mount_DATA += obexftp.mount
+libexec_PROGRAMS += gvfsd-obexftp
+BUILT_SOURCES = obexftp-marshal.c obexftp-marshal.h
+
+obexftp-marshal.h: obexftp-marshal.list
+	glib-genmarshal $< --prefix=obexftp_marshal --header > $@
+
+obexftp-marshal.c: obexftp-marshal.list
+	echo "#include \"obexftp-marshal.h\"" > $@ && glib-genmarshal $< --prefix=obexftp_marshal --body >> $@
+
+endif
+
 mount_in_files += dns-sd.mount.in
 if HAVE_AVAHI
 mount_DATA += dns-sd.mount
 libexec_PROGRAMS += gvfsd-dnssd
 endif
 
-EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files)
+EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files) obexftp-marshal.list
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
 
@@ -182,6 +197,22 @@ gvfsd_smb_browse_CPPFLAGS = \
 	-DBACKEND_TYPES='"smb-network", G_VFS_TYPE_BACKEND_SMB_BROWSE,"smb-server", G_VFS_TYPE_BACKEND_SMB_BROWSE,'
 
 gvfsd_smb_browse_LDADD = $(SAMBA_LIBS)  $(GCONF_LIBS) $(libraries)
+
+gvfsd_obexftp_SOURCES = \
+	gvfsbackendobexftp.c gvfsbackendobexftp.h \
+	obexftp-marshal.c obexftp-marshal.h \
+	gvfsbackendobexftp-fl-parser.c gvfsbackendobexftp-fl-parser.h \
+	gvfsbackendobexftp-cap-parser.c gvfsbackendobexftp-cap-parser.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_obexftp_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendobexftp.h \
+	-DDEFAULT_BACKEND_TYPE=obex \
+	-DMAX_JOB_THREADS=1 \
+	-DBACKEND_TYPES='"obex", G_VFS_TYPE_BACKEND_OBEXFTP,'
+
+gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(XML_LIBS) $(libraries)
 
 gvfsd_ftp_SOURCES = \
 	gvfsbackendftp.c gvfsbackendftp.h \

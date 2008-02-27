@@ -1,3 +1,22 @@
+2008-02-27  Bastien Nocera  <hadess@hadess.net>
+
+	* client/test-uri-utils.c: add test for obex URIs
+	* configure.ac: Require expat for the obexftp backend
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendobexftp-cap-parser.c:
+	* daemon/gvfsbackendobexftp-cap-parser.h:
+	* daemon/gvfsbackendobexftp-fl-parser.c:
+	* daemon/gvfsbackendobexftp-fl-parser.h:
+	Added ObexFTP folder listing and capability parser from
+	gnome-vfs-obexftp, ported to gio
+
+	* daemon/gvfsbackendobexftp.c:
+	* daemon/gvfsbackendobexftp.h:
+	* daemon/obexftp-marshal.list:
+	* daemon/obexftp.mount.in: Add read-only ObexFTP backend
+
+	(Closes: #509621)
+
 2008-02-27  Luca Ferretti  <elle.uca@libero.it>
 
 	* daemon/gvfsbackendcdda.c: (do_query_info):

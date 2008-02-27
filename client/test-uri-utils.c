@@ -13,7 +13,8 @@ typedef struct {
 static TestURIs uris[] = {
 	{ "https://[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]:443/", "[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]", 443 },
 	{ "http://test:443/", "test", 443 },
-	{ "http://test/", "test", -1 }
+	{ "http://test/", "test", -1 },
+	{ "obex://[00:FF:FF:FF:FF:FF]/MMC/foo.jpg", "[00:FF:FF:FF:FF:FF]", -1 }
 };
 
 int main (int argc, char **argv)
