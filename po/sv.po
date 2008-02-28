@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-26 08:53+0100\n"
-"PO-Revision-Date: 2008-02-26 08:54+0100\n"
+"POT-Creation-Date: 2008-02-28 18:50+0100\n"
+"PO-Revision-Date: 2008-02-28 18:53+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -106,6 +106,17 @@ msgstr "Slut på ström"
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
 #: ../client/gdaemonfileoutputstream.c:835
+#: ../daemon/gvfsbackendobexftp.c:577
+#: ../daemon/gvfsbackendobexftp.c:600
+#: ../daemon/gvfsbackendobexftp.c:723
+#: ../daemon/gvfsbackendobexftp.c:862
+#: ../daemon/gvfsbackendobexftp.c:927
+#: ../daemon/gvfsbackendobexftp.c:1056
+#: ../daemon/gvfsbackendobexftp.c:1085
+#: ../daemon/gvfsbackendobexftp.c:1148
+#: ../daemon/gvfsbackendobexftp.c:1172
+#: ../daemon/gvfsbackendobexftp.c:1233
+#: ../daemon/gvfsbackendobexftp.c:1254
 #: ../daemon/gvfsbackendsmb.c:1014
 #: ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120
@@ -208,7 +219,7 @@ msgid "No such file or directory"
 msgstr "Ingen sådan fil eller katalog"
 
 #: ../daemon/gvfsbackendburn.c:426
-#: ../daemon/gvfsbackenddav.c:1682
+#: ../daemon/gvfsbackenddav.c:1756
 msgid "Directory not empty"
 msgstr "Katalogen är inte tom"
 
@@ -314,8 +325,15 @@ msgid "No such file"
 msgstr "Ingen sådan fil"
 
 #: ../daemon/gvfsbackendcdda.c:826
+#: ../daemon/gvfsbackendcomputer.c:571
+#: ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendnetwork.c:587
+#: ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866
+#: ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
-msgid "The file does not exist"
+msgid "File doesn't exist"
 msgstr "Filen finns inte"
 
 #: ../daemon/gvfsbackendcdda.c:833
@@ -331,16 +349,6 @@ msgstr "Dator"
 #: ../daemon/gvfsbackendcomputer.c:465
 msgid "Filesystem"
 msgstr "Filsystem"
-
-#: ../daemon/gvfsbackendcomputer.c:571
-#: ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendnetwork.c:587
-#: ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:866
-#: ../daemon/gvfsbackendsmbbrowse.c:1037
-#: ../daemon/gvfsbackendsmbbrowse.c:1111
-msgid "File doesn't exist"
-msgstr "Filen finns inte"
 
 #: ../daemon/gvfsbackendcomputer.c:589
 #: ../daemon/gvfsbackendtrash.c:635
@@ -375,73 +383,77 @@ msgstr "Kan inte avmontera fil"
 msgid "Can't eject file"
 msgstr "Kan inte mata ut fil"
 
-#: ../daemon/gvfsbackenddav.c:275
-#: ../daemon/gvfsbackenddav.c:1190
-#: ../daemon/gvfsbackenddav.c:1645
+#: ../daemon/gvfsbackenddav.c:282
+#: ../daemon/gvfsbackenddav.c:1258
+#: ../daemon/gvfsbackenddav.c:1719
 #: ../daemon/gvfsbackendhttp.c:215
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP-fel: %s"
 
-#: ../daemon/gvfsbackenddav.c:291
+#: ../daemon/gvfsbackenddav.c:298
 msgid "Could not parse response"
 msgstr "Kunde inte tolka svaret"
 
-#: ../daemon/gvfsbackenddav.c:300
+#: ../daemon/gvfsbackenddav.c:307
 msgid "Empty response"
 msgstr "Tomt svar"
 
-#: ../daemon/gvfsbackenddav.c:307
+#: ../daemon/gvfsbackenddav.c:314
 msgid "Unexpected reply from server"
 msgstr "Oväntat svar från server"
 
-#: ../daemon/gvfsbackenddav.c:910
-#: ../daemon/gvfsbackenddav.c:1303
+#: ../daemon/gvfsbackenddav.c:917
+#: ../daemon/gvfsbackenddav.c:1377
 #, c-format
 msgid "Response invalid"
 msgstr "Svaret är ogiltigt"
 
-#: ../daemon/gvfsbackenddav.c:1001
-msgid "Please enter proxy password"
-msgstr "Ange lösenord för proxyserver"
-
-#: ../daemon/gvfsbackenddav.c:1010
+#: ../daemon/gvfsbackenddav.c:1061
 msgid "WebDAV share"
 msgstr "WebDAV-utdelning"
 
-#: ../daemon/gvfsbackenddav.c:1012
+#. translators: %s here is the display name of the share
+#: ../daemon/gvfsbackenddav.c:1063
+#: ../daemon/gvfsbackendftp.c:733
 #, c-format
 msgid "Enter password for %s"
 msgstr "Ange lösenord för %s"
 
-#: ../daemon/gvfsbackenddav.c:1111
+#: ../daemon/gvfsbackenddav.c:1066
+msgid "Please enter proxy password"
+msgstr "Ange lösenord för proxyserver"
+
+#: ../daemon/gvfsbackenddav.c:1175
 #: ../daemon/gvfsbackendhttp.c:292
+#: ../daemon/gvfsbackendobexftp.c:429
+#: ../daemon/gvfsbackendobexftp.c:440
 #: ../daemon/gvfsbackendsmb.c:594
 msgid "Invalid mount spec"
 msgstr "Ogiltig monteringsspecifikation"
 
-#: ../daemon/gvfsbackenddav.c:1194
-#: ../daemon/gvfsbackenddav.c:1198
+#: ../daemon/gvfsbackenddav.c:1262
+#: ../daemon/gvfsbackenddav.c:1266
 msgid "Not a WebDAV enabled share"
 msgstr "Inte en WebDAV-aktiverad utdelning"
 
-#: ../daemon/gvfsbackenddav.c:1259
-#: ../daemon/gvfsbackenddav.c:1334
+#: ../daemon/gvfsbackenddav.c:1333
+#: ../daemon/gvfsbackenddav.c:1408
 msgid "Could not create request"
 msgstr "Kunde inte skapa begäran"
 
-#: ../daemon/gvfsbackenddav.c:1399
+#: ../daemon/gvfsbackenddav.c:1473
 #: ../daemon/gvfsbackendsmb.c:1726
 msgid "Target file already exists"
 msgstr "Målfilen finns redan"
 
-#: ../daemon/gvfsbackenddav.c:1469
+#: ../daemon/gvfsbackenddav.c:1543
 #: ../daemon/gvfsbackendsftp.c:2689
 #: ../daemon/gvfsbackendsmb.c:982
 msgid "The file was externally modified"
 msgstr "Filen blev externt ändrad"
 
-#: ../daemon/gvfsbackenddav.c:1500
+#: ../daemon/gvfsbackenddav.c:1574
 #: ../daemon/gvfsbackendsmb.c:1020
 #: ../daemon/gvfsbackendsmb.c:1743
 msgid "Backup file creation failed"
@@ -469,16 +481,106 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Nätverk"
 
-#: ../daemon/gvfsbackendftp.c:109
+#: ../daemon/gvfsbackendftp.c:126
+msgid "Accounts are unsupported"
+msgstr "Konton stöds inte"
+
+#: ../daemon/gvfsbackendftp.c:130
+msgid "Host closed connection"
+msgstr "Värden stängde anslutningen"
+
+#: ../daemon/gvfsbackendftp.c:134
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Kan inte öppna dataanslutning. Kanske förhindrar din brandvägg detta?"
+
+#: ../daemon/gvfsbackendftp.c:138
+msgid "Data connection closed"
+msgstr "Dataanslutning stängd"
+
+#: ../daemon/gvfsbackendftp.c:144
+msgid "File unavailable"
+msgstr "Filen är inte tillgänglig"
+
+#: ../daemon/gvfsbackendftp.c:148
+msgid "Operation failed"
+msgstr "Åtgärden misslyckades"
+
+#: ../daemon/gvfsbackendftp.c:153
+msgid "No space left on server"
+msgstr "Inget ledigt utrymme på servern"
+
+#: ../daemon/gvfsbackendftp.c:161
+msgid "Operation unsupported"
+msgstr "Åtgärden stöds inte"
+
+#: ../daemon/gvfsbackendftp.c:165
+#: ../daemon/gvfsbackendsftp.c:261
+msgid "Permission denied"
+msgstr "Åtkomst nekas"
+
+#: ../daemon/gvfsbackendftp.c:169
+msgid "Page type unknown"
+msgstr "Sidtypen är okänd"
+
+#: ../daemon/gvfsbackendftp.c:173
+msgid "Invalid filename."
+msgstr "Ogiltigt filnamn."
+
+#: ../daemon/gvfsbackendftp.c:177
+msgid "Invalid reply from server."
+msgstr "Ogiltigt svar från servern."
+
+#: ../daemon/gvfsbackendftp.c:253
+#: ../daemon/gvfsbackendftp.c:277
+#: ../daemon/gvfsbackendftp.c:290
+#: ../daemon/gvfsbackendftp.c:306
+#, c-format
+msgid "Invalid reply"
+msgstr "Ogiltigt svar"
+
+#: ../daemon/gvfsbackendftp.c:395
+#, c-format
+msgid "broken transmission"
+msgstr "avbruten överföring"
+
+#: ../daemon/gvfsbackendftp.c:488
+#: ../daemon/gvfsbackendftp.c:607
+#, c-format
+msgid "Could not connect to host"
+msgstr "Kunde inte ansluta till värd"
+
+#: ../daemon/gvfsbackendftp.c:682
+#, c-format
+msgid "Operation cancelled"
+msgstr "Åtgärden avbröts"
+
+#: ../daemon/gvfsbackendftp.c:802
 #: ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "Inget värdnamn angivet"
 
-#: ../daemon/gvfsbackendftp.c:197
-#: ../daemon/gvfsbackendsmb.c:685
-#: ../daemon/gvfsbackendsmb.c:1116
-msgid "Unsupported seek type"
-msgstr "Söktypen stöds inte"
+#. translators: this is the default display name for FTP shares.
+#. * %s is the hostname.
+#: ../daemon/gvfsbackendftp.c:820
+#, c-format
+msgid "FTP on %s"
+msgstr "FTP på %s"
+
+#. translators: this is the display name for FTP shares on a non-default
+#. * port. %s is hostname, %u the used port.
+#: ../daemon/gvfsbackendftp.c:824
+#, c-format
+msgid "FTP on %s:%u"
+msgstr "FTP på %s:%u"
+
+#: ../daemon/gvfsbackendftp.c:1065
+msgid "backups not supported yet"
+msgstr "säkerhetskopior stöds inte än"
+
+#: ../daemon/gvfsbackendftp.c:1307
+#, c-format
+msgid "filename too long"
+msgstr "filnamnet är för långt"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:234
@@ -527,6 +629,7 @@ msgstr "HTTP-klientfel: %s"
 #: ../daemon/gvfsbackendsftp.c:1751
 #: ../daemon/gvfsbackendsmb.c:1229
 #: ../daemon/gvfsbackendtrash.c:960
+#: ../daemon/gvfsdaemonutils.c:206
 msgid " (invalid encoding)"
 msgstr " (ogiltig kodning)"
 
@@ -545,13 +648,17 @@ msgstr "Windows-nätverk"
 msgid "Local Network"
 msgstr "Lokalt nätverk"
 
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:268
+#: ../daemon/gvfsbackendsmb.c:513
+#: ../daemon/gvfsbackendsmb.c:1222
+#, c-format
+msgid "%s on %s"
+msgstr "%s på %s"
+
 #: ../daemon/gvfsbackendsftp.c:253
 msgid "ssh program unexpectedly exited"
 msgstr "ssh-programmet avslutades oväntat"
-
-#: ../daemon/gvfsbackendsftp.c:261
-msgid "Permission denied"
-msgstr "Åtkomst nekas"
 
 #: ../daemon/gvfsbackendsftp.c:268
 msgid "Hostname not known"
@@ -709,17 +816,15 @@ msgstr "Lösenord krävs för utdelningen %s på %s"
 msgid "Internal Error (%s)"
 msgstr "Internt fel (%s)"
 
-#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:513
-#: ../daemon/gvfsbackendsmb.c:1222
-#, c-format
-msgid "%s on %s"
-msgstr "%s på %s"
-
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:560
 msgid "Failed to mount Windows share"
 msgstr "Misslyckades med att montera Windows-utdelning"
+
+#: ../daemon/gvfsbackendsmb.c:685
+#: ../daemon/gvfsbackendsmb.c:1116
+msgid "Unsupported seek type"
+msgstr "Söktypen stöds inte"
 
 #: ../daemon/gvfsbackendsmb.c:1170
 #, c-format
@@ -809,7 +914,7 @@ msgstr "Fel vid sändning av fd: %s"
 #: ../daemon/gvfsjobdelete.c:122
 #: ../daemon/gvfsjobenumerate.c:256
 #: ../daemon/gvfsjobmakedirectory.c:122
-#: ../daemon/gvfsjobmount.c:105
+#: ../daemon/gvfsjobmount.c:109
 #: ../daemon/gvfsjobmountmountable.c:156
 #: ../daemon/gvfsjobmove.c:169
 #: ../daemon/gvfsjobopenforread.c:130
@@ -1344,6 +1449,8 @@ msgstr "FILER... - öppna FILER med registrerade program."
 msgid "Opens the file(s) with the default application registered to handle the type of the file."
 msgstr "Öppnar fil(er) med standardprogrammet registrerat att hantera den typen av fil."
 
+#~ msgid "The file does not exist"
+#~ msgstr "Filen finns inte"
 #~ msgid "Audio Disc on %s"
 #~ msgstr "Ljudskiva på %s"
 #~ msgid "CD Burner"
