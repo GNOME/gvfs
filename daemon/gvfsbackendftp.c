@@ -636,7 +636,7 @@ do_mount (GVfsBackend *backend,
   GError *error = NULL;
 
   /* translators: %s here is the display name of the share */
-  prompt = g_strdup_printf (_("Enter passsword for %s"),
+  prompt = g_strdup_printf (_("Enter password for %s"),
                             g_vfs_backend_get_display_name (backend));
 
   handled = g_mount_source_ask_password (

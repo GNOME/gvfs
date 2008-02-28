@@ -1,5 +1,10 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (do_mount):
+	fix typo (thanks Andre)
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_connection_sendv),
 	(ftp_connection_send), (do_start_write), (do_create), (do_append),
 	(do_replace), (g_vfs_backend_ftp_class_init):
