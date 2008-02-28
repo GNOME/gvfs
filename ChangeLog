@@ -1,5 +1,23 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	reviewed by: A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/daemon-main-generic.c: (main):
+	* daemon/daemon-main.c: (daemon_setup):
+	* daemon/daemon-main.h:
+	* daemon/gvfsbackendcdda.c: (g_vfs_cdda_daemon_init):
+	* daemon/gvfsbackendcdda.h:
+	* daemon/gvfsbackendsmb.c: (g_vfs_smb_daemon_init):
+	* daemon/gvfsbackendsmb.h:
+	* daemon/gvfsbackendsmbbrowse.c: (g_vfs_smb_browse_daemon_init):
+	* daemon/gvfsbackendsmbbrowse.h:
+	provide default application names for the daemons. This is necessary
+	to avoid gnome-keyring from saying "Application" wants access to the
+	keyring, which could sound very evil for a casual user.
+	Adds some more strings for the poor translators, too!
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_mount), (try_mount):
 	rewrite login code to use the keyring if available. Also fix mount
 	specs to be unique and display names to list the user while at it.

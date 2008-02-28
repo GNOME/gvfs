@@ -31,6 +31,7 @@ void          daemon_init       (void);
 GMountSpec   *daemon_parse_args (int         argc,
 				 char       *argv[],
 				 const char *default_type);
+void	      daemon_setup	(void);
 void          daemon_main       (int         argc,
 				 char       *argv[],
 				 int max_job_threads,

@@ -23,6 +23,7 @@
 #include <config.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include "daemon-main.h"
 #include G_STRINGIFY(BACKEND_HEADER)
 
@@ -30,6 +31,11 @@ int
 main (int argc, char *argv[])
 {
   daemon_init ();
+#ifdef BACKEND_SETUP_FUNC
+  BACKEND_SETUP_FUNC ();
+#else
+  daemon_setup ();
+#endif
   daemon_main (argc, argv,
 #ifdef MAX_JOB_THREADS
 	       MAX_JOB_THREADS,

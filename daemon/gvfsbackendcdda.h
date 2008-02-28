@@ -46,6 +46,9 @@ GType g_vfs_backend_cdda_get_type (void) G_GNUC_CONST;
   
 GVfsBackendCdda *g_vfs_backend_cdda_new (void);
 
+#define BACKEND_SETUP_FUNC g_vfs_cdda_daemon_init
+void g_vfs_cdda_daemon_init (void);
+
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_CDDA_H__ */

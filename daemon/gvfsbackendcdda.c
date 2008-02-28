@@ -932,3 +932,9 @@ g_vfs_backend_cdda_class_init (GVfsBackendCddaClass *klass)
   backend_class->query_fs_info = do_query_fs_info;
   backend_class->enumerate = do_enumerate;
 }
+
+void
+g_vfs_cdda_daemon_init (void)
+{
+  g_set_application_name (_("Audio CD Filesystem Service"));
+}

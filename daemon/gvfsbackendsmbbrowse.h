@@ -45,6 +45,9 @@ struct _GVfsBackendSmbBrowseClass
 
 GType g_vfs_backend_smb_browse_get_type (void) G_GNUC_CONST;
   
+#define BACKEND_SETUP_FUNC g_vfs_smb_browse_daemon_init
+void g_vfs_smb_browse_daemon_init (void);
+  
 G_END_DECLS
 
 #endif /* __G_VFS_BACKEND_SMB_BROWSE_H__ */
