@@ -163,7 +163,7 @@ virtual_node_unref (VirtualNode *node)
     virtual_node_free (node, TRUE);
 }
 
-static VirtualNode *
+static G_GNUC_UNUSED VirtualNode *
 virtual_node_ref (VirtualNode *node)
 {
   g_return_val_if_fail (node != NULL, NULL);

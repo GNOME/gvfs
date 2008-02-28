@@ -178,7 +178,7 @@ benchmark_quit_main_loop (void)
 }
 
 static void
-benchmark_timeout (void)
+benchmark_timeout (int signal)
 {
   benchmark_is_running = FALSE;
 }

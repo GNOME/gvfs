@@ -1,5 +1,13 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	gcc warning fixes to be able to compile with -Werror:
+	* daemon/gvfsbackendburn.c:
+	mark virtual_node_ref as unused, because it is
+	* test/benchmark-common.c: (benchmark_timeout):
+	signal handlers take an int argument.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	* configure.ac:
 	list FTP in configuration summary, too
 
