@@ -1,3 +1,17 @@
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsdaemonutils.c: (gvfs_file_info_populate_default),
+	(gvfs_file_info_populate_names),
+	(gvfs_file_info_populate_content_types):
+	* daemon/gvfsdaemonutils.h:
+	add functions that are supposed to set default values on a remote file
+	info structure, so we don't duplicate the code across multiple
+	backends.
+
+	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
+	(ftp_connection_new), (file_info_get_flags), (file_info_query):
+	use it.
+
 2008-02-28  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonvolumemonitor.c:

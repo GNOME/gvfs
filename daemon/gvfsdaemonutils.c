@@ -146,3 +146,167 @@ g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)
   
   return buffer;
 }
+
+/**
+ * gvfs_file_info_populate_default:
+ * @info: file info to populate
+ * @name_string: a bytes string of possibly the full path to the given file
+ * @type: type of this file
+ *
+ * Calls gvfs_file_info_populate_names() and 
+ * gvfs_file_info_populate_content_types() on the given @name_string.
+ **/
+void
+gvfs_file_info_populate_default (GFileInfo  *info,
+                                 const char *name_string,
+			         GFileType   type)
+{
+  char *edit_name;
+
+  g_return_if_fail (G_IS_FILE_INFO (info));
+  g_return_if_fail (name_string != NULL);
+
+  edit_name = gvfs_file_info_populate_names (info, name_string);
+  gvfs_file_info_populate_content_types (info, edit_name, type);
+  g_free (edit_name);
+}
+
+/**
+ * gvfs_file_info_populate_names:
+ * @info: the file info to fill
+ * @name_string: a bytes string of possibly the full path to the given file
+ *
+ * Sets the name of the file info to @name_string and determines display and 
+ * edit name for it.
+ *
+ * Returns: the utf-8 encoded edit name for the given file.
+ **/
+char *
+gvfs_file_info_populate_names (GFileInfo  *info,
+                               const char *name_string)
+{
+  //const char *slash;
+  char *edit_name;
+
+  g_return_val_if_fail (G_IS_FILE_INFO (info), NULL);
+  g_return_val_if_fail (name_string != NULL, NULL);
+
+#if 0
+  slash = strrchr (name_string, '/');
+  if (slash && slash[1])
+    name_string = slash + 1;
+#endif
+  edit_name = g_filename_display_basename (name_string);
+  g_file_info_set_edit_name (info, edit_name);
+
+  if (strstr (edit_name, "\357\277\275") != NULL)
+    {
+      char *display_name;
+      
+      display_name = g_strconcat (edit_name, _(" (invalid encoding)"), NULL);
+      g_file_info_set_display_name (info, display_name);
+      g_free (display_name);
+    }
+  else
+    g_file_info_set_display_name (info, edit_name);
+
+  return edit_name;
+}
+
+/**
+ * gvfs_file_info_populate_content_types:
+ * @info: the file info to fill
+ * @basename: utf-8 encoded base name of file
+ * @type: type of this file
+ *
+ * Takes the base name and guesses content type and icon with it. This function
+ * is intended for remote files. Do not use it for directories.
+ **/
+void
+gvfs_file_info_populate_content_types (GFileInfo  *info,
+				       const char *basename,
+				       GFileType   type)
+{
+  char *free_mimetype = NULL;
+  const char *mimetype;
+  GIcon *icon;
+
+  g_return_if_fail (G_IS_FILE_INFO (info));
+  g_return_if_fail (basename != NULL);
+
+  g_file_info_set_file_type (info, type);
+
+  switch (type)
+    {
+      case G_FILE_TYPE_DIRECTORY:
+	mimetype = "inode/directory";
+	break;
+      case G_FILE_TYPE_SYMBOLIC_LINK:
+	mimetype = "inode/symlink";
+	break;
+      case G_FILE_TYPE_SPECIAL:
+	mimetype = "inode/special";
+	break;
+      case G_FILE_TYPE_SHORTCUT:
+	mimetype = "inode/shortcut";
+	break;
+      case G_FILE_TYPE_MOUNTABLE:
+	mimetype = "inode/mountable";
+	break;
+      case G_FILE_TYPE_REGULAR:
+	free_mimetype = g_content_type_guess (basename, NULL, 0, NULL);
+	mimetype = free_mimetype;
+	break;
+      case G_FILE_TYPE_UNKNOWN:
+      default:
+        mimetype = "application/octet-stream";
+	break;
+    }
+
+  g_file_info_set_content_type (info, mimetype);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
+      
+  if (type == G_FILE_TYPE_DIRECTORY)
+    /* FIXME: or just folder? */
+    icon = g_themed_icon_new ("folder-remote");
+  else if (mimetype)
+    {
+      char *mimetype_icon, *generic_mimetype_icon, *type_icon;
+      const char *p;
+      char *icon_names[3];
+      int i;
+      
+      mimetype_icon = g_strdup (mimetype);
+      g_strdelimit (mimetype_icon, "/", '-');
+      
+      p = strchr (mimetype, '/');
+      if (p == NULL)
+	p = mimetype + strlen (mimetype);
+      
+      generic_mimetype_icon = g_malloc (p - mimetype + strlen ("-x-generic") + 1);
+      memcpy (generic_mimetype_icon, mimetype, p - mimetype);
+      memcpy (generic_mimetype_icon + (p - mimetype), "-x-generic", strlen ("-x-generic"));
+      generic_mimetype_icon[(p - mimetype) + strlen ("-x-generic")] = 0;
+      
+      type_icon = "text-x-generic";
+      
+      i = 0;
+      icon_names[i++] = mimetype_icon;
+      icon_names[i++] = generic_mimetype_icon;
+      if (strcmp (generic_mimetype_icon, type_icon) != 0 &&
+	  strcmp (mimetype_icon, type_icon) != 0) 
+	icon_names[i++] = type_icon;
+
+      icon = g_themed_icon_new_from_names (icon_names, i);
+      
+      g_free (mimetype_icon);
+      g_free (generic_mimetype_icon);
+      
+    }
+
+  g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+
+  g_free (free_mimetype);
+}
+

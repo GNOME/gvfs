@@ -38,6 +38,15 @@ char *       g_error_to_daemon_reply              (GError           *error,
 						   guint32           seq_nr,
 						   gsize            *len_out);
 
+void	     gvfs_file_info_populate_default	  (GFileInfo        *info,
+						   const char       *name_string,
+						   GFileType	     type);
+char *	     gvfs_file_info_populate_names	  (GFileInfo        *info,
+						   const char       *name_string);
+void	     gvfs_file_info_populate_content_types(GFileInfo        *info,
+						   const char       *basename,
+						   GFileType	     type);
+
 G_END_DECLS
 
 #endif /* __G_VFS_DAEMON_UTILS_H__ */

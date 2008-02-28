@@ -43,6 +43,7 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfsdaemonutils.h"
 
 #if 1
 #define DEBUG g_print
@@ -118,7 +119,12 @@ ftp_error_set_from_response (GError **error, guint response)
    * but group responses with the same message. */
   switch (response)
     {
-
+      case 332: /* Need account for login. */
+      case 532: /* Need account for storing files. */
+	/* FIXME: implement a sane way to handle accounts. */
+	code = G_IO_ERROR_NOT_SUPPORTED;
+	msg = _("Accounts are unsupported");
+	break;
       case 421: /* Service not available, closing control connection. */
 	code = G_IO_ERROR_FAILED;
 	msg = _("Host closed connection");
@@ -151,8 +157,6 @@ ftp_error_set_from_response (GError **error, guint response)
       case 502: /* Command not implemented. */
       case 503: /* Bad sequence of commands. */
       case 504: /* Command not implemented for that parameter. */
-      case 532: /* Need account for storing files. */
-	/* FIXME: implement a sane way to handle accounts. */
 	code = G_IO_ERROR_NOT_SUPPORTED;
 	msg = _("Operation unsupported");
 	break;
@@ -491,30 +495,16 @@ ftp_connection_new (SoupAddress * addr,
   if (status == 0)
     goto fail;
 
-  status = ftp_connection_send (conn, RESPONSE_PASS_300, NULL,
+  status = ftp_connection_send (conn, RESPONSE_PASS_300, error,
                                 "USER %s", username);
   if (status == 0)
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-		   _("Invalid username"));
-      goto fail;
-    }
+    goto fail;
   else if (STATUS_GROUP (status) == 3)
     {
-      status = ftp_connection_send (conn, RESPONSE_PASS_300, NULL,
+      status = ftp_connection_send (conn, 0, error,
 				    "PASS %s", password);
       if (status == 0)
-	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-		       _("Invalid password"));
-	  goto fail;
-	}
-      else if (STATUS_GROUP (status) == 3)
-	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		       _("Accounts are not supported"));
-	  goto fail;
-	}
+	goto fail;
     }
 
   /* only binary transfers please */
@@ -1119,7 +1109,6 @@ do_write (GVfsBackend *backend,
 }
 
 typedef enum {
-  FILE_INFO_DISPLAY_NAME = (1 << 0),
   FILE_INFO_SIZE         = (1 << 1),
   FILE_INFO_MTIME	 = (1 << 2),
   FILE_INFO_TYPE         = (1 << 3)
@@ -1130,9 +1119,6 @@ file_info_get_flags (FtpConnection *        conn,
 		     GFileAttributeMatcher *matcher)
 {
   FileInfoFlags flags = 0;
-
-  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
-    flags |= FILE_INFO_DISPLAY_NAME;
 
   if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_SIZE) &&
       (conn->features& FTP_FEATURE_SIZE))
@@ -1154,23 +1140,27 @@ file_info_query (FtpConnection *conn,
 		 GFileInfo *     info,
 		 FileInfoFlags  flags)
 {
+  GFileType type;
   guint response;
 
   DEBUG ("query %s (flags %u)\n", filename, flags);
-  if (flags & FILE_INFO_DISPLAY_NAME)
+
+  if (flags & FILE_INFO_TYPE)
     {
-      char *display_name = g_filename_display_basename (filename);
-
-      if (strstr (display_name, "\357\277\275") != NULL)
-        {
-          char *p = display_name;
-          display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
-          g_free (p);
-        }
-
-      g_file_info_set_display_name (info, display_name);
-      g_free (display_name);
+      /* kind of an evil trick here to determine the type.
+       * We cwd to the given filename.
+       * If it succeeds, it's a directroy, otherwise it's a file.
+       */
+      response = ftp_connection_send (conn, 0, NULL, "CWD %s", filename);
+      if (response == 0)
+	type = G_FILE_TYPE_REGULAR;
+      else
+	type = G_FILE_TYPE_DIRECTORY;
     }
+  else
+    type = G_FILE_TYPE_REGULAR;
+
+  gvfs_file_info_populate_default (info, filename, type);
 
   if (flags & FILE_INFO_SIZE)
     {
@@ -1204,18 +1194,6 @@ file_info_query (FtpConnection *conn,
 	}
     }
 
-  if (flags & FILE_INFO_TYPE)
-    {
-      /* kind of an evil trick here to determine the type.
-       * We cwd to the given filename.
-       * If it succeeds, it's a directroy, otherwise it's a file.
-       */
-      response = ftp_connection_send (conn, 0, NULL, "CWD %s", filename);
-      if (response == 0)
-	g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
-      else
-	g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-    }
 }
 
 static void
