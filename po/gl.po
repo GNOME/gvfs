@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-28 13:31+0100\n"
+"POT-Creation-Date: 2008-02-28 21:08+0100\n"
 "PO-Revision-Date: 2008-02-19 21:45+0100\n"
 "Last-Translator: Ignacio Casal Quinteiro <icq@svn.gnome.org>\n"
 "Language-Team: Galego <proxecto@trasno.net>\n"
@@ -102,12 +102,12 @@ msgstr "Final do fluxo"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:537
-#: ../daemon/gvfsbackendobexftp.c:560 ../daemon/gvfsbackendobexftp.c:684
-#: ../daemon/gvfsbackendobexftp.c:823 ../daemon/gvfsbackendobexftp.c:888
-#: ../daemon/gvfsbackendobexftp.c:1017 ../daemon/gvfsbackendobexftp.c:1046
-#: ../daemon/gvfsbackendobexftp.c:1109 ../daemon/gvfsbackendobexftp.c:1133
-#: ../daemon/gvfsbackendobexftp.c:1194 ../daemon/gvfsbackendobexftp.c:1215
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:577
+#: ../daemon/gvfsbackendobexftp.c:600 ../daemon/gvfsbackendobexftp.c:723
+#: ../daemon/gvfsbackendobexftp.c:862 ../daemon/gvfsbackendobexftp.c:927
+#: ../daemon/gvfsbackendobexftp.c:1056 ../daemon/gvfsbackendobexftp.c:1085
+#: ../daemon/gvfsbackendobexftp.c:1148 ../daemon/gvfsbackendobexftp.c:1172
+#: ../daemon/gvfsbackendobexftp.c:1233 ../daemon/gvfsbackendobexftp.c:1254
 #: ../daemon/gvfsbackendsmb.c:1014 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:297
@@ -201,7 +201,7 @@ msgstr "Imposible crear o directorio temporal"
 msgid "No such file or directory"
 msgstr "O ficheiro ou directorio non existe"
 
-#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1756
+#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1757
 msgid "Directory not empty"
 msgstr "O directorio non está baleiro"
 
@@ -215,7 +215,7 @@ msgid "CD/DVD Creator"
 msgstr "Creador de CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:634
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "O ficheiro non é un directorio"
 
@@ -299,7 +299,7 @@ msgid "No such file"
 msgstr "Non existe o ficheiro"
 
 #: ../daemon/gvfsbackendcdda.c:826 ../daemon/gvfsbackendcomputer.c:571
-#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:587
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:590
 #: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
 #: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
@@ -349,67 +349,66 @@ msgstr "Non se pode desmontar o ficheiro"
 msgid "Can't eject file"
 msgstr "Non se pode expulsar o ficheiro"
 
-#: ../daemon/gvfsbackenddav.c:282 ../daemon/gvfsbackenddav.c:1258
-#: ../daemon/gvfsbackenddav.c:1719 ../daemon/gvfsbackendhttp.c:215
+#: ../daemon/gvfsbackenddav.c:283 ../daemon/gvfsbackenddav.c:1259
+#: ../daemon/gvfsbackenddav.c:1720 ../daemon/gvfsbackendhttp.c:215
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Erro de HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:298
+#: ../daemon/gvfsbackenddav.c:299
 msgid "Could not parse response"
 msgstr "Non se puido analizar a resposta"
 
-#: ../daemon/gvfsbackenddav.c:307
+#: ../daemon/gvfsbackenddav.c:308
 msgid "Empty response"
 msgstr "Resposta baleira"
 
-#: ../daemon/gvfsbackenddav.c:314
+#: ../daemon/gvfsbackenddav.c:315
 msgid "Unexpected reply from server"
 msgstr "Resposta inesperada do servidor"
 
-#: ../daemon/gvfsbackenddav.c:917 ../daemon/gvfsbackenddav.c:1377
+#: ../daemon/gvfsbackenddav.c:918 ../daemon/gvfsbackenddav.c:1378
 #, c-format
 msgid "Response invalid"
 msgstr "Resposta inválida"
 
-#: ../daemon/gvfsbackenddav.c:1061
+#: ../daemon/gvfsbackenddav.c:1062
 msgid "WebDAV share"
 msgstr "Compartición WebDAV"
 
-#. translators: %s here is the display name of the share
-#: ../daemon/gvfsbackenddav.c:1063 ../daemon/gvfsbackendftp.c:639
+#: ../daemon/gvfsbackenddav.c:1064
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introduza contrasinal para %s"
 
-#: ../daemon/gvfsbackenddav.c:1066
+#: ../daemon/gvfsbackenddav.c:1067
 msgid "Please enter proxy password"
 msgstr "Introduza o contrasinal do proxy"
 
-#: ../daemon/gvfsbackenddav.c:1175 ../daemon/gvfsbackendhttp.c:292
-#: ../daemon/gvfsbackendobexftp.c:404 ../daemon/gvfsbackendobexftp.c:415
+#: ../daemon/gvfsbackenddav.c:1176 ../daemon/gvfsbackendhttp.c:292
+#: ../daemon/gvfsbackendobexftp.c:429 ../daemon/gvfsbackendobexftp.c:440
 #: ../daemon/gvfsbackendsmb.c:594
 msgid "Invalid mount spec"
 msgstr "Especificación de montaxe non válida"
 
-#: ../daemon/gvfsbackenddav.c:1262 ../daemon/gvfsbackenddav.c:1266
+#: ../daemon/gvfsbackenddav.c:1263 ../daemon/gvfsbackenddav.c:1267
 msgid "Not a WebDAV enabled share"
 msgstr "Non é unha compartición activada WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1333 ../daemon/gvfsbackenddav.c:1408
+#: ../daemon/gvfsbackenddav.c:1334 ../daemon/gvfsbackenddav.c:1409
 msgid "Could not create request"
 msgstr "Non se puido crear a resposta"
 
-#: ../daemon/gvfsbackenddav.c:1473 ../daemon/gvfsbackendsmb.c:1726
+#: ../daemon/gvfsbackenddav.c:1474 ../daemon/gvfsbackendsmb.c:1726
 msgid "Target file already exists"
 msgstr "O ficheiro obxectivo xa existe"
 
-#: ../daemon/gvfsbackenddav.c:1543 ../daemon/gvfsbackendsftp.c:2689
+#: ../daemon/gvfsbackenddav.c:1544 ../daemon/gvfsbackendsftp.c:2689
 #: ../daemon/gvfsbackendsmb.c:982
 msgid "The file was externally modified"
 msgstr "O ficheiro foi modificado externamente"
 
-#: ../daemon/gvfsbackenddav.c:1574 ../daemon/gvfsbackendsmb.c:1020
+#: ../daemon/gvfsbackenddav.c:1575 ../daemon/gvfsbackendsmb.c:1020
 #: ../daemon/gvfsbackendsmb.c:1743
 msgid "Backup file creation failed"
 msgstr "Fallou a creación do ficheiro de seguranza"
@@ -419,7 +418,7 @@ msgstr "Fallou a creación do ficheiro de seguranza"
 msgid "dns-sd"
 msgstr "dns-sd"
 
-#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:728
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
 msgid "Can't monitor file or directory."
 msgstr "Non se pode monitorizar ficheiros ou directorios."
 
@@ -428,81 +427,97 @@ msgstr "Non se pode monitorizar ficheiros ou directorios."
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:673
-#: ../daemon/gvfsbackendnetwork.c:811 ../daemon/gvfsbackendnetwork.c:812
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
 msgid "Network"
 msgstr "Rede"
 
-#: ../daemon/gvfsbackendftp.c:109
-#, c-format
+#: ../daemon/gvfsbackendftp.c:127
+msgid "Accounts are unsupported"
+msgstr "As contas non están soportadas"
+
+#: ../daemon/gvfsbackendftp.c:131
+msgid "Host closed connection"
+msgstr "O servidor pechou a conexión"
+
+#: ../daemon/gvfsbackendftp.c:135
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr ""
+"Non se pode abrir a conexión de datos. Pode ser que esté a través dun "
+"firewall?"
+
+#: ../daemon/gvfsbackendftp.c:139
+msgid "Data connection closed"
+msgstr "Conexión de datos pechada"
+
+#: ../daemon/gvfsbackendftp.c:145
+msgid "File unavailable"
+msgstr "Ficheiro non dispoñible"
+
+#: ../daemon/gvfsbackendftp.c:149
 msgid "Operation failed"
 msgstr "Fallou a operación"
 
-#: ../daemon/gvfsbackendftp.c:180 ../daemon/gvfsbackendftp.c:204
-#: ../daemon/gvfsbackendftp.c:217 ../daemon/gvfsbackendftp.c:233
+#: ../daemon/gvfsbackendftp.c:154
+msgid "No space left on server"
+msgstr "Sen espazo no servidor"
+
+#: ../daemon/gvfsbackendftp.c:162
+msgid "Operation unsupported"
+msgstr "Operación non soportada"
+
+#: ../daemon/gvfsbackendftp.c:166 ../daemon/gvfsbackendsftp.c:261
+msgid "Permission denied"
+msgstr "Permiso denegado"
+
+#: ../daemon/gvfsbackendftp.c:170
+msgid "Page type unknown"
+msgstr "Tipo de páxina descoñecida"
+
+#: ../daemon/gvfsbackendftp.c:174
+msgid "Invalid filename."
+msgstr "Nome de ficheiro inválido."
+
+#: ../daemon/gvfsbackendftp.c:178
+msgid "Invalid reply from server."
+msgstr "Resposta inválida do servidor."
+
+#: ../daemon/gvfsbackendftp.c:254 ../daemon/gvfsbackendftp.c:278
+#: ../daemon/gvfsbackendftp.c:291 ../daemon/gvfsbackendftp.c:307
 #, c-format
 msgid "Invalid reply"
 msgstr "Resposta inválida"
 
-#: ../daemon/gvfsbackendftp.c:322
+#: ../daemon/gvfsbackendftp.c:396
 #, c-format
 msgid "broken transmission"
 msgstr "transmisión rota"
 
-#: ../daemon/gvfsbackendftp.c:417 ../daemon/gvfsbackendftp.c:513
+#: ../daemon/gvfsbackendftp.c:489 ../daemon/gvfsbackendftp.c:610
 #, c-format
 msgid "Could not connect to host"
 msgstr "Non se puido conectar ao servidor"
 
-#: ../daemon/gvfsbackendftp.c:430
-#, c-format
-msgid "Invalid username"
-msgstr "Nome de usuario inválido"
-
-#: ../daemon/gvfsbackendftp.c:440
-#, c-format
-msgid "Invalid password"
-msgstr "Contrasinal inválido"
-
-#: ../daemon/gvfsbackendftp.c:446
-#, c-format
-msgid "Accounts are not supported"
-msgstr "As contas non están soportadas"
-
-#: ../daemon/gvfsbackendftp.c:588
+#: ../daemon/gvfsbackendftp.c:685
 #, c-format
 msgid "Operation cancelled"
 msgstr "Operación cancelada"
 
-#: ../daemon/gvfsbackendftp.c:708 ../daemon/gvfsbackendsftp.c:1411
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:769
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "Introduza o contrasinal para ftp en %s"
+
+#: ../daemon/gvfsbackendftp.c:874 ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "Non se especificou un nome de servidor"
 
-#. translators: this is the default display name for FTP shares.
-#. * %s is the hostname.
-#: ../daemon/gvfsbackendftp.c:726
-#, c-format
-msgid "FTP on %s"
-msgstr "FTP en %s"
-
-#. translators: this is the display name for FTP shares on a non-default
-#. * port. %s is hostname, %u the used port.
-#: ../daemon/gvfsbackendftp.c:730
-#, c-format
-msgid "FTP on %s:%u"
-msgstr "FTP en %s:%u"
-
-#: ../daemon/gvfsbackendftp.c:971
+#: ../daemon/gvfsbackendftp.c:1123
 msgid "backups not supported yet"
 msgstr "as copias de seguranza non están soportadas todavía"
 
-#: ../daemon/gvfsbackendftp.c:1098 ../daemon/gvfsbackendhttp.c:550
-#: ../daemon/gvfsbackendsftp.c:1751 ../daemon/gvfsbackendsmb.c:1229
-#: ../daemon/gvfsbackendtrash.c:960
-msgid " (invalid encoding)"
-msgstr " (codificación inválida)"
-
-#: ../daemon/gvfsbackendftp.c:1226
+#: ../daemon/gvfsbackendftp.c:1365
 #, c-format
 msgid "filename too long"
 msgstr "o nome de ficheiro é demasiado longo"
@@ -546,22 +561,28 @@ msgstr "gphoto2 montado en %s"
 msgid "HTTP Client Error: %s"
 msgstr "Erro HTTP do cliente: %s"
 
+#: ../daemon/gvfsbackendhttp.c:550 ../daemon/gvfsbackendsftp.c:1751
+#: ../daemon/gvfsbackendsmb.c:1229 ../daemon/gvfsbackendtrash.c:960
+#: ../daemon/gvfsdaemonutils.c:206
+msgid " (invalid encoding)"
+msgstr " (codificación inválida)"
+
 #: ../daemon/gvfsbackendlocaltest.c:853
 msgid "Directory notification not supported"
 msgstr "Non se soporta a notificación de directorios"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:266 ../daemon/gvfsbackendsmbbrowse.c:694
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:694
 msgid "Windows Network"
 msgstr "Rede de Windows"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:389
+#: ../daemon/gvfsbackendnetwork.c:392
 msgid "Local Network"
 msgstr "Rede local"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:262 ../daemon/gvfsbackendsmb.c:513
+#: ../daemon/gvfsbackendobexftp.c:268 ../daemon/gvfsbackendsmb.c:513
 #: ../daemon/gvfsbackendsmb.c:1222
 #, c-format
 msgid "%s on %s"
@@ -570,10 +591,6 @@ msgstr "%s en %s"
 #: ../daemon/gvfsbackendsftp.c:253
 msgid "ssh program unexpectedly exited"
 msgstr "O programa de ssh rematou inesperadamente"
-
-#: ../daemon/gvfsbackendsftp.c:261
-msgid "Permission denied"
-msgstr "Permiso denegado"
 
 #: ../daemon/gvfsbackendsftp.c:268
 msgid "Hostname not known"
@@ -1301,6 +1318,18 @@ msgid ""
 msgstr ""
 "Abre o ficheiro(s) cunha aplicación rexistrada predeterminada para manexar o "
 "tipo do ficheiro."
+
+#~ msgid "Invalid username"
+#~ msgstr "Nome de usuario inválido"
+
+#~ msgid "Invalid password"
+#~ msgstr "Contrasinal inválido"
+
+#~ msgid "FTP on %s"
+#~ msgstr "FTP en %s"
+
+#~ msgid "FTP on %s:%u"
+#~ msgstr "FTP en %s:%u"
 
 #~ msgid "The file does not exist"
 #~ msgstr "O ficheiro non existe"
