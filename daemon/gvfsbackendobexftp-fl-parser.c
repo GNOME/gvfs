@@ -115,13 +115,13 @@ fl_parser_start_node_cb (void        *user_data,
 		return;
 	}
 
-	//FIXME
-#if 0
-	if (info->mime_type == NULL) {
-		info->mime_type = g_strdup (
-			gnome_vfs_mime_type_from_name (info->name));
+	if (g_file_info_get_content_type (info) == NULL) {
+		char *mime_type;
+		mime_type = g_content_type_guess (g_file_info_get_name (info), NULL, 0, NULL);
+		g_file_info_set_content_type (info, mime_type);
+		g_free (mime_type);
 	}
-#endif
+
 	/* Permissions on folders in OBEX has different semantics than POSIX.
 	 * In POSIX, if a folder is not writable, it means that it's content
 	 * can't be removed, whereas in OBEX, it just means that the folder
