@@ -36,14 +36,13 @@ service_DATA = gvfs-daemon.service
 
 libexec_PROGRAMS=gvfsd gvfsd-ftp gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest
 
-mount_in_files = ftp.mount.in sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
+mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
 mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount
-# Disabled until the implementation is working: ftp.mount
 
-mount_in_files += http.mount.in dav.mount.in 
+mount_in_files += http.mount.in dav.mount.in ftp.mount.in 
 if HAVE_HTTP
-mount_DATA += http.mount dav.mount  
-libexec_PROGRAMS += gvfsd-http gvfsd-dav
+mount_DATA += http.mount dav.mount ftp.mount
+libexec_PROGRAMS += gvfsd-http gvfsd-dav gvfsd-ftp
 endif
 
 mount_in_files += smb.mount.in smb-browse.mount.in
@@ -223,9 +222,10 @@ gvfsd_ftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendftp.h \
 	-DDEFAULT_BACKEND_TYPE=ftp \
 	-DMAX_JOB_THREADS=1 \
+	$(HTTP_CFLAGS) \
 	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP,'
 
-gvfsd_ftp_LDADD = $(libraries)
+gvfsd_ftp_LDADD = $(libraries) $(HTTP_LIBS)
 
 gvfsd_sftp_SOURCES = \
 	sftp.h \

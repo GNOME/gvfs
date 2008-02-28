@@ -1,3 +1,11 @@
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendftp.h:
+	drop my current FTP code and continue development in here. Should make
+	testing easier for adventurous people.
+
 2008-02-28  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c (do_query_info): Add

@@ -1,6 +1,6 @@
 /* GIO - GLib Input, Output and Streaming Library
  * 
- * Copyright (C) 2006-2007 Red Hat, Inc.
+ * Copyright (C) 2008 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * Author: Alexander Larsson <alexl@redhat.com>
+ * Author: Benjamin Otte <otte@gnome.org>
  */
 
 #ifndef __G_VFS_BACKEND_FTP_H__
