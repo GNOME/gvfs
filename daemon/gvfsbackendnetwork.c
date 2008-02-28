@@ -47,6 +47,8 @@
 #define PATH_GCONF_GVFS_DNS_SD_DISPLAY_LOCAL "/system/dns_sd/display_local"
 #define PATH_GCONF_GVFS_DNS_SD_EXTRA_DOMAINS "/system/dns_sd/extra_domains"
 
+#define NETWORK_FILE_ATTRIBUTES "standard::name,standard::display-name,standard::target-uri"
+
 typedef struct {
   char *file_name; 
   char *display_name;
@@ -299,7 +301,7 @@ recompute_files (GVfsBackendNetwork *backend)
 
       /* children of current workgroup */
       enumer = g_file_enumerate_children (server_file, 
-                                          "standard::name,standard::display-name", 
+                                          NETWORK_FILE_ATTRIBUTES, 
                                           G_FILE_QUERY_INFO_NONE, 
                                           NULL, NULL);
       if (enumer != NULL)
@@ -357,7 +359,7 @@ recompute_files (GVfsBackendNetwork *backend)
         {
           /* "merged": add local domains to network:/// */
           enumer = g_file_enumerate_children (server_file, 
-                                              "standard::name,standard::display-name", 
+                                              NETWORK_FILE_ATTRIBUTES, 
                                               G_FILE_QUERY_INFO_NONE, 
                                               NULL, NULL);
           if (enumer != NULL)
@@ -366,7 +368,8 @@ recompute_files (GVfsBackendNetwork *backend)
               while (info != NULL)
                 {
                   file_name = g_strconcat("dnssd-domain-", g_file_info_get_name (info), NULL);
-                  link_uri = g_strconcat("dns-sd://local/", g_file_info_get_name (info), NULL);
+                  link_uri = g_strdup(g_file_info_get_attribute_string (info,
+                                      "standard::target-uri"));
                   file = network_file_new (file_name, 
 					   g_file_info_get_display_name (info), 
 					   link_uri, 
