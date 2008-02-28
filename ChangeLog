@@ -1,3 +1,10 @@
+2008-02-28  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c: (g_vfs_network_daemon_init):
+	* daemon/gvfsbackendnetwork.h:
+	Set the default name for the network backend to prevent 
+	possible confusion about "NETWORK Filesystem Service".
+
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_mount):

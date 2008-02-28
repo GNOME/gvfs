@@ -854,3 +854,9 @@ g_vfs_backend_network_class_init (GVfsBackendNetworkClass *klass)
   backend_class->try_create_file_monitor = try_create_monitor;
 }
 
+void 
+g_vfs_network_daemon_init ()
+{
+  g_set_application_name (_("Network Location Monitor"));
+}
+
