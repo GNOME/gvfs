@@ -1,3 +1,8 @@
+2008-02-28  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c (g_vfs_backend_dav_init): 
+	Mark the dav backend as user visible.
+
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_connection_create),

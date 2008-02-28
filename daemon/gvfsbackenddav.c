@@ -114,6 +114,7 @@ g_vfs_backend_dav_finalize (GObject *object)
 static void
 g_vfs_backend_dav_init (GVfsBackendDav *backend)
 {
+  g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), TRUE);
 }
 
 /* ************************************************************************* */
@@ -525,7 +526,7 @@ ms_response_get_propstat (xmlNodeIter *cur_node, MsPropstat *propstat)
 
   status = NULL;
   prop = NULL;
-
+  
   for (iter = pstat_node->children; iter; iter = iter->next)
     {
       if (!node_is_element (iter))
@@ -618,7 +619,7 @@ ms_response_to_file_info (MsResponse *response,
       for (node = propstat.prop_node->children; node; node = node->next)
         {
           if (! node_is_element (node))
-            continue; /* FIXME: check namespace, parse user data nodes*/
+            continue; /* TODO: check namespace, parse user data nodes*/
 
           text = node_get_content (node);
 
@@ -1473,7 +1474,7 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
                         _("Target file already exists"));
       return;
     }
-  /* FIXME: other errors */
+  /* TODO: other errors */
 
   put_msg = message_new_from_uri ("PUT", soup_message_get_uri (msg));
 
@@ -1494,7 +1495,7 @@ try_create (GVfsBackend *backend,
   GVfsBackendHttp *op_backend;
   SoupMessage     *msg;
 
-  /* FIXME: if SoupOutputStream supported chunked requests, we could
+  /* TODO: if SoupOutputStream supported chunked requests, we could
    * use a PUT with "If-None-Match: *" and "Expect: 100-continue"
    */
 
@@ -1543,7 +1544,7 @@ try_replace_checked_etag (SoupSession *session, SoupMessage *msg,
                         _("The file was externally modified"));
       return;
     }
-  /* FIXME: other errors */
+  /* TODO: other errors */
 
   open_for_replace_succeeded (op_backend, job, soup_message_get_uri (msg),
                               soup_message_headers_get (msg->request_headers, "If-Match"));
@@ -1560,7 +1561,7 @@ try_replace (GVfsBackend *backend,
   GVfsBackendHttp *op_backend;
   SoupURI         *uri;
 
-  /* FIXME: if SoupOutputStream supported chunked requests, we could
+  /* TODO: if SoupOutputStream supported chunked requests, we could
    * use a PUT with "If-Match: ..." and "Expect: 100-continue"
    */
 
