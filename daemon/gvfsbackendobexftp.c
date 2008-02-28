@@ -769,6 +769,7 @@ do_query_info (GVfsBackend *backend,
 
   if (_query_file_info_helper (backend, filename, info, &error) == FALSE)
     {
+      g_mutex_unlock (op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;

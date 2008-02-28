@@ -1,3 +1,8 @@
+2008-02-28  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (do_query_info): Add
+	missing mutex unlock, duh!
+
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsjobenumerate.c: (g_vfs_job_enumerate_add_infos):
