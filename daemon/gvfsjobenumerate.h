@@ -70,7 +70,7 @@ GVfsJob *g_vfs_job_enumerate_new        (DBusConnection        *connection,
 void     g_vfs_job_enumerate_add_info   (GVfsJobEnumerate      *job,
 					 GFileInfo             *info);
 void     g_vfs_job_enumerate_add_infos  (GVfsJobEnumerate      *job,
-					 GList                 *info);
+					 const GList           *info);
 void     g_vfs_job_enumerate_done       (GVfsJobEnumerate      *job);
 
 G_END_DECLS

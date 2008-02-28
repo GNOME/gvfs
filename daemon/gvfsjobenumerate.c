@@ -207,9 +207,9 @@ g_vfs_job_enumerate_add_info (GVfsJobEnumerate *job,
 
 void
 g_vfs_job_enumerate_add_infos (GVfsJobEnumerate *job,
-			       GList *infos)
+			       const GList *infos)
 {
-  GList *l;
+  const GList *l;
   GFileInfo *info;
 
   for (l = infos; l != NULL; l = l->next)

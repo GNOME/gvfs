@@ -1,3 +1,9 @@
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsjobenumerate.c: (g_vfs_job_enumerate_add_infos):
+	* daemon/gvfsjobenumerate.h:
+	constify list argument, so ownership is apparent.
+
 2008-02-28  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb):
