@@ -1,3 +1,10 @@
+2008-02-29  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* daemon/gvfsbackendftp.c (g_vfs_backend_ftp_pop_connection):
+
+	Reuse existing string to reduce the impact of the string
+	freeze breaks.
+
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_mount):

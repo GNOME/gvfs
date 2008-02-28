@@ -682,7 +682,7 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
     {
       /* FIXME: need different error on force-unmount? */
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED,
-	           _("Operation cancelled"));
+	           _("Operation was cancelled"));
     }
   else
     conn->cancellable = cancellable;
