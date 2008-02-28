@@ -291,28 +291,19 @@ ftp_connection_receive (FtpConnection *conn,
  *     
  **/
 static guint
-ftp_connection_send (FtpConnection *conn,
-		     ResponseFlags  flags,
-		     GError **	    error,
-		     const char *   format,
-		     ...) G_GNUC_PRINTF (4, 5);
-static guint
-ftp_connection_send (FtpConnection *conn,
-		     ResponseFlags  flags,
-		     GError **	    error,
-		     const char *   format,
-		     ...)
+ftp_connection_sendv (FtpConnection *conn,
+		      ResponseFlags  flags,
+		      GError **	     error,
+		      const char *   format,
+		      va_list	     varargs)
 {
-  va_list varargs;
   GString *command;
   SoupSocketIOStatus status;
   gsize n_bytes;
   guint response;
 
   command = g_string_new ("");
-  va_start (varargs, format);
   g_string_append_vprintf (command, format, varargs);
-  va_end (varargs);
   DEBUG ("--> %s\n", command->str);
   g_string_append (command, "\r\n");
   status = soup_socket_write (conn->commands,
@@ -340,6 +331,32 @@ ftp_connection_send (FtpConnection *conn,
   g_string_free (command, TRUE);
 
   response = ftp_connection_receive (conn, flags, error);
+  return response;
+}
+
+static guint
+ftp_connection_send (FtpConnection *conn,
+		     ResponseFlags  flags,
+		     GError **	    error,
+		     const char *   format,
+		     ...) G_GNUC_PRINTF (4, 5);
+static guint
+ftp_connection_send (FtpConnection *conn,
+		     ResponseFlags  flags,
+		     GError **	    error,
+		     const char *   format,
+		     ...)
+{
+  va_list varargs;
+  guint response;
+
+  va_start (varargs, format);
+  response = ftp_connection_sendv (conn,
+				   flags,
+				   error,
+				   format,
+				   varargs);
+  va_end (varargs);
   return response;
 }
 
@@ -511,6 +528,7 @@ ftp_connection_close_data_connection (FtpConnection *conn)
   g_object_unref (conn->data);
   conn->data = NULL;
 }
+
 /*** BACKEND ***/
 
 static void
@@ -839,13 +857,22 @@ do_read (GVfsBackend *     backend,
   g_error_free (error);
 }
 
-static void
+static gboolean
 do_start_write (GVfsBackendFtp *ftp,
 		FtpConnection *conn,
 		GVfsJobOpenForWrite *job,
-		const char *filename,
-		GFileCreateFlags flags)
+		GFileCreateFlags flags,
+		const char *format,
+		...) G_GNUC_PRINTF (5, 6);
+static gboolean
+do_start_write (GVfsBackendFtp *ftp,
+		FtpConnection *conn,
+		GVfsJobOpenForWrite *job,
+		GFileCreateFlags flags,
+		const char *format,
+		...)
 {
+  va_list varargs;
   GError *error = NULL;
   guint status;
 
@@ -853,10 +880,13 @@ do_start_write (GVfsBackendFtp *ftp,
   if (!ftp_connection_ensure_data_connection (conn, &error))
     goto error;
 
-  status = ftp_connection_send (conn,
+  va_start (varargs, format);
+  status = ftp_connection_sendv (conn,
 				RESPONSE_PASS_100 | RESPONSE_FAIL_200,
 				&error,
-                                "STOR %s", filename);
+				format,
+				varargs);
+  va_end (varargs);
   if (status == 0)
     goto error;
 
@@ -865,12 +895,13 @@ do_start_write (GVfsBackendFtp *ftp,
   g_vfs_job_open_for_write_set_handle (job, conn);
   g_vfs_job_open_for_write_set_can_seek (job, FALSE);
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  return;
+  return TRUE;
 
 error:
   g_vfs_backend_ftp_push_connection (ftp, conn);
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
   g_error_free (error);
+  return FALSE;
 }
 
 static void
@@ -887,7 +918,30 @@ do_create (GVfsBackend *backend,
   if (conn == NULL)
     goto error;
 
-  do_start_write (ftp, conn, job, filename, flags);
+  do_start_write (ftp, conn, job, flags, "STOR %s", filename);
+  return;
+
+error:
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+}
+
+static void
+do_append (GVfsBackend *backend,
+	   GVfsJobOpenForWrite *job,
+	   const char *filename,
+	   GFileCreateFlags flags)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  FtpConnection *conn;
+  GError *error = NULL;
+
+  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job)->cancellable, &error);
+  if (conn == NULL)
+    goto error;
+
+  do_start_write (ftp, conn, job, flags, "APPE %s", filename);
   return;
 
 error:
@@ -922,7 +976,7 @@ do_replace (GVfsBackend *backend,
   if (conn == NULL)
     goto error;
 
-  do_start_write (ftp, conn, job, filename, flags);
+  do_start_write (ftp, conn, job, flags, "STOR %s", filename);
   return;
 
 error:
@@ -1271,6 +1325,7 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->close_read = do_close_read;
   backend_class->read = do_read;
   backend_class->create = do_create;
+  backend_class->append_to = do_append;
   backend_class->replace = do_replace;
   backend_class->close_write = do_close_write;
   backend_class->write = do_write;

@@ -1,5 +1,12 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_connection_sendv),
+	(ftp_connection_send), (do_start_write), (do_create), (do_append),
+	(do_replace), (g_vfs_backend_ftp_class_init):
+	implement append
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	gcc warning fixes to be able to compile with -Werror:
 	* daemon/gvfsbackendburn.c:
 	mark virtual_node_ref as unused, because it is
