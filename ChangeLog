@@ -1,3 +1,8 @@
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	actually translate the display name
+
 2008-02-28  A. Walton  <awalton@svn.gnome.org>
 
 	* daemon/gvfsbackendnetwork.c: (g_vfs_network_daemon_init):

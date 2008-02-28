@@ -831,12 +831,12 @@ try_login:
     }
   if (g_str_equal (ftp->user, "anonymous"))
     {
-      display_name = g_strdup_printf ("ftp on %s", host);
+      display_name = g_strdup_printf (_("ftp on %s"), host);
     }
   else
     {
       g_mount_spec_set (mount_spec, "user", ftp->user);
-      display_name = g_strdup_printf ("ftp for %s on %s", ftp->user, host);
+      display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, host);
     }
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_mount_spec_unref (mount_spec);
