@@ -1,5 +1,10 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	* configure.ac:
+	list FTP in configuration summary, too
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/Makefile.am:
 	* daemon/gvfsbackendftp.c:
 	* daemon/gvfsbackendftp.h:

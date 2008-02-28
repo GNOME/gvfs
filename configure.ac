@@ -472,7 +472,7 @@ po/Makefile.in
 echo 
 echo "gvfs configuration summary:"
 echo "
-        HTTP/WebDAV support           $msg_http
+        FTP/HTTP/WebDAV support       $msg_http
         ObexFTP support               $msg_obexftp
 	Samba support:	              $msg_samba
 	FUSE support:                 $msg_fuse
