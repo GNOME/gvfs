@@ -466,11 +466,9 @@ ftp_connection_parse_features (FtpConnection *conn)
 }
 
 static FtpConnection *
-ftp_connection_new (SoupAddress * addr, 
-                    GCancellable *cancellable,
-		    const char *  username,
-		    const char *  password,
-		    GError **	  error)
+ftp_connection_create (SoupAddress * addr, 
+		       GCancellable *cancellable,
+		       GError **     error)
 {
   FtpConnection *conn;
   guint status;
@@ -494,35 +492,72 @@ ftp_connection_new (SoupAddress * addr,
   status = ftp_connection_receive (conn, 0, error);
   if (status == 0)
     goto fail;
+  
+  return conn;
+
+fail:
+  ftp_connection_free (conn);
+  return NULL;
+}
+
+static guint
+ftp_connection_login (FtpConnection *conn,
+		      const char *   username,
+		      const char *   password,
+		      GError **	     error)
+{
+  guint status;
 
   status = ftp_connection_send (conn, RESPONSE_PASS_300, error,
                                 "USER %s", username);
-  if (status == 0)
-    goto fail;
-  else if (STATUS_GROUP (status) == 3)
-    {
-      status = ftp_connection_send (conn, 0, error,
-				    "PASS %s", password);
-      if (status == 0)
-	goto fail;
-    }
+  
+  if (STATUS_GROUP (status) == 3)
+    status = ftp_connection_send (conn, 0, error,
+				  "PASS %s", password);
+
+  return status;
+}
+
+static gboolean
+ftp_connection_use (FtpConnection *conn,
+		    GError **	   error)
+{
+  guint status;
 
   /* only binary transfers please */
   status = ftp_connection_send (conn, 0, error, "TYPE I");
   if (status == 0)
-    goto fail;
+    return FALSE;
 
   /* check supported features */
   status = ftp_connection_send (conn, 0, NULL, "FEAT");
   if (status != 0)
     ftp_connection_parse_features (conn);
 
+  return TRUE;
+}
+
+static FtpConnection *
+ftp_connection_new (SoupAddress * addr, 
+                    GCancellable *cancellable,
+		    const char *  username,
+		    const char *  password,
+		    GError **	  error)
+{
+  FtpConnection *conn;
+
+  conn = ftp_connection_create (addr, cancellable, error);
+  if (conn == NULL)
+    return NULL;
+
+  if (ftp_connection_login (conn, username, password, error) == 0 ||
+      !ftp_connection_use (conn, error))
+    {
+      ftp_connection_free (conn);
+      return NULL;
+    }
 
   return conn;
-
-fail:
-  ftp_connection_free (conn);
-  return NULL;
 }
 
 static gboolean
