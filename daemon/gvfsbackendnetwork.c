@@ -857,6 +857,8 @@ g_vfs_backend_network_class_init (GVfsBackendNetworkClass *klass)
 void 
 g_vfs_network_daemon_init ()
 {
+  /* Translators: this is the friendly name of the 'network://' backend that
+   * shows computers in your local network. */
   g_set_application_name (_("Network Location Monitor"));
 }
 
