@@ -148,7 +148,9 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   if (mount)
     {
       g_warning (G_STRLOC ": Mount was added twice!");
-      goto out;
+      
+      G_UNLOCK (_the_daemon_volume_monitor);
+      return;
     }
 
   if (mount_info->user_visible)
@@ -158,11 +160,19 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
       if (volume != NULL)
         g_daemon_mount_set_foreign_volume (mount, volume);
       daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
-      g_signal_emit_by_name (daemon_monitor, "mount_added", mount);
-    }
 
- out:
+      /* Ref for the signal emission, other ref is owned by volume monitor */
+      g_object_ref (mount);
+    }
+  
   G_UNLOCK (_the_daemon_volume_monitor);
+
+  if (mount)
+    {
+      /* Emit signal outside lock */
+      g_signal_emit_by_name (daemon_monitor, "mount_added", mount);
+      g_object_unref (mount);
+    }
 }
 
 static void
@@ -177,16 +187,19 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
     {
       if (mount_info->user_visible)
 	g_warning (G_STRLOC ": An unknown mount was removed!");
-      goto out;
+      
+      G_UNLOCK (_the_daemon_volume_monitor);
+      return;
     }
 
   daemon_monitor->mounts = g_list_remove (daemon_monitor->mounts, mount);
+  
+  G_UNLOCK (_the_daemon_volume_monitor);
+
   g_signal_emit_by_name (daemon_monitor, "mount_removed", mount);
   g_signal_emit_by_name (mount, "unmounted");
+  
   g_object_unref (mount);
-
- out:
-  G_UNLOCK (_the_daemon_volume_monitor);
 }
 
 static void
