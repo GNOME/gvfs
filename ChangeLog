@@ -1,5 +1,10 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (do_mount):
+	check for errors correctly
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	reviewed by: A. Walton  <awalton@svn.gnome.org>
 
 	* daemon/daemon-main-generic.c: (main):

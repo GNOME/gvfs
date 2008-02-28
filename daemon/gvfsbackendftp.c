@@ -790,7 +790,7 @@ try_login:
       ftp->user = username;
       g_free (ftp->password);
       ftp->password = password;
-      if (ftp_connection_login (conn, username, password, &error))
+      if (ftp_connection_login (conn, username, password, &error) == 0)
 	break;
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
 	goto fail;
