@@ -97,8 +97,13 @@ fl_parser_start_node_cb (void        *user_data,
 		g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
 	}
 	else if (strcmp (node_name, "folder") == 0) {
+		GIcon *icon;
 		g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-		g_file_info_set_content_type (info, "x-directory/normal");
+		g_file_info_set_content_type (info, "inode/directory");
+
+		icon = g_themed_icon_new ("folder");
+		g_file_info_set_icon (info, icon);
+		g_object_unref (icon);
 	} else {
 		g_set_error (data->error,
 			     G_MARKUP_ERROR,
@@ -120,6 +125,20 @@ fl_parser_start_node_cb (void        *user_data,
 		mime_type = g_content_type_guess (g_file_info_get_name (info), NULL, 0, NULL);
 		g_file_info_set_content_type (info, mime_type);
 		g_free (mime_type);
+	}
+
+	if (g_file_info_get_content_type (info) == NULL) {
+		g_file_info_set_content_type (info, "application/octet-stream");
+	}
+
+	if (g_file_info_get_file_type (info) ==  G_FILE_TYPE_REGULAR) {
+		GIcon *icon;
+
+		icon = g_content_type_get_icon (g_file_info_get_content_type (info));
+		if (icon != NULL) {
+			g_file_info_set_icon (info, icon);
+			g_object_unref (icon);
+		}
 	}
 
 	/* Permissions on folders in OBEX has different semantics than POSIX.

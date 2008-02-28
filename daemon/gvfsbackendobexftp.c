@@ -208,6 +208,8 @@ _change_directory (GVfsBackendObexftp *op_backend,
                              G_TYPE_INVALID) == FALSE)
         {
           g_message ("ChangeCurrentFolderToRoot failed");
+          //FIXME change the retval from org.openobex.Error.NotAuthorized to
+          //no such file or directory
           return FALSE;
         }
     }
@@ -252,13 +254,17 @@ _query_file_info_helper (GVfsBackend *backend,
 
   if (strcmp (filename, "/") == 0)
     {
+      GIcon *icon;
       char *display;
 
       /* That happens when you want '/'
        * and we don't have any info about it :( */
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-      g_file_info_set_content_type (info, "x-directory/normal");
+      g_file_info_set_content_type (info, "inode/directory");
       g_file_info_set_name (info, "/");
+      icon = g_themed_icon_new ("bluetooth");
+      g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
       display = g_strdup_printf (_("%s on %s"), "/", op_backend->display_name);
       g_file_info_set_display_name (info, display);
       g_free (display);
@@ -379,6 +385,24 @@ closed_cb (DBusGProxy *proxy, gpointer user_data)
   _exit (1);
 }
 
+static int
+is_connected (DBusGProxy *session_proxy, GVfsJob *job)
+{
+  GError *error = NULL;
+  gboolean connected;
+
+  if (dbus_g_proxy_call (session_proxy, "IsConnected", &error,
+                         G_TYPE_INVALID,
+                         G_TYPE_BOOLEAN, &connected, G_TYPE_INVALID) == FALSE)
+    {
+      g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
+      return -1;
+    }
+
+  return connected;
+}
+
 static void
 do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
@@ -392,6 +416,7 @@ do_mount (GVfsBackend *backend,
   const gchar *path = NULL;
   char *server, *bdaddr;
   GMountSpec *obexftp_mount_spec;
+  gboolean connected;
 
   g_print ("+ do_mount\n");
 
@@ -474,6 +499,21 @@ do_mount (GVfsBackend *backend,
 
   dbus_g_proxy_add_signal(op_backend->session_proxy, "TransferStarted",
                           G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
+
+  /* Now wait until the device is connected */
+  connected = is_connected (op_backend->session_proxy, G_VFS_JOB (job));
+  while (connected == FALSE)
+    {
+      g_usleep (G_USEC_PER_SEC / 100);
+      connected = is_connected (op_backend->session_proxy, G_VFS_JOB (job));
+    }
+
+  if (connected < 0)
+    {
+      //FIXME bail out
+      g_message ("mount failed");
+      return;
+    }
 
   g_free (bdaddr);
 
@@ -615,7 +655,6 @@ do_open_for_read (GVfsBackend *backend,
     {
       op_backend->doing_io = FALSE;
       g_mutex_unlock (op_backend->mutex);
-      g_free (basename);
       close (fd);
       g_vfs_job_failed_from_error (G_VFS_JOB (job),
                                    op_backend->error);

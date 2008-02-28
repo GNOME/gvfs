@@ -1,3 +1,23 @@
+2008-02-28  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb):
+	Fix the content-type of directories (inode/directory, not
+	x-directory/normal as in gnome-vfs)
+	Set file icons from the content-type
+
+	* daemon/gvfsbackendobexftp.c (_change_directory):
+	Add a FIXME, trying to change to a non-existant directory
+	errors out with "permission denied", which isn't the case
+
+	(_query_file_info_helper): set the right content-type and icon
+	for the root folder
+
+	(is_connected), (do_mount): Wait until we're connected to exit from
+	do_mount()
+
+	(do_open_for_read): Fix a crash when opening an inexistant file for
+	read
+
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
