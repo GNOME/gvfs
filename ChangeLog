@@ -1,6 +1,11 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_mount):
+	really check for errors correctly. I need to go to bed.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
 	check for errors correctly
 
 2008-02-28  Benjamin Otte  <otte@gnome.org>

@@ -783,14 +783,18 @@ do_mount (GVfsBackend *backend,
 		        NULL,
 		        &password_save) ||
 	  aborted) 
-	goto fail;
+	{
+	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+		       "%s", _("Password dialog cancelled"));
+	  goto fail;
+	}
 
 try_login:
       g_free (ftp->user);
       ftp->user = username;
       g_free (ftp->password);
       ftp->password = password;
-      if (ftp_connection_login (conn, username, password, &error) == 0)
+      if (ftp_connection_login (conn, username, password, &error) != 0)
 	break;
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
 	goto fail;
