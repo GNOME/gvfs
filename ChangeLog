@@ -1,5 +1,10 @@
 2008-02-28  A. Walton  <awalton@svn.gnome.org>
 
+	* daemon/Makefile.am:
+	Really disable FTP if we don't HAVE_HTTP.
+
+2008-02-28  A. Walton  <awalton@svn.gnome.org>
+
 	* daemon/gvfsbackendnetwork.c: (recompute_files):
 	Fixup DNS-SD exposed links to actually link to the service provided.
 
