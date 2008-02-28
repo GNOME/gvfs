@@ -836,6 +836,7 @@ try_login:
   else
     {
       g_mount_spec_set (mount_spec, "user", ftp->user);
+      /* Translators: the first %s is the username, the second the host name */
       display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, host);
     }
   g_vfs_backend_set_mount_spec (backend, mount_spec);
