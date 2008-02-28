@@ -1,5 +1,12 @@
 2008-02-28  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
+	(file_info_query), (do_query_info):
+	Set sane error messages for ftp error codes.
+	Also remove some excessive debug messages.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_mount):
 	fix typo (thanks Andre)
 

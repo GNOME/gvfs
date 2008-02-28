@@ -101,12 +101,81 @@ ftp_connection_free (FtpConnection *conn)
   g_slice_free (FtpConnection, conn);
 }
 
+/**
+ * ftp_error_set_from_response:
+ * @error: pointer to an error to be set or %NULL
+ * @response: an FTP response code to use as the error message
+ *
+ * Sets an error based on an FTP response code.
+ **/
 static void
 ftp_error_set_from_response (GError **error, guint response)
 {
-  /* FIXME: make error messages nicer */
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               _("Operation failed"));
+  const char *msg;
+  int code;
+
+  /* Please keep this list ordered by response code,
+   * but group responses with the same message. */
+  switch (response)
+    {
+
+      case 421: /* Service not available, closing control connection. */
+	code = G_IO_ERROR_FAILED;
+	msg = _("Host closed connection");
+	break;
+      case 425: /* Can't open data connection. */
+	code = G_IO_ERROR_CLOSED;
+	msg = _("Cannot open data connection. Maybe your firewall prevents this?");
+	break;
+      case 426: /* Connection closed; transfer aborted. */
+	code = G_IO_ERROR_CLOSED;
+	msg = _("Data connection closed");
+	break;
+      case 450: /* Requested file action not taken. File unavailable (e.g., file busy). */
+      case 550: /* Requested action not taken. File unavailable (e.g., file not found, no access). */
+	/* FIXME: This is a lot of different errors */
+	code = G_IO_ERROR_NOT_FOUND;
+	msg = _("File unavailable");
+	break;
+      case 451: /* Requested action aborted: local error in processing. */
+	code = G_IO_ERROR_FAILED;
+	msg = _("Operation failed");
+	break;
+      case 452: /* Requested action not taken. Insufficient storage space in system. */
+      case 552:
+	code = G_IO_ERROR_NO_SPACE;
+	msg = _("No space left on server");
+	break;
+      case 500: /* Syntax error, command unrecognized. */
+      case 501: /* Syntax error in parameters or arguments. */
+      case 502: /* Command not implemented. */
+      case 503: /* Bad sequence of commands. */
+      case 504: /* Command not implemented for that parameter. */
+      case 532: /* Need account for storing files. */
+	/* FIXME: implement a sane way to handle accounts. */
+	code = G_IO_ERROR_NOT_SUPPORTED;
+	msg = _("Operation unsupported");
+	break;
+      case 530: /* Not logged in. */
+	code = G_IO_ERROR_PERMISSION_DENIED;
+	msg = _("Permission denied");
+	break;
+      case 551: /* Requested action aborted: page type unknown. */
+	code = G_IO_ERROR_FAILED;
+	msg = _("Page type unknown");
+	break;
+      case 553: /* Requested action not taken. File name not allowed. */
+	code = G_IO_ERROR_INVALID_FILENAME;
+	msg = _("Invalid filename.");
+	break;
+      default:
+	code = G_IO_ERROR_FAILED;
+	msg = _("Invalid reply from server.");
+	break;
+    }
+
+  DEBUG ("error: %s\n", msg);
+  g_set_error (error, G_IO_ERROR, code, msg);
 }
 
 /**
@@ -1087,7 +1156,7 @@ file_info_query (FtpConnection *conn,
 {
   guint response;
 
-  DEBUG ("%p query %s\n", info, filename);
+  DEBUG ("query %s (flags %u)\n", filename, flags);
   if (flags & FILE_INFO_DISPLAY_NAME)
     {
       char *display_name = g_filename_display_basename (filename);
@@ -1167,7 +1236,6 @@ do_query_info (GVfsBackend *backend,
     goto error;
 
   g_file_info_set_name (info, filename);
-  DEBUG ("%p query %s\n", info, filename);
   flags = file_info_get_flags (conn, matcher);
   file_info_query (conn, filename, info, flags);
 
