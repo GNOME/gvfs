@@ -1,3 +1,9 @@
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount), (try_mount):
+	rewrite login code to use the keyring if available. Also fix mount
+	specs to be unique and display names to list the user while at it.
+
 2008-02-28  A. Walton  <awalton@svn.gnome.org>
 
 	* daemon/Makefile.am:

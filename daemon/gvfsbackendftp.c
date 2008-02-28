@@ -44,6 +44,7 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfsdaemonutils.h"
+#include "gvfskeyring.h"
 
 #if 1
 #define DEBUG g_print
@@ -537,6 +538,7 @@ ftp_connection_use (FtpConnection *conn,
   return TRUE;
 }
 
+#if 0
 static FtpConnection *
 ftp_connection_new (SoupAddress * addr, 
                     GCancellable *cancellable,
@@ -559,6 +561,7 @@ ftp_connection_new (SoupAddress * addr,
 
   return conn;
 }
+#endif
 
 static gboolean
 ftp_connection_ensure_data_connection (FtpConnection *conn, 
@@ -723,63 +726,133 @@ do_mount (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  char *prompt;
+  char *host;
+  char *prompt = NULL;
   char *username;
   char *password;
-  gboolean aborted, handled;
+  char *display_name;
+  gboolean aborted;
   GError *error = NULL;
+  GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
 
-  /* translators: %s here is the display name of the share */
-  prompt = g_strdup_printf (_("Enter password for %s"),
-                            g_vfs_backend_get_display_name (backend));
+  /* FIXME: need to translate this? */
+  if (soup_address_get_port (ftp->addr) == 21)
+    host = g_strdup (soup_address_get_name (ftp->addr));
+  else
+    host = g_strdup_printf ("%s:%u", 
+	                    soup_address_get_name (ftp->addr),
+	                    soup_address_get_port (ftp->addr));
 
-  handled = g_mount_source_ask_password (
-         mount_source,
-         prompt,
-         ftp->user ? ftp->user : "anonymous",
-         NULL,
-         G_ASK_PASSWORD_NEED_USERNAME |
-         G_ASK_PASSWORD_NEED_PASSWORD |
-         G_ASK_PASSWORD_ANONYMOUS_SUPPORTED,
-	 &aborted,
-	 &password,
-	 &username,
-	 NULL,
-	 NULL);
-  if (handled && !aborted)
-    {
-      g_free (ftp->user);
-      g_free (ftp->password);
-      ftp->user = username;
-      ftp->password = password;
-    }
-  else if (handled)
-    { 
-      g_free (username);
-      g_free (password);
-    }
-
-  if (ftp->user == NULL)
-    ftp->user = g_strdup ("anonymous");
-
-  g_free (prompt);
-
-  conn = ftp_connection_new (ftp->addr,
-			     G_VFS_JOB (job)->cancellable,
-			     ftp->user,
-			     ftp->password,
-			     &error);
+  conn = ftp_connection_create (ftp->addr,
+			        G_VFS_JOB (job)->cancellable,
+			        &error);
   if (conn == NULL)
+    goto fail;
+
+  if (ftp->user &&
+      g_vfs_keyring_lookup_password (ftp->user,
+				     soup_address_get_name (ftp->addr),
+				     NULL,
+				     "ftp",
+				     NULL,
+				     NULL,
+				     soup_address_get_port (ftp->addr),
+				     &username,
+				     NULL,
+				     &password))
+      goto try_login;
+
+  while (TRUE)
     {
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      if (prompt == NULL)
+	/* translators: %s here is the hostname */
+	prompt = g_strdup_printf (_("Enter password for ftp on %s"), host);
+
+      if (!g_mount_source_ask_password (
+			mount_source,
+		        prompt,
+			ftp->user ? ftp->user : "anonymous",
+		        NULL,
+		        G_ASK_PASSWORD_NEED_USERNAME |
+		        G_ASK_PASSWORD_NEED_PASSWORD |
+		        G_ASK_PASSWORD_ANONYMOUS_SUPPORTED |
+		        (g_vfs_keyring_is_available () ? G_ASK_PASSWORD_SAVING_SUPPORTED : 0),
+		        &aborted,
+		        &password,
+		        &username,
+		        NULL,
+		        &password_save) ||
+	  aborted) 
+	goto fail;
+
+try_login:
+      g_free (ftp->user);
+      ftp->user = username;
+      g_free (ftp->password);
+      ftp->password = password;
+      if (ftp_connection_login (conn, username, password, &error))
+	break;
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
+	goto fail;
+
       g_error_free (error);
+      error = NULL;
+    }
+  
+  if (prompt)
+    {
+      /* a prompt was created, so we have to save the password */
+      g_vfs_keyring_save_password (ftp->user,
+                                   soup_address_get_name (ftp->addr),
+                                   NULL,
+                                   "ftp",
+				   NULL,
+				   NULL,
+                                   soup_address_get_port (ftp->addr),
+                                   ftp->password,
+                                   password_save);
+      g_free (prompt);
+    }
+
+  if (!ftp_connection_use (conn, &error))
+    goto fail;
+
+  mount_spec = g_mount_spec_new ("ftp");
+  g_mount_spec_set (mount_spec, "host", soup_address_get_name (ftp->addr));
+  if (soup_address_get_port (ftp->addr) != 21)
+    {
+      char *port = g_strdup_printf ("%u", soup_address_get_port (ftp->addr));
+      g_mount_spec_set (mount_spec, "port", port);
+      g_free (port);
+    }
+  if (g_str_equal (ftp->user, "anonymous"))
+    {
+      display_name = g_strdup_printf ("ftp on %s", host);
     }
   else
     {
-      ftp->queue = g_queue_new ();
-      g_vfs_backend_ftp_push_connection (ftp, conn);
-      g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_mount_spec_set (mount_spec, "user", ftp->user);
+      display_name = g_strdup_printf ("ftp for %s on %s", ftp->user, host);
     }
+  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  g_mount_spec_unref (mount_spec);
+
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
+
+  ftp->queue = g_queue_new ();
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_free (host);
+  return;
+
+fail:
+  if (conn)
+    ftp_connection_free (conn);
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+  g_free (host);
 }
 
 static gboolean
@@ -792,7 +865,6 @@ try_mount (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   const char *host, *port_str;
   guint port;
-  char *name;
 
   host = g_mount_spec_get (mount_spec, "host");
   if (host == NULL)
@@ -813,20 +885,6 @@ try_mount (GVfsBackend *backend,
 
   ftp->addr = soup_address_new (host, port);
   ftp->user = g_strdup (g_mount_spec_get (mount_spec, "user"));
-
-  if (port_str == NULL)
-    /* translators: this is the default display name for FTP shares.
-     * %s is the hostname. */
-    name = g_strdup_printf (_("FTP on %s"), host);
-  else
-    /* translators: this is the display name for FTP shares on a non-default
-     * port. %s is hostname, %u the used port. */
-    name = g_strdup_printf (_("FTP on %s:%u"), host, port);
-
-  g_vfs_backend_set_display_name (backend, name);
-  g_free (name);
-  g_vfs_backend_set_mount_spec (backend, mount_spec);
-  g_vfs_backend_set_icon_name (backend, "folder-remote");
 
   return FALSE;
 }
