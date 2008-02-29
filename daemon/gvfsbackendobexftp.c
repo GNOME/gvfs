@@ -61,6 +61,8 @@
 #define ASYNC_PENDING 0
 #define ASYNC_ERROR -1
 
+#define CACHE_LIFESPAN 3
+
 struct _GVfsBackendObexftp
 {
   GVfsBackend parent_instance;
@@ -71,11 +73,17 @@ struct _GVfsBackendObexftp
   DBusGProxy *manager_proxy;
   DBusGProxy *session_proxy;
 
+  /* Use for the async notifications and errors */
   GCond *cond;
   GMutex *mutex;
   int status;
   gboolean doing_io;
   GError *error;
+
+  /* Folders listing cache */
+  char *files_listing;
+  char *directory;
+  time_t time_captured;
 };
 
 typedef struct {
@@ -148,6 +156,8 @@ g_vfs_backend_obexftp_finalize (GObject *object)
   backend = G_VFS_BACKEND_OBEXFTP (object);
 
   g_free (backend->display_name);
+  g_free (backend->files_listing);
+  g_free (backend->directory);
 
   if (backend->session_proxy != NULL)
         g_object_unref (backend->session_proxy);
@@ -240,10 +250,50 @@ _change_directory (GVfsBackendObexftp *op_backend,
 }
 
 static gboolean
+_retrieve_folder_listing (GVfsBackend *backend,
+                          const char *filename,
+                          char **files,
+                          GError **error)
+{
+  GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (backend);
+  time_t current;
+
+  current = time (NULL);
+
+  if (op_backend->directory != NULL &&
+      strcmp (op_backend->directory, filename) == 0 &&
+      op_backend->time_captured > current - CACHE_LIFESPAN)
+    {
+      *files = g_strdup (op_backend->files_listing);
+      return TRUE;
+    }
+  else
+    {
+      g_free (op_backend->directory);
+      op_backend->directory = NULL;
+      g_free (op_backend->files_listing);
+      op_backend->files_listing = NULL;
+    }
+
+  if (dbus_g_proxy_call (op_backend->session_proxy, "RetrieveFolderListing", error,
+                         G_TYPE_INVALID,
+                         G_TYPE_STRING, files, G_TYPE_INVALID) == FALSE)
+    {
+      return FALSE;
+    }
+
+  op_backend->directory = g_strdup (filename);
+  op_backend->files_listing = g_strdup (*files);
+  op_backend->time_captured = time (NULL);
+
+  return TRUE;
+}
+
+static gboolean
 _query_file_info_helper (GVfsBackend *backend,
-                           const char *filename,
-                           GFileInfo *info,
-                           GError **error)
+                         const char *filename,
+                         GFileInfo *info,
+                         GError **error)
 {
   GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (backend);
   char *parent, *basename, *files;
@@ -277,15 +327,15 @@ _query_file_info_helper (GVfsBackend *backend,
       g_free (parent);
       return FALSE;
     }
-  g_free (parent);
 
   files = NULL;
-  if (dbus_g_proxy_call (op_backend->session_proxy, "RetrieveFolderListing", error,
-                         G_TYPE_INVALID,
-                         G_TYPE_STRING, &files, G_TYPE_INVALID) == FALSE)
+  if (_retrieve_folder_listing (backend, parent, &files, error) == FALSE)
     {
+      g_free (parent);
       return FALSE;
     }
+
+  g_free (parent);
 
   if (gvfsbackendobexftp_fl_parser_parse (files, strlen (files), &elements, error) == FALSE)
     {
@@ -990,9 +1040,7 @@ do_enumerate (GVfsBackend *backend,
     }
 
   files = NULL;
-  if (dbus_g_proxy_call (op_backend->session_proxy, "RetrieveFolderListing", &error,
-                         G_TYPE_INVALID,
-                         G_TYPE_STRING, &files, G_TYPE_INVALID) == FALSE)
+  if (_retrieve_folder_listing (backend, filename, &files, &error) == FALSE)
     {
       g_mutex_unlock (op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -1089,9 +1137,7 @@ do_delete (GVfsBackend *backend,
         }
 
       files = NULL;
-      if (dbus_g_proxy_call (op_backend->session_proxy, "RetrieveFolderListing", &error,
-                             G_TYPE_INVALID,
-                             G_TYPE_STRING, &files, G_TYPE_INVALID) == FALSE)
+      if (_retrieve_folder_listing (backend, filename, &files, &error) == FALSE)
         {
           g_mutex_unlock (op_backend->mutex);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);

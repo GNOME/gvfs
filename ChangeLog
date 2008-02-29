@@ -1,3 +1,14 @@
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (g_vfs_backend_obexftp_finalize),
+	(_retrieve_folder_listing), (_query_file_info_helper),
+	(do_open_for_read), (do_query_info), (do_query_fs_info),
+	(do_enumerate), (do_delete): Use a convenience function
+	to load directory listings, implement a simple cache there
+	that keeps folder listings for 3 seconds (should speed up
+	folder enumeration followed by info fetching, as well
+	as checking for non-existant files)
+
 2008-02-29  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsdaemonutils.[ch]:
