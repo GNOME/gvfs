@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-28 22:22+0000\n"
-"PO-Revision-Date: 2008-02-28 23:47+0100\n"
+"POT-Creation-Date: 2008-02-29 00:43+0000\n"
+"PO-Revision-Date: 2008-02-29 12:44+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -102,15 +102,16 @@ msgstr "Final de flujo"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:577
-#: ../daemon/gvfsbackendobexftp.c:600 ../daemon/gvfsbackendobexftp.c:723
-#: ../daemon/gvfsbackendobexftp.c:862 ../daemon/gvfsbackendobexftp.c:927
-#: ../daemon/gvfsbackendobexftp.c:1056 ../daemon/gvfsbackendobexftp.c:1085
-#: ../daemon/gvfsbackendobexftp.c:1148 ../daemon/gvfsbackendobexftp.c:1172
-#: ../daemon/gvfsbackendobexftp.c:1233 ../daemon/gvfsbackendobexftp.c:1254
-#: ../daemon/gvfsbackendsmb.c:1014 ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
-#: ../daemon/gvfschannel.c:297
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:685
+#: ../daemon/gvfsbackendobexftp.c:577 ../daemon/gvfsbackendobexftp.c:600
+#: ../daemon/gvfsbackendobexftp.c:723 ../daemon/gvfsbackendobexftp.c:862
+#: ../daemon/gvfsbackendobexftp.c:927 ../daemon/gvfsbackendobexftp.c:1056
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1148
+#: ../daemon/gvfsbackendobexftp.c:1172 ../daemon/gvfsbackendobexftp.c:1233
+#: ../daemon/gvfsbackendobexftp.c:1254 ../daemon/gvfsbackendsmb.c:1014
+#: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
+#: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
+#, c-format
 msgid "Operation was cancelled"
 msgstr "Se canceló la operación"
 
@@ -221,7 +222,7 @@ msgstr "No se puede copiar un archivo sobre un directorio"
 msgid "CD/DVD Creator"
 msgstr "Creador de CD/DVD"
 
-#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
 #: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
@@ -305,7 +306,7 @@ msgstr "Error al buscar en el flujo en la unidad %s"
 msgid "No such file"
 msgstr "No existe el archivo"
 
-#: ../daemon/gvfsbackendcdda.c:826 ../daemon/gvfsbackendcomputer.c:571
+#: ../daemon/gvfsbackendcdda.c:826 ../daemon/gvfsbackendcomputer.c:573
 #: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:590
 #: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
 #: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
@@ -322,41 +323,45 @@ msgstr "El archivo no existe o no es una pista de sonido"
 msgid "Audio CD Filesystem Service"
 msgstr "Servicio de sistema de archivos de Audio CD"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
+#: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
 msgid "Computer"
 msgstr "Equipo"
 
-#: ../daemon/gvfsbackendcomputer.c:465
+#: ../daemon/gvfsbackendcomputer.c:467
 msgid "Filesystem"
 msgstr "Sistema de archivos"
 
-#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:635
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendtrash.c:635
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
 
-#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:731
+#: ../daemon/gvfsbackendcomputer.c:595 ../daemon/gvfsbackendcomputer.c:733
 msgid "Can't open mountable file"
 msgstr "No se puede abrir el archivo montable"
 
-#: ../daemon/gvfsbackendcomputer.c:779
+#: ../daemon/gvfsbackendcomputer.c:781
 #, c-format
 msgid "Internal error: %s"
 msgstr "Error interno: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:803 ../daemon/gvfsbackendcomputer.c:869
-#: ../daemon/gvfsbackendcomputer.c:969
-msgid "Not a mountable file"
-msgstr "No es un archivo montable"
-
-#: ../daemon/gvfsbackendcomputer.c:826
+#: ../daemon/gvfsbackendcomputer.c:813 ../daemon/gvfsbackendcomputer.c:927
 msgid "Can't mount file"
 msgstr "No se puede montar el archivo"
 
-#: ../daemon/gvfsbackendcomputer.c:884
+#: ../daemon/gvfsbackendcomputer.c:822
+msgid "No media in the drive"
+msgstr "No hay un soporte en la unidad"
+
+#: ../daemon/gvfsbackendcomputer.c:879 ../daemon/gvfsbackendcomputer.c:970
+#: ../daemon/gvfsbackendcomputer.c:1070
+msgid "Not a mountable file"
+msgstr "No es un archivo montable"
+
+#: ../daemon/gvfsbackendcomputer.c:985
 msgid "Can't unmount file"
 msgstr "No se puede desmontar el archivo"
 
-#: ../daemon/gvfsbackendcomputer.c:1000
+#: ../daemon/gvfsbackendcomputer.c:1101
 msgid "Can't eject file"
 msgstr "No se puede expulsar el archivo"
 
@@ -453,7 +458,9 @@ msgstr "El servidor cerró la conexión"
 
 #: ../daemon/gvfsbackendftp.c:135
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr "No se puede abrir la conexión de datos. ¿Quizá su cortafuegos lo esté impidiendo?"
+msgstr ""
+"No se puede abrir la conexión de datos. ¿Quizá su cortafuegos lo esté "
+"impidiendo?"
 
 #: ../daemon/gvfsbackendftp.c:139
 msgid "Data connection closed"
@@ -507,11 +514,6 @@ msgstr "transmisión rota"
 msgid "Could not connect to host"
 msgstr "No se pudo conectar con el equipo"
 
-#: ../daemon/gvfsbackendftp.c:685
-#, c-format
-msgid "Operation cancelled"
-msgstr "Operación cancelada"
-
 #. translators: %s here is the hostname
 #: ../daemon/gvfsbackendftp.c:769
 #, c-format
@@ -527,20 +529,21 @@ msgstr "Se canceló el diálogo de la contraseña"
 msgid "ftp on %s"
 msgstr "ftp en %s"
 
-#: ../daemon/gvfsbackendftp.c:839
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:840
 #, c-format
 msgid "ftp as %s on %s"
-msgstr ""
+msgstr "%s en el ftp de %s"
 
-#: ../daemon/gvfsbackendftp.c:878 ../daemon/gvfsbackendsftp.c:1411
+#: ../daemon/gvfsbackendftp.c:879 ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "No se especificó un nombre de servidor"
 
-#: ../daemon/gvfsbackendftp.c:1127
+#: ../daemon/gvfsbackendftp.c:1128
 msgid "backups not supported yet"
 msgstr "aún no se soportan los respaldos"
 
-#: ../daemon/gvfsbackendftp.c:1369
+#: ../daemon/gvfsbackendftp.c:1370
 #, c-format
 msgid "filename too long"
 msgstr "el nombre de archivo es demasiado largo"
@@ -604,9 +607,11 @@ msgstr "Red de Windows"
 msgid "Local Network"
 msgstr "Red local"
 
-#: ../daemon/gvfsbackendnetwork.c:860
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:862
 msgid "Network Location Monitor"
-msgstr ""
+msgstr "Monitor de ubicación de red"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendobexftp.c:268 ../daemon/gvfsbackendsmb.c:513
