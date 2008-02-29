@@ -1,5 +1,10 @@
 2008-02-29  Bastien Nocera  <hadess@hadess.net>
 
+	* daemon/gvfsbackendobexftp.c (_get_icon_from_type):
+	Use better icons for the devices
+
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
 	* daemon/gvfsbackendobexftp.c (_get_icon_from_type),
 	(_get_type_from_class), (_get_device_properties),
 	(do_mount): When getting the remote device's name, also get

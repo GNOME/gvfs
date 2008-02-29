@@ -115,13 +115,13 @@ _get_icon_from_type (guint type)
   switch (type)
     {
     case BLUETOOTH_TYPE_PHONE:
-      return "stock_cell-phone";
+      return "phone";
       break;
     case BLUETOOTH_TYPE_MODEM:
       return "modem";
       break;
     case BLUETOOTH_TYPE_COMPUTER:
-      return "computer";
+      return "network-server";
       break;
     case BLUETOOTH_TYPE_NETWORK:
       return "network-wireless";
