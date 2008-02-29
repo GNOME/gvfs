@@ -915,7 +915,7 @@ dbus_source_add_watch (DBusSource *dbus_source,
   handler->dbus_source = dbus_source;
   handler->watch = watch;
 
-#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+#if (DBUS_MAJOR_VERSION == 1 && DBUS_MINOR_VERSION == 1 && DBUS_MICRO_VERSION >= 1) || (DBUS_MAJOR_VERSION == 1 && DBUS_MINOR_VERSION > 1) || (DBUS_MAJOR_VERSION > 1)
   fd = dbus_watch_get_unix_fd (watch);
 #else
   fd = dbus_watch_get_fd (watch);
