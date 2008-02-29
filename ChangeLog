@@ -1,5 +1,13 @@
 2008-02-29  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsdaemonutils.[ch]:
+	Rename gvfs_file_info_populate_names() to
+        gvfs_file_info_populate_names_as_local() and
+	add docs explaining when to use this function
+	and when not to.
+
+2008-02-29  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsdaemonutils.c:
         (gvfs_file_info_populate_content_types):
 	Use g_content_type_get_icon() for the icon mapping.

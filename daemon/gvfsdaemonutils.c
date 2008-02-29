@@ -153,7 +153,7 @@ g_error_to_daemon_reply (GError *error, guint32 seq_nr, gsize *len_out)
  * @name_string: a bytes string of possibly the full path to the given file
  * @type: type of this file
  *
- * Calls gvfs_file_info_populate_names() and 
+ * Calls gvfs_file_info_populate_names_as_local() and 
  * gvfs_file_info_populate_content_types() on the given @name_string.
  **/
 void
@@ -166,24 +166,29 @@ gvfs_file_info_populate_default (GFileInfo  *info,
   g_return_if_fail (G_IS_FILE_INFO (info));
   g_return_if_fail (name_string != NULL);
 
-  edit_name = gvfs_file_info_populate_names (info, name_string);
+  edit_name = gvfs_file_info_populate_names_as_local (info, name_string);
   gvfs_file_info_populate_content_types (info, edit_name, type);
   g_free (edit_name);
 }
 
 /**
- * gvfs_file_info_populate_names:
+ * gvfs_file_info_populate_names_as_local:
  * @info: the file info to fill
  * @name_string: a bytes string of possibly the full path to the given file
  *
  * Sets the name of the file info to @name_string and determines display and 
  * edit name for it.
  *
+ * This generates the display name based on what encoding is used for local filenames.
+ * It might be a good thing to use if you have no idea of the remote system filename
+ * encoding, but if you know the actual encoding use, or if you allow per-mount
+ * configuration of filename encoding in your backend you should not use this.
+ * 
  * Returns: the utf-8 encoded edit name for the given file.
  **/
 char *
-gvfs_file_info_populate_names (GFileInfo  *info,
-                               const char *name_string)
+gvfs_file_info_populate_names_as_local (GFileInfo  *info,
+					const char *name_string)
 {
   //const char *slash;
   char *edit_name;
