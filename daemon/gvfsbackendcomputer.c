@@ -18,7 +18,8 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * Author: Alexander Larsson <alexl@redhat.com>
+ * Authors: Alexander Larsson <alexl@redhat.com>
+ *          Cosimo Cecchi <cosimoc@gnome.org>
  */
 
 
@@ -426,6 +427,7 @@ recompute_files (GVfsBackendComputer *backend)
           file->icon = g_drive_get_icon (file->drive);
           file->display_name = g_drive_get_name (file->drive);
           file->can_eject = g_drive_can_eject (file->drive);
+          file->can_mount = TRUE;
         }
 
       if (file->drive)
@@ -785,6 +787,80 @@ mount_volume_cb (GObject *source_object,
     }
 }
 
+static void
+mount_volume_from_drive (GDrive *drive, 
+                         GVfsJob *job,
+                         GMountOperation *mount_op)
+{
+  GList *volumes;
+  GVolume *volume;
+
+  volumes = g_drive_get_volumes (drive);
+  volume = G_VOLUME (volumes->data);
+  if (volume)
+    {
+      g_volume_mount (volume,
+                      0,
+                      mount_op,
+                      G_VFS_JOB (job)->cancellable,
+                      mount_volume_cb,
+                      job);
+    }
+  else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Can't mount file"));
+    }
+}
+
+static void
+report_no_media_error (GVfsJob *job)
+{
+  g_vfs_job_failed (job, G_IO_ERROR,
+                    G_IO_ERROR_NOT_SUPPORTED,
+                    _("No media in the drive"));
+}
+
+typedef struct {
+  GVfsJobMountMountable *job;
+  GMountOperation *mount_op;
+} PollForMediaData;
+
+static void
+poll_for_media_cb (GObject *source_object,
+                   GAsyncResult *res,
+                   gpointer user_data)
+{
+  PollForMediaData *data = user_data;
+  GDrive *drive;
+  GError *error;
+  
+  drive = G_DRIVE (source_object);
+  error = NULL;
+  
+  if (g_drive_poll_for_media_finish (drive, res, &error))
+    {
+      gboolean has_media;
+      has_media = g_drive_has_media (drive);
+
+      if (!has_media)
+        {
+          report_no_media_error (G_VFS_JOB (data->job));
+        }
+      else
+        {
+          mount_volume_from_drive (drive, G_VFS_JOB (data->job), data->mount_op);
+	  g_slice_free (PollForMediaData, data);
+        }
+    }
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (data->job), error);
+      g_error_free (error);
+    }
+}
+
 static gboolean
 try_mount_mountable (GVfsBackend *backend,
                      GVfsJobMountMountable *job,
@@ -813,12 +889,37 @@ try_mount_mountable (GVfsBackend *backend,
                           mount_volume_cb,
                           job);
         }
-#if 0
+
       else if (file->drive)
         {
-          /* TODO: Poll for media? */
+          if (!g_drive_has_media (file->drive))
+            {
+              if (!g_drive_can_poll_for_media (file->drive))
+                  report_no_media_error (G_VFS_JOB (job));
+              else
+                {
+                  PollForMediaData *data;
+
+                  data = g_slice_new0 (PollForMediaData);
+                  mount_op = g_mount_source_get_operation (mount_source);
+                  data->job = job;
+                  data->mount_op = mount_op;
+                  if (!g_drive_is_media_check_automatic (file->drive))
+                    g_drive_poll_for_media (file->drive,
+                                            G_VFS_JOB (job)->cancellable,
+                                            poll_for_media_cb,
+                                            data);
+                  else
+                    report_no_media_error (G_VFS_JOB (job));
+                }
+            }
+          else
+            {
+              mount_op = g_mount_source_get_operation (mount_source);
+              mount_volume_from_drive (file->drive, G_VFS_JOB (job), mount_op);
+            }
         }
-#endif
+
       else
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,

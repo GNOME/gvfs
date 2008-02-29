@@ -1,3 +1,11 @@
+2008-02-29  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendcomputer.c: (recompute_files),
+	(mount_volume_from_drive), (report_no_media_error),
+	(poll_for_media_cb), (try_mount_mountable):
+	Implement media polling for Computer backend, handling the case when
+	no media is in the drive. Also adds a new string. (#514135)
+
 2008-02-29  Wouter Bolsterlee  <wbolster@svn.gnome.org>
 
 	* daemon/gvfsbackendnetwork.c (g_vfs_network_daemon_init):
