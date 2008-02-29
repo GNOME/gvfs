@@ -94,8 +94,110 @@ typedef struct {
 
 G_DEFINE_TYPE (GVfsBackendObexftp, g_vfs_backend_obexftp, G_VFS_TYPE_BACKEND);
 
+/* This should all live in bluez-gnome, and we
+ * should depend on it */
+enum {
+    BLUETOOTH_TYPE_ANY        = 1,
+    BLUETOOTH_TYPE_PHONE      = 1 << 1,
+    BLUETOOTH_TYPE_MODEM      = 1 << 2,
+    BLUETOOTH_TYPE_COMPUTER   = 1 << 3,
+    BLUETOOTH_TYPE_NETWORK    = 1 << 4,
+    BLUETOOTH_TYPE_HEADSET    = 1 << 5,
+    BLUETOOTH_TYPE_KEYBOARD   = 1 << 6,
+    BLUETOOTH_TYPE_MOUSE      = 1 << 7,
+    BLUETOOTH_TYPE_CAMERA     = 1 << 8,
+    BLUETOOTH_TYPE_PRINTER    = 1 << 9 
+};
+
+static const char *
+_get_icon_from_type (guint type)
+{
+  switch (type)
+    {
+    case BLUETOOTH_TYPE_PHONE:
+      return "stock_cell-phone";
+      break;
+    case BLUETOOTH_TYPE_MODEM:
+      return "modem";
+      break;
+    case BLUETOOTH_TYPE_COMPUTER:
+      return "computer";
+      break;
+    case BLUETOOTH_TYPE_NETWORK:
+      return "network-wireless";
+      break;
+    case BLUETOOTH_TYPE_HEADSET:
+      return "stock_headphones";
+      break;
+    case BLUETOOTH_TYPE_KEYBOARD:
+      return "input-keyboard";
+      break;
+    case BLUETOOTH_TYPE_MOUSE:
+      return "input-mouse";
+      break;
+    case BLUETOOTH_TYPE_CAMERA:
+      return "camera-photo";
+      break;
+    case BLUETOOTH_TYPE_PRINTER:
+      return "printer";
+      break;
+    default:
+      return "bluetooth";
+      break;
+    }
+}
+
+static int
+_get_type_from_class (guint class)
+{
+  switch ((class & 0x1f00) >> 8)
+    {
+    case 0x01:
+      return BLUETOOTH_TYPE_COMPUTER;
+    case 0x02:
+      switch ((class & 0xfc) >> 2)
+        {
+        case 0x01:
+        case 0x02:
+        case 0x03:
+        case 0x05:
+          return BLUETOOTH_TYPE_PHONE;
+        case 0x04:
+          return BLUETOOTH_TYPE_MODEM;
+        }
+      break;
+    case 0x03:
+      return BLUETOOTH_TYPE_NETWORK;
+    case 0x04:
+      switch ((class & 0xfc) >> 2)
+        {
+        case 0x01:
+          return BLUETOOTH_TYPE_HEADSET;
+        }
+      break;
+    case 0x05:
+      switch ((class & 0xc0) >> 6)
+        {
+        case 0x01:
+          return BLUETOOTH_TYPE_KEYBOARD;
+        case 0x02:
+          return BLUETOOTH_TYPE_MOUSE;
+        }
+      break;
+    case 0x06:
+      if (class & 0x80)
+            return BLUETOOTH_TYPE_PRINTER;
+      if (class & 0x20)
+            return BLUETOOTH_TYPE_CAMERA;
+      break;
+    }
+
+  return BLUETOOTH_TYPE_ANY;
+
+}
+
 static gchar *
-get_device_name (const char *bdaddr)
+_get_device_properties (const char *bdaddr, guint32 *type)
 {
   DBusGConnection *connection;
   DBusGProxy *manager;
@@ -135,6 +237,18 @@ get_device_name (const char *bdaddr)
         {
           if (name != NULL && name[0] != '\0')
             {
+              guint32 class;
+
+              if (dbus_g_proxy_call(adapter, "GetRemoteClass", NULL,
+                                    G_TYPE_STRING, bdaddr, G_TYPE_INVALID,
+                                    G_TYPE_UINT, &class, G_TYPE_INVALID) != FALSE)
+                {
+                  *type = _get_type_from_class (class);
+                }
+              else
+                {
+                  *type = BLUETOOTH_TYPE_ANY;
+                }
               g_object_unref (adapter);
               break;
             }
@@ -467,6 +581,7 @@ do_mount (GVfsBackend *backend,
   char *server, *bdaddr;
   GMountSpec *obexftp_mount_spec;
   gboolean connected;
+  guint32 type;
 
   g_print ("+ do_mount\n");
 
@@ -512,13 +627,14 @@ do_mount (GVfsBackend *backend,
                                                          path,
                                                          "org.openobex.Session");
 
-  op_backend->display_name = get_device_name (bdaddr);
+  op_backend->display_name = _get_device_properties (bdaddr, &type);
   if (!op_backend->display_name)
         op_backend->display_name = g_strdup (bdaddr);
 
   g_vfs_backend_set_display_name (G_VFS_BACKEND  (op_backend),
                                   op_backend->display_name);
-  g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend), "bluetooth");
+  g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend),
+                               _get_icon_from_type (type));
 
   obexftp_mount_spec = g_mount_spec_new ("obex");
   server = g_strdup_printf ("[%s]", bdaddr);

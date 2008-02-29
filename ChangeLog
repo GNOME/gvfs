@@ -1,3 +1,11 @@
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_get_icon_from_type),
+	(_get_type_from_class), (_get_device_properties),
+	(do_mount): When getting the remote device's name, also get
+	its class, so we can use device specific icons instead of the 
+	standard Bluetooth icon (Closes: #519369)
+
 2008-02-29  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
