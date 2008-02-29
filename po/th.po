@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-26 17:25+0700\n"
-"PO-Revision-Date: 2008-02-26 17:29+0700\n"
+"POT-Creation-Date: 2008-02-29 09:58+0700\n"
+"PO-Revision-Date: 2008-02-29 10:48+0700\n"
 "Last-Translator: Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "Language-Team: Thai <thai-l10n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -100,9 +100,16 @@ msgstr "จบสตรีม"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:1014
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:685
+#: ../daemon/gvfsbackendobexftp.c:577 ../daemon/gvfsbackendobexftp.c:600
+#: ../daemon/gvfsbackendobexftp.c:723 ../daemon/gvfsbackendobexftp.c:862
+#: ../daemon/gvfsbackendobexftp.c:927 ../daemon/gvfsbackendobexftp.c:1056
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1148
+#: ../daemon/gvfsbackendobexftp.c:1172 ../daemon/gvfsbackendobexftp.c:1233
+#: ../daemon/gvfsbackendobexftp.c:1254 ../daemon/gvfsbackendsmb.c:1014
 #: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
 #: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
+#, c-format
 msgid "Operation was cancelled"
 msgstr "ปฏิบัติการถูกยกเลิก"
 
@@ -143,37 +150,44 @@ msgstr "รูปแบบของข้อมูลเกี่ยวกับ
 msgid "Invalid attribute info list content"
 msgstr "เนื้อหารายการข้อมูลคุณลักษณะผิดพลาด"
 
-#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:192
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "เกิดข้อผิดพลาดขณะเชื่อมต่อไปยัง D-Bus: %s"
 
-#: ../daemon/daemon-main.c:83
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+#: ../daemon/daemon-main.c:78
+#, c-format
+msgid "%s Filesystem Service"
+msgstr "บริการระบบแฟ้ม %s"
+
+#: ../daemon/daemon-main.c:97
 #, c-format
 msgid "Error: %s"
 msgstr "ผิดพลาด: %s"
 
-#: ../daemon/daemon-main.c:117
+#: ../daemon/daemon-main.c:131
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "วิธีใช้: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:141 ../daemon/daemon-main.c:159
+#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "วิธีใช้: %s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:157
+#: ../daemon/daemon-main.c:171
 #, c-format
 msgid "No mount type specified"
 msgstr "ไม่ได้ระบุชนิดของการเมานท์"
 
-#: ../daemon/daemon-main.c:227
+#: ../daemon/daemon-main.c:241
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "จุดเมานท์สำหรับ %s ได้ทำงานอยู่แล้ว"
 
-#: ../daemon/daemon-main.c:238
+#: ../daemon/daemon-main.c:252
 msgid "error starting mount daemon"
 msgstr "เกิดข้อผิดพลาดขณะตั้งต้นดีมอนสำหรับเมานท์"
 
@@ -193,7 +207,7 @@ msgstr "ไม่สามารถสร้างไดเรกทอรีช
 msgid "No such file or directory"
 msgstr "ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าว"
 
-#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1682
+#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1757
 msgid "Directory not empty"
 msgstr "ไดเรกทอรีไม่ว่าง"
 
@@ -206,8 +220,8 @@ msgstr "ไม่สามารถคัดลอกแฟ้มทับได
 msgid "CD/DVD Creator"
 msgstr "แบ็กเอนด์เขียนซีดี/ดีวีดี"
 
-#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:634
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "แฟ้มดังกล่าวไม่ใช่ไดเรกทอรี"
 
@@ -289,120 +303,125 @@ msgstr "เกิดข้อผิดพลาดขณะเลื่อนต
 msgid "No such file"
 msgstr "ไม่มีแฟ้มดังกล่าว"
 
-#: ../daemon/gvfsbackendcdda.c:826
+#: ../daemon/gvfsbackendcdda.c:826 ../daemon/gvfsbackendcomputer.c:573
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
+#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
-msgid "The file does not exist"
-msgstr "ไม่มีแฟ้มดังกล่าวอยู่"
+msgid "File doesn't exist"
+msgstr "ไม่มีแฟ้มอยู่"
 
 #: ../daemon/gvfsbackendcdda.c:833
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "ไม่มีแฟ้มดังกล่าวอยู่ หรือไม่ใช่ร่องเสียง"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
+#: ../daemon/gvfsbackendcdda.c:939
+msgid "Audio CD Filesystem Service"
+msgstr "บริการระบบแฟ้มซีดีเพลง"
+
+#: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
 msgid "Computer"
 msgstr "คอมพิวเตอร์"
 
-#: ../daemon/gvfsbackendcomputer.c:465
+#: ../daemon/gvfsbackendcomputer.c:467
 msgid "Filesystem"
 msgstr "ระบบแฟ้ม"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendnetwork.c:587 ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
-#: ../daemon/gvfsbackendsmbbrowse.c:1111
-msgid "File doesn't exist"
-msgstr "ไม่มีแฟ้มอยู่"
-
-#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:635
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendtrash.c:635
 msgid "Can't open directory"
 msgstr "ไม่สามารถเปิดไดเรกทอรี"
 
-#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:731
+#: ../daemon/gvfsbackendcomputer.c:595 ../daemon/gvfsbackendcomputer.c:733
 msgid "Can't open mountable file"
 msgstr "ไม่สามารถเปิดแฟ้มสำหรับเมานท์"
 
-#: ../daemon/gvfsbackendcomputer.c:779
+#: ../daemon/gvfsbackendcomputer.c:781
 #, c-format
 msgid "Internal error: %s"
 msgstr "เกิดข้อผิดพลาดภายใน: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:803 ../daemon/gvfsbackendcomputer.c:869
-#: ../daemon/gvfsbackendcomputer.c:969
-msgid "Not a mountable file"
-msgstr "ไม่ใช่แฟ้มสำหรับเมานท์"
-
-#: ../daemon/gvfsbackendcomputer.c:826
+#: ../daemon/gvfsbackendcomputer.c:813 ../daemon/gvfsbackendcomputer.c:927
 msgid "Can't mount file"
 msgstr "ไม่สามารถเมาทน์แฟ้ม"
 
-#: ../daemon/gvfsbackendcomputer.c:884
+#: ../daemon/gvfsbackendcomputer.c:822
+msgid "No media in the drive"
+msgstr "ไม่มีสื่อในไดรว์"
+
+#: ../daemon/gvfsbackendcomputer.c:879 ../daemon/gvfsbackendcomputer.c:970
+#: ../daemon/gvfsbackendcomputer.c:1070
+msgid "Not a mountable file"
+msgstr "ไม่ใช่แฟ้มสำหรับเมานท์"
+
+#: ../daemon/gvfsbackendcomputer.c:985
 msgid "Can't unmount file"
 msgstr "ไม่สามารถเลิกเมาทน์แฟ้ม"
 
-#: ../daemon/gvfsbackendcomputer.c:1000
+#: ../daemon/gvfsbackendcomputer.c:1101
 msgid "Can't eject file"
 msgstr "ไม่สามารถดันแฟ้มออก"
 
-#: ../daemon/gvfsbackenddav.c:275 ../daemon/gvfsbackenddav.c:1190
-#: ../daemon/gvfsbackenddav.c:1645 ../daemon/gvfsbackendhttp.c:215
+#: ../daemon/gvfsbackenddav.c:283 ../daemon/gvfsbackenddav.c:1259
+#: ../daemon/gvfsbackenddav.c:1720 ../daemon/gvfsbackendhttp.c:215
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "ข้อผิดพลาด HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:291
+#: ../daemon/gvfsbackenddav.c:299
 msgid "Could not parse response"
 msgstr "ไม่สามารถแจงคำตอบ"
 
-#: ../daemon/gvfsbackenddav.c:300
+#: ../daemon/gvfsbackenddav.c:308
 msgid "Empty response"
 msgstr "คำตอบว่างเปล่า"
 
-#: ../daemon/gvfsbackenddav.c:307
+#: ../daemon/gvfsbackenddav.c:315
 msgid "Unexpected reply from server"
 msgstr "ได้รับคำตอบที่ไม่คาดหมายจากเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsbackenddav.c:910 ../daemon/gvfsbackenddav.c:1303
+#: ../daemon/gvfsbackenddav.c:918 ../daemon/gvfsbackenddav.c:1378
 #, c-format
 msgid "Response invalid"
 msgstr "คำตอบใช้ไม่ได้"
 
-#: ../daemon/gvfsbackenddav.c:1001
-msgid "Please enter proxy password"
-msgstr "กรุณาป้อนรหัสผ่านสำหรับพร็อกซี"
-
-#: ../daemon/gvfsbackenddav.c:1010
+#: ../daemon/gvfsbackenddav.c:1062
 msgid "WebDAV share"
 msgstr "การเปิดให้ใช้ร่วมผ่าน WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1012
+#: ../daemon/gvfsbackenddav.c:1064
 #, c-format
 msgid "Enter password for %s"
 msgstr "กรุณาป้อนรหัสผ่านสำหรับ %s"
 
-#: ../daemon/gvfsbackenddav.c:1111 ../daemon/gvfsbackendhttp.c:292
+#: ../daemon/gvfsbackenddav.c:1067
+msgid "Please enter proxy password"
+msgstr "กรุณาป้อนรหัสผ่านสำหรับพร็อกซี"
+
+#: ../daemon/gvfsbackenddav.c:1176 ../daemon/gvfsbackendhttp.c:292
+#: ../daemon/gvfsbackendobexftp.c:429 ../daemon/gvfsbackendobexftp.c:440
 #: ../daemon/gvfsbackendsmb.c:594
 msgid "Invalid mount spec"
 msgstr "ข้อกำหนดการเมานท์ผิดพลาด"
 
-#: ../daemon/gvfsbackenddav.c:1194 ../daemon/gvfsbackenddav.c:1198
+#: ../daemon/gvfsbackenddav.c:1263 ../daemon/gvfsbackenddav.c:1267
 msgid "Not a WebDAV enabled share"
 msgstr "ไม่ใช่แหล่งใช้ร่วมที่ใช้ WebDAV ได้"
 
-#: ../daemon/gvfsbackenddav.c:1259 ../daemon/gvfsbackenddav.c:1334
+#: ../daemon/gvfsbackenddav.c:1334 ../daemon/gvfsbackenddav.c:1409
 msgid "Could not create request"
 msgstr "ไม่สามารถสร้างคำร้องขอ"
 
-#: ../daemon/gvfsbackenddav.c:1399 ../daemon/gvfsbackendsmb.c:1726
+#: ../daemon/gvfsbackenddav.c:1474 ../daemon/gvfsbackendsmb.c:1726
 msgid "Target file already exists"
 msgstr "มีแฟ้มปลายทางอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackenddav.c:1469 ../daemon/gvfsbackendsftp.c:2689
+#: ../daemon/gvfsbackenddav.c:1544 ../daemon/gvfsbackendsftp.c:2689
 #: ../daemon/gvfsbackendsmb.c:982
 msgid "The file was externally modified"
 msgstr "แฟ้มถูกเปลี่ยนแปลงจากโปรแกรมภายนอก"
 
-#: ../daemon/gvfsbackenddav.c:1500 ../daemon/gvfsbackendsmb.c:1020
+#: ../daemon/gvfsbackenddav.c:1575 ../daemon/gvfsbackendsmb.c:1020
 #: ../daemon/gvfsbackendsmb.c:1743
 msgid "Backup file creation failed"
 msgstr "สร้างแฟ้มสำรองไม่สำเร็จ"
@@ -412,7 +431,7 @@ msgstr "สร้างแฟ้มสำรองไม่สำเร็จ"
 msgid "dns-sd"
 msgstr "dns-sd"
 
-#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:728
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
 msgid "Can't monitor file or directory."
 msgstr "ไม่สามารถติดตามแฟ้มหรือไดเรกทอรี"
 
@@ -421,19 +440,108 @@ msgstr "ไม่สามารถติดตามแฟ้มหรือไ
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:673
-#: ../daemon/gvfsbackendnetwork.c:811 ../daemon/gvfsbackendnetwork.c:812
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
 msgid "Network"
 msgstr "เครือข่าย"
 
-#: ../daemon/gvfsbackendftp.c:109 ../daemon/gvfsbackendsftp.c:1411
+#: ../daemon/gvfsbackendftp.c:127
+msgid "Accounts are unsupported"
+msgstr "ไม่รองรับการเข้าระบบผ่านบัญชีผู้ใช้"
+
+#: ../daemon/gvfsbackendftp.c:131
+msgid "Host closed connection"
+msgstr "โฮสต์ปิดการเชื่อมต่อ"
+
+#: ../daemon/gvfsbackendftp.c:135
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "ไม่สามารถเปิดการเชื่อมต่อเพื่อรับส่งข้อมูล บางทีไฟร์วอลล์ของคุณอาจปิดกั้นไว้"
+
+#: ../daemon/gvfsbackendftp.c:139
+msgid "Data connection closed"
+msgstr "การเชื่อมต่อเพื่อรับส่งข้อมูลถูกปิด"
+
+#: ../daemon/gvfsbackendftp.c:145
+msgid "File unavailable"
+msgstr "ไม่มีแฟ้มอยู่"
+
+#: ../daemon/gvfsbackendftp.c:149
+msgid "Operation failed"
+msgstr "ปฏิบัติการล้มเหลว"
+
+#: ../daemon/gvfsbackendftp.c:154
+msgid "No space left on server"
+msgstr "ไม่มีที่ว่างเหลือในเซิร์ฟเวอร์"
+
+#: ../daemon/gvfsbackendftp.c:162
+msgid "Operation unsupported"
+msgstr "ไม่รองรับปฏิบัติการนี้"
+
+#: ../daemon/gvfsbackendftp.c:166 ../daemon/gvfsbackendsftp.c:261
+msgid "Permission denied"
+msgstr "ไม่ได้รับอนุญาต"
+
+#: ../daemon/gvfsbackendftp.c:170
+msgid "Page type unknown"
+msgstr "ได้รับชนิดของเพจที่ไม่รู้จัก"
+
+#: ../daemon/gvfsbackendftp.c:174
+msgid "Invalid filename."
+msgstr "ชื่อแฟ้มใช้ไม่ได้"
+
+#: ../daemon/gvfsbackendftp.c:178
+msgid "Invalid reply from server."
+msgstr "ได้รับคำตอบที่ใช้ไม่ได้จากเซิร์ฟเวอร์"
+
+#: ../daemon/gvfsbackendftp.c:254 ../daemon/gvfsbackendftp.c:278
+#: ../daemon/gvfsbackendftp.c:291 ../daemon/gvfsbackendftp.c:307
+#, c-format
+msgid "Invalid reply"
+msgstr "ได้รับคำตอบที่ใช้ไม่ได้"
+
+#: ../daemon/gvfsbackendftp.c:396
+#, c-format
+msgid "broken transmission"
+msgstr "การส่งข้อมูลขาดตอน"
+
+#: ../daemon/gvfsbackendftp.c:489 ../daemon/gvfsbackendftp.c:610
+#, c-format
+msgid "Could not connect to host"
+msgstr "ไม่สามารถเชื่อมต่อไปยังโฮสต์"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:769
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "กรุณาป้อนรหัสผ่านสำหรับ ftp ที่ %s"
+
+#: ../daemon/gvfsbackendftp.c:788 ../daemon/gvfsbackendsftp.c:834
+msgid "Password dialog cancelled"
+msgstr "กล่องโต้ตอบรหัสผ่านถูกยกเลิก"
+
+#: ../daemon/gvfsbackendftp.c:834
+#, c-format
+msgid "ftp on %s"
+msgstr "ftp ที่ %s"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:840
+#, c-format
+msgid "ftp as %s on %s"
+msgstr "ftp ในนาม %s ที่ %s"
+
+#: ../daemon/gvfsbackendftp.c:879 ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "ไม่ได้ระบุชื่อโฮสต์"
 
-#: ../daemon/gvfsbackendftp.c:197 ../daemon/gvfsbackendsmb.c:685
-#: ../daemon/gvfsbackendsmb.c:1116
-msgid "Unsupported seek type"
-msgstr "ไม่รองรับการเลื่อนตำแหน่งวิธีนี้"
+#: ../daemon/gvfsbackendftp.c:1128
+msgid "backups not supported yet"
+msgstr "ยังไม่รองรับการสำรองแฟ้ม"
+
+#: ../daemon/gvfsbackendftp.c:1370
+#, c-format
+msgid "filename too long"
+msgstr "ชื่อแฟ้มยาวเกินไป"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:234
@@ -476,6 +584,7 @@ msgstr "ข้อผิดพลาดของลูกข่าย HTTP: %s"
 
 #: ../daemon/gvfsbackendhttp.c:550 ../daemon/gvfsbackendsftp.c:1751
 #: ../daemon/gvfsbackendsmb.c:1229 ../daemon/gvfsbackendtrash.c:960
+#: ../daemon/gvfsdaemonutils.c:206
 msgid " (invalid encoding)"
 msgstr " (รหัสอักขระผิดรูปแบบ)"
 
@@ -484,22 +593,31 @@ msgid "Directory notification not supported"
 msgstr "ไม่รองรับการแจ้งเหตุไดเรกทอรี"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:266 ../daemon/gvfsbackendsmbbrowse.c:694
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:694
 msgid "Windows Network"
 msgstr "เครือข่ายวินโดวส์"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:389
+#: ../daemon/gvfsbackendnetwork.c:392
 msgid "Local Network"
 msgstr "เครือข่ายท้องถิ่น"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:862
+msgid "Network Location Monitor"
+msgstr "หน้าต่างติดตามตำแหน่งในเครือข่าย"
+
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:268 ../daemon/gvfsbackendsmb.c:513
+#: ../daemon/gvfsbackendsmb.c:1222
+#, c-format
+msgid "%s on %s"
+msgstr "%s ที่ %s"
 
 #: ../daemon/gvfsbackendsftp.c:253
 msgid "ssh program unexpectedly exited"
 msgstr "โปรแกรม ssh จบการทำงานกะทันหัน"
-
-#: ../daemon/gvfsbackendsftp.c:261
-msgid "Permission denied"
-msgstr "ไม่ได้รับอนุญาต"
 
 #: ../daemon/gvfsbackendsftp.c:268
 msgid "Hostname not known"
@@ -537,10 +655,6 @@ msgstr "กรุณาป้อนวลีรหัสผ่านสำหร
 #: ../daemon/gvfsbackendsftp.c:821
 msgid "Enter password"
 msgstr "กรุณาป้อนรหัสผ่าน"
-
-#: ../daemon/gvfsbackendsftp.c:834
-msgid "Password dialog cancelled"
-msgstr "กล่องโต้ตอบรหัสผ่านถูกยกเลิก"
 
 #: ../daemon/gvfsbackendsftp.c:881
 msgid "Can't send password"
@@ -643,16 +757,14 @@ msgstr "ต้องใช้รหัสผ่านในการเข้า
 msgid "Internal Error (%s)"
 msgstr "เกิดข้อผิดพลาดภายใน (%s)"
 
-#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:513 ../daemon/gvfsbackendsmb.c:1222
-#, c-format
-msgid "%s on %s"
-msgstr "%s ที่ %s"
-
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmb.c:560
 msgid "Failed to mount Windows share"
 msgstr "เมาทน์แหล่งใช้ร่วมของวินโดวส์ไม่สำเร็จ"
+
+#: ../daemon/gvfsbackendsmb.c:685 ../daemon/gvfsbackendsmb.c:1116
+msgid "Unsupported seek type"
+msgstr "ไม่รองรับการเลื่อนตำแหน่งวิธีนี้"
 
 #: ../daemon/gvfsbackendsmb.c:1170
 #, c-format
@@ -682,6 +794,10 @@ msgstr "เกิดข้อผิดพลาดขณะลบแฟ้มป
 msgid "Can't recursively move directory"
 msgstr "ไม่สามารถย้ายไดเรกทอรีทั้งยวง"
 
+#: ../daemon/gvfsbackendsmb.c:1850
+msgid "Windows Shares Filesystem Service"
+msgstr "บริการระบบแฟ้มแหล่งใช้ร่วมของวินโดวส์"
+
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
 #: ../daemon/gvfsbackendsmbbrowse.c:702
@@ -700,6 +816,10 @@ msgstr "ไม่ใช่แฟ้มปกติ"
 #: ../daemon/gvfsbackendsmbbrowse.c:1107
 msgid "Not a directory"
 msgstr "ไม่ใช่ไดเรกทอรี"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1219
+msgid "Windows Network Filesystem Service"
+msgstr "บริการระบบแฟ้มในเครือข่ายของวินโดวส์"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
@@ -734,7 +854,7 @@ msgstr "เกิดข้อผิดพลาดขณะส่ง fd: %s"
 #: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
 #: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
 #: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
-#: ../daemon/gvfsjobmount.c:106 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmount.c:109 ../daemon/gvfsjobmountmountable.c:156
 #: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
 #: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
 #: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
@@ -1225,6 +1345,9 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "เปิดแฟ้มด้วยโปรแกรมปริยายที่ลงทะเบียนไว้สำหรับจัดการแฟ้มชนิดนั้นๆ"
+
+#~ msgid "The file does not exist"
+#~ msgstr "ไม่มีแฟ้มดังกล่าวอยู่"
 
 #~ msgid "Audio Disc on %s"
 #~ msgstr "แผ่นเพลงที่ %s"
