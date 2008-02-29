@@ -1,5 +1,14 @@
 2008-02-29  Bastien Nocera  <hadess@hadess.net>
 
+	* daemon/gvfsbackendobexftp.c (is_connected), (do_mount),
+	(do_open_for_read), (is_busy), (do_read), (do_query_info),
+	(do_query_fs_info), (do_enumerate), (do_delete),
+	(do_make_directory): Don't use a temporary error to set
+	jobs as failed, use g_vfs_job_failed instead
+	Error out properly when trying to open a directory for read
+
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
 	* daemon/gvfsbackendobexftp.c (g_vfs_backend_obexftp_finalize),
 	(_retrieve_folder_listing), (_query_file_info_helper),
 	(do_open_for_read), (do_query_info), (do_query_fs_info),

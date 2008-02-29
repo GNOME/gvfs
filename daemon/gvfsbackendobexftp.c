@@ -395,7 +395,7 @@ error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *erro
       op_backend->status = ASYNC_ERROR;
       op_backend->error = g_error_new (DBUS_GERROR,
                                        DBUS_GERROR_REMOTE_EXCEPTION,
-                                   error_message);
+                                       error_message);
       g_cond_signal (op_backend->cond);
       g_mutex_unlock (op_backend->mutex);
       return;
@@ -615,6 +615,18 @@ do_open_for_read (GVfsBackend *backend,
       g_object_unref (info);
       return;
     }
+  /* If we're trying to open a directory for reading, exit out */
+  if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+    {
+      op_backend->doing_io = FALSE;
+      g_mutex_unlock (op_backend->mutex);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_IS_DIRECTORY,
+                        _("Can't open directory"));
+      g_object_unref (info);
+      return;
+    }
+
   size = g_file_info_get_size (info);
   g_object_unref (info);
 
@@ -622,11 +634,9 @@ do_open_for_read (GVfsBackend *backend,
     {
       op_backend->doing_io = FALSE;
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       return;
     }
 
@@ -645,11 +655,9 @@ do_open_for_read (GVfsBackend *backend,
     {
       op_backend->doing_io = FALSE;
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                                    G_IO_ERROR_CANCELLED,
                                    _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
       return;
     }
 
@@ -766,13 +774,9 @@ do_read (GVfsBackend *backend,
 
       if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
         {
-          GError *error;
-
-          error = g_error_new_literal (G_IO_ERROR,
-                                       G_IO_ERROR_CANCELLED,
-                                       _("Operation was cancelled"));
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_CANCELLED,
+                            _("Operation was cancelled"));
           return;
         }
 
@@ -907,11 +911,9 @@ do_query_fs_info (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       g_free (caps_str);
       return;
     }
@@ -972,11 +974,9 @@ do_query_fs_info (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       ovu_caps_free (caps);
       return;
     }
@@ -1099,11 +1099,9 @@ do_delete (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       g_object_unref (info);
       return;
     }
@@ -1128,11 +1126,9 @@ do_delete (GVfsBackend *backend,
       if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
         {
           g_mutex_unlock (op_backend->mutex);
-          error = g_error_new_literal (G_IO_ERROR,
-                                       G_IO_ERROR_CANCELLED,
-                                       _("Operation was cancelled"));
-          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-          g_error_free (error);
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_CANCELLED,
+                            _("Operation was cancelled"));
           return;
         }
 
@@ -1189,11 +1185,9 @@ do_delete (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       g_free (basename);
       return;
     }
@@ -1213,11 +1207,9 @@ do_delete (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       g_free (basename);
       return;
     }
@@ -1274,11 +1266,9 @@ do_make_directory (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       return;
     }
 
@@ -1295,11 +1285,9 @@ do_make_directory (GVfsBackend *backend,
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
-      error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_CANCELLED,
-                                   _("Operation was cancelled"));
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
       return;
     }
 
