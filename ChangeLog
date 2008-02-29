@@ -1,5 +1,15 @@
 2008-02-29  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
+	(ftp_connection_parse_features), (ftp_filename_from_gvfs_path),
+	(ftp_filename_to_gvfs_path), (ftp_filename_construct),
+	(do_open_for_read), (do_create), (do_append), (do_replace),
+	(do_set_display_name), (g_vfs_backend_ftp_class_init):
+	introduce a differentiation between gvfs paths and ftp filenames and
+	use it. Also implement set_display_name.
+
+2008-02-29  Benjamin Otte  <otte@gnome.org>
+
 	* common/gdbusutils.c: (dbus_source_add_watch):
 	* daemon/dbus-gmain.c: (connection_setup_add_watch):
 	use the right names for dbus version macros

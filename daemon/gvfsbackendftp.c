@@ -52,9 +52,23 @@
 #define DEBUG(...)
 #endif
 
+/*
+ * about filename interpretation in the ftp backend
+ *
+ * As GVfs composes paths using a slash character, we cannot allow a slash as 
+ * part of a basename. Other critical characters are \r \n and sometimes the 
+ * space. We therefore g_uri_escape_string() filenames by default and concatenate 
+ * paths using slashes. This should make GVfs happy.
+ *
+ * Luckily, TVFS (see RFC 3xxx for details) is a specification that does exactly 
+ * what we want. It disallows slashes, \r and \n in filenames, so we can happily 
+ * use it without the need to escape. We also can operate on full paths as our 
+ * paths exactly match those of a TVFS-using FTP server.
+ */
 typedef enum {
   FTP_FEATURE_MDTM = (1 << 0),
-  FTP_FEATURE_SIZE = (1 << 1)
+  FTP_FEATURE_SIZE = (1 << 1),
+  FTP_FEATURE_TVFS = (1 << 2)
 } FtpFeatures;
 
 struct _GVfsBackendFtp
@@ -171,11 +185,11 @@ ftp_error_set_from_response (GError **error, guint response)
 	break;
       case 553: /* Requested action not taken. File name not allowed. */
 	code = G_IO_ERROR_INVALID_FILENAME;
-	msg = _("Invalid filename.");
+	msg = _("Invalid filename");
 	break;
       default:
 	code = G_IO_ERROR_FAILED;
-	msg = _("Invalid reply from server.");
+	msg = _("Invalid reply from server");
 	break;
     }
 
@@ -442,7 +456,8 @@ ftp_connection_parse_features (FtpConnection *conn)
     FtpFeatures		enable;		/* flags to enable with this feature */
   } features[] = {
     { "MDTM", FTP_FEATURE_MDTM },
-    { "SIZE", FTP_FEATURE_SIZE }
+    { "SIZE", FTP_FEATURE_SIZE },
+    { "TVFS", FTP_FEATURE_TVFS }
   };
   char **supported;
   guint i, j;
@@ -624,6 +639,50 @@ ftp_connection_close_data_connection (FtpConnection *conn)
 
   g_object_unref (conn->data);
   conn->data = NULL;
+}
+
+/*** FILE MAPPINGS ***/
+
+/* FIXME: This most likely needs adaption to non-unix like directory structures.
+ * There's at least the case of multiple roots (Netware) plus probably a shitload
+ * of weird old file systems (starting with MS-DOS)
+ * But we first need a way to detect that.
+ */
+
+/**
+ * FtpFile:
+ *
+ * Byte string used to identify a file on the FTP server. It's typedef'ed to
+ * make it easy to distinguish from GVfs paths.
+ */
+
+/* unsinged char is on purpose, so we get warnings when we misuse them */
+typedef unsigned char FtpFile;
+
+static FtpFile *
+ftp_filename_from_gvfs_path (FtpConnection *conn, const char *pathname)
+{
+  return (FtpFile *) g_strdup (pathname);
+}
+
+static char *
+ftp_filename_to_gvfs_path (FtpConnection *conn, const FtpFile *filename)
+{
+  return g_strdup ((const char *) filename);
+}
+
+/* Takes an FTP dirname and a basename (as used in RNTO or as result from LIST 
+ * or similar) and gets the new ftp filename from it.
+ *
+ * Returns: the filename or %NULL if filename construction wasn't possible.
+ */
+static FtpFile *
+ftp_filename_construct (FtpConnection *conn, const FtpFile *dirname, const char *basename)
+{
+  if (strpbrk (basename, "/\r\n"))
+    return NULL;
+
+  return (FtpFile *) g_strconcat ((char *) dirname, "/", basename, NULL);
 }
 
 /*** BACKEND ***/
@@ -923,6 +982,7 @@ do_open_for_read (GVfsBackend *backend,
   GError *error = NULL;
   FtpConnection *conn;
   guint status;
+  FtpFile *file;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job)->cancellable, &error);
   if (conn == NULL)
@@ -930,10 +990,12 @@ do_open_for_read (GVfsBackend *backend,
   if (!ftp_connection_ensure_data_connection (conn, &error))
     goto error;
 
+  file = ftp_filename_from_gvfs_path (conn, filename);
   status = ftp_connection_send (conn,
 				RESPONSE_PASS_100 | RESPONSE_FAIL_200,
 				&error,
-                                "RETR %s", filename);
+                                "RETR %s", file);
+  g_free (file);
   if (status == 0)
     goto error;
 
@@ -1070,12 +1132,15 @@ do_create (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   GError *error = NULL;
+  FtpFile *file;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job)->cancellable, &error);
   if (conn == NULL)
     goto error;
 
-  do_start_write (ftp, conn, job, flags, "STOR %s", filename);
+  file = ftp_filename_from_gvfs_path (conn, filename);
+  do_start_write (ftp, conn, job, flags, "STOR %s", file);
+  g_free (file);
   return;
 
 error:
@@ -1093,12 +1158,15 @@ do_append (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   GError *error = NULL;
+  FtpFile *file;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job)->cancellable, &error);
   if (conn == NULL)
     goto error;
 
+  file = ftp_filename_from_gvfs_path (conn, filename);
   do_start_write (ftp, conn, job, flags, "APPE %s", filename);
+  g_free (file);
   return;
 
 error:
@@ -1118,6 +1186,7 @@ do_replace (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   GError *error = NULL;
+  FtpFile *file;
 
   if (make_backup)
     {
@@ -1133,7 +1202,9 @@ do_replace (GVfsBackend *backend,
   if (conn == NULL)
     goto error;
 
+  file = ftp_filename_from_gvfs_path (conn, filename);
   do_start_write (ftp, conn, job, flags, "STOR %s", filename);
+  g_free (file);
   return;
 
 error:
@@ -1455,6 +1526,72 @@ error:
 }
 
 static void
+do_set_display_name (GVfsBackend *backend,
+		     GVfsJobSetDisplayName *job,
+		     const char *filename,
+		     const char *display_name)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  GError *error = NULL;
+  FtpConnection *conn;
+  char *name;
+  FtpFile *original, *dir, *now;
+  guint response;
+
+  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job)->cancellable, &error);
+  if (conn == NULL)
+    goto error;
+
+  original = ftp_filename_from_gvfs_path (conn, filename);
+  name = g_path_get_dirname (filename);
+  dir = ftp_filename_from_gvfs_path (conn, name);
+  g_free (name);
+  now = ftp_filename_construct (conn, dir, display_name);
+  g_free (dir);
+  if (now == NULL)
+    {
+      g_set_error (&error, 
+	           G_IO_ERROR,
+	           G_IO_ERROR_INVALID_FILENAME,
+		   _("Invalid filename"));
+      goto error;
+    }
+  response = ftp_connection_send (conn,
+                                  RESPONSE_PASS_300 | RESPONSE_FAIL_200,
+				  &error,
+				  "RNFR %s", original);
+  g_free (original);
+  if (response == 0)
+    {
+      g_free (now);
+      goto error;
+    }
+  response = ftp_connection_send (conn,
+				  0,
+				  &error,
+				  "RNTO %s", now);
+  if (response == 0)
+    {
+      g_free (now);
+      goto error;
+    }
+
+  name = ftp_filename_to_gvfs_path (conn, now);
+  g_free (now);
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_job_set_display_name_set_new_path (job, name);
+  g_free (name);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return;
+
+error:
+  g_free (dir);
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+}
+
+static void
 g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1475,4 +1612,5 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->write = do_write;
   backend_class->query_info = do_query_info;
   backend_class->enumerate = do_enumerate;
+  backend_class->set_display_name = do_set_display_name;
 }
