@@ -285,7 +285,6 @@ do_mount (GVfsBackend *backend,
 
   if (cdio_cddap_open (cdda_backend->drive) != 0)
     {
-      cdio_cddap_close (cdda_backend->drive);
       g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, 
                    _("Drive %s does not contain audio files"), cdda_backend->device_path);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);

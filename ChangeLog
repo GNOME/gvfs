@@ -1,3 +1,8 @@
+2008-03-01  David Zeuthen  <davidz@redhat.com>
+
+	* daemon/gvfsbackendcdda.c (do_mount): Avoid calling
+	cddio_cddap_close() twice on an error path.
+
 2008-03-01  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (run_list_command):
