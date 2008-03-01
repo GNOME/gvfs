@@ -1724,11 +1724,11 @@ run_list_command (FtpConnection *conn, GError **error, const char *command, ...)
   else
     g_free (name);
 
+  ftp_connection_close_data_connection (conn);
   response = ftp_connection_receive (conn, 0, error);
   if (response == 0)
     goto error;
 
-  ftp_connection_close_data_connection (conn);
   return g_list_reverse (list);
 
 error2:

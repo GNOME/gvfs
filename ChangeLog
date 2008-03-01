@@ -1,5 +1,12 @@
 2008-03-01  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (run_list_command):
+	close the data connection before trying to receive the OK. Some
+	servers send it out only after the connection was closed properly and
+	otherwise cause stalls.
+
+2008-03-01  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_mount):
 	use 0 as port in the keyring when it's the default ftp port. Stops the
 	access dialog fro printing the port name.
