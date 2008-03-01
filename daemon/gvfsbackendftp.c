@@ -822,14 +822,16 @@ do_mount (GVfsBackend *backend,
   gboolean aborted;
   GError *error = NULL;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
+  guint port;
 
+  port = soup_address_get_port (ftp->addr);
   /* FIXME: need to translate this? */
-  if (soup_address_get_port (ftp->addr) == 21)
+  if (port == 21)
     host = g_strdup (soup_address_get_name (ftp->addr));
   else
     host = g_strdup_printf ("%s:%u", 
 	                    soup_address_get_name (ftp->addr),
-	                    soup_address_get_port (ftp->addr));
+	                    port);
 
   conn = ftp_connection_create (ftp->addr,
 			        G_VFS_JOB (job)->cancellable,
@@ -844,7 +846,7 @@ do_mount (GVfsBackend *backend,
 				     "ftp",
 				     NULL,
 				     NULL,
-				     soup_address_get_port (ftp->addr),
+				     port == 21 ? 0 : port,
 				     &username,
 				     NULL,
 				     &password))
@@ -900,7 +902,7 @@ try_login:
                                    "ftp",
 				   NULL,
 				   NULL,
-                                   soup_address_get_port (ftp->addr),
+				   port == 21 ? 0 : port,
                                    ftp->password,
                                    password_save);
       g_free (prompt);
@@ -911,12 +913,13 @@ try_login:
 
   mount_spec = g_mount_spec_new ("ftp");
   g_mount_spec_set (mount_spec, "host", soup_address_get_name (ftp->addr));
-  if (soup_address_get_port (ftp->addr) != 21)
+  if (port != 21)
     {
-      char *port = g_strdup_printf ("%u", soup_address_get_port (ftp->addr));
-      g_mount_spec_set (mount_spec, "port", port);
-      g_free (port);
+      char *port_str = g_strdup_printf ("%u", port);
+      g_mount_spec_set (mount_spec, "port", port_str);
+      g_free (port_str);
     }
+
   if (g_str_equal (ftp->user, "anonymous"))
     {
       display_name = g_strdup_printf (_("ftp on %s"), host);
