@@ -496,14 +496,13 @@ msgid "Page type unknown"
 msgstr "Rodzaj strony nieznany"
 
 #: ../daemon/gvfsbackendftp.c:190 ../daemon/gvfsbackendftp.c:1905
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid filename"
-msgstr "Niepoprawna nazwa pliku."
+msgstr "Niepoprawna nazwa pliku"
 
 #: ../daemon/gvfsbackendftp.c:194
-#, fuzzy
 msgid "Invalid reply from server"
-msgstr "Otrzymano niepoprawną odpowiedź od serwera."
+msgstr "Niepoprawna odpowiedź od serwera"
 
 #: ../daemon/gvfsbackendftp.c:270 ../daemon/gvfsbackendftp.c:294
 #: ../daemon/gvfsbackendftp.c:307 ../daemon/gvfsbackendftp.c:323
@@ -556,7 +555,6 @@ msgid "filename too long"
 msgstr "nazwa pliku zbyt długa"
 
 #: ../daemon/gvfsbackendftp.c:1802
-#, fuzzy
 msgid "File does not exist"
 msgstr "Plik nie istnieje"
 
@@ -571,7 +569,7 @@ msgstr "Aparat cyfrowy (%s)"
 #: ../daemon/gvfsbackendgphoto2.c:379 ../hal/ghalvolume.c:390
 #, c-format
 msgid "%s Camera"
-msgstr "Aparat cyfrowy %s"
+msgstr "Aparat %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
@@ -582,7 +580,7 @@ msgstr "Odtwarzacz muzyki %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:391 ../hal/ghalvolume.c:402
 msgid "Camera"
-msgstr "Aparat cyfrowy"
+msgstr "Aparat"
 
 #: ../daemon/gvfsbackendgphoto2.c:393 ../hal/ghalvolume.c:398
 msgid "Audio Player"
@@ -899,11 +897,11 @@ msgstr "Zamiana starej usługi."
 
 #: ../daemon/main.c:48
 msgid "Don't start fuse."
-msgstr "Nie uruchamiaj fuse."
+msgstr "Bez uruchamiania fuse."
 
 #: ../daemon/main.c:60
 msgid "GVFS Daemon"
-msgstr "Usługa GVFS/"
+msgstr "Usługa GVFS"
 
 #: ../daemon/main.c:63
 msgid "Main daemon for GVFS"
@@ -1004,15 +1002,15 @@ msgstr "HDDVD-RW"
 
 #: ../hal/ghaldrive.c:174
 msgid "Blu-ray"
-msgstr "Blu-Ray"
+msgstr "Blu-ray"
 
 #: ../hal/ghaldrive.c:176
 msgid "Blu-ray-R"
-msgstr "Blu-Ray-R"
+msgstr "Blu-ray-R"
 
 #: ../hal/ghaldrive.c:178
 msgid "Blu-ray-RE"
-msgstr "Blu-Ray-RE"
+msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
@@ -1030,7 +1028,7 @@ msgstr "Napęd %s"
 
 #: ../hal/ghaldrive.c:194
 msgid "Floppy Drive"
-msgstr "Napęd dyskietek"
+msgstr "Stacja dyskietek"
 
 #: ../hal/ghaldrive.c:200
 msgid "Software RAID Drive"
@@ -1170,27 +1168,27 @@ msgstr "Pusta płyta DVD+R DL"
 
 #: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:149
 msgid "Blu-Ray Disc"
-msgstr "Płyta Blu-Ray"
+msgstr "Płyta Blu-ray"
 
 #: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:149
 msgid "Blank Blu-Ray Disc"
-msgstr "Pusta płyta Blu-Ray"
+msgstr "Pusta płyta Blu-ray"
 
 #: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:150
 msgid "Blu-Ray R Disc"
-msgstr "Płyta Blu-Ray R"
+msgstr "Płyta Blu-ray R"
 
 #: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:150
 msgid "Blank Blu-Ray R Disc"
-msgstr "Pusta płyta Blu-Ray R"
+msgstr "Pusta płyta Blu-ray R"
 
 #: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:151
 msgid "Blu-Ray RW Disc"
-msgstr "Płyta Blu-Ray RW"
+msgstr "Płyta Blu-ray RW"
 
 #: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:151
 msgid "Blank Blu-Ray RW Disc"
-msgstr "Pusta płyta Blu-Ray RW"
+msgstr "Pusta płyta Blu-ray RW"
 
 #: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:152
 msgid "HD DVD Disc"
