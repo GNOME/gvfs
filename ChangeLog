@@ -1,3 +1,9 @@
+2008-03-01  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_query_file_info_helper):
+	Fix another case where the icon name was wrong for the
+	root folder (Helps: #519369)
+
 2008-03-01  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/Makefile.am:

@@ -68,6 +68,7 @@ struct _GVfsBackendObexftp
   GVfsBackend parent_instance;
 
   char *display_name;
+  guint type;
 
   DBusGConnection *connection;
   DBusGProxy *manager_proxy;
@@ -418,7 +419,6 @@ _query_file_info_helper (GVfsBackend *backend,
 
   if (strcmp (filename, "/") == 0)
     {
-      GIcon *icon;
       char *display;
 
       /* That happens when you want '/'
@@ -426,9 +426,8 @@ _query_file_info_helper (GVfsBackend *backend,
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_content_type (info, "inode/directory");
       g_file_info_set_name (info, "/");
-      icon = g_themed_icon_new ("bluetooth");
-      g_file_info_set_icon (info, icon);
-      g_object_unref (icon);
+      g_vfs_backend_set_icon_name (backend,
+                                   _get_icon_from_type (op_backend->type));
       display = g_strdup_printf (_("%s on %s"), "/", op_backend->display_name);
       g_file_info_set_display_name (info, display);
       g_free (display);
@@ -581,7 +580,6 @@ do_mount (GVfsBackend *backend,
   char *server, *bdaddr;
   GMountSpec *obexftp_mount_spec;
   gboolean connected;
-  guint32 type;
 
   g_print ("+ do_mount\n");
 
@@ -627,14 +625,14 @@ do_mount (GVfsBackend *backend,
                                                          path,
                                                          "org.openobex.Session");
 
-  op_backend->display_name = _get_device_properties (bdaddr, &type);
+  op_backend->display_name = _get_device_properties (bdaddr, &op_backend->type);
   if (!op_backend->display_name)
         op_backend->display_name = g_strdup (bdaddr);
 
   g_vfs_backend_set_display_name (G_VFS_BACKEND  (op_backend),
                                   op_backend->display_name);
   g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend),
-                               _get_icon_from_type (type));
+                               _get_icon_from_type (op_backend->type));
 
   obexftp_mount_spec = g_mount_spec_new ("obex");
   server = g_strdup_printf ("[%s]", bdaddr);
