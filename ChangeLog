@@ -1,3 +1,16 @@
+2008-03-01  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/Makefile.am:
+	* daemon/ParseFTPList.c:
+	* daemon/ParseFTPList.h:
+	* daemon/gvfsbackendftp.c: (ftp_connection_cd), (process_line),
+	(run_list_command), (do_query_info), (do_enumerate):
+	rewrite directory enumeration and query_info by using the LIST parsing
+	code from Mozilla. It was the only code I could find that was LGPL
+	licensed, even though it looks way out of date.
+	Also, error messages are handled way better and the code even copes
+	somewhat with symlinks.
+
 2008-02-29  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c (_get_icon_from_type):
