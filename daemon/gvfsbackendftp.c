@@ -724,7 +724,7 @@ ftp_filename_construct (FtpConnection *conn, const FtpFile *dirname, const char 
   if (strpbrk (basename, "/\r\n"))
     return NULL;
 
-  return (FtpFile *) g_strconcat ((char *) dirname, "/", basename, NULL);
+  return (FtpFile *) g_build_path ("/", (char *) dirname, basename, NULL);
 }
 
 /*** COMMON FUNCTIONS WITH SPECIAL HANDLING ***/

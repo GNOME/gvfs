@@ -1,5 +1,10 @@
 2008-03-02  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_filename_construct):
+	use g_build_path() to not get excess slashes in paths
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_connection_try_cd), (process_line),
 	(do_query_info), (do_move), (g_vfs_backend_ftp_class_init):
 	implement move vfunc
