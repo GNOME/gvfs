@@ -1834,6 +1834,35 @@ do_set_display_name (GVfsBackend *backend,
 }
 
 static void
+do_delete (GVfsBackend *backend,
+	   GVfsJobDelete *job,
+	   const char *filename)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  FtpConnection *conn;
+  FtpFile *file;
+  guint response;
+
+  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
+  if (conn == NULL)
+    return;
+
+  /* We try file deletion first. If that fails, we try directory deletion.
+   * The file-first-then-directory order has been decided by coin-toss. */
+  file = ftp_filename_from_gvfs_path (conn, filename);
+  response = ftp_connection_send (conn,
+				  RESPONSE_PASS_500,
+				  "DELE %s", file);
+  if (STATUS_GROUP (response) == 5)
+    ftp_connection_send (conn,
+			 0,
+			 "RMD %s", file);
+
+  g_free (file);
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+}
+
+static void
 g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1855,4 +1884,5 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->query_info = do_query_info;
   backend_class->enumerate = do_enumerate;
   backend_class->set_display_name = do_set_display_name;
+  backend_class->delete = do_delete;
 }
