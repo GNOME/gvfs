@@ -1,3 +1,11 @@
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	redo error handling: We now store the error and the job in the
+	FtpConnection. This way we don't have to handle errors in the outer
+	functions and can just "if (conn->error) return FALSE;" in the inner
+	functions.
+
 2008-03-01  David Zeuthen  <davidz@redhat.com>
 
 	* daemon/gvfsbackendcdda.c (do_mount): Avoid calling
