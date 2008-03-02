@@ -1,3 +1,9 @@
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_try_cd), (process_line),
+	(do_query_info), (do_move), (g_vfs_backend_ftp_class_init):
+	implement move vfunc
+
 2008-03-02  Carlos Garcia Campos  <carlosgc@gnome.org>
 
 	* common/gmountsource.c: (ask_password_reply):

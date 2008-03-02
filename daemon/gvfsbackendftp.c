@@ -751,6 +751,21 @@ ftp_connection_cd (FtpConnection *conn, const FtpFile *file)
   return response != 0;
 }
 
+static gboolean
+ftp_connection_try_cd (FtpConnection *conn, const FtpFile *file)
+{
+  if (ftp_connection_in_error (conn))
+    return FALSE;
+
+  if (!ftp_connection_cd (conn, file))
+    {
+      g_clear_error (&conn->error);
+      return FALSE;
+    }
+  
+  return TRUE;
+}
+
 /*** BACKEND ***/
 
 static void
@@ -1560,13 +1575,10 @@ process_line (FtpConnection *conn, const char *line, const FtpFile *dirname, str
 	  return NULL;
 	}
 
-      if (ftp_connection_cd (conn, (FtpFile *) s))
+      if (ftp_connection_try_cd (conn, (FtpFile *) s))
 	type = 'd';
       else
-	{
-	  g_clear_error (&conn->error);
-	  type = 'f';
-	}
+	type = 'f';
 
       /* FIXME: can we just copy paths for symlinks? */
       g_file_info_set_symlink_target (info, link);
@@ -1708,7 +1720,7 @@ do_query_info (GVfsBackend *backend,
     return;
 
   file = ftp_filename_from_gvfs_path (conn, filename);
-  if (ftp_connection_cd (conn, file))
+  if (ftp_connection_try_cd (conn, file))
     { 
       /* file is a directory */
       char *basename = g_path_get_basename (filename);
@@ -1723,7 +1735,6 @@ do_query_info (GVfsBackend *backend,
     {
       GFileInfo *real = NULL;
 
-      g_clear_error (&conn->error);
       /* file is not a directory - maybe it doesn't even exist? */
       list = run_list_command (conn, "LIST %s", file);
       for (walk = list; walk; walk = walk->next)
@@ -1897,6 +1908,71 @@ do_make_directory (GVfsBackend *backend,
 }
 
 static void
+do_move (GVfsBackend *backend,
+	 GVfsJobMove *job,
+	 const char *source,
+	 const char *destination,
+	 GFileCopyFlags flags,
+	 GFileProgressCallback progress_callback,
+	 gpointer progress_callback_data)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  FtpConnection *conn;
+  FtpFile *srcfile, *destfile;
+
+  /* FIXME: what about G_FILE_COPY_NOFOLLOW_SYMLINKS and G_FILE_COPY_ALL_METADATA? */
+
+  if (flags & G_FILE_COPY_BACKUP)
+    {
+      /* FIXME: implement! */
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR,
+			G_IO_ERROR_CANT_CREATE_BACKUP,
+			_("backups not supported yet"));
+      return;
+    }
+
+  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
+  if (conn == NULL)
+    return;
+
+  srcfile = ftp_filename_from_gvfs_path (conn, source);
+  destfile = ftp_filename_from_gvfs_path (conn, destination);
+  if (ftp_connection_try_cd (conn, destfile))
+    {
+      char *basename = g_path_get_basename (source);
+      FtpFile *real = ftp_filename_construct (conn, destfile, basename);
+
+      g_free (basename);
+      if (real == NULL)
+	g_set_error (&conn->error, 
+	             G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
+		     _("Invalid destination filename"));
+      else
+	{
+	  g_free (destfile);
+	  destfile = real;
+	}
+    }
+
+  if (!(flags & G_FILE_COPY_OVERWRITE))
+    {
+      /* FIXME: check if file exists */
+    }
+
+  ftp_connection_send (conn,
+		       RESPONSE_PASS_300 | RESPONSE_FAIL_200,
+		       "RNFR %s", srcfile);
+  ftp_connection_send (conn,
+		       0,
+		       "RNTO %s", destfile);
+
+  g_free (srcfile);
+  g_free (destfile);
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+}
+
+static void
 g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1920,4 +1996,5 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->set_display_name = do_set_display_name;
   backend_class->delete = do_delete;
   backend_class->make_directory = do_make_directory;
+  backend_class->move = do_move;
 }
