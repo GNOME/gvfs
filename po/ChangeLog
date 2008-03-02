@@ -1,3 +1,8 @@
+2008-03-02  Philip Withnall  <pwithnall@svn.gnome.org>
+
+	* LINGUAS: Added en_GB (British English).
+	* en_GB.po: Added British English translation.
+
 2008-03-02  Petr Kovar  <pknbe@volny.cz>
 
 	* cs.po: Updated Czech translation.
