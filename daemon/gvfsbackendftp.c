@@ -1056,10 +1056,15 @@ do_open_for_read (GVfsBackend *backend,
 		       "RETR %s", file);
   g_free (file);
 
-  /* don't push the connection back, it's our handle now */
-  g_vfs_job_open_for_read_set_handle (job, conn);
-  g_vfs_job_open_for_read_set_can_seek (job, FALSE);
-  ftp_connection_pop_job (conn);
+  if (ftp_connection_in_error (conn))
+    g_vfs_backend_ftp_push_connection (ftp, conn);
+  else
+    {
+      /* don't push the connection back, it's our handle now */
+      g_vfs_job_open_for_read_set_handle (job, conn);
+      g_vfs_job_open_for_read_set_can_seek (job, FALSE);
+      ftp_connection_pop_job (conn);
+    }
 }
 
 static void
@@ -1128,10 +1133,15 @@ do_start_write (GVfsBackendFtp *ftp,
 				varargs);
   va_end (varargs);
 
-  /* don't push the connection back, it's our handle now */
-  g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (conn->job), conn);
-  g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (conn->job), FALSE);
-  ftp_connection_pop_job (conn);
+  if (ftp_connection_in_error (conn))
+    g_vfs_backend_ftp_push_connection (ftp, conn);
+  else
+    {
+      /* don't push the connection back, it's our handle now */
+      g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (conn->job), conn);
+      g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (conn->job), FALSE);
+      ftp_connection_pop_job (conn);
+    }
 }
 
 static void
@@ -1879,6 +1889,8 @@ do_make_directory (GVfsBackend *backend,
   ftp_connection_send (conn,
 		       0,
 		       "MKD %s", file);
+  /* FIXME: Compare created file with name from server result to be sure 
+   * it's correct and otherwise fail. */
   g_free (file);
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
