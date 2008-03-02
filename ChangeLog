@@ -1,5 +1,10 @@
 2008-03-02  Benjamin Otte  <otte@gnome.org>
 
+	* client/gvfsuriutils.c: (g_vfs_decode_uri):
+	don't pass the [] when parsing IPv6 addresses
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_make_directory),
 	(g_vfs_backend_ftp_class_init):
 	implement make_directory
