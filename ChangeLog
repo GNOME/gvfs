@@ -1,5 +1,11 @@
 2008-03-02  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (do_make_directory),
+	(g_vfs_backend_ftp_class_init):
+	implement make_directory
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_delete),
 	(g_vfs_backend_ftp_class_init):
 	implement delete

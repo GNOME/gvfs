@@ -1863,6 +1863,28 @@ do_delete (GVfsBackend *backend,
 }
 
 static void
+do_make_directory (GVfsBackend *backend,
+		   GVfsJobMakeDirectory *job,
+		   const char *filename)
+{
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  FtpConnection *conn;
+  FtpFile *file;
+
+  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
+  if (conn == NULL)
+    return;
+
+  file = ftp_filename_from_gvfs_path (conn, filename);
+  ftp_connection_send (conn,
+		       0,
+		       "MKD %s", file);
+  g_free (file);
+
+  g_vfs_backend_ftp_push_connection (ftp, conn);
+}
+
+static void
 g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1885,4 +1907,5 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->enumerate = do_enumerate;
   backend_class->set_display_name = do_set_display_name;
   backend_class->delete = do_delete;
+  backend_class->make_directory = do_make_directory;
 }
