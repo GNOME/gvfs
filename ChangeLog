@@ -1,3 +1,9 @@
+2008-03-02  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* common/gmountsource.c: (ask_password_reply):
+	Treat DBus output paramaters that contain "" as NULL. It fixes the
+	sftp backend when a username is provided by the user.
+	
 2008-03-02  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_open_for_read), (do_start_write),

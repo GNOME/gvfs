@@ -193,9 +193,9 @@ ask_password_reply (DBusMessage *reply,
 	{
 	  data->aborted = aborted;
 
-	  data->password = g_strdup (password);
-	  data->username = g_strdup (username);
-	  data->domain = g_strdup (domain);
+	  data->password = *password == 0 ? NULL : g_strdup (password);
+	  data->username = *username == 0 ? NULL : g_strdup (username);
+	  data->domain = *domain == 0 ? NULL : g_strdup (domain);
 	  data->password_save = (GPasswordSave)password_save;
 
 	  /* TODO: handle more args */
