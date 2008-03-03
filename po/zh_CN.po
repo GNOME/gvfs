@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-01 04:26+0000\n"
-"PO-Revision-Date: 2008-03-01 15:11+0800\n"
+"POT-Creation-Date: 2008-03-03 09:02+0000\n"
+"PO-Revision-Date: 2008-03-03 18:47+0800\n"
 "Last-Translator: Xin Guan <guanx.bac@gmail.com>\n"
 "Language-Team: Simplified Chinese <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -100,16 +100,15 @@ msgstr "流终止"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:773
-#: ../daemon/gvfsbackendobexftp.c:755 ../daemon/gvfsbackendobexftp.c:776
-#: ../daemon/gvfsbackendobexftp.c:895 ../daemon/gvfsbackendobexftp.c:1032
-#: ../daemon/gvfsbackendobexftp.c:1095 ../daemon/gvfsbackendobexftp.c:1220
-#: ../daemon/gvfsbackendobexftp.c:1247 ../daemon/gvfsbackendobexftp.c:1306
-#: ../daemon/gvfsbackendobexftp.c:1328 ../daemon/gvfsbackendobexftp.c:1387
-#: ../daemon/gvfsbackendobexftp.c:1406 ../daemon/gvfsbackendsmb.c:1014
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:824
+#: ../daemon/gvfsbackendobexftp.c:753 ../daemon/gvfsbackendobexftp.c:774
+#: ../daemon/gvfsbackendobexftp.c:893 ../daemon/gvfsbackendobexftp.c:1030
+#: ../daemon/gvfsbackendobexftp.c:1093 ../daemon/gvfsbackendobexftp.c:1218
+#: ../daemon/gvfsbackendobexftp.c:1245 ../daemon/gvfsbackendobexftp.c:1304
+#: ../daemon/gvfsbackendobexftp.c:1326 ../daemon/gvfsbackendobexftp.c:1385
+#: ../daemon/gvfsbackendobexftp.c:1404 ../daemon/gvfsbackendsmb.c:1014
 #: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
 #: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
-#, c-format
 msgid "Operation was cancelled"
 msgstr "操作被取消"
 
@@ -221,7 +220,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD 生成器"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:705
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:742
 #: ../daemon/gvfsbackendnetwork.c:637
 #, c-format
 msgid "The file is not a directory"
@@ -252,7 +251,7 @@ msgstr "无法递归复制目录"
 msgid "Not supported"
 msgstr "不支持"
 
-#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:336
+#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:335
 msgid "No drive specified"
 msgstr "未指定驱动器"
 
@@ -261,64 +260,65 @@ msgstr "未指定驱动器"
 msgid "Cannot find drive %s"
 msgstr "找不到驱动器 %s"
 
-#: ../daemon/gvfsbackendcdda.c:290
+#: ../daemon/gvfsbackendcdda.c:289
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "驱动器 %s 不含音频文件"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:298
+#: ../daemon/gvfsbackendcdda.c:297
 #, c-format
 msgid "cdda mount on %s"
 msgstr "%s 上挂载的 cdda"
 
-#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendcdda.c:803
+#: ../daemon/gvfsbackendcdda.c:298 ../daemon/gvfsbackendcdda.c:802
 #: ../hal/ghalmount.c:488 ../hal/ghalvolume.c:286 ../hal/ghalvolume.c:307
 #, c-format
 msgid "Audio Disc"
 msgstr "音频光盘"
 
-#: ../daemon/gvfsbackendcdda.c:360
+#: ../daemon/gvfsbackendcdda.c:359
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "文件系统忙：打开了 %d 个文件"
 
-#: ../daemon/gvfsbackendcdda.c:550
+#: ../daemon/gvfsbackendcdda.c:549
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "文件 %s 在驱动器 %s 上不存在"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:659
+#: ../daemon/gvfsbackendcdda.c:658
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "驱动器 %s 上有错误来自 'paranoia'"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:721
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "在驱动器 %s 上的流搜索时出错"
 
-#: ../daemon/gvfsbackendcdda.c:819
+#: ../daemon/gvfsbackendcdda.c:818
 #, c-format
 msgid "No such file"
 msgstr "无此文件"
 
-#: ../daemon/gvfsbackendcdda.c:826 ../daemon/gvfsbackendcomputer.c:573
-#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
-#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcdda.c:825 ../daemon/gvfsbackendcomputer.c:573
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1765
+#: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
 msgid "File doesn't exist"
 msgstr "文件不存在"
 
-#: ../daemon/gvfsbackendcdda.c:833
+#: ../daemon/gvfsbackendcdda.c:832
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "文件不存在或不是音轨"
 
-#: ../daemon/gvfsbackendcdda.c:939
+#: ../daemon/gvfsbackendcdda.c:938
 msgid "Audio CD Filesystem Service"
 msgstr "音频 CD 文件系统服务"
 
@@ -330,7 +330,7 @@ msgstr "计算机"
 msgid "Filesystem"
 msgstr "文件系统"
 
-#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendobexftp.c:741
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendobexftp.c:739
 #: ../daemon/gvfsbackendtrash.c:635
 msgid "Can't open directory"
 msgstr "无法打开目录"
@@ -402,7 +402,7 @@ msgid "Please enter proxy password"
 msgstr "请输入代理密码"
 
 #: ../daemon/gvfsbackenddav.c:1176 ../daemon/gvfsbackendhttp.c:292
-#: ../daemon/gvfsbackendobexftp.c:594 ../daemon/gvfsbackendobexftp.c:605
+#: ../daemon/gvfsbackendobexftp.c:592 ../daemon/gvfsbackendobexftp.c:603
 #: ../daemon/gvfsbackendsmb.c:594
 msgid "Invalid mount spec"
 msgstr "无效的挂载描述"
@@ -448,114 +448,112 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "网络"
 
-#: ../daemon/gvfsbackendftp.c:143
+#: ../daemon/gvfsbackendftp.c:183
 msgid "Accounts are unsupported"
 msgstr "不支持这些帐号"
 
-#: ../daemon/gvfsbackendftp.c:147
+#: ../daemon/gvfsbackendftp.c:187
 msgid "Host closed connection"
 msgstr "主机已关闭连接"
 
-#: ../daemon/gvfsbackendftp.c:151
+#: ../daemon/gvfsbackendftp.c:191
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "无法打开数据连接。是不是您的防火墙不允许？"
 
-#: ../daemon/gvfsbackendftp.c:155
+#: ../daemon/gvfsbackendftp.c:195
 msgid "Data connection closed"
 msgstr "数据连接已关闭"
 
-#: ../daemon/gvfsbackendftp.c:161
+#: ../daemon/gvfsbackendftp.c:201
 msgid "File unavailable"
 msgstr "文件不可用"
 
-#: ../daemon/gvfsbackendftp.c:165
+#: ../daemon/gvfsbackendftp.c:205
 msgid "Operation failed"
 msgstr "操作失败"
 
-#: ../daemon/gvfsbackendftp.c:170
+#: ../daemon/gvfsbackendftp.c:210
 msgid "No space left on server"
 msgstr "服务器上没有剩余空间了"
 
-#: ../daemon/gvfsbackendftp.c:178
+#: ../daemon/gvfsbackendftp.c:218
 msgid "Operation unsupported"
 msgstr "不支持此操作"
 
-#: ../daemon/gvfsbackendftp.c:182 ../daemon/gvfsbackendsftp.c:261
+#: ../daemon/gvfsbackendftp.c:222 ../daemon/gvfsbackendsftp.c:261
 msgid "Permission denied"
 msgstr "权限不足"
 
-#: ../daemon/gvfsbackendftp.c:186
+#: ../daemon/gvfsbackendftp.c:226
 msgid "Page type unknown"
 msgstr "页面类型未知"
 
-#: ../daemon/gvfsbackendftp.c:190 ../daemon/gvfsbackendftp.c:1905
+#: ../daemon/gvfsbackendftp.c:230 ../daemon/gvfsbackendftp.c:1840
 #, c-format
 msgid "Invalid filename"
 msgstr "无效文件名"
 
-#: ../daemon/gvfsbackendftp.c:194
-msgid "Invalid reply from server"
-msgstr "服务器回复无效"
-
-#: ../daemon/gvfsbackendftp.c:270 ../daemon/gvfsbackendftp.c:294
-#: ../daemon/gvfsbackendftp.c:307 ../daemon/gvfsbackendftp.c:323
+#: ../daemon/gvfsbackendftp.c:234 ../daemon/gvfsbackendftp.c:312
+#: ../daemon/gvfsbackendftp.c:336 ../daemon/gvfsbackendftp.c:349
+#: ../daemon/gvfsbackendftp.c:365 ../daemon/gvfsbackendftp.c:648
 #, c-format
 msgid "Invalid reply"
 msgstr "无效回复"
 
-#: ../daemon/gvfsbackendftp.c:412
+#: ../daemon/gvfsbackendftp.c:461
 #, c-format
 msgid "broken transmission"
 msgstr "传输损坏"
 
-#: ../daemon/gvfsbackendftp.c:506 ../daemon/gvfsbackendftp.c:627
+#: ../daemon/gvfsbackendftp.c:553 ../daemon/gvfsbackendftp.c:666
 #, c-format
 msgid "Could not connect to host"
 msgstr "无法连接到主机"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:857
+#: ../daemon/gvfsbackendftp.c:906
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "请输入 %s 上 ftp 的密码"
 
-#: ../daemon/gvfsbackendftp.c:876 ../daemon/gvfsbackendsftp.c:834
+#: ../daemon/gvfsbackendftp.c:925 ../daemon/gvfsbackendsftp.c:834
 msgid "Password dialog cancelled"
 msgstr "密码对话框被取消"
 
-#: ../daemon/gvfsbackendftp.c:922
+#: ../daemon/gvfsbackendftp.c:977
 #, c-format
 msgid "ftp on %s"
 msgstr "%s 上的 ftp"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:928
+#: ../daemon/gvfsbackendftp.c:983
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "以 %s ftp 到 %s"
 
-#: ../daemon/gvfsbackendftp.c:967 ../daemon/gvfsbackendsftp.c:1411
+#: ../daemon/gvfsbackendftp.c:1015 ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "未指定主机名"
 
-#: ../daemon/gvfsbackendftp.c:1226
+#: ../daemon/gvfsbackendftp.c:1221 ../daemon/gvfsbackendftp.c:1931
 msgid "backups not supported yet"
 msgstr "尚不支持备份"
 
-#: ../daemon/gvfsbackendftp.c:1471 ../daemon/gvfsbackendftp.c:1673
+#: ../daemon/gvfsbackendftp.c:1436 ../daemon/gvfsbackendftp.c:1636
 #, c-format
 msgid "filename too long"
 msgstr "文件名过长"
 
-#: ../daemon/gvfsbackendftp.c:1802
-msgid "File does not exist"
-msgstr "文件不存在"
+#: ../daemon/gvfsbackendftp.c:1950
+#, c-format
+msgid "Invalid destination filename"
+msgstr "无效目标文件名"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:234
 #, c-format
 msgid "Digital Camera (%s)"
-msgstr "数码相机（%s）"
+msgstr "数码相机(%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
@@ -598,7 +596,7 @@ msgstr " (无效编码)"
 
 #: ../daemon/gvfsbackendlocaltest.c:853
 msgid "Directory notification not supported"
-msgstr "不支持目录notification"
+msgstr "不支持目录通知"
 
 #. smb:/// root link
 #: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:694
@@ -617,11 +615,11 @@ msgid "Network Location Monitor"
 msgstr "网络位置监测器"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:432 ../daemon/gvfsbackendsmb.c:513
+#: ../daemon/gvfsbackendobexftp.c:431 ../daemon/gvfsbackendsmb.c:513
 #: ../daemon/gvfsbackendsmb.c:1222
 #, c-format
 msgid "%s on %s"
-msgstr "%s 于 %s"
+msgstr "%2$s 上的 %1$s"
 
 #: ../daemon/gvfsbackendsftp.c:253
 msgid "ssh program unexpectedly exited"
@@ -1350,3 +1348,9 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "使用注册的用于处理此类文件的应用打开此文件。"
+
+#~ msgid "Invalid reply from server"
+#~ msgstr "服务器回复无效"
+
+#~ msgid "File does not exist"
+#~ msgstr "文件不存在"
