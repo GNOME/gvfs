@@ -108,7 +108,8 @@ struct _FtpConnection
   FtpFeatures		features;
 
   SoupSocket *		commands;
-  gchar			read_buffer[256];
+  gchar *	      	read_buffer;
+  gsize			read_buffer_size;
   gsize			read_bytes;
 
   SoupSocket *		data;
@@ -285,31 +286,55 @@ ftp_connection_receive (FtpConnection *conn,
     DONE
   } reply_state = FIRST_LINE;
   guint response = 0;
-  gsize bytes_left;
 
   if (ftp_connection_in_error (conn))
     return 0;
 
   conn->read_bytes = 0;
-  bytes_left = sizeof (conn->read_buffer) - conn->read_bytes - 1;
-  while (reply_state != DONE && bytes_left >= 6)
+  while (reply_state != DONE)
     {
+      DEBUG ("%u %u\n", conn->read_buffer_size, conn->read_bytes);
+      if (conn->read_buffer_size - conn->read_bytes < 128)
+	{
+	  gsize new_size = conn->read_buffer_size + 1024;
+	  /* FIXME: upper limit for size? */
+	  gchar *new = g_try_realloc (conn->read_buffer, new_size);
+	  if (new)
+	    {
+	      conn->read_buffer = new;
+	      conn->read_buffer_size = new_size;
+	    }
+	  else
+	    {
+	      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid reply"));
+	      return 0;
+	    }
+	}
       last_line = conn->read_buffer + conn->read_bytes;
       status = soup_socket_read_until (conn->commands,
 				       last_line,
-				       bytes_left,
+				       /* -1 byte for nul-termination */
+				       conn->read_buffer_size - conn->read_bytes - 1,
 				       "\r\n",
 				       2,
 				       &n_bytes,
 				       &got_boundary,
 				       conn->job->cancellable,
 				       &conn->error);
+
+      conn->read_bytes += n_bytes;
+      conn->read_buffer[conn->read_bytes] = 0;
+      DEBUG ("<-- %s", last_line);
+
       switch (status)
 	{
 	  case SOUP_SOCKET_OK:
 	  case SOUP_SOCKET_EOF:
 	    if (got_boundary)
 	      break;
+	    if (n_bytes > 0)
+	      continue;
 	    g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			 _("Invalid reply"));
 	    /* fall through */
@@ -321,11 +346,6 @@ ftp_connection_receive (FtpConnection *conn,
 	    g_assert_not_reached ();
 	    break;
 	}
-
-      bytes_left -= n_bytes;
-      conn->read_bytes += n_bytes;
-      conn->read_buffer[conn->read_bytes] = 0;
-      DEBUG ("<-- %s", last_line);
 
       if (reply_state == FIRST_LINE)
 	{
@@ -359,13 +379,6 @@ ftp_connection_receive (FtpConnection *conn,
 	      last_line[3] == ' ')
 	    reply_state = DONE;
 	}
-    }
-
-  if (reply_state != DONE)
-    {
-      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid reply"));
-      return 0;
     }
 
   switch (STATUS_GROUP (response))

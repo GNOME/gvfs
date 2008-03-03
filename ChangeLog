@@ -1,5 +1,11 @@
 2008-03-03  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_connection_receive):
+	dynamically resize the read buffer. This allows receiving the huge
+	welcome messages some ftp servers think are cool.
+
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_connection_parse_features),
 	(ftp_connection_use), (ftp_connection_ensure_data_connection):
 	implement EPSV. This should make IPv6 work.
