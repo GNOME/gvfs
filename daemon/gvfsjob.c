@@ -204,18 +204,19 @@ gboolean
 g_vfs_job_try (GVfsJob *job)
 {
   GVfsJobClass *class;
+  gboolean res;
 
   class = G_VFS_JOB_GET_CLASS (job);
   
-  /* Ensure that the job lives durint the whole
+  /* Ensure that the job lives during the whole
    * lifetime of the call, as it may disappear when
    * we call g_vfs_job_succeed/fail()
    */
   g_object_ref (job);
-  
-  return class->try (job);
-  
+  res = class->try (job);
   g_object_unref (job);
+
+  return res;
 }
 
 void

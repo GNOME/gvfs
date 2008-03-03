@@ -1,3 +1,9 @@
+2008-03-03  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsjob.c: (g_vfs_job_try): Make sure the g_object_unref
+	call is _before_ the return call.
+	Fixes bug #519867
+
 2008-03-03  Cosimo Cecchi  <cosimoc@gnome.org>
 
 	* daemon/gvfsbackendtrash.c: (do_mount):
