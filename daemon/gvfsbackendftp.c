@@ -89,6 +89,8 @@ struct _GVfsBackendFtp
   GQueue *		queue;
   GMutex *		mutex;
   GCond *		cond;
+  guint			connections;
+  guint			max_connections;
 };
 
 G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
@@ -287,13 +289,14 @@ ftp_connection_receive (FtpConnection *conn,
   } reply_state = FIRST_LINE;
   guint response = 0;
 
+  g_assert (conn->job != NULL);
+
   if (ftp_connection_in_error (conn))
     return 0;
 
   conn->read_bytes = 0;
   while (reply_state != DONE)
     {
-      DEBUG ("%u %u\n", conn->read_buffer_size, conn->read_bytes);
       if (conn->read_buffer_size - conn->read_bytes < 128)
 	{
 	  gsize new_size = conn->read_buffer_size + 1024;
@@ -447,6 +450,8 @@ ftp_connection_sendv (FtpConnection *conn,
   SoupSocketIOStatus status;
   gsize n_bytes;
   guint response;
+
+  g_assert (conn->job != NULL);
 
   if (ftp_connection_in_error (conn))
     return 0;
@@ -614,31 +619,6 @@ ftp_connection_use (FtpConnection *conn)
   g_clear_error (&conn->error);
   return TRUE;
 }
-
-#if 0
-static FtpConnection *
-ftp_connection_new (SoupAddress * addr, 
-                    GCancellable *cancellable,
-		    const char *  username,
-		    const char *  password,
-		    GError **	  error)
-{
-  FtpConnection *conn;
-
-  conn = ftp_connection_create (addr, cancellable, error);
-  if (conn == NULL)
-    return NULL;
-
-  if (ftp_connection_login (conn, username, password, error) == 0 ||
-      !ftp_connection_use (conn, error))
-    {
-      ftp_connection_free (conn);
-      return NULL;
-    }
-
-  return conn;
-}
-#endif
 
 static gboolean
 ftp_connection_ensure_data_connection (FtpConnection *conn)
@@ -842,33 +822,67 @@ static FtpConnection *
 g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp, 
 				  GVfsJob *	  job)
 {
-  FtpConnection *conn;
+  FtpConnection *conn = NULL;
+  guint id;
 
   g_mutex_lock (ftp->mutex);
-  conn = ftp->queue ? g_queue_pop_head (ftp->queue) : NULL;
-  if (conn == NULL && ftp->queue != NULL)
+  id = g_signal_connect (job->cancellable, 
+			       "cancelled", 
+			       G_CALLBACK (do_broadcast),
+			       ftp->cond);
+  while (conn == NULL && ftp->queue != NULL)
     {
-      guint id = g_signal_connect (job->cancellable, 
-				   "cancelled", 
-				   G_CALLBACK (do_broadcast),
-				   ftp->cond);
-      while (conn == NULL && ftp->queue == NULL && !g_cancellable_is_cancelled (job->cancellable))
+      if (g_cancellable_is_cancelled (job->cancellable))
+	break;
+      conn = g_queue_pop_head (ftp->queue);
+
+      if (conn != NULL) {
+	/* Figure out if this connection had a timeout sent. If so, skip it. */
+	g_mutex_unlock (ftp->mutex);
+	ftp_connection_push_job (conn, job);
+	if (ftp_connection_send (conn, 0, "NOOP"))
+	  break;
+	    
+	g_clear_error (&conn->error);
+	conn->job = NULL;
+	ftp_connection_free (conn);
+	conn = NULL;
+	g_mutex_lock (ftp->mutex);
+	ftp->connections--;
+	continue;
+      }
+
+      if (ftp->connections < ftp->max_connections)
 	{
-	  g_cond_wait (ftp->cond, ftp->mutex);
-	  conn = g_queue_pop_head (ftp->queue);
+	  ftp->connections++;
+	  g_mutex_unlock (ftp->mutex);
+	  conn = ftp_connection_create (ftp->addr, job);
+	  ftp_connection_login (conn, ftp->user, ftp->password);
+	  ftp_connection_use (conn);
+	  if (!ftp_connection_in_error (conn))
+	    break;
+
+	  ftp_connection_pop_job (conn);
+	  ftp_connection_free (conn);
+	  conn = NULL;
+	  g_mutex_lock (ftp->mutex);
+	  ftp->connections--;
+	  /* FIXME: This assignment is racy due to the mutex unlock above */
+	  ftp->max_connections = ftp->connections;
+	  if (ftp->max_connections == 0)
+	    {
+	      DEBUG ("no more connections left, exiting...");
+	      /* FIXME: shut down properly */
+	      exit (0);
+	    }
+
+	  continue;
 	}
-      g_signal_handler_disconnect (job->cancellable, id);
-    }
-  g_mutex_unlock (ftp->mutex);
 
-  if (conn == NULL)
-    {
-      /* FIXME: need different error on force-unmount? */
-      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_CANCELLED,
-	                _("Operation was cancelled"));
+      g_cond_wait (ftp->cond, ftp->mutex);
     }
+  g_signal_handler_disconnect (job->cancellable, id);
 
-  ftp_connection_push_job (conn, job);
   return conn;
 }
 
@@ -1033,6 +1047,8 @@ try_login:
       g_free (display_name);
       g_vfs_backend_set_icon_name (backend, "folder-remote");
 
+      ftp->connections = 1;
+      ftp->max_connections = G_MAXUINT;
       ftp->queue = g_queue_new ();
       g_vfs_backend_ftp_push_connection (ftp, conn);
     }

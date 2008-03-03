@@ -1,3 +1,11 @@
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_receive),
+	(ftp_connection_sendv), (g_vfs_backend_ftp_pop_connection),
+	(do_mount):
+	fix server disconnect on timeout. Side effect is that the ftp backend
+	just spawned multiple connections support.
+
 2008-03-03  Alexander Larsson  <alexl@redhat.com>
 
         * common/gdbusutils.[ch]:
