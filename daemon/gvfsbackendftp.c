@@ -72,8 +72,10 @@
 typedef enum {
   FTP_FEATURE_MDTM = (1 << 0),
   FTP_FEATURE_SIZE = (1 << 1),
-  FTP_FEATURE_TVFS = (1 << 2)
+  FTP_FEATURE_TVFS = (1 << 2),
+  FTP_FEATURE_EPSV = (1 << 3)
 } FtpFeatures;
+#define FTP_FEATURES_DEFAULT (FTP_FEATURE_EPSV)
 
 struct _GVfsBackendFtp
 {
@@ -505,7 +507,8 @@ ftp_connection_parse_features (FtpConnection *conn)
   } features[] = {
     { "MDTM", FTP_FEATURE_MDTM },
     { "SIZE", FTP_FEATURE_SIZE },
-    { "TVFS", FTP_FEATURE_TVFS }
+    { "TVFS", FTP_FEATURE_TVFS },
+    { "EPSV", FTP_FEATURE_EPSV }
   };
   char **supported;
   guint i, j;
@@ -588,6 +591,12 @@ ftp_connection_use (FtpConnection *conn)
   /* check supported features */
   if (ftp_connection_send (conn, 0, "FEAT") != 0)
     ftp_connection_parse_features (conn);
+  else
+    conn->features = FTP_FEATURES_DEFAULT;
+
+  /* RFC 2428 suggests to send this to make NAT routers happy */
+  if (conn->features & FTP_FEATURE_EPSV)
+    ftp_connection_send (conn, 0, "EPSV ALL");
 
   g_clear_error (&conn->error);
   return TRUE;
@@ -627,6 +636,27 @@ ftp_connection_ensure_data_connection (FtpConnection *conn)
   char *ip;
   guint status;
 
+  if (conn->features & FTP_FEATURE_EPSV)
+    {
+      status = ftp_connection_send (conn, RESPONSE_PASS_500, "EPSV");
+      if (STATUS_GROUP (status) == 2)
+	{
+	  s = strrchr (conn->read_buffer, '(');
+	  if (s)
+	    {
+	      guint port;
+	      s += 4;
+	      port = strtoul (s, NULL, 10);
+	      if (port != 0)
+		{
+		  addr = soup_address_new (
+		      soup_address_get_name (soup_socket_get_remote_address (conn->commands)),
+		      port);
+		  goto have_address;
+		}
+	    }
+	}
+    }
   /* only binary transfers please */
   status = ftp_connection_send (conn, 0, "PASV");
   if (status == 0)
@@ -652,6 +682,7 @@ ftp_connection_ensure_data_connection (FtpConnection *conn)
   addr = soup_address_new (ip, port1 << 8 | port2);
   g_free (ip);
 
+have_address:
   conn->data = soup_socket_new ("non-blocking", FALSE,
 				"remote-address", addr,
 				NULL);
