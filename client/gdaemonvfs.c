@@ -38,6 +38,13 @@
 #include "gdaemonvolumemonitor.h"
 #include <glib/gi18n-lib.h>
 
+typedef struct  {
+  char *type;
+  char *scheme;
+  char **scheme_aliases;
+  int default_port;
+  gboolean host_is_inet;
+} MountableInfo; 
 
 struct _GDaemonVfs
 {
@@ -51,7 +58,8 @@ struct _GDaemonVfs
   GHashTable *from_uri_hash;
   GHashTable *to_uri_hash;
 
-  gchar **supported_uri_schemes;
+  MountableInfo **mountable_info;
+  char **supported_uri_schemes;
 };
 
 struct _GDaemonVfsClass
@@ -65,6 +73,8 @@ static GDaemonVfs *the_vfs = NULL;
 
 G_LOCK_DEFINE_STATIC(mount_cache);
 
+
+static void fill_mountable_info (GDaemonVfs *vfs);
 
 static void
 g_daemon_vfs_finalize (GObject *object)
@@ -92,6 +102,58 @@ g_daemon_vfs_finalize (GObject *object)
   
   /* must chain up */
   G_OBJECT_CLASS (g_daemon_vfs_parent_class)->finalize (object);
+}
+
+static MountableInfo *
+get_mountable_info_for_scheme (GDaemonVfs *vfs,
+			       const char *scheme)
+{
+  MountableInfo *info;
+  int i, j;
+
+  if (vfs->mountable_info == NULL)
+    return NULL;
+
+  for (i = 0; vfs->mountable_info[i] != NULL; i++)
+    {
+      info = vfs->mountable_info[i];
+      
+      if (info->scheme != NULL && strcmp (info->scheme, scheme) == 0)
+	return info;
+
+      if (info->scheme_aliases != NULL)
+	{
+	  for (j = 0; info->scheme_aliases[j] != NULL; j++)
+	    {
+	      if (strcmp (info->scheme_aliases[j], scheme) == 0)
+		return info;
+	    }
+	}
+      
+    }
+  
+  return NULL;
+}
+
+static MountableInfo *
+get_mountable_info_for_type (GDaemonVfs *vfs,
+			     const char *type)
+{
+  MountableInfo *info;
+  int i;
+  
+  if (vfs->mountable_info == NULL)
+    return NULL;
+  
+  for (i = 0; vfs->mountable_info[i] != NULL; i++)
+    {
+      info = vfs->mountable_info[i];
+      
+      if (strcmp (info->type, type) == 0)
+	return info;
+    }
+  
+  return NULL;
 }
 
 static gboolean
@@ -130,19 +192,49 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   if (spec == NULL)
     {
       GDecodedUri *decoded;
-      
+      MountableInfo *mountable;
+      char *type, *p;
+      int l;
+
       decoded = g_vfs_decode_uri (uri);
       if (decoded)
-	{
-	  spec = g_mount_spec_new (decoded->scheme);
+	{	
+	  mountable = get_mountable_info_for_scheme (vfs, decoded->scheme);
+      
+	  if (mountable)
+	    type = mountable->type;
+	  else
+	    type = decoded->scheme;
+	  
+	  spec = g_mount_spec_new (type);
 	  
 	  if (decoded->host && *decoded->host)
-	    g_mount_spec_set (spec, "host", decoded->host);
+	    {
+	      if (mountable && mountable->host_is_inet)
+		{
+		  /* Convert hostname to lower case */
+		  for (p = decoded->host; *p != 0; p++)
+		    *p = g_ascii_tolower (*p);
+		  
+		  /* Remove brackets aroung ipv6 addresses */
+		  l = strlen (decoded->host);
+		  if (decoded->host[0] == '[' &&
+		      decoded->host[l - 1] == ']')
+		    g_mount_spec_set_with_len (spec, "host", decoded->host+1, l - 2);
+		  else
+		    g_mount_spec_set (spec, "host", decoded->host);
+		}
+	      else
+		g_mount_spec_set (spec, "host", decoded->host);
+	    }
 	  
 	  if (decoded->userinfo && *decoded->userinfo)
 	    g_mount_spec_set (spec, "user", decoded->userinfo);
 	  
-	  if (decoded->port != -1)
+	  if (decoded->port != -1 &&
+	      (mountable == NULL ||
+	       mountable->default_port == 0 ||
+	       mountable->default_port != decoded->port))
 	    {
 	      char *port = g_strdup_printf ("%d", decoded->port);
 	      g_mount_spec_set (spec, "port", port);
@@ -150,7 +242,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	    }
 	  
 	  path = g_strdup (decoded->path);
-
+	  
 	  g_vfs_decoded_uri_free (decoded);
 	}
     }
@@ -201,6 +293,8 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
      even for somewhat modern ones like solaris.
   */
   signal (SIGPIPE, SIG_IGN);
+
+  fill_mountable_info (vfs);
   
   vfs->wrapped_vfs = g_vfs_get_local ();
 
@@ -357,24 +451,41 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
   if (uri == NULL)
     {
       GDecodedUri decoded;
+      MountableInfo *mountable;
       const char *port;
+      gboolean free_host;
 
       memset (&decoded, 0, sizeof (decoded));
       decoded.port = -1;
-      
-      decoded.scheme = (char *)type;
+
+      mountable = get_mountable_info_for_type (the_vfs, type);
+
+      if (mountable)
+	decoded.scheme = mountable->scheme;
+      else
+	decoded.scheme = (char *)type;
       decoded.host = (char *)g_mount_spec_get (spec, "host");
+      free_host = FALSE;
+      if (mountable && mountable->host_is_inet && strchr (decoded.host, ':') != NULL)
+	{
+	  free_host = TRUE;
+	  decoded.host = g_strconcat ("[", decoded.host, "]", NULL);
+	}
+      
       decoded.userinfo = (char *)g_mount_spec_get (spec, "user");
       port = g_mount_spec_get (spec, "port");
       if (port != NULL)
 	decoded.port = atoi (port);
-
+      
       if (path == NULL)
 	decoded.path = "/";
       else
 	decoded.path = path;
       
       uri = g_vfs_encode_uri (&decoded, FALSE);
+      
+      if (free_host)
+	g_free (decoded.host);
     }
   
   return uri;
@@ -385,6 +496,7 @@ _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
 {
   const char *type, *scheme;
   GVfsUriMapper *mapper;
+  MountableInfo *mountable;
 
   type = g_mount_spec_get_type (spec);
   mapper = g_hash_table_lookup (the_vfs->to_uri_hash, type);
@@ -401,28 +513,31 @@ _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
     }
   
   if (scheme == NULL)
-    scheme = type;
+    {
+      mountable = get_mountable_info_for_type (the_vfs, type);
+      if (mountable)
+	scheme = mountable->scheme;
+      else
+	scheme = type;
+    }
   
   return scheme;
 }
 
 static void
-fill_supported_uri_schemes (GDaemonVfs *vfs)
+fill_mountable_info (GDaemonVfs *vfs)
 {
-  DBusConnection *connection;
   DBusMessage *message, *reply;
   DBusError error;
-  DBusMessageIter iter, array_iter;
+  DBusMessageIter iter, array_iter, struct_iter;
+  MountableInfo *info;
+  GPtrArray *infos, *uri_schemes;
   gint i, count;
-  GList *l, *list = NULL;
 
-  connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
-
-  
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
                                           G_VFS_DBUS_MOUNTTRACKER_PATH,
 					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
-					  G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNT_TYPES);
+					  G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTABLE_INFO);
 
   if (message == NULL)
     _g_dbus_oom ();
@@ -430,96 +545,85 @@ fill_supported_uri_schemes (GDaemonVfs *vfs)
   dbus_message_set_auto_start (message, TRUE);
   
   dbus_error_init (&error);
-  reply = dbus_connection_send_with_reply_and_block (connection,
+  reply = dbus_connection_send_with_reply_and_block (vfs->async_bus,
                                                      message,
 						     G_VFS_DBUS_TIMEOUT_MSECS,
 						     &error);
   dbus_message_unref (message);
-
+  
   if (dbus_error_is_set (&error))
     {
       dbus_error_free (&error);
-      dbus_connection_unref (connection);
       return;
     }
-
+  
   if (reply == NULL)
     _g_dbus_oom ();
 
   dbus_message_iter_init (reply, &iter);
-  g_assert (dbus_message_iter_get_element_type (&iter) == DBUS_TYPE_STRING);
 
   dbus_message_iter_recurse (&iter, &array_iter);
-  
+
+  infos = g_ptr_array_new ();
+  uri_schemes = g_ptr_array_new ();
   count = 0;
   do
     {
-      gchar *type;
-      const char *scheme = NULL;
-      GVfsUriMapper *mapper = NULL;
-      GMountSpec *spec;
-      gboolean new = TRUE;
+      char *type, *scheme, **scheme_aliases;
+      int scheme_aliases_len;
+      gint32 default_port;
+      dbus_bool_t host_is_inet;
+      
+      if (dbus_message_iter_get_arg_type (&array_iter) != DBUS_TYPE_STRUCT)
+	break;
+      
+      dbus_message_iter_recurse (&array_iter, &struct_iter);
+      
+      if (!_g_dbus_message_iter_get_args (&struct_iter, NULL,
+					  DBUS_TYPE_STRING, &type,
+					  DBUS_TYPE_STRING, &scheme,
+					  DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &scheme_aliases, &scheme_aliases_len,
+					  DBUS_TYPE_INT32, &default_port,
+					  DBUS_TYPE_BOOLEAN, &host_is_inet,
+					  0))
+	break;
 
-      dbus_message_iter_get_basic (&array_iter, &type);
-
-      spec = g_mount_spec_new (type);
-
-      mapper = g_hash_table_lookup (vfs->to_uri_hash, type);
-    
-      if (mapper)
+      info = g_new0 (MountableInfo, 1);
+      info->type = g_strdup (type);
+      if (*scheme != 0)
 	{
-	  GVfsUriMountInfo info;
-	  
-	  info.keys = spec->items;
-	  info.path = "/";
-	  
-	  scheme = g_vfs_uri_mapper_to_uri_scheme (mapper, &info);
+	  info->scheme = g_strdup (scheme);
+	  g_ptr_array_add (uri_schemes, g_strdup (scheme));
 	}
+      
+      info->scheme_aliases = g_new (char *, scheme_aliases_len);
+      for (i = 0; i < scheme_aliases_len; i++)
+	{
+	  info->scheme_aliases[i] = g_strdup (scheme_aliases[i]);
+	  g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
+	}
+	
+      info->default_port = default_port;
+      info->host_is_inet = host_is_inet;
+      
+      g_ptr_array_add (infos, info);
 
-      if (scheme == NULL)
-        scheme = type;
-
-      for (l = list; l != NULL; l = l->next)
-        {
-          if (strcmp (l->data, scheme) == 0)
-            {
-              new = FALSE;
-              break;
-            }
-        }
-
-      if (new)
-        {
-          list = g_list_prepend (list, g_strdup (scheme));
-          count++;
-        }
-
-      g_mount_spec_unref (spec);
+      dbus_free_string_array (scheme_aliases);
     }
   while (dbus_message_iter_next (&array_iter));
 
   dbus_message_unref (reply);
-  dbus_connection_unref (connection);
 
-  list = g_list_prepend (list, g_strdup ("file"));
-  list = g_list_sort (list, (GCompareFunc) strcmp);
-
-  vfs->supported_uri_schemes = g_new0 (gchar *, count + 2);
-
-  for (i = 0, l = list; l != NULL; l = l->next, i++)
-    vfs->supported_uri_schemes[i] = l->data;
-
-  g_list_free (list);
+  g_ptr_array_add (uri_schemes, NULL);
+  g_ptr_array_add (infos, NULL);
+  vfs->mountable_info = (MountableInfo **)g_ptr_array_free (infos, FALSE);
+  vfs->supported_uri_schemes = (char **)g_ptr_array_free (uri_schemes, FALSE);
 }
+
 
 static const gchar * const *
 g_daemon_vfs_get_supported_uri_schemes (GVfs *vfs)
 {
-  GDaemonVfs *daemon_vfs = G_DAEMON_VFS (vfs);
-
-  if (!daemon_vfs->supported_uri_schemes)
-    fill_supported_uri_schemes (daemon_vfs);
-    
   return (const gchar * const *) G_DAEMON_VFS (vfs)->supported_uri_schemes;
 }
 
@@ -833,7 +937,6 @@ g_io_module_load (GIOModule *module)
   
   g_vfs_uri_mapper_register (module);
   g_vfs_uri_mapper_smb_register (module);
-  g_vfs_uri_mapper_sftp_register (module);
   g_vfs_uri_mapper_http_register (module);
 }
 

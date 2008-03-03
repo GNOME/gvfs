@@ -2,3 +2,7 @@
 Type=sftp
 Exec=@libexecdir@/gvfsd-sftp
 AutoMount=false
+Scheme=sftp
+SchemeAliases=ssh
+DefaultPort=22
+HostnameIsInetAddress=true

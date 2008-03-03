@@ -56,6 +56,10 @@ typedef struct  {
   char *exec;
   char *dbus_name;
   gboolean automount;
+  char *scheme;
+  char **scheme_aliases;
+  int default_port;
+  gboolean hostname_is_inet;
 } VfsMountable; 
 
 typedef void (*MountCallback) (VfsMountable *mountable,
@@ -143,6 +147,8 @@ vfs_mountable_free (VfsMountable *mountable)
   g_free (mountable->type);
   g_free (mountable->exec);
   g_free (mountable->dbus_name);
+  g_free (mountable->scheme);
+  g_strfreev (mountable->scheme_aliases);
   g_free (mountable);
 }
 
@@ -232,6 +238,60 @@ vfs_mount_to_dbus (VfsMount *mount,
   if (!dbus_message_iter_close_container (iter, &struct_iter))
     _g_dbus_oom ();
 }
+
+static void
+vfs_mountable_to_dbus (VfsMountable *mountable,
+		       DBusMessageIter *iter)
+{
+  DBusMessageIter struct_iter;
+  dbus_bool_t bool;
+  guint32 int32;
+  char *s;
+  char **a;
+  char *empty[] = {NULL};
+  
+  if (!dbus_message_iter_open_container (iter,
+					 DBUS_TYPE_STRUCT,
+					 NULL,
+					 &struct_iter))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &mountable->type))
+    _g_dbus_oom ();
+  
+  s = mountable->scheme;
+  if (s == NULL)
+    s = "";
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &s))
+    _g_dbus_oom ();
+
+  a = mountable->scheme_aliases;
+  if (a == NULL)
+    a = empty;
+  _g_dbus_message_iter_append_args (&struct_iter,
+				    DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &a, (int)g_strv_length (a),
+				    0);
+  
+  int32 = mountable->default_port;
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_INT32,
+				       &int32))
+    _g_dbus_oom ();
+  
+  bool = mountable->hostname_is_inet;
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_BOOLEAN,
+				       &bool))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_close_container (iter, &struct_iter))
+    _g_dbus_oom ();
+}
+
 
 /************************************************************************
  * Support for mounting a VfsMountable                                  *
@@ -496,6 +556,14 @@ read_mountable_config (void)
 			  mountable->exec = g_key_file_get_string (keyfile, "Mount", "Exec", NULL);
 			  mountable->dbus_name = g_key_file_get_string (keyfile, "Mount", "DBusName", NULL);
 			  mountable->automount = g_key_file_get_boolean (keyfile, "Mount", "AutoMount", NULL);
+			  mountable->scheme = g_key_file_get_string (keyfile, "Mount", "Scheme", NULL);
+			  mountable->scheme_aliases =
+			    g_key_file_get_string_list (keyfile, "Mount", "SchemeAliases", NULL, NULL);
+			  mountable->default_port = g_key_file_get_integer (keyfile, "Mount", "DefaultPort", NULL);
+			  mountable->hostname_is_inet = g_key_file_get_boolean (keyfile, "Mount", "HostnameIsInetAddress", NULL);
+
+			  if (mountable->scheme == NULL)
+			    mountable->scheme = g_strdup (mountable->type);
 			  
 			  mountables = g_list_prepend (mountables, mountable);
 			}
@@ -942,6 +1010,47 @@ list_mount_types (DBusConnection *connection,
   dbus_connection_send (connection, reply, NULL);
 }
 
+static void
+list_mountable_info (DBusConnection *connection,
+		     DBusMessage *message)
+{
+  VfsMountable *mountable;
+  DBusMessage *reply;
+  DBusMessageIter iter, array_iter;
+  GList *l;
+
+  reply = dbus_message_new_method_return (message);
+  if (reply == NULL)
+    _g_dbus_oom ();
+
+  dbus_message_iter_init_append (reply, &iter);
+
+  
+  if (!dbus_message_iter_open_container (&iter,
+					 DBUS_TYPE_ARRAY,
+					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+					   DBUS_TYPE_STRING_AS_STRING /* type */
+					   DBUS_TYPE_STRING_AS_STRING /* scheme */
+					   DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING /* scheme aliases */
+					   DBUS_TYPE_INT32_AS_STRING /* default port */
+					   DBUS_TYPE_BOOLEAN_AS_STRING /* host is inet */
+					 DBUS_STRUCT_END_CHAR_AS_STRING,
+					 &array_iter))
+    _g_dbus_oom ();
+
+  for (l = mountables; l != NULL; l = l->next)
+    {
+      mountable = l->data;
+      
+      vfs_mountable_to_dbus (mountable, &array_iter);
+    }
+
+  if (!dbus_message_iter_close_container (&iter, &array_iter))
+    _g_dbus_oom ();
+  
+  dbus_connection_send (connection, reply, NULL);
+}
+
 static DBusHandlerResult
 dbus_message_function (DBusConnection  *connection,
 		       DBusMessage     *message,
@@ -974,6 +1083,10 @@ dbus_message_function (DBusConnection  *connection,
   					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNT_TYPES))
     list_mount_types (connection, message);
+  else if (dbus_message_is_method_call (message,
+  					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTABLE_INFO))
+    list_mountable_info (connection, message);
   else
     res = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
   

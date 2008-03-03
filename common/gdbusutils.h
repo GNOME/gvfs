@@ -44,6 +44,12 @@ GList *      _g_dbus_bus_list_names_with_prefix     (DBusConnection   *connectio
 						     DBusError        *error);
 void         _g_dbus_message_iter_append_cstring    (DBusMessageIter  *iter,
 						     const char       *str);
+void         _g_dbus_message_iter_append_args_valist (DBusMessageIter *iter,
+						     int               first_arg_type,
+						     va_list           var_args);
+void         _g_dbus_message_iter_append_args       (DBusMessageIter  *iter,
+						     int               first_arg_type,
+						     ...);
 void         _g_dbus_message_append_args_valist     (DBusMessage      *message,
 						     int               first_arg_type,
 						     va_list           var_args);

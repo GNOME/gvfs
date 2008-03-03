@@ -240,18 +240,15 @@ _g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *str)
 }
 
 void
-_g_dbus_message_append_args_valist (DBusMessage *message,
-				    int          first_arg_type,
-				    va_list      var_args)
+_g_dbus_message_iter_append_args_valist (DBusMessageIter *iter,
+					 int          first_arg_type,
+					 va_list      var_args)
 {
   int type;
-  DBusMessageIter iter;
 
-  g_return_if_fail (message != NULL);
+  g_return_if_fail (iter != NULL);
 
   type = first_arg_type;
-
-  dbus_message_iter_init_append (message, &iter);
 
   while (type != DBUS_TYPE_INVALID)
     {
@@ -263,14 +260,14 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
 	  value_p = va_arg (var_args, const char**);
 	  value = *value_p;
 
-	  _g_dbus_message_iter_append_cstring (&iter, value);
+	  _g_dbus_message_iter_append_cstring (iter, value);
 	}
       else if (dbus_type_is_basic (type))
         {
           const void *value;
           value = va_arg (var_args, const void*);
 
-          if (!dbus_message_iter_append_basic (&iter,
+          if (!dbus_message_iter_append_basic (iter,
                                                type,
                                                value))
 	    _g_dbus_oom ();
@@ -285,7 +282,7 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
               
           buf[0] = element_type;
           buf[1] = '\0';
-          if (!dbus_message_iter_open_container (&iter,
+          if (!dbus_message_iter_open_container (iter,
                                                  DBUS_TYPE_ARRAY,
                                                  buf,
                                                  &array))
@@ -335,12 +332,32 @@ _g_dbus_message_append_args_valist (DBusMessage *message,
 		       element_type);
             }
 
-          if (!dbus_message_iter_close_container (&iter, &array))
+          if (!dbus_message_iter_close_container (iter, &array))
 	    _g_dbus_oom ();
         }
 
       type = va_arg (var_args, int);
     }
+}
+
+
+void
+_g_dbus_message_append_args_valist (DBusMessage *message,
+				    int          first_arg_type,
+				    va_list      var_args)
+{
+  int type;
+  DBusMessageIter iter;
+
+  g_return_if_fail (message != NULL);
+
+  type = first_arg_type;
+
+  dbus_message_iter_init_append (message, &iter);
+
+  _g_dbus_message_iter_append_args_valist (&iter,
+					   first_arg_type,
+					   var_args);
 }
 
 dbus_bool_t
@@ -567,6 +584,21 @@ _g_dbus_message_append_args (DBusMessage *message,
   va_end (var_args);
 }
 
+void
+_g_dbus_message_iter_append_args (DBusMessageIter *iter,
+				  int          first_arg_type,
+				  ...)
+{
+  va_list var_args;
+
+  g_return_if_fail (iter != NULL);
+
+  va_start (var_args, first_arg_type);
+  _g_dbus_message_iter_append_args_valist (iter,
+					   first_arg_type,
+					   var_args);
+  va_end (var_args);
+}
 
 void
 _g_error_from_dbus (DBusError *derror, 

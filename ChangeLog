@@ -1,3 +1,33 @@
+2008-03-03  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gdbusutils.[ch]:
+        Add _g_dbus_message_iter_append_args_valist and
+        _g_dbus_message_iter_append_args.
+
+        * common/gvfsdaemonprotocol.h:
+	Add G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTABLE_INFO
+	
+        * client/Makefile.am:
+        * client/gdaemonvfs.c:
+	Use listMountableInfo to get supported uri schemes
+	and information for default uri handling.
+	Handle default port in uris and if host_is_inet normalize hostnames,
+	including removing ipv6 brackets.
+	
+        * client/sftpuri.c:
+	Removed, as the previous work replaces it
+	
+        * daemon/gvfsdaemonutils.c:
+        (gvfs_file_info_populate_content_types):
+	Fix uninitialized variable warning.
+	
+        * daemon/mount.c:
+	Read new mountfile info and implement
+	list_mountable_info.
+	
+        * daemon/sftp.mount.in:
+	Add info for sftp
+
 2008-03-03  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsjob.c: (g_vfs_job_try): Make sure the g_object_unref
