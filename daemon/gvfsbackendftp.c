@@ -1762,7 +1762,7 @@ do_query_info (GVfsBackend *backend,
 	g_set_error (&conn->error,
 		     G_IO_ERROR,
 		     G_IO_ERROR_NOT_FOUND,
-		     _("File does not exist"));
+		     _("File doesn't exist"));
 
     }
 

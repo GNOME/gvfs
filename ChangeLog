@@ -1,3 +1,10 @@
+2008-03-03  Luca Ferretti  <elle.uca@libero.it>
+
+	* daemon/gvfsbackendftp.c: (do_query_info):
+	Make "file don't exist" message conform to other backends;
+	no, it isn't a string freeze break, the message yet exists
+	elsewhere.
+
 2008-03-02  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_filename_construct):
