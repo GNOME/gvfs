@@ -1,3 +1,8 @@
+2008-03-03  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendtrash.c: (do_mount):
+	Create the root monitor for trash when mounting. (#509740).
+
 2008-03-03  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_connection_receive):

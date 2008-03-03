@@ -115,10 +115,11 @@ G_LOCK_DEFINE_STATIC(root_monitor);
 
 G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND)
 
-static void   schedule_update_trash_files (GVfsBackendTrash *backend,
-                                           gboolean          update_trash_dirs);
-static GList *enumerate_root              (GVfsBackend      *backend,
-                                           GVfsJobEnumerate *job);
+static void   schedule_update_trash_files  (GVfsBackendTrash *backend,
+                                            gboolean          update_trash_dirs);
+static GList *enumerate_root               (GVfsBackend      *backend,
+                                            GVfsJobEnumerate *job);
+static GVfsMonitor *do_create_root_monitor (GVfsBackend      *backend);
 
 static char *
 escape_pathname (const char *dir)
@@ -618,6 +619,7 @@ do_mount (GVfsBackend *backend,
   names = enumerate_root (backend, NULL);
   trash_backend->num_top_files = g_list_length (names);
   trash_backend->top_files = g_list_sort (names, (GCompareFunc)strcmp);
+  do_create_root_monitor (backend);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
  }
