@@ -612,8 +612,8 @@ do_mount (GVfsBackend *backend,
                          DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID) == FALSE)
     {
       g_free (bdaddr);
-      g_error_free (error);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       return;
     }
 
@@ -1081,6 +1081,7 @@ do_query_fs_info (GVfsBackend *backend,
     {
       g_mutex_unlock (op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       ovu_caps_free (caps);
       return;
     }
@@ -1206,6 +1207,7 @@ do_delete (GVfsBackend *backend,
     {
       g_mutex_unlock (op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       g_object_unref (info);
       return;
     }
@@ -1374,6 +1376,7 @@ do_make_directory (GVfsBackend *backend,
     {
       g_mutex_unlock (op_backend->mutex);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       return;
     }
 

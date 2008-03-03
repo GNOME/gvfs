@@ -1,3 +1,11 @@
+2008-03-03  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (do_mount), (do_open_for_read),
+	(do_read), (do_query_info), (do_query_fs_info), (do_enumerate),
+	(do_delete), (do_make_directory): Fix a crasher when
+	mounting fails, by not freeing the error just before using it
+	(duh!) (Closes: #519752), Fix a few error paths leaking errors
+
 2008-03-03  Luca Ferretti  <elle.uca@libero.it>
 
 	* daemon/gvfsbackendftp.c: (do_query_info):
