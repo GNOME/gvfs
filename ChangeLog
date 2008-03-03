@@ -1,3 +1,33 @@
+2008-03-03  David Zeuthen  <davidz@redhat.com>
+
+	Add write support to gphoto2 backend. Also performance
+	enhancements for querying, enumerating and reading.
+	Fixes bug #519651
+
+	* daemon/gvfsbackendgphoto2.c: (monitor_proxy_free), (DEBUG),
+	(write_handle_free), (ensure_not_dirty), (dup_for_gphoto2),
+	(monitors_emit_internal), (monitors_emit_created),
+	(monitors_emit_deleted), (monitors_emit_changed),
+	(caches_invalidate_all), (caches_invalidate_free_space),
+	(caches_invalidate_dir), (caches_invalidate_file),
+	(get_error_from_gphoto2), (release_device),
+	(g_vfs_backend_gphoto2_finalize), (_gphoto2_logger_func),
+	(g_vfs_backend_gphoto2_init), (find_udi_for_device),
+	(_hal_device_removed), (split_filename_with_ignore_prefix),
+	(add_ignore_prefix), (file_get_info), (is_directory), (is_regular),
+	(is_directory_empty), (ensure_ignore_prefix), (do_mount),
+	(try_mount), (do_unmount), (free_read_handle), (do_open_for_read),
+	(try_read), (try_seek_on_read), (do_close_read), (do_query_info),
+	(try_query_info), (do_enumerate), (try_enumerate),
+	(do_query_fs_info), (try_query_fs_info), (do_make_directory),
+	(do_slow_file_rename_in_same_dir), (do_file_rename_in_same_dir),
+	(do_dir_rename_in_same_dir), (do_set_display_name), (do_delete),
+	(do_create_internal), (do_create), (do_replace), (do_append_to),
+	(do_write), (do_seek_on_write), (commit_write_handle),
+	(do_close_write), (do_move), (vfs_dir_monitor_destroyed),
+	(do_create_dir_monitor), (vfs_file_monitor_destroyed),
+	(do_create_file_monitor), (g_vfs_backend_gphoto2_class_init):
+
 2008-03-03  Carlos Garcia Campos  <carlosgc@gnome.org>
 
 	* daemon/mount.c: (read_mountable_config):
