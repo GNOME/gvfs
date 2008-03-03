@@ -181,25 +181,23 @@ g_vfs_decode_uri (const char *uri)
 	      return NULL;
 	    }
 	  port_start = memchr (host_end, ':', authority_end - host_start);
-	  host_start++;
         }
       else
         {
 	  port_start = memchr (host_start, ':', authority_end - host_start);
-	  host_end = port_start ? port_start : authority_end;
 	}
 
       if (port_start)
 	{
-	  decoded->port = atoi(port_start + 1);
-	  if (decoded->port <= 0)
-	    {
-	      g_vfs_decoded_uri_free (decoded);
-	      return NULL;
-	    }
+	  host_end = port_start++;
+
+	  decoded->port = atoi(port_start);
 	}
       else
-	decoded->port = -1;
+	{
+	  host_end = authority_end;
+	  decoded->port = -1;
+	}
 
       decoded->host = g_strndup (host_start, host_end - host_start);
 
