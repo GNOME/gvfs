@@ -1,3 +1,8 @@
+2008-03-03  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/mount.c: (read_mountable_config):
+	Fix memory leak.
+	
 2008-03-03  Benjamin Otte  <otte@gnome.org>
 
 	* client/gdaemonvfs.c: (fill_mountable_info):

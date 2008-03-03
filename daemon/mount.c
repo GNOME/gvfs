@@ -574,6 +574,7 @@ read_mountable_config (void)
 	  g_key_file_free (keyfile);
 	  g_free (path);
 	}
+      g_dir_close (dir);
     }
 }
 
