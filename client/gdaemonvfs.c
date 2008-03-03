@@ -596,11 +596,15 @@ fill_mountable_info (GDaemonVfs *vfs)
 	  g_ptr_array_add (uri_schemes, g_strdup (scheme));
 	}
       
-      info->scheme_aliases = g_new (char *, scheme_aliases_len);
-      for (i = 0; i < scheme_aliases_len; i++)
+      if (scheme_aliases_len > 0)
 	{
-	  info->scheme_aliases[i] = g_strdup (scheme_aliases[i]);
-	  g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
+	  info->scheme_aliases = g_new (char *, scheme_aliases_len + 1);
+	  for (i = 0; i < scheme_aliases_len; i++)
+	    {
+	      info->scheme_aliases[i] = g_strdup (scheme_aliases[i]);
+	      g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
+	    }
+	  info->scheme_aliases[scheme_aliases_len] = NULL;
 	}
 	
       info->default_port = default_port;

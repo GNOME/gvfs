@@ -1,5 +1,10 @@
 2008-03-03  Benjamin Otte  <otte@gnome.org>
 
+	* client/gdaemonvfs.c: (fill_mountable_info):
+	properly parse aliases
+
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
 	* client/gvfsuriutils.c: (g_vfs_decode_uri):
 	revert yesterday's commit. It broke the obex and gphoto backends. We
 	now parse hostnames different for internet hosts.
