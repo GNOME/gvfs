@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-02 16:37+0000\n"
+"POT-Creation-Date: 2008-03-03 21:22+0000\n"
 "PO-Revision-Date: 2008-03-02 16:37+0000\n"
 "Last-Translator: Philip Withnall <pwithnall@svn.gnome.org>\n"
 "Language-Team: \n"
@@ -100,15 +100,15 @@ msgstr "End of stream"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:809
-#: ../daemon/gvfsbackendobexftp.c:753 ../daemon/gvfsbackendobexftp.c:774
-#: ../daemon/gvfsbackendobexftp.c:893 ../daemon/gvfsbackendobexftp.c:1030
-#: ../daemon/gvfsbackendobexftp.c:1093 ../daemon/gvfsbackendobexftp.c:1218
-#: ../daemon/gvfsbackendobexftp.c:1245 ../daemon/gvfsbackendobexftp.c:1304
-#: ../daemon/gvfsbackendobexftp.c:1326 ../daemon/gvfsbackendobexftp.c:1385
-#: ../daemon/gvfsbackendobexftp.c:1404 ../daemon/gvfsbackendsmb.c:1014
-#: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
-#: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:753
+#: ../daemon/gvfsbackendobexftp.c:774 ../daemon/gvfsbackendobexftp.c:893
+#: ../daemon/gvfsbackendobexftp.c:1030 ../daemon/gvfsbackendobexftp.c:1094
+#: ../daemon/gvfsbackendobexftp.c:1220 ../daemon/gvfsbackendobexftp.c:1247
+#: ../daemon/gvfsbackendobexftp.c:1306 ../daemon/gvfsbackendobexftp.c:1328
+#: ../daemon/gvfsbackendobexftp.c:1388 ../daemon/gvfsbackendobexftp.c:1407
+#: ../daemon/gvfsbackendsmb.c:1014 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:297
 msgid "Operation was cancelled"
 msgstr "Operation was cancelled"
 
@@ -121,7 +121,7 @@ msgstr "Seek not supported on stream"
 msgid "The query info operation is not supported"
 msgstr "The query info operation is not supported"
 
-#: ../client/gdaemonvfs.c:604
+#: ../client/gdaemonvfs.c:712
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Error while getting mount info: %s"
@@ -206,7 +206,7 @@ msgstr "Unable to create temporary directory"
 msgid "No such file or directory"
 msgstr "No such file or directory"
 
-#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1757
+#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1748
 msgid "Directory not empty"
 msgstr "Directory not empty"
 
@@ -220,7 +220,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD Creator"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:742
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:766
 #: ../daemon/gvfsbackendnetwork.c:637
 #, c-format
 msgid "The file is not a directory"
@@ -300,15 +300,16 @@ msgstr "Error from 'paranoia' on drive %s"
 msgid "Error seeking in stream on drive %s"
 msgstr "Error seeking in stream on drive %s"
 
-#: ../daemon/gvfsbackendcdda.c:818
+#: ../daemon/gvfsbackendcdda.c:818 ../daemon/gvfsbackendgphoto2.c:1695
 #, c-format
 msgid "No such file"
 msgstr "No such file"
 
 #: ../daemon/gvfsbackendcdda.c:825 ../daemon/gvfsbackendcomputer.c:573
-#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
-#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1825
+#: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
 msgid "File doesn't exist"
 msgstr "File doesn't exist"
@@ -330,8 +331,8 @@ msgstr "Computer"
 msgid "Filesystem"
 msgstr "Filesystem"
 
-#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendobexftp.c:739
-#: ../daemon/gvfsbackendtrash.c:635
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendgphoto2.c:1687
+#: ../daemon/gvfsbackendobexftp.c:739 ../daemon/gvfsbackendtrash.c:637
 msgid "Can't open directory"
 msgstr "Can't open directory"
 
@@ -365,66 +366,67 @@ msgstr "Can't unmount file"
 msgid "Can't eject file"
 msgstr "Can't eject file"
 
-#: ../daemon/gvfsbackenddav.c:283 ../daemon/gvfsbackenddav.c:1259
-#: ../daemon/gvfsbackenddav.c:1720 ../daemon/gvfsbackendhttp.c:215
+#: ../daemon/gvfsbackenddav.c:271 ../daemon/gvfsbackenddav.c:1243
+#: ../daemon/gvfsbackendhttp.c:220
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP Error: %s"
 
-#: ../daemon/gvfsbackenddav.c:299
+#: ../daemon/gvfsbackenddav.c:287
 msgid "Could not parse response"
 msgstr "Could not parse response"
 
-#: ../daemon/gvfsbackenddav.c:308
+#: ../daemon/gvfsbackenddav.c:296
 msgid "Empty response"
 msgstr "Empty response"
 
-#: ../daemon/gvfsbackenddav.c:315
+#: ../daemon/gvfsbackenddav.c:303
 msgid "Unexpected reply from server"
 msgstr "Unexpected reply from server"
 
-#: ../daemon/gvfsbackenddav.c:918 ../daemon/gvfsbackenddav.c:1378
+#: ../daemon/gvfsbackenddav.c:903 ../daemon/gvfsbackenddav.c:1362
 #, c-format
 msgid "Response invalid"
 msgstr "Response invalid"
 
-#: ../daemon/gvfsbackenddav.c:1062
+#: ../daemon/gvfsbackenddav.c:1046
 msgid "WebDAV share"
 msgstr "WebDAV share"
 
-#: ../daemon/gvfsbackenddav.c:1064
+#: ../daemon/gvfsbackenddav.c:1048
 #, c-format
 msgid "Enter password for %s"
 msgstr "Enter password for %s"
 
-#: ../daemon/gvfsbackenddav.c:1067
+#: ../daemon/gvfsbackenddav.c:1051
 msgid "Please enter proxy password"
 msgstr "Please enter proxy password"
 
-#: ../daemon/gvfsbackenddav.c:1176 ../daemon/gvfsbackendhttp.c:292
+#: ../daemon/gvfsbackenddav.c:1160 ../daemon/gvfsbackendhttp.c:273
 #: ../daemon/gvfsbackendobexftp.c:592 ../daemon/gvfsbackendobexftp.c:603
 #: ../daemon/gvfsbackendsmb.c:594
 msgid "Invalid mount spec"
 msgstr "Invalid mount spec"
 
-#: ../daemon/gvfsbackenddav.c:1263 ../daemon/gvfsbackenddav.c:1267
+#: ../daemon/gvfsbackenddav.c:1247 ../daemon/gvfsbackenddav.c:1251
 msgid "Not a WebDAV enabled share"
 msgstr "Not a WebDAV-enabled share"
 
-#: ../daemon/gvfsbackenddav.c:1334 ../daemon/gvfsbackenddav.c:1409
+#: ../daemon/gvfsbackenddav.c:1318 ../daemon/gvfsbackenddav.c:1391
 msgid "Could not create request"
 msgstr "Could not create request"
 
-#: ../daemon/gvfsbackenddav.c:1474 ../daemon/gvfsbackendsmb.c:1726
+#: ../daemon/gvfsbackenddav.c:1457 ../daemon/gvfsbackenddav.c:1706
+#: ../daemon/gvfsbackendsmb.c:1726
 msgid "Target file already exists"
 msgstr "Target file already exists"
 
-#: ../daemon/gvfsbackenddav.c:1544 ../daemon/gvfsbackendsftp.c:2689
+#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackendsftp.c:2689
 #: ../daemon/gvfsbackendsmb.c:982
 msgid "The file was externally modified"
 msgstr "The file was externally modified"
 
-#: ../daemon/gvfsbackenddav.c:1575 ../daemon/gvfsbackendsmb.c:1020
+#: ../daemon/gvfsbackenddav.c:1558 ../daemon/gvfsbackendsmb.c:1020
 #: ../daemon/gvfsbackendsmb.c:1743
 msgid "Backup file creation failed"
 msgstr "Backup file creation failed"
@@ -448,148 +450,148 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Network"
 
-#: ../daemon/gvfsbackendftp.c:183
+#: ../daemon/gvfsbackendftp.c:188
 msgid "Accounts are unsupported"
 msgstr "Accounts are unsupported"
 
-#: ../daemon/gvfsbackendftp.c:187
+#: ../daemon/gvfsbackendftp.c:192
 msgid "Host closed connection"
 msgstr "Host closed connection"
 
-#: ../daemon/gvfsbackendftp.c:191
+#: ../daemon/gvfsbackendftp.c:196
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Cannot open data connection. Maybe your firewall prevents this?"
 
-#: ../daemon/gvfsbackendftp.c:195
+#: ../daemon/gvfsbackendftp.c:200
 msgid "Data connection closed"
 msgstr "Data connection closed"
 
-#: ../daemon/gvfsbackendftp.c:201
+#: ../daemon/gvfsbackendftp.c:206
 msgid "File unavailable"
 msgstr "File unavailable"
 
-#: ../daemon/gvfsbackendftp.c:205
+#: ../daemon/gvfsbackendftp.c:210
 msgid "Operation failed"
 msgstr "Operation failed"
 
-#: ../daemon/gvfsbackendftp.c:210
+#: ../daemon/gvfsbackendftp.c:215
 msgid "No space left on server"
 msgstr "No space left on server"
 
-#: ../daemon/gvfsbackendftp.c:218
+#: ../daemon/gvfsbackendftp.c:223
 msgid "Operation unsupported"
 msgstr "Operation unsupported"
 
-#: ../daemon/gvfsbackendftp.c:222 ../daemon/gvfsbackendsftp.c:261
+#: ../daemon/gvfsbackendftp.c:227 ../daemon/gvfsbackendsftp.c:261
 msgid "Permission denied"
 msgstr "Permission denied"
 
-#: ../daemon/gvfsbackendftp.c:226
+#: ../daemon/gvfsbackendftp.c:231
 msgid "Page type unknown"
 msgstr "Page type unknown"
 
-#: ../daemon/gvfsbackendftp.c:230 ../daemon/gvfsbackendftp.c:1819
+#: ../daemon/gvfsbackendftp.c:235 ../daemon/gvfsbackendftp.c:1900
 #, c-format
 msgid "Invalid filename"
 msgstr "Invalid filename"
 
-#: ../daemon/gvfsbackendftp.c:234 ../daemon/gvfsbackendftp.c:312
-#: ../daemon/gvfsbackendftp.c:336 ../daemon/gvfsbackendftp.c:349
-#: ../daemon/gvfsbackendftp.c:365 ../daemon/gvfsbackendftp.c:648
+#: ../daemon/gvfsbackendftp.c:239 ../daemon/gvfsbackendftp.c:313
+#: ../daemon/gvfsbackendftp.c:342 ../daemon/gvfsbackendftp.c:361
+#: ../daemon/gvfsbackendftp.c:374 ../daemon/gvfsbackendftp.c:671
 #, c-format
 msgid "Invalid reply"
 msgstr "Invalid reply"
 
-#: ../daemon/gvfsbackendftp.c:461
+#: ../daemon/gvfsbackendftp.c:481
 #, c-format
 msgid "broken transmission"
 msgstr "broken transmission"
 
-#: ../daemon/gvfsbackendftp.c:553 ../daemon/gvfsbackendftp.c:666
+#: ../daemon/gvfsbackendftp.c:574 ../daemon/gvfsbackendftp.c:690
 #, c-format
 msgid "Could not connect to host"
 msgstr "Could not connect to host"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:891
+#: ../daemon/gvfsbackendftp.c:964
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Enter password for ftp on %s"
 
-#: ../daemon/gvfsbackendftp.c:910 ../daemon/gvfsbackendsftp.c:834
+#: ../daemon/gvfsbackendftp.c:983 ../daemon/gvfsbackendsftp.c:834
 msgid "Password dialog cancelled"
 msgstr "Password dialogue cancelled"
 
-#: ../daemon/gvfsbackendftp.c:962
+#: ../daemon/gvfsbackendftp.c:1035
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp on %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:968
+#: ../daemon/gvfsbackendftp.c:1041
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp as %s on %s"
 
-#: ../daemon/gvfsbackendftp.c:1000 ../daemon/gvfsbackendsftp.c:1411
+#: ../daemon/gvfsbackendftp.c:1075 ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "No hostname specified"
 
-#: ../daemon/gvfsbackendftp.c:1196
+#: ../daemon/gvfsbackendftp.c:1281 ../daemon/gvfsbackendftp.c:1991
 msgid "backups not supported yet"
 msgstr "backups not supported yet"
 
-#: ../daemon/gvfsbackendftp.c:1411 ../daemon/gvfsbackendftp.c:1614
+#: ../daemon/gvfsbackendftp.c:1496 ../daemon/gvfsbackendftp.c:1696
 #, c-format
 msgid "filename too long"
 msgstr "filename too long"
 
-#: ../daemon/gvfsbackendftp.c:1744
+#: ../daemon/gvfsbackendftp.c:2010
 #, c-format
-msgid "File does not exist"
-msgstr "File does not exist"
+msgid "Invalid destination filename"
+msgstr "Invalid destination filename"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:234
+#: ../daemon/gvfsbackendgphoto2.c:697
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digital Camera (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:379 ../hal/ghalvolume.c:390
+#: ../daemon/gvfsbackendgphoto2.c:843 ../hal/ghalvolume.c:390
 #, c-format
 msgid "%s Camera"
 msgstr "%s Camera"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:382 ../hal/ghalvolume.c:385
+#: ../daemon/gvfsbackendgphoto2.c:846 ../hal/ghalvolume.c:385
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s Audio Player"
 
-#: ../daemon/gvfsbackendgphoto2.c:391 ../hal/ghalvolume.c:402
+#: ../daemon/gvfsbackendgphoto2.c:855 ../hal/ghalvolume.c:402
 msgid "Camera"
 msgstr "Camera"
 
-#: ../daemon/gvfsbackendgphoto2.c:393 ../hal/ghalvolume.c:398
+#: ../daemon/gvfsbackendgphoto2.c:857 ../hal/ghalvolume.c:398
 msgid "Audio Player"
 msgstr "Audio Player"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:613
+#: ../daemon/gvfsbackendgphoto2.c:1539
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 mount on %s"
 
-#: ../daemon/gvfsbackendhttp.c:211
+#: ../daemon/gvfsbackendhttp.c:216
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP Client Error: %s"
 
-#: ../daemon/gvfsbackendhttp.c:550 ../daemon/gvfsbackendsftp.c:1751
-#: ../daemon/gvfsbackendsmb.c:1229 ../daemon/gvfsbackendtrash.c:960
+#: ../daemon/gvfsbackendhttp.c:534 ../daemon/gvfsbackendsftp.c:1751
+#: ../daemon/gvfsbackendsmb.c:1229 ../daemon/gvfsbackendtrash.c:962
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (invalid encoding)"
@@ -829,20 +831,20 @@ msgstr "Windows Network Filesystem Service"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:599 ../daemon/gvfsbackendtrash.c:1188
+#: ../daemon/gvfsbackendtrash.c:600 ../daemon/gvfsbackendtrash.c:1190
 msgid "Trash"
 msgstr "Wastebasket"
 
-#: ../daemon/gvfsbackendtrash.c:970
+#: ../daemon/gvfsbackendtrash.c:972
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (in wastebasket)"
 
-#: ../daemon/gvfsbackendtrash.c:1289
+#: ../daemon/gvfsbackendtrash.c:1291
 msgid "Can't delete trash"
 msgstr "Can't delete wastebasket"
 
-#: ../daemon/gvfsbackendtrash.c:1636 ../daemon/gvfsbackendtrash.c:1711
+#: ../daemon/gvfsbackendtrash.c:1638 ../daemon/gvfsbackendtrash.c:1713
 msgid "Trash directory notification not supported"
 msgstr "Wastebasket directory notification not supported"
 
@@ -910,28 +912,28 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Try \"%s --help\" for more information."
 
-#: ../daemon/mount.c:372
+#: ../daemon/mount.c:432
 msgid "Invalid arguments from spawned child"
 msgstr "Invalid arguments from spawned child"
 
-#: ../daemon/mount.c:662
+#: ../daemon/mount.c:731
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automount failed: %s"
 
-#: ../daemon/mount.c:707
+#: ../daemon/mount.c:776
 msgid "The specified location is not mounted"
 msgstr "The specified location is not mounted"
 
-#: ../daemon/mount.c:712
+#: ../daemon/mount.c:781
 msgid "The specified location is not supported"
 msgstr "The specified location is not supported"
 
-#: ../daemon/mount.c:875
+#: ../daemon/mount.c:944
 msgid "Location is already mounted"
 msgstr "Location is already mounted"
 
-#: ../daemon/mount.c:883
+#: ../daemon/mount.c:952
 msgid "Location is not mountable"
 msgstr "Location is not mountable"
 
@@ -1354,3 +1356,6 @@ msgid ""
 msgstr ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
+
+#~ msgid "File does not exist"
+#~ msgstr "File does not exist"
