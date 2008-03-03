@@ -80,13 +80,20 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
-  backend->session = soup_session_sync_new ();
-  backend->session_async = soup_session_async_new ();
+  backend->session = soup_session_sync_new_with_options ("user-agent",
+                                                         "gvfs/" VERSION,
+                                                         NULL);
+
+  backend->session_async = soup_session_async_new_with_options ("user-agent",
+                                                                "gvfs/" VERSION,
+                                                                NULL);
 }
 
+/* ************************************************************************* */
+/* public utility functions */
 
 SoupURI *
-g_vfs_backend_uri_for_filename (GVfsBackend *backend,
+http_backend_uri_for_filename (GVfsBackend *backend,
                                 const char  *filename,
                                 gboolean     is_dir)
 {
@@ -121,7 +128,7 @@ g_vfs_backend_uri_for_filename (GVfsBackend *backend,
 }
 
 char *
-uri_get_basename (const char *uri_str)
+http_uri_get_basename (const char *uri_str)
 {
     const char *parent;
     const char *path;
@@ -163,8 +170,6 @@ uri_get_basename (const char *uri_str)
     return basename;
 }
 
-/* ************************************************************************* */
-/*  */
 guint
 http_error_code_from_status (guint status)
 {
@@ -216,49 +221,25 @@ g_vfs_job_failed_from_http_status (GVfsJob *job, guint status_code, const char *
   }
 }
 
-/* ************************************************************************* */
-/* public utility functions */
-
-SoupMessage *
-message_new_from_uri (const char *method,
-                      SoupURI    *uri)
+guint
+http_backend_send_message (GVfsBackend *backend,
+                           SoupMessage *msg)
 {
-  SoupMessage *msg;
-
-  msg = soup_message_new_from_uri (method, uri);
-
-  /* Add standard headers */
-  soup_message_headers_append (msg->request_headers,
-                           "User-Agent", "gvfs/" VERSION);
-  return msg;
+  GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
+  return soup_session_send_message (op_backend->session, msg);
 }
 
-SoupMessage *
-message_new_from_filename_full (GVfsBackend *backend,
-                                const char  *method,
-                                const char  *filename,
-                                gboolean     is_dir)
+void
+http_backend_queue_message (GVfsBackend         *backend,
+                            SoupMessage         *msg,
+                            SoupSessionCallback  callback,
+                            gpointer             user_data)
 {
-  SoupMessage     *msg;
-  SoupURI         *uri;
-
-  uri = g_vfs_backend_uri_for_filename (backend, filename, is_dir);
-  msg = message_new_from_uri (method, uri);
-
-  soup_uri_free (uri);
-  return msg;
+  GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
+  
+  soup_session_queue_message (op_backend->session_async, msg, 
+                              callback, user_data);
 }
-
-
-SoupMessage *
-message_new_from_filename (GVfsBackend *backend,
-                           const char  *method,
-                           const char  *filename)
-{ 
-  return message_new_from_filename_full (backend, method, filename, FALSE);
-}
-
-
 /* ************************************************************************* */
 /* virtual functions overrides */
 
@@ -357,9 +338,12 @@ try_open_for_read (GVfsBackend        *backend,
   GVfsBackendHttp *op_backend;
   GInputStream    *stream;
   SoupMessage     *msg;
+  SoupURI         *uri;
 
   op_backend = G_VFS_BACKEND_HTTP (backend);
-  msg = message_new_from_filename (backend, "GET", filename);
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
+  soup_uri_free (uri);
 
   stream = soup_input_stream_new (op_backend->session_async, msg);
   g_object_unref (msg);
@@ -532,7 +516,7 @@ query_info_ready (SoupSession *session,
     }
 
   uri = soup_message_get_uri (msg);
-  basename = uri_get_basename (uri->path);
+  basename = http_uri_get_basename (uri->path);
 
   g_print ("basename:%s\n", basename);
 
@@ -625,15 +609,15 @@ try_query_info (GVfsBackend           *backend,
                 GFileInfo             *info,
                 GFileAttributeMatcher *attribute_matcher)
 {
-  GVfsBackendHttp *op_backend;
-  SoupMessage     *msg;
+  SoupMessage *msg;
+  SoupURI     *uri;
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
+  soup_uri_free (uri);
 
-  msg = message_new_from_filename (backend, "HEAD", filename);
+  http_backend_queue_message (backend, msg, query_info_ready, job);
 
-  soup_session_queue_message (op_backend->session, msg,
-                              query_info_ready, job);
   return TRUE;
 }
 

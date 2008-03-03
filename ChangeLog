@@ -1,3 +1,19 @@
+2008-03-03  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Remove unecessary message_new_from_xxx functions. Prefix all
+	public utility functions that need the backend with
+	http_backend_, i.e. rename g_vfs_backend_uri_for_filename() to
+	http_backend_uri_for_filename().
+	Create http_backend_send_message(), http_backend_queue_message()
+	convenience functions which will pick up the right SoupSession.
+
+	* daemon/gvfsbackenddav.c:
+	Port to new utility functions and http_backend_xx namespace.
+	Clean up error handling and remove the const keyword from most
+	SoupURI variables.
+
 2008-03-03  David Zeuthen  <davidz@redhat.com>
 
 	Add write support to gphoto2 backend. Also performance

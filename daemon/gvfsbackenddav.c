@@ -126,18 +126,6 @@ sm_has_header (SoupMessage *msg, const char *header)
   return soup_message_headers_get (msg->response_headers, header) != NULL;
 }
 
-static inline void
-send_message (GVfsBackend         *backend,
-              SoupMessage         *message, 
-              SoupSessionCallback  callback,
-              gpointer             user_data)
-{
-
-  soup_session_queue_message (G_VFS_BACKEND_HTTP (backend)->session,
-                              message,
-                              callback, user_data);
-}
-
 static char *
 path_get_parent_dir (const char *path)
 {
@@ -331,7 +319,7 @@ struct _Multistatus {
   xmlDocPtr  doc;
   xmlNodePtr root;
 
-  const SoupURI *target;
+  SoupURI *target;
 
 };
 
@@ -441,18 +429,18 @@ ms_response_get_basename (MsResponse *response)
   const char *text;
   text = node_get_content (response->href);
 
-  return uri_get_basename (text);
+  return http_uri_get_basename (text);
 
 }
 
 static gboolean
 ms_response_is_target (MsResponse *response)
 {
-  const char    *text;
-  const char    *path;
-  const SoupURI *target;
-  SoupURI       *uri;
-  gboolean       res;
+  const char *text;
+  const char *path;
+  SoupURI    *target;
+  SoupURI    *uri;
+  gboolean    res;
 
   res    = FALSE;
   uri    = NULL;
@@ -728,11 +716,13 @@ propfind_request_new (GVfsBackend     *backend,
                       const PropName  *properties)
 {
   SoupMessage *msg;
+  SoupURI     *uri;
   const char  *header_depth;
   GString     *body;
 
-  msg = message_new_from_filename_full (backend, SOUP_METHOD_PROPFIND,
-                                        filename, (depth > 0));
+  uri = http_backend_uri_for_filename (backend, filename, depth > 0);
+  msg = soup_message_new_from_uri (SOUP_METHOD_PROPFIND, uri);
+  soup_uri_free (uri);
 
   if (msg == NULL)
     return NULL;
@@ -793,8 +783,8 @@ message_add_apply_to_redirect_header (SoupMessage         *msg,
 }
 
 static SoupMessage *
-stat_location_begin (const SoupURI  *uri,
-                     gboolean        count_children)
+stat_location_begin (SoupURI  *uri,
+                     gboolean  count_children)
 {
   SoupMessage       *msg;
   const char        *depth;
@@ -876,28 +866,24 @@ stat_location_finish (SoupMessage *msg,
 }
 
 static gboolean
-stat_location (GVfsBackend    *backend,
-               const SoupURI  *uri,
-               GFileType      *target_type,
-               guint          *num_children,
-               GError        **error)
+stat_location (GVfsBackend  *backend,
+               SoupURI      *uri,
+               GFileType    *target_type,
+               guint        *num_children,
+               GError      **error)
 {
-  SoupSession *session;
   SoupMessage *msg;
   guint        status;
   gboolean     count_children;
   gboolean     res;
 
-  session = G_VFS_BACKEND_HTTP (backend)->session;
-
   count_children = num_children != NULL;
-
   msg = stat_location_begin (uri, count_children);
 
   if (msg == NULL)
     return FALSE;
 
-  status = soup_session_send_message (session, msg);
+  status = http_backend_send_message (backend, msg);
 
   if (status != 207)
     {
@@ -912,11 +898,9 @@ stat_location (GVfsBackend    *backend,
   res = stat_location_finish (msg, target_type, num_children);
 
   if (res == FALSE)
-    {
-      g_set_error (error, 
-                   G_IO_ERROR, G_IO_ERROR_FAILED,
-                   _("Response invalid"));
-    }
+    g_set_error (error, 
+                 G_IO_ERROR, G_IO_ERROR_FAILED,
+                 _("Response invalid"));
 
   return res;
 }
@@ -1013,8 +997,8 @@ soup_authenticate_interactive (SoupSession *session,
 
   if (have_auth == FALSE && g_vfs_keyring_is_available ())
     {
-      const SoupURI *uri; 
-      SoupURI       *uri_free = NULL;
+      SoupURI *uri; 
+      SoupURI *uri_free = NULL;
 
       pw_ask_flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
 
@@ -1207,11 +1191,11 @@ do_mount (GVfsBackend  *backend,
                                 data);
 
   last_good_path = NULL;
-  msg_opts = message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
+  msg_opts = soup_message_new_from_uri (SOUP_METHOD_OPTIONS, mount_base);
   msg_stat = stat_location_begin (mount_base, FALSE);
 
   do {
-    status = soup_session_send_message (session, msg_opts);
+    status = http_backend_send_message (backend, msg_opts);
 
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
     is_webdav = is_success && sm_has_header (msg_opts, "DAV");
@@ -1227,7 +1211,7 @@ do_mount (GVfsBackend  *backend,
         cur_uri = soup_message_get_uri (msg_opts);
         soup_message_set_uri (msg_stat, cur_uri);
 
-        soup_session_send_message (session, msg_stat);
+        http_backend_send_message (backend, msg_stat);
         res = stat_location_finish (msg_stat, &file_type, NULL);
 
         if (res && file_type == G_FILE_TYPE_DIRECTORY)
@@ -1338,7 +1322,7 @@ do_query_info (GVfsBackend           *backend,
 
   message_add_apply_to_redirect_header (msg, flags);
 
-  soup_session_send_message (G_VFS_BACKEND_HTTP (backend)->session, msg);
+  http_backend_send_message (backend, msg);
 
   res = multistatus_parse (msg, &ms, &error);
 
@@ -1388,17 +1372,15 @@ do_enumerate (GVfsBackend           *backend,
               GFileAttributeMatcher *matcher,
               GFileQueryInfoFlags    flags)
 {
-  GVfsBackendHttp *backend_http;
-  SoupMessage     *msg;
-  Multistatus      ms;
-  xmlNodeIter      iter;
-  gboolean         res;
-  SoupURI         *base;
-  GError          *error;
+  SoupMessage *msg;
+  Multistatus  ms;
+  xmlNodeIter  iter;
+  gboolean     res;
+  SoupURI     *base;
+  GError      *error;
  
-  backend_http = G_VFS_BACKEND_HTTP (backend);
-  base         = backend_http->mount_base;
-  error        = NULL;
+  base  = G_VFS_BACKEND_HTTP (backend)->mount_base;
+  error = NULL;
 
   msg = propfind_request_new (backend, filename, 1, NULL);
 
@@ -1413,7 +1395,7 @@ do_enumerate (GVfsBackend           *backend,
 
   message_add_apply_to_redirect_header (msg, flags);
 
-  soup_session_send_message (backend_http->session, msg);
+  http_backend_send_message (backend, msg);
 
   res = multistatus_parse (msg, &ms, &error);
 
@@ -1465,6 +1447,7 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
   GVfsBackendHttp *op_backend = job->backend_data;
   GOutputStream   *stream;
   SoupMessage     *put_msg;
+  SoupURI         *uri;
 
   if (SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -1476,7 +1459,8 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
     }
   /* TODO: other errors */
 
-  put_msg = message_new_from_uri ("PUT", soup_message_get_uri (msg));
+  uri = soup_message_get_uri (msg);
+  put_msg = soup_message_new_from_uri (SOUP_METHOD_PUT, uri);
 
   soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
   stream = soup_output_stream_new (op_backend->session, put_msg, -1);
@@ -1492,20 +1476,19 @@ try_create (GVfsBackend *backend,
             const char *filename,
             GFileCreateFlags flags)
 {
-  GVfsBackendHttp *op_backend;
-  SoupMessage     *msg;
+  SoupMessage *msg;
+  SoupURI     *uri;
 
   /* TODO: if SoupOutputStream supported chunked requests, we could
    * use a PUT with "If-None-Match: *" and "Expect: 100-continue"
    */
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_HEAD, uri);
+  soup_uri_free (uri);
 
-  op_backend = G_VFS_BACKEND_HTTP (backend);
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
 
-  msg = message_new_from_filename (backend, "HEAD", filename);
-
-  g_vfs_job_set_backend_data (G_VFS_JOB (job), op_backend, NULL);
-  soup_session_queue_message (op_backend->session, msg,
-                              try_create_tested_existence, job);
+  http_backend_queue_message (backend, msg, try_create_tested_existence, job);
   return TRUE;
 }
 
@@ -1517,7 +1500,7 @@ open_for_replace_succeeded (GVfsBackendHttp *op_backend, GVfsJob *job,
   SoupMessage     *put_msg;
   GOutputStream   *stream;
 
-  put_msg = message_new_from_uri (SOUP_METHOD_PUT, uri);
+  put_msg = soup_message_new_from_uri (SOUP_METHOD_PUT, uri);
 
   if (etag)
     soup_message_headers_append (put_msg->request_headers, "If-Match", etag);
@@ -1578,7 +1561,7 @@ try_replace (GVfsBackend *backend,
 
 
 
-  uri = g_vfs_backend_uri_for_filename (backend, filename, FALSE);
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
 
   if (etag)
     {
@@ -1706,18 +1689,25 @@ do_make_directory (GVfsBackend          *backend,
                    GVfsJobMakeDirectory *job,
                    const char           *filename)
 {
-  SoupMessage     *msg;
-  guint            status;
+  SoupMessage *msg;
+  SoupURI     *uri;
+  guint        status;
 
-  msg = message_new_from_filename_full (backend, "MKCOL", filename, TRUE);
+  uri = http_backend_uri_for_filename (backend, filename, TRUE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_MKCOL, uri);
+  soup_uri_free (uri);
 
-  status = soup_session_send_message (G_VFS_BACKEND_HTTP (backend)->session, msg);
+  status = http_backend_send_message (backend, msg);
 
-  /* TODO: error reporting sucks */
   if (! SOUP_STATUS_IS_SUCCESSFUL (status))
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR, G_IO_ERROR_FAILED,
-                      _("HTTP Error: %s"), msg->reason_phrase);
+    if (status == SOUP_STATUS_METHOD_NOT_ALLOWED)
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_EXISTS,
+                        _("Target file already exists"));
+    else
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        http_error_code_from_status (status),
+                        msg->reason_phrase);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1741,12 +1731,13 @@ do_delete (GVfsBackend   *backend,
   error = NULL;
   session = G_VFS_BACKEND_HTTP (backend)->session;
 
-  uri = g_vfs_backend_uri_for_filename (backend, filename, FALSE);
+  uri = http_backend_uri_for_filename (backend, filename, FALSE);
   res = stat_location (backend, uri, &file_type, &num_children, &error);
 
   if (res == FALSE)
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       return;
     }
 
@@ -1760,7 +1751,7 @@ do_delete (GVfsBackend   *backend,
 
   msg = soup_message_new_from_uri (SOUP_METHOD_DELETE, uri);
 
-  status = soup_session_send_message (session, msg);
+  status = http_backend_send_message (backend, msg);
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
     g_vfs_job_failed (G_VFS_JOB (job),
