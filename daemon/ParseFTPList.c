@@ -1067,12 +1067,12 @@ int ParseFTPList(const char *line, struct list_state *state,
               )
            )
           {
+            unsigned int i;
             lstyle = 'U'; /* assume /bin/ls or variant format */
             tokmarker = pos;
 
             /* check that size is numeric */
             p = tokens[tokmarker];
-            unsigned int i;
             for (i = 0; i < toklen[tokmarker]; i++)
             {
               if (!isdigit(*p++))

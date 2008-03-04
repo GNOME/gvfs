@@ -1,3 +1,9 @@
+2008-03-04  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/ParseFTPList.c (ParseFTPList):
+	Trivial C89 patch, fixes #520339. 
+	Patch from Jens Granseuer.
+
 2008-03-04  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_mount):
