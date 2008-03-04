@@ -1,5 +1,11 @@
 2008-03-04  Sebastien Bacher  <seb128@ubuntu.com>
 
+	* configure.ac: New version update
+		
+=== gvfs 0.1.11 ===
+
+2008-03-04  Sebastien Bacher  <seb128@ubuntu.com>
+
 	* NEWS: Update for 0.1.11
 
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
