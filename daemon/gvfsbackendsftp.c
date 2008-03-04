@@ -826,6 +826,7 @@ handle_login (GVfsBackend *backend,
                                                 &new_password,
                                                 &new_user,
                                                 NULL,
+						NULL,
                                                 &password_save) ||
                   aborted)
                 {

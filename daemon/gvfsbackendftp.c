@@ -83,7 +83,7 @@ struct _GVfsBackendFtp
 
   SoupAddress *		addr;
   char *		user;
-  char *		password;
+  char *		password;	/* password or NULL for anonymous */
 
   /* connection collection */
   GQueue *		queue;
@@ -592,8 +592,20 @@ ftp_connection_login (FtpConnection *conn,
                                 "USER %s", username);
   
   if (STATUS_GROUP (status) == 3)
-    status = ftp_connection_send (conn, 0,
-				  "PASS %s", password);
+    {
+      /* rationale for choosing the default password:
+       * - some ftp servers expect something that looks like an email address
+       * - we don't want to send the user's name or address, as that would be
+       *   a privacy problem
+       * - we want to give ftp server administrators a chance to notify us of 
+       *   problems with our client.
+       * - we don't want to drown in spam.
+       */
+      if (password == NULL)
+	password = "gvfsd-ftp-" VERSION "@example.com";
+      status = ftp_connection_send (conn, 0,
+				    "PASS %s", password);
+    }
 
   return status;
 }
@@ -927,7 +939,7 @@ do_mount (GVfsBackend *backend,
   char *username;
   char *password;
   char *display_name;
-  gboolean aborted;
+  gboolean aborted, anonymous;
   GError *error = NULL;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   guint port;
@@ -966,7 +978,7 @@ do_mount (GVfsBackend *backend,
       if (!g_mount_source_ask_password (
 			mount_source,
 		        prompt,
-			ftp->user ? ftp->user : "anonymous",
+			ftp->user,
 		        NULL,
 		        G_ASK_PASSWORD_NEED_USERNAME |
 		        G_ASK_PASSWORD_NEED_PASSWORD |
@@ -976,6 +988,7 @@ do_mount (GVfsBackend *backend,
 		        &password,
 		        &username,
 		        NULL,
+			&anonymous,
 		        &password_save) ||
 	  aborted) 
 	{
@@ -985,12 +998,27 @@ do_mount (GVfsBackend *backend,
 	}
 
 try_login:
+      DEBUG ("user: %s\n", username);
       g_free (ftp->user);
-      ftp->user = username;
       g_free (ftp->password);
-      ftp->password = password;
-      if (ftp_connection_login (conn, username, password) != 0)
-	break;
+      if (anonymous)
+	{
+	  if (ftp_connection_login (conn, "anonymous", "") != 0)
+	    {
+	      ftp->user = g_strdup ("anonymous");
+	      ftp->password = g_strdup ("");
+	      break;
+	    }
+	  ftp->user = NULL;
+	  ftp->password = NULL;
+	}
+      else
+	{
+	  ftp->user = username ? username : g_strdup ("");
+	  ftp->password = password;
+	  if (ftp_connection_login (conn, username, password) != 0)
+	    break;
+	}
       if (!g_error_matches (conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
 	break;
 

@@ -1062,6 +1062,7 @@ soup_authenticate_interactive (SoupSession *session,
                                      &new_password,
                                      &new_username,
                                      NULL,
+				     NULL,
                                      &pw_save);
 
   if (res && !aborted)

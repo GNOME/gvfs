@@ -65,6 +65,7 @@ gboolean      g_mount_source_ask_password             (GMountSource             
 						       char                     **password_out,
 						       char                     **user_out,
 						       char                     **domain_out,
+						       gboolean			 *anonymous_out,
 						       GPasswordSave             *password_save_out);
 
 void          g_mount_source_ask_password_async       (GMountSource              *mount_source,
@@ -81,6 +82,7 @@ gboolean     g_mount_source_ask_password_finish       (GMountSource             
                                                        char                     **password_out,
                                                        char                     **user_out,
                                                        char                     **domain_out,
+						       gboolean			 *anonymous_out,
 						       GPasswordSave             *password_save_out);
 
 gboolean      g_mount_source_ask_question             (GMountSource              *mount_source,

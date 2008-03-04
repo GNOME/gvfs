@@ -129,6 +129,7 @@ struct AskPasswordData {
   char          *username;
   char          *domain;
   GPasswordSave  password_save;
+  gboolean	 anonymous;
 };
 
 typedef struct AskSyncData AskSyncData;
@@ -193,10 +194,14 @@ ask_password_reply (DBusMessage *reply,
 	{
 	  data->aborted = aborted;
 
-	  data->password = *password == 0 ? NULL : g_strdup (password);
-	  data->username = *username == 0 ? NULL : g_strdup (username);
-	  data->domain = *domain == 0 ? NULL : g_strdup (domain);
+	  if (!anonymous)
+	    {
+	      data->password = *password == 0 ? NULL : g_strdup (password);
+	      data->username = *username == 0 ? NULL : g_strdup (username);
+	      data->domain = *domain == 0 ? NULL : g_strdup (domain);
+	    }
 	  data->password_save = (GPasswordSave)password_save;
+	  data->anonymous = anonymous;
 
 	  /* TODO: handle more args */
 	}
@@ -265,6 +270,27 @@ g_mount_source_ask_password_async (GMountSource              *source,
 
 }
 
+/**
+ * g_mount_source_ask_password_finish:
+ * @source: the source to query
+ * @result: the async result
+ * @aborted: set to %TRUE if the password dialog was aborted by the user
+ * @password_out: the to the password set by the user or to %NULL if none
+ * @user_out: set to the username set by the user or to %NULL if none
+ * @domain_out: set to the domain set by the user or to %NULL if none
+ * @anonymous_out: set to %TRUE if the user selected anonymous login. This
+ *                 should only happen if G_ASK_PASSWORD_ANONYMOUS_SUPPORTED
+ *                 was supplied whe querying the password.
+ * @password_save_out: set to the save flags to use when saving the password
+ *                     in the keyring.
+ *
+ * Requests the reply parameters from a g_mount_source_ask_password_async() 
+ * request. All out parameters can be set to %NULL to ignore them.
+ * <note><para>Please be aware that all string parameters can be set to %NULL,
+ * so make sure to check them.</para></note>
+ *
+ * Returns: %FALSE if the async reply contained an error.
+ **/
 gboolean
 g_mount_source_ask_password_finish (GMountSource  *source,
                                     GAsyncResult  *result,
@@ -272,6 +298,7 @@ g_mount_source_ask_password_finish (GMountSource  *source,
                                     char         **password_out,
                                     char         **user_out,
                                     char         **domain_out,
+				    gboolean	  *anonymous_out,
 				    GPasswordSave *password_save_out)
 {
   AskPasswordData *data, def = { TRUE, };
@@ -304,6 +331,9 @@ g_mount_source_ask_password_finish (GMountSource  *source,
       *domain_out = data->domain;
       data->domain = NULL;
     }
+
+  if (anonymous_out)
+    *anonymous_out = data->anonymous;
 
   if (password_save_out)
     *password_save_out = data->password_save;  
@@ -339,19 +369,11 @@ g_mount_source_ask_password (GMountSource *source,
 			     char **password_out,
 			     char **user_out,
 			     char **domain_out,
+			     gboolean *anonymous_out,
 			     GPasswordSave *password_save_out)
 {
-  char *password, *username, *domain;
-  GPasswordSave password_save;
-  gboolean handled, aborted;
+  gboolean handled;
   AskSyncData data = {NULL};
-  
-  if (password_out)
-    *password_out = NULL;
-  if (user_out)
-    *user_out = NULL;
-  if (domain_out)
-    *domain_out = NULL;
   
   data.mutex = g_mutex_new ();
   data.cond = g_cond_new ();
@@ -376,34 +398,14 @@ g_mount_source_ask_password (GMountSource *source,
 
   handled = g_mount_source_ask_password_finish (source,
                                                 data.result,
-                                                &aborted,
-                                                &password,
-                                                &username,
-                                                &domain,
-						&password_save);
+                                                aborted_out,
+                                                password_out,
+                                                user_out,
+                                                domain_out,
+						anonymous_out,
+						password_save_out);
   g_object_unref (data.result);
 
-  if (aborted_out)
-    *aborted_out = aborted;
-
-  if (password_out)
-    *password_out = password;
-  else
-    g_free (password);
-
-  if (user_out)
-    *user_out = username;
-  else
-    g_free (username);
-
-  if (domain_out)
-    *domain_out = domain;
-  else
-    g_free (domain);
-
-  if (password_save_out)
-    *password_save_out = password_save;
-  
   return handled;
 }
 
@@ -433,6 +435,7 @@ op_ask_password_reply (GObject *source_object,
                                                 &username,
                                                 &password,
                                                 &domain,
+						NULL,
 						&password_save);
 
   if (!handled)

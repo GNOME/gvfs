@@ -222,6 +222,7 @@ auth_callback (SMBCCTX *context,
 						 &ask_password,
 						 &ask_user,
 						 &ask_domain,
+						 NULL,
 						 &(backend->password_save));
 	  g_free (message);
 	  if (!handled)

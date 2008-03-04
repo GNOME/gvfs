@@ -1,3 +1,19 @@
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountsource.c: (ask_password_reply),
+	(g_mount_source_ask_password_finish),
+	(g_mount_source_ask_password), (op_ask_password_reply):
+	* common/gmountsource.h:
+	add an anonymous_out parameter for anonymous logins.
+	* daemon/gvfsbackenddav.c: (soup_authenticate_interactive):
+	* daemon/gvfsbackendsftp.c: (handle_login):
+	* daemon/gvfsbackendsmb.c: (auth_callback):
+	make the backends compile with the new parameter. They don't use
+	anonymous logins.
+	* daemon/gvfsbackendftp.c: (do_mount):
+	make login work as users would expect it with anonymous logins. 
+	Fixes bug #520131
+
 2008-03-04  Carlos Garcia Campos  <carlosgc@gnome.org>
 
 	* common/gmountspec.c: (g_mount_spec_copy):
