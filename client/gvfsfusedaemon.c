@@ -102,7 +102,7 @@ static GHashTable    *global_fh_table     = NULL;
 static void
 debug_print (const gchar *message, ...)
 {
-#ifdef DEBUG_ENABLED
+#if DEBUG_ENABLED
 
   static FILE *debug_fhd = NULL;
   va_list      var_args;

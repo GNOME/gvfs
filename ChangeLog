@@ -1,5 +1,11 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gvfsfusedaemon.c:
+        (debug_print):
+	Actually disable debug log by default
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac: 
 	Post release version bump
 	
