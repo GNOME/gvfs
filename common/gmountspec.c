@@ -139,6 +139,9 @@ g_mount_spec_set_with_len (GMountSpec *spec,
   int i;
   char *value_copy;
 
+  g_return_if_fail (key != NULL);
+  g_return_if_fail (value != NULL);
+
   if (value_len == -1)
     value_copy = g_strdup (value);
   else
