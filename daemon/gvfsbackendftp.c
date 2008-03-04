@@ -940,7 +940,6 @@ do_mount (GVfsBackend *backend,
   char *password;
   char *display_name;
   gboolean aborted, anonymous;
-  GError *error = NULL;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   guint port;
 
@@ -992,7 +991,7 @@ do_mount (GVfsBackend *backend,
 		        &password_save) ||
 	  aborted) 
 	{
-	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+	  g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
 		       "%s", _("Password dialog cancelled"));
 	  break;
 	}

@@ -1,5 +1,10 @@
 2008-03-04  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (do_mount):
+	set the right GError here. Makes gvfsd-ftp run fine manually again.
+
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
 	* common/gmountspec.c: (g_mount_spec_set_with_len):
 	add g_return_if_fail here - I had SEGVs sometime later due to values
 	being NULL here. So better catch em early
