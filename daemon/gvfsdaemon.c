@@ -1050,6 +1050,7 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
 			  "daemon", daemon,
 			  "object_path", obj_path,
 			  NULL);
+  g_free (obj_path);
 
   g_vfs_daemon_add_job_source (daemon, G_VFS_JOB_SOURCE (backend));
   g_object_unref (backend);

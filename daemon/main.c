@@ -77,8 +77,11 @@ main (int argc, char *argv[])
                   g_get_prgname ());
       g_printerr ("\n");
       g_error_free (error);
+      g_option_context_free (context);
       return 1;
     }
+
+  g_option_context_free (context);
 
   dbus_threads_init_default ();
   

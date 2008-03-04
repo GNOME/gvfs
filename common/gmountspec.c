@@ -175,7 +175,7 @@ g_mount_spec_copy (GMountSpec *spec)
   int i;
 
   copy = g_mount_spec_new (NULL);
-  copy->mount_prefix = g_strdup (spec->mount_prefix);
+  g_mount_spec_set_mount_prefix (copy, spec->mount_prefix);
 
   for (i = 0; i < spec->items->len; i++)
     {
