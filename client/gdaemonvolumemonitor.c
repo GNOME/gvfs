@@ -33,7 +33,7 @@
 #include "gdaemonvfs.h"
 #include "gmounttracker.h"
 
-G_LOCK_DEFINE_STATIC(_the_daemon_volume_monitor);
+G_LOCK_DEFINE_STATIC(daemon_vm);
 
 static GDaemonVolumeMonitor *_the_daemon_volume_monitor;
 
@@ -52,14 +52,14 @@ get_mounts (GVolumeMonitor *volume_monitor)
   GDaemonVolumeMonitor *monitor;
   GList *l;
 
-  G_LOCK (_the_daemon_volume_monitor);
+  G_LOCK (daemon_vm);
 
   monitor = G_DAEMON_VOLUME_MONITOR (volume_monitor);
 
   l = g_list_copy (monitor->mounts);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
-  G_UNLOCK (_the_daemon_volume_monitor);
+  G_UNLOCK (daemon_vm);
 
   return l;
 }
@@ -83,7 +83,6 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
 {
   return NULL;
 }
-
 
 static GMount *
 get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
@@ -118,20 +117,18 @@ g_daemon_volume_monitor_find_mount_by_mount_info (GMountInfo *mount_info)
 {
   GDaemonMount *daemon_mount;
 
-  if (_the_daemon_volume_monitor == NULL)
+  G_LOCK (daemon_vm);
+
+  daemon_mount = NULL;
+  if (_the_daemon_volume_monitor != NULL)
     {
-      return NULL;
+      daemon_mount = find_mount_by_mount_info (_the_daemon_volume_monitor, mount_info);
+      
+      if (daemon_mount != NULL)
+        g_object_ref (daemon_mount);
     }
 
-  G_LOCK (_the_daemon_volume_monitor);
-
-  daemon_mount = find_mount_by_mount_info (_the_daemon_volume_monitor, mount_info);
-  if (daemon_mount != NULL)
-    {
-      g_object_ref (daemon_mount);
-    }
-
-  G_UNLOCK (_the_daemon_volume_monitor);
+  G_UNLOCK (daemon_vm);
 
   return daemon_mount;
 }
@@ -142,14 +139,14 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   GDaemonMount *mount;
   GVolume *volume;
 
-  G_LOCK (_the_daemon_volume_monitor);
+  G_LOCK (daemon_vm);
 
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (mount)
     {
       g_warning (G_STRLOC ": Mount was added twice!");
       
-      G_UNLOCK (_the_daemon_volume_monitor);
+      G_UNLOCK (daemon_vm);
       return;
     }
 
@@ -165,7 +162,7 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
       g_object_ref (mount);
     }
   
-  G_UNLOCK (_the_daemon_volume_monitor);
+  G_UNLOCK (daemon_vm);
 
   if (mount)
     {
@@ -180,7 +177,7 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
   GDaemonMount *mount;
 
-  G_LOCK (_the_daemon_volume_monitor);
+  G_LOCK (daemon_vm);
 
   mount = find_mount_by_mount_info (daemon_monitor, mount_info);
   if (!mount)
@@ -188,13 +185,13 @@ mount_removed (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
       if (mount_info->user_visible)
 	g_warning (G_STRLOC ": An unknown mount was removed!");
       
-      G_UNLOCK (_the_daemon_volume_monitor);
+      G_UNLOCK (daemon_vm);
       return;
     }
 
   daemon_monitor->mounts = g_list_remove (daemon_monitor->mounts, mount);
   
-  G_UNLOCK (_the_daemon_volume_monitor);
+  G_UNLOCK (daemon_vm);
 
   g_signal_emit_by_name (daemon_monitor, "mount_removed", mount);
   g_signal_emit_by_name (mount, "unmounted");
@@ -244,8 +241,6 @@ g_daemon_volume_monitor_finalize (GObject *object)
 {
   GDaemonVolumeMonitor *monitor;
   
-  G_LOCK (_the_daemon_volume_monitor);
-
   monitor = G_DAEMON_VOLUME_MONITOR (object);
 
   g_signal_handlers_disconnect_by_func (monitor->mount_tracker, mount_added, monitor);
@@ -258,10 +253,21 @@ g_daemon_volume_monitor_finalize (GObject *object)
   
   if (G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->finalize) (object);
+}
 
+static void
+g_daemon_volume_monitor_dispose (GObject *object)
+{
+  GDaemonVolumeMonitor *monitor;
+  
+  monitor = G_DAEMON_VOLUME_MONITOR (object);
+
+  G_LOCK (daemon_vm);
   _the_daemon_volume_monitor = NULL;
-
-  G_UNLOCK (_the_daemon_volume_monitor);
+  G_UNLOCK (daemon_vm);
+  
+  if (G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_daemon_volume_monitor_parent_class)->dispose) (object);
 }
 
 static void
@@ -293,6 +299,7 @@ g_daemon_volume_monitor_class_init (GDaemonVolumeMonitorClass *klass)
   GVolumeMonitorClass *monitor_class = G_VOLUME_MONITOR_CLASS (klass);
   
   gobject_class->finalize = g_daemon_volume_monitor_finalize;
+  gobject_class->dispose = g_daemon_volume_monitor_dispose;
 
   monitor_class->is_supported = is_supported;
   monitor_class->get_mounts = get_mounts;

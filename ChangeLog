@@ -1,5 +1,18 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonmount.c:
+        * client/gdaemonvolumemonitor.c:
+        * hal/ghaldrive.c:
+        * hal/ghalmount.c:
+        * hal/ghalvolume.c:
+        * hal/ghalvolumemonitor.[ch]:
+	Properly lock around volume monitors and
+	volume monitor objects.
+	Emit all events in idles to avoid reentrancy
+	issues. Fixed deadlock in #519599.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
         * common/gmountsource.c:
         * common/gmounttracker.c:
 	Work around problems with type registering when the common code

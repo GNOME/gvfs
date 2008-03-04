@@ -44,6 +44,9 @@
  * We avoid locking since GUnionVolumeMonitor, the only user of us,
  * does locking.
  */
+
+G_LOCK_DEFINE_STATIC(hal_vm);
+
 static GHalVolumeMonitor *the_volume_monitor = NULL;
 static HalPool *pool = NULL;
 
@@ -80,15 +83,36 @@ static void mounts_changed           (GUnixMountMonitor  *mount_monitor,
 static void hal_changed              (HalPool    *pool,
                                       HalDevice  *device,
                                       gpointer    user_data);
-static void update_all               (GHalVolumeMonitor *monitor);
-static void update_drives            (GHalVolumeMonitor *monitor);
-static void update_volumes           (GHalVolumeMonitor *monitor);
-static void update_mounts            (GHalVolumeMonitor *monitor);
-static void update_discs             (GHalVolumeMonitor *monitor);
-static void update_cameras           (GHalVolumeMonitor *monitor);
+static void update_all               (GHalVolumeMonitor *monitor,
+                                      gboolean emit_changes);
+static void update_drives            (GHalVolumeMonitor *monitor,
+                                      GList **added_drives,
+                                      GList **removed_drives);
+static void update_volumes           (GHalVolumeMonitor *monitor,
+                                      GList **added_volumes,
+                                      GList **removed_volumes);
+static void update_mounts            (GHalVolumeMonitor *monitor,
+                                      GList **added_mounts,
+                                      GList **removed_mounts);
+static void update_discs             (GHalVolumeMonitor *monitor,
+                                      GList **added_volumes,
+                                      GList **removed_volumes,
+                                      GList **added_mounts,
+                                      GList **removed_mounts);
+static void update_cameras           (GHalVolumeMonitor *monitor,
+                                      GList **added_volumes,
+                                      GList **removed_volumes);
+
 
 #define g_hal_volume_monitor_get_type g_hal_volume_monitor_get_type
 G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR)
+
+static void
+list_free (GList *objects)
+{
+  g_list_foreach (objects, (GFunc)g_object_unref, NULL);
+  g_list_free (objects);
+}
 
 static HalPool *
 get_hal_pool (void)
@@ -102,11 +126,24 @@ get_hal_pool (void)
 }
 
 static void
+g_hal_volume_monitor_dispose (GObject *object)
+{
+  GHalVolumeMonitor *monitor;
+  
+  monitor = G_HAL_VOLUME_MONITOR (object);
+
+  G_LOCK (hal_vm);
+  the_volume_monitor = NULL;
+  G_UNLOCK (hal_vm);
+  
+  if (G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->dispose) (object);
+}
+
+static void
 g_hal_volume_monitor_finalize (GObject *object)
 {
   GHalVolumeMonitor *monitor;
-
-  the_volume_monitor = NULL;
 
   monitor = G_HAL_VOLUME_MONITOR (object);
 
@@ -116,33 +153,21 @@ g_hal_volume_monitor_finalize (GObject *object)
 
   g_object_unref (monitor->mount_monitor);
   g_object_unref (monitor->pool);
+  
+  list_free (monitor->last_camera_devices);
+  list_free (monitor->last_optical_disc_devices);
+  list_free (monitor->last_drive_devices);
+  list_free (monitor->last_volume_devices);
+  list_free (monitor->last_mountpoints);
+  list_free (monitor->last_mounts);
 
-  g_list_foreach (monitor->last_camera_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_camera_devices);
-  g_list_foreach (monitor->last_optical_disc_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_optical_disc_devices);
-  g_list_foreach (monitor->last_drive_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_drive_devices);
-  g_list_foreach (monitor->last_volume_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_volume_devices);
-  g_list_foreach (monitor->last_mountpoints, (GFunc)g_unix_mount_point_free, NULL);
-  g_list_free (monitor->last_mountpoints);
-  g_list_foreach (monitor->last_mounts, (GFunc)g_unix_mount_free, NULL);
-  g_list_free (monitor->last_mounts);
+  list_free (monitor->drives);
+  list_free (monitor->volumes);
+  list_free (monitor->mounts);
 
-  g_list_foreach (monitor->drives, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->drives);
-  g_list_foreach (monitor->volumes, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->volumes);
-  g_list_foreach (monitor->mounts, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->mounts);
-
-  g_list_foreach (monitor->disc_volumes, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->disc_volumes);
-  g_list_foreach (monitor->disc_mounts, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->disc_mounts);
-  g_list_foreach (monitor->camera_volumes, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->camera_volumes);
+  list_free (monitor->disc_volumes);
+  list_free (monitor->disc_mounts);
+  list_free (monitor->camera_volumes);
   
   if (G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->finalize) (object);
@@ -156,11 +181,15 @@ get_mounts (GVolumeMonitor *volume_monitor)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
+  G_LOCK (hal_vm);
+  
   l = g_list_copy (monitor->mounts);
   ll = g_list_copy (monitor->disc_mounts);
   l = g_list_concat (l, ll);
 
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
+
+  G_UNLOCK (hal_vm);
 
   return l;
 }
@@ -173,6 +202,8 @@ get_volumes (GVolumeMonitor *volume_monitor)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
+  G_LOCK (hal_vm);
+
   l = g_list_copy (monitor->volumes);
   ll = g_list_copy (monitor->disc_volumes);
   l = g_list_concat (l, ll);
@@ -181,6 +212,8 @@ get_volumes (GVolumeMonitor *volume_monitor)
 
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
+  G_UNLOCK (hal_vm);
+  
   return l;
 }
 
@@ -192,9 +225,13 @@ get_connected_drives (GVolumeMonitor *volume_monitor)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
+  G_LOCK (hal_vm);
+
   l = g_list_copy (monitor->drives);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
+  G_UNLOCK (hal_vm);
+  
   return l;
 }
 
@@ -207,6 +244,8 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
+  G_LOCK (hal_vm);
+  
   volume = NULL;
 
   for (l = monitor->volumes; l != NULL; l = l->next)
@@ -223,11 +262,17 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
         goto found;
     }
 
+  G_UNLOCK (hal_vm);
+  
   return NULL;
 
  found:
 
-  return g_object_ref (volume);
+  g_object_ref (volume);
+  
+  G_UNLOCK (hal_vm);
+
+  return (GVolume *)volume;
 }
 
 static GMount *
@@ -239,6 +284,8 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
+  G_LOCK (hal_vm);
+  
   mount = NULL;
 
   for (l = monitor->mounts; l != NULL; l = l->next)
@@ -255,11 +302,17 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
         goto found;
     }
 
+  G_UNLOCK (hal_vm);
+  
   return NULL;
 
  found:
 
-  return g_object_ref (mount);
+  g_object_ref (mount);
+  
+  G_UNLOCK (hal_vm);
+  
+  return (GMount *)mount;
 }
 
 static GMount *
@@ -270,9 +323,13 @@ get_mount_for_mount_path (const char *mount_path,
   GHalMount *hal_mount;
   GHalVolumeMonitor *volume_monitor;
 
-  mount = NULL;
+  G_LOCK (hal_vm);
+  volume_monitor = NULL;
+  if (the_volume_monitor != NULL)
+    volume_monitor = g_object_ref (the_volume_monitor);
+  G_UNLOCK (hal_vm);
 
-  if (the_volume_monitor == NULL)
+  if (volume_monitor == NULL)
     {
       /* Dammit, no monitor is set up.. so we have to create one, find
        * what the user asks for and throw it away again. 
@@ -283,13 +340,15 @@ get_mount_for_mount_path (const char *mount_path,
        */
       volume_monitor = G_HAL_VOLUME_MONITOR (g_hal_volume_monitor_new ());
     }
-  else
-    volume_monitor = g_object_ref (the_volume_monitor);
+
+  mount = NULL;
 
   /* creation of the volume monitor might actually fail */
   if (volume_monitor != NULL)
     {
       GList *l;
+
+      G_LOCK (hal_vm);
       
       for (l = volume_monitor->mounts; l != NULL; l = l->next)
         {
@@ -302,10 +361,12 @@ get_mount_for_mount_path (const char *mount_path,
             }
         }
 
+      G_UNLOCK (hal_vm);
+      
       g_object_unref (volume_monitor);
     }
 
-  return mount;
+  return (GMount *)mount;
 }
 
 static void
@@ -314,7 +375,7 @@ mountpoints_changed (GUnixMountMonitor *mount_monitor,
 {
   GHalVolumeMonitor *monitor = G_HAL_VOLUME_MONITOR (user_data);
 
-  update_all (monitor);
+  update_all (monitor, TRUE);
 }
 
 static void
@@ -323,13 +384,13 @@ mounts_changed (GUnixMountMonitor *mount_monitor,
 {
   GHalVolumeMonitor *monitor = G_HAL_VOLUME_MONITOR (user_data);
 
-  update_all (monitor);
+  update_all (monitor, TRUE);
 }
 
 void 
 g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor)
 {
-  update_all (monitor);
+  update_all (monitor, TRUE);
 }
 
 static void
@@ -341,7 +402,7 @@ hal_changed (HalPool    *pool,
   
   /*g_warning ("hal changed");*/
   
-  update_all (monitor);
+  update_all (monitor, TRUE);
 }
 
 static GObject *
@@ -354,11 +415,14 @@ g_hal_volume_monitor_constructor (GType                  type,
   GHalVolumeMonitorClass *klass;
   GObjectClass *parent_class;  
 
+  G_LOCK (hal_vm);
   if (the_volume_monitor != NULL)
     {
       object = g_object_ref (the_volume_monitor);
+      G_UNLOCK (hal_vm);
       return object;
     }
+  G_UNLOCK (hal_vm);
 
   /*g_warning ("creating hal vm");*/
 
@@ -392,9 +456,11 @@ g_hal_volume_monitor_constructor (GType                  type,
                     "device_removed", G_CALLBACK (hal_changed),
                     monitor);
 		    
-  update_all (monitor);
+  update_all (monitor, FALSE);
 
+  G_LOCK (hal_vm);
   the_volume_monitor = monitor;
+  G_UNLOCK (hal_vm);
 
   return object;
 }
@@ -426,13 +492,23 @@ adopt_orphan_mount (GMount *mount)
   GList *l;
   GFile *mount_root;
   GVolume *ret;
-
-  if (the_volume_monitor == NULL)
-    return NULL;
-
+  GHalVolumeMonitor *volume_monitor;
+  
+  /* This is called by the union volume monitor which does
+     have a ref to this. So its guaranteed to live, unfortunately
+     the pointer is not passed as an argument :/
+  */
   ret = NULL;
-  mount_root = g_mount_get_root (mount);
+  
+  G_LOCK (hal_vm);
+  if (the_volume_monitor == NULL)
+    {
+      G_UNLOCK (hal_vm);
+      return NULL;
+    }
 
+  mount_root = g_mount_get_root (mount);
+  
   /* cdda:// as foreign mounts */
   for (l = the_volume_monitor->disc_volumes; l != NULL; l = l->next)
     {
@@ -460,8 +536,9 @@ adopt_orphan_mount (GMount *mount)
     }
 
  found:
-  
   g_object_unref (mount_root);
+  
+  G_UNLOCK (hal_vm);
   return ret;
 }
 
@@ -474,6 +551,7 @@ g_hal_volume_monitor_class_init (GHalVolumeMonitorClass *klass)
 
   gobject_class->constructor = g_hal_volume_monitor_constructor;
   gobject_class->finalize = g_hal_volume_monitor_finalize;
+  gobject_class->dispose = g_hal_volume_monitor_dispose;
 
   monitor_class->get_mounts = get_mounts;
   monitor_class->get_volumes = get_volumes;
@@ -545,25 +623,31 @@ diff_sorted_lists (GList         *list1,
     }
 }
 
-GHalVolume *
-g_hal_volume_monitor_lookup_volume_for_mount_path (GHalVolumeMonitor *monitor,
+static GHalVolume *
+lookup_volume_for_mount_path (GHalVolumeMonitor *monitor,
                                                    const char         *mount_path)
 {
   GList *l;
+  GHalVolume *found;
 
+  found = NULL;
+  
   for (l = monitor->volumes; l != NULL; l = l->next)
     {
       GHalVolume *volume = l->data;
 
       if (g_hal_volume_has_mount_path (volume, mount_path))
-	return volume;
+        {
+          found = volume;
+          break;
+        }
     }
-  
-  return NULL;
+
+  return found;
 }
 
 static GHalVolume *
-g_hal_volume_monitor_lookup_volume_for_device_path (GHalVolumeMonitor *monitor,
+lookup_volume_for_device_path (GHalVolumeMonitor *monitor,
                                                     const char         *device_path)
 {
   GList *l;
@@ -776,17 +860,119 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
 }
 
 static void
-update_all (GHalVolumeMonitor *monitor)
+list_emit (GHalVolumeMonitor *monitor,
+           const char *monitor_signal,
+           const char *object_signal,
+           GList *objects)
 {
-  update_drives (monitor);
-  update_volumes (monitor);
-  update_mounts (monitor);
-  update_discs (monitor);
-  update_cameras (monitor);
+  GList *l;
+
+  for (l = objects; l != NULL; l = l->next)
+    {
+      g_signal_emit_by_name (monitor, monitor_signal, l->data);
+      if (object_signal)
+        g_signal_emit_by_name (l->data, object_signal);
+    }
+}
+
+typedef struct {
+  GHalVolumeMonitor *monitor;
+  GList *added_drives, *removed_drives;
+  GList *added_volumes, *removed_volumes;
+  GList *added_mounts, *removed_mounts;
+} ChangedLists;
+
+
+static gboolean
+emit_lists_in_idle (gpointer data)
+{
+  ChangedLists *lists = data;
+
+  list_emit (lists->monitor,
+             "drive_disconnected", NULL,
+             lists->removed_drives);
+  list_emit (lists->monitor,
+             "drive_connected", NULL,
+             lists->added_drives);
+
+  list_emit (lists->monitor,
+             "volume_removed", "removed",
+             lists->removed_volumes);
+  list_emit (lists->monitor,
+             "volume_added", NULL,
+             lists->added_volumes);
+
+  list_emit (lists->monitor,
+             "mount_removed", "unmounted",
+             lists->removed_mounts);
+  list_emit (lists->monitor,
+             "mount_added", NULL,
+             lists->added_mounts);
+  
+  list_free (lists->removed_drives);
+  list_free (lists->added_drives);
+  list_free (lists->removed_volumes);
+  list_free (lists->added_volumes);
+  list_free (lists->removed_mounts);
+  list_free (lists->added_mounts);
+  g_object_unref (lists->monitor);
+  g_free (lists);
+  
+  return FALSE;
+}
+
+/* Must be called from idle if emit_changes, with no locks held */
+static void
+update_all (GHalVolumeMonitor *monitor,
+            gboolean emit_changes)
+{
+  ChangedLists *lists;
+  GList *added_drives, *removed_drives;
+  GList *added_volumes, *removed_volumes;
+  GList *added_mounts, *removed_mounts;
+
+  added_drives = NULL;
+  removed_drives = NULL;
+  added_volumes = NULL;
+  removed_volumes = NULL;
+  added_mounts = NULL;
+  removed_mounts = NULL;
+  
+  G_LOCK (hal_vm);
+  update_drives (monitor, &added_drives, &removed_drives);
+  update_volumes (monitor, &added_volumes, &removed_volumes);
+  update_mounts (monitor, &added_mounts, &removed_mounts);
+  update_discs (monitor,
+                &added_volumes, &removed_volumes,
+                &added_mounts, &removed_mounts);
+  update_cameras (monitor, &added_volumes, &removed_volumes);
+  G_UNLOCK (hal_vm);
+
+  /* TODO: Should happen in idle */
+  if (emit_changes)
+    {
+      lists = g_new0 (ChangedLists, 1);
+      lists->monitor = g_object_ref (monitor);
+      lists->added_drives = added_drives;
+      lists->removed_drives = removed_drives;
+      
+      g_idle_add (emit_lists_in_idle, lists);
+    }
+  else
+    {
+      list_free (removed_drives);
+      list_free (added_drives);
+      list_free (removed_volumes);
+      list_free (added_volumes);
+      list_free (removed_mounts);
+      list_free (added_mounts);
+    }
 }
 
 static void
-update_drives (GHalVolumeMonitor *monitor)
+update_drives (GHalVolumeMonitor *monitor,
+               GList **added_drives,
+               GList **removed_drives)
 {
   GList *new_drive_devices;
   GList *removed, *added;
@@ -823,8 +1009,7 @@ update_drives (GHalVolumeMonitor *monitor)
           /*g_warning ("hal removing drive %s", hal_device_get_property_string (d, "block.device"));*/
           g_hal_drive_disconnected (drive);
           monitor->drives = g_list_remove (monitor->drives, drive);
-          g_signal_emit_by_name (monitor, "drive_disconnected", drive);
-          g_object_unref (drive);
+          *removed_drives = g_list_prepend (*removed_drives, drive);
         }
     }
   
@@ -840,20 +1025,21 @@ update_drives (GHalVolumeMonitor *monitor)
           if (drive != NULL)
             {
               monitor->drives = g_list_prepend (monitor->drives, drive);
-              g_signal_emit_by_name (monitor, "drive_connected", drive);
+              *added_drives = g_list_prepend (*added_drives, g_object_ref (drive));
             }
         }
     }
   
   g_list_free (added);
   g_list_free (removed);
-  g_list_foreach (monitor->last_drive_devices, (GFunc) g_object_unref, NULL);
-  g_list_free (monitor->last_drive_devices);
+  list_free (monitor->last_drive_devices);
   monitor->last_drive_devices = new_drive_devices;
 }
 
 static void
-update_volumes (GHalVolumeMonitor *monitor)
+update_volumes (GHalVolumeMonitor *monitor,
+                GList **added_volumes,
+                GList **removed_volumes)
 {
   GList *new_volume_devices;
   GList *removed, *added;
@@ -891,9 +1077,8 @@ update_volumes (GHalVolumeMonitor *monitor)
           /*g_warning ("hal removing vol %s", hal_device_get_property_string (d, "block.device"));*/
           g_hal_volume_removed (volume);
           monitor->volumes = g_list_remove (monitor->volumes, volume);
-          g_signal_emit_by_name (monitor, "volume_removed", volume);
-          g_signal_emit_by_name (volume, "removed");
-          g_object_unref (volume);
+
+          *removed_volumes = g_list_prepend (*removed_volumes, volume);
         }
     }
   
@@ -916,20 +1101,21 @@ update_volumes (GHalVolumeMonitor *monitor)
           if (volume != NULL)
             {
               monitor->volumes = g_list_prepend (monitor->volumes, volume);
-              g_signal_emit_by_name (monitor, "volume_added", volume);
+              *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
             }
         }
     }
   
   g_list_free (added);
   g_list_free (removed);
-  g_list_foreach (monitor->last_volume_devices, (GFunc) g_object_unref, NULL);
-  g_list_free (monitor->last_volume_devices);
+  list_free (monitor->last_volume_devices);
   monitor->last_volume_devices = new_volume_devices;
 }
 
 static void
-update_mounts (GHalVolumeMonitor *monitor)
+update_mounts (GHalVolumeMonitor *monitor,
+               GList **added_mounts,
+               GList **removed_mounts)
 {
   GList *new_mounts;
   GList *removed, *added;
@@ -957,9 +1143,8 @@ update_mounts (GHalVolumeMonitor *monitor)
 	{
 	  g_hal_mount_unmounted (mount);
 	  monitor->mounts = g_list_remove (monitor->mounts, mount);
-	  g_signal_emit_by_name (monitor, "mount_removed", mount);
-	  g_signal_emit_by_name (mount, "unmounted");
-	  g_object_unref (mount);
+
+          *removed_mounts = g_list_prepend (*removed_mounts, mount);
 	}
     }
   
@@ -969,16 +1154,16 @@ update_mounts (GHalVolumeMonitor *monitor)
 
       device_path = g_unix_mount_get_device_path (mount_entry);
       mount_path = g_unix_mount_get_mount_path (mount_entry);
-      volume = g_hal_volume_monitor_lookup_volume_for_device_path (monitor, device_path);
+      volume = lookup_volume_for_device_path (monitor, device_path);
       if (volume == NULL)
-        volume = g_hal_volume_monitor_lookup_volume_for_mount_path (monitor, mount_path);
+        volume = lookup_volume_for_mount_path (monitor, mount_path);
 
       /*g_warning ("hal adding mount %s (vol %p)", g_unix_mount_get_device_path (mount_entry), volume);*/
       mount = g_hal_mount_new (G_VOLUME_MONITOR (monitor), mount_entry, monitor->pool, volume);
       if (mount)
 	{
 	  monitor->mounts = g_list_prepend (monitor->mounts, mount);
-	  g_signal_emit_by_name (monitor, "mount_added", mount);
+          *added_mounts = g_list_prepend (*added_mounts, g_object_ref (mount));
 	}
     }
   
@@ -991,7 +1176,11 @@ update_mounts (GHalVolumeMonitor *monitor)
 }
 
 static void
-update_discs (GHalVolumeMonitor *monitor)
+update_discs (GHalVolumeMonitor *monitor,
+              GList **added_volumes,
+              GList **removed_volumes,
+              GList **added_mounts,
+              GList **removed_mounts)
 {
   GList *new_optical_disc_devices;
   GList *removed, *added;
@@ -1041,9 +1230,7 @@ update_discs (GHalVolumeMonitor *monitor)
         {
 	  g_hal_mount_unmounted (mount);
 	  monitor->disc_mounts = g_list_remove (monitor->disc_mounts, mount);
-	  g_signal_emit_by_name (monitor, "mount_removed", mount);
-	  g_signal_emit_by_name (mount, "unmounted");
-	  g_object_unref (mount);
+          *removed_mounts = g_list_prepend (*removed_mounts, mount);
         }
 
       volume = find_disc_volume_by_udi (monitor, udi);
@@ -1051,9 +1238,7 @@ update_discs (GHalVolumeMonitor *monitor)
         {
 	  g_hal_volume_removed (volume);
 	  monitor->disc_volumes = g_list_remove (monitor->disc_volumes, volume);
-	  g_signal_emit_by_name (monitor, "volume_removed", volume);
-	  g_signal_emit_by_name (volume, "removed");
-	  g_object_unref (volume);
+          *removed_volumes = g_list_prepend (*removed_volumes, volume);
         }
     }
   
@@ -1117,12 +1302,12 @@ update_discs (GHalVolumeMonitor *monitor)
           if (volume != NULL)
             {
               monitor->disc_volumes = g_list_prepend (monitor->disc_volumes, volume);
-              g_signal_emit_by_name (monitor, "volume_added", volume);
+              *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
               
               if (mount != NULL)
                 {
                   monitor->disc_mounts = g_list_prepend (monitor->disc_mounts, mount);
-                  g_signal_emit_by_name (monitor, "mount_added", mount);
+                  *added_mounts = g_list_prepend (*added_mounts, g_object_ref (mount));
                 }
             }
         }
@@ -1130,13 +1315,14 @@ update_discs (GHalVolumeMonitor *monitor)
 
   g_list_free (added);
   g_list_free (removed);
-  g_list_foreach (monitor->last_optical_disc_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_optical_disc_devices);
+  list_free (monitor->last_optical_disc_devices);
   monitor->last_optical_disc_devices = new_optical_disc_devices;
 }
 
 static void
-update_cameras (GHalVolumeMonitor *monitor)
+update_cameras (GHalVolumeMonitor *monitor,
+                GList **added_volumes,
+                GList **removed_volumes)
 {
 #ifdef HAVE_GPHOTO2
   GList *new_camera_devices;
@@ -1192,9 +1378,7 @@ update_cameras (GHalVolumeMonitor *monitor)
         {
 	  g_hal_volume_removed (volume);
 	  monitor->camera_volumes = g_list_remove (monitor->camera_volumes, volume);
-	  g_signal_emit_by_name (monitor, "volume_removed", volume);
-	  g_signal_emit_by_name (volume, "removed");
-	  g_object_unref (volume);
+          *removed_volumes = g_list_prepend (*removed_volumes, volume);
         }
     }
   
@@ -1227,14 +1411,13 @@ update_cameras (GHalVolumeMonitor *monitor)
       if (volume != NULL)
         {
           monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
-          g_signal_emit_by_name (monitor, "volume_added", volume);
+          *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
         }
     }
 
   g_list_free (added);
   g_list_free (removed);
-  g_list_foreach (monitor->last_camera_devices, (GFunc)g_object_unref, NULL);
-  g_list_free (monitor->last_camera_devices);
+  list_free (monitor->last_camera_devices);
   monitor->last_camera_devices = new_camera_devices;
 #endif
 }

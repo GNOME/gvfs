@@ -34,6 +34,10 @@
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
 
+/* Protects all fields of GDaemonMount that can change
+   which at this point is just foreign_volume */
+G_LOCK_DEFINE_STATIC(daemon_mount);
+
 struct _GDaemonMount {
   GObject     parent;
 
@@ -146,9 +150,14 @@ static GDrive *
 g_daemon_mount_get_drive (GMount *mount)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
+  GDrive *drive;
+
+  G_LOCK (daemon_mount);
+  drive = NULL;
   if (daemon_mount->foreign_volume != NULL)
-    return g_volume_get_drive (daemon_mount->foreign_volume);
-  return NULL;
+    drive = g_volume_get_drive (daemon_mount->foreign_volume);
+  G_UNLOCK (daemon_mount);
+  return drive;
 }
 
 static gboolean
@@ -161,23 +170,44 @@ static gboolean
 g_daemon_mount_can_eject (GMount *mount)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
+  gboolean res;
+  
+  G_LOCK (daemon_mount);
+  res = FALSE;
   if (daemon_mount->foreign_volume != NULL)
-    return g_volume_can_eject (daemon_mount->foreign_volume);
-  return FALSE;
+    res = g_volume_can_eject (daemon_mount->foreign_volume);
+  G_UNLOCK (daemon_mount);
+  
+  return res;
 }
 
 static void
 foreign_volume_removed (GVolume *volume, gpointer user_data)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (user_data);
+
+  G_LOCK (daemon_mount);
+
+  g_object_ref (daemon_mount);
+  
   if (daemon_mount->foreign_volume == volume)
     g_daemon_mount_set_foreign_volume (daemon_mount, NULL);
+
+  G_UNLOCK (daemon_mount);
+  
+  g_signal_emit_by_name (daemon_mount, "changed");
+  if (daemon_mount->volume_monitor != NULL)
+    g_signal_emit_by_name (daemon_mount->volume_monitor, "mount_changed", daemon_mount);
+  
+  g_object_unref (daemon_mount);
 }
 
 void
 g_daemon_mount_set_foreign_volume (GDaemonMount *mount, 
                                    GVolume *foreign_volume)
 {
+  G_LOCK (daemon_mount);
+  
   if (mount->foreign_volume != NULL)
     g_object_unref (mount->foreign_volume);
 
@@ -189,9 +219,7 @@ g_daemon_mount_set_foreign_volume (GDaemonMount *mount,
   else
     mount->foreign_volume = NULL;
 
-  g_signal_emit_by_name (mount, "changed");
-  if (mount->volume_monitor != NULL)
-    g_signal_emit_by_name (mount->volume_monitor, "mount_changed", mount);
+  G_UNLOCK (daemon_mount);
 }
 
 static void
@@ -278,18 +306,23 @@ g_daemon_mount_eject (GMount              *mount,
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   GDrive *drive;
 
+  G_LOCK (daemon_mount);
+
+  drive = NULL;
   if (daemon_mount->foreign_volume != NULL)
+    drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
+      
+  G_UNLOCK (daemon_mount);
+  
+  if (drive != NULL)
     {
-      drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
-      if (drive != NULL)
-        {
-          EjectWrapperOp *data;
-          data = g_new0 (EjectWrapperOp, 1);
-          data->object = G_OBJECT (mount);
-          data->callback = callback;
-          data->user_data = user_data;
-          g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
-        }
+      EjectWrapperOp *data;
+      data = g_new0 (EjectWrapperOp, 1);
+      data->object = G_OBJECT (mount);
+      data->callback = callback;
+      data->user_data = user_data;
+      g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
+      g_object_unref (drive);
     }
 }
 
@@ -300,14 +333,24 @@ g_daemon_mount_eject_finish (GMount        *mount,
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   GDrive *drive;
+  gboolean res;
 
+  res = TRUE;
+
+  G_LOCK (daemon_mount);
+  
   if (daemon_mount->foreign_volume != NULL)
+    drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
+
+  G_UNLOCK (daemon_mount);
+  
+  if (drive != NULL)
     {
-      drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
-      if (drive != NULL)
-        return g_drive_eject_finish (drive, result, error);
+      res = g_drive_eject_finish (drive, result, error);
+      g_object_unref (drive);
     }
-  return TRUE;
+  
+  return res;
 }
 
 static void
