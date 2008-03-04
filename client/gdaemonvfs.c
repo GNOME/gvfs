@@ -524,6 +524,23 @@ _g_daemon_vfs_mountspec_get_uri_scheme (GMountSpec *spec)
   return scheme;
 }
 
+static int
+find_string (GPtrArray *array, const char *find_me)
+{
+  int i;
+  
+  g_return_val_if_fail (find_me != NULL, -1);
+  
+  for (i = 0; i < array->len; ++i)
+    {
+      if (strcmp (g_ptr_array_index (array, i), find_me) == 0)
+	return i;
+    }
+  
+  return -1;
+}
+
+
 static void
 fill_mountable_info (GDaemonVfs *vfs)
 {
@@ -593,7 +610,8 @@ fill_mountable_info (GDaemonVfs *vfs)
       if (*scheme != 0)
 	{
 	  info->scheme = g_strdup (scheme);
-	  g_ptr_array_add (uri_schemes, g_strdup (scheme));
+	  if (find_string (uri_schemes, scheme) == -1)
+	    g_ptr_array_add (uri_schemes, g_strdup (scheme));
 	}
       
       if (scheme_aliases_len > 0)
@@ -602,7 +620,8 @@ fill_mountable_info (GDaemonVfs *vfs)
 	  for (i = 0; i < scheme_aliases_len; i++)
 	    {
 	      info->scheme_aliases[i] = g_strdup (scheme_aliases[i]);
-	      g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
+	      if (find_string (uri_schemes, scheme_aliases[i]) == -1)
+		g_ptr_array_add (uri_schemes, g_strdup (scheme_aliases[i]));
 	    }
 	  info->scheme_aliases[scheme_aliases_len] = NULL;
 	}
