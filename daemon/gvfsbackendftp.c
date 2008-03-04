@@ -1730,8 +1730,8 @@ run_list_command (FtpConnection *conn, const char *command, ...)
       status = soup_socket_read_until (conn->data,
 				       name + bytes_read,
 				       size - bytes_read - 1,
-				       "\r\n",
-				       2,
+				       "\n",
+				       1,
 				       &n_bytes,
 				       &got_boundary,
 				       conn->job->cancellable,
@@ -1749,7 +1749,7 @@ run_list_command (FtpConnection *conn, const char *command, ...)
 	      }
 	    if (got_boundary)
 	      {
-		name[bytes_read - 2] = 0;
+		name[bytes_read - 1] = 0;
 		list = g_list_prepend (list, g_strdup (name));
 		bytes_read = 0;
 	      }

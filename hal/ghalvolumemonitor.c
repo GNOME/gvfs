@@ -492,7 +492,6 @@ adopt_orphan_mount (GMount *mount)
   GList *l;
   GFile *mount_root;
   GVolume *ret;
-  GHalVolumeMonitor *volume_monitor;
   
   /* This is called by the union volume monitor which does
      have a ref to this. So its guaranteed to live, unfortunately

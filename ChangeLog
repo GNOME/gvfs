@@ -1,3 +1,10 @@
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (run_list_command):
+	don't require \r as line ending for LIST commands. Fixes ftp.netbsd.org
+	* hal/ghalvolumemonitor.c: (adopt_orphan_mount):
+	unused variable
+
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonmount.c:
