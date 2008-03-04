@@ -954,6 +954,10 @@ update_all (GHalVolumeMonitor *monitor,
       lists->monitor = g_object_ref (monitor);
       lists->added_drives = added_drives;
       lists->removed_drives = removed_drives;
+      lists->added_volumes = added_volumes;
+      lists->removed_volumes = removed_volumes;
+      lists->added_mounts = added_mounts;
+      lists->removed_mounts = removed_mounts;
       
       g_idle_add (emit_lists_in_idle, lists);
     }

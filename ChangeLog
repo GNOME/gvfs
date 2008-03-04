@@ -1,5 +1,11 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghalvolumemonitor.c:
+        (update_all):
+	Actually emit changes for volumes and mounts too
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac:
 	Post release version bump
 
