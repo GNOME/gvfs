@@ -1,5 +1,13 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+	* client/gdaemonmount.c (g_daemon_mount_get_icon):
+	Use fallbacks for mount icon.
+
+	* NEWS:
+	Update for release.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendcomputer.c:
         (mount_volume_from_drive):
 	Avoid crash when mounting drive

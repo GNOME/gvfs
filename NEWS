@@ -1,3 +1,13 @@
+Major changes in 0.1.9:
+* Added ftp backend
+* Added obexftp backend
+* Locking fixed for volume monitors
+* Better bash completion
+* Better webdav support
+* Allow backends to specify uri details in .mount file
+* Fix leaks and crashes
+* Fix icon for audio cds
+
 Major changes in 0.1.8:
 * Update for gio API changes
 * Add gphoto2 backend

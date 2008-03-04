@@ -120,7 +120,7 @@ g_daemon_mount_get_icon (GMount *mount)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
 
-  return g_themed_icon_new (daemon_mount->mount_info->icon);
+  return g_themed_icon_new_with_default_fallbacks (daemon_mount->mount_info->icon);
 }
 
 static char *
