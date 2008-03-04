@@ -1,5 +1,11 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+	* client/gdaemonvfs.c (_g_daemon_vfs_get_mount_info_async):
+	Bump timeout to standard gvfs time.
+	Patch from Matthias Clasen
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
         * hal/ghalvolumemonitor.c:
         (update_all):
 	Actually emit changes for volumes and mounts too

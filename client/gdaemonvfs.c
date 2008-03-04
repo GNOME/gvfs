@@ -826,7 +826,7 @@ _g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
   data->callback = callback;
   data->user_data = user_data;
   
-  _g_dbus_connection_call_async (the_vfs->async_bus, message, 2000,
+  _g_dbus_connection_call_async (the_vfs->async_bus, message, G_VFS_DBUS_TIMEOUT_MSECS,
 				 async_get_mount_info_response,
 				 data);
   
