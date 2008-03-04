@@ -947,7 +947,6 @@ update_all (GHalVolumeMonitor *monitor,
   update_cameras (monitor, &added_volumes, &removed_volumes);
   G_UNLOCK (hal_vm);
 
-  /* TODO: Should happen in idle */
   if (emit_changes)
     {
       lists = g_new0 (ChangedLists, 1);
