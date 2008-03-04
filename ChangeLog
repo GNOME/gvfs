@@ -1,5 +1,10 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+	* daemon/Makefile.am (gvfsd_ftp_SOURCES):
+	Use correct case for ParseFTPList.h
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonvfs.c:
         (_g_daemon_vfs_get_uri_for_mountspec):
 	Fix crash with NULL host (like "ftp://")
