@@ -159,7 +159,9 @@ g_hal_volume_monitor_finalize (GObject *object)
   list_free (monitor->last_drive_devices);
   list_free (monitor->last_volume_devices);
   list_free (monitor->last_mountpoints);
-  list_free (monitor->last_mounts);
+  g_list_foreach (monitor->last_mounts,
+		  (GFunc)g_unix_mount_free, NULL);
+  g_list_free (monitor->last_mounts);
 
   list_free (monitor->drives);
   list_free (monitor->volumes);

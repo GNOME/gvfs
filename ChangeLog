@@ -1,5 +1,11 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+        * hal/ghalvolumemonitor.c:
+        (g_hal_volume_monitor_finalize):
+	Free mounts with g_unix_mount_free, not g_object_unref.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
         * client/gvfsfusedaemon.c:
         (debug_print):
 	Actually disable debug log by default
