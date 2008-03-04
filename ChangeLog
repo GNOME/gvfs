@@ -1,3 +1,10 @@
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gmountsource.c:
+        * common/gmounttracker.c:
+	Work around problems with type registering when the common code
+	is used in both daemon and client.
+
 2008-03-04  Benjamin Otte  <otte@gnome.org>
 
 	* common/gmountsource.c: (ask_password_reply),
