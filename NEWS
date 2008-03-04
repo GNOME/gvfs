@@ -1,3 +1,7 @@
+Major changes in 0.1.11:
+* Correctly free mounts
+* Disable debug log
+
 Major changes in 0.1.10:
 * Fix volume monitor change reporting
 * Fix timeout during automount
