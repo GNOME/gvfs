@@ -1,5 +1,11 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonvfs.c:
+        (_g_daemon_vfs_get_uri_for_mountspec):
+	Fix crash with NULL host (like "ftp://")
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
 	* client/gdaemonmount.c (g_daemon_mount_get_icon):
 	Use fallbacks for mount icon.
 

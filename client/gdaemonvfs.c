@@ -466,7 +466,7 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
 	decoded.scheme = (char *)type;
       decoded.host = (char *)g_mount_spec_get (spec, "host");
       free_host = FALSE;
-      if (mountable && mountable->host_is_inet && strchr (decoded.host, ':') != NULL)
+      if (mountable && mountable->host_is_inet && decoded.host != NULL && strchr (decoded.host, ':') != NULL)
 	{
 	  free_host = TRUE;
 	  decoded.host = g_strconcat ("[", decoded.host, "]", NULL);
