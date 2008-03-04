@@ -796,9 +796,9 @@ mount_volume_from_drive (GDrive *drive,
   GVolume *volume;
 
   volumes = g_drive_get_volumes (drive);
-  volume = G_VOLUME (volumes->data);
-  if (volume)
+  if (volumes)
     {
+      volume = G_VOLUME (volumes->data);
       g_volume_mount (volume,
                       0,
                       mount_op,
@@ -812,6 +812,9 @@ mount_volume_from_drive (GDrive *drive,
                         G_IO_ERROR_NOT_SUPPORTED,
                         _("Can't mount file"));
     }
+  
+  g_list_foreach (volumes, (GFunc)g_object_unref, NULL);
+  g_list_free (volumes);
 }
 
 static void

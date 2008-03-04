@@ -1,5 +1,12 @@
 2008-03-04  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendcomputer.c:
+        (mount_volume_from_drive):
+	Avoid crash when mounting drive
+	Fix leak.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
         * hal/ghalmount.c:
 	Fix deadlock when looking for cdrom icons.
 
