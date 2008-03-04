@@ -1,3 +1,8 @@
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+        * hal/ghalmount.c:
+	Fix deadlock when looking for cdrom icons.
+
 2008-03-04  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (run_list_command):

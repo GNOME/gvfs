@@ -74,6 +74,9 @@ _g_find_file_insensitive_async (GFile              *parent,
                                 GAsyncReadyCallback callback,
                                 gpointer            user_data);
 
+
+static GFile *get_root (GHalMount *hal_mount);
+
 static void g_hal_mount_mount_iface_init (GMountIface *iface);
 
 #define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
@@ -341,7 +344,7 @@ _g_find_mount_icon (GHalMount *m)
 	
   search_data = g_new0 (MountIconSearchData, 1);
   search_data->mount = g_object_ref (m);
-  search_data->root = g_mount_get_root (G_MOUNT (m));
+  search_data->root = get_root (m);
   
   _g_find_file_insensitive_async (search_data->root,
                                   "autorun.inf",
@@ -775,18 +778,22 @@ g_hal_mount_unset_volume (GHalMount *mount,
 }
 
 static GFile *
+get_root (GHalMount *hal_mount)
+{
+  if (hal_mount->override_root != NULL)
+    return g_object_ref (hal_mount->override_root);
+  else
+    return g_file_new_for_path (hal_mount->mount_path);
+}
+
+static GFile *
 g_hal_mount_get_root (GMount *mount)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   GFile *root;
 
   G_LOCK (hal_mount);
-  
-  if (hal_mount->override_root != NULL)
-    root = g_object_ref (hal_mount->override_root);
-  else
-    root = g_file_new_for_path (hal_mount->mount_path);
-
+  root = get_root (hal_mount);
   G_UNLOCK (hal_mount);
 
   return root;
