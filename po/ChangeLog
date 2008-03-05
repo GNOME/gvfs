@@ -1,3 +1,8 @@
+2008-03-05  Runa Bhattacharjee <runab@fedoraproject.org>
+
+	* bn_IN.po: Added Bengali India Translations by Sankarshan Mukhopadhyay
+	* LINGUAS: Added Bengali India (bn_IN) to the list of languages
+
 2008-03-05  Takeshi AIHANA <takeshi.aihana@gmail.com>
 
 	* ja.po: Updated Japanese translation.
