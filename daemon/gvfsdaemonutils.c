@@ -271,14 +271,14 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
   g_file_info_set_content_type (info, mimetype);
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mimetype);
 
-  icon = NULL;
   if (type == G_FILE_TYPE_DIRECTORY)
     icon = g_themed_icon_new ("folder");
-  else if (mimetype)
-    icon = g_content_type_get_icon (mimetype);
-
-  if (icon == NULL)
-    icon = g_themed_icon_new ("text-x-generic");
+  else
+    {
+      icon = g_content_type_get_icon (mimetype);
+      if (G_IS_THEMED_ICON (icon))
+	g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
+    }
   
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);

@@ -1,5 +1,12 @@
 2008-03-05  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsdaemonutils.c:
+	(gvfs_file_info_populate_content_types):
+	add text-x-generic mime type as a last fallback option.
+	Fixes #520189
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c:
 	rewrite file info construction and directory listing. It should now
 	correctly resolve symlinks and be fast enough for general use.
