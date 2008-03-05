@@ -338,7 +338,8 @@ g_daemon_mount_eject_finish (GMount        *mount,
   res = TRUE;
 
   G_LOCK (daemon_mount);
-  
+
+  drive = NULL;
   if (daemon_mount->foreign_volume != NULL)
     drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
 

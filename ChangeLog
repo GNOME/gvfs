@@ -1,3 +1,10 @@
+2008-03-05  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonmount.c:
+        (g_daemon_mount_eject_finish):
+	Initialize drive variable not access
+	undefined memory (#520388)
+
 2008-03-04  A. Walton  <awalton@svn.gnome.org>
 
 	* daemon/ParseFTPList.c (ParseFTPList):
