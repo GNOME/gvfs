@@ -1443,6 +1443,10 @@ do_start_write (GVfsBackendFtp *ftp,
     }
 }
 
+/* forward declaration */
+static GFileInfo *
+create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink);
+
 static void
 do_create (GVfsBackend *backend,
 	   GVfsJobOpenForWrite *job,
@@ -1451,17 +1455,30 @@ do_create (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
+  GFileInfo *info;
   FtpFile *file;
 
-  /* FIXME FIXME FIXME: create MUST check that the file doesn't exist */
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
     return;
 
+  info = create_file_info (ftp, conn, filename, NULL);
+  if (info)
+    {
+      g_object_unref (info);
+      g_set_error (&conn->error,
+	           G_IO_ERROR,
+		   G_IO_ERROR_EXISTS,
+		   _("Target file already exists"));
+      goto error;
+    }
   file = ftp_filename_from_gvfs_path (conn, filename);
   do_start_write (ftp, conn, flags, "STOR %s", file);
   g_free (file);
   return;
+
+error:
+  g_vfs_backend_ftp_push_connection (ftp, conn);
 }
 
 static void

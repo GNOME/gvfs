@@ -1,5 +1,10 @@
 2008-03-05  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (do_create):
+	fail if the file to be created already exists
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_mount):
 	set anonymous login to FALSE, no uninitialized variables please.
 	* hal/ghalvolumemonitor.c: (adopt_orphan_mount):
