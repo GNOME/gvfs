@@ -1,3 +1,9 @@
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	rewrite file info construction and directory listing. It should now
+	correctly resolve symlinks and be fast enough for general use.
+
 2008-03-05  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c (do_enumerate):
