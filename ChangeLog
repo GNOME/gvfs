@@ -1,5 +1,10 @@
 2008-03-05  Bastien Nocera  <hadess@hadess.net>
 
+	* daemon/gvfsbackendobexftp.c (do_enumerate):
+	Better error message for Nokia 3650 phones
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
 	* daemon/gvfsbackendobexftp.c (_get_icon_from_type),
 	(_get_type_from_class), (_is_nokia_3650), (_get_device_properties),
 	(g_vfs_backend_obexftp_finalize), (do_mount), (do_open_for_read),

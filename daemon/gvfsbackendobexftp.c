@@ -1193,7 +1193,7 @@ do_enumerate (GVfsBackend *backend,
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_SUPPORTED,
-                            _I18N_LATER("Broken firmware"));
+                            _I18N_LATER("Device requires a software update"));
         }
       else
         {
