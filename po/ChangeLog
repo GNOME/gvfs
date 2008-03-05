@@ -1,3 +1,7 @@
+2008-03-06  Runa Bhattacharjee <runab@fedoraproject.org>
+
+	* bn_IN: Correction of header section for plural form
+
 2008-03-05  Runa Bhattacharjee <runab@fedoraproject.org>
 
 	* bn_IN.po: Added Bengali India Translations by Sankarshan Mukhopadhyay
