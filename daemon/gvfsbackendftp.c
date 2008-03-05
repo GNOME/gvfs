@@ -892,6 +892,20 @@ dir_default_iter_process (gpointer        iter,
   if (type != 'd' && type != 'f' && type != 'l')
     return NULL;
 
+  /* don't list . and .. directories
+   * Let's hope they're not important files on some ftp servers
+   */
+  if (type == 'd')
+    {
+      if (result.fe_fnlen == 1 && 
+	  result.fe_fname[0] == '.')
+	return NULL;
+      if (result.fe_fnlen == 2 && 
+	  result.fe_fname[0] == '.' &&
+	  result.fe_fname[1] == '.')
+	return NULL;
+    }
+
   s = g_strndup (result.fe_fname, result.fe_fnlen);
   if (dirname)
     {
@@ -904,7 +918,10 @@ dir_default_iter_process (gpointer        iter,
     return NULL;
 
   if (must_match_file && !ftp_filename_equal (name, must_match_file))
-    return NULL;
+    {
+      g_free (name);
+      return NULL;
+    }
 
   info = g_file_info_new ();
 
@@ -1903,7 +1920,7 @@ do_enumerate (GVfsBackend *backend,
       iter = ftp->dir_ops->iter_new (conn);
       for (walk = files; walk; walk = walk->next)
 	{
-	  char *symlink;
+	  char *symlink = NULL;
 	  info = ftp->dir_ops->iter_process (iter,
 					     conn,
 					     dir,

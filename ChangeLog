@@ -1,5 +1,11 @@
 2008-03-05  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (dir_default_iter_process),
+	(do_enumerate):
+	don't list "." and ".." directories.
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (do_create):
 	fail if the file to be created already exists
 
