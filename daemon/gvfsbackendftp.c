@@ -859,7 +859,7 @@ dir_default_get_root (FtpConnection *conn)
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
 
-  icon = g_themed_icon_new ("remote-folder");
+  icon = g_themed_icon_new ("folder-remote");
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
 

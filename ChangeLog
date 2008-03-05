@@ -1,3 +1,9 @@
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (dir_default_get_root):
+	the proper icon name is folder-remote, not remote-folder.
+	really fixed #520189
+
 2008-03-05  Bastien Nocera  <hadess@hadess.net>
 
 	* configure.ac: Disable gphoto2 building when
