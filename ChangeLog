@@ -1,5 +1,10 @@
 2008-03-05  Bastien Nocera  <hadess@hadess.net>
 
+	* configure.ac: Disable gphoto2 building when
+	HAL is disabled as well (Closes: #519872)
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
 	* client/gvfsuriutils.c (g_vfs_decode_uri):
 	Fix parsing of IPv6-style hostnames to not find the
 	port in the path section of the URI, fixes browing

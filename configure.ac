@@ -283,7 +283,7 @@ msg_gphoto2=no
 GPHOTO2_LIBS=
 GPHOTO2_CFLAGS=
 
-if test "x$enable_gphoto2" != "xno"; then
+if test "x$enable_gphoto2" != "xno" -a "x$msg_hal" = "xyes" ; then
   PKG_CHECK_EXISTS(libgphoto2, msg_gphoto2=yes)
 
   # Need OS tweaks in hal volume monitor backend
