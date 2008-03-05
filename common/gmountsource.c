@@ -221,7 +221,7 @@ ask_password_reply (DBusMessage *reply,
 
 	  if (!anonymous)
 	    {
-	      data->password = *password == 0 ? NULL : g_strdup (password);
+	      data->password = g_strdup (password);
 	      data->username = *username == 0 ? NULL : g_strdup (username);
 	      data->domain = *domain == 0 ? NULL : g_strdup (domain);
 	    }
@@ -311,8 +311,9 @@ g_mount_source_ask_password_async (GMountSource              *source,
  *
  * Requests the reply parameters from a g_mount_source_ask_password_async() 
  * request. All out parameters can be set to %NULL to ignore them.
- * <note><para>Please be aware that all string parameters can be set to %NULL,
- * so make sure to check them.</para></note>
+ * <note><para>Please be aware that out parameters other than the password
+ * are set to %NULL if the user don't specify them so make sure to
+ * check them.</para></note>
  *
  * Returns: %FALSE if the async reply contained an error.
  **/

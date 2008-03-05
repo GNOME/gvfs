@@ -1,5 +1,13 @@
 2008-03-05  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gmountsource.c:
+        (ask_password_reply):
+	Always set password to non-NULL, but keep
+	user/domain as NULL if not specified by user.
+	Fixes #520317 (smb auth crash)
+	
+2008-03-05  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonmount.c:
         (g_daemon_mount_eject_finish):
 	Initialize drive variable not access
