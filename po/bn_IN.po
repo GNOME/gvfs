@@ -1,22 +1,21 @@
-# translation of gvfs.HEAD.po to Bengali (India)
+# translation of gvfs to Bengali INDIA
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs.HEAD\n"
+"Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-05 18:21+0000\n"
-"PO-Revision-Date: 2008-03-05 23:44+0530\n"
-"Last-Translator: Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail."
-"com>\n"
-"Language-Team: Bengali (India) <discuss@ankur.co.in>\n"
+"PO-Revision-Date: 2008-03-06 00:00+0530\n"
+"Last-Translator: Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail.com>\n"
+"Language-Team: Bengali INDIA <discuss@ankur.co.in>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1867
 msgid "Operation not supported, files on different mounts"
@@ -1344,3 +1343,4 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
+
