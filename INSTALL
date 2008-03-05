@@ -1,0 +1,3 @@
+The ObexFTP backend requires the obex-data-server D-Bus service in
+addition to the dependencies listed in the configure. See:
+http://wiki.muiline.com/obex-data-server
