@@ -489,7 +489,7 @@ is_supported (void)
 }
 
 static GVolume *
-adopt_orphan_mount (GMount *mount)
+adopt_orphan_mount (GMount *mount, GVolumeMonitor *monitor)
 {
   GList *l;
   GFile *mount_root;

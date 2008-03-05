@@ -1,3 +1,10 @@
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	set anonymous login to FALSE, no uninitialized variables please.
+	* hal/ghalvolumemonitor.c: (adopt_orphan_mount):
+	fix warning due to glib changes
+
 2008-03-05  Bastien Nocera  <hadess@hadess.net>
 
 	* INSTALL: Add mention of obex-data-server

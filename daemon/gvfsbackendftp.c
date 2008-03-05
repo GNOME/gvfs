@@ -1161,7 +1161,10 @@ do_mount (GVfsBackend *backend,
 				     &username,
 				     NULL,
 				     &password))
+    {
+      anonymous = FALSE;
       goto try_login;
+    }
 
   while (TRUE)
     {
