@@ -1,3 +1,15 @@
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* client/gvfsuriutils.c (g_vfs_decode_uri):
+	Fix parsing of IPv6-style hostnames to not find the
+	port in the path section of the URI, fixes browing
+	browsing ObexFTP on Nokia Series 60 phones which show
+	drive letters as directories in the root (eg. "C:")
+	(Closes: #520314)
+
+	* client/test-uri-utils.c (main): Add test for the above,
+	and another test for the IPv4-style URIs
+
 2008-03-05  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsdaemonutils.c:

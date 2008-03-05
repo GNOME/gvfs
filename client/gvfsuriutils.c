@@ -174,13 +174,39 @@ g_vfs_decode_uri (const char *uri)
        * See http://tools.ietf.org/html/rfc2732 */
       if (*host_start == '[')
         {
+          char *s;
+
+          port_start = NULL;
 	  host_end = memchr (host_start, ']', authority_end - host_start);
 	  if (host_end == NULL)
 	    {
 	      g_vfs_decoded_uri_free (decoded);
 	      return NULL;
 	    }
-	  port_start = memchr (host_end, ':', authority_end - host_start);
+
+	  /* Look for the start of the port,
+	   * And we sure we don't have it start somewhere
+	   * in the path section */
+	  s = (char *) host_end;
+	  while (1)
+	    {
+	      if (*s == '/')
+	        {
+	          port_start = NULL;
+	          break;
+		}
+	      else if (*s == ':')
+	        {
+	          port_start = s;
+	          break;
+		}
+	      else if (*s == '\0')
+	        {
+	          break;
+		}
+
+	      s++;
+	    }
         }
       else
         {
