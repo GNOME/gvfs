@@ -1,3 +1,13 @@
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_get_icon_from_type),
+	(_get_type_from_class), (_is_nokia_3650), (_get_device_properties),
+	(g_vfs_backend_obexftp_finalize), (do_mount), (do_open_for_read),
+	(do_query_info), (do_query_fs_info), (do_enumerate), (do_delete):
+	Error out cleanly from do_mount() if we somehow lose connection
+	to the device, Show a meaningful error when browsing broken
+	Nokia 3650 phones (Closes: #519733)
+
 2008-03-05  Alexander Larsson  <alexl@redhat.com>
 
         * common/gmountsource.c:

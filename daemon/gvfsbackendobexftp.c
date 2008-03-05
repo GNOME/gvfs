@@ -63,11 +63,14 @@
 
 #define CACHE_LIFESPAN 3
 
+#define _I18N_LATER(x) x
+
 struct _GVfsBackendObexftp
 {
   GVfsBackend parent_instance;
 
   char *display_name;
+  char *bdaddr;
   guint type;
 
   DBusGConnection *connection;
@@ -194,7 +197,16 @@ _get_type_from_class (guint class)
     }
 
   return BLUETOOTH_TYPE_ANY;
+}
 
+/* Used to detect broken listings from
+ * old Nokia 3650s */
+static gboolean
+_is_nokia_3650 (const char *bdaddr)
+{
+  /* Don't ask, Nokia seem to use a Bluetooth
+   * HCI from Murata */
+  return g_str_has_prefix(bdaddr, "00:60:57");
 }
 
 static gchar *
@@ -271,6 +283,7 @@ g_vfs_backend_obexftp_finalize (GObject *object)
   backend = G_VFS_BACKEND_OBEXFTP (object);
 
   g_free (backend->display_name);
+  g_free (backend->bdaddr);
   g_free (backend->files_listing);
   g_free (backend->directory);
 
@@ -577,7 +590,7 @@ do_mount (GVfsBackend *backend,
   const char *device;
   GError *error = NULL;
   const gchar *path = NULL;
-  char *server, *bdaddr;
+  char *server;
   GMountSpec *obexftp_mount_spec;
   gboolean connected;
 
@@ -594,10 +607,10 @@ do_mount (GVfsBackend *backend,
     }
 
   /* Strip the brackets */
-  bdaddr = g_strndup (device + 1, 17);
-  if (bachk (bdaddr) < 0)
+  op_backend->bdaddr = g_strndup (device + 1, 17);
+  if (bachk (op_backend->bdaddr) < 0)
     {
-      g_free (bdaddr);
+      g_free (op_backend->bdaddr);
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                         _("Invalid mount spec"));
@@ -608,26 +621,26 @@ do_mount (GVfsBackend *backend,
    * http://bugs.muiline.com/view.php?id=51 */
 
   if (dbus_g_proxy_call (op_backend->manager_proxy, "CreateBluetoothSession", &error,
-                         G_TYPE_STRING, bdaddr, G_TYPE_STRING, "ftp", G_TYPE_INVALID,
+                         G_TYPE_STRING, op_backend->bdaddr, G_TYPE_STRING, "ftp", G_TYPE_INVALID,
                          DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID) == FALSE)
     {
-      g_free (bdaddr);
+      g_free (op_backend->bdaddr);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
-  g_print ("  do_mount: %s mounted\n", bdaddr);
+  g_print ("  do_mount: %s mounted\n", op_backend->bdaddr);
 
   op_backend->session_proxy = dbus_g_proxy_new_for_name (op_backend->connection,
                                                          "org.openobex",
                                                          path,
                                                          "org.openobex.Session");
 
-  op_backend->display_name = _get_device_properties (bdaddr, &op_backend->type);
+  op_backend->display_name = _get_device_properties (op_backend->bdaddr, &op_backend->type);
   if (!op_backend->display_name)
-        op_backend->display_name = g_strdup (bdaddr);
+        op_backend->display_name = g_strdup (op_backend->bdaddr);
 
   g_vfs_backend_set_display_name (G_VFS_BACKEND  (op_backend),
                                   op_backend->display_name);
@@ -635,7 +648,7 @@ do_mount (GVfsBackend *backend,
                                _get_icon_from_type (op_backend->type));
 
   obexftp_mount_spec = g_mount_spec_new ("obex");
-  server = g_strdup_printf ("[%s]", bdaddr);
+  server = g_strdup_printf ("[%s]", op_backend->bdaddr);
   g_mount_spec_set (obexftp_mount_spec, "host", server);
   g_free (server);
   g_vfs_backend_set_mount_spec (G_VFS_BACKEND (op_backend), obexftp_mount_spec);
@@ -674,12 +687,20 @@ do_mount (GVfsBackend *backend,
 
   if (connected < 0)
     {
-      //FIXME bail out
-      g_message ("mount failed");
+      g_message ("mount failed, didn't connect");
+
+      g_free (op_backend->display_name);
+      op_backend->display_name = NULL;
+      g_free (op_backend->bdaddr);
+      op_backend->bdaddr = NULL;
+      g_object_unref (op_backend->session_proxy);
+      op_backend->session_proxy = NULL;
+
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_BUSY,
+                        _I18N_LATER("Connection to the device lost"));
       return;
     }
-
-  g_free (bdaddr);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1166,9 +1187,20 @@ do_enumerate (GVfsBackend *backend,
   if (gvfsbackendobexftp_fl_parser_parse (files, strlen (files), &elements, &error) == FALSE)
     {
       g_mutex_unlock (op_backend->mutex);
+      /* See http://web.archive.org/web/20070826221251/http://docs.kde.org/development/en/extragear-pim/kdebluetooth/components.kio_obex.html#devices
+       * for the reasoning */
+      if (strstr (files, "SYSTEM\"obex-folder-listing.dtd") != NULL && _is_nokia_3650 (op_backend->bdaddr))
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _I18N_LATER("Broken firmware"));
+        }
+      else
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+        }
       g_message ("gvfsbackendobexftp_fl_parser_parse failed");
       g_free (files);
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
