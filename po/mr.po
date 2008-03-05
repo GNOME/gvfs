@@ -1,13 +1,14 @@
 # translation of gvfs.HEAD.mr.po to marathi
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
+#
 # Sandeep Shedmake <sandeep.shedmake@gmail.com>, 2008.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD.mr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-29 00:43+0000\n"
-"PO-Revision-Date: 2008-02-29 13:03+0530\n"
+"POT-Creation-Date: 2008-03-03 15:53+0000\n"
+"PO-Revision-Date: 2008-03-04 17:47+0530\n"
 "Last-Translator: Sandeep Shedmake <sandeep.shedmake@gmail.com>\n"
 "Language-Team: marathi\n"
 "MIME-Version: 1.0\n"
@@ -99,16 +100,15 @@ msgstr "स्ट्रीमचे शेवट"
 #: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:685
-#: ../daemon/gvfsbackendobexftp.c:577 ../daemon/gvfsbackendobexftp.c:600
-#: ../daemon/gvfsbackendobexftp.c:723 ../daemon/gvfsbackendobexftp.c:862
-#: ../daemon/gvfsbackendobexftp.c:927 ../daemon/gvfsbackendobexftp.c:1056
-#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1148
-#: ../daemon/gvfsbackendobexftp.c:1172 ../daemon/gvfsbackendobexftp.c:1233
-#: ../daemon/gvfsbackendobexftp.c:1254 ../daemon/gvfsbackendsmb.c:1014
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendftp.c:868
+#: ../daemon/gvfsbackendobexftp.c:753 ../daemon/gvfsbackendobexftp.c:774
+#: ../daemon/gvfsbackendobexftp.c:893 ../daemon/gvfsbackendobexftp.c:1030
+#: ../daemon/gvfsbackendobexftp.c:1094 ../daemon/gvfsbackendobexftp.c:1220
+#: ../daemon/gvfsbackendobexftp.c:1247 ../daemon/gvfsbackendobexftp.c:1306
+#: ../daemon/gvfsbackendobexftp.c:1328 ../daemon/gvfsbackendobexftp.c:1388
+#: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendsmb.c:1014
 #: ../daemon/gvfsbackendtest.c:87 ../daemon/gvfsbackendtest.c:120
 #: ../daemon/gvfsbackendtest.c:183 ../daemon/gvfschannel.c:297
-#, c-format
 msgid "Operation was cancelled"
 msgstr "कार्य रद्द करण्यात आले"
 
@@ -121,7 +121,7 @@ msgstr "श्रृंखलेवर सीक समर्थित नाह
 msgid "The query info operation is not supported"
 msgstr "query info पध्दती समर्थीत नाही"
 
-#: ../client/gdaemonvfs.c:604
+#: ../client/gdaemonvfs.c:708
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "आरोहण माहिती प्राप्त करतेवेळी त्रुटी: %s"
@@ -220,7 +220,9 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD निर्माता"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendnetwork.c:637
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:786
+#: ../daemon/gvfsbackendnetwork.c:637
+#, c-format
 msgid "The file is not a directory"
 msgstr "फाइल संचयीका नाही"
 
@@ -249,7 +251,7 @@ msgstr "संचयीकेची पुनः प्रत बनवू श�
 msgid "Not supported"
 msgstr "समर्थीत नाही"
 
-#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:336
+#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:335
 msgid "No drive specified"
 msgstr "ड्राइव्ह निर्धारीत नाही"
 
@@ -258,65 +260,66 @@ msgstr "ड्राइव्ह निर्धारीत नाही"
 msgid "Cannot find drive %s"
 msgstr "ड्राइव्ह %s शोधू शकले नाही"
 
-#: ../daemon/gvfsbackendcdda.c:290
+#: ../daemon/gvfsbackendcdda.c:289
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "ड्राइव्ह %s मध्ये आवाज फाइल समाविष्ट नाही"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:298
+#: ../daemon/gvfsbackendcdda.c:297
 #, c-format
 msgid "cdda mount on %s"
 msgstr "%s वर cdda आरोहण"
 
-#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendcdda.c:803
+#: ../daemon/gvfsbackendcdda.c:298 ../daemon/gvfsbackendcdda.c:802
 #: ../hal/ghalmount.c:488 ../hal/ghalvolume.c:286 ../hal/ghalvolume.c:307
 #, c-format
 msgid "Audio Disc"
 msgstr "श्राव्य डिस्क"
 
-#: ../daemon/gvfsbackendcdda.c:360
+#: ../daemon/gvfsbackendcdda.c:359
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "फाइल प्रणाली व्यस्थ आहे: %d उघडे फाइल"
 msgstr[1] "फाइल प्रणाली व्यस्थ आहे: %d उघडे फाइलं"
 
-#: ../daemon/gvfsbackendcdda.c:550
+#: ../daemon/gvfsbackendcdda.c:549
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "ड्राइव्ह %s वरील फाइल %s नाही"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:659
+#: ../daemon/gvfsbackendcdda.c:658
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "ड्राइव्ह %s वरील 'paranoia' मध्ये त्रुटी"
 
-#: ../daemon/gvfsbackendcdda.c:722
+#: ../daemon/gvfsbackendcdda.c:721
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "ड्राइव्ह %s वरील स्ट्रीम संचयनवेळी त्रुटी"
 
-#: ../daemon/gvfsbackendcdda.c:819
+#: ../daemon/gvfsbackendcdda.c:818
 #, c-format
 msgid "No such file"
 msgstr "या प्रकारची फाइल नाही"
 
-#: ../daemon/gvfsbackendcdda.c:826 ../daemon/gvfsbackendcomputer.c:573
-#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:866
-#: ../daemon/gvfsbackendsmbbrowse.c:1037 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendcdda.c:825 ../daemon/gvfsbackendcomputer.c:573
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1809
+#: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
 msgid "File doesn't exist"
 msgstr "फाइल अस्तित्वात नाही"
 
-#: ../daemon/gvfsbackendcdda.c:833
+#: ../daemon/gvfsbackendcdda.c:832
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "फाइल जी अस्तित्वात नाही किंवा ती संगीत फाइल नाही"
 
-#: ../daemon/gvfsbackendcdda.c:939
+#: ../daemon/gvfsbackendcdda.c:938
 msgid "Audio CD Filesystem Service"
 msgstr "ऑडीओ CD फाइलप्रणाली सेवा"
 
@@ -328,7 +331,8 @@ msgstr "संगणक"
 msgid "Filesystem"
 msgstr "फाइलप्रणाली"
 
-#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendtrash.c:635
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendobexftp.c:739
+#: ../daemon/gvfsbackendtrash.c:637
 msgid "Can't open directory"
 msgstr "संचयीका उघडू शकत नाही"
 
@@ -399,7 +403,7 @@ msgid "Please enter proxy password"
 msgstr "कृपया प्रॉक्सी गुप्तशब्द प्रविष्ट करा"
 
 #: ../daemon/gvfsbackenddav.c:1176 ../daemon/gvfsbackendhttp.c:292
-#: ../daemon/gvfsbackendobexftp.c:429 ../daemon/gvfsbackendobexftp.c:440
+#: ../daemon/gvfsbackendobexftp.c:592 ../daemon/gvfsbackendobexftp.c:603
 #: ../daemon/gvfsbackendsmb.c:594
 msgid "Invalid mount spec"
 msgstr "अवैध अनारोहण स्पेक"
@@ -445,103 +449,106 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "संजाळ"
 
-#: ../daemon/gvfsbackendftp.c:127
+#: ../daemon/gvfsbackendftp.c:186
 msgid "Accounts are unsupported"
 msgstr "खाते समर्थीत नाही"
 
-#: ../daemon/gvfsbackendftp.c:131
+#: ../daemon/gvfsbackendftp.c:190
 msgid "Host closed connection"
 msgstr "यजमानने जुळवणी बंद केली"
 
-#: ../daemon/gvfsbackendftp.c:135
+#: ../daemon/gvfsbackendftp.c:194
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "माहिती जुळवणी उघडू शकत नाही. कदाचीत तुमचे फायरवॉल हे करण्यास नकारते?"
 
-#: ../daemon/gvfsbackendftp.c:139
+#: ../daemon/gvfsbackendftp.c:198
 msgid "Data connection closed"
 msgstr "माहिती जुळवणी बंद झाली"
 
-#: ../daemon/gvfsbackendftp.c:145
+#: ../daemon/gvfsbackendftp.c:204
 msgid "File unavailable"
 msgstr "फाइल अनुपलब्ध"
 
-#: ../daemon/gvfsbackendftp.c:149
+#: ../daemon/gvfsbackendftp.c:208
 msgid "Operation failed"
 msgstr "कार्यपध्दती अपयशी"
 
-#: ../daemon/gvfsbackendftp.c:154
+#: ../daemon/gvfsbackendftp.c:213
 msgid "No space left on server"
 msgstr "सर्वरवर रिकामी जागा नाही"
 
-#: ../daemon/gvfsbackendftp.c:162
+#: ../daemon/gvfsbackendftp.c:221
 msgid "Operation unsupported"
 msgstr "कार्यपध्दती समर्थीत नाही"
 
-#: ../daemon/gvfsbackendftp.c:166 ../daemon/gvfsbackendsftp.c:261
+#: ../daemon/gvfsbackendftp.c:225 ../daemon/gvfsbackendsftp.c:261
 msgid "Permission denied"
 msgstr "परवानगी नाकारली"
 
-#: ../daemon/gvfsbackendftp.c:170
+#: ../daemon/gvfsbackendftp.c:229
 msgid "Page type unknown"
 msgstr "पान प्रकार अपरिचीत"
 
-#: ../daemon/gvfsbackendftp.c:174
-msgid "Invalid filename."
-msgstr "अवैध फाइलनाव."
+#: ../daemon/gvfsbackendftp.c:233 ../daemon/gvfsbackendftp.c:1884
+#, c-format
+msgid "Invalid filename"
+msgstr "अवैध फाइलनाव"
 
-#: ../daemon/gvfsbackendftp.c:178
-msgid "Invalid reply from server."
-msgstr "सर्वर पासून अवैध प्रतिसाद."
-
-#: ../daemon/gvfsbackendftp.c:254 ../daemon/gvfsbackendftp.c:278
-#: ../daemon/gvfsbackendftp.c:291 ../daemon/gvfsbackendftp.c:307
+#: ../daemon/gvfsbackendftp.c:237 ../daemon/gvfsbackendftp.c:310
+#: ../daemon/gvfsbackendftp.c:339 ../daemon/gvfsbackendftp.c:358
+#: ../daemon/gvfsbackendftp.c:371 ../daemon/gvfsbackendftp.c:691
 #, c-format
 msgid "Invalid reply"
 msgstr "अवैध प्रतिसाद"
 
-#: ../daemon/gvfsbackendftp.c:396
+#: ../daemon/gvfsbackendftp.c:476
 #, c-format
 msgid "broken transmission"
 msgstr "खंडीत स्थानांतरन"
 
-#: ../daemon/gvfsbackendftp.c:489 ../daemon/gvfsbackendftp.c:610
+#: ../daemon/gvfsbackendftp.c:569 ../daemon/gvfsbackendftp.c:710
 #, c-format
 msgid "Could not connect to host"
 msgstr "यजमानशी जुळवणी प्राप्त करू शकला नाही"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:769
+#: ../daemon/gvfsbackendftp.c:950
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "%s वर ftp करीता गुप्तशब्द प्रविष्ट करा"
 
-#: ../daemon/gvfsbackendftp.c:788 ../daemon/gvfsbackendsftp.c:834
+#: ../daemon/gvfsbackendftp.c:969 ../daemon/gvfsbackendsftp.c:834
 msgid "Password dialog cancelled"
 msgstr "गुप्तशब्द संवाद रद्द केले"
 
-#: ../daemon/gvfsbackendftp.c:834
+#: ../daemon/gvfsbackendftp.c:1021
 #, c-format
 msgid "ftp on %s"
 msgstr "%s वरील ftp"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:840
+#: ../daemon/gvfsbackendftp.c:1027
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "%s वर %s ftp म्हणून"
 
-#: ../daemon/gvfsbackendftp.c:879 ../daemon/gvfsbackendsftp.c:1411
+#: ../daemon/gvfsbackendftp.c:1059 ../daemon/gvfsbackendsftp.c:1411
 msgid "No hostname specified"
 msgstr "यजमाननाव निश्चित केले नाही"
 
-#: ../daemon/gvfsbackendftp.c:1128
+#: ../daemon/gvfsbackendftp.c:1265 ../daemon/gvfsbackendftp.c:1975
 msgid "backups not supported yet"
 msgstr "बॅकऐंड अजूनही समर्थीत नाही"
 
-#: ../daemon/gvfsbackendftp.c:1370
+#: ../daemon/gvfsbackendftp.c:1480 ../daemon/gvfsbackendftp.c:1680
 #, c-format
 msgid "filename too long"
 msgstr "फाइलनाव खूप लांब आहे"
+
+#: ../daemon/gvfsbackendftp.c:1994
+#, c-format
+msgid "Invalid destination filename"
+msgstr "अवैध लक्ष्यनीय फाइलनाव"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:234
@@ -583,8 +590,8 @@ msgid "HTTP Client Error: %s"
 msgstr "HTTP क्लाऐंट त्रुटी: %s"
 
 #: ../daemon/gvfsbackendhttp.c:550 ../daemon/gvfsbackendsftp.c:1751
-#: ../daemon/gvfsbackendsmb.c:1229 ../daemon/gvfsbackendtrash.c:960
-#: ../daemon/gvfsdaemonutils.c:206
+#: ../daemon/gvfsbackendsmb.c:1229 ../daemon/gvfsbackendtrash.c:962
+#: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (अवैध ऐंकोडींग)"
 
@@ -609,7 +616,7 @@ msgid "Network Location Monitor"
 msgstr "संजाळ स्थान नियंत्रण"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:268 ../daemon/gvfsbackendsmb.c:513
+#: ../daemon/gvfsbackendobexftp.c:431 ../daemon/gvfsbackendsmb.c:513
 #: ../daemon/gvfsbackendsmb.c:1222
 #, c-format
 msgid "%s on %s"
@@ -680,7 +687,8 @@ msgstr ""
 "दूरस्थ संगणकाची ओळख (%s) अपरिचीत आहे.\n"
 "हे तेव्हा होते जेव्हा तुम्ही संगणकावर दाखलन करता.\n"
 "\n"
-"दूरस्थ संगणकाने पाठविलेली ओळख %s आहे. पुढे जाणे सुरक्षीत आहे हे निश्चित करण्याकरीता, प्रणाली प्रशासकाशी संपर्क करा."
+"दूरस्थ संगणकाने पाठविलेली ओळख %s आहे. पुढे जाणे सुरक्षीत आहे हे निश्चित करण्याकरीता, प्रणाली "
+"प्रशासकाशी संपर्क करा."
 
 #: ../daemon/gvfsbackendsftp.c:919
 msgid "Login dialog cancelled"
@@ -822,20 +830,20 @@ msgstr "Windows संजाळ फाइलप्रणाली सेवा"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:599 ../daemon/gvfsbackendtrash.c:1188
+#: ../daemon/gvfsbackendtrash.c:600 ../daemon/gvfsbackendtrash.c:1190
 msgid "Trash"
 msgstr "कचरापेटी"
 
-#: ../daemon/gvfsbackendtrash.c:970
+#: ../daemon/gvfsbackendtrash.c:972
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (कचरापेटीत)"
 
-#: ../daemon/gvfsbackendtrash.c:1289
+#: ../daemon/gvfsbackendtrash.c:1291
 msgid "Can't delete trash"
 msgstr "कचरापेटी काढूण टाकू शकत नाही"
 
-#: ../daemon/gvfsbackendtrash.c:1636 ../daemon/gvfsbackendtrash.c:1711
+#: ../daemon/gvfsbackendtrash.c:1638 ../daemon/gvfsbackendtrash.c:1713
 msgid "Trash directory notification not supported"
 msgstr "कचरापेटी संचयीका सूचना समर्थीत नाही"
 
@@ -903,28 +911,28 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "अधिक माहिती करीता \"%s --help\" वापरू पहा."
 
-#: ../daemon/mount.c:372
+#: ../daemon/mount.c:432
 msgid "Invalid arguments from spawned child"
 msgstr "बांधणीतील उपघटकाचे अवैध बाबी"
 
-#: ../daemon/mount.c:662
+#: ../daemon/mount.c:730
 #, c-format
 msgid "Automount failed: %s"
 msgstr "स्वआरोहण अपयशी: %s"
 
-#: ../daemon/mount.c:707
+#: ../daemon/mount.c:775
 msgid "The specified location is not mounted"
 msgstr "निर्धारीत स्थान आरोहीत नाही"
 
-#: ../daemon/mount.c:712
+#: ../daemon/mount.c:780
 msgid "The specified location is not supported"
 msgstr "निर्धारीत स्थान अनारोहीत नाही"
 
-#: ../daemon/mount.c:875
+#: ../daemon/mount.c:943
 msgid "Location is already mounted"
 msgstr "स्थान आधिपासूनच आरोहीत आहे"
 
-#: ../daemon/mount.c:883
+#: ../daemon/mount.c:951
 msgid "Location is not mountable"
 msgstr "स्थान आधिपासूनच आरोहणजोगी नाही"
 
