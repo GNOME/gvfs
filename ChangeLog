@@ -1,3 +1,8 @@
+2008-03-07  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Only ask for common properties and don't use allprop.
+
 2008-03-06  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c: 

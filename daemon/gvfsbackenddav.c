@@ -778,14 +778,18 @@ propfind_request_new (GVfsBackend     *backend,
   if (properties != NULL)
     {
       const PropName *prop;
+      g_string_append (body, PROPSTAT_XML_PROP_BEGIN);
 
       for (prop = properties; prop->name; prop++)
         {
           if (prop->namespace != NULL)
-            g_string_append (body, "<%s xmlns=\"%s\"/>");
+            g_string_append_printf (body, "<%s xmlns=\"%s\"/>\n",
+                                    prop->name,
+                                    prop->namespace);
           else
-            g_string_append (body, "<D:%s/>");
+            g_string_append_printf (body, "<D:%s/>\n", prop->name);
         }
+      g_string_append (body, PROPSTAT_XML_PROP_END);
     }
   else
     g_string_append (body, PROPSTAT_XML_ALLPROP);
@@ -1336,6 +1340,17 @@ do_mount (GVfsBackend  *backend,
   g_print ("- mount\n");
 }
 
+static PropName ls_propnames[] = {
+    {"creationdate",     NULL},
+    {"displayname",      NULL},
+    {"getcontentlength", NULL},
+    {"getcontenttype",   NULL},
+    {"getetag",          NULL},
+    {"getlastmodified",  NULL},
+    {"resourcetype",     NULL},
+    {NULL,               NULL}
+};
+
 /* *** query_info () *** */
 static void
 do_query_info (GVfsBackend           *backend,
@@ -1355,7 +1370,7 @@ do_query_info (GVfsBackend           *backend,
   base    = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error   = NULL;
 
-  msg = propfind_request_new (backend, filename, 0, NULL);
+  msg = propfind_request_new (backend, filename, 0, ls_propnames);
 
   if (msg == NULL)
     {
@@ -1428,7 +1443,7 @@ do_enumerate (GVfsBackend           *backend,
   base  = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error = NULL;
 
-  msg = propfind_request_new (backend, filename, 1, NULL);
+  msg = propfind_request_new (backend, filename, 1, ls_propnames);
 
   if (msg == NULL)
     {
