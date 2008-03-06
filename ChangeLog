@@ -1,3 +1,9 @@
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gsysutils.c:
+        * configure.ac:
+	Include sys/uio.h if availible (#520307)
+
 2008-03-06  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_mount):

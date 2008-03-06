@@ -29,6 +29,9 @@
 #include <strings.h>
 #include <errno.h>
 #include <unistd.h>
+#ifdef HAVE_SYS_UIO_H
+#include <sys/uio.h>
+#endif
 #include <gio/gio.h>
 
 #include <glib/gi18n-lib.h>

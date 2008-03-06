@@ -94,7 +94,7 @@ dnl ****************************
 dnl *** Checks for pty stuff ***
 dnl ****************************
 
-AC_CHECK_HEADERS(sys/un.h stropts.h termios.h utmp.h)
+AC_CHECK_HEADERS(sys/un.h stropts.h termios.h utmp.h sys/uio.h)
 
 # Check for PTY handling functions.
 AC_CHECK_FUNCS(getpt posix_openpt grantpt unlockpt ptsname ptsname_r)
