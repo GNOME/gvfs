@@ -191,7 +191,10 @@ foreign_volume_removed (GVolume *volume, gpointer user_data)
   g_object_ref (daemon_mount);
   
   if (daemon_mount->foreign_volume == volume)
-    g_daemon_mount_set_foreign_volume (daemon_mount, NULL);
+    {
+      g_object_unref (daemon_mount->foreign_volume);
+      daemon_mount->foreign_volume = NULL;
+    }
 
   G_UNLOCK (daemon_mount);
   

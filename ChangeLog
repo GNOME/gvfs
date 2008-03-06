@@ -1,3 +1,9 @@
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonmount.c:
+        (foreign_volume_removed):
+	Avoid deadlock when foreign volume is removed.
+
 2008-03-05  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (dir_default_iter_process),
