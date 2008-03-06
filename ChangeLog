@@ -1,3 +1,9 @@
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackenddav.c:
+        (do_mount):
+	Set display name for dav mount (#519588)
+
 2008-03-06  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (do_move):

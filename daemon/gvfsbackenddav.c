@@ -1146,6 +1146,7 @@ do_mount (GVfsBackend  *backend,
   gboolean        is_webdav;
   gboolean        res;
   char           *last_good_path;
+  char           *display_name;
 
   g_print ("+ mount\n");
 
@@ -1270,7 +1271,11 @@ do_mount (GVfsBackend  *backend,
 
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
-
+  
+  display_name = g_strdup_printf (_("WebDAV on %s"), host);
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  
   /* cleanup */
   g_mount_spec_unref (mount_spec);
   g_object_unref (msg_opts);
