@@ -1295,35 +1295,9 @@ set_info_from_stat (GVfsBackendSmb *backend,
 	  
 	  if (content_type)
 	    {
-	      char *mimetype_icon, *generic_mimetype_icon, *type_icon, *p;
-	      char *icon_names[3];
-	      int i;
-
-	      mimetype_icon = g_strdup (content_type);
-	      g_strdelimit (mimetype_icon, "/", '-');
-	      
-	      p = strchr (content_type, '/');
-	      if (p == NULL)
-		p = content_type + strlen (content_type);
-	      
-	      generic_mimetype_icon = g_malloc (p - content_type + strlen ("-x-generic") + 1);
-	      memcpy (generic_mimetype_icon, content_type, p - content_type);
-	      memcpy (generic_mimetype_icon + (p - content_type), "-x-generic", strlen ("-x-generic"));
-	      generic_mimetype_icon[(p - content_type) + strlen ("-x-generic")] = 0;
-	      
-	      type_icon = "text-x-generic";
-	      
-	      i = 0;
-	      icon_names[i++] = mimetype_icon;
-	      icon_names[i++] = generic_mimetype_icon;
-	      if (strcmp (generic_mimetype_icon, type_icon) != 0 &&
-		  strcmp (mimetype_icon, type_icon) != 0) 
-		icon_names[i++] = type_icon;
-	      
-	      icon = g_themed_icon_new_from_names (icon_names, i);
-	      
-	      g_free (mimetype_icon);
-	      g_free (generic_mimetype_icon);
+              icon = g_content_type_get_icon (content_type);
+              if (G_IS_THEMED_ICON (icon))
+                g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
 	    }
 	}
       
@@ -1332,12 +1306,12 @@ set_info_from_stat (GVfsBackendSmb *backend,
 	  g_file_info_set_content_type (info, content_type);
 	  g_free (content_type);
 	}
+
+      if (icon == NULL)
+	icon = g_themed_icon_new ("text-x-generic");
       
-      if (icon)
-	{
-	  g_file_info_set_icon (info, icon);
-	  g_object_unref (icon);
-	}
+      g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
   }
   
   /* Don't trust n_link, uid, gid, etc returned from libsmb, its just made up.

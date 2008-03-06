@@ -1,3 +1,11 @@
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+	Use g_content_type_get_icon() instead of open
+	coding it. Also picks up more icons since
+	that has been fixed. (#520742)
+	
 2008-03-06  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_connection_create),
