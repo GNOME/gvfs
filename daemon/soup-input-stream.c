@@ -842,6 +842,18 @@ soup_input_stream_seek (GSeekable     *seekable,
   SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (seekable);
   char *range;
 
+  if (type == G_SEEK_END)
+    {
+      /* FIXME: we could send "bytes=-offset", but unless we know the
+       * Content-Length, we wouldn't be able to answer a tell() properly.
+       * We could find the Content-Length by doing a HEAD...
+       */
+
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                   "G_SEEK_END not currently supported");
+      return FALSE;
+    }
+
   if (!g_input_stream_set_pending (stream, error))
       return FALSE;
 
@@ -860,12 +872,8 @@ soup_input_stream_seek (GSeekable     *seekable,
       break;
 
     case G_SEEK_END:
-      /* FIXME: we could send "bytes=-offset", but unless we know the
-       * Content-Length, we wouldn't be able to answer a tell() properly.
-       * We could find the Content-Length by doing a HEAD...
-       */
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   "G_SEEK_END not currently supported");
+      range = NULL; /* keep compilers happy */
+      g_return_val_if_reached (FALSE);
       break;
 
     default:
