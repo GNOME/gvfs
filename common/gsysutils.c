@@ -22,6 +22,9 @@
 
 #include <config.h>
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <stdio.h>
