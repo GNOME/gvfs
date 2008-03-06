@@ -1200,6 +1200,15 @@ do_mount (GVfsBackend *backend,
 
   conn = ftp_connection_create (ftp->addr,
 			        G_VFS_JOB (job));
+  /* fail fast here. No need to ask for a password if we know the hostname
+   * doesn't exist or the given host/port doesn't have an ftp server running.
+   */
+  if (ftp_connection_in_error (conn))
+    {
+      ftp_connection_pop_job (conn);
+      ftp_connection_free (conn);
+      return;
+    }
 
   port = soup_address_get_port (ftp->addr);
   /* FIXME: need to translate this? */
