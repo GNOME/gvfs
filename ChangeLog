@@ -1,3 +1,10 @@
+2008-03-06  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_create),
+	(ftp_connection_ensure_data_connection),
+	(g_vfs_backend_ftp_pop_connection), (do_mount):
+	timeout I/O or g_cond_wait after 30 seconds
+
 2008-03-06  Alexander Larsson  <alexl@redhat.com>
 
         * common/gsysutils.c:

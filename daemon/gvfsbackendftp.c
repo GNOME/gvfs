@@ -24,6 +24,7 @@
 
 #include <config.h>
 
+#include <errno.h> /* for strerror (EAGAIN) */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,6 +56,9 @@
 #else
 #define DEBUG(...)
 #endif
+
+/* timeout for network connect/send/receive (use 0 for none) */
+#define TIMEOUT_IN_SECONDS 30
 
 /*
  * about filename interpretation in the ftp backend
@@ -595,6 +599,7 @@ ftp_connection_create (SoupAddress * addr,
 
   conn->commands = soup_socket_new ("non-blocking", FALSE,
                                     "remote-address", addr,
+				    "timeout", TIMEOUT_IN_SECONDS,
 				    NULL);
   status = soup_socket_connect_sync (conn->commands, job->cancellable);
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
@@ -753,6 +758,7 @@ ftp_connection_ensure_data_connection (FtpConnection *conn)
 have_address:
   conn->data = soup_socket_new ("non-blocking", FALSE,
 				"remote-address", addr,
+				"timeout", TIMEOUT_IN_SECONDS,
 				NULL);
   g_object_unref (addr);
   status = soup_socket_connect_sync (conn->data, conn->job->cancellable);
@@ -1072,6 +1078,7 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 				  GVfsJob *	  job)
 {
   FtpConnection *conn = NULL;
+  GTimeVal now;
   guint id;
 
   g_mutex_lock (ftp->mutex);
@@ -1128,7 +1135,17 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	  continue;
 	}
 
-      g_cond_wait (ftp->cond, ftp->mutex);
+      g_get_current_time (&now);
+      g_time_val_add (&now, TIMEOUT_IN_SECONDS * 1000 * 1000);
+      if (!g_cond_timed_wait (ftp->cond, ftp->mutex, &now))
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job),
+			   G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK,
+			   /* defeat string freeze! */
+			   /* _("Resource temporarily unavailable")); */
+			   "%s", g_strerror (EAGAIN));
+	  break;
+	}
     }
   g_signal_handler_disconnect (job->cancellable, id);
 
