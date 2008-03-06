@@ -1,5 +1,6 @@
 2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
 
+	* client/httpuri.c: Remove unused vars.
 	* daemon/gvfsbackenddav.c: Remove a couple
 	of unused variables.
 

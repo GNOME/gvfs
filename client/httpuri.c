@@ -198,7 +198,6 @@ http_to_uri (GVfsUriMapper    *mapper,
              gboolean          allow_utf8)
 {
   char       *res;
-  const char *uri;
   const char *type;
   const char *host;
   const char *user;
@@ -209,7 +208,6 @@ http_to_uri (GVfsUriMapper    *mapper,
 
   if (strcmp (type, "http") == 0)
     {
-      uri = g_vfs_uri_mount_info_get (info, "uri");
       res = g_strdup (g_vfs_uri_mount_info_get (info, "uri"));
     }
   else
