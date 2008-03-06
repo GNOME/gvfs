@@ -1,3 +1,7 @@
+2008-03-06  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* nl.po: Updated Dutch translation by Wouter Bolsterlee.
+
 2008-03-06  Runa Bhattacharjee <runab@fedoraproject.org>
 
 	* bn_IN: Correction of header section for plural form
@@ -13,7 +17,7 @@
 
 2008-03-05  Hendrik Brandt  <heb@gnome-de.org>
 
-        * de.po: Updated German translation.
+	* de.po: Updated German translation.
 
 2008-03-05  Rahul Bhalerao <b.rahul.pm@gmail.com>
 
