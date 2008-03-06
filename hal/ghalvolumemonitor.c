@@ -24,7 +24,9 @@
 
 #include <config.h>
 
+#include <limits.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -771,8 +773,80 @@ hal_device_compare (HalDevice *a, HalDevice *b)
   return strcmp (hal_device_get_udi (a), hal_device_get_udi (b));
 }
 
+/* TODO: move to gio */
 static gboolean
-should_volume_be_ignored (HalPool *pool, HalDevice *d)
+_g_unix_mount_point_guess_should_display (GUnixMountPoint *mount_point)
+{
+  const char *mount_path;
+
+  mount_path = g_unix_mount_point_get_mount_path (mount_point);
+
+  /* Never display internal mountpoints */
+  if (g_unix_is_mount_path_system_internal (mount_path))
+    return FALSE;
+
+  /* Only display things in /media (which are generally user mountable)
+     and home dir (fuse stuff) */
+  if (g_str_has_prefix (mount_path, "/media/"))
+    return TRUE;
+
+  if (g_str_has_prefix (mount_path, g_get_home_dir ()))
+    return TRUE;
+
+  return FALSE;
+}
+
+
+static gboolean
+should_be_hidden_according_to_etc_fstab (HalDevice *d, GList *fstab_mount_points)
+{
+  GList *l;
+  gboolean ret;
+  const char *device_file;
+
+  ret = TRUE;
+
+  device_file = hal_device_get_property_string (d, "block.device");
+
+  for (l = fstab_mount_points; l != NULL; l = l->next) {
+    GUnixMountPoint *mount_point = l->data;
+    const char *device_path;
+    gboolean device_file_matches;
+
+    device_file_matches = FALSE;
+    device_path = g_unix_mount_point_get_device_path (mount_point);
+
+    if (g_str_has_prefix (device_path, "LABEL="))
+      {
+        if (strcmp (device_path + 6, hal_device_get_property_string (d, "volume.label")) == 0)
+          device_file_matches = TRUE;
+      }
+    else if (g_str_has_prefix (device_path, "UUID="))
+      {
+        if (g_ascii_strcasecmp (device_path + 5, hal_device_get_property_string (d, "volume.uuid")) == 0)
+          device_file_matches = TRUE;
+      }
+    else
+      {
+        char resolved_device_path[PATH_MAX];
+        /* handle symlinks such as /dev/disk/by-uuid/47C2-1994 */
+        if (realpath (device_path, resolved_device_path) != NULL &&
+            strcmp (resolved_device_path, device_file) == 0)
+          device_file_matches = TRUE;
+    }
+
+    if (device_file_matches && !_g_unix_mount_point_guess_should_display (mount_point))
+      goto out;
+  }
+
+  ret = FALSE;
+
+ out:
+  return ret;
+}
+
+static gboolean
+should_volume_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points)
 {
   gboolean volume_ignore;
   const char *volume_fsusage;
@@ -820,12 +894,18 @@ should_volume_be_ignored (HalPool *pool, HalDevice *d)
       if (g_unix_is_mount_path_system_internal (hal_device_get_property_string (d, "volume.mount_point")))
         return TRUE;
     }
-  
+  else
+    {
+      /* not mounted, may be referenced in /etc/fstab though */
+      if (should_be_hidden_according_to_etc_fstab (d, fstab_mount_points))
+        return TRUE;
+    }
+
   return FALSE;
 }
 
 static gboolean
-should_drive_be_ignored (HalPool *pool, HalDevice *d)
+should_drive_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points)
 {
   GList *volumes, *l;
   const char *drive_udi;
@@ -847,7 +927,7 @@ should_drive_be_ignored (HalPool *pool, HalDevice *d)
       if (strcmp (drive_udi, hal_device_get_property_string (volume_dev, "block.storage_device")) == 0)
         {
           got_volumes = TRUE;
-          if (!should_volume_be_ignored (pool, volume_dev) ||
+          if (!should_volume_be_ignored (pool, volume_dev, fstab_mount_points) ||
               hal_device_get_property_bool (volume_dev, "volume.disc.has_audio") ||
               hal_device_get_property_bool (volume_dev, "volume.disc.is_blank"))
             {
@@ -982,6 +1062,9 @@ update_drives (GHalVolumeMonitor *monitor,
   GList *removed, *added;
   GList *l, *ll;
   GHalDrive *drive;
+  GList *fstab_mount_points;
+
+  fstab_mount_points = g_unix_mount_points_get (NULL);
 
   new_drive_devices = hal_pool_find_by_capability (monitor->pool, "storage");
 
@@ -992,7 +1075,7 @@ update_drives (GHalVolumeMonitor *monitor,
     {
       HalDevice *d = l->data;
       ll = l->next;
-      if (should_drive_be_ignored (monitor->pool, d))
+      if (should_drive_be_ignored (monitor->pool, d, fstab_mount_points))
         new_drive_devices = g_list_delete_link (new_drive_devices, l);
     }
 
@@ -1038,6 +1121,9 @@ update_drives (GHalVolumeMonitor *monitor,
   g_list_free (removed);
   list_free (monitor->last_drive_devices);
   monitor->last_drive_devices = new_drive_devices;
+
+  g_list_foreach (fstab_mount_points, (GFunc) g_unix_mount_point_free, NULL);
+  g_list_free (fstab_mount_points);
 }
 
 static void
@@ -1050,7 +1136,10 @@ update_volumes (GHalVolumeMonitor *monitor,
   GList *l, *ll;
   GHalVolume *volume;
   GHalDrive *drive;
-  
+  GList *fstab_mount_points;
+
+  fstab_mount_points = g_unix_mount_points_get (NULL);
+
   new_volume_devices = hal_pool_find_by_capability (monitor->pool, "volume");
 
   /* remove devices we want to ignore - we do it here so we get to reevaluate
@@ -1060,7 +1149,7 @@ update_volumes (GHalVolumeMonitor *monitor,
     {
       HalDevice *d = l->data;
       ll = l->next;
-      if (should_volume_be_ignored (monitor->pool, d))
+      if (should_volume_be_ignored (monitor->pool, d, fstab_mount_points))
         new_volume_devices = g_list_delete_link (new_volume_devices, l);
     }
 
@@ -1114,6 +1203,9 @@ update_volumes (GHalVolumeMonitor *monitor,
   g_list_free (removed);
   list_free (monitor->last_volume_devices);
   monitor->last_volume_devices = new_volume_devices;
+
+  g_list_foreach (fstab_mount_points, (GFunc) g_unix_mount_point_free, NULL);
+  g_list_free (fstab_mount_points);
 }
 
 static void

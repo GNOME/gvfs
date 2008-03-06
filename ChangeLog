@@ -1,3 +1,13 @@
+2008-03-06  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	(_g_unix_mount_point_guess_should_display),
+	(should_be_hidden_according_to_etc_fstab),
+	(should_volume_be_ignored), (should_drive_be_ignored),
+	(update_drives), (update_volumes):
+	Avoid showing volumes from /etc/fstab if the mount point is one
+	that should not be displayed to the user (#520851)
+
 2008-03-07  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c:
