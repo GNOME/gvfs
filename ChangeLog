@@ -1,3 +1,8 @@
+2008-03-07  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Initialize error variable to NULL. (#519035)
+
 2008-03-06  David Zeuthen  <davidz@redhat.com>
 
 	* hal/ghalvolumemonitor.c:

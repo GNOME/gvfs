@@ -1710,6 +1710,7 @@ close_write_ready (GObject      *source_object,
   GError        *error;
   gboolean       res;
 
+  error = NULL;
   job = G_VFS_JOB (user_data);
   stream = G_OUTPUT_STREAM (source_object);
   res = g_output_stream_close_finish (stream,
