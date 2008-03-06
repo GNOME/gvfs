@@ -1363,11 +1363,9 @@ do_query_info (GVfsBackend           *backend,
   SoupMessage *msg;
   Multistatus  ms;
   xmlNodeIter  iter;
-  SoupURI     *base;
   gboolean     res;
   GError      *error;
 
-  base    = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error   = NULL;
 
   msg = propfind_request_new (backend, filename, 0, ls_propnames);
@@ -1437,10 +1435,8 @@ do_enumerate (GVfsBackend           *backend,
   Multistatus  ms;
   xmlNodeIter  iter;
   gboolean     res;
-  SoupURI     *base;
   GError      *error;
  
-  base  = G_VFS_BACKEND_HTTP (backend)->mount_base;
   error = NULL;
 
   msg = propfind_request_new (backend, filename, 1, ls_propnames);
@@ -1473,13 +1469,10 @@ do_enumerate (GVfsBackend           *backend,
   while (xml_node_iter_next (&iter))
     {
       MsResponse  response;
-      const char *basename;
       GFileInfo  *info;
 
       if (! multistatus_get_response (&iter, &response))
         continue;
-
-      basename = ms_response_get_basename (&response);
 
       if (ms_response_is_target (&response))
         continue;

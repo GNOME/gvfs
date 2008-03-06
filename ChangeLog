@@ -1,3 +1,8 @@
+2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* daemon/gvfsbackenddav.c: Remove a couple
+	of unused variables.
+
 2008-03-07  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c:
