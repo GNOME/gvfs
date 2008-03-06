@@ -2107,7 +2107,19 @@ do_move (GVfsBackend *backend,
 
   if (!(flags & G_FILE_COPY_OVERWRITE))
     {
-      /* FIXME: check if file exists */
+      char *destfilename = ftp_filename_to_gvfs_path (conn, destfile);
+      GFileInfo *info = create_file_info (ftp, conn, destfilename, NULL);
+
+      g_free (destfilename);
+      if (info)
+	{
+	  g_object_unref (info);
+	  g_set_error (&conn->error,
+		       G_IO_ERROR,
+	               G_IO_ERROR_EXISTS,
+		       _("Target file already exists"));
+	  goto out;
+	}
     }
 
   ftp_connection_send (conn,
@@ -2117,6 +2129,7 @@ do_move (GVfsBackend *backend,
 		       0,
 		       "RNTO %s", destfile);
 
+out:
   g_free (srcfile);
   g_free (destfile);
   g_vfs_backend_ftp_push_connection (ftp, conn);
