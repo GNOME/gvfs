@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-05 15:44+0100\n"
-"PO-Revision-Date: 2008-03-05 15:44+0100\n"
+"POT-Creation-Date: 2008-03-06 16:31+0100\n"
+"PO-Revision-Date: 2008-03-06 16:32+0100\n"
 "Last-Translator: Hendrik Brandt <heb@gnome-de.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -135,12 +135,12 @@ msgstr "Fehler beim Abfragen von Informationen zum Speicherort: %s"
 msgid "Error connecting to daemon: %s"
 msgstr "Fehler beim Verbinden zum Dienst: %s"
 
-#: ../common/gsysutils.c:127
+#: ../common/gsysutils.c:130
 #, c-format
 msgid "Error creating socket: %s"
 msgstr "Fehler beim Erstellen des Socket: %s"
 
-#: ../common/gsysutils.c:165
+#: ../common/gsysutils.c:168
 #, c-format
 msgid "Error connecting to socket: %s"
 msgstr "Fehler beim Verbinden zum Socket: %s"
@@ -210,7 +210,7 @@ msgstr "Temporärer Ordner konnte nicht erzeugt werden"
 msgid "No such file or directory"
 msgstr "Unbekannte Datei oder unbekannter Ordner"
 
-#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1749
+#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1754
 msgid "Directory not empty"
 msgstr "Ordner ist nicht leer"
 
@@ -224,7 +224,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD-Ersteller"
 
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
-#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:778
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:846
 #: ../daemon/gvfsbackendnetwork.c:637
 #, c-format
 msgid "The file is not a directory"
@@ -310,7 +310,7 @@ msgid "No such file"
 msgstr "Unbekannte Datei"
 
 #: ../daemon/gvfsbackendcdda.c:825 ../daemon/gvfsbackendcomputer.c:573
-#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1852
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1955
 #: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
 #: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
 #: ../daemon/gvfsbackendsmbbrowse.c:1111
@@ -370,7 +370,7 @@ msgstr "Datei konnte nicht ausgehängt werden"
 msgid "Can't eject file"
 msgstr "Datei konnte nicht ausgeworfen werden"
 
-#: ../daemon/gvfsbackenddav.c:271 ../daemon/gvfsbackenddav.c:1244
+#: ../daemon/gvfsbackenddav.c:271 ../daemon/gvfsbackenddav.c:1245
 #: ../daemon/gvfsbackendhttp.c:220
 #, c-format
 msgid "HTTP Error: %s"
@@ -388,7 +388,7 @@ msgstr "Leere Antwort"
 msgid "Unexpected reply from server"
 msgstr "Unerwartete Antwort vom Server"
 
-#: ../daemon/gvfsbackenddav.c:903 ../daemon/gvfsbackenddav.c:1363
+#: ../daemon/gvfsbackenddav.c:903 ../daemon/gvfsbackenddav.c:1368
 #, c-format
 msgid "Response invalid"
 msgstr "Antwort ungültig"
@@ -406,31 +406,38 @@ msgstr "Bitte Passwort für %s eingeben"
 msgid "Please enter proxy password"
 msgstr "Bitte geben Sie das Proxy-Passwort ein"
 
-#: ../daemon/gvfsbackenddav.c:1161 ../daemon/gvfsbackendhttp.c:273
+#: ../daemon/gvfsbackenddav.c:1162 ../daemon/gvfsbackendhttp.c:273
 #: ../daemon/gvfsbackendobexftp.c:605 ../daemon/gvfsbackendobexftp.c:616
 #: ../daemon/gvfsbackendsmb.c:595
 msgid "Invalid mount spec"
 msgstr "Ungültige Mount-Spezifikation"
 
-#: ../daemon/gvfsbackenddav.c:1248 ../daemon/gvfsbackenddav.c:1252
+#: ../daemon/gvfsbackenddav.c:1249 ../daemon/gvfsbackenddav.c:1253
 msgid "Not a WebDAV enabled share"
 msgstr "Kein WebDAV-fähiger Speicher"
 
-#: ../daemon/gvfsbackenddav.c:1319 ../daemon/gvfsbackenddav.c:1392
+#: ../daemon/gvfsbackenddav.c:1275
+#, c-format
+msgid "WebDAV on %s"
+msgstr "WebDAV auf %s"
+
+#: ../daemon/gvfsbackenddav.c:1324 ../daemon/gvfsbackenddav.c:1397
 msgid "Could not create request"
 msgstr "Anfrage konnte nicht erstellt werden"
 
-#: ../daemon/gvfsbackenddav.c:1458 ../daemon/gvfsbackenddav.c:1707
+#: ../daemon/gvfsbackenddav.c:1463 ../daemon/gvfsbackenddav.c:1712
+#: ../daemon/gvfsbackendftp.c:1558 ../daemon/gvfsbackendftp.c:2189
 #: ../daemon/gvfsbackendsmb.c:1727
+#, c-format
 msgid "Target file already exists"
 msgstr "Zieldatei existiert bereits"
 
-#: ../daemon/gvfsbackenddav.c:1528 ../daemon/gvfsbackendsftp.c:2690
+#: ../daemon/gvfsbackenddav.c:1533 ../daemon/gvfsbackendsftp.c:2688
 #: ../daemon/gvfsbackendsmb.c:983
 msgid "The file was externally modified"
 msgstr "Die Datei wurde extern verändert"
 
-#: ../daemon/gvfsbackenddav.c:1559 ../daemon/gvfsbackendsmb.c:1021
+#: ../daemon/gvfsbackenddav.c:1564 ../daemon/gvfsbackendsmb.c:1021
 #: ../daemon/gvfsbackendsmb.c:1744
 msgid "Backup file creation failed"
 msgstr "Anlegen der Sicherheitskopie fehlgeschlagen"
@@ -454,105 +461,111 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Netzwerk"
 
-#: ../daemon/gvfsbackendftp.c:188
+#: ../daemon/gvfsbackendftp.c:224
 msgid "Accounts are unsupported"
 msgstr "Konten werden nicht unterstützt"
 
-#: ../daemon/gvfsbackendftp.c:192
+#: ../daemon/gvfsbackendftp.c:228
 msgid "Host closed connection"
 msgstr "Verbindung wurde von Gegenstelle getrennt"
 
-#: ../daemon/gvfsbackendftp.c:196
+#: ../daemon/gvfsbackendftp.c:232
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "Es konnte keine Datenverbindung hergestellt werden. Wird dies eventuell von "
 "Ihrer Firewall unterbunden?"
 
-#: ../daemon/gvfsbackendftp.c:200
+#: ../daemon/gvfsbackendftp.c:236
 msgid "Data connection closed"
 msgstr "Datenverbindung geschlossen"
 
-#: ../daemon/gvfsbackendftp.c:206
+#: ../daemon/gvfsbackendftp.c:242
 msgid "File unavailable"
 msgstr "Datei nicht verfügbar"
 
-#: ../daemon/gvfsbackendftp.c:210
+#: ../daemon/gvfsbackendftp.c:246
 msgid "Operation failed"
 msgstr "Vorgang fehlgeschlagen"
 
-#: ../daemon/gvfsbackendftp.c:215
+#: ../daemon/gvfsbackendftp.c:251
 msgid "No space left on server"
 msgstr "Der Speicherplatz auf dem Server ist aufgebraucht"
 
-#: ../daemon/gvfsbackendftp.c:223
+#: ../daemon/gvfsbackendftp.c:259 ../daemon/gvfsbackendsftp.c:3710
 msgid "Operation unsupported"
 msgstr "Vorgang wird nicht unterstützt"
 
-#: ../daemon/gvfsbackendftp.c:227 ../daemon/gvfsbackendsftp.c:261
+#: ../daemon/gvfsbackendftp.c:263 ../daemon/gvfsbackendsftp.c:259
 msgid "Permission denied"
 msgstr "Zugriff verweigert"
 
-#: ../daemon/gvfsbackendftp.c:231
+#: ../daemon/gvfsbackendftp.c:267
 msgid "Page type unknown"
 msgstr "Unbekannter Seitentyp"
 
-#: ../daemon/gvfsbackendftp.c:235 ../daemon/gvfsbackendftp.c:1927
+#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:2059
 #, c-format
 msgid "Invalid filename"
 msgstr "Ungültiger Dateiname"
 
-#: ../daemon/gvfsbackendftp.c:239 ../daemon/gvfsbackendftp.c:313
-#: ../daemon/gvfsbackendftp.c:342 ../daemon/gvfsbackendftp.c:361
-#: ../daemon/gvfsbackendftp.c:374 ../daemon/gvfsbackendftp.c:683
+#: ../daemon/gvfsbackendftp.c:275 ../daemon/gvfsbackendftp.c:349
+#: ../daemon/gvfsbackendftp.c:378 ../daemon/gvfsbackendftp.c:397
+#: ../daemon/gvfsbackendftp.c:410 ../daemon/gvfsbackendftp.c:751
 #, c-format
 msgid "Invalid reply"
 msgstr "Ungültige Antwort"
 
-#: ../daemon/gvfsbackendftp.c:481
+#: ../daemon/gvfsbackendftp.c:517
 #, c-format
 msgid "broken transmission"
 msgstr "beschädigte Übertragung"
 
-#: ../daemon/gvfsbackendftp.c:574 ../daemon/gvfsbackendftp.c:702
+#: ../daemon/gvfsbackendftp.c:611 ../daemon/gvfsbackendftp.c:771
 #, c-format
 msgid "Could not connect to host"
 msgstr "Keine Verbindung zum Zielrechner möglich"
 
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendftp.c:897 ../daemon/gvfsbackendsftp.c:1762
+#, c-format
+msgid "/ on %s"
+msgstr "/ auf %s"
+
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:975
+#: ../daemon/gvfsbackendftp.c:1259
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Bitte Passwort für FTP auf %s eingeben"
 
-#: ../daemon/gvfsbackendftp.c:995 ../daemon/gvfsbackendsftp.c:835
+#: ../daemon/gvfsbackendftp.c:1279 ../daemon/gvfsbackendsftp.c:833
 msgid "Password dialog cancelled"
 msgstr "Passwortdialog abgebrochen"
 
-#: ../daemon/gvfsbackendftp.c:1062
+#: ../daemon/gvfsbackendftp.c:1345
 #, c-format
 msgid "ftp on %s"
 msgstr "FTP auf %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1068
+#: ../daemon/gvfsbackendftp.c:1351
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "FTP als %s auf %s"
 
-#: ../daemon/gvfsbackendftp.c:1102 ../daemon/gvfsbackendsftp.c:1412
+#: ../daemon/gvfsbackendftp.c:1385 ../daemon/gvfsbackendsftp.c:1410
 msgid "No hostname specified"
 msgstr "Kein Server-Name angegeben"
 
-#: ../daemon/gvfsbackendftp.c:1308 ../daemon/gvfsbackendftp.c:2018
+#: ../daemon/gvfsbackendftp.c:1608 ../daemon/gvfsbackendftp.c:2150
 msgid "backups not supported yet"
 msgstr "Sicherheitskopien werden derzeit nicht unterstützt"
 
-#: ../daemon/gvfsbackendftp.c:1523 ../daemon/gvfsbackendftp.c:1723
+#: ../daemon/gvfsbackendftp.c:1684
 #, c-format
 msgid "filename too long"
 msgstr "Dateiname ist zu lang"
 
-#: ../daemon/gvfsbackendftp.c:2037
+#: ../daemon/gvfsbackendftp.c:2169
 #, c-format
 msgid "Invalid destination filename"
 msgstr "Ungültiger Zieldateiname"
@@ -596,7 +609,7 @@ msgstr "gphoto2-Medium auf %s"
 msgid "HTTP Client Error: %s"
 msgstr "HTTP-Client-Fehler: %s"
 
-#: ../daemon/gvfsbackendhttp.c:534 ../daemon/gvfsbackendsftp.c:1752
+#: ../daemon/gvfsbackendhttp.c:534 ../daemon/gvfsbackendsftp.c:1750
 #: ../daemon/gvfsbackendsmb.c:1230 ../daemon/gvfsbackendtrash.c:962
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
@@ -629,60 +642,60 @@ msgstr "Rechner im Netzwerk"
 msgid "%s on %s"
 msgstr "%s auf %s"
 
-#: ../daemon/gvfsbackendsftp.c:253
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "Das SSH-Programm wurde unerwartet beendet"
 
-#: ../daemon/gvfsbackendsftp.c:268
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "Unbekannter Server-Name"
 
-#: ../daemon/gvfsbackendsftp.c:275
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "Keine Verbindung zum Server"
 
-#: ../daemon/gvfsbackendsftp.c:282
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "Verbindung wurde vom Server verweigert"
 
-#: ../daemon/gvfsbackendsftp.c:289
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "Überprüfung des Server-Schlüssels fehlgeschlagen"
 
-#: ../daemon/gvfsbackendsftp.c:372
+#: ../daemon/gvfsbackendsftp.c:370
 msgid "Unable to spawn ssh program"
 msgstr "Das SSH-Programm konnte nicht gestartet werden"
 
-#: ../daemon/gvfsbackendsftp.c:388
+#: ../daemon/gvfsbackendsftp.c:386
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Das SSH-Programm konnte nicht gestartet werden: %s"
 
-#: ../daemon/gvfsbackendsftp.c:491 ../daemon/gvfsbackendsftp.c:743
+#: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:741
 msgid "Timed out when logging in"
 msgstr "Zeitüberschreitung beim Anmelden"
 
-#: ../daemon/gvfsbackendsftp.c:819
+#: ../daemon/gvfsbackendsftp.c:817
 msgid "Enter passphrase for key"
 msgstr "Bitte geben Sie das Passwort für den Schlüssel ein"
 
-#: ../daemon/gvfsbackendsftp.c:821
+#: ../daemon/gvfsbackendsftp.c:819
 msgid "Enter password"
 msgstr "Passwort eingeben"
 
-#: ../daemon/gvfsbackendsftp.c:882
+#: ../daemon/gvfsbackendsftp.c:880
 msgid "Can't send password"
 msgstr "Passwort kann nicht gesendet werden"
 
-#: ../daemon/gvfsbackendsftp.c:890
+#: ../daemon/gvfsbackendsftp.c:888
 msgid "Log In Anyway"
 msgstr "Dennoch anmelden"
 
-#: ../daemon/gvfsbackendsftp.c:890
+#: ../daemon/gvfsbackendsftp.c:888
 msgid "Cancel Login"
 msgstr "Anmelden abbrechen"
 
-#: ../daemon/gvfsbackendsftp.c:900
+#: ../daemon/gvfsbackendsftp.c:898
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -698,65 +711,59 @@ msgstr ""
 "Fortfahren absolut sicher gehen wollen, dann kontaktieren Sie Ihren "
 "Systemadministrator."
 
-#: ../daemon/gvfsbackendsftp.c:920
+#: ../daemon/gvfsbackendsftp.c:918
 msgid "Login dialog cancelled"
 msgstr "Anmeldedialog abgebrochen"
 
-#: ../daemon/gvfsbackendsftp.c:940
+#: ../daemon/gvfsbackendsftp.c:938
 msgid "Can't send host identity confirmation"
 msgstr "Identitätsbestätigung konnte nicht gesendet werden"
 
-#: ../daemon/gvfsbackendsftp.c:1331 ../daemon/gvfsbackendsftp.c:1354
+#: ../daemon/gvfsbackendsftp.c:1329 ../daemon/gvfsbackendsftp.c:1352
 msgid "Protocol error"
 msgstr "Protokollfehler"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1378
+#: ../daemon/gvfsbackendsftp.c:1376
 #, c-format
 msgid "sftp on %s"
 msgstr "SFTP auf %s"
 
-#: ../daemon/gvfsbackendsftp.c:1402
+#: ../daemon/gvfsbackendsftp.c:1400
 msgid "Unable to find supported ssh command"
 msgstr "Es konnte kein unterstütztes SSH-Programm gefunden werden"
 
-#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1764
-#, c-format
-msgid "/ on %s"
-msgstr "/ auf %s"
-
-#: ../daemon/gvfsbackendsftp.c:1828
+#: ../daemon/gvfsbackendsftp.c:1826
 msgid "File is directory"
 msgstr "Datei ist ein Ordner"
 
-#: ../daemon/gvfsbackendsftp.c:1837
+#: ../daemon/gvfsbackendsftp.c:1835
 msgid "Failure"
 msgstr "Fehler"
 
-#: ../daemon/gvfsbackendsftp.c:1902 ../daemon/gvfsbackendsftp.c:1964
-#: ../daemon/gvfsbackendsftp.c:1975 ../daemon/gvfsbackendsftp.c:2033
-#: ../daemon/gvfsbackendsftp.c:2123 ../daemon/gvfsbackendsftp.c:2152
-#: ../daemon/gvfsbackendsftp.c:2200 ../daemon/gvfsbackendsftp.c:2279
-#: ../daemon/gvfsbackendsftp.c:2390 ../daemon/gvfsbackendsftp.c:2431
-#: ../daemon/gvfsbackendsftp.c:2483 ../daemon/gvfsbackendsftp.c:2554
-#: ../daemon/gvfsbackendsftp.c:2574 ../daemon/gvfsbackendsftp.c:2728
-#: ../daemon/gvfsbackendsftp.c:2754 ../daemon/gvfsbackendsftp.c:2811
-#: ../daemon/gvfsbackendsftp.c:2870 ../daemon/gvfsbackendsftp.c:3150
-#: ../daemon/gvfsbackendsftp.c:3279 ../daemon/gvfsbackendsftp.c:3312
-#: ../daemon/gvfsbackendsftp.c:3413 ../daemon/gvfsbackendsftp.c:3454
-#: ../daemon/gvfsbackendsftp.c:3510 ../daemon/gvfsbackendsftp.c:3546
-#: ../daemon/gvfsbackendsftp.c:3580 ../daemon/gvfsbackendsftp.c:3595
-#: ../daemon/gvfsbackendsftp.c:3614
+#: ../daemon/gvfsbackendsftp.c:1900 ../daemon/gvfsbackendsftp.c:1962
+#: ../daemon/gvfsbackendsftp.c:1973 ../daemon/gvfsbackendsftp.c:2031
+#: ../daemon/gvfsbackendsftp.c:2121 ../daemon/gvfsbackendsftp.c:2150
+#: ../daemon/gvfsbackendsftp.c:2198 ../daemon/gvfsbackendsftp.c:2277
+#: ../daemon/gvfsbackendsftp.c:2388 ../daemon/gvfsbackendsftp.c:2429
+#: ../daemon/gvfsbackendsftp.c:2481 ../daemon/gvfsbackendsftp.c:2552
+#: ../daemon/gvfsbackendsftp.c:2572 ../daemon/gvfsbackendsftp.c:2726
+#: ../daemon/gvfsbackendsftp.c:2752 ../daemon/gvfsbackendsftp.c:2809
+#: ../daemon/gvfsbackendsftp.c:2868 ../daemon/gvfsbackendsftp.c:3148
+#: ../daemon/gvfsbackendsftp.c:3277 ../daemon/gvfsbackendsftp.c:3310
+#: ../daemon/gvfsbackendsftp.c:3411 ../daemon/gvfsbackendsftp.c:3452
+#: ../daemon/gvfsbackendsftp.c:3508 ../daemon/gvfsbackendsftp.c:3544
+#: ../daemon/gvfsbackendsftp.c:3578 ../daemon/gvfsbackendsftp.c:3593
+#: ../daemon/gvfsbackendsftp.c:3612 ../daemon/gvfsbackendsftp.c:3690
 msgid "Invalid reply received"
 msgstr "Ungültige Antwort erhalten"
 
-#: ../daemon/gvfsbackendsftp.c:2221
+#: ../daemon/gvfsbackendsftp.c:2219
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Fehler beim Anlegen der Sicherheitskopie: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2636
+#: ../daemon/gvfsbackendsftp.c:2634
 msgid "Unable to create temporary file"
 msgstr "Temporäre Datei konnte nicht erzeugt werden"
 
@@ -914,7 +921,8 @@ msgstr "Hauptdienst für GVFS."
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:135
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:165 ../programs/gvfs-cat.c:178
+#: ../programs/gvfs-open.c:133 ../programs/gvfs-open.c:146
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Versuchen Sie »%s --help« für mehr Informationen"
@@ -1334,7 +1342,7 @@ msgstr ""
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:133
+#: ../programs/gvfs-cat.c:176 ../programs/gvfs-open.c:144
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: keine Orte angegeben"
