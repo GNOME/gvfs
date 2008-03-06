@@ -1,3 +1,16 @@
+2008-03-05  A. Walton  <awalton@svn.gnome.org>
+
+	* programs/gvfs-cat.c (main):
+	* programs/gvfs-copy.c (main):
+	* programs/gvfs-info.c (main):
+	* programs/gvfs-ls.c (main):
+	* programs/gvfs-move.c (main):
+	* programs/gvfs-open.c (main):
+	* programs/gvfs-save.c (main):
+	* programs/gvfs-tree.c (main):
+	Error out if the user passes invalid flags and warn the user.
+	Fixes bug #520086.
+
 2008-03-06  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

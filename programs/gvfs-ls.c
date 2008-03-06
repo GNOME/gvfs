@@ -27,6 +27,7 @@
 #include <glib.h>
 #include <locale.h>
 #include <string.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 
 static char *attributes = NULL;
@@ -379,6 +380,17 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+  
+  if (error != NULL)
+    {
+      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr ("\n");
+      g_printerr (_("Try \"%s --help\" for more information."),
+                  g_get_prgname ());
+      g_printerr ("\n");
+      g_error_free(error);
+      return 1;
+    }
 
   if (attributes != NULL)
     {
