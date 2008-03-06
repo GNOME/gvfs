@@ -54,24 +54,24 @@ struct _GVfsBackendHttp
   SoupSession *session_async;
 };
 
-GType        g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
+GType         g_vfs_backend_http_get_type    (void) G_GNUC_CONST;
 
-SoupURI *    http_backend_uri_for_filename  (GVfsBackend *backend,
-                                             const char  *filename,
-                                             gboolean     is_dir);
+SoupURI *     http_backend_uri_for_filename  (GVfsBackend *backend,
+                                              const char  *filename,
+                                              gboolean     is_dir);
 
 
-char *        http_uri_get_basename         (const char *uri_str);
+char *        http_uri_get_basename          (const char *uri_str);
 
-guint         http_error_code_from_status   (guint status);
+guint         http_error_code_from_status    (guint status);
 
-guint         http_backend_send_message     (GVfsBackend *backend,
-                                             SoupMessage *msg);
+guint         http_backend_send_message      (GVfsBackend *backend,
+                                              SoupMessage *msg);
 
-void          http_backend_queue_message    (GVfsBackend         *backend,
-                                             SoupMessage         *msg,
-                                             SoupSessionCallback  callback,
-                                             gpointer             user_data);
+void          http_backend_queue_message     (GVfsBackend         *backend,
+                                              SoupMessage         *msg,
+                                              SoupSessionCallback  callback,
+                                              gpointer             user_data);
 
 G_END_DECLS
 

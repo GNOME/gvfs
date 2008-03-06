@@ -87,8 +87,6 @@ struct _MountAuthData {
 
 };
 
-
-
 struct _GVfsBackendDav
 {
   GVfsBackendHttp parent_instance;
@@ -118,7 +116,7 @@ g_vfs_backend_dav_init (GVfsBackendDav *backend)
 }
 
 /* ************************************************************************* */
-/*  */
+/* Small utility functions */
 
 static inline gboolean
 sm_has_header (SoupMessage *msg, const char *header)
@@ -579,6 +577,16 @@ parse_resourcetype (xmlNodePtr rt)
   return type;
 }
 
+static inline void
+file_info_set_content_type (GFileInfo *info, const char *type)
+{
+  g_file_info_set_content_type (info, type);
+  g_file_info_set_attribute_string (info,
+                                    G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+                                    type);
+
+}
+
 static void
 ms_response_to_file_info (MsResponse *response,
                           GFileInfo  *info)
@@ -590,11 +598,16 @@ ms_response_to_file_info (MsResponse *response,
   char       *basename;
   const char *text;
   GTimeVal    tv;
+  GFileType   file_type;
+  char       *mime_type;
+  GIcon      *icon;
 
   basename = ms_response_get_basename (response);
   g_file_info_set_name (info, basename);
   g_file_info_set_edit_name (info, basename);
-  g_free (basename);
+
+  file_type = G_FILE_TYPE_UNKNOWN;
+  mime_type = NULL;
 
   ms_response_get_propstat_iter (response, &iter);
   while (xml_node_iter_next (&iter))
@@ -613,8 +626,8 @@ ms_response_to_file_info (MsResponse *response,
 
           if (node_has_name (node, "resourcetype"))
             {
-              GFileType type = parse_resourcetype (node);
-              g_file_info_set_file_type (info, type);
+              file_type = parse_resourcetype (node);
+              g_file_info_set_file_type (info, file_type);
             }
           else if (node_has_name (node, "displayname"))
             {
@@ -636,7 +649,7 @@ ms_response_to_file_info (MsResponse *response,
             }
           else if (node_has_name (node, "getcontenttype"))
             {
-              g_file_info_set_content_type (info, text);
+              mime_type = g_strdup (text);
             }
           else if (node_has_name (node, "getcontentlength"))
             {
@@ -651,6 +664,30 @@ ms_response_to_file_info (MsResponse *response,
             }
         }
     }
+
+  if (file_type == G_FILE_TYPE_DIRECTORY)
+    {
+      icon = g_themed_icon_new ("folder");
+      file_info_set_content_type (info, "inode/directory");
+    }
+  else
+    {
+      if (mime_type == NULL)
+        mime_type = g_content_type_guess (basename, NULL, 0, NULL);
+
+      icon = g_content_type_get_icon (mime_type);
+
+      if (G_IS_THEMED_ICON (icon))
+        g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
+
+      file_info_set_content_type (info, mime_type);
+    }
+
+  g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+  g_free (mime_type);
+  g_free (basename);
+
 }
 
 static GFileType
@@ -907,7 +944,7 @@ stat_location (GVfsBackend  *backend,
 
 
 /* ************************************************************************* */
-/*  */
+/* Authentication */
 
 static void
 mount_auth_info_free (MountAuthData *data)
@@ -1099,6 +1136,9 @@ keyring_save_authinfo (AuthInfo *info,
                                info->password,
                                info->pw_save);
 }
+
+/* ************************************************************************* */
+/* Authentication */
 
 static inline GMountSpec *
 g_mount_spec_dup_known (GMountSpec *spec)
@@ -1468,7 +1508,10 @@ try_create_tested_existence (SoupSession *session, SoupMessage *msg,
   uri = soup_message_get_uri (msg);
   put_msg = soup_message_new_from_uri (SOUP_METHOD_PUT, uri);
 
-  soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
+  /* 
+   * Doesn't work with apache > 2.2.9
+   * soup_message_headers_append (put_msg->request_headers, "If-None-Match", "*");
+   */
   stream = soup_output_stream_new (op_backend->session, put_msg, -1);
   g_object_unref (put_msg);
 
@@ -1725,7 +1768,6 @@ do_delete (GVfsBackend   *backend,
            GVfsJobDelete *job,
            const char    *filename)
 {
-  SoupSession *session;
   SoupMessage *msg;
   SoupURI     *uri;
   GFileType    file_type;
@@ -1735,7 +1777,6 @@ do_delete (GVfsBackend   *backend,
   GError      *error;
 
   error = NULL;
-  session = G_VFS_BACKEND_HTTP (backend)->session;
 
   uri = http_backend_uri_for_filename (backend, filename, FALSE);
   res = stat_location (backend, uri, &file_type, &num_children, &error);
@@ -1770,6 +1811,7 @@ do_delete (GVfsBackend   *backend,
   soup_uri_free (uri);
   g_object_unref (msg);
 }
+
 
 /* ************************************************************************* */
 /*  */

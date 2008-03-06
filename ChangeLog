@@ -1,3 +1,11 @@
+2008-03-06  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Correctly set the content types and the icon correclty. (#518679)
+	Also don't add the If-None-Matcher header for now since
+	early apache versions don't like it. We need to be smart about
+	that later.
+
 2008-03-06  Alexander Larsson  <alexl@redhat.com>
 
         * common/gsysutils.c:
