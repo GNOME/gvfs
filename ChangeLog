@@ -1,3 +1,11 @@
+2008-03-06  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_parse_system),
+	(ftp_connection_use), (dir_default_iter_process):
+	parse the ftp server's system. Using that information, mark dot-files
+	as hidden.
+	Fixes #520203
+
 2008-03-05  A. Walton  <awalton@svn.gnome.org>
 
 	* programs/gvfs-cat.c (main):

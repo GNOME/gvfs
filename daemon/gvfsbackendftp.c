@@ -97,6 +97,12 @@ typedef enum {
 } FtpFeatures;
 #define FTP_FEATURES_DEFAULT (FTP_FEATURE_EPSV)
 
+typedef enum {
+  FTP_SYSTEM_UNKNOWN = 0,
+  FTP_SYSTEM_UNIX,
+  FTP_SYSTEM_WINDOWS
+} FtpSystem;
+
 struct _GVfsBackendFtp
 {
   GVfsBackend		backend;
@@ -133,6 +139,7 @@ struct _FtpConnection
   GVfsJob *		job;
 
   FtpFeatures		features;
+  FtpSystem		system;
 
   SoupSocket *		commands;
   gchar *	      	read_buffer;
@@ -635,6 +642,33 @@ ftp_connection_login (FtpConnection *conn,
   return status;
 }
 
+static void
+ftp_connection_parse_system (FtpConnection *conn)
+{
+  static const struct {
+    const char *id;
+    FtpSystem	system;
+  } known_systems[] = {
+    /* NB: the first entry that matches is taken, so order matters */
+    { "UNIX ", FTP_SYSTEM_UNIX },
+    { "WINDOWS_NT ", FTP_SYSTEM_WINDOWS }
+  };
+  guint i;
+  char *system_name = conn->read_buffer + 4;
+
+  for (i = 0; i < G_N_ELEMENTS (known_systems); i++) 
+    {
+      if (g_ascii_strncasecmp (system_name, 
+	                       known_systems[i].id, 
+			       strlen (known_systems[i].id)) == 0)
+	{
+	  conn->system = known_systems[i].system;
+	  DEBUG ("system is %u\n", conn->system);
+	  break;
+	}
+    }
+}
+
 static gboolean
 ftp_connection_use (FtpConnection *conn)
 {
@@ -652,8 +686,12 @@ ftp_connection_use (FtpConnection *conn)
   /* RFC 2428 suggests to send this to make NAT routers happy */
   if (conn->features & FTP_FEATURE_EPSV)
     ftp_connection_send (conn, 0, "EPSV ALL");
-
   g_clear_error (&conn->error);
+
+  if (ftp_connection_send (conn, 0, "SYST"))
+    ftp_connection_parse_system (conn);
+  g_clear_error (&conn->error);
+
   return TRUE;
 }
 
@@ -972,6 +1010,11 @@ dir_default_iter_process (gpointer        iter,
 				   type == 'f' ? G_FILE_TYPE_REGULAR :
 				   type == 'l' ? G_FILE_TYPE_SYMBOLIC_LINK :
 				   G_FILE_TYPE_DIRECTORY);
+
+  if (conn->system == FTP_SYSTEM_UNIX)
+    g_file_info_set_is_hidden (info, result.fe_fnlen > 0 &&
+	                             result.fe_fname[0] == '.');
+
   g_free (s);
   g_free (name);
 
