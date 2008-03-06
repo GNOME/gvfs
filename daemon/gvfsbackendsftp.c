@@ -59,8 +59,6 @@
 
 /* TODO for sftp:
  * Implement can_delete & can_rename
- * query_writable_attributes
- * set_attributes
  * fstat
  */
 
@@ -3655,6 +3653,75 @@ try_delete (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+try_query_settable_attributes (GVfsBackend *backend,
+			       GVfsJobQueryAttributes *job,
+			       const char *filename)
+{
+  GFileAttributeInfoList *list;
+
+  list = g_file_attribute_info_list_new ();
+
+  g_file_attribute_info_list_add (list,
+				  G_FILE_ATTRIBUTE_UNIX_MODE,
+				  G_FILE_ATTRIBUTE_TYPE_UINT32,
+				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  
+  g_vfs_job_query_attributes_set_list (job, list);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  g_file_attribute_info_list_unref (list);
+  
+  return TRUE;
+}
+
+static void
+set_attribute_reply (GVfsBackendSftp *backend,
+		     int reply_type,
+		     GDataInputStream *reply,
+		     guint32 len,
+		     GVfsJob *job,
+		     gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    result_from_status (job, reply, -1, -1);
+  else 
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+		      _("Invalid reply received"));
+}
+
+static gboolean
+try_set_attribute (GVfsBackend *backend,
+		   GVfsJobSetAttribute *job,
+		   const char *filename,
+		   const char *attribute,
+		   GFileAttributeType type,
+		   gpointer value_p,
+		   GFileQueryInfoFlags flags)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  guint32 id;
+
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) != 0)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			_("Operation unsupported"));
+      return TRUE;
+    }
+
+  command = new_command_stream (op_backend,
+				SSH_FXP_SETSTAT,
+				&id);
+  put_string (command, filename);
+  g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL);
+  g_data_output_stream_put_uint32 (command, (*(guint32 *)value_p) & 0777, NULL, NULL);
+  queue_command_stream_and_free (op_backend, command, id, set_attribute_reply, G_VFS_JOB (job), NULL);
+  
+  return TRUE;
+}
+
 static void
 g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 {
@@ -3682,4 +3749,6 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_make_directory = try_make_directory;
   backend_class->try_delete = try_delete;
   backend_class->try_set_display_name = try_set_display_name;
+  backend_class->try_query_settable_attributes = try_query_settable_attributes;
+  backend_class->try_set_attribute = try_set_attribute;
 }
