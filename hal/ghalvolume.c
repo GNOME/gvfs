@@ -517,7 +517,10 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
   HalDevice *drive_device;
   const char *storage_udi;
   const char *device_path;
-      
+  gboolean ignore_automount;
+
+  ignore_automount = FALSE;
+  
   if (hal_device_has_capability (device, "block"))
     {
       storage_udi = hal_device_get_property_string (device, "block.storage_device");
@@ -554,6 +557,10 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
 
       if (foreign_mount_root == NULL)
         return NULL;
+
+      /* We don't want to automount cameras as the gphoto backend
+         blocks access from other apps */
+      ignore_automount = TRUE;
     }
 #endif
   else
@@ -570,7 +577,7 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
   volume->drive_device = g_object_ref (drive_device);
   volume->foreign_mount_root = foreign_mount_root != NULL ? g_object_ref (foreign_mount_root) : NULL;
   volume->is_mountable = is_mountable;
-  volume->ignore_automount = ! hal_device_is_recently_plugged_in (device);
+  volume->ignore_automount = ignore_automount || ! hal_device_is_recently_plugged_in (device);
   
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);

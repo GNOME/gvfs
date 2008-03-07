@@ -1,3 +1,13 @@
+2008-03-07  Alexander Larsson  <alexl@redhat.com>
+
+        * hal/ghalmount.c:
+        (get_disc_name):
+	Translate disc names.
+	
+        * hal/ghalvolume.c:
+        (g_hal_volume_new):
+	Don't automount gphoto volumes.
+
 2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* programs/gvfs-mount.c: ANSIfication

@@ -209,9 +209,9 @@ get_disc_name (const char *disc_type, gboolean is_blank)
     }
   
   if (is_blank)
-    return disc_data[n].ui_name_blank;
+    return gettext(disc_data[n].ui_name_blank);
   else
-    return disc_data[n].ui_name;
+    return gettext(disc_data[n].ui_name);
 }
 
 typedef struct _MountIconSearchData
