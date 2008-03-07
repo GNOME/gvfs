@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-07 00:46+0100\n"
-"PO-Revision-Date: 2008-03-04 23:19+0100\n"
+"POT-Creation-Date: 2008-03-07 09:37+0100\n"
+"PO-Revision-Date: 2008-03-07 09:37+0100\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
@@ -415,9 +415,9 @@ msgid "Not a WebDAV enabled share"
 msgstr "No és un recurs compartit habilitat per a WebDAV"
 
 #: ../daemon/gvfsbackenddav.c:1319
-#, fuzzy, c-format
+#, c-format
 msgid "WebDAV on %s"
-msgstr "Recurs compartit de WebDAV"
+msgstr "WebDAV a %s"
 
 #: ../daemon/gvfsbackenddav.c:1377 ../daemon/gvfsbackenddav.c:1448
 msgid "Could not create request"
