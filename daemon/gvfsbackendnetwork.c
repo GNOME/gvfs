@@ -855,7 +855,7 @@ g_vfs_backend_network_class_init (GVfsBackendNetworkClass *klass)
 }
 
 void 
-g_vfs_network_daemon_init ()
+g_vfs_network_daemon_init (void)
 {
   /* Translators: this is the friendly name of the 'network://' backend that
    * shows computers in your local network. */

@@ -1,3 +1,8 @@
+2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* programs/gvfs-mount.c: ANSIfication
+	* daemon/gvfsbackendnetwork.c: Same.
+
 2008-03-07  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/soup-input-stream.c: Since G_SEEK_END is not supported

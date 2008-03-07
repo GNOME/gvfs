@@ -264,7 +264,7 @@ iterate_gmain_timeout_function (gpointer data)
 }
 
 static void
-iterate_gmain()
+iterate_gmain(void)
 {
   g_timeout_add (500, iterate_gmain_timeout_function, NULL);  
   g_main_loop_run (main_loop);
@@ -439,7 +439,7 @@ list_drives (GList *drives,
 
 
 static void
-list_monitor_items()
+list_monitor_items(void)
 {
   GVolumeMonitor *volume_monitor;
   GList *drives, *volumes, *mounts;
