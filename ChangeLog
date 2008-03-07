@@ -1,3 +1,11 @@
+2008-03-08  Christian Kellner  <gicmo@gnome.org>
+
+	* hal/ghalmount.c: 
+	Use dgettext instead of gettext as we are a library.
+
+	* hal/ghalvolume.c: 
+	Translate disc names (using dgettext).
+
 2008-03-07  Alexander Larsson  <alexl@redhat.com>
 
         * hal/ghalvolumemonitor.c:

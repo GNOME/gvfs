@@ -184,9 +184,9 @@ get_disc_name (const char *disc_type, gboolean is_blank)
     }
   
   if (is_blank)
-    return disc_data[n].ui_name_blank;
+    return dgettext (GETTEXT_PACKAGE, disc_data[n].ui_name_blank);
   else
-    return disc_data[n].ui_name;
+    return dgettext (GETTEXT_PACKAGE, disc_data[n].ui_name);
 }
 
 
