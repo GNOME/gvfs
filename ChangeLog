@@ -3,7 +3,7 @@
         * hal/ghalvolumemonitor.c:
         (get_mount_point_for_device):
         (should_volume_be_ignored):
-	Really make sure we ignore stuff outside /media (#520615)
+	Really make sure we ignore stuff outside /media (#520851)
 
 2008-03-07  Alexander Larsson  <alexl@redhat.com>
 
