@@ -797,52 +797,52 @@ _g_unix_mount_point_guess_should_display (GUnixMountPoint *mount_point)
 }
 
 
-static gboolean
-should_be_hidden_according_to_etc_fstab (HalDevice *d, GList *fstab_mount_points)
+static GUnixMountPoint *
+get_mount_point_for_device (HalDevice *d, GList *fstab_mount_points)
 {
   GList *l;
   gboolean ret;
   const char *device_file;
+  const char *device_mount_point;
 
-  ret = TRUE;
+  device_mount_point = hal_device_get_property_string (d, "volume.mount_point");
 
   device_file = hal_device_get_property_string (d, "block.device");
 
-  for (l = fstab_mount_points; l != NULL; l = l->next) {
-    GUnixMountPoint *mount_point = l->data;
-    const char *device_path;
-    gboolean device_file_matches;
-
-    device_file_matches = FALSE;
-    device_path = g_unix_mount_point_get_device_path (mount_point);
-
-    if (g_str_has_prefix (device_path, "LABEL="))
-      {
-        if (strcmp (device_path + 6, hal_device_get_property_string (d, "volume.label")) == 0)
-          device_file_matches = TRUE;
-      }
-    else if (g_str_has_prefix (device_path, "UUID="))
-      {
-        if (g_ascii_strcasecmp (device_path + 5, hal_device_get_property_string (d, "volume.uuid")) == 0)
-          device_file_matches = TRUE;
-      }
-    else
-      {
-        char resolved_device_path[PATH_MAX];
-        /* handle symlinks such as /dev/disk/by-uuid/47C2-1994 */
-        if (realpath (device_path, resolved_device_path) != NULL &&
-            strcmp (resolved_device_path, device_file) == 0)
-          device_file_matches = TRUE;
+  for (l = fstab_mount_points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      const char *device_path;
+      const char *mount_path;
+      
+      mount_path = g_unix_mount_point_get_mount_path (mount_point);
+      if (device_mount_point != NULL &&
+          mount_path != NULL &&
+          strcmp (device_mount_point, mount_path) == 0)
+        return mount_point;
+      
+      device_path = g_unix_mount_point_get_device_path (mount_point);
+      if (g_str_has_prefix (device_path, "LABEL="))
+        {
+          if (strcmp (device_path + 6, hal_device_get_property_string (d, "volume.label")) == 0)
+            return mount_point;
+        }
+      else if (g_str_has_prefix (device_path, "UUID="))
+        {
+          if (g_ascii_strcasecmp (device_path + 5, hal_device_get_property_string (d, "volume.uuid")) == 0)
+            return mount_point;
+        }
+      else
+        {
+          char resolved_device_path[PATH_MAX];
+          /* handle symlinks such as /dev/disk/by-uuid/47C2-1994 */
+          if (realpath (device_path, resolved_device_path) != NULL &&
+              strcmp (resolved_device_path, device_file) == 0)
+            return mount_point;
+        }
     }
 
-    if (device_file_matches && !_g_unix_mount_point_guess_should_display (mount_point))
-      goto out;
-  }
-
-  ret = FALSE;
-
- out:
-  return ret;
+  return NULL;
 }
 
 static gboolean
@@ -850,6 +850,7 @@ should_volume_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points
 {
   gboolean volume_ignore;
   const char *volume_fsusage;
+  GUnixMountPoint *mount_point;
   
   volume_fsusage = hal_device_get_property_string (d, "volume.fsusage");
   volume_ignore = hal_device_get_property_bool (d, "volume.ignore");
@@ -889,17 +890,9 @@ should_volume_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points
       return TRUE;
     }
 
-  if (hal_device_get_property_bool (d, "volume.is_mounted"))
-    {
-      if (g_unix_is_mount_path_system_internal (hal_device_get_property_string (d, "volume.mount_point")))
-        return TRUE;
-    }
-  else
-    {
-      /* not mounted, may be referenced in /etc/fstab though */
-      if (should_be_hidden_according_to_etc_fstab (d, fstab_mount_points))
-        return TRUE;
-    }
+  mount_point = get_mount_point_for_device (d, fstab_mount_points);
+  if (mount_point != NULL && !_g_unix_mount_point_guess_should_display (mount_point))
+    return TRUE;
 
   return FALSE;
 }
