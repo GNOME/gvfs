@@ -1,0 +1,1367 @@
+# Danish translation of gvfs
+# Copyright (C) 2008 Free Software Foundation
+# This file is distributed under the same license as the gvfs package.
+#
+# Ask Hjorth Larsen <asklarsen@gmail.com>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-03-08 13:49+0000\n"
+"PO-Revision-Date: 2008-03-09 18:29+0100\n"
+"Last-Translator: Ask Hjorth Larsen <asklarsen@gmail.com>\n"
+"Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1867
+msgid "Operation not supported, files on different mounts"
+msgstr "Operationen er ikke tilladt, filer er på forskellige monteringspunkter"
+
+#: ../client/gdaemonfile.c:758
+msgid "Invalid return value from get_info"
+msgstr "Ugyldig returværdi fra get_info"
+
+#: ../client/gdaemonfile.c:787
+msgid "Invalid return value from query_info"
+msgstr "Ugyldig returværdi fra query_info"
+
+#: ../client/gdaemonfile.c:865
+msgid "Couldn't get stream file descriptor"
+msgstr "Kunne ikke hente fildeskriptor for strømmen"
+
+#: ../client/gdaemonfile.c:897 ../client/gdaemonfile.c:967
+#: ../client/gdaemonfile.c:1026 ../client/gdaemonfile.c:1085
+#: ../client/gdaemonfile.c:1147
+msgid "Invalid return value from open"
+msgstr "Ugyldig returværdi fra open"
+
+#: ../client/gdaemonfile.c:977 ../client/gdaemonfile.c:1036
+#: ../client/gdaemonfile.c:1095 ../client/gdaemonfile.c:1157
+msgid "Didn't get stream file descriptor"
+msgstr "Hentede ikke fildeskriptor for strømmen"
+
+#: ../client/gdaemonfile.c:1209 ../client/gdaemonfile.c:1226
+msgid "Invalid return value from call"
+msgstr "Ugyldig returværdi fra call"
+
+#: ../client/gdaemonfile.c:1505
+msgid "Invalid return value from get_filesystem_info"
+msgstr "Ugyldig returværdi fra get_filesystem_info"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1549
+msgid "Could not find enclosing mount"
+msgstr "Kunne ikke finde det omsluttende monteringsobjekt"
+
+#: ../client/gdaemonfile.c:1579
+#, c-format
+msgid "Invalid filename %s"
+msgstr "Ugyldigt filnavn %s"
+
+#: ../client/gdaemonfile.c:1621
+msgid "Invalid return value from query_filesystem_info"
+msgstr "Ugyldig returværdi fra query_filesystem_info"
+
+#: ../client/gdaemonfile.c:2012
+msgid "Invalid return value from monitor_dir"
+msgstr "Ugyldig returværdi fra monitor_dir"
+
+#: ../client/gdaemonfile.c:2061
+msgid "Invalid return value from monitor_file"
+msgstr "Ugyldig returværdi fra monitor_file"
+
+#: ../client/gdaemonfileinputstream.c:451
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1304
+#: ../client/gdaemonfileinputstream.c:1314
+#: ../client/gdaemonfileoutputstream.c:403
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1052
+#: ../client/gdaemonfileoutputstream.c:1062
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "Fejl i strømprotokol: %s"
+
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1314
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1062
+msgid "End of stream"
+msgstr "Slutning af strøm"
+
+#: ../client/gdaemonfileinputstream.c:519
+#: ../client/gdaemonfileinputstream.c:676
+#: ../client/gdaemonfileinputstream.c:785
+#: ../client/gdaemonfileinputstream.c:1036
+#: ../client/gdaemonfileoutputstream.c:460
+#: ../client/gdaemonfileoutputstream.c:639
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:774
+#: ../daemon/gvfsbackendobexftp.c:795 ../daemon/gvfsbackendobexftp.c:914
+#: ../daemon/gvfsbackendobexftp.c:1051 ../daemon/gvfsbackendobexftp.c:1115
+#: ../daemon/gvfsbackendobexftp.c:1252 ../daemon/gvfsbackendobexftp.c:1279
+#: ../daemon/gvfsbackendobexftp.c:1338 ../daemon/gvfsbackendobexftp.c:1360
+#: ../daemon/gvfsbackendobexftp.c:1420 ../daemon/gvfsbackendobexftp.c:1439
+#: ../daemon/gvfsbackendsmb.c:1015 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:297
+msgid "Operation was cancelled"
+msgstr "Operationen blev annulleret"
+
+#: ../client/gdaemonfileinputstream.c:1211
+#: ../client/gdaemonfileoutputstream.c:946
+msgid "Seek not supported on stream"
+msgstr "Søgning understøttes ikke for denne strøm"
+
+#: ../client/gdaemonfileinputstream.c:1241
+msgid "The query info operation is not supported"
+msgstr "Query-info-operationen understøttes ikke"
+
+#: ../client/gdaemonvfs.c:731
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "Fejl under indhentning af monteringsinformation: %s"
+
+#: ../client/gvfsdaemondbus.c:559 ../client/gvfsdaemondbus.c:946
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "Fejl ved forbindelse til dæmon: %s"
+
+#: ../common/gsysutils.c:133
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "Fejl ved oprettelse af sokkel: %s"
+
+#: ../common/gsysutils.c:171
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "Fejl ved forbindelse til sokkel: %s"
+
+#: ../common/gvfsdaemonprotocol.c:515
+msgid "Invalid file info format"
+msgstr "Ugyldig filinformationsformat"
+
+#: ../common/gvfsdaemonprotocol.c:532
+msgid "Invalid attribute info list content"
+msgstr "Ugyldigt indhold af attribut-infoliste"
+
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr "Fejl ved forbindelse til D-Bus: %s"
+
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+#: ../daemon/daemon-main.c:78
+#, c-format
+msgid "%s Filesystem Service"
+msgstr "%s-filsystemstjeneste"
+
+#: ../daemon/daemon-main.c:97
+#, c-format
+msgid "Error: %s"
+msgstr "Fejl: %s"
+
+#: ../daemon/daemon-main.c:131
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "Brug: %s --spawner dbus-id objektsti"
+
+#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "Brug: %s nøgle=værdi nøgle=værdi ..."
+
+#: ../daemon/daemon-main.c:171
+#, c-format
+msgid "No mount type specified"
+msgstr "Ingen monteringstype angivet"
+
+#: ../daemon/daemon-main.c:241
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "monteringspunkt for %s kører allerede"
+
+#: ../daemon/daemon-main.c:252
+msgid "error starting mount daemon"
+msgstr "fejl ved opstart af monteringsdæmon"
+
+# name of the backend?  Så må vi hellere være forsigtige
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:347
+msgid "Burn"
+msgstr "Burn"
+
+#: ../daemon/gvfsbackendburn.c:377
+msgid "Unable to create temporary directory"
+msgstr "Kan ikke oprette midlertidig mappe"
+
+#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
+#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
+#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
+#: ../daemon/gvfsbackendburn.c:784
+msgid "No such file or directory"
+msgstr "Filen eller mappen findes ikke"
+
+#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1804
+msgid "Directory not empty"
+msgstr "Mappen er ikke tom"
+
+#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:898
+msgid "Can't copy file over directory"
+msgstr "Kan ikke kopiere fil over mappe"
+
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:652
+msgid "CD/DVD Creator"
+msgstr "CD/DVD Creator"
+
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:846
+#: ../daemon/gvfsbackendnetwork.c:637
+#, c-format
+msgid "The file is not a directory"
+msgstr "Filen er ikke en mappe"
+
+#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
+#: ../daemon/gvfsbackendburn.c:918
+msgid "File exists"
+msgstr "Filen findes"
+
+#: ../daemon/gvfsbackendburn.c:846
+msgid "No such file or directory in target path"
+msgstr "Filen eller mappen findes ikke i destinationsstien"
+
+#: ../daemon/gvfsbackendburn.c:869
+msgid "Can't copy directory over directory"
+msgstr "Kan ikke kopiere mappe over mappen"
+
+#: ../daemon/gvfsbackendburn.c:878
+msgid "Target file exists"
+msgstr "Destinationsfilen findes"
+
+#: ../daemon/gvfsbackendburn.c:885
+msgid "Can't recursively copy directory"
+msgstr "Kan ikke kopiere mappen rekursivt"
+
+#: ../daemon/gvfsbackendburn.c:944
+msgid "Not supported"
+msgstr "Ikke understøttet"
+
+#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:335
+msgid "No drive specified"
+msgstr "Intet drev angivet"
+
+#: ../daemon/gvfsbackendcdda.c:279
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "Kan ikke finde drevet %s"
+
+#: ../daemon/gvfsbackendcdda.c:289
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "Drevet %s indeholder ikke lydfiler"
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:297
+#, c-format
+msgid "cdda mount on %s"
+msgstr "cdda-montering på %s"
+
+#: ../daemon/gvfsbackendcdda.c:298 ../daemon/gvfsbackendcdda.c:802
+#: ../hal/ghalmount.c:492 ../hal/ghalvolume.c:298 ../hal/ghalvolume.c:319
+#, c-format
+msgid "Audio Disc"
+msgstr "Audio-disk"
+
+#: ../daemon/gvfsbackendcdda.c:359
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "Filsystemet er optaget: %d åben fil"
+msgstr[1] "Filsystemet er optaget: %d åbne filer"
+
+#: ../daemon/gvfsbackendcdda.c:549
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "Filen %s findes ikke på drevet %s"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:658
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr "Fejl fra \"paranoia\" på drevet %s"
+
+#: ../daemon/gvfsbackendcdda.c:721
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "Fejl ved søgning i strøm på drevet %s"
+
+#: ../daemon/gvfsbackendcdda.c:818 ../daemon/gvfsbackendgphoto2.c:1695
+#, c-format
+msgid "No such file"
+msgstr "Filen findes ikke"
+
+#: ../daemon/gvfsbackendcdda.c:825 ../daemon/gvfsbackendcomputer.c:573
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1955
+#: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
+#, c-format
+msgid "File doesn't exist"
+msgstr "Filen findes ikke"
+
+#: ../daemon/gvfsbackendcdda.c:832
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "Filen findes ikke eller er ikke et lydspor"
+
+#: ../daemon/gvfsbackendcdda.c:938
+msgid "Audio CD Filesystem Service"
+msgstr "Filsystemstjeneste for Audio-CD"
+
+#: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
+msgid "Computer"
+msgstr "Computer"
+
+#: ../daemon/gvfsbackendcomputer.c:467
+msgid "Filesystem"
+msgstr "Filsystem"
+
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendgphoto2.c:1687
+#: ../daemon/gvfsbackendobexftp.c:760 ../daemon/gvfsbackendtrash.c:637
+msgid "Can't open directory"
+msgstr "Kan ikke åbne mappe"
+
+#: ../daemon/gvfsbackendcomputer.c:595 ../daemon/gvfsbackendcomputer.c:733
+msgid "Can't open mountable file"
+msgstr "Kan ikke åbne monterbar fil"
+
+#: ../daemon/gvfsbackendcomputer.c:781
+#, c-format
+msgid "Internal error: %s"
+msgstr "Intern fejl: %s"
+
+#: ../daemon/gvfsbackendcomputer.c:813 ../daemon/gvfsbackendcomputer.c:930
+msgid "Can't mount file"
+msgstr "Kan ikke montere fil"
+
+#: ../daemon/gvfsbackendcomputer.c:825
+msgid "No media in the drive"
+msgstr "Intet medie i drevet"
+
+#: ../daemon/gvfsbackendcomputer.c:882 ../daemon/gvfsbackendcomputer.c:973
+#: ../daemon/gvfsbackendcomputer.c:1073
+msgid "Not a mountable file"
+msgstr "Ikke en monterbar fil"
+
+#: ../daemon/gvfsbackendcomputer.c:988
+msgid "Can't unmount file"
+msgstr "Kan ikke afmontere fil"
+
+# ??
+#: ../daemon/gvfsbackendcomputer.c:1104
+msgid "Can't eject file"
+msgstr "Kan ikke skubbe filen ud"
+
+#: ../daemon/gvfsbackenddav.c:269 ../daemon/gvfsbackenddav.c:1289
+#: ../daemon/gvfsbackendhttp.c:220
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "HTTP-fejl: %s"
+
+#: ../daemon/gvfsbackenddav.c:285
+msgid "Could not parse response"
+msgstr "Kunne ikke fortolke svaret"
+
+#: ../daemon/gvfsbackenddav.c:294
+msgid "Empty response"
+msgstr "Tomt svar"
+
+#: ../daemon/gvfsbackenddav.c:301
+msgid "Unexpected reply from server"
+msgstr "Uventet svar fra server"
+
+#: ../daemon/gvfsbackenddav.c:944 ../daemon/gvfsbackenddav.c:1421
+#, c-format
+msgid "Response invalid"
+msgstr "Ugyldigt svar"
+
+#: ../daemon/gvfsbackenddav.c:1087
+msgid "WebDAV share"
+msgstr "WebDAV-tjeneste"
+
+#: ../daemon/gvfsbackenddav.c:1089
+#, c-format
+msgid "Enter password for %s"
+msgstr "Indtast kodeord for %s"
+
+# proxy?  Nå, vi skriver det bare...
+#: ../daemon/gvfsbackenddav.c:1092
+msgid "Please enter proxy password"
+msgstr "Indtast venligst et proxy-kodeord"
+
+#: ../daemon/gvfsbackenddav.c:1206 ../daemon/gvfsbackendhttp.c:273
+#: ../daemon/gvfsbackendobexftp.c:605 ../daemon/gvfsbackendobexftp.c:616
+#: ../daemon/gvfsbackendsmb.c:595
+msgid "Invalid mount spec"
+msgstr "Ugyldig monteringsspecifikation"
+
+#: ../daemon/gvfsbackenddav.c:1293 ../daemon/gvfsbackenddav.c:1297
+msgid "Not a WebDAV enabled share"
+msgstr "Ikke en WebDAV-aktiveret deling"
+
+#: ../daemon/gvfsbackenddav.c:1319
+#, c-format
+msgid "WebDAV on %s"
+msgstr "WebDAV på %s"
+
+#: ../daemon/gvfsbackenddav.c:1377 ../daemon/gvfsbackenddav.c:1448
+msgid "Could not create request"
+msgstr "Kunne ikke oprette forespørgsel"
+
+#: ../daemon/gvfsbackenddav.c:1511 ../daemon/gvfsbackenddav.c:1764
+#: ../daemon/gvfsbackendftp.c:1558 ../daemon/gvfsbackendftp.c:2189
+#: ../daemon/gvfsbackendsmb.c:1701
+#, c-format
+msgid "Target file already exists"
+msgstr "Destinationsfilen findes allerede"
+
+#: ../daemon/gvfsbackenddav.c:1584 ../daemon/gvfsbackendsftp.c:2662
+#: ../daemon/gvfsbackendsmb.c:983
+msgid "The file was externally modified"
+msgstr "Filen blev modificeret udefra"
+
+#: ../daemon/gvfsbackenddav.c:1615 ../daemon/gvfsbackendsmb.c:1021
+#: ../daemon/gvfsbackendsmb.c:1718
+msgid "Backup file creation failed"
+msgstr "Oprettelse af sikkerhedskopi af filen slog fejl"
+
+#. TODO: Name
+#: ../daemon/gvfsbackenddnssd.c:433
+msgid "dns-sd"
+msgstr "dsn-sd"
+
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
+msgid "Can't monitor file or directory."
+msgstr "Kan ikke overvåge fil eller mappe."
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:687
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+msgid "Network"
+msgstr "Netværk"
+
+#: ../daemon/gvfsbackendftp.c:224
+msgid "Accounts are unsupported"
+msgstr "Kontoerne understøttes ikke"
+
+#: ../daemon/gvfsbackendftp.c:228
+msgid "Host closed connection"
+msgstr "Værten lukkede forbindelsen"
+
+#: ../daemon/gvfsbackendftp.c:232
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Kan ikke åbne dataforbindelse. Bliver det forhindret af din brandmur?"
+
+#: ../daemon/gvfsbackendftp.c:236
+msgid "Data connection closed"
+msgstr "Dataforbindelse lukket"
+
+#: ../daemon/gvfsbackendftp.c:242
+msgid "File unavailable"
+msgstr "Filen utilgængelig"
+
+#: ../daemon/gvfsbackendftp.c:246
+msgid "Operation failed"
+msgstr "Operationen slog fejl"
+
+#: ../daemon/gvfsbackendftp.c:251
+msgid "No space left on server"
+msgstr "Ikke mere plads på serveren"
+
+#: ../daemon/gvfsbackendftp.c:259 ../daemon/gvfsbackendsftp.c:3684
+msgid "Operation unsupported"
+msgstr "Operationen understøttes ikke"
+
+#: ../daemon/gvfsbackendftp.c:263 ../daemon/gvfsbackendsftp.c:259
+msgid "Permission denied"
+msgstr "Adgang nægtet"
+
+#: ../daemon/gvfsbackendftp.c:267
+msgid "Page type unknown"
+msgstr "Ukendt sidetype"
+
+#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:2059
+#, c-format
+msgid "Invalid filename"
+msgstr "Ugyldigt filnavn"
+
+#: ../daemon/gvfsbackendftp.c:275 ../daemon/gvfsbackendftp.c:349
+#: ../daemon/gvfsbackendftp.c:378 ../daemon/gvfsbackendftp.c:397
+#: ../daemon/gvfsbackendftp.c:410 ../daemon/gvfsbackendftp.c:751
+#, c-format
+msgid "Invalid reply"
+msgstr "Ugyldigt svar"
+
+#: ../daemon/gvfsbackendftp.c:517
+#, c-format
+msgid "broken transmission"
+msgstr "transmission afbrudt"
+
+#: ../daemon/gvfsbackendftp.c:611 ../daemon/gvfsbackendftp.c:771
+#, c-format
+msgid "Could not connect to host"
+msgstr "Kunne ikke forbinde til værten"
+
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendftp.c:897 ../daemon/gvfsbackendsftp.c:1736
+#, c-format
+msgid "/ on %s"
+msgstr "/ på %s"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:1259
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "Indtast kodeord for ftp på %s"
+
+#: ../daemon/gvfsbackendftp.c:1279 ../daemon/gvfsbackendsftp.c:833
+msgid "Password dialog cancelled"
+msgstr "Kodeordsdialog afbrudt"
+
+#: ../daemon/gvfsbackendftp.c:1345
+#, c-format
+msgid "ftp on %s"
+msgstr "ftp på %s"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1351
+#, c-format
+msgid "ftp as %s on %s"
+msgstr "ftp som %s på %s"
+
+#: ../daemon/gvfsbackendftp.c:1385 ../daemon/gvfsbackendsftp.c:1410
+msgid "No hostname specified"
+msgstr "Intet værtsnavn angivet"
+
+#: ../daemon/gvfsbackendftp.c:1608 ../daemon/gvfsbackendftp.c:2150
+msgid "backups not supported yet"
+msgstr "sikkerhedskopier understøttes endnu ikke"
+
+#: ../daemon/gvfsbackendftp.c:1684
+#, c-format
+msgid "filename too long"
+msgstr "filnavnet er for langt"
+
+#: ../daemon/gvfsbackendftp.c:2169
+#, c-format
+msgid "Invalid destination filename"
+msgstr "Ugyldigt destinationsfilnavn"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:697
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "Digitalkamera (%s)"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:843 ../hal/ghalvolume.c:398
+#, c-format
+msgid "%s Camera"
+msgstr "%s-kamera"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:846 ../hal/ghalvolume.c:393
+#, c-format
+msgid "%s Audio Player"
+msgstr "%s-lydafspiller"
+
+#: ../daemon/gvfsbackendgphoto2.c:855 ../hal/ghalvolume.c:407
+msgid "Camera"
+msgstr "Kamera"
+
+#: ../daemon/gvfsbackendgphoto2.c:857 ../hal/ghalvolume.c:405
+msgid "Audio Player"
+msgstr "Lydafspiller"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:1539
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "gphoto2-montering på %s"
+
+#: ../daemon/gvfsbackendhttp.c:216
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "HTTP-klientfejl: %s"
+
+#: ../daemon/gvfsbackendhttp.c:534 ../daemon/gvfsbackendsftp.c:1724
+#: ../daemon/gvfsbackendsmb.c:1230 ../daemon/gvfsbackendtrash.c:962
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (ugyldig kodning)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr "Mappeunderrettelse understøttes ikke"
+
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Windows-netværk"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:392
+msgid "Local Network"
+msgstr "Lokalt netværk"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:862
+msgid "Network Location Monitor"
+msgstr "Netværksstedsovervåger"
+
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:444 ../daemon/gvfsbackendsmb.c:514
+#: ../daemon/gvfsbackendsmb.c:1223
+#, c-format
+msgid "%s on %s"
+msgstr "%s på %s"
+
+#: ../daemon/gvfsbackendsftp.c:251
+msgid "ssh program unexpectedly exited"
+msgstr "ssh-programmet afsluttede uventet"
+
+#: ../daemon/gvfsbackendsftp.c:266
+msgid "Hostname not known"
+msgstr "Ukendt værtsnavn"
+
+#: ../daemon/gvfsbackendsftp.c:273
+msgid "No route to host"
+msgstr "Ingen rute til vært"
+
+#: ../daemon/gvfsbackendsftp.c:280
+msgid "Connection refused by server"
+msgstr "Forbindelse nægtet af server"
+
+#: ../daemon/gvfsbackendsftp.c:287
+msgid "Host key verification failed"
+msgstr "Godkendelse af værtsnøgle slog fejl"
+
+#: ../daemon/gvfsbackendsftp.c:370
+msgid "Unable to spawn ssh program"
+msgstr "Kunne ikke starte ny instans af ssh-program"
+
+#: ../daemon/gvfsbackendsftp.c:386
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "Kunne ikke starte ny instans af ssh-program: %s"
+
+#: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:741
+msgid "Timed out when logging in"
+msgstr "Tidsudløb ved indlogning"
+
+#: ../daemon/gvfsbackendsftp.c:817
+msgid "Enter passphrase for key"
+msgstr "Indtast adgangskode for nøgle"
+
+#: ../daemon/gvfsbackendsftp.c:819
+msgid "Enter password"
+msgstr "Indtast kodeord"
+
+#: ../daemon/gvfsbackendsftp.c:880
+msgid "Can't send password"
+msgstr "Kan ikke sende kodeord"
+
+#: ../daemon/gvfsbackendsftp.c:888
+msgid "Log In Anyway"
+msgstr "Log ind alligevel"
+
+#: ../daemon/gvfsbackendsftp.c:888
+msgid "Cancel Login"
+msgstr "Afbryd indlogning"
+
+#: ../daemon/gvfsbackendsftp.c:898
+#, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
+msgstr ""
+"Identiteten af den fjerne computer (%s) er ukendt.\n"
+"Dette sker når du logger ind på en computer første gang.\n"
+"\n"
+"Identiteten som sendes af den fjerne computer er %s. Hvis du vil være fuldstændig sikker på at det er sikkert at fortsætte, så kontakt systemadministratoren."
+
+#: ../daemon/gvfsbackendsftp.c:918
+msgid "Login dialog cancelled"
+msgstr "Logind-dialog afbrudt"
+
+#: ../daemon/gvfsbackendsftp.c:938
+msgid "Can't send host identity confirmation"
+msgstr "Kan ikke sende bekræftelse af værtsidentitet"
+
+#: ../daemon/gvfsbackendsftp.c:1329 ../daemon/gvfsbackendsftp.c:1352
+msgid "Protocol error"
+msgstr "Protokolfejl"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1376
+#, c-format
+msgid "sftp on %s"
+msgstr "sftp på %s"
+
+#: ../daemon/gvfsbackendsftp.c:1400
+msgid "Unable to find supported ssh command"
+msgstr "Kunne ikke finde en understøttet ssh-kommando"
+
+#: ../daemon/gvfsbackendsftp.c:1800
+msgid "File is directory"
+msgstr "Filen er en mappe"
+
+#: ../daemon/gvfsbackendsftp.c:1809
+msgid "Failure"
+msgstr "Mislykkedes"
+
+#: ../daemon/gvfsbackendsftp.c:1874 ../daemon/gvfsbackendsftp.c:1936
+#: ../daemon/gvfsbackendsftp.c:1947 ../daemon/gvfsbackendsftp.c:2005
+#: ../daemon/gvfsbackendsftp.c:2095 ../daemon/gvfsbackendsftp.c:2124
+#: ../daemon/gvfsbackendsftp.c:2172 ../daemon/gvfsbackendsftp.c:2251
+#: ../daemon/gvfsbackendsftp.c:2362 ../daemon/gvfsbackendsftp.c:2403
+#: ../daemon/gvfsbackendsftp.c:2455 ../daemon/gvfsbackendsftp.c:2526
+#: ../daemon/gvfsbackendsftp.c:2546 ../daemon/gvfsbackendsftp.c:2700
+#: ../daemon/gvfsbackendsftp.c:2726 ../daemon/gvfsbackendsftp.c:2783
+#: ../daemon/gvfsbackendsftp.c:2842 ../daemon/gvfsbackendsftp.c:3122
+#: ../daemon/gvfsbackendsftp.c:3251 ../daemon/gvfsbackendsftp.c:3284
+#: ../daemon/gvfsbackendsftp.c:3385 ../daemon/gvfsbackendsftp.c:3426
+#: ../daemon/gvfsbackendsftp.c:3482 ../daemon/gvfsbackendsftp.c:3518
+#: ../daemon/gvfsbackendsftp.c:3552 ../daemon/gvfsbackendsftp.c:3567
+#: ../daemon/gvfsbackendsftp.c:3586 ../daemon/gvfsbackendsftp.c:3664
+msgid "Invalid reply received"
+msgstr "Ugyldigt svar modtaget"
+
+#: ../daemon/gvfsbackendsftp.c:2193
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "Fejl ved oprettelse af sikkerhedskopi af fil: %s"
+
+#: ../daemon/gvfsbackendsftp.c:2608
+msgid "Unable to create temporary file"
+msgstr "Kunne ikke oprette midlertidig fil"
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:214
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "Delingen %s på %s kræver et kodeord"
+
+#: ../daemon/gvfsbackendsmb.c:466 ../daemon/gvfsbackendsmb.c:506
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Intern fejl (%s)"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:561
+msgid "Failed to mount Windows share"
+msgstr "Kunne ikke montere Windows-deling"
+
+#: ../daemon/gvfsbackendsmb.c:686 ../daemon/gvfsbackendsmb.c:1117
+msgid "Unsupported seek type"
+msgstr "Uunderstøttet søgningstype"
+
+#: ../daemon/gvfsbackendsmb.c:1171
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "Oprettelse af sikkerhedskopifil mislykkedes: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1602
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Fejl ved sletning af fil: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1666
+#, c-format
+msgid "Error moving file: %s"
+msgstr "Fejl ved flytning af fil: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1690
+msgid "Can't move directory over directory"
+msgstr "Kan ikke flytte mappe over mappe"
+
+#: ../daemon/gvfsbackendsmb.c:1738
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "Fejl ved fjernelse af destinationsfil: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1762
+msgid "Can't recursively move directory"
+msgstr "Kan ikke flytte mappen rekursivt"
+
+#: ../daemon/gvfsbackendsmb.c:1825
+msgid "Windows Shares Filesystem Service"
+msgstr "Filsystemstjeneste for Windows-delinger"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:702
+#, c-format
+msgid "Windows shares on %s"
+msgstr "Windows-delinger på %s"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:794 ../daemon/gvfsbackendsmbbrowse.c:840
+msgid "The file is not a mountable"
+msgstr "Denne fil kan ikke monteres"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:862
+msgid "Not a regular file"
+msgstr "Ikke en regulær fil"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1107
+msgid "Not a directory"
+msgstr "Ikke en mappe"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1219
+msgid "Windows Network Filesystem Service"
+msgstr "Filsystemstjeneste til Windows-netværk"
+
+#. translators: This is the name of the backend
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:600 ../daemon/gvfsbackendtrash.c:1190
+msgid "Trash"
+msgstr "Papirkurv"
+
+#: ../daemon/gvfsbackendtrash.c:972
+#, c-format
+msgid "%s (in trash)"
+msgstr "%s (i papirkurv)"
+
+#: ../daemon/gvfsbackendtrash.c:1291
+msgid "Can't delete trash"
+msgstr "Kan ikke slette affald"
+
+#: ../daemon/gvfsbackendtrash.c:1638 ../daemon/gvfsbackendtrash.c:1713
+msgid "Trash directory notification not supported"
+msgstr "Underrettelse om papirkurvsmappe understøttes ikke"
+
+#: ../daemon/gvfsdaemon.c:1032
+msgid "Invalid backend type"
+msgstr "Ugyldig backend-type"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "Fejl ved afsending af fildeskriptor: %s"
+
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "Operationen understøttes ikke af backend"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "Backend understøtter ikke symbolske links"
+
+#: ../daemon/gvfsjobsetattribute.c:123
+msgid "Invalid dbus message"
+msgstr "Ugyldig dbus-meddelelse"
+
+#: ../daemon/main.c:47
+msgid "Replace old daemon."
+msgstr "Erstat gammel dæmon."
+
+#: ../daemon/main.c:48
+msgid "Don't start fuse."
+msgstr "Undlad at starte fuse."
+
+#: ../daemon/main.c:60
+msgid "GVFS Daemon"
+msgstr "GVFS-dæmon"
+
+#: ../daemon/main.c:63
+msgid "Main daemon for GVFS"
+msgstr "Hoveddæmon for GVFS"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:74
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:165 ../programs/gvfs-cat.c:178
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-ls.c:388 ../programs/gvfs-move.c:97
+#: ../programs/gvfs-open.c:133 ../programs/gvfs-open.c:146
+#: ../programs/gvfs-save.c:165 ../programs/gvfs-tree.c:253
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "Prøv \"%s --help\" for mere information."
+
+# spawn? Det er sådan et halv-reserveret ord, en specifik OS-funktion
+#: ../daemon/mount.c:432
+msgid "Invalid arguments from spawned child"
+msgstr "Ugyldige argumenter fra spawnet underproces"
+
+#: ../daemon/mount.c:731
+#, c-format
+msgid "Automount failed: %s"
+msgstr "Automontering mislykkedes: %s"
+
+#: ../daemon/mount.c:776
+msgid "The specified location is not mounted"
+msgstr "Den angivne placering er ikke monteret"
+
+#: ../daemon/mount.c:781
+msgid "The specified location is not supported"
+msgstr "Den angivne placering understøttes ikke"
+
+#: ../daemon/mount.c:944
+msgid "Location is already mounted"
+msgstr "Placeringen er allerede monteret"
+
+#: ../daemon/mount.c:952
+msgid "Location is not mountable"
+msgstr "Placeringen kan ikke monteres"
+
+#: ../hal/ghaldrive.c:144
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../hal/ghaldrive.c:146
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../hal/ghaldrive.c:148
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../hal/ghaldrive.c:152
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../hal/ghaldrive.c:154
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../hal/ghaldrive.c:156
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../hal/ghaldrive.c:158
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../hal/ghaldrive.c:160
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../hal/ghaldrive.c:162
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../hal/ghaldrive.c:165
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../hal/ghaldrive.c:168
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../hal/ghaldrive.c:170
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../hal/ghaldrive.c:172
+msgid "HDDVD-r"
+msgstr "HDDVD-r"
+
+#: ../hal/ghaldrive.c:174
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../hal/ghaldrive.c:176
+msgid "Blu-ray"
+msgstr "Blu-ray"
+
+#: ../hal/ghaldrive.c:178
+msgid "Blu-ray-R"
+msgstr "Blu-ray-R"
+
+#: ../hal/ghaldrive.c:180
+msgid "Blu-ray-RE"
+msgstr "Blu-ray-RE"
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../hal/ghaldrive.c:186
+#, c-format
+msgid "%s/%s Drive"
+msgstr "%s/%s-drev"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../hal/ghaldrive.c:192
+#, c-format
+msgid "%s Drive"
+msgstr "%s-drev"
+
+#: ../hal/ghaldrive.c:196
+msgid "Floppy Drive"
+msgstr "Diskettedrev"
+
+#: ../hal/ghaldrive.c:202
+msgid "Software RAID Drive"
+msgstr "Sofware-RAID-drev"
+
+#: ../hal/ghaldrive.c:204
+msgid "USB Drive"
+msgstr "USB-drev"
+
+#: ../hal/ghaldrive.c:206
+msgid "ATA Drive"
+msgstr "ATA-drev"
+
+#: ../hal/ghaldrive.c:208
+msgid "SCSI Drive"
+msgstr "SCSI-drev"
+
+#: ../hal/ghaldrive.c:210
+msgid "FireWire Drive"
+msgstr "FireWire-drev"
+
+#: ../hal/ghaldrive.c:214
+msgid "Tape Drive"
+msgstr "Bånddrev"
+
+#: ../hal/ghaldrive.c:216
+msgid "CompactFlash Drive"
+msgstr "CompactFlash-drev"
+
+# MemoryStick bør nok ikke oversættes da det refererer til en bestemt teknologi
+#: ../hal/ghaldrive.c:218
+msgid "MemoryStick Drive"
+msgstr "MemoryStick-drev"
+
+#: ../hal/ghaldrive.c:220
+msgid "SmartMedia Drive"
+msgstr "SmartMedia-drev"
+
+#: ../hal/ghaldrive.c:222
+msgid "SD/MMC Drive"
+msgstr "SD/MMC-drev"
+
+#: ../hal/ghaldrive.c:224
+msgid "Zip Drive"
+msgstr "Zip-drev"
+
+#: ../hal/ghaldrive.c:226
+msgid "Jaz Drive"
+msgstr "Jaz-drev"
+
+#: ../hal/ghaldrive.c:228
+msgid "Thumb Drive"
+msgstr "Thumb-drev"
+
+# wiki: "Devices which support this standard are referred to as MSC (Mass Storage Class) devices. Blahblah..."
+#: ../hal/ghaldrive.c:231
+msgid "Mass Storage Drive"
+msgstr "Mass Storage-drev"
+
+#: ../hal/ghaldrive.c:730
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "Kunne ikke skubbe mediet ud; et eller flere drev på mediet er optaget."
+
+#: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
+msgid "CD-ROM Disc"
+msgstr "CD-ROM-disk"
+
+#: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
+msgid "Blank CD-ROM Disc"
+msgstr "Tom CD-ROM-disk"
+
+#: ../hal/ghalmount.c:167 ../hal/ghalvolume.c:156
+msgid "CD-R Disc"
+msgstr "CD-R-disk"
+
+#: ../hal/ghalmount.c:167 ../hal/ghalvolume.c:156
+msgid "Blank CD-R Disc"
+msgstr "Tom CD-R-disk"
+
+#: ../hal/ghalmount.c:168 ../hal/ghalvolume.c:157
+msgid "CD-RW Disc"
+msgstr "CD-RW-disk"
+
+#: ../hal/ghalmount.c:168 ../hal/ghalvolume.c:157
+msgid "Blank CD-RW Disc"
+msgstr "Tom CD-RW-disk"
+
+#: ../hal/ghalmount.c:169 ../hal/ghalmount.c:171 ../hal/ghalvolume.c:158
+#: ../hal/ghalvolume.c:160
+msgid "DVD-ROM Disc"
+msgstr "DVD-ROM-disk"
+
+#: ../hal/ghalmount.c:169 ../hal/ghalmount.c:171 ../hal/ghalvolume.c:158
+#: ../hal/ghalvolume.c:160
+msgid "Blank DVD-ROM Disc"
+msgstr "Tom DVD-ROM-disk"
+
+#: ../hal/ghalmount.c:170 ../hal/ghalvolume.c:159
+msgid "DVD-RAM Disc"
+msgstr "DVD-RAM-disk"
+
+#: ../hal/ghalmount.c:170 ../hal/ghalvolume.c:159
+msgid "Blank DVD-RAM Disc"
+msgstr "Blank DVD-RAM-disk"
+
+#: ../hal/ghalmount.c:172 ../hal/ghalvolume.c:161
+msgid "DVD-RW Disc"
+msgstr "DVD-RW-disk"
+
+#: ../hal/ghalmount.c:172 ../hal/ghalvolume.c:161
+msgid "Blank DVD-RW Disc"
+msgstr "Tom DVD-RW-disk"
+
+#: ../hal/ghalmount.c:173 ../hal/ghalvolume.c:162
+msgid "DVD+R Disc"
+msgstr "DVD+R-disk"
+
+#: ../hal/ghalmount.c:173 ../hal/ghalvolume.c:162
+msgid "Blank DVD+R Disc"
+msgstr "Tom DVD+R-disk"
+
+#: ../hal/ghalmount.c:174 ../hal/ghalvolume.c:163
+msgid "DVD+RW Disc"
+msgstr "DVD+RW-disk"
+
+#: ../hal/ghalmount.c:174 ../hal/ghalvolume.c:163
+msgid "Blank DVD+RW Disc"
+msgstr "Tom DVD+RW-disk"
+
+#: ../hal/ghalmount.c:175 ../hal/ghalvolume.c:164
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL-disk"
+
+#: ../hal/ghalmount.c:175 ../hal/ghalvolume.c:164
+msgid "Blank DVD+R DL Disc"
+msgstr "Tom DVD+R DL-disk"
+
+#: ../hal/ghalmount.c:176 ../hal/ghalvolume.c:165
+msgid "Blu-Ray Disc"
+msgstr "Blu-Ray-disk"
+
+#: ../hal/ghalmount.c:176 ../hal/ghalvolume.c:165
+msgid "Blank Blu-Ray Disc"
+msgstr "Tom Blu-Ray-disk"
+
+#: ../hal/ghalmount.c:177 ../hal/ghalvolume.c:166
+msgid "Blu-Ray R Disc"
+msgstr "Blu-Ray R-disk"
+
+#: ../hal/ghalmount.c:177 ../hal/ghalvolume.c:166
+msgid "Blank Blu-Ray R Disc"
+msgstr "Tom Blu-Ray R-disk"
+
+#: ../hal/ghalmount.c:178 ../hal/ghalvolume.c:167
+msgid "Blu-Ray RW Disc"
+msgstr "Blu-Ray RW-disk"
+
+#: ../hal/ghalmount.c:178 ../hal/ghalvolume.c:167
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Tom Blu-Ray RW-disk"
+
+#: ../hal/ghalmount.c:179 ../hal/ghalvolume.c:168
+msgid "HD DVD Disc"
+msgstr "HD DVD-disk"
+
+#: ../hal/ghalmount.c:179 ../hal/ghalvolume.c:168
+msgid "Blank HD DVD Disc"
+msgstr "Tom HD DVD-disk"
+
+#: ../hal/ghalmount.c:180 ../hal/ghalvolume.c:169
+msgid "HD DVD-R Disc"
+msgstr "HD DVD-R-disk"
+
+#: ../hal/ghalmount.c:180 ../hal/ghalvolume.c:169
+msgid "Blank HD DVD-R Disc"
+msgstr "Tom HD DVD-R-disk"
+
+#: ../hal/ghalmount.c:181 ../hal/ghalvolume.c:170
+msgid "HD DVD-RW Disc"
+msgstr "HD DVD-RW-disk"
+
+#: ../hal/ghalmount.c:181 ../hal/ghalvolume.c:170
+msgid "Blank HD DVD-RW Disc"
+msgstr "Tom HD DVD-RW-disk"
+
+#: ../hal/ghalmount.c:182 ../hal/ghalvolume.c:171
+msgid "MO Disc"
+msgstr "MO-disk"
+
+#: ../hal/ghalmount.c:182 ../hal/ghalvolume.c:171
+msgid "Blank MO Disc"
+msgstr "Tom MO-disk"
+
+#: ../hal/ghalmount.c:183 ../hal/ghalvolume.c:172
+msgid "Disc"
+msgstr "Disk"
+
+#: ../hal/ghalmount.c:183 ../hal/ghalvolume.c:172
+msgid "Blank Disc"
+msgstr "Tom disk"
+
+#: ../hal/ghalmount.c:368
+#, c-format
+msgid "%.1f kB Media"
+msgstr "%.1f kB-medie"
+
+#: ../hal/ghalmount.c:373
+#, c-format
+msgid "%.1f MB Media"
+msgstr "%.1f MB-medie"
+
+#: ../hal/ghalmount.c:378
+#, c-format
+msgid "%.1f GB Media"
+msgstr "%.1f GB-medie"
+
+#: ../hal/ghalmount.c:490 ../hal/ghalvolume.c:317
+msgid "Mixed Audio/Data Disc"
+msgstr "Blandet lyd-/datadisk"
+
+#: ../hal/ghalvolume.c:206
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kB"
+
+#: ../hal/ghalvolume.c:211
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: ../hal/ghalvolume.c:216
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:305
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s krypteret data"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../hal/ghalvolume.c:328
+#, c-format
+msgid "%s Media"
+msgstr "%s-medie"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:59
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: fejl ved åbning af fil: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:82
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, skrivefejl til standard-uddata"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:94
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: læsefejl: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:112
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s: fejl ved lukning: %s\n"
+
+# ??? det er nok en identifier (som det er ok at oversætte)
+#: ../programs/gvfs-cat.c:138
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "PLACERING... - sammenføj PLACERINGER til standard-uddata."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:143
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr "Sammenføj filer på forskellige placeringer og udskriv til standard-uddata. Virker præcis som det traditionelle cat-værktøj, men bruger gvfs-placeringer i stedet for lokale filer: for eksempel kan du skrive smb://server/resource/file.txt som placeringen der skal sammenføjes."
+
+#: ../programs/gvfs-cat.c:150
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr "NB: send dette (pipe) gennem cat hvis du skal bruge cats formatteringstilvalg såsom -n og -T."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:176 ../programs/gvfs-open.c:144
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: mangler placeringer"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:58
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: fejl ved åbning af placering: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:85
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: fejl ved programopstart: %s\n"
+
+#: ../programs/gvfs-open.c:115
+msgid "FILES... - open FILES with registered application."
+msgstr "FILER... - åbn FILER med registreret program."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:119
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr "Åbner filen eller filerne med det forvalgte program for den pågældende filtype."
