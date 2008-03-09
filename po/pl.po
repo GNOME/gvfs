@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-08 22:50+0100\n"
+"POT-Creation-Date: 2008-03-09 12:13+0100\n"
 "PO-Revision-Date: 2008-03-07 14:08+0100\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Tomasz Dominikowski (Aviary.pl) <dominikowski@gmail.com>\n"
@@ -180,6 +180,7 @@ msgid "Usage: %s key=value key=value ..."
 msgstr "Użytkowanie: %s key=wartość key=wartość ..."
 
 #: ../daemon/daemon-main.c:171
+#, c-format
 msgid "No mount type specified"
 msgstr "Nie podanu typu montowania"
 
@@ -224,6 +225,7 @@ msgstr "Asystent CD/DVD"
 #: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
 #: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:846
 #: ../daemon/gvfsbackendnetwork.c:637
+#, c-format
 msgid "The file is not a directory"
 msgstr "Plik nie jest folderem"
 
@@ -274,6 +276,7 @@ msgstr "Punkt montowania cdda na %s"
 
 #: ../daemon/gvfsbackendcdda.c:298 ../daemon/gvfsbackendcdda.c:802
 #: ../hal/ghalmount.c:492 ../hal/ghalvolume.c:298 ../hal/ghalvolume.c:319
+#, c-format
 msgid "Audio Disc"
 msgstr "Płyta CD-Audio"
 
@@ -302,6 +305,7 @@ msgid "Error seeking in stream on drive %s"
 msgstr "Błąd podczas wyszukiwania w strumieniu w napędzie %s"
 
 #: ../daemon/gvfsbackendcdda.c:818 ../daemon/gvfsbackendgphoto2.c:1695
+#, c-format
 msgid "No such file"
 msgstr "Nie ma takiego pliku"
 
@@ -310,10 +314,12 @@ msgstr "Nie ma takiego pliku"
 #: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
 #: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
 #: ../daemon/gvfsbackendsmbbrowse.c:1111
+#, c-format
 msgid "File doesn't exist"
 msgstr "Plik nie istnieje"
 
 #: ../daemon/gvfsbackendcdda.c:832
+#, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Plik nie istnieje lub nie jest ścieżką dźwiękową"
 
@@ -383,6 +389,7 @@ msgid "Unexpected reply from server"
 msgstr "Nieoczekiwana odpowiedź od serwera"
 
 #: ../daemon/gvfsbackenddav.c:944 ../daemon/gvfsbackenddav.c:1421
+#, c-format
 msgid "Response invalid"
 msgstr "Niepoprawna odpowiedź"
 
@@ -421,6 +428,7 @@ msgstr "Nie można utworzyć żądania"
 #: ../daemon/gvfsbackenddav.c:1511 ../daemon/gvfsbackenddav.c:1764
 #: ../daemon/gvfsbackendftp.c:1558 ../daemon/gvfsbackendftp.c:2189
 #: ../daemon/gvfsbackendsmb.c:1701
+#, c-format
 msgid "Target file already exists"
 msgstr "Plik docelowy już istnieje"
 
@@ -496,20 +504,24 @@ msgid "Page type unknown"
 msgstr "Rodzaj strony nieznany"
 
 #: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:2059
+#, c-format
 msgid "Invalid filename"
 msgstr "Niepoprawna nazwa pliku"
 
 #: ../daemon/gvfsbackendftp.c:275 ../daemon/gvfsbackendftp.c:349
 #: ../daemon/gvfsbackendftp.c:378 ../daemon/gvfsbackendftp.c:397
 #: ../daemon/gvfsbackendftp.c:410 ../daemon/gvfsbackendftp.c:751
+#, c-format
 msgid "Invalid reply"
 msgstr "Niepoprawna odpowiedź"
 
 #: ../daemon/gvfsbackendftp.c:517
+#, c-format
 msgid "broken transmission"
 msgstr "transmisja przerwana"
 
 #: ../daemon/gvfsbackendftp.c:611 ../daemon/gvfsbackendftp.c:771
+#, c-format
 msgid "Could not connect to host"
 msgstr "Nie można połączyć się z komputerem"
 
@@ -549,10 +561,12 @@ msgid "backups not supported yet"
 msgstr "kopie zapasowe nie są jeszcze obsługiwane"
 
 #: ../daemon/gvfsbackendftp.c:1684
+#, c-format
 msgid "filename too long"
 msgstr "nazwa pliku zbyt długa"
 
 #: ../daemon/gvfsbackendftp.c:2169
+#, c-format
 msgid "Invalid destination filename"
 msgstr "Niepoprawna docelowa nazwa pliku"
 
@@ -1083,6 +1097,7 @@ msgid "Mass Storage Drive"
 msgstr "Napęd pamięci masowej"
 
 #: ../hal/ghaldrive.c:730
+#, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "Wysunięcie nośnika nieudane; jeden lub więcej woluminów w nośniku są zajęte."
