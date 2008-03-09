@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 0.1.8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-13 21:16+0800\n"
-"PO-Revision-Date: 2008-02-13 21:19+0800\n"
+"POT-Creation-Date: 2008-03-09 21:08+0800\n"
+"PO-Revision-Date: 2008-03-09 21:08+0800\n"
 "Last-Translator: Chao-Hsiung Liao <j_h_liau@yahoo.com.tw>\n"
 "Language-Team: Chinese (Hong Kong) <community@linuxhall.org>\n"
 "MIME-Version: 1.0\n"
@@ -15,105 +15,111 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1860
+#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1867
 msgid "Operation not supported, files on different mounts"
 msgstr "檔案在不同掛載點，不支援此操作"
 
-#: ../client/gdaemonfile.c:749
+#: ../client/gdaemonfile.c:758
 msgid "Invalid return value from get_info"
 msgstr "從 get_info 傳回無效的數值"
 
-#: ../client/gdaemonfile.c:778
+#: ../client/gdaemonfile.c:787
 msgid "Invalid return value from query_info"
 msgstr "從 query_info 傳回無效的數值"
 
-#: ../client/gdaemonfile.c:850
+#: ../client/gdaemonfile.c:865
 msgid "Couldn't get stream file descriptor"
 msgstr "無法取得串流檔案檔案描述器"
 
-#: ../client/gdaemonfile.c:882 ../client/gdaemonfile.c:952
-#: ../client/gdaemonfile.c:1011 ../client/gdaemonfile.c:1070
-#: ../client/gdaemonfile.c:1132
+#: ../client/gdaemonfile.c:897 ../client/gdaemonfile.c:967
+#: ../client/gdaemonfile.c:1026 ../client/gdaemonfile.c:1085
+#: ../client/gdaemonfile.c:1147
 msgid "Invalid return value from open"
 msgstr "從開啟中傳回無效的數值"
 
-#: ../client/gdaemonfile.c:962 ../client/gdaemonfile.c:1021
-#: ../client/gdaemonfile.c:1080 ../client/gdaemonfile.c:1142
+#: ../client/gdaemonfile.c:977 ../client/gdaemonfile.c:1036
+#: ../client/gdaemonfile.c:1095 ../client/gdaemonfile.c:1157
 msgid "Didn't get stream file descriptor"
 msgstr "不要取得串流檔案檔案描述器"
 
-#: ../client/gdaemonfile.c:1194 ../client/gdaemonfile.c:1211
+#: ../client/gdaemonfile.c:1209 ../client/gdaemonfile.c:1226
 msgid "Invalid return value from call"
 msgstr "從呼叫中傳回無效的數值"
 
-#: ../client/gdaemonfile.c:1490
+#: ../client/gdaemonfile.c:1505
 msgid "Invalid return value from get_filesystem_info"
 msgstr "從 get_filesystem_info 傳回無效的數值"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1529
+#: ../client/gdaemonfile.c:1549
 msgid "Could not find enclosing mount"
 msgstr "找不到所屬掛載點"
 
-#: ../client/gdaemonfile.c:1559
+#: ../client/gdaemonfile.c:1579
 #, c-format
 msgid "Invalid filename %s"
 msgstr "無效的檔案名稱 %s"
 
-#: ../client/gdaemonfile.c:1601
+#: ../client/gdaemonfile.c:1621
 msgid "Invalid return value from query_filesystem_info"
 msgstr "從 query_filesystem_info 傳回無效的數值"
 
-#: ../client/gdaemonfile.c:2009
+#: ../client/gdaemonfile.c:2012
 msgid "Invalid return value from monitor_dir"
 msgstr "從 monitor_dir 傳回無效的數值"
 
-#: ../client/gdaemonfile.c:2058
+#: ../client/gdaemonfile.c:2061
 msgid "Invalid return value from monitor_file"
 msgstr "從 monitor_file 傳回無效的數值"
 
 #: ../client/gdaemonfileinputstream.c:451
 #: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1307
-#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileinputstream.c:1304
+#: ../client/gdaemonfileinputstream.c:1314
 #: ../client/gdaemonfileoutputstream.c:403
 #: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1051
-#: ../client/gdaemonfileoutputstream.c:1061
+#: ../client/gdaemonfileoutputstream.c:1052
+#: ../client/gdaemonfileoutputstream.c:1062
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "串流通訊協定發生錯誤：%s"
 
 #: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1317
+#: ../client/gdaemonfileinputstream.c:1314
 #: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1061
+#: ../client/gdaemonfileoutputstream.c:1062
 msgid "End of stream"
 msgstr "串流結尾"
 
 #: ../client/gdaemonfileinputstream.c:519
 #: ../client/gdaemonfileinputstream.c:676
-#: ../client/gdaemonfileinputstream.c:784
-#: ../client/gdaemonfileinputstream.c:1035
+#: ../client/gdaemonfileinputstream.c:785
+#: ../client/gdaemonfileinputstream.c:1036
 #: ../client/gdaemonfileoutputstream.c:460
 #: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendsmb.c:956
-#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:298
+#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:774
+#: ../daemon/gvfsbackendobexftp.c:795 ../daemon/gvfsbackendobexftp.c:914
+#: ../daemon/gvfsbackendobexftp.c:1051 ../daemon/gvfsbackendobexftp.c:1115
+#: ../daemon/gvfsbackendobexftp.c:1252 ../daemon/gvfsbackendobexftp.c:1279
+#: ../daemon/gvfsbackendobexftp.c:1338 ../daemon/gvfsbackendobexftp.c:1360
+#: ../daemon/gvfsbackendobexftp.c:1420 ../daemon/gvfsbackendobexftp.c:1439
+#: ../daemon/gvfsbackendsmb.c:1015 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:297
 msgid "Operation was cancelled"
 msgstr "操作已被取消"
 
-#: ../client/gdaemonfileinputstream.c:1210
+#: ../client/gdaemonfileinputstream.c:1211
 #: ../client/gdaemonfileoutputstream.c:946
 msgid "Seek not supported on stream"
 msgstr "串流不支援搜尋"
 
-#: ../client/gdaemonfileinputstream.c:1244
+#: ../client/gdaemonfileinputstream.c:1241
 msgid "The query info operation is not supported"
 msgstr "不支援此查詢資訊的操作"
 
-#: ../client/gdaemonvfs.c:603
+#: ../client/gdaemonvfs.c:731
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "取得掛載資訊時發生錯誤：%s"
@@ -123,12 +129,12 @@ msgstr "取得掛載資訊時發生錯誤：%s"
 msgid "Error connecting to daemon: %s"
 msgstr "連線到伺服程式發生錯誤：%s"
 
-#: ../common/gsysutils.c:127
+#: ../common/gsysutils.c:133
 #, c-format
 msgid "Error creating socket: %s"
 msgstr "建立 socket 時發生錯誤：%s"
 
-#: ../common/gsysutils.c:165
+#: ../common/gsysutils.c:171
 #, c-format
 msgid "Error connecting to socket: %s"
 msgstr "連線至 socket 時發生錯誤：%s"
@@ -141,37 +147,44 @@ msgstr "無效的檔案資訊格式"
 msgid "Invalid attribute info list content"
 msgstr "無效的屬性資訊清單內容"
 
-#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:190
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "連線到 D-Bus 時發生錯誤：%s"
 
-#: ../daemon/daemon-main.c:82
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+#: ../daemon/daemon-main.c:78
+#, c-format
+msgid "%s Filesystem Service"
+msgstr "%s 檔案系統服務"
+
+#: ../daemon/daemon-main.c:97
 #, c-format
 msgid "Error: %s"
 msgstr "錯誤：%s"
 
-#: ../daemon/daemon-main.c:115
+#: ../daemon/daemon-main.c:131
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "用法：%s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:139 ../daemon/daemon-main.c:157
+#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "用法： %s key=value key=value ..."
 
-#: ../daemon/daemon-main.c:155
+#: ../daemon/daemon-main.c:171
 #, c-format
 msgid "No mount type specified"
 msgstr "未指定掛載類型"
 
-#: ../daemon/daemon-main.c:225
+#: ../daemon/daemon-main.c:241
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "%s 的掛載點已在使用中"
 
-#: ../daemon/daemon-main.c:236
+#: ../daemon/daemon-main.c:252
 msgid "error starting mount daemon"
 msgstr "啟動掛載伺服程式的發生錯誤"
 
@@ -191,7 +204,7 @@ msgstr "無法建立暫存目錄"
 msgid "No such file or directory"
 msgstr "沒有這個檔案或目錄"
 
-#: ../daemon/gvfsbackendburn.c:426
+#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1804
 msgid "Directory not empty"
 msgstr "目錄不是空的"
 
@@ -202,9 +215,12 @@ msgstr "不能將檔案複製到目錄上"
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:652
 msgid "CD/DVD Creator"
-msgstr ""
+msgstr "CD/DVD 錄製程式"
 
-#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:650
+#: ../daemon/gvfsbackendburn.c:681 ../daemon/gvfsbackendcomputer.c:652
+#: ../daemon/gvfsbackenddnssd.c:393 ../daemon/gvfsbackendftp.c:846
+#: ../daemon/gvfsbackendnetwork.c:637
+#, c-format
 msgid "The file is not a directory"
 msgstr "該檔案不是目錄"
 
@@ -233,191 +249,360 @@ msgstr "不能循環複製目錄"
 msgid "Not supported"
 msgstr "不支援"
 
-#: ../daemon/gvfsbackendcdda.c:145 ../daemon/gvfsbackendcdda.c:212
+#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:335
 msgid "No drive specified"
 msgstr "未指定裝置"
 
-#: ../daemon/gvfsbackendcdda.c:157
+#: ../daemon/gvfsbackendcdda.c:279
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "找不到到裝置 %s"
 
-#: ../daemon/gvfsbackendcdda.c:167
+#: ../daemon/gvfsbackendcdda.c:289
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "裝置 %s 中不包含音樂檔案"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:174
+#: ../daemon/gvfsbackendcdda.c:297
 #, c-format
-msgid "Audio Disc on %s"
-msgstr "%s 中為音樂光碟"
+msgid "cdda mount on %s"
+msgstr "cdda 掛載於 %s"
 
-#: ../daemon/gvfsbackendcdda.c:175 ../daemon/gvfsbackendcdda.c:682
-#: ../hal/ghalmount.c:442 ../hal/ghalvolume.c:242 ../hal/ghalvolume.c:263
+#: ../daemon/gvfsbackendcdda.c:298 ../daemon/gvfsbackendcdda.c:802
+#: ../hal/ghalmount.c:492 ../hal/ghalvolume.c:298 ../hal/ghalvolume.c:319
 #, c-format
 msgid "Audio Disc"
 msgstr "音樂光碟"
 
-#: ../daemon/gvfsbackendcdda.c:236
+#: ../daemon/gvfsbackendcdda.c:359
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "檔案系統忙碌中：開啟了 %d 個檔案"
 
-#: ../daemon/gvfsbackendcdda.c:429
+#: ../daemon/gvfsbackendcdda.c:549
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "磁碟 %2$s 中沒有檔案 %1$s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:538
+#: ../daemon/gvfsbackendcdda.c:658
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "來自磁碟 %s 上的「paranoia」的錯誤"
 
-#: ../daemon/gvfsbackendcdda.c:601
+#: ../daemon/gvfsbackendcdda.c:721
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "在磁碟 %s 上搜尋串流發生錯誤"
 
-#: ../daemon/gvfsbackendcdda.c:698
+#: ../daemon/gvfsbackendcdda.c:818 ../daemon/gvfsbackendgphoto2.c:1695
 #, c-format
 msgid "No such file"
 msgstr "沒有這個檔案"
 
-#: ../daemon/gvfsbackendcdda.c:705
+#: ../daemon/gvfsbackendcdda.c:825 ../daemon/gvfsbackendcomputer.c:573
+#: ../daemon/gvfsbackenddnssd.c:345 ../daemon/gvfsbackendftp.c:1955
+#: ../daemon/gvfsbackendnetwork.c:590 ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:866 ../daemon/gvfsbackendsmbbrowse.c:1037
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
-msgid "The file does not exist"
-msgstr "該檔案不存在"
+msgid "File doesn't exist"
+msgstr "檔案不存在"
 
-#: ../daemon/gvfsbackendcdda.c:712
+#: ../daemon/gvfsbackendcdda.c:832
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "檔案不存在或不是音軌"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:692
+#: ../daemon/gvfsbackendcdda.c:938
+msgid "Audio CD Filesystem Service"
+msgstr "音樂 CD 檔案系統服務"
+
+#: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
 msgid "Computer"
-msgstr ""
+msgstr "電腦"
 
-#: ../daemon/gvfsbackendcomputer.c:465
+#: ../daemon/gvfsbackendcomputer.c:467
 msgid "Filesystem"
-msgstr ""
+msgstr "檔案系統"
 
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackendsmbbrowse.c:786
-#: ../daemon/gvfsbackendsmbbrowse.c:853 ../daemon/gvfsbackendsmbbrowse.c:1024
-#: ../daemon/gvfsbackendsmbbrowse.c:1098
-msgid "File doesn't exist"
-msgstr "檔案不存在"
-
-#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendtrash.c:632
+#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendgphoto2.c:1687
+#: ../daemon/gvfsbackendobexftp.c:760 ../daemon/gvfsbackendtrash.c:637
 msgid "Can't open directory"
 msgstr "不能開啟目錄"
 
-#: ../daemon/gvfsbackendcomputer.c:593 ../daemon/gvfsbackendcomputer.c:727
+#: ../daemon/gvfsbackendcomputer.c:595 ../daemon/gvfsbackendcomputer.c:733
 msgid "Can't open mountable file"
 msgstr "不能開啟可掛載式檔案"
 
-#: ../daemon/gvfsbackendcomputer.c:774
+#: ../daemon/gvfsbackendcomputer.c:781
 #, c-format
 msgid "Internal error: %s"
 msgstr "內部的錯誤：%s"
 
-#: ../daemon/gvfsbackendcomputer.c:798 ../daemon/gvfsbackendcomputer.c:864
-#: ../daemon/gvfsbackendcomputer.c:964
-msgid "Not a mountable file"
-msgstr "不是可掛載式檔案"
-
-#: ../daemon/gvfsbackendcomputer.c:821
+#: ../daemon/gvfsbackendcomputer.c:813 ../daemon/gvfsbackendcomputer.c:930
 msgid "Can't mount file"
 msgstr "不能掛載檔案"
 
-#: ../daemon/gvfsbackendcomputer.c:879
+#: ../daemon/gvfsbackendcomputer.c:825
+msgid "No media in the drive"
+msgstr "裝置中沒有媒體"
+
+#: ../daemon/gvfsbackendcomputer.c:882 ../daemon/gvfsbackendcomputer.c:973
+#: ../daemon/gvfsbackendcomputer.c:1073
+msgid "Not a mountable file"
+msgstr "不是可掛載式檔案"
+
+#: ../daemon/gvfsbackendcomputer.c:988
 msgid "Can't unmount file"
 msgstr "不能卸載檔案"
 
-#: ../daemon/gvfsbackendcomputer.c:995
+#: ../daemon/gvfsbackendcomputer.c:1104
 msgid "Can't eject file"
 msgstr "不能退出檔案"
 
-#: ../daemon/gvfsbackenddav.c:155 ../daemon/gvfsbackenddav.c:642
-#: ../daemon/gvfsbackendhttp.c:170
+#: ../daemon/gvfsbackenddav.c:269 ../daemon/gvfsbackenddav.c:1289
+#: ../daemon/gvfsbackendhttp.c:220
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP 錯誤： %s"
 
-#: ../daemon/gvfsbackenddav.c:167
+#: ../daemon/gvfsbackenddav.c:285
 msgid "Could not parse response"
 msgstr "無法解析回應"
 
-#: ../daemon/gvfsbackenddav.c:176
+#: ../daemon/gvfsbackenddav.c:294
 msgid "Empty response"
 msgstr "空白的回應"
 
-#: ../daemon/gvfsbackenddav.c:183
+#: ../daemon/gvfsbackenddav.c:301
 msgid "Unexpected reply from server"
 msgstr "來自伺服器未預期的回應"
 
-#: ../daemon/gvfsbackenddav.c:564
-msgid "Please enter proxy password"
-msgstr "請輸入代理伺服器密碼"
-
-#: ../daemon/gvfsbackenddav.c:573
-msgid "WebDAV share"
-msgstr "WebDAV 分享"
-
-#: ../daemon/gvfsbackenddav.c:575
-#, fuzzy, c-format
-msgid "Enter password for %s"
-msgstr "輸入密碼匙的密語 "
-
-#: ../daemon/gvfsbackenddav.c:646
-msgid "Not a WebDAV enabled share"
-msgstr "不是使用 WebDAV 的分享"
-
-#: ../daemon/gvfsbackenddav.c:709 ../daemon/gvfsbackendhttp.c:239
-#: ../daemon/gvfsbackendsmb.c:542
-msgid "Invalid mount spec"
-msgstr "無效的掛載資料"
-
-#: ../daemon/gvfsbackenddav.c:797
+#: ../daemon/gvfsbackenddav.c:944 ../daemon/gvfsbackenddav.c:1421
+#, c-format
 msgid "Response invalid"
 msgstr "回應無效"
 
-#: ../daemon/gvfsbackenddav.c:826 ../daemon/gvfsbackenddav.c:941
+#: ../daemon/gvfsbackenddav.c:1087
+msgid "WebDAV share"
+msgstr "WebDAV 分享"
+
+#: ../daemon/gvfsbackenddav.c:1089
+#, c-format
+msgid "Enter password for %s"
+msgstr "輸入 %s 的密碼 "
+
+#: ../daemon/gvfsbackenddav.c:1092
+msgid "Please enter proxy password"
+msgstr "請輸入代理伺服器密碼"
+
+#: ../daemon/gvfsbackenddav.c:1206 ../daemon/gvfsbackendhttp.c:273
+#: ../daemon/gvfsbackendobexftp.c:605 ../daemon/gvfsbackendobexftp.c:616
+#: ../daemon/gvfsbackendsmb.c:595
+msgid "Invalid mount spec"
+msgstr "無效的掛載資料"
+
+#: ../daemon/gvfsbackenddav.c:1293 ../daemon/gvfsbackenddav.c:1297
+msgid "Not a WebDAV enabled share"
+msgstr "不是使用 WebDAV 的分享"
+
+#: ../daemon/gvfsbackenddav.c:1319
+#, c-format
+msgid "WebDAV on %s"
+msgstr "WebDAV 於 %s"
+
+#: ../daemon/gvfsbackenddav.c:1377 ../daemon/gvfsbackenddav.c:1448
 msgid "Could not create request"
 msgstr "無法建立要求"
 
-#: ../daemon/gvfsbackenddav.c:989 ../daemon/gvfsbackendsmb.c:1668
+#: ../daemon/gvfsbackenddav.c:1511 ../daemon/gvfsbackenddav.c:1764
+#: ../daemon/gvfsbackendftp.c:1558 ../daemon/gvfsbackendftp.c:2189
+#: ../daemon/gvfsbackendsmb.c:1701
+#, c-format
 msgid "Target file already exists"
 msgstr "目標檔案已存在"
 
-#: ../daemon/gvfsbackenddav.c:1059 ../daemon/gvfsbackendsftp.c:2433
-#: ../daemon/gvfsbackendsmb.c:924
+#: ../daemon/gvfsbackenddav.c:1584 ../daemon/gvfsbackendsftp.c:2662
+#: ../daemon/gvfsbackendsmb.c:983
 msgid "The file was externally modified"
 msgstr "該檔案已被外部程式修改過"
 
-#: ../daemon/gvfsbackenddav.c:1090 ../daemon/gvfsbackendsmb.c:962
-#: ../daemon/gvfsbackendsmb.c:1685
+#: ../daemon/gvfsbackenddav.c:1615 ../daemon/gvfsbackendsmb.c:1021
+#: ../daemon/gvfsbackendsmb.c:1718
 msgid "Backup file creation failed"
 msgstr "建立備份檔案失敗"
 
-#: ../daemon/gvfsbackendftp.c:113 ../daemon/gvfsbackendsftp.c:1164
+#. TODO: Name
+#: ../daemon/gvfsbackenddnssd.c:433
+msgid "dns-sd"
+msgstr "dns-sd"
+
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
+msgid "Can't monitor file or directory."
+msgstr "不能監控檔案或目錄。"
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:687
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+msgid "Network"
+msgstr "網絡"
+
+#: ../daemon/gvfsbackendftp.c:224
+msgid "Accounts are unsupported"
+msgstr "帳號不被支援"
+
+#: ../daemon/gvfsbackendftp.c:228
+msgid "Host closed connection"
+msgstr "主機關閉連線"
+
+#: ../daemon/gvfsbackendftp.c:232
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "無法開啟資料連線。也許你的防火牆阻擋了它？"
+
+#: ../daemon/gvfsbackendftp.c:236
+msgid "Data connection closed"
+msgstr "資料連線已關閉"
+
+#: ../daemon/gvfsbackendftp.c:242
+msgid "File unavailable"
+msgstr "檔案無法使用"
+
+#: ../daemon/gvfsbackendftp.c:246
+msgid "Operation failed"
+msgstr "操作已失敗"
+
+#: ../daemon/gvfsbackendftp.c:251
+msgid "No space left on server"
+msgstr "伺服器中沒有剩餘空間"
+
+#: ../daemon/gvfsbackendftp.c:259 ../daemon/gvfsbackendsftp.c:3684
+msgid "Operation unsupported"
+msgstr "操作不被支援"
+
+#: ../daemon/gvfsbackendftp.c:263 ../daemon/gvfsbackendsftp.c:259
+msgid "Permission denied"
+msgstr "權限不足"
+
+#: ../daemon/gvfsbackendftp.c:267
+msgid "Page type unknown"
+msgstr "頁面類型不明"
+
+#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:2059
+#, c-format
+msgid "Invalid filename"
+msgstr "無效的檔案名稱"
+
+#: ../daemon/gvfsbackendftp.c:275 ../daemon/gvfsbackendftp.c:349
+#: ../daemon/gvfsbackendftp.c:378 ../daemon/gvfsbackendftp.c:397
+#: ../daemon/gvfsbackendftp.c:410 ../daemon/gvfsbackendftp.c:751
+#, c-format
+msgid "Invalid reply"
+msgstr "無效的回應"
+
+#: ../daemon/gvfsbackendftp.c:517
+#, c-format
+msgid "broken transmission"
+msgstr "損壞的傳輸"
+
+#: ../daemon/gvfsbackendftp.c:611 ../daemon/gvfsbackendftp.c:771
+#, c-format
+msgid "Could not connect to host"
+msgstr "無法連線至主機"
+
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendftp.c:897 ../daemon/gvfsbackendsftp.c:1736
+#, c-format
+msgid "/ on %s"
+msgstr "/ 於 %s"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:1259
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "輸入 %s 的 ftp 密碼 "
+
+#: ../daemon/gvfsbackendftp.c:1279 ../daemon/gvfsbackendsftp.c:833
+msgid "Password dialog cancelled"
+msgstr "密碼對話盒已被取消"
+
+#: ../daemon/gvfsbackendftp.c:1345
+#, c-format
+msgid "ftp on %s"
+msgstr "ftp 於 %s"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1351
+#, c-format
+msgid "ftp as %s on %s"
+msgstr "以 %s 登入 %s 的 ftp"
+
+#: ../daemon/gvfsbackendftp.c:1385 ../daemon/gvfsbackendsftp.c:1410
 msgid "No hostname specified"
 msgstr "未指定主機名稱"
 
-#: ../daemon/gvfsbackendftp.c:200 ../daemon/gvfsbackendsmb.c:627
-#: ../daemon/gvfsbackendsmb.c:1058
-msgid "Unsupported seek type"
-msgstr "不支援的搜尋類型"
+#: ../daemon/gvfsbackendftp.c:1608 ../daemon/gvfsbackendftp.c:2150
+msgid "backups not supported yet"
+msgstr "備份尚未支援"
 
-#: ../daemon/gvfsbackendhttp.c:166
+#: ../daemon/gvfsbackendftp.c:1684
+#, c-format
+msgid "filename too long"
+msgstr "檔案名稱太長"
+
+#: ../daemon/gvfsbackendftp.c:2169
+#, c-format
+msgid "Invalid destination filename"
+msgstr "無效的目的端檔案名稱"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:697
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "數碼相機 (%s)"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:843 ../hal/ghalvolume.c:398
+#, c-format
+msgid "%s Camera"
+msgstr "%s 照相機"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:846 ../hal/ghalvolume.c:393
+#, c-format
+msgid "%s Audio Player"
+msgstr "%s 音樂播放機"
+
+#: ../daemon/gvfsbackendgphoto2.c:855 ../hal/ghalvolume.c:407
+msgid "Camera"
+msgstr "照相機"
+
+#: ../daemon/gvfsbackendgphoto2.c:857 ../hal/ghalvolume.c:405
+msgid "Audio Player"
+msgstr "音樂播放機"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:1539
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "gphoto2 掛載於 %s"
+
+#: ../daemon/gvfsbackendhttp.c:216
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP 客戶端錯誤：%s"
 
-#: ../daemon/gvfsbackendhttp.c:504 ../daemon/gvfsbackendsftp.c:1495
-#: ../daemon/gvfsbackendsmb.c:1171 ../daemon/gvfsbackendtrash.c:951
+#: ../daemon/gvfsbackendhttp.c:534 ../daemon/gvfsbackendsftp.c:1724
+#: ../daemon/gvfsbackendsmb.c:1230 ../daemon/gvfsbackendtrash.c:962
+#: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr "（無效的編碼）"
 
@@ -425,27 +610,46 @@ msgstr "（無效的編碼）"
 msgid "Directory notification not supported"
 msgstr "不支援目錄通知"
 
-#: ../daemon/gvfsbackendsftp.c:249
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:694
+msgid "Windows Network"
+msgstr "Windows 網絡"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:392
+msgid "Local Network"
+msgstr "本地端網絡"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:862
+msgid "Network Location Monitor"
+msgstr "網絡位置監視器"
+
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:444 ../daemon/gvfsbackendsmb.c:514
+#: ../daemon/gvfsbackendsmb.c:1223
+#, c-format
+msgid "%s on %s"
+msgstr "%s 於 %s"
+
+#: ../daemon/gvfsbackendsftp.c:251
 msgid "ssh program unexpectedly exited"
 msgstr "ssh 程式意外的中止了"
 
-#: ../daemon/gvfsbackendsftp.c:257
-msgid "Permission denied"
-msgstr ""
-
-#: ../daemon/gvfsbackendsftp.c:264
+#: ../daemon/gvfsbackendsftp.c:266
 msgid "Hostname not known"
 msgstr "主機名稱不明"
 
-#: ../daemon/gvfsbackendsftp.c:271
+#: ../daemon/gvfsbackendsftp.c:273
 msgid "No route to host"
 msgstr "沒有路由可到主機"
 
-#: ../daemon/gvfsbackendsftp.c:278
+#: ../daemon/gvfsbackendsftp.c:280
 msgid "Connection refused by server"
 msgstr "連線被伺服器拒絕"
 
-#: ../daemon/gvfsbackendsftp.c:285
+#: ../daemon/gvfsbackendsftp.c:287
 msgid "Host key verification failed"
 msgstr "驗證主機密碼匙失敗"
 
@@ -458,176 +662,196 @@ msgstr "無法呼叫 ssh 程式"
 msgid "Unable to spawn ssh program: %s"
 msgstr "無法呼叫 ssh 程式：%s"
 
-#: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:646
+#: ../daemon/gvfsbackendsftp.c:489 ../daemon/gvfsbackendsftp.c:741
 msgid "Timed out when logging in"
 msgstr "登入逾時時間"
 
-#: ../daemon/gvfsbackendsftp.c:694
+#: ../daemon/gvfsbackendsftp.c:817
 msgid "Enter passphrase for key"
 msgstr "輸入密碼匙的密語 "
 
-#: ../daemon/gvfsbackendsftp.c:696
-#, fuzzy
+#: ../daemon/gvfsbackendsftp.c:819
 msgid "Enter password"
-msgstr "不能傳送密碼"
+msgstr "輸入密碼"
 
-#: ../daemon/gvfsbackendsftp.c:708
-msgid "Password dialog cancelled"
-msgstr "密碼對話盒已被取消"
-
-#: ../daemon/gvfsbackendsftp.c:724
+#: ../daemon/gvfsbackendsftp.c:880
 msgid "Can't send password"
 msgstr "不能傳送密碼"
 
-#: ../daemon/gvfsbackendsftp.c:1090 ../daemon/gvfsbackendsftp.c:1113
+#: ../daemon/gvfsbackendsftp.c:888
+msgid "Log In Anyway"
+msgstr "強制登入"
+
+#: ../daemon/gvfsbackendsftp.c:888
+msgid "Cancel Login"
+msgstr "取消登入"
+
+#: ../daemon/gvfsbackendsftp.c:898
+#, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
+msgstr ""
+"遠端電腦 (%s) 的識別不明。\n"
+"這通常發生在你第一次登入電腦的時候。\n"
+"\n"
+"由遠端電腦傳送的識別為 %s。如果你想要完全確定繼續是安全的，請聯絡系統管理者。"
+
+#: ../daemon/gvfsbackendsftp.c:918
+msgid "Login dialog cancelled"
+msgstr "登入對話盒已被取消"
+
+#: ../daemon/gvfsbackendsftp.c:938
+msgid "Can't send host identity confirmation"
+msgstr "不能傳送主機識別確認"
+
+#: ../daemon/gvfsbackendsftp.c:1329 ../daemon/gvfsbackendsftp.c:1352
 msgid "Protocol error"
 msgstr "通訊協定錯誤"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1130
+#: ../daemon/gvfsbackendsftp.c:1376
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp 於 %s"
 
-#: ../daemon/gvfsbackendsftp.c:1154
+#: ../daemon/gvfsbackendsftp.c:1400
 msgid "Unable to find supported ssh command"
 msgstr "找不到支援的 ssh 指令"
 
-#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1507
-#, c-format
-msgid "/ on %s"
-msgstr "/ 於 %s"
-
-#: ../daemon/gvfsbackendsftp.c:1571
+#: ../daemon/gvfsbackendsftp.c:1800
 msgid "File is directory"
 msgstr "檔案是目錄"
 
-#: ../daemon/gvfsbackendsftp.c:1580
+#: ../daemon/gvfsbackendsftp.c:1809
 msgid "Failure"
 msgstr "失敗"
 
-#: ../daemon/gvfsbackendsftp.c:1645 ../daemon/gvfsbackendsftp.c:1707
-#: ../daemon/gvfsbackendsftp.c:1718 ../daemon/gvfsbackendsftp.c:1776
-#: ../daemon/gvfsbackendsftp.c:1866 ../daemon/gvfsbackendsftp.c:1895
-#: ../daemon/gvfsbackendsftp.c:1943 ../daemon/gvfsbackendsftp.c:2022
-#: ../daemon/gvfsbackendsftp.c:2133 ../daemon/gvfsbackendsftp.c:2174
-#: ../daemon/gvfsbackendsftp.c:2226 ../daemon/gvfsbackendsftp.c:2297
-#: ../daemon/gvfsbackendsftp.c:2317 ../daemon/gvfsbackendsftp.c:2471
-#: ../daemon/gvfsbackendsftp.c:2497 ../daemon/gvfsbackendsftp.c:2554
-#: ../daemon/gvfsbackendsftp.c:2613 ../daemon/gvfsbackendsftp.c:2895
-#: ../daemon/gvfsbackendsftp.c:3024 ../daemon/gvfsbackendsftp.c:3057
-#: ../daemon/gvfsbackendsftp.c:3158 ../daemon/gvfsbackendsftp.c:3199
-#: ../daemon/gvfsbackendsftp.c:3255 ../daemon/gvfsbackendsftp.c:3291
-#: ../daemon/gvfsbackendsftp.c:3325 ../daemon/gvfsbackendsftp.c:3340
-#: ../daemon/gvfsbackendsftp.c:3359
+#: ../daemon/gvfsbackendsftp.c:1874 ../daemon/gvfsbackendsftp.c:1936
+#: ../daemon/gvfsbackendsftp.c:1947 ../daemon/gvfsbackendsftp.c:2005
+#: ../daemon/gvfsbackendsftp.c:2095 ../daemon/gvfsbackendsftp.c:2124
+#: ../daemon/gvfsbackendsftp.c:2172 ../daemon/gvfsbackendsftp.c:2251
+#: ../daemon/gvfsbackendsftp.c:2362 ../daemon/gvfsbackendsftp.c:2403
+#: ../daemon/gvfsbackendsftp.c:2455 ../daemon/gvfsbackendsftp.c:2526
+#: ../daemon/gvfsbackendsftp.c:2546 ../daemon/gvfsbackendsftp.c:2700
+#: ../daemon/gvfsbackendsftp.c:2726 ../daemon/gvfsbackendsftp.c:2783
+#: ../daemon/gvfsbackendsftp.c:2842 ../daemon/gvfsbackendsftp.c:3122
+#: ../daemon/gvfsbackendsftp.c:3251 ../daemon/gvfsbackendsftp.c:3284
+#: ../daemon/gvfsbackendsftp.c:3385 ../daemon/gvfsbackendsftp.c:3426
+#: ../daemon/gvfsbackendsftp.c:3482 ../daemon/gvfsbackendsftp.c:3518
+#: ../daemon/gvfsbackendsftp.c:3552 ../daemon/gvfsbackendsftp.c:3567
+#: ../daemon/gvfsbackendsftp.c:3586 ../daemon/gvfsbackendsftp.c:3664
 msgid "Invalid reply received"
 msgstr "收到無效的回應"
 
-#: ../daemon/gvfsbackendsftp.c:1964
+#: ../daemon/gvfsbackendsftp.c:2193
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "建立備份檔案時發生錯誤：%s"
 
-#: ../daemon/gvfsbackendsftp.c:2379
+#: ../daemon/gvfsbackendsftp.c:2608
 msgid "Unable to create temporary file"
 msgstr "無法建立暫存檔案"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:180
+#: ../daemon/gvfsbackendsmb.c:214
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "要分享 %2$s 上的 %1$s 需要密碼"
 
-#: ../daemon/gvfsbackendsmb.c:429 ../daemon/gvfsbackendsmb.c:464
+#: ../daemon/gvfsbackendsmb.c:466 ../daemon/gvfsbackendsmb.c:506
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "內部的錯誤 (%s)"
 
-#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendsmb.c:472 ../daemon/gvfsbackendsmb.c:1164
-#, fuzzy, c-format
-msgid "%s on %s"
-msgstr "/ 於 %s"
-
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:518
+#: ../daemon/gvfsbackendsmb.c:561
 msgid "Failed to mount Windows share"
 msgstr "掛載 Windows 分享失敗"
 
-#: ../daemon/gvfsbackendsmb.c:1112
-#, fuzzy, c-format
-msgid "Backup file creation failed: %s"
-msgstr "建立備份檔案失敗：%d"
+#: ../daemon/gvfsbackendsmb.c:686 ../daemon/gvfsbackendsmb.c:1117
+msgid "Unsupported seek type"
+msgstr "不支援的搜尋類型"
 
-#: ../daemon/gvfsbackendsmb.c:1569
+#: ../daemon/gvfsbackendsmb.c:1171
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "建立備份檔案失敗：%s"
+
+#: ../daemon/gvfsbackendsmb.c:1602
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "刪除檔案時發生錯誤：%s"
 
-#: ../daemon/gvfsbackendsmb.c:1633
+#: ../daemon/gvfsbackendsmb.c:1666
 #, c-format
 msgid "Error moving file: %s"
 msgstr "移動檔案時發生錯誤：%s"
 
-#: ../daemon/gvfsbackendsmb.c:1657
+#: ../daemon/gvfsbackendsmb.c:1690
 msgid "Can't move directory over directory"
 msgstr "不能將目錄移動至目錄上"
 
-#: ../daemon/gvfsbackendsmb.c:1705
+#: ../daemon/gvfsbackendsmb.c:1738
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "移除目標檔案時發生錯誤：%s"
 
-#: ../daemon/gvfsbackendsmb.c:1729
+#: ../daemon/gvfsbackendsmb.c:1762
 msgid "Can't recursively move directory"
 msgstr "不能循環移動目錄"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:676
-msgid "Windows Network"
-msgstr ""
+#: ../daemon/gvfsbackendsmb.c:1825
+msgid "Windows Shares Filesystem Service"
+msgstr "Windows 分享檔案系統服務"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:684
+#: ../daemon/gvfsbackendsmbbrowse.c:702
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Windows 分享於 %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:781 ../daemon/gvfsbackendsmbbrowse.c:827
+#: ../daemon/gvfsbackendsmbbrowse.c:794 ../daemon/gvfsbackendsmbbrowse.c:840
 msgid "The file is not a mountable"
 msgstr "該檔案是無法掛載的"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:849
+#: ../daemon/gvfsbackendsmbbrowse.c:862
 msgid "Not a regular file"
 msgstr "不是正規的檔案"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1094
+#: ../daemon/gvfsbackendsmbbrowse.c:1107
 msgid "Not a directory"
 msgstr "不是一個目錄"
 
+#: ../daemon/gvfsbackendsmbbrowse.c:1219
+msgid "Windows Network Filesystem Service"
+msgstr "Windows 網絡檔案系統服務"
+
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:597 ../daemon/gvfsbackendtrash.c:1180
-#, fuzzy
+#: ../daemon/gvfsbackendtrash.c:600 ../daemon/gvfsbackendtrash.c:1190
 msgid "Trash"
 msgstr "回收筒"
 
-#: ../daemon/gvfsbackendtrash.c:961
+#: ../daemon/gvfsbackendtrash.c:972
 #, c-format
 msgid "%s (in trash)"
-msgstr ""
+msgstr "%s (於回收筒)"
 
-#: ../daemon/gvfsbackendtrash.c:1278
+#: ../daemon/gvfsbackendtrash.c:1291
 msgid "Can't delete trash"
 msgstr "無法刪除回收筒"
 
-#: ../daemon/gvfsbackendtrash.c:1625 ../daemon/gvfsbackendtrash.c:1700
+#: ../daemon/gvfsbackendtrash.c:1638 ../daemon/gvfsbackendtrash.c:1713
 msgid "Trash directory notification not supported"
 msgstr "不支援目錄通知"
 
-#: ../daemon/gvfsdaemon.c:1030
+#: ../daemon/gvfsdaemon.c:1032
 msgid "Invalid backend type"
 msgstr "無效的後端類型"
 
@@ -640,12 +864,12 @@ msgstr "傳送 fd 時發生錯誤：%s"
 #: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
 #: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
 #: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
-#: ../daemon/gvfsjobenumerate.c:225 ../daemon/gvfsjobmakedirectory.c:122
-#: ../daemon/gvfsjobmount.c:105 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109 ../daemon/gvfsjobmountmountable.c:156
 #: ../daemon/gvfsjobmove.c:169 ../daemon/gvfsjobopenforread.c:130
 #: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
 #: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:137
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
 #: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
 #: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
 #: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
@@ -684,378 +908,372 @@ msgstr "GCFS 主伺服程式"
 #: ../daemon/main.c:74
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
-#: ../daemon/main.c:76 ../programs/gvfs-cat.c:167 ../programs/gvfs-open.c:135
+#: ../daemon/main.c:76 ../programs/gvfs-cat.c:165 ../programs/gvfs-cat.c:178
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-ls.c:388 ../programs/gvfs-move.c:97
+#: ../programs/gvfs-open.c:133 ../programs/gvfs-open.c:146
+#: ../programs/gvfs-save.c:165 ../programs/gvfs-tree.c:253
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "使用「%s --help」以獲得更多資訊。"
 
-#: ../daemon/mount.c:372
+#: ../daemon/mount.c:432
 msgid "Invalid arguments from spawned child"
 msgstr "來自衍生子程序的無效引數"
 
-#: ../daemon/mount.c:662
+#: ../daemon/mount.c:731
 #, c-format
 msgid "Automount failed: %s"
 msgstr "自動掛載失敗：%s"
 
-#: ../daemon/mount.c:707
+#: ../daemon/mount.c:776
 msgid "The specified location is not mounted"
 msgstr "指定的位置尚未掛載"
 
-#: ../daemon/mount.c:712
+#: ../daemon/mount.c:781
 msgid "The specified location is not supported"
 msgstr "指定的位置不被支援"
 
-#: ../daemon/mount.c:875
+#: ../daemon/mount.c:944
 msgid "Location is already mounted"
 msgstr "該位置已經掛載了"
 
-#: ../daemon/mount.c:883
+#: ../daemon/mount.c:952
 msgid "Location is not mountable"
 msgstr "該位置不是可掛載的"
 
-#: ../hal/ghaldrive.c:135
+#: ../hal/ghaldrive.c:144
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: ../hal/ghaldrive.c:137
+#: ../hal/ghaldrive.c:146
 msgid "CD-R"
 msgstr "CD-R"
 
-#: ../hal/ghaldrive.c:139
+#: ../hal/ghaldrive.c:148
 msgid "CD-RW"
 msgstr "CD-RW"
 
-#: ../hal/ghaldrive.c:143
+#: ../hal/ghaldrive.c:152
 msgid "DVD-ROM"
 msgstr "DVD-ROM"
 
-#: ../hal/ghaldrive.c:145
+#: ../hal/ghaldrive.c:154
 msgid "DVD+R"
 msgstr "DVD+R"
 
-#: ../hal/ghaldrive.c:147
+#: ../hal/ghaldrive.c:156
 msgid "DVD+RW"
 msgstr "DVD+RW"
 
-#: ../hal/ghaldrive.c:149
+#: ../hal/ghaldrive.c:158
 msgid "DVD-R"
 msgstr "DVD-R"
 
-#: ../hal/ghaldrive.c:151
+#: ../hal/ghaldrive.c:160
 msgid "DVD-RW"
 msgstr "DVD-RW"
 
-#: ../hal/ghaldrive.c:153
+#: ../hal/ghaldrive.c:162
 msgid "DVD-RAM"
 msgstr "DVD-RAM"
 
-#: ../hal/ghaldrive.c:156
+#: ../hal/ghaldrive.c:165
 msgid "DVD±R"
 msgstr "DVD±R"
 
-#: ../hal/ghaldrive.c:159
+#: ../hal/ghaldrive.c:168
 msgid "DVD±RW"
 msgstr "DVD±RW"
 
-#: ../hal/ghaldrive.c:161
+#: ../hal/ghaldrive.c:170
 msgid "HDDVD"
 msgstr "HDDVD"
 
-#: ../hal/ghaldrive.c:163
+#: ../hal/ghaldrive.c:172
 msgid "HDDVD-r"
 msgstr "HDDVD-r"
 
-#: ../hal/ghaldrive.c:165
+#: ../hal/ghaldrive.c:174
 msgid "HDDVD-RW"
 msgstr "HDDVD-RW"
 
-#: ../hal/ghaldrive.c:167
+#: ../hal/ghaldrive.c:176
 msgid "Blu-ray"
 msgstr "Blu-ray"
 
-#: ../hal/ghaldrive.c:169
+#: ../hal/ghaldrive.c:178
 msgid "Blu-ray-R"
 msgstr "Blu-ray-R"
 
-#: ../hal/ghaldrive.c:171
+#: ../hal/ghaldrive.c:180
 msgid "Blu-ray-RE"
 msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: ../hal/ghaldrive.c:177
+#: ../hal/ghaldrive.c:186
 #, c-format
 msgid "%s/%s Drive"
 msgstr "%s/%s 裝置"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
-#: ../hal/ghaldrive.c:183
+#: ../hal/ghaldrive.c:192
 #, c-format
 msgid "%s Drive"
 msgstr "%s 裝置"
 
-#: ../hal/ghaldrive.c:187
+#: ../hal/ghaldrive.c:196
 msgid "Floppy Drive"
 msgstr "軟碟機"
 
-#: ../hal/ghaldrive.c:193
+#: ../hal/ghaldrive.c:202
 msgid "Software RAID Drive"
 msgstr "軟件 RAID 陣列"
 
-#: ../hal/ghaldrive.c:195
+#: ../hal/ghaldrive.c:204
 msgid "USB Drive"
 msgstr "USB 磁碟機"
 
-#: ../hal/ghaldrive.c:197
+#: ../hal/ghaldrive.c:206
 msgid "ATA Drive"
 msgstr "ATA 磁碟機"
 
-#: ../hal/ghaldrive.c:199
+#: ../hal/ghaldrive.c:208
 msgid "SCSI Drive"
 msgstr "SCSI 裝置"
 
-#: ../hal/ghaldrive.c:201
+#: ../hal/ghaldrive.c:210
 msgid "FireWire Drive"
 msgstr "FireWire 磁碟機"
 
-#: ../hal/ghaldrive.c:205
+#: ../hal/ghaldrive.c:214
 msgid "Tape Drive"
 msgstr "磁帶機"
 
-#: ../hal/ghaldrive.c:207
+#: ../hal/ghaldrive.c:216
 msgid "CompactFlash Drive"
 msgstr "CompactFlash 裝置"
 
-#: ../hal/ghaldrive.c:209
+#: ../hal/ghaldrive.c:218
 msgid "MemoryStick Drive"
 msgstr "MemoryStick 裝置"
 
-#: ../hal/ghaldrive.c:211
+#: ../hal/ghaldrive.c:220
 msgid "SmartMedia Drive"
 msgstr "SmartMedia 裝置"
 
-#: ../hal/ghaldrive.c:213
+#: ../hal/ghaldrive.c:222
 msgid "SD/MMC Drive"
 msgstr "SD/MMC 裝置"
 
-#: ../hal/ghaldrive.c:215
+#: ../hal/ghaldrive.c:224
 msgid "Zip Drive"
 msgstr "Zip 磁碟機"
 
-#: ../hal/ghaldrive.c:217
+#: ../hal/ghaldrive.c:226
 msgid "Jaz Drive"
 msgstr "Jaz 磁碟機"
 
-#: ../hal/ghaldrive.c:219
+#: ../hal/ghaldrive.c:228
 msgid "Thumb Drive"
 msgstr "隨身碟"
 
-#: ../hal/ghaldrive.c:222
+#: ../hal/ghaldrive.c:231
 msgid "Mass Storage Drive"
 msgstr "大量存放裝置"
 
-#: ../hal/ghaldrive.c:634
+#: ../hal/ghaldrive.c:730
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "退出媒體失敗；該媒體上的一或多個儲存裝置正在忙碌。"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
 msgid "CD-ROM Disc"
 msgstr "CD-ROM 光碟"
 
-#: ../hal/ghalmount.c:147 ../hal/ghalvolume.c:138
+#: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
 msgid "Blank CD-ROM Disc"
 msgstr "空白 CD-ROM 光碟"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:167 ../hal/ghalvolume.c:156
 msgid "CD-R Disc"
 msgstr "CD-R 光碟"
 
-#: ../hal/ghalmount.c:148 ../hal/ghalvolume.c:139
+#: ../hal/ghalmount.c:167 ../hal/ghalvolume.c:156
 msgid "Blank CD-R Disc"
 msgstr "空白 CD-R 光碟"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:168 ../hal/ghalvolume.c:157
 msgid "CD-RW Disc"
 msgstr "CD-RW 光碟"
 
-#: ../hal/ghalmount.c:149 ../hal/ghalvolume.c:140
+#: ../hal/ghalmount.c:168 ../hal/ghalvolume.c:157
 msgid "Blank CD-RW Disc"
 msgstr "空白 CD-RW 光碟"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
-#: ../hal/ghalvolume.c:143
+#: ../hal/ghalmount.c:169 ../hal/ghalmount.c:171 ../hal/ghalvolume.c:158
+#: ../hal/ghalvolume.c:160
 msgid "DVD-ROM Disc"
 msgstr "DVD-ROM 光碟"
 
-#: ../hal/ghalmount.c:150 ../hal/ghalmount.c:152 ../hal/ghalvolume.c:141
-#: ../hal/ghalvolume.c:143
+#: ../hal/ghalmount.c:169 ../hal/ghalmount.c:171 ../hal/ghalvolume.c:158
+#: ../hal/ghalvolume.c:160
 msgid "Blank DVD-ROM Disc"
 msgstr "空白 DVD-ROM 光碟"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:170 ../hal/ghalvolume.c:159
 msgid "DVD-RAM Disc"
 msgstr "DVD-RAM 光碟"
 
-#: ../hal/ghalmount.c:151 ../hal/ghalvolume.c:142
+#: ../hal/ghalmount.c:170 ../hal/ghalvolume.c:159
 msgid "Blank DVD-RAM Disc"
 msgstr "空白 DVD-RAM 光碟"
 
-#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:172 ../hal/ghalvolume.c:161
 msgid "DVD-RW Disc"
 msgstr "DVD-RW 光碟"
 
-#: ../hal/ghalmount.c:153 ../hal/ghalvolume.c:144
+#: ../hal/ghalmount.c:172 ../hal/ghalvolume.c:161
 msgid "Blank DVD-RW Disc"
 msgstr "空白 DVD-RW 光碟"
 
-#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:173 ../hal/ghalvolume.c:162
 msgid "DVD+R Disc"
 msgstr "DVD+R 光碟"
 
-#: ../hal/ghalmount.c:154 ../hal/ghalvolume.c:145
+#: ../hal/ghalmount.c:173 ../hal/ghalvolume.c:162
 msgid "Blank DVD+R Disc"
 msgstr "空白 DVD+R 光碟"
 
-#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:174 ../hal/ghalvolume.c:163
 msgid "DVD+RW Disc"
 msgstr "DVD+RW 光碟"
 
-#: ../hal/ghalmount.c:155 ../hal/ghalvolume.c:146
+#: ../hal/ghalmount.c:174 ../hal/ghalvolume.c:163
 msgid "Blank DVD+RW Disc"
 msgstr "空白 DVD+RW 光碟"
 
-#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:175 ../hal/ghalvolume.c:164
 msgid "DVD+R DL Disc"
 msgstr "DVD+R DL 光碟"
 
-#: ../hal/ghalmount.c:156 ../hal/ghalvolume.c:147
+#: ../hal/ghalmount.c:175 ../hal/ghalvolume.c:164
 msgid "Blank DVD+R DL Disc"
 msgstr "空白 DVD+R DL 光碟"
 
-#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:176 ../hal/ghalvolume.c:165
 msgid "Blu-Ray Disc"
 msgstr "Blu-Ray 光碟"
 
-#: ../hal/ghalmount.c:157 ../hal/ghalvolume.c:148
+#: ../hal/ghalmount.c:176 ../hal/ghalvolume.c:165
 msgid "Blank Blu-Ray Disc"
 msgstr "空白 Blu-Ray 光碟"
 
-#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:177 ../hal/ghalvolume.c:166
 msgid "Blu-Ray R Disc"
 msgstr "Blu-Ray R 光碟"
 
-#: ../hal/ghalmount.c:158 ../hal/ghalvolume.c:149
+#: ../hal/ghalmount.c:177 ../hal/ghalvolume.c:166
 msgid "Blank Blu-Ray R Disc"
 msgstr "空白 Blu-Ray R 光碟"
 
-#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:178 ../hal/ghalvolume.c:167
 msgid "Blu-Ray RW Disc"
 msgstr "Blu-Ray RW 光碟"
 
-#: ../hal/ghalmount.c:159 ../hal/ghalvolume.c:150
+#: ../hal/ghalmount.c:178 ../hal/ghalvolume.c:167
 msgid "Blank Blu-Ray RW Disc"
 msgstr "空白 Blu-Ray RW 光碟"
 
-#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:179 ../hal/ghalvolume.c:168
 msgid "HD DVD Disc"
 msgstr "HD DVD 光碟"
 
-#: ../hal/ghalmount.c:160 ../hal/ghalvolume.c:151
+#: ../hal/ghalmount.c:179 ../hal/ghalvolume.c:168
 msgid "Blank HD DVD Disc"
 msgstr "空白 HD DVD 光碟"
 
-#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:180 ../hal/ghalvolume.c:169
 msgid "HD DVD-R Disc"
 msgstr "HD DVD-R 光碟"
 
-#: ../hal/ghalmount.c:161 ../hal/ghalvolume.c:152
+#: ../hal/ghalmount.c:180 ../hal/ghalvolume.c:169
 msgid "Blank HD DVD-R Disc"
 msgstr "空白 HD DVD-R 光碟"
 
-#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:181 ../hal/ghalvolume.c:170
 msgid "HD DVD-RW Disc"
 msgstr "HD DVD-RW 光碟"
 
-#: ../hal/ghalmount.c:162 ../hal/ghalvolume.c:153
+#: ../hal/ghalmount.c:181 ../hal/ghalvolume.c:170
 msgid "Blank HD DVD-RW Disc"
 msgstr "空白 HD DVD-RW 光碟"
 
-#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:182 ../hal/ghalvolume.c:171
 msgid "MO Disc"
 msgstr "MO 光碟"
 
-#: ../hal/ghalmount.c:163 ../hal/ghalvolume.c:154
+#: ../hal/ghalmount.c:182 ../hal/ghalvolume.c:171
 msgid "Blank MO Disc"
 msgstr "空白 MO 光碟"
 
-#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:183 ../hal/ghalvolume.c:172
 msgid "Disc"
 msgstr "光碟"
 
-#: ../hal/ghalmount.c:164 ../hal/ghalvolume.c:155
+#: ../hal/ghalmount.c:183 ../hal/ghalvolume.c:172
 msgid "Blank Disc"
 msgstr "空白光碟"
 
-#: ../hal/ghalmount.c:348
+#: ../hal/ghalmount.c:368
 #, c-format
 msgid "%.1f kB Media"
 msgstr "%.1f kB 媒體"
 
-#: ../hal/ghalmount.c:353
+#: ../hal/ghalmount.c:373
 #, c-format
 msgid "%.1f MB Media"
 msgstr "%.1f MB 媒體"
 
-#: ../hal/ghalmount.c:358
+#: ../hal/ghalmount.c:378
 #, c-format
 msgid "%.1f GB Media"
 msgstr "%.1f GB 媒體"
 
-#: ../hal/ghalmount.c:440 ../hal/ghalvolume.c:261
+#: ../hal/ghalmount.c:490 ../hal/ghalvolume.c:317
 msgid "Mixed Audio/Data Disc"
 msgstr "混合音樂/資料光碟"
 
-#: ../hal/ghalvolume.c:189
+#: ../hal/ghalvolume.c:206
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
-#: ../hal/ghalvolume.c:194
+#: ../hal/ghalvolume.c:211
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: ../hal/ghalvolume.c:199
+#: ../hal/ghalvolume.c:216
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../hal/ghalvolume.c:249
+#: ../hal/ghalvolume.c:305
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s 加密的資料"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../hal/ghalvolume.c:272
+#: ../hal/ghalvolume.c:328
 #, c-format
 msgid "%s Media"
 msgstr "%s 媒體"
-
-#: ../hal/ghalvolume.c:314
-#, fuzzy
-msgid "Camera"
-msgstr "%s 照相機"
-
-#: ../hal/ghalvolume.c:321
-#, c-format
-msgid "%s Camera"
-msgstr "%s 照相機"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1107,7 +1325,7 @@ msgstr "注意：只要利用導管通過 cat 就可以使用它的格式選項�
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:165 ../programs/gvfs-open.c:133
+#: ../programs/gvfs-cat.c:176 ../programs/gvfs-open.c:144
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s：漏掉位置"
@@ -1137,6 +1355,3 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "使用註冊為處理該檔案類型的預設應用程式來開啟檔案。"
-
-#~ msgid "CD Burner"
-#~ msgstr "CD 燒錄器"
