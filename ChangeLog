@@ -1,5 +1,11 @@
 2008-03-10  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Bump version to 0.2.0.1 (minor release
+	last translation changes)
+
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
 	* NEWS:
 	Update for release
 
