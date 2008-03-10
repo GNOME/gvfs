@@ -1,5 +1,13 @@
 2008-03-10  Alexander Larsson  <alexl@redhat.com>
 
+	* NEWS:
+	Update for release
+
+	* configure.ac:
+	Bump version to 0.2.0
+
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonvfs.c:
 	Free strings with g_free, not dbus_free (#521269)
 

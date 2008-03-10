@@ -1,3 +1,15 @@
+Major changes in 0.2.0:
+* Fix crashes
+* Build and portability fixes
+* Better mime icons for remote shares
+* Don't show mounts and volumes outside /media
+* Don't automount gphoto mounts
+* Translate cd disc names
+* ftp: Updates
+* obex: Give better error message on broken phones
+* sftp: Allow setting permissions
+* dav: Correct mount name, file icons and file types
+
 Major changes in 0.1.11:
 * Correctly free mounts
 * Disable debug log
