@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-10 21:38+0100\n"
-"PO-Revision-Date: 2008-03-10 21:36+0100\n"
+"PO-Revision-Date: 2008-03-10 22:00+0100\n"
 "Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -329,7 +329,7 @@ msgstr "Service de CD Audio"
 
 #: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
 msgid "Computer"
-msgstr "Ordinateur"
+msgstr "Poste de travail"
 
 #: ../daemon/gvfsbackendcomputer.c:467
 msgid "Filesystem"
