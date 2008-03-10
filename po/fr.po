@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-09 14:39+0100\n"
-"PO-Revision-Date: 2008-03-09 14:40+0100\n"
+"POT-Creation-Date: 2008-03-10 21:38+0100\n"
+"PO-Revision-Date: 2008-03-10 21:36+0100\n"
 "Last-Translator: Stéphane Raimbault <stephane.raimbault@gmail.com>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -355,7 +355,7 @@ msgstr "Impossible de monter le fichier"
 
 #: ../daemon/gvfsbackendcomputer.c:825
 msgid "No media in the drive"
-msgstr "Aucun support dans le lecteur"
+msgstr "Aucun média dans le lecteur"
 
 #: ../daemon/gvfsbackendcomputer.c:882 ../daemon/gvfsbackendcomputer.c:973
 #: ../daemon/gvfsbackendcomputer.c:1073
@@ -1107,8 +1107,8 @@ msgstr "Lecteur de stockage de masse"
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
-"L'éjection du support a échoué ; un ou plusieurs volumes sont occupés sur le "
-"support."
+"L'éjection du média a échoué ; un ou plusieurs volumes sont en cours "
+"d'utilisation sur le média."
 
 #: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
 msgid "CD-ROM Disc"
@@ -1251,17 +1251,17 @@ msgstr "Disque vierge"
 #: ../hal/ghalmount.c:368
 #, c-format
 msgid "%.1f kB Media"
-msgstr "Support %.1f Kio"
+msgstr "Média %.1f Kio"
 
 #: ../hal/ghalmount.c:373
 #, c-format
 msgid "%.1f MB Media"
-msgstr "Support %.1f Mio"
+msgstr "Média %.1f Mio"
 
 #: ../hal/ghalmount.c:378
 #, c-format
 msgid "%.1f GB Media"
-msgstr "Support %.1f Gio"
+msgstr "Média %.1f Gio"
 
 #: ../hal/ghalmount.c:490 ../hal/ghalvolume.c:317
 msgid "Mixed Audio/Data Disc"
@@ -1292,7 +1292,7 @@ msgstr "Données chiffrées %s"
 #: ../hal/ghalvolume.c:328
 #, c-format
 msgid "%s Media"
-msgstr "Support %s"
+msgstr "Média %s"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
