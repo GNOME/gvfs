@@ -631,7 +631,7 @@ fill_mountable_info (GDaemonVfs *vfs)
       
       g_ptr_array_add (infos, info);
 
-      dbus_free_string_array (scheme_aliases);
+      g_strfreev (scheme_aliases);
     }
   while (dbus_message_iter_next (&array_iter));
 

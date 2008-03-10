@@ -1,3 +1,8 @@
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonvfs.c:
+	Free strings with g_free, not dbus_free (#521269)
+
 2008-03-08  Christian Kellner  <gicmo@gnome.org>
 
 	* hal/ghalmount.c: 
