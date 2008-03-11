@@ -2,7 +2,7 @@
 
 	* daemon/gvfsbackendsftp.c (spawn_ssh):
 	Use GError->message, not GError->msg.
-	Patch from Alexander Larsson <alexl@redhat.com>
+	Patch from Jasper Lievisse Adriaanse <jasper@humppa.nl>
 
 2008-03-10  Alexander Larsson  <alexl@redhat.com>
 
