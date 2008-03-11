@@ -383,7 +383,7 @@ spawn_ssh (GVfsBackend *backend,
     {
       g_set_error (error,
                    G_IO_ERROR, G_IO_ERROR_FAILED,
-                   _("Unable to spawn ssh program: %s"), my_error->msg);
+                   _("Unable to spawn ssh program: %s"), my_error->message);
       g_error_free (my_error);
       return FALSE;
     }
