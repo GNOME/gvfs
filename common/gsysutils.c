@@ -22,6 +22,9 @@
 
 #include <config.h>
 
+#if defined(HAVE_SYS_PARAM_H)
+#include <sys/param.h>
+#endif
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -46,7 +49,7 @@ _g_socket_send_fd (int connection_fd,
 		   int fd)
 {
   struct msghdr msg;
-  struct iovec vec;
+  struct iovec vec[1];
   char buf[1] = {'x'};
   char ccmsg[CMSG_SPACE (sizeof (fd))];
   struct cmsghdr *cmsg;
@@ -55,9 +58,9 @@ _g_socket_send_fd (int connection_fd,
   msg.msg_name = NULL;
   msg.msg_namelen = 0;
 
-  vec.iov_base = buf;
-  vec.iov_len = 1;
-  msg.msg_iov = &vec;
+  vec[0].iov_base = buf;
+  vec[0].iov_len = 1;
+  msg.msg_iov = vec;
   msg.msg_iovlen = 1;
   msg.msg_control = ccmsg;
   msg.msg_controllen = sizeof (ccmsg);
@@ -78,17 +81,17 @@ int
 _g_socket_receive_fd (int socket_fd)
 {
   struct msghdr msg;
-  struct iovec iov;
+  struct iovec iov[1];
   char buf[1];
   int rv;
   char ccmsg[CMSG_SPACE (sizeof(int))];
   struct cmsghdr *cmsg;
 
-  iov.iov_base = buf;
-  iov.iov_len = 1;
+  iov[0].iov_base = buf;
+  iov[0].iov_len = 1;
   msg.msg_name = 0;
   msg.msg_namelen = 0;
-  msg.msg_iov = &iov;
+  msg.msg_iov = iov;
   msg.msg_iovlen = 1;
   msg.msg_control = ccmsg;
   msg.msg_controllen = sizeof (ccmsg);
