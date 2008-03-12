@@ -89,6 +89,12 @@ mount_DATA += dns-sd.mount
 libexec_PROGRAMS += gvfsd-dnssd
 endif
 
+mount_in_files += archive.mount.in
+if HAVE_ARCHIVE
+mount_DATA += archive.mount
+libexec_PROGRAMS += gvfsd-archive
+endif
+
 EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files) obexftp-marshal.list
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
@@ -298,6 +304,20 @@ gvfsd_dnssd_CPPFLAGS = \
 
 gvfsd_dnssd_LDADD = $(libraries) $(AVAHI_LIBS)
 
+
+gvfsd_archive_SOURCES = \
+	gvfsbackendarchive.c gvfsbackendarchive.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c 
+
+gvfsd_archive_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendarchive.h \
+	-DDEFAULT_BACKEND_TYPE=archive \
+	-DMAX_JOB_THREADS=1 \
+	$(ARCHIVE_CFLAGS) \
+	-DBACKEND_TYPES='"archive", G_VFS_TYPE_BACKEND_ARCHIVE,'
+
+gvfsd_archive_LDADD = $(libraries) $(ARCHIVE_LIBS)
 
 gvfsd_burn_SOURCES = \
 	gvfsbackendburn.c gvfsbackendburn.h \
