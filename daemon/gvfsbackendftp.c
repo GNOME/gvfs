@@ -179,12 +179,12 @@ ftp_connection_pop_job (FtpConnection *conn)
     {
       g_vfs_job_failed_from_error (conn->job, conn->error);
       g_clear_error (&conn->error);
-      result = TRUE;
+      result = FALSE;
     }
   else
     {
       g_vfs_job_succeeded (conn->job);
-      result = FALSE;
+      result = TRUE;
     }
 
   conn->job = NULL;
@@ -1054,7 +1054,8 @@ g_vfs_backend_ftp_push_connection (GVfsBackendFtp *ftp, FtpConnection *conn)
   if (conn == NULL)
     return;
 
-  ftp_connection_pop_job (conn);
+  if (conn->job)
+    ftp_connection_pop_job (conn);
 
   g_mutex_lock (ftp->mutex);
   if (ftp->queue)
@@ -2015,47 +2016,54 @@ do_enumerate (GVfsBackend *backend,
 
   dir = ftp_filename_from_gvfs_path (conn, dirname);
   files = enumerate_directory (ftp, conn, dir, FALSE);
-  if (files != NULL)
+  if (ftp_connection_pop_job (conn))
     {
-      iter = ftp->dir_ops->iter_new (conn);
-      for (walk = files; walk; walk = walk->next)
+      ftp_connection_push_job (conn, G_VFS_JOB (job));
+      if (files != NULL)
 	{
-	  char *symlink = NULL;
-	  info = ftp->dir_ops->iter_process (iter,
-					     conn,
-					     dir,
-					     NULL,
-					     walk->data,
-					     query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? NULL : &symlink);
-	  if (symlink)
+	  iter = ftp->dir_ops->iter_new (conn);
+	  for (walk = files; walk; walk = walk->next)
 	    {
-	      /* This is necessary due to our locking. 
-	       * And we must not unlock here because it might invalidate the list we iterate */
-	      symlink_targets = g_slist_prepend (symlink_targets, symlink);
-	      symlink_fileinfos = g_slist_prepend (symlink_fileinfos, info);
+	      char *symlink = NULL;
+	      info = ftp->dir_ops->iter_process (iter,
+						 conn,
+						 dir,
+						 NULL,
+						 walk->data,
+						 query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? NULL : &symlink);
+	      if (symlink)
+		{
+		  /* This is necessary due to our locking. 
+		   * And we must not unlock here because it might invalidate the list we iterate */
+		  symlink_targets = g_slist_prepend (symlink_targets, symlink);
+		  symlink_fileinfos = g_slist_prepend (symlink_fileinfos, info);
+		}
+	      else if (info)
+		{
+		  g_vfs_job_enumerate_add_info (job, info);
+		  g_object_unref (info);
+		}
 	    }
-	  else if (info)
+	  ftp->dir_ops->iter_free (iter);
+	  g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
+	  for (twalk = symlink_targets, fwalk = symlink_fileinfos; twalk; 
+	       twalk = twalk->next, fwalk = fwalk->next)
 	    {
+	      info = resolve_symlink (ftp, conn, fwalk->data, twalk->data);
+	      g_free (twalk->data);
 	      g_vfs_job_enumerate_add_info (job, info);
 	      g_object_unref (info);
 	    }
+	  g_slist_free (symlink_targets);
+	  g_slist_free (symlink_fileinfos);
 	}
-      ftp->dir_ops->iter_free (iter);
-      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-      for (twalk = symlink_targets, fwalk = symlink_fileinfos; twalk; 
-	   twalk = twalk->next, fwalk = fwalk->next)
-	{
-	  info = resolve_symlink (ftp, conn, fwalk->data, twalk->data);
-	  g_free (twalk->data);
-	  g_vfs_job_enumerate_add_info (job, info);
-	  g_object_unref (info);
-	}
-      g_slist_free (symlink_targets);
-      g_slist_free (symlink_fileinfos);
-  
-      if (!ftp_connection_in_error (conn))
-	g_vfs_job_enumerate_done (G_VFS_JOB_ENUMERATE (conn->job));
+      
+      g_vfs_job_enumerate_done (job);
+      conn->job = NULL;
+      g_clear_error (&conn->error);
     }
+  else
+    g_assert (files == NULL);
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
   g_free (dir);

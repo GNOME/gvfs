@@ -1,3 +1,8 @@
+2008-03-12  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	fix enumerating to do the right thing
+
 2008-03-12  Alexander Larsson  <alexl@redhat.com>
 
         * configure.ac:
