@@ -639,7 +639,7 @@ do_async_path_call (GFile *file,
 
   data->file = g_object_ref (file);
   data->op = g_strdup (op);
-  if (data->cancellable)
+  if (cancellable)
     data->cancellable = g_object_ref (cancellable);
   data->callback = callback;
   data->callback_data = callback_data;

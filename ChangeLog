@@ -1,3 +1,9 @@
+2008-03-12  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gdaemonfile.c (do_async_path_call): We were testing the
+	wrong cancellable pointer for non-NULL-ness, which broke cancellation
+	for all async operations. Fix that.
+
 2008-03-11  Alexander Larsson  <alexl@redhat.com>
 
         * common/gsysutils.c:
