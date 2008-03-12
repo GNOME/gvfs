@@ -11,6 +11,7 @@ common/gsysutils.c
 common/gvfsdaemonprotocol.c
 daemon/daemon-main.c
 daemon/gvfsbackend.c
+daemon/gvfsbackendarchive.c
 daemon/gvfsbackendburn.c
 daemon/gvfsbackendcdda.c
 daemon/gvfsbackendcomputer.c

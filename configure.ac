@@ -401,7 +401,69 @@ fi
 AM_CONDITIONAL(HAVE_SAMBA, test "$msg_samba" = "yes")
 AC_SUBST(SAMBA_CFLAGS)
 AC_SUBST(SAMBA_LIBS)
+
+dnl ==========================================================================
+
+dnl ****************************
+dnl *** Check for libarchive ***
+dnl ****************************
+
+AC_ARG_ENABLE(archive, [  --disable-archive       build without archive support])
+msg_archive="no"
+if test "x$enable_archive" != "xno"; then
+  AC_ARG_WITH(archive-includes, [  --with-archive-includes=PREFIX     Location of archive includes.],
+	      with_archive_includes="$withval", with_archive_includes="/usr/include")
+  have_archive_includes="no"
+  if test "x${with_archive_includes}" != "xno"; then
+	CPPFLAGS_save="$CPPFLAGS"
+
+	CPPFLAGS="$CPPFLAGS -I$with_archive_includes"
+	AC_CHECK_HEADER(archive.h, [ archive_includes="yes" ])
+	CPPFLAGS="$CPPFLAGS_save"
 	
+	if test "x{archive_includes}" != "xno" -a "x${archive_includes}" != "x"; then
+		have_archive_includes="yes"
+		if test "${with_archive_includes}" != "/usr/include" ; then
+			ARCHIVE_CFLAGS="-I$with_archive_includes"
+		else
+			ARCHIVE_CFLAGS=""
+		fi
+	else
+		ARCHIVE_CFLAGS=""
+	fi
+  fi
+  AC_ARG_WITH(archive-libs, [  --with-archive-libs=PREFIX     	Location of Archive libs.],
+	      with_archive_libs="$withval", with_archive_libs="/usr/lib")
+  if test "x${with_archive_libs}" != "xno" -a "x${have_archive_includes}" != "xno"; then
+	LDFLAGS_save="$LDFLAGS"
+	
+	LDFLAGS="$LDFLAGS -L$with_archive_libs"
+	AC_CHECK_LIB(archive, archive_read_open, archive_libs="yes", archive_libs="no")
+	LDFLAGS="$LDFLAGS_save"
+	if test "x${archive_libs}" != "xno"; then
+		AC_DEFINE(HAVE_ARCHIVE,, [Define to 1 if you have the libarchive library])
+		msg_archive="yes"
+                if test x$with_archive_libs != x/usr/lib; then
+                        ARCHIVE_LIBS="-L$with_archive_libs -larchive"
+                else
+                	ARCHIVE_LIBS="-larchive"
+                fi
+	else
+		AC_CHECK_LIB(archive, archive_read_open, archive_old_libs="yes", archive_old_libs="no")
+		if test "x${archive_old_libs}" != "xno"; then
+		   msg_archive="Too old, need at least archive 3.0.22"
+		fi
+		ARCHIVE_CFLAGS=""
+		ARCHIVE_LIBS=""
+	fi
+  fi
+  AC_MSG_CHECKING(for Archive 3.libraries)
+  AC_MSG_RESULT($msg_archive)
+fi
+AM_CONDITIONAL(HAVE_ARCHIVE, test "$msg_archive" = "yes")
+AC_SUBST(ARCHIVE_CFLAGS)
+AC_SUBST(ARCHIVE_LIBS)
+
 dnl ==========================================================================
 	
 dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
@@ -478,6 +540,7 @@ echo "
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
         Gphoto2 support:              $msg_gphoto2
+	archive support:	      $msg_archive
         GConf support:                $msg_gconf
         DNS-SD support:               $msg_avahi
 	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)

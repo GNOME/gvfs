@@ -25,6 +25,7 @@
 #include <config.h>
 
 #include <glib/gi18n.h>
+#include <string.h>
 #include <archive.h>
 #include <archive_entry.h>
 
@@ -472,14 +473,16 @@ do_mount (GVfsBackend *backend,
 	  gboolean is_automount)
 {
   GVfsBackendArchive *archive = G_VFS_BACKEND_ARCHIVE (backend);
-  const char *host;
+  const char *host, *file;
   GFileInfo *info;
   GIcon *icon;
   char *filename, *s;
   GError *error = NULL;
 
   host = g_mount_spec_get (mount_spec, "host");
-  if (host == NULL)
+  file = g_mount_spec_get (mount_spec, "file");
+  if (host == NULL &&
+      file == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                        G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
@@ -487,20 +490,25 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  filename = g_uri_unescape_string (host, NULL);
-  if (filename == NULL)
+  if (host != NULL)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                       G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                       _("Invalid mount spec"));
-      return;
+      filename = g_uri_unescape_string (host, NULL);
+      if (filename == NULL)
+        {
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                            _("Invalid mount spec"));
+          return;
+        }
+      
+      archive->file = g_file_new_for_uri (filename);
+      g_free (filename);
     }
-  DEBUG ("Trying to mount %s\n", filename);
+  else
+    archive->file = g_file_new_for_uri (file);
+  
+  DEBUG ("Trying to mount %s\n", g_file_get_uri (archive->file));
 
-  archive->file = g_file_new_for_uri (filename);
-  g_free (filename);
-
-  /* FIXME: check if this file is an archive */
   info = g_file_query_info (archive->file,
 			    "*",
 			    G_FILE_QUERY_INFO_NONE,
@@ -514,6 +522,16 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
+  if (g_file_info_get_file_type (info) != G_FILE_TYPE_REGULAR)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                        _("Invalid mount spec"));
+      return;
+    }
+
+  /* FIXME: check if this file is an archive */
+  
   filename = g_file_get_uri (archive->file);
   DEBUG ("mounted %s\n", filename);
   s = g_uri_escape_string (filename, NULL, FALSE);

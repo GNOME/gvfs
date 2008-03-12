@@ -1,3 +1,11 @@
+2008-03-12  Alexander Larsson  <alexl@redhat.com>
+
+        * configure.ac:
+        * daemon/Makefile.am:
+        * daemon/gvfsbackendarchive.[ch]:
+	Added archive backend from Benjamin Otte
+	Requires libarchive
+
 2008-03-12  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c:
