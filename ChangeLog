@@ -1,3 +1,10 @@
+2008-03-12  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	invalidate the cache of directories that we modified ourselves.
+	* daemon/Makefile.am:
+	allow 10 threads in parallel
+
 2008-03-12  Hans Petter Jansson  <hpj@novell.com>
 
 	* client/gdaemonfile.c (do_async_path_call): We were testing the

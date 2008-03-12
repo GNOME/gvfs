@@ -222,7 +222,7 @@ gvfsd_ftp_SOURCES = \
 gvfsd_ftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendftp.h \
 	-DDEFAULT_BACKEND_TYPE=ftp \
-	-DMAX_JOB_THREADS=1 \
+	-DMAX_JOB_THREADS=10 \
 	$(HTTP_CFLAGS) \
 	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP,'
 

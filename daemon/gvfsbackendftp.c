@@ -1529,6 +1529,34 @@ do_start_write (GVfsBackendFtp *ftp,
     }
 }
 
+static void
+gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *ftp,
+					const FtpFile * dir)
+{
+  g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
+  g_hash_table_remove (ftp->directory_cache, dir);
+  g_static_rw_lock_writer_unlock (&ftp->directory_cache_lock);
+}
+
+static void
+gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *ftp,
+				      FtpConnection * conn,
+				      const FtpFile * file)
+{
+  char *dirname, *filename;
+  FtpFile *dir;
+
+  filename = ftp_filename_to_gvfs_path (conn, file);
+  dirname = g_path_get_dirname (filename);
+  dir = ftp_filename_from_gvfs_path (conn, dirname);
+
+  gvfs_backend_ftp_purge_cache_directory (ftp, dir);
+
+  g_free (dir);
+  g_free (filename);
+  g_free (dirname);
+}
+
 /* forward declaration */
 static GFileInfo *
 create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink);
@@ -1560,6 +1588,7 @@ do_create (GVfsBackend *backend,
     }
   file = ftp_filename_from_gvfs_path (conn, filename);
   do_start_write (ftp, conn, flags, "STOR %s", file);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
   g_free (file);
   return;
 
@@ -1583,6 +1612,7 @@ do_append (GVfsBackend *backend,
 
   file = ftp_filename_from_gvfs_path (conn, filename);
   do_start_write (ftp, conn, flags, "APPE %s", filename);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
   g_free (file);
   return;
 }
@@ -1615,6 +1645,7 @@ do_replace (GVfsBackend *backend,
 
   file = ftp_filename_from_gvfs_path (conn, filename);
   do_start_write (ftp, conn, flags, "STOR %s", file);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
   g_free (file);
   return;
 }
@@ -2050,7 +2081,6 @@ do_set_display_name (GVfsBackend *backend,
   dir = ftp_filename_from_gvfs_path (conn, name);
   g_free (name);
   now = ftp_filename_construct (conn, dir, display_name);
-  g_free (dir);
   if (now == NULL)
     {
       g_set_error (&conn->error, 
@@ -2070,6 +2100,8 @@ do_set_display_name (GVfsBackend *backend,
   g_free (now);
   g_vfs_job_set_display_name_set_new_path (job, name);
   g_free (name);
+  gvfs_backend_ftp_purge_cache_directory (ftp, dir);
+  g_free (dir);
   g_vfs_backend_ftp_push_connection (ftp, conn);
 }
 
@@ -2098,6 +2130,7 @@ do_delete (GVfsBackend *backend,
 			 0,
 			 "RMD %s", file);
 
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
   g_free (file);
   g_vfs_backend_ftp_push_connection (ftp, conn);
 }
@@ -2121,6 +2154,7 @@ do_make_directory (GVfsBackend *backend,
 		       "MKD %s", file);
   /* FIXME: Compare created file with name from server result to be sure 
    * it's correct and otherwise fail. */
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
   g_free (file);
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
@@ -2198,6 +2232,8 @@ do_move (GVfsBackend *backend,
 		       0,
 		       "RNTO %s", destfile);
 
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, srcfile);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, destfile);
 out:
   g_free (srcfile);
   g_free (destfile);
