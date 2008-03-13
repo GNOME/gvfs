@@ -1,0 +1,5 @@
+[Mount]
+Type=archive
+Exec=@libexecdir@/gvfsd-archive
+AutoMount=false
+Scheme=archive

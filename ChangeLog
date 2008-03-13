@@ -1,3 +1,8 @@
+2008-03-13  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/archive.mount.in:
+	Actually add the mount file for archive
+
 2008-03-12  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c:
