@@ -4,7 +4,7 @@
         (set_info_from_stat):
 	Mark files with an initial dot to be hidden.
 	This handles unix smb shares, and should not affect
-	windows shares much, since they generally use dot
+	windows shares much, since they generally don't use dot
 	for extensions so its not used otherwise in filenames.
 
 2008-03-14  Christian Kellner  <gicmo@gnome.org>
