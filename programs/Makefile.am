@@ -19,6 +19,7 @@ bin_PROGRAMS =					\
 	gvfs-tree				\
 	gvfs-info				\
 	gvfs-trash				\
+	gvfs-rename                             \
 	gvfs-rm					\
 	gvfs-copy				\
 	gvfs-move				\
@@ -51,6 +52,9 @@ gvfs_info_LDADD = $(libraries)
 
 gvfs_trash_SOURCES = gvfs-trash.c
 gvfs_trash_LDADD = $(libraries)
+
+gvfs_rename_SOURCES = gvfs-rename.c
+gvfs_rename_LDADD = $(libraries)
 
 gvfs_rm_SOURCES = gvfs-rm.c
 gvfs_rm_LDADD = $(libraries)
