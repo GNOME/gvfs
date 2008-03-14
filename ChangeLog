@@ -1,23 +1,9 @@
 2008-03-14  Christian Kellner  <gicmo@gnome.org>
 
-	reviewed by: <delete if not using a buddy>
-
-	* daemon/gvfsbackenddav.c (message_add_destination_header),
-	(message_add_overwrite_header), (message_add_redirect_header),
-	(redirect_handler), (do_query_info), (do_enumerate),
-	(do_set_display_name), (g_vfs_backend_dav_class_init):
 	* programs/Makefile.am:
-	* programs/gvfs-rename.c (main):
-
-2008-03-14  Christian Kellner  <gicmo@gnome.org>
-
-	reviewed by: <delete if not using a buddy>
-
-	* daemon/gvfsbackenddav.c (message_add_destination_header),
-	(message_add_overwrite_header), (message_add_redirect_header),
-	(redirect_handler), (do_query_info), (do_enumerate),
-	(do_set_display_name), (g_vfs_backend_dav_class_init):
-	* programs/Makefile.am:
+	* programs/gvfs-rename.c:
+	Add a little helper program that renames files
+	by calling g_file_set_display_name ().
 
 2008-03-14  Christian Kellner  <gicmo@gnome.org>
 
