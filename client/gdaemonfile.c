@@ -2071,6 +2071,567 @@ g_daemon_file_monitor_file (GFile* file,
   return monitor;
 }
 
+typedef struct
+{
+  GSimpleAsyncResult *result;
+  dbus_bool_t         can_seek;
+  guint64             initial_offset;
+}
+StreamOpenParams;
+
+static void
+stream_open_cb (gint fd, StreamOpenParams *params)
+{
+  GFileOutputStream *output_stream;
+
+  if (fd == -1)
+    {
+      g_simple_async_result_set_error (params->result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "%s", _("Didn't get stream file descriptor"));
+      goto out;
+    }
+
+  output_stream = g_daemon_file_output_stream_new (fd, params->can_seek, params->initial_offset);
+  g_simple_async_result_set_op_res_gpointer (params->result, output_stream, g_object_unref);
+
+out:
+  g_simple_async_result_complete (params->result);
+  g_object_unref (params->result);
+  g_slice_free (StreamOpenParams, params);
+}
+
+static void
+append_to_async_cb (DBusMessage *reply,
+                    DBusConnection *connection,
+                    GSimpleAsyncResult *result,
+                    GCancellable *cancellable,
+                    gpointer callback_data)
+{
+  DBusMessageIter iter;
+  guint32 fd_id;
+  StreamOpenParams *open_params;
+
+  open_params = g_slice_new0 (StreamOpenParams);
+
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+    {
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       "Invalid return value from append_to_async");
+      goto failure;
+    }
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &open_params->can_seek,
+			      DBUS_TYPE_UINT64, &open_params->initial_offset,
+			      DBUS_TYPE_INVALID))
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "%s", _("Invalid return value from open"));
+      goto failure;
+    }
+
+  open_params->result = g_object_ref (result);
+  _g_dbus_connection_get_fd_async (connection, fd_id,
+                                   (GetFdAsyncCallback) stream_open_cb, open_params);
+  return;
+
+failure:
+  g_slice_free (StreamOpenParams, open_params);
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_append_to_async (GFile                      *file,
+                               GFileCreateFlags            flags,
+                               int                         io_priority,
+                               GCancellable               *cancellable,
+                               GAsyncReadyCallback         callback,
+                               gpointer                    user_data)
+{
+  guint16 mode;
+  dbus_bool_t make_backup;
+  guint32 dbus_flags;
+  char *etag;
+
+  mode = 1;
+  etag = "";
+  make_backup = FALSE;
+  dbus_flags = flags;
+  
+  do_async_path_call (file, 
+                      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
+                      cancellable,
+                      callback, user_data,
+                      append_to_async_cb, NULL, NULL,
+                      DBUS_TYPE_UINT16, &mode,
+                      DBUS_TYPE_STRING, &etag,
+                      DBUS_TYPE_BOOLEAN, &make_backup,
+                      DBUS_TYPE_UINT32, &dbus_flags,
+                      0);
+}
+
+static GFileOutputStream *
+g_daemon_file_append_to_finish (GFile                      *file,
+                                GAsyncResult               *res,
+                                GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GFileOutputStream *output_stream;
+
+  output_stream = g_simple_async_result_get_op_res_gpointer (simple);
+  if (output_stream)
+    return g_object_ref (output_stream);
+
+  return NULL;
+}
+
+static void
+create_async_cb (DBusMessage *reply,
+                 DBusConnection *connection,
+                 GSimpleAsyncResult *result,
+                 GCancellable *cancellable,
+                 gpointer callback_data)
+{
+  DBusMessageIter iter;
+  guint32 fd_id;
+  StreamOpenParams *open_params;
+
+  open_params = g_slice_new0 (StreamOpenParams);
+
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+    {
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       "Invalid return value from create_async");
+      goto failure;
+    }
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &open_params->can_seek,
+			      DBUS_TYPE_UINT64, &open_params->initial_offset,
+			      DBUS_TYPE_INVALID))
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "%s", _("Invalid return value from open"));
+      goto failure;
+    }
+
+  open_params->result = g_object_ref (result);
+  _g_dbus_connection_get_fd_async (connection, fd_id,
+                                   (GetFdAsyncCallback) stream_open_cb, open_params);
+  return;
+
+failure:
+  g_slice_free (StreamOpenParams, open_params);
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_create_async (GFile                      *file,
+                            GFileCreateFlags            flags,
+                            int                         io_priority,
+                            GCancellable               *cancellable,
+                            GAsyncReadyCallback         callback,
+                            gpointer                    user_data)
+{
+  guint16 mode;
+  dbus_bool_t make_backup;
+  char *etag;
+  guint32 dbus_flags;
+
+  mode = 0;
+  etag = "";
+  make_backup = FALSE;
+  dbus_flags = flags;
+  
+  do_async_path_call (file, 
+                      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
+                      cancellable,
+                      callback, user_data,
+                      create_async_cb, NULL, NULL,
+                      DBUS_TYPE_UINT16, &mode,
+                      DBUS_TYPE_STRING, &etag,
+                      DBUS_TYPE_BOOLEAN, &make_backup,
+                      DBUS_TYPE_UINT32, &dbus_flags,
+                      0);
+}
+
+static GFileOutputStream *
+g_daemon_file_create_finish (GFile                      *file,
+                             GAsyncResult               *res,
+                             GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GFileOutputStream *output_stream;
+
+  output_stream = g_simple_async_result_get_op_res_gpointer (simple);
+  if (output_stream)
+    return g_object_ref (output_stream);
+
+  return NULL;
+}
+
+static void
+enumerate_children_async_cb (DBusMessage *reply,
+                             DBusConnection *connection,
+                             GSimpleAsyncResult *result,
+                             GCancellable *cancellable,
+                             gpointer callback_data)
+{
+  GDaemonFileEnumerator *enumerator = callback_data;
+
+  if (reply == NULL || connection == NULL)
+  {
+    g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                     "Invalid return value from enumerate_children");
+    goto out;
+  }
+
+  g_object_ref (enumerator);
+
+  g_daemon_file_enumerator_set_sync_connection (enumerator, connection);
+  g_simple_async_result_set_op_res_gpointer (result, enumerator, g_object_unref);
+
+out:
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_enumerate_children_async (GFile                      *file,
+                                        const char                 *attributes,
+                                        GFileQueryInfoFlags         flags,
+                                        int                         io_priority,
+                                        GCancellable               *cancellable,
+                                        GAsyncReadyCallback         callback,
+                                        gpointer                    user_data)
+{
+  dbus_uint32_t flags_dbus;
+  char *obj_path;
+  GDaemonFileEnumerator *enumerator;
+  char *uri;
+
+  enumerator = g_daemon_file_enumerator_new ();
+  obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
+
+  uri = g_file_get_uri (file);
+
+  if (attributes == NULL)
+    attributes = "";
+  flags_dbus = flags;
+  do_async_path_call (file, 
+                      G_VFS_DBUS_MOUNT_OP_ENUMERATE,
+                      cancellable,
+                      callback, user_data,
+                      enumerate_children_async_cb, enumerator, g_object_unref,
+                      DBUS_TYPE_STRING, &obj_path,
+                      DBUS_TYPE_STRING, &attributes,
+                      DBUS_TYPE_UINT32, &flags_dbus,
+                      DBUS_TYPE_STRING, &uri,
+                      0);
+  g_free (uri);
+  g_free (obj_path);
+}
+
+static GFileEnumerator *
+g_daemon_file_enumerate_children_finish (GFile                      *file,
+                                         GAsyncResult               *res,
+                                         GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GDaemonFileEnumerator *enumerator;
+
+  enumerator = g_simple_async_result_get_op_res_gpointer (simple);
+  if (enumerator)
+    return g_object_ref (enumerator);
+
+  return NULL;
+}
+
+typedef struct
+{
+  GFile              *file;
+  GSimpleAsyncResult *result;
+  GCancellable       *cancellable;
+}
+FindEnclosingMountData;
+
+static void
+find_enclosing_mount_cb (GMountInfo *mount_info,
+                         gpointer user_data,
+                         GError *error)
+{
+  FindEnclosingMountData *data = user_data;
+  GError *my_error = NULL;
+
+  if (data->cancellable && g_cancellable_set_error_if_cancelled (data->cancellable, &my_error))
+    {
+      g_simple_async_result_set_from_error (data->result, my_error);
+      goto out;
+    }
+
+  if (error)
+    {
+      g_simple_async_result_set_from_error (data->result, error);
+      goto out;
+    }
+
+  if (!mount_info)
+    {
+      g_simple_async_result_set_error (data->result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "Internal error: \"%s\"",
+                                       "No error but no mount info from g_daemon_vfs_get_mount_info_async");
+      goto out;
+    }
+
+  if (mount_info->user_visible)
+    {
+      GDaemonMount *mount;
+
+      /* if we have a daemon volume monitor then return one of it's mounts */
+      mount = g_daemon_volume_monitor_find_mount_by_mount_info (mount_info);
+      if (mount == NULL)
+        mount = g_daemon_mount_new (mount_info, NULL);
+      
+      if (mount)
+        g_simple_async_result_set_op_res_gpointer (data->result, mount, g_object_unref);
+      else
+        g_simple_async_result_set_error (data->result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                         "Internal error: \"%s\"",
+                                         "Mount info did not yield a mount");
+    }
+
+out:
+  g_simple_async_result_complete (data->result);
+
+  if (error)
+    g_error_free (error);
+  if (my_error)
+    g_error_free (my_error);
+  if (mount_info)
+    g_mount_info_unref (mount_info);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
+  g_object_unref (data->file);
+  g_free (data);
+}
+
+static void
+g_daemon_file_find_enclosing_mount_async (GFile                *file,
+                                          int                   io_priority,
+                                          GCancellable         *cancellable,
+                                          GAsyncReadyCallback   callback,
+                                          gpointer              user_data)
+{
+  GDaemonFile            *daemon_file = G_DAEMON_FILE (file);
+  FindEnclosingMountData *data;
+
+  data = g_new0 (FindEnclosingMountData, 1);
+
+  data->result = g_simple_async_result_new (G_OBJECT (file),
+                                            callback, user_data,
+                                            NULL);
+  data->file = g_object_ref (file);
+
+  if (cancellable)
+    data->cancellable = g_object_ref (cancellable);
+
+  _g_daemon_vfs_get_mount_info_async (daemon_file->mount_spec,
+                                      daemon_file->path,
+                                      find_enclosing_mount_cb,
+                                      data);
+}
+
+static GMount *
+g_daemon_file_find_enclosing_mount_finish (GFile              *file,
+                                           GAsyncResult       *res,
+                                           GError            **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GMount             *mount;
+
+  mount = g_simple_async_result_get_op_res_gpointer (simple);
+  if (mount)
+    return g_object_ref (mount);
+
+  return NULL;
+}
+
+static void
+replace_async_cb (DBusMessage *reply,
+                  DBusConnection *connection,
+                  GSimpleAsyncResult *result,
+                  GCancellable *cancellable,
+                  gpointer callback_data)
+{
+  DBusMessageIter iter;
+  guint32 fd_id;
+  StreamOpenParams *open_params;
+
+  open_params = g_slice_new0 (StreamOpenParams);
+
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+    {
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       "Invalid return value from replace_async");
+      goto failure;
+    }
+
+  if (!dbus_message_get_args (reply, NULL,
+			      DBUS_TYPE_UINT32, &fd_id,
+			      DBUS_TYPE_BOOLEAN, &open_params->can_seek,
+			      DBUS_TYPE_UINT64, &open_params->initial_offset,
+			      DBUS_TYPE_INVALID))
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "%s", _("Invalid return value from open"));
+      goto failure;
+    }
+
+  open_params->result = g_object_ref (result);
+  _g_dbus_connection_get_fd_async (connection, fd_id,
+                                   (GetFdAsyncCallback) stream_open_cb, open_params);
+  return;
+
+failure:
+  g_slice_free (StreamOpenParams, open_params);
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_replace_async (GFile                      *file,
+                             const char                 *etag,
+                             gboolean                    make_backup,
+                             GFileCreateFlags            flags,
+                             int                         io_priority,
+                             GCancellable               *cancellable,
+                             GAsyncReadyCallback         callback,
+                             gpointer                    user_data)
+{
+  dbus_bool_t dbus_make_backup = make_backup;
+  guint32 dbus_flags = flags;
+  guint16 mode = 0;
+
+  do_async_path_call (file, 
+                      G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
+                      cancellable,
+                      callback, user_data,
+                      replace_async_cb, NULL, NULL,
+                      DBUS_TYPE_UINT16, &mode,
+                      DBUS_TYPE_STRING, &etag,
+                      DBUS_TYPE_BOOLEAN, &dbus_make_backup,
+                      DBUS_TYPE_UINT32, &dbus_flags,
+                      0);
+}
+
+static GFileOutputStream *
+g_daemon_file_replace_finish (GFile                      *file,
+                              GAsyncResult               *res,
+                              GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GFileOutputStream *output_stream;
+
+  output_stream = g_simple_async_result_get_op_res_gpointer (simple);
+  if (output_stream)
+    return g_object_ref (output_stream);
+
+  return NULL;
+}
+
+static void
+set_display_name_async_cb (DBusMessage *reply,
+                           DBusConnection *connection,
+                           GSimpleAsyncResult *result,
+                           GCancellable *cancellable,
+                           gpointer callback_data)
+{
+  GDaemonFile *daemon_file = callback_data;
+  GFile *file;
+  DBusMessageIter iter;
+  gchar *new_path;
+
+  if (!dbus_message_iter_init (reply, &iter) ||
+      !_g_dbus_message_iter_get_args (&iter, NULL,
+				      G_DBUS_TYPE_CSTRING, &new_path,
+				      0))
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                                       "%s", "Invalid return value from set_display_name");
+      goto out;
+    }
+
+  file = new_file_for_new_path (daemon_file, new_path);
+  g_free (new_path);
+
+  g_simple_async_result_set_op_res_gpointer (result, file, g_object_unref);
+
+out:
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_set_display_name_async (GFile                      *file,
+                                      const char                 *display_name,
+                                      int                         io_priority,
+                                      GCancellable               *cancellable,
+                                      GAsyncReadyCallback         callback,
+                                      gpointer                    user_data)
+{
+  g_object_ref (file);
+
+  do_async_path_call (file,
+                      G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME,
+                      cancellable,
+                      callback, user_data,
+                      set_display_name_async_cb, file, g_object_unref,
+                      DBUS_TYPE_STRING, &display_name,
+                      0);
+}
+
+static GFile *
+g_daemon_file_set_display_name_finish (GFile                      *file,
+                                       GAsyncResult               *res,
+                                       GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GFile *new_file;
+
+  new_file = g_simple_async_result_get_op_res_gpointer (simple);
+  return new_file;
+}
+
+#if 0
+
+static void
+g_daemon_file_set_attributes_async (GFile                      *file,
+                                    GFileInfo                  *info,
+                                    GFileQueryInfoFlags        flags,
+                                    int                         io_priority,
+                                    GCancellable               *cancellable,
+                                    GAsyncReadyCallback         callback,
+                                    gpointer                    user_data)
+{
+  /* TODO */
+}
+
+static gboolean
+g_daemon_file_set_attributes_finish (GFile                      *file,
+                                     GAsyncResult               *result,
+                                     GFileInfo                 **info,
+                                     GError                    **error)
+{
+  /* TODO */
+}
+
+#endif
+
 static void
 g_daemon_file_file_iface_init (GFileIface *iface)
 {
@@ -2121,4 +2682,23 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->make_symbolic_link = g_daemon_file_make_symbolic_link;
   iface->monitor_dir = g_daemon_file_monitor_dir;
   iface->monitor_file = g_daemon_file_monitor_file;
+
+  /* Async operations */
+
+  iface->append_to_async = g_daemon_file_append_to_async;
+  iface->append_to_finish = g_daemon_file_append_to_finish;
+  iface->create_async = g_daemon_file_create_async;
+  iface->create_finish = g_daemon_file_create_finish;
+  iface->enumerate_children_async = g_daemon_file_enumerate_children_async;
+  iface->enumerate_children_finish = g_daemon_file_enumerate_children_finish;
+  iface->find_enclosing_mount_async = g_daemon_file_find_enclosing_mount_async;
+  iface->find_enclosing_mount_finish = g_daemon_file_find_enclosing_mount_finish;
+  iface->replace_async = g_daemon_file_replace_async;
+  iface->replace_finish = g_daemon_file_replace_finish;
+  iface->set_display_name_async = g_daemon_file_set_display_name_async;
+  iface->set_display_name_finish = g_daemon_file_set_display_name_finish;
+#if 0
+  iface->set_attributes_async = g_daemon_file_set_attributes_async;
+  iface->set_attributes_finish = g_daemon_file_set_attributes_finish;
+#endif
 }

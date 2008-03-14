@@ -1,3 +1,28 @@
+2008-03-14  Hans Petter Jansson  <hpj@novell.com>
+
+	Implement most of the GDaemonFile async functions.
+
+	* client/gdaemonfile.c (stream_open_cb): Implement.
+	(append_to_async_cb): Implement.
+	(g_daemon_file_append_to_async): Implement.
+	(g_daemon_file_append_to_finish): Implement.
+	(create_async_cb): Implement.
+	(g_daemon_file_create_async): Implement.
+	(g_daemon_file_create_finish): Implement.
+	(enumerate_children_async_cb): Implement.
+	(g_daemon_file_enumerate_children_async): Implement.
+	(g_daemon_file_enumerate_children_finish): Implement.
+	(find_enclosing_mount_cb): Implement.
+	(g_daemon_file_find_enclosing_mount_async): Implement.
+	(g_daemon_file_find_enclosing_mount_finish): Implement.
+	(replace_async_cb): Implement.
+	(g_daemon_file_replace_async): Implement.
+	(g_daemon_file_replace_finish): Implement.
+	(set_display_name_async_cb): Implement.
+	(g_daemon_file_set_display_name_async): Implement.
+	(g_daemon_file_set_display_name_finish): Implement.
+	(g_daemon_file_file_iface_init): Hook up new async functions.
+
 2008-03-14  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/main.c:
