@@ -232,6 +232,8 @@ http_to_uri (GVfsUriMapper    *mapper,
       
       if (port && (port_num = atoi (port)))
           decoded_uri->port = port_num;
+      else
+          decoded_uri->port = -1;
 
       decoded_uri->path = g_strdup (info->path);
 

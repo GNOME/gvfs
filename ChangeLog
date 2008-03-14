@@ -1,3 +1,10 @@
+2008-03-14  Christian Kellner  <gicmo@gnome.org>
+
+	* client/httpuri.c:
+	Make sure we set the port to -1 in case when no port
+	is specified on the url so the port will be omiited
+	when we convert the url to a string
+
 2008-03-13  Alexander Larsson  <alexl@redhat.com>
 
 	* daemon/archive.mount.in:
