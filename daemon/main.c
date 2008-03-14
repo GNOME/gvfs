@@ -66,6 +66,10 @@ main (int argc, char *argv[])
 
   replace = FALSE;
   no_fuse = FALSE;
+
+  if (g_getenv ("GVFS_DISABLE_FUSE") != NULL)
+    no_fuse = TRUE;
+  
   error = NULL;
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {

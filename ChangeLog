@@ -1,5 +1,11 @@
 2008-03-14  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/main.c:
+	Don't autostart fuse backend if the GVFS_DISABLE_FUSE
+	env var is set
+	
+2008-03-14  Alexander Larsson  <alexl@redhat.com>
+
 	* hal/ghalvolume.c (g_hal_volume_new):
 	Respect storage.automount_enabled_hint hal property (#520736)
 	Patch from Martin Pitt
