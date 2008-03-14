@@ -1212,9 +1212,14 @@ set_info_from_stat (GVfsBackendSmb *backend,
   char *content_type;
   char *display_name;
 
-  if (basename) 
-    g_file_info_set_name (info, basename);
+  if (basename)
+    {
+      g_file_info_set_name (info, basename);
+      if (*basename == '.')
+	g_file_info_set_is_hidden (info, TRUE);
+    }
 
+  
   if (basename != NULL &&
       g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
