@@ -1,5 +1,11 @@
 2008-03-14  Alexander Larsson  <alexl@redhat.com>
 
+	* hal/ghalvolume.c (g_hal_volume_new):
+	Respect storage.automount_enabled_hint hal property (#520736)
+	Patch from Martin Pitt
+
+2008-03-14  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsmb.c:
         (set_info_from_stat):
 	Mark files with an initial dot to be hidden.

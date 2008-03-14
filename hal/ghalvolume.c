@@ -568,6 +568,11 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
       return NULL;
     }
 
+  if (drive_device && 
+      hal_device_has_property (drive_device, "storage.automount_enabled_hint") &&
+      !hal_device_get_property_bool (drive_device, "storage.automount_enabled_hint"))
+    ignore_automount = TRUE;
+  
   volume = g_object_new (G_TYPE_HAL_VOLUME, NULL);
   volume->volume_monitor = volume_monitor;
   g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(volume->volume_monitor));
