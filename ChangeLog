@@ -1,3 +1,10 @@
+2008-03-14  Christian Kellner  <gicmo@gnome.org>
+
+	* AUTHORS: Update, add a lot of people and I am
+	sure I have forgotten a few.
+
+	* MAINTAINERS: Add myself
+
 2008-03-14  Hans Petter Jansson  <hpj@novell.com>
 
 	Implement most of the GDaemonFile async functions.
