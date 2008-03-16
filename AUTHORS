@@ -1,4 +1,7 @@
+Overall Superhero (Desgin, Implementation, etc pp)
+==================================================
 Alexander Larsson <alexl@redhat.com>
+
 
 FUSE Integration
 ===============
@@ -27,6 +30,10 @@ Http/WebDAV Backend
 ===================
 Christian Kellner <gicmo@gnome.org>
 Dan Winship <danw@gnome.org>
+
+Network Backend
+===============
+Andrew Walton <awalton@svn.gnome.org>
 
 ObexFTP Backend
 ===============

@@ -1,5 +1,9 @@
 2008-03-16  Christian Kellner  <gicmo@gnome.org>
 
+	* AUTHORS: Forgot to mention A. Walton. Correct that.
+
+2008-03-16  Christian Kellner  <gicmo@gnome.org>
+
 	* client/gdaemonfile.c:  Don't free up the error that
 	we don't own (#522566). Thanks Cosimo Cecchi for helping
 	to debug the issue.
