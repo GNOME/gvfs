@@ -2408,8 +2408,6 @@ find_enclosing_mount_cb (GMountInfo *mount_info,
 out:
   g_simple_async_result_complete (data->result);
 
-  if (error)
-    g_error_free (error);
   if (my_error)
     g_error_free (my_error);
   if (mount_info)
