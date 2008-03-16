@@ -28,7 +28,7 @@
 
 static GOptionEntry entries[] = 
 {
-	{ NULL }
+  { NULL }
 };
 
 
@@ -39,11 +39,11 @@ main (int argc, char *argv[])
   GError         *error;
   GFile          *file;
   GFile          *new_file;
-  
+
   setlocale (LC_ALL, "");
 
   g_type_init ();
-  
+
   error = NULL;
   context = g_option_context_new ("- rename file");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
@@ -56,7 +56,7 @@ main (int argc, char *argv[])
                   g_get_prgname ());
       return 1;
     }
-  
+
   file = g_file_new_for_commandline_arg (argv[1]);
 
   new_file = g_file_set_display_name (file, argv[2],
@@ -64,13 +64,13 @@ main (int argc, char *argv[])
 
   if (new_file == NULL)
     {
-      g_print ("Error rename file: %s\n", error->message);
+      g_print ("Error: %s\n", error->message);
       g_error_free (error);
     }
   else
     {
       char *uri = g_file_get_uri (new_file);
-      g_print ("Success (new uri: %s)\n", uri);
+      g_print ("Rename successful. New uri: %s\n", uri);
       g_object_unref (new_file);
       g_free (uri);
     }
