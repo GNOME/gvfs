@@ -1,3 +1,15 @@
+Major changes in 0.2.1:
+* Added archive backend
+* Implement most of the async functions in GDaemonFile
+* Correctly handle usernames in uris for ftp://
+* Ftp fixes
+* Webdav fixes
+* Add gvfs-rename command line utility
+* Fix cancellation
+* OpenBSD fixes
+* smb: hide dot files
+* Enviroment variable to disable fuse backend at runtime
+
 Major changes in 0.2.0:
 * Fix crashes
 * Build and portability fixes
