@@ -2410,8 +2410,6 @@ out:
 
   if (my_error)
     g_error_free (my_error);
-  if (mount_info)
-    g_mount_info_unref (mount_info);
   if (data->cancellable)
     g_object_unref (data->cancellable);
   g_object_unref (data->file);
