@@ -1,3 +1,10 @@
+2008-03-17  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendftp.c (do_mount):
+	Correctly handle username in mountspec. Only set it if
+	it was in the requested mountspec (and only to that value).
+	Fixes #522449
+
 2008-03-17  Christian Kellner  <gicmo@gnome.org>
 
 	* client/gdaemonfile.c: (find_enclosing_mount_cb): Don't unref

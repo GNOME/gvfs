@@ -113,6 +113,7 @@ struct _GVfsBackendFtp
 
   SoupAddress *		addr;
   char *		user;
+  gboolean              has_initial_user;
   char *		password;	/* password or NULL for anonymous */
 
   /* vfuncs */
@@ -1213,7 +1214,7 @@ do_mount (GVfsBackend *backend,
   char *username;
   char *password;
   char *display_name;
-  gboolean aborted, anonymous;
+  gboolean aborted, anonymous, break_on_fail;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   guint port;
 
@@ -1238,8 +1239,18 @@ do_mount (GVfsBackend *backend,
 	                    soup_address_get_name (ftp->addr),
 	                    port);
 
-  if (ftp->user &&
-      g_vfs_keyring_lookup_password (ftp->user,
+  username = NULL;
+  password = NULL;
+  break_on_fail = FALSE;
+  
+  if (ftp->user != NULL && strcmp (ftp->user, "anonymous") == 0)
+    {
+      anonymous = TRUE;
+      break_on_fail = TRUE;
+      goto try_login;
+    }
+  
+  if (g_vfs_keyring_lookup_password (ftp->user,
 				     soup_address_get_name (ftp->addr),
 				     NULL,
 				     "ftp",
@@ -1256,19 +1267,25 @@ do_mount (GVfsBackend *backend,
 
   while (TRUE)
     {
+      GAskPasswordFlags flags;
       if (prompt == NULL)
 	/* translators: %s here is the hostname */
 	prompt = g_strdup_printf (_("Enter password for ftp on %s"), host);
 
+      flags = G_ASK_PASSWORD_NEED_PASSWORD;
+        
+      if (!ftp->has_initial_user)
+        flags |= G_ASK_PASSWORD_NEED_USERNAME | G_ASK_PASSWORD_ANONYMOUS_SUPPORTED;
+      
+      if (g_vfs_keyring_is_available ())
+        flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+      
       if (!g_mount_source_ask_password (
 			mount_source,
 		        prompt,
 			ftp->user,
 		        NULL,
-		        G_ASK_PASSWORD_NEED_USERNAME |
-		        G_ASK_PASSWORD_NEED_PASSWORD |
-		        G_ASK_PASSWORD_ANONYMOUS_SUPPORTED |
-		        (g_vfs_keyring_is_available () ? G_ASK_PASSWORD_SAVING_SUPPORTED : 0),
+                        flags,
 		        &aborted,
 		        &password,
 		        &username,
@@ -1282,6 +1299,13 @@ do_mount (GVfsBackend *backend,
 	  break;
 	}
 
+      /* NEED_USERNAME wasn't set */
+      if (ftp->has_initial_user)
+        {
+          g_free (username);
+          username = g_strdup (ftp->user);
+        }
+      
 try_login:
       g_free (ftp->user);
       g_free (ftp->password);
@@ -1298,12 +1322,16 @@ try_login:
 	}
       else
 	{
-	  ftp->user = username ? username : g_strdup ("");
-	  ftp->password = password;
+	  ftp->user = username ? g_strdup (username) : g_strdup ("");
+	  ftp->password = g_strdup (password);
 	  if (ftp_connection_login (conn, username, password) != 0)
 	    break;
 	}
-      if (!g_error_matches (conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
+      g_free (username);
+      g_free (password);
+      
+      if (break_on_fail ||
+          !g_error_matches (conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
 	break;
 
       g_clear_error (&conn->error);
@@ -1318,7 +1346,7 @@ try_login:
     }
   else
     {
-      if (prompt)
+      if (prompt && !anonymous)
 	{
 	  /* a prompt was created, so we have to save the password */
 	  g_vfs_keyring_save_password (ftp->user,
@@ -1342,13 +1370,13 @@ try_login:
 	  g_free (port_str);
 	}
 
+      if (ftp->has_initial_user)
+        g_mount_spec_set (mount_spec, "user", ftp->user);
+          
       if (g_str_equal (ftp->user, "anonymous"))
-	{
-	  display_name = g_strdup_printf (_("ftp on %s"), host);
-	}
+        display_name = g_strdup_printf (_("ftp on %s"), host);
       else
 	{
-	  g_mount_spec_set (mount_spec, "user", ftp->user);
 	  /* Translators: the first %s is the username, the second the host name */
 	  display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, host);
 	}
@@ -1398,6 +1426,7 @@ try_mount (GVfsBackend *backend,
 
   ftp->addr = soup_address_new (host, port);
   ftp->user = g_strdup (g_mount_spec_get (mount_spec, "user"));
+  ftp->has_initial_user = ftp->user != NULL;
 
   return FALSE;
 }
