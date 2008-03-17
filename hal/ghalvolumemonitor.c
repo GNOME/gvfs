@@ -801,7 +801,6 @@ static GUnixMountPoint *
 get_mount_point_for_device (HalDevice *d, GList *fstab_mount_points)
 {
   GList *l;
-  gboolean ret;
   const char *device_file;
   const char *device_mount_point;
 

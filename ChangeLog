@@ -1,3 +1,11 @@
+2008-03-17  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	return G_IO_ERROR_NOT_EMPTY if we're trying to delete a non-empty
+	directory.
+	* hal/ghalvolumemonitor.c: (get_mount_point_for_device):
+	remove unused variable
+
 2008-03-16  Christian Kellner  <gicmo@gnome.org>
 
 	* AUTHORS: Forgot to mention A. Walton. Correct that.

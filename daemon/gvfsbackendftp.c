@@ -237,7 +237,8 @@ ftp_connection_set_error_from_response (FtpConnection *conn, guint response)
 	break;
       case 450: /* Requested file action not taken. File unavailable (e.g., file busy). */
       case 550: /* Requested action not taken. File unavailable (e.g., file not found, no access). */
-	/* FIXME: This is a lot of different errors */
+	/* FIXME: This is a lot of different errors. So we have to pretend to 
+	 * be smart here. */
 	code = G_IO_ERROR_NOT_FOUND;
 	msg = _("File unavailable");
 	break;
@@ -2134,9 +2135,29 @@ do_delete (GVfsBackend *backend,
 				  RESPONSE_PASS_500,
 				  "DELE %s", file);
   if (STATUS_GROUP (response) == 5)
-    ftp_connection_send (conn,
-			 0,
-			 "RMD %s", file);
+    {
+      response = ftp_connection_send (conn,
+				      RESPONSE_PASS_500,
+				      "RMD %s", file);
+      if (response == 550)
+	{
+	  const GList *files = enumerate_directory (ftp, conn, file, FALSE);
+	  if (files)
+	    {
+	      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
+	      g_set_error (&conn->error, 
+			   G_IO_ERROR,
+			   G_IO_ERROR_NOT_EMPTY,
+			   "%s", g_strerror (ENOTEMPTY));
+	    }
+	  else
+	    ftp_connection_set_error_from_response (conn, response);
+	}
+      else if (STATUS_GROUP (response) == 5)
+	{
+	  ftp_connection_set_error_from_response (conn, response);
+	}
+    }
 
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
   g_free (file);
