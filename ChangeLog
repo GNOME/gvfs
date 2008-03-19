@@ -1,3 +1,10 @@
+2008-03-19  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsjobenumerate.c (send_reply): 
+	* daemon/gvfsjobdbus.c (send_reply):
+	Add job pointer to output spew to make it possible
+	to match lines.
+
 2008-03-19  Sebastian Dröge  <slomo@circular-chaos.org>
 
 	* daemon/gvfsbackendsftp.c: (handle_login): Make the sftp backend

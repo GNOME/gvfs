@@ -156,7 +156,7 @@ send_reply (GVfsJob *job)
   DBusMessage *reply;
   GVfsJobDBusClass *class;
 
-  g_print ("send_reply, failed=%d (%s)\n", job->failed, job->failed?job->error->message:"");
+  g_print ("send_reply(%p), failed=%d (%s)\n", job, job->failed, job->failed?job->error->message:"");
   
   class = G_VFS_JOB_DBUS_GET_CLASS (job);
   
