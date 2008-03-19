@@ -782,6 +782,8 @@ handle_login (GVfsBackend *backend,
       if (g_str_has_suffix (buffer, "password: ") ||
           g_str_has_suffix (buffer, "Password: ") ||
           g_str_has_suffix (buffer, "Password:")  ||
+          g_str_has_prefix (buffer, "Password for ") ||
+          g_str_has_prefix (buffer, "Enter Kerberos password") ||
           g_str_has_prefix (buffer, "Enter passphrase for key"))
         {
 	  authtype = get_authtype_from_password_line (buffer);

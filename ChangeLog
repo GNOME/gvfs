@@ -1,3 +1,8 @@
+2008-03-19  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login): Make the sftp backend
+	work when pam_krb5 is used on the server side.
+
 2008-03-18  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac: Post release version bump.
