@@ -57,6 +57,7 @@
 #define PATH_GCONF_GNOME_VFS_SMB_WORKGROUP "/system/smb/workgroup"
 
 #include <libsmbclient.h>
+#include "libsmb-compat.h"
 
 struct _GVfsBackendSmb
 {
@@ -147,7 +148,7 @@ auth_callback (SMBCCTX *context,
   char *ask_password, *ask_user, *ask_domain;
   gboolean handled, abort;
 
-  backend = smbc_option_get (context, "user_data");
+  backend = smbc_getOptionUserData (context);
 
   strncpy (password_out, "", pwmaxlen);
   
@@ -274,7 +275,7 @@ add_cached_server (SMBCCTX *context, SMBCSRV *new,
 {
   GVfsBackendSmb *backend;
 
-  backend = smbc_option_get (context, "user_data");
+  backend = smbc_getOptionUserData (context);
   
   if (backend->cached_server != NULL)
     return 1;
@@ -300,7 +301,7 @@ remove_cached_server(SMBCCTX * context, SMBCSRV * server)
 {
   GVfsBackendSmb *backend;
 
-  backend = smbc_option_get (context, "user_data");
+  backend = smbc_getOptionUserData (context);
   
   if (backend->cached_server == server)
     {
@@ -336,7 +337,7 @@ get_cached_server (SMBCCTX * context,
 {
   GVfsBackendSmb *backend;
 
-  backend = smbc_option_get (context, "user_data");
+  backend = smbc_getOptionUserData (context);
 
   if (backend->cached_server != NULL &&
       strcmp (backend->cached_server_name, server_name) == 0 &&
@@ -360,7 +361,7 @@ purge_cached (SMBCCTX * context)
 {
   GVfsBackendSmb *backend;
   
-  backend = smbc_option_get (context, "user_data");
+  backend = smbc_getOptionUserData (context);
 
   if (backend->cached_server)
     remove_cached_server(context, backend->cached_server);
@@ -457,6 +458,7 @@ do_mount (GVfsBackend *backend,
   int res;
   char *display_name;
   GMountSpec *smb_mount_spec;
+  smbc_stat_fn smbc_stat;
 
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
@@ -466,37 +468,31 @@ do_mount (GVfsBackend *backend,
 			_("Internal Error (%s)"), "Failed to allocate smb context");
       return;
     }
-  smbc_option_set (smb_context, "user_data", backend);
-  
-  smb_context->debug = 0;
-  
-  smb_context->callbacks.auth_fn = NULL;
-  smbc_option_set (smb_context, "auth_function",
-		   (void *) auth_callback);
-  
-  smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
-  smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
-  smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
-  smb_context->callbacks.purge_cached_fn      = purge_cached;
- 
-  /* libsmbclient frees this on it's own, so make sure 
-   * to use simple system malloc */
-  if (default_workgroup != NULL)
-    smb_context->workgroup = strdup (default_workgroup);
-  
-  smb_context->flags = 0;
-  
-#if defined(HAVE_SAMBA_FLAGS) 
-#if defined(SMB_CTX_FLAG_USE_KERBEROS) && defined(SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS)
-  smb_context->flags |= SMB_CTX_FLAG_USE_KERBEROS | SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS;
-#endif
-#if defined(SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON)
-  smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
-#endif
-#endif
+  smbc_setOptionUserData (smb_context, backend);
 
+  smbc_setDebug (smb_context, 0);
+  smbc_setFunctionAuthDataWithContext (smb_context, auth_callback);
+  
+  smbc_setFunctionAddCachedServer (smb_context, add_cached_server);
+  smbc_setFunctionGetCachedServer (smb_context, get_cached_server);
+  smbc_setFunctionRemoveCachedServer (smb_context, remove_cached_server);
+  smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
+
+  /* FIXME: is strdup() still needed here? -- removed */
+  if (default_workgroup != NULL)
+    smbc_setWorkgroup (smb_context, default_workgroup);
+
+#ifndef DEPRECATED_SMBC_INTERFACE
+  smb_context->flags = 0;
+#endif
+  
+  smbc_setOptionUseKerberos (smb_context, 1);
+  smbc_setOptionFallbackAfterKerberos (smb_context, 1);  
+  smbc_setOptionNoAutoAnonymousLogin (smb_context, 1);
+
+  
 #if 0
-  smbc_option_set(smb_context, "debug_stderr", (void *) 1);
+  smbc_setOptionDebugToStderr (smb_context, 1);
 #endif
   
   if (!smbc_init_context (smb_context))
@@ -536,8 +532,9 @@ do_mount (GVfsBackend *backend,
   do
     {
       op_backend->mount_try_again = FALSE;
-      
-      res = smb_context->stat (smb_context, uri, &st);
+
+      smbc_stat = smbc_getFunctionStat (smb_context);
+      res = smbc_stat (smb_context, uri, &st);
       
       if (res == 0 ||
 	  (errno != EACCES && errno != EPERM))
@@ -615,9 +612,11 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
   SMBCFILE *file;
+  smbc_open_fn smbc_open;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  file = op_backend->smb_context->open (op_backend->smb_context, uri, O_RDONLY, 0);
+  smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  file = smbc_open (op_backend->smb_context, uri, O_RDONLY, 0);
   g_free (uri);
 
   if (file == NULL)
@@ -639,6 +638,7 @@ do_read (GVfsBackend *backend,
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   ssize_t res;
+  smbc_read_fn smbc_read;
 
   /* For some reason requests of 65536 bytes broke for me (returned 0)
    * Maybe some smb protocol limit
@@ -646,7 +646,8 @@ do_read (GVfsBackend *backend,
   if (bytes_requested > 65535)
     bytes_requested = 65535;
   
-  res = op_backend->smb_context->read (op_backend->smb_context, (SMBCFILE *)handle, buffer, bytes_requested);
+  smbc_read = smbc_getFunctionRead (op_backend->smb_context);
+  res = smbc_read (op_backend->smb_context, (SMBCFILE *)handle, buffer, bytes_requested);
 
   if (res == -1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
@@ -668,6 +669,7 @@ do_seek_on_read (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   int whence;
   off_t res;
+  smbc_lseek_fn smbc_lseek;
 
   switch (type)
     {
@@ -687,7 +689,8 @@ do_seek_on_read (GVfsBackend *backend,
       return;
     }
 
-  res = op_backend->smb_context->lseek (op_backend->smb_context, (SMBCFILE *)handle, offset, whence);
+  smbc_lseek = smbc_getFunctionLseek (op_backend->smb_context);
+  res = smbc_lseek (op_backend->smb_context, (SMBCFILE *)handle, offset, whence);
 
   if (res == (off_t)-1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
@@ -707,8 +710,10 @@ do_close_read (GVfsBackend *backend,
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   ssize_t res;
+  smbc_close_fn smbc_close;
 
-  res = op_backend->smb_context->close_fn (op_backend->smb_context, (SMBCFILE *)handle);
+  smbc_close = smbc_getFunctionClose (op_backend->smb_context);
+  res = smbc_close (op_backend->smb_context, (SMBCFILE *)handle);
   if (res == -1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
   else
@@ -741,9 +746,11 @@ do_create (GVfsBackend *backend,
   char *uri;
   SMBCFILE *file;
   SmbWriteHandle *handle;
+  smbc_open_fn smbc_open;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+  smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  file = smbc_open (op_backend->smb_context, uri,
 					O_CREAT|O_WRONLY|O_EXCL, 0666);
   g_free (uri);
 
@@ -771,9 +778,12 @@ do_append_to (GVfsBackend *backend,
   SMBCFILE *file;
   SmbWriteHandle *handle;
   off_t initial_offset;
+  smbc_open_fn smbc_open;
+  smbc_lseek_fn smbc_lseek;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+  smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  file = smbc_open (op_backend->smb_context, uri,
 					O_CREAT|O_WRONLY|O_APPEND, 0666);
   g_free (uri);
 
@@ -784,7 +794,8 @@ do_append_to (GVfsBackend *backend,
       handle = g_new0 (SmbWriteHandle, 1);
       handle->file = file;
 
-      initial_offset = op_backend->smb_context->lseek (op_backend->smb_context, file,
+      smbc_lseek = smbc_getFunctionLseek (op_backend->smb_context);
+      initial_offset = smbc_lseek (op_backend->smb_context, file,
 						       0, SEEK_CUR);
       if (initial_offset == (off_t) -1)
 	g_vfs_job_open_for_write_set_can_seek (job, FALSE);
@@ -837,6 +848,7 @@ open_tmpfile (GVfsBackendSmb *backend,
   char *dir_uri, *tmp_uri;
   char filename[] = "~gvfXXXX.tmp";
   SMBCFILE *file;
+  smbc_open_fn smbc_open;
 
   dir_uri = get_dir_from_uri (uri);
  
@@ -844,7 +856,8 @@ open_tmpfile (GVfsBackendSmb *backend,
     random_chars (filename + 4, 4);
     tmp_uri = g_strconcat (dir_uri, filename, NULL);
 
-    file = backend->smb_context->open (backend->smb_context, tmp_uri,
+    smbc_open = smbc_getFunctionOpen (backend->smb_context);
+    file = smbc_open (backend->smb_context, tmp_uri,
 				       O_CREAT|O_WRONLY|O_EXCL, 0666);
   } while (file == NULL && errno == EEXIST);
 
@@ -874,19 +887,28 @@ copy_file (GVfsBackendSmb *backend,
   ssize_t res;
   char *p;
   gboolean succeeded;
+  smbc_open_fn smbc_open;
+  smbc_read_fn smbc_read;
+  smbc_write_fn smbc_write;
+  smbc_close_fn smbc_close;
   
 
   from_file = NULL;
   to_file = NULL;
 
   succeeded = FALSE;
-  
-  from_file = backend->smb_context->open (backend->smb_context, from_uri,
+
+  smbc_open = smbc_getFunctionOpen (backend->smb_context);
+  smbc_read = smbc_getFunctionRead (backend->smb_context);
+  smbc_write = smbc_getFunctionWrite (backend->smb_context);
+  smbc_close = smbc_getFunctionClose (backend->smb_context);
+
+  from_file = smbc_open (backend->smb_context, from_uri,
 					  O_RDONLY, 0666);
   if (from_file == NULL || g_vfs_job_is_cancelled (job))
     goto out;
   
-  to_file = backend->smb_context->open (backend->smb_context, to_uri,
+  to_file = smbc_open (backend->smb_context, to_uri,
 					O_CREAT|O_WRONLY|O_TRUNC, 0666);
 
   if (from_file == NULL || g_vfs_job_is_cancelled (job))
@@ -895,7 +917,7 @@ copy_file (GVfsBackendSmb *backend,
   while (1)
     {
       
-      res = backend->smb_context->read (backend->smb_context, from_file,
+      res = smbc_read (backend->smb_context, from_file,
 					buffer, sizeof(buffer));
       if (res < 0 || g_vfs_job_is_cancelled (job))
 	goto out;
@@ -906,7 +928,7 @@ copy_file (GVfsBackendSmb *backend,
       p = buffer;
       while (buffer_size > 0)
 	{
-	  res = backend->smb_context->write (backend->smb_context, to_file,
+	  res = smbc_write (backend->smb_context, to_file,
 					     p, buffer_size);
 	  if (res < 0 || g_vfs_job_is_cancelled (job))
 	    goto out;
@@ -918,9 +940,9 @@ copy_file (GVfsBackendSmb *backend,
  
  out: 
   if (to_file)
-    backend->smb_context->close_fn (backend->smb_context, to_file);
+	  smbc_close (backend->smb_context, to_file);
   if (from_file)
-    backend->smb_context->close_fn (backend->smb_context, from_file);
+	  smbc_close (backend->smb_context, from_file);
   return succeeded;
 }
 
@@ -945,6 +967,8 @@ do_replace (GVfsBackend *backend,
   SMBCFILE *file;
   GError *error = NULL;
   SmbWriteHandle *handle;
+  smbc_open_fn smbc_open;
+  smbc_stat_fn smbc_stat;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   tmp_uri = NULL;
@@ -952,8 +976,11 @@ do_replace (GVfsBackend *backend,
     backup_uri = g_strconcat (uri, "~", NULL);
   else
     backup_uri = NULL;
+
+  smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
   
-  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+  file = smbc_open (op_backend->smb_context, uri,
 					O_CREAT|O_WRONLY|O_EXCL, 0);
   if (file == NULL && errno != EEXIST)
     {
@@ -968,7 +995,7 @@ do_replace (GVfsBackend *backend,
     {
       if (etag != NULL)
 	{
-	  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &original_stat);
+	  res = smbc_stat (op_backend->smb_context, uri, &original_stat);
 	  
 	  if (res == 0)
 	    {
@@ -1025,7 +1052,7 @@ do_replace (GVfsBackend *backend,
 	      backup_uri = NULL;
 	    }
 	  
-	  file = op_backend->smb_context->open (op_backend->smb_context, uri,
+	  file = smbc_open (op_backend->smb_context, uri,
 						O_CREAT|O_WRONLY|O_TRUNC, 0);
 	  if (file == NULL)
 	    {
@@ -1076,8 +1103,10 @@ do_write (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   SmbWriteHandle *handle = _handle;
   ssize_t res;
+  smbc_write_fn smbc_write;
 
-  res = op_backend->smb_context->write (op_backend->smb_context, handle->file,
+  smbc_write = smbc_getFunctionWrite (op_backend->smb_context);
+  res = smbc_write (op_backend->smb_context, handle->file,
 					buffer, buffer_size);
   if (res == -1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
@@ -1099,6 +1128,7 @@ do_seek_on_write (GVfsBackend *backend,
   SmbWriteHandle *handle = _handle;
   int whence;
   off_t res;
+  smbc_lseek_fn smbc_lseek;
 
   switch (type)
     {
@@ -1118,7 +1148,8 @@ do_seek_on_write (GVfsBackend *backend,
       return;
     }
 
-  res = op_backend->smb_context->lseek (op_backend->smb_context, handle->file, offset, whence);
+  smbc_lseek = smbc_getFunctionLseek (op_backend->smb_context);
+  res = smbc_lseek (op_backend->smb_context, handle->file, offset, whence);
 
   if (res == (off_t)-1)
     g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
@@ -1141,17 +1172,26 @@ do_close_write (GVfsBackend *backend,
   struct stat stat_at_close;
   int stat_res;
   ssize_t res;
+  smbc_fstat_fn smbc_fstat;
+  smbc_close_fn smbc_close;
+  smbc_unlink_fn smbc_unlink;
+  smbc_rename_fn smbc_rename;
 
-  stat_res = op_backend->smb_context->fstat (op_backend->smb_context, handle->file, &stat_at_close);
+  smbc_fstat = smbc_getFunctionFstat (op_backend->smb_context);
+  smbc_close = smbc_getFunctionClose (op_backend->smb_context);
+  smbc_unlink = smbc_getFunctionUnlink (op_backend->smb_context);
+  smbc_rename = smbc_getFunctionRename (op_backend->smb_context);
   
-  res = op_backend->smb_context->close_fn (op_backend->smb_context, handle->file);
+  stat_res = smbc_fstat (op_backend->smb_context, handle->file, &stat_at_close);
+  
+  res = smbc_close (op_backend->smb_context, handle->file);
 
   if (res == -1)
     {
       g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
       
       if (handle->tmp_uri)
-	op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
+    	  smbc_unlink (op_backend->smb_context, handle->tmp_uri);
       goto out;
     }
 
@@ -1159,13 +1199,13 @@ do_close_write (GVfsBackend *backend,
     {
       if (handle->backup_uri)
 	{
-	  res = op_backend->smb_context->rename (op_backend->smb_context, handle->uri,
+	  res = smbc_rename (op_backend->smb_context, handle->uri,
 						 op_backend->smb_context, handle->backup_uri);
 	  if (res ==  -1)
 	    {
               int errsv = errno;
 
-	      op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
+          smbc_unlink (op_backend->smb_context, handle->tmp_uri);
 	      g_vfs_job_failed (G_VFS_JOB (job),
 				G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
 				_("Backup file creation failed: %s"), g_strerror (errsv));
@@ -1173,13 +1213,13 @@ do_close_write (GVfsBackend *backend,
 	    }
 	}
       else
-	op_backend->smb_context->unlink (op_backend->smb_context, handle->uri);
+	smbc_unlink (op_backend->smb_context, handle->uri);
       
-      res = op_backend->smb_context->rename (op_backend->smb_context, handle->tmp_uri,
+      res = smbc_rename (op_backend->smb_context, handle->tmp_uri,
 					     op_backend->smb_context, handle->uri);
       if (res ==  -1)
 	{
-	  op_backend->smb_context->unlink (op_backend->smb_context, handle->tmp_uri);
+	  smbc_unlink (op_backend->smb_context, handle->tmp_uri);
 	  g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
 	  goto out;
 	}
@@ -1377,9 +1417,11 @@ do_query_info (GVfsBackend *backend,
   char *uri;
   int res, saved_errno;
   char *basename;
+  smbc_stat_fn smbc_stat;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &st);
+  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+  res = smbc_stat (op_backend->smb_context, uri, &st);
   saved_errno = errno;
   g_free (uri);
 
@@ -1450,9 +1492,19 @@ do_enumerate (GVfsBackend *backend,
   GFileInfo *info;
   GString *uri;
   int uri_start_len;
+  smbc_opendir_fn smbc_opendir;
+  smbc_getdents_fn smbc_getdents;
+  smbc_stat_fn smbc_stat;
+  smbc_closedir_fn smbc_closedir;
 
   uri = create_smb_uri_string (op_backend->server, op_backend->share, filename);
-  dir = op_backend->smb_context->opendir (op_backend->smb_context, uri->str);
+  
+  smbc_opendir = smbc_getFunctionOpendir (op_backend->smb_context);
+  smbc_getdents = smbc_getFunctionGetdents (op_backend->smb_context);
+  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+  smbc_closedir = smbc_getFunctionClosedir (op_backend->smb_context);
+  
+  dir = smbc_opendir (op_backend->smb_context, uri->str);
 
   if (dir == NULL)
     {
@@ -1475,7 +1527,7 @@ do_enumerate (GVfsBackend *backend,
     {
       files = NULL;
       
-      res = op_backend->smb_context->getdents (op_backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
+      res = smbc_getdents (op_backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
       if (res <= 0)
 	break;
       
@@ -1507,7 +1559,7 @@ do_enumerate (GVfsBackend *backend,
 		}
 	      else
 		{
-		  stat_res = op_backend->smb_context->stat (op_backend->smb_context,
+		  stat_res = smbc_stat (op_backend->smb_context,
 							    uri->str, &st);
 		  if (stat_res == 0)
 		    {
@@ -1532,7 +1584,7 @@ do_enumerate (GVfsBackend *backend,
 	}
     }
       
-  res = op_backend->smb_context->closedir (op_backend->smb_context, dir);
+  res = smbc_closedir (op_backend->smb_context, dir);
 
   g_vfs_job_enumerate_done (job);
 
@@ -1555,6 +1607,7 @@ do_set_display_name (GVfsBackend *backend,
   char *from_uri, *to_uri;
   char *dirname, *new_path;
   int res, errsv;
+  smbc_rename_fn smbc_rename;
 
   dirname = g_path_get_dirname (filename);
 
@@ -1568,7 +1621,8 @@ do_set_display_name (GVfsBackend *backend,
   from_uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   to_uri = create_smb_uri (op_backend->server, op_backend->share, new_path);
   
-  res = op_backend->smb_context->rename (op_backend->smb_context, from_uri,
+  smbc_rename = smbc_getFunctionRename (op_backend->smb_context);
+  res = smbc_rename (op_backend->smb_context, from_uri,
 					 op_backend->smb_context, to_uri);
   errsv = errno;
   g_free (from_uri);
@@ -1593,10 +1647,18 @@ do_delete (GVfsBackend *backend,
   struct stat statbuf;
   char *uri;
   int errsv, res;
+  smbc_stat_fn smbc_stat;
+  smbc_rmdir_fn smbc_rmdir;
+  smbc_unlink_fn smbc_unlink;
+
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
 
-  res = op_backend->smb_context->stat (op_backend->smb_context, uri, &statbuf);
+  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+  smbc_rmdir = smbc_getFunctionRmdir (op_backend->smb_context);
+  smbc_unlink = smbc_getFunctionUnlink (op_backend->smb_context);
+
+  res = smbc_stat (op_backend->smb_context, uri, &statbuf);
   if (res == -1)
     {
       errsv = errno;
@@ -1611,9 +1673,9 @@ do_delete (GVfsBackend *backend,
     }
 
   if (S_ISDIR (statbuf.st_mode))
-    res = op_backend->smb_context->rmdir (op_backend->smb_context, uri);
+    res = smbc_rmdir (op_backend->smb_context, uri);
   else
-    res = op_backend->smb_context->unlink (op_backend->smb_context, uri);
+    res = smbc_unlink (op_backend->smb_context, uri);
   errsv = errno;
   g_free (uri);
 
@@ -1631,9 +1693,11 @@ do_make_directory (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
   int errsv, res;
+  smbc_mkdir_fn smbc_mkdir;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
-  res = op_backend->smb_context->mkdir (op_backend->smb_context, uri, 0666);
+  smbc_mkdir = smbc_getFunctionMkdir (op_backend->smb_context);
+  res = smbc_mkdir (op_backend->smb_context, uri, 0666);
   errsv = errno;
   g_free (uri);
 
@@ -1657,10 +1721,18 @@ do_move (GVfsBackend *backend,
   gboolean destination_exist, source_is_dir;
   struct stat statbuf;
   int res, errsv;
+  smbc_stat_fn smbc_stat;
+  smbc_rename_fn smbc_rename;
+  smbc_unlink_fn smbc_unlink;
+
   
   source_uri = create_smb_uri (op_backend->server, op_backend->share, source);
 
-  res = op_backend->smb_context->stat (op_backend->smb_context, source_uri, &statbuf);
+  smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+  smbc_rename = smbc_getFunctionRename (op_backend->smb_context);
+  smbc_unlink = smbc_getFunctionUnlink (op_backend->smb_context);
+
+  res = smbc_stat (op_backend->smb_context, source_uri, &statbuf);
   if (res == -1)
     {
       errsv = errno;
@@ -1679,7 +1751,7 @@ do_move (GVfsBackend *backend,
   dest_uri = create_smb_uri (op_backend->server, op_backend->share, destination);
   
   destination_exist = FALSE;
-  res = op_backend->smb_context->stat (op_backend->smb_context, dest_uri, &statbuf);
+  res = smbc_stat (op_backend->smb_context, dest_uri, &statbuf);
   if (res == 0)
     {
       destination_exist = TRUE; /* Target file exists */
@@ -1713,7 +1785,7 @@ do_move (GVfsBackend *backend,
   if (flags & G_FILE_COPY_BACKUP && destination_exist)
     {
       backup_uri = g_strconcat (dest_uri, "~", NULL);
-      res = op_backend->smb_context->rename (op_backend->smb_context, dest_uri,
+      res = smbc_rename (op_backend->smb_context, dest_uri,
 					     op_backend->smb_context, backup_uri);
       if (res == -1)
 	{
@@ -1734,7 +1806,7 @@ do_move (GVfsBackend *backend,
     {
       /* Source is a dir, destination exists (and is not a dir, because that would have failed
 	 earlier), and we're overwriting. Manually remove the target so we can do the rename. */
-      res = op_backend->smb_context->unlink (op_backend->smb_context, dest_uri);
+      res = smbc_unlink (op_backend->smb_context, dest_uri);
       errsv = errno;
       if (res == -1)
 	{
@@ -1749,7 +1821,7 @@ do_move (GVfsBackend *backend,
     }
 
   
-  res = op_backend->smb_context->rename (op_backend->smb_context, source_uri,
+  res = smbc_rename (op_backend->smb_context, source_uri,
 					 op_backend->smb_context, dest_uri);
   errsv = errno;
   g_free (source_uri);

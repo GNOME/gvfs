@@ -1,3 +1,10 @@
+2008-03-20  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/libsmb-compat.h:
+	Port to new smbclient API introduced in samba-3.2.0pre2
+
 2008-03-19  Alexander Larsson  <alexl@redhat.com>
 
 	* daemon/gvfsjobenumerate.c (send_reply): 

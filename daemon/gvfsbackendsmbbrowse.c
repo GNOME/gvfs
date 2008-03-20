@@ -42,7 +42,9 @@
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
 #include "gmounttracker.h"
+
 #include <libsmbclient.h>
+#include "libsmb-compat.h"
 
 #ifdef HAVE_GCONF
 #include <gconf/gconf-client.h>
@@ -255,7 +257,7 @@ auth_callback (SMBCCTX *context,
 {
   GVfsBackendSmbBrowse *backend;
 
-  backend = smbc_option_get (context, "user_data");
+  backend = smbc_getOptionUserData (context);
 
   if (backend->domain)
     strncpy (domain_out, backend->domain, domainmaxlen);
@@ -427,6 +429,10 @@ update_cache (GVfsBackendSmbBrowse *backend)
   int entry_errno;
   SMBCFILE *dir;
   int res;
+  smbc_opendir_fn smbc_opendir;
+  smbc_getdents_fn smbc_getdents;
+  smbc_closedir_fn smbc_closedir;
+
 
   entries = NULL;
   entry_errno = 0;
@@ -439,8 +445,12 @@ update_cache (GVfsBackendSmbBrowse *backend)
       g_string_append_encoded (uri, backend->server, NULL, NULL);
       g_string_append_c (uri, '/');
     }
-  
-  dir = backend->smb_context->opendir (backend->smb_context, uri->str);
+
+  smbc_opendir = smbc_getFunctionOpendir (backend->smb_context);
+  smbc_getdents = smbc_getFunctionGetdents (backend->smb_context);
+  smbc_closedir = smbc_getFunctionClosedir (backend->smb_context);
+
+  dir = smbc_opendir (backend->smb_context, uri->str);
   g_string_free (uri, TRUE);
   if (dir == NULL)
     {
@@ -450,7 +460,7 @@ update_cache (GVfsBackendSmbBrowse *backend)
 
   while (TRUE)
     {
-      res = backend->smb_context->getdents (backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
+      res = smbc_getdents (backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
       if (res <= 0)
 	break;
       
@@ -485,7 +495,7 @@ update_cache (GVfsBackendSmbBrowse *backend)
       entries = g_list_reverse (entries);
     }
       
-  backend->smb_context->closedir (backend->smb_context, dir);
+  smbc_closedir (backend->smb_context, dir);
 
 
  out:
@@ -638,36 +648,31 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  smbc_option_set (smb_context, "user_data", backend);
-  
-  smb_context->debug = 0;
-  smb_context->callbacks.auth_fn = NULL;
-  smbc_option_set (smb_context, "auth_function",
-		   (void *) auth_callback);
-  
-  smb_context->callbacks.add_cached_srv_fn    = add_cached_server;
-  smb_context->callbacks.get_cached_srv_fn    = get_cached_server;
-  smb_context->callbacks.remove_cached_srv_fn = remove_cached_server;
-  smb_context->callbacks.purge_cached_fn      = purge_cached;
+  smbc_setOptionUserData (smb_context, backend);
 
-  /* libsmbclient frees this on it's own, so make sure 
-   * to use simple system malloc */
+  smbc_setDebug (smb_context, 0);
+  smbc_setFunctionAuthDataWithContext (smb_context, auth_callback);
+  
+  smbc_setFunctionAddCachedServer (smb_context, add_cached_server);
+  smbc_setFunctionGetCachedServer (smb_context, get_cached_server);
+  smbc_setFunctionRemoveCachedServer (smb_context, remove_cached_server);
+  smbc_setFunctionPurgeCachedServers (smb_context, purge_cached);
+  
+  /* FIXME: is strdup() still needed here? -- removed */
   if (default_workgroup != NULL)
-    smb_context->workgroup = strdup (default_workgroup);
-  
+    smbc_setWorkgroup (smb_context, default_workgroup);
+
+#ifndef DEPRECATED_SMBC_INTERFACE
   smb_context->flags = 0;
+#endif
+
+  smbc_setOptionUseKerberos (smb_context, 1);
+  smbc_setOptionFallbackAfterKerberos (smb_context, 1);  
+  //smbc_setOptionNoAutoAnonymousLogin (smb_context, 1);
   
-#if defined(HAVE_SAMBA_FLAGS) 
-#if defined(SMB_CTX_FLAG_USE_KERBEROS) && defined(SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS)
-  smb_context->flags |= SMB_CTX_FLAG_USE_KERBEROS | SMB_CTX_FLAG_FALLBACK_AFTER_KERBEROS;
-#endif
-#if defined(SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON)
-  //smb_context->flags |= SMBCCTX_FLAG_NO_AUTO_ANONYMOUS_LOGON;
-#endif
-#endif
 
 #if 0
-  smbc_option_set (smb_context, "debug_stderr", (void *) 1);
+  smbc_setOptionDebugToStderr (smb_context, 1);
 #endif
   
   if (!smbc_init_context (smb_context))
@@ -684,7 +689,7 @@ do_mount (GVfsBackend *backend,
   /* Convert DEFAULT_WORKGROUP_NAME to real domain */
   if (op_backend->mounted_server != NULL &&
       g_ascii_strcasecmp (op_backend->mounted_server, DEFAULT_WORKGROUP_NAME) == 0)
-    op_backend->server = g_strdup (smb_context->workgroup);
+    op_backend->server = g_strdup (smbc_getWorkgroup (smb_context));
   else
     op_backend->server = g_strdup (op_backend->mounted_server);
 
