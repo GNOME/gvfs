@@ -1,3 +1,8 @@
+2008-03-20 Erdal Ronahi  <erdal dot ronahi at gmail dot com>
+
+	* LINGUAS: Added ku to list of languages
+	* ku.po: Added initial Kurdish translations
+
 2008-03-12  Alexander Larsson  <alexl@redhat.com>
 
         * POTFILES.in:
