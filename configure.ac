@@ -51,7 +51,9 @@ AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory f
 DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
-
+dnl **** gio module path handling ****
+giomodulesdir=`pkg-config --variable=giomoduledir gio-2.0`
+AC_SUBST(giomodulesdir)
 
 dnl ****************************
 dnl *** Checks for intltool  ***
@@ -534,6 +536,8 @@ po/Makefile.in
 echo 
 echo "gvfs configuration summary:"
 echo "
+        gio module directory : $giomodulesdir
+
         FTP/HTTP/WebDAV support       $msg_http
         ObexFTP support               $msg_obexftp
 	Samba support:	              $msg_samba

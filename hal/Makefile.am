@@ -4,7 +4,6 @@ NULL =
 module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_io_module_(load|unload)'
 
 giomodules_LTLIBRARIES = libgiohal-volume-monitor.la
-giomodulesdir = $(libdir)/gio/modules
 
 BUILT_SOURCES =                                         \
 	hal-marshal.h           hal-marshal.c

@@ -1,3 +1,12 @@
+2008-03-22  Christian Kellner  <gicmo@gnome.org>
+
+	* client/Makefile.am:
+	* configure.ac:
+	* gconf/Makefile.am:
+	* hal/Makefile.am:
+	Respect the giomoduledir provided in gio's package config
+	file. (#523852 and maybe #523039)
+
 2008-03-20  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendsmb.c:

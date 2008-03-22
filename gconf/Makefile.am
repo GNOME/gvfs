@@ -7,8 +7,6 @@ if USE_GCONF
 giomodules_LTLIBRARIES = libgiogconf.la
 endif
 
-giomodulesdir = $(libdir)/gio/modules
-
 libgiogconf_la_SOURCES =				\
 	gapplookupgconf.c gapplookupgconf.h		\
 	gconf-module.c					\
