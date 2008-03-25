@@ -1,3 +1,9 @@
+2008-03-25  Paolo Borelli  <pborelli@katamail.com>
+
+	* daemon/gvfsbackendtrash.c (add_extra_trash_info):
+	Make sure the display name is correct even for subdirectories
+	inside the trash. (#523127)
+
 2008-03-25  Alexander Larsson  <alexl@redhat.com>
 
 	* daemon/gvfsbackendarchive.c (archive_file_set_info_from_entry):

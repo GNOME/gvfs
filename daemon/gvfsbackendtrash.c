@@ -671,7 +671,6 @@ do_open_for_read (GVfsBackend *backend,
     }
 }
 
-
 static void
 do_read (GVfsBackend *backend,
          GVfsJobRead *job,
@@ -752,7 +751,6 @@ do_close_read (GVfsBackend *backend,
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
     }
-
 }
 
 typedef struct {
@@ -951,9 +949,14 @@ add_extra_trash_info (GFileInfo *file_info,
 
           if (orig_path_unescaped)
             {
-              /* Set display name and edit name based of original basename */
-              display_name = g_filename_display_basename (orig_path_unescaped);
+              if (g_path_is_absolute (orig_path_unescaped))
+                orig_path = g_build_filename (orig_path_unescaped, relative_path, NULL);
+              else
+                orig_path = g_build_filename (topdir, orig_path_unescaped, relative_path, NULL);
+              g_free (orig_path_unescaped);
 
+              /* Set display name and edit name based of original basename */
+              display_name = g_filename_display_basename (orig_path);
               g_file_info_set_edit_name (file_info, display_name);
               
               if (strstr (display_name, "\357\277\275") != NULL)
@@ -975,22 +978,11 @@ add_extra_trash_info (GFileInfo *file_info,
               
               g_free (display_name);
               
-              
-              /* Set orig_path */
-              
-              if (g_path_is_absolute (orig_path_unescaped))
-                orig_path = g_build_filename (orig_path_unescaped, relative_path, NULL);
-              else
-                orig_path = g_build_filename (topdir, orig_path_unescaped, relative_path, NULL);
-
-              
               g_file_info_set_attribute_byte_string (file_info,
                                                      "trash::orig-path",
                                                      orig_path);
               g_free (orig_path);
-              g_free (orig_path_unescaped);
             }
-          
 
           g_free (orig_path_key);
         }
@@ -1048,7 +1040,6 @@ enumerate_root_trashdir (GVfsBackend *backend,
                                 name,
                                 NULL);
 
-          
           /* Update the name to also have the trash dir */
           new_name = g_build_filename (trashdir, name, NULL);
           new_name_escaped = escape_pathname (new_name);
