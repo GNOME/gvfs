@@ -1,3 +1,9 @@
+2008-03-25  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfschannel.c: (got_request), (send_reply_cb):
+	Do not create new read/write jobs if the gvfschannel has been
+	cancelled. Fixes a crash in sftp backend (#522192).
+	
 2008-03-25  Paolo Borelli  <pborelli@katamail.com>
 
 	* daemon/gvfsbackendtrash.c (add_extra_trash_info):
