@@ -45,6 +45,8 @@
 #include "gvfsdaemonutils.h"
 #include "gvfskeyring.h"
 
+#define MOUNT_ICON_NAME "drive-removable-media"
+
 /* #define PRINT_DEBUG  */
 
 #ifdef PRINT_DEBUG
@@ -291,11 +293,12 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
 #define archive_file_find(ba, filename) archive_file_get_from_path((ba)->files, (filename) + 1, FALSE)
 
 static void
-create_root_file (GVfsBackendArchive *ba, GIcon *icon)
+create_root_file (GVfsBackendArchive *ba)
 {
   ArchiveFile *root = g_slice_new0 (ArchiveFile);
   GFileInfo *info;
   char *s, *display_name;
+  GIcon *icon;
 
   root = g_slice_new0 (ArchiveFile);
   root->name = g_strdup ("/");
@@ -319,7 +322,9 @@ create_root_file (GVfsBackendArchive *ba, GIcon *icon)
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
 
+  icon = g_themed_icon_new ("folder");
   g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
 }
 
 static void
@@ -444,7 +449,9 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
 	  ArchiveFile *file = archive_file_get_from_path (ba->files, 
 	                                                  archive_entry_pathname (entry), 
 							  TRUE);
-	  archive_file_set_info_from_entry (file, entry);
+          /* Don't set info for root */
+          if (file != ba->files)
+            archive_file_set_info_from_entry (file, entry);
 	  archive_read_data_skip (archive->archive);
 	}
     }
@@ -544,15 +551,10 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_display_name (backend, g_file_info_get_display_name (info));
 
   icon = g_file_info_get_icon (info);
-#if 0
-  if (G_IS_THEMED_ICON (icon))
-    g_vfs_backend_set_icon_name (backend, 
-	                         g_themed_icon_get_names (G_THEMED_ICON (icon))[0]);
-  else
-#endif
-    g_vfs_backend_set_icon_name (backend, "package-x-generic");
 
-  create_root_file (archive, icon);
+  g_vfs_backend_set_icon_name (backend, MOUNT_ICON_NAME);
+
+  create_root_file (archive);
   create_file_tree (archive, G_VFS_JOB (job));
   g_object_unref (info);
 }

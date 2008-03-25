@@ -1,3 +1,8 @@
+2008-03-25  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendarchive.c (archive_file_set_info_from_entry):
+	Better mount icons and root display name.
+
 2008-03-24  A. Walton  <awalton@svn.gnome.org>
 
 	* configure.ac:
