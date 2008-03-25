@@ -1,3 +1,9 @@
+2008-03-24  A. Walton  <awalton@svn.gnome.org>
+
+	* configure.ac:
+	The CDDA backend requires HAL to build.
+	Closes bug #524062.
+
 2008-03-22  Christian Kellner  <gicmo@gnome.org>
 
 	* client/Makefile.am:

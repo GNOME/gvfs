@@ -148,28 +148,6 @@ if test "x$enable_avahi" != "xno"; then
 	AC_SUBST(AVAHI_LIBS)
 fi
 
-dnl **************************************************
-dnl *** Check if we should build with CDDA backend ***
-dnl **************************************************
-AC_ARG_ENABLE(cdda, [  --disable-cdda           build without CDDA backend])
-msg_cdda=no
-CDDA_LIBS=
-CDDA_CFLAGS=
-
-if test "x$enable_cdda" != "xno"; then
-  PKG_CHECK_EXISTS(libcdio_paranoia >= 0.78.2, msg_cdda=yes)
-
-  if test "x$msg_cdda" == "xyes"; then
-    PKG_CHECK_MODULES(CDDA, libcdio_paranoia)
-    AC_DEFINE(HAVE_CDDA, 1, [Define to 1 if CDDA is going to be built])
-  fi
-fi
-
-AC_SUBST(CDDA_LIBS)
-AC_SUBST(CDDA_CFLAGS)
-
-AM_CONDITIONAL(USE_CDDA, [test "$msg_cdda" = "yes"])
-
 dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************
@@ -241,6 +219,28 @@ AC_SUBST(HAL_LIBS)
 AC_SUBST(HAL_CFLAGS)
 
 AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
+
+dnl **************************************************
+dnl *** Check if we should build with CDDA backend ***
+dnl **************************************************
+AC_ARG_ENABLE(cdda, [  --disable-cdda           build without CDDA backend])
+msg_cdda=no
+CDDA_LIBS=
+CDDA_CFLAGS=
+
+if test "x$enable_cdda" != "xno"; then
+  PKG_CHECK_EXISTS(libcdio_paranoia >= 0.78.2 hal >= $HAL_REQUIRED, msg_cdda=yes)
+
+  if test "x$msg_cdda" == "xyes"; then
+    PKG_CHECK_MODULES(CDDA, libcdio_paranoia hal >= $HAL_REQUIRED)
+    AC_DEFINE(HAVE_CDDA, 1, [Define to 1 if CDDA is going to be built])
+  fi
+fi
+
+AC_SUBST(CDDA_LIBS)
+AC_SUBST(CDDA_CFLAGS)
+
+AM_CONDITIONAL(USE_CDDA, [test "$msg_cdda" = "yes"])
 
 dnl *****************************************************
 dnl *** Check if we should build with obexftp backend ***
