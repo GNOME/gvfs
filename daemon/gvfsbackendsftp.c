@@ -67,6 +67,8 @@
 #define USE_PTY 1
 #endif
 
+static GQuark id_q;
+
 typedef enum {
   SFTP_VENDOR_INVALID = 0,
   SFTP_VENDOR_OPENSSH,
@@ -400,7 +402,7 @@ get_new_id (GVfsBackendSftp *backend)
 }
 
 static GDataOutputStream *
-new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
+new_command_stream (GVfsBackendSftp *backend, int type)
 {
   GOutputStream *mem_stream;
   GDataOutputStream *data_stream;
@@ -416,8 +418,7 @@ new_command_stream (GVfsBackendSftp *backend, int type, guint32 *id_out)
     {
       id = get_new_id (backend);
       g_data_output_stream_put_uint32 (data_stream, id, NULL, NULL);
-      if (id_out)
-        *id_out = id;
+      g_object_set_qdata (G_OBJECT (data_stream), id_q, GUINT_TO_POINTER (id));
     }
   
   return data_stream;
@@ -1185,7 +1186,6 @@ queue_command_buffer (GVfsBackendSftp *backend,
 static void
 queue_command_stream_and_free (GVfsBackendSftp *backend,
                                GDataOutputStream *command_stream,
-                               guint32 id,
                                ReplyCallback callback,
                                GVfsJob *job,
                                gpointer user_data)
@@ -1193,12 +1193,14 @@ queue_command_stream_and_free (GVfsBackendSftp *backend,
   gpointer data;
   gsize len;
   DataBuffer *buffer;
+  guint32 id;
 
+  id = GPOINTER_TO_UINT (g_object_get_qdata (G_OBJECT (command_stream), id_q));
   data = get_data_from_command_stream (command_stream, &len);
   
   buffer = data_buffer_new (data, len);
   g_object_unref (command_stream);
-  
+
   expect_reply (backend, id, callback, job, user_data);
   queue_command_buffer (backend, buffer);
 }
@@ -1211,7 +1213,7 @@ get_uid_sync (GVfsBackendSftp *backend)
   GFileInfo *info;
   int type;
   
-  command = new_command_stream (backend, SSH_FXP_STAT, NULL);
+  command = new_command_stream (backend, SSH_FXP_STAT);
   put_string (command, ".");
   send_command_sync_and_unref_command (backend, command, NULL, NULL);
 
@@ -1281,7 +1283,7 @@ do_mount (GVfsBackend *backend,
 
   op_backend->command_stream = g_unix_output_stream_new (stdin_fd, TRUE);
 
-  command = new_command_stream (op_backend, SSH_FXP_INIT, NULL);
+  command = new_command_stream (op_backend, SSH_FXP_INIT);
   g_data_output_stream_put_int32 (command,
                                   SSH_FILEXFER_VERSION, NULL, NULL);
   send_command_sync_and_unref_command (op_backend, command, NULL, NULL);
@@ -1834,13 +1836,12 @@ open_for_read_reply (GVfsBackendSftp *backend,
         {
           GDataOutputStream *command;
           DataBuffer *bhandle;
-          guint32 id;
 
           bhandle = read_data_buffer (reply);
           
-          command = new_command_stream (backend, SSH_FXP_CLOSE, &id);
+          command = new_command_stream (backend, SSH_FXP_CLOSE);
           put_data_buffer (command, bhandle);
-          queue_command_stream_and_free (backend, command, id, NULL, G_VFS_JOB (job), NULL);
+          queue_command_stream_and_free (backend, command, NULL, G_VFS_JOB (job), NULL);
 
           data_buffer_free (bhandle);
         }
@@ -1890,25 +1891,22 @@ try_open_for_read (GVfsBackend *backend,
                    const char *filename)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   G_VFS_JOB(job)->backend_data = GINT_TO_POINTER (0);
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_STAT,
-                                &id);
+                                SSH_FXP_STAT);
   put_string (command, filename);
-  queue_command_stream_and_free (op_backend, command, id, open_stat_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, open_stat_reply, G_VFS_JOB (job), NULL);
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_OPEN,
-                                &id);
+                                SSH_FXP_OPEN);
   put_string (command, filename);
   g_data_output_stream_put_uint32 (command, SSH_FXF_READ, NULL, NULL); /* open flags */
   g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
   
-  queue_command_stream_and_free (op_backend, command, id, open_for_read_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, open_for_read_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -1965,17 +1963,15 @@ try_read (GVfsBackend *backend,
 {
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_READ,
-                                &id);
+                                SSH_FXP_READ);
   put_data_buffer (command, handle->raw_handle);
   g_data_output_stream_put_uint64 (command, handle->offset, NULL, NULL);
   g_data_output_stream_put_uint32 (command, bytes_requested, NULL, NULL);
   
-  queue_command_stream_and_free (op_backend, command, id, read_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, read_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -2047,15 +2043,13 @@ try_seek_on_read (GVfsBackend *backend,
 {
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_FSTAT,
-                                &id);
+                                SSH_FXP_FSTAT);
   put_data_buffer (command, handle->raw_handle);
   
-  queue_command_stream_and_free (op_backend, command, id, seek_read_fstat_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, seek_read_fstat_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -2066,15 +2060,13 @@ delete_temp_file (GVfsBackendSftp *backend,
                   GVfsJob *job)
 {
   GDataOutputStream *command;
-  guint32 id;
   
   if (handle->tempname)
     {
       command = new_command_stream (backend,
-                                    SSH_FXP_REMOVE,
-                                    &id);
+                                    SSH_FXP_REMOVE);
       put_string (command, handle->tempname);
-      queue_command_stream_and_free (backend, command, id, NULL, job, NULL);
+      queue_command_stream_and_free (backend, command, NULL, job, NULL);
     }
 }
 
@@ -2110,7 +2102,6 @@ close_deleted_file (GVfsBackendSftp *backend,
                     gpointer user_data)
 {
   GDataOutputStream *command;
-  guint32 id;
   GError *error;
   gboolean res;
   SftpHandle *handle;
@@ -2130,11 +2121,10 @@ close_deleted_file (GVfsBackendSftp *backend,
       /* Removed original file, now move new file in place */
 
       command = new_command_stream (backend,
-                                    SSH_FXP_RENAME,
-                                    &id);
+                                    SSH_FXP_RENAME);
       put_string (command, handle->tempname);
       put_string (command, handle->filename);
-      queue_command_stream_and_free (backend, command, id, close_moved_tempfile, G_VFS_JOB (job), handle);
+      queue_command_stream_and_free (backend, command, close_moved_tempfile, G_VFS_JOB (job), handle);
     }
   else
     {
@@ -2158,7 +2148,6 @@ close_moved_file (GVfsBackendSftp *backend,
                   gpointer user_data)
 {
   GDataOutputStream *command;
-  guint32 id;
   GError *error;
   gboolean res;
   SftpHandle *handle;
@@ -2178,11 +2167,10 @@ close_moved_file (GVfsBackendSftp *backend,
       /* moved original file to backup, now move new file in place */
 
       command = new_command_stream (backend,
-                                    SSH_FXP_RENAME,
-                                    &id);
+                                    SSH_FXP_RENAME);
       put_string (command, handle->tempname);
       put_string (command, handle->filename);
-      queue_command_stream_and_free (backend, command, id, close_moved_tempfile, G_VFS_JOB (job), handle);
+      queue_command_stream_and_free (backend, command, close_moved_tempfile, G_VFS_JOB (job), handle);
     }
   else
     {
@@ -2209,7 +2197,6 @@ close_deleted_backup (GVfsBackendSftp *backend,
   SftpHandle *handle;
   GDataOutputStream *command;
   char *backup_name;
-  guint32 id;
 
   /* Ignore result here, if it failed we'll just get a new error when moving over it
    * This is simpler than ignoring NOEXIST errors
@@ -2218,13 +2205,12 @@ close_deleted_backup (GVfsBackendSftp *backend,
   handle = user_data;
   
   command = new_command_stream (backend,
-                                SSH_FXP_RENAME,
-                                &id);
+                                SSH_FXP_RENAME);
   backup_name = g_strconcat (handle->filename, "~", NULL);
   put_string (command, handle->filename);
   put_string (command, backup_name);
   g_free (backup_name);
-  queue_command_stream_and_free (backend, command, id, close_moved_file, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (backend, command, close_moved_file, G_VFS_JOB (job), handle);
 }
 
 static void
@@ -2236,7 +2222,6 @@ close_write_reply (GVfsBackendSftp *backend,
                    gpointer user_data)
 {
   GDataOutputStream *command;
-  guint32 id;
   GError *error;
   gboolean res;
   char *backup_name;
@@ -2259,20 +2244,18 @@ close_write_reply (GVfsBackendSftp *backend,
           if (handle->make_backup)
             {
               command = new_command_stream (backend,
-                                            SSH_FXP_REMOVE,
-                                            &id);
+                                            SSH_FXP_REMOVE);
               backup_name = g_strconcat (handle->filename, "~", NULL);
               put_string (command, backup_name);
               g_free (backup_name);
-              queue_command_stream_and_free (backend, command, id, close_deleted_backup, G_VFS_JOB (job), handle);
+              queue_command_stream_and_free (backend, command, close_deleted_backup, G_VFS_JOB (job), handle);
             }
           else
             {
               command = new_command_stream (backend,
-                                            SSH_FXP_REMOVE,
-                                            &id);
+                                            SSH_FXP_REMOVE);
               put_string (command, handle->filename);
-              queue_command_stream_and_free (backend, command, id, close_deleted_file, G_VFS_JOB (job), handle);
+              queue_command_stream_and_free (backend, command, close_deleted_file, G_VFS_JOB (job), handle);
             }
         }
       else
@@ -2307,7 +2290,6 @@ close_write_fstat_reply (GVfsBackendSftp *backend,
   GDataOutputStream *command;
   GFileInfo *info;
   const char *etag;
-  guint32 id;
   
   if (reply_type == SSH_FXP_ATTRS)
     {
@@ -2320,10 +2302,10 @@ close_write_fstat_reply (GVfsBackendSftp *backend,
       g_object_unref (info);
     }
   
-  command = new_command_stream (backend, SSH_FXP_CLOSE, &id);
+  command = new_command_stream (backend, SSH_FXP_CLOSE);
   put_data_buffer (command, handle->raw_handle);
 
-  queue_command_stream_and_free (backend, command, id, close_write_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (backend, command, close_write_reply, G_VFS_JOB (job), handle);
 }
 
 static gboolean
@@ -2333,13 +2315,12 @@ try_close_write (GVfsBackend *backend,
 {
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
-  command = new_command_stream (op_backend, SSH_FXP_FSTAT, &id);
+  command = new_command_stream (op_backend, SSH_FXP_FSTAT);
   put_data_buffer (command, handle->raw_handle);
 
-  queue_command_stream_and_free (op_backend, command, id, close_write_fstat_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, close_write_fstat_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -2373,12 +2354,11 @@ try_close_read (GVfsBackend *backend,
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
 
-  command = new_command_stream (op_backend, SSH_FXP_CLOSE, &id);
+  command = new_command_stream (op_backend, SSH_FXP_CLOSE);
   put_data_buffer (command, handle->raw_handle);
 
-  queue_command_stream_and_free (op_backend, command, id, close_read_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, close_read_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -2420,17 +2400,15 @@ try_create (GVfsBackend *backend,
             GFileCreateFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_OPEN,
-                                &id);
+                                SSH_FXP_OPEN);
   put_string (command, filename);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
   g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
   
-  queue_command_stream_and_free (op_backend, command, id, create_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, create_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -2472,17 +2450,15 @@ try_append_to (GVfsBackend *backend,
                GFileCreateFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_OPEN,
-                                &id);
+                                SSH_FXP_OPEN);
   put_string (command, filename);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_APPEND,  NULL, NULL); /* open flags */
   g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
   
-  queue_command_stream_and_free (op_backend, command, id, append_to_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, append_to_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -2593,7 +2569,6 @@ replace_create_temp (GVfsBackendSftp *backend,
                      GVfsJobOpenForWrite *job)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
   char *dirname;
   ReplaceData *data;
@@ -2619,13 +2594,12 @@ replace_create_temp (GVfsBackendSftp *backend,
   g_free (dirname);
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_OPEN,
-                                &id);
+                                SSH_FXP_OPEN);
   put_string (command, data->tempname);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
   g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL); /* Attr flags */
   g_data_output_stream_put_uint32 (command, data->permissions, NULL, NULL);
-  queue_command_stream_and_free (op_backend, command, id, replace_create_temp_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, replace_create_temp_reply, G_VFS_JOB (job), NULL);
 }
 
 static void
@@ -2690,7 +2664,6 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
   GDataOutputStream *command;
   SftpHandle *handle;
   GError *error;
-  guint32 id;
 
   op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
   if (reply_type == SSH_FXP_STATUS)
@@ -2709,10 +2682,9 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
           /* Replace existing file code: */
           
           command = new_command_stream (backend,
-                                        SSH_FXP_STAT,
-                                        &id);
+                                        SSH_FXP_STAT);
           put_string (command, op_job->filename);
-          queue_command_stream_and_free (backend, command, id, replace_stat_reply, G_VFS_JOB (job), NULL);
+          queue_command_stream_and_free (backend, command, replace_stat_reply, G_VFS_JOB (job), NULL);
         }
       else
         {
@@ -2746,17 +2718,15 @@ try_replace (GVfsBackend *backend,
              GFileCreateFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_OPEN,
-                                &id);
+                                SSH_FXP_OPEN);
   put_string (command, filename);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
   g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
   
-  queue_command_stream_and_free (op_backend, command, id, replace_exclusive_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, replace_exclusive_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -2794,12 +2764,10 @@ try_write (GVfsBackend *backend,
 {
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_WRITE,
-                                &id);
+                                SSH_FXP_WRITE);
   put_data_buffer (command, handle->raw_handle);
   g_data_output_stream_put_uint64 (command, handle->offset, NULL, NULL);
   g_data_output_stream_put_uint32 (command, buffer_size, NULL, NULL);
@@ -2809,7 +2777,7 @@ try_write (GVfsBackend *backend,
                              buffer, buffer_size,
                              NULL, NULL, NULL);
   
-  queue_command_stream_and_free (op_backend, command, id, write_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, write_reply, G_VFS_JOB (job), handle);
 
   /* We always write the full size (on success) */
   g_vfs_job_write_set_written_size (job, buffer_size);
@@ -2884,15 +2852,13 @@ try_seek_on_write (GVfsBackend *backend,
 {
   SftpHandle *handle = _handle;
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
 
   command = new_command_stream (op_backend,
-                                SSH_FXP_FSTAT,
-                                &id);
+                                SSH_FXP_FSTAT);
   put_data_buffer (command, handle->raw_handle);
   
-  queue_command_stream_and_free (op_backend, command, id, seek_write_fstat_reply, G_VFS_JOB (job), handle);
+  queue_command_stream_and_free (op_backend, command, seek_write_fstat_reply, G_VFS_JOB (job), handle);
 
   return TRUE;
 }
@@ -2951,7 +2917,6 @@ read_dir_got_stat_info (GVfsBackendSftp *backend,
   GVfsJobEnumerate *enum_job;
   GDataOutputStream *command;
   ReadDirData *data;
-  guint32 id;
   char *abs_name;
   
   data = job->backend_data;
@@ -2963,12 +2928,11 @@ read_dir_got_stat_info (GVfsBackendSftp *backend,
     {
       data->outstanding_requests++;
       command = new_command_stream (backend,
-                                    SSH_FXP_READLINK,
-                                    &id);
+                                    SSH_FXP_READLINK);
       abs_name = g_build_filename (enum_job->filename, g_file_info_get_name (info), NULL);
       put_string (command, abs_name);
       g_free (abs_name);
-      queue_command_stream_and_free (backend, command, id, read_dir_readlink_reply, G_VFS_JOB (job), g_object_ref (info));
+      queue_command_stream_and_free (backend, command, read_dir_readlink_reply, G_VFS_JOB (job), g_object_ref (info));
     }
   else
     g_vfs_job_enumerate_add_info (enum_job, info);
@@ -3024,7 +2988,6 @@ read_dir_reply (GVfsBackendSftp *backend,
   GVfsJobEnumerate *enum_job;
   guint32 count;
   int i;
-  guint32 id;
   GDataOutputStream *command;
   ReadDirData *data;
 
@@ -3039,10 +3002,9 @@ read_dir_reply (GVfsBackendSftp *backend,
       /* Close handle */
 
       command = new_command_stream (backend,
-                                    SSH_FXP_CLOSE,
-                                    &id);
+                                    SSH_FXP_CLOSE);
       put_data_buffer (command, data->handle);
-      queue_command_stream_and_free (backend, command, id, NULL, G_VFS_JOB (job), NULL);
+      queue_command_stream_and_free (backend, command, NULL, G_VFS_JOB (job), NULL);
   
       if (--data->outstanding_requests == 0)
         g_vfs_job_enumerate_done (enum_job);
@@ -3073,13 +3035,12 @@ read_dir_reply (GVfsBackendSftp *backend,
           /* Default (at least for openssh) is for readdir to not follow symlinks.
              This was a symlink, and follow links was requested, so we need to manually follow it */
           command = new_command_stream (backend,
-                                        SSH_FXP_STAT,
-                                        &id);
+                                        SSH_FXP_STAT);
           abs_name = g_build_filename (enum_job->filename, name, NULL);
           put_string (command, abs_name);
           g_free (abs_name);
           
-          queue_command_stream_and_free (backend, command, id, read_dir_symlink_reply, G_VFS_JOB (job), g_object_ref (info));
+          queue_command_stream_and_free (backend, command, read_dir_symlink_reply, G_VFS_JOB (job), g_object_ref (info));
           data->outstanding_requests ++;
         }
       else if (strcmp (".", name) != 0 &&
@@ -3091,10 +3052,9 @@ read_dir_reply (GVfsBackendSftp *backend,
     }
 
   command = new_command_stream (backend,
-                                SSH_FXP_READDIR,
-                                &id);
+                                SSH_FXP_READDIR);
   put_data_buffer (command, data->handle);
-  queue_command_stream_and_free (backend, command, id, read_dir_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (backend, command, read_dir_reply, G_VFS_JOB (job), NULL);
 }
 
 static void
@@ -3106,7 +3066,6 @@ open_dir_reply (GVfsBackendSftp *backend,
                 gpointer user_data)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
   ReadDirData *data;
 
@@ -3130,13 +3089,12 @@ open_dir_reply (GVfsBackendSftp *backend,
   data->handle = read_data_buffer (reply);
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_READDIR,
-                                &id);
+                                SSH_FXP_READDIR);
   put_data_buffer (command, data->handle);
 
   data->outstanding_requests = 1;
   
-  queue_command_stream_and_free (op_backend, command, id, read_dir_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, read_dir_reply, G_VFS_JOB (job), NULL);
 }
 
 static gboolean
@@ -3147,7 +3105,6 @@ try_enumerate (GVfsBackend *backend,
                GFileQueryInfoFlags flags)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
   ReadDirData *data;
 
@@ -3155,11 +3112,10 @@ try_enumerate (GVfsBackend *backend,
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), data, (GDestroyNotify)read_dir_data_free);
   command = new_command_stream (op_backend,
-                                SSH_FXP_OPENDIR,
-                                &id);
+                                SSH_FXP_OPENDIR);
   put_string (command, filename);
   
-  queue_command_stream_and_free (op_backend, command, id, open_dir_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, open_dir_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -3331,7 +3287,6 @@ try_query_info (GVfsBackend *backend,
                 GFileAttributeMatcher *matcher)
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
-  guint32 id;
   GDataOutputStream *command;
   QueryInfoData *data;
 
@@ -3340,20 +3295,18 @@ try_query_info (GVfsBackend *backend,
   
   data->cb_count = 1;
   command = new_command_stream (op_backend,
-                                SSH_FXP_LSTAT,
-                                &id);
+                                SSH_FXP_LSTAT);
   put_string (command, filename);
-  queue_command_stream_and_free (op_backend, command, id, query_info_lstat_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, query_info_lstat_reply, G_VFS_JOB (job), NULL);
 
   if (! (job->flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS))
     {
       data->cb_count++;
       
       command = new_command_stream (op_backend,
-                                    SSH_FXP_STAT,
-                                    &id);
+                                    SSH_FXP_STAT);
       put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, query_info_stat_reply, G_VFS_JOB (job), NULL);
+      queue_command_stream_and_free (op_backend, command, query_info_stat_reply, G_VFS_JOB (job), NULL);
     }
 
   if (g_file_attribute_matcher_matches (job->attribute_matcher,
@@ -3362,10 +3315,9 @@ try_query_info (GVfsBackend *backend,
       data->cb_count++;
       
       command = new_command_stream (op_backend,
-                                    SSH_FXP_READLINK,
-                                    &id);
+                                    SSH_FXP_READLINK);
       put_string (command, filename);
-      queue_command_stream_and_free (op_backend, command, id, query_info_readlink_reply, G_VFS_JOB (job), NULL);
+      queue_command_stream_and_free (op_backend, command, query_info_readlink_reply, G_VFS_JOB (job), NULL);
     }
   
   return TRUE;
@@ -3398,17 +3350,15 @@ try_move (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_RENAME,
-                                &id);
+                                SSH_FXP_RENAME);
   put_string (command, source);
   put_string (command, destination);
 
   /* This fails if the target exists, we then fallback to default implementation */
   
-  queue_command_stream_and_free (op_backend, command, id, move_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, move_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -3436,7 +3386,6 @@ try_set_display_name (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
   char *dirname, *basename, *new_name;
 
   /* We use the same setting as for local files. Can't really
@@ -3456,12 +3405,11 @@ try_set_display_name (GVfsBackend *backend,
                                            new_name);
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_RENAME,
-                                &id);
+                                SSH_FXP_RENAME);
   put_string (command, filename);
   put_string (command, new_name);
   
-  queue_command_stream_and_free (op_backend, command, id, set_display_name_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, set_display_name_reply, G_VFS_JOB (job), NULL);
 
   g_free (new_name);
 
@@ -3492,15 +3440,13 @@ try_make_symlink (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_SYMLINK,
-                                &id);
+                                SSH_FXP_SYMLINK);
   put_string (command, filename);
   put_string (command, symlink_value);
   
-  queue_command_stream_and_free (op_backend, command, id, make_symlink_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, make_symlink_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -3527,14 +3473,12 @@ try_make_directory (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_MKDIR,
-                                &id);
+                                SSH_FXP_MKDIR);
   put_string (command, filename);
   
-  queue_command_stream_and_free (op_backend, command, id, make_directory_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, make_directory_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -3578,7 +3522,6 @@ delete_lstat_reply (GVfsBackendSftp *backend,
                     gpointer user_data)
 {
   GDataOutputStream *command;
-  guint32 id;
   GFileInfo *info;
 
   if (reply_type == SSH_FXP_STATUS)
@@ -3595,18 +3538,16 @@ delete_lstat_reply (GVfsBackendSftp *backend,
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
         {
           command = new_command_stream (backend,
-                                        SSH_FXP_RMDIR,
-                                        &id);
+                                        SSH_FXP_RMDIR);
           put_string (command, G_VFS_JOB_DELETE (job)->filename);
-          queue_command_stream_and_free (backend, command, id, delete_rmdir_reply, G_VFS_JOB (job), NULL);
+          queue_command_stream_and_free (backend, command, delete_rmdir_reply, G_VFS_JOB (job), NULL);
         }
       else
         {
           command = new_command_stream (backend,
-                                        SSH_FXP_REMOVE,
-                                        &id);
+                                        SSH_FXP_REMOVE);
           put_string (command, G_VFS_JOB_DELETE (job)->filename);
-          queue_command_stream_and_free (backend, command, id, delete_remove_reply, G_VFS_JOB (job), NULL);
+          queue_command_stream_and_free (backend, command, delete_remove_reply, G_VFS_JOB (job), NULL);
         }
     }
 }
@@ -3618,13 +3559,11 @@ try_delete (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
   
   command = new_command_stream (op_backend,
-                                SSH_FXP_LSTAT,
-                                &id);
+                                SSH_FXP_LSTAT);
   put_string (command, filename);
-  queue_command_stream_and_free (op_backend, command, id, delete_lstat_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, delete_lstat_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
 }
@@ -3677,7 +3616,6 @@ try_set_attribute (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  guint32 id;
 
   if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) != 0)
     {
@@ -3688,12 +3626,11 @@ try_set_attribute (GVfsBackend *backend,
     }
 
   command = new_command_stream (op_backend,
-				SSH_FXP_SETSTAT,
-				&id);
+                                SSH_FXP_SETSTAT);
   put_string (command, filename);
   g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL);
   g_data_output_stream_put_uint32 (command, (*(guint32 *)value_p) & 0777, NULL, NULL);
-  queue_command_stream_and_free (op_backend, command, id, set_attribute_reply, G_VFS_JOB (job), NULL);
+  queue_command_stream_and_free (op_backend, command, set_attribute_reply, G_VFS_JOB (job), NULL);
   
   return TRUE;
 }
@@ -3703,6 +3640,8 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsBackendClass *backend_class = G_VFS_BACKEND_CLASS (klass);
+
+  id_q = g_quark_from_static_string ("command-id");
   
   gobject_class->finalize = g_vfs_backend_sftp_finalize;
 

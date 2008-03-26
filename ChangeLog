@@ -1,3 +1,9 @@
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Pass id via the command object, not via out parameter.
+	Removes a bunch of code to pass the id around.
+
 2008-03-25  Carlos Garcia Campos  <carlosgc@gnome.org>
 
 	* daemon/gvfschannel.c: (got_request), (send_reply_cb):
