@@ -197,6 +197,9 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 
 	  g_object_ref (monitor);
 	  monitor->priv->subscribers = g_list_prepend (monitor->priv->subscribers, subscriber);
+
+	  reply = dbus_message_new_method_return (message);
+	  dbus_connection_send (connection, reply, NULL);
 	}
       
       return DBUS_HANDLER_RESULT_HANDLED;
@@ -232,6 +235,9 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 		  break;
 		}
 	    }
+	  
+	  reply = dbus_message_new_method_return (message);
+	  dbus_connection_send (connection, reply, NULL);
 	}
       
       return DBUS_HANDLER_RESULT_HANDLED;
