@@ -1,5 +1,12 @@
 2008-03-26  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfileenumerator.c:
+        (g_daemon_file_enumerator_next_file):
+	Avoid hanging forever and not sending any async messages.
+	This could happen if we raced and missed the done check.
+
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/gvfsmonitor.c:
 	Send replies to subscribe and unsubscribe messages.
 

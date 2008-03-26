@@ -196,10 +196,12 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
   GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator);
   GFileInfo *info;
   gboolean done;
+  int count;
   
   info = NULL;
   done = FALSE;
-  while (1)
+  count = 0;
+  while (count < G_VFS_DBUS_TIMEOUT_MSECS / 100)
     {
       G_LOCK (infos);
       if (daemon->infos)
@@ -219,8 +221,12 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
       
       if (done)
 	break;
-  
-      if (!dbus_connection_read_write_dispatch (daemon->sync_connection, -1))
+
+      /* We sleep only 100 msecs here, not the full time because we might have
+       * raced with the filter func being called after unlocking
+       * and setting done or ->infos. So, we want to check it again reasonaby soon.
+       */
+      if (!dbus_connection_read_write_dispatch (daemon->sync_connection, 100))
 	  break;
     }
 
