@@ -1,5 +1,10 @@
 2008-03-26  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfile.c:
+	Implement true async query_filesystem_info
+
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfileenumerator.c:
         (g_daemon_file_enumerator_next_file):
 	Avoid hanging forever and not sending any async messages.

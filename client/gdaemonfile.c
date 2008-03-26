@@ -1513,6 +1513,75 @@ g_daemon_file_query_filesystem_info (GFile                *file,
   return info;
 }
 
+static void
+query_fs_info_async_cb (DBusMessage *reply,
+			DBusConnection *connection,
+			GSimpleAsyncResult *result,
+			GCancellable *cancellable,
+			gpointer callback_data)
+{
+  DBusMessageIter iter;
+  GFileInfo *info;
+  GError *error;
+
+  info = NULL;
+  
+  if (!dbus_message_iter_init (reply, &iter) ||
+      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
+    {
+      g_simple_async_result_set_error (result,
+				       G_IO_ERROR, G_IO_ERROR_FAILED,
+				       _("Invalid return value from query_info"));
+      g_simple_async_result_complete (result);
+      return;
+    }
+
+  error = NULL;
+  info = _g_dbus_get_file_info (&iter, &error);
+  if (info == NULL)
+    {
+      g_simple_async_result_set_from_error (result, error);
+      g_error_free (error);
+      g_simple_async_result_complete (result);
+      return;
+    }
+
+  g_simple_async_result_set_op_res_gpointer (result, info, g_object_unref);
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_query_filesystem_info_async (GFile                      *file,
+					   const char                 *attributes,
+					   int                         io_priority,
+					   GCancellable               *cancellable,
+					   GAsyncReadyCallback         callback,
+					   gpointer                    user_data)
+{
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_QUERY_FILESYSTEM_INFO,
+		      cancellable,
+		      callback, user_data,
+		      query_fs_info_async_cb, NULL, NULL,
+		      DBUS_TYPE_STRING, &attributes,
+		      0);
+}
+
+static GFileInfo *
+g_daemon_file_query_filesystem_info_finish (GFile                      *file,
+					    GAsyncResult               *res,
+					    GError                    **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GFileInfo *info;
+
+  info = g_simple_async_result_get_op_res_gpointer (simple);
+  if (info)
+    return g_object_ref (info);
+  
+  return NULL;
+}
+
 static GMount *
 g_daemon_file_find_enclosing_mount (GFile *file,
                                     GCancellable *cancellable,
@@ -2666,6 +2735,8 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->eject_mountable = g_daemon_file_eject_mountable;
   iface->eject_mountable_finish = g_daemon_file_eject_mountable_finish;
   iface->query_filesystem_info = g_daemon_file_query_filesystem_info;
+  iface->query_filesystem_info_async = g_daemon_file_query_filesystem_info_async;
+  iface->query_filesystem_info_finish = g_daemon_file_query_filesystem_info_finish;
   iface->set_display_name = g_daemon_file_set_display_name;
   iface->delete_file = g_daemon_file_delete;
   iface->trash = g_daemon_file_trash;
