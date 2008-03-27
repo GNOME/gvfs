@@ -62,6 +62,10 @@ GVfsJob *g_vfs_job_move_new (DBusConnection *connection,
 			     DBusMessage    *message,
 			     GVfsBackend    *backend);
 
+void g_vfs_job_move_progress_callback (goffset current_num_bytes,
+				       goffset total_num_bytes,
+				       GVfsJob *job);
+
 G_END_DECLS
 
 #endif /* __G_VFS_JOB_MOVE_H__ */

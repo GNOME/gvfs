@@ -48,6 +48,7 @@
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobqueryinfo.h"
+#include "gvfsjobmove.h"
 #include "gvfsjobdelete.h"
 #include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
@@ -100,7 +101,7 @@ typedef struct {
 } MultiRequest;
 
 struct _MultiReply {
-  int reply_type;
+  int type;
   GDataInputStream *data;
   guint32 data_len;
 
@@ -1248,7 +1249,7 @@ multi_request_cb (GVfsBackendSftp *backend,
   reply = user_data;
   request = reply->request;
 
-  reply->reply_type = reply_type;
+  reply->type = reply_type;
   reply->data = g_object_ref (reply_stream);
   reply->data_len = len;
 
@@ -1613,25 +1614,40 @@ error_from_status (GVfsJob *job,
 }
 
 static gboolean
-result_from_status (GVfsJob *job,
-                    GDataInputStream *reply,
-                    int failure_error,
-                    int allowed_sftp_error)
+failure_from_status (GVfsJob *job,
+                     GDataInputStream *reply,
+                     int failure_error,
+                     int allowed_sftp_error)
 {
   GError *error;
 
   error = NULL;
   if (error_from_status (job, reply, failure_error, allowed_sftp_error, &error))
-    {
-      g_vfs_job_succeeded (job);
-      return TRUE;
-    }
+    return TRUE;
   else
     {
       g_vfs_job_failed_from_error (job, error);
       g_error_free (error);
     }
   return FALSE;
+}
+
+
+static gboolean
+result_from_status (GVfsJob *job,
+                    GDataInputStream *reply,
+                    int failure_error,
+                    int allowed_sftp_error)
+{
+  gboolean res;
+
+  res = failure_from_status (job, reply, 
+                             failure_error,
+                             allowed_sftp_error);
+  if (res)
+    g_vfs_job_succeeded (job);
+  
+  return res;
 }
 
 static void
@@ -1929,7 +1945,6 @@ open_for_read_reply (GVfsBackendSftp *backend,
                      gpointer user_data)
 {
   SftpHandle *handle;
-  GError *error;
 
   if (g_vfs_job_is_finished (job))
     {
@@ -1957,21 +1972,14 @@ open_for_read_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      error = NULL;
-      if (error_from_status (job,
-                             reply,
-                             -1,
-                             SSH_FX_FAILURE,
-                             &error))
+      if (failure_from_status (job,
+                               reply,
+                               -1,
+                               SSH_FX_FAILURE))
         {
           /* Unknown failure type, mark that we got this and
              return result from stat result */
           G_VFS_JOB(job)->backend_data = GINT_TO_POINTER (1);
-        }
-      else
-        {
-          g_vfs_job_failed_from_error (job, error);
-          g_error_free (error);
         }
       
       return;
@@ -3236,7 +3244,6 @@ query_info_reply (GVfsBackendSftp *backend,
   char *basename;
   int i;
   MultiReply *lstat_reply, *reply;
-  GError *error;
   GFileInfo *lstat_info;
   GVfsJobQueryInfo *op_job;
 
@@ -3245,15 +3252,12 @@ query_info_reply (GVfsBackendSftp *backend,
   i = 0;
   lstat_reply = &replies[i++];
 
-  if (lstat_reply->reply_type == SSH_FXP_STATUS)
+  if (lstat_reply->type == SSH_FXP_STATUS)
     {
-        error = NULL;
-        error_from_status (job, lstat_reply->data, -1, -1, &error);
-        g_vfs_job_failed_from_error (job, error);
-        g_error_free (error);
-        return;
+      result_from_status (job, lstat_reply->data, -1, -1);
+      return;
     }
-  else if (lstat_reply->reply_type != SSH_FXP_ATTRS)
+  else if (lstat_reply->type != SSH_FXP_ATTRS)
     {
       g_vfs_job_failed (job,
                         G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -3275,7 +3279,7 @@ query_info_reply (GVfsBackendSftp *backend,
       /* Look at stat results */
       reply = &replies[i++];
 
-      if (reply->reply_type == SSH_FXP_ATTRS)
+      if (reply->type == SSH_FXP_ATTRS)
         {
           parse_attributes (backend, op_job->file_info, basename,
                             reply->data, op_job->attribute_matcher);
@@ -3305,7 +3309,7 @@ query_info_reply (GVfsBackendSftp *backend,
       /* Look at readlink results */
       reply = &replies[i++];
 
-      if (reply->reply_type == SSH_FXP_NAME)
+      if (reply->type == SSH_FXP_NAME)
         {
           char *symlink_target;
           guint32 count;
@@ -3370,13 +3374,152 @@ move_reply (GVfsBackendSftp *backend,
             GVfsJob *job,
             gpointer user_data)
 {
+  goffset *file_size;
+
   /* on any unknown error, return NOT_SUPPORTED to get the fallback implementation */
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply, G_IO_ERROR_NOT_SUPPORTED, -1); 
+    {
+      if (failure_from_status (job, reply, G_IO_ERROR_NOT_SUPPORTED, -1))
+        {
+          /* Succeeded, report file size */
+          file_size = job->backend_data;
+          if (file_size != NULL) 
+            g_vfs_job_move_progress_callback (*file_size, *file_size, job);
+          g_vfs_job_succeeded (job);
+        }
+    }
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Invalid reply received"));
 }
+
+static void
+move_do_rename (GVfsBackendSftp *backend,
+                GVfsJob *job)
+{
+  GVfsJobMove *op_job;
+  GDataOutputStream *command;
+
+  op_job = G_VFS_JOB_MOVE (job);
+
+  command = new_command_stream (backend,
+                                SSH_FXP_RENAME);
+  put_string (command, op_job->source);
+  put_string (command, op_job->destination);
+
+  queue_command_stream_and_free (backend, command, move_reply, G_VFS_JOB (job), NULL);
+}
+
+static void
+move_delete_target_reply (GVfsBackendSftp *backend,
+                          int reply_type,
+                          GDataInputStream *reply,
+                          guint32 len,
+                          GVfsJob *job,
+                          gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      if (failure_from_status (job, reply, -1, -1))
+        move_do_rename (backend, job);
+    }
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply received"));
+}
+
+
+static void
+move_lstat_reply (GVfsBackendSftp *backend,
+                  MultiReply *replies,
+                  int n_replies,
+                  GVfsJob *job,
+                  gpointer user_data)
+{
+  GVfsJobMove *op_job;
+  gboolean destination_exist, source_is_dir, dest_is_dir;
+  GDataOutputStream *command;
+  GFileInfo *info;
+  goffset *file_size;
+
+  op_job = G_VFS_JOB_MOVE (job);
+  
+  if (replies[0].type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, replies[0].data, -1, -1);
+      return;
+    }
+  else if (replies[0].type != SSH_FXP_ATTRS)
+    {
+      g_vfs_job_failed (job,
+                        G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "%s", _("Invalid reply received"));
+      return;
+    }
+
+  info = g_file_info_new ();
+  parse_attributes (backend, info, NULL,
+                    replies[0].data, NULL);
+  source_is_dir = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
+  file_size = g_new (goffset, 1);
+  *file_size = g_file_info_get_size (info);
+  g_vfs_job_set_backend_data (G_VFS_JOB (job), file_size, g_free);
+  g_object_unref (info);
+  
+  destination_exist = FALSE;
+  if (replies[1].type == SSH_FXP_ATTRS)
+    {
+      destination_exist = TRUE; /* Target file exists */
+
+      info = g_file_info_new ();
+      parse_attributes (backend, info, NULL,
+                        replies[1].data, NULL);
+      dest_is_dir = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
+      g_object_unref (info);
+      
+      if (op_job->flags & G_FILE_COPY_OVERWRITE)
+	{
+          
+	  /* Always fail on dirs, even with overwrite */
+	  if (dest_is_dir)
+	    {
+              if (source_is_dir)
+                g_vfs_job_failed (job,
+                                  G_IO_ERROR,
+                                  G_IO_ERROR_WOULD_MERGE,
+                                  _("Can't move directory over directory"));
+              else
+                g_vfs_job_failed (job,
+                                  G_IO_ERROR,
+                                  G_IO_ERROR_IS_DIRECTORY,
+                                  _("File is directory"));
+	      return;
+	    }
+	}
+      else
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job),
+			    G_IO_ERROR,
+			    G_IO_ERROR_EXISTS,
+			    _("Target file already exists"));
+	  return;
+	}
+    }
+
+  /* TODO: Check flags & G_FILE_COPY_BACKUP */
+
+  if (destination_exist && (op_job->flags & G_FILE_COPY_OVERWRITE))
+    {
+      command = new_command_stream (backend,
+                                    SSH_FXP_REMOVE);
+      put_string (command, op_job->destination);
+      queue_command_stream_and_free (backend, command, move_delete_target_reply, G_VFS_JOB (job), NULL);
+      return;
+    }
+
+  move_do_rename (backend, job);
+}
+
 
 static gboolean
 try_move (GVfsBackend *backend,
@@ -3389,16 +3532,20 @@ try_move (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  
-  command = new_command_stream (op_backend,
-                                SSH_FXP_RENAME);
+  GDataOutputStream *commands[2];
+
+  command = commands[0] =
+    new_command_stream (op_backend,
+                        SSH_FXP_LSTAT);
   put_string (command, source);
+
+  command = commands[1] =
+    new_command_stream (op_backend,
+                        SSH_FXP_LSTAT);
   put_string (command, destination);
 
-  /* This fails if the target exists, we then fallback to default implementation */
+  queue_command_streams_and_free (op_backend, commands, 2, move_lstat_reply, G_VFS_JOB (job), NULL);
   
-  queue_command_stream_and_free (op_backend, command, move_reply, G_VFS_JOB (job), NULL);
-
   return TRUE;
 }
 

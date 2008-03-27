@@ -122,12 +122,11 @@ g_vfs_job_move_new (DBusConnection *connection,
   return G_VFS_JOB (job);
 }
 
-static void
-progress_callback (goffset current_num_bytes,
-		   goffset total_num_bytes,
-		   gpointer user_data)
+void
+g_vfs_job_move_progress_callback (goffset current_num_bytes,
+				  goffset total_num_bytes,
+				  GVfsJob *job)
 {
-  GVfsJob *job = G_VFS_JOB (user_data);
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
   GVfsJobMove *op_job = G_VFS_JOB_MOVE (job);
   dbus_uint64_t current_dbus, total_dbus;
@@ -175,7 +174,7 @@ run (GVfsJob *job)
 	       op_job->source,
 	       op_job->destination,
 	       op_job->flags,
-	       progress_callback,
+	       (GFileProgressCallback)g_vfs_job_move_progress_callback,
 	       job);
 }
 
@@ -193,7 +192,7 @@ try (GVfsJob *job)
 			  op_job->source,
 			  op_job->destination,
 			  op_job->flags,
-			  progress_callback,
+			  (GFileProgressCallback)g_vfs_job_move_progress_callback,
 			  job);
 }
 

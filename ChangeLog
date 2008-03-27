@@ -1,6 +1,16 @@
 2008-03-27  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:
+	Handle all target exists errors correctly
+	in move. This should make us not silently
+	overwrite files.
+	
+        * daemon/gvfsjobmove.[ch]:
+        Add g_vfs_job_move_progress_callback
+
+2008-03-27  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
 	Introduce helpers for multi-request ops.
 	Use it for query_info.
 
