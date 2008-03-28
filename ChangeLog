@@ -1,3 +1,11 @@
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am (gvfsd_smb_SOURCES):
+	Dist libsmb-compat.h.
+
+	* NEWS:
+	Update for release
+
 2008-03-28  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac: Silence out libtool if

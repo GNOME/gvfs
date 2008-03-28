@@ -176,7 +176,7 @@ gvfsd_localtest_CPPFLAGS = \
 gvfsd_localtest_LDADD = $(libraries)
 
 gvfsd_smb_SOURCES = \
-	gvfsbackendsmb.c gvfsbackendsmb.h \
+	gvfsbackendsmb.c gvfsbackendsmb.h libsmb-compat.h \
 	daemon-main.c daemon-main.h \
 	daemon-main-generic.c 
 

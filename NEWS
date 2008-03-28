@@ -1,3 +1,15 @@
+Major changes in 0.2.2:
+* Respect the giomoduledir provided in gio package config file
+* Better mount icon and name for archive backend
+* Fix crashes with cancelled stream ops
+* Fix race that caused a mount to hang for a client
+* Implement async query_filesystem_info
+* Fix minor leaks
+* trash: Correct display names for directories
+* sftp: Kerberos support
+* smb: Port to new samba 3.2.0 API (backwards compat)
+* sftp: Handle overwrites correctly (was silent overwrite)
+
 Major changes in 0.2.1:
 * Added archive backend
 * Implement most of the async functions in GDaemonFile
