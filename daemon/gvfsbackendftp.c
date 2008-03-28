@@ -173,22 +173,32 @@ static gboolean
 ftp_connection_pop_job (FtpConnection *conn)
 {
   gboolean result;
+  GError *error;
+  GVfsJob *job;
 
   g_return_val_if_fail (conn->job != NULL, FALSE);
 
-  if (ftp_connection_in_error (conn))
+  /* sending a reply is racy after the reply is sent. The connection may be
+   * reused in a different thread before the reply sending returns. This is
+   * racy in particular when the connection is used as a read/write handle.
+   */
+  error = conn->error;
+  conn->error = NULL;
+  job = conn->job;
+  conn->job = NULL;
+
+  if (error)
     {
-      g_vfs_job_failed_from_error (conn->job, conn->error);
-      g_clear_error (&conn->error);
+      g_vfs_job_failed_from_error (job, error);
+      g_clear_error (&error);
       result = FALSE;
     }
   else
     {
-      g_vfs_job_succeeded (conn->job);
+      g_vfs_job_succeeded (job);
       result = TRUE;
     }
 
-  conn->job = NULL;
   return result;
 }
 
