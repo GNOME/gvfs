@@ -46,6 +46,7 @@ g_vfs_job_close_write_finalize (GObject *object)
 
   job = G_VFS_JOB_CLOSE_WRITE (object);
   g_object_unref (job->channel);
+  g_free (job->etag);
 
   if (G_OBJECT_CLASS (g_vfs_job_close_write_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_close_write_parent_class)->finalize) (object);

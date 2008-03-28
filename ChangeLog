@@ -1,3 +1,9 @@
+2008-03-28  Paolo Borelli  <pborelli@katamail.com>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsjobclosewrite.c:
+	Plug some more minor memory leaks.
+
 2008-03-28  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:

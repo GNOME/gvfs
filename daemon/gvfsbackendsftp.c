@@ -1311,13 +1311,11 @@ queue_command_streams_and_free (GVfsBackendSftp *backend,
     }
 }
 
-
 static gboolean
 get_uid_sync (GVfsBackendSftp *backend)
 {
   GDataOutputStream *command;
   GDataInputStream *reply;
-  GFileInfo *info;
   int type;
   
   command = new_command_stream (backend, SSH_FXP_STAT);
@@ -1336,6 +1334,8 @@ get_uid_sync (GVfsBackendSftp *backend)
   backend->my_gid = (guint32)-1;
   if (type == SSH_FXP_ATTRS)
     {
+      GFileInfo *info;
+
       info = g_file_info_new ();
       parse_attributes (backend, info, NULL, reply, NULL);
       if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID))
@@ -1346,8 +1346,11 @@ get_uid_sync (GVfsBackendSftp *backend)
           backend->my_gid = g_file_info_get_attribute_uint32 (info,
                                                               G_FILE_ATTRIBUTE_UNIX_GID);
         }
+
       g_object_unref (info);
     }
+
+  g_object_unref (reply);
 
   return TRUE;
 }
@@ -3707,9 +3710,6 @@ delete_lstat_reply (GVfsBackendSftp *backend,
                     GVfsJob *job,
                     gpointer user_data)
 {
-  GDataOutputStream *command;
-  GFileInfo *info;
-
   if (reply_type == SSH_FXP_STATUS)
     result_from_status (job, reply, -1, -1);
   else if (reply_type != SSH_FXP_ATTRS)
@@ -3717,9 +3717,11 @@ delete_lstat_reply (GVfsBackendSftp *backend,
                       _("Invalid reply received"));
   else
     {
+      GFileInfo *info;
+      GDataOutputStream *command;
+
       info = g_file_info_new ();
-      parse_attributes (backend, info, NULL,
-                        reply, NULL);
+      parse_attributes (backend, info, NULL, reply, NULL);
 
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
         {
@@ -3735,6 +3737,8 @@ delete_lstat_reply (GVfsBackendSftp *backend,
           put_string (command, G_VFS_JOB_DELETE (job)->filename);
           queue_command_stream_and_free (backend, command, delete_remove_reply, G_VFS_JOB (job), NULL);
         }
+
+      g_object_unref (info);
     }
 }
 
