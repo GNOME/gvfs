@@ -1,3 +1,8 @@
+2008-03-28  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Silence out libtool if
+	make is invoked with --silence.
+
 2008-03-28  Paolo Borelli  <pborelli@katamail.com>
 
 	* daemon/gvfsbackendtrash.c: plug some minor memory leaks.
