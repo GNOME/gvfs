@@ -573,6 +573,10 @@ list_trash_dirs (void)
         has_trash_files = TRUE;
     }
 
+  g_list_foreach (topdirs, (GFunc) g_free, NULL);
+  g_list_free (topdirs);
+  g_list_free (topdirs_info);
+
   return g_list_reverse (dirs);
 }
 
@@ -1007,9 +1011,6 @@ enumerate_root_trashdir (GVfsBackend *backend,
 { 
   GFile *file, *files_file;
   GFileEnumerator *enumerator;
-  GFileInfo *info;
-  const char *name;
-  char *new_name, *new_name_escaped;
   char *info_dir;
 
   info_dir = g_build_filename (trashdir, "info", NULL);
@@ -1027,10 +1028,15 @@ enumerate_root_trashdir (GVfsBackend *backend,
 
   if (enumerator)
     {
+      GFileInfo *info;
+
       while ((info = g_file_enumerator_next_file (enumerator,
                                                   job ? G_VFS_JOB (job)->cancellable : NULL,
                                                   NULL)) != NULL)
         {
+          const char *name;
+          char *new_name, *new_name_escaped;
+
           name = g_file_info_get_name (info);
 
           /* Get the display name, etc */
@@ -1058,6 +1064,8 @@ enumerate_root_trashdir (GVfsBackend *backend,
                                NULL);
       g_object_unref (enumerator);
     }
+
+  g_free (info_dir);
 }
 
 static GList *
