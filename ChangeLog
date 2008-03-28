@@ -1,3 +1,9 @@
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfileenumerator.c (g_daemon_file_enumerator_next_file):
+	Actually increment count so that timeouts works.
+	Pointed out by Joe Marcus Clarke
+
 2008-03-27  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

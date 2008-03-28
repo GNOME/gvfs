@@ -201,7 +201,7 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
   info = NULL;
   done = FALSE;
   count = 0;
-  while (count < G_VFS_DBUS_TIMEOUT_MSECS / 100)
+  while (count++ < G_VFS_DBUS_TIMEOUT_MSECS / 100)
     {
       G_LOCK (infos);
       if (daemon->infos)
