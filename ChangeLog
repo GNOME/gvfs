@@ -1,5 +1,12 @@
 2008-03-28  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.2.2 ===
+
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/Makefile.am (gvfsd_smb_SOURCES):
 	Dist libsmb-compat.h.
 
