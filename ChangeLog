@@ -1,3 +1,9 @@
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Bump version to 0.99.1 for unstable development
+	Stable branch is gnome-2-22
+
 2008-03-28  Paolo Borelli  <pborelli@katamail.com>
 
 	* daemon/gvfsbackendsftp.c:
