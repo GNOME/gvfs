@@ -1,3 +1,10 @@
+2008-03-31  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: Make sure we send (error)
+	replies to all outstanding jobs and unmount the mount
+	in case of an error occures while reading data from
+	the pipe to the ssh agent (e.g. if the ssh process died).
+
 2008-03-31  Alexander Larsson  <alexl@redhat.com>
 
         * client/gvfsdaemondbus.[ch]:

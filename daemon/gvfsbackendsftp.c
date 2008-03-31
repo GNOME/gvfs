@@ -997,6 +997,41 @@ handle_login (GVfsBackend *backend,
   return ret_val;
 }
 
+static void
+fail_jobs_and_die (GVfsBackendSftp *backend, GError *error)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+
+  g_hash_table_iter_init (&iter, backend->expected_replies);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      ExpectedReply *expected_reply = (ExpectedReply *) value;
+      g_vfs_job_failed_from_error (expected_reply->job, error);
+    }
+
+  g_error_free (error);
+
+  _exit (1);
+}
+
+static void
+check_input_stream_read_result (GVfsBackendSftp *backend, gssize res, GError *error)
+{
+  if (G_UNLIKELY (res <= 0))
+    {
+      if (res == 0 || error == NULL)
+        {
+          g_clear_error (&error);
+          g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                       _("Internal error: %s"),
+                       res == 0 ? "The underlying ssh process died" : "Unkown Error");
+        }
+
+      fail_jobs_and_die (backend, error);
+    }
+}
+
 static void read_reply_async (GVfsBackendSftp *backend);
 
 static void
@@ -1015,14 +1050,7 @@ read_reply_async_got_data  (GObject *source_object,
   error = NULL;
   res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, &error);
 
-  if (res <= 0)
-    {
-      /* TODO: unmount, etc */
-      g_warning ("Error reading results: %s", res < 0 ? error->message : "end of stream");
-      if (error)
-        g_error_free (error);
-      return;
-    }
+  check_input_stream_read_result (backend, res, error);
 
   backend->reply_size_read += res;
 
@@ -1069,16 +1097,7 @@ read_reply_async_got_len  (GObject *source_object,
   error = NULL;
   res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, &error);
 
-  if (res <= 0)
-    {
-      /* TODO: unmount, etc */
-      g_warning ("Error reading results: %s", res < 0 ? error->message : "end of stream");
-      if (error)
-        g_error_free (error);
-      error = NULL;
-      look_for_stderr_errors (G_VFS_BACKEND (backend), &error);
-      return;
-    }
+  check_input_stream_read_result (backend, res, error);
 
   backend->reply_size_read += res;
 
