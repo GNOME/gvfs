@@ -1,3 +1,9 @@
+2008-03-31  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Get the right size of the command messages.
+	Actually send file attributes in mkdir request.
+
 2008-03-31  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackendsftp.c: Make sure we send (error)
