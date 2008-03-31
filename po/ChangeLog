@@ -1,3 +1,8 @@
+2008-03-30  Owen Taylor  <otaylor@redhat.com>
+
+	* LINGUAS: Remove vi ... the actual vi.po wasn't added.
+	(missed svn add?)
+
 2008-03-30  Nguyễn Thái Ngọc Duy <pclouds@gmail.com>
 
 	* vi.po: -m Added Vietnamese translation
