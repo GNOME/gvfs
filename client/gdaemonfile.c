@@ -398,7 +398,10 @@ do_sync_path_call (GFile *file,
 {
   DBusMessage *message, *reply;
   va_list var_args;
+  GError *my_error;
 
+ retry:
+  
   message = create_empty_message (file, op, mount_info_out, error);
   if (!message)
     return NULL;
@@ -409,11 +412,23 @@ do_sync_path_call (GFile *file,
 				      var_args);
   va_end (var_args);
 
+
+  my_error = NULL;
   reply = _g_vfs_daemon_call_sync (message,
 				   connection_out,
 				   NULL, NULL, NULL,
-				   cancellable, error);
+				   cancellable, &my_error);
   dbus_message_unref (message);
+
+  if (reply == NULL)
+    {
+      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+	{
+	  g_error_free (my_error);
+	  goto retry;
+	}
+      g_propagate_error (error, my_error);
+    }
 
   return reply;
 }
@@ -437,7 +452,10 @@ do_sync_2_path_call (GFile *file1,
   GMountInfo *mount_info1, *mount_info2;
   const char *path1, *path2;
   va_list var_args;
+  GError *my_error;
 
+ retry:
+  
   mount_info1 = _g_daemon_vfs_get_mount_info_sync (daemon_file1->mount_spec,
 						   daemon_file1->path,
 						   error);
@@ -488,18 +506,29 @@ do_sync_2_path_call (GFile *file1,
 				      first_arg_type,
 				      var_args);
   va_end (var_args);
-  
+
+  my_error = NULL;
   reply = _g_vfs_daemon_call_sync (message,
 				   connection_out,
 				   callback_obj_path,
 				   callback,
 				   callback_user_data, 
-				   cancellable, error);
+				   cancellable, &my_error);
   dbus_message_unref (message);
 
   g_mount_info_unref (mount_info1);
   if (mount_info2)
     g_mount_info_unref (mount_info2);
+
+  if (reply == NULL)
+    {
+      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+	{
+	  g_error_free (my_error);
+	  goto retry;
+	}
+      g_propagate_error (error, my_error);
+    }
   
   return reply;
 }
@@ -1840,7 +1869,10 @@ g_daemon_file_set_attribute (GFile *file,
   DBusMessage *message, *reply;
   DBusMessageIter iter;
   dbus_uint32_t flags_dbus;
+  GError *my_error;
 
+ retry:
+  
   message = create_empty_message (file, G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE, NULL, error);
   if (!message)
     return FALSE;
@@ -1854,13 +1886,22 @@ g_daemon_file_set_attribute (GFile *file,
 
   _g_dbus_append_file_attribute (&iter, attribute, type, value_p);
 
+  my_error = NULL;
   reply = _g_vfs_daemon_call_sync (message,
 				   NULL,
 				   NULL, NULL, NULL,
-				   cancellable, error);
+				   cancellable, &my_error);
 
   if (reply == NULL)
-    return FALSE;
+    {
+      if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))
+	{
+	  g_error_free (my_error);
+	  goto retry;
+	}
+      g_propagate_error (error, my_error);
+      return FALSE;
+    }
 
   dbus_message_unref (reply);
   return TRUE;
