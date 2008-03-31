@@ -452,6 +452,16 @@ new_command_stream (GVfsBackendSftp *backend, int type)
   return data_stream;
 }
 
+static gsize
+get_data_size (GMemoryOutputStream *stream)
+{
+  g_seekable_seek (G_SEEKABLE (stream),
+                   0,
+                   G_SEEK_END,
+                   NULL, NULL);
+  return g_seekable_tell (G_SEEKABLE (stream));
+}
+
 static gpointer
 get_data_from_command_stream (GDataOutputStream *command_stream, gsize *len)
 {
@@ -461,7 +471,7 @@ get_data_from_command_stream (GDataOutputStream *command_stream, gsize *len)
   
   mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));
   data = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
-  *len = g_memory_output_stream_get_size (G_MEMORY_OUTPUT_STREAM (mem_stream));
+  *len = get_data_size (G_MEMORY_OUTPUT_STREAM (mem_stream));
 
   len_ptr = (guint32 *)data;
   *len_ptr = GUINT32_TO_BE (*len - 4);
@@ -3681,10 +3691,12 @@ try_make_directory (GVfsBackend *backend,
 {
   GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
   GDataOutputStream *command;
-  
+
   command = new_command_stream (op_backend,
                                 SSH_FXP_MKDIR);
   put_string (command, filename);
+  /* No file info - flag 0 */
+  g_data_output_stream_put_uint32 (command, 0, NULL, NULL);
   
   queue_command_stream_and_free (op_backend, command, make_directory_reply, G_VFS_JOB (job), NULL);
 
