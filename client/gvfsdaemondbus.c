@@ -65,6 +65,15 @@ static GHashTable *obj_path_map = NULL;
 G_LOCK_DEFINE_STATIC(obj_path_map);
 
 static void setup_async_fd_receive (VfsConnectionData *connection_data);
+static void invalidate_local_connection (const char *dbus_id,
+					 GError **error);
+  
+
+GQuark
+_g_vfs_error_quark (void)
+{
+  return g_quark_from_static_string ("g-vfs-error-quark");
+}
 
 static gpointer
 vfs_dbus_init (gpointer arg)
@@ -690,9 +699,6 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
   if (connection == NULL)
     return NULL;
 
-  /* TODO: Handle errors below due to unmount and invalidate the
-     sync connection cache */
-  
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
@@ -715,11 +721,12 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 					    G_VFS_DBUS_TIMEOUT_MSECS))
 	_g_dbus_oom ();
       
-      if (pending == NULL)
+      if (pending == NULL ||
+	  !dbus_connection_get_is_connected (connection))
 	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       "Error while getting peer-to-peer dbus connection: %s",
-		       "Connection is closed");
+	  if (pending)
+	    dbus_pending_call_unref (pending);
+	  invalidate_local_connection (dbus_id, error);
 	  goto out;
 	}
 
@@ -804,7 +811,17 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
 							 &derror);
       if (!reply)
 	{
-	  _g_error_from_dbus (&derror, error);
+	  if (dbus_error_has_name (&derror, DBUS_ERROR_NO_REPLY) &&
+	      !dbus_connection_get_is_connected (connection))
+	    {
+	      /* The mount for this connection died, we invalidate
+	       * the caches, and then caller needs to retry.
+	       */
+
+	      invalidate_local_connection (dbus_id, error);
+	    }
+	  else
+	    _g_error_from_dbus (&derror, error);
 	  dbus_error_free (&derror);
 	  goto out;
 	}
@@ -852,6 +869,24 @@ free_local_connections (ThreadLocalConnections *local)
   g_free (local);
 }
 
+static void
+invalidate_local_connection (const char *dbus_id,
+			     GError **error)
+{
+  ThreadLocalConnections *local;
+  
+  _g_daemon_vfs_invalidate_dbus_id (dbus_id);
+
+  local = g_static_private_get (&local_connections);
+  if (local)
+    g_hash_table_remove (local->connections, dbus_id);
+  
+  g_set_error (error,
+	       G_VFS_ERROR,
+	       G_VFS_ERROR_RETRY,
+	       "Cache invalid, retry (internally handled)");
+}
+
 DBusConnection *
 _g_dbus_connection_get_sync (const char *dbus_id,
 			     GError **error)
@@ -877,20 +912,38 @@ _g_dbus_connection_get_sync (const char *dbus_id,
     }
 
   if (dbus_id == NULL)
-    connection = local->session_bus;
-  else
-    connection = g_hash_table_lookup (local->connections, dbus_id);
-  
-  if (connection != NULL)
     {
-      if (!dbus_connection_get_is_connected (connection))
+      /* Session bus */
+      
+      if (local->session_bus)
 	{
-	  _g_daemon_vfs_invalidate_dbus_id (dbus_id);
-	  g_hash_table_remove (local->connections, dbus_id);
-	  return NULL;
+	  if (dbus_connection_get_is_connected (local->session_bus))
+	    return local->session_bus;
+
+	  /* Session bus was disconnected, re-connect */
+	  local->session_bus = NULL;
+	  dbus_connection_unref (local->session_bus);
 	}
-      else
-	return connection;
+    }
+  else
+    {
+      /* Mount daemon connection */
+      
+      connection = g_hash_table_lookup (local->connections, dbus_id);
+      if (connection != NULL)
+	{
+	  if (!dbus_connection_get_is_connected (connection))
+	    {
+	      /* The mount for this connection died, we invalidate
+	       * the caches, and then caller needs to retry.
+	       */
+
+	      invalidate_local_connection (dbus_id, error);
+	      return NULL;
+	    }
+	  
+	  return connection;
+	}
     }
 
   dbus_error_init (&derror);
@@ -910,7 +963,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
       local->session_bus = bus;
 
       if (dbus_id == NULL)
-	return bus;
+	return bus; /* We actually wanted the session bus, so done */
     }
   
   message = dbus_message_new_method_call (dbus_id,

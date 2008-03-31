@@ -29,6 +29,16 @@
 
 G_BEGIN_DECLS
 
+/* Used for internal errors */
+GQuark  _g_vfs_error_quark (void);
+#define G_VFS_ERROR _g_vfs_error_quark()
+
+typedef enum
+{
+  G_VFS_ERROR_RETRY
+} GVfsError;
+
+
 typedef void (*GVfsAsyncDBusCallback) (DBusMessage *reply,
 				       DBusConnection *connection,
 				       GError *io_error,
