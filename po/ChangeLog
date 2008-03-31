@@ -1,5 +1,9 @@
 === gvfs 0.2.2 ===
 
+2008-03-31  Eskild Hustvedt  <eskildh@gnome.org>
+
+	* nn.po: Added Norwegian Nynorsk translation
+
 2008-03-28  Daniel Nylander <po@danielnylander.se>
 
 	* sv.po: Updated Swedish translation.
