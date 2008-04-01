@@ -1,3 +1,9 @@
+2008-04-01  A. Walton  <awalton@svn.gnome.org>
+
+	reviewed by: Christian Kellner
+	* hal/ghalmount.c (do_update_from_hal):
+	Disable the "media-encrypted" icon for Gnome 2.22.
+
 2008-03-31  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

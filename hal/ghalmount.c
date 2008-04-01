@@ -443,8 +443,13 @@ do_update_from_hal (GHalMount *m)
     icon_name = icon_from_hal;
   else if (is_audio_player)
     icon_name = "multimedia-player";
+#if 0
+  /* This icon hasn't been finalized yet, and causes issues with
+   * the icon theme, so it has been disabled for gnome 2.22.
+   */
   else if (is_crypto || is_crypto_cleartext)
     icon_name = "media-encrypted";
+#endif
   else if (strcmp (drive_type, "disk") == 0)
     {
       if (strcmp (drive_bus, "ide") == 0)
