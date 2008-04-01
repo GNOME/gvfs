@@ -1,3 +1,8 @@
+2008-04-01  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* hal/ghalmount.c: (format_size_for_display), (do_update_from_hal):
+	Use consistent translatable strings for mounts and volume (#525286)
+
 2008-03-31  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

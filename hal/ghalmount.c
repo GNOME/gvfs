@@ -365,17 +365,17 @@ format_size_for_display (guint64 size)
   if (size < MEGABYTE_FACTOR)
     {
       displayed_size = (double) size / KILOBYTE_FACTOR;
-      str = g_strdup_printf (_("%.1f kB Media"), displayed_size);
+      str = g_strdup_printf (_("%.1f kB"), displayed_size);
     } 
   else if (size < GIGABYTE_FACTOR)
     {
       displayed_size = (double) size / MEGABYTE_FACTOR;
-      str = g_strdup_printf (_("%.1f MB Media"), displayed_size);
+      str = g_strdup_printf (_("%.1f MB"), displayed_size);
     } 
   else 
     {
       displayed_size = (double) size / GIGABYTE_FACTOR;
-      str = g_strdup_printf (_("%.1f GB Media"), displayed_size);
+      str = g_strdup_printf (_("%.1f GB"), displayed_size);
     }
   
   return str;
@@ -495,7 +495,14 @@ do_update_from_hal (GHalMount *m)
         name = g_strdup (get_disc_name (volume_disc_type, volume_disc_is_blank));
     }
   else
-    name = format_size_for_display (volume_size);
+    {
+      char *size;
+
+      size = format_size_for_display (volume_size);  
+      /* Translators: %s is the size of the mount (e.g. 512 MB) */
+      name = g_strdup_printf (_("%s Media"), size);
+      g_free (size);
+    }
 
   if (m->override_name != NULL)
     {
