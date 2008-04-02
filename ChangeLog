@@ -1,3 +1,28 @@
+2008-04-02  Christian Kellner  <gicmo@gnome.org>
+
+	* hal/hal-utils.h:
+	* hal/hal-utils.c:
+	Create new files for utility functions and move get_disc_icon()
+	and get_disc_name() here.
+	Also create get_themed_icon_with_fallbacks() to create
+	GThemedIcons with default fallbacks but with the ability to
+	pass in another name to create the fallbacks from then the
+	icon name.
+
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	Use newly created get_themed_icon_with_fallbacks () and pass
+	in custom fallback name for encrypted mounts/volumes (#525153).
+
+	* hal/Makefile.am:
+	Add hal-utils.[hc]
+
+	* programs/gvfs-mount.c:
+	Display the icon names for mounts/volumes if the icon is
+	a GThemedIcon.
+	
+	[Merged from gnome-2-22]
+
 2008-04-01  Sebastien Bacher  <seb128@ubuntu.com>
 
 	* hal/ghalmount.c: (format_size_for_display), (do_update_from_hal):

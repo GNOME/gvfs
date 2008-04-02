@@ -36,6 +36,8 @@
 #include "ghalmount.h"
 #include "ghalvolume.h"
 
+#include "hal-utils.h"
+
 /* Protects all fields of GHalDrive that can change */
 G_LOCK_DEFINE_STATIC(hal_mount);
 
@@ -155,63 +157,6 @@ changed_in_idle (gpointer data)
   g_object_unref (mount);
   
   return FALSE;
-}
-
-static const struct {
-  const char *disc_type;
-  const char *icon_name;
-  char *ui_name;
-  char *ui_name_blank;
-} disc_data[] = {
-  {"cd_rom",        "media-optical-cd-rom", N_("CD-ROM Disc"), N_("Blank CD-ROM Disc")},
-  {"cd_r",          "media-optical-cd-r", N_("CD-R Disc"), N_("Blank CD-R Disc")},
-  {"cd_rw",         "media-optical-cd-rw", N_("CD-RW Disc"), N_("Blank CD-RW Disc")},
-  {"dvd_rom",       "media-optical-dvd-rom", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-  {"dvd_ram",       "media-optical-dvd-ram", N_("DVD-RAM Disc"), N_("Blank DVD-RAM Disc")},
-  {"dvd_r",         "media-optical-dvd-r", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-  {"dvd_rw",        "media-optical-dvd-rw", N_("DVD-RW Disc"), N_("Blank DVD-RW Disc")},
-  {"dvd_plus_r",    "media-optical-dvd-r-plus", N_("DVD+R Disc"), N_("Blank DVD+R Disc")},
-  {"dvd_plus_rw",   "media-optical-dvd-rw-plus",  N_("DVD+RW Disc"), N_("Blank DVD+RW Disc")},
-  {"dvd_plus_r_dl", "media-optical-dvd-dl-r-plus", N_("DVD+R DL Disc"), N_("Blank DVD+R DL Disc")},
-  {"bd_rom",        "media-optical-bd-rom", N_("Blu-Ray Disc"), N_("Blank Blu-Ray Disc")},
-  {"bd_r",          "media-optical-bd-r", N_("Blu-Ray R Disc"), N_("Blank Blu-Ray R Disc")},
-  {"bd_re",         "media-optical-bd-re", N_("Blu-Ray RW Disc"), N_("Blank Blu-Ray RW Disc")},
-  {"hddvd_rom",     "media-optical-hddvd-rom", N_("HD DVD Disc"), N_("Blank HD DVD Disc")},
-  {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
-  {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
-  {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
-  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")}
-};
-
-static const char *
-get_disc_icon (const char *disc_type)
-{
-  int n;
-  
-  for (n = 0; disc_data[n].disc_type != NULL; n++)
-    {
-      if (strcmp (disc_data[n].disc_type, disc_type) == 0)
-        break;
-    }
-  
-  return disc_data[n].icon_name;
-}
-
-static const char *
-get_disc_name (const char *disc_type, gboolean is_blank)
-{
-  int n;
-  
-  for (n = 0; disc_data[n].disc_type != NULL; n++)
-    {
-      if (strcmp (disc_data[n].disc_type, disc_type) == 0)
-        break;
-    }
-  
-  if (is_blank)
-    return dgettext (GETTEXT_PACKAGE, disc_data[n].ui_name_blank);
-  else
-    return dgettext (GETTEXT_PACKAGE, disc_data[n].ui_name);
 }
 
 typedef struct _MountIconSearchData
@@ -388,6 +333,7 @@ do_update_from_hal (GHalMount *m)
   HalDevice *drive;
   char *name;
   const char *icon_name;
+  const char *icon_name_fallback;
   const char *drive_type;
   const char *drive_bus;
   gboolean drive_uses_removable_media;
@@ -437,14 +383,14 @@ do_update_from_hal (GHalMount *m)
   /*g_warning ("drive_bus='%s'", drive_bus); */
   /*g_warning ("drive_uses_removable_media=%d", drive_uses_removable_media); */
 
+  icon_name_fallback = NULL;
+
   if (strlen (volume_icon_from_hal) > 0)
     icon_name = volume_icon_from_hal;
   else if (strlen (icon_from_hal) > 0)
     icon_name = icon_from_hal;
   else if (is_audio_player)
     icon_name = "multimedia-player";
-  else if (is_crypto || is_crypto_cleartext)
-    icon_name = "media-encrypted";
   else if (strcmp (drive_type, "disk") == 0)
     {
       if (strcmp (drive_bus, "ide") == 0)
@@ -459,7 +405,7 @@ do_update_from_hal (GHalMount *m)
         icon_name = "drive-harddisk";
     }
   else if (strcmp (drive_type, "cdrom") == 0)
-    icon_name = g_strdup (get_disc_icon (volume_disc_type));
+    icon_name = get_disc_icon (volume_disc_type);
   else if (strcmp (drive_type, "floppy") == 0)
     icon_name = "media-floppy";
   else if (strcmp (drive_type, "tape") == 0)
@@ -475,7 +421,16 @@ do_update_from_hal (GHalMount *m)
   else
     icon_name = "drive-harddisk";
 
-  
+  /* Create default fallbacks for the icon_name by default
+   * with get_themed_icon_with_fallbacks () */
+  icon_name_fallback = icon_name;
+
+  /* Note: we are not chaning the default fallbacks
+   * so we get all the fallbacks if the media-encrytped
+   * icon is not there */
+  if (is_crypto || is_crypto_cleartext)
+    icon_name = "media-encrypted";
+
   if (strlen (volume_name_from_hal) > 0)
     name = g_strdup (volume_name_from_hal);
   else if (strlen (name_from_hal) > 0)
@@ -515,8 +470,9 @@ do_update_from_hal (GHalMount *m)
   if (m->override_icon != NULL)
     m->icon = g_object_ref (m->override_icon);
   else
-    m->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
-    
+    m->icon = get_themed_icon_with_fallbacks (icon_name,
+                                              icon_name_fallback);
+
   /* If this is a CD-ROM, begin searching for an icon specified in
    * autorun.inf.
   **/
