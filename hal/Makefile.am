@@ -16,6 +16,7 @@ hal-marshal.c: hal-marshal.list
 
 
 libgiohal_volume_monitor_la_SOURCES =				\
+	hal-utils.c 		hal-utils.h \
 	hal-module.c					\
 	hal-marshal.c		hal-marshal.h		\
 	hal-device.c		hal-device.h		\

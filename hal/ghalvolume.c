@@ -36,6 +36,8 @@
 #include "ghalvolume.h"
 #include "ghalmount.h"
 
+#include "hal-utils.h"
+
 /* Protects all fields of GHalDrive that can change */
 G_LOCK_DEFINE_STATIC(hal_volume);
 
@@ -63,6 +65,7 @@ struct _GHalVolume {
 
   char *name;
   char *icon;
+  char *icon_fallback;
 };
 
 static void g_hal_volume_volume_iface_init (GVolumeIface *iface);
@@ -110,6 +113,7 @@ g_hal_volume_finalize (GObject *object)
 
   g_free (volume->name);
   g_free (volume->icon);
+  g_free (volume->icon_fallback);
 
   if (G_OBJECT_CLASS (g_hal_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_hal_volume_parent_class)->finalize) (object);
@@ -145,50 +149,6 @@ changed_in_idle (gpointer data)
   
   return FALSE;
 }
-
-static const struct {
-  const char *disc_type;
-  const char *icon_name;
-  char *ui_name;
-  char *ui_name_blank;
-} disc_data[] = {
-  {"cd_rom",        "media-optical-cd-rom", N_("CD-ROM Disc"), N_("Blank CD-ROM Disc")},
-  {"cd_r",          "media-optical-cd-r", N_("CD-R Disc"), N_("Blank CD-R Disc")},
-  {"cd_rw",         "media-optical-cd-rw", N_("CD-RW Disc"), N_("Blank CD-RW Disc")},
-  {"dvd_rom",       "media-optical-dvd-rom", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-  {"dvd_ram",       "media-optical-dvd-ram", N_("DVD-RAM Disc"), N_("Blank DVD-RAM Disc")},
-  {"dvd_r",         "media-optical-dvd-r", N_("DVD-ROM Disc"), N_("Blank DVD-ROM Disc")},
-  {"dvd_rw",        "media-optical-dvd-rw", N_("DVD-RW Disc"), N_("Blank DVD-RW Disc")},
-  {"dvd_plus_r",    "media-optical-dvd-r-plus", N_("DVD+R Disc"), N_("Blank DVD+R Disc")},
-  {"dvd_plus_rw",   "media-optical-dvd-rw-plus",  N_("DVD+RW Disc"), N_("Blank DVD+RW Disc")},
-  {"dvd_plus_r_dl", "media-optical-dvd-dl-r-plus", N_("DVD+R DL Disc"), N_("Blank DVD+R DL Disc")},
-  {"bd_rom",        "media-optical-bd-rom", N_("Blu-Ray Disc"), N_("Blank Blu-Ray Disc")},
-  {"bd_r",          "media-optical-bd-r", N_("Blu-Ray R Disc"), N_("Blank Blu-Ray R Disc")},
-  {"bd_re",         "media-optical-bd-re", N_("Blu-Ray RW Disc"), N_("Blank Blu-Ray RW Disc")},
-  {"hddvd_rom",     "media-optical-hddvd-rom", N_("HD DVD Disc"), N_("Blank HD DVD Disc")},
-  {"hddvd_r",       "media-optical-hddvd-r", N_("HD DVD-R Disc"), N_("Blank HD DVD-R Disc")},
-  {"hddvd_rw",      "media-optical-hddvd-rw", N_("HD DVD-RW Disc"), N_("Blank HD DVD-RW Disc")},
-  {"mo",            "media-optical-mo", N_("MO Disc"), N_("Blank MO Disc")},
-  {NULL,            "media-optical", N_("Disc"), N_("Blank Disc")}
-};
-
-static const char *
-get_disc_name (const char *disc_type, gboolean is_blank)
-{
-  int n;
-  
-  for (n = 0; disc_data[n].disc_type != NULL; n++)
-    {
-      if (strcmp (disc_data[n].disc_type, disc_type) == 0)
-        break;
-    }
-  
-  if (is_blank)
-    return dgettext (GETTEXT_PACKAGE, disc_data[n].ui_name_blank);
-  else
-    return dgettext (GETTEXT_PACKAGE, disc_data[n].ui_name);
-}
-
 
 #define KILOBYTE_FACTOR 1000.0
 #define MEGABYTE_FACTOR (1000.0 * 1000.0)
@@ -332,11 +292,13 @@ do_update_from_hal (GHalVolume *mv)
     }
 
   mv->name = name;
+  mv->icon = _drive_get_icon (drive); /* use the drive icon since we're unmounted */
 
   if (is_crypto || is_crypto_cleartext)
-    mv->icon = g_strdup ("drive-encrypted");
-  else
-    mv->icon = _drive_get_icon (drive); /* use the drive icon since we're unmounted */
+    {
+      mv->icon_fallback = mv->icon;
+      mv->icon = g_strdup ("drive-encrypted");
+    }
 
   if (hal_device_get_property_bool (volume, "volume.is_mounted"))
     mv->mount_path = g_strdup (hal_device_get_property_string (volume, "volume.mount_point"));
@@ -690,11 +652,19 @@ g_hal_volume_get_icon (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   GIcon *icon;
+  const char *name;
+  const char *fallback;
 
   G_LOCK (hal_volume);
-  icon = g_themed_icon_new_with_default_fallbacks (hal_volume->icon);
+  name = hal_volume->icon;
+
+  if (hal_volume->icon_fallback)
+    fallback = hal_volume->icon_fallback;
+  else /* if no custom fallbacks are set, use the icon to create them */
+    fallback = name;
+
+  icon = get_themed_icon_with_fallbacks (name, fallback);
   G_UNLOCK (hal_volume);
-  
   return icon;
 }
 

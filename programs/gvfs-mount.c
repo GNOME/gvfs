@@ -270,6 +270,24 @@ iterate_gmain(void)
   g_main_loop_run (main_loop);
 }
 
+static void
+show_themed_icon_names (GThemedIcon *icon, int indent)
+{
+  char **names;
+  char **iter;
+
+  g_print ("%*sthemed icons:", indent, " ");
+
+  names = NULL;
+
+  g_object_get (icon, "names", &names, NULL);
+
+  for (iter = names; *iter; iter++)
+    g_print ("  [%s]", *iter);
+
+  g_print ("\n");
+  g_strfreev (names);
+}
 
 static void
 list_mounts (GList *mounts,
@@ -282,6 +300,7 @@ list_mounts (GList *mounts,
   GVolume *volume;
   char *name, *uuid, *uri;
   GFile *root;
+  GIcon *icon;
   
   for (c = 0, l = mounts; l != NULL; l = l->next, c++)
     {
@@ -308,6 +327,16 @@ list_mounts (GList *mounts,
 	  uuid = g_mount_get_uuid (mount);
 	  if (uuid)
 	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
+
+      icon = g_mount_get_icon (mount);
+      if (icon)
+        {
+          if (G_IS_THEMED_ICON (icon))
+            show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+
+          g_object_unref (icon);
+        }
+
 	  g_print ("%*scan_unmount=%d\n", indent + 2, "", g_mount_can_unmount (mount));
 	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_mount_can_eject (mount));
 	  g_free (uuid);
@@ -318,8 +347,6 @@ list_mounts (GList *mounts,
       g_free (uri);
     }  
 }
-
-
 
 static void
 list_volumes (GList *volumes,
@@ -334,6 +361,7 @@ list_volumes (GList *volumes,
   char *name;
   char *uuid;
   char **ids;
+  GIcon *icon;
   
   for (c = 0, l = volumes; l != NULL; l = l->next, c++)
     {
@@ -373,6 +401,15 @@ list_volumes (GList *volumes,
 	  uuid = g_volume_get_uuid (volume);
 	  if (uuid)
 	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
+      icon = g_volume_get_icon (volume);
+      if (icon)
+        {
+          if (G_IS_THEMED_ICON (icon))
+            show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+
+          g_object_unref (icon);
+        }
+
 	  g_print ("%*scan_mount=%d\n", indent + 2, "", g_volume_can_mount (volume));
 	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_volume_can_eject (volume));
 	  g_free (uuid);
