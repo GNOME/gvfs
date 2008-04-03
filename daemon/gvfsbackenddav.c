@@ -94,7 +94,7 @@ struct _GVfsBackendDav
   MountAuthData auth_info;
 };
 
-G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP)
+G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP);
 
 static void
 g_vfs_backend_dav_finalize (GObject *object)
@@ -144,6 +144,242 @@ path_get_parent_dir (const char *path)
     return NULL;
 
   return g_strndup (path, (parent - path) + 1);
+}
+
+/* message utility functions */
+
+static void
+message_add_destination_header (SoupMessage *msg,
+                                SoupURI     *uri)
+{
+  char *string;
+
+  string = soup_uri_to_string (uri, FALSE);
+  soup_message_headers_append (msg->request_headers,
+                               "Destination",
+                               string);
+  g_free (string);
+}
+static void
+message_add_overwrite_header (SoupMessage *msg,
+                              gboolean     overwrite)
+{
+  soup_message_headers_append (msg->request_headers,
+                               "Overwrite",
+                               overwrite ? "T" : "F");
+}
+
+static void
+message_add_redirect_header (SoupMessage         *msg,
+                             GFileQueryInfoFlags  flags)
+{
+  const char  *header_redirect;
+
+  /* RFC 4437 */
+  if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
+      header_redirect = "F";
+  else
+      header_redirect = "T";
+
+  soup_message_headers_append (msg->request_headers,
+                               "Apply-To-Redirect-Ref",
+                               header_redirect);
+}
+
+static inline gboolean
+str_equal (const char *a, const char *b, gboolean insensitive)
+{
+   if (a == NULL || b == NULL)
+      return a == b;
+
+   return insensitive ? !g_ascii_strcasecmp (a, b) : !strcmp (a, b);
+}
+
+static gboolean
+path_equal (const char *a, const char *b, gboolean relax)
+{
+  gboolean res;
+  size_t a_len, b_len;
+
+  if (relax == FALSE)
+    return str_equal (a, b, FALSE);
+
+  if (a == NULL || b == NULL)
+      return a == b;
+
+  a_len = strlen (a);
+  b_len = strlen (b);
+
+  while (a[a_len - 1] == '/')
+    a_len--;
+
+  while (b[b_len - 1] == '/')
+    b_len--;
+
+  if (a_len == b_len)
+    res = ! strncmp (a, b, a_len);
+  else
+    res = FALSE;
+
+  return res;
+}
+
+/* Like soup_uri_equal */
+static gboolean
+dav_uri_match (SoupURI *a, SoupURI *b, gboolean relax)
+{
+  if (a->scheme != b->scheme ||
+      a->port != b->port     ||
+      ! str_equal (a->user, b->user, FALSE)         ||
+      ! str_equal (a->password, b->password, FALSE) ||
+      ! str_equal (a->host, b->host, TRUE)          ||
+      ! path_equal (a->path, b->path, relax)        ||
+      ! str_equal (a->query, b->query, FALSE)       ||
+      ! str_equal (a->fragment, b->fragment, FALSE))
+    return FALSE;
+  return TRUE;
+}
+
+static gboolean
+message_should_apply_redir_ref (SoupMessage *msg)
+{
+  const char *header;
+
+  header = soup_message_headers_get (msg->request_headers,
+                                     "Apply-To-Redirect-Ref");
+
+  if (header == NULL || g_ascii_strcasecmp (header, "T"))
+    return FALSE;
+
+  return TRUE;
+}
+
+/* redirection */
+static void
+redirect_handler (SoupMessage *msg, gpointer user_data)
+{
+    SoupSession *session = user_data;
+    const char  *new_loc;
+    SoupURI     *new_uri;
+    SoupURI     *old_uri;
+    guint        status;
+    gboolean     redirect;
+
+    status = msg->status_code;
+    new_loc = soup_message_headers_get (msg->response_headers, "Location");
+
+    /* If we don't have a location to redirect to, just fail */
+    if (new_loc == NULL)
+      return;
+
+   new_uri = soup_uri_new_with_base (soup_message_get_uri (msg), new_loc);
+   if (new_uri == NULL)
+     {
+       soup_message_set_status_full (msg,
+                                     SOUP_STATUS_MALFORMED,
+                                     "Invalid Redirect URL");
+       return;
+     }
+
+   old_uri = soup_message_get_uri (msg);
+
+   /* Check if this is a trailing slash redirect (i.e. /a/b to /a/b/),
+    * redirect it right away
+    */
+   redirect = dav_uri_match (new_uri, old_uri, TRUE);
+
+   if (redirect == TRUE)
+     {
+       const char *dest;
+
+       dest = soup_message_headers_get (msg->request_headers,
+                                        "Destination");
+
+       if (dest && g_str_has_suffix (dest, "/") == FALSE)
+         {
+           char *new_dest = g_strconcat (dest, "/", NULL);
+           soup_message_headers_replace (msg->request_headers,
+                                         "Destination",
+                                         new_dest);
+           g_free (new_dest);
+         }
+     }
+   else if (message_should_apply_redir_ref (msg))
+     {
+
+
+       if (status == SOUP_STATUS_MOVED_PERMANENTLY ||
+           status == SOUP_STATUS_TEMPORARY_REDIRECT)
+         {
+
+           /* Only corss-site redirect safe methods */
+           if (msg->method == SOUP_METHOD_GET &&
+               msg->method == SOUP_METHOD_HEAD &&
+               msg->method == SOUP_METHOD_OPTIONS &&
+               msg->method == SOUP_METHOD_PROPFIND)
+             redirect = TRUE;
+         }
+
+#if 0
+       else if (msg->status_code == SOUP_STATUS_SEE_OTHER ||
+                msg->status_code == SOUP_STATUS_FOUND)
+         {
+           /* Redirect using a GET */
+           g_object_set (msg,
+                         SOUP_MESSAGE_METHOD, SOUP_METHOD_GET,
+                         NULL);
+           soup_message_set_request (msg, NULL,
+                                     SOUP_MEMORY_STATIC, NULL, 0);
+           soup_message_headers_set_encoding (msg->request_headers,
+                                              SOUP_ENCODING_NONE);
+         }
+#endif
+         /* ELSE:
+          *
+          * Three possibilities:
+          *
+          *   1) This was a non-3xx response that happened to
+          *      have a "Location" header
+          *   2) It's a non-redirecty 3xx response (300, 304,
+          *      305, 306)
+          *   3) It's some newly-defined 3xx response (308+)
+          *
+          * We ignore all of these cases. In the first two,
+          * redirecting would be explicitly wrong, and in the
+          * last case, we have no clue if the 3xx response is
+          * supposed to be redirecty or non-redirecty. Plus,
+          * 2616 says unrecognized status codes should be
+          * treated as the equivalent to the x00 code, and we
+          * don't redirect on 300, so therefore we shouldn't
+          * redirect on 308+ either.
+          */
+     }
+
+    if (redirect)
+      {
+        soup_message_set_uri (msg, new_uri);
+        soup_session_requeue_message (session, msg);
+      }
+
+    soup_uri_free (new_uri);
+}
+
+static guint
+g_vfs_backend_dav_send_message (GVfsBackend *backend, SoupMessage *message)
+{
+  GVfsBackendHttp *http_backend;
+  SoupSession     *session;
+
+  http_backend = G_VFS_BACKEND_HTTP (backend);
+  session = http_backend->session;
+
+  /* We have our own custom redirect handler */
+  soup_message_set_flags (message, SOUP_MESSAGE_NO_REDIRECT);
+
+  soup_message_add_header_handler (message, "got_body", "Location",
+                                   G_CALLBACK (redirect_handler), session);
+
+  return http_backend_send_message (backend, message);
 }
 
 /* ************************************************************************* */
@@ -440,7 +676,6 @@ ms_response_is_target (MsResponse *response)
   SoupURI    *uri;
   gboolean    res;
 
-  res    = FALSE;
   uri    = NULL;
   path   = NULL;
   target = response->multistatus->target;
@@ -449,35 +684,14 @@ ms_response_is_target (MsResponse *response)
   if (text == NULL)
     return FALSE;
 
-  if (*text == '/')
-    {
-      path = text;
-    }
-  else if (!g_ascii_strncasecmp (text, "http", 4))
-    {
-      uri = soup_uri_new (text);
-      path = uri->path;
-    }
+  uri = soup_uri_new_with_base (target, text);
 
-  if (path)
-    {
-      size_t len_path, len_target;
+  if (uri == NULL)
+    return FALSE;
 
-      len_path = strlen (path);
-      len_target = strlen (target->path);
+  res = dav_uri_match (uri, target, TRUE);
 
-      while (path[len_path - 1] == '/')
-        len_path--;
-
-      while (path[len_target - 1] == '/')
-        len_target--;
-
-      if (len_path == len_target)
-        res = ! g_ascii_strncasecmp (path, target->path, len_path);
-    }
-
-  if (uri)
-    soup_uri_free (uri);
+  soup_uri_free (uri);
   
   return res;
 }
@@ -601,6 +815,7 @@ ms_response_to_file_info (MsResponse *response,
   GFileType   file_type;
   char       *mime_type;
   GIcon      *icon;
+  gboolean    have_display_name;
 
   basename = ms_response_get_basename (response);
   g_file_info_set_name (info, basename);
@@ -609,6 +824,7 @@ ms_response_to_file_info (MsResponse *response,
   file_type = G_FILE_TYPE_UNKNOWN;
   mime_type = NULL;
 
+  have_display_name = FALSE;
   ms_response_get_propstat_iter (response, &iter);
   while (xml_node_iter_next (&iter))
     {
@@ -682,6 +898,9 @@ ms_response_to_file_info (MsResponse *response,
 
       file_info_set_content_type (info, mime_type);
     }
+
+  if (have_display_name == FALSE)
+    g_file_info_set_display_name (info, basename);
 
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
@@ -807,22 +1026,6 @@ propfind_request_new (GVfsBackend     *backend,
   return msg;
 }
 
-static void
-message_add_apply_to_redirect_header (SoupMessage         *msg,
-                                      GFileQueryInfoFlags  flags)
-{
-  const char  *header_redirect;
-
-  /* RFC 4437 */
-  if (flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-      header_redirect = "F";
-  else
-      header_redirect = "T";
-
-  soup_message_headers_append (msg->request_headers,
-                               "Apply-To-Redirect-Ref", header_redirect);
-}
-
 static SoupMessage *
 stat_location_begin (SoupURI  *uri,
                      gboolean  count_children)
@@ -924,7 +1127,7 @@ stat_location (GVfsBackend  *backend,
   if (msg == NULL)
     return FALSE;
 
-  status = http_backend_send_message (backend, msg);
+  status = g_vfs_backend_dav_send_message (backend, msg);
 
   if (status != 207)
     {
@@ -1142,7 +1345,6 @@ keyring_save_authinfo (AuthInfo *info,
 }
 
 /* ************************************************************************* */
-/* Authentication */
 
 static inline GMountSpec *
 g_mount_spec_dup_known (GMountSpec *spec)
@@ -1167,6 +1369,8 @@ g_mount_spec_dup_known (GMountSpec *spec)
   return new_spec;
 }
 
+/* ************************************************************************* */
+/* Backend Functions */
 static void
 do_mount (GVfsBackend  *backend,
           GVfsJobMount *job,
@@ -1241,7 +1445,7 @@ do_mount (GVfsBackend  *backend,
   msg_stat = stat_location_begin (mount_base, FALSE);
 
   do {
-    status = http_backend_send_message (backend, msg_opts);
+    status = g_vfs_backend_dav_send_message (backend, msg_opts);
 
     is_success = SOUP_STATUS_IS_SUCCESSFUL (status);
     is_webdav = is_success && sm_has_header (msg_opts, "DAV");
@@ -1257,7 +1461,7 @@ do_mount (GVfsBackend  *backend,
         cur_uri = soup_message_get_uri (msg_opts);
         soup_message_set_uri (msg_stat, cur_uri);
 
-        http_backend_send_message (backend, msg_stat);
+        g_vfs_backend_dav_send_message (backend, msg_stat);
         res = stat_location_finish (msg_stat, &file_type, NULL);
 
         if (res && file_type == G_FILE_TYPE_DIRECTORY)
@@ -1368,6 +1572,8 @@ do_query_info (GVfsBackend           *backend,
 
   error   = NULL;
 
+  g_print ("Query info %s\n", filename);
+
   msg = propfind_request_new (backend, filename, 0, ls_propnames);
 
   if (msg == NULL)
@@ -1379,9 +1585,9 @@ do_query_info (GVfsBackend           *backend,
       return;
     }
 
-  message_add_apply_to_redirect_header (msg, flags);
+  message_add_redirect_header (msg, flags);
 
-  http_backend_send_message (backend, msg);
+  g_vfs_backend_dav_send_message (backend, msg);
 
   res = multistatus_parse (msg, &ms, &error);
 
@@ -1439,6 +1645,8 @@ do_enumerate (GVfsBackend           *backend,
  
   error = NULL;
 
+  g_print ("+ do_enumerate: %s\n", filename);
+
   msg = propfind_request_new (backend, filename, 1, ls_propnames);
 
   if (msg == NULL)
@@ -1450,9 +1658,9 @@ do_enumerate (GVfsBackend           *backend,
       return;
     }
 
-  message_add_apply_to_redirect_header (msg, flags);
+  message_add_redirect_header (msg, flags);
 
-  http_backend_send_message (backend, msg);
+  g_vfs_backend_dav_send_message (backend, msg);
 
   res = multistatus_parse (msg, &ms, &error);
 
@@ -1755,7 +1963,7 @@ do_make_directory (GVfsBackend          *backend,
   msg = soup_message_new_from_uri (SOUP_METHOD_MKCOL, uri);
   soup_uri_free (uri);
 
-  status = http_backend_send_message (backend, msg);
+  status = g_vfs_backend_dav_send_message (backend, msg);
 
   if (! SOUP_STATUS_IS_SUCCESSFUL (status))
     if (status == SOUP_STATUS_METHOD_NOT_ALLOWED)
@@ -1807,7 +2015,7 @@ do_delete (GVfsBackend   *backend,
 
   msg = soup_message_new_from_uri (SOUP_METHOD_DELETE, uri);
 
-  status = http_backend_send_message (backend, msg);
+  status = g_vfs_backend_dav_send_message (backend, msg);
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
     g_vfs_job_failed (G_VFS_JOB (job),
@@ -1821,15 +2029,85 @@ do_delete (GVfsBackend   *backend,
   g_object_unref (msg);
 }
 
+static void
+do_set_display_name (GVfsBackend           *backend,
+                     GVfsJobSetDisplayName *job,
+                     const char            *filename,
+                     const char            *display_name)
+{
+  SoupMessage *msg;
+  SoupURI     *source;
+  SoupURI     *target;
+  char        *target_path;
+  char        *dirname;
+  guint        status;
+
+  source = http_backend_uri_for_filename (backend, filename, FALSE);
+  msg = soup_message_new_from_uri (SOUP_METHOD_MOVE, source);
+
+  dirname = g_path_get_dirname (filename);
+  target_path = g_build_filename (dirname, display_name, NULL);
+  target = http_backend_uri_for_filename (backend, target_path, FALSE);
+
+  message_add_destination_header (msg, target);
+  message_add_overwrite_header (msg, FALSE);
+
+  status = g_vfs_backend_dav_send_message (backend, msg);
+
+  /*
+   * The precondition of SOUP_STATUS_PRECONDITION_FAILED (412) in
+   * this case was triggered by the "Overwrite: F" header which
+   * means that the target already exists.
+   * Also if we get a REDIRECTION it means that there was no
+   * "Location" header, since otherwise that would have triggered
+   * our redirection handler. This probably means we are dealing
+   * with an web dav implementation (like mod_dav) that also sends
+   * redirects for the destionaion (i.e. "Destination: /foo" header)
+   * which very likely means that the target also exists (and is a
+   * directory). That or the webdav server is broken.
+   * We could find out by doing another stat and but I think this is
+   * such a corner case that we are totally fine with returning
+   * G_IO_ERROR_EXISTS.
+   * */
+
+  if (SOUP_STATUS_IS_SUCCESSFUL (status))
+    {
+      g_print ("new target_path: %s\n", target_path);
+      g_vfs_job_set_display_name_set_new_path (job, target_path);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else if (status == SOUP_STATUS_PRECONDITION_FAILED ||
+           SOUP_STATUS_IS_REDIRECTION (status))
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      G_IO_ERROR_EXISTS,
+                      _("Target file already exists"));
+  else
+    g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                      http_error_code_from_status (status),
+                      "%s", msg->reason_phrase);
+
+  g_object_unref (msg);
+  g_free (dirname);
+  g_free (target_path);
+  soup_uri_free (target);
+  soup_uri_free (source);
+}
+
+
+static gboolean
+try_unmount (GVfsBackend    *backend,
+             GVfsJobUnmount *job)
+{
+  _exit (0);
+}
 
 /* ************************************************************************* */
 /*  */
-
 static void
 g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
 {
-  GObjectClass     *gobject_class;
-  GVfsBackendClass *backend_class;
+  GObjectClass         *gobject_class;
+  GVfsBackendClass     *backend_class;
   
   gobject_class = G_OBJECT_CLASS (klass); 
   gobject_class->finalize  = g_vfs_backend_dav_finalize;
@@ -1847,4 +2125,6 @@ g_vfs_backend_dav_class_init (GVfsBackendDavClass *klass)
   backend_class->try_close_write   = try_close_write;
   backend_class->make_directory    = do_make_directory;
   backend_class->delete            = do_delete;
+  backend_class->set_display_name  = do_set_display_name;
+  backend_class->try_unmount       = try_unmount;
 }

@@ -94,8 +94,8 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 
 SoupURI *
 http_backend_uri_for_filename (GVfsBackend *backend,
-                                const char  *filename,
-                                gboolean     is_dir)
+                               const char  *filename,
+                               gboolean     is_dir)
 {
   GVfsBackendHttp *op_backend;
   SoupURI         *uri;
@@ -226,6 +226,7 @@ http_backend_send_message (GVfsBackend *backend,
                            SoupMessage *msg)
 {
   GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
+
   return soup_session_send_message (op_backend->session, msg);
 }
 
@@ -236,7 +237,7 @@ http_backend_queue_message (GVfsBackend         *backend,
                             gpointer             user_data)
 {
   GVfsBackendHttp *op_backend = G_VFS_BACKEND_HTTP (backend);
-  
+
   soup_session_queue_message (op_backend->session_async, msg, 
                               callback, user_data);
 }
