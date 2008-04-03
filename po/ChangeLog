@@ -1,3 +1,7 @@
+2008-04-03  Luca Ferretti  <elle.uca@libero.it>
+
+	* POTFILES.in: Added hal-utils.c (no new strings, just moved)
+
 2008-04-01  Priit Laes  <plaes at svn dot gnome dot org>
 
 	* et.po: Translation updated by Ivar Smolin

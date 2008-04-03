@@ -64,6 +64,7 @@ hal/ghaldrive.c
 hal/ghalmount.c
 hal/ghalvolume.c
 hal/ghalvolumemonitor.c
+hal/hal-utils.c
 programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c
