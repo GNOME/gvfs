@@ -42,6 +42,7 @@ typedef struct _GVfsBackendHttpClass   GVfsBackendHttpClass;
 struct _GVfsBackendHttpClass
 {
   GVfsBackendClass parent_class;
+
 };
 
 struct _GVfsBackendHttp
