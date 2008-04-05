@@ -1,3 +1,12 @@
+2008-04-05  Christian Kellner  <gicmo@gnome.org>
+
+	* client/httpuri.c: 
+	Only set a port in the mount spec if it is not the default
+	port for the scheme.
+
+	* daemon/gvfsbackenddav.c:
+	Cleanup mount function a bit.
+
 2008-04-04  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c:

@@ -1346,27 +1346,70 @@ keyring_save_authinfo (AuthInfo *info,
 
 /* ************************************************************************* */
 
-static inline GMountSpec *
-g_mount_spec_dup_known (GMountSpec *spec)
+static SoupURI *
+g_mount_spec_to_dav_uri (GMountSpec *spec)
 {
-  static const char *known_keys[] = {"host", "user", "port", "ssl", NULL};
-  GMountSpec *new_spec;
-  const char **iter;
-  const char *value;
-  const char *type;
+  SoupURI        *uri;
+  const char     *host;
+  const char     *user;
+  const char     *port;
+  const char     *ssl;
+  gint            port_num;
 
-  type = g_mount_spec_get_type (spec);
-  new_spec = g_mount_spec_new (type);
+  host = g_mount_spec_get (spec, "host");
+  user = g_mount_spec_get (spec, "user");
+  port = g_mount_spec_get (spec, "port");
+  ssl  = g_mount_spec_get (spec, "ssl");
 
-  for (iter = known_keys; *iter; iter++)
+  if (host == NULL || *host == 0)
+    return NULL;
+
+  uri = soup_uri_new (NULL);
+
+  if (ssl != NULL && (strcmp (ssl, "true") == 0))
+    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTPS);
+  else
+    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTP);
+
+  soup_uri_set_user (uri, user);
+
+  if (port && (port_num = atoi (port)))
+    soup_uri_set_port (uri, port_num);
+
+  soup_uri_set_host (uri, host);
+  soup_uri_set_path (uri, spec->mount_prefix);
+
+  return uri;
+}
+
+static GMountSpec *
+g_mount_spec_from_dav_uri (SoupURI *uri)
+{
+  GMountSpec *spec;
+  const char *ssl;
+
+  spec = g_mount_spec_new ("dav");
+
+  g_mount_spec_set (spec, "host", uri->host);
+
+  if (uri->scheme == SOUP_URI_SCHEME_HTTPS)
+    ssl = "true";
+  else
+    ssl = "false";
+
+  g_mount_spec_set (spec, "ssl", ssl);
+
+  if (uri->user)
+    g_mount_spec_set (spec, "user", uri->user);
+
+  if (! soup_uri_uses_default_port (uri))
     {
-      value = g_mount_spec_get (spec, *iter);
-
-      if (value)
-        g_mount_spec_set (new_spec, *iter, value);
+      char *port = g_strdup_printf ("%u", uri->port);
+      g_mount_spec_set (spec, "port", port);
+      g_free (port);
     }
 
-  return new_spec;
+  return spec;
 }
 
 /* ************************************************************************* */
@@ -1383,11 +1426,6 @@ do_mount (GVfsBackend  *backend,
   SoupMessage    *msg_opts;
   SoupMessage    *msg_stat;
   SoupURI        *mount_base;
-  const char     *host;
-  const char     *user;
-  const char     *port;
-  const char     *ssl;
-  guint           port_num;
   gulong          signal_id;
   guint           status;
   gboolean        is_success;
@@ -1398,41 +1436,22 @@ do_mount (GVfsBackend  *backend,
 
   g_print ("+ mount\n");
 
-  host = g_mount_spec_get (mount_spec, "host");
-  user = g_mount_spec_get (mount_spec, "user");
-  port = g_mount_spec_get (mount_spec, "port");
-  ssl  = g_mount_spec_get (mount_spec, "ssl");
-  
-  if (host == NULL || *host == 0)
+  mount_base = g_mount_spec_to_dav_uri (mount_spec);
+
+  if (mount_base == NULL)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_INVALID_ARGUMENT,
                         _("Invalid mount spec"));
-      
       return;
     }
-
-  mount_base = soup_uri_new (NULL);
-
-  if (ssl != NULL && (strcmp (ssl, "true") == 0))
-    soup_uri_set_scheme (mount_base, SOUP_URI_SCHEME_HTTPS);
-  else
-    soup_uri_set_scheme (mount_base, SOUP_URI_SCHEME_HTTP);
-
-  soup_uri_set_user (mount_base, user);
-
-  if (port && (port_num = atoi (port)))
-    soup_uri_set_port (mount_base, port_num);
-
-  soup_uri_set_host (mount_base, host);
-  soup_uri_set_path (mount_base, mount_spec->mount_prefix);
 
   session = G_VFS_BACKEND_HTTP (backend)->session;
   G_VFS_BACKEND_HTTP (backend)->mount_base = mount_base; 
 
   data = &(G_VFS_BACKEND_DAV (backend)->auth_info); 
   data->mount_source = g_object_ref (mount_source);
-  data->server_auth.username = g_strdup (user);
+  data->server_auth.username = g_strdup (mount_base->user);
   data->server_auth.pw_save = G_PASSWORD_SAVE_NEVER;
   data->proxy_auth.pw_save = G_PASSWORD_SAVE_NEVER;
 
@@ -1499,6 +1518,8 @@ do_mount (GVfsBackend  *backend,
         g_vfs_job_failed (G_VFS_JOB (job),
                           G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Not a WebDAV enabled share"));
+
+      /* TODO: We leak a bunch of stuff here :-( */
       /* TODO: STRING CHANGE: change to: Could not find an enclosing directory */
       return;
     }
@@ -1514,13 +1535,12 @@ do_mount (GVfsBackend  *backend,
   mount_base->path = last_good_path;
 
   /* dup the mountspec, but only copy known fields */
-  mount_spec = g_mount_spec_dup_known (mount_spec);
-  g_mount_spec_set_mount_prefix (mount_spec, mount_base->path);
+  mount_spec = g_mount_spec_from_dav_uri (mount_base);
 
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
   
-  display_name = g_strdup_printf (_("WebDAV on %s"), host);
+  display_name = g_strdup_printf (_("WebDAV on %s"), mount_base->host);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   
@@ -2092,7 +2112,6 @@ do_set_display_name (GVfsBackend           *backend,
   soup_uri_free (target);
   soup_uri_free (source);
 }
-
 
 static gboolean
 try_unmount (GVfsBackend    *backend,
