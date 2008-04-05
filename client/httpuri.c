@@ -65,9 +65,18 @@ http_get_handled_schemes (GVfsUriMapper *mapper)
   return schemes;
 }
 
+static inline gboolean
+port_is_defaul_port (int port, gboolean ssl)
+{
+  if (ssl)
+    return port == 443;
+  else
+    return port == 80;
+}
+
 static GVfsUriMountInfo *
 http_from_uri (GVfsUriMapper *mapper,
-	       const char     *uri_str)
+               const char     *uri_str)
 {
   GVfsUriMountInfo *info;
   char *path;
@@ -84,11 +93,11 @@ http_from_uri (GVfsUriMapper *mapper,
       g_vfs_uri_mount_info_set (info, "uri", uri_str);
       
       if (uri)
-	{
-	  path = uri->path;
-	  uri->path = NULL;
-	  g_vfs_decoded_uri_free (uri);
-	}
+        {
+          path = uri->path;
+          uri->path = NULL;
+          g_vfs_decoded_uri_free (uri);
+        }
     }
   else
     {
@@ -109,7 +118,8 @@ http_from_uri (GVfsUriMapper *mapper,
       if (uri->userinfo && *uri->userinfo)
           g_vfs_uri_mount_info_set (info, "user", uri->userinfo);
 
-      if (uri->port != -1)
+      /* only set the port if it isn't the default port */
+      if (uri->port != -1 && ! port_is_defaul_port (uri->port, ssl))
         {
           char *port = g_strdup_printf ("%d", uri->port);
           g_vfs_uri_mount_info_set (info, "port", port);
@@ -148,13 +158,13 @@ http_get_mount_info_for_path (GVfsUriMapper *mapper,
       uri = g_vfs_decode_uri (uri_str);
 
       if (uri == NULL)
-	return NULL;
+        return NULL;
 
       if (strcmp (uri->path, new_path) == 0)
-	{
-	  g_vfs_decoded_uri_free (uri);
-	  return NULL;
-	}
+        {
+          g_vfs_decoded_uri_free (uri);
+          return NULL;
+        }
 
       g_free (uri->path);
       uri->path = g_strdup (new_path);
