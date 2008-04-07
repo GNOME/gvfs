@@ -1,3 +1,13 @@
+2008-04-07  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghalvolume.c (g_hal_volume_new): Unbreak the gphoto2 backend
+	by allowing automounting.
+
+	* programs/gvfs-mount.c (main, unmount_all_with_scheme): Add a
+	new option --unmount-scheme
+
+	* AUTHORS: Add cdda and gphoto2 backends
+
 2008-04-05  Christian Kellner  <gicmo@gnome.org>
 
 	* client/httpuri.c: 

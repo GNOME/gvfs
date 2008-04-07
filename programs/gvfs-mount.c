@@ -43,11 +43,13 @@ static gboolean mount_mountable = FALSE;
 static gboolean mount_unmount = FALSE;
 static gboolean mount_list = FALSE;
 static gboolean mount_list_info = FALSE;
+static const char *unmount_scheme = NULL;
 
-static GOptionEntry entries[] = 
+static const GOptionEntry entries[] = 
 {
   { "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, "Mount as mountable", NULL },
   { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, "Unmount", NULL},
+  { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, "Unmount all mounts with the given scheme", NULL},
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, "List", NULL},
   { "list-info", 'i', 0, G_OPTION_ARG_NONE, &mount_list_info, "List extra information", NULL},
   { NULL }
@@ -502,6 +504,34 @@ list_monitor_items(void)
   g_list_free (mounts);
 }
 
+static void
+unmount_all_with_scheme (const char *scheme)
+{
+  GVolumeMonitor *volume_monitor;
+  GList *mounts;
+  GList *l;
+
+  volume_monitor = g_volume_monitor_get();
+
+  /* populate gvfs network mounts */
+  iterate_gmain();
+
+  mounts = g_volume_monitor_get_mounts (volume_monitor);
+  for (l = mounts; l != NULL; l = l->next) {
+    GMount *mount = G_MOUNT (l->data);
+    GFile *root;
+
+    root = g_mount_get_root (mount);
+    if (g_file_has_uri_scheme (root, scheme)) {
+            unmount (root);
+    }
+    g_object_unref (root);
+  }
+  g_list_foreach (mounts, (GFunc)g_object_unref, NULL);
+  g_list_free (mounts);
+
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -523,6 +553,10 @@ main (int argc, char *argv[])
   
   if (mount_list)
     list_monitor_items ();
+  else if (unmount_scheme != NULL)
+    {
+      unmount_all_with_scheme (unmount_scheme);
+    }
   else if (argc > 1)
     {
       int i;

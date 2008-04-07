@@ -519,10 +519,6 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
 
       if (foreign_mount_root == NULL)
         return NULL;
-
-      /* We don't want to automount cameras as the gphoto backend
-         blocks access from other apps */
-      ignore_automount = TRUE;
     }
 #endif
   else
