@@ -1,3 +1,11 @@
+Major changes in 0.2.3:
+* WebDAV: implement set_display_name
+* WebDAV fixes
+* Proper fallback icons for encrypted volumes
+* Sftp: Fix make_directory calls
+* Ftp: various fixes
+* Minor bug were fixed and leaks plugged
+
 Major changes in 0.2.2:
 * Respect the giomoduledir provided in gio package config file
 * Better mount icon and name for archive backend

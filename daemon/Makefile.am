@@ -73,6 +73,8 @@ mount_in_files += obexftp.mount.in
 if USE_OBEXFTP
 mount_DATA += obexftp.mount
 libexec_PROGRAMS += gvfsd-obexftp
+endif
+
 BUILT_SOURCES = obexftp-marshal.c obexftp-marshal.h
 
 obexftp-marshal.h: obexftp-marshal.list
@@ -81,7 +83,6 @@ obexftp-marshal.h: obexftp-marshal.list
 obexftp-marshal.c: obexftp-marshal.list
 	echo "#include \"obexftp-marshal.h\"" > $@ && glib-genmarshal $< --prefix=obexftp_marshal --body >> $@
 
-endif
 
 mount_in_files += dns-sd.mount.in
 if HAVE_AVAHI
