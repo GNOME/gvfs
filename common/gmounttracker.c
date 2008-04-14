@@ -236,7 +236,8 @@ g_mount_tracker_finalize (GObject *object)
 
   tracker = G_MOUNT_TRACKER (object);
 
-  g_mutex_free (tracker->lock);
+  if (tracker->lock)
+    g_mutex_free (tracker->lock);
   
   g_list_foreach (tracker->mounts,
 		  (GFunc)g_mount_info_unref, NULL);

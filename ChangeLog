@@ -1,3 +1,8 @@
+2008-04-14  Matthias Clasen  <mclasen@redhat.com>
+
+	* common/gmounttracker.c (g_mount_tracker_finalize): Only free
+	lock if it is non-NULL. Pointed out by Denis Leroy.
+
 2008-04-07  David Zeuthen  <davidz@redhat.com>
 
 	* hal/ghalvolume.c (g_hal_volume_new): Unbreak the gphoto2 backend
