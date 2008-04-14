@@ -1,5 +1,10 @@
 2008-04-14  Matthias Clasen  <mclasen@redhat.com>
 
+	* client/gvfsfusedaemon.c: You cannot store pointers in integers.
+	Fixes a crash on 64bit systems.
+
+2008-04-14  Matthias Clasen  <mclasen@redhat.com>
+
 	* common/gmounttracker.c (g_mount_tracker_finalize): Only free
 	lock if it is non-NULL. Pointed out by Denis Leroy.
 
