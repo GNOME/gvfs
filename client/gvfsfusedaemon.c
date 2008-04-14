@@ -55,8 +55,8 @@
 
 #define DEBUG_ENABLED 0
 
-#define GET_FILE_HANDLE(fi)     (GUINT_TO_POINTER ((guint) (fi)->fh))
-#define SET_FILE_HANDLE(fi, fh) ((fi)->fh = (guint64) GPOINTER_TO_UINT (fh))
+#define GET_FILE_HANDLE(fi)     ((gpointer) (fi)->fh)
+#define SET_FILE_HANDLE(fi, fh) ((fi)->fh = (guint64) (fh))
 
 typedef struct {
   time_t creation_time;
