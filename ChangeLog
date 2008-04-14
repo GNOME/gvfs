@@ -1,3 +1,8 @@
+2008-04-14  Matthias Clasen  <mclasen@redhat.com>
+
+	* common/gmounttracker.c (g_mount_tracker_finalize): Only free
+	lock if it is non-NULL. Pointed out by Denis Leroy.
+
 2008-04-08  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac: Post release version bump
