@@ -1,5 +1,10 @@
 2008-04-16  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackenddav.c:
+	Set mount prefix on the mount_spec (again). Fixes #528218
+
+2008-04-16  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackendhttp.c:
 	Add logging for soup so we can get easy network traces even
 	if we are doing https.
