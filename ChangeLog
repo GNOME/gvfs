@@ -1,3 +1,10 @@
+2008-04-15  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 526454 – too early use of dbus session bus
+
+	* client/gdaemonvfs.c (g_io_module_load): Refuse to load if
+	there is no session bus. 
+	
 2008-04-14  Matthias Clasen  <mclasen@redhat.com>
 
 	* client/gvfsfusedaemon.c: You cannot store pointers in integers.

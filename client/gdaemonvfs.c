@@ -950,6 +950,13 @@ void g_vfs_uri_mapper_sftp_register (GIOModule *module);
 void
 g_io_module_load (GIOModule *module)
 {
+  /* This is so that system daemons can use gio
+   * without spawning private dbus instances.
+   * See bug 526454.
+   */
+  if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL) 
+    return;
+
   g_daemon_vfs_register_type (G_TYPE_MODULE (module));
   g_daemon_volume_monitor_register_types (G_TYPE_MODULE (module));
 
