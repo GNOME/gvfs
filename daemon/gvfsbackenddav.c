@@ -1409,6 +1409,8 @@ g_mount_spec_from_dav_uri (SoupURI *uri)
       g_free (port);
     }
 
+  g_mount_spec_set_mount_prefix (spec, uri->path);
+
   return spec;
 }
 
