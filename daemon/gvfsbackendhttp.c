@@ -75,9 +75,13 @@ g_vfs_backend_http_finalize (GObject *object)
     (*G_OBJECT_CLASS (g_vfs_backend_http_parent_class)->finalize) (object);
 }
 
+#define DEBUG_MAX_BODY_SIZE (100 * 1024 * 1024)
+
 static void
 g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
+   const char         *debug;
+
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
   backend->session = soup_session_sync_new_with_options ("user-agent",
@@ -87,6 +91,28 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   backend->session_async = soup_session_async_new_with_options ("user-agent",
                                                                 "gvfs/" VERSION,
                                                                 NULL);
+
+  /* Logging */
+  debug = g_getenv ("GVFS_HTTP_DEBUG");
+  if (debug)
+    {
+      SoupLogger         *logger;
+      SoupLoggerLogLevel  level;
+
+      if (g_ascii_strcasecmp (debug, "all") ||
+          g_ascii_strcasecmp (debug, "body"))
+        level = SOUP_LOGGER_LOG_BODY;
+      else if (g_ascii_strcasecmp (debug, "header"))
+        level = SOUP_LOGGER_LOG_HEADERS;
+      else
+        level = SOUP_LOGGER_LOG_MINIMAL;
+
+      logger = soup_logger_new (level, DEBUG_MAX_BODY_SIZE);
+      soup_logger_attach (logger, backend->session);
+      soup_logger_attach (logger, backend->session_async);
+      g_object_unref (logger);
+    }
+
 }
 
 /* ************************************************************************* */
