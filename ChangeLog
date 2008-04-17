@@ -1,3 +1,11 @@
+2008-04-16  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 526793 – unmount hangs with some backends
+
+	* daemon/gvfsbackendgphoto2.c: Set exit-on-disconnect to FALSE
+	on the private dbus connection to prevent unexpected exit before
+	the job is done.
+
 2008-04-16  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackenddav.c:
