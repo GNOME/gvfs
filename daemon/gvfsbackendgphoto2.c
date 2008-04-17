@@ -1394,6 +1394,8 @@ do_mount (GVfsBackend *backend,
       return;
     }
   
+  dbus_connection_set_exit_on_disconnect (gphoto2_backend->dbus_connection, FALSE);
+
   gphoto2_backend->hal_ctx = libhal_ctx_new ();
   if (gphoto2_backend->hal_ctx == NULL)
     {
