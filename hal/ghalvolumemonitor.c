@@ -845,6 +845,32 @@ get_mount_point_for_device (HalDevice *d, GList *fstab_mount_points)
 }
 
 static gboolean
+should_mount_be_ignored (HalPool *pool, HalDevice *d)
+{
+  const char *device_mount_point;
+
+  device_mount_point = hal_device_get_property_string (d, "volume.mount_point");
+  if (device_mount_point != NULL && strlen (device_mount_point) > 0)
+    {
+      GUnixMountEntry *mount_entry;
+
+      /*g_warning ("device_mount_point = '%s'", device_mount_point);*/
+
+      mount_entry = g_unix_mount_at (device_mount_point, NULL);
+      if (mount_entry != NULL) {
+        if (!g_unix_mount_guess_should_display (mount_entry))
+          {
+            g_unix_mount_free (mount_entry);
+            return TRUE;
+          }
+        g_unix_mount_free (mount_entry);
+      }
+    }
+
+  return FALSE;
+}
+
+static gboolean
 should_volume_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points)
 {
   gboolean volume_ignore;
@@ -892,6 +918,9 @@ should_volume_be_ignored (HalPool *pool, HalDevice *d, GList *fstab_mount_points
   mount_point = get_mount_point_for_device (d, fstab_mount_points);
   if (mount_point != NULL && !_g_unix_mount_point_guess_should_display (mount_point))
     return TRUE;
+
+  if (hal_device_get_property_bool (d, "volume.is_mounted"))
+    return should_mount_be_ignored (pool, d);
 
   return FALSE;
 }
@@ -1207,13 +1236,29 @@ update_mounts (GHalVolumeMonitor *monitor,
 {
   GList *new_mounts;
   GList *removed, *added;
-  GList *l;
+  GList *l, *ll;
   GHalMount *mount;
   GHalVolume *volume;
   const char *device_path;
   const char *mount_path;
   
   new_mounts = g_unix_mounts_get (NULL);
+
+  /* remove mounts we want to ignore - we do it here so we get to reevaluate
+   * on the next update whether they should still be ignored
+   */
+  for (l = new_mounts; l != NULL; l = ll)
+    {
+      GUnixMountEntry *mount_entry = l->data;
+      ll = l->next;
+
+      /* keep in sync with should_mount_be_ignored() */
+      if (!g_unix_mount_guess_should_display (mount_entry))
+        {
+          g_unix_mount_free (mount_entry);
+          new_mounts = g_list_delete_link (new_mounts, l);
+        }
+    }
   
   new_mounts = g_list_sort (new_mounts, (GCompareFunc) g_unix_mount_compare);
   
