@@ -322,6 +322,13 @@ create_root_file (GVfsBackendArchive *ba)
   g_file_info_set_content_type (info, "inode/directory");
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
 
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
+
   icon = g_themed_icon_new ("folder");
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
@@ -340,19 +347,19 @@ archive_file_set_info_from_entry (ArchiveFile *	        file,
   g_file_info_set_attribute_uint64 (info,
 				    G_FILE_ATTRIBUTE_TIME_ACCESS,
 				    archive_entry_atime (entry));
-  g_file_info_set_attribute_uint64 (info,
+  g_file_info_set_attribute_uint32 (info,
 				    G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
 				    archive_entry_atime_nsec (entry) / 1000);
   g_file_info_set_attribute_uint64 (info,
 				    G_FILE_ATTRIBUTE_TIME_CHANGED,
 				    archive_entry_ctime (entry));
-  g_file_info_set_attribute_uint64 (info,
+  g_file_info_set_attribute_uint32 (info,
 				    G_FILE_ATTRIBUTE_TIME_CHANGED_USEC,
 				    archive_entry_ctime_nsec (entry) / 1000);
   g_file_info_set_attribute_uint64 (info,
 				    G_FILE_ATTRIBUTE_TIME_MODIFIED,
 				    archive_entry_mtime (entry));
-  g_file_info_set_attribute_uint64 (info,
+  g_file_info_set_attribute_uint32 (info,
 				    G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
 				    archive_entry_mtime_nsec (entry) / 1000);
 
@@ -386,6 +393,13 @@ archive_file_set_info_from_entry (ArchiveFile *	        file,
 
   g_file_info_set_size (info,
 			archive_entry_size (entry));
+
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, type == G_FILE_TYPE_DIRECTORY);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE);
 
   /* FIXME: add info for these
 dev_t			 archive_entry_dev(struct archive_entry *);
@@ -508,11 +522,11 @@ do_mount (GVfsBackend *backend,
           return;
         }
       
-      archive->file = g_file_new_for_uri (filename);
+      archive->file = g_file_new_for_commandline_arg (filename);
       g_free (filename);
     }
   else
-    archive->file = g_file_new_for_uri (file);
+    archive->file = g_file_new_for_commandline_arg (file);
   
   DEBUG ("Trying to mount %s\n", g_file_get_uri (archive->file));
 
@@ -714,6 +728,19 @@ do_enumerate (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
+static gboolean
+try_query_fs_info (GVfsBackend *backend,
+                   GVfsJobQueryFsInfo *job,
+                   const char *filename,
+                   GFileInfo *info,
+                   GFileAttributeMatcher *attribute_matcher)
+{
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW, G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  return TRUE;
+}
+
 static void
 g_vfs_backend_archive_class_init (GVfsBackendArchiveClass *klass)
 {
@@ -729,4 +756,5 @@ g_vfs_backend_archive_class_init (GVfsBackendArchiveClass *klass)
   backend_class->read = do_read;
   backend_class->enumerate = do_enumerate;
   backend_class->query_info = do_query_info;
+  backend_class->try_query_fs_info = try_query_fs_info;
 }
