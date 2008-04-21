@@ -1,3 +1,9 @@
+2008-04-21  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* daemon/gvfsbackendftp.c: (do_enumerate_directory): 
+	remove trailing '\r', that workarounds a parser issue causing 
+	some filenames to not be listed (#524880)
+
 2008-04-21  Matthias Clasen  <mclasen@redhat.com>
 
 	* client/gdaemonvfs.c:
