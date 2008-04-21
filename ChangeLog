@@ -1,3 +1,8 @@
+2008-04-21  David Zeuthen  <davidz@redhat.com>
+
+	* client/gvfsfusedaemon.c: Fix some reference issues, see
+	http://mail.gnome.org/archives/gvfs-list/2008-April/msg00017.html
+
 2008-04-20  David Zeuthen  <davidz@redhat.com>
 
 	* daemon/gvfsbackendarchive.c: some minor fixes (#528950)

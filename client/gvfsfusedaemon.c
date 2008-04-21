@@ -71,6 +71,8 @@ typedef enum {
 } FileOp;
 
 typedef struct {
+  gint      refcount;
+
   GMutex   *mutex;
   FileOp    op;
   gpointer  stream;
@@ -188,10 +190,24 @@ file_handle_new (void)
   FileHandle *file_handle;
 
   file_handle = g_new0 (FileHandle, 1);
+  file_handle->refcount = 1;
   file_handle->mutex = g_mutex_new ();
   file_handle->op = FILE_OP_NONE;
 
   return file_handle;
+}
+
+static FileHandle *
+file_handle_ref (FileHandle *file_handle)
+{
+  g_atomic_int_inc (&file_handle->refcount);
+  return file_handle;
+}
+
+static gboolean
+file_handle_unref (FileHandle *file_handle)
+{
+  return g_atomic_int_dec_and_test (&file_handle->refcount);
 }
 
 static void
@@ -278,21 +294,19 @@ reindex_file_handle_for_path (const gchar *old_path, const gchar *new_path)
   g_static_mutex_unlock (&global_mutex);
 }
 
-static gboolean
+static void
 free_file_handle_for_path (const gchar *path)
 {
   FileHandle *fh;
 
-  fh = get_file_handle_for_path (path);
+  g_static_mutex_lock (&global_mutex);
+  fh = g_hash_table_lookup (global_fh_table, path);
   if (fh)
     {
-      g_static_mutex_lock (&global_mutex);
-      g_hash_table_remove (global_fh_table, path);
-      g_static_mutex_unlock (&global_mutex);
-      return TRUE;
+      if (file_handle_unref (fh))
+        g_hash_table_remove (global_fh_table, path);
     }
-
-  return FALSE;
+  g_static_mutex_unlock (&global_mutex);
 }
 
 static MountRecord *
@@ -923,6 +937,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
               
               /* File exists */
 
+              file_handle_ref (fh);
               SET_FILE_HANDLE (fi, fh);
 
               debug_print ("vfs_open: flags=%o\n", fi->flags);
@@ -1013,6 +1028,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 
               /* Success */
 
+              file_handle_ref (fh);
               SET_FILE_HANDLE (fi, fh);
 
               g_assert (fh->stream == NULL);
@@ -1047,7 +1063,10 @@ vfs_release (const gchar *path, struct fuse_file_info *fi)
   debug_print ("vfs_release: %s\n", path);
 
   if (fh)
-    free_file_handle_for_path (path);
+    {
+      if (!file_handle_unref (fh))
+        free_file_handle_for_path (path);
+    }
 
   return 0;
 }
