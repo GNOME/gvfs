@@ -308,6 +308,8 @@ hal_pool_new (char **cap_only)
       goto out;
     }
   
+  dbus_connection_set_exit_on_disconnect (dbus_connection, FALSE);
+
   hal_ctx = libhal_ctx_new ();
   if (hal_ctx == NULL)
     {

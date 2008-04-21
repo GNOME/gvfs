@@ -298,6 +298,8 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   
   vfs->wrapped_vfs = g_vfs_get_local ();
 
+  dbus_connection_set_exit_on_disconnect (vfs->async_bus, FALSE);
+
   _g_dbus_connection_integrate_with_main (vfs->async_bus);
 
   modules = g_io_modules_load_all_in_directory (GVFS_MODULE_DIR);
