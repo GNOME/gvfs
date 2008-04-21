@@ -1,3 +1,9 @@
+2008-04-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* client/gdaemonvfs.c:
+	* hal/hal-pool.c: Set exit-on-disconnect to FALSE on private
+	dbus connections to prevent unexpected exits.  (#528785)
+
 2008-04-21  David Zeuthen  <davidz@redhat.com>
 
 	* client/gvfsfusedaemon.c: Fix some reference issues, see
