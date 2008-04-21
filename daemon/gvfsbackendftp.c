@@ -1782,6 +1782,8 @@ do_enumerate_directory (FtpConnection *conn)
 	    if (got_boundary)
 	      {
 		name[bytes_read - 1] = 0;
+		if (bytes_read >= 2 && name[bytes_read - 2] == '\r') 
+				name[bytes_read - 2] = 0;
 		DEBUG ("--- %s\n", name);
 		list = g_list_prepend (list, g_strdup (name));
 		bytes_read = 0;
