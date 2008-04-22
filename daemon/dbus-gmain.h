@@ -20,7 +20,6 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-/* -*- mode: C; c-file-style: "gnu" -*- */
 /* dbus-glib-lowlevel.h GLib integration details that require dbus/dbus.h
  *
  * Copyright (C) 2002, 2003  CodeFactory AB

@@ -1,5 +1,3 @@
-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-
 /* hal-device.c
  *
  * Copyright (C) 2007 David Zeuthen

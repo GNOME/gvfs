@@ -20,7 +20,6 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-/* -*- mode: C; c-file-style: "gnu" -*- */
 /* dbus-gmain.c GLib main loop integration
  *
  * Copyright (C) 2002, 2003 CodeFactory AB

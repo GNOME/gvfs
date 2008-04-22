@@ -1,3 +1,9 @@
+2008-04-22  Benjamin Otte  <otte@gnome.org>
+
+	* */*.[ch]: get rid of modelines
+	The modelines were inconsistent and caused issues when used in 
+	different editors.
+
 2008-04-21  Sebastien Bacher  <seb128@ubuntu.com>
 
 	* daemon/gvfsbackendftp.c: (do_enumerate_directory): 

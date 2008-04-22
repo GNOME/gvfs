@@ -1,5 +1,3 @@
-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-
 /* GVFS cdrom audio file system driver
  * 
  * Copyright (C) 2007 Red Hat, Inc.

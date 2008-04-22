@@ -1,4 +1,3 @@
-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 
 /* GVFS gphoto2 file system driver
  * 
