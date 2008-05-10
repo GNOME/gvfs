@@ -243,7 +243,7 @@ hal_device_new_from_udi_and_properties (LibHalContext *hal_ctx,
   HalDevice *device;
   
   device = HAL_DEVICE (g_object_new (HAL_TYPE_DEVICE, NULL));
-  device->priv->udi = udi;
+  device->priv->udi = g_strdup (udi);
   device->priv->hal_ctx = hal_ctx;
   device->priv->properties = properties;
   return device;

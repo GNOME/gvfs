@@ -359,9 +359,8 @@ hal_pool_new (char **cap_only)
     {
       for (i = 0; i < num_devices; i++)
         hal_pool_add_device_by_udi_and_properties (pool, devices[i], properties[i], FALSE);
-      /* _add_device_by_udi_and_properties steals the given parameters */
-      free (devices);
-      free (properties);
+      libhal_free_string_array (devices);
+      free (properties); /* hal_pool_add_device_by_udi_and_properties steals the given properties */
       goto out;
     }
 #endif

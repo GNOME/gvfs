@@ -1,3 +1,12 @@
+2008-05-09  Federico Mena Quintero  <federico@novell.com>
+
+	http://bugzilla.gnome.org/show_bug.cgi?id=532375 - Fix strdup() /
+	g_free() confusion.
+
+	* hal/hal-device.c (hal_device_new_from_udi_and_properties):
+	g_strdup() the UDI.  We can't just steal it, since it comes from
+	libhal, which uses strdup() (and we do g_free() in our finalizer).
+
 2008-04-22  Benjamin Otte  <otte@gnome.org>
 
 	* */*.[ch]: get rid of modelines
@@ -176,6 +185,10 @@
 	Post release version bump
 
 === gvfs 0.2.2 ===
+=======
+	* hal/hal-pool.c (hal_pool_new): Free the actual device strings here.
+>>>>>>> bgo532375 - fix strdup and g_free() confusion
+2008-05-09  Federico Mena Quintero  <federico@novell.com>:ChangeLog
 
 2008-03-28  Alexander Larsson  <alexl@redhat.com>
 
