@@ -1,3 +1,8 @@
+2008-05-11  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c: Fix erroneous copyright header and
+	provide a better description of the source file.
+
 2008-05-09  Federico Mena Quintero  <federico@novell.com>
 
 	http://bugzilla.gnome.org/show_bug.cgi?id=532375 - Fix strdup() /

@@ -1,6 +1,6 @@
-/* GIO - GLib Input, Output and Streaming Library
+/* gvfsfusedaemon.c - FUSE file system mapping daemon for GVFS
  * 
- * Copyright (C) 2006-2007 Red Hat, Inc.
+ * Copyright (C) 2007-2008 Hans Petter Jansson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,9 +17,8 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * Author: Alexander Larsson <alexl@redhat.com>
+ * Author: Hans Petter Jansson <hpj@novell.com>
  */
-
 
 #include <config.h>
 
