@@ -206,6 +206,7 @@ fl_parser_fill_file_info (GFileInfo *info, const char **attr)
 		value = attr[++i];
 		
 		if (strcmp (name, "name") == 0) {
+			char *display_name;
 			/* Apparently someone decided it was a good idea
 			 * to send name="" mem-type="MMC" 
 			 */
@@ -214,7 +215,10 @@ fl_parser_fill_file_info (GFileInfo *info, const char **attr)
 			}
 
 			g_file_info_set_name (info, value);
-			d(g_print ("Name: '%s'\n", value));
+			display_name = g_filename_display_name (value);
+			g_file_info_set_display_name (info, display_name);
+			d(g_print ("Name: '%s'\n", display_name));
+			g_free (display_name);
 		}
 		else if (strcmp (name, "size") == 0) {
 			g_file_info_set_size (info, strtoll (value, NULL, 10));

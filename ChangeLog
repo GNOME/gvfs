@@ -1,3 +1,9 @@
+2008-05-20  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_fill_file_info):
+	Fill in the display name, even if layers above should be able to do
+	without (Closes: #523699)
+
 2008-05-11  Hans Petter Jansson  <hpj@novell.com>
 
 	* client/gvfsfusedaemon.c: Fix erroneous copyright header and
