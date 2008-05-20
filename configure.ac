@@ -472,6 +472,25 @@ AM_CONDITIONAL(HAVE_ARCHIVE, test "$msg_archive" = "yes")
 AC_SUBST(ARCHIVE_CFLAGS)
 AC_SUBST(ARCHIVE_LIBS)
 
+dnl Install bash-completion file?
+AC_ARG_ENABLE([bash-completion],
+	      AC_HELP_STRING([--disable-bash-completion],
+			     [build without bash-completion support]),
+	      msg_bash_completion=$enableval,
+	      msg_bash_completion=yes)
+if test "x$enable_bash_completion" != "xno"; then
+  msg_bash_completion=yes
+fi
+AM_CONDITIONAL(ENABLE_BASHCOMP, test "$msg_bash_completion" = "yes")
+
+AC_ARG_WITH([bash-completion-dir],
+	    AC_HELP_STRING([--with-bash-completion-dir=PATH],
+	    		   [choose directory for bash-completion file (default=SYSCONFDIR/profile.d)]),
+	    with_bashcomp_dir=$withval,
+	    with_bashcomp_dir=$sysconfdir/profile.d)
+BASHCOMP_DIR=$with_bashcomp_dir
+AC_SUBST(BASHCOMP_DIR)
+
 dnl ==========================================================================
 	
 dnl Globally define_GNU_SOURCE and therefore enable the GNU extensions
@@ -555,4 +574,5 @@ echo "
         DNS-SD support:               $msg_avahi
 	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)
 	GNOME Keyring support:        $msg_keyring
+	Bash-completion support:      $msg_bash_completion
 "

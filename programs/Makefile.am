@@ -32,8 +32,10 @@ bin_SCRIPTS =					\
 	gvfs-less				\
 	$(NULL)
 
-profiledir = $(sysconfdir)/profile.d
+if ENABLE_BASHCOMP
+profiledir = $(BASHCOMP_DIR)
 profile_SCRIPTS = gvfs-bash-completion.sh
+endif
 
 gvfs_cat_SOURCES = gvfs-cat.c
 gvfs_cat_LDADD = $(libraries)
@@ -80,4 +82,4 @@ gvfs_monitor_file_LDADD = $(libraries)
 gvfs_mkdir_SOURCES = gvfs-mkdir.c
 gvfs_mkdir_LDADD = $(libraries)
 
-EXTRA_DIST=gvfs-less gvfs-bash-completion.sh
+EXTRA_DIST = gvfs-less gvfs-bash-completion.sh

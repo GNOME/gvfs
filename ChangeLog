@@ -1,3 +1,11 @@
+2008-05-20  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	* programs/Makefile.am:
+	Allow to disable the installation of the bash completion
+	scripts. Also make it possible to choose the directory
+	where the file gets installed. Fixes #530772
+
 2008-05-20  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_fill_file_info):
