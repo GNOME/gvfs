@@ -2049,6 +2049,18 @@ dbus_filter_func (DBusConnection *connection,
 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
+static gboolean
+shutdown_on_idle (void)
+{
+  fuse_exit (fuse_get_context ()->fuse);
+  return FALSE;
+}
+
+static void
+shutdown_signal (gint signum)
+{
+  g_idle_add ((GSourceFunc) shutdown_on_idle, NULL);
+}
 
 static gpointer
 vfs_init (struct fuse_conn_info *conn)
@@ -2102,6 +2114,11 @@ vfs_init (struct fuse_conn_info *conn)
   volume_monitor = g_object_new (g_type_from_name ("GDaemonVolumeMonitor"), NULL);
   
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
+
+  signal (SIGHUP, shutdown_signal);
+  signal (SIGTERM, shutdown_signal);
+  signal (SIGINT, shutdown_signal);
+
   subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);
 
   return NULL;

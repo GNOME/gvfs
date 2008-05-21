@@ -1,3 +1,10 @@
+2008-05-22  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (shutown_on_idle)
+	(shutdown_signal)
+	(vfs_init): When the process receives one of the HUP, TERM or
+	INT signals, shut down gracefully. Fixes GNOME bug #531516.
+
 2008-05-21  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendsmb.c: (do_mount):
