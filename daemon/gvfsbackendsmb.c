@@ -457,6 +457,8 @@ do_mount (GVfsBackend *backend,
   char *uri;
   int res;
   char *display_name;
+  const char *debug;
+  int debug_val;
   GMountSpec *smb_mount_spec;
   smbc_stat_fn smbc_stat;
 
@@ -470,7 +472,13 @@ do_mount (GVfsBackend *backend,
     }
   smbc_setOptionUserData (smb_context, backend);
 
-  smbc_setDebug (smb_context, 0);
+  debug = g_getenv ("GVFS_SMB_DEBUG");
+  if (debug)
+    debug_val = atoi (debug);
+  else
+    debug_val = 0;
+
+  smbc_setDebug (smb_context, debug_val);
   smbc_setFunctionAuthDataWithContext (smb_context, auth_callback);
   
   smbc_setFunctionAddCachedServer (smb_context, add_cached_server);

@@ -1,6 +1,11 @@
 2008-05-21  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackendsmb.c (do_mount):
+	Add GVFS_SMB_DEBUG env variable to control smb debugging.
+
+2008-05-21  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendsmb.c (do_mount):
 	Set the information on the mount spec *after* having asked
 	the user for credentials since username and domain can be
 	changed by the user.
