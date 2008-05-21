@@ -561,9 +561,9 @@ do_mount (GVfsBackend *backend,
   smb_mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
   g_mount_spec_set (smb_mount_spec, "server", op_backend->server);
-  if (op_backend->user)
+  if (op_backend->last_user)
     g_mount_spec_set (smb_mount_spec, "user", op_backend->last_user);
-  if (op_backend->domain)
+  if (op_backend->last_domain)
     g_mount_spec_set (smb_mount_spec, "domain", op_backend->last_domain);
 
   g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
