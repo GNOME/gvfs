@@ -1,3 +1,9 @@
+2008-05-21  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	Check for gphoto2 versions greaten then 2.4.0. Patch from 
+	Tom Parker <palfrey@tevp.net>. Fixes #531702
+
 2008-05-20  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac:
