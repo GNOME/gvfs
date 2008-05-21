@@ -1,5 +1,12 @@
 2008-05-21  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackendsmb.c (do_mount):
+	Set the information on the mount spec *after* having asked
+	the user for credentials since username and domain can be
+	changed by the user.
+
+2008-05-21  Christian Kellner  <gicmo@gnome.org>
+
 	* configure.ac:
 	Check for gphoto2 versions greaten then 2.4.0. Patch from 
 	Tom Parker <palfrey@tevp.net>. Fixes #531702
