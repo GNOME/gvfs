@@ -1,4 +1,4 @@
-# translation of gvfs.HEAD.ar.po to Arabic
+# translation of gvfs.HEAD.po to Arabic
 # Automatically generated, 2008.
 # Khaled Hosny <khaledhosny@eglug.org>, 2008.
 # Arabic translations for gnome package.
@@ -7,19 +7,18 @@
 # Djihed Afifi <djihed@gmail.com> 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs.HEAD.ar\n"
+"Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-04-21 19:01+0000\n"
-"PO-Revision-Date: 2008-03-08 17:57-0000\n"
-"Last-Translator: Djihed Afifi <djihed@gmail.com>\n"
+"PO-Revision-Date: 2008-05-22 19:21+0300\n"
+"Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Arabic\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1977
 msgid "Operation not supported, files on different mounts"
@@ -135,7 +134,7 @@ msgstr "خطأ أثناء جلب معلومات الوصْل: %s"
 #: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
 #, c-format
 msgid "Error connecting to daemon: %s"
-msgstr "خطأ أثناء الاتصال بالخادم: %s"
+msgstr "خطأ أثناء الاتصال بالخادوم: %s"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -165,7 +164,7 @@ msgstr "خطأ أثناء الاتصال بـ D-Bus: %s"
 #: ../daemon/daemon-main.c:78
 #, c-format
 msgid "%s Filesystem Service"
-msgstr "خادم نظام الملفات لـ %s"
+msgstr "خدمة نظام ملفات %s"
 
 #: ../daemon/daemon-main.c:97
 #, c-format
@@ -185,7 +184,7 @@ msgstr "الاستخدام: ‪%s key=value key=value ...‬"
 #: ../daemon/daemon-main.c:171
 #, c-format
 msgid "No mount type specified"
-msgstr "لم يُحدّد وصْل"
+msgstr "لم يُحدّد نوع الوصْل"
 
 #: ../daemon/daemon-main.c:241
 #, c-format
@@ -194,7 +193,7 @@ msgstr "نقطة الوصل %s تعمل مسبقا"
 
 #: ../daemon/daemon-main.c:252
 msgid "error starting mount daemon"
-msgstr "خطأ أثناء بدأ خادم الوصْل"
+msgstr "خطأ أثناء بدأ جني الوصْل"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -261,7 +260,7 @@ msgstr "لا يمكن نسخ ملف على مجلد"
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:652
 msgid "CD/DVD Creator"
-msgstr "منشئ الأقراص المدمجة/أقراص الـDVD"
+msgstr "منشئ الاسطوانات/ديفيدي"
 
 #: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
 #: ../daemon/gvfsbackendburn.c:918
@@ -353,7 +352,7 @@ msgstr "الملف غير موجود أو ليس مقطعا صوتيا"
 
 #: ../daemon/gvfsbackendcdda.c:938
 msgid "Audio CD Filesystem Service"
-msgstr "خادم نظام الملفات لأقراص الصوت"
+msgstr "خدمة نظام ملفات أقراص الصوت"
 
 #: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
 msgid "Computer"
@@ -383,7 +382,7 @@ msgstr "تعذّر وصْل الملف"
 
 #: ../daemon/gvfsbackendcomputer.c:825
 msgid "No media in the drive"
-msgstr "ليس ثمّة وسائط في القرص"
+msgstr "لا وسائط في القرص"
 
 #: ../daemon/gvfsbackendcomputer.c:882 ../daemon/gvfsbackendcomputer.c:973
 #: ../daemon/gvfsbackendcomputer.c:1073
@@ -414,7 +413,7 @@ msgstr "استجابة خالية"
 
 #: ../daemon/gvfsbackenddav.c:537
 msgid "Unexpected reply from server"
-msgstr "ردّ غير متوقّع من الخادم"
+msgstr "ردّ غير متوقّع من الخادوم"
 
 #: ../daemon/gvfsbackenddav.c:1147 ../daemon/gvfsbackenddav.c:1649
 #, c-format
@@ -463,7 +462,7 @@ msgstr "عُدّل الملف خارجيّا"
 #: ../daemon/gvfsbackenddav.c:1845 ../daemon/gvfsbackendsmb.c:1048
 #: ../daemon/gvfsbackendsmb.c:1795
 msgid "Backup file creation failed"
-msgstr "فشل إنشاء الملف الاحتياطية"
+msgstr "فشل إنشاء الملف الاحتياطي"
 
 #. TODO: Name
 #: ../daemon/gvfsbackenddnssd.c:433
@@ -482,7 +481,7 @@ msgstr "Dns-SD"
 #: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
 #: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
 msgid "Network"
-msgstr "شبكة"
+msgstr "الشبكة"
 
 #: ../daemon/gvfsbackendftp.c:235
 msgid "Accounts are unsupported"
@@ -490,7 +489,7 @@ msgstr "الحسابات غير مدعومة"
 
 #: ../daemon/gvfsbackendftp.c:239
 msgid "Host closed connection"
-msgstr "قام الخادم بقطع الإتصال"
+msgstr "قطع الخادوم الاتصال"
 
 #: ../daemon/gvfsbackendftp.c:243
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
@@ -498,7 +497,7 @@ msgstr "لا يمكن فتح اتصال. هل هناك حائط ناري؟"
 
 #: ../daemon/gvfsbackendftp.c:247
 msgid "Data connection closed"
-msgstr "تم غلق اتصال البيانات"
+msgstr "أُغلق اتصال البيانات"
 
 #: ../daemon/gvfsbackendftp.c:254
 msgid "File unavailable"
@@ -510,7 +509,7 @@ msgstr "فشلت العمليّة"
 
 #: ../daemon/gvfsbackendftp.c:263
 msgid "No space left on server"
-msgstr "لا توجد مساحة كافية على الخادم"
+msgstr "لا توجد مساحة كافية على الخادوم"
 
 #: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendsftp.c:3845
 msgid "Operation unsupported"
@@ -539,12 +538,12 @@ msgstr "رد غير صالح"
 #: ../daemon/gvfsbackendftp.c:529
 #, c-format
 msgid "broken transmission"
-msgstr "تكسّر الإرسال"
+msgstr "إرسال معطّل"
 
 #: ../daemon/gvfsbackendftp.c:623 ../daemon/gvfsbackendftp.c:783
 #, c-format
 msgid "Could not connect to host"
-msgstr "لم يمكن الاتصال بالخادم"
+msgstr "تعذّر الاتصال بالمستضيف"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsbackendftp.c:1283
@@ -565,16 +564,16 @@ msgstr "آف تي بي (ftp) على %s"
 #: ../daemon/gvfsbackendftp.c:1391
 #, c-format
 msgid "ftp as %s on %s"
-msgstr "آف تي بي (ftp) ك %s على %s"
+msgstr "آف تي بي (ftp) باسم %s على %s"
 
 #: ../daemon/gvfsbackendftp.c:1679 ../daemon/gvfsbackendftp.c:2252
 msgid "backups not supported yet"
-msgstr "النسخ الإحتياطية غير مدعومة"
+msgstr "النسخ الاحتياطية غير مدعومة"
 
 #: ../daemon/gvfsbackendftp.c:1756
 #, c-format
 msgid "filename too long"
-msgstr "اسم الملف طويل جداً"
+msgstr "اسم الملف طويل جدًا"
 
 #: ../daemon/gvfsbackendftp.c:2271
 #, c-format
@@ -592,14 +591,14 @@ msgstr "آلة تصوير رقميّة (%s)"
 #: ../daemon/gvfsbackendgphoto2.c:843 ../hal/ghalvolume.c:360
 #, c-format
 msgid "%s Camera"
-msgstr "%s آلة تصوير"
+msgstr "آلة تصوير %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
 #: ../daemon/gvfsbackendgphoto2.c:846 ../hal/ghalvolume.c:355
 #, c-format
 msgid "%s Audio Player"
-msgstr "‏%s مشغل الصوت"
+msgstr "مشغل صوت %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:855 ../hal/ghalvolume.c:369
 msgid "Camera"
@@ -613,7 +612,7 @@ msgstr "مشغل الصوت"
 #: ../daemon/gvfsbackendgphoto2.c:1541
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr "نقطة تحميل gphoto2 على %s"
+msgstr "نقطة وصْل gphoto2 على %s"
 
 #: ../daemon/gvfsbackendhttp.c:242
 #, c-format
@@ -667,11 +666,11 @@ msgstr "لا توجيه للمستضيف"
 
 #: ../daemon/gvfsbackendsftp.c:310
 msgid "Connection refused by server"
-msgstr "رفض الخادم الاتصال"
+msgstr "رفض الخادوم الاتصال"
 
 #: ../daemon/gvfsbackendsftp.c:317
 msgid "Host key verification failed"
-msgstr "فشل التحقق من مفتاح الخادم"
+msgstr "فشل التحقق من مفتاح المستضيف"
 
 #: ../daemon/gvfsbackendsftp.c:400
 msgid "Unable to spawn ssh program"
@@ -700,11 +699,11 @@ msgstr "تعذّر إرسال كلمة السر"
 
 #: ../daemon/gvfsbackendsftp.c:929
 msgid "Log In Anyway"
-msgstr "تسجيل الدخول بكلّ الأحوال"
+msgstr "لُج على أي حال"
 
 #: ../daemon/gvfsbackendsftp.c:929
 msgid "Cancel Login"
-msgstr "إلغاء تسجيل الدخول"
+msgstr "ألغِ الولوج"
 
 #: ../daemon/gvfsbackendsftp.c:939
 #, c-format
@@ -716,18 +715,18 @@ msgid ""
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
 "هوية الحاسوب البعيد (%s) غير معروفة.\n"
-"يحدث هذا عند تسجيل الدخول إلى حاسوب للمرّة الأولى.\n"
+"يحدث هذا عند الولوج إلى حاسوب للمرّة الأولى.\n"
 "\n"
-"الهوية المريلة من طرف الحاسوب البعيد هي %s.إذا أردت التأكد من سلامة "
-"الإستمرار، اتصل بمدير النظام."
+"الهوية المرسلة من الحاسوب البعيد هي %s. إذا أردت التأكد من سلامة "
+"الاستمرار، اتصل بمدير النظام."
 
 #: ../daemon/gvfsbackendsftp.c:959
 msgid "Login dialog cancelled"
-msgstr "تمّ إلغاء حوار تسجيل الدخول"
+msgstr "أُلغِي حوار الولوج"
 
 #: ../daemon/gvfsbackendsftp.c:979
 msgid "Can't send host identity confirmation"
-msgstr "لا يمكن إرسال تأكيد هوية الخادم"
+msgstr "لا يمكن إرسال تأكيد هوية الخادوم"
 
 #: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
 msgid "Protocol error"
@@ -829,7 +828,7 @@ msgstr "تعذّر نقل المجلد تتابعيا"
 
 #: ../daemon/gvfsbackendsmb.c:1902
 msgid "Windows Shares Filesystem Service"
-msgstr "خادم نظام ملفات مشاركات ويندوز"
+msgstr "خادوم نظام ملفات مشاركات ويندوز"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
@@ -852,7 +851,7 @@ msgstr "ليس دليلا"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1224
 msgid "Windows Network Filesystem Service"
-msgstr "خادم نظام ملفات شبكة ويندوز"
+msgstr "خادوم نظام ملفات شبكة ويندوز"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
@@ -863,7 +862,7 @@ msgstr "المهملات"
 #: ../daemon/gvfsbackendtrash.c:979
 #, c-format
 msgid "%s (in trash)"
-msgstr "‏%s في سلة المهملات "
+msgstr "‏%s (في المهملات)"
 
 #: ../daemon/gvfsbackendtrash.c:1290
 msgid "Can't delete trash"
@@ -911,7 +910,7 @@ msgstr "رسالة dbus غير سليمة"
 
 #: ../daemon/main.c:47
 msgid "Replace old daemon."
-msgstr "استبدل الخادم القديم."
+msgstr "استبدل الخادوم القديم."
 
 #: ../daemon/main.c:48
 msgid "Don't start fuse."
@@ -919,11 +918,11 @@ msgstr "لا تبدأ fuse."
 
 #: ../daemon/main.c:60
 msgid "GVFS Daemon"
-msgstr "خادم GVFS"
+msgstr "عفريت GVFS"
 
 #: ../daemon/main.c:63
 msgid "Main daemon for GVFS"
-msgstr "خادم GVFS الرئيسي"
+msgstr "عفريت GVFS الرئيسي"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
@@ -956,7 +955,7 @@ msgstr "المكان المحدد ليس موصولا"
 
 #: ../daemon/mount.c:781
 msgid "The specified location is not supported"
-msgstr "الموقع المحدد ليس مدعوما"
+msgstr "المكان المحدد ليس مدعوما"
 
 #: ../daemon/mount.c:944
 msgid "Location is already mounted"
@@ -1137,7 +1136,7 @@ msgstr "قرص صوت و بيانات مختلط"
 #: ../hal/ghalmount.c:458 ../hal/ghalvolume.c:288
 #, c-format
 msgid "%s Media"
-msgstr "%s وسائط"
+msgstr "وسط %s"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
 #: ../hal/ghalvolume.c:265
@@ -1330,8 +1329,7 @@ msgstr ""
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
-msgstr ""
-"ملاحظة: مرر إلى cat إذا كانت تريد خياراته التنسيقية مثل ‪-n‬، ‪-T‬، أو غيرها."
+msgstr "ملاحظة: مرر إلى cat إذا كانت تريد خياراته التنسيقية مثل ‪-n‬، ‪-T‬، أو غيرها."
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1364,22 +1362,5 @@ msgstr "ملف... - افتح الملفات بالبرنامج المسجل"
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
-msgstr "افتح ملف(ات) بالبرنامج المبدئي المسجل لمعالجة هذا النوع من الملفات."
+msgstr "افتح الملف/الملفات بالبرنامج المبدئي المسجل لمعالجة هذا النوع من الملفات."
 
-#~ msgid "%.1f kB Media"
-#~ msgstr "وسيط %I.1f ك.بايت"
-
-#~ msgid "%.1f MB Media"
-#~ msgstr "وسيط %I.1f م.بايت"
-
-#~ msgid "%.1f GB Media"
-#~ msgstr "وسيط %I.1f ج.بايت"
-
-#~ msgid "The file does not exist"
-#~ msgstr "الملف غير موجود"
-
-#~ msgid "Audio Disc on %s"
-#~ msgstr "قرص صوتي على %s"
-
-#~ msgid "CD Burner"
-#~ msgstr "ناسخ الاسطوانات"
