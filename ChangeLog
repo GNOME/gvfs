@@ -1,3 +1,8 @@
+2008-05-22  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendarchive.c:
+	Improve error handling allowing to mount non-standard ISO images
+
 2008-05-22  Hans Petter Jansson  <hpj@novell.com>
 
 	* client/gvfsfusedaemon.c (shutown_on_idle)

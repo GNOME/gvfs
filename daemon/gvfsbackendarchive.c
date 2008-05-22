@@ -457,8 +457,14 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
   do
     {
       result = archive_read_next_header (archive->archive, &entry);
-      if (result == ARCHIVE_OK)
+      if (result >= ARCHIVE_WARN && result <= ARCHIVE_OK)
 	{
+  	  if (result < ARCHIVE_OK) {
+  	    DEBUG ("archive_read_next_header: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
+  	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
+  	    archive_clear_error (archive->archive);
+	  }
+  
 	  ArchiveFile *file = archive_file_get_from_path (ba->files, 
 	                                                  archive_entry_pathname (entry), 
 							  TRUE);
@@ -600,8 +606,14 @@ do_open_for_read (GVfsBackend *       backend,
   do
     {
       result = archive_read_next_header (archive->archive, &entry);
-      if (result == ARCHIVE_OK)
+      if (result >= ARCHIVE_WARN && result <= ARCHIVE_OK)
         {
+	  if (result < ARCHIVE_OK) {
+	    DEBUG ("do_open_for_read: result = %d, error = '%s'\n", result, archive_error_string (archive->archive));
+	    archive_set_error (archive->archive, ARCHIVE_OK, "No error");
+	    archive_clear_error (archive->archive);
+	  }
+                              
           if (g_str_equal (archive_entry_pathname (entry), filename + 1))
             {
               /* SUCCESS */
