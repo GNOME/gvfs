@@ -2015,6 +2015,9 @@ subthread_main (gpointer data)
   g_object_unref (volume_monitor);
   volume_monitor = NULL;
 
+  /* Tell the main thread to unmount. Using kill() is necessary according to FUSE maintainers. */
+  kill (getpid (), SIGHUP);
+
   return NULL;
 }
 
@@ -2042,24 +2045,18 @@ dbus_filter_func (DBusConnection *connection,
           *new_owner == 0)
         {
           /* The daemon died, unmount */
-          kill (getpid(), SIGHUP);
+          g_main_loop_quit (subthread_main_loop);
         }
+    }
+  else if (dbus_message_is_signal (message,
+                                   DBUS_INTERFACE_LOCAL,
+                                   "Disconnected"))
+    {
+      /* Session bus died, unmount */
+      g_main_loop_quit (subthread_main_loop);
     }
 	
 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-}
-
-static gboolean
-shutdown_on_idle (void)
-{
-  fuse_exit (fuse_get_context ()->fuse);
-  return FALSE;
-}
-
-static void
-shutdown_signal (gint signum)
-{
-  g_idle_add ((GSourceFunc) shutdown_on_idle, NULL);
 }
 
 static gpointer
@@ -2088,6 +2085,8 @@ vfs_init (struct fuse_conn_info *conn)
       return NULL;
     }
 
+  dbus_connection_set_exit_on_disconnect (dbus_conn, FALSE);
+
   _g_dbus_connection_integrate_with_main (dbus_conn);
 
 	dbus_bus_add_match (dbus_conn,
@@ -2114,11 +2113,6 @@ vfs_init (struct fuse_conn_info *conn)
   volume_monitor = g_object_new (g_type_from_name ("GDaemonVolumeMonitor"), NULL);
   
   subthread_main_loop = g_main_loop_new (NULL, FALSE);
-
-  signal (SIGHUP, shutdown_signal);
-  signal (SIGTERM, shutdown_signal);
-  signal (SIGINT, shutdown_signal);
-
   subthread = g_thread_create ((GThreadFunc) subthread_main, NULL, FALSE, NULL);
 
   return NULL;

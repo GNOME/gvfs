@@ -1,3 +1,17 @@
+2008-05-22  Hans Petter Jansson  <hpj@novell.com>
+
+	A more complete fix for GNOME bug #531516.
+
+	* client/gvfsfusedaemon.c (subthread_main): Send SIGHUP to the
+	main thread just before subthread exits.
+	(dbus_filter_func): When gvfsd goes away, exit the subthread's
+	main loop instead of immediately sending SIGHUP to parent thread.
+	Do the same when the session bus goes away.
+	(shutdown_on_idle): Remove, no longer needed.
+	(shutdown_signal): Remove, no longer needed.
+	(vfs_init): Tell dbus to not exit when session bus goes down.
+	Don't catch signals anymore, since Fuse does this for us.
+
 2008-05-22  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendarchive.c:
