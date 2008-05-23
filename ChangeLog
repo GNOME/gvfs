@@ -1,5 +1,35 @@
 2008-05-22  Hans Petter Jansson  <hpj@novell.com>
 
+	Fix fuse daemon locking and file handle life-cycle issues that
+	were causing frequent crashes.
+
+	* client/gvfsfusedaemon.c (file_handle_new): Add a "path" field
+	pointing to a string representing the path this file handle is
+	associated with, for reverse mapping.
+	(file_handle_unref): Is now responsible for decrementing the ref
+	count and freeing the handle if it reaches 0. Note that we need
+	to check the ref count again after obtaining the global mutex.
+	(file_handle_free): The new path member is freed here.
+	(get_file_handle_for_path): Ref the obtained handle.
+	(get_or_create_file_handle_for_path): Ditto, and hold the lock the
+	whole time.
+	(reindex_file_handle_for_path): Steal the old entry to avoid
+	buildup of stale handles.
+	(free_file_handle_for_path): Remove.
+	(vfs_getattr): Unref the handle when we're done with it.
+	(vfs_rename): Ditto.
+	(vfs_unlink): Ditto.
+	(vfs_truncate): Ditto.
+	(vfs_open): Don't ref the obtained handle; it's done in the helper.
+	(vfs_create): Ditto.
+	(vfs_release): Let file_handle_unref() free the handle if
+	appropriate. Note that the old logic here was inverted, meaning we'd
+	try to free the handle if the ref count was non-zero.
+	(vfs_init): The hash table no longer owns the path key strings -
+	the file handle does.
+
+2008-05-22  Hans Petter Jansson  <hpj@novell.com>
+
 	A more complete fix for GNOME bug #531516.
 
 	* client/gvfsfusedaemon.c (subthread_main): Send SIGHUP to the

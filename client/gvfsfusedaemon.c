@@ -72,6 +72,7 @@ typedef struct {
   gint      refcount;
 
   GMutex   *mutex;
+  gchar    *path;
   FileOp    op;
   gpointer  stream;
   gint      length;
@@ -183,7 +184,7 @@ errno_from_error (GError *error)
 }
 
 static FileHandle *
-file_handle_new (void)
+file_handle_new (const gchar *path)
 {
   FileHandle *file_handle;
 
@@ -191,6 +192,7 @@ file_handle_new (void)
   file_handle->refcount = 1;
   file_handle->mutex = g_mutex_new ();
   file_handle->op = FILE_OP_NONE;
+  file_handle->path = g_strdup (path);
 
   return file_handle;
 }
@@ -202,10 +204,22 @@ file_handle_ref (FileHandle *file_handle)
   return file_handle;
 }
 
-static gboolean
+static void
 file_handle_unref (FileHandle *file_handle)
 {
-  return g_atomic_int_dec_and_test (&file_handle->refcount);
+  if (g_atomic_int_dec_and_test (&file_handle->refcount))
+    {
+      g_static_mutex_lock (&global_mutex);
+
+      /* Test again, since e.g. get_file_handle_for_path() might have
+       * snatched the global mutex and revived the file handle between
+       * g_atomic_int_dec_and_test() and us obtaining the lock. */
+
+      if (g_atomic_int_get (&file_handle->refcount) == 0)
+        g_hash_table_remove (global_fh_table, file_handle->path);
+
+      g_static_mutex_unlock (&global_mutex);
+    }
 }
 
 static void
@@ -234,11 +248,13 @@ file_handle_close_stream (FileHandle *file_handle)
     }
 }
 
+/* Called on hash table removal */
 static void
 file_handle_free (FileHandle *file_handle)
 {
   file_handle_close_stream (file_handle);
   g_mutex_free (file_handle->mutex);
+  g_free (file_handle->path);
   g_free (file_handle);
 }
 
@@ -248,7 +264,11 @@ get_file_handle_for_path (const gchar *path)
   FileHandle *fh;
 
   g_static_mutex_lock (&global_mutex);
+
   fh = g_hash_table_lookup (global_fh_table, path);
+  if (fh)
+    file_handle_ref (fh);
+
   g_static_mutex_unlock (&global_mutex);
 
   return fh;
@@ -259,15 +279,21 @@ get_or_create_file_handle_for_path (const gchar *path)
 {
   FileHandle *fh;
 
-  fh = get_file_handle_for_path (path);
-  if (!fh)
-    {
-      fh = file_handle_new ();
+  g_static_mutex_lock (&global_mutex);
 
-      g_static_mutex_lock (&global_mutex);
-      g_hash_table_insert (global_fh_table, g_strdup (path), fh);
-      g_static_mutex_unlock (&global_mutex);
+  fh = g_hash_table_lookup (global_fh_table, path);
+
+  if (fh)
+    {
+      file_handle_ref (fh);
     }
+  else
+    {
+      fh = file_handle_new (path);
+      g_hash_table_insert (global_fh_table, fh->path, fh);
+    }
+
+  g_static_mutex_unlock (&global_mutex);
 
   return fh;
 }
@@ -285,25 +311,12 @@ reindex_file_handle_for_path (const gchar *old_path, const gchar *new_path)
                                      (gpointer *) &fh))
       goto out;
 
-  g_free (old_path_internal);
-  g_hash_table_insert (global_fh_table, g_strdup (new_path), fh);
+  g_free (fh->path);
+  fh->path = g_strdup (new_path);
+  g_hash_table_steal (global_fh_table, old_path);
+  g_hash_table_insert (global_fh_table, fh->path, fh);
 
  out:
-  g_static_mutex_unlock (&global_mutex);
-}
-
-static void
-free_file_handle_for_path (const gchar *path)
-{
-  FileHandle *fh;
-
-  g_static_mutex_lock (&global_mutex);
-  fh = g_hash_table_lookup (global_fh_table, path);
-  if (fh)
-    {
-      if (file_handle_unref (fh))
-        g_hash_table_remove (global_fh_table, path);
-    }
   g_static_mutex_unlock (&global_mutex);
 }
 
@@ -807,7 +820,10 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
     }
 
   if (fh)
-    g_mutex_unlock (fh->mutex);
+    {
+      g_mutex_unlock (fh->mutex);
+      file_handle_unref (fh);
+    }
 
   debug_print ("vfs_getattr: -> %s\n", strerror (-result));
 
@@ -935,7 +951,6 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
               
               /* File exists */
 
-              file_handle_ref (fh);
               SET_FILE_HANDLE (fi, fh);
 
               debug_print ("vfs_open: flags=%o\n", fi->flags);
@@ -946,6 +961,8 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
                 result = setup_output_stream (file, fh);
               else
                 result = setup_input_stream (file, fh);
+
+              /* The added reference to the file handle is released in vfs_release() */
             }
           else if (file_type == G_FILE_TYPE_DIRECTORY)
             {
@@ -1026,13 +1043,14 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 
               /* Success */
 
-              file_handle_ref (fh);
               SET_FILE_HANDLE (fi, fh);
 
               g_assert (fh->stream == NULL);
 
               fh->stream = file_output_stream;
               fh->op = FILE_OP_WRITE;
+
+              /* The added reference to the file handle is released in vfs_release() */
             }
           else
             {
@@ -1061,10 +1079,7 @@ vfs_release (const gchar *path, struct fuse_file_info *fi)
   debug_print ("vfs_release: %s\n", path);
 
   if (fh)
-    {
-      if (!file_handle_unref (fh))
-        free_file_handle_for_path (path);
-    }
+    file_handle_unref (fh);
 
   return 0;
 }
@@ -1496,6 +1511,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
       if (fh)
         {
           g_mutex_unlock (fh->mutex);
+          file_handle_unref (fh);
         }
 
       if (result == -EISDIR)
@@ -1547,6 +1563,7 @@ vfs_unlink (const gchar *path)
       if (fh)
         {
           g_mutex_unlock (fh->mutex);
+          file_handle_unref (fh);
         }
 
       if (error)
@@ -1765,7 +1782,10 @@ vfs_truncate (const gchar *path, off_t size)
         }
 
       if (fh)
-        g_mutex_unlock (fh->mutex);
+        {
+          g_mutex_unlock (fh->mutex);
+          file_handle_unref (fh);
+        }
 
       g_object_unref (file);
     }
@@ -2072,7 +2092,7 @@ vfs_init (struct fuse_conn_info *conn)
 
   mount_list_mutex = g_mutex_new ();
   global_fh_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                           g_free, (GDestroyNotify) file_handle_free);
+                                           NULL, (GDestroyNotify) file_handle_free);
 
 	dbus_error_init (&error);
 
