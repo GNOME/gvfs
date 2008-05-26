@@ -1,3 +1,12 @@
+Major changes in 0.2.4:
+* Fix fuse locking and file handle life-cycle issues that 
+  were causing frequent crashes.
+* Unmount fuse mounts on logout
+* Ftp: various fixes
+* gphoto: various fixes
+* Add ability to control http debuging through GVFS_HTTP_DEBUG
+  env variable
+
 Major changes in 0.2.3:
 * WebDAV: implement set_display_name
 * WebDAV fixes

@@ -1,3 +1,7 @@
+2008-05-27  Christian Kellner  <gicmo@gnome.org>
+
+	* NEWS: Prepare for release.
+
 2008-05-22  Hans Petter Jansson  <hpj@novell.com>
 
 	Fix fuse daemon locking and file handle life-cycle issues that
