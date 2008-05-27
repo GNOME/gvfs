@@ -1,5 +1,10 @@
 2008-05-27  Tomas Bzatek  <tbzatek@redhat.com>
 
+	* daemon/gvfsbackendsmb.c: (do_mount):
+	Don't set domain to mountspec when not setting username
+
+2008-05-27  Tomas Bzatek  <tbzatek@redhat.com>
+
 	* common/gmountspec.c: (add_item):
 	Don't allow setting a null parameter in mountspec (coming 
 	from broken backend)

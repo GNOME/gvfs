@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
@@ -561,10 +562,12 @@ do_mount (GVfsBackend *backend,
   smb_mount_spec = g_mount_spec_new ("smb-share");
   g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
   g_mount_spec_set (smb_mount_spec, "server", op_backend->server);
-  if (op_backend->last_user)
-    g_mount_spec_set (smb_mount_spec, "user", op_backend->last_user);
-  if (op_backend->last_domain)
-    g_mount_spec_set (smb_mount_spec, "domain", op_backend->last_domain);
+  if (op_backend->last_user && strlen(op_backend->last_user) > 0)
+    {
+      g_mount_spec_set (smb_mount_spec, "user", op_backend->last_user);
+      if (op_backend->last_domain)
+        g_mount_spec_set (smb_mount_spec, "domain", op_backend->last_domain);
+    }
 
   g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
   g_mount_spec_unref (smb_mount_spec);
