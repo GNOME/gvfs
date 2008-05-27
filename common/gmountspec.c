@@ -123,6 +123,9 @@ add_item (GMountSpec *spec,
 {
   GMountSpecItem item;
 
+  g_return_if_fail (key != NULL);
+  g_return_if_fail (value != NULL);
+
   item.key = g_strdup (key);
   item.value = value;
 

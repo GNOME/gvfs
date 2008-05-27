@@ -1,3 +1,9 @@
+2008-05-27  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* common/gmountspec.c: (add_item):
+	Don't allow setting a null parameter in mountspec (coming 
+	from broken backend)
+
 2008-05-22  Hans Petter Jansson  <hpj@novell.com>
 
 	Fix fuse daemon locking and file handle life-cycle issues that
