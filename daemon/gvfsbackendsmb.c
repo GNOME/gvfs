@@ -625,17 +625,33 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
   char *uri;
   SMBCFILE *file;
+  struct stat st;
   smbc_open_fn smbc_open;
+  smbc_stat_fn smbc_stat;
+  int res;
+  int olderr;
+
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   file = smbc_open (op_backend->smb_context, uri, O_RDONLY, 0);
-  g_free (uri);
 
   if (file == NULL)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+    {
+      olderr = errno;
+      smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
+      res = smbc_stat (op_backend->smb_context, uri, &st);
+      g_free (uri);
+      if ((res == 0) && (S_ISDIR (st.st_mode)))
+            g_vfs_job_failed (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                             _("Can't open directory"));
+      else
+        g_vfs_job_failed_from_errno (G_VFS_JOB (job), olderr);
+  }
   else
     {
+      
       g_vfs_job_open_for_read_set_can_seek (job, TRUE);
       g_vfs_job_open_for_read_set_handle (job, file);
       g_vfs_job_succeeded (G_VFS_JOB (job));

@@ -1,3 +1,9 @@
+2008-05-28  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c: (do_open_for_read):
+	Return G_IO_ERROR_IS_DIRECTORY when attempting
+	to read a directory (fixes #522933 for SMB)
+
 2008-05-27  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendsmb.c: (do_mount):
