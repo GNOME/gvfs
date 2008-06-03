@@ -1,3 +1,8 @@
+2008-06-03  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Fix definition of giomodulesdir, so we install
+	GIO modules to the libdir specified by the user. Fixes distcheck.
+
 2008-05-28  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendsmb.c: (do_open_for_read):
