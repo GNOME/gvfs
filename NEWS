@@ -1,3 +1,18 @@
+Major changes in 0.99.1:
+* Fix directory copy/delete problems
+* Fuse daemon robustness fixes
+* Allow mounting non-standard ISO images
+* Better username/domain tests on mount spec
+* Require gphoto >= 2.4.0
+* Fix strdup()/g_free() confusion
+* Use consistent translatable strings for mount and volume
+* Plug some memory leaks
+* Many smaller bug fixes
+* Translation updates: 
+  ar (Djihed Afifi, Khaled Hosny), bg (Alexander Shopov),
+  et (Ivar Smolin), he (Yair Hershkovitz),
+  nb (Kjartan Maraas), tr (Baris Cicek), vi (Clytie Siddall)
+
 Major changes in 0.2.2:
 * Respect the giomoduledir provided in gio package config file
 * Better mount icon and name for archive backend
