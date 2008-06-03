@@ -1,0 +1,1486 @@
+# Vietnamese translation for GVFS.
+# Copyright © 2008 GNOME i18n Project for Vietnamese.
+# Clytie Siddall <clytie@riverland.net.au>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs GNOME TRUNK\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-06-02 04:11+0000\n"
+"PO-Revision-Date: 2008-06-02 22:10+0930\n"
+"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
+"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: LocFactoryEditor 1.7b3\n"
+
+#: ../client/gdaemonfile.c:482
+#: ../client/gdaemonfile.c:1977
+msgid "Operation not supported, files on different mounts"
+msgstr "Thao tác không được hỗ trợ, vì tập tin nằm ở điểm gắn kết khác nhau"
+
+#: ../client/gdaemonfile.c:787
+msgid "Invalid return value from get_info"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm lấy thông tin (get_info)"
+
+#: ../client/gdaemonfile.c:816
+#: ../client/gdaemonfile.c:1563
+msgid "Invalid return value from query_info"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm truy vấn thông tin (query_info)"
+
+#: ../client/gdaemonfile.c:894
+msgid "Couldn't get stream file descriptor"
+msgstr "Không thể lấy bộ mô tả tập tin luồng"
+
+#: ../client/gdaemonfile.c:926
+#: ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055
+#: ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176
+#: ../client/gdaemonfile.c:2242
+#: ../client/gdaemonfile.c:2330
+#: ../client/gdaemonfile.c:2599
+msgid "Invalid return value from open"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm mở (open)"
+
+#: ../client/gdaemonfile.c:1006
+#: ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124
+#: ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:2200
+msgid "Didn't get stream file descriptor"
+msgstr "Đã không lấy được bộ mô tả tập tin luồng"
+
+#: ../client/gdaemonfile.c:1238
+#: ../client/gdaemonfile.c:1255
+msgid "Invalid return value from call"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm gọi (call)"
+
+#: ../client/gdaemonfile.c:1534
+msgid "Invalid return value from get_filesystem_info"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm lấy thông tin về hệ thống tập tin (get_filesystem_info)"
+
+#: ../client/gdaemonfile.c:1647
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+msgid "Could not find enclosing mount"
+msgstr "Không thể tìm thấy điểm gắn kết bao bọc"
+
+#: ../client/gdaemonfile.c:1677
+#, c-format
+msgid "Invalid filename %s"
+msgstr "Tên tập tin không hợp lệ %s"
+
+#: ../client/gdaemonfile.c:1719
+msgid "Invalid return value from query_filesystem_info"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm truy vấn thông tin về hệ thống tập tin (query_filesystem_info)"
+
+#: ../client/gdaemonfile.c:2122
+msgid "Invalid return value from monitor_dir"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm theo dõi thư mục (monitor_dir)"
+
+#: ../client/gdaemonfile.c:2171
+msgid "Invalid return value from monitor_file"
+msgstr "Giá trị đáp ứng không hợp lệ từ hàm theo dõi tập tin (monitor_file)"
+
+#: ../client/gdaemonfileinputstream.c:451
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1304
+#: ../client/gdaemonfileinputstream.c:1314
+#: ../client/gdaemonfileoutputstream.c:403
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1052
+#: ../client/gdaemonfileoutputstream.c:1062
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "Lỗi trong giao thức luồng: %s"
+
+#: ../client/gdaemonfileinputstream.c:459
+#: ../client/gdaemonfileinputstream.c:1314
+#: ../client/gdaemonfileoutputstream.c:411
+#: ../client/gdaemonfileoutputstream.c:1062
+msgid "End of stream"
+msgstr "Kết thúc luồng"
+
+#: ../client/gdaemonfileinputstream.c:519
+#: ../client/gdaemonfileinputstream.c:676
+#: ../client/gdaemonfileinputstream.c:785
+#: ../client/gdaemonfileinputstream.c:1036
+#: ../client/gdaemonfileoutputstream.c:460
+#: ../client/gdaemonfileoutputstream.c:639
+#: ../client/gdaemonfileoutputstream.c:835
+#: ../daemon/gvfsbackendobexftp.c:774
+#: ../daemon/gvfsbackendobexftp.c:795
+#: ../daemon/gvfsbackendobexftp.c:914
+#: ../daemon/gvfsbackendobexftp.c:1051
+#: ../daemon/gvfsbackendobexftp.c:1115
+#: ../daemon/gvfsbackendobexftp.c:1252
+#: ../daemon/gvfsbackendobexftp.c:1279
+#: ../daemon/gvfsbackendobexftp.c:1338
+#: ../daemon/gvfsbackendobexftp.c:1360
+#: ../daemon/gvfsbackendobexftp.c:1420
+#: ../daemon/gvfsbackendobexftp.c:1439
+#: ../daemon/gvfsbackendsmb.c:1071
+#: ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120
+#: ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+msgid "Operation was cancelled"
+msgstr "Thao tác bị thôi"
+
+#: ../client/gdaemonfileinputstream.c:1211
+#: ../client/gdaemonfileoutputstream.c:946
+msgid "Seek not supported on stream"
+msgstr "Chức năng seek (tìm nơi) không được hỗ trợ trên luồng"
+
+#: ../client/gdaemonfileinputstream.c:1241
+msgid "The query info operation is not supported"
+msgstr "Thao tác truy vấn thông tin không được hỗ trợ"
+
+#: ../client/gdaemonvfs.c:733
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "Gặp lỗi khi lấy thông tin về điểm gắn kết: %s"
+
+#: ../client/gvfsdaemondbus.c:568
+#: ../client/gvfsdaemondbus.c:999
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "Gặp lỗi khi kết nối tới trình nền: %s"
+
+#: ../common/gsysutils.c:136
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "Gặp lỗi khi tạo ổ cắm: %s"
+
+#: ../common/gsysutils.c:174
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "Gặp lỗi khi kết nối tới ổ cắm: %s"
+
+#: ../common/gvfsdaemonprotocol.c:515
+msgid "Invalid file info format"
+msgstr "Định dạng thông tin tập tin không hợp lệ"
+
+#: ../common/gvfsdaemonprotocol.c:532
+msgid "Invalid attribute info list content"
+msgstr "Nội dung danh sách thông tin thuộc tính không hợp lệ"
+
+#: ../daemon/daemon-main.c:63
+#: ../daemon/daemon-main.c:206
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr "Gặp lỗi khi kết nối tới mạch nối D-Bus: %s"
+
+#: ../daemon/daemon-main.c:78
+#, c-format
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+msgid "%s Filesystem Service"
+msgstr "Dịch vụ Hệ thống Tập tin %s"
+
+#: ../daemon/daemon-main.c:97
+#, c-format
+msgid "Error: %s"
+msgstr "Lỗi: %s"
+
+#: ../daemon/daemon-main.c:131
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "Sử dụng: %s --spawner dbus-id đường_dẫn_đối_tường"
+
+#: ../daemon/daemon-main.c:155
+#: ../daemon/daemon-main.c:173
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "Sử dụng: %s khoá=giá_trị khoá=giá_trị ..."
+
+#: ../daemon/daemon-main.c:171
+#, c-format
+msgid "No mount type specified"
+msgstr "Chưa xác định kiểu điểm gắn kết"
+
+#: ../daemon/daemon-main.c:241
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "điểm gắn kết cho %s đã bắt đầu chạy"
+
+#: ../daemon/daemon-main.c:252
+msgid "error starting mount daemon"
+msgstr "gặp lỗi khi khởi chạy trình nền gắn kết"
+
+#: ../daemon/gvfsbackendarchive.c:315
+#: ../daemon/gvfsbackendftp.c:908
+#: ../daemon/gvfsbackendsftp.c:1893
+#, c-format
+#. FIXME: this should really be "/ in %s", but can't change
+#. due to string freeze.
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+msgid "/ on %s"
+msgstr "/ trên %s"
+
+#: ../daemon/gvfsbackendarchive.c:515
+#: ../daemon/gvfsbackendftp.c:1424
+#: ../daemon/gvfsbackendsftp.c:1552
+msgid "No hostname specified"
+msgstr "Chưa chỉ ra tên máy"
+
+#: ../daemon/gvfsbackendarchive.c:526
+#: ../daemon/gvfsbackendarchive.c:555
+#: ../daemon/gvfsbackenddav.c:1446
+#: ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackendobexftp.c:605
+#: ../daemon/gvfsbackendobexftp.c:616
+#: ../daemon/gvfsbackendsmb.c:605
+msgid "Invalid mount spec"
+msgstr "đặc tả gắn kết không hợp lệ"
+
+#: ../daemon/gvfsbackendarchive.c:636
+#: ../daemon/gvfsbackendarchive.c:686
+#: ../daemon/gvfsbackendarchive.c:715
+#: ../daemon/gvfsbackendcdda.c:823
+#: ../daemon/gvfsbackendcomputer.c:572
+#: ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendftp.c:2028
+#: ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendsmbbrowse.c:804
+#: ../daemon/gvfsbackendsmbbrowse.c:871
+#: ../daemon/gvfsbackendsmbbrowse.c:1042
+#: ../daemon/gvfsbackendsmbbrowse.c:1116
+#, c-format
+msgid "File doesn't exist"
+msgstr "Tập tin không tồn tại"
+
+#: ../daemon/gvfsbackendarchive.c:724
+#: ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651
+#: ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:857
+#: ../daemon/gvfsbackendnetwork.c:637
+#, c-format
+msgid "The file is not a directory"
+msgstr "Tập tin không phải là một thư mục"
+
+#: ../daemon/gvfsbackendburn.c:346
+#. Translators: This is the name of the backend
+msgid "Burn"
+msgstr "Ghi chép"
+
+#: ../daemon/gvfsbackendburn.c:376
+msgid "Unable to create temporary directory"
+msgstr "Không thể tạo thư mục tạm thời"
+
+#: ../daemon/gvfsbackendburn.c:405
+#: ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451
+#: ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719
+#: ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783
+msgid "No such file or directory"
+msgstr "Không có tập tin hay thư mục nào như vậy"
+
+#: ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackenddav.c:2033
+msgid "Directory not empty"
+msgstr "Thư mục không rỗng"
+
+#: ../daemon/gvfsbackendburn.c:459
+#: ../daemon/gvfsbackendburn.c:897
+msgid "Can't copy file over directory"
+msgstr "Không thể sao chép tập tin đè lên thư mục"
+
+#: ../daemon/gvfsbackendburn.c:651
+#. Translators: this is the display name of the backend
+msgid "CD/DVD Creator"
+msgstr "Bộ tạo đĩa CD/DVD"
+
+#: ../daemon/gvfsbackendburn.c:755
+#: ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:917
+msgid "File exists"
+msgstr "Tập tin đã có"
+
+#: ../daemon/gvfsbackendburn.c:845
+msgid "No such file or directory in target path"
+msgstr "Không có tập tin hay thư mục nào như vậy trên đường dẫn đích đến"
+
+#: ../daemon/gvfsbackendburn.c:868
+msgid "Can't copy directory over directory"
+msgstr "Không thể sao chép thư mục đè lên thư mục"
+
+#: ../daemon/gvfsbackendburn.c:877
+msgid "Target file exists"
+msgstr "Tập tin đích đã có"
+
+#: ../daemon/gvfsbackendburn.c:884
+msgid "Can't recursively copy directory"
+msgstr "Không thể sao chép đệ quy thư mục"
+
+#: ../daemon/gvfsbackendburn.c:943
+msgid "Not supported"
+msgstr "Không được hỗ trợ"
+
+#: ../daemon/gvfsbackendcdda.c:262
+#: ../daemon/gvfsbackendcdda.c:333
+msgid "No drive specified"
+msgstr "Chưa ghi rõ ổ đĩa"
+
+#: ../daemon/gvfsbackendcdda.c:277
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "Không thể tìm ổ đĩa %s."
+
+#: ../daemon/gvfsbackendcdda.c:287
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "Ổ đĩa %s không chứa tập tin âm thanh"
+
+#: ../daemon/gvfsbackendcdda.c:295
+#, c-format
+#. Translator: %s is the device the disc is inserted into
+msgid "cdda mount on %s"
+msgstr "điểm gắn kết cdda trên %s"
+
+#: ../daemon/gvfsbackendcdda.c:296
+#: ../daemon/gvfsbackendcdda.c:800
+#: ../hal/ghalmount.c:445
+#: ../hal/ghalvolume.c:256
+#: ../hal/ghalvolume.c:277
+#, c-format
+msgid "Audio Disc"
+msgstr "Đĩa âm thanh"
+
+#: ../daemon/gvfsbackendcdda.c:357
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "Hệ thống tập tin đang bận: %d tập tin còn mở"
+
+#: ../daemon/gvfsbackendcdda.c:547
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "Không có tập tin như vậy trên ồ đĩa %s"
+
+#: ../daemon/gvfsbackendcdda.c:656
+#, c-format
+#. Translators: paranoia is the name of the cd audio reading library
+msgid "Error from 'paranoia' on drive %s"
+msgstr "Lỗi từ « paranoia » trên ổ đĩa %s"
+
+#: ../daemon/gvfsbackendcdda.c:719
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "Gặp lỗi khi tìm nơi trên ổ đĩa %s"
+
+#: ../daemon/gvfsbackendcdda.c:816
+#: ../daemon/gvfsbackendgphoto2.c:1696
+#, c-format
+msgid "No such file"
+msgstr "Không có tập tin như vậy."
+
+#: ../daemon/gvfsbackendcdda.c:830
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "Tập tin không tồn tại hoặc không phải là một rãnh âm thanh."
+
+#: ../daemon/gvfsbackendcdda.c:936
+msgid "Audio CD Filesystem Service"
+msgstr "Dịch vụ Hệ thống Tập tin Đĩa CD Âm thanh"
+
+#: ../daemon/gvfsbackendcomputer.c:179
+#: ../daemon/gvfsbackendcomputer.c:693
+msgid "Computer"
+msgstr "Máy tính"
+
+#: ../daemon/gvfsbackendcomputer.c:466
+msgid "Filesystem"
+msgstr "Hệ thống tập tin"
+
+#: ../daemon/gvfsbackendcomputer.c:590
+#: ../daemon/gvfsbackendgphoto2.c:1688
+#: ../daemon/gvfsbackendobexftp.c:760
+#: ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendtrash.c:640
+msgid "Can't open directory"
+msgstr "Không thể mở thư mục"
+
+#: ../daemon/gvfsbackendcomputer.c:594
+#: ../daemon/gvfsbackendcomputer.c:732
+msgid "Can't open mountable file"
+msgstr "Không thể mở tập tin có khả năng gắn kết"
+
+#: ../daemon/gvfsbackendcomputer.c:780
+#: ../daemon/gvfsbackendsftp.c:1036
+#, c-format
+msgid "Internal error: %s"
+msgstr "Lỗi nội bộ : %s"
+
+#: ../daemon/gvfsbackendcomputer.c:812
+#: ../daemon/gvfsbackendcomputer.c:929
+msgid "Can't mount file"
+msgstr "Không thể gắn kết tập tin"
+
+#: ../daemon/gvfsbackendcomputer.c:824
+msgid "No media in the drive"
+msgstr "Không có vật chứa trong ổ"
+
+#: ../daemon/gvfsbackendcomputer.c:881
+#: ../daemon/gvfsbackendcomputer.c:972
+#: ../daemon/gvfsbackendcomputer.c:1072
+msgid "Not a mountable file"
+msgstr "Không phải là một tập tin có khả năng gắn kết"
+
+#: ../daemon/gvfsbackendcomputer.c:987
+msgid "Can't unmount file"
+msgstr "Không thể tháo gắn kết tập tin"
+
+#: ../daemon/gvfsbackendcomputer.c:1103
+msgid "Can't eject file"
+msgstr "Không thể đẩy tập tin ra"
+
+#: ../daemon/gvfsbackenddav.c:504
+#: ../daemon/gvfsbackenddav.c:1513
+#: ../daemon/gvfsbackendhttp.c:245
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "Lỗi HTTP: %s"
+
+#: ../daemon/gvfsbackenddav.c:520
+msgid "Could not parse response"
+msgstr "Không thể phân tích đáp ứng"
+
+#: ../daemon/gvfsbackenddav.c:529
+msgid "Empty response"
+msgstr "Đáp ứng rỗng"
+
+#: ../daemon/gvfsbackenddav.c:536
+msgid "Unexpected reply from server"
+msgstr "Gặp đáp ứng bất thường từ máy phục vụ"
+
+#: ../daemon/gvfsbackenddav.c:1146
+#: ../daemon/gvfsbackenddav.c:1648
+#, c-format
+msgid "Response invalid"
+msgstr "Đáp ứng không hợp lệ"
+
+#: ../daemon/gvfsbackenddav.c:1289
+msgid "WebDAV share"
+msgstr "Vùng chia sẻ WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:1291
+#, c-format
+msgid "Enter password for %s"
+msgstr "Nhập mật khẩu cho %s"
+
+#: ../daemon/gvfsbackenddav.c:1294
+msgid "Please enter proxy password"
+msgstr "Hãy nhập mật khẩu ủy nhiệm"
+
+#: ../daemon/gvfsbackenddav.c:1517
+#: ../daemon/gvfsbackenddav.c:1521
+msgid "Not a WebDAV enabled share"
+msgstr "Không phải một vùng chia sẻ có khả năng WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:1544
+#, c-format
+msgid "WebDAV on %s"
+msgstr "WebDAV trên %s"
+
+#: ../daemon/gvfsbackenddav.c:1604
+#: ../daemon/gvfsbackenddav.c:1677
+msgid "Could not create request"
+msgstr "Không thể tạo yêu cầu"
+
+#: ../daemon/gvfsbackenddav.c:1740
+#: ../daemon/gvfsbackenddav.c:1993
+#: ../daemon/gvfsbackenddav.c:2104
+#: ../daemon/gvfsbackendftp.c:1626
+#: ../daemon/gvfsbackendftp.c:2292
+#: ../daemon/gvfsbackendsftp.c:3535
+#: ../daemon/gvfsbackendsmb.c:1807
+#, c-format
+msgid "Target file already exists"
+msgstr "Tập tin đích đã có"
+
+#: ../daemon/gvfsbackenddav.c:1813
+#: ../daemon/gvfsbackendsftp.c:2783
+#: ../daemon/gvfsbackendsmb.c:1039
+msgid "The file was externally modified"
+msgstr "Tập tin đã bị sửa đổi bên ngoài"
+
+#: ../daemon/gvfsbackenddav.c:1844
+#: ../daemon/gvfsbackendsmb.c:1077
+#: ../daemon/gvfsbackendsmb.c:1824
+msgid "Backup file creation failed"
+msgstr "Lỗi tạo tập tin sao lưu"
+
+#: ../daemon/gvfsbackenddnssd.c:433
+#. TODO: Name
+msgid "dns-sd"
+msgstr "dns-sd"
+
+#: ../daemon/gvfsbackenddnssd.c:669
+#: ../daemon/gvfsbackendnetwork.c:731
+msgid "Can't monitor file or directory."
+msgstr "Không thể theo dõi tập tin hay thư mục"
+
+#: ../daemon/gvfsbackenddnssd.c:687
+#. TODO: Names, etc
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:688
+#: ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814
+#: ../daemon/gvfsbackendnetwork.c:815
+msgid "Network"
+msgstr "Mạng"
+
+#: ../daemon/gvfsbackendftp.c:234
+msgid "Accounts are unsupported"
+msgstr "Tài khoản không được hỗ trợ"
+
+#: ../daemon/gvfsbackendftp.c:238
+msgid "Host closed connection"
+msgstr "Máy đã đóng kết nối"
+
+#: ../daemon/gvfsbackendftp.c:242
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Không thể mở kết nối dữ liệu. Có thể bức tường lửa ngăn cản ?"
+
+#: ../daemon/gvfsbackendftp.c:246
+msgid "Data connection closed"
+msgstr "Kết nối dữ liệu bị đóng"
+
+#: ../daemon/gvfsbackendftp.c:253
+msgid "File unavailable"
+msgstr "Tập tin không sẵn sàng"
+
+#: ../daemon/gvfsbackendftp.c:257
+msgid "Operation failed"
+msgstr "Thao tác bị lỗi"
+
+#: ../daemon/gvfsbackendftp.c:262
+msgid "No space left on server"
+msgstr "Không có sức chứa còn rảnh trên máy phục vụ"
+
+#: ../daemon/gvfsbackendftp.c:270
+#: ../daemon/gvfsbackendsftp.c:3844
+msgid "Operation unsupported"
+msgstr "Thao tác không được hỗ trợ"
+
+#: ../daemon/gvfsbackendftp.c:274
+#: ../daemon/gvfsbackendsftp.c:288
+msgid "Permission denied"
+msgstr "Không đủ quyền truy cập"
+
+#: ../daemon/gvfsbackendftp.c:278
+msgid "Page type unknown"
+msgstr "Không rõ kiểu trang"
+
+#: ../daemon/gvfsbackendftp.c:282
+#: ../daemon/gvfsbackendftp.c:2138
+#, c-format
+msgid "Invalid filename"
+msgstr "Tên tập tin không hợp lệ"
+
+#: ../daemon/gvfsbackendftp.c:286
+#: ../daemon/gvfsbackendftp.c:360
+#: ../daemon/gvfsbackendftp.c:389
+#: ../daemon/gvfsbackendftp.c:408
+#: ../daemon/gvfsbackendftp.c:421
+#: ../daemon/gvfsbackendftp.c:762
+#, c-format
+msgid "Invalid reply"
+msgstr "Đáp ứng không hợp lệ"
+
+#: ../daemon/gvfsbackendftp.c:528
+#, c-format
+msgid "broken transmission"
+msgstr "lỗi truyền"
+
+#: ../daemon/gvfsbackendftp.c:622
+#: ../daemon/gvfsbackendftp.c:782
+#, c-format
+msgid "Could not connect to host"
+msgstr "Không thể kết nối tới máy chủ"
+
+#: ../daemon/gvfsbackendftp.c:1282
+#, c-format
+#. translators: %s here is the hostname
+msgid "Enter password for ftp on %s"
+msgstr "Nhập mật khẩu cho dịch vụ FTP trên %s"
+
+#: ../daemon/gvfsbackendftp.c:1307
+#: ../daemon/gvfsbackendsftp.c:873
+msgid "Password dialog cancelled"
+msgstr "Hộp thoại mật khẩu bị thôi"
+
+#: ../daemon/gvfsbackendftp.c:1386
+#, c-format
+msgid "ftp on %s"
+msgstr "FTP trên %s"
+
+#: ../daemon/gvfsbackendftp.c:1390
+#, c-format
+#. Translators: the first %s is the username, the second the host name
+msgid "ftp as %s on %s"
+msgstr "FTP dưới %s trên %s"
+
+#: ../daemon/gvfsbackendftp.c:1678
+#: ../daemon/gvfsbackendftp.c:2253
+msgid "backups not supported yet"
+msgstr "chưa hỗ trợ chức năng sao lưu"
+
+#: ../daemon/gvfsbackendftp.c:1755
+#, c-format
+msgid "filename too long"
+msgstr "tên tập tin quá dài"
+
+#: ../daemon/gvfsbackendftp.c:2272
+#, c-format
+msgid "Invalid destination filename"
+msgstr "Tên tập tin đích không hợp lệt"
+
+#: ../daemon/gvfsbackendgphoto2.c:696
+#, c-format
+#. Translator: %s represents the device, e.g. usb:001,042
+msgid "Digital Camera (%s)"
+msgstr "Máy ảnh số (%s)"
+
+#: ../daemon/gvfsbackendgphoto2.c:842
+#: ../hal/ghalvolume.c:358
+#, c-format
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+msgid "%s Camera"
+msgstr "Máy ảnh %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:845
+#: ../hal/ghalvolume.c:353
+#, c-format
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+msgid "%s Audio Player"
+msgstr "Bộ phát nhạc %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:854
+#: ../hal/ghalvolume.c:367
+msgid "Camera"
+msgstr "Máy ảnh"
+
+#: ../daemon/gvfsbackendgphoto2.c:856
+#: ../hal/ghalvolume.c:365
+msgid "Audio Player"
+msgstr "Bộ phát âm thanh"
+
+#: ../daemon/gvfsbackendgphoto2.c:1540
+#, c-format
+#. Translator: %s represents the device, e.g. usb:001,042
+msgid "gphoto2 mount on %s"
+msgstr "điểm gắn kết gphoto2 trên %s"
+
+#: ../daemon/gvfsbackendhttp.c:241
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "Lỗi ứng dụng khách HTTP: %s"
+
+#: ../daemon/gvfsbackendhttp.c:560
+#: ../daemon/gvfsbackendsftp.c:1881
+#: ../daemon/gvfsbackendsmb.c:1304
+#: ../daemon/gvfsbackendtrash.c:968
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (bảng mã không hợp lệ)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr "Thông báo thư mục không được hỗ trợ"
+
+#: ../daemon/gvfsbackendnetwork.c:268
+#: ../daemon/gvfsbackendsmbbrowse.c:699
+#. smb:/// root link
+msgid "Windows Network"
+msgstr "Mạng Windows"
+
+#: ../daemon/gvfsbackendnetwork.c:392
+#. "separate": a link to dns-sd://local/
+msgid "Local Network"
+msgstr "Mạng nội bộ"
+
+#: ../daemon/gvfsbackendnetwork.c:862
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+msgid "Network Location Monitor"
+msgstr "Theo dõi Vị trí Mạng"
+
+#: ../daemon/gvfsbackendobexftp.c:444
+#: ../daemon/gvfsbackendsmb.c:557
+#: ../daemon/gvfsbackendsmb.c:1297
+#, c-format
+#. Mount was successful
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+msgid "%s on %s"
+msgstr "%s trên %s"
+
+#: ../daemon/gvfsbackendsftp.c:280
+msgid "ssh program unexpectedly exited"
+msgstr "Chương trình SSH đã thoát bất thường"
+
+#: ../daemon/gvfsbackendsftp.c:295
+msgid "Hostname not known"
+msgstr "Không rõ tên máy"
+
+#: ../daemon/gvfsbackendsftp.c:302
+msgid "No route to host"
+msgstr "Không có đường dẫn đến máy"
+
+#: ../daemon/gvfsbackendsftp.c:309
+msgid "Connection refused by server"
+msgstr "Kết nối bị máy phục vụ từ chối"
+
+#: ../daemon/gvfsbackendsftp.c:316
+msgid "Host key verification failed"
+msgstr "Lỗi thẩm tra khoá của máy"
+
+#: ../daemon/gvfsbackendsftp.c:399
+msgid "Unable to spawn ssh program"
+msgstr "Không thể tạọ và thực hiện chương trình SSH"
+
+#: ../daemon/gvfsbackendsftp.c:415
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "Không thể tạọ và thực hiện chương trình SSH: %s"
+
+#: ../daemon/gvfsbackendsftp.c:527
+#: ../daemon/gvfsbackendsftp.c:779
+msgid "Timed out when logging in"
+msgstr "Quá hạn trong khi đăng nhập"
+
+#: ../daemon/gvfsbackendsftp.c:857
+msgid "Enter passphrase for key"
+msgstr "Gõ cụm từ mật khẩu cho khoá"
+
+#: ../daemon/gvfsbackendsftp.c:859
+msgid "Enter password"
+msgstr "Gõ mật khẩu"
+
+#: ../daemon/gvfsbackendsftp.c:920
+msgid "Can't send password"
+msgstr "Không thể gửi mật khẩu"
+
+#: ../daemon/gvfsbackendsftp.c:928
+msgid "Log In Anyway"
+msgstr "Vẫn đăng nhập"
+
+#: ../daemon/gvfsbackendsftp.c:928
+msgid "Cancel Login"
+msgstr "Thôi đăng nhập"
+
+#: ../daemon/gvfsbackendsftp.c:938
+#, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
+msgstr ""
+"Không rõ máy ở xa (%s) là máy gì.\n"
+"Trường hợp này xảy ra khi bạn đăng nhập vào một máy tính lần đầu tiên.\n"
+"\n"
+"Máy tính ở xa đã gửi thông tin nhận diện là %s. Nếu bạn muốn đảm bảo là an toàn để tiếp tục, hãy liên lạc với nhà quản trị hệ thống."
+
+#: ../daemon/gvfsbackendsftp.c:958
+msgid "Login dialog cancelled"
+msgstr "Hộp thoại đăng nhập bị thôi"
+
+#: ../daemon/gvfsbackendsftp.c:978
+msgid "Can't send host identity confirmation"
+msgstr "Không thể gửi thông tin xác nhận sự giống hệt của máy"
+
+#: ../daemon/gvfsbackendsftp.c:1471
+#: ../daemon/gvfsbackendsftp.c:1494
+msgid "Protocol error"
+msgstr "Lỗi giao thức"
+
+#: ../daemon/gvfsbackendsftp.c:1518
+#, c-format
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+msgid "sftp on %s"
+msgstr "SFTP trên %s"
+
+#: ../daemon/gvfsbackendsftp.c:1542
+msgid "Unable to find supported ssh command"
+msgstr "Không tìm thấy câu lệnh ssh được hỗ trợ"
+
+#: ../daemon/gvfsbackendsftp.c:1957
+#: ../daemon/gvfsbackendsftp.c:3526
+msgid "File is directory"
+msgstr "Tập tin là thư mục"
+
+#: ../daemon/gvfsbackendsftp.c:1966
+msgid "Failure"
+msgstr "Không thành công"
+
+#: ../daemon/gvfsbackendsftp.c:2022
+#: ../daemon/gvfsbackendsftp.c:2081
+#: ../daemon/gvfsbackendsftp.c:2092
+#: ../daemon/gvfsbackendsftp.c:2148
+#: ../daemon/gvfsbackendsftp.c:2234
+#: ../daemon/gvfsbackendsftp.c:2262
+#: ../daemon/gvfsbackendsftp.c:2308
+#: ../daemon/gvfsbackendsftp.c:2383
+#: ../daemon/gvfsbackendsftp.c:2490
+#: ../daemon/gvfsbackendsftp.c:2530
+#: ../daemon/gvfsbackendsftp.c:2580
+#: ../daemon/gvfsbackendsftp.c:2649
+#: ../daemon/gvfsbackendsftp.c:2669
+#: ../daemon/gvfsbackendsftp.c:2820
+#: ../daemon/gvfsbackendsftp.c:2845
+#: ../daemon/gvfsbackendsftp.c:2900
+#: ../daemon/gvfsbackendsftp.c:2957
+#: ../daemon/gvfsbackendsftp.c:3228
+#: ../daemon/gvfsbackendsftp.c:3295
+#: ../daemon/gvfsbackendsftp.c:3424
+#: ../daemon/gvfsbackendsftp.c:3459
+#: ../daemon/gvfsbackendsftp.c:3487
+#: ../daemon/gvfsbackendsftp.c:3595
+#: ../daemon/gvfsbackendsftp.c:3649
+#: ../daemon/gvfsbackendsftp.c:3683
+#: ../daemon/gvfsbackendsftp.c:3717
+#: ../daemon/gvfsbackendsftp.c:3732
+#: ../daemon/gvfsbackendsftp.c:3747
+#: ../daemon/gvfsbackendsftp.c:3825
+msgid "Invalid reply received"
+msgstr "Nhận được đáp ứng không hợp lệ"
+
+#: ../daemon/gvfsbackendsftp.c:2328
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "Gặp lỗi khi tạo tập tin sao lưu : %s"
+
+#: ../daemon/gvfsbackendsftp.c:2730
+msgid "Unable to create temporary file"
+msgstr "Không thể tạo tập tin tạm thời"
+
+#: ../daemon/gvfsbackendsftp.c:3521
+#: ../daemon/gvfsbackendsmb.c:1796
+msgid "Can't move directory over directory"
+msgstr "Không thể di chuyển thư mục đè lên thư mục"
+
+#: ../daemon/gvfsbackendsmb.c:216
+#, c-format
+#. translators: First %s is a share name, second is a server name
+msgid "Password required for share %s on %s"
+msgstr "Yêu cầu mật khẩu cho vùng chia sẻ %s trên %s"
+
+#: ../daemon/gvfsbackendsmb.c:471
+#: ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Lỗi nội bộ (%s)"
+
+#: ../daemon/gvfsbackendsmb.c:550
+#. translators: We tried to mount a windows (samba) share, but failed
+msgid "Failed to mount Windows share"
+msgstr "Lỗi gắn kết vùng chia sẻ Windows"
+
+#: ../daemon/gvfsbackendsmb.c:717
+#: ../daemon/gvfsbackendsmb.c:1176
+msgid "Unsupported seek type"
+msgstr "Cách tìm nơi không được hỗ trợ"
+
+#: ../daemon/gvfsbackendsmb.c:1240
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "Gặp lỗi khi tạo tập tin sao lưu : %s"
+
+#: ../daemon/gvfsbackendsmb.c:1698
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Gặp lỗi khi xoá tập tin: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1772
+#, c-format
+msgid "Error moving file: %s"
+msgstr "Gặp lỗi khi di chuyển tập tin: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1844
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "Gặp lỗi khi gỡ bỏ tập tin đích: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1868
+msgid "Can't recursively move directory"
+msgstr "Không thể di chuyển đệ quy thư mục"
+
+#: ../daemon/gvfsbackendsmb.c:1931
+msgid "Windows Shares Filesystem Service"
+msgstr "Dịch vụ Hệ thống Tập tin Chia sẻ Windows"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:707
+#, c-format
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+msgid "Windows shares on %s"
+msgstr "Vùng chia sẻ Windows trên %s"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:799
+#: ../daemon/gvfsbackendsmbbrowse.c:845
+msgid "The file is not a mountable"
+msgstr "Tập tin không có khả năng gắn kết"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:867
+msgid "Not a regular file"
+msgstr "Không phải là một tập tin tiêu chuẩn"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1112
+msgid "Not a directory"
+msgstr "Không phải là một thư mục"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1224
+msgid "Windows Network Filesystem Service"
+msgstr "Dịch vụ Hệ thống Tập tin Mạng Windows"
+
+#: ../daemon/gvfsbackendtrash.c:603
+#: ../daemon/gvfsbackendtrash.c:1188
+#. translators: This is the name of the backend
+#. Translators: this is the display name of the backend
+msgid "Trash"
+msgstr "Sọt Rác"
+
+#: ../daemon/gvfsbackendtrash.c:978
+#, c-format
+msgid "%s (in trash)"
+msgstr "%s (trong Sọt Rác)"
+
+#: ../daemon/gvfsbackendtrash.c:1289
+msgid "Can't delete trash"
+msgstr "Không thể xoá Sọt Rác"
+
+#: ../daemon/gvfsbackendtrash.c:1636
+#: ../daemon/gvfsbackendtrash.c:1711
+msgid "Trash directory notification not supported"
+msgstr "Thông báo thư mục Sọt Rác không được hỗ trợ"
+
+#: ../daemon/gvfsdaemon.c:1032
+msgid "Invalid backend type"
+msgstr "Kiểu hậu phương không hợp lệ"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "Gặp lỗi khi gửi bộ mô tả tập tin: %s"
+
+#: ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsjobclosewrite.c:120
+#: ../daemon/gvfsjobcopy.c:169
+#: ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151
+#: ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192
+#: ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256
+#: ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109
+#: ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:168
+#: ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148
+#: ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176
+#: ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146
+#: ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "Thao tác không được hậu phương hỗ trợ"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "Liên kết tượng trưng không được hậu phương hỗ trợ"
+
+#: ../daemon/gvfsjobsetattribute.c:123
+msgid "Invalid dbus message"
+msgstr "Thông điệp dbus không hợp lệ"
+
+#: ../daemon/main.c:45
+msgid "Replace old daemon."
+msgstr "Thay thế trình nền cũ."
+
+#: ../daemon/main.c:46
+msgid "Don't start fuse."
+msgstr "Không chạy fuse."
+
+#: ../daemon/main.c:58
+msgid "GVFS Daemon"
+msgstr "Trình nền GVFS"
+
+#: ../daemon/main.c:61
+msgid "Main daemon for GVFS"
+msgstr "Trình nền chính cho GVFS"
+
+#: ../daemon/main.c:76
+#, c-format
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:78
+#: ../programs/gvfs-cat.c:163
+#: ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:101
+#: ../programs/gvfs-info.c:337
+#: ../programs/gvfs-ls.c:386
+#: ../programs/gvfs-move.c:97
+#: ../programs/gvfs-open.c:131
+#: ../programs/gvfs-open.c:144
+#: ../programs/gvfs-save.c:165
+#: ../programs/gvfs-tree.c:251
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "Hãy thử câu lệnh trợ giúp « %s --help » để xem thông tin thêm."
+
+#: ../daemon/mount.c:432
+msgid "Invalid arguments from spawned child"
+msgstr "Đối số không hợp lệ từ tiến trình con đã tạo và thực hiện"
+
+#: ../daemon/mount.c:731
+#, c-format
+msgid "Automount failed: %s"
+msgstr "Lỗi tự động gắn kết: %s"
+
+#: ../daemon/mount.c:776
+msgid "The specified location is not mounted"
+msgstr "Vị trí đã ghi rõ không phải được gắn kết"
+
+#: ../daemon/mount.c:781
+msgid "The specified location is not supported"
+msgstr "Vị trí đã ghi rõ không được hỗ trợ"
+
+#: ../daemon/mount.c:944
+msgid "Location is already mounted"
+msgstr "Vị trí đã được gắn kết"
+
+#: ../daemon/mount.c:952
+msgid "Location is not mountable"
+msgstr "Vị trí không có khả năng gắn kết"
+
+#: ../hal/ghaldrive.c:142
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../hal/ghaldrive.c:144
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../hal/ghaldrive.c:146
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../hal/ghaldrive.c:150
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../hal/ghaldrive.c:152
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../hal/ghaldrive.c:154
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../hal/ghaldrive.c:156
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../hal/ghaldrive.c:158
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../hal/ghaldrive.c:160
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../hal/ghaldrive.c:163
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../hal/ghaldrive.c:166
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../hal/ghaldrive.c:168
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../hal/ghaldrive.c:170
+msgid "HDDVD-r"
+msgstr "HDDVD-r"
+
+#: ../hal/ghaldrive.c:172
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../hal/ghaldrive.c:174
+msgid "Blu-ray"
+msgstr "Blu-ray"
+
+#: ../hal/ghaldrive.c:176
+msgid "Blu-ray-R"
+msgstr "Blu-ray-R"
+
+#: ../hal/ghaldrive.c:178
+msgid "Blu-ray-RE"
+msgstr "Blu-ray-RE"
+
+#: ../hal/ghaldrive.c:184
+#, c-format
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+msgid "%s/%s Drive"
+msgstr "Ổ %s/%s"
+
+#: ../hal/ghaldrive.c:190
+#, c-format
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+msgid "%s Drive"
+msgstr "Ổ %s"
+
+#: ../hal/ghaldrive.c:194
+msgid "Floppy Drive"
+msgstr "Ổ đĩa mềm"
+
+#: ../hal/ghaldrive.c:200
+msgid "Software RAID Drive"
+msgstr "Ổ phần mềm RAID"
+
+#: ../hal/ghaldrive.c:202
+msgid "USB Drive"
+msgstr "Ổ USB"
+
+#: ../hal/ghaldrive.c:204
+msgid "ATA Drive"
+msgstr "Ổ đĩa ATA"
+
+#: ../hal/ghaldrive.c:206
+msgid "SCSI Drive"
+msgstr "Ổ đĩa SCSI"
+
+#: ../hal/ghaldrive.c:208
+msgid "FireWire Drive"
+msgstr "Ổ đĩa FireWire"
+
+#: ../hal/ghaldrive.c:212
+msgid "Tape Drive"
+msgstr "Ổ băng từ"
+
+#: ../hal/ghaldrive.c:214
+msgid "CompactFlash Drive"
+msgstr "Ổ CompactFlash (CF)"
+
+#: ../hal/ghaldrive.c:216
+msgid "MemoryStick Drive"
+msgstr "Ổ thanh bộ nhớ"
+
+#: ../hal/ghaldrive.c:218
+msgid "SmartMedia Drive"
+msgstr "Ổ vật chứa khéo"
+
+#: ../hal/ghaldrive.c:220
+msgid "SD/MMC Drive"
+msgstr "Ổ thẻ SD/MMC"
+
+#: ../hal/ghaldrive.c:222
+msgid "Zip Drive"
+msgstr "Ổ đĩa Zip"
+
+#: ../hal/ghaldrive.c:224
+msgid "Jaz Drive"
+msgstr "Ổ đĩa Jaz"
+
+#: ../hal/ghaldrive.c:226
+msgid "Thumb Drive"
+msgstr "Ổ thanh ghi nhớ"
+
+#: ../hal/ghaldrive.c:229
+msgid "Mass Storage Drive"
+msgstr "Ổ lưu trữ hàng loạt"
+
+#: ../hal/ghaldrive.c:728
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "Lỗi đẩy ra vật chứa; một hay nhiều khối tin trên vật chứa vẫn còn bận."
+
+#: ../hal/ghalmount.c:311
+#: ../hal/ghalvolume.c:164
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kB"
+
+#: ../hal/ghalmount.c:316
+#: ../hal/ghalvolume.c:169
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: ../hal/ghalmount.c:321
+#: ../hal/ghalvolume.c:174
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#: ../hal/ghalmount.c:443
+#: ../hal/ghalvolume.c:275
+msgid "Mixed Audio/Data Disc"
+msgstr "Đĩa hỗn hợp Âm thanh/Dữ liệu"
+
+#: ../hal/ghalmount.c:456
+#: ../hal/ghalvolume.c:286
+#, c-format
+#. Translators: %s is the size of the mount (e.g. 512 MB)
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+msgid "%s Media"
+msgstr "Vật chứa %s"
+
+#: ../hal/ghalvolume.c:263
+#, c-format
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+msgid "%s Encrypted Data"
+msgstr "Dữ liệu mật mã %s"
+
+#: ../hal/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "Đĩa CD-ROM"
+
+#: ../hal/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "Đĩa CD-ROM trắng"
+
+#: ../hal/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "Đĩa CD-R"
+
+#: ../hal/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "Đĩa CD-R trắng"
+
+#: ../hal/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "Đĩa CD-RW"
+
+#: ../hal/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "Đĩa CD-RW trắng"
+
+#: ../hal/hal-utils.c:43
+#: ../hal/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "Đĩa DVD-ROM"
+
+#: ../hal/hal-utils.c:43
+#: ../hal/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "Đĩa DVD-ROM trắng"
+
+#: ../hal/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "Đĩa DVD-RAM"
+
+#: ../hal/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "Đĩa DVD-RAM trắng"
+
+#: ../hal/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "Đĩa DVD-RW"
+
+#: ../hal/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "Đĩa DVD-RW trắng"
+
+#: ../hal/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "Đĩa DVD+R"
+
+#: ../hal/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "Đĩa DVD+R trắng"
+
+#: ../hal/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "Đĩa DVD+RW"
+
+#: ../hal/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "Đĩa DVD+RW trắng"
+
+#: ../hal/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "Đĩa DVD+R DL"
+
+#: ../hal/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "Đĩa DVD+R DL trắng"
+
+#: ../hal/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "Đĩa Blu-Ray"
+
+#: ../hal/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "Đĩa Blu-Ray trắng"
+
+#: ../hal/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "Đĩa Blu-Ray R trắng"
+
+#: ../hal/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "Đĩa Blu-Ray R trắng"
+
+#: ../hal/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "Đĩa Blu-Ray RW"
+
+#: ../hal/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Đĩa Blu-Ray RW trắng"
+
+#: ../hal/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "Đĩa HD DVD"
+
+#: ../hal/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "Đĩa HD DVD trắng"
+
+#: ../hal/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "Đĩa HD DVD-R"
+
+#: ../hal/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "Đĩa HD DVD-R trắng"
+
+#: ../hal/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "Đĩa HD DVD-RW"
+
+#: ../hal/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "Đĩa HD DVD-RW trắng"
+
+#: ../hal/hal-utils.c:56
+msgid "MO Disc"
+msgstr "Đĩa MO"
+
+#: ../hal/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "Đĩa MO trắng"
+
+#: ../hal/hal-utils.c:57
+msgid "Disc"
+msgstr "Đĩa"
+
+#: ../hal/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "Đĩa trắng"
+
+#: ../programs/gvfs-cat.c:57
+#, c-format
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: gặp lỗi khi mở tập tin: %s\n"
+
+#: ../programs/gvfs-cat.c:80
+#, c-format
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, gặp lỗi khi ghi vào đầu ra tiêu chuẩn"
+
+#: ../programs/gvfs-cat.c:92
+#, c-format
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: lỗi đọc: %s\n"
+
+#: ../programs/gvfs-cat.c:110
+#, c-format
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s: lỗi đóng: %s\n"
+
+#: ../programs/gvfs-cat.c:136
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "VỊ TRÍ... — ghép nối các VỊ TRÍ ra đầu ra tiêu chuẩn."
+
+#: ../programs/gvfs-cat.c:141
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr "Ghép nối các tập tin ở vị trí, và in ra đầu ra tiêu chuẩn (stdout). Chạy đúng như tiện ích cat truyền thống, nhưng dùng vị trí gvfs thay cho tập tin cục bộ. Ví dụ, bạn có thể sử dụng cái gì như « smb://máy/tài_nguyên/tập_tin.txt » làm vị trí cần ghép nối."
+
+#: ../programs/gvfs-cat.c:148
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr "Ghi chú : chỉ gửi dữ liệu qua ống dẫn cho tiện ích cat nếu bạn cần dùng tùy chọn định dạng của nó (v.d. « -n », « -T »)."
+
+#: ../programs/gvfs-cat.c:174
+#: ../programs/gvfs-open.c:142
+#, c-format
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+msgid "%s: missing locations"
+msgstr "%s: thiếu vị trí"
+
+#: ../programs/gvfs-open.c:56
+#, c-format
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: gặp lỗi khi mở vị trí: %s\n"
+
+#: ../programs/gvfs-open.c:83
+#, c-format
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: gặp lỗi khi khởi chạy ứng dụng: %s\n"
+
+#: ../programs/gvfs-open.c:113
+msgid "FILES... - open FILES with registered application."
+msgstr "TẬP TIN... — mở các TẬP TIN dùng ứng dụng đã đăng ký."
+
+#: ../programs/gvfs-open.c:117
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr "Mở (các) tập tin bằng ứng dụng mặc định được đăng ký để xử lý tập tin kiểu đó."
