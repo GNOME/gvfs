@@ -1520,6 +1520,22 @@ update_cameras (GHalVolumeMonitor *monitor,
       GFile *foreign_mount_root;
       int usb_bus_num;
       int usb_device_num;
+      gboolean found;
+
+      /* Look for the device in the added volumes, so as
+       * not to add devices that are both audio players, and cameras */
+      found = FALSE;
+      for (ll = *added_volumes; ll; ll = ll->next)
+        {
+	  if (g_hal_volume_has_udi (ll->data, hal_device_get_udi (d)) != FALSE)
+	    {
+	      found = TRUE;
+	      break;
+	    }
+	}
+
+      if (found)
+        continue;
 
       usb_bus_num = hal_device_get_property_int (d, "usb.bus_number");
       usb_device_num = hal_device_get_property_int (d, "usb.linux.device_number");

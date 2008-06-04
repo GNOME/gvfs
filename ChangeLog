@@ -1,3 +1,11 @@
+2008-06-04  Bastien Nocera  <hadess@hadess.net>
+
+	* hal/ghalvolumemonitor.c (update_cameras): Don't add
+	devices that are both audio players and cameras twice,
+	as it causes 1) error messages when plugging in (it tries to
+	mount the device another time) 2) weird behaviour in
+	nautilus' computer:/ (See #536601)
+
 2008-06-03  Hans Petter Jansson  <hpj@novell.com>
 
 	* configure.ac: Post-release bump to 0.99.2.
