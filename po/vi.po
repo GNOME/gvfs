@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs GNOME TRUNK\n"
+"Project-Id-Version: gvfs 0.99.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-06-02 04:11+0000\n"
-"PO-Revision-Date: 2008-06-02 22:10+0930\n"
+"PO-Revision-Date: 2008-06-05 18:53+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -362,7 +362,7 @@ msgstr[0] "Hệ thống tập tin đang bận: %d tập tin còn mở"
 #: ../daemon/gvfsbackendcdda.c:547
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr "Không có tập tin như vậy trên ồ đĩa %s"
+msgstr "Không có tập tin %s như vậy trên ồ đĩa %s"
 
 #: ../daemon/gvfsbackendcdda.c:656
 #, c-format
