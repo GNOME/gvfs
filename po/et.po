@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-28 04:18+0000\n"
-"PO-Revision-Date: 2008-05-19 17:10+0300\n"
+"PO-Revision-Date: 2008-06-04 20:24+0300\n"
 "Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
@@ -637,7 +637,7 @@ msgstr "Kohalik võrk"
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:862
 msgid "Network Location Monitor"
-msgstr ""
+msgstr "Võrguasukoha monitoorija"
 
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
 #: ../daemon/gvfsbackendobexftp.c:444 ../daemon/gvfsbackendsmb.c:510
@@ -1095,7 +1095,7 @@ msgstr "Jaz-ajam"
 
 #: ../hal/ghaldrive.c:228
 msgid "Thumb Drive"
-msgstr ""
+msgstr "Mälupulk"
 
 #: ../hal/ghaldrive.c:231
 msgid "Mass Storage Drive"
