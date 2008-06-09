@@ -135,6 +135,8 @@ fl_parser_start_node_cb (void        *user_data,
 
 		icon = g_content_type_get_icon (g_file_info_get_content_type (info));
 		if (icon != NULL) {
+			if (G_IS_THEMED_ICON (icon))
+				g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
 			g_file_info_set_icon (info, icon);
 			g_object_unref (icon);
 		}

@@ -1,3 +1,10 @@
+2008-06-09  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb): 
+	Patch from Tomáš Bžatek <tbzatek@redhat.com> to fix the fugly icons
+	when the mime-type of a file isn't known to us. See:
+	https://bugzilla.redhat.com/show_bug.cgi?id=450453
+
 2008-06-04  Bastien Nocera  <hadess@hadess.net>
 
 	* hal/ghalvolumemonitor.c (update_cameras): Don't add
