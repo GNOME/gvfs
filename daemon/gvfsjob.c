@@ -247,17 +247,26 @@ g_vfs_job_failed (GVfsJob *job,
   va_list args;
   char *message;
 
+  va_start (args, format);
+  message = g_strdup_vprintf (format, args);
+  va_end (args);
+
+  g_vfs_job_failed_literal (job, domain, code, message);
+  g_free (message);
+}
+
+void
+g_vfs_job_failed_literal (GVfsJob *job,
+                          GQuark        domain,
+                          gint          code,
+                          const gchar  *message)
+{
   if (job->failed)
     return;
 
   job->failed = TRUE;
 
-  va_start (args, format);
-  message = g_strdup_vprintf (format, args);
-  va_end (args);
-
-  job->error = g_error_new (domain, code, message);
-  g_free (message);
+  job->error = g_error_new_literal (domain, code, message);
 
   g_vfs_job_send_reply (job);
 }

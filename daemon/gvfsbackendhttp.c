@@ -230,8 +230,8 @@ g_vfs_job_failed_from_http_status (GVfsJob *job, guint status_code, const char *
   switch (status_code) {
 
   case SOUP_STATUS_NOT_FOUND:
-    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                      message);
+    g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                              message);
     break;
 
   case SOUP_STATUS_UNAUTHORIZED:
@@ -340,10 +340,10 @@ open_for_read_ready (GObject      *source_object,
                                        &error);
   if (res == FALSE)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        error->domain,
-                        error->code,
-                        error->message);
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                error->domain,
+                                error->code,
+                                error->message);
 
       g_error_free (error);
       return;
@@ -401,10 +401,10 @@ read_ready (GObject      *source_object,
 
   if (nread < 0)
    {
-     g_vfs_job_failed (G_VFS_JOB (job),
-                       error->domain,
-                       error->code,
-                       error->message);
+     g_vfs_job_failed_literal (G_VFS_JOB (job),
+                               error->domain,
+                               error->code,
+                               error->message);
 
      g_error_free (error);
      return;
@@ -451,10 +451,10 @@ try_seek_on_read (GVfsBackend *backend,
   if (!g_seekable_seek (G_SEEKABLE (stream), offset, type,
                         G_VFS_JOB (job)->cancellable, &error))
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        error->domain,
-                        error->code,
-                        error->message);
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                error->domain,
+                                error->code,
+                                error->message);
       g_error_free (error);
       return FALSE;
     }
@@ -485,10 +485,10 @@ close_read_ready (GObject      *source_object,
                                      &error);
   if (res == FALSE)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        error->domain,
-                        error->code,
-                        error->message);
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                error->domain,
+                                error->code,
+                                error->message);
 
       g_error_free (error);
     }

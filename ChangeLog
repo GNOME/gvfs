@@ -1,3 +1,20 @@
+2008-06-10  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendarchive.c: (gvfs_archive_pop_job):
+	* daemon/gvfsbackenddav.c: (stat_location), (write_ready),
+	(close_write_ready), (do_make_directory), (do_delete):
+	* daemon/gvfsbackendftp.c:
+	(ftp_connection_set_error_from_response):
+	* daemon/gvfsbackendhttp.c: (g_vfs_job_failed_from_http_status),
+	(open_for_read_ready), (read_ready), (try_seek_on_read),
+	(close_read_ready):
+	* daemon/gvfsbackendobexftp.c: (_query_file_info_helper),
+	(error_occurred_cb), (do_delete):
+	Fix build warnings with GCC 4.3.0 (#537588).
+	* daemon/gvfsjob.c: (g_vfs_job_failed), (g_vfs_job_failed_literal):
+	* daemon/gvfsjob.h:
+	Add g_vfs_job_failed_literal ().
+
 2008-06-09  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb): 

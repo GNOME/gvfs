@@ -180,10 +180,10 @@ gvfs_archive_pop_job (GVfsArchive *archive)
     }
   else if (archive_errno (archive->archive))
     {
-      g_vfs_job_failed (archive->job,
-			G_IO_ERROR,
-			archive_errno (archive->archive),
-			archive_error_string (archive->archive));
+      g_vfs_job_failed_literal (archive->job,
+				G_IO_ERROR,
+				archive_errno (archive->archive),
+				archive_error_string (archive->archive));
     }
   else
     g_vfs_job_succeeded (archive->job);

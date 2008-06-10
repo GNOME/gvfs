@@ -93,6 +93,10 @@ void     g_vfs_job_failed            (GVfsJob     *job,
 				      gint         code,
 				      const gchar *format,
 				      ...) G_GNUC_PRINTF (4, 5);
+void     g_vfs_job_failed_literal    (GVfsJob     *job,
+                                      GQuark       domain,
+                                      gint         code,
+                                      const gchar *message);
 void     g_vfs_job_failed_from_error (GVfsJob     *job,
 				      const GError*error);
 void     g_vfs_job_failed_from_errno (GVfsJob     *job,

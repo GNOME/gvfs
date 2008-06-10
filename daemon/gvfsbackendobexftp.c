@@ -487,7 +487,7 @@ _query_file_info_helper (GVfsBackend *backend,
     {
       g_set_error (error, G_IO_ERROR,
                    G_IO_ERROR_NOT_FOUND,
-                   g_strerror (ENOENT));
+                   "%s", g_strerror (ENOENT));
     }
 
   g_free (basename);
@@ -519,9 +519,9 @@ error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *erro
   if (op_backend->doing_io)
     {
       op_backend->status = ASYNC_ERROR;
-      op_backend->error = g_error_new (DBUS_GERROR,
-                                       DBUS_GERROR_REMOTE_EXCEPTION,
-                                       error_message);
+      op_backend->error = g_error_new_literal (DBUS_GERROR,
+                                               DBUS_GERROR_REMOTE_EXCEPTION,
+                                               error_message);
       g_cond_signal (op_backend->cond);
       g_mutex_unlock (op_backend->mutex);
       return;
@@ -1309,7 +1309,7 @@ do_delete (GVfsBackend *backend,
           g_mutex_unlock (op_backend->mutex);
           g_set_error (&error, G_IO_ERROR,
                        G_IO_ERROR_NOT_EMPTY,
-                       g_strerror (ENOTEMPTY));
+                       "%s", g_strerror (ENOTEMPTY));
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
           return;

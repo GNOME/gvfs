@@ -1133,7 +1133,7 @@ stat_location (GVfsBackend  *backend,
       g_set_error (error,
                    G_IO_ERROR,
                    http_error_code_from_status (status),
-                   msg->reason_phrase);
+                   "%s", msg->reason_phrase);
 
       return FALSE;
     }
@@ -1887,10 +1887,10 @@ write_ready (GObject      *source_object,
 
   if (nwrote < 0)
    {
-     g_vfs_job_failed (G_VFS_JOB (job),
-                       error->domain,
-                       error->code,
-                       error->message);
+     g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              error->domain,
+                              error->code,
+                              error->message);
 
      g_error_free (error);
      return;
@@ -1940,10 +1940,10 @@ close_write_ready (GObject      *source_object,
                                       &error);
   if (res == FALSE)
     {
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        error->domain,
-                        error->code,
-                        error->message);
+      g_vfs_job_failed_literal (G_VFS_JOB (job),
+                                error->domain,
+                                error->code,
+                                error->message);
 
       g_error_free (error);
     }
@@ -1992,9 +1992,9 @@ do_make_directory (GVfsBackend          *backend,
                         G_IO_ERROR_EXISTS,
                         _("Target file already exists"));
     else
-      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                        http_error_code_from_status (status),
-                        msg->reason_phrase);
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+                                http_error_code_from_status (status),
+                                msg->reason_phrase);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2039,10 +2039,10 @@ do_delete (GVfsBackend   *backend,
   status = g_vfs_backend_dav_send_message (backend, msg);
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
-    g_vfs_job_failed (G_VFS_JOB (job),
-                      G_IO_ERROR,
-                      http_error_code_from_status (status),
-                      msg->reason_phrase);
+    g_vfs_job_failed_literal (G_VFS_JOB (job),
+                              G_IO_ERROR,
+                              http_error_code_from_status (status),
+                              msg->reason_phrase);
   else
     g_vfs_job_succeeded (G_VFS_JOB (job));
 

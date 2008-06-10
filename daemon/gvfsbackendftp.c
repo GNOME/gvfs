@@ -288,7 +288,7 @@ ftp_connection_set_error_from_response (FtpConnection *conn, guint response)
     }
 
   DEBUG ("error: %s\n", msg);
-  g_set_error (&conn->error, G_IO_ERROR, code, msg);
+  g_set_error (&conn->error, G_IO_ERROR, code, "%s", msg);
 }
 
 /**
