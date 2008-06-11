@@ -147,17 +147,21 @@ escape_pathname (const char *dir)
   while (*dir == '/')
     dir++;
 
-  /* Underscores are doubled, count them */
+  /* count characters that need to be escaped. */
   count = 0;
   p = dir;
   while (*p)
     {
       if (*p == '_')
         count++;
+      if (*p == '/')
+        count++;
+      if (*p == '%')
+        count++;
       p++;
     }
   
-  res = g_malloc (strlen (dir) + count + 1);
+  res = g_malloc (strlen (dir) + count*2 + 1);
   
   p = dir;
   d = res;
@@ -166,17 +170,26 @@ escape_pathname (const char *dir)
       c = *p++;
       if (c == '_')
         {
-          *d++ = '_';
-          *d++ = '_';
+          *d++ = '%';
+          *d++ = '5';
+          *d++ = 'f';
         }
       else if (c == '/')
         {
-          *d++ = '_';
+          *d++ = '%';
+          *d++ = '2';
+          *d++ = 'f';
           
           /* Skip consecutive slashes, they are unnecessary,
              and break our escaping */
           while (*p == '/')
             p++;
+        }
+      else if (c == '%')
+        {
+          *d++ = '%';
+          *d++ = '2';
+          *d++ = '5';
         }
       else
         *d++ = c;
@@ -215,20 +228,22 @@ unescape_pathname (const char *escaped_dir, int len)
   while (p < end)
     {
       c = *p++;
-      if (c == '_')
+      if (c == '%' && p < (end-1))
         {
-          if (p == end)
-            *d++ = '_';
-          else
+          if (*(p) == '2' && *(p+1) == 'f')
             {
-              c = *p;
-              if (c == '_')
-                {
-                  p++;
-                  *d++ = '_';
-                }
-              else
-                *d++ = '/';
+              *d++ = '/';
+              p+=2;
+            }
+          else if (*(p) == '2' && *(p+1) == '5')
+            {
+              *d++ = '%';
+              p+=2;
+            }
+          else if (*(p) == '5' && *(p+1) == 'f')
+            {
+              *d++ = '_';
+              p+=2;
             }
         }
       else

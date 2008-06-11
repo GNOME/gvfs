@@ -1,3 +1,10 @@
+2008-06-11  A. Walton  <awalton@gnome.org>
+
+	* daemon/gvfsbackendtrash.c (escape_pathname), (unescape_pathname):
+	Use hex escapes in the trash backend. 
+	Patch by Andreas Henriksson.
+	Fixes bug #523139.
+
 2008-06-11  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendftp.c:
