@@ -1,3 +1,9 @@
+2008-06-11  Tomas Bzatek  <tbzatek@redhat.com>
+
+        * daemon/gvfsbackendftp.c:
+        Fix recursive copy of directories (#522933)
+        Introduce new error 550 handling framework
+
 2008-05-28  Tomas Bzatek  <tbzatek@redhat.com>
 
         * daemon/gvfsbackendsmb.c: (do_open_for_read):
