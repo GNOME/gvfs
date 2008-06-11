@@ -134,6 +134,8 @@ G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
 
 #define STATUS_GROUP(status) ((status) / 100)
 
+typedef void (* Ftp550Handler) (FtpConnection *conn, const FtpFile *file);
+
 /*** FTP CONNECTION ***/
 
 struct _FtpConnection
@@ -249,8 +251,8 @@ ftp_connection_set_error_from_response (FtpConnection *conn, guint response)
       case 550: /* Requested action not taken. File unavailable (e.g., file not found, no access). */
 	/* FIXME: This is a lot of different errors. So we have to pretend to 
 	 * be smart here. */
-	code = G_IO_ERROR_NOT_FOUND;
-	msg = _("File unavailable");
+	code = G_IO_ERROR_FAILED;
+	msg = _("Operation failed");
 	break;
       case 451: /* Requested action aborted: local error in processing. */
 	code = G_IO_ERROR_FAILED;
@@ -297,6 +299,7 @@ ftp_connection_set_error_from_response (FtpConnection *conn, guint response)
  * RESPONSE_PASS_300: Don't treat 3XX responses, but return them
  * RESPONSE_PASS_400: Don't treat 4XX responses, but return them
  * RESPONSE_PASS_500: Don't treat 5XX responses, but return them
+ * RESPONSE_PASS_550: Don't treat 550 responses, but return them
  * RESPONSE_FAIL_200: Fail on a 2XX response
  */
 
@@ -305,7 +308,8 @@ typedef enum {
   RESPONSE_PASS_300 = (1 << 1),
   RESPONSE_PASS_400 = (1 << 2),
   RESPONSE_PASS_500 = (1 << 3),
-  RESPONSE_FAIL_200 = (1 << 4)
+  RESPONSE_PASS_550 = (1 << 4),
+  RESPONSE_FAIL_200 = (1 << 5)
 } ResponseFlags;
 
 /**
@@ -459,7 +463,7 @@ ftp_connection_receive (FtpConnection *conn,
 	return 0;
 	break;
       case 5:
-	if (flags & RESPONSE_PASS_500)
+	if ((flags & RESPONSE_PASS_500) || (response == 550 && (flags & RESPONSE_PASS_550)))
 	  break;
 	ftp_connection_set_error_from_response (conn, response);
 	return 0;
@@ -560,6 +564,57 @@ ftp_connection_send (FtpConnection *conn,
 				   format,
 				   varargs);
   va_end (varargs);
+  return response;
+}
+
+static void
+ftp_connection_check_file (FtpConnection *conn,
+                           const Ftp550Handler *handlers,
+                           const FtpFile *file)
+{
+  while (*handlers && !ftp_connection_in_error (conn))
+    {
+      (*handlers) (conn, file);
+      handlers++;
+    }
+}
+
+static guint
+ftp_connection_send_and_check (FtpConnection *conn,
+                               ResponseFlags flags,
+                               const Ftp550Handler *handlers,
+                               const FtpFile *file,
+                               const char *format,
+                               ...) G_GNUC_PRINTF (5, 6);
+static guint
+ftp_connection_send_and_check (FtpConnection *conn,
+                               ResponseFlags flags,
+                               const Ftp550Handler *handlers,
+                               const FtpFile *file,
+                               const char *format,
+                               ...)
+{
+  va_list varargs;
+  guint response;
+
+  /* check that there's no 550 handling used - don't allow bad use of API */
+  g_return_val_if_fail ((flags & RESPONSE_PASS_550) == 0, 0);
+  g_return_val_if_fail (handlers != NULL, 0);
+  g_return_val_if_fail (file != NULL, 0);
+
+  va_start (varargs, format);
+  response = ftp_connection_sendv (conn,
+                                   flags | RESPONSE_PASS_550,
+                                   format,
+                                   varargs);
+  va_end (varargs);
+  if (response == 550)
+    {
+      ftp_connection_check_file (conn, handlers, file);
+      if (!ftp_connection_in_error (conn))
+          ftp_connection_set_error_from_response (conn, response);
+      response = 0;
+    }
   return response;
 }
 
@@ -1461,6 +1516,21 @@ do_unmount (GVfsBackend *   backend,
 }
 
 static void
+error_550_is_directory (FtpConnection *conn, const FtpFile *file)
+{
+  guint response = ftp_connection_send (conn, 
+                                        RESPONSE_PASS_550,
+                                        "CWD %s", file);
+
+  if (STATUS_GROUP (response) == 2)
+    {
+      g_set_error (&conn->error, G_IO_ERROR, 
+                   G_IO_ERROR_IS_DIRECTORY,
+                   _("File is directory"));
+    }
+}
+
+static void
 do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
 		  const char *filename)
@@ -1468,6 +1538,7 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   FtpFile *file;
+  static const Ftp550Handler open_read_handlers[] = { error_550_is_directory, NULL };
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (!conn)
@@ -1476,9 +1547,11 @@ do_open_for_read (GVfsBackend *backend,
   ftp_connection_ensure_data_connection (conn);
 
   file = ftp_filename_from_gvfs_path (conn, filename);
-  ftp_connection_send (conn,
-		       RESPONSE_PASS_100 | RESPONSE_FAIL_200,
-		       "RETR %s", file);
+  ftp_connection_send_and_check (conn,
+		                 RESPONSE_PASS_100 | RESPONSE_FAIL_200, 
+		                 &open_read_handlers[0],
+		                 file,
+		                 "RETR %s", file);
   g_free (file);
 
   if (ftp_connection_in_error (conn))

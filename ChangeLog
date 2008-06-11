@@ -1,3 +1,9 @@
+2008-06-11  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendftp.c:
+	Fix recursive copy of directories (#522933)
+	Introduce new error 550 handling framework
+
 2008-06-10  Cosimo Cecchi  <cosimoc@gnome.org>
 
 	* daemon/gvfsbackendarchive.c: (gvfs_archive_pop_job):
