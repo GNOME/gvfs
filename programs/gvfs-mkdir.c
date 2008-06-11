@@ -23,11 +23,14 @@
 #include <config.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <locale.h>
 #include <gio/gio.h>
 
+static gboolean parent = FALSE;
 static GOptionEntry entries[] = 
 {
+	{ "parent", 'p', 0, G_OPTION_ARG_NONE, &parent, "create parent directories", NULL },
 	{ NULL }
 };
 
@@ -48,21 +51,44 @@ main (int argc, char *argv[])
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
+
+  if (error != NULL)
+    {
+      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr ("\n");
+      g_printerr (_("Try \"%s --help\" for more information."),
+                  g_get_prgname ());
+      g_printerr ("\n");
+      g_error_free(error);
+      return 1;
+    }
   
   if (argc > 1)
     {
       int i;
       
-      for (i = 1; i < argc; i++) {
-	file = g_file_new_for_commandline_arg (argv[i]);
-	error = NULL;
-	if (!g_file_make_directory (file, NULL, &error))
-	  {
-	    g_print ("Error creating directory: %s\n", error->message);
-	    g_error_free (error);
-	  }
-	g_object_unref (file);
-      }
+      for (i = 1; i < argc; i++) 
+        {
+	  file = g_file_new_for_commandline_arg (argv[i]);
+          error = NULL;
+          if (parent)
+            {
+               if (!g_file_make_directory_with_parents (file, NULL, &error))
+	        {
+	          g_print ("Error creating directory: %s\n", error->message);
+	          g_error_free (error);
+	        } 
+            }
+          else
+            {
+	      if (!g_file_make_directory (file, NULL, &error))
+	        {
+	          g_print ("Error creating directory: %s\n", error->message);
+	          g_error_free (error);
+	        }
+              g_object_unref (file);
+            }
+        }
     }
 
   return 0;

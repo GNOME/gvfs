@@ -1,3 +1,10 @@
+2008-06-11  Ross Burton  <ross@burtonini.com>
+
+	* programs/gvfs-mkdir.c:
+	Add -p to create parents (using
+	g_file_make_directory_with_parents, just landed in glib).  Patch
+	from A Walton (#511367)
+
 2008-06-11  A. Walton  <awalton@gnome.org>
 
 	* daemon/gvfsbackendtrash.c (escape_pathname), (unescape_pathname):
