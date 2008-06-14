@@ -69,6 +69,7 @@ programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c
 programs/gvfs-ls.c
+programs/gvfs-mkdir.c
 programs/gvfs-move.c
 programs/gvfs-open.c
 programs/gvfs-save.c
