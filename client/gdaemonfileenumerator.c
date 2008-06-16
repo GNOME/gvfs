@@ -112,11 +112,13 @@ g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 }
 
 GDaemonFileEnumerator *
-g_daemon_file_enumerator_new (void)
+g_daemon_file_enumerator_new (GFile *file)
 {
   GDaemonFileEnumerator *daemon;
 
-  daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR, NULL);
+  daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR,
+                         "container", file,
+                         NULL);
   
   return daemon;
 }

@@ -709,7 +709,7 @@ g_daemon_file_enumerate_children (GFile      *file,
   DBusConnection *connection;
   char *uri;
 
-  enumerator = g_daemon_file_enumerator_new ();
+  enumerator = g_daemon_file_enumerator_new (file);
   obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
 
 
@@ -2425,7 +2425,7 @@ g_daemon_file_enumerate_children_async (GFile                      *file,
   GDaemonFileEnumerator *enumerator;
   char *uri;
 
-  enumerator = g_daemon_file_enumerator_new ();
+  enumerator = g_daemon_file_enumerator_new (file);
   obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
 
   uri = g_file_get_uri (file);

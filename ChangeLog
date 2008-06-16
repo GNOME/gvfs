@@ -1,3 +1,14 @@
+2008-06-16  Ross Burton  <ross@burtonini.com>
+
+	Bug 536252 – GFileEnumerator should allow access to the containing
+	GFile
+	
+	* client/gdaemonfile.c:
+	* client/gdaemonfileenumerator.c:
+	* client/gdaemonfileenumerator.h:
+	Pass the GFile to the file enumerator constructor and use it to
+	set the container property.  (Requires glib r7044)
+
 2008-06-11  Ross Burton  <ross@burtonini.com>
 
 	* programs/gvfs-mkdir.c:
