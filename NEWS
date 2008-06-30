@@ -1,3 +1,7 @@
+Major changes in 0.2.5:
+* Fix unremovable files in trash (#523139).
+* Fix recursive copy of directories (#522933).
+
 Major changes in 0.2.4:
 * Fix fuse locking and file handle life-cycle issues that 
   were causing frequent crashes.

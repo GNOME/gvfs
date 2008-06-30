@@ -58,7 +58,7 @@ DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
 dnl **** gio module path handling ****
-giomodulesdir=`pkg-config --variable=giomoduledir gio-2.0`
+giomodulesdir=`pkg-config --define-variable=libdir=$libdir --variable=giomoduledir gio-2.0`
 AC_SUBST(giomodulesdir)
 
 dnl ****************************
