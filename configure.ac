@@ -214,10 +214,13 @@ if test "x$enable_hal" != "xno"; then
   if test "x$msg_hal" == "xyes"; then
     PKG_CHECK_MODULES([HAL],[hal >= $HAL_REQUIRED])
     AC_DEFINE(HAVE_HAL, 1, [Define to 1 if HAL is available])
+    save_libs="$LIBS"
+    LIBS="$HAL_LIBS"
     AC_CHECK_LIB(hal, libhal_get_all_devices_with_properties, have_hal_fast_init=yes)
     if test "x$have_hal_fast_init" == "xyes"; then
       AC_DEFINE(HAVE_HAL_FAST_INIT, 1, [Define to 1 if libhal_get_all_devices_with_properties is available])
     fi
+    LIBS="$save_libs"
   fi
 fi
 

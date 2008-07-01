@@ -1,3 +1,8 @@
+2008-07-01  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Correctly check the right libhal for hal features.
+	Patch from Andreas Rottmann <a.rottmann@gmx.at> (#537149)
+
 2008-06-16  Ross Burton  <ross@burtonini.com>
 
 	Bug 536252 – GFileEnumerator should allow access to the containing
