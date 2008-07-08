@@ -1,5 +1,9 @@
 2008-07-08  David Zeuthen  <davidz@redhat.com>
 
+	* monitor/hal/Makefile.am: Fix 'make distcheck'.
+
+2008-07-08  David Zeuthen  <davidz@redhat.com>
+
 	* configure.in:
 	* Makefile.am:
 	* hal/*:

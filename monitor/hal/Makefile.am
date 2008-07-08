@@ -57,6 +57,6 @@ $(service_DATA): $(service_in_files) Makefile
 	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 clean-local:
-	rm -f *~ *.loT $(BUILT_SOURCES)
+	rm -f *~ *.loT $(BUILT_SOURCES) $(service_DATA)
 
-EXTRA_DIST = hal-marshal.list $(service_in_files)
+EXTRA_DIST = hal-marshal.list $(service_in_files) hal.monitor

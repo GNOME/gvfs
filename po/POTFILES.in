@@ -60,11 +60,11 @@ daemon/gvfsjobupload.c
 daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
-hal/ghaldrive.c
-hal/ghalmount.c
-hal/ghalvolume.c
-hal/ghalvolumemonitor.c
-hal/hal-utils.c
+monitor/hal/ghaldrive.c
+monitor/hal/ghalmount.c
+monitor/hal/ghalvolume.c
+monitor/hal/ghalvolumemonitor.c
+monitor/hal/hal-utils.c
 programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c
