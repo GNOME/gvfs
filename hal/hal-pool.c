@@ -47,7 +47,7 @@ struct _HalPoolPrivate
   GHashTable *devices;
 };
 
-G_DEFINE_DYNAMIC_TYPE (HalPool, hal_pool, G_TYPE_OBJECT)
+G_DEFINE_TYPE (HalPool, hal_pool, G_TYPE_OBJECT)
 
 static void
 hal_pool_finalize (HalPool *pool)
@@ -117,12 +117,6 @@ hal_pool_class_init (HalPoolClass *klass)
                   HAL_TYPE_DEVICE,
                   G_TYPE_STRING,
                   G_TYPE_STRING);
-}
-
-static void
-hal_pool_class_finalize (HalPoolClass *klass)
-{
-  g_type_class_unref (g_type_class_peek (HAL_TYPE_DEVICE));
 }
 
 static void
@@ -461,10 +455,4 @@ hal_pool_find_by_capability (HalPool *pool, const char *capability)
   
  out:
   return devices;
-}
-
-void 
-hal_pool_register (GIOModule *module)
-{
-  hal_pool_register_type (G_TYPE_MODULE (module));
 }

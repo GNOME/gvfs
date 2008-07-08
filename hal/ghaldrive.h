@@ -44,7 +44,6 @@ struct _GHalDriveClass {
 };
 
 GType g_hal_drive_get_type (void) G_GNUC_CONST;
-void  g_hal_drive_register (GIOModule *module);
 
 GHalDrive *g_hal_drive_new          (GVolumeMonitor *volume_monitor,
 				     HalDevice      *device,

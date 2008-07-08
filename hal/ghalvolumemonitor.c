@@ -104,8 +104,7 @@ static void update_cameras           (GHalVolumeMonitor *monitor,
                                       GList **removed_volumes);
 
 
-#define g_hal_volume_monitor_get_type g_hal_volume_monitor_get_type
-G_DEFINE_DYNAMIC_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR)
+G_DEFINE_TYPE (GHalVolumeMonitor, g_hal_volume_monitor, G_TYPE_NATIVE_VOLUME_MONITOR)
 
 static void
 list_free (GList *objects)
@@ -470,16 +469,6 @@ g_hal_volume_monitor_constructor (GType                  type,
 static void
 g_hal_volume_monitor_init (GHalVolumeMonitor *monitor)
 {
-}
-
-static void
-g_hal_volume_monitor_class_finalize (GHalVolumeMonitorClass *klass)
-{
-  if (pool)
-    {
-      g_object_unref (pool);
-      pool = NULL;
-    }
 }
 
 static gboolean
@@ -1567,14 +1556,4 @@ update_cameras (GHalVolumeMonitor *monitor,
   list_free (monitor->last_camera_devices);
   monitor->last_camera_devices = new_camera_devices;
 #endif
-}
-
-void 
-g_hal_volume_monitor_register (GIOModule *module)
-{
-  g_hal_volume_monitor_register_type (G_TYPE_MODULE (module));
-  g_io_extension_point_implement (G_NATIVE_VOLUME_MONITOR_EXTENSION_POINT_NAME,
-				  G_TYPE_HAL_VOLUME_MONITOR,
-				  "hal",
-				  1);
 }

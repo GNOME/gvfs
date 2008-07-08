@@ -1,9 +1,7 @@
 
 NULL =
 
-module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_io_module_(load|unload)'
-
-giomodules_LTLIBRARIES = libgiohal-volume-monitor.la
+libexec_PROGRAMS = gvfs-hal-volume-monitor
 
 BUILT_SOURCES =                                         \
 	hal-marshal.h           hal-marshal.c
@@ -15,9 +13,9 @@ hal-marshal.c: hal-marshal.list
 	echo "#include \"hal-marshal.h\"" > $@ && glib-genmarshal $< --prefix=hal_marshal --body >> $@
 
 
-libgiohal_volume_monitor_la_SOURCES =				\
-	hal-utils.c 		hal-utils.h \
-	hal-module.c					\
+gvfs_hal_volume_monitor_SOURCES =			\
+	hal-utils.c 		hal-utils.h 		\
+	hal-volume-monitor-daemon.c			\
 	hal-marshal.c		hal-marshal.h		\
 	hal-device.c		hal-device.h		\
 	hal-pool.c		hal-pool.h		\
@@ -27,9 +25,10 @@ libgiohal_volume_monitor_la_SOURCES =				\
 	ghalvolumemonitor.c	ghalvolumemonitor.h	\
 	$(NULL)
 
-libgiohal_volume_monitor_la_CFLAGS =		\
+gvfs_hal_volume_monitor_CFLAGS =		\
 	-DG_LOG_DOMAIN=\"GVFS-Hal\"		\
 	-I$(top_srcdir)/common                  \
+	-I$(top_srcdir)/monitor/proxy           \
 	$(GLIB_CFLAGS)                          \
 	$(HAL_CFLAGS)                           \
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
@@ -37,17 +36,27 @@ libgiohal_volume_monitor_la_CFLAGS =		\
 	-DG_DISABLE_DEPRECATED			\
 	$(NULL)
 
-libgiohal_volume_monitor_la_LDFLAGS = \
-	$(module_flags)               \
+gvfs_hal_volume_monitor_LDFLAGS =	\
 	$(NULL)
 
-libgiohal_volume_monitor_la_LIBADD  =		     \
-	$(GLIB_LIBS)                                 \
-	$(HAL_LIBS)                                  \
-	$(top_builddir)/common/libgvfscommon-noin.la \
+gvfs_hal_volume_monitor_LDADD  =		     			      \
+	$(GLIB_LIBS)                                 			      \
+	$(HAL_LIBS)                                  			      \
+	$(top_builddir)/common/libgvfscommon-noin.la 			      \
+	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)
+
+remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors
+remote_volume_monitors_DATA = hal.monitor
+
+servicedir       = $(datadir)/dbus-1/services
+service_in_files = org.gtk.Private.HalVolumeMonitor.service.in
+service_DATA     = $(service_in_files:.service.in=.service)
+
+$(service_DATA): $(service_in_files) Makefile
+	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 clean-local:
 	rm -f *~ *.loT $(BUILT_SOURCES)
 
-EXTRA_DIST = hal-marshal.list
+EXTRA_DIST = hal-marshal.list $(service_in_files)

@@ -39,7 +39,7 @@ enum {
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_DYNAMIC_TYPE (HalDevice, hal_device, G_TYPE_OBJECT)
+G_DEFINE_TYPE (HalDevice, hal_device, G_TYPE_OBJECT)
 
 static void
 hal_device_finalize (HalDevice *device)
@@ -79,11 +79,6 @@ hal_device_class_init (HalDeviceClass *klass)
                   G_TYPE_NONE, 2,
                   G_TYPE_STRING,
                   G_TYPE_STRING);
-}
-
-static void
-hal_device_class_finalize (HalDeviceClass *klass)
-{
 }
 
 static void
@@ -285,12 +280,6 @@ LibHalPropertySet *
 hal_device_get_properties (HalDevice *device)
 {
   return device->priv->properties;
-}
-
-void 
-hal_device_register (GIOModule *module)
-{
-  hal_device_register_type (G_TYPE_MODULE (module));
 }
 
 gboolean

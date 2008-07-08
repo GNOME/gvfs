@@ -1,6 +1,7 @@
-/* GIO - GLib Input, Output and Streaming Library
- * 
- * Copyright (C) 2006-2007 Red Hat, Inc.
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+/* gvfs - extensions for gio
+ *
+ * Copyright (C) 2006-2008 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,28 +28,39 @@
 #include <gmodule.h>
 #include <gio/gio.h>
 
-#include "ghalvolumemonitor.h"
-#include "ghalvolume.h"
-#include "ghalmount.h"
-#include "ghaldrive.h"
-#include "hal-pool.h"
-#include "hal-device.h"
+#include "gproxyvolumemonitor.h"
+#include "gproxyvolume.h"
+#include "gproxymount.h"
+#include "gproxydrive.h"
 
 void
 g_io_module_load (GIOModule *module)
 {
+  /* see gvfsproxyvolumemonitor.c:g_vfs_proxy_volume_monitor_daemon_init() */
+  if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL)
+    goto out;
+
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
-  hal_device_register (module);
-  hal_pool_register (module);
-  g_hal_drive_register (module);
-  g_hal_mount_register (module);
-  g_hal_volume_register (module);
-  g_hal_volume_monitor_register (module);
+  g_proxy_volume_monitor_setup_session_bus_connection ();
+
+  g_proxy_drive_register (module);
+  g_proxy_mount_register (module);
+  g_proxy_volume_register (module);
+  g_proxy_volume_monitor_register (module);
+out:
+  ;
  }
 
 void
 g_io_module_unload (GIOModule *module)
 {
+  if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL)
+    goto out;
+
+  g_proxy_volume_monitor_teardown_session_bus_connection ();
+
+out:
+  ;
 }

@@ -53,9 +53,6 @@ GType g_hal_volume_monitor_get_type (void) G_GNUC_CONST;
 GVolumeMonitor *g_hal_volume_monitor_new                          (void);
 void            g_hal_volume_monitor_force_update                 (GHalVolumeMonitor *monitor);
 
-void            g_hal_volume_monitor_register                     (GIOModule         *module);
-
-
 G_END_DECLS
 
 #endif /* __G_HAL_VOLUME_MONITOR_H__ */

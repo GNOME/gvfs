@@ -44,7 +44,6 @@ struct _GHalMountClass {
 };
 
 GType g_hal_mount_get_type (void) G_GNUC_CONST;
-void  g_hal_mount_register (GIOModule *module);
 
 GHalMount *  g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
 						HalDevice         *device,

@@ -68,16 +68,9 @@ struct _GHalVolume {
 
 static void g_hal_volume_volume_iface_init (GVolumeIface *iface);
 
-#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
-  const GInterfaceInfo g_implement_interface_info = { \
-    (GInterfaceInitFunc) iface_init, NULL, NULL \
-  }; \
-  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
-}
-
-G_DEFINE_DYNAMIC_TYPE_EXTENDED (GHalVolume, g_hal_volume, G_TYPE_OBJECT, 0,
-                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_VOLUME,
-                                                                g_hal_volume_volume_iface_init))
+G_DEFINE_TYPE_EXTENDED (GHalVolume, g_hal_volume, G_TYPE_OBJECT, 0,
+                        G_IMPLEMENT_INTERFACE (G_TYPE_VOLUME,
+                                               g_hal_volume_volume_iface_init))
 
 static void
 g_hal_volume_finalize (GObject *object)
@@ -123,11 +116,6 @@ g_hal_volume_class_init (GHalVolumeClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = g_hal_volume_finalize;
-}
-
-static void
-g_hal_volume_class_finalize (GHalVolumeClass *klass)
-{
 }
 
 static void
@@ -1158,6 +1146,14 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   return (char **)g_ptr_array_free (res, FALSE);
 }
 
+static GFile *
+g_hal_volume_get_activation_root (GVolume *volume)
+{
+  GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+
+  return hal_volume->foreign_mount_root != NULL ? g_object_ref (hal_volume->foreign_mount_root) : NULL;
+}
+
 static void
 g_hal_volume_volume_iface_init (GVolumeIface *iface)
 {
@@ -1175,10 +1171,5 @@ g_hal_volume_volume_iface_init (GVolumeIface *iface)
   iface->eject_finish = g_hal_volume_eject_finish;
   iface->get_identifier = g_hal_volume_get_identifier;
   iface->enumerate_identifiers = g_hal_volume_enumerate_identifiers;
-}
-
-void 
-g_hal_volume_register (GIOModule *module)
-{
-  g_hal_volume_register_type (G_TYPE_MODULE (module));
+  iface->get_activation_root = g_hal_volume_get_activation_root;
 }

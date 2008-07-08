@@ -58,16 +58,9 @@ struct _GHalDrive {
 
 static void g_hal_drive_drive_iface_init (GDriveIface *iface);
 
-#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
-  const GInterfaceInfo g_implement_interface_info = { \
-    (GInterfaceInitFunc) iface_init, NULL, NULL \
-  }; \
-  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
-}
-
-G_DEFINE_DYNAMIC_TYPE_EXTENDED (GHalDrive, g_hal_drive, G_TYPE_OBJECT, 0,
-                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_DRIVE,
-                                                                g_hal_drive_drive_iface_init))
+G_DEFINE_TYPE_EXTENDED (GHalDrive, g_hal_drive, G_TYPE_OBJECT, 0,
+                        G_IMPLEMENT_INTERFACE (G_TYPE_DRIVE,
+                                               g_hal_drive_drive_iface_init))
 
 static void
 g_hal_drive_finalize (GObject *object)
@@ -105,11 +98,6 @@ g_hal_drive_class_init (GHalDriveClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = g_hal_drive_finalize;
-}
-
-static void
-g_hal_drive_class_finalize (GHalDriveClass *klass)
-{
 }
 
 static void
@@ -374,7 +362,12 @@ hal_condition (HalDevice *device, const char *name, const char *detail, gpointer
   GHalDrive *hal_drive = G_HAL_DRIVE (user_data);
 
   if (strcmp (name, "EjectPressed") == 0)
-    g_signal_emit_by_name (hal_drive, "eject-button");
+    {
+      g_signal_emit_by_name (hal_drive, "eject-button");
+      if (hal_drive->volume_monitor != NULL)
+        g_signal_emit_by_name (hal_drive->volume_monitor, "drive-eject-button", hal_drive);
+    }
+
 }
 
 static void
@@ -1007,10 +1000,4 @@ g_hal_drive_drive_iface_init (GDriveIface *iface)
   iface->poll_for_media_finish = g_hal_drive_poll_for_media_finish;
   iface->get_identifier = g_hal_drive_get_identifier;
   iface->enumerate_identifiers = g_hal_drive_enumerate_identifiers;
-}
-
-void 
-g_hal_drive_register (GIOModule *module)
-{
-  g_hal_drive_register_type (G_TYPE_MODULE (module));
 }

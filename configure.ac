@@ -554,6 +554,8 @@ Makefile
 common/Makefile
 client/Makefile
 daemon/Makefile
+monitor/Makefile
+monitor/proxy/Makefile
 hal/Makefile
 gconf/Makefile
 programs/Makefile

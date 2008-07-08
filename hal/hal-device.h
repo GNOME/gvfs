@@ -58,7 +58,6 @@ struct _HalDeviceClass
 
 
 GType               hal_device_get_type                    (void);
-void                hal_device_register                    (GIOModule         *module);
 
 HalDevice *         hal_device_new_from_udi                (LibHalContext     *hal_ctx, 
                                                             const char        *udi);

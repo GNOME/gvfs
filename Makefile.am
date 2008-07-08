@@ -4,6 +4,7 @@ SUBDIRS = \
 	common \
 	client \
 	daemon \
+	monitor \
 	gconf \
 	po   \
 	programs \

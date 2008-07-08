@@ -362,6 +362,7 @@ list_volumes (GList *volumes,
   GDrive *drive;
   char *name;
   char *uuid;
+  GFile *activation_root;
   char **ids;
   GIcon *icon;
   
@@ -403,6 +404,15 @@ list_volumes (GList *volumes,
 	  uuid = g_volume_get_uuid (volume);
 	  if (uuid)
 	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
+	  activation_root = g_volume_get_activation_root (volume);
+	  if (activation_root)
+            {
+              char *uri;
+              uri = g_file_get_uri (activation_root);
+              g_print ("%*sactivation_root=%s\n", indent + 2, "", uri);
+              g_free (uri);
+              g_object_unref (activation_root);
+            }
       icon = g_volume_get_icon (volume);
       if (icon)
         {
@@ -437,6 +447,7 @@ list_drives (GList *drives,
   GDrive *drive;
   char *name;
   char **ids;
+  GIcon *icon;
   
   for (c = 0, l = drives; l != NULL; l = l->next, c++)
     {
@@ -461,6 +472,14 @@ list_drives (GList *drives,
 		}
 	    }
 	  g_strfreev (ids);
+
+          icon = g_drive_get_icon (drive);
+          if (icon)
+          {
+                  if (G_IS_THEMED_ICON (icon))
+                          show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+                  g_object_unref (icon);
+          }
 
 	  g_print ("%*sis_media_removable=%d\n", indent + 2, "", g_drive_is_media_removable (drive));
 	  g_print ("%*shas_media=%d\n", indent + 2, "", g_drive_has_media (drive));
@@ -502,6 +521,8 @@ list_monitor_items(void)
   list_mounts (mounts, 0, TRUE);
   g_list_foreach (mounts, (GFunc)g_object_unref, NULL);
   g_list_free (mounts);
+
+  g_object_unref (volume_monitor);
 }
 
 static void
@@ -530,6 +551,7 @@ unmount_all_with_scheme (const char *scheme)
   g_list_foreach (mounts, (GFunc)g_object_unref, NULL);
   g_list_free (mounts);
 
+  g_object_unref (volume_monitor);
 }
 
 int

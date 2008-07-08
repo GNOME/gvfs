@@ -44,7 +44,6 @@ struct _GHalVolumeClass {
 };
 
 GType g_hal_volume_get_type (void) G_GNUC_CONST;
-void  g_hal_volume_register (GIOModule *module);
 
 GHalVolume *g_hal_volume_new            (GVolumeMonitor   *volume_monitor,
 					 HalDevice        *device,

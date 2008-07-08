@@ -1,3 +1,47 @@
+2008-07-08  David Zeuthen  <davidz@redhat.com>
+
+	Provide infrastructure for out of process volume monitors and
+	port the hal volume monitor to use it (#520132).
+
+	* Makefile.am:
+	* configure.ac:
+	Add the monitor and monitor/proxy directories.
+
+	* hal/Makefile.am:
+	Don't build a gio module for the hal volume monitor; instead
+	build a volume monitor daemon.
+
+	* hal/ghaldrive.[ch]:
+	* hal/ghalmount.[ch]:
+	* hal/ghalvolume.[ch]:
+	* hal/ghalvolumemonitor.[ch]:
+	* hal/hal-device.[ch]:
+	* hal/hal-device.[ch]:
+	* hal/hal-pool.[ch]:
+	Make all types static and implement g_volume_get_activation_root()
+	added to gio (#541793). Also emit the drive-eject-button
+	signal (#541794).
+
+	* hal/hal-module.c:
+	Removed since the monitor is being moved out of process.
+
+	* hal/hal-volume-monitor-daemon.c:
+	* hal/hal.monitor:
+	* hal/org.gtk.Private.HalVolumeMonitor.service.in:
+	New files for remote volume monitor.
+
+	* monitor/Makefile.am:
+	New file.
+
+	* monitor/proxy/*:
+	Add proxy volume monitor gio module (the D-Bus client side of
+	out-of-process volume monitors) and a static library for providing
+	the D-Bus server side of out of process volume monitors.
+
+	* programs/gvfs-mount.c:
+	Print activation uri for a volumes and icons for drives.
+	Also unref volume monitor when no longer in use.
+
 2008-07-01  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac: Correctly check the right libhal for hal features.

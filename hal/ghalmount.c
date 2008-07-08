@@ -79,15 +79,9 @@ static GFile *get_root (GHalMount *hal_mount);
 
 static void g_hal_mount_mount_iface_init (GMountIface *iface);
 
-#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
-  const GInterfaceInfo g_implement_interface_info = { \
-    (GInterfaceInitFunc) iface_init, NULL, NULL \
-  }; \
-  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
-}
-G_DEFINE_DYNAMIC_TYPE_EXTENDED (GHalMount, g_hal_mount, G_TYPE_OBJECT, 0, 
-                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_MOUNT,
-                                                                g_hal_mount_mount_iface_init))
+G_DEFINE_TYPE_EXTENDED (GHalMount, g_hal_mount, G_TYPE_OBJECT, 0,
+                        G_IMPLEMENT_INTERFACE (G_TYPE_MOUNT,
+                                               g_hal_mount_mount_iface_init))
 
 static void
 g_hal_mount_finalize (GObject *object)
@@ -132,11 +126,6 @@ g_hal_mount_class_init (GHalMountClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = g_hal_mount_finalize;
-}
-
-static void
-g_hal_mount_class_finalize (GHalMountClass *klass)
-{
 }
 
 static void
@@ -1160,12 +1149,6 @@ g_hal_mount_mount_iface_init (GMountIface *iface)
   iface->unmount_finish = g_hal_mount_unmount_finish;
   iface->eject = g_hal_mount_eject;
   iface->eject_finish = g_hal_mount_eject_finish;
-}
-
-void 
-g_hal_mount_register (GIOModule *module)
-{
-  g_hal_mount_register_type (G_TYPE_MODULE (module));
 }
 
 #define INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK 100
