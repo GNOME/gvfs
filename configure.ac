@@ -556,7 +556,7 @@ client/Makefile
 daemon/Makefile
 monitor/Makefile
 monitor/proxy/Makefile
-hal/Makefile
+monitor/hal/Makefile
 gconf/Makefile
 programs/Makefile
 test/Makefile

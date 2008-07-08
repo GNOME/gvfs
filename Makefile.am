@@ -11,10 +11,6 @@ SUBDIRS = \
 	test \
 	$(NULL)
 
-if USE_HAL
-SUBDIRS += hal
-endif
-
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 EXTRA_DIST = \

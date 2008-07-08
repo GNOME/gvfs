@@ -1,5 +1,14 @@
 2008-07-08  David Zeuthen  <davidz@redhat.com>
 
+	* configure.in:
+	* Makefile.am:
+	* hal/*:
+	* monitor/Makefile.am:
+	* monitor/hal/*:
+	Move hal/ to monitor/hal/.
+
+2008-07-08  David Zeuthen  <davidz@redhat.com>
+
 	Provide infrastructure for out of process volume monitors and
 	port the hal volume monitor to use it (#520132).
 
