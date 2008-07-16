@@ -62,7 +62,7 @@ GProxyMount    *g_proxy_volume_monitor_get_mount_for_id  (GProxyVolumeMonitor *v
 DBusConnection *g_proxy_volume_monitor_get_dbus_connection (GProxyVolumeMonitor *volume_monitor);
 const char     *g_proxy_volume_monitor_get_dbus_name       (GProxyVolumeMonitor *volume_monitor);
 
-void g_proxy_volume_monitor_setup_session_bus_connection (void);
+gboolean g_proxy_volume_monitor_setup_session_bus_connection (void);
 void g_proxy_volume_monitor_teardown_session_bus_connection (void);
 
 

@@ -43,7 +43,8 @@ g_io_module_load (GIOModule *module)
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
-  g_proxy_volume_monitor_setup_session_bus_connection ();
+  if (!g_proxy_volume_monitor_setup_session_bus_connection ())
+    goto out;
 
   g_proxy_drive_register (module);
   g_proxy_mount_register (module);

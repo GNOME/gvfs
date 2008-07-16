@@ -947,10 +947,13 @@ register_volume_monitor (GTypeModule *type_module,
                                   priority);
 }
 
-void
+gboolean
 g_proxy_volume_monitor_setup_session_bus_connection (void)
 {
+  gboolean ret;
   DBusError dbus_error;
+
+  ret = FALSE;
 
   G_LOCK (proxy_vm);
   if (the_session_bus != NULL)
@@ -981,8 +984,11 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
 
   the_volume_monitors = g_hash_table_new_full (g_int_hash, g_int_equal, NULL, NULL);
 
+  ret = TRUE;
+
  out:
   G_UNLOCK (proxy_vm);
+  return ret;
 }
 
 void
