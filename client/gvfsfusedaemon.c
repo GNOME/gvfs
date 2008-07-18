@@ -959,10 +959,14 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
 
               /* Set up a stream here, so we can check for errors */
 
+              g_mutex_lock (fh->mutex);
+
               if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
                 result = setup_output_stream (file, fh);
               else
                 result = setup_input_stream (file, fh);
+
+              g_mutex_unlock (fh->mutex);
 
               /* The added reference to the file handle is released in vfs_release() */
             }
@@ -1047,10 +1051,13 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 
               SET_FILE_HANDLE (fi, fh);
 
-              g_assert (fh->stream == NULL);
+              g_mutex_lock (fh->mutex);
 
+              file_handle_close_stream (fh);
               fh->stream = file_output_stream;
               fh->op = FILE_OP_WRITE;
+
+              g_mutex_unlock (fh->mutex);
 
               /* The added reference to the file handle is released in vfs_release() */
             }
