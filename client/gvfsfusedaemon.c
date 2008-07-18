@@ -311,9 +311,11 @@ reindex_file_handle_for_path (const gchar *old_path, const gchar *new_path)
                                      (gpointer *) &fh))
       goto out;
 
+  g_hash_table_steal (global_fh_table, old_path);
+
   g_free (fh->path);
   fh->path = g_strdup (new_path);
-  g_hash_table_steal (global_fh_table, old_path);
+
   g_hash_table_insert (global_fh_table, fh->path, fh);
 
  out:

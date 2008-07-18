@@ -1,3 +1,9 @@
+2008-07-17  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (reindex_file_handle_for_path): Steal the
+	old file handle record from the global hash table before replacing
+	its path, not after. Part of fix for #536614.
+
 2008-07-16  David Zeuthen  <davidz@redhat.com>
 
 	* monitor/proxy/gproxyvolumemonitor.c:
