@@ -1892,6 +1892,8 @@ g_daemon_file_set_attribute (GFile *file,
 				   NULL, NULL, NULL,
 				   cancellable, &my_error);
 
+  dbus_message_unref (message);
+
   if (reply == NULL)
     {
       if (g_error_matches (my_error, G_VFS_ERROR, G_VFS_ERROR_RETRY))

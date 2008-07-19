@@ -1,3 +1,8 @@
+2008-07-19  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gdaemonfile.c (g_daemon_file_set_attribute): Don't leak
+	D-Bus messages.
+
 2008-07-18  Hans Petter Jansson  <hpj@novell.com>
 
 	* client/gvfsfusedaemon.c (vfs_open)
