@@ -982,7 +982,7 @@ g_proxy_volume_monitor_setup_session_bus_connection (void)
 
   _g_dbus_connection_integrate_with_main (the_session_bus);
 
-  the_volume_monitors = g_hash_table_new_full (g_int_hash, g_int_equal, NULL, NULL);
+  the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
 
   ret = TRUE;
 

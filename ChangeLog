@@ -1,3 +1,10 @@
+2008-07-21  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/proxy/gproxyvolumemonitor.c
+	(g_proxy_volume_monitor_setup_session_bus_connection): Use the
+	correct hash functions for the hash table of existing proxy
+	volume monitors
+
 2008-07-21  Kjartan Maraas  <kmaraas@gnome.org>
 
 	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
