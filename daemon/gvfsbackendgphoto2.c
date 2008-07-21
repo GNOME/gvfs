@@ -673,7 +673,7 @@ compute_icon_name (GVfsBackendGphoto2 *gphoto2_backend)
 
   if (gphoto2_backend->hal_icon_name == NULL)
     {
-      result = g_strdup_printf ("camera");
+      result = g_strdup_printf ("camera-photo");
     }
   else
     {
@@ -870,7 +870,7 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
                                 }
                               else
                                 {
-                                  gphoto2_backend->hal_icon_name = g_strdup ("camera");
+                                  gphoto2_backend->hal_icon_name = g_strdup ("camera-photo");
                                 }
                             }
                         }

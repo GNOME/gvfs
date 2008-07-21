@@ -197,7 +197,7 @@ do_update_from_hal_for_camera (GGPhoto2Volume *v)
   else if (is_audio_player)
     v->icon = g_strdup ("multimedia-player");
   else
-    v->icon = g_strdup ("camera");
+    v->icon = g_strdup ("camera-photo");
 
   g_object_set_data_full (G_OBJECT (v),
                           "hal-storage-device-capabilities",

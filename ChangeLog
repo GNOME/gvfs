@@ -1,5 +1,13 @@
 2008-07-21  David Zeuthen  <davidz@redhat.com>
 
+	* monitor/gphoto2/ggphoto2volume.c (do_update_from_hal_for_camera):
+	* daemon/gvfsbackendgphoto2.c (compute_icon_name):
+	(find_udi_for_device):
+	Use 'camera-photo' rather than just 'camera' since gnome-icon-theme
+	in 2.23/2.24 no longer ships 'camera'. Now the icons look fine again.
+
+2008-07-21  David Zeuthen  <davidz@redhat.com>
+
 	* configure.ac:
 	* monitor/Makefile.am:
 	* monitor/hal/*:
