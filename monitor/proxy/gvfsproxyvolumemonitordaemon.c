@@ -23,6 +23,7 @@
 
 #include <config.h>
 #include <string.h>
+#include <locale.h>
 #include <gio/gio.h>
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
