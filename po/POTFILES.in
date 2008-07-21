@@ -65,6 +65,9 @@ monitor/hal/ghalmount.c
 monitor/hal/ghalvolume.c
 monitor/hal/ghalvolumemonitor.c
 monitor/hal/hal-utils.c
+monitor/gphoto2/ggphoto2volume.c
+monitor/gphoto2/ggphoto2volumemonitor.c
+monitor/gphoto2/hal-utils.c
 programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c

@@ -557,6 +557,7 @@ daemon/Makefile
 monitor/Makefile
 monitor/proxy/Makefile
 monitor/hal/Makefile
+monitor/gphoto2/Makefile
 gconf/Makefile
 programs/Makefile
 test/Makefile

@@ -304,72 +304,6 @@ do_update_from_hal (GHalVolume *mv)
                           (GDestroyNotify) g_free);
 }
 
-#ifdef HAVE_GPHOTO2
-static void
-do_update_from_hal_for_camera (GHalVolume *v)
-{
-  const char *vendor;
-  const char *product;
-  const char *icon_from_hal;
-  const char *name_from_hal;
-  gboolean is_audio_player;
-
-  vendor = hal_device_get_property_string (v->drive_device, "usb_device.vendor");
-  product = hal_device_get_property_string (v->drive_device, "usb_device.product");
-  icon_from_hal = hal_device_get_property_string (v->device, "info.desktop.icon");
-  name_from_hal = hal_device_get_property_string (v->device, "info.desktop.name");
-
-  is_audio_player = hal_device_has_capability (v->device, "portable_audio_player");
-
-  v->name = NULL;
-  if (strlen (name_from_hal) > 0)
-    v->name = g_strdup (name_from_hal);
-  else if (vendor == NULL)
-    {
-      if (product != NULL)
-        v->name = g_strdup (product);
-    }
-  else
-    {
-      if (product != NULL)
-        v->name = g_strdup_printf ("%s %s", vendor, product);
-      else
-        {
-          if (is_audio_player)
-            {
-              /* Translators: %s is the device vendor */
-              v->name = g_strdup_printf (_("%s Audio Player"), vendor);
-            }
-          else
-            {
-              /* Translators: %s is the device vendor */
-              v->name = g_strdup_printf (_("%s Camera"), vendor);
-            }
-        }
-    }
-  if (v->name == NULL)
-    {
-      if (is_audio_player)
-        v->name = g_strdup (_("Audio Player"));
-      else
-        v->name = g_strdup (_("Camera"));
-    }
-
-  if (strlen (icon_from_hal) > 0)
-    v->icon = g_strdup (icon_from_hal);
-  else if (is_audio_player)
-    v->icon = g_strdup ("multimedia-player");
-  else
-    v->icon = g_strdup ("camera");
-  v->mount_path = NULL;
-
-  g_object_set_data_full (G_OBJECT (v), 
-                          "hal-storage-device-capabilities",
-                          dupv_and_uniqify (hal_device_get_property_strlist (v->device, "info.capabilities")),
-                          (GDestroyNotify) g_strfreev);
-}
-#endif
-
 static void
 update_from_hal (GHalVolume *mv, gboolean emit_changed)
 {
@@ -386,16 +320,7 @@ update_from_hal (GHalVolume *mv, gboolean emit_changed)
   g_free (mv->name);
   g_free (mv->icon);
   g_free (mv->mount_path);
-#ifdef HAVE_GPHOTO2
-  if (hal_device_has_capability (mv->device, "camera") || 
-      (hal_device_has_capability (mv->device, "portable_audio_player") &&
-       hal_device_get_property_bool (mv->device, "camera.libgphoto2.support")))
-    do_update_from_hal_for_camera (mv);
-  else
-    do_update_from_hal (mv);
-#else
   do_update_from_hal (mv);
-#endif
 
   if (emit_changed)
     {
@@ -481,32 +406,6 @@ g_hal_volume_new (GVolumeMonitor   *volume_monitor,
       
       device_path = hal_device_get_property_string (device, "block.device");
     }
-#ifdef HAVE_GPHOTO2
-  else if (hal_device_has_capability (device, "camera") ||
-           (hal_device_has_capability (device, "portable_audio_player") &&
-            hal_device_get_property_bool (device, "camera.libgphoto2.support")))
-    {
-
-      /* OK, so we abuse storage_udi and drive_device for the USB main
-       * device that holds this interface... 
-       */
-      storage_udi = hal_device_get_property_string (device, "info.parent");
-      if (storage_udi == NULL)
-        return NULL;
-      
-      drive_device = hal_pool_get_device_by_udi (pool, storage_udi);
-      if (drive_device == NULL)
-        return NULL;
-
-      /* TODO: other OS'es? Will address this with DK aka HAL 2.0 */
-      device_path = hal_device_get_property_string (drive_device, "linux.device_file");
-      if (strlen (device_path) == 0)
-        device_path = NULL;
-
-      if (foreign_mount_root == NULL)
-        return NULL;
-    }
-#endif
   else
     {
       return NULL;

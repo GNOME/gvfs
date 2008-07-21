@@ -1,5 +1,14 @@
 2008-07-21  David Zeuthen  <davidz@redhat.com>
 
+	* configure.ac:
+	* monitor/Makefile.am:
+	* monitor/hal/*:
+	* monitor/gphoto2/*:
+	Separate the hal and gphoto2 volume monitors - this is in part
+	needed to solve bug #520123.
+
+2008-07-21  David Zeuthen  <davidz@redhat.com>
+
 	* monitor/proxy/gproxyvolumemonitor.c
 	(g_proxy_volume_monitor_setup_session_bus_connection): Use the
 	correct hash functions for the hash table of existing proxy
