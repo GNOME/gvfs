@@ -1,3 +1,5 @@
+=== gvfs 0.99.2 ===
+
 2008-07-08  David Zeuthen  <davidz@redhat.com>
 
 	* POTFILES.in: hal/*.c moved to monitor/hal/*.c

@@ -1,5 +1,9 @@
+=== gvfs 0.99.2 ===
+
 2008-07-22  Matthias Clasen  <mclasen@redhat.com>
 
+
+	* Makefile.am: Fix up intltool mess
 	* configure.in: Bump glib requirement to 2.17.4
 	* NEWS: Updates
 
