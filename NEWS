@@ -1,3 +1,11 @@
+Major changes in 0.99.2
+* Move hal and gphoto volume monitors out of process
+* Fix recursive copying
+* Make the fuse daemon more reliable
+* Many smaller bugfixes
+* et (Ivar Smolin), vi (Clytie Siddall), 
+  ar (Djihed Afifi, Khaled Hosny)
+
 Major changes in 0.99.1:
 * Fix directory copy/delete problems
 * Fuse daemon robustness fixes

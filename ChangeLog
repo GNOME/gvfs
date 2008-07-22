@@ -1,3 +1,7 @@
+2008-07-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* NEWS: Updates
+
 2008-07-21  David Zeuthen  <davidz@redhat.com>
 
 	* monitor/gphoto2/ggphoto2volume.c (do_update_from_hal_for_camera):
