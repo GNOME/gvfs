@@ -1,6 +1,7 @@
 Major changes in 0.99.2
 * Move hal and gphoto volume monitors out of process
 * Fix recursive copying
+* Require glib >= 2.17.4
 * Make the fuse daemon more reliable
 * Many smaller bugfixes
 * et (Ivar Smolin), vi (Clytie Siddall), 
