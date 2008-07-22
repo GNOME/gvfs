@@ -1,10 +1,13 @@
+2008-07-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.ac: Post-release bump
+
 === gvfs 0.99.2 ===
 
 2008-07-22  Matthias Clasen  <mclasen@redhat.com>
 
-
 	* Makefile.am: Fix up intltool mess
-	* configure.in: Bump glib requirement to 2.17.4
+	* configure.ac: Bump glib requirement to 2.17.4
 	* NEWS: Updates
 
 2008-07-21  David Zeuthen  <davidz@redhat.com>
