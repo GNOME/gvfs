@@ -98,7 +98,11 @@ g_proxy_volume_monitor_finalize (GObject *object)
   char *match_rule;
   GObjectClass *parent_class;
 
-  parent_class = G_OBJECT_CLASS (G_OBJECT_GET_CLASS (object));
+  /* since GProxyVolumeMonitor is a non-instantiatable type we're dealing with a
+   * sub-type here. So we need to look at the grandparent sub-type to get the
+   * parent class for GProxyVolumeMonitor */
+  parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (
+                                 g_type_class_peek_parent (G_OBJECT_GET_CLASS (object))));
 
   monitor = G_PROXY_VOLUME_MONITOR (object);
 
@@ -108,6 +112,7 @@ g_proxy_volume_monitor_finalize (GObject *object)
 
   dbus_connection_remove_filter (monitor->session_bus, filter_function, monitor);
   match_rule = get_match_rule (monitor);
+  dbus_error_init (&dbus_error);
   dbus_bus_remove_match (monitor->session_bus,
                          match_rule,
                          &dbus_error);
