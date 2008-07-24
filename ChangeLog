@@ -1,3 +1,7 @@
+2008-07-23  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Post-release bump to 0.99.4.
+
 === gvfs 0.99.3 ===
 
 2008-07-23  Hans Petter Jansson  <hpj@novell.com>
