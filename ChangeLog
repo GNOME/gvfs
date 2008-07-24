@@ -1,3 +1,9 @@
+=== gvfs 0.99.3 ===
+
+2008-07-23  Hans Petter Jansson  <hpj@novell.com>
+
+	* NEWS: 0.99.3 update.
+
 2008-07-23  David Zeuthen  <davidz@redhat.com>
 
 	* monitor/proxy/gproxyvolumemonitor.c

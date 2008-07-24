@@ -1,3 +1,6 @@
+Major changes in 0.99.3
+* Fix frequent crasher in volume monitor
+
 Major changes in 0.99.2
 * Move hal and gphoto volume monitors out of process
 * Fix recursive copying
