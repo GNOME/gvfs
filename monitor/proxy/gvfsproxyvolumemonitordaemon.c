@@ -56,9 +56,8 @@ _g_icon_serialize (GIcon *icon)
       uri = g_file_get_uri (file);
       escaped_uri = g_uri_escape_string (uri, NULL, TRUE);
 
-      ret = g_strdup_printf ("GFileIcon %s", escaped_uri);
+      ret = g_strdup_printf ("2 GFileIcon %s", escaped_uri);
 
-      g_object_unref (file);
       g_free (uri);
       g_free (escaped_uri);
     }
@@ -73,7 +72,8 @@ _g_icon_serialize (GIcon *icon)
                     "names", &names,
                     NULL);
 
-      s = g_string_new ("GThemedIcon");
+      s = g_string_new (0); 
+      g_string_append_printf (s, "%d GThemedIcon", g_strv_length (names) + 1);
 
       if (names != NULL)
         {
@@ -90,6 +90,20 @@ _g_icon_serialize (GIcon *icon)
       ret = g_string_free (s, FALSE);
 
       g_strfreev (names);
+    }
+  else if (G_IS_EMBLEMED_ICON (icon))
+    {
+      char *base;
+      char *emblem;
+      int n;
+
+      base = _g_icon_serialize (g_emblemed_icon_get_icon (G_EMBLEMED_ICON (icon)));
+      emblem = _g_icon_serialize (g_emblemed_icon_get_emblem (G_EMBLEMED_ICON (icon)));
+
+      n = atoi (base) + atoi (emblem) + 3;
+      ret = g_strdup_printf ("%d GEmblemedIcon %s %s", n, base, emblem);
+      g_free (base);
+      g_free (emblem);
     }
   else
     {

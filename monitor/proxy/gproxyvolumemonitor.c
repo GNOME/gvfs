@@ -841,36 +841,19 @@ _get_identifiers (DBusMessageIter *iter)
   return hash_table;
 }
 
-GIcon *
-_g_icon_new_from_serialized_data (const char *gicon_data)
+static GIcon *
+_g_icon_new_from_tokens (char **tokens, int num_tokens)
 {
-  char **tokens;
   GIcon *icon;
-  guint num_tokens;
-
-  g_return_val_if_fail (gicon_data != NULL, NULL);
-
+  
   icon = NULL;
-
-  tokens = g_strsplit (gicon_data, " ", 0);
-  num_tokens = g_strv_length (tokens);
-
-  if (num_tokens < 2)
-    {
-      g_warning ("malformed GIcon data \"%s\"", gicon_data);
-      goto out;
-    }
-
   if (strcmp (tokens[0], "GFileIcon") == 0)
     {
       GFile *file;
       char *unescaped_uri;
 
       if (num_tokens != 2)
-        {
-          g_warning ("malformed GFileIcon gicon_data \"%s\"", gicon_data);
-          goto out;
-        }
+        goto out;
 
       unescaped_uri = g_uri_unescape_string (tokens[1], NULL);
       file = g_file_new_for_uri (unescaped_uri);
@@ -882,7 +865,6 @@ _g_icon_new_from_serialized_data (const char *gicon_data)
     {
       int n;
 
-      icon = NULL;
       for (n = 1; n < num_tokens; n++)
         {
           char *unescaped_name;
@@ -895,12 +877,59 @@ _g_icon_new_from_serialized_data (const char *gicon_data)
           g_free (unescaped_name);
         }
     }
-  else
+  else if (strcmp (tokens[0], "GEmblemedIcon") == 0)
     {
-      g_warning ("cannot parse gicon_data \"%s\"; please add support", gicon_data);
+       int n, m;
+       GIcon *base;
+       GIcon *emblem;
+     
+       n = atoi (tokens[1]);
+       if (num_tokens < n + 2)
+         goto out;
+       m = atoi (tokens[n+2]);
+       if (num_tokens < n + m + 3)
+         goto out;
+       
+       base = _g_icon_new_from_tokens (tokens + 2, n);
+       if (base == NULL)
+         goto out;
+       emblem = _g_icon_new_from_tokens (tokens + n + 3, m);
+       if (emblem == NULL)
+         {
+           g_object_unref (base);
+           goto out;
+         }
+       icon = g_emblemed_icon_new (base, emblem);
+       g_object_unref (base);
+       g_object_unref (emblem);
     }
 
  out:
+   return icon;
+}
+
+GIcon *
+_g_icon_new_from_serialized_data (const char *gicon_data)
+{
+  char **tokens;
+  GIcon *icon;
+  gint num_tokens;
+
+  g_return_val_if_fail (gicon_data != NULL, NULL);
+
+  icon = NULL;
+
+  tokens = g_strsplit (gicon_data, " ", 0);
+
+  if (g_strv_length (tokens) >= 3)
+    {
+      num_tokens = atoi (tokens[0]);
+      icon = _g_icon_new_from_tokens (tokens + 1, num_tokens);
+    }
+
+  if (icon == NULL)
+    g_warning ("malformed GIcon data \"%s\"", gicon_data);
+
   g_strfreev (tokens);
   return icon;
 }
