@@ -50,10 +50,10 @@ static struct {
 	char *icon;
 	gpointer handle;
 } dns_sd_types[] = {
-	{"_ftp._tcp", "ftp", "gnome-fs-ftp"},
-	{"_webdav._tcp", "dav", "gnome-fs-share"},
-	{"_webdavs._tcp", "davs", "gnome-fs-share"},
-	{"_sftp-ssh._tcp", "sftp", "gnome-fs-ssh"},
+	{"_ftp._tcp", "ftp", "folder-remote-ftp"},
+	{"_webdav._tcp", "dav", "folder-remote"},
+	{"_webdavs._tcp", "davs", "folder-remote"},
+	{"_sftp-ssh._tcp", "sftp", "folder-remote-ssh"},
 };
 
 static AvahiClient *global_client = NULL;

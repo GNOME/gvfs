@@ -1,5 +1,13 @@
 2008-07-28  Matthias Clasen  <mclasen@redhat.com>
 
+	Bug 545068 – use standard icon names
+
+	* daemon/gvfsbackendburn.c:
+	* daemon/gvfsbackendcomputer.c:
+	* daemon/gvfsbackenddnssd.c: Use standard icon names.
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
 	* configure.ac: Bump GLib requirement to 2.17.5 (for GEmblemedIcon)
 	* gproxyvolumemonitor.c: Handle GEmblemedIcon in deserialization code.
 	* gvfsproxyvolumemonitordaemon.c: Handle GEmblemedIcon in 

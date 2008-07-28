@@ -344,7 +344,7 @@ g_vfs_backend_burn_init (GVfsBackendBurn *burn_backend)
   
   /* Translators: This is the name of the backend */
   g_vfs_backend_set_display_name (backend, _("Burn"));
-  g_vfs_backend_set_icon_name (backend, "gnome-fs-client");
+  g_vfs_backend_set_icon_name (backend, "computer");
   g_vfs_backend_set_user_visible (backend, FALSE);
 
   mount_spec = g_mount_spec_new ("burn");

@@ -177,7 +177,7 @@ g_vfs_backend_computer_init (GVfsBackendComputer *computer_backend)
   GMountSpec *mount_spec;
   
   g_vfs_backend_set_display_name (backend, _("Computer"));
-  g_vfs_backend_set_icon_name (backend, "gnome-fs-client");
+  g_vfs_backend_set_icon_name (backend, "computer");
   g_vfs_backend_set_user_visible (backend, FALSE);
 
   mount_spec = g_mount_spec_new ("computer");
@@ -691,7 +691,7 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_name (info, "/");
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_display_name (info, _("Computer"));
-      icon = g_themed_icon_new ("gnome-fs-client");
+      icon = g_themed_icon_new ("computer");
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
