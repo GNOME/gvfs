@@ -42,6 +42,7 @@ typedef struct {
   volatile int ref_count;
   char *display_name;
   char *stable_name;
+  char *x_content_types;
   char *icon;
   char *dbus_id;
   char *object_path;

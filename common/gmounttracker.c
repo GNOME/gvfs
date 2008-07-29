@@ -115,6 +115,7 @@ g_mount_info_dup (GMountInfo *info)
   copy->ref_count = 1;
   copy->display_name = g_strdup (info->display_name);
   copy->stable_name = g_strdup (info->stable_name);
+  copy->x_content_types = g_strdup (info->x_content_types);
   copy->icon = g_strdup (info->icon);
   copy->dbus_id = g_strdup (info->dbus_id);
   copy->object_path = g_strdup (info->object_path);
@@ -140,6 +141,7 @@ g_mount_info_unref (GMountInfo *info)
     {
       g_free (info->display_name);
       g_free (info->stable_name);
+      g_free (info->x_content_types);
       g_free (info->icon);
       g_free (info->dbus_id);
       g_free (info->object_path);
@@ -184,6 +186,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   dbus_bool_t user_visible;
   char *display_name;
   char *stable_name;
+  char *x_content_types;
   char *icon;
   char *prefered_filename_encoding;
   char *dbus_id;
@@ -200,6 +203,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
 				      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      DBUS_TYPE_STRING, &display_name,
 				      DBUS_TYPE_STRING, &stable_name,
+                                      DBUS_TYPE_STRING, &x_content_types,
 				      DBUS_TYPE_STRING, &icon,
 				      DBUS_TYPE_STRING, &prefered_filename_encoding,
 				      DBUS_TYPE_BOOLEAN, &user_visible,
@@ -217,6 +221,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   info->ref_count = 1;
   info->display_name = g_strdup (display_name);
   info->stable_name = g_strdup (stable_name);
+  info->x_content_types = g_strdup (x_content_types);
   info->icon = g_strdup (icon);
   info->dbus_id = g_strdup (dbus_id);
   info->object_path = g_strdup (obj_path);

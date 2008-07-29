@@ -48,6 +48,7 @@ typedef struct _GProxyMount GProxyMount;
 struct _GProxyVolumeMonitorClass {
   GNativeVolumeMonitorClass parent_class;
   char *dbus_name;
+  gboolean is_native;
 };
 
 GType g_proxy_volume_monitor_get_type (void) G_GNUC_CONST;

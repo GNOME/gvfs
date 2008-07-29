@@ -379,6 +379,8 @@ void        g_vfs_backend_set_display_name               (GVfsBackend        *ba
 							  const char         *display_name);
 void        g_vfs_backend_set_stable_name                (GVfsBackend        *backend,
 							  const char         *stable_name);
+void        g_vfs_backend_set_x_content_types            (GVfsBackend        *backend,
+							  char              **x_content_types);
 void        g_vfs_backend_set_icon_name                  (GVfsBackend        *backend,
 							  const char         *icon);
 void        g_vfs_backend_set_prefered_filename_encoding (GVfsBackend        *backend,
@@ -396,6 +398,7 @@ void        g_vfs_backend_unregister_mount               (GVfsBackend        *ba
 const char *g_vfs_backend_get_backend_type               (GVfsBackend        *backend);
 const char *g_vfs_backend_get_display_name               (GVfsBackend        *backend);
 const char *g_vfs_backend_get_stable_name                (GVfsBackend        *backend);
+char      **g_vfs_backend_get_x_content_types            (GVfsBackend        *backend);
 const char *g_vfs_backend_get_icon_name                  (GVfsBackend        *backend);
 GMountSpec *g_vfs_backend_get_mount_spec                 (GVfsBackend        *backend);
 GVfsDaemon *g_vfs_backend_get_daemon                     (GVfsBackend        *backend);

@@ -31,7 +31,7 @@
  *    - neglible memory + cpu overhead
  *      - will need to construct them at some point
  *    - we can actually implement get_mount_for_mount_path()
- *      correctly
+ *      correctly even when no volume monitor is constructed
  *
  *  - implement support for GMountOperation
  *    - not implemented in the HAL volume monitor and that's all
@@ -264,42 +264,45 @@ static GMount *
 get_mount_for_mount_path (const char *mount_path,
                           GCancellable *cancellable)
 {
-  GType type;
   GMount *mount;
-  GNativeVolumeMonitorClass *klass;
+  GProxyVolumeMonitor *volume_monitor;
+  GProxyVolumeMonitorClass *klass;
+  GHashTableIter vm_hash_iter;
+  GHashTableIter vol_hash_iter;
+  GProxyMount *candidate_mount;
 
   /* This static method on GNativeVolumeMonitor is a *complete* pain
    * in the ass to deal with; we need to rework gio so it's deprecated
    * and thus never will get called.
    *
-   * For now we just implement as badly as the GUnixVolumeMonitor
-   * shipped with gio; e.g. we just return *some* object that
-   * implements GMount and we don't worry about setting the
-   * corresponding volume or ensuring it's the same reference as what
-   * one would normally get.
+   * TODO: we don't handle the case when there's no volume monitor ever
+   * constructed. See TODO at the top of this file on how to handle that.
    */
 
   mount = NULL;
-  klass = NULL;
+  G_LOCK (proxy_vm);
 
-  /* You can't hide types from me
-   *
-   * (read: _g_unix_volume_monitor_get_type() isn't exported)
-   */
-  type = g_type_from_name ("GUnixVolumeMonitor");
-  if (type == 0)
-    goto out;
+  /* First find the native volume monitor if one exists */
+  g_hash_table_iter_init (&vm_hash_iter, the_volume_monitors);
+  while (g_hash_table_iter_next (&vm_hash_iter, NULL, (gpointer) &volume_monitor)) {
+    klass = G_PROXY_VOLUME_MONITOR_CLASS (G_OBJECT_GET_CLASS (volume_monitor));
 
-  klass = G_NATIVE_VOLUME_MONITOR_CLASS (g_type_class_ref (type));
-  if (klass == NULL)
-    goto out;
-
-  if (klass->get_mount_for_mount_path != NULL)
-    mount = klass->get_mount_for_mount_path (mount_path, cancellable);
+    if (klass->is_native) {
+      /* The see if we've got a mount */
+      g_hash_table_iter_init (&vol_hash_iter, volume_monitor->mounts);
+      while (g_hash_table_iter_next (&vol_hash_iter, NULL, (gpointer) &candidate_mount)) {
+        if (g_proxy_mount_has_mount_path (candidate_mount, mount_path))
+          {
+            mount = g_object_ref (candidate_mount);
+            goto out;
+          }
+      }
+      goto out;
+    }
+  }
 
  out:
-  if (klass != NULL)
-    g_type_class_unref (klass);
+  G_UNLOCK (proxy_vm);
   return mount;
 }
 
@@ -418,12 +421,16 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
   GProxyVolumeMonitor *monitor = G_PROXY_VOLUME_MONITOR (user_data);
   DBusMessageIter iter;
   const char *id;
+  const char *the_dbus_name;
   const char *member;
   GProxyDrive *drive;
   GProxyVolume *volume;
   GProxyMount *mount;
+  GProxyVolumeMonitorClass *klass;
 
   G_LOCK (proxy_vm);
+
+  klass = G_PROXY_VOLUME_MONITOR_CLASS (G_OBJECT_GET_CLASS (monitor));
 
   member = dbus_message_get_member (message);
 
@@ -433,8 +440,13 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
       dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveEjectButton")) {
 
     dbus_message_iter_init (message, &iter);
+    dbus_message_iter_get_basic (&iter, &the_dbus_name);
+    dbus_message_iter_next (&iter);
     dbus_message_iter_get_basic (&iter, &id);
     dbus_message_iter_next (&iter);
+
+    if (strcmp (the_dbus_name, klass->dbus_name) != 0)
+      goto not_for_us;
 
     if (strcmp (member, "DriveChanged") == 0)
       {
@@ -484,8 +496,13 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
              dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeRemoved")) {
 
     dbus_message_iter_init (message, &iter);
+    dbus_message_iter_get_basic (&iter, &the_dbus_name);
+    dbus_message_iter_next (&iter);
     dbus_message_iter_get_basic (&iter, &id);
     dbus_message_iter_next (&iter);
+
+    if (strcmp (the_dbus_name, klass->dbus_name) != 0)
+      goto not_for_us;
 
     if (strcmp (member, "VolumeChanged") == 0)
       {
@@ -527,8 +544,13 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
              dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "MountRemoved")) {
 
     dbus_message_iter_init (message, &iter);
+    dbus_message_iter_get_basic (&iter, &the_dbus_name);
+    dbus_message_iter_next (&iter);
     dbus_message_iter_get_basic (&iter, &id);
     dbus_message_iter_next (&iter);
+
+    if (strcmp (the_dbus_name, klass->dbus_name) != 0)
+      goto not_for_us;
 
     if (strcmp (member, "MountChanged") == 0)
       {
@@ -575,6 +597,7 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
 
   }
 
+ not_for_us:
   G_UNLOCK (proxy_vm);
 
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -591,10 +614,27 @@ g_proxy_volume_monitor_class_finalize (GProxyVolumeMonitorClass *klass)
   g_free (klass->dbus_name);
 }
 
+typedef struct {
+  char *dbus_name;
+  gboolean is_native;
+} ProxyClassData;
+
+static ProxyClassData *
+proxy_class_data_new (const char *dbus_name, gboolean is_native)
+{
+  ProxyClassData *data;
+  data = g_new0 (ProxyClassData, 1);
+  data->dbus_name = g_strdup (dbus_name);
+  data->is_native = is_native;
+  return data;
+}
+
 static void
 g_proxy_volume_monitor_class_intern_init_pre (GProxyVolumeMonitorClass *klass, gconstpointer class_data)
 {
-  klass->dbus_name = g_strdup ((char *) class_data);
+  ProxyClassData *data = (ProxyClassData *) class_data;
+  klass->dbus_name = g_strdup (data->dbus_name);
+  klass->is_native = data->is_native;
   g_proxy_volume_monitor_class_intern_init (klass);
 }
 
@@ -961,7 +1001,7 @@ register_volume_monitor (GTypeModule *type_module,
     (GBaseFinalizeFunc) NULL,
     (GClassInitFunc) g_proxy_volume_monitor_class_intern_init_pre,
     (GClassFinalizeFunc) g_proxy_volume_monitor_class_finalize,
-    (gconstpointer) g_strdup (dbus_name),  /* class_data (leaked!) */
+    (gconstpointer) proxy_class_data_new (dbus_name, is_native),  /* class_data (leaked!) */
     sizeof (GProxyVolumeMonitor),
     0,      /* n_preallocs */
     (GInstanceInitFunc) g_proxy_volume_monitor_init,

@@ -357,6 +357,49 @@ g_daemon_mount_eject_finish (GMount        *mount,
   return res;
 }
 
+static char **
+g_daemon_mount_guess_content_type_sync (GMount              *mount,
+                                        gboolean             force_rescan,
+                                        GCancellable        *cancellable,
+                                        GError             **error)
+{
+  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
+  char **result;
+
+  result = NULL;
+  G_LOCK (daemon_mount);
+  if (daemon_mount->mount_info->x_content_types != NULL &&
+      strlen (daemon_mount->mount_info->x_content_types) > 0)
+    result = g_strsplit (daemon_mount->mount_info->x_content_types, " ", 0);
+  G_UNLOCK (daemon_mount);
+
+  return result;
+}
+
+static void
+g_daemon_mount_guess_content_type (GMount              *mount,
+                                   gboolean             force_rescan,
+                                   GCancellable        *cancellable,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
+{
+  GSimpleAsyncResult *simple;
+  simple = g_simple_async_result_new (G_OBJECT (mount),
+                                      callback,
+                                      user_data,
+                                      NULL);
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static char **
+g_daemon_mount_guess_content_type_finish (GMount              *mount,
+                                          GAsyncResult        *result,
+                                          GError             **error)
+{
+  return g_daemon_mount_guess_content_type_sync (mount, FALSE, NULL, error);
+}
+
 static void
 g_daemon_mount_mount_iface_init (GMountIface *iface)
 {
@@ -372,4 +415,7 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->unmount_finish = g_daemon_mount_unmount_finish;
   iface->eject = g_daemon_mount_eject;
   iface->eject_finish = g_daemon_mount_eject_finish;
+  iface->guess_content_type = g_daemon_mount_guess_content_type;
+  iface->guess_content_type_finish = g_daemon_mount_guess_content_type_finish;
+  iface->guess_content_type_sync = g_daemon_mount_guess_content_type_sync;
 }

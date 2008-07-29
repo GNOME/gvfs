@@ -49,7 +49,7 @@ GProxyMount  *g_proxy_mount_new      (GProxyVolumeMonitor *volume_monitor);
 void          g_proxy_mount_update   (GProxyMount         *mount,
                                       DBusMessageIter     *iter);
 const char   *g_proxy_mount_get_id   (GProxyMount         *mount);
-
+gboolean      g_proxy_mount_has_mount_path (GProxyMount *mount, const char *mount_path);
 
 G_END_DECLS
 

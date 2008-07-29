@@ -140,3 +140,32 @@ get_themed_icon_with_fallbacks (const char *icon_name,
   return icon;
 }
 
+char **
+dupv_and_uniqify (char **str_array)
+{
+  int n, m, o;
+  int len;
+  char **result;
+
+  result = g_strdupv (str_array);
+  len = g_strv_length (result);
+
+  for (n = 0; n < len; n++)
+    {
+      char *s = result[n];
+      for (m = n + 1; m < len; m++)
+        {
+          char *p = result[m];
+          if (strcmp (s, p) == 0)
+            {
+              for (o = m + 1; o < len; o++)
+                result[o - 1] = result[o];
+              len--;
+              result[len] = NULL;
+              m--;
+            }
+        }
+    }
+
+  return result;
+}

@@ -1,3 +1,36 @@
+2008-07-29  David Zeuthen  <davidz@redhat.com>
+
+	* client/gdaemonmount.c:
+	* common/gmounttracker.c:
+	* common/gmounttracker.h:
+	* daemon/gvfsbackend.c:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsbackendcdda.c:
+	* daemon/gvfsbackendgphoto2.c:
+	* daemon/mount.c:
+	Add x-content/* support to daemon mounts. Right now a backend
+	can only set the x-content/* type ahead of time. We might want
+	to add support dynamically obtaining it too (e.g. support
+	force_rescan).
+
+	* monitor/hal/ghalmount.c:
+	* monitor/hal/ghalvolume.c:
+	* monitor/hal/ghalvolumemonitor.c:
+	* monitor/hal/hal-utils.c:
+	* monitor/hal/hal-utils.h:
+	Add x-content/* support to the HAL volume monitor.
+
+	* monitor/proxy/gproxymount.c:
+	* monitor/proxy/gproxymount.h:
+	* monitor/proxy/gproxyvolumemonitor.c:
+	* monitor/proxy/gproxyvolumemonitor.h:
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	Add x-content/* support to proxy volume monitor. Also fix
+	a number of bugs the initial implementation had.
+
+	* programs/gvfs-mount.c:
+	Print out x-content-types.
+
 2008-07-28  Matthias Clasen  <mclasen@redhat.com>
 
 	Bug 528848 – [PATCH] statfs lies

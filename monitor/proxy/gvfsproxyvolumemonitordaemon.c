@@ -34,6 +34,7 @@
 static GVolumeMonitor *monitor = NULL;
 static DBusConnection *connection = NULL;
 static GType the_volume_monitor_type;
+static const char *the_dbus_name = NULL;
 
 static void monitor_try_create (void);
 
@@ -344,6 +345,8 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
   gboolean can_unmount;
   GVolume *volume;
   char *volume_id;
+  char **x_content_types;
+  int n;
 
   dbus_message_iter_open_container (iter_array, DBUS_TYPE_STRUCT, NULL, &iter_struct);
 
@@ -375,7 +378,12 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &volume_id);
 
   dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "s", &iter_x_content_types_array);
-  /* TODO: append x-content types */
+  x_content_types = (char **) g_object_get_data (G_OBJECT (mount), "x-content-types");
+  if (x_content_types != NULL)
+    {
+      for (n = 0; x_content_types[n] != NULL; n++)
+        dbus_message_iter_append_basic (&iter_x_content_types_array, DBUS_TYPE_STRING, &(x_content_types[n]));
+    }
   dbus_message_iter_close_container (&iter_struct, &iter_x_content_types_array);
 
   g_free (volume_id);
@@ -893,6 +901,7 @@ emit_signal (DBusConnection *connection, const char *signal_name, void *object, 
 
   message = dbus_message_new_signal ("/", "org.gtk.Private.RemoteVolumeMonitor", signal_name);
   dbus_message_iter_init_append (message, &iter);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &the_dbus_name);
   dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &id);
 
   func (object, &iter);
@@ -954,8 +963,17 @@ mount_changed (GVolumeMonitor *monitor, GMount *mount, DBusConnection *connectio
 }
 
 static void
+mount_sniff_x_content_type (GMount *mount)
+{
+  char **x_content_types;
+  x_content_types = g_mount_guess_content_type_sync (mount, TRUE, NULL, NULL);
+  g_object_set_data_full (G_OBJECT (mount), "x-content-types", x_content_types, (GDestroyNotify) g_strfreev);
+}
+
+static void
 mount_added (GVolumeMonitor *monitor, GMount *mount, DBusConnection *connection)
 {
+  mount_sniff_x_content_type (mount);
   emit_signal (connection, "MountAdded", mount, (AppendFunc) append_mount);
 }
 
@@ -996,6 +1014,8 @@ static void
 monitor_try_create (void)
 {
   GVolumeMonitorClass *klass;
+  GList *mounts;
+  GList *l;
 
   monitor = NULL;
   klass = G_VOLUME_MONITOR_CLASS (g_type_class_ref (the_volume_monitor_type));
@@ -1020,6 +1040,12 @@ monitor_try_create (void)
       g_warning ("Cannot instantiate volume monitor");
       goto fail;
     }
+
+  mounts = g_volume_monitor_get_mounts (monitor);
+  for (l = mounts; l != NULL; l = l->next)
+    mount_sniff_x_content_type (G_MOUNT (l->data));
+  g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
+  g_list_free (mounts);
 
  fail:
   if (klass != NULL)
@@ -1047,6 +1073,7 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
    */
 
   the_volume_monitor_type = volume_monitor_type;
+  the_dbus_name = dbus_name;
 
   /* try and create the monitor */
   monitor_try_create ();

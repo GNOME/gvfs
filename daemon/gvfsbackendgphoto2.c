@@ -716,6 +716,8 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
   int usb_device_num;
   char **tokens;
   char *endp;
+  char *camera_x_content_types[] = {"x-content/image-dcf", NULL};
+  char *music_player_x_content_types[] = {"x-content/audio-player", NULL};
 
   gphoto2_backend->hal_udi = NULL;
 
@@ -870,6 +872,19 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
                                   gphoto2_backend->hal_icon_name = g_strdup ("camera-photo");
                                 }
                             }
+
+                          /* TODO: should we sniff the files instead? */
+                          if (m == 0)
+                            {
+                              g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend),
+                                                                 camera_x_content_types);
+                            }
+                          else
+                            {
+                              g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend),
+                                                                 music_player_x_content_types);
+                            }
+
                         }
                       
                     }

@@ -182,10 +182,12 @@ g_vfs_backend_cdda_init (GVfsBackendCdda *cdda_backend)
 {
   GVfsBackend *backend = G_VFS_BACKEND (cdda_backend);
   GMountSpec *mount_spec;
+  char *x_content_types[] = {"x-content/audio-cdda", NULL};
 
   //g_warning ("initing %p", cdda_backend);
 
   g_vfs_backend_set_display_name (backend, "cdda");
+  g_vfs_backend_set_x_content_types (backend, x_content_types);
   // TODO: HMM: g_vfs_backend_set_user_visible (backend, FALSE);  
 
   mount_spec = g_mount_spec_new ("cdda");

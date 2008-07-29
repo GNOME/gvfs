@@ -68,6 +68,7 @@ struct _GVfsBackendPrivate
   
   char *display_name;
   char *stable_name;
+  char **x_content_types;
   char *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
@@ -142,6 +143,7 @@ g_vfs_backend_finalize (GObject *object)
   
   g_free (backend->priv->display_name);
   g_free (backend->priv->stable_name);
+  g_strfreev (backend->priv->x_content_types);
   g_free (backend->priv->icon);
   g_free (backend->priv->prefered_filename_encoding);
   if (backend->priv->mount_spec)
@@ -299,6 +301,27 @@ g_vfs_backend_set_stable_name (GVfsBackend        *backend,
   backend->priv->stable_name = g_strdup (stable_name);
 }
 
+/**
+ * g_vfs_backend_set_x_content_types:
+ * @backend: backend
+ * @x_content_types: the x-content types
+ *
+ * For backends where the x-content type is known ahead of time and
+ * won't change (such as a CDDA audio disc backend), this function
+ * should be called when the backend is constructed with the given
+ * types.
+ *
+ * See the <ulink url="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</ulink>
+ * specification for more on x-content types.
+ **/
+void
+g_vfs_backend_set_x_content_types (GVfsBackend        *backend,
+                                   char              **x_content_types)
+{
+  g_strfreev (backend->priv->x_content_types);
+  backend->priv->x_content_types = g_strdupv (x_content_types);
+}
+
 void
 g_vfs_backend_set_icon_name (GVfsBackend *backend,
 			     const char *icon)
@@ -349,6 +372,12 @@ const char *
 g_vfs_backend_get_stable_name (GVfsBackend *backend)
 {
   return backend->priv->stable_name;
+}
+
+char **
+g_vfs_backend_get_x_content_types (GVfsBackend *backend)
+{
+  return backend->priv->x_content_types;
 }
 
 const char *
@@ -551,7 +580,13 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   DBusMessage *message;
   DBusMessageIter iter;
   dbus_bool_t user_visible;
-  
+  char *x_content_types_string;
+
+  if (backend->priv->x_content_types != NULL && g_strv_length (backend->priv->x_content_types) > 0)
+    x_content_types_string = g_strjoinv (" ", backend->priv->x_content_types);
+  else
+    x_content_types_string = g_strdup ("");
+
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  G_VFS_DBUS_MOUNTTRACKER_PATH,
 					  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
@@ -570,6 +605,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
 				 DBUS_TYPE_STRING, &backend->priv->display_name,
 				 DBUS_TYPE_STRING, &stable_name,
+                                 DBUS_TYPE_STRING, &x_content_types_string,
 				 DBUS_TYPE_STRING, &backend->priv->icon,
 				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
 				 DBUS_TYPE_BOOLEAN, &user_visible,
@@ -584,6 +620,8 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   _g_dbus_connection_call_async (NULL, message, -1, 
 				 callback, user_data);
   dbus_message_unref (message);
+
+  g_free (x_content_types_string);
 }
 
 void

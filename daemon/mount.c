@@ -39,6 +39,7 @@
 typedef struct {
   char *display_name;
   char *stable_name;
+  char *x_content_types;
   char *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
@@ -157,6 +158,7 @@ vfs_mount_free (VfsMount *mount)
 {
   g_free (mount->display_name);
   g_free (mount->stable_name);
+  g_free (mount->x_content_types);
   g_free (mount->icon);
   g_free (mount->prefered_filename_encoding);
   g_free (mount->dbus_id);
@@ -198,6 +200,11 @@ vfs_mount_to_dbus (VfsMount *mount,
   if (!dbus_message_iter_append_basic (&struct_iter,
 				       DBUS_TYPE_STRING,
 				       &mount->stable_name))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &mount->x_content_types))
     _g_dbus_oom ();
   
   if (!dbus_message_iter_append_basic (&struct_iter,
@@ -647,7 +654,7 @@ register_mount (DBusConnection *connection,
   VfsMount *mount;
   DBusMessage *reply;
   DBusError error;
-  const char *display_name, *stable_name, *icon, *obj_path, *id, *prefered_filename_encoding;
+  const char *display_name, *stable_name, *x_content_types, *icon, *obj_path, *id, *prefered_filename_encoding;
   dbus_bool_t user_visible;
   DBusMessageIter iter;
   GMountSpec *mount_spec;
@@ -662,6 +669,7 @@ register_mount (DBusConnection *connection,
 				     DBUS_TYPE_OBJECT_PATH, &obj_path,
 				     DBUS_TYPE_STRING, &display_name,
                                      DBUS_TYPE_STRING, &stable_name,
+                                     DBUS_TYPE_STRING, &x_content_types,
 				     DBUS_TYPE_STRING, &icon,
 				     DBUS_TYPE_STRING, &prefered_filename_encoding,
 				     DBUS_TYPE_BOOLEAN, &user_visible,
@@ -684,6 +692,7 @@ register_mount (DBusConnection *connection,
 	  mount = g_new0 (VfsMount, 1);
 	  mount->display_name = g_strdup (display_name);
           mount->stable_name = g_strdup (stable_name);
+          mount->x_content_types = g_strdup (x_content_types);
 	  mount->icon = g_strdup (icon);
 	  mount->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
 	  mount->user_visible = user_visible;
@@ -846,6 +855,7 @@ list_mounts (DBusConnection *connection,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_OBJECT_PATH_AS_STRING
+					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING
 					   DBUS_TYPE_STRING_AS_STRING

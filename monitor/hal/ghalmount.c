@@ -1,3 +1,4 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
@@ -1134,6 +1135,121 @@ g_hal_mount_eject_finish (GMount        *mount,
   return res;
 }
 
+/* TODO: handle force_rescan */
+static char **
+g_hal_mount_guess_content_type_sync (GMount              *mount,
+                                     gboolean             force_rescan,
+                                     GCancellable        *cancellable,
+                                     GError             **error)
+{
+  GHalMount *hal_mount = G_HAL_MOUNT (mount);
+  const char *disc_type;
+  char **x_content_types;
+  GFile *root;
+  GPtrArray *p;
+  char **result;
+  int n;
+  char **caps;
+  char *uri;
+
+  p = g_ptr_array_new ();
+
+  G_LOCK (hal_mount);
+
+  root = get_root (hal_mount);
+  uri = g_file_get_uri (root);
+  if (g_str_has_prefix (uri, "burn://"))
+    {
+      /* doesn't make sense to probe burn:/// - look at the disc type instead */
+      if (hal_mount->device != NULL)
+        {
+          disc_type = hal_device_get_property_string (hal_mount->device, "volume.disc.type");
+          if (disc_type != NULL)
+            {
+              if (g_str_has_prefix (disc_type, "dvd"))
+                g_ptr_array_add (p, g_strdup ("x-content/blank-dvd"));
+              else if (g_str_has_prefix (disc_type, "hddvd"))
+                g_ptr_array_add (p, g_strdup ("x-content/blank-hddvd"));
+              else if (g_str_has_prefix (disc_type, "bd"))
+                g_ptr_array_add (p, g_strdup ("x-content/blank-bd"));
+              else
+                g_ptr_array_add (p, g_strdup ("x-content/blank-cd")); /* assume CD */
+            }
+        }
+    }
+  else
+    {
+      /* sniff content type */
+      x_content_types = g_content_type_guess_for_tree (root);
+      if (x_content_types != NULL)
+        {
+          for (n = 0; x_content_types[n] != NULL; n++)
+            g_ptr_array_add (p, g_strdup (x_content_types[n]));
+          g_strfreev (x_content_types);
+        }
+    }
+  g_object_unref (root);
+  g_free (uri);
+
+  /* also add content types from hal capabilities */
+  if (hal_mount->drive_device != NULL)
+    {
+      caps = dupv_and_uniqify (hal_device_get_property_strlist (hal_mount->drive_device, "info.capabilities"));
+      if (caps != NULL)
+        {
+          for (n = 0; caps[n] != NULL; n++)
+            {
+              if (strcmp (caps[n], "portable_audio_player") == 0)
+                g_ptr_array_add (p, g_strdup ("x-content/audio-player"));
+            }
+          g_strfreev (caps);
+        }
+    }
+
+  if (p->len == 0)
+    {
+      result = NULL;
+      g_ptr_array_free (p, TRUE);
+    }
+  else
+    {
+      g_ptr_array_add (p, NULL);
+      result = (char **) g_ptr_array_free (p, FALSE);
+    }
+
+  G_UNLOCK (hal_mount);
+
+  return result;
+}
+
+/* since we're an out-of-process volume monitor we'll just do this sync */
+static void
+g_hal_mount_guess_content_type (GMount              *mount,
+                                gboolean             force_rescan,
+                                GCancellable        *cancellable,
+                                GAsyncReadyCallback  callback,
+                                gpointer             user_data)
+{
+  GSimpleAsyncResult *simple;
+
+  /* TODO: handle force_rescan */
+  simple = g_simple_async_result_new (G_OBJECT (mount),
+                                      callback,
+                                      user_data,
+                                      NULL);
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static char **
+g_hal_mount_guess_content_type_finish (GMount              *mount,
+                                       GAsyncResult        *result,
+                                       GError             **error)
+{
+  /* TODO: handle force_rescan */
+  return g_hal_mount_guess_content_type_sync (mount, FALSE, NULL, error);
+}
+
 static void
 g_hal_mount_mount_iface_init (GMountIface *iface)
 {
@@ -1149,6 +1265,9 @@ g_hal_mount_mount_iface_init (GMountIface *iface)
   iface->unmount_finish = g_hal_mount_unmount_finish;
   iface->eject = g_hal_mount_eject;
   iface->eject_finish = g_hal_mount_eject_finish;
+  iface->guess_content_type = g_hal_mount_guess_content_type;
+  iface->guess_content_type_finish = g_hal_mount_guess_content_type_finish;
+  iface->guess_content_type_sync = g_hal_mount_guess_content_type_sync;
 }
 
 #define INSENSITIVE_SEARCH_ITEMS_PER_CALLBACK 100

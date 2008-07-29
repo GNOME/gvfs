@@ -1,3 +1,4 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* GIO - GLib Input, Output and Streaming Library
  * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
@@ -303,6 +304,7 @@ list_mounts (GList *mounts,
   char *name, *uuid, *uri;
   GFile *root;
   GIcon *icon;
+  char **x_content_types;
   
   for (c = 0, l = mounts; l != NULL; l = l->next, c++)
     {
@@ -330,14 +332,25 @@ list_mounts (GList *mounts,
 	  if (uuid)
 	    g_print ("%*suuid=%s\n", indent + 2, "", uuid);
 
-      icon = g_mount_get_icon (mount);
-      if (icon)
-        {
-          if (G_IS_THEMED_ICON (icon))
-            show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+          icon = g_mount_get_icon (mount);
+          if (icon)
+            {
+              if (G_IS_THEMED_ICON (icon))
+                show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+              
+              g_object_unref (icon);
+            }
 
-          g_object_unref (icon);
-        }
+          x_content_types = g_mount_guess_content_type_sync (mount, FALSE, NULL, NULL);
+          if (x_content_types != NULL && g_strv_length (x_content_types) > 0)
+            {
+              int n;
+              g_print ("%*sx_content_types:", indent + 2, "");
+              for (n = 0; x_content_types[n] != NULL; n++)
+                  g_print (" %s", x_content_types[n]);
+              g_print ("\n");
+            }
+          g_strfreev (x_content_types);
 
 	  g_print ("%*scan_unmount=%d\n", indent + 2, "", g_mount_can_unmount (mount));
 	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_mount_can_eject (mount));

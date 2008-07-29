@@ -35,6 +35,8 @@ const char * get_disc_name (const char *disc_type, gboolean is_blank);
 GIcon *      get_themed_icon_with_fallbacks (const char *icon_name,
                                              const char *fallbacks);
 
+char **dupv_and_uniqify (char **str_array);
+
 G_END_DECLS
 
 #endif /* __HAL_UTILS_H__ */

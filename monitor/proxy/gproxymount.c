@@ -118,6 +118,22 @@ g_proxy_mount_new (GProxyVolumeMonitor *volume_monitor)
   return mount;
 }
 
+gboolean
+g_proxy_mount_has_mount_path (GProxyMount *mount, const char *mount_path)
+{
+  char *path;
+  gboolean result;
+  result = FALSE;
+  path = g_file_get_path (mount->root);
+  if (path != NULL)
+    {
+      if (strcmp (path, mount_path) == 0)
+        result = TRUE;
+      g_free (path);
+    }
+  return result;
+}
+
 /* string               id
  * string               name
  * string               gicon_data
@@ -479,6 +495,44 @@ g_proxy_mount_unmount_finish (GMount        *mount,
 }
 
 static void
+g_proxy_mount_guess_content_type (GMount              *mount,
+                                  gboolean             force_rescan,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
+{
+  GSimpleAsyncResult *simple;
+
+  /* TODO: handle force_rescan */
+  simple = g_simple_async_result_new (G_OBJECT (mount),
+                                      callback,
+                                      user_data,
+                                      NULL);
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static char **
+g_proxy_mount_guess_content_type_finish (GMount              *mount,
+                                         GAsyncResult        *result,
+                                         GError             **error)
+{
+  GProxyMount *proxy_mount = G_PROXY_MOUNT (mount);
+  return g_strdupv (proxy_mount->x_content_types);
+}
+
+static char **
+g_proxy_mount_guess_content_type_sync (GMount              *mount,
+                                       gboolean             force_rescan,
+                                       GCancellable        *cancellable,
+                                       GError             **error)
+{
+  GProxyMount *proxy_mount = G_PROXY_MOUNT (mount);
+  /* TODO: handle force_rescan */
+  return g_strdupv (proxy_mount->x_content_types);
+}
+
+static void
 g_proxy_mount_mount_iface_init (GMountIface *iface)
 {
   iface->get_root = g_proxy_mount_get_root;
@@ -493,6 +547,9 @@ g_proxy_mount_mount_iface_init (GMountIface *iface)
   iface->unmount_finish = g_proxy_mount_unmount_finish;
   iface->eject = g_proxy_mount_eject;
   iface->eject_finish = g_proxy_mount_eject_finish;
+  iface->guess_content_type = g_proxy_mount_guess_content_type;
+  iface->guess_content_type_finish = g_proxy_mount_guess_content_type_finish;
+  iface->guess_content_type_sync = g_proxy_mount_guess_content_type_sync;
 }
 
 void
