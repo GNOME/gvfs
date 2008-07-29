@@ -666,9 +666,6 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
   stbuf->f_flag = 0;  /* Ignored by FUSE */
   stbuf->f_namemax = 1024;
 
-  if (statvfs ("/", stbuf) != 0)
-    result = -errno;
-
   debug_print ("vfs_statfs: -> %s\n", strerror (-result));
 
   return result;

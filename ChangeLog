@@ -1,5 +1,12 @@
 2008-07-28  Matthias Clasen  <mclasen@redhat.com>
 
+	Bug 528848 – [PATCH] statfs lies
+
+	* client/gvfsfusedaemon.c (vfs_statfs): Don't call
+	statvfs on /. Patch by Bill Nottingham.
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
 	Bug 518284 – need to add i18n on module branching
 
 	* daemon/gvfsbackendcdda.c:
