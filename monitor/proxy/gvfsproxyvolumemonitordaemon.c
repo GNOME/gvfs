@@ -363,6 +363,8 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
 
   if (name == NULL)
     name = g_strdup ("");
+  if (uuid == NULL)
+    uuid = g_strdup ("");
 
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &id);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &name);
