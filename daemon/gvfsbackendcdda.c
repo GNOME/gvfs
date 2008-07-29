@@ -47,9 +47,6 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 
-/* see this bug http://bugzilla.gnome.org/show_bug.cgi?id=518284 */
-#define _I18N_LATER(x) x
-
 #define DO_NOT_WANT_PARANOIA_COMPATIBILITY
 #include <cdio/paranoia.h>
 
@@ -221,7 +218,7 @@ do_mount (GVfsBackend *backend,
     {
       release_device (cdda_backend);
       dbus_error_free (&dbus_error);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _I18N_LATER("Cannot connect to the system bus"));
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -231,7 +228,7 @@ do_mount (GVfsBackend *backend,
   if (cdda_backend->hal_ctx == NULL)
     {
       release_device (cdda_backend);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _I18N_LATER("Cannot create libhal context"));
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -244,7 +241,7 @@ do_mount (GVfsBackend *backend,
     {
       release_device (cdda_backend);
       dbus_error_free (&dbus_error);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _I18N_LATER("Cannot initialize libhal"));
+      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;

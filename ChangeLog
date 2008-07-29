@@ -1,5 +1,14 @@
 2008-07-28  Matthias Clasen  <mclasen@redhat.com>
 
+	Bug 518284 – need to add i18n on module branching
+
+	* daemon/gvfsbackendcdda.c:
+	* daemon/gvfsbackendgphoto2.c:
+	* daemon/gvfsbackendobexftp.c: Now is later.
+	Remove the I18N_LATER hack. 
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
 	* monitor/proxy/gvfsproxyvolumemonitordaemon.c (append_mount):
 	Don't pass a NULL uuid to dbus_message_iter_append_basic. Fixes
 	a crash with bind mounts.
