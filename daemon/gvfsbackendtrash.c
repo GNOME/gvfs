@@ -572,8 +572,11 @@ list_trash_dirs (void)
     {
       mount = l->data;
       
-      topdir = g_unix_mount_get_mount_path (mount);
-      topdirs = g_list_prepend (topdirs, g_strdup (topdir));
+      if (!g_unix_mount_is_system_internal (mount) )
+        {
+          topdir = g_unix_mount_get_mount_path (mount);
+          topdirs = g_list_prepend (topdirs, g_strdup (topdir));
+        }
       
       g_unix_mount_free (mount);
     }

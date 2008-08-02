@@ -1,5 +1,11 @@
 2008-08-02  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackendtrash.c: Don't include internal mounts
+	while building up the list of trash directories. Bug #525779
+	Patcg from A. Walton  <awalton@svn.gnome.org>
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackenddav.c: (parse_xml): Free the xml doc in
 	error cases. Plug the leaks, fix bug #545968, thanks to
 	Christian Persch <chpe@gnome.org> again!
