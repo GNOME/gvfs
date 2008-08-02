@@ -508,6 +508,7 @@ parse_xml (SoupMessage  *msg,
                        msg->response_body->length,
                        "response.xml",
                        NULL,
+                       XML_PARSE_NONET |
                        XML_PARSE_NOWARNING |
                        XML_PARSE_NOBLANKS |
                        XML_PARSE_NSCLEAN |
