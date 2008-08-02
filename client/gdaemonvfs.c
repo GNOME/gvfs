@@ -156,6 +156,19 @@ get_mountable_info_for_type (GDaemonVfs *vfs,
   return NULL;
 }
 
+static void
+str_tolower_inplace (char *str)
+{
+  char *p = str;
+
+  while (*p != 0)
+    {
+      *p = g_ascii_tolower (*p);
+      p++;
+    }
+
+}
+
 static gboolean
 get_mountspec_from_uri (GDaemonVfs *vfs,
 			const char *uri,
@@ -171,6 +184,10 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   scheme = g_uri_parse_scheme (uri);
   if (scheme == NULL)
     return FALSE;
+
+  /* convert the scheme to lower case since g_uri_prase_scheme
+   * doesn't do that and we compare with g_str_equal */
+  str_tolower_inplace (scheme);
   
   spec = NULL;
   path = NULL;
@@ -193,7 +210,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
     {
       GDecodedUri *decoded;
       MountableInfo *mountable;
-      char *type, *p;
+      char *type;
       int l;
 
       decoded = g_vfs_decode_uri (uri);
@@ -213,8 +230,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	      if (mountable && mountable->host_is_inet)
 		{
 		  /* Convert hostname to lower case */
-		  for (p = decoded->host; *p != 0; p++)
-		    *p = g_ascii_tolower (*p);
+          str_tolower_inplace (decoded->host);
 		  
 		  /* Remove brackets aroung ipv6 addresses */
 		  l = strlen (decoded->host);
@@ -356,7 +372,7 @@ g_daemon_vfs_get_file_for_uri (GVfs       *vfs,
 
   daemon_vfs = G_DAEMON_VFS (vfs);
 
-  if (g_str_has_prefix (uri, "file:"))
+  if (g_ascii_strncasecmp (uri, "file:", 5) == 0)
     {
       path = g_filename_from_uri (uri, NULL, NULL);
 

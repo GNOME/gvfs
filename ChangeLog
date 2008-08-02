@@ -1,5 +1,11 @@
 2008-08-02  Christian Kellner  <gicmo@gnome.org>
 
+	* client/gdaemonvfs.c: 
+	Make sure we handle URI schemes case insensitive, so that File://
+	and other versions also work. Bug #528891
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackendtrash.c: Don't include internal mounts
 	while building up the list of trash directories. Bug #525779
 	Patcg from A. Walton  <awalton@svn.gnome.org>
