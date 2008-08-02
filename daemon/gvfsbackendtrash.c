@@ -531,12 +531,32 @@ list_trash_dirs (void)
   GList *topdirs_info;
   struct stat statbuf;
   gboolean has_trash_files;
+  int stat_result;
 
   dirs = NULL;
   has_trash_files = FALSE;
   
   home_trash = g_build_filename (g_get_user_data_dir (), "Trash", NULL);
-  if (lstat (home_trash, &statbuf) == 0 &&
+
+  stat_result = g_lstat (home_trash, &statbuf);
+
+  /* If the home trash directory doesn't exist at this point, we must create
+   * it in order to monitor it. */
+  if (stat_result != 0)
+    {
+      gchar *home_trash_files = g_build_filename (home_trash, "files", NULL);
+      gchar *home_trash_info  = g_build_filename (home_trash, "info", NULL);
+
+      g_mkdir_with_parents (home_trash_files, 0700);
+      g_mkdir_with_parents (home_trash_info, 0700);
+
+      g_free (home_trash_files);
+      g_free (home_trash_info);
+
+      stat_result = g_lstat (home_trash, &statbuf);
+    }
+
+  if (stat_result == 0 &&
       S_ISDIR (statbuf.st_mode))
     {
       dirs = g_list_prepend (dirs, home_trash);
