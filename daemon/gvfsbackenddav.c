@@ -527,13 +527,15 @@ parse_xml (SoupMessage  *msg,
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 	                   _("Empty response"));
+      xmlFreeDoc (doc);
       return NULL;
     }
 
   if (strcmp ((char *) (*root)->name, name))
     {
-        g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-	                     _("Unexpected reply from server"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Unexpected reply from server"));
+      xmlFreeDoc (doc);
       return NULL;
     }
 

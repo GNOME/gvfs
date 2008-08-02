@@ -1,5 +1,11 @@
 2008-08-02  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsbackenddav.c: (parse_xml): Free the xml doc in
+	error cases. Plug the leaks, fix bug #545968, thanks to
+	Christian Persch <chpe@gnome.org> again!
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
 	* daemon/gvfsbackenddav.c:
 	Use XML_PARSE_NONET with xmlReadMemory when parsing the webdav
 	responses to disallow net access of the parser. Bug #545966
