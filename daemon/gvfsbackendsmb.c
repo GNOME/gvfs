@@ -1015,9 +1015,9 @@ do_replace (GVfsBackend *backend,
     {
       int errsv = errno;
 
-      g_set_error (&error, G_IO_ERROR,
-		   g_io_error_from_errno (errsv),
-		   "%s", g_strerror (errsv));
+      g_set_error_literal (&error, G_IO_ERROR,
+			   g_io_error_from_errno (errsv),
+			   g_strerror (errsv));
       goto error;
     }
   else if (file == NULL && errno == EEXIST)
@@ -1032,11 +1032,10 @@ do_replace (GVfsBackend *backend,
 	      if (strcmp (etag, current_etag) != 0)
 		{
 		  g_free (current_etag);
-		  g_set_error (&error,
-			       G_IO_ERROR,
-			       G_IO_ERROR_WRONG_ETAG,
-			       "%s",
-                               _("The file was externally modified"));
+		  g_set_error_literal (&error,
+				       G_IO_ERROR,
+				       G_IO_ERROR_WRONG_ETAG,
+                	               _("The file was externally modified"));
 		  goto error;
 		}
 	      g_free (current_etag);
@@ -1064,17 +1063,15 @@ do_replace (GVfsBackend *backend,
 	      if (!copy_file (op_backend, G_VFS_JOB (job), uri, backup_uri))
 		{
 		  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
-		    g_set_error (&error,
-				 G_IO_ERROR,
-				 G_IO_ERROR_CANCELLED,
-                                 "%s",
-				 _("Operation was cancelled"));
+		    g_set_error_literal (&error,
+					 G_IO_ERROR,
+					 G_IO_ERROR_CANCELLED,
+					 _("Operation was cancelled"));
 		  else
-		    g_set_error (&error,
-				 G_IO_ERROR,
-				 G_IO_ERROR_CANT_CREATE_BACKUP,
-                                 "%s",
-				 _("Backup file creation failed"));
+		    g_set_error_literal (&error,
+					 G_IO_ERROR,
+					 G_IO_ERROR_CANT_CREATE_BACKUP,
+					 _("Backup file creation failed"));
 		  goto error;
 		}
 	      g_free (backup_uri);
@@ -1087,9 +1084,9 @@ do_replace (GVfsBackend *backend,
 	    {
               int errsv = errno;
 
-	      g_set_error (&error, G_IO_ERROR,
-			   g_io_error_from_errno (errsv),
-			   "%s", g_strerror (errsv));
+	      g_set_error_literal (&error, G_IO_ERROR,
+				   g_io_error_from_errno (errsv),
+				   g_strerror (errsv));
 	      goto error;
 	    }
 	}
@@ -1540,9 +1537,9 @@ do_enumerate (GVfsBackend *backend,
       int errsv = errno;
 
       error = NULL;
-      g_set_error (&error, G_IO_ERROR,
-		   g_io_error_from_errno (errsv),
-		   "%s", g_strerror (errsv));
+      g_set_error_literal (&error, G_IO_ERROR,
+			   g_io_error_from_errno (errsv),
+			   g_strerror (errsv));
       goto error;
     }
 

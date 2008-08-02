@@ -435,14 +435,14 @@ spawn_mount_message_function (DBusConnection  *connection,
 				  DBUS_TYPE_STRING, &error_message,
 				  DBUS_TYPE_INVALID))
 	{
-	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       "%s", _("Invalid arguments from spawned child"));
+	  g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			       _("Invalid arguments from spawned child"));
 	  mount_finish (data, error);
 	  g_error_free (error);
 	}
       else if (!succeeded)
 	{
-	  g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", error_message);
+	  g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, error_message);
 	  mount_finish (data, error);
 	  g_error_free (error);
 	}
@@ -472,8 +472,8 @@ spawn_mount (MountData *data)
   error = NULL;
   if (data->mountable->exec == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   "No exec key defined for mountpoint");
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   "No exec key defined for mountpoint");
       mount_finish (data, error);
       g_error_free (error);
     }

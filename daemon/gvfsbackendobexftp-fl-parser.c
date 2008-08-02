@@ -367,10 +367,10 @@ gvfsbackendobexftp_fl_parser_parse (const gchar *buf, gint len, GList **elements
 		fl_parser_free_parser_data (data, TRUE);
 
 		if (*error == NULL) {
-			g_set_error (error,
-				     G_MARKUP_ERROR,
-				     G_MARKUP_ERROR_INVALID_CONTENT,
-				     "Couldn't parse the incoming data");
+			g_set_error_literal (error,
+					     G_MARKUP_ERROR,
+					     G_MARKUP_ERROR_INVALID_CONTENT,
+					     "Couldn't parse the incoming data");
 		}
 		return FALSE;
 	}

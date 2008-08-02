@@ -139,7 +139,7 @@ write_channel_handle_request (GVfsChannel *channel,
     default:
       g_set_error (error, G_IO_ERROR,
 		   G_IO_ERROR_FAILED,
-		   "Unknown stream command %"G_GUINT32_FORMAT"\n", command);
+		   "Unknown stream command %"G_GUINT32_FORMAT, command);
       break;
     }
 

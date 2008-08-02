@@ -381,8 +381,8 @@ set_error_if_http_failed (SoupMessage *msg, GError **error)
 {
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      g_set_error (error, SOUP_HTTP_ERROR,
-		   msg->status_code, "%s", msg->reason_phrase);
+      g_set_error_literal (error, SOUP_HTTP_ERROR,
+			   msg->status_code, msg->reason_phrase);
       return TRUE;
     }
   return FALSE;
@@ -849,8 +849,8 @@ soup_input_stream_seek (GSeekable     *seekable,
        * We could find the Content-Length by doing a HEAD...
        */
 
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                   "G_SEEK_END not currently supported");
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+	                   "G_SEEK_END not currently supported");
       return FALSE;
     }
 
@@ -902,8 +902,8 @@ soup_input_stream_truncate (GSeekable     *seekable,
 			    GCancellable  *cancellable,
 			    GError       **error)
 {
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-	       "Truncate not allowed on input stream");
+  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+		       "Truncate not allowed on input stream");
   return FALSE;
 }
 

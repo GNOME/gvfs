@@ -290,7 +290,7 @@ ftp_connection_set_error_from_response (FtpConnection *conn, guint response)
     }
 
   DEBUG ("error: %s\n", msg);
-  g_set_error (&conn->error, G_IO_ERROR, code, "%s", msg);
+  g_set_error_literal (&conn->error, G_IO_ERROR, code, msg);
 }
 
 /**
@@ -360,8 +360,8 @@ ftp_connection_receive (FtpConnection *conn,
 	    }
 	  else
 	    {
-	      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid reply"));
+	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+				   _("Invalid reply"));
 	      return 0;
 	    }
 	}
@@ -389,8 +389,8 @@ ftp_connection_receive (FtpConnection *conn,
 	      break;
 	    if (n_bytes > 0)
 	      continue;
-	    g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			 _("Invalid reply"));
+	    g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+				 _("Invalid reply"));
 	    /* fall through */
 	  case SOUP_SOCKET_ERROR:
 	    conn->read_buffer[conn->read_bytes] = 0;
@@ -408,8 +408,8 @@ ftp_connection_receive (FtpConnection *conn,
 	      last_line[1] < '0' || last_line[1] > '9' ||
 	      last_line[2] < '0' || last_line[2] > '9')
 	    {
-	      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid reply"));
+	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+				   _("Invalid reply"));
 	      return 0;
 	    }
 	  response = 100 * (last_line[0] - '0') +
@@ -421,8 +421,8 @@ ftp_connection_receive (FtpConnection *conn,
 	    reply_state = MULTILINE;
 	  else
 	    {
-	      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid reply"));
+	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+				   _("Invalid reply"));
 	      return 0;
 	    }
 	}
@@ -528,8 +528,8 @@ ftp_connection_sendv (FtpConnection *conn,
       case SOUP_SOCKET_EOF:
 	if (n_bytes == command->len)
 	  break;
-	g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-	    _("broken transmission"));
+	g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			     _("broken transmission"));
 	/* fall through */
       case SOUP_SOCKET_ERROR:
 	g_string_free (command, TRUE);
@@ -671,10 +671,10 @@ ftp_connection_create (SoupAddress * addr,
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
     {
       /* FIXME: better error messages depending on status please */
-      g_set_error (&conn->error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_HOST_NOT_FOUND,
-		   _("Could not connect to host"));
+      g_set_error_literal (&conn->error,
+			   G_IO_ERROR,
+			   G_IO_ERROR_HOST_NOT_FOUND,
+			   _("Could not connect to host"));
     }
 
   ftp_connection_receive (conn, 0);
@@ -813,8 +813,8 @@ ftp_connection_ensure_data_connection (FtpConnection *conn)
     }
   if (*s == 0)
     {
-      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Invalid reply"));
+      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid reply"));
       return FALSE;
     }
   ip = g_strdup_printf ("%u.%u.%u.%u", ip1, ip2, ip3, ip4);
@@ -831,10 +831,10 @@ have_address:
   if (!SOUP_STATUS_IS_SUCCESSFUL (status))
     {
       /* FIXME: better error messages depending on status please */
-      g_set_error (&conn->error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_HOST_NOT_FOUND,
-		   _("Could not connect to host"));
+      g_set_error_literal (&conn->error,
+			   G_IO_ERROR,
+			   G_IO_ERROR_HOST_NOT_FOUND,
+			   _("Could not connect to host"));
       g_object_unref (conn->data);
       conn->data = NULL;
       return FALSE;
@@ -907,9 +907,9 @@ ftp_connection_cd (FtpConnection *conn, const FtpFile *file)
 					"CWD %s", file);
   if (response == 550)
     {
-      g_set_error (&conn->error, 
-	           G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
-		   _("The file is not a directory"));
+      g_set_error_literal (&conn->error, 
+		           G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
+			   _("The file is not a directory"));
       response = 0;
     }
   else if (STATUS_GROUP (response) == 5)
@@ -1358,8 +1358,8 @@ do_mount (GVfsBackend *backend,
 		        &password_save) ||
 	  aborted) 
 	{
-	  g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-		       "%s", _("Password dialog cancelled"));
+	  g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+			       _("Password dialog cancelled"));
 	  break;
 	}
 
@@ -1524,9 +1524,9 @@ error_550_is_directory (FtpConnection *conn, const FtpFile *file)
 
   if (STATUS_GROUP (response) == 2)
     {
-      g_set_error (&conn->error, G_IO_ERROR, 
-                   G_IO_ERROR_IS_DIRECTORY,
-                   _("File is directory"));
+      g_set_error_literal (&conn->error, G_IO_ERROR, 
+	                   G_IO_ERROR_IS_DIRECTORY,
+        	           _("File is directory"));
     }
 }
 
@@ -1693,10 +1693,10 @@ do_create (GVfsBackend *backend,
   if (info)
     {
       g_object_unref (info);
-      g_set_error (&conn->error,
-	           G_IO_ERROR,
-		   G_IO_ERROR_EXISTS,
-		   _("Target file already exists"));
+      g_set_error_literal (&conn->error,
+		           G_IO_ERROR,
+			   G_IO_ERROR_EXISTS,
+			   _("Target file already exists"));
       goto error;
     }
   file = ftp_filename_from_gvfs_path (conn, filename);
@@ -1824,8 +1824,8 @@ do_enumerate_directory (FtpConnection *conn)
 	{
 	  if (size >= 16384)
 	    {
-	      g_set_error (&conn->error, G_IO_ERROR, G_IO_ERROR_FILENAME_TOO_LONG,
-		           _("filename too long"));
+	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FILENAME_TOO_LONG,
+			           _("filename too long"));
 	      break;
 	    }
 	  size += 128;
@@ -2095,10 +2095,10 @@ do_query_info (GVfsBackend *backend,
       g_object_unref (real);
     }
   else if (!ftp_connection_in_error (conn))
-    g_set_error (&conn->error,
-		 G_IO_ERROR,
-		 G_IO_ERROR_NOT_FOUND,
-		 _("File doesn't exist"));
+    g_set_error_literal (&conn->error,
+			 G_IO_ERROR,
+			 G_IO_ERROR_NOT_FOUND,
+			 _("File doesn't exist"));
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
 }
@@ -2205,10 +2205,10 @@ do_set_display_name (GVfsBackend *backend,
   now = ftp_filename_construct (conn, dir, display_name);
   if (now == NULL)
     {
-      g_set_error (&conn->error, 
-	           G_IO_ERROR,
-	           G_IO_ERROR_INVALID_FILENAME,
-		   _("Invalid filename"));
+      g_set_error_literal (&conn->error, 
+		           G_IO_ERROR,
+		           G_IO_ERROR_INVALID_FILENAME,
+			   _("Invalid filename"));
     }
   ftp_connection_send (conn,
 		       RESPONSE_PASS_300 | RESPONSE_FAIL_200,
@@ -2258,10 +2258,10 @@ do_delete (GVfsBackend *backend,
 	  if (files)
 	    {
 	      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-	      g_set_error (&conn->error, 
-			   G_IO_ERROR,
-			   G_IO_ERROR_NOT_EMPTY,
-			   "%s", g_strerror (ENOTEMPTY));
+	      g_set_error_literal (&conn->error, 
+				   G_IO_ERROR,
+				   G_IO_ERROR_NOT_EMPTY,
+				   g_strerror (ENOTEMPTY));
 	    }
 	  else
 	    ftp_connection_set_error_from_response (conn, response);
@@ -2340,9 +2340,9 @@ do_move (GVfsBackend *backend,
 
       g_free (basename);
       if (real == NULL)
-	g_set_error (&conn->error, 
-	             G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
-		     _("Invalid destination filename"));
+	g_set_error_literal (&conn->error, 
+		             G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
+			     _("Invalid destination filename"));
       else
 	{
 	  g_free (destfile);
@@ -2359,10 +2359,10 @@ do_move (GVfsBackend *backend,
       if (info)
 	{
 	  g_object_unref (info);
-	  g_set_error (&conn->error,
-		       G_IO_ERROR,
-	               G_IO_ERROR_EXISTS,
-		       _("Target file already exists"));
+	  g_set_error_literal (&conn->error,
+			       G_IO_ERROR,
+		               G_IO_ERROR_EXISTS,
+			       _("Target file already exists"));
 	  goto out;
 	}
     }

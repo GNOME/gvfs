@@ -329,11 +329,10 @@ decode_reply (GString *buffer, GVfsDaemonSocketProtocolReply *reply_out)
 static void
 decode_error (GVfsDaemonSocketProtocolReply *reply, char *data, GError **error)
 {
-  g_set_error (error,
-	       g_quark_from_string (data),
-	       reply->arg1,
-               "%s",
-	       data + strlen (data) + 1);
+  g_set_error_literal (error,
+		       g_quark_from_string (data),
+		       reply->arg1,
+		       data + strlen (data) + 1);
 }
 
 
@@ -453,11 +452,10 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	  if (io_op->io_cancelled)
 	    {
 	      op->ret_val = -1;
-	      g_set_error (&op->ret_error,
-			   G_IO_ERROR,
-			   G_IO_ERROR_CANCELLED,
-			   "%s",
-                           _("Operation was cancelled"));
+	      g_set_error_literal (&op->ret_error,
+				   G_IO_ERROR,
+				   G_IO_ERROR_CANCELLED,
+                        	   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
 	  
@@ -632,11 +630,10 @@ iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	  if (io_op->io_cancelled)
 	    {
 	      op->ret_val = FALSE;
-	      g_set_error (&op->ret_error,
-			   G_IO_ERROR,
-			   G_IO_ERROR_CANCELLED,
-                           "%s",
-			   _("Operation was cancelled"));
+	      g_set_error_literal (&op->ret_error,
+				   G_IO_ERROR,
+				   G_IO_ERROR_CANCELLED,
+				   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
 
@@ -828,11 +825,10 @@ iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_o
 	  if (io_op->io_cancelled)
 	    {
 	      op->ret_val = -1;
-	      g_set_error (&op->ret_error,
-			   G_IO_ERROR,
-			   G_IO_ERROR_CANCELLED,
-                           "%s",
-			   _("Operation was cancelled"));
+	      g_set_error_literal (&op->ret_error,
+				   G_IO_ERROR,
+				   G_IO_ERROR_CANCELLED,
+				   _("Operation was cancelled"));
 	      return STATE_OP_DONE;
 	    }
 
@@ -942,8 +938,8 @@ g_daemon_file_output_stream_seek (GFileOutputStream *stream,
 
   if (!file->can_seek)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   "%s", _("Seek not supported on stream"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			   _("Seek not supported on stream"));
       return FALSE;
     }
   

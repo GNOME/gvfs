@@ -794,14 +794,14 @@ run_mount_mountable (GVfsBackendSmbBrowse *backend,
 	  g_mount_spec_unref (mount_spec);
 	}
       else
-	g_set_error (&error,
-		     G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE_FILE,
-		     "%s", _("The file is not a mountable"));
+	g_set_error_literal (&error,
+			     G_IO_ERROR, G_IO_ERROR_NOT_MOUNTABLE_FILE,
+			     _("The file is not a mountable"));
     }
   else
-    g_set_error (&error,
-		 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-		 "%s", _("File doesn't exist"));
+    g_set_error_literal (&error,
+			 G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+			 _("File doesn't exist"));
       
   g_mutex_unlock (backend->entries_lock);
 

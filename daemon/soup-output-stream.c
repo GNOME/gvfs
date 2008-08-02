@@ -239,8 +239,8 @@ set_error_if_http_failed (SoupMessage *msg, GError **error)
 {
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      g_set_error (error, SOUP_HTTP_ERROR,
-		   msg->status_code, "%s", msg->reason_phrase);
+      g_set_error_literal (error, SOUP_HTTP_ERROR,
+			   msg->status_code, msg->reason_phrase);
       return TRUE;
     }
   return FALSE;
@@ -256,8 +256,8 @@ soup_output_stream_write (GOutputStream  *stream,
   SoupOutputStreamPrivate *priv = SOUP_OUTPUT_STREAM_GET_PRIVATE (stream);
 
   if (priv->size > 0 && priv->offset + count > priv->size) {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
-		   "Write would exceed caller-defined file size");
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+			   "Write would exceed caller-defined file size");
       return -1;
   }
 
@@ -274,8 +274,8 @@ soup_output_stream_close (GOutputStream  *stream,
   SoupOutputStreamPrivate *priv = SOUP_OUTPUT_STREAM_GET_PRIVATE (stream);
 
   if (priv->size > 0 && priv->offset != priv->size) {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
-		   "File is incomplete");
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+			   "File is incomplete");
       return -1;
   }
 

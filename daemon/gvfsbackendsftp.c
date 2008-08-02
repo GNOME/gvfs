@@ -275,45 +275,45 @@ look_for_stderr_errors (GVfsBackend *backend, GError **error)
       if (line == NULL)
         {
           /* Error (real or WOULDBLOCK) or EOF */
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                       "%s", _("ssh program unexpectedly exited"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_FAILED,
+        	               _("ssh program unexpectedly exited"));
           return;
         }
       
       if (strstr (line, "Permission denied") != NULL)
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                       "%s", _("Permission denied"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        	               _("Permission denied"));
           return;
         }
       else if (strstr (line, "Name or service not known") != NULL)
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
-                       "%s", _("Hostname not known"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+        	               _("Hostname not known"));
           return;
         }
       else if (strstr (line, "No route to host") != NULL)
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
-                       "%s", _("No route to host"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+        	               _("No route to host"));
           return;
         }
       else if (strstr (line, "Connection refused") != NULL)
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                       "%s", _("Connection refused by server"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        	               _("Connection refused by server"));
           return;
         }
       else if (strstr (line, "Host key verification failed") != NULL) 
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_FAILED,
-                       "%s", _("Host key verification failed"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_FAILED,
+        	               _("Host key verification failed"));
           return;
         }
       
@@ -394,9 +394,9 @@ spawn_ssh (GVfsBackend *backend,
 		     stdin_fd, stdout_fd, stderr_fd);
   if (*tty_fd == -1)
     {
-      g_set_error (error,
-		   G_IO_ERROR, G_IO_ERROR_FAILED,
-		   "%s", _("Unable to spawn ssh program"));
+      g_set_error_literal (error,
+			   G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Unable to spawn ssh program"));
       return FALSE;
     }
 #else
@@ -522,9 +522,9 @@ wait_for_reply (GVfsBackend *backend, int stdout_fd, GError **error)
 
   if (ret <= 0)
     {
-      g_set_error (error,
-		   G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
-		   "%s", _("Timed out when logging in"));
+      g_set_error_literal (error,
+			   G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
+			   _("Timed out when logging in"));
       return FALSE;
     }
   return TRUE;
@@ -774,9 +774,9 @@ handle_login (GVfsBackend *backend,
       
       if (ret <= 0)
         {
-          g_set_error (error,
-                       G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
-                       "%s", _("Timed out when logging in"));
+          g_set_error_literal (error,
+	                       G_IO_ERROR, G_IO_ERROR_TIMED_OUT,
+        	               _("Timed out when logging in"));
           ret_val = FALSE;
           break;
         }
@@ -868,9 +868,9 @@ handle_login (GVfsBackend *backend,
                                                 &password_save) ||
                   aborted)
                 {
-                  g_set_error (error,
-                               G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                               "%s", _("Password dialog cancelled"));
+                  g_set_error_literal (error,
+	                               G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        	                       _("Password dialog cancelled"));
                   ret_val = FALSE;
                   break;
                 }
@@ -895,9 +895,9 @@ handle_login (GVfsBackend *backend,
 	      op_backend->tmp_password = new_password;
 	      new_password = NULL;
 	      
-	      g_set_error (error,
-			   G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-			   "Invalid user name");
+	      g_set_error_literal (error,
+				   G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+				   "Invalid user name");
 	      ret_val = FALSE;
 	      break;
 	    }
@@ -915,9 +915,9 @@ handle_login (GVfsBackend *backend,
                                           &bytes_written,
                                           NULL, NULL))
             {
-              g_set_error (error,
-                           G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                           "%s", _("Can't send password"));
+              g_set_error_literal (error,
+	                           G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        	                   _("Can't send password"));
               ret_val = FALSE;
               break;
             }
@@ -953,9 +953,9 @@ handle_login (GVfsBackend *backend,
 					    &choice) || 
 	      aborted)
 	    {
-	      g_set_error (error,
-			   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-			   "%s", _("Login dialog cancelled"));
+	      g_set_error_literal (error,
+				   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+				   _("Login dialog cancelled"));
 	      g_free (message);
 	      ret_val = FALSE;
 	      break;
@@ -973,9 +973,9 @@ handle_login (GVfsBackend *backend,
 					  &bytes_written,
 					  NULL, NULL))
 	    {
-	      g_set_error (error,
-			   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-			   "%s", _("Can't send host identity confirmation"));
+	      g_set_error_literal (error,
+				   G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+				   _("Can't send host identity confirmation"));
 	      ret_val = FALSE;
 	      break;
 	    }
@@ -1468,7 +1468,7 @@ do_mount (GVfsBackend *backend,
   
   if (g_data_input_stream_read_byte (reply, NULL, NULL) != SSH_FXP_VERSION)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("Protocol error"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1491,7 +1491,7 @@ do_mount (GVfsBackend *backend,
 
   if (!get_uid_sync (op_backend))
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("Protocol error"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -2258,8 +2258,8 @@ close_deleted_file (GVfsBackendSftp *backend,
   if (reply_type == SSH_FXP_STATUS)
     res = error_from_status (job, reply, -1, -1, &error);
   else
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                 "%s", _("Invalid reply received"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	                 _("Invalid reply received"));
 
   if (res)
     {
@@ -2304,8 +2304,8 @@ close_moved_file (GVfsBackendSftp *backend,
   if (reply_type == SSH_FXP_STATUS)
     res = error_from_status (job, reply, -1, -1, &error);
   else
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                 "%s", _("Invalid reply received"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	                 _("Invalid reply received"));
 
   if (res)
     {
@@ -2379,8 +2379,8 @@ close_write_reply (GVfsBackendSftp *backend,
   if (reply_type == SSH_FXP_STATUS)
     res = error_from_status (job, reply, -1, -1, &error);
   else
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                 "%s", _("Invalid reply received"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	                 _("Invalid reply received"));
 
   if (res)
     {

@@ -220,7 +220,7 @@ do_mount (GVfsBackend *backend,
     {
       release_device (cdda_backend);
       dbus_error_free (&dbus_error);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -230,7 +230,7 @@ do_mount (GVfsBackend *backend,
   if (cdda_backend->hal_ctx == NULL)
     {
       release_device (cdda_backend);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -243,7 +243,7 @@ do_mount (GVfsBackend *backend,
     {
       release_device (cdda_backend);
       dbus_error_free (&dbus_error);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -258,7 +258,7 @@ do_mount (GVfsBackend *backend,
   //g_warning ("host=%s", host);
   if (host == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("No drive specified"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No drive specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (cdda_backend);
@@ -329,7 +329,7 @@ try_mount (GVfsBackend *backend,
   //g_warning ("tm host=%s", host);
   if (host == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", _("No drive specified"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No drive specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return TRUE;

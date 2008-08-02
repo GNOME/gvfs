@@ -499,7 +499,6 @@ parse_xml (SoupMessage  *msg,
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                    _("HTTP Error: %s"), msg->reason_phrase);
       return NULL;
@@ -516,8 +515,8 @@ parse_xml (SoupMessage  *msg,
                        XML_PARSE_COMPACT);
   if (doc == NULL)
     { 
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   "%s", _("Could not parse response"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	                   _("Could not parse response"));
       return NULL;
     }
 
@@ -525,15 +524,15 @@ parse_xml (SoupMessage  *msg,
 
   if (*root == NULL || (*root)->children == NULL)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                   "%s", _("Empty response"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	                   _("Empty response"));
       return NULL;
     }
 
   if (strcmp ((char *) (*root)->name, name))
     {
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                     "%s", _("Unexpected reply from server"));
+        g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	                     _("Unexpected reply from server"));
       return NULL;
     }
 
@@ -1130,10 +1129,10 @@ stat_location (GVfsBackend  *backend,
 
   if (status != 207)
     {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   http_error_code_from_status (status),
-                   "%s", msg->reason_phrase);
+      g_set_error_literal (error,
+	                   G_IO_ERROR,
+        	           http_error_code_from_status (status),
+                	   msg->reason_phrase);
 
       return FALSE;
     }
@@ -1141,9 +1140,9 @@ stat_location (GVfsBackend  *backend,
   res = stat_location_finish (msg, target_type, num_children);
 
   if (res == FALSE)
-    g_set_error (error, 
-                 G_IO_ERROR, G_IO_ERROR_FAILED,
-                 _("Response invalid"));
+    g_set_error_literal (error, 
+	                 G_IO_ERROR, G_IO_ERROR_FAILED,
+        	         _("Response invalid"));
 
   return res;
 }

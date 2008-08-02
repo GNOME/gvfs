@@ -628,7 +628,7 @@ _g_error_from_dbus (DBusError *derror,
 	    code = atoi (end);
 	}
       
-      g_set_error (error, domain, code, "%s", derror->message);
+      g_set_error_literal (error, domain, code, derror->message);
     }
   /* TODO: Special case other types, like DBUS_ERROR_NO_MEMORY etc? */
   else
@@ -1345,8 +1345,8 @@ _g_dbus_connection_call_async (DBusConnection *connection,
       connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
       if (connection == NULL)
 	{
-	  g_set_error (&data->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       "Can't open dbus connection");
+	  g_set_error_literal (&data->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			       "Can't open dbus connection");
 	  g_idle_add (async_call_error_at_idle, data);
 	  return;
 	}

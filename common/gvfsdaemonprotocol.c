@@ -511,8 +511,8 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 
  error:
   g_object_unref (info);
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-	       "%s", _("Invalid file info format"));
+  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+		       _("Invalid file info format"));
   return NULL;
 }
 
@@ -528,8 +528,8 @@ _g_dbus_get_attribute_info_list (DBusMessageIter *iter,
   if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_ARRAY ||
       dbus_message_iter_get_element_type (iter) != DBUS_TYPE_STRUCT)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   "%s", _("Invalid attribute info list content"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid attribute info list content"));
       return NULL;
     }
 

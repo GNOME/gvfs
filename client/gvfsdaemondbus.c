@@ -881,10 +881,10 @@ invalidate_local_connection (const char *dbus_id,
   if (local)
     g_hash_table_remove (local->connections, dbus_id);
   
-  g_set_error (error,
-	       G_VFS_ERROR,
-	       G_VFS_ERROR_RETRY,
-	       "Cache invalid, retry (internally handled)");
+  g_set_error_literal (error,
+		       G_VFS_ERROR,
+		       G_VFS_ERROR_RETRY,
+		       "Cache invalid, retry (internally handled)");
 }
 
 DBusConnection *
@@ -954,7 +954,7 @@ _g_dbus_connection_get_sync (const char *dbus_id,
       if (bus == NULL)
 	{
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       "Couldn't get main dbus connection: %s\n",
+		       "Couldn't get main dbus connection: %s",
 		       derror.message);
 	  dbus_error_free (&derror);
 	  return NULL;

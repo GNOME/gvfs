@@ -1399,7 +1399,7 @@ do_mount (GVfsBackend *backend,
     {
       release_device (gphoto2_backend);
       dbus_error_free (&dbus_error);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1411,7 +1411,7 @@ do_mount (GVfsBackend *backend,
   if (gphoto2_backend->hal_ctx == NULL)
     {
       release_device (gphoto2_backend);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1424,7 +1424,7 @@ do_mount (GVfsBackend *backend,
     {
       release_device (gphoto2_backend);
       dbus_error_free (&dbus_error);
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
@@ -1439,7 +1439,7 @@ do_mount (GVfsBackend *backend,
   DEBUG ("  host='%s'", host);
   if (host == NULL || strlen (host) < 3 || host[0] != '[' || host[strlen (host) - 1] != ']')
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No device specified"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No device specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -1456,7 +1456,7 @@ do_mount (GVfsBackend *backend,
   gphoto2_backend->context = gp_context_new ();
   if (gphoto2_backend->context == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gphoto2 context"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gphoto2 context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -1624,7 +1624,7 @@ try_mount (GVfsBackend *backend,
   DEBUG ("  host=%s", host);
   if (host == NULL)
     {
-      g_set_error (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No camera specified"));
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("No camera specified"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return TRUE;

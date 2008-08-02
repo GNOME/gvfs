@@ -630,10 +630,10 @@ do_open_for_read (GVfsBackend *       backend,
 
   if (!gvfs_archive_in_error (archive))
     {
-      g_set_error (&archive->error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_NOT_FOUND,
-		   _("File doesn't exist"));
+      g_set_error_literal (&archive->error,
+			   G_IO_ERROR,
+			   G_IO_ERROR_NOT_FOUND,
+			   _("File doesn't exist"));
     }
   gvfs_archive_finish (archive);
 }

@@ -483,9 +483,9 @@ _query_file_info_helper (GVfsBackend *backend,
 
   if (found == FALSE)
     {
-      g_set_error (error, G_IO_ERROR,
-                   G_IO_ERROR_NOT_FOUND,
-                   "%s", g_strerror (ENOENT));
+      g_set_error_literal (error, G_IO_ERROR,
+	                   G_IO_ERROR_NOT_FOUND,
+        	           g_strerror (ENOENT));
     }
 
   g_free (basename);
@@ -1305,9 +1305,9 @@ do_delete (GVfsBackend *backend,
       if (len != 0)
         {
           g_mutex_unlock (op_backend->mutex);
-          g_set_error (&error, G_IO_ERROR,
-                       G_IO_ERROR_NOT_EMPTY,
-                       "%s", g_strerror (ENOTEMPTY));
+          g_set_error_literal (&error, G_IO_ERROR,
+	                       G_IO_ERROR_NOT_EMPTY,
+        	               g_strerror (ENOTEMPTY));
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
           return;

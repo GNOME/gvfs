@@ -1,3 +1,32 @@
+2008-08-02  Christian Persch <chpe@gnome.org>
+
+        * ChangeLog
+        * client/gdaemonfile.c
+        * client/gdaemonfileinputstream.c
+        * client/gdaemonfileoutputstream.c
+        * client/gvfsdaemondbus.c
+        * common/gdbusutils.c
+        * common/gvfsdaemonprotocol.c
+        * daemon/gvfsbackendarchive.c
+        * daemon/gvfsbackendcdda.c
+        * daemon/gvfsbackenddav.c
+        * daemon/gvfsbackendftp.c
+        * daemon/gvfsbackendgphoto2.c
+        * daemon/gvfsbackendobexftp-cap-parser.c
+        * daemon/gvfsbackendobexftp-fl-parser.c
+        * daemon/gvfsbackendobexftp.c
+        * daemon/gvfsbackendsftp.c
+        * daemon/gvfsbackendsmb.c
+        * daemon/gvfsbackendsmbbrowse.c
+        * daemon/gvfsjob.c
+        * daemon/gvfsjobopenforwrite.c
+        * daemon/gvfsreadchannel.c
+        * daemon/gvfswritechannel.c
+        * daemon/mount.c
+        * daemon/soup-input-stream.c
+        * daemon/soup-output-stream.c: Use g_set_error_literal where
+        appropriate. Bug #539167.
+
 2008-07-29  David Zeuthen  <davidz@redhat.com>
 
 	* client/gdaemonmount.c:
