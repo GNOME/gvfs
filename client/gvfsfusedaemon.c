@@ -2037,6 +2037,7 @@ subthread_main (gpointer data)
   g_signal_handlers_disconnect_by_func (volume_monitor, mount_tracker_unmounted_cb, NULL);
 
   g_main_loop_unref (subthread_main_loop);
+  subthread_main_loop = NULL;
 
   g_object_unref (volume_monitor);
   volume_monitor = NULL;
@@ -2148,7 +2149,8 @@ static void
 vfs_destroy (gpointer param)
 {
   mount_list_free ();
-  g_main_loop_quit (subthread_main_loop);
+  if (subthread_main_loop != NULL) 
+    g_main_loop_quit (subthread_main_loop);
   g_mutex_free (mount_list_mutex);
   g_object_unref (gvfs);
 }
