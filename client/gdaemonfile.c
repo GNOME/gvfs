@@ -2624,9 +2624,9 @@ g_daemon_file_replace_async (GFile                      *file,
 {
   dbus_bool_t dbus_make_backup = make_backup;
   guint32 dbus_flags = flags;
-  guint16 mode = 0;
+  guint16 mode = 2;
 
-  do_async_path_call (file, 
+  do_async_path_call (file,
                       G_VFS_DBUS_MOUNT_OP_OPEN_FOR_WRITE,
                       cancellable,
                       callback, user_data,

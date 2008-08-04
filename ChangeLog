@@ -1,3 +1,10 @@
+2008-08-04  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c: (g_daemon_file_replace_async):
+	Correctly set the mode to 2 resulting in the replace vfunc being
+	called inside the backends.
+	Bug #544008. Patch by Jesse van den Kieboom <jesse@icecrew.net>
+
 2008-08-04  Matthias Clasen  <mclasen@redhat.com>
 
 	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
