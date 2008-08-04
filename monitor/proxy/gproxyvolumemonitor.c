@@ -919,29 +919,49 @@ _g_icon_new_from_tokens (char **tokens, int num_tokens)
     }
   else if (strcmp (tokens[0], "GEmblemedIcon") == 0)
     {
-       int n, m;
-       GIcon *base;
-       GIcon *emblem;
-     
-       n = atoi (tokens[1]);
-       if (num_tokens < n + 2)
+       int n, m, i;
+       GIcon *base, *e_icon;
+       GEmblem *emblem;
+       GList *emblems, *e;
+       GEmblemOrigin origin;
+       char **t = tokens;
+
+       t++;
+       n = atoi (*t);
+       t++;
+       if (t - tokens >= num_tokens) 
          goto out;
-       m = atoi (tokens[n+2]);
-       if (num_tokens < n + m + 3)
-         goto out;
-       
-       base = _g_icon_new_from_tokens (tokens + 2, n);
+       base = _g_icon_new_from_tokens (t, n);
        if (base == NULL)
          goto out;
-       emblem = _g_icon_new_from_tokens (tokens + n + 3, m);
-       if (emblem == NULL)
+
+       t = t + n;
+       m = atoi (*t);
+       t++;
+       emblems = NULL;
+       for (i = 0; i < m; i++)
          {
-           g_object_unref (base);
-           goto out;
+           origin = atoi (*t);
+           t++;
+           n = atoi (*t);
+           t++;
+           if (t - tokens >= num_tokens) 
+             goto cleanup;
+           e_icon = _g_icon_new_from_tokens (t, n);
+           t += n;
+           if (e_icon == NULL)
+             goto cleanup;
+           emblem = g_emblem_new_with_origin (e_icon, origin);
+           emblems = g_list_append (emblems, emblem);
          }
-       icon = g_emblemed_icon_new (base, emblem);
+       icon = g_emblemed_icon_new (base, (GEmblem*)emblems->data);
+       for (e = emblems->next; e; e = e->next)
+         g_emblemed_icon_add_emblem (G_EMBLEMED_ICON (icon), (GEmblem*)e->data);
+
+ cleanup:
        g_object_unref (base);
-       g_object_unref (emblem);
+       g_list_foreach (emblems, (GFunc)g_object_unref, NULL);
+       g_list_free (emblems);
     }
 
  out:

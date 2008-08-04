@@ -46,6 +46,11 @@ _g_icon_serialize (GIcon *icon)
   g_return_val_if_fail (icon != NULL, NULL);
   g_return_val_if_fail (G_IS_ICON (icon), NULL);
 
+  /* We encode icons as a series of whitespace-separated tokens.
+   * The first token is the type of the icon. To help decoding, 
+   * the number of tokens is prepended as the first token (not 
+   * included in the count).
+   */
   if (G_IS_FILE_ICON (icon))
     {
       GFileIcon *file_icon = G_FILE_ICON (icon);
@@ -94,17 +99,32 @@ _g_icon_serialize (GIcon *icon)
     }
   else if (G_IS_EMBLEMED_ICON (icon))
     {
-      char *base;
-      char *emblem;
+      char *base, *s;
+      GList *emblems, *e;
       int n;
+      GString *str;
 
+      /* GEmblemedIcons are encoded as 
+       * 
+       *   <num_tokens> GEmblemedIcon <num_emblems> [<origin> <encoded_icon> ]*
+       */
+      str = g_string_new ("");
       base = _g_icon_serialize (g_emblemed_icon_get_icon (G_EMBLEMED_ICON (icon)));
-      emblem = _g_icon_serialize (g_emblemed_icon_get_emblem (G_EMBLEMED_ICON (icon)));
-
-      n = atoi (base) + atoi (emblem) + 3;
-      ret = g_strdup_printf ("%d GEmblemedIcon %s %s", n, base, emblem);
+      emblems = g_emblemed_icon_get_emblems (G_EMBLEMED_ICON (icon));
+      g_string_append_printf (str, "GEmblemedIcon %s %d", base, g_list_length (emblems));
+      n = atoi (base) + 2;
       g_free (base);
-      g_free (emblem);
+      for (e = emblems; e; e = e->next)
+        {
+          s = _g_icon_serialize (g_emblem_get_icon (G_EMBLEM (e->data)));
+          g_string_append_printf (str, " %d %s", g_emblem_get_origin (G_EMBLEM (e->data)), s);
+          n += atoi (s) + 2;
+          g_free (s);
+        }
+       
+      s = g_string_free (str, FALSE);
+      ret = g_strdup_printf ("%d %s", n + 1, s);
+      g_free (s);
     }
   else
     {

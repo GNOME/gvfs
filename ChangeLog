@@ -1,3 +1,9 @@
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	* monitor/proxy/gproxyvolumemonitor.c: Update the GIcon serialization
+	code to work with GEmblem.
+
 2008-08-03  Christian Kellner  <gicmo@gnome.org>
 
 	* client/gvfsfusedaemon.c:
