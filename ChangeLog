@@ -1,3 +1,16 @@
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* monitor/hal/ghaldrive.c: 
+	Various ref counting fixes.
+
+	* monitor/hal/ghalvolume.c:
+	Report error in idle to avoid calling a callback with the
+	volume lock held.
+	Use volume lock in hhal_volume_get_activation_root. Various
+	ref counting fixes.
+
+	Bug #545489. Based on a patch from Matthias Clasen.
+
 2008-08-04  Christian Kellner  <gicmo@gnome.org>
 
 	* client/gdaemonfile.c: (g_daemon_file_replace_async):

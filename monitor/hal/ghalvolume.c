@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -798,14 +798,11 @@ spawn_do (GVolume             *volume,
                       &child_pid,
                       &error))
     {
-      GSimpleAsyncResult *simple;
-      simple = g_simple_async_result_new_from_error (data->object,
-                                                     data->callback,
-                                                     data->user_data,
-                                                     error);
+      g_simple_async_report_gerror_in_idle (data->object,
+                                            data->callback,
+                                            data->user_data,
+                                            error);
       g_object_unref (data->object);
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
       g_error_free (error);
       g_free (data);
       return;
@@ -828,6 +825,7 @@ mount_foreign_callback (GObject *source_object,
 {
   ForeignMountOp *data = user_data;
   data->callback (G_OBJECT (data->enclosing_volume), res, data->user_data);
+  g_object_unref (data->enclosing_volume);
   g_free (data);
 }
 
@@ -852,7 +850,7 @@ g_hal_volume_mount (GVolume             *volume,
       ForeignMountOp *data;
 
       data = g_new0 (ForeignMountOp, 1);
-      data->enclosing_volume = hal_volume;
+      data->enclosing_volume = g_object_ref (hal_volume);
       data->callback = callback;
       data->user_data = user_data;
 
@@ -907,6 +905,7 @@ eject_wrapper_callback (GObject *source_object,
 {
   EjectWrapperOp *data  = user_data;
   data->callback (data->object, res, data->user_data);
+  g_object_unref (data->object);
   g_free (data);
 }
 
@@ -927,7 +926,7 @@ g_hal_volume_eject (GVolume              *volume,
   if (hal_volume->drive != NULL)
     drive = g_object_ref (hal_volume->drive);
   G_UNLOCK (hal_volume);
-  
+
   if (drive != NULL)
     {
       EjectWrapperOp *data;
@@ -986,7 +985,7 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   const char *label, *uuid;
 
   G_LOCK (hal_volume);
-  
+
   res = g_ptr_array_new ();
 
   g_ptr_array_add (res,
@@ -995,10 +994,10 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   if (hal_volume->device_path && *hal_volume->device_path != 0)
     g_ptr_array_add (res,
                      g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
-    
+
   label = hal_device_get_property_string (hal_volume->device, "volume.label");
   uuid = hal_device_get_property_string (hal_volume->device, "volume.uuid");
-  
+
   if (label && *label != 0)
     g_ptr_array_add (res,
                      g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
@@ -1011,7 +1010,7 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   g_ptr_array_add (res, NULL);
 
   G_UNLOCK (hal_volume);
-  
+
   return (char **)g_ptr_array_free (res, FALSE);
 }
 
@@ -1019,8 +1018,14 @@ static GFile *
 g_hal_volume_get_activation_root (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
+  GFile *root = NULL;
 
-  return hal_volume->foreign_mount_root != NULL ? g_object_ref (hal_volume->foreign_mount_root) : NULL;
+  G_LOCK (hal_volume);
+  if (hal_volume->foreign_mount_root != NULL)
+    root = g_object_ref (hal_volume->foreign_mount_root);
+  G_UNLOCK (hal_volume);
+
+  return root;
 }
 
 static void

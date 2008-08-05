@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -623,6 +623,7 @@ spawn_cb (GPid pid, gint status, gpointer user_data)
     }
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
+  g_object_unref (data->object);
   g_free (data);
 }
 
@@ -647,7 +648,7 @@ g_hal_drive_eject_do (GDrive              *drive,
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
-  
+
   error = NULL;
   if (!g_spawn_async (NULL,         /* working dir */
                       argv,
@@ -659,19 +660,20 @@ g_hal_drive_eject_do (GDrive              *drive,
                       &error))
     {
       GSimpleAsyncResult *simple;
-      
+
       simple = g_simple_async_result_new_from_error (data->object,
                                                      data->callback,
                                                      data->user_data,
                                                      error);
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
+      g_object_unref (drive);
       g_error_free (error);
       g_free (data);
     }
   else
     g_child_watch_add (child_pid, spawn_cb, data);
-    
+
   g_free (argv[4]);
 }
 
@@ -717,10 +719,10 @@ _eject_unmount_mounts_cb (GObject *source_object,
       if (error->code != G_IO_ERROR_FAILED_HANDLED)
         {
           g_error_free (error);
-          error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY, 
+          error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY,
                                _("Failed to eject media; one or more volumes on the media are busy."));
         }
-      
+
       /* unmount failed; need to fail the whole eject operation */
       simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
                                                      data->callback,
@@ -758,6 +760,8 @@ _eject_unmount_mounts (UnmountMountsOp *data)
                             data->cancellable,
                             data->callback,
                             data->user_data);
+
+      g_object_unref (data->drive);
       g_free (data);
     }
   else
@@ -789,7 +793,7 @@ g_hal_drive_eject (GDrive              *drive,
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
 
   data = g_new0 (UnmountMountsOp, 1);
-  data->drive = drive;
+  data->drive = g_object_ref (drive);
   data->cancellable = cancellable;
   data->callback = callback;
   data->user_data = user_data;
@@ -831,14 +835,14 @@ poll_for_media_cb (DBusPendingCall *pending_call, void *user_data)
   PollOp *data = (PollOp *) user_data;
   GSimpleAsyncResult *simple;
   DBusMessage *reply;
-  
+
   reply = dbus_pending_call_steal_reply (pending_call);
-  
+
   if (dbus_message_get_type (reply) == DBUS_MESSAGE_TYPE_ERROR)
     {
       GError *error;
       DBusError dbus_error;
-      
+
       dbus_error_init (&dbus_error);
       dbus_set_error_from_message (&dbus_error, reply);
       error = g_error_new (G_IO_ERROR,
@@ -855,18 +859,19 @@ poll_for_media_cb (DBusPendingCall *pending_call, void *user_data)
       goto out;
     }
 
-  /* TODO: parse reply and extract result? 
-   * (the result is whether the media availability state changed) 
+  /* TODO: parse reply and extract result?
+   * (the result is whether the media availability state changed)
    */
-  
+
   simple = g_simple_async_result_new (data->object,
                                       data->callback,
                                       data->user_data,
                                       NULL);
   g_simple_async_result_complete (simple);
   g_object_unref (simple);
-  
+
  out:
+  g_object_unref (data->object);
   dbus_message_unref (reply);
   dbus_pending_call_unref (pending_call);
 }
@@ -885,7 +890,7 @@ g_hal_drive_poll_for_media (GDrive              *drive,
   PollOp *data;
 
   data = g_new0 (PollOp, 1);
-  data->object = G_OBJECT (drive);
+  data->object = g_object_ref (drive);
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
@@ -894,12 +899,12 @@ g_hal_drive_poll_for_media (GDrive              *drive,
 
   G_LOCK (hal_drive);
   con = hal_pool_get_dbus_connection (hal_drive->pool);
-  msg = dbus_message_new_method_call ("org.freedesktop.Hal", 
+  msg = dbus_message_new_method_call ("org.freedesktop.Hal",
                                       hal_device_get_udi (hal_drive->device),
                                       "org.freedesktop.Hal.Device.Storage.Removable",
                                       "CheckForMedia");
   G_UNLOCK (hal_drive);
-  
+
   if (!dbus_connection_send_with_reply (con, msg, &pending_call, -1))
     {
       GError *error;
@@ -914,6 +919,7 @@ g_hal_drive_poll_for_media (GDrive              *drive,
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
       g_error_free (error);
+      g_object_unref (data->object);
       g_free (data);
     }
   else
@@ -921,7 +927,7 @@ g_hal_drive_poll_for_media (GDrive              *drive,
                                   poll_for_media_cb,
                                   data,
                                   (DBusFreeFunction) g_free);
-  
+
   dbus_message_unref (msg);
 }
 
