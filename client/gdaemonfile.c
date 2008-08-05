@@ -2219,20 +2219,10 @@ append_to_async_cb (DBusMessage *reply,
                     GCancellable *cancellable,
                     gpointer callback_data)
 {
-  DBusMessageIter iter;
   guint32 fd_id;
   StreamOpenParams *open_params;
 
   open_params = g_slice_new0 (StreamOpenParams);
-
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
-    {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       "Invalid return value from append_to_async");
-      goto failure;
-    }
 
   if (!dbus_message_get_args (reply, NULL,
 			      DBUS_TYPE_UINT32, &fd_id,
@@ -2307,20 +2297,10 @@ create_async_cb (DBusMessage *reply,
                  GCancellable *cancellable,
                  gpointer callback_data)
 {
-  DBusMessageIter iter;
   guint32 fd_id;
   StreamOpenParams *open_params;
 
   open_params = g_slice_new0 (StreamOpenParams);
-
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
-    {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       "Invalid return value from create_async");
-      goto failure;
-    }
 
   if (!dbus_message_get_args (reply, NULL,
 			      DBUS_TYPE_UINT32, &fd_id,
@@ -2576,20 +2556,10 @@ replace_async_cb (DBusMessage *reply,
                   GCancellable *cancellable,
                   gpointer callback_data)
 {
-  DBusMessageIter iter;
   guint32 fd_id;
   StreamOpenParams *open_params;
 
   open_params = g_slice_new0 (StreamOpenParams);
-
-  if (!dbus_message_iter_init (reply, &iter) ||
-      (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
-    {
-      g_simple_async_result_set_error (result,
-				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       "Invalid return value from replace_async");
-      goto failure;
-    }
 
   if (!dbus_message_get_args (reply, NULL,
 			      DBUS_TYPE_UINT32, &fd_id,

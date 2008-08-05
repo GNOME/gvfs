@@ -1,3 +1,10 @@
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c:
+	Remove wrong dbus reply struct checks for replace_async,
+	create_async and append_async that would live to (false)
+	invalid reply errors.
+
 2008-08-05  Jesse van den Kieboom  <jesse@icecrew.nl>
 
 	* client/gdaemonfile.c:
