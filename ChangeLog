@@ -1,5 +1,11 @@
 2008-08-05  Christian Kellner  <gicmo@gnome.org>
 
+	* configure.ac: Post-release bump to 0.99.5.
+
+=== gvfs 0.99.4 ===
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
 	* NEWS: Update for release
 
 2008-08-05  Christian Kellner  <gicmo@gnome.org>
