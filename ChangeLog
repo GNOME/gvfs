@@ -1,3 +1,8 @@
+2008-08-05  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* daemon/gvfsbackendsftp.c:
+	Added restoring file permissions when replacing a file.
+
 2008-08-05  Christian Kellner  <gicmo@gnome.org>
 
 	* client/gdaemonfile.c:

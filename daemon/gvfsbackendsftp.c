@@ -119,6 +119,7 @@ typedef struct {
   goffset offset;
   char *filename;
   char *tempname;
+  guint32 permissions;
   gboolean make_backup;
 } SftpHandle;
 
@@ -2237,6 +2238,28 @@ close_moved_tempfile (GVfsBackendSftp *backend,
   sftp_handle_free (handle);
 }
   
+static void
+close_restore_permissions (GVfsBackendSftp *backend,
+                           int reply_type,
+                           GDataInputStream *reply,
+                           guint32 len,
+                           GVfsJob *job,
+                           gpointer user_data)
+{
+  GDataOutputStream *command;
+  SftpHandle *handle;
+
+  handle = user_data;
+  
+  /* Here we don't really care whether or not setting the permissions succeeded
+     or not. We just take the last step and rename the temp file to the
+     actual file */
+  command = new_command_stream (backend,
+                                SSH_FXP_RENAME);
+  put_string (command, handle->tempname);
+  put_string (command, handle->filename);
+  queue_command_stream_and_free (backend, command, close_moved_tempfile, G_VFS_JOB (job), handle);
+}
 
 static void
 close_deleted_file (GVfsBackendSftp *backend,
@@ -2263,13 +2286,13 @@ close_deleted_file (GVfsBackendSftp *backend,
 
   if (res)
     {
-      /* Removed original file, now move new file in place */
-
+      /* Removed original file, now first try to restore permissions */
       command = new_command_stream (backend,
-                                    SSH_FXP_RENAME);
+                                    SSH_FXP_SETSTAT);
       put_string (command, handle->tempname);
-      put_string (command, handle->filename);
-      queue_command_stream_and_free (backend, command, close_moved_tempfile, G_VFS_JOB (job), handle);
+      g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL);
+      g_data_output_stream_put_uint32 (command, handle->permissions, NULL, NULL);
+      queue_command_stream_and_free (backend, command, close_restore_permissions, G_VFS_JOB (job), handle);
     }
   else
     {
@@ -2673,6 +2696,7 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
   handle = sftp_handle_new (reply);
   handle->filename = g_strdup (op_job->filename);
   handle->tempname = g_strdup (data->tempname);
+  handle->permissions = data->permissions;
   handle->make_backup = op_job->make_backup;
   
   g_vfs_job_open_for_write_set_handle (op_job, handle);
