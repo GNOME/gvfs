@@ -1,3 +1,9 @@
+2008-08-05  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* client/gdaemonfile.c:
+	Set etag to "" when supplied to g_daemon_file_replace_async
+	with NULL. Bug #546300
+
 2008-08-05  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac: Post-release bump to 0.99.5.
