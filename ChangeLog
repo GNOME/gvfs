@@ -1,5 +1,9 @@
 2008-08-05  Christian Kellner  <gicmo@gnome.org>
 
+	* NEWS: Update for release
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
 	* configure.ac:
 	Require glib 2.17.6 (cause by GEmblemedIcon changes)
 

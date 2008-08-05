@@ -1,4 +1,32 @@
+Major changes in 0.99.4
+=======================
+
+* Require glib >= 2.17.6
+* Support und update serialization of GEmblem and GEmblemedIcon
+* Add x-content/* support to daemon mounts
+* Use standard icon names
+
+* Bug fixes
+  545695 – any new volume is mounted twice
+  545489 – Nautilus hangs when inserting a CD
+  544008 – g_daemon_file_replace_async mode err
+  543552 – gvfs-fuse-daemon crashes if dbus dies
+  528891 – Handle URI schemes case insensitive
+  525779 – Dont look for trashs dir on sys mounts
+  545968 – leaks xml documents in error cases
+  545966 – Disallow net access to WebDAV xml parser
+  509740 – Trash icon not updated ..
+  539167 – Use g_set_error_literal where appropriate
+  528848 – [PATCH] statfs lies
+  518284 – need to add i18n on module branching
+
+* Translation updates:
+  it (Luca Ferretti), gl (Ignacio Casal Quinteiro), es (Jorge Gonzalez)
+  ja (Takeshi AIHANA), ar (Khaled Hosny), pt_BR (Vladimir Melo),
+ 
+
 Major changes in 0.99.3
+=======================
 * Fix frequent crasher in volume monitor
 
 Major changes in 0.99.2
