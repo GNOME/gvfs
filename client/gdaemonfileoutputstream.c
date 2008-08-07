@@ -984,6 +984,12 @@ g_daemon_file_output_stream_query_info (GFileOutputStream     *stream,
 
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
 #endif
+  
+  g_set_error (error,
+               G_IO_ERROR,
+               G_IO_ERROR_NOT_SUPPORTED,
+               _("Query info not supported on stream"));
+
   return NULL;
 }
 

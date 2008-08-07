@@ -1,3 +1,9 @@
+2008-08-07  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* client/gdaemonfileoutputstream.c:
+	Fixed crash in gio because error was not properly
+	being set in the query_info noop
+
 2008-08-05  Jesse van den Kieboom  <jesse@icecrew.nl>
 
 	* daemon/gvfsbackendsftp.c:
