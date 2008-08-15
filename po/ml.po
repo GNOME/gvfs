@@ -9,27 +9,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.ml\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-29 02:24+0000\n"
-"PO-Revision-Date: 2008-08-08 22:39+0530\n"
+"POT-Creation-Date: 2008-08-15 07:26+0000\n"
+"PO-Revision-Date: 2008-08-15 13:20+0530\n"
 "Last-Translator: Hari Vishnu <harivishnu@gmail.com>\n"
 "Language-Team: SMC - Malayalam <smc-discuss@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);"
 
-#: ../client/gdaemonfile.c:482
-#: ../client/gdaemonfile.c:1979
+#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1979
 msgid "Operation not supported, files on different mounts"
-msgstr "പ്രവര്‍ത്തനം പിന്തുണയ്ക്കുന്നില്ല, ഫയലുകള്‍ പല മൌണ്ടുകളിലാണ്"
+msgstr "പ്രവര്‍ത്തനം പിന്തുണയ്ക്കുന്നില്ല, ഫയലുകള്‍ പല മൌണ്ടുകളിലാണു്"
 
 #: ../client/gdaemonfile.c:787
 msgid "Invalid return value from get_info"
 msgstr "get_info-ല്‍ നിന്നും സാധുവല്ലാത്ത മറുപടി"
 
-#: ../client/gdaemonfile.c:816
-#: ../client/gdaemonfile.c:1563
+#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
 msgid "Invalid return value from query_info"
 msgstr "query_info-ല്‍ നിന്നും സാധുവല്ലാത്ത മറുപടി"
 
@@ -37,27 +34,20 @@ msgstr "query_info-ല്‍ നിന്നും സാധുവല്ലാ�
 msgid "Couldn't get stream file descriptor"
 msgstr "സ്ട്രീം ഫയല്‍ ഡിസ്ക്രിപ്റ്റര്‍ ലഭ്യമായില്ല"
 
-#: ../client/gdaemonfile.c:926
-#: ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055
-#: ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176
-#: ../client/gdaemonfile.c:2244
-#: ../client/gdaemonfile.c:2332
-#: ../client/gdaemonfile.c:2601
+#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2234
+#: ../client/gdaemonfile.c:2312 ../client/gdaemonfile.c:2571
 msgid "Invalid return value from open"
 msgstr "open-ല്‍ നിന്നും സാധുവല്ലാത്ത മറുപടി"
 
-#: ../client/gdaemonfile.c:1006
-#: ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124
-#: ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
 #: ../client/gdaemonfile.c:2202
 msgid "Didn't get stream file descriptor"
 msgstr "സ്ട്രീം ഫയല്‍ ഡിസ്ക്രിപ്റ്റര്‍ ലഭ്യമായില്ല"
 
-#: ../client/gdaemonfile.c:1238
-#: ../client/gdaemonfile.c:1255
+#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
 msgid "Invalid return value from call"
 msgstr "കോളില്‍ നിന്നും സാധുവല്ലാത്ത മറുപടി"
 
@@ -88,67 +78,63 @@ msgstr "monitor_dir-ല്‍ നിന്നും സാധുവല്ലാ�
 msgid "Invalid return value from monitor_file"
 msgstr "monitor_file-ല്‍ നിന്നും സാധുവല്ലാത്ത മറുപടി"
 
-#: ../client/gdaemonfileinputstream.c:451
-#: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1304
-#: ../client/gdaemonfileinputstream.c:1314
-#: ../client/gdaemonfileoutputstream.c:403
-#: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1052
-#: ../client/gdaemonfileoutputstream.c:1062
+#: ../client/gdaemonfileinputstream.c:450
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1300
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:402
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "സ്ട്രീം സമ്പ്രദായത്തില്‍ പിഴവ്: %s"
 
-#: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1314
-#: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1062
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1064
 msgid "End of stream"
 msgstr "സ്ട്രീമിന്റെ അവസാനം"
 
-#: ../client/gdaemonfileinputstream.c:519
-#: ../client/gdaemonfileinputstream.c:676
-#: ../client/gdaemonfileinputstream.c:785
-#: ../client/gdaemonfileinputstream.c:1036
-#: ../client/gdaemonfileoutputstream.c:460
-#: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835
-#: ../daemon/gvfsbackendobexftp.c:772
-#: ../daemon/gvfsbackendobexftp.c:793
-#: ../daemon/gvfsbackendobexftp.c:912
-#: ../daemon/gvfsbackendobexftp.c:1049
-#: ../daemon/gvfsbackendobexftp.c:1113
-#: ../daemon/gvfsbackendobexftp.c:1250
-#: ../daemon/gvfsbackendobexftp.c:1277
-#: ../daemon/gvfsbackendobexftp.c:1336
-#: ../daemon/gvfsbackendobexftp.c:1358
-#: ../daemon/gvfsbackendobexftp.c:1418
-#: ../daemon/gvfsbackendobexftp.c:1437
-#: ../daemon/gvfsbackendsmb.c:1071
-#: ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120
-#: ../daemon/gvfsbackendtest.c:183
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
+#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
+#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
+#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
+#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
+#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
+#: ../daemon/gvfsbackendsmb.c:1069 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
 msgid "Operation was cancelled"
 msgstr "പ്രവര്‍ത്തനം റദ്ദാക്കിയിരിക്കുന്നു"
 
-#: ../client/gdaemonfileinputstream.c:1211
-#: ../client/gdaemonfileoutputstream.c:946
+#: ../client/gdaemonfileinputstream.c:1207
+#: ../client/gdaemonfileoutputstream.c:942
 msgid "Seek not supported on stream"
 msgstr "സ്ട്രീമില്‍ സീക്ക് പിന്തുണയ്ക്കുന്നില്ല"
 
-#: ../client/gdaemonfileinputstream.c:1241
+#: ../client/gdaemonfileinputstream.c:1237
 msgid "The query info operation is not supported"
 msgstr "ക്വറി ഇന്‍ഫോ പ്രവര്‍ത്തനം പിന്തുണയ്ക്കുന്നില്ല"
 
-#: ../client/gdaemonvfs.c:733
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr "സ്ട്രീമില്‍ ക്വറിന്‍ഫോ പിന്തുണയ്ക്കുന്നില്ല"
+
+#: ../client/gdaemonvfs.c:749
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "മൌണ്ട് വിവരങ്ങള്‍ ലഭ്യമാക്കുന്നതിനിടയില്‍ പിശക്: %s"
 
-#: ../client/gvfsdaemondbus.c:568
-#: ../client/gvfsdaemondbus.c:999
+#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "നിരന്തരപ്രവൃത്തിയുമായി ബന്ധപ്പെടുന്നതില്‍ പിശക്: %s"
@@ -171,8 +157,7 @@ msgstr "സാധുവല്ലാത്ത ഫയല്‍ വിവര ശൈ
 msgid "Invalid attribute info list content"
 msgstr "സാധുവല്ലാത്ത ആട്രിബ്യൂട്ട് ഇന്‍ഫോ ലിസ്റ്റ് ഉള്ളടക്കം"
 
-#: ../daemon/daemon-main.c:63
-#: ../daemon/daemon-main.c:206
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "ഡി-ബസുമായി ബന്ധപ്പെടുന്നതില്‍ പിശക്: %s"
@@ -194,8 +179,7 @@ msgstr "പിശക്: %s"
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "ഉപയോഗിക്കേണ്ട വിധം: %s --spawner dbus-id object_path"
 
-#: ../daemon/daemon-main.c:155
-#: ../daemon/daemon-main.c:173
+#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "ഉപയോഗിക്കേണ്ട വിധം: %s key=value key=value ..."
@@ -217,52 +201,37 @@ msgstr "മൌണ്ട് ഡെമണ്‍ ആരംഭിക്കുന്�
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:315
-#: ../daemon/gvfsbackendftp.c:963
-#: ../daemon/gvfsbackendsftp.c:1893
+#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:963
+#: ../daemon/gvfsbackendsftp.c:1894
 #, c-format
 msgid "/ on %s"
 msgstr "%s-ല്‍ /"
 
-#: ../daemon/gvfsbackendarchive.c:515
-#: ../daemon/gvfsbackendftp.c:1479
-#: ../daemon/gvfsbackendsftp.c:1552
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1479
+#: ../daemon/gvfsbackendsftp.c:1553
 msgid "No hostname specified"
 msgstr "ഹോസ്റ്റിന്റെ നാമം വ്യക്തമാക്കിയിട്ടില്ല"
 
-#: ../daemon/gvfsbackendarchive.c:526
-#: ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1446
-#: ../daemon/gvfsbackendhttp.c:299
-#: ../daemon/gvfsbackendobexftp.c:603
-#: ../daemon/gvfsbackendobexftp.c:614
+#: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
+#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
 msgstr "സാധുവല്ലാത്ത മൌണ്ട്"
 
-#: ../daemon/gvfsbackendarchive.c:636
-#: ../daemon/gvfsbackendarchive.c:686
-#: ../daemon/gvfsbackendarchive.c:715
-#: ../daemon/gvfsbackendcdda.c:820
-#: ../daemon/gvfsbackendcomputer.c:572
-#: ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendftp.c:2101
-#: ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:804
-#: ../daemon/gvfsbackendsmbbrowse.c:871
-#: ../daemon/gvfsbackendsmbbrowse.c:1042
-#: ../daemon/gvfsbackendsmbbrowse.c:1116
+#: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
+#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:822
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendftp.c:2101 ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
+#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1116
 #, c-format
 msgid "File doesn't exist"
 msgstr "ഫയല്‍ നിലവിലില്ല"
 
-#: ../daemon/gvfsbackendarchive.c:724
-#: ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651
-#: ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:912
-#: ../daemon/gvfsbackendnetwork.c:637
-#, c-format
+#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:912 ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "ഫയല്‍ ഒരു തട്ടു് അല്ല"
 
@@ -275,27 +244,20 @@ msgstr "ബേണ്‍"
 msgid "Unable to create temporary directory"
 msgstr "താല്‍ക്കാലിക തട്ടു് ഉണ്ടാക്കുവാന്‍ സാധ്യമായില്ല"
 
-#: ../daemon/gvfsbackendburn.c:405
-#: ../daemon/gvfsbackendburn.c:416
-#: ../daemon/gvfsbackendburn.c:451
-#: ../daemon/gvfsbackendburn.c:672
-#: ../daemon/gvfsbackendburn.c:719
-#: ../daemon/gvfsbackendburn.c:745
-#: ../daemon/gvfsbackendburn.c:783
-#: ../daemon/gvfsbackendgphoto2.c:1083
-#: ../daemon/gvfsbackendgphoto2.c:1963
-#: ../daemon/gvfsbackendgphoto2.c:2672
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
+#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
 #, c-format
 msgid "No such file or directory"
 msgstr "ഈ പേരില്‍ ഒരു ഫയലോ തട്ടോ ഇല്ല"
 
-#: ../daemon/gvfsbackendburn.c:425
-#: ../daemon/gvfsbackenddav.c:2033
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
 msgid "Directory not empty"
 msgstr "തട്ടു് ശൂന്യമല്ല"
 
-#: ../daemon/gvfsbackendburn.c:459
-#: ../daemon/gvfsbackendburn.c:897
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:897
 msgid "Can't copy file over directory"
 msgstr "നിലവിലുള്ള തട്ടായി ഫയല്‍ പകര്‍ത്തുവാന്‍ സാധ്യമല്ല"
 
@@ -304,10 +266,8 @@ msgstr "നിലവിലുള്ള തട്ടായി ഫയല്‍ പ
 msgid "CD/DVD Creator"
 msgstr "സിഡി/ഡിവിഡി സൃഷ്ടാവ്"
 
-#: ../daemon/gvfsbackendburn.c:755
-#: ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917
-#: ../daemon/gvfsbackendgphoto2.c:2745
+#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
 msgid "File exists"
 msgstr "ഫയല്‍ നിലവിലുണ്ട്"
 
@@ -327,102 +287,89 @@ msgstr "ലക്ഷ്യസ്ഥാനത്തു് ഫയലുണ്ട�
 msgid "Can't recursively copy directory"
 msgstr "ആവര്‍ത്തിച്ച് തട്ടു് പകര്‍ത്തുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackendburn.c:943
-#: ../daemon/gvfsbackendgphoto2.c:2330
-#: ../daemon/gvfsbackendgphoto2.c:2538
-#: ../daemon/gvfsbackendgphoto2.c:2633
-#: ../daemon/gvfsbackendgphoto2.c:2724
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
+#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
+#: ../daemon/gvfsbackendgphoto2.c:2739
 msgid "Not supported"
 msgstr "പിന്തുണ ലഭ്യമല്ല"
 
-#: ../daemon/gvfsbackendcdda.c:221
-#: ../daemon/gvfsbackendgphoto2.c:1387
-#, c-format
+#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1402
 msgid "Cannot connect to the system bus"
 msgstr "സിസ്റ്റം ബസ്സുമായി ബന്ധപ്പെടാന്‍ കഴിയുന്നില്ല"
 
-#: ../daemon/gvfsbackendcdda.c:231
-#: ../daemon/gvfsbackendgphoto2.c:1399
-#, c-format
+#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1414
 msgid "Cannot create libhal context"
 msgstr "ലിബ്-ഹാല്‍ കോണ്ടെക്സ്റ്റ് ഉണ്ടാക്കാന്‍ കഴിഞ്ഞില്ല"
 
-#: ../daemon/gvfsbackendcdda.c:244
-#: ../daemon/gvfsbackendgphoto2.c:1412
-#, c-format
+#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1427
 msgid "Cannot initialize libhal"
 msgstr "ലിബ്-ഹാല്‍ തുടങ്ങാന്‍ കഴിയുന്നില്ല"
 
-#: ../daemon/gvfsbackendcdda.c:259
-#: ../daemon/gvfsbackendcdda.c:330
+#: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
 msgid "No drive specified"
 msgstr "ഡ്രൈവ് വ്യക്തമാക്കിയിട്ടില്ല"
 
-#: ../daemon/gvfsbackendcdda.c:274
+#: ../daemon/gvfsbackendcdda.c:276
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "ഡ്രൈവ് %s ലഭ്യമല്ല"
 
-#: ../daemon/gvfsbackendcdda.c:284
+#: ../daemon/gvfsbackendcdda.c:286
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "ഡ്രൈവ് %s-ല്‍ ഓഡിയോ ഫയലുകള്‍ ലഭ്യമല്ല"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:292
+#: ../daemon/gvfsbackendcdda.c:294
 #, c-format
 msgid "cdda mount on %s"
 msgstr "സി.ഡി.ഡി.എ മൗണ്ട്  %s-ഏല്‍"
 
-#: ../daemon/gvfsbackendcdda.c:293
-#: ../daemon/gvfsbackendcdda.c:797
-#: ../monitor/hal/ghalmount.c:434
-#: ../monitor/hal/ghalvolume.c:244
-#: ../monitor/hal/ghalvolume.c:265
+#: ../daemon/gvfsbackendcdda.c:295 ../daemon/gvfsbackendcdda.c:799
+#: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:214
+#: ../monitor/hal/ghalvolume.c:235
 #, c-format
 msgid "Audio Disc"
 msgstr "ഓഡിയോ ഡിസ്ക്"
 
-#: ../daemon/gvfsbackendcdda.c:354
+#: ../daemon/gvfsbackendcdda.c:356
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "ഫയല്‍ സിസ്റ്റം തിരക്കിലാണ്: %d ഫയല്‍ തുറക്കുന്നിരിയ്ക്കുന്നു"
 msgstr[1] "ഫയല്‍ സിസ്റ്റം തിരക്കിലാണ്: %d ഫയലുകള്‍ തുറക്കുന്നിരിയ്ക്കുന്നു"
 
-#: ../daemon/gvfsbackendcdda.c:544
+#: ../daemon/gvfsbackendcdda.c:546
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "ഡ്രൈവ് %s-ല്‍ %s എന്നൊരു ഫയല്‍ ലഭ്യമല്ല"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:653
+#: ../daemon/gvfsbackendcdda.c:655
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "ഡ്രൈവ് %s-ല്‍ പാരനോയിയയില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendcdda.c:716
+#: ../daemon/gvfsbackendcdda.c:718
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "ഡ്രൈവ് %s-ല്‍ സ്ട്രീമില്‍ തിരയുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendcdda.c:813
-#: ../daemon/gvfsbackendgphoto2.c:1693
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
 #, c-format
 msgid "No such file"
 msgstr "അങ്ങനെ ഒരു ഫയല്‍ ലഭ്യമല്ല"
 
-#: ../daemon/gvfsbackendcdda.c:827
+#: ../daemon/gvfsbackendcdda.c:829
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "ഫയല്‍ നിലവിലില്ല, അല്ലെങ്കില്‍ ഇത് ഒരു ഓഡിയോ ട്രാക്കല്ല"
 
-#: ../daemon/gvfsbackendcdda.c:933
+#: ../daemon/gvfsbackendcdda.c:935
 msgid "Audio CD Filesystem Service"
 msgstr "ശബ്ദ സി.ഡി ഫയല്‍ സിസ്റ്റം സേവനം"
 
-#: ../daemon/gvfsbackendcomputer.c:179
-#: ../daemon/gvfsbackendcomputer.c:693
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
 msgid "Computer"
 msgstr "കമ്പ്യൂട്ടര്‍"
 
@@ -430,27 +377,22 @@ msgstr "കമ്പ്യൂട്ടര്‍"
 msgid "Filesystem"
 msgstr "ഫയല്‍ സിസ്റ്റം"
 
-#: ../daemon/gvfsbackendcomputer.c:590
-#: ../daemon/gvfsbackendgphoto2.c:1685
-#: ../daemon/gvfsbackendobexftp.c:758
-#: ../daemon/gvfsbackendsmb.c:648
-#: ../daemon/gvfsbackendtrash.c:655
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
 msgstr "തട്ടു് തുറക്കുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackendcomputer.c:594
-#: ../daemon/gvfsbackendcomputer.c:732
+#: ../daemon/gvfsbackendcomputer.c:594 ../daemon/gvfsbackendcomputer.c:732
 msgid "Can't open mountable file"
 msgstr "മൌണ്ട് ചെയ്യുവാന്‍ കഴിയുന്ന ഫയല്‍ തുറക്കുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackendcomputer.c:780
-#: ../daemon/gvfsbackendsftp.c:1036
+#: ../daemon/gvfsbackendcomputer.c:780 ../daemon/gvfsbackendsftp.c:1037
 #, c-format
 msgid "Internal error: %s"
 msgstr "ആന്തരിക പിഴവ്: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:812
-#: ../daemon/gvfsbackendcomputer.c:929
+#: ../daemon/gvfsbackendcomputer.c:812 ../daemon/gvfsbackendcomputer.c:929
 msgid "Can't mount file"
 msgstr "ഫയല്‍ മൌണ്ട് ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
@@ -458,8 +400,7 @@ msgstr "ഫയല്‍ മൌണ്ട് ചെയ്യുവാന്‍ സ
 msgid "No media in the drive"
 msgstr "ഡ്രൈവില്‍ മാധ്യമം ഇല്ല"
 
-#: ../daemon/gvfsbackendcomputer.c:881
-#: ../daemon/gvfsbackendcomputer.c:972
+#: ../daemon/gvfsbackendcomputer.c:881 ../daemon/gvfsbackendcomputer.c:972
 #: ../daemon/gvfsbackendcomputer.c:1072
 msgid "Not a mountable file"
 msgstr "ഒരു മൌണ്ടു് ചെയ്യാവുന്ന ഫയല്‍ അല്ല"
@@ -472,8 +413,7 @@ msgstr "ഫയല്‍ അണ്‍മൌണ്ട് ചെയ്യുവാ�
 msgid "Can't eject file"
 msgstr "ഫയല്‍ ലഭ്യമാക്കുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackenddav.c:504
-#: ../daemon/gvfsbackenddav.c:1513
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -487,64 +427,54 @@ msgstr "മറുപടി പാഴ്സ് ചെയ്യുവാന്‍ 
 msgid "Empty response"
 msgstr "മറുപടി ശൂന്യം"
 
-#: ../daemon/gvfsbackenddav.c:536
+#: ../daemon/gvfsbackenddav.c:537
 msgid "Unexpected reply from server"
 msgstr "സെര്‍വറില്‍ നിന്നും അപ്രതീക്ഷിതമായ മറുപടി"
 
-#: ../daemon/gvfsbackenddav.c:1146
-#: ../daemon/gvfsbackenddav.c:1648
-#, c-format
+#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
 msgid "Response invalid"
 msgstr "സാധുവല്ലാത്ത മറുപടി"
 
-#: ../daemon/gvfsbackenddav.c:1289
+#: ../daemon/gvfsbackenddav.c:1291
 msgid "WebDAV share"
 msgstr "WebDAV ഷെയര്‍"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1293
 #, c-format
 msgid "Enter password for %s"
 msgstr "%s-നുള്ള അടയാളവാക്കു് നല്‍കുക"
 
-#: ../daemon/gvfsbackenddav.c:1294
+#: ../daemon/gvfsbackenddav.c:1296
 msgid "Please enter proxy password"
 msgstr "ദയവായി പ്രോക്സി അടയാളവാക്കു് നല്‍കുക"
 
-#: ../daemon/gvfsbackenddav.c:1517
-#: ../daemon/gvfsbackenddav.c:1521
+#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
 msgid "Not a WebDAV enabled share"
 msgstr "WebDAV സജ്ജമായ ഷെയര്‍ അല്ല"
 
-#: ../daemon/gvfsbackenddav.c:1544
+#: ../daemon/gvfsbackenddav.c:1546
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV %s-ഏല്‍"
 
-#: ../daemon/gvfsbackenddav.c:1604
-#: ../daemon/gvfsbackenddav.c:1677
+#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
 msgid "Could not create request"
 msgstr "ആവശ്യം അറിയിക്കുവാന്‍ സാധിച്ചില്ല"
 
-#: ../daemon/gvfsbackenddav.c:1740
-#: ../daemon/gvfsbackenddav.c:1993
-#: ../daemon/gvfsbackenddav.c:2104
-#: ../daemon/gvfsbackendftp.c:1699
-#: ../daemon/gvfsbackendftp.c:2365
-#: ../daemon/gvfsbackendsftp.c:3535
-#: ../daemon/gvfsbackendsmb.c:1807
-#, c-format
+#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
+#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
+#: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "ലക്ഷ്യസ്ഥാനത്തുള്ള ഫയല്‍ നിലവിലുണ്ട്"
 
-#: ../daemon/gvfsbackenddav.c:1813
-#: ../daemon/gvfsbackendsftp.c:2783
-#: ../daemon/gvfsbackendsmb.c:1039
+#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "ഫയല്‍ പുറത്ത് നിന്നും മാറ്റിയിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackenddav.c:1844
-#: ../daemon/gvfsbackendsmb.c:1077
-#: ../daemon/gvfsbackendsmb.c:1824
+#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "കരുതല്‍ പകര്‍പ്പു് ഫയല്‍ ഉണ്ടാക്കുന്നത് പരാജയപ്പെട്ടു"
 
@@ -553,8 +483,7 @@ msgstr "കരുതല്‍ പകര്‍പ്പു് ഫയല്‍ ഉ
 msgid "dns-sd"
 msgstr "ഡി.എന്‍.എസ്-എസ്.ഡി(dns-sd)"
 
-#: ../daemon/gvfsbackenddnssd.c:669
-#: ../daemon/gvfsbackendnetwork.c:731
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
 msgid "Can't monitor file or directory."
 msgstr "ഫയല്‍ അല്ലെങ്കില്‍ തട്ടു് മോണിറ്റര്‍ ചെയ്യാന്‍ കഴിയുന്നില്ല"
 
@@ -563,10 +492,8 @@ msgstr "ഫയല്‍ അല്ലെങ്കില്‍ തട്ടു് 
 msgid "Dns-SD"
 msgstr "ഡി.എന്‍.എസ്-എസ്.ഡി(Dns-SD)"
 
-#: ../daemon/gvfsbackenddnssd.c:688
-#: ../daemon/gvfsbackendnetwork.c:676
-#: ../daemon/gvfsbackendnetwork.c:814
-#: ../daemon/gvfsbackendnetwork.c:815
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
 msgid "Network"
 msgstr "ശ്രൃംഖല"
 
@@ -586,8 +513,7 @@ msgstr "വിവര ബന്ധം തുടങ്ങാന്‍ കഴിയ
 msgid "Data connection closed"
 msgstr "വിവര ബന്ധം അടച്ചു"
 
-#: ../daemon/gvfsbackendftp.c:255
-#: ../daemon/gvfsbackendftp.c:259
+#: ../daemon/gvfsbackendftp.c:255 ../daemon/gvfsbackendftp.c:259
 msgid "Operation failed"
 msgstr "പ്രവര്‍ത്തനം റദ്ദാക്കിയിരിക്കുന്നു "
 
@@ -595,13 +521,11 @@ msgstr "പ്രവര്‍ത്തനം റദ്ദാക്കിയി�
 msgid "No space left on server"
 msgstr "സെര്‍വറില്‍ സ്ഥലം ബാക്കിയില്ല"
 
-#: ../daemon/gvfsbackendftp.c:272
-#: ../daemon/gvfsbackendsftp.c:3844
+#: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
 msgid "Operation unsupported"
 msgstr "പ്രവര്‍ത്തനം പിന്തുണയ്ക്കുന്നില്ല"
 
-#: ../daemon/gvfsbackendftp.c:276
-#: ../daemon/gvfsbackendsftp.c:288
+#: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
 msgid "Permission denied"
 msgstr "അനുവാദമില്ല"
 
@@ -609,30 +533,21 @@ msgstr "അനുവാദമില്ല"
 msgid "Page type unknown"
 msgstr "പേജ് തരം അറിയുന്നതല്ല"
 
-#: ../daemon/gvfsbackendftp.c:284
-#: ../daemon/gvfsbackendftp.c:2211
-#, c-format
+#: ../daemon/gvfsbackendftp.c:284 ../daemon/gvfsbackendftp.c:2211
 msgid "Invalid filename"
 msgstr "സാധുവല്ലാത്ത ഫയല്‍നാമം"
 
-#: ../daemon/gvfsbackendftp.c:288
-#: ../daemon/gvfsbackendftp.c:364
-#: ../daemon/gvfsbackendftp.c:393
-#: ../daemon/gvfsbackendftp.c:412
-#: ../daemon/gvfsbackendftp.c:425
-#: ../daemon/gvfsbackendftp.c:817
-#, c-format
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendftp.c:364
+#: ../daemon/gvfsbackendftp.c:393 ../daemon/gvfsbackendftp.c:412
+#: ../daemon/gvfsbackendftp.c:425 ../daemon/gvfsbackendftp.c:817
 msgid "Invalid reply"
 msgstr "സാധുവല്ലാത്ത മറുപടി"
 
 #: ../daemon/gvfsbackendftp.c:532
-#, c-format
 msgid "broken transmission"
 msgstr "പൊട്ടിയ പ്രക്ഷേപണം"
 
-#: ../daemon/gvfsbackendftp.c:677
-#: ../daemon/gvfsbackendftp.c:837
-#, c-format
+#: ../daemon/gvfsbackendftp.c:677 ../daemon/gvfsbackendftp.c:837
 msgid "Could not connect to host"
 msgstr "ഹോസ്റ്റുമായി ബന്ധപ്പെടാന്‍ കഴിഞ്ഞില്ല"
 
@@ -642,8 +557,7 @@ msgstr "ഹോസ്റ്റുമായി ബന്ധപ്പെടാന�
 msgid "Enter password for ftp on %s"
 msgstr "%s-നുള്ള എഫ്.ടി.പി-ക്കുള്ള അടയാളവാക്കു് നല്‍കുക"
 
-#: ../daemon/gvfsbackendftp.c:1362
-#: ../daemon/gvfsbackendsftp.c:873
+#: ../daemon/gvfsbackendftp.c:1362 ../daemon/gvfsbackendsftp.c:874
 msgid "Password dialog cancelled"
 msgstr "അടയാളവാക്കിനുള്ള സംഭാഷണം റദ്ദാക്കിയിരിക്കുന്നു"
 
@@ -658,25 +572,20 @@ msgstr "%s-ല്‍ ftp"
 msgid "ftp as %s on %s"
 msgstr "%2$s-ല്‍ %1$s-ആയി ftp"
 
-#: ../daemon/gvfsbackendftp.c:1529
-#: ../daemon/gvfsbackendsftp.c:1957
-#: ../daemon/gvfsbackendsftp.c:3526
-#, c-format
+#: ../daemon/gvfsbackendftp.c:1529 ../daemon/gvfsbackendsftp.c:1958
+#: ../daemon/gvfsbackendsftp.c:3550
 msgid "File is directory"
 msgstr "ഫയലൊരു തട്ടാണു്"
 
-#: ../daemon/gvfsbackendftp.c:1751
-#: ../daemon/gvfsbackendftp.c:2326
+#: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
 msgid "backups not supported yet"
 msgstr "കരുതല്‍ പകര്‍പ്പുകള്‍ പിന്തുണയ്ക്കുന്നില്ല"
 
 #: ../daemon/gvfsbackendftp.c:1828
-#, c-format
 msgid "filename too long"
 msgstr "ഫയലിന്റെ പേരു് വളരെ വലുതാണു്"
 
 #: ../daemon/gvfsbackendftp.c:2345
-#, c-format
 msgid "Invalid destination filename"
 msgstr "സാധുവല്ലാത്ത ഉദ്ദേശ ഫയല്‍നാമം"
 
@@ -708,188 +617,176 @@ msgstr "ഡിജിറ്റല്‍ ക്യാമറ (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:839
-#: ../monitor/gphoto2/ggphoto2volume.c:183
+#: ../daemon/gvfsbackendgphoto2.c:841 ../monitor/gphoto2/ggphoto2volume.c:183
 #, c-format
 msgid "%s Camera"
 msgstr "%s ക്യാമറ"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:842
-#: ../monitor/gphoto2/ggphoto2volume.c:178
+#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s ശബ്ദ പ്ലേയര്‍"
 
-#: ../daemon/gvfsbackendgphoto2.c:851
-#: ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:192
 msgid "Camera"
 msgstr "ക്യാമറ"
 
-#: ../daemon/gvfsbackendgphoto2.c:853
-#: ../monitor/gphoto2/ggphoto2volume.c:190
+#: ../daemon/gvfsbackendgphoto2.c:855 ../monitor/gphoto2/ggphoto2volume.c:190
 msgid "Audio Player"
 msgstr "ശബ്ദ പ്ലേയര്‍"
 
-#: ../daemon/gvfsbackendgphoto2.c:1310
+#: ../daemon/gvfsbackendgphoto2.c:1325
 msgid "Error listing folders to figure out ignore prefix"
 msgstr "അവഗണന മുന്‍-വാചകം കണ്ടു പിടിക്കാന്‍ അറകളുടെ പട്ടിക ഉണ്ടാക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1427
-#, c-format
+#: ../daemon/gvfsbackendgphoto2.c:1442
 msgid "No device specified"
 msgstr "ഉപകരണം വ്യക്തമാക്കിയിട്ടില്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:1444
-#, c-format
+#: ../daemon/gvfsbackendgphoto2.c:1459
 msgid "Cannot create gphoto2 context"
 msgstr "ജി.പി.ഫോടോ2 കോണ്ടെക്സ്റ്റ് ഉണ്ടാക്കാന്‍ കഴിയുന്നില്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:1454
+#: ../daemon/gvfsbackendgphoto2.c:1469
 msgid "Error creating camera"
 msgstr "ക്യാമറ ഉണ്ടാക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1467
+#: ../daemon/gvfsbackendgphoto2.c:1482
 msgid "Error creating port info list"
 msgstr "പോര്‍ട് വിവര പട്ടിക ഉണ്ടാക്കുന്നതില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1477
+#: ../daemon/gvfsbackendgphoto2.c:1492
 msgid "Error loading info list"
 msgstr "വിവര പട്ടിക തുറക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1489
+#: ../daemon/gvfsbackendgphoto2.c:1504
 msgid "Error looking up port info from port info list"
 msgstr "പോര്‍ട് വിവര പട്ടികയില്‍ നിന്നും പോര്‍ട് വിവരങ്ങള്‍ കണ്ടുപിടിക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1499
+#: ../daemon/gvfsbackendgphoto2.c:1514
 msgid "Error getting port info from port info list"
 msgstr "പോര്‍ട് വിവര പട്ടികയില്‍ നിന്നും  പോര്‍ട് വിവരങ്ങള്‍ കിട്ടുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1512
+#: ../daemon/gvfsbackendgphoto2.c:1527
 msgid "Error setting port info"
 msgstr "പോര്‍ട് വിവരം സെറ്റപ്പ് ചെയ്യുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1523
+#: ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Error initializing camera"
 msgstr "ക്യാമറ ആരംഭിക്കാന്‍ കഴിയുന്നില്ല"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1537
+#: ../daemon/gvfsbackendgphoto2.c:1552
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "ജി.പി.ഫോടോ2 മൗണ്ട് %s-ഏല്‍"
 
-#: ../daemon/gvfsbackendgphoto2.c:1612
-#, c-format
+#: ../daemon/gvfsbackendgphoto2.c:1627
 msgid "No camera specified"
 msgstr "ക്യാമറ ഒന്നും വ്യക്തമാക്കിയിട്ടില്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:1640
+#: ../daemon/gvfsbackendgphoto2.c:1655
 #, c-format
 msgid "File system is busy: %d open files"
 msgstr "ഫയല്‍ സിസ്റ്റം തിരക്കിലാണ്: %d ഫയല്‍ തുറന്നിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendgphoto2.c:1701
+#: ../daemon/gvfsbackendgphoto2.c:1716
 msgid "Error creating file object"
 msgstr "ഫയല്‍ വസ്തു ഉണ്ടാക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1715
+#: ../daemon/gvfsbackendgphoto2.c:1730
 msgid "Error getting file"
 msgstr "ഫയല്‍ കിട്ടുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1724
+#: ../daemon/gvfsbackendgphoto2.c:1739
 msgid "Error getting data from file"
 msgstr "ഫയലില്‍ നിന്നും വിവരങ്ങള്‍ കിട്ടുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1818
-#: ../daemon/gvfsbackendgphoto2.c:2992
+#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "%s ക്യാമറയില്‍ അകത്തേക്കുള്ള സ്റ്റ്രീം കണ്ടെത്തുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:1957
-#: ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "ഒരു തട്ടു് അല്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:1990
+#: ../daemon/gvfsbackendgphoto2.c:2005
 msgid "Error listing folders"
 msgstr "അറ പട്ടികകള്‍ ഉണ്ടാക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2053
+#: ../daemon/gvfsbackendgphoto2.c:2068
 msgid "Error listing files in folder"
 msgstr "അറയില്‍ ഫയല്‍ പട്ടികകള്‍ ഉണ്ടാക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2342
+#: ../daemon/gvfsbackendgphoto2.c:2357
 msgid "Error creating directory"
 msgstr "അറ ഉണ്ടാക്കുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2550
+#: ../daemon/gvfsbackendgphoto2.c:2565
 msgid "Name already exists"
 msgstr "പേര് നേരത്തേ തന്നെ ഉണ്ട്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2561
-#: ../daemon/gvfsbackendgphoto2.c:3182
+#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
 msgid "New name too long"
 msgstr "പുതിയ പേര് വളരെ വലുതാണ്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2571
-#: ../daemon/gvfsbackendgphoto2.c:3193
+#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
 msgid "Error renaming dir"
 msgstr "അറ പേര് മാറ്റുനത്തില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2583
-#: ../daemon/gvfsbackendgphoto2.c:3205
+#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
 msgid "Error renaming file"
 msgstr "ഫയല്‍ പേര് മാറ്റുനത്തില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2646
+#: ../daemon/gvfsbackendgphoto2.c:2661
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "തട്ടു്  '%s' ശൂന്യമല്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:2657
+#: ../daemon/gvfsbackendgphoto2.c:2672
 msgid "Error deleting directory"
 msgstr "അറ കളയുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2682
+#: ../daemon/gvfsbackendgphoto2.c:2697
 msgid "Error deleting file"
 msgstr "ഫയല്‍ കളയുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:2734
+#: ../daemon/gvfsbackendgphoto2.c:2749
 msgid "Can't write to directory"
 msgstr "അറയിലേക്ക് എഴുതാന്‍ കഴിയുന്നില്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:2781
+#: ../daemon/gvfsbackendgphoto2.c:2796
 msgid "Cannot allocate new file to append to"
 msgstr "ഇത് ചേര്‍ക്കണ്ട ഫയല്‍ അലോക്കേറ്റ് ചെയ്യാന്‍ കഴിഞ്ഞില്ല (സ്ഥലം കണ്ടു പിടിക്കാന്‍ കഴിഞ്ഞില്ല)"
 
-#: ../daemon/gvfsbackendgphoto2.c:2795
+#: ../daemon/gvfsbackendgphoto2.c:2810
 msgid "Cannot read file to append to"
 msgstr "ഇത് ചേര്‍ക്കണ്ട ഫയല്‍ വായിക്കാന്‍ കഴിയുന്നില്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:2805
+#: ../daemon/gvfsbackendgphoto2.c:2820
 msgid "Cannot get data of file to append to"
 msgstr "ഇത് ചേര്‍ക്കണ്ട ഫയലിന്റെ വിവരങ്ങള്‍ ലഭിക്കുന്നില്ല"
 
-#: ../daemon/gvfsbackendgphoto2.c:3091
+#: ../daemon/gvfsbackendgphoto2.c:3106
 msgid "Error writing file"
 msgstr "ഫയല്‍ എഴുതുന്നതില്‍ പിശക്"
 
-#: ../daemon/gvfsbackendgphoto2.c:3138
+#: ../daemon/gvfsbackendgphoto2.c:3153
 msgid "Not supported (not same directory)"
 msgstr "പിന്തുണയ്ക്കുന്നില്ല (അതേ അറയല്ല)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3150
+#: ../daemon/gvfsbackendgphoto2.c:3165
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "പിന്തുണയ്ക്കുന്നില്ല (സ്രോതസ്സ് അറയാണ്, ലക്ഷ്യം അറയാണ്)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3158
+#: ../daemon/gvfsbackendgphoto2.c:3173
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "പിന്തുണയ്ക്കുന്നില്ല (സ്രോതസ്സ്  അറയാണ്, ലക്ഷ്യം നിലവിലുള്ള ഫയലാണ്)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3170
+#: ../daemon/gvfsbackendgphoto2.c:3185
 msgid "Not supported (src is file, dst is dir)"
 msgstr "പിന്തുണയ്ക്കുന്നില്ല (സ്രോതസ്സ്  ഫയലാണ് , ലക്ഷ്യം അറയാണ്)"
 
@@ -898,10 +795,8 @@ msgstr "പിന്തുണയ്ക്കുന്നില്ല (സ്ര�
 msgid "HTTP Client Error: %s"
 msgstr "HTTP ക്ലയന്റില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsbackendhttp.c:560
-#: ../daemon/gvfsbackendsftp.c:1881
-#: ../daemon/gvfsbackendsmb.c:1304
-#: ../daemon/gvfsbackendtrash.c:983
+#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
+#: ../daemon/gvfsbackendsmb.c:1301 ../daemon/gvfsbackendtrash.c:1006
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (സാധുവല്ലാത്ത എന്‍കോഡിങ്)"
@@ -911,8 +806,7 @@ msgid "Directory notification not supported"
 msgstr "തട്ടിനുള്ള അറിയിപ്പ് പിന്തുണയ്ക്കുന്നില്ല"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:268
-#: ../daemon/gvfsbackendsmbbrowse.c:699
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
 msgid "Windows Network"
 msgstr "വിന്‍ഡോസ് ശൃംഖല"
 
@@ -929,9 +823,8 @@ msgstr "ശ്രംഖല സ്ഥാനം നിരീക്ഷിയ്ക�
 
 #. Mount was successful
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:442
-#: ../daemon/gvfsbackendsmb.c:557
-#: ../daemon/gvfsbackendsmb.c:1297
+#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:557
+#: ../daemon/gvfsbackendsmb.c:1294
 #, c-format
 msgid "%s on %s"
 msgstr "%s-ല്‍ %s"
@@ -944,143 +837,128 @@ msgstr "ഉപകരണവുമായുള്ള ബന്ധം നഷ്ട�
 msgid "Device requires a software update"
 msgstr "ഉപകരണം ഒരു സോഫ്റ്റ്‌വെയര്‍ പുതുക്കല്‍ ആവശ്യപ്പെടുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:280
+#: ../daemon/gvfsbackendsftp.c:281
 msgid "ssh program unexpectedly exited"
 msgstr "ssh പ്രോഗ്രാമില്‍ നിന്നും അപ്രതീക്ഷിതമായി പുറത്തു് കടന്നിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:295
+#: ../daemon/gvfsbackendsftp.c:296
 msgid "Hostname not known"
 msgstr "ഹോസ്റ്റിന്റെ പേരു് ലഭ്യമല്ല"
 
-#: ../daemon/gvfsbackendsftp.c:302
+#: ../daemon/gvfsbackendsftp.c:303
 msgid "No route to host"
 msgstr "ഹോസ്റ്റിലേക്കുള്ള വഴി ലഭ്യമല്ല"
 
-#: ../daemon/gvfsbackendsftp.c:309
+#: ../daemon/gvfsbackendsftp.c:310
 msgid "Connection refused by server"
 msgstr "സെര്‍വര്‍ ബന്ധം നിഷേധിച്ചിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:316
+#: ../daemon/gvfsbackendsftp.c:317
 msgid "Host key verification failed"
 msgstr "ഹോസ്റ്റ് കീയുടെ തിരിച്ചറിയല്‍ പരാജയപ്പെട്ടിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:399
+#: ../daemon/gvfsbackendsftp.c:400
 msgid "Unable to spawn ssh program"
 msgstr "ssh പ്രോഗ്രാം സ്പോണ്‍ ചെയ്യുവാന്‍ സാധ്യമായില്ല"
 
-#: ../daemon/gvfsbackendsftp.c:415
+#: ../daemon/gvfsbackendsftp.c:416
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "ssh പ്രോഗ്രാം സ്പോണ്‍ ചെയ്യുവാന്‍ സാധ്യമായില്ല: %s"
 
-#: ../daemon/gvfsbackendsftp.c:527
-#: ../daemon/gvfsbackendsftp.c:779
+#: ../daemon/gvfsbackendsftp.c:528 ../daemon/gvfsbackendsftp.c:780
 msgid "Timed out when logging in"
 msgstr "ലോഗിന്‍ ചെയ്യുന്നതിനുള്ള സമയം കഴിഞ്ഞിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:857
+#: ../daemon/gvfsbackendsftp.c:858
 msgid "Enter passphrase for key"
 msgstr "കീയ്ക്കുള്ള അടയാളവാചകം നല്‍കുക"
 
-#: ../daemon/gvfsbackendsftp.c:859
+#: ../daemon/gvfsbackendsftp.c:860
 msgid "Enter password"
 msgstr "അടയാളവാക്കു് നല്‍കുക"
 
-#: ../daemon/gvfsbackendsftp.c:920
+#: ../daemon/gvfsbackendsftp.c:921
 msgid "Can't send password"
 msgstr "അടയാളവാക്കു് അയയ്ക്കുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackendsftp.c:928
+#: ../daemon/gvfsbackendsftp.c:929
 msgid "Log In Anyway"
 msgstr "ഏതായാലും അകത്തുകയറുക"
 
-#: ../daemon/gvfsbackendsftp.c:928
+#: ../daemon/gvfsbackendsftp.c:929
 msgid "Cancel Login"
 msgstr "അകത്തുകയറല്‍ റദ്ദാക്കുക"
 
-#: ../daemon/gvfsbackendsftp.c:938
+#: ../daemon/gvfsbackendsftp.c:939
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
 "This happens when you log in to a computer the first time.\n"
 "\n"
-"The identity sent by the remote computer is %s. If you want to be absolutely sure it is safe to continue, contact the system administrator."
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
 msgstr ""
 "ദൂര കമ്പ്യൂടറുടെ (%s) തിരിച്ചറിയല്‍ അറിയുന്നതല്ല.\n"
 "ഇത് നിങ്ങള്‍ ഒരു കമ്പ്യൂടറില്‍ ആദ്യത്തെ തവണ അകത്തുകയറുമ്പോള്‍ സംഭവിയ്ക്കുന്നു.\n"
 "\n"
-"ദൂര കമ്പ്യൂടര്‍ അയച്ച ഹിരിച്ചറിയല്‍ %s ആണ്. നിങ്ങള്‍ക്ക് വളരെ ഉറപ്പുണ്ടെങ്കില്‍ തുടരാം, സിസ്റ്റം പരിപാലകനുമായി ബന്ധപ്പെടുക."
+"ദൂര കമ്പ്യൂടര്‍ അയച്ച ഹിരിച്ചറിയല്‍ %s ആണ്. നിങ്ങള്‍ക്ക് വളരെ ഉറപ്പുണ്ടെങ്കില്‍ തുടരാം, സിസ്റ്റം "
+"പരിപാലകനുമായി ബന്ധപ്പെടുക."
 
-#: ../daemon/gvfsbackendsftp.c:958
+#: ../daemon/gvfsbackendsftp.c:959
 msgid "Login dialog cancelled"
 msgstr "അകത്തകയറുന്നതിനുള്ള സംഭാഷണം റദ്ദാക്കിയിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:978
+#: ../daemon/gvfsbackendsftp.c:979
 msgid "Can't send host identity confirmation"
 msgstr "ഹോസ്റ്റ് തിരിച്ചറിയല്‍ വിവരം അയയ്ക്കാന്‍ കഴിയുന്നില്ല"
 
-#: ../daemon/gvfsbackendsftp.c:1471
-#: ../daemon/gvfsbackendsftp.c:1494
+#: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
 msgid "Protocol error"
 msgstr "സമ്പ്രദായത്തില്‍ പിഴവ്"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1518
+#: ../daemon/gvfsbackendsftp.c:1519
 #, c-format
 msgid "sftp on %s"
 msgstr "%s-ല്‍ sftp"
 
-#: ../daemon/gvfsbackendsftp.c:1542
+#: ../daemon/gvfsbackendsftp.c:1543
 msgid "Unable to find supported ssh command"
 msgstr "പിന്തുണയ്ക്കുന്ന ssh കമാന്‍ഡ് ലഭ്യമായില്ല"
 
-#: ../daemon/gvfsbackendsftp.c:1966
+#: ../daemon/gvfsbackendsftp.c:1967
 msgid "Failure"
 msgstr "പരാജയം"
 
-#: ../daemon/gvfsbackendsftp.c:2022
-#: ../daemon/gvfsbackendsftp.c:2081
-#: ../daemon/gvfsbackendsftp.c:2092
-#: ../daemon/gvfsbackendsftp.c:2148
-#: ../daemon/gvfsbackendsftp.c:2234
-#: ../daemon/gvfsbackendsftp.c:2262
-#: ../daemon/gvfsbackendsftp.c:2308
-#: ../daemon/gvfsbackendsftp.c:2383
-#: ../daemon/gvfsbackendsftp.c:2490
-#: ../daemon/gvfsbackendsftp.c:2530
-#: ../daemon/gvfsbackendsftp.c:2580
-#: ../daemon/gvfsbackendsftp.c:2649
-#: ../daemon/gvfsbackendsftp.c:2669
-#: ../daemon/gvfsbackendsftp.c:2820
-#: ../daemon/gvfsbackendsftp.c:2845
-#: ../daemon/gvfsbackendsftp.c:2900
-#: ../daemon/gvfsbackendsftp.c:2957
-#: ../daemon/gvfsbackendsftp.c:3228
-#: ../daemon/gvfsbackendsftp.c:3295
-#: ../daemon/gvfsbackendsftp.c:3424
-#: ../daemon/gvfsbackendsftp.c:3459
-#: ../daemon/gvfsbackendsftp.c:3487
-#: ../daemon/gvfsbackendsftp.c:3595
-#: ../daemon/gvfsbackendsftp.c:3649
-#: ../daemon/gvfsbackendsftp.c:3683
-#: ../daemon/gvfsbackendsftp.c:3717
-#: ../daemon/gvfsbackendsftp.c:3732
-#: ../daemon/gvfsbackendsftp.c:3747
-#: ../daemon/gvfsbackendsftp.c:3825
+#: ../daemon/gvfsbackendsftp.c:2023 ../daemon/gvfsbackendsftp.c:2082
+#: ../daemon/gvfsbackendsftp.c:2093 ../daemon/gvfsbackendsftp.c:2149
+#: ../daemon/gvfsbackendsftp.c:2235 ../daemon/gvfsbackendsftp.c:2285
+#: ../daemon/gvfsbackendsftp.c:2331 ../daemon/gvfsbackendsftp.c:2406
+#: ../daemon/gvfsbackendsftp.c:2513 ../daemon/gvfsbackendsftp.c:2553
+#: ../daemon/gvfsbackendsftp.c:2603 ../daemon/gvfsbackendsftp.c:2672
+#: ../daemon/gvfsbackendsftp.c:2692 ../daemon/gvfsbackendsftp.c:2844
+#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2924
+#: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendsftp.c:3252
+#: ../daemon/gvfsbackendsftp.c:3319 ../daemon/gvfsbackendsftp.c:3448
+#: ../daemon/gvfsbackendsftp.c:3483 ../daemon/gvfsbackendsftp.c:3511
+#: ../daemon/gvfsbackendsftp.c:3619 ../daemon/gvfsbackendsftp.c:3673
+#: ../daemon/gvfsbackendsftp.c:3707 ../daemon/gvfsbackendsftp.c:3741
+#: ../daemon/gvfsbackendsftp.c:3756 ../daemon/gvfsbackendsftp.c:3771
+#: ../daemon/gvfsbackendsftp.c:3849
 msgid "Invalid reply received"
 msgstr "സാധുവല്ലാത്ത മറുപടി ലഭിച്ചിരിക്കുന്നു"
 
-#: ../daemon/gvfsbackendsftp.c:2328
+#: ../daemon/gvfsbackendsftp.c:2351
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "കരുതല്‍ പകര്‍പ്പു് ഫയല്‍ ഉണ്ടാക്കുന്നതില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2730
+#: ../daemon/gvfsbackendsftp.c:2754
 msgid "Unable to create temporary file"
 msgstr "താല്‍ക്കാലിക ഫയല്‍ ഉണ്ടാകുവാന്‍ സാധ്യമായില്ല"
 
-#: ../daemon/gvfsbackendsftp.c:3521
-#: ../daemon/gvfsbackendsmb.c:1796
+#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1793
 msgid "Can't move directory over directory"
 msgstr "ഒരു തട്ടിന്റെ പുറത്ത് മറ്റൊരെണ്ണം നീക്കുവാന്‍ സാധ്യമല്ല"
 
@@ -1090,8 +968,7 @@ msgstr "ഒരു തട്ടിന്റെ പുറത്ത് മറ്റ
 msgid "Password required for share %s on %s"
 msgstr "%s-ല്‍ %s പങ്കിടുന്നതിനായി അടയാളവാക്കു് ആവശ്യമുണ്ട്"
 
-#: ../daemon/gvfsbackendsmb.c:471
-#: ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsbackendsmb.c:471 ../daemon/gvfsbackendsmb.c:511
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
@@ -1102,36 +979,35 @@ msgstr "ആന്തരിക പിശക് (%s)"
 msgid "Failed to mount Windows share"
 msgstr "വിന്‍ഡോസ് ഷെയര്‍ മൌണ്ട് ചെയ്യുന്നതില്‍ പരാജയം"
 
-#: ../daemon/gvfsbackendsmb.c:717
-#: ../daemon/gvfsbackendsmb.c:1176
+#: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
 msgid "Unsupported seek type"
 msgstr "പിന്തുണലഭ്യമല്ലാത്ത തരത്തിലുള്ള തിരച്ചില്‍"
 
-#: ../daemon/gvfsbackendsmb.c:1240
+#: ../daemon/gvfsbackendsmb.c:1237
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "കരുതല്‍ പകര്‍പ്പിനുള്ള ഫയല്‍ ഉണ്ടാക്കുന്നത് പരാജയപ്പെട്ടു: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1698
+#: ../daemon/gvfsbackendsmb.c:1695
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "ഫയല്‍ നീക്കം ചെയ്യുന്നതില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1772
+#: ../daemon/gvfsbackendsmb.c:1769
 #, c-format
 msgid "Error moving file: %s"
 msgstr "ഫയല്‍ നീക്കുന്നതില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1844
+#: ../daemon/gvfsbackendsmb.c:1841
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "ലക്ഷ്യസ്ഥാനത്തുള്ള ഫയല്‍ നീക്കുന്നതില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1868
+#: ../daemon/gvfsbackendsmb.c:1865
 msgid "Can't recursively move directory"
 msgstr "ആവര്‍ത്തിച്ച് തട്ടു് നീക്കുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackendsmb.c:1931
+#: ../daemon/gvfsbackendsmb.c:1928
 msgid "Windows Shares Filesystem Service"
 msgstr "വിന്‍ഡോസ് ഷെയറുകളുടെ ഫയല്‍ സിസ്റ്റം സേവനം"
 
@@ -1142,8 +1018,7 @@ msgstr "വിന്‍ഡോസ് ഷെയറുകളുടെ ഫയല്�
 msgid "Windows shares on %s"
 msgstr "%s-ല്‍ വിന്‍ഡോസ് ഷെയറുകള്‍"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:799
-#: ../daemon/gvfsbackendsmbbrowse.c:845
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
 msgid "The file is not a mountable"
 msgstr "ഫയല്‍ മൌണ്ടു് ചെയ്യാവുന്ന അല്ല"
 
@@ -1157,22 +1032,20 @@ msgstr "വിന്‍ഡോസ് ശൃംഖല ഫയല്‍സിസ്�
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:618
-#: ../daemon/gvfsbackendtrash.c:1203
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
 msgid "Trash"
 msgstr "ചവറ്റുകുട്ട"
 
-#: ../daemon/gvfsbackendtrash.c:993
+#: ../daemon/gvfsbackendtrash.c:1016
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (ചവറ്റുകുട്ടയില്‍)"
 
-#: ../daemon/gvfsbackendtrash.c:1304
+#: ../daemon/gvfsbackendtrash.c:1327
 msgid "Can't delete trash"
 msgstr "ചവറ്റുകുട്ട നീക്കം ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
-#: ../daemon/gvfsbackendtrash.c:1651
-#: ../daemon/gvfsbackendtrash.c:1726
+#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
 msgid "Trash directory notification not supported"
 msgstr "ചവറ്റുകുട്ടയ്ക്കുള്ള അറിയിപ്പ് പിന്തുണയ്ക്കുന്നില്ല"
 
@@ -1185,35 +1058,21 @@ msgstr "സാധുവല്ലാത്ത ബാക്കെന്‍ഡ് �
 msgid "Error sending fd: %s"
 msgstr "fd അയയ്ക്കുന്നതില്‍ പിശക്: %s"
 
-#: ../daemon/gvfsjobcloseread.c:112
-#: ../daemon/gvfsjobclosewrite.c:120
-#: ../daemon/gvfsjobcopy.c:169
-#: ../daemon/gvfsjobcreatemonitor.c:140
-#: ../daemon/gvfsjobcreatemonitor.c:151
-#: ../daemon/gvfsjobcreatemonitor.c:174
-#: ../daemon/gvfsjobcreatemonitor.c:192
-#: ../daemon/gvfsjobdelete.c:122
-#: ../daemon/gvfsjobenumerate.c:256
-#: ../daemon/gvfsjobmakedirectory.c:122
-#: ../daemon/gvfsjobmount.c:109
-#: ../daemon/gvfsjobmountmountable.c:156
-#: ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:130
-#: ../daemon/gvfsjobopenforwrite.c:148
-#: ../daemon/gvfsjobopenforwrite.c:162
-#: ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131
-#: ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:154
-#: ../daemon/gvfsjobsetdisplayname.c:127
-#: ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:120
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:168 ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
 #: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146
-#: ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
 #: ../daemon/gvfsjobwrite.c:120
 msgid "Operation not supported by backend"
 msgstr "ബാക്കെന്‍ഡ് പ്രവര്‍ത്തനം പിന്തുണയ്ക്കുന്നില്ല"
@@ -1249,44 +1108,38 @@ msgstr "GVFS-നുള്ള പ്രധാന ഡെമണ്‍"
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78
-#: ../programs/gvfs-cat.c:163
-#: ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101
-#: ../programs/gvfs-info.c:337
-#: ../programs/gvfs-ls.c:386
-#: ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97
-#: ../programs/gvfs-open.c:131
-#: ../programs/gvfs-open.c:144
-#: ../programs/gvfs-save.c:165
+#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
+#: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
 #: ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "കൂടുതല്‍ വിവരങ്ങള്‍ക്കായി \"%s --help\" ഉപയോഗിക്കുക."
 
-#: ../daemon/mount.c:432
+#: ../daemon/mount.c:439
 msgid "Invalid arguments from spawned child"
 msgstr "സ്പോണ്‍ഡ് ചൈള്‍ഡില്‍ നിന്നും സാധുവല്ലാത്ത ആര്‍ഗ്യുമെന്റുകള്‍"
 
-#: ../daemon/mount.c:731
+#: ../daemon/mount.c:740
 #, c-format
 msgid "Automount failed: %s"
 msgstr "ഓട്ടോമൌണ്ട് പരാജയപ്പെട്ടിരിക്കുന്നു: %s"
 
-#: ../daemon/mount.c:776
+#: ../daemon/mount.c:785
 msgid "The specified location is not mounted"
 msgstr "പറഞ്ഞിരിക്കുന്ന സ്ഥലം മൌണ്ട് ചെയ്തിട്ടില്ല"
 
-#: ../daemon/mount.c:781
+#: ../daemon/mount.c:790
 msgid "The specified location is not supported"
 msgstr "പറഞ്ഞിരിക്കുന്ന സ്ഥലം പിന്തുണയ്ക്കുന്നില്ല"
 
-#: ../daemon/mount.c:944
+#: ../daemon/mount.c:954
 msgid "Location is already mounted"
 msgstr "സ്ഥലം നിലവില്‍ മൌണ്ട് ചെയ്തിരിക്കുന്നു"
 
-#: ../daemon/mount.c:952
+#: ../daemon/mount.c:962
 msgid "Location is not mountable"
 msgstr "സ്ഥലം മൌണ്ട് ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
@@ -1432,219 +1285,179 @@ msgstr "തംബ് ഡ്രൈവ്"
 msgid "Mass Storage Drive"
 msgstr "മാസ് സ്റ്റോറേജ് ഡ്രൈവ്"
 
-#: ../monitor/hal/ghaldrive.c:721
+#: ../monitor/hal/ghaldrive.c:723
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "സിഡി പുറത്തെടുക്കുന്നതില്‍ പരാജയപ്പെട്ടു; മീഡിയയിലുള്ള ഒന്നോ അതിലധികമോ വോള്യമുകള്‍ തിരക്കിലാണ്."
+msgstr ""
+"സിഡി പുറത്തെടുക്കുന്നതില്‍ പരാജയപ്പെട്ടു; മീഡിയയിലുള്ള ഒന്നോ അതിലധികമോ വോള്യമുകള്‍ തിരക്കിലാണ്."
 
-#: ../monitor/hal/ghalmount.c:300
-#: ../monitor/hal/ghalvolume.c:152
+#: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:152
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f കെബി"
 
-#: ../monitor/hal/ghalmount.c:305
-#: ../monitor/hal/ghalvolume.c:157
+#: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:157
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f എംബി"
 
-#: ../monitor/hal/ghalmount.c:310
-#: ../monitor/hal/ghalvolume.c:162
+#: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:162
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f ജിബി"
 
-#: ../monitor/hal/ghalmount.c:432
-#: ../monitor/hal/ghalvolume.c:263
+#: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:233
 msgid "Mixed Audio/Data Disc"
 msgstr "മിക്സ്ഡ് ഓഡിയോ/ഡേറ്റാ ഡിസ്ക്"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalmount.c:445
-#: ../monitor/hal/ghalvolume.c:274
+#: ../monitor/hal/ghalmount.c:446 ../monitor/hal/ghalvolume.c:244
 #, c-format
 msgid "%s Media"
 msgstr "%s മീഡിയാ"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalvolume.c:251
+#: ../monitor/hal/ghalvolume.c:221
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s എന്‍ക്രിപ്റ്റഡ് ഡേറ്റാ"
 
-#: ../monitor/hal/hal-utils.c:40
-#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
 msgid "CD-ROM Disc"
 msgstr "സിഡി-റോം ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:40
-#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
 msgid "Blank CD-ROM Disc"
 msgstr "ഒഴിഞ്ഞ സിഡി-റോം ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:41
-#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
 msgid "CD-R Disc"
 msgstr "സിഡി-ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:41
-#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
 msgid "Blank CD-R Disc"
 msgstr "ഒഴിഞ്ഞ സിഡി-ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:42
-#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
 msgid "CD-RW Disc"
 msgstr "സിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:42
-#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
 msgid "Blank CD-RW Disc"
 msgstr "ഒഴിഞ്ഞ സിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:43
-#: ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43
-#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
 msgid "DVD-ROM Disc"
 msgstr "ഡിവിഡി-റോം ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:43
-#: ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43
-#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
 msgid "Blank DVD-ROM Disc"
 msgstr "ഒഴിഞ്ഞ ഡിവിഡി-റോം ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:44
-#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
 msgid "DVD-RAM Disc"
 msgstr "ഡിവിഡി-റാം ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:44
-#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
 msgid "Blank DVD-RAM Disc"
 msgstr "ഒഴിഞ്ഞ ഡിവിഡി-റാം ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:46
-#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
 msgid "DVD-RW Disc"
 msgstr "ഡിവിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:46
-#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
 msgid "Blank DVD-RW Disc"
 msgstr "ഒഴിഞ്ഞ ഡിവിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:47
-#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
 msgid "DVD+R Disc"
 msgstr "ഡിവി‍ഡി+ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:47
-#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
 msgid "Blank DVD+R Disc"
 msgstr "ഒഴിഞ്ഞ ഡിവി‍ഡി+ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:48
-#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
 msgid "DVD+RW Disc"
 msgstr "ഡിവി‍ഡി+ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:48
-#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
 msgid "Blank DVD+RW Disc"
 msgstr "ഒഴിഞ്ഞ ഡിവി‍ഡി+ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:49
-#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
 msgid "DVD+R DL Disc"
 msgstr "ഡിവി‍ഡി+ആര്‍ ഡിഎല്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:49
-#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
 msgid "Blank DVD+R DL Disc"
 msgstr "ഒഴിഞ്ഞ ഡിവി‍ഡി+ആര്‍ ഡിഎല്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:50
-#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
 msgid "Blu-Ray Disc"
 msgstr "ബ്ലു-റേ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:50
-#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
 msgid "Blank Blu-Ray Disc"
 msgstr "ഒഴിഞ്ഞ ബ്ലു-റേ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:51
-#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
 msgid "Blu-Ray R Disc"
 msgstr "ബ്ലു-റേ ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:51
-#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
 msgid "Blank Blu-Ray R Disc"
 msgstr "ഒഴിഞ്ഞ ബ്ലു-റേ ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:52
-#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
 msgid "Blu-Ray RW Disc"
 msgstr "ബ്ലു-റേ ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:52
-#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
 msgid "Blank Blu-Ray RW Disc"
 msgstr "ഒഴിഞ്ഞ ബ്ലു-റേ ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:53
-#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
 msgid "HD DVD Disc"
 msgstr "എച്ഡി ഡിവിഡി ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:53
-#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
 msgid "Blank HD DVD Disc"
 msgstr "ഒഴിഞ്ഞ എച്ഡി ഡിവിഡി ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:54
-#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
 msgid "HD DVD-R Disc"
 msgstr "എച്ഡി ഡിവിഡി-ആര്‍ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:54
-#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
 msgid "Blank HD DVD-R Disc"
 msgstr "ഒഴിഞ്ഞ എച്ഡി ഡിവിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:55
-#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
 msgid "HD DVD-RW Disc"
 msgstr "എച്ഡി ഡിവിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:55
-#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
 msgid "Blank HD DVD-RW Disc"
 msgstr "ഒഴിഞ്ഞ എച്ഡി ഡിവിഡി-ആര്‍ഡബ്ലിയു ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:56
-#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
 msgid "MO Disc"
 msgstr "എംഓ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:56
-#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
 msgid "Blank MO Disc"
 msgstr "ഒഴിഞ്ഞ എംഓ ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:57
-#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
 msgid "Disc"
 msgstr "ഡിസ്ക്"
 
-#: ../monitor/hal/hal-utils.c:57
-#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
 msgid "Blank Disc"
 msgstr "ഒഴിഞ്ഞ ഡിസ്ക്"
 
@@ -1683,17 +1496,28 @@ msgstr "സ്ഥാനം... - സാധാരണ ഔട്ട്പുട്�
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-cat.c:141
-msgid "Concatenate files at locations and print to the standard output. Works just like the traditional cat utility, but using gvfs location instead local files: for example you can use something like smb://server/resource/file.txt as location to concatenate."
-msgstr "സ്ഥാനങ്ങളില്‍ ഫയലുകള്‍ കൂട്ടിചേര്‍ത്ത് സാധാരണ ഔട്ട്പുട്ടിലേക്ക് പ്രിന്റ് ചെയ്യുക. പഴയ cat പോലെ തന്നെ പ്രവര്‍ത്തിക്കുന്നു, പക്ഷേ ലോക്കല്‍ ഫയലുകള്‍ക്ക് പകരം gvfs സ്ഥാനം ഉപയോഗിക്കുന്നു: ഉദാഹരണത്തിന്, നിങ്ങള്‍ക്ക് കൂട്ടിചേര്‍ക്കുന്നതിനുള്ള സ്ഥാനമായി smb://server/resource/file.txt എന്ന് ഉപയോഗിക്കാം."
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+"സ്ഥാനങ്ങളില്‍ ഫയലുകള്‍ കൂട്ടിചേര്‍ത്ത് സാധാരണ ഔട്ട്പുട്ടിലേക്ക് പ്രിന്റ് ചെയ്യുക. പഴയ cat പോലെ തന്നെ "
+"പ്രവര്‍ത്തിക്കുന്നു, പക്ഷേ ലോക്കല്‍ ഫയലുകള്‍ക്ക് പകരം gvfs സ്ഥാനം ഉപയോഗിക്കുന്നു: ഉദാഹരണത്തിന്, "
+"നിങ്ങള്‍ക്ക് കൂട്ടിചേര്‍ക്കുന്നതിനുള്ള സ്ഥാനമായി smb://server/resource/file.txt എന്ന് "
+"ഉപയോഗിക്കാം."
 
 #: ../programs/gvfs-cat.c:148
-msgid "Note: just pipe through cat if you need its formatting option like -n, -T or other."
-msgstr "കുറിപ്പ്: -n, -T അല്ലെങ്കില്‍ other എന്നിങ്ങനെയുള്ള ഫോര്‍മാറ്റിങ് ഉപാധികള്‍ ആവശ്യമെങ്കില്‍ cat കമാന്‍ഡില്‍ | ഉപയോഗിക്കുക"
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+"കുറിപ്പ്: -n, -T അല്ലെങ്കില്‍ other എന്നിങ്ങനെയുള്ള ഫോര്‍മാറ്റിങ് ഉപാധികള്‍ ആവശ്യമെങ്കില്‍ cat "
+"കമാന്‍ഡില്‍ | ഉപയോഗിക്കുക"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174
-#: ../programs/gvfs-open.c:142
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:142
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: ലഭ്യമല്ലാത്ത സ്ഥലങ്ങള്‍"
@@ -1719,17 +1543,22 @@ msgstr "ഫയലുകള്‍... - രജിസ്ടര്‍ ചെയ്�
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-open.c:117
-msgid "Opens the file(s) with the default application registered to handle the type of the file."
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
 msgstr "ഇത്തരത്തിലുള്ള ഫയലുകള്‍ കൈകാര്യം ചെയ്യുന്നതിന് സ്വതവേയുള്ള പ്രയോഗം ഉപയോഗിച്ച് ഫയല്‍ തുറക്കുക."
 
 #~ msgid "Audio Disc on %s"
 #~ msgstr "%s-ലുള്ള ഓഡിയോ ഡിസ്ക്"
+
 #~ msgid "The file does not exist"
 #~ msgstr "ഫയല്‍ നിലവിലില്ല"
+
 #~ msgid "%.1f kB Media"
 #~ msgstr "%.1f kB മീഡിയാ"
+
 #~ msgid "%.1f MB Media"
 #~ msgstr "%.1f MB മീഡിയാ"
+
 #~ msgid "%.1f GB Media"
 #~ msgstr "%.1f GB മീഡിയാ"
-
