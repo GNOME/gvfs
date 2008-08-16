@@ -849,6 +849,7 @@ ms_response_to_file_info (MsResponse *response,
           else if (node_has_name (node, "displayname"))
             {
               g_file_info_set_display_name (info, text);
+              have_display_name = TRUE;
             }
           else if (node_has_name (node, "getetag"))
             {
