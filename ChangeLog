@@ -1,3 +1,8 @@
+2008-08-16  Christian Neumair  <cneumair@gnome.org>
+
+	* daemon/gvfsbackendtrash.c (add_extra_trash_info):
+	Correctly set copy name to original file name. Fixes #41852.
+
 2008-08-07  Jesse van den Kieboom  <jesse@icecrew.nl>
 
 	* client/gdaemonfileoutputstream.c:

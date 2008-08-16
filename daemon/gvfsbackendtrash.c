@@ -1009,7 +1009,10 @@ add_extra_trash_info (GFileInfo *file_info,
                   g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, NULL);
                 }
               else
-                g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, display_name);
+		{
+		  g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME, display_name);
+		  g_file_info_set_attribute_string (file_info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME, display_name);
+		}
                 
               g_file_info_set_display_name (file_info, display_name);
 
