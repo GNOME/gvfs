@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-28 04:18+0000\n"
-"PO-Revision-Date: 2008-06-04 20:24+0300\n"
+"POT-Creation-Date: 2008-08-07 20:41+0000\n"
+"PO-Revision-Date: 2008-08-16 09:53+0300\n"
 "Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
@@ -19,118 +19,123 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1936
+#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1979
 msgid "Operation not supported, files on different mounts"
 msgstr "Operatsioon pole toetatud, failid asuvad eri ketastel"
 
-#: ../client/gdaemonfile.c:758
+#: ../client/gdaemonfile.c:787
 msgid "Invalid return value from get_info"
 msgstr "get_info tagastas vigase väärtuse"
 
-#: ../client/gdaemonfile.c:787 ../client/gdaemonfile.c:1534
+#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
 msgid "Invalid return value from query_info"
 msgstr "query_info tagastas vigase väärtuse"
 
-#: ../client/gdaemonfile.c:865
+#: ../client/gdaemonfile.c:894
 msgid "Couldn't get stream file descriptor"
 msgstr "Voo failideskriptorit pole võimalik hankida"
 
-#: ../client/gdaemonfile.c:897 ../client/gdaemonfile.c:967
-#: ../client/gdaemonfile.c:1026 ../client/gdaemonfile.c:1085
-#: ../client/gdaemonfile.c:1147 ../client/gdaemonfile.c:2201
-#: ../client/gdaemonfile.c:2289 ../client/gdaemonfile.c:2558
+#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2234
+#: ../client/gdaemonfile.c:2312 ../client/gdaemonfile.c:2571
 msgid "Invalid return value from open"
 msgstr "open tagastas vigase väärtuse"
 
-#: ../client/gdaemonfile.c:977 ../client/gdaemonfile.c:1036
-#: ../client/gdaemonfile.c:1095 ../client/gdaemonfile.c:1157
-#: ../client/gdaemonfile.c:2159
+#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:2202
 msgid "Didn't get stream file descriptor"
 msgstr "Ei õnnestunud voofaili deskriptiorit saada"
 
-#: ../client/gdaemonfile.c:1209 ../client/gdaemonfile.c:1226
+#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
 msgid "Invalid return value from call"
 msgstr "call tagastas vigase väärtuse"
 
-#: ../client/gdaemonfile.c:1505
+#: ../client/gdaemonfile.c:1534
 msgid "Invalid return value from get_filesystem_info"
 msgstr "get_filesystem_info tagastas vigase väärtuse"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1618
+#: ../client/gdaemonfile.c:1647
 msgid "Could not find enclosing mount"
 msgstr ""
 
-#: ../client/gdaemonfile.c:1648
+#: ../client/gdaemonfile.c:1677
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Vigane failinimi %s"
 
-#: ../client/gdaemonfile.c:1690
+#: ../client/gdaemonfile.c:1719
 msgid "Invalid return value from query_filesystem_info"
 msgstr "query_filesystem_info tagastas vigase väärtuse"
 
-#: ../client/gdaemonfile.c:2081
+#: ../client/gdaemonfile.c:2124
 msgid "Invalid return value from monitor_dir"
 msgstr "monitor_dir tagastas vigase väärtuse"
 
-#: ../client/gdaemonfile.c:2130
+#: ../client/gdaemonfile.c:2173
 msgid "Invalid return value from monitor_file"
 msgstr "monitor_file tagastas vigase väärtuse"
 
-#: ../client/gdaemonfileinputstream.c:451
-#: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1304
-#: ../client/gdaemonfileinputstream.c:1314
-#: ../client/gdaemonfileoutputstream.c:403
-#: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1052
-#: ../client/gdaemonfileoutputstream.c:1062
+#: ../client/gdaemonfileinputstream.c:450
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1300
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:402
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Viga vooprotokollis: %s"
 
-#: ../client/gdaemonfileinputstream.c:459
-#: ../client/gdaemonfileinputstream.c:1314
-#: ../client/gdaemonfileoutputstream.c:411
-#: ../client/gdaemonfileoutputstream.c:1062
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1064
 msgid "End of stream"
 msgstr "Voo lõpp"
 
-#: ../client/gdaemonfileinputstream.c:519
-#: ../client/gdaemonfileinputstream.c:676
-#: ../client/gdaemonfileinputstream.c:785
-#: ../client/gdaemonfileinputstream.c:1036
-#: ../client/gdaemonfileoutputstream.c:460
-#: ../client/gdaemonfileoutputstream.c:639
-#: ../client/gdaemonfileoutputstream.c:835 ../daemon/gvfsbackendobexftp.c:774
-#: ../daemon/gvfsbackendobexftp.c:795 ../daemon/gvfsbackendobexftp.c:914
-#: ../daemon/gvfsbackendobexftp.c:1051 ../daemon/gvfsbackendobexftp.c:1115
-#: ../daemon/gvfsbackendobexftp.c:1252 ../daemon/gvfsbackendobexftp.c:1279
-#: ../daemon/gvfsbackendobexftp.c:1338 ../daemon/gvfsbackendobexftp.c:1360
-#: ../daemon/gvfsbackendobexftp.c:1420 ../daemon/gvfsbackendobexftp.c:1439
-#: ../daemon/gvfsbackendsmb.c:1042 ../daemon/gvfsbackendtest.c:87
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
+#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
+#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
+#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
+#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
+#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
+#: ../daemon/gvfsbackendsmb.c:1069 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
 msgid "Operation was cancelled"
 msgstr "Operatsioon katkestati"
 
-#: ../client/gdaemonfileinputstream.c:1211
-#: ../client/gdaemonfileoutputstream.c:946
+#: ../client/gdaemonfileinputstream.c:1207
+#: ../client/gdaemonfileoutputstream.c:942
 msgid "Seek not supported on stream"
 msgstr "Andmevoogude korral pole asukohale hüppamine toetatud"
 
-#: ../client/gdaemonfileinputstream.c:1241
+#: ../client/gdaemonfileinputstream.c:1237
 msgid "The query info operation is not supported"
 msgstr "Andmete pärimise operatsioon pole toetatud"
 
-#: ../client/gdaemonvfs.c:731
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr "Andmevoogude korral pole andmepäring toetatud"
+
+#: ../client/gdaemonvfs.c:749
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Viga ühendamise andmete hankimisel: %s"
 
-#: ../client/gvfsdaemondbus.c:559 ../client/gvfsdaemondbus.c:946
+#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Viga deemoniga ühendumisel: %s"
@@ -197,264 +202,280 @@ msgstr "viga ühendamisdeemoni käivitamisel"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:316 ../daemon/gvfsbackendftp.c:899
-#: ../daemon/gvfsbackendsftp.c:1862
+#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:963
+#: ../daemon/gvfsbackendsftp.c:1894
 #, c-format
 msgid "/ on %s"
 msgstr "hosti %s /"
 
-#: ../daemon/gvfsbackendarchive.c:496 ../daemon/gvfsbackendftp.c:1415
-#: ../daemon/gvfsbackendsftp.c:1521
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1479
+#: ../daemon/gvfsbackendsftp.c:1553
 msgid "No hostname specified"
 msgstr "Hostinimi on määramata"
 
-#: ../daemon/gvfsbackendarchive.c:507 ../daemon/gvfsbackendarchive.c:536
-#: ../daemon/gvfsbackenddav.c:1206 ../daemon/gvfsbackendhttp.c:273
-#: ../daemon/gvfsbackendobexftp.c:605 ../daemon/gvfsbackendobexftp.c:616
-#: ../daemon/gvfsbackendsmb.c:592
+#: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
+#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
+#: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
 msgstr "Vigane ühendamiskirjeldus"
 
-#: ../daemon/gvfsbackendarchive.c:611 ../daemon/gvfsbackendarchive.c:661
-#: ../daemon/gvfsbackendarchive.c:690 ../daemon/gvfsbackendcdda.c:825
-#: ../daemon/gvfsbackendcomputer.c:573 ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendftp.c:2017 ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
+#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:822
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendftp.c:2101 ../daemon/gvfsbackendnetwork.c:590
 #: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
 #: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1116
 #, c-format
 msgid "File doesn't exist"
 msgstr "Faili pole olemas"
 
-#: ../daemon/gvfsbackendarchive.c:699 ../daemon/gvfsbackendburn.c:681
-#: ../daemon/gvfsbackendcomputer.c:652 ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:848 ../daemon/gvfsbackendnetwork.c:637
-#, c-format
+#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:912 ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "Fail pole kataloog"
 
 #. Translators: This is the name of the backend
-#: ../daemon/gvfsbackendburn.c:347
+#: ../daemon/gvfsbackendburn.c:346
 msgid "Burn"
 msgstr ""
 
-#: ../daemon/gvfsbackendburn.c:377
+#: ../daemon/gvfsbackendburn.c:376
 msgid "Unable to create temporary directory"
 msgstr "Ajutist kataloogi pole võimalik luua"
 
-#: ../daemon/gvfsbackendburn.c:406 ../daemon/gvfsbackendburn.c:417
-#: ../daemon/gvfsbackendburn.c:452 ../daemon/gvfsbackendburn.c:673
-#: ../daemon/gvfsbackendburn.c:720 ../daemon/gvfsbackendburn.c:746
-#: ../daemon/gvfsbackendburn.c:784
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
+#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#, c-format
 msgid "No such file or directory"
 msgstr "Sellist faili või kataloogi ei ole"
 
-#: ../daemon/gvfsbackendburn.c:426 ../daemon/gvfsbackenddav.c:1804
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
 msgid "Directory not empty"
 msgstr "Kataloog pole tühi"
 
-#: ../daemon/gvfsbackendburn.c:460 ../daemon/gvfsbackendburn.c:898
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:897
 msgid "Can't copy file over directory"
 msgstr ""
 
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendburn.c:652
+#: ../daemon/gvfsbackendburn.c:651
 msgid "CD/DVD Creator"
 msgstr "CD/DVD-looja"
 
-#: ../daemon/gvfsbackendburn.c:756 ../daemon/gvfsbackendburn.c:792
-#: ../daemon/gvfsbackendburn.c:918
+#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
 msgid "File exists"
 msgstr "Fail on olemas"
 
-#: ../daemon/gvfsbackendburn.c:846
+#: ../daemon/gvfsbackendburn.c:845
 msgid "No such file or directory in target path"
 msgstr "Sihtkohas pole sellist faili ega kataloogi"
 
-#: ../daemon/gvfsbackendburn.c:869
+#: ../daemon/gvfsbackendburn.c:868
 msgid "Can't copy directory over directory"
 msgstr ""
 
-#: ../daemon/gvfsbackendburn.c:878
+#: ../daemon/gvfsbackendburn.c:877
 msgid "Target file exists"
 msgstr "Sihtfail on juba olemas"
 
-#: ../daemon/gvfsbackendburn.c:885
+#: ../daemon/gvfsbackendburn.c:884
 msgid "Can't recursively copy directory"
 msgstr "Kataloogi pole võimalik rekursiivselt kopeerida"
 
-#: ../daemon/gvfsbackendburn.c:944
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
+#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
+#: ../daemon/gvfsbackendgphoto2.c:2739
 msgid "Not supported"
 msgstr "Pole toetatud"
 
-#: ../daemon/gvfsbackendcdda.c:264 ../daemon/gvfsbackendcdda.c:335
-msgid "No drive specified"
-msgstr "Seade on määramata"
+#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1402
+msgid "Cannot connect to the system bus"
+msgstr "Süsteemse siiniga pole võimalik ühendust võtta"
 
-#: ../daemon/gvfsbackendcdda.c:279
+#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1414
+msgid "Cannot create libhal context"
+msgstr "libhal-konteksti pole võimalik luua"
+
+#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1427
+msgid "Cannot initialize libhal"
+msgstr "libhal-i pole võimalik lähtestada"
+
+#: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
+msgid "No drive specified"
+msgstr "Ketas on määramata"
+
+#: ../daemon/gvfsbackendcdda.c:276
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Seadet %s pole võimalik leida"
 
-#: ../daemon/gvfsbackendcdda.c:289
+#: ../daemon/gvfsbackendcdda.c:286
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Seade %s ei sisalda audiofaile"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:297
+#: ../daemon/gvfsbackendcdda.c:294
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda ühendus seadmes %s"
 
-#: ../daemon/gvfsbackendcdda.c:298 ../daemon/gvfsbackendcdda.c:802
-#: ../hal/ghalmount.c:492 ../hal/ghalvolume.c:298 ../hal/ghalvolume.c:319
+#: ../daemon/gvfsbackendcdda.c:295 ../daemon/gvfsbackendcdda.c:799
+#: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:214
+#: ../monitor/hal/ghalvolume.c:235
 #, c-format
 msgid "Audio Disc"
 msgstr "Audioplaat"
 
-#: ../daemon/gvfsbackendcdda.c:359
+#: ../daemon/gvfsbackendcdda.c:356
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Failisüsteem on hõivatud: %d fail on avatud"
 msgstr[1] "Failisüsteem on hõivatud: %d faili on avatud"
 
-#: ../daemon/gvfsbackendcdda.c:549
+#: ../daemon/gvfsbackendcdda.c:546
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Faili %s pole %s kettal"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:658
+#: ../daemon/gvfsbackendcdda.c:655
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "'paranoia' teegi viga seadmega %s"
 
-#: ../daemon/gvfsbackendcdda.c:721
+#: ../daemon/gvfsbackendcdda.c:718
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr ""
 
-#: ../daemon/gvfsbackendcdda.c:818 ../daemon/gvfsbackendgphoto2.c:1695
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
 #, c-format
 msgid "No such file"
 msgstr "Sellist faili ei ole"
 
-#: ../daemon/gvfsbackendcdda.c:832
+#: ../daemon/gvfsbackendcdda.c:829
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Faili pole olemas või pole see audiofail"
 
-#: ../daemon/gvfsbackendcdda.c:938
+#: ../daemon/gvfsbackendcdda.c:935
 msgid "Audio CD Filesystem Service"
 msgstr "Audio-CD failisüsteemi teenus"
 
-#: ../daemon/gvfsbackendcomputer.c:180 ../daemon/gvfsbackendcomputer.c:694
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
 msgid "Computer"
 msgstr "Arvuti"
 
-#: ../daemon/gvfsbackendcomputer.c:467
+#: ../daemon/gvfsbackendcomputer.c:466
 msgid "Filesystem"
 msgstr "Failisüsteem"
 
-#: ../daemon/gvfsbackendcomputer.c:591 ../daemon/gvfsbackendgphoto2.c:1687
-#: ../daemon/gvfsbackendobexftp.c:760 ../daemon/gvfsbackendtrash.c:637
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
 msgstr "Kataloogi pole võimalik avada"
 
-#: ../daemon/gvfsbackendcomputer.c:595 ../daemon/gvfsbackendcomputer.c:733
+#: ../daemon/gvfsbackendcomputer.c:594 ../daemon/gvfsbackendcomputer.c:732
 msgid "Can't open mountable file"
 msgstr "Ühendatavat faili pole võimalik avada"
 
-#: ../daemon/gvfsbackendcomputer.c:781
+#: ../daemon/gvfsbackendcomputer.c:780 ../daemon/gvfsbackendsftp.c:1037
 #, c-format
 msgid "Internal error: %s"
 msgstr "Sisemine viga: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:813 ../daemon/gvfsbackendcomputer.c:930
+#: ../daemon/gvfsbackendcomputer.c:812 ../daemon/gvfsbackendcomputer.c:929
 msgid "Can't mount file"
 msgstr "Faili pole võimalik ühendada"
 
-#: ../daemon/gvfsbackendcomputer.c:825
+#: ../daemon/gvfsbackendcomputer.c:824
 msgid "No media in the drive"
 msgstr "Seadmes puudub meedium"
 
-#: ../daemon/gvfsbackendcomputer.c:882 ../daemon/gvfsbackendcomputer.c:973
-#: ../daemon/gvfsbackendcomputer.c:1073
+#: ../daemon/gvfsbackendcomputer.c:881 ../daemon/gvfsbackendcomputer.c:972
+#: ../daemon/gvfsbackendcomputer.c:1072
 msgid "Not a mountable file"
 msgstr "Pole ühendatav fail"
 
-#: ../daemon/gvfsbackendcomputer.c:988
+#: ../daemon/gvfsbackendcomputer.c:987
 msgid "Can't unmount file"
 msgstr "Faili pole võimalik lahti ühendada"
 
-#: ../daemon/gvfsbackendcomputer.c:1104
+#: ../daemon/gvfsbackendcomputer.c:1103
 msgid "Can't eject file"
 msgstr "Faili pole võimalik väljastada"
 
-#: ../daemon/gvfsbackenddav.c:269 ../daemon/gvfsbackenddav.c:1289
-#: ../daemon/gvfsbackendhttp.c:220
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP viga: %s"
 
-#: ../daemon/gvfsbackenddav.c:285
+#: ../daemon/gvfsbackenddav.c:520
 msgid "Could not parse response"
 msgstr "Vastust pole võimalik analüüsida"
 
-#: ../daemon/gvfsbackenddav.c:294
+#: ../daemon/gvfsbackenddav.c:529
 msgid "Empty response"
 msgstr "Tühi vastus"
 
-#: ../daemon/gvfsbackenddav.c:301
+#: ../daemon/gvfsbackenddav.c:537
 msgid "Unexpected reply from server"
 msgstr "Ootamatu vastus serverilt"
 
-#: ../daemon/gvfsbackenddav.c:944 ../daemon/gvfsbackenddav.c:1421
-#, c-format
+#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
 msgid "Response invalid"
 msgstr "Vastus on vigane"
 
-#: ../daemon/gvfsbackenddav.c:1087
+#: ../daemon/gvfsbackenddav.c:1291
 msgid "WebDAV share"
 msgstr "WebDAV'i jagatud kataloog"
 
-#: ../daemon/gvfsbackenddav.c:1089
+#: ../daemon/gvfsbackenddav.c:1293
 #, c-format
 msgid "Enter password for %s"
 msgstr "Sisesta %s parool"
 
-#: ../daemon/gvfsbackenddav.c:1092
+#: ../daemon/gvfsbackenddav.c:1296
 msgid "Please enter proxy password"
 msgstr "Palun sisesta proksi parool"
 
-#: ../daemon/gvfsbackenddav.c:1293 ../daemon/gvfsbackenddav.c:1297
+#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
 msgid "Not a WebDAV enabled share"
 msgstr "Pole WebDAV'i jagatud kataloog"
 
-#: ../daemon/gvfsbackenddav.c:1319
+#: ../daemon/gvfsbackenddav.c:1546
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV hostil %s"
 
-#: ../daemon/gvfsbackenddav.c:1377 ../daemon/gvfsbackenddav.c:1448
+#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
 msgid "Could not create request"
 msgstr "Päringut pole võimalik luua"
 
-#: ../daemon/gvfsbackenddav.c:1511 ../daemon/gvfsbackenddav.c:1764
-#: ../daemon/gvfsbackendftp.c:1617 ../daemon/gvfsbackendftp.c:2281
-#: ../daemon/gvfsbackendsftp.c:3504 ../daemon/gvfsbackendsmb.c:1778
-#, c-format
+#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
+#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
+#: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "Sihtfail on juba olemas"
 
-#: ../daemon/gvfsbackenddav.c:1584 ../daemon/gvfsbackendsftp.c:2752
-#: ../daemon/gvfsbackendsmb.c:1010
+#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "Faili on mõne teise programmi poolt muudetud"
 
-#: ../daemon/gvfsbackenddav.c:1615 ../daemon/gvfsbackendsmb.c:1048
-#: ../daemon/gvfsbackendsmb.c:1795
+#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "Tõrge varufaili loomisel"
 
@@ -477,144 +498,310 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Võrk"
 
-#: ../daemon/gvfsbackendftp.c:225
+#: ../daemon/gvfsbackendftp.c:236
 msgid "Accounts are unsupported"
 msgstr "Kontod pole toetatud"
 
-#: ../daemon/gvfsbackendftp.c:229
+#: ../daemon/gvfsbackendftp.c:240
 msgid "Host closed connection"
 msgstr "Host sulges ühenduse"
 
-#: ../daemon/gvfsbackendftp.c:233
+#: ../daemon/gvfsbackendftp.c:244
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Andmeühendust pole võimalik avada. Võibolla tulemüür takistab seda?"
 
-#: ../daemon/gvfsbackendftp.c:237
+#: ../daemon/gvfsbackendftp.c:248
 msgid "Data connection closed"
 msgstr "Andmeühendus on suletud"
 
-#: ../daemon/gvfsbackendftp.c:244
-msgid "File unavailable"
-msgstr "Fail pole saadaval"
-
-#: ../daemon/gvfsbackendftp.c:248
+#: ../daemon/gvfsbackendftp.c:255 ../daemon/gvfsbackendftp.c:259
 msgid "Operation failed"
 msgstr "Operatsioon nurjus"
 
-#: ../daemon/gvfsbackendftp.c:253
+#: ../daemon/gvfsbackendftp.c:264
 msgid "No space left on server"
 msgstr "Serveris pole vaba ruumi"
 
-#: ../daemon/gvfsbackendftp.c:261 ../daemon/gvfsbackendsftp.c:3810
+#: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
 msgid "Operation unsupported"
 msgstr "Operatsioon pole toetatud"
 
-#: ../daemon/gvfsbackendftp.c:265 ../daemon/gvfsbackendsftp.c:289
+#: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
 msgid "Permission denied"
 msgstr "Ligipääs keelatud"
 
-#: ../daemon/gvfsbackendftp.c:269
+#: ../daemon/gvfsbackendftp.c:280
 msgid "Page type unknown"
 msgstr ""
 
-#: ../daemon/gvfsbackendftp.c:273 ../daemon/gvfsbackendftp.c:2127
-#, c-format
+#: ../daemon/gvfsbackendftp.c:284 ../daemon/gvfsbackendftp.c:2211
 msgid "Invalid filename"
 msgstr "Vigane failinimi"
 
-#: ../daemon/gvfsbackendftp.c:277 ../daemon/gvfsbackendftp.c:351
-#: ../daemon/gvfsbackendftp.c:380 ../daemon/gvfsbackendftp.c:399
-#: ../daemon/gvfsbackendftp.c:412 ../daemon/gvfsbackendftp.c:753
-#, c-format
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendftp.c:364
+#: ../daemon/gvfsbackendftp.c:393 ../daemon/gvfsbackendftp.c:412
+#: ../daemon/gvfsbackendftp.c:425 ../daemon/gvfsbackendftp.c:817
 msgid "Invalid reply"
 msgstr "Vigane vastus"
 
-#: ../daemon/gvfsbackendftp.c:519
-#, c-format
+#: ../daemon/gvfsbackendftp.c:532
 msgid "broken transmission"
 msgstr "vigane ülekanne"
 
-#: ../daemon/gvfsbackendftp.c:613 ../daemon/gvfsbackendftp.c:773
-#, c-format
+#: ../daemon/gvfsbackendftp.c:677 ../daemon/gvfsbackendftp.c:837
 msgid "Could not connect to host"
 msgstr "Hostiga pole võimalik ühendust võtta"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1273
+#: ../daemon/gvfsbackendftp.c:1337
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Sisesta hosti %s ftp-parool"
 
-#: ../daemon/gvfsbackendftp.c:1298 ../daemon/gvfsbackendsftp.c:864
+#: ../daemon/gvfsbackendftp.c:1362 ../daemon/gvfsbackendsftp.c:874
 msgid "Password dialog cancelled"
 msgstr "Paroolidialoog tühistati"
 
-#: ../daemon/gvfsbackendftp.c:1377
+#: ../daemon/gvfsbackendftp.c:1441
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp hostil %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1381
+#: ../daemon/gvfsbackendftp.c:1445
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp kasutajanimega %s hostil %s"
 
-#: ../daemon/gvfsbackendftp.c:1669 ../daemon/gvfsbackendftp.c:2242
+#: ../daemon/gvfsbackendftp.c:1529 ../daemon/gvfsbackendsftp.c:1958
+#: ../daemon/gvfsbackendsftp.c:3550
+msgid "File is directory"
+msgstr "Fail on kataloog"
+
+#: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
 msgid "backups not supported yet"
 msgstr "varukoopiad pole veel toetatud"
 
-#: ../daemon/gvfsbackendftp.c:1746
-#, c-format
+#: ../daemon/gvfsbackendftp.c:1828
 msgid "filename too long"
 msgstr "failinimi on liiga pikk"
 
-#: ../daemon/gvfsbackendftp.c:2261
-#, c-format
+#: ../daemon/gvfsbackendftp.c:2345
 msgid "Invalid destination filename"
 msgstr "Vigane sihtfaili nimi"
 
+#: ../daemon/gvfsbackendgphoto2.c:501
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr "%s: %d: Kataloog või fail on juba olemas"
+
+#: ../daemon/gvfsbackendgphoto2.c:508
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr "%s: %d: Sellist faili või kataloogi ei ole"
+
+#: ../daemon/gvfsbackendgphoto2.c:514
+#, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "%s: %d: Vigane failinimi"
+
+#: ../daemon/gvfsbackendgphoto2.c:520
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr "%s: %d: Pole toetatud"
+
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:697
+#: ../daemon/gvfsbackendgphoto2.c:693
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digikaamera (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:843 ../hal/ghalvolume.c:398
+#: ../daemon/gvfsbackendgphoto2.c:841 ../monitor/gphoto2/ggphoto2volume.c:183
 #, c-format
 msgid "%s Camera"
 msgstr "%s kaamera"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:846 ../hal/ghalvolume.c:393
+#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s audioesitaja"
 
-#: ../daemon/gvfsbackendgphoto2.c:855 ../hal/ghalvolume.c:407
+#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:192
 msgid "Camera"
 msgstr "Kaamera"
 
-#: ../daemon/gvfsbackendgphoto2.c:857 ../hal/ghalvolume.c:405
+#: ../daemon/gvfsbackendgphoto2.c:855 ../monitor/gphoto2/ggphoto2volume.c:190
 msgid "Audio Player"
 msgstr "Audioesitaja"
 
+#: ../daemon/gvfsbackendgphoto2.c:1325
+msgid "Error listing folders to figure out ignore prefix"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1442
+msgid "No device specified"
+msgstr "Seade on määramata"
+
+#: ../daemon/gvfsbackendgphoto2.c:1459
+msgid "Cannot create gphoto2 context"
+msgstr "gphoto2 konteksti pole võimalik luua"
+
+#: ../daemon/gvfsbackendgphoto2.c:1469
+msgid "Error creating camera"
+msgstr "Viga kaamera loomisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:1482
+#, fuzzy
+msgid "Error creating port info list"
+msgstr "Viga sokli loomisel: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1492
+#, fuzzy
+msgid "Error loading info list"
+msgstr "Viga fd saatmisel: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1504
+msgid "Error looking up port info from port info list"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1514
+msgid "Error getting port info from port info list"
+msgstr "Viga pordi andmete hankimisel pordi andmete nimekirjast"
+
+#: ../daemon/gvfsbackendgphoto2.c:1527
+msgid "Error setting port info"
+msgstr "Viga pordi andmete seadmisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:1538
+msgid "Error initializing camera"
+msgstr "Viga kaamera lähtestamisel"
+
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendgphoto2.c:1552
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 ühendatud ketas %s"
 
-#: ../daemon/gvfsbackendhttp.c:216
+#: ../daemon/gvfsbackendgphoto2.c:1627
+msgid "No camera specified"
+msgstr "Kaamera on määramata"
+
+#: ../daemon/gvfsbackendgphoto2.c:1655
+#, c-format
+msgid "File system is busy: %d open files"
+msgstr "Failisüsteem on hõivatud: %d faili on avatud"
+
+#: ../daemon/gvfsbackendgphoto2.c:1716
+msgid "Error creating file object"
+msgstr "Viga failiobjekti loomisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:1730
+msgid "Error getting file"
+msgstr "Viga faili hankimisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:1739
+msgid "Error getting data from file"
+msgstr "Viga andmete hankimisel failist"
+
+#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
+#, fuzzy, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr "Viga vooprotokollis: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+msgid "Not a directory"
+msgstr "Pole kataloog"
+
+#: ../daemon/gvfsbackendgphoto2.c:2005
+#, fuzzy
+msgid "Error listing folders"
+msgstr "Viga faili kustutamisel: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:2068
+#, fuzzy
+msgid "Error listing files in folder"
+msgstr "Viga faili kustutamisel: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:2357
+msgid "Error creating directory"
+msgstr "Viga kataloogi loomisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:2565
+msgid "Name already exists"
+msgstr "Nimi on juba olemas"
+
+#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
+msgid "New name too long"
+msgstr "Uus nimi on liiga pikk"
+
+#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
+msgid "Error renaming dir"
+msgstr "Viga kataloogi ümbernimetamisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
+msgid "Error renaming file"
+msgstr "Viga faili ümbernimetamisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:2661
+#, c-format
+msgid "Directory '%s' is not empty"
+msgstr "Kataloog '%s' pole tühi"
+
+#: ../daemon/gvfsbackendgphoto2.c:2672
+msgid "Error deleting directory"
+msgstr "Viga kataloogi kustutamisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:2697
+msgid "Error deleting file"
+msgstr "Viga faili kustutamisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:2749
+msgid "Can't write to directory"
+msgstr "Kataloogi pole võimalik kirjutada"
+
+#: ../daemon/gvfsbackendgphoto2.c:2796
+msgid "Cannot allocate new file to append to"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2810
+msgid "Cannot read file to append to"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2820
+msgid "Cannot get data of file to append to"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:3106
+msgid "Error writing file"
+msgstr "Viga faili kirjutamisel"
+
+#: ../daemon/gvfsbackendgphoto2.c:3153
+msgid "Not supported (not same directory)"
+msgstr "Pole toetatud (pole sama kataloog)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3165
+msgid "Not supported (src is dir, dst is dir)"
+msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on ka kataloog)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3173
+msgid "Not supported (src is dir, dst is existing file)"
+msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on olemasolev fail)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3185
+msgid "Not supported (src is file, dst is dir)"
+msgstr "Pole toetatud (lähtekoht on fail, sihtkoht on kataloog)"
+
+#: ../daemon/gvfsbackendhttp.c:241
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP-kliendi viga: %s"
 
-#: ../daemon/gvfsbackendhttp.c:534 ../daemon/gvfsbackendsftp.c:1850
-#: ../daemon/gvfsbackendsmb.c:1275 ../daemon/gvfsbackendtrash.c:965
+#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
+#: ../daemon/gvfsbackendsmb.c:1301 ../daemon/gvfsbackendtrash.c:1006
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (vigane kodeering)"
@@ -639,12 +826,21 @@ msgstr "Kohalik võrk"
 msgid "Network Location Monitor"
 msgstr "Võrguasukoha monitoorija"
 
+#. Mount was successful
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:444 ../daemon/gvfsbackendsmb.c:510
-#: ../daemon/gvfsbackendsmb.c:1268
+#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:557
+#: ../daemon/gvfsbackendsmb.c:1294
 #, c-format
 msgid "%s on %s"
 msgstr "Kataloog %s serverist %s"
+
+#: ../daemon/gvfsbackendobexftp.c:699
+msgid "Connection to the device lost"
+msgstr "Ühendus seadmega on katkenud"
+
+#: ../daemon/gvfsbackendobexftp.c:1194
+msgid "Device requires a software update"
+msgstr "Seadmele on vaja teha tarkvarauuendus"
 
 #: ../daemon/gvfsbackendsftp.c:281
 msgid "ssh program unexpectedly exited"
@@ -675,31 +871,31 @@ msgstr "ssh-programmi pole võimalik käivitada"
 msgid "Unable to spawn ssh program: %s"
 msgstr "ssh-programmi pole võimalik käivitada: %s"
 
-#: ../daemon/gvfsbackendsftp.c:518 ../daemon/gvfsbackendsftp.c:770
+#: ../daemon/gvfsbackendsftp.c:528 ../daemon/gvfsbackendsftp.c:780
 msgid "Timed out when logging in"
 msgstr "Sisselogimine ületas ajapiirangu"
 
-#: ../daemon/gvfsbackendsftp.c:848
+#: ../daemon/gvfsbackendsftp.c:858
 msgid "Enter passphrase for key"
 msgstr "Sisesta võtme parool"
 
-#: ../daemon/gvfsbackendsftp.c:850
+#: ../daemon/gvfsbackendsftp.c:860
 msgid "Enter password"
 msgstr "Sisesta parool"
 
-#: ../daemon/gvfsbackendsftp.c:911
+#: ../daemon/gvfsbackendsftp.c:921
 msgid "Can't send password"
 msgstr "Parooli pole võimalik saata"
 
-#: ../daemon/gvfsbackendsftp.c:919
+#: ../daemon/gvfsbackendsftp.c:929
 msgid "Log In Anyway"
 msgstr "Logi ikkagi sisse"
 
-#: ../daemon/gvfsbackendsftp.c:919
+#: ../daemon/gvfsbackendsftp.c:929
 msgid "Cancel Login"
 msgstr "Katkesta sisselogimine"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:939
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -714,113 +910,109 @@ msgstr ""
 "Kaugarvuti poolt saadetud identiteet on %s. Kui sa tahad turvakaalutlustel "
 "selles täiesti kindel olla, siis võta palun ühendust oma süsteemihalduriga."
 
-#: ../daemon/gvfsbackendsftp.c:949
+#: ../daemon/gvfsbackendsftp.c:959
 msgid "Login dialog cancelled"
 msgstr "Sisselogimisdialoog tühistati"
 
-#: ../daemon/gvfsbackendsftp.c:969
+#: ../daemon/gvfsbackendsftp.c:979
 msgid "Can't send host identity confirmation"
 msgstr "Hosti identimisandmeid pole võimalik saata"
 
-#: ../daemon/gvfsbackendsftp.c:1440 ../daemon/gvfsbackendsftp.c:1463
+#: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
 msgid "Protocol error"
 msgstr "Protokolli viga"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1487
+#: ../daemon/gvfsbackendsftp.c:1519
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp hostil %s"
 
-#: ../daemon/gvfsbackendsftp.c:1511
+#: ../daemon/gvfsbackendsftp.c:1543
 msgid "Unable to find supported ssh command"
 msgstr "Toetatud ssh-käsku pole võimalik leida"
 
-#: ../daemon/gvfsbackendsftp.c:1926 ../daemon/gvfsbackendsftp.c:3495
-msgid "File is directory"
-msgstr "Fail on kataloog"
-
-#: ../daemon/gvfsbackendsftp.c:1935
+#: ../daemon/gvfsbackendsftp.c:1967
 msgid "Failure"
 msgstr "Tõrge"
 
-#: ../daemon/gvfsbackendsftp.c:1991 ../daemon/gvfsbackendsftp.c:2050
-#: ../daemon/gvfsbackendsftp.c:2061 ../daemon/gvfsbackendsftp.c:2117
-#: ../daemon/gvfsbackendsftp.c:2203 ../daemon/gvfsbackendsftp.c:2231
-#: ../daemon/gvfsbackendsftp.c:2277 ../daemon/gvfsbackendsftp.c:2352
-#: ../daemon/gvfsbackendsftp.c:2459 ../daemon/gvfsbackendsftp.c:2499
-#: ../daemon/gvfsbackendsftp.c:2549 ../daemon/gvfsbackendsftp.c:2618
-#: ../daemon/gvfsbackendsftp.c:2638 ../daemon/gvfsbackendsftp.c:2789
-#: ../daemon/gvfsbackendsftp.c:2814 ../daemon/gvfsbackendsftp.c:2869
-#: ../daemon/gvfsbackendsftp.c:2926 ../daemon/gvfsbackendsftp.c:3197
-#: ../daemon/gvfsbackendsftp.c:3264 ../daemon/gvfsbackendsftp.c:3393
-#: ../daemon/gvfsbackendsftp.c:3428 ../daemon/gvfsbackendsftp.c:3456
-#: ../daemon/gvfsbackendsftp.c:3564 ../daemon/gvfsbackendsftp.c:3618
-#: ../daemon/gvfsbackendsftp.c:3652 ../daemon/gvfsbackendsftp.c:3684
-#: ../daemon/gvfsbackendsftp.c:3699 ../daemon/gvfsbackendsftp.c:3717
-#: ../daemon/gvfsbackendsftp.c:3791
+#: ../daemon/gvfsbackendsftp.c:2023 ../daemon/gvfsbackendsftp.c:2082
+#: ../daemon/gvfsbackendsftp.c:2093 ../daemon/gvfsbackendsftp.c:2149
+#: ../daemon/gvfsbackendsftp.c:2235 ../daemon/gvfsbackendsftp.c:2285
+#: ../daemon/gvfsbackendsftp.c:2331 ../daemon/gvfsbackendsftp.c:2406
+#: ../daemon/gvfsbackendsftp.c:2513 ../daemon/gvfsbackendsftp.c:2553
+#: ../daemon/gvfsbackendsftp.c:2603 ../daemon/gvfsbackendsftp.c:2672
+#: ../daemon/gvfsbackendsftp.c:2692 ../daemon/gvfsbackendsftp.c:2844
+#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2924
+#: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendsftp.c:3252
+#: ../daemon/gvfsbackendsftp.c:3319 ../daemon/gvfsbackendsftp.c:3448
+#: ../daemon/gvfsbackendsftp.c:3483 ../daemon/gvfsbackendsftp.c:3511
+#: ../daemon/gvfsbackendsftp.c:3619 ../daemon/gvfsbackendsftp.c:3673
+#: ../daemon/gvfsbackendsftp.c:3707 ../daemon/gvfsbackendsftp.c:3741
+#: ../daemon/gvfsbackendsftp.c:3756 ../daemon/gvfsbackendsftp.c:3771
+#: ../daemon/gvfsbackendsftp.c:3849
 msgid "Invalid reply received"
 msgstr "Võeti vastu vigane vastus"
 
-#: ../daemon/gvfsbackendsftp.c:2297
+#: ../daemon/gvfsbackendsftp.c:2351
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Viga varufaili loomisel: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2699
+#: ../daemon/gvfsbackendsftp.c:2754
 msgid "Unable to create temporary file"
 msgstr "Ajutist faili pole võimalik luua"
 
-#: ../daemon/gvfsbackendsftp.c:3490 ../daemon/gvfsbackendsmb.c:1767
+#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1793
 msgid "Can't move directory over directory"
 msgstr ""
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:215
+#: ../daemon/gvfsbackendsmb.c:216
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Serveris %2$s asuva jagatud kataloogile %1$s on vaja parooli"
 
-#: ../daemon/gvfsbackendsmb.c:468 ../daemon/gvfsbackendsmb.c:502
+#: ../daemon/gvfsbackendsmb.c:471 ../daemon/gvfsbackendsmb.c:511
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Sisemine viga (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:558
+#: ../daemon/gvfsbackendsmb.c:550
 msgid "Failed to mount Windows share"
 msgstr "Tõrge Windowsi jagatud kataloogi ühendamisel"
 
-#: ../daemon/gvfsbackendsmb.c:688 ../daemon/gvfsbackendsmb.c:1147
+#: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
 msgid "Unsupported seek type"
 msgstr ""
 
-#: ../daemon/gvfsbackendsmb.c:1211
+#: ../daemon/gvfsbackendsmb.c:1237
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Tõrge varufaili loomisel: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1669
+#: ../daemon/gvfsbackendsmb.c:1695
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Viga faili kustutamisel: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1743
+#: ../daemon/gvfsbackendsmb.c:1769
 #, c-format
 msgid "Error moving file: %s"
-msgstr "Viga faili ümbertõstmise: %s"
+msgstr "Viga faili ümbertõstmisel: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1815
+#: ../daemon/gvfsbackendsmb.c:1841
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Viga sihtfaili eemaldamisel: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1839
+#: ../daemon/gvfsbackendsmb.c:1865
 msgid "Can't recursively move directory"
 msgstr "Kataloogi pole võimalik rekursiivselt ümber tõsta"
 
-#: ../daemon/gvfsbackendsmb.c:1902
+#: ../daemon/gvfsbackendsmb.c:1928
 msgid "Windows Shares Filesystem Service"
 msgstr "Windowsi jagatud failisüsteemi teenus"
 
@@ -839,30 +1031,26 @@ msgstr "Fail pole ühendatav"
 msgid "Not a regular file"
 msgstr "Pole tavaline fail"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1112
-msgid "Not a directory"
-msgstr "Pole kataloog"
-
 #: ../daemon/gvfsbackendsmbbrowse.c:1224
 msgid "Windows Network Filesystem Service"
 msgstr "Windowsi võrgufailisüsteemi teenus"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:600 ../daemon/gvfsbackendtrash.c:1181
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
 msgid "Trash"
 msgstr "Prügikast"
 
-#: ../daemon/gvfsbackendtrash.c:975
+#: ../daemon/gvfsbackendtrash.c:1016
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (prügikastis)"
 
-#: ../daemon/gvfsbackendtrash.c:1282
+#: ../daemon/gvfsbackendtrash.c:1327
 msgid "Can't delete trash"
 msgstr "Prügikasti pole võimalik kustutada"
 
-#: ../daemon/gvfsbackendtrash.c:1629 ../daemon/gvfsbackendtrash.c:1704
+#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
 msgid "Trash directory notification not supported"
 msgstr "Prügikataloogi teavitus pole toetatud"
 
@@ -875,7 +1063,7 @@ msgstr "Vigane taustaprogrammi liik"
 msgid "Error sending fd: %s"
 msgstr "Viga fd saatmisel: %s"
 
-#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:119
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:120
 #: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
 #: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
 #: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
@@ -902,429 +1090,416 @@ msgstr "Nimeviidad pole taustaprogrammi poolt toetatud"
 msgid "Invalid dbus message"
 msgstr "Vigane dbus-sõnum"
 
-#: ../daemon/main.c:47
+#: ../daemon/main.c:45
 msgid "Replace old daemon."
 msgstr "Vana deemoni asendamine."
 
-#: ../daemon/main.c:48
+#: ../daemon/main.c:46
 msgid "Don't start fuse."
 msgstr "Fuse't ei käivitata."
 
-#: ../daemon/main.c:60
+#: ../daemon/main.c:58
 msgid "GVFS Daemon"
 msgstr "GVFS-deemon"
 
-#: ../daemon/main.c:63
+#: ../daemon/main.c:61
 msgid "Main daemon for GVFS"
 msgstr "GVFS-i peadeemon"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:78
+#: ../daemon/main.c:76
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:80 ../programs/gvfs-cat.c:165 ../programs/gvfs-cat.c:178
+#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
-#: ../programs/gvfs-ls.c:388 ../programs/gvfs-move.c:97
-#: ../programs/gvfs-open.c:133 ../programs/gvfs-open.c:146
-#: ../programs/gvfs-save.c:165 ../programs/gvfs-tree.c:253
+#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
+#: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Täiendava teabe jaoks proovi \"%s --help\"."
 
-#: ../daemon/mount.c:432
+#: ../daemon/mount.c:439
 msgid "Invalid arguments from spawned child"
 msgstr ""
 
-#: ../daemon/mount.c:731
+#: ../daemon/mount.c:740
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Tõrge automaatühendamisel: %s"
 
-#: ../daemon/mount.c:776
+#: ../daemon/mount.c:785
 msgid "The specified location is not mounted"
 msgstr "Määratud asukoht pole ühendatud"
 
-#: ../daemon/mount.c:781
+#: ../daemon/mount.c:790
 msgid "The specified location is not supported"
 msgstr "Määratud asukoht pole toetatud"
 
-#: ../daemon/mount.c:944
+#: ../daemon/mount.c:954
 msgid "Location is already mounted"
 msgstr "Asukoht on juba ühendatud"
 
-#: ../daemon/mount.c:952
+#: ../daemon/mount.c:962
 msgid "Location is not mountable"
 msgstr "Asukoht pole ühendatav"
 
-#: ../hal/ghaldrive.c:144
+#: ../monitor/hal/ghaldrive.c:130
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: ../hal/ghaldrive.c:146
+#: ../monitor/hal/ghaldrive.c:132
 msgid "CD-R"
 msgstr "CD-R"
 
-#: ../hal/ghaldrive.c:148
+#: ../monitor/hal/ghaldrive.c:134
 msgid "CD-RW"
 msgstr "CD-RW"
 
-#: ../hal/ghaldrive.c:152
+#: ../monitor/hal/ghaldrive.c:138
 msgid "DVD-ROM"
 msgstr "DVD-ROM"
 
-#: ../hal/ghaldrive.c:154
+#: ../monitor/hal/ghaldrive.c:140
 msgid "DVD+R"
 msgstr "DVD+R"
 
-#: ../hal/ghaldrive.c:156
+#: ../monitor/hal/ghaldrive.c:142
 msgid "DVD+RW"
 msgstr "DVD+RW"
 
-#: ../hal/ghaldrive.c:158
+#: ../monitor/hal/ghaldrive.c:144
 msgid "DVD-R"
 msgstr "DVD-R"
 
-#: ../hal/ghaldrive.c:160
+#: ../monitor/hal/ghaldrive.c:146
 msgid "DVD-RW"
 msgstr "DVD-RW"
 
-#: ../hal/ghaldrive.c:162
+#: ../monitor/hal/ghaldrive.c:148
 msgid "DVD-RAM"
 msgstr "DVD-RAM"
 
-#: ../hal/ghaldrive.c:165
+#: ../monitor/hal/ghaldrive.c:151
 msgid "DVD±R"
 msgstr "DVD±R"
 
-#: ../hal/ghaldrive.c:168
+#: ../monitor/hal/ghaldrive.c:154
 msgid "DVD±RW"
 msgstr "DVD±RW"
 
-#: ../hal/ghaldrive.c:170
+#: ../monitor/hal/ghaldrive.c:156
 msgid "HDDVD"
 msgstr "HDDVD"
 
-#: ../hal/ghaldrive.c:172
+#: ../monitor/hal/ghaldrive.c:158
 msgid "HDDVD-r"
 msgstr "HDDVD-r"
 
-#: ../hal/ghaldrive.c:174
+#: ../monitor/hal/ghaldrive.c:160
 msgid "HDDVD-RW"
 msgstr "HDDVD-RW"
 
-#: ../hal/ghaldrive.c:176
+#: ../monitor/hal/ghaldrive.c:162
 msgid "Blu-ray"
 msgstr "Blu-ray"
 
-#: ../hal/ghaldrive.c:178
+#: ../monitor/hal/ghaldrive.c:164
 msgid "Blu-ray-R"
 msgstr "Blu-ray-R"
 
-#: ../hal/ghaldrive.c:180
+#: ../monitor/hal/ghaldrive.c:166
 msgid "Blu-ray-RE"
 msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: ../hal/ghaldrive.c:186
+#: ../monitor/hal/ghaldrive.c:172
 #, c-format
 msgid "%s/%s Drive"
 msgstr "%s/%s-ajam"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
-#: ../hal/ghaldrive.c:192
+#: ../monitor/hal/ghaldrive.c:178
 #, c-format
 msgid "%s Drive"
 msgstr "%s-ajam"
 
-#: ../hal/ghaldrive.c:196
+#: ../monitor/hal/ghaldrive.c:182
 msgid "Floppy Drive"
 msgstr "Flopiajam"
 
-#: ../hal/ghaldrive.c:202
+#: ../monitor/hal/ghaldrive.c:188
 msgid "Software RAID Drive"
 msgstr "Tarkvaraline RAID-salvesti"
 
-#: ../hal/ghaldrive.c:204
+#: ../monitor/hal/ghaldrive.c:190
 msgid "USB Drive"
 msgstr "USB-ajam"
 
-#: ../hal/ghaldrive.c:206
+#: ../monitor/hal/ghaldrive.c:192
 msgid "ATA Drive"
 msgstr "ATA-ajam"
 
-#: ../hal/ghaldrive.c:208
+#: ../monitor/hal/ghaldrive.c:194
 msgid "SCSI Drive"
 msgstr "SCSI-ajam"
 
-#: ../hal/ghaldrive.c:210
+#: ../monitor/hal/ghaldrive.c:196
 msgid "FireWire Drive"
 msgstr "FireWire-ajam"
 
-#: ../hal/ghaldrive.c:214
+#: ../monitor/hal/ghaldrive.c:200
 msgid "Tape Drive"
 msgstr "Magnetlintsalvesti"
 
-#: ../hal/ghaldrive.c:216
+#: ../monitor/hal/ghaldrive.c:202
 msgid "CompactFlash Drive"
 msgstr "CompactFlash-ajam"
 
-#: ../hal/ghaldrive.c:218
+#: ../monitor/hal/ghaldrive.c:204
 msgid "MemoryStick Drive"
 msgstr "MemoryStick-ajam"
 
-#: ../hal/ghaldrive.c:220
+#: ../monitor/hal/ghaldrive.c:206
 msgid "SmartMedia Drive"
 msgstr "SmartMedia-ajam"
 
-#: ../hal/ghaldrive.c:222
+#: ../monitor/hal/ghaldrive.c:208
 msgid "SD/MMC Drive"
 msgstr "SD/MMC-ajam"
 
-#: ../hal/ghaldrive.c:224
+#: ../monitor/hal/ghaldrive.c:210
 msgid "Zip Drive"
 msgstr "Zip-ajam"
 
-#: ../hal/ghaldrive.c:226
+#: ../monitor/hal/ghaldrive.c:212
 msgid "Jaz Drive"
 msgstr "Jaz-ajam"
 
-#: ../hal/ghaldrive.c:228
+#: ../monitor/hal/ghaldrive.c:214
 msgid "Thumb Drive"
 msgstr "Mälupulk"
 
-#: ../hal/ghaldrive.c:231
+#: ../monitor/hal/ghaldrive.c:217
 msgid "Mass Storage Drive"
 msgstr "Massalvesti"
 
-#: ../hal/ghaldrive.c:730
+#: ../monitor/hal/ghaldrive.c:723
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "Tõrge meediumi väljastamisel, üks või enam meediumit on hõivatud."
 
-#: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
-msgid "CD-ROM Disc"
-msgstr "CD-ROM plaat"
-
-#: ../hal/ghalmount.c:166 ../hal/ghalvolume.c:155
-msgid "Blank CD-ROM Disc"
-msgstr "Tühi CD-ROM plaat"
-
-#: ../hal/ghalmount.c:167 ../hal/ghalvolume.c:156
-msgid "CD-R Disc"
-msgstr "CD-R plaat"
-
-#: ../hal/ghalmount.c:167 ../hal/ghalvolume.c:156
-msgid "Blank CD-R Disc"
-msgstr "Tühi CD-R plaat"
-
-#: ../hal/ghalmount.c:168 ../hal/ghalvolume.c:157
-msgid "CD-RW Disc"
-msgstr "CD-RW plaat"
-
-#: ../hal/ghalmount.c:168 ../hal/ghalvolume.c:157
-msgid "Blank CD-RW Disc"
-msgstr "Tühi CD-RW plaat"
-
-#: ../hal/ghalmount.c:169 ../hal/ghalmount.c:171 ../hal/ghalvolume.c:158
-#: ../hal/ghalvolume.c:160
-msgid "DVD-ROM Disc"
-msgstr "DVD-ROM plaat"
-
-#: ../hal/ghalmount.c:169 ../hal/ghalmount.c:171 ../hal/ghalvolume.c:158
-#: ../hal/ghalvolume.c:160
-msgid "Blank DVD-ROM Disc"
-msgstr "Tühi DVD-ROM plaat"
-
-#: ../hal/ghalmount.c:170 ../hal/ghalvolume.c:159
-msgid "DVD-RAM Disc"
-msgstr "DVD-RAM plaat"
-
-#: ../hal/ghalmount.c:170 ../hal/ghalvolume.c:159
-msgid "Blank DVD-RAM Disc"
-msgstr "Tühi DVD-RAM plaat"
-
-#: ../hal/ghalmount.c:172 ../hal/ghalvolume.c:161
-msgid "DVD-RW Disc"
-msgstr "DVD-RW plaat"
-
-#: ../hal/ghalmount.c:172 ../hal/ghalvolume.c:161
-msgid "Blank DVD-RW Disc"
-msgstr "Tühi DVD-RW plaat"
-
-#: ../hal/ghalmount.c:173 ../hal/ghalvolume.c:162
-msgid "DVD+R Disc"
-msgstr "DVD+R plaat"
-
-#: ../hal/ghalmount.c:173 ../hal/ghalvolume.c:162
-msgid "Blank DVD+R Disc"
-msgstr "Tühi DVD+R plaat"
-
-#: ../hal/ghalmount.c:174 ../hal/ghalvolume.c:163
-msgid "DVD+RW Disc"
-msgstr "DVD+RW plaat"
-
-#: ../hal/ghalmount.c:174 ../hal/ghalvolume.c:163
-msgid "Blank DVD+RW Disc"
-msgstr "Tühi DVD+RW plaat"
-
-#: ../hal/ghalmount.c:175 ../hal/ghalvolume.c:164
-msgid "DVD+R DL Disc"
-msgstr "DVD+R DL plaat"
-
-#: ../hal/ghalmount.c:175 ../hal/ghalvolume.c:164
-msgid "Blank DVD+R DL Disc"
-msgstr "Tühi DVD+R DL plaat"
-
-#: ../hal/ghalmount.c:176 ../hal/ghalvolume.c:165
-msgid "Blu-Ray Disc"
-msgstr "Blu-Ray plaat"
-
-#: ../hal/ghalmount.c:176 ../hal/ghalvolume.c:165
-msgid "Blank Blu-Ray Disc"
-msgstr "Tühi Blu-Ray plaat"
-
-#: ../hal/ghalmount.c:177 ../hal/ghalvolume.c:166
-msgid "Blu-Ray R Disc"
-msgstr "Blu-Ray R plaat"
-
-#: ../hal/ghalmount.c:177 ../hal/ghalvolume.c:166
-msgid "Blank Blu-Ray R Disc"
-msgstr "Tühi Blu-Ray R plaat"
-
-#: ../hal/ghalmount.c:178 ../hal/ghalvolume.c:167
-msgid "Blu-Ray RW Disc"
-msgstr "Blu-Ray RW plaat"
-
-#: ../hal/ghalmount.c:178 ../hal/ghalvolume.c:167
-msgid "Blank Blu-Ray RW Disc"
-msgstr "Tühi Blu-Ray RW plaat"
-
-#: ../hal/ghalmount.c:179 ../hal/ghalvolume.c:168
-msgid "HD DVD Disc"
-msgstr "HD DVD plaat"
-
-#: ../hal/ghalmount.c:179 ../hal/ghalvolume.c:168
-msgid "Blank HD DVD Disc"
-msgstr "Tühi HD DVD plaat"
-
-#: ../hal/ghalmount.c:180 ../hal/ghalvolume.c:169
-msgid "HD DVD-R Disc"
-msgstr "HD DVD-R plaat"
-
-#: ../hal/ghalmount.c:180 ../hal/ghalvolume.c:169
-msgid "Blank HD DVD-R Disc"
-msgstr "Tühi HD DVD-R plaat"
-
-#: ../hal/ghalmount.c:181 ../hal/ghalvolume.c:170
-msgid "HD DVD-RW Disc"
-msgstr "HD DVD-RW plaat"
-
-#: ../hal/ghalmount.c:181 ../hal/ghalvolume.c:170
-msgid "Blank HD DVD-RW Disc"
-msgstr "Tühi HD DVD-RW plaat"
-
-#: ../hal/ghalmount.c:182 ../hal/ghalvolume.c:171
-msgid "MO Disc"
-msgstr "MO plaat"
-
-#: ../hal/ghalmount.c:182 ../hal/ghalvolume.c:171
-msgid "Blank MO Disc"
-msgstr "Tühi MO plaat"
-
-#: ../hal/ghalmount.c:183 ../hal/ghalvolume.c:172
-msgid "Disc"
-msgstr "Plaat"
-
-#: ../hal/ghalmount.c:183 ../hal/ghalvolume.c:172
-msgid "Blank Disc"
-msgstr "Tühi plaat"
-
-#: ../hal/ghalmount.c:368
-#, c-format
-msgid "%.1f kB Media"
-msgstr "%.1f kB meedium"
-
-#: ../hal/ghalmount.c:373
-#, c-format
-msgid "%.1f MB Media"
-msgstr "%.1f MB meedium"
-
-#: ../hal/ghalmount.c:378
-#, c-format
-msgid "%.1f GB Media"
-msgstr "%.1f GB meedium"
-
-#: ../hal/ghalmount.c:490 ../hal/ghalvolume.c:317
-msgid "Mixed Audio/Data Disc"
-msgstr "Audio ja andmete segaplaat"
-
-#: ../hal/ghalvolume.c:206
+#: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:152
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
-#: ../hal/ghalvolume.c:211
+#: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:157
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: ../hal/ghalvolume.c:216
+#: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:162
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../hal/ghalvolume.c:305
-#, c-format
-msgid "%s Encrypted Data"
-msgstr "%s krüptitud andmed"
+#: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:233
+msgid "Mixed Audio/Data Disc"
+msgstr "Audio ja andmete segaplaat"
 
+#. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../hal/ghalvolume.c:328
+#: ../monitor/hal/ghalmount.c:446 ../monitor/hal/ghalvolume.c:244
 #, c-format
 msgid "%s Media"
 msgstr "%s meedium"
 
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalvolume.c:221
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s krüptitud andmed"
+
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "CD-ROM plaat"
+
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "Tühi CD-ROM plaat"
+
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "CD-R plaat"
+
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "Tühi CD-R plaat"
+
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "CD-RW plaat"
+
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "Tühi CD-RW plaat"
+
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "DVD-ROM plaat"
+
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "Tühi DVD-ROM plaat"
+
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "DVD-RAM plaat"
+
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "Tühi DVD-RAM plaat"
+
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "DVD-RW plaat"
+
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "Tühi DVD-RW plaat"
+
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "DVD+R plaat"
+
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "Tühi DVD+R plaat"
+
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "DVD+RW plaat"
+
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "Tühi DVD+RW plaat"
+
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL plaat"
+
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "Tühi DVD+R DL plaat"
+
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "Blu-Ray plaat"
+
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "Tühi Blu-Ray plaat"
+
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "Blu-Ray R plaat"
+
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "Tühi Blu-Ray R plaat"
+
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "Blu-Ray RW plaat"
+
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Tühi Blu-Ray RW plaat"
+
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "HD DVD plaat"
+
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "Tühi HD DVD plaat"
+
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "HD DVD-R plaat"
+
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "Tühi HD DVD-R plaat"
+
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "HD DVD-RW plaat"
+
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "Tühi HD DVD-RW plaat"
+
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
+msgid "MO Disc"
+msgstr "MO plaat"
+
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "Tühi MO plaat"
+
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
+msgid "Disc"
+msgstr "Plaat"
+
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "Tühi plaat"
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:59
+#: ../programs/gvfs-cat.c:57
 #, c-format
 msgid "%s: %s: error opening file: %s\n"
 msgstr "%s: %s: viga faili avamisel: %s\n"
 
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
-#: ../programs/gvfs-cat.c:82
+#: ../programs/gvfs-cat.c:80
 #, c-format
 msgid "%s: %s, error writing to stdout"
 msgstr "%s: %s, viga standardväljundisse kirjutamisel"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:94
+#: ../programs/gvfs-cat.c:92
 #, c-format
 msgid "%s: %s: error reading: %s\n"
 msgstr "%s: %s: viga lugemisel: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-cat.c:112
+#: ../programs/gvfs-cat.c:110
 #, c-format
 msgid "%s: %s:error closing: %s\n"
 msgstr "%s: %s: viga sulgemisel: %s\n"
 
-#: ../programs/gvfs-cat.c:138
+#: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
 msgstr "ASUKOHT... - ASUKOHTADE ühteliitmine standardväljundisse."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-cat.c:143
+#: ../programs/gvfs-cat.c:141
 msgid ""
 "Concatenate files at locations and print to the standard output. Works just "
 "like the traditional cat utility, but using gvfs location instead local "
@@ -1336,7 +1511,7 @@ msgstr ""
 "failide asemel gvfs-i asukohti. Näiteks võib failide liitmiseks kasutada "
 "asukohta smb://server/resource/file.txt."
 
-#: ../programs/gvfs-cat.c:150
+#: ../programs/gvfs-cat.c:148
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
@@ -1346,35 +1521,47 @@ msgstr ""
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:176 ../programs/gvfs-open.c:144
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:142
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: asukohad on puudu"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:58
+#: ../programs/gvfs-open.c:56
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
 msgstr "%s: %s: viga asukoha avamisel: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:85
+#: ../programs/gvfs-open.c:83
 #, c-format
 msgid "%s: %s: error launching application: %s\n"
 msgstr "%s: %s: viga rakenduse käivitamisel: %s\n"
 
-#: ../programs/gvfs-open.c:115
+#: ../programs/gvfs-open.c:113
 msgid "FILES... - open FILES with registered application."
 msgstr "FAILID... - FAILIDE avamine registreeritud rakenduse abil."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:119
+#: ../programs/gvfs-open.c:117
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
 "Faili(de) avamine selle failitüübi käsitlemiseks registreeritud vaikimisi "
 "rakendusega."
+
+#~ msgid "File unavailable"
+#~ msgstr "Fail pole saadaval"
+
+#~ msgid "%.1f kB Media"
+#~ msgstr "%.1f kB meedium"
+
+#~ msgid "%.1f MB Media"
+#~ msgstr "%.1f MB meedium"
+
+#~ msgid "%.1f GB Media"
+#~ msgstr "%.1f GB meedium"
