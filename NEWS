@@ -1,3 +1,22 @@
+Major changes in 0.99.5
+=======================
+
+* FTP backend now restores file permissions when replacing a file.
+* Miscellaneous unreported bug fixes.
+
+* Bug fixes
+  41852  - Items should be restored to orig. name when moved out of trash
+  546300 - g_file_replace_async doesn't allow NULL etag
+
+* Translation updates:
+  be@latin (Ihar Hrachyshka), es (Priit Laes, Jorge Gonzalez),
+  th (Theppitak Karoonboonyanan), pt_BR (Og Maciel), pl (Tomasz
+  Dominikowski), ml (Praveen Arimbrathodiyil), pt (Duarte Loreto),
+  fi (Ilkka Tuohela), zh_HK (Chao-Hsiung Liao), zh_TW (Chao-Hsiung Liao),
+  cs (Petr Kovar), gl (Ignacio Casal Quinteiro), ja (Takeshi AIHANA),
+  he (Yair Hershkovitz), gu (Sweta Kothari), ar (Djihed Afifi)
+
+
 Major changes in 0.99.4
 =======================
 

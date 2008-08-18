@@ -1,3 +1,5 @@
+=== gvfs 0.99.5 ===
+
 2008-08-16  Ihar Hrachyshka <booxter@lacinka.org>
 
 	* be@latin.po: Updated Belarusian Latin translation by Ihar Hrachyshka.
@@ -65,6 +67,8 @@
 
 	* es.po: Updated Spanish translation
 
+=== gvfs 0.99.4 ===
+	
 2008-08-04  Luca Ferretti  <elle.uca@libero.it>
 
 	* it.po: Updated italian translation.

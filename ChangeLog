@@ -1,3 +1,5 @@
+=== gvfs 0.99.5 ===
+
 2008-08-16  Jesse van den Kieboom  <jesse@icecrew.nl>
 
 	* daemon/gvfsbackenddav.c:
