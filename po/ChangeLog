@@ -1,3 +1,7 @@
+2008-08-21  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* nl.po: Updated Dutch translation by Wouter Bolsterlee.
+
 === gvfs 0.99.5 ===
 
 2008-08-16  Ihar Hrachyshka <booxter@lacinka.org>
@@ -13,7 +17,7 @@
 	* th.po: Updated Thai translation.
 
 2008-08-15 Og Maciel <ogmaciel@gnome.org>
-    * pt_BR.po: Updated translation by Vladimir Melo.
+	* pt_BR.po: Updated translation by Vladimir Melo.
 
 2008-08-15  Tomasz Dominikowski  <tdominikowski@aviary.pl>
 	* pl.po: Updated Polish translation.
@@ -32,8 +36,8 @@
 
 2008-08-12 Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
 
-        * zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
-        * zh_TW.po: Updated Traditional Chinese translation(Taiwan).
+	* zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
+	* zh_TW.po: Updated Traditional Chinese translation(Taiwan).
 
 2008-08-09  Petr Kovar  <pknbe@volny.cz>
 
@@ -107,7 +111,7 @@
 
 	* ar.po: Updated Arabic Translation by Khaled Hosny.
 
-2008-06-05   Clytie Siddall <clytie@riverland.net.au>
+2008-06-05  Clytie Siddall <clytie@riverland.net.au>
 
 	* vi.po: Updated Vietnamese translation.
 
@@ -117,7 +121,7 @@
 
 === gvfs 0.99.1 ===
 
-2008-06-02   Clytie Siddall <clytie@riverland.net.au>
+2008-06-02  Clytie Siddall <clytie@riverland.net.au>
 
 	* vi.po: Added Vietnamese translation (and in LINGUAS).
 
@@ -175,7 +179,7 @@
 
 2008-03-12  Alexander Larsson  <alexl@redhat.com>
 
-        * POTFILES.in:
+	* POTFILES.in:
 	Added gvfsbackenddaemon.c
 
 2008-03-10  Stéphane Raimbault  <stephane.raimbault@gmail.com>
@@ -220,8 +224,8 @@
 
 2008-03-09 Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
 
-        * zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
-        * zh_TW.po: Updated Traditional Chinese translation(Taiwan).
+	* zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
+	* zh_TW.po: Updated Traditional Chinese translation(Taiwan).
 
 2008-03-09  Artur Flinta  <aflinta@gmail.com>
 
@@ -258,8 +262,8 @@
 
 2008-03-08 Maxim Dziumanenko <dziumanenko@gmail.com>
 
-        * uk.po: Added Ukrainian translation.
-        * LINGUAS: Added Ukrainian (uk) to the list of languages
+	* uk.po: Added Ukrainian translation.
+	* LINGUAS: Added Ukrainian (uk) to the list of languages
 
 2008-03-07  Daniel Nylander <po@danielnylander.se>
 
@@ -267,7 +271,7 @@
 
 2008-03-07 Arangel Angov <arangel@linux.net.mk>
 
-        * mk.po: Updated Macedonian translation.
+	* mk.po: Updated Macedonian translation.
 
 2008-03-07  Luca Ferretti  <elle.uca@libero.it>
 
