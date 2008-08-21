@@ -1,5 +1,12 @@
 2008-08-21  Hans Petter Jansson  <hpj@novell.com>
 
+	* daemon/gvfsbackendgphoto2.c (ensure_ignore_prefix)
+	(do_mount)
+	(do_enumerate): Improve various user- and translator-
+	unfriendly error messages.
+
+2008-08-21  Hans Petter Jansson  <hpj@novell.com>
+
 	* configure.ac: Late post-release version bump to 0.99.6.
 
 2008-08-21  Wouter Bolsterlee  <wbolster@svn.gnome.org>

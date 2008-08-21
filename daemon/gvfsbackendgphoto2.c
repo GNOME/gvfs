@@ -1322,7 +1322,7 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
                                       gphoto2_backend->context);
   if (rc != 0)
     {
-      error = get_error_from_gphoto2 (_("Error listing folders to figure out ignore prefix"), rc);
+      error = get_error_from_gphoto2 (_("Failed to get folder list"), rc);
       g_vfs_job_failed_from_error (job, error);
       return FALSE;
   }  
@@ -1479,7 +1479,7 @@ do_mount (GVfsBackend *backend,
   rc = gp_port_info_list_new (&il);
   if (rc != 0)
     {
-      error = get_error_from_gphoto2 (_("Error creating port info list"), rc);
+      error = get_error_from_gphoto2 (_("Error loading device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -1489,7 +1489,7 @@ do_mount (GVfsBackend *backend,
   rc = gp_port_info_list_load (il);
   if (rc != 0)
     {
-      error = get_error_from_gphoto2 (_("Error loading info list"), rc);
+      error = get_error_from_gphoto2 (_("Error loading device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -1501,7 +1501,7 @@ do_mount (GVfsBackend *backend,
   n = gp_port_info_list_lookup_path (il, gphoto2_backend->gphoto2_port);
   if (n == GP_ERROR_UNKNOWN_PORT)
     {
-      error = get_error_from_gphoto2 (_("Error looking up port info from port info list"), rc);
+      error = get_error_from_gphoto2 (_("Error looking up device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -1511,7 +1511,7 @@ do_mount (GVfsBackend *backend,
   rc = gp_port_info_list_get_info (il, n, &info);
   if (rc != 0)
     {
-      error = get_error_from_gphoto2 (_("Error getting port info from port info list"), rc);
+      error = get_error_from_gphoto2 (_("Error getting device information"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -1524,7 +1524,7 @@ do_mount (GVfsBackend *backend,
   rc = gp_camera_set_port_info (gphoto2_backend->camera, info);
   if (rc != 0)
     {
-      error = get_error_from_gphoto2 (_("Error setting port info"), rc);
+      error = get_error_from_gphoto2 (_("Error setting up camera communications port"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (gphoto2_backend);
@@ -2005,7 +2005,7 @@ do_enumerate (GVfsBackend *backend,
                                           gphoto2_backend->context);
       if (rc != 0)
         {
-          error = get_error_from_gphoto2 (_("Error listing folders"), rc);
+          error = get_error_from_gphoto2 (_("Failed to get folder list"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_free (filename);
           return;
@@ -2068,7 +2068,7 @@ do_enumerate (GVfsBackend *backend,
                                         gphoto2_backend->context);
       if (rc != 0)
         {
-          error = get_error_from_gphoto2 (_("Error listing files in folder"), rc);
+          error = get_error_from_gphoto2 (_("Failed to get file list"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_free (filename);
           return;
