@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-08 20:01+0200\n"
-"PO-Revision-Date: 2008-08-08 20:02+0200\n"
+"POT-Creation-Date: 2008-08-21 17:47+0200\n"
+"PO-Revision-Date: 2008-08-21 17:48+0200\n"
 "Last-Translator: Ignacio Casal Quinteiro <icq@svn.gnome.org>\n"
 "Language-Team: Galego <proxecto@trasno.net>\n"
 "MIME-Version: 1.0\n"
@@ -214,7 +214,7 @@ msgid "No hostname specified"
 msgstr "Non se especificou un nome de servidor"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackenddav.c:1449 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
@@ -249,12 +249,12 @@ msgstr "Imposible crear o directorio temporal"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendgphoto2.c:2690
 #, c-format
 msgid "No such file or directory"
 msgstr "O ficheiro ou directorio non existe"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2036
 msgid "Directory not empty"
 msgstr "O directorio non está baleiro"
 
@@ -268,7 +268,7 @@ msgid "CD/DVD Creator"
 msgstr "Creador de CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2763
 msgid "File exists"
 msgstr "O ficheiro xa existe"
 
@@ -288,9 +288,9 @@ msgstr "O ficheiro obxectivo existe"
 msgid "Can't recursively copy directory"
 msgstr "Non se pode copiar recursivamente o directorio"
 
-#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
-#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2348
+#: ../daemon/gvfsbackendgphoto2.c:2556 ../daemon/gvfsbackendgphoto2.c:2651
+#: ../daemon/gvfsbackendgphoto2.c:2742
 msgid "Not supported"
 msgstr "Non soportado"
 
@@ -333,7 +333,7 @@ msgstr "cdda montado en %s"
 msgid "Audio Disc"
 msgstr "Disco de son"
 
-#: ../daemon/gvfsbackendcdda.c:356
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1655
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -356,7 +356,7 @@ msgstr "Erro de 'paranoia' na unidade %s"
 msgid "Error seeking in stream on drive %s"
 msgstr "Erro ao buscar no fluxo na unidade %s"
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1711
 #, c-format
 msgid "No such file"
 msgstr "Non existe o ficheiro"
@@ -378,7 +378,7 @@ msgstr "Computador"
 msgid "Filesystem"
 msgstr "Sistema de ficheiros"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1703
 #: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
 #: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
@@ -414,7 +414,7 @@ msgstr "Non se pode desmontar o ficheiro"
 msgid "Can't eject file"
 msgstr "Non se pode expulsar o ficheiro"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1516
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -432,49 +432,49 @@ msgstr "Resposta baleira"
 msgid "Unexpected reply from server"
 msgstr "Resposta inesperada do servidor"
 
-#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
+#: ../daemon/gvfsbackenddav.c:1149 ../daemon/gvfsbackenddav.c:1651
 msgid "Response invalid"
 msgstr "Resposta inválida"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1292
 msgid "WebDAV share"
 msgstr "Compartición WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1293
+#: ../daemon/gvfsbackenddav.c:1294
 #, c-format
 msgid "Enter password for %s"
 msgstr "Introduza contrasinal para %s"
 
-#: ../daemon/gvfsbackenddav.c:1296
+#: ../daemon/gvfsbackenddav.c:1297
 msgid "Please enter proxy password"
 msgstr "Introduza o contrasinal do proxy"
 
-#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:1520 ../daemon/gvfsbackenddav.c:1524
 msgid "Not a WebDAV enabled share"
 msgstr "Non é unha compartición activada WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1546
+#: ../daemon/gvfsbackenddav.c:1547
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV en %s"
 
-#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
+#: ../daemon/gvfsbackenddav.c:1607 ../daemon/gvfsbackenddav.c:1680
 msgid "Could not create request"
 msgstr "Non se puido crear a resposta"
 
-#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
-#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackenddav.c:1743 ../daemon/gvfsbackenddav.c:1996
+#: ../daemon/gvfsbackenddav.c:2107 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
 #: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "O ficheiro obxectivo xa existe"
 
-#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackenddav.c:1816 ../daemon/gvfsbackendsftp.c:2807
 #: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "O ficheiro foi modificado externamente"
 
-#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:1847 ../daemon/gvfsbackendsmb.c:1074
 #: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "Fallou a creación do ficheiro de seguranza"
@@ -640,9 +640,9 @@ msgstr "Cámara"
 msgid "Audio Player"
 msgstr "Reprodutor de son"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325
-msgid "Error listing folders to figure out ignore prefix"
-msgstr "Erro ao listar os cartafoles para averiguar o prefixo de ignorado"
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2008
+msgid "Failed to get folder list"
+msgstr "Fallou ao obter a lista de cartafoles"
 
 #: ../daemon/gvfsbackendgphoto2.c:1442
 msgid "No device specified"
@@ -656,27 +656,21 @@ msgstr "Non se pode crear o contexto gphoto2"
 msgid "Error creating camera"
 msgstr "Erro creando a cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1482
-msgid "Error creating port info list"
-msgstr "Erro ao crear a listaxe de información do porto"
-
-#: ../daemon/gvfsbackendgphoto2.c:1492
-msgid "Error loading info list"
-msgstr "Erro ao cargar a listaxe de información"
+#: ../daemon/gvfsbackendgphoto2.c:1482 ../daemon/gvfsbackendgphoto2.c:1492
+msgid "Error loading device information"
+msgstr "Erro ao cargar a información do dispositivo"
 
 #: ../daemon/gvfsbackendgphoto2.c:1504
-msgid "Error looking up port info from port info list"
-msgstr ""
-"Erro ao buscar a información do porto da listaxe de información do porto"
+msgid "Error looking up device information"
+msgstr "Erro ao buscar a información do dispositivo"
 
 #: ../daemon/gvfsbackendgphoto2.c:1514
-msgid "Error getting port info from port info list"
-msgstr ""
-"Erro ao obter a información do porto da listaxe de información do porto"
+msgid "Error getting device information"
+msgstr "Erro ao obter a información do dispositivo"
 
 #: ../daemon/gvfsbackendgphoto2.c:1527
-msgid "Error setting port info"
-msgstr "Erro ao establecer a información do porto"
+msgid "Error setting up camera communications port"
+msgstr "Erro ao configurar o porto de comunicacións da cámara"
 
 #: ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Error initializing camera"
@@ -692,106 +686,97 @@ msgstr "gphoto2 montado en %s"
 msgid "No camera specified"
 msgstr "Non se especificou ningunha cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
-#, c-format
-msgid "File system is busy: %d open files"
-msgstr "O sistema de ficheiros está ocupado: %d ficheiros abertos"
-
-#: ../daemon/gvfsbackendgphoto2.c:1716
+#: ../daemon/gvfsbackendgphoto2.c:1719
 msgid "Error creating file object"
 msgstr "Erro ao crear o ficheiro obxecto"
 
-#: ../daemon/gvfsbackendgphoto2.c:1730
+#: ../daemon/gvfsbackendgphoto2.c:1733
 msgid "Error getting file"
 msgstr "Erro ao obter o ficheiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:1739
+#: ../daemon/gvfsbackendgphoto2.c:1742
 msgid "Error getting data from file"
 msgstr "Erro ao obter datos do ficheiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
+#: ../daemon/gvfsbackendgphoto2.c:1836 ../daemon/gvfsbackendgphoto2.c:3010
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Erro ao buscar no fluxo na cámara %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1975 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "Non é un directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2005
-msgid "Error listing folders"
-msgstr "Erro ao listar os cartafoles"
+#: ../daemon/gvfsbackendgphoto2.c:2071
+msgid "Failed to get file list"
+msgstr "Fallou ao obter a lista de ficheiros"
 
-#: ../daemon/gvfsbackendgphoto2.c:2068
-msgid "Error listing files in folder"
-msgstr "Erro ao listar os ficheiros no cartafol"
-
-#: ../daemon/gvfsbackendgphoto2.c:2357
+#: ../daemon/gvfsbackendgphoto2.c:2360
 msgid "Error creating directory"
 msgstr "Erro ao crear o directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2565
+#: ../daemon/gvfsbackendgphoto2.c:2568
 msgid "Name already exists"
 msgstr "O nome xa existe"
 
-#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:2579 ../daemon/gvfsbackendgphoto2.c:3200
 msgid "New name too long"
 msgstr "O nome é demasiado longo"
 
-#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
+#: ../daemon/gvfsbackendgphoto2.c:2589 ../daemon/gvfsbackendgphoto2.c:3211
 msgid "Error renaming dir"
 msgstr "Erro ao renomear o directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:2601 ../daemon/gvfsbackendgphoto2.c:3223
 msgid "Error renaming file"
 msgstr "Erro ao renomear o ficheiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:2661
+#: ../daemon/gvfsbackendgphoto2.c:2664
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "O directorio '%s' non está baleiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:2672
+#: ../daemon/gvfsbackendgphoto2.c:2675
 msgid "Error deleting directory"
 msgstr "Erro ao eliminar o directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2697
+#: ../daemon/gvfsbackendgphoto2.c:2700
 msgid "Error deleting file"
 msgstr "Erro ao eliminar o ficheiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:2749
+#: ../daemon/gvfsbackendgphoto2.c:2752
 msgid "Can't write to directory"
 msgstr "Non se pode escribir no directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796
+#: ../daemon/gvfsbackendgphoto2.c:2799
 msgid "Cannot allocate new file to append to"
 msgstr "Non se pode asignar o novo ficheiro no que engadir"
 
-#: ../daemon/gvfsbackendgphoto2.c:2810
+#: ../daemon/gvfsbackendgphoto2.c:2813
 msgid "Cannot read file to append to"
 msgstr "Non se pode ler o ficheiro no que engadir"
 
-#: ../daemon/gvfsbackendgphoto2.c:2820
+#: ../daemon/gvfsbackendgphoto2.c:2823
 msgid "Cannot get data of file to append to"
 msgstr "Non se poden obter os datos do ficheiro no que engadir"
 
-#: ../daemon/gvfsbackendgphoto2.c:3106
+#: ../daemon/gvfsbackendgphoto2.c:3109
 msgid "Error writing file"
 msgstr "Erro ao escribir o ficheiro"
 
-#: ../daemon/gvfsbackendgphoto2.c:3153
+#: ../daemon/gvfsbackendgphoto2.c:3156
 msgid "Not supported (not same directory)"
 msgstr "Non soportado (non é o mesmo directorio)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:3168
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Non soportado (src é un directorio, dst é un directorio)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3173
+#: ../daemon/gvfsbackendgphoto2.c:3176
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Non soportado (src é un directorio, dst é un ficheiro existente)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3185
+#: ../daemon/gvfsbackendgphoto2.c:3188
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Non soportado (src é un ficheiro, dst é un directorio)"
 
@@ -1038,20 +1023,20 @@ msgstr "Servizo de sistema de ficheiros de rede de Windows"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
 msgid "Trash"
 msgstr "Lixo"
 
-#: ../daemon/gvfsbackendtrash.c:1016
+#: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (no colector de lixo)"
 
-#: ../daemon/gvfsbackendtrash.c:1327
+#: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
 msgstr "Non se pode borrar o lixo"
 
-#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
 msgstr "Non se soporta a notificación do lixo"
 
@@ -1554,6 +1539,25 @@ msgid ""
 msgstr ""
 "Abre o ficheiro(s) cunha aplicación rexistrada predeterminada para manexar o "
 "tipo do ficheiro."
+
+#~ msgid "Error listing folders to figure out ignore prefix"
+#~ msgstr "Erro ao listar os cartafoles para averiguar o prefixo de ignorado"
+
+#~ msgid "Error creating port info list"
+#~ msgstr "Erro ao crear a listaxe de información do porto"
+
+#~ msgid "Error getting port info from port info list"
+#~ msgstr ""
+#~ "Erro ao obter a información do porto da listaxe de información do porto"
+
+#~ msgid "File system is busy: %d open files"
+#~ msgstr "O sistema de ficheiros está ocupado: %d ficheiros abertos"
+
+#~ msgid "Error listing folders"
+#~ msgstr "Erro ao listar os cartafoles"
+
+#~ msgid "Error listing files in folder"
+#~ msgstr "Erro ao listar os ficheiros no cartafol"
 
 #~ msgid "File unavailable"
 #~ msgstr "Ficheiro non dispoñible"
