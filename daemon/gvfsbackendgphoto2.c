@@ -1652,7 +1652,10 @@ do_unmount (GVfsBackend *backend,
   if (num_open_files > 0)
     {
       error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY, 
-                           _("File system is busy: %d open files"), num_open_files);
+                           ngettext("File system is busy: %d open file",
+                                    "File system is busy: %d open files",
+                                    num_open_files),
+                           num_open_files);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       return;
     }
