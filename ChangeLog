@@ -1,3 +1,10 @@
+2008-08-22  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendhttp.c (query_info_ready): Use
+	libsoup to parse the "Last-Modified" header, not
+	the ISO-8601 parsing functions (Closes: #547133)
+	Requires libsoup trunk
+
 2008-08-21  Hans Petter Jansson  <hpj@novell.com>
 
 	* daemon/gvfsbackendgphoto2.c (ensure_ignore_prefix)
