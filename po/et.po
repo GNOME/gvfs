@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-07 20:41+0000\n"
-"PO-Revision-Date: 2008-08-16 09:53+0300\n"
+"POT-Creation-Date: 2008-08-21 15:25+0000\n"
+"PO-Revision-Date: 2008-08-23 14:16+0300\n"
 "Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
@@ -214,7 +214,7 @@ msgid "No hostname specified"
 msgstr "Hostinimi on määramata"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackenddav.c:1449 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
@@ -249,12 +249,12 @@ msgstr "Ajutist kataloogi pole võimalik luua"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendgphoto2.c:2690
 #, c-format
 msgid "No such file or directory"
 msgstr "Sellist faili või kataloogi ei ole"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2036
 msgid "Directory not empty"
 msgstr "Kataloog pole tühi"
 
@@ -268,7 +268,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD-looja"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2763
 msgid "File exists"
 msgstr "Fail on olemas"
 
@@ -288,9 +288,9 @@ msgstr "Sihtfail on juba olemas"
 msgid "Can't recursively copy directory"
 msgstr "Kataloogi pole võimalik rekursiivselt kopeerida"
 
-#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
-#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2348
+#: ../daemon/gvfsbackendgphoto2.c:2556 ../daemon/gvfsbackendgphoto2.c:2651
+#: ../daemon/gvfsbackendgphoto2.c:2742
 msgid "Not supported"
 msgstr "Pole toetatud"
 
@@ -333,7 +333,7 @@ msgstr "cdda ühendus seadmes %s"
 msgid "Audio Disc"
 msgstr "Audioplaat"
 
-#: ../daemon/gvfsbackendcdda.c:356
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1655
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -356,7 +356,7 @@ msgstr "'paranoia' teegi viga seadmega %s"
 msgid "Error seeking in stream on drive %s"
 msgstr ""
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1711
 #, c-format
 msgid "No such file"
 msgstr "Sellist faili ei ole"
@@ -378,7 +378,7 @@ msgstr "Arvuti"
 msgid "Filesystem"
 msgstr "Failisüsteem"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1703
 #: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
 #: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
@@ -414,7 +414,7 @@ msgstr "Faili pole võimalik lahti ühendada"
 msgid "Can't eject file"
 msgstr "Faili pole võimalik väljastada"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1516
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -432,49 +432,49 @@ msgstr "Tühi vastus"
 msgid "Unexpected reply from server"
 msgstr "Ootamatu vastus serverilt"
 
-#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
+#: ../daemon/gvfsbackenddav.c:1149 ../daemon/gvfsbackenddav.c:1651
 msgid "Response invalid"
 msgstr "Vastus on vigane"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1292
 msgid "WebDAV share"
 msgstr "WebDAV'i jagatud kataloog"
 
-#: ../daemon/gvfsbackenddav.c:1293
+#: ../daemon/gvfsbackenddav.c:1294
 #, c-format
 msgid "Enter password for %s"
 msgstr "Sisesta %s parool"
 
-#: ../daemon/gvfsbackenddav.c:1296
+#: ../daemon/gvfsbackenddav.c:1297
 msgid "Please enter proxy password"
 msgstr "Palun sisesta proksi parool"
 
-#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:1520 ../daemon/gvfsbackenddav.c:1524
 msgid "Not a WebDAV enabled share"
 msgstr "Pole WebDAV'i jagatud kataloog"
 
-#: ../daemon/gvfsbackenddav.c:1546
+#: ../daemon/gvfsbackenddav.c:1547
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV hostil %s"
 
-#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
+#: ../daemon/gvfsbackenddav.c:1607 ../daemon/gvfsbackenddav.c:1680
 msgid "Could not create request"
 msgstr "Päringut pole võimalik luua"
 
-#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
-#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackenddav.c:1743 ../daemon/gvfsbackenddav.c:1996
+#: ../daemon/gvfsbackenddav.c:2107 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
 #: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "Sihtfail on juba olemas"
 
-#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackenddav.c:1816 ../daemon/gvfsbackendsftp.c:2807
 #: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "Faili on mõne teise programmi poolt muudetud"
 
-#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:1847 ../daemon/gvfsbackendsmb.c:1074
 #: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "Tõrge varufaili loomisel"
@@ -638,9 +638,9 @@ msgstr "Kaamera"
 msgid "Audio Player"
 msgstr "Audioesitaja"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325
-msgid "Error listing folders to figure out ignore prefix"
-msgstr ""
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2008
+msgid "Failed to get folder list"
+msgstr "Kataloogide nimekirja pole võimalik hankida"
 
 #: ../daemon/gvfsbackendgphoto2.c:1442
 msgid "No device specified"
@@ -654,27 +654,21 @@ msgstr "gphoto2 konteksti pole võimalik luua"
 msgid "Error creating camera"
 msgstr "Viga kaamera loomisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:1482
-#, fuzzy
-msgid "Error creating port info list"
-msgstr "Viga sokli loomisel: %s"
-
-#: ../daemon/gvfsbackendgphoto2.c:1492
-#, fuzzy
-msgid "Error loading info list"
-msgstr "Viga fd saatmisel: %s"
+#: ../daemon/gvfsbackendgphoto2.c:1482 ../daemon/gvfsbackendgphoto2.c:1492
+msgid "Error loading device information"
+msgstr "Viga seadme andmete laadimisel"
 
 #: ../daemon/gvfsbackendgphoto2.c:1504
-msgid "Error looking up port info from port info list"
+msgid "Error looking up device information"
 msgstr ""
 
 #: ../daemon/gvfsbackendgphoto2.c:1514
-msgid "Error getting port info from port info list"
-msgstr "Viga pordi andmete hankimisel pordi andmete nimekirjast"
+msgid "Error getting device information"
+msgstr "Viga seadme andmete hankimisel"
 
 #: ../daemon/gvfsbackendgphoto2.c:1527
-msgid "Error setting port info"
-msgstr "Viga pordi andmete seadmisel"
+msgid "Error setting up camera communications port"
+msgstr "Viga kaamera suhtluspordi andmete seadmisel"
 
 #: ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Error initializing camera"
@@ -690,108 +684,97 @@ msgstr "gphoto2 ühendatud ketas %s"
 msgid "No camera specified"
 msgstr "Kaamera on määramata"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
-#, c-format
-msgid "File system is busy: %d open files"
-msgstr "Failisüsteem on hõivatud: %d faili on avatud"
-
-#: ../daemon/gvfsbackendgphoto2.c:1716
+#: ../daemon/gvfsbackendgphoto2.c:1719
 msgid "Error creating file object"
 msgstr "Viga failiobjekti loomisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:1730
+#: ../daemon/gvfsbackendgphoto2.c:1733
 msgid "Error getting file"
 msgstr "Viga faili hankimisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:1739
+#: ../daemon/gvfsbackendgphoto2.c:1742
 msgid "Error getting data from file"
 msgstr "Viga andmete hankimisel failist"
 
-#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
-#, fuzzy, c-format
+#: ../daemon/gvfsbackendgphoto2.c:1836 ../daemon/gvfsbackendgphoto2.c:3010
+#, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr "Viga vooprotokollis: %s"
+msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1975 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "Pole kataloog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2005
-#, fuzzy
-msgid "Error listing folders"
-msgstr "Viga faili kustutamisel: %s"
+#: ../daemon/gvfsbackendgphoto2.c:2071
+msgid "Failed to get file list"
+msgstr "Failide nimekirja pole võimalik hankida"
 
-#: ../daemon/gvfsbackendgphoto2.c:2068
-#, fuzzy
-msgid "Error listing files in folder"
-msgstr "Viga faili kustutamisel: %s"
-
-#: ../daemon/gvfsbackendgphoto2.c:2357
+#: ../daemon/gvfsbackendgphoto2.c:2360
 msgid "Error creating directory"
 msgstr "Viga kataloogi loomisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:2565
+#: ../daemon/gvfsbackendgphoto2.c:2568
 msgid "Name already exists"
 msgstr "Nimi on juba olemas"
 
-#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:2579 ../daemon/gvfsbackendgphoto2.c:3200
 msgid "New name too long"
 msgstr "Uus nimi on liiga pikk"
 
-#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
+#: ../daemon/gvfsbackendgphoto2.c:2589 ../daemon/gvfsbackendgphoto2.c:3211
 msgid "Error renaming dir"
 msgstr "Viga kataloogi ümbernimetamisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:2601 ../daemon/gvfsbackendgphoto2.c:3223
 msgid "Error renaming file"
 msgstr "Viga faili ümbernimetamisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:2661
+#: ../daemon/gvfsbackendgphoto2.c:2664
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "Kataloog '%s' pole tühi"
 
-#: ../daemon/gvfsbackendgphoto2.c:2672
+#: ../daemon/gvfsbackendgphoto2.c:2675
 msgid "Error deleting directory"
 msgstr "Viga kataloogi kustutamisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:2697
+#: ../daemon/gvfsbackendgphoto2.c:2700
 msgid "Error deleting file"
 msgstr "Viga faili kustutamisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:2749
+#: ../daemon/gvfsbackendgphoto2.c:2752
 msgid "Can't write to directory"
 msgstr "Kataloogi pole võimalik kirjutada"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796
+#: ../daemon/gvfsbackendgphoto2.c:2799
 msgid "Cannot allocate new file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:2810
+#: ../daemon/gvfsbackendgphoto2.c:2813
 msgid "Cannot read file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:2820
+#: ../daemon/gvfsbackendgphoto2.c:2823
 msgid "Cannot get data of file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3106
+#: ../daemon/gvfsbackendgphoto2.c:3109
 msgid "Error writing file"
 msgstr "Viga faili kirjutamisel"
 
-#: ../daemon/gvfsbackendgphoto2.c:3153
+#: ../daemon/gvfsbackendgphoto2.c:3156
 msgid "Not supported (not same directory)"
 msgstr "Pole toetatud (pole sama kataloog)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:3168
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on ka kataloog)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3173
+#: ../daemon/gvfsbackendgphoto2.c:3176
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Pole toetatud (lähtekoht on kataloog, sihtkoht on olemasolev fail)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3185
+#: ../daemon/gvfsbackendgphoto2.c:3188
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Pole toetatud (lähtekoht on fail, sihtkoht on kataloog)"
 
@@ -1037,20 +1020,20 @@ msgstr "Windowsi võrgufailisüsteemi teenus"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
 msgid "Trash"
 msgstr "Prügikast"
 
-#: ../daemon/gvfsbackendtrash.c:1016
+#: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (prügikastis)"
 
-#: ../daemon/gvfsbackendtrash.c:1327
+#: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
 msgstr "Prügikasti pole võimalik kustutada"
 
-#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
 msgstr "Prügikataloogi teavitus pole toetatud"
 
@@ -1553,6 +1536,12 @@ msgid ""
 msgstr ""
 "Faili(de) avamine selle failitüübi käsitlemiseks registreeritud vaikimisi "
 "rakendusega."
+
+#~ msgid "Error getting port info from port info list"
+#~ msgstr "Viga pordi andmete hankimisel pordi andmete nimekirjast"
+
+#~ msgid "File system is busy: %d open files"
+#~ msgstr "Failisüsteem on hõivatud: %d faili on avatud"
 
 #~ msgid "File unavailable"
 #~ msgstr "Fail pole saadaval"
