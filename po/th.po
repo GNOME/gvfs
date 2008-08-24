@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-15 20:38+0700\n"
-"PO-Revision-Date: 2008-08-16 10:50+0700\n"
+"POT-Creation-Date: 2008-08-24 12:13+0700\n"
+"PO-Revision-Date: 2008-08-24 12:17+0700\n"
 "Last-Translator: Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "Language-Team: Thai <thai-l10n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -212,7 +212,7 @@ msgid "No hostname specified"
 msgstr "ไม่ได้ระบุชื่อโฮสต์"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackenddav.c:1449 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
@@ -247,12 +247,12 @@ msgstr "ไม่สามารถสร้างไดเรกทอรีช
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendgphoto2.c:2690
 #, c-format
 msgid "No such file or directory"
 msgstr "ไม่มีแฟ้มหรือไดเรกทอรีดังกล่าว"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2036
 msgid "Directory not empty"
 msgstr "ไดเรกทอรีไม่ว่าง"
 
@@ -266,7 +266,7 @@ msgid "CD/DVD Creator"
 msgstr "แบ็กเอนด์เขียนซีดี/ดีวีดี"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2763
 msgid "File exists"
 msgstr "แฟ้มมีอยู่แล้ว"
 
@@ -286,9 +286,9 @@ msgstr "มีแฟ้มปลายทางอยู่แล้ว"
 msgid "Can't recursively copy directory"
 msgstr "ไม่สามารถคัดลอกไดเรกทอรีทั้งยวง"
 
-#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
-#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2348
+#: ../daemon/gvfsbackendgphoto2.c:2556 ../daemon/gvfsbackendgphoto2.c:2651
+#: ../daemon/gvfsbackendgphoto2.c:2742
 msgid "Not supported"
 msgstr "ไม่รองรับ"
 
@@ -331,7 +331,7 @@ msgstr "การเมานท์ cdda ที่ %s"
 msgid "Audio Disc"
 msgstr "แผ่นเพลง"
 
-#: ../daemon/gvfsbackendcdda.c:356
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1655
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -353,7 +353,7 @@ msgstr "เกิดข้อผิดพลาดจาก 'paranoia' ที่
 msgid "Error seeking in stream on drive %s"
 msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่ไดรว์ %s"
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1711
 #, c-format
 msgid "No such file"
 msgstr "ไม่มีแฟ้มดังกล่าว"
@@ -375,7 +375,7 @@ msgstr "คอมพิวเตอร์"
 msgid "Filesystem"
 msgstr "ระบบแฟ้ม"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1703
 #: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
 #: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
@@ -411,7 +411,7 @@ msgstr "ไม่สามารถเลิกเมาทน์แฟ้ม"
 msgid "Can't eject file"
 msgstr "ไม่สามารถดันแฟ้มออก"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1516
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -429,49 +429,49 @@ msgstr "คำตอบว่างเปล่า"
 msgid "Unexpected reply from server"
 msgstr "ได้รับคำตอบที่ไม่คาดหมายจากเซิร์ฟเวอร์"
 
-#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
+#: ../daemon/gvfsbackenddav.c:1149 ../daemon/gvfsbackenddav.c:1651
 msgid "Response invalid"
 msgstr "คำตอบใช้ไม่ได้"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1292
 msgid "WebDAV share"
 msgstr "การเปิดให้ใช้ร่วมผ่าน WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1293
+#: ../daemon/gvfsbackenddav.c:1294
 #, c-format
 msgid "Enter password for %s"
 msgstr "กรุณาป้อนรหัสผ่านสำหรับ %s"
 
-#: ../daemon/gvfsbackenddav.c:1296
+#: ../daemon/gvfsbackenddav.c:1297
 msgid "Please enter proxy password"
 msgstr "กรุณาป้อนรหัสผ่านสำหรับพร็อกซี"
 
-#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:1520 ../daemon/gvfsbackenddav.c:1524
 msgid "Not a WebDAV enabled share"
 msgstr "ไม่ใช่แหล่งใช้ร่วมที่ใช้ WebDAV ได้"
 
-#: ../daemon/gvfsbackenddav.c:1546
+#: ../daemon/gvfsbackenddav.c:1547
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV ที่ %s"
 
-#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
+#: ../daemon/gvfsbackenddav.c:1607 ../daemon/gvfsbackenddav.c:1680
 msgid "Could not create request"
 msgstr "ไม่สามารถสร้างคำร้องขอ"
 
-#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
-#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackenddav.c:1743 ../daemon/gvfsbackenddav.c:1996
+#: ../daemon/gvfsbackenddav.c:2107 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
 #: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "มีแฟ้มปลายทางอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackenddav.c:1816 ../daemon/gvfsbackendsftp.c:2807
 #: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "แฟ้มถูกเปลี่ยนแปลงจากโปรแกรมภายนอก"
 
-#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:1847 ../daemon/gvfsbackendsmb.c:1074
 #: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "สร้างแฟ้มสำรองไม่สำเร็จ"
@@ -635,9 +635,9 @@ msgstr "กล้อง"
 msgid "Audio Player"
 msgstr "เครื่องเล่นเพลง"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325
-msgid "Error listing folders to figure out ignore prefix"
-msgstr "เกิดข้อผิดพลาดขณะไล่เรียงโฟลเดอร์เพื่อหาส่วนหน้าที่จะตัดทิ้งของชื่อแฟ้ม"
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2008
+msgid "Failed to get folder list"
+msgstr "ดึงรายชื่อโฟลเดอร์ไม่สำเร็จ"
 
 #: ../daemon/gvfsbackendgphoto2.c:1442
 msgid "No device specified"
@@ -651,25 +651,21 @@ msgstr "ไม่สามารถสร้างบริบทสำหรั
 msgid "Error creating camera"
 msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์กล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1482
-msgid "Error creating port info list"
-msgstr "เกิดข้อผิดพลาดขณะสร้างรายชื่อข้อมูลพอร์ต"
-
-#: ../daemon/gvfsbackendgphoto2.c:1492
-msgid "Error loading info list"
-msgstr "เกิดข้อผิดพลาดขณะโหลดรายชื่อข้อมูล"
+#: ../daemon/gvfsbackendgphoto2.c:1482 ../daemon/gvfsbackendgphoto2.c:1492
+msgid "Error loading device information"
+msgstr "เกิดข้อผิดพลาดขณะโหลดข้อมูลอุปกรณ์"
 
 #: ../daemon/gvfsbackendgphoto2.c:1504
-msgid "Error looking up port info from port info list"
-msgstr "เกิดข้อผิดพลาดขณะหาข้อมูลพอร์ตจากรายชื่อข้อมูลพอร์ต"
+msgid "Error looking up device information"
+msgstr "เกิดข้อผิดพลาดขณะหาข้อมูลอุปกรณ์"
 
 #: ../daemon/gvfsbackendgphoto2.c:1514
-msgid "Error getting port info from port info list"
-msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลพอร์ตจากรายชื่อข้อมูลพอร์ต"
+msgid "Error getting device information"
+msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลอุปกรณ์"
 
 #: ../daemon/gvfsbackendgphoto2.c:1527
-msgid "Error setting port info"
-msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าข้อมูลพอร์ต"
+msgid "Error setting up camera communications port"
+msgstr "เกิดข้อผิดพลาดขณะกำหนดค่าพอร์ตสื่อสารของกล้องถ่ายรูป"
 
 #: ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Error initializing camera"
@@ -685,106 +681,97 @@ msgstr "การเมานท์ gphoto2 ที่ %s"
 msgid "No camera specified"
 msgstr "ไม่ได้ระบุกล้องถ่ายรูป"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
-#, c-format
-msgid "File system is busy: %d open files"
-msgstr "ระบบแฟ้มถูกใช้งานอยู่: เปิดแฟ้มอยู่ %d แฟ้ม"
-
-#: ../daemon/gvfsbackendgphoto2.c:1716
+#: ../daemon/gvfsbackendgphoto2.c:1719
 msgid "Error creating file object"
 msgstr "เกิดข้อผิดพลาดขณะสร้างอ็อบเจกต์แฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:1730
+#: ../daemon/gvfsbackendgphoto2.c:1733
 msgid "Error getting file"
 msgstr "เกิดข้อผิดพลาดขณะหยิบแฟ้มมาใช้"
 
-#: ../daemon/gvfsbackendgphoto2.c:1739
+#: ../daemon/gvfsbackendgphoto2.c:1742
 msgid "Error getting data from file"
 msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลจากแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
+#: ../daemon/gvfsbackendgphoto2.c:1836 ../daemon/gvfsbackendgphoto2.c:3010
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "เกิดข้อผิดพลาดขณะเลื่อนตำแหน่งในสตรีมที่กล้องถ่ายรูป %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1975 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "ไม่ใช่ไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2005
-msgid "Error listing folders"
-msgstr "เกิดข้อผิดพลาดขณะไล่เรียงโฟลเดอร์"
+#: ../daemon/gvfsbackendgphoto2.c:2071
+msgid "Failed to get file list"
+msgstr "ดึงรายชื่อแฟ้มไม่สำเร็จ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2068
-msgid "Error listing files in folder"
-msgstr "เกิดข้อผิดพลาดขณะไล่เรียงแฟ้มในโฟลเดอร์"
-
-#: ../daemon/gvfsbackendgphoto2.c:2357
+#: ../daemon/gvfsbackendgphoto2.c:2360
 msgid "Error creating directory"
 msgstr "เกิดข้อผิดพลาดขณะสร้างไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2565
+#: ../daemon/gvfsbackendgphoto2.c:2568
 msgid "Name already exists"
 msgstr "มีชื่อซ้ำอยู่ก่อนแล้ว"
 
-#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:2579 ../daemon/gvfsbackendgphoto2.c:3200
 msgid "New name too long"
 msgstr "ชื่อใหม่ยาวเกินไป"
 
-#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
+#: ../daemon/gvfsbackendgphoto2.c:2589 ../daemon/gvfsbackendgphoto2.c:3211
 msgid "Error renaming dir"
 msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:2601 ../daemon/gvfsbackendgphoto2.c:3223
 msgid "Error renaming file"
 msgstr "เกิดข้อผิดพลาดขณะเปลี่ยนชื่อแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:2661
+#: ../daemon/gvfsbackendgphoto2.c:2664
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "ไดเรกทอรี '%s' ไม่ว่าง"
 
-#: ../daemon/gvfsbackendgphoto2.c:2672
+#: ../daemon/gvfsbackendgphoto2.c:2675
 msgid "Error deleting directory"
 msgstr "เกิดข้อผิดพลาดขณะลบไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2697
+#: ../daemon/gvfsbackendgphoto2.c:2700
 msgid "Error deleting file"
 msgstr "เกิดข้อผิดพลาดขณะลบแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:2749
+#: ../daemon/gvfsbackendgphoto2.c:2752
 msgid "Can't write to directory"
 msgstr "ไม่สามารถเขียนลงในไดเรกทอรี"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796
+#: ../daemon/gvfsbackendgphoto2.c:2799
 msgid "Cannot allocate new file to append to"
 msgstr "ไม่สามารถสร้างแฟ้มใหม่เพื่อเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:2810
+#: ../daemon/gvfsbackendgphoto2.c:2813
 msgid "Cannot read file to append to"
 msgstr "ไม่สามารถอ่านแฟ้มที่จะเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:2820
+#: ../daemon/gvfsbackendgphoto2.c:2823
 msgid "Cannot get data of file to append to"
 msgstr "ไม่สามารถอ่านข้อมูลจากแฟ้มที่จะเขียนต่อท้าย"
 
-#: ../daemon/gvfsbackendgphoto2.c:3106
+#: ../daemon/gvfsbackendgphoto2.c:3109
 msgid "Error writing file"
 msgstr "เกิดข้อผิดพลาดขณะเขียนแฟ้ม"
 
-#: ../daemon/gvfsbackendgphoto2.c:3153
+#: ../daemon/gvfsbackendgphoto2.c:3156
 msgid "Not supported (not same directory)"
 msgstr "ไม่รองรับ (ไม่ใช่ไดเรกทอรีเดียวกัน)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:3168
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี, ปลายทางเป็นไดเรกทอรี)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3173
+#: ../daemon/gvfsbackendgphoto2.c:3176
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "ไม่รองรับ (ต้นทางเป็นไดเรกทอรี, ปลายทางเป็นแฟ้มที่มีอยู่)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3185
+#: ../daemon/gvfsbackendgphoto2.c:3188
 msgid "Not supported (src is file, dst is dir)"
 msgstr "ไม่รองรับ (ต้นทางเป็นแฟ้ม, ปลายทางเป็นไดเรกทอรี)"
 
@@ -1030,20 +1017,20 @@ msgstr "บริการระบบแฟ้มในเครือข่า
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
 msgid "Trash"
 msgstr "ถังขยะ"
 
-#: ../daemon/gvfsbackendtrash.c:1016
+#: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (ในถังขยะ)"
 
-#: ../daemon/gvfsbackendtrash.c:1327
+#: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
 msgstr "ไม่สามารถลบขยะ"
 
-#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
 msgstr "ไม่รองรับการแจ้งเหตุไดเรกทอรีถังขยะ"
 
@@ -1543,6 +1530,24 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "เปิดแฟ้มด้วยโปรแกรมปริยายที่ลงทะเบียนไว้สำหรับจัดการแฟ้มชนิดนั้นๆ"
+
+#~ msgid "Error listing folders to figure out ignore prefix"
+#~ msgstr "เกิดข้อผิดพลาดขณะไล่เรียงโฟลเดอร์เพื่อหาส่วนหน้าที่จะตัดทิ้งของชื่อแฟ้ม"
+
+#~ msgid "Error creating port info list"
+#~ msgstr "เกิดข้อผิดพลาดขณะสร้างรายชื่อข้อมูลพอร์ต"
+
+#~ msgid "Error getting port info from port info list"
+#~ msgstr "เกิดข้อผิดพลาดขณะอ่านข้อมูลพอร์ตจากรายชื่อข้อมูลพอร์ต"
+
+#~ msgid "File system is busy: %d open files"
+#~ msgstr "ระบบแฟ้มถูกใช้งานอยู่: เปิดแฟ้มอยู่ %d แฟ้ม"
+
+#~ msgid "Error listing folders"
+#~ msgstr "เกิดข้อผิดพลาดขณะไล่เรียงโฟลเดอร์"
+
+#~ msgid "Error listing files in folder"
+#~ msgstr "เกิดข้อผิดพลาดขณะไล่เรียงแฟ้มในโฟลเดอร์"
 
 #~ msgid "File unavailable"
 #~ msgstr "ไม่มีแฟ้มอยู่"
