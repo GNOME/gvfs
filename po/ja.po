@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-07 22:29+0900\n"
-"PO-Revision-Date: 2008-08-07 22:29+0900\n"
+"POT-Creation-Date: 2008-08-24 15:24+0900\n"
+"PO-Revision-Date: 2008-08-24 15:22+0900\n"
 "Last-Translator: Takeshi AIHANA <takeshi.aihana@gmail.com>\n"
 "Language-Team: Japanese <takeshi.aihana@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1979
 msgid "Operation not supported, files on different mounts"
-msgstr "サポートしていない操作です (files on different mounts)"
+msgstr "サポートしていない操作です (ファイルが別々のマウント先にあります)"
 
 #: ../client/gdaemonfile.c:787
 msgid "Invalid return value from get_info"
@@ -82,8 +82,8 @@ msgstr "monitor_file() の返り値が間違っています"
 #: ../client/gdaemonfileinputstream.c:1310
 #: ../client/gdaemonfileoutputstream.c:402
 #: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1048
-#: ../client/gdaemonfileoutputstream.c:1058
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "ストリームのプロトコルでエラー: %s"
@@ -91,7 +91,7 @@ msgstr "ストリームのプロトコルでエラー: %s"
 #: ../client/gdaemonfileinputstream.c:458
 #: ../client/gdaemonfileinputstream.c:1310
 #: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1058
+#: ../client/gdaemonfileoutputstream.c:1064
 msgid "End of stream"
 msgstr "ストリームの最後"
 
@@ -121,6 +121,11 @@ msgstr "ストリーム上のシークはサポートしていません"
 #: ../client/gdaemonfileinputstream.c:1237
 msgid "The query info operation is not supported"
 msgstr "query_info の操作はサポートしていません"
+
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr "ストリーム上での query_info はサポートしていません"
 
 #: ../client/gdaemonvfs.c:749
 #, c-format
@@ -206,7 +211,7 @@ msgid "No hostname specified"
 msgstr "ホスト名が指定されていません"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackenddav.c:1449 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
@@ -241,12 +246,12 @@ msgstr "作業ディレクトリを生成できません"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendgphoto2.c:2690
 #, c-format
 msgid "No such file or directory"
 msgstr "そのようなファイルまたはディレクトリは存在しません"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2036
 msgid "Directory not empty"
 msgstr "ディレクトリが空ではありません"
 
@@ -260,7 +265,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD クリエータ"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2763
 msgid "File exists"
 msgstr "ファイルが存在しています"
 
@@ -280,9 +285,9 @@ msgstr "転送先にファイルが存在します"
 msgid "Can't recursively copy directory"
 msgstr "ディレクトリを再帰的にコピーできません"
 
-#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
-#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2348
+#: ../daemon/gvfsbackendgphoto2.c:2556 ../daemon/gvfsbackendgphoto2.c:2651
+#: ../daemon/gvfsbackendgphoto2.c:2742
 msgid "Not supported"
 msgstr "サポートしていません"
 
@@ -325,7 +330,7 @@ msgstr "cdda が %s にマウントしました"
 msgid "Audio Disc"
 msgstr "オーディオ・ディスク"
 
-#: ../daemon/gvfsbackendcdda.c:356
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1655
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -348,7 +353,7 @@ msgstr "ドライブ (%s) の 'paranoia'でエラー"
 msgid "Error seeking in stream on drive %s"
 msgstr "ドライブ (%s) のストリームをシークする際にエラー"
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1711
 #, c-format
 msgid "No such file"
 msgstr "そのようなファイルは存在しません"
@@ -370,7 +375,7 @@ msgstr "コンピュータ"
 msgid "Filesystem"
 msgstr "ファイルシステム"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1703
 #: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
 #: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
@@ -406,7 +411,7 @@ msgstr "ファイルをアンマウントできません"
 msgid "Can't eject file"
 msgstr "ファイルを取り出せません"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1516
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -424,49 +429,49 @@ msgstr "応答メッセージが空です"
 msgid "Unexpected reply from server"
 msgstr "サーバからの想定外のリプライです"
 
-#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
+#: ../daemon/gvfsbackenddav.c:1149 ../daemon/gvfsbackenddav.c:1651
 msgid "Response invalid"
 msgstr "応答メッセージが間違っています"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1292
 msgid "WebDAV share"
 msgstr "WebDAV 共有"
 
-#: ../daemon/gvfsbackenddav.c:1293
+#: ../daemon/gvfsbackenddav.c:1294
 #, c-format
 msgid "Enter password for %s"
 msgstr "%s のパスワードを入力して下さい"
 
-#: ../daemon/gvfsbackenddav.c:1296
+#: ../daemon/gvfsbackenddav.c:1297
 msgid "Please enter proxy password"
 msgstr "プロキシのパスワードを入力して下さい"
 
-#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:1520 ../daemon/gvfsbackenddav.c:1524
 msgid "Not a WebDAV enabled share"
 msgstr "WebDAV 共有は利用できません"
 
-#: ../daemon/gvfsbackenddav.c:1546
+#: ../daemon/gvfsbackenddav.c:1547
 #, c-format
 msgid "WebDAV on %s"
 msgstr "%s での WebDAV 共有"
 
-#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
+#: ../daemon/gvfsbackenddav.c:1607 ../daemon/gvfsbackenddav.c:1680
 msgid "Could not create request"
 msgstr "要求メッセージを生成できませんでした"
 
-#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
-#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackenddav.c:1743 ../daemon/gvfsbackenddav.c:1996
+#: ../daemon/gvfsbackenddav.c:2107 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
 #: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "対象のファイルが既に存在しています"
 
-#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackenddav.c:1816 ../daemon/gvfsbackendsftp.c:2807
 #: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "そのファイルは他のプロセスで変更されました"
 
-#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:1847 ../daemon/gvfsbackendsmb.c:1074
 #: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "バックアップ・ファイルの生成に失敗しました"
@@ -632,9 +637,9 @@ msgstr "カメラ"
 msgid "Audio Player"
 msgstr "オーディオ・プレイヤー"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325
-msgid "Error listing folders to figure out ignore prefix"
-msgstr "複数のディレクトリを監視する際にエラー"
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2008
+msgid "Failed to get folder list"
+msgstr "フォルダの一覧を取得できませんでした"
 
 #: ../daemon/gvfsbackendgphoto2.c:1442
 msgid "No device specified"
@@ -648,29 +653,25 @@ msgstr "gphoto2 のコンテキストを生成できません"
 msgid "Error creating camera"
 msgstr "カメラ・オブジェクトを生成できません"
 
-#: ../daemon/gvfsbackendgphoto2.c:1482
-msgid "Error creating port info list"
-msgstr "ポート情報の一覧を生成する際にエラー"
-
-#: ../daemon/gvfsbackendgphoto2.c:1492
-msgid "Error loading info list"
-msgstr "ポート情報の一覧を読み込む際にエラー"
+#: ../daemon/gvfsbackendgphoto2.c:1482 ../daemon/gvfsbackendgphoto2.c:1492
+msgid "Error loading device information"
+msgstr "デバイス情報を読み込む際にエラー"
 
 #: ../daemon/gvfsbackendgphoto2.c:1504
-msgid "Error looking up port info from port info list"
-msgstr "一覧からポート情報を検索する際にエラー"
+msgid "Error looking up device information"
+msgstr "デバイス情報を検索する際にエラー"
 
 #: ../daemon/gvfsbackendgphoto2.c:1514
-msgid "Error getting port info from port info list"
-msgstr "一覧からポート情報を取得する際にエラー"
+msgid "Error getting device information"
+msgstr "デバイス情報を取得する際にエラー"
 
 #: ../daemon/gvfsbackendgphoto2.c:1527
-msgid "Error setting port info"
-msgstr "ポート情報をセットする際にエラー"
+msgid "Error setting up camera communications port"
+msgstr "カメラに接続するポートを設定する際にエラー"
 
 #: ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Error initializing camera"
-msgstr "カメラ・オブジェクトを初期化する際にエラー"
+msgstr "カメラのオブジェクトを初期化する際にエラー"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:1552
@@ -682,106 +683,97 @@ msgstr "gphoto2 が %s にマウントしました"
 msgid "No camera specified"
 msgstr "カメラが指定されていません"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
-#, c-format
-msgid "File system is busy: %d open files"
-msgstr "ファイルシステムは使用中です: %d個のファイルをオープンしています"
-
-#: ../daemon/gvfsbackendgphoto2.c:1716
+#: ../daemon/gvfsbackendgphoto2.c:1719
 msgid "Error creating file object"
 msgstr "ファイル・オブジェクトを生成する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:1730
+#: ../daemon/gvfsbackendgphoto2.c:1733
 msgid "Error getting file"
 msgstr "ファイルを取得する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:1739
+#: ../daemon/gvfsbackendgphoto2.c:1742
 msgid "Error getting data from file"
 msgstr "ファイルのデータを取得する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
+#: ../daemon/gvfsbackendgphoto2.c:1836 ../daemon/gvfsbackendgphoto2.c:3010
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "カメラ (%s) のストリームを検索する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1975 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "ディレクトリではありません"
 
-#: ../daemon/gvfsbackendgphoto2.c:2005
-msgid "Error listing folders"
-msgstr "ディレクトリを監視する際にエラー"
+#: ../daemon/gvfsbackendgphoto2.c:2071
+msgid "Failed to get file list"
+msgstr "ファイルの一覧を取得できませんでした"
 
-#: ../daemon/gvfsbackendgphoto2.c:2068
-msgid "Error listing files in folder"
-msgstr "ディレクトリの中にあるファイルを監視する際にエラー"
-
-#: ../daemon/gvfsbackendgphoto2.c:2357
+#: ../daemon/gvfsbackendgphoto2.c:2360
 msgid "Error creating directory"
 msgstr "ディレクトリを生成する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:2565
+#: ../daemon/gvfsbackendgphoto2.c:2568
 msgid "Name already exists"
 msgstr "既に存在しています"
 
-#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:2579 ../daemon/gvfsbackendgphoto2.c:3200
 msgid "New name too long"
 msgstr "新しい名前が長すぎます"
 
-#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
+#: ../daemon/gvfsbackendgphoto2.c:2589 ../daemon/gvfsbackendgphoto2.c:3211
 msgid "Error renaming dir"
 msgstr "ディレクトリ名を変更する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:2601 ../daemon/gvfsbackendgphoto2.c:3223
 msgid "Error renaming file"
 msgstr "ファイル名を変更する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:2661
+#: ../daemon/gvfsbackendgphoto2.c:2664
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "ディレクトリ (%s) は空ではありません"
 
-#: ../daemon/gvfsbackendgphoto2.c:2672
+#: ../daemon/gvfsbackendgphoto2.c:2675
 msgid "Error deleting directory"
 msgstr "ディレクトリを削除する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:2697
+#: ../daemon/gvfsbackendgphoto2.c:2700
 msgid "Error deleting file"
 msgstr "ファイルを削除する際にエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:2749
+#: ../daemon/gvfsbackendgphoto2.c:2752
 msgid "Can't write to directory"
 msgstr "ディレクトリに書き込めません"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796
+#: ../daemon/gvfsbackendgphoto2.c:2799
 msgid "Cannot allocate new file to append to"
 msgstr "追加先の新しいファイルを確保できません"
 
-#: ../daemon/gvfsbackendgphoto2.c:2810
+#: ../daemon/gvfsbackendgphoto2.c:2813
 msgid "Cannot read file to append to"
 msgstr "追加先のファイルを読み込めません"
 
-#: ../daemon/gvfsbackendgphoto2.c:2820
+#: ../daemon/gvfsbackendgphoto2.c:2823
 msgid "Cannot get data of file to append to"
 msgstr "追加先のファイルのデータを取得できません"
 
-#: ../daemon/gvfsbackendgphoto2.c:3106
+#: ../daemon/gvfsbackendgphoto2.c:3109
 msgid "Error writing file"
 msgstr "ファイルの書き込みでエラー"
 
-#: ../daemon/gvfsbackendgphoto2.c:3153
+#: ../daemon/gvfsbackendgphoto2.c:3156
 msgid "Not supported (not same directory)"
 msgstr "未サポートです (同じディレクトリではありません)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:3168
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "未サポートです (転送元と転送先の双方がディレクトリ)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3173
+#: ../daemon/gvfsbackendgphoto2.c:3176
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "未サポートです (転送元がディレクトリで転送先がファイル)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3185
+#: ../daemon/gvfsbackendgphoto2.c:3188
 msgid "Not supported (src is file, dst is dir)"
 msgstr "未サポートです (転送元がファイルで転送先がディレクトリ)"
 
@@ -1028,20 +1020,20 @@ msgstr "Windows ネットワークのファイルシステム・サービス"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
 msgid "Trash"
 msgstr "ゴミ箱"
 
-#: ../daemon/gvfsbackendtrash.c:1016
+#: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (ゴミ箱の中)"
 
-#: ../daemon/gvfsbackendtrash.c:1327
+#: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
 msgstr "ゴミ箱は削除できません"
 
-#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
 msgstr "ゴミ箱はディレクトリ通知をサポートしていません"
 
