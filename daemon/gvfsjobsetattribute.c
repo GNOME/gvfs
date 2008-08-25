@@ -86,7 +86,6 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   GVfsJobSetAttribute *job;
   DBusMessage *reply;
   DBusMessageIter iter, array_iter;
-  DBusError derror;
   const gchar *filename = NULL;
   gint filename_len;
   GFileQueryInfoFlags flags;
@@ -95,8 +94,6 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
   GFileAttributeType type;
   GDbusAttributeValue value;
   
-  dbus_error_init (&derror);
-
   dbus_message_iter_init (message, &iter);
 
   if (dbus_message_iter_get_arg_type (&iter) == DBUS_TYPE_ARRAY &&
@@ -121,7 +118,6 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
       reply = dbus_message_new_error (message,
 				      DBUS_ERROR_FAILED,
                                       _("Invalid dbus message"));
-      dbus_error_free (&derror);
 
       dbus_connection_send (connection, reply, NULL);
       return NULL;

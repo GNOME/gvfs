@@ -225,6 +225,7 @@ mount_op_ask_password (GMountOperationDBus *op_dbus,
       if (!dbus_connection_send (op_dbus->connection, reply, NULL))
 	_g_dbus_oom ();
       dbus_message_unref (reply);
+      dbus_error_free (&error);
       return;
     }
   
@@ -297,6 +298,7 @@ mount_op_ask_question (GMountOperationDBus *op_dbus,
       if (!dbus_connection_send (op_dbus->connection, reply, NULL))
 	_g_dbus_oom ();
       dbus_message_unref (reply);
+      dbus_error_free (&error);
       return;
     }
   

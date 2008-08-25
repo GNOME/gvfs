@@ -1,3 +1,14 @@
+2008-08-25  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 549253 – error path leaks
+
+	* common/gmountoperationdbus.c: 
+	* common/gdbusutils.c:
+	* daemon/gvfsbackendgphoto2.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsjobsetattribute.c: Plug some leaks on
+	error paths.
+
 2008-08-25  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackenddav.c (ms_response_to_file_info):

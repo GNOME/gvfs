@@ -1348,6 +1348,7 @@ _g_dbus_connection_call_async (DBusConnection *connection,
 	  g_set_error_literal (&data->io_error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			       "Can't open dbus connection");
 	  g_idle_add (async_call_error_at_idle, data);
+          dbus_error_free (&derror);
 	  return;
 	}
     }

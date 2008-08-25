@@ -561,7 +561,7 @@ list_trash_dirs (void)
     {
       dirs = g_list_prepend (dirs, home_trash);
       if (statbuf.st_nlink != 2)
-        has_trash_files = TRUE;;
+        has_trash_files = TRUE;
     }
   else
     g_free (home_trash);

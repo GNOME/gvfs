@@ -1324,6 +1324,7 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
     {
       error = get_error_from_gphoto2 (_("Failed to get folder list"), rc);
       g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
       return FALSE;
   }  
 
@@ -1657,6 +1658,7 @@ do_unmount (GVfsBackend *backend,
                                     num_open_files),
                            num_open_files);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       return;
     }
 
@@ -1718,6 +1720,7 @@ do_open_for_read (GVfsBackend *backend,
     {
       error = get_error_from_gphoto2 (_("Error creating file object"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       free_read_handle (read_handle);
       goto out;
     }
@@ -1732,6 +1735,7 @@ do_open_for_read (GVfsBackend *backend,
     {
       error = get_error_from_gphoto2 (_("Error getting file"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       free_read_handle (read_handle);
       goto out;
     }
@@ -1741,6 +1745,7 @@ do_open_for_read (GVfsBackend *backend,
     {
       error = get_error_from_gphoto2 (_("Error getting data from file"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       free_read_handle (read_handle);
       goto out;
     }
@@ -1885,9 +1890,11 @@ do_query_info (GVfsBackend *backend,
 
   split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
+  error = NULL;
   if (!file_get_info (gphoto2_backend, dir, name, info, &error, FALSE))
     {
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
     }
   else
     {
@@ -1909,7 +1916,6 @@ try_query_info (GVfsBackend *backend,
                 GFileAttributeMatcher *matcher)
 {
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
-  GError *error;
   char *dir;
   char *name;
   gboolean ret;
@@ -1920,7 +1926,7 @@ try_query_info (GVfsBackend *backend,
 
   split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
-  if (!file_get_info (gphoto2_backend, dir, name, info, &error, TRUE))
+  if (!file_get_info (gphoto2_backend, dir, name, info, NULL, TRUE))
     {
       DEBUG ("  BUU no info from cache for try_query_info (%s)", filename);
       goto out;
@@ -2007,6 +2013,7 @@ do_enumerate (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Failed to get folder list"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           g_free (filename);
           return;
         }  
@@ -2025,9 +2032,11 @@ do_enumerate (GVfsBackend *backend,
       gp_list_get_name (list, n, &name);
       DEBUG ("  enum folder '%s'", name);
       info = g_file_info_new ();
+      error = NULL;
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, FALSE))
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           g_list_foreach (l, (GFunc) g_object_unref, NULL);
           g_list_free (l);
           gp_list_free (list);
@@ -2070,6 +2079,7 @@ do_enumerate (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Failed to get file list"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           g_free (filename);
           return;
         }
@@ -2089,9 +2099,11 @@ do_enumerate (GVfsBackend *backend,
       DEBUG ("  enum file '%s'", name);
 
       info = g_file_info_new ();
+      error = NULL;
       if (!file_get_info (gphoto2_backend, filename, name, info, &error, FALSE))
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           g_list_foreach (l, (GFunc) g_object_unref, NULL);
           g_list_free (l);
           gp_list_free (list);
@@ -2359,6 +2371,7 @@ do_make_directory (GVfsBackend *backend,
     {
       error = get_error_from_gphoto2 (_("Error creating directory"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
       goto out;
     }
 
@@ -2588,6 +2601,7 @@ do_set_display_name (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Error renaming dir"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           goto out;
         }
       caches_invalidate_file (gphoto2_backend, dir, name);
@@ -2600,6 +2614,7 @@ do_set_display_name (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Error renaming file"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           goto out;
         }
       caches_invalidate_file (gphoto2_backend, dir, name);
@@ -2674,6 +2689,7 @@ do_delete (GVfsBackend *backend,
             {
               error = get_error_from_gphoto2 (_("Error deleting directory"), rc);
               g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+              g_error_free (error);
               goto out;
             }
           caches_invalidate_file (gphoto2_backend, dir, name);
@@ -2699,6 +2715,7 @@ do_delete (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Error deleting file"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           goto out;
         }
 
@@ -2798,6 +2815,7 @@ do_create_internal (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Cannot allocate new file to append to"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           write_handle_free (handle);
           goto out;
         }
@@ -2812,6 +2830,7 @@ do_create_internal (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Cannot read file to append to"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           write_handle_free (handle);
           gp_file_unref (file);
           goto out;
@@ -2822,6 +2841,7 @@ do_create_internal (GVfsBackend *backend,
         {
           error = get_error_from_gphoto2 (_("Cannot get data of file to append to"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           write_handle_free (handle);
           gp_file_unref (file);
           goto out;
@@ -3108,6 +3128,7 @@ do_close_write (GVfsBackend *backend,
     {
       error = get_error_from_gphoto2 (_("Error writing file"), rc);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);      
+      g_error_free (error);
       goto out;
     }
 
@@ -3210,6 +3231,7 @@ do_move (GVfsBackend *backend,
           DEBUG ("  error renaming dir");
           error = get_error_from_gphoto2 (_("Error renaming dir"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           goto out;
         }
     }
@@ -3222,6 +3244,7 @@ do_move (GVfsBackend *backend,
           DEBUG ("  error renaming file");
           error = get_error_from_gphoto2 (_("Error renaming file"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
           goto out;
         }
     }
