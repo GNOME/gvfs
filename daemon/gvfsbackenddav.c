@@ -877,9 +877,16 @@ ms_response_to_file_info (MsResponse *response,
             }
           else if (node_has_name (node, "getlastmodified"))
             {
-              if (g_time_val_from_iso8601 (text, &tv))
-                g_file_info_set_modification_time (info, &tv);
-            }
+              SoupDate *sd;
+              GTimeVal tv;
+	      sd = soup_date_new_from_string(text);
+	      if (sd)
+	        {
+		  soup_date_to_timeval (sd, &tv);
+		  g_file_info_set_modification_time (info, &tv);
+		  soup_date_free (sd);
+		}
+	    }
         }
     }
 
