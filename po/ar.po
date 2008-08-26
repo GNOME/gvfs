@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-06 09:20+0100\n"
+"POT-Creation-Date: 2008-08-26 14:48+0100\n"
 "PO-Revision-Date: 2008-05-22 19:21+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
@@ -87,8 +87,8 @@ msgstr "قيمة مُرتجعة غير صحيحة من monitor_file"
 #: ../client/gdaemonfileinputstream.c:1310
 #: ../client/gdaemonfileoutputstream.c:402
 #: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1048
-#: ../client/gdaemonfileoutputstream.c:1058
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "خطأ في برتوكول الدفْق: %s"
@@ -96,7 +96,7 @@ msgstr "خطأ في برتوكول الدفْق: %s"
 #: ../client/gdaemonfileinputstream.c:458
 #: ../client/gdaemonfileinputstream.c:1310
 #: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1058
+#: ../client/gdaemonfileoutputstream.c:1064
 msgid "End of stream"
 msgstr "نهاية الدفْق"
 
@@ -126,6 +126,11 @@ msgstr "لا يُدعم الالتماس على الدفْق"
 #: ../client/gdaemonfileinputstream.c:1237
 msgid "The query info operation is not supported"
 msgstr "لا تُدعم عملية استعلام المعلومات"
+
+#: ../client/gdaemonfileoutputstream.c:991
+#, fuzzy, c-format
+msgid "Query info not supported on stream"
+msgstr "لا يُدعم الالتماس على الدفْق"
 
 #: ../client/gdaemonvfs.c:749
 #, c-format
@@ -211,7 +216,7 @@ msgid "No hostname specified"
 msgstr "لم يحدّد اسم مستضيف"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
@@ -246,12 +251,12 @@ msgstr "تعذّر إنشاء المجلد المؤقت"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:2706
 #, c-format
 msgid "No such file or directory"
 msgstr "ليس ثمّة ملف أو مجلد"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2043
 msgid "Directory not empty"
 msgstr "الدليل غير فارغ"
 
@@ -265,7 +270,7 @@ msgid "CD/DVD Creator"
 msgstr "منشئ الاسطوانات/ديڤيدي"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2780
 msgid "File exists"
 msgstr "الملف موجود"
 
@@ -285,22 +290,22 @@ msgstr "الملف الهدف موجود مسبّقا"
 msgid "Can't recursively copy directory"
 msgstr "تعذّر النسخ التتابعي للدليل "
 
-#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
-#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2360
+#: ../daemon/gvfsbackendgphoto2.c:2569 ../daemon/gvfsbackendgphoto2.c:2666
+#: ../daemon/gvfsbackendgphoto2.c:2759
 msgid "Not supported"
 msgstr "ليس مدعومًا"
 
-#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1402
+#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1403
 #, fuzzy
 msgid "Cannot connect to the system bus"
 msgstr "تعذّر الاتصال بالمستضيف"
 
-#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1414
+#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1415
 msgid "Cannot create libhal context"
 msgstr ""
 
-#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1427
+#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1428
 msgid "Cannot initialize libhal"
 msgstr ""
 
@@ -331,7 +336,7 @@ msgstr "نقطة تحميل cdda2 على %s"
 msgid "Audio Disc"
 msgstr "قرص صوتي"
 
-#: ../daemon/gvfsbackendcdda.c:356
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1656
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -358,7 +363,7 @@ msgstr "خطأ من 'paranoia' على المشغّل %s"
 msgid "Error seeking in stream on drive %s"
 msgstr "خطأ أثناء الالتماس في الدفق على المشغّل %s"
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1713
 #, c-format
 msgid "No such file"
 msgstr "ليس ثمّة ملف"
@@ -380,7 +385,7 @@ msgstr "الحاسوب"
 msgid "Filesystem"
 msgstr "نظام الملفات"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
 #: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
 #: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
@@ -416,7 +421,7 @@ msgstr "تعذّر فصْل الملف"
 msgid "Can't eject file"
 msgstr "تعذّر إخراج الملف"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1523
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -434,49 +439,49 @@ msgstr "استجابة خالية"
 msgid "Unexpected reply from server"
 msgstr "ردّ غير متوقّع من الخادوم"
 
-#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
+#: ../daemon/gvfsbackenddav.c:1156 ../daemon/gvfsbackenddav.c:1658
 msgid "Response invalid"
 msgstr "رد غير سليم"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1299
 msgid "WebDAV share"
 msgstr "مشاركة WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1293
+#: ../daemon/gvfsbackenddav.c:1301
 #, c-format
 msgid "Enter password for %s"
 msgstr "أدخل كلمة سر %s"
 
-#: ../daemon/gvfsbackenddav.c:1296
+#: ../daemon/gvfsbackenddav.c:1304
 msgid "Please enter proxy password"
 msgstr "رجاءً أدخل كلمة سر الوسيط"
 
-#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackenddav.c:1531
 msgid "Not a WebDAV enabled share"
 msgstr "ليس مشاركة WebDAV مفعّلة"
 
-#: ../daemon/gvfsbackenddav.c:1546
+#: ../daemon/gvfsbackenddav.c:1554
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV على %s"
 
-#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
+#: ../daemon/gvfsbackenddav.c:1614 ../daemon/gvfsbackenddav.c:1687
 msgid "Could not create request"
 msgstr "تعذّر إنشاء الطلب"
 
-#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
-#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
+#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
 #: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "الملف الهدف موجود مسبقًا"
 
-#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
 #: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "عُدّل الملف خارجيّا"
 
-#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1074
 #: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "فشل إنشاء الملف الاحتياطي"
@@ -640,178 +645,164 @@ msgstr "آلة تصوير"
 msgid "Audio Player"
 msgstr "مشغل الصوت"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325
-msgid "Error listing folders to figure out ignore prefix"
-msgstr ""
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2014
+#, fuzzy
+msgid "Failed to get folder list"
+msgstr "الملف غير موجود"
 
-#: ../daemon/gvfsbackendgphoto2.c:1442
+#: ../daemon/gvfsbackendgphoto2.c:1443
 #, fuzzy
 msgid "No device specified"
 msgstr "لم يحدّد أي مشغّل"
 
-#: ../daemon/gvfsbackendgphoto2.c:1459
+#: ../daemon/gvfsbackendgphoto2.c:1460
 msgid "Cannot create gphoto2 context"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:1469
+#: ../daemon/gvfsbackendgphoto2.c:1470
 #, fuzzy
 msgid "Error creating camera"
 msgstr "خطأ أثناء إنشاء المقبس: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1482
+#: ../daemon/gvfsbackendgphoto2.c:1483 ../daemon/gvfsbackendgphoto2.c:1493
 #, fuzzy
-msgid "Error creating port info list"
-msgstr "خطأ أثناء إنشاء المقبس: %s"
-
-#: ../daemon/gvfsbackendgphoto2.c:1492
-#, fuzzy
-msgid "Error loading info list"
+msgid "Error loading device information"
 msgstr "حدث خطأ أثناء إرسال fd: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1504
-msgid "Error looking up port info from port info list"
+#: ../daemon/gvfsbackendgphoto2.c:1505
+msgid "Error looking up device information"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:1514
+#: ../daemon/gvfsbackendgphoto2.c:1515
 #, fuzzy
-msgid "Error getting port info from port info list"
+msgid "Error getting device information"
+msgstr "خطأ في إزالة الملف الهدف: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1528
+#, fuzzy
+msgid "Error setting up camera communications port"
 msgstr "خطأ أثناء جلب معلومات الوصْل: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1527
-#, fuzzy
-msgid "Error setting port info"
-msgstr "خطأ أثناء جلب معلومات الوصْل: %s"
-
-#: ../daemon/gvfsbackendgphoto2.c:1538
+#: ../daemon/gvfsbackendgphoto2.c:1539
 msgid "Error initializing camera"
 msgstr ""
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1552
+#: ../daemon/gvfsbackendgphoto2.c:1553
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "نقطة وصْل gphoto2 على %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1627
+#: ../daemon/gvfsbackendgphoto2.c:1628
 #, fuzzy
 msgid "No camera specified"
 msgstr "لم يحدّد اسم مستضيف"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
-#, fuzzy, c-format
-msgid "File system is busy: %d open files"
-msgstr "نظام الملفات مشغول: لا ملفات مفتوحة"
-
-#: ../daemon/gvfsbackendgphoto2.c:1716
+#: ../daemon/gvfsbackendgphoto2.c:1721
 #, fuzzy
 msgid "Error creating file object"
 msgstr "خطأ في إنشاء الملف الاحتياطي: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1730
+#: ../daemon/gvfsbackendgphoto2.c:1736
 #, fuzzy
 msgid "Error getting file"
 msgstr "خطأ أثناء حذف الملف: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1739
+#: ../daemon/gvfsbackendgphoto2.c:1746
 #, fuzzy
 msgid "Error getting data from file"
 msgstr "خطأ في إزالة الملف الهدف: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
+#: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
 #, fuzzy, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "خطأ أثناء الالتماس في الدفق على المشغّل %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "ليس دليلا"
 
-#: ../daemon/gvfsbackendgphoto2.c:2005
+#: ../daemon/gvfsbackendgphoto2.c:2080
 #, fuzzy
-msgid "Error listing folders"
-msgstr "خطأ أثناء حذف الملف: %s"
+msgid "Failed to get file list"
+msgstr "الملف غير موجود"
 
-#: ../daemon/gvfsbackendgphoto2.c:2068
-#, fuzzy
-msgid "Error listing files in folder"
-msgstr "خطأ أثناء حذف الملف: %s"
-
-#: ../daemon/gvfsbackendgphoto2.c:2357
+#: ../daemon/gvfsbackendgphoto2.c:2372
 #, fuzzy
 msgid "Error creating directory"
 msgstr "خطأ أثناء إنشاء المقبس: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2565
+#: ../daemon/gvfsbackendgphoto2.c:2581
 #, fuzzy
 msgid "Name already exists"
 msgstr "الملف الهدف موجود مسبقًا"
 
-#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:2592 ../daemon/gvfsbackendgphoto2.c:3221
 #, fuzzy
 msgid "New name too long"
 msgstr "اسم الملف طويل جدًا"
 
-#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
+#: ../daemon/gvfsbackendgphoto2.c:2602 ../daemon/gvfsbackendgphoto2.c:3232
 #, fuzzy
 msgid "Error renaming dir"
 msgstr "حدث خطأ أثناء إرسال fd: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3245
 #, fuzzy
 msgid "Error renaming file"
 msgstr "خطأ أثناء نقل الملف: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2661
+#: ../daemon/gvfsbackendgphoto2.c:2679
 #, fuzzy, c-format
 msgid "Directory '%s' is not empty"
 msgstr "الدليل غير فارغ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2672
+#: ../daemon/gvfsbackendgphoto2.c:2690
 #, fuzzy
 msgid "Error deleting directory"
 msgstr "خطأ أثناء حذف الملف: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2697
+#: ../daemon/gvfsbackendgphoto2.c:2716
 #, fuzzy
 msgid "Error deleting file"
 msgstr "خطأ أثناء حذف الملف: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2749
+#: ../daemon/gvfsbackendgphoto2.c:2769
 #, fuzzy
 msgid "Can't write to directory"
 msgstr "تعذّر فتح الدّليل"
 
-#: ../daemon/gvfsbackendgphoto2.c:2796
+#: ../daemon/gvfsbackendgphoto2.c:2816
 msgid "Cannot allocate new file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:2810
+#: ../daemon/gvfsbackendgphoto2.c:2831
 msgid "Cannot read file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:2820
+#: ../daemon/gvfsbackendgphoto2.c:2842
 msgid "Cannot get data of file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3106
+#: ../daemon/gvfsbackendgphoto2.c:3129
 #, fuzzy
 msgid "Error writing file"
 msgstr "خطأ أثناء حذف الملف: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:3153
+#: ../daemon/gvfsbackendgphoto2.c:3177
 #, fuzzy
 msgid "Not supported (not same directory)"
 msgstr "ليس دليلا"
 
-#: ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:3189
 msgid "Not supported (src is dir, dst is dir)"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3173
+#: ../daemon/gvfsbackendgphoto2.c:3197
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3185
+#: ../daemon/gvfsbackendgphoto2.c:3209
 msgid "Not supported (src is file, dst is dir)"
 msgstr ""
 
@@ -1057,20 +1048,20 @@ msgstr "خادوم نظام ملفات شبكة ويندوز"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
 msgid "Trash"
 msgstr "المهملات"
 
-#: ../daemon/gvfsbackendtrash.c:1016
+#: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
 msgstr "‏%s (في المهملات)"
 
-#: ../daemon/gvfsbackendtrash.c:1327
+#: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
 msgstr "تعذّر حذف المهملات"
 
-#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
 msgstr "تنبيه مجلد المهملات غير مدعوم"
 
@@ -1094,7 +1085,7 @@ msgstr "حدث خطأ أثناء إرسال fd: %s"
 #: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
 #: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
 #: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
 #: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
 #: ../daemon/gvfsjobunmountmountable.c:132
 #: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
@@ -1106,7 +1097,7 @@ msgstr "لا تدعم الخلفية هذا العملية"
 msgid "Symlinks not supported by backend"
 msgstr "لا تدعم الخلفية الوصلات الرمزية"
 
-#: ../daemon/gvfsjobsetattribute.c:123
+#: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
 msgstr "رسالة dbus غير سليمة"
 
@@ -1570,6 +1561,26 @@ msgid ""
 "of the file."
 msgstr ""
 "افتح الملف/الملفات بالبرنامج المبدئي المسجل لمعالجة هذا النوع من الملفات."
+
+#, fuzzy
+#~ msgid "Error creating port info list"
+#~ msgstr "خطأ أثناء إنشاء المقبس: %s"
+
+#, fuzzy
+#~ msgid "Error getting port info from port info list"
+#~ msgstr "خطأ أثناء جلب معلومات الوصْل: %s"
+
+#, fuzzy
+#~ msgid "File system is busy: %d open files"
+#~ msgstr "نظام الملفات مشغول: لا ملفات مفتوحة"
+
+#, fuzzy
+#~ msgid "Error listing folders"
+#~ msgstr "خطأ أثناء حذف الملف: %s"
+
+#, fuzzy
+#~ msgid "Error listing files in folder"
+#~ msgstr "خطأ أثناء حذف الملف: %s"
 
 #~ msgid "File unavailable"
 #~ msgstr "ملفّ غير متوفّر"
