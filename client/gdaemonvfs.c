@@ -185,7 +185,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
   if (scheme == NULL)
     return FALSE;
 
-  /* convert the scheme to lower case since g_uri_prase_scheme
+  /* convert the scheme to lower case since g_uri_parse_scheme
    * doesn't do that and we compare with g_str_equal */
   str_tolower_inplace (scheme);
   
@@ -256,6 +256,11 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	      g_mount_spec_set (spec, "port", port);
 	      g_free (port);
 	    }
+
+	  if (decoded->query && *decoded->query)
+	    g_mount_spec_set (spec, "query", decoded->query);
+	  if (decoded->fragment && *decoded->fragment)
+	    g_mount_spec_set (spec, "fragment", decoded->fragment);
 	  
 	  path = g_strdup (decoded->path);
 	  
@@ -499,6 +504,9 @@ _g_daemon_vfs_get_uri_for_mountspec (GMountSpec *spec,
 	decoded.path = "/";
       else
 	decoded.path = path;
+
+      decoded.query = (char *)g_mount_spec_get (spec, "query");
+      decoded.fragment = (char *)g_mount_spec_get (spec, "fragment");
       
       uri = g_vfs_encode_uri (&decoded, FALSE);
       

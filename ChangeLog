@@ -1,3 +1,11 @@
+2008-08-27  Bastien Nocera  <hadess@hadess.net>
+
+	* client/gdaemonvfs.c (get_mountspec_from_uri),
+	(_g_daemon_vfs_get_uri_for_mountspec): Don't drop
+	query and fragment portions of the URI when decoding
+	it and the URI scheme isn't handled by any backends
+	(Closes: #549553)
+
 2008-08-25  Matthias Clasen  <mclasen@redhat.com>
 
 	Bug 549253 – error path leaks
