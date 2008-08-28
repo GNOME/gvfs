@@ -1,3 +1,10 @@
+2008-08-28  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/proxy/gproxyvolume.c: (g_proxy_volume_mount):
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	(handle_volume_mount): Make sure we really read mount_flags and
+	use_mount_operation. Fixes RH bug 460223.
+
 2008-08-27  Bastien Nocera  <hadess@hadess.net>
 
 	* client/gdaemonvfs.c (get_mountspec_from_uri),

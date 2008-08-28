@@ -27,6 +27,7 @@
 #include <gio/gio.h>
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
+#include <stdlib.h>
 
 #include "gdbusutils.h"
 #include "gvfsproxyvolumemonitordaemon.h"
@@ -592,13 +593,12 @@ handle_volume_mount (DBusConnection *connection, DBusMessage *message)
   GMountOperation *mount_operation;
 
   volume = NULL;
-  mount_flags = 0;
   ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
   dbus_error_init (&dbus_error);
   if (!dbus_message_get_args (message, &dbus_error,
                               DBUS_TYPE_STRING, &id,
-                              DBUS_TYPE_UINT32 &mount_flags,
+                              DBUS_TYPE_UINT32, &mount_flags,
                               DBUS_TYPE_BOOLEAN, &use_mount_operation,
                               DBUS_TYPE_INVALID))
     {
