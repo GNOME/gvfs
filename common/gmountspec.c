@@ -247,6 +247,7 @@ g_mount_spec_from_dbus (DBusMessageIter *iter)
     return NULL;
 
   spec = g_mount_spec_new (NULL);
+  g_free (spec->mount_prefix);
   spec->mount_prefix = mount_prefix;
   
   if (dbus_message_iter_get_arg_type (&spec_iter) != DBUS_TYPE_ARRAY ||

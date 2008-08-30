@@ -1,3 +1,8 @@
+2008-08-30  Matthias Clasen  <mclasen@redhat.com>
+
+	* common/gmountspec.c (g_mount_spec_from_dbus): Plug a tiny
+	memory leak.
+
 2008-08-28  David Zeuthen  <davidz@redhat.com>
 
 	* monitor/proxy/gproxyvolume.c: (g_proxy_volume_mount):
