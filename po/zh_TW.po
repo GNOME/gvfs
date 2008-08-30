@@ -4,192 +4,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs 0.99.5\n"
+"Project-Id-Version: gvfs 0.99.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-11 06:39+0800\n"
-"PO-Revision-Date: 2008-08-09 20:47+0800\n"
+"POT-Creation-Date: 2008-08-30 19:41+0800\n"
+"PO-Revision-Date: 2008-08-30 20:47+0800\n"
 "Last-Translator: Chao-Hsiung Liao <j_h_liau@yahoo.com.tw>\n"
 "Language-Team: Chinese (Taiwan) <community@linuxhall.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1427
-msgid "Cannot initialize libhal"
-msgstr "不能初始化 libhal"
-
-#: ../daemon/gvfsbackendgphoto2.c:1504
-msgid "Error looking up port info from port info list"
-msgstr "從通訊埠清單尋找通訊埠資訊時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1538
-msgid "Error initializing camera"
-msgstr "初始化攝影機發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2796
-msgid "Cannot allocate new file to append to"
-msgstr "不能分配新檔案加入到"
-
-#: ../daemon/gvfsbackendgphoto2.c:2810
-msgid "Cannot read file to append to"
-msgstr "不能讀取檔案加入到"
-
-#: ../daemon/gvfsbackendgphoto2.c:2820
-msgid "Cannot get data of file to append to"
-msgstr "不能取得檔案的資料加入到"
-
-#: ../daemon/gvfsbackendgphoto2.c:3165
-msgid "Not supported (src is dir, dst is dir)"
-msgstr "不支援（來源是目錄，目的也是目錄）"
-
-#: ../daemon/gvfsbackendgphoto2.c:3173
-msgid "Not supported (src is dir, dst is existing file)"
-msgstr "不支援（來源是目錄，目的是既存的檔案）"
-
-#: ../daemon/gvfsbackendgphoto2.c:3185
-msgid "Not supported (src is file, dst is dir)"
-msgstr "不支援（來源是檔案，目的是目錄）"
-
-#: ../daemon/gvfsbackendobexftp.c:699
-msgid "Connection to the device lost"
-msgstr "到裝置的連線已失去"
-
-#: ../daemon/gvfsbackendobexftp.c:1194
-msgid "Device requires a software update"
-msgstr "裝置要求更新軟體"
-
-#: ../client/gdaemonfileoutputstream.c:991
-#, c-format
-msgid "Query info not supported on stream"
-msgstr "串流不支援查詢資訊"
-
-#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1402
-msgid "Cannot connect to the system bus"
-msgstr "不能連線到系統匯流排"
-
-#: ../daemon/gvfsbackendgphoto2.c:501
-#, c-format
-msgid "%s: %d: Directory or file exists"
-msgstr "%s：%d：目錄或檔案已存在"
-
-#: ../daemon/gvfsbackendgphoto2.c:508
-#, c-format
-msgid "%s: %d: No such file or directory"
-msgstr "%s：%d：沒有這個檔案或目錄"
-
-#: ../daemon/gvfsbackendgphoto2.c:514
-#, c-format
-msgid "%s: %d: Invalid filename"
-msgstr "%s：%d：無效的檔案名稱"
-
-#: ../daemon/gvfsbackendgphoto2.c:520
-#, c-format
-msgid "%s: %d: Not Supported"
-msgstr "%s：%d：不支援"
-
-#: ../daemon/gvfsbackendgphoto2.c:1442
-msgid "No device specified"
-msgstr "未指定裝置"
-
-#: ../daemon/gvfsbackendgphoto2.c:1469
-msgid "Error creating camera"
-msgstr "建立攝影機發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1482
-msgid "Error creating port info list"
-msgstr "建立通訊埠資訊清單時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1492
-msgid "Error loading info list"
-msgstr "載入資訊時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1514
-msgid "Error getting port info from port info list"
-msgstr "從通訊埠資訊清單取得通訊埠資訊時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1527
-msgid "Error setting port info"
-msgstr "設定通訊埠資訊時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1627
-msgid "No camera specified"
-msgstr "未指定攝影機"
-
-#: ../daemon/gvfsbackendgphoto2.c:1655
-#, c-format
-msgid "File system is busy: %d open files"
-msgstr "檔案系統忙碌中：開啟了 %d 個檔案"
-
-#: ../daemon/gvfsbackendgphoto2.c:1716
-msgid "Error creating file object"
-msgstr "建立檔案物件發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1730
-msgid "Error getting file"
-msgstr "讀取檔案時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1739
-msgid "Error getting data from file"
-msgstr "從檔案取得資料時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:1833 ../daemon/gvfsbackendgphoto2.c:3007
-#, c-format
-msgid "Error seeking in stream on camera %s"
-msgstr "在攝影機 %s 上搜尋串流發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2005
-msgid "Error listing folders"
-msgstr "列出資料夾時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2068
-msgid "Error listing files in folder"
-msgstr "列出資料夾中的檔案時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2357
-msgid "Error creating directory"
-msgstr "建立目錄時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2565
-msgid "Name already exists"
-msgstr "名稱已存在"
-
-#: ../daemon/gvfsbackendgphoto2.c:2576 ../daemon/gvfsbackendgphoto2.c:3197
-msgid "New name too long"
-msgstr "新的名稱太長"
-
-#: ../daemon/gvfsbackendgphoto2.c:2586 ../daemon/gvfsbackendgphoto2.c:3208
-msgid "Error renaming dir"
-msgstr "重新命名目錄時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2598 ../daemon/gvfsbackendgphoto2.c:3220
-msgid "Error renaming file"
-msgstr "重新命名檔案時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2661
-#, c-format
-msgid "Directory '%s' is not empty"
-msgstr "目錄「%s」不是空的"
-
-#: ../daemon/gvfsbackendgphoto2.c:2672
-msgid "Error deleting directory"
-msgstr "刪除目錄時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2697
-msgid "Error deleting file"
-msgstr "刪除檔案時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:2749
-msgid "Can't write to directory"
-msgstr "不能寫入至目錄"
-
-#: ../daemon/gvfsbackendgphoto2.c:3106
-msgid "Error writing file"
-msgstr "寫入檔案時發生錯誤"
-
-#: ../daemon/gvfsbackendgphoto2.c:3153
-msgid "Not supported (not same directory)"
-msgstr "不支援（不同目錄）"
 
 #: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1979
 msgid "Operation not supported, files on different mounts"
@@ -297,7 +121,12 @@ msgstr "串流不支援搜尋"
 msgid "The query info operation is not supported"
 msgstr "不支援此查詢資訊的操作"
 
-#: ../client/gdaemonvfs.c:749
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr "串流不支援查詢資訊"
+
+#: ../client/gdaemonvfs.c:757
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "取得掛載資訊時發生錯誤：%s"
@@ -381,7 +210,7 @@ msgid "No hostname specified"
 msgstr "未指定主機名稱"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1448 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
 #: ../daemon/gvfsbackendsmb.c:605
 msgid "Invalid mount spec"
@@ -416,12 +245,12 @@ msgstr "無法建立暫存目錄"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1978 ../daemon/gvfsbackendgphoto2.c:2687
+#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:2706
 #, c-format
 msgid "No such file or directory"
 msgstr "沒有這個檔案或目錄"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2035
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2043
 msgid "Directory not empty"
 msgstr "目錄不是空的"
 
@@ -435,7 +264,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD 錄製程式"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2760
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2780
 msgid "File exists"
 msgstr "檔案已存在"
 
@@ -455,11 +284,24 @@ msgstr "目標檔案已存在"
 msgid "Can't recursively copy directory"
 msgstr "不能循環複製目錄"
 
-#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2345
-#: ../daemon/gvfsbackendgphoto2.c:2553 ../daemon/gvfsbackendgphoto2.c:2648
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2360
+#: ../daemon/gvfsbackendgphoto2.c:2569 ../daemon/gvfsbackendgphoto2.c:2666
+#: ../daemon/gvfsbackendgphoto2.c:2759
 msgid "Not supported"
 msgstr "不支援"
+
+#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1403
+msgid "Cannot connect to the system bus"
+msgstr "不能連線到系統匯流排"
+
+#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1415
+#, fuzzy
+msgid "Cannot create libhal context"
+msgstr "不能初始化 libhal"
+
+#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1428
+msgid "Cannot initialize libhal"
+msgstr "不能初始化 libhal"
 
 #: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
 msgid "No drive specified"
@@ -488,7 +330,7 @@ msgstr "cdda 掛載於 %s"
 msgid "Audio Disc"
 msgstr "音樂光碟"
 
-#: ../daemon/gvfsbackendcdda.c:356
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1656
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -510,7 +352,7 @@ msgstr "來自磁碟 %s 上的「paranoia」的錯誤"
 msgid "Error seeking in stream on drive %s"
 msgstr "在磁碟 %s 上搜尋串流發生錯誤"
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1708
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1713
 #, c-format
 msgid "No such file"
 msgstr "沒有這個檔案"
@@ -532,7 +374,7 @@ msgstr "電腦"
 msgid "Filesystem"
 msgstr "檔案系統"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1700
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
 #: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
 #: ../daemon/gvfsbackendtrash.c:678
 msgid "Can't open directory"
@@ -568,7 +410,7 @@ msgstr "不能卸載檔案"
 msgid "Can't eject file"
 msgstr "不能退出檔案"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1515
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1523
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
@@ -586,49 +428,49 @@ msgstr "空白的回應"
 msgid "Unexpected reply from server"
 msgstr "來自伺服器未預期的回應"
 
-#: ../daemon/gvfsbackenddav.c:1148 ../daemon/gvfsbackenddav.c:1650
+#: ../daemon/gvfsbackenddav.c:1156 ../daemon/gvfsbackenddav.c:1658
 msgid "Response invalid"
 msgstr "回應無效"
 
-#: ../daemon/gvfsbackenddav.c:1291
+#: ../daemon/gvfsbackenddav.c:1299
 msgid "WebDAV share"
 msgstr "WebDAV 分享"
 
-#: ../daemon/gvfsbackenddav.c:1293
+#: ../daemon/gvfsbackenddav.c:1301
 #, c-format
 msgid "Enter password for %s"
 msgstr "輸入 %s 的密碼 "
 
-#: ../daemon/gvfsbackenddav.c:1296
+#: ../daemon/gvfsbackenddav.c:1304
 msgid "Please enter proxy password"
 msgstr "請輸入代理伺服器密碼"
 
-#: ../daemon/gvfsbackenddav.c:1519 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackenddav.c:1531
 msgid "Not a WebDAV enabled share"
 msgstr "不是使用 WebDAV 的分享"
 
-#: ../daemon/gvfsbackenddav.c:1546
+#: ../daemon/gvfsbackenddav.c:1554
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV 於 %s"
 
-#: ../daemon/gvfsbackenddav.c:1606 ../daemon/gvfsbackenddav.c:1679
+#: ../daemon/gvfsbackenddav.c:1614 ../daemon/gvfsbackenddav.c:1687
 msgid "Could not create request"
 msgstr "無法建立要求"
 
-#: ../daemon/gvfsbackenddav.c:1742 ../daemon/gvfsbackenddav.c:1995
-#: ../daemon/gvfsbackenddav.c:2106 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
+#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
 #: ../daemon/gvfsbackendsmb.c:1804
 msgid "Target file already exists"
 msgstr "目標檔案已存在"
 
-#: ../daemon/gvfsbackenddav.c:1815 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
 #: ../daemon/gvfsbackendsmb.c:1038
 msgid "The file was externally modified"
 msgstr "該檔案已被外部程式修改過"
 
-#: ../daemon/gvfsbackenddav.c:1846 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1074
 #: ../daemon/gvfsbackendsmb.c:1821
 msgid "Backup file creation failed"
 msgstr "建立備份檔案失敗"
@@ -744,6 +586,26 @@ msgstr "檔案名稱太長"
 msgid "Invalid destination filename"
 msgstr "無效的目的端檔案名稱"
 
+#: ../daemon/gvfsbackendgphoto2.c:501
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr "%s：%d：目錄或檔案已存在"
+
+#: ../daemon/gvfsbackendgphoto2.c:508
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr "%s：%d：沒有這個檔案或目錄"
+
+#: ../daemon/gvfsbackendgphoto2.c:514
+#, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "%s：%d：無效的檔案名稱"
+
+#: ../daemon/gvfsbackendgphoto2.c:520
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr "%s：%d：不支援"
+
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:693
 #, c-format
@@ -772,15 +634,145 @@ msgstr "照相機"
 msgid "Audio Player"
 msgstr "音樂播放機"
 
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2014
+msgid "Failed to get folder list"
+msgstr "取得資料夾清單失敗"
+
+#: ../daemon/gvfsbackendgphoto2.c:1443
+msgid "No device specified"
+msgstr "未指定裝置"
+
+#: ../daemon/gvfsbackendgphoto2.c:1460
+msgid "Cannot create gphoto2 context"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1470
+msgid "Error creating camera"
+msgstr "建立攝影機發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1483 ../daemon/gvfsbackendgphoto2.c:1493
+msgid "Error loading device information"
+msgstr "載入裝置資訊時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1505
+msgid "Error looking up device information"
+msgstr "尋找裝置資訊時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1515
+msgid "Error getting device information"
+msgstr "取得裝置資訊時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1528
+msgid "Error setting up camera communications port"
+msgstr "設定攝影機通訊埠時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1539
+msgid "Error initializing camera"
+msgstr "初始化攝影機發生錯誤"
+
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1552
+#: ../daemon/gvfsbackendgphoto2.c:1553
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 掛載於 %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1972 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1628
+msgid "No camera specified"
+msgstr "未指定攝影機"
+
+#: ../daemon/gvfsbackendgphoto2.c:1721
+msgid "Error creating file object"
+msgstr "建立檔案物件發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1736
+msgid "Error getting file"
+msgstr "讀取檔案時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1746
+msgid "Error getting data from file"
+msgstr "從檔案取得資料時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
+#, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr "在攝影機 %s 上搜尋串流發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "不是一個目錄"
+
+#: ../daemon/gvfsbackendgphoto2.c:2080
+msgid "Failed to get file list"
+msgstr "取得檔案清單失敗"
+
+#: ../daemon/gvfsbackendgphoto2.c:2372
+msgid "Error creating directory"
+msgstr "建立目錄時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:2581
+msgid "Name already exists"
+msgstr "名稱已存在"
+
+#: ../daemon/gvfsbackendgphoto2.c:2592 ../daemon/gvfsbackendgphoto2.c:3221
+msgid "New name too long"
+msgstr "新的名稱太長"
+
+#: ../daemon/gvfsbackendgphoto2.c:2602 ../daemon/gvfsbackendgphoto2.c:3232
+msgid "Error renaming dir"
+msgstr "重新命名目錄時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3245
+msgid "Error renaming file"
+msgstr "重新命名檔案時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:2679
+#, c-format
+msgid "Directory '%s' is not empty"
+msgstr "目錄「%s」不是空的"
+
+#: ../daemon/gvfsbackendgphoto2.c:2690
+msgid "Error deleting directory"
+msgstr "刪除目錄時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:2716
+msgid "Error deleting file"
+msgstr "刪除檔案時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:2769
+msgid "Can't write to directory"
+msgstr "不能寫入至目錄"
+
+#: ../daemon/gvfsbackendgphoto2.c:2816
+msgid "Cannot allocate new file to append to"
+msgstr "不能分配新檔案加入到"
+
+#: ../daemon/gvfsbackendgphoto2.c:2831
+msgid "Cannot read file to append to"
+msgstr "不能讀取檔案加入到"
+
+#: ../daemon/gvfsbackendgphoto2.c:2842
+msgid "Cannot get data of file to append to"
+msgstr "不能取得檔案的資料加入到"
+
+#: ../daemon/gvfsbackendgphoto2.c:3129
+msgid "Error writing file"
+msgstr "寫入檔案時發生錯誤"
+
+#: ../daemon/gvfsbackendgphoto2.c:3177
+msgid "Not supported (not same directory)"
+msgstr "不支援（不同目錄）"
+
+#: ../daemon/gvfsbackendgphoto2.c:3189
+msgid "Not supported (src is dir, dst is dir)"
+msgstr "不支援（來源是目錄，目的也是目錄）"
+
+#: ../daemon/gvfsbackendgphoto2.c:3197
+msgid "Not supported (src is dir, dst is existing file)"
+msgstr "不支援（來源是目錄，目的是既存的檔案）"
+
+#: ../daemon/gvfsbackendgphoto2.c:3209
+msgid "Not supported (src is file, dst is dir)"
+msgstr "不支援（來源是檔案，目的是目錄）"
 
 #: ../daemon/gvfsbackendhttp.c:241
 #, c-format
@@ -820,6 +812,14 @@ msgstr "網路位置監視器"
 #, c-format
 msgid "%s on %s"
 msgstr "%s 於 %s"
+
+#: ../daemon/gvfsbackendobexftp.c:699
+msgid "Connection to the device lost"
+msgstr "到裝置的連線已失去"
+
+#: ../daemon/gvfsbackendobexftp.c:1194
+msgid "Device requires a software update"
+msgstr "裝置要求更新軟體"
 
 #: ../daemon/gvfsbackendsftp.c:281
 msgid "ssh program unexpectedly exited"
@@ -1015,20 +1015,20 @@ msgstr "Windows 網路檔案系統服務"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1226
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
 msgid "Trash"
 msgstr "回收筒"
 
-#: ../daemon/gvfsbackendtrash.c:1016
+#: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
 msgstr "%s (於回收筒)"
 
-#: ../daemon/gvfsbackendtrash.c:1327
+#: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
 msgstr "無法刪除回收筒"
 
-#: ../daemon/gvfsbackendtrash.c:1674 ../daemon/gvfsbackendtrash.c:1749
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
 msgstr "不支援目錄通知"
 
@@ -1052,7 +1052,7 @@ msgstr "傳送 fd 時發生錯誤：%s"
 #: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
 #: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
 #: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:154
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
 #: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
 #: ../daemon/gvfsjobunmountmountable.c:132
 #: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
@@ -1064,7 +1064,7 @@ msgstr "後端不支援此操作"
 msgid "Symlinks not supported by backend"
 msgstr "後端不支援符號連結"
 
-#: ../daemon/gvfsjobsetattribute.c:123
+#: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
 msgstr "無效的 dbus 訊息"
 
@@ -1526,6 +1526,21 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "使用註冊為處理該檔案類型的預設應用程式來開啟檔案。"
+
+#~ msgid "Error creating port info list"
+#~ msgstr "建立通訊埠資訊清單時發生錯誤"
+
+#~ msgid "Error getting port info from port info list"
+#~ msgstr "從通訊埠資訊清單取得通訊埠資訊時發生錯誤"
+
+#~ msgid "File system is busy: %d open files"
+#~ msgstr "檔案系統忙碌中：開啟了 %d 個檔案"
+
+#~ msgid "Error listing folders"
+#~ msgstr "列出資料夾時發生錯誤"
+
+#~ msgid "Error listing files in folder"
+#~ msgstr "列出資料夾中的檔案時發生錯誤"
 
 #~ msgid "File unavailable"
 #~ msgstr "檔案無法使用"
