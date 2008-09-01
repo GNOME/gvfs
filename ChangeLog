@@ -1,4 +1,9 @@
 2008-09-01  Christian Kellner  <gicmo@gnome.org>
+	
+	* configure.ac:
+	Require libsoup >= 2.23.91
+
+2008-09-01  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsjobpull.c:
 	* daemon/gvfsjobpull.h:

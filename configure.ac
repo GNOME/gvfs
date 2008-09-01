@@ -125,7 +125,7 @@ HTTP_CFLAGS=
 HTTP_LIBS=
 
 if test "x$enable_http" != "xno"; then
-  PKG_CHECK_EXISTS(libsoup-2.4 >= 2.3.0, msg_http=yes)
+  PKG_CHECK_EXISTS(libsoup-2.4 >= 2.23.91, msg_http=yes)
 
   if test "x$msg_http" == "xyes"; then
     PKG_CHECK_MODULES(HTTP, libsoup-2.4 libxml-2.0)
