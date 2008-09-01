@@ -1940,47 +1940,52 @@ progress_callback_message (DBusConnection  *connection,
 }
 
 static gboolean
-g_daemon_file_copy (GFile                  *source,
-		    GFile                  *destination,
-		    GFileCopyFlags          flags,
-		    GCancellable           *cancellable,
-		    GFileProgressCallback   progress_callback,
-		    gpointer                progress_callback_data,
-		    GError                **error)
+file_transfer (GFile                  *source,
+               GFile                  *destination,
+               GFileCopyFlags          flags,
+               gboolean                remove_source,
+               GCancellable           *cancellable,
+               GFileProgressCallback   progress_callback,
+               gpointer                progress_callback_data,
+               GError                **error)
 {
-  GDaemonFile *daemon_source;
   DBusMessage *reply;
-  char *local_path;
   char *obj_path, *dbus_obj_path;
   dbus_uint32_t flags_dbus;
+  dbus_bool_t dbus_remove_source;
   struct ProgressCallbackData data;
+  char *local_path = NULL;
+  gboolean source_is_daemon;
+  gboolean dest_is_daemon;
+  gboolean native_transfer;
 
-  if (!G_IS_DAEMON_FILE (destination))
+  native_transfer  = FALSE;
+  source_is_daemon = G_IS_DAEMON_FILE (source);
+  dest_is_daemon   = G_IS_DAEMON_FILE (destination);
+
+  if (source_is_daemon && dest_is_daemon)
+    native_transfer = TRUE;
+  else if (dest_is_daemon && !source_is_daemon)
+    local_path = g_file_get_path (source);
+  else if (source_is_daemon && !dest_is_daemon)
+    local_path = g_file_get_path (destination);
+  else
     {
-      /* Fall back to default move */
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");
+      /* Fall back to default copy/move */
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           "Operation not supported");
       return FALSE;
     }
 
-  if (G_IS_DAEMON_FILE (source))
+  if (!native_transfer && local_path == NULL)
     {
-      daemon_source = G_DAEMON_FILE (source);
-      local_path = NULL;
-    }
-  else
-    {
-      daemon_source = NULL;
-      local_path = g_file_get_path (source);
+      /* This will cause the fallback code to be involved */
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported, files on different mounts"));
+      return FALSE;
 
-      if (local_path == NULL)
-	{
-	  /* This will cause the fallback code to be involved */
-	  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-			       _("Operation not supported, files on different mounts"));
-	  return FALSE;
-	}
     }
-  
+
   if (progress_callback)
     {
       obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
@@ -1997,30 +2002,52 @@ g_daemon_file_copy (GFile                  *source,
   data.progress_callback_data = progress_callback_data;
 
   flags_dbus = flags;
-  
-  if (daemon_source)
+  dbus_remove_source = remove_source;
+
+  if (native_transfer == TRUE)
     {
-      reply = do_sync_2_path_call (source, destination, 
-				   G_VFS_DBUS_MOUNT_OP_COPY,
-				   obj_path, progress_callback_message, &data,
-				   NULL, cancellable, error,
-				   DBUS_TYPE_UINT32, &flags_dbus,
-				   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-				   0);
+      const char *method_string;
+
+      if (remove_source == FALSE)
+        method_string = G_VFS_DBUS_MOUNT_OP_COPY;
+      else
+        method_string = G_VFS_DBUS_MOUNT_OP_MOVE;
+
+      reply = do_sync_2_path_call (source, destination,
+                                   method_string,
+                                   obj_path, progress_callback_message, &data,
+                                   NULL, cancellable, error,
+                                   DBUS_TYPE_UINT32, &flags_dbus,
+                                   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+                                   0);
+    }
+  else if (dest_is_daemon == TRUE)
+    {
+      reply = do_sync_2_path_call (destination, NULL,
+                                   G_VFS_DBUS_MOUNT_OP_PUSH,
+                                   obj_path, progress_callback_message, &data,
+                                   NULL, cancellable, error,
+                                   G_DBUS_TYPE_CSTRING, &local_path,
+                                   DBUS_TYPE_UINT32, &flags_dbus,
+                                   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+                                   DBUS_TYPE_BOOLEAN, &dbus_remove_source,
+                                   0);
     }
   else
     {
-      reply = do_sync_2_path_call (destination, NULL, 
-				   G_VFS_DBUS_MOUNT_OP_UPLOAD,
-				   obj_path, progress_callback_message, &data,
-				   NULL, cancellable, error,
-				   G_DBUS_TYPE_CSTRING, &local_path,
-				   DBUS_TYPE_UINT32, &flags_dbus,
-				   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-				   0);
-      g_free (local_path);
+      reply = do_sync_2_path_call (source, NULL,
+                                   G_VFS_DBUS_MOUNT_OP_PULL,
+                                   obj_path, progress_callback_message, &data,
+                                   NULL, cancellable, error,
+                                   G_DBUS_TYPE_CSTRING, &local_path,
+                                   DBUS_TYPE_UINT32, &flags_dbus,
+                                   DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
+                                   DBUS_TYPE_BOOLEAN, &dbus_remove_source,
+                                   0);
+
     }
 
+  g_free (local_path);
   g_free (obj_path);
 
   if (reply == NULL)
@@ -2028,6 +2055,29 @@ g_daemon_file_copy (GFile                  *source,
 
   dbus_message_unref (reply);
   return TRUE;
+}
+
+static gboolean
+g_daemon_file_copy (GFile                  *source,
+		    GFile                  *destination,
+		    GFileCopyFlags          flags,
+		    GCancellable           *cancellable,
+		    GFileProgressCallback   progress_callback,
+		    gpointer                progress_callback_data,
+		    GError                **error)
+{
+  gboolean result;
+
+  result = file_transfer (source,
+                          destination,
+                          flags,
+                          FALSE,
+                          cancellable,
+                          progress_callback,
+                          progress_callback_data,
+                          error);
+
+  return result;
 }
 
 static gboolean
@@ -2039,50 +2089,18 @@ g_daemon_file_move (GFile                  *source,
 		    gpointer                progress_callback_data,
 		    GError                **error)
 {
-  DBusMessage *reply;
-  char *obj_path, *dbus_obj_path;
-  dbus_uint32_t flags_dbus;
-  struct ProgressCallbackData data;
+  gboolean result;
 
-  if (!G_IS_DAEMON_FILE (source) ||
-      !G_IS_DAEMON_FILE (destination))
-    {
-      /* Fall back to default move */
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Move not supported");
-      return FALSE;
-    }
-  
-  if (progress_callback)
-    {
-      obj_path = g_strdup_printf ("/org/gtk/vfs/callback/%p", &obj_path);
-      dbus_obj_path = obj_path;
-    }
-  else
-    {
-      obj_path = NULL;
-      /* Can't pass NULL obj path as arg */
-      dbus_obj_path = "/org/gtk/vfs/void";
-    }
+  result = file_transfer (source,
+                          destination,
+                          flags,
+                          TRUE,
+                          cancellable,
+                          progress_callback,
+                          progress_callback_data,
+                          error);
 
-  data.progress_callback = progress_callback;
-  data.progress_callback_data = progress_callback_data;
-
-  flags_dbus = flags;
-  reply = do_sync_2_path_call (source, destination, 
-			       G_VFS_DBUS_MOUNT_OP_MOVE,
-			       obj_path, progress_callback_message, &data,
-			       NULL, cancellable, error,
-			       DBUS_TYPE_UINT32, &flags_dbus,
-			       DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
-			       0);
-
-  g_free (obj_path);
-
-  if (reply == NULL)
-    return FALSE;
-
-  dbus_message_unref (reply);
-  return TRUE;
+  return result;
 }
 
 static GFileMonitor*

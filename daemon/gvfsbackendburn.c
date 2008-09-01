@@ -809,18 +809,27 @@ try_set_display_name (GVfsBackend *backend,
 }
 
 static gboolean
-try_upload (GVfsBackend *backend,
-            GVfsJobUpload *job,
-            const char *destination,
-            const char *local_path,
-            GFileCopyFlags flags,
-            GFileProgressCallback progress_callback,
-            gpointer progress_callback_data)
+try_push (GVfsBackend *backend,
+          GVfsJobPush *job,
+          const char *destination,
+          const char *local_path,
+          GFileCopyFlags flags,
+          gboolean remove_source,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
 {
   VirtualNode *file, *dir;
   struct stat stat_buf;
   char *dirname, *basename;
-  
+
+  if (remove_source)
+    {
+      /* Fallback to copy & delete for now, fix that up later */
+      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                _("Operation not supported by backend"));
+      return TRUE;
+    }
+
   if (g_stat (local_path, &stat_buf) == -1)
     {
       int errsv = errno;
@@ -959,7 +968,7 @@ g_vfs_backend_burn_class_init (GVfsBackendBurnClass *klass)
   backend_class->try_create_dir_monitor = try_create_dir_monitor;
   backend_class->try_make_directory = try_make_directory;
   backend_class->try_set_display_name = try_set_display_name;
-  backend_class->try_upload = try_upload;
+  backend_class->try_push = try_push;
   backend_class->try_delete = try_delete;
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;

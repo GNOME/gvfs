@@ -134,8 +134,9 @@ libdaemon_la_SOURCES = \
 	gvfsjobtrash.c gvfsjobtrash.h \
 	gvfsjobdelete.c gvfsjobdelete.h \
 	gvfsjobcopy.c gvfsjobcopy.h \
-	gvfsjobupload.c gvfsjobupload.h \
 	gvfsjobmove.c gvfsjobmove.h \
+	gvfsjobpush.c gvfsjobpush.h \
+	gvfsjobpull.c gvfsjobpull.h \
 	gvfsjobmakedirectory.c gvfsjobmakedirectory.h \
 	gvfsjobmakesymlink.c gvfsjobmakesymlink.h \
 	gvfsjobsetattribute.c gvfsjobsetattribute.h \

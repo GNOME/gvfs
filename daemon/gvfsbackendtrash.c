@@ -1761,6 +1761,86 @@ do_create_file_monitor (GVfsBackend *backend,
 }
 
 static void
+do_pull (GVfsBackend *backend,
+         GVfsJobPull *job,
+         const char *filename,
+         const char *local_destination,
+         GFileCopyFlags flags,
+         gboolean remove_source,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  GFile *dst_file;
+  GFile *src_file;
+  char *trashdir, *topdir, *relative_path, *trashfile;
+  char *src_path;
+  gboolean res;
+  GError *error = NULL;
+
+  res = decode_path (filename, &trashdir, &trashfile, &relative_path, &topdir);
+
+  if (res == FALSE)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_IS_DIRECTORY,
+                        _("Can't open directory"));
+      return;
+    }
+
+  dst_file = g_file_new_for_path (local_destination);
+
+  src_path = g_build_filename (trashdir, "files", trashfile, relative_path, NULL);
+  src_file = g_file_new_for_path (src_path);
+
+  if (remove_source)
+    res = g_file_move (src_file,
+                       dst_file,
+                       flags,
+                       G_VFS_JOB (job)->cancellable,
+                       progress_callback,
+                       progress_callback_data,
+                       &error);
+  else
+    res = g_file_copy (src_file,
+                       dst_file,
+                       flags,
+                       G_VFS_JOB (job)->cancellable,
+                       progress_callback,
+                       progress_callback_data,
+                       &error);
+
+  if (res == FALSE)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+
+      if (relative_path == NULL)
+        {
+          char *info_filename, *info_path;
+
+          info_filename = g_strconcat (trashfile, ".trashinfo", NULL);
+          info_path = g_build_filename (trashdir, "info", info_filename, NULL);
+          g_free (info_filename);
+          g_unlink (info_path);
+          g_free (info_path);
+        }
+    }
+
+  g_object_unref (src_file);
+  g_object_unref (dst_file);
+
+  g_free (trashdir);
+  g_free (trashfile);
+  g_free (relative_path);
+  g_free (topdir);
+}
+
+
+static void
 g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -1778,4 +1858,5 @@ g_vfs_backend_trash_class_init (GVfsBackendTrashClass *klass)
   backend_class->delete = do_delete;
   backend_class->create_dir_monitor = do_create_dir_monitor;
   backend_class->create_file_monitor = do_create_file_monitor;
+  backend_class->pull = do_pull;
 }

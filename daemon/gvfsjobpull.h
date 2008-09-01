@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -20,8 +20,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_VFS_JOB_UPLOAD_H__
-#define __G_VFS_JOB_UPLOAD_H__
+#ifndef __G_VFS_JOB_PULL_H__
+#define __G_VFS_JOB_PULL_H__
 
 #include <gio/gio.h>
 #include <gvfsjob.h>
@@ -30,37 +30,38 @@
 
 G_BEGIN_DECLS
 
-#define G_VFS_TYPE_JOB_UPLOAD         (g_vfs_job_upload_get_type ())
-#define G_VFS_JOB_UPLOAD(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB_UPLOAD, GVfsJobUpload))
-#define G_VFS_JOB_UPLOAD_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB_UPLOAD, GVfsJobUploadClass))
-#define G_VFS_IS_JOB_UPLOAD(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_UPLOAD))
-#define G_VFS_IS_JOB_UPLOAD_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_UPLOAD))
-#define G_VFS_JOB_UPLOAD_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB_UPLOAD, GVfsJobUploadClass))
+#define G_VFS_TYPE_JOB_PULL         (g_vfs_job_pull_get_type ())
+#define G_VFS_JOB_PULL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_JOB_PULL, GVfsJobPull))
+#define G_VFS_JOB_PULL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_VFS_TYPE_JOB_PULL, GVfsJobPullClass))
+#define G_VFS_IS_JOB_PULL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_VFS_TYPE_JOB_PULL))
+#define G_VFS_IS_JOB_PULL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_VFS_TYPE_JOB_PULL))
+#define G_VFS_JOB_PULL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_VFS_TYPE_JOB_PULL, GVfsJobPullClass))
 
-typedef struct _GVfsJobUploadClass   GVfsJobUploadClass;
+typedef struct _GVfsJobPullClass   GVfsJobPullClass;
 
-struct _GVfsJobUpload
+struct _GVfsJobPull
 {
   GVfsJobDBus parent_instance;
 
   GVfsBackend *backend;
-  char *destination;
+  char *source;
   char *local_path;
   GFileCopyFlags flags;
   char *callback_obj_path;
+  gboolean remove_source;
 };
 
-struct _GVfsJobUploadClass
+struct _GVfsJobPullClass
 {
   GVfsJobDBusClass parent_class;
 };
 
-GType g_vfs_job_upload_get_type (void) G_GNUC_CONST;
+GType g_vfs_job_pull_get_type (void) G_GNUC_CONST;
 
-GVfsJob *g_vfs_job_upload_new (DBusConnection *connection,
-			       DBusMessage    *message,
-			       GVfsBackend    *backend);
+GVfsJob *g_vfs_job_pull_new (DBusConnection *connection,
+                             DBusMessage    *message,
+                             GVfsBackend    *backend);
 
 G_END_DECLS
 
-#endif /* __G_VFS_JOB_UPLOAD_H__ */
+#endif /* __G_VFS_JOB_PULL_H__ */

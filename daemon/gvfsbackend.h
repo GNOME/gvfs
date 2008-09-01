@@ -64,8 +64,9 @@ typedef struct _GVfsJobDelete          GVfsJobDelete;
 typedef struct _GVfsJobMakeDirectory   GVfsJobMakeDirectory;
 typedef struct _GVfsJobMakeSymlink     GVfsJobMakeSymlink;
 typedef struct _GVfsJobCopy            GVfsJobCopy;
-typedef struct _GVfsJobUpload          GVfsJobUpload;
 typedef struct _GVfsJobMove            GVfsJobMove;
+typedef struct _GVfsJobPush            GVfsJobPush;
+typedef struct _GVfsJobPull            GVfsJobPull;
 typedef struct _GVfsJobSetAttribute    GVfsJobSetAttribute;
 typedef struct _GVfsJobQueryAttributes GVfsJobQueryAttributes;
 typedef struct _GVfsJobCreateMonitor   GVfsJobCreateMonitor;
@@ -297,21 +298,7 @@ struct _GVfsBackendClass
 				 GFileCopyFlags flags,
 				 GFileProgressCallback progress_callback,
 				 gpointer progress_callback_data);
-  void     (*upload)            (GVfsBackend *backend,
-				 GVfsJobUpload *job,
-				 const char *destination,
-				 const char *local_path,
-				 GFileCopyFlags flags,
-				 GFileProgressCallback progress_callback,
-				 gpointer progress_callback_data);
-  gboolean (*try_upload)        (GVfsBackend *backend,
-				 GVfsJobUpload *job,
-				 const char *destination,
-				 const char *local_path,
-				 GFileCopyFlags flags,
-				 GFileProgressCallback progress_callback,
-				 gpointer progress_callback_data);
-  void     (*move)              (GVfsBackend *backend,
+   void     (*move)              (GVfsBackend *backend,
 				 GVfsJobMove *job,
 				 const char *source,
 				 const char *destination,
@@ -325,6 +312,38 @@ struct _GVfsBackendClass
 				 GFileCopyFlags flags,
 				 GFileProgressCallback progress_callback,
 				 gpointer progress_callback_data);
+  void     (*push)             (GVfsBackend *backend,
+                                GVfsJobPush *job,
+                                const char *destination,
+                                const char *local_path,
+                                GFileCopyFlags flags,
+                                gboolean remove_source,
+                                GFileProgressCallback progress_callback,
+                                gpointer progress_callback_data);
+  gboolean (*try_push)         (GVfsBackend *backend,
+                                GVfsJobPush *job,
+                                const char *destination,
+                                const char *local_path,
+                                GFileCopyFlags flags,
+                                gboolean remove_source,
+                                GFileProgressCallback progress_callback,
+                                gpointer progress_callback_data);
+  void     (*pull)             (GVfsBackend *backend,
+                                GVfsJobPull *job,
+                                const char *source,
+                                const char *local_path,
+                                GFileCopyFlags flags,
+                                gboolean remove_source,
+                                GFileProgressCallback progress_callback,
+                                gpointer progress_callback_data);
+  gboolean (*try_pull)         (GVfsBackend *backend,
+                                GVfsJobPull *job,
+                                const char *source,
+                                const char *local_path,
+                                GFileCopyFlags flags,
+                                gboolean remove_source,
+                                GFileProgressCallback progress_callback,
+                                gpointer progress_callback_data);
   void     (*set_attribute)     (GVfsBackend *backend,
 				 GVfsJobSetAttribute *set_attribute,
 				 const char *filename,

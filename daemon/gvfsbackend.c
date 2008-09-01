@@ -48,9 +48,10 @@
 #include <gvfsjobmakedirectory.h>
 #include <gvfsjobmakesymlink.h>
 #include <gvfsjobcreatemonitor.h>
-#include <gvfsjobupload.h>
 #include <gvfsjobcopy.h>
 #include <gvfsjobmove.h>
+#include <gvfsjobpush.h>
+#include <gvfsjobpull.h>
 #include <gvfsjobsetattribute.h>
 #include <gvfsjobqueryattributes.h>
 #include <gdbusutils.h>
@@ -534,8 +535,12 @@ backend_dbus_handler (DBusConnection  *connection,
     job = g_vfs_job_copy_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
-					G_VFS_DBUS_MOUNT_OP_UPLOAD))
-    job = g_vfs_job_upload_new (connection, message, backend);
+					G_VFS_DBUS_MOUNT_OP_PUSH))
+    job = g_vfs_job_push_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_PULL))
+    job = g_vfs_job_pull_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_MOVE))

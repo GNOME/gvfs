@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -31,11 +31,11 @@
 #include <glib.h>
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
-#include "gvfsjobupload.h"
+#include "gvfsjobpull.h"
 #include "gdbusutils.h"
 #include "gvfsdaemonprotocol.h"
 
-G_DEFINE_TYPE (GVfsJobUpload, g_vfs_job_upload, G_VFS_TYPE_JOB_DBUS)
+G_DEFINE_TYPE (GVfsJobPull, g_vfs_job_pull, G_VFS_TYPE_JOB_DBUS)
 
 static void         run          (GVfsJob        *job);
 static gboolean     try          (GVfsJob        *job);
@@ -44,58 +44,60 @@ static DBusMessage *create_reply (GVfsJob        *job,
 				  DBusMessage    *message);
 
 static void
-g_vfs_job_upload_finalize (GObject *object)
+g_vfs_job_pull_finalize (GObject *object)
 {
-  GVfsJobUpload *job;
+  GVfsJobPull *job;
 
-  job = G_VFS_JOB_UPLOAD (object);
-  
+  job = G_VFS_JOB_PULL (object);
+
   g_free (job->local_path);
-  g_free (job->destination);
+  g_free (job->source);
   g_free (job->callback_obj_path);
-  
-  if (G_OBJECT_CLASS (g_vfs_job_upload_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_vfs_job_upload_parent_class)->finalize) (object);
+
+  if (G_OBJECT_CLASS (g_vfs_job_pull_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_vfs_job_pull_parent_class)->finalize) (object);
 }
 
 static void
-g_vfs_job_upload_class_init (GVfsJobUploadClass *klass)
+g_vfs_job_pull_class_init (GVfsJobPullClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVfsJobClass *job_class = G_VFS_JOB_CLASS (klass);
   GVfsJobDBusClass *job_dbus_class = G_VFS_JOB_DBUS_CLASS (klass);
-  
-  gobject_class->finalize = g_vfs_job_upload_finalize;
+
+  gobject_class->finalize = g_vfs_job_pull_finalize;
   job_class->run = run;
   job_class->try = try;
   job_dbus_class->create_reply = create_reply;
 }
 
 static void
-g_vfs_job_upload_init (GVfsJobUpload *job)
+g_vfs_job_pull_init (GVfsJobPull *job)
 {
 }
 
 GVfsJob *
-g_vfs_job_upload_new (DBusConnection *connection,
+g_vfs_job_pull_new (DBusConnection *connection,
 			DBusMessage *message,
 			GVfsBackend *backend)
 {
-  GVfsJobUpload *job;
+  GVfsJobPull *job;
   DBusMessage *reply;
   DBusError derror;
   int path1_len, path2_len;
   const char *path1_data, *path2_data, *callback_obj_path;
   dbus_uint32_t flags;
-  
+  dbus_bool_t remove_source;
+
   dbus_error_init (&derror);
-  if (!dbus_message_get_args (message, &derror, 
+  if (!dbus_message_get_args (message, &derror,
 			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
 			      &path1_data, &path1_len,
 			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
 			      &path2_data, &path2_len,
                               DBUS_TYPE_UINT32, &flags,
 			      DBUS_TYPE_OBJECT_PATH, &callback_obj_path,
+                              DBUS_TYPE_BOOLEAN, &remove_source,
 			      0))
     {
       reply = dbus_message_new_error (message,
@@ -107,18 +109,20 @@ g_vfs_job_upload_new (DBusConnection *connection,
       return NULL;
     }
 
-  job = g_object_new (G_VFS_TYPE_JOB_UPLOAD,
+  job = g_object_new (G_VFS_TYPE_JOB_PULL,
 		      "message", message,
 		      "connection", connection,
 		      NULL);
 
-  job->destination = g_strndup (path1_data, path1_len);
+  job->source = g_strndup (path1_data, path1_len);
   job->local_path = g_strndup (path2_data, path2_len);
   job->backend = backend;
   job->flags = flags;
+  job->remove_source = remove_source;
+  g_print ("Remove Source: %s\n", remove_source ? "true" : "false");
   if (strcmp (callback_obj_path, "/org/gtk/vfs/void") != 0)
     job->callback_obj_path = g_strdup (callback_obj_path);
-  
+
   return G_VFS_JOB (job);
 }
 
@@ -129,7 +133,7 @@ progress_callback (goffset current_num_bytes,
 {
   GVfsJob *job = G_VFS_JOB (user_data);
   GVfsJobDBus *dbus_job = G_VFS_JOB_DBUS (job);
-  GVfsJobUpload *op_job = G_VFS_JOB_UPLOAD (job);
+  GVfsJobPull *op_job = G_VFS_JOB_PULL (job);
   dbus_uint64_t current_dbus, total_dbus;
   DBusMessage *message;
 
@@ -137,7 +141,7 @@ progress_callback (goffset current_num_bytes,
 
   if (op_job->callback_obj_path == NULL)
     return;
-  
+
   message =
     dbus_message_new_method_call (dbus_message_get_sender (dbus_job->message),
 				  op_job->callback_obj_path,
@@ -160,41 +164,43 @@ progress_callback (goffset current_num_bytes,
 static void
 run (GVfsJob *job)
 {
-  GVfsJobUpload *op_job = G_VFS_JOB_UPLOAD (job);
+  GVfsJobPull *op_job = G_VFS_JOB_PULL (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->upload == NULL)
+  if (class->pull == NULL)
     {
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 			_("Operation not supported by backend"));
       return;
     }
-  
-  class->upload (op_job->backend,
-		 op_job,
-		 op_job->destination,
-		 op_job->local_path,
-		 op_job->flags,
-		 progress_callback,
-		 job);
+
+  class->pull (op_job->backend,
+               op_job,
+               op_job->source,
+               op_job->local_path,
+               op_job->flags,
+               op_job->remove_source,
+               progress_callback,
+               job);
 }
 
 static gboolean
 try (GVfsJob *job)
 {
-  GVfsJobUpload *op_job = G_VFS_JOB_UPLOAD (job);
+  GVfsJobPull *op_job = G_VFS_JOB_PULL (job);
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
-  if (class->try_upload == NULL)
+  if (class->try_pull == NULL)
     return FALSE;
-  
-  return class->try_upload (op_job->backend,
-			    op_job,
-			    op_job->destination,
-			    op_job->local_path,
-			    op_job->flags,
-			    progress_callback,
-			    job);
+
+  return class->try_pull (op_job->backend,
+                          op_job,
+                          op_job->source,
+                          op_job->local_path,
+                          op_job->flags,
+                          op_job->remove_source,
+                          progress_callback,
+                          job);
 }
 
 /* Might be called on an i/o thread */
@@ -206,6 +212,6 @@ create_reply (GVfsJob *job,
   DBusMessage *reply;
 
   reply = dbus_message_new_method_return (message);
-  
+
   return reply;
 }

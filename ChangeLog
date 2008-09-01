@@ -1,5 +1,39 @@
 2008-09-01  Christian Kellner  <gicmo@gnome.org>
 
+	* daemon/gvfsjobpull.c:
+	* daemon/gvfsjobpull.h:
+	New daemon method to pull files from daemons to the local
+	file system.
+
+	* daemon/gvfsjobpush.c:
+	* daemon/gvfsjobpush.h:
+	New daemon method to push local files to daemons. (Replaces
+	Upload)
+
+	* daemon/gvfsjobupload.c:
+	* daemon/gvfsjobupload.h:
+	Replaced by Push.
+
+	* common/gvfsdaemonprotocol.h:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.c:
+	* daemon/gvfsbackend.h:
+	Add Push and Pull. Remove Upload.
+
+	* client/gdaemonfile.c:	
+	New transfer logic. In case of move try push/pull (with
+	remove_source set to TRUE) first then fallback. In case of copy
+	try push/pull first then fallback. Use the same logic for
+	both cases.
+
+	* daemon/gvfsbackendburn.c:
+	Port Upload to Push.
+	
+	* daemon/gvfsbackendtrash.c:
+	Implement the Pull method. That should fix bug #529971
+
+2008-09-01  Christian Kellner  <gicmo@gnome.org>
+
 	* monitor/hal/ghalvolume.c: (do_update_from_hal):
 	Use g_format_size_for_display for consistency.
 	Patch from Christian Persch <chpe@gnome.org>
