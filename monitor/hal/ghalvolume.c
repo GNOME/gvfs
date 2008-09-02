@@ -136,6 +136,35 @@ changed_in_idle (gpointer data)
   return FALSE;
 }
 
+#define KILOBYTE_FACTOR 1000.0
+#define MEGABYTE_FACTOR (1000.0 * 1000.0)
+#define GIGABYTE_FACTOR (1000.0 * 1000.0 * 1000.0)
+
+static char *
+format_size_for_display (guint64 size)
+{
+  char *str;
+  gdouble displayed_size;
+  
+  if (size < MEGABYTE_FACTOR)
+    {
+      displayed_size = (double) size / KILOBYTE_FACTOR;
+      str = g_strdup_printf (_("%.1f kB"), displayed_size);
+    } 
+  else if (size < GIGABYTE_FACTOR)
+    {
+      displayed_size = (double) size / MEGABYTE_FACTOR;
+      str = g_strdup_printf (_("%.1f MB"), displayed_size);
+    } 
+  else 
+    {
+      displayed_size = (double) size / GIGABYTE_FACTOR;
+      str = g_strdup_printf (_("%.1f GB"), displayed_size);
+    }
+  
+  return str;
+}
+
 static void
 do_update_from_hal (GHalVolume *mv)
 {
@@ -187,7 +216,7 @@ do_update_from_hal (GHalVolume *mv)
     {
       if (strcmp (volume_fsusage, "crypto") == 0 && strcmp (volume_fstype, "crypto_LUKS") == 0)
         {
-          size = g_format_size_for_display (volume_size);
+          size = format_size_for_display (volume_size);
           /* Translators: %s is the size of the volume (e.g. 512 MB) */
           name = g_strdup_printf (_("%s Encrypted Data"), size);
           g_free (size);
@@ -210,7 +239,7 @@ do_update_from_hal (GHalVolume *mv)
             }
           else
             {
-              size = g_format_size_for_display (volume_size);
+              size = format_size_for_display (volume_size);
               /* Translators: %s is the size of the volume (e.g. 512 MB) */
               name = g_strdup_printf (_("%s Media"), size);
               g_free (size);

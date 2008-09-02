@@ -1,3 +1,9 @@
+2008-09-02  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/hal/ghalvolume.c (do_update_from_hal): Revert patch from
+	bug 550100 - we really don't want to show "61.7MB Volume" instead
+	of "64M Volume".
+
 2008-09-01  Hans Petter Jansson  <hpj@novell.com>
 
 	* configure.ac: Post-release version bump to 0.99.7.
