@@ -1,3 +1,5 @@
+=== gvfs 0.99.6 ===
+
 2008-09-01  Hans Petter Jansson  <hpj@novell.com>
 
 	* POTFILES.in: Remove dead file gvfsjobupload.c and add replacement
