@@ -957,6 +957,8 @@ unmount_cb (GPid pid, gint status, gpointer user_data)
   g_string_free (data->error_string, TRUE);
   close (data->error_fd);
   g_spawn_close_pid (pid);
+
+  g_object_unref (data->object);
   g_free (data);
 }
 
@@ -988,7 +990,7 @@ unmount_do (GMount               *mount,
   GError *error;
 
   data = g_new0 (UnmountOp, 1);
-  data->object = G_OBJECT (mount);
+  data->object = g_object_ref (mount);
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;  
@@ -1079,6 +1081,7 @@ eject_wrapper_callback (GObject *source_object,
 {
   EjectWrapperOp *data  = user_data;
   data->callback (data->object, res, data->user_data);
+  g_object_unref (data->object);
   g_free (data);
 }
 
@@ -1102,7 +1105,7 @@ g_hal_mount_eject (GMount              *mount,
     {
       EjectWrapperOp *data;
       data = g_new0 (EjectWrapperOp, 1);
-      data->object = G_OBJECT (mount);
+      data->object = g_object_ref (mount);
       data->callback = callback;
       data->user_data = user_data;
       g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);

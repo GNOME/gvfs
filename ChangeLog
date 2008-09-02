@@ -1,5 +1,15 @@
 2008-09-02  David Zeuthen  <davidz@redhat.com>
 
+	* monitor/hal/ghaldrive.c: (g_hal_drive_eject_do):
+	* monitor/hal/ghalmount.c: (unmount_cb), (unmount_do),
+	(eject_wrapper_callback), (g_hal_mount_eject):
+	* monitor/proxy/gproxymount.c: (eject_wrapper_callback),
+	(g_proxy_mount_eject):
+	* monitor/proxy/gproxyvolume.c: (eject_wrapper_callback):
+	Remember to refcount objects (#546971).
+
+2008-09-02  David Zeuthen  <davidz@redhat.com>
+
 	* monitor/hal/ghalvolume.c (format_size_for_display): Add docs
 	explaining why powers of 10 are used.
 

@@ -361,6 +361,7 @@ eject_wrapper_callback (GObject *source_object,
 {
   EjectWrapperOp *data  = user_data;
   data->callback (data->object, res, data->user_data);
+  g_object_unref (data->object);
   g_free (data);
 }
 
@@ -379,7 +380,7 @@ g_proxy_mount_eject (GMount              *mount,
     {
       EjectWrapperOp *data;
       data = g_new0 (EjectWrapperOp, 1);
-      data->object = G_OBJECT (mount);
+      data->object = g_object_ref (mount);
       data->callback = callback;
       data->user_data = user_data;
       g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);

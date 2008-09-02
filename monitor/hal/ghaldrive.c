@@ -644,7 +644,7 @@ g_hal_drive_eject_do (GDrive              *drive,
   G_UNLOCK (hal_drive);
   
   data = g_new0 (SpawnOp, 1);
-  data->object = G_OBJECT (drive);
+  data->object = g_object_ref (drive);
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
