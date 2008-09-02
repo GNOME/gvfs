@@ -1,3 +1,32 @@
+Major changes in 0.99.6
+=======================
+
+* Better cross-backend copy/move logic. Now will perform an actual file
+  system move if possible, even when the source and target are handled
+  by different backends (e.g. trash and local).
+* Now requires libsoup >= 2.23.91.
+
+* Bug fixes
+  548841 - Incorrect usage of plural forms in gphoto backend
+  547133 - Getting mtime over http backend is broken
+  538573 - lastmodified uses ISO 8601 date/time where it should use http-date
+  549253 - error path leaks
+  549553 - gvfs mangles uri for unhandled schemes
+  550100 - gio uses 10^3 base (SI) for volume names
+  529971 - Restore from trash appears to do a file copy
+  RH 460223 - gnome-mount no longer automatically opens LUKS-encrypted
+              partitions
+
+* Translation updates:
+  nl.po (Wouter Bolsterlee), gl.po (Ignacio Casal Quinteiro), es.po
+  (Jorge Gonzalez), pt_BR.po (Og Maciel), et.po (Priit Laes), eu.po
+  (Inaki Larranaga Murgoitio), th.po (Theppitak Karoonboonyanan), ja.po
+  (Takeshi AIHANA), vi.po (Nguyễn Thái Ngọc Duy), fr.po (Robert-André
+  Mauchin), he.po (Yair Hershkovitz), nb.po (Kjartan Maraas), mk.po
+  (Jovan Naumovski), de.po (Hendrik Richter), ga.po (Seán de Búrca),
+  zh_HK.po (Chao-Hsiung Liao), zh_TW.po (Chao-Hsiung Liao), sv.po
+  (Daniel Nylander)
+
 Major changes in 0.99.5
 =======================
 
