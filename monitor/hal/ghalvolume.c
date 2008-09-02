@@ -140,6 +140,25 @@ changed_in_idle (gpointer data)
 #define MEGABYTE_FACTOR (1000.0 * 1000.0)
 #define GIGABYTE_FACTOR (1000.0 * 1000.0 * 1000.0)
 
+/**
+ * format_size_for_display:
+ * @size: a number of octects
+ *
+ * Format a human readable string that can conveys how much storage a
+ * user-visible drive or piece of media can hold.
+ *
+ * As a matter of policy, we want this string to resemble what's on
+ * the packaging of the drive/media. Since all manufacturers use
+ * powers of 10, g_format_size_for_display() is not suitable here.
+ *
+ * TODO: we probably want to round to nearest power of two if @size is
+ * "close" (e.g. within 5%) - this is to avoid e.g. 63.4G when the
+ * packaging says "64G drive". We could also use per-drive or
+ * per-media quirks to make a better guess.
+ *
+ * Returns: A human readable string, caller must free it using
+ * g_free().
+ **/
 static char *
 format_size_for_display (guint64 size)
 {
