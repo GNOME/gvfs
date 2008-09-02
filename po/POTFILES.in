@@ -45,6 +45,8 @@ daemon/gvfsjobmountmountable.c
 daemon/gvfsjobmove.c
 daemon/gvfsjobopenforread.c
 daemon/gvfsjobopenforwrite.c
+daemon/gvfsjobpull.c
+daemon/gvfsjobpush.c
 daemon/gvfsjobqueryattributes.c
 daemon/gvfsjobqueryfsinfo.c
 daemon/gvfsjobqueryinfo.c
@@ -56,7 +58,6 @@ daemon/gvfsjobsetdisplayname.c
 daemon/gvfsjobtrash.c
 daemon/gvfsjobunmount.c
 daemon/gvfsjobunmountmountable.c
-daemon/gvfsjobupload.c
 daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
