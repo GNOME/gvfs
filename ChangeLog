@@ -1,3 +1,10 @@
+2008-09-05  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendcdda.c (track_free), (release_metadata),
+	(fetch_metadata), (g_vfs_backend_cdda_finalize), (do_mount),
+	(do_unmount), (set_info_for_track), (do_query_info):
+	Export CD-Text metadata via xattrs (Closes: #550858)
+
 2008-09-02  David Zeuthen  <davidz@redhat.com>
 
 	* monitor/hal/ghaldrive.c: (g_hal_drive_eject_do):

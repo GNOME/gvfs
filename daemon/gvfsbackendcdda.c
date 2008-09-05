@@ -49,6 +49,7 @@
 
 #define DO_NOT_WANT_PARANOIA_COMPATIBILITY
 #include <cdio/paranoia.h>
+#include <cdio/cdio.h>
 
 /* TODO:
  *
@@ -80,6 +81,12 @@
 
 /*--------------------------------------------------------------------------------------------------------------*/
 
+typedef struct {
+  char *artist;
+  char *title;
+  int  duration; /* Duration in seconds */
+} GVfsBackendCddaTrack;
+
 struct _GVfsBackendCdda
 {
   GVfsBackend parent_instance;
@@ -93,6 +100,12 @@ struct _GVfsBackendCdda
   char *device_path;
   cdrom_drive_t *drive;
   int num_open_files;
+
+  /* Metadata from CD-Text */
+  char *album_title;
+  char *album_artist;
+  char *genre;
+  GList *tracks; /* a GList of GVfsBackendCddaTrack */
 };
 
 G_DEFINE_TYPE (GVfsBackendCdda, g_vfs_backend_cdda, G_VFS_TYPE_BACKEND)
@@ -108,6 +121,67 @@ release_device (GVfsBackendCdda *cdda_backend)
       cdio_cddap_close (cdda_backend->drive);
       cdda_backend->drive = NULL;
     }
+}
+
+/* Metadata related functions */
+static void
+track_free (GVfsBackendCddaTrack *track)
+{
+  if (track == NULL)
+    return;
+  g_free (track->artist);
+  g_free (track->title);
+}
+
+static void
+release_metadata (GVfsBackendCdda *cdda_backend)
+{
+  g_free (cdda_backend->album_title);
+  cdda_backend->album_title = NULL;
+  g_free (cdda_backend->album_artist);
+  cdda_backend->album_artist = NULL;
+  g_free (cdda_backend->genre);
+  cdda_backend->genre = NULL;
+  g_list_foreach (cdda_backend->tracks, (GFunc) track_free, NULL);
+  g_list_free (cdda_backend->tracks);
+  cdda_backend->tracks = NULL;
+}
+
+static void
+fetch_metadata (GVfsBackendCdda *cdda_backend)
+{
+  CdIo *cdio;
+  track_t cdtrack, last_cdtrack;
+  const cdtext_t *cdtext;
+
+  cdio = cdio_open (cdda_backend->device_path, DRIVER_UNKNOWN);
+  if (!cdio)
+    return;
+
+  cdtext = cdio_get_cdtext(cdio, 0);
+  if (cdtext) {
+    cdda_backend->album_title = g_strdup (cdtext_get (CDTEXT_TITLE, cdtext));
+    cdda_backend->album_artist = g_strdup (cdtext_get (CDTEXT_PERFORMER, cdtext));
+    cdda_backend->genre = g_strdup (cdtext_get (CDTEXT_GENRE, cdtext));
+  }
+
+  cdtrack = cdio_get_first_track_num(cdio);
+  last_cdtrack = cdtrack + cdio_get_num_tracks(cdio);
+
+  for ( ; cdtrack < last_cdtrack; cdtrack++ ) {
+    GVfsBackendCddaTrack *track;
+    track = g_new0 (GVfsBackendCddaTrack, 1);
+    cdtext = cdio_get_cdtext(cdio, cdtrack);
+    if (cdtext) {
+      track->title = g_strdup (cdtext_get (CDTEXT_TITLE, cdtext));
+      track->artist = g_strdup (cdtext_get (CDTEXT_PERFORMER, cdtext));
+    }
+    track->duration = cdio_get_track_sec_count (cdio, cdtrack) / CDIO_CD_FRAMES_PER_SEC;
+
+    cdda_backend->tracks = g_list_append (cdda_backend->tracks, track);
+  }
+
+  cdio_destroy (cdio);
 }
 
 static void
@@ -172,6 +246,7 @@ g_vfs_backend_cdda_finalize (GObject *object)
   //g_warning ("finalizing %p", object);
 
   release_device (cdda_backend);
+  release_metadata (cdda_backend);
 
   if (G_OBJECT_CLASS (g_vfs_backend_cdda_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_backend_cdda_parent_class)->finalize) (object);
@@ -219,6 +294,7 @@ do_mount (GVfsBackend *backend,
   if (dbus_error_is_set (&dbus_error))
     {
       release_device (cdda_backend);
+      release_metadata (cdda_backend);
       dbus_error_free (&dbus_error);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot connect to the system bus"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -230,6 +306,7 @@ do_mount (GVfsBackend *backend,
   if (cdda_backend->hal_ctx == NULL)
     {
       release_device (cdda_backend);
+      release_metadata (cdda_backend);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create libhal context"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
@@ -242,6 +319,7 @@ do_mount (GVfsBackend *backend,
   if (!libhal_ctx_init (cdda_backend->hal_ctx, &dbus_error))
     {
       release_device (cdda_backend);
+      release_metadata (cdda_backend);
       dbus_error_free (&dbus_error);
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot initialize libhal"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
@@ -262,6 +340,7 @@ do_mount (GVfsBackend *backend,
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (cdda_backend);
+      release_metadata (cdda_backend);
       return;
     }
 
@@ -277,8 +356,11 @@ do_mount (GVfsBackend *backend,
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (cdda_backend);
+      release_metadata (cdda_backend);
       return;
     }
+
+  fetch_metadata (cdda_backend);
 
   if (cdio_cddap_open (cdda_backend->drive) != 0)
     {
@@ -287,6 +369,7 @@ do_mount (GVfsBackend *backend,
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       release_device (cdda_backend);
+      release_metadata (cdda_backend);
       return;
     }
 
@@ -362,6 +445,7 @@ do_unmount (GVfsBackend *backend,
     }
 
   release_device (cdda_backend);
+  release_metadata (cdda_backend);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -753,6 +837,7 @@ set_info_for_track (GVfsBackendCdda *cdda_backend, GFileInfo *info, int track_nu
   long header_size;
   long content_size;
   GIcon *icon;
+  GVfsBackendCddaTrack *track;
 
   first = cdio_cddap_track_firstsector (cdda_backend->drive, track_num);
   last = cdio_cddap_track_lastsector (cdda_backend->drive, track_num);
@@ -773,11 +858,22 @@ set_info_for_track (GVfsBackendCdda *cdda_backend, GFileInfo *info, int track_nu
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE); 
 
+  track = g_list_nth_data (cdda_backend->tracks, track_num - 1);
+  if (track) {
+    if (track->title)
+      g_file_info_set_attribute_string (info, "xattr::org.gnome.audio.title", track->title);
+    if (track->artist)
+      g_file_info_set_attribute_string (info, "xattr::org.gnome.audio.artist", track->artist);
+    g_file_info_set_attribute_uint64 (info, "xattr::org.gnome.audio.duration", track->duration);
+  }
+
   icon = g_themed_icon_new ("audio-x-generic");
   g_file_info_set_icon (info, icon);
   g_object_unref (icon);
 
 }
+
+#define SET_INFO(attr, value) if (value) g_file_info_set_attribute_string (info, attr, value);
 
 static void
 do_query_info (GVfsBackend *backend,
@@ -799,6 +895,9 @@ do_query_info (GVfsBackend *backend,
       g_file_info_set_display_name (info, _("Audio Disc")); /* TODO: fill in from metadata */
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_content_type (info, "inode/directory");
+      SET_INFO ("xattr::org.gnome.audio.title", cdda_backend->album_title);
+      SET_INFO ("xattr::org.gnome.audio.artist", cdda_backend->album_artist);
+      SET_INFO ("xattr::org.gnome.audio.genre", cdda_backend->genre);
       g_file_info_set_size (info, 0);
       icon = g_themed_icon_new ("folder");
       g_file_info_set_icon (info, icon);
