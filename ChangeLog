@@ -1,3 +1,9 @@
+=== gvfs 0.99.7 ===
+
+2008-09-09  Hans Petter Jansson  <hpj@novell.com>
+
+	* NEWS: Update for 0.99.7.
+
 2008-09-05  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendcdda.c (track_free), (release_metadata),
