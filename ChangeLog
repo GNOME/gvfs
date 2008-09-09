@@ -1,3 +1,10 @@
+=== gvfs 0.99.7.1 ===
+
+2008-09-09  Bastien Nocera  <hadess@hadess.net>
+
+	* NEWS: upd
+	* configure.ac: 0.99.7.1
+
 2008-09-02  David Zeuthen  <davidz@redhat.com>
 
 	* monitor/hal/ghaldrive.c: (g_hal_drive_eject_do):

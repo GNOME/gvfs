@@ -1,3 +1,14 @@
+Major changes in 0.99.7.1
+=========================
+
+* Go back to using powers of 10 instead of powers of 2 for display sizes.
+  This means we will agree with printed sizes for most devices (e.g. memory
+  sticks will now correctly report "64MB volume" instead of previous
+  "61.7MB volume").
+
+* Bug fixes:
+  546971 - rhythmbox crashed when ejecting an ipod device
+
 Major changes in 0.99.6
 =======================
 
