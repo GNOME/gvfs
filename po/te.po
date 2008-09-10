@@ -1,0 +1,1539 @@
+# translation of te.po to Telugu
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Krishna Babu K <kkrothap@redhat.com>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: te\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-09-10 04:14+0000\n"
+"PO-Revision-Date: 2008-09-10 12:58+0530\n"
+"Last-Translator: Krishna Babu K <kkrothap@redhat.com>\n"
+"Language-Team: Telugu <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
+msgid "Operation not supported, files on different mounts"
+msgstr "కార్యము మద్దతీయబడదు, దస్త్రములు భిన్నమైన మౌంట్‌లనందు వున్నవి"
+
+#: ../client/gdaemonfile.c:787
+msgid "Invalid return value from get_info"
+msgstr "get_info నుండి చెల్లని తిరుగు విలువ"
+
+#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
+msgid "Invalid return value from query_info"
+msgstr "query_info నుండి చెల్లని తిరుగు విలువ"
+
+#: ../client/gdaemonfile.c:894
+msgid "Couldn't get stream file descriptor"
+msgstr "స్ట్రీమ్ దస్త్రం వివరణిని పొందలేకపోయింది"
+
+#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
+#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
+msgid "Invalid return value from open"
+msgstr "తెరువుట నుండి చెల్లని తిరుగు విలువ"
+
+#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:2220
+msgid "Didn't get stream file descriptor"
+msgstr "స్ట్రీమ్ దస్త్రం వివరిణిని పొందలేదు"
+
+#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
+msgid "Invalid return value from call"
+msgstr "కాల్ నుండి చెల్లని తిరుగు విలువ"
+
+#: ../client/gdaemonfile.c:1534
+msgid "Invalid return value from get_filesystem_info"
+msgstr "get_filesystem_info నుండి చెల్లని తిరుగు విలువ"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1647
+msgid "Could not find enclosing mount"
+msgstr "ఎన్‌క్లోసింగ్ మౌంట్ ను కనుగొనలేక పోయింది"
+
+#: ../client/gdaemonfile.c:1677
+#, c-format
+msgid "Invalid filename %s"
+msgstr "సరికాని దస్త్రనామము %s"
+
+#: ../client/gdaemonfile.c:1719
+msgid "Invalid return value from query_filesystem_info"
+msgstr "query_filesystem_info నుండి సరికాని తిరుగు విలువ"
+
+#: ../client/gdaemonfile.c:2142
+msgid "Invalid return value from monitor_dir"
+msgstr "monitor_dir నుండి సరికాని తిరుగు విలువ"
+
+#: ../client/gdaemonfile.c:2191
+msgid "Invalid return value from monitor_file"
+msgstr "monitor_file నుండి సరికాని తిరుగు విలువ"
+
+#: ../client/gdaemonfileinputstream.c:450
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1300
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:402
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "స్ట్రీమ్ నియమం నందు దోషం: %s"
+
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1064
+msgid "End of stream"
+msgstr "స్ట్రీమ్ యొక్క ముగింపు"
+
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
+#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
+#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
+#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
+#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
+#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
+#: ../daemon/gvfsbackendsmb.c:1069 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+msgid "Operation was cancelled"
+msgstr "కార్యము రద్దుచేయబడింది"
+
+#: ../client/gdaemonfileinputstream.c:1207
+#: ../client/gdaemonfileoutputstream.c:942
+msgid "Seek not supported on stream"
+msgstr "స్ట్రీమ్ పై సీక్ మద్దతీయబడదు"
+
+#: ../client/gdaemonfileinputstream.c:1237
+msgid "The query info operation is not supported"
+msgstr "సవాలు సమాచారం కార్యము మద్దతీయబడదు"
+
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr "క్వరీ సమాచారం స్ట్రీమ్‌నందు మద్దతీయబడదు"
+
+#: ../client/gdaemonvfs.c:757
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "మౌంట్ సమాచారాన్ని పొందునప్పుడు దోషం: %s"
+
+#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "డెమోన్ కు అనుసంధానించబడుతున్నప్పుడు దోషం: %s"
+
+#: ../common/gsysutils.c:136
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "సాకెట్ సృష్టించుటలో దోషం: %s"
+
+#: ../common/gsysutils.c:174
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "సాకెట్ కు అనుసంధానించుటలో దోషం: %s"
+
+#: ../common/gvfsdaemonprotocol.c:515
+msgid "Invalid file info format"
+msgstr "సరికాని దస్త్రం సమాచారం రూపం"
+
+#: ../common/gvfsdaemonprotocol.c:532
+msgid "Invalid attribute info list content"
+msgstr "చెల్లని యాట్రిబ్యూట్ సమాచారం జాబితా సారం"
+
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr "D-Bus కు అనుసంధానించుటలో దోషం: %s"
+
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+#: ../daemon/daemon-main.c:78
+#, c-format
+msgid "%s Filesystem Service"
+msgstr "%s ఫైల్‌సిస్టమ్ సేవ"
+
+#: ../daemon/daemon-main.c:97
+#, c-format
+msgid "Error: %s"
+msgstr "దోషం: %s"
+
+#: ../daemon/daemon-main.c:131
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "ఉపయోగం: %s --స్పానర్ dbus-id object_path"
+
+#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "ఉపయోగం: %s key=value key=value ..."
+
+#: ../daemon/daemon-main.c:171
+#, c-format
+msgid "No mount type specified"
+msgstr "ఏ మౌంట్ రకం తెలుపలేదు"
+
+#: ../daemon/daemon-main.c:241
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "%s కొరకు మౌంట్‌సూచి ఇప్పటికే నడుస్తోంది"
+
+#: ../daemon/daemon-main.c:252
+msgid "error starting mount daemon"
+msgstr "మౌంట్ డెమోన్ ను ప్రారంభించుటలో దోషం"
+
+#. FIXME: this should really be "/ in %s", but can't change
+#. due to string freeze.
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:963
+#: ../daemon/gvfsbackendsftp.c:1894
+#, c-format
+msgid "/ on %s"
+msgstr "%s పై /"
+
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1479
+#: ../daemon/gvfsbackendsftp.c:1553
+msgid "No hostname specified"
+msgstr "ఏ అతిధేయనామము తెలుపబడలేదు"
+
+#: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
+#: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
+#: ../daemon/gvfsbackendsmb.c:605
+msgid "Invalid mount spec"
+msgstr "చెల్లని మౌంట్ స్పెక్"
+
+#: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
+#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:822
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendftp.c:2101 ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
+#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1116
+#, c-format
+msgid "File doesn't exist"
+msgstr "దస్త్రం లేదు"
+
+#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:912 ../daemon/gvfsbackendnetwork.c:637
+msgid "The file is not a directory"
+msgstr "ఆ దస్త్రము సంచయంకాదు"
+
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr "వ్రాయుము"
+
+#: ../daemon/gvfsbackendburn.c:376
+msgid "Unable to create temporary directory"
+msgstr "తాత్కాలిక సంచయాన్ని సృష్టించలేదు"
+
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
+#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:2706
+#, c-format
+msgid "No such file or directory"
+msgstr "అటువంటి దస్త్రముగాని లేదా సంచయంగాని లేదు"
+
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2043
+msgid "Directory not empty"
+msgstr "సంచయం ఖాళీగా లేదు"
+
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
+msgid "Can't copy file over directory"
+msgstr "సంచయంనుండి దస్త్రమును నకలుతీయలేము"
+
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:651
+msgid "CD/DVD Creator"
+msgstr "CD/DVD సృష్టీకరణి"
+
+#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2780
+msgid "File exists"
+msgstr "దస్త్రం ఉంది"
+
+#: ../daemon/gvfsbackendburn.c:829 ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:169
+#: ../daemon/gvfsjobcreatemonitor.c:140 ../daemon/gvfsjobcreatemonitor.c:151
+#: ../daemon/gvfsjobcreatemonitor.c:174 ../daemon/gvfsjobcreatemonitor.c:192
+#: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
+#: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
+#: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
+#: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
+#: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
+#: ../daemon/gvfsjobpull.c:173 ../daemon/gvfsjobpush.c:173
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "బ్యాక్ఎండ్ చేత కార్యము మద్దతునీయబడదు"
+
+#: ../daemon/gvfsbackendburn.c:854
+msgid "No such file or directory in target path"
+msgstr "లక్ష్య మార్గమునందు అటువంటి దస్త్రముగాని లేదా సంచయంగాని లేదు"
+
+#: ../daemon/gvfsbackendburn.c:877
+msgid "Can't copy directory over directory"
+msgstr "సంచయంనందు సంచయంను నకలుతీయలేము"
+
+#: ../daemon/gvfsbackendburn.c:886
+msgid "Target file exists"
+msgstr "లక్ష్యపు దస్త్రము ఉంది"
+
+#: ../daemon/gvfsbackendburn.c:893
+msgid "Can't recursively copy directory"
+msgstr "సంచయంను మరలమరలా నకలు తీయలేము"
+
+#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendgphoto2.c:2360
+#: ../daemon/gvfsbackendgphoto2.c:2569 ../daemon/gvfsbackendgphoto2.c:2666
+#: ../daemon/gvfsbackendgphoto2.c:2759
+msgid "Not supported"
+msgstr "మద్దతీయబడదు"
+
+#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1403
+msgid "Cannot connect to the system bus"
+msgstr "సిస్టమ్ బస్‌కు అనుసంధానం కాలేదు"
+
+#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1415
+msgid "Cannot create libhal context"
+msgstr "libhal సందర్భంను సృష్టించలేదు"
+
+#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1428
+msgid "Cannot initialize libhal"
+msgstr "libhalను సిద్దము చేయలేదు"
+
+#: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
+msgid "No drive specified"
+msgstr "ఏ డ్రైవ్ తెలుపబడలేదు"
+
+#: ../daemon/gvfsbackendcdda.c:276
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "డ్రైవ్ %s ను కనుగొనలేకపోయింది"
+
+#: ../daemon/gvfsbackendcdda.c:286
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "డ్రైవ్ %s ఆడియో దస్త్రములను కలిగిలేదు"
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:294
+#, c-format
+msgid "cdda mount on %s"
+msgstr "cdda %sనందు మౌంట్ అయినది"
+
+#: ../daemon/gvfsbackendcdda.c:295 ../daemon/gvfsbackendcdda.c:799
+#: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:233
+#: ../monitor/hal/ghalvolume.c:254
+#, c-format
+msgid "Audio Disc"
+msgstr "ఆడియో డిస్కు"
+
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1656
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "దస్త్ర వ్యవస్థ రద్దీగా ఉంది: %d తెరిచిన దస్త్రం"
+msgstr[1] "దస్త్ర వ్యవస్థ రద్దీగా ఉంది: %d తెరిచిన దస్త్రం"
+
+#: ../daemon/gvfsbackendcdda.c:546
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "%2$s డ్రై నందు %1$s లాంటి దస్త్రం లేదు"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:655
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr "డ్రైవ్ %s పైన 'paranoia' నుండి దోషం"
+
+#: ../daemon/gvfsbackendcdda.c:718
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "డ్రైవ్ %s పైన స్ట్రీమ్ నందు దోషం వెతుకుతోంది"
+
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1713
+#, c-format
+msgid "No such file"
+msgstr "అటువంటి దస్త్రం లేదు"
+
+#: ../daemon/gvfsbackendcdda.c:829
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "ఆ దస్త్రం లేదు లేదా అది ఆడియో ట్రాక్ కాదు"
+
+#: ../daemon/gvfsbackendcdda.c:935
+msgid "Audio CD Filesystem Service"
+msgstr "ఆడియో CD దస్త్రవ్యవస్థ సేవ"
+
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
+msgid "Computer"
+msgstr "కంప్యూటర్"
+
+#: ../daemon/gvfsbackendcomputer.c:466
+msgid "Filesystem"
+msgstr "దస్త్రవ్యవస్థ"
+
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
+#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendtrash.c:678 ../daemon/gvfsbackendtrash.c:1786
+msgid "Can't open directory"
+msgstr "సంచయంను తెరువలేదు"
+
+#: ../daemon/gvfsbackendcomputer.c:594 ../daemon/gvfsbackendcomputer.c:732
+msgid "Can't open mountable file"
+msgstr "మౌంటబుల్ దస్త్రాన్ని తెరువలేదు"
+
+#: ../daemon/gvfsbackendcomputer.c:780 ../daemon/gvfsbackendsftp.c:1037
+#, c-format
+msgid "Internal error: %s"
+msgstr "అంతర్గత దోషం: %s"
+
+#: ../daemon/gvfsbackendcomputer.c:812 ../daemon/gvfsbackendcomputer.c:929
+msgid "Can't mount file"
+msgstr "దస్త్రాన్ని మౌంట్ చేయలేము"
+
+#: ../daemon/gvfsbackendcomputer.c:824
+msgid "No media in the drive"
+msgstr "డ్రైవ్‌నందు యెటువంటి మాధ్యమం లేదు"
+
+#: ../daemon/gvfsbackendcomputer.c:881 ../daemon/gvfsbackendcomputer.c:972
+#: ../daemon/gvfsbackendcomputer.c:1072
+msgid "Not a mountable file"
+msgstr "మౌంటబుల్ దస్త్రం కాదు"
+
+#: ../daemon/gvfsbackendcomputer.c:987
+msgid "Can't unmount file"
+msgstr "దస్త్రాన్ని అన్‌మౌంట్ చేయలేము"
+
+#: ../daemon/gvfsbackendcomputer.c:1103
+msgid "Can't eject file"
+msgstr "దస్త్రాన్ని బయటకు పంపలేము"
+
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackendhttp.c:245
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "HTTP దోషం: %s"
+
+#: ../daemon/gvfsbackenddav.c:520
+msgid "Could not parse response"
+msgstr "ప్రతిస్పందనను పార్శ్  చేయలేము"
+
+#: ../daemon/gvfsbackenddav.c:529
+msgid "Empty response"
+msgstr "ఖాళీ ప్రతిస్పందన"
+
+#: ../daemon/gvfsbackenddav.c:537
+msgid "Unexpected reply from server"
+msgstr "సేవికనుండి అనుకోని ప్రత్యుత్తరము"
+
+#: ../daemon/gvfsbackenddav.c:1156 ../daemon/gvfsbackenddav.c:1658
+msgid "Response invalid"
+msgstr "ప్రతిస్పందన చెల్లనిది"
+
+#: ../daemon/gvfsbackenddav.c:1299
+msgid "WebDAV share"
+msgstr "WebDAV భాగస్వామ్యం"
+
+#: ../daemon/gvfsbackenddav.c:1301
+#, c-format
+msgid "Enter password for %s"
+msgstr "%s కొరకు సంకేతపదాన్ని ప్రవేశపెట్టుము"
+
+#: ../daemon/gvfsbackenddav.c:1304
+msgid "Please enter proxy password"
+msgstr "ప్రాక్సీ సంకేతపదంను ప్రవేశపెట్టండి"
+
+#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackenddav.c:1531
+msgid "Not a WebDAV enabled share"
+msgstr "అది WebDAV చేతనమైన భాగస్వామ్యంకాదు"
+
+#: ../daemon/gvfsbackenddav.c:1554
+#, c-format
+msgid "WebDAV on %s"
+msgstr "%s నందు WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:1614 ../daemon/gvfsbackenddav.c:1687
+msgid "Could not create request"
+msgstr "అభ్యర్ధనను సృష్టించలేక పోయింది"
+
+#: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
+#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
+#: ../daemon/gvfsbackendsmb.c:1804
+msgid "Target file already exists"
+msgstr "లక్ష్యపు దస్త్రం ఇప్పటికే ఉంది"
+
+#: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackendsmb.c:1038
+msgid "The file was externally modified"
+msgstr "ఆ దస్త్రం బహిర్గతంగా సవరించబడింది"
+
+#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackendsmb.c:1821
+msgid "Backup file creation failed"
+msgstr "బ్యాక్‌అప్ దస్త్రం సృష్టీకరణ విఫలమైంది"
+
+#. TODO: Name
+#: ../daemon/gvfsbackenddnssd.c:433
+msgid "dns-sd"
+msgstr "dns-sd"
+
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
+msgid "Can't monitor file or directory."
+msgstr "దస్త్రమును లేదా డైరెక్టరీని పర్యవేక్షించలేదు."
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:687
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+msgid "Network"
+msgstr "నెట్ వర్క్"
+
+#: ../daemon/gvfsbackendftp.c:236
+msgid "Accounts are unsupported"
+msgstr "ఖాతాలు మద్దతీయనివి"
+
+#: ../daemon/gvfsbackendftp.c:240
+msgid "Host closed connection"
+msgstr "హోస్ట్‍ అనుసంధానంను మూసివేసినది"
+
+#: ../daemon/gvfsbackendftp.c:244
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "డాటా అనుసంధానంను తెరువలేదు. బహుశా మీ ఫైర్‌వాల్ దీనిని నిరోధిస్తోందా?"
+
+#: ../daemon/gvfsbackendftp.c:248
+msgid "Data connection closed"
+msgstr "డాటా అనుసంధానం ముయబడింది"
+
+#: ../daemon/gvfsbackendftp.c:255 ../daemon/gvfsbackendftp.c:259
+msgid "Operation failed"
+msgstr "ఆపరేషన్ విఫలమైంది"
+
+#: ../daemon/gvfsbackendftp.c:264
+msgid "No space left on server"
+msgstr "సేవికనందు ఖాళీ మిగిలిలేదు"
+
+#: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
+msgid "Operation unsupported"
+msgstr "ఆపరేషన్ మద్దతీయుటలేదు"
+
+#: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
+msgid "Permission denied"
+msgstr "అనుమతి తిరస్కరించబడినది"
+
+#: ../daemon/gvfsbackendftp.c:280
+msgid "Page type unknown"
+msgstr "పుట రకము తెలియనిది"
+
+#: ../daemon/gvfsbackendftp.c:284 ../daemon/gvfsbackendftp.c:2211
+msgid "Invalid filename"
+msgstr "చెల్లని దస్త్రమునామము"
+
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendftp.c:364
+#: ../daemon/gvfsbackendftp.c:393 ../daemon/gvfsbackendftp.c:412
+#: ../daemon/gvfsbackendftp.c:425 ../daemon/gvfsbackendftp.c:817
+msgid "Invalid reply"
+msgstr "చెల్లని ప్రత్యుత్తరము"
+
+#: ../daemon/gvfsbackendftp.c:532
+msgid "broken transmission"
+msgstr "విరిగిన బదిలీకరణ"
+
+#: ../daemon/gvfsbackendftp.c:677 ../daemon/gvfsbackendftp.c:837
+msgid "Could not connect to host"
+msgstr "హోస్ట్‍‌కు అనుసంధానం కాలేకపోయింది"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:1337
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "%sపైన ftp కొరకు సంకేతపదమును ప్రవేశపెట్టండి"
+
+#: ../daemon/gvfsbackendftp.c:1362 ../daemon/gvfsbackendsftp.c:874
+msgid "Password dialog cancelled"
+msgstr "సంకేతపదం డైలాగ్ రద్దుచేయబడింది"
+
+#: ../daemon/gvfsbackendftp.c:1441
+#, c-format
+msgid "ftp on %s"
+msgstr "%s పైన ftp"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1445
+#, c-format
+msgid "ftp as %s on %s"
+msgstr "%2$s పైన %1$sలా ftp"
+
+#: ../daemon/gvfsbackendftp.c:1529 ../daemon/gvfsbackendsftp.c:1958
+#: ../daemon/gvfsbackendsftp.c:3550
+msgid "File is directory"
+msgstr "దస్త్రము సంచయం"
+
+#: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
+msgid "backups not supported yet"
+msgstr "బ్యాక్అప్స్‍ యింకా మద్దతునీయుటలేదు"
+
+#: ../daemon/gvfsbackendftp.c:1828
+msgid "filename too long"
+msgstr "దస్త్రమునామము మరీ పొడవైనది"
+
+#: ../daemon/gvfsbackendftp.c:2345
+msgid "Invalid destination filename"
+msgstr "గమ్య దస్త్రనామము చెల్లనిది"
+
+#: ../daemon/gvfsbackendgphoto2.c:501
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr "%s: %d: డైరెక్టరీ లేదా దస్త్రము వుంది"
+
+#: ../daemon/gvfsbackendgphoto2.c:508
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr "%s: %d: అటువంటి దస్త్రము లేదా డైరక్టరీ లేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:514
+#, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "%s: %d: చెల్లని దస్త్రనామము"
+
+#: ../daemon/gvfsbackendgphoto2.c:520
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr "%s: %d: మద్దతీయుటలేదు"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:693
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "డిజిటల్ కామెరా(%s)"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:841 ../monitor/gphoto2/ggphoto2volume.c:183
+#, c-format
+msgid "%s Camera"
+msgstr "%s కేమెరా"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
+#, c-format
+msgid "%s Audio Player"
+msgstr "%s ఆడియో ప్లేయర్"
+
+#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:192
+msgid "Camera"
+msgstr "కేమెరా"
+
+#: ../daemon/gvfsbackendgphoto2.c:855 ../monitor/gphoto2/ggphoto2volume.c:190
+msgid "Audio Player"
+msgstr "ఆడియో ప్లేయర్"
+
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2014
+msgid "Failed to get folder list"
+msgstr "సంచయం జాబితాను పొందుటలో విఫలమైంది"
+
+#: ../daemon/gvfsbackendgphoto2.c:1443
+msgid "No device specified"
+msgstr "ఎటువంచి పరికరము తెలుపబడలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:1460
+msgid "Cannot create gphoto2 context"
+msgstr "gphoto2 సందర్భంను సృష్టించలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:1470
+msgid "Error creating camera"
+msgstr "కామెరా సృష్టించుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1483 ../daemon/gvfsbackendgphoto2.c:1493
+msgid "Error loading device information"
+msgstr "పరికరము సమాచారం లోడ్‌చేయుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1505
+msgid "Error looking up device information"
+msgstr "పరికరము సమాచారం చూడుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1515
+msgid "Error getting device information"
+msgstr "పరికరము సమాచారం పొందుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1528
+msgid "Error setting up camera communications port"
+msgstr "కామెరా సంప్రదింపుల పోర్ట్‍‌ను అమర్చుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1539
+msgid "Error initializing camera"
+msgstr "కామెరాను సిద్దముచేయుటలో దోషము"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:1553
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "%s పై gphoto2 మౌంట్"
+
+#: ../daemon/gvfsbackendgphoto2.c:1628
+msgid "No camera specified"
+msgstr "ఎటువంటి కామెరా తెలుపబడలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:1721
+msgid "Error creating file object"
+msgstr "దస్త్రము ఆబ్జక్‌ను సృష్టించుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1736
+msgid "Error getting file"
+msgstr "దస్త్రమును పొందుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1746
+msgid "Error getting data from file"
+msgstr "దస్త్రమునుండి డాటాను పొందుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
+#, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr "కామెరా %s నందు స్ట్రీమ్ సీకింగ్ దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
+msgid "Not a directory"
+msgstr "సంచయం కాదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:2080
+msgid "Failed to get file list"
+msgstr "దస్త్రము జాబితాను పొందుటలో విఫలమైంది"
+
+#: ../daemon/gvfsbackendgphoto2.c:2372
+msgid "Error creating directory"
+msgstr "డైరెక్టరీ సృష్టించుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:2581
+msgid "Name already exists"
+msgstr "నామము యిప్పటికే వుంది"
+
+#: ../daemon/gvfsbackendgphoto2.c:2592 ../daemon/gvfsbackendgphoto2.c:3221
+msgid "New name too long"
+msgstr "కొత్త నామము మరీ పొడవైనది"
+
+#: ../daemon/gvfsbackendgphoto2.c:2602 ../daemon/gvfsbackendgphoto2.c:3232
+msgid "Error renaming dir"
+msgstr "డైరెక్టరీ పునఃనామకరణ చేయుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3245
+msgid "Error renaming file"
+msgstr "దస్త్రము పునఃనామకరణలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:2679
+#, c-format
+msgid "Directory '%s' is not empty"
+msgstr "డైరెక్టరీ '%s'లో ఖాళీలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:2690
+msgid "Error deleting directory"
+msgstr "డైరక్టీ తొలగించుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:2716
+msgid "Error deleting file"
+msgstr "దస్త్రము తొలగించుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:2769
+msgid "Can't write to directory"
+msgstr "డైరక్టరీకి వ్రాయలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:2816
+msgid "Cannot allocate new file to append to"
+msgstr "దీనికి కలుపుటకు కొత్త దస్త్రమును కేటాయించలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:2831
+msgid "Cannot read file to append to"
+msgstr "దీనికి కలుపుటకు దస్త్రమును చదువలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:2842
+msgid "Cannot get data of file to append to"
+msgstr "దీనికి కలుపుటకు దస్త్రముయొక్క డాటాను పొందలేదు"
+
+#: ../daemon/gvfsbackendgphoto2.c:3129
+msgid "Error writing file"
+msgstr "దస్త్రముకు వ్రాయుటలో దోషము"
+
+#: ../daemon/gvfsbackendgphoto2.c:3177
+msgid "Not supported (not same directory)"
+msgstr "మద్దతీయుటలేదు (అదే డైరక్టరీకాదు)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3189
+msgid "Not supported (src is dir, dst is dir)"
+msgstr "మద్దతీయుటలేదు (మూలం డైరెక్టరీనే, గమ్యం డైరక్టరీనే)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3197
+msgid "Not supported (src is dir, dst is existing file)"
+msgstr "మద్దతీయుట లేదు (మూలం డైరెక్టరీ, గమ్యం కలిగివున్న దస్త్రము)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3209
+msgid "Not supported (src is file, dst is dir)"
+msgstr "మద్దతీయుటలేదు (మూలం దస్త్రము, గమ్యం డైరెక్టరీ)"
+
+#: ../daemon/gvfsbackendhttp.c:241
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "HTTP కక్షిదారి దోషం: %s"
+
+#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
+#: ../daemon/gvfsbackendsmb.c:1301 ../daemon/gvfsbackendtrash.c:1006
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (సరికాని ఎన్కోడింగ్)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr "సంచయం ప్రకటన మద్దతిచ్చునదికాదు"
+
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
+msgid "Windows Network"
+msgstr "విండోస్ నెట్వర్కు"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:392
+msgid "Local Network"
+msgstr "స్థానిక నెట్వర్క్‍"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:862
+msgid "Network Location Monitor"
+msgstr "నెట్వర్క్‍ స్థానము పర్యవేక్షణి"
+
+#. Mount was successful
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:557
+#: ../daemon/gvfsbackendsmb.c:1294
+#, c-format
+msgid "%s on %s"
+msgstr "%s పైన %s"
+
+#: ../daemon/gvfsbackendobexftp.c:699
+msgid "Connection to the device lost"
+msgstr "పరికరమునకు అనుసంధానం కోల్పోయింది"
+
+#: ../daemon/gvfsbackendobexftp.c:1194
+msgid "Device requires a software update"
+msgstr "పరికరంకు సాఫ్ట్‍‌వేర్ నవీకరణ అవసరము"
+
+#: ../daemon/gvfsbackendsftp.c:281
+msgid "ssh program unexpectedly exited"
+msgstr "ssh ప్రోగ్రామ్ అనుకోకుండా బయటకువచ్చింది"
+
+#: ../daemon/gvfsbackendsftp.c:296
+msgid "Hostname not known"
+msgstr "అతిధేయనామము తెలియనిది"
+
+#: ../daemon/gvfsbackendsftp.c:303
+msgid "No route to host"
+msgstr "అతిధేయ కు ఏ రూట్ లేదు"
+
+#: ../daemon/gvfsbackendsftp.c:310
+msgid "Connection refused by server"
+msgstr "సేవిక చేత అనుసంధానం తిరస్కరించబడింది"
+
+#: ../daemon/gvfsbackendsftp.c:317
+msgid "Host key verification failed"
+msgstr "అతిధేయ కీ నిర్ధారణ విఫలమైంది"
+
+#: ../daemon/gvfsbackendsftp.c:400
+msgid "Unable to spawn ssh program"
+msgstr "ssh ప్రోగ్రమ్ ను విస్తరింప లేదు"
+
+#: ../daemon/gvfsbackendsftp.c:416
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "ssh ప్రోగ్రామ్ ను విస్తరింపలేదు: %s"
+
+#: ../daemon/gvfsbackendsftp.c:528 ../daemon/gvfsbackendsftp.c:780
+msgid "Timed out when logging in"
+msgstr "లాగిన్ అవుతున్నప్పుడు కాలముమించినది"
+
+#: ../daemon/gvfsbackendsftp.c:858
+msgid "Enter passphrase for key"
+msgstr "కీ కొరకు సంకేతపదాన్ని ప్రవేశపెట్టండి"
+
+#: ../daemon/gvfsbackendsftp.c:860
+msgid "Enter password"
+msgstr "రహస్య పదమును ప్రవేశపెట్టండి"
+
+#: ../daemon/gvfsbackendsftp.c:921
+msgid "Can't send password"
+msgstr "సంకేతపదాన్ని పంపలేదు"
+
+#: ../daemon/gvfsbackendsftp.c:929
+msgid "Log In Anyway"
+msgstr "ఏవిధంగానైనా లాగిన్ అవ్వుము"
+
+#: ../daemon/gvfsbackendsftp.c:929
+msgid "Cancel Login"
+msgstr "లాగిన్ రద్దుచేయుము"
+
+#: ../daemon/gvfsbackendsftp.c:939
+#, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
+msgstr ""
+"దూరస్థ కంప్యూటర్ (%s)యొక్క గుర్తింపు తెలియనిది.\n"
+"మీరు కంప్యూటర్‌కు మొదటిసారి లాగిన్ అయినప్పుడు ఇది జరుగుతుంది.\n"
+"\n"
+"దూరస్థ కంప్యూటర్ ద్వారా పంపబడిన గుర్తింపు %s. మీరు యిలా కొనసాగించుట "
+"ఖచ్చితంగా సురక్షితమైన అనుకుంటే, సిస్టమ్ నిర్వాహకుడను సంప్రదించండి."
+
+#: ../daemon/gvfsbackendsftp.c:959
+msgid "Login dialog cancelled"
+msgstr "లాగిన్ డైలాగ్ రద్దుచేయబడింది."
+
+#: ../daemon/gvfsbackendsftp.c:979
+msgid "Can't send host identity confirmation"
+msgstr "హోస్ట్‍ గుర్తింపు నిర్ధారణను పంపలేదు"
+
+#: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
+msgid "Protocol error"
+msgstr "నియమం దోషం"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1519
+#, c-format
+msgid "sftp on %s"
+msgstr "%s పై sftp"
+
+#: ../daemon/gvfsbackendsftp.c:1543
+msgid "Unable to find supported ssh command"
+msgstr "మద్దతివ్వబడే ssh ఆదేశాన్ని కనుగొనలేకపోయింది"
+
+#: ../daemon/gvfsbackendsftp.c:1967
+msgid "Failure"
+msgstr "వైఫల్యం"
+
+#: ../daemon/gvfsbackendsftp.c:2023 ../daemon/gvfsbackendsftp.c:2082
+#: ../daemon/gvfsbackendsftp.c:2093 ../daemon/gvfsbackendsftp.c:2149
+#: ../daemon/gvfsbackendsftp.c:2235 ../daemon/gvfsbackendsftp.c:2285
+#: ../daemon/gvfsbackendsftp.c:2331 ../daemon/gvfsbackendsftp.c:2406
+#: ../daemon/gvfsbackendsftp.c:2513 ../daemon/gvfsbackendsftp.c:2553
+#: ../daemon/gvfsbackendsftp.c:2603 ../daemon/gvfsbackendsftp.c:2672
+#: ../daemon/gvfsbackendsftp.c:2692 ../daemon/gvfsbackendsftp.c:2844
+#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2924
+#: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendsftp.c:3252
+#: ../daemon/gvfsbackendsftp.c:3319 ../daemon/gvfsbackendsftp.c:3448
+#: ../daemon/gvfsbackendsftp.c:3483 ../daemon/gvfsbackendsftp.c:3511
+#: ../daemon/gvfsbackendsftp.c:3619 ../daemon/gvfsbackendsftp.c:3673
+#: ../daemon/gvfsbackendsftp.c:3707 ../daemon/gvfsbackendsftp.c:3741
+#: ../daemon/gvfsbackendsftp.c:3756 ../daemon/gvfsbackendsftp.c:3771
+#: ../daemon/gvfsbackendsftp.c:3849
+msgid "Invalid reply received"
+msgstr "చెల్లని ప్రత్యుత్తరం స్వీకరించబడింది"
+
+#: ../daemon/gvfsbackendsftp.c:2351
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "బ్యాక్‌అప్ దస్త్రం సృష్టించటలో దోషం: %s"
+
+#: ../daemon/gvfsbackendsftp.c:2754
+msgid "Unable to create temporary file"
+msgstr "తాత్కాలిక దస్త్రాన్ని సృష్టించలేక పోయింది"
+
+#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1793
+msgid "Can't move directory over directory"
+msgstr "సంచయంను సంచయం మీదకు కదుపలేము"
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:216
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "%2$s పైన %1$s పంచుకోవడానికి సంకేతపదం అవసరం"
+
+#: ../daemon/gvfsbackendsmb.c:471 ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "అంతర్గత దోషం (%s)"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:550
+msgid "Failed to mount Windows share"
+msgstr "విండోల భాగస్వామ్యాన్ని మౌంట్ చేయుటకు విఫలమైంది"
+
+#: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
+msgid "Unsupported seek type"
+msgstr "మద్దతీయబడని సీక్ రకము"
+
+#: ../daemon/gvfsbackendsmb.c:1237
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "బ్యాక్అప్ దస్త్రము సృష్టీకరణ విఫలమైంది: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1695
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "దస్త్రము తొలగించుటలో దోషం: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1769
+#, c-format
+msgid "Error moving file: %s"
+msgstr "దస్త్రము కదుపుటలో దోషం: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1841
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "లక్ష్యపు దస్త్రంను తీసివేయుటలో దోషం: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1865
+msgid "Can't recursively move directory"
+msgstr "సంచయంను మరలమరలా కదుపలేము"
+
+#: ../daemon/gvfsbackendsmb.c:1928
+msgid "Windows Shares Filesystem Service"
+msgstr "విండోలు దస్త్రవ్యవస్థ సేవను పంచుకొంటాయి"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:707
+#, c-format
+msgid "Windows shares on %s"
+msgstr "%s పైన విండోస్ భాగస్వామ్యం"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
+msgid "The file is not a mountable"
+msgstr "ఆ దస్త్రం మౌంటవునది కాదు"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:867
+msgid "Not a regular file"
+msgstr "సాదారణ దస్త్రం కాదు"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1224
+msgid "Windows Network Filesystem Service"
+msgstr "విండోస్ నెట్వర్క్‍ దస్త్రవ్యవస్థ సేవ"
+
+#. translators: This is the name of the backend
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
+msgid "Trash"
+msgstr "చెత్తకుండి"
+
+#: ../daemon/gvfsbackendtrash.c:1019
+#, c-format
+msgid "%s (in trash)"
+msgstr "%s (ట్రాష్ నందు)"
+
+#: ../daemon/gvfsbackendtrash.c:1330
+msgid "Can't delete trash"
+msgstr "చెత్తను తొలగించ లేదు"
+
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
+msgid "Trash directory notification not supported"
+msgstr "చెత్త సంచయం యొక్క ప్రకటన మద్దతునీయదు"
+
+#: ../daemon/gvfsdaemon.c:1032
+msgid "Invalid backend type"
+msgstr "చెల్లని బ్యాక్ఎండ్ రకం"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "fd పంపుటలో దోషం: %s"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "బ్యాక్ఎండ్ ద్వారా సిమ్‌లింక్స్  మద్దతునీయబడవు"
+
+#: ../daemon/gvfsjobsetattribute.c:120
+msgid "Invalid dbus message"
+msgstr "సరికాని dbus సందేశం"
+
+#: ../daemon/main.c:45
+msgid "Replace old daemon."
+msgstr "ాత డెమోన్ ను పునఃస్థాపించుమ.ు"
+
+#: ../daemon/main.c:46
+msgid "Don't start fuse."
+msgstr "ఫ్యూజ్ ను ప్రారంభించ వద్దు."
+
+#: ../daemon/main.c:58
+msgid "GVFS Daemon"
+msgstr "GVFS డెమోన్"
+
+#: ../daemon/main.c:61
+msgid "Main daemon for GVFS"
+msgstr "GVFS కొరకు ముఖ్య డెమోన్"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:76
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
+#: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-tree.c:251
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "ఎక్కువ సమాచారం కొరకు \"%s --సహాయం\" ను ప్రయత్నించండి."
+
+#: ../daemon/mount.c:439
+msgid "Invalid arguments from spawned child"
+msgstr "ఉద్బవించిన శిశువునుండి చెల్లని ఆర్గుమెంట్లు"
+
+#: ../daemon/mount.c:740
+#, c-format
+msgid "Automount failed: %s"
+msgstr "స్వయంచాలకమౌంట్ విఫలమైంది: %s"
+
+#: ../daemon/mount.c:785
+msgid "The specified location is not mounted"
+msgstr "తెలుపబడిన స్థానము మౌంట్ కాలేదు"
+
+#: ../daemon/mount.c:790
+msgid "The specified location is not supported"
+msgstr "తెలుపబడిన స్థానము మద్దతివ్వబడలేదు"
+
+#: ../daemon/mount.c:954
+msgid "Location is already mounted"
+msgstr "స్థానము ఇప్పటికే మౌంటుఅయిఉంది"
+
+#: ../daemon/mount.c:962
+msgid "Location is not mountable"
+msgstr "స్థానము మౌంటగునది కాదు"
+
+#: ../monitor/hal/ghaldrive.c:130
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../monitor/hal/ghaldrive.c:132
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../monitor/hal/ghaldrive.c:134
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../monitor/hal/ghaldrive.c:138
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../monitor/hal/ghaldrive.c:140
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../monitor/hal/ghaldrive.c:142
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../monitor/hal/ghaldrive.c:144
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../monitor/hal/ghaldrive.c:146
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../monitor/hal/ghaldrive.c:148
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../monitor/hal/ghaldrive.c:151
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../monitor/hal/ghaldrive.c:154
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../monitor/hal/ghaldrive.c:156
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../monitor/hal/ghaldrive.c:158
+msgid "HDDVD-r"
+msgstr "HDDVD-r"
+
+#: ../monitor/hal/ghaldrive.c:160
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../monitor/hal/ghaldrive.c:162
+msgid "Blu-ray"
+msgstr "Blu-ray"
+
+#: ../monitor/hal/ghaldrive.c:164
+msgid "Blu-ray-R"
+msgstr "Blu-ray-R"
+
+#: ../monitor/hal/ghaldrive.c:166
+msgid "Blu-ray-RE"
+msgstr "Blu-ray-RE"
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../monitor/hal/ghaldrive.c:172
+#, c-format
+msgid "%s/%s Drive"
+msgstr "%s/%s డ్రైవ్"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../monitor/hal/ghaldrive.c:178
+#, c-format
+msgid "%s Drive"
+msgstr "%s డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:182
+msgid "Floppy Drive"
+msgstr "ఫ్లాపీ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:188
+msgid "Software RAID Drive"
+msgstr "సాఫ్టువేర్ RAID డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:190
+msgid "USB Drive"
+msgstr "USB డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:192
+msgid "ATA Drive"
+msgstr "ATA డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:194
+msgid "SCSI Drive"
+msgstr "SCSI డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:196
+msgid "FireWire Drive"
+msgstr "ఫైర్‌వైర్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:200
+msgid "Tape Drive"
+msgstr "టేప్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:202
+msgid "CompactFlash Drive"
+msgstr "కాంపాక్ట్‌ఫ్లాష్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:204
+msgid "MemoryStick Drive"
+msgstr "మెమొరీస్టిక్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:206
+msgid "SmartMedia Drive"
+msgstr "స్మార్ట్‌మాద్యమం డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:208
+msgid "SD/MMC Drive"
+msgstr "SD/MMC డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:210
+msgid "Zip Drive"
+msgstr "జిప్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:212
+msgid "Jaz Drive"
+msgstr "జాజ్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:214
+msgid "Thumb Drive"
+msgstr "థంబ్ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:217
+msgid "Mass Storage Drive"
+msgstr "అధిక నిల్వ డ్రైవ్"
+
+#: ../monitor/hal/ghaldrive.c:723
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"మాద్యమాన్ని బయటకు పంపుట విఫలమైంది, మాద్యమం పైని ఒకటి లేదా ఎక్కువ వాల్యూమ్స్ "
+"రద్దీగా ఉన్నాయి."
+
+#: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kB"
+
+#: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:176
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:181
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:252
+msgid "Mixed Audio/Data Disc"
+msgstr "మిశ్రమ ఆడియో/డాటా డిస్కు"
+
+#. Translators: %s is the size of the mount (e.g. 512 MB)
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalmount.c:446 ../monitor/hal/ghalvolume.c:263
+#, c-format
+msgid "%s Media"
+msgstr "%s మాద్యమం"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalvolume.c:240
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s ఎన్క్రిప్టెడ్ డాటా"
+
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "CD-ROM డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "ఖాళీ CD-ROM డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "CD-R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "ఖాళీ CD-R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "CD-RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "ఖాళీ CD-RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "DVD-ROM డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "ఖాళీ DVD-ROM డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "DVD-RAM డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "ఖాళీ DVD-RAM డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "DVD-RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "ఖాళీ DVD-RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "DVD+R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "ఖాళీ DVD+R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "DVD+RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "ఖాళీ DVD+RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "ఖాళీ DVD+R DL డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "Blu-Ray డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "ఖాళీ Blu-Ray డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "Blu-Ray R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "ఖాళీ Blu-Ray R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "Blu-Ray RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "ఖాళీ Blu-Ray RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "HD DVD డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "ఖాళీ HD DVD డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "HD DVD-R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "ఖాళీ HD DVD-R డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "HD DVD-RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "ఖాళీ HD DVD-RW డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
+msgid "MO Disc"
+msgstr "MO డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "ఖాళీ MO డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
+msgid "Disc"
+msgstr "డిస్కు"
+
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "ఖాళీ డిస్కు"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:57
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: దొషం దస్త్రాన్ని తెరువుటలో: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:80
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, దోషం stdout కు వ్రాస్తోంది"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:92
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: దోషం చదువుతోంది: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:110
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s:దోషం మూసివేస్తోంది: %s\n"
+
+#: ../programs/gvfs-cat.c:136
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "స్థానము... - ప్రామాణిక అవుట్‌పుట్ కు స్థానములను కలుపుట."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:141
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+"స్థానములవద్ద దస్త్రాలను కులుపుము మరియు ప్రామాణిక అవుట్‌పుట్ కు ముద్రించుము. ఇది "
+"సాంప్రదాయ cat సౌలబ్యంలాగా నే పనిచేస్తుంది, అయితే gvfs స్థానమును స్థానిక దస్త్రముల "
+"బదులుగా ఉపయోగిస్తుంది: ఉదాహరణకు మీరు smb://server/resource/file.txt వంటి "
+"దాన్ని స్థానముగా కలుపుటకొరకు ఉపయోగించవచ్చు."
+
+#: ../programs/gvfs-cat.c:148
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+"గమనిక: మీకు రూపీకరణ ఐచ్చికం -n, -T లేదా ఇతరం అవసరం అయితే cat గుండా "
+"పైప్ చేయుము."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:142
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: తప్పిపోయిన స్థానములు"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:56
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: దోషం స్థానము తెరువుటలో: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:83
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: దోషం అనువర్తనం దించుటలో: %s\n"
+
+#: ../programs/gvfs-open.c:113
+msgid "FILES... - open FILES with registered application."
+msgstr "దస్త్రములు... - నమోదైన అనువర్తనం తో దస్త్రములను తెరువుము."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:117
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
+"ఈ రకమైన దస్త్రము(ల) ను సంభాలించుటకు నమోదైన అప్రమేయ అనువర్తనంతో దస్త్రము ను "
+"తెరువుము."
+
