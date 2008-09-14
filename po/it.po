@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-14 12:50+0200\n"
-"PO-Revision-Date: 2008-09-14 13:01+0200\n"
+"PO-Revision-Date: 2008-09-14 14:55+0200\n"
 "Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
@@ -662,6 +662,8 @@ msgstr "Fotocamera digitale (%s)"
 msgid "%s Camera"
 msgstr "Fotocamera %s"
 
+# usato lettore perché tutti vendor
+# hanno "lettori mp3" nei cataloghi
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
 #: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
@@ -766,7 +768,7 @@ msgstr "Recupero dell'elenco dei file non riuscito"
 # GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:2372
 msgid "Error creating directory"
-msgstr "Errore nel crare la directory"
+msgstr "Errore nel creare la directory"
 
 # GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:2581
