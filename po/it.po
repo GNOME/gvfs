@@ -6,13 +6,15 @@
 #
 # Da glib/gio
 #   * seek --> posizionamento
+#   * stream --> lasciato come tale, cfr 
+#                http://library.gnome.org/devel/gio/stable/streaming.html
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-06 18:37+0200\n"
-"PO-Revision-Date: 2008-09-06 18:53+0200\n"
+"POT-Creation-Date: 2008-09-14 12:50+0200\n"
+"PO-Revision-Date: 2008-09-14 13:01+0200\n"
 "Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
@@ -128,10 +130,12 @@ msgstr "Posizionamento non supportato sullo stream"
 msgid "The query info operation is not supported"
 msgstr "L'operazione di interrogazione informazioni non è supportata"
 
+# GNOME-2-24
+# spero che sia così...
 #: ../client/gdaemonfileoutputstream.c:991
 #, c-format
 msgid "Query info not supported on stream"
-msgstr ""
+msgstr "Informazioni di interrogazione non supportate sullo stream"
 
 # leggendo il codice è proprio le informazioni
 # sull'oggetto GMount
@@ -744,16 +748,17 @@ msgstr "Errore nell'ottenere il file"
 msgid "Error getting data from file"
 msgstr "Errore nell'ottenere i dati dal file"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr ""
+msgstr "Errore nel posizionarsi nello stream sulla fotocamera «%s»"
 
 #: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
 msgid "Not a directory"
 msgstr "Non è una directory"
 
-# GNOME-2-4
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:2080
 msgid "Failed to get file list"
 msgstr "Recupero dell'elenco dei file non riuscito"
@@ -804,38 +809,46 @@ msgstr "Errore nell'eliminare il file"
 msgid "Can't write to directory"
 msgstr "Impossibile scrivere nella directory"
 
+# GNOME-2-24
+# non sono molto sicuro di queste tre con append...
 #: ../daemon/gvfsbackendgphoto2.c:2816
 msgid "Cannot allocate new file to append to"
-msgstr ""
+msgstr "Impossibile allocare un nuovo file su cui accodare"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:2831
 msgid "Cannot read file to append to"
-msgstr ""
+msgstr "Impossibile leggere il file su cui accodare"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:2842
 msgid "Cannot get data of file to append to"
-msgstr ""
+msgstr "Impossibile ottenere i dati del file su cui accodare"
 
 # GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:3129
 msgid "Error writing file"
 msgstr "Errore nello scrivere il file"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:3177
 msgid "Not supported (not same directory)"
-msgstr ""
+msgstr "Non supportato (non è la stessa directory)"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:3189
 msgid "Not supported (src is dir, dst is dir)"
-msgstr ""
+msgstr "Non supportato (orig è directory, dest è directory)"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:3197
 msgid "Not supported (src is dir, dst is existing file)"
-msgstr ""
+msgstr "Non supportato (orig è directory, dest è file esistente)"
 
+# GNOME-2-24
 #: ../daemon/gvfsbackendgphoto2.c:3209
 msgid "Not supported (src is file, dst is dir)"
-msgstr ""
+msgstr "Non supportato (orig è file, dest è directory)"
 
 #: ../daemon/gvfsbackendhttp.c:241
 #, c-format
@@ -1347,7 +1360,9 @@ msgstr "Unità di memorizzazione"
 #: ../monitor/hal/ghaldrive.c:723
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "Espulsione del supporto non riuscita: uno o più volumi sul supporto sono occupati."
+msgstr ""
+"Espulsione del supporto non riuscita: uno o più volumi sul supporto sono "
+"occupati."
 
 #: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
 #, c-format
