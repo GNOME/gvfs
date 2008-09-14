@@ -1,3 +1,7 @@
+2008-09-14 Goran Rakić  <grakic@devbase.net>
+
+        * LINGUAS, sr.po, sr@latin.po: Added Serbian Translation.
+
 2008-09-14  Ilkka Tuohela <hile@iki.fi>
 
 	* fi.po: Updated Finnish translation.
@@ -69,6 +73,7 @@
 
 	* fr.po: Updated French translation.
 
+>>>>>>> .r1965
 2008-08-24  Nguyễn Thái Ngọc Duy <pclouds@gmail.com>
 
 	* vi.po: Updated Vietnamese translation
