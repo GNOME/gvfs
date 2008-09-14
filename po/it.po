@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-14 12:50+0200\n"
-"PO-Revision-Date: 2008-09-14 14:55+0200\n"
+"PO-Revision-Date: 2008-09-14 19:20+0200\n"
 "Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
@@ -1549,12 +1549,13 @@ msgstr "Disco vuoto"
 msgid "%s: %s: error opening file: %s\n"
 msgstr "%s: %s: errore nell'aprire il file. %s\n"
 
+# GNOME-2-24
 #. Translators: the first %s is the program name, the
 #. second one is the URI of the file.
 #: ../programs/gvfs-cat.c:80
 #, c-format
 msgid "%s: %s, error writing to stdout"
-msgstr "%s: %s, nello scrivere su standard output"
+msgstr "%s: %s, errore nello scrivere su standard output"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
