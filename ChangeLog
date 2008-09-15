@@ -1,3 +1,9 @@
+2008-09-15  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c:
+	Don't leak the GSimpleAsyncResult in find_enclosing_mount_async.
+	Patch by Matthias Clasen <mclasen@redhat.com) (#552295)
+
 2008-09-15  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfile.c:
