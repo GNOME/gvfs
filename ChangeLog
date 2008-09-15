@@ -1,3 +1,8 @@
+2008-09-15  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Fix gnome-keyring configure switch
+	Patch by Rémi Cardona  <remi@gentoo.org> (#552126)
+
 2008-09-09  Hans Petter Jansson  <hpj@novell.com>
 
 	* configure.ac: Post-release version bump to 0.99.8.
