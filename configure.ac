@@ -326,7 +326,7 @@ AM_CONDITIONAL(USE_GPHOTO2, [test "$msg_gphoto2" = "yes"])
 dnl *******************************
 dnl *** Check for GNOME Keyring ***
 dnl *******************************
-AC_ARG_ENABLE(KEYRING, [  --disable-keyring           build without GNOME Keyring support])
+AC_ARG_ENABLE(keyring, [  --disable-keyring           build without GNOME Keyring support])
 msg_keyring=no
 KEYRING_LIBS=
 KEYRING_CFLAGS=
