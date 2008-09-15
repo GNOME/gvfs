@@ -206,6 +206,8 @@ smb_to_uri (GVfsUriMapper *mapper,
   const char *type;
   const char *server;
   const char *share;
+  const char *user;
+  const char *domain;
   char *s;
   GDecodedUri *uri;
 
@@ -240,6 +242,15 @@ smb_to_uri (GVfsUriMapper *mapper,
 	uri->path = g_strconcat ("/", share, info->path, NULL);
       else
 	uri->path = g_strconcat ("/", share, "/", info->path, NULL);
+	
+      user = g_vfs_uri_mount_info_get (info, "user");
+      domain = g_vfs_uri_mount_info_get (info, "domain");
+      if (user) {
+        if (domain)
+          uri->userinfo = g_strconcat (domain, ";", user, NULL);
+        else
+          uri->userinfo = g_strdup (user);
+      }
     }
 
   s = g_vfs_encode_uri (uri, allow_utf8);
