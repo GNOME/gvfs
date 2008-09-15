@@ -2522,6 +2522,7 @@ out:
   if (data->cancellable)
     g_object_unref (data->cancellable);
   g_object_unref (data->file);
+  g_object_unref (data->result);
   g_free (data);
 }
 
