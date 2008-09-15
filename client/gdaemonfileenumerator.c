@@ -43,12 +43,18 @@ struct _GDaemonFileEnumerator
   GFileEnumerator parent;
 
   gint id;
-  DBusConnection *sync_connection;
+  DBusConnection *sync_connection; /* NULL if async, i.e. we're listening on main dbus connection */
 
   /* protected by infos lock */
   GList *infos;
   gboolean done;
-  
+
+  /* For async ops, also protected by infos lock */
+  int async_requested_files;
+  GCancellable *async_cancel;
+  gulong cancelled_tag;
+  guint timeout_tag;
+  GSimpleAsyncResult *async_res;
 };
 
 G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUMERATOR)
@@ -56,12 +62,36 @@ G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUM
 static GFileInfo *       g_daemon_file_enumerator_next_file   (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,
 							       GError          **error);
+static void              g_daemon_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
+								    int                  num_files,
+								    int                  io_priority,
+								    GCancellable        *cancellable,
+								    GAsyncReadyCallback  callback,
+								    gpointer             user_data);
+static GList *           g_daemon_file_enumerator_next_files_finish (GFileEnumerator  *enumerator,
+								     GAsyncResult     *result,
+								     GError          **error);
 static gboolean          g_daemon_file_enumerator_close       (GFileEnumerator  *enumerator,
 							       GCancellable     *cancellable,
 							       GError          **error);
+static void              g_daemon_file_enumerator_close_async (GFileEnumerator      *enumerator,
+							       int                   io_priority,
+							       GCancellable         *cancellable,
+							       GAsyncReadyCallback   callback,
+							       gpointer              user_data);
+static gboolean          g_daemon_file_enumerator_close_finish (GFileEnumerator      *enumerator,
+							       GAsyncResult         *result,
+							       GError              **error);
 static DBusHandlerResult g_daemon_file_enumerator_dbus_filter (DBusConnection   *connection,
 							       DBusMessage      *message,
 							       void             *user_data);
+
+static void
+free_info_list (GList *infos)
+{
+  g_list_foreach (infos, (GFunc)g_object_unref, NULL);
+  g_list_free (infos);
+}
 
 static void
 g_daemon_file_enumerator_finalize (GObject *object)
@@ -75,8 +105,7 @@ g_daemon_file_enumerator_finalize (GObject *object)
   _g_dbus_unregister_vfs_filter (path);
   g_free (path);
 
-  g_list_foreach (daemon->infos, (GFunc)g_object_unref, NULL);
-  g_list_free (daemon->infos);
+  free_info_list (daemon->infos);
 
   if (daemon->sync_connection)
     dbus_connection_unref (daemon->sync_connection);
@@ -95,7 +124,11 @@ g_daemon_file_enumerator_class_init (GDaemonFileEnumeratorClass *klass)
   gobject_class->finalize = g_daemon_file_enumerator_finalize;
 
   enumerator_class->next_file = g_daemon_file_enumerator_next_file;
+  enumerator_class->next_files_async = g_daemon_file_enumerator_next_files_async;
+  enumerator_class->next_files_finish = g_daemon_file_enumerator_next_files_finish;
   enumerator_class->close_fn = g_daemon_file_enumerator_close;
+  enumerator_class->close_async = g_daemon_file_enumerator_close_async;
+  enumerator_class->close_finish = g_daemon_file_enumerator_close_finish;
 }
 
 static void
@@ -123,6 +156,47 @@ g_daemon_file_enumerator_new (GFile *file)
   return daemon;
 }
 
+/* Called with infos lock held */
+static void
+trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
+{
+  GList *rest, *l;
+
+  if (ok)
+    {
+      l = daemon->infos;
+      rest = g_list_nth (l, daemon->async_requested_files);
+      if (rest)
+	{
+	  /* Split list */
+	  rest->prev->next = NULL;
+	  rest->prev = NULL;
+	}
+      daemon->infos = rest;
+      
+      g_simple_async_result_set_op_res_gpointer (daemon->async_res,
+						 l,
+						 (GDestroyNotify)free_info_list);
+    }
+
+  g_simple_async_result_complete_in_idle (daemon->async_res);
+  
+  if (daemon->cancelled_tag != 0)
+    g_signal_handler_disconnect (daemon->async_cancel,
+				 daemon->cancelled_tag);
+  daemon->async_cancel = 0;
+  daemon->cancelled_tag = 0;
+
+  if (daemon->timeout_tag != 0)
+    g_source_remove (daemon->timeout_tag);
+  daemon->timeout_tag = 0;
+  
+  daemon->async_requested_files = 0;
+  
+  g_object_unref (daemon->async_res);
+  daemon->async_res = NULL;
+}
+
 static DBusHandlerResult
 g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
 				      DBusMessage        *message,
@@ -140,6 +214,8 @@ g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
     {
       G_LOCK (infos);
       enumerator->done = TRUE;
+      if (enumerator->async_requested_files > 0)
+	trigger_async_done (enumerator, TRUE);
       G_UNLOCK (infos);
       return DBUS_HANDLER_RESULT_HANDLED;
     }
@@ -170,6 +246,9 @@ g_daemon_file_enumerator_dbus_filter (DBusConnection     *connection,
       
       G_LOCK (infos);
       enumerator->infos = g_list_concat (enumerator->infos, infos);
+      if (enumerator->async_requested_files > 0 &&
+	  g_list_length (enumerator->infos) >= enumerator->async_requested_files)
+	trigger_async_done (enumerator, TRUE);
       G_UNLOCK (infos);
       return DBUS_HANDLER_RESULT_HANDLED;
     }
@@ -228,11 +307,121 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
        * raced with the filter func being called after unlocking
        * and setting done or ->infos. So, we want to check it again reasonaby soon.
        */
-      if (!dbus_connection_read_write_dispatch (daemon->sync_connection, 100))
-	  break;
+      if (daemon->sync_connection != NULL)
+	{
+	  /* The initializing call for the enumerator was a sync one, and we
+	     have a reference to its private connection. In order to ensure we
+	     get the responses sent to that originating connection we pump it
+	     here.
+	     This should be safe as we're either on the thread that did the call
+	     so its our connection, or its the private connection for another
+	     thread. If that thread is idle the pumping won't affect anything, and
+	     if it is doing something thats ok to, because we don't use filters
+	     on the private sync connections so we won't cause any reentrancy
+	     (except the file enumerator filter, but that is safe to run in
+	     some other thread).
+	  */
+	  if (!dbus_connection_read_write_dispatch (daemon->sync_connection, 100))
+	    break;
+	}
+      else
+	{
+	  /* The enumerator was initialized by an async call, so responses will
+	     come to the async dbus connection. We can't pump that as that would
+	     cause all sort of filters and stuff to run, possibly on the wrong
+	     thread. If you want to do async next_files you must create the
+	     enumerator asynchrounously.
+	  */
+	  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			       "Can't do synchronous next_files() on a file enumerator created asynchronously");
+	  return NULL;
+	}
     }
 
   return info;
+}
+
+static void
+async_cancelled (GCancellable *cancellable,
+		 GDaemonFileEnumerator *daemon)
+{
+  g_simple_async_result_set_error (daemon->async_res,
+				   G_IO_ERROR,
+				   G_IO_ERROR_CANCELLED,
+				   _("Operation was cancelled"));
+  trigger_async_done (daemon, FALSE);
+}
+
+static gboolean
+async_timeout (gpointer data)
+{
+  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (data);
+  trigger_async_done (daemon, TRUE);
+  return FALSE;
+}
+
+static void
+g_daemon_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
+					   int                  num_files,
+					   int                  io_priority,
+					   GCancellable        *cancellable,
+					   GAsyncReadyCallback  callback,
+					   gpointer             user_data)
+{
+  GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (enumerator);
+
+  if (daemon->sync_connection != NULL)
+    {
+      /* If the enumerator was created synchronously then the connection used
+       * for return messages will be the private connection for that thread.
+       * We can't rely on it being pumped, so we don't support this.
+       * We could possibly pump it ourselves in this case, but i'm not sure
+       * how much sense this makes, so we don't for now.
+       */
+      g_simple_async_report_error_in_idle  (G_OBJECT (enumerator),
+					    callback,
+					    user_data,
+					    G_IO_ERROR, G_IO_ERROR_FAILED,
+					    "Can't do asynchronous next_files() on a file enumerator created synchronously");
+      return;
+    }
+  
+  G_LOCK (infos);
+  daemon->async_cancel = cancellable;
+  daemon->cancelled_tag = 0;
+  daemon->timeout_tag = 0;
+  daemon->async_requested_files = num_files;
+  daemon->async_res = g_simple_async_result_new (G_OBJECT (enumerator), callback, user_data,
+						 g_daemon_file_enumerator_next_files_async);
+
+  /* Maybe we already have enough info to fulfill the requeust already */
+  if (daemon->done ||
+      g_list_length (daemon->infos) >= daemon->async_requested_files)
+    trigger_async_done (daemon, TRUE);
+  else
+    {
+      if (cancellable)
+	daemon->cancelled_tag = g_signal_connect (cancellable, "cancelled", (GCallback)async_cancelled, daemon);
+      daemon->timeout_tag = g_timeout_add (G_VFS_DBUS_TIMEOUT_MSECS,
+					   async_timeout, daemon);
+    }
+  
+  G_UNLOCK (infos);
+}
+
+static GList *
+g_daemon_file_enumerator_next_files_finish (GFileEnumerator  *enumerator,
+					    GAsyncResult     *result,
+					    GError          **error)
+{
+  GList *l;
+
+  l = g_simple_async_result_get_op_res_gpointer (G_SIMPLE_ASYNC_RESULT (result));
+  /* We want the caller to own this, and not the result, so clear the result data */
+  g_simple_async_result_set_op_res_gpointer (G_SIMPLE_ASYNC_RESULT (result),
+					     NULL, NULL);
+  
+  return l;
 }
 
 static gboolean
@@ -246,3 +435,27 @@ g_daemon_file_enumerator_close (GFileEnumerator *enumerator,
 }
 
 
+/* We want an explicitly async version of close (doing nothing) to avoid
+   the default thread-using version. */
+static void
+g_daemon_file_enumerator_close_async (GFileEnumerator      *enumerator,
+				      int                   io_priority,
+				      GCancellable         *cancellable,
+				      GAsyncReadyCallback   callback,
+				      gpointer              user_data)
+{
+  GSimpleAsyncResult *res;
+
+  res = g_simple_async_result_new (G_OBJECT (enumerator), callback, user_data,
+				   g_daemon_file_enumerator_close_async);
+  g_simple_async_result_complete_in_idle (res);
+  g_object_unref (res);
+}
+
+static gboolean
+g_daemon_file_enumerator_close_finish (GFileEnumerator      *enumerator,
+				       GAsyncResult         *result,
+				       GError              **error)
+{
+  return TRUE;
+}
