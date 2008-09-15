@@ -1,5 +1,10 @@
 2008-09-15  Tomas Bzatek  <tbzatek@redhat.com>
 
+	* client/smburi.c:
+	Encode username and domain into the URI
+
+2008-09-15  Tomas Bzatek  <tbzatek@redhat.com>
+
 	* daemon/gvfsbackendsmb.c:
 	Revert commit #1772.
 	Set the information on the mount spec from the original URI
