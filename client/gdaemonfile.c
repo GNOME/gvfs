@@ -2404,7 +2404,6 @@ enumerate_children_async_cb (DBusMessage *reply,
 
   g_object_ref (enumerator);
 
-  g_daemon_file_enumerator_set_sync_connection (enumerator, connection);
   g_simple_async_result_set_op_res_gpointer (result, enumerator, g_object_unref);
 
 out:

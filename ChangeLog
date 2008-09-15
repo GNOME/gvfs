@@ -1,3 +1,11 @@
+2008-09-15  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * client/gdaemonfileenumerator.c:
+	Add proper implementation of async file enumeration.
+	This avoids the problem with the default thread based ones
+	that could cause callbacks in the non-mainloop thread. (#551337)
+
 2008-09-15  Christian Kellner  <gicmo@gnome.org>
 
 	* configure.ac: Fix gnome-keyring configure switch
