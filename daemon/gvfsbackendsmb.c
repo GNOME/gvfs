@@ -515,6 +515,29 @@ do_mount (GVfsBackend *backend,
 
   op_backend->smb_context = smb_context;
 
+  /* Set the mountspec according to original uri, no matter whether user changes
+     credentials during mount loop. Nautilus and other gio clients depend
+     on correct mountspec, setting it to real (different) credentials would 
+     lead to G_IO_ERROR_NOT_MOUNTED errors
+   */
+
+  /* Translators: This is "<sharename> on <servername>" and is used as name for an SMB share */
+  display_name = g_strdup_printf (_("%s on %s"), op_backend->share, op_backend->server);
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
+
+  smb_mount_spec = g_mount_spec_new ("smb-share");
+  g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
+  g_mount_spec_set (smb_mount_spec, "server", op_backend->server);
+  if (op_backend->user)
+    g_mount_spec_set (smb_mount_spec, "user", op_backend->user);
+  if (op_backend->domain)
+    g_mount_spec_set (smb_mount_spec, "domain", op_backend->domain);
+
+  g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
+  g_mount_spec_unref (smb_mount_spec);
+
   uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
 
   op_backend->mount_source = mount_source;
@@ -552,25 +575,6 @@ do_mount (GVfsBackend *backend,
     }
 
   /* Mount was successful */
-
-  /* Translators: This is "<sharename> on <servername>" and is used as name for an SMB share */
-  display_name = g_strdup_printf (_("%s on %s"), op_backend->share, op_backend->server);
-  g_vfs_backend_set_display_name (backend, display_name);
-  g_free (display_name);
-  g_vfs_backend_set_icon_name (backend, "folder-remote");
-
-  smb_mount_spec = g_mount_spec_new ("smb-share");
-  g_mount_spec_set (smb_mount_spec, "share", op_backend->share);
-  g_mount_spec_set (smb_mount_spec, "server", op_backend->server);
-  if (op_backend->last_user && strlen(op_backend->last_user) > 0)
-    {
-      g_mount_spec_set (smb_mount_spec, "user", op_backend->last_user);
-      if (op_backend->last_domain)
-        g_mount_spec_set (smb_mount_spec, "domain", op_backend->last_domain);
-    }
-
-  g_vfs_backend_set_mount_spec (backend, smb_mount_spec);
-  g_mount_spec_unref (smb_mount_spec);
 
   g_vfs_keyring_save_password (op_backend->last_user,
 			       op_backend->server,
