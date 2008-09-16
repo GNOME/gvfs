@@ -2,6 +2,7 @@
 # Please keep this file sorted alphabetically.
 [encoding: UTF-8]
 client/gdaemonfile.c
+client/gdaemonfileenumerator.c
 client/gdaemonfileinputstream.c
 client/gdaemonfileoutputstream.c
 client/gdaemonvfs.c
