@@ -1,3 +1,10 @@
+=== gvfs 0.99.8 ===
+
+2008-09-15  Hans Petter Jansson <hpj@novell.com>
+
+	* NEWS:
+	* configure.ac: Prepare for 0.99.8 release.
+
 2008-09-15  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* client/smburi.c:

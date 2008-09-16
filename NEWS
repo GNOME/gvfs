@@ -1,3 +1,19 @@
+Major changes in 0.99.8
+=======================
+
+* Bug fixes:
+  552295 - leaks a GSimpleAsyncResult
+  551337 - gedit crashes browsing fileselector ssh locations
+  552126 - --enable/disable-keyring switch is currently broken
+
+* Translation updates:
+  nb.po (Kjartan Maraas), gu.po (Sweta Kothari), pl.po (Tomasz Dominikowski),
+  zh_CN.po (Funda Wang), it.po (Luca Ferretti), en_GB.po (Philip Withnall),
+  nl.po (Wouter Bolsterlee), pt.po (Duarte Loreto), cs.po (Petr Kovar),
+  te.po (Krishnababu K), mr.po (Sandeep Shedmake), ta.po (I. Felix),
+  lt.po (Gintautas Miliauskas), sr.po (Goran Rakić), bg.po (Alexander Shopov),
+  ar.po (Djihed Afifi), ca.po (Gil Forcada)
+
 Major changes in 0.99.7.1
 =========================
 
