@@ -1,5 +1,0 @@
-[Mount]
-Type=burn
-Exec=@libexecdir@/gvfsd-burn
-AutoMount=true
-

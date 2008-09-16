@@ -1,4 +1,0 @@
-[Mount]
-Type=dav
-Exec=@libexecdir@/gvfsd-dav
-AutoMount=false
