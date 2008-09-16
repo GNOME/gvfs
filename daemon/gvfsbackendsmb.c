@@ -175,10 +175,7 @@ auth_callback (SMBCCTX *context,
       backend->user == NULL &&
       backend->domain == NULL)
     {
-      /* Try anon login */
-      strncpy (username_out, "", unmaxlen);
-      strncpy (password_out, "", pwmaxlen);
-      /* Try again if anon login fails */
+      /* Try again if kerberos login + anonymous fallback fails */
       backend->mount_try_again = TRUE;
     }
   else
@@ -495,9 +492,15 @@ do_mount (GVfsBackend *backend,
   smb_context->flags = 0;
 #endif
   
+  /* Initial settings:
+   *   - use Kerberos (always)
+   *   - in case of no username specified, try anonymous login
+   */
   smbc_setOptionUseKerberos (smb_context, 1);
-  smbc_setOptionFallbackAfterKerberos (smb_context, 1);  
-  smbc_setOptionNoAutoAnonymousLogin (smb_context, 1);
+  smbc_setOptionFallbackAfterKerberos (smb_context,
+                                       op_backend->user != NULL);
+  smbc_setOptionNoAutoAnonymousLogin (smb_context,
+                                      op_backend->user != NULL);
 
   
 #if 0
@@ -540,6 +543,8 @@ do_mount (GVfsBackend *backend,
 
   uri = create_smb_uri (op_backend->server, op_backend->share, NULL);
 
+
+  /*  Samba mount loop  */
   op_backend->mount_source = mount_source;
   op_backend->mount_try = 0;
   op_backend->password_save = G_PASSWORD_SAVE_NEVER;
@@ -554,8 +559,17 @@ do_mount (GVfsBackend *backend,
       if (res == 0 ||
 	  (errno != EACCES && errno != EPERM))
 	break;
-      
-      op_backend->mount_try ++;      
+
+      /* The first round is Kerberos-only.  Only if this fails do we enable
+       * NTLMSSP fallback (turning off anonymous fallback, which we've
+       * already tried and failed with).
+       */
+      if (op_backend->mount_try == 0)
+        {
+          smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
+          smbc_setOptionNoAutoAnonymousLogin (op_backend->smb_context, 1);
+        }
+      op_backend->mount_try ++;
     }
   while (op_backend->mount_try_again);
   

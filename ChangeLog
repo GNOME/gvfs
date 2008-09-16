@@ -1,3 +1,9 @@
+2008-09-16  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	Kerberos authentication fixes. Fixes #524498
+	Inspired by the smb-browse patch from Steve Langasek
+
 2008-09-15  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* client/smburi.c:
