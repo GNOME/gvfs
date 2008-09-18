@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-15 10:43+0100\n"
+"POT-Creation-Date: 2008-09-18 02:54+0100\n"
 "PO-Revision-Date: 2008-05-22 19:21+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
@@ -40,7 +40,7 @@ msgstr "تعذر جلب واصِف ملف الدفْق"
 #: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
 #: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
 #: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
-#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2588
+#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
 msgid "Invalid return value from open"
 msgstr "قيمة غير صحيحة للدفْق من \"افتح\""
 
@@ -81,6 +81,25 @@ msgstr "قيمة مُرتجعة غير صحيحة من monitor_dir"
 msgid "Invalid return value from monitor_file"
 msgstr "قيمة مُرتجعة غير صحيحة من monitor_file"
 
+#: ../client/gdaemonfileenumerator.c:351
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
+#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
+#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
+#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
+#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
+#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
+#: ../daemon/gvfsbackendsmb.c:1087 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+msgid "Operation was cancelled"
+msgstr "أُلغيت العملية"
+
 #: ../client/gdaemonfileinputstream.c:450
 #: ../client/gdaemonfileinputstream.c:458
 #: ../client/gdaemonfileinputstream.c:1300
@@ -99,24 +118,6 @@ msgstr "خطأ في برتوكول الدفْق: %s"
 #: ../client/gdaemonfileoutputstream.c:1064
 msgid "End of stream"
 msgstr "نهاية الدفْق"
-
-#: ../client/gdaemonfileinputstream.c:518
-#: ../client/gdaemonfileinputstream.c:674
-#: ../client/gdaemonfileinputstream.c:782
-#: ../client/gdaemonfileinputstream.c:1032
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
-#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
-#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
-#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
-#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
-#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
-#: ../daemon/gvfsbackendsmb.c:1069 ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
-#: ../daemon/gvfschannel.c:298
-msgid "Operation was cancelled"
-msgstr "أُلغيت العملية"
 
 #: ../client/gdaemonfileinputstream.c:1207
 #: ../client/gdaemonfileoutputstream.c:942
@@ -218,7 +219,7 @@ msgstr "لم يحدّد اسم مستضيف"
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
 #: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
 #: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
-#: ../daemon/gvfsbackendsmb.c:605
+#: ../daemon/gvfsbackendsmb.c:623
 msgid "Invalid mount spec"
 msgstr "وصف وصْل خطأ"
 
@@ -405,7 +406,7 @@ msgid "Filesystem"
 msgstr "نظام الملفات"
 
 #: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
-#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:666
 #: ../daemon/gvfsbackendtrash.c:678 ../daemon/gvfsbackendtrash.c:1786
 msgid "Can't open directory"
 msgstr "تعذّر فتح الدّليل"
@@ -491,17 +492,17 @@ msgstr "تعذّر إنشاء الطلب"
 #: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
 #: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
 #: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
-#: ../daemon/gvfsbackendsmb.c:1804
+#: ../daemon/gvfsbackendsmb.c:1822
 msgid "Target file already exists"
 msgstr "الملف الهدف موجود مسبقًا"
 
 #: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
-#: ../daemon/gvfsbackendsmb.c:1038
+#: ../daemon/gvfsbackendsmb.c:1056
 msgid "The file was externally modified"
 msgstr "عُدّل الملف خارجيّا"
 
-#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1074
-#: ../daemon/gvfsbackendsmb.c:1821
+#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1092
+#: ../daemon/gvfsbackendsmb.c:1839
 msgid "Backup file creation failed"
 msgstr "فشل إنشاء الملف الاحتياطي"
 
@@ -831,7 +832,7 @@ msgid "HTTP Client Error: %s"
 msgstr "خطأ عميل ‪HTTP‬: ‫%s"
 
 #: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
-#: ../daemon/gvfsbackendsmb.c:1301 ../daemon/gvfsbackendtrash.c:1006
+#: ../daemon/gvfsbackendsmb.c:1319 ../daemon/gvfsbackendtrash.c:1006
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr "  (ترميز غير سليم)"
@@ -856,10 +857,14 @@ msgstr "شبكة محليّة"
 msgid "Network Location Monitor"
 msgstr "مراقب أمكنة الشبكة"
 
-#. Mount was successful
+#. Set the mountspec according to original uri, no matter whether user changes
+#. credentials during mount loop. Nautilus and other gio clients depend
+#. on correct mountspec, setting it to real (different) credentials would
+#. lead to G_IO_ERROR_NOT_MOUNTED errors
+#.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:557
-#: ../daemon/gvfsbackendsmb.c:1294
+#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:528
+#: ../daemon/gvfsbackendsmb.c:1312
 #, c-format
 msgid "%s on %s"
 msgstr "‏%s على %s"
@@ -993,56 +998,56 @@ msgstr "خطأ في إنشاء الملف الاحتياطي: %s"
 msgid "Unable to create temporary file"
 msgstr "تعذّر إنشاء الملف المؤقت"
 
-#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1793
+#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1811
 msgid "Can't move directory over directory"
 msgstr "لا يمكن نقل دليل على دليل"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:216
+#: ../daemon/gvfsbackendsmb.c:213
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "كلمة السر مطلوبة لمشاركة %s على %s"
 
-#: ../daemon/gvfsbackendsmb.c:471 ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsbackendsmb.c:468 ../daemon/gvfsbackendsmb.c:514
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "خطأ داخلي (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:550
+#: ../daemon/gvfsbackendsmb.c:587
 msgid "Failed to mount Windows share"
 msgstr "فشل وصْل مشاركة ويندوز"
 
-#: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
+#: ../daemon/gvfsbackendsmb.c:735 ../daemon/gvfsbackendsmb.c:1191
 msgid "Unsupported seek type"
 msgstr "نوع التماس غير مدعوم"
 
-#: ../daemon/gvfsbackendsmb.c:1237
+#: ../daemon/gvfsbackendsmb.c:1255
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "فشل إنشاء ملف تخزين: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1695
+#: ../daemon/gvfsbackendsmb.c:1713
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "خطأ أثناء حذف الملف: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1769
+#: ../daemon/gvfsbackendsmb.c:1787
 #, c-format
 msgid "Error moving file: %s"
 msgstr "خطأ أثناء نقل الملف: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1841
+#: ../daemon/gvfsbackendsmb.c:1859
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "خطأ في إزالة الملف الهدف: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1865
+#: ../daemon/gvfsbackendsmb.c:1883
 msgid "Can't recursively move directory"
 msgstr "تعذّر نقل المجلد تتابعيا"
 
-#: ../daemon/gvfsbackendsmb.c:1928
+#: ../daemon/gvfsbackendsmb.c:1946
 msgid "Windows Shares Filesystem Service"
 msgstr "خادوم نظام ملفات مشاركات ويندوز"
 
