@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.gnome-2-24.gu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-05 07:54+0000\n"
-"PO-Revision-Date: 2008-09-05 15:24+0530\n"
+"POT-Creation-Date: 2008-09-05 09:55+0000\n"
+"PO-Revision-Date: 2008-09-19 17:17+0530\n"
 "Last-Translator: Sweta Kothari <swkothar@redhat.com>\n"
 "Language-Team: Gujarati\n"
 "MIME-Version: 1.0\n"
@@ -904,6 +904,11 @@ msgid ""
 "The identity sent by the remote computer is %s. If you want to be absolutely "
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
+"દૂરસ્થ કૉમ્પ્યુટરનું (%s) વ્યક્તિત્વ અજ્ઞાત છે.\n"
+"આ એટલે બને છે કે જ્યારે તમે પહેલી વખત કૉમ્પ્યુટરમાં દાખલ થાવો છો.\n"
+"\n"
+"દૂરસ્થ કૉમ્પ્યુટર દ્દારા મોકલાયેલ વ્યક્તિત્વ %s છે. તે ચાલુ રાખવાનું સલામત છે જો તમે સંપૂર્ણપણે ખાતરી કરવા "
+"કરવા ઇચ્છતા હોય, સિસ્ટમ વહીવટકર્તાને સંપર્ક કરો."
 
 #: ../daemon/gvfsbackendsftp.c:959
 msgid "Login dialog cancelled"
@@ -1471,7 +1476,7 @@ msgstr "%s: %s:બંધ કરવામાં ભૂલ: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr ""
+msgstr "સ્થાન... - આવશ્યક આઉટપુટ કરવા માટે સાંકળેલ સ્થાનો."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1482,12 +1487,15 @@ msgid ""
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
 msgstr ""
+"જગ્યાઓ પર ફાઇલોને સાંકળો અને આવશ્યક આઉટપુટને છાપો. પારંપરિક cat ઉપયોગિતા જેવું કામ કરો, "
+"પરંતુ સ્થાનિક ફાઇલને બદલે gvfs વાપરી રહ્યા છે: ઉદાહરણ તરીકે તમે સાંકળેલી જગ્યા તરીકે "
+"smb://server/resource/file.txt જેવુ વાપરી શકો છો."
 
 #: ../programs/gvfs-cat.c:148
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
-msgstr ""
+msgstr "નોંધ: બંધારણ વિકલ્પ જેવા કે -n, -T અથવા બીજા જરૂર હોય તો cat મારફતે પાઇપ કરો."
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1512,7 +1520,7 @@ msgstr "%s: %s: કાર્યક્રમ લોન્ચ કરવામા�
 
 #: ../programs/gvfs-open.c:113
 msgid "FILES... - open FILES with registered application."
-msgstr ""
+msgstr "ફાઇલો... - રજીસ્ટર થયેલ કાર્યક્રમ સાથે ફાઇલોને ખોલો."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1520,5 +1528,5 @@ msgstr ""
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
-msgstr ""
+msgstr "ફાઇલનાં પ્રકારને સંભાળવા માટે રજીસ્ટર થયેલ મૂળભૂત કાર્યક્રમ સાથે ફાઇલને ખો"
 
