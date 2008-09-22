@@ -1,3 +1,9 @@
+Major changes in 1.0.0
+======================
+
+* Bug fixes:
+  524498 - smb kerberos authentication fixes
+
 Major changes in 0.99.8
 =======================
 
