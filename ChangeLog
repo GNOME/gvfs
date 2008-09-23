@@ -1,3 +1,27 @@
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
+        * client/Makefile.am:
+        * common/Makefile.am:
+        * common/gmountsource.c:
+        * common/gmounttracker.c:
+        * monitor/gphoto2/Makefile.am:
+        * monitor/hal/Makefile.am:
+        * monitor/proxy/Makefile.am:
+	Link all modules against the installed libgvfscommon instead
+	of duplicating the statically linked one. This is safe wrt
+	namespace conflicts, because the modules are opened RTLD_LOCAL
+	so the dependencies will not pollute the global namespace.
+
+        * client/gdaemonvfs.c:
+	Make the gvfsdbus module persistant. This means we will never
+	unload it, and thus not unload libgvfscommon which could
+	be problematic. This is not a huge problem, as:
+	 + The gio modules will not be loaded anyway unless you use gio
+	 + The gvfsdbus module will be persistent anyway as soon as
+	   the app references the GVfs object, which likely all gio apps do
+	 + The module load order doesn't matter wrt unload order, because
+	   all gio modules are loaded before any one is unloaded.
+	
 2008-09-22  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:

@@ -33,7 +33,7 @@ libgioremote_volume_monitor_la_LDFLAGS = 				\
 libgioremote_volume_monitor_la_LIBADD  =		     		\
 	$(GLIB_LIBS)                                 			\
 	$(DBUS_LIBS)                                 			\
-	$(top_builddir)/common/libgvfscommon-noin.la 			\
+	$(top_builddir)/common/libgvfscommon.la 			\
 	$(NULL)
 
 ############################################################################
@@ -57,7 +57,7 @@ libgvfsproxyvolumemonitordaemon_noin_la_CFLAGS =		\
 libgvfsproxyvolumemonitordaemon_noin_la_LIBADD  =     		\
 	$(GLIB_LIBS)                                 		\
 	$(DBUS_LIBS)                                 		\
-	$(top_builddir)/common/libgvfscommon-noin.la 		\
+	$(top_builddir)/common/libgvfscommon.la 		\
 	$(NULL)
 
 clean-local:

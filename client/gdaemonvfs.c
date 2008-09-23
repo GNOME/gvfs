@@ -983,6 +983,14 @@ g_io_module_load (GIOModule *module)
   if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL) 
     return;
 
+  /* Make this module resident so that we ground the common
+   * library. If that is unloaded we could get into all kinds
+   * of strange situations. This is safe to do even if we loaded
+   * some other common-using module first as all modules are loaded
+   * before any are freed.
+   */
+  g_type_module_use (G_TYPE_MODULE (module));
+  
   g_daemon_vfs_register_type (G_TYPE_MODULE (module));
   g_daemon_volume_monitor_register_types (G_TYPE_MODULE (module));
 

@@ -39,7 +39,7 @@ vfssources = \
 	$(NULL)
 
 vfslibs = \
-	$(top_builddir)/common/libgvfscommon-noin.la \
+	$(top_builddir)/common/libgvfscommon.la \
 	$(DBUS_LIBS) \
 	$(GLIB_LIBS) \
 	$(NULL)
