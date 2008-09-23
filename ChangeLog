@@ -1,3 +1,40 @@
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
+        * monitor/proxy/gproxyvolumemonitor.[ch]:
+        * monitor/proxy/gproxyvolumemonitor.h:
+        * monitor/proxy/remote-volume-monitor-module.c:
+	Only call the IsSupported dbus call when the class
+	is actually needed instead of on gio init.
+	Don't integrate internal session bus with mainloop
+	during is_support code, as that is not necessary yet, and
+	it caused problem if done in a thread.
+	
+	This fixes the trash crash issue in bug #547568.
+
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
+        * client/Makefile.am:
+        * common/Makefile.am:
+        * common/gmountsource.c:
+        * common/gmounttracker.c:
+        * monitor/gphoto2/Makefile.am:
+        * monitor/hal/Makefile.am:
+        * monitor/proxy/Makefile.am:
+	Link all modules against the installed libgvfscommon instead
+	of duplicating the statically linked one. This is safe wrt
+	namespace conflicts, because the modules are opened RTLD_LOCAL
+	so the dependencies will not pollute the global namespace.
+
+        * client/gdaemonvfs.c:
+	Make the gvfsdbus module persistant. This means we will never
+	unload it, and thus not unload libgvfscommon which could
+	be problematic. This is not a huge problem, as:
+	 + The gio modules will not be loaded anyway unless you use gio
+	 + The gvfsdbus module will be persistent anyway as soon as
+	   the app references the GVfs object, which likely all gio apps do
+	 + The module load order doesn't matter wrt unload order, because
+	   all gio modules are loaded before any one is unloaded.
+	
 2008-09-16  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendsmb.c:

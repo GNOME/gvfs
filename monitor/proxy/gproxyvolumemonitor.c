@@ -58,6 +58,7 @@
 G_LOCK_DEFINE_STATIC(proxy_vm);
 
 static DBusConnection *the_session_bus = NULL;
+static gboolean the_session_bus_is_integrated = FALSE;
 static GHashTable *the_volume_monitors = NULL;
 
 struct _GProxyVolumeMonitor {
@@ -80,6 +81,30 @@ static void seed_monitor (GProxyVolumeMonitor  *monitor);
 static DBusHandlerResult filter_function (DBusConnection *connection, DBusMessage *message, void *user_data);
 
 static void signal_emit_in_idle (gpointer object, const char *signal_name, gpointer other_object);
+
+static gboolean is_supported (GProxyVolumeMonitorClass *klass);
+
+/* The is_supported API is kinda lame and doesn't pass in the class,
+   so we work around this with this hack */
+typedef gboolean (*is_supported_func) (void);
+
+static GProxyVolumeMonitorClass *is_supported_classes[10] = { NULL };
+static gboolean is_supported_0 (void) { return is_supported (is_supported_classes[0]); };
+static gboolean is_supported_1 (void) { return is_supported (is_supported_classes[1]); };
+static gboolean is_supported_2 (void) { return is_supported (is_supported_classes[2]); };
+static gboolean is_supported_3 (void) { return is_supported (is_supported_classes[3]); };
+static gboolean is_supported_4 (void) { return is_supported (is_supported_classes[4]); };
+static gboolean is_supported_5 (void) { return is_supported (is_supported_classes[5]); };
+static gboolean is_supported_6 (void) { return is_supported (is_supported_classes[6]); };
+static gboolean is_supported_7 (void) { return is_supported (is_supported_classes[7]); };
+static gboolean is_supported_8 (void) { return is_supported (is_supported_classes[8]); };
+static gboolean is_supported_9 (void) { return is_supported (is_supported_classes[9]); };
+static is_supported_func is_supported_funcs[] = {
+  is_supported_0, is_supported_1, is_supported_2, is_supported_3,
+  is_supported_4, is_supported_5, is_supported_6, is_supported_7,
+  is_supported_8, is_supported_9,
+  NULL
+};
 
 static char *
 get_match_rule (GProxyVolumeMonitor *monitor)
@@ -606,6 +631,7 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
 static void
 g_proxy_volume_monitor_init (GProxyVolumeMonitor *monitor)
 {
+  g_proxy_volume_monitor_setup_session_bus_connection (TRUE);
 }
 
 static void
@@ -617,15 +643,22 @@ g_proxy_volume_monitor_class_finalize (GProxyVolumeMonitorClass *klass)
 typedef struct {
   char *dbus_name;
   gboolean is_native;
+  int is_supported_nr;
 } ProxyClassData;
 
 static ProxyClassData *
 proxy_class_data_new (const char *dbus_name, gboolean is_native)
 {
   ProxyClassData *data;
+  static int is_supported_nr = 0;
+  
   data = g_new0 (ProxyClassData, 1);
   data->dbus_name = g_strdup (dbus_name);
   data->is_native = is_native;
+  data->is_supported_nr = is_supported_nr++;
+
+  g_assert (is_supported_funcs[data->is_supported_nr] != NULL);
+  
   return data;
 }
 
@@ -635,15 +668,79 @@ g_proxy_volume_monitor_class_intern_init_pre (GProxyVolumeMonitorClass *klass, g
   ProxyClassData *data = (ProxyClassData *) class_data;
   klass->dbus_name = g_strdup (data->dbus_name);
   klass->is_native = data->is_native;
+  klass->is_supported_nr = data->is_supported_nr;
   g_proxy_volume_monitor_class_intern_init (klass);
 }
 
 static gboolean
-is_supported (void)
+is_remote_monitor_supported (const char *dbus_name)
 {
-  if (the_session_bus != NULL)
-    return TRUE;
-  return FALSE;
+  DBusMessage *message;
+  DBusMessage *reply;
+  DBusError dbus_error;
+  dbus_bool_t is_supported;
+
+  message = NULL;
+  reply = NULL;
+  is_supported = FALSE;
+
+  message = dbus_message_new_method_call (dbus_name,
+                                          "/",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "IsSupported");
+  if (message == NULL)
+    {
+      g_warning ("Cannot allocate memory for DBusMessage");
+      goto fail;
+    }
+  dbus_error_init (&dbus_error);
+  reply = dbus_connection_send_with_reply_and_block (the_session_bus,
+                                                     message,
+                                                     -1,
+                                                     &dbus_error);
+  if (dbus_error_is_set (&dbus_error))
+    {
+      g_warning ("invoking IsSupported() failed for remote volume monitor with dbus name %s: %s: %s",
+                 dbus_name,
+                 dbus_error.name,
+                 dbus_error.message);
+      dbus_error_free (&dbus_error);
+      goto fail;
+    }
+
+  if (!dbus_message_get_args (reply, &dbus_error,
+                              DBUS_TYPE_BOOLEAN, &is_supported,
+                              DBUS_TYPE_INVALID))
+    {
+      g_warning ("Error parsing args in reply for IsSupported(): %s: %s", dbus_error.name, dbus_error.message);
+      dbus_error_free (&dbus_error);
+      goto fail;
+    }
+
+  if (!is_supported)
+    g_warning ("remote volume monitor with dbus name %s is not supported", dbus_name);
+
+ fail:
+  if (message != NULL)
+    dbus_message_unref (message);
+  if (reply != NULL)
+    dbus_message_unref (reply);
+  return is_supported;
+}
+
+static gboolean
+is_supported (GProxyVolumeMonitorClass *klass)
+{
+  gboolean res;
+
+  G_LOCK (proxy_vm);
+  res = g_proxy_volume_monitor_setup_session_bus_connection (FALSE);
+  G_UNLOCK (proxy_vm);
+  
+  if (res)
+    res = is_remote_monitor_supported (klass->dbus_name);
+
+  return res;
 }
 
 static GVolume *
@@ -702,6 +799,7 @@ g_proxy_volume_monitor_class_init (GProxyVolumeMonitorClass *klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GVolumeMonitorClass *monitor_class = G_VOLUME_MONITOR_CLASS (klass);
   GNativeVolumeMonitorClass *native_class = G_NATIVE_VOLUME_MONITOR_CLASS (klass);
+  int i;
 
   gobject_class->constructor = g_proxy_volume_monitor_constructor;
   gobject_class->finalize = g_proxy_volume_monitor_finalize;
@@ -712,7 +810,10 @@ g_proxy_volume_monitor_class_init (GProxyVolumeMonitorClass *klass)
   monitor_class->get_volume_for_uuid = get_volume_for_uuid;
   monitor_class->get_mount_for_uuid = get_mount_for_uuid;
   monitor_class->adopt_orphan_mount = adopt_orphan_mount;
-  monitor_class->is_supported = is_supported;
+
+  i = klass->is_supported_nr;
+  is_supported_classes[i] = klass;
+  monitor_class->is_supported = is_supported_funcs[i];
 
   native_class->get_mount_for_mount_path = get_mount_for_mount_path;
 }
@@ -1041,47 +1142,47 @@ register_volume_monitor (GTypeModule *type_module,
                                   priority);
 }
 
+/* Call with proxy_vm lock held */
 gboolean
-g_proxy_volume_monitor_setup_session_bus_connection (void)
+g_proxy_volume_monitor_setup_session_bus_connection (gboolean need_integration)
 {
   gboolean ret;
   DBusError dbus_error;
 
   ret = FALSE;
 
-  G_LOCK (proxy_vm);
   if (the_session_bus != NULL)
-    {
-      g_warning ("session bus connection is already up!");
-      dbus_connection_ref (the_session_bus);
-      goto out;
-    }
+    goto has_bus_already;
 
   /* This is so that system daemons can use gio
    * without spawning private dbus instances.
    * See bug 526454.
    */
   if (g_getenv ("DBUS_SESSION_BUS_ADDRESS") == NULL)
-    {
-      goto out;
-    }
+    goto out;
 
   dbus_error_init (&dbus_error);
   the_session_bus = dbus_bus_get_private (DBUS_BUS_SESSION, &dbus_error);
-  if (dbus_error_is_set (&dbus_error)) {
-    g_warning ("cannot connect to the session bus: %s: %s", dbus_error.name, dbus_error.message);
-    dbus_error_free (&dbus_error);
-    goto out;
-  }
-
-  _g_dbus_connection_integrate_with_main (the_session_bus);
+  if (dbus_error_is_set (&dbus_error))
+    {
+      g_warning ("cannot connect to the session bus: %s: %s", dbus_error.name, dbus_error.message);
+      dbus_error_free (&dbus_error);
+      goto out;
+    }
 
   the_volume_monitors = g_hash_table_new (g_direct_hash, g_direct_equal);
 
+ has_bus_already:
+  
+  if (need_integration && !the_session_bus_is_integrated)
+    {
+      _g_dbus_connection_integrate_with_main (the_session_bus);
+      the_session_bus_is_integrated = TRUE;
+    }
+  
   ret = TRUE;
 
  out:
-  G_UNLOCK (proxy_vm);
   return ret;
 }
 
@@ -1091,8 +1192,9 @@ g_proxy_volume_monitor_teardown_session_bus_connection (void)
   G_LOCK (proxy_vm);
   if (the_session_bus != NULL)
     {
-      /* it would be nice to check that refcount==1 here */
-      _g_dbus_connection_remove_from_main (the_session_bus);
+      if (the_session_bus_is_integrated)
+        _g_dbus_connection_remove_from_main (the_session_bus);
+      the_session_bus_is_integrated = FALSE;      
       dbus_connection_close (the_session_bus);
       the_session_bus = NULL;
 
@@ -1100,62 +1202,6 @@ g_proxy_volume_monitor_teardown_session_bus_connection (void)
       the_volume_monitors = NULL;
     }
   G_UNLOCK (proxy_vm);
-}
-
-static gboolean
-is_remote_monitor_supported (const char *dbus_name)
-{
-  DBusMessage *message;
-  DBusMessage *reply;
-  DBusError dbus_error;
-  dbus_bool_t is_supported;
-
-  message = NULL;
-  reply = NULL;
-  is_supported = FALSE;
-
-  message = dbus_message_new_method_call (dbus_name,
-                                          "/",
-                                          "org.gtk.Private.RemoteVolumeMonitor",
-                                          "IsSupported");
-  if (message == NULL)
-    {
-      g_warning ("Cannot allocate memory for DBusMessage");
-      goto fail;
-    }
-  dbus_error_init (&dbus_error);
-  reply = dbus_connection_send_with_reply_and_block (the_session_bus,
-                                                     message,
-                                                     -1,
-                                                     &dbus_error);
-  if (dbus_error_is_set (&dbus_error))
-    {
-      g_warning ("invoking IsSupported() failed for remote volume monitor with dbus name %s: %s: %s",
-                 dbus_name,
-                 dbus_error.name,
-                 dbus_error.message);
-      dbus_error_free (&dbus_error);
-      goto fail;
-    }
-
-  if (!dbus_message_get_args (reply, &dbus_error,
-                              DBUS_TYPE_BOOLEAN, &is_supported,
-                              DBUS_TYPE_INVALID))
-    {
-      g_warning ("Error parsing args in reply for IsSupported(): %s: %s", dbus_error.name, dbus_error.message);
-      dbus_error_free (&dbus_error);
-      goto fail;
-    }
-
-  if (!is_supported)
-    g_warning ("remote volume monitor with dbus name %s is not supported", dbus_name);
-
- fail:
-  if (message != NULL)
-    dbus_message_unref (message);
-  if (reply != NULL)
-    dbus_message_unref (reply);
-  return is_supported;
 }
 
 void
@@ -1256,14 +1302,11 @@ g_proxy_volume_monitor_register (GIOModule *module)
               native_priority = 0;
             }
 
-          if (is_remote_monitor_supported (dbus_name))
-            {
-              register_volume_monitor (G_TYPE_MODULE (module),
-                                       type_name,
-                                       dbus_name,
-                                       is_native,
-                                       native_priority);
-            }
+          register_volume_monitor (G_TYPE_MODULE (module),
+                                   type_name,
+                                   dbus_name,
+                                   is_native,
+                                   native_priority);
 
         cont:
 

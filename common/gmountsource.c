@@ -35,32 +35,7 @@ struct _GMountSource
   char *obj_path;
 };
 
-/* We use this hack to avoid problems when this code
-   is shared in both the daemon and the client */
-static GType _g_mount_source_get_type (void) G_GNUC_CONST;
-
-#define g_mount_source_get_type _g_mount_source_get_type
 G_DEFINE_TYPE (GMountSource, g_mount_source, G_TYPE_OBJECT)
-#undef g_mount_source_get_type
-
-GType
-g_mount_source_get_type (void)
-{
-  static volatile gsize type_volatile = 0;
-  
-  if (g_once_init_enter (&type_volatile))
-    {
-      GType type;
-      
-      type = g_type_from_name ("GMountSource");
-      if (type == 0)
-	type = _g_mount_source_get_type ();
-      
-      g_once_init_leave (&type_volatile, type);
-    }
-  
-  return type_volatile;
-}
 
 static void
 g_mount_source_finalize (GObject *object)
