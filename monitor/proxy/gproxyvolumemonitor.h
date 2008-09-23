@@ -49,6 +49,7 @@ struct _GProxyVolumeMonitorClass {
   GNativeVolumeMonitorClass parent_class;
   char *dbus_name;
   gboolean is_native;
+  int is_supported_nr;
 };
 
 GType g_proxy_volume_monitor_get_type (void) G_GNUC_CONST;
@@ -63,7 +64,7 @@ GProxyMount    *g_proxy_volume_monitor_get_mount_for_id  (GProxyVolumeMonitor *v
 DBusConnection *g_proxy_volume_monitor_get_dbus_connection (GProxyVolumeMonitor *volume_monitor);
 const char     *g_proxy_volume_monitor_get_dbus_name       (GProxyVolumeMonitor *volume_monitor);
 
-gboolean g_proxy_volume_monitor_setup_session_bus_connection (void);
+gboolean g_proxy_volume_monitor_setup_session_bus_connection (gboolean need_integration);
 void g_proxy_volume_monitor_teardown_session_bus_connection (void);
 
 

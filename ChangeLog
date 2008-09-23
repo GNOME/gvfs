@@ -1,5 +1,18 @@
 2008-09-23  Alexander Larsson  <alexl@redhat.com>
 
+        * monitor/proxy/gproxyvolumemonitor.[ch]:
+        * monitor/proxy/gproxyvolumemonitor.h:
+        * monitor/proxy/remote-volume-monitor-module.c:
+	Only call the IsSupported dbus call when the class
+	is actually needed instead of on gio init.
+	Don't integrate internal session bus with mainloop
+	during is_support code, as that is not necessary yet, and
+	it caused problem if done in a thread.
+	
+	This fixes the trash crash issue in bug #547568.
+
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
         * client/Makefile.am:
         * common/Makefile.am:
         * common/gmountsource.c:
