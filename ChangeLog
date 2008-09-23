@@ -1,5 +1,10 @@
 2008-09-23  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Bump version of unstable branch to 1.1.1
+
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
         * monitor/proxy/gproxyvolumemonitor.[ch]:
         * monitor/proxy/gproxyvolumemonitor.h:
         * monitor/proxy/remote-volume-monitor-module.c:
