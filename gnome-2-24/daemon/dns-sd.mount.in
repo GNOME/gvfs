@@ -1,4 +1,0 @@
-[Mount]
-Type=dns-sd
-Exec=@libexecdir@/gvfsd-dnssd
-AutoMount=true

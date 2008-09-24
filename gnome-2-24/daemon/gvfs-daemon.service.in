@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.gtk.vfs.Daemon
-Exec=@libexecdir@/gvfsd
