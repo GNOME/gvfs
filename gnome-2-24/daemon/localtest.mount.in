@@ -1,0 +1,4 @@
+[Mount]
+Type=localtest
+Exec=@libexecdir@/gvfsd-localtest
+AutoMount=false

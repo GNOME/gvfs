@@ -1,0 +1,5120 @@
+2008-09-24  Christian Kellner  <gicmo@gnome.org>
+
+	* NEWS:
+	Update for release.
+
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
+        * monitor/proxy/gproxyvolumemonitor.[ch]:
+        * monitor/proxy/gproxyvolumemonitor.h:
+        * monitor/proxy/remote-volume-monitor-module.c:
+	Only call the IsSupported dbus call when the class
+	is actually needed instead of on gio init.
+	Don't integrate internal session bus with mainloop
+	during is_support code, as that is not necessary yet, and
+	it caused problem if done in a thread.
+	
+	This fixes the trash crash issue in bug #547568.
+
+2008-09-23  Alexander Larsson  <alexl@redhat.com>
+
+        * client/Makefile.am:
+        * common/Makefile.am:
+        * common/gmountsource.c:
+        * common/gmounttracker.c:
+        * monitor/gphoto2/Makefile.am:
+        * monitor/hal/Makefile.am:
+        * monitor/proxy/Makefile.am:
+	Link all modules against the installed libgvfscommon instead
+	of duplicating the statically linked one. This is safe wrt
+	namespace conflicts, because the modules are opened RTLD_LOCAL
+	so the dependencies will not pollute the global namespace.
+
+        * client/gdaemonvfs.c:
+	Make the gvfsdbus module persistant. This means we will never
+	unload it, and thus not unload libgvfscommon which could
+	be problematic. This is not a huge problem, as:
+	 + The gio modules will not be loaded anyway unless you use gio
+	 + The gvfsdbus module will be persistent anyway as soon as
+	   the app references the GVfs object, which likely all gio apps do
+	 + The module load order doesn't matter wrt unload order, because
+	   all gio modules are loaded before any one is unloaded.
+	
+2008-09-22  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 1.0.0. ===
+
+2008-09-22  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS: 
+	* configure.ac:
+	Bump version to 1.0.0
+
+2008-09-17  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	Kerberos authentication fixes. Fixes #524498
+	Inspired by the smb-browse patch from Steve Langasek
+
+=== gvfs 0.99.8 ===
+
+2008-09-15  Hans Petter Jansson <hpj@novell.com>
+
+	* NEWS:
+	* configure.ac: Prepare for 0.99.8 release.
+
+2008-09-15  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* client/smburi.c:
+	Encode username and domain into the URI
+
+2008-09-15  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	Revert commit #1772.
+	Set the information on the mount spec from the original URI
+
+2008-09-15  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c:
+	Don't leak the GSimpleAsyncResult in find_enclosing_mount_async.
+	Patch by Matthias Clasen <mclasen@redhat.com) (#552295)
+
+2008-09-15  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+        * client/gdaemonfileenumerator.c:
+	Add proper implementation of async file enumeration.
+	This avoids the problem with the default thread based ones
+	that could cause callbacks in the non-mainloop thread. (#551337)
+
+2008-09-15  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Fix gnome-keyring configure switch
+	Patch by Rémi Cardona  <remi@gentoo.org> (#552126)
+
+=== gvfs 0.99.7.1 ===
+
+2008-09-09  Bastien Nocera  <hadess@hadess.net>
+
+	* NEWS: upd
+	* configure.ac: 0.99.7.1
+
+2008-09-02  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/hal/ghaldrive.c: (g_hal_drive_eject_do):
+	* monitor/hal/ghalmount.c: (unmount_cb), (unmount_do),
+	(eject_wrapper_callback), (g_hal_mount_eject):
+	* monitor/proxy/gproxymount.c: (eject_wrapper_callback),
+	(g_proxy_mount_eject):
+	* monitor/proxy/gproxyvolume.c: (eject_wrapper_callback):
+	Remember to refcount objects (#546971).
+
+2008-09-02  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/hal/ghalvolume.c (format_size_for_display): Add docs
+	explaining why powers of 10 are used.
+
+2008-09-02  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/hal/ghalvolume.c (do_update_from_hal): Revert patch from
+	bug 550100 - we really don't want to show "61.7MB Volume" instead
+	of "64M Volume".
+
+2008-09-01  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Post-release version bump to 0.99.7.
+
+=== gvfs 0.99.6 ===
+
+2008-09-01  Hans Petter Jansson  <hpj@novell.com>
+
+	* NEWS: Update for 0.99.6.
+
+2008-09-01  Christian Kellner  <gicmo@gnome.org>
+	
+	* configure.ac:
+	Require libsoup >= 2.23.91
+
+2008-09-01  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsjobpull.c:
+	* daemon/gvfsjobpull.h:
+	New daemon method to pull files from daemons to the local
+	file system.
+
+	* daemon/gvfsjobpush.c:
+	* daemon/gvfsjobpush.h:
+	New daemon method to push local files to daemons. (Replaces
+	Upload)
+
+	* daemon/gvfsjobupload.c:
+	* daemon/gvfsjobupload.h:
+	Replaced by Push.
+
+	* common/gvfsdaemonprotocol.h:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.c:
+	* daemon/gvfsbackend.h:
+	Add Push and Pull. Remove Upload.
+
+	* client/gdaemonfile.c:	
+	New transfer logic. In case of move try push/pull (with
+	remove_source set to TRUE) first then fallback. In case of copy
+	try push/pull first then fallback. Use the same logic for
+	both cases.
+
+	* daemon/gvfsbackendburn.c:
+	Port Upload to Push.
+	
+	* daemon/gvfsbackendtrash.c:
+	Implement the Pull method. That should fix bug #529971
+
+2008-09-01  Christian Kellner  <gicmo@gnome.org>
+
+	* monitor/hal/ghalvolume.c: (do_update_from_hal):
+	Use g_format_size_for_display for consistency.
+	Patch from Christian Persch <chpe@gnome.org>
+	Fixes bug #550100
+
+2008-08-30  Matthias Clasen  <mclasen@redhat.com>
+
+	* common/gmountspec.c (g_mount_spec_from_dbus): Plug a tiny
+	memory leak.
+
+2008-08-28  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/proxy/gproxyvolume.c: (g_proxy_volume_mount):
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	(handle_volume_mount): Make sure we really read mount_flags and
+	use_mount_operation. Fixes RH bug 460223.
+
+2008-08-27  Bastien Nocera  <hadess@hadess.net>
+
+	* client/gdaemonvfs.c (get_mountspec_from_uri),
+	(_g_daemon_vfs_get_uri_for_mountspec): Don't drop
+	query and fragment portions of the URI when decoding
+	it and the URI scheme isn't handled by any backends
+	(Closes: #549553)
+
+2008-08-25  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 549253 – error path leaks
+
+	* common/gmountoperationdbus.c: 
+	* common/gdbusutils.c:
+	* daemon/gvfsbackendgphoto2.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsjobsetattribute.c: Plug some leaks on
+	error paths.
+
+2008-08-25  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackenddav.c (ms_response_to_file_info):
+	Same as below but for the webdav's getlastmodified
+	response (Closes: #538573)
+
+2008-08-22  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendhttp.c (query_info_ready): Use
+	libsoup to parse the "Last-Modified" header, not
+	the ISO-8601 parsing functions (Closes: #547133)
+	Requires libsoup trunk
+
+2008-08-21  Hans Petter Jansson  <hpj@novell.com>
+
+	* daemon/gvfsbackendgphoto2.c (ensure_ignore_prefix)
+	(do_mount)
+	(do_enumerate): Improve various user- and translator-
+	unfriendly error messages.
+
+2008-08-21  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Late post-release version bump to 0.99.6.
+
+2008-08-21  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* daemon/gvfsbackendgphoto2.c (do_unmount):
+	Handle plural forms correctly. Fixes bug #548841.
+
+=== gvfs 0.99.5 ===
+
+2008-08-16  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* daemon/gvfsbackenddav.c:
+	Fixed using display_name property getting overwritten
+
+2008-08-16  Christian Neumair  <cneumair@gnome.org>
+
+	* daemon/gvfsbackendtrash.c (add_extra_trash_info):
+	Correctly set copy name to original file name. Fixes #41852.
+
+2008-08-07  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* client/gdaemonfileoutputstream.c:
+	Fixed crash in gio because error was not properly
+	being set in the query_info noop
+
+2008-08-05  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* daemon/gvfsbackendsftp.c:
+	Added restoring file permissions when replacing a file.
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c:
+	Remove wrong dbus reply struct checks for replace_async,
+	create_async and append_async that would live to (false)
+	invalid reply errors.
+
+2008-08-05  Jesse van den Kieboom  <jesse@icecrew.nl>
+
+	* client/gdaemonfile.c:
+	Set etag to "" when supplied to g_daemon_file_replace_async
+	with NULL. Bug #546300
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Post-release bump to 0.99.5.
+
+=== gvfs 0.99.4 ===
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* NEWS: Update for release
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	Require glib 2.17.6 (cause by GEmblemedIcon changes)
+
+2008-08-05  Christian Kellner  <gicmo@gnome.org>
+
+	* monitor/hal/ghaldrive.c: 
+	Various ref counting fixes.
+
+	* monitor/hal/ghalvolume.c:
+	Report error in idle to avoid calling a callback with the
+	volume lock held.
+	Use volume lock in hhal_volume_get_activation_root. Various
+	ref counting fixes.
+
+	Bug #545489. Based on a patch from Matthias Clasen.
+
+2008-08-04  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c: (g_daemon_file_replace_async):
+	Correctly set the mode to 2 resulting in the replace vfunc being
+	called inside the backends.
+	Bug #544008. Patch by Jesse van den Kieboom <jesse@icecrew.net>
+
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	* monitor/proxy/gproxyvolumemonitor.c: Update the GIcon serialization
+	code to work with GEmblem.
+
+2008-08-03  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gvfsfusedaemon.c:
+	Avoid a race between the subthread and the main thread in the case
+	of dbus going bye-bye.
+	Bug #543552. Patch from Austin Lund <austin.lund@gmail.com>
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonvfs.c: 
+	Make sure we handle URI schemes case insensitive, so that File://
+	and other versions also work. Bug #528891
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendtrash.c: Don't include internal mounts
+	while building up the list of trash directories. Bug #525779
+	Patcg from A. Walton  <awalton@svn.gnome.org>
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: (parse_xml): Free the xml doc in
+	error cases. Plug the leaks, fix bug #545968, thanks to
+	Christian Persch <chpe@gnome.org> again!
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Use XML_PARSE_NONET with xmlReadMemory when parsing the webdav
+	responses to disallow net access of the parser. Bug #545966
+	Patch by Christian Persch <chpe@gnome.org>
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendtrash.c: (list_trash_dirs):
+	Create the home trash directory if it doesn't already exist,
+	so that we can monitor it for changes. Part two of bug #509740; 
+	Patch by Hans Petter Jansson <hpj@novell.com>
+
+2008-08-02  Christian Kellner  <gicmo@gnome.org>
+
+	* autogen.sh: Allow libtool 2.2.
+
+2008-08-02  Christian Persch <chpe@gnome.org>
+
+        * ChangeLog
+        * client/gdaemonfile.c
+        * client/gdaemonfileinputstream.c
+        * client/gdaemonfileoutputstream.c
+        * client/gvfsdaemondbus.c
+        * common/gdbusutils.c
+        * common/gvfsdaemonprotocol.c
+        * daemon/gvfsbackendarchive.c
+        * daemon/gvfsbackendcdda.c
+        * daemon/gvfsbackenddav.c
+        * daemon/gvfsbackendftp.c
+        * daemon/gvfsbackendgphoto2.c
+        * daemon/gvfsbackendobexftp-cap-parser.c
+        * daemon/gvfsbackendobexftp-fl-parser.c
+        * daemon/gvfsbackendobexftp.c
+        * daemon/gvfsbackendsftp.c
+        * daemon/gvfsbackendsmb.c
+        * daemon/gvfsbackendsmbbrowse.c
+        * daemon/gvfsjob.c
+        * daemon/gvfsjobopenforwrite.c
+        * daemon/gvfsreadchannel.c
+        * daemon/gvfswritechannel.c
+        * daemon/mount.c
+        * daemon/soup-input-stream.c
+        * daemon/soup-output-stream.c: Use g_set_error_literal where
+        appropriate. Bug #539167.
+
+2008-07-29  David Zeuthen  <davidz@redhat.com>
+
+	* client/gdaemonmount.c:
+	* common/gmounttracker.c:
+	* common/gmounttracker.h:
+	* daemon/gvfsbackend.c:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsbackendcdda.c:
+	* daemon/gvfsbackendgphoto2.c:
+	* daemon/mount.c:
+	Add x-content/* support to daemon mounts. Right now a backend
+	can only set the x-content/* type ahead of time. We might want
+	to add support dynamically obtaining it too (e.g. support
+	force_rescan).
+
+	* monitor/hal/ghalmount.c:
+	* monitor/hal/ghalvolume.c:
+	* monitor/hal/ghalvolumemonitor.c:
+	* monitor/hal/hal-utils.c:
+	* monitor/hal/hal-utils.h:
+	Add x-content/* support to the HAL volume monitor.
+
+	* monitor/proxy/gproxymount.c:
+	* monitor/proxy/gproxymount.h:
+	* monitor/proxy/gproxyvolumemonitor.c:
+	* monitor/proxy/gproxyvolumemonitor.h:
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	Add x-content/* support to proxy volume monitor. Also fix
+	a number of bugs the initial implementation had.
+
+	* programs/gvfs-mount.c:
+	Print out x-content-types.
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 528848 – [PATCH] statfs lies
+
+	* client/gvfsfusedaemon.c (vfs_statfs): Don't call
+	statvfs on /. Patch by Bill Nottingham.
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 518284 – need to add i18n on module branching
+
+	* daemon/gvfsbackendcdda.c:
+	* daemon/gvfsbackendgphoto2.c:
+	* daemon/gvfsbackendobexftp.c: Now is later.
+	Remove the I18N_LATER hack. 
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c (append_mount):
+	Don't pass a NULL uuid to dbus_message_iter_append_basic. Fixes
+	a crash with bind mounts.
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 545068 – use standard icon names
+
+	* daemon/gvfsbackendburn.c:
+	* daemon/gvfsbackendcomputer.c:
+	* daemon/gvfsbackenddnssd.c: Use standard icon names.
+
+2008-07-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.ac: Bump GLib requirement to 2.17.5 (for GEmblemedIcon)
+	* gproxyvolumemonitor.c: Handle GEmblemedIcon in deserialization code.
+	* gvfsproxyvolumemonitordaemon.c: Handle GEmblemedIcon in 
+	serialization code.
+
+2008-07-23  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Post-release bump to 0.99.4.
+
+=== gvfs 0.99.3 ===
+
+2008-07-23  Hans Petter Jansson  <hpj@novell.com>
+
+	* NEWS: 0.99.3 update.
+
+2008-07-23  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/proxy/gproxyvolumemonitor.c
+	(g_proxy_volume_monitor_finalize): Fix crasher (#544399)
+
+2008-07-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* configure.ac: Post-release bump
+
+=== gvfs 0.99.2 ===
+
+2008-07-22  Matthias Clasen  <mclasen@redhat.com>
+
+	* Makefile.am: Fix up intltool mess
+	* configure.ac: Bump glib requirement to 2.17.4
+	* NEWS: Updates
+
+2008-07-21  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/gphoto2/ggphoto2volume.c (do_update_from_hal_for_camera):
+	* daemon/gvfsbackendgphoto2.c (compute_icon_name):
+	(find_udi_for_device):
+	Use 'camera-photo' rather than just 'camera' since gnome-icon-theme
+	in 2.23/2.24 no longer ships 'camera'. Now the icons look fine again.
+
+2008-07-21  David Zeuthen  <davidz@redhat.com>
+
+	* configure.ac:
+	* monitor/Makefile.am:
+	* monitor/hal/*:
+	* monitor/gphoto2/*:
+	Separate the hal and gphoto2 volume monitors - this is in part
+	needed to solve bug #520123.
+
+2008-07-21  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/proxy/gproxyvolumemonitor.c
+	(g_proxy_volume_monitor_setup_session_bus_connection): Use the
+	correct hash functions for the hash table of existing proxy
+	volume monitors
+
+2008-07-21  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	#include <locale.h> to fix the build.
+
+2008-07-19  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gdaemonfile.c (g_daemon_file_set_attribute): Don't leak
+	D-Bus messages.
+
+2008-07-18  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (vfs_open)
+	(vfs_create): Hold the file handle lock while opening the stream.
+	Second part of fix for #536614.
+
+2008-07-17  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (reindex_file_handle_for_path): Steal the
+	old file handle record from the global hash table before replacing
+	its path, not after. Part of fix for #536614.
+
+2008-07-16  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/proxy/gproxyvolumemonitor.c:
+	* monitor/proxy/gproxyvolumemonitor.h:
+	* monitor/proxy/remote-volume-monitor-module.c:
+	Avoid setting up proxy volume monitors if no session bus is
+	available. Fixes a crasher with the Fedora NetworkManager system
+	settings plug-in that is now using GIO to do file monitoring.
+
+2008-07-08  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/hal/Makefile.am: Fix 'make distcheck'.
+
+2008-07-08  David Zeuthen  <davidz@redhat.com>
+
+	* configure.in:
+	* Makefile.am:
+	* hal/*:
+	* monitor/Makefile.am:
+	* monitor/hal/*:
+	Move hal/ to monitor/hal/.
+
+2008-07-08  David Zeuthen  <davidz@redhat.com>
+
+	Provide infrastructure for out of process volume monitors and
+	port the hal volume monitor to use it (#520132).
+
+	* Makefile.am:
+	* configure.ac:
+	Add the monitor and monitor/proxy directories.
+
+	* hal/Makefile.am:
+	Don't build a gio module for the hal volume monitor; instead
+	build a volume monitor daemon.
+
+	* hal/ghaldrive.[ch]:
+	* hal/ghalmount.[ch]:
+	* hal/ghalvolume.[ch]:
+	* hal/ghalvolumemonitor.[ch]:
+	* hal/hal-device.[ch]:
+	* hal/hal-device.[ch]:
+	* hal/hal-pool.[ch]:
+	Make all types static and implement g_volume_get_activation_root()
+	added to gio (#541793). Also emit the drive-eject-button
+	signal (#541794).
+
+	* hal/hal-module.c:
+	Removed since the monitor is being moved out of process.
+
+	* hal/hal-volume-monitor-daemon.c:
+	* hal/hal.monitor:
+	* hal/org.gtk.Private.HalVolumeMonitor.service.in:
+	New files for remote volume monitor.
+
+	* monitor/Makefile.am:
+	New file.
+
+	* monitor/proxy/*:
+	Add proxy volume monitor gio module (the D-Bus client side of
+	out-of-process volume monitors) and a static library for providing
+	the D-Bus server side of out of process volume monitors.
+
+	* programs/gvfs-mount.c:
+	Print activation uri for a volumes and icons for drives.
+	Also unref volume monitor when no longer in use.
+
+2008-07-01  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Correctly check the right libhal for hal features.
+	Patch from Andreas Rottmann <a.rottmann@gmx.at> (#537149)
+
+2008-06-16  Ross Burton  <ross@burtonini.com>
+
+	Bug 536252 – GFileEnumerator should allow access to the containing
+	GFile
+	
+	* client/gdaemonfile.c:
+	* client/gdaemonfileenumerator.c:
+	* client/gdaemonfileenumerator.h:
+	Pass the GFile to the file enumerator constructor and use it to
+	set the container property.  (Requires glib r7044)
+
+2008-06-11  Ross Burton  <ross@burtonini.com>
+
+	* programs/gvfs-mkdir.c:
+	Add -p to create parents (using
+	g_file_make_directory_with_parents, just landed in glib).  Patch
+	from A Walton (#511367)
+
+2008-06-11  A. Walton  <awalton@gnome.org>
+
+	* daemon/gvfsbackendtrash.c (escape_pathname), (unescape_pathname):
+	Use hex escapes in the trash backend. 
+	Patch by Andreas Henriksson.
+	Fixes bug #523139.
+
+2008-06-11  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendftp.c:
+	Fix recursive copy of directories (#522933)
+	Introduce new error 550 handling framework
+
+2008-06-10  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendarchive.c: (gvfs_archive_pop_job):
+	* daemon/gvfsbackenddav.c: (stat_location), (write_ready),
+	(close_write_ready), (do_make_directory), (do_delete):
+	* daemon/gvfsbackendftp.c:
+	(ftp_connection_set_error_from_response):
+	* daemon/gvfsbackendhttp.c: (g_vfs_job_failed_from_http_status),
+	(open_for_read_ready), (read_ready), (try_seek_on_read),
+	(close_read_ready):
+	* daemon/gvfsbackendobexftp.c: (_query_file_info_helper),
+	(error_occurred_cb), (do_delete):
+	Fix build warnings with GCC 4.3.0 (#537588).
+	* daemon/gvfsjob.c: (g_vfs_job_failed), (g_vfs_job_failed_literal):
+	* daemon/gvfsjob.h:
+	Add g_vfs_job_failed_literal ().
+
+2008-06-09  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb): 
+	Patch from Tomáš Bžatek <tbzatek@redhat.com> to fix the fugly icons
+	when the mime-type of a file isn't known to us. See:
+	https://bugzilla.redhat.com/show_bug.cgi?id=450453
+
+2008-06-04  Bastien Nocera  <hadess@hadess.net>
+
+	* hal/ghalvolumemonitor.c (update_cameras): Don't add
+	devices that are both audio players and cameras twice,
+	as it causes 1) error messages when plugging in (it tries to
+	mount the device another time) 2) weird behaviour in
+	nautilus' computer:/ (See #536601)
+
+2008-06-03  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Post-release bump to 0.99.2.
+
+=== gvfs 0.99.1 ===
+
+2008-06-03  Hans Petter Jansson  <hpj@novell.com>
+
+	* NEWS: Prepare for 0.99.1 release.
+
+2008-06-03  Hans Petter Jansson  <hpj@novell.com>
+
+	* configure.ac: Fix definition of giomodulesdir, so we install
+	GIO modules to the libdir specified by the user. Fixes distcheck.
+
+2008-05-28  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c: (do_open_for_read):
+	Return G_IO_ERROR_IS_DIRECTORY when attempting
+	to read a directory (fixes #522933 for SMB)
+
+2008-05-27  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c: (do_mount):
+	Don't set domain to mountspec when not setting username
+
+2008-05-27  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* common/gmountspec.c: (add_item):
+	Don't allow setting a null parameter in mountspec (coming 
+	from broken backend)
+
+2008-05-22  Hans Petter Jansson  <hpj@novell.com>
+
+	Fix fuse daemon locking and file handle life-cycle issues that
+	were causing frequent crashes.
+
+	* client/gvfsfusedaemon.c (file_handle_new): Add a "path" field
+	pointing to a string representing the path this file handle is
+	associated with, for reverse mapping.
+	(file_handle_unref): Is now responsible for decrementing the ref
+	count and freeing the handle if it reaches 0. Note that we need
+	to check the ref count again after obtaining the global mutex.
+	(file_handle_free): The new path member is freed here.
+	(get_file_handle_for_path): Ref the obtained handle.
+	(get_or_create_file_handle_for_path): Ditto, and hold the lock the
+	whole time.
+	(reindex_file_handle_for_path): Steal the old entry to avoid
+	buildup of stale handles.
+	(free_file_handle_for_path): Remove.
+	(vfs_getattr): Unref the handle when we're done with it.
+	(vfs_rename): Ditto.
+	(vfs_unlink): Ditto.
+	(vfs_truncate): Ditto.
+	(vfs_open): Don't ref the obtained handle; it's done in the helper.
+	(vfs_create): Ditto.
+	(vfs_release): Let file_handle_unref() free the handle if
+	appropriate. Note that the old logic here was inverted, meaning we'd
+	try to free the handle if the ref count was non-zero.
+	(vfs_init): The hash table no longer owns the path key strings -
+	the file handle does.
+
+2008-05-22  Hans Petter Jansson  <hpj@novell.com>
+
+	A more complete fix for GNOME bug #531516.
+
+	* client/gvfsfusedaemon.c (subthread_main): Send SIGHUP to the
+	main thread just before subthread exits.
+	(dbus_filter_func): When gvfsd goes away, exit the subthread's
+	main loop instead of immediately sending SIGHUP to parent thread.
+	Do the same when the session bus goes away.
+	(shutdown_on_idle): Remove, no longer needed.
+	(shutdown_signal): Remove, no longer needed.
+	(vfs_init): Tell dbus to not exit when session bus goes down.
+	Don't catch signals anymore, since Fuse does this for us.
+
+2008-05-22  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendarchive.c:
+	Improve error handling allowing to mount non-standard ISO images
+
+2008-05-22  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (shutown_on_idle)
+	(shutdown_signal)
+	(vfs_init): When the process receives one of the HUP, TERM or
+	INT signals, shut down gracefully. Fixes GNOME bug #531516.
+
+2008-05-21  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c: (do_mount):
+	Fix username & domain tests while setting mount spec
+
+2008-05-21  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendsmb.c (do_mount):
+	Add GVFS_SMB_DEBUG env variable to control smb debugging.
+
+2008-05-21  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendsmb.c (do_mount):
+	Set the information on the mount spec *after* having asked
+	the user for credentials since username and domain can be
+	changed by the user.
+
+2008-05-21  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	Check for gphoto2 versions greaten then 2.4.0. Patch from 
+	Tom Parker <palfrey@tevp.net>. Fixes #531702
+
+2008-05-20  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	* programs/Makefile.am:
+	Allow to disable the installation of the bash completion
+	scripts. Also make it possible to choose the directory
+	where the file gets installed. Fixes #530772
+
+2008-05-20  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_fill_file_info):
+	Fill in the display name, even if layers above should be able to do
+	without (Closes: #523699)
+
+2008-05-11  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c: Fix erroneous copyright header and
+	provide a better description of the source file.
+
+2008-05-09  Federico Mena Quintero  <federico@novell.com>
+
+	http://bugzilla.gnome.org/show_bug.cgi?id=532375 - Fix strdup() /
+	g_free() confusion.
+
+	* hal/hal-device.c (hal_device_new_from_udi_and_properties):
+	g_strdup() the UDI.  We can't just steal it, since it comes from
+	libhal, which uses strdup() (and we do g_free() in our finalizer).
+
+	* hal/hal-pool.c (hal_pool_new): Free the actual device strings here.
+
+2008-04-22  Benjamin Otte  <otte@gnome.org>
+
+	* */*.[ch]: get rid of modelines
+	The modelines were inconsistent and caused issues when used in 
+	different editors.
+
+2008-04-21  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* daemon/gvfsbackendftp.c: (do_enumerate_directory): 
+	remove trailing '\r', that workarounds a parser issue causing 
+	some filenames to not be listed (#524880)
+
+2008-04-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* client/gdaemonvfs.c:
+	* hal/hal-pool.c: Set exit-on-disconnect to FALSE on private
+	dbus connections to prevent unexpected exits.  (#528785)
+
+2008-04-21  David Zeuthen  <davidz@redhat.com>
+
+	* client/gvfsfusedaemon.c: Fix some reference issues, see
+	http://mail.gnome.org/archives/gvfs-list/2008-April/msg00017.html
+
+2008-04-20  David Zeuthen  <davidz@redhat.com>
+
+	* daemon/gvfsbackendarchive.c: some minor fixes (#528950)
+
+2008-04-16  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghalvolumemonitor.c: (should_mount_be_ignored),
+	(should_volume_be_ignored), (update_mounts):
+
+	Avoid having GVolume and GMount objects for mounts for which the
+	mount point will make g_unix_mount_guess_should_display() return
+	FALSE. This fixes a problem where e.g. live cd installers mounts
+	some file system somewhere (e.g. a /boot partition at
+	/mnt/installer_boot).
+
+2008-04-16  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 526793 – unmount hangs with some backends
+
+	* daemon/gvfsbackendgphoto2.c: Set exit-on-disconnect to FALSE
+	on the private dbus connection to prevent unexpected exit before
+	the job is done.
+
+2008-04-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Set mount prefix on the mount_spec (again). Fixes #528218
+
+2008-04-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendhttp.c:
+	Add logging for soup so we can get easy network traces even
+	if we are doing https.
+
+2008-04-15  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 526454 – too early use of dbus session bus
+
+	* client/gdaemonvfs.c (g_io_module_load): Refuse to load if
+	there is no session bus. 
+	
+2008-04-14  Matthias Clasen  <mclasen@redhat.com>
+
+	* client/gvfsfusedaemon.c: You cannot store pointers in integers.
+	Fixes a crash on 64bit systems.
+
+2008-04-14  Matthias Clasen  <mclasen@redhat.com>
+
+	* common/gmounttracker.c (g_mount_tracker_finalize): Only free
+	lock if it is non-NULL. Pointed out by Denis Leroy.
+
+2008-04-07  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghalvolume.c (g_hal_volume_new): Unbreak the gphoto2 backend
+	by allowing automounting.
+
+	* programs/gvfs-mount.c (main, unmount_all_with_scheme): Add a
+	new option --unmount-scheme
+
+	* AUTHORS: Add cdda and gphoto2 backends
+
+2008-04-05  Christian Kellner  <gicmo@gnome.org>
+
+	* client/httpuri.c: 
+	Only set a port in the mount spec if it is not the default
+	port for the scheme.
+
+	* daemon/gvfsbackenddav.c:
+	Cleanup mount function a bit.
+
+2008-04-04  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Implement set_display_name. (#525980) 
+	With this patch we also do our own redirection handling which
+	alyways allows redirects from /a/b -> /a/b/ (trainling slashes)
+	even for non safe methods. Also some code was cleaned up.
+
+2008-04-02  Christian Kellner  <gicmo@gnome.org>
+
+	* hal/hal-utils.h:
+	* hal/hal-utils.c:
+	Create new files for utility functions and move get_disc_icon()
+	and get_disc_name() here.
+	Also create get_themed_icon_with_fallbacks() to create
+	GThemedIcons with default fallbacks but with the ability to
+	pass in another name to create the fallbacks from then the
+	icon name.
+
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	Use newly created get_themed_icon_with_fallbacks () and pass
+	in custom fallback name for encrypted mounts/volumes (#525153).
+
+	* hal/Makefile.am:
+	Add hal-utils.[hc]
+
+	* programs/gvfs-mount.c:
+	Display the icon names for mounts/volumes if the icon is
+	a GThemedIcon.
+	
+	[Merged from gnome-2-22]
+
+2008-04-01  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* hal/ghalmount.c: (format_size_for_display), (do_update_from_hal):
+	Use consistent translatable strings for mounts and volume (#525286)
+
+2008-03-31  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Get the right size of the command messages.
+	Actually send file attributes in mkdir request.
+
+2008-03-31  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: Make sure we send (error)
+	replies to all outstanding jobs and unmount the mount
+	in case of an error occures while reading data from
+	the pipe to the ssh agent (e.g. if the ssh process died).
+
+2008-03-31  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gvfsdaemondbus.[ch]:
+	In call_sync, on stale cache errors due to a
+	mount daemon disappearing, invalidate caches and
+	return G_VFS_ERROR_RETRY so that the caller can
+	retry with fresh caches.
+	
+        * client/gdaemonfile.c:
+	Retry calls on G_VFS_ERROR_RETRY.
+
+2008-03-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_pop_job):
+	fix race that could cause uploads to stop
+
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Bump version to 0.99.1 for unstable development
+	Stable branch is gnome-2-22
+
+2008-03-28  Paolo Borelli  <pborelli@katamail.com>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsjobclosewrite.c:
+	Plug some more minor memory leaks.
+
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.2.2 ===
+
+2008-05-09  Federico Mena Quintero  <federico@novell.com>:ChangeLog
+
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am (gvfsd_smb_SOURCES):
+	Dist libsmb-compat.h.
+
+	* NEWS:
+	Update for release
+
+2008-03-28  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Silence out libtool if
+	make is invoked with --silence.
+
+2008-03-28  Paolo Borelli  <pborelli@katamail.com>
+
+	* daemon/gvfsbackendtrash.c: plug some minor memory leaks.
+
+2008-03-28  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfileenumerator.c (g_daemon_file_enumerator_next_file):
+	Actually increment count so that timeouts works.
+	Pointed out by Joe Marcus Clarke
+
+2008-03-27  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Handle all target exists errors correctly
+	in move. This should make us not silently
+	overwrite files.
+	
+        * daemon/gvfsjobmove.[ch]:
+        Add g_vfs_job_move_progress_callback
+
+2008-03-27  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Introduce helpers for multi-request ops.
+	Use it for query_info.
+
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfile.c:
+	Implement true async query_filesystem_info
+
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfileenumerator.c:
+        (g_daemon_file_enumerator_next_file):
+	Avoid hanging forever and not sending any async messages.
+	This could happen if we raced and missed the done check.
+
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsmonitor.c:
+	Send replies to subscribe and unsubscribe messages.
+
+2008-03-26  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Pass id via the command object, not via out parameter.
+	Removes a bunch of code to pass the id around.
+
+2008-03-25  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfschannel.c: (got_request), (send_reply_cb):
+	Do not create new read/write jobs if the gvfschannel has been
+	cancelled. Fixes a crash in sftp backend (#522192).
+	
+2008-03-25  Paolo Borelli  <pborelli@katamail.com>
+
+	* daemon/gvfsbackendtrash.c (add_extra_trash_info):
+	Make sure the display name is correct even for subdirectories
+	inside the trash. (#523127)
+
+2008-03-25  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendarchive.c (archive_file_set_info_from_entry):
+	Better mount icons and root display name.
+
+2008-03-24  A. Walton  <awalton@svn.gnome.org>
+
+	* configure.ac:
+	The CDDA backend requires HAL to build.
+	Closes bug #524062.
+
+2008-03-22  Christian Kellner  <gicmo@gnome.org>
+
+	* client/Makefile.am:
+	* configure.ac:
+	* gconf/Makefile.am:
+	* hal/Makefile.am:
+	Respect the giomoduledir provided in gio's package config
+	file. (#523852 and maybe #523039)
+
+2008-03-20  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/libsmb-compat.h:
+	Port to new smbclient API introduced in samba-3.2.0pre2
+
+2008-03-19  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsjobenumerate.c (send_reply): 
+	* daemon/gvfsjobdbus.c (send_reply):
+	Add job pointer to output spew to make it possible
+	to match lines.
+
+2008-03-19  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login): Make the sftp backend
+	work when pam_krb5 is used on the server side.
+
+2008-03-18  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac: Post release version bump.
+
+=== gvfs 0.2.1 ===
+
+2008-03-17  Christian Kellner  <gicmo@gnome.org>
+
+	* NEWS: Update for release
+
+2008-03-17  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendftp.c (do_mount):
+	Correctly handle username in mountspec. Only set it if
+	it was in the requested mountspec (and only to that value).
+	Fixes #522449
+
+2008-03-17  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c: (find_enclosing_mount_cb): Don't unref
+	mount_info since we don't one a ref. (#522919)
+
+2008-03-17  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	return G_IO_ERROR_NOT_EMPTY if we're trying to delete a non-empty
+	directory.
+	* hal/ghalvolumemonitor.c: (get_mount_point_for_device):
+	remove unused variable
+
+2008-03-16  Christian Kellner  <gicmo@gnome.org>
+
+	* AUTHORS: Forgot to mention A. Walton. Correct that.
+
+2008-03-16  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonfile.c:  Don't free up the error that
+	we don't own (#522566). Thanks Cosimo Cecchi for helping
+	to debug the issue.
+
+2008-03-16  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* programs/gvfs-rename.c (main): Fix wording of error
+	messages. Don't include "Error renaming file" since
+	that's what the error->message might contain as well.
+
+2008-03-14  Christian Kellner  <gicmo@gnome.org>
+
+	* programs/Makefile.am:
+	* programs/gvfs-rename.c:
+	Add a little helper program that renames files
+	by calling g_file_set_display_name ().
+
+2008-03-14  Christian Kellner  <gicmo@gnome.org>
+
+	* AUTHORS: Update, add a lot of people and I am
+	sure I have forgotten a few.
+
+	* MAINTAINERS: Add myself
+
+2008-03-14  Hans Petter Jansson  <hpj@novell.com>
+
+	Implement most of the GDaemonFile async functions.
+
+	* client/gdaemonfile.c (stream_open_cb): Implement.
+	(append_to_async_cb): Implement.
+	(g_daemon_file_append_to_async): Implement.
+	(g_daemon_file_append_to_finish): Implement.
+	(create_async_cb): Implement.
+	(g_daemon_file_create_async): Implement.
+	(g_daemon_file_create_finish): Implement.
+	(enumerate_children_async_cb): Implement.
+	(g_daemon_file_enumerate_children_async): Implement.
+	(g_daemon_file_enumerate_children_finish): Implement.
+	(find_enclosing_mount_cb): Implement.
+	(g_daemon_file_find_enclosing_mount_async): Implement.
+	(g_daemon_file_find_enclosing_mount_finish): Implement.
+	(replace_async_cb): Implement.
+	(g_daemon_file_replace_async): Implement.
+	(g_daemon_file_replace_finish): Implement.
+	(set_display_name_async_cb): Implement.
+	(g_daemon_file_set_display_name_async): Implement.
+	(g_daemon_file_set_display_name_finish): Implement.
+	(g_daemon_file_file_iface_init): Hook up new async functions.
+
+2008-03-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/main.c:
+	Don't autostart fuse backend if the GVFS_DISABLE_FUSE
+	env var is set
+	
+2008-03-14  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolume.c (g_hal_volume_new):
+	Respect storage.automount_enabled_hint hal property (#520736)
+	Patch from Martin Pitt
+
+2008-03-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	(set_info_from_stat):
+	Mark files with an initial dot to be hidden.
+	This handles unix smb shares, and should not affect
+	windows shares much, since they generally don't use dot
+	for extensions so its not used otherwise in filenames.
+
+2008-03-14  Christian Kellner  <gicmo@gnome.org>
+
+	* client/httpuri.c:
+	Make sure we set the port to -1 in case when no port
+	is specified on the url so the port will be omiited
+	when we convert the url to a string
+
+2008-03-13  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/archive.mount.in:
+	Actually add the mount file for archive
+
+2008-03-12  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	fix enumerating to do the right thing
+
+2008-03-12  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendarchive.[ch]:
+	Added archive backend from Benjamin Otte
+	Requires libarchive
+
+2008-03-12  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	invalidate the cache of directories that we modified ourselves.
+	* daemon/Makefile.am:
+	allow 10 threads in parallel
+
+2008-03-12  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gdaemonfile.c (do_async_path_call): We were testing the
+	wrong cancellable pointer for non-NULL-ness, which broke cancellation
+	for all async operations. Fix that.
+
+2008-03-11  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gsysutils.c:
+	* configure.ac:
+	OpenBSB portability fixes.
+	Patch from Jasper Lievisse Adriaanse <jasper@humppa.nl>
+
+2008-03-11  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c (spawn_ssh):
+	Use GError->message, not GError->msg.
+	Patch from Jasper Lievisse Adriaanse <jasper@humppa.nl>
+
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.2.0.1 ===
+
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Bump version to 0.2.0.1 (minor release
+	last translation changes)
+
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+	* configure.ac:
+	Bump version to 0.2.0
+
+2008-03-10  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	Free strings with g_free, not dbus_free (#521269)
+
+2008-03-08  Christian Kellner  <gicmo@gnome.org>
+
+	* hal/ghalmount.c: 
+	Use dgettext instead of gettext as we are a library.
+
+	* hal/ghalvolume.c: 
+	Translate disc names (using dgettext).
+
+2008-03-07  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	(get_mount_point_for_device):
+	(should_volume_be_ignored):
+	Really make sure we ignore stuff outside /media (#520851)
+
+2008-03-07  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalmount.c:
+	(get_disc_name):
+	Translate disc names.
+	
+	* hal/ghalvolume.c:
+	(g_hal_volume_new):
+	Don't automount gphoto volumes.
+
+2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* programs/gvfs-mount.c: ANSIfication
+	* daemon/gvfsbackendnetwork.c: Same.
+
+2008-03-07  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/soup-input-stream.c: Since G_SEEK_END is not supported
+	at the moment immediately return FALSE without aborting the
+	the soup message.
+
+2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* daemon/gvfsreadchannel.c,
+	* daemon/gvfswritechannel.c:
+	Fix format specifiers here.
+
+2008-03-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* client/httpuri.c: Remove unused vars.
+	* daemon/gvfsbackenddav.c: Remove a couple
+	of unused variables.
+
+2008-03-07  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Initialize error variable to NULL. (#519035)
+
+2008-03-06  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	(_g_unix_mount_point_guess_should_display),
+	(should_be_hidden_according_to_etc_fstab),
+	(should_volume_be_ignored), (should_drive_be_ignored),
+	(update_drives), (update_volumes):
+	Avoid showing volumes from /etc/fstab if the mount point is one
+	that should not be displayed to the user (#520851)
+
+2008-03-07  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Only ask for common properties and don't use allprop.
+
+2008-03-06  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Correctly set the content types and the icon correclty. (#518679)
+	Also don't add the If-None-Matcher header for now since
+	early apache versions don't like it. We need to be smart about
+	that later.
+
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gsysutils.c:
+	Include <sys/types.h> also (#520307)
+
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	Use g_content_type_get_icon() instead of open
+	coding it. Also picks up more icons since
+	that has been fixed. (#520742)
+	
+2008-03-06  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_create),
+	(ftp_connection_ensure_data_connection),
+	(g_vfs_backend_ftp_pop_connection), (do_mount):
+	timeout I/O or g_cond_wait after 30 seconds
+
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gsysutils.c:
+	* configure.ac:
+	Include sys/uio.h if availible (#520307)
+
+2008-03-06  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	fail early if there's no ftp server where we connect
+
+2008-03-06  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_parse_system),
+	(ftp_connection_use), (dir_default_iter_process):
+	parse the ftp server's system. Using that information, mark dot-files
+	as hidden.
+	Fixes #520203
+
+2008-03-05  A. Walton  <awalton@svn.gnome.org>
+
+	* programs/gvfs-cat.c (main):
+	* programs/gvfs-copy.c (main):
+	* programs/gvfs-info.c (main):
+	* programs/gvfs-ls.c (main):
+	* programs/gvfs-move.c (main):
+	* programs/gvfs-open.c (main):
+	* programs/gvfs-save.c (main):
+	* programs/gvfs-tree.c (main):
+	Error out if the user passes invalid flags and warn the user.
+	Fixes bug #520086.
+
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Allow setting unix mode on sftp (#520571)
+	Patch from Carlos Garcia Campos
+
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackenddav.c:
+	(do_mount):
+	Set display name for dav mount (#519588)
+
+2008-03-06  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_move):
+	fail if file exists
+
+2008-03-06  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c:
+	(foreign_volume_removed):
+	Avoid deadlock when foreign volume is removed.
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (dir_default_iter_process),
+	(do_enumerate):
+	don't list "." and ".." directories.
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_create):
+	fail if the file to be created already exists
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	set anonymous login to FALSE, no uninitialized variables please.
+	* hal/ghalvolumemonitor.c: (adopt_orphan_mount):
+	fix warning due to glib changes
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* INSTALL: Add mention of obex-data-server
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (dir_default_get_root):
+	the proper icon name is folder-remote, not remote-folder.
+	really fixed #520189
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* configure.ac: Disable gphoto2 building when
+	HAL is disabled as well (Closes: #519872)
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* client/gvfsuriutils.c (g_vfs_decode_uri):
+	Fix parsing of IPv6-style hostnames to not find the
+	port in the path section of the URI, fixes browing
+	browsing ObexFTP on Nokia Series 60 phones which show
+	drive letters as directories in the root (eg. "C:")
+	(Closes: #520314)
+
+	* client/test-uri-utils.c (main): Add test for the above,
+	and another test for the IPv4-style URIs
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsdaemonutils.c:
+	(gvfs_file_info_populate_content_types):
+	add text-x-generic mime type as a last fallback option.
+	Fixes #520189
+
+2008-03-05  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	rewrite file info construction and directory listing. It should now
+	correctly resolve symlinks and be fast enough for general use.
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (do_enumerate):
+	Better error message for Nokia 3650 phones
+
+2008-03-05  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_get_icon_from_type),
+	(_get_type_from_class), (_is_nokia_3650), (_get_device_properties),
+	(g_vfs_backend_obexftp_finalize), (do_mount), (do_open_for_read),
+	(do_query_info), (do_query_fs_info), (do_enumerate), (do_delete):
+	Error out cleanly from do_mount() if we somehow lose connection
+	to the device, Show a meaningful error when browsing broken
+	Nokia 3650 phones (Closes: #519733)
+
+2008-03-05  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountsource.c:
+	(ask_password_reply):
+	Always set password to non-NULL, but keep
+	user/domain as NULL if not specified by user.
+	Fixes #520317 (smb auth crash)
+	
+2008-03-05  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c:
+	(g_daemon_mount_eject_finish):
+	Initialize drive variable not access
+	undefined memory (#520388)
+
+2008-03-04  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/ParseFTPList.c (ParseFTPList):
+	Trivial C89 patch, fixes #520339. 
+	Patch from Jens Granseuer.
+
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	set the right GError here. Makes gvfsd-ftp run fine manually again.
+
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountspec.c: (g_mount_spec_set_with_len):
+	add g_return_if_fail here - I had SEGVs sometime later due to values
+	being NULL here. So better catch em early
+
+2008-03-04  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* configure.ac: New version update
+		
+=== gvfs 0.1.11 ===
+
+2008-03-04  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* NEWS: Update for 0.1.11
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	(g_hal_volume_monitor_finalize):
+	Free mounts with g_unix_mount_free, not g_object_unref.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsfusedaemon.c:
+	(debug_print):
+	Actually disable debug log by default
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac: 
+	Post release version bump
+	
+=== gvfs 0.1.10 ===
+	
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c (_g_daemon_vfs_get_mount_info_async):
+	Bump timeout to standard gvfs time.
+	Patch from Matthias Clasen
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	(update_all):
+	Actually emit changes for volumes and mounts too
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.9 ===
+	
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am (gvfsd_ftp_SOURCES):
+	Use correct case for ParseFTPList.h
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	(_g_daemon_vfs_get_uri_for_mountspec):
+	Fix crash with NULL host (like "ftp://")
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c (g_daemon_mount_get_icon):
+	Use fallbacks for mount icon.
+
+	* NEWS:
+	Update for release.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendcomputer.c:
+	(mount_volume_from_drive):
+	Avoid crash when mounting drive
+	Fix leak.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalmount.c:
+	Fix deadlock when looking for cdrom icons.
+
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (run_list_command):
+	don't require \r as line ending for LIST commands. Fixes ftp.netbsd.org
+	* hal/ghalvolumemonitor.c: (adopt_orphan_mount):
+	unused variable
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c:
+	* client/gdaemonvolumemonitor.c:
+	* hal/ghaldrive.c:
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	* hal/ghalvolumemonitor.[ch]:
+	Properly lock around volume monitors and
+	volume monitor objects.
+	Emit all events in idles to avoid reentrancy
+	issues. Fixed deadlock in #519599.
+
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountsource.c:
+	* common/gmounttracker.c:
+	Work around problems with type registering when the common code
+	is used in both daemon and client.
+
+2008-03-04  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountsource.c: (ask_password_reply),
+	(g_mount_source_ask_password_finish),
+	(g_mount_source_ask_password), (op_ask_password_reply):
+	* common/gmountsource.h:
+	add an anonymous_out parameter for anonymous logins.
+	* daemon/gvfsbackenddav.c: (soup_authenticate_interactive):
+	* daemon/gvfsbackendsftp.c: (handle_login):
+	* daemon/gvfsbackendsmb.c: (auth_callback):
+	make the backends compile with the new parameter. They don't use
+	anonymous logins.
+	* daemon/gvfsbackendftp.c: (do_mount):
+	make login work as users would expect it with anonymous logins. 
+	Fixes bug #520131
+
+2008-03-04  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* common/gmountspec.c: (g_mount_spec_copy):
+	* daemon/gvfsdaemon.c: (g_vfs_daemon_initiate_mount):
+	* daemon/main.c: (main):
+	Fix memory leaks.
+	
+2008-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	Avoid duplications in supported_uris.
+	
+	* daemon/smb-browse.mount.in:
+	* daemon/smb.mount.in:
+	Add scheme info so smb is listed in supported_uris again.
+
+2008-03-03  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Remove unecessary message_new_from_xxx functions. Prefix all
+	public utility functions that need the backend with
+	http_backend_, i.e. rename g_vfs_backend_uri_for_filename() to
+	http_backend_uri_for_filename().
+	Create http_backend_send_message(), http_backend_queue_message()
+	convenience functions which will pick up the right SoupSession.
+
+	* daemon/gvfsbackenddav.c:
+	Port to new utility functions and http_backend_xx namespace.
+	Clean up error handling and remove the const keyword from most
+	SoupURI variables.
+
+2008-03-03  David Zeuthen  <davidz@redhat.com>
+
+	Add write support to gphoto2 backend. Also performance
+	enhancements for querying, enumerating and reading.
+	Fixes bug #519651
+
+	* daemon/gvfsbackendgphoto2.c: (monitor_proxy_free), (DEBUG),
+	(write_handle_free), (ensure_not_dirty), (dup_for_gphoto2),
+	(monitors_emit_internal), (monitors_emit_created),
+	(monitors_emit_deleted), (monitors_emit_changed),
+	(caches_invalidate_all), (caches_invalidate_free_space),
+	(caches_invalidate_dir), (caches_invalidate_file),
+	(get_error_from_gphoto2), (release_device),
+	(g_vfs_backend_gphoto2_finalize), (_gphoto2_logger_func),
+	(g_vfs_backend_gphoto2_init), (find_udi_for_device),
+	(_hal_device_removed), (split_filename_with_ignore_prefix),
+	(add_ignore_prefix), (file_get_info), (is_directory), (is_regular),
+	(is_directory_empty), (ensure_ignore_prefix), (do_mount),
+	(try_mount), (do_unmount), (free_read_handle), (do_open_for_read),
+	(try_read), (try_seek_on_read), (do_close_read), (do_query_info),
+	(try_query_info), (do_enumerate), (try_enumerate),
+	(do_query_fs_info), (try_query_fs_info), (do_make_directory),
+	(do_slow_file_rename_in_same_dir), (do_file_rename_in_same_dir),
+	(do_dir_rename_in_same_dir), (do_set_display_name), (do_delete),
+	(do_create_internal), (do_create), (do_replace), (do_append_to),
+	(do_write), (do_seek_on_write), (commit_write_handle),
+	(do_close_write), (do_move), (vfs_dir_monitor_destroyed),
+	(do_create_dir_monitor), (vfs_file_monitor_destroyed),
+	(do_create_file_monitor), (g_vfs_backend_gphoto2_class_init):
+
+2008-03-03  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/mount.c: (read_mountable_config):
+	Fix memory leak.
+	
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
+	* client/gdaemonvfs.c: (fill_mountable_info):
+	properly parse aliases
+
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
+	* client/gvfsuriutils.c: (g_vfs_decode_uri):
+	revert yesterday's commit. It broke the obex and gphoto backends. We
+	now parse hostnames different for internet hosts.
+	* daemon/ftp.mount.in:
+	Parse hostnames different.
+
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_receive),
+	(ftp_connection_sendv), (g_vfs_backend_ftp_pop_connection),
+	(do_mount):
+	fix server disconnect on timeout. Side effect is that the ftp backend
+	just spawned multiple connections support.
+
+2008-03-03  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gdbusutils.[ch]:
+	Add _g_dbus_message_iter_append_args_valist and
+	_g_dbus_message_iter_append_args.
+
+	* common/gvfsdaemonprotocol.h:
+	Add G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTABLE_INFO
+	
+	* client/Makefile.am:
+	* client/gdaemonvfs.c:
+	Use listMountableInfo to get supported uri schemes
+	and information for default uri handling.
+	Handle default port in uris and if host_is_inet normalize hostnames,
+	including removing ipv6 brackets.
+	
+	* client/sftpuri.c:
+	Removed, as the previous work replaces it
+	
+	* daemon/gvfsdaemonutils.c:
+	(gvfs_file_info_populate_content_types):
+	Fix uninitialized variable warning.
+	
+	* daemon/mount.c:
+	Read new mountfile info and implement
+	list_mountable_info.
+	
+	* daemon/sftp.mount.in:
+	Add info for sftp
+
+2008-03-03  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsjob.c: (g_vfs_job_try): Make sure the g_object_unref
+	call is _before_ the return call.
+	Fixes bug #519867
+
+2008-03-03  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendtrash.c: (do_mount):
+	Create the root monitor for trash when mounting. (#509740).
+
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_receive):
+	dynamically resize the read buffer. This allows receiving the huge
+	welcome messages some ftp servers think are cool.
+
+2008-03-03  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_parse_features),
+	(ftp_connection_use), (ftp_connection_ensure_data_connection):
+	implement EPSV. This should make IPv6 work.
+
+2008-03-03  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (do_mount), (do_open_for_read),
+	(do_read), (do_query_info), (do_query_fs_info), (do_enumerate),
+	(do_delete), (do_make_directory): Fix a crasher when
+	mounting fails, by not freeing the error just before using it
+	(duh!) (Closes: #519752), Fix a few error paths leaking errors
+
+2008-03-03  Luca Ferretti  <elle.uca@libero.it>
+
+	* daemon/gvfsbackendftp.c: (do_query_info):
+	Make "file don't exist" message conform to other backends;
+	no, it isn't a string freeze break, the message yet exists
+	elsewhere.
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_filename_construct):
+	use g_build_path() to not get excess slashes in paths
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_try_cd), (process_line),
+	(do_query_info), (do_move), (g_vfs_backend_ftp_class_init):
+	implement move vfunc
+
+2008-03-02  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* common/gmountsource.c: (ask_password_reply):
+	Treat DBus output paramaters that contain "" as NULL. It fixes the
+	sftp backend when a username is provided by the user.
+	
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_open_for_read), (do_start_write),
+	(do_make_directory):
+	push back connection if we fail starting a read/write
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* client/gvfsuriutils.c: (g_vfs_decode_uri):
+	don't pass the [] when parsing IPv6 addresses
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_make_directory),
+	(g_vfs_backend_ftp_class_init):
+	implement make_directory
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_delete),
+	(g_vfs_backend_ftp_class_init):
+	implement delete
+
+2008-03-02  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	redo error handling: We now store the error and the job in the
+	FtpConnection. This way we don't have to handle errors in the outer
+	functions and can just "if (conn->error) return FALSE;" in the inner
+	functions.
+
+2008-03-01  David Zeuthen  <davidz@redhat.com>
+
+	* daemon/gvfsbackendcdda.c (do_mount): Avoid calling
+	cddio_cddap_close() twice on an error path.
+
+2008-03-01  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (run_list_command):
+	close the data connection before trying to receive the OK. Some
+	servers send it out only after the connection was closed properly and
+	otherwise cause stalls.
+
+2008-03-01  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	use 0 as port in the keyring when it's the default ftp port. Stops the
+	access dialog fro printing the port name.
+
+2008-03-01  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_query_file_info_helper):
+	Fix another case where the icon name was wrong for the
+	root folder (Helps: #519369)
+
+2008-03-01  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/Makefile.am:
+	* daemon/ParseFTPList.c:
+	* daemon/ParseFTPList.h:
+	* daemon/gvfsbackendftp.c: (ftp_connection_cd), (process_line),
+	(run_list_command), (do_query_info), (do_enumerate):
+	rewrite directory enumeration and query_info by using the LIST parsing
+	code from Mozilla. It was the only code I could find that was LGPL
+	licensed, even though it looks way out of date.
+	Also, error messages are handled way better and the code even copes
+	somewhat with symlinks.
+
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_get_icon_from_type):
+	Use better icons for the devices
+
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_get_icon_from_type),
+	(_get_type_from_class), (_get_device_properties),
+	(do_mount): When getting the remote device's name, also get
+	its class, so we can use device specific icons instead of the 
+	standard Bluetooth icon (Closes: #519369)
+
+2008-02-29  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
+	(ftp_connection_parse_features), (ftp_filename_from_gvfs_path),
+	(ftp_filename_to_gvfs_path), (ftp_filename_construct),
+	(do_open_for_read), (do_create), (do_append), (do_replace),
+	(do_set_display_name), (g_vfs_backend_ftp_class_init):
+	introduce a differentiation between gvfs paths and ftp filenames and
+	use it. Also implement set_display_name.
+
+2008-02-29  Benjamin Otte  <otte@gnome.org>
+
+	* common/gdbusutils.c: (dbus_source_add_watch):
+	* daemon/dbus-gmain.c: (connection_setup_add_watch):
+	use the right names for dbus version macros
+
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (is_connected), (do_mount),
+	(do_open_for_read), (is_busy), (do_read), (do_query_info),
+	(do_query_fs_info), (do_enumerate), (do_delete),
+	(do_make_directory): Don't use a temporary error to set
+	jobs as failed, use g_vfs_job_failed instead
+	Error out properly when trying to open a directory for read
+
+2008-02-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (g_vfs_backend_obexftp_finalize),
+	(_retrieve_folder_listing), (_query_file_info_helper),
+	(do_open_for_read), (do_query_info), (do_query_fs_info),
+	(do_enumerate), (do_delete): Use a convenience function
+	to load directory listings, implement a simple cache there
+	that keeps folder listings for 3 seconds (should speed up
+	folder enumeration followed by info fetching, as well
+	as checking for non-existant files)
+
+2008-02-29  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsdaemonutils.[ch]:
+	Rename gvfs_file_info_populate_names() to
+	gvfs_file_info_populate_names_as_local() and
+	add docs explaining when to use this function
+	and when not to.
+
+2008-02-29  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsdaemonutils.c:
+	(gvfs_file_info_populate_content_types):
+	Use g_content_type_get_icon() for the icon mapping.
+	Use folder, not folder-remote for icon. I don't
+	think we should use folder-remote for things like
+	shares, not normal folders.
+
+2008-02-29  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendcomputer.c: (recompute_files),
+	(mount_volume_from_drive), (report_no_media_error),
+	(poll_for_media_cb), (try_mount_mountable):
+	Implement media polling for Computer backend, handling the case when
+	no media is in the drive. Also adds a new string. (#514135)
+
+2008-02-29  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c (g_vfs_network_daemon_init):
+
+	Added another translator comment.
+
+2008-02-29  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* daemon/gvfsbackendftp.c (do_mount):
+
+	Added translator comment.
+
+2008-02-29  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* daemon/gvfsbackendftp.c (g_vfs_backend_ftp_pop_connection):
+
+	Reuse existing string to reduce the impact of the string
+	freeze breaks.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	actually translate the display name
+
+2008-02-28  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c: (g_vfs_network_daemon_init):
+	* daemon/gvfsbackendnetwork.h:
+	Set the default name for the network backend to prevent 
+	possible confusion about "NETWORK Filesystem Service".
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	really check for errors correctly. I need to go to bed.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	check for errors correctly
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	reviewed by: A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/daemon-main-generic.c: (main):
+	* daemon/daemon-main.c: (daemon_setup):
+	* daemon/daemon-main.h:
+	* daemon/gvfsbackendcdda.c: (g_vfs_cdda_daemon_init):
+	* daemon/gvfsbackendcdda.h:
+	* daemon/gvfsbackendsmb.c: (g_vfs_smb_daemon_init):
+	* daemon/gvfsbackendsmb.h:
+	* daemon/gvfsbackendsmbbrowse.c: (g_vfs_smb_browse_daemon_init):
+	* daemon/gvfsbackendsmbbrowse.h:
+	provide default application names for the daemons. This is necessary
+	to avoid gnome-keyring from saying "Application" wants access to the
+	keyring, which could sound very evil for a casual user.
+	Adds some more strings for the poor translators, too!
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount), (try_mount):
+	rewrite login code to use the keyring if available. Also fix mount
+	specs to be unique and display names to list the user while at it.
+
+2008-02-28  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/Makefile.am:
+	Really disable FTP if we don't HAVE_HTTP.
+
+2008-02-28  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c: (recompute_files):
+	Fixup DNS-SD exposed links to actually link to the service provided.
+
+2008-02-28  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c (g_vfs_backend_dav_init): 
+	Mark the dav backend as user visible.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_create),
+	(ftp_connection_login), (ftp_connection_use), (ftp_connection_new):
+	split out login code, so we can try multiple auths when some fail.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsdaemonutils.c: (gvfs_file_info_populate_default),
+	(gvfs_file_info_populate_names),
+	(gvfs_file_info_populate_content_types):
+	* daemon/gvfsdaemonutils.h:
+	add functions that are supposed to set default values on a remote file
+	info structure, so we don't duplicate the code across multiple
+	backends.
+
+	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
+	(ftp_connection_new), (file_info_get_flags), (file_info_query):
+	use it.
+
+2008-02-28  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvolumemonitor.c:
+	(mount_added):
+	(mount_removed):
+	Emit signals outside of the lock to avoid
+	deadlocks (#519250)
+
+2008-02-28  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb):
+	Fix the content-type of directories (inode/directory, not
+	x-directory/normal as in gnome-vfs)
+	Set file icons from the content-type
+
+	* daemon/gvfsbackendobexftp.c (_change_directory):
+	Add a FIXME, trying to change to a non-existant directory
+	errors out with "permission denied", which isn't the case
+
+	(_query_file_info_helper): set the right content-type and icon
+	for the root folder
+
+	(is_connected), (do_mount): Wait until we're connected to exit from
+	do_mount()
+
+	(do_open_for_read): Fix a crash when opening an inexistant file for
+	read
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_error_set_from_response),
+	(file_info_query), (do_query_info):
+	Set sane error messages for ftp error codes.
+	Also remove some excessive debug messages.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (do_mount):
+	fix typo (thanks Andre)
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_sendv),
+	(ftp_connection_send), (do_start_write), (do_create), (do_append),
+	(do_replace), (g_vfs_backend_ftp_class_init):
+	implement append
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	gcc warning fixes to be able to compile with -Werror:
+	* daemon/gvfsbackendburn.c:
+	mark virtual_node_ref as unused, because it is
+	* test/benchmark-common.c: (benchmark_timeout):
+	signal handlers take an int argument.
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* configure.ac:
+	list FTP in configuration summary, too
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendftp.h:
+	drop my current FTP code and continue development in here. Should make
+	testing easier for adventurous people.
+
+2008-02-28  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (do_query_info): Add
+	missing mutex unlock, duh!
+
+2008-02-28  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsjobenumerate.c: (g_vfs_job_enumerate_add_infos):
+	* daemon/gvfsjobenumerate.h:
+	constify list argument, so ownership is apparent.
+
+2008-02-28  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp-fl-parser.c (fl_parser_start_node_cb):
+	Set the content-type on files by having a good guess if we didn't
+	get a mime-type from the folder listings
+
+2008-02-27  Benjamin Otte  <otte@gnome.org>
+
+	* programs/gvfs-mount.c: (prompt_for):
+	don't mess up my terminal when entering passwords
+
+2008-02-27  Bastien Nocera  <hadess@hadess.net>
+
+	* client/test-uri-utils.c: add test for obex URIs
+	* configure.ac: Require expat for the obexftp backend
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendobexftp-cap-parser.c:
+	* daemon/gvfsbackendobexftp-cap-parser.h:
+	* daemon/gvfsbackendobexftp-fl-parser.c:
+	* daemon/gvfsbackendobexftp-fl-parser.h:
+	Added ObexFTP folder listing and capability parser from
+	gnome-vfs-obexftp, ported to gio
+
+	* daemon/gvfsbackendobexftp.c:
+	* daemon/gvfsbackendobexftp.h:
+	* daemon/obexftp-marshal.list:
+	* daemon/obexftp.mount.in: Add read-only ObexFTP backend
+
+	(Closes: #509621)
+
+2008-02-27  Luca Ferretti  <elle.uca@libero.it>
+
+	* daemon/gvfsbackendcdda.c: (do_query_info):
+	Make "file don't exist" message conform to other backends;
+	no, it isn't a string freeze break, the message yet exists
+	elsewhere.
+
+2008-02-27  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountsource.c: (g_mount_source_ask_question_finish):
+	Set out parameters for questions, too.
+
+2008-02-27  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountsource.c: (g_mount_source_ask_password_finish):
+	Set out parameters even in error case.
+
+2008-02-26  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: (do_delete):
+	Correct error domain in case delete failed.
+
+2008-02-26  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Redo authentication and implement keyring support. Based
+	on a patch by Carlos Garcia Campos.
+
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
+	* programs/gvfs-bash-completion.sh:
+	* programs/gvfs-ls.c:
+	Better completion
+
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsjobmount.c (run):
+	No need to ref backend specifically now, as
+	the core refs the job and the job refs the
+	backend. Revert that change.
+
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsjob.c:
+	(g_vfs_job_run):
+	(g_vfs_job_try):
+	Ref job while calling out.
+	
+	* daemon/gvfsjobmount.c:
+	Own ref to backend while job is alive.
+
+2008-02-26  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsmb.c: (auth_callback):
+	Fix parameters order in keyring lookup call.
+	
+2008-02-26  Yanko Kaneti  <yaneti@declera.com>
+
+	* configure.ac: explicitly depend on libxml-2.0 
+	for building the dav backend.
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
+	* common/gmountsource.c: (ask_password_reply),
+	(g_mount_source_ask_password_async), (ask_question_reply),
+	(g_mount_source_ask_question_async):
+	make errors say "Internal Error" instead of failing
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsjobmount.c: (run), (try):
+	use ref/unref pair to stop backend from going away when the mount
+	fails
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsjobmount.c: (mount_failed):
+	no g_warning for failed monts, please
+
+2008-02-26  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsjob.c: (g_vfs_job_failed_from_error):
+	* daemon/gvfsjob.h:
+	make the error argument const
+
+2008-02-26  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvolumemonitor.c:
+	Use standard lock instead of recursive lock.
+
+2008-02-25  David Zeuthen  <davidz@redhat.com>
+
+	* configure.ac: fix typo in AC_ARG_ENABLE for gphoto2
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gdbusutils.c:
+	* daemon/dbus-gmain.c:
+	Only use dbus_watch_get_unix_fd for
+	dbus >= 1.1.1
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.8 ===
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* programs/Makefile.am (EXTRA_DIST):
+	Add gvfs-bash-completion.sh
+
+	* NEWS:
+	Update for release
+
+2008-02-25  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	Update to gvfskeyring api changes
+
+	* daemon/gvfskeyring.c:
+	* daemon/gvfskeyring.h:
+	Add object, authtype and port parameters for both save and
+	lookup. 
+	
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Initial take on implementing delete.
+
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Add http_error_code_from_status helper function.
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Also check if the URL is a directory by doing a PROPFIND in
+	addition to the OPTIONS. That will also force authentication
+	since some servers (e.g. Zope) allow OPTIONS without doing
+	authentication.
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* client/sftpuri.c:
+	Make sure both no-port and port 22 refer to the same mount.
+	
+	* daemon/gvfsbackendsftp.c:
+	Support ports. (#518504)
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	Keep the SoupMessage around for as long as Multistatus is
+	valid.
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Add a SoupSessionAsync to be used for SoupInputStream doesn't
+	yet work with SoupSessionSync. Also make sure we share
+	authentication.
+
+2008-02-25  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	- Port the mount operation to use the sync i/op.
+	- Keep the auth information around so we can use them again in
+	the case that a subpath requires different authentication. This
+	is needed since libsoup will forgot all auth after a 401.
+	- Ignore trailing slashes in ms_response_is_target ().
+	- Add an initial version of make_directory ().
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/gvfsbackendhttp.h:
+	Add message_new_from_filename_full which will add a trailing "/"
+	if is_dir is true. (Saves uneccesary redirects in some cases)
+
+	Various bits and pieces came from Yann Rouillard.
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	Support gnome-keyring (#511517)
+	Patch from Carlos Garcia Campos
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendnetwork.c (recompute_files):
+	Fix spelling inconsistency "Network" vs "network" (#518487)
+	
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c (get_mountspec_from_uri):
+	g_uri_get_scheme -> g_uri_parse_scheme
+
+2008-02-25  Wouter Bolsterlee  <wbolster@svn.gnome.org>
+
+	* hal/ghalvolume.c (do_update_from_hal_for_camera): Add
+	two translator comments.
+
+2008-02-24  David Zeuthen  <davidz@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonvolumemonitor.c:
+	* client/gdaemonvolumemonitor.h: Prefer to return a GDaemonMount
+	from an existing GDaemonVolumeMonitor rather than rolling our own
+	for GDaemonFile's g_file_find_enclosing_mount()
+	implementation. This is to ensure that g_mount_get_volume() will
+	work properly with mounts that are adopted by GVolume objects from
+	other volume monitors.
+
+	* configure.ac: Check for libgphoto2
+
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendcdda.c: Use HAL to detect when the disc is
+	removed and then forcibly unmount the mount. Report size of
+	disc. Hint the file manager to preview files.
+
+	* hal/ghaldrive.c:
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	* hal/ghalvolumemonitor.c:
+	* hal/ghalvolumemonitor.h:
+	* hal/hal-pool.c: Ensure that audio and blank CD's are
+	displayed (#514139).  Read info.desktop.[icon|name] properties
+	from hal and use these if found. Use proper icon for audio players
+	and make the gphoto2 detection support it as well. Also check for
+	subsystem when filtering on hal capabilities. Also revert the
+	commit to ignore NFS mounts as gio will now only report an user
+	visible mount if it's in /media or $HOME. Make LUKS encrypted
+	volumes work.
+
+	* daemon/Makefile.am:
+	* daemon/gphoto2.mount.in:
+	* daemon/gvfsbackendgphoto2.c:
+	Land the gphoto2 backend.
+
+	* programs/Makefile.am:
+	* programs/gvfs-ls.c: Make the --hidden option work. Default
+	to short listing and add a --long option. Implement new options
+	--show-completions and --show-mounts that can be used for
+	shell completions.
+	* programs/gvfs-tree.c: New program
+	* programs/gvfs-bash-completion.sh: Bash completion for gvfs;
+	uses the new --show-completions and --show-mounts options in
+	gvfs-ls.
+
+2008-02-25  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendnetwork.c:
+	Add monitoring of inlined locations. (#509600)
+	Patch from A. Walton
+
+2008-02-22  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c: (recompute_files):
+	Make network:// really add extra domain links.
+
+2008-02-22  A. Walton  <awalton@svn.gnome.org>
+
+	* daemon/gvfsbackendnetwork.c: (recompute_files):
+	Fix typo so we generate correct dns-sd links.
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendnetwork.c:
+	(g_vfs_backend_network_init):
+	Fix up dns-sd method name and gconf directory.
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/dns-sd.mount.in:
+	Correct type and exec name
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmounttracker.c:
+	Unlock lock if returning early.
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	* daemon/Makefile.am:
+	* daemon/dns-sd.mount.in:
+	* daemon/gvfsbackenddnssd.[ch]:
+	Landed initial version of dns-sd backend.
+
+2007-02-22  Christian Neumair  <cneumair@gnome.org>
+
+	* gconf/gconf-module.c: (g_io_module_load):
+	* gconf/Makefile.am:
+	* hal/hal-module.c: (g_io_module_load):
+	* hal/Makefile.am:
+	* client/gdaemonvfs.c: (g_daemon_vfs_init):
+	* client/Makefile.am:
+	Bind to GVFS text domain. Fixes #517892.
+
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendnetwork.c:
+	Fix up network_file_equal.
+	
+2008-02-22  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendnetwork.c:
+	Update the network backend to use inline files and
+	remove the default workgroup link. Also add dns-sd
+	support (not used yet). (#509600)
+	Patch from A. Walton
+
+2008-02-22  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login), (do_mount):
+	Ask for the username in the sftp login when it's not
+	provided. (#511509)
+	
+2008-02-21  Christian Persch  <chpe@gnome.org>
+
+	* configure.ac: Update hal req to 0.5.10. Bug #515779.
+
+2008-02-21  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login):
+	Fix memory leak.
+	
+2008-02-21  Carlos Garcia Campos  <carlosgc@gnome.org>
+
+	* daemon/gvfsbackendsftp.c: (handle_login):
+	Fix password save flags initialization.
+	
+2008-02-21  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac (DISTCHECK_CONFIGURE_FLAGS):
+	Require latest glib for the contains_file
+	change.
+
+2008-02-21  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	(g_daemon_file_prefix_matches):
+	(g_daemon_file_file_iface_init):
+	Update for the contains_file rename in gio.
+
+2008-02-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	If gconf availible, initialize default workgroup
+	from gconf.
+	Handle X-GNOME-DEFAULT-WORKGROUP special case
+	to list the current workgroup
+
+2008-02-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/daemon-main.c (send_spawned):
+	Fix "_" spew.
+	
+2008-02-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Fix spelling in string
+
+2008-02-20  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountsource.[ch]:
+	Add ask_question support
+
+	* daemon/gvfsbackendsftp.c:
+	Handle host identity changed messages (#517460)
+
+	Patch from Carlos Garcia Campos
+
+2008-02-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendnetwork.[ch]:
+	* daemon/network.mount.in: 
+	Initial network backend work (#509600)
+
+2008-02-19  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Authentication fixups (#511517)
+	Patch from Carlos Garcia Campos
+
+2008-02-19  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendtrash.c:
+	* gconf/gapplookupgconf.c:
+	* test/benchmark-common.c:
+	Some more cleanup.
+
+2008-02-19  Alexander Larsson  <alexl@redhat.com>
+
+	* lots of *.c files:
+	Code cleanup from Kjartan:
+	Removes unused code/variables.
+	Uses right printf types
+	Uses non-deprecated dbus calls.
+	Removes spurious ; and ,
+	deleted extra checks for NULL for g_free
+
+2008-02-18  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalmount.c:
+	Cleanups of case insensitive search. (#154549)
+	patch from John Millikin.
+
+2008-02-18  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsjobenumerate.c (g_vfs_job_enumerate_add_info):
+	Ensure we're using "/" as separator for uris.
+	This only affects win32, which probably doesn't work atm, but
+	still its nice to be explicit.
+	
+2008-02-18  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Detect gnome-keyring
+	
+	* common/gmountsource.[ch]:
+	Add password out to ask_password
+	
+	* daemon/Makefile.am:
+	* daemon/gvfskeyring.[ch]:
+	Helper code for keyring support
+	
+	* daemon/gvfsbackendsftp.c:
+	Add keyring support
+	
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackendsmb.c:
+	Update to api changes
+
+	This is the initial work on keyring support (#511517)
+	Patch from Carlos Garcia Campos
+
+2008-02-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/soup-input-stream.c:
+	* daemon/soup-output-stream.c:
+	Use SoupSessionSync instead of SoupSessionAsync and 
+	convert SoupStreams and authentication logic.
+
+2008-02-15  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsjobenumerate.c:
+	Fix a little crasher (NULL terminate g_build_filename) that
+	was introduced by the optional uri addition change to enumerate.
+
+2008-02-15  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Completly redo Multistatus parsing.
+
+2008-02-15  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	Pass uri in query_info_async too.
+
+2008-02-15  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	Pass an optional uri to query_info and enumerate
+	
+	* daemon/gvfsbackend.[ch]:
+	Add automatic info filling, implement thumbnail
+	checking if uri passed in.
+	
+	* daemon/gvfsjobenumerate.[ch]:
+	* daemon/gvfsjobqueryinfo.[ch]:
+	Get optional uri argument.
+	Call automatic backend info filling.
+
+2008-02-15  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackendhttp.c: (g_vfs_backend_uri_for_filename):
+	Escape the filename.
+
+2008-02-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendcomputer.c:
+	If lookup returns NULL it already set the error.
+	Handle this in all callers.
+
+2008-02-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	Disable install of ftp.mount for now
+
+2008-02-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfschannel.c:
+	Fix case where current_job has died (NULL) but
+	the current_job_seq_nr was left and matched
+	a sent cancel op. (#515959)
+
+2008-02-13  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsmb.c (do_read):
+	Limit smb reads to 65535 bytes to avoid issues on
+	large reads.
+
+2008-02-13  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/gvfsbackendtrash.c:
+	Keep track of the number of top level items in the trash.
+	Expose this value via the trash::item-count attribute.
+
+2008-02-13  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalmount.c:
+	Don't show nfs mounts (#516036)
+
+2008-02-12  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c (g_hal_volume_monitor_finalize):
+	Don't double free list optical disc list.
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.7 ===
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Set the correct copy name.
+	Set description.
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	(do_set_display_name):
+	Fix typo: get_dirname, not get_basename.
+	Fixes renames on smb (#514126)
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Set new path in set_display name.
+	
+	* daemon/gvfsjobsetdisplayname.c:
+	Assert that new_path is set
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	* common/gsysutils.c:
+	* common/gvfsdaemonprotocol.c:
+	* daemon/gvfsbackendburn.c:
+	* daemon/gvfsbackendcdda.c:
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendtest.c:
+	* daemon/gvfsdaemonutils.c:
+	* daemon/gvfsjob.c:
+	* daemon/mount.c:
+	* daemon/pty_open.c:
+	Save errno befor making other calls.
+	Be safe when calling g_set_error()
+	Patch from Christian Persch (#514822)
+
+2008-02-11  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* daemon/gvfsbackendcomputer.c:
+	* hal/ghalvolume.c:
+	* programs/gvfs-mount.c:
+	Update for the new mount flag argument.
+	
+	* hal/ghaldrive.c:
+	* programs/gvfs-open.c:
+	Fix warnings
+
+2008-02-10  Luca Ferretti  <elle.uca@libero.it>
+
+	* daemon/gvfsbackendburn.c: (g_vfs_backend_burn_init),
+	(file_info_from_node):
+	Rename burn:// with old "CD/DVD Creator" name.
+
+	* daemon/gvfsbackendtrash.c: (g_vfs_backend_trash_init),
+	(do_query_info):
+	Rename trash:// with old "Trash" name.
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolume.c:
+	Implement g_volume_should_automount.
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendcomputer.c:
+	Add "filesystem" to computer:
+	
+	* hal/ghalmount.c:
+	Remove spew
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalmount.c:
+	Try to find cdrom icons from autorun.inf.
+	Based on patch from John Millikin
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.c:
+	Fix up indentation
+	Don't unref file from g_file_icon_get_file().
+
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Always set CAN_TRASH to false
+	
+2008-02-08  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c (unescape_pathname):
+	Handle unescaping __ correctly (#514040)
+
+2008-02-06  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	Ensure name is set in query_info (#511601)
+	Clean up setting display name of /
+
+2008-02-05  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvolumemonitor.c (mount_removed):
+	Don't spew warnings when hidden mounts are unmounted.
+	
+2008-02-05  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	(do_query_info):
+	Correctly set the name for toplevel items.
+
+2008-02-04  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsjobmakesymlink.c:
+	Wrong symlink target passed to backend
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
+	* README:
+	Add some info in README
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Make name of sftp root be "/ on <host>" (#511515)
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsdaemonutils.c:
+	* hal/ghalvolume.c:
+	Cleanup i18n strings (#510192)
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.h:
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	* daemon/gvfsreadchannel.c:
+	* daemon/gvfswritechannel.c:
+	Remove SEEK_CUR from channel protocol. This
+	doesn't work with readahead, and can be converted
+	to a SEEK_SET since we know the file position on
+	the client side.
+
+2008-02-04  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	Init seq_nr to 1 so that seq_nr 0 is special
+	(used for e.g. readahead ops)
+	
+	* daemon/gvfschannel.[ch]:
+	* daemon/gvfsreadchannel.c:
+	Implement readahead.
+
+2008-02-03  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackendhttp.c:
+	Move write logic (replace, create) to the dav backend.
+
+2008-02-01  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsreadchannel.c:
+	Request larger buffers than the client requested
+	so for better network efficiency. (#512472)
+
+2008-02-01  Alexander Larsson  <alexl@redhat.com>
+
+	* programs/gvfs-open.c:
+	Pass on uris unmodified to avoid roundtripping
+	through GFile which can be destructive.
+
+2008-01-31  Alexander Larsson  <alexl@redhat.com>
+
+	Implement uri navigation for http uris (#509341)
+	
+	* client/gvfsurimapper.[ch]:
+	Add get_mount_info_for_path method for mount types
+	like ssh that change MountInfo as the path changes.
+	
+	* client/httpuri.c:
+	Implement get_mount_info_for_path.
+	For http, set the path from the uri.
+	The will be removed on i/o by the corresponding
+	path being in the mount_prefix.
+	
+	* daemon/gvfsbackendhttp.c:
+	Set mount_prefix to path from uri.
+	Remove unused code in message_new_from_filename
+
+	* client/gdaemonfile.c:
+	* client/gdaemonvfs.[ch]:
+	Use the new uri mapper function to change GMountInfo
+	as the path changes.
+	
+2008-01-31  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountspec.[ch]:
+	Add shared path canonicalization:
+	g_mount_spec_canonicalize_path()
+
+2008-01-31  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/soup-input-stream.c:
+	Handle errors in send_finish.
+
+2008-01-30  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendlocaltest.c:
+	Use read/write operations instead of do_copy ()
+
+2008-01-30  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsfusedaemon.c:
+	Set read and execute privs for all directories.
+	Fix up type when reading can-read etc attributes.
+	Don't use uid/gid in the fuse mount. The
+	uid/gid doesn't make sense locally anyway.
+
+2008-01-30  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackend.c:
+	(g_vfs_backend_register_mount):
+	Correctly detect unset stable name
+
+2008-01-29  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendlocaltest.c:
+	Fixed error handling in do_enumerate ()
+	More cleanup
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile.am:
+	* configure.ac:
+	* gconf/Makefile.am: Added.
+	* gconf/gapplookupgconf.[ch]: Added.
+	* gconf/gconf-module.c: Added.
+	Add gconf based implementation of
+	g_app_info_get_default_for_uri_scheme ()
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c (g_hal_volume_monitor_class_init):
+	Remove setting prio/name
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Require glib 2.15.5 for g_file_query_default_handler ().
+
+	* programs/Makefile.am:
+	* programs/gvfs-open.c:
+	Added gvfs-open app
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.6 ===
+
+2008-01-29  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+	* daemon/Makefile.am:
+	Always dist all .mount.in files
+	
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.5 ===
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/daemon-main.c:
+	* daemon/main.c:
+	Include locate.h for setlocale
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/hal-device.c:
+	Use gi18n-lib.h, not gi18n.h in client side code.
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c (g_daemon_file_move):
+	Fix typo G_DAEMON_FILE -> G_IS_DAEMON_FILE
+
+	* configure.ac:
+	Require glib >= 2.15.4
+
+	* client/gdaemonvfs.c:
+	* client/gdaemonvolumemonitor.c:
+	* hal/ghalvolumemonitor.c:
+	Register with the new extension points API.
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendlocaltest.c:
+	* programs/gvfs-cat.c:
+	C89 fixes from Jens Granseuer (#511838)
+
+2008-01-28  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	* daemon/daemon-main.c:
+	* daemon/main.c:
+	Enable translations for daemons and some l10n
+	fixes. Patch from Luca Ferretti.
+
+2008-01-24  Matthias Clasen  <mclasen@redhat.com>
+
+	* daemon/gvfsbackendsmbbrowse.c
+	(get_file_info_from_entry): Replace : by :: in 
+	smb::comment, too.
+
+2008-01-24  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Update intltool req for po/LINGUAS
+
+2008-01-24  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	Remove debug spew.
+	
+	* hal/ghaldrive.c:
+	* hal/ghalvolume.c:
+	Implement identifier getters
+	
+	* programs/gvfs-mount.c:
+	Show identifiers
+
+2008-01-24  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsdaemon.c:
+	Indentation fix
+	
+	* hal/ghaldrive.[ch]:
+	* hal/hal-device.c:
+	* hal/ghalvolume.c:
+	* hal/ghalmount.c:
+	Clean up coding style
+	
+	* hal/ghalvolumemonitor.[ch]:
+	Clean up coding style
+	Don't show drives if we're ignoring all their
+	volumes (and there are volumes)
+	
+	* hal/hal-pool.c:
+	Clean up coding style
+	Actually look at cap_only.
+	Free private dbus_connection on error
+
+2008-01-24  Bastien Nocera  <hadess@hadess.net>
+
+	* programs/Makefile.am:
+	* programs/gvfs-mkdir.c: (main): Add a test mkdir program
+
+2008-01-23  Bastien Nocera  <hadess@hadess.net>
+
+	* client/test-uri-utils.c: (main):
+	* client/Makefile.am: Add test program for the
+	functions in gvfsuriutils.c
+
+	* client/gvfsuriutils.c: (g_vfs_decode_uri):
+	Fix parsing of IPv6 URIs where the host is in brackets
+
+2008-01-23  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	(add_extra_trash_info):
+	Use -, not _ in attribute names
+
+2008-01-23  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	(add_extra_trash_info):
+	Use :: to delimit namespace for trash attributes
+
+2008-01-22  Gil Forcada  <gforcada@gnome.org>
+
+	* configure.ac: Added ca to ALL_LINUGAS.
+
+2008-01-22  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Ensure we return a IS_DIRECTORY error when
+	we open a file for reading (#511225)
+	The same needs to happen for writes.
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.4 ===
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/sftpuri.c:
+	* common/gmounttracker.c:
+	* daemon/gvfsmonitor.c:
+	* daemon/gvfsbackend.c:
+	Fix warnings
+	
+	* daemon/gvfsbackendburn.c:
+	* daemon/gvfsbackendlocaltest.c:
+	* daemon/gvfsbackendtrash.c:
+	Update to latest gio API (removal of
+	duplicate GSeekable calls).
+	
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+	
+=== gvfs 0.1.3 ===
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+	
+	* daemon/Makefile.am:
+	* daemon/main.c:
+	Autospawn fuse on daemon start.
+	
+	* daemon/mount.c:
+	(read_mountable_config):
+	Remove debug spew
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsfusedaemon.c:
+	Fix error with the names of the root items the
+	fuse mount.
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/mount.c:
+	Reload the list of mountables on SIGUSR1
+
+2008-01-21  Christian Kellner  <gicmo@gnome.org>
+
+
+	* daemon/gvfsbackenddav.c:
+	Small cleanups.
+
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/gvfsbackendhttp.h:
+	Implement query_info for plain http.
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* client/Makefile.am:
+	* client/gdaemonvfs.c:
+	* client/sftpuri.c: Added.
+	Added sftp uri mapper that aliases ssh: to sftp: (#509860)
+	
+	* client/smburi.c:
+	(smb_from_uri):
+	Fix leak.
+
+2008-01-21  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmounttracker.c:
+	Do the initial mount tracker call sync so that
+	the volume monitor is populated with the current
+	status after construction. This is more in-line
+	with what apps expect.
+
+2008-01-18  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountspec.c:
+	(g_mount_spec_new_from_data):
+	Ensure that mount_prefix is never NULL. It
+	should be "/" in that case.
+
+2008-01-18  Luca Ferretti  <elle.uca@libero.it>
+
+	* programs/Makefile.am:
+	* programs/gvfs-cat.c: (cat), (main):
+	Add i18n/l10n to gvfs-cat, plus indentation. For details see
+	http://mail.gnome.org/archives/gnome-vfs-list/2008-January/msg00020.html
+
+2008-01-18  David Zeuthen  <davidz@redhat.com>
+
+	The volume monitor bits of gphoto2 support. The actual backend
+	will follow later. Right now the code is only enabled on Linux,
+	need trivial changes to work on other operating systems.
+
+	* hal/ghalvolume.c: (do_update_from_hal_for_camera),
+	(update_from_hal), (g_hal_volume_new):
+	* hal/ghalvolumemonitor.c: (get_hal_pool),
+	(g_hal_volume_monitor_finalize), (get_volumes),
+	(mountpoints_changed), (mounts_changed),
+	(g_hal_volume_monitor_force_update), (hal_changed),
+	(g_hal_volume_monitor_constructor), (find_camera_volume_by_udi),
+	(update_cameras):
+	* hal/ghalvolumemonitor.h:
+	* hal/hal-pool.c: (hal_pool_finalize), (has_cap_only),
+	(hal_pool_add_device_by_udi),
+	(hal_pool_add_device_by_udi_and_properties), (hal_pool_new):
+	* hal/hal-pool.h:
+
+2008-01-17  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	Disconnect signal handler, since the data struct we pass
+	into the signal handler will be invalid after the mount
+	is finished.
+
+2008-01-17  Christian Kellner  <gicmo@gnome.org>
+
+	* common/gmountsource.c:
+	* common/gmountsource.h:
+	Make g_mount_source_ask_password_async () public and add
+	g_mount_source_ask_password_finish (). 
+
+	* daemon/gvfsbackenddav.c: 
+	Use g_mount_source_ask_password_async instead of the sync
+	version so we don't hang during auth. Few cleanups.
+
+	* programs/gvfs-mount.c: 
+	Don't echo the password, if possible.
+
+2008-01-17  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolume.c:
+	* hal/ghalvolumemonitor.c:
+	Initial work on LUKS, from david.
+
+2008-01-17  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.h:
+	* client/gdaemonfile.c:
+	Add upload operation (requires latest glib)
+	
+	* daemon/gvfsbackend.[ch]:
+	* daemon/gvfsjobupload.[ch]: Added.
+	Implement upload in daemon
+	
+	* daemon/Makefile.am:
+	* daemon/burn.mount.in: Added.
+	* daemon/gvfsbackendburn.[ch]: Added.
+	Added initial burn:/// implementation.
+	Not fully implemented, but read works.
+	
+	* daemon/gvfsbackendcomputer.c:
+	Ensure we set right mimetype for dirs
+
+2008-01-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c:	
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	A few cleanups.
+
+2008-01-16  Christian Kellner  <gicmo@gnome.org>
+
+	* daemon/gvfsbackenddav.c: 
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	* daemon/soup-input-stream.c:
+	* daemon/soup-output-stream.c:
+	Port to libsoup-2.4.
+
+	* configure.ac:
+	* daemon/Makefile.am:
+	Make building of http optional (and depend on wether
+	libsoup is found or not)
+	Patch from Dan Winship.
+
+2008-01-16  Frederic Crozat  <fcrozat@mandriva.com>
+
+	* Makefile.am: Only build hal module when hal support is
+	enabled (#509693).
+
+2008-01-15  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* daemon/daemon-main.c:
+	* daemon/gvfsbackendcdda.c:
+	* daemon/gvfsbackendcomputer.c:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendlocaltest.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsjobsetattribute.c:
+	* hal/ghaldrive.c:
+	Clean up strings and add translator comments
+
+2008-01-15  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendcomputer.c:
+	(recompute_files):
+	Fix crash (#508236)
+	Patch from Joe Marcus Clarke
+
+2008-01-15  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghaldrive.c: (_eject_unmount_mounts_cb),
+	(_eject_unmount_mounts), (g_hal_drive_eject):
+	* hal/ghalvolume.c: (g_hal_volume_new), (g_hal_volume_can_mount),
+	(g_hal_volume_has_device_path), (g_hal_volume_mount),
+	(g_hal_volume_eject):
+	* hal/ghalvolume.h:
+	* hal/ghalvolumemonitor.c:
+	(g_hal_volume_monitor_lookup_volume_for_device_path),
+	(update_volumes), (update_mounts), (update_discs):
+	Fix debug spew and use try device path before mount path to tie
+	volume and mount objects together. Also fix some issues with
+	mounting and unmounting.
+	
+2008-01-15  Daniel Nylander <po@danielnylander.se>
+
+	* configure.ac: Added sv to ALL_LINGUAS.
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.2 ===
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac (DISTCHECK_CONFIGURE_FLAGS):
+	Require glib 2.15.2
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* daemon/gvfsbackendlocaltest.c:
+	* daemon/gvfsbackendtrash.c:
+	* programs/gvfs-monitor-dir.c:
+	* programs/gvfs-monitor-file.c:
+	Update to new gio API
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	(match_prefix):
+	Handle root correctly in g_file_get_relative_path (#508719)
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsdaemon.c:
+	Don't translate g_warning strings
+
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/httpuri.c:
+	(http_from_uri):
+	Only set "ssl" key in dav case.
+	
+2008-01-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/httpuri.c:
+	(http_to_uri_scheme):
+	Fix some crashes
+	
+2008-01-13  Dan Winship  <danw@gnome.org>
+
+	* client/httpuri.c (http_from_uri): fix
+
+	* daemon/soup-output-stream.c: Initial SoupOutputStream; still
+	works like gnome-vfs http did, by storing all the writes in memory
+	until close.
+
+	* daemon/gvfsbackendhttp.c (try_create, try_replace): Implement.
+	For now we need to do HEAD-then-PUT, but we may later be able to
+	do a single PUT with "Expect: 100-continue".
+	(try_write, try_close_write): Implement.
+
+2008-01-13  Christian Kellner <gicmo@gnome.org>
+
+	* client/httpuri.c: 
+	Also handle dav uris in the http mapper.
+
+	* daemon/dav.mount.in:
+	* daemon/Makefile.am:
+	Add the new dav backend.
+
+	* daemon/gvfsbackendhttp.c: 
+	* daemon/gvfsbackendhttp.h:
+	Implement a utility function so dav and http
+	backend can share uri from filename creation.
+
+	* daemon/gvfsbackenddav.c: 
+	First attempt to write the dav backend as a subclass of http.
+	Mount, QueryInfo, Enumerate should work and Read is provided
+	by the base class.
+
+2008-01-12  Leonid Kanter <leon@asplinux.ru>
+
+	* configure.ac: Added "ru" (Russian) to ALL_LINGUAS.
+
+2008-01-12  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	Set the http daemon dbus busname so that multiple mounts
+	work in the same process.
+
+2008-01-11  Dan Winship  <danw@gnome.org>
+
+	* daemon/soup-input-stream.c: implement GSeekable (a bit hackishly
+	due to a bug in libsoup 2.2.x)
+
+	* daemon/gvfsbackendhttp.c (try_seek_on_read): implement
+
+2008-01-11  Dan Winship  <danw@gnome.org>
+
+	* daemon/gvfsbackendhttp.c (g_vfs_backend_http_finalize): cleanup
+	(g_vfs_backend_http_init): move session creation here. Don't
+	explicitly set ASYNC_CONTEXT to g_main_context_default() because
+	that trips up SoupInputStream.
+	(uri_for_filename): create a SoupUri corresponding to a filename.
+	In particular, "/" corresponds to mount_base, not the result of
+	combining mount_base with "/".
+	(try_open_for_read): use uri_for_filename, free the result.
+
+2008-01-11  Dan Winship  <danw@gnome.org>
+
+	* daemon/soup-input-stream.c (soup_input_stream_send)
+	(wrapper_callback, soup_input_stream_send_async): Fix for changes
+	to g_input_stream_set_pending() since I wrote this.
+
+	* client/gdaemonfile.c (g_daemon_file_hash): x86_64 fix.
+
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendhttp.c:
+	Make http mount not user visible.
+	Set backend mount spec in try_mount.
+
+2008-01-11  Christian Kellner  <gicmo@gnome.org>
+
+	* client/gdaemonvfs.c:
+	Fix the double use of a counter variable inside nested loops.
+
+	* client/Makefile.am:
+	* client/httpuri.c:
+	UriMapper added, which is needed for plain http method.
+	
+	* configure.ac:
+	Check for libsoup version >= 2.2.104
+
+	* daemon/gvfsbackendhttp.c:
+	Initial implementation of plain http methods.
+
+	* daemon/Makefile.am:
+	* daemon/http.mount.in:
+	Added.
+
+	* daemon/soup-input-stream.c:
+	* daemon/soup-input-stream.h:
+	Import of Dan Winship's libsoup based streaming classes.
+
+2008-01-11  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
+
+	* configure.ac: Added "eu" (Basque) to ALL_LINGUAS.
+
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendcomputer.c:
+	Set can't write info on the root.
+
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
+	* programs/gvfs-mount.c (list_volumes):
+	Fix crash if no mount in volume.
+
+2008-01-11  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* common/gvfsdaemonprotocol.h:
+	Implement unmount_mountable and eject_mountable
+	on client side.
+	
+	* common/gmountoperationdbus.c:
+	Fix warnings
+	
+	* daemon/gvfsbackend.[ch]:
+	* daemon/gvfsjobunmountmountable.[ch]:
+	Add unmount_mountable and eject_mountable in daemon.
+	
+	* daemon/gvfsbackendcomputer.c:
+	Implement unmount_mountable and eject_mountable
+
+	* daemon/gvfsbackendlocaltest.c:
+	Update to latest API
+	
+	* daemon/gvfsbackendsftp.c:
+	Fix indentation
+	
+	* daemon/gvfsjobunmount.c:
+	Always allow unmount if unmount is not
+	implemented.
+
+2008-01-11  Christian Kellner  <gicmo@gnome.org>
+
+	* configure.ac:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendhttp.c:
+	* daemon/gvfsbackendhttp.h:
+	Initial attempt of writing the http backend. Not much
+	there yet only a stub.
+
+2008-01-10  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsmonitor.[ch]:
+	* daemon/gvfsbackendcomputer.c:
+	* daemon/gvfsbackendtrash.c:
+	Make GVfsMonitor API simpler for users.
+
+2008-01-10  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsmonitor.c:
+	Remove freeing of initial ref after delay.
+
+	* daemon/gvfsjobcreatemonitor.[ch]:
+	Set the monitor as result here, not only the obj path.
+	Nicer and allows better lifetime handling.
+	If returning a obj ref, keep the monitor alive for
+	some time to allow a subscribe request.
+	
+	* daemon/gvfsbackendcomputer.c:
+	* daemon/gvfsbackendtrash.c:
+	Update to the new APIs
+
+2008-01-10  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmounttracker.c:
+	Handle error reply from list_mounts.
+
+	* programs/gvfs-mount.c:
+	Add option to list mounts.
+	Based on patch from nf2@scheinwelt.at
+
+2008-01-09  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghaldrive.c:
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	Use default fallbacks for icons
+
+2008-01-09  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountsource.[ch]:
+	Add g_mount_source_get_operation() that lets
+	you handle a remote GMountSource as if it
+	was a GMountOperation.
+	
+	* common/gmountoperationdbus.c:
+	* programs/gvfs-mount.c:
+	Update to new GMountOperation APIs
+	
+	* client/gdaemonfile.c:
+	* daemon/gvfsjobmountmountable.[ch]:
+	Also let you return target by uri, as not all
+	targets are from gvfs.
+	
+	* daemon/gvfsbackendcomputer.c:
+	Initial cut at mount_mountable
+
+2008-01-09  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c (_g_daemon_vfs_get_mount_info_sync):
+	Better error return on not mounted.
+
+2008-01-09  Luca Ferretti  <elle.uca@libero.it>
+
+	* Makefile.am:
+	* autogen.sh:
+	* configure.ac:
+
+	Reuse intltool by now, glib-gettext rules seems unable
+	to properly remove "[encoding: UTF-8]" generating
+	po/POTFILES.
+	
+	* mkinstalldirs:
+
+	Removed, autogenerated by intltool
+
+2008-01-08  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.1 ===
+
+2008-01-08  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+	
+2008-01-08  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Require glib 2.15.1
+
+2008-01-08  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	* daemon/computer.mount.in:
+	* daemon/gvfsbackendcomputer.[ch]:
+	Add initial computer backend
+	
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsjobunmountmountable.[ch]:
+	Add umount_mountable calls
+
+2008-01-07  Alexander Larsson  <alexl@redhat.com>
+
+	* client/Makefile.am:
+	* client/gdaemondirectorymonitor.[ch]:
+	* client/gdaemonfile.c:
+	* daemon/gvfsbackendtrash.c:
+	* programs/gvfs-monitor-dir.c:
+	Update to handle removed GDirectoryMonitor from
+	API.
+	
+	* daemon/gvfsbackendsftp.c:
+	Fix warnings
+
+2008-01-07  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Remove debug spew
+	
+2008-01-07  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Update to new gio API
+
+2008-01-04  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	(make_reply_stream):
+	Update to new gio API
+
+2008-01-03  Matthias Clasen  <mclasen@redhat.com>
+
+	* daemon/Makefile.am: Install the .mount files
+	in /usr/share/gvfs/mounts, not in /etc/gvfs/mounts
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghalvolumemonitor.c:
+	Handle pool finalizing on unloads of hal module
+	(#507037)
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Return icons
+	
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Use right types for file times (#506494)
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Don't return errors on EOF (#506493)
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile.am:
+	* mkinstalldirs: Added.
+	Added mkinstalldirs to svn and EXTRA_DIST ase
+	we now don't gettextize in autogen.
+
+2008-01-03  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghaldrive.c:
+	(_drive_get_description):
+	Fix plus/minus utf8 string.
+	Patch from Luca Ferretti.
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.1.0 ===
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+	* configure.ac:
+	Bump version to 0.1.0
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* autogen.sh:
+	Don't run gettextize
+	
+	* programs/Makefile.am:
+	dist gvfs-less
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/main.c:
+	Fix translated "".
+	
+	* hal/ghaldrive.c:
+	Encode +/- as utf8 c escapes
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Require glib 2.15.0
+	
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsfusedaemon.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsjobqueryinfo.c:
+	* programs/gvfs-copy.c:
+	* programs/gvfs-ls.c:
+	* programs/gvfs-move.c:
+	* test/benchmark-gvfs-big-files.c:
+	* test/benchmark-gvfs-small-files.c:
+	Update to new file attribute names
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c:
+	* hal/ghaldrive.c:
+	* hal/ghalmount.c:
+	* hal/ghalvolume.c:
+	* programs/gvfs-mount.c:
+	Update to new unmount flag api
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	* client/gdaemonvfs.c:
+	* client/gvfsfusedaemon.c:
+	Fix warnings
+
+2007-12-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	Build without cdda.
+	Patch from nf2@scheinwelt.at
+
+2007-12-19  David Zeuthen  <davidz@redhat.com>
+
+	Add missing files from previous patch.
+
+	* daemon/cdda.mount.in:
+	* daemon/gvfsbackendcdda.c: (g_vfs_backend_cdda_finalize),
+	(g_vfs_backend_cdda_init), (do_mount), (try_mount), (do_unmount),
+	(get_track_num_from_name), (free_read_handle), (create_header),
+	(do_open_for_read), (paranoia_callback), (do_read),
+	(do_seek_on_read), (do_close_read), (set_info_for_track),
+	(do_query_info), (do_enumerate), (g_vfs_backend_cdda_class_init):
+	* daemon/gvfsbackendcdda.h:
+	* programs/gvfs-less:
+
+2007-12-19  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.[ch]:
+	* client/gdaemonvolumemonitor.c:
+	* hal/ghalvolumemonitor.c:
+	* hal/hal-module.c:
+	Remove spew
+	Update for new APIs
+	Don't use GDaemonVolumeMonitor if not using GDaemonVfs.
+	
+	* hal/hal-pool.c:
+	Close custom dbus connection before unrefing
+
+2007-12-19  David Zeuthen  <davidz@redhat.com>
+
+	Add the cdda:// backend for Compact Disc Digital Audio discs.
+
+	Allow a backend to specify the fuse name directly instead of
+	using the display name
+
+	Make GDaemonVolumeMonitor and GDaemonMount use the new
+	adopt_orphan_mount() function on GVolumeMonitor in gio. Also,
+	since a GMount now can be associated with a GVolume, implement
+	eject().
+
+	Add a new gvfs-less program.
+
+	Make gvfs-mount capable of unmounting as well.
+
+	HAL backend changes: attempt to unmount all mounts from
+	enclosing volumes and fail the ejection if one of the unmount
+	operations fails. Use new adopt_orphan_mount() from gio to
+	adopt cdda:// volumes for audio discs. Emit the 'eject-button'
+	signal on GDrive. Various other fixes.
+
+	* client/gdaemonfile.c: (g_daemon_file_find_enclosing_mount):
+	* client/gdaemonmount.c: (g_daemon_mount_finalize),
+	(g_daemon_mount_new), (g_daemon_mount_get_volume),
+	(g_daemon_mount_get_drive), (g_daemon_mount_can_eject),
+	(foreign_volume_removed), (g_daemon_mount_set_foreign_volume),
+	(eject_wrapper_callback), (g_daemon_mount_eject),
+	(g_daemon_mount_eject_finish), (g_daemon_mount_mount_iface_init):
+	* client/gdaemonmount.h:
+	* client/gdaemonvolumemonitor.c: (mount_added), (mount_removed),
+	(g_daemon_volume_monitor_init):
+	* client/gvfsfusedaemon.c: (file_handle_close_stream),
+	(free_file_handle_for_path), (mount_record_new):
+	* common/gmounttracker.c: (g_mount_info_dup), (g_mount_info_unref),
+	(g_mount_info_from_dbus):
+	* common/gmounttracker.h:
+	* configure.ac:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.c: (g_vfs_backend_finalize),
+	(g_vfs_backend_init), (g_vfs_backend_set_fuse_name),
+	(g_vfs_backend_get_fuse_name), (g_vfs_backend_register_mount):
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsjobunmount.c: (unregister_mount_callback),
+	(send_reply):
+	* daemon/mount.c: (vfs_mount_free), (vfs_mount_to_dbus),
+	(register_mount), (list_mounts):
+	* hal/ghaldrive.c: (g_hal_drive_finalize), (hal_condition),
+	(g_hal_drive_new), (spawn_cb), (g_hal_drive_eject_do),
+	(free_unmount_mounts_op), (_eject_unmount_mounts_cb),
+	(_eject_unmount_mounts), (g_hal_drive_eject):
+	* hal/ghalmount.c: (g_hal_mount_finalize), (unmount_cb),
+	(unmount_read_error), (unmount_do), (g_hal_mount_unmount),
+	(eject_wrapper_callback), (g_hal_mount_eject),
+	(g_hal_mount_eject_finish):
+	* hal/ghalvolume.c: (g_hal_volume_finalize), (do_update_from_hal),
+	(g_hal_volume_new), (g_hal_volume_get_mount),
+	(foreign_mount_unmounted), (g_hal_volume_adopt_foreign_mount),
+	(g_hal_volume_has_foreign_mount_root), (spawn_cb),
+	(mount_foreign_callback), (g_hal_volume_mount),
+	(g_hal_volume_mount_finish), (eject_wrapper_callback),
+	(g_hal_volume_eject), (g_hal_volume_eject_finish):
+	* hal/ghalvolume.h:
+	* hal/ghalvolumemonitor.c: (adopt_orphan_mount),
+	(g_hal_volume_monitor_class_init), (update_volumes),
+	(update_mounts), (update_discs):
+	* hal/hal-device.c: (hal_device_class_init),
+	(_hal_device_hal_condition):
+	* hal/hal-device.h:
+	* hal/hal-marshal.list:
+	* hal/hal-pool.c: (hal_pool_class_init), (_hal_condition),
+	(hal_pool_new):
+	* hal/hal-pool.h:
+	* programs/Makefile.am:
+	* programs/gvfs-mount.c: (unmount_done_cb), (unmount), (main):
+
+2007-12-18  Luca Ferretti  <elle.uca@libero.it>
+
+	* configure.ac: Add ALL_LINGUAS and definition for GVFS_LOCALEDIR;
+	the second one is unused by now, but could be needed, so all
+	l10n stuff in this file should be OK.
+
+2007-12-17  David Zeuthen  <davidz@redhat.com>
+
+	* hal/ghalvolumemonitor.c (update_mounts): g_get_unix_mounts()
+	was renamed to g_unix_mounts_get() in gio
+
+	* hal/hal-pool.c, Makefile.am: Instead of dbus-glib-1, use the
+	function _g_dbus_connection_integrate_with_main() for mainloop
+	integration.
+
+	* hal/ghalmount.h, hal/ghalvolume.h, hal/ghaldrive.h: Use a weak
+	pointer for the volume monitor
+
+	* configure.ac: Don't require dbus-glib-1 for the hal vm backend
+
+2007-12-17  David Zeuthen  <davidz@redhat.com>
+
+	* client/gdaemonmount.c (g_daemon_mount_mount_iface_init): Fix typo
+	with setting the can_eject() function
+
+2007-12-17  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendtrash.c: (list_trash_dirs):
+	Fix build, renamed g_get_unix_mounts to g_unix_mounts_get
+
+2007-12-17  Alexander Larsson  <alexl@redhat.com>
+
+	* hal/ghaldrive.[ch]:
+	* hal/ghalmount.[ch]:
+	* hal/ghalvolume.[ch]:
+	* hal/ghalvolumemonitor.[ch]:
+	* hal/hal-device.[ch]:
+	* hal/hal-module.c:
+	* hal/hal-pool.[ch]:
+	Make types dynamic and update to support volume monitor
+	backend name and is_supported().
+
+2007-12-17  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonmount.c (g_daemon_mount_mount_iface_init):
+	Eject not supported. Make vtable NULL.
+
+2007-12-14  David Zeuthen  <davidz@redhat.com>
+
+	* Makefile.am:
+	* client/gdaemonmount.c: (g_daemon_mount_get_uuid),
+	(g_daemon_mount_can_eject), (g_daemon_mount_eject),
+	(g_daemon_mount_eject_finish), (g_daemon_mount_mount_iface_init):
+	* client/gdaemonvolumemonitor.c: (get_volume_for_uuid),
+	(get_mount_for_uuid), (g_daemon_volume_monitor_class_init):
+	* configure.ac:
+	* hal/*: new files
+
+	Update to latest gio API changes and add the HAL backend for
+	volume monitoring.
+
+2007-12-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonfileinputstream.c:
+	* client/gvfsfusedaemon.c:
+	* common/gvfsdaemonprotocol.c:
+	* common/gvfsdaemonprotocol.h:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsjobsetattribute.c:
+	* daemon/gvfsjobsetattribute.h:
+	* programs/gvfs-info.c:
+	* programs/gvfs-ls.c:
+	Update for gio API changes (removal of GFileAttributeValue).
+
+2007-12-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* common/gmountsource.c:
+	* common/gmountsource.h:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* programs/gvfs-info.c:
+	* programs/gvfs-monitor-dir.c:
+	* programs/gvfs-monitor-file.c:
+	* programs/gvfs-mount.c:
+	* programs/gvfs-save.c:
+	* test/benchmark-gvfs-big-files.c:
+	* test/benchmark-gvfs-small-files.c:
+	Update to new gio flag enum types/values
+
+2007-12-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemondirectorymonitor.c:
+	* client/gdaemondirectorymonitor.h:
+	* client/gdaemonfile.c:
+	* client/gdaemonfile.h:
+	* client/gdaemonfileenumerator.c:
+	* client/gdaemonfileenumerator.h:
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileinputstream.h:
+	* client/gdaemonfilemonitor.c:
+	* client/gdaemonfilemonitor.h:
+	* client/gdaemonfileoutputstream.c:
+	* client/gdaemonfileoutputstream.h:
+	* client/gdaemonmount.c:
+	* client/gdaemonmount.h:
+	* client/gdaemonvfs.c:
+	* client/gdaemonvfs.h:
+	* client/gdaemonvolumemonitor.h:
+	* client/gvfsdaemondbus.c:
+	* client/gvfsdaemondbus.h:
+	* client/gvfsfusedaemon.c:
+	* client/gvfsurimapper.h:
+	* client/smburi.c:
+	* common/gdbusutils.c:
+	* common/gdbusutils.h:
+	* common/gmountoperationdbus.c:
+	* common/gmountoperationdbus.h:
+	* common/gmountsource.c:
+	* common/gmountsource.h:
+	* common/gsysutils.c:
+	* common/gvfsdaemonprotocol.c:
+	* common/gvfsdaemonprotocol.h:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendtest.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsdaemonutils.c:
+	* daemon/gvfsjob.c:
+	* daemon/gvfsjob.h:
+	* daemon/gvfsjobcopy.h:
+	* daemon/gvfsjobcreatemonitor.h:
+	* daemon/gvfsjobdelete.h:
+	* daemon/gvfsjobenumerate.h:
+	* daemon/gvfsjobmakedirectory.h:
+	* daemon/gvfsjobmakesymlink.h:
+	* daemon/gvfsjobmount.h:
+	* daemon/gvfsjobmountmountable.h:
+	* daemon/gvfsjobmove.h:
+	* daemon/gvfsjobqueryattributes.h:
+	* daemon/gvfsjobqueryfsinfo.h:
+	* daemon/gvfsjobqueryinfo.h:
+	* daemon/gvfsjobsetattribute.h:
+	* daemon/gvfsjobsetdisplayname.h:
+	* daemon/gvfsjobtrash.h:
+	* daemon/gvfsjobunmount.h:
+	* daemon/gvfsmonitor.h:
+	* daemon/mount.c:
+	* daemon/mount.h:
+	* programs/gvfs-cat.c:
+	* programs/gvfs-copy.c:
+	* programs/gvfs-info.c:
+	* programs/gvfs-ls.c:
+	* programs/gvfs-monitor-dir.c:
+	* programs/gvfs-monitor-file.c:
+	* programs/gvfs-mount.c:
+	* programs/gvfs-move.c:
+	* programs/gvfs-rm.c:
+	* programs/gvfs-save.c:
+	* programs/gvfs-trash.c:
+	* test/benchmark-gvfs-big-files.c:
+	* test/benchmark-gvfs-small-files.c:
+	* test/benchmark-posix-big-files.c:
+	* test/benchmark-posix-small-files.c:
+	Only use <gio/gio.h> include 
+
+2007-12-13  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* programs/gvfs-mount.c:
+	Update for g_mount_for_location to g_file_mount_enclosing_volume change.
+
+2007-12-11  David Zeuthen  <davidz@redhat.com>
+
+	Update for API changes in gio trunk.
+
+	* client/Makefile.am:
+	* client/gdaemonfile.c: (g_daemon_file_find_enclosing_mount),
+	(g_daemon_file_file_iface_init):
+	* client/gdaemonvolumemonitor.c: (get_mounts), (get_volumes),
+	(find_mount_by_mount_info), (mount_added), (mount_removed),
+	(g_daemon_volume_monitor_init), (g_daemon_volume_monitor_finalize),
+	(g_daemon_volume_monitor_class_init):
+	* client/gdaemonvolumemonitor.h:
+	* client/gvfsfusedaemon.c: (mount_record_new),
+	(mount_record_for_mount_exists), (mount_list_update),
+	(mount_tracker_mounted_cb), (mount_tracker_unmounted_cb),
+	(subthread_main):
+	* daemon/gvfsbackendtrash.c: (list_trash_dirs):
+
+2007-12-05  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	(g_daemon_vfs_init):
+	Use the new API to load the modules
+
+2007-12-05  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonfileenumerator.c:
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	Update to gio API change
+
+2007-11-27  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	* client/gdaemonvfs.c:
+	* client/gvfsfusedaemon.c:
+	* client/gvfsuriutils.h:
+	* daemon/gvfsbackend.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfschannel.c:
+	* daemon/gvfsmonitor.c:
+	* daemon/mount.c:
+	Update to build with the latest glib included
+	gio
+	
+2007-11-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile.am:
+	* configure.ac:
+	* programs/Makefile.am:
+	* programs/gvfs-cat.c:
+	* programs/gvfs-copy.c:
+	* programs/gvfs-info.c:
+	* programs/gvfs-ls.c:
+	* programs/gvfs-monitor-dir.c:
+	* programs/gvfs-monitor-file.c:
+	* programs/gvfs-mount.c:
+	* programs/gvfs-move.c:
+	* programs/gvfs-rm.c:
+	* programs/gvfs-save.c:
+	* programs/gvfs-trash.c:
+	Moved the gio tools from gio-standalone
+
+2007-11-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Add comment
+	
+	* daemon/gvfsbackendsmb.c:
+	Support new WOULD_MERGE error code
+
+2007-11-16  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	* client/smburi.c:
+	* common/gdbusutils.c:
+	* common/gmountsource.c:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsdaemon.c:
+	* daemon/gvfsjob.c:
+	* daemon/gvfsjobdbus.c:
+	* daemon/gvfsjobopenforwrite.h:
+	* daemon/mount.c:
+	* daemon/pty_open.c:
+	* test/benchmark-gvfs-big-files.c:
+	* test/benchmark-gvfs-small-files.c:
+	* test/benchmark-posix-small-files.c:
+	Code cleanups from Kjartan Maraas.
+
+2007-11-15  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.0.2 ===
+
+2007-11-15  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Require gio 0.1.2
+
+	* NEWS:
+	Update for release
+
+2007-11-15  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/Makefile.am:
+	* daemon/ftp.mount.in:
+	* daemon/gvfs-daemon.service.in:
+	* daemon/sftp.mount.in:
+	* daemon/smb-browse.mount.in:
+	* daemon/smb.mount.in:
+	* daemon/trash.mount.in:
+	Rename gvfs daemon processes to start
+	with "gvfsd". This is shorter and nicer.
+
+2007-11-14  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.h:
+	Add unmount operation and
+	unregister mount mounttracker call
+	
+	* client/gdaemonvolume.c:
+	Implement client side of unmount
+	
+	* daemon/Makefile.am:
+	* daemon/gvfsjobunmount.[ch]: Added.
+	Add unmount job type
+	
+	* daemon/gvfsbackend.[ch]:
+	Implement unmount
+
+2007-11-14  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gdbusutils.c:
+	Handle NULL callback in _g_dbus_connection_call_async
+	
+	* daemon/gvfsdaemon.c:
+	Re-register backends with new main daemons
+
+2007-11-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.[ch]:
+	* client/gvfsdaemondbus.c:
+	Make sure we somewhat cleanly handle the
+	various dbus daemons going down. By somewhat
+	I mean that no problem should be persistant
+	even if you might get some transient error
+	messages.
+
+	Unfortunately the only way to be able to cleanly
+	handle this involves globally ignoring SIGPIPE.
+	What can I say, unix sucks.
+	
+	* common/gsysutils.c:
+	(_g_socket_receive_fd):
+	Handle errors if e.g. the fd is closed
+
+2007-11-13  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gsysutils.c:
+	* daemon/gvfschannel.c:
+	* daemon/gvfsdaemonutils.c:
+	* daemon/gvfsjobcopy.c:
+	* daemon/gvfsmonitor.c:
+	* daemon/gvfswritechannel.c:
+	Add required includes for solaris
+	Patch from Damien Carbery
+
+2007-11-12  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsurimapper.[ch]:
+	Make this class dynamic
+	
+	* client/Makefile.am:
+	* client/gdaemonvfs.c:
+	* client/smburi.c:
+	Build smb uri mapper into module
+	(this avoids extra .so files)
+
+2007-11-12  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountspec.[ch]:
+	(g_mount_spec_new_from_data):
+	(g_mount_spec_set_with_len):
+	Add new functions
+	
+	* client/Makefile.am:
+	* common/Makefile.am:
+	Update for moved files
+	Build non-shared version of common libs.
+	Ups non-shared common libs in client module.
+
+	* common/gvfsuriutils.[ch]: Removed.
+	* client/gvfsuriutils.[ch]: Added.
+	Moved uriutils to gvfs (not used by daemon)
+	Re-namespace to g_vfs_*
+	
+	* common/gvfsurimapper.[ch]: Removed.
+	* client/gvfsurimapper.[ch]: Added.
+	Move UriMapper to client lib
+	Remove/Hide use of GMountSpec
+	
+	* client/gdaemonvfs.c:
+	* client/smburi.c:
+	Update to the new APIs
+	
+	* client/gvfsfusedaemon.c:
+	* daemon/gvfsbackendtrash.c:
+	* daemon/gvfsjobqueryfsinfo.c:
+	Fix warnings
+
+2007-11-08  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsdaemon.c:
+	* daemon/gvfsjobmove.c:
+	* test/benchmark-common.c:
+	Fixes for solaris build.
+	Patches from Damien Carbery
+
+2007-11-07  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* daemon/gvfsbackendsftp.c:
+	Update g_memory_output_stream_set_free_on_close() to
+	g_memory_output_stream_set_free_data().
+
+2007-11-07  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	Update to new gvfs construction API
+
+2007-11-07  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gdbusutils.c:
+	* daemon/gvfsbackendtest.c:
+	* daemon/gvfsbackendtrash.c:
+	Ansi C fixes from Jens Granseuer
+
+2007-11-06  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* configure.ac:
+	* daemon/gvfsdaemonutils.c: (dbus_connection_send_fd):
+	* daemon/mount.c: (vfs_mount_to_dbus), (dbus_message_function):
+	Fix typo: availible -> available.
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 0.0.1 ===
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
+	* client/Makefile.am:
+	* daemon/Makefile.am:
+	* test/Makefile.am:
+	Fix make distcheck
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	(g_daemon_file_file_iface_init):
+	Actually export get_uri_scheme
+	
+	* client/gdaemonfileinputstream.c:
+	(g_daemon_file_input_stream_query_info):
+	Set NOT_SUPPORTED error
+
+2007-11-06  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountoperationdbus.c:
+	* common/gmounttracker.c:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfschannel.h:
+	Remove use of old giotypes.h header
+
+2007-11-03  Paolo Borelli  <pborelli@katamail.com>
+
+	* client/gdaemonvfs.c (get_mountspec_from_uri):
+	Do not leak the decoded uri.
+
+2007-11-02  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* common/Makefile.am: use the correct gmountoperationdbus.h naming
+
+2007-11-01  Christian Kellner  <gicmo@gnome.org>
+
+	* client/*.[ch]:
+	* common/*.[ch]:
+	* daemon/*.[ch]:
+	* test/*.[ch]:
+	Add copyright information to source files.
+
+2007-11-01  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonvfs.[ch]:
+	Implement get_uri_scheme
+	
+	* daemon/mount.c:
+	Add needed includes
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	Implement contains_file and get_relative_path
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackend.[ch]:	
+	Add g_vfs_backend_get_mount_spec
+	
+	* daemon/gvfsjobqueryfsinfo.c:
+	Fix indentation
+	
+	* daemon/gvfsjobqueryinfo.c:
+	Implement id:fs attribute
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvolume.c:
+	Remove get_platform_id
+	
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	Implement find_enclosing_volume
+	
+	* client/gdaemonvolume.[ch]:
+	* client/gdaemonvolumemonitor.c:
+	No need to pass volume monitor when
+	createing volumes
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmounttracker.[ch]:
+	Add all mount info to GMountInfo
+	Make it refcounted
+	
+	* client/gdaemonvfs.[ch]:
+	* client/gdaemonfile.c:
+	* client/gdaemonvolumemonitor.c:
+	Remove GMountRef, replacing its use with
+	GMountInfo
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsjobqueryfsinfo.c:
+	Remove volume name attribute
+
+2007-10-31  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Update to new API
+	
+2007-10-30  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmounttracker.c:
+	Handle threads not being initialized
+	
+	* daemon/gvfsjobqueryfsinfo.c:
+	Set volume name
+
+2007-10-26  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvolumemonitor.c:
+	Don't show not user visible mounts
+
+	* daemon/mount.c:
+	Don't give fuse mounts for non visible mounts
+	(as they don't get mounted)
+	
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendtrash.c:
+	Mark as not user visible
+	
+2007-10-26  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.h:
+	Add registerFuse call
+	
+	* client/gvfsfusedaemon.c:
+	Register with vfs daemon
+	Exit (and unmount) if daemon dies
+	
+	* daemon/mount.c:
+	Hand out fuse mountpaths when availible.
+	
+	* client/gdaemonvfs.[ch]:
+	* common/gmounttracker.c:
+	Handle sent fuse mountpath
+	
+	* client/gdaemonfile.c:
+	Implement g_daemon_file_get_path using fuse
+	if availible.
+
+2007-10-26  Alexander Larsson  <alexl@redhat.com>
+
+	* client/Makefile.am:
+	* client/gvfsfusedaemon.c:
+	Update fuse daemon to use the giomodule instead of
+	linking to a copy of the code. The old way was
+	problematic with the module code being a dynamic
+	type in the module and not in the fuse daemon.
+
+2007-10-25  Alexander Larsson  <alexl@redhat.com>
+
+	* client/smburi.c:
+	* common/gvfsurimapper.[ch]:
+	Make to_uri_scheme return const string.
+	
+	* client/gdaemonfile.[ch]:
+	* client/gdaemonvfs.[ch]:
+	Add _g_daemon_vfs_mountspec_has_uri_scheme and use it to
+	implement g_file_has_uri_scheme
+
+2007-10-24  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountsource.c:
+	(g_mount_source_ask_password):
+	Increase password dialog timeout to 30 minutes
+
+2007-10-24  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountspec.c:
+	(g_mount_spec_set_mount_prefix):
+	Actually assign the mount_prefix in the GMountSpec
+
+2007-10-23  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/Makefile.am:
+	Change the GIO module dir to $(libdir)/gio/modules as was
+	done in GIO.
+
+2007-10-23  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonvfs.c:
+	* common/gmountspec.[ch]:
+	Ensure GDaemonFile mount specs are actually unique.
+	When a non-unique mount spec was finalized any unique
+	version of the same was removed from the hashtable.
+
+2007-10-23  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	(_g_daemon_vfs_get_uri_for_mountspec):
+	Better handling for default types.
+	(Handle hostname, port and username)
+
+2007-10-22  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.c:
+	* common/gvfsuriutils.[ch]:
+	* daemon/gvfsbackendtrash.c:
+	Update to use the gurifuncs.h from gio.
+	Fix filename parsing to handle ~/x
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackend.[ch]:
+	Rename set_icon -> set_icon_name
+	Add getter for icon_name and display_name
+	
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	Update for API changes
+	Set display name for in fileinfo
+
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendtrash.c:
+	Update for API changes
+
+	
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	(g_daemon_file_hash): Faster hash, since mount_spec is unique
+	(g_daemon_file_equal): Compare mount spec too
+	
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	Set volume display names and icons
+	Set content type and icon for files
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmounttracker.[ch]:
+	* client/gdaemonvfs.c:
+	* daemon/mount.c:
+	Add user_visible to mount info
+	Reorder args so that new stuff comes at the end
+	
+	* daemon/gvfsbackend.[ch]:
+	Add user_visible setting
+	Fix up various setters that set the wrong variable
+	
+	* daemon/gvfsbackendtrash.c:
+	Add icon and better display name
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonvfs.[ch]:
+	* client/gdaemonvolume.c:
+	* client/gdaemonvolumemonitor.[ch]:
+	Implement using DEFINE_DYNAMIC_TYPE
+	Actually register GDaemonVolumeMonitor in giomodule
+	
+	* common/gmounttracker.c:
+	Update to the on-dbus format for mounts
+
+2007-10-19  Alexander Larsson  <alexl@redhat.com>
+
+	* client/smburi.c (smb_to_uri):
+	No port by default
+
+2007-10-16  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	(g_daemon_file_get_parent):
+	Fix get_parent to handle files that are in the root directory
+
+2007-10-16  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.[ch]:
+	Make sending icons actually work
+	
+	* daemon/gvfsbackendtrash.c:
+	Set icon for toplevel
+	
+	* daemon/gvfsmonitor.c:
+	Initialize error before call
+
+2007-10-12  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsdaemon.c:
+	Build fixes
+	Patch from Milosz Derezynski <internalerror@gmail.com>
+
+2007-10-10  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Support file monitor on trash:/// (for icon)
+
+2007-10-10  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Add support for directory monitor on root dir
+
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Correctly handle len arg in unescape_pathname
+	
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Nicer filenames for things in the home trash.
+	This is the common case, so lets make them look nice.
+
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Check for trash dirs in fork to avoid getting stuck
+	on e.g. hanged nfs dirs
+
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
+	* client/Makefile.am:
+	* client/gdaemonfile.c:
+	* client/gdaemonfilemonitor.[ch]:
+	Implement file monitor in client
+	
+	* common/gvfsdaemonprotocol.h:
+	* daemon/gvfsbackend.c:
+	Implement file monitor in daemon
+	
+	* daemon/gvfsbackendtrash.c:
+	Implement file monitor in trash backend
+	Make trash filename escaping nicer
+
+2007-10-09  Alexander Larsson  <alexl@redhat.com>
+
+	* configure.ac:
+	Pull in gio-unix-2.0
+	
+	* daemon/gvfsbackendtrash.c:
+	Use GUnixMounts instead of volume monitor
+	This shows *all* mounts and avoids unnecessary stuff
+
+2007-10-08  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsdaemonprotocol.h:
+	Add defines for monitoring
+	
+	* client/Makefile.am:
+	* client/gdaemondirectorymonitor.[ch]: 
+	* client/gdaemonfilemonitor.[ch]:
+	* client/gdaemonfile.c:
+	Add daemon directory monitor and initial work on file monitor
+	
+	* client/gdaemonfileenumerator.c:
+	Make path_counter private
+	Return DBUS_HANDLER_RESULT_HANDLED when handling messages.
+	
+	* client/gdaemonvfs.[ch]:
+	Make _g_mount_ref_ref "public"
+	
+	* client/gvfsdaemondbus.c:
+	Handle NULL callbacks for async calls
+	
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.[ch]:
+	* daemon/gvfsjobcreatemonitor.[ch]:
+	Add create_dir_monitor and create_file_monitor.
+	Add g_vfs_backend_get_daemon
+	
+	* daemon/gvfsmonitor.[ch]:
+	Helper code for monitors
+	
+	* daemon/gvfsbackendtrash.c:
+	Implement directory monitor for trash dirs
+
+2007-10-08  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/gdaemonvfs.c: (g_daemon_vfs_finalize),
+	(g_daemon_vfs_init), (fill_supported_uri_schemes),
+	(g_daemon_vfs_get_supported_uri_schemes),
+	(g_daemon_vfs_class_init):
+	* client/smburi.c: (smb_to_uri_scheme),
+	(g_vfs_uri_mapper_smb_class_init):
+	* common/gvfsdaemonprotocol.h:
+	* common/gvfsurimapper.c: (g_vfs_uri_mapper_to_uri_scheme):
+	* common/gvfsurimapper.h:
+	* daemon/mount.c: (list_mount_types), (dbus_message_function):
+	Implement get_supported_uri_schemes method and add a GVfsUriMapper
+	method to map a mount spec to an URI scheme.
+
+2007-10-05  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendtrash.c:
+	Add delete support to trash
+
+2007-10-04  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gvfsuriutils.c:
+	(g_uri_unescape_string):
+	Allow NULL end pointer
+
+	* daemon/gvfsjob.[ch]:
+	Add cancellable to GVfsJob for backends that want one
+	
+	* daemon/gvfsjobenumerate.[ch]:
+	* daemon/gvfsjobqueryinfo.[ch]:
+	Also store attribute in string form.
+	Needed if you want to pass it on into gio.
+	
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendtrash.[ch]:
+	* daemon/trash.mount.in: Added.
+	Added trash backend
+
+2007-10-04  Alexander Larsson  <alexl@redhat.com>
+
+	* TODO:
+	* client/gdaemonfile.c:
+	* client/gvfsfusedaemon.c:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsjobopenforwrite.[ch]:
+	* test/benchmark-gvfs-big-files.c:
+	* test/benchmark-gvfs-small-files.c:
+	Add GFileCreateFlags flag to open for write.
+	No actual backend support yet though.
+
+2007-10-02  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/gdaemonfile.c: (g_daemon_file_append_to),
+	(g_daemon_file_create), (g_daemon_file_replace):
+	* test/benchmark-gvfs-big-files.c: (create_file):
+	* test/benchmark-gvfs-small-files.c: (create_file): Update to API
+	changes in gio.
+
+	* daemon/gvfschannel.c:
+	* daemon/gvfsreadchannel.c:
+	* daemon/gvfswritechannel.c:
+	* daemon/main.c:
+	Drop unecessary includes.
+
+2007-09-29  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* configure.ac: Revert accidentally included local change.
+
+2007-09-29  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* configure.ac: Update to the new pkg-config filename.
+	* gio-standalone.pc.in: Remove pkg-config file that belongs to gio.
+
+2007-09-27  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* daemon/gvfsbackendftp.c: (do_replace), (do_query_info),
+	(do_query_fs_info), (do_enumerate):
+	Update signatures for API changes in gio.
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsdaemondbus.c:
+	Clear VfsConnectionData on creation
+	(fixes read of uninitialized data on thread shutdown)
+	
+	* daemon/sftp.mount.in:
+	Correct the type to "sftp"
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/mount.c:
+	Return NOT_SUPPORTED error for unsupported uri types
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsfusedaemon.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	Update for G_IO_ERROR_NOT_MOUNTABLE_FILE name change
+
+2007-09-25  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gmountoperationdbus.[ch]:
+	* common/gmounttracker.[ch]:
+	Pass in DBusConnection to use instead of using default one
+	
+	* client/gdaemonfile.c:
+	* client/gdaemonvfs.[ch]:
+	* client/gvfsdaemondbus.c:
+	Use private dbus connection even for async calls, since the
+	mainloop integration is conflicting with dbus-glib.
+	This is a temporary measure until this is solved in a better way.
+	
+	* client/gdaemonvolumemonitor.c:
+	* client/gvfsfusedaemon.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	Update to the API changes
+
+2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/gdaemonvfs.c: (g_daemon_vfs_finalize):
+	Don't unref wrapped_vfs as it's just a pointer to the single instance
+	return value of g_vfs_get_local().
+
+2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* client/gdaemonfile.c: (g_daemon_file_resolve_relative_path),
+	(g_daemon_file_file_iface_init):
+	* test/benchmark-gvfs-big-files.c: (create_file):
+	* test/benchmark-gvfs-small-files.c: (create_file):
+	Update for API change in GIO. g_file_resolve_relative was renamed
+	to g_file_resolve_relative_path.
+
+2007-09-25  Sebastian Dröge  <slomo@circular-chaos.org>
+
+	* common/gmountspec.c: (g_mount_spec_to_dbus_with_path):
+	* common/gvfsdaemonprotocol.c: (_g_dbus_append_file_attribute),
+	(_g_dbus_append_file_info), (_g_dbus_append_attribute_info_list):
+	* daemon/mount.c: (vfs_mount_to_dbus):
+	Don't pass the contained signature when creating a DBus struct. Since
+	DBus 1.1.0 this will lead to an assertion. The signature will filled
+	automatically while adding values to the struct.
+
+2007-09-17  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfile.c:
+	* client/gdaemonfileinputstream.c:
+	* client/gdaemonfileoutputstream.c:
+	* client/gvfsfusedaemon.c:
+	* common/gvfsdaemonprotocol.h:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.[ch]:
+	* daemon/gvfsbackendftp.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendtest.c:
+	* daemon/gvfsjobenumerate.h:
+	* daemon/gvfsjobgetfsinfo.[ch]: Removed.
+	* daemon/gvfsjobgetinfo.[ch]: Removed.
+	* daemon/gvfsjobqueryfsinfo.[ch]: Added.
+	* daemon/gvfsjobqueryinfo.[ch]: Added.
+	* daemon/gvfsjobsetattribute.[ch]:
+	* test/benchmark-gvfs-big-files.c:
+	* test/benchmark-gvfs-small-files.c:
+	Update with the get_info -> query_info rename in gio
+
+2007-09-17  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Update to new GDataInputStream function names 
+
+2007-09-14  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gdaemonfileoutputstream.c:
+	(g_daemon_file_output_stream_get_etag):
+	Update to new get_etag API.
+
+2007-09-14  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c:
+	Add etag support for close on write
+
+I stopped tracked changes here. Look at "git log" instead.
+		
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfilesimple.[ch]:
+	Move GFileSimple struct into c file	
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfile.[ch]:
+	Add follow_symlinks argument to get_info
+	
+	* gfileinfo.[ch]:
+	Some mask fixes
+	
+	* gfilesimple.c:
+	More implementation work
+	
+	* glocalfileoutputstream.[ch]:
+	Implement set_original_mtime and set_create_backup
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	Add gfilesimple
+	
+	* gfile.[ch]:
+	Add g_file_copy()
+	Finish rename to parse_name
+	Remove set_keep_open for now
+	
+	* gfilesimple.[ch]:
+	Initial skeleton for GFileSimple
+	Handle parse names
+	
+	* gvfssimple.c:
+	Handle parse names
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfileenumerator.c:
+	* gfileinfo.c:
+	* gfileinputstream.c:
+	* gfileoutputstream.c:
+	* ginputstream.c:
+	* glocalfileinputstream.c:
+	* glocalfileoutputstream.c:
+	* goutputstream.c:
+	* gvfssimple.c:
+	Use macro-created parent_class
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfile.c:
+	* gvfs.[ch]:
+	* gvfssimple.c:
+	Clean up parse_name names.
+
+2006-09-28  Alexander Larsson  <alexl@redhat.com>
+
+	* gfile.[ch]:
+	Add request flags & attributes
+	Use FileStreams
+	
+	* gfileinputstream.h:
+	* gfileoutputstream.h:
+	Fix G_TYPE_... defines
+	
+	* glocalfileoutputstream.c:
+	Small cleanups and mention gedit.
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* gfileinfo.[ch]:
+	Added g_file_info_new, g_file_info_set_from_stat
+	
+	* glocalfileinputstream.c:
+	* glocalfileoutputstream.c:
+	Implemented get_file_info.
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* glocalfileoutputstream.c:
+	Update implementation of final mtime
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* gfileinfo.h:
+	* gfileinputstream.[ch]:
+	* gfileoutputstream.[ch]:
+	Flags & attributes in get_file_info
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	* ginputstreamfile.[ch]:
+	* goutputstreamfile.[ch]:
+	* glocalfileinputstream.[ch]:
+	* glocalfileoutputstream.[ch]:
+	Rename local file streams and make them
+	inherit from FileInput/OutputStream
+	
+	* test.c:
+	Update
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	* gfileinputstream.[ch]:
+	* gfileoutputstream.[ch]:
+	Add new classes.
+	
+	* gfileinfo.[ch]:
+	Add flags, symlink_target and edit_name
+	
+	* ginputstream.[ch]
+	* goutputstream.[ch]:
+	Export close/pending state a bit
+	
+	* gvfserror.h:
+	Add NOT_SUPPORTED
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* ginputstream.c:
+	* goutputstream.c:
+	Wrap async callback to automatically handle
+	setting of pending, closed and ref/unref of the stream.
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	reviewed by: <delete if not using a buddy>
+
+	* ginputstream.c: (read_async_callback_wrapper),
+	(g_input_stream_read_async), (skip_async_callback_wrapper),
+	(g_input_stream_skip_async), (close_async_callback_wrapper),
+	(g_input_stream_close_async), (read_op_report), (read_op_free),
+	(g_input_stream_real_read_async), (skip_op_report), (skip_op_free),
+	(g_input_stream_real_skip_async), (close_op_report),
+	(close_op_free), (g_input_stream_real_close_async):
+	* goutputstream.c: (write_async_callback_wrapper),
+	(g_output_stream_write_async), (flush_async_callback_wrapper),
+	(g_output_stream_flush_async), (close_async_callback_wrapper),
+	(g_output_stream_close_async):
+
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* ginputstream.[ch]:
+	Update of close and pending handling.
+	
+	* goutputstream.[ch]:
+	Implement default async version
+	
+2006-09-27  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	Add output file streams
+	
+	* ginputstream.c: (g_input_stream_is_cancelled):
+	Cleanup
+	
+	* ginputstreamfile.[ch]:
+	remove get_fd.
+	
+	* goutputstream.[ch]:
+	Add g_output_stream_is_cancelled
+	Add padding
+	Add cancel_async
+	
+	* goutputstreamfile.[ch]:
+	Add new class
+	
+	* gvfserror.h:
+	Add new errors
+	
+	* test.c:
+	Some tests
+	
+2006-09-26  Alexander Larsson  <alexl@redhat.com>
+
+	* Makefile:
+	Add gthread-2.0
+	
+	* ginputstream.h:
+	add async_skip and is_cancelled.
+	
+	* ginputstream.c:
+	Implement async fallbacks using thread
+	
+	* ginputstreamfile.c:
+	Handle cancellation
+	
+	* gioscheduler.c:
+	Schedule cancelled jobs first
+	Fix out-of-lock reads of job
+	Add g_io_job_mark_done().
+	
+	* gioscheduler.h:
+	Add g_io_job_mark_done().
+	
+	* test.c:
+	Add some stream tests
+

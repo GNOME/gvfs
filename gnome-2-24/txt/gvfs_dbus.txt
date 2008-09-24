@@ -1,0 +1,65 @@
+how to chain to simple stuff
+
+how to parse uris (i.e. map to mounts)
+
+what connections do we have:
+shared dbus connection
+connection to main daemom
+connection to each mount daemon
+
+"fast ops" (uri->gfile) vs blocking ops (read, open etc) and how to avoid slow blocking fast
+
+
+each thread has, on demand:
+connection to main daemon
+connection to some mount daemons
+
+global state:
+cache of previously used mountpoints
+
+
+how to mount
+
+how to store/restore permanent mounts with the session => store as drives (mountpoints), not volumes!
+
+Don't always want to log in to all mounts on login? (mounpoints!)
+
+computer:// handled in main daemon?
+
+No volume monitor in public API, only computer:// ?
+Problems:
+* mounted (desktop/computer:, trash dir)
+* unmounted/pre_unmount (desktop/computer:, close windows on unmounted volumes, trash dir)
+* map path to volume (close windows on unmounted volumes, check for readonly mount, get volume name)
+* get all drives/volumes (detecting where to show eject, mount, unmount menu items,
+			  tree view, places sidebar, display volume icon in pathbar)
+* eject/unmount ops
+* needs eject
+
+unmounted URI => return a mountpoint object?
+
+GMountOperation, async mount operation object
+signals => passwd, question, keyring?
+
+GFile mountpoint => GMountOperation
+
+What process calls gnome-keyring? 
+
+
+
+--------------------
+
+GFile creation => decompose URI, no i/o
+
+on i/o:
+ * figure out mountpoint (for now, always toplevel uri location)
+ * if we have a local dbus connection to that, use it, otherwise:
+   + create (if needed) local session dbus connection
+   + ask for mount daemon for new session
+     - If not existing, error on i/o, return mountpoint type on get_info
+   + set up new local connection with the mount daemon
+ * send dbus message
+ * recieve answer, if has magic flag, followed by fd sendmsg() (created by socketpair())
+
+ 
+ 

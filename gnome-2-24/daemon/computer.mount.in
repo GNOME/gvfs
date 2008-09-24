@@ -1,0 +1,5 @@
+[Mount]
+Type=computer
+Exec=@libexecdir@/gvfsd-computer
+AutoMount=true
+

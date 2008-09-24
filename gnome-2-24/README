@@ -1,0 +1,21 @@
+gvfs is a userspace virtual filesystem designed to work with the i/o
+abstractions of gio (a library availible in glib >= 2.15.1). It
+installs several modules that are automatically used by applications
+using the APIs of libgio. There is also fuse support that allows
+applications not using gio to access the gvfs filesystems.
+
+
+The gvfs model differs from e.g. gnome-vfs in that filesystems must
+be mounted before they are used. There is a central daemon (gvfsd)
+that handles coordinting mounts, and then each mount is (typically)
+in its own daemon process (although mounts can share daemon process).
+
+gvfs comes with a set of backends, including trash support, sftp,
+smb, http, dav and others. More backends are planned.
+
+gvfs also contains modules for gio that implement hal volume monitors
+and the gnome uri-scheme handler configuration.
+
+There is a set of command line programs starting with "gvfs-" that
+lets you run commands (like cat, ls, stat, etc) on files in the gvfs
+mounts.

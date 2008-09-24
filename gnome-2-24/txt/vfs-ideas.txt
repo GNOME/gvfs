@@ -1,0 +1,425 @@
+Subject: Plans for gnome-vfs replacement
+
+Recently there has been a lot of discussions about the platform and
+the correct stacking order and quality of the modules. Gnome-vfs
+is a clear problem in this discussion. Having spent the last 4 years
+as the gnome-vfs maintainer, and even longer as the primary gnome-vfs
+user (in Nautilus) I'm well aware of the problems it has. I think that
+we've reached a point where the problems in the gnome-vfs architecture
+and its position in the stack are now ranking as one of the most
+problematic aspects of the gnome platform, especially considering the
+enhancements and quality improvements seen in other parts of the
+platform.
+
+So, I think the time has come for a serious look at what gnome-vfs
+could be. I've spent much time last week thinking about the weaknesses
+and problems of the current gnome-vfs and possibilities inherent in a
+redesign, both having learnt from 7 years of gnome-vfs existance and
+the improvements in the platform (both Gnome and surrounding
+technologies) since 1999 when it was designed.
+
+As soon as you spend some time looking at this problem is evident that
+to solve the platform ordering issues we really need a clean cut from
+the current gnome-vfs. I think the ideal level for a VFS would be in
+glib, in a separate library similar to gthread or gobject. That way
+gtk+ would be able to integrate with it and all gnome apps would have
+access to it, but it wouldn't affect small apps that just wants to use
+the glib core. Furthermore, not being libglib lets us use GObjects in
+the vfs, which means we can make a more modern API. Of course, this
+places quite some limitations on the vfs, especially in terms of
+dependencies and how integration with a UI should work.
+
+Any thoughs on the design of a vfs to replace gnome-vfs must be based
+on a solid understanding of the problems with the current system, to
+avoid redoing old mistakes and to make sure that we solve all the
+known problems of the current system. So, I'm gonna start by
+describing what I see as the main architectural and "hard" problems in
+gnome-vfs.
+
+The first, and most often discussed problem is of course
+compatibility. The various desktops use different vfs implementations,
+so they can't read each others files. Many applications use no VFS
+at all and have no way to access files on vfs shares. And the
+existence of multiple vfs implementations makes it unlikely that they
+will start using one.
+
+Gnome-vfs has no concept of Display Names, something which is very
+useful in a gui based system. In some places we auto-generate virtual
+desktop files to get this feature, but that is very hackish and need
+support in all apps to understand them. This is also quite closely
+related to handling filename charset encoding, another very weak point
+in gnome-vfs. The ideal way to reference a file is the actual real
+identifer on disk, database, remote share or what have you, as that
+can be passed between implementations, used with other access methods,
+etc. But to display something useful to the user you really need a
+user understandable utf-8 encoded string and a way to map that to/from
+the filename.
+
+There is no support for icons at the level of gnome-vfs. This means
+that all users above the vfs must implement it themselves (e.g. in
+nautilus and in the file selector). Each implementation have its own
+bugs, maintainance load and risk for different behaviour. It also
+means that vfs backends cannot supply their own icons, something which
+might be very useful for e.g. a network share based on some new fancy
+web service. 
+
+The abstraction that gnome-vfs use is very similar to the posix model,
+which is problematic in several ways. The posix model matches poorly
+with the sort of highlevel operations that gnome applications wants to
+do with the vfs. The vfs is not typically used for what I would call
+"implementation files", which are things like configuration files,
+data files shipped with apps, system files, etc, but rather for what
+I'd like to call "user document files". These are the kind of files
+you open, save, or download from the internet to look at. Applications
+that use these would like highlevel operations that match the kind
+of operations you use on them, like read-entire-file, save-file,
+copy-file, etc. 
+
+The posix model is also a bad match when implementing gnome-vfs
+modules. It requires some features from the implementation that can be
+difficult or impossible to implement. For example, its not really
+possible to support seeking when writing to a file on a webdav share,
+because a webdav put operation is essentially just streaming a copy of
+the new file contents. We currently work around this by locally
+caching all the file data being written and then sending it all in the
+close() call. This is clearly suboptimal for a lot of reasons, like
+applications not expecting close() to take a long time, and not
+checking its error conditions very closely.
+
+Another problem is that the posix model doesn't contain explicit
+operations for some of the things applications need to do. So instead
+applications rely on well known knowledge of the behaviour of posix
+to implement these operations. However, such behaviour might not be
+guaranteed on some gnome-vfs backends. A common example is the atomic
+save operation. A typical way to implement this on posix is to write
+to a temporary file in the same directory, and then rename over the
+target file, thus guaranteeing an atomic replacement of the file on
+disk, or a failure that didn't affect the original file. Of course,
+if a gnome-vfs application would use this and the backend was a
+webdav share to a subversion repository you would get some really
+weird versioning history in the repository for no good reason. If the
+backend had its own implementation of the save operation we could get 
+both optimal behaviour on each backend, and an application API that
+doesn't require arcane knowledge of the atomicity of renames.
+
+One of the most problematic aspects of gnome-vfs is its authentication
+framework. The way it works is that you register callbacks to handle
+the authentication dialog, and whenever any operation needs to do
+authentication these callbacks will be called. The idea is that a
+console application would register a set of callbacks that print
+prompts on the console, and a Gtk+ application would have a set of
+callbacks that displays dialogs. There is a set of standard dialog
+based callbacks in libgnomeui that you can install by calling
+gnome_authentication_manager_init(). From an initial look this seems
+like a reasonable approach, but it turns out that this creates a host
+of different problems.
+
+One problem is how you connect this to the application. A lot of
+people are unaware that you have to call gnome_auth_manager_init() to
+get authentication dialogs, or don't want to depend on libgnomeui to
+do so. So a lot of applications don't work with authentication. Those
+who do call it generally have pretty poor integration with the
+authentication dialogs. For instance, the general authentication
+dialogs can't be marked as parents of whatever dialog caused the
+authentication (because they have know whay of knowing what caused
+it), and all sorts of problems appear when there is a modal dialog
+displayed already.
+
+Another problem is the combination of blocking gnome-vfs calls and
+authentication. When calling a blocking operation like read() and it
+results in a password dialog we have to start up a recursive mainloop
+to display it. Not only is this unexpected for the application, it
+also brings with it all the type of reentrancy issues that we had in
+bonobo. Even worse, there is no way to make this threadsafe. To make
+it threadsafe the callback would have to take the gdk lock before
+doing any Gtk+ calls, but this would cause a deadlock if the
+application called it with the gdk lock held. If we don't take the
+gdk lock then you can't do blocking vfs calls on any thread but the
+mainloop, or you have to take the gdk lock on any gnome-vfs call.
+
+The authentication callbacks can appear at *any* gnome-vfs entry
+point, which makes it very hard to write gnome-vfs applications that
+don't accidentally trigger a lot of authentication dialogs. For
+instance, the tree sidebar in nautilus has to take particular care not
+to stat or otherwise look at the toplevel items until the user
+explicitly expands them, otherwise you'd get authentication dialogs
+every time you opened a window. Its also easy to get multiple
+authentication dialogs for the same entity.
+
+The way threads are used in gnome-vfs is problematic, both from the
+point of view of writing backends, and for users of the library. For
+users it forces the use of threading, even if the application doesn't
+use the asynchronous calls that use the threading. It also enforces
+the need for a gnome_vfs_init() function, as thread initialization
+must be done very early.
+
+For backend implementations the use of threads forces every
+backend to be threadsafe. Many of the backends are inherently single
+threaded, either because they use non-threadsafe libraries like the
+smb backend, or because the server being wrapped forces serialized
+access (like an ftp backend where you really only want one connection
+to the server). 
+
+Backends run in context of the application using gnome-vfs, which can
+be a gtk+ app, but as well a console application, so they have no
+control or guarantee of their environment. For instance, they cannot
+rely on the existance of a mainloop, so there is no way to use
+e.g. timeouts to handle invalidation of caches. One way we have tried
+to solve this is to move some backends to the gnome-vfs daemon, where
+they can rely on the existance of the mainloop.
+
+Gnome-vfs use something called "gnome vfs uris" to identify
+files. These are similar, but not entierly identical to the types of
+uri used in webbrowsers. For instance, we often make us our own types
+of URIs when there is no official standard for them (although such
+standards might appear later, with incompatible behaviour). We also
+have a "well defined" posix-like type of behaviour that isn't the same
+as for web uris. The most extreme example would be mailto:, but even
+things like ftp:// uris are different. The ftp uri rfc explains how
+ftp:///dir/file.txt refers to $(login_dir)/dir/file.txt, and that you
+have to use ftp:///%2fdir/file.txt to refer to the absolute path
+/dir/file.txt on the server. Clearly we can't have pathname handling
+semantics that vary depending on the backend (no app would get it
+right), so we ignore the rfcs on this.
+
+Then there is the thing with escaping and unescaping uris. Although
+technically not very complex it is just are very hard to get right all
+the time. Among the most common questions on the gnome-vfs list is
+what the various escape/unescape functions does, what arguments has to
+be escaped, and how to display uris "nicely" (i.e. without escapes,
+although that makes them invalid uris). This is made extra complicated
+due to the poor handling of filename encodings and display names, and
+the fact that only "less common" cases (like spaces in filenames)
+break if you get it wrong.
+
+Last but not least, the fact that gnome-vfs uses something called a
+"uri" gives people the wrong impression of what the library is
+designed for. It causes people to complain when it doesn't have some
+support for mailto: links, and it makes people want support for
+cookies, extra http headers and other things typically used by a web
+browser. This isn't really the kind of use that vfs is targeted at. A
+library specific to that sort use would probably fit these apps much 
+better. 
+
+Most gnome-vfs state is tied to the application that uses it, which I
+think is quite unexpected by the user. For instance, when you log into
+a network share in nautilus and then click on a file to open it, the
+opening  application will have to re-connect and re-authenticate to
+the share, much to the users surprise. I really think most people
+expect a login like that is somehow session global. We do sometimes
+misuse gnome-keyring to "solve" the authentication issue, but even
+then we still have multiple connections to the network share, which
+can cause problem, for instance with ftp shares that use round-robin
+dns where the mirrors aren't fully sync:ed up. Again, some backends
+(smb) are now in the daemon which solves this issue.
+
+gnome_vfs_xfer() is possibly the worst-API call in the whole gnome
+platform. Its a single, buggy, do-it-all function with shitloads of
+combinations of flags and arguments to do all sort of things, with
+little or no semantic specifications or testcases. Its also to a large
+extent unnecessary for most applications and could easily be part of
+the file manager instead of a generic library. I'm also not sure that
+the "first do preflight calculation, then execute operation" model it
+uses is right. It is inherently racy, since the target or source could
+easily change during the preflight, and it makes error reporting and
+handling much more complicated. 
+
+The behaviour of symlink resolution in the UI has been discussed many
+times. Should clicking on a symlink "foo" in $dir go to $dir/foo or to
+the target directory. The Nautilus maintainers has decided that the
+best way to approach this is to have symlinks be used for "filesystem
+implementation" (like a symlink for /home -> /mnt/hdb2) and thus not
+be resolved on activation. However, we should (this hasn't been
+finished yet) support a different form of links (called "shortcuts" in
+the UI) that always resolve on activation. At the moment there is no
+support for anything like that in gnome-vfs, so we abuse desktop files
+for this. We even generate virtual in-memory desktop files in the smb
+backend to get this behaviour. Proper support for shortcuts in the
+vfs API would let apps automatically work without ugly desktop file
+hacks.
+
+Over the years gnome-vfs has accumulated a lot of cruft. It links to a
+lot of libraries, including openssl, gconf+ORBit2, avahi, dbus, popt,
+libxml, kerberos, libz and libresolv. Very few applications need all
+of these, yet every application that uses gnome-vfs links to all of
+them. Furthermore, some of the functionallity in gnome-vfs, like the
+wrapper for dns-sd, resolving, network utilities, ls parsing
+functions, ssl support, pty handling are perhaps not best suited for a
+vfs library, nor do they always have great apis and quality
+implementations. We could definately clean this up and minimize the
+APIs.
+
+At some point in time gnome_vfs_uri_is_local() started detecting and
+returning TRUE for NFS mounts and other type of local network
+mounts. This is both slow and unexpected, and has led to problems and
+unnecessary changes in many places. 
+
+The way the cancellation API for asynchronous operations is set up
+creates races and fragile code. The main issue is that if you call
+cancel before the operation callback has been called the callback will
+not be called. However, the callback typically wants to free some sort
+of user_data object passed to it, so that has to be handled also when
+you call cancellation. Couple this with the fact that there is no
+destroy notifies and you can't cancel after the operation callback has
+been called and you get an extremely tricky setup of combined
+callbacks. Furthermore, if threads are used there are some inherent
+races wrt detecting if the callback has been called when cancel is
+called, making it essentially impossible to get this right.
+
+There are also a bunch of issues with the current gnome-vfs that could
+technically be fixed like support for hidden file flags,
+backend-extensible metadata, no standard vfs dialogs like progress
+bars, etc.
+
+Last week I started thinking about a new design for a gnome-vfs
+replacement that would solve most of these issues, and at the same
+time gives a correct ordering of the platform stack. I've come up with
+a highlevel architecture that I think will work, even though I haven't
+yet finished it in detail or gotten the API totally worked out. Its
+somewhat of a radical departure from gnome-vfs as it is today, so
+brace with me as I try to explain the model and the ideas behind it.
+
+The gnome-vfs model is what I would call stateless. You can at any
+time throw a URI at it and it will do everything required to access
+the location. There is no need to, nor is there a way to set up
+anything like a "session" with a remote share. Of course, in practice
+this is not the way network shares work, so all sorts of session
+initiation, caching and other magic happens under the covers to make
+it look stateless. This is the source of all the problems with the
+gnome-vfs authentication model.
+
+I'd like to propose using a stateful model, where you have to
+explicitly initiate a session ("mount" a share) before you can start
+accessing files. This will give a well specified time when all forms
+of authentication will happen, when applications expect it and when
+they can use a more expressive and suitable API for this kind of
+operation. The actual i/o operations will then never cause any sort of
+authentication issues, and can thus be purely non-graphical
+(i.e. glib-only apps can do i/o). I imagine all/most actual mounting
+of shares will happen in the file manager and the file selector, or at
+gnome-session startup, so applications don't really need to handle
+this themselves.
+
+Not only is the model stateful. I'd like all state to be session
+global. That is, all mounts and network connections are shared between
+all applications in the session. So, if you pass a file reference from
+one app to another there is no need to log in again or anything like
+that. I think this is what users expect.
+
+Having a global stateful model means all non-local vfs accesses go
+through the vfs daemon. This works pretty well with the smb backend in
+the current gnome-vfs, and smb is the backend most likely to have high
+bandwidth traffic, so this doesn't seem to be a large performance
+problem. Although we do have to take the performance aspect into
+consideration when designing the daemon.
+
+In order to avoid all the problems with threading described above the
+vfs daemon will not use threads. In fact, I think the best approach is
+to let each active mountpoint be its own process. That way we get
+robustness (one mount can't crash the others) and simplify the backend
+creation greatly (each backend fully controls its context). It also
+will let us do concurrent access to e.g. two smb shares (like a copy
+from one to the other). We can't really do this atm since the thread
+lock in the smb backend serializes such access. But with two smb
+processes this is not a problem.
+
+There might be an issue with using separate processes for the
+mountpoints bloating up the desktop, but I don't think that it will be
+much of a problem. None of these processes will use the gui libraries
+that are the real sources of unshared dirty memory use. I tried a
+simple process that just used gobject and ran a mainloop. It only used
+78k of dirty memory. Also, each server need only link to and
+initialize the few libraries it needs, further keeping memory use down
+and avoiding bloat in all applications (e.g. apps need not link to
+openssl). 
+
+As a consequence of the stateful model we don't need the stateless
+properties that URIs has as identifier. To avoid all the problems
+comming from the use of URIs  we use a much simpler form of
+identifier. Namely filenames, in a hierarchical tree with
+mountpoints. These filenames are from an extended set of strings that
+includes the set of normal filenames, but also includes some platform
+dependent extensions. On win32 the full set might be some form of
+stringified version of the ITEMIDLIST from the windows shell api, and
+on unix we would use some out of band prefix to mark a non-local
+filename.  
+
+For example, we could be to use "//.network/" as a prefix for the vfs
+filename namespace. A smb share might then be accessed as
+"//.network/smb/computer:share/dir/file.txt", or a ftp share as
+"//.network/ftp/alex@ftp.gnome.org/dir/file.txt". With a setup like
+"//.network/$method/$mount_object/" it would be quite easy to find the
+process handling the mount. Just ask for a dbus named object like
+"org.glib.gvsf.smb.computer:share". It is also very easy to detect
+local filenames and short-circuit to in-process i/o.
+
+These filenames would be the real identifier for the files, and as
+such not really presentable to the user as it. You'd need to ask for
+the display name via the vfs to get a user readable utf8-encoded
+string for display. 
+
+The set of operations on files and folders would be both simplified
+and extended. We'd remove complicated things like read+write access to
+a file, and give less posix-like guarantees. We also make seek and
+truncate support optional in the backend. But then we will extend the
+set of operations possible to allow things like copy on the remote
+side (to avoid a download+upload operation on copy) and to have 
+a set of highlevel operations that applications want, like "save" that
+implements the best way to save for each particular backend.
+
+We support metadata like display name, mimetypes, icon, and some
+general information like length and mtime. But we make support for
+getting the full "struct stat" buffer backend optional, as that isn't
+a good abstraction for most backends. Also, the API will be designed
+on the idea that network latency is expensive, so that there will only
+be one call to stat() or readdir() needed to read all the metadata
+requested by the application. (Whereas posix will have readdir return
+only the names and force you to stat each file in a separate
+roundtrip.)
+
+We likely don't want the full gnome/unix vfs implementation in
+glib, instead glib will only ship an implementation of the vfs API for
+local file access, and one that communicates to the vfs
+daemon(s). Then we ship the daemon and the implementations of the
+various backends externally.
+
+We will also write a single gnome-vfs backend that allows access to
+all the glib vfs shares by using a uri like gvfs:///XXX that just maps
+to //.network/XXX. We can also implement a similar backend for kio so
+that kde applications can read and write to the shares.
+
+Furthermore, if FUSE is supported on the system we can write a FUSE
+filesystem so that we can access the files as $HOME/.network/XXX. This
+can be made extra nice if the application (like e.g. acrobat) uses
+the gtk+ file selector but not the vfs by having the file selector
+detect a filename like this and reverse-mapping it into a vfs pathname
+and use the vfs for folder access. 
+
+I've been doing some initial sketching of the glib API, and I've
+started by introducing base GInputStream and GOutputStream similar to
+the stream objects in Java and .Net. These have async i/o support and
+will make the API for reading and writing files nicer and more
+modern. There is also a GSeekable interface that streams can
+optionally implement if they support seeking.
+
+I've also introduced a GFile object that wraps a file path. This means
+you don't have to do tedious string operations on the pathnames to
+navigate the filesystem. It also means we can use the openat() class
+of file operations when traversing the filesystem tree, avoiding some
+forms of races when we do things like recursive copies.
+
+To support the stateful model and still have some form of caching we
+will also need to add some cache specific api so that you can trigger
+a reload of information from a directory. Otherwise a reload operation
+in the file manager wouldn't always get the latest state on something
+like a ftp share where we cache things aggressively.
+
+I have some initial code here for some of the basic APIs, but its far
+from finished and I'd like to spend some more time working on it
+before I present it. However, I think the general architecture is
+pretty sound and in a state where it can be discussed.
+
+Hopefully this description of my plans is enought to make people
+understand some of my ideas and allow us to start and discussion about
+the future of gnome-vfs. Also, consider it a heads up that I and other
+people will likely be working on this this in the future.

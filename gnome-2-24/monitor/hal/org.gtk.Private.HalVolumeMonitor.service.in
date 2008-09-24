@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.gtk.Private.HalVolumeMonitor
+Exec=@libexecdir@/gvfs-hal-volume-monitor

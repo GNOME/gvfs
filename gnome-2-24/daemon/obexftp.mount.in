@@ -1,0 +1,4 @@
+[Mount]
+Type=obex
+Exec=@libexecdir@/gvfsd-obexftp
+AutoMount=false
