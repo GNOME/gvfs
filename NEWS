@@ -1,3 +1,9 @@
+Major changes in 1.0.1
+======================
+
+* Bug fixes:
+  547568 - gvfsd-trash crash due to race condition
+
 Major changes in 1.0.0
 ======================
 
