@@ -1,3 +1,9 @@
+2008-09-25  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gvfsdaemonprotocol.c:
+        (_g_dbus_get_file_attribute):
+	Free returned strv with g_strfreev, not dbus_free_string_array. (#529596)
+
 2008-09-23  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
