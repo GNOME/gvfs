@@ -436,7 +436,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 					     &strs, &n_elements, 0))
 	    {
 	      obj = G_OBJECT (g_themed_icon_new_from_names (strs, n_elements));
-	      dbus_free_string_array (strs);
+	      g_strfreev (strs);
 	    }
 	}
       else if (obj_type == 2)
