@@ -60,6 +60,8 @@ void            _g_daemon_vfs_get_mount_info_async     (GMountSpec              
 GMountInfo *    _g_daemon_vfs_get_mount_info_sync      (GMountSpec               *spec,
 							const char               *path,
 							GError                  **error);
+GMountInfo *    _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
+							   char **mount_path);
 GMountSpec *    _g_daemon_vfs_get_mount_spec_for_path  (GMountSpec               *spec,
 						        const char               *path,
 						        const char               *new_path);

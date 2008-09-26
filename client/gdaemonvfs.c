@@ -55,6 +55,8 @@ struct _GDaemonVfs
   GVfs *wrapped_vfs;
   GList *mount_cache;
 
+  GFile *fuse_root;
+  
   GHashTable *from_uri_hash;
   GHashTable *to_uri_hash;
 
@@ -287,6 +289,7 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   const char * const *schemes, * const *mount_types;
   GVfsUriMapper *mapper;
   GList *modules;
+  char *file;
   int i;
 
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
@@ -319,6 +322,10 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
   
   vfs->wrapped_vfs = g_vfs_get_local ();
 
+  file = g_build_filename (g_get_home_dir(), ".gvfs", NULL);
+  vfs->fuse_root = g_vfs_get_file_for_path (vfs->wrapped_vfs, file);
+  g_free (file);
+  
   dbus_connection_set_exit_on_disconnect (vfs->async_bus, FALSE);
 
   _g_dbus_connection_integrate_with_main (vfs->async_bus);
@@ -357,13 +364,42 @@ g_daemon_vfs_new (void)
   return g_object_new (G_TYPE_DAEMON_VFS, NULL);
 }
 
+/* This unrefs file if its changed */
+static GFile *
+convert_fuse_path (GVfs     *vfs,
+		   GFile    *file)
+{
+  GFile *fuse_root;
+  char *fuse_path, *mount_path;
+  GMountInfo *mount_info;
+
+  fuse_root = ((GDaemonVfs *)vfs)->fuse_root;
+  if (g_file_has_prefix (file, fuse_root))
+    {
+      fuse_path = g_file_get_path (file);
+      mount_info = _g_daemon_vfs_get_mount_info_by_fuse_sync (fuse_path, &mount_path);
+      g_free (fuse_path);
+      if (mount_info)
+	{
+	  g_object_unref (file);
+	  /* TODO: Do we need to look at the prefix of the mount_spec? */
+	  file = g_daemon_file_new (mount_info->mount_spec, mount_path);
+	  g_free (mount_path);
+	  g_mount_info_unref (mount_info);
+	}
+    }
+  return file;
+}
+
 static GFile *
 g_daemon_vfs_get_file_for_path (GVfs       *vfs,
 				const char *path)
 {
-  /* TODO: detect fuse paths and convert to daemon vfs GFiles */
+  GFile *file;
   
-  return g_vfs_get_file_for_path (G_DAEMON_VFS (vfs)->wrapped_vfs, path);
+  file = g_vfs_get_file_for_path (G_DAEMON_VFS (vfs)->wrapped_vfs, path);
+  file = convert_fuse_path (vfs, file);
+  return file;
 }
 
 static GFile *
@@ -711,6 +747,41 @@ lookup_mount_info_in_cache (GMountSpec *spec,
   return info;
 }
 
+static GMountInfo *
+lookup_mount_info_by_fuse_path_in_cache (const char *fuse_path,
+					 char **mount_path)
+{
+  GMountInfo *info;
+  GList *l;
+
+  G_LOCK (mount_cache);
+  info = NULL;
+  for (l = the_vfs->mount_cache; l != NULL; l = l->next)
+    {
+      GMountInfo *mount_info = l->data;
+
+      if (mount_info->fuse_mountpoint != NULL &&
+	  g_str_has_prefix (fuse_path, mount_info->fuse_mountpoint))
+	{
+	  int len = strlen (mount_info->fuse_mountpoint);
+	  if (fuse_path[len] == 0 ||
+	      fuse_path[len] == '/')
+	    {
+	      if (fuse_path[len] == 0)
+		*mount_path = g_strdup ("/");
+	      else
+		*mount_path = g_strdup (fuse_path + len);
+	      info = g_mount_info_ref (mount_info);
+	      break;
+	    }
+	}
+    }
+  G_UNLOCK (mount_cache);
+
+  return info;
+}
+
+
 void
 _g_daemon_vfs_invalidate_dbus_id (const char *dbus_id)
 {
@@ -908,6 +979,71 @@ _g_daemon_vfs_get_mount_info_sync (GMountSpec *spec,
   return info;
 }
 
+GMountInfo *
+_g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
+					   char **mount_path)
+{
+  GMountInfo *info;
+  DBusConnection *conn;
+  DBusMessage *message, *reply;
+  DBusMessageIter iter;
+  DBusError derror;
+  int len;
+	
+  info = lookup_mount_info_by_fuse_path_in_cache (fuse_path,
+						  mount_path);
+  if (info != NULL)
+    return info;
+  
+  conn = _g_dbus_connection_get_sync (NULL, NULL);
+  if (conn == NULL)
+    return NULL;
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
+				  G_VFS_DBUS_MOUNTTRACKER_PATH,
+				  G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+				  G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT_BY_FUSE_PATH);
+  dbus_message_set_auto_start (message, TRUE);
+  
+  dbus_message_iter_init_append (message, &iter);
+  _g_dbus_message_iter_append_cstring (&iter, fuse_path);
+
+  dbus_error_init (&derror);
+  reply = dbus_connection_send_with_reply_and_block (conn, message, -1, &derror);
+  dbus_message_unref (message);
+  if (!reply)
+    {
+      dbus_error_free (&derror);
+      return NULL;
+    }
+
+  info = handler_lookup_mount_reply (reply, NULL);
+  dbus_message_unref (reply);
+  
+  if (info)
+    {
+      if (info->fuse_mountpoint)
+	{
+	  len = strlen (info->fuse_mountpoint);
+	  if (fuse_path[len] == 0)
+	    *mount_path = g_strdup ("/");
+	  else
+	    *mount_path = g_strdup (fuse_path + len);
+	}
+      else
+	{
+	  /* This could happen if we race with the gvfs fuse mount
+	   * at startup of gvfsd... */
+	  g_mount_info_unref (info);
+	  info = NULL;
+	}
+    }
+
+  
+  return info;
+}
+
 static GFile *
 g_daemon_vfs_parse_name (GVfs       *vfs,
 			 const char *parse_name)
@@ -917,8 +1053,8 @@ g_daemon_vfs_parse_name (GVfs       *vfs,
   if (g_path_is_absolute (parse_name) ||
       *parse_name == '~')
     {
-      /* TODO: detect fuse paths and convert to daemon vfs GFiles ? */
       file = g_vfs_parse_name (G_DAEMON_VFS (vfs)->wrapped_vfs, parse_name);
+      file = convert_fuse_path (vfs, file);
     }
   else
     {

@@ -43,7 +43,8 @@ typedef struct {
   char *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
-
+  char *fuse_mountpoint; /* Always set, even if fuse not availible */
+  
   /* Daemon object ref */
   char *dbus_id;
   char *object_path;
@@ -98,6 +99,32 @@ find_vfs_mount (const char *dbus_id,
   
   return NULL;
 }
+
+static VfsMount *
+find_vfs_mount_by_fuse_path (const char *fuse_path)
+{
+  GList *l;
+
+  if (!fuse_available)
+    return NULL;
+  
+  for (l = mounts; l != NULL; l = l->next)
+    {
+      VfsMount *mount = l->data;
+
+      if (mount->fuse_mountpoint != NULL &&
+	  g_str_has_prefix (fuse_path, mount->fuse_mountpoint))
+	{
+	  int len = strlen (mount->fuse_mountpoint);
+	  if (fuse_path[len] == 0 ||
+	      fuse_path[len] == '/')
+	    return mount;
+	}
+    }
+  
+  return NULL;
+}
+
 
 static VfsMount *
 match_vfs_mount (GMountSpec *match)
@@ -160,6 +187,7 @@ vfs_mount_free (VfsMount *mount)
   g_free (mount->stable_name);
   g_free (mount->x_content_types);
   g_free (mount->icon);
+  g_free (mount->fuse_mountpoint);
   g_free (mount->prefered_filename_encoding);
   g_free (mount->dbus_id);
   g_free (mount->object_path);
@@ -223,21 +251,10 @@ vfs_mount_to_dbus (VfsMount *mount,
 				       &user_visible))
     _g_dbus_oom ();
 	      
-  
-  fuse_mountpoint = NULL;
-  if (fuse_available && mount->user_visible)
-    {
-      char *fs_name;
-      
-      /* Keep in sync with fuse daemon */
-      fs_name = g_uri_escape_string (mount->stable_name, "+@#$., ", TRUE);
-      
-      fuse_mountpoint = g_build_filename (g_get_home_dir(), ".gvfs", fs_name, NULL);
-    }
-  
-  if (fuse_mountpoint == NULL)
-    fuse_mountpoint = g_strdup ("");
 
+  fuse_mountpoint = "";
+  if (fuse_available && mount->fuse_mountpoint)
+    fuse_mountpoint = mount->fuse_mountpoint;
   _g_dbus_message_iter_append_cstring (&struct_iter, fuse_mountpoint);
 
   g_mount_spec_to_dbus (&struct_iter, mount->mount_spec);
@@ -699,6 +716,16 @@ register_mount (DBusConnection *connection,
 	  mount->dbus_id = g_strdup (id);
 	  mount->object_path = g_strdup (obj_path);
 	  mount->mount_spec = mount_spec;
+
+	  if (user_visible)
+	    {
+	      char *fs_name;
+	      
+	      /* Keep in sync with fuse daemon */
+	      fs_name = g_uri_escape_string (mount->stable_name, "+@#$., ", TRUE);
+	      
+	      mount->fuse_mountpoint = g_build_filename (g_get_home_dir(), ".gvfs", fs_name, NULL);
+	    }
 	  
 	  mounts = g_list_prepend (mounts, mount);
 
@@ -830,6 +857,48 @@ lookup_mount (DBusConnection *connection,
 				    "Invalid arguments");
   
   g_mount_spec_unref (spec);
+  if (reply != NULL)
+    dbus_connection_send (connection, reply, NULL);
+}
+
+static void
+lookup_mount_by_fuse_path (DBusConnection *connection,
+			   DBusMessage *message)
+{
+  VfsMount *mount;
+  DBusMessage *reply;
+  DBusMessageIter iter;
+  char *fuse_path;
+
+  dbus_message_iter_init (message, &iter);
+
+  reply = NULL;
+  if (_g_dbus_message_iter_get_args (&iter, NULL, 
+				     G_DBUS_TYPE_CSTRING, &fuse_path,
+				     0))
+    {
+      mount = find_vfs_mount_by_fuse_path (fuse_path);
+
+      if (mount == NULL)
+	reply = _dbus_message_new_gerror (message,
+					  G_IO_ERROR,
+					  G_IO_ERROR_NOT_MOUNTED,
+					  _("The specified location is not mounted"));
+      else
+	{
+	  reply = dbus_message_new_method_return (message);
+	  if (reply)
+	    {
+	      dbus_message_iter_init_append (reply, &iter);
+	      vfs_mount_to_dbus (mount, &iter);
+	    }
+	}
+    }
+  else
+    reply = dbus_message_new_error (message,
+				    DBUS_ERROR_INVALID_ARGS,
+				    "Invalid arguments");
+  
   if (reply != NULL)
     dbus_connection_send (connection, reply, NULL);
 }
@@ -1082,6 +1151,10 @@ dbus_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT))
     lookup_mount (connection, message, TRUE);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
+					G_VFS_DBUS_MOUNTTRACKER_OP_LOOKUP_MOUNT_BY_FUSE_PATH))
+    lookup_mount_by_fuse_path (connection, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNTTRACKER_INTERFACE,
 					G_VFS_DBUS_MOUNTTRACKER_OP_LIST_MOUNTS))
