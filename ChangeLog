@@ -1,5 +1,11 @@
 2008-09-29  David Zeuthen  <davidz@redhat.com>
 
+	* monitor/proxy/gproxyvolume.c (mount_cb): Complete the mounting
+	operation in idle to ensure we've processed pending dbus messages
+	for creating the new mount object
+
+2008-09-29  David Zeuthen  <davidz@redhat.com>
+
 	* monitor/hal/ghalvolume.c:
 	* monitor/hal/ghalvolumemonitor.[ch]:
 	Make sure we emit 'mount-added' when forcing an update for
