@@ -33,7 +33,6 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <dbus/dbus-glib.h>
-#include <bluetooth/bluetooth.h>
 
 #include "gvfsbackendobexftp.h"
 #include "gvfsbackendobexftp-fl-parser.h"
@@ -69,7 +68,7 @@ struct _GVfsBackendObexftp
 
   char *display_name;
   char *bdaddr;
-  guint type;
+  char *icon_name;
 
   DBusGConnection *connection;
   DBusGProxy *manager_proxy;
@@ -96,106 +95,14 @@ typedef struct {
 
 G_DEFINE_TYPE (GVfsBackendObexftp, g_vfs_backend_obexftp, G_VFS_TYPE_BACKEND);
 
-/* This should all live in bluez-gnome, and we
- * should depend on it */
-enum {
-    BLUETOOTH_TYPE_ANY        = 1,
-    BLUETOOTH_TYPE_PHONE      = 1 << 1,
-    BLUETOOTH_TYPE_MODEM      = 1 << 2,
-    BLUETOOTH_TYPE_COMPUTER   = 1 << 3,
-    BLUETOOTH_TYPE_NETWORK    = 1 << 4,
-    BLUETOOTH_TYPE_HEADSET    = 1 << 5,
-    BLUETOOTH_TYPE_KEYBOARD   = 1 << 6,
-    BLUETOOTH_TYPE_MOUSE      = 1 << 7,
-    BLUETOOTH_TYPE_CAMERA     = 1 << 8,
-    BLUETOOTH_TYPE_PRINTER    = 1 << 9 
-};
-
-static const char *
-_get_icon_from_type (guint type)
-{
-  switch (type)
-    {
-    case BLUETOOTH_TYPE_PHONE:
-      return "phone";
-      break;
-    case BLUETOOTH_TYPE_MODEM:
-      return "modem";
-      break;
-    case BLUETOOTH_TYPE_COMPUTER:
-      return "network-server";
-      break;
-    case BLUETOOTH_TYPE_NETWORK:
-      return "network-wireless";
-      break;
-    case BLUETOOTH_TYPE_HEADSET:
-      return "stock_headphones";
-      break;
-    case BLUETOOTH_TYPE_KEYBOARD:
-      return "input-keyboard";
-      break;
-    case BLUETOOTH_TYPE_MOUSE:
-      return "input-mouse";
-      break;
-    case BLUETOOTH_TYPE_CAMERA:
-      return "camera-photo";
-      break;
-    case BLUETOOTH_TYPE_PRINTER:
-      return "printer";
-      break;
-    default:
-      return "bluetooth";
-      break;
-    }
-}
-
-static int
-_get_type_from_class (guint class)
-{
-  switch ((class & 0x1f00) >> 8)
-    {
-    case 0x01:
-      return BLUETOOTH_TYPE_COMPUTER;
-    case 0x02:
-      switch ((class & 0xfc) >> 2)
-        {
-        case 0x01:
-        case 0x02:
-        case 0x03:
-        case 0x05:
-          return BLUETOOTH_TYPE_PHONE;
-        case 0x04:
-          return BLUETOOTH_TYPE_MODEM;
-        }
-      break;
-    case 0x03:
-      return BLUETOOTH_TYPE_NETWORK;
-    case 0x04:
-      switch ((class & 0xfc) >> 2)
-        {
-        case 0x01:
-          return BLUETOOTH_TYPE_HEADSET;
-        }
-      break;
-    case 0x05:
-      switch ((class & 0xc0) >> 6)
-        {
-        case 0x01:
-          return BLUETOOTH_TYPE_KEYBOARD;
-        case 0x02:
-          return BLUETOOTH_TYPE_MOUSE;
-        }
-      break;
-    case 0x06:
-      if (class & 0x80)
-            return BLUETOOTH_TYPE_PRINTER;
-      if (class & 0x20)
-            return BLUETOOTH_TYPE_CAMERA;
-      break;
-    }
-
-  return BLUETOOTH_TYPE_ANY;
-}
+static void session_connect_error_cb (DBusGProxy *proxy,
+                                      const char *session_object,
+                                      const gchar *error_name,
+                                      const gchar *error_message,
+                                      gpointer user_data);
+static void session_connected_cb (DBusGProxy *proxy,
+                                  const char *session_object,
+                                  gpointer user_data);
 
 /* Used to detect broken listings from
  * old Nokia 3650s */
@@ -207,66 +114,87 @@ _is_nokia_3650 (const char *bdaddr)
   return g_str_has_prefix(bdaddr, "00:60:57");
 }
 
+static char *
+get_name_and_icon (DBusGProxy *device, char **icon_name)
+{
+  GHashTable *hash;
+
+  if (dbus_g_proxy_call (device, "GetProperties", NULL,
+                         G_TYPE_INVALID, dbus_g_type_get_map ("GHashTable", G_TYPE_STRING, G_TYPE_VALUE),
+                         &hash, G_TYPE_INVALID) != FALSE)
+    {
+      GValue *value;
+      char *name;
+
+      value = g_hash_table_lookup (hash, "Name");
+      name = value ? g_value_dup_string(value) : NULL;
+
+      value = g_hash_table_lookup (hash, "Icon");
+      if (value)
+        {
+          *icon_name = g_value_dup_string (value);
+        }
+      else
+        {
+          *icon_name = g_strdup ("bluetooth");
+        }
+      g_hash_table_destroy (hash);
+      return name;
+    }
+
+  return NULL;
+}
+
 static gchar *
-_get_device_properties (const char *bdaddr, guint32 *type)
+_get_device_properties (const char *bdaddr, char **icon_name)
 {
   DBusGConnection *connection;
   DBusGProxy *manager;
-  gchar *name, **adapters;
+  GPtrArray *adapters;
+  gchar *name;
   guint i;
 
   name = NULL;
 
   connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, NULL);
   if (connection == NULL)
-        return NULL;
+        return name;
 
   manager = dbus_g_proxy_new_for_name (connection, "org.bluez",
-                                       "/org/bluez", "org.bluez.Manager");
+                                       "/", "org.bluez.Manager");
   if (manager == NULL)
     {
       dbus_g_connection_unref (connection);
-      return NULL;
+      return name;
     }
 
-  if (dbus_g_proxy_call (manager, "ListAdapters", NULL, G_TYPE_INVALID, G_TYPE_STRV, &adapters, G_TYPE_INVALID) == FALSE)
+  if (dbus_g_proxy_call (manager, "ListAdapters", NULL, G_TYPE_INVALID, dbus_g_type_get_collection ("GPtrArray", DBUS_TYPE_G_OBJECT_PATH), &adapters, G_TYPE_INVALID) == FALSE)
     {
       g_object_unref (manager);
       dbus_g_connection_unref (connection);
-      return NULL;
+      return name;
     }
 
-  for (i = 0; adapters[i] != NULL; i++)
+  for (i = 0; i < adapters->len && name == NULL; i++)
     {
       DBusGProxy *adapter;
+      char *device_path;
 
       adapter = dbus_g_proxy_new_for_name (connection, "org.bluez",
-                                           adapters[i], "org.bluez.Adapter");
-      if (dbus_g_proxy_call (adapter, "GetRemoteName", NULL,
+                                           g_ptr_array_index (adapters, i), "org.bluez.Adapter");
+      if (dbus_g_proxy_call (adapter, "FindDevice", NULL,
                              G_TYPE_STRING, bdaddr, G_TYPE_INVALID,
-                             G_TYPE_STRING, &name, G_TYPE_INVALID) != FALSE)
+                             DBUS_TYPE_G_OBJECT_PATH, &device_path, G_TYPE_INVALID) != FALSE)
         {
-          if (name != NULL && name[0] != '\0')
-            {
-              guint32 class;
-
-              if (dbus_g_proxy_call(adapter, "GetRemoteClass", NULL,
-                                    G_TYPE_STRING, bdaddr, G_TYPE_INVALID,
-                                    G_TYPE_UINT, &class, G_TYPE_INVALID) != FALSE)
-                {
-                  *type = _get_type_from_class (class);
-                }
-              else
-                {
-                  *type = BLUETOOTH_TYPE_ANY;
-                }
-              g_object_unref (adapter);
-              break;
-            }
+          DBusGProxy *device;
+          device = dbus_g_proxy_new_for_name (connection, "org.bluez", device_path, "org.bluez.Device");
+          name = get_name_and_icon (device, icon_name);
+          g_object_unref (device);
         }
       g_object_unref (adapter);
     }
 
+  g_ptr_array_free (adapters, TRUE);
   g_object_unref (manager);
   dbus_g_connection_unref (connection);
 
@@ -282,6 +210,7 @@ g_vfs_backend_obexftp_finalize (GObject *object)
 
   g_free (backend->display_name);
   g_free (backend->bdaddr);
+  g_free (backend->icon_name);
   g_free (backend->files_listing);
   g_free (backend->directory);
 
@@ -312,6 +241,15 @@ g_vfs_backend_obexftp_init (GVfsBackendObexftp *backend)
                                                       "org.openobex",
                                                       "/org/openobex",
                                                       "org.openobex.Manager");
+
+  dbus_g_proxy_add_signal(backend->manager_proxy, "SessionConnectError",
+                          DBUS_TYPE_G_OBJECT_PATH, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INVALID);
+  dbus_g_proxy_connect_signal(backend->manager_proxy, "SessionConnectError",
+                              G_CALLBACK(session_connect_error_cb), backend, NULL);
+  dbus_g_proxy_add_signal(backend->manager_proxy, "SessionConnected",
+                          DBUS_TYPE_G_OBJECT_PATH, G_TYPE_INVALID);
+  dbus_g_proxy_connect_signal(backend->manager_proxy, "SessionConnected",
+                              G_CALLBACK(session_connected_cb), backend, NULL);
 }
 
 static gboolean
@@ -437,8 +375,7 @@ _query_file_info_helper (GVfsBackend *backend,
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_content_type (info, "inode/directory");
       g_file_info_set_name (info, "/");
-      g_vfs_backend_set_icon_name (backend,
-                                   _get_icon_from_type (op_backend->type));
+      g_vfs_backend_set_icon_name (backend, op_backend->icon_name);
       display = g_strdup_printf (_("%s on %s"), "/", op_backend->display_name);
       g_file_info_set_display_name (info, display);
       g_free (display);
@@ -531,6 +468,37 @@ error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *erro
 }
 
 static void
+session_connect_error_cb (DBusGProxy *proxy,
+                          const char *session_object,
+                          const gchar *error_name,
+                          const gchar *error_message,
+                          gpointer user_data)
+{
+  GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
+
+  g_mutex_lock (op_backend->mutex);
+  op_backend->status = ASYNC_ERROR;
+  op_backend->error = g_error_new_literal (DBUS_GERROR,
+                                           DBUS_GERROR_REMOTE_EXCEPTION,
+                                           error_message);
+  g_cond_signal (op_backend->cond);
+  g_mutex_unlock (op_backend->mutex);
+}
+
+static void
+session_connected_cb (DBusGProxy *proxy,
+                      const char *session_object,
+                      gpointer user_data)
+{
+  GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
+
+  g_mutex_lock (op_backend->mutex);
+  op_backend->status = ASYNC_SUCCESS;
+  g_cond_signal (op_backend->cond);
+  g_mutex_unlock (op_backend->mutex);
+}
+
+static void
 cancelled_cb (DBusGProxy *proxy, gpointer user_data)
 {
   GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
@@ -559,24 +527,6 @@ closed_cb (DBusGProxy *proxy, gpointer user_data)
   _exit (1);
 }
 
-static int
-is_connected (DBusGProxy *session_proxy, GVfsJob *job)
-{
-  GError *error = NULL;
-  gboolean connected;
-
-  if (dbus_g_proxy_call (session_proxy, "IsConnected", &error,
-                         G_TYPE_INVALID,
-                         G_TYPE_BOOLEAN, &connected, G_TYPE_INVALID) == FALSE)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_error_free (error);
-      return -1;
-    }
-
-  return connected;
-}
-
 static void
 do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
@@ -590,7 +540,7 @@ do_mount (GVfsBackend *backend,
   const gchar *path = NULL;
   char *server;
   GMountSpec *obexftp_mount_spec;
-  gboolean connected;
+  guint count;
 
   g_print ("+ do_mount\n");
 
@@ -616,10 +566,11 @@ do_mount (GVfsBackend *backend,
     }
 
   /* FIXME, Have a way for the mount to be cancelled, see:
-   * http://bugs.muiline.com/view.php?id=51 */
+   * Use CancelSessionConnect */
+  op_backend->status = ASYNC_PENDING;
 
   if (dbus_g_proxy_call (op_backend->manager_proxy, "CreateBluetoothSession", &error,
-                         G_TYPE_STRING, op_backend->bdaddr, G_TYPE_STRING, "ftp", G_TYPE_INVALID,
+                         G_TYPE_STRING, op_backend->bdaddr, G_TYPE_STRING, "00:00:00:00:00:00", G_TYPE_STRING, "ftp", G_TYPE_INVALID,
                          DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID) == FALSE)
     {
       g_free (op_backend->bdaddr);
@@ -636,14 +587,13 @@ do_mount (GVfsBackend *backend,
                                                          path,
                                                          "org.openobex.Session");
 
-  op_backend->display_name = _get_device_properties (op_backend->bdaddr, &op_backend->type);
+  op_backend->display_name = _get_device_properties (op_backend->bdaddr, &op_backend->icon_name);
   if (!op_backend->display_name)
         op_backend->display_name = g_strdup (op_backend->bdaddr);
 
   g_vfs_backend_set_display_name (G_VFS_BACKEND  (op_backend),
                                   op_backend->display_name);
-  g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend),
-                               _get_icon_from_type (op_backend->type));
+  g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend), op_backend->icon_name);
 
   obexftp_mount_spec = g_mount_spec_new ("obex");
   server = g_strdup_printf ("[%s]", op_backend->bdaddr);
@@ -676,14 +626,20 @@ do_mount (GVfsBackend *backend,
                           G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
 
   /* Now wait until the device is connected */
-  connected = is_connected (op_backend->session_proxy, G_VFS_JOB (job));
-  while (connected == FALSE)
-    {
-      g_usleep (G_USEC_PER_SEC / 100);
-      connected = is_connected (op_backend->session_proxy, G_VFS_JOB (job));
-    }
+  count = 0;
+  g_mutex_lock (op_backend->mutex);
 
-  if (connected < 0)
+  while (op_backend->status == ASYNC_PENDING && count < 100) {
+      GTimeVal val;
+      g_get_current_time (&val);
+      g_time_val_add (&val, 100000);
+      count++;
+      if (g_cond_timed_wait (op_backend->cond, op_backend->mutex, &val) != FALSE)
+            break;
+  }
+  g_mutex_unlock (op_backend->mutex);
+
+  if (op_backend->status == ASYNC_ERROR || op_backend->status == ASYNC_PENDING)
     {
       g_message ("mount failed, didn't connect");
 
@@ -694,11 +650,16 @@ do_mount (GVfsBackend *backend,
       g_object_unref (op_backend->session_proxy);
       op_backend->session_proxy = NULL;
 
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_BUSY,
-                        _("Connection to the device lost"));
+      if (op_backend->status != ASYNC_PENDING)
+            g_vfs_job_failed_from_error (G_VFS_JOB (job), op_backend->error);
+      else
+            g_vfs_job_failed (G_VFS_JOB (job),
+                              G_IO_ERROR, G_IO_ERROR_BUSY,
+                              _("Connection to the device lost"));
       return;
     }
+
+  op_backend->status = ASYNC_PENDING;
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -1482,6 +1443,12 @@ g_vfs_backend_obexftp_class_init (GVfsBackendObexftpClass *klass)
   /* TransferStarted */
   dbus_g_object_register_marshaller(obexftp_marshal_VOID__STRING_STRING_UINT64,
                                     G_TYPE_NONE, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
+  /* SessionConnected */
+  dbus_g_object_register_marshaller(obexftp_marshal_VOID__STRING,
+                                    G_TYPE_NONE, DBUS_TYPE_G_OBJECT_PATH, G_TYPE_INVALID);
+  /* SessionConnectError */
+  dbus_g_object_register_marshaller (obexftp_marshal_VOID__STRING_STRING_STRING,
+                                     G_TYPE_NONE, DBUS_TYPE_G_OBJECT_PATH, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INVALID);
 }
 
 /*

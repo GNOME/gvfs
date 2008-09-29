@@ -1,3 +1,16 @@
+2008-09-29  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (_is_nokia_3650),
+	(get_name_and_icon), (_get_device_properties),
+	(g_vfs_backend_obexftp_finalize), (g_vfs_backend_obexftp_init),
+	(_query_file_info_helper), (session_connect_error_cb),
+	(session_connected_cb), (do_mount),
+	(g_vfs_backend_obexftp_class_init):
+	* daemon/obexftp-marshal.list:
+	Port to BlueZ 4.x API and obex-data-server SVN API,
+	use the "Icon" property to get the icon, instead of parsing the
+	device class ourselves (#552356)
+
 2008-09-26  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonvfs.[ch]:
