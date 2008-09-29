@@ -1,3 +1,10 @@
+2008-09-29  David Zeuthen  <davidz@redhat.com>
+
+	* monitor/hal/ghalvolume.c:
+	* monitor/hal/ghalvolumemonitor.[ch]:
+	Make sure we emit 'mount-added' when forcing an update for
+	completing a mount operation (#552168)
+
 2008-09-29  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c (_is_nokia_3650),

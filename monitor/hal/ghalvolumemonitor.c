@@ -82,7 +82,8 @@ static void hal_changed              (HalPool    *pool,
                                       HalDevice  *device,
                                       gpointer    user_data);
 static void update_all               (GHalVolumeMonitor *monitor,
-                                      gboolean emit_changes);
+                                      gboolean emit_changes,
+                                      gboolean emit_in_idle);
 static void update_drives            (GHalVolumeMonitor *monitor,
                                       GList **added_drives,
                                       GList **removed_drives);
@@ -367,7 +368,7 @@ mountpoints_changed (GUnixMountMonitor *mount_monitor,
 {
   GHalVolumeMonitor *monitor = G_HAL_VOLUME_MONITOR (user_data);
 
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, TRUE);
 }
 
 static void
@@ -376,13 +377,13 @@ mounts_changed (GUnixMountMonitor *mount_monitor,
 {
   GHalVolumeMonitor *monitor = G_HAL_VOLUME_MONITOR (user_data);
 
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, TRUE);
 }
 
 void 
-g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor)
+g_hal_volume_monitor_force_update (GHalVolumeMonitor *monitor, gboolean emit_in_idle)
 {
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, emit_in_idle);
 }
 
 static void
@@ -394,7 +395,7 @@ hal_changed (HalPool    *pool,
   
   /*g_warning ("hal changed");*/
   
-  update_all (monitor, TRUE);
+  update_all (monitor, TRUE, TRUE);
 }
 
 static GObject *
@@ -448,7 +449,7 @@ g_hal_volume_monitor_constructor (GType                  type,
                     "device_removed", G_CALLBACK (hal_changed),
                     monitor);
 		    
-  update_all (monitor, FALSE);
+  update_all (monitor, FALSE, TRUE);
 
   G_LOCK (hal_vm);
   the_volume_monitor = monitor;
@@ -973,7 +974,8 @@ emit_lists_in_idle (gpointer data)
 /* Must be called from idle if emit_changes, with no locks held */
 static void
 update_all (GHalVolumeMonitor *monitor,
-            gboolean emit_changes)
+            gboolean emit_changes,
+            gboolean emit_in_idle)
 {
   ChangedLists *lists;
   GList *added_drives, *removed_drives;
@@ -1007,7 +1009,10 @@ update_all (GHalVolumeMonitor *monitor,
       lists->added_mounts = added_mounts;
       lists->removed_mounts = removed_mounts;
       
-      g_idle_add (emit_lists_in_idle, lists);
+      if (emit_in_idle)
+        g_idle_add (emit_lists_in_idle, lists);
+      else
+        emit_lists_in_idle (lists);
     }
   else
     {

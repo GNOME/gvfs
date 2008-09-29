@@ -760,9 +760,10 @@ spawn_cb (GPid pid, gint status, gpointer user_data)
   GSimpleAsyncResult *simple;
 
   /* ensure that the #GHalMount corrosponding to the #GHalVolume we've
-   * mounted is made available before returning to the user
+   * mounted is made available before returning to the user (make sure
+   * we don't emit the signals in idle; see #552168).
    */
-  g_hal_volume_monitor_force_update (G_HAL_VOLUME_MONITOR (G_HAL_VOLUME (data->object)->volume_monitor));
+  g_hal_volume_monitor_force_update (G_HAL_VOLUME_MONITOR (G_HAL_VOLUME (data->object)->volume_monitor), FALSE);
 
   if (WEXITSTATUS (status) != 0)
     {

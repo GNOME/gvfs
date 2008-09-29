@@ -51,7 +51,8 @@ struct _GHalVolumeMonitorClass {
 GType g_hal_volume_monitor_get_type (void) G_GNUC_CONST;
 
 GVolumeMonitor *g_hal_volume_monitor_new                          (void);
-void            g_hal_volume_monitor_force_update                 (GHalVolumeMonitor *monitor);
+void            g_hal_volume_monitor_force_update                 (GHalVolumeMonitor *monitor,
+                                                                   gboolean emit_in_idle);
 
 G_END_DECLS
 
