@@ -1,5 +1,10 @@
 2008-10-02  Bastien Nocera  <hadess@hadess.net>
 
+	* daemon/gvfsbackendobexftp.c: Re-add bluetooth.h include,
+	we still use bachk right now
+
+2008-10-02  Bastien Nocera  <hadess@hadess.net>
+
 	* client/test-uri-utils.c: Add a few more test URIs
 
 2008-09-29  David Zeuthen  <davidz@redhat.com>

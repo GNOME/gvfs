@@ -33,6 +33,7 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <dbus/dbus-glib.h>
+#include <bluetooth/bluetooth.h>
 
 #include "gvfsbackendobexftp.h"
 #include "gvfsbackendobexftp-fl-parser.h"
