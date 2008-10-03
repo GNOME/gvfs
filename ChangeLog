@@ -1,3 +1,8 @@
+2008-10-03  David Zeuthen  <davidz@redhat.com>
+
+	* daemon/gvfsbackendgphoto2.c: Remove misleading comment about the
+	license (#554811)
+
 2008-10-02  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c: Re-add bluetooth.h include,

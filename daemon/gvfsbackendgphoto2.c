@@ -21,10 +21,6 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-/* NOTE: since we link the libcdio libs (GPLv2) into our process space
- * the combined work is GPLv2. This source file, however, is LGPLv2+.
- */
-
 #include <config.h>
 
 #include <sys/types.h>
