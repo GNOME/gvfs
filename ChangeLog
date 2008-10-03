@@ -1,3 +1,9 @@
+2008-10-03  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackendobexftp.c (get_name_and_icon): Use
+	the Alias instead of the Name, so we automatically fallback
+	if the name isn't available
+
 2008-10-03  David Zeuthen  <davidz@redhat.com>
 
 	* daemon/gvfsbackendgphoto2.c: Remove misleading comment about the

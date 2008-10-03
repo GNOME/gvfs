@@ -127,7 +127,7 @@ get_name_and_icon (DBusGProxy *device, char **icon_name)
       GValue *value;
       char *name;
 
-      value = g_hash_table_lookup (hash, "Name");
+      value = g_hash_table_lookup (hash, "Alias");
       name = value ? g_value_dup_string(value) : NULL;
 
       value = g_hash_table_lookup (hash, "Icon");
