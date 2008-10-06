@@ -1,6 +1,6 @@
 2008-10-06  Alexander Larsson  <alexl@redhat.com>
 
-	Patch from Andreas Henriksson
+	Patch from Andreas Henriksson (from trunk)
 
         * daemon/gvfsbackendftp.c:
         (dir_default_iter_new):
