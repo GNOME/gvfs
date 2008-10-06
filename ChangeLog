@@ -1,3 +1,12 @@
+2008-10-06  Alexander Larsson  <alexl@redhat.com>
+
+	Patch from Andreas Henriksson
+
+        * daemon/gvfsbackendftp.c:
+        (dir_default_iter_new):
+        (dir_default_iter_process):
+	Don't read past start of filename. (#545971)
+
 2008-10-03  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c (get_name_and_icon): Use
