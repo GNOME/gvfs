@@ -979,7 +979,7 @@ dir_default_get_root (FtpConnection *conn)
 static gpointer
 dir_default_iter_new (FtpConnection *conn)
 {
-  return g_slice_new (struct list_state);
+  return g_slice_new0 (struct list_state);
 }
 
 static GFileInfo *
@@ -1062,9 +1062,15 @@ dir_default_iter_process (gpointer        iter,
 	      char *end = str + 4;
 	      char *start;
 	      start = str - 1;
-	      while (*start != '/')
+	      while (start >= symlink_file && *start != '/')
 		start--;
-	      memcpy (start + 1, end, strlen (end) + 1);
+
+	      if (start < symlink_file) {
+		      *symlink_file = '/';
+		      start = symlink_file;
+	      }
+
+	      memmove (start + 1, end, strlen (end) + 1);
 	    }
 	  str = symlink_file + strlen (symlink_file) - 1;
 	  while (*str == '/' && str > symlink_file)
