@@ -1,3 +1,10 @@
+2008-10-09  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfileinputstream.c:
+        (run_sync_state_machine):
+	Add some debug spew and avoid crashing in case of code not properly
+	setting the GError, as reported on the list.
+
 2008-10-06  Alexander Larsson  <alexl@redhat.com>
 
 	Patch from Andreas Henriksson (from trunk)

@@ -446,8 +446,14 @@ run_sync_state_machine (GDaemonFileInputStream *file,
 	    }
 	  else
 	    {
+	      /* We got reports of this crashing with io_error NULL. That shouldn't
+		 happen, so try to spew some debug info and avoid crashing. */
+	      if (io_error == NULL)
+		g_warning ("run_sync_state_machine got error but no GError set. This should not happen. io_op was: %d\n",
+			   io_op);
 	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Error in stream protocol: %s"), io_error->message);
+			   _("Error in stream protocol: %s"),
+			   io_error ? io_error->message : "Unknown error");
 	      g_error_free (io_error);
 	      return FALSE;
 	    }
