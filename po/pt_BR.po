@@ -23,7 +23,7 @@ msgstr ""
 #: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1979
 msgid "Operation not supported, files on different mounts"
 msgstr ""
-"Operação sem suporte, os arquivos estão em diferentes pontos de montagem"
+"Não há suporte à operação, os arquivos estão em diferentes pontos de montagem"
 
 #: ../client/gdaemonfile.c:787
 msgid "Invalid return value from get_info"
@@ -121,16 +121,16 @@ msgstr "A operação foi cancelada"
 #: ../client/gdaemonfileinputstream.c:1207
 #: ../client/gdaemonfileoutputstream.c:942
 msgid "Seek not supported on stream"
-msgstr "Busca sem suporte no fluxo"
+msgstr "Não há suporte à busca no fluxo"
 
 #: ../client/gdaemonfileinputstream.c:1237
 msgid "The query info operation is not supported"
-msgstr "A operação de consulta não tem suporte"
+msgstr "Não há suporte à operação de consulta"
 
 #: ../client/gdaemonfileoutputstream.c:991
 #, c-format
 msgid "Query info not supported on stream"
-msgstr "Informações de consulta sem suporte no fluxo"
+msgstr "Não há suporte às informações de consulta"
 
 #: ../client/gdaemonvfs.c:749
 #, c-format
@@ -294,7 +294,7 @@ msgstr "Não foi possível copiar o diretório recursivamente"
 #: ../daemon/gvfsbackendgphoto2.c:2556 ../daemon/gvfsbackendgphoto2.c:2651
 #: ../daemon/gvfsbackendgphoto2.c:2742
 msgid "Not supported"
-msgstr "Sem suporte"
+msgstr "Não há suporte"
 
 #: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1402
 msgid "Cannot connect to the system bus"
@@ -502,7 +502,7 @@ msgstr "Rede"
 
 #: ../daemon/gvfsbackendftp.c:236
 msgid "Accounts are unsupported"
-msgstr "As contas não têm suporte"
+msgstr "Não há suporte às contas"
 
 #: ../daemon/gvfsbackendftp.c:240
 msgid "Host closed connection"
@@ -527,7 +527,7 @@ msgstr "Não há espaço no servidor"
 
 #: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
 msgid "Operation unsupported"
-msgstr "A operação não tem suporte"
+msgstr "Não há suporte à operação"
 
 #: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
 msgid "Permission denied"
@@ -583,7 +583,7 @@ msgstr "O arquivo é um diretório"
 
 #: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
 msgid "backups not supported yet"
-msgstr "Ainda sem suporte para backups"
+msgstr "Ainda não há suporte a backups"
 
 #: ../daemon/gvfsbackendftp.c:1828
 msgid "filename too long"
@@ -611,7 +611,7 @@ msgstr "%s: %d: nome de arquivo inválido"
 #: ../daemon/gvfsbackendgphoto2.c:520
 #, c-format
 msgid "%s: %d: Not Supported"
-msgstr "%s: %d: sem suporte"
+msgstr "%s: %d: não há suporte"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:693
@@ -767,19 +767,19 @@ msgstr "Erro ao escrever arquivo"
 
 #: ../daemon/gvfsbackendgphoto2.c:3156
 msgid "Not supported (not same directory)"
-msgstr "Sem suporte (não é o mesmo diretório)"
+msgstr "Não há suporte (não é o mesmo diretório)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3168
 msgid "Not supported (src is dir, dst is dir)"
-msgstr "Sem suporte (src é diretório, dst é diretório)"
+msgstr "Não há suporte (src é diretório, dst é diretório)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3176
 msgid "Not supported (src is dir, dst is existing file)"
-msgstr "Sem suporte (src é diretório, dst é arquivo existente)"
+msgstr "Não há suporte (src é diretório, dst é arquivo existente)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3188
 msgid "Not supported (src is file, dst is dir)"
-msgstr "Sem suporte (src é arquivo, dst é diretório)"
+msgstr "Não há suporte (src é arquivo, dst é diretório)"
 
 #: ../daemon/gvfsbackendhttp.c:241
 #, c-format
@@ -794,7 +794,7 @@ msgstr " (codificação inválida)"
 
 #: ../daemon/gvfsbackendlocaltest.c:853
 msgid "Directory notification not supported"
-msgstr "Notificação de diretório sem suporte"
+msgstr "Não há suporte à notificação de diretório"
 
 #. smb:/// root link
 #: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
@@ -863,7 +863,7 @@ msgstr "Tempo esgotado ao efetuar o login"
 
 #: ../daemon/gvfsbackendsftp.c:858
 msgid "Enter passphrase for key"
-msgstr "Digite a senha para a chave"
+msgstr "Digite a frase secreta para a chave"
 
 #: ../daemon/gvfsbackendsftp.c:860
 msgid "Enter password"
@@ -972,7 +972,7 @@ msgstr "Falha ao montar o compartilhamento Windows"
 
 #: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
 msgid "Unsupported seek type"
-msgstr "Tipo de pesquisa sem suporte"
+msgstr "Não há suporte ao tipo de pesquisa"
 
 #: ../daemon/gvfsbackendsmb.c:1237
 #, c-format
@@ -1038,7 +1038,7 @@ msgstr "A lixeira não pode ser excluída"
 
 #: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
 msgid "Trash directory notification not supported"
-msgstr "Notificação do diretório da lixeira sem suporte"
+msgstr "Não há suporte à notificação do diretório da lixeira"
 
 #: ../daemon/gvfsdaemon.c:1032
 msgid "Invalid backend type"
@@ -1066,11 +1066,11 @@ msgstr "Erro ao enviar fd: %s"
 #: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
 #: ../daemon/gvfsjobwrite.c:120
 msgid "Operation not supported by backend"
-msgstr "Operação sem suporte pelo backend"
+msgstr "Não há suporte à operação pelo backend"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
-msgstr "Links simbólicos não tem suporte pelo backend"
+msgstr "Não há suporte aos links simbólicos pelo backend"
 
 #: ../daemon/gvfsjobsetattribute.c:123
 msgid "Invalid dbus message"
@@ -1124,7 +1124,7 @@ msgstr "A localização especificada não está montada"
 
 #: ../daemon/mount.c:790
 msgid "The specified location is not supported"
-msgstr "A localização especificada não tem suporte"
+msgstr "Não há suporte à localização especificada"
 
 #: ../daemon/mount.c:954
 msgid "Location is already mounted"
