@@ -2,6 +2,12 @@
 
         * daemon/gvfsbackendftp.c:
         (do_mount):
+	Revert last change, it should go on head (its a string change)
+	
+2008-10-16  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendftp.c:
+        (do_mount):
 	Show username in auth dialog if specified in uri (#554156)
 
 2008-10-16  Alexander Larsson  <alexl@redhat.com>
