@@ -1,3 +1,9 @@
+2008-10-16  Alexander Larsson  <alexl@redhat.com>
+
+	* client/gvfsfusedaemon.c (getattr_for_file):
+	Set st_blocks & co so that du works (#554682)
+	Patch from Andreas Henriksson
+
 2008-10-09  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfileinputstream.c:
