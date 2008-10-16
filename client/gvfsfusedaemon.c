@@ -744,6 +744,13 @@ getattr_for_file (GFile *file, struct stat *sbuf)
       if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS))
         sbuf->st_atime = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_TIME_ACCESS);
 
+      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE))
+	sbuf->st_blksize = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE);
+      if (g_file_info_has_attribute (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCKS))
+	sbuf->st_blocks = file_info_get_attribute_as_uint (file_info, G_FILE_ATTRIBUTE_UNIX_BLOCKS);
+      else /* fake it to make 'du' work like 'du --apparent'. */
+	sbuf->st_blocks = (sbuf->st_size + 1) / 512;
+
       /* Setting st_nlink to 1 for directories makes 'find' work */
       sbuf->st_nlink = 1;
 
