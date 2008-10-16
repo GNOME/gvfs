@@ -1339,9 +1339,15 @@ do_mount (GVfsBackend *backend,
     {
       GAskPasswordFlags flags;
       if (prompt == NULL)
-	/* translators: %s here is the hostname */
-	prompt = g_strdup_printf (_("Enter password for ftp on %s"), host);
-
+	{
+	  if (ftp->has_initial_user)
+	    /* Translators: the first %s is the username, the second the host name */
+	    prompt = g_strdup_printf (_("Enter password for ftp as %s on %s"), ftp->user, host);
+	  else
+	    /* translators: %s here is the hostname */
+	    prompt = g_strdup_printf (_("Enter password for ftp on %s"), host);
+	}
+	  
       flags = G_ASK_PASSWORD_NEED_PASSWORD;
         
       if (!ftp->has_initial_user)
