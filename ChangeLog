@@ -1,3 +1,10 @@
+2008-10-17  Alexander Larsson  <alexl@redhat.com>
+
+	Import from trunk:
+	
+	* common/gdbusutils.c (append_escaped_name):
+	Fix uninitialized memory read.
+	
 2008-10-16  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendftp.c:
