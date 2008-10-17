@@ -53,6 +53,7 @@ append_escaped_name (GString *s,
   gboolean first;
   static const gchar hex[16] = "0123456789ABCDEF";
 
+  first = TRUE;
   while ((c = *unescaped++) != 0)
     {
       if (first)

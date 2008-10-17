@@ -1,3 +1,8 @@
+2008-10-17  Alexander Larsson  <alexl@redhat.com>
+
+	* common/gdbusutils.c (append_escaped_name):
+	Fix uninitialized memory read.
+
 2008-10-17  Hans Petter Jansson  <hpj@novell.com>
 
 	Attempt to prevent potential race conditions in the FUSE backend
