@@ -1,3 +1,37 @@
+2008-10-17  Hans Petter Jansson  <hpj@novell.com>
+
+	Attempt to prevent potential race conditions in the FUSE backend
+	when file handles get closed while still in use in another thread,
+	if that ever happens.
+
+	* client/gvfsfusedaemon.c (file_handle_new): Insert new file
+	handles in global hash table of active file handles.
+	(file_handle_unref): Clarify the code and comments a little.
+	(file_handle_free): Remove file handle from global table of
+	active handles.
+	(reindex_file_handle_for_path)
+	(get_file_handle_for_path)
+	(get_or_create_file_handle_for_path): global_fh_table ->
+	global_path_to_fh_map.
+	(get_file_handle_from_info): New function that recovers our file
+	handle from a fuse_file_info struct, but only if it exists in
+	the global table of valid handles.
+	(vfs_getattr): Remove code that acquired and locked the file handle
+	for the path we operate on. No locking is required here.
+	(vfs_open): Assign file handle to fuse_file_info while holding lock.
+	Purely a formality that makes code easier to read.
+	(vfs_create): Ditto.
+	(vfs_release): Use get_file_handle_from_info () so the file handle
+	is validated.
+	(vfs_read): Hold a ref to the file handle while it's in use. If
+	handle is invalid, raise EINVAL.
+	(vfs_ftruncate): Ditto.
+	(vfs_write): Ditto.
+	(vfs_rename): Cosmetic change.
+	(vfs_unlink): Ditto.
+	(vfs_truncate): Add helpful comment.
+	(vfs_init): Create global table of active file handles.
+
 2008-10-16  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendftp.c:
