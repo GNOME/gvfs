@@ -109,9 +109,42 @@ show_attributes (GFileInfo *info)
   g_print ("attributes:\n");
   for (i = 0; attributes[i] != NULL; i++)
     {
-      s = g_file_info_get_attribute_as_string (info, attributes[i]);
-      g_print ("  %s: %s\n", attributes[i], s);
-      g_free (s);
+      /* list the icons in order rather than displaying "GThemedIcon:0x8df7200" */
+      if (strcmp (attributes[i], "standard::icon") == 0)
+        {
+          GIcon *icon;
+          gboolean fallbacks;
+          int j, len;
+          char **names = NULL;
+          icon = g_file_info_get_icon (info);
+
+          /* only look up names if GThemedIcon */
+          if (G_IS_THEMED_ICON(icon))
+            {
+              g_object_get (G_OBJECT(icon), "names", &names,
+                            "use-default-fallbacks", &fallbacks, NULL);
+              g_print ("  %s: (fallbacks: %s)\n", attributes[i],
+                       fallbacks ? "TRUE" : "FALSE");
+              len = g_strv_length (names);
+              for (j = 0; j < len; j++)
+                {
+                  g_print ("   %i. name:%s\n", j+1, names[j]);
+                }
+              g_strfreev (names);
+            }
+          else
+            {
+              s = g_file_info_get_attribute_as_string (info, attributes[i]);
+              g_print ("  %s: %s\n", attributes[i], s);
+              g_free (s);
+            }
+        }
+      else
+        {
+          s = g_file_info_get_attribute_as_string (info, attributes[i]);
+          g_print ("  %s: %s\n", attributes[i], s);
+          g_free (s);
+        }
     }
   g_strfreev (attributes);
 }

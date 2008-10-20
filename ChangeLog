@@ -1,3 +1,20 @@
+2008-10-20  Richard Hughes  <richard@hughsie.com>
+
+	reviewed by: Christian Kellner <ck@xatom.net>
+
+	* programs/gvfs-info.c: (show_attributes):
+	Whilst debugging an icon theme bug, I wanted to know what icon
+	would be chosen for a file. It turns out gvfs-info gets all the
+	properties and prints them, but for an icon prints:
+	  standard::icon: GThemedIcon:0x8df7200
+	This isn't very helpful. I've fixed this to print out the icons and
+	the order they should be chosen like:
+	  standard::icon: (fallbacks: FALSE)
+	   1. name:application-x-cd-image
+	   2. name:gnome-mime-application-x-cd-image
+	   3. name:application-x-generic
+	   4. name:text-x-generic
+
 2008-10-20  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonfileinputstream.c:
