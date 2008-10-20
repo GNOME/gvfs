@@ -1,5 +1,12 @@
 2008-10-20  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfileinputstream.c:
+        (run_sync_state_machine):
+	Revert debug spew from recent commit now that the core
+	issue is fixed (by the fuse race condition fix).
+
+2008-10-20  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/gvfsbackendcomputer.c (try_create_dir_monitor):
 	Always fail the job when we don't support monitoring.
 
