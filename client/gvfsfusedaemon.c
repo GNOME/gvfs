@@ -79,22 +79,23 @@ typedef struct {
   size_t    pos;
 } FileHandle;
 
-static GThread       *subthread           = NULL;
-static GMainLoop     *subthread_main_loop = NULL;
-static GVfs          *gvfs                = NULL;
+static GThread        *subthread             = NULL;
+static GMainLoop      *subthread_main_loop   = NULL;
+static GVfs           *gvfs                  = NULL;
 
-static GVolumeMonitor *volume_monitor     = NULL;
+static GVolumeMonitor *volume_monitor        = NULL;
 
 /* Contains pointers to MountRecord */
-static GList         *mount_list          = NULL;
-static GMutex        *mount_list_mutex;
+static GList          *mount_list            = NULL;
+static GMutex         *mount_list_mutex;
 
-static time_t         daemon_creation_time;
-static uid_t          daemon_uid;
-static gid_t          daemon_gid;
+static time_t          daemon_creation_time;
+static uid_t           daemon_uid;
+static gid_t           daemon_gid;
 
-static GStaticMutex   global_mutex        = G_STATIC_MUTEX_INIT;
-static GHashTable    *global_fh_table     = NULL;
+static GStaticMutex    global_mutex          = G_STATIC_MUTEX_INIT;
+static GHashTable     *global_path_to_fh_map = NULL;
+static GHashTable     *global_active_fh_map  = NULL;
 
 /* ------- *
  * Helpers *
@@ -194,6 +195,8 @@ file_handle_new (const gchar *path)
   file_handle->op = FILE_OP_NONE;
   file_handle->path = g_strdup (path);
 
+  g_hash_table_insert (global_active_fh_map, file_handle, file_handle);
+
   return file_handle;
 }
 
@@ -209,14 +212,18 @@ file_handle_unref (FileHandle *file_handle)
 {
   if (g_atomic_int_dec_and_test (&file_handle->refcount))
     {
+      gint refs;
+
       g_static_mutex_lock (&global_mutex);
 
       /* Test again, since e.g. get_file_handle_for_path() might have
        * snatched the global mutex and revived the file handle between
-       * g_atomic_int_dec_and_test() and us obtaining the lock. */
+       * g_atomic_int_dec_and_test() and us obtaining the global lock. */
 
-      if (g_atomic_int_get (&file_handle->refcount) == 0)
-        g_hash_table_remove (global_fh_table, file_handle->path);
+      refs = g_atomic_int_get (&file_handle->refcount);
+
+      if (refs == 0)
+        g_hash_table_remove (global_path_to_fh_map, file_handle->path);
 
       g_static_mutex_unlock (&global_mutex);
     }
@@ -252,6 +259,8 @@ file_handle_close_stream (FileHandle *file_handle)
 static void
 file_handle_free (FileHandle *file_handle)
 {
+  g_hash_table_remove (global_active_fh_map, file_handle);
+
   file_handle_close_stream (file_handle);
   g_mutex_free (file_handle->mutex);
   g_free (file_handle->path);
@@ -265,12 +274,12 @@ get_file_handle_for_path (const gchar *path)
 
   g_static_mutex_lock (&global_mutex);
 
-  fh = g_hash_table_lookup (global_fh_table, path);
+  fh = g_hash_table_lookup (global_path_to_fh_map, path);
+
   if (fh)
     file_handle_ref (fh);
 
   g_static_mutex_unlock (&global_mutex);
-
   return fh;
 }
 
@@ -281,7 +290,7 @@ get_or_create_file_handle_for_path (const gchar *path)
 
   g_static_mutex_lock (&global_mutex);
 
-  fh = g_hash_table_lookup (global_fh_table, path);
+  fh = g_hash_table_lookup (global_path_to_fh_map, path);
 
   if (fh)
     {
@@ -290,11 +299,30 @@ get_or_create_file_handle_for_path (const gchar *path)
   else
     {
       fh = file_handle_new (path);
-      g_hash_table_insert (global_fh_table, fh->path, fh);
+      g_hash_table_insert (global_path_to_fh_map, fh->path, fh);
     }
 
   g_static_mutex_unlock (&global_mutex);
+  return fh;
+}
 
+static FileHandle *
+get_file_handle_from_info (struct fuse_file_info *fi)
+{
+  FileHandle *fh;
+
+  g_static_mutex_lock (&global_mutex);
+
+  fh = GET_FILE_HANDLE (fi);
+
+  /* If the file handle is still valid, its value won't change. If
+   * invalid, it's set to NULL. */
+  fh = g_hash_table_lookup (global_active_fh_map, fh);
+
+  if (fh)
+    file_handle_ref (fh);
+
+  g_static_mutex_unlock (&global_mutex);
   return fh;
 }
 
@@ -306,17 +334,17 @@ reindex_file_handle_for_path (const gchar *old_path, const gchar *new_path)
 
   g_static_mutex_lock (&global_mutex);
 
-  if (!g_hash_table_lookup_extended (global_fh_table, old_path,
+  if (!g_hash_table_lookup_extended (global_path_to_fh_map, old_path,
                                      (gpointer *) &old_path_internal,
                                      (gpointer *) &fh))
       goto out;
 
-  g_hash_table_steal (global_fh_table, old_path);
+  g_hash_table_steal (global_path_to_fh_map, old_path);
 
   g_free (fh->path);
   fh->path = g_strdup (new_path);
 
-  g_hash_table_insert (global_fh_table, fh->path, fh);
+  g_hash_table_insert (global_path_to_fh_map, fh->path, fh);
 
  out:
   g_static_mutex_unlock (&global_mutex);
@@ -779,13 +807,8 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
 {
   GFile      *file;
   gint        result = 0;
-  FileHandle *fh;
 
   debug_print ("vfs_getattr: %s\n", path);
-
-  fh = get_file_handle_for_path (path);
-  if (fh)
-    g_mutex_lock (fh->mutex);
 
   memset (sbuf, 0, sizeof (*sbuf));
 
@@ -823,12 +846,6 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
   else
     {
       result = -ENOENT;
-    }
-
-  if (fh)
-    {
-      g_mutex_unlock (fh->mutex);
-      file_handle_unref (fh);
     }
 
   debug_print ("vfs_getattr: -> %s\n", strerror (-result));
@@ -954,7 +971,9 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
           if (file_type == G_FILE_TYPE_REGULAR)
             {
               FileHandle *fh = get_or_create_file_handle_for_path (path);
-              
+
+              g_mutex_lock (fh->mutex);
+
               /* File exists */
 
               SET_FILE_HANDLE (fi, fh);
@@ -962,8 +981,6 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
               debug_print ("vfs_open: flags=%o\n", fi->flags);
 
               /* Set up a stream here, so we can check for errors */
-
-              g_mutex_lock (fh->mutex);
 
               if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
                 result = setup_output_stream (file, fh);
@@ -1053,9 +1070,9 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 
               /* Success */
 
-              SET_FILE_HANDLE (fi, fh);
-
               g_mutex_lock (fh->mutex);
+
+              SET_FILE_HANDLE (fi, fh);
 
               file_handle_close_stream (fh);
               fh->stream = file_output_stream;
@@ -1087,12 +1104,16 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
 static gint
 vfs_release (const gchar *path, struct fuse_file_info *fi)
 {
-  FileHandle *fh = GET_FILE_HANDLE (fi);
+  FileHandle *fh = get_file_handle_from_info (fi);
 
   debug_print ("vfs_release: %s\n", path);
 
   if (fh)
-    file_handle_unref (fh);
+    {
+      /* get_file_handle_from_info () adds a "working ref", so unref twice. */
+      file_handle_unref (fh);
+      file_handle_unref (fh);
+    }
 
   return 0;
 }
@@ -1209,23 +1230,32 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
 
   if ((file = file_from_full_path (path)))
     {
-      FileHandle *fh = GET_FILE_HANDLE (fi);
+      FileHandle *fh = get_file_handle_from_info (fi);
 
-      g_mutex_lock (fh->mutex);
-
-      result = setup_input_stream (file, fh);
-
-      if (result == 0)
+      if (fh)
         {
-          result = read_stream (fh, buf, size, offset);
+          g_mutex_lock (fh->mutex);
+
+          result = setup_input_stream (file, fh);
+
+          if (result == 0)
+            {
+              result = read_stream (fh, buf, size, offset);
+            }
+          else
+            {
+              debug_print ("vfs_read: failed to setup input_stream!\n");
+            }
+
+          g_mutex_unlock (fh->mutex);
+          file_handle_unref (fh);
         }
       else
         {
-          debug_print ("vfs_read: failed to setup input_stream!\n");
+          result = -EINVAL;
         }
 
       g_object_unref (file);
-      g_mutex_unlock (fh->mutex);
     }
   else
     {
@@ -1328,18 +1358,27 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
 
   if ((file = file_from_full_path (path)))
     {
-      FileHandle *fh = GET_FILE_HANDLE (fi);
+      FileHandle *fh = get_file_handle_from_info (fi);
 
-      g_mutex_lock (fh->mutex);
-
-      result = setup_output_stream (file, fh);
-      if (result == 0)
+      if (fh)
         {
-          result = write_stream (fh, buf, len, offset);
+          g_mutex_lock (fh->mutex);
+
+          result = setup_output_stream (file, fh);
+          if (result == 0)
+            {
+              result = write_stream (fh, buf, len, offset);
+            }
+
+          g_mutex_unlock (fh->mutex);
+          file_handle_unref (fh);
+        }
+      else
+        {
+          result = -EINVAL;
         }
 
       g_object_unref (file);
-      g_mutex_unlock (fh->mutex);
     }
   else
     {
@@ -1497,9 +1536,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
 
   if (old_file && new_file)
     {
-      FileHandle *fh;
-
-      fh = get_file_handle_for_path (old_path);
+      FileHandle *fh = get_file_handle_for_path (old_path);
 
       if (fh)
         {
@@ -1561,9 +1598,7 @@ vfs_unlink (const gchar *path)
 
   if (file)
     {
-      FileHandle *fh;
-
-      fh = get_file_handle_for_path (path);
+      FileHandle *fh = get_file_handle_for_path (path);
 
       if (fh)
         {
@@ -1706,40 +1741,49 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
 
   if (file)
     {
-      FileHandle *fh = GET_FILE_HANDLE (fi);
+      FileHandle *fh = get_file_handle_from_info (fi);
 
-      g_mutex_lock (fh->mutex);
-
-      result = setup_output_stream (file, fh);
-
-      if (result == 0)
+      if (fh)
         {
-          if (g_seekable_can_truncate (G_SEEKABLE (fh->stream)))
-            {
-              g_seekable_truncate (fh->stream, size, NULL, &error);
-            }
-          else if (size == 0)
-            {
-              g_output_stream_close (fh->stream, NULL, NULL);
-              g_object_unref (fh->stream);
-              fh->stream = NULL;
+          g_mutex_lock (fh->mutex);
 
-              fh->stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
-            }
-          else
+          result = setup_output_stream (file, fh);
+
+          if (result == 0)
             {
-              result = -ENOTSUP;
+              if (g_seekable_can_truncate (G_SEEKABLE (fh->stream)))
+                {
+                  g_seekable_truncate (fh->stream, size, NULL, &error);
+                }
+              else if (size == 0)
+                {
+                  g_output_stream_close (fh->stream, NULL, NULL);
+                  g_object_unref (fh->stream);
+                  fh->stream = NULL;
+
+                  fh->stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
+                }
+              else
+                {
+                  result = -ENOTSUP;
+                }
+
+              if (error)
+                {
+                  result = -errno_from_error (error);
+                  g_error_free (error);
+                }
             }
 
-          if (error)
-            {
-              result = -errno_from_error (error);
-              g_error_free (error);
-            }
+          g_mutex_unlock (fh->mutex);
+          file_handle_unref (fh);
+        }
+      else
+        {
+          result = -EINVAL;
         }
 
       g_object_unref (file);
-      g_mutex_unlock (fh->mutex);
     }
   else
     {
@@ -1767,6 +1811,7 @@ vfs_truncate (const gchar *path, off_t size)
       GFileOutputStream *file_output_stream = NULL;
       FileHandle        *fh;
 
+      /* Get a file handle just to lock the path while we're working */
       fh = get_file_handle_for_path (path);
       if (fh)
         g_mutex_lock (fh->mutex);
@@ -2105,8 +2150,10 @@ vfs_init (struct fuse_conn_info *conn)
   daemon_gid = getgid ();
 
   mount_list_mutex = g_mutex_new ();
-  global_fh_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                           NULL, (GDestroyNotify) file_handle_free);
+  global_path_to_fh_map = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                 NULL, (GDestroyNotify) file_handle_free);
+  global_active_fh_map = g_hash_table_new_full (g_direct_hash, g_direct_equal,
+                                                NULL, NULL);
 
 	dbus_error_init (&error);
 
