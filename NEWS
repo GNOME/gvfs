@@ -1,3 +1,11 @@
+Major changes in 1.0.2
+======================
+
+* Make sure mount-added is always emitted when a mount operation is completed
+* Crash fixes
+* FUSE: Set st_blocks to make du and ls -s work
+* FUSE: Stability fix with concurrent close and reads (made amarok2 crash)
+
 Major changes in 1.0.1
 ======================
 
