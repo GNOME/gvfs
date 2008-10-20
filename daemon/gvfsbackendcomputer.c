@@ -726,10 +726,9 @@ try_create_dir_monitor (GVfsBackend *backend,
 
   if (file != &root)
     {
-      if (file != NULL)
-        g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
-                          G_IO_ERROR_NOT_SUPPORTED,
-                          _("Can't open mountable file"));
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+			G_IO_ERROR_NOT_SUPPORTED,
+			_("Not supported"));
       
       return TRUE;
     }

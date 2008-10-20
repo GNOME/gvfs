@@ -1,3 +1,11 @@
+2008-10-20  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendcomputer.c (try_create_dir_monitor):
+	Always fail the job when we don't support monitoring.
+
+	* client/gvfsfusedaemon.c (getattr_for_file):
+	Correct st_blocks rounding in previous commit
+
 2008-10-17  Alexander Larsson  <alexl@redhat.com>
 
 	* common/gdbusutils.c (append_escaped_name):
