@@ -1,3 +1,12 @@
+2008-10-20  Alexander Larsson  <alexl@redhat.com>
+
+	Import from trunk:
+	
+        * client/gdaemonfileinputstream.c:
+        (run_sync_state_machine):
+	Revert debug spew from recent commit now that the core
+	issue is fixed (by the fuse race condition fix).
+
 2008-10-17  Hans Petter Jansson  <hpj@novell.com>
 
 	Import from trunk:
