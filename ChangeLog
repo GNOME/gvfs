@@ -1,6 +1,6 @@
 2008-10-21  Alexander Larsson  <alexl@redhat.com>
 
-	Patch from David Zeuthen
+	Patch from David Zeuthen (#557182)
 	
         * common/Makefile.am:
         * common/gvfsicon.[ch]:
