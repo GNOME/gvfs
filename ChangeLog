@@ -1,5 +1,35 @@
 2008-10-21  Alexander Larsson  <alexl@redhat.com>
 
+	Patch from David Zeuthen
+	
+        * common/Makefile.am:
+        * common/gvfsicon.[ch]:
+	Added GVfsIcon object for GVfs backend specific icons.
+	
+        * common/gmountspec.[ch]:
+	Make sure to/from string works correctly to roundtrip GMountSpec:s
+	Make GMountSpec a boxed type
+	
+        * common/gvfsdaemonprotocol.h:
+	Add OpenIconForRead operation
+	
+        * client/Makefile.am:
+        * client/gvfsiconloadable.[ch]:
+	In gvfs client side, implement GLoadableIcon for GVfsIcon type.
+	
+        * client/gdaemonvfs.c:
+	Make sure that we add the GLoadableIcon interface for GVfsIcon on load
+	
+        * daemon/Makefile.am:
+        * daemon/gvfsbackend.[ch]:
+        * daemon/gvfsjobopeniconforread.[ch]:
+	Add new job type for OpenIconForRead op
+	
+        * daemon/gvfsbackendgphoto2.c:
+	Implement OpenIconForRead for icon previews.
+
+2008-10-21  Alexander Larsson  <alexl@redhat.com>
+
         * configure.ac:
 	Require glib 2.19.1 for GIcon serialization support
 	

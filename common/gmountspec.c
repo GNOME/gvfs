@@ -455,6 +455,8 @@ char *
 g_mount_spec_to_string (GMountSpec *spec)
 {
   GString *str;
+  char *k;
+  char *v;
   int i;
 
   if (spec == NULL)
@@ -466,12 +468,101 @@ g_mount_spec_to_string (GMountSpec *spec)
     {
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
 
-      g_string_append_printf (str, "%s='%s',", item->key, item->value);
+      k = g_uri_escape_string (item->key, NULL, TRUE);
+      v = g_uri_escape_string (item->value, NULL, TRUE);
+      g_string_append_printf (str, "%s=%s,", k, v);
+      g_free (k);
+      g_free (v);
     }
-  g_string_append_printf (str, "mount_prefix='%s'", spec->mount_prefix);
+  k = g_uri_escape_string ("__mount_prefix", NULL, TRUE);
+  v = g_uri_escape_string (spec->mount_prefix, NULL, TRUE);
+  g_string_append_printf (str, "%s=%s", k, v);
+  g_free (k);
+  g_free (v);
 
   return g_string_free (str, FALSE);
 }
+
+GMountSpec *
+g_mount_spec_new_from_string (const gchar     *str,
+                              GError         **error)
+{
+  GArray *items;
+  GMountSpec *mount_spec;
+  char **kv_pairs;
+  char *mount_prefix;
+  int i;
+
+  g_return_val_if_fail (str != NULL, NULL);
+
+  mount_spec = NULL;
+  mount_prefix = NULL;
+  items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
+
+  kv_pairs = g_strsplit (str, ",", 0);
+  for (i = 0; kv_pairs[i] != NULL; i++)
+    {
+      char **tokens;
+      GMountSpecItem item;
+
+      tokens = g_strsplit (kv_pairs[i], "=", 0);
+      if (g_strv_length (tokens) != 2)
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_INVALID_ARGUMENT,
+                       "Encountered invalid key/value pair '%s' while decoding GMountSpec",
+                       kv_pairs[i]);
+          g_strfreev (tokens);
+          g_strfreev (kv_pairs);
+          goto fail;
+        }
+
+      item.key = g_uri_unescape_string (tokens[0], NULL);
+      item.value = g_uri_unescape_string (tokens[1], NULL);
+
+      if (strcmp (item.key, "__mount_prefix") == 0)
+        {
+          g_free (item.key);
+          mount_prefix = item.value;
+        }
+      else
+        {
+          g_array_append_val (items, item);
+        }
+
+      g_strfreev (tokens);
+    }
+  g_strfreev (kv_pairs);
+
+  if (mount_prefix == NULL)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_ARGUMENT,
+                   "Didn't find __mount_prefix while decoding '%s' GMountSpec",
+                   str);
+      goto fail;
+    }
+
+  /* this constructor takes ownership of the data we pass in */
+  mount_spec = g_mount_spec_new_from_data (items,
+                                           mount_prefix);
+
+  return mount_spec;
+
+ fail:
+  for (i = 0; i < items->len; i++)
+    {
+      GMountSpecItem *item = &g_array_index (items, GMountSpecItem, i);
+      g_free (item->key);
+      g_free (item->value);
+    }
+  g_array_free (items, TRUE);
+  g_free (mount_prefix);
+  return NULL;
+}
+
 
 char *
 g_mount_spec_canonicalize_path (const char *path)
@@ -531,4 +622,16 @@ g_mount_spec_canonicalize_path (const char *path)
     *(p-1) = 0;
   
   return canon;
+}
+
+GType
+g_type_mount_spec_get_gtype (void)
+{
+  static GType type_id = 0;
+
+  if (type_id == 0)
+    type_id = g_boxed_type_register_static (g_intern_static_string ("GMountSpec"),
+                                            (GBoxedCopyFunc) g_mount_spec_ref,
+                                            (GBoxedFreeFunc) g_mount_spec_unref);
+  return type_id;
 }

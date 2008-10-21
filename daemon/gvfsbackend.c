@@ -35,6 +35,7 @@
 #include "gvfsjobsource.h"
 #include "gvfsdaemonprotocol.h"
 #include <gvfsjobopenforread.h>
+#include <gvfsjobopeniconforread.h>
 #include <gvfsjobopenforwrite.h>
 #include <gvfsjobqueryinfo.h>
 #include <gvfsjobqueryfsinfo.h>
@@ -481,6 +482,10 @@ backend_dbus_handler (DBusConnection  *connection,
 				   G_VFS_DBUS_MOUNT_INTERFACE,
 				   G_VFS_DBUS_MOUNT_OP_OPEN_FOR_READ))
     job = g_vfs_job_open_for_read_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+				   G_VFS_DBUS_MOUNT_INTERFACE,
+				   G_VFS_DBUS_MOUNT_OP_OPEN_ICON_FOR_READ))
+    job = g_vfs_job_open_icon_for_read_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_QUERY_INFO))

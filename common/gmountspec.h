@@ -92,10 +92,16 @@ const char *g_mount_spec_get               (GMountSpec      *spec,
 					    const char      *key);
 const char *g_mount_spec_get_type          (GMountSpec      *spec);
 
-/* For debugging */
 char *      g_mount_spec_to_string         (GMountSpec      *spec);
 
+GMountSpec *g_mount_spec_new_from_string   (const gchar     *str,
+                                            GError         **error);
+
 char *      g_mount_spec_canonicalize_path (const char      *path);
+
+
+#define G_TYPE_MOUNT_SPEC (g_type_mount_spec_get_gtype ())
+GType g_type_mount_spec_get_gtype (void) G_GNUC_CONST;
 
 G_END_DECLS
 

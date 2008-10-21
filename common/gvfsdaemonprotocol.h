@@ -49,6 +49,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_SET_ATTRIBUTE "SetAttribute"
 #define G_VFS_DBUS_MOUNT_OP_QUERY_SETTABLE_ATTRIBUTES "QuerySettableAttributes"
 #define G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES "QueryWritableNamespaces"
+#define G_VFS_DBUS_MOUNT_OP_OPEN_ICON_FOR_READ "OpenIconForRead"
 
 /* Progress callback interface for copy and move */
 #define G_VFS_DBUS_PROGRESS_INTERFACE "org.gtk.vfs.Progress"

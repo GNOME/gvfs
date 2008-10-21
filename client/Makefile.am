@@ -33,6 +33,7 @@ vfssources = \
 	gdaemonfileenumerator.c gdaemonfileenumerator.h \
 	gdaemonfilemonitor.c gdaemonfilemonitor.h \
 	gvfsdaemondbus.c gvfsdaemondbus.h \
+	gvfsiconloadable.c gvfsiconloadable.h \
 	gvfsuriutils.c gvfsuriutils.h \
 	gvfsurimapper.c gvfsurimapper.h \
 	$(URI_PARSER_SOURCES) \

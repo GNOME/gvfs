@@ -41,6 +41,7 @@
 
 #include "gvfsbackendgphoto2.h"
 #include "gvfsjobopenforread.h"
+#include "gvfsjobopeniconforread.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobqueryinfo.h"
@@ -52,6 +53,7 @@
 #include "gvfsjobcreatemonitor.h"
 #include "gvfsmonitor.h"
 #include "gvfsjobseekwrite.h"
+#include "gvfsicon.h"
 
 /* showing debug traces */
 #if 0
@@ -1132,6 +1134,25 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
     mime_type = g_strdup ("application/octet-stream");
   g_file_info_set_content_type (info, mime_type);
 
+  /* assume that all JPG files, and only all JPG files, has a preview file */
+  if (strcmp (mime_type, "image/jpg") == 0 ||
+      strcmp (mime_type, "image/jpeg") == 0)
+    {
+      char *icon_id;
+      GIcon *icon;
+      GMountSpec *mount_spec;
+
+      mount_spec = g_vfs_backend_get_mount_spec (G_VFS_BACKEND (gphoto2_backend));
+      icon_id = g_strdup_printf ("preview:%s/%s", dir + strlen (gphoto2_backend->ignore_prefix), name);
+      icon = g_vfs_icon_new (mount_spec,
+                             icon_id);
+      g_file_info_set_attribute_object (info,
+                                        G_FILE_ATTRIBUTE_PREVIEW_ICON,
+                                        G_OBJECT (icon));
+      g_object_unref (icon);
+      g_free (icon_id);
+    }
+
   icon = g_content_type_get_icon (mime_type);
   DEBUG ("  got icon %p for mime_type '%s'", icon, mime_type);
   if (icon != NULL)
@@ -1140,7 +1161,6 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
       g_object_unref (icon);
     }
   g_free (mime_type);
-
 
   if (gp_info.file.fields & GP_FILE_INFO_MTIME)
     mtime.tv_sec = gp_info.file.mtime;
@@ -1677,9 +1697,10 @@ free_read_handle (ReadHandle *read_handle)
 }
 
 static void
-do_open_for_read (GVfsBackend *backend,
-                  GVfsJobOpenForRead *job,
-                  const char *filename)
+do_open_for_read_real (GVfsBackend *backend,
+                       GVfsJobOpenForRead *job,
+                       const char *filename,
+                       gboolean get_preview)
 {
   int rc;
   GError *error;
@@ -1687,8 +1708,6 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
   char *dir;
   char *name;
-
-  DEBUG ("open_for_read (%s)", filename);
 
   ensure_not_dirty (gphoto2_backend);
 
@@ -1724,7 +1743,7 @@ do_open_for_read (GVfsBackend *backend,
   rc = gp_camera_file_get (gphoto2_backend->camera,
                            dir,
                            name,
-                           GP_FILE_TYPE_NORMAL,
+                           get_preview ? GP_FILE_TYPE_PREVIEW : GP_FILE_TYPE_NORMAL,
                            read_handle->file,
                            gphoto2_backend->context);
   if (rc != 0)
@@ -1761,6 +1780,44 @@ do_open_for_read (GVfsBackend *backend,
  out:
   g_free (name);
   g_free (dir);
+}
+
+
+static void
+do_open_for_read (GVfsBackend *backend,
+                  GVfsJobOpenForRead *job,
+                  const char *filename)
+{
+  DEBUG ("open_for_read (%s)", filename);
+
+  do_open_for_read_real (backend,
+                         job,
+                         filename,
+                         FALSE);
+}
+
+static void
+do_open_icon_for_read (GVfsBackend *backend,
+                       GVfsJobOpenIconForRead *job,
+                       const char *icon_id)
+{
+  DEBUG ("open_icon_for_read (%s)", icon_id);
+
+  if (g_str_has_prefix (icon_id, "preview:"))
+    {
+      do_open_for_read_real (backend,
+                             G_VFS_JOB_OPEN_FOR_READ (job),
+                             icon_id + sizeof ("preview:") - 1,
+                             TRUE);
+    }
+  else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        G_IO_ERROR_INVALID_ARGUMENT,
+                        _("Malformed icon identifier '%s'"),
+                        icon_id);
+    }
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -3373,6 +3430,7 @@ g_vfs_backend_gphoto2_class_init (GVfsBackendGphoto2Class *klass)
   backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
   backend_class->unmount = do_unmount;
+  backend_class->open_icon_for_read = do_open_icon_for_read;
   backend_class->open_for_read = do_open_for_read;
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;

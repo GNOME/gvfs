@@ -36,6 +36,8 @@
 #include "gmountspec.h"
 #include "gvfsurimapper.h"
 #include "gdaemonvolumemonitor.h"
+#include "gvfsicon.h"
+#include "gvfsiconloadable.h"
 #include <glib/gi18n-lib.h>
 
 typedef struct  {
@@ -1129,6 +1131,10 @@ g_io_module_load (GIOModule *module)
   
   g_daemon_vfs_register_type (G_TYPE_MODULE (module));
   g_daemon_volume_monitor_register_types (G_TYPE_MODULE (module));
+  
+  /* We implement GLoadableIcon only on client side.
+     see comment in common/giconvfs.c */
+  _g_vfs_icon_add_loadable_interface ();
 
   g_io_extension_point_implement (G_VFS_EXTENSION_POINT_NAME,
 				  G_TYPE_DAEMON_VFS,

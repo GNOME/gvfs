@@ -48,6 +48,7 @@ typedef struct _GVfsJobUnmount         GVfsJobUnmount;
 typedef struct _GVfsJobMountMountable  GVfsJobMountMountable;
 typedef struct _GVfsJobUnmountMountable GVfsJobUnmountMountable;
 typedef struct _GVfsJobOpenForRead     GVfsJobOpenForRead;
+typedef struct _GVfsJobOpenIconForRead     GVfsJobOpenIconForRead;
 typedef struct _GVfsJobSeekRead        GVfsJobSeekRead;
 typedef struct _GVfsJobCloseRead       GVfsJobCloseRead;
 typedef struct _GVfsJobRead            GVfsJobRead;
@@ -138,6 +139,12 @@ struct _GVfsBackendClass
   gboolean (*try_open_for_read) (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);
+  void     (*open_icon_for_read) (GVfsBackend *backend,
+                                  GVfsJobOpenIconForRead *job,
+                                  const char *icon_id);
+  gboolean (*try_open_icon_for_read) (GVfsBackend *backend,
+                                      GVfsJobOpenIconForRead *job,
+                                      const char *icon_id);
   void     (*close_read)        (GVfsBackend *backend,
 				 GVfsJobCloseRead *job,
 				 GVfsBackendHandle handle);
