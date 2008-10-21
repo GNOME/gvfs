@@ -254,7 +254,10 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   volume->name = g_strdup (name);
   volume->uuid = g_strdup (uuid);
   volume->activation_uri = g_strdup (activation_uri);
-  volume->icon = _g_icon_new_from_serialized_data (gicon_data);
+  if (*gicon_data == 0)
+    volume->icon = NULL;
+  else
+    volume->icon = g_icon_new_for_string (gicon_data, NULL);
   volume->drive_id = g_strdup (drive_id);
   volume->mount_id = g_strdup (mount_id);
   volume->can_mount = can_mount;

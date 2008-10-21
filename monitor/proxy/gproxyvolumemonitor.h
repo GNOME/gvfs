@@ -70,8 +70,6 @@ void g_proxy_volume_monitor_teardown_session_bus_connection (void);
 
 GHashTable *_get_identifiers (DBusMessageIter *iter);
 
-GIcon *_g_icon_new_from_serialized_data (const char *gicon_data);
-
 G_END_DECLS
 
 #endif /* __G_PROXY_VOLUME_MONITOR_H__ */

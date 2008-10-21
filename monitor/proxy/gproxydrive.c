@@ -198,7 +198,11 @@ g_proxy_drive_update (GProxyDrive         *drive,
   /* in with the new */
   drive->id = g_strdup (id);
   drive->name = g_strdup (name);
-  drive->icon = _g_icon_new_from_serialized_data (gicon_data);
+  if (*gicon_data == 0)
+    drive->icon = NULL;
+  else
+    drive->icon = g_icon_new_for_string (gicon_data, NULL);
+
   drive->can_eject = can_eject;
   drive->can_poll_for_media = can_poll_for_media;
   drive->has_media = has_media;

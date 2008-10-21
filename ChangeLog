@@ -1,3 +1,19 @@
+2008-10-21  Alexander Larsson  <alexl@redhat.com>
+
+        * configure.ac:
+	Require glib 2.19.1 for GIcon serialization support
+	
+        * common/gvfsdaemonprotocol.c:
+	Use g_icon_to_string & co instead of home-brewed serialization
+	
+        * monitor/proxy/gproxydrive.c:
+        * monitor/proxy/gproxymount.c:
+        * monitor/proxy/gproxyvolume.c:
+        * monitor/proxy/gproxyvolumemonitor.c:
+        * monitor/proxy/gproxyvolumemonitor.h:
+        * monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	Use g_icon_to_string & co instead of home-brewed serialization
+	
 2008-10-20  Richard Hughes  <richard@hughsie.com>
 
 	reviewed by: Christian Kellner <ck@xatom.net>

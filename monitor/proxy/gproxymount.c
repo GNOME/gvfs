@@ -212,7 +212,10 @@ g_proxy_mount_update (GProxyMount         *mount,
   /* in with the new */
   mount->id = g_strdup (id);
   mount->name = g_strdup (name);
-  mount->icon = _g_icon_new_from_serialized_data (gicon_data);
+  if (*gicon_data == 0)
+    mount->icon = NULL;
+  else
+    mount->icon = g_icon_new_for_string (gicon_data, NULL);
   mount->uuid = g_strdup (uuid);
   mount->root = g_file_new_for_uri (root_uri);
   mount->can_unmount = can_unmount;

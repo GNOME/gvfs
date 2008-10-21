@@ -39,103 +39,6 @@ static const char *the_dbus_name = NULL;
 
 static void monitor_try_create (void);
 
-static char *
-_g_icon_serialize (GIcon *icon)
-{
-  char *ret;
-
-  g_return_val_if_fail (icon != NULL, NULL);
-  g_return_val_if_fail (G_IS_ICON (icon), NULL);
-
-  /* We encode icons as a series of whitespace-separated tokens.
-   * The first token is the type of the icon. To help decoding, 
-   * the number of tokens is prepended as the first token (not 
-   * included in the count).
-   */
-  if (G_IS_FILE_ICON (icon))
-    {
-      GFileIcon *file_icon = G_FILE_ICON (icon);
-      GFile *file;
-      char *uri;
-      char *escaped_uri;
-
-      file = g_file_icon_get_file (file_icon);
-      uri = g_file_get_uri (file);
-      escaped_uri = g_uri_escape_string (uri, NULL, TRUE);
-
-      ret = g_strdup_printf ("2 GFileIcon %s", escaped_uri);
-
-      g_free (uri);
-      g_free (escaped_uri);
-    }
-  else if (G_IS_THEMED_ICON (icon))
-    {
-      GThemedIcon *themed_icon = G_THEMED_ICON (icon);
-      char *escaped_name;
-      char **names;
-      GString *s;
-
-      g_object_get (themed_icon,
-                    "names", &names,
-                    NULL);
-
-      s = g_string_new (0); 
-      g_string_append_printf (s, "%d GThemedIcon", g_strv_length (names) + 1);
-
-      if (names != NULL)
-        {
-          int n;
-          for (n = 0; names[n] != NULL; n++)
-            {
-              escaped_name = g_uri_escape_string (names[n], NULL, TRUE);
-              g_string_append_c (s, ' ');
-              g_string_append (s, escaped_name);
-              g_free (escaped_name);
-            }
-        }
-
-      ret = g_string_free (s, FALSE);
-
-      g_strfreev (names);
-    }
-  else if (G_IS_EMBLEMED_ICON (icon))
-    {
-      char *base, *s;
-      GList *emblems, *e;
-      int n;
-      GString *str;
-
-      /* GEmblemedIcons are encoded as 
-       * 
-       *   <num_tokens> GEmblemedIcon <num_emblems> [<origin> <encoded_icon> ]*
-       */
-      str = g_string_new ("");
-      base = _g_icon_serialize (g_emblemed_icon_get_icon (G_EMBLEMED_ICON (icon)));
-      emblems = g_emblemed_icon_get_emblems (G_EMBLEMED_ICON (icon));
-      g_string_append_printf (str, "GEmblemedIcon %s %d", base, g_list_length (emblems));
-      n = atoi (base) + 2;
-      g_free (base);
-      for (e = emblems; e; e = e->next)
-        {
-          s = _g_icon_serialize (g_emblem_get_icon (G_EMBLEM (e->data)));
-          g_string_append_printf (str, " %d %s", g_emblem_get_origin (G_EMBLEM (e->data)), s);
-          n += atoi (s) + 2;
-          g_free (s);
-        }
-       
-      s = g_string_free (str, FALSE);
-      ret = g_strdup_printf ("%d %s", n + 1, s);
-      g_free (s);
-    }
-  else
-    {
-      ret = NULL;
-      g_warning ("unknown icon type; please add support");
-    }
-
-  return ret;
-}
-
 /* string               id
  * string               name
  * string               gicon_data
@@ -171,7 +74,10 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
   id = g_strdup_printf ("%p", drive);
   name = g_drive_get_name (drive);
   icon = g_drive_get_icon (drive);
-  icon_data = _g_icon_serialize (icon);
+  if (icon)
+    icon_data = g_icon_to_string (icon);
+  else
+    icon_data = g_strdup ("");
   can_eject = g_drive_can_eject (drive);
   can_poll_for_media = g_drive_can_poll_for_media (drive);
   has_media = g_drive_has_media (drive);
@@ -268,7 +174,10 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
   id = g_strdup_printf ("%p", volume);
   name = g_volume_get_name (volume);
   icon = g_volume_get_icon (volume);
-  icon_data = _g_icon_serialize (icon);
+  if (icon)
+    icon_data = g_icon_to_string (icon);
+  else
+    icon_data = g_strdup ("");
   uuid = g_volume_get_uuid (volume);
   activation_root = g_volume_get_activation_root (volume);
   if (activation_root == NULL)
@@ -374,7 +283,10 @@ append_mount (GMount *mount, DBusMessageIter *iter_array)
   id = g_strdup_printf ("%p", mount);
   name = g_mount_get_name (mount);
   icon = g_mount_get_icon (mount);
-  icon_data = _g_icon_serialize (icon);
+  if (icon)
+    icon_data = g_icon_to_string (icon);
+  else
+    icon_data = g_strdup ("");
   uuid = g_mount_get_uuid (mount);
   root = g_mount_get_root (mount);
   root_uri = g_file_get_uri (root);

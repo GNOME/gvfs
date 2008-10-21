@@ -32,59 +32,18 @@
 static const char *
 get_object_signature (GObject *obj)
 {
-  if (G_IS_THEMED_ICON (obj))
+  if (G_IS_ICON (obj))
     {
       return
 	DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-	  DBUS_TYPE_UINT32_AS_STRING
-	  DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING
+	 DBUS_TYPE_UINT32_AS_STRING
+	 DBUS_TYPE_STRING_AS_STRING
 	DBUS_STRUCT_END_CHAR_AS_STRING;
-	}
-  else if (G_IS_FILE_ICON (obj))
-    {
-      GFile *file;
-      char *path;
-      
-      file = g_file_icon_get_file (G_FILE_ICON (obj));
-      
-      path = g_file_get_path (file);
-      if (path)
-	{
-	  g_free (path);
-	  return
-	    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-	      DBUS_TYPE_UINT32_AS_STRING
-	      DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
-	    DBUS_STRUCT_END_CHAR_AS_STRING;
-	}
     }
   return
     DBUS_STRUCT_BEGIN_CHAR_AS_STRING
-      DBUS_TYPE_UINT32_AS_STRING
+     DBUS_TYPE_UINT32_AS_STRING
     DBUS_STRUCT_END_CHAR_AS_STRING;
-}
-
-static void
-append_string_array (DBusMessageIter *iter, char **strs)
-{
-  DBusMessageIter array;
-  int i;
-
-  if (!dbus_message_iter_open_container (iter,
-					 DBUS_TYPE_ARRAY,
-					 DBUS_TYPE_STRING_AS_STRING,
-					 &array))
-    _g_dbus_oom ();
-  
-              
-  for (i = 0; strs[i] != NULL; i++)
-    {
-      if (!dbus_message_iter_append_basic (&array, DBUS_TYPE_STRING, &strs[i]))
-	_g_dbus_oom ();
-    }
-  
-  if (!dbus_message_iter_close_container (iter, &array))
-    _g_dbus_oom ();
 }
 
 static void
@@ -99,51 +58,22 @@ append_object (DBusMessageIter *iter, GObject *obj)
 					 &obj_struct_iter))
     _g_dbus_oom ();
 
-  if (G_IS_THEMED_ICON (obj))
+  /* version 1 and 2 are deprecated old themed-icon and file-icon values */
+  if (G_IS_ICON (obj))
     {
-      const char * const *icons;
-      
-      icons = g_themed_icon_get_names (G_THEMED_ICON (obj));
-      
-      v_uint32 = 1;
+      char *data;
+
+      data = g_icon_to_string (G_ICON (obj));
+      v_uint32 = 3;
       if (!dbus_message_iter_append_basic (&obj_struct_iter,
 					   DBUS_TYPE_UINT32, &v_uint32))
 	_g_dbus_oom ();
-      
-      append_string_array (&obj_struct_iter, (char **)icons);
-    }
-  else if (G_IS_FILE_ICON (obj))
-    {
-      GFile *file;
-      char *path;
-      
-      file = g_file_icon_get_file (G_FILE_ICON (obj));
-      
-      path = g_file_get_path (file);
-      if (path)
-	{
-	  v_uint32 = 2;
-	  if (!dbus_message_iter_append_basic (&obj_struct_iter,
-					       DBUS_TYPE_UINT32, &v_uint32))
-	    _g_dbus_oom ();
-	  
-	  path = g_file_get_path (file);
-	  _g_dbus_message_iter_append_cstring (&obj_struct_iter, path);
-	  g_free (path);
-	}
-      else
-	{
-	  /* Seems unlikely that daemon backend will generate GFileIcons with
-	     files on the vfs, so its probably not a problem not to support this.
-	     (Its tricky to support, since we don't link the daemon to the client/
-	     library directly.) */
-	  g_warning ("Unknown file type for icon in attribute, ignoring");
-	  
-	  v_uint32 = 0;
-	  if (!dbus_message_iter_append_basic (&obj_struct_iter,
-					       DBUS_TYPE_UINT32, &v_uint32))
-	    _g_dbus_oom ();
-	}
+
+      if (!dbus_message_iter_append_basic (&obj_struct_iter,
+					   DBUS_TYPE_STRING, &data))
+	_g_dbus_oom ();
+
+      g_free (data);
     }
   else
     {
@@ -429,7 +359,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 
       if (obj_type == 1)
 	{
-	  /* G_THEMED_ICON */
+	  /* Old deprecated G_THEMED_ICON */
 	  if (_g_dbus_message_iter_get_args (&obj_iter,
 					     NULL,
 					     DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
@@ -441,7 +371,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 	}
       else if (obj_type == 2)
 	{
-	  /* G_FILE_ICON, w/ local file */
+	  /* Old deprecated G_FILE_ICON, w/ local file */
 	  if (_g_dbus_message_iter_get_args (&obj_iter,
 					     NULL,
 					     G_DBUS_TYPE_CSTRING, &str,
@@ -451,6 +381,15 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 	      obj = G_OBJECT (g_file_icon_new (file));
 	      g_free (str);
 	    }
+	}
+      else if (obj_type == 3)
+	{
+	  /* serialized G_ICON */
+	  if (_g_dbus_message_iter_get_args (&obj_iter,
+					     NULL,
+					     DBUS_TYPE_STRING, &str,
+					     0))
+	    obj = (GObject *)g_icon_new_for_string (str, NULL);
 	}
       else
 	{
