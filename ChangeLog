@@ -1,3 +1,11 @@
+2008-10-23  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsdaemonutils.c:
+	Don't return fallback icons, since that gives problems
+	with custom mime icons (#528320)
+
 2008-10-21  Alexander Larsson  <alexl@redhat.com>
 
 	Patch from David Zeuthen (#557182)
