@@ -1381,13 +1381,8 @@ set_info_from_stat (GVfsBackendSmb *backend,
       else
 	{
 	  content_type = g_content_type_guess (basename, NULL, 0, NULL);
-	  
 	  if (content_type)
-	    {
-              icon = g_content_type_get_icon (content_type);
-              if (G_IS_THEMED_ICON (icon))
-                g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
-	    }
+	    icon = g_content_type_get_icon (content_type);
 	}
       
       if (content_type)

@@ -276,8 +276,6 @@ gvfs_file_info_populate_content_types (GFileInfo  *info,
   else
     {
       icon = g_content_type_get_icon (mimetype);
-      if (G_IS_THEMED_ICON (icon))
-	g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
     }
   
   g_file_info_set_icon (info, icon);

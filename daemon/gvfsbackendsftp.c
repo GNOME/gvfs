@@ -1804,11 +1804,7 @@ parse_attributes (GVfsBackendSftp *backend,
           if (S_ISDIR(mode))
             icon = g_themed_icon_new ("folder");
           else if (mimetype)
-            {
               icon = g_content_type_get_icon (mimetype);
-              if (G_IS_THEMED_ICON (icon))
-                g_themed_icon_append_name (G_THEMED_ICON (icon), "text-x-generic");
-            }
 
           if (icon == NULL)
             icon = g_themed_icon_new ("text-x-generic");

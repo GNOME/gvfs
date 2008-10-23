@@ -1,3 +1,13 @@
+2008-10-23  Alexander Larsson  <alexl@redhat.com>
+
+	Import from trunk:
+	
+        * daemon/gvfsbackendsftp.c:
+        * daemon/gvfsbackendsmb.c:
+        * daemon/gvfsdaemonutils.c:
+	Don't return fallback icons, since that gives problems
+	with custom mime icons (#528320)
+
 2008-10-20  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
