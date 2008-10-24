@@ -78,6 +78,7 @@ struct _GVfsBackendSmb
   GMountSource *mount_source; /* Only used/set during mount */
   int mount_try;
   gboolean mount_try_again;
+  gboolean mount_cancelled;
 	
   gboolean password_in_keyring;
   GPasswordSave password_save;
@@ -158,6 +159,14 @@ auth_callback (SMBCCTX *context,
   if (backend->user)
     strncpy (username_out, backend->user, unmaxlen);
 
+  if (backend->mount_cancelled)
+    {
+      /*  Don't prompt for credentials, let smbclient finish the mount loop  */
+      strncpy (username_out, "ABORT", unmaxlen);
+      strncpy (password_out, "", pwmaxlen);
+      return;
+    }
+
   if (backend->mount_source == NULL)
     {
       /* Not during mount, use last password */
@@ -231,6 +240,7 @@ auth_callback (SMBCCTX *context,
 	    {
 	      strncpy (username_out, "ABORT", unmaxlen);
 	      strncpy (password_out, "", pwmaxlen);
+	      backend->mount_cancelled = TRUE;
 	      goto out;
 	    }
 	}
@@ -552,11 +562,12 @@ do_mount (GVfsBackend *backend,
   do
     {
       op_backend->mount_try_again = FALSE;
+      op_backend->mount_cancelled = FALSE;
 
       smbc_stat = smbc_getFunctionStat (smb_context);
       res = smbc_stat (smb_context, uri, &st);
       
-      if (res == 0 ||
+      if (res == 0 || op_backend->mount_cancelled ||
 	  (errno != EACCES && errno != EPERM))
 	break;
 
@@ -581,10 +592,17 @@ do_mount (GVfsBackend *backend,
     {
       /* TODO: Error from errno? */
       op_backend->mount_source = NULL;
-      g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR, G_IO_ERROR_FAILED,
-			/* translators: We tried to mount a windows (samba) share, but failed */
-			_("Failed to mount Windows share"));
+      
+      if (op_backend->mount_cancelled) 
+        g_vfs_job_failed (G_VFS_JOB (job),
+			  G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+			  _("Password dialog cancelled"));
+      else
+        g_vfs_job_failed (G_VFS_JOB (job),
+			  G_IO_ERROR, G_IO_ERROR_FAILED,
+			  /* translators: We tried to mount a windows (samba) share, but failed */
+			  _("Failed to mount Windows share"));
+
       return;
     }
 

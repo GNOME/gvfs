@@ -1,3 +1,8 @@
+2008-10-24  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	Don't ask for credentials twice when the password dialog was cancelled
+
 2008-10-24  Alexander Larsson  <alexl@redhat.com>
 
 	* programs/gvfs-info.c (show_attributes):
