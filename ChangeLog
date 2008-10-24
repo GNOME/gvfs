@@ -1,3 +1,9 @@
+2008-10-24  Alexander Larsson  <alexl@redhat.com>
+
+	* programs/gvfs-info.c (show_attributes):
+	Don't show fallback setting for GThemedIcon (this is a construct only property).
+	List icons on same line.
+
 2008-10-23  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

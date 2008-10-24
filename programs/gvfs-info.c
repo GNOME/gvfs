@@ -113,24 +113,18 @@ show_attributes (GFileInfo *info)
       if (strcmp (attributes[i], "standard::icon") == 0)
         {
           GIcon *icon;
-          gboolean fallbacks;
-          int j, len;
-          char **names = NULL;
+          int j;
+          const char * const *names = NULL;
           icon = g_file_info_get_icon (info);
 
           /* only look up names if GThemedIcon */
           if (G_IS_THEMED_ICON(icon))
             {
-              g_object_get (G_OBJECT(icon), "names", &names,
-                            "use-default-fallbacks", &fallbacks, NULL);
-              g_print ("  %s: (fallbacks: %s)\n", attributes[i],
-                       fallbacks ? "TRUE" : "FALSE");
-              len = g_strv_length (names);
-              for (j = 0; j < len; j++)
-                {
-                  g_print ("   %i. name:%s\n", j+1, names[j]);
-                }
-              g_strfreev (names);
+	      names = g_themed_icon_get_names (G_THEMED_ICON (icon));
+	      g_print ("  %s: ", attributes[i]);
+              for (j = 0; names[j] != NULL; j++)
+		g_print ("%s%s", names[j], (names[j+1] == NULL)?"":", ");
+	      g_print ("\n");
             }
           else
             {
