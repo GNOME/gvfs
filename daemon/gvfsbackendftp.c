@@ -946,7 +946,7 @@ dir_default_init_data (FtpConnection *conn, const FtpFile *dir)
 
   ftp_connection_send (conn,
 		       RESPONSE_PASS_100 | RESPONSE_FAIL_200,
-		       "LIST");
+		       (conn->system == FTP_SYSTEM_UNIX) ? "LIST -a" : "LIST");
 }
 
 static GFileInfo *
