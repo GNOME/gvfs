@@ -1096,6 +1096,13 @@ dir_default_iter_process (gpointer        iter,
   g_free (s);
   g_free (name);
 
+  /* Workaround:
+   * result.fetime.tm_year contains actual year instead of offset-from-1900,
+   * which mktime expects.
+   */
+  if (result.fe_time.tm_year >= 1900)
+	  result.fe_time.tm_year -= 1900;
+
   tv.tv_sec = mktime (&result.fe_time);
   if (tv.tv_sec != -1)
     g_file_info_set_modification_time (info, &tv);

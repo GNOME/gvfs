@@ -1,9 +1,15 @@
 2008-10-28  Cosimo Cecchi  <cosimoc@gnome.org>
 
-	* daemon/gvfsbackendftp.c: (dir_default_init_data):
+	* daemon/gvfsbackendftp.c: (dir_default_iter_process):
 	Convert stuct tm from what ParseFTPList gives to what mktime expects.
 	Fixes wrong date/time parsing for FTP files.
 	Patch by Andreas Henriksson (#550837). 
+
+2008-10-28  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (dir_default_init_data):
+	Use LIST -a instead of LIST on UNIX ftp sites.
+	Patch by Andreas Henriksson (#551822).
 
 2008-10-24  Tomas Bzatek  <tbzatek@redhat.com>
 
