@@ -1,3 +1,9 @@
+2008-11-04  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* client/gdaemonmount.c: (g_daemon_mount_guess_content_type_sync):
+	Return an empty array on success when no content type
+	matches (#357468)
+
 2008-10-23  Alexander Larsson  <alexl@redhat.com>
 
 	Import from trunk:
