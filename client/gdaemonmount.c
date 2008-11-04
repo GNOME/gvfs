@@ -366,11 +366,12 @@ g_daemon_mount_guess_content_type_sync (GMount              *mount,
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   char **result;
 
-  result = NULL;
   G_LOCK (daemon_mount);
   if (daemon_mount->mount_info->x_content_types != NULL &&
       strlen (daemon_mount->mount_info->x_content_types) > 0)
     result = g_strsplit (daemon_mount->mount_info->x_content_types, " ", 0);
+  else
+    result = g_new0 (char *, 1);
   G_UNLOCK (daemon_mount);
 
   return result;
