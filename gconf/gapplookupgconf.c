@@ -163,6 +163,7 @@ get_default_for_uri_scheme (GDesktopAppInfoLookup *lookup,
     }
   
   g_object_unref (client);
+  g_free (command);
   
   return appinfo;
 }
