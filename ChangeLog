@@ -1,3 +1,9 @@
+2008-11-10  Tomas Bzatek  <tbzatek@redhat.com>
+
+	* daemon/gvfsbackendsmb.c:
+	* daemon/libsmb-compat.h:
+	Timestamp (mtime) setting support
+
 2008-11-06  Hans Petter Jansson  <hpj@novell.com>
 
 	* gconf/gapplookupgconf.c (get_default_for_uri_scheme): Free command

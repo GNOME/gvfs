@@ -94,6 +94,14 @@ typedef int (*smbc_mkdir_fn)(SMBCCTX *c,
                              const char *fname,
                              mode_t mode);
 
+typedef int (*smbc_chmod_fn)(SMBCCTX *c,
+                             const char *fname,
+                             mode_t mode);
+
+typedef int (*smbc_utimes_fn)(SMBCCTX *c,
+                              const char *fname,
+                              struct timeval *tbuf);
+
 
 
 #define smbc_getOptionUserData(ctx)		\
@@ -184,6 +192,9 @@ typedef int (*smbc_mkdir_fn)(SMBCCTX *c,
 
 #define smbc_getFunctionMkdir(ctx)	ctx->mkdir
 
+#define smbc_getFunctionChmod(ctx)	ctx->chmod
+
+#define smbc_getFunctionUtimes(ctx)	ctx->utimes
 
 
 #endif

@@ -1517,18 +1517,95 @@ try_query_settable_attributes (GVfsBackend *backend,
 
   list = g_file_attribute_info_list_new ();
 
-  /* TODO: Add all settable attributes here */
-  /*
+  /* TODO: Add all settable attributes here -- bug #559586 */
+  /* TODO: xattrs support? */
+
   g_file_attribute_info_list_add (list,
-				  "smb:test",
-				  G_FILE_ATTRIBUTE_TYPE_UINT32);
-  */
+                                  G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                  G_FILE_ATTRIBUTE_TYPE_UINT64,
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+
+#if 0
+/* FIXME: disabled; despite chmod is supported, it makes no sense on samba shares and
+          libsmbclient lacks proper API to read unix file modes.
+          The struct stat->st_mode member is used for special Windows attributes. */
+  g_file_attribute_info_list_add (list,
+                                  G_FILE_ATTRIBUTE_UNIX_MODE,
+                                  G_FILE_ATTRIBUTE_TYPE_UINT32,
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+                                  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+#endif
 
   g_vfs_job_query_attributes_set_list (job, list);
   g_vfs_job_succeeded (G_VFS_JOB (job));
   
   g_file_attribute_info_list_unref (list);
   return TRUE;
+}
+
+static void
+do_set_attribute (GVfsBackend *backend,
+                  GVfsJobSetAttribute *job,
+                  const char *filename,
+                  const char *attribute,
+                  GFileAttributeType type,
+                  gpointer value_p,
+                  GFileQueryInfoFlags flags)
+{
+  GVfsBackendSmb *op_backend;
+  char *uri;
+  int res, errsv;
+  struct timeval tbuf[2];
+  smbc_utimes_fn smbc_utimes;
+#if 0
+  smbc_chmod_fn smbc_chmod;
+#endif
+
+
+  op_backend = G_VFS_BACKEND_SMB (backend);
+
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) != 0
+#if 0
+      && strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) != 0
+#endif
+      )
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                        _("Operation unsupported"));
+      return;
+    }
+
+  uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+  res = -1;
+
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == 0)
+    {
+      smbc_utimes = smbc_getFunctionUtimes (op_backend->smb_context);
+      tbuf[1].tv_sec = (*(guint64 *)value_p);  /* mtime */
+      tbuf[1].tv_usec = 0;
+      /* atime = mtime (atimes are usually disabled on desktop systems) */
+      tbuf[0].tv_sec = tbuf[1].tv_sec;  
+      tbuf[0].tv_usec = 0;
+      res = smbc_utimes (op_backend->smb_context, uri, &tbuf[0]);
+    }
+#if 0
+  else
+  if (strcmp (attribute, G_FILE_ATTRIBUTE_UNIX_MODE) == 0)
+    {
+      smbc_chmod = smbc_getFunctionChmod (op_backend->smb_context);
+      res = smbc_chmod (op_backend->smb_context, uri, (*(guint32 *)value_p) & 0777);
+    }
+#endif    
+
+  errsv = errno;
+  g_free (uri);
+
+  if (res != 0)
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
 static void
@@ -1932,6 +2009,7 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->make_directory = do_make_directory;
   backend_class->move = do_move;
   backend_class->try_query_settable_attributes = try_query_settable_attributes;
+  backend_class->set_attribute = do_set_attribute;
 
 #ifdef HAVE_GCONF
   gclient = gconf_client_get_default ();
