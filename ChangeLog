@@ -2,6 +2,15 @@
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_connection_prepare),
+	(ftp_connection_use), (g_vfs_backend_ftp_pop_connection),
+	(do_mount):
+	Do FEAT and OPTS UTF8 ON before login. This mirros behavior of lftp.
+
+2008-11-17  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c:
 	(ftp_connection_ensure_data_connection_epsv),
 	(ftp_connection_ensure_data_connection_pasv):

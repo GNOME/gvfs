@@ -749,21 +749,26 @@ ftp_connection_parse_system (FtpConnection *conn)
 }
 
 static gboolean
-ftp_connection_use (FtpConnection *conn)
+ftp_connection_prepare (FtpConnection *conn)
 {
-  /* only binary transfers please */
-  ftp_connection_send (conn, 0, "TYPE I");
-  if (ftp_connection_in_error (conn))
-    return FALSE;
-
   /* check supported features */
   if (ftp_connection_send (conn, 0, "FEAT") != 0)
     ftp_connection_parse_features (conn);
   else
     conn->features = FTP_FEATURES_DEFAULT;
 
+  /* instruct server that we'll give and assume we get utf8 */
   if (conn->features & FTP_FEATURE_UTF8)
     ftp_connection_send (conn, 0, "OPTS UTF8 ON");
+}
+
+static gboolean
+ftp_connection_use (FtpConnection *conn)
+{
+  /* only binary transfers please */
+  ftp_connection_send (conn, 0, "TYPE I");
+  if (ftp_connection_in_error (conn))
+    return FALSE;
 
 #if 0
   /* RFC 2428 suggests to send this to make NAT routers happy */
@@ -1283,6 +1288,7 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	  ftp->connections++;
 	  g_mutex_unlock (ftp->mutex);
 	  conn = ftp_connection_create (ftp->addr, job);
+	  ftp_connection_prepare (conn);
 	  ftp_connection_login (conn, ftp->user, ftp->password);
 	  ftp_connection_use (conn);
 	  if (!ftp_connection_in_error (conn))
@@ -1396,6 +1402,8 @@ do_mount (GVfsBackend *backend,
       ftp_connection_free (conn);
       return;
     }
+
+  ftp_connection_prepare (conn);
 
   port = soup_address_get_port (ftp->addr);
   /* FIXME: need to translate this? */
