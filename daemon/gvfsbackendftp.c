@@ -23,6 +23,7 @@
 
 #include <config.h>
 
+#include <ctype.h>
 #include <errno.h> /* for strerror (EAGAIN) */
 #include <stdio.h>
 #include <stdlib.h>
@@ -641,19 +642,30 @@ ftp_connection_parse_features (FtpConnection *conn)
   char **supported;
   guint i, j;
 
-  supported = g_strsplit (conn->read_buffer, "\r\n", -1);
+  /* The "\n" should really be "\r\n" but we deal with both to handle broken
+   * servers. We strip off '\r' later, if it exists. */
+  supported = g_strsplit (conn->read_buffer, "\n", -1);
 
   for (i = 1; supported[i]; i++)
     {
-      const char *feature = supported[i];
+      char *feature = supported[i];
+      int len;
+
       if (feature[0] != ' ')
 	continue;
+      feature++;
 
       /* There should just be one space according to RFC2389, but some
        * servers have more so we deal with any number of leading spaces.
        */
-      while (feature[0] == ' ')
+      while (isspace (feature[0]))
         feature++;
+
+      /* strip off trailing '\r', if it exists. */
+      len = strlen(feature);
+      if (len > 0 && feature[len-1] == '\r')
+	      feature[len-1] = '\0';
+
       for (j = 0; j < G_N_ELEMENTS (features); j++)
 	{
 	  if (g_ascii_strcasecmp (feature, features[j].name) == 0)
@@ -753,7 +765,7 @@ ftp_connection_parse_system (FtpConnection *conn)
     }
 }
 
-static gboolean
+static void
 ftp_connection_prepare (FtpConnection *conn)
 {
   /* check supported features */

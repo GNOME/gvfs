@@ -3,6 +3,13 @@
 	reviewed by: Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c: (ftp_connection_parse_features):
+	Deal with "\n" vs "\r\n" in FEAT responses. Researched by Oliver Joos.
+
+2008-11-17  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_parse_features):
 	Be less strict in leading spaces of FEAT reply.
 	Researched by Oliver Joos. Apparently common, one affected ftp server
 	visible in bug #556809.
