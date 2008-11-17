@@ -23,7 +23,6 @@
 
 #include <config.h>
 
-#include <ctype.h>
 #include <errno.h> /* for strerror (EAGAIN) */
 #include <stdio.h>
 #include <stdlib.h>
@@ -666,7 +665,7 @@ ftp_connection_parse_features (FtpConnection *conn)
       /* There should just be one space according to RFC2389, but some
        * servers have more so we deal with any number of leading spaces.
        */
-      while (isspace (feature[0]))
+      while (g_ascii_isspace (feature[0]))
         feature++;
 
       /* strip off trailing '\r', if it exists. */
