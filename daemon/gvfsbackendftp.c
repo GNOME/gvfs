@@ -107,6 +107,11 @@ typedef enum {
   FTP_SYSTEM_WINDOWS
 } FtpSystem;
 
+typedef enum {
+  FTP_WORKAROUND_BROKEN_EPSV = (1 << 0),
+  FTP_WORKAROUND_PASV_ADDR = (1 << 1),
+} FtpWorkarounds;
+
 struct _GVfsBackendFtp
 {
   GVfsBackend		backend;
@@ -147,6 +152,7 @@ struct _FtpConnection
 
   FtpFeatures		features;
   FtpSystem		system;
+  FtpWorkarounds	workarounds;
 
   SoupSocket *		commands;
   gchar *	      	read_buffer;
@@ -816,8 +822,12 @@ ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
   guint port;
   SoupAddress *addr;
   guint status;
+  gboolean connected;
 
   if ((conn->features & FTP_FEATURE_EPSV) == 0)
+    return FALSE;
+
+  if (conn->workarounds & FTP_WORKAROUND_BROKEN_EPSV)
     return FALSE;
 
   status = ftp_connection_send (conn, RESPONSE_PASS_500, "EPSV");
@@ -837,15 +847,22 @@ ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
 		      soup_address_get_name (soup_socket_get_remote_address (conn->commands)),
 		      port);
 
-  return ftp_connection_open_data_connection (conn, addr);
+  connected = ftp_connection_open_data_connection (conn, addr);
+  if (!connected)
+    {
+      DEBUG ("Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
+      conn->workarounds |= FTP_WORKAROUND_BROKEN_EPSV;
+      g_clear_error (&conn->error);
+    }
+  return connected;
 }
 
 static gboolean
 ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
 {
   guint ip1, ip2, ip3, ip4, port1, port2;
-  char *ip;
   const char *s;
+  gboolean connected;
   SoupAddress *addr;
   guint status;
 
@@ -860,8 +877,8 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
   for (s = conn->read_buffer; *s; s++)
     {
       if (sscanf (s, "%u,%u,%u,%u,%u,%u", 
-                 &ip1, &ip2, &ip3, &ip4, 
-                 &port1, &port2) == 6)
+		 &ip1, &ip2, &ip3, &ip4, 
+		 &port1, &port2) == 6)
        break;
     }
   if (*s == 0)
@@ -871,10 +888,33 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
       return FALSE;
     }
 
-  ip = g_strdup_printf ("%u.%u.%u.%u", ip1, ip2, ip3, ip4);
-  addr = soup_address_new (ip, port1 << 8 | port2);
-  g_free (ip);
+  if (!(conn->workarounds & FTP_WORKAROUND_PASV_ADDR))
+    {
+      char *ip;
 
+      ip = g_strdup_printf ("%u.%u.%u.%u", ip1, ip2, ip3, ip4);
+      addr = soup_address_new (ip, port1 << 8 | port2);
+      g_free (ip);
+
+      connected = ftp_connection_open_data_connection (conn, addr);
+      if (!connected)
+        {
+          /* set workaround flag (see below), so we don't try this again */
+          DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
+          conn->workarounds |= FTP_WORKAROUND_PASV_ADDR;
+          g_clear_error (&conn->error);
+	}
+    }
+
+  /* Workaround code:
+   * Various ftp servers aren;t setup correctly when behind a NAT. They report
+   * their own IP address (like 10.0.0.4) and not the address in front of the
+   * NAT. But this is likely the same address that we connected to with our
+   * command connetion. So if the address given by PASV fails, we fall back 
+   * to the address of the command stream.
+   */
+  addr = soup_address_new (soup_address_get_name (soup_socket_get_remote_address (conn->commands)),
+			   port1 << 8 | port2);
   return ftp_connection_open_data_connection (conn, addr);
 }
 

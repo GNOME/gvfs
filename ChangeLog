@@ -3,6 +3,19 @@
 	reviewed by: Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c:
+	(ftp_connection_ensure_data_connection_epsv),
+	(ftp_connection_ensure_data_connection_pasv):
+	Add workarounds for EPSV/PASV data connection failures.
+	- don't use EPSV if we get successful return codes but fails to
+	connect.
+	- don't use address in PASV response if we fail to connect to it
+	 (use the same address as the command connection is established to).
+
+2008-11-17  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
 	(_ftp_connection_ensure_data_connection),
 	(ftp_connection_ensure_data_connection_epsv),
 	(ftp_connection_ensure_data_connection_pasv),
