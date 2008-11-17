@@ -96,7 +96,8 @@ typedef enum {
   FTP_FEATURE_MDTM = (1 << 0),
   FTP_FEATURE_SIZE = (1 << 1),
   FTP_FEATURE_TVFS = (1 << 2),
-  FTP_FEATURE_EPSV = (1 << 3)
+  FTP_FEATURE_EPSV = (1 << 3),
+  FTP_FEATURE_UTF8 = (1 << 4),
 } FtpFeatures;
 #define FTP_FEATURES_DEFAULT (FTP_FEATURE_EPSV)
 
@@ -628,7 +629,8 @@ ftp_connection_parse_features (FtpConnection *conn)
     { "MDTM", FTP_FEATURE_MDTM },
     { "SIZE", FTP_FEATURE_SIZE },
     { "TVFS", FTP_FEATURE_TVFS },
-    { "EPSV", FTP_FEATURE_EPSV }
+    { "EPSV", FTP_FEATURE_EPSV },
+    { "UTF8", FTP_FEATURE_UTF8 },
   };
   char **supported;
   guint i, j;
