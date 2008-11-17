@@ -111,6 +111,7 @@ typedef enum {
 typedef enum {
   FTP_WORKAROUND_BROKEN_EPSV = (1 << 0),
   FTP_WORKAROUND_PASV_ADDR = (1 << 1),
+  FTP_WORKAROUND_FEAT_AFTER_LOGIN = (1 << 2),
 } FtpWorkarounds;
 
 struct _GVfsBackendFtp
@@ -769,10 +770,13 @@ static void
 ftp_connection_prepare (FtpConnection *conn)
 {
   /* check supported features */
-  if (ftp_connection_send (conn, 0, "FEAT") != 0)
+  if (ftp_connection_send (conn, 0, "FEAT") != 0) {
     ftp_connection_parse_features (conn);
-  else
-    conn->features = FTP_FEATURES_DEFAULT;
+  } else {
+    g_clear_error (&conn->error);
+    conn->workarounds |= FTP_WORKAROUND_FEAT_AFTER_LOGIN;
+    conn->features = 0;
+  }
 
   /* instruct server that we'll give and assume we get utf8 */
   if (conn->features & FTP_FEATURE_UTF8)
@@ -803,6 +807,15 @@ ftp_connection_use (FtpConnection *conn)
     ftp_connection_send (conn, 0, "EPSV ALL");
   g_clear_error (&conn->error);
 #endif
+
+  if (conn->workarounds & FTP_WORKAROUND_FEAT_AFTER_LOGIN) {
+    if (ftp_connection_send (conn, 0, "FEAT") != 0) {
+      ftp_connection_parse_features (conn);
+    } else {
+      g_clear_error (&conn->error);
+      conn->features = FTP_FEATURE_EPSV;
+    }
+  }
 
   if (ftp_connection_send (conn, 0, "SYST"))
     ftp_connection_parse_system (conn);

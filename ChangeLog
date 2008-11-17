@@ -1,3 +1,11 @@
+2008-11-17  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_prepare),
+	(ftp_connection_use):
+	If feat before login fails, try it again after login. (fixes bug
+	#556786, researched by Oliver Joos) So we're now "better than gftp and
+	filezilla together". Take that gnome-vfs!
+
 2008-11-17  Andreas Henriksson <andreas@fatal.se>
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>
