@@ -648,7 +648,12 @@ ftp_connection_parse_features (FtpConnection *conn)
       const char *feature = supported[i];
       if (feature[0] != ' ')
 	continue;
-      feature++;
+
+      /* There should just be one space according to RFC2389, but some
+       * servers have more so we deal with any number of leading spaces.
+       */
+      while (feature[0] == ' ')
+        feature++;
       for (j = 0; j < G_N_ELEMENTS (features); j++)
 	{
 	  if (g_ascii_strcasecmp (feature, features[j].name) == 0)
