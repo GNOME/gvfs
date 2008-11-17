@@ -109,8 +109,15 @@ typedef enum {
 } FtpSystem;
 
 typedef enum {
+  /* Server advertises support for EPSV (or we assume that it supports it),
+   * but it does fail to do so, we set this flag so we can fall back to 
+   * PASV. */
   FTP_WORKAROUND_BROKEN_EPSV = (1 << 0),
+  /* Server replies with a wrong address in PASV, we use connection IP 
+   * instead */
   FTP_WORKAROUND_PASV_ADDR = (1 << 1),
+  /* server does not allow querying features before login, so we try after
+   * logging in instead. */
   FTP_WORKAROUND_FEAT_AFTER_LOGIN = (1 << 2),
 } FtpWorkarounds;
 
