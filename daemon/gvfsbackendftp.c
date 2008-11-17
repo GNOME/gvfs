@@ -756,6 +756,9 @@ ftp_connection_use (FtpConnection *conn)
   else
     conn->features = FTP_FEATURES_DEFAULT;
 
+  if (conn->features & FTP_FEATURE_UTF8)
+    ftp_connection_send (conn, 0, "OPTS UTF8 ON");
+
   /* RFC 2428 suggests to send this to make NAT routers happy */
   if (conn->features & FTP_FEATURE_EPSV)
     ftp_connection_send (conn, 0, "EPSV ALL");

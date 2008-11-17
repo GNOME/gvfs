@@ -2,6 +2,13 @@
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_connection_use):
+	Use UTF8 when available.
+
+2008-11-17  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_connection_parse_features):
 	Add UTF8 to feature parsing.
 
