@@ -784,61 +784,10 @@ ftp_connection_use (FtpConnection *conn)
 }
 
 static gboolean
-ftp_connection_ensure_data_connection (FtpConnection *conn)
+ftp_connection_open_data_connection (FtpConnection *conn, SoupAddress *addr)
 {
-  guint ip1, ip2, ip3, ip4, port1, port2;
-  SoupAddress *addr;
-  const char *s;
-  char *ip;
   guint status;
 
-  if (conn->features & FTP_FEATURE_EPSV)
-    {
-      status = ftp_connection_send (conn, RESPONSE_PASS_500, "EPSV");
-      if (STATUS_GROUP (status) == 2)
-	{
-	  s = strrchr (conn->read_buffer, '(');
-	  if (s)
-	    {
-	      guint port;
-	      s += 4;
-	      port = strtoul (s, NULL, 10);
-	      if (port != 0)
-		{
-		  addr = soup_address_new (
-		      soup_address_get_name (soup_socket_get_remote_address (conn->commands)),
-		      port);
-		  goto have_address;
-		}
-	    }
-	}
-    }
-  /* only binary transfers please */
-  status = ftp_connection_send (conn, 0, "PASV");
-  if (status == 0)
-    return FALSE;
-
-  /* parse response and try to find the address to connect to.
-   * This code does the sameas curl.
-   */
-  for (s = conn->read_buffer; *s; s++)
-    {
-      if (sscanf (s, "%u,%u,%u,%u,%u,%u", 
-                 &ip1, &ip2, &ip3, &ip4, 
-                 &port1, &port2) == 6)
-       break;
-    }
-  if (*s == 0)
-    {
-      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid reply"));
-      return FALSE;
-    }
-  ip = g_strdup_printf ("%u.%u.%u.%u", ip1, ip2, ip3, ip4);
-  addr = soup_address_new (ip, port1 << 8 | port2);
-  g_free (ip);
-
-have_address:
   conn->data = soup_socket_new ("non-blocking", FALSE,
 				"remote-address", addr,
 				"timeout", TIMEOUT_IN_SECONDS,
@@ -858,6 +807,90 @@ have_address:
     }
 
   return TRUE;
+}
+
+static gboolean
+ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
+{
+  const char *s;
+  guint port;
+  SoupAddress *addr;
+  guint status;
+
+  if ((conn->features & FTP_FEATURE_EPSV) == 0)
+    return FALSE;
+
+  status = ftp_connection_send (conn, RESPONSE_PASS_500, "EPSV");
+  if (STATUS_GROUP (status) != 2)
+    return FALSE;
+
+  s = strrchr (conn->read_buffer, '(');
+  if (!s)
+    return FALSE;
+
+  s += 4;
+  port = strtoul (s, NULL, 10);
+  if (port == 0)
+    return FALSE;
+
+  addr = soup_address_new (
+		      soup_address_get_name (soup_socket_get_remote_address (conn->commands)),
+		      port);
+
+  return ftp_connection_open_data_connection (conn, addr);
+}
+
+static gboolean
+ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
+{
+  guint ip1, ip2, ip3, ip4, port1, port2;
+  char *ip;
+  const char *s;
+  SoupAddress *addr;
+  guint status;
+
+  /* only binary transfers please */
+  status = ftp_connection_send (conn, 0, "PASV");
+  if (status == 0)
+    return FALSE;
+
+  /* parse response and try to find the address to connect to.
+   * This code does the same as curl.
+   */
+  for (s = conn->read_buffer; *s; s++)
+    {
+      if (sscanf (s, "%u,%u,%u,%u,%u,%u", 
+                 &ip1, &ip2, &ip3, &ip4, 
+                 &port1, &port2) == 6)
+       break;
+    }
+  if (*s == 0)
+    {
+      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid reply"));
+      return FALSE;
+    }
+
+  ip = g_strdup_printf ("%u.%u.%u.%u", ip1, ip2, ip3, ip4);
+  addr = soup_address_new (ip, port1 << 8 | port2);
+  g_free (ip);
+
+  return ftp_connection_open_data_connection (conn, addr);
+}
+
+static gboolean
+ftp_connection_ensure_data_connection (FtpConnection *conn)
+{
+  if (ftp_connection_ensure_data_connection_epsv (conn))
+    return TRUE;
+
+  if (ftp_connection_in_error (conn))
+    return FALSE;
+
+  if (ftp_connection_ensure_data_connection_pasv (conn))
+    return TRUE;
+
+  return FALSE;
 }
 
 static void

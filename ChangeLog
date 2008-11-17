@@ -2,6 +2,22 @@
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c:
+	(_ftp_connection_ensure_data_connection),
+	(ftp_connection_ensure_data_connection_epsv),
+	(ftp_connection_ensure_data_connection_pasv),
+	(ftp_connection_ensure_data_connection):
+	Restructure ..._ensure_data_connection and fall back on PASV when EPSV
+	fails.
+	- split up ..._ensure_data_connection in subroutines
+	- make a full attempt to connect instead of relying on response
+	  code from EPSV command.
+	- when EPSV data connection fails, try PASV.
+
+2008-11-17  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_connection_use):
 	 Disable usage of "EPSV ALL". (fixes #547855). See in-source comment
 	 for the reasons.
