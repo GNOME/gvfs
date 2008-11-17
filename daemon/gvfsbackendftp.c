@@ -759,10 +759,22 @@ ftp_connection_use (FtpConnection *conn)
   if (conn->features & FTP_FEATURE_UTF8)
     ftp_connection_send (conn, 0, "OPTS UTF8 ON");
 
+#if 0
   /* RFC 2428 suggests to send this to make NAT routers happy */
+  /* XXX: Disabled for the following reasons:
+   * - most ftp clients don't use it
+   * - lots of broken ftp servers can't see the difference between 
+   *   "EPSV" and "EPSV ALL"
+   * - impossible to dynamically fall back to regular PASV in case
+   *   EPSV doesn't work for some reason.
+   * If this makes your ftp connection fail, please file a bug and we will
+   * try to invent a way to make this all work. Until then, we'll just 
+   * ignore the RFC.
+   */
   if (conn->features & FTP_FEATURE_EPSV)
     ftp_connection_send (conn, 0, "EPSV ALL");
   g_clear_error (&conn->error);
+#endif
 
   if (ftp_connection_send (conn, 0, "SYST"))
     ftp_connection_parse_system (conn);
