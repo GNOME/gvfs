@@ -1,6 +1,11 @@
 2008-11-18  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:
+	Better name for the has-username case.
+	
+2008-11-18  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
 	If user is specified, add to name too, so we get a unique fuse path
 
 2008-11-17  Benjamin Otte  <otte@gnome.org>

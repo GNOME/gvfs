@@ -1516,8 +1516,8 @@ do_mount (GVfsBackend *backend,
   g_mount_spec_unref (sftp_mount_spec);
 
   if (op_backend->user_specified)
-    /* Translators: This is the name of an sftp share, like "sftp on <hostname> as <user>" */
-    display_name = g_strdup_printf (_("sftp on %s as %s"), op_backend->host, op_backend->user);
+    /* Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>" */
+    display_name = g_strdup_printf (_("sftp for %s on %s"), op_backend->user, op_backend->host);
   else
     /* Translators: This is the name of an sftp share, like "sftp on <hostname>" */
     display_name = g_strdup_printf (_("sftp on %s"), op_backend->host);
