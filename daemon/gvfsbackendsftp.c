@@ -1515,8 +1515,12 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, sftp_mount_spec);
   g_mount_spec_unref (sftp_mount_spec);
 
-  /* Translators: This is the name of an sftp share, like "sftp on <hostname>" */
-  display_name = g_strdup_printf (_("sftp on %s"), op_backend->host);
+  if (op_backend->user_specified)
+    /* Not translated on stable branch, but needed to fix fuse dirname conflict */
+    display_name = g_strdup_printf ("sftp for %s on %s", op_backend->user, op_backend->host);
+  else
+    /* Translators: This is the name of an sftp share, like "sftp on <hostname>" */
+    display_name = g_strdup_printf (_("sftp on %s"), op_backend->host);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
