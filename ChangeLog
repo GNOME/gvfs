@@ -1,3 +1,8 @@
+2008-11-24  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
 2008-11-18  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

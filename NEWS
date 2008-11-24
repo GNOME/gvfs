@@ -1,3 +1,11 @@
+Major changes in 1.0.3
+======================
+
+* Fixed custom mimetype icon won't display problem
+  (requires new glib and nautilus too)
+* Fixed a memory leak
+* Fixed paste into menu item blinking in nautilus
+
 Major changes in 1.0.2
 ======================
 
