@@ -1,3 +1,8 @@
+2008-11-25  Frederic Peters  <fpeters@0d.be>
+
+	* daemon/gvfsbackendsftp.c: (do_mount):
+	Add translation marks and translator comment to the sftp fuse path.
+
 2008-11-24  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
