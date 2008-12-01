@@ -24,6 +24,7 @@
 #define __G_MOUNT_TRACKER_H__
 
 #include <glib-object.h>
+#include <gio/gio.h>
 #include <gmountspec.h>
 
 G_BEGIN_DECLS
@@ -43,7 +44,7 @@ typedef struct {
   char *display_name;
   char *stable_name;
   char *x_content_types;
-  char *icon;
+  GIcon *icon;
   char *dbus_id;
   char *object_path;
   gboolean user_visible;

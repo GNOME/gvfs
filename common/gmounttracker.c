@@ -90,7 +90,7 @@ g_mount_info_dup (GMountInfo *info)
   copy->display_name = g_strdup (info->display_name);
   copy->stable_name = g_strdup (info->stable_name);
   copy->x_content_types = g_strdup (info->x_content_types);
-  copy->icon = g_strdup (info->icon);
+  copy->icon = g_object_ref (info->icon);
   copy->dbus_id = g_strdup (info->dbus_id);
   copy->object_path = g_strdup (info->object_path);
   copy->mount_spec = g_mount_spec_copy (info->mount_spec);
@@ -116,7 +116,7 @@ g_mount_info_unref (GMountInfo *info)
       g_free (info->display_name);
       g_free (info->stable_name);
       g_free (info->x_content_types);
-      g_free (info->icon);
+      g_object_unref (info->icon);
       g_free (info->dbus_id);
       g_free (info->object_path);
       g_mount_spec_unref (info->mount_spec);
@@ -161,11 +161,13 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   char *display_name;
   char *stable_name;
   char *x_content_types;
-  char *icon;
+  char *icon_str;
   char *prefered_filename_encoding;
   char *dbus_id;
   char *obj_path;
   char *fuse_mountpoint;
+  GIcon *icon;
+  GError *error;
 
   if (dbus_message_iter_get_arg_type (iter) != DBUS_TYPE_STRUCT)
     return NULL;
@@ -178,7 +180,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
 				      DBUS_TYPE_STRING, &display_name,
 				      DBUS_TYPE_STRING, &stable_name,
                                       DBUS_TYPE_STRING, &x_content_types,
-				      DBUS_TYPE_STRING, &icon,
+				      DBUS_TYPE_STRING, &icon_str,
 				      DBUS_TYPE_STRING, &prefered_filename_encoding,
 				      DBUS_TYPE_BOOLEAN, &user_visible,
 				      G_DBUS_TYPE_CSTRING, &fuse_mountpoint,
@@ -191,12 +193,23 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
     return NULL;
   }
 
+  if (icon_str == NULL || strlen (icon_str) == 0)
+    icon_str = "drive-removable-media";
+  error = NULL;
+  icon = g_icon_new_for_string (icon_str, &error);
+  if (icon == NULL)
+    {
+      g_warning ("Malformed icon string '%s': %s", icon_str, error->message);
+      g_error_free (error);
+      icon = g_themed_icon_new ("gtk-missing-image"); /* TODO: maybe choose a better name */
+    }
+
   info = g_new0 (GMountInfo, 1);
   info->ref_count = 1;
   info->display_name = g_strdup (display_name);
   info->stable_name = g_strdup (stable_name);
   info->x_content_types = g_strdup (x_content_types);
-  info->icon = g_strdup (icon);
+  info->icon = icon;
   info->dbus_id = g_strdup (dbus_id);
   info->object_path = g_strdup (obj_path);
   info->mount_spec = mount_spec;

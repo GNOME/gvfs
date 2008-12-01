@@ -1067,7 +1067,6 @@ try_query_info (GVfsBackend *backend,
 		GFileAttributeMatcher *matcher)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
-  const char *icon_name;
   GIcon *icon;
 
   if (is_root (filename))
@@ -1075,13 +1074,9 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
       g_file_info_set_display_name (info, g_vfs_backend_get_display_name (backend));
-      icon_name = g_vfs_backend_get_icon_name (backend);
-      if (icon_name)
-	{
-	  icon = g_themed_icon_new (icon_name);
-	  g_file_info_set_icon (info, icon);
-	  g_object_unref (icon);
-	}
+      icon = g_vfs_backend_get_icon (backend);
+      if (icon != NULL)
+        g_file_info_set_icon (info, icon);
       g_vfs_job_succeeded (G_VFS_JOB (job));
       
       return TRUE;

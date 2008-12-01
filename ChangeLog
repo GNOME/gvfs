@@ -1,5 +1,20 @@
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonmount.c:
+        * common/gmounttracker.[ch]:
+        * daemon/gvfsbackend.[ch]:
+	Make mounts/backends have a GIcon not a icon name
+	
+        * daemon/gvfsbackendsftp.c:
+	Support /etc/favicon.png
+	
+        * daemon/gvfsbackendsmbbrowse.c:
+	Simplify some code with the new GIcon support
+
+	Patch from David Zeuthen (#557540)
+
+2008-12-01  Alexander Larsson  <alexl@redhat.com>
+
         * common/Makefile.am:
         * common/gvfsdnssdresolver.c: Added.
         * common/gvfsdnssdresolver.h: Added.

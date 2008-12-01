@@ -71,7 +71,7 @@ struct _GVfsBackendPrivate
   char *display_name;
   char *stable_name;
   char **x_content_types;
-  char *icon;
+  GIcon *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
   GMountSpec *mount_spec;
@@ -146,7 +146,8 @@ g_vfs_backend_finalize (GObject *object)
   g_free (backend->priv->display_name);
   g_free (backend->priv->stable_name);
   g_strfreev (backend->priv->x_content_types);
-  g_free (backend->priv->icon);
+  if (backend->priv->icon != NULL)
+    g_object_unref (backend->priv->icon);
   g_free (backend->priv->prefered_filename_encoding);
   if (backend->priv->mount_spec)
     g_mount_spec_unref (backend->priv->mount_spec);
@@ -194,7 +195,7 @@ static void
 g_vfs_backend_init (GVfsBackend *backend)
 {
   backend->priv = G_TYPE_INSTANCE_GET_PRIVATE (backend, G_VFS_TYPE_BACKEND, GVfsBackendPrivate);
-  backend->priv->icon = g_strdup ("");
+  backend->priv->icon = NULL;
   backend->priv->prefered_filename_encoding = g_strdup ("");
   backend->priv->display_name = g_strdup ("");
   backend->priv->stable_name = g_strdup ("");
@@ -326,10 +327,20 @@ g_vfs_backend_set_x_content_types (GVfsBackend        *backend,
 
 void
 g_vfs_backend_set_icon_name (GVfsBackend *backend,
-			     const char *icon)
+			     const char *icon_name)
 {
-  g_free (backend->priv->icon);
-  backend->priv->icon = g_strdup (icon);
+  if (backend->priv->icon != NULL)
+    g_object_unref (backend->priv->icon);
+  backend->priv->icon = g_themed_icon_new_with_default_fallbacks (icon_name);
+}
+
+void
+g_vfs_backend_set_icon (GVfsBackend *backend,
+                        GIcon       *icon)
+{
+  if (backend->priv->icon != NULL)
+    g_object_unref (backend->priv->icon);
+  backend->priv->icon = g_object_ref (icon);
 }
 
 void
@@ -382,8 +393,8 @@ g_vfs_backend_get_x_content_types (GVfsBackend *backend)
   return backend->priv->x_content_types;
 }
 
-const char *
-g_vfs_backend_get_icon_name (GVfsBackend *backend)
+GIcon *
+g_vfs_backend_get_icon (GVfsBackend *backend)
 {
   return backend->priv->icon;
 }
@@ -591,11 +602,17 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   DBusMessageIter iter;
   dbus_bool_t user_visible;
   char *x_content_types_string;
+  char *icon_str;
 
   if (backend->priv->x_content_types != NULL && g_strv_length (backend->priv->x_content_types) > 0)
     x_content_types_string = g_strjoinv (" ", backend->priv->x_content_types);
   else
     x_content_types_string = g_strdup ("");
+
+  if (backend->priv->icon != NULL)
+    icon_str = g_icon_to_string (backend->priv->icon);
+  else
+    icon_str = g_strdup ("");
 
   message = dbus_message_new_method_call (G_VFS_DBUS_DAEMON_NAME,
 					  G_VFS_DBUS_MOUNTTRACKER_PATH,
@@ -616,7 +633,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 				 DBUS_TYPE_STRING, &backend->priv->display_name,
 				 DBUS_TYPE_STRING, &stable_name,
                                  DBUS_TYPE_STRING, &x_content_types_string,
-				 DBUS_TYPE_STRING, &backend->priv->icon,
+				 DBUS_TYPE_STRING, &icon_str,
 				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
 				 DBUS_TYPE_BOOLEAN, &user_visible,
 				 0))
@@ -632,6 +649,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   dbus_message_unref (message);
 
   g_free (x_content_types_string);
+  g_free (icon_str);
 }
 
 void

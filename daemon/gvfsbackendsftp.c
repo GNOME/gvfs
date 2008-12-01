@@ -37,8 +37,12 @@
 #include <gio/gunixinputstream.h>
 #include <gio/gunixoutputstream.h>
 
+#include "gvfsicon.h"
+
 #include "gvfsbackendsftp.h"
 #include "gvfsjobopenforread.h"
+#include "gvfsjobopeniconforread.h"
+#include "gvfsjobmount.h"
 #include "gvfsjobread.h"
 #include "gvfsjobseekread.h"
 #include "gvfsjobopenforwrite.h"
@@ -173,6 +177,9 @@ static void parse_attributes (GVfsBackendSftp *backend,
                               const char *basename,
                               GDataInputStream *reply,
                               GFileAttributeMatcher *attribute_matcher);
+
+static void setup_icon (GVfsBackendSftp *op_backend,
+                        GVfsJobMount    *job);
 
 
 G_DEFINE_TYPE (GVfsBackendSftp, g_vfs_backend_sftp, G_VFS_TYPE_BACKEND)
@@ -1523,9 +1530,11 @@ do_mount (GVfsBackend *backend,
     display_name = g_strdup_printf (_("sftp on %s"), op_backend->host);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
-  g_vfs_backend_set_icon_name (backend, "folder-remote");
 
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+  /* checks for /etc/favicon.png */
+  setup_icon (op_backend, job);
+  
+  /* NOTE: job_succeeded called async from setup_icon reply */
 }
 
 static gboolean
@@ -2054,6 +2063,26 @@ try_open_for_read (GVfsBackend *backend,
   
   queue_command_stream_and_free (op_backend, command, open_for_read_reply, G_VFS_JOB (job), NULL);
 
+  return TRUE;
+}
+
+static gboolean
+try_open_icon_for_read (GVfsBackend *backend,
+                        GVfsJobOpenIconForRead *job,
+                        const char *icon_id)
+{
+  if (g_str_has_prefix (icon_id, "favicon:"))
+    {
+      return try_open_for_read (backend,
+                                G_VFS_JOB_OPEN_FOR_READ (job),
+                                icon_id + sizeof ("favicon:") -1);
+    }
+
+  g_vfs_job_failed (G_VFS_JOB (job),
+                    G_IO_ERROR,
+                    G_IO_ERROR_INVALID_ARGUMENT,
+                    _("Invalid icon_id '%s' in OpenIconForRead"),
+                    icon_id);
   return TRUE;
 }
 
@@ -3880,6 +3909,56 @@ try_set_attribute (GVfsBackend *backend,
 }
 
 static void
+setup_icon_reply (GVfsBackendSftp *backend,
+                  MultiReply *replies,
+                  int n_replies,
+                  GVfsJob *job,
+                  gpointer user_data)
+{
+  GIcon *icon;
+  gboolean have_favicon;
+  MultiReply *stat_reply;
+
+  have_favicon = FALSE;
+
+  stat_reply = &replies[0];
+  if (stat_reply->type == SSH_FXP_ATTRS)
+    have_favicon = TRUE;
+
+  if (have_favicon)
+    {
+      icon = g_vfs_icon_new (g_vfs_backend_get_mount_spec (G_VFS_BACKEND (backend)),
+                             "favicon:/etc/favicon.png");
+      g_vfs_backend_set_icon (G_VFS_BACKEND (backend), icon);
+      g_object_unref (icon);
+    }
+  else
+    {
+      g_vfs_backend_set_icon_name (G_VFS_BACKEND (backend), "folder-remote");
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+/* called from do_mount(); finds out if there's an /etc/favicon.png file; if so, use it as the icon */
+static void
+setup_icon (GVfsBackendSftp *op_backend,
+            GVfsJobMount    *job)
+{
+  GDataOutputStream *command;
+
+  command = new_command_stream (op_backend, SSH_FXP_STAT);
+  put_string (command, "/etc/favicon.png");
+
+  queue_command_streams_and_free (op_backend,
+                                  &command,
+                                  1,
+                                  setup_icon_reply,
+                                  G_VFS_JOB (job),
+                                  NULL);
+}
+
+static void
 g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -3891,6 +3970,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 
   backend_class->mount = do_mount;
   backend_class->try_mount = try_mount;
+  backend_class->try_open_icon_for_read = try_open_icon_for_read;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;
   backend_class->try_seek_on_read = try_seek_on_read;
