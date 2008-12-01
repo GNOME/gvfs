@@ -61,9 +61,19 @@
 #include "soup-input-stream.h"
 #include "soup-output-stream.h"
 
+#ifdef HAVE_AVAHI
+#include "gvfsdnssdutils.h"
+#include "gvfsdnssdresolver.h"
+#endif
+
 typedef struct _MountAuthData MountAuthData;
 
 static void mount_auth_info_free (MountAuthData *info);
+
+
+#ifdef HAVE_AVAHI
+static void dns_sd_resolver_changed  (GVfsDnsSdResolver *resolver, GVfsBackendDav *dav_backend);
+#endif
 
 typedef struct _AuthInfo {
 
@@ -91,6 +101,11 @@ struct _GVfsBackendDav
   GVfsBackendHttp parent_instance;
 
   MountAuthData auth_info;
+
+#ifdef HAVE_AVAHI
+  /* only set if we're handling a [dav|davs]+sd:// mounts */
+  GVfsDnsSdResolver *resolver;
+#endif
 };
 
 G_DEFINE_TYPE (GVfsBackendDav, g_vfs_backend_dav, G_VFS_TYPE_BACKEND_HTTP);
@@ -101,6 +116,14 @@ g_vfs_backend_dav_finalize (GObject *object)
   GVfsBackendDav *dav_backend;
 
   dav_backend = G_VFS_BACKEND_DAV (object);
+
+#ifdef HAVE_AVAHI
+  if (dav_backend->resolver != NULL)
+    {
+      g_signal_handlers_disconnect_by_func (dav_backend->resolver, dns_sd_resolver_changed, dav_backend);
+      g_object_unref (dav_backend->resolver);
+    }
+#endif
 
   mount_auth_info_free (&(dav_backend->auth_info));
   
@@ -209,10 +232,10 @@ path_equal (const char *a, const char *b, gboolean relax)
   a_len = strlen (a);
   b_len = strlen (b);
 
-  while (a[a_len - 1] == '/')
+  while (a_len > 0 && a[a_len - 1] == '/')
     a_len--;
 
-  while (b[b_len - 1] == '/')
+  while (b_len > 0 && b[b_len - 1] == '/')
     b_len--;
 
   if (a_len == b_len)
@@ -1392,10 +1415,31 @@ g_mount_spec_to_dav_uri (GMountSpec *spec)
 }
 
 static GMountSpec *
-g_mount_spec_from_dav_uri (SoupURI *uri)
+g_mount_spec_from_dav_uri (GVfsBackendDav *dav_backend,
+                           SoupURI *uri)
 {
   GMountSpec *spec;
   const char *ssl;
+
+#ifdef HAVE_AVAHI
+  if (dav_backend->resolver != NULL)
+    {
+      const char *type;
+      const char *service_type;
+
+      service_type = g_vfs_dns_sd_resolver_get_service_type (dav_backend->resolver);
+      if (strcmp (service_type, "_webdavs._tcp") == 0)
+        type = "davs+sd";
+      else
+        type = "dav+sd";
+
+      spec = g_mount_spec_new (type);
+      g_mount_spec_set (spec,
+                        "host",
+                        g_vfs_dns_sd_resolver_get_encoded_triple (dav_backend->resolver));
+      return spec;
+    }
+#endif
 
   spec = g_mount_spec_new ("dav");
 
@@ -1423,6 +1467,63 @@ g_mount_spec_from_dav_uri (SoupURI *uri)
   return spec;
 }
 
+#ifdef HAVE_AVAHI
+static SoupURI *
+dav_uri_from_dns_sd_resolver (GVfsBackendDav *dav_backend)
+{
+  SoupURI    *uri;
+  char       *user;
+  char       *path;
+  char       *address;
+  const char *service_type;
+  guint       port;
+
+  service_type = g_vfs_dns_sd_resolver_get_service_type (dav_backend->resolver);
+  address = g_vfs_dns_sd_resolver_get_address (dav_backend->resolver);
+  port = g_vfs_dns_sd_resolver_get_port (dav_backend->resolver);
+  user = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "u"); /* mandatory */
+  path = g_vfs_dns_sd_resolver_lookup_txt_record (dav_backend->resolver, "path"); /* optional */
+
+  /* TODO: According to http://www.dns-sd.org/ServiceTypes.html
+   * there's also a TXT record "p" for password. Handle this.
+   */
+
+  uri = soup_uri_new (NULL);
+
+  if (strcmp (service_type, "_webdavs._tcp") == 0)
+    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTPS);
+  else
+    soup_uri_set_scheme (uri, SOUP_URI_SCHEME_HTTP);
+
+  soup_uri_set_user (uri, user);
+
+  soup_uri_set_port (uri, port);
+
+  soup_uri_set_host (uri, address);
+
+  if (path != NULL)
+    soup_uri_set_path (uri, path);
+  else
+    soup_uri_set_path (uri, "/");
+
+
+  g_free (address);
+  g_free (user);
+  g_free (path);
+
+  return uri;
+}
+#endif
+
+#ifdef HAVE_AVAHI
+static void
+dns_sd_resolver_changed (GVfsDnsSdResolver *resolver,
+                         GVfsBackendDav    *dav_backend)
+{
+  /* TODO: handle when DNS-SD data changes */
+}
+#endif
+
 /* ************************************************************************* */
 /* Backend Functions */
 static void
@@ -1432,6 +1533,7 @@ do_mount (GVfsBackend  *backend,
           GMountSource *mount_source,
           gboolean      is_automount)
 {
+  GVfsBackendDav *dav_backend = G_VFS_BACKEND_DAV (backend);
   MountAuthData  *data;
   SoupSession    *session;
   SoupMessage    *msg_opts;
@@ -1444,10 +1546,43 @@ do_mount (GVfsBackend  *backend,
   gboolean        res;
   char           *last_good_path;
   char           *display_name;
+  const char     *host;
+  const char     *type;
 
   g_print ("+ mount\n");
 
-  mount_base = g_mount_spec_to_dav_uri (mount_spec);
+  host = g_mount_spec_get (mount_spec, "host");
+  type = g_mount_spec_get (mount_spec, "type");
+
+#ifdef HAVE_AVAHI
+  /* resolve DNS-SD style URIs */
+  if ((strcmp (type, "dav+sd") == 0 || strcmp (type, "davs+sd") == 0) && host != NULL)
+    {
+      GError *error;
+
+      dav_backend->resolver = g_vfs_dns_sd_resolver_new_for_encoded_triple (host, "u");
+
+      error = NULL;
+      if (!g_vfs_dns_sd_resolver_resolve_sync (dav_backend->resolver,
+                                               NULL,
+                                               &error))
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          return;
+        }
+      g_signal_connect (dav_backend->resolver,
+                        "changed",
+                        (GCallback) dns_sd_resolver_changed,
+                        dav_backend);
+
+      mount_base = dav_uri_from_dns_sd_resolver (dav_backend);
+    }
+  else
+#endif
+    {
+      mount_base = g_mount_spec_to_dav_uri (mount_spec);
+    }
 
   if (mount_base == NULL)
     {
@@ -1546,12 +1681,17 @@ do_mount (GVfsBackend  *backend,
   mount_base->path = last_good_path;
 
   /* dup the mountspec, but only copy known fields */
-  mount_spec = g_mount_spec_from_dav_uri (mount_base);
+  mount_spec = g_mount_spec_from_dav_uri (dav_backend, mount_base);
 
   g_vfs_backend_set_mount_spec (backend, mount_spec);
   g_vfs_backend_set_icon_name (backend, "folder-remote");
   
-  display_name = g_strdup_printf (_("WebDAV on %s"), mount_base->host);
+#ifdef HAVE_AVAHI
+  if (dav_backend->resolver != NULL)
+    display_name = g_strdup (g_vfs_dns_sd_resolver_get_service_name (dav_backend->resolver));
+  else
+#endif
+    display_name = g_strdup_printf (_("WebDAV on %s"), mount_base->host);
   g_vfs_backend_set_display_name (backend, display_name);
   g_free (display_name);
   

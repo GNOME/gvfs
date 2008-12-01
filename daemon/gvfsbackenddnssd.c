@@ -37,6 +37,7 @@
 #include <avahi-glib/glib-malloc.h>
 
 #include "gvfsbackenddnssd.h"
+#include "gvfsdnssdutils.h"
 
 #include "gvfsdaemonprotocol.h"
 #include "gvfsjobcreatemonitor.h"
@@ -45,15 +46,40 @@
 #include "gvfsmonitor.h"
 
 static struct {
-	char *type;
-	char *method;
-	char *icon;
-	gpointer handle;
+  char *type;
+  char *method;
+  gboolean use_dns_sd_uri;
+  char *icon;
 } dns_sd_types[] = {
-	{"_ftp._tcp", "ftp", "folder-remote-ftp"},
-	{"_webdav._tcp", "dav", "folder-remote"},
-	{"_webdavs._tcp", "davs", "folder-remote"},
-	{"_sftp-ssh._tcp", "sftp", "folder-remote-ssh"},
+	{
+          "_ftp._tcp",
+          "ftp",
+          FALSE,
+          "folder-remote-ftp"
+        },
+	{
+          "_webdav._tcp",
+          "dav+sd",
+          TRUE,
+          "folder-remote-dav"
+        },
+	{
+          "_webdavs._tcp",
+          "davs+sd",
+          TRUE,
+          "folder-remote-davs"},
+	{
+          "_sftp-ssh._tcp",
+          "sftp",
+          FALSE,
+          "folder-remote-ssh"
+        },
+	{
+          "_ssh._tcp",
+          "sftp",
+          FALSE,
+          "folder-remote-ssh"
+        },
 };
 
 static AvahiClient *global_client = NULL;
@@ -62,14 +88,18 @@ static gboolean avahi_initialized = FALSE;
 static GList *dnssd_backends = NULL;
 
 typedef struct {
-  char *file_name; 
+  char *file_name;
   char *name;
   char *type;
+  char *domain;
   char *target_uri;
+
   GIcon *icon;
 } LinkFile;
 
 static LinkFile root = { "/" };
+
+static gboolean resolver_supports_mdns = FALSE;
 
 struct _GVfsBackendDnsSd
 {
@@ -164,7 +194,7 @@ get_icon_for_type (const char *type)
   for (i = 0; i < G_N_ELEMENTS (dns_sd_types); i++)
     {
       if (strcmp (type, dns_sd_types[i].type) == 0)
-	return g_themed_icon_new (dns_sd_types[i].icon);
+	return g_themed_icon_new_with_default_fallbacks (dns_sd_types[i].icon);
     }
   
   return g_themed_icon_new ("text-x-generic");
@@ -184,34 +214,18 @@ get_method_for_type (const char *type)
   return NULL;
 }
 
-static char *
-encode_filename (const char *service,
-		 const char *type)
+static gboolean
+use_dns_sd_uri_for_type (const char *type)
 {
-  GString *string;
-  const char *p;
-  
-  string = g_string_new (NULL);
-  
-  p = service;
-  
-  while (*p)
+  int i;
+
+  for (i = 0; i < G_N_ELEMENTS (dns_sd_types); i++)
     {
-      if (*p == '\\') 
-	g_string_append (string, "\\\\");
-      else if (*p == '.') 
-	g_string_append (string, "\\.");
-      else if (*p == '/') 
-	g_string_append (string, "\\s");
-      else
-	g_string_append_c (string, *p);
-      p++;
+      if (strcmp (type, dns_sd_types[i].type) == 0)
+	return dns_sd_types[i].use_dns_sd_uri;
     }
-  
-  g_string_append_c (string, '.');
-  g_string_append (string, type);
-  
-  return g_string_free (string, FALSE);
+
+  return FALSE;
 }
 
 static LinkFile *
@@ -225,56 +239,89 @@ link_file_new (const char *name,
 	       AvahiStringList *txt)
 {
   LinkFile *file;
-  char *path, *user, *user_str;
-  AvahiStringList *path_l, *user_l;
   char a[128];
   const char *method;
-  
+  char *uri;
+
   file = g_slice_new0 (LinkFile);
 
   file->name = g_strdup (name);
   file->type = g_strdup (type);
-  file->file_name = encode_filename (name, type);
+  file->domain = g_strdup (domain);
   file->icon = get_icon_for_type (type);
-	
 
-  path = NULL;
-  user_str = NULL;
-  if (txt != NULL)
-    {
-      path_l = avahi_string_list_find (txt, "path");
-      if (path_l != NULL)
-	avahi_string_list_get_pair (path_l, NULL, &path, NULL);
-      
-      user_l = avahi_string_list_find (txt, "u");
-      if (user_l != NULL)
-	{
-	  avahi_string_list_get_pair (user_l, NULL, &user, NULL);
-	  
-	  user_str = g_strconcat (user, "@", NULL);
-	}
-    }
-  
-  if (path == NULL)
-    path = g_strdup ("/");
-      
+  uri = g_vfs_get_dns_sd_uri_for_triple (name, type, domain);
+  file->file_name = g_path_get_basename (uri);
+  g_free (uri);
+
   avahi_address_snprint (a, sizeof(a), address);
 
   method = get_method_for_type (type);
 
-  if (protocol == AVAHI_PROTO_INET6)
-	/* an ipv6 address, follow rfc2732 */
-    file->target_uri = g_strdup_printf ("%s://%s[%s]:%d%s",
-					method,
-					user_str?user_str:"",
-					a, port, path);
+  if (use_dns_sd_uri_for_type (type))
+    {
+      char *encoded_triple;
+      encoded_triple = g_vfs_encode_dns_sd_triple (name, type, domain);
+      file->target_uri = g_strdup_printf ("%s://%s",
+                                          method,
+                                          encoded_triple);
+      g_free (encoded_triple);
+    }
   else
-    file->target_uri = g_strdup_printf ("%s://%s%s:%d%s",
-					method,
-					user_str?user_str:"",
-					a, port, path);
-  g_free (user_str);
-  g_free (path);
+    {
+      char *path, *user, *user_str;
+      AvahiStringList *path_l, *user_l;
+
+      path = NULL;
+      user_str = NULL;
+      if (txt != NULL)
+        {
+          path_l = avahi_string_list_find (txt, "path");
+          if (path_l != NULL)
+            avahi_string_list_get_pair (path_l, NULL, &path, NULL);
+          user_l = avahi_string_list_find (txt, "u");
+          if (user_l != NULL)
+            {
+              avahi_string_list_get_pair (user_l, NULL, &user, NULL);
+              user_str = g_strconcat (user, "@", NULL);
+            }
+        }
+      if (path == NULL)
+        path = g_strdup ("/");
+
+      if (resolver_supports_mdns)
+        {
+          file->target_uri = g_strdup_printf ("%s://%s%s:%d%s",
+                                              method,
+                                              user_str != NULL ? user_str : "",
+                                              host_name, port, path);
+        }
+      else
+        {
+          if (protocol == AVAHI_PROTO_INET6)
+            {
+              /* an ipv6 address, follow rfc2732 */
+              file->target_uri = g_strdup_printf ("%s://%s[%s]:%d%s",
+                                                  method,
+                                                  user_str?user_str:"",
+                                                  a,
+                                                  port,
+                                                  path);
+            }
+          else
+            {
+              file->target_uri = g_strdup_printf ("%s://%s%s:%d%s",
+                                                  method,
+                                                  user_str?user_str:"",
+                                                  a,
+                                                  port,
+                                                  path);
+            }
+        }
+
+      g_free (user_str);
+      g_free (path);
+    }
 
   return file;
 }
@@ -285,6 +332,7 @@ link_file_free (LinkFile *file)
   g_free (file->file_name);
   g_free (file->name);
   g_free (file->type);
+  g_free (file->domain);
   g_free (file->target_uri);
  
   if (file->icon)
@@ -357,7 +405,7 @@ file_info_from_file (LinkFile *file,
   g_file_info_set_name (info, file->file_name);
   g_file_info_set_display_name (info, file->name);
 
-  if (file->icon) 
+  if (file->icon)
     g_file_info_set_icon (info, file->icon);
 
   g_file_info_set_file_type (info, G_FILE_TYPE_SHORTCUT);
@@ -366,8 +414,7 @@ file_info_from_file (LinkFile *file,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, 
-                                    file->target_uri);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, file->target_uri);
 }
 
 /* Backend Functions */
@@ -427,13 +474,28 @@ try_query_info (GVfsBackend *backend,
   if (file == &root)
     {
       GIcon *icon;
+      char *display_name;
+      char *s;
+
+      s = g_strdup (job->uri);
+      if (s[strlen(s) - 1] == '/') /* job->uri is guranteed to be longer than 1 byte */
+        s[strlen(s) - 1] = '\0';
+      display_name = g_path_get_basename (s);
+      if (strcmp (display_name, "local") == 0)
+        {
+          g_free (display_name);
+          display_name = g_strdup (_("Local Network"));
+        }
+      g_free (s);
+
       g_file_info_set_name (info, "/");
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-      /* TODO: Name */
-      g_file_info_set_display_name (info, _("dns-sd"));
+      g_file_info_set_display_name (info, display_name);
       icon = g_themed_icon_new ("network-workgroup");
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
+      g_free (display_name);
+
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
@@ -688,6 +750,8 @@ g_vfs_backend_dns_sd_init (GVfsBackendDnsSd *network_backend)
   g_vfs_backend_set_stable_name (backend, _("Network"));
   g_vfs_backend_set_icon_name (backend, "network-workgroup");
   g_vfs_backend_set_user_visible (backend, FALSE);
+
+  resolver_supports_mdns = (avahi_nss_support () > 0);
 
 }
 

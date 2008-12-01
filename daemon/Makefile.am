@@ -42,6 +42,9 @@ mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount
 mount_in_files += http.mount.in dav.mount.in ftp.mount.in 
 if HAVE_HTTP
 mount_DATA += http.mount dav.mount ftp.mount
+if HAVE_AVAHI
+mount_DATA += dav+sd.mount
+endif
 libexec_PROGRAMS += gvfsd-http gvfsd-dav gvfsd-ftp
 endif
 
@@ -304,7 +307,7 @@ gvfsd_dnssd_CPPFLAGS = \
 	$(AVAHI_CFLAGS) \
 	-DBACKEND_TYPES='"dns-sd", G_VFS_TYPE_BACKEND_DNS_SD,'
 
-gvfsd_dnssd_LDADD = $(libraries) $(AVAHI_LIBS)
+gvfsd_dnssd_LDADD = $(libraries) $(AVAHI_LIBS) $(top_builddir)/common/libgvfscommon-dnssd.la
 
 
 gvfsd_archive_SOURCES = \
@@ -391,8 +394,15 @@ gvfsd_dav_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackenddav.h \
 	-DDEFAULT_BACKEND_TYPE=dav \
 	-DMAX_JOB_THREADS=1 \
-	$(HTTP_CFLAGS) \
-	-DBACKEND_TYPES='"dav", G_VFS_TYPE_BACKEND_DAV,'
+	$(HTTP_CFLAGS)
+
+if HAVE_AVAHI
+gvfsd_dav_CPPFLAGS += -DBACKEND_TYPES='"dav", G_VFS_TYPE_BACKEND_DAV, "dav+sd", G_VFS_TYPE_BACKEND_DAV, "davs+sd", G_VFS_TYPE_BACKEND_DAV,'
+else
+gvfsd_dav_CPPFLAGS += -DBACKEND_TYPES='"dav", G_VFS_TYPE_BACKEND_DAV,'
+endif
 
 gvfsd_dav_LDADD = $(libraries) $(HTTP_LIBS)
-
+if HAVE_AVAHI
+gvfsd_dav_LDADD += $(top_builddir)/common/libgvfscommon-dnssd.la
+endif

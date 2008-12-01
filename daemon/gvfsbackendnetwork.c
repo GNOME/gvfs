@@ -411,7 +411,7 @@ recompute_files (GVfsBackendNetwork *backend)
 	      file = network_file_new (file_name,
 				       domains[i],
 				       link_uri,
-				       backend->server_icon);
+				       backend->workgroup_icon);
 	      files = g_list_prepend (files, file);   
 	      g_free (link_uri);
 	      g_free (file_name);

@@ -22,3 +22,20 @@ libgvfscommon_la_SOURCES = 	\
 libgvfscommon_la_LIBADD =	\
 	$(DBUS_LIBS) 	\
 	$(GLIB_LIBS)
+
+if HAVE_AVAHI
+lib_LTLIBRARIES += libgvfscommon-dnssd.la
+
+libgvfscommon_dnssd_la_SOURCES = 	\
+	gvfsdnssdutils.c gvfsdnssdutils.h \
+	gvfsdnssdresolver.c gvfsdnssdresolver.h \
+	$(NULL)
+
+libgvfscommon_dnssd_la_CFLAGS =	\
+	$(AVAHI_CFLAGS)
+
+libgvfscommon_dnssd_la_LIBADD =	\
+	$(top_builddir)/common/libgvfscommon.la \
+	$(AVAHI_LIBS)
+endif
+

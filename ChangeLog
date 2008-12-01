@@ -1,3 +1,23 @@
+2008-12-01  Alexander Larsson  <alexl@redhat.com>
+
+        * common/Makefile.am:
+        * common/gvfsdnssdresolver.c: Added.
+        * common/gvfsdnssdresolver.h: Added.
+        * common/gvfsdnssdutils.c: Added.
+        * common/gvfsdnssdutils.h: Added.
+        * daemon/Makefile.am:
+        * daemon/dav+sd.mount.in: Added.
+        * daemon/dav.mount.in:
+        * daemon/gvfsbackenddav.c:
+        * daemon/gvfsbackenddnssd.c:
+        * daemon/gvfsbackendnetwork.c:
+	For references to dns-sd dav services, use a
+	dav+sd: uri, since this is stable over e.g.
+	port changes and as such work better in e.g.
+	bookmarks.
+	
+	Patch from David Zeuthen (#555436)
+
 2008-11-18  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

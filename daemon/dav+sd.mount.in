@@ -1,4 +1,4 @@
 [Mount]
-Type=dav;davs
+Type=dav+sd;davs+sd
 Exec=@libexecdir@/gvfsd-dav
 AutoMount=false
