@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-01 10:42+0200\n"
-"PO-Revision-Date: 2008-09-01 10:46+0100\n"
+"POT-Creation-Date: 2008-12-01 21:22+0100\n"
+"PO-Revision-Date: 2008-12-01 21:25+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../client/gdaemonfile.c:482
-#: ../client/gdaemonfile.c:1979
+#: ../client/gdaemonfile.c:1984
 msgid "Operation not supported, files on different mounts"
 msgstr "Åtgärden stöds inte, filer på olika monteringar"
 
@@ -31,6 +31,7 @@ msgid "Invalid return value from query_info"
 msgstr "Ogiltigt svarsvärde från query_info"
 
 #: ../client/gdaemonfile.c:894
+#: ../client/gvfsiconloadable.c:338
 msgid "Couldn't get stream file descriptor"
 msgstr "Kunde inte få filhandtag för ström"
 
@@ -39,9 +40,10 @@ msgstr "Kunde inte få filhandtag för ström"
 #: ../client/gdaemonfile.c:1055
 #: ../client/gdaemonfile.c:1114
 #: ../client/gdaemonfile.c:1176
-#: ../client/gdaemonfile.c:2234
-#: ../client/gdaemonfile.c:2312
-#: ../client/gdaemonfile.c:2571
+#: ../client/gdaemonfile.c:2252
+#: ../client/gdaemonfile.c:2330
+#: ../client/gdaemonfile.c:2589
+#: ../client/gvfsiconloadable.c:370
 msgid "Invalid return value from open"
 msgstr "Ogiltigt svarsvärde från open"
 
@@ -49,7 +51,8 @@ msgstr "Ogiltigt svarsvärde från open"
 #: ../client/gdaemonfile.c:1065
 #: ../client/gdaemonfile.c:1124
 #: ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2202
+#: ../client/gdaemonfile.c:2220
+#: ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Fick inget filhandtag för ström"
 
@@ -77,13 +80,40 @@ msgstr "Ogiltigt filnamn %s"
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Ogiltigt svarsvärde från query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2124
+#: ../client/gdaemonfile.c:2142
 msgid "Invalid return value from monitor_dir"
 msgstr "Ogiltigt svarsvärde från monitor_dir"
 
-#: ../client/gdaemonfile.c:2173
+#: ../client/gdaemonfile.c:2191
 msgid "Invalid return value from monitor_file"
 msgstr "Ogiltigt svarsvärde från monitor_file"
+
+#: ../client/gdaemonfileenumerator.c:351
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831
+#: ../daemon/gvfsbackendobexftp.c:734
+#: ../daemon/gvfsbackendobexftp.c:755
+#: ../daemon/gvfsbackendobexftp.c:874
+#: ../daemon/gvfsbackendobexftp.c:1011
+#: ../daemon/gvfsbackendobexftp.c:1075
+#: ../daemon/gvfsbackendobexftp.c:1212
+#: ../daemon/gvfsbackendobexftp.c:1239
+#: ../daemon/gvfsbackendobexftp.c:1298
+#: ../daemon/gvfsbackendobexftp.c:1320
+#: ../daemon/gvfsbackendobexftp.c:1380
+#: ../daemon/gvfsbackendobexftp.c:1399
+#: ../daemon/gvfsbackendsmb.c:1105
+#: ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120
+#: ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+msgid "Operation was cancelled"
+msgstr "Åtgärden avbröts"
 
 #: ../client/gdaemonfileinputstream.c:450
 #: ../client/gdaemonfileinputstream.c:458
@@ -104,32 +134,6 @@ msgstr "Fel i strömningsprotokoll: %s"
 msgid "End of stream"
 msgstr "Slut på ström"
 
-#: ../client/gdaemonfileinputstream.c:518
-#: ../client/gdaemonfileinputstream.c:674
-#: ../client/gdaemonfileinputstream.c:782
-#: ../client/gdaemonfileinputstream.c:1032
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831
-#: ../daemon/gvfsbackendobexftp.c:772
-#: ../daemon/gvfsbackendobexftp.c:793
-#: ../daemon/gvfsbackendobexftp.c:912
-#: ../daemon/gvfsbackendobexftp.c:1049
-#: ../daemon/gvfsbackendobexftp.c:1113
-#: ../daemon/gvfsbackendobexftp.c:1250
-#: ../daemon/gvfsbackendobexftp.c:1277
-#: ../daemon/gvfsbackendobexftp.c:1336
-#: ../daemon/gvfsbackendobexftp.c:1358
-#: ../daemon/gvfsbackendobexftp.c:1418
-#: ../daemon/gvfsbackendobexftp.c:1437
-#: ../daemon/gvfsbackendsmb.c:1069
-#: ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120
-#: ../daemon/gvfsbackendtest.c:183
-#: ../daemon/gvfschannel.c:298
-msgid "Operation was cancelled"
-msgstr "Åtgärden avbröts"
-
 #: ../client/gdaemonfileinputstream.c:1207
 #: ../client/gdaemonfileoutputstream.c:942
 msgid "Seek not supported on stream"
@@ -144,7 +148,7 @@ msgstr "Frågeåtgärden stöds inte"
 msgid "Query info not supported on stream"
 msgstr "Informationsbegäran stöds inte i strömmen"
 
-#: ../client/gdaemonvfs.c:757
+#: ../client/gdaemonvfs.c:830
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Fel vid hämtning av monteringsinformation: %s"
@@ -154,6 +158,10 @@ msgstr "Fel vid hämtning av monteringsinformation: %s"
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Fel vid anslutning till demon: %s"
+
+#: ../client/gvfsiconloadable.c:145
+msgid "Invalid return value from open_icon_for_read"
+msgstr "Ogiltigt svarsvärde från open_icon_for_read"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -165,13 +173,54 @@ msgstr "Fel vid skapande av uttag: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Fel vid anslutning till uttag: %s"
 
-#: ../common/gvfsdaemonprotocol.c:515
+#: ../common/gvfsdaemonprotocol.c:454
 msgid "Invalid file info format"
 msgstr "Ogiltigt format på filinformation"
 
-#: ../common/gvfsdaemonprotocol.c:532
+#: ../common/gvfsdaemonprotocol.c:471
 msgid "Invalid attribute info list content"
 msgstr "Ogiltigt innehåll för attributinformation"
+
+#: ../common/gvfsdnssdresolver.c:208
+#, c-format
+msgid "Error initializing Avahi: %s"
+msgstr "Fel vid initiering av Avahi: %s"
+
+#: ../common/gvfsdnssdresolver.c:254
+#, c-format
+msgid "Error creating Avahi resolver: %s"
+msgstr "Fel vid skapande av Avahi-uppslag: %s"
+
+#: ../common/gvfsdnssdresolver.c:1094
+#, c-format
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "Fel vid uppslag av \"%s\"-tjänst \"%s\" på domänen \"%s\""
+
+#: ../common/gvfsdnssdresolver.c:1114
+#, c-format
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT records are missing. Keys required: \"%s\"."
+msgstr "Fel vid uppslag av \"%s\"-tjänst \"%s\" på domänen \"%s\". EN eller flera TXT-poster saknas. Nycklar krävs: \"%s\"."
+
+#: ../common/gvfsdnssdresolver.c:1126
+#, c-format
+msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "Tidsgräns uppnådess vid uppslag av \"%s\"-tjänst \"%s\" på domänen \"%s\""
+
+#: ../common/gvfsdnssdutils.c:233
+#: ../common/gvfsdnssdutils.c:263
+#: ../common/gvfsdnssdutils.c:280
+#, c-format
+msgid "Malformed dns-sd encoded_triple '%s'"
+msgstr "Felformulerad dns-sd encoded_triple \"%s\""
+
+#: ../common/gvfsicon.c:250
+#, c-format
+msgid "Can't handle version %d of GVfsIcon encoding"
+msgstr "Kan inte hantera version %d av GVfsIcon-kodning"
+
+#: ../common/gvfsicon.c:260
+msgid "Malformed input data for GVfsIcon"
+msgstr "Felformaterat inmatningsdata för GVfsIcon"
 
 #: ../daemon/daemon-main.c:63
 #: ../daemon/daemon-main.c:206
@@ -220,40 +269,40 @@ msgstr "fel vid start av monteringsdemon"
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:315
-#: ../daemon/gvfsbackendftp.c:963
-#: ../daemon/gvfsbackendsftp.c:1894
+#: ../daemon/gvfsbackendftp.c:1094
+#: ../daemon/gvfsbackendsftp.c:1903
 #, c-format
 msgid "/ on %s"
 msgstr "/ på %s"
 
 #: ../daemon/gvfsbackendarchive.c:515
-#: ../daemon/gvfsbackendftp.c:1479
-#: ../daemon/gvfsbackendsftp.c:1553
+#: ../daemon/gvfsbackendftp.c:1632
+#: ../daemon/gvfsbackendsftp.c:1566
 msgid "No hostname specified"
 msgstr "Inget värdnamn angivet"
 
 #: ../daemon/gvfsbackendarchive.c:526
 #: ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1456
+#: ../daemon/gvfsbackenddav.c:1591
 #: ../daemon/gvfsbackendhttp.c:299
-#: ../daemon/gvfsbackendobexftp.c:603
-#: ../daemon/gvfsbackendobexftp.c:614
-#: ../daemon/gvfsbackendsmb.c:605
+#: ../daemon/gvfsbackendobexftp.c:554
+#: ../daemon/gvfsbackendobexftp.c:565
+#: ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
 msgstr "Ogiltig monteringsspecifikation"
 
 #: ../daemon/gvfsbackendarchive.c:636
 #: ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715
-#: ../daemon/gvfsbackendcdda.c:822
+#: ../daemon/gvfsbackendcdda.c:921
 #: ../daemon/gvfsbackendcomputer.c:572
-#: ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendftp.c:2101
+#: ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:2254
 #: ../daemon/gvfsbackendnetwork.c:590
 #: ../daemon/gvfsbackendsmbbrowse.c:804
 #: ../daemon/gvfsbackendsmbbrowse.c:871
 #: ../daemon/gvfsbackendsmbbrowse.c:1042
-#: ../daemon/gvfsbackendsmbbrowse.c:1116
+#: ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
 msgid "File doesn't exist"
 msgstr "Filen finns inte"
@@ -261,8 +310,8 @@ msgstr "Filen finns inte"
 #: ../daemon/gvfsbackendarchive.c:724
 #: ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:651
-#: ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:912
+#: ../daemon/gvfsbackenddnssd.c:440
+#: ../daemon/gvfsbackendftp.c:1043
 #: ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "Filen är inte en katalog"
@@ -283,20 +332,20 @@ msgstr "Kunde inte skapa temporärkatalog"
 #: ../daemon/gvfsbackendburn.c:719
 #: ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783
-#: ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1987
-#: ../daemon/gvfsbackendgphoto2.c:2706
+#: ../daemon/gvfsbackendgphoto2.c:1096
+#: ../daemon/gvfsbackendgphoto2.c:2040
+#: ../daemon/gvfsbackendgphoto2.c:2759
 #, c-format
 msgid "No such file or directory"
 msgstr "Ingen sådan fil eller katalog"
 
 #: ../daemon/gvfsbackendburn.c:425
-#: ../daemon/gvfsbackenddav.c:2043
+#: ../daemon/gvfsbackenddav.c:2183
 msgid "Directory not empty"
 msgstr "Katalogen är inte tom"
 
 #: ../daemon/gvfsbackendburn.c:459
-#: ../daemon/gvfsbackendburn.c:897
+#: ../daemon/gvfsbackendburn.c:906
 msgid "Can't copy file over directory"
 msgstr "Kan inte kopiera fil över katalog"
 
@@ -307,116 +356,153 @@ msgstr "Cd/dvd-skapare"
 
 #: ../daemon/gvfsbackendburn.c:755
 #: ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:917
-#: ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendburn.c:926
+#: ../daemon/gvfsbackendgphoto2.c:2833
 msgid "File exists"
 msgstr "Filen finns"
 
-#: ../daemon/gvfsbackendburn.c:845
+#: ../daemon/gvfsbackendburn.c:829
+#: ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsjobclosewrite.c:120
+#: ../daemon/gvfsjobcopy.c:169
+#: ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151
+#: ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192
+#: ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256
+#: ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109
+#: ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:168
+#: ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148
+#: ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176
+#: ../daemon/gvfsjobopeniconforread.c:120
+#: ../daemon/gvfsjobpull.c:173
+#: ../daemon/gvfsjobpush.c:173
+#: ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150
+#: ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "Åtgärden stöds inte av bakänden"
+
+#: ../daemon/gvfsbackendburn.c:854
 msgid "No such file or directory in target path"
 msgstr "Ingen sådan fil eller katalog i målsökväg"
 
-#: ../daemon/gvfsbackendburn.c:868
+#: ../daemon/gvfsbackendburn.c:877
 msgid "Can't copy directory over directory"
 msgstr "Kan inte kopiera katalog över katalog"
 
-#: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendburn.c:886
 msgid "Target file exists"
 msgstr "Målfilen finns"
 
-#: ../daemon/gvfsbackendburn.c:884
+#: ../daemon/gvfsbackendburn.c:893
 msgid "Can't recursively copy directory"
 msgstr "Kan inte kopiera katalog rekursivt"
 
-#: ../daemon/gvfsbackendburn.c:943
-#: ../daemon/gvfsbackendgphoto2.c:2360
-#: ../daemon/gvfsbackendgphoto2.c:2569
-#: ../daemon/gvfsbackendgphoto2.c:2666
-#: ../daemon/gvfsbackendgphoto2.c:2759
+#: ../daemon/gvfsbackendburn.c:952
+#: ../daemon/gvfsbackendcomputer.c:731
+#: ../daemon/gvfsbackendgphoto2.c:2413
+#: ../daemon/gvfsbackendgphoto2.c:2622
+#: ../daemon/gvfsbackendgphoto2.c:2719
+#: ../daemon/gvfsbackendgphoto2.c:2812
 msgid "Not supported"
 msgstr "Stöds inte"
 
-#: ../daemon/gvfsbackendcdda.c:223
-#: ../daemon/gvfsbackendgphoto2.c:1403
+#: ../daemon/gvfsbackendcdda.c:299
+#: ../daemon/gvfsbackendgphoto2.c:1419
 msgid "Cannot connect to the system bus"
 msgstr "Kan inte ansluta till systembussen"
 
-#: ../daemon/gvfsbackendcdda.c:233
-#: ../daemon/gvfsbackendgphoto2.c:1415
+#: ../daemon/gvfsbackendcdda.c:310
+#: ../daemon/gvfsbackendgphoto2.c:1431
 msgid "Cannot create libhal context"
 msgstr "Kan inte skapa libhal-kontext"
 
-#: ../daemon/gvfsbackendcdda.c:246
-#: ../daemon/gvfsbackendgphoto2.c:1428
+#: ../daemon/gvfsbackendcdda.c:324
+#: ../daemon/gvfsbackendgphoto2.c:1444
 msgid "Cannot initialize libhal"
 msgstr "Kan inte initiera libhal"
 
-#: ../daemon/gvfsbackendcdda.c:261
-#: ../daemon/gvfsbackendcdda.c:332
+#: ../daemon/gvfsbackendcdda.c:339
+#: ../daemon/gvfsbackendcdda.c:415
 msgid "No drive specified"
 msgstr "Ingen enhet angiven"
 
-#: ../daemon/gvfsbackendcdda.c:276
+#: ../daemon/gvfsbackendcdda.c:355
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Kan inte hitta enheten %s"
 
-#: ../daemon/gvfsbackendcdda.c:286
+#: ../daemon/gvfsbackendcdda.c:368
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Enheten %s innehåller inga ljudfiler"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:294
+#: ../daemon/gvfsbackendcdda.c:377
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda-montering på %s"
 
-#: ../daemon/gvfsbackendcdda.c:295
-#: ../daemon/gvfsbackendcdda.c:799
+#: ../daemon/gvfsbackendcdda.c:378
+#: ../daemon/gvfsbackendcdda.c:895
 #: ../monitor/hal/ghalmount.c:435
-#: ../monitor/hal/ghalvolume.c:214
-#: ../monitor/hal/ghalvolume.c:235
+#: ../monitor/hal/ghalvolume.c:233
+#: ../monitor/hal/ghalvolume.c:254
 #, c-format
 msgid "Audio Disc"
 msgstr "Ljudskiva"
 
-#: ../daemon/gvfsbackendcdda.c:356
-#: ../daemon/gvfsbackendgphoto2.c:1656
+#: ../daemon/gvfsbackendcdda.c:439
+#: ../daemon/gvfsbackendgphoto2.c:1672
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "Filsystemet är upptaget: %d öppnad fil"
 msgstr[1] "Filsystemet är upptaget: %d öppnade filer"
 
-#: ../daemon/gvfsbackendcdda.c:546
+#: ../daemon/gvfsbackendcdda.c:630
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Ingen sådan fil %s på enheten %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:655
+#: ../daemon/gvfsbackendcdda.c:739
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Fel från \"paranoia\" på enheten %s"
 
-#: ../daemon/gvfsbackendcdda.c:718
+#: ../daemon/gvfsbackendcdda.c:802
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Fel vid sökning i ström på enheten %s"
 
-#: ../daemon/gvfsbackendcdda.c:815
-#: ../daemon/gvfsbackendgphoto2.c:1713
+#: ../daemon/gvfsbackendcdda.c:914
+#: ../daemon/gvfsbackendgphoto2.c:1728
 #, c-format
 msgid "No such file"
 msgstr "Ingen sådan fil"
 
-#: ../daemon/gvfsbackendcdda.c:829
+#: ../daemon/gvfsbackendcdda.c:928
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Filen finns inte eller är inte ett ljudspår"
 
-#: ../daemon/gvfsbackendcdda.c:935
+#: ../daemon/gvfsbackendcdda.c:1034
 msgid "Audio CD Filesystem Service"
 msgstr "Filsystemstjänst för ljud-cd"
 
@@ -430,275 +516,284 @@ msgid "Filesystem"
 msgstr "Filsystem"
 
 #: ../daemon/gvfsbackendcomputer.c:590
-#: ../daemon/gvfsbackendgphoto2.c:1705
-#: ../daemon/gvfsbackendobexftp.c:758
-#: ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendgphoto2.c:1720
+#: ../daemon/gvfsbackendobexftp.c:720
+#: ../daemon/gvfsbackendsmb.c:684
 #: ../daemon/gvfsbackendtrash.c:678
+#: ../daemon/gvfsbackendtrash.c:1786
 msgid "Can't open directory"
 msgstr "Kan inte öppna katalog"
 
 #: ../daemon/gvfsbackendcomputer.c:594
-#: ../daemon/gvfsbackendcomputer.c:732
 msgid "Can't open mountable file"
 msgstr "Kan inte öppna monteringsbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:780
-#: ../daemon/gvfsbackendsftp.c:1037
+#: ../daemon/gvfsbackendcomputer.c:779
+#: ../daemon/gvfsbackendsftp.c:1044
 #, c-format
 msgid "Internal error: %s"
 msgstr "Internt fel: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:812
-#: ../daemon/gvfsbackendcomputer.c:929
+#: ../daemon/gvfsbackendcomputer.c:811
+#: ../daemon/gvfsbackendcomputer.c:928
 msgid "Can't mount file"
 msgstr "Kan inte montera fil"
 
-#: ../daemon/gvfsbackendcomputer.c:824
+#: ../daemon/gvfsbackendcomputer.c:823
 msgid "No media in the drive"
 msgstr "Inget media i enheten"
 
-#: ../daemon/gvfsbackendcomputer.c:881
-#: ../daemon/gvfsbackendcomputer.c:972
-#: ../daemon/gvfsbackendcomputer.c:1072
+#: ../daemon/gvfsbackendcomputer.c:880
+#: ../daemon/gvfsbackendcomputer.c:971
+#: ../daemon/gvfsbackendcomputer.c:1071
 msgid "Not a mountable file"
 msgstr "Inte en monteringsbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:987
+#: ../daemon/gvfsbackendcomputer.c:986
 msgid "Can't unmount file"
 msgstr "Kan inte avmontera fil"
 
-#: ../daemon/gvfsbackendcomputer.c:1103
+#: ../daemon/gvfsbackendcomputer.c:1102
 msgid "Can't eject file"
 msgstr "Kan inte mata ut fil"
 
-#: ../daemon/gvfsbackenddav.c:503
-#: ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:526
+#: ../daemon/gvfsbackenddav.c:1658
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP-fel: %s"
 
-#: ../daemon/gvfsbackenddav.c:520
+#: ../daemon/gvfsbackenddav.c:543
 msgid "Could not parse response"
 msgstr "Kunde inte tolka svaret"
 
-#: ../daemon/gvfsbackenddav.c:529
+#: ../daemon/gvfsbackenddav.c:552
 msgid "Empty response"
 msgstr "Tomt svar"
 
-#: ../daemon/gvfsbackenddav.c:537
+#: ../daemon/gvfsbackenddav.c:560
 msgid "Unexpected reply from server"
 msgstr "Oväntat svar från server"
 
-#: ../daemon/gvfsbackenddav.c:1156
-#: ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackenddav.c:1179
+#: ../daemon/gvfsbackenddav.c:1798
 msgid "Response invalid"
 msgstr "Svaret är ogiltigt"
 
-#: ../daemon/gvfsbackenddav.c:1299
+#: ../daemon/gvfsbackenddav.c:1322
 msgid "WebDAV share"
 msgstr "WebDAV-utdelning"
 
-#: ../daemon/gvfsbackenddav.c:1301
+#: ../daemon/gvfsbackenddav.c:1324
 #, c-format
 msgid "Enter password for %s"
 msgstr "Ange lösenord för %s"
 
-#: ../daemon/gvfsbackenddav.c:1304
+#: ../daemon/gvfsbackenddav.c:1327
 msgid "Please enter proxy password"
 msgstr "Ange lösenord för proxyserver"
 
-#: ../daemon/gvfsbackenddav.c:1527
-#: ../daemon/gvfsbackenddav.c:1531
+#: ../daemon/gvfsbackenddav.c:1662
+#: ../daemon/gvfsbackenddav.c:1666
 msgid "Not a WebDAV enabled share"
 msgstr "Inte en WebDAV-aktiverad utdelning"
 
-#: ../daemon/gvfsbackenddav.c:1554
+#: ../daemon/gvfsbackenddav.c:1694
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV på %s"
 
-#: ../daemon/gvfsbackenddav.c:1614
-#: ../daemon/gvfsbackenddav.c:1687
+#: ../daemon/gvfsbackenddav.c:1754
+#: ../daemon/gvfsbackenddav.c:1827
 msgid "Could not create request"
 msgstr "Kunde inte skapa begäran"
 
-#: ../daemon/gvfsbackenddav.c:1750
-#: ../daemon/gvfsbackenddav.c:2003
-#: ../daemon/gvfsbackenddav.c:2114
-#: ../daemon/gvfsbackendftp.c:1699
-#: ../daemon/gvfsbackendftp.c:2365
-#: ../daemon/gvfsbackendsftp.c:3559
-#: ../daemon/gvfsbackendsmb.c:1804
+#: ../daemon/gvfsbackenddav.c:1890
+#: ../daemon/gvfsbackenddav.c:2143
+#: ../daemon/gvfsbackenddav.c:2254
+#: ../daemon/gvfsbackendftp.c:1852
+#: ../daemon/gvfsbackendftp.c:2518
+#: ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackendsmb.c:1912
 msgid "Target file already exists"
 msgstr "Målfilen finns redan"
 
-#: ../daemon/gvfsbackenddav.c:1823
-#: ../daemon/gvfsbackendsftp.c:2807
-#: ../daemon/gvfsbackendsmb.c:1038
+#: ../daemon/gvfsbackenddav.c:1963
+#: ../daemon/gvfsbackendsftp.c:2836
+#: ../daemon/gvfsbackendsmb.c:1074
 msgid "The file was externally modified"
 msgstr "Filen blev externt ändrad"
 
-#: ../daemon/gvfsbackenddav.c:1854
-#: ../daemon/gvfsbackendsmb.c:1074
-#: ../daemon/gvfsbackendsmb.c:1821
+#: ../daemon/gvfsbackenddav.c:1994
+#: ../daemon/gvfsbackendsmb.c:1110
+#: ../daemon/gvfsbackendsmb.c:1929
 msgid "Backup file creation failed"
 msgstr "Skapandet av säkerhetskopia misslyckades"
 
-#. TODO: Name
-#: ../daemon/gvfsbackenddnssd.c:433
-msgid "dns-sd"
-msgstr "dns-sd"
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackenddnssd.c:487
+#: ../daemon/gvfsbackendnetwork.c:392
+msgid "Local Network"
+msgstr "Lokalt nätverk"
 
-#: ../daemon/gvfsbackenddnssd.c:669
+#: ../daemon/gvfsbackenddnssd.c:731
 #: ../daemon/gvfsbackendnetwork.c:731
 msgid "Can't monitor file or directory."
 msgstr "Kan inte övervaka fil eller katalog."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:687
+#: ../daemon/gvfsbackenddnssd.c:749
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:688
+#: ../daemon/gvfsbackenddnssd.c:750
 #: ../daemon/gvfsbackendnetwork.c:676
 #: ../daemon/gvfsbackendnetwork.c:814
 #: ../daemon/gvfsbackendnetwork.c:815
 msgid "Network"
 msgstr "Nätverk"
 
-#: ../daemon/gvfsbackendftp.c:236
+#: ../daemon/gvfsbackendftp.c:251
 msgid "Accounts are unsupported"
 msgstr "Konton stöds inte"
 
-#: ../daemon/gvfsbackendftp.c:240
+#: ../daemon/gvfsbackendftp.c:255
 msgid "Host closed connection"
 msgstr "Värden stängde anslutningen"
 
-#: ../daemon/gvfsbackendftp.c:244
+#: ../daemon/gvfsbackendftp.c:259
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Kan inte öppna dataanslutning. Kanske förhindrar din brandvägg detta?"
 
-#: ../daemon/gvfsbackendftp.c:248
+#: ../daemon/gvfsbackendftp.c:263
 msgid "Data connection closed"
 msgstr "Dataanslutning stängd"
 
-#: ../daemon/gvfsbackendftp.c:255
-#: ../daemon/gvfsbackendftp.c:259
+#: ../daemon/gvfsbackendftp.c:270
+#: ../daemon/gvfsbackendftp.c:274
 msgid "Operation failed"
 msgstr "Åtgärden misslyckades"
 
-#: ../daemon/gvfsbackendftp.c:264
+#: ../daemon/gvfsbackendftp.c:279
 msgid "No space left on server"
 msgstr "Inget ledigt utrymme på servern"
 
-#: ../daemon/gvfsbackendftp.c:272
-#: ../daemon/gvfsbackendsftp.c:3868
+#: ../daemon/gvfsbackendftp.c:287
+#: ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendsmb.c:1576
 msgid "Operation unsupported"
 msgstr "Åtgärden stöds inte"
 
-#: ../daemon/gvfsbackendftp.c:276
-#: ../daemon/gvfsbackendsftp.c:289
+#: ../daemon/gvfsbackendftp.c:291
+#: ../daemon/gvfsbackendsftp.c:296
 msgid "Permission denied"
 msgstr "Åtkomst nekas"
 
-#: ../daemon/gvfsbackendftp.c:280
+#: ../daemon/gvfsbackendftp.c:295
 msgid "Page type unknown"
 msgstr "Sidtypen är okänd"
 
-#: ../daemon/gvfsbackendftp.c:284
-#: ../daemon/gvfsbackendftp.c:2211
+#: ../daemon/gvfsbackendftp.c:299
+#: ../daemon/gvfsbackendftp.c:2364
 msgid "Invalid filename"
 msgstr "Ogiltigt filnamn"
 
-#: ../daemon/gvfsbackendftp.c:288
-#: ../daemon/gvfsbackendftp.c:364
-#: ../daemon/gvfsbackendftp.c:393
-#: ../daemon/gvfsbackendftp.c:412
-#: ../daemon/gvfsbackendftp.c:425
-#: ../daemon/gvfsbackendftp.c:817
+#: ../daemon/gvfsbackendftp.c:303
+#: ../daemon/gvfsbackendftp.c:379
+#: ../daemon/gvfsbackendftp.c:408
+#: ../daemon/gvfsbackendftp.c:427
+#: ../daemon/gvfsbackendftp.c:440
+#: ../daemon/gvfsbackendftp.c:928
 msgid "Invalid reply"
 msgstr "Ogiltigt svar"
 
-#: ../daemon/gvfsbackendftp.c:532
+#: ../daemon/gvfsbackendftp.c:547
 msgid "broken transmission"
 msgstr "avbruten överföring"
 
-#: ../daemon/gvfsbackendftp.c:677
-#: ../daemon/gvfsbackendftp.c:837
+#: ../daemon/gvfsbackendftp.c:709
+#: ../daemon/gvfsbackendftp.c:850
 msgid "Could not connect to host"
 msgstr "Kunde inte ansluta till värd"
 
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1486
+#, c-format
+msgid "Enter password for ftp as %s on %s"
+msgstr "Ange lösenordet för ftp som %s på %s"
+
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1337
+#: ../daemon/gvfsbackendftp.c:1489
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Ange lösenord för ftp på %s"
 
-#: ../daemon/gvfsbackendftp.c:1362
-#: ../daemon/gvfsbackendsftp.c:874
+#: ../daemon/gvfsbackendftp.c:1515
+#: ../daemon/gvfsbackendsftp.c:881
+#: ../daemon/gvfsbackendsmb.c:599
 msgid "Password dialog cancelled"
 msgstr "Lösenordsdialogen avbröts"
 
-#: ../daemon/gvfsbackendftp.c:1441
+#: ../daemon/gvfsbackendftp.c:1594
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp på %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1445
+#: ../daemon/gvfsbackendftp.c:1598
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp som %s på %s"
 
-#: ../daemon/gvfsbackendftp.c:1529
-#: ../daemon/gvfsbackendsftp.c:1958
-#: ../daemon/gvfsbackendsftp.c:3550
+#: ../daemon/gvfsbackendftp.c:1682
+#: ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:3579
 msgid "File is directory"
 msgstr "Filen är en katalog"
 
-#: ../daemon/gvfsbackendftp.c:1751
-#: ../daemon/gvfsbackendftp.c:2326
+#: ../daemon/gvfsbackendftp.c:1904
+#: ../daemon/gvfsbackendftp.c:2479
 msgid "backups not supported yet"
 msgstr "säkerhetskopior stöds inte än"
 
-#: ../daemon/gvfsbackendftp.c:1828
+#: ../daemon/gvfsbackendftp.c:1981
 msgid "filename too long"
 msgstr "filnamnet är för långt"
 
-#: ../daemon/gvfsbackendftp.c:2345
+#: ../daemon/gvfsbackendftp.c:2498
 msgid "Invalid destination filename"
 msgstr "Ogiltigt målfilnamn"
 
-#: ../daemon/gvfsbackendgphoto2.c:501
+#: ../daemon/gvfsbackendgphoto2.c:499
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: Katalog eller fil finns redan"
 
-#: ../daemon/gvfsbackendgphoto2.c:508
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: Ingen sådan fil eller katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:514
+#: ../daemon/gvfsbackendgphoto2.c:512
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: Ogiltigt filnamn"
 
-#: ../daemon/gvfsbackendgphoto2.c:520
+#: ../daemon/gvfsbackendgphoto2.c:518
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: Stöds inte"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:693
+#: ../daemon/gvfsbackendgphoto2.c:691
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digitalkamera (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:841
+#: ../daemon/gvfsbackendgphoto2.c:839
 #: ../monitor/gphoto2/ggphoto2volume.c:183
 #, c-format
 msgid "%s Camera"
@@ -706,166 +801,171 @@ msgstr "%s-kamera"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:844
+#: ../daemon/gvfsbackendgphoto2.c:842
 #: ../monitor/gphoto2/ggphoto2volume.c:178
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s-ljudspelare"
 
-#: ../daemon/gvfsbackendgphoto2.c:853
+#: ../daemon/gvfsbackendgphoto2.c:851
 #: ../monitor/gphoto2/ggphoto2volume.c:192
 msgid "Camera"
 msgstr "Kamera"
 
-#: ../daemon/gvfsbackendgphoto2.c:855
+#: ../daemon/gvfsbackendgphoto2.c:853
 #: ../monitor/gphoto2/ggphoto2volume.c:190
 msgid "Audio Player"
 msgstr "Ljudspelare"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325
-#: ../daemon/gvfsbackendgphoto2.c:2014
+#: ../daemon/gvfsbackendgphoto2.c:1341
+#: ../daemon/gvfsbackendgphoto2.c:2067
 msgid "Failed to get folder list"
 msgstr "Misslyckades med att få tag på mapplista"
 
-#: ../daemon/gvfsbackendgphoto2.c:1443
+#: ../daemon/gvfsbackendgphoto2.c:1459
 msgid "No device specified"
 msgstr "Ingen enhet angiven"
 
-#: ../daemon/gvfsbackendgphoto2.c:1460
+#: ../daemon/gvfsbackendgphoto2.c:1476
 msgid "Cannot create gphoto2 context"
 msgstr "Kan inte skapa gphoto2-kontext"
 
-#: ../daemon/gvfsbackendgphoto2.c:1470
+#: ../daemon/gvfsbackendgphoto2.c:1486
 msgid "Error creating camera"
 msgstr "Fel vid skapande av kamera"
 
-#: ../daemon/gvfsbackendgphoto2.c:1483
-#: ../daemon/gvfsbackendgphoto2.c:1493
+#: ../daemon/gvfsbackendgphoto2.c:1499
+#: ../daemon/gvfsbackendgphoto2.c:1509
 msgid "Error loading device information"
 msgstr "Fel vid inläsning av enhetsinformation"
 
-#: ../daemon/gvfsbackendgphoto2.c:1505
+#: ../daemon/gvfsbackendgphoto2.c:1521
 msgid "Error looking up device information"
 msgstr "Fel vid uppslag av enhetsinformation"
 
-#: ../daemon/gvfsbackendgphoto2.c:1515
+#: ../daemon/gvfsbackendgphoto2.c:1531
 msgid "Error getting device information"
 msgstr "Fel vid hämtning av enhetsinformation"
 
-#: ../daemon/gvfsbackendgphoto2.c:1528
+#: ../daemon/gvfsbackendgphoto2.c:1544
 msgid "Error setting up camera communications port"
 msgstr "Fel vid konfiguration av port för kamerakommunikation"
 
-#: ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendgphoto2.c:1555
 msgid "Error initializing camera"
 msgstr "Fel vid initiering av kamera"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1553
+#: ../daemon/gvfsbackendgphoto2.c:1569
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2-montering på %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1628
+#: ../daemon/gvfsbackendgphoto2.c:1644
 msgid "No camera specified"
 msgstr "Ingen kamera angiven"
 
-#: ../daemon/gvfsbackendgphoto2.c:1721
+#: ../daemon/gvfsbackendgphoto2.c:1736
 msgid "Error creating file object"
 msgstr "Fel vid skapande av filobjekt"
 
-#: ../daemon/gvfsbackendgphoto2.c:1736
+#: ../daemon/gvfsbackendgphoto2.c:1751
 msgid "Error getting file"
 msgstr "Fel vid hämtning av fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:1746
+#: ../daemon/gvfsbackendgphoto2.c:1761
 msgid "Error getting data from file"
 msgstr "Fel vid datahämtning från fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:1841
-#: ../daemon/gvfsbackendgphoto2.c:3030
+#: ../daemon/gvfsbackendgphoto2.c:1818
+#, c-format
+msgid "Malformed icon identifier '%s'"
+msgstr "Felformaterad ikonidentifierare \"%s\""
+
+#: ../daemon/gvfsbackendgphoto2.c:1894
+#: ../daemon/gvfsbackendgphoto2.c:3083
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Fel vid sökning i ström på kameran %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1981
-#: ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:2034
+#: ../daemon/gvfsbackendsmbbrowse.c:1107
 msgid "Not a directory"
 msgstr "Inte en katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2080
+#: ../daemon/gvfsbackendgphoto2.c:2133
 msgid "Failed to get file list"
 msgstr "Misslyckades med att få tag på fillista"
 
-#: ../daemon/gvfsbackendgphoto2.c:2372
+#: ../daemon/gvfsbackendgphoto2.c:2425
 msgid "Error creating directory"
 msgstr "Fel vid skapande av katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2581
+#: ../daemon/gvfsbackendgphoto2.c:2634
 msgid "Name already exists"
 msgstr "Namnet finns redan"
 
-#: ../daemon/gvfsbackendgphoto2.c:2592
-#: ../daemon/gvfsbackendgphoto2.c:3221
+#: ../daemon/gvfsbackendgphoto2.c:2645
+#: ../daemon/gvfsbackendgphoto2.c:3274
 msgid "New name too long"
 msgstr "Nytt namn är för långt"
 
-#: ../daemon/gvfsbackendgphoto2.c:2602
-#: ../daemon/gvfsbackendgphoto2.c:3232
+#: ../daemon/gvfsbackendgphoto2.c:2655
+#: ../daemon/gvfsbackendgphoto2.c:3285
 msgid "Error renaming dir"
 msgstr "Fel vid namnbyte av katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2615
-#: ../daemon/gvfsbackendgphoto2.c:3245
+#: ../daemon/gvfsbackendgphoto2.c:2668
+#: ../daemon/gvfsbackendgphoto2.c:3298
 msgid "Error renaming file"
 msgstr "Fel vid namnbyte av fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:2679
+#: ../daemon/gvfsbackendgphoto2.c:2732
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "Katalogen \"%s\" är inte tom"
 
-#: ../daemon/gvfsbackendgphoto2.c:2690
+#: ../daemon/gvfsbackendgphoto2.c:2743
 msgid "Error deleting directory"
 msgstr "Fel vid borttagning av katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2716
+#: ../daemon/gvfsbackendgphoto2.c:2769
 msgid "Error deleting file"
 msgstr "Fel vid borttagning av fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:2769
+#: ../daemon/gvfsbackendgphoto2.c:2822
 msgid "Can't write to directory"
 msgstr "Kan inte skriva till katalog"
 
-#: ../daemon/gvfsbackendgphoto2.c:2816
+#: ../daemon/gvfsbackendgphoto2.c:2869
 msgid "Cannot allocate new file to append to"
 msgstr "Kan inte allokera ny fil att lägga till i"
 
-#: ../daemon/gvfsbackendgphoto2.c:2831
+#: ../daemon/gvfsbackendgphoto2.c:2884
 msgid "Cannot read file to append to"
 msgstr "Kan inte läsa fil att lägga till i"
 
-#: ../daemon/gvfsbackendgphoto2.c:2842
+#: ../daemon/gvfsbackendgphoto2.c:2895
 msgid "Cannot get data of file to append to"
 msgstr "Kan inte få tag på data för fil att lägga till i"
 
-#: ../daemon/gvfsbackendgphoto2.c:3129
+#: ../daemon/gvfsbackendgphoto2.c:3182
 msgid "Error writing file"
 msgstr "Fel vid skrivning av fil"
 
-#: ../daemon/gvfsbackendgphoto2.c:3177
+#: ../daemon/gvfsbackendgphoto2.c:3230
 msgid "Not supported (not same directory)"
 msgstr "Stöds inte (inte samma katalog)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3189
+#: ../daemon/gvfsbackendgphoto2.c:3242
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Stöds inte (källa är katalog, mål är katalog)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:3250
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Stöds inte (källa är katalog, mål är befintlig fil)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3209
+#: ../daemon/gvfsbackendgphoto2.c:3262
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Stöds inte (källa är fil, mål är katalog)"
 
@@ -875,8 +975,8 @@ msgid "HTTP Client Error: %s"
 msgstr "HTTP-klientfel: %s"
 
 #: ../daemon/gvfsbackendhttp.c:560
-#: ../daemon/gvfsbackendsftp.c:1882
-#: ../daemon/gvfsbackendsmb.c:1301
+#: ../daemon/gvfsbackendsftp.c:1891
+#: ../daemon/gvfsbackendsmb.c:1337
 #: ../daemon/gvfsbackendtrash.c:1006
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
@@ -892,89 +992,88 @@ msgstr "Notifiering för katalog stöds inte"
 msgid "Windows Network"
 msgstr "Windows-nätverk"
 
-#. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:392
-msgid "Local Network"
-msgstr "Lokalt nätverk"
-
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:862
 msgid "Network Location Monitor"
 msgstr "Övervakare för nätverksplatser"
 
-#. Mount was successful
+#. Set the mountspec according to original uri, no matter whether user changes
+#. credentials during mount loop. Nautilus and other gio clients depend
+#. on correct mountspec, setting it to real (different) credentials would
+#. lead to G_IO_ERROR_NOT_MOUNTED errors
+#.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:442
-#: ../daemon/gvfsbackendsmb.c:557
-#: ../daemon/gvfsbackendsmb.c:1294
+#: ../daemon/gvfsbackendobexftp.c:380
+#: ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: ../daemon/gvfsbackendobexftp.c:699
+#: ../daemon/gvfsbackendobexftp.c:659
 msgid "Connection to the device lost"
 msgstr "Anslutning till enheten förlorades"
 
-#: ../daemon/gvfsbackendobexftp.c:1194
+#: ../daemon/gvfsbackendobexftp.c:1156
 msgid "Device requires a software update"
 msgstr "Enheten kräver en programuppdatering"
 
-#: ../daemon/gvfsbackendsftp.c:281
+#: ../daemon/gvfsbackendsftp.c:288
 msgid "ssh program unexpectedly exited"
 msgstr "ssh-programmet avslutades oväntat"
 
-#: ../daemon/gvfsbackendsftp.c:296
+#: ../daemon/gvfsbackendsftp.c:303
 msgid "Hostname not known"
 msgstr "Värdnamnet är inte känt"
 
-#: ../daemon/gvfsbackendsftp.c:303
+#: ../daemon/gvfsbackendsftp.c:310
 msgid "No route to host"
 msgstr "Ingen väg till värd"
 
-#: ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendsftp.c:317
 msgid "Connection refused by server"
 msgstr "Anslutningen nekades av server"
 
-#: ../daemon/gvfsbackendsftp.c:317
+#: ../daemon/gvfsbackendsftp.c:324
 msgid "Host key verification failed"
 msgstr "Verifiering av värdnyckel misslyckades"
 
-#: ../daemon/gvfsbackendsftp.c:400
+#: ../daemon/gvfsbackendsftp.c:407
 msgid "Unable to spawn ssh program"
 msgstr "Kunde inte starta ssh-program"
 
-#: ../daemon/gvfsbackendsftp.c:416
+#: ../daemon/gvfsbackendsftp.c:423
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Kunde inte starta ssh-program: %s"
 
-#: ../daemon/gvfsbackendsftp.c:528
-#: ../daemon/gvfsbackendsftp.c:780
+#: ../daemon/gvfsbackendsftp.c:535
+#: ../daemon/gvfsbackendsftp.c:787
 msgid "Timed out when logging in"
 msgstr "Tidsgräns överstigen vid inloggning"
 
-#: ../daemon/gvfsbackendsftp.c:858
+#: ../daemon/gvfsbackendsftp.c:865
 msgid "Enter passphrase for key"
 msgstr "Ange lösenfras för nyckel"
 
-#: ../daemon/gvfsbackendsftp.c:860
+#: ../daemon/gvfsbackendsftp.c:867
 msgid "Enter password"
 msgstr "Ange lösenord"
 
-#: ../daemon/gvfsbackendsftp.c:921
+#: ../daemon/gvfsbackendsftp.c:928
 msgid "Can't send password"
 msgstr "Kan inte skicka lösenord"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:936
 msgid "Log In Anyway"
 msgstr "Logga in ändå"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:936
 msgid "Cancel Login"
 msgstr "Avbryt inloggning"
 
-#: ../daemon/gvfsbackendsftp.c:939
+#: ../daemon/gvfsbackendsftp.c:946
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -987,127 +1086,138 @@ msgstr ""
 "\n"
 "Identiteten som skickades av fjärrdatorn är %s.  Du bör kontakta systemadministratören om du vill vara absolut säker på identiteten."
 
-#: ../daemon/gvfsbackendsftp.c:959
+#: ../daemon/gvfsbackendsftp.c:966
 msgid "Login dialog cancelled"
 msgstr "Inloggningsdialogen avbröts"
 
-#: ../daemon/gvfsbackendsftp.c:979
+#: ../daemon/gvfsbackendsftp.c:986
 msgid "Can't send host identity confirmation"
 msgstr "Kan inte skicka värdidentitetsbekräftelse"
 
-#: ../daemon/gvfsbackendsftp.c:1472
-#: ../daemon/gvfsbackendsftp.c:1495
+#: ../daemon/gvfsbackendsftp.c:1479
+#: ../daemon/gvfsbackendsftp.c:1502
 msgid "Protocol error"
 msgstr "Protokollfel"
 
+#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1527
+#, c-format
+msgid "sftp for %s on %s"
+msgstr "sftp för %s på %s"
+
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1519
+#: ../daemon/gvfsbackendsftp.c:1530
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp på %s"
 
-#: ../daemon/gvfsbackendsftp.c:1543
+#: ../daemon/gvfsbackendsftp.c:1556
 msgid "Unable to find supported ssh command"
 msgstr "Kunde inte hitta ssh-kommando som stöds"
 
-#: ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:1976
 msgid "Failure"
 msgstr "Fel"
 
-#: ../daemon/gvfsbackendsftp.c:2023
-#: ../daemon/gvfsbackendsftp.c:2082
-#: ../daemon/gvfsbackendsftp.c:2093
-#: ../daemon/gvfsbackendsftp.c:2149
-#: ../daemon/gvfsbackendsftp.c:2235
-#: ../daemon/gvfsbackendsftp.c:2285
-#: ../daemon/gvfsbackendsftp.c:2331
-#: ../daemon/gvfsbackendsftp.c:2406
-#: ../daemon/gvfsbackendsftp.c:2513
-#: ../daemon/gvfsbackendsftp.c:2553
-#: ../daemon/gvfsbackendsftp.c:2603
-#: ../daemon/gvfsbackendsftp.c:2672
-#: ../daemon/gvfsbackendsftp.c:2692
-#: ../daemon/gvfsbackendsftp.c:2844
-#: ../daemon/gvfsbackendsftp.c:2869
-#: ../daemon/gvfsbackendsftp.c:2924
-#: ../daemon/gvfsbackendsftp.c:2981
-#: ../daemon/gvfsbackendsftp.c:3252
-#: ../daemon/gvfsbackendsftp.c:3319
-#: ../daemon/gvfsbackendsftp.c:3448
-#: ../daemon/gvfsbackendsftp.c:3483
-#: ../daemon/gvfsbackendsftp.c:3511
-#: ../daemon/gvfsbackendsftp.c:3619
-#: ../daemon/gvfsbackendsftp.c:3673
-#: ../daemon/gvfsbackendsftp.c:3707
-#: ../daemon/gvfsbackendsftp.c:3741
-#: ../daemon/gvfsbackendsftp.c:3756
-#: ../daemon/gvfsbackendsftp.c:3771
-#: ../daemon/gvfsbackendsftp.c:3849
+#: ../daemon/gvfsbackendsftp.c:2032
+#: ../daemon/gvfsbackendsftp.c:2111
+#: ../daemon/gvfsbackendsftp.c:2122
+#: ../daemon/gvfsbackendsftp.c:2178
+#: ../daemon/gvfsbackendsftp.c:2264
+#: ../daemon/gvfsbackendsftp.c:2314
+#: ../daemon/gvfsbackendsftp.c:2360
+#: ../daemon/gvfsbackendsftp.c:2435
+#: ../daemon/gvfsbackendsftp.c:2542
+#: ../daemon/gvfsbackendsftp.c:2582
+#: ../daemon/gvfsbackendsftp.c:2632
+#: ../daemon/gvfsbackendsftp.c:2701
+#: ../daemon/gvfsbackendsftp.c:2721
+#: ../daemon/gvfsbackendsftp.c:2873
+#: ../daemon/gvfsbackendsftp.c:2898
+#: ../daemon/gvfsbackendsftp.c:2953
+#: ../daemon/gvfsbackendsftp.c:3010
+#: ../daemon/gvfsbackendsftp.c:3281
+#: ../daemon/gvfsbackendsftp.c:3348
+#: ../daemon/gvfsbackendsftp.c:3477
+#: ../daemon/gvfsbackendsftp.c:3512
+#: ../daemon/gvfsbackendsftp.c:3540
+#: ../daemon/gvfsbackendsftp.c:3648
+#: ../daemon/gvfsbackendsftp.c:3702
+#: ../daemon/gvfsbackendsftp.c:3736
+#: ../daemon/gvfsbackendsftp.c:3770
+#: ../daemon/gvfsbackendsftp.c:3785
+#: ../daemon/gvfsbackendsftp.c:3800
+#: ../daemon/gvfsbackendsftp.c:3878
 msgid "Invalid reply received"
 msgstr "Ogiltigt svar togs emot"
 
-#: ../daemon/gvfsbackendsftp.c:2351
+#: ../daemon/gvfsbackendsftp.c:2084
+#, c-format
+msgid "Invalid icon_id '%s' in OpenIconForRead"
+msgstr "Ogiltigt icon_id \"%s\" i OpenIconForRead"
+
+#: ../daemon/gvfsbackendsftp.c:2380
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Fel vid skapande av säkerhetskopia: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2754
+#: ../daemon/gvfsbackendsftp.c:2783
 msgid "Unable to create temporary file"
 msgstr "Kunde inte skapa temporärfil"
 
-#: ../daemon/gvfsbackendsftp.c:3545
-#: ../daemon/gvfsbackendsmb.c:1793
+#: ../daemon/gvfsbackendsftp.c:3574
+#: ../daemon/gvfsbackendsmb.c:1901
 msgid "Can't move directory over directory"
 msgstr "Kan inte flytta katalog över katalog"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:216
+#: ../daemon/gvfsbackendsmb.c:222
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Lösenord krävs för utdelningen %s på %s"
 
-#: ../daemon/gvfsbackendsmb.c:471
-#: ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsbackendsmb.c:478
+#: ../daemon/gvfsbackendsmb.c:524
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Internt fel (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:550
+#: ../daemon/gvfsbackendsmb.c:604
 msgid "Failed to mount Windows share"
 msgstr "Misslyckades med att montera Windows-utdelning"
 
-#: ../daemon/gvfsbackendsmb.c:717
-#: ../daemon/gvfsbackendsmb.c:1173
+#: ../daemon/gvfsbackendsmb.c:753
+#: ../daemon/gvfsbackendsmb.c:1209
 msgid "Unsupported seek type"
 msgstr "Söktypen stöds inte"
 
-#: ../daemon/gvfsbackendsmb.c:1237
+#: ../daemon/gvfsbackendsmb.c:1273
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Skapandet av säkerhetskopia misslyckades: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1695
+#: ../daemon/gvfsbackendsmb.c:1803
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Fel vid borttagning av fil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1769
+#: ../daemon/gvfsbackendsmb.c:1877
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Fel vid flyttning av fil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1841
+#: ../daemon/gvfsbackendsmb.c:1949
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Fel vid borttagning av målfil: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1865
+#: ../daemon/gvfsbackendsmb.c:1973
 msgid "Can't recursively move directory"
 msgstr "Kan inte flytta katalog rekursivt"
 
-#: ../daemon/gvfsbackendsmb.c:1928
+#: ../daemon/gvfsbackendsmb.c:2037
 msgid "Windows Shares Filesystem Service"
 msgstr "Filsystemstjänst för Windows-utdelningar"
 
@@ -1127,7 +1237,7 @@ msgstr "Filen är inte monteringsbar"
 msgid "Not a regular file"
 msgstr "Inte en vanlig fil"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1224
+#: ../daemon/gvfsbackendsmbbrowse.c:1219
 msgid "Windows Network Filesystem Service"
 msgstr "Filsystemstjänst för Windows-nätverk"
 
@@ -1160,39 +1270,6 @@ msgstr "Ogiltig typ av bakände"
 #, c-format
 msgid "Error sending fd: %s"
 msgstr "Fel vid sändning av fd: %s"
-
-#: ../daemon/gvfsjobcloseread.c:112
-#: ../daemon/gvfsjobclosewrite.c:120
-#: ../daemon/gvfsjobcopy.c:169
-#: ../daemon/gvfsjobcreatemonitor.c:140
-#: ../daemon/gvfsjobcreatemonitor.c:151
-#: ../daemon/gvfsjobcreatemonitor.c:174
-#: ../daemon/gvfsjobcreatemonitor.c:192
-#: ../daemon/gvfsjobdelete.c:122
-#: ../daemon/gvfsjobenumerate.c:256
-#: ../daemon/gvfsjobmakedirectory.c:122
-#: ../daemon/gvfsjobmount.c:109
-#: ../daemon/gvfsjobmountmountable.c:156
-#: ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:130
-#: ../daemon/gvfsjobopenforwrite.c:148
-#: ../daemon/gvfsjobopenforwrite.c:162
-#: ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131
-#: ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127
-#: ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146
-#: ../daemon/gvfsjobupload.c:169
-#: ../daemon/gvfsjobwrite.c:120
-msgid "Operation not supported by backend"
-msgstr "Åtgärden stöds inte av bakänden"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
@@ -1229,7 +1306,7 @@ msgstr "%s: %s"
 #: ../programs/gvfs-cat.c:163
 #: ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:101
-#: ../programs/gvfs-info.c:337
+#: ../programs/gvfs-info.c:364
 #: ../programs/gvfs-ls.c:386
 #: ../programs/gvfs-mkdir.c:59
 #: ../programs/gvfs-move.c:97
@@ -1241,30 +1318,211 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Prova \"%s --help\" för mer information."
 
-#: ../daemon/mount.c:439
+#: ../daemon/mount.c:456
 msgid "Invalid arguments from spawned child"
 msgstr "Ogiltiga argument från startad barnprocess"
 
-#: ../daemon/mount.c:740
+#: ../daemon/mount.c:767
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automatisk montering misslyckades: %s"
 
-#: ../daemon/mount.c:785
+#: ../daemon/mount.c:812
+#: ../daemon/mount.c:886
 msgid "The specified location is not mounted"
 msgstr "Angiven plats är inte monterad"
 
-#: ../daemon/mount.c:790
+#: ../daemon/mount.c:817
 msgid "The specified location is not supported"
 msgstr "Angiven plats stöds inte"
 
-#: ../daemon/mount.c:954
+#: ../daemon/mount.c:1023
 msgid "Location is already mounted"
 msgstr "Platsen är redan monterad"
 
-#: ../daemon/mount.c:962
+#: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "Platsen är inte monteringsbar"
+
+# http://www.nada.kth.se/dataterm/rek.html#a23
+#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "Cd-romskiva"
+
+#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "Tom cd-rom-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "Cd-r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "Tom cd-r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "Cd-rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "Tom cd-rw-skiva"
+
+# http://www.nada.kth.se/dataterm/rek.html#a23
+#: ../monitor/gphoto2/hal-utils.c:43
+#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43
+#: ../monitor/hal/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "Dvd-romskiva"
+
+# http://www.nada.kth.se/dataterm/rek.html#a23
+#: ../monitor/gphoto2/hal-utils.c:43
+#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43
+#: ../monitor/hal/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "Tom dvd-rom-skiva"
+
+# http://www.nada.kth.se/dataterm/rek.html#a23
+#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "Dvd-ramskiva"
+
+# http://www.nada.kth.se/dataterm/rek.html#a23
+#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "Tom dvd-ramskiva"
+
+#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "Dvd-rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "Tom dvd-rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "Dvd+r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "Tom dvd+r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "Dvd+rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "Tom dvd+rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "Tom DVD+R DL-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "Blu-Ray-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "Tom Blu-Ray-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "Blu-Ray r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "Tom Blu-Ray r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "Blu-Ray rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Tom Blu-Ray rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "HD dvd-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "Tom HD dvd-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "HD dvd-r-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "Tom HD dvd-rom-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "HD dvd-rw-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "Tom HD dvd-rw-skiva"
+
+# http://www.nada.kth.se/dataterm/rek.html#a23
+#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56
+msgid "MO Disc"
+msgstr "Mo-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "Tom mo-skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57
+msgid "Disc"
+msgstr "Skiva"
+
+#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "Tom skiva"
 
 #: ../monitor/hal/ghaldrive.c:130
 msgid "CD-ROM"
@@ -1415,221 +1673,41 @@ msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "Misslyckades med att mata ut media; en eller flera volymer på mediet är upptagna."
 
 #: ../monitor/hal/ghalmount.c:301
-#: ../monitor/hal/ghalvolume.c:152
+#: ../monitor/hal/ghalvolume.c:171
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
 #: ../monitor/hal/ghalmount.c:306
-#: ../monitor/hal/ghalvolume.c:157
+#: ../monitor/hal/ghalvolume.c:176
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
 #: ../monitor/hal/ghalmount.c:311
-#: ../monitor/hal/ghalvolume.c:162
+#: ../monitor/hal/ghalvolume.c:181
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
 #: ../monitor/hal/ghalmount.c:433
-#: ../monitor/hal/ghalvolume.c:233
+#: ../monitor/hal/ghalvolume.c:252
 msgid "Mixed Audio/Data Disc"
 msgstr "Blandad ljud- och dataskiva"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
 #: ../monitor/hal/ghalmount.c:446
-#: ../monitor/hal/ghalvolume.c:244
+#: ../monitor/hal/ghalvolume.c:263
 #, c-format
 msgid "%s Media"
 msgstr "%s-media"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalvolume.c:221
+#: ../monitor/hal/ghalvolume.c:240
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s-krypterat data"
-
-# http://www.nada.kth.se/dataterm/rek.html#a23
-#: ../monitor/hal/hal-utils.c:40
-#: ../monitor/gphoto2/hal-utils.c:40
-msgid "CD-ROM Disc"
-msgstr "Cd-romskiva"
-
-#: ../monitor/hal/hal-utils.c:40
-#: ../monitor/gphoto2/hal-utils.c:40
-msgid "Blank CD-ROM Disc"
-msgstr "Tom cd-rom-skiva"
-
-#: ../monitor/hal/hal-utils.c:41
-#: ../monitor/gphoto2/hal-utils.c:41
-msgid "CD-R Disc"
-msgstr "Cd-r-skiva"
-
-#: ../monitor/hal/hal-utils.c:41
-#: ../monitor/gphoto2/hal-utils.c:41
-msgid "Blank CD-R Disc"
-msgstr "Tom cd-r-skiva"
-
-#: ../monitor/hal/hal-utils.c:42
-#: ../monitor/gphoto2/hal-utils.c:42
-msgid "CD-RW Disc"
-msgstr "Cd-rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:42
-#: ../monitor/gphoto2/hal-utils.c:42
-msgid "Blank CD-RW Disc"
-msgstr "Tom cd-rw-skiva"
-
-# http://www.nada.kth.se/dataterm/rek.html#a23
-#: ../monitor/hal/hal-utils.c:43
-#: ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43
-#: ../monitor/gphoto2/hal-utils.c:45
-msgid "DVD-ROM Disc"
-msgstr "Dvd-romskiva"
-
-# http://www.nada.kth.se/dataterm/rek.html#a23
-#: ../monitor/hal/hal-utils.c:43
-#: ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43
-#: ../monitor/gphoto2/hal-utils.c:45
-msgid "Blank DVD-ROM Disc"
-msgstr "Tom dvd-rom-skiva"
-
-# http://www.nada.kth.se/dataterm/rek.html#a23
-#: ../monitor/hal/hal-utils.c:44
-#: ../monitor/gphoto2/hal-utils.c:44
-msgid "DVD-RAM Disc"
-msgstr "Dvd-ramskiva"
-
-# http://www.nada.kth.se/dataterm/rek.html#a23
-#: ../monitor/hal/hal-utils.c:44
-#: ../monitor/gphoto2/hal-utils.c:44
-msgid "Blank DVD-RAM Disc"
-msgstr "Tom dvd-ramskiva"
-
-#: ../monitor/hal/hal-utils.c:46
-#: ../monitor/gphoto2/hal-utils.c:46
-msgid "DVD-RW Disc"
-msgstr "Dvd-rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:46
-#: ../monitor/gphoto2/hal-utils.c:46
-msgid "Blank DVD-RW Disc"
-msgstr "Tom dvd-rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:47
-#: ../monitor/gphoto2/hal-utils.c:47
-msgid "DVD+R Disc"
-msgstr "Dvd+r-skiva"
-
-#: ../monitor/hal/hal-utils.c:47
-#: ../monitor/gphoto2/hal-utils.c:47
-msgid "Blank DVD+R Disc"
-msgstr "Tom dvd+r-skiva"
-
-#: ../monitor/hal/hal-utils.c:48
-#: ../monitor/gphoto2/hal-utils.c:48
-msgid "DVD+RW Disc"
-msgstr "Dvd+rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:48
-#: ../monitor/gphoto2/hal-utils.c:48
-msgid "Blank DVD+RW Disc"
-msgstr "Tom dvd+rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:49
-#: ../monitor/gphoto2/hal-utils.c:49
-msgid "DVD+R DL Disc"
-msgstr "DVD+R DL-skiva"
-
-#: ../monitor/hal/hal-utils.c:49
-#: ../monitor/gphoto2/hal-utils.c:49
-msgid "Blank DVD+R DL Disc"
-msgstr "Tom DVD+R DL-skiva"
-
-#: ../monitor/hal/hal-utils.c:50
-#: ../monitor/gphoto2/hal-utils.c:50
-msgid "Blu-Ray Disc"
-msgstr "Blu-Ray-skiva"
-
-#: ../monitor/hal/hal-utils.c:50
-#: ../monitor/gphoto2/hal-utils.c:50
-msgid "Blank Blu-Ray Disc"
-msgstr "Tom Blu-Ray-skiva"
-
-#: ../monitor/hal/hal-utils.c:51
-#: ../monitor/gphoto2/hal-utils.c:51
-msgid "Blu-Ray R Disc"
-msgstr "Blu-Ray r-skiva"
-
-#: ../monitor/hal/hal-utils.c:51
-#: ../monitor/gphoto2/hal-utils.c:51
-msgid "Blank Blu-Ray R Disc"
-msgstr "Tom Blu-Ray r-skiva"
-
-#: ../monitor/hal/hal-utils.c:52
-#: ../monitor/gphoto2/hal-utils.c:52
-msgid "Blu-Ray RW Disc"
-msgstr "Blu-Ray rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:52
-#: ../monitor/gphoto2/hal-utils.c:52
-msgid "Blank Blu-Ray RW Disc"
-msgstr "Tom Blu-Ray rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:53
-#: ../monitor/gphoto2/hal-utils.c:53
-msgid "HD DVD Disc"
-msgstr "HD dvd-skiva"
-
-#: ../monitor/hal/hal-utils.c:53
-#: ../monitor/gphoto2/hal-utils.c:53
-msgid "Blank HD DVD Disc"
-msgstr "Tom HD dvd-skiva"
-
-#: ../monitor/hal/hal-utils.c:54
-#: ../monitor/gphoto2/hal-utils.c:54
-msgid "HD DVD-R Disc"
-msgstr "HD dvd-r-skiva"
-
-#: ../monitor/hal/hal-utils.c:54
-#: ../monitor/gphoto2/hal-utils.c:54
-msgid "Blank HD DVD-R Disc"
-msgstr "Tom HD dvd-rom-skiva"
-
-#: ../monitor/hal/hal-utils.c:55
-#: ../monitor/gphoto2/hal-utils.c:55
-msgid "HD DVD-RW Disc"
-msgstr "HD dvd-rw-skiva"
-
-#: ../monitor/hal/hal-utils.c:55
-#: ../monitor/gphoto2/hal-utils.c:55
-msgid "Blank HD DVD-RW Disc"
-msgstr "Tom HD dvd-rw-skiva"
-
-# http://www.nada.kth.se/dataterm/rek.html#a23
-#: ../monitor/hal/hal-utils.c:56
-#: ../monitor/gphoto2/hal-utils.c:56
-msgid "MO Disc"
-msgstr "Mo-skiva"
-
-#: ../monitor/hal/hal-utils.c:56
-#: ../monitor/gphoto2/hal-utils.c:56
-msgid "Blank MO Disc"
-msgstr "Tom mo-skiva"
-
-#: ../monitor/hal/hal-utils.c:57
-#: ../monitor/gphoto2/hal-utils.c:57
-msgid "Disc"
-msgstr "Skiva"
-
-#: ../monitor/hal/hal-utils.c:57
-#: ../monitor/gphoto2/hal-utils.c:57
-msgid "Blank Disc"
-msgstr "Tom skiva"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1704,6 +1782,9 @@ msgstr "FILER... - öppna FILER med registrerade program."
 #: ../programs/gvfs-open.c:117
 msgid "Opens the file(s) with the default application registered to handle the type of the file."
 msgstr "Öppnar fil(er) med standardprogrammet registrerat att hantera den typen av fil."
+
+#~ msgid "dns-sd"
+#~ msgstr "dns-sd"
 
 #, fuzzy
 #~ msgid "Error creating port info list"
