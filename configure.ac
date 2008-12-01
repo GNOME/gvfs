@@ -260,7 +260,7 @@ OBEXFTP_LIBS=
 OBEXFTP_CFLAGS=
 
 if test "x$enable_obexftp" != "xno"; then
-  PKG_CHECK_EXISTS(dbus-glib-1 bluez >= 3.12, msg_obexftp=yes)
+  PKG_CHECK_EXISTS(dbus-glib-1 bluez >= 4.0, msg_obexftp=yes)
 
   dnl Make sure we have expat
   AC_CHECK_LIB(expat, XML_ParserCreate_MM,
@@ -268,7 +268,7 @@ if test "x$enable_obexftp" != "xno"; then
                have_expat=false)
 
   if test "x$msg_obexftp" == "xyes" -a "x$have_expat" == "xtrue"; then
-    PKG_CHECK_MODULES(OBEXFTP, dbus-glib-1 bluez >= 3.12)
+    PKG_CHECK_MODULES(OBEXFTP, dbus-glib-1 bluez >= 4.0)
     AC_SUBST(OBEXFTP_LIBS)
     AC_SUBST(OBEXFTP_CFLAGS)
 

@@ -1,3 +1,9 @@
+2008-12-01  Bastien Nocera  <hadess@hadess.net>
+
+	* configure.ac: Update bluez requirements, we
+	can't really require the 4.x API without the 4.x
+	libraries...
+
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonmount.c:
