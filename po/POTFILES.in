@@ -2,13 +2,18 @@
 # Please keep this file sorted alphabetically.
 [encoding: UTF-8]
 client/gdaemonfile.c
+client/gdaemonfileenumerator.c
 client/gdaemonfileinputstream.c
 client/gdaemonfileoutputstream.c
 client/gdaemonvfs.c
 client/gvfsdaemondbus.c
+client/gvfsiconloadable.c
 common/gmounttracker.c
 common/gsysutils.c
 common/gvfsdaemonprotocol.c
+common/gvfsdnssdresolver.c
+common/gvfsdnssdutils.c
+common/gvfsicon.c
 daemon/daemon-main.c
 daemon/gvfsbackend.c
 daemon/gvfsbackendarchive.c
@@ -45,6 +50,7 @@ daemon/gvfsjobmountmountable.c
 daemon/gvfsjobmove.c
 daemon/gvfsjobopenforread.c
 daemon/gvfsjobopenforwrite.c
+daemon/gvfsjobopeniconforread.c
 daemon/gvfsjobpull.c
 daemon/gvfsjobpush.c
 daemon/gvfsjobqueryattributes.c
@@ -61,14 +67,14 @@ daemon/gvfsjobunmountmountable.c
 daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
+monitor/gphoto2/ggphoto2volume.c
+monitor/gphoto2/ggphoto2volumemonitor.c
+monitor/gphoto2/hal-utils.c
 monitor/hal/ghaldrive.c
 monitor/hal/ghalmount.c
 monitor/hal/ghalvolume.c
 monitor/hal/ghalvolumemonitor.c
 monitor/hal/hal-utils.c
-monitor/gphoto2/ggphoto2volume.c
-monitor/gphoto2/ggphoto2volumemonitor.c
-monitor/gphoto2/hal-utils.c
 programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c

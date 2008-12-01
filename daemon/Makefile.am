@@ -39,7 +39,7 @@ libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-lo
 mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
 mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount
 
-mount_in_files += http.mount.in dav.mount.in ftp.mount.in 
+mount_in_files += http.mount.in dav.mount.in dav+sd.mount ftp.mount.in 
 if HAVE_HTTP
 mount_DATA += http.mount dav.mount ftp.mount
 if HAVE_AVAHI
