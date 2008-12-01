@@ -44,6 +44,7 @@ typedef struct _GProxyVolumeMonitorClass GProxyVolumeMonitorClass;
 typedef struct _GProxyDrive GProxyDrive;
 typedef struct _GProxyVolume GProxyVolume;
 typedef struct _GProxyMount GProxyMount;
+typedef struct _GProxyShadowMount GProxyShadowMount;
 
 struct _GProxyVolumeMonitorClass {
   GNativeVolumeMonitorClass parent_class;

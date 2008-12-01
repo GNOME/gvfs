@@ -43,7 +43,6 @@ struct _GDaemonMount {
 
   GMountInfo *mount_info;
 
-  GVolume *foreign_volume;
   GVolumeMonitor *volume_monitor;
 };
 
@@ -59,9 +58,6 @@ g_daemon_mount_finalize (GObject *object)
   GDaemonMount *mount;
   
   mount = G_DAEMON_MOUNT (object);
-
-  if (mount->foreign_volume != NULL)
-    g_object_unref (mount->foreign_volume);
 
   if (mount->volume_monitor != NULL)
     g_object_remove_weak_pointer (G_OBJECT (mount->volume_monitor), (gpointer) &(mount->volume_monitor));
@@ -140,24 +136,13 @@ g_daemon_mount_get_uuid (GMount *mount)
 static GVolume *
 g_daemon_mount_get_volume (GMount *mount)
 {
-  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
-  if (daemon_mount->foreign_volume != NULL)
-    return g_object_ref (daemon_mount->foreign_volume);
   return NULL;
 }
 
 static GDrive *
 g_daemon_mount_get_drive (GMount *mount)
 {
-  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
-  GDrive *drive;
-
-  G_LOCK (daemon_mount);
-  drive = NULL;
-  if (daemon_mount->foreign_volume != NULL)
-    drive = g_volume_get_drive (daemon_mount->foreign_volume);
-  G_UNLOCK (daemon_mount);
-  return drive;
+  return NULL;
 }
 
 static gboolean
@@ -169,60 +154,7 @@ g_daemon_mount_can_unmount (GMount *mount)
 static gboolean
 g_daemon_mount_can_eject (GMount *mount)
 {
-  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
-  gboolean res;
-  
-  G_LOCK (daemon_mount);
-  res = FALSE;
-  if (daemon_mount->foreign_volume != NULL)
-    res = g_volume_can_eject (daemon_mount->foreign_volume);
-  G_UNLOCK (daemon_mount);
-  
-  return res;
-}
-
-static void
-foreign_volume_removed (GVolume *volume, gpointer user_data)
-{
-  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (user_data);
-
-  G_LOCK (daemon_mount);
-
-  g_object_ref (daemon_mount);
-  
-  if (daemon_mount->foreign_volume == volume)
-    {
-      g_object_unref (daemon_mount->foreign_volume);
-      daemon_mount->foreign_volume = NULL;
-    }
-
-  G_UNLOCK (daemon_mount);
-  
-  g_signal_emit_by_name (daemon_mount, "changed");
-  if (daemon_mount->volume_monitor != NULL)
-    g_signal_emit_by_name (daemon_mount->volume_monitor, "mount_changed", daemon_mount);
-  
-  g_object_unref (daemon_mount);
-}
-
-void
-g_daemon_mount_set_foreign_volume (GDaemonMount *mount, 
-                                   GVolume *foreign_volume)
-{
-  G_LOCK (daemon_mount);
-  
-  if (mount->foreign_volume != NULL)
-    g_object_unref (mount->foreign_volume);
-
-  if (foreign_volume != NULL)
-    {
-      mount->foreign_volume = foreign_volume;
-      g_signal_connect_object (foreign_volume, "removed", (GCallback) foreign_volume_removed, mount, 0);
-    }
-  else
-    mount->foreign_volume = NULL;
-
-  G_UNLOCK (daemon_mount);
+  return FALSE;
 }
 
 static void
@@ -283,80 +215,6 @@ g_daemon_mount_unmount_finish (GMount *mount,
   return TRUE;
 }
 
-typedef struct {
-  GObject *object;
-  GAsyncReadyCallback callback;
-  gpointer user_data;
-} EjectWrapperOp;
-
-static void
-eject_wrapper_callback (GObject *source_object,
-                        GAsyncResult *res,
-                        gpointer user_data)
-{
-  EjectWrapperOp *data  = user_data;
-  data->callback (data->object, res, data->user_data);
-  g_free (data);
-}
-
-static void
-g_daemon_mount_eject (GMount              *mount,
-		      GMountUnmountFlags   flags,
-                      GCancellable        *cancellable,
-                      GAsyncReadyCallback  callback,
-                      gpointer             user_data)
-{
-  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
-  GDrive *drive;
-
-  G_LOCK (daemon_mount);
-
-  drive = NULL;
-  if (daemon_mount->foreign_volume != NULL)
-    drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
-      
-  G_UNLOCK (daemon_mount);
-  
-  if (drive != NULL)
-    {
-      EjectWrapperOp *data;
-      data = g_new0 (EjectWrapperOp, 1);
-      data->object = G_OBJECT (mount);
-      data->callback = callback;
-      data->user_data = user_data;
-      g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
-      g_object_unref (drive);
-    }
-}
-
-static gboolean
-g_daemon_mount_eject_finish (GMount        *mount,
-			     GAsyncResult  *result,
-			     GError       **error)
-{
-  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
-  GDrive *drive;
-  gboolean res;
-
-  res = TRUE;
-
-  G_LOCK (daemon_mount);
-
-  drive = NULL;
-  if (daemon_mount->foreign_volume != NULL)
-    drive = g_volume_get_drive (G_VOLUME (daemon_mount->foreign_volume));
-
-  G_UNLOCK (daemon_mount);
-  
-  if (drive != NULL)
-    {
-      res = g_drive_eject_finish (drive, result, error);
-      g_object_unref (drive);
-    }
-  
-  return res;
-}
-
 static char **
 g_daemon_mount_guess_content_type_sync (GMount              *mount,
                                         gboolean             force_rescan,
@@ -414,8 +272,6 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->can_eject = g_daemon_mount_can_eject;
   iface->unmount = g_daemon_mount_unmount;
   iface->unmount_finish = g_daemon_mount_unmount_finish;
-  iface->eject = g_daemon_mount_eject;
-  iface->eject_finish = g_daemon_mount_eject_finish;
   iface->guess_content_type = g_daemon_mount_guess_content_type;
   iface->guess_content_type_finish = g_daemon_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_daemon_mount_guess_content_type_sync;

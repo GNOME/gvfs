@@ -28,6 +28,7 @@
 #include <gio/gio.h>
 
 #include "gproxyvolumemonitor.h"
+#include "gproxyshadowmount.h"
 
 G_BEGIN_DECLS
 
@@ -48,10 +49,9 @@ GProxyVolume *g_proxy_volume_new                 (GProxyVolumeMonitor *volume_mo
 void          g_proxy_volume_update              (GProxyVolume        *volume,
                                                   DBusMessageIter     *iter);
 const char   *g_proxy_volume_get_id              (GProxyVolume        *volume);
-void          g_proxy_volume_adopt_foreign_mount (GProxyVolume        *volume,
-                                                  GMount              *foreign_mount);
 void          g_proxy_volume_register            (GIOModule           *module);
 
+GProxyShadowMount *g_proxy_volume_get_shadow_mount (GProxyVolume        *volume);
 
 G_END_DECLS
 

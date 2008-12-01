@@ -12,6 +12,7 @@ libgioremote_volume_monitor_la_SOURCES =				\
 	gproxydrive.c			gproxydrive.h			\
 	gproxyvolume.c			gproxyvolume.h			\
 	gproxymount.c			gproxymount.h			\
+	gproxyshadowmount.c		gproxyshadowmount.h		\
 	gproxyvolumemonitor.c		gproxyvolumemonitor.h		\
 	$(NULL)
 

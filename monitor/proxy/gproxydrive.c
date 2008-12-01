@@ -115,6 +115,9 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
   GProxyDrive *drive;
   drive = g_object_new (G_TYPE_PROXY_DRIVE, NULL);
   drive->volume_monitor = g_object_ref (volume_monitor);
+  g_object_set_data (G_OBJECT (drive),
+                     "g-proxy-drive-volume-monitor-name",
+                     (gpointer) g_type_name (G_TYPE_FROM_INSTANCE (volume_monitor)));
   return drive;
 }
 

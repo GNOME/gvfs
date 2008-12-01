@@ -1,5 +1,26 @@
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonmount.c:
+        * client/gdaemonvolumemonitor.c:
+        * monitor/proxy/Makefile.am:
+        * monitor/proxy/gproxydrive.c:
+        * monitor/proxy/gproxymount.c:
+        * monitor/proxy/gproxyvolume.c:
+        * monitor/proxy/gproxyvolume.h:
+        * monitor/proxy/gproxyvolumemonitor.c:
+        * monitor/proxy/gproxyvolumemonitor.h:
+        * monitor/proxy/remote-volume-monitor-module.c:
+	* monitor/proxy/gproxyshadowmount.[ch]:
+	Use the new support for shadow mounts instead
+	of g_volume_monitor_adopt_orphan_mount
+
+	Patch from David Zeuthen (#555332)
+	
+        * programs/gvfs-mount.c:
+	Add support to monitor volume monitor events
+
+2008-12-01  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac:
 	Post release version bump
 

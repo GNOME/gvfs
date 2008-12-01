@@ -37,6 +37,8 @@
 #include "gproxyvolume.h"
 #include "gproxymount.h"
 
+static void signal_emit_in_idle (gpointer object, const char *signal_name, gpointer other_object);
+
 /* Protects all fields of GProxyVolume that can change */
 G_LOCK_DEFINE_STATIC(proxy_volume);
 
@@ -44,6 +46,9 @@ struct _GProxyVolume {
   GObject parent;
 
   GProxyVolumeMonitor *volume_monitor;
+
+  /* non-NULL only if activation_uri != NULL */
+  GVolumeMonitor *union_monitor;
 
   char *id;
   char *name;
@@ -54,10 +59,10 @@ struct _GProxyVolume {
   char *mount_id;
   GHashTable *identifiers;
 
-  GMount *foreign_mount;
-
   gboolean can_mount;
   gboolean should_automount;
+
+  GProxyShadowMount *shadow_mount;
 };
 
 static void g_proxy_volume_volume_iface_init (GVolumeIface *iface);
@@ -72,6 +77,30 @@ static void g_proxy_volume_volume_iface_init (GVolumeIface *iface);
 G_DEFINE_DYNAMIC_TYPE_EXTENDED (GProxyVolume, g_proxy_volume, G_TYPE_OBJECT, 0,
                                 _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_VOLUME,
                                                                 g_proxy_volume_volume_iface_init))
+
+
+static void union_monitor_mount_added (GVolumeMonitor *union_monitor,
+                                       GMount         *mount,
+                                       GProxyVolume   *volume);
+
+static void union_monitor_mount_removed (GVolumeMonitor *union_monitor,
+                                         GMount         *mount,
+                                         GProxyVolume   *volume);
+
+static void union_monitor_mount_changed (GVolumeMonitor *union_monitor,
+                                         GMount         *mount,
+                                         GProxyVolume   *volume);
+
+static void update_shadow_mount (GProxyVolume *volume);
+
+GProxyShadowMount *
+g_proxy_volume_get_shadow_mount (GProxyVolume *volume)
+{
+  if (volume->shadow_mount != NULL)
+    return g_object_ref (volume->shadow_mount);
+  else
+    return NULL;
+}
 
 static void
 g_proxy_volume_finalize (GObject *object)
@@ -91,11 +120,26 @@ g_proxy_volume_finalize (GObject *object)
   if (volume->identifiers != NULL)
     g_hash_table_unref (volume->identifiers);
 
-  if (volume->foreign_mount != NULL)
-    g_object_unref (volume->foreign_mount);
+  if (volume->shadow_mount != NULL)
+    {
+      signal_emit_in_idle (volume->shadow_mount, "unmounted", NULL);
+      signal_emit_in_idle (volume->volume_monitor, "mount-removed", volume->shadow_mount);
+      g_proxy_shadow_mount_remove (volume->shadow_mount);
+      g_object_unref (volume->shadow_mount);
+    }
+
+  if (volume->union_monitor != NULL)
+    {
+      g_signal_handlers_disconnect_by_func (volume->union_monitor, union_monitor_mount_added, volume);
+      g_signal_handlers_disconnect_by_func (volume->union_monitor, union_monitor_mount_removed, volume);
+      g_signal_handlers_disconnect_by_func (volume->union_monitor, union_monitor_mount_changed, volume);
+      g_object_unref (volume->union_monitor);
+    }
 
   if (volume->volume_monitor != NULL)
-    g_object_unref (volume->volume_monitor);
+    {
+      g_object_unref (volume->volume_monitor);
+    }
 
   if (G_OBJECT_CLASS (g_proxy_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_proxy_volume_parent_class)->finalize) (object);
@@ -125,53 +169,159 @@ g_proxy_volume_new (GProxyVolumeMonitor *volume_monitor)
   GProxyVolume *volume;
   volume = g_object_new (G_TYPE_PROXY_VOLUME, NULL);
   volume->volume_monitor = g_object_ref (volume_monitor);
+  g_object_set_data (G_OBJECT (volume),
+                     "g-proxy-volume-volume-monitor-name",
+                     (gpointer) g_type_name (G_TYPE_FROM_INSTANCE (volume_monitor)));
   return volume;
 }
 
-static gboolean
-changed_in_idle (gpointer data)
+
+static void
+union_monitor_mount_added (GVolumeMonitor *union_monitor,
+                           GMount         *mount,
+                           GProxyVolume   *volume)
 {
-  GProxyVolume *volume = data;
+  update_shadow_mount (volume);
+}
 
-  g_signal_emit_by_name (volume, "changed");
-  if (volume->volume_monitor != NULL)
-    g_signal_emit_by_name (volume->volume_monitor, "volume-changed", volume);
+static void
+union_monitor_mount_removed (GVolumeMonitor *union_monitor,
+                             GMount         *mount,
+                             GProxyVolume   *volume)
+{
+  update_shadow_mount (volume);
+}
+
+static void
+union_monitor_mount_changed (GVolumeMonitor *union_monitor,
+                             GMount         *mount,
+                             GProxyVolume   *volume)
+{
+  if (volume->shadow_mount != NULL)
+    {
+      GMount *real_mount;
+      real_mount = g_proxy_shadow_mount_get_real_mount (volume->shadow_mount);
+      if (mount == real_mount)
+        {
+          signal_emit_in_idle (volume->shadow_mount, "changed", NULL);
+          signal_emit_in_idle (volume->volume_monitor, "mount-changed", volume->shadow_mount);
+        }
+      g_object_unref (real_mount);
+    }
+}
+
+static void
+update_shadow_mount (GProxyVolume *volume)
+{
+  GFile *activation_root;
+  GList *mounts;
+  GList *l;
+  GMount *mount_to_shadow;
+
+  activation_root = NULL;
+  mount_to_shadow = NULL;
+
+  if (volume->activation_uri == NULL)
+    goto out;
+
+  activation_root = g_file_new_for_uri (volume->activation_uri);
+
+  if (volume->union_monitor == NULL)
+    {
+      volume->union_monitor = g_volume_monitor_get ();
+      g_signal_connect (volume->union_monitor, "mount-added", (GCallback) union_monitor_mount_added, volume);
+      g_signal_connect (volume->union_monitor, "mount-removed", (GCallback) union_monitor_mount_removed, volume);
+      g_signal_connect (volume->union_monitor, "mount-changed", (GCallback) union_monitor_mount_changed, volume);
+    }
+
+  mounts = g_volume_monitor_get_mounts (volume->union_monitor);
+  for (l = mounts; l != NULL; l = l->next)
+    {
+      GMount *mount = G_MOUNT (l->data);
+      GFile *mount_root;
+
+      /* don't consider our (possibly) existing shadow mount */
+      if (G_IS_PROXY_SHADOW_MOUNT (mount))
+        continue;
+
+      mount_root = g_mount_get_root (mount);
+      if (g_file_has_prefix (activation_root, mount_root))
+        {
+          mount_to_shadow = g_object_ref (mount);
+          break;
+        }
+    }
+  g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
+  g_list_free (mounts);
+
+  if (mount_to_shadow != NULL)
+    {
+      /* there's now a mount to shadow, if we don't have a GProxyShadowMount then create one */
+      if (volume->shadow_mount == NULL)
+        {
+          volume->shadow_mount = g_proxy_shadow_mount_new (volume->volume_monitor,
+                                                           volume,
+                                                           mount_to_shadow);
+          signal_emit_in_idle (volume->volume_monitor, "mount-added", volume->shadow_mount);
+        }
+      else
+        {
+          GFile *current_activation_root;
+
+          /* we have a GProxyShadowMount already. However, we need to replace it if the
+           * activation root has changed.
+           */
+          current_activation_root = g_proxy_shadow_mount_get_activation_root (volume->shadow_mount);
+          if (!g_file_equal (current_activation_root, activation_root))
+            {
+              signal_emit_in_idle (volume->shadow_mount, "unmounted", NULL);
+              signal_emit_in_idle (volume->volume_monitor, "mount-removed", volume->shadow_mount);
+              g_proxy_shadow_mount_remove (volume->shadow_mount);
+              g_object_unref (volume->shadow_mount);
+              volume->shadow_mount = NULL;
+
+              volume->shadow_mount = g_proxy_shadow_mount_new (volume->volume_monitor,
+                                                               volume,
+                                                               mount_to_shadow);
+              signal_emit_in_idle (volume->volume_monitor, "mount-added", volume->shadow_mount);
+            }
+          g_object_unref (current_activation_root);
+        }
+    }
+  else
+    {
+      /* no mount to shadow; if we have a GProxyShadowMount then remove it */
+      if (volume->shadow_mount != NULL)
+        {
+          signal_emit_in_idle (volume->shadow_mount, "unmounted", NULL);
+          signal_emit_in_idle (volume->volume_monitor, "mount-removed", volume->shadow_mount);
+          g_proxy_shadow_mount_remove (volume->shadow_mount);
+          g_object_unref (volume->shadow_mount);
+          volume->shadow_mount = NULL;
+        }
+    }
+
+ out:
+
+  if (activation_root != NULL)
+    g_object_unref (activation_root);
+
+  if (mount_to_shadow != NULL)
+    g_object_unref (mount_to_shadow);
+}
+
+static gboolean
+update_shadow_mount_in_idle_do (GProxyVolume *volume)
+{
+  update_shadow_mount (volume);
   g_object_unref (volume);
-
   return FALSE;
 }
 
 static void
-foreign_mount_unmounted (GMount *mount, gpointer user_data)
+update_shadow_mount_in_idle (GProxyVolume *volume)
 {
-  GProxyVolume *volume = G_PROXY_VOLUME (user_data);
-  gboolean check;
-
-  G_LOCK (proxy_volume);
-  check = (volume->foreign_mount == mount);
-  G_UNLOCK (proxy_volume);
-  if (check)
-    g_proxy_volume_adopt_foreign_mount (volume, NULL);
-}
-
-void
-g_proxy_volume_adopt_foreign_mount (GProxyVolume *volume,
-                                    GMount       *foreign_mount)
-{
-  G_LOCK (proxy_volume);
-  if (volume->foreign_mount != NULL)
-    g_object_unref (volume->foreign_mount);
-
-  if (foreign_mount != NULL)
-    {
-      volume->foreign_mount =  g_object_ref (foreign_mount);
-      g_signal_connect_object (foreign_mount, "unmounted", (GCallback) foreign_mount_unmounted, volume, 0);
-    }
-  else
-    volume->foreign_mount =  NULL;
-
-  g_idle_add (changed_in_idle, g_object_ref (volume));
-  G_UNLOCK (proxy_volume);
+  g_idle_add ((GSourceFunc) update_shadow_mount_in_idle_do, g_object_ref (volume));
 }
 
 /* string               id
@@ -263,6 +413,9 @@ void g_proxy_volume_update (GProxyVolume    *volume,
   volume->can_mount = can_mount;
   volume->should_automount = should_automount;
   volume->identifiers = identifiers != NULL ? g_hash_table_ref (identifiers) : NULL;
+
+  /* this calls into the union monitor; do it in idle to avoid locking issues */
+  update_shadow_mount_in_idle (volume);
 
  out:
   g_hash_table_unref (identifiers);
@@ -381,22 +534,21 @@ g_proxy_volume_get_mount (GVolume *volume)
   GProxyVolume *proxy_volume = G_PROXY_VOLUME (volume);
   GMount *mount;
 
+  mount = NULL;
+
   G_LOCK (proxy_volume);
-  if (proxy_volume->foreign_mount != NULL)
+
+  if (proxy_volume->shadow_mount != NULL)
     {
-      mount = g_object_ref (proxy_volume->foreign_mount);
+      mount = g_object_ref (proxy_volume->shadow_mount);
     }
-  else
+  else if (proxy_volume->mount_id != NULL && strlen (proxy_volume->mount_id) > 0)
     {
-      mount = NULL;
-      if (proxy_volume->mount_id != NULL && strlen (proxy_volume->mount_id) > 0)
-        {
-          GProxyMount *proxy_mount;
-          proxy_mount = g_proxy_volume_monitor_get_mount_for_id (proxy_volume->volume_monitor,
-                                                                 proxy_volume->mount_id);
-          if (proxy_mount != NULL)
-            mount = G_MOUNT (proxy_mount);
-        }
+      GProxyMount *proxy_mount;
+      proxy_mount = g_proxy_volume_monitor_get_mount_for_id (proxy_volume->volume_monitor,
+                                                             proxy_volume->mount_id);
+      if (proxy_mount != NULL)
+        mount = G_MOUNT (proxy_mount);
     }
   G_UNLOCK (proxy_volume);
 
@@ -689,4 +841,40 @@ void
 g_proxy_volume_register (GIOModule *module)
 {
   g_proxy_volume_register_type (G_TYPE_MODULE (module));
+}
+
+typedef struct {
+  const char *signal_name;
+  GObject *object;
+  GObject *other_object;
+} SignalEmitIdleData;
+
+static gboolean
+signal_emit_in_idle_do (SignalEmitIdleData *data)
+{
+  if (data->other_object != NULL)
+    {
+      g_signal_emit_by_name (data->object, data->signal_name, data->other_object);
+      g_object_unref (data->other_object);
+    }
+  else
+    {
+      g_signal_emit_by_name (data->object, data->signal_name);
+    }
+  g_object_unref (data->object);
+  g_free (data);
+
+  return FALSE;
+}
+
+static void
+signal_emit_in_idle (gpointer object, const char *signal_name, gpointer other_object)
+{
+  SignalEmitIdleData *data;
+
+  data = g_new0 (SignalEmitIdleData, 1);
+  data->signal_name = signal_name;
+  data->object = g_object_ref (G_OBJECT (object));
+  data->other_object = other_object != NULL ? g_object_ref (G_OBJECT (other_object)) : NULL;
+  g_idle_add ((GSourceFunc) signal_emit_in_idle_do, data);
 }

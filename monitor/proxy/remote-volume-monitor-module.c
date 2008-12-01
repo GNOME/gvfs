@@ -31,6 +31,7 @@
 #include "gproxyvolumemonitor.h"
 #include "gproxyvolume.h"
 #include "gproxymount.h"
+#include "gproxyshadowmount.h"
 #include "gproxydrive.h"
 
 void
@@ -45,6 +46,7 @@ g_io_module_load (GIOModule *module)
 
   g_proxy_drive_register (module);
   g_proxy_mount_register (module);
+  g_proxy_shadow_mount_register (module);
   g_proxy_volume_register (module);
   g_proxy_volume_monitor_register (module);
 out:

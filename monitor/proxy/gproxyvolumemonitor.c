@@ -162,6 +162,7 @@ get_mounts (GVolumeMonitor *volume_monitor)
   GList *l;
   GHashTableIter hash_iter;
   GProxyMount *mount;
+  GProxyVolume *volume;
 
   monitor = G_PROXY_VOLUME_MONITOR (volume_monitor);
   l = NULL;
@@ -171,6 +172,16 @@ get_mounts (GVolumeMonitor *volume_monitor)
   g_hash_table_iter_init (&hash_iter, monitor->mounts);
   while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &mount))
     l = g_list_append (l, g_object_ref (mount));
+
+  /* also return shadow mounts */
+  g_hash_table_iter_init (&hash_iter, monitor->volumes);
+  while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &volume))
+    {
+      GProxyShadowMount *shadow_mount;
+      shadow_mount = g_proxy_volume_get_shadow_mount (volume);
+      if (shadow_mount != NULL)
+        l = g_list_append (l, shadow_mount);
+    }
 
   G_UNLOCK (proxy_vm);
 
@@ -534,9 +545,19 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
         volume = g_hash_table_lookup (monitor->volumes, id);
         if (volume != NULL)
           {
+            GProxyShadowMount *shadow_mount;
+
             g_proxy_volume_update (volume, &iter);
             signal_emit_in_idle (volume, "changed", NULL);
             signal_emit_in_idle (monitor, "volume-changed", volume);
+
+            shadow_mount = g_proxy_volume_get_shadow_mount (volume);
+            if (shadow_mount != NULL)
+              {
+                signal_emit_in_idle (shadow_mount, "changed", NULL);
+                signal_emit_in_idle (monitor, "mount-changed", shadow_mount);
+                g_object_unref (shadow_mount);
+              }
           }
       }
     else if (strcmp (member, "VolumeAdded") == 0)
@@ -743,56 +764,6 @@ is_supported (GProxyVolumeMonitorClass *klass)
   return res;
 }
 
-static GVolume *
-adopt_orphan_mount (GMount *mount, GVolumeMonitor *monitor)
-{
-  GProxyVolumeMonitor *proxy_monitor = G_PROXY_VOLUME_MONITOR (monitor);
-  GFile *mount_root;
-  GProxyVolume *proxy_volume;
-  GVolume *ret;
-  GHashTableIter hash_iter;
-
-  ret = NULL;
-
-  G_LOCK (proxy_vm);
-
-  mount_root = g_mount_get_root (mount);
-
-  /* TODO: consider what happens if two volumes wants to adopt the same mount?
-   *
-   * e.g. imagine two GVolume objects with activation_roots
-   *
-   *      ssh://server/dir1
-   *      ssh://server/dir2
-   */
-
-  g_hash_table_iter_init (&hash_iter, proxy_monitor->volumes);
-  while (g_hash_table_iter_next (&hash_iter, NULL, (gpointer) &proxy_volume))
-    {
-      GFile *activation_root;
-
-      activation_root = g_volume_get_activation_root (G_VOLUME (proxy_volume));
-      if (activation_root != NULL)
-        {
-          if (g_file_has_prefix (activation_root, mount_root) ||
-              g_file_equal (activation_root, mount_root))
-            {
-              g_proxy_volume_adopt_foreign_mount (proxy_volume, mount);
-              ret = g_object_ref (proxy_volume);
-              g_object_unref (activation_root);
-              goto found;
-            }
-          g_object_unref (activation_root);
-        }
-    }
-
- found:
-  g_object_unref (mount_root);
-
-  G_UNLOCK (proxy_vm);
-  return ret;
-}
-
 static void
 g_proxy_volume_monitor_class_init (GProxyVolumeMonitorClass *klass)
 {
@@ -809,7 +780,6 @@ g_proxy_volume_monitor_class_init (GProxyVolumeMonitorClass *klass)
   monitor_class->get_connected_drives = get_connected_drives;
   monitor_class->get_volume_for_uuid = get_volume_for_uuid;
   monitor_class->get_mount_for_uuid = get_mount_for_uuid;
-  monitor_class->adopt_orphan_mount = adopt_orphan_mount;
 
   i = klass->is_supported_nr;
   is_supported_classes[i] = klass;

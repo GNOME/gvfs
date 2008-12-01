@@ -43,7 +43,8 @@ static GMainLoop *main_loop;
 static gboolean mount_mountable = FALSE;
 static gboolean mount_unmount = FALSE;
 static gboolean mount_list = FALSE;
-static gboolean mount_list_info = FALSE;
+static gboolean extra_detail = FALSE;
+static gboolean mount_monitor = FALSE;
 static const char *unmount_scheme = NULL;
 
 static const GOptionEntry entries[] = 
@@ -52,7 +53,8 @@ static const GOptionEntry entries[] =
   { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, "Unmount", NULL},
   { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, "Unmount all mounts with the given scheme", NULL},
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, "List", NULL},
-  { "list-info", 'i', 0, G_OPTION_ARG_NONE, &mount_list_info, "List extra information", NULL},
+  { "detail", 'i', 0, G_OPTION_ARG_NONE, &extra_detail, "Show extra information for List and Monitor", NULL},
+  { "monitor", 'o', 0, G_OPTION_ARG_NONE, &mount_monitor, "Monitor events", NULL},
   { NULL }
 };
 
@@ -292,6 +294,50 @@ show_themed_icon_names (GThemedIcon *icon, int indent)
   g_strfreev (names);
 }
 
+/* don't copy-paste this code */
+static char *
+get_type_name (gpointer object)
+{
+  const char *type_name;
+  char *ret;
+
+  type_name = g_type_name (G_TYPE_FROM_INSTANCE (object));
+  if (strcmp ("GProxyDrive", type_name) == 0)
+    {
+      ret = g_strdup_printf ("%s (%s)",
+                             type_name,
+                             (const char *) g_object_get_data (G_OBJECT (object),
+                                                               "g-proxy-drive-volume-monitor-name"));
+    }
+  else if (strcmp ("GProxyVolume", type_name) == 0)
+    {
+      ret = g_strdup_printf ("%s (%s)",
+                             type_name,
+                             (const char *) g_object_get_data (G_OBJECT (object),
+                                                               "g-proxy-volume-volume-monitor-name"));
+    }
+  else if (strcmp ("GProxyMount", type_name) == 0)
+    {
+      ret = g_strdup_printf ("%s (%s)",
+                             type_name,
+                             (const char *) g_object_get_data (G_OBJECT (object),
+                                                               "g-proxy-mount-volume-monitor-name"));
+    }
+  else if (strcmp ("GProxyShadowMount", type_name) == 0)
+    {
+      ret = g_strdup_printf ("%s (%s)",
+                             type_name,
+                             (const char *) g_object_get_data (G_OBJECT (object),
+                                                               "g-proxy-shadow-mount-volume-monitor-name"));
+    }
+  else
+    {
+      ret = g_strdup (type_name);
+    }
+
+  return ret;
+}
+
 static void
 list_mounts (GList *mounts,
 	     int indent,
@@ -305,6 +351,7 @@ list_mounts (GList *mounts,
   GFile *root;
   GIcon *icon;
   char **x_content_types;
+  char *type_name;
   
   for (c = 0, l = mounts; l != NULL; l = l->next, c++)
     {
@@ -315,7 +362,7 @@ list_mounts (GList *mounts,
 	  volume = g_mount_get_volume (mount);
 	  if (volume != NULL)
 	    {
-	      g_object_unref (volume);
+              g_object_unref (volume);
 	      continue;
 	    }
 	}
@@ -326,7 +373,11 @@ list_mounts (GList *mounts,
       
       g_print ("%*sMount(%d): %s -> %s\n", indent, "", c, name, uri);
 
-      if (mount_list_info)
+      type_name = get_type_name (mount);
+      g_print ("%*sType: %s\n", indent+2, "", type_name);
+      g_free (type_name);
+
+      if (extra_detail)
 	{
 	  uuid = g_mount_get_uuid (mount);
 	  if (uuid)
@@ -354,6 +405,7 @@ list_mounts (GList *mounts,
 
 	  g_print ("%*scan_unmount=%d\n", indent + 2, "", g_mount_can_unmount (mount));
 	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_mount_can_eject (mount));
+	  g_print ("%*sis_shadowed=%d\n", indent + 2, "", g_mount_is_shadowed (mount));
 	  g_free (uuid);
 	}
       
@@ -378,6 +430,7 @@ list_volumes (GList *volumes,
   GFile *activation_root;
   char **ids;
   GIcon *icon;
+  char *type_name;
   
   for (c = 0, l = volumes; l != NULL; l = l->next, c++)
     {
@@ -398,7 +451,11 @@ list_volumes (GList *volumes,
       g_print ("%*sVolume(%d): %s\n", indent, "", c, name);
       g_free (name);
 
-      if (mount_list_info)
+      type_name = get_type_name (volume);
+      g_print ("%*sType: %s\n", indent+2, "", type_name);
+      g_free (type_name);
+
+      if (extra_detail)
 	{
 	  ids = g_volume_enumerate_identifiers (volume);
 	  if (ids && ids[0] != NULL)
@@ -461,6 +518,7 @@ list_drives (GList *drives,
   char *name;
   char **ids;
   GIcon *icon;
+  char *type_name;
   
   for (c = 0, l = drives; l != NULL; l = l->next, c++)
     {
@@ -469,8 +527,12 @@ list_drives (GList *drives,
       
       g_print ("%*sDrive(%d): %s\n", indent, "", c, name);
       g_free (name);
+
+      type_name = get_type_name (drive);
+      g_print ("%*sType: %s\n", indent+2, "", type_name);
+      g_free (type_name);
       
-      if (mount_list_info)
+      if (extra_detail)
 	{
 	  ids = g_drive_enumerate_identifiers (drive);
 	  if (ids && ids[0] != NULL)
@@ -567,6 +629,180 @@ unmount_all_with_scheme (const char *scheme)
   g_object_unref (volume_monitor);
 }
 
+static void
+monitor_print_mount (GMount *mount)
+{
+  if (extra_detail)
+    {
+      GList *l;
+      l = g_list_prepend (NULL, mount);
+      list_mounts (l, 2, FALSE);
+      g_list_free (l);
+      g_print ("\n");
+    }
+}
+
+static void
+monitor_print_volume (GVolume *volume)
+{
+  if (extra_detail)
+    {
+      GList *l;
+      l = g_list_prepend (NULL, volume);
+      list_volumes (l, 2, FALSE);
+      g_list_free (l);
+      g_print ("\n");
+    }
+}
+
+static void
+monitor_print_drive (GDrive *drive)
+{
+  if (extra_detail)
+    {
+      GList *l;
+      l = g_list_prepend (NULL, drive);
+      list_drives (l, 2);
+      g_list_free (l);
+      g_print ("\n");
+    }
+}
+
+static void
+monitor_mount_added (GVolumeMonitor *volume_monitor, GMount *mount)
+{
+  char *name;
+  name = g_mount_get_name (mount);
+  g_print ("Mount added: '%s'\n", name);
+  g_free (name);
+  monitor_print_mount (mount);
+}
+
+static void
+monitor_mount_removed (GVolumeMonitor *volume_monitor, GMount *mount)
+{
+  char *name;
+  name = g_mount_get_name (mount);
+  g_print ("Mount removed: '%s'\n", name);
+  g_free (name);
+  monitor_print_mount (mount);
+}
+
+static void
+monitor_mount_changed (GVolumeMonitor *volume_monitor, GMount *mount)
+{
+  char *name;
+  name = g_mount_get_name (mount);
+  g_print ("Mount changed: '%s'\n", name);
+  g_free (name);
+  monitor_print_mount (mount);
+}
+
+static void
+monitor_mount_pre_unmount (GVolumeMonitor *volume_monitor, GMount *mount)
+{
+  char *name;
+  name = g_mount_get_name (mount);
+  g_print ("Mount pre-unmount:  '%s'\n", name);
+  g_free (name);
+  monitor_print_mount (mount);
+}
+
+static void
+monitor_volume_added (GVolumeMonitor *volume_monitor, GVolume *volume)
+{
+  char *name;
+  name = g_volume_get_name (volume);
+  g_print ("Volume added:       '%s'\n", name);
+  g_free (name);
+  monitor_print_volume (volume);
+}
+
+static void
+monitor_volume_removed (GVolumeMonitor *volume_monitor, GVolume *volume)
+{
+  char *name;
+  name = g_volume_get_name (volume);
+  g_print ("Volume removed:     '%s'\n", name);
+  g_free (name);
+  monitor_print_volume (volume);
+}
+
+static void
+monitor_volume_changed (GVolumeMonitor *volume_monitor, GVolume *volume)
+{
+  char *name;
+  name = g_volume_get_name (volume);
+  g_print ("Volume changed:     '%s'\n", name);
+  g_free (name);
+  monitor_print_volume (volume);
+}
+
+static void
+monitor_drive_connected (GVolumeMonitor *volume_monitor, GDrive *drive)
+{
+  char *name;
+  name = g_drive_get_name (drive);
+  g_print ("Drive connected:    '%s'\n", name);
+  g_free (name);
+  monitor_print_drive (drive);
+}
+
+static void
+monitor_drive_disconnected (GVolumeMonitor *volume_monitor, GDrive *drive)
+{
+  char *name;
+  name = g_drive_get_name (drive);
+  g_print ("Drive disconnected: '%s'\n", name);
+  g_free (name);
+  monitor_print_drive (drive);
+}
+
+static void
+monitor_drive_changed (GVolumeMonitor *volume_monitor, GDrive *drive)
+{
+  char *name;
+  name = g_drive_get_name (drive);
+  g_print ("Drive changed:      '%s'\n", name);
+  g_free (name);
+  monitor_print_drive (drive);
+}
+
+static void
+monitor_drive_eject_button (GVolumeMonitor *volume_monitor, GDrive *drive)
+{
+  char *name;
+  name = g_drive_get_name (drive);
+  g_print ("Drive eject button: '%s'\n", name);
+  g_free (name);
+}
+
+static void
+monitor (void)
+{
+  GMainLoop *loop;
+  GVolumeMonitor *volume_monitor;
+
+  loop = g_main_loop_new (NULL, FALSE);
+  volume_monitor = g_volume_monitor_get ();
+
+  g_signal_connect (volume_monitor, "mount-added", (GCallback) monitor_mount_added, NULL);
+  g_signal_connect (volume_monitor, "mount-removed", (GCallback) monitor_mount_removed, NULL);
+  g_signal_connect (volume_monitor, "mount-changed", (GCallback) monitor_mount_changed, NULL);
+  g_signal_connect (volume_monitor, "mount-pre-unmount", (GCallback) monitor_mount_pre_unmount, NULL);
+  g_signal_connect (volume_monitor, "volume-added", (GCallback) monitor_volume_added, NULL);
+  g_signal_connect (volume_monitor, "volume-removed", (GCallback) monitor_volume_removed, NULL);
+  g_signal_connect (volume_monitor, "volume-changed", (GCallback) monitor_volume_changed, NULL);
+  g_signal_connect (volume_monitor, "drive-connected", (GCallback) monitor_drive_connected, NULL);
+  g_signal_connect (volume_monitor, "drive-disconnected", (GCallback) monitor_drive_disconnected, NULL);
+  g_signal_connect (volume_monitor, "drive-changed", (GCallback) monitor_drive_changed, NULL);
+  g_signal_connect (volume_monitor, "drive-eject-button", (GCallback) monitor_drive_eject_button, NULL);
+
+  g_print ("Monitoring events. Press Ctrl+C to quit.\n");
+
+  g_main_loop_run (main_loop);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -591,6 +827,10 @@ main (int argc, char *argv[])
   else if (unmount_scheme != NULL)
     {
       unmount_all_with_scheme (unmount_scheme);
+    }
+  else if (mount_monitor)
+    {
+      monitor ();
     }
   else if (argc > 1)
     {

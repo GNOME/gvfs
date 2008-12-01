@@ -115,6 +115,9 @@ g_proxy_mount_new (GProxyVolumeMonitor *volume_monitor)
   GProxyMount *mount;
   mount = g_object_new (G_TYPE_PROXY_MOUNT, NULL);
   mount->volume_monitor = g_object_ref (volume_monitor);
+  g_object_set_data (G_OBJECT (mount),
+                     "g-proxy-mount-volume-monitor-name",
+                     (gpointer) g_type_name (G_TYPE_FROM_INSTANCE (volume_monitor)));
   return mount;
 }
 

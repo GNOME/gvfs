@@ -136,7 +136,6 @@ static void
 mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
 {
   GDaemonMount *mount;
-  GVolume *volume;
 
   G_LOCK (daemon_vm);
 
@@ -152,9 +151,6 @@ mount_added (GDaemonVolumeMonitor *daemon_monitor, GMountInfo *mount_info)
   if (mount_info->user_visible)
     {
       mount = g_daemon_mount_new (mount_info, G_VOLUME_MONITOR (daemon_monitor));
-      volume = g_volume_monitor_adopt_orphan_mount (G_MOUNT (mount));
-      if (volume != NULL)
-        g_daemon_mount_set_foreign_volume (mount, volume);
       daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
 
       /* Ref for the signal emission, other ref is owned by volume monitor */
@@ -204,7 +200,6 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
   GList *mounts, *l;
   GDaemonMount *mount;
   GMountInfo *info;
-  GVolume *volume;
 
   _the_daemon_volume_monitor = daemon_monitor;
 
@@ -223,9 +218,6 @@ g_daemon_volume_monitor_init (GDaemonVolumeMonitor *daemon_monitor)
     if (info->user_visible)
       {
         mount = g_daemon_mount_new (info, G_VOLUME_MONITOR (daemon_monitor));
-        volume = g_volume_monitor_adopt_orphan_mount (G_MOUNT (mount));
-        if (volume != NULL)
-          g_daemon_mount_set_foreign_volume (mount, volume);
 	daemon_monitor->mounts = g_list_prepend (daemon_monitor->mounts, mount);
       }
     
