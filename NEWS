@@ -1,3 +1,23 @@
+Major changes in 1.1.1
+======================
+* Reverse map FUSE pathnames to gvfs locations
+* Fix crashes
+* Show better icon info in gvfs-info
+* Support custom icons for gvfs backends
+* dav: support uris (dav+sd://) which specify dns-sd services instead of resolved ip+port
+* ftp: Fix time parsing
+* ftp: Show username in auth dialog if specified in uri
+* ftp: Support UTF8 server feature
+* ftp: Use LIST -a instead of LIST on unix servers
+* fuse: Fix major race in that caused crashes
+* fuse: Set st_blocks so that e.g. the "du" command works
+* gphoto: use custom icons for faster thumbnails
+* obexftp: Port to bluez 4 API
+* sftp: If name specified in mount, use in name too so that fuse paths are unique
+* sftp: Support /etc/favicon.png
+* smb: Don't ask for password twice if cancelled
+* smb: support setting timestamp
+
 Major changes in 0.99.7
 =======================
 
