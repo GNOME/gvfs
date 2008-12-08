@@ -6,8 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-05 07:54+0000\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gvfs&amp;component=general\n"
+"POT-Creation-Date: 2008-12-01 18:18+0000\n"
 "PO-Revision-Date: 2008-08-26 16:28+0200\n"
 "Last-Translator: Mark Krapivner <mark125@gmail.com>\n"
 "Language-Team: he\n"
@@ -28,7 +29,7 @@ msgstr "Invalid return value from get_info"
 msgid "Invalid return value from query_info"
 msgstr "Invalid return value from query_info"
 
-#: ../client/gdaemonfile.c:894
+#: ../client/gdaemonfile.c:894 ../client/gvfsiconloadable.c:338
 msgid "Couldn't get stream file descriptor"
 msgstr "Couldn't get stream file descriptor"
 
@@ -36,12 +37,13 @@ msgstr "Couldn't get stream file descriptor"
 #: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
 #: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
 #: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
+#: ../client/gvfsiconloadable.c:370
 msgid "Invalid return value from open"
 msgstr "Invalid return value from open"
 
 #: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
 #: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2220
+#: ../client/gdaemonfile.c:2220 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Didn't get stream file descriptor"
 
@@ -76,6 +78,25 @@ msgstr "Invalid return value from monitor_dir"
 msgid "Invalid return value from monitor_file"
 msgstr "Invalid return value from monitor_file"
 
+#: ../client/gdaemonfileenumerator.c:351
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:734
+#: ../daemon/gvfsbackendobexftp.c:755 ../daemon/gvfsbackendobexftp.c:874
+#: ../daemon/gvfsbackendobexftp.c:1011 ../daemon/gvfsbackendobexftp.c:1075
+#: ../daemon/gvfsbackendobexftp.c:1212 ../daemon/gvfsbackendobexftp.c:1239
+#: ../daemon/gvfsbackendobexftp.c:1298 ../daemon/gvfsbackendobexftp.c:1320
+#: ../daemon/gvfsbackendobexftp.c:1380 ../daemon/gvfsbackendobexftp.c:1399
+#: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+msgid "Operation was cancelled"
+msgstr "הפעולה בוטלה"
+
 #: ../client/gdaemonfileinputstream.c:450
 #: ../client/gdaemonfileinputstream.c:458
 #: ../client/gdaemonfileinputstream.c:1300
@@ -95,24 +116,6 @@ msgstr "Error in stream protocol: %s"
 msgid "End of stream"
 msgstr "End of stream"
 
-#: ../client/gdaemonfileinputstream.c:518
-#: ../client/gdaemonfileinputstream.c:674
-#: ../client/gdaemonfileinputstream.c:782
-#: ../client/gdaemonfileinputstream.c:1032
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
-#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
-#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
-#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
-#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
-#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
-#: ../daemon/gvfsbackendsmb.c:1069 ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
-#: ../daemon/gvfschannel.c:298
-msgid "Operation was cancelled"
-msgstr "הפעולה בוטלה"
-
 #: ../client/gdaemonfileinputstream.c:1207
 #: ../client/gdaemonfileoutputstream.c:942
 msgid "Seek not supported on stream"
@@ -123,11 +126,11 @@ msgid "The query info operation is not supported"
 msgstr "The query info operation is not supported"
 
 #: ../client/gdaemonfileoutputstream.c:991
-#, fuzzy, c-format
+#, c-format
 msgid "Query info not supported on stream"
-msgstr "Seek not supported on stream"
+msgstr "Query info not supported on stream"
 
-#: ../client/gdaemonvfs.c:757
+#: ../client/gdaemonvfs.c:830
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Error while getting mount info: %s"
@@ -136,6 +139,10 @@ msgstr "Error while getting mount info: %s"
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Error connecting to daemon: %s"
+
+#: ../client/gvfsiconloadable.c:145
+msgid "Invalid return value from open_icon_for_read"
+msgstr "Invalid return value from open_icon_for_read"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -147,13 +154,57 @@ msgstr "Error creating socket: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Error connecting to socket: %s"
 
-#: ../common/gvfsdaemonprotocol.c:515
+#: ../common/gvfsdaemonprotocol.c:454
 msgid "Invalid file info format"
 msgstr "Invalid file info format"
 
-#: ../common/gvfsdaemonprotocol.c:532
+#: ../common/gvfsdaemonprotocol.c:471
 msgid "Invalid attribute info list content"
 msgstr "Invalid attribute info list content"
+
+#: ../common/gvfsdnssdresolver.c:208
+#, c-format
+msgid "Error initializing Avahi: %s"
+msgstr "Error initializing Avahi: %s"
+
+#: ../common/gvfsdnssdresolver.c:254
+#, c-format
+msgid "Error creating Avahi resolver: %s"
+msgstr "Error creating Avahi resolver: %s"
+
+#: ../common/gvfsdnssdresolver.c:1094
+#, c-format
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "Error resolving \"%s\" service \"%s\" on domain \"%s\""
+
+#: ../common/gvfsdnssdresolver.c:1114
+#, c-format
+msgid ""
+"Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
+"records are missing. Keys required: \"%s\"."
+msgstr ""
+"Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
+"records are missing. Keys required: \"%s\"."
+
+#: ../common/gvfsdnssdresolver.c:1126
+#, c-format
+msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
+
+#: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
+#: ../common/gvfsdnssdutils.c:280
+#, c-format
+msgid "Malformed dns-sd encoded_triple '%s'"
+msgstr "Malformed dns-sd encoded_triple '%s'"
+
+#: ../common/gvfsicon.c:250
+#, c-format
+msgid "Can't handle version %d of GVfsIcon encoding"
+msgstr "Can't handle version %d of GVfsIcon encoding"
+
+#: ../common/gvfsicon.c:260
+msgid "Malformed input data for GVfsIcon"
+msgstr "Malformed input data for GVfsIcon"
 
 #: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
 #, c-format
@@ -199,37 +250,37 @@ msgstr "error starting mount daemon"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:963
-#: ../daemon/gvfsbackendsftp.c:1894
+#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:1094
+#: ../daemon/gvfsbackendsftp.c:1903
 #, c-format
 msgid "/ on %s"
 msgstr "/ ב-%s"
 
-#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1479
-#: ../daemon/gvfsbackendsftp.c:1553
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1632
+#: ../daemon/gvfsbackendsftp.c:1566
 msgid "No hostname specified"
 msgstr "לא צויין שם מארח"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
-#: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
-#: ../daemon/gvfsbackendsmb.c:605
+#: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackendobexftp.c:554 ../daemon/gvfsbackendobexftp.c:565
+#: ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
 msgstr ""
 
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
-#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:822
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendftp.c:2101 ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:2254 ../daemon/gvfsbackendnetwork.c:590
 #: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
-#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1116
+#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
 msgid "File doesn't exist"
 msgstr "קובץ לא קיים"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:912 ../daemon/gvfsbackendnetwork.c:637
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:440
+#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:637
 msgid "The file is not a directory"
 msgstr "הקובץ אינו ספרייה"
 
@@ -245,13 +296,13 @@ msgstr "לא ניתן ליצור ספרייה זמנית"
 #: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
-#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:2706
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1096
+#: ../daemon/gvfsbackendgphoto2.c:2040 ../daemon/gvfsbackendgphoto2.c:2759
 #, c-format
 msgid "No such file or directory"
 msgstr ""
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2043
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2183
 msgid "Directory not empty"
 msgstr "ספרייה לא ריקה"
 
@@ -265,7 +316,7 @@ msgid "CD/DVD Creator"
 msgstr "יוצר CD/DVD"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2833
 msgid "File exists"
 msgstr "קובץ קיים"
 
@@ -278,12 +329,13 @@ msgstr "קובץ קיים"
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
 #: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
 #: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobpull.c:173 ../daemon/gvfsjobpush.c:173
-#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
-#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
-#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:173
+#: ../daemon/gvfsjobpush.c:173 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
 #: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
 msgid "Operation not supported by backend"
 msgstr "הפעולה לא נתמכת על ידי המנוע"
@@ -304,89 +356,85 @@ msgstr "קובץ היעד קיים"
 msgid "Can't recursively copy directory"
 msgstr ""
 
-#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendgphoto2.c:2360
-#: ../daemon/gvfsbackendgphoto2.c:2569 ../daemon/gvfsbackendgphoto2.c:2666
-#: ../daemon/gvfsbackendgphoto2.c:2759
+#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendcomputer.c:731
+#: ../daemon/gvfsbackendgphoto2.c:2413 ../daemon/gvfsbackendgphoto2.c:2622
+#: ../daemon/gvfsbackendgphoto2.c:2719 ../daemon/gvfsbackendgphoto2.c:2812
 msgid "Not supported"
 msgstr "לא נתמך"
 
-#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1403
-#, fuzzy
+#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendgphoto2.c:1419
 msgid "Cannot connect to the system bus"
-msgstr "לא ניתן להתחבר למארח"
+msgstr "Cannot connect to the system bus"
 
-#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1415
+#: ../daemon/gvfsbackendcdda.c:310 ../daemon/gvfsbackendgphoto2.c:1431
 msgid "Cannot create libhal context"
-msgstr ""
+msgstr "Cannot create libhal context"
 
-#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1428
+#: ../daemon/gvfsbackendcdda.c:324 ../daemon/gvfsbackendgphoto2.c:1444
 msgid "Cannot initialize libhal"
-msgstr ""
+msgstr "Cannot initialize libhal"
 
-#: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
+#: ../daemon/gvfsbackendcdda.c:339 ../daemon/gvfsbackendcdda.c:415
 msgid "No drive specified"
 msgstr "לא צויין כונן"
 
-#: ../daemon/gvfsbackendcdda.c:276
+#: ../daemon/gvfsbackendcdda.c:355
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "הכונן %s לא נימצא"
 
-#: ../daemon/gvfsbackendcdda.c:286
+#: ../daemon/gvfsbackendcdda.c:368
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "הכונן %s אינו מכיל קבצי שמע"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:294
+#: ../daemon/gvfsbackendcdda.c:377
 #, c-format
 msgid "cdda mount on %s"
-msgstr ""
-"חיבור cdda על %s"
+msgstr "חיבור cdda על %s"
 
-#: ../daemon/gvfsbackendcdda.c:295 ../daemon/gvfsbackendcdda.c:799
+#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendcdda.c:895
 #: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:233
 #: ../monitor/hal/ghalvolume.c:254
 #, c-format
 msgid "Audio Disc"
 msgstr "תקליטור שמע"
 
-#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1656
+#: ../daemon/gvfsbackendcdda.c:439 ../daemon/gvfsbackendgphoto2.c:1672
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "מערכת הקבצים עסוקה: קובץ אחד פתוח"
-msgstr[1] ""
-"מערכת הקבצים עסוקה: %d קבצים פתוחים"
+msgstr[1] "מערכת הקבצים עסוקה: %d קבצים פתוחים"
 
-#: ../daemon/gvfsbackendcdda.c:546
+#: ../daemon/gvfsbackendcdda.c:630
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr ""
-"אין את קובץ %s על הכונן %s"
+msgstr "אין את קובץ %s על הכונן %s"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:655
+#: ../daemon/gvfsbackendcdda.c:739
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr ""
 
-#: ../daemon/gvfsbackendcdda.c:718
+#: ../daemon/gvfsbackendcdda.c:802
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr ""
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1713
+#: ../daemon/gvfsbackendcdda.c:914 ../daemon/gvfsbackendgphoto2.c:1728
 #, c-format
 msgid "No such file"
 msgstr "אין כזה קובץ"
 
-#: ../daemon/gvfsbackendcdda.c:829
+#: ../daemon/gvfsbackendcdda.c:928
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "הקובץ לא קיים או שאינו מסילת שמע"
 
-#: ../daemon/gvfsbackendcdda.c:935
+#: ../daemon/gvfsbackendcdda.c:1034
 msgid "Audio CD Filesystem Service"
 msgstr "שירות מערכת קבצי תקליטורי שמע"
 
@@ -398,414 +446,420 @@ msgstr "מחשב"
 msgid "Filesystem"
 msgstr "מערכת קבצים"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
-#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1720
+#: ../daemon/gvfsbackendobexftp.c:720 ../daemon/gvfsbackendsmb.c:684
 #: ../daemon/gvfsbackendtrash.c:678 ../daemon/gvfsbackendtrash.c:1786
 msgid "Can't open directory"
 msgstr "לא ניתן לפתוח ספרייה"
 
-#: ../daemon/gvfsbackendcomputer.c:594 ../daemon/gvfsbackendcomputer.c:732
+#: ../daemon/gvfsbackendcomputer.c:594
 msgid "Can't open mountable file"
-msgstr ""
-"לא ניתן לפתוח קובץ הניתן לחיבור"
+msgstr "לא ניתן לפתוח קובץ הניתן לחיבור"
 
-#: ../daemon/gvfsbackendcomputer.c:780 ../daemon/gvfsbackendsftp.c:1037
+#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1044
 #, c-format
 msgid "Internal error: %s"
-msgstr ""
-"שגיאה פנימית: %s"
+msgstr "שגיאה פנימית: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:812 ../daemon/gvfsbackendcomputer.c:929
+#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
 msgid "Can't mount file"
-msgstr ""
-"לא ניתן לחבר את הקובץ"
+msgstr "לא ניתן לחבר את הקובץ"
 
-#: ../daemon/gvfsbackendcomputer.c:824
+#: ../daemon/gvfsbackendcomputer.c:823
 msgid "No media in the drive"
 msgstr "אין מדיה בכונן"
 
-#: ../daemon/gvfsbackendcomputer.c:881 ../daemon/gvfsbackendcomputer.c:972
-#: ../daemon/gvfsbackendcomputer.c:1072
+#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
+#: ../daemon/gvfsbackendcomputer.c:1071
 msgid "Not a mountable file"
 msgstr "לא קובץ הניתן לחיבור"
 
-#: ../daemon/gvfsbackendcomputer.c:987
+#: ../daemon/gvfsbackendcomputer.c:986
 msgid "Can't unmount file"
 msgstr "לא ניתן לנתק את הקובץ"
 
-#: ../daemon/gvfsbackendcomputer.c:1103
+#: ../daemon/gvfsbackendcomputer.c:1102
 msgid "Can't eject file"
 msgstr "לא ניתן להוציא את הקובץ"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackenddav.c:526 ../daemon/gvfsbackenddav.c:1658
 #: ../daemon/gvfsbackendhttp.c:245
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "שגיאת HTTP: %s"
 
-#: ../daemon/gvfsbackenddav.c:520
+#: ../daemon/gvfsbackenddav.c:543
 msgid "Could not parse response"
 msgstr "Could not parse response"
 
-#: ../daemon/gvfsbackenddav.c:529
+#: ../daemon/gvfsbackenddav.c:552
 msgid "Empty response"
 msgstr "Empty response"
 
-#: ../daemon/gvfsbackenddav.c:537
+#: ../daemon/gvfsbackenddav.c:560
 msgid "Unexpected reply from server"
 msgstr "Unexpected reply from server"
 
-#: ../daemon/gvfsbackenddav.c:1156 ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackenddav.c:1179 ../daemon/gvfsbackenddav.c:1798
 msgid "Response invalid"
 msgstr "Response invalid"
 
-#: ../daemon/gvfsbackenddav.c:1299
+#: ../daemon/gvfsbackenddav.c:1322
 msgid "WebDAV share"
 msgstr "שיתוף WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1301
+#: ../daemon/gvfsbackenddav.c:1324
 #, c-format
 msgid "Enter password for %s"
 msgstr "הכנס סיסמה עבור %s"
 
-#: ../daemon/gvfsbackenddav.c:1304
+#: ../daemon/gvfsbackenddav.c:1327
 msgid "Please enter proxy password"
 msgstr "נא להכניס את סיסמת המתווך"
 
-#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackenddav.c:1531
+#: ../daemon/gvfsbackenddav.c:1662 ../daemon/gvfsbackenddav.c:1666
 msgid "Not a WebDAV enabled share"
 msgstr ""
 
-#: ../daemon/gvfsbackenddav.c:1554
+#: ../daemon/gvfsbackenddav.c:1694
 #, c-format
 msgid "WebDAV on %s"
 msgstr "‏WebDAV ב-%s"
 
-#: ../daemon/gvfsbackenddav.c:1614 ../daemon/gvfsbackenddav.c:1687
+#: ../daemon/gvfsbackenddav.c:1754 ../daemon/gvfsbackenddav.c:1827
 msgid "Could not create request"
 msgstr "לא ניתן ליצור בקשה"
 
-#: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
-#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
-#: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
-#: ../daemon/gvfsbackendsmb.c:1804
+#: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
+#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1852
+#: ../daemon/gvfsbackendftp.c:2518 ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackendsmb.c:1912
 msgid "Target file already exists"
 msgstr "קובת היעד כבר קיים"
 
-#: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
-#: ../daemon/gvfsbackendsmb.c:1038
+#: ../daemon/gvfsbackenddav.c:1963 ../daemon/gvfsbackendsftp.c:2836
+#: ../daemon/gvfsbackendsmb.c:1074
 msgid "The file was externally modified"
 msgstr ""
 
-#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1074
-#: ../daemon/gvfsbackendsmb.c:1821
+#: ../daemon/gvfsbackenddav.c:1994 ../daemon/gvfsbackendsmb.c:1110
+#: ../daemon/gvfsbackendsmb.c:1929
 msgid "Backup file creation failed"
 msgstr "יצירץ קובץ גיבוי נכשלה"
 
-#. TODO: Name
-#: ../daemon/gvfsbackenddnssd.c:433
-msgid "dns-sd"
-msgstr "dns-sd"
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackenddnssd.c:487 ../daemon/gvfsbackendnetwork.c:392
+msgid "Local Network"
+msgstr "רשת מקומית"
 
-#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
+#: ../daemon/gvfsbackenddnssd.c:731 ../daemon/gvfsbackendnetwork.c:731
 #, fuzzy
 msgid "Can't monitor file or directory."
 msgstr "לא ניתן לפתוח ספרייה"
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:687
+#: ../daemon/gvfsbackenddnssd.c:749
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackenddnssd.c:750 ../daemon/gvfsbackendnetwork.c:676
 #: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
 msgid "Network"
 msgstr "רשת"
 
-#: ../daemon/gvfsbackendftp.c:236
+#: ../daemon/gvfsbackendftp.c:251
 #, fuzzy
 msgid "Accounts are unsupported"
 msgstr "לא נתמך"
 
-#: ../daemon/gvfsbackendftp.c:240
+#: ../daemon/gvfsbackendftp.c:255
 msgid "Host closed connection"
 msgstr "המארח סגר את החיבור"
 
-#: ../daemon/gvfsbackendftp.c:244
+#: ../daemon/gvfsbackendftp.c:259
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 
-#: ../daemon/gvfsbackendftp.c:248
+#: ../daemon/gvfsbackendftp.c:263
 msgid "Data connection closed"
 msgstr "חיבור המידע נסגר"
 
-#: ../daemon/gvfsbackendftp.c:255 ../daemon/gvfsbackendftp.c:259
+#: ../daemon/gvfsbackendftp.c:270 ../daemon/gvfsbackendftp.c:274
 msgid "Operation failed"
 msgstr "הפעולה בוטלה"
 
-#: ../daemon/gvfsbackendftp.c:264
+#: ../daemon/gvfsbackendftp.c:279
 msgid "No space left on server"
 msgstr "לא נשאר מקום בשרת"
 
-#: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
+#: ../daemon/gvfsbackendftp.c:287 ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendsmb.c:1576
 msgid "Operation unsupported"
 msgstr "פעולה לא נתמכת"
 
-#: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
+#: ../daemon/gvfsbackendftp.c:291 ../daemon/gvfsbackendsftp.c:296
 msgid "Permission denied"
 msgstr "ההרשאה נדחתה"
 
-#: ../daemon/gvfsbackendftp.c:280
+#: ../daemon/gvfsbackendftp.c:295
 msgid "Page type unknown"
 msgstr "סוג הדף לא ידוע"
 
-#: ../daemon/gvfsbackendftp.c:284 ../daemon/gvfsbackendftp.c:2211
+#: ../daemon/gvfsbackendftp.c:299 ../daemon/gvfsbackendftp.c:2364
 msgid "Invalid filename"
 msgstr "שם קובץ לא תקין"
 
-#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendftp.c:364
-#: ../daemon/gvfsbackendftp.c:393 ../daemon/gvfsbackendftp.c:412
-#: ../daemon/gvfsbackendftp.c:425 ../daemon/gvfsbackendftp.c:817
+#: ../daemon/gvfsbackendftp.c:303 ../daemon/gvfsbackendftp.c:379
+#: ../daemon/gvfsbackendftp.c:408 ../daemon/gvfsbackendftp.c:427
+#: ../daemon/gvfsbackendftp.c:440 ../daemon/gvfsbackendftp.c:928
 msgid "Invalid reply"
 msgstr ""
 
-#: ../daemon/gvfsbackendftp.c:532
+#: ../daemon/gvfsbackendftp.c:547
 msgid "broken transmission"
 msgstr "broken transmission"
 
-#: ../daemon/gvfsbackendftp.c:677 ../daemon/gvfsbackendftp.c:837
+#: ../daemon/gvfsbackendftp.c:709 ../daemon/gvfsbackendftp.c:850
 msgid "Could not connect to host"
 msgstr "לא ניתן להתחבר למארח"
 
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1486
+#, fuzzy, c-format
+msgid "Enter password for ftp as %s on %s"
+msgstr "הכנס סיסמה עבור ftp ב-%s"
+
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1337
+#: ../daemon/gvfsbackendftp.c:1489
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "הכנס סיסמה עבור ftp ב-%s"
 
-#: ../daemon/gvfsbackendftp.c:1362 ../daemon/gvfsbackendsftp.c:874
+#: ../daemon/gvfsbackendftp.c:1515 ../daemon/gvfsbackendsftp.c:881
+#: ../daemon/gvfsbackendsmb.c:599
 msgid "Password dialog cancelled"
 msgstr ""
 
-#: ../daemon/gvfsbackendftp.c:1441
+#: ../daemon/gvfsbackendftp.c:1594
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp ב-%s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1445
+#: ../daemon/gvfsbackendftp.c:1598
 #, fuzzy, c-format
 msgid "ftp as %s on %s"
 msgstr "sftp ב-%s"
 
-#: ../daemon/gvfsbackendftp.c:1529 ../daemon/gvfsbackendsftp.c:1958
-#: ../daemon/gvfsbackendsftp.c:3550
+#: ../daemon/gvfsbackendftp.c:1682 ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:3579
 msgid "File is directory"
 msgstr "הקובץ הוא ספרייה"
 
-#: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
+#: ../daemon/gvfsbackendftp.c:1904 ../daemon/gvfsbackendftp.c:2479
 msgid "backups not supported yet"
 msgstr "גיבויים עדיין לא נתמכים"
 
-#: ../daemon/gvfsbackendftp.c:1828
+#: ../daemon/gvfsbackendftp.c:1981
 msgid "filename too long"
 msgstr "filename too long"
 
-#: ../daemon/gvfsbackendftp.c:2345
+#: ../daemon/gvfsbackendftp.c:2498
 #, fuzzy
 msgid "Invalid destination filename"
 msgstr "שם קובץ לא תקין %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:501
+#: ../daemon/gvfsbackendgphoto2.c:499
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "‏%s: ‏%d: התיקייה או הקובץ כבר קיימים"
 
-#: ../daemon/gvfsbackendgphoto2.c:508
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "‏%s: ‏%d: אין כזה קובץ או תיקייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:514
+#: ../daemon/gvfsbackendgphoto2.c:512
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "‏%s: ‏%d: שם קובץ לא תקין"
 
-#: ../daemon/gvfsbackendgphoto2.c:520
+#: ../daemon/gvfsbackendgphoto2.c:518
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "‏%s: ‏%d: לא נתמך"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:693
+#: ../daemon/gvfsbackendgphoto2.c:691
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "מצלמה דיגיטלית (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:841 ../monitor/gphoto2/ggphoto2volume.c:183
+#: ../daemon/gvfsbackendgphoto2.c:839 ../monitor/gphoto2/ggphoto2volume.c:183
 #, c-format
 msgid "%s Camera"
-msgstr ""
-"מצלמה של %s"
+msgstr "מצלמה של %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
+#: ../daemon/gvfsbackendgphoto2.c:842 ../monitor/gphoto2/ggphoto2volume.c:178
 #, c-format
 msgid "%s Audio Player"
-msgstr ""
-"נגן שמע של %s"
+msgstr "נגן שמע של %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:851 ../monitor/gphoto2/ggphoto2volume.c:192
 msgid "Camera"
 msgstr "מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:855 ../monitor/gphoto2/ggphoto2volume.c:190
+#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:190
 msgid "Audio Player"
 msgstr "נגן שמע"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2014
+#: ../daemon/gvfsbackendgphoto2.c:1341 ../daemon/gvfsbackendgphoto2.c:2067
 msgid "Failed to get folder list"
 msgstr "נכשל בקבלת רשימת תיקיות"
 
-#: ../daemon/gvfsbackendgphoto2.c:1443
+#: ../daemon/gvfsbackendgphoto2.c:1459
 msgid "No device specified"
 msgstr "לא צויין התקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1460
+#: ../daemon/gvfsbackendgphoto2.c:1476
 msgid "Cannot create gphoto2 context"
 msgstr "לא ניתן ליצור הקשר gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1470
+#: ../daemon/gvfsbackendgphoto2.c:1486
 msgid "Error creating camera"
 msgstr "שגיאה ביצירת מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1483 ../daemon/gvfsbackendgphoto2.c:1493
+#: ../daemon/gvfsbackendgphoto2.c:1499 ../daemon/gvfsbackendgphoto2.c:1509
 msgid "Error loading device information"
 msgstr "שגיאה בטעינת נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1505
+#: ../daemon/gvfsbackendgphoto2.c:1521
 msgid "Error looking up device information"
 msgstr "שגיאה בחיפוש נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1515
+#: ../daemon/gvfsbackendgphoto2.c:1531
 msgid "Error getting device information"
 msgstr "שגיאה בקבלת נתוני ההתקן"
 
-#: ../daemon/gvfsbackendgphoto2.c:1528
+#: ../daemon/gvfsbackendgphoto2.c:1544
 msgid "Error setting up camera communications port"
 msgstr "שגיאה בהגדרת שער התקשורת של המצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendgphoto2.c:1555
 msgid "Error initializing camera"
 msgstr "שגיאה באתחול המצלמה"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1553
+#: ../daemon/gvfsbackendgphoto2.c:1569
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr ""
-"חיבור gphoto2 על %s"
+msgstr "חיבור gphoto2 על %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1628
+#: ../daemon/gvfsbackendgphoto2.c:1644
 msgid "No camera specified"
 msgstr "לא צויינה מצלמה"
 
-#: ../daemon/gvfsbackendgphoto2.c:1721
+#: ../daemon/gvfsbackendgphoto2.c:1736
 msgid "Error creating file object"
 msgstr "שגיאה ביצירת אובייקט קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1736
+#: ../daemon/gvfsbackendgphoto2.c:1751
 msgid "Error getting file"
 msgstr "שגיאה בקבלת קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1746
+#: ../daemon/gvfsbackendgphoto2.c:1761
 msgid "Error getting data from file"
 msgstr "שגיאה בקבלת נתונים מהקובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
+#: ../daemon/gvfsbackendgphoto2.c:1818
+#, c-format
+msgid "Malformed icon identifier '%s'"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1894 ../daemon/gvfsbackendgphoto2.c:3083
 #, fuzzy, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Error in stream protocol: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:2034 ../daemon/gvfsbackendsmbbrowse.c:1107
 msgid "Not a directory"
 msgstr "לא ספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2080
+#: ../daemon/gvfsbackendgphoto2.c:2133
 msgid "Failed to get file list"
 msgstr "נכשל בקבלת רשימת קבצים"
 
-#: ../daemon/gvfsbackendgphoto2.c:2372
+#: ../daemon/gvfsbackendgphoto2.c:2425
 msgid "Error creating directory"
 msgstr "שגיאה ביצירת ספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2581
+#: ../daemon/gvfsbackendgphoto2.c:2634
 msgid "Name already exists"
 msgstr "השם כבר קיים"
 
-#: ../daemon/gvfsbackendgphoto2.c:2592 ../daemon/gvfsbackendgphoto2.c:3221
+#: ../daemon/gvfsbackendgphoto2.c:2645 ../daemon/gvfsbackendgphoto2.c:3274
 msgid "New name too long"
 msgstr "השם החדש ארוך מדי"
 
-#: ../daemon/gvfsbackendgphoto2.c:2602 ../daemon/gvfsbackendgphoto2.c:3232
+#: ../daemon/gvfsbackendgphoto2.c:2655 ../daemon/gvfsbackendgphoto2.c:3285
 msgid "Error renaming dir"
 msgstr "שגיאה בשינוי שם ספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3245
+#: ../daemon/gvfsbackendgphoto2.c:2668 ../daemon/gvfsbackendgphoto2.c:3298
 msgid "Error renaming file"
 msgstr "שגיאה בשינוי שם קובץ"
 
 # c-format
-#: ../daemon/gvfsbackendgphoto2.c:2679
+#: ../daemon/gvfsbackendgphoto2.c:2732
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "הספרייה '%s' אינה ריקה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2690
+#: ../daemon/gvfsbackendgphoto2.c:2743
 msgid "Error deleting directory"
 msgstr "שגיאה במחיקת ספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2716
+#: ../daemon/gvfsbackendgphoto2.c:2769
 msgid "Error deleting file"
 msgstr "שגיאה במחיקת קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2769
+#: ../daemon/gvfsbackendgphoto2.c:2822
 msgid "Can't write to directory"
 msgstr "לא ניתן לכתוב לספרייה"
 
-#: ../daemon/gvfsbackendgphoto2.c:2816
+#: ../daemon/gvfsbackendgphoto2.c:2869
 msgid "Cannot allocate new file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:2831
+#: ../daemon/gvfsbackendgphoto2.c:2884
 msgid "Cannot read file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:2842
+#: ../daemon/gvfsbackendgphoto2.c:2895
 msgid "Cannot get data of file to append to"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3129
+#: ../daemon/gvfsbackendgphoto2.c:3182
 msgid "Error writing file"
 msgstr "שגיאה בכתיבת קובץ"
 
-#: ../daemon/gvfsbackendgphoto2.c:3177
+#: ../daemon/gvfsbackendgphoto2.c:3230
 msgid "Not supported (not same directory)"
-msgstr ""
-"לא נתמך (לא אותה ספרייה)"
+msgstr "לא נתמך (לא אותה ספרייה)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3189
+#: ../daemon/gvfsbackendgphoto2.c:3242
 msgid "Not supported (src is dir, dst is dir)"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3197
+#: ../daemon/gvfsbackendgphoto2.c:3250
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr ""
 
-#: ../daemon/gvfsbackendgphoto2.c:3209
+#: ../daemon/gvfsbackendgphoto2.c:3262
 msgid "Not supported (src is file, dst is dir)"
 msgstr ""
 
@@ -814,8 +868,8 @@ msgstr ""
 msgid "HTTP Client Error: %s"
 msgstr "שגיאת לקוח HTTP: %s"
 
-#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
-#: ../daemon/gvfsbackendsmb.c:1301 ../daemon/gvfsbackendtrash.c:1006
+#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1891
+#: ../daemon/gvfsbackendsmb.c:1337 ../daemon/gvfsbackendtrash.c:1006
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (קידוד לא תקין)"
@@ -829,87 +883,86 @@ msgstr ""
 msgid "Windows Network"
 msgstr "רשת Windows"
 
-#. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:392
-msgid "Local Network"
-msgstr "רשת מקומית"
-
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:862
 msgid "Network Location Monitor"
 msgstr "מנטר מיקום הרשת"
 
-#. Mount was successful
+#. Set the mountspec according to original uri, no matter whether user changes
+#. credentials during mount loop. Nautilus and other gio clients depend
+#. on correct mountspec, setting it to real (different) credentials would
+#. lead to G_IO_ERROR_NOT_MOUNTED errors
+#.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:557
-#: ../daemon/gvfsbackendsmb.c:1294
+#: ../daemon/gvfsbackendobexftp.c:380 ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s ב-%s"
 
-#: ../daemon/gvfsbackendobexftp.c:699
+#: ../daemon/gvfsbackendobexftp.c:659
 msgid "Connection to the device lost"
 msgstr "החיבור להתקן אבד"
 
-#: ../daemon/gvfsbackendobexftp.c:1194
+#: ../daemon/gvfsbackendobexftp.c:1156
 msgid "Device requires a software update"
 msgstr "ההתקן דורש עדכון תוכנה"
 
-#: ../daemon/gvfsbackendsftp.c:281
+#: ../daemon/gvfsbackendsftp.c:288
 msgid "ssh program unexpectedly exited"
 msgstr "תוכנית ה-ssh הסתיימה באופן בלתי צפוי"
 
-#: ../daemon/gvfsbackendsftp.c:296
+#: ../daemon/gvfsbackendsftp.c:303
 msgid "Hostname not known"
 msgstr "שם המארח לא ידוע"
 
-#: ../daemon/gvfsbackendsftp.c:303
+#: ../daemon/gvfsbackendsftp.c:310
 msgid "No route to host"
 msgstr "אין נתיב אל המארח"
 
-#: ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendsftp.c:317
 msgid "Connection refused by server"
 msgstr "החיבור נדחה על ידי השרת"
 
-#: ../daemon/gvfsbackendsftp.c:317
+#: ../daemon/gvfsbackendsftp.c:324
 msgid "Host key verification failed"
 msgstr "אימות מפתח המארח נכשל"
 
-#: ../daemon/gvfsbackendsftp.c:400
+#: ../daemon/gvfsbackendsftp.c:407
 msgid "Unable to spawn ssh program"
 msgstr "לא ניתן להריץ את התוכנית ssh"
 
-#: ../daemon/gvfsbackendsftp.c:416
+#: ../daemon/gvfsbackendsftp.c:423
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "לא ניתן להריץ את התוכנית ssh: ‏%s"
 
-#: ../daemon/gvfsbackendsftp.c:528 ../daemon/gvfsbackendsftp.c:780
+#: ../daemon/gvfsbackendsftp.c:535 ../daemon/gvfsbackendsftp.c:787
 msgid "Timed out when logging in"
 msgstr ""
 
-#: ../daemon/gvfsbackendsftp.c:858
+#: ../daemon/gvfsbackendsftp.c:865
 msgid "Enter passphrase for key"
 msgstr ""
 
-#: ../daemon/gvfsbackendsftp.c:860
+#: ../daemon/gvfsbackendsftp.c:867
 msgid "Enter password"
 msgstr "הכנס סיסמה"
 
-#: ../daemon/gvfsbackendsftp.c:921
+#: ../daemon/gvfsbackendsftp.c:928
 msgid "Can't send password"
 msgstr "לא ניתן לשלוח את הסיסמה"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:936
 msgid "Log In Anyway"
 msgstr "התחבר בכל זאת"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:936
 msgid "Cancel Login"
 msgstr "ביטול התחברות"
 
-#: ../daemon/gvfsbackendsftp.c:939
+#: ../daemon/gvfsbackendsftp.c:946
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -919,121 +972,129 @@ msgid ""
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
 
-#: ../daemon/gvfsbackendsftp.c:959
+#: ../daemon/gvfsbackendsftp.c:966
 msgid "Login dialog cancelled"
 msgstr "תיבת הדו-שיח של התחברות בוטלה"
 
-#: ../daemon/gvfsbackendsftp.c:979
+#: ../daemon/gvfsbackendsftp.c:986
 msgid "Can't send host identity confirmation"
 msgstr ""
 
-#: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
+#: ../daemon/gvfsbackendsftp.c:1479 ../daemon/gvfsbackendsftp.c:1502
 msgid "Protocol error"
 msgstr "שגיאת פרוטוקול"
 
+#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1527
+#, fuzzy, c-format
+msgid "sftp for %s on %s"
+msgstr "sftp ב-%s"
+
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1519
+#: ../daemon/gvfsbackendsftp.c:1530
 #, c-format
 msgid "sftp on %s"
-msgstr ""
-"‏sftp ב-%s"
+msgstr "‏sftp ב-%s"
 
-#: ../daemon/gvfsbackendsftp.c:1543
+#: ../daemon/gvfsbackendsftp.c:1556
 msgid "Unable to find supported ssh command"
 msgstr ""
 
-#: ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:1976
 msgid "Failure"
 msgstr "כישלון"
 
-#: ../daemon/gvfsbackendsftp.c:2023 ../daemon/gvfsbackendsftp.c:2082
-#: ../daemon/gvfsbackendsftp.c:2093 ../daemon/gvfsbackendsftp.c:2149
-#: ../daemon/gvfsbackendsftp.c:2235 ../daemon/gvfsbackendsftp.c:2285
-#: ../daemon/gvfsbackendsftp.c:2331 ../daemon/gvfsbackendsftp.c:2406
-#: ../daemon/gvfsbackendsftp.c:2513 ../daemon/gvfsbackendsftp.c:2553
-#: ../daemon/gvfsbackendsftp.c:2603 ../daemon/gvfsbackendsftp.c:2672
-#: ../daemon/gvfsbackendsftp.c:2692 ../daemon/gvfsbackendsftp.c:2844
-#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2924
-#: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendsftp.c:3252
-#: ../daemon/gvfsbackendsftp.c:3319 ../daemon/gvfsbackendsftp.c:3448
-#: ../daemon/gvfsbackendsftp.c:3483 ../daemon/gvfsbackendsftp.c:3511
-#: ../daemon/gvfsbackendsftp.c:3619 ../daemon/gvfsbackendsftp.c:3673
-#: ../daemon/gvfsbackendsftp.c:3707 ../daemon/gvfsbackendsftp.c:3741
-#: ../daemon/gvfsbackendsftp.c:3756 ../daemon/gvfsbackendsftp.c:3771
-#: ../daemon/gvfsbackendsftp.c:3849
+#: ../daemon/gvfsbackendsftp.c:2032 ../daemon/gvfsbackendsftp.c:2111
+#: ../daemon/gvfsbackendsftp.c:2122 ../daemon/gvfsbackendsftp.c:2178
+#: ../daemon/gvfsbackendsftp.c:2264 ../daemon/gvfsbackendsftp.c:2314
+#: ../daemon/gvfsbackendsftp.c:2360 ../daemon/gvfsbackendsftp.c:2435
+#: ../daemon/gvfsbackendsftp.c:2542 ../daemon/gvfsbackendsftp.c:2582
+#: ../daemon/gvfsbackendsftp.c:2632 ../daemon/gvfsbackendsftp.c:2701
+#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2873
+#: ../daemon/gvfsbackendsftp.c:2898 ../daemon/gvfsbackendsftp.c:2953
+#: ../daemon/gvfsbackendsftp.c:3010 ../daemon/gvfsbackendsftp.c:3281
+#: ../daemon/gvfsbackendsftp.c:3348 ../daemon/gvfsbackendsftp.c:3477
+#: ../daemon/gvfsbackendsftp.c:3512 ../daemon/gvfsbackendsftp.c:3540
+#: ../daemon/gvfsbackendsftp.c:3648 ../daemon/gvfsbackendsftp.c:3702
+#: ../daemon/gvfsbackendsftp.c:3736 ../daemon/gvfsbackendsftp.c:3770
+#: ../daemon/gvfsbackendsftp.c:3785 ../daemon/gvfsbackendsftp.c:3800
+#: ../daemon/gvfsbackendsftp.c:3878
 msgid "Invalid reply received"
 msgstr ""
 
-#: ../daemon/gvfsbackendsftp.c:2351
+#: ../daemon/gvfsbackendsftp.c:2084
+#, c-format
+msgid "Invalid icon_id '%s' in OpenIconForRead"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:2380
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "שגיאה ביצירת קובץ גיבוי: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2754
+#: ../daemon/gvfsbackendsftp.c:2783
 msgid "Unable to create temporary file"
 msgstr "לא ניתן לייצר קובץ זמני"
 
-#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1793
+#: ../daemon/gvfsbackendsftp.c:3574 ../daemon/gvfsbackendsmb.c:1901
 msgid "Can't move directory over directory"
 msgstr ""
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:216
+#: ../daemon/gvfsbackendsmb.c:222
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "סיסמה נדרשת עבור השיתוף %s על %s"
 
-#: ../daemon/gvfsbackendsmb.c:471 ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsbackendsmb.c:478 ../daemon/gvfsbackendsmb.c:524
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "שגיאה פנימית (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:550
+#: ../daemon/gvfsbackendsmb.c:604
 msgid "Failed to mount Windows share"
 msgstr "נכשל בחיבור שיתוף Windows"
 
-#: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
+#: ../daemon/gvfsbackendsmb.c:753 ../daemon/gvfsbackendsmb.c:1209
 msgid "Unsupported seek type"
 msgstr ""
 
-#: ../daemon/gvfsbackendsmb.c:1237
+#: ../daemon/gvfsbackendsmb.c:1273
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "יצירת קובץ גיבוי נכשלה: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1695
+#: ../daemon/gvfsbackendsmb.c:1803
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "שגיאה במחיקת קובץ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1769
+#: ../daemon/gvfsbackendsmb.c:1877
 #, c-format
 msgid "Error moving file: %s"
 msgstr "שגיאה בהעברת קובץ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1841
+#: ../daemon/gvfsbackendsmb.c:1949
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "שגיאה בהסרת קובץ המטרה: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1865
+#: ../daemon/gvfsbackendsmb.c:1973
 msgid "Can't recursively move directory"
 msgstr ""
 
-#: ../daemon/gvfsbackendsmb.c:1928
+#: ../daemon/gvfsbackendsmb.c:2037
 msgid "Windows Shares Filesystem Service"
-msgstr ""
-"שרות מערכת קבצי שיתוף Windows"
+msgstr "שרות מערכת קבצי שיתוף Windows"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
 #: ../daemon/gvfsbackendsmbbrowse.c:707
 #, c-format
 msgid "Windows shares on %s"
-msgstr ""
-"שיתוף Windows ב-%s"
+msgstr "שיתוף Windows ב-%s"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
 msgid "The file is not a mountable"
@@ -1043,10 +1104,9 @@ msgstr "לא ניתן לחבר את הקובץ"
 msgid "Not a regular file"
 msgstr "לא קובץ רגיל"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1224
+#: ../daemon/gvfsbackendsmbbrowse.c:1219
 msgid "Windows Network Filesystem Service"
-msgstr ""
-"שירות מערכת קבצי רשת Windows"
+msgstr "שירות מערכת קבצי רשת Windows"
 
 #. translators: This is the name of the backend
 #. Translators: this is the display name of the backend
@@ -1057,8 +1117,7 @@ msgstr "אשפה"
 #: ../daemon/gvfsbackendtrash.c:1019
 #, c-format
 msgid "%s (in trash)"
-msgstr ""
-"‏%s (באשפה)"
+msgstr "‏%s (באשפה)"
 
 #: ../daemon/gvfsbackendtrash.c:1330
 msgid "Can't delete trash"
@@ -1109,7 +1168,7 @@ msgid "%s: %s"
 msgstr "%s: %s"
 
 #: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:364
 #: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
 #: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
 #: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
@@ -1118,30 +1177,168 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Try \"%s --help\" for more information."
 
-#: ../daemon/mount.c:439
+#: ../daemon/mount.c:456
 msgid "Invalid arguments from spawned child"
 msgstr ""
 
-#: ../daemon/mount.c:740
+#: ../daemon/mount.c:767
 #, c-format
 msgid "Automount failed: %s"
 msgstr "חיבור אוטומטי נכשל: %s"
 
-#: ../daemon/mount.c:785
+#: ../daemon/mount.c:812 ../daemon/mount.c:886
 msgid "The specified location is not mounted"
 msgstr "המיקום שצויין אינו מחובר"
 
-#: ../daemon/mount.c:790
+#: ../daemon/mount.c:817
 msgid "The specified location is not supported"
 msgstr "המיקום שצויין אינו נתמך"
 
-#: ../daemon/mount.c:954
+#: ../daemon/mount.c:1023
 msgid "Location is already mounted"
 msgstr "המיקום כבר מחובר"
 
-#: ../daemon/mount.c:962
+#: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "המיקום אינו מחובר"
+
+#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "תקליטור CD-ROM"
+
+#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "תקליטור CD-ROM ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "תקליטור CD-R"
+
+#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "תקליטור CD-R ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "תקליטור CD-RW"
+
+#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "תקליטור CD-RW ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "תקליטור DVD-ROM"
+
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "תקליטור DVD-ROM ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "תקליטור DVD-RAM"
+
+#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "תקליטור DVD-RAM ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "תקליטור DVD-RW"
+
+#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "תקליטור DVD-RW ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "תקליטור DVD+R"
+
+#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "תקליטור DVD+R ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "תקליטור DVD+RW"
+
+#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "תקליטור DVD+RW ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "תקליטור DVD+R DL"
+
+#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "תקליטור DVD+R DL ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "תקליטור Blu-Ray"
+
+#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "תקליטור Blu-Ray ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "תקליטור Blu-Ray R"
+
+#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "תקליטור Blu-Ray R ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "תקליטור Blu-Ray RW"
+
+#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "תקליטור Blu-Ray RW ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "תקליטור HD DVD"
+
+#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "תקליטור HD DVD ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "תקליטור HD DVD-R"
+
+#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "תקליטור HD DVD-R ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "תקליטור HD DVD-RW"
+
+#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "תקליטור HD DVD-RW ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
+msgid "MO Disc"
+msgstr "תקליטור MO"
+
+#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "תקליטוק MO ריק"
+
+#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
+msgid "Disc"
+msgstr "תקליטור"
+
+#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "תקליטורכ ריק"
 
 #: ../monitor/hal/ghaldrive.c:130
 msgid "CD-ROM"
@@ -1216,8 +1413,7 @@ msgstr "Blu-ray-RE"
 #: ../monitor/hal/ghaldrive.c:172
 #, c-format
 msgid "%s/%s Drive"
-msgstr ""
-"כונן ‎%s/‏%s"
+msgstr "כונן ‎%s/‏%s"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
@@ -1289,26 +1485,22 @@ msgstr ""
 #: ../monitor/hal/ghaldrive.c:723
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"נכשל בהוצאת המדיה; כרך אחד או יותר על המדיה עסוקים."
+msgstr "נכשל בהוצאת המדיה; כרך אחד או יותר על המדיה עסוקים."
 
 #: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
 #, c-format
 msgid "%.1f kB"
-msgstr ""
-"‏‎%.1f kB"
+msgstr "‏‎%.1f kB"
 
 #: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:176
 #, c-format
 msgid "%.1f MB"
-msgstr ""
-"‏‎%.1f MB"
+msgstr "‏‎%.1f MB"
 
 #: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:181
 #, c-format
 msgid "%.1f GB"
-msgstr ""
-"‏‎%.1f GB"
+msgstr "‏‎%.1f GB"
 
 #: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:252
 msgid "Mixed Audio/Data Disc"
@@ -1325,176 +1517,7 @@ msgstr "מדיה %s"
 #: ../monitor/hal/ghalvolume.c:240
 #, c-format
 msgid "%s Encrypted Data"
-msgstr ""
-"מידע מוצפן %s"
-
-#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
-msgid "CD-ROM Disc"
-msgstr ""
-"תקליטור CD-ROM"
-
-#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
-msgid "Blank CD-ROM Disc"
-msgstr ""
-"תקליטור CD-ROM ריק"
-
-#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
-msgid "CD-R Disc"
-msgstr ""
-"תקליטור CD-R"
-
-#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
-msgid "Blank CD-R Disc"
-msgstr ""
-"תקליטור CD-R ריק"
-
-#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
-msgid "CD-RW Disc"
-msgstr ""
-"תקליטור CD-RW"
-
-#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
-msgid "Blank CD-RW Disc"
-msgstr ""
-"תקליטור CD-RW ריק"
-
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-msgid "DVD-ROM Disc"
-msgstr ""
-"תקליטור DVD-ROM"
-
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-msgid "Blank DVD-ROM Disc"
-msgstr ""
-"תקליטור DVD-ROM ריק"
-
-#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
-msgid "DVD-RAM Disc"
-msgstr ""
-"תקליטור DVD-RAM"
-
-#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
-msgid "Blank DVD-RAM Disc"
-msgstr ""
-"תקליטור DVD-RAM ריק"
-
-#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
-msgid "DVD-RW Disc"
-msgstr ""
-"תקליטור DVD-RW"
-
-#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
-msgid "Blank DVD-RW Disc"
-msgstr ""
-"תקליטור DVD-RW ריק"
-
-#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
-msgid "DVD+R Disc"
-msgstr ""
-"תקליטור DVD+R"
-
-#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
-msgid "Blank DVD+R Disc"
-msgstr ""
-"תקליטור DVD+R ריק"
-
-#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
-msgid "DVD+RW Disc"
-msgstr ""
-"תקליטור DVD+RW"
-
-#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
-msgid "Blank DVD+RW Disc"
-msgstr ""
-"תקליטור DVD+RW ריק"
-
-#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
-msgid "DVD+R DL Disc"
-msgstr ""
-"תקליטור DVD+R DL"
-
-#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
-msgid "Blank DVD+R DL Disc"
-msgstr ""
-"תקליטור DVD+R DL ריק"
-
-#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
-msgid "Blu-Ray Disc"
-msgstr ""
-"תקליטור Blu-Ray"
-
-#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
-msgid "Blank Blu-Ray Disc"
-msgstr ""
-"תקליטור Blu-Ray ריק"
-
-#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
-msgid "Blu-Ray R Disc"
-msgstr ""
-"תקליטור Blu-Ray R"
-
-#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
-msgid "Blank Blu-Ray R Disc"
-msgstr ""
-"תקליטור Blu-Ray R ריק"
-
-#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
-msgid "Blu-Ray RW Disc"
-msgstr ""
-"תקליטור Blu-Ray RW"
-
-#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
-msgid "Blank Blu-Ray RW Disc"
-msgstr ""
-"תקליטור Blu-Ray RW ריק"
-
-#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
-msgid "HD DVD Disc"
-msgstr ""
-"תקליטור HD DVD"
-
-#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
-msgid "Blank HD DVD Disc"
-msgstr ""
-"תקליטור HD DVD ריק"
-
-#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
-msgid "HD DVD-R Disc"
-msgstr ""
-"תקליטור HD DVD-R"
-
-#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
-msgid "Blank HD DVD-R Disc"
-msgstr ""
-"תקליטור HD DVD-R ריק"
-
-#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
-msgid "HD DVD-RW Disc"
-msgstr ""
-"תקליטור HD DVD-RW"
-
-#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
-msgid "Blank HD DVD-RW Disc"
-msgstr ""
-"תקליטור HD DVD-RW ריק"
-
-#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
-msgid "MO Disc"
-msgstr "תקליטור MO"
-
-#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
-msgid "Blank MO Disc"
-msgstr "תקליטוק MO ריק"
-
-#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
-msgid "Disc"
-msgstr "תקליטור"
-
-#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
-msgid "Blank Disc"
-msgstr "תקליטורכ ריק"
+msgstr "מידע מוצפן %s"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1584,6 +1607,9 @@ msgid ""
 msgstr ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
+
+#~ msgid "dns-sd"
+#~ msgstr "dns-sd"
 
 #, fuzzy
 #~ msgid "Error creating port info list"
