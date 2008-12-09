@@ -1,5 +1,10 @@
 2008-12-09  Bastien Nocera  <hadess@hadess.net>
 
+	* daemon/gvfsbackendobexftp.c (_query_file_info_helper): Fix icon
+	for the root directory of an obexftp server (Closes: #542687)
+
+2008-12-09  Bastien Nocera  <hadess@hadess.net>
+
 	* monitor/gphoto2/Makefile.am:
 	* monitor/gphoto2/ggphoto2volumemonitor.c (get_stores_for_camera),
 	(update_cameras): For each camera discovered, create shadow mounts

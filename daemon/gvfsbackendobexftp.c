@@ -376,7 +376,14 @@ _query_file_info_helper (GVfsBackend *backend,
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_content_type (info, "inode/directory");
       g_file_info_set_name (info, "/");
-      g_vfs_backend_set_icon_name (backend, op_backend->icon_name);
+      if (op_backend->icon_name) {
+          GIcon *icon;
+
+          g_vfs_backend_set_icon_name (backend, op_backend->icon_name);
+          icon = g_themed_icon_new (op_backend->icon_name);
+          g_file_info_set_icon (info, icon);
+          g_object_unref (icon);
+      }
       display = g_strdup_printf (_("%s on %s"), "/", op_backend->display_name);
       g_file_info_set_display_name (info, display);
       g_free (display);
