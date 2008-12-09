@@ -29,6 +29,7 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
+#include <gphoto2.h>
 #include <gio/gio.h>
 
 #include "ggphoto2volumemonitor.h"
@@ -448,6 +449,67 @@ update_all (GGPhoto2VolumeMonitor *monitor,
     }
 }
 
+static GList *
+get_stores_for_camera (int bus_num, int device_num)
+{
+  GList *l;
+  CameraStorageInformation *storage_info;
+  GPContext *context;
+  GPPortInfo info;
+  GPPortInfoList *il;
+  int num_storage_info, n;
+  Camera *camera;
+  char *port;
+  guint i;
+
+  il = NULL;
+  camera = NULL;
+  context = NULL;
+  l = NULL;
+  port = g_strdup_printf ("usb:%d,%d", bus_num, device_num);
+
+  /* Connect to the camera */
+  context = gp_context_new ();
+  if (gp_camera_new (&camera) != 0)
+    goto out;
+  if (gp_port_info_list_new (&il) != 0)
+    goto out;
+  if (gp_port_info_list_load (il) != 0)
+    goto out;
+  n = gp_port_info_list_lookup_path (il, port);
+  if (n == GP_ERROR_UNKNOWN_PORT)
+    goto out;
+  if (gp_port_info_list_get_info (il, n, &info) != 0)
+    goto out;
+  if (gp_camera_set_port_info (camera, info) != 0)
+    goto out;
+  gp_port_info_list_free (il);
+  il = NULL;
+  if (gp_camera_init (camera, context) != 0)
+    goto out;
+
+  /* Get information about the storage heads */
+  if (gp_camera_get_storageinfo (camera, &storage_info, &num_storage_info, context) != 0)
+    goto out;
+
+  /* Append the data to the list */
+  for (i = 0; i < num_storage_info; i++)
+    l = g_list_prepend (l, g_strdup (storage_info[i].basedir));
+
+out:
+  /* Clean up */
+  if (il != NULL)
+    gp_port_info_list_free (il);
+  if (context != NULL)
+    gp_context_unref (context);
+  if (camera != NULL)
+    gp_camera_unref (camera);
+
+  g_free (port);
+
+  return l;
+}
+
 static void
 update_cameras (GGPhoto2VolumeMonitor *monitor,
                 GList **added_volumes,
@@ -513,11 +575,11 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
   for (l = added; l != NULL; l = l->next)
     {
       HalDevice *d = l->data;
-      char *uri;
       GFile *foreign_mount_root;
       int usb_bus_num;
       int usb_device_num;
       gboolean found;
+      GList *store_heads, *l;
 
       /* Look for the device in the added volumes, so as
        * not to add devices that are both audio players, and cameras */
@@ -537,24 +599,34 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
       usb_bus_num = hal_device_get_property_int (d, "usb.bus_number");
       usb_device_num = hal_device_get_property_int (d, "usb.linux.device_number");
 
-      uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]", usb_bus_num, usb_device_num);
-      /*g_warning ("uri is '%s'", uri);*/
-      foreign_mount_root = g_file_new_for_uri (uri);
-      g_free (uri);
-
-      udi = hal_device_get_udi (d);
-      /*g_warning ("camera adding %s", udi);*/
-
-      volume = g_gphoto2_volume_new (G_VOLUME_MONITOR (monitor),
-                                     d,
-                                     monitor->pool,
-                                     foreign_mount_root);
-      g_object_unref (foreign_mount_root);
-      if (volume != NULL)
+      store_heads = get_stores_for_camera (usb_bus_num, usb_device_num);
+      for (l = store_heads ; l != NULL; l = l->next)
         {
-          monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
-          *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
+          char *store_path = (char *) l->data;
+          char *uri;
+
+	  uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]/%s", usb_bus_num, usb_device_num,
+	  			 store_path[0] == '/' ? store_path + 1 : store_path);
+
+	  foreign_mount_root = g_file_new_for_uri (uri);
+	  g_free (uri);
+
+	  udi = hal_device_get_udi (d);
+	  volume = g_gphoto2_volume_new (G_VOLUME_MONITOR (monitor),
+					 d,
+					 monitor->pool,
+					 foreign_mount_root);
+	  g_object_unref (foreign_mount_root);
+	  if (volume != NULL)
+            {
+	      monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
+	      *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
+	    }
+
+	  g_free (l->data);
+
         }
+      g_list_free (store_heads);
     }
 
   g_list_free (added);

@@ -29,6 +29,7 @@ gvfs_gphoto2_volume_monitor_CFLAGS =		\
 	-I$(top_srcdir)/monitor/proxy           \
 	$(GLIB_CFLAGS)                          \
 	$(HAL_CFLAGS)                           \
+	$(GPHOTO2_CFLAGS)			\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DG_DISABLE_DEPRECATED			\
@@ -40,6 +41,7 @@ gvfs_gphoto2_volume_monitor_LDFLAGS =	\
 gvfs_gphoto2_volume_monitor_LDADD  =		     			      \
 	$(GLIB_LIBS)                                 			      \
 	$(HAL_LIBS)                                  			      \
+	$(GPHOTO2_LIBS)                              			      \
 	$(top_builddir)/common/libgvfscommon.la 			      \
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)

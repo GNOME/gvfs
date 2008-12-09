@@ -1,3 +1,24 @@
+2008-12-09  Bastien Nocera  <hadess@hadess.net>
+
+	* monitor/gphoto2/Makefile.am:
+	* monitor/gphoto2/ggphoto2volumemonitor.c (get_stores_for_camera),
+	(update_cameras): For each camera discovered, create shadow mounts
+	for each one of the top-level storage heads, makes each of the
+	device's stores appear separately
+
+	* daemon/gvfsbackendgphoto2.c (monitors_emit_internal),
+	(release_device), (split_filename), (file_get_info), (do_mount),
+	(do_open_for_read_real), (do_query_info), (try_query_info),
+	(do_enumerate), (try_enumerate), (do_make_directory),
+	(do_set_display_name), (do_delete), (do_create_internal),
+	(do_replace), (do_append_to), (do_move), (do_create_dir_monitor),
+	(do_create_file_monitor): Remove all the hacks to handle
+	a single storage head differently from multiple storage heads,
+	this makes photo directories detection and the likes work
+	for multiple storage-heads
+
+	(Closes: #520123)
+
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonmount.c:
