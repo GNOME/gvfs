@@ -1,3 +1,14 @@
+2008-12-11  Dan Winship  <danw@gnome.org>
+
+	* daemon/soup-input-stream.c (read_async_done)
+	(soup_input_stream_read_async, soup_input_stream_close_async):
+	don't leak GSimpleAsyncResults. #551075.
+
+	* daemon/gvfsbackendhttp.c (try_open_for_read): set_accumulate to
+	FALSE on the response body to avoid extra allocating+freeing.
+	Patch from Peter Christoffersen, part of #551075.
+	(open_for_read_ready): unref the stream on error.
+
 2008-12-09  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackendobexftp.c (_query_file_info_helper): Fix icon

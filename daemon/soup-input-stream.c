@@ -714,6 +714,7 @@ read_async_done (GInputStream *stream)
   soup_input_stream_done_io (stream);
 
   g_simple_async_result_complete (result);
+  g_object_unref (result);
 }
 
 static void
@@ -748,6 +749,7 @@ soup_input_stream_read_async (GInputStream        *stream,
     {
       g_simple_async_result_set_op_res_gssize (result, 0);
       g_simple_async_result_complete_in_idle (result);
+      g_object_unref (result);
       return;
     }
 
@@ -756,6 +758,7 @@ soup_input_stream_read_async (GInputStream        *stream,
       gsize nread = read_from_leftover (priv, buffer, count);
       g_simple_async_result_set_op_res_gssize (result, nread);
       g_simple_async_result_complete_in_idle (result);
+      g_object_unref (result);
       return;
     }
 
@@ -804,6 +807,7 @@ soup_input_stream_close_async (GInputStream       *stream,
     }
 
   g_simple_async_result_complete_in_idle (result);
+  g_object_unref (result);
 }
 
 static gboolean

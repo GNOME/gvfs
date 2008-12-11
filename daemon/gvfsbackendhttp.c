@@ -346,6 +346,7 @@ open_for_read_ready (GObject      *source_object,
                                 error->message);
 
       g_error_free (error);
+      g_object_unref (stream);
       return;
     }
 
@@ -370,6 +371,8 @@ try_open_for_read (GVfsBackend        *backend,
   uri = http_backend_uri_for_filename (backend, filename, FALSE);
   msg = soup_message_new_from_uri (SOUP_METHOD_GET, uri);
   soup_uri_free (uri);
+
+  soup_message_body_set_accumulate (msg->response_body, FALSE);
 
   stream = soup_input_stream_new (op_backend->session_async, msg);
   g_object_unref (msg);
