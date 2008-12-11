@@ -33,7 +33,7 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 
-#include <libsoup/soup.h>
+#include <libsoup/soup-gnome.h>
 #include "gvfsbackendhttp.h"
 #include "gvfsjobopenforread.h"
 #include "gvfsjobread.h"
@@ -79,7 +79,8 @@ g_vfs_backend_http_finalize (GObject *object)
 static void
 g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
-   const char         *debug;
+  const char         *debug;
+  SoupSessionFeature *proxy_resolver;
 
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
@@ -90,6 +91,12 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   backend->session_async = soup_session_async_new_with_options ("user-agent",
                                                                 "gvfs/" VERSION,
                                                                 NULL);
+
+  /* Proxy handling */
+  proxy_resolver = g_object_new (SOUP_TYPE_PROXY_RESOLVER_GNOME, NULL);
+  soup_session_add_feature (backend->session, proxy_resolver);
+  soup_session_add_feature (backend->session_async, proxy_resolver);
+  g_object_unref (proxy_resolver);
 
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
@@ -107,8 +114,8 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
         level = SOUP_LOGGER_LOG_MINIMAL;
 
       logger = soup_logger_new (level, DEBUG_MAX_BODY_SIZE);
-      soup_logger_attach (logger, backend->session);
-      soup_logger_attach (logger, backend->session_async);
+      soup_session_add_feature (backend->session, SOUP_SESSION_FEATURE (logger));
+      soup_session_add_feature (backend->session_async, SOUP_SESSION_FEATURE (logger));
       g_object_unref (logger);
     }
 
