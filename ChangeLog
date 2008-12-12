@@ -1,5 +1,12 @@
 2008-12-11  Ryan Lortie  <desrt@desrt.ca>
 
+	Implement pull support on trash backend.
+
+	* daemon/trashlib/trashitem.[ch]: add support for restoring items
+	* daemon/gvfsbackendtrash.c: implement pull
+
+2008-12-11  Ryan Lortie  <desrt@desrt.ca>
+
 	New trash:/ backend.
 
 	* daemon/trashlib: implementation of the reader side of the fd.o

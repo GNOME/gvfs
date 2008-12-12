@@ -52,5 +52,8 @@ GFile          *trash_item_get_file          (TrashItem          *item);
 /* delete a trash item (safe while holding a reference to it) */
 gboolean        trash_item_delete            (TrashItem          *item,
                                               GError            **error);
+gboolean        trash_item_restore           (TrashItem          *item,
+                                              GFile              *dest,
+                                              GError            **error);
 
 #endif /* _trashitem_h_ */

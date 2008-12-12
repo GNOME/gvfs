@@ -479,30 +479,9 @@ trash_item_delete (TrashItem  *item,
       g_sprintf (buffer, "%u", unique + i);
       temp_name = g_file_get_child (expunged, buffer);
 
-      if (g_file_move (item->file, temp_name,
-                       G_FILE_COPY_OVERWRITE |
-                       G_FILE_COPY_NOFOLLOW_SYMLINKS |
-                       G_FILE_COPY_NO_FALLBACK_FOR_MOVE,
-                       NULL, NULL, NULL, NULL))
+      /* "restore" the item into the expunged folder */
+      if (trash_item_restore (item, temp_name, NULL))
         {
-          g_static_rw_lock_writer_lock (&item->root->lock);
-          g_hash_table_remove (item->root->item_table, item->escaped_name);
-          g_static_rw_lock_writer_unlock (&item->root->lock);
-
-          {
-            GFile *trashinfo;
-            gchar *basename;
-            gchar *relname;
-
-            basename = g_file_get_basename (item->file);
-            relname = g_strdup_printf ("../../info/%s.trashinfo", basename);
-            trashinfo = g_file_resolve_relative_path (item->file, relname);
-            g_free (basename);
-            g_free (relname);
-
-            g_file_delete (trashinfo, NULL, NULL);
-          }
-
           trash_expunge (expunged);
           success = TRUE;
         }
@@ -519,4 +498,39 @@ trash_item_delete (TrashItem  *item,
   trash_root_thaw (item->root);
 
   return success;
+}
+
+gboolean
+trash_item_restore (TrashItem  *item,
+                    GFile      *dest,
+                    GError    **error)
+{
+  if (g_file_move (item->file, dest,
+                   G_FILE_COPY_OVERWRITE |
+                   G_FILE_COPY_NOFOLLOW_SYMLINKS |
+                   G_FILE_COPY_NO_FALLBACK_FOR_MOVE,
+                   NULL, NULL, NULL, NULL))
+    {
+      g_static_rw_lock_writer_lock (&item->root->lock);
+      g_hash_table_remove (item->root->item_table, item->escaped_name);
+      g_static_rw_lock_writer_unlock (&item->root->lock);
+
+      {
+        GFile *trashinfo;
+        gchar *basename;
+        gchar *relname;
+
+        basename = g_file_get_basename (item->file);
+        relname = g_strdup_printf ("../../info/%s.trashinfo", basename);
+        trashinfo = g_file_resolve_relative_path (item->file, relname);
+        g_free (basename);
+        g_free (relname);
+
+        g_file_delete (trashinfo, NULL, NULL);
+      }
+
+      return TRUE;
+    }
+
+  return FALSE;
 }
