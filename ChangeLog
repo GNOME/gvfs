@@ -1,3 +1,14 @@
+2008-12-11  Ryan Lortie  <desrt@desrt.ca>
+
+	New trash:/ backend.
+
+	* daemon/trashlib: implementation of the reader side of the fd.o
+	trash specification
+	* daemon/gvfsbackendtrash.[ch]: rewrite based on trashlib
+	* configure.ac: add daemon/trashlib/Makefile to output
+	* daemon/Makefile.am: add trashlib/ subdir and include in trash
+	backend libraries
+
 2008-12-11  Dan Winship  <danw@gnome.org>
 
 	* configure.ac: require libsoup-gnome, for SoupProxyResolverGNOME

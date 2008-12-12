@@ -553,6 +553,7 @@ AC_OUTPUT([
 Makefile
 common/Makefile
 client/Makefile
+daemon/trashlib/Makefile
 daemon/Makefile
 monitor/Makefile
 monitor/proxy/Makefile

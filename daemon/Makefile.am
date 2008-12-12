@@ -1,3 +1,5 @@
+SUBDIRS = trashlib
+
 NULL =
 
 mountdir = $(datadir)/gvfs/mounts
@@ -264,9 +266,10 @@ gvfsd_trash_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendtrash.h \
 	-DDEFAULT_BACKEND_TYPE=trash \
 	-DMAX_JOB_THREADS=10 \
-	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,'
+	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,' \
+	-Itrashlib
 
-gvfsd_trash_LDADD = $(libraries)
+gvfsd_trash_LDADD = $(libraries) trashlib/libtrash.a
 
 gvfsd_computer_SOURCES = \
 	gvfsbackendcomputer.c gvfsbackendcomputer.h \
