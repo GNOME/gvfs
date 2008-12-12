@@ -937,14 +937,13 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
       addr = soup_address_new (ip, port1 << 8 | port2);
       g_free (ip);
 
-      connected = ftp_connection_open_data_connection (conn, addr);
-      if (!connected)
-        {
-          /* set workaround flag (see below), so we don't try this again */
-          DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
-          conn->workarounds |= FTP_WORKAROUND_PASV_ADDR;
-          g_clear_error (&conn->error);
-	}
+      if (ftp_connection_open_data_connection (conn, addr))
+        return TRUE;
+         
+      /* set workaround flag (see below), so we don't try this again */
+      DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
+      conn->workarounds |= FTP_WORKAROUND_PASV_ADDR;
+      g_clear_error (&conn->error);
     }
 
   /* Workaround code:

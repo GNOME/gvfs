@@ -1,3 +1,12 @@
+2008-12-12  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	(ftp_connection_ensure_data_connection_pasv):
+	Fix successful PASV connections (don't try to apply workaround).
+	(fixes #564027)
+
 2008-12-11  Ryan Lortie  <desrt@desrt.ca>
 
 	Implement pull support on trash backend.
