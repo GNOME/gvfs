@@ -261,6 +261,7 @@ trash_watcher_new (TrashRoot *root)
                                              g_get_user_data_dir (),
                                              "Trash/files");
 
+  g_unix_mount_free (homedir_mount);
   g_object_unref (homedir_trashdir);
   g_object_unref (user_datadir);
 

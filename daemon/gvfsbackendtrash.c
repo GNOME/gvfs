@@ -250,6 +250,7 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
 
   return TRUE;
 }
@@ -276,6 +277,7 @@ trash_backend_read (GVfsBackend       *backend,
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
 
   return TRUE;
 }
@@ -298,6 +300,7 @@ trash_backend_seek_on_read (GVfsBackend       *backend,
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
 
   return TRUE;
 }
@@ -316,7 +319,10 @@ trash_backend_close_read (GVfsBackend       *backend,
       return TRUE;
     }
 
+  g_object_unref (handle);
+
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
 
   return TRUE;
 }
@@ -328,6 +334,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
 {
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
   GError *error = NULL;
+  g_print ("before job: %d\n", G_OBJECT(job)->ref_count);
 
   if (filename[1] == '\0')
     g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -343,6 +350,9 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
 
       if (real)
         {
+          /* not interested in the 'real', but the item */
+          g_object_unref (real);
+
           if (!is_toplevel)
             g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                          _("Items in the trash may not be modified"));
@@ -352,6 +362,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
               if (trash_item_delete (item, &error))
                 {
                   g_vfs_job_succeeded (G_VFS_JOB (job));
+                  trash_item_unref (item);
 
                   return TRUE;
                 }
@@ -359,10 +370,10 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
 
           trash_item_unref (item);
         }
- 
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
   
   return TRUE;
 }
@@ -416,17 +427,21 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
               if (it_worked)
                 {
                   g_vfs_job_succeeded (G_VFS_JOB (job));
+                  trash_item_unref (item);
+                  g_object_unref (real);
 
                   return TRUE;
                 }
             }
 
           trash_item_unref (item);
+          g_object_unref (real);
         }
  
     }
 
   g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
   
   return TRUE;
 }
@@ -470,87 +485,37 @@ trash_backend_add_info (TrashItem *item,
                                      is_toplevel);
 }
 
-static gboolean
-trash_backend_enumerate (GVfsBackend           *vfs_backend,
-                         GVfsJobEnumerate      *job,
-                         const char            *filename,
-                         GFileAttributeMatcher *attribute_matcher,
-                         GFileQueryInfoFlags    flags)
+static void
+trash_backend_enumerate_root (GVfsBackendTrash      *backend,
+                              GVfsJobEnumerate      *job,
+                              GFileAttributeMatcher *attribute_matcher,
+                              GFileQueryInfoFlags    flags)
 {
-  GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
+  GList *items, *node;
 
-  g_assert (filename[0] == '/');
+  g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  trash_watcher_rescan (backend->watcher);
+  items = trash_root_get_items (backend->root);
 
-  if (filename[1])
-    /* not root case */
+  for (node = items; node; node = node->next)
     {
-      GError *error = NULL;
-      GFile *real;
+      TrashItem *item = node->data;
+      GFileInfo *info;
 
-      real = trash_backend_get_file (backend, filename, NULL, NULL, &error);
+      info = g_file_query_info (trash_item_get_file (item),
+                                job->attributes, flags, NULL, NULL);
 
-      if (real)
+      if (info)
         {
-          GFileEnumerator *enumerator;
-
-          enumerator = g_file_enumerate_children (real, job->attributes,
-                                                  job->flags, NULL, &error);
-
-          if (enumerator)
-            {
-              GFileInfo *info;
-
-              g_vfs_job_succeeded (G_VFS_JOB (job));
-
-              while ((info = g_file_enumerator_next_file (enumerator,
-                                                          NULL, &error)))
-                {
-                  trash_backend_add_info (NULL, info, FALSE);
-                  g_vfs_job_enumerate_add_info (job, info);
-                  g_object_unref (info);
-                }
-
-              g_object_unref (enumerator);
-
-              if (!error)
-                {
-                  g_vfs_job_enumerate_done (job);
-
-                  return TRUE;
-                }
-            }
-        }
-
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error); /* wrote when drunk at uds, plz check later, k thx. XXX */
-    }
-  else
-    {
-      GCancellable *cancellable;
-      GList *items;
-      GList *node;
-
-      cancellable = G_VFS_JOB (job)->cancellable;
-      g_vfs_job_succeeded (G_VFS_JOB (job));
-
-      items = trash_root_get_items (backend->root);
-
-      for (node = items; node; node = node->next)
-        {
-          TrashItem *item = node->data;
-          GFileInfo *info;
           GFile *original;
 
-          info = g_file_query_info (trash_item_get_file (item),
-                                    job->attributes,
-                                    flags, cancellable, NULL);
-
           g_file_info_set_attribute_mask (info, attribute_matcher);
-          trash_backend_add_info (item, info, TRUE);
+
           g_file_info_set_name (info, trash_item_get_escaped_name (item));
+          trash_backend_add_info (item, info, TRUE);
 
           original = trash_item_get_original (item);
+
           if (original)
             {
               char *basename;
@@ -565,9 +530,80 @@ trash_backend_enumerate (GVfsBackend           *vfs_backend,
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (info);
         }
+
+      trash_item_unref (item);
     }
 
   g_vfs_job_enumerate_done (job);
+  g_list_free (items);
+}
+
+static void
+trash_backend_enumerate_non_root (GVfsBackendTrash      *backend,
+                                  GVfsJobEnumerate      *job,
+                                  const gchar           *filename,
+                                  GFileAttributeMatcher *attribute_matcher,
+                                  GFileQueryInfoFlags    flags)
+{
+  GError *error = NULL;
+  GFile *real;
+
+  real = trash_backend_get_file (backend, filename, NULL, NULL, &error);
+
+  if (real)
+    {
+      GFileEnumerator *enumerator;
+
+      enumerator = g_file_enumerate_children (real, job->attributes,
+                                              job->flags, NULL, &error);
+      g_object_unref (real);
+
+      if (enumerator)
+        {
+          GFileInfo *info;
+
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+
+          while ((info = g_file_enumerator_next_file (enumerator,
+                                                      NULL, &error)))
+            {
+              trash_backend_add_info (NULL, info, FALSE);
+              g_vfs_job_enumerate_add_info (job, info);
+              g_object_unref (info);
+            }
+
+          /* error from next_file?  ignore. */
+          if (error)
+            g_error_free (error);
+
+          g_vfs_job_enumerate_done (job);
+          g_object_unref (enumerator);
+          return;
+        }
+    }
+
+  g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+  g_error_free (error);
+}
+
+static gboolean
+trash_backend_enumerate (GVfsBackend           *vfs_backend,
+                         GVfsJobEnumerate      *job,
+                         const char            *filename,
+                         GFileAttributeMatcher *attribute_matcher,
+                         GFileQueryInfoFlags    flags)
+{
+  GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
+
+  g_assert (filename[0] == '/');
+
+  trash_watcher_rescan (backend->watcher);
+
+  if (filename[1])
+    trash_backend_enumerate_non_root (backend, job, filename,
+                                      attribute_matcher, flags);
+  else
+    trash_backend_enumerate_root (backend, job, attribute_matcher, flags);
 
   return TRUE;
 }
@@ -622,12 +658,15 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
 
           real_info = g_file_query_info (real, job->attributes,
                                          flags, NULL, &error);
+          g_object_unref (real);
 
           if (real_info)
             {
               g_file_info_copy_into (real_info, info);
               trash_backend_add_info (item, info, is_toplevel);
               g_vfs_job_succeeded (G_VFS_JOB (job));
+              trash_item_unref (item);
+              g_object_unref (real_info);
 
               return TRUE;
             }
@@ -636,6 +675,7 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
         }
 
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
     }
   else
     {

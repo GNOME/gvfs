@@ -1,3 +1,14 @@
+2008-12-12  Ryan Lortie  <desrt@desrt.ca>
+
+	Fix memory leaks on trash backend
+
+	* daemon/trashlib/trashdir.c:
+	* daemon/trashlib/trashexpunge.c:
+	* daemon/trashlib/trashitem.c:
+	* daemon/trashlib/trashwatcher.c: fix memory leaks
+	* daemon/gvfsbackendtrash.c: fix leaks; split enumerate into two
+	functions (one for the root, one for the non-root case)
+
 2008-12-12  Andreas Henriksson <andreas@fatal.se>
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>

@@ -527,6 +527,7 @@ trash_item_restore (TrashItem  *item,
         g_free (relname);
 
         g_file_delete (trashinfo, NULL, NULL);
+        g_object_unref (trashinfo);
       }
 
       return TRUE;

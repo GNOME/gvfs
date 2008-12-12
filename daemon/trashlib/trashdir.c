@@ -292,6 +292,8 @@ trash_dir_new (TrashRoot  *root,
   if (ui_hook)
     ui_hook (dir, dir->directory);
 
+  g_free (rel);
+
   return dir;
 }
 

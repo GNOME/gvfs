@@ -40,6 +40,7 @@ trash_expunge_delete_everything_under (GFile *directory)
           /* do the delete here */
           g_file_delete (sub, NULL, NULL);
 
+          g_object_unref (info);
           g_object_unref (sub);
         }
       g_object_unref (enumerator);
