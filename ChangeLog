@@ -1,3 +1,8 @@
+2008-12-15  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
 2008-12-12  Ryan Lortie  <desrt@desrt.ca>
 
 	Fix memory leaks on trash backend

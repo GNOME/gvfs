@@ -1,3 +1,12 @@
+Major changes in 1.1.2
+======================
+* New trash backend
+* Use the new shadow mount facility in gio
+* gphoto2: Use shadow mounts
+* obex: Fix icon for root directory
+* http: Fix major memory leak
+* http: Support proxies
+
 Major changes in 1.1.1
 ======================
 * Reverse map FUSE pathnames to gvfs locations
