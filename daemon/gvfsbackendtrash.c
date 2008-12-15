@@ -11,8 +11,8 @@
 #include <glib/gi18n.h> /* _() */
 #include <string.h>
 
-#include "trashwatcher.h"
-#include "trashitem.h"
+#include "trashlib/trashwatcher.h"
+#include "trashlib/trashitem.h"
 
 #include "gvfsjobcreatemonitor.h"
 #include "gvfsjobopenforread.h"

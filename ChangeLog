@@ -1,5 +1,11 @@
 2008-12-15  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendtrash.c:
+        * daemon/trashlib/Makefile.am:
+	Fix dist issues
+
+2008-12-15  Alexander Larsson  <alexl@redhat.com>
+
 	* NEWS:
 	Update for release
 

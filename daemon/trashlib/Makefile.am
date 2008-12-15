@@ -9,7 +9,7 @@ libtrash_a_SOURCES = \
 	trashdir.c	\
 	trashitem.h	\
 	trashitem.c	\
-       	trashwatcher.h	\
-       	trashwatcher.c	\
+	trashwatcher.h	\
+	trashwatcher.c	\
 	trashexpunge.h	\
 	trashexpunge.c
