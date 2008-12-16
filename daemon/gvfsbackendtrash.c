@@ -454,21 +454,36 @@ trash_backend_add_info (TrashItem *item,
                         GFileInfo *info,
                         gboolean   is_toplevel)
 {
-  GFile *original;
-
-  if (is_toplevel && item)
+  if (is_toplevel)
     {
+      const gchar *delete_date;
+      GFile *original;
+
+      g_assert (item != NULL);
+
       original = trash_item_get_original (item);
 
       if (original)
         {
-          gchar *basename;
+          gchar *basename, *path;
 
-          basename = g_file_get_basename (original);
-          /* XXX: utf8ify or something... */
+          path = g_file_get_path (original);
+          basename = g_filename_display_basename (path);
+
           g_file_info_set_display_name (info, basename);
+          g_file_info_set_attribute_byte_string (info,
+                                                 "trash::orig-path",
+                                                 path);
           g_free (basename);
+          g_free (path);
         }
+
+      delete_date = trash_item_get_delete_date (item);
+
+      if (delete_date)
+        g_file_info_set_attribute_string (info,
+                                          "trash::deletion-date",
+                                          delete_date);
     }
 
   g_file_info_set_attribute_boolean (info,

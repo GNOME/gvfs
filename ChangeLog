@@ -1,3 +1,8 @@
+2008-12-16  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/gvfsbackendtrash.c (trash_backend_add_info): add
+	trash::orig-path and trash::deletion-date info
+
 2008-12-15  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
