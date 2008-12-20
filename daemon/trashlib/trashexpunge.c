@@ -19,6 +19,11 @@ trash_expunge_delete_everything_under (GFile *directory)
 {
   GFileEnumerator *enumerator;
 
+  g_file_set_attribute_uint32 (directory,
+                               G_FILE_ATTRIBUTE_UNIX_MODE, 0700,
+                               G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                               NULL, NULL);
+
   enumerator = g_file_enumerate_children (directory,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME,
                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,

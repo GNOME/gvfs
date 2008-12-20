@@ -1,5 +1,10 @@
 2008-12-16  Ryan Lortie  <desrt@desrt.ca>
 
+	* daemon/trashlib/trashexpunge.c: set files to mode 700 before
+	deleting to deal with users trashing read-only directories
+
+2008-12-16  Ryan Lortie  <desrt@desrt.ca>
+
 	Bug 562955 – parallel build doesn't work
 
 	* common/Makefile.am: use non-absolute path for libgvfscommon.la so
