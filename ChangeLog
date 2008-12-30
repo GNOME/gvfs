@@ -1,5 +1,11 @@
 2008-12-30  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (g_vfs_backend_ftp_pop_connection):
+	remove fixme for max connection tracking, by remembering the max
+	connections on the stack.
+
+2008-12-30  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_connection_prepare),
 	(ftp_connection_use), (ftp_connection_ensure_data_connection_epsv),
 	(ftp_connection_ensure_data_connection_pasv),

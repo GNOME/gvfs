@@ -1322,6 +1322,12 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 
       if (ftp->connections < ftp->max_connections)
 	{
+	  /* Save current number of connections here, so we can limit maximum 
+	   * connections later.
+	   * This is necessary for threading reasons (connections can be 
+	   * opened or closed while we are still in the opening process. */
+	  guint maybe_max_connections = ftp->connections;
+
 	  ftp->connections++;
 	  g_mutex_unlock (ftp->mutex);
 	  conn = ftp_connection_create (ftp->addr, job);
@@ -1337,8 +1343,7 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	  conn = NULL;
 	  g_mutex_lock (ftp->mutex);
 	  ftp->connections--;
-	  /* FIXME: This assignment is racy due to the mutex unlock above */
-	  ftp->max_connections = ftp->connections;
+	  ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
 	  if (ftp->max_connections == 0)
 	    {
 	      DEBUG ("no more connections left, exiting...");
