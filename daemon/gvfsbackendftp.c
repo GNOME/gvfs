@@ -184,6 +184,7 @@ ftp_connection_free (FtpConnection *conn)
 }
 
 #define ftp_connection_in_error(conn) ((conn)->error != NULL)
+#define ftp_connection_clear_error(conn) (g_clear_error (&(conn)->error))
 
 static gboolean
 ftp_connection_pop_job (FtpConnection *conn)
@@ -779,7 +780,7 @@ ftp_connection_prepare (FtpConnection *conn)
   if (ftp_connection_send (conn, 0, "FEAT") != 0) {
     ftp_connection_parse_features (conn);
   } else {
-    g_clear_error (&conn->error);
+    ftp_connection_clear_error(conn);
     conn->workarounds |= FTP_WORKAROUND_FEAT_AFTER_LOGIN;
     conn->features = 0;
   }
@@ -811,21 +812,21 @@ ftp_connection_use (FtpConnection *conn)
    */
   if (conn->features & FTP_FEATURE_EPSV)
     ftp_connection_send (conn, 0, "EPSV ALL");
-  g_clear_error (&conn->error);
+  ftp_connection_clear_error(conn);
 #endif
 
   if (conn->workarounds & FTP_WORKAROUND_FEAT_AFTER_LOGIN) {
     if (ftp_connection_send (conn, 0, "FEAT") != 0) {
       ftp_connection_parse_features (conn);
     } else {
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error(conn);
       conn->features = FTP_FEATURE_EPSV;
     }
   }
 
   if (ftp_connection_send (conn, 0, "SYST"))
     ftp_connection_parse_system (conn);
-  g_clear_error (&conn->error);
+  ftp_connection_clear_error(conn);
 
   return TRUE;
 }
@@ -893,7 +894,7 @@ ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
     {
       DEBUG ("Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
       conn->workarounds |= FTP_WORKAROUND_BROKEN_EPSV;
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error (conn);
     }
   return connected;
 }
@@ -943,7 +944,7 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
       /* set workaround flag (see below), so we don't try this again */
       DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
       conn->workarounds |= FTP_WORKAROUND_PASV_ADDR;
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error (conn);
     }
 
   /* Workaround code:
@@ -1059,7 +1060,7 @@ ftp_connection_try_cd (FtpConnection *conn, const FtpFile *file)
 
   if (!ftp_connection_cd (conn, file))
     {
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error (conn);
       return FALSE;
     }
   
@@ -1302,21 +1303,22 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	break;
       conn = g_queue_pop_head (ftp->queue);
 
-      if (conn != NULL) {
-	/* Figure out if this connection had a timeout sent. If so, skip it. */
-	g_mutex_unlock (ftp->mutex);
-	ftp_connection_push_job (conn, job);
-	if (ftp_connection_send (conn, 0, "NOOP"))
-	  break;
-	    
-	g_clear_error (&conn->error);
-	conn->job = NULL;
-	ftp_connection_free (conn);
-	conn = NULL;
-	g_mutex_lock (ftp->mutex);
-	ftp->connections--;
-	continue;
-      }
+      if (conn != NULL)
+	{
+	  /* Figure out if this connection had a timeout sent. If so, skip it. */
+	  g_mutex_unlock (ftp->mutex);
+	  ftp_connection_push_job (conn, job);
+	  if (ftp_connection_send (conn, 0, "NOOP"))
+	    break;
+	      
+	  ftp_connection_clear_error (conn);
+	  conn->job = NULL;
+	  ftp_connection_free (conn);
+	  conn = NULL;
+	  g_mutex_lock (ftp->mutex);
+	  ftp->connections--;
+	  continue;
+	}
 
       if (ftp->connections < ftp->max_connections)
 	{
@@ -1329,7 +1331,7 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	  if (G_LIKELY (!ftp_connection_in_error (conn)))
 	    break;
 
-	  g_clear_error (&conn->error);
+	  ftp_connection_clear_error (conn);
 	  ftp_connection_pop_job (conn);
 	  ftp_connection_free (conn);
 	  conn = NULL;
@@ -1551,7 +1553,7 @@ try_login:
           !g_error_matches (conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
 	break;
 
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error (conn);
     }
   
   ftp_connection_use (conn);
@@ -2177,7 +2179,7 @@ resolve_symlink (GVfsBackendFtp *ftp, FtpConnection *conn, GFileInfo *original, 
   if (ftp_connection_in_error (conn))
     {
       g_assert (info == NULL);
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error (conn);
       return original;
     }
   if (info == NULL)
@@ -2327,7 +2329,7 @@ do_enumerate (GVfsBackend *backend,
       
       g_vfs_job_enumerate_done (job);
       conn->job = NULL;
-      g_clear_error (&conn->error);
+      ftp_connection_clear_error (conn);
     }
   else
     g_assert (files == NULL);

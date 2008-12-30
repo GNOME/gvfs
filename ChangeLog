@@ -1,5 +1,14 @@
 2008-12-30  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (ftp_connection_prepare),
+	(ftp_connection_use), (ftp_connection_ensure_data_connection_epsv),
+	(ftp_connection_ensure_data_connection_pasv),
+	(ftp_connection_try_cd), (g_vfs_backend_ftp_pop_connection),
+	(do_mount), (resolve_symlink), (do_enumerate):
+	introduce ftp_connection_clear_error() for clarity
+
+2008-12-30  Benjamin Otte  <otte@gnome.org>
+
 	Bug 565504 - limited number of connections causes commands to fail
 
 	* daemon/gvfsbackendftp.c: (g_vfs_backend_ftp_pop_connection):
