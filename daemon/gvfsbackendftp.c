@@ -1326,9 +1326,10 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	  ftp_connection_prepare (conn);
 	  ftp_connection_login (conn, ftp->user, ftp->password);
 	  ftp_connection_use (conn);
-	  if (!ftp_connection_in_error (conn))
+	  if (G_LIKELY (!ftp_connection_in_error (conn)))
 	    break;
 
+	  g_clear_error (&conn->error);
 	  ftp_connection_pop_job (conn);
 	  ftp_connection_free (conn);
 	  conn = NULL;

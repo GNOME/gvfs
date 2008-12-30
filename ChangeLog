@@ -1,3 +1,11 @@
+2008-12-30  Benjamin Otte  <otte@gnome.org>
+
+	Bug 565504 - limited number of connections causes commands to fail
+
+	* daemon/gvfsbackendftp.c: (g_vfs_backend_ftp_pop_connection):
+	clear connection error before popping job, so that the error isn't
+	propagated to the job
+
 2008-12-16  Ryan Lortie  <desrt@desrt.ca>
 
 	* daemon/trashlib/trashexpunge.c: set files to mode 700 before
