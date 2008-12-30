@@ -1338,7 +1338,8 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	    break;
 
 	  ftp_connection_clear_error (conn);
-	  ftp_connection_pop_job (conn);
+	  /* Don't call ftp_connection_pop_job () here, the job isn't done yet */
+	  conn->job = NULL;
 	  ftp_connection_free (conn);
 	  conn = NULL;
 	  g_mutex_lock (ftp->mutex);

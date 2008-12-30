@@ -1,5 +1,13 @@
 2008-12-30  Benjamin Otte  <otte@gnome.org>
 
+	Bug 565504 - limited number of connections causes commands to fail
+
+	* daemon/gvfsbackendftp.c: (g_vfs_backend_ftp_pop_connection):
+	really fix this bug by not calling g_vfs_job_succeeded() on the error
+	path.
+
+2008-12-30  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (g_vfs_backend_ftp_pop_connection):
 	remove fixme for max connection tracking, by remembering the max
 	connections on the stack.
