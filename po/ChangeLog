@@ -1,3 +1,8 @@
+2009-01-04  Raivis Dejus  <orvils@gmail.com>
+
+	* lv.po: Added latvian translation
+	* LINGUAS: Added 'lv' for Latvian translations
+
 2008-12-16  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
 
 	* es.po: Updated Spanish translation.  
