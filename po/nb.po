@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 0.1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-15 22:44+0100\n"
-"PO-Revision-Date: 2008-12-15 22:45+0100\n"
+"POT-Creation-Date: 2009-01-05 15:51+0100\n"
+"PO-Revision-Date: 2009-01-05 15:53+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -173,7 +173,7 @@ msgstr "Feil ved oppretting av Avahi navneoppslag: %s"
 #: ../common/gvfsdnssdresolver.c:1094
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
+msgstr "Feil i oppslag av «%s» tjeneste «%s» på domene «%s»"
 
 #: ../common/gvfsdnssdresolver.c:1114
 #, c-format
@@ -200,7 +200,7 @@ msgstr ""
 
 #: ../common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
-msgstr ""
+msgstr "Feil inndata for GVfsIcon"
 
 #: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
 #, c-format
@@ -252,7 +252,7 @@ msgstr "feil under oppstart av monteringstjenesten"
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1631
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1639
 #: ../daemon/gvfsbackendsftp.c:1566
 msgid "No hostname specified"
 msgstr "Ingen vertsnavn oppgitt"
@@ -267,7 +267,7 @@ msgstr "Ugyldige monteringsspesifikasjon"
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
 #: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:2253 ../daemon/gvfsbackendnetwork.c:589
+#: ../daemon/gvfsbackendftp.c:2261 ../daemon/gvfsbackendnetwork.c:589
 #: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
 #: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1111
 #, c-format
@@ -529,8 +529,8 @@ msgid "Could not create request"
 msgstr "Kan ikke opprette forespørsel"
 
 #: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
-#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1851
-#: ../daemon/gvfsbackendftp.c:2517 ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1859
+#: ../daemon/gvfsbackendftp.c:2525 ../daemon/gvfsbackendsftp.c:3588
 #: ../daemon/gvfsbackendsmb.c:1912
 msgid "Target file already exists"
 msgstr "Målfilen eksisterer allerede"
@@ -564,103 +564,103 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Nettverk"
 
-#: ../daemon/gvfsbackendftp.c:251
+#: ../daemon/gvfsbackendftp.c:252
 msgid "Accounts are unsupported"
 msgstr "Kontoer er ikke støttet"
 
-#: ../daemon/gvfsbackendftp.c:255
+#: ../daemon/gvfsbackendftp.c:256
 msgid "Host closed connection"
 msgstr "Vert lukket forbindelsen"
 
-#: ../daemon/gvfsbackendftp.c:259
+#: ../daemon/gvfsbackendftp.c:260
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Kan ikke åpne dataforbindelse. Kanskje en brannmur forhindrer dette?"
 
-#: ../daemon/gvfsbackendftp.c:263
+#: ../daemon/gvfsbackendftp.c:264
 msgid "Data connection closed"
 msgstr "Dataforbindelse lukket"
 
-#: ../daemon/gvfsbackendftp.c:270 ../daemon/gvfsbackendftp.c:274
+#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:275
 msgid "Operation failed"
 msgstr "Operasjonen feilet"
 
-#: ../daemon/gvfsbackendftp.c:279
+#: ../daemon/gvfsbackendftp.c:280
 msgid "No space left on server"
 msgstr "Ikke mer plass på tjener"
 
-#: ../daemon/gvfsbackendftp.c:287 ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:3897
 #: ../daemon/gvfsbackendsmb.c:1576
 msgid "Operation unsupported"
 msgstr "Operasjonen støttes ikke"
 
-#: ../daemon/gvfsbackendftp.c:291 ../daemon/gvfsbackendsftp.c:296
+#: ../daemon/gvfsbackendftp.c:292 ../daemon/gvfsbackendsftp.c:296
 msgid "Permission denied"
 msgstr "Tilgang nektet"
 
-#: ../daemon/gvfsbackendftp.c:295
+#: ../daemon/gvfsbackendftp.c:296
 msgid "Page type unknown"
 msgstr "Ukjent sidetype"
 
-#: ../daemon/gvfsbackendftp.c:299 ../daemon/gvfsbackendftp.c:2363
+#: ../daemon/gvfsbackendftp.c:300 ../daemon/gvfsbackendftp.c:2371
 msgid "Invalid filename"
 msgstr "Ugyldig filnavn"
 
-#: ../daemon/gvfsbackendftp.c:303 ../daemon/gvfsbackendftp.c:379
-#: ../daemon/gvfsbackendftp.c:408 ../daemon/gvfsbackendftp.c:427
-#: ../daemon/gvfsbackendftp.c:440 ../daemon/gvfsbackendftp.c:928
+#: ../daemon/gvfsbackendftp.c:304 ../daemon/gvfsbackendftp.c:380
+#: ../daemon/gvfsbackendftp.c:409 ../daemon/gvfsbackendftp.c:428
+#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:928
 msgid "Invalid reply"
 msgstr "Ugyldig svar"
 
-#: ../daemon/gvfsbackendftp.c:547
+#: ../daemon/gvfsbackendftp.c:548
 msgid "broken transmission"
 msgstr "avbrutt overføring"
 
-#: ../daemon/gvfsbackendftp.c:709 ../daemon/gvfsbackendftp.c:850
+#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendftp.c:851
 msgid "Could not connect to host"
 msgstr "Kunne ikke koble til vert"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1485
+#: ../daemon/gvfsbackendftp.c:1493
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Skriv inn passord for ftp som %s på %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1488
+#: ../daemon/gvfsbackendftp.c:1496
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Skriv inn passord for ftp på %s"
 
-#: ../daemon/gvfsbackendftp.c:1514 ../daemon/gvfsbackendsftp.c:881
+#: ../daemon/gvfsbackendftp.c:1522 ../daemon/gvfsbackendsftp.c:881
 #: ../daemon/gvfsbackendsmb.c:599
 msgid "Password dialog cancelled"
 msgstr "Passorddialog avbrutt"
 
-#: ../daemon/gvfsbackendftp.c:1593
+#: ../daemon/gvfsbackendftp.c:1601
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp på %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1597
+#: ../daemon/gvfsbackendftp.c:1605
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp som %s på %s"
 
-#: ../daemon/gvfsbackendftp.c:1681 ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendftp.c:1689 ../daemon/gvfsbackendsftp.c:1967
 #: ../daemon/gvfsbackendsftp.c:3579
 msgid "File is directory"
 msgstr "Filen er en katalog"
 
-#: ../daemon/gvfsbackendftp.c:1903 ../daemon/gvfsbackendftp.c:2478
+#: ../daemon/gvfsbackendftp.c:1911 ../daemon/gvfsbackendftp.c:2486
 msgid "backups not supported yet"
 msgstr "sikkerhetskopier er ikke støttet ennå"
 
-#: ../daemon/gvfsbackendftp.c:1980
+#: ../daemon/gvfsbackendftp.c:1988
 msgid "filename too long"
 msgstr "for langt filnavn"
 
-#: ../daemon/gvfsbackendftp.c:2497
+#: ../daemon/gvfsbackendftp.c:2505
 msgid "Invalid destination filename"
 msgstr "Ugyldig filnavn for mål"
 
@@ -1115,16 +1115,16 @@ msgstr "Kan ikke slette søppel"
 #: ../daemon/gvfsbackendtrash.c:361 ../daemon/gvfsbackendtrash.c:413
 #, c-format
 msgid "Items in the trash may not be modified"
-msgstr ""
+msgstr "Oppføringer i papirkurven kan ikke endres"
 
 #: ../daemon/gvfsbackendtrash.c:399
-#, fuzzy, c-format
+#, c-format
 msgid "Can't pull trash"
-msgstr "Kan ikke slette søppel"
+msgstr "Kan ikke angre papirkurv"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:693 ../daemon/gvfsbackendtrash.c:801
+#: ../daemon/gvfsbackendtrash.c:708 ../daemon/gvfsbackendtrash.c:816
 msgid "Trash"
 msgstr "Papirkurv"
 
