@@ -1,3 +1,7 @@
+2009-01-05  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/trashlib/COPYING: include text of GPL3 by request of Vincent.
+
 2008-12-30  Benjamin Otte  <otte@gnome.org>
 
 	Bug 565504 - limited number of connections causes commands to fail
