@@ -2,14 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Jorge González <jorgegonz@svn.gnome.org>, 2008.
+# Jorge González <jorgegonz@svn.gnome.org>, 200, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&amp;component=general\n"
-"POT-Creation-Date: 2008-12-12 07:42+0000\n"
-"PO-Revision-Date: 2008-12-16 20:46+0100\n"
+"product=gvfs&component=general\n"
+"POT-Creation-Date: 2009-01-06 15:17+0000\n"
+"PO-Revision-Date: 2009-01-06 17:58+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -259,7 +259,7 @@ msgstr "error al iniciar el demonio de montado"
 msgid "/ on %s"
 msgstr "/ en %s"
 
-#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1632
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1640
 #: ../daemon/gvfsbackendsftp.c:1566
 msgid "No hostname specified"
 msgstr "No se especificó un nombre de servidor"
@@ -274,16 +274,16 @@ msgstr "Especificación de montaje no válida"
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
 #: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:2254 ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
-#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:650
+#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
+#: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
 #, c-format
 msgid "File doesn't exist"
 msgstr "El archivo no existe"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:440
-#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:637
+#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:697
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
 
@@ -301,7 +301,7 @@ msgstr "No se pudo crear el directorio temporal"
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1063
 #: ../daemon/gvfsbackendgphoto2.c:1916 ../daemon/gvfsbackendgphoto2.c:2626
-#: ../daemon/gvfsbackendtrash.c:211
+#: ../daemon/gvfsbackendtrash.c:214
 #, c-format
 msgid "No such file or directory"
 msgstr "El archivo o directorio no existe"
@@ -452,7 +452,7 @@ msgstr "Sistema de archivos"
 
 #: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
 #: ../daemon/gvfsbackendobexftp.c:727 ../daemon/gvfsbackendsmb.c:684
-#: ../daemon/gvfsbackendtrash.c:227
+#: ../daemon/gvfsbackendtrash.c:230
 #, c-format
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
@@ -536,8 +536,8 @@ msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
 #: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
-#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1852
-#: ../daemon/gvfsbackendftp.c:2518 ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1860
+#: ../daemon/gvfsbackendftp.c:2526 ../daemon/gvfsbackendsftp.c:3588
 #: ../daemon/gvfsbackendsmb.c:1912
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
@@ -553,11 +553,11 @@ msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:487 ../daemon/gvfsbackendnetwork.c:392
+#: ../daemon/gvfsbackenddnssd.c:487 ../daemon/gvfsbackendnetwork.c:397
 msgid "Local Network"
 msgstr "Red local"
 
-#: ../daemon/gvfsbackenddnssd.c:731 ../daemon/gvfsbackendnetwork.c:731
+#: ../daemon/gvfsbackenddnssd.c:731 ../daemon/gvfsbackendnetwork.c:801
 msgid "Can't monitor file or directory."
 msgstr "No se puede monitorizar el archivo o directorio."
 
@@ -566,110 +566,110 @@ msgstr "No se puede monitorizar el archivo o directorio."
 msgid "Dns-SD"
 msgstr "DNS-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:750 ../daemon/gvfsbackendnetwork.c:676
-#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+#: ../daemon/gvfsbackenddnssd.c:750 ../daemon/gvfsbackendnetwork.c:736
+#: ../daemon/gvfsbackendnetwork.c:886 ../daemon/gvfsbackendnetwork.c:887
 msgid "Network"
 msgstr "Red"
 
-#: ../daemon/gvfsbackendftp.c:251
+#: ../daemon/gvfsbackendftp.c:252
 msgid "Accounts are unsupported"
 msgstr "Las cuentas no están soportadas"
 
-#: ../daemon/gvfsbackendftp.c:255
+#: ../daemon/gvfsbackendftp.c:256
 msgid "Host closed connection"
 msgstr "El servidor cerró la conexión"
 
-#: ../daemon/gvfsbackendftp.c:259
+#: ../daemon/gvfsbackendftp.c:260
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "No se puede abrir la conexión de datos. ¿Quizá su cortafuegos lo esté "
 "impidiendo?"
 
-#: ../daemon/gvfsbackendftp.c:263
+#: ../daemon/gvfsbackendftp.c:264
 msgid "Data connection closed"
 msgstr "Se cerró la conexión de datos"
 
-#: ../daemon/gvfsbackendftp.c:270 ../daemon/gvfsbackendftp.c:274
+#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:275
 msgid "Operation failed"
 msgstr "Falló la operación"
 
-#: ../daemon/gvfsbackendftp.c:279
+#: ../daemon/gvfsbackendftp.c:280
 msgid "No space left on server"
 msgstr "No queda espacio libre en el servidor"
 
-#: ../daemon/gvfsbackendftp.c:287 ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:3897
 #: ../daemon/gvfsbackendsmb.c:1576
 msgid "Operation unsupported"
 msgstr "La operación no está soportada"
 
-#: ../daemon/gvfsbackendftp.c:291 ../daemon/gvfsbackendsftp.c:296
+#: ../daemon/gvfsbackendftp.c:292 ../daemon/gvfsbackendsftp.c:296
 msgid "Permission denied"
 msgstr "Permiso denegado"
 
-#: ../daemon/gvfsbackendftp.c:295
+#: ../daemon/gvfsbackendftp.c:296
 msgid "Page type unknown"
 msgstr "Tipo de página desconocido"
 
-#: ../daemon/gvfsbackendftp.c:299 ../daemon/gvfsbackendftp.c:2364
+#: ../daemon/gvfsbackendftp.c:300 ../daemon/gvfsbackendftp.c:2372
 msgid "Invalid filename"
 msgstr "Nombre de archivo no válido"
 
-#: ../daemon/gvfsbackendftp.c:303 ../daemon/gvfsbackendftp.c:379
-#: ../daemon/gvfsbackendftp.c:408 ../daemon/gvfsbackendftp.c:427
-#: ../daemon/gvfsbackendftp.c:440 ../daemon/gvfsbackendftp.c:928
+#: ../daemon/gvfsbackendftp.c:304 ../daemon/gvfsbackendftp.c:380
+#: ../daemon/gvfsbackendftp.c:409 ../daemon/gvfsbackendftp.c:428
+#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:929
 msgid "Invalid reply"
 msgstr "Se recibió una respuesta no válida"
 
-#: ../daemon/gvfsbackendftp.c:547
+#: ../daemon/gvfsbackendftp.c:548
 msgid "broken transmission"
 msgstr "transmisión rota"
 
-#: ../daemon/gvfsbackendftp.c:709 ../daemon/gvfsbackendftp.c:850
+#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendftp.c:851
 msgid "Could not connect to host"
 msgstr "No se pudo conectar con el equipo"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1486
+#: ../daemon/gvfsbackendftp.c:1494
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Introduzca la contraseña para el ftp %s en %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1489
+#: ../daemon/gvfsbackendftp.c:1497
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Introduzca la contraseña para el ftp en %s"
 
-#: ../daemon/gvfsbackendftp.c:1515 ../daemon/gvfsbackendsftp.c:881
-#: ../daemon/gvfsbackendsmb.c:599
+#: ../daemon/gvfsbackendftp.c:1523 ../daemon/gvfsbackendsftp.c:881
+#: ../daemon/gvfsbackendsmb.c:599 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "Se canceló el diálogo de la contraseña"
 
-#: ../daemon/gvfsbackendftp.c:1594
+#: ../daemon/gvfsbackendftp.c:1602
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp en %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1598
+#: ../daemon/gvfsbackendftp.c:1606
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "%s en el ftp de %s"
 
-#: ../daemon/gvfsbackendftp.c:1682 ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendftp.c:1690 ../daemon/gvfsbackendsftp.c:1967
 #: ../daemon/gvfsbackendsftp.c:3579
 msgid "File is directory"
 msgstr "El archivo es un directorio"
 
-#: ../daemon/gvfsbackendftp.c:1904 ../daemon/gvfsbackendftp.c:2479
+#: ../daemon/gvfsbackendftp.c:1912 ../daemon/gvfsbackendftp.c:2487
 msgid "backups not supported yet"
 msgstr "aún no se soportan los respaldos"
 
-#: ../daemon/gvfsbackendftp.c:1981
+#: ../daemon/gvfsbackendftp.c:1989
 msgid "filename too long"
 msgstr "el nombre de archivo es demasiado largo"
 
-#: ../daemon/gvfsbackendftp.c:2498
+#: ../daemon/gvfsbackendftp.c:2506
 msgid "Invalid destination filename"
 msgstr "Nombre de archivo de destino no válido"
 
@@ -785,7 +785,7 @@ msgstr "Identificador de icono «%s» mal formado"
 msgid "Error seeking in stream on camera %s"
 msgstr "Error al buscar en el flujo en la cámara %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1107
+#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1388
 msgid "Not a directory"
 msgstr "No es un directorio"
 
@@ -881,13 +881,13 @@ msgid "Directory notification not supported"
 msgstr "No se soporta la notificación de directorios"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
+#: ../daemon/gvfsbackendnetwork.c:270 ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Red de Windows"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:862
+#: ../daemon/gvfsbackendnetwork.c:935
 msgid "Network Location Monitor"
 msgstr "Monitor de ubicación de red"
 
@@ -1097,43 +1097,54 @@ msgstr "No se puede mover recursivamente un directorio"
 msgid "Windows Shares Filesystem Service"
 msgstr "Servicio del sistema de archivos compartidos de Windows"
 
+#. translators: %s is a server name
+#: ../daemon/gvfsbackendsmbbrowse.c:365
+#, c-format
+msgid "Password required for %s"
+msgstr "Se requiere contraseña para %s"
+
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:707
+#: ../daemon/gvfsbackendsmbbrowse.c:893
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Comparticiones Windows en %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmbbrowse.c:992
+msgid "Failed to retrieve share list from server"
+msgstr "Falló al obtener la lista de compartición del servidor"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
 msgstr "El archivo no se puede montar"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:867
+#: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
 msgstr "No es un archivo regular"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1219
+#: ../daemon/gvfsbackendsmbbrowse.c:1501
 msgid "Windows Network Filesystem Service"
 msgstr "Servicio del sistema de archivos de red de Windows"
 
-#: ../daemon/gvfsbackendtrash.c:334
+#: ../daemon/gvfsbackendtrash.c:344
 #, c-format
 msgid "Can't delete trash"
 msgstr "No se puede borrar la papelera"
 
-#: ../daemon/gvfsbackendtrash.c:348 ../daemon/gvfsbackendtrash.c:399
+#: ../daemon/gvfsbackendtrash.c:361 ../daemon/gvfsbackendtrash.c:413
 #, c-format
 msgid "Items in the trash may not be modified"
 msgstr "Los elementos en la papelera no se deben modificar"
 
-#: ../daemon/gvfsbackendtrash.c:385
+#: ../daemon/gvfsbackendtrash.c:399
 #, c-format
 msgid "Can't pull trash"
 msgstr "No se puede vaciar la papelera"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:650 ../daemon/gvfsbackendtrash.c:758
+#: ../daemon/gvfsbackendtrash.c:708 ../daemon/gvfsbackendtrash.c:816
 msgid "Trash"
 msgstr "Papelera"
 
