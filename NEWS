@@ -1,3 +1,12 @@
+Major changes in 1.1.3
+======================
+* ftp: fix limited number of connections causes commands to fail (#565504)
+* trash: fix parallel build doesn't work (#562955)
+* trash: add trash::orig-path and trash::deletion-date info
+* trash: set files to mode 700 before deleting to deal with users trashing read-only directories
+* smb-browse: browsing authentication support (#524485)
+* smb-browse: make backend not automounted anymore
+
 Major changes in 1.1.2
 ======================
 * New trash backend
