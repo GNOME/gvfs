@@ -76,6 +76,8 @@ struct _GVfsBackendNetwork
   gboolean have_smb;
   char *current_workgroup;
   GFileMonitor *smb_monitor;
+  GMutex *smb_mount_lock;
+  GVfsJobMount *mount_job;
 
   /* DNS-SD Stuff */
   gboolean have_dnssd;
@@ -270,7 +272,7 @@ recompute_files (GVfsBackendNetwork *backend)
       files = g_list_prepend (files, file);
 
       if (backend->current_workgroup == NULL ||
-         backend->current_workgroup[0] == 0)
+          backend->current_workgroup[0] == 0)
         workgroup = g_strconcat ("smb://", DEFAULT_WORKGROUP_NAME, "/", NULL);  
       else 
         workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);    
@@ -292,10 +294,9 @@ recompute_files (GVfsBackendNetwork *backend)
             {
 	      char *uri = g_file_get_uri (server_file);
               g_warning ("Couldn't create directory monitor on %s. Error: %s", 
-			 uri, error->message);
+	     		 uri, error->message);
 	      g_free (uri);
-              g_error_free (error);
-              error = NULL;
+              g_clear_error (&error);
             }
         }
 
@@ -303,7 +304,8 @@ recompute_files (GVfsBackendNetwork *backend)
       enumer = g_file_enumerate_children (server_file, 
                                           NETWORK_FILE_ATTRIBUTES, 
                                           G_FILE_QUERY_INFO_NONE, 
-                                          NULL, NULL);
+                                          NULL, &error);
+                                          
       if (enumer != NULL)
         {
           info = g_file_enumerator_next_file (enumer, NULL, NULL);
@@ -322,10 +324,13 @@ recompute_files (GVfsBackendNetwork *backend)
               g_object_unref (info);
               info = g_file_enumerator_next_file (enumer, NULL, NULL);
             }
+          g_file_enumerator_close (enumer, NULL, NULL);
+          g_object_unref (enumer);
         }
+        
+      if (error)
+        g_error_free (error);
     
-      g_file_enumerator_close (enumer, NULL, NULL);
-      g_object_unref (enumer);
       g_object_unref (server_file);
 
       g_free (workgroup);
@@ -434,10 +439,61 @@ idle_add_recompute (GVfsBackendNetwork *backend)
 }
 
 static void
+mount_smb_done_cb (GObject *object,
+                   GAsyncResult *res,
+                   gpointer user_data)
+{
+  GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
+  GError *error = NULL;
+
+  g_file_mount_enclosing_volume_finish (G_FILE (object), res, &error);
+  
+  if (error)
+    g_error_free (error);
+
+  recompute_files (backend);
+
+  /*  We've been spawned from try_mount  */
+  if (backend->mount_job)
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (backend->mount_job));
+      g_object_unref (backend->mount_job);
+    }  
+  g_mutex_unlock (backend->smb_mount_lock);
+}
+
+static void
+remount_smb (GVfsBackendNetwork *backend, GVfsJobMount *job)
+{
+  GFile *file;
+  char *workgroup;
+
+  if (! g_mutex_trylock (backend->smb_mount_lock))
+    /*  Do nothing when the mount operation is already active  */
+    return;
+  
+  backend->mount_job = job ? g_object_ref (job) : NULL;
+
+  if (backend->current_workgroup == NULL ||
+      backend->current_workgroup[0] == 0)
+    workgroup = g_strconcat ("smb://", DEFAULT_WORKGROUP_NAME, "/", NULL);  
+  else 
+    workgroup = g_strconcat ("smb://", backend->current_workgroup, "/", NULL);    
+
+  file = g_file_new_for_uri (workgroup);
+
+  g_file_mount_enclosing_volume (file, G_MOUNT_MOUNT_NONE,
+                                 NULL, NULL, mount_smb_done_cb, backend);
+  g_free (workgroup);
+  g_object_unref (file);
+}
+
+static void
 notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, 
                           GFileMonitorEvent event_type, gpointer user_data)
 {
   GVfsBackendNetwork *backend = G_VFS_BACKEND_NETWORK(user_data);
+  
   switch (event_type)
     {
     case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
@@ -453,9 +509,12 @@ notify_smb_files_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
         backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
       
       /* stop monitoring as the backend's gone. */
-      g_file_monitor_cancel (backend->smb_monitor);
-      g_object_unref (backend->smb_monitor);
-      backend->smb_monitor = NULL;
+      if (backend->smb_monitor)
+        {
+          g_file_monitor_cancel (backend->smb_monitor);
+          g_object_unref (backend->smb_monitor);
+          backend->smb_monitor = NULL;
+        }  
       break;
     default:
       break;
@@ -545,16 +604,17 @@ notify_gconf_smb_workgroup_changed (GConfClient *client,
   backend->current_workgroup = current_workgroup;
 
   /* cancel the smb monitor */
-  g_signal_handlers_disconnect_by_func (backend->smb_monitor,
-					notify_smb_files_changed,
-					backend->smb_monitor);
-  g_file_monitor_cancel (backend->smb_monitor);
-  g_object_unref (backend->smb_monitor);
-  backend->smb_monitor = NULL;
+  if (backend->smb_monitor)
+    {
+      g_signal_handlers_disconnect_by_func (backend->smb_monitor,
+					    notify_smb_files_changed,
+					    backend->smb_monitor);
+      g_file_monitor_cancel (backend->smb_monitor);
+      g_object_unref (backend->smb_monitor);
+      backend->smb_monitor = NULL;
+    }  
 
-  /* don't re-issue recomputes if we've already queued one. */
-  if (backend->idle_tag == 0)
-    backend->idle_tag = g_idle_add ((GSourceFunc)idle_add_recompute, backend);
+  remount_smb (backend, NULL);
 }
 
 static NetworkFile *
@@ -692,6 +752,7 @@ try_query_info (GVfsBackend *backend,
   return TRUE;
 }
 
+
 static gboolean
 try_mount (GVfsBackend *backend,
            GVfsJobMount *job,
@@ -700,10 +761,19 @@ try_mount (GVfsBackend *backend,
            gboolean is_automount)
 {
   GVfsBackendNetwork *network_backend = G_VFS_BACKEND_NETWORK (backend);
-  network_backend->root_monitor = g_vfs_monitor_new (backend);
-  recompute_files (network_backend);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
 
+  network_backend->root_monitor = g_vfs_monitor_new (backend);
+
+  if (network_backend->have_smb)
+    {
+      remount_smb (network_backend, job);
+    }
+  else
+    {
+      recompute_files (network_backend);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }  
+    
   return TRUE;
 }
 
@@ -748,6 +818,8 @@ g_vfs_backend_network_init (GVfsBackendNetwork *network_backend)
   char *current_workgroup;
   const char * const* supported_vfs;
   int i;
+
+  network_backend->smb_mount_lock = g_mutex_new ();
 
   supported_vfs = g_vfs_get_supported_uri_schemes (g_vfs_get_default ());
 
@@ -830,6 +902,7 @@ g_vfs_backend_network_finalize (GObject *object)
   GVfsBackendNetwork *backend;
   backend = G_VFS_BACKEND_NETWORK (object);
 
+  g_mutex_free (backend->smb_mount_lock);
   g_mount_spec_unref (backend->mount_spec);
   g_object_unref (backend->root_monitor);
   g_object_unref (backend->workgroup_icon);

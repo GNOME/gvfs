@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
@@ -41,6 +42,7 @@
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfskeyring.h"
 #include "gmounttracker.h"
 
 #include <libsmbclient.h>
@@ -55,6 +57,18 @@
 
 /* The magic "default workgroup" hostname */
 #define DEFAULT_WORKGROUP_NAME "X-GNOME-DEFAULT-WORKGROUP"
+
+/* Time in seconds before we mark dirents cache outdated */
+#define DEFAULT_CACHE_EXPIRATION_TIME 10
+
+
+#define PRINT_DEBUG 
+
+#ifdef PRINT_DEBUG 
+#define DEBUG(msg...) g_print("### SMB-BROWSE: " msg)
+#else 
+#define DEBUG(...) 
+#endif 
 
 typedef struct {
   unsigned int smbc_type;
@@ -74,7 +88,20 @@ struct _GVfsBackendSmbBrowse
   char *mounted_server; /* server or DEFAULT_WORKGROUP_NAME */
   SMBCCTX *smb_context;
 
+  char *last_user;
+  char *last_domain;
+  char *last_password;
+
+  GMountSource *mount_source;
+  int mount_try;
+  gboolean mount_try_again;
+  gboolean mount_cancelled;
+  
+  gboolean password_in_keyring;
+  GPasswordSave password_save;
+
   GMutex *entries_lock;
+  GMutex *update_cache_lock;
   time_t last_entry_update;
   GList *entries;
   int entry_errno;
@@ -206,6 +233,7 @@ g_vfs_backend_smb_browse_finalize (GObject *object)
   g_free (backend->server);
   
   g_mutex_free (backend->entries_lock);
+  g_mutex_free (backend->update_cache_lock);
 
   smbc_free_context (backend->smb_context, TRUE);
   
@@ -220,6 +248,7 @@ static void
 g_vfs_backend_smb_browse_init (GVfsBackendSmbBrowse *backend)
 {
   backend->entries_lock = g_mutex_new ();
+  backend->update_cache_lock = g_mutex_new ();
 
   if (mount_tracker == NULL)
     mount_tracker = g_mount_tracker_new (NULL);
@@ -256,14 +285,129 @@ auth_callback (SMBCCTX *context,
 	       char *password_out, int pwmaxlen)
 {
   GVfsBackendSmbBrowse *backend;
+  char *ask_password, *ask_user, *ask_domain;
+  gboolean handled, abort;
 
   backend = smbc_getOptionUserData (context);
+
+  strncpy (password_out, "", pwmaxlen);
 
   if (backend->domain)
     strncpy (domain_out, backend->domain, domainmaxlen);
   if (backend->user)
     strncpy (username_out, backend->user, unmaxlen);
-  strncpy (password_out, "", pwmaxlen);
+
+  if (backend->mount_cancelled)
+    {
+      /*  Don't prompt for credentials, let smbclient finish the mount loop  */
+      strncpy (username_out, "ABORT", unmaxlen);
+      strncpy (password_out, "", pwmaxlen);
+      DEBUG ("auth_callback - mount_cancelled\n");
+      return;
+    }
+
+  if (backend->mount_source == NULL)
+    {
+      /* Not during mount, use last password */
+      if (backend->last_user)
+        strncpy (username_out, backend->last_user, unmaxlen);
+      if (backend->last_domain)
+        strncpy (domain_out, backend->last_domain, domainmaxlen);
+      if (backend->last_password)
+        strncpy (password_out, backend->last_password, pwmaxlen);
+      return;
+    }
+
+  if (backend->mount_try == 0 &&
+      backend->user == NULL &&
+      backend->domain == NULL)
+    {
+      /* Try again if kerberos login + anonymous fallback fails */
+      backend->mount_try_again = TRUE;
+      DEBUG ("auth_callback - anonymous pass\n");
+    }
+  else
+    {
+      gboolean in_keyring = FALSE;
+
+      DEBUG ("auth_callback - normal pass\n");
+
+      if (!backend->password_in_keyring)
+        {
+	  in_keyring = g_vfs_keyring_lookup_password (backend->user,
+						      backend->server,
+						      backend->domain,
+						      "smb",
+						      NULL,
+						      NULL,
+						      0,
+						      &ask_user,
+						      &ask_domain,
+						      &ask_password);
+	  backend->password_in_keyring = in_keyring;
+	}
+
+      if (!in_keyring)
+        {
+	  GAskPasswordFlags flags = G_ASK_PASSWORD_NEED_PASSWORD;
+	  char *message;
+
+	  if (g_vfs_keyring_is_available ())
+	    flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
+	  if (backend->domain == NULL)
+	    flags |= G_ASK_PASSWORD_NEED_DOMAIN;
+	  if (backend->user == NULL)
+	    flags |= G_ASK_PASSWORD_NEED_USERNAME;
+
+	  DEBUG ("auth_callback - asking for password...\n");
+
+	  /* translators: %s is a server name */
+	  message = g_strdup_printf (_("Password required for %s"),
+				     server_name);
+	  handled = g_mount_source_ask_password (backend->mount_source,
+						 message,
+						 username_out,
+						 domain_out,
+						 flags,
+						 &abort,
+						 &ask_password,
+						 &ask_user,
+						 &ask_domain,
+						 NULL,
+						 &(backend->password_save));
+	  g_free (message);
+	  if (!handled)
+	    goto out;
+
+	  if (abort)
+	    {
+	      strncpy (username_out, "ABORT", unmaxlen);
+	      strncpy (password_out, "", pwmaxlen);
+	      backend->mount_cancelled = TRUE;
+	      goto out;
+	    }
+	}
+
+      /* Try again if this fails */
+      backend->mount_try_again = TRUE;
+
+      strncpy (password_out, ask_password, pwmaxlen);
+      if (ask_user && *ask_user)
+	strncpy (username_out, ask_user, unmaxlen);
+      if (ask_domain && *ask_domain)
+	strncpy (domain_out, ask_domain, domainmaxlen);
+
+    out:
+      g_free (ask_password);
+      g_free (ask_user);
+      g_free (ask_domain);
+    }
+
+  backend->last_user = g_strdup (username_out);
+  backend->last_domain = g_strdup (domain_out);
+  backend->last_password = g_strdup (password_out);
+  DEBUG ("auth_callback - out: last_user = '%s', last_domain = '%s'\n", 
+         backend->last_user, backend->last_domain);
 }
 
 /* Add a server to the cache system
@@ -419,8 +563,8 @@ g_string_append_encoded (GString *string,
     }
 }
 
-static void
-update_cache (GVfsBackendSmbBrowse *backend)
+static gboolean
+update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
 {
   GString *uri;
   char dirents[1024*4];
@@ -436,6 +580,11 @@ update_cache (GVfsBackendSmbBrowse *backend)
 
   entries = NULL;
   entry_errno = 0;
+  res = -1;
+
+  g_mutex_lock (backend->update_cache_lock);
+  
+  DEBUG ("update_cache - updating...\n");
   
   /* Update Cache */
   uri = g_string_new ("smb://");
@@ -450,7 +599,7 @@ update_cache (GVfsBackendSmbBrowse *backend)
   smbc_getdents = smbc_getFunctionGetdents (backend->smb_context);
   smbc_closedir = smbc_getFunctionClosedir (backend->smb_context);
 
-  dir = smbc_opendir (backend->smb_context, uri->str);
+  dir = supplied_dir ? supplied_dir : smbc_opendir (backend->smb_context, uri->str);
   g_string_free (uri, TRUE);
   if (dir == NULL)
     {
@@ -462,7 +611,12 @@ update_cache (GVfsBackendSmbBrowse *backend)
     {
       res = smbc_getdents (backend->smb_context, dir, (struct smbc_dirent *)dirents, sizeof (dirents));
       if (res <= 0)
-	break;
+        {
+          if (res < 0)
+            DEBUG ("update_cache - smbc_getdents returned %d, errno = [%d] %s\n", 
+                   res, errno, strerror (errno));
+	  break;
+	}  
       
       dirp = (struct smbc_dirent *)dirents;
       while (res > 0)
@@ -494,8 +648,9 @@ update_cache (GVfsBackendSmbBrowse *backend)
 
       entries = g_list_reverse (entries);
     }
-      
-  smbc_closedir (backend->smb_context, dir);
+
+  if (! supplied_dir)
+    smbc_closedir (backend->smb_context, dir);
 
 
  out:
@@ -509,8 +664,12 @@ update_cache (GVfsBackendSmbBrowse *backend)
   backend->entry_errno = entry_errno;
   backend->last_entry_update = time (NULL);
 
+  DEBUG ("update_cache - done.\n");
+
   g_mutex_unlock (backend->entries_lock);
-  
+  g_mutex_unlock (backend->update_cache_lock);
+
+  return (res >= 0);
 }
 
 static BrowseEntry *
@@ -620,10 +779,17 @@ has_name (GVfsBackendSmbBrowse *backend,
 static gboolean
 cache_needs_updating (GVfsBackendSmbBrowse *backend)
 {
-  time_t now = time (NULL);
+  time_t now;
+  gboolean res;
+
+  /*  If there's already cache update in progress, lock and wait until update is finished, then recheck  */
+  g_mutex_lock (backend->update_cache_lock);
+  now = time (NULL);
+  res = now < backend->last_entry_update ||
+    (now - backend->last_entry_update) > DEFAULT_CACHE_EXPIRATION_TIME;
+  g_mutex_unlock (backend->update_cache_lock);
   
-  return now < backend->last_entry_update ||
-    (now - backend->last_entry_update) > 10;
+  return res; 
 }
 
 static void
@@ -635,10 +801,17 @@ do_mount (GVfsBackend *backend,
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
   SMBCCTX *smb_context;
+  SMBCFILE *dir;
   char *display_name;
+  const char *debug;
+  int debug_val;
   char *icon;
+  GString *uri;
+  gboolean res;
   GMountSpec *browse_mount_spec;
-
+  smbc_opendir_fn smbc_opendir;
+  smbc_closedir_fn smbc_closedir;
+  
   smb_context = smbc_new_context ();
   if (smb_context == NULL)
     {
@@ -650,7 +823,17 @@ do_mount (GVfsBackend *backend,
 
   smbc_setOptionUserData (smb_context, backend);
 
-  smbc_setDebug (smb_context, 0);
+  debug = g_getenv ("GVFS_SMB_DEBUG");
+  if (debug)
+    debug_val = atoi (debug);
+  else
+#ifdef PRINT_DEBUG
+    debug_val = 4;
+#else
+    debug_val = 0;
+#endif
+
+  smbc_setDebug (smb_context, debug_val);
   smbc_setFunctionAuthDataWithContext (smb_context, auth_callback);
   
   smbc_setFunctionAddCachedServer (smb_context, add_cached_server);
@@ -666,10 +849,13 @@ do_mount (GVfsBackend *backend,
   smb_context->flags = 0;
 #endif
 
+  /* Initial settings: 
+   *   - use Kerberos (always) 
+   *   - in case of no username specified, try anonymous login 
+   */
   smbc_setOptionUseKerberos (smb_context, 1);
-  smbc_setOptionFallbackAfterKerberos (smb_context, 1);  
-  //smbc_setOptionNoAutoAnonymousLogin (smb_context, 1);
-  
+  smbc_setOptionFallbackAfterKerberos (smb_context, op_backend->user != NULL);
+  smbc_setOptionNoAutoAnonymousLogin (smb_context, op_backend->user != NULL);
 
 #if 0
   smbc_setOptionDebugToStderr (smb_context, 1);
@@ -722,6 +908,101 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_user_visible (backend, FALSE);  
   g_vfs_backend_set_mount_spec (backend, browse_mount_spec);
   g_mount_spec_unref (browse_mount_spec);
+
+  op_backend->mount_source = mount_source;
+  op_backend->mount_try = 0;
+  op_backend->password_save = G_PASSWORD_SAVE_NEVER;
+
+  smbc_opendir = smbc_getFunctionOpendir (smb_context);
+  smbc_closedir = smbc_getFunctionClosedir (smb_context);
+
+  uri = g_string_new ("smb://");
+
+  if (op_backend->server)
+    {
+      g_string_append_encoded (uri, op_backend->server, NULL, NULL);
+      g_string_append_c (uri, '/');
+    }
+
+  DEBUG ("do_mount - URI = %s\n", uri->str);
+
+  do
+    {
+      op_backend->mount_try_again = FALSE;
+      op_backend->mount_cancelled = FALSE;
+
+      DEBUG ("do_mount - try #%d \n", op_backend->mount_try);
+
+      dir = smbc_opendir (smb_context, uri->str);
+
+      DEBUG ("do_mount - [%s; %d] dir = %p, cancelled = %d, errno = [%d] '%s' \n", 
+             uri->str, op_backend->mount_try, dir, op_backend->mount_cancelled, 
+             errno, strerror (errno));
+
+      if (dir == NULL && 
+          (op_backend->mount_cancelled || (errno != EPERM && errno != EACCES)))
+        {
+	  DEBUG ("do_mount - (errno != EPERM && errno != EACCES), breaking\n");
+	  break;
+	}
+
+      if (dir != NULL)
+        {
+          /*  Let update_cache() do enumeration, check for the smbc_getdents() result */
+          res = update_cache (op_backend, dir);
+          smbc_closedir (smb_context, dir);
+          DEBUG ("do_mount - login successful, res = %d\n", res);
+          if (res)
+            break;
+        }
+	else {
+	  /*  Purge the cache, we need to have clean playground for next auth try  */
+	  purge_cached (smb_context);
+	}
+
+      /* The first round is Kerberos-only.  Only if this fails do we enable
+       * NTLMSSP fallback (turning off anonymous fallback, which we've
+       * already tried and failed with).
+       */
+      if (op_backend->mount_try == 0)
+        {
+          DEBUG ("do_mount - after anon, enabling NTLMSSP fallback\n");
+          smbc_setOptionFallbackAfterKerberos (op_backend->smb_context, 1);
+          smbc_setOptionNoAutoAnonymousLogin (op_backend->smb_context, 1);
+        }
+      op_backend->mount_try++;
+    }
+  while (op_backend->mount_try_again);
+
+  g_string_free (uri, TRUE);
+
+  op_backend->mount_source = NULL;
+
+  if (dir == NULL)
+    {
+      if (op_backend->mount_cancelled)
+        g_vfs_job_failed (G_VFS_JOB (job),
+                         G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                         _("Password dialog cancelled"));
+      else
+        /* TODO: Error from errno? */
+        g_vfs_job_failed (G_VFS_JOB (job),
+			  G_IO_ERROR, G_IO_ERROR_FAILED,
+			  /* translators: We tried to mount a windows (samba) share, but failed */
+			  _("Failed to retrieve share list from server"));
+
+      return;
+    }
+
+  g_vfs_keyring_save_password (op_backend->last_user,
+			       op_backend->server,
+			       op_backend->last_domain,
+			       "smb",
+			       NULL,
+			       NULL,
+			       0,
+			       op_backend->last_password,
+			       op_backend->password_save);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -822,7 +1103,7 @@ do_mount_mountable (GVfsBackend *backend,
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
-  update_cache (op_backend);
+  update_cache (op_backend, NULL);
 
   run_mount_mountable (op_backend,
 		       job,
@@ -878,7 +1159,7 @@ do_open_for_read (GVfsBackend *backend,
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
-  update_cache (op_backend);
+  update_cache (op_backend, NULL);
 
   run_open_for_read (op_backend, job, filename);
 }
@@ -1052,7 +1333,7 @@ do_query_info (GVfsBackend *backend,
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
 
-  update_cache (op_backend);
+  update_cache (op_backend, NULL);
 
   run_query_info (op_backend, job, filename, info, matcher);
 }
@@ -1145,8 +1426,8 @@ do_enumerate (GVfsBackend *backend,
 	      GFileQueryInfoFlags flags)
 {
   GVfsBackendSmbBrowse *op_backend = G_VFS_BACKEND_SMB_BROWSE (backend);
-  
-  update_cache (op_backend);
+
+  update_cache (op_backend, NULL);
 
   run_enumerate (op_backend, job, filename, matcher);
 }
@@ -1211,6 +1492,7 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
     }
 #endif
 
+  DEBUG ("g_vfs_backend_smb_browse_class_init - default workgroup = '%s'\n", default_workgroup);
 }
 
 void
