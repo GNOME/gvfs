@@ -304,8 +304,8 @@ recompute_files (GVfsBackendNetwork *backend)
       enumer = g_file_enumerate_children (server_file, 
                                           NETWORK_FILE_ATTRIBUTES, 
                                           G_FILE_QUERY_INFO_NONE, 
-                                          NULL, &error);
-                                          
+                                          NULL, NULL);
+
       if (enumer != NULL)
         {
           info = g_file_enumerator_next_file (enumer, NULL, NULL);
@@ -327,10 +327,7 @@ recompute_files (GVfsBackendNetwork *backend)
           g_file_enumerator_close (enumer, NULL, NULL);
           g_object_unref (enumer);
         }
-        
-      if (error)
-        g_error_free (error);
-    
+
       g_object_unref (server_file);
 
       g_free (workgroup);
@@ -356,7 +353,7 @@ recompute_files (GVfsBackendNetwork *backend)
 	      g_warning ("Couldn't create directory monitor on %s. Error: %s", 
 			 uri, error->message);
 	      g_free (uri);
-	      g_error_free (error);
+	      g_clear_error (&error);
 	    }
 	}
       
