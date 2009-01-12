@@ -1,13 +1,13 @@
 # Norwegian translation of gvfs (bokmål dialect).
 # Copyright (C) 1999-2003 Free Software Foundation, Inc.
-# Kjartan Maraas <kmaraas@gnome.org>, 1999-2008.
+# Kjartan Maraas <kmaraas@gnome.org>, 1999-2009.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs 0.1.x\n"
+"Project-Id-Version: gvfs 1.1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-05 15:51+0100\n"
-"PO-Revision-Date: 2009-01-05 15:53+0100\n"
+"POT-Creation-Date: 2009-01-12 15:19+0100\n"
+"PO-Revision-Date: 2009-01-12 15:22+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -180,23 +180,23 @@ msgstr "Feil i oppslag av «%s» tjeneste «%s» på domene «%s»"
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
-msgstr ""
+msgstr "Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-poster mangler. Nøkler som kreves: «%s»."
 
 #: ../common/gvfsdnssdresolver.c:1126
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
+msgstr "Tidsavbrudd ved oppslag av «%s»-tjeneste «%s» i domene «%s»"
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
 #, c-format
 msgid "Malformed dns-sd encoded_triple '%s'"
-msgstr ""
+msgstr "Feilutformet dns-sd encoded_triple «%s»"
 
 #: ../common/gvfsicon.c:250
 #, c-format
 msgid "Can't handle version %d of GVfsIcon encoding"
-msgstr ""
+msgstr "KAn ikke håndtere versjon %d av GVfsIcon-koding"
 
 #: ../common/gvfsicon.c:260
 msgid "Malformed input data for GVfsIcon"
@@ -267,16 +267,16 @@ msgstr "Ugyldige monteringsspesifikasjon"
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
 #: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:392
-#: ../daemon/gvfsbackendftp.c:2261 ../daemon/gvfsbackendnetwork.c:589
-#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
-#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1111
+#: ../daemon/gvfsbackendftp.c:2261 ../daemon/gvfsbackendnetwork.c:646
+#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
+#: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
 #, c-format
 msgid "File doesn't exist"
 msgstr "Filen eksisterer ikke"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:679
 #: ../daemon/gvfsbackendcomputer.c:650 ../daemon/gvfsbackenddnssd.c:439
-#: ../daemon/gvfsbackendftp.c:1042 ../daemon/gvfsbackendnetwork.c:636
+#: ../daemon/gvfsbackendftp.c:1042 ../daemon/gvfsbackendnetwork.c:693
 msgid "The file is not a directory"
 msgstr "Filen er ikke en katalog"
 
@@ -546,11 +546,11 @@ msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:391
+#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Lokalt nettverk"
 
-#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:730
+#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Kan ikke overvåke fil eller katalog."
 
@@ -559,8 +559,8 @@ msgstr "Kan ikke overvåke fil eller katalog."
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:675
-#: ../daemon/gvfsbackendnetwork.c:813 ../daemon/gvfsbackendnetwork.c:814
+#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Nettverk"
 
@@ -632,7 +632,7 @@ msgid "Enter password for ftp on %s"
 msgstr "Skriv inn passord for ftp på %s"
 
 #: ../daemon/gvfsbackendftp.c:1522 ../daemon/gvfsbackendsftp.c:881
-#: ../daemon/gvfsbackendsmb.c:599
+#: ../daemon/gvfsbackendsmb.c:599 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "Passorddialog avbrutt"
 
@@ -769,14 +769,14 @@ msgstr "Feil under henting av data fra fil"
 #: ../daemon/gvfsbackendgphoto2.c:1696
 #, c-format
 msgid "Malformed icon identifier '%s'"
-msgstr ""
+msgstr "Feilutformet ikonidentifikator «%s»"
 
 #: ../daemon/gvfsbackendgphoto2.c:1772 ../daemon/gvfsbackendgphoto2.c:2950
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Feil ved søking i strøm på kamera %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1107
+#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1388
 msgid "Not a directory"
 msgstr "Ikke en katalog"
 
@@ -872,13 +872,13 @@ msgid "Directory notification not supported"
 msgstr "Varsling for kataloger er ikke støttet"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:267 ../daemon/gvfsbackendsmbbrowse.c:699
+#: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Windows nettverk"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:861
+#: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
 msgstr "Vis nettverkslokasjoner"
 
@@ -1024,7 +1024,7 @@ msgstr "Ugyldig svar mottatt"
 #: ../daemon/gvfsbackendsftp.c:2084
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
-msgstr ""
+msgstr "Ugyldig icon_id «%s» i OpenIconForRead"
 
 #: ../daemon/gvfsbackendsftp.c:2380
 #, c-format
@@ -1088,22 +1088,33 @@ msgstr "Kan ikke flytte katalog rekursivt"
 msgid "Windows Shares Filesystem Service"
 msgstr "Filsystemtjeneste for delte Windows-ressurser"
 
+#. translators: %s is a server name
+#: ../daemon/gvfsbackendsmbbrowse.c:365
+#, c-format
+msgid "Password required for %s"
+msgstr "Passord kreves for %s"
+
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:707
+#: ../daemon/gvfsbackendsmbbrowse.c:893
 #, c-format
 msgid "Windows shares on %s"
 msgstr "Delt Windows-ressurs på %s"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmbbrowse.c:992
+msgid "Failed to retrieve share list from server"
+msgstr "Klarte ikke å hente liste over delte ressurser fra tjener"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
 msgstr "Filen er ikke monterbar"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:867
+#: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
 msgstr "Ikke en vanlig fil"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1219
+#: ../daemon/gvfsbackendsmbbrowse.c:1501
 msgid "Windows Network Filesystem Service"
 msgstr "Filsystemtjeneste for Windows nettverk"
 
