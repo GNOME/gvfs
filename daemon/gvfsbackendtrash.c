@@ -36,6 +36,8 @@ struct OPAQUE_TYPE__GVfsBackendTrash
 
   TrashWatcher *watcher;
   TrashRoot *root;
+
+  guint thaw_timeout_id;
 };
 
 G_DEFINE_TYPE (GVfsBackendTrash, g_vfs_backend_trash, G_VFS_TYPE_BACKEND);
@@ -331,6 +333,28 @@ trash_backend_close_read (GVfsBackend       *backend,
 }
 
 static gboolean
+trash_backend_thaw_callback (gpointer user_data)
+{
+  GVfsBackendTrash *backend = user_data;
+
+  trash_root_thaw (backend->root);
+
+  backend->thaw_timeout_id = 0;
+  return FALSE;
+}
+
+static void
+trash_backend_schedule_thaw (GVfsBackendTrash *backend)
+{
+  if (backend->thaw_timeout_id)
+    g_source_remove (backend->thaw_timeout_id);
+
+  backend->thaw_timeout_id = g_timeout_add (200,
+                                            trash_backend_thaw_callback,
+                                            backend);
+}
+
+static gboolean
 trash_backend_delete (GVfsBackend   *vfs_backend,
                       GVfsJobDelete *job,
                       const char    *filename)
@@ -364,6 +388,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
             {
               if (trash_item_delete (item, &error))
                 {
+                  trash_backend_schedule_thaw (backend);
                   g_vfs_job_succeeded (G_VFS_JOB (job));
                   trash_item_unref (item);
 

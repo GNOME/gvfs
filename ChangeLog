@@ -1,3 +1,9 @@
+2009-01-12  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/trashlib/trashitem.c: don't insta-thaw deletes
+	* daemon/gvfsbackendtrash.c: use a timeout to only call thaw() once
+	per batch of delete method calls.
+
 2009-01-12  Matthias Clasen  <mclasen@redhat.com>
 
         * daemon/Makefile.am: Dist the dav+sd.mount.in file

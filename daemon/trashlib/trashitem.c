@@ -495,8 +495,6 @@ trash_item_delete (TrashItem  *item,
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                  "Failed to delete the item from the trash");
 
-  trash_root_thaw (item->root);
-
   return success;
 }
 
