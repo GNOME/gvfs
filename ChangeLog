@@ -1,3 +1,7 @@
+2009-01-12  Matthias Clasen  <mclasen@redhat.com>
+
+        * daemon/Makefile.am: Dist the dav+sd.mount.in file
+
 2009-01-07  Tomas Bzatek  <tbzatek@redhat.com>
 
 	* daemon/gvfsbackendnetwork.c: (recompute_files):
