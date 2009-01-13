@@ -1,3 +1,13 @@
+2009-01-13  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (getattr_for_file)
+	(vfs_open)
+	(vfs_create)
+	(vfs_rmdir)
+	(vfs_access): Get only the attributes we require. This speeds up
+	directory listings in particular, since we don't need to probe
+	individual files to determine their MIME types.
+
 2009-01-12  Ryan Lortie  <desrt@desrt.ca>
 
 	* daemon/trashlib/trashitem.c: don't insta-thaw deletes
