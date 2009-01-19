@@ -1,3 +1,8 @@
+Major changes in 1.1.4
+======================
+* Trash performance fixes
+* Fuse performance fixes
+
 Major changes in 1.1.3
 ======================
 * ftp: fix limited number of connections causes commands to fail (#565504)
