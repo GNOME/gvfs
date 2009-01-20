@@ -1,3 +1,9 @@
+2009-01-20  Bastien Nocera  <hadess@hadess.net>
+
+	* daemon/gvfsbackenddnssd.c: Some devices/systems
+	advertise SMB through zeroconf instead of NetBios,
+	displays Apple Time Capsules in nautilus (Closes: #568147)
+
 2009-01-20  Ryan Lortie  <desrt@desrt.ca>
 
 	* daemon/gvfsbackendtrash.c: nail a couple of leaks

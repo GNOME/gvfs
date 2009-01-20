@@ -80,6 +80,12 @@ static struct {
           FALSE,
           "folder-remote-ssh"
         },
+	{
+	  "_smb._tcp",
+	  "smb",
+	  FALSE,
+	  "network-server"
+	},
 };
 
 static AvahiClient *global_client = NULL;
