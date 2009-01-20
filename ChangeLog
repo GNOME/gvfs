@@ -1,3 +1,7 @@
+2009-01-20  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/gvfsbackendtrash.c: nail a couple of leaks
+
 2009-01-20  Sebastien Bacher  <seb128@ubuntu.com>
 
 	* common/Makefile.am: use glib where it is required

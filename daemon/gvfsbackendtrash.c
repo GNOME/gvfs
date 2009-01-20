@@ -242,6 +242,7 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
           GFileInputStream *stream;
 
           stream = g_file_read (real, NULL, &error);
+          g_object_unref (real);
       
           if (stream)
             {
@@ -320,6 +321,7 @@ trash_backend_close_read (GVfsBackend       *backend,
   if (g_input_stream_close (handle, NULL, &error))
     {
       g_vfs_job_succeeded (G_VFS_JOB (job));
+      g_object_unref (handle);
 
       return TRUE;
     }
