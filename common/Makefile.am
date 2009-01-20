@@ -36,6 +36,7 @@ libgvfscommon_dnssd_la_CFLAGS =	\
 
 libgvfscommon_dnssd_la_LIBADD =	\
 	libgvfscommon.la \
-	$(AVAHI_LIBS)
+	$(AVAHI_LIBS) \
+	$(GLIB_LIBS)
 endif
 

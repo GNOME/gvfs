@@ -1,3 +1,7 @@
+2009-01-20  Sebastien Bacher  <seb128@ubuntu.com>
+
+	* common/Makefile.am: use glib where it is required
+
 2009-01-19  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:
