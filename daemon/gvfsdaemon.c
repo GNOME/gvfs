@@ -309,7 +309,7 @@ static void
 daemon_schedule_exit (GVfsDaemon *daemon)
 {
   if (daemon->exit_tag == 0)
-    daemon->exit_tag = g_timeout_add (1000, exit_at_idle, daemon);
+    daemon->exit_tag = g_timeout_add_seconds (1, exit_at_idle, daemon);
 }
 
 static void

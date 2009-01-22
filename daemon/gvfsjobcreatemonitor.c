@@ -232,9 +232,9 @@ create_reply (GVfsJob *job,
      to allow for a subscribe call to come in and bump
      the refcount */
   g_object_ref (op_job->monitor);
-  g_timeout_add (5000,
-		 unref_monitor_timeout,
-		 op_job->monitor);
+  g_timeout_add_seconds (5,
+			 unref_monitor_timeout,
+			 op_job->monitor);
   
   obj_path = g_vfs_monitor_get_object_path (op_job->monitor);
   dbus_message_iter_init_append (reply, &iter);

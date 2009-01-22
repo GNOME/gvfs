@@ -1,3 +1,10 @@
+2009-01-21  A. Walton  <awalton@gnome.org>
+
+	* daemon/gvfsdaemon.c (daemon_schedule_exit):
+	* daemon/gvfsjobcreatemonitor.c (create_reply):
+	Use g_timeout_add_seconds() instead of g_timeout_add() to save
+	some power.
+
 2009-01-20  Bastien Nocera  <hadess@hadess.net>
 
 	* daemon/gvfsbackenddnssd.c: Some devices/systems
