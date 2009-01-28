@@ -1,3 +1,12 @@
+2009-01-28  Ryan Lortie  <desrt@desrt.ca>
+
+	Bug 569480 – trash backend crashes due to invalid write
+
+	* daemon/trashlib/trashitem.c (trash_item_escape_name): correct
+	extremely silly mistake.
+
+	Problem caught by Seb's heroic valgrinding :)
+
 2009-01-28  Cosimo Cecchi  <cosimoc@gnome.org>
 
 	* daemon/gvfsbackendobexftp.c: (_invalidate_cache_helper),

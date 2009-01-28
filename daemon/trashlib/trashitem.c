@@ -127,7 +127,7 @@ trash_item_escape_name (GFile    *file,
         }
 
       g_free (uri);
-      *src = '\0';
+      *dest = '\0';
 
       return escaped;
     }
