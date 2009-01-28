@@ -1,3 +1,13 @@
+2009-01-28  Cosimo Cecchi  <cosimoc@gnome.org>
+
+	* daemon/gvfsbackendobexftp.c: (_invalidate_cache_helper),
+	(do_mount), (push_transfer_started_cb),
+	(push_transfer_completed_cb), (push_transfer_progress_cb),
+	(push_data_free), (_push_single_file_helper), (do_push),
+	(do_make_directory), (g_vfs_backend_obexftp_class_init):
+	* daemon/obexftp-marshal.list:
+	Implement write support for the ObexFTP backend (#519071).
+
 2009-01-21  A. Walton  <awalton@gnome.org>
 
 	* daemon/gvfsdaemon.c (daemon_schedule_exit):

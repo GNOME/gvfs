@@ -17,7 +17,8 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * Author: Bastien Nocera <hadess@hadess.net>
+ * Authors: Bastien Nocera <hadess@hadess.net>
+ *          Cosimo Cecchi  <cosimoc@gnome.org>
  */
 
 #include <config.h>
@@ -57,7 +58,8 @@
 
 #define BDADDR_LEN 17
 
-#define ASYNC_SUCCESS 1
+#define ASYNC_SUCCESS 2
+#define ASYNC_RUNNING 1
 #define ASYNC_PENDING 0
 #define ASYNC_ERROR -1
 
@@ -443,6 +445,13 @@ _query_file_info_helper (GVfsBackend *backend,
 }
 
 static void
+_invalidate_cache_helper (GVfsBackendObexftp *op_backend)
+{
+  g_free (op_backend->directory);
+  op_backend->directory = NULL;
+}
+
+static void
 error_occurred_cb (DBusGProxy *proxy, const gchar *error_name, const gchar *error_message, gpointer user_data)
 {
   GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (user_data);
@@ -632,6 +641,10 @@ do_mount (GVfsBackend *backend,
 
   dbus_g_proxy_add_signal(op_backend->session_proxy, "TransferStarted",
                           G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
+  dbus_g_proxy_add_signal(op_backend->session_proxy, "TransferCompleted",
+                          G_TYPE_INVALID);
+  dbus_g_proxy_add_signal(op_backend->session_proxy, "TransferProgress",
+                          G_TYPE_UINT64, G_TYPE_INVALID);
 
   /* Now wait until the device is connected */
   count = 0;
@@ -1186,6 +1199,326 @@ do_enumerate (GVfsBackend *backend,
   g_print ("- do_enumerate\n");
 }
 
+typedef struct {
+  GVfsBackendObexftp *op_backend;
+  GFileProgressCallback progress_callback;
+  gpointer progress_callback_data;
+  goffset total_bytes;
+} PushData;
+
+static void
+push_transfer_started_cb (DBusGProxy *proxy,
+                          const gchar *filename,
+                          const gchar *local_path,
+                          guint64 total_bytes,
+                          gpointer user_data)
+{
+  PushData *job_data = (PushData *) user_data;
+  GVfsBackendObexftp *op_backend = job_data->op_backend;
+
+  g_message ("transfer of %s to %s started", filename, local_path);
+
+  g_mutex_lock (op_backend->mutex);
+
+  op_backend->status = ASYNC_RUNNING;
+  job_data->total_bytes = (goffset) total_bytes;
+  job_data->progress_callback (0, job_data->total_bytes,
+                               job_data->progress_callback_data);
+
+  g_cond_signal (op_backend->cond);
+  g_mutex_unlock (op_backend->mutex);
+}
+
+static void
+push_transfer_completed_cb (DBusGProxy *proxy,
+                            gpointer user_data)
+{
+  PushData *job_data = (PushData *) user_data;
+  GVfsBackendObexftp *op_backend = job_data->op_backend;
+
+  g_message ("transfer completed");
+
+  g_mutex_lock (op_backend->mutex);
+
+  op_backend->status = ASYNC_SUCCESS;
+
+  g_cond_signal (op_backend->cond);
+  g_mutex_unlock (op_backend->mutex);
+}
+
+static void
+push_transfer_progress_cb (DBusGProxy *proxy,
+                           guint64 bytes_transferred,
+                           gpointer user_data)
+{
+  PushData *job_data = (PushData *) user_data;
+
+  g_message ("transfer progress");
+
+  job_data->progress_callback ((goffset) bytes_transferred,
+                               job_data->total_bytes,
+                               job_data->progress_callback_data);
+}
+
+static void
+push_data_free (PushData *job_data)
+{
+  g_object_unref (job_data->op_backend);
+  g_slice_free (PushData, job_data);
+}
+
+static gboolean
+_push_single_file_helper (GVfsBackendObexftp *op_backend,
+                          GVfsJobPush *job,
+                          const char *local_path,
+                          const char *destination,
+                          GError **error,
+                          PushData *job_data)
+{
+  char *dirname;
+  int success;
+
+  dirname = g_path_get_dirname (destination);
+
+  if (_change_directory (op_backend, dirname, error) == FALSE)
+    {
+      g_free (dirname);
+      return FALSE;
+    }
+
+  g_free (dirname);
+
+  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
+    {
+      g_set_error (error, G_IO_ERROR,
+                   G_IO_ERROR_CANCELLED,
+                   _("Operation was cancelled"));
+      return FALSE;
+    }
+
+  op_backend->status = ASYNC_PENDING;
+
+  /* connect to the transfer signals */
+  dbus_g_proxy_connect_signal (op_backend->session_proxy, "TransferStarted",
+                               G_CALLBACK (push_transfer_started_cb), job_data,
+                               NULL);
+  dbus_g_proxy_connect_signal (op_backend->session_proxy, "TransferCompleted",
+                               G_CALLBACK (push_transfer_completed_cb), job_data,
+                               NULL);
+  dbus_g_proxy_connect_signal (op_backend->session_proxy, "TransferProgress",
+                               G_CALLBACK (push_transfer_progress_cb), job_data,
+                               NULL);
+
+  if (dbus_g_proxy_call (op_backend->session_proxy, "SendFile", error,
+                         G_TYPE_STRING, local_path, G_TYPE_INVALID,
+                         G_TYPE_INVALID) == FALSE)
+    {
+      dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferStarted", 
+                                      G_CALLBACK (push_transfer_started_cb), job_data);
+      dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferCompleted", 
+                                      G_CALLBACK (push_transfer_completed_cb), job_data);
+      dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferProgress", 
+                                      G_CALLBACK (push_transfer_progress_cb), job_data);
+      return FALSE;
+    }
+
+  /* wait for the TransferStarted or ErrorOccurred signal */
+  while (op_backend->status == ASYNC_PENDING)
+    g_cond_wait (op_backend->cond, op_backend->mutex);
+
+  dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferStarted",
+                                  G_CALLBACK (push_transfer_started_cb), job_data);
+  success = op_backend->status;
+
+  /* we either got the operation running or an error */
+  if (success == ASYNC_ERROR)
+    {
+      dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferCompleted", 
+                                      G_CALLBACK (push_transfer_completed_cb), job_data);
+      dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferProgress", 
+                                      G_CALLBACK (push_transfer_progress_cb), job_data);
+
+      *error = g_error_copy (op_backend->error);
+      g_error_free (op_backend->error);
+      op_backend->error = NULL;
+      return FALSE;
+    }
+
+  while (op_backend->status == ASYNC_RUNNING)
+    g_cond_wait (op_backend->cond, op_backend->mutex);
+
+  dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferCompleted", 
+                                  G_CALLBACK (push_transfer_completed_cb), job_data);
+  dbus_g_proxy_disconnect_signal (op_backend->session_proxy, "TransferProgress", 
+                                  G_CALLBACK (push_transfer_progress_cb), job_data);
+  success = op_backend->status;
+
+  /* same as before, either we have success or an error */
+  if (success == ASYNC_ERROR)
+    {
+      *error = g_error_copy (op_backend->error);
+      g_error_free (op_backend->error);
+      op_backend->error = NULL;
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static void
+do_push (GVfsBackend *backend,
+         GVfsJobPush *job,
+         const char *destination,
+         const char *local_path,
+         GFileCopyFlags flags,
+         gboolean remove_source,
+         GFileProgressCallback progress_callback,
+         gpointer progress_callback_data)
+{
+  GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (backend);
+  GError *error = NULL;
+  gboolean is_dir, overwrite, res;
+  GFileType target_type;
+  PushData *job_data;
+  GFileInfo *info;
+
+  g_print ("+ do_push, destination: %s, local_path: %s\n", destination, local_path);
+
+  g_mutex_lock (op_backend->mutex);
+  op_backend->doing_io = TRUE;
+
+  overwrite = (flags & G_FILE_COPY_OVERWRITE);
+  is_dir = g_file_test (local_path, G_FILE_TEST_IS_DIR);
+  info = g_file_info_new ();
+  target_type = 0;
+
+  if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
+    {
+      op_backend->doing_io = FALSE;
+      g_mutex_unlock (op_backend->mutex);
+
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_CANCELLED,
+                        _("Operation was cancelled"));
+      return;
+    }
+
+  res = _query_file_info_helper (backend, destination, info, &error);
+
+  if (error != NULL)
+    {
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+        {
+          op_backend->doing_io = FALSE;
+          g_mutex_unlock (op_backend->mutex);
+
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+
+          return;
+        }
+      else
+        {
+          g_clear_error (&error);
+          res = TRUE;
+        }
+    }
+
+  if (res)
+    target_type = g_file_info_get_file_type (info);
+
+  g_object_unref (info);
+
+  /* error handling */
+  if (is_dir)
+    {
+      op_backend->doing_io = FALSE;
+      g_mutex_unlock (op_backend->mutex);
+
+      if (target_type != 0)
+        {
+          if (overwrite)
+            {
+              if (target_type == G_FILE_TYPE_DIRECTORY)
+                {
+                  g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                                    G_IO_ERROR_WOULD_MERGE,
+                                   _("Can't copy directory over directory"));
+                  return;
+                }
+            }
+          else
+            {
+              g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                                G_IO_ERROR_EXISTS,
+                                _("Target file exists"));
+              return;
+            }
+        }
+
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_WOULD_RECURSE,
+                        _("Can't recursively copy directory"));
+      return;
+    }
+  else
+    {
+      if (target_type != 0)
+        {
+          op_backend->doing_io = FALSE;
+          g_mutex_unlock (op_backend->mutex);
+
+          if (overwrite)
+            {
+              if (target_type == G_FILE_TYPE_DIRECTORY)
+                {
+                  g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                                    G_IO_ERROR_IS_DIRECTORY,
+                                    _("Can't copy file over directory"));
+                  return;
+                }
+            }
+          else
+            {
+              g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                                G_IO_ERROR_EXISTS,
+                                _("Target file exists"));
+              return;
+            }
+        }
+    }
+
+  job_data = g_slice_new0 (PushData);
+  job_data->op_backend = g_object_ref (op_backend);
+  job_data->progress_callback = progress_callback;
+  job_data->progress_callback_data = progress_callback_data;
+
+  /* start the actual transfer operation */
+  if (_push_single_file_helper (op_backend, job, local_path, destination,
+                                &error, job_data) == FALSE)
+    {
+      op_backend->doing_io = FALSE;
+      g_mutex_unlock (op_backend->mutex);
+      push_data_free (job_data);
+
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+    }
+
+  push_data_free (job_data);
+
+  /* we called _query_file_info_helper (), so we need to invalidate the
+   * cache, as a query_info () will be called on us after we return.
+   */
+  _invalidate_cache_helper (op_backend);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  op_backend->doing_io = FALSE;
+  g_mutex_unlock (op_backend->mutex);
+
+  g_print ("- do_push\n");
+}
+
 static void
 do_delete (GVfsBackend *backend,
            GVfsJobDelete *job,
@@ -1379,6 +1712,9 @@ do_make_directory (GVfsBackend *backend,
       return;
     }
 
+  if (error)
+    g_clear_error (&error);
+
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
       g_mutex_unlock (op_backend->mutex);
@@ -1413,17 +1749,23 @@ do_make_directory (GVfsBackend *backend,
                          G_TYPE_INVALID) == FALSE)
     {
       g_mutex_unlock (op_backend->mutex);
+      g_free (basename);
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
   g_free (basename);
 
+  /* reset the current directory so that we won't cache when querying
+   * info after this has succeeded.
+   */
+  _invalidate_cache_helper (op_backend);
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   g_mutex_unlock (op_backend->mutex);
 
-  g_print ("+ do_make_directory\n");
+  g_print ("- do_make_directory\n");
 }
 
 static void
@@ -1443,6 +1785,7 @@ g_vfs_backend_obexftp_class_init (GVfsBackendObexftpClass *klass)
   backend_class->enumerate = do_enumerate;
   backend_class->delete = do_delete;
   backend_class->make_directory = do_make_directory;
+  backend_class->push = do_push;
 
   /* ErrorOccurred */
   dbus_g_object_register_marshaller (obexftp_marshal_VOID__STRING_STRING,
@@ -1451,6 +1794,9 @@ g_vfs_backend_obexftp_class_init (GVfsBackendObexftpClass *klass)
   /* TransferStarted */
   dbus_g_object_register_marshaller(obexftp_marshal_VOID__STRING_STRING_UINT64,
                                     G_TYPE_NONE, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
+  /* TransferProgress */
+  dbus_g_object_register_marshaller(obexftp_marshal_VOID__UINT64,
+                                    G_TYPE_NONE, G_TYPE_UINT64, G_TYPE_INVALID);
   /* SessionConnected */
   dbus_g_object_register_marshaller(obexftp_marshal_VOID__STRING,
                                     G_TYPE_NONE, DBUS_TYPE_G_OBJECT_PATH, G_TYPE_INVALID);
