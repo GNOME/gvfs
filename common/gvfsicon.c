@@ -226,7 +226,7 @@ g_vfs_icon_to_tokens (GIcon *icon,
 
   s = g_mount_spec_to_string (vfs_icon->mount_spec);
   g_ptr_array_add (tokens, s);
-  g_ptr_array_add (tokens, vfs_icon->icon_id);
+  g_ptr_array_add (tokens, g_strdup (vfs_icon->icon_id));
 
   return TRUE;
 }

@@ -1,3 +1,9 @@
+2009-01-29  Alexander Larsson  <alexl@redhat.com>
+
+        * common/gvfsicon.c:
+        (g_vfs_icon_to_tokens):
+	Dup string to avoid double free later.
+
 2009-01-28  Ryan Lortie  <desrt@desrt.ca>
 
 	Bug 569480 – trash backend crashes due to invalid write
