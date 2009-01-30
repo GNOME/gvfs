@@ -1,7 +1,15 @@
+2009-01-28  Ryan Lortie  <desrt@desrt.ca>
+
+	Bug 512144 – symlinks to folders are deleted recursively
+
+	* desrt: place a paper bag over my face
+	* daemon/trashlib/trashexpunge.c: try a lot harder to not follow
+	symlinks.
+
 2009-01-29  Alexander Larsson  <alexl@redhat.com>
 
-        * common/gvfsicon.c:
-        (g_vfs_icon_to_tokens):
+	* common/gvfsicon.c:
+	(g_vfs_icon_to_tokens):
 	Dup string to avoid double free later.
 
 2009-01-28  Ryan Lortie  <desrt@desrt.ca>

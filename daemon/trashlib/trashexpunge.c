@@ -25,7 +25,8 @@ trash_expunge_delete_everything_under (GFile *directory)
                                NULL, NULL);
 
   enumerator = g_file_enumerate_children (directory,
-                                          G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                          G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                          G_FILE_ATTRIBUTE_STANDARD_TYPE,
                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                           NULL, NULL);
 
@@ -40,7 +41,9 @@ trash_expunge_delete_everything_under (GFile *directory)
           
           basename = g_file_info_get_name (info);
           sub = g_file_get_child (directory, basename);
-          trash_expunge_delete_everything_under (sub);
+
+          if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+            trash_expunge_delete_everything_under (sub);
 
           /* do the delete here */
           g_file_delete (sub, NULL, NULL);
