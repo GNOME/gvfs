@@ -1,3 +1,11 @@
+Major changes in 1.1.5
+======================
+* network: Pick up SMB shares from zeroconf
+* obexftp: Write support for
+* obexftp: Support obexftp over usb
+* trash: Don't follow symlinks on delete
+* fix crashes
+
 Major changes in 1.1.4
 ======================
 * Trash performance fixes
