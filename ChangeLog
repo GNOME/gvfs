@@ -1,5 +1,12 @@
 2009-02-02  Alexander Larsson  <alexl@redhat.com>
 
+	* configure.ac:
+	Post release version bump
+
+=== gvfs 1.1.5 ===
+
+2009-02-02  Alexander Larsson  <alexl@redhat.com>
+
 	* NEWS:
 	Update for release
 
