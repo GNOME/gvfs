@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-01-06 15:17+0000\n"
-"PO-Revision-Date: 2009-01-06 17:58+0100\n"
+"POT-Creation-Date: 2009-02-02 12:29+0000\n"
+"PO-Revision-Date: 2009-02-02 18:29+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -88,15 +88,17 @@ msgstr "El valor devuelto por monitor_file no es válido"
 #: ../client/gdaemonfileinputstream.c:1032
 #: ../client/gdaemonfileoutputstream.c:458
 #: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:741
-#: ../daemon/gvfsbackendobexftp.c:762 ../daemon/gvfsbackendobexftp.c:881
-#: ../daemon/gvfsbackendobexftp.c:1018 ../daemon/gvfsbackendobexftp.c:1082
-#: ../daemon/gvfsbackendobexftp.c:1219 ../daemon/gvfsbackendobexftp.c:1246
-#: ../daemon/gvfsbackendobexftp.c:1305 ../daemon/gvfsbackendobexftp.c:1327
-#: ../daemon/gvfsbackendobexftp.c:1387 ../daemon/gvfsbackendobexftp.c:1406
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:1049
+#: ../daemon/gvfsbackendobexftp.c:1070 ../daemon/gvfsbackendobexftp.c:1189
+#: ../daemon/gvfsbackendobexftp.c:1326 ../daemon/gvfsbackendobexftp.c:1390
+#: ../daemon/gvfsbackendobexftp.c:1590 ../daemon/gvfsbackendobexftp.c:1697
+#: ../daemon/gvfsbackendobexftp.c:1847 ../daemon/gvfsbackendobexftp.c:1874
+#: ../daemon/gvfsbackendobexftp.c:1933 ../daemon/gvfsbackendobexftp.c:1955
+#: ../daemon/gvfsbackendobexftp.c:2018 ../daemon/gvfsbackendobexftp.c:2037
 #: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
+#, c-format
 msgid "Operation was cancelled"
 msgstr "Se canceló la operación"
 
@@ -266,15 +268,15 @@ msgstr "No se especificó un nombre de servidor"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
 #: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:561 ../daemon/gvfsbackendobexftp.c:572
-#: ../daemon/gvfsbackendsmb.c:641
+#: ../daemon/gvfsbackendobexftp.c:827 ../daemon/gvfsbackendobexftp.c:843
+#: ../daemon/gvfsbackendobexftp.c:862 ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:650
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:399
+#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:647
 #: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
 #: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
 #, c-format
@@ -282,8 +284,8 @@ msgid "File doesn't exist"
 msgstr "El archivo no existe"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:440
-#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:697
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:446
+#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:694
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
 
@@ -301,7 +303,7 @@ msgstr "No se pudo crear el directorio temporal"
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
 #: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1063
 #: ../daemon/gvfsbackendgphoto2.c:1916 ../daemon/gvfsbackendgphoto2.c:2626
-#: ../daemon/gvfsbackendtrash.c:214
+#: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "El archivo o directorio no existe"
@@ -311,6 +313,7 @@ msgid "Directory not empty"
 msgstr "El directorio no está vacío"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendobexftp.c:1772
 msgid "Can't copy file over directory"
 msgstr "No se puede copiar un archivo sobre un directorio"
 
@@ -348,15 +351,16 @@ msgstr "El backend no soporta la operación"
 msgid "No such file or directory in target path"
 msgstr "El archivo o directorio no existe en la ruta de destino"
 
-#: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendburn.c:877 ../daemon/gvfsbackendobexftp.c:1741
 msgid "Can't copy directory over directory"
 msgstr "No se puede copiar un directorio sobre otro directorio"
 
-#: ../daemon/gvfsbackendburn.c:886
+#: ../daemon/gvfsbackendburn.c:886 ../daemon/gvfsbackendobexftp.c:1749
+#: ../daemon/gvfsbackendobexftp.c:1780
 msgid "Target file exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendburn.c:893
+#: ../daemon/gvfsbackendburn.c:893 ../daemon/gvfsbackendobexftp.c:1756
 msgid "Can't recursively copy directory"
 msgstr "No se puede copiar recursivamente un directorio"
 
@@ -451,8 +455,8 @@ msgid "Filesystem"
 msgstr "Sistema de archivos"
 
 #: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
-#: ../daemon/gvfsbackendobexftp.c:727 ../daemon/gvfsbackendsmb.c:684
-#: ../daemon/gvfsbackendtrash.c:230
+#: ../daemon/gvfsbackendobexftp.c:1035 ../daemon/gvfsbackendsmb.c:684
+#: ../daemon/gvfsbackendtrash.c:232
 #, c-format
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
@@ -553,21 +557,21 @@ msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:487 ../daemon/gvfsbackendnetwork.c:397
+#: ../daemon/gvfsbackenddnssd.c:493 ../daemon/gvfsbackendnetwork.c:394
 msgid "Local Network"
 msgstr "Red local"
 
-#: ../daemon/gvfsbackenddnssd.c:731 ../daemon/gvfsbackendnetwork.c:801
+#: ../daemon/gvfsbackenddnssd.c:737 ../daemon/gvfsbackendnetwork.c:798
 msgid "Can't monitor file or directory."
 msgstr "No se puede monitorizar el archivo o directorio."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:749
+#: ../daemon/gvfsbackenddnssd.c:755
 msgid "Dns-SD"
 msgstr "DNS-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:750 ../daemon/gvfsbackendnetwork.c:736
-#: ../daemon/gvfsbackendnetwork.c:886 ../daemon/gvfsbackendnetwork.c:887
+#: ../daemon/gvfsbackenddnssd.c:756 ../daemon/gvfsbackendnetwork.c:733
+#: ../daemon/gvfsbackendnetwork.c:883 ../daemon/gvfsbackendnetwork.c:884
 msgid "Network"
 msgstr "Red"
 
@@ -887,7 +891,7 @@ msgstr "Red de Windows"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:935
+#: ../daemon/gvfsbackendnetwork.c:932
 msgid "Network Location Monitor"
 msgstr "Monitor de ubicación de red"
 
@@ -897,17 +901,21 @@ msgstr "Monitor de ubicación de red"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:387 ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendobexftp.c:647 ../daemon/gvfsbackendsmb.c:538
 #: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s en %s"
 
-#: ../daemon/gvfsbackendobexftp.c:666
+#: ../daemon/gvfsbackendobexftp.c:856
+msgid "USB support missing. Please contact your software vendor"
+msgstr "Falta el soporte para USB. Contacte con el fabricante de su software."
+
+#: ../daemon/gvfsbackendobexftp.c:974
 msgid "Connection to the device lost"
 msgstr "Se perdió la conexión con el dispositivo"
 
-#: ../daemon/gvfsbackendobexftp.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1471
 msgid "Device requires a software update"
 msgstr "El dispositivo requiere una actualización de software"
 
@@ -1127,24 +1135,24 @@ msgstr "No es un archivo regular"
 msgid "Windows Network Filesystem Service"
 msgstr "Servicio del sistema de archivos de red de Windows"
 
-#: ../daemon/gvfsbackendtrash.c:344
+#: ../daemon/gvfsbackendtrash.c:370
 #, c-format
 msgid "Can't delete trash"
 msgstr "No se puede borrar la papelera"
 
-#: ../daemon/gvfsbackendtrash.c:361 ../daemon/gvfsbackendtrash.c:413
+#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
 #, c-format
 msgid "Items in the trash may not be modified"
 msgstr "Los elementos en la papelera no se deben modificar"
 
-#: ../daemon/gvfsbackendtrash.c:399
+#: ../daemon/gvfsbackendtrash.c:426
 #, c-format
 msgid "Can't pull trash"
 msgstr "No se puede vaciar la papelera"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:708 ../daemon/gvfsbackendtrash.c:816
+#: ../daemon/gvfsbackendtrash.c:735 ../daemon/gvfsbackendtrash.c:843
 msgid "Trash"
 msgstr "Papelera"
 
