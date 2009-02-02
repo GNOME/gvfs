@@ -1,3 +1,17 @@
+2009-02-02  Bastien Nocera  <hadess@hadess.net>
+
+	Bug 511671 - Make obex-ftp work over usb connections
+
+	* configure.ac: Require HAL for the ObexFTP backend
+	* daemon/Makefile.am:
+	* daemon/gvfsbackendobexftp.c (_get_numbers_from_usb_path),
+	(_is_nokia_3650), (_get_bluetooth_name_and_icon),
+	(_get_bluetooth_device_properties), (_is_same_path),
+	(_find_ods_usb_intfnum), (_get_usb_intfnum_and_properties),
+	(do_mount): Add support for USB ObexFTP devices, original
+	patch from Alexander Kanavin <ak@sensi.org>, requires
+	current obex-data-server trunk
+
 2009-01-28  Ryan Lortie  <desrt@desrt.ca>
 
 	Bug 512144 – symlinks to folders are deleted recursively

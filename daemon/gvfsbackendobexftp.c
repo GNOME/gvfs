@@ -29,10 +29,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+#include <libhal.h>
 #include <dbus/dbus-glib.h>
 #include <bluetooth/bluetooth.h>
 
@@ -72,6 +74,7 @@ struct _GVfsBackendObexftp
   char *display_name;
   char *bdaddr;
   char *icon_name;
+  gint usbintfnum;
 
   DBusGConnection *connection;
   DBusGProxy *manager_proxy;
@@ -107,18 +110,70 @@ static void session_connected_cb (DBusGProxy *proxy,
                                   const char *session_object,
                                   gpointer user_data);
 
+/* Parse USB paths from do_mount(), or obex-data-server */
+static gboolean
+_get_numbers_from_usb_path (const char *path, int *usb_bus_num, int *usb_device_num, int *usb_intf_num)
+{
+  char **tokens;
+  char *endp;
+  gboolean has_brackets = FALSE;
+
+  if (path == NULL)
+    return FALSE;
+  if (*path == '[')
+    {
+      path++;
+      has_brackets = TRUE;
+    }
+
+  tokens = g_strsplit (path + 4, ",", 0);
+  if (g_strv_length (tokens) != 3)
+    {
+      g_strfreev (tokens);
+      return FALSE;
+    }
+
+ *usb_bus_num = strtol (tokens[0], &endp, 10);
+  if (*endp != '\0')
+    {
+      g_strfreev (tokens);
+      return FALSE;
+    }
+
+  *usb_device_num = strtol (tokens[1], &endp, 10);
+  if (*endp != '\0')
+    {
+      g_strfreev (tokens);
+      return FALSE;
+    }
+
+  *usb_intf_num = strtol (tokens[2], &endp, 10);
+  if ((has_brackets && *endp != ']') || (!has_brackets && *endp != '\0'))
+    {
+      g_strfreev (tokens);
+      return FALSE;
+    }
+
+  g_strfreev (tokens);
+
+  return TRUE;
+}
+
 /* Used to detect broken listings from
  * old Nokia 3650s */
 static gboolean
 _is_nokia_3650 (const char *bdaddr)
 {
+  if (!bdaddr)
+    return FALSE;
+
   /* Don't ask, Nokia seem to use a Bluetooth
    * HCI from Murata */
   return g_str_has_prefix(bdaddr, "00:60:57");
 }
 
 static char *
-get_name_and_icon (DBusGProxy *device, char **icon_name)
+_get_bluetooth_name_and_icon (DBusGProxy *device, char **icon_name)
 {
   GHashTable *hash;
 
@@ -149,7 +204,7 @@ get_name_and_icon (DBusGProxy *device, char **icon_name)
 }
 
 static gchar *
-_get_device_properties (const char *bdaddr, char **icon_name)
+_get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
 {
   DBusGConnection *connection;
   DBusGProxy *manager;
@@ -191,7 +246,7 @@ _get_device_properties (const char *bdaddr, char **icon_name)
         {
           DBusGProxy *device;
           device = dbus_g_proxy_new_for_name (connection, "org.bluez", device_path, "org.bluez.Device");
-          name = get_name_and_icon (device, icon_name);
+          name = _get_bluetooth_name_and_icon (device, icon_name);
           g_object_unref (device);
         }
       g_object_unref (adapter);
@@ -202,6 +257,209 @@ _get_device_properties (const char *bdaddr, char **icon_name)
   dbus_g_connection_unref (connection);
 
   return name;
+}
+
+static gboolean
+_is_same_path (const char *path, int usb_bus_num, int usb_device_num, int usb_intf_num)
+{
+  int bus, dev, intf;
+
+  if (!_get_numbers_from_usb_path (path, &bus, &dev, &intf))
+    return FALSE;
+
+  if (bus == usb_bus_num &&
+      dev == usb_device_num &&
+      intf == usb_intf_num)
+        return TRUE;
+
+  return FALSE;
+}
+
+static int
+_find_ods_usb_intfnum (DBusGProxy *obex_manager, int device_usb_bus_num, int device_usb_device_num, int device_usb_interface_num)
+{
+  int i, n;
+  GHashTable *hash;
+
+  if (obex_manager == NULL)
+    return -1;
+
+  if (dbus_g_proxy_call (obex_manager, "GetUsbInterfacesNum", NULL, G_TYPE_INVALID, G_TYPE_UINT, &n, G_TYPE_INVALID) == FALSE)
+    return -1;
+
+  for (i = 0; i < n; i++) 
+    {
+      if (dbus_g_proxy_call (obex_manager, "GetUsbInterfaceInfo", NULL,
+                             G_TYPE_UINT, i, G_TYPE_INVALID,
+                             DBUS_TYPE_G_STRING_STRING_HASHTABLE, &hash, 
+                             G_TYPE_INVALID) != FALSE)
+        {
+          const char* ods_path = g_hash_table_lookup (hash, "Path");
+
+          if (ods_path == NULL)
+            {
+              g_hash_table_destroy (hash);
+              return -2;
+            }
+
+          if (_is_same_path (ods_path, device_usb_bus_num, device_usb_device_num, device_usb_interface_num))
+            {
+              g_hash_table_destroy (hash);
+              return i;
+            }
+          g_hash_table_destroy (hash);
+        }
+    }
+  return -1;
+}
+
+static gint
+_get_usb_intfnum_and_properties (DBusGProxy *obex_manager, const char *device, char **display_name, char **icon_name)
+{
+  char **obex_devices;
+  int num_obex_devices;
+  int usb_bus_num;
+  int usb_device_num;
+  int usb_intf_num;
+  DBusError dbus_error;
+  DBusConnection *dbus_connection;
+  LibHalContext *hal_ctx;
+  int ods_intf_num = 1;
+  int n;
+
+  /* Parse the [usb:1,41,3] string */
+  if (!g_str_has_prefix (device, "[usb:"))
+    {
+      return -1;
+    }
+
+  if (!_get_numbers_from_usb_path (device, &usb_bus_num, &usb_device_num, &usb_intf_num))
+    return -1;
+
+  g_message ("Parsed '%s' into bus=%d device=%d interface=%d", device, usb_bus_num, usb_device_num, usb_intf_num);
+
+  dbus_error_init (&dbus_error);
+  dbus_connection = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_error);
+  if (dbus_error_is_set (&dbus_error))
+    {
+      dbus_error_free (&dbus_error);
+      return -1;
+    }
+  dbus_connection_set_exit_on_disconnect (dbus_connection, FALSE);
+
+  hal_ctx = libhal_ctx_new ();
+  if (hal_ctx == NULL)
+    {
+      dbus_connection_close (dbus_connection);
+      dbus_connection_unref (dbus_connection);
+      dbus_error_free (&dbus_error);
+      return -1;
+    }
+
+  libhal_ctx_set_dbus_connection (hal_ctx, dbus_connection);
+  if (!libhal_ctx_init (hal_ctx, &dbus_error))
+    {
+      libhal_ctx_free (hal_ctx);
+      dbus_connection_close (dbus_connection);
+      dbus_connection_unref (dbus_connection);
+      dbus_error_free (&dbus_error);
+      return -1;
+    }
+  obex_devices = libhal_find_device_by_capability (hal_ctx, "obex", &num_obex_devices, NULL);
+
+  for (n = 0; n < num_obex_devices; n++)
+    {
+      char *udi = obex_devices[n];
+      LibHalPropertySet *ps;
+
+      ps = libhal_device_get_all_properties (hal_ctx, udi, NULL);
+      if (ps != NULL)
+        {
+          const char *subsystem;
+
+          subsystem = libhal_ps_get_string (ps, "info.subsystem");
+          if (subsystem != NULL && strcmp (subsystem, "usb") == 0)
+            {
+              int device_usb_bus_num;
+              int device_usb_device_num;
+              int device_usb_interface_num;
+              const char *icon_from_hal;
+              const char *name_from_hal;
+
+              device_usb_bus_num = libhal_ps_get_int32 (ps, "usb.bus_number");
+              device_usb_device_num = libhal_ps_get_int32 (ps, "usb.linux.device_number");
+              device_usb_interface_num = libhal_ps_get_int32 (ps, "usb.interface.number");
+              icon_from_hal = libhal_ps_get_string (ps, "info.desktop.icon");
+              name_from_hal = libhal_ps_get_string (ps, "info.desktop.name");
+
+              g_message ("looking at usb device '%s' with bus=%d, device=%d interface=%d", 
+                     udi, device_usb_bus_num, device_usb_device_num, device_usb_interface_num);
+
+              if (device_usb_bus_num == usb_bus_num &&
+                  device_usb_device_num == usb_device_num &&
+                  device_usb_interface_num == usb_intf_num)
+                {
+                  const char *parent_udi;
+
+                  g_message ("udi '%s' matches %s", udi, device);
+                  parent_udi = libhal_ps_get_string (ps, "info.parent");
+
+                  if (parent_udi != NULL)
+                    {
+                      LibHalPropertySet *ps2;
+
+                      ps2 = libhal_device_get_all_properties (hal_ctx, parent_udi, NULL);
+                      if (ps2 != NULL)
+                        {
+                          ods_intf_num = _find_ods_usb_intfnum (obex_manager,
+                                                                device_usb_bus_num,
+                                                                device_usb_device_num,
+                                                                device_usb_interface_num);
+
+                          if (ods_intf_num >= 0)
+                            {
+                              if (icon_from_hal != NULL)
+                                *icon_name = g_strdup (icon_from_hal);
+                              else
+                                *icon_name = "drive-removable-media-usb";
+
+                              if (name_from_hal != NULL)
+                                *display_name = g_strdup (name_from_hal);
+                              else
+                                *display_name = g_strdup_printf ("%s - %s",
+                                                                 libhal_ps_get_string (ps2, "usb_device.vendor"),
+                                                                 libhal_ps_get_string (ps2, "usb_device.product"));
+
+                              libhal_free_property_set (ps2);
+                              libhal_free_property_set (ps);
+
+                              goto end;
+                            }
+                          else if (ods_intf_num == -2)
+                            {
+                              libhal_free_property_set (ps2);
+                              libhal_free_property_set (ps);
+
+                              goto end;
+                            }
+                          libhal_free_property_set (ps2);
+                        }
+                    }
+                }
+            }
+          libhal_free_property_set (ps);
+        }
+    }
+
+end:
+  libhal_free_string_array (obex_devices);
+  libhal_ctx_free (hal_ctx);
+
+  dbus_connection_close (dbus_connection);
+  dbus_connection_unref (dbus_connection);
+  dbus_error_free (&dbus_error);
+
+  return ods_intf_num;
 }
 
 static void
@@ -555,7 +813,6 @@ do_mount (GVfsBackend *backend,
   const char *device;
   GError *error = NULL;
   const gchar *path = NULL;
-  char *server;
   GMountSpec *obexftp_mount_spec;
   guint count;
 
@@ -563,7 +820,7 @@ do_mount (GVfsBackend *backend,
 
   device = g_mount_spec_get (mount_spec, "host");
 
-  if (device == NULL || strlen (device) != BDADDR_LEN + 2)
+  if (device == NULL || (strlen (device) != BDADDR_LEN + 2 && !g_str_has_prefix(device, "[usb:")) )
     {
       g_vfs_job_failed (G_VFS_JOB (job),
                         G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
@@ -571,51 +828,89 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  /* Strip the brackets */
-  op_backend->bdaddr = g_strndup (device + 1, 17);
-  if (bachk (op_backend->bdaddr) < 0)
+  op_backend->bdaddr = NULL;
+  op_backend->usbintfnum = -1;
+
+  if (!g_str_has_prefix(device, "[usb:"))
     {
-      g_free (op_backend->bdaddr);
-      g_vfs_job_failed (G_VFS_JOB (job),
-                        G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                        _("Invalid mount spec"));
-      return;
+      /* Strip the brackets */
+      op_backend->bdaddr = g_strndup (device + 1, BDADDR_LEN);
+      if (bachk (op_backend->bdaddr) < 0)
+        {
+          g_free (op_backend->bdaddr);
+          g_vfs_job_failed (G_VFS_JOB (job),
+                            G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                            _("Invalid mount spec"));
+          return;
+        }
+    }
+  else
+    {
+      op_backend->usbintfnum = _get_usb_intfnum_and_properties (op_backend->manager_proxy, device, &op_backend->display_name, &op_backend->icon_name);
+      if (op_backend->usbintfnum < 0)
+        {
+          if (op_backend->usbintfnum == -2)
+            {
+              g_vfs_job_failed (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                                _("USB support missing. Please contact your software vendor"));
+            }
+          else
+            {
+              g_vfs_job_failed (G_VFS_JOB (job),
+                                G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                                _("Invalid mount spec"));
+            }
+          return;
+        }
     }
 
   /* FIXME, Have a way for the mount to be cancelled, see:
    * Use CancelSessionConnect */
   op_backend->status = ASYNC_PENDING;
 
-  if (dbus_g_proxy_call (op_backend->manager_proxy, "CreateBluetoothSession", &error,
-                         G_TYPE_STRING, op_backend->bdaddr, G_TYPE_STRING, "00:00:00:00:00:00", G_TYPE_STRING, "ftp", G_TYPE_INVALID,
-                         DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID) == FALSE)
+  if (op_backend->bdaddr)
     {
-      g_free (op_backend->bdaddr);
-      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
-      g_error_free (error);
-      return;
+      if (dbus_g_proxy_call (op_backend->manager_proxy, "CreateBluetoothSession", &error,
+                             G_TYPE_STRING, op_backend->bdaddr, G_TYPE_STRING, "00:00:00:00:00:00", G_TYPE_STRING, "ftp", G_TYPE_INVALID,
+                             DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID) == FALSE)
+        {
+          g_free (op_backend->bdaddr);
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          return;
+        }
+      op_backend->display_name = _get_bluetooth_device_properties (op_backend->bdaddr, &op_backend->icon_name);
+      if (!op_backend->display_name)
+        op_backend->display_name = g_strdelimit (op_backend->bdaddr, ":", '-');
+      g_print ("  do_mount: %s (%s) mounted\n", op_backend->display_name, op_backend->bdaddr);
+    }
+  else
+    {
+      if (dbus_g_proxy_call (op_backend->manager_proxy, "CreateUsbSession", &error,
+                             G_TYPE_UINT, op_backend->usbintfnum, G_TYPE_STRING, "ftp", G_TYPE_INVALID,
+                             DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID) == FALSE)
+        {
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+          return;
+        }
+      g_print ("  do_mount: usb interface %d mounted\n", op_backend->usbintfnum);
     }
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
-  g_print ("  do_mount: %s mounted\n", op_backend->bdaddr);
 
   op_backend->session_proxy = dbus_g_proxy_new_for_name (op_backend->connection,
                                                          "org.openobex",
                                                          path,
                                                          "org.openobex.Session");
 
-  op_backend->display_name = _get_device_properties (op_backend->bdaddr, &op_backend->icon_name);
-  if (!op_backend->display_name)
-        op_backend->display_name = g_strdup (op_backend->bdaddr);
-
   g_vfs_backend_set_display_name (G_VFS_BACKEND  (op_backend),
                                   op_backend->display_name);
   g_vfs_backend_set_icon_name (G_VFS_BACKEND (op_backend), op_backend->icon_name);
 
   obexftp_mount_spec = g_mount_spec_new ("obex");
-  server = g_strdup_printf ("[%s]", op_backend->bdaddr);
-  g_mount_spec_set (obexftp_mount_spec, "host", server);
-  g_free (server);
+  g_mount_spec_set (obexftp_mount_spec, "host", device);
   g_vfs_backend_set_mount_spec (G_VFS_BACKEND (op_backend), obexftp_mount_spec);
   g_mount_spec_unref (obexftp_mount_spec);
 

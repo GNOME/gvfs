@@ -222,9 +222,10 @@ gvfsd_obexftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendobexftp.h \
 	-DDEFAULT_BACKEND_TYPE=obex \
 	-DMAX_JOB_THREADS=1 \
+	$(HAL_CFLAGS) \
 	-DBACKEND_TYPES='"obex", G_VFS_TYPE_BACKEND_OBEXFTP,'
 
-gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(XML_LIBS) $(libraries)
+gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(XML_LIBS) $(HAL_LIBS) $(libraries)
 
 gvfsd_ftp_SOURCES = \
 	gvfsbackendftp.c gvfsbackendftp.h \
