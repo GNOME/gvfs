@@ -882,7 +882,9 @@ do_mount (GVfsBackend *backend,
         }
       op_backend->display_name = _get_bluetooth_device_properties (op_backend->bdaddr, &op_backend->icon_name);
       if (!op_backend->display_name)
-        op_backend->display_name = g_strdelimit (op_backend->bdaddr, ":", '-');
+        op_backend->display_name = g_strdelimit (g_strdup (op_backend->bdaddr), ":", '-');
+      if (!op_backend->icon_name)
+        op_backend->icon_name = g_strdup ("bluetooth");
       g_print ("  do_mount: %s (%s) mounted\n", op_backend->display_name, op_backend->bdaddr);
     }
   else
