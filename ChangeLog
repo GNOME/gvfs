@@ -1,5 +1,13 @@
 2009-02-03  Bastien Nocera  <hadess@hadess.net>
 
+	Bug 570193 – Mounting phone connected via Bluetooth fails
+
+	* daemon/gvfsbackendobexftp.c (_get_bluetooth_device_properties):
+	Use a private connection to connect to the system D-Bus, thanks
+	to Alexander Larsson
+
+2009-02-03  Bastien Nocera  <hadess@hadess.net>
+
 	* daemon/gvfsbackendobexftp.c (do_mount): Fix
 	possible double-free when the display name is freed
 	Avoid errors when the icon name couldn't be gathered

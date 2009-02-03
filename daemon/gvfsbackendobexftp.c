@@ -36,6 +36,8 @@
 #include <gio/gio.h>
 #include <libhal.h>
 #include <dbus/dbus-glib.h>
+#include <dbus/dbus-glib-bindings.h>
+#include <dbus/dbus-glib-lowlevel.h>
 #include <bluetooth/bluetooth.h>
 
 #include "gvfsbackendobexftp.h"
@@ -203,10 +205,14 @@ _get_bluetooth_name_and_icon (DBusGProxy *device, char **icon_name)
   return NULL;
 }
 
+
+#define _DBUS_POINTER_SHIFT(p)   ((void*) (((char*)p) + sizeof (void*)))
+#define DBUS_G_CONNECTION_FROM_CONNECTION(x)     ((DBusGConnection*) _DBUS_POINTER_SHIFT(x))
+
 static gchar *
 _get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
 {
-  DBusGConnection *connection;
+  DBusConnection *conn;
   DBusGProxy *manager;
   GPtrArray *adapters;
   gchar *name;
@@ -214,22 +220,24 @@ _get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
 
   name = NULL;
 
-  connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, NULL);
-  if (connection == NULL)
+  conn = dbus_bus_get_private (DBUS_BUS_SYSTEM, NULL);
+  if (conn == NULL)
         return name;
 
-  manager = dbus_g_proxy_new_for_name (connection, "org.bluez",
+  manager = dbus_g_proxy_new_for_name (DBUS_G_CONNECTION_FROM_CONNECTION(conn), "org.bluez",
                                        "/", "org.bluez.Manager");
   if (manager == NULL)
     {
-      dbus_g_connection_unref (connection);
+      dbus_connection_close (conn);
+      dbus_connection_unref (conn);
       return name;
     }
 
   if (dbus_g_proxy_call (manager, "ListAdapters", NULL, G_TYPE_INVALID, dbus_g_type_get_collection ("GPtrArray", DBUS_TYPE_G_OBJECT_PATH), &adapters, G_TYPE_INVALID) == FALSE)
     {
       g_object_unref (manager);
-      dbus_g_connection_unref (connection);
+      dbus_connection_close (conn);
+      dbus_connection_unref (conn);
       return name;
     }
 
@@ -238,14 +246,14 @@ _get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
       DBusGProxy *adapter;
       char *device_path;
 
-      adapter = dbus_g_proxy_new_for_name (connection, "org.bluez",
+      adapter = dbus_g_proxy_new_for_name (DBUS_G_CONNECTION_FROM_CONNECTION(conn), "org.bluez",
                                            g_ptr_array_index (adapters, i), "org.bluez.Adapter");
       if (dbus_g_proxy_call (adapter, "FindDevice", NULL,
                              G_TYPE_STRING, bdaddr, G_TYPE_INVALID,
                              DBUS_TYPE_G_OBJECT_PATH, &device_path, G_TYPE_INVALID) != FALSE)
         {
           DBusGProxy *device;
-          device = dbus_g_proxy_new_for_name (connection, "org.bluez", device_path, "org.bluez.Device");
+          device = dbus_g_proxy_new_for_name (DBUS_G_CONNECTION_FROM_CONNECTION(conn), "org.bluez", device_path, "org.bluez.Device");
           name = _get_bluetooth_name_and_icon (device, icon_name);
           g_object_unref (device);
         }
@@ -254,7 +262,8 @@ _get_bluetooth_device_properties (const char *bdaddr, char **icon_name)
 
   g_ptr_array_free (adapters, TRUE);
   g_object_unref (manager);
-  dbus_g_connection_unref (connection);
+  dbus_connection_close (conn);
+  dbus_connection_unref (conn);
 
   return name;
 }
