@@ -1,3 +1,10 @@
+2009-02-04  Ryan Lortie  <desrt@desrt.ca>
+
+	Bug 570481 – Please add translator comments
+
+	* daemon/gvfsbackendtrash.c: use clearer language to make it easier to
+	translate (not to mention, easier to understand in English).
+	
 2009-02-03  Bastien Nocera  <hadess@hadess.net>
 
 	Bug 570193 – Mounting phone connected via Bluetooth fails

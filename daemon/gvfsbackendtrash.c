@@ -367,7 +367,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
 
   if (filename[1] == '\0')
     g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                 _("Can't delete trash"));
+                 _("The trash folder may not be deleted"));
   else
     {
       gboolean is_toplevel;
@@ -423,7 +423,7 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
 
   if (source[1] == '\0')
     g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                 _("Can't pull trash"));
+                 _("The trash folder may not be deleted"));
   else
     {
       gboolean is_toplevel;
