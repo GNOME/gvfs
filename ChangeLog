@@ -1,3 +1,16 @@
+2009-02-05  Bastien Nocera  <hadess@hadess.net>
+
+	Bug 563788 – GNOME Goal: Clean up GLib and GTK+ includes
+
+	* client/gvfsuriutils.h:
+	* daemon/gvfsbackendburn.c:
+	* daemon/gvfsbackendcomputer.c:
+	* daemon/gvfsbackenddnssd.c:
+	* daemon/gvfsbackendnetwork.c:
+	* daemon/gvfsdaemonutils.c:
+	* daemon/mount.c: Fix build for single GTK+ include, patch
+	from Luis Menina <liberforce@freeside.fr> (Closes: #563788)
+
 2009-02-04  Ryan Lortie  <desrt@desrt.ca>
 
 	Bug 570481 – Please add translator comments

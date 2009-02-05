@@ -26,7 +26,6 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gi18n.h>
-#include <glib/gurifuncs.h>
 #include <gio/gio.h>
 
 #include <avahi-client/client.h>

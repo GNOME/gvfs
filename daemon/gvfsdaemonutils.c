@@ -31,7 +31,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include <glib/gthread.h>
+#include <glib.h>
 #include <glib/gi18n.h>
 
 #include <gio/gio.h>

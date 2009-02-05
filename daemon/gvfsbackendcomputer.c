@@ -32,11 +32,11 @@
 #include <fcntl.h>
 #include <string.h>
 
+#include <glib.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <gio/gunixmounts.h>
-#include <glib/gurifuncs.h>
 
 #include "gvfsbackendcomputer.h"
 #include "gvfsmonitor.h"
