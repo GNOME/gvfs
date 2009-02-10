@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-12 15:19+0100\n"
-"PO-Revision-Date: 2009-01-12 15:22+0100\n"
+"POT-Creation-Date: 2009-02-10 08:02+0100\n"
+"PO-Revision-Date: 2009-02-10 08:02+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -83,15 +83,17 @@ msgstr "Ugyldig returverdi fra monitor_file"
 #: ../client/gdaemonfileinputstream.c:1032
 #: ../client/gdaemonfileoutputstream.c:458
 #: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:741
-#: ../daemon/gvfsbackendobexftp.c:762 ../daemon/gvfsbackendobexftp.c:881
-#: ../daemon/gvfsbackendobexftp.c:1018 ../daemon/gvfsbackendobexftp.c:1082
-#: ../daemon/gvfsbackendobexftp.c:1219 ../daemon/gvfsbackendobexftp.c:1246
-#: ../daemon/gvfsbackendobexftp.c:1305 ../daemon/gvfsbackendobexftp.c:1327
-#: ../daemon/gvfsbackendobexftp.c:1387 ../daemon/gvfsbackendobexftp.c:1406
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:1060
+#: ../daemon/gvfsbackendobexftp.c:1081 ../daemon/gvfsbackendobexftp.c:1200
+#: ../daemon/gvfsbackendobexftp.c:1337 ../daemon/gvfsbackendobexftp.c:1401
+#: ../daemon/gvfsbackendobexftp.c:1601 ../daemon/gvfsbackendobexftp.c:1708
+#: ../daemon/gvfsbackendobexftp.c:1858 ../daemon/gvfsbackendobexftp.c:1885
+#: ../daemon/gvfsbackendobexftp.c:1944 ../daemon/gvfsbackendobexftp.c:1966
+#: ../daemon/gvfsbackendobexftp.c:2029 ../daemon/gvfsbackendobexftp.c:2048
 #: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
+#, c-format
 msgid "Operation was cancelled"
 msgstr "Operasjonen ble avbrutt"
 
@@ -180,7 +182,9 @@ msgstr "Feil i oppslag av «%s» tjeneste «%s» på domene «%s»"
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
-msgstr "Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-poster mangler. Nøkler som kreves: «%s»."
+msgstr ""
+"Feil ved oppslag av «%s»-tjeneste «%s» i domene «%s». En eller flere TXT-poster "
+"mangler. Nøkler som kreves: «%s»."
 
 #: ../common/gvfsdnssdresolver.c:1126
 #, c-format
@@ -259,14 +263,14 @@ msgstr "Ingen vertsnavn oppgitt"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
 #: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:561 ../daemon/gvfsbackendobexftp.c:572
-#: ../daemon/gvfsbackendsmb.c:641
+#: ../daemon/gvfsbackendobexftp.c:836 ../daemon/gvfsbackendobexftp.c:852
+#: ../daemon/gvfsbackendobexftp.c:871 ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
 msgstr "Ugyldige monteringsspesifikasjon"
 
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:571 ../daemon/gvfsbackenddnssd.c:392
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:398
 #: ../daemon/gvfsbackendftp.c:2261 ../daemon/gvfsbackendnetwork.c:646
 #: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
 #: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
@@ -274,50 +278,51 @@ msgstr "Ugyldige monteringsspesifikasjon"
 msgid "File doesn't exist"
 msgstr "Filen eksisterer ikke"
 
-#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:679
-#: ../daemon/gvfsbackendcomputer.c:650 ../daemon/gvfsbackenddnssd.c:439
+#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:1042 ../daemon/gvfsbackendnetwork.c:693
 msgid "The file is not a directory"
 msgstr "Filen er ikke en katalog"
 
 #. Translators: This is the name of the backend
-#: ../daemon/gvfsbackendburn.c:345
+#: ../daemon/gvfsbackendburn.c:346
 msgid "Burn"
 msgstr "Brenn"
 
-#: ../daemon/gvfsbackendburn.c:375
+#: ../daemon/gvfsbackendburn.c:376
 msgid "Unable to create temporary directory"
 msgstr "Kan ikke opprette midlertidig katalog"
 
-#: ../daemon/gvfsbackendburn.c:404 ../daemon/gvfsbackendburn.c:415
-#: ../daemon/gvfsbackendburn.c:450 ../daemon/gvfsbackendburn.c:671
-#: ../daemon/gvfsbackendburn.c:718 ../daemon/gvfsbackendburn.c:744
-#: ../daemon/gvfsbackendburn.c:782 ../daemon/gvfsbackendgphoto2.c:1063
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1063
 #: ../daemon/gvfsbackendgphoto2.c:1916 ../daemon/gvfsbackendgphoto2.c:2626
-#: ../daemon/gvfsbackendtrash.c:214
+#: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "Filen eller katalogen finnes ikke"
 
-#: ../daemon/gvfsbackendburn.c:424 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2183
 msgid "Directory not empty"
 msgstr "Katalogen er ikke tom"
 
-#: ../daemon/gvfsbackendburn.c:458 ../daemon/gvfsbackendburn.c:905
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendobexftp.c:1783
 msgid "Can't copy file over directory"
 msgstr "Kan ikke kopiere fil over katalog"
 
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendburn.c:650
+#: ../daemon/gvfsbackendburn.c:651
 msgid "CD/DVD Creator"
 msgstr "CD/DVD-oppretting"
 
-#: ../daemon/gvfsbackendburn.c:754 ../daemon/gvfsbackendburn.c:790
-#: ../daemon/gvfsbackendburn.c:925 ../daemon/gvfsbackendgphoto2.c:2700
+#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2700
 msgid "File exists"
 msgstr "Filen eksisterer"
 
-#: ../daemon/gvfsbackendburn.c:828 ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsbackendburn.c:829 ../daemon/gvfsjobcloseread.c:112
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:169
 #: ../daemon/gvfsjobcreatemonitor.c:140 ../daemon/gvfsjobcreatemonitor.c:151
 #: ../daemon/gvfsjobcreatemonitor.c:174 ../daemon/gvfsjobcreatemonitor.c:192
@@ -337,23 +342,24 @@ msgstr "Filen eksisterer"
 msgid "Operation not supported by backend"
 msgstr "Operasjonen ikke tillatt av motoren"
 
-#: ../daemon/gvfsbackendburn.c:853
+#: ../daemon/gvfsbackendburn.c:854
 msgid "No such file or directory in target path"
 msgstr "Fil eller katalog finnes ikke i målsti"
 
-#: ../daemon/gvfsbackendburn.c:876
+#: ../daemon/gvfsbackendburn.c:877 ../daemon/gvfsbackendobexftp.c:1752
 msgid "Can't copy directory over directory"
 msgstr "Kan ikke kopiere katalog over katalog"
 
-#: ../daemon/gvfsbackendburn.c:885
+#: ../daemon/gvfsbackendburn.c:886 ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Target file exists"
 msgstr "Målfilen eksisterer"
 
-#: ../daemon/gvfsbackendburn.c:892
+#: ../daemon/gvfsbackendburn.c:893 ../daemon/gvfsbackendobexftp.c:1767
 msgid "Can't recursively copy directory"
 msgstr "Kan ikke kopiere katalog rekursivt"
 
-#: ../daemon/gvfsbackendburn.c:951 ../daemon/gvfsbackendcomputer.c:730
+#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendcomputer.c:731
 #: ../daemon/gvfsbackendgphoto2.c:2281 ../daemon/gvfsbackendgphoto2.c:2490
 #: ../daemon/gvfsbackendgphoto2.c:2587 ../daemon/gvfsbackendgphoto2.c:2679
 msgid "Not supported"
@@ -435,48 +441,48 @@ msgstr "Filen eksisterer ikke eller er ikke et lydspor"
 msgid "Audio CD Filesystem Service"
 msgstr "Filsystemtjeneste for lyd-CD"
 
-#: ../daemon/gvfsbackendcomputer.c:178 ../daemon/gvfsbackendcomputer.c:692
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
 msgid "Computer"
 msgstr "Datamaskin"
 
-#: ../daemon/gvfsbackendcomputer.c:465
+#: ../daemon/gvfsbackendcomputer.c:466
 msgid "Filesystem"
 msgstr "Filsystem"
 
-#: ../daemon/gvfsbackendcomputer.c:589 ../daemon/gvfsbackendgphoto2.c:1598
-#: ../daemon/gvfsbackendobexftp.c:727 ../daemon/gvfsbackendsmb.c:684
-#: ../daemon/gvfsbackendtrash.c:230
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
+#: ../daemon/gvfsbackendobexftp.c:1046 ../daemon/gvfsbackendsmb.c:684
+#: ../daemon/gvfsbackendtrash.c:232
 #, c-format
 msgid "Can't open directory"
 msgstr "Kan ikke åpne katalog"
 
-#: ../daemon/gvfsbackendcomputer.c:593
+#: ../daemon/gvfsbackendcomputer.c:594
 msgid "Can't open mountable file"
 msgstr "Kan ikke åpne monterbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:778 ../daemon/gvfsbackendsftp.c:1044
+#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1044
 #, c-format
 msgid "Internal error: %s"
 msgstr "Intern feil: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:810 ../daemon/gvfsbackendcomputer.c:927
+#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
 msgid "Can't mount file"
 msgstr "Kan ikke montere fil"
 
-#: ../daemon/gvfsbackendcomputer.c:822
+#: ../daemon/gvfsbackendcomputer.c:823
 msgid "No media in the drive"
 msgstr "Ingen medie i stasjonen"
 
-#: ../daemon/gvfsbackendcomputer.c:879 ../daemon/gvfsbackendcomputer.c:970
-#: ../daemon/gvfsbackendcomputer.c:1070
+#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
+#: ../daemon/gvfsbackendcomputer.c:1071
 msgid "Not a mountable file"
 msgstr "Ikke en monterbar fil"
 
-#: ../daemon/gvfsbackendcomputer.c:985
+#: ../daemon/gvfsbackendcomputer.c:986
 msgid "Can't unmount file"
 msgstr "Kan ikke avmontere fil"
 
-#: ../daemon/gvfsbackendcomputer.c:1101
+#: ../daemon/gvfsbackendcomputer.c:1102
 msgid "Can't eject file"
 msgstr "Kan ikke løse ut fil"
 
@@ -546,20 +552,20 @@ msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Lokalt nettverk"
 
-#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Kan ikke overvåke fil eller katalog."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:748
+#: ../daemon/gvfsbackenddnssd.c:754
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
 #: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Nettverk"
@@ -888,17 +894,21 @@ msgstr "Vis nettverkslokasjoner"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:387 ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendobexftp.c:656 ../daemon/gvfsbackendsmb.c:538
 #: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: ../daemon/gvfsbackendobexftp.c:666
+#: ../daemon/gvfsbackendobexftp.c:865
+msgid "USB support missing. Please contact your software vendor"
+msgstr "Støtte for USB mangler. Vennligst kontakt din programvareleverandør"
+
+#: ../daemon/gvfsbackendobexftp.c:985
 msgid "Connection to the device lost"
 msgstr "Mistet forbindelsen til enheten"
 
-#: ../daemon/gvfsbackendobexftp.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1482
 msgid "Device requires a software update"
 msgstr "Enheten krever en programvareoppdatering"
 
@@ -1118,24 +1128,19 @@ msgstr "Ikke en vanlig fil"
 msgid "Windows Network Filesystem Service"
 msgstr "Filsystemtjeneste for Windows nettverk"
 
-#: ../daemon/gvfsbackendtrash.c:344
+#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 #, c-format
-msgid "Can't delete trash"
-msgstr "Kan ikke slette søppel"
+msgid "The trash folder may not be deleted"
+msgstr "Papirkurven kan ikke slettes"
 
-#: ../daemon/gvfsbackendtrash.c:361 ../daemon/gvfsbackendtrash.c:413
+#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
 #, c-format
 msgid "Items in the trash may not be modified"
 msgstr "Oppføringer i papirkurven kan ikke endres"
 
-#: ../daemon/gvfsbackendtrash.c:399
-#, c-format
-msgid "Can't pull trash"
-msgstr "Kan ikke angre papirkurv"
-
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:708 ../daemon/gvfsbackendtrash.c:816
+#: ../daemon/gvfsbackendtrash.c:735 ../daemon/gvfsbackendtrash.c:843
 msgid "Trash"
 msgstr "Papirkurv"
 
@@ -1189,28 +1194,28 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "Prøv «%s --help» for mer informasjon."
 
-#: ../daemon/mount.c:455
+#: ../daemon/mount.c:456
 msgid "Invalid arguments from spawned child"
 msgstr "Ugyldige argumenter fra startet underprosess"
 
-#: ../daemon/mount.c:766
+#: ../daemon/mount.c:767
 #, c-format
 msgid "Automount failed: %s"
 msgstr "Automatisk montering feilet: %s"
 
-#: ../daemon/mount.c:811 ../daemon/mount.c:885
+#: ../daemon/mount.c:812 ../daemon/mount.c:886
 msgid "The specified location is not mounted"
 msgstr "Spesifisert lokasjon er ikke montert"
 
-#: ../daemon/mount.c:816
+#: ../daemon/mount.c:817
 msgid "The specified location is not supported"
 msgstr "Spesifisert lokasjon er ikke støttet"
 
-#: ../daemon/mount.c:1022
+#: ../daemon/mount.c:1023
 msgid "Location is already mounted"
 msgstr "Lokasjonen er allerede montert"
 
-#: ../daemon/mount.c:1030
+#: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "Lokasjonen kan ikke monteres"
 
