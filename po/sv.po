@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-08 01:26+0100\n"
-"PO-Revision-Date: 2009-01-08 01:27+0100\n"
+"POT-Creation-Date: 2009-02-11 12:52+0100\n"
+"PO-Revision-Date: 2009-02-11 12:53+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -96,22 +96,25 @@ msgstr "Ogiltigt svarsvärde från monitor_file"
 #: ../client/gdaemonfileoutputstream.c:458
 #: ../client/gdaemonfileoutputstream.c:636
 #: ../client/gdaemonfileoutputstream.c:831
-#: ../daemon/gvfsbackendobexftp.c:741
-#: ../daemon/gvfsbackendobexftp.c:762
-#: ../daemon/gvfsbackendobexftp.c:881
-#: ../daemon/gvfsbackendobexftp.c:1018
-#: ../daemon/gvfsbackendobexftp.c:1082
-#: ../daemon/gvfsbackendobexftp.c:1219
-#: ../daemon/gvfsbackendobexftp.c:1246
-#: ../daemon/gvfsbackendobexftp.c:1305
-#: ../daemon/gvfsbackendobexftp.c:1327
-#: ../daemon/gvfsbackendobexftp.c:1387
-#: ../daemon/gvfsbackendobexftp.c:1406
+#: ../daemon/gvfsbackendobexftp.c:1060
+#: ../daemon/gvfsbackendobexftp.c:1081
+#: ../daemon/gvfsbackendobexftp.c:1200
+#: ../daemon/gvfsbackendobexftp.c:1337
+#: ../daemon/gvfsbackendobexftp.c:1401
+#: ../daemon/gvfsbackendobexftp.c:1601
+#: ../daemon/gvfsbackendobexftp.c:1708
+#: ../daemon/gvfsbackendobexftp.c:1858
+#: ../daemon/gvfsbackendobexftp.c:1885
+#: ../daemon/gvfsbackendobexftp.c:1944
+#: ../daemon/gvfsbackendobexftp.c:1966
+#: ../daemon/gvfsbackendobexftp.c:2029
+#: ../daemon/gvfsbackendobexftp.c:2048
 #: ../daemon/gvfsbackendsmb.c:1105
 #: ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120
 #: ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
+#, c-format
 msgid "Operation was cancelled"
 msgstr "Åtgärden avbröts"
 
@@ -285,8 +288,9 @@ msgstr "Inget värdnamn angivet"
 #: ../daemon/gvfsbackendarchive.c:555
 #: ../daemon/gvfsbackenddav.c:1591
 #: ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:561
-#: ../daemon/gvfsbackendobexftp.c:572
+#: ../daemon/gvfsbackendobexftp.c:836
+#: ../daemon/gvfsbackendobexftp.c:852
+#: ../daemon/gvfsbackendobexftp.c:871
 #: ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
 msgstr "Ogiltig monteringsspecifikation"
@@ -296,9 +300,9 @@ msgstr "Ogiltig monteringsspecifikation"
 #: ../daemon/gvfsbackendarchive.c:715
 #: ../daemon/gvfsbackendcdda.c:921
 #: ../daemon/gvfsbackendcomputer.c:572
-#: ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackenddnssd.c:398
 #: ../daemon/gvfsbackendftp.c:2262
-#: ../daemon/gvfsbackendnetwork.c:647
+#: ../daemon/gvfsbackendnetwork.c:646
 #: ../daemon/gvfsbackendsmbbrowse.c:1085
 #: ../daemon/gvfsbackendsmbbrowse.c:1152
 #: ../daemon/gvfsbackendsmbbrowse.c:1323
@@ -310,9 +314,9 @@ msgstr "Filen finns inte"
 #: ../daemon/gvfsbackendarchive.c:724
 #: ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:651
-#: ../daemon/gvfsbackenddnssd.c:440
+#: ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:1043
-#: ../daemon/gvfsbackendnetwork.c:694
+#: ../daemon/gvfsbackendnetwork.c:693
 msgid "The file is not a directory"
 msgstr "Filen är inte en katalog"
 
@@ -335,7 +339,7 @@ msgstr "Kunde inte skapa temporärkatalog"
 #: ../daemon/gvfsbackendgphoto2.c:1063
 #: ../daemon/gvfsbackendgphoto2.c:1916
 #: ../daemon/gvfsbackendgphoto2.c:2626
-#: ../daemon/gvfsbackendtrash.c:214
+#: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "Ingen sådan fil eller katalog"
@@ -347,6 +351,7 @@ msgstr "Katalogen är inte tom"
 
 #: ../daemon/gvfsbackendburn.c:459
 #: ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendobexftp.c:1783
 msgid "Can't copy file over directory"
 msgstr "Kan inte kopiera fil över katalog"
 
@@ -403,14 +408,18 @@ msgid "No such file or directory in target path"
 msgstr "Ingen sådan fil eller katalog i målsökväg"
 
 #: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendobexftp.c:1752
 msgid "Can't copy directory over directory"
 msgstr "Kan inte kopiera katalog över katalog"
 
 #: ../daemon/gvfsbackendburn.c:886
+#: ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Target file exists"
 msgstr "Målfilen finns"
 
 #: ../daemon/gvfsbackendburn.c:893
+#: ../daemon/gvfsbackendobexftp.c:1767
 msgid "Can't recursively copy directory"
 msgstr "Kan inte kopiera katalog rekursivt"
 
@@ -518,9 +527,9 @@ msgstr "Filsystem"
 
 #: ../daemon/gvfsbackendcomputer.c:590
 #: ../daemon/gvfsbackendgphoto2.c:1598
-#: ../daemon/gvfsbackendobexftp.c:727
+#: ../daemon/gvfsbackendobexftp.c:1046
 #: ../daemon/gvfsbackendsmb.c:684
-#: ../daemon/gvfsbackendtrash.c:230
+#: ../daemon/gvfsbackendtrash.c:232
 #, c-format
 msgid "Can't open directory"
 msgstr "Kan inte öppna katalog"
@@ -633,25 +642,25 @@ msgid "Backup file creation failed"
 msgstr "Skapandet av säkerhetskopia misslyckades"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:487
-#: ../daemon/gvfsbackendnetwork.c:394
+#: ../daemon/gvfsbackenddnssd.c:492
+#: ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Lokalt nätverk"
 
-#: ../daemon/gvfsbackenddnssd.c:731
-#: ../daemon/gvfsbackendnetwork.c:798
+#: ../daemon/gvfsbackenddnssd.c:736
+#: ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Kan inte övervaka fil eller katalog."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:749
+#: ../daemon/gvfsbackenddnssd.c:754
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:750
-#: ../daemon/gvfsbackendnetwork.c:733
+#: ../daemon/gvfsbackenddnssd.c:755
+#: ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882
 #: ../daemon/gvfsbackendnetwork.c:883
-#: ../daemon/gvfsbackendnetwork.c:884
 msgid "Network"
 msgstr "Nätverk"
 
@@ -987,14 +996,14 @@ msgid "Directory notification not supported"
 msgstr "Notifiering för katalog stöds inte"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:270
+#: ../daemon/gvfsbackendnetwork.c:269
 #: ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Windows-nätverk"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:932
+#: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
 msgstr "Övervakare för nätverksplatser"
 
@@ -1004,18 +1013,22 @@ msgstr "Övervakare för nätverksplatser"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:387
+#: ../daemon/gvfsbackendobexftp.c:656
 #: ../daemon/gvfsbackendsmb.c:538
 #: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s på %s"
 
-#: ../daemon/gvfsbackendobexftp.c:666
+#: ../daemon/gvfsbackendobexftp.c:865
+msgid "USB support missing. Please contact your software vendor"
+msgstr "USB-stöd saknas. Kontakta din programtillverkare"
+
+#: ../daemon/gvfsbackendobexftp.c:985
 msgid "Connection to the device lost"
 msgstr "Anslutning till enheten förlorades"
 
-#: ../daemon/gvfsbackendobexftp.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1482
 msgid "Device requires a software update"
 msgstr "Enheten kräver en programuppdatering"
 
@@ -1252,26 +1265,22 @@ msgstr "Inte en vanlig fil"
 msgid "Windows Network Filesystem Service"
 msgstr "Filsystemstjänst för Windows-nätverk"
 
-#: ../daemon/gvfsbackendtrash.c:344
+#: ../daemon/gvfsbackendtrash.c:370
+#: ../daemon/gvfsbackendtrash.c:426
 #, c-format
-msgid "Can't delete trash"
-msgstr "Kan inte ta bort papperskorg"
+msgid "The trash folder may not be deleted"
+msgstr "Papperskorgsmappen kan inte tas bort"
 
-#: ../daemon/gvfsbackendtrash.c:361
-#: ../daemon/gvfsbackendtrash.c:413
+#: ../daemon/gvfsbackendtrash.c:387
+#: ../daemon/gvfsbackendtrash.c:440
 #, c-format
 msgid "Items in the trash may not be modified"
 msgstr "Objekt i papperskorgen kan inte ändras"
 
-#: ../daemon/gvfsbackendtrash.c:399
-#, c-format
-msgid "Can't pull trash"
-msgstr ""
-
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:708
-#: ../daemon/gvfsbackendtrash.c:816
+#: ../daemon/gvfsbackendtrash.c:735
+#: ../daemon/gvfsbackendtrash.c:843
 msgid "Trash"
 msgstr "Papperskorg"
 
@@ -1796,6 +1805,8 @@ msgstr "FILER... - öppna FILER med registrerade program."
 msgid "Opens the file(s) with the default application registered to handle the type of the file."
 msgstr "Öppnar fil(er) med standardprogrammet registrerat att hantera den typen av fil."
 
+#~ msgid "Can't delete trash"
+#~ msgstr "Kan inte ta bort papperskorg"
 #~ msgid "%s (in trash)"
 #~ msgstr "%s (i papperskorg)"
 #~ msgid "Trash directory notification not supported"
