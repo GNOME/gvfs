@@ -1,0 +1,1806 @@
+# Romanian translation for gvfs
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the gvfs package.
+# Adi Roiban https://launchpad.net/~adiroiban, 2008, 2009
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gvfs\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
+"POT-Creation-Date: 2009-02-11 11:54+0000\n"
+"PO-Revision-Date: 2009-02-12 14:31+0200\n"
+"Last-Translator: Adi Roiban <adi@roiban.ro>\n"
+"Language-Team: Gnome Romanian Team <gnomero-list@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 ? 0: (((n % 100 > 19) || ((n % 100 == 0) && (n != 0))) ? 2: 1));\n"
+
+#: ../client/gdaemonfile.c:482
+#: ../client/gdaemonfile.c:1984
+msgid "Operation not supported, files on different mounts"
+msgstr "Operație nesuportată, fișiere pe partiții diferite"
+
+#: ../client/gdaemonfile.c:787
+msgid "Invalid return value from get_info"
+msgstr "Valoare returnată nevalidă de la „get_info”"
+
+#: ../client/gdaemonfile.c:816
+#: ../client/gdaemonfile.c:1563
+msgid "Invalid return value from query_info"
+msgstr "Valoare returnată nevalidă de la „query_info"
+
+#: ../client/gdaemonfile.c:894
+#: ../client/gvfsiconloadable.c:338
+msgid "Couldn't get stream file descriptor"
+msgstr "Nu s-a putut obține descriptorul de fișier pentru flux"
+
+#: ../client/gdaemonfile.c:926
+#: ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055
+#: ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176
+#: ../client/gdaemonfile.c:2252
+#: ../client/gdaemonfile.c:2330
+#: ../client/gdaemonfile.c:2589
+#: ../client/gvfsiconloadable.c:370
+msgid "Invalid return value from open"
+msgstr "Valoare returnată nevalidă de la „open”"
+
+#: ../client/gdaemonfile.c:1006
+#: ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124
+#: ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:2220
+#: ../client/gvfsiconloadable.c:155
+msgid "Didn't get stream file descriptor"
+msgstr "Nu s-a obținut descriptorul de fișier pentru flux"
+
+#: ../client/gdaemonfile.c:1238
+#: ../client/gdaemonfile.c:1255
+msgid "Invalid return value from call"
+msgstr "Valoare returnată nevalidă de la „call”"
+
+#: ../client/gdaemonfile.c:1534
+msgid "Invalid return value from get_filesystem_info"
+msgstr "Valoare returnată nevalidă de la „get_filesystem_infol”"
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1647
+msgid "Could not find enclosing mount"
+msgstr "Nu s-a putut găsi punctul de montare asociat"
+
+#: ../client/gdaemonfile.c:1677
+#, c-format
+msgid "Invalid filename %s"
+msgstr "Nume de fișier %s nevalid"
+
+#: ../client/gdaemonfile.c:1719
+msgid "Invalid return value from query_filesystem_info"
+msgstr "Valoare returnată nevalidă de la „query_filesystem_info”"
+
+#: ../client/gdaemonfile.c:2142
+msgid "Invalid return value from monitor_dir"
+msgstr "Valoare returnată nevalidă de la „monitor_dir”"
+
+#: ../client/gdaemonfile.c:2191
+msgid "Invalid return value from monitor_file"
+msgstr "Valoare returnată nevalidă de la „monitor_file”"
+
+#: ../client/gdaemonfileenumerator.c:351
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831
+#: ../daemon/gvfsbackendobexftp.c:1060
+#: ../daemon/gvfsbackendobexftp.c:1081
+#: ../daemon/gvfsbackendobexftp.c:1200
+#: ../daemon/gvfsbackendobexftp.c:1337
+#: ../daemon/gvfsbackendobexftp.c:1401
+#: ../daemon/gvfsbackendobexftp.c:1601
+#: ../daemon/gvfsbackendobexftp.c:1708
+#: ../daemon/gvfsbackendobexftp.c:1858
+#: ../daemon/gvfsbackendobexftp.c:1885
+#: ../daemon/gvfsbackendobexftp.c:1944
+#: ../daemon/gvfsbackendobexftp.c:1966
+#: ../daemon/gvfsbackendobexftp.c:2029
+#: ../daemon/gvfsbackendobexftp.c:2048
+#: ../daemon/gvfsbackendsmb.c:1105
+#: ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120
+#: ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+#, c-format
+msgid "Operation was cancelled"
+msgstr "Operațiunea a fost anulată"
+
+#: ../client/gdaemonfileinputstream.c:450
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1300
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:402
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr "Eroare în protocol flux: %s"
+
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1064
+msgid "End of stream"
+msgstr "Sfârșit de flux"
+
+#: ../client/gdaemonfileinputstream.c:1207
+#: ../client/gdaemonfileoutputstream.c:942
+msgid "Seek not supported on stream"
+msgstr "Derularea în flux nu este suportată"
+
+#: ../client/gdaemonfileinputstream.c:1237
+msgid "The query info operation is not supported"
+msgstr "Operația de interogare informații nu este suportată"
+
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr "Interogarea informației nu este suportată în flux"
+
+#: ../client/gdaemonvfs.c:830
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr "Eroare la obținerea informațiilor de montare: %s"
+
+#: ../client/gvfsdaemondbus.c:568
+#: ../client/gvfsdaemondbus.c:999
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr "Eroare conectare la serviciu: %s"
+
+#: ../client/gvfsiconloadable.c:145
+msgid "Invalid return value from open_icon_for_read"
+msgstr "Valoare returnată nevalidă pentru „open_icon_for_read”"
+
+#: ../common/gsysutils.c:136
+#, c-format
+msgid "Error creating socket: %s"
+msgstr "Eroare creare socket: %s"
+
+#: ../common/gsysutils.c:174
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr "Eroare conectare la socket: %s"
+
+#: ../common/gvfsdaemonprotocol.c:454
+msgid "Invalid file info format"
+msgstr "Format nevalid informații fișier"
+
+#: ../common/gvfsdaemonprotocol.c:471
+msgid "Invalid attribute info list content"
+msgstr "Atribut nevalid în conținut informații fișier"
+
+#: ../common/gvfsdnssdresolver.c:208
+#, c-format
+msgid "Error initializing Avahi: %s"
+msgstr "Eroare la inițializarea Avahi: %s"
+
+#: ../common/gvfsdnssdresolver.c:254
+#, c-format
+msgid "Error creating Avahi resolver: %s"
+msgstr "Eroare la crearea rezolvatorului Avahi: %s"
+
+#: ../common/gvfsdnssdresolver.c:1094
+#, c-format
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "Eroare la rezolvarea „%s” serviciu „%s” în domeniul „%s”"
+
+#: ../common/gvfsdnssdresolver.c:1114
+#, c-format
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT records are missing. Keys required: \"%s\"."
+msgstr "Eroare la rezolvarea „%s” serviciu „%s” în domeniul „%s”. Una sau mai multe întrări TXT lispsesc. Chei necesare: „%s”."
+
+#: ../common/gvfsdnssdresolver.c:1126
+#, c-format
+msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "Timp expirat la rezolvarea „%s” serviciu „%s” în domeniul „%s”"
+
+#: ../common/gvfsdnssdutils.c:233
+#: ../common/gvfsdnssdutils.c:263
+#: ../common/gvfsdnssdutils.c:280
+#, c-format
+msgid "Malformed dns-sd encoded_triple '%s'"
+msgstr "Intrare dns-sd encoded_triple „%s” defectă"
+
+#: ../common/gvfsicon.c:250
+#, c-format
+msgid "Can't handle version %d of GVfsIcon encoding"
+msgstr "Nu se poate opera versiunea %d a codării GVfsIcon"
+
+#: ../common/gvfsicon.c:260
+msgid "Malformed input data for GVfsIcon"
+msgstr "Date de intrare defecte pentru GVfsIcon"
+
+#: ../daemon/daemon-main.c:63
+#: ../daemon/daemon-main.c:206
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr "Eroare conectare la D-Bus: %s"
+
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+#: ../daemon/daemon-main.c:78
+#, c-format
+msgid "%s Filesystem Service"
+msgstr "Serviciu sistem de fișiere %s"
+
+#: ../daemon/daemon-main.c:97
+#, c-format
+msgid "Error: %s"
+msgstr "Eroare: %s"
+
+#: ../daemon/daemon-main.c:131
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr "Utilizare: %s --spawner dbus-id cale_obiect"
+
+#: ../daemon/daemon-main.c:155
+#: ../daemon/daemon-main.c:173
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr "Utilizare: %s cheie=valoare cheie=valoare ..."
+
+#: ../daemon/daemon-main.c:171
+#, c-format
+msgid "No mount type specified"
+msgstr "Tip montare nespecificat"
+
+#: ../daemon/daemon-main.c:241
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr "punctul de montare pentru %s rulează deja"
+
+#: ../daemon/daemon-main.c:252
+msgid "error starting mount daemon"
+msgstr "eroare la pornirea serviciului de montare"
+
+#. FIXME: this should really be "/ in %s", but can't change
+#. due to string freeze.
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendarchive.c:315
+#: ../daemon/gvfsbackendftp.c:1094
+#: ../daemon/gvfsbackendsftp.c:1903
+#, c-format
+msgid "/ on %s"
+msgstr "/ pe %s"
+
+#: ../daemon/gvfsbackendarchive.c:515
+#: ../daemon/gvfsbackendftp.c:1640
+#: ../daemon/gvfsbackendsftp.c:1566
+msgid "No hostname specified"
+msgstr "Nu ați specificat un nume de gazdă"
+
+#: ../daemon/gvfsbackendarchive.c:526
+#: ../daemon/gvfsbackendarchive.c:555
+#: ../daemon/gvfsbackenddav.c:1591
+#: ../daemon/gvfsbackendhttp.c:306
+#: ../daemon/gvfsbackendobexftp.c:836
+#: ../daemon/gvfsbackendobexftp.c:852
+#: ../daemon/gvfsbackendobexftp.c:871
+#: ../daemon/gvfsbackendsmb.c:641
+msgid "Invalid mount spec"
+msgstr "Specificații de montare nevalide"
+
+#: ../daemon/gvfsbackendarchive.c:636
+#: ../daemon/gvfsbackendarchive.c:686
+#: ../daemon/gvfsbackendarchive.c:715
+#: ../daemon/gvfsbackendcdda.c:921
+#: ../daemon/gvfsbackendcomputer.c:572
+#: ../daemon/gvfsbackenddnssd.c:398
+#: ../daemon/gvfsbackendftp.c:2262
+#: ../daemon/gvfsbackendnetwork.c:646
+#: ../daemon/gvfsbackendsmbbrowse.c:1085
+#: ../daemon/gvfsbackendsmbbrowse.c:1152
+#: ../daemon/gvfsbackendsmbbrowse.c:1323
+#: ../daemon/gvfsbackendsmbbrowse.c:1392
+#, c-format
+msgid "File doesn't exist"
+msgstr "Fișier neexistent"
+
+#: ../daemon/gvfsbackendarchive.c:724
+#: ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651
+#: ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendftp.c:1043
+#: ../daemon/gvfsbackendnetwork.c:693
+msgid "The file is not a directory"
+msgstr "Fișierul nu este un director"
+
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr "Scrie"
+
+#: ../daemon/gvfsbackendburn.c:376
+msgid "Unable to create temporary directory"
+msgstr "Nu s-a putut crea directorul temporar"
+
+#: ../daemon/gvfsbackendburn.c:405
+#: ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451
+#: ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719
+#: ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783
+#: ../daemon/gvfsbackendgphoto2.c:1063
+#: ../daemon/gvfsbackendgphoto2.c:1916
+#: ../daemon/gvfsbackendgphoto2.c:2626
+#: ../daemon/gvfsbackendtrash.c:216
+#, c-format
+msgid "No such file or directory"
+msgstr "Nu există un asemenea fișier sau director"
+
+#: ../daemon/gvfsbackendburn.c:425
+#: ../daemon/gvfsbackenddav.c:2183
+msgid "Directory not empty"
+msgstr "Directorul nu este gol"
+
+#: ../daemon/gvfsbackendburn.c:459
+#: ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendobexftp.c:1783
+msgid "Can't copy file over directory"
+msgstr "Nu se poate copia fișierul peste director"
+
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:651
+msgid "CD/DVD Creator"
+msgstr "Creare CD/DVD"
+
+#: ../daemon/gvfsbackendburn.c:755
+#: ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:926
+#: ../daemon/gvfsbackendgphoto2.c:2700
+msgid "File exists"
+msgstr "Fișierul există"
+
+#: ../daemon/gvfsbackendburn.c:829
+#: ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsjobclosewrite.c:120
+#: ../daemon/gvfsjobcopy.c:169
+#: ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151
+#: ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192
+#: ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256
+#: ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109
+#: ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:168
+#: ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148
+#: ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176
+#: ../daemon/gvfsjobopeniconforread.c:120
+#: ../daemon/gvfsjobpull.c:173
+#: ../daemon/gvfsjobpush.c:173
+#: ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150
+#: ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146
+#: ../daemon/gvfsjobwrite.c:120
+msgid "Operation not supported by backend"
+msgstr "Operația nu este admisă de către suport"
+
+#: ../daemon/gvfsbackendburn.c:854
+msgid "No such file or directory in target path"
+msgstr "Nu există un asemenea fișier sau director în calea specificată"
+
+#: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendobexftp.c:1752
+msgid "Can't copy directory over directory"
+msgstr "Nu se poate copia un director peste un alt director"
+
+#: ../daemon/gvfsbackendburn.c:886
+#: ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendobexftp.c:1791
+msgid "Target file exists"
+msgstr "Fișierul destinație există deja"
+
+#: ../daemon/gvfsbackendburn.c:893
+#: ../daemon/gvfsbackendobexftp.c:1767
+msgid "Can't recursively copy directory"
+msgstr "Nu se poate copia recursiv directorul"
+
+#: ../daemon/gvfsbackendburn.c:952
+#: ../daemon/gvfsbackendcomputer.c:731
+#: ../daemon/gvfsbackendgphoto2.c:2281
+#: ../daemon/gvfsbackendgphoto2.c:2490
+#: ../daemon/gvfsbackendgphoto2.c:2587
+#: ../daemon/gvfsbackendgphoto2.c:2679
+msgid "Not supported"
+msgstr "Nu este suportat"
+
+#: ../daemon/gvfsbackendcdda.c:299
+#: ../daemon/gvfsbackendgphoto2.c:1303
+msgid "Cannot connect to the system bus"
+msgstr "Nu s-a putut conecta la magistrala sistemului"
+
+#: ../daemon/gvfsbackendcdda.c:310
+#: ../daemon/gvfsbackendgphoto2.c:1315
+msgid "Cannot create libhal context"
+msgstr "Nu s-a putut crea contextul libhal"
+
+#: ../daemon/gvfsbackendcdda.c:324
+#: ../daemon/gvfsbackendgphoto2.c:1328
+msgid "Cannot initialize libhal"
+msgstr "Nu s-a putut inițializa libhal"
+
+#: ../daemon/gvfsbackendcdda.c:339
+#: ../daemon/gvfsbackendcdda.c:415
+msgid "No drive specified"
+msgstr "Nicio unitate specificată"
+
+#: ../daemon/gvfsbackendcdda.c:355
+#, c-format
+msgid "Cannot find drive %s"
+msgstr "Nu s-a găsit dispozitivul %s"
+
+#: ../daemon/gvfsbackendcdda.c:368
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr "Dispozitivul %s nu conține fișiere audio"
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:377
+#, c-format
+msgid "cdda mount on %s"
+msgstr "cdda montat în %s"
+
+#: ../daemon/gvfsbackendcdda.c:378
+#: ../daemon/gvfsbackendcdda.c:895
+#: ../monitor/hal/ghalmount.c:435
+#: ../monitor/hal/ghalvolume.c:233
+#: ../monitor/hal/ghalvolume.c:254
+#, c-format
+msgid "Audio Disc"
+msgstr "Disc audio"
+
+#: ../daemon/gvfsbackendcdda.c:439
+#: ../daemon/gvfsbackendgphoto2.c:1550
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] "Sistemul de fișiere este ocupat: %d fișier deschis"
+msgstr[1] "Sistemul de fișiere este ocupat: %d fișiere deschise"
+msgstr[2] "Sistemul de fișiere este ocupat: %d de fișiere deschise"
+
+#: ../daemon/gvfsbackendcdda.c:630
+#, c-format
+msgid "No such file %s on drive %s"
+msgstr "Nu există un asemenea fișier %s pe unitatea %s"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:739
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr "Eroare de la „paranoia” pe unitatea %s"
+
+#: ../daemon/gvfsbackendcdda.c:802
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr "Eroare la derularea în flux pe unitatea %s"
+
+#: ../daemon/gvfsbackendcdda.c:914
+#: ../daemon/gvfsbackendgphoto2.c:1606
+#, c-format
+msgid "No such file"
+msgstr "Nu există un asemena fișier"
+
+#: ../daemon/gvfsbackendcdda.c:928
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr "Fișierul nu există sau nu este o pistă audio"
+
+#: ../daemon/gvfsbackendcdda.c:1034
+msgid "Audio CD Filesystem Service"
+msgstr "Serviciu sistem de fișiere CD Audio"
+
+#: ../daemon/gvfsbackendcomputer.c:179
+#: ../daemon/gvfsbackendcomputer.c:693
+msgid "Computer"
+msgstr "Calculator"
+
+#: ../daemon/gvfsbackendcomputer.c:466
+msgid "Filesystem"
+msgstr "Sistem de fișiere"
+
+#: ../daemon/gvfsbackendcomputer.c:590
+#: ../daemon/gvfsbackendgphoto2.c:1598
+#: ../daemon/gvfsbackendobexftp.c:1046
+#: ../daemon/gvfsbackendsmb.c:684
+#: ../daemon/gvfsbackendtrash.c:232
+#, c-format
+msgid "Can't open directory"
+msgstr "Nu se poate deschide dosarul"
+
+#: ../daemon/gvfsbackendcomputer.c:594
+msgid "Can't open mountable file"
+msgstr "Nu s-a putut deschide fișierul montabil"
+
+#: ../daemon/gvfsbackendcomputer.c:779
+#: ../daemon/gvfsbackendsftp.c:1044
+#, c-format
+msgid "Internal error: %s"
+msgstr "Eroare internă: %s"
+
+#: ../daemon/gvfsbackendcomputer.c:811
+#: ../daemon/gvfsbackendcomputer.c:928
+msgid "Can't mount file"
+msgstr "Nu s-a putut monta fișierul"
+
+#: ../daemon/gvfsbackendcomputer.c:823
+msgid "No media in the drive"
+msgstr "Nu există mediu în unitate"
+
+#: ../daemon/gvfsbackendcomputer.c:880
+#: ../daemon/gvfsbackendcomputer.c:971
+#: ../daemon/gvfsbackendcomputer.c:1071
+msgid "Not a mountable file"
+msgstr "Nu este un fișier montabil"
+
+#: ../daemon/gvfsbackendcomputer.c:986
+msgid "Can't unmount file"
+msgstr "Nu se poate demonta fișierul"
+
+#: ../daemon/gvfsbackendcomputer.c:1102
+msgid "Can't eject file"
+msgstr "Nu se poate scoate fișierul"
+
+#: ../daemon/gvfsbackenddav.c:526
+#: ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackendhttp.c:252
+#, c-format
+msgid "HTTP Error: %s"
+msgstr "Eroare HTTP: %s"
+
+#: ../daemon/gvfsbackenddav.c:543
+msgid "Could not parse response"
+msgstr "Nu se poate analiza răspunsul"
+
+#: ../daemon/gvfsbackenddav.c:552
+msgid "Empty response"
+msgstr "Răspuns gol"
+
+#: ../daemon/gvfsbackenddav.c:560
+msgid "Unexpected reply from server"
+msgstr "Răspuns neașteptat de la server"
+
+#: ../daemon/gvfsbackenddav.c:1179
+#: ../daemon/gvfsbackenddav.c:1798
+msgid "Response invalid"
+msgstr "Răspuns nevalid"
+
+#: ../daemon/gvfsbackenddav.c:1322
+msgid "WebDAV share"
+msgstr "Partajare WebDAV"
+
+#: ../daemon/gvfsbackenddav.c:1324
+#, c-format
+msgid "Enter password for %s"
+msgstr "Introduceți parola pentru %s"
+
+#: ../daemon/gvfsbackenddav.c:1327
+msgid "Please enter proxy password"
+msgstr "Introduceți parola de proxy"
+
+#: ../daemon/gvfsbackenddav.c:1662
+#: ../daemon/gvfsbackenddav.c:1666
+msgid "Not a WebDAV enabled share"
+msgstr "Partanjare fără activare WebDav"
+
+#: ../daemon/gvfsbackenddav.c:1694
+#, c-format
+msgid "WebDAV on %s"
+msgstr "WebDAV pe %s"
+
+#: ../daemon/gvfsbackenddav.c:1754
+#: ../daemon/gvfsbackenddav.c:1827
+msgid "Could not create request"
+msgstr "Nu s-a putut crea cererea"
+
+#: ../daemon/gvfsbackenddav.c:1890
+#: ../daemon/gvfsbackenddav.c:2143
+#: ../daemon/gvfsbackenddav.c:2254
+#: ../daemon/gvfsbackendftp.c:1860
+#: ../daemon/gvfsbackendftp.c:2526
+#: ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackendsmb.c:1912
+msgid "Target file already exists"
+msgstr "Fișierul specificat există deja"
+
+#: ../daemon/gvfsbackenddav.c:1963
+#: ../daemon/gvfsbackendsftp.c:2836
+#: ../daemon/gvfsbackendsmb.c:1074
+msgid "The file was externally modified"
+msgstr "Fișierul a fost modificat de o aplicație externă"
+
+#: ../daemon/gvfsbackenddav.c:1994
+#: ../daemon/gvfsbackendsmb.c:1110
+#: ../daemon/gvfsbackendsmb.c:1929
+msgid "Backup file creation failed"
+msgstr "Crearea fișierului de „backup” a eșuat"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackenddnssd.c:492
+#: ../daemon/gvfsbackendnetwork.c:393
+msgid "Local Network"
+msgstr "Rețea locală"
+
+#: ../daemon/gvfsbackenddnssd.c:736
+#: ../daemon/gvfsbackendnetwork.c:797
+msgid "Can't monitor file or directory."
+msgstr "Nu se poate monitoriza fișierul sau directorul."
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:754
+msgid "Dns-SD"
+msgstr "Dns-SD"
+
+#: ../daemon/gvfsbackenddnssd.c:755
+#: ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882
+#: ../daemon/gvfsbackendnetwork.c:883
+msgid "Network"
+msgstr "Rețea"
+
+#: ../daemon/gvfsbackendftp.c:252
+msgid "Accounts are unsupported"
+msgstr "Conturile nu sunt suportate"
+
+#: ../daemon/gvfsbackendftp.c:256
+msgid "Host closed connection"
+msgstr "Conexiune închisă de gazdă"
+
+#: ../daemon/gvfsbackendftp.c:260
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Nu se poate deschide conexiunea de date. Probabil este blocată de firewall?"
+
+#: ../daemon/gvfsbackendftp.c:264
+msgid "Data connection closed"
+msgstr "Conexiune date închisă"
+
+#: ../daemon/gvfsbackendftp.c:271
+#: ../daemon/gvfsbackendftp.c:275
+msgid "Operation failed"
+msgstr "Operațiune eșuată"
+
+#: ../daemon/gvfsbackendftp.c:280
+msgid "No space left on server"
+msgstr "Nu a mai rămas spațiu pe server"
+
+#: ../daemon/gvfsbackendftp.c:288
+#: ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendsmb.c:1576
+msgid "Operation unsupported"
+msgstr "Operațiune nesuportată"
+
+#: ../daemon/gvfsbackendftp.c:292
+#: ../daemon/gvfsbackendsftp.c:296
+msgid "Permission denied"
+msgstr "Acces interzis"
+
+#: ../daemon/gvfsbackendftp.c:296
+msgid "Page type unknown"
+msgstr "Tip pagină necunoscut"
+
+#: ../daemon/gvfsbackendftp.c:300
+#: ../daemon/gvfsbackendftp.c:2372
+msgid "Invalid filename"
+msgstr "Nume de fișier nevalid"
+
+#: ../daemon/gvfsbackendftp.c:304
+#: ../daemon/gvfsbackendftp.c:380
+#: ../daemon/gvfsbackendftp.c:409
+#: ../daemon/gvfsbackendftp.c:428
+#: ../daemon/gvfsbackendftp.c:441
+#: ../daemon/gvfsbackendftp.c:929
+msgid "Invalid reply"
+msgstr "Răspuns nevalid"
+
+#: ../daemon/gvfsbackendftp.c:548
+msgid "broken transmission"
+msgstr "transmisiune întreruptă"
+
+#: ../daemon/gvfsbackendftp.c:710
+#: ../daemon/gvfsbackendftp.c:851
+msgid "Could not connect to host"
+msgstr "Nu s-a putut conecta la gazdă"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1494
+#, c-format
+msgid "Enter password for ftp as %s on %s"
+msgstr "Introduceți parola ftp pentru %s pe %s"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:1497
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "Introduceți parola pentru ftp pe %s"
+
+#: ../daemon/gvfsbackendftp.c:1523
+#: ../daemon/gvfsbackendsftp.c:881
+#: ../daemon/gvfsbackendsmb.c:599
+#: ../daemon/gvfsbackendsmbbrowse.c:986
+msgid "Password dialog cancelled"
+msgstr "Dialog parolă anulat"
+
+#: ../daemon/gvfsbackendftp.c:1602
+#, c-format
+msgid "ftp on %s"
+msgstr "ftp pe %s"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1606
+#, c-format
+msgid "ftp as %s on %s"
+msgstr "ftp ca %s pe %s"
+
+#: ../daemon/gvfsbackendftp.c:1690
+#: ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:3579
+msgid "File is directory"
+msgstr "Fișierul este director"
+
+#: ../daemon/gvfsbackendftp.c:1912
+#: ../daemon/gvfsbackendftp.c:2487
+msgid "backups not supported yet"
+msgstr "copiile de siguranță nu sunt încă suportate"
+
+#: ../daemon/gvfsbackendftp.c:1989
+msgid "filename too long"
+msgstr "nume de fișier prea lung"
+
+#: ../daemon/gvfsbackendftp.c:2506
+msgid "Invalid destination filename"
+msgstr "Nume fișier destinație nevalid"
+
+#: ../daemon/gvfsbackendgphoto2.c:486
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr "%s: %d: Dosarul sau fișierul există"
+
+#: ../daemon/gvfsbackendgphoto2.c:493
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr "%s: %d: Nu există un asemenea fișier sau director"
+
+#: ../daemon/gvfsbackendgphoto2.c:499
+#, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "%s: %d: Nume fișier nevalid"
+
+#: ../daemon/gvfsbackendgphoto2.c:505
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr "%s: %d: Nesuportat"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:675
+#, c-format
+msgid "Digital Camera (%s)"
+msgstr "Cameră digitală (%s)"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:823
+#: ../monitor/gphoto2/ggphoto2volume.c:183
+#, c-format
+msgid "%s Camera"
+msgstr "Cameră %s"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:826
+#: ../monitor/gphoto2/ggphoto2volume.c:178
+#, c-format
+msgid "%s Audio Player"
+msgstr "Player audio %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:835
+#: ../monitor/gphoto2/ggphoto2volume.c:192
+msgid "Camera"
+msgstr "Cameră"
+
+#: ../daemon/gvfsbackendgphoto2.c:837
+#: ../monitor/gphoto2/ggphoto2volume.c:190
+msgid "Audio Player"
+msgstr "Player audio"
+
+#: ../daemon/gvfsbackendgphoto2.c:1343
+msgid "No device specified"
+msgstr "Niciun dispozitiv specificat"
+
+#: ../daemon/gvfsbackendgphoto2.c:1360
+msgid "Cannot create gphoto2 context"
+msgstr "Nu s-a putut crea contextul gphoto2"
+
+#: ../daemon/gvfsbackendgphoto2.c:1370
+msgid "Error creating camera"
+msgstr "Eroare la creearea camerei"
+
+#: ../daemon/gvfsbackendgphoto2.c:1383
+#: ../daemon/gvfsbackendgphoto2.c:1393
+msgid "Error loading device information"
+msgstr "Eroare la încărcarea informațiilor pentru dispozitiv"
+
+#: ../daemon/gvfsbackendgphoto2.c:1405
+msgid "Error looking up device information"
+msgstr "Eroare la căutarea informațiilor pentru dispozitiv"
+
+#: ../daemon/gvfsbackendgphoto2.c:1415
+msgid "Error getting device information"
+msgstr "Eroare la obținerea informațiilor pentru dispozitiv"
+
+#: ../daemon/gvfsbackendgphoto2.c:1428
+msgid "Error setting up camera communications port"
+msgstr "Eroare la inițializarea portului de comunicare cu camera"
+
+#: ../daemon/gvfsbackendgphoto2.c:1439
+msgid "Error initializing camera"
+msgstr "Eroare la inițializarea camerei"
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:1447
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr "gphoto2 montat în %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1522
+msgid "No camera specified"
+msgstr "Nicio cameră specificată"
+
+#: ../daemon/gvfsbackendgphoto2.c:1614
+msgid "Error creating file object"
+msgstr "Eroare la crearea obiectului fișier"
+
+#: ../daemon/gvfsbackendgphoto2.c:1629
+msgid "Error getting file"
+msgstr "Eroare la obținerea fișierului"
+
+#: ../daemon/gvfsbackendgphoto2.c:1639
+msgid "Error getting data from file"
+msgstr "Eroare la obținerea datelor din fișier"
+
+#: ../daemon/gvfsbackendgphoto2.c:1696
+#, c-format
+msgid "Malformed icon identifier '%s'"
+msgstr "Pictogramă identificator defectă „%s”"
+
+#: ../daemon/gvfsbackendgphoto2.c:1772
+#: ../daemon/gvfsbackendgphoto2.c:2950
+#, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr "Eroare la derularea în flux pe camera %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1910
+#: ../daemon/gvfsbackendsmbbrowse.c:1388
+msgid "Not a directory"
+msgstr "Nu e un dosar"
+
+#: ../daemon/gvfsbackendgphoto2.c:1943
+msgid "Failed to get folder list"
+msgstr "Obținerea listei dosarelor a eșuat"
+
+#: ../daemon/gvfsbackendgphoto2.c:2008
+msgid "Failed to get file list"
+msgstr "Obținerea listei de fișier a eșuat"
+
+#: ../daemon/gvfsbackendgphoto2.c:2293
+msgid "Error creating directory"
+msgstr "Eroare la creearea dosarului"
+
+#: ../daemon/gvfsbackendgphoto2.c:2502
+msgid "Name already exists"
+msgstr "Numele există deja"
+
+#: ../daemon/gvfsbackendgphoto2.c:2513
+#: ../daemon/gvfsbackendgphoto2.c:3141
+msgid "New name too long"
+msgstr "Noul nume este prea lung"
+
+#: ../daemon/gvfsbackendgphoto2.c:2523
+#: ../daemon/gvfsbackendgphoto2.c:3152
+msgid "Error renaming dir"
+msgstr "Eroare la redenumirea dosarului"
+
+#: ../daemon/gvfsbackendgphoto2.c:2536
+#: ../daemon/gvfsbackendgphoto2.c:3165
+msgid "Error renaming file"
+msgstr "Eroare la redenumirea fișierului"
+
+#: ../daemon/gvfsbackendgphoto2.c:2599
+#, c-format
+msgid "Directory '%s' is not empty"
+msgstr "Dosarul „%s” nu este gol"
+
+#: ../daemon/gvfsbackendgphoto2.c:2610
+msgid "Error deleting directory"
+msgstr "Eroare la ștergerea dosarului"
+
+#: ../daemon/gvfsbackendgphoto2.c:2636
+msgid "Error deleting file"
+msgstr "Eroare la ștergerea fișierului"
+
+#: ../daemon/gvfsbackendgphoto2.c:2689
+msgid "Can't write to directory"
+msgstr "Nu se poate scrie în dosar"
+
+#: ../daemon/gvfsbackendgphoto2.c:2736
+msgid "Cannot allocate new file to append to"
+msgstr "Nu s-a putut aloca fișierul nou pentru adăugarea la"
+
+#: ../daemon/gvfsbackendgphoto2.c:2751
+msgid "Cannot read file to append to"
+msgstr "Nu s-a putut citi fișierul pentru adăugarea la"
+
+#: ../daemon/gvfsbackendgphoto2.c:2762
+msgid "Cannot get data of file to append to"
+msgstr "Nu s-a putut obține datele fișierul pentru adăugarea la"
+
+#: ../daemon/gvfsbackendgphoto2.c:3049
+msgid "Error writing file"
+msgstr "Eroare la scrierea fișierului"
+
+#: ../daemon/gvfsbackendgphoto2.c:3097
+msgid "Not supported (not same directory)"
+msgstr "Nesuportat (nu e același dosar)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3109
+msgid "Not supported (src is dir, dst is dir)"
+msgstr "Nesuportat (sursa este dosar, destinația este dosar)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3117
+msgid "Not supported (src is dir, dst is existing file)"
+msgstr "Nesuportat (sursa este dosar, destinația este un fișier existent)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3129
+msgid "Not supported (src is file, dst is dir)"
+msgstr "Nesuportat (sursa este fișier, destinația este dosar)"
+
+#: ../daemon/gvfsbackendhttp.c:248
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr "Eroare client HTTP: %s"
+
+#: ../daemon/gvfsbackendhttp.c:570
+#: ../daemon/gvfsbackendsftp.c:1891
+#: ../daemon/gvfsbackendsmb.c:1337
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (codare nevalidă)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr "Notificare dosar nesuportată"
+
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:269
+#: ../daemon/gvfsbackendsmbbrowse.c:885
+msgid "Windows Network"
+msgstr "Rețea Windows"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:931
+msgid "Network Location Monitor"
+msgstr "Monitor locații rețea"
+
+#. Set the mountspec according to original uri, no matter whether user changes
+#. credentials during mount loop. Nautilus and other gio clients depend
+#. on correct mountspec, setting it to real (different) credentials would
+#. lead to G_IO_ERROR_NOT_MOUNTED errors
+#.
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:656
+#: ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendsmb.c:1330
+#, c-format
+msgid "%s on %s"
+msgstr "%s pe %s"
+
+#: ../daemon/gvfsbackendobexftp.c:865
+msgid "USB support missing. Please contact your software vendor"
+msgstr "Suportul USB lipsește. Contactați furnizorul software"
+
+#: ../daemon/gvfsbackendobexftp.c:985
+msgid "Connection to the device lost"
+msgstr "Conexiune la dispozitiv pierdută"
+
+#: ../daemon/gvfsbackendobexftp.c:1482
+msgid "Device requires a software update"
+msgstr "Dispozitivul necesită o actualizare software"
+
+#: ../daemon/gvfsbackendsftp.c:288
+msgid "ssh program unexpectedly exited"
+msgstr "program ssh terminat neașteptat"
+
+#: ../daemon/gvfsbackendsftp.c:303
+msgid "Hostname not known"
+msgstr "Nume gazdă necunoscut"
+
+#: ../daemon/gvfsbackendsftp.c:310
+msgid "No route to host"
+msgstr "Nu există rută către gazdă"
+
+#: ../daemon/gvfsbackendsftp.c:317
+msgid "Connection refused by server"
+msgstr "Conexiune refuzată de server"
+
+#: ../daemon/gvfsbackendsftp.c:324
+msgid "Host key verification failed"
+msgstr "Verificare cheie gazdă eșuată"
+
+#: ../daemon/gvfsbackendsftp.c:407
+msgid "Unable to spawn ssh program"
+msgstr "Nu s-a putut porni programul ssh"
+
+#: ../daemon/gvfsbackendsftp.c:423
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr "Nu s-a putut porni programul ssh: %s"
+
+#: ../daemon/gvfsbackendsftp.c:535
+#: ../daemon/gvfsbackendsftp.c:787
+msgid "Timed out when logging in"
+msgstr "Timpul a expirat la autentificare"
+
+#: ../daemon/gvfsbackendsftp.c:865
+msgid "Enter passphrase for key"
+msgstr "Introduceți parola pentru cheie"
+
+#: ../daemon/gvfsbackendsftp.c:867
+msgid "Enter password"
+msgstr "Introduceți parola"
+
+#: ../daemon/gvfsbackendsftp.c:928
+msgid "Can't send password"
+msgstr "Nu s-a putut trimite parola"
+
+#: ../daemon/gvfsbackendsftp.c:936
+msgid "Log In Anyway"
+msgstr "Autentificați oricum"
+
+#: ../daemon/gvfsbackendsftp.c:936
+msgid "Cancel Login"
+msgstr "Anulează autentificarea"
+
+#: ../daemon/gvfsbackendsftp.c:946
+#, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely sure it is safe to continue, contact the system administrator."
+msgstr ""
+"Identitatea calculatorului de la distanță (%s) este necunoscută.\n"
+"Acest lucru se întâmplă când vă conectați pe acest calculator pentru prima oară.\n"
+"\n"
+"Identitatea trimisă de calculatorul de la distanță este %s. Dacă doriți să fiți absolut sigur în a continua, contactați administratorul de sistem."
+
+#: ../daemon/gvfsbackendsftp.c:966
+msgid "Login dialog cancelled"
+msgstr "Dialog autentificare anulat"
+
+#: ../daemon/gvfsbackendsftp.c:986
+msgid "Can't send host identity confirmation"
+msgstr "Nu se poate trimite confirmare de identificare gazdă"
+
+#: ../daemon/gvfsbackendsftp.c:1479
+#: ../daemon/gvfsbackendsftp.c:1502
+msgid "Protocol error"
+msgstr "Eroare de protocol"
+
+#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1527
+#, c-format
+msgid "sftp for %s on %s"
+msgstr "sftp pentru %s pe %s"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1530
+#, c-format
+msgid "sftp on %s"
+msgstr "sftp pe %s"
+
+#: ../daemon/gvfsbackendsftp.c:1556
+msgid "Unable to find supported ssh command"
+msgstr "Nu s-a găsit comanda ssh suportată"
+
+#: ../daemon/gvfsbackendsftp.c:1976
+msgid "Failure"
+msgstr "Eșuare"
+
+#: ../daemon/gvfsbackendsftp.c:2032
+#: ../daemon/gvfsbackendsftp.c:2111
+#: ../daemon/gvfsbackendsftp.c:2122
+#: ../daemon/gvfsbackendsftp.c:2178
+#: ../daemon/gvfsbackendsftp.c:2264
+#: ../daemon/gvfsbackendsftp.c:2314
+#: ../daemon/gvfsbackendsftp.c:2360
+#: ../daemon/gvfsbackendsftp.c:2435
+#: ../daemon/gvfsbackendsftp.c:2542
+#: ../daemon/gvfsbackendsftp.c:2582
+#: ../daemon/gvfsbackendsftp.c:2632
+#: ../daemon/gvfsbackendsftp.c:2701
+#: ../daemon/gvfsbackendsftp.c:2721
+#: ../daemon/gvfsbackendsftp.c:2873
+#: ../daemon/gvfsbackendsftp.c:2898
+#: ../daemon/gvfsbackendsftp.c:2953
+#: ../daemon/gvfsbackendsftp.c:3010
+#: ../daemon/gvfsbackendsftp.c:3281
+#: ../daemon/gvfsbackendsftp.c:3348
+#: ../daemon/gvfsbackendsftp.c:3477
+#: ../daemon/gvfsbackendsftp.c:3512
+#: ../daemon/gvfsbackendsftp.c:3540
+#: ../daemon/gvfsbackendsftp.c:3648
+#: ../daemon/gvfsbackendsftp.c:3702
+#: ../daemon/gvfsbackendsftp.c:3736
+#: ../daemon/gvfsbackendsftp.c:3770
+#: ../daemon/gvfsbackendsftp.c:3785
+#: ../daemon/gvfsbackendsftp.c:3800
+#: ../daemon/gvfsbackendsftp.c:3878
+msgid "Invalid reply received"
+msgstr "S-a primit răspuns nevalid"
+
+#: ../daemon/gvfsbackendsftp.c:2084
+#, c-format
+msgid "Invalid icon_id '%s' in OpenIconForRead"
+msgstr "Icon_id „%s” nevalid în OpenIconForRead"
+
+#: ../daemon/gvfsbackendsftp.c:2380
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr "Eroare la crearea fișierul copie de siguranță: %s"
+
+#: ../daemon/gvfsbackendsftp.c:2783
+msgid "Unable to create temporary file"
+msgstr "Nu s-a putut crea un fișier temporar"
+
+#: ../daemon/gvfsbackendsftp.c:3574
+#: ../daemon/gvfsbackendsmb.c:1901
+msgid "Can't move directory over directory"
+msgstr "Nu se poate muta un director peste un alt director"
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:222
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr "Este necesară parola pentru partajarea %s de pe %s"
+
+#: ../daemon/gvfsbackendsmb.c:478
+#: ../daemon/gvfsbackendsmb.c:524
+#: ../daemon/gvfsdaemonutils.c:92
+#, c-format
+msgid "Internal Error (%s)"
+msgstr "Eroare internă (%s)"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:604
+msgid "Failed to mount Windows share"
+msgstr "Montare partajare Windows eșuată"
+
+#: ../daemon/gvfsbackendsmb.c:753
+#: ../daemon/gvfsbackendsmb.c:1209
+msgid "Unsupported seek type"
+msgstr "Tip de căutare nesuportat"
+
+#: ../daemon/gvfsbackendsmb.c:1273
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr "Eroare creare fișier copie de siguranță: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1803
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Eroare la ștergerea fișierului: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1877
+#, c-format
+msgid "Error moving file: %s"
+msgstr "Eroare la mutarea fișierului: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1949
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "Eroare la ștergerea fișierului destinație: %s"
+
+#: ../daemon/gvfsbackendsmb.c:1973
+msgid "Can't recursively move directory"
+msgstr "Directorul nu se poate muta recursiv"
+
+#: ../daemon/gvfsbackendsmb.c:2037
+msgid "Windows Shares Filesystem Service"
+msgstr "Serviciu sistem de fișiere partajări Windows"
+
+#. translators: %s is a server name
+#: ../daemon/gvfsbackendsmbbrowse.c:365
+#, c-format
+msgid "Password required for %s"
+msgstr "Este necesară parola pentru %s"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:893
+#, c-format
+msgid "Windows shares on %s"
+msgstr "Partajare Windows pe %s"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmbbrowse.c:992
+msgid "Failed to retrieve share list from server"
+msgstr "Obținerea listei de partajări de pe server a eșuat"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1080
+#: ../daemon/gvfsbackendsmbbrowse.c:1126
+msgid "The file is not a mountable"
+msgstr "Fișierul nu este montabil"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1148
+msgid "Not a regular file"
+msgstr "Nu este un fișier obișnuit"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1501
+msgid "Windows Network Filesystem Service"
+msgstr "Serviciu sistem de fișiere rețea Windows"
+
+#: ../daemon/gvfsbackendtrash.c:370
+#: ../daemon/gvfsbackendtrash.c:426
+#, c-format
+msgid "The trash folder may not be deleted"
+msgstr "Dosarul gunoi nu poate fi șters"
+
+#: ../daemon/gvfsbackendtrash.c:387
+#: ../daemon/gvfsbackendtrash.c:440
+#, c-format
+msgid "Items in the trash may not be modified"
+msgstr "Elementele din gunoi nu pot fi modificate"
+
+#. Translators: this is the display name of the backend
+#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendtrash.c:735
+#: ../daemon/gvfsbackendtrash.c:843
+msgid "Trash"
+msgstr "Gunoi"
+
+#: ../daemon/gvfsdaemon.c:1032
+msgid "Invalid backend type"
+msgstr "Tip de suport nevalid"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr "Eroare trimitere fd: %s"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr "Legătură simbolică nesuportată de suport"
+
+#: ../daemon/gvfsjobsetattribute.c:120
+msgid "Invalid dbus message"
+msgstr "Mesaj dbus nevalid"
+
+#: ../daemon/main.c:45
+msgid "Replace old daemon."
+msgstr "Înlocuiește serviciul vechi."
+
+#: ../daemon/main.c:46
+msgid "Don't start fuse."
+msgstr "Nu porni fuse."
+
+#: ../daemon/main.c:58
+msgid "GVFS Daemon"
+msgstr "Serviciu GVFS"
+
+#: ../daemon/main.c:61
+msgid "Main daemon for GVFS"
+msgstr "Serviciul prinicpal pentru GVFS"
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:76
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: ../daemon/main.c:78
+#: ../programs/gvfs-cat.c:163
+#: ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:101
+#: ../programs/gvfs-info.c:364
+#: ../programs/gvfs-ls.c:386
+#: ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:97
+#: ../programs/gvfs-open.c:131
+#: ../programs/gvfs-open.c:144
+#: ../programs/gvfs-save.c:165
+#: ../programs/gvfs-tree.c:251
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr "Încercați „%s --help” pentru mai multe informații"
+
+#: ../daemon/mount.c:456
+msgid "Invalid arguments from spawned child"
+msgstr "Argumente nevalide pentru copii lansați"
+
+#: ../daemon/mount.c:767
+#, c-format
+msgid "Automount failed: %s"
+msgstr "Montare automată eșuată: %s"
+
+#: ../daemon/mount.c:812
+#: ../daemon/mount.c:886
+msgid "The specified location is not mounted"
+msgstr "Locația specificată nu este montată"
+
+#: ../daemon/mount.c:817
+msgid "The specified location is not supported"
+msgstr "Locația specificată nu este suportată"
+
+#: ../daemon/mount.c:1023
+msgid "Location is already mounted"
+msgstr "Locația este deja montată"
+
+#: ../daemon/mount.c:1031
+msgid "Location is not mountable"
+msgstr "Locația nu este montabilă"
+
+#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "Disc CD-ROM"
+
+#: ../monitor/gphoto2/hal-utils.c:40
+#: ../monitor/hal/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "Disc CD-ROM gol"
+
+#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "Disc CD-R"
+
+#: ../monitor/gphoto2/hal-utils.c:41
+#: ../monitor/hal/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "Disc CD-R gol"
+
+#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "Disc CD-RW"
+
+#: ../monitor/gphoto2/hal-utils.c:42
+#: ../monitor/hal/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "Disc CD-RW gol"
+
+#: ../monitor/gphoto2/hal-utils.c:43
+#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43
+#: ../monitor/hal/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "Disc DVD-ROM"
+
+#: ../monitor/gphoto2/hal-utils.c:43
+#: ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43
+#: ../monitor/hal/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "Disc DVD-ROM gol"
+
+#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "Disc DVD-RAM"
+
+#: ../monitor/gphoto2/hal-utils.c:44
+#: ../monitor/hal/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "Disc DVD-RAM gol"
+
+#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "Disc DVD-RW"
+
+#: ../monitor/gphoto2/hal-utils.c:46
+#: ../monitor/hal/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "Disc DVD-RW gol"
+
+#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "Disc DVD+R"
+
+#: ../monitor/gphoto2/hal-utils.c:47
+#: ../monitor/hal/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "Disc DVD+R gol"
+
+#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "Disc DVD+RW"
+
+#: ../monitor/gphoto2/hal-utils.c:48
+#: ../monitor/hal/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "Disc DVD+RW gol"
+
+#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "Disc DVD+R DL"
+
+#: ../monitor/gphoto2/hal-utils.c:49
+#: ../monitor/hal/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "Disc DVD+R DL gol"
+
+#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "Disc Blu-Ray"
+
+#: ../monitor/gphoto2/hal-utils.c:50
+#: ../monitor/hal/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "Disc Blu-Ray gol"
+
+#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "Disc Blu-Ray R"
+
+#: ../monitor/gphoto2/hal-utils.c:51
+#: ../monitor/hal/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "Disc Blu-Ray R gol"
+
+#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "Disc Blu-Ray RW"
+
+#: ../monitor/gphoto2/hal-utils.c:52
+#: ../monitor/hal/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Disc Blu-Ray RW gol"
+
+#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "Disc HD DVD"
+
+#: ../monitor/gphoto2/hal-utils.c:53
+#: ../monitor/hal/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "Disc HD DVD gol"
+
+#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "Disc HD DVD-R"
+
+#: ../monitor/gphoto2/hal-utils.c:54
+#: ../monitor/hal/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "Disc HD DVD-R gol"
+
+#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "Disc HD DVD-RW"
+
+#: ../monitor/gphoto2/hal-utils.c:55
+#: ../monitor/hal/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "Disc HD DVD-RW gol"
+
+#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56
+msgid "MO Disc"
+msgstr "Disc MO"
+
+#: ../monitor/gphoto2/hal-utils.c:56
+#: ../monitor/hal/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "Disc MO gol"
+
+#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57
+msgid "Disc"
+msgstr "Disc"
+
+#: ../monitor/gphoto2/hal-utils.c:57
+#: ../monitor/hal/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "Disc gol"
+
+#: ../monitor/hal/ghaldrive.c:130
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../monitor/hal/ghaldrive.c:132
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../monitor/hal/ghaldrive.c:134
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../monitor/hal/ghaldrive.c:138
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../monitor/hal/ghaldrive.c:140
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../monitor/hal/ghaldrive.c:142
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../monitor/hal/ghaldrive.c:144
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../monitor/hal/ghaldrive.c:146
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../monitor/hal/ghaldrive.c:148
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../monitor/hal/ghaldrive.c:151
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../monitor/hal/ghaldrive.c:154
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../monitor/hal/ghaldrive.c:156
+msgid "HDDVD"
+msgstr "HDDVD"
+
+#: ../monitor/hal/ghaldrive.c:158
+msgid "HDDVD-r"
+msgstr "HDDVD-R"
+
+#: ../monitor/hal/ghaldrive.c:160
+msgid "HDDVD-RW"
+msgstr "HDDVD-RW"
+
+#: ../monitor/hal/ghaldrive.c:162
+msgid "Blu-ray"
+msgstr "Blu-ray"
+
+#: ../monitor/hal/ghaldrive.c:164
+msgid "Blu-ray-R"
+msgstr "Blu-ray-R"
+
+#: ../monitor/hal/ghaldrive.c:166
+msgid "Blu-ray-RE"
+msgstr "Blu-ray-RE"
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../monitor/hal/ghaldrive.c:172
+#, c-format
+msgid "%s/%s Drive"
+msgstr "Unitate %s/%s"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../monitor/hal/ghaldrive.c:178
+#, c-format
+msgid "%s Drive"
+msgstr "Unitate %s"
+
+#: ../monitor/hal/ghaldrive.c:182
+msgid "Floppy Drive"
+msgstr "Unitate dischetă"
+
+#: ../monitor/hal/ghaldrive.c:188
+msgid "Software RAID Drive"
+msgstr "Unitate RAID software"
+
+#: ../monitor/hal/ghaldrive.c:190
+msgid "USB Drive"
+msgstr "Unitate USB"
+
+#: ../monitor/hal/ghaldrive.c:192
+msgid "ATA Drive"
+msgstr "Dispozitiv ATA"
+
+#: ../monitor/hal/ghaldrive.c:194
+msgid "SCSI Drive"
+msgstr "Dispozitiv SCSI"
+
+#: ../monitor/hal/ghaldrive.c:196
+msgid "FireWire Drive"
+msgstr "Dispozitiv FireWire"
+
+#: ../monitor/hal/ghaldrive.c:200
+msgid "Tape Drive"
+msgstr "Casetă"
+
+#: ../monitor/hal/ghaldrive.c:202
+msgid "CompactFlash Drive"
+msgstr "Unitate CompactFlash"
+
+#: ../monitor/hal/ghaldrive.c:204
+msgid "MemoryStick Drive"
+msgstr "Unitate MemoryStick"
+
+#: ../monitor/hal/ghaldrive.c:206
+msgid "SmartMedia Drive"
+msgstr "Unitate SmartMedia"
+
+#: ../monitor/hal/ghaldrive.c:208
+msgid "SD/MMC Drive"
+msgstr "Unitate SD/MMC"
+
+#: ../monitor/hal/ghaldrive.c:210
+msgid "Zip Drive"
+msgstr "Unitate Zip"
+
+#: ../monitor/hal/ghaldrive.c:212
+msgid "Jaz Drive"
+msgstr "Unitate Jaz"
+
+#: ../monitor/hal/ghaldrive.c:214
+msgid "Thumb Drive"
+msgstr ""
+
+#: ../monitor/hal/ghaldrive.c:217
+msgid "Mass Storage Drive"
+msgstr "Unitate de stocare în masă"
+
+#: ../monitor/hal/ghaldrive.c:723
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "Scoaterea mediului a eșuat; una sau mai multe volume de pe mediu sunt ocupate"
+
+#: ../monitor/hal/ghalmount.c:301
+#: ../monitor/hal/ghalvolume.c:171
+#, c-format
+msgid "%.1f kB"
+msgstr "%.1f kO"
+
+#: ../monitor/hal/ghalmount.c:306
+#: ../monitor/hal/ghalvolume.c:176
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MO"
+
+#: ../monitor/hal/ghalmount.c:311
+#: ../monitor/hal/ghalvolume.c:181
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GO"
+
+#: ../monitor/hal/ghalmount.c:433
+#: ../monitor/hal/ghalvolume.c:252
+msgid "Mixed Audio/Data Disc"
+msgstr "Disc combinat audio/date"
+
+#. Translators: %s is the size of the mount (e.g. 512 MB)
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalmount.c:446
+#: ../monitor/hal/ghalvolume.c:263
+#, c-format
+msgid "%s Media"
+msgstr "Mediu %s"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalvolume.c:240
+#, c-format
+msgid "%s Encrypted Data"
+msgstr "%s date criptate"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:57
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr "%s: %s: eroare deschidere fișier: %s\n"
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:80
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr "%s: %s, eroare scriere în ieșirea standard"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:92
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr "%s: %s: eroare citire: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:110
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr "%s: %s: eroare închidere: %s\n"
+
+#: ../programs/gvfs-cat.c:136
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr "LOC... - concatenează LOCURI în ieșirea standard"
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:141
+msgid "Concatenate files at locations and print to the standard output. Works just like the traditional cat utility, but using gvfs location instead local files: for example you can use something like smb://server/resource/file.txt as location to concatenate."
+msgstr "Concatenează fișiere la locații și afișează în ieșirea standard. Funcționează ca utilitarul tradițional „cat”, dar folosind locații gvfs în locul fișierelor locale: de exemplu puteți folosi smb://server/resoursă/fișier.txt ca locație pentru concatenare."
+
+#: ../programs/gvfs-cat.c:148
+msgid "Note: just pipe through cat if you need its formatting option like -n, -T or other."
+msgstr "Notă: trimiteți prin „cat” în cazul în care aveți nevoie de opțiune de formatare precum -n, -T sau altele."
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:174
+#: ../programs/gvfs-open.c:142
+#, c-format
+msgid "%s: missing locations"
+msgstr "%s: lipsesc locațiile"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:56
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr "%s: %s: eroare la deschiderea locațiilor: %s\n"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:83
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr "%s: %s: eroare lansare aplicație: %s\n"
+
+#: ../programs/gvfs-open.c:113
+msgid "FILES... - open FILES with registered application."
+msgstr "FIȘIERE... - deschide fișiere cu aplicațiile inregistrate."
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:117
+msgid "Opens the file(s) with the default application registered to handle the type of the file."
+msgstr "Deschide fișierul (fișierele) cu aplicația implicită înregistrată pentru acest timp de fișier."
+
+#~ msgid "Can't delete trash"
+#~ msgstr "Nu se poate șterge gunoiul"
+#~ msgid "Can't pull trash"
+#~ msgstr "Nu s-a putut trage gunoiul"
+
