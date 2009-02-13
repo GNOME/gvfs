@@ -449,7 +449,7 @@ if test "x$enable_archive" != "xno"; then
 	LDFLAGS_save="$LDFLAGS"
 	
 	LDFLAGS="$LDFLAGS -L$with_archive_libs"
-	AC_CHECK_LIB(archive, archive_read_open, archive_libs="yes", archive_libs="no")
+	AC_CHECK_LIB(archive, archive_entry_filetype, archive_libs="yes", archive_libs="no")
 	LDFLAGS="$LDFLAGS_save"
 	if test "x${archive_libs}" != "xno"; then
 		AC_DEFINE(HAVE_ARCHIVE,, [Define to 1 if you have the libarchive library])
@@ -460,7 +460,7 @@ if test "x$enable_archive" != "xno"; then
                 	ARCHIVE_LIBS="-larchive"
                 fi
 	else
-		AC_CHECK_LIB(archive, archive_read_open, archive_old_libs="yes", archive_old_libs="no")
+		AC_CHECK_LIB(archive, archive_entry_filetype, archive_old_libs="yes", archive_old_libs="no")
 		if test "x${archive_old_libs}" != "xno"; then
 		   msg_archive="Too old, need at least archive 3.0.22"
 		fi
