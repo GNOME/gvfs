@@ -1,5 +1,17 @@
 2009-02-13  Cosimo Cecchi  <cosimoc@gnome.org>
 
+	Bug 570533 – use g_set_error_literal
+
+	* daemon/gvfsbackendobexftp.c: (_push_single_file_helper):
+	* daemon/gvfsbackendtrash.c: (trash_backend_get_file),
+	(trash_backend_open_for_read), (trash_backend_delete),
+	(trash_backend_pull):
+	* daemon/trashlib/trashitem.c: (trash_item_delete):
+	use g_set_error_literal() when appropriate.
+	Patch by Christian Persch.
+
+2009-02-13  Cosimo Cecchi  <cosimoc@gnome.org>
+
 	Bug 531705 – Won't build with libarchive 1.3.1
 
 	* configure.ac: check for archive_entry_filetype() instead of

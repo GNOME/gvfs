@@ -492,8 +492,8 @@ trash_item_delete (TrashItem  *item,
   g_object_unref (expunged);
 
   if (!success)
-    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                 "Failed to delete the item from the trash");
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                         "Failed to delete the item from the trash");
 
   return success;
 }

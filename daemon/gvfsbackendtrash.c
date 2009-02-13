@@ -212,8 +212,8 @@ trash_backend_get_file (GVfsBackendTrash  *backend,
     }
 
   if (file == NULL)
-    g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
-                 _("No such file or directory"));
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                         _("No such file or directory"));
 
   return file;
 }
@@ -228,8 +228,8 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
   GError *error = NULL;
 
   if (filename[1] == '\0')
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-                 _("Can't open directory"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                         _("Can't open directory"));
 
   else
     {
@@ -366,8 +366,8 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
   g_print ("before job: %d\n", G_OBJECT(job)->ref_count);
 
   if (filename[1] == '\0')
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                 _("The trash folder may not be deleted"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                         _("The trash folder may not be deleted"));
   else
     {
       gboolean is_toplevel;
@@ -383,8 +383,8 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
           g_object_unref (real);
 
           if (!is_toplevel)
-            g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                         _("Items in the trash may not be modified"));
+            g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                 _("Items in the trash may not be modified"));
 
           else
             {
@@ -422,8 +422,8 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
   GError *error = NULL;
 
   if (source[1] == '\0')
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                 _("The trash folder may not be deleted"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                         _("The trash folder may not be deleted"));
   else
     {
       gboolean is_toplevel;
@@ -436,8 +436,8 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
       if (real)
         {
           if (remove_source && !is_toplevel)
-            g_set_error (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-                         _("Items in the trash may not be modified"));
+            g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                                 _("Items in the trash may not be modified"));
 
           else
             {

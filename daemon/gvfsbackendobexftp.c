@@ -1596,9 +1596,9 @@ _push_single_file_helper (GVfsBackendObexftp *op_backend,
 
   if (g_vfs_job_is_cancelled (G_VFS_JOB (job)))
     {
-      g_set_error (error, G_IO_ERROR,
-                   G_IO_ERROR_CANCELLED,
-                   _("Operation was cancelled"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_CANCELLED,
+                           _("Operation was cancelled"));
       return FALSE;
     }
 
