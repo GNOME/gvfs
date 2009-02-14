@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-04 12:02+0100\n"
+"POT-Creation-Date: 2009-02-14 01:24+0100\n"
 "PO-Revision-Date: 2009-02-04 12:14+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
@@ -98,7 +98,6 @@ msgstr "Ongeldig resultaat van ‘monitor_file’"
 #: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
-#, c-format
 msgid "Operation was cancelled"
 msgstr "Bewerking is geannuleerd"
 
@@ -187,7 +186,9 @@ msgstr "Fout bij resolven van ‘%s’-service ‘%s’ in domein ‘%s’"
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
-msgstr "Fout bij resolven van ‘%s’-service ‘%s’ in domein ‘%s’. Een of meerdere TXT-records ontbreken. Benodigde keys: ‘%s’."
+msgstr ""
+"Fout bij resolven van ‘%s’-service ‘%s’ in domein ‘%s’. Een of meerdere TXT-"
+"records ontbreken. Benodigde keys: ‘%s’."
 
 #: ../common/gvfsdnssdresolver.c:1126
 #, c-format
@@ -273,8 +274,8 @@ msgstr "Ongeldige aankoppelspecificatie"
 
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:399
-#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:647
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:398
+#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:646
 #: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
 #: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
 #, c-format
@@ -282,8 +283,8 @@ msgid "File doesn't exist"
 msgstr "Bestand bestaat niet"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:446
-#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:694
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:693
 msgid "The file is not a directory"
 msgstr "Het bestand is geen map"
 
@@ -455,7 +456,6 @@ msgstr "Bestandssysteem"
 #: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
 #: ../daemon/gvfsbackendobexftp.c:1046 ../daemon/gvfsbackendsmb.c:684
 #: ../daemon/gvfsbackendtrash.c:232
-#, c-format
 msgid "Can't open directory"
 msgstr "Kan map niet openen"
 
@@ -558,21 +558,21 @@ msgid "Backup file creation failed"
 msgstr "Aanmaken reservekopie"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:493 ../daemon/gvfsbackendnetwork.c:394
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Lokaal netwerk"
 
-#: ../daemon/gvfsbackenddnssd.c:737 ../daemon/gvfsbackendnetwork.c:798
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Kan bestand of map niet monitoren."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:755
+#: ../daemon/gvfsbackenddnssd.c:754
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:756 ../daemon/gvfsbackendnetwork.c:733
-#: ../daemon/gvfsbackendnetwork.c:883 ../daemon/gvfsbackendnetwork.c:884
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Netwerk"
 
@@ -885,13 +885,13 @@ msgid "Directory notification not supported"
 msgstr "Mapwijzigingsmeldingen niet ondersteund"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:270 ../daemon/gvfsbackendsmbbrowse.c:885
+#: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Windows-netwerk"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:932
+#: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
 msgstr "Monitor voor netwerklokaties"
 
@@ -1136,21 +1136,13 @@ msgstr "Geen normaal bestand"
 msgid "Windows Network Filesystem Service"
 msgstr "Bestandssysteemvoorziening voor Windows-netwerken"
 
-#: ../daemon/gvfsbackendtrash.c:370
-#, c-format
-msgid "Can't delete trash"
-msgstr "Kan prullenbak niet legen"
+#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+msgid "The trash folder may not be deleted"
+msgstr "De prullenbak kan niet verwijderd worden"
 
 #: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
-#, c-format
 msgid "Items in the trash may not be modified"
 msgstr "Items in de prullenbak kunnen niet gewijzigd worden"
-
-# Zie http://bugzilla.gnome.org/show_bug.cgi?id=570481 (Wouter Bolsterlee)
-#: ../daemon/gvfsbackendtrash.c:426
-#, c-format
-msgid "Can't pull trash"
-msgstr ""
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
@@ -1640,6 +1632,9 @@ msgid ""
 msgstr ""
 "Een of meerdere bestanden met de standaardtoepassing voor dit bestandstype "
 "openen."
+
+#~ msgid "Can't delete trash"
+#~ msgstr "Kan prullenbak niet legen"
 
 #~ msgid "dns-sd"
 #~ msgstr "dns-sd"
