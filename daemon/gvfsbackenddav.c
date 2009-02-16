@@ -517,6 +517,36 @@ xml_node_iter_get_current (xmlNodeIter *iter)
   return iter->cur_node;
 }
 
+static gint
+http_to_gio_error(guint status_code)
+{
+  switch (status_code)
+    {
+      case SOUP_STATUS_NOT_FOUND:
+        return G_IO_ERROR_NOT_FOUND;
+        break;
+      case SOUP_STATUS_UNAUTHORIZED:
+      case SOUP_STATUS_PAYMENT_REQUIRED:
+      case SOUP_STATUS_FORBIDDEN:
+        return G_IO_ERROR_PERMISSION_DENIED;
+        break;
+      case SOUP_STATUS_REQUEST_TIMEOUT:
+        return G_IO_ERROR_TIMED_OUT;
+        break;
+      case SOUP_STATUS_CANT_RESOLVE:
+        return G_IO_ERROR_HOST_NOT_FOUND;
+        break;
+      case SOUP_STATUS_NOT_IMPLEMENTED:
+        return G_IO_ERROR_NOT_SUPPORTED;
+        break;
+      case SOUP_STATUS_INSUFFICIENT_STORAGE:
+        return G_IO_ERROR_NO_SPACE;
+        break;
+    }
+  
+  return G_IO_ERROR_FAILED;
+}
+
 static xmlDocPtr
 parse_xml (SoupMessage  *msg,
            xmlNodePtr   *root,
@@ -527,7 +557,7 @@ parse_xml (SoupMessage  *msg,
 
   if (!SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+      g_set_error (error, G_IO_ERROR, http_to_gio_error (msg->status_code),
                    _("HTTP Error: %s"), msg->reason_phrase);
       return NULL;
     }

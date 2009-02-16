@@ -1,3 +1,10 @@
+2009-02-16  Christian Kellner  <gicmo@gnome.org>
+
+	536305 – incorrect GError propagation in the htt
+
+	* daemon/gvfsbackenddav.c: Convert soup errors to
+	gio errors. Patch from Jesse van den Kieboom
+
 2009-02-16  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 529349 – Redirects with username doesn't work
