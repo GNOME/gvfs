@@ -294,6 +294,9 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
     if (new_loc == NULL)
       return;
 
+    if (!SOUP_STATUS_IS_REDIRECTION(status))
+      return;
+
    new_uri = soup_uri_new_with_base (soup_message_get_uri (msg), new_loc);
    if (new_uri == NULL)
      {
@@ -358,15 +361,13 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
 #endif
          /* ELSE:
           *
-          * Three possibilities:
+          * Two possibilities:
           *
-          *   1) This was a non-3xx response that happened to
-          *      have a "Location" header
-          *   2) It's a non-redirecty 3xx response (300, 304,
+          *   1) It's a non-redirecty 3xx response (300, 304,
           *      305, 306)
-          *   3) It's some newly-defined 3xx response (308+)
+          *   2) It's some newly-defined 3xx response (308+)
           *
-          * We ignore all of these cases. In the first two,
+          * We ignore both of these cases. In the first,
           * redirecting would be explicitly wrong, and in the
           * last case, we have no clue if the 3xx response is
           * supposed to be redirecty or non-redirecty. Plus,

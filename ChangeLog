@@ -1,3 +1,12 @@
+2009-02-16  Alexander Larsson  <alexl@redhat.com>
+
+        Bug 566452 – Error when creating folder on webdav share
+
+        * daemon/gvfsbackenddav.c:
+        (redirect_handler):
+	Don't intercept "201 Created" return as a redirection
+	Patch from Mads Chr. Olesen
+
 2009-02-13  Cosimo Cecchi  <cosimoc@gnome.org>
 
 	Bug 570533 – use g_set_error_literal
