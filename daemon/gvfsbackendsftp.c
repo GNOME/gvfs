@@ -2781,18 +2781,26 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
           replace_create_temp (backend, op_job);
         }
       else if (data->set_ownership &&
-	       error->code == G_IO_ERROR_PERMISSION_DENIED &&
-	       !op_job->make_backup)
+	       error->code == G_IO_ERROR_PERMISSION_DENIED)
         {
+          g_error_free (error);
+	  
           /* This was probably due to the fact that the ownership could not be
              set properly. In this case we change our strategy altogether and
              simply open/truncate the original file. This is not as secure
              as the atomit tempfile/move approach, but at least ownership 
              doesn't change */
-	  /* We only do this if make_backup is FALSE, as this version breaks
-	     the backup code. Would like to handle the backup case too by
-	     backing up before truncating... */
-          replace_truncate_original (backend, job);
+	  if (!op_job->make_backup)
+	    replace_truncate_original (backend, job);
+	  else
+	    {
+	      /* We only do this if make_backup is FALSE, as this version breaks
+		 the backup code. Would like to handle the backup case too by
+		 backing up before truncating, but for now error out... */
+	      g_vfs_job_failed (job, G_IO_ERROR,
+				G_IO_ERROR_CANT_CREATE_BACKUP,
+				_("backups not supported yet"));
+	    }
         }
       else
         {
