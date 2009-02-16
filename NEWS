@@ -1,3 +1,14 @@
+Major changes in 1.1.6
+======================
+* Fix crashes
+* trash: Better messages
+* Clean up glib and gtk includes
+* archive: Build with later versions of libarchive
+* dav: Fix folder creation
+* dav: Fix redirection when user is specified in url
+* http: fix error propagation
+* sftp: Try to preserve ownership when replacing a file
+
 Major changes in 1.1.5
 ======================
 * network: Pick up SMB shares from zeroconf
