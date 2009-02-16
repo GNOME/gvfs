@@ -1,5 +1,15 @@
 2009-02-16  Christian Kellner  <gicmo@gnome.org>
 
+	Bug 546256 – Crash in g_vfs_get_file_for_uri()
+
+	* client/httpuri.c: Make sure we never return a non-NULL 
+	GVfsUriMountInfo with the path component set to NULL, since
+	this leads to dead kittens.
+	NB: This only fixes the symptom. The real problem is deep in
+	the uri parsing logic.
+
+2009-02-16  Christian Kellner  <gicmo@gnome.org>
+
 	536305 – incorrect GError propagation in the htt
 
 	* daemon/gvfsbackenddav.c: Convert soup errors to

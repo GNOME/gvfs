@@ -79,44 +79,30 @@ http_from_uri (GVfsUriMapper *mapper,
                const char     *uri_str)
 {
   GVfsUriMountInfo *info;
-  char *path;
   gboolean ssl;
+  GDecodedUri *uri;
 
-  path = NULL;
-  if (!g_ascii_strncasecmp (uri_str, "http", 4))
+  uri = g_vfs_decode_uri (uri_str);
+
+  if (uri == NULL)
+    return NULL;
+
+  if (!g_ascii_strncasecmp (uri->scheme, "http", 4))
     {
-      GDecodedUri *uri;
-
-      uri = g_vfs_decode_uri (uri_str);
-
       info = g_vfs_uri_mount_info_new ("http");
       g_vfs_uri_mount_info_set (info, "uri", uri_str);
-      
-      if (uri)
-        {
-          path = uri->path;
-          uri->path = NULL;
-          g_vfs_decoded_uri_free (uri);
-        }
     }
   else
     {
-      GDecodedUri *uri;
-
-      uri = g_vfs_decode_uri (uri_str);
-
-      if (uri == NULL)
-          return NULL;
-
       info = g_vfs_uri_mount_info_new ("dav");
       ssl = !g_ascii_strcasecmp (uri->scheme, "davs");
       g_vfs_uri_mount_info_set (info, "ssl", ssl ? "true" : "false");
 
       if (uri->host && *uri->host)
-          g_vfs_uri_mount_info_set (info, "host", uri->host);
+        g_vfs_uri_mount_info_set (info, "host", uri->host);
 
       if (uri->userinfo && *uri->userinfo)
-          g_vfs_uri_mount_info_set (info, "user", uri->userinfo);
+        g_vfs_uri_mount_info_set (info, "user", uri->userinfo);
 
       /* only set the port if it isn't the default port */
       if (uri->port != -1 && ! port_is_defaul_port (uri->port, ssl))
@@ -125,15 +111,12 @@ http_from_uri (GVfsUriMapper *mapper,
           g_vfs_uri_mount_info_set (info, "port", port);
           g_free (port);
         }
-
-      path = uri->path;
-      uri->path = NULL;
-      
-      g_vfs_decoded_uri_free (uri);
     }
 
+  info->path = uri->path;
+  uri->path = NULL;
+  g_vfs_decoded_uri_free (uri);
 
-  info->path = path;
   return info;
 }
 
