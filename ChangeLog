@@ -1,3 +1,15 @@
+2009-02-16  Alexander Larsson  <alexl@redhat.com>
+
+         Bug 546482 – Keep ownership when replacing files on sftp
+
+        * daemon/gvfsbackendsftp.c:
+	Try to copy ownership. If this fails revert to truncate
+	and overwrite, unless make_backup is set.
+	Ideally we should handle the backup case too, but that
+	requires more code.
+
+	Patch from Jesse van den Kieboom.
+
 2009-02-16  Christian Kellner  <gicmo@gnome.org>
 
 	Bug 546256 – Crash in g_vfs_get_file_for_uri()

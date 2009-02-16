@@ -2662,6 +2662,9 @@ try_append_to (GVfsBackend *backend,
 
 typedef struct {
   guint32 permissions;
+  guint32 uid;
+  guint32 gid;
+  gboolean set_ownership;
   char *tempname;
   int temp_count;
 } ReplaceData;
@@ -2675,6 +2678,76 @@ replace_data_free (ReplaceData *data)
 
 static void replace_create_temp (GVfsBackendSftp *backend,
                                  GVfsJobOpenForWrite *job);
+
+static void
+replace_truncate_original_reply (GVfsBackendSftp *backend,
+                                 int reply_type,
+                                 GDataInputStream *reply,
+                                 guint32 len,
+                                 GVfsJob *job,
+                                 gpointer user_data)
+{
+  GVfsJobOpenForWrite *op_job;
+  SftpHandle *handle;
+  ReplaceData *data;
+  GError *error = NULL;
+
+  op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+  data = G_VFS_JOB (job)->backend_data;
+  
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      error = NULL;
+      if (error_from_status (job, reply, G_IO_ERROR_EXISTS, -1, &error))
+        /* Open should not return OK */
+        g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                          _("Invalid reply received"));
+      else
+        {
+          g_vfs_job_failed_from_error (job, error);
+          g_error_free (error);
+        }
+      return;
+    }
+
+  if (reply_type != SSH_FXP_HANDLE)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
+
+  handle = sftp_handle_new (reply);
+  handle->filename = g_strdup (op_job->filename);
+  handle->tempname = NULL;
+  handle->permissions = data->permissions;
+  handle->make_backup = op_job->make_backup;
+  
+  g_vfs_job_open_for_write_set_handle (op_job, handle);
+  g_vfs_job_open_for_write_set_can_seek (op_job, TRUE);
+  
+  g_vfs_job_succeeded (job);
+}
+
+static void
+replace_truncate_original (GVfsBackendSftp *backend,
+                           GVfsJob *job)
+{
+  GVfsJobOpenForWrite *op_job;
+  GDataOutputStream *command;
+  ReplaceData *data;
+
+  data = job->backend_data;
+  op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+  
+  command = new_command_stream (backend,
+                                SSH_FXP_OPEN);
+  put_string (command, op_job->filename);
+  g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_TRUNC,  NULL, NULL); /* open flags */
+  g_data_output_stream_put_uint32 (command, 0, NULL, NULL); /* Attr flags */
+  
+  queue_command_stream_and_free (backend, command, replace_truncate_original_reply, job, NULL);
+}
 
 static void
 replace_create_temp_reply (GVfsBackendSftp *backend,
@@ -2706,6 +2779,20 @@ replace_create_temp_reply (GVfsBackendSftp *backend,
           g_error_free (error);
 
           replace_create_temp (backend, op_job);
+        }
+      else if (data->set_ownership &&
+	       error->code == G_IO_ERROR_PERMISSION_DENIED &&
+	       !op_job->make_backup)
+        {
+          /* This was probably due to the fact that the ownership could not be
+             set properly. In this case we change our strategy altogether and
+             simply open/truncate the original file. This is not as secure
+             as the atomit tempfile/move approach, but at least ownership 
+             doesn't change */
+	  /* We only do this if make_backup is FALSE, as this version breaks
+	     the backup code. Would like to handle the backup case too by
+	     backing up before truncating... */
+          replace_truncate_original (backend, job);
         }
       else
         {
@@ -2795,7 +2882,14 @@ replace_create_temp (GVfsBackendSftp *backend,
                                 SSH_FXP_OPEN);
   put_string (command, data->tempname);
   g_data_output_stream_put_uint32 (command, SSH_FXF_WRITE|SSH_FXF_CREAT|SSH_FXF_EXCL,  NULL, NULL); /* open flags */
-  g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS, NULL, NULL); /* Attr flags */
+  g_data_output_stream_put_uint32 (command, SSH_FILEXFER_ATTR_PERMISSIONS | (data->set_ownership ? SSH_FILEXFER_ATTR_UIDGID : 0), NULL, NULL); /* Attr flags */
+  
+  if (data->set_ownership)
+  {
+    g_data_output_stream_put_uint32 (command, data->uid, NULL, NULL);
+    g_data_output_stream_put_uint32 (command, data->gid, NULL, NULL);
+  }
+  
   g_data_output_stream_put_uint32 (command, data->permissions, NULL, NULL);
   queue_command_stream_and_free (op_backend, command, replace_create_temp_reply, G_VFS_JOB (job), NULL);
 }
@@ -2812,6 +2906,9 @@ replace_stat_reply (GVfsBackendSftp *backend,
   GVfsJobOpenForWrite *op_job;
   const char *current_etag;
   guint32 permissions;
+  guint32 uid;
+  guint32 gid;
+  gboolean set_ownership = FALSE;
   ReplaceData *data;
 
   op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
@@ -2841,10 +2938,25 @@ replace_stat_reply (GVfsBackendSftp *backend,
 
       if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_MODE))
         permissions = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE) & 0777;
+      
+      if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_UID) && g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_GID))
+      {
+        set_ownership = TRUE;
+        uid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID);
+        gid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID);
+      }
     }
 
   data = g_slice_new0 (ReplaceData);
   data->permissions = permissions;
+  data->set_ownership = set_ownership;
+  
+  if (set_ownership)
+  {
+    data->uid = uid;
+    data->gid = gid;
+  }
+  
   g_vfs_job_set_backend_data (job, data, (GDestroyNotify)replace_data_free);
 
   replace_create_temp (backend, op_job);    
