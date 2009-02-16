@@ -1,5 +1,13 @@
 2009-02-16  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 529349 – Redirects with username doesn't work
+
+        * daemon/gvfsbackenddav.c: (redirect_handler):
+	Copy username and password when redirecting.
+	Patch from Mads Chr. Olesen
+
+2009-02-16  Alexander Larsson  <alexl@redhat.com>
+
         Bug 566452 – Error when creating folder on webdav share
 
         * daemon/gvfsbackenddav.c:

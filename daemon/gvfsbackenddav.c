@@ -308,6 +308,10 @@ redirect_handler (SoupMessage *msg, gpointer user_data)
 
    old_uri = soup_message_get_uri (msg);
 
+   /* copy over username and password to new_uri */
+   soup_uri_set_user(new_uri, old_uri->user);
+   soup_uri_set_password(new_uri, old_uri->password);
+
    /* Check if this is a trailing slash redirect (i.e. /a/b to /a/b/),
     * redirect it right away
     */
