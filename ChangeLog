@@ -18,9 +18,9 @@
 
 2009-02-16  Alexander Larsson  <alexl@redhat.com>
 
-         Bug 546482 – Keep ownership when replacing files on sftp
+	Bug 546482 – Keep ownership when replacing files on sftp
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Try to copy ownership. If this fails revert to truncate
 	and overwrite, unless make_backup is set.
 	Ideally we should handle the backup case too, but that
@@ -49,16 +49,16 @@
 
 	Bug 529349 – Redirects with username doesn't work
 
-        * daemon/gvfsbackenddav.c: (redirect_handler):
+	* daemon/gvfsbackenddav.c: (redirect_handler):
 	Copy username and password when redirecting.
 	Patch from Mads Chr. Olesen
 
 2009-02-16  Alexander Larsson  <alexl@redhat.com>
 
-        Bug 566452 – Error when creating folder on webdav share
+	Bug 566452 – Error when creating folder on webdav share
 
-        * daemon/gvfsbackenddav.c:
-        (redirect_handler):
+	* daemon/gvfsbackenddav.c:
+	(redirect_handler):
 	Don't intercept "201 Created" return as a redirection
 	Patch from Mads Chr. Olesen
 
@@ -225,7 +225,7 @@
 
 2009-01-12  Matthias Clasen  <mclasen@redhat.com>
 
-        * daemon/Makefile.am: Dist the dav+sd.mount.in file
+	* daemon/Makefile.am: Dist the dav+sd.mount.in file
 
 2009-01-07  Tomas Bzatek  <tbzatek@redhat.com>
 
@@ -413,23 +413,23 @@
 
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonmount.c:
-        * client/gdaemonvolumemonitor.c:
-        * monitor/proxy/Makefile.am:
-        * monitor/proxy/gproxydrive.c:
-        * monitor/proxy/gproxymount.c:
-        * monitor/proxy/gproxyvolume.c:
-        * monitor/proxy/gproxyvolume.h:
-        * monitor/proxy/gproxyvolumemonitor.c:
-        * monitor/proxy/gproxyvolumemonitor.h:
-        * monitor/proxy/remote-volume-monitor-module.c:
+	* client/gdaemonmount.c:
+	* client/gdaemonvolumemonitor.c:
+	* monitor/proxy/Makefile.am:
+	* monitor/proxy/gproxydrive.c:
+	* monitor/proxy/gproxymount.c:
+	* monitor/proxy/gproxyvolume.c:
+	* monitor/proxy/gproxyvolume.h:
+	* monitor/proxy/gproxyvolumemonitor.c:
+	* monitor/proxy/gproxyvolumemonitor.h:
+	* monitor/proxy/remote-volume-monitor-module.c:
 	* monitor/proxy/gproxyshadowmount.[ch]:
 	Use the new support for shadow mounts instead
 	of g_volume_monitor_adopt_orphan_mount
 
 	Patch from David Zeuthen (#555332)
 	
-        * programs/gvfs-mount.c:
+	* programs/gvfs-mount.c:
 	Add support to monitor volume monitor events
 
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
@@ -455,32 +455,32 @@
 
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonmount.c:
-        * common/gmounttracker.[ch]:
-        * daemon/gvfsbackend.[ch]:
+	* client/gdaemonmount.c:
+	* common/gmounttracker.[ch]:
+	* daemon/gvfsbackend.[ch]:
 	Make mounts/backends have a GIcon not a icon name
 	
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Support /etc/favicon.png
 	
-        * daemon/gvfsbackendsmbbrowse.c:
+	* daemon/gvfsbackendsmbbrowse.c:
 	Simplify some code with the new GIcon support
 
 	Patch from David Zeuthen (#557540)
 
 2008-12-01  Alexander Larsson  <alexl@redhat.com>
 
-        * common/Makefile.am:
-        * common/gvfsdnssdresolver.c: Added.
-        * common/gvfsdnssdresolver.h: Added.
-        * common/gvfsdnssdutils.c: Added.
-        * common/gvfsdnssdutils.h: Added.
-        * daemon/Makefile.am:
-        * daemon/dav+sd.mount.in: Added.
-        * daemon/dav.mount.in:
-        * daemon/gvfsbackenddav.c:
-        * daemon/gvfsbackenddnssd.c:
-        * daemon/gvfsbackendnetwork.c:
+	* common/Makefile.am:
+	* common/gvfsdnssdresolver.c: Added.
+	* common/gvfsdnssdresolver.h: Added.
+	* common/gvfsdnssdutils.c: Added.
+	* common/gvfsdnssdutils.h: Added.
+	* daemon/Makefile.am:
+	* daemon/dav+sd.mount.in: Added.
+	* daemon/dav.mount.in:
+	* daemon/gvfsbackenddav.c:
+	* daemon/gvfsbackenddnssd.c:
+	* daemon/gvfsbackendnetwork.c:
 	For references to dns-sd dav services, use a
 	dav+sd: uri, since this is stable over e.g.
 	port changes and as such work better in e.g.
@@ -490,12 +490,12 @@
 
 2008-11-18  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Better name for the has-username case.
 	
 2008-11-18  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	If user is specified, add to name too, so we get a unique fuse path
 
 2008-11-17  Benjamin Otte  <otte@gnome.org>
@@ -634,9 +634,9 @@
 
 2008-10-23  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
-        * daemon/gvfsbackendsmb.c:
-        * daemon/gvfsdaemonutils.c:
+	* daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsmb.c:
+	* daemon/gvfsdaemonutils.c:
 	Don't return fallback icons, since that gives problems
 	with custom mime icons (#528320)
 
@@ -644,46 +644,46 @@
 
 	Patch from David Zeuthen (#557182)
 	
-        * common/Makefile.am:
-        * common/gvfsicon.[ch]:
+	* common/Makefile.am:
+	* common/gvfsicon.[ch]:
 	Added GVfsIcon object for GVfs backend specific icons.
 	
-        * common/gmountspec.[ch]:
+	* common/gmountspec.[ch]:
 	Make sure to/from string works correctly to roundtrip GMountSpec:s
 	Make GMountSpec a boxed type
 	
-        * common/gvfsdaemonprotocol.h:
+	* common/gvfsdaemonprotocol.h:
 	Add OpenIconForRead operation
 	
-        * client/Makefile.am:
-        * client/gvfsiconloadable.[ch]:
+	* client/Makefile.am:
+	* client/gvfsiconloadable.[ch]:
 	In gvfs client side, implement GLoadableIcon for GVfsIcon type.
 	
-        * client/gdaemonvfs.c:
+	* client/gdaemonvfs.c:
 	Make sure that we add the GLoadableIcon interface for GVfsIcon on load
 	
-        * daemon/Makefile.am:
-        * daemon/gvfsbackend.[ch]:
-        * daemon/gvfsjobopeniconforread.[ch]:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.[ch]:
+	* daemon/gvfsjobopeniconforread.[ch]:
 	Add new job type for OpenIconForRead op
 	
-        * daemon/gvfsbackendgphoto2.c:
+	* daemon/gvfsbackendgphoto2.c:
 	Implement OpenIconForRead for icon previews.
 
 2008-10-21  Alexander Larsson  <alexl@redhat.com>
 
-        * configure.ac:
+	* configure.ac:
 	Require glib 2.19.1 for GIcon serialization support
 	
-        * common/gvfsdaemonprotocol.c:
+	* common/gvfsdaemonprotocol.c:
 	Use g_icon_to_string & co instead of home-brewed serialization
 	
-        * monitor/proxy/gproxydrive.c:
-        * monitor/proxy/gproxymount.c:
-        * monitor/proxy/gproxyvolume.c:
-        * monitor/proxy/gproxyvolumemonitor.c:
-        * monitor/proxy/gproxyvolumemonitor.h:
-        * monitor/proxy/gvfsproxyvolumemonitordaemon.c:
+	* monitor/proxy/gproxydrive.c:
+	* monitor/proxy/gproxymount.c:
+	* monitor/proxy/gproxyvolume.c:
+	* monitor/proxy/gproxyvolumemonitor.c:
+	* monitor/proxy/gproxyvolumemonitor.h:
+	* monitor/proxy/gvfsproxyvolumemonitordaemon.c:
 	Use g_icon_to_string & co instead of home-brewed serialization
 	
 2008-10-20  Richard Hughes  <richard@hughsie.com>
@@ -705,8 +705,8 @@
 
 2008-10-20  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfileinputstream.c:
-        (run_sync_state_machine):
+	* client/gdaemonfileinputstream.c:
+	(run_sync_state_machine):
 	Revert debug spew from recent commit now that the core
 	issue is fixed (by the fuse race condition fix).
 
@@ -759,8 +759,8 @@
 
 2008-10-16  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendftp.c:
-        (do_mount):
+	* daemon/gvfsbackendftp.c:
+	(do_mount):
 	Show username in auth dialog if specified in uri (#554156)
 
 2008-10-16  Alexander Larsson  <alexl@redhat.com>
@@ -771,8 +771,8 @@
 
 2008-10-09  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfileinputstream.c:
-        (run_sync_state_machine):
+	* client/gdaemonfileinputstream.c:
+	(run_sync_state_machine):
 	Add some debug spew and avoid crashing in case of code not properly
 	setting the GError, as reported on the list.
 
@@ -780,9 +780,9 @@
 
 	Patch from Andreas Henriksson
 
-        * daemon/gvfsbackendftp.c:
-        (dir_default_iter_new):
-        (dir_default_iter_process):
+	* daemon/gvfsbackendftp.c:
+	(dir_default_iter_new):
+	(dir_default_iter_process):
 	Don't read past start of filename. (#545971)
 
 2008-10-03  Bastien Nocera  <hadess@hadess.net>
@@ -833,16 +833,16 @@
 
 2008-09-26  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonvfs.[ch]:
-        * common/gvfsdaemonprotocol.h:
-        * daemon/mount.c:
+	* client/gdaemonvfs.[ch]:
+	* common/gvfsdaemonprotocol.h:
+	* daemon/mount.c:
 	Reverse map fuse paths to gvfs uris in
 	g_file_new_for_path().
 
 2008-09-25  Alexander Larsson  <alexl@redhat.com>
 
-        * common/gvfsdaemonprotocol.c:
-        (_g_dbus_get_file_attribute):
+	* common/gvfsdaemonprotocol.c:
+	(_g_dbus_get_file_attribute):
 	Free returned strv with g_strfreev, not dbus_free_string_array. (#529596)
 
 2008-09-23  Alexander Larsson  <alexl@redhat.com>
@@ -852,9 +852,9 @@
 
 2008-09-23  Alexander Larsson  <alexl@redhat.com>
 
-        * monitor/proxy/gproxyvolumemonitor.[ch]:
-        * monitor/proxy/gproxyvolumemonitor.h:
-        * monitor/proxy/remote-volume-monitor-module.c:
+	* monitor/proxy/gproxyvolumemonitor.[ch]:
+	* monitor/proxy/gproxyvolumemonitor.h:
+	* monitor/proxy/remote-volume-monitor-module.c:
 	Only call the IsSupported dbus call when the class
 	is actually needed instead of on gio init.
 	Don't integrate internal session bus with mainloop
@@ -865,19 +865,19 @@
 
 2008-09-23  Alexander Larsson  <alexl@redhat.com>
 
-        * client/Makefile.am:
-        * common/Makefile.am:
-        * common/gmountsource.c:
-        * common/gmounttracker.c:
-        * monitor/gphoto2/Makefile.am:
-        * monitor/hal/Makefile.am:
-        * monitor/proxy/Makefile.am:
+	* client/Makefile.am:
+	* common/Makefile.am:
+	* common/gmountsource.c:
+	* common/gmounttracker.c:
+	* monitor/gphoto2/Makefile.am:
+	* monitor/hal/Makefile.am:
+	* monitor/proxy/Makefile.am:
 	Link all modules against the installed libgvfscommon instead
 	of duplicating the statically linked one. This is safe wrt
 	namespace conflicts, because the modules are opened RTLD_LOCAL
 	so the dependencies will not pollute the global namespace.
 
-        * client/gdaemonvfs.c:
+	* client/gdaemonvfs.c:
 	Make the gvfsdbus module persistant. This means we will never
 	unload it, and thus not unload libgvfscommon which could
 	be problematic. This is not a huge problem, as:
@@ -912,8 +912,8 @@
 
 2008-09-15  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfile.c:
-        * client/gdaemonfileenumerator.c:
+	* client/gdaemonfile.c:
+	* client/gdaemonfileenumerator.c:
 	Add proper implementation of async file enumeration.
 	This avoids the problem with the default thread based ones
 	that could cause callbacks in the non-mainloop thread. (#551337)
@@ -1199,32 +1199,32 @@
 
 2008-08-02  Christian Persch <chpe@gnome.org>
 
-        * ChangeLog
-        * client/gdaemonfile.c
-        * client/gdaemonfileinputstream.c
-        * client/gdaemonfileoutputstream.c
-        * client/gvfsdaemondbus.c
-        * common/gdbusutils.c
-        * common/gvfsdaemonprotocol.c
-        * daemon/gvfsbackendarchive.c
-        * daemon/gvfsbackendcdda.c
-        * daemon/gvfsbackenddav.c
-        * daemon/gvfsbackendftp.c
-        * daemon/gvfsbackendgphoto2.c
-        * daemon/gvfsbackendobexftp-cap-parser.c
-        * daemon/gvfsbackendobexftp-fl-parser.c
-        * daemon/gvfsbackendobexftp.c
-        * daemon/gvfsbackendsftp.c
-        * daemon/gvfsbackendsmb.c
-        * daemon/gvfsbackendsmbbrowse.c
-        * daemon/gvfsjob.c
-        * daemon/gvfsjobopenforwrite.c
-        * daemon/gvfsreadchannel.c
-        * daemon/gvfswritechannel.c
-        * daemon/mount.c
-        * daemon/soup-input-stream.c
-        * daemon/soup-output-stream.c: Use g_set_error_literal where
-        appropriate. Bug #539167.
+	* ChangeLog
+	* client/gdaemonfile.c
+	* client/gdaemonfileinputstream.c
+	* client/gdaemonfileoutputstream.c
+	* client/gvfsdaemondbus.c
+	* common/gdbusutils.c
+	* common/gvfsdaemonprotocol.c
+	* daemon/gvfsbackendarchive.c
+	* daemon/gvfsbackendcdda.c
+	* daemon/gvfsbackenddav.c
+	* daemon/gvfsbackendftp.c
+	* daemon/gvfsbackendgphoto2.c
+	* daemon/gvfsbackendobexftp-cap-parser.c
+	* daemon/gvfsbackendobexftp-fl-parser.c
+	* daemon/gvfsbackendobexftp.c
+	* daemon/gvfsbackendsftp.c
+	* daemon/gvfsbackendsmb.c
+	* daemon/gvfsbackendsmbbrowse.c
+	* daemon/gvfsjob.c
+	* daemon/gvfsjobopenforwrite.c
+	* daemon/gvfsreadchannel.c
+	* daemon/gvfswritechannel.c
+	* daemon/mount.c
+	* daemon/soup-input-stream.c
+	* daemon/soup-output-stream.c: Use g_set_error_literal where
+	appropriate. Bug #539167.
 
 2008-07-29  David Zeuthen  <davidz@redhat.com>
 
@@ -1777,7 +1777,7 @@
 
 2008-03-31  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Get the right size of the command messages.
 	Actually send file attributes in mkdir request.
 
@@ -1790,13 +1790,13 @@
 
 2008-03-31  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gvfsdaemondbus.[ch]:
+	* client/gvfsdaemondbus.[ch]:
 	In call_sync, on stale cache errors due to a
 	mount daemon disappearing, invalidate caches and
 	return G_VFS_ERROR_RETRY so that the caller can
 	retry with fresh caches.
 	
-        * client/gdaemonfile.c:
+	* client/gdaemonfile.c:
 	Retry calls on G_VFS_ERROR_RETRY.
 
 2008-03-28  Benjamin Otte  <otte@gnome.org>
@@ -1850,29 +1850,29 @@
 
 2008-03-27  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Handle all target exists errors correctly
 	in move. This should make us not silently
 	overwrite files.
 	
-        * daemon/gvfsjobmove.[ch]:
-        Add g_vfs_job_move_progress_callback
+	* daemon/gvfsjobmove.[ch]:
+	Add g_vfs_job_move_progress_callback
 
 2008-03-27  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Introduce helpers for multi-request ops.
 	Use it for query_info.
 
 2008-03-26  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfile.c:
+	* client/gdaemonfile.c:
 	Implement true async query_filesystem_info
 
 2008-03-26  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfileenumerator.c:
-        (g_daemon_file_enumerator_next_file):
+	* client/gdaemonfileenumerator.c:
+	(g_daemon_file_enumerator_next_file):
 	Avoid hanging forever and not sending any async messages.
 	This could happen if we raced and missed the done check.
 
@@ -1883,7 +1883,7 @@
 
 2008-03-26  Alexander Larsson  <alexl@redhat.com>
 
-        * daemon/gvfsbackendsftp.c:
+	* daemon/gvfsbackendsftp.c:
 	Pass id via the command object, not via out parameter.
 	Removes a bunch of code to pass the id around.
 
