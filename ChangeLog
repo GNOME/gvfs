@@ -1,3 +1,8 @@
+2009-02-17  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/trashlib/trashwatcher.c: rescan NFS mounts when enumerating
+	trash (since not all change events are reported).
+
 2009-02-16  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:

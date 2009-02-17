@@ -65,7 +65,14 @@ static WatchType
 decide_watch_type (GUnixMountEntry *mount,
                    gboolean         is_home_trash)
 {
-  return TRASH_WATCHER_TRUSTED;
+  const gchar *fs_type;
+
+  fs_type = g_unix_mount_get_fs_type (mount);
+
+  if (strcmp (fs_type, "nfs") == 0)
+    return TRASH_WATCHER_WATCH;
+  else
+    return TRASH_WATCHER_TRUSTED;
 }
 
 /* find the mount entry for the directory containing 'file'.
