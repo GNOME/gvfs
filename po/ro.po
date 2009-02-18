@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-02-11 11:54+0000\n"
-"PO-Revision-Date: 2009-02-12 14:31+0200\n"
+"POT-Creation-Date: 2009-02-12 19:44+0000\n"
+"PO-Revision-Date: 2009-02-18 23:18+0200\n"
 "Last-Translator: Adi Roiban <adi@roiban.ro>\n"
 "Language-Team: Gnome Romanian Team <gnomero-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -1677,7 +1677,7 @@ msgstr "Unitate Jaz"
 
 #: ../monitor/hal/ghaldrive.c:214
 msgid "Thumb Drive"
-msgstr ""
+msgstr "Stick memorie USB"
 
 #: ../monitor/hal/ghaldrive.c:217
 msgid "Mass Storage Drive"
