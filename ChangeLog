@@ -1,3 +1,13 @@
+2009-02-18  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 563623 – build dies on platforms lacking poll() implimentation
+
+        * client/gvfsdaemondbus.c:
+        (setup_async_fd_receive):
+        (_g_vfs_daemon_call_sync):
+	Use g_poll instead of poll.
+	Patch from ephraim_owns@hotmail.com
+
 2009-02-17  Ryan Lortie  <desrt@desrt.ca>
 
 	* daemon/trashlib/trashwatcher.c: rescan NFS mounts when enumerating

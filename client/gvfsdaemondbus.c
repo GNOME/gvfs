@@ -29,7 +29,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#include <poll.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -301,7 +300,7 @@ setup_async_fd_receive (VfsConnectionData *connection_data)
   
   
   connection_data->extra_fd_source =
-    __g_fd_source_new (connection_data->extra_fd, POLLIN|POLLERR, NULL);
+    __g_fd_source_new (connection_data->extra_fd, G_IO_IN|G_IO_ERR, NULL);
   g_source_set_callback (connection_data->extra_fd_source,
 			 (GSourceFunc)async_connection_accept_new_fd,
 			 connection_data, NULL);
@@ -745,16 +744,16 @@ _g_vfs_daemon_call_sync (DBusMessage *message,
       sent_cancel = (cancel_fd == -1);
       while (!dbus_pending_call_get_completed (pending))
 	{
-	  struct pollfd poll_fds[2];
+	  GPollFD poll_fds[2];
 	  int poll_ret;
 	  
 	  do
 	    {
-	      poll_fds[0].events = POLLIN;
+	      poll_fds[0].events = G_IO_IN;
 	      poll_fds[0].fd = dbus_fd;
-	      poll_fds[1].events = POLLIN;
+	      poll_fds[1].events = G_IO_IN;
 	      poll_fds[1].fd = cancel_fd;
-	      poll_ret = poll (poll_fds, sent_cancel?1:2, -1);
+	      poll_ret = g_poll (poll_fds, sent_cancel?1:2, -1);
 	    }
 	  while (poll_ret == -1 && errno == EINTR);
 
