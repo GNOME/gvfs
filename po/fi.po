@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-27 18:14+0300\n"
-"PO-Revision-Date: 2009-02-18 10:45+0200\n"
+"POT-Creation-Date: 2009-02-19 10:32+0300\n"
+"PO-Revision-Date: 2009-02-19 10:35+0300\n"
 "Last-Translator: Ilkka Tuohela <hile@iki.fi>\n"
 "Language-Team: Finnish <gnome-fi-laatu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -84,12 +84,13 @@ msgstr "Virheellinen kutsun monitor_file paluuarvo"
 #: ../client/gdaemonfileinputstream.c:1032
 #: ../client/gdaemonfileoutputstream.c:458
 #: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:741
-#: ../daemon/gvfsbackendobexftp.c:762 ../daemon/gvfsbackendobexftp.c:881
-#: ../daemon/gvfsbackendobexftp.c:1018 ../daemon/gvfsbackendobexftp.c:1082
-#: ../daemon/gvfsbackendobexftp.c:1219 ../daemon/gvfsbackendobexftp.c:1246
-#: ../daemon/gvfsbackendobexftp.c:1305 ../daemon/gvfsbackendobexftp.c:1327
-#: ../daemon/gvfsbackendobexftp.c:1387 ../daemon/gvfsbackendobexftp.c:1406
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:1060
+#: ../daemon/gvfsbackendobexftp.c:1081 ../daemon/gvfsbackendobexftp.c:1200
+#: ../daemon/gvfsbackendobexftp.c:1337 ../daemon/gvfsbackendobexftp.c:1401
+#: ../daemon/gvfsbackendobexftp.c:1601 ../daemon/gvfsbackendobexftp.c:1708
+#: ../daemon/gvfsbackendobexftp.c:1858 ../daemon/gvfsbackendobexftp.c:1885
+#: ../daemon/gvfsbackendobexftp.c:1944 ../daemon/gvfsbackendobexftp.c:1966
+#: ../daemon/gvfsbackendobexftp.c:2029 ../daemon/gvfsbackendobexftp.c:2048
 #: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
@@ -134,7 +135,7 @@ msgstr "Virta ei tue tietojen kyselyä"
 msgid "Error while getting mount info: %s"
 msgstr "Virhe haettaessa tietoja liitospisteestä: %s"
 
-#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
+#: ../client/gvfsdaemondbus.c:567 ../client/gvfsdaemondbus.c:998
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Virhe yhdistettäessä palvelinprosessiin: %s"
@@ -182,11 +183,13 @@ msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
+"Virhe selvitettäessä \"%s\"-palvelua \"%s\" alueella \"%s\". Yksi tai "
+"useampia TXT-tietueita puuttuu. Vaaditut avaimet: \"%s\"."
 
 #: ../common/gvfsdnssdresolver.c:1126
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr ""
+msgstr "Aikakatkaisu selvitettäessä \"%s\"-palvelua \"%s\" alueella \"%s\""
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
@@ -259,16 +262,16 @@ msgid "No hostname specified"
 msgstr "Verkkonimeä ei annettu"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:561 ../daemon/gvfsbackendobexftp.c:572
-#: ../daemon/gvfsbackendsmb.c:641
+#: ../daemon/gvfsbackenddav.c:1626 ../daemon/gvfsbackendhttp.c:306
+#: ../daemon/gvfsbackendobexftp.c:836 ../daemon/gvfsbackendobexftp.c:852
+#: ../daemon/gvfsbackendobexftp.c:871 ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
 msgstr "Virheellinen liitosmäärittely"
 
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
 #: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:399
-#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:647
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:398
+#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:646
 #: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
 #: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
 #, c-format
@@ -276,8 +279,8 @@ msgid "File doesn't exist"
 msgstr "Tiedostoa ei ole olemassa"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:446
-#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:694
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:693
 msgid "The file is not a directory"
 msgstr "Tiedosto ei ole kansio"
 
@@ -300,11 +303,12 @@ msgstr "Väliaikaistiedostoa ei voitu luoda"
 msgid "No such file or directory"
 msgstr "Tiedostoa tai kansiota ei löydy"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2218
 msgid "Directory not empty"
 msgstr "Kansio ei ole tyhjä"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendobexftp.c:1783
 msgid "Can't copy file over directory"
 msgstr "Tiedostoa ei voi kopioida kansion päälle"
 
@@ -342,15 +346,16 @@ msgstr "Taustajärjestelmä ei tue toimintoa"
 msgid "No such file or directory in target path"
 msgstr "Kohdepolulla ei ole haluttua kansiota tai hakemistoa"
 
-#: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendburn.c:877 ../daemon/gvfsbackendobexftp.c:1752
 msgid "Can't copy directory over directory"
 msgstr "Kansiota ei voi kopioida kansion päälle"
 
-#: ../daemon/gvfsbackendburn.c:886
+#: ../daemon/gvfsbackendburn.c:886 ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Target file exists"
 msgstr "Kohdetiedosto on jo olemassa"
 
-#: ../daemon/gvfsbackendburn.c:893
+#: ../daemon/gvfsbackendburn.c:893 ../daemon/gvfsbackendobexftp.c:1767
 msgid "Can't recursively copy directory"
 msgstr "Kansiota ei voi kopioida rekursiivisesti"
 
@@ -445,9 +450,8 @@ msgid "Filesystem"
 msgstr "Tiedostojärjestelmä"
 
 #: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
-#: ../daemon/gvfsbackendobexftp.c:727 ../daemon/gvfsbackendsmb.c:684
+#: ../daemon/gvfsbackendobexftp.c:1046 ../daemon/gvfsbackendsmb.c:684
 #: ../daemon/gvfsbackendtrash.c:232
-#, c-format
 msgid "Can't open directory"
 msgstr "Kansiota ei voi avata"
 
@@ -481,87 +485,87 @@ msgstr "Tiedostoa ei voi irrottaa"
 msgid "Can't eject file"
 msgstr "Tiedostoa ei voi poistaa asemasta"
 
-#: ../daemon/gvfsbackenddav.c:526 ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1693
 #: ../daemon/gvfsbackendhttp.c:252
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP-virhe: %s"
 
-#: ../daemon/gvfsbackenddav.c:543
+#: ../daemon/gvfsbackenddav.c:578
 msgid "Could not parse response"
 msgstr "Vastausta ei voitu tulkita"
 
-#: ../daemon/gvfsbackenddav.c:552
+#: ../daemon/gvfsbackenddav.c:587
 msgid "Empty response"
 msgstr "Tyhjä vastaus"
 
-#: ../daemon/gvfsbackenddav.c:560
+#: ../daemon/gvfsbackenddav.c:595
 msgid "Unexpected reply from server"
 msgstr "Odottamaton vastaus palvelimelta"
 
-#: ../daemon/gvfsbackenddav.c:1179 ../daemon/gvfsbackenddav.c:1798
+#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1833
 msgid "Response invalid"
 msgstr "Virheellinen vastaus"
 
-#: ../daemon/gvfsbackenddav.c:1322
+#: ../daemon/gvfsbackenddav.c:1357
 msgid "WebDAV share"
 msgstr "WebDAV-jako"
 
-#: ../daemon/gvfsbackenddav.c:1324
+#: ../daemon/gvfsbackenddav.c:1359
 #, c-format
 msgid "Enter password for %s"
 msgstr "Anna kohteen %s salasana"
 
-#: ../daemon/gvfsbackenddav.c:1327
+#: ../daemon/gvfsbackenddav.c:1362
 msgid "Please enter proxy password"
 msgstr "Syötä välipalvelimen salasana"
 
-#: ../daemon/gvfsbackenddav.c:1662 ../daemon/gvfsbackenddav.c:1666
+#: ../daemon/gvfsbackenddav.c:1697 ../daemon/gvfsbackenddav.c:1701
 msgid "Not a WebDAV enabled share"
 msgstr "Jako ei tue WebDAV:ia"
 
-#: ../daemon/gvfsbackenddav.c:1694
+#: ../daemon/gvfsbackenddav.c:1729
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV-jako palvelimella %s"
 
-#: ../daemon/gvfsbackenddav.c:1754 ../daemon/gvfsbackenddav.c:1827
+#: ../daemon/gvfsbackenddav.c:1789 ../daemon/gvfsbackenddav.c:1862
 msgid "Could not create request"
 msgstr "Pyyntöä ei voitu luoda"
 
-#: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
-#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1860
-#: ../daemon/gvfsbackendftp.c:2526 ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackenddav.c:1925 ../daemon/gvfsbackenddav.c:2178
+#: ../daemon/gvfsbackenddav.c:2289 ../daemon/gvfsbackendftp.c:1860
+#: ../daemon/gvfsbackendftp.c:2526 ../daemon/gvfsbackendsftp.c:3708
 #: ../daemon/gvfsbackendsmb.c:1912
 msgid "Target file already exists"
 msgstr "Kohdetiedosto on jo olemassa"
 
-#: ../daemon/gvfsbackenddav.c:1963 ../daemon/gvfsbackendsftp.c:2836
+#: ../daemon/gvfsbackenddav.c:1998 ../daemon/gvfsbackendsftp.c:2941
 #: ../daemon/gvfsbackendsmb.c:1074
 msgid "The file was externally modified"
 msgstr "Tiedostoa muokattiin muualta"
 
-#: ../daemon/gvfsbackenddav.c:1994 ../daemon/gvfsbackendsmb.c:1110
+#: ../daemon/gvfsbackenddav.c:2029 ../daemon/gvfsbackendsmb.c:1110
 #: ../daemon/gvfsbackendsmb.c:1929
 msgid "Backup file creation failed"
 msgstr "Varmuuskopiotiedoston luonti epäonnistui"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:493 ../daemon/gvfsbackendnetwork.c:394
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Paikallisverkko"
 
-#: ../daemon/gvfsbackenddnssd.c:737 ../daemon/gvfsbackendnetwork.c:798
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Tiedostoa tai kansiota ei voi tarkkailla."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:755
+#: ../daemon/gvfsbackenddnssd.c:754
 msgid "Dns-SD"
 msgstr "DNS-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:756 ../daemon/gvfsbackendnetwork.c:733
-#: ../daemon/gvfsbackendnetwork.c:883 ../daemon/gvfsbackendnetwork.c:884
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Verkko"
 
@@ -589,7 +593,7 @@ msgstr "Toiminto epäonnistui"
 msgid "No space left on server"
 msgstr "Palvelimella ei ole tilaa jäljellä"
 
-#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:4017
 #: ../daemon/gvfsbackendsmb.c:1576
 msgid "Operation unsupported"
 msgstr "Toiminto ei tue tuettu"
@@ -622,7 +626,7 @@ msgstr "Palvelimeen ei saatu yhteyttä"
 
 #. Translators: the first %s is the username, the second the host name
 #: ../daemon/gvfsbackendftp.c:1494
-#,  c-format
+#, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Anna käyttäjän %s ftp-palvelimen %s ftp-salasana"
 
@@ -649,11 +653,12 @@ msgid "ftp as %s on %s"
 msgstr "ftp käyttäjänä %s palvelimella %s"
 
 #: ../daemon/gvfsbackendftp.c:1690 ../daemon/gvfsbackendsftp.c:1967
-#: ../daemon/gvfsbackendsftp.c:3579
+#: ../daemon/gvfsbackendsftp.c:3699
 msgid "File is directory"
 msgstr "Tiedosto on kansio"
 
 #: ../daemon/gvfsbackendftp.c:1912 ../daemon/gvfsbackendftp.c:2487
+#: ../daemon/gvfsbackendsftp.c:2802
 msgid "backups not supported yet"
 msgstr "varmuuskopioita ei vielä tueta"
 
@@ -873,13 +878,13 @@ msgid "Directory notification not supported"
 msgstr "Kansioiden huomautukset eivät ole tuettu"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:270 ../daemon/gvfsbackendsmbbrowse.c:885
+#: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Windows-verkko"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:932
+#: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
 msgstr "Verkkosijaintien tarkkailija"
 
@@ -889,17 +894,21 @@ msgstr "Verkkosijaintien tarkkailija"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:387 ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendobexftp.c:656 ../daemon/gvfsbackendsmb.c:538
 #: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s palvelimella %s"
 
-#: ../daemon/gvfsbackendobexftp.c:666
+#: ../daemon/gvfsbackendobexftp.c:865
+msgid "USB support missing. Please contact your software vendor"
+msgstr "USB-tuki puuttuu. Ota yhteyttä ohjelmiston toimittajaan"
+
+#: ../daemon/gvfsbackendobexftp.c:985
 msgid "Connection to the device lost"
 msgstr "Yhteys laitteeseen hukattiin"
 
-#: ../daemon/gvfsbackendobexftp.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1482
 msgid "Device requires a software update"
 msgstr "Laite vaatii ohjelmistopäivityksen"
 
@@ -1007,16 +1016,17 @@ msgstr "Virhe"
 #: ../daemon/gvfsbackendsftp.c:2264 ../daemon/gvfsbackendsftp.c:2314
 #: ../daemon/gvfsbackendsftp.c:2360 ../daemon/gvfsbackendsftp.c:2435
 #: ../daemon/gvfsbackendsftp.c:2542 ../daemon/gvfsbackendsftp.c:2582
-#: ../daemon/gvfsbackendsftp.c:2632 ../daemon/gvfsbackendsftp.c:2701
-#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2873
-#: ../daemon/gvfsbackendsftp.c:2898 ../daemon/gvfsbackendsftp.c:2953
-#: ../daemon/gvfsbackendsftp.c:3010 ../daemon/gvfsbackendsftp.c:3281
-#: ../daemon/gvfsbackendsftp.c:3348 ../daemon/gvfsbackendsftp.c:3477
-#: ../daemon/gvfsbackendsftp.c:3512 ../daemon/gvfsbackendsftp.c:3540
-#: ../daemon/gvfsbackendsftp.c:3648 ../daemon/gvfsbackendsftp.c:3702
-#: ../daemon/gvfsbackendsftp.c:3736 ../daemon/gvfsbackendsftp.c:3770
-#: ../daemon/gvfsbackendsftp.c:3785 ../daemon/gvfsbackendsftp.c:3800
-#: ../daemon/gvfsbackendsftp.c:3878
+#: ../daemon/gvfsbackendsftp.c:2632 ../daemon/gvfsbackendsftp.c:2704
+#: ../daemon/gvfsbackendsftp.c:2716 ../daemon/gvfsbackendsftp.c:2774
+#: ../daemon/gvfsbackendsftp.c:2816 ../daemon/gvfsbackendsftp.c:2993
+#: ../daemon/gvfsbackendsftp.c:3018 ../daemon/gvfsbackendsftp.c:3073
+#: ../daemon/gvfsbackendsftp.c:3130 ../daemon/gvfsbackendsftp.c:3401
+#: ../daemon/gvfsbackendsftp.c:3468 ../daemon/gvfsbackendsftp.c:3597
+#: ../daemon/gvfsbackendsftp.c:3632 ../daemon/gvfsbackendsftp.c:3660
+#: ../daemon/gvfsbackendsftp.c:3768 ../daemon/gvfsbackendsftp.c:3822
+#: ../daemon/gvfsbackendsftp.c:3856 ../daemon/gvfsbackendsftp.c:3890
+#: ../daemon/gvfsbackendsftp.c:3905 ../daemon/gvfsbackendsftp.c:3920
+#: ../daemon/gvfsbackendsftp.c:3998
 msgid "Invalid reply received"
 msgstr "Saatiin virheellinen vastaus"
 
@@ -1030,11 +1040,11 @@ msgstr "Virheellinen icon_id \"%s\" kutsussa OpenIconForRead"
 msgid "Error creating backup file: %s"
 msgstr "Virhe luotaessa varmuuskopiotiedostoa: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2783
+#: ../daemon/gvfsbackendsftp.c:2878
 msgid "Unable to create temporary file"
 msgstr "Virhe luotaessa väliaikaistiedostoa"
 
-#: ../daemon/gvfsbackendsftp.c:3574 ../daemon/gvfsbackendsmb.c:1901
+#: ../daemon/gvfsbackendsftp.c:3694 ../daemon/gvfsbackendsmb.c:1901
 msgid "Can't move directory over directory"
 msgstr "Kansiota ei voi siirtää kansion päälle"
 
@@ -1117,20 +1127,13 @@ msgstr "Ei ole tavallinen tiedosto"
 msgid "Windows Network Filesystem Service"
 msgstr "Windows-verkon tiedostojärjestelmäpalvelu"
 
-#: ../daemon/gvfsbackendtrash.c:370
-#, c-format
-msgid "Can't delete trash"
-msgstr "Roskakoria ei voi poistaa"
+#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+msgid "The trash folder may not be deleted"
+msgstr "Roskakorikansiota ei voi poistaa"
 
 #: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
-#, c-format
 msgid "Items in the trash may not be modified"
 msgstr "Roskakorissa olevia tiedostoja ei voi muokata"
-
-#: ../daemon/gvfsbackendtrash.c:426
-#, fuzzy, c-format
-msgid "Can't pull trash"
-msgstr "Roskakoria ei voi poistaa"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
