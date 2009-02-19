@@ -1,3 +1,13 @@
+2009-02-19  Benjamin Otte  <otte@gnome.org>
+
+	reviewed by: Andreas Henriksson <andreas@fatal.se>
+
+	Bug 525283 - handle short reads in ftp
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_receive):
+	account for cases where soup_socket_read_until() would not read up to
+	the boundary on the first read.
+
 2009-02-18  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 563623 – build dies on platforms lacking poll() implimentation
