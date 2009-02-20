@@ -234,48 +234,6 @@ is_supported (void)
   return get_hal_pool() != NULL;
 }
 
-static GVolume *
-adopt_orphan_mount (GMount *mount, GVolumeMonitor *monitor)
-{
-  GList *l;
-  GFile *mount_root;
-  GVolume *ret;
-
-  /* This is called by the union volume monitor which does
-     have a ref to this. So its guaranteed to live, unfortunately
-     the pointer is not passed as an argument :/
-  */
-  ret = NULL;
-
-  G_LOCK (hal_vm);
-  if (the_volume_monitor == NULL)
-    {
-      G_UNLOCK (hal_vm);
-      return NULL;
-    }
-
-  mount_root = g_mount_get_root (mount);
-
-  /* gphoto2:// are foreign mounts */
-  for (l = the_volume_monitor->camera_volumes; l != NULL; l = l->next)
-    {
-      GGPhoto2Volume *volume = l->data;
-
-      if (g_gphoto2_volume_has_foreign_mount_root (volume, mount_root))
-        {
-          g_gphoto2_volume_adopt_foreign_mount (volume, mount);
-          ret = g_object_ref (volume);
-          goto found;
-        }
-    }
-
- found:
-  g_object_unref (mount_root);
-
-  G_UNLOCK (hal_vm);
-  return ret;
-}
-
 static void
 g_gphoto2_volume_monitor_class_init (GGPhoto2VolumeMonitorClass *klass)
 {
@@ -291,7 +249,6 @@ g_gphoto2_volume_monitor_class_init (GGPhoto2VolumeMonitorClass *klass)
   monitor_class->get_connected_drives = get_connected_drives;
   monitor_class->get_volume_for_uuid = get_volume_for_uuid;
   monitor_class->get_mount_for_uuid = get_mount_for_uuid;
-  monitor_class->adopt_orphan_mount = adopt_orphan_mount;
   monitor_class->is_supported = is_supported;
 }
 
@@ -575,11 +532,11 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
   for (l = added; l != NULL; l = l->next)
     {
       HalDevice *d = l->data;
-      GFile *foreign_mount_root;
       int usb_bus_num;
       int usb_device_num;
       gboolean found;
       GList *store_heads, *l;
+      guint num_store_heads;
 
       /* Look for the device in the added volumes, so as
        * not to add devices that are both audio players, and cameras */
@@ -600,32 +557,44 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
       usb_device_num = hal_device_get_property_int (d, "usb.linux.device_number");
 
       store_heads = get_stores_for_camera (usb_bus_num, usb_device_num);
+      num_store_heads = g_list_length (store_heads);
       for (l = store_heads ; l != NULL; l = l->next)
         {
           char *store_path = (char *) l->data;
-          char *uri;
+          GFile *activation_mount_root;
+          gchar *uri;
 
-	  uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]/%s", usb_bus_num, usb_device_num,
-	  			 store_path[0] == '/' ? store_path + 1 : store_path);
-
-	  foreign_mount_root = g_file_new_for_uri (uri);
-	  g_free (uri);
-
-	  udi = hal_device_get_udi (d);
-	  volume = g_gphoto2_volume_new (G_VOLUME_MONITOR (monitor),
-					 d,
-					 monitor->pool,
-					 foreign_mount_root);
-	  g_object_unref (foreign_mount_root);
-	  if (volume != NULL)
+          /* If we only have a single store, don't use the store name at all. The backend automatically
+           * prepend the storename; this is to work around bugs with devices (like the iPhone) for which
+           * the store name changes every time the camera is initialized (e.g. mounted).
+           */
+          if (num_store_heads == 1)
             {
-	      monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
-	      *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
-	    }
+              uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]", usb_bus_num, usb_device_num);
+            }
+          else
+            {
+              uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]/%s", usb_bus_num, usb_device_num,
+                                     store_path[0] == '/' ? store_path + 1 : store_path);
+            }
+          activation_mount_root = g_file_new_for_uri (uri);
+          g_free (uri);
 
-	  g_free (l->data);
+          udi = hal_device_get_udi (d);
+          volume = g_gphoto2_volume_new (G_VOLUME_MONITOR (monitor),
+                                         d,
+                                         monitor->pool,
+                                         activation_mount_root);
+          if (volume != NULL)
+            {
+              monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
+              *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
+            }
 
+          if (activation_mount_root != NULL)
+            g_object_unref (activation_mount_root);
         }
+      g_list_foreach (store_heads, (GFunc) g_free, NULL);
       g_list_free (store_heads);
     }
 

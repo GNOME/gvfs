@@ -1,3 +1,21 @@
+2009-02-20  David Zeuthen  <davidz@redhat.com>
+
+	Make the gphoto2 backend work with buggy devices (such as the
+	iPhone) where the basedir of the store changes.
+
+	* daemon/gvfsbackendgphoto2.c: Revert the patch from #520123 that
+	removed the ignore_prefix handling. Change ensure_ignore_prefix()
+	to only use an ignore prefix if there is exactly one storage head.
+
+	* monitor/gphoto2/ggphoto2volumemonitor.c: Nuke orphan mount
+	handling since that is superseeded by shadow mounts. Also avoid
+	appending the store name if there is only one storage head.
+
+	* monitor/gphoto2/ggphoto2volume.[ch]: Rename foreign_mount_root
+	to activation_root since that is really what it is now. Also
+	fix a silly logical bug whereby music players (as reported by
+	HAL) weren't detected.
+
 2009-02-19  Benjamin Otte  <otte@gnome.org>
 
 	reviewed by: Andreas Henriksson <andreas@fatal.se>

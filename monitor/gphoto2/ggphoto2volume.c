@@ -47,8 +47,7 @@ struct _GGPhoto2Volume {
   HalDevice *device;
   HalDevice *drive_device;
 
-  GFile *foreign_mount_root;
-  GMount *foreign_mount;
+  GFile *activation_root;
 
   char *name;
   char *icon;
@@ -70,11 +69,8 @@ g_gphoto2_volume_finalize (GObject *object)
   if (volume->device != NULL)
     g_object_unref (volume->device);
 
-  if (volume->foreign_mount_root != NULL)
-    g_object_unref (volume->foreign_mount_root);
-
-  if (volume->foreign_mount != NULL)
-    g_object_unref (volume->foreign_mount);
+  if (volume->activation_root != NULL)
+    g_object_unref (volume->activation_root);
 
   if (volume->volume_monitor != NULL)
     g_object_remove_weak_pointer (G_OBJECT (volume->volume_monitor), (gpointer) &(volume->volume_monitor));
@@ -248,7 +244,7 @@ GGPhoto2Volume *
 g_gphoto2_volume_new (GVolumeMonitor   *volume_monitor,
                       HalDevice        *device,
                       HalPool          *pool,
-                      GFile            *foreign_mount_root)
+                      GFile            *activation_root)
 {
   GGPhoto2Volume *volume;
   HalDevice *drive_device;
@@ -258,11 +254,11 @@ g_gphoto2_volume_new (GVolumeMonitor   *volume_monitor,
   g_return_val_if_fail (volume_monitor != NULL, NULL);
   g_return_val_if_fail (device != NULL, NULL);
   g_return_val_if_fail (pool != NULL, NULL);
-  g_return_val_if_fail (foreign_mount_root != NULL, NULL);
+  g_return_val_if_fail (activation_root != NULL, NULL);
 
-  if (!hal_device_has_capability (device, "camera") ||
-      (hal_device_has_capability (device, "portable_audio_player") &&
-       hal_device_get_property_bool (device, "camera.libgphoto2.support")))
+  if (!(hal_device_has_capability (device, "camera") ||
+        (hal_device_has_capability (device, "portable_audio_player") &&
+         hal_device_get_property_bool (device, "camera.libgphoto2.support"))))
     return NULL;
 
   /* OK, so we abuse storage_udi and drive_device for the USB main
@@ -287,7 +283,7 @@ g_gphoto2_volume_new (GVolumeMonitor   *volume_monitor,
   volume->device_path = g_strdup (device_path);
   volume->device = g_object_ref (device);
   volume->drive_device = g_object_ref (drive_device);
-  volume->foreign_mount_root = foreign_mount_root != NULL ? g_object_ref (foreign_mount_root) : NULL;
+  volume->activation_root = g_object_ref (activation_root);
 
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
@@ -361,16 +357,7 @@ g_gphoto2_volume_get_drive (GVolume *volume)
 static GMount *
 g_gphoto2_volume_get_mount (GVolume *volume)
 {
-  GGPhoto2Volume *gphoto2_volume = G_GPHOTO2_VOLUME (volume);
-  GMount *mount;
-
-  G_LOCK (gphoto2_volume);
-  mount = NULL;
-  if (gphoto2_volume->foreign_mount != NULL)
-    mount = g_object_ref (gphoto2_volume->foreign_mount);
-  G_UNLOCK (gphoto2_volume);
-
-  return mount;
+  return NULL;
 }
 
 gboolean
@@ -388,101 +375,51 @@ g_gphoto2_volume_has_udi (GGPhoto2Volume  *volume,
   return res;
 }
 
-static void
-foreign_mount_unmounted (GMount *mount, gpointer user_data)
-{
-  GGPhoto2Volume *volume = G_GPHOTO2_VOLUME (user_data);
-  gboolean check;
-
-  G_LOCK (gphoto2_volume);
-  check = volume->foreign_mount == mount;
-  G_UNLOCK (gphoto2_volume);
-  if (check)
-    g_gphoto2_volume_adopt_foreign_mount (volume, NULL);
-}
-
-void
-g_gphoto2_volume_adopt_foreign_mount (GGPhoto2Volume *volume, GMount *foreign_mount)
-{
-  G_LOCK (gphoto2_volume);
-  if (volume->foreign_mount != NULL)
-    g_object_unref (volume->foreign_mount);
-
-  if (foreign_mount != NULL)
-    {
-      volume->foreign_mount =  g_object_ref (foreign_mount);
-      g_signal_connect_object (foreign_mount, "unmounted", (GCallback) foreign_mount_unmounted, volume, 0);
-    }
-  else
-    volume->foreign_mount =  NULL;
-
-  g_idle_add (changed_in_idle, g_object_ref (volume));
-  G_UNLOCK (gphoto2_volume);
-}
-
-gboolean
-g_gphoto2_volume_has_foreign_mount_root (GGPhoto2Volume       *volume,
-                                     GFile            *mount_root)
-{
-  GGPhoto2Volume *gphoto2_volume = G_GPHOTO2_VOLUME (volume);
-  gboolean res;
-
-  G_LOCK (gphoto2_volume);
-  res = FALSE;
-  if (gphoto2_volume->foreign_mount_root != NULL)
-    res = g_file_equal (gphoto2_volume->foreign_mount_root, mount_root);
-  G_UNLOCK (gphoto2_volume);
-
-  return res;
-}
-
-
-
 typedef struct
 {
   GGPhoto2Volume *enclosing_volume;
   GAsyncReadyCallback  callback;
   gpointer user_data;
-} ForeignMountOp;
+} ActivationMountOp;
 
 static void
-mount_foreign_callback (GObject *source_object,
+mount_callback (GObject *source_object,
                         GAsyncResult *res,
                         gpointer user_data)
 {
-  ForeignMountOp *data = user_data;
+  ActivationMountOp *data = user_data;
   data->callback (G_OBJECT (data->enclosing_volume), res, data->user_data);
   g_free (data);
 }
 
 static void
 g_gphoto2_volume_mount (GVolume             *volume,
-                    GMountMountFlags     flags,
-                    GMountOperation     *mount_operation,
-                    GCancellable        *cancellable,
-                    GAsyncReadyCallback  callback,
-                    gpointer             user_data)
+                        GMountMountFlags     flags,
+                        GMountOperation     *mount_operation,
+                        GCancellable        *cancellable,
+                        GAsyncReadyCallback  callback,
+                        gpointer             user_data)
 {
   GGPhoto2Volume *gphoto2_volume = G_GPHOTO2_VOLUME (volume);
-  ForeignMountOp *data;
+  ActivationMountOp *data;
 
   /*g_warning ("gphoto2_volume_mount (can_mount=%d foreign=%p device_path=%s)",
               g_gphoto2_volume_can_mount (volume),
-              gphoto2_volume->foreign_mount_root,
+              gphoto2_volume->activation_root,
               gphoto2_volume->device_path);*/
 
   G_LOCK (gphoto2_volume);
 
-  data = g_new0 (ForeignMountOp, 1);
+  data = g_new0 (ActivationMountOp, 1);
   data->enclosing_volume = gphoto2_volume;
   data->callback = callback;
   data->user_data = user_data;
 
-  g_file_mount_enclosing_volume (gphoto2_volume->foreign_mount_root,
+  g_file_mount_enclosing_volume (gphoto2_volume->activation_root,
                                  0,
                                  mount_operation,
                                  cancellable,
-                                 mount_foreign_callback,
+                                 mount_callback,
                                  data);
 
   G_UNLOCK (gphoto2_volume);
@@ -497,7 +434,7 @@ g_gphoto2_volume_mount_finish (GVolume       *volume,
   gboolean res;
 
   G_LOCK (gphoto2_volume);
-  res = g_file_mount_enclosing_volume_finish (gphoto2_volume->foreign_mount_root, result, error);
+  res = g_file_mount_enclosing_volume_finish (gphoto2_volume->activation_root, result, error);
   G_UNLOCK (gphoto2_volume);
 
   return res;
@@ -551,7 +488,7 @@ g_gphoto2_volume_get_activation_root (GVolume *volume)
 {
   GGPhoto2Volume *gphoto2_volume = G_GPHOTO2_VOLUME (volume);
 
-  return g_object_ref (gphoto2_volume->foreign_mount_root);
+  return g_object_ref (gphoto2_volume->activation_root);
 }
 
 static void

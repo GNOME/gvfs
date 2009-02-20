@@ -172,6 +172,9 @@ struct _GVfsBackendGphoto2
   GPContext *context;
   Camera *camera;
 
+  /* see comment in ensure_ignore_prefix() */
+  char *ignore_prefix;
+
   /* list of open files */
   int num_open_files_for_reading;
 
@@ -226,7 +229,7 @@ G_DEFINE_TYPE (GVfsBackendGphoto2, g_vfs_backend_gphoto2, G_VFS_TYPE_BACKEND);
 /* ------------------------------------------------------------------------------------------------- */
 
 typedef struct {
-  /* this is the path of the dir/file */
+  /* this is the path of the dir/file including ignore_prefix */
   char *path;
   GVfsMonitor *vfs_monitor;
 } MonitorProxy;
@@ -348,6 +351,8 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
   GList *l;
   char *filepath;
 
+  g_return_if_fail (g_str_has_prefix (dir, gphoto2_backend->ignore_prefix));
+
   DEBUG ("monitors_emit_internal() %s for '%s' '%s'", event_name, dir, name);
 
   for (l = gphoto2_backend->dir_monitor_proxies; l != NULL; l = l->next)
@@ -356,7 +361,7 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
       if (strcmp (proxy->path, dir) == 0)
         {
           char *path;
-          path = g_build_filename (dir, name, NULL);
+          path = g_build_filename (dir + strlen (gphoto2_backend->ignore_prefix), name, NULL);
           g_vfs_monitor_emit_event (proxy->vfs_monitor, event, path, NULL);
           DEBUG ("  emitted %s for '%s' on dir monitor for '%s'", event_name, path, dir);
           g_free (path);
@@ -369,8 +374,9 @@ monitors_emit_internal (GVfsBackendGphoto2 *gphoto2_backend,
       MonitorProxy *proxy = l->data;
       if (strcmp (proxy->path, filepath) == 0)
         {
-          g_vfs_monitor_emit_event (proxy->vfs_monitor, event, filepath, NULL);
-          DEBUG ("  emitted %s for '%s' on file monitor", event_name, filepath);
+          const char *path = filepath + strlen (gphoto2_backend->ignore_prefix);
+          g_vfs_monitor_emit_event (proxy->vfs_monitor, event, path, NULL);
+          DEBUG ("  emitted %s for '%s' on file monitor", event_name, path);
         }
     }
   g_free (filepath);
@@ -554,6 +560,9 @@ release_device (GVfsBackendGphoto2 *gphoto2_backend)
   gphoto2_backend->hal_name = NULL;
   g_free (gphoto2_backend->hal_icon_name);
   gphoto2_backend->hal_icon_name = NULL;
+
+  g_free (gphoto2_backend->ignore_prefix);
+  gphoto2_backend->ignore_prefix = NULL;
 
   if (gphoto2_backend->info_cache != NULL)
     {
@@ -903,15 +912,15 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
 /* ------------------------------------------------------------------------------------------------- */
 
 static void
-split_filename (GVfsBackendGphoto2 *gphoto2_backend, const char *filename, char **dir, char **name)
+split_filename_with_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, const char *filename, char **dir, char **name)
 {
   char *s;
 
   s = g_path_get_dirname (filename);
   if (s[0] == '/')
-    *dir = g_strconcat ("/", s + 1, NULL);
+    *dir = g_strconcat (gphoto2_backend->ignore_prefix, s + 1, NULL);
   else
-    *dir = g_strconcat ("/", s, NULL);
+    *dir = g_strconcat (gphoto2_backend->ignore_prefix, s, NULL);
   g_free (s);
 
   if (strcmp (filename, "/") == 0)
@@ -923,11 +932,28 @@ split_filename (GVfsBackendGphoto2 *gphoto2_backend, const char *filename, char 
   if (s[strlen(s)] == '/')
     s[strlen(s)] = '\0';
 
-  /*DEBUG ("split_filename: '%s' -> '%s' '%s'", filename, *dir, *name);*/
+  /*DEBUG ("split_filename_with_ignore_prefix: '%s' -> '%s' '%s'", filename, *dir, *name);*/
 }
 
 /* ------------------------------------------------------------------------------------------------- */
 
+static char *
+add_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, const char *filename)
+{
+  char *result;
+
+  if (filename[0] == '/')
+    result = g_strconcat (gphoto2_backend->ignore_prefix, filename + 1, NULL);
+  else
+    result = g_strconcat (gphoto2_backend->ignore_prefix, filename, NULL);
+
+  /*DEBUG ("add_ignore_prefix: '%s' -> '%s'", filename, result);*/
+  return result;
+}
+
+/* ------------------------------------------------------------------------------------------------- */
+
+/* the passed 'dir' variable must contain ignore_prefix */
 static gboolean
 file_get_info (GVfsBackendGphoto2 *gphoto2_backend, 
                const char *dir, 
@@ -951,7 +977,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   full_path = g_build_filename (dir, name, NULL);
   DEBUG ("file_get_info() try_cache_only=%d dir='%s', name='%s'\n"
          "                full_path='%s'", 
-         try_cache_only, dir, name, full_path);
+         try_cache_only, dir, name, full_path, gphoto2_backend->ignore_prefix);
 
 
   /* first look up cache */
@@ -978,7 +1004,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   g_file_info_unset_attribute_mask (info);
 
   /* handle root directory */
-  if (strcmp (full_path, "/") == 0)
+  if (strcmp (full_path, gphoto2_backend->ignore_prefix) == 0 || strcmp (full_path, "/") == 0)
     {
       char *display_name;
       display_name = compute_display_name (gphoto2_backend);
@@ -1110,7 +1136,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
       GMountSpec *mount_spec;
 
       mount_spec = g_vfs_backend_get_mount_spec (G_VFS_BACKEND (gphoto2_backend));
-      icon_id = g_strdup_printf ("preview:%s/%s", dir, name);
+      icon_id = g_strdup_printf ("preview:%s/%s", dir + strlen (gphoto2_backend->ignore_prefix), name);
       icon = g_vfs_icon_new (mount_spec,
                              icon_id);
       g_file_info_set_attribute_object (info,
@@ -1264,6 +1290,54 @@ is_directory_empty (GVfsBackendGphoto2 *gphoto2_backend, const char *dir)
  out:
   DEBUG ("  is_directory_empty (%s) -> %d", dir, ret);
   return ret;
+}
+
+/* ------------------------------------------------------------------------------------------------- */
+
+/* If we only have a single storage head, the gphoto2 volume monitor
+ * will not use activation roots into our mount. This is mainly to
+ * work around buggy devices where the basedir of the storage head
+ * changes on every camera initialization, e.g. the iPhone.
+ *
+ * So, if we have only one storage head, do use basedir of that
+ * head as ignore_prefix.
+ *
+ * See also update_cameras() in ggphoto2volumemonitor.c.
+ *
+ * This function needs to be called from do_mount().
+ */
+static gboolean
+ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
+{
+  gchar *prefix;
+  CameraStorageInformation *storage_info;
+  int num_storage_info;
+
+  /* already set */
+  if (gphoto2_backend->ignore_prefix != NULL)
+    return TRUE;
+
+  prefix = NULL;
+
+  if (gp_camera_get_storageinfo (gphoto2_backend->camera,
+                                 &storage_info,
+                                 &num_storage_info,
+                                 gphoto2_backend->context) != 0)
+    goto out;
+
+  if (num_storage_info > 1)
+    goto out;
+
+  prefix = g_strdup_printf ("%s/", storage_info[0].basedir);
+
+ out:
+
+  if (prefix == NULL)
+    gphoto2_backend->ignore_prefix = g_strdup ("/");
+  else
+    gphoto2_backend->ignore_prefix = prefix;
+
+  return TRUE;
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -1443,6 +1517,12 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
+  if (!ensure_ignore_prefix (gphoto2_backend, G_VFS_JOB (job)))
+    {
+      release_device (gphoto2_backend);
+      return;
+    }
+
   /* Translator: %s represents the device, e.g. usb:001,042  */
   fuse_name = g_strdup_printf (_("gphoto2 mount on %s"), gphoto2_backend->gphoto2_port);
   icon_name = compute_icon_name (gphoto2_backend);
@@ -1589,7 +1669,7 @@ do_open_for_read_real (GVfsBackend *backend,
 
   ensure_not_dirty (gphoto2_backend);
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   if (is_directory (gphoto2_backend, dir, name))
     {
@@ -1819,7 +1899,7 @@ do_query_info (GVfsBackend *backend,
 
   DEBUG ("query_info (%s)", filename);
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   error = NULL;
   if (!file_get_info (gphoto2_backend, dir, name, info, &error, FALSE))
@@ -1855,7 +1935,7 @@ try_query_info (GVfsBackend *backend,
 
   ret = FALSE;
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   if (!file_get_info (gphoto2_backend, dir, name, info, NULL, TRUE))
     {
@@ -1889,6 +1969,7 @@ do_enumerate (GVfsBackend *backend,
   CameraList *list;
   int n;
   int rc;
+  char *filename;
   gboolean using_cached_dir_list;
   gboolean using_cached_file_list;
   char *as_dir;
@@ -1898,9 +1979,10 @@ do_enumerate (GVfsBackend *backend,
   using_cached_dir_list = FALSE;
   using_cached_file_list = FALSE;
 
+  filename = add_ignore_prefix (gphoto2_backend, given_filename);
   DEBUG ("enumerate (%s)", given_filename);
 
-  split_filename (gphoto2_backend, given_filename, &as_dir, &as_name);
+  split_filename_with_ignore_prefix (gphoto2_backend, given_filename, &as_dir, &as_name);
   if (!is_directory (gphoto2_backend, as_dir, as_name))
     {
       if (is_regular (gphoto2_backend, as_dir, as_name))
@@ -1924,18 +2006,18 @@ do_enumerate (GVfsBackend *backend,
 
   /* first, list the folders */
   g_mutex_lock (gphoto2_backend->lock);
-  list = g_hash_table_lookup (gphoto2_backend->dir_name_cache, given_filename);
+  list = g_hash_table_lookup (gphoto2_backend->dir_name_cache, filename);
   if (list == NULL)
     {
       g_mutex_unlock (gphoto2_backend->lock);
 
       ensure_not_dirty (gphoto2_backend);
 
-      DEBUG ("  Generating dir list for dir '%s'", given_filename);
+      DEBUG ("  Generating dir list for dir '%s'", filename);
 
       gp_list_new (&list);
       rc = gp_camera_folder_list_folders (gphoto2_backend->camera, 
-                                          given_filename, 
+                                          filename, 
                                           list, 
                                           gphoto2_backend->context);
       if (rc != 0)
@@ -1943,12 +2025,13 @@ do_enumerate (GVfsBackend *backend,
           error = get_error_from_gphoto2 (_("Failed to get folder list"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
+          g_free (filename);
           return;
         }  
     }
   else
     {
-      DEBUG ("  Using cached dir list for dir '%s'", given_filename);
+      DEBUG ("  Using cached dir list for dir '%s'", filename);
       using_cached_dir_list = TRUE;
       gp_list_ref (list);
       g_mutex_unlock (gphoto2_backend->lock);
@@ -1961,7 +2044,7 @@ do_enumerate (GVfsBackend *backend,
       DEBUG ("  enum folder '%s'", name);
       info = g_file_info_new ();
       error = NULL;
-      if (!file_get_info (gphoto2_backend, given_filename, name, info, &error, FALSE))
+      if (!file_get_info (gphoto2_backend, filename, name, info, &error, FALSE))
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
@@ -1976,7 +2059,7 @@ do_enumerate (GVfsBackend *backend,
     {
 #ifndef DEBUG_NO_CACHING
       g_mutex_lock (gphoto2_backend->lock);
-      g_hash_table_insert (gphoto2_backend->dir_name_cache, g_strdup (given_filename), list);
+      g_hash_table_insert (gphoto2_backend->dir_name_cache, g_strdup (filename), list);
       g_mutex_unlock (gphoto2_backend->lock);
 #endif
     }
@@ -1990,17 +2073,17 @@ do_enumerate (GVfsBackend *backend,
 
   /* then list the files in each folder */
   g_mutex_lock (gphoto2_backend->lock);
-  list = g_hash_table_lookup (gphoto2_backend->file_name_cache, given_filename);
+  list = g_hash_table_lookup (gphoto2_backend->file_name_cache, filename);
   if (list == NULL)
     {
       g_mutex_unlock (gphoto2_backend->lock);
       ensure_not_dirty (gphoto2_backend);
 
-      DEBUG ("  Generating file list for dir '%s'", given_filename);
+      DEBUG ("  Generating file list for dir '%s'", filename);
 
       gp_list_new (&list);
       rc = gp_camera_folder_list_files (gphoto2_backend->camera, 
-                                        given_filename,
+                                        filename, 
                                         list, 
                                         gphoto2_backend->context);
       if (rc != 0)
@@ -2008,12 +2091,13 @@ do_enumerate (GVfsBackend *backend,
           error = get_error_from_gphoto2 (_("Failed to get file list"), rc);
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
+          g_free (filename);
           return;
         }
     }
   else
     {
-      DEBUG ("  Using cached file list for dir '%s'", given_filename);
+      DEBUG ("  Using cached file list for dir '%s'", filename);
       using_cached_file_list = TRUE;
       gp_list_ref (list);
       g_mutex_unlock (gphoto2_backend->lock);
@@ -2027,7 +2111,7 @@ do_enumerate (GVfsBackend *backend,
 
       info = g_file_info_new ();
       error = NULL;
-      if (!file_get_info (gphoto2_backend, given_filename, name, info, &error, FALSE))
+      if (!file_get_info (gphoto2_backend, filename, name, info, &error, FALSE))
         {
           g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
           g_error_free (error);
@@ -2042,7 +2126,7 @@ do_enumerate (GVfsBackend *backend,
     {
 #ifndef DEBUG_NO_CACHING
       g_mutex_lock (gphoto2_backend->lock);
-      g_hash_table_insert (gphoto2_backend->file_name_cache, g_strdup (given_filename), list);
+      g_hash_table_insert (gphoto2_backend->file_name_cache, g_strdup (filename), list);
       g_mutex_unlock (gphoto2_backend->lock);
 #endif
     }
@@ -2060,6 +2144,8 @@ do_enumerate (GVfsBackend *backend,
   g_list_foreach (l, (GFunc) g_object_unref, NULL);
   g_list_free (l);
   g_vfs_job_enumerate_done (job);
+
+  g_free (filename);
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -2077,15 +2163,17 @@ try_enumerate (GVfsBackend *backend,
   GError *error;
   CameraList *list;
   int n;
+  char *filename;
   const char *name;
 
   l = NULL;
 
+  filename = add_ignore_prefix (gphoto2_backend, given_filename);
   DEBUG ("try_enumerate (%s)", given_filename);
 
   /* first, list the folders */
   g_mutex_lock (gphoto2_backend->lock);
-  list = g_hash_table_lookup (gphoto2_backend->dir_name_cache, given_filename);
+  list = g_hash_table_lookup (gphoto2_backend->dir_name_cache, filename);
   if (list == NULL)
     {
       g_mutex_unlock (gphoto2_backend->lock);
@@ -2098,7 +2186,7 @@ try_enumerate (GVfsBackend *backend,
       gp_list_get_name (list, n, &name);
       DEBUG ("  try_enum folder '%s'", name);
       info = g_file_info_new ();
-      if (!file_get_info (gphoto2_backend, given_filename, name, info, &error, TRUE))
+      if (!file_get_info (gphoto2_backend, filename, name, info, &error, TRUE))
         {
           g_mutex_lock (gphoto2_backend->lock);
           gp_list_unref (list);
@@ -2113,7 +2201,7 @@ try_enumerate (GVfsBackend *backend,
 
   /* then list the files in each folder */
   g_mutex_lock (gphoto2_backend->lock);
-  list = g_hash_table_lookup (gphoto2_backend->file_name_cache, given_filename);
+  list = g_hash_table_lookup (gphoto2_backend->file_name_cache, filename);
   if (list == NULL)
     {
       g_mutex_unlock (gphoto2_backend->lock);
@@ -2127,7 +2215,7 @@ try_enumerate (GVfsBackend *backend,
       DEBUG ("  try_enum file '%s'", name);
 
       info = g_file_info_new ();
-      if (!file_get_info (gphoto2_backend, given_filename, name, info, &error, TRUE))
+      if (!file_get_info (gphoto2_backend, filename, name, info, &error, TRUE))
         {
           g_mutex_lock (gphoto2_backend->lock);
           gp_list_unref (list);
@@ -2148,6 +2236,7 @@ try_enumerate (GVfsBackend *backend,
   g_list_free (l);
   g_vfs_job_enumerate_done (job);
 
+  g_free (filename);
   DEBUG ("  YAY got info from cache for try_enumerate (%s)", given_filename);
   return TRUE;
 
@@ -2155,6 +2244,7 @@ try_enumerate (GVfsBackend *backend,
   g_list_foreach (l, (GFunc) g_object_unref, NULL);
   g_list_free (l);
 
+  g_free (filename);
   DEBUG ("  BUU no info from cache for try_enumerate (%s)", given_filename);
   return FALSE;
 }
@@ -2282,7 +2372,7 @@ do_make_directory (GVfsBackend *backend,
       goto out;
     }
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   rc = gp_camera_folder_make_dir (gphoto2_backend->camera,
                                   dir,
@@ -2491,7 +2581,7 @@ do_set_display_name (GVfsBackend *backend,
       goto out;
     }
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   /* refuse is desired name is already taken */
   if (is_directory (gphoto2_backend, dir, display_name) ||
@@ -2546,7 +2636,7 @@ do_set_display_name (GVfsBackend *backend,
   monitors_emit_deleted (gphoto2_backend, dir, name);
   monitors_emit_created (gphoto2_backend, dir, display_name);
 
-  new_name = g_build_filename (dir, display_name, NULL);
+  new_name = g_build_filename (dir + strlen (gphoto2_backend->ignore_prefix), display_name, NULL);
   g_vfs_job_set_display_name_set_new_path (job, new_name);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -2588,11 +2678,12 @@ do_delete (GVfsBackend *backend,
       goto out;
     }
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   if (is_directory (gphoto2_backend, dir, name))
     {
-      if (!is_directory_empty (gphoto2_backend, filename))
+      dir_name = add_ignore_prefix (gphoto2_backend, filename);
+      if (!is_directory_empty (gphoto2_backend, dir_name))
         {
           g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                             G_IO_ERROR_NOT_EMPTY,
@@ -2680,7 +2771,7 @@ do_create_internal (GVfsBackend *backend,
       goto out;
     }
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   if (is_directory (gphoto2_backend, dir, name))
     {
@@ -2838,7 +2929,7 @@ do_replace (GVfsBackend *backend,
 
   dir = NULL;
   name = NULL;
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
   
   /* write a new file
    * - will delete the existing one when done in do_close_write() 
@@ -2865,7 +2956,7 @@ do_append_to (GVfsBackend *backend,
 
   dir = NULL;
   name = NULL;
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
   
   /* write a new file
    * - will read existing data in do_create_internal
@@ -3085,8 +3176,8 @@ do_move (GVfsBackend *backend,
 
   ensure_not_dirty (gphoto2_backend);
 
-  split_filename (gphoto2_backend, source, &src_dir, &src_name);
-  split_filename (gphoto2_backend, destination, &dst_dir, &dst_name);
+  split_filename_with_ignore_prefix (gphoto2_backend, source, &src_dir, &src_name);
+  split_filename_with_ignore_prefix (gphoto2_backend, destination, &dst_dir, &dst_name);
 
   /* this is an limited implementation that can only move files / folders in the same directory */
   if (strcmp (src_dir, dst_dir) != 0)
@@ -3220,10 +3311,10 @@ do_create_dir_monitor (GVfsBackend *backend,
 
   DEBUG ("create_dir_monitor (%s)", filename);
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   proxy = g_new0 (MonitorProxy, 1);
-  proxy->path = g_strdup (filename);
+  proxy->path = add_ignore_prefix (gphoto2_backend, filename);
   proxy->vfs_monitor = g_vfs_monitor_new (backend);
 
   gphoto2_backend->dir_monitor_proxies = g_list_prepend (gphoto2_backend->dir_monitor_proxies, proxy);
@@ -3270,10 +3361,10 @@ do_create_file_monitor (GVfsBackend *backend,
 
   DEBUG ("create_file_monitor (%s)", filename);
 
-  split_filename (gphoto2_backend, filename, &dir, &name);
+  split_filename_with_ignore_prefix (gphoto2_backend, filename, &dir, &name);
 
   proxy = g_new0 (MonitorProxy, 1);
-  proxy->path = g_strdup (filename);
+  proxy->path = add_ignore_prefix (gphoto2_backend, filename);
   proxy->vfs_monitor = g_vfs_monitor_new (backend);
 
   gphoto2_backend->file_monitor_proxies = g_list_prepend (gphoto2_backend->file_monitor_proxies, proxy);

@@ -48,16 +48,10 @@ GType g_gphoto2_volume_get_type (void) G_GNUC_CONST;
 GGPhoto2Volume *g_gphoto2_volume_new            (GVolumeMonitor   *volume_monitor,
                                                  HalDevice        *device,
                                                  HalPool          *pool,
-                                                 GFile            *foreign_mount_root);
+                                                 GFile            *activation_root);
 
 gboolean    g_gphoto2_volume_has_udi        (GGPhoto2Volume       *volume,
                                              const char       *udi);
-
-gboolean    g_gphoto2_volume_has_foreign_mount_root (GGPhoto2Volume       *volume,
-                                                     GFile            *mount_root);
-
-void        g_gphoto2_volume_adopt_foreign_mount (GGPhoto2Volume *volume,
-                                                  GMount *foreign_mount);
 
 void        g_gphoto2_volume_removed        (GGPhoto2Volume       *volume);
 
