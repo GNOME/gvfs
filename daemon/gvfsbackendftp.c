@@ -1,6 +1,7 @@
 /* GIO - GLib Input, Output and Streaming Library
  * 
- * Copyright (C) 2008 Benjamin Otte <otte@gnome.org>
+ * Copyright (C) 2008,2009 Benjamin Otte <otte@gnome.org>
+ *               2008,2009 Andreas Henriksson <andreas@fatal.se>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +19,7 @@
  * Boston, MA 02111-1307, USA.
  *
  * Author: Benjmain Otte <otte@gnome.org>
+ *         Andreas Henriksson <andreas@fatal.se>
  */
 
 

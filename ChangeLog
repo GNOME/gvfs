@@ -18,6 +18,12 @@
 
 2009-02-19  Benjamin Otte  <otte@gnome.org>
 
+	* AUTHORS:
+	* daemon/gvfsbackendftp.c:
+	add Andreas as author of the ftp backend
+
+2009-02-19  Benjamin Otte  <otte@gnome.org>
+
 	reviewed by: Andreas Henriksson <andreas@fatal.se>
 
 	Bug 525283 - handle short reads in ftp
