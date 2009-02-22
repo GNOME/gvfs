@@ -1,3 +1,8 @@
+2009-02-22  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c:
+	fix typo in my name (thx Wouter)
+
 2009-02-20  David Zeuthen  <davidz@redhat.com>
 
 	Make the gphoto2 backend work with buggy devices (such as the

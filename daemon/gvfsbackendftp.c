@@ -18,7 +18,7 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * Author: Benjmain Otte <otte@gnome.org>
+ * Author: Benjamin Otte <otte@gnome.org>
  *         Andreas Henriksson <andreas@fatal.se>
  */
 
