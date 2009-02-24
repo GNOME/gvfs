@@ -614,7 +614,7 @@ update_cache (GVfsBackendSmbBrowse *backend, SMBCFILE *supplied_dir)
         {
           if (res < 0)
             DEBUG ("update_cache - smbc_getdents returned %d, errno = [%d] %s\n", 
-                   res, errno, strerror (errno));
+                   res, errno, g_strerror (errno));
 	  break;
 	}  
       
@@ -937,7 +937,7 @@ do_mount (GVfsBackend *backend,
 
       DEBUG ("do_mount - [%s; %d] dir = %p, cancelled = %d, errno = [%d] '%s' \n", 
              uri->str, op_backend->mount_try, dir, op_backend->mount_cancelled, 
-             errno, strerror (errno));
+             errno, g_strerror (errno));
 
       if (dir == NULL && 
           (op_backend->mount_cancelled || (errno != EPERM && errno != EACCES)))

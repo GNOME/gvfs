@@ -1,3 +1,12 @@
+2009-02-24  Paolo Borelli  <pborelli@katamail.com>
+
+	* test/benchmark-posix-small-files.c:
+	* test/benchmark-posix-big-files.c:
+	* daemon/trashlib/dirwatch.c:
+	* daemon/gvfsbackendsmbbrowse.c:
+	* client/gvfsfusedaemon.c:
+	Always use g_strerror
+
 2009-02-24  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c:

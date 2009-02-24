@@ -86,7 +86,6 @@ struct OPAQUE_TYPE__DirWatch
 
 #ifdef DIR_WATCH_DEBUG
 #include <errno.h>
-#include <string.h>
 #endif
 
 static gboolean
@@ -104,8 +103,9 @@ dir_exists (GFile *file)
 
 #ifdef DIR_WATCH_DEBUG
   g_print ("    lstat ('%s') -> is%s a directory (%s)\n",
-           path, result ? "" : " not", strerror (errno));
+           path, result ? "" : " not", g_strerror (errno));
 #endif
+
   g_free (path);
 
   return result;

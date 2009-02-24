@@ -666,7 +666,7 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
       g_object_unref (file);
     }
 
-  debug_print ("vfs_statfs: -> %s\n", strerror (-result));
+  debug_print ("vfs_statfs: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -694,7 +694,7 @@ vfs_statfs (const gchar *path, struct statvfs *stbuf)
   stbuf->f_flag = 0;  /* Ignored by FUSE */
   stbuf->f_namemax = 1024;
 
-  debug_print ("vfs_statfs: -> %s\n", strerror (-result));
+  debug_print ("vfs_statfs: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -859,7 +859,7 @@ vfs_getattr (const gchar *path, struct stat *sbuf)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_getattr: -> %s\n", strerror (-result));
+  debug_print ("vfs_getattr: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1037,7 +1037,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_open: -> %s\n", strerror (-result));
+  debug_print ("vfs_open: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1107,7 +1107,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_create: -> %s\n", strerror (-result));
+  debug_print ("vfs_create: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1274,7 +1274,7 @@ vfs_read (const gchar *path, gchar *buf, size_t size,
     }
 
   if (result < 0)
-    debug_print ("vfs_read: -> %s\n", strerror (-result));
+    debug_print ("vfs_read: -> %s\n", g_strerror (-result));
   else
     debug_print ("vfs_read: -> %d bytes read.\n", result);
 
@@ -1397,7 +1397,7 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
     }
 
   if (result < 0)
-    debug_print ("vfs_write: -> %s\n", strerror (-result));
+    debug_print ("vfs_write: -> %s\n", g_strerror (-result));
   else
     debug_print ("vfs_write: -> %d bytes written.\n", result);
 
@@ -1591,7 +1591,7 @@ vfs_rename (const gchar *old_path, const gchar *new_path)
   if (new_file)
     g_object_unref (new_file);
 
-  debug_print ("vfs_rename: -> %s\n", strerror (-result));
+  debug_print ("vfs_rename: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1640,7 +1640,7 @@ vfs_unlink (const gchar *path)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_unlink: -> %s\n", strerror (-result));
+  debug_print ("vfs_unlink: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1678,7 +1678,7 @@ vfs_mkdir (const gchar *path, mode_t mode)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_mkdir: -> %s\n", strerror (-result));
+  debug_print ("vfs_mkdir: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1734,7 +1734,7 @@ vfs_rmdir (const gchar *path)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_rmdir: -> %s\n", strerror (-result));
+  debug_print ("vfs_rmdir: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1801,7 +1801,7 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_ftruncate: -> %s\n", strerror (-result));
+  debug_print ("vfs_ftruncate: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1863,7 +1863,7 @@ vfs_truncate (const gchar *path, off_t size)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_truncate: -> %s\n", strerror (-result));
+  debug_print ("vfs_truncate: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1894,7 +1894,7 @@ vfs_symlink (const gchar *path_old, const gchar *path_new)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_symlink: -> %s\n", strerror (-result));
+  debug_print ("vfs_symlink: -> %s\n", g_strerror (-result));
 
   return result;
 }
@@ -1952,7 +1952,7 @@ vfs_access (const gchar *path, gint mode)
       result = -ENOENT;
     }
 
-  debug_print ("vfs_access: -> %s\n", strerror (-result));
+  debug_print ("vfs_access: -> %s\n", g_strerror (-result));
   return result;
 }
 
@@ -2014,7 +2014,7 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
       result = -ENOENT;
     }
 
-  debug_print ("vfs_utimens: -> %s\n", strerror (-result));
+  debug_print ("vfs_utimens: -> %s\n", g_strerror (-result));
   return result;
 }
 

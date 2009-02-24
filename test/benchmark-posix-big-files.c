@@ -72,7 +72,7 @@ create_file (const gchar *base_dir)
   output_fd = open (scratch_file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
   if (output_fd < 0)
     {
-      g_printerr ("Failed to create scratch file: %s\n", strerror (errno));
+      g_printerr ("Failed to create scratch file: %s\n", g_strerror (errno));
       g_free (scratch_file);
       return NULL;
     }
@@ -92,7 +92,7 @@ create_file (const gchar *base_dir)
               continue;
             }
 
-          g_printerr ("Failed to populate scratch file: %s\n", strerror (errno));
+          g_printerr ("Failed to populate scratch file: %s\n", g_strerror (errno));
           close (output_fd);
           g_free (scratch_file);
           return NULL;
@@ -112,7 +112,7 @@ read_file (const gchar *scratch_file)
   input_fd = open (scratch_file, O_RDONLY);
   if (input_fd < 0)
     {
-      g_printerr ("Failed to read back scratch file: %s\n", strerror (errno));
+      g_printerr ("Failed to read back scratch file: %s\n", g_strerror (errno));
       return;
     }
 
@@ -130,7 +130,7 @@ read_file (const gchar *scratch_file)
               continue;
             }
 
-          g_printerr ("Failed to read back scratch file: %s\n", strerror (errno));
+          g_printerr ("Failed to read back scratch file: %s\n", g_strerror (errno));
           close (input_fd);
           return;
         }
@@ -144,7 +144,7 @@ delete_file (const gchar *scratch_file)
 {
   if (unlink (scratch_file) < 0)
     {
-      g_printerr ("Failed to delete scratch file: %s\n", strerror (errno));
+      g_printerr ("Failed to delete scratch file: %s\n", g_strerror (errno));
     }
 }
 
