@@ -905,7 +905,6 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
 {
   guint ip1, ip2, ip3, ip4, port1, port2;
   const char *s;
-  gboolean connected;
   SoupAddress *addr;
   guint status;
 

@@ -1,5 +1,11 @@
 2009-02-24  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c:
+	(ftp_connection_ensure_data_connection_pasv):
+	remove unused variable
+
+2009-02-24  Benjamin Otte  <otte@gnome.org>
+
 	Bug 525283 - handle short reads in ftp
 
 	* daemon/gvfsbackendftp.c: (ftp_connection_receive):
