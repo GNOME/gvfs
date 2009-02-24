@@ -348,7 +348,6 @@ ftp_connection_receive (FtpConnection *conn,
 			ResponseFlags  flags)
 {
   SoupSocketIOStatus status;
-  gsize n_bytes;
   gboolean got_boundary;
   char *last_line;
   enum {
@@ -368,6 +367,8 @@ ftp_connection_receive (FtpConnection *conn,
     {
       last_line = conn->read_buffer + conn->read_bytes;
       do {
+        gsize n_bytes;
+
         /* the available size must at least allow for boundary size (2)
          * bytes to be available for reading */
         if (conn->read_buffer_size - conn->read_bytes < 128)
@@ -419,8 +420,7 @@ ftp_connection_receive (FtpConnection *conn,
 
       if (reply_state == FIRST_LINE)
 	{
-	  if (n_bytes < 4 ||
-	      last_line[0] <= '0' || last_line[0] > '5' ||
+	  if (last_line[0] <= '0' || last_line[0] > '5' ||
 	      last_line[1] < '0' || last_line[1] > '9' ||
 	      last_line[2] < '0' || last_line[2] > '9')
 	    {
@@ -444,8 +444,9 @@ ftp_connection_receive (FtpConnection *conn,
 	}
       else
 	{
-	  if (n_bytes >= 4 &&
-	      memcmp (conn->read_buffer, last_line, 3) == 0 &&
+	  if (last_line[0] == conn->read_buffer[0] &&
+              last_line[1] == conn->read_buffer[1] &&
+              last_line[2] == conn->read_buffer[2] &&
 	      last_line[3] == ' ')
 	    reply_state = DONE;
 	}

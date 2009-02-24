@@ -1,3 +1,12 @@
+2009-02-24  Benjamin Otte  <otte@gnome.org>
+
+	Bug 525283 - handle short reads in ftp
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_receive):
+	fix usage of n_bytes variable that changed meaning with the last ftp
+	fixes.
+	Spotted by Filippo Argiolas <filippo.argiolas@gmail.com>
+
 2009-02-22  Benjamin Otte  <otte@gnome.org>
 
 	* daemon/gvfsbackendftp.c:
