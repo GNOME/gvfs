@@ -41,6 +41,15 @@ g_io_module_load (GIOModule *module)
   if (g_getenv ("GVFS_REMOTE_VOLUME_MONITOR_IGNORE") != NULL)
     goto out;
 
+  /* We make this module resident since we *may* hold on to an instance
+   * of the union monitor in the static method get_mount_for_mount_path()
+   * on GNativeVolumeMonitor. And it doesn't make much sense to unload
+   * the module *anyway*.
+   *
+   * See the comment gproxyvolumemonitor.c:get_mount_for_mount_path().
+   */
+  g_type_module_use (G_TYPE_MODULE (module));
+
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 

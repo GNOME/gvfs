@@ -263,10 +263,28 @@ g_proxy_shadow_mount_can_eject (GMount *mount)
   gboolean res;
 
   G_LOCK (proxy_shadow_mount);
-  res = g_mount_can_eject (G_MOUNT (proxy_shadow_mount->real_mount));
+  res = g_volume_can_eject (G_VOLUME (proxy_shadow_mount->volume));
   G_UNLOCK (proxy_shadow_mount);
 
   return res;
+}
+
+
+typedef struct {
+  GObject *object;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+} EjectWrapperOp;
+
+static void
+eject_wrapper_callback (GObject *source_object,
+                        GAsyncResult *res,
+                        gpointer user_data)
+{
+  EjectWrapperOp *data  = user_data;
+  data->callback (data->object, res, data->user_data);
+  g_object_unref (data->object);
+  g_free (data);
 }
 
 static void
@@ -277,12 +295,15 @@ g_proxy_shadow_mount_eject (GMount              *mount,
                             gpointer             user_data)
 {
   GProxyShadowMount *proxy_shadow_mount = G_PROXY_SHADOW_MOUNT (mount);
+  EjectWrapperOp *data;
 
-  g_mount_eject (proxy_shadow_mount->real_mount,
-                 flags,
-                 cancellable,
-                 callback,
-                 user_data);
+  G_LOCK (proxy_shadow_mount);
+  data = g_new0 (EjectWrapperOp, 1);
+  data->object = g_object_ref (mount);
+  data->callback = callback;
+  data->user_data = user_data;
+  g_volume_eject (G_VOLUME (proxy_shadow_mount->volume), flags, cancellable, eject_wrapper_callback, data);
+  G_UNLOCK (proxy_shadow_mount);
 }
 
 static gboolean
@@ -291,10 +312,13 @@ g_proxy_shadow_mount_eject_finish (GMount        *mount,
                                    GError       **error)
 {
   GProxyShadowMount *proxy_shadow_mount = G_PROXY_SHADOW_MOUNT (mount);
+  gboolean res;
 
-  return g_mount_eject_finish (proxy_shadow_mount->real_mount,
-                               result,
-                               error);
+  G_LOCK (proxy_shadow_mount);
+  res = g_volume_eject_finish (G_VOLUME (proxy_shadow_mount->volume), result, error);
+  G_UNLOCK (proxy_shadow_mount);
+
+  return res;
 }
 
 static void

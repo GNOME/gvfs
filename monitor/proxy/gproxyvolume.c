@@ -63,6 +63,8 @@ struct _GProxyVolume {
   gboolean should_automount;
 
   GProxyShadowMount *shadow_mount;
+
+  GHashTable *hash_mount_op_id_to_data;
 };
 
 static void g_proxy_volume_volume_iface_init (GVolumeIface *iface);
@@ -141,6 +143,8 @@ g_proxy_volume_finalize (GObject *object)
       g_object_unref (volume->volume_monitor);
     }
 
+  g_hash_table_unref (volume->hash_mount_op_id_to_data);
+
   if (G_OBJECT_CLASS (g_proxy_volume_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_proxy_volume_parent_class)->finalize) (object);
 }
@@ -161,6 +165,7 @@ g_proxy_volume_class_finalize (GProxyVolumeClass *klass)
 static void
 g_proxy_volume_init (GProxyVolume *proxy_volume)
 {
+  proxy_volume->hash_mount_op_id_to_data = g_hash_table_new (g_str_hash, g_str_equal);
 }
 
 GProxyVolume *
@@ -672,32 +677,60 @@ g_proxy_volume_enumerate_identifiers (GVolume *volume)
 }
 
 typedef struct {
-  GObject *object;
+  GProxyVolume *volume;
   GAsyncReadyCallback callback;
   gpointer user_data;
+
+  gchar *cancellation_id;
   GCancellable *cancellable;
+  gulong cancelled_handler_id;
+
+  gchar *mount_op_id;
+  GMountOperation *mount_operation;
+  gulong reply_handler_id;
 } DBusOp;
 
 static void
 mount_cb (DBusMessage *reply,
-          GError *error,
-          DBusOp *data)
+          GError      *error,
+          DBusOp      *data)
 {
-  GSimpleAsyncResult *simple;
-  if (error != NULL)
-    simple = g_simple_async_result_new_from_error (data->object,
-                                                   data->callback,
-                                                   data->user_data,
-                                                   error);
-  else
-    simple = g_simple_async_result_new (data->object,
-                                        data->callback,
-                                        data->user_data,
-                                        NULL);
-  g_simple_async_result_complete_in_idle (simple);
-  g_object_unref (simple);
+  if (data->cancelled_handler_id > 0)
+    g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
 
-  g_object_unref (data->object);
+  if (!g_cancellable_is_cancelled (data->cancellable))
+    {
+      GSimpleAsyncResult *simple;
+
+      if (error != NULL)
+        simple = g_simple_async_result_new_from_error (G_OBJECT (data->volume),
+                                                       data->callback,
+                                                       data->user_data,
+                                                       error);
+      else
+        simple = g_simple_async_result_new (G_OBJECT (data->volume),
+                                            data->callback,
+                                            data->user_data,
+                                            NULL);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+    }
+
+  /* free DBusOp */
+  if (strlen (data->mount_op_id) > 0)
+    g_hash_table_remove (data->volume->hash_mount_op_id_to_data, data->mount_op_id);
+  g_object_unref (data->volume);
+
+  g_free (data->mount_op_id);
+  if (data->reply_handler_id > 0)
+    g_signal_handler_disconnect (data->mount_operation, data->reply_handler_id);
+  if (data->mount_operation != NULL)
+    g_object_unref (data->mount_operation);
+
+  g_free (data->cancellation_id);
+  if (data->cancellable != NULL)
+    g_object_unref (data->cancellable);
+
   g_free (data);
 }
 
@@ -717,6 +750,61 @@ mount_foreign_callback (GObject *source_object,
   data->callback (G_OBJECT (data->enclosing_volume), res, data->user_data);
   g_object_unref (data->enclosing_volume);
   g_free (data);
+}
+
+static void
+cancel_operation_reply_cb (DBusMessage *reply,
+                           GError      *error,
+                           gpointer     user_data)
+{
+  if (error != NULL)
+    {
+      g_warning ("Error from CancelOperation(): %s", error->message);
+    }
+}
+
+static void
+mount_cancelled (GCancellable *cancellable,
+                 gpointer      user_data)
+{
+  DBusOp *data = user_data;
+  GSimpleAsyncResult *simple;
+  DBusConnection *connection;
+  DBusMessage *message;
+  const char *name;
+
+  G_LOCK (proxy_volume);
+
+  simple = g_simple_async_result_new_error (G_OBJECT (data->volume),
+                                            data->callback,
+                                            data->user_data,
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_CANCELLED,
+                                            _("Operation was cancelled"));
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+
+  /* Now tell the remote volume monitor that the op has been cancelled */
+  connection = g_proxy_volume_monitor_get_dbus_connection (data->volume->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (data->volume->volume_monitor);
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "CancelOperation");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(data->cancellation_id),
+                            DBUS_TYPE_INVALID);
+
+  G_UNLOCK (proxy_volume);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 -1,
+                                 (GAsyncDBusCallback) cancel_operation_reply_cb,
+                                 NULL);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
 }
 
 static void
@@ -760,41 +848,302 @@ g_proxy_volume_mount (GVolume             *volume,
       const char *name;
       DBusMessage *message;
       dbus_uint32_t _flags = flags;
-      dbus_bool_t use_mount_operation = mount_operation != NULL;
 
-      /* TODO: support mount_operation */
+      if (g_cancellable_is_cancelled (cancellable))
+        {
+          GSimpleAsyncResult *simple;
+          simple = g_simple_async_result_new_error (G_OBJECT (volume),
+                                                    callback,
+                                                    user_data,
+                                                    G_IO_ERROR,
+                                                    G_IO_ERROR_CANCELLED,
+                                                    _("Operation was cancelled"));
+          g_simple_async_result_complete_in_idle (simple);
+          g_object_unref (simple);
+          G_UNLOCK (proxy_volume);
+          goto out;
+        }
 
       data = g_new0 (DBusOp, 1);
-      data->object = g_object_ref (volume);
+      data->volume = g_object_ref (volume);
       data->callback = callback;
       data->user_data = user_data;
-      data->cancellable = cancellable;
+      if (cancellable != NULL)
+        {
+          data->cancellation_id = g_strdup_printf ("%p", cancellable);
+          data->cancellable = g_object_ref (cancellable);
+          data->cancelled_handler_id = g_signal_connect (data->cancellable,
+                                                         "cancelled",
+                                                         G_CALLBACK (mount_cancelled),
+                                                         data);
+        }
+      else
+        {
+          data->cancellation_id = g_strdup ("");
+        }
+
+      if (mount_operation != NULL)
+        {
+          data->mount_op_id = g_strdup_printf ("%p", mount_operation);
+          data->mount_operation = g_object_ref (mount_operation);
+          g_hash_table_insert (proxy_volume->hash_mount_op_id_to_data,
+                               data->mount_op_id,
+                               data);
+        }
+      else
+        {
+          data->mount_op_id = g_strdup ("");
+        }
 
       connection = g_proxy_volume_monitor_get_dbus_connection (proxy_volume->volume_monitor);
       name = g_proxy_volume_monitor_get_dbus_name (proxy_volume->volume_monitor);
 
       message = dbus_message_new_method_call (name,
-                                              "/",
+                                              "/org/gtk/Private/RemoteVolumeMonitor",
                                               "org.gtk.Private.RemoteVolumeMonitor",
                                               "VolumeMount");
       dbus_message_append_args (message,
                                 DBUS_TYPE_STRING,
                                 &(proxy_volume->id),
+                                DBUS_TYPE_STRING,
+                                &(data->cancellation_id),
                                 DBUS_TYPE_UINT32,
                                 &_flags,
-                                DBUS_TYPE_BOOLEAN,
-                                &use_mount_operation,
+                                DBUS_TYPE_STRING,
+                                &(data->mount_op_id),
                                 DBUS_TYPE_INVALID);
       G_UNLOCK (proxy_volume);
 
       _g_dbus_connection_call_async (connection,
                                      message,
-                                     -1,
+                                     30 * 60 * 1000,                /* 30 minute timeout */
                                      (GAsyncDBusCallback) mount_cb,
                                      data);
       dbus_message_unref (message);
       dbus_connection_unref (connection);
     }
+
+ out:
+  ;
+}
+
+
+static void
+mount_op_reply_cb (DBusMessage *reply,
+                   GError      *error,
+                   DBusOp      *data)
+{
+  if (error != NULL)
+    {
+      g_warning ("Error from MountOpReply(): %s", error->message);
+    }
+}
+
+static void
+mount_operation_reply (GMountOperation        *mount_operation,
+                       GMountOperationResult  result,
+                       gpointer               user_data)
+{
+  DBusOp *data = user_data;
+  DBusConnection *connection;
+  const char *name;
+  DBusMessage *message;
+  const char *user_name;
+  const char *domain;
+  const char *password;
+  char *encoded_password;
+  dbus_uint32_t password_save;
+  dbus_uint32_t choice;
+  dbus_bool_t anonymous;
+
+  connection = g_proxy_volume_monitor_get_dbus_connection (data->volume->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (data->volume->volume_monitor);
+
+  user_name     = g_mount_operation_get_username (mount_operation);
+  domain        = g_mount_operation_get_domain (mount_operation);
+  password      = g_mount_operation_get_password (mount_operation);
+  password_save = g_mount_operation_get_password_save (mount_operation);
+  choice        = g_mount_operation_get_choice (mount_operation);
+  anonymous     = g_mount_operation_get_anonymous (mount_operation);
+
+  if (user_name == NULL)
+    user_name = "";
+  if (domain == NULL)
+    domain = "";
+  if (password == NULL)
+    password = "";
+
+  /* NOTE: this is not to add "security", it's merely to prevent accidental exposure
+   *       of passwords when running dbus-monitor
+   */
+  encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
+
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "MountOpReply");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(data->volume->id),
+                            DBUS_TYPE_STRING,
+                            &(data->mount_op_id),
+                            DBUS_TYPE_INT32,
+                            &result,
+                            DBUS_TYPE_STRING,
+                            &user_name,
+                            DBUS_TYPE_STRING,
+                            &domain,
+                            DBUS_TYPE_STRING,
+                            &encoded_password,
+                            DBUS_TYPE_INT32,
+                            &password_save,
+                            DBUS_TYPE_INT32,
+                            &choice,
+                            DBUS_TYPE_BOOLEAN,
+                            &anonymous,
+                            DBUS_TYPE_INVALID);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 -1,
+                                 (GAsyncDBusCallback) mount_op_reply_cb,
+                                 data);
+
+  g_free (encoded_password);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
+}
+
+void
+g_proxy_volume_handle_mount_op_ask_password (GProxyVolume        *volume,
+                                             DBusMessageIter     *iter)
+{
+  const char *mount_op_id;
+  const char *message;
+  const char *default_user;
+  const char *default_domain;
+  dbus_int32_t flags;
+  DBusOp *data;
+
+  dbus_message_iter_get_basic (iter, &mount_op_id);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &message);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &default_user);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &default_domain);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &flags);
+  dbus_message_iter_next (iter);
+
+  data = g_hash_table_lookup (volume->hash_mount_op_id_to_data, mount_op_id);
+
+  /* since eavesdropping is enabled on the session bus we get this signal even if it
+   * is for another application; so silently ignore it if it's not for us
+   */
+  if (data == NULL)
+    goto out;
+
+  if (data->reply_handler_id == 0)
+    {
+      data->reply_handler_id = g_signal_connect (data->mount_operation,
+                                                 "reply",
+                                                 G_CALLBACK (mount_operation_reply),
+                                                 data);
+    }
+
+  g_signal_emit_by_name (data->mount_operation,
+                         "ask-password",
+                         message,
+                         default_user,
+                         default_domain,
+                         flags);
+
+ out:
+  ;
+}
+
+void
+g_proxy_volume_handle_mount_op_ask_question (GProxyVolume        *volume,
+                                             DBusMessageIter     *iter)
+{
+  const char *mount_op_id;
+  const char *message;
+  GPtrArray *choices;
+  DBusMessageIter iter_array;
+  DBusOp *data;
+
+  choices = NULL;
+
+  dbus_message_iter_get_basic (iter, &mount_op_id);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &message);
+  dbus_message_iter_next (iter);
+
+  choices = g_ptr_array_new ();
+  dbus_message_iter_recurse (iter, &iter_array);
+  while (dbus_message_iter_get_arg_type (&iter_array) != DBUS_TYPE_INVALID)
+    {
+      const char *choice;
+      dbus_message_iter_get_basic (&iter_array, &choice);
+      dbus_message_iter_next (&iter_array);
+
+      g_ptr_array_add (choices, g_strdup (choice));
+    }
+  g_ptr_array_add (choices, NULL);
+
+  data = g_hash_table_lookup (volume->hash_mount_op_id_to_data, mount_op_id);
+
+  /* since eavesdropping is enabled on the session bus we get this signal even if it
+   * is for another application; so silently ignore it if it's not for us
+   */
+  if (data == NULL)
+    goto out;
+
+  if (data->reply_handler_id == 0)
+    {
+      data->reply_handler_id = g_signal_connect (data->mount_operation,
+                                                 "reply",
+                                                 G_CALLBACK (mount_operation_reply),
+                                                 data);
+    }
+
+  g_signal_emit_by_name (data->mount_operation,
+                         "ask-question",
+                         message,
+                         choices->pdata);
+
+ out:
+  g_ptr_array_free (choices, TRUE);
+}
+
+void
+g_proxy_volume_handle_mount_op_aborted (GProxyVolume        *volume,
+                                        DBusMessageIter     *iter)
+{
+  const char *mount_op_id;
+  DBusOp *data;
+
+  dbus_message_iter_get_basic (iter, &mount_op_id);
+  dbus_message_iter_next (iter);
+
+  data = g_hash_table_lookup (volume->hash_mount_op_id_to_data, mount_op_id);
+
+  /* since eavesdropping is enabled on the session bus we get this signal even if it
+   * is for another application; so silently ignore it if it's not for us
+   */
+  if (data == NULL)
+    goto out;
+
+  g_signal_emit_by_name (data->mount_operation, "aborted");
+
+ out:
+  ;
 }
 
 static gboolean

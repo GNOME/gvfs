@@ -53,6 +53,15 @@ void          g_proxy_volume_register            (GIOModule           *module);
 
 GProxyShadowMount *g_proxy_volume_get_shadow_mount (GProxyVolume        *volume);
 
+void          g_proxy_volume_handle_mount_op_ask_password (GProxyVolume        *volume,
+                                                           DBusMessageIter     *iter);
+
+void          g_proxy_volume_handle_mount_op_ask_question (GProxyVolume        *volume,
+                                                           DBusMessageIter     *iter);
+
+void          g_proxy_volume_handle_mount_op_aborted      (GProxyVolume        *volume,
+                                                           DBusMessageIter     *iter);
+
 G_END_DECLS
 
 #endif /* __G_PROXY_VOLUME_H__ */

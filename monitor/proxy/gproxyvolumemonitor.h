@@ -31,11 +31,12 @@
 
 G_BEGIN_DECLS
 
-#define G_TYPE_PROXY_VOLUME_MONITOR        (g_proxy_volume_monitor_get_type ())
-#define G_PROXY_VOLUME_MONITOR(o)          (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_PROXY_VOLUME_MONITOR, GProxyVolumeMonitor))
-#define G_PROXY_VOLUME_MONITOR_CLASS(k)    (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_PROXY_VOLUME_MONITOR, GProxyVolumeMonitorClass))
-#define G_IS_PROXY_VOLUME_MONITOR(o)       (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_PROXY_VOLUME_MONITOR))
-#define G_IS_PROXY_VOLUME_MONITOR_CLASS(k) (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_PROXY_VOLUME_MONITOR))
+#define G_TYPE_PROXY_VOLUME_MONITOR         (g_proxy_volume_monitor_get_type ())
+#define G_PROXY_VOLUME_MONITOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_PROXY_VOLUME_MONITOR, GProxyVolumeMonitor))
+#define G_PROXY_VOLUME_MONITOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_PROXY_VOLUME_MONITOR, GProxyVolumeMonitorClass))
+#define G_PROXY_VOLUME_MONITOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_PROXY_VOLUME_MONITOR, GProxyVolumeMonitorClass))
+#define G_IS_PROXY_VOLUME_MONITOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_PROXY_VOLUME_MONITOR))
+#define G_IS_PROXY_VOLUME_MONITOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_PROXY_VOLUME_MONITOR))
 
 typedef struct _GProxyVolumeMonitor GProxyVolumeMonitor;
 typedef struct _GProxyVolumeMonitorClass GProxyVolumeMonitorClass;

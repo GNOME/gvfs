@@ -1,3 +1,49 @@
+2009-02-26  David Zeuthen  <davidz@redhat.com>
+
+	Lots of proxy monitor fixes.
+
+	Reviewed by: Alexander Larsson  <alexl@redhat.com>
+
+	o  add support for proxying GMountOperation to the remote volume
+	   monitor process.
+
+	o  add support for proxying GCancellable to the remote volume
+	   monitor process.
+
+	o  make each volume monitor process track callers and cancels
+	   operations initiated by callers that disconnects from the bus
+
+	o  makes the client side proxy monitor track the remote monitor. If
+	   the monitor process disconnects, then all drives/volumes/mounts
+	   are removed. If the monitor process reconnects, we reseed the
+	   internal monitor and add drives/volumes/mounts.
+
+	o  Each monitor process now uses ALLOW_REPLACEMENT when claiming a
+	   name and also kills itself on NameLost (e.g. if it is
+	   replaced). Coupled with the above disconnection/reconnection logic
+	   it this makes it a lot more tolerable to hack on a remote volume
+	   monitor. Simply just compile it, start it and the
+	   existing (system-wide) copy will kill itself. And all the
+	   clients (Nautilus, panel, drive applet, gvfsd-computer, etc.) will
+	   reconnect and do the right thing.
+
+	o  make the get_mount_for_mount_path() method on the class
+	   GNativeVolumeMonitor actually work. It turns out that at least
+	   gvfs-mount -u needs that.
+
+	o  use /org/gtk/Private/RemoteVolumeMonitor instead of / as the
+	   object name. Cf. the version D-Bus debacle on Lennart Poettering's
+	   blog.
+
+	o  make the proxy monitor client module resident
+
+	o For shadow mounts, redirect can_eject() and eject() to the
+	  volume for the shadow mount. Without this patch eject on
+	  e.g. cdda:// volumes won't work since cdda:// volumes are
+	  GDaedmonMount and these don't implement eject.
+
+	* monitor/proxy/*.[ch]: See above.
+
 2009-02-26  Hans Petter Jansson  <hpj@novell.com>
 
 	* client/gvfsfusedaemon.c (vfs_ftruncate): Immediately close the stream

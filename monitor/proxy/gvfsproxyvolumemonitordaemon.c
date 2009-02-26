@@ -28,14 +28,172 @@
 #include <dbus/dbus.h>
 #include <glib/gi18n.h>
 #include <stdlib.h>
+#include <glib/gprintf.h>
 
 #include "gdbusutils.h"
 #include "gvfsproxyvolumemonitordaemon.h"
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+/* #define DEBUG_ENABLED */
+
+#ifdef DEBUG_ENABLED
+static void
+print_debug (const gchar *format, ...)
+{
+  va_list      var_args;
+
+  va_start (var_args, format);
+
+  g_print ("### debug: ");
+  g_vprintf (format, var_args);
+  g_print ("\n");
+
+  va_end (var_args);
+}
+#else
+static void
+print_debug (const gchar *format, ...)
+{
+}
+#endif
+
+
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+GType g_proxy_mount_operation_get_type (void) G_GNUC_CONST;
+
+typedef struct
+{
+  GMountOperation parent_instance;
+} GProxyMountOperation;
+
+typedef struct
+{
+  GMountOperationClass parent_class;
+} GProxyMountOperationClass;
+
+
+static GMountOperation *
+g_proxy_mount_operation_new (void)
+{
+  return G_MOUNT_OPERATION (g_object_new (g_proxy_mount_operation_get_type(), NULL));
+}
+
+G_DEFINE_TYPE (GProxyMountOperation, g_proxy_mount_operation, G_TYPE_MOUNT_OPERATION)
+
+static void
+g_proxy_mount_operation_init (GProxyMountOperation *mount_operation)
+{
+}
+
+static void
+g_proxy_mount_operation_ask_password (GMountOperation *op,
+                                      const char      *message,
+                                      const char      *default_user,
+                                      const char      *default_domain,
+                                      GAskPasswordFlags flags)
+{
+  /* do nothing */
+}
+
+static void
+g_proxy_mount_operation_ask_question (GMountOperation *op,
+                                      const char      *message,
+                                      const char      *choices[])
+{
+  /* do nothing */
+}
+
+static void
+g_proxy_mount_operation_class_init (GProxyMountOperationClass *klass)
+{
+  GMountOperationClass *mount_op_class;
+
+  mount_op_class = G_MOUNT_OPERATION_CLASS (klass);
+
+  mount_op_class->ask_password = g_proxy_mount_operation_ask_password;
+  mount_op_class->ask_question = g_proxy_mount_operation_ask_question;
+}
+
 
 static GVolumeMonitor *monitor = NULL;
 static DBusConnection *connection = NULL;
 static GType the_volume_monitor_type;
 static const char *the_dbus_name = NULL;
+
+static GList *outstanding_ops = NULL;
+
+static GHashTable *unique_names_being_watched = NULL;
+
+static void
+cancellable_destroyed_cb (gpointer user_data,
+                          GObject *where_the_cancellable_was)
+{
+  outstanding_ops = g_list_remove (outstanding_ops, where_the_cancellable_was);
+}
+
+static void
+remove_name_owned_changed_for_unique_name (const gchar *unique_name)
+{
+  const gchar *match_rule;
+  DBusError dbus_error;
+
+  match_rule = g_hash_table_lookup (unique_names_being_watched, unique_name);
+  if (match_rule == NULL)
+    {
+      g_warning ("Was asked to remove match rule for unique_name %s but we don't have one", unique_name);
+      goto out;
+    }
+
+  dbus_error_init (&dbus_error);
+  dbus_bus_remove_match (connection,
+                         match_rule,
+                         &dbus_error);
+  if (dbus_error_is_set (&dbus_error)) {
+    g_warning ("cannot remove match rule '%s': %s: %s", match_rule, dbus_error.name, dbus_error.message);
+    dbus_error_free (&dbus_error);
+  }
+
+  g_hash_table_remove (unique_names_being_watched, unique_name);
+
+ out:
+  ;
+}
+
+static void
+ensure_name_owner_changed_for_unique_name (const gchar *unique_name)
+{
+  gchar *match_rule;
+  DBusError dbus_error;
+
+  if (g_hash_table_lookup (unique_names_being_watched, unique_name) != NULL)
+    goto out;
+
+  match_rule = g_strdup_printf ("type='signal',"
+                                "interface='org.freedesktop.DBus',"
+                                "member='NameOwnerChanged',"
+                                "arg0='%s'",
+                                unique_name);
+
+  dbus_error_init (&dbus_error);
+  dbus_bus_add_match (connection,
+                      match_rule,
+                      &dbus_error);
+  if (dbus_error_is_set (&dbus_error))
+    {
+      g_warning ("cannot add match rule '%s': %s: %s", match_rule, dbus_error.name, dbus_error.message);
+      dbus_error_free (&dbus_error);
+      g_free (match_rule);
+      goto out;
+    }
+
+  g_hash_table_insert (unique_names_being_watched, g_strdup (unique_name), match_rule);
+
+ out:
+  ;
+}
 
 static void monitor_try_create (void);
 
@@ -46,10 +204,11 @@ static void monitor_try_create (void);
  * boolean              can-poll-for-media
  * boolean              has-media
  * boolean              is-media-removable
+ * boolean              is-media-check-automatic
  * array:string         volume-ids
  * dict:string->string  identifiers
  */
-#define DRIVE_STRUCT_TYPE "(sssbbbbasa{ss})"
+#define DRIVE_STRUCT_TYPE "(sssbbbbbasa{ss})"
 
 static void
 append_drive (GDrive *drive, DBusMessageIter *iter_array)
@@ -65,6 +224,7 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
   gboolean can_poll_for_media;
   gboolean has_media;
   gboolean is_media_removable;
+  gboolean is_media_check_automatic;
   GList *volumes, *l;
   char **identifiers;
   int n;
@@ -82,6 +242,7 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
   can_poll_for_media = g_drive_can_poll_for_media (drive);
   has_media = g_drive_has_media (drive);
   is_media_removable = g_drive_is_media_removable (drive);
+  is_media_check_automatic = g_drive_is_media_check_automatic (drive);
   volumes = g_drive_get_volumes (drive);
   identifiers = g_drive_enumerate_identifiers (drive);
 
@@ -95,6 +256,7 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_BOOLEAN, &can_poll_for_media);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_BOOLEAN, &has_media);
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_BOOLEAN, &is_media_removable);
+  dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_BOOLEAN, &is_media_check_automatic);
 
   dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "s", &iter_volume_array);
   for (l = volumes; l != NULL; l = l->next)
@@ -108,7 +270,7 @@ append_drive (GDrive *drive, DBusMessageIter *iter_array)
   dbus_message_iter_close_container (&iter_struct, &iter_volume_array);
 
   dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "{ss}", &iter_identifiers);
-  for (n = 0; identifiers[n] != NULL; n++)
+  for (n = 0; identifiers != NULL && identifiers[n] != NULL; n++)
     {
       DBusMessageIter iter_dict_entry;
       char *id_value;
@@ -214,7 +376,7 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
   dbus_message_iter_append_basic (&iter_struct, DBUS_TYPE_STRING, &mount_id);
 
   dbus_message_iter_open_container (&iter_struct, DBUS_TYPE_ARRAY, "{ss}", &iter_identifiers);
-  for (n = 0; identifiers[n] != NULL; n++)
+  for (n = 0; identifiers != NULL && identifiers[n] != NULL; n++)
     {
       DBusMessageIter iter_dict_entry;
       char *id_value;
@@ -343,6 +505,8 @@ handle_list (DBusConnection *connection, DBusMessage *message)
   DBusMessageIter iter_array;
   DBusMessage *reply;
 
+  print_debug ("in handle_list");
+
   drives = g_volume_monitor_get_connected_drives (monitor);
   volumes = g_volume_monitor_get_volumes (monitor);
   mounts = g_volume_monitor_get_mounts (monitor);
@@ -383,14 +547,20 @@ mount_unmount_cb (GMount *mount, GAsyncResult *result, DBusMessage *message)
   GError *error;
   DBusMessage *reply;
 
+  print_debug ("in mount_unmount_cb");
+
+  g_object_set_data (G_OBJECT (mount), "cancellable", NULL);
+
   error = NULL;
   if (!g_mount_unmount_finish (mount, result, &error))
     {
+      print_debug ("  error: %s", error->message);
       reply = _dbus_message_new_from_gerror (message, error);
       g_error_free (error);
     }
   else
     {
+      print_debug (" success");
       reply = dbus_message_new_method_return (message);
     }
 
@@ -403,6 +573,9 @@ static DBusHandlerResult
 handle_mount_unmount (DBusConnection *connection, DBusMessage *message)
 {
   const char *id;
+  const char *cancellation_id;
+  const char *sender;
+  GCancellable *cancellable;
   dbus_uint32_t unmount_flags;
   DBusError dbus_error;
   GList *mounts, *l;
@@ -416,7 +589,8 @@ handle_mount_unmount (DBusConnection *connection, DBusMessage *message)
   dbus_error_init (&dbus_error);
   if (!dbus_message_get_args (message, &dbus_error,
                               DBUS_TYPE_STRING, &id,
-                              DBUS_TYPE_UINT32 &unmount_flags,
+                              DBUS_TYPE_STRING, &cancellation_id,
+                              DBUS_TYPE_UINT32, &unmount_flags,
                               DBUS_TYPE_INVALID))
     {
       g_warning ("Error parsing args for MountUnmount(): %s: %s", dbus_error.name, dbus_error.message);
@@ -424,7 +598,11 @@ handle_mount_unmount (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  print_debug ("in handle_mount_unmount");
+
   ret = DBUS_HANDLER_RESULT_HANDLED;
+
+  sender = dbus_message_get_sender (message);
 
   mount = NULL;
   mounts = g_volume_monitor_get_mounts (monitor);
@@ -453,6 +631,26 @@ handle_mount_unmount (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  if (g_object_get_data (G_OBJECT (mount), "cancellable") != NULL)
+    {
+      DBusMessage *reply;
+      reply = dbus_message_new_error (message,
+                                      "org.gtk.Private.RemoteVolumeMonitor.Failed",
+                                      "An operation is already pending");
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+      goto out;
+    }
+
+  cancellable = g_cancellable_new ();
+  g_object_set_data_full (G_OBJECT (mount), "cancellable", cancellable, g_object_unref);
+  g_object_set_data_full (G_OBJECT (cancellable), "owner", g_strdup (sender), g_free);
+  g_object_set_data_full (G_OBJECT (cancellable), "cancellation_id", g_strdup (cancellation_id), g_free);
+  outstanding_ops = g_list_prepend (outstanding_ops, cancellable);
+  g_object_weak_ref (G_OBJECT (cancellable),
+                     cancellable_destroyed_cb,
+                     NULL);
+
   g_mount_unmount (mount,
                    unmount_flags,
                    NULL,
@@ -470,54 +668,50 @@ handle_mount_unmount (DBusConnection *connection, DBusMessage *message)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static void
-volume_mount_cb (GVolume *volume, GAsyncResult *result, DBusMessage *message)
-{
-  GError *error;
-  DBusMessage *reply;
-
-  error = NULL;
-  if (!g_volume_mount_finish (volume, result, &error))
-    {
-      reply = _dbus_message_new_from_gerror (message, error);
-      g_error_free (error);
-    }
-  else
-    {
-      reply = dbus_message_new_method_return (message);
-    }
-
-  dbus_connection_send (connection, reply, NULL);
-  dbus_message_unref (message);
-  dbus_message_unref (reply);
-}
-
 static DBusHandlerResult
-handle_volume_mount (DBusConnection *connection, DBusMessage *message)
+handle_mount_op_reply (DBusConnection *connection, DBusMessage *message)
 {
   const char *id;
-  dbus_uint32_t mount_flags;
-  dbus_bool_t use_mount_operation;
+  const char *mount_op_id;
+  dbus_int32_t result;
+  const char *user_name;
+  const char *domain;
+  const char *encoded_password;
+  char *decoded_password;
+  gsize decoded_password_len;
+  dbus_int32_t password_save;
+  dbus_int32_t choice;
+  dbus_bool_t anonymous;
   DBusError dbus_error;
+  DBusHandlerResult ret;
   GList *volumes, *l;
   GVolume *volume;
-  DBusHandlerResult ret;
+  DBusMessage *reply;
   GMountOperation *mount_operation;
 
-  volume = NULL;
+  volumes = NULL;
+  decoded_password = NULL;
   ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
   dbus_error_init (&dbus_error);
   if (!dbus_message_get_args (message, &dbus_error,
                               DBUS_TYPE_STRING, &id,
-                              DBUS_TYPE_UINT32, &mount_flags,
-                              DBUS_TYPE_BOOLEAN, &use_mount_operation,
+                              DBUS_TYPE_STRING, &mount_op_id,
+                              DBUS_TYPE_INT32, &result,
+                              DBUS_TYPE_STRING, &user_name,
+                              DBUS_TYPE_STRING, &domain,
+                              DBUS_TYPE_STRING, &encoded_password,
+                              DBUS_TYPE_INT32, &password_save,
+                              DBUS_TYPE_INT32, &choice,
+                              DBUS_TYPE_BOOLEAN, &anonymous,
                               DBUS_TYPE_INVALID))
     {
-      g_warning ("Error parsing args for VolumeMount(): %s: %s", dbus_error.name, dbus_error.message);
+      g_warning ("Error parsing args for MountOpReply(): %s: %s", dbus_error.name, dbus_error.message);
       dbus_error_free (&dbus_error);
       goto out;
     }
+
+  print_debug ("in handle_mount_op_reply");
 
   ret = DBUS_HANDLER_RESULT_HANDLED;
 
@@ -548,19 +742,316 @@ handle_volume_mount (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  mount_operation = g_object_get_data (G_OBJECT (volume), "mount_operation");
+  if (mount_operation == NULL)
+    {
+      DBusMessage *reply;
+      reply = dbus_message_new_error (message,
+                                      "org.gtk.Private.RemoteVolumeMonitor.NotFound",
+                                      "No outstanding mount operation");
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+      goto out;
+    }
+
+  decoded_password = (gchar *) g_base64_decode (encoded_password, &decoded_password_len);
+
+  g_mount_operation_set_username (mount_operation, user_name);
+  g_mount_operation_set_domain (mount_operation, domain);
+  g_mount_operation_set_password (mount_operation, decoded_password);
+  g_mount_operation_set_password_save (mount_operation, password_save);
+  g_mount_operation_set_choice (mount_operation, choice);
+  g_mount_operation_set_anonymous (mount_operation, anonymous);
+
+  g_mount_operation_reply (mount_operation, result);
+
+  reply = dbus_message_new_method_return (message);
+  dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
+
+ out:
+  g_free (decoded_password);
+  if (volumes != NULL)
+    {
+      g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
+      g_list_free (volumes);
+    }
+  return ret;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static void
+volume_mount_cb (GVolume *volume, GAsyncResult *result, DBusMessage *message)
+{
+  GError *error;
+  DBusMessage *reply;
+
+  print_debug ("in volume_mount_cb");
+
+  g_object_set_data (G_OBJECT (volume), "mount_operation", NULL);
+  g_object_set_data (G_OBJECT (volume), "cancellable", NULL);
+
+  error = NULL;
+  if (!g_volume_mount_finish (volume, result, &error))
+    {
+      print_debug ("  error: %s", error->message);
+      reply = _dbus_message_new_from_gerror (message, error);
+      g_error_free (error);
+    }
+  else
+    {
+      print_debug (" success");
+      reply = dbus_message_new_method_return (message);
+    }
+
+  dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (message);
+  dbus_message_unref (reply);
+}
+
+static void
+ask_password_cb (GMountOperation  *mount_operation,
+                 const gchar      *message_to_show,
+                 const gchar      *default_user,
+                 const gchar      *default_domain,
+                 GAskPasswordFlags flags,
+                 gpointer          user_data)
+{
+  gchar *id;
+  DBusMessage *message;
+  DBusMessageIter iter;
+  GVolume *volume;
+  const gchar *mount_op_id;
+  const gchar *mount_op_owner;
+
+  print_debug ("in ask_password_cb %s", message_to_show);
+
+  volume = G_VOLUME (user_data);
+
+  id = g_strdup_printf ("%p", volume);
+
+  mount_op_id = g_object_get_data (G_OBJECT (mount_operation), "mount_op_id");
+  mount_op_owner = g_object_get_data (G_OBJECT (mount_operation), "mount_op_owner");
+
+  message = dbus_message_new_signal ("/org/gtk/Private/RemoteVolumeMonitor",
+                                     "org.gtk.Private.RemoteVolumeMonitor",
+                                     "MountOpAskPassword");
+  dbus_message_iter_init_append (message, &iter);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &the_dbus_name);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &id);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &mount_op_id);
+
+  if (message_to_show == NULL)
+    message_to_show = "";
+
+  if (default_user == NULL)
+    default_user = "";
+
+  if (default_domain == NULL)
+    default_domain = "";
+
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &message_to_show);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &default_user);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &default_domain);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_INT32, &flags);
+
+  dbus_message_set_destination (message, mount_op_owner);
+
+  dbus_connection_send (connection, message, NULL);
+  dbus_message_unref (message);
+
+  g_free (id);
+}
+
+static void
+ask_question_cb (GMountOperation  *mount_operation,
+                 const gchar      *message_to_show,
+                 gchar           **choices,
+                 gpointer          user_data)
+{
+  gchar *id;
+  DBusMessage *message;
+  DBusMessageIter iter;
+  DBusMessageIter iter_string_array;
+  const gchar *mount_op_id;
+  const gchar *mount_op_owner;
+  GVolume *volume;
+  guint n;
+
+  print_debug ("in ask_question_cb %s", message_to_show);
+
+  volume = G_VOLUME (user_data);
+
+  id = g_strdup_printf ("%p", volume);
+
+  mount_op_id = g_object_get_data (G_OBJECT (mount_operation), "mount_op_id");
+  mount_op_owner = g_object_get_data (G_OBJECT (mount_operation), "mount_op_owner");
+
+  message = dbus_message_new_signal ("/org/gtk/Private/RemoteVolumeMonitor",
+                                     "org.gtk.Private.RemoteVolumeMonitor",
+                                     "MountOpAskQuestion");
+  dbus_message_iter_init_append (message, &iter);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &the_dbus_name);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &id);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &mount_op_id);
+
+  if (message_to_show == NULL)
+    message_to_show = "";
+
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &message_to_show);
+
+  dbus_message_iter_open_container (&iter, DBUS_TYPE_ARRAY, DBUS_TYPE_STRING_AS_STRING, &iter_string_array);
+  for (n = 0; choices != NULL && choices[n] != NULL; n++)
+    dbus_message_iter_append_basic (&iter_string_array, DBUS_TYPE_STRING, &(choices[n]));
+  dbus_message_iter_close_container (&iter, &iter_string_array);
+
+  dbus_message_set_destination (message, mount_op_owner);
+
+  dbus_connection_send (connection, message, NULL);
+  dbus_message_unref (message);
+
+  g_free (id);
+}
+
+static void
+aborted_cb (GMountOperation  *mount_operation,
+            gpointer          user_data)
+{
+  gchar *id;
+  DBusMessage *message;
+  DBusMessageIter iter;
+  GVolume *volume;
+  const gchar *mount_op_id;
+  const gchar *mount_op_owner;
+
+  print_debug ("in aborted_cb");
+
+  volume = G_VOLUME (user_data);
+
+  id = g_strdup_printf ("%p", volume);
+
+  mount_op_id = g_object_get_data (G_OBJECT (mount_operation), "mount_op_id");
+  mount_op_owner = g_object_get_data (G_OBJECT (mount_operation), "mount_op_owner");
+
+  message = dbus_message_new_signal ("/org/gtk/Private/RemoteVolumeMonitor",
+                                     "org.gtk.Private.RemoteVolumeMonitor",
+                                     "MountOpAborted");
+  dbus_message_iter_init_append (message, &iter);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &the_dbus_name);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &id);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &mount_op_id);
+
+  dbus_message_set_destination (message, mount_op_owner);
+
+  dbus_connection_send (connection, message, NULL);
+  dbus_message_unref (message);
+
+  g_free (id);
+}
+
+static DBusHandlerResult
+handle_volume_mount (DBusConnection *connection, DBusMessage *message)
+{
+  const char *id;
+  const char *cancellation_id;
+  const char *sender;
+  dbus_uint32_t mount_flags;
+  const char *mount_op_id;
+  DBusError dbus_error;
+  GList *volumes, *l;
+  GVolume *volume;
+  DBusHandlerResult ret;
+  GMountOperation *mount_operation;
+  GCancellable *cancellable;
+
+  volumes = NULL;
+  ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+  dbus_error_init (&dbus_error);
+  if (!dbus_message_get_args (message, &dbus_error,
+                              DBUS_TYPE_STRING, &id,
+                              DBUS_TYPE_STRING, &cancellation_id,
+                              DBUS_TYPE_UINT32, &mount_flags,
+                              DBUS_TYPE_STRING, &mount_op_id,
+                              DBUS_TYPE_INVALID))
+    {
+      g_warning ("Error parsing args for VolumeMount(): %s: %s", dbus_error.name, dbus_error.message);
+      dbus_error_free (&dbus_error);
+      goto out;
+    }
+
+  print_debug ("in handle_volume_mount");
+
+  ret = DBUS_HANDLER_RESULT_HANDLED;
+
+  sender = dbus_message_get_sender (message);
+
+  volume = NULL;
+  volumes = g_volume_monitor_get_volumes (monitor);
+  for (l = volumes; l != NULL; l = l->next)
+    {
+      char *volume_id;
+
+      volume = G_VOLUME (l->data);
+      volume_id = g_strdup_printf ("%p", volume);
+      if (strcmp (volume_id, id) == 0)
+        break;
+
+      g_free (volume_id);
+    }
+  if (l == NULL)
+    volume = NULL;
+
+  if (volume == NULL)
+    {
+      DBusMessage *reply;
+      reply = dbus_message_new_error (message,
+                                      "org.gtk.Private.RemoteVolumeMonitor.NotFound",
+                                      "The given volume was not found");
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+      goto out;
+    }
+
+  if (g_object_get_data (G_OBJECT (volume), "cancellable") != NULL)
+    {
+      DBusMessage *reply;
+      reply = dbus_message_new_error (message,
+                                      "org.gtk.Private.RemoteVolumeMonitor.Failed",
+                                      "An operation is already pending");
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+      goto out;
+    }
+
   mount_operation = NULL;
-  if (use_mount_operation)
-    mount_operation = g_mount_operation_new ();
+  if (mount_op_id != NULL && strlen (mount_op_id) > 0)
+    {
+      mount_operation = g_proxy_mount_operation_new ();
+      g_signal_connect (mount_operation, "ask-password", G_CALLBACK (ask_password_cb), volume);
+      g_signal_connect (mount_operation, "ask-question", G_CALLBACK (ask_question_cb), volume);
+      g_signal_connect (mount_operation, "aborted", G_CALLBACK (aborted_cb), volume);
+      g_object_set_data_full (G_OBJECT (mount_operation), "mount_op_id", g_strdup (mount_op_id), g_free);
+      g_object_set_data_full (G_OBJECT (mount_operation), "mount_op_owner", g_strdup (sender), g_free);
+      g_object_set_data_full (G_OBJECT (volume), "mount_operation", mount_operation, g_object_unref);
+    }
+
+  cancellable = g_cancellable_new ();
+  g_object_set_data_full (G_OBJECT (volume), "cancellable", cancellable, g_object_unref);
+  g_object_set_data_full (G_OBJECT (cancellable), "owner", g_strdup (sender), g_free);
+  g_object_set_data_full (G_OBJECT (cancellable), "cancellation_id", g_strdup (cancellation_id), g_free);
+  outstanding_ops = g_list_prepend (outstanding_ops, cancellable);
+  g_object_weak_ref (G_OBJECT (cancellable),
+                     cancellable_destroyed_cb,
+                     NULL);
 
   g_volume_mount (volume,
                   mount_flags,
                   mount_operation,
-                  NULL,
+                  cancellable,
                   (GAsyncReadyCallback) volume_mount_cb,
                   dbus_message_ref (message));
-
-  if (mount_operation != NULL)
-    g_object_unref (mount_operation);
 
  out:
   if (volumes != NULL)
@@ -579,14 +1070,20 @@ drive_eject_cb (GDrive *drive, GAsyncResult *result, DBusMessage *message)
   GError *error;
   DBusMessage *reply;
 
+  print_debug ("in drive_eject_cb");
+
+  g_object_set_data (G_OBJECT (drive), "cancellable", NULL);
+
   error = NULL;
   if (!g_drive_eject_finish (drive, result, &error))
     {
+      print_debug ("  error: %s", error->message);
       reply = _dbus_message_new_from_gerror (message, error);
       g_error_free (error);
     }
   else
     {
+      print_debug (" success");
       reply = dbus_message_new_method_return (message);
     }
 
@@ -599,6 +1096,9 @@ static DBusHandlerResult
 handle_drive_eject (DBusConnection *connection, DBusMessage *message)
 {
   const char *id;
+  const char *cancellation_id;
+  const char *sender;
+  GCancellable *cancellable;
   dbus_uint32_t unmount_flags;
   DBusError dbus_error;
   GList *drives, *l;
@@ -606,12 +1106,14 @@ handle_drive_eject (DBusConnection *connection, DBusMessage *message)
   DBusHandlerResult ret;
 
   drive = NULL;
+  drives = NULL;
   unmount_flags = 0;
   ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
   dbus_error_init (&dbus_error);
   if (!dbus_message_get_args (message, &dbus_error,
                               DBUS_TYPE_STRING, &id,
+                              DBUS_TYPE_STRING, &cancellation_id,
                               DBUS_TYPE_UINT32 &unmount_flags,
                               DBUS_TYPE_INVALID))
     {
@@ -620,7 +1122,11 @@ handle_drive_eject (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  print_debug ("in handle_drive_eject");
+
   ret = DBUS_HANDLER_RESULT_HANDLED;
+
+  sender = dbus_message_get_sender (message);
 
   drive = NULL;
   drives = g_volume_monitor_get_connected_drives (monitor);
@@ -649,9 +1155,29 @@ handle_drive_eject (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  if (g_object_get_data (G_OBJECT (drive), "cancellable") != NULL)
+    {
+      DBusMessage *reply;
+      reply = dbus_message_new_error (message,
+                                      "org.gtk.Private.RemoteVolumeMonitor.Failed",
+                                      "An operation is already pending");
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+      goto out;
+    }
+
+  cancellable = g_cancellable_new ();
+  g_object_set_data_full (G_OBJECT (drive), "cancellable", cancellable, g_object_unref);
+  g_object_set_data_full (G_OBJECT (cancellable), "owner", g_strdup (sender), g_free);
+  g_object_set_data_full (G_OBJECT (cancellable), "cancellation_id", g_strdup (cancellation_id), g_free);
+  outstanding_ops = g_list_prepend (outstanding_ops, cancellable);
+  g_object_weak_ref (G_OBJECT (cancellable),
+                     cancellable_destroyed_cb,
+                     NULL);
+
   g_drive_eject (drive,
                  unmount_flags,
-                 NULL,
+                 cancellable,
                  (GAsyncReadyCallback) drive_eject_cb,
                  dbus_message_ref (message));
 
@@ -672,14 +1198,20 @@ drive_poll_for_media_cb (GDrive *drive, GAsyncResult *result, DBusMessage *messa
   GError *error;
   DBusMessage *reply;
 
+  print_debug ("in drive_poll_for_media_cb");
+
+  g_object_set_data (G_OBJECT (drive), "cancellable", NULL);
+
   error = NULL;
   if (!g_drive_poll_for_media_finish (drive, result, &error))
     {
+      print_debug ("  error: %s", error->message);
       reply = _dbus_message_new_from_gerror (message, error);
       g_error_free (error);
     }
   else
     {
+      print_debug (" success");
       reply = dbus_message_new_method_return (message);
     }
 
@@ -692,17 +1224,22 @@ static DBusHandlerResult
 handle_drive_poll_for_media (DBusConnection *connection, DBusMessage *message)
 {
   const char *id;
+  const char *cancellation_id;
+  const char *sender;
+  GCancellable *cancellable;
   DBusError dbus_error;
   GList *drives, *l;
   GDrive *drive;
   DBusHandlerResult ret;
 
   drive = NULL;
+  drives = NULL;
   ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
   dbus_error_init (&dbus_error);
   if (!dbus_message_get_args (message, &dbus_error,
                               DBUS_TYPE_STRING, &id,
+                              DBUS_TYPE_STRING, &cancellation_id,
                               DBUS_TYPE_INVALID))
     {
       g_warning ("Error parsing args for DrivePollForMedia(): %s: %s", dbus_error.name, dbus_error.message);
@@ -710,7 +1247,11 @@ handle_drive_poll_for_media (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  print_debug ("in handle_drive_poll_for_media");
+
   ret = DBUS_HANDLER_RESULT_HANDLED;
+
+  sender = dbus_message_get_sender (message);
 
   drive = NULL;
   drives = g_volume_monitor_get_connected_drives (monitor);
@@ -739,8 +1280,28 @@ handle_drive_poll_for_media (DBusConnection *connection, DBusMessage *message)
       goto out;
     }
 
+  if (g_object_get_data (G_OBJECT (drive), "cancellable") != NULL)
+    {
+      DBusMessage *reply;
+      reply = dbus_message_new_error (message,
+                                      "org.gtk.Private.RemoteVolumeMonitor.Failed",
+                                      "An operation is already pending");
+      dbus_connection_send (connection, reply, NULL);
+      dbus_message_unref (reply);
+      goto out;
+    }
+
+  cancellable = g_cancellable_new ();
+  g_object_set_data_full (G_OBJECT (drive), "cancellable", cancellable, g_object_unref);
+  g_object_set_data_full (G_OBJECT (cancellable), "owner", g_strdup (sender), g_free);
+  g_object_set_data_full (G_OBJECT (cancellable), "cancellation_id", g_strdup (cancellation_id), g_free);
+  outstanding_ops = g_list_prepend (outstanding_ops, cancellable);
+  g_object_weak_ref (G_OBJECT (cancellable),
+                     cancellable_destroyed_cb,
+                     NULL);
+
   g_drive_poll_for_media (drive,
-                          NULL,
+                          cancellable,
                           (GAsyncReadyCallback) drive_poll_for_media_cb,
                           dbus_message_ref (message));
 
@@ -762,6 +1323,8 @@ handle_is_supported (DBusConnection *connection, DBusMessage *message)
   DBusMessage *reply;
   DBusMessageIter iter;
 
+  print_debug ("in handle_supported");
+
   /* if monitor wasn't created on startup; try again */
   if (monitor == NULL)
     monitor_try_create ();
@@ -780,40 +1343,157 @@ handle_is_supported (DBusConnection *connection, DBusMessage *message)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static DBusHandlerResult
+handle_cancel_operation (DBusConnection *connection, DBusMessage *message)
+{
+  DBusMessage *reply;
+  DBusMessageIter iter;
+  DBusError dbus_error;
+  dbus_bool_t was_cancelled;
+  const char *sender;
+  const char *cancellation_id;
+  GList *l;
+
+  was_cancelled = FALSE;
+
+  sender = dbus_message_get_sender (message);
+
+  dbus_error_init (&dbus_error);
+  if (!dbus_message_get_args (message, &dbus_error,
+                              DBUS_TYPE_STRING, &cancellation_id,
+                              DBUS_TYPE_INVALID))
+    {
+      g_warning ("Error parsing args for CancelOperation(): %s: %s", dbus_error.name, dbus_error.message);
+      dbus_error_free (&dbus_error);
+      goto out;
+    }
+
+  print_debug ("in handle_cancel_operation");
+
+  /* Find GCancellable to cancel */
+  for (l = outstanding_ops; l != NULL; l = l->next)
+    {
+      GCancellable *cancellable = G_CANCELLABLE (l->data);
+      const gchar *owner;
+      const gchar *id;
+
+      owner = g_object_get_data (G_OBJECT (cancellable), "owner");
+      id = g_object_get_data (G_OBJECT (cancellable), "cancellation_id");
+      if (g_strcmp0 (owner, sender) == 0 && g_strcmp0 (id, cancellation_id) == 0)
+        {
+          print_debug ("found op to cancel");
+          g_cancellable_cancel (cancellable);
+
+          was_cancelled = TRUE;
+          break;
+        }
+    }
+
+  if (!was_cancelled)
+    g_warning ("didn't find op to cancel");
+
+ out:
+  reply = dbus_message_new_method_return (message);
+  dbus_message_iter_init_append (reply, &iter);
+  dbus_message_iter_append_basic (&iter, DBUS_TYPE_BOOLEAN, &was_cancelled);
+  dbus_connection_send (connection, reply, NULL);
+  dbus_message_unref (reply);
+
+  return DBUS_HANDLER_RESULT_HANDLED;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static DBusHandlerResult
 filter_function (DBusConnection *connection, DBusMessage *message, void *user_data)
 {
   DBusHandlerResult ret;
 
   ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-  if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "IsSupported") &&
-      strcmp (dbus_message_get_path (message), "/") == 0)
+  if (dbus_message_is_signal (message, "org.freedesktop.DBus", "NameLost"))
     {
-      ret = handle_is_supported (connection, message);
+      /* means that someone has claimed our name (we allow replacement) */
+      g_warning ("Got NameLost, some other instance replaced us");
+      exit (0);
     }
-  else
+  else if (dbus_message_is_signal (message, "org.freedesktop.DBus", "NameOwnerChanged"))
     {
-      if (monitor != NULL)
+      DBusMessageIter iter;
+      const gchar *name;
+      const gchar *old_owner;
+      const gchar *new_owner;
+
+      dbus_message_iter_init (message, &iter);
+      dbus_message_iter_get_basic (&iter, &name);
+      dbus_message_iter_next (&iter);
+      dbus_message_iter_get_basic (&iter, &old_owner);
+      dbus_message_iter_next (&iter);
+      dbus_message_iter_get_basic (&iter, &new_owner);
+      dbus_message_iter_next (&iter);
+
+      print_debug ("NameOwnerChanged: '%s' '%s' '%s'", name, old_owner, new_owner);
+
+      if (strlen (new_owner) == 0)
         {
-          if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "List") &&
-              strcmp (dbus_message_get_path (message), "/") == 0)
-            ret = handle_list (connection, message);
+          GList *l;
 
-          else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountUnmount") &&
-                   strcmp (dbus_message_get_path (message), "/") == 0)
-            ret = handle_mount_unmount (connection, message);
+          /* see if @name has outstanding ops; if so, cancel them */
+          for (l = outstanding_ops; l != NULL; l = l->next)
+            {
+              GCancellable *cancellable = G_CANCELLABLE (l->data);
+              const gchar *owner;
 
-          else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeMount") &&
-                   strcmp (dbus_message_get_path (message), "/") == 0)
-            ret = handle_volume_mount (connection, message);
+              owner = g_object_get_data (G_OBJECT (cancellable), "owner");
+              print_debug ("looking at op for %s", owner);
+              if (g_strcmp0 (owner, name) == 0)
+                {
+                  print_debug ("****** name has an outstanding op");
+                  g_cancellable_cancel (cancellable);
+                }
+            }
 
-          else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveEject") &&
-                   strcmp (dbus_message_get_path (message), "/") == 0)
-            ret = handle_drive_eject (connection, message);
+          remove_name_owned_changed_for_unique_name (name);
+        }
 
-          else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "DrivePollForMedia") &&
-                   strcmp (dbus_message_get_path (message), "/") == 0)
-            ret = handle_drive_poll_for_media (connection, message);
+    }
+  else if (g_strcmp0 (dbus_message_get_interface (message), "org.gtk.Private.RemoteVolumeMonitor") == 0 &&
+           g_strcmp0 (dbus_message_get_path (message), "/org/gtk/Private/RemoteVolumeMonitor") == 0)
+    {
+      /* If someone is calling into this object and interface, start watching their name so
+       * we can cancel operations initiated by them when they disconnect
+       */
+      ensure_name_owner_changed_for_unique_name (dbus_message_get_sender (message));
+
+      if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "IsSupported"))
+        {
+          ret = handle_is_supported (connection, message);
+        }
+      else
+        {
+          if (monitor != NULL)
+            {
+              if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "List"))
+                ret = handle_list (connection, message);
+
+              else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "CancelOperation"))
+                ret = handle_cancel_operation (connection, message);
+
+              else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountUnmount"))
+                ret = handle_mount_unmount (connection, message);
+
+              else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpReply"))
+                ret = handle_mount_op_reply (connection, message);
+
+              else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeMount"))
+                ret = handle_volume_mount (connection, message);
+
+              else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveEject"))
+                ret = handle_drive_eject (connection, message);
+
+              else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "DrivePollForMedia"))
+                ret = handle_drive_poll_for_media (connection, message);
+
+            }
         }
     }
 
@@ -831,7 +1511,9 @@ emit_signal (DBusConnection *connection, const char *signal_name, void *object, 
 
   id = g_strdup_printf ("%p", object);
 
-  message = dbus_message_new_signal ("/", "org.gtk.Private.RemoteVolumeMonitor", signal_name);
+  message = dbus_message_new_signal ("/org/gtk/Private/RemoteVolumeMonitor",
+                                     "org.gtk.Private.RemoteVolumeMonitor",
+                                     signal_name);
   dbus_message_iter_init_append (message, &iter);
   dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &the_dbus_name);
   dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &id);
@@ -1006,6 +1688,7 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
 
   the_volume_monitor_type = volume_monitor_type;
   the_dbus_name = dbus_name;
+  unique_names_being_watched = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
   /* try and create the monitor */
   monitor_try_create ();
@@ -1021,7 +1704,12 @@ g_vfs_proxy_volume_monitor_daemon_main (int argc,
 
   _g_dbus_connection_integrate_with_main (connection);
 
-  rc = dbus_bus_request_name (connection, dbus_name, 0, &dbus_error);
+  rc = dbus_bus_request_name (connection,
+                              dbus_name,
+                              DBUS_NAME_FLAG_ALLOW_REPLACEMENT |
+                              DBUS_NAME_FLAG_DO_NOT_QUEUE |
+                              DBUS_NAME_FLAG_REPLACE_EXISTING,
+                              &dbus_error);
   if (dbus_error_is_set (&dbus_error))
     {
       g_warning ("dbus_bus_request_name failed: %s: %s", dbus_error.name, dbus_error.message);

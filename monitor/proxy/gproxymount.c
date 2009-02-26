@@ -415,32 +415,99 @@ g_proxy_mount_eject_finish (GMount        *mount,
 }
 
 typedef struct {
-  GObject *object;
+  GProxyMount *mount;
   GAsyncReadyCallback callback;
   gpointer user_data;
+
+  gchar *cancellation_id;
   GCancellable *cancellable;
+  gulong cancelled_handler_id;
 } DBusOp;
+
+static void
+cancel_operation_reply_cb (DBusMessage *reply,
+                           GError      *error,
+                           gpointer     user_data)
+{
+  if (error != NULL)
+    {
+      g_warning ("Error from CancelOperation(): %s", error->message);
+    }
+}
+
+static void
+operation_cancelled (GCancellable *cancellable,
+                     gpointer      user_data)
+{
+  DBusOp *data = user_data;
+  GSimpleAsyncResult *simple;
+  DBusConnection *connection;
+  DBusMessage *message;
+  const char *name;
+
+  G_LOCK (proxy_mount);
+
+  simple = g_simple_async_result_new_error (G_OBJECT (data->mount),
+                                            data->callback,
+                                            data->user_data,
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_CANCELLED,
+                                            _("Operation was cancelled"));
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+
+  /* Now tell the remote volume monitor that the op has been cancelled */
+  connection = g_proxy_volume_monitor_get_dbus_connection (data->mount->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (data->mount->volume_monitor);
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "CancelOperation");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(data->cancellation_id),
+                            DBUS_TYPE_INVALID);
+
+  G_UNLOCK (proxy_mount);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 -1,
+                                 (GAsyncDBusCallback) cancel_operation_reply_cb,
+                                 NULL);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
+}
 
 static void
 unmount_cb (DBusMessage *reply,
             GError *error,
             DBusOp *data)
 {
-  GSimpleAsyncResult *simple;
-  if (error != NULL)
-    simple = g_simple_async_result_new_from_error (data->object,
-                                                   data->callback,
-                                                   data->user_data,
-                                                   error);
-  else
-    simple = g_simple_async_result_new (data->object,
-                                        data->callback,
-                                        data->user_data,
-                                        NULL);
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  if (data->cancelled_handler_id > 0)
+    g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
 
-  g_object_unref (data->object);
+  if (!g_cancellable_is_cancelled (data->cancellable))
+    {
+      GSimpleAsyncResult *simple;
+      if (error != NULL)
+        simple = g_simple_async_result_new_from_error (G_OBJECT (data->mount),
+                                                       data->callback,
+                                                       data->user_data,
+                                                       error);
+      else
+        simple = g_simple_async_result_new (G_OBJECT (data->mount),
+                                            data->callback,
+                                            data->user_data,
+                                            NULL);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+    }
+
+  g_object_unref (data->mount);
+  g_free (data->cancellation_id);
+  if (data->cancellable != NULL)
+    g_object_unref (data->cancellable);
   g_free (data);
 }
 
@@ -460,22 +527,52 @@ g_proxy_mount_unmount (GMount              *mount,
 
   G_LOCK (proxy_mount);
 
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_error (G_OBJECT (mount),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_CANCELLED,
+                                                _("Operation was cancelled"));
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      G_UNLOCK (proxy_mount);
+      goto out;
+    }
+
   data = g_new0 (DBusOp, 1);
-  data->object = g_object_ref (mount);
+  data->mount = g_object_ref (mount);
   data->callback = callback;
   data->user_data = user_data;
-  data->cancellable = cancellable;
+
+  if (cancellable != NULL)
+    {
+      data->cancellation_id = g_strdup_printf ("%p", cancellable);
+      data->cancellable = g_object_ref (cancellable);
+      data->cancelled_handler_id = g_signal_connect (data->cancellable,
+                                                     "cancelled",
+                                                     G_CALLBACK (operation_cancelled),
+                                                     data);
+    }
+  else
+    {
+      data->cancellation_id = g_strdup ("");
+    }
 
   connection = g_proxy_volume_monitor_get_dbus_connection (proxy_mount->volume_monitor);
   name = g_proxy_volume_monitor_get_dbus_name (proxy_mount->volume_monitor);
 
   message = dbus_message_new_method_call (name,
-                                          "/",
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
                                           "org.gtk.Private.RemoteVolumeMonitor",
                                           "MountUnmount");
   dbus_message_append_args (message,
                             DBUS_TYPE_STRING,
                             &(proxy_mount->id),
+                            DBUS_TYPE_STRING,
+                            &(data->cancellation_id),
                             DBUS_TYPE_UINT32,
                             &_flags,
                             DBUS_TYPE_INVALID);
@@ -489,6 +586,8 @@ g_proxy_mount_unmount (GMount              *mount,
 
   dbus_message_unref (message);
   dbus_connection_unref (connection);
+ out:
+  ;
 }
 
 static gboolean
