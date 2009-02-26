@@ -459,16 +459,6 @@ new_command_stream (GVfsBackendSftp *backend, int type)
   return data_stream;
 }
 
-static gsize
-get_data_size (GMemoryOutputStream *stream)
-{
-  g_seekable_seek (G_SEEKABLE (stream),
-                   0,
-                   G_SEEK_END,
-                   NULL, NULL);
-  return g_seekable_tell (G_SEEKABLE (stream));
-}
-
 static gpointer
 get_data_from_command_stream (GDataOutputStream *command_stream, gsize *len)
 {
@@ -477,8 +467,8 @@ get_data_from_command_stream (GDataOutputStream *command_stream, gsize *len)
   guint32 *len_ptr;
   
   mem_stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (command_stream));
+  *len = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mem_stream));
   data = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mem_stream));
-  *len = get_data_size (G_MEMORY_OUTPUT_STREAM (mem_stream));
 
   len_ptr = (guint32 *)data;
   *len_ptr = GUINT32_TO_BE (*len - 4);

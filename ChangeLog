@@ -1,3 +1,12 @@
+2009-02-26  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 570977 – sftp backend sends trailing zeros to communication data
+
+	* daemon/gvfsbackendsftp.c (get_data_from_command_stream):
+	Use g_memory_output_stream_get_data_size instead of old
+	workaround.
+	Patch from Pekka Vuorela
+
 2009-02-26  David Zeuthen  <davidz@redhat.com>
 
 	Implement --device option for gvfs-mount.
