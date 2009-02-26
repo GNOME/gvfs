@@ -1,3 +1,9 @@
+2009-02-26  Alexander Larsson  <alexl@redhat.com>
+
+	* daemon/gvfsbackendsftp.c (try_make_symlink):
+	Fix order of SSH_FXP_SYMLINK arguments. It seems
+	openssh is not following the docs here.
+
 2009-02-24  Paolo Borelli  <pborelli@katamail.com>
 
 	* test/benchmark-posix-small-files.c:

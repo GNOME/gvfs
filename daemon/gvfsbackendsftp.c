@@ -3833,8 +3833,10 @@ try_make_symlink (GVfsBackend *backend,
   
   command = new_command_stream (op_backend,
                                 SSH_FXP_SYMLINK);
-  put_string (command, filename);
+  /* Note: This is the reverse order of how this is documented in
+     draft-ietf-secsh-filexfer-02.txt, but its how openssh does it. */
   put_string (command, symlink_value);
+  put_string (command, filename);
   
   queue_command_stream_and_free (op_backend, command, make_symlink_reply, G_VFS_JOB (job), NULL);
 
