@@ -1762,6 +1762,16 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
                   fh->stream = NULL;
 
                   fh->stream = g_file_replace (file, 0, FALSE, 0, NULL, &error);
+
+                  if (fh->stream != NULL)
+                    {
+                      /* The stream created by g_file_replace() won't always replace
+                       * the file until it's been closed. So close it now to make
+                       * future operations consistent. */
+                      g_output_stream_close (fh->stream, NULL, NULL);
+                      g_object_unref (fh->stream);
+                      fh->stream = NULL;
+                    }
                 }
               else
                 {

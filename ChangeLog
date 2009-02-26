@@ -1,3 +1,9 @@
+2009-02-26  Hans Petter Jansson  <hpj@novell.com>
+
+	* client/gvfsfusedaemon.c (vfs_ftruncate): Immediately close the stream
+	we get from g_file_replace(), so truncation becomes visible. Fixes
+	BRC #479199.
+
 2008-11-25  Frederic Peters  <fpeters@0d.be>
 
 	* daemon/gvfsbackendsftp.c: (do_mount):
