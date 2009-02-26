@@ -46,10 +46,12 @@ static gboolean mount_list = FALSE;
 static gboolean extra_detail = FALSE;
 static gboolean mount_monitor = FALSE;
 static const char *unmount_scheme = NULL;
+static const char *mount_device_file = NULL;
 
 static const GOptionEntry entries[] = 
 {
   { "mountable", 'm', 0, G_OPTION_ARG_NONE, &mount_mountable, "Mount as mountable", NULL },
+  { "device", 'd', 0, G_OPTION_ARG_STRING, &mount_device_file, "Mount volume with device file", NULL},
   { "unmount", 'u', 0, G_OPTION_ARG_NONE, &mount_unmount, "Unmount", NULL},
   { "unmount-scheme", 's', 0, G_OPTION_ARG_STRING, &unmount_scheme, "Unmount all mounts with the given scheme", NULL},
   { "list", 'l', 0, G_OPTION_ARG_NONE, &mount_list, "List", NULL},
@@ -193,7 +195,12 @@ new_mount_op (void)
   
   op = g_mount_operation_new ();
 
-  g_signal_connect (op, "ask_password", (GCallback)ask_password_cb, NULL);
+  g_signal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
+
+  /* TODO: we *should* also connect to the "aborted" signal but since we the
+   *       main thread is blocked handling input we won't get that signal
+   *       anyway...
+   */
 
   return op;
 }
@@ -630,6 +637,93 @@ unmount_all_with_scheme (const char *scheme)
 }
 
 static void
+mount_with_device_file_cb (GObject *object,
+                           GAsyncResult *res,
+                           gpointer user_data)
+{
+  GVolume *volume;
+  gboolean succeeded;
+  GError *error = NULL;
+
+  volume = G_VOLUME (object);
+
+  succeeded = g_volume_mount_finish (volume, res, &error);
+
+  if (!succeeded)
+    {
+      g_print ("Error mounting %s: %s\n",
+               g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE),
+               error->message);
+    }
+  else
+    {
+      GMount *mount;
+      GFile *root;
+      char *mount_path;
+
+      mount = g_volume_get_mount (volume);
+      root = g_mount_get_root (mount);
+      mount_path = g_file_get_path (root);
+
+      g_print ("Mounted %s at %s\n",
+               g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE),
+               mount_path);
+
+      g_object_unref (mount);
+      g_object_unref (root);
+      g_free (mount_path);
+    }
+
+  outstanding_mounts--;
+
+  if (outstanding_mounts == 0)
+    g_main_loop_quit (main_loop);
+}
+
+static void
+mount_with_device_file (const char *device_file)
+{
+  GVolumeMonitor *volume_monitor;
+  GList *volumes;
+  GList *l;
+
+  volume_monitor = g_volume_monitor_get();
+
+  volumes = g_volume_monitor_get_volumes (volume_monitor);
+  for (l = volumes; l != NULL; l = l->next)
+    {
+      GVolume *volume = G_VOLUME (l->data);
+
+      if (g_strcmp0 (g_volume_get_identifier (volume,
+                                              G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE), device_file) == 0)
+        {
+          GMountOperation *op;
+
+          op = new_mount_op ();
+
+          g_volume_mount (volume,
+                          G_MOUNT_MOUNT_NONE,
+                          op,
+                          NULL,
+                          mount_with_device_file_cb,
+                          op);
+
+          outstanding_mounts++;
+        }
+    }
+  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
+  g_list_free (volumes);
+
+  if (outstanding_mounts == 0)
+    {
+      g_print ("No volume for device file %s\n", device_file);
+      return;
+    }
+
+  g_object_unref (volume_monitor);
+}
+
+static void
 monitor_print_mount (GMount *mount)
 {
   if (extra_detail)
@@ -824,6 +918,10 @@ main (int argc, char *argv[])
   
   if (mount_list)
     list_monitor_items ();
+  else if (mount_device_file != NULL)
+    {
+      mount_with_device_file (mount_device_file);
+    }
   else if (unmount_scheme != NULL)
     {
       unmount_all_with_scheme (unmount_scheme);

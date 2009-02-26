@@ -1,5 +1,20 @@
 2009-02-26  David Zeuthen  <davidz@redhat.com>
 
+	Implement --device option for gvfs-mount.
+
+	This allows things like this
+
+        $ gvfs-mount -d /dev/sdb3
+        The device "Generic STORAGE DEVICE" contains encrypted data on partition 3.
+        Password:
+        Mounted /dev/dm-0 at /media/Encrypted Stuff
+
+	Reviewed by: Alexander Larsson  <alexl@redhat.com>
+
+	* programs/gvfs-mount.c: See above.
+
+2009-02-26  David Zeuthen  <davidz@redhat.com>
+
 	Lots of proxy monitor fixes.
 
 	Reviewed by: Alexander Larsson  <alexl@redhat.com>
