@@ -193,6 +193,17 @@ G_DEFINE_TYPE (GDaemonFileOutputStream, g_daemon_file_output_stream,
 	       G_TYPE_FILE_OUTPUT_STREAM)
 
 static void
+g_string_remove_in_front (GString *string,
+			  gsize bytes)
+{
+  memmove (string->str,
+	   string->str + bytes,
+	   string->len - bytes);
+  g_string_truncate (string,
+		     string->len - bytes);
+}
+
+static void
 g_daemon_file_output_stream_finalize (GObject *object)
 {
   GDaemonFileOutputStream *file;
@@ -461,11 +472,8 @@ iterate_write_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 	  
 	  if (io_op->io_res < file->output_buffer->len)
 	    {
-	      memcpy (file->output_buffer->str,
-		      file->output_buffer->str + io_op->io_res,
-		      file->output_buffer->len - io_op->io_res);
-	      g_string_truncate (file->output_buffer,
-				 file->output_buffer->len - io_op->io_res);
+	      g_string_remove_in_front (file->output_buffer,
+					io_op->io_res);
 	      io_op->io_buffer = file->output_buffer->str;
 	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
@@ -639,11 +647,8 @@ iterate_close_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_
 
 	  if (io_op->io_res < file->output_buffer->len)
 	    {
-	      memcpy (file->output_buffer->str,
-		      file->output_buffer->str + io_op->io_res,
-		      file->output_buffer->len - io_op->io_res);
-	      g_string_truncate (file->output_buffer,
-				 file->output_buffer->len - io_op->io_res);
+	      g_string_remove_in_front (file->output_buffer,
+					io_op->io_res);
 	      io_op->io_buffer = file->output_buffer->str;
 	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;
@@ -834,11 +839,8 @@ iterate_seek_state_machine (GDaemonFileOutputStream *file, IOOperationData *io_o
 
 	  if (io_op->io_res < file->output_buffer->len)
 	    {
-	      memcpy (file->output_buffer->str,
-		      file->output_buffer->str + io_op->io_res,
-		      file->output_buffer->len - io_op->io_res);
-	      g_string_truncate (file->output_buffer,
-				 file->output_buffer->len - io_op->io_res);
+	      g_string_remove_in_front (file->output_buffer,
+					io_op->io_res);
 	      io_op->io_buffer = file->output_buffer->str;
 	      io_op->io_size = file->output_buffer->len;
 	      io_op->io_allow_cancel = FALSE;

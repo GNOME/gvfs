@@ -1,5 +1,10 @@
 2009-02-27  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfileoutputstream.c:
+        Add and use g_string_remove_in_front helper function.
+
+2009-02-27  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfileinputstream.c:
 	Support async query info
 
