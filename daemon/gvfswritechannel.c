@@ -39,6 +39,7 @@
 #include <gvfsjobwrite.h>
 #include <gvfsjobseekwrite.h>
 #include <gvfsjobclosewrite.h>
+#include <gvfsjobqueryinfowrite.h>
 
 struct _GVfsWriteChannel
 {
@@ -103,6 +104,7 @@ write_channel_handle_request (GVfsChannel *channel,
   GVfsBackendHandle backend_handle;
   GVfsBackend *backend;
   GVfsWriteChannel *write_channel;
+  char *attrs;
 
   write_channel = G_VFS_WRITE_CHANNEL (channel);
   backend_handle = g_vfs_channel_get_backend_handle (channel);
@@ -134,6 +136,15 @@ write_channel_handle_request (GVfsChannel *channel,
 				      seek_type,
 				      ((goffset)arg1) | (((goffset)arg2) << 32),
 				      backend);
+      break;
+      
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_QUERY_INFO:
+      attrs = g_strndup (data, data_len);
+      job = g_vfs_job_query_info_write_new (write_channel,
+					    backend_handle,
+					    attrs,
+					    backend);
+      g_free (attrs);
       break;
       
     default:

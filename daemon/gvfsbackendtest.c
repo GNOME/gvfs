@@ -39,6 +39,10 @@
 #include "gvfsjobseekread.h"
 #include "gvfsjobqueryinfo.h"
 #include "gvfsjobenumerate.h"
+#include "gvfsjobwrite.h"
+#include "gvfsjobopenforwrite.h"
+#include "gvfsjobclosewrite.h"
+#include "gvfsjobqueryinfowrite.h"
 
 G_DEFINE_TYPE (GVfsBackendTest, g_vfs_backend_test, G_VFS_TYPE_BACKEND)
 
@@ -334,6 +338,197 @@ do_query_info (GVfsBackend *backend,
   g_object_unref (file);
 }
 
+static void
+do_create (GVfsBackend *backend,
+	   GVfsJobOpenForWrite *job,
+	   const char *filename,
+	   GFileCreateFlags flags)
+{
+  GFile *file;
+  GFileOutputStream *out;
+  GError *error;
+  
+  file = g_vfs_get_file_for_path (g_vfs_get_local (),
+				  filename);
+
+  error = NULL;
+  out = g_file_create (file, flags, G_VFS_JOB (job)->cancellable, &error);
+  g_object_unref (file);
+  if (out)
+    {
+      g_vfs_job_open_for_write_set_can_seek (job, FALSE);
+      g_vfs_job_open_for_write_set_handle (job, out);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+static void
+do_append_to (GVfsBackend *backend,
+	      GVfsJobOpenForWrite *job,
+	      const char *filename,
+	      GFileCreateFlags flags)
+{
+  GFile *file;
+  GFileOutputStream *out;
+  GError *error;
+  
+  file = g_vfs_get_file_for_path (g_vfs_get_local (),
+				  filename);
+
+  error = NULL;
+  out = g_file_append_to (file, flags, G_VFS_JOB (job)->cancellable, &error);
+  g_object_unref (file);
+  if (out)
+    {
+      g_vfs_job_open_for_write_set_can_seek (job, FALSE);
+      g_vfs_job_open_for_write_set_handle (job, out);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+static void
+do_replace (GVfsBackend *backend,
+	    GVfsJobOpenForWrite *job,
+	    const char *filename,
+	    const char *etag,
+	    gboolean make_backup,
+	    GFileCreateFlags flags)
+{
+  GFile *file;
+  GFileOutputStream *out;
+  GError *error;
+  
+  file = g_vfs_get_file_for_path (g_vfs_get_local (),
+				  filename);
+
+  error = NULL;
+  out = g_file_replace (file,
+			etag, make_backup,
+			flags, G_VFS_JOB (job)->cancellable,
+			&error);
+  g_object_unref (file);
+  if (out)
+    {
+      g_vfs_job_open_for_write_set_can_seek (job, FALSE);
+      g_vfs_job_open_for_write_set_handle (job, out);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+static void
+do_close_write (GVfsBackend *backend,
+		GVfsJobCloseWrite *job,
+		GVfsBackendHandle handle)
+{
+  GFileOutputStream *out;
+  GError *error;
+  char *etag;
+
+  out = (GFileOutputStream *)handle;
+
+  error = NULL;
+  if (!g_output_stream_close (G_OUTPUT_STREAM (out),
+			      G_VFS_JOB (job)->cancellable,
+			      &error))
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      etag = g_file_output_stream_get_etag (out);
+
+      if (etag)
+	{
+	  g_vfs_job_close_write_set_etag (job, etag);
+	  g_free (etag);
+	}
+      
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  
+  g_object_unref (out);
+}
+
+static void
+do_write (GVfsBackend *backend,
+	  GVfsJobWrite *job,
+	  GVfsBackendHandle handle,
+	  char *buffer,
+	  gsize buffer_size)
+{
+  GFileOutputStream *out;
+  GError *error;
+  gssize res;
+
+  g_print ("do_write\n");
+  
+  out = (GFileOutputStream *)handle;
+
+  error = NULL;
+  res = g_output_stream_write (G_OUTPUT_STREAM (out),
+			       buffer, buffer_size,
+			       G_VFS_JOB (job)->cancellable,
+			       &error);
+  if (res < 0)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_vfs_job_write_set_written_size (job, res);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+}
+
+static void
+do_query_info_on_write (GVfsBackend *backend,
+			GVfsJobQueryInfoWrite *job,
+			GVfsBackendHandle handle,
+			GFileInfo *info,
+			GFileAttributeMatcher *attribute_matcher)
+{
+  GFileOutputStream *out;
+  GError *error;
+  GFileInfo *info2;
+
+  g_print ("do_query_info_on_write\n");
+  
+  out = (GFileOutputStream *)handle;
+  
+  error = NULL;
+  info2 = g_file_output_stream_query_info (out, job->attributes,
+					  G_VFS_JOB (job)->cancellable,
+					  &error);
+  if (info2 == NULL)
+    {
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+  else
+    {
+      g_file_info_copy_into (info2, info);
+      g_object_unref (info2);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+}
+
 static gboolean
 try_enumerate (GVfsBackend *backend,
 	       GVfsJobEnumerate *job,
@@ -384,6 +579,14 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->query_info_on_read = do_query_info_on_read;
   backend_class->close_read = do_close_read;
+
+  backend_class->replace = do_replace;
+  backend_class->create = do_create;
+  backend_class->append_to = do_append_to;
+  backend_class->write = do_write;
+  backend_class->query_info_on_write = do_query_info_on_write;
+  backend_class->close_write = do_close_write;
+  
   backend_class->query_info = do_query_info;
   backend_class->try_enumerate = try_enumerate;
 }

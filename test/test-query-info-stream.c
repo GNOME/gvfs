@@ -86,29 +86,9 @@ allocate_block (gsize size)
 }
 
 static void
-create_file (GFile *file, gsize size)
-{
-  guchar *data;
-  GError *error;
-
-  data = allocate_block (size);
-
-  error = NULL;
-  if (!g_file_replace_contents (file,
-				(char *)data,
-				size,
-				NULL, FALSE, 0,
-				NULL, NULL, &error))
-    {
-      g_print ("error creating file: %s\n", error->message);
-      exit (1);
-    }
-  g_free (data);
-}
-
-static void
 check_query_info_res (GFileInfo *info,
-		      GError *error)
+		      GError *error,
+		      gsize expected_size)
 {
   goffset file_size;
 
@@ -125,16 +105,69 @@ check_query_info_res (GFileInfo *info,
     }
   
   file_size = g_file_info_get_size (info);
-  if (file_size != 100*1000)
+  if (file_size != expected_size)
     {
       g_print ("wrong file size\n");
       exit (1);
     }
 }
 
+static void
+check_query_info_out (GFileOutputStream *out, gsize expected_size)
+{
+  GFileInfo *info;
+  GError *error;
+
+  error = NULL;
+  info = g_file_output_stream_query_info (out, "*", NULL, &error);
+
+  check_query_info_res (info, error, expected_size);
+}
 
 static void
-check_query_info (GFileInputStream *in)
+create_file (GFile *file, gsize size)
+{
+  GFileOutputStream *out;
+  guchar *data;
+  gsize written;
+  GError *error;
+
+  data = allocate_block (size);
+
+  error = NULL;
+  out = g_file_replace (file, NULL, FALSE, 0, NULL, &error);
+  if (out == NULL)
+    {
+      g_print ("error creating file: %s\n", error->message);
+      exit (1);
+    }
+  
+  check_query_info_out (out, 0);
+  
+  if (!g_output_stream_write_all (G_OUTPUT_STREAM (out),
+				  data, size, 
+				  &written,
+				  NULL, &error))
+    {
+      g_print ("error writing to file: %s\n", error->message);
+      exit (1);
+    }
+
+  check_query_info_out (out, written);
+  
+  if (written != size)
+    {
+      g_print ("not all data written to file\n");
+      exit (1);
+    }
+
+  g_output_stream_close (G_OUTPUT_STREAM (out), NULL, NULL);
+  
+  g_free (data);
+}
+
+static void
+check_query_info (GFileInputStream *in, gsize expected_size)
 {
   GFileInfo *info;
   GError *error;
@@ -142,7 +175,7 @@ check_query_info (GFileInputStream *in)
   error = NULL;
   info = g_file_input_stream_query_info (in, "*", NULL, &error);
 
-  check_query_info_res (info, error);
+  check_query_info_res (info, error, expected_size);
 }
 
 static void
@@ -158,7 +191,7 @@ async_cb (GObject *source_object,
     g_file_input_stream_query_info_finish (G_FILE_INPUT_STREAM (source_object),
 					   res, &error);
 
-  check_query_info_res (info, error);
+  check_query_info_res (info, error, 100*1000);
   
   g_main_loop_quit (main_loop);
 }
@@ -209,7 +242,7 @@ main (int argc, char *argv[])
       exit (1);
     }
 
-  check_query_info (in);
+  check_query_info (in, 100*1000);
 
   buffer = malloc (100*1000);
 
@@ -238,7 +271,7 @@ main (int argc, char *argv[])
 
       read_size += res;
 
-      check_query_info (in);
+      check_query_info (in, 100*1000);
     }
   while (1);
 

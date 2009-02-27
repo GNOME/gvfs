@@ -43,35 +43,36 @@ typedef struct _GVfsBackend        GVfsBackend;
 typedef struct _GVfsBackendPrivate GVfsBackendPrivate;
 typedef struct _GVfsBackendClass   GVfsBackendClass;
 
-typedef struct _GVfsJobMount           GVfsJobMount;
-typedef struct _GVfsJobUnmount         GVfsJobUnmount;
-typedef struct _GVfsJobMountMountable  GVfsJobMountMountable;
+typedef struct _GVfsJobMount            GVfsJobMount;
+typedef struct _GVfsJobUnmount          GVfsJobUnmount;
+typedef struct _GVfsJobMountMountable   GVfsJobMountMountable;
 typedef struct _GVfsJobUnmountMountable GVfsJobUnmountMountable;
-typedef struct _GVfsJobOpenForRead     GVfsJobOpenForRead;
-typedef struct _GVfsJobOpenIconForRead     GVfsJobOpenIconForRead;
-typedef struct _GVfsJobSeekRead        GVfsJobSeekRead;
-typedef struct _GVfsJobCloseRead       GVfsJobCloseRead;
-typedef struct _GVfsJobRead            GVfsJobRead;
-typedef struct _GVfsJobOpenForWrite    GVfsJobOpenForWrite;
-typedef struct _GVfsJobWrite           GVfsJobWrite;
-typedef struct _GVfsJobSeekWrite       GVfsJobSeekWrite;
-typedef struct _GVfsJobCloseWrite      GVfsJobCloseWrite;
-typedef struct _GVfsJobQueryInfo       GVfsJobQueryInfo;
-typedef struct _GVfsJobQueryInfoRead   GVfsJobQueryInfoRead;
-typedef struct _GVfsJobQueryFsInfo     GVfsJobQueryFsInfo;
-typedef struct _GVfsJobEnumerate       GVfsJobEnumerate;
-typedef struct _GVfsJobSetDisplayName  GVfsJobSetDisplayName;
-typedef struct _GVfsJobTrash           GVfsJobTrash;
-typedef struct _GVfsJobDelete          GVfsJobDelete;
-typedef struct _GVfsJobMakeDirectory   GVfsJobMakeDirectory;
-typedef struct _GVfsJobMakeSymlink     GVfsJobMakeSymlink;
-typedef struct _GVfsJobCopy            GVfsJobCopy;
-typedef struct _GVfsJobMove            GVfsJobMove;
-typedef struct _GVfsJobPush            GVfsJobPush;
-typedef struct _GVfsJobPull            GVfsJobPull;
-typedef struct _GVfsJobSetAttribute    GVfsJobSetAttribute;
-typedef struct _GVfsJobQueryAttributes GVfsJobQueryAttributes;
-typedef struct _GVfsJobCreateMonitor   GVfsJobCreateMonitor;
+typedef struct _GVfsJobOpenForRead      GVfsJobOpenForRead;
+typedef struct _GVfsJobOpenIconForRead  GVfsJobOpenIconForRead;
+typedef struct _GVfsJobSeekRead         GVfsJobSeekRead;
+typedef struct _GVfsJobCloseRead        GVfsJobCloseRead;
+typedef struct _GVfsJobRead             GVfsJobRead;
+typedef struct _GVfsJobOpenForWrite     GVfsJobOpenForWrite;
+typedef struct _GVfsJobWrite            GVfsJobWrite;
+typedef struct _GVfsJobSeekWrite        GVfsJobSeekWrite;
+typedef struct _GVfsJobCloseWrite       GVfsJobCloseWrite;
+typedef struct _GVfsJobQueryInfo        GVfsJobQueryInfo;
+typedef struct _GVfsJobQueryInfoRead    GVfsJobQueryInfoRead;
+typedef struct _GVfsJobQueryInfoWrite   GVfsJobQueryInfoWrite;
+typedef struct _GVfsJobQueryFsInfo      GVfsJobQueryFsInfo;
+typedef struct _GVfsJobEnumerate        GVfsJobEnumerate;
+typedef struct _GVfsJobSetDisplayName   GVfsJobSetDisplayName;
+typedef struct _GVfsJobTrash            GVfsJobTrash;
+typedef struct _GVfsJobDelete           GVfsJobDelete;
+typedef struct _GVfsJobMakeDirectory    GVfsJobMakeDirectory;
+typedef struct _GVfsJobMakeSymlink      GVfsJobMakeSymlink;
+typedef struct _GVfsJobCopy             GVfsJobCopy;
+typedef struct _GVfsJobMove             GVfsJobMove;
+typedef struct _GVfsJobPush             GVfsJobPush;
+typedef struct _GVfsJobPull             GVfsJobPull;
+typedef struct _GVfsJobSetAttribute     GVfsJobSetAttribute;
+typedef struct _GVfsJobQueryAttributes  GVfsJobQueryAttributes;
+typedef struct _GVfsJobCreateMonitor    GVfsJobCreateMonitor;
 
 typedef gpointer GVfsBackendHandle;
 
@@ -245,6 +246,16 @@ struct _GVfsBackendClass
 				 GFileAttributeMatcher *attribute_matcher);
   gboolean (*try_query_info_on_read)(GVfsBackend *backend,
 				 GVfsJobQueryInfoRead *job,
+				 GVfsBackendHandle handle,
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
+  void     (*query_info_on_write)(GVfsBackend *backend,
+				 GVfsJobQueryInfoWrite *job,
+				 GVfsBackendHandle handle,
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
+  gboolean (*try_query_info_on_write)(GVfsBackend *backend,
+				 GVfsJobQueryInfoWrite *job,
 				 GVfsBackendHandle handle,
 				 GFileInfo *info,
 				 GFileAttributeMatcher *attribute_matcher);
