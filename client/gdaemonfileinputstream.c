@@ -220,56 +220,66 @@ struct _GDaemonFileInputStream {
   GString *output_buffer;
 };
 
-static gssize     g_daemon_file_input_stream_read          (GInputStream         *stream,
-							    void                 *buffer,
-							    gsize                 count,
-							    GCancellable         *cancellable,
-							    GError              **error);
-static gssize     g_daemon_file_input_stream_skip          (GInputStream         *stream,
-							    gsize                 count,
-							    GCancellable         *cancellable,
-							    GError              **error);
-static gboolean   g_daemon_file_input_stream_close         (GInputStream         *stream,
-							    GCancellable         *cancellable,
-							    GError              **error);
-static GFileInfo *g_daemon_file_input_stream_query_info    (GFileInputStream     *stream,
-							    char                 *attributes,
-							    GCancellable         *cancellable,
-							    GError              **error);
-static goffset    g_daemon_file_input_stream_tell          (GFileInputStream     *stream);
-static gboolean   g_daemon_file_input_stream_can_seek      (GFileInputStream     *stream);
-static gboolean   g_daemon_file_input_stream_seek          (GFileInputStream     *stream,
-							    goffset               offset,
-							    GSeekType             type,
-							    GCancellable         *cancellable,
-							    GError              **error);
-static void       g_daemon_file_input_stream_read_async    (GInputStream         *stream,
-							    void                 *buffer,
-							    gsize                 count,
-							    int                   io_priority,
-							    GCancellable         *cancellable,
-							    GAsyncReadyCallback   callback,
-							    gpointer              data);
-static gssize     g_daemon_file_input_stream_read_finish   (GInputStream         *stream,
-							    GAsyncResult         *result,
-							    GError              **error);
-static void       g_daemon_file_input_stream_skip_async    (GInputStream         *stream,
-							    gsize                 count,
-							    int                   io_priority,
-							    GCancellable         *cancellable,
-							    GAsyncReadyCallback   callback,
-							    gpointer              data);
-static gssize     g_daemon_file_input_stream_skip_finish   (GInputStream         *stream,
-							    GAsyncResult         *result,
-							    GError              **error);
-static void       g_daemon_file_input_stream_close_async   (GInputStream         *stream,
-							    int                   io_priority,
-							    GCancellable         *cancellable,
-							    GAsyncReadyCallback   callback,
-							    gpointer              data);
-static gboolean   g_daemon_file_input_stream_close_finish  (GInputStream         *stream,
-							    GAsyncResult         *result,
-							    GError              **error);
+static gssize     g_daemon_file_input_stream_read              (GInputStream         *stream,
+								void                 *buffer,
+								gsize                 count,
+								GCancellable         *cancellable,
+								GError              **error);
+static gssize     g_daemon_file_input_stream_skip              (GInputStream         *stream,
+								gsize                 count,
+								GCancellable         *cancellable,
+								GError              **error);
+static gboolean   g_daemon_file_input_stream_close             (GInputStream         *stream,
+								GCancellable         *cancellable,
+								GError              **error);
+static GFileInfo *g_daemon_file_input_stream_query_info        (GFileInputStream     *stream,
+								char                 *attributes,
+								GCancellable         *cancellable,
+								GError              **error);
+static goffset    g_daemon_file_input_stream_tell              (GFileInputStream     *stream);
+static gboolean   g_daemon_file_input_stream_can_seek          (GFileInputStream     *stream);
+static gboolean   g_daemon_file_input_stream_seek              (GFileInputStream     *stream,
+								goffset               offset,
+								GSeekType             type,
+								GCancellable         *cancellable,
+								GError              **error);
+static void       g_daemon_file_input_stream_read_async        (GInputStream         *stream,
+								void                 *buffer,
+								gsize                 count,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              data);
+static gssize     g_daemon_file_input_stream_read_finish       (GInputStream         *stream,
+								GAsyncResult         *result,
+								GError              **error);
+static void       g_daemon_file_input_stream_skip_async        (GInputStream         *stream,
+								gsize                 count,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              data);
+static gssize     g_daemon_file_input_stream_skip_finish       (GInputStream         *stream,
+								GAsyncResult         *result,
+								GError              **error);
+static void       g_daemon_file_input_stream_close_async       (GInputStream         *stream,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              data);
+static gboolean   g_daemon_file_input_stream_close_finish      (GInputStream         *stream,
+								GAsyncResult         *result,
+								GError              **error);
+static void       g_daemon_file_input_stream_query_info_async  (GFileInputStream     *stream,
+								char                 *attributes,
+								int                   io_priority,
+								GCancellable         *cancellable,
+								GAsyncReadyCallback   callback,
+								gpointer              user_data);
+static GFileInfo *g_daemon_file_input_stream_query_info_finish (GFileInputStream     *stream,
+								GAsyncResult         *result,
+								GError              **error);
+
 
 
 G_DEFINE_TYPE (GDaemonFileInputStream, g_daemon_file_input_stream,
@@ -347,6 +357,8 @@ g_daemon_file_input_stream_class_init (GDaemonFileInputStreamClass *klass)
   file_stream_class->can_seek = g_daemon_file_input_stream_can_seek;
   file_stream_class->seek = g_daemon_file_input_stream_seek;
   file_stream_class->query_info = g_daemon_file_input_stream_query_info;
+  file_stream_class->query_info_async = g_daemon_file_input_stream_query_info_async;
+  file_stream_class->query_info_finish = g_daemon_file_input_stream_query_info_finish;
 
 }
 
@@ -1606,6 +1618,7 @@ g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
   return op.info;
 }
 
+
 /************************************************************************
  *         Async I/O Code                                               *
  ************************************************************************/
@@ -2007,4 +2020,97 @@ g_daemon_file_input_stream_close_finish (GInputStream              *stream,
 {
   /* Failures handled in generic close_finish code */
   return TRUE;
+}
+
+static void
+async_query_done (GInputStream *stream,
+		  gpointer op_data,
+		  GAsyncReadyCallback callback,
+		  gpointer user_data,
+		  GError *io_error)
+{
+  GDaemonFileInputStream *file;
+  GSimpleAsyncResult *simple;
+  QueryOperation *op;
+  GFileInfo *info;
+  GError *error;
+
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
+  
+  op = op_data;
+
+  if (io_error)
+    {
+      info = NULL;
+      error = io_error;
+    }
+  else
+    {
+      info = op->info;
+      error = op->ret_error;
+    }
+
+  simple = g_simple_async_result_new (G_OBJECT (stream),
+				      callback, user_data,
+				      g_daemon_file_input_stream_query_info_async);
+
+  if (info == NULL)
+    g_simple_async_result_set_from_error (simple, error);
+  else
+    g_simple_async_result_set_op_res_gpointer (simple, info,
+					       g_object_unref);
+  
+  /* Complete immediately, not in idle, since we're already in a mainloop callout */
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+  
+  if (op->ret_error)
+    g_error_free (op->ret_error);
+  g_free (op->attributes);
+  g_free (op);
+}
+
+static void
+g_daemon_file_input_stream_query_info_async  (GFileInputStream     *stream,
+					      char                 *attributes,
+					      int                   io_priority,
+					      GCancellable         *cancellable,
+					      GAsyncReadyCallback   callback,
+					      gpointer              user_data)
+{
+  GDaemonFileInputStream *file;
+  QueryOperation *op;
+
+  file = G_DAEMON_FILE_INPUT_STREAM (stream);
+  
+  op = g_new0 (QueryOperation, 1);
+  op->state = QUERY_STATE_INIT;
+  if (attributes)
+    op->attributes = g_strdup (attributes);
+  else
+    op->attributes = g_strdup ("");
+
+  run_async_state_machine (file,
+			   (state_machine_iterator)iterate_query_state_machine,
+			   op, io_priority,
+			   callback, user_data,
+			   cancellable,
+			   async_query_done);
+}
+
+static GFileInfo *
+g_daemon_file_input_stream_query_info_finish (GFileInputStream     *stream,
+					      GAsyncResult         *result,
+					      GError              **error)
+{
+  GSimpleAsyncResult *simple;
+  GFileInfo *info;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+  g_assert (g_simple_async_result_get_source_tag (simple) == g_daemon_file_input_stream_query_info_async);
+  
+  info = g_simple_async_result_get_op_res_gpointer (simple);
+  
+  return g_object_ref (info);
+  
 }

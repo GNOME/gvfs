@@ -1,5 +1,13 @@
 2009-02-27  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonfileinputstream.c:
+	Support async query info
+
+        * test/test-query-info-stream.c:
+	Test async query info
+
+2009-02-27  Alexander Larsson  <alexl@redhat.com>
+
         * common/Makefile.am:
         * common/gvfsfileinfo.[ch]:
 	Add (de)marshalling functions for GFileInfos.

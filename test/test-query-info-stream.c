@@ -39,6 +39,8 @@
  * hide bugs */
 #define DATA_MODULO 200
 
+static GMainLoop *main_loop;
+
 static gboolean
 verify_block (guchar *data, guchar *start, gsize size)
 {
@@ -105,14 +107,11 @@ create_file (GFile *file, gsize size)
 }
 
 static void
-check_query_info (GFileInputStream *in)
+check_query_info_res (GFileInfo *info,
+		      GError *error)
 {
-  GFileInfo *info;
-  GError *error;
   goffset file_size;
 
-  error = NULL;
-  info = g_file_input_stream_query_info (in, "*", NULL, &error);
   if (info == NULL)
     {
       g_print ("error querying info: %s\n", error->message);
@@ -126,12 +125,42 @@ check_query_info (GFileInputStream *in)
     }
   
   file_size = g_file_info_get_size (info);
-  g_print ("file size: %d\n", (int)file_size);
   if (file_size != 100*1000)
     {
       g_print ("wrong file size\n");
       exit (1);
     }
+}
+
+
+static void
+check_query_info (GFileInputStream *in)
+{
+  GFileInfo *info;
+  GError *error;
+
+  error = NULL;
+  info = g_file_input_stream_query_info (in, "*", NULL, &error);
+
+  check_query_info_res (info, error);
+}
+
+static void
+async_cb (GObject *source_object,
+	  GAsyncResult *res,
+	  gpointer user_data)
+{
+  GFileInfo *info;
+  GError *error;
+
+  error = NULL;
+  info =
+    g_file_input_stream_query_info_finish (G_FILE_INPUT_STREAM (source_object),
+					   res, &error);
+
+  check_query_info_res (info, error);
+  
+  g_main_loop_quit (main_loop);
 }
 
 int
@@ -201,8 +230,6 @@ main (int argc, char *argv[])
 	  exit (1);
 	}
 
-      g_print ("res: %d\n", (int)res);
-
       if (!verify_block (buffer, &start, res))
 	{
 	  g_print ("error in block starting at %d\n", (int)read_size);
@@ -220,7 +247,15 @@ main (int argc, char *argv[])
       g_print ("Didn't read entire file\n");
       exit (1);
     }
+
+  main_loop = g_main_loop_new (NULL, FALSE);
   
+  g_file_input_stream_query_info_async  (in, "*",
+					 0, NULL,
+					 async_cb, NULL);
   
+  g_main_loop_run (main_loop);
+
+  g_print ("ALL OK\n");
   return 0;
 }
