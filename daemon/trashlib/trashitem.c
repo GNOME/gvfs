@@ -180,6 +180,7 @@ trash_item_get_trashinfo (GFile  *path,
 
           rootdir = g_file_get_parent (trashdir);
           *original = g_file_get_child (rootdir, orig);
+          g_object_unref (rootdir);
         }
 
       g_free (orig);

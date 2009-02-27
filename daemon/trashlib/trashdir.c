@@ -8,6 +8,7 @@
 
 #include "trashdir.h"
 
+#include <sys/stat.h>
 #include <string.h>
 
 #include "dirwatch.h"
@@ -146,6 +147,10 @@ trash_dir_changed (GFileMonitor      *monitor,
   else if (event_type == G_FILE_MONITOR_EVENT_DELETED)
     trash_root_remove_item (dir->root, file, dir->is_homedir);
 
+  else if (event_type == G_FILE_MONITOR_EVENT_PRE_UNMOUNT ||
+           event_type == G_FILE_MONITOR_EVENT_UNMOUNTED)
+    ;
+
   else
     {
       static gboolean already_did_warning;
@@ -168,6 +173,8 @@ trash_dir_changed (GFileMonitor      *monitor,
       dirname = g_file_get_path (dir->directory);
       g_warning ("  dir: %s, file: %s, type: %d\n\n",
                  dirname, name, event_type);
+      g_free (dirname);
+      g_free (name);
     }
 
   trash_root_thaw (dir->root);
@@ -182,6 +189,14 @@ trash_dir_created (gpointer user_data)
   dir->monitor = g_file_monitor_directory (dir->directory, 0, NULL, NULL);
   g_signal_connect (dir->monitor, "changed",
                     G_CALLBACK (trash_dir_changed), dir);
+  trash_dir_enumerate (dir);
+}
+
+static void
+trash_dir_check (gpointer user_data)
+{
+  TrashDir *dir = user_data;
+
   trash_dir_enumerate (dir);
 }
 
@@ -201,6 +216,7 @@ void
 trash_dir_watch (TrashDir *dir)
 {
   g_assert (dir->monitor == NULL);
+  g_assert (dir->watch == NULL);
 
   /* start monitoring after a period of not monitoring.
    *
@@ -214,7 +230,7 @@ trash_dir_watch (TrashDir *dir)
    *        toplevel items that need to be removed.
    *
    * in case 1, trash_dir_created() will be called from
-   * dir_watch_new().  it calls trash_dir_rescan() itself.
+   * dir_watch_new().  it calls trash_enumerate() itself.
    *
    * in case 2, no other function will be called and we must manually
    * call trash_dir_empty().
@@ -222,7 +238,11 @@ trash_dir_watch (TrashDir *dir)
    * we can tell if case 1 happened because trash_dir_created() also
    * sets the dir->monitor.
    */
-  dir_watch_enable (dir->watch);
+  dir->watch = dir_watch_new (dir->directory, dir->topdir,
+                              trash_dir_created,
+                              trash_dir_check,
+                              trash_dir_destroyed,
+                              dir);
 
   if (dir->monitor == NULL)
     /* case 2 */
@@ -232,6 +252,8 @@ trash_dir_watch (TrashDir *dir)
 void
 trash_dir_unwatch (TrashDir *dir)
 {
+  g_assert (dir->watch != NULL);
+
   /* stop monitoring.
    *
    * in all cases, we just fall silent.
@@ -243,19 +265,49 @@ trash_dir_unwatch (TrashDir *dir)
       dir->monitor = NULL;
     }
 
-  dir_watch_disable (dir->watch);
+  dir_watch_free (dir->watch);
+  dir->watch = NULL;
+}
+
+static gboolean
+dir_exists (GFile *directory,
+            GFile *top_dir)
+{
+  gboolean result = FALSE;
+  GFile *parent;
+
+  if (g_file_equal (directory, top_dir))
+    return TRUE;
+
+  parent = g_file_get_parent (directory);
+
+  if (dir_exists (parent, top_dir))
+    {
+      struct stat buf;
+      gchar *path;
+
+      path = g_file_get_path (directory);
+      result = !lstat (path, &buf) && S_ISDIR (buf.st_mode);
+
+      g_free (path);
+    }
+
+  g_object_unref (parent);
+
+  return result;
 }
 
 void
 trash_dir_rescan (TrashDir *dir)
 {
-  if (dir_watch_double_check (dir->watch))
-    {
-      if (dir_watch_is_valid (dir->watch))
-        trash_dir_enumerate (dir);
-      else
-        trash_dir_empty (dir);
-    }
+  if (dir->watch)
+    dir_watch_check (dir->watch);
+
+  else if (dir_exists (dir->directory, dir->topdir))
+    trash_dir_enumerate (dir);
+
+  else
+    trash_dir_empty (dir);
 }
 
 static trash_dir_ui_hook ui_hook;
@@ -285,9 +337,15 @@ trash_dir_new (TrashRoot  *root,
   dir->monitor = NULL;
   dir->is_homedir = is_homedir;
 
-  dir->watch = dir_watch_new (dir->directory, dir->topdir, watching,
-                              trash_dir_created, trash_dir_destroyed,
-                              dir);
+  if (watching)
+    dir->watch = dir_watch_new (dir->directory,
+                                dir->topdir,
+                                trash_dir_created,
+                                trash_dir_check,
+                                trash_dir_destroyed,
+                                dir);
+  else
+    dir->watch = NULL;
 
   if (ui_hook)
     ui_hook (dir, dir->directory);
@@ -306,7 +364,8 @@ trash_dir_set_ui_hook (trash_dir_ui_hook _ui_hook)
 void
 trash_dir_free (TrashDir *dir)
 {
-  dir_watch_free (dir->watch);
+  if (dir->watch)
+    dir_watch_free (dir->watch);
 
   if (dir->monitor)
     g_object_unref (dir->monitor);

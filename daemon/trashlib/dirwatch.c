@@ -42,6 +42,13 @@
  * stops existing momentarily will (hopefully) always be reported.
  * The first call (if it happens) will always be to create().
  *
+ * check() is only ever called in response to a call to
+ * dir_watch_check() in which case it will be called only if the
+ * watched directory was marked as having existed before the check and
+ * is found to still exist.  This facilitates the checking that has to
+ * occur in that case (ie: check the contents of the directory to make
+ * sure that they are also unchanged).
+ *
  * This implementation is currently tweaked a bit for how GFileMonitor
  * currently works with inotify.  If GFileMonitor's implementation is
  * changed it might be a good idea to take another look at this code.
@@ -53,10 +60,10 @@ struct OPAQUE_TYPE__DirWatch
   GFile *topdir;
 
   DirWatchFunc create;
+  DirWatchFunc check;
   DirWatchFunc destroy;
   gpointer user_data;
   gboolean state;
-  gboolean active;
 
   DirWatch *parent;
 
@@ -172,6 +179,29 @@ dir_watch_recursive_create (gpointer user_data)
 }
 
 static void
+dir_watch_recursive_check (gpointer user_data)
+{
+  DirWatch *watch = user_data;
+  gboolean exists;
+ 
+  exists = dir_exists (watch->directory);
+
+  if (watch->state && exists)
+    watch->check (watch->user_data);
+
+  else if (!watch->state && exists)
+    {
+      watch->state = TRUE;
+      dir_watch_created (watch);
+    }
+  else if (watch->state && !exists)
+    {
+      watch->state = FALSE;
+      dir_watch_destroyed (watch);
+    }
+}
+
+static void
 dir_watch_recursive_destroy (gpointer user_data)
 {
   DirWatch *watch = user_data;
@@ -193,8 +223,8 @@ dir_watch_recursive_destroy (gpointer user_data)
 DirWatch *
 dir_watch_new (GFile        *directory,
                GFile        *topdir,
-               gboolean      watching,
                DirWatchFunc  create,
+               DirWatchFunc  check,
                DirWatchFunc  destroy,
                gpointer      user_data)
 {
@@ -202,6 +232,7 @@ dir_watch_new (GFile        *directory,
 
   watch = g_slice_new0 (DirWatch);
   watch->create = create;
+  watch->check = check;
   watch->destroy = destroy;
   watch->user_data = user_data;
 
@@ -211,9 +242,7 @@ dir_watch_new (GFile        *directory,
   /* the top directory always exists */
   if (g_file_equal (directory, topdir))
     {
-      if (watching)
-        dir_watch_created (watch);
-
+      dir_watch_created (watch);
       watch->state = TRUE;
     }
 
@@ -224,15 +253,13 @@ dir_watch_new (GFile        *directory,
       parent = g_file_get_parent (directory);
       g_assert (parent != NULL);
 
-      watch->parent = dir_watch_new (parent, topdir, watching,
+      watch->parent = dir_watch_new (parent, topdir,
                                      dir_watch_recursive_create,
+                                     dir_watch_recursive_check,
                                      dir_watch_recursive_destroy,
                                      watch);
 
       g_object_unref (parent);
-
-      if (!watching)
-        watch->state = watch->parent->state && dir_exists (directory);
     }
 
   return watch;
@@ -250,68 +277,37 @@ dir_watch_free (DirWatch *watch)
       g_object_unref (watch->topdir);
 
       dir_watch_free (watch->parent);
+
+      g_slice_free (DirWatch, watch);
     }
 }
 
+/**
+ * dir_watch_check:
+ * @watch: a #DirWatch
+ *
+ * Emit missed events.
+ *
+ * This function is called on a DirWatch that might have missed events
+ * (because it is watching on an NFS mount, for example).
+ * 
+ * This function will manually check if any directories have come into
+ * or gone out of existence and will emit created or destroyed callbacks
+ * as appropriate.
+ *
+ * Additionally, if a directory is found to still exist, the checked
+ * callback will be emitted.
+ **/
 void
-dir_watch_enable (DirWatch *watch)
+dir_watch_check (DirWatch *watch)
 {
-  /* topdir always exists.  say so. */
-  if (watch->parent == NULL)
-    dir_watch_created (watch);
-
-  else
-    dir_watch_enable (watch->parent);
-}
-
-void
-dir_watch_disable (DirWatch *watch)
-{
-  if (watch->parent_monitor)
-    g_object_unref (watch->parent_monitor);
-
-  watch->parent_monitor = NULL;
-
-  if (watch->parent)
-    dir_watch_disable (watch->parent);
-}
-
-gboolean
-dir_watch_is_valid (DirWatch *watch)
-{
-  return watch->state;
-}
-
-gboolean
-dir_watch_double_check (DirWatch *watch)
-{
-  gboolean old_state;
-
-  old_state = watch->state;
-
   if (watch->parent == NULL)
     {
-      g_assert (watch->state == TRUE);
-      return TRUE;
+      g_assert (watch->state);
+
+      watch->check (watch->user_data);
+      return;
     }
 
-  if (dir_watch_double_check (watch->parent))
-    {
-      if (dir_watch_is_valid (watch->parent))
-        watch->state = dir_exists (watch->directory);
-      else
-        watch->state = FALSE;
-
-
-      if (!old_state && watch->state && watch->parent_monitor)
-        dir_watch_created (watch);
-
-      else if (old_state && !watch->state && watch->parent_monitor)
-        dir_watch_destroyed (watch);
-
-      else if (old_state || watch->state)
-        return TRUE;
-    }
-
-  return FALSE;
+  dir_watch_check (watch->parent);
 }

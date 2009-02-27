@@ -1,15 +1,25 @@
+2009-02-27  Ryan Lortie  <desrt@desrt.ca>
+
+	* daemon/trashlib/dirwatch.c:
+	* daemon/trashlib/dirwatch.h:
+	* daemon/trashlib/trashdir.c:
+	* daemon/trashlib/trashitem.c:
+
+	Use DirWatch only when watching (move broken manual-scan code out).
+	Fix a bunch of leaks.
+
 2009-02-27  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfileoutputstream.c:
+	* client/gdaemonfileoutputstream.c:
 	Support query info on output streams
 
-        * daemon/Makefile.am:
-        * daemon/gvfsbackend.h:
-        * daemon/gvfsjobqueryinfowrite.[ch]:
-        * daemon/gvfswritechannel.c:
+	* daemon/Makefile.am:
+	* daemon/gvfsbackend.h:
+	* daemon/gvfsjobqueryinfowrite.[ch]:
+	* daemon/gvfswritechannel.c:
 	Add query info write support.
 
-        * daemon/gvfsbackendtest.c:
+	* daemon/gvfsbackendtest.c:
 	Implement writing to files in test backend.
 	Implement query info on write
 
@@ -18,46 +28,46 @@
 
 2009-02-27  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfileoutputstream.c:
-        Add and use g_string_remove_in_front helper function.
+	* client/gdaemonfileoutputstream.c:
+	Add and use g_string_remove_in_front helper function.
 
 2009-02-27  Alexander Larsson  <alexl@redhat.com>
 
-        * client/gdaemonfileinputstream.c:
+	* client/gdaemonfileinputstream.c:
 	Support async query info
 
-        * test/test-query-info-stream.c:
+	* test/test-query-info-stream.c:
 	Test async query info
 
 2009-02-27  Alexander Larsson  <alexl@redhat.com>
 
-        * common/Makefile.am:
-        * common/gvfsfileinfo.[ch]:
+	* common/Makefile.am:
+	* common/gvfsfileinfo.[ch]:
 	Add (de)marshalling functions for GFileInfos.
 
-        * common/gvfsdaemonprotocol.h:
+	* common/gvfsdaemonprotocol.h:
 	Add protocol extensions for query info over streams
 
-        * client/gdaemonfileinputstream.c:
+	* client/gdaemonfileinputstream.c:
 	Support sync query_info.
 
-        * daemon/Makefile.am:
-        * daemon/gvfsjobqueryinforead.[ch]:
-        * daemon/gvfsbackend.h:
+	* daemon/Makefile.am:
+	* daemon/gvfsjobqueryinforead.[ch]:
+	* daemon/gvfsbackend.h:
 	Added query info job and backend call for input streams
 
-        * daemon/gvfsbackendtest.c:
+	* daemon/gvfsbackendtest.c:
 	Implement query_info_on_read
 
-        * daemon/gvfschannel.[ch]:
-        Add g_vfs_channel_send_info
+	* daemon/gvfschannel.[ch]:
+	Add g_vfs_channel_send_info
 
-        * daemon/gvfsreadchannel.c:
-        (read_channel_handle_request):
+	* daemon/gvfsreadchannel.c:
+	(read_channel_handle_request):
 	Handle query info
 
-        * test/Makefile.am:
-        * test/test-query-info-stream.c:
+	* test/Makefile.am:
+	* test/test-query-info-stream.c:
 	Add test for stream query info.
 
 2009-02-26  Alexander Larsson  <alexl@redhat.com>
@@ -75,10 +85,10 @@
 
 	This allows things like this
 
-        $ gvfs-mount -d /dev/sdb3
-        The device "Generic STORAGE DEVICE" contains encrypted data on partition 3.
-        Password:
-        Mounted /dev/dm-0 at /media/Encrypted Stuff
+	$ gvfs-mount -d /dev/sdb3
+	The device "Generic STORAGE DEVICE" contains encrypted data on partition 3.
+	Password:
+	Mounted /dev/dm-0 at /media/Encrypted Stuff
 
 	Reviewed by: Alexander Larsson  <alexl@redhat.com>
 
@@ -209,9 +219,9 @@
 
 	Bug 563623 – build dies on platforms lacking poll() implimentation
 
-        * client/gvfsdaemondbus.c:
-        (setup_async_fd_receive):
-        (_g_vfs_daemon_call_sync):
+	* client/gvfsdaemondbus.c:
+	(setup_async_fd_receive):
+	(_g_vfs_daemon_call_sync):
 	Use g_poll instead of poll.
 	Patch from ephraim_owns@hotmail.com
 
