@@ -10,6 +10,7 @@ AM_LDFLAGS =                           \
 	$(GLIB_LIBS)
 
 noinst_PROGRAMS = \
+	test-query-info-stream    \
 	benchmark-gvfs-small-files    \
 	benchmark-gvfs-big-files      \
 	benchmark-posix-small-files   \

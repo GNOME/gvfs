@@ -1,3 +1,34 @@
+2009-02-27  Alexander Larsson  <alexl@redhat.com>
+
+        * common/Makefile.am:
+        * common/gvfsfileinfo.[ch]:
+	Add (de)marshalling functions for GFileInfos.
+
+        * common/gvfsdaemonprotocol.h:
+	Add protocol extensions for query info over streams
+
+        * client/gdaemonfileinputstream.c:
+	Support sync query_info.
+
+        * daemon/Makefile.am:
+        * daemon/gvfsjobqueryinforead.[ch]:
+        * daemon/gvfsbackend.h:
+	Added query info job and backend call for input streams
+
+        * daemon/gvfsbackendtest.c:
+	Implement query_info_on_read
+
+        * daemon/gvfschannel.[ch]:
+        Add g_vfs_channel_send_info
+
+        * daemon/gvfsreadchannel.c:
+        (read_channel_handle_request):
+	Handle query info
+
+        * test/Makefile.am:
+        * test/test-query-info-stream.c:
+	Add test for stream query info.
+
 2009-02-26  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 570977 – sftp backend sends trailing zeros to communication data

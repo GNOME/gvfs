@@ -134,6 +134,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobseekwrite.c gvfsjobseekwrite.h \
 	gvfsjobclosewrite.c gvfsjobclosewrite.h \
 	gvfsjobqueryinfo.c gvfsjobqueryinfo.h \
+	gvfsjobqueryinforead.c gvfsjobqueryinforead.h \
 	gvfsjobqueryfsinfo.c gvfsjobqueryfsinfo.h \
 	gvfsjobenumerate.c gvfsjobenumerate.h \
 	gvfsjobsetdisplayname.c gvfsjobsetdisplayname.h \

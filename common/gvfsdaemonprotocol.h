@@ -113,6 +113,7 @@ typedef struct {
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL 3
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_SET 4
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SEEK_END 5
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_QUERY_INFO 6
 
 /*
 read, readahead reply:
@@ -123,6 +124,10 @@ type, pos (64),
 
 error:
 type, code, size, data (size bytes, 2 strings: domain, message)
+
+info:
+type,    0, size, data 
+
 */
 
 typedef struct {
@@ -139,6 +144,7 @@ typedef struct {
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_SEEK_POS 2
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_WRITTEN  3
 #define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_CLOSED   4
+#define G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_INFO     5
 
 #define G_FILE_INFO_INNER_TYPE_AS_STRING         \
   DBUS_TYPE_ARRAY_AS_STRING			 \

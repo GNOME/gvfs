@@ -37,7 +37,9 @@
 #include <gvfsdaemonutils.h>
 #include <gvfsjobread.h>
 #include <gvfsjobseekread.h>
+#include <gvfsjobqueryinforead.h>
 #include <gvfsjobcloseread.h>
+#include <gvfsfileinfo.h>
 
 struct _GVfsReadChannel
 {
@@ -134,6 +136,7 @@ read_channel_handle_request (GVfsChannel *channel,
   GVfsBackendHandle backend_handle;
   GVfsBackend *backend;
   GVfsReadChannel *read_channel;
+  char *attrs;
 
   read_channel = G_VFS_READ_CHANNEL (channel);
   backend_handle = g_vfs_channel_get_backend_handle (channel);
@@ -167,6 +170,16 @@ read_channel_handle_request (GVfsChannel *channel,
 				     seek_type,
 				     ((goffset)arg1) | (((goffset)arg2) << 32),
 				     backend);
+      break;
+
+    case G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_QUERY_INFO:
+      attrs = g_strndup (data, data_len);
+      job = g_vfs_job_query_info_read_new (read_channel,
+					   backend_handle,
+					   attrs,
+					   backend);
+      
+      g_free (attrs);
       break;
       
     default:

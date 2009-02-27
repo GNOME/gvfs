@@ -76,6 +76,8 @@ gboolean          g_vfs_channel_has_job            (GVfsChannel                 
 GVfsJob *         g_vfs_channel_get_job            (GVfsChannel                   *channel);
 void              g_vfs_channel_send_error         (GVfsChannel                   *channel,
 						    GError                        *error);
+void              g_vfs_channel_send_info          (GVfsChannel                   *channel,
+						    GFileInfo                     *info);
 void              g_vfs_channel_send_reply         (GVfsChannel                   *channel,
 						    GVfsDaemonSocketProtocolReply *reply,
 						    const void                    *data,

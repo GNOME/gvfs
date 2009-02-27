@@ -40,6 +40,7 @@
 #include <gvfsdaemonutils.h>
 #include <gvfsjobcloseread.h>
 #include <gvfsjobclosewrite.h>
+#include <gvfsfileinfo.h>
 
 static void g_vfs_channel_job_source_iface_init (GVfsJobSourceIface *iface);
 
@@ -667,6 +668,26 @@ g_vfs_channel_send_error (GVfsChannel *channel,
   
   data = g_error_to_daemon_reply (error, channel->priv->current_job_seq_nr, &data_len);
   g_vfs_channel_send_reply (channel, NULL, data, data_len);
+}
+
+/* Might be called on an i/o thread
+ */
+void
+g_vfs_channel_send_info (GVfsChannel *channel,
+			 GFileInfo *info)
+{
+  GVfsDaemonSocketProtocolReply reply;
+  char *data;
+  gsize data_len;
+  
+  data = gvfs_file_info_marshal (info, &data_len);
+
+  reply.type = g_htonl (G_VFS_DAEMON_SOCKET_PROTOCOL_REPLY_INFO);
+  reply.seq_nr = g_htonl (g_vfs_channel_get_current_seq_nr (channel));
+  reply.arg1 = 0;
+  reply.arg2 = g_htonl (data_len);
+
+  g_vfs_channel_send_reply (channel, &reply, data, data_len);
 }
 
 int

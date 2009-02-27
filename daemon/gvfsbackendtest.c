@@ -250,6 +250,42 @@ do_seek_on_read (GVfsBackend *backend,
 }
 
 static void
+do_query_info_on_read (GVfsBackend *backend,
+		       GVfsJobQueryInfoRead *job,
+		       GVfsBackendHandle handle,
+		       GFileInfo *info,
+		       GFileAttributeMatcher *attribute_matcher)
+{
+  int fd, res;
+  struct stat statbuf;
+    
+  fd = GPOINTER_TO_INT (handle);
+
+  res = fstat (fd, &statbuf);
+
+  if (res == -1)
+    {
+      int errsv = errno;
+
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+			g_io_error_from_errno (errsv),
+			"Error querying info in file: %s",
+			g_strerror (errsv));
+    }
+  else
+    {
+      g_file_info_set_size (info, statbuf.st_size);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_DEVICE,
+					statbuf.st_dev);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, statbuf.st_mtime);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, statbuf.st_atime);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_CHANGED, statbuf.st_ctime);
+
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+}
+
+static void
 do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
@@ -283,7 +319,7 @@ do_query_info (GVfsBackend *backend,
   file = g_vfs_get_file_for_path (local_vfs, filename);
 
   error = NULL;
-  info2 = g_file_query_info (file, NULL, flags,
+  info2 = g_file_query_info (file, job->attributes, flags,
 			     NULL, &error);
 
   if (info2)
@@ -346,6 +382,7 @@ g_vfs_backend_test_class_init (GVfsBackendTestClass *klass)
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;
   backend_class->seek_on_read = do_seek_on_read;
+  backend_class->query_info_on_read = do_query_info_on_read;
   backend_class->close_read = do_close_read;
   backend_class->query_info = do_query_info;
   backend_class->try_enumerate = try_enumerate;

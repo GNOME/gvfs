@@ -57,6 +57,7 @@ typedef struct _GVfsJobWrite           GVfsJobWrite;
 typedef struct _GVfsJobSeekWrite       GVfsJobSeekWrite;
 typedef struct _GVfsJobCloseWrite      GVfsJobCloseWrite;
 typedef struct _GVfsJobQueryInfo       GVfsJobQueryInfo;
+typedef struct _GVfsJobQueryInfoRead   GVfsJobQueryInfoRead;
 typedef struct _GVfsJobQueryFsInfo     GVfsJobQueryFsInfo;
 typedef struct _GVfsJobEnumerate       GVfsJobEnumerate;
 typedef struct _GVfsJobSetDisplayName  GVfsJobSetDisplayName;
@@ -235,6 +236,16 @@ struct _GVfsBackendClass
 				 GVfsJobQueryInfo *job,
 				 const char *filename,
 				 GFileQueryInfoFlags flags,
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
+  void     (*query_info_on_read)(GVfsBackend *backend,
+				 GVfsJobQueryInfoRead *job,
+				 GVfsBackendHandle handle,
+				 GFileInfo *info,
+				 GFileAttributeMatcher *attribute_matcher);
+  gboolean (*try_query_info_on_read)(GVfsBackend *backend,
+				 GVfsJobQueryInfoRead *job,
+				 GVfsBackendHandle handle,
 				 GFileInfo *info,
 				 GFileAttributeMatcher *attribute_matcher);
   void     (*query_fs_info)     (GVfsBackend *backend,
