@@ -1,5 +1,12 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 564003 – gvfs Cygwin patches
+
+        * daemon/gvfsbackendsftp.c:
+	Include <sys/time.h> for struct timeval on cygwin
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
         Bug 569203 – gvfsd-sftp crashed with SIGSEGV in strlen()
 
         * daemon/gvfsbackendsftp.c:
