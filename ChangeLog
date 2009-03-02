@@ -1,5 +1,12 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 565041 – burn: Doesn't support move
+
+        * daemon/gvfsbackendburn.c:
+	Implement try_move based on patch from Fabio Bonelli.
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
         Bug 569066 – gvfs' configure.ac uses non posix 'test' constructions
 
         * configure.ac:

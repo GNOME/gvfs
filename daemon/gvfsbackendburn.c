@@ -393,9 +393,9 @@ try_delete (GVfsBackend *backend,
   char *dirname, *basename;
   VirtualNode *file, *dir;
 
-	dirname = g_path_get_dirname (filename);
+  dirname = g_path_get_dirname (filename);
   dir = virtual_node_lookup (G_VFS_BACKEND_BURN (backend)->root_node, dirname, NULL);
-	g_free (dirname);
+  g_free (dirname);
 
   if (dir == NULL ||
       dir->type != VIRTUAL_NODE_DIRECTORY)
@@ -406,17 +406,17 @@ try_delete (GVfsBackend *backend,
       return TRUE;
     }
 
-	basename = g_path_get_basename (filename);
-	file = virtual_dir_lookup (dir, basename);
+  basename = g_path_get_basename (filename);
+  file = virtual_dir_lookup (dir, basename);
   g_free (basename);
-	if (file == NULL)
+  if (file == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
                         _("No such file or directory"));
       return TRUE;
     }
-
+  
   if (file->type == VIRTUAL_NODE_DIRECTORY &&
       file->children != NULL)
     {
@@ -734,11 +734,11 @@ try_make_directory (GVfsBackend *backend,
   char *dirname, *basename;
   VirtualNode *file, *dir;
   
-	dirname = g_path_get_dirname (filename);
+  dirname = g_path_get_dirname (filename);
   dir = virtual_node_lookup (G_VFS_BACKEND_BURN (backend)->root_node, dirname, NULL);
-	g_free (dirname);
+  g_free (dirname);
   
-	if (dir == NULL)
+  if (dir == NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_FOUND,
@@ -746,9 +746,9 @@ try_make_directory (GVfsBackend *backend,
       return TRUE;
     }
 
-	basename = g_path_get_basename (filename);
-	file = virtual_dir_lookup (dir, basename);
-	if (file != NULL)
+  basename = g_path_get_basename (filename);
+  file = virtual_dir_lookup (dir, basename);
+  if (file != NULL)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_EXISTS,
@@ -757,9 +757,9 @@ try_make_directory (GVfsBackend *backend,
       return TRUE;
     }
 
-	file = virtual_mkdir (dir, basename);
-	g_free (basename);
-
+  file = virtual_mkdir (dir, basename);
+  g_free (basename);
+  
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
   return TRUE;
@@ -825,7 +825,8 @@ try_push (GVfsBackend *backend,
   if (remove_source)
     {
       /* Fallback to copy & delete for now, fix that up later */
-      g_vfs_job_failed_literal (job, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+      g_vfs_job_failed_literal (G_VFS_JOB (job), G_IO_ERROR,
+				G_IO_ERROR_NOT_SUPPORTED,
                                 _("Operation not supported by backend"));
       return TRUE;
     }
@@ -841,9 +842,9 @@ try_push (GVfsBackend *backend,
       return TRUE;
     }
 
-	dirname = g_path_get_dirname (destination);
+  dirname = g_path_get_dirname (destination);
   dir = virtual_node_lookup (G_VFS_BACKEND_BURN (backend)->root_node, dirname, NULL);
-	g_free (dirname);
+  g_free (dirname);
   file = NULL;
 
   if (dir == NULL)
@@ -953,6 +954,78 @@ try_create_dir_monitor (GVfsBackend *backend,
   return TRUE;
 }
 
+static gboolean
+try_move (GVfsBackend *backend,
+          GVfsJobMove *job,
+          const char *source,
+          const char *destination,
+          GFileCopyFlags flags,
+          GFileProgressCallback progress_callback,
+          gpointer progress_callback_data)
+{
+  VirtualNode *source_node, *dest_node, *root_node, *source_dir, *dest_dir;
+
+  root_node = G_VFS_BACKEND_BURN (backend)->root_node;
+  
+  source_node = virtual_node_lookup (root_node, source, &source_dir);
+  if (source_node == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_FOUND,
+                        _("No such file or directory"));
+      return TRUE;
+    }
+
+  dest_node = virtual_node_lookup (root_node, destination, &dest_dir);
+  if (dest_node != NULL)
+    {
+      if (flags & G_FILE_COPY_OVERWRITE)
+	{
+	  if (dest_node->type == VIRTUAL_NODE_DIRECTORY)
+	    {
+	      if (source_node->type == VIRTUAL_NODE_DIRECTORY)
+		g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+				  G_IO_ERROR_WOULD_MERGE,
+				  _("File exists"));
+	      else
+		g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+				  G_IO_ERROR_IS_DIRECTORY,
+				  _("File exists"));
+	      return TRUE;
+	    }
+	  else
+	    virtual_unlink (dest_dir, dest_node);
+	}
+      else
+	{
+	  g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+			    G_IO_ERROR_EXISTS,
+			    _("File exists"));
+	  return TRUE;
+	}
+    }
+  else if (dest_dir == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_FOUND,
+                        _("No such file or directory"));
+      return TRUE;
+    }
+  
+  g_free (source_node->filename);
+  source_node->filename = g_path_get_basename (destination);
+  
+  if (source_dir != dest_dir)
+    {
+      source_dir->children = g_list_remove (source_dir->children, source_node);
+      dest_dir->children = g_list_append (dest_dir->children, source_node);
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+  
+  return TRUE;
+}
+
 static void
 g_vfs_backend_burn_class_init (GVfsBackendBurnClass *klass)
 {
@@ -970,6 +1043,7 @@ g_vfs_backend_burn_class_init (GVfsBackendBurnClass *klass)
   backend_class->try_set_display_name = try_set_display_name;
   backend_class->try_push = try_push;
   backend_class->try_delete = try_delete;
+  backend_class->try_move = try_move;
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
   backend_class->close_read = do_close_read;
