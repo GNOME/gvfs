@@ -406,10 +406,12 @@ append_request (GDaemonFileInputStream *stream, guint32 command,
     *seq_nr = stream->seq_nr;
   
   cmd.command = g_htonl (command);
-  cmd.seq_nr = g_htonl (stream->seq_nr++);
+  cmd.seq_nr = g_htonl (stream->seq_nr);
   cmd.arg1 = g_htonl (arg1);
   cmd.arg2 = g_htonl (arg2);
   cmd.data_len = g_htonl (data_len);
+
+  stream->seq_nr++;
 
   g_string_append_len (stream->output_buffer,
 		       (char *)&cmd, G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_SIZE);
