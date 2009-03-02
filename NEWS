@@ -1,3 +1,16 @@
+Major changes in 1.1.7
+======================
+* Fix build on some platforms
+* ftp: Fix short read errors
+* gphoto2: Make it work on iphone
+* sftp: Fix symlink creation
+* fuse: Better support of truncation, fixing OOo save
+* proxy monitors: Support mount operations, etc
+* gvfs-mount: add --device commandline support
+* sftp: Fix protocol bug that made some servers not work
+* general support for query_info over streams, implemented for smb, sftp
+* Initial support for .xdg-volume-info reading
+
 Major changes in 1.1.6
 ======================
 * Fix crashes
