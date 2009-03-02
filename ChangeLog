@@ -1,3 +1,15 @@
+2009-03-02  David Zeuthen  <davidz@redhat.com>
+
+	Bug 551403 – Support Reading Volume Icon/Name Information
+	from .xdg-volume-info
+
+	* common/Makefile.am:
+	* common/gvfsmountinfo.[ch]: Move autorun file detection to common
+	library. Also add routines for detecting .xdg-volume-info files.
+
+	* monitor/hal/ghalmount.c: Use g_mount_info*() functions for
+	detecting autorun and .xdg-volume-info files.
+
 2009-03-02  Paolo Borelli  <pborelli@katamail.com>
 
 	* daemon/gvfsbackendarchive.c:
