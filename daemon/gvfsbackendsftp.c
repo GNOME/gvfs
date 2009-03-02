@@ -903,7 +903,18 @@ handle_login (GVfsBackend *backend,
 	    {
 	      g_free (new_user);
 	    }
-          
+
+	  if (new_password == NULL)
+	    {
+	      /* This really should not happen, but was seen as bug #569203
+	       * avoid crash and ask for info
+	       */
+	      g_warning ("Got NULL password but no error in sftp login request. "
+			 "This should not happen, if you can reproduce this, please "
+			 "add information to http://bugzilla.gnome.org/show_bug.cgi?id=569203");
+	      new_password = g_strdup ("");
+	    }
+	  
           if (!g_output_stream_write_all (reply_stream,
                                           new_password, strlen (new_password),
                                           &bytes_written,
