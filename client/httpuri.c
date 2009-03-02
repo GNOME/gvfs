@@ -164,8 +164,6 @@ http_get_mount_info_for_path (GVfsUriMapper *mapper,
       g_vfs_uri_mount_info_set (new_info, "uri", new_uri);
       g_free (new_uri);
 
-      uri->path = NULL;
-
       g_vfs_decoded_uri_free (uri);
 
       return new_info;

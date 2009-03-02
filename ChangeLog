@@ -1,3 +1,10 @@
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 547161 – http string leak
+
+	* client/httpuri.c (http_get_mount_info_for_path):
+	Fix leak
+
 2009-03-02  Christian Kellner  <gicmo@gnome.org>
 
 	* daemon/gvfsbackendsftp.c:
