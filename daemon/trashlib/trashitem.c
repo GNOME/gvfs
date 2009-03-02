@@ -508,7 +508,7 @@ trash_item_restore (TrashItem  *item,
                    G_FILE_COPY_OVERWRITE |
                    G_FILE_COPY_NOFOLLOW_SYMLINKS |
                    G_FILE_COPY_NO_FALLBACK_FOR_MOVE,
-                   NULL, NULL, NULL, NULL))
+                   NULL, NULL, NULL, error))
     {
       g_static_rw_lock_writer_lock (&item->root->lock);
       g_hash_table_remove (item->root->item_table, item->escaped_name);
