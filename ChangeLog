@@ -1,3 +1,8 @@
+2009-03-02  Paolo Borelli  <pborelli@katamail.com>
+
+	* daemon/gvfsbackendarchive.c:
+	Chain up finalize
+
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 547161 – http string leak
