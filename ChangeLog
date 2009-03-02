@@ -1,9 +1,14 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsmb.c:
+	Implement query_info on smb streams
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 573371 – Unsafe g_htonl() macro expansion
 
-	* client/gdaemonfileoutputstream.c (append_request): 
-	* client/gdaemonfileinputstream.c (append_request): 
+	* client/gdaemonfileoutputstream.c (append_request):
+	* client/gdaemonfileinputstream.c (append_request):
 	Don't use ++ inside macro that may evaluate twice.
 
 2009-03-02  Alexander Larsson  <alexl@redhat.com>

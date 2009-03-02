@@ -95,6 +95,13 @@ static char *default_workgroup = NULL;
 
 G_DEFINE_TYPE (GVfsBackendSmb, g_vfs_backend_smb, G_VFS_TYPE_BACKEND)
 
+static void set_info_from_stat (GVfsBackendSmb *backend,
+				GFileInfo *info,
+				struct stat *statbuf,
+				const char *basename,
+				GFileAttributeMatcher *matcher);
+
+
 static void
 g_vfs_backend_smb_finalize (GObject *object)
 {
@@ -769,6 +776,33 @@ do_seek_on_read (GVfsBackend *backend,
 }
 
 static void
+do_query_info_on_read (GVfsBackend *backend,
+		       GVfsJobQueryInfoRead *job,
+		       GVfsBackendHandle handle,
+		       GFileInfo *info,
+		       GFileAttributeMatcher *matcher)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat st = {0};
+  int res, saved_errno;
+  smbc_fstat_fn smbc_fstat;
+
+  smbc_fstat = smbc_getFunctionFstat (op_backend->smb_context);
+  res = smbc_fstat (op_backend->smb_context, (SMBCFILE *)handle, &st);
+  saved_errno = errno;
+
+  if (res == 0)
+    {
+      set_info_from_stat (op_backend, info, &st, NULL, matcher);
+      
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
+
+}
+
+static void
 do_close_read (GVfsBackend *backend,
 	       GVfsJobCloseRead *job,
 	       GVfsBackendHandle handle)
@@ -1222,6 +1256,34 @@ do_seek_on_write (GVfsBackend *backend,
     }
 
   return;
+}
+
+static void
+do_query_info_on_write (GVfsBackend *backend,
+			GVfsJobQueryInfoWrite *job,
+			GVfsBackendHandle _handle,
+			GFileInfo *info,
+			GFileAttributeMatcher *matcher)
+{
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  struct stat st = {0};
+  SmbWriteHandle *handle = _handle;
+  int res, saved_errno;
+  smbc_fstat_fn smbc_fstat;
+
+  smbc_fstat = smbc_getFunctionFstat (op_backend->smb_context);
+  res = smbc_fstat (op_backend->smb_context, handle->file, &st);
+  saved_errno = errno;
+
+  if (res == 0)
+    {
+      set_info_from_stat (op_backend, info, &st, NULL, matcher);
+      
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), saved_errno);
+
 }
 
 static void
@@ -1994,12 +2056,14 @@ g_vfs_backend_smb_class_init (GVfsBackendSmbClass *klass)
   backend_class->open_for_read = do_open_for_read;
   backend_class->read = do_read;
   backend_class->seek_on_read = do_seek_on_read;
+  backend_class->query_info_on_read = do_query_info_on_read;
   backend_class->close_read = do_close_read;
   backend_class->create = do_create;
   backend_class->append_to = do_append_to;
   backend_class->replace = do_replace;
   backend_class->write = do_write;
   backend_class->seek_on_write = do_seek_on_write;
+  backend_class->query_info_on_write = do_query_info_on_write;
   backend_class->close_write = do_close_write;
   backend_class->query_info = do_query_info;
   backend_class->query_fs_info = do_query_fs_info;
