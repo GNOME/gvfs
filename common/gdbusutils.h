@@ -75,11 +75,6 @@ DBusMessage *_dbus_message_new_gerror               (DBusMessage      *message,
 						     gint              code,
 						     const gchar      *format,
 						     ...);
-char *       _g_dbus_unescape_bus_name              (const char       *escaped,
-						     const char       *end);
-void         _g_dbus_append_escaped_bus_name        (GString          *string,
-						     gboolean          at_start,
-						     const char       *unescaped);
 void         _g_dbus_connection_integrate_with_main (DBusConnection   *connection);
 void         _g_dbus_connection_remove_from_main    (DBusConnection   *connection);
 GSource *    __g_fd_source_new                      (int               fd,

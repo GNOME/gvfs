@@ -159,64 +159,6 @@ append_unescaped_dbus_name (GString *s,
     }
 }
 
-char *
-_g_dbus_unescape_bus_name (const char *escaped, const char *end)
-{
-  GString *s = g_string_new ("");
-  
-  if (end == NULL)
-    end = escaped + strlen (escaped);
-
-  append_unescaped_dbus_name (s, escaped, end);
-  return g_string_free (s, FALSE);
-}
-
-/* We use _ for escaping */
-#define VALID_INITIAL_BUS_NAME_CHARACTER(c)     \
-  ( ((c) >= 'A' && (c) <= 'Z') ||               \
-    ((c) >= 'a' && (c) <= 'z') ||               \
-   /*((c) == '_') || */((c) == '-'))
-#define VALID_BUS_NAME_CHARACTER(c)             \
-  ( ((c) >= '0' && (c) <= '9') ||               \
-    ((c) >= 'A' && (c) <= 'Z') ||               \
-    ((c) >= 'a' && (c) <= 'z') ||               \
-   /*((c) == '_')||*/  ((c) == '-'))
-
-void
-_g_dbus_append_escaped_bus_name (GString *s,
-				 gboolean at_start,
-				 const char *unescaped)
-{
-  char c;
-  gboolean first;
-  static const gchar hex[16] = "0123456789ABCDEF";
-
-  while ((c = *unescaped++) != 0)
-    {
-      if (first && at_start)
-	{
-	  if (VALID_INITIAL_BUS_NAME_CHARACTER (c))
-	    {
-	      g_string_append_c (s, c);
-	      continue;
-	    }
-	}
-      else
-	{
-	  if (VALID_BUS_NAME_CHARACTER (c))
-	    {
-	      g_string_append_c (s, c);
-	      continue;
-	    }
-	}
-
-      first = FALSE;
-      g_string_append_c (s, '_');
-      g_string_append_c (s, hex[((guchar)c) >> 4]);
-      g_string_append_c (s, hex[((guchar)c) & 0xf]);
-    }
-}
-
 void
 _g_dbus_message_iter_append_cstring (DBusMessageIter *iter, const char *str)
 {
