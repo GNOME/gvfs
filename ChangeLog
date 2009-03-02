@@ -1,5 +1,13 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+        Bug 569066 – gvfs' configure.ac uses non posix 'test' constructions
+
+        * configure.ac:
+	Use '=', not '==' for comparison
+	Patch from Alexis Ballier
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 564003 – gvfs Cygwin patches
 
         * daemon/gvfsbackendsftp.c:

@@ -127,7 +127,7 @@ HTTP_LIBS=
 if test "x$enable_http" != "xno"; then
   PKG_CHECK_EXISTS(libsoup-gnome-2.4 >= 2.25.1, msg_http=yes)
 
-  if test "x$msg_http" == "xyes"; then
+  if test "x$msg_http" = "xyes"; then
     PKG_CHECK_MODULES(HTTP, libsoup-gnome-2.4 libxml-2.0)
     AC_DEFINE(HAVE_HTTP, 1, [Define to 1 if http/dav is going to be built])
   fi
@@ -165,7 +165,7 @@ FUSE_CFLAGS=
 if test "x$enable_fuse" != "xno"; then
   PKG_CHECK_EXISTS(fuse, msg_fuse=yes)
 
-  if test "x$msg_fuse" == "xyes"; then
+  if test "x$msg_fuse" = "xyes"; then
     PKG_CHECK_MODULES(FUSE, fuse)
     AC_DEFINE(HAVE_FUSE, 1, [Define to 1 if FUSE is available])
   fi
@@ -187,7 +187,7 @@ GCONF_CFLAGS=
 if test "x$enable_gconf" != "xno"; then
   PKG_CHECK_EXISTS(gconf-2.0, msg_gconf=yes)
 
-  if test "x$msg_gconf" == "xyes"; then
+  if test "x$msg_gconf" = "xyes"; then
     PKG_CHECK_MODULES(GCONF, gconf-2.0)
     AC_DEFINE(HAVE_GCONF, 1, [Define to 1 if GConf is available])
   fi
@@ -211,13 +211,13 @@ HAL_REQUIRED=0.5.10
 if test "x$enable_hal" != "xno"; then
   PKG_CHECK_EXISTS([hal >= $HAL_REQUIRED], msg_hal=yes)
 
-  if test "x$msg_hal" == "xyes"; then
+  if test "x$msg_hal" = "xyes"; then
     PKG_CHECK_MODULES([HAL],[hal >= $HAL_REQUIRED])
     AC_DEFINE(HAVE_HAL, 1, [Define to 1 if HAL is available])
     save_libs="$LIBS"
     LIBS="$HAL_LIBS"
     AC_CHECK_LIB(hal, libhal_get_all_devices_with_properties, have_hal_fast_init=yes)
-    if test "x$have_hal_fast_init" == "xyes"; then
+    if test "x$have_hal_fast_init" = "xyes"; then
       AC_DEFINE(HAVE_HAL_FAST_INIT, 1, [Define to 1 if libhal_get_all_devices_with_properties is available])
     fi
     LIBS="$save_libs"
@@ -240,7 +240,7 @@ CDDA_CFLAGS=
 if test "x$enable_cdda" != "xno"; then
   PKG_CHECK_EXISTS(libcdio_paranoia >= 0.78.2 hal >= $HAL_REQUIRED, msg_cdda=yes)
 
-  if test "x$msg_cdda" == "xyes"; then
+  if test "x$msg_cdda" = "xyes"; then
     PKG_CHECK_MODULES(CDDA, libcdio_paranoia hal >= $HAL_REQUIRED)
     AC_DEFINE(HAVE_CDDA, 1, [Define to 1 if CDDA is going to be built])
   fi
@@ -267,7 +267,7 @@ if test "x$enable_obexftp" != "xno" -a "x$msg_hal" = "xyes" ; then
                [ AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false) ],
                have_expat=false)
 
-  if test "x$msg_obexftp" == "xyes" -a "x$have_expat" == "xtrue"; then
+  if test "x$msg_obexftp" = "xyes" -a "x$have_expat" = "xtrue"; then
     PKG_CHECK_MODULES(OBEXFTP, dbus-glib-1 bluez >= 4.0)
     AC_SUBST(OBEXFTP_LIBS)
     AC_SUBST(OBEXFTP_CFLAGS)
@@ -307,8 +307,8 @@ if test "x$enable_gphoto2" != "xno" -a "x$msg_hal" = "xyes" ; then
       ;;
   esac
 
-  if test "x$msg_gphoto2" == "xyes"; then
-    if test "x$use_gphoto2" == "xyes"; then
+  if test "x$msg_gphoto2" = "xyes"; then
+    if test "x$use_gphoto2" = "xyes"; then
       PKG_CHECK_MODULES(GPHOTO2, libgphoto2 >= 2.4.0)
       AC_DEFINE(HAVE_GPHOTO2, 1, [Define to 1 if gphoto2 is available])
     else
@@ -334,7 +334,7 @@ KEYRING_CFLAGS=
 if test "x$enable_keyring" != "xno"; then
   PKG_CHECK_EXISTS(gnome-keyring-1, msg_keyring=yes)
 
-  if test "x$msg_keyring" == "xyes"; then
+  if test "x$msg_keyring" = "xyes"; then
     PKG_CHECK_MODULES(KEYRING, gnome-keyring-1)
     AC_DEFINE(HAVE_KEYRING, 1, [Define to 1 if GNOME Keyring is available])
   fi
