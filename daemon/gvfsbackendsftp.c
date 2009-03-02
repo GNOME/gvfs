@@ -365,8 +365,11 @@ setup_ssh_commandline (GVfsBackend *backend)
     }
     
 
-  args[last_arg++] = g_strdup ("-l");
-  args[last_arg++] = g_strdup (op_backend->user);
+  if (op_backend->user_specified)
+    {
+      args[last_arg++] = g_strdup ("-l");
+      args[last_arg++] = g_strdup (op_backend->user);
+    }
 
   args[last_arg++] = g_strdup ("-s");
 
@@ -885,10 +888,14 @@ handle_login (GVfsBackend *backend,
           else
             password_in_keyring = TRUE;
 
-	  if (new_user && strcmp (new_user, op_backend->user) != 0)
+	  if (new_user &&
+	      (op_backend->user == NULL ||
+	       strcmp (new_user, op_backend->user) != 0))
 	    {
 	      g_free (op_backend->user);
 	      op_backend->user = new_user;
+
+	      op_backend->user_specified = TRUE;
 	      
 	      g_free (op_backend->tmp_password);
 	      op_backend->tmp_password = new_password;
@@ -1584,8 +1591,6 @@ try_mount (GVfsBackend *backend,
   op_backend->user = g_strdup (user);
   if (op_backend->user)
     op_backend->user_specified = TRUE;
-  else
-    op_backend->user = g_strdup (g_get_user_name ());
 
   return FALSE;
 }
