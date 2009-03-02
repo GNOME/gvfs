@@ -1088,6 +1088,11 @@ service_resolver_changed (GVfsDnsSdResolver *resolver,
         }
       else
         {
+          /* Translators:
+           * - the first %s refers to the service type
+           * - the second %s refers to the service name
+           * - the third %s refers to the domain
+           */
           g_simple_async_result_set_error (data->simple,
                                            G_IO_ERROR,
                                            G_IO_ERROR_FAILED,
@@ -1108,6 +1113,12 @@ service_resolver_timed_out (ResolveData *data)
   if (data->resolver->address != NULL)
     {
       /* special case if one of the required TXT records are missing */
+      /* Translators:
+       * - the first %s refers to the service type
+       * - the second %s refers to the service name
+       * - the third %s refers to the domain
+       * - the fourth %s refers to the required TXT keys
+       */
       g_simple_async_result_set_error (data->simple,
                                        G_IO_ERROR,
                                        G_IO_ERROR_FAILED,
@@ -1120,6 +1131,11 @@ service_resolver_timed_out (ResolveData *data)
     }
   else
     {
+      /* Translators:
+       * - the first %s refers to the service type
+       * - the second %s refers to the service name
+       * - the third %s refers to the domain
+       */
       g_simple_async_result_set_error (data->simple,
                                        G_IO_ERROR,
                                        G_IO_ERROR_TIMED_OUT,

@@ -1,5 +1,13 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 569712 – Write comments for translators!
+
+        * common/gvfsdnssdresolver.c:
+        Add some translator comments.
+	Patch from David Planella
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
         * daemon/gvfsbackendsmb.c:
 	Implement query_info on smb streams
 
