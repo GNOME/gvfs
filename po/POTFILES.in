@@ -56,6 +56,8 @@ daemon/gvfsjobpush.c
 daemon/gvfsjobqueryattributes.c
 daemon/gvfsjobqueryfsinfo.c
 daemon/gvfsjobqueryinfo.c
+daemon/gvfsjobqueryinforead.c
+daemon/gvfsjobqueryinfowrite.c
 daemon/gvfsjobread.c
 daemon/gvfsjobseekread.c
 daemon/gvfsjobseekwrite.c
@@ -75,6 +77,9 @@ monitor/hal/ghalmount.c
 monitor/hal/ghalvolume.c
 monitor/hal/ghalvolumemonitor.c
 monitor/hal/hal-utils.c
+monitor/proxy/gproxydrive.c
+monitor/proxy/gproxymount.c
+monitor/proxy/gproxyvolume.c
 programs/gvfs-cat.c
 programs/gvfs-copy.c
 programs/gvfs-info.c

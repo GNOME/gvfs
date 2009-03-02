@@ -1,3 +1,8 @@
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
+	* POTFILES.in:
+	Add new files
+
 2009-02-27  Luca Ferretti  <elle.uca@libero.it>
 
 	* it.po: Updated Italian translation.
