@@ -354,8 +354,8 @@ do_update_from_hal (GHalMount *m)
   volume_disc_is_blank = hal_device_get_property_bool (volume, "volume.disc.is_blank");
   volume_disc_type = hal_device_get_property_string (volume, "volume.disc.type");
   is_audio_player = hal_device_has_capability (drive, "portable_audio_player");
-  icon_from_hal = hal_device_get_property_string (drive, "info.desktop.icon");
-  volume_icon_from_hal = hal_device_get_property_string (volume, "info.desktop.icon");
+  icon_from_hal = hal_device_get_property_string (drive, "storage.icon.drive");
+  volume_icon_from_hal = hal_device_get_property_string (volume, "storage.icon.volume");
   name_from_hal = hal_device_get_property_string (drive, "info.desktop.name");
   volume_name_from_hal = hal_device_get_property_string (volume, "info.desktop.name");
 

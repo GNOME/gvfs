@@ -231,7 +231,7 @@ _drive_get_icon (HalDevice *d)
   drive_type = hal_device_get_property_string (d, "storage.drive_type");
   drive_bus = hal_device_get_property_string (d, "storage.bus");
   is_audio_player = hal_device_has_capability (d, "portable_audio_player");
-  icon_from_hal = hal_device_get_property_string (d, "info.desktop.icon");
+  icon_from_hal = hal_device_get_property_string (d, "storage.icon.drive");
 
   if (strlen (icon_from_hal) > 0)
     s = g_strdup (icon_from_hal);

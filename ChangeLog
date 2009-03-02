@@ -1,5 +1,16 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 545025 – gvfs doesnt use hal storage.icon.drive/volume properties
+
+        * monitor/hal/ghaldrive.c:
+        * monitor/hal/ghalmount.c:
+	Use storage.icon.drive and storage.icon.volume, not
+	info.desktop.icon as per the spec.
+
+	Patch from Karl Relton
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 565041 – burn: Doesn't support move
 
         * daemon/gvfsbackendburn.c:
