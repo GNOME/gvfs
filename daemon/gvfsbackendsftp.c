@@ -52,6 +52,8 @@
 #include "gvfsjobseekwrite.h"
 #include "gvfsjobsetdisplayname.h"
 #include "gvfsjobqueryinfo.h"
+#include "gvfsjobqueryinforead.h"
+#include "gvfsjobqueryinfowrite.h"
 #include "gvfsjobmove.h"
 #include "gvfsjobdelete.h"
 #include "gvfsjobqueryfsinfo.h"
@@ -3577,6 +3579,72 @@ try_query_info (GVfsBackend *backend,
   return TRUE;
 }
 
+typedef struct {
+   GFileInfo *info;
+   GFileAttributeMatcher *attribute_matcher;
+} QueryInfoFStatData;
+
+static void
+query_info_fstat_reply (GVfsBackendSftp *backend,
+                        int reply_type,
+                        GDataInputStream *reply,
+                        guint32 len,
+                        GVfsJob *job,
+                        gpointer user_data)
+{
+  QueryInfoFStatData *data = user_data;
+  GFileInfo *file_info;
+  GFileAttributeMatcher *attribute_matcher;
+
+  file_info = data->info;
+  attribute_matcher = data->attribute_matcher;
+  g_slice_free (QueryInfoFStatData, data);
+
+  if (reply_type == SSH_FXP_STATUS)
+    {
+      result_from_status (job, reply, -1, -1);
+      return;
+    }
+
+  if (reply_type != SSH_FXP_ATTRS)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      return;
+    }
+
+  parse_attributes (backend,
+                    file_info,
+                    NULL,
+                    reply,
+                    attribute_matcher);
+
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+}
+
+static gboolean
+try_query_info_fstat (GVfsBackend *backend,
+                      GVfsJob *job,
+                      GVfsBackendHandle _handle,
+                      GFileInfo *info,
+                      GFileAttributeMatcher *attribute_matcher)
+{
+  SftpHandle *handle = _handle;
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  QueryInfoFStatData *data;
+
+  command = new_command_stream (op_backend, SSH_FXP_FSTAT);
+  put_data_buffer (command, handle->raw_handle);
+
+  data = g_slice_new (QueryInfoFStatData);
+  data->info = info;
+  data->attribute_matcher = attribute_matcher;
+  queue_command_stream_and_free (op_backend, command, query_info_fstat_reply, G_VFS_JOB (job), data);
+
+  return TRUE;
+}
+
 static void
 move_reply (GVfsBackendSftp *backend,
             int reply_type,
@@ -4106,6 +4174,8 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   backend_class->try_close_read = try_close_read;
   backend_class->try_close_write = try_close_write;
   backend_class->try_query_info = try_query_info;
+  backend_class->try_query_info_on_read = (gpointer) try_query_info_fstat;
+  backend_class->try_query_info_on_write = (gpointer) try_query_info_fstat;
   backend_class->try_enumerate = try_enumerate;
   backend_class->try_create = try_create;
   backend_class->try_append_to = try_append_to;
