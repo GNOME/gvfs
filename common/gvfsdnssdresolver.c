@@ -1088,14 +1088,14 @@ service_resolver_changed (GVfsDnsSdResolver *resolver,
         }
       else
         {
+          g_simple_async_result_set_error (data->simple,
+                                           G_IO_ERROR,
+                                           G_IO_ERROR_FAILED,
           /* Translators:
            * - the first %s refers to the service type
            * - the second %s refers to the service name
            * - the third %s refers to the domain
            */
-          g_simple_async_result_set_error (data->simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
                                            _("Error resolving \"%s\" service \"%s\" on domain \"%s\""),
                                            data->resolver->service_type,
                                            data->resolver->service_name,
@@ -1113,15 +1113,15 @@ service_resolver_timed_out (ResolveData *data)
   if (data->resolver->address != NULL)
     {
       /* special case if one of the required TXT records are missing */
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_FAILED,
       /* Translators:
        * - the first %s refers to the service type
        * - the second %s refers to the service name
        * - the third %s refers to the domain
        * - the fourth %s refers to the required TXT keys
        */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_FAILED,
                                        _("Error resolving \"%s\" service \"%s\" on domain \"%s\". "
                                          "One or more TXT records are missing. Keys required: \"%s\"."),
                                        data->resolver->service_type,
@@ -1131,14 +1131,14 @@ service_resolver_timed_out (ResolveData *data)
     }
   else
     {
+      g_simple_async_result_set_error (data->simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_TIMED_OUT,
       /* Translators:
        * - the first %s refers to the service type
        * - the second %s refers to the service name
        * - the third %s refers to the domain
        */
-      g_simple_async_result_set_error (data->simple,
-                                       G_IO_ERROR,
-                                       G_IO_ERROR_TIMED_OUT,
                                        _("Timed out resolving \"%s\" service \"%s\" on domain \"%s\""),
                                        data->resolver->service_type,
                                        data->resolver->service_name,

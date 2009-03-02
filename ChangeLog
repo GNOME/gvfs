@@ -1,5 +1,12 @@
 2009-03-02  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 569712 – Write comments for translators!
+
+	* common/gvfsdnssdresolver.c (service_resolver_timed_out):
+	Fix position of translator comments.
+
+2009-03-02  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 545025 – gvfs doesnt use hal storage.icon.drive/volume properties
 
         * monitor/hal/ghaldrive.c:
