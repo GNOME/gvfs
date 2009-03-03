@@ -180,7 +180,7 @@ static gboolean   g_daemon_file_output_stream_close             (GOutputStream  
 								 GCancellable         *cancellable,
 								 GError              **error);
 static GFileInfo *g_daemon_file_output_stream_query_info        (GFileOutputStream    *stream,
-								 char                 *attributes,
+								 const char           *attributes,
 								 GCancellable         *cancellable,
 								 GError              **error);
 static char      *g_daemon_file_output_stream_get_etag          (GFileOutputStream    *stream);
@@ -210,7 +210,7 @@ static gboolean   g_daemon_file_output_stream_close_finish      (GOutputStream  
 								 GAsyncResult         *result,
 								 GError              **error);
 static void       g_daemon_file_output_stream_query_info_async  (GFileOutputStream    *stream,
-								 char                 *attributes,
+								 const char           *attributes,
 								 int                   io_priority,
 								 GCancellable         *cancellable,
 								 GAsyncReadyCallback   callback,
@@ -1143,8 +1143,8 @@ iterate_query_state_machine (GDaemonFileOutputStream *file,
 }
 
 static GFileInfo *
-g_daemon_file_output_stream_query_info (GFileOutputStream     *stream,
-					char                 *attributes,
+g_daemon_file_output_stream_query_info (GFileOutputStream    *stream,
+					const char           *attributes,
 					GCancellable         *cancellable,
 					GError              **error)
 {
@@ -1159,7 +1159,7 @@ g_daemon_file_output_stream_query_info (GFileOutputStream     *stream,
   memset (&op, 0, sizeof (op));
   op.state = QUERY_STATE_INIT;
   if (attributes)
-    op.attributes = attributes;
+    op.attributes = (char *)attributes;
   else
     op.attributes = "";
   
@@ -1602,8 +1602,8 @@ async_query_done (GOutputStream *stream,
 }
 
 static void
-g_daemon_file_output_stream_query_info_async  (GFileOutputStream     *stream,
-					       char                 *attributes,
+g_daemon_file_output_stream_query_info_async  (GFileOutputStream    *stream,
+					       const char           *attributes,
 					       int                   io_priority,
 					       GCancellable         *cancellable,
 					       GAsyncReadyCallback   callback,

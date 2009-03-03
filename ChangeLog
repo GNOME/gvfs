@@ -1,3 +1,9 @@
+2009-03-03  Alexander Larsson  <alexl@redhat.com>
+
+        * client/gdaemonfileinputstream.c:
+        * client/gdaemonfileoutputstream.c:
+	Make argument const char * as per the glib change.
+
 2009-03-02  Ryan Lortie  <desrt@desrt.ca>
 
 	* daemon/trashlib/trashitem.c (trash_item_restore): set 'error' on

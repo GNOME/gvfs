@@ -233,7 +233,7 @@ static gboolean   g_daemon_file_input_stream_close             (GInputStream    
 								GCancellable         *cancellable,
 								GError              **error);
 static GFileInfo *g_daemon_file_input_stream_query_info        (GFileInputStream     *stream,
-								char                 *attributes,
+								const char           *attributes,
 								GCancellable         *cancellable,
 								GError              **error);
 static goffset    g_daemon_file_input_stream_tell              (GFileInputStream     *stream);
@@ -271,7 +271,7 @@ static gboolean   g_daemon_file_input_stream_close_finish      (GInputStream    
 								GAsyncResult         *result,
 								GError              **error);
 static void       g_daemon_file_input_stream_query_info_async  (GFileInputStream     *stream,
-								char                 *attributes,
+								const char           *attributes,
 								int                   io_priority,
 								GCancellable         *cancellable,
 								GAsyncReadyCallback   callback,
@@ -1591,7 +1591,7 @@ iterate_query_state_machine (GDaemonFileInputStream *file,
 
 static GFileInfo *
 g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
-				       char                 *attributes,
+				       const char           *attributes,
 				       GCancellable         *cancellable,
 				       GError              **error)
 {
@@ -1606,7 +1606,7 @@ g_daemon_file_input_stream_query_info (GFileInputStream     *stream,
   memset (&op, 0, sizeof (op));
   op.state = QUERY_STATE_INIT;
   if (attributes)
-    op.attributes = attributes;
+    op.attributes = (char *)attributes;
   else
     op.attributes = "";
   
@@ -2074,7 +2074,7 @@ async_query_done (GInputStream *stream,
 
 static void
 g_daemon_file_input_stream_query_info_async  (GFileInputStream     *stream,
-					      char                 *attributes,
+					      const char           *attributes,
 					      int                   io_priority,
 					      GCancellable         *cancellable,
 					      GAsyncReadyCallback   callback,
