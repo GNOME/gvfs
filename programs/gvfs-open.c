@@ -38,6 +38,15 @@ static GOptionEntry entries[] = {
   {NULL}
 };
 
+static gboolean
+is_file_uri_with_anchor (char *str)
+{
+  if (g_ascii_strncasecmp (str, "file:", 5) == 0 &&
+      strchr (str, '#') != NULL)
+    return TRUE;
+  return FALSE;
+}
+
 static void
 open (GFile *file, char *arg_string)
 {
@@ -59,7 +68,7 @@ open (GFile *file, char *arg_string)
       return;
     }
 
-  if (g_file_is_native (file))
+  if (g_file_is_native (file) && !is_file_uri_with_anchor (arg_string))
     {
       /* For normal files, pass in the canonicalized GFile as path */
       l.data = file;
