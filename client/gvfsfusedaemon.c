@@ -75,8 +75,7 @@ typedef struct {
   gchar    *path;
   FileOp    op;
   gpointer  stream;
-  gint      length;
-  size_t    pos;
+  goffset   pos;
 } FileHandle;
 
 static GThread        *subthread             = NULL;
@@ -1739,12 +1738,46 @@ vfs_rmdir (const gchar *path)
   return result;
 }
 
+static gboolean
+file_handle_get_size (FileHandle *fh,
+		      goffset *size)
+{
+  GFileInfo *info;
+  gboolean res;
+
+  if (fh->stream == NULL)
+    return FALSE;
+  
+  info = NULL;
+  if (fh->op == FILE_OP_READ)
+    info = g_file_input_stream_query_info (fh->stream,
+					   G_FILE_ATTRIBUTE_STANDARD_SIZE,
+					   NULL, NULL);
+  else if (fh->op == FILE_OP_WRITE)
+    info = g_file_output_stream_query_info (fh->stream,
+					    G_FILE_ATTRIBUTE_STANDARD_SIZE,
+					    NULL, NULL);
+
+  res = FALSE;
+  if (info)
+    {
+      if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE))
+	{
+	  *size = g_file_info_get_size (info);
+	  res = TRUE;
+	}
+      g_object_unref (info);
+    }
+  return res;
+}
+
 static gint
 vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
 {
   GFile  *file;
   GError *error  = NULL;
   gint    result = 0;
+  goffset current_size;
 
   debug_print ("vfs_ftruncate: %s\n", path);
 
@@ -1784,9 +1817,14 @@ vfs_ftruncate (const gchar *path, off_t size, struct fuse_file_info *fi)
                       fh->stream = NULL;
                     }
                 }
-              else
-                {
-                  result = -ENOTSUP;
+              else if (file_handle_get_size (fh, &current_size) &&
+		       current_size == size)
+		{
+		  /* Don't have to do anything to succeed */
+		}
+	      else
+		{
+		  result = -ENOTSUP;
                 }
 
               if (error)

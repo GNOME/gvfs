@@ -1,5 +1,13 @@
 2009-03-04  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 573837 – gvfs-fuse does not support ftruncate size != 0
+
+        * client/gvfsfusedaemon.c:
+	Support ftruncate to the current size as a NOP.
+	Fixes OOo saving
+
+2009-03-04  Alexander Larsson  <alexl@redhat.com>
+
 	* monitor/proxy/gproxyvolumemonitor.c:
 	Break circular dependencies on dispose.
 
