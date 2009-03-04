@@ -1,3 +1,8 @@
+2009-03-04  Alexander Larsson  <alexl@redhat.com>
+
+	* monitor/proxy/gproxyvolumemonitor.c:
+	Break circular dependencies on dispose.
+
 2009-03-03  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 561172 – gnome-open fails on local URIs with anchors

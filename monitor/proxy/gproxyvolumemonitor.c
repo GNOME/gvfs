@@ -167,6 +167,33 @@ g_proxy_volume_monitor_finalize (GObject *object)
     parent_class->finalize (object);
 }
 
+static void
+g_proxy_volume_monitor_dispose (GObject *object)
+{
+  GProxyVolumeMonitor *monitor;
+  GObjectClass *parent_class;
+
+  /* since GProxyVolumeMonitor is a non-instantiatable type we're dealing with a
+   * sub-type here. So we need to look at the grandparent sub-type to get the
+   * parent class for GProxyVolumeMonitor */
+  parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (
+                                 g_type_class_peek_parent (G_OBJECT_GET_CLASS (object))));
+
+  monitor = G_PROXY_VOLUME_MONITOR (object);
+
+  /* Clear all objects to avoid circular dependencies keeping things alive.
+   * Note that atm we're keeping the union monitor alive, so this won't
+   * actually happen, but better safe than sorry in case we change this
+   * later */
+  g_hash_table_remove_all (monitor->drives);
+  g_hash_table_remove_all (monitor->volumes);
+  g_hash_table_remove_all (monitor->mounts);
+  
+ if (parent_class->dispose)
+    parent_class->dispose (object);
+}
+
+
 static GList *
 get_mounts (GVolumeMonitor *volume_monitor)
 {
@@ -920,6 +947,7 @@ g_proxy_volume_monitor_class_init (GProxyVolumeMonitorClass *klass)
 
   gobject_class->constructor = g_proxy_volume_monitor_constructor;
   gobject_class->finalize = g_proxy_volume_monitor_finalize;
+  gobject_class->dispose = g_proxy_volume_monitor_dispose;
 
   monitor_class->get_mounts = get_mounts;
   monitor_class->get_volumes = get_volumes;
