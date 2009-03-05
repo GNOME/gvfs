@@ -684,6 +684,8 @@ ftp_connection_parse_features (FtpConnection *conn)
 	    }
 	}
     }
+  
+  g_strfreev (supported);
 }
 
 /* NB: you must free the connection if it's in error returning from here */
