@@ -27,6 +27,8 @@
 
 #include "gvfsmountinfo.h"
 
+#define VOLUME_INFO_GROUP "Volume Info"
+
 static GFile *
 _g_find_file_insensitive_finish (GFile        *parent,
                                  GAsyncResult *result,
@@ -271,12 +273,14 @@ on_xdg_volume_info_loaded (GObject      *source_object,
   GKeyFile *key_file;
   gchar *name;
   gchar *icon_name;
+  gchar *icon_file;
   GIcon *icon;
 
   content = NULL;
   key_file = NULL;
   name = NULL;
   icon_name = NULL;
+  icon_file = NULL;
 
   xdg_volume_info_file = G_FILE (source_object);
 
@@ -298,27 +302,47 @@ on_xdg_volume_info_loaded (GObject      *source_object,
 
 
       name = g_key_file_get_locale_string (key_file,
-                                           "XDG Volume Info",
+                                           VOLUME_INFO_GROUP,
                                            "Name",
                                            NULL,
                                            NULL);
 
-      icon_name = g_key_file_get_locale_string (key_file,
-                                                "XDG Volume Info",
-                                                "Icon",
-                                                NULL,
-                                                NULL);
+      icon_name = g_key_file_get_string (key_file,
+                                         VOLUME_INFO_GROUP,
+                                         "Icon",
+                                         NULL);
+      
+      icon_file = g_key_file_get_string (key_file,
+                                         VOLUME_INFO_GROUP,
+                                         "IconFile",
+                                         NULL);
 
-      if (icon_name != NULL)
+      icon = NULL;
+      
+      if (icon_file != NULL)
+        {
+          GFile *dir, *f;
+
+          dir = g_file_get_parent (xdg_volume_info_file);
+          if (dir)
+            {
+              f = g_file_resolve_relative_path (dir, icon_file);
+              if (f)
+                {
+                  icon = g_file_icon_new (f);
+                  g_object_unref (f);
+                }
+              
+              g_object_unref (dir);
+            }
+        }
+            
+      if (icon == NULL && icon_name != NULL)
         {
           icon = g_themed_icon_new (icon_name);
           g_themed_icon_append_name (G_THEMED_ICON (icon), "drive-removable-media");
           g_themed_icon_append_name (G_THEMED_ICON (icon), "drive-removable");
           g_themed_icon_append_name (G_THEMED_ICON (icon), "drive");
-        }
-      else
-        {
-          icon = NULL;
         }
 
       g_simple_async_result_set_op_res_gpointer (simple, icon, NULL);
@@ -343,6 +367,7 @@ on_xdg_volume_info_loaded (GObject      *source_object,
 
   g_free (name);
   g_free (icon_name);
+  g_free (icon_file);
   g_free (content);
 }
 

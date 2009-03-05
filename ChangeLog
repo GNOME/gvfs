@@ -1,5 +1,13 @@
 2009-03-05  Alexander Larsson  <alexl@redhat.com>
 
+        * common/gvfsmountinfo.c:
+	Updated .xdg-volume-info format as per bug 551403:
+	+ Group name is "Volume Info"
+	+ Icon is not translated
+	+ support IconFile key
+
+2009-03-05  Alexander Larsson  <alexl@redhat.com>
+
         * monitor/hal/ghaldrive.c:
         * monitor/hal/ghalmount.c:
         * monitor/hal/ghalvolume.c:
