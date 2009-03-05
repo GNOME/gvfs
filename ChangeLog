@@ -1,5 +1,12 @@
 2009-03-05  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 564003 – gvfs Cygwin patches
+	
+	* common/Makefile.am:
+	Add -no-undefined required for cygwin build
+
+2009-03-05  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 569199 – incorrectly open smb workgroup using a space
 	
 	* client/gvfsuriutils.c (g_vfs_encode_uri),

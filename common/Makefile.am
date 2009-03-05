@@ -21,6 +21,9 @@ libgvfscommon_la_SOURCES = 	\
 	gvfsfileinfo.c gvfsfileinfo.h \
 	$(NULL)
 
+# needed by cygwin (see bug #564003)
+libgvfscommon_la_LDFLAGS = -no-undefined
+
 libgvfscommon_la_LIBADD =	\
 	$(DBUS_LIBS) 	\
 	$(GLIB_LIBS)
