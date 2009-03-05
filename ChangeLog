@@ -1,5 +1,20 @@
 2009-03-05  Alexander Larsson  <alexl@redhat.com>
 
+        * monitor/hal/ghaldrive.c:
+        * monitor/hal/ghalmount.c:
+        * monitor/hal/ghalvolume.c:
+        * monitor/hal/ghalvolumemonitor.c:
+	Remove all locking (not needed since we're now
+	a single threaded process).
+	Don't emit signals in idle, thus risking callback
+	reordering. We don't need this anymore as it was
+	part of the locking structure.
+
+	This should fix the "No mount object for mounted
+	volume" error when mounting.
+
+2009-03-05  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 564003 – gvfs Cygwin patches
 	
 	* common/Makefile.am:

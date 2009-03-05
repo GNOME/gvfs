@@ -36,9 +36,6 @@
 
 #include "hal-utils.h"
 
-/* Protects all fields of GHalDrive that can change */
-G_LOCK_DEFINE_STATIC(hal_volume);
-
 struct _GHalVolume {
   GObject parent;
 
@@ -123,17 +120,12 @@ g_hal_volume_init (GHalVolume *hal_volume)
 {
 }
 
-static gboolean
-changed_in_idle (gpointer data)
+static void
+emit_volume_changed (GHalVolume *volume)
 {
-  GHalVolume *volume = data;
-  
   g_signal_emit_by_name (volume, "changed");
   if (volume->volume_monitor != NULL)
     g_signal_emit_by_name (volume->volume_monitor, "volume_changed", volume);
-  g_object_unref (volume);
-  
-  return FALSE;
 }
 
 #define KILOBYTE_FACTOR 1000.0
@@ -300,8 +292,6 @@ update_from_hal (GHalVolume *mv, gboolean emit_changed)
   char *old_icon;
   char *old_mount_path;
 
-  G_LOCK (hal_volume);
-  
   old_name = g_strdup (mv->name);
   old_icon = g_strdup (mv->icon);
   old_mount_path = g_strdup (mv->mount_path);
@@ -327,13 +317,11 @@ update_from_hal (GHalVolume *mv, gboolean emit_changed)
            old_icon == NULL ||
            strcmp (old_name, mv->name) != 0 ||
            strcmp (old_icon, mv->icon) != 0))
-        g_idle_add (changed_in_idle, g_object_ref (mv));
+	emit_volume_changed (mv);
     }
   g_free (old_name);
   g_free (old_icon);
   g_free (old_mount_path);
-
-  G_UNLOCK (hal_volume);
 }
 
 static void
@@ -439,8 +427,6 @@ void
 g_hal_volume_removed (GHalVolume *volume)
 {
 
-  G_LOCK (hal_volume);
-  
   if (volume->mount != NULL)
     {
       g_hal_mount_unset_volume (volume->mount, volume);
@@ -452,15 +438,12 @@ g_hal_volume_removed (GHalVolume *volume)
       g_hal_drive_unset_volume (volume->drive, volume);
       volume->drive = NULL;
     }
-
-  G_UNLOCK (hal_volume);
 }
 
 void
 g_hal_volume_set_mount (GHalVolume  *volume,
                         GHalMount *mount)
 {
-  G_LOCK (hal_volume);
   if (volume->mount != mount)
     {
       
@@ -469,29 +452,25 @@ g_hal_volume_set_mount (GHalVolume  *volume,
       
       volume->mount = mount;
 
-      g_idle_add (changed_in_idle, g_object_ref (volume));
+      emit_volume_changed (volume);
     }
-  G_UNLOCK (hal_volume);
 }
  
 void
 g_hal_volume_unset_mount (GHalVolume  *volume,
                           GHalMount *mount)
 {
-  G_LOCK (hal_volume);
   if (volume->mount == mount)
     {
       volume->mount = NULL;
-      g_idle_add (changed_in_idle, g_object_ref (volume));
+      emit_volume_changed (volume);
     }
-  G_UNLOCK (hal_volume);
 }
 
 void
 g_hal_volume_set_drive (GHalVolume  *volume,
                         GHalDrive *drive)
 {
-  G_LOCK (hal_volume);
   if (volume->drive != drive)
     {
       if (volume->drive != NULL)
@@ -499,22 +478,19 @@ g_hal_volume_set_drive (GHalVolume  *volume,
       
       volume->drive = drive;
       
-      g_idle_add (changed_in_idle, g_object_ref (volume));
+      emit_volume_changed (volume);
     }
-  G_UNLOCK (hal_volume);
 }
 
 void
 g_hal_volume_unset_drive (GHalVolume  *volume,
                           GHalDrive *drive)
 {
-  G_LOCK (hal_volume);
   if (volume->drive == drive)
     {
       volume->drive = NULL;
-      g_idle_add (changed_in_idle, g_object_ref (volume));
+      emit_volume_changed (volume);
     }
-  G_UNLOCK (hal_volume);
 }
 
 static GIcon *
@@ -525,7 +501,6 @@ g_hal_volume_get_icon (GVolume *volume)
   const char *name;
   const char *fallback;
 
-  G_LOCK (hal_volume);
   name = hal_volume->icon;
 
   if (hal_volume->icon_fallback)
@@ -534,7 +509,6 @@ g_hal_volume_get_icon (GVolume *volume)
     fallback = name;
 
   icon = get_themed_icon_with_fallbacks (name, fallback);
-  G_UNLOCK (hal_volume);
   return icon;
 }
 
@@ -542,39 +516,24 @@ static char *
 g_hal_volume_get_name (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  char *name;
 
-  G_LOCK (hal_volume);
-  name = g_strdup (hal_volume->name);
-  G_UNLOCK (hal_volume);
-  
-  return name;
+  return g_strdup (hal_volume->name);
 }
 
 static char *
 g_hal_volume_get_uuid (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  char *uuid;
 
-  G_LOCK (hal_volume);
-  uuid = g_strdup (hal_volume->uuid);
-  G_UNLOCK (hal_volume);
-  
-  return uuid;
+  return g_strdup (hal_volume->uuid);
 }
 
 static gboolean
 g_hal_volume_can_mount (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  gboolean res;
 
-  G_LOCK (hal_volume);
-  res = hal_volume->is_mountable;
-  G_UNLOCK (hal_volume);
-  
-  return res;
+  return hal_volume->is_mountable;
 }
 
 static gboolean
@@ -583,11 +542,9 @@ g_hal_volume_can_eject (GVolume *volume)
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
 
-  G_LOCK (hal_volume);
   res = FALSE;
   if (hal_volume->drive != NULL)
     res = g_drive_can_eject (G_DRIVE (hal_volume->drive));
-  G_UNLOCK (hal_volume);
   
   return res;
 }
@@ -596,13 +553,8 @@ static gboolean
 g_hal_volume_should_automount (GVolume *volume)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
-  gboolean res;
 
-  G_LOCK (hal_volume);
-  res = ! (hal_volume->ignore_automount);
-  G_UNLOCK (hal_volume);
-  
-  return res;
+  return  ! (hal_volume->ignore_automount);
 }
 
 static GDrive *
@@ -611,11 +563,9 @@ g_hal_volume_get_drive (GVolume *volume)
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   GDrive *drive;
 
-  G_LOCK (hal_volume);
   drive = NULL;
   if (hal_volume->drive != NULL)
     drive = g_object_ref (hal_volume->drive);
-  G_UNLOCK (hal_volume);
   
   return drive;
 }
@@ -626,13 +576,11 @@ g_hal_volume_get_mount (GVolume *volume)
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   GMount *mount;
 
-  G_LOCK (hal_volume);
   mount = NULL;
   if (hal_volume->foreign_mount != NULL)
     mount = g_object_ref (hal_volume->foreign_mount);
   else if (hal_volume->mount != NULL)
     mount = g_object_ref (hal_volume->mount);
-  G_UNLOCK (hal_volume);
 
   return mount;
 }
@@ -643,11 +591,9 @@ g_hal_volume_has_mount_path (GHalVolume *volume,
 {
   gboolean res;
 
-  G_LOCK (hal_volume);
   res = FALSE;
   if (volume->mount_path != NULL)
     res = strcmp (volume->mount_path, mount_path) == 0;
-  G_UNLOCK (hal_volume);
 
   return res;
 }
@@ -659,10 +605,8 @@ g_hal_volume_has_device_path (GHalVolume *volume,
   gboolean res;
 
   res = FALSE;
-  G_LOCK (hal_volume);
   if (volume->device_path != NULL)
     res = strcmp (volume->device_path, device_path) == 0;
-  G_UNLOCK (hal_volume);
   return res;
 }
 
@@ -673,11 +617,9 @@ g_hal_volume_has_udi (GHalVolume  *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
   
-  G_LOCK (hal_volume);
   res = FALSE;
   if (hal_volume->device != NULL)
     res = strcmp (hal_device_get_udi (hal_volume->device), udi) == 0;
-  G_UNLOCK (hal_volume);
   return res;
 }
 
@@ -688,11 +630,9 @@ g_hal_volume_has_uuid (GHalVolume  *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
 
-  G_LOCK (hal_volume);
   res = FALSE;
   if (hal_volume->uuid != NULL)
     res = strcmp (hal_volume->uuid, uuid) == 0;
-  G_UNLOCK (hal_volume);
 
   return res;
 }
@@ -703,9 +643,7 @@ foreign_mount_unmounted (GMount *mount, gpointer user_data)
   GHalVolume *volume = G_HAL_VOLUME (user_data);
   gboolean check;
 
-  G_LOCK (hal_volume);
   check = volume->foreign_mount == mount;
-  G_UNLOCK (hal_volume);
   if (check)
     g_hal_volume_adopt_foreign_mount (volume, NULL);
 }
@@ -713,7 +651,6 @@ foreign_mount_unmounted (GMount *mount, gpointer user_data)
 void
 g_hal_volume_adopt_foreign_mount (GHalVolume *volume, GMount *foreign_mount)
 {
-  G_LOCK (hal_volume);
   if (volume->foreign_mount != NULL)
     g_object_unref (volume->foreign_mount);
 
@@ -724,9 +661,8 @@ g_hal_volume_adopt_foreign_mount (GHalVolume *volume, GMount *foreign_mount)
     }
   else
     volume->foreign_mount =  NULL;
-
-  g_idle_add (changed_in_idle, g_object_ref (volume));
-  G_UNLOCK (hal_volume);
+  
+  emit_volume_changed (volume);
 }
 
 gboolean
@@ -736,11 +672,9 @@ g_hal_volume_has_foreign_mount_root (GHalVolume       *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
 
-  G_LOCK (hal_volume);
   res = FALSE;
   if (hal_volume->foreign_mount_root != NULL)
     res = g_file_equal (hal_volume->foreign_mount_root, mount_root);
-  G_UNLOCK (hal_volume);
   
   return res;
 }
@@ -864,7 +798,6 @@ g_hal_volume_mount (GVolume             *volume,
               hal_volume->foreign_mount_root,
               hal_volume->device_path);*/
 
-  G_LOCK (hal_volume);
   if (hal_volume->foreign_mount_root != NULL)
     {
       ForeignMountOp *data;
@@ -890,7 +823,6 @@ g_hal_volume_mount (GVolume             *volume,
         argv[4] = "-n";
       spawn_do (volume, cancellable, callback, user_data, argv);
     }
-  G_UNLOCK (hal_volume);
 }
 
 static gboolean
@@ -901,13 +833,10 @@ g_hal_volume_mount_finish (GVolume       *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
 
-  G_LOCK (hal_volume);
   res = TRUE;
   
   if (hal_volume->foreign_mount_root != NULL)
     res = g_file_mount_enclosing_volume_finish (hal_volume->foreign_mount_root, result, error);
-  
-  G_UNLOCK (hal_volume);
   
   return res;
 }
@@ -942,10 +871,8 @@ g_hal_volume_eject (GVolume              *volume,
   /*g_warning ("hal_volume_eject");*/
 
   drive = NULL;
-  G_LOCK (hal_volume);
   if (hal_volume->drive != NULL)
     drive = g_object_ref (hal_volume->drive);
-  G_UNLOCK (hal_volume);
 
   if (drive != NULL)
     {
@@ -967,11 +894,9 @@ g_hal_volume_eject_finish (GVolume        *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
 
-  G_LOCK (hal_volume);
   res = TRUE;
   if (hal_volume->drive != NULL)
     res = g_drive_eject_finish (G_DRIVE (hal_volume->drive), result, error);
-  G_UNLOCK (hal_volume);
   return res;
 }
 
@@ -982,7 +907,6 @@ g_hal_volume_get_identifier (GVolume              *volume,
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   char *id;
 
-  G_LOCK (hal_volume);
   id = NULL;
   if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_HAL_UDI) == 0)
     id = g_strdup (hal_device_get_udi (hal_volume->device));
@@ -992,7 +916,6 @@ g_hal_volume_get_identifier (GVolume              *volume,
     id = g_strdup (hal_device_get_property_string (hal_volume->device, "volume.label"));
   else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
     id = g_strdup (hal_device_get_property_string (hal_volume->device, "volume.uuid"));
-  G_UNLOCK (hal_volume);
   
   return id;
 }
@@ -1003,8 +926,6 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   GPtrArray *res;
   const char *label, *uuid;
-
-  G_LOCK (hal_volume);
 
   res = g_ptr_array_new ();
 
@@ -1029,8 +950,6 @@ g_hal_volume_enumerate_identifiers (GVolume *volume)
   /* Null-terminate */
   g_ptr_array_add (res, NULL);
 
-  G_UNLOCK (hal_volume);
-
   return (char **)g_ptr_array_free (res, FALSE);
 }
 
@@ -1040,10 +959,8 @@ g_hal_volume_get_activation_root (GVolume *volume)
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   GFile *root = NULL;
 
-  G_LOCK (hal_volume);
   if (hal_volume->foreign_mount_root != NULL)
     root = g_object_ref (hal_volume->foreign_mount_root);
-  G_UNLOCK (hal_volume);
 
   return root;
 }

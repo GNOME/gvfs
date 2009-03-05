@@ -33,9 +33,6 @@
 #include "ghaldrive.h"
 #include "ghalvolume.h"
 
-/* Protects all fields of GHalDrive that can change */
-G_LOCK_DEFINE_STATIC(hal_drive);
-
 struct _GHalDrive {
   GObject parent;
 
@@ -300,17 +297,12 @@ _do_update_from_hal (GHalDrive *d)
     }
 }
 
-static gboolean
-changed_in_idle (gpointer data)
+static void
+emit_drive_changed (GHalDrive *drive)
 {
-  GHalDrive *drive = data;
-  
   g_signal_emit_by_name (drive, "changed");
   if (drive->volume_monitor != NULL)
     g_signal_emit_by_name (drive->volume_monitor, "drive_changed", drive);
-  g_object_unref (drive);
-  
-  return FALSE;
 }
 
 static void
@@ -324,8 +316,6 @@ _update_from_hal (GHalDrive *d, gboolean emit_changed)
   gboolean old_can_poll_for_media;
   gboolean old_can_eject;
 
-  G_LOCK (hal_drive);
-  
   old_name = g_strdup (d->name);
   old_icon = g_strdup (d->icon);
   old_uses_removable_media = d->uses_removable_media;
@@ -348,12 +338,10 @@ _update_from_hal (GHalDrive *d, gboolean emit_changed)
        old_icon == NULL ||
        strcmp (old_name, d->name) != 0 ||
        strcmp (old_icon, d->icon) != 0))
-      g_idle_add (changed_in_idle, g_object_ref (d));
+    emit_drive_changed (d);
   
   g_free (old_name);
   g_free (old_icon);
-
-  G_UNLOCK (hal_drive);
 }
 
 static void
@@ -409,10 +397,8 @@ g_hal_drive_disconnected (GHalDrive *drive)
 {
   GList *l, *volumes;
 
-  G_LOCK (hal_drive);
   volumes = drive->volumes;
   drive->volumes = NULL;
-  G_UNLOCK (hal_drive);
   
   for (l = volumes; l != NULL; l = l->next)
     {
@@ -428,15 +414,11 @@ g_hal_drive_set_volume (GHalDrive *drive,
                         GHalVolume *volume)
 {
 
-  G_LOCK (hal_drive);
-  
   if (g_list_find (drive->volumes, volume) == NULL)
     {
       drive->volumes = g_list_prepend (drive->volumes, volume);
-      g_idle_add (changed_in_idle, g_object_ref (drive));
+      emit_drive_changed (drive);
     }
-
-  G_UNLOCK (hal_drive);
 }
 
 void 
@@ -445,17 +427,13 @@ g_hal_drive_unset_volume (GHalDrive *drive,
 {
   GList *l;
 
-  G_LOCK (hal_drive);
-  
   l = g_list_find (drive->volumes, volume);
   if (l != NULL)
     {
       drive->volumes = g_list_delete_link (drive->volumes, l);
 
-      g_idle_add (changed_in_idle, g_object_ref (drive));
+      emit_drive_changed (drive);
     }
-  
-  G_UNLOCK (hal_drive);
 }
 
 gboolean 
@@ -463,9 +441,7 @@ g_hal_drive_has_udi (GHalDrive *drive, const char *udi)
 {
   gboolean res;
   
-  G_LOCK (hal_drive);
   res = strcmp (udi, hal_device_get_udi (drive->device)) == 0;
-  G_UNLOCK (hal_drive);
 
   return res;
 }
@@ -476,9 +452,7 @@ g_hal_drive_get_icon (GDrive *drive)
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
   GIcon *icon;
 
-  G_LOCK (hal_drive);
   icon = g_themed_icon_new_with_default_fallbacks (hal_drive->icon);
-  G_UNLOCK (hal_drive);
   
   return icon; 
 }
@@ -489,9 +463,7 @@ g_hal_drive_get_name (GDrive *drive)
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
   char *name;
 
-  G_LOCK (hal_drive);
   name = g_strdup (hal_drive->name);
-  G_UNLOCK (hal_drive);
   
   return name;
 }
@@ -502,10 +474,8 @@ g_hal_drive_get_volumes (GDrive *drive)
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
   GList *l;
 
-  G_LOCK (hal_drive);
   l = g_list_copy (hal_drive->volumes);
   g_list_foreach (l, (GFunc) g_object_ref, NULL);
-  G_UNLOCK (hal_drive);
 
   return l;
 }
@@ -514,52 +484,32 @@ static gboolean
 g_hal_drive_has_volumes (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
-  gboolean res;
 
-  G_LOCK (hal_drive);
-  res = hal_drive->volumes != NULL;
-  G_UNLOCK (hal_drive);
-  
-  return res;
+  return hal_drive->volumes != NULL;
 }
 
 static gboolean
 g_hal_drive_is_media_removable (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
-  gboolean res;
 
-  G_LOCK (hal_drive);
-  res = hal_drive->uses_removable_media;
-  G_UNLOCK (hal_drive);
-  
-  return res;
+  return hal_drive->uses_removable_media;
 }
 
 static gboolean
 g_hal_drive_has_media (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
-  gboolean res;
 
-  G_LOCK (hal_drive);
-  res = hal_drive->has_media;
-  G_UNLOCK (hal_drive);
-  
-  return res;
+  return hal_drive->has_media;
 }
 
 static gboolean
 g_hal_drive_is_media_check_automatic (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
-  gboolean res;
 
-  G_LOCK (hal_drive);
-  res = hal_drive->is_media_check_automatic;
-  G_UNLOCK (hal_drive);
-  
-  return res;
+  return hal_drive->is_media_check_automatic;
 }
 
 static gboolean
@@ -568,24 +518,15 @@ g_hal_drive_can_eject (GDrive *drive)
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
   gboolean res;
   
-  G_LOCK (hal_drive);
-  res = hal_drive->can_eject;
-  G_UNLOCK (hal_drive);
-
-  return res;
+  return hal_drive->can_eject;
 }
 
 static gboolean
 g_hal_drive_can_poll_for_media (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
-  gboolean res;
   
-  G_LOCK (hal_drive);
-  res = hal_drive->can_poll_for_media;
-  G_UNLOCK (hal_drive);
-
-  return res;
+  return hal_drive->can_poll_for_media;
 }
 
 typedef struct {
@@ -639,9 +580,7 @@ g_hal_drive_eject_do (GDrive              *drive,
   GError *error;
   char *argv[] = {"gnome-mount", "-e", "-b", "-d", NULL, NULL};
 
-  G_LOCK (hal_drive);
   argv[4] = g_strdup (hal_drive->device_path);
-  G_UNLOCK (hal_drive);
   
   data = g_new0 (SpawnOp, 1);
   data->object = g_object_ref (drive);
@@ -799,7 +738,6 @@ g_hal_drive_eject (GDrive              *drive,
   data->user_data = user_data;
   data->flags = flags;
 
-  G_LOCK (hal_drive);
   for (l = hal_drive->volumes; l != NULL; l = l->next)
     {
       GHalVolume *volume = l->data;
@@ -809,7 +747,6 @@ g_hal_drive_eject (GDrive              *drive,
       if (mount != NULL && g_mount_can_unmount (mount))
         data->pending_mounts = g_list_prepend (data->pending_mounts, g_object_ref (mount));
     }
-  G_UNLOCK (hal_drive);
 
   _eject_unmount_mounts (data);
 }
@@ -897,13 +834,11 @@ g_hal_drive_poll_for_media (GDrive              *drive,
 
   /*g_warning ("Rescanning udi %s", hal_device_get_udi (hal_drive->device));*/
 
-  G_LOCK (hal_drive);
   con = hal_pool_get_dbus_connection (hal_drive->pool);
   msg = dbus_message_new_method_call ("org.freedesktop.Hal",
                                       hal_device_get_udi (hal_drive->device),
                                       "org.freedesktop.Hal.Device.Storage.Removable",
                                       "CheckForMedia");
-  G_UNLOCK (hal_drive);
 
   if (!dbus_connection_send_with_reply (con, msg, &pending_call, -1))
     {
@@ -949,15 +884,11 @@ g_hal_drive_get_identifier (GDrive              *drive,
 
   res = NULL;
 
-  G_LOCK (hal_drive);
-  
   if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_HAL_UDI) == 0)
     res = g_strdup (hal_device_get_udi (hal_drive->device));
   
   if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
     res = g_strdup (hal_drive->device_path);
-  
-  G_UNLOCK (hal_drive);
   
   return res;
 }
@@ -970,8 +901,6 @@ g_hal_drive_enumerate_identifiers (GDrive *drive)
 
   res = g_ptr_array_new ();
 
-  G_LOCK (hal_drive);
-  
   g_ptr_array_add (res,
                    g_strdup (G_VOLUME_IDENTIFIER_KIND_HAL_UDI));
 
@@ -979,8 +908,6 @@ g_hal_drive_enumerate_identifiers (GDrive *drive)
     g_ptr_array_add (res,
                      g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
     
-
-  G_UNLOCK (hal_drive);
   
   /* Null-terminate */
   g_ptr_array_add (res, NULL);

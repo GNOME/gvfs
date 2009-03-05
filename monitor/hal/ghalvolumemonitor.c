@@ -42,11 +42,9 @@
  * us without an instance..  and ideally we want to piggyback on an
  * already existing instance. 
  *
- * We avoid locking since GUnionVolumeMonitor, the only user of us,
- * does locking.
+ * We don't need locking since this runs out of process in a single
+ * threaded mode with now weird things happening in signal handlers.
  */
-
-G_LOCK_DEFINE_STATIC(hal_vm);
 
 static GHalVolumeMonitor *the_volume_monitor = NULL;
 static HalPool *pool = NULL;
@@ -127,9 +125,7 @@ g_hal_volume_monitor_dispose (GObject *object)
   
   monitor = G_HAL_VOLUME_MONITOR (object);
 
-  G_LOCK (hal_vm);
   the_volume_monitor = NULL;
-  G_UNLOCK (hal_vm);
   
   if (G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->dispose)
     (*G_OBJECT_CLASS (g_hal_volume_monitor_parent_class)->dispose) (object);
@@ -176,15 +172,11 @@ get_mounts (GVolumeMonitor *volume_monitor)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
-  
   l = g_list_copy (monitor->mounts);
   ll = g_list_copy (monitor->disc_mounts);
   l = g_list_concat (l, ll);
 
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
-
-  G_UNLOCK (hal_vm);
 
   return l;
 }
@@ -197,16 +189,12 @@ get_volumes (GVolumeMonitor *volume_monitor)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
-
   l = g_list_copy (monitor->volumes);
   ll = g_list_copy (monitor->disc_volumes);
   l = g_list_concat (l, ll);
 
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
-  G_UNLOCK (hal_vm);
-  
   return l;
 }
 
@@ -218,13 +206,9 @@ get_connected_drives (GVolumeMonitor *volume_monitor)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
-
   l = g_list_copy (monitor->drives);
   g_list_foreach (l, (GFunc)g_object_ref, NULL);
 
-  G_UNLOCK (hal_vm);
-  
   return l;
 }
 
@@ -237,8 +221,6 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
-  
   volume = NULL;
 
   for (l = monitor->volumes; l != NULL; l = l->next)
@@ -255,15 +237,11 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
         goto found;
     }
 
-  G_UNLOCK (hal_vm);
-  
   return NULL;
 
  found:
 
   g_object_ref (volume);
-  
-  G_UNLOCK (hal_vm);
 
   return (GVolume *)volume;
 }
@@ -277,8 +255,6 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   
   monitor = G_HAL_VOLUME_MONITOR (volume_monitor);
 
-  G_LOCK (hal_vm);
-  
   mount = NULL;
 
   for (l = monitor->mounts; l != NULL; l = l->next)
@@ -295,15 +271,11 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
         goto found;
     }
 
-  G_UNLOCK (hal_vm);
-  
   return NULL;
 
  found:
 
   g_object_ref (mount);
-  
-  G_UNLOCK (hal_vm);
   
   return (GMount *)mount;
 }
@@ -316,11 +288,9 @@ get_mount_for_mount_path (const char *mount_path,
   GHalMount *hal_mount;
   GHalVolumeMonitor *volume_monitor;
 
-  G_LOCK (hal_vm);
   volume_monitor = NULL;
   if (the_volume_monitor != NULL)
     volume_monitor = g_object_ref (the_volume_monitor);
-  G_UNLOCK (hal_vm);
 
   if (volume_monitor == NULL)
     {
@@ -341,8 +311,6 @@ get_mount_for_mount_path (const char *mount_path,
     {
       GList *l;
 
-      G_LOCK (hal_vm);
-      
       for (l = volume_monitor->mounts; l != NULL; l = l->next)
         {
           hal_mount = l->data;
@@ -354,8 +322,6 @@ get_mount_for_mount_path (const char *mount_path,
             }
         }
 
-      G_UNLOCK (hal_vm);
-      
       g_object_unref (volume_monitor);
     }
 
@@ -408,14 +374,11 @@ g_hal_volume_monitor_constructor (GType                  type,
   GHalVolumeMonitorClass *klass;
   GObjectClass *parent_class;  
 
-  G_LOCK (hal_vm);
   if (the_volume_monitor != NULL)
     {
       object = g_object_ref (the_volume_monitor);
-      G_UNLOCK (hal_vm);
       return object;
     }
-  G_UNLOCK (hal_vm);
 
   /*g_warning ("creating hal vm");*/
 
@@ -451,9 +414,7 @@ g_hal_volume_monitor_constructor (GType                  type,
 		    
   update_all (monitor, FALSE, TRUE);
 
-  G_LOCK (hal_vm);
   the_volume_monitor = monitor;
-  G_UNLOCK (hal_vm);
 
   return object;
 }
@@ -482,10 +443,8 @@ adopt_orphan_mount (GMount *mount, GVolumeMonitor *monitor)
   */
   ret = NULL;
   
-  G_LOCK (hal_vm);
   if (the_volume_monitor == NULL)
     {
-      G_UNLOCK (hal_vm);
       return NULL;
     }
 
@@ -507,7 +466,6 @@ adopt_orphan_mount (GMount *mount, GVolumeMonitor *monitor)
  found:
   g_object_unref (mount_root);
   
-  G_UNLOCK (hal_vm);
   return ret;
 }
 
@@ -989,14 +947,12 @@ update_all (GHalVolumeMonitor *monitor,
   added_mounts = NULL;
   removed_mounts = NULL;
   
-  G_LOCK (hal_vm);
   update_drives (monitor, &added_drives, &removed_drives);
   update_volumes (monitor, &added_volumes, &removed_volumes);
   update_mounts (monitor, &added_mounts, &removed_mounts);
   update_discs (monitor,
                 &added_volumes, &removed_volumes,
                 &added_mounts, &removed_mounts);
-  G_UNLOCK (hal_vm);
 
   if (emit_changes)
     {

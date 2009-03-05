@@ -39,9 +39,6 @@
 
 #include "hal-utils.h"
 
-/* Protects all fields of GHalDrive that can change */
-G_LOCK_DEFINE_STATIC(hal_mount);
-
 struct _GHalMount {
   GObject parent;
 
@@ -138,17 +135,12 @@ g_hal_mount_init (GHalMount *hal_mount)
 {
 }
 
-static gboolean
-changed_in_idle (gpointer data)
+static void
+emit_mount_changed (GHalMount *mount)
 {
-  GHalMount *mount = data;
-  
   g_signal_emit_by_name (mount, "changed");
   if (mount->volume_monitor != NULL)
     g_signal_emit_by_name (mount->volume_monitor, "mount_changed", mount);
-  g_object_unref (mount);
-  
-  return FALSE;
 }
 
 #define KILOBYTE_FACTOR 1000.0
@@ -404,8 +396,6 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
   char *old_name;
   GIcon *old_icon;
 
-  G_LOCK (hal_mount);
-  
   old_name = g_strdup (m->name);
   old_icon = m->icon != NULL ? g_object_ref (m->icon) : NULL;
 
@@ -420,13 +410,11 @@ update_from_hal (GHalMount *m, gboolean emit_changed)
           old_icon == NULL ||
           strcmp (old_name, m->name) != 0 ||
           (! g_icon_equal (old_icon, m->icon)))
-        g_idle_add (changed_in_idle, g_object_ref (m));
+        emit_mount_changed (m);
     }
   g_free (old_name);
   if (old_icon != NULL)
     g_object_unref (old_icon);
-
-  G_UNLOCK (hal_mount);
 }
 
 static void
@@ -519,8 +507,6 @@ g_hal_mount_new_for_hal_device    (GVolumeMonitor    *volume_monitor,
 void 
 g_hal_mount_override_name (GHalMount *mount, const char *name)
 {
-  G_LOCK (hal_mount);
-  
   g_free (mount->override_name);
 
   if (name != NULL)
@@ -528,15 +514,12 @@ g_hal_mount_override_name (GHalMount *mount, const char *name)
   else
     mount->override_name = NULL;
   
-  G_UNLOCK (hal_mount);
-
   update_from_hal (mount, TRUE);
 }
 
 void
 g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
 {
-  G_LOCK (hal_mount);
   if (mount->override_icon != NULL)
     g_object_unref (mount->override_icon);
 
@@ -545,8 +528,6 @@ g_hal_mount_override_icon (GHalMount *mount, GIcon *icon)
   else
     mount->override_icon = NULL;
 
-  G_UNLOCK (hal_mount);
-  
   update_from_hal (mount, TRUE);
 }
 
@@ -634,27 +615,23 @@ g_hal_mount_new (GVolumeMonitor       *volume_monitor,
 void
 g_hal_mount_unmounted (GHalMount *mount)
 {
-  G_LOCK (hal_mount);
   if (mount->volume != NULL)
     {
       g_hal_volume_unset_mount (mount->volume, mount);
       mount->volume = NULL;
-      g_idle_add (changed_in_idle, g_object_ref (mount));
+      emit_mount_changed (mount);
     }
-  G_UNLOCK (hal_mount);
 }
 
 void
 g_hal_mount_unset_volume (GHalMount *mount,
                                        GHalVolume  *volume)
 {
-  G_LOCK (hal_mount);
   if (mount->volume == volume)
     {
       mount->volume = NULL;
-      g_idle_add (changed_in_idle, g_object_ref (mount));
+      emit_mount_changed (mount);
     }
-  G_UNLOCK (hal_mount);
 }
 
 static GFile *
@@ -670,52 +647,32 @@ static GFile *
 g_hal_mount_get_root (GMount *mount)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
-  GFile *root;
-
-  G_LOCK (hal_mount);
-  root = get_root (hal_mount);
-  G_UNLOCK (hal_mount);
-
-  return root;
+  
+  return get_root (hal_mount);
 }
 
 static GIcon *
 g_hal_mount_get_icon (GMount *mount)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
-  GIcon *icon;
 
-  G_LOCK (hal_mount);
-  icon = g_object_ref (hal_mount->icon);
-  G_UNLOCK (hal_mount);
-  
-  return icon;
+  return g_object_ref (hal_mount->icon);
 }
 
 static char *
 g_hal_mount_get_uuid (GMount *mount)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
-  char *uuid;
 
-  G_LOCK (hal_mount);
-  uuid = g_strdup (hal_mount->uuid);
-  G_UNLOCK (hal_mount);
-  
-  return uuid;
+  return g_strdup (hal_mount->uuid);
 }
 
 static char *
 g_hal_mount_get_name (GMount *mount)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
-  char *name;
-
-  G_LOCK (hal_mount);
-  name = g_strdup (hal_mount->name);
-  G_UNLOCK (hal_mount);
   
-  return name;
+  return g_strdup (hal_mount->name);
 }
 
 gboolean
@@ -724,11 +681,9 @@ g_hal_mount_has_uuid (GHalMount         *mount,
 {
   gboolean res;
 
-  G_LOCK (hal_mount);
   res = FALSE;
   if (mount->uuid != NULL)
     res = strcmp (mount->uuid, uuid) == 0;
-  G_UNLOCK (hal_mount);
 
   return res;
 }
@@ -737,12 +692,7 @@ gboolean
 g_hal_mount_has_mount_path (GHalMount *mount,
                             const char  *mount_path)
 {
-  gboolean res;
-
-  G_LOCK (hal_mount);
-  res = strcmp (mount->mount_path, mount_path) == 0;
-  G_UNLOCK (hal_mount);
-  return res;
+  return strcmp (mount->mount_path, mount_path) == 0;
 }
 
 gboolean
@@ -751,11 +701,9 @@ g_hal_mount_has_udi (GHalMount *mount,
 {
   gboolean res;
 
-  G_LOCK (hal_mount);
   res = FALSE;
   if (mount->device != NULL)
     res = strcmp (hal_device_get_udi (mount->device), udi) == 0;
-  G_UNLOCK (hal_mount);
 
   return res;
 }
@@ -766,11 +714,9 @@ g_hal_mount_get_drive (GMount *mount)
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   GDrive *drive;
 
-  G_LOCK (hal_mount);
   drive = NULL;
   if (hal_mount->volume != NULL)
     drive = g_volume_get_drive (G_VOLUME (hal_mount->volume));
-  G_UNLOCK (hal_mount);
 
   return drive;
 }
@@ -781,11 +727,9 @@ g_hal_mount_get_volume (GMount *mount)
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   GVolume *volume;
 
-  G_LOCK (hal_mount);
   volume = NULL;
   if (hal_mount->volume)
     volume = G_VOLUME (g_object_ref (hal_mount->volume));
-  G_UNLOCK (hal_mount);
   
   return volume;
 }
@@ -796,11 +740,9 @@ g_hal_mount_can_unmount (GMount *mount)
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   gboolean res;
 
-  G_LOCK (hal_mount);
   res = TRUE;
   if (hal_mount->cannot_unmount)
     res = FALSE;
-  G_UNLOCK (hal_mount);
 
   return res;
 }
@@ -812,7 +754,6 @@ g_hal_mount_can_eject (GMount *mount)
   GDrive *drive;
   gboolean can_eject;
 
-  G_LOCK (hal_mount);
   can_eject = FALSE;
   if (hal_mount->volume != NULL)
     {
@@ -820,7 +761,6 @@ g_hal_mount_can_eject (GMount *mount)
       if (drive != NULL)
         can_eject = g_drive_can_eject (drive);
     }
-  G_UNLOCK (hal_mount);
 
   return can_eject;
 }
@@ -968,11 +908,8 @@ g_hal_mount_unmount (GMount              *mount,
   gboolean using_legacy = FALSE;
   char *d, *m;
 
-  G_LOCK (hal_mount);
   d = g_strdup (hal_mount->device_path);
   m = g_strdup (hal_mount->mount_path);
-  G_UNLOCK (hal_mount);
-
   
   if (hal_mount->device != NULL)
     argv[4] = d;
@@ -1024,11 +961,9 @@ g_hal_mount_eject (GMount              *mount,
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   GDrive *drive;
 
-  G_LOCK (hal_mount);
   drive = NULL;
   if (hal_mount->volume != NULL)
     drive = g_volume_get_drive (G_VOLUME (hal_mount->volume));
-  G_UNLOCK (hal_mount);
   
   if (drive != NULL)
     {
@@ -1053,11 +988,9 @@ g_hal_mount_eject_finish (GMount        *mount,
 
   res = TRUE;
   
-  G_LOCK (hal_mount);
   drive = NULL;
   if (hal_mount->volume != NULL)
     drive = g_volume_get_drive (G_VOLUME (hal_mount->volume));
-  G_UNLOCK (hal_mount);
   
   if (drive != NULL)
     {
@@ -1085,8 +1018,6 @@ g_hal_mount_guess_content_type_sync (GMount              *mount,
   char *uri;
 
   p = g_ptr_array_new ();
-
-  G_LOCK (hal_mount);
 
   root = get_root (hal_mount);
   uri = g_file_get_uri (root);
@@ -1148,8 +1079,6 @@ g_hal_mount_guess_content_type_sync (GMount              *mount,
       g_ptr_array_add (p, NULL);
       result = (char **) g_ptr_array_free (p, FALSE);
     }
-
-  G_UNLOCK (hal_mount);
 
   return result;
 }
