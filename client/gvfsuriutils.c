@@ -225,7 +225,7 @@ g_vfs_decode_uri (const char *uri)
 	  decoded->port = -1;
 	}
 
-      decoded->host = g_strndup (host_start, host_end - host_start);
+      decoded->host = g_uri_unescape_segment (host_start, host_end, NULL);
 
       hier_part_start = authority_end;
     }
@@ -261,7 +261,10 @@ g_vfs_encode_uri (GDecodedUri *decoded, gboolean allow_utf8)
 	  g_string_append_c (uri, '@');
 	}
       
-      g_string_append (uri, decoded->host);
+      g_string_append_uri_escaped (uri, decoded->host,
+				   /* Allowed unescaped in hostname / ip address */
+				   G_URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS ":[]" ,
+				   allow_utf8);
       
       if (decoded->port != -1)
 	{

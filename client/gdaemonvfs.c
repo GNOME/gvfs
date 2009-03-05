@@ -234,7 +234,7 @@ get_mountspec_from_uri (GDaemonVfs *vfs,
 	      if (mountable && mountable->host_is_inet)
 		{
 		  /* Convert hostname to lower case */
-          str_tolower_inplace (decoded->host);
+		  str_tolower_inplace (decoded->host);
 		  
 		  /* Remove brackets aroung ipv6 addresses */
 		  l = strlen (decoded->host);

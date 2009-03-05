@@ -1,5 +1,18 @@
 2009-03-05  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 569199 – incorrectly open smb workgroup using a space
+	
+	* client/gvfsuriutils.c (g_vfs_encode_uri),
+	(g_vfs_decode_uri):
+	Escape and unescape host part too. This means we handle
+	e.g. smb workgroups with spaces in them. Allowing
+	escapes in hostnames complies with RFC 3986.
+
+	* client/gdaemonvfs.c (get_mountspec_from_uri): 
+	Fix indentation
+	
+2009-03-05  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 573381 – Memory leak in ftp_connection_parse_features()
 	
 	* daemon/gvfsbackendftp.c (ftp_connection_parse_features):
