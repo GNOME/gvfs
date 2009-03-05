@@ -1,3 +1,8 @@
+2009-03-06  Manoj Kumar Giri  <mgiri@redhat.com>
+
+	* or.po: Updated Oriya Translation.
+	* LINGUAS: Added Oriya (or) in the list.
+
 2009-03-03  Gil Forcada  <gforcada@gnome.org>
 
 	* ca.po: Updated Catalan translation.
