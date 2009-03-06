@@ -735,7 +735,7 @@ iterate_read_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op
 				 current_len + len);
 	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
-	      io_op->io_allow_cancel = !op->sent_cancel;
+	      io_op->io_allow_cancel = file->input_buffer->len == 0 && !op->sent_cancel;
 	      return STATE_OP_READ;
 	    }
 
@@ -993,7 +993,7 @@ iterate_close_state_machine (GDaemonFileInputStream *file, IOOperationData *io_o
 				 current_len + len);
 	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
-	      io_op->io_allow_cancel = !op->sent_cancel;
+	      io_op->io_allow_cancel = file->input_buffer->len == 0 && !op->sent_cancel;
 	      return STATE_OP_READ;
 	    }
 
@@ -1257,7 +1257,7 @@ iterate_seek_state_machine (GDaemonFileInputStream *file, IOOperationData *io_op
 				 current_len + len);
 	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
-	      io_op->io_allow_cancel = !op->sent_cancel;
+	      io_op->io_allow_cancel = file->input_buffer->len == 0 && !op->sent_cancel;
 	      return STATE_OP_READ;
 	    }
 
@@ -1534,7 +1534,7 @@ iterate_query_state_machine (GDaemonFileInputStream *file,
 				 current_len + len);
 	      io_op->io_buffer = file->input_buffer->str + current_len;
 	      io_op->io_size = len;
-	      io_op->io_allow_cancel = !op->sent_cancel;
+	      io_op->io_allow_cancel = file->input_buffer->len == 0 && !op->sent_cancel;
 	      return STATE_OP_READ;
 	    }
 
