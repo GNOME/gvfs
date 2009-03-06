@@ -1,5 +1,13 @@
 2009-03-06  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 535814 – hangup on g_input_stream_close after cancelling from other thread
+        * daemon/gvfschannel.c:
+	Reverted patch from bug 522192 as it caused bug 535814.
+	Furthermore, its just wrong. We don't cancel streams as such, we
+	cancel individual operations on the stream.
+
+2009-03-06  Alexander Larsson  <alexl@redhat.com>
+
         * client/gdaemonfileinputstream.c:
         (iterate_read_state_machine):
         (iterate_close_state_machine):

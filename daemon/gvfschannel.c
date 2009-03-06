@@ -85,7 +85,6 @@ struct _GVfsChannelPrivate
   GInputStream *command_stream;
   GOutputStream *reply_stream;
   int remote_fd;
-  gboolean cancelled;
   
   GVfsBackendHandle backend_handle;
   GVfsJob *current_job;
@@ -342,8 +341,7 @@ got_request (GVfsChannel *channel,
   command = g_ntohl (request->command);
   arg1 = g_ntohl (request->arg1);
 
-  if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL ||
-      channel->priv->cancelled)
+  if (command == G_VFS_DAEMON_SOCKET_PROTOCOL_REQUEST_CANCEL)
     {
       if (arg1 == channel->priv->current_job_seq_nr &&
 	  channel->priv->current_job != NULL)
@@ -367,8 +365,6 @@ got_request (GVfsChannel *channel,
 	    }
 	}
 
-      channel->priv->cancelled = TRUE;
-      
       /* Cancel ops get no return */
       g_free (data);
       return;
@@ -609,8 +605,7 @@ send_reply_cb (GObject *source_object,
       g_vfs_job_source_new_job (G_VFS_JOB_SOURCE (channel), channel->priv->current_job);
     }
   /* Start queued request or readahead */
-  else if (!channel->priv->cancelled &&
-	   !start_queued_request (channel) &&
+  else if (!start_queued_request (channel) &&
 	   class->readahead)
     {
       /* No queued requests, maybe we want to do a readahead call */
