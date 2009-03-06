@@ -38,7 +38,17 @@
 static char *spawner_id = NULL;
 static char *spawner_path = NULL;
 
+static gboolean print_debug = FALSE;
 
+static void
+log_debug (const gchar   *log_domain,
+	   GLogLevelFlags log_level,
+	   const gchar   *message,
+	   gpointer	      unused_data)
+{
+  if (print_debug)
+    g_print ("%s", message);
+}
 
 void
 daemon_init (void)
@@ -56,6 +66,9 @@ daemon_init (void)
   g_thread_init (NULL);
   g_type_init ();
 
+  g_log_set_handler (NULL, G_LOG_LEVEL_DEBUG, log_debug, NULL);
+
+  
   dbus_error_init (&derror);
   connection = dbus_bus_get (DBUS_BUS_SESSION, &derror);
   if (connection == NULL)
@@ -122,6 +135,13 @@ GMountSpec *
 daemon_parse_args (int argc, char *argv[], const char *default_type)
 {
   GMountSpec *mount_spec;
+
+  if (argc > 1 && strcmp (argv[1], "--debug") == 0)
+    {
+      print_debug = TRUE;
+      argc--;
+      argv++;
+    }
   
   mount_spec = NULL;
   if (argc > 1 && strcmp (argv[1], "--spawner") == 0)
