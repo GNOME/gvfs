@@ -133,7 +133,7 @@ progress_callback (goffset current_num_bytes,
   dbus_uint64_t current_dbus, total_dbus;
   DBusMessage *message;
 
-  g_print ("progress_callback %d/%d\n", (int)current_num_bytes, (int)total_num_bytes);
+  g_debug ("progress_callback %d/%d\n", (int)current_num_bytes, (int)total_num_bytes);
 
   if (op_job->callback_obj_path == NULL)
     return;

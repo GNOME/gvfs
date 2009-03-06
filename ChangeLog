@@ -1,5 +1,32 @@
 2009-03-06  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/daemon-main.c:
+        * daemon/gvfsbackend.c:
+        * daemon/gvfsbackendburn.c:
+        * daemon/gvfsbackenddav.c:
+        * daemon/gvfsbackendhttp.c:
+        * daemon/gvfsbackendobexftp.c:
+        * daemon/gvfsbackendtrash.c:
+        * daemon/gvfsdaemon.c:
+        * daemon/gvfsjobcloseread.c:
+        * daemon/gvfsjobclosewrite.c:
+        * daemon/gvfsjobcopy.c:
+        * daemon/gvfsjobdbus.c:
+        * daemon/gvfsjobenumerate.c:
+        * daemon/gvfsjobmount.c:
+        * daemon/gvfsjobmove.c:
+        * daemon/gvfsjobpull.c:
+        * daemon/gvfsjobpush.c:
+        * daemon/gvfsjobread.c:
+        * daemon/gvfsjobseekread.c:
+        * daemon/gvfsjobseekwrite.c:
+        * daemon/gvfsjobunmount.c:
+        * daemon/gvfsjobwrite.c:
+        * daemon/mount.c:
+	Convert all spew to g_debug()
+
+2009-03-06  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 535814 – hangup on g_input_stream_close after cancelling from other thread
         * daemon/gvfschannel.c:
 	Reverted patch from bug 522192 as it caused bug 535814.

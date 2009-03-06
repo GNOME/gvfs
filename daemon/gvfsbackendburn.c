@@ -708,8 +708,6 @@ try_query_info (GVfsBackend *backend,
 {
   VirtualNode *node;
 
-  g_print ("q_i: filename: %s\n", filename);
-  
   node = virtual_node_lookup (G_VFS_BACKEND_BURN (backend)->root_node, filename, NULL);
  
   if (node == NULL)
@@ -895,7 +893,6 @@ try_push (GVfsBackend *backend,
       return TRUE;
     }
 
-  g_print ("file: %p, overwrite: %u\n", file, flags & G_FILE_COPY_OVERWRITE);
   if (file != NULL)
     {
       if (flags & G_FILE_COPY_OVERWRITE)

@@ -99,7 +99,7 @@ static void
 send_reply (GVfsJob *job)
 {
   GVfsJobWrite *op_job = G_VFS_JOB_WRITE (job);
-  g_print ("job_write send reply\n");
+  g_debug ("job_write send reply\n");
 
   if (job->failed)
     g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);

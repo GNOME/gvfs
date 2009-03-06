@@ -157,7 +157,7 @@ mount_failed (GVfsJobMount *op_job, GError *error)
 	}
     }
   else
-    g_print ("Mount failed: %s\n", error->message);
+    g_debug ("Mount failed: %s\n", error->message);
 
   backend = g_object_ref (op_job->backend);
   g_vfs_job_emit_finished (G_VFS_JOB (op_job));
@@ -176,7 +176,7 @@ register_mount_callback (DBusMessage *mount_reply,
   DBusConnection *conn;
   DBusMessage *reply;
 
-  g_print ("register_mount_callback, mount_reply: %p, error: %p\n", mount_reply, error);
+  g_debug ("register_mount_callback, mount_reply: %p, error: %p\n", mount_reply, error);
   
   if (mount_reply == NULL)
     mount_failed (op_job, error);
@@ -205,7 +205,7 @@ send_reply (GVfsJob *job)
 {
   GVfsJobMount *op_job = G_VFS_JOB_MOUNT (job);
 
-  g_print ("send_reply, failed: %d\n", job->failed);
+  g_debug ("send_reply, failed: %d\n", job->failed);
   
   if (job->failed)
     mount_failed (op_job, job->error);

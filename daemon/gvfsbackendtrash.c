@@ -363,7 +363,7 @@ trash_backend_delete (GVfsBackend   *vfs_backend,
 {
   GVfsBackendTrash *backend = G_VFS_BACKEND_TRASH (vfs_backend);
   GError *error = NULL;
-  g_print ("before job: %d\n", G_OBJECT(job)->ref_count);
+  g_debug ("before job: %d\n", G_OBJECT(job)->ref_count);
 
   if (filename[1] == '\0')
     g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,

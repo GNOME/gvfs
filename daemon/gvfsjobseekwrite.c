@@ -96,7 +96,7 @@ send_reply (GVfsJob *job)
 {
   GVfsJobSeekWrite *op_job = G_VFS_JOB_SEEK_WRITE (job);
   
-  g_print ("job_seek_write send reply, pos %d\n", (int)op_job->final_offset);
+  g_debug ("job_seek_write send reply, pos %d\n", (int)op_job->final_offset);
 
   if (job->failed)
     g_vfs_channel_send_error (G_VFS_CHANNEL (op_job->channel), job->error);

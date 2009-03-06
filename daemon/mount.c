@@ -794,7 +794,7 @@ maybe_automount (GMountSpec *spec,
       AutoMountData *data;
       GMountSource *mount_source;
 
-      g_print ("automounting...\n");
+      g_debug ("automounting...\n");
 
       mount_source = g_mount_source_new_dummy ();
 

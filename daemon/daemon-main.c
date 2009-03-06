@@ -162,7 +162,7 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
 	    found_type = TRUE;
 	  
 	  g_mount_spec_set (mount_spec, key, p+1);
-	  g_print ("setting '%s' to '%s'\n", key, p+1);
+	  g_debug ("setting '%s' to '%s'\n", key, p+1);
 	  g_free (key);
 	}
 

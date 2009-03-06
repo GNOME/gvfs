@@ -297,7 +297,7 @@ try_mount (GVfsBackend  *backend,
   if (uri_str)
     uri = soup_uri_new (uri_str);
 
-  g_print ("+ try_mount: %s\n", uri_str ? uri_str : "(null)");
+  g_debug ("+ try_mount: %s\n", uri_str ? uri_str : "(null)");
 
   if (uri == NULL)
     {
@@ -554,7 +554,7 @@ query_info_ready (SoupSession *session,
   uri = soup_message_get_uri (msg);
   basename = http_uri_get_basename (uri->path);
 
-  g_print ("basename:%s\n", basename);
+  g_debug ("basename:%s\n", basename);
 
   /* read http/1.1 rfc, until then we copy the local files
    * behaviour */ 

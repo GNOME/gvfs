@@ -364,7 +364,7 @@ void
 g_vfs_daemon_add_job_source (GVfsDaemon *daemon,
 			     GVfsJobSource *job_source)
 {
-  g_print ("Added new job source %p (%s)\n", job_source, g_type_name_from_instance ((gpointer)job_source));
+  g_debug ("Added new job source %p (%s)\n", job_source, g_type_name_from_instance ((gpointer)job_source));
   
   g_mutex_lock (daemon->lock);
 
@@ -439,7 +439,7 @@ void
 g_vfs_daemon_queue_job (GVfsDaemon *daemon,
 			GVfsJob *job)
 {
-  g_print ("Queued new job %p (%s)\n", job, g_type_name_from_instance ((gpointer)job));
+  g_debug ("Queued new job %p (%s)\n", job, g_type_name_from_instance ((gpointer)job));
   
   g_object_ref (job);
   g_signal_connect (job, "finished", (GCallback)job_finished_callback, daemon);

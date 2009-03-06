@@ -119,7 +119,7 @@ g_vfs_job_pull_new (DBusConnection *connection,
   job->backend = backend;
   job->flags = flags;
   job->remove_source = remove_source;
-  g_print ("Remove Source: %s\n", remove_source ? "true" : "false");
+  g_debug ("Remove Source: %s\n", remove_source ? "true" : "false");
   if (strcmp (callback_obj_path, "/org/gtk/vfs/void") != 0)
     job->callback_obj_path = g_strdup (callback_obj_path);
 
@@ -137,7 +137,7 @@ progress_callback (goffset current_num_bytes,
   dbus_uint64_t current_dbus, total_dbus;
   DBusMessage *message;
 
-  g_print ("progress_callback %d/%d\n", (int)current_num_bytes, (int)total_num_bytes);
+  g_debug ("progress_callback %d/%d\n", (int)current_num_bytes, (int)total_num_bytes);
 
   if (op_job->callback_obj_path == NULL)
     return;

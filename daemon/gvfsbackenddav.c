@@ -1245,7 +1245,7 @@ soup_authenticate_from_data (SoupSession *session,
   MountAuthData *data;
   AuthInfo      *info;
 
-  g_print ("+ soup_authenticate_from_data (%s) \n",
+  g_debug ("+ soup_authenticate_from_data (%s) \n",
            retrying ? "retrying" : "first auth");
 
   if (retrying)
@@ -1281,7 +1281,7 @@ soup_authenticate_interactive (SoupSession *session,
   char              *new_password;
   char              *prompt;
 
-  g_print ("+ soup_authenticate_interactive (%s) \n",
+  g_debug ("+ soup_authenticate_interactive (%s) \n",
            retrying ? "retrying" : "first auth");
 
   data = (MountAuthData *) user_data;
@@ -1389,7 +1389,7 @@ soup_authenticate_interactive (SoupSession *session,
   else
     soup_session_cancel_message (session, msg, SOUP_STATUS_CANCELLED);
 
-  g_print ("- soup_authenticate \n");
+  g_debug ("- soup_authenticate \n");
   g_free (prompt);
 }
 
@@ -1584,7 +1584,7 @@ do_mount (GVfsBackend  *backend,
   const char     *host;
   const char     *type;
 
-  g_print ("+ mount\n");
+  g_debug ("+ mount\n");
 
   host = g_mount_spec_get (mount_spec, "host");
   type = g_mount_spec_get (mount_spec, "type");
@@ -1747,7 +1747,7 @@ do_mount (GVfsBackend  *backend,
                     data);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
-  g_print ("- mount\n");
+  g_debug ("- mount\n");
 }
 
 static PropName ls_propnames[] = {
@@ -1778,7 +1778,7 @@ do_query_info (GVfsBackend           *backend,
 
   error   = NULL;
 
-  g_print ("Query info %s\n", filename);
+  g_debug ("Query info %s\n", filename);
 
   msg = propfind_request_new (backend, filename, 0, ls_propnames);
 
@@ -1851,7 +1851,7 @@ do_enumerate (GVfsBackend           *backend,
  
   error = NULL;
 
-  g_print ("+ do_enumerate: %s\n", filename);
+  g_debug ("+ do_enumerate: %s\n", filename);
 
   msg = propfind_request_new (backend, filename, 1, ls_propnames);
 
@@ -2278,7 +2278,7 @@ do_set_display_name (GVfsBackend           *backend,
 
   if (SOUP_STATUS_IS_SUCCESSFUL (status))
     {
-      g_print ("new target_path: %s\n", target_path);
+      g_debug ("new target_path: %s\n", target_path);
       g_vfs_job_set_display_name_set_new_path (job, target_path);
       g_vfs_job_succeeded (G_VFS_JOB (job));
     }

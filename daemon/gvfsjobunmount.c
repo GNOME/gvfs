@@ -78,7 +78,7 @@ g_vfs_job_unmount_new (DBusConnection *connection,
 {
   GVfsJobUnmount *job;
 
-  g_print ("g_vfs_job_unmount_new request: %p\n", message);
+  g_debug ("g_vfs_job_unmount_new request: %p\n", message);
   
   job = g_object_new (G_VFS_TYPE_JOB_UNMOUNT,
 		      "message", message,
@@ -130,7 +130,7 @@ unregister_mount_callback (DBusMessage *unmount_reply,
   GVfsBackend *backend;
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (user_data);
 
-  g_print ("unregister_mount_callback, unmount_reply: %p, error: %p\n", unmount_reply, error);
+  g_debug ("unregister_mount_callback, unmount_reply: %p, error: %p\n", unmount_reply, error);
 
   backend = op_job->backend;
   (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));
@@ -145,7 +145,7 @@ send_reply (GVfsJob *job)
 {
   GVfsJobUnmount *op_job = G_VFS_JOB_UNMOUNT (job);
 
-  g_print ("send_reply, failed: %d\n", job->failed);
+  g_debug ("send_reply, failed: %d\n", job->failed);
 
   if (job->failed)
     (*G_VFS_JOB_CLASS (g_vfs_job_unmount_parent_class)->send_reply) (G_VFS_JOB (op_job));

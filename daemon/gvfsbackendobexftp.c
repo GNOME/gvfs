@@ -634,7 +634,7 @@ _query_file_info_helper (GVfsBackend *backend,
   GList *elements, *l;
   gboolean found;
 
-  g_print ("+ _query_file_info_helper, filename: %s\n", filename);
+  g_debug ("+ _query_file_info_helper, filename: %s\n", filename);
 
   if (strcmp (filename, "/") == 0)
     {
@@ -706,7 +706,7 @@ _query_file_info_helper (GVfsBackend *backend,
   g_list_foreach (elements, (GFunc)g_object_unref, NULL);
   g_list_free (elements);
 
-  g_print ("- _query_file_info_helper\n");
+  g_debug ("- _query_file_info_helper\n");
 
   return found;
 }
@@ -825,7 +825,7 @@ do_mount (GVfsBackend *backend,
   GMountSpec *obexftp_mount_spec;
   guint count;
 
-  g_print ("+ do_mount\n");
+  g_debug ("+ do_mount\n");
 
   device = g_mount_spec_get (mount_spec, "host");
 
@@ -894,7 +894,7 @@ do_mount (GVfsBackend *backend,
         op_backend->display_name = g_strdelimit (g_strdup (op_backend->bdaddr), ":", '-');
       if (!op_backend->icon_name)
         op_backend->icon_name = g_strdup ("bluetooth");
-      g_print ("  do_mount: %s (%s) mounted\n", op_backend->display_name, op_backend->bdaddr);
+      g_debug ("  do_mount: %s (%s) mounted\n", op_backend->display_name, op_backend->bdaddr);
     }
   else
     {
@@ -906,7 +906,7 @@ do_mount (GVfsBackend *backend,
           g_error_free (error);
           return;
         }
-      g_print ("  do_mount: usb interface %d mounted\n", op_backend->usbintfnum);
+      g_debug ("  do_mount: usb interface %d mounted\n", op_backend->usbintfnum);
     }
 
   g_vfs_job_set_backend_data (G_VFS_JOB (job), backend, NULL);
@@ -990,7 +990,7 @@ do_mount (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_print ("- do_mount\n");
+  g_debug ("- do_mount\n");
 }
 
 static void
@@ -1020,7 +1020,7 @@ do_open_for_read (GVfsBackend *backend,
   goffset size;
   int fd, success;
 
-  g_print ("+ do_open_for_read, filename: %s\n", filename);
+  g_debug ("+ do_open_for_read, filename: %s\n", filename);
 
   g_mutex_lock (op_backend->mutex);
   op_backend->doing_io = TRUE;
@@ -1148,7 +1148,7 @@ do_open_for_read (GVfsBackend *backend,
   handle->size = size;
   g_vfs_job_open_for_read_set_handle (job, handle);
 
-  g_print ("- do_open_for_read, filename: %s\n", filename);
+  g_debug ("- do_open_for_read, filename: %s\n", filename);
 
   g_vfs_job_open_for_read_set_can_seek (G_VFS_JOB_OPEN_FOR_READ (job), FALSE);
   g_vfs_job_succeeded (G_VFS_JOB (job));
@@ -1233,7 +1233,7 @@ do_close_read (GVfsBackend *backend,
   ObexFTPOpenHandle *backend_handle = (ObexFTPOpenHandle *) handle;
   int busy;
 
-  g_print ("+ do_close_read\n");
+  g_debug ("+ do_close_read\n");
 
   busy = is_busy (op_backend->session_proxy, G_VFS_JOB (job));
   if (busy < 0) {
@@ -1263,7 +1263,7 @@ do_close_read (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_print ("- do_close_read\n");
+  g_debug ("- do_close_read\n");
 }
 
 static void
@@ -1277,7 +1277,7 @@ do_query_info (GVfsBackend *backend,
   GVfsBackendObexftp *op_backend = G_VFS_BACKEND_OBEXFTP (backend);
   GError *error = NULL;
 
-  g_print ("+ do_query_info, filename: %s\n", filename);
+  g_debug ("+ do_query_info, filename: %s\n", filename);
 
   g_mutex_lock (op_backend->mutex);
 
@@ -1293,7 +1293,7 @@ do_query_info (GVfsBackend *backend,
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
-  g_print ("- do_query_info\n");
+  g_debug ("- do_query_info\n");
 
   return;
 }
@@ -1314,7 +1314,7 @@ do_query_fs_info (GVfsBackend *backend,
   GList *l;
   gboolean has_free_memory;
 
-  g_print ("+ do_query_fs_info, filename: %s\n", filename);
+  g_debug ("+ do_query_fs_info, filename: %s\n", filename);
 
   g_mutex_lock (op_backend->mutex);
 
@@ -1434,7 +1434,7 @@ set_info_from_memory:
 
   g_mutex_unlock (op_backend->mutex);
 
-  g_print ("- do_query_fs_info\n");
+  g_debug ("- do_query_fs_info\n");
 }
 
 static void
@@ -1449,7 +1449,7 @@ do_enumerate (GVfsBackend *backend,
   char *files;
   GList *elements = NULL;
 
-  g_print ("+ do_enumerate, filename: %s\n", filename);
+  g_debug ("+ do_enumerate, filename: %s\n", filename);
 
   g_mutex_lock (op_backend->mutex);
 
@@ -1502,7 +1502,7 @@ do_enumerate (GVfsBackend *backend,
 
   g_mutex_unlock (op_backend->mutex);
 
-  g_print ("- do_enumerate\n");
+  g_debug ("- do_enumerate\n");
 }
 
 typedef struct {
@@ -1688,7 +1688,7 @@ do_push (GVfsBackend *backend,
   PushData *job_data;
   GFileInfo *info;
 
-  g_print ("+ do_push, destination: %s, local_path: %s\n", destination, local_path);
+  g_debug ("+ do_push, destination: %s, local_path: %s\n", destination, local_path);
 
   g_mutex_lock (op_backend->mutex);
   op_backend->doing_io = TRUE;
@@ -1822,7 +1822,7 @@ do_push (GVfsBackend *backend,
   op_backend->doing_io = FALSE;
   g_mutex_unlock (op_backend->mutex);
 
-  g_print ("- do_push\n");
+  g_debug ("- do_push\n");
 }
 
 static void
@@ -1835,7 +1835,7 @@ do_delete (GVfsBackend *backend,
   GError *error = NULL;
   GFileInfo *info;
 
-  g_print ("+ do_delete, filename: %s\n", filename);
+  g_debug ("+ do_delete, filename: %s\n", filename);
 
   g_mutex_lock (op_backend->mutex);
 
@@ -1983,7 +1983,7 @@ do_delete (GVfsBackend *backend,
 
   g_mutex_unlock (op_backend->mutex);
 
-  g_print ("- do_delete\n");
+  g_debug ("- do_delete\n");
 }
 
 static void
@@ -1996,7 +1996,7 @@ do_make_directory (GVfsBackend *backend,
   GError *error = NULL;
   GFileInfo *info;
 
-  g_print ("+ do_make_directory, filename: %s\n", filename);
+  g_debug ("+ do_make_directory, filename: %s\n", filename);
 
   g_mutex_lock (op_backend->mutex);
 
@@ -2071,7 +2071,7 @@ do_make_directory (GVfsBackend *backend,
 
   g_mutex_unlock (op_backend->mutex);
 
-  g_print ("- do_make_directory\n");
+  g_debug ("- do_make_directory\n");
 }
 
 static void

@@ -481,7 +481,7 @@ backend_dbus_handler (DBusConnection  *connection,
 
   job = NULL;
 
-  g_print ("backend_dbus_handler %s:%s\n",
+  g_debug ("backend_dbus_handler %s:%s\n",
 	   dbus_message_get_interface (message),
 	   dbus_message_get_member (message));
   
