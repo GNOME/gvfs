@@ -740,7 +740,7 @@ ftp_connection_login (FtpConnection *conn,
        *   problems with our client.
        * - we don't want to drown in spam.
        */
-      if (password == NULL)
+      if (password == NULL || password[0] == 0)
 	password = "gvfsd-ftp-" VERSION "@example.com";
       status = ftp_connection_send (conn, 0,
 				    "PASS %s", password);

@@ -1,3 +1,12 @@
+2009-03-08  Andreas Henriksson <andreas@fatal.se>
+
+	reviewed by: Benjamin Otte  <otte@gnome.org>
+
+	Bug 533219 - anonymous ftp login not working
+
+	* daemon/gvfsbackendftp.c: (ftp_connection_login):
+	replace the empty string with the default password
+
 2009-03-06  Alexander Larsson  <alexl@redhat.com>
 
         * ChangeLog:
