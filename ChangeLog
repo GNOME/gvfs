@@ -1,5 +1,12 @@
 2009-03-09  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 523732 – gvfs-bash-completion.sh should not modify COMP_WORDBREAKS
+
+	* programs/gvfs-bash-completion.sh:
+	Don't override COMP_WORDBREAKS, instead workaround the colon problem
+
+2009-03-09  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 551683 – archive backend says file doesn't exist for directories
 
         * daemon/gvfsbackendarchive.c:

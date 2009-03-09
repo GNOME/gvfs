@@ -24,14 +24,26 @@
 
 ####################################################################################################
 
-# don't misbehave on colons; See item E13 at http://tiswww.case.edu/php/chet/bash/FAQ
-COMP_WORDBREAKS=${COMP_WORDBREAKS//:}
 
 __gvfs_multiple_uris() {
     local IFS=$'\n'
     local cur="${COMP_WORDS[COMP_CWORD]}"
 
     COMPREPLY=($(compgen -W '$(gvfs-ls --show-completions "$cur")' -- ""))
+
+    # don't misbehave on colons; See item E13 at http://tiswww.case.edu/php/chet/bash/FAQ
+    # We handle this locally be extracting any BLAH: prefix and removing it from the result.
+    # Not great, but better than globally changing COMP_WORDBREAKS
+    
+    case "$cur" in
+	*:*)
+	    case "$COMP_WORDBREAKS" in
+		*:*) colon_prefix=$(echo $cur | sed 's/:[^:]*$/:/' )
+		    COMPREPLY=${COMPREPLY##${colon_prefix}}
+		    ;;
+	    esac
+	    ;;
+    esac
 }
 
 ####################################################################################################
