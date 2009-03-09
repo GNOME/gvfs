@@ -1,3 +1,11 @@
+2009-03-09  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 570888 – gvfs-gphoto2 mount 4 devices when pluging one camera
+
+        * monitor/gphoto2/ggphoto2volumemonitor.c:
+        (get_stores_for_camera):
+	Ignore stores that have 0 byte capability.
+
 2009-03-08  Andreas Henriksson <andreas@fatal.se>
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>

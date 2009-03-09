@@ -451,7 +451,13 @@ get_stores_for_camera (int bus_num, int device_num)
 
   /* Append the data to the list */
   for (i = 0; i < num_storage_info; i++)
-    l = g_list_prepend (l, g_strdup (storage_info[i].basedir));
+    {
+      /* Ignore storage with no capacity (see bug 570888) */
+      if ((storage_info[i].fields & GP_STORAGEINFO_MAXCAPACITY) &&
+          storage_info[i].capacitykbytes == 0)
+        continue;
+      l = g_list_prepend (l, g_strdup (storage_info[i].basedir));
+    }
 
 out:
   /* Clean up */
