@@ -1,5 +1,13 @@
 2009-03-09  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 543064 – configure script does not pick up giomoduledir
+
+	* configure.ac:
+	Don't pass --define-variable libdir when getting giomoduledir.
+	This was added wrongly before.
+
+2009-03-09  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 523732 – gvfs-bash-completion.sh should not modify COMP_WORDBREAKS
 
 	* programs/gvfs-bash-completion.sh:
@@ -35,15 +43,6 @@
         * ChangeLog:
         * daemon/daemon-main.c:
 	Only spew g_debug if backend started with --debug
-
-2009-03-06  Alexander Larsson  <alexl@redhat.com>
-
-        Reviewed by NOBODY (OOPS!).
-
-        * daemon/daemon-main.c:
-        (log_debug):
-        (daemon_init):
-        (daemon_parse_args):
 
 2009-03-06  Alexander Larsson  <alexl@redhat.com>
 
