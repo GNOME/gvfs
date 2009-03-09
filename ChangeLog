@@ -1,5 +1,13 @@
 2009-03-09  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 551683 – archive backend says file doesn't exist for directories
+
+        * daemon/gvfsbackendarchive.c:
+        (do_open_for_read):
+	Return G_IO_ERROR_IS_DIRECTORY if opening directory.
+
+2009-03-09  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 570888 – gvfs-gphoto2 mount 4 devices when pluging one camera
 
         * monitor/gphoto2/ggphoto2volumemonitor.c:

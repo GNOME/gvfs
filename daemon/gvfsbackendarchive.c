@@ -603,7 +603,26 @@ do_open_for_read (GVfsBackend *       backend,
   GVfsArchive *archive;
   struct archive_entry *entry;
   int result;
+  ArchiveFile *file;
 
+  file = archive_file_find (ba, filename);
+  if (file == NULL)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+		        G_IO_ERROR,
+			G_IO_ERROR_NOT_FOUND,
+			_("File doesn't exist"));
+      return;
+    }
+
+  if (g_file_info_get_file_type (file->info) == G_FILE_TYPE_DIRECTORY)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+			G_IO_ERROR_IS_DIRECTORY,
+			_("Can't open directory"));
+      return;
+    }
+  
   archive = gvfs_archive_new (ba, G_VFS_JOB (job));
 
   do
