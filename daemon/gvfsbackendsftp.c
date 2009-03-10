@@ -560,6 +560,15 @@ read_reply_sync (GVfsBackendSftp *backend, gsize *len_out, GError **error)
 				&bytes_read, NULL, error))
     return NULL;
 
+  /* Make sure we handle ssh exiting early, e.g. if no further
+     authentication methods */
+  if (bytes_read == 0)
+    {
+      g_set_error_literal (error,
+			   G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("ssh program unexpectedly exited"));
+      return NULL;
+    }
   
   len = GUINT32_FROM_BE (len);
   

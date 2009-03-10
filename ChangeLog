@@ -1,5 +1,12 @@
 2009-03-10  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 574754 – 100% cpu usage when connecting to a ssh key and denying key access
+
+	* daemon/gvfsbackendsftp.c (read_reply_sync):
+	Make sure we handle ssh exiting early.
+
+2009-03-10  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac:
 	Post release version bump
 
