@@ -1,5 +1,13 @@
 2009-03-10  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 563418 – gvfs backend leaks monitors
+
+        * client/gdaemonfilemonitor.c:
+        (g_daemon_file_monitor_cancel):
+	Actually pass in object_path in unsubscribe message
+
+2009-03-10  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 574754 – 100% cpu usage when connecting to a ssh key and denying key access
 
 	* daemon/gvfsbackendsftp.c (read_reply_sync):

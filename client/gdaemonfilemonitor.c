@@ -202,6 +202,9 @@ g_daemon_file_monitor_cancel (GFileMonitor* monitor)
 				  G_VFS_DBUS_MONITOR_INTERFACE,
 				  G_VFS_DBUS_MONITOR_OP_UNSUBSCRIBE);
 
+  _g_dbus_message_append_args (message, DBUS_TYPE_OBJECT_PATH,
+			       &daemon_monitor->object_path, 0);
+  
   _g_vfs_daemon_call_async (message,
 			    NULL, NULL, 
 			    NULL);
