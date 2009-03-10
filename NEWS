@@ -1,3 +1,18 @@
+Major changes in 1.1.8
+======================
+* Fix crashers and leaks
+* Handle file:// uris with anchors in gvfs-open
+* fuse: Support ftruncate to the current file size
+* escape/unescape hostname part in uris, allowing spaces in e.g. smb domains
+* hal: Fix "No mount object" error on mount
+* Change details of the new .xdg-volume-info file format
+* Fix races in cancellation of gvfs streams
+* Remove debug spew from backends
+* ftp: Fix anonymous login
+* gphoto2: Ignore broken storages with no capacity
+* Don't globally modify COMP_WORDBREAKS in bash completion script
+* Don't ask for username when getting ssh key passphrase
+
 Major changes in 1.1.7
 ======================
 * Fix build on some platforms
