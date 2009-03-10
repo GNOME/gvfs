@@ -851,13 +851,14 @@ handle_login (GVfsBackend *backend,
               
               if (g_vfs_keyring_is_available ())
                 flags |= G_ASK_PASSWORD_SAVING_SUPPORTED;
-	      if (!op_backend->user_specified)
+	      if (strcmp (authtype, "password") == 0 &&
+		  !op_backend->user_specified)
 	        flags |= G_ASK_PASSWORD_NEED_USERNAME;
 
               g_free (new_password);
               
               if (!g_mount_source_ask_password (mount_source,
-                                                g_str_has_prefix (buffer, "Enter passphrase for key") ?
+                                                strcmp (authtype, "publickey") == 0 ?
                                                 _("Enter passphrase for key")
                                                 :
                                                 _("Enter password"),

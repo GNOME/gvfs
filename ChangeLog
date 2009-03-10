@@ -1,3 +1,9 @@
+2009-03-10  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+        (handle_login):
+	Don't ask for username when getting ssh key passphrase
+
 2009-03-09  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 543064 – configure script does not pick up giomoduledir
