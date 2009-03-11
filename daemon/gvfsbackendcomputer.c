@@ -382,7 +382,7 @@ recompute_files (GVfsBackendComputer *backend)
     {
       mount = l->data;
       volume = g_mount_get_volume (mount);
-      if (volume == NULL)
+      if (volume == NULL && !g_mount_is_shadowed (mount))
         {
           file = g_slice_new0 (ComputerFile);
           file->drive = NULL;

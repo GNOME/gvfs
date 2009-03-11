@@ -1,3 +1,10 @@
+2009-03-11  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 572521 – gvfsd-cdda create two different Audio Disc Icons on Desktop
+
+	* daemon/gvfsbackendcomputer.c (recompute_files):
+	Don't show shadowed mounts.
+
 2009-03-10  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 563418 – gvfs backend leaks monitors
