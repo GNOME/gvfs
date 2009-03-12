@@ -1310,8 +1310,8 @@ static gboolean
 ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
 {
   gchar *prefix;
-  CameraStorageInformation *storage_info;
-  int num_storage_info;
+  CameraStorageInformation *storage_info, *head;
+  int num_storage_info, i;
 
   /* already set */
   if (gphoto2_backend->ignore_prefix != NULL)
@@ -1325,10 +1325,22 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
                                  gphoto2_backend->context) != 0)
     goto out;
 
-  if (num_storage_info > 1)
-    goto out;
+  head = NULL;
+  for (i = 0; i < num_storage_info; i++)
+    {
+      /* Ignore storage with no capacity (see bug 570888) */
+      if ((storage_info[i].fields & GP_STORAGEINFO_MAXCAPACITY) &&
+          storage_info[i].capacitykbytes == 0)
+        continue;
+      
+      /* Multiple heads, don't ignore */
+      if (head != NULL)
+	goto out;
+	
+      head = &storage_info[i];
+    }
 
-  prefix = g_strdup_printf ("%s/", storage_info[0].basedir);
+  prefix = g_strdup_printf ("%s/", head->basedir);
 
  out:
 
