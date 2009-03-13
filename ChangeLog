@@ -1,5 +1,14 @@
 2009-03-13  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 563418 – gvfs backend leaks monitors
+
+        * daemon/gvfsmonitor.c:
+        (unsubscribe):
+        (vfs_monitor_message_callback):
+	Fix crashes when unsubscribing monitors.
+
+2009-03-13  Alexander Larsson  <alexl@redhat.com>
+
 	* daemon/daemon-main.c (daemon_parse_args):
 	Enable debug output if GVFS_DEBUG is set in the environment.
 

@@ -150,14 +150,13 @@ static void
 unsubscribe (GVfsMonitor *monitor,
 	     Subscriber *subscriber)
 {
+  monitor->priv->subscribers = g_list_remove (monitor->priv->subscribers, subscriber);
+  
   dbus_connection_unref (subscriber->connection);
   g_free (subscriber->id);
   g_free (subscriber->object_path);
   g_free (subscriber);
   g_object_unref (monitor);
-  
-  monitor->priv->subscribers = g_list_remove (monitor->priv->subscribers, subscriber);
-  
 }
 
 static DBusHandlerResult
@@ -222,6 +221,7 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 	}
       else
 	{
+	  g_object_ref (monitor); /* Keep alive during possible last remove */
 	  for (l = monitor->priv->subscribers; l != NULL; l = l->next)
 	    {
 	      subscriber = l->data;
@@ -238,6 +238,8 @@ vfs_monitor_message_callback (DBusConnection  *connection,
 	  
 	  reply = dbus_message_new_method_return (message);
 	  dbus_connection_send (connection, reply, NULL);
+
+	  g_object_unref (monitor);
 	}
       
       return DBUS_HANDLER_RESULT_HANDLED;
