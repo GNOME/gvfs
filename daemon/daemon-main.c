@@ -142,6 +142,10 @@ daemon_parse_args (int argc, char *argv[], const char *default_type)
       argc--;
       argv++;
     }
+  else if (g_getenv ("GVFS_DEBUG"))
+    {
+      print_debug = TRUE;
+    }
   
   mount_spec = NULL;
   if (argc > 1 && strcmp (argv[1], "--spawner") == 0)
