@@ -1,3 +1,9 @@
+Major changes in 1.2.0
+======================
+* sftp: Don't hang if ssh no authentication method availible
+* Don't leak file monitors
+* computer: don't show shadowed mounts
+
 Major changes in 1.1.8
 ======================
 * Fix crashers and leaks

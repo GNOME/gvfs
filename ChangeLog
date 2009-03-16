@@ -1,3 +1,11 @@
+2009-03-16  Alexander Larsson  <alexl@redhat.com>
+
+	* NEWS:
+	Update for release
+
+	* configure.ac:
+	Bump version to 1.2.0
+
 2009-03-13  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 563418 – gvfs backend leaks monitors
