@@ -2427,7 +2427,10 @@ do_delete (GVfsBackend *backend,
 				   g_strerror (ENOTEMPTY));
 	    }
 	  else
-	    ftp_connection_set_error_from_response (conn, response);
+            {
+              ftp_connection_clear_error (conn);
+              ftp_connection_set_error_from_response (conn, response);
+            }
 	}
       else if (STATUS_GROUP (response) == 5)
 	{

@@ -1,5 +1,12 @@
 2009-03-16  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 575286 – [PATCH] fix GError overwrite warning when missing delete permission.
+
+	* daemon/gvfsbackendftp.c (do_delete):
+	Clear error before calling set_from_response.
+
+2009-03-16  Alexander Larsson  <alexl@redhat.com>
+
 	* configure.ac:
 	Post release version bump
 
