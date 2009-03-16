@@ -1,0 +1,5 @@
+[Mount]
+Type=trash
+Exec=@libexecdir@/gvfsd-trash
+AutoMount=true
+

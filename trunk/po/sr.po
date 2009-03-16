@@ -1,0 +1,2737 @@
+# Serbian translation of gnome-vfs
+# Courtesy of Prevod.org team (http://prevod.org/) -- 2003, 2004, 2005, 2006, 2007.
+#
+# This file is distributed under the same license as the gnome-vfs package.
+#
+# Maintainer: Душан Живојнов <calvin@verat.net>
+# Reviewed on 2004-02-03 by: Данило Шеган <dsegan@gmx.net>
+# Reviewed on 2005-07-08 by: Данило Шеган <dsegan@gmx.net>
+# Reviewed on 2005-09-22 by: Данило Шеган <danilo@prevod.org>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-vfs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-09-14 18:11+0200\n"
+"PO-Revision-Date: 2007-09-06 21:18+0100\n"
+"Last-Translator: Горан Ракић <grakic@devbase.net>\n"
+"Language-Team: Serbian (sr) <gnom@prevod.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3;    plural=n%10==1 && n%100!=11 ? 0 :    n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1979
+msgid "Operation not supported, files on different mounts"
+msgstr ""
+
+#: ../client/gdaemonfile.c:787
+msgid "Invalid return value from get_info"
+msgstr ""
+
+#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
+msgid "Invalid return value from query_info"
+msgstr ""
+
+#: ../client/gdaemonfile.c:894
+msgid "Couldn't get stream file descriptor"
+msgstr ""
+
+#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
+#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
+#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2234
+#: ../client/gdaemonfile.c:2312 ../client/gdaemonfile.c:2571
+msgid "Invalid return value from open"
+msgstr ""
+
+#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
+#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
+#: ../client/gdaemonfile.c:2202
+msgid "Didn't get stream file descriptor"
+msgstr ""
+
+#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
+msgid "Invalid return value from call"
+msgstr ""
+
+#: ../client/gdaemonfile.c:1534
+msgid "Invalid return value from get_filesystem_info"
+msgstr ""
+
+#. translators: this is an error message when there is no user visible "mount" object
+#. corresponding to a particular path/uri
+#: ../client/gdaemonfile.c:1647
+#, fuzzy
+msgid "Could not find enclosing mount"
+msgstr "Не могу пронаћи главни разгледач"
+
+#: ../client/gdaemonfile.c:1677
+#, fuzzy, c-format
+msgid "Invalid filename %s"
+msgstr "Неисправно име датотеке"
+
+#: ../client/gdaemonfile.c:1719
+msgid "Invalid return value from query_filesystem_info"
+msgstr ""
+
+#: ../client/gdaemonfile.c:2124
+msgid "Invalid return value from monitor_dir"
+msgstr ""
+
+#: ../client/gdaemonfile.c:2173
+msgid "Invalid return value from monitor_file"
+msgstr ""
+
+#: ../client/gdaemonfileinputstream.c:450
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1300
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:402
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1054
+#: ../client/gdaemonfileoutputstream.c:1064
+#, c-format
+msgid "Error in stream protocol: %s"
+msgstr ""
+
+#: ../client/gdaemonfileinputstream.c:458
+#: ../client/gdaemonfileinputstream.c:1310
+#: ../client/gdaemonfileoutputstream.c:410
+#: ../client/gdaemonfileoutputstream.c:1064
+#, fuzzy
+msgid "End of stream"
+msgstr "Крај датотеке"
+
+#: ../client/gdaemonfileinputstream.c:518
+#: ../client/gdaemonfileinputstream.c:674
+#: ../client/gdaemonfileinputstream.c:782
+#: ../client/gdaemonfileinputstream.c:1032
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:636
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
+#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
+#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
+#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
+#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
+#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
+#: ../daemon/gvfsbackendsmb.c:1069 ../daemon/gvfsbackendtest.c:87
+#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
+#: ../daemon/gvfschannel.c:298
+#, fuzzy
+msgid "Operation was cancelled"
+msgstr "Радња је обустављена"
+
+#: ../client/gdaemonfileinputstream.c:1207
+#: ../client/gdaemonfileoutputstream.c:942
+msgid "Seek not supported on stream"
+msgstr ""
+
+#: ../client/gdaemonfileinputstream.c:1237
+msgid "The query info operation is not supported"
+msgstr ""
+
+#: ../client/gdaemonfileoutputstream.c:991
+#, c-format
+msgid "Query info not supported on stream"
+msgstr ""
+
+#: ../client/gdaemonvfs.c:749
+#, c-format
+msgid "Error while getting mount info: %s"
+msgstr ""
+
+#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
+#, c-format
+msgid "Error connecting to daemon: %s"
+msgstr ""
+
+#: ../common/gsysutils.c:136
+#, c-format
+msgid "Error creating socket: %s"
+msgstr ""
+
+#: ../common/gsysutils.c:174
+#, c-format
+msgid "Error connecting to socket: %s"
+msgstr ""
+
+#: ../common/gvfsdaemonprotocol.c:515
+#, fuzzy
+msgid "Invalid file info format"
+msgstr "Неисправно име датотеке"
+
+#: ../common/gvfsdaemonprotocol.c:532
+msgid "Invalid attribute info list content"
+msgstr ""
+
+#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
+#, c-format
+msgid "Error connecting to D-Bus: %s"
+msgstr ""
+
+#. translators: This is the default daemon's application name,
+#. * the %s is the type of the backend, like "ftp"
+#: ../daemon/daemon-main.c:78
+#, fuzzy, c-format
+msgid "%s Filesystem Service"
+msgstr "Систем датотека"
+
+#: ../daemon/daemon-main.c:97
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: ../daemon/daemon-main.c:131
+#, c-format
+msgid "Usage: %s --spawner dbus-id object_path"
+msgstr ""
+
+#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
+#, c-format
+msgid "Usage: %s key=value key=value ..."
+msgstr ""
+
+#: ../daemon/daemon-main.c:171
+#, c-format
+msgid "No mount type specified"
+msgstr ""
+
+#: ../daemon/daemon-main.c:241
+#, c-format
+msgid "mountpoint for %s already running"
+msgstr ""
+
+#: ../daemon/daemon-main.c:252
+msgid "error starting mount daemon"
+msgstr ""
+
+#. FIXME: this should really be "/ in %s", but can't change
+#. due to string freeze.
+#. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
+#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:963
+#: ../daemon/gvfsbackendsftp.c:1894
+#, c-format
+msgid "/ on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1479
+#: ../daemon/gvfsbackendsftp.c:1553
+msgid "No hostname specified"
+msgstr ""
+
+#: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
+#: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
+#: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
+#: ../daemon/gvfsbackendsmb.c:605
+#, fuzzy
+msgid "Invalid mount spec"
+msgstr "Неисправни параметри"
+
+#: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
+#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:822
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:345
+#: ../daemon/gvfsbackendftp.c:2101 ../daemon/gvfsbackendnetwork.c:590
+#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
+#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1116
+#, fuzzy, c-format
+msgid "File doesn't exist"
+msgstr "Датотека постоји"
+
+#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:393
+#: ../daemon/gvfsbackendftp.c:912 ../daemon/gvfsbackendnetwork.c:637
+#, fuzzy
+msgid "The file is not a directory"
+msgstr "Није фасцикла"
+
+#. Translators: This is the name of the backend
+#: ../daemon/gvfsbackendburn.c:346
+msgid "Burn"
+msgstr ""
+
+#: ../daemon/gvfsbackendburn.c:376
+msgid "Unable to create temporary directory"
+msgstr ""
+
+#: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
+#: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
+#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
+#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:2706
+#, fuzzy, c-format
+msgid "No such file or directory"
+msgstr "Није фасцикла"
+
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2043
+msgid "Directory not empty"
+msgstr "Директоријум није празан"
+
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:897
+msgid "Can't copy file over directory"
+msgstr ""
+
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendburn.c:651
+msgid "CD/DVD Creator"
+msgstr ""
+
+#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
+#: ../daemon/gvfsbackendburn.c:917 ../daemon/gvfsbackendgphoto2.c:2780
+msgid "File exists"
+msgstr "Датотека постоји"
+
+#: ../daemon/gvfsbackendburn.c:845
+msgid "No such file or directory in target path"
+msgstr ""
+
+#: ../daemon/gvfsbackendburn.c:868
+msgid "Can't copy directory over directory"
+msgstr ""
+
+#: ../daemon/gvfsbackendburn.c:877
+#, fuzzy
+msgid "Target file exists"
+msgstr "Датотека постоји"
+
+#: ../daemon/gvfsbackendburn.c:884
+msgid "Can't recursively copy directory"
+msgstr ""
+
+#: ../daemon/gvfsbackendburn.c:943 ../daemon/gvfsbackendgphoto2.c:2360
+#: ../daemon/gvfsbackendgphoto2.c:2569 ../daemon/gvfsbackendgphoto2.c:2666
+#: ../daemon/gvfsbackendgphoto2.c:2759
+msgid "Not supported"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1403
+msgid "Cannot connect to the system bus"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1415
+msgid "Cannot create libhal context"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1428
+#, fuzzy
+msgid "Cannot initialize libhal"
+msgstr "Не могу да покренем Бонобо"
+
+#: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
+msgid "No drive specified"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:276
+#, c-format
+msgid "Cannot find drive %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:286
+#, c-format
+msgid "Drive %s does not contain audio files"
+msgstr ""
+
+#. Translator: %s is the device the disc is inserted into
+#: ../daemon/gvfsbackendcdda.c:294
+#, c-format
+msgid "cdda mount on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:295 ../daemon/gvfsbackendcdda.c:799
+#: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:214
+#: ../monitor/hal/ghalvolume.c:235
+#, c-format
+msgid "Audio Disc"
+msgstr "Звучни диск"
+
+#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1656
+#, c-format
+msgid "File system is busy: %d open file"
+msgid_plural "File system is busy: %d open files"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: ../daemon/gvfsbackendcdda.c:546
+#, fuzzy, c-format
+msgid "No such file %s on drive %s"
+msgstr "Нема више простора на уређају"
+
+#. Translators: paranoia is the name of the cd audio reading library
+#: ../daemon/gvfsbackendcdda.c:655
+#, c-format
+msgid "Error from 'paranoia' on drive %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:718
+#, c-format
+msgid "Error seeking in stream on drive %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1713
+#, c-format
+msgid "No such file"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:829
+#, c-format
+msgid "The file does not exist or isn't an audio track"
+msgstr ""
+
+#: ../daemon/gvfsbackendcdda.c:935
+msgid "Audio CD Filesystem Service"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
+msgid "Computer"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:466
+msgid "Filesystem"
+msgstr "Систем датотека"
+
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
+#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackendtrash.c:678
+#, fuzzy
+msgid "Can't open directory"
+msgstr "Није фасцикла"
+
+#: ../daemon/gvfsbackendcomputer.c:594 ../daemon/gvfsbackendcomputer.c:732
+msgid "Can't open mountable file"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:780 ../daemon/gvfsbackendsftp.c:1037
+#, fuzzy, c-format
+msgid "Internal error: %s"
+msgstr "Унутрашња грешка"
+
+#: ../daemon/gvfsbackendcomputer.c:812 ../daemon/gvfsbackendcomputer.c:929
+msgid "Can't mount file"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:824
+msgid "No media in the drive"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:881 ../daemon/gvfsbackendcomputer.c:972
+#: ../daemon/gvfsbackendcomputer.c:1072
+msgid "Not a mountable file"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:987
+msgid "Can't unmount file"
+msgstr ""
+
+#: ../daemon/gvfsbackendcomputer.c:1103
+msgid "Can't eject file"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1523
+#: ../daemon/gvfsbackendhttp.c:245
+#, c-format
+msgid "HTTP Error: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:520
+#, fuzzy
+msgid "Could not parse response"
+msgstr "Не могу рашчланити: %s"
+
+#: ../daemon/gvfsbackenddav.c:529
+msgid "Empty response"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:537
+msgid "Unexpected reply from server"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1156 ../daemon/gvfsbackenddav.c:1658
+msgid "Response invalid"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1299
+msgid "WebDAV share"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1301
+#, c-format
+msgid "Enter password for %s"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1304
+#, fuzzy
+msgid "Please enter proxy password"
+msgstr "Лозинка HTTP посредника"
+
+#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackenddav.c:1531
+msgid "Not a WebDAV enabled share"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1554
+#, c-format
+msgid "WebDAV on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1614 ../daemon/gvfsbackenddav.c:1687
+#, fuzzy
+msgid "Could not create request"
+msgstr "Не могу рашчланити: %s"
+
+#: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
+#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
+#: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
+#: ../daemon/gvfsbackendsmb.c:1804
+msgid "Target file already exists"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
+#: ../daemon/gvfsbackendsmb.c:1038
+msgid "The file was externally modified"
+msgstr ""
+
+#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackendsmb.c:1821
+msgid "Backup file creation failed"
+msgstr ""
+
+#. TODO: Name
+#: ../daemon/gvfsbackenddnssd.c:433
+msgid "dns-sd"
+msgstr ""
+
+#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
+msgid "Can't monitor file or directory."
+msgstr ""
+
+#. TODO: Names, etc
+#: ../daemon/gvfsbackenddnssd.c:687
+msgid "Dns-SD"
+msgstr ""
+
+#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
+#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+msgid "Network"
+msgstr "Мрежа"
+
+#: ../daemon/gvfsbackendftp.c:236
+msgid "Accounts are unsupported"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:240
+msgid "Host closed connection"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:244
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:248
+msgid "Data connection closed"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:255 ../daemon/gvfsbackendftp.c:259
+#, fuzzy
+msgid "Operation failed"
+msgstr "Радња је обустављена"
+
+#: ../daemon/gvfsbackendftp.c:264
+#, fuzzy
+msgid "No space left on server"
+msgstr "Нема више простора на уређају"
+
+#: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
+#, fuzzy
+msgid "Operation unsupported"
+msgstr "Радња је заустављена"
+
+#: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
+#, fuzzy
+msgid "Permission denied"
+msgstr "Пристип одбијен"
+
+#: ../daemon/gvfsbackendftp.c:280
+msgid "Page type unknown"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:284 ../daemon/gvfsbackendftp.c:2211
+msgid "Invalid filename"
+msgstr "Неисправно име датотеке"
+
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendftp.c:364
+#: ../daemon/gvfsbackendftp.c:393 ../daemon/gvfsbackendftp.c:412
+#: ../daemon/gvfsbackendftp.c:425 ../daemon/gvfsbackendftp.c:817
+#, fuzzy
+msgid "Invalid reply"
+msgstr "Неисправна адреса"
+
+#: ../daemon/gvfsbackendftp.c:532
+msgid "broken transmission"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:677 ../daemon/gvfsbackendftp.c:837
+msgid "Could not connect to host"
+msgstr ""
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:1337
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:1362 ../daemon/gvfsbackendsftp.c:874
+msgid "Password dialog cancelled"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:1441
+#, c-format
+msgid "ftp on %s"
+msgstr ""
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1445
+#, c-format
+msgid "ftp as %s on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:1529 ../daemon/gvfsbackendsftp.c:1958
+#: ../daemon/gvfsbackendsftp.c:3550
+#, fuzzy
+msgid "File is directory"
+msgstr "Датотека је празна"
+
+#: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
+msgid "backups not supported yet"
+msgstr ""
+
+#: ../daemon/gvfsbackendftp.c:1828
+#, fuzzy
+msgid "filename too long"
+msgstr "Име је предугачко"
+
+#: ../daemon/gvfsbackendftp.c:2345
+#, fuzzy
+msgid "Invalid destination filename"
+msgstr "Неисправно име датотеке"
+
+#: ../daemon/gvfsbackendgphoto2.c:501
+#, c-format
+msgid "%s: %d: Directory or file exists"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:508
+#, c-format
+msgid "%s: %d: No such file or directory"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:514
+#, fuzzy, c-format
+msgid "%s: %d: Invalid filename"
+msgstr "Неисправно име датотеке"
+
+#: ../daemon/gvfsbackendgphoto2.c:520
+#, c-format
+msgid "%s: %d: Not Supported"
+msgstr ""
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:693
+#, fuzzy, c-format
+msgid "Digital Camera (%s)"
+msgstr "%s %s дигитални фотоапарат"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:841 ../monitor/gphoto2/ggphoto2volume.c:183
+#, fuzzy, c-format
+msgid "%s Camera"
+msgstr "Фотоапарат"
+
+#. Translator: %s is the vendor name, e.g. Panasonic
+#. Translators: %s is the device vendor
+#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
+#, fuzzy, c-format
+msgid "%s Audio Player"
+msgstr "%s %s пуштач музике"
+
+#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:192
+msgid "Camera"
+msgstr "Фотоапарат"
+
+#: ../daemon/gvfsbackendgphoto2.c:855 ../monitor/gphoto2/ggphoto2volume.c:190
+#, fuzzy
+msgid "Audio Player"
+msgstr "%s %s пуштач музике"
+
+# bug: inconsistent wording with above "Bookmark saving failed" [eg. "Failed to save a bookmark" would be one way to solve it]
+#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2014
+#, fuzzy
+msgid "Failed to get folder list"
+msgstr "Неуспешно отварање датотеке „%s“: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:1443
+msgid "No device specified"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1460
+msgid "Cannot create gphoto2 context"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1470
+#, fuzzy
+msgid "Error creating camera"
+msgstr "Грешка при покретању наредбе"
+
+#: ../daemon/gvfsbackendgphoto2.c:1483 ../daemon/gvfsbackendgphoto2.c:1493
+#, fuzzy
+msgid "Error loading device information"
+msgstr "Грешка при покретању наредбе"
+
+#: ../daemon/gvfsbackendgphoto2.c:1505
+msgid "Error looking up device information"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1515
+msgid "Error getting device information"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1528
+msgid "Error setting up camera communications port"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1539
+msgid "Error initializing camera"
+msgstr ""
+
+#. Translator: %s represents the device, e.g. usb:001,042
+#: ../daemon/gvfsbackendgphoto2.c:1553
+#, c-format
+msgid "gphoto2 mount on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1628
+msgid "No camera specified"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1721
+msgid "Error creating file object"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1736
+#, fuzzy
+msgid "Error getting file"
+msgstr "Неуспешна пријава"
+
+#: ../daemon/gvfsbackendgphoto2.c:1746
+msgid "Error getting data from file"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
+#, c-format
+msgid "Error seeking in stream on camera %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
+msgid "Not a directory"
+msgstr "Није фасцикла"
+
+# bug: inconsistent wording with above "Bookmark saving failed" [eg. "Failed to save a bookmark" would be one way to solve it]
+#: ../daemon/gvfsbackendgphoto2.c:2080
+#, fuzzy
+msgid "Failed to get file list"
+msgstr "Неуспешно отварање датотеке „%s“: %s"
+
+#: ../daemon/gvfsbackendgphoto2.c:2372
+#, fuzzy
+msgid "Error creating directory"
+msgstr "Није фасцикла"
+
+#: ../daemon/gvfsbackendgphoto2.c:2581
+#, fuzzy
+msgid "Name already exists"
+msgstr "Датотека постоји"
+
+#: ../daemon/gvfsbackendgphoto2.c:2592 ../daemon/gvfsbackendgphoto2.c:3221
+#, fuzzy
+msgid "New name too long"
+msgstr "Име је предугачко"
+
+#: ../daemon/gvfsbackendgphoto2.c:2602 ../daemon/gvfsbackendgphoto2.c:3232
+msgid "Error renaming dir"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3245
+msgid "Error renaming file"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2679
+#, fuzzy, c-format
+msgid "Directory '%s' is not empty"
+msgstr "Директоријум није празан"
+
+#: ../daemon/gvfsbackendgphoto2.c:2690
+#, fuzzy
+msgid "Error deleting directory"
+msgstr "Није фасцикла"
+
+#: ../daemon/gvfsbackendgphoto2.c:2716
+msgid "Error deleting file"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2769
+#, fuzzy
+msgid "Can't write to directory"
+msgstr "Није фасцикла"
+
+#: ../daemon/gvfsbackendgphoto2.c:2816
+msgid "Cannot allocate new file to append to"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2831
+msgid "Cannot read file to append to"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:2842
+msgid "Cannot get data of file to append to"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:3129
+msgid "Error writing file"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:3177
+#, fuzzy
+msgid "Not supported (not same directory)"
+msgstr "Није фасцикла"
+
+#: ../daemon/gvfsbackendgphoto2.c:3189
+msgid "Not supported (src is dir, dst is dir)"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:3197
+msgid "Not supported (src is dir, dst is existing file)"
+msgstr ""
+
+#: ../daemon/gvfsbackendgphoto2.c:3209
+msgid "Not supported (src is file, dst is dir)"
+msgstr ""
+
+#: ../daemon/gvfsbackendhttp.c:241
+#, c-format
+msgid "HTTP Client Error: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
+#: ../daemon/gvfsbackendsmb.c:1301 ../daemon/gvfsbackendtrash.c:1006
+#: ../daemon/gvfsdaemonutils.c:211
+#, fuzzy
+msgid " (invalid encoding)"
+msgstr " (неисправан Уникод)"
+
+#: ../daemon/gvfsbackendlocaltest.c:853
+msgid "Directory notification not supported"
+msgstr ""
+
+#. smb:/// root link
+#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
+msgid "Windows Network"
+msgstr "Windows мрежа"
+
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackendnetwork.c:392
+#, fuzzy
+msgid "Local Network"
+msgstr "Мрежа"
+
+#. Translators: this is the friendly name of the 'network://' backend that
+#. * shows computers in your local network.
+#: ../daemon/gvfsbackendnetwork.c:862
+msgid "Network Location Monitor"
+msgstr ""
+
+#. Mount was successful
+#. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
+#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:557
+#: ../daemon/gvfsbackendsmb.c:1294
+#, c-format
+msgid "%s on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendobexftp.c:699
+msgid "Connection to the device lost"
+msgstr ""
+
+#: ../daemon/gvfsbackendobexftp.c:1194
+msgid "Device requires a software update"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:281
+msgid "ssh program unexpectedly exited"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:296
+#, fuzzy
+msgid "Hostname not known"
+msgstr "Име рачунара није исправно"
+
+#: ../daemon/gvfsbackendsftp.c:303
+msgid "No route to host"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:310
+msgid "Connection refused by server"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:317
+msgid "Host key verification failed"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:400
+msgid "Unable to spawn ssh program"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:416
+#, c-format
+msgid "Unable to spawn ssh program: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:528 ../daemon/gvfsbackendsftp.c:780
+msgid "Timed out when logging in"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:858
+msgid "Enter passphrase for key"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:860
+#, fuzzy
+msgid "Enter password"
+msgstr "Лозинка HTTP посредника"
+
+#: ../daemon/gvfsbackendsftp.c:921
+#, fuzzy
+msgid "Can't send password"
+msgstr "Не могу да пошаљем лозинку процесу који прикључује"
+
+#: ../daemon/gvfsbackendsftp.c:929
+msgid "Log In Anyway"
+msgstr "Ипак се пријави"
+
+#: ../daemon/gvfsbackendsftp.c:929
+msgid "Cancel Login"
+msgstr "Откажи пријаву"
+
+#: ../daemon/gvfsbackendsftp.c:939
+#, fuzzy, c-format
+msgid ""
+"The identity of the remote computer (%s) is unknown.\n"
+"This happens when you log in to a computer the first time.\n"
+"\n"
+"The identity sent by the remote computer is %s. If you want to be absolutely "
+"sure it is safe to continue, contact the system administrator."
+msgstr ""
+"Ово се догађа када се по први пут пријавите на рачунар.\n"
+"\n"
+"Идентитет који је послао удаљени рачунар је %s. Уколико желите да будете "
+"потпуно сигурни да је безбедно да наставите, ступите у везу са "
+"администратором система."
+
+#: ../daemon/gvfsbackendsftp.c:959
+msgid "Login dialog cancelled"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:979
+msgid "Can't send host identity confirmation"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
+msgid "Protocol error"
+msgstr "Грешка у протоколу"
+
+#. Translators: This is the name of an sftp share, like "sftp on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1519
+#, c-format
+msgid "sftp on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:1543
+#, fuzzy
+msgid "Unable to find supported ssh command"
+msgstr "Неуспешно покретање наредбе"
+
+#: ../daemon/gvfsbackendsftp.c:1967
+#, fuzzy
+msgid "Failure"
+msgstr "Датотеке"
+
+#: ../daemon/gvfsbackendsftp.c:2023 ../daemon/gvfsbackendsftp.c:2082
+#: ../daemon/gvfsbackendsftp.c:2093 ../daemon/gvfsbackendsftp.c:2149
+#: ../daemon/gvfsbackendsftp.c:2235 ../daemon/gvfsbackendsftp.c:2285
+#: ../daemon/gvfsbackendsftp.c:2331 ../daemon/gvfsbackendsftp.c:2406
+#: ../daemon/gvfsbackendsftp.c:2513 ../daemon/gvfsbackendsftp.c:2553
+#: ../daemon/gvfsbackendsftp.c:2603 ../daemon/gvfsbackendsftp.c:2672
+#: ../daemon/gvfsbackendsftp.c:2692 ../daemon/gvfsbackendsftp.c:2844
+#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2924
+#: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendsftp.c:3252
+#: ../daemon/gvfsbackendsftp.c:3319 ../daemon/gvfsbackendsftp.c:3448
+#: ../daemon/gvfsbackendsftp.c:3483 ../daemon/gvfsbackendsftp.c:3511
+#: ../daemon/gvfsbackendsftp.c:3619 ../daemon/gvfsbackendsftp.c:3673
+#: ../daemon/gvfsbackendsftp.c:3707 ../daemon/gvfsbackendsftp.c:3741
+#: ../daemon/gvfsbackendsftp.c:3756 ../daemon/gvfsbackendsftp.c:3771
+#: ../daemon/gvfsbackendsftp.c:3849
+#, fuzzy
+msgid "Invalid reply received"
+msgstr "Неисправни параметри"
+
+#: ../daemon/gvfsbackendsftp.c:2351
+#, c-format
+msgid "Error creating backup file: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:2754
+msgid "Unable to create temporary file"
+msgstr ""
+
+#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1793
+msgid "Can't move directory over directory"
+msgstr ""
+
+#. translators: First %s is a share name, second is a server name
+#: ../daemon/gvfsbackendsmb.c:216
+#, c-format
+msgid "Password required for share %s on %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmb.c:471 ../daemon/gvfsbackendsmb.c:511
+#: ../daemon/gvfsdaemonutils.c:92
+#, fuzzy, c-format
+msgid "Internal Error (%s)"
+msgstr "Унутрашња грешка"
+
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmb.c:550
+#, fuzzy
+msgid "Failed to mount Windows share"
+msgstr "Не могу да одспојим прикључени сервер"
+
+#: ../daemon/gvfsbackendsmb.c:717 ../daemon/gvfsbackendsmb.c:1173
+#, fuzzy
+msgid "Unsupported seek type"
+msgstr "Операција није подржана"
+
+#: ../daemon/gvfsbackendsmb.c:1237
+#, c-format
+msgid "Backup file creation failed: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmb.c:1695
+#, c-format
+msgid "Error deleting file: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmb.c:1769
+#, fuzzy, c-format
+msgid "Error moving file: %s"
+msgstr "Неуспешно чување обележивача (%s)"
+
+#: ../daemon/gvfsbackendsmb.c:1841
+#, c-format
+msgid "Error removing target file: %s"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmb.c:1865
+msgid "Can't recursively move directory"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmb.c:1928
+#, fuzzy
+msgid "Windows Shares Filesystem Service"
+msgstr "Дељени Windows диск"
+
+#. translators: Name for the location that lists the smb shares
+#. availible on a server (%s is the name of the server)
+#: ../daemon/gvfsbackendsmbbrowse.c:707
+#, fuzzy, c-format
+msgid "Windows shares on %s"
+msgstr "Дељени Windows диск"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
+msgid "The file is not a mountable"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmbbrowse.c:867
+msgid "Not a regular file"
+msgstr ""
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1224
+#, fuzzy
+msgid "Windows Network Filesystem Service"
+msgstr "Windows мрежа"
+
+#. translators: This is the name of the backend
+#. Translators: this is the display name of the backend
+#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
+msgid "Trash"
+msgstr ""
+
+#: ../daemon/gvfsbackendtrash.c:1019
+#, c-format
+msgid "%s (in trash)"
+msgstr ""
+
+#: ../daemon/gvfsbackendtrash.c:1330
+#, fuzzy
+msgid "Can't delete trash"
+msgstr "Баратај trash адресама"
+
+#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
+msgid "Trash directory notification not supported"
+msgstr ""
+
+#: ../daemon/gvfsdaemon.c:1032
+#, fuzzy
+msgid "Invalid backend type"
+msgstr "Неисправни параметри"
+
+#: ../daemon/gvfsdaemonutils.c:104
+#, c-format
+msgid "Error sending fd: %s"
+msgstr ""
+
+#: ../daemon/gvfsjobcloseread.c:112 ../daemon/gvfsjobclosewrite.c:120
+#: ../daemon/gvfsjobcopy.c:169 ../daemon/gvfsjobcreatemonitor.c:140
+#: ../daemon/gvfsjobcreatemonitor.c:151 ../daemon/gvfsjobcreatemonitor.c:174
+#: ../daemon/gvfsjobcreatemonitor.c:192 ../daemon/gvfsjobdelete.c:122
+#: ../daemon/gvfsjobenumerate.c:256 ../daemon/gvfsjobmakedirectory.c:122
+#: ../daemon/gvfsjobmount.c:109 ../daemon/gvfsjobmountmountable.c:156
+#: ../daemon/gvfsjobmove.c:168 ../daemon/gvfsjobopenforread.c:130
+#: ../daemon/gvfsjobopenforwrite.c:148 ../daemon/gvfsjobopenforwrite.c:162
+#: ../daemon/gvfsjobopenforwrite.c:176 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobupload.c:169
+#: ../daemon/gvfsjobwrite.c:120
+#, fuzzy
+msgid "Operation not supported by backend"
+msgstr "Операција није дозвољена"
+
+#: ../daemon/gvfsjobmakesymlink.c:126
+msgid "Symlinks not supported by backend"
+msgstr ""
+
+#: ../daemon/gvfsjobsetattribute.c:120
+#, fuzzy
+msgid "Invalid dbus message"
+msgstr "Неисправно име датотеке"
+
+#: ../daemon/main.c:45
+msgid "Replace old daemon."
+msgstr ""
+
+#: ../daemon/main.c:46
+msgid "Don't start fuse."
+msgstr ""
+
+#: ../daemon/main.c:58
+msgid "GVFS Daemon"
+msgstr ""
+
+#: ../daemon/main.c:61
+msgid "Main daemon for GVFS"
+msgstr ""
+
+#. Translators: the first %s is the application name,
+#. the second %s is the error message
+#: ../daemon/main.c:76
+#, c-format
+msgid "%s: %s"
+msgstr ""
+
+#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
+#: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-tree.c:251
+#, c-format
+msgid "Try \"%s --help\" for more information."
+msgstr ""
+
+#: ../daemon/mount.c:439
+msgid "Invalid arguments from spawned child"
+msgstr ""
+
+#: ../daemon/mount.c:740
+#, c-format
+msgid "Automount failed: %s"
+msgstr ""
+
+#: ../daemon/mount.c:785
+msgid "The specified location is not mounted"
+msgstr ""
+
+#: ../daemon/mount.c:790
+msgid "The specified location is not supported"
+msgstr ""
+
+#: ../daemon/mount.c:954
+msgid "Location is already mounted"
+msgstr ""
+
+#: ../daemon/mount.c:962
+msgid "Location is not mountable"
+msgstr ""
+
+#: ../monitor/hal/ghaldrive.c:130
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: ../monitor/hal/ghaldrive.c:132
+msgid "CD-R"
+msgstr "CD-R"
+
+#: ../monitor/hal/ghaldrive.c:134
+msgid "CD-RW"
+msgstr "CD-RW"
+
+#: ../monitor/hal/ghaldrive.c:138
+msgid "DVD-ROM"
+msgstr "DVD-ROM"
+
+#: ../monitor/hal/ghaldrive.c:140
+msgid "DVD+R"
+msgstr "DVD+R"
+
+#: ../monitor/hal/ghaldrive.c:142
+msgid "DVD+RW"
+msgstr "DVD+RW"
+
+#: ../monitor/hal/ghaldrive.c:144
+msgid "DVD-R"
+msgstr "DVD-R"
+
+#: ../monitor/hal/ghaldrive.c:146
+msgid "DVD-RW"
+msgstr "DVD-RW"
+
+#: ../monitor/hal/ghaldrive.c:148
+msgid "DVD-RAM"
+msgstr "DVD-RAM"
+
+#: ../monitor/hal/ghaldrive.c:151
+msgid "DVD±R"
+msgstr "DVD±R"
+
+#: ../monitor/hal/ghaldrive.c:154
+msgid "DVD±RW"
+msgstr "DVD±RW"
+
+#: ../monitor/hal/ghaldrive.c:156
+#, fuzzy
+msgid "HDDVD"
+msgstr "ДВД"
+
+#: ../monitor/hal/ghaldrive.c:158
+#, fuzzy
+msgid "HDDVD-r"
+msgstr "DVD-R"
+
+#: ../monitor/hal/ghaldrive.c:160
+#, fuzzy
+msgid "HDDVD-RW"
+msgstr "DVD-RW"
+
+#: ../monitor/hal/ghaldrive.c:162
+msgid "Blu-ray"
+msgstr ""
+
+#: ../monitor/hal/ghaldrive.c:164
+msgid "Blu-ray-R"
+msgstr ""
+
+#: ../monitor/hal/ghaldrive.c:166
+msgid "Blu-ray-RE"
+msgstr ""
+
+#. translators: This wis something like "CD-ROM/DVD Drive" or
+#. "CD-RW/Blue-ray Drive" depending on the properties of the drive
+#: ../monitor/hal/ghaldrive.c:172
+#, c-format
+msgid "%s/%s Drive"
+msgstr "%s/%s диск"
+
+#. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
+#. depending on the properties of the drive
+#: ../monitor/hal/ghaldrive.c:178
+#, c-format
+msgid "%s Drive"
+msgstr "%s диск"
+
+#: ../monitor/hal/ghaldrive.c:182
+msgid "Floppy Drive"
+msgstr "Дискета"
+
+#: ../monitor/hal/ghaldrive.c:188
+msgid "Software RAID Drive"
+msgstr ""
+
+#: ../monitor/hal/ghaldrive.c:190
+msgid "USB Drive"
+msgstr "УСБ диск"
+
+#: ../monitor/hal/ghaldrive.c:192
+#, fuzzy
+msgid "ATA Drive"
+msgstr "Уређај"
+
+#: ../monitor/hal/ghaldrive.c:194
+#, fuzzy
+msgid "SCSI Drive"
+msgstr "УСБ диск"
+
+#: ../monitor/hal/ghaldrive.c:196
+#, fuzzy
+msgid "FireWire Drive"
+msgstr "Зип диск"
+
+#: ../monitor/hal/ghaldrive.c:200
+#, fuzzy
+msgid "Tape Drive"
+msgstr "Зип диск"
+
+#: ../monitor/hal/ghaldrive.c:202
+#, fuzzy
+msgid "CompactFlash Drive"
+msgstr "Компактни-флеш диск (CF)"
+
+# Чаробни штапић? :)
+#: ../monitor/hal/ghaldrive.c:204
+#, fuzzy
+msgid "MemoryStick Drive"
+msgstr "Меморијски штапић"
+
+#: ../monitor/hal/ghaldrive.c:206
+#, fuzzy
+msgid "SmartMedia Drive"
+msgstr "Мудри носач (SM)"
+
+#: ../monitor/hal/ghaldrive.c:208
+msgid "SD/MMC Drive"
+msgstr "SD/MMC носач"
+
+#: ../monitor/hal/ghaldrive.c:210
+msgid "Zip Drive"
+msgstr "Зип диск"
+
+#: ../monitor/hal/ghaldrive.c:212
+msgid "Jaz Drive"
+msgstr "Џез диск"
+
+#: ../monitor/hal/ghaldrive.c:214
+#, fuzzy
+msgid "Thumb Drive"
+msgstr "%s диск"
+
+#: ../monitor/hal/ghaldrive.c:217
+msgid "Mass Storage Drive"
+msgstr ""
+
+#: ../monitor/hal/ghaldrive.c:723
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+
+#: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:152
+#, fuzzy, c-format
+msgid "%.1f kB"
+msgstr "%.1f КБ"
+
+#: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:157
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f МБ"
+
+#: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:162
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f ГБ"
+
+#: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:233
+#, fuzzy
+msgid "Mixed Audio/Data Disc"
+msgstr "Звучни диск"
+
+#. Translators: %s is the size of the mount (e.g. 512 MB)
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalmount.c:446 ../monitor/hal/ghalvolume.c:244
+#, fuzzy, c-format
+msgid "%s Media"
+msgstr "Мудри носач (SM)"
+
+#. Translators: %s is the size of the volume (e.g. 512 MB)
+#: ../monitor/hal/ghalvolume.c:221
+#, c-format
+msgid "%s Encrypted Data"
+msgstr ""
+
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "Обичан диск"
+
+#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
+#, fuzzy
+msgid "Blank CD-ROM Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "Једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "Пиши-бриши диск"
+
+#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "Празан пиши-бриши диск"
+
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "Обичан ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+#, fuzzy
+msgid "Blank DVD-ROM Disc"
+msgstr "Празан - ДВД меморијски диск"
+
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "Меморијски - ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "Празан - ДВД меморијски диск"
+
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "Пиши-бриши ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "Празан пиши-бриши ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "Једном уписиви + ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "Празан једном уписиви + ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "Пиши+бриши ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "Празан пиши+бриши ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
+#, fuzzy
+msgid "DVD+R DL Disc"
+msgstr "Једном уписиви + ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
+#, fuzzy
+msgid "Blank DVD+R DL Disc"
+msgstr "Празан једном уписиви + ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
+#, fuzzy
+msgid "Blu-Ray Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
+#, fuzzy
+msgid "Blank Blu-Ray Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
+#, fuzzy
+msgid "Blu-Ray R Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
+#, fuzzy
+msgid "Blank Blu-Ray R Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
+#, fuzzy
+msgid "Blu-Ray RW Disc"
+msgstr "Празан пиши-бриши диск"
+
+#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
+#, fuzzy
+msgid "Blank Blu-Ray RW Disc"
+msgstr "Празан пиши-бриши диск"
+
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
+#, fuzzy
+msgid "HD DVD Disc"
+msgstr "Једном уписиви - ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
+#, fuzzy
+msgid "Blank HD DVD Disc"
+msgstr "Празан једном уписиви - ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
+#, fuzzy
+msgid "HD DVD-R Disc"
+msgstr "Једном уписиви - ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
+#, fuzzy
+msgid "Blank HD DVD-R Disc"
+msgstr "Празан једном уписиви - ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
+#, fuzzy
+msgid "HD DVD-RW Disc"
+msgstr "Пиши-бриши ДВД диск"
+
+#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
+#, fuzzy
+msgid "Blank HD DVD-RW Disc"
+msgstr "Празан пиши-бриши ДВД диск"
+
+# bug: Compact Disk Disk?
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
+#, fuzzy
+msgid "MO Disc"
+msgstr "ЦД диск"
+
+#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
+#, fuzzy
+msgid "Blank MO Disc"
+msgstr "Празан једном-уписив диск"
+
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
+#, fuzzy
+msgid "Disc"
+msgstr "Диск"
+
+#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
+#, fuzzy
+msgid "Blank Disc"
+msgstr "Празан једном-уписив диск"
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:57
+#, c-format
+msgid "%s: %s: error opening file: %s\n"
+msgstr ""
+
+#. Translators: the first %s is the program name, the
+#. second one is the URI of the file.
+#: ../programs/gvfs-cat.c:80
+#, c-format
+msgid "%s: %s, error writing to stdout"
+msgstr ""
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:92
+#, c-format
+msgid "%s: %s: error reading: %s\n"
+msgstr ""
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-cat.c:110
+#, c-format
+msgid "%s: %s:error closing: %s\n"
+msgstr ""
+
+#: ../programs/gvfs-cat.c:136
+msgid "LOCATION... - concatenate LOCATIONS to standard output."
+msgstr ""
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-cat.c:141
+msgid ""
+"Concatenate files at locations and print to the standard output. Works just "
+"like the traditional cat utility, but using gvfs location instead local "
+"files: for example you can use something like smb://server/resource/file.txt "
+"as location to concatenate."
+msgstr ""
+
+#: ../programs/gvfs-cat.c:148
+msgid ""
+"Note: just pipe through cat if you need its formatting option like -n, -T or "
+"other."
+msgstr ""
+
+#. Translators: the %s is the program name. This error message
+#. means the user is calling gvfs-cat without any argument.
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:142
+#, c-format
+msgid "%s: missing locations"
+msgstr ""
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:56
+#, c-format
+msgid "%s: %s: error opening location: %s\n"
+msgstr ""
+
+#. Translators: the first %s is the program name, the second one
+#. is the URI of the file, the third is the error message.
+#: ../programs/gvfs-open.c:83
+#, c-format
+msgid "%s: %s: error launching application: %s\n"
+msgstr ""
+
+#: ../programs/gvfs-open.c:113
+msgid "FILES... - open FILES with registered application."
+msgstr ""
+
+#. Translators: this message will appear after the usage string
+#. and before the list of options.
+#: ../programs/gvfs-open.c:117
+msgid ""
+"Opens the file(s) with the default application registered to handle the type "
+"of the file."
+msgstr ""
+
+#~ msgid "ISO 9660 Volume"
+#~ msgstr "ИСО 9660 диск"
+
+#~ msgid "%s:%u contains NUL characters."
+#~ msgstr "%s:%u садржи NUL знакове."
+
+#~ msgid "%s:%u contains no method name."
+#~ msgstr "%s:%u не садржи име метода."
+
+#~ msgid "%s:%u has no options endmarker."
+#~ msgstr "%s:%u не садржи ознаку краја опција."
+
+#~ msgid "%s:%u has unknown options %s."
+#~ msgstr "%s:%u користи непознате опције %s."
+
+#~ msgid "%s:%u contains no module name."
+#~ msgstr "%s:%u не садржи име модула."
+
+#~ msgid "Configuration file `%s' was not found: %s"
+#~ msgstr "Датотека са подешавањима „%s“ није нађена: %s"
+
+#~ msgid "%s:%d aborted parsing."
+#~ msgstr "%s:%d је прекинуо рашчлањивање."
+
+#~ msgid "AFFS Volume"
+#~ msgstr "AFFS диск"
+
+#~ msgid "AFS Network Volume"
+#~ msgstr "Мрежни AFS диск"
+
+#~ msgid "Auto-detected Volume"
+#~ msgstr "Самопрепознати диск"
+
+#~ msgid "CD-ROM Drive"
+#~ msgstr "ЦД уређај"
+
+#~ msgid "CD Digital Audio"
+#~ msgstr "Музички диск"
+
+# bug(slobo): хм, не бих рекао
+#~ msgid "Hardware Device Volume"
+#~ msgstr "Диск на хардверском уређају"
+
+#~ msgid "EncFS Volume"
+#~ msgstr "EncFS диск"
+
+# bug: does it differentiate between Hurd Ext2 and Linux Ext2?
+#~ msgid "Ext2 Linux Volume"
+#~ msgstr "Линукс Ext2 диск"
+
+#~ msgid "Ext3 Linux Volume"
+#~ msgstr "Линукс Ext3 диск"
+
+#~ msgid "MSDOS Volume"
+#~ msgstr "МСДОС диск"
+
+#~ msgid "BSD Volume"
+#~ msgstr "БСД диск"
+
+#~ msgid "FUSE Volume"
+#~ msgstr "ФУСЕ јединица"
+
+#~ msgid "MacOS Volume"
+#~ msgstr "МекОС диск"
+
+# ЦеДе диск, а не „Компактни диск диск“
+#~ msgid "CDROM Volume"
+#~ msgstr "ЦД јединица"
+
+#~ msgid "Hsfs CDROM Volume"
+#~ msgstr "Hsfs ЦД јединица"
+
+#~ msgid "JFS Volume"
+#~ msgstr "ЈФС диск"
+
+#~ msgid "Windows NT Volume"
+#~ msgstr "Windows NT диск"
+
+#~ msgid "System Volume"
+#~ msgstr "Системски диск"
+
+#~ msgid "Memory Volume"
+#~ msgstr "Меморијски диск"
+
+#~ msgid "Minix Volume"
+#~ msgstr "Миникс диск"
+
+#~ msgid "NFS Network Volume"
+#~ msgstr "Диск мрежног система датотека"
+
+#~ msgid "Netware Volume"
+#~ msgstr "Netware диск"
+
+#~ msgid "Reiser4 Linux Volume"
+#~ msgstr "Линукс Рајзер4 диск"
+
+#~ msgid "ReiserFS Linux Volume"
+#~ msgstr "Линукс РајзерФС диск"
+
+#~ msgid "SuperMount Volume"
+#~ msgstr "SuperMount диск"
+
+#~ msgid "DVD Volume"
+#~ msgstr "ДВД јединица"
+
+#~ msgid "Solaris/BSD Volume"
+#~ msgstr "Соларис/БСД диск"
+
+#~ msgid "Udfs Solaris Volume"
+#~ msgstr "Соларис Udfs диск"
+
+#~ msgid "Pcfs Solaris Volume"
+#~ msgstr "Соларис Pcfs диск"
+
+#~ msgid "Sun SAM-QFS Volume"
+#~ msgstr "Sun SAM-QFS диск"
+
+#~ msgid "Temporary Volume"
+#~ msgstr "Привремени диск"
+
+#~ msgid "Enhanced DOS Volume"
+#~ msgstr "Унапређени DOS диск"
+
+#~ msgid "Windows VFAT Volume"
+#~ msgstr "Windows VFAT диск"
+
+#~ msgid "Xenix Volume"
+#~ msgstr "Xenix диск"
+
+#~ msgid "XFS Linux Volume"
+#~ msgstr "Линукс XFS диск"
+
+#~ msgid "XIAFS Volume"
+#~ msgstr "XIAFS диск"
+
+#~ msgid "CIFS Volume"
+#~ msgstr "CIFS диск"
+
+#~ msgid "Unknown"
+#~ msgstr "Непознат"
+
+#~ msgid "%s Volume"
+#~ msgstr "%s диск"
+
+# :)
+#~ msgid "Pen Drive"
+#~ msgstr "Оловкасти диск"
+
+#~ msgid "External %s"
+#~ msgstr "Спољни %s"
+
+#~ msgid "%s Removable Volume"
+#~ msgstr "Уклоњиви %s диск"
+
+#~ msgid "Volume"
+#~ msgstr "Диск"
+
+#~ msgid "Unknown operation type %u"
+#~ msgstr "Непознат тип операције %u"
+
+#~ msgid "Cannot create pipe for open GIOChannel: %s"
+#~ msgstr "Не могу направити цевку за отворени GIOChannel: %s"
+
+#~ msgid "Unknown job kind %u"
+#~ msgstr "Непозната врста посла %u"
+
+#~ msgid ""
+#~ "Deprecated function.  User modifications to the MIME database are no "
+#~ "longer supported."
+#~ msgstr ""
+#~ "Превазиђена функција.  Измене корисника у МИМЕ бази више нису подржане."
+
+#~ msgid "More parsing errors will be ignored."
+#~ msgstr "Остале грешке у обради ће бити занемарене."
+
+#~ msgid "No error"
+#~ msgstr "Нема грешке"
+
+#~ msgid "File not found"
+#~ msgstr "Датотека није нађена"
+
+#~ msgid "Generic error"
+#~ msgstr "Општа грешка"
+
+#~ msgid "I/O error"
+#~ msgstr "У/И грешка"
+
+#~ msgid "Data corrupted"
+#~ msgstr "Подаци оштећени"
+
+#~ msgid "Format not valid"
+#~ msgstr "Облик није исправан"
+
+# bug: is file handle the same as file descriptor?
+#~ msgid "Bad file handle"
+#~ msgstr "Лоша ручка датотеке"
+
+#~ msgid "File too big"
+#~ msgstr "Датотека је превелика"
+
+#~ msgid "Read-only file system"
+#~ msgstr "Систем датотека само за читање"
+
+#~ msgid "File not open"
+#~ msgstr "Датотека није отворена"
+
+#~ msgid "Open mode not valid"
+#~ msgstr "Начин отварања није исправан"
+
+#~ msgid "Too many open files"
+#~ msgstr "Превише отворених датотека"
+
+#~ msgid "Operation in progress"
+#~ msgstr "Операција у току"
+
+#~ msgid "Operation interrupted"
+#~ msgstr "Операција прекинута"
+
+#~ msgid "Looping links encountered"
+#~ msgstr "Пронађене кружне везе"
+
+#~ msgid "Is a directory"
+#~ msgstr "Јесте фасцикла"
+
+#~ msgid "Not enough memory"
+#~ msgstr "Нема довољно меморије"
+
+#~ msgid "Host not found"
+#~ msgstr "Рачунар није нађен"
+
+#~ msgid "Host has no address"
+#~ msgstr "Рачунар нема адресу"
+
+#~ msgid "Directory busy"
+#~ msgstr "Заузет директоријум"
+
+#~ msgid "Too many links"
+#~ msgstr "Превише веза"
+
+#~ msgid "Read only file system"
+#~ msgstr "Неуписив систем датотека"
+
+#~ msgid "Not on the same file system"
+#~ msgstr "Није на истом систему датотека"
+
+#~ msgid "Service not available"
+#~ msgstr "Услуга није доступна"
+
+#~ msgid "Request obsoletes service's data"
+#~ msgstr "Захтев застарева податке услуге"
+
+#~ msgid "No default action associated"
+#~ msgstr "Није додељено уобичајено дејство"
+
+#~ msgid "No handler for URL scheme"
+#~ msgstr "Нема руковаоца за врсту адресе (URL-а)"
+
+#~ msgid "Error parsing command line"
+#~ msgstr "Грешка при читању наредбе"
+
+#~ msgid "Timeout reached"
+#~ msgstr "Достигнут рок"
+
+#~ msgid "Nameserver error"
+#~ msgstr "Грешка са сервером имена"
+
+#~ msgid "The resource is locked"
+#~ msgstr "Ресурс је закључан"
+
+#~ msgid "Function call deprecated"
+#~ msgstr "Позив функције је превазиђен"
+
+#~ msgid "Not a symbolic link"
+#~ msgstr "Није симболичка веза"
+
+#~ msgid "Unknown error"
+#~ msgstr "Непозната грешка"
+
+#~ msgid "%u byte"
+#~ msgid_plural "%u bytes"
+#~ msgstr[0] "%u бајт"
+#~ msgstr[1] "%u бајта"
+#~ msgstr[2] "%u бајтова"
+
+#~ msgid "Floppy"
+#~ msgstr "Дискета"
+
+#~ msgid "CD-ROM/DVD-ROM"
+#~ msgstr "ЦД-РОМ/ДВД-РОМ"
+
+#~ msgid "CD-ROM/DVD-RAM"
+#~ msgstr "ЦД-РОМ/ДВД-РАМ"
+
+#~ msgid "CD-ROM/DVD-R"
+#~ msgstr "ЦД-РОМ/ДВД-Р"
+
+#~ msgid "CD-ROM/DVD-RW"
+#~ msgstr "ЦД-РОМ/ДВД-РВ"
+
+#~ msgid "CD-R/DVD-ROM"
+#~ msgstr "ЦД-Р/ДВД-РОМ"
+
+#~ msgid "CD-R/DVD-RAM"
+#~ msgstr "ЦД-Р/ДВД-РАМ"
+
+#~ msgid "CD-R/DVD-R"
+#~ msgstr "ЦД-Р/ДВД-Р"
+
+#~ msgid "CD-R/DVD-RW"
+#~ msgstr "ЦД-Р/ДВД-РВ"
+
+#~ msgid "CD-RW/DVD-ROM"
+#~ msgstr "ЦД-РВ/ДВД-РОМ"
+
+#~ msgid "CD-RW/DVD-RAM"
+#~ msgstr "ЦД-РВ/ДВД-РАМ"
+
+#~ msgid "CD-RW/DVD-R"
+#~ msgstr "ЦД-РВ/ДВД-Р"
+
+#~ msgid "CD-RW/DVD-RW"
+#~ msgstr "ЦД-РВ/ДВД-РВ"
+
+#~ msgid "IEEE1394 Drive"
+#~ msgstr "ИЕЕЕ1394 диск"
+
+#~ msgid "CF"
+#~ msgstr "CF"
+
+#~ msgid "SD/MMC"
+#~ msgstr "SD/MMC"
+
+# Чаробни штапић? :)
+#~ msgid "Memory Stick"
+#~ msgstr "Меморијски штапић"
+
+#~ msgid "Root Volume"
+#~ msgstr "Корени диск"
+
+#~ msgid "Audio CD"
+#~ msgstr "Музички диск"
+
+#~ msgid "Unknown volume"
+#~ msgstr "Непознати диск"
+
+#~ msgid "Network server"
+#~ msgstr "Мрежни сервер"
+
+#~ msgid ""
+#~ "Unable to mount the floppy drive. There is probably no floppy in the "
+#~ "drive."
+#~ msgstr "Не могу да прикључим дискету. Вероватно дискета није у уређају. "
+
+#~ msgid ""
+#~ "Unable to mount the volume. There is probably no media in the device."
+#~ msgstr "Не могу да прикључим диск. Вероватно нема носача у уређају. "
+
+#~ msgid ""
+#~ "Unable to mount the floppy drive. The floppy is probably in a format that "
+#~ "cannot be mounted."
+#~ msgstr ""
+#~ "Не могу да прикључим дискету. Вероватно је дискета у запису који се не "
+#~ "може читати."
+
+#~ msgid ""
+#~ "Unable to mount the volume. If this is an encrypted drive, then the wrong "
+#~ "password or key was used."
+#~ msgstr ""
+#~ "Не могу да прикључим диск. Ако је он шифрован, тада је била искоришћена "
+#~ "погрешна лозинка или кључ."
+
+#~ msgid ""
+#~ "Unable to mount the selected volume. The volume is probably in a format "
+#~ "that cannot be mounted."
+#~ msgstr ""
+#~ "Не могу да прикључим изабрани диск. Вероватно је диск у запису који се не "
+#~ "може читати."
+
+#~ msgid "Unable to mount the selected floppy drive."
+#~ msgstr "Не могу да прикључим изабрану дискету."
+
+#~ msgid "Unable to mount the selected volume."
+#~ msgstr "Не могу да прикључим изабрани диск."
+
+#~ msgid ""
+#~ "Unable to unmount the selected volume. The volume is in use by one or "
+#~ "more programs."
+#~ msgstr ""
+#~ "Не могу да одспојим изабрани диск. Њега вероватно користи неки програм "
+#~ "или програми."
+
+#~ msgid "Unable to unmount the selected volume."
+#~ msgstr "Не могу да одспојим изабрани диск."
+
+#~ msgid "Failed to read data from child process %d (%s)"
+#~ msgstr "Неуспешно читање датотеке из наследног процеса %d (%s)"
+
+#~ msgid "Couldn't run mount process in a pty"
+#~ msgstr "Не могу да покренем процес прикључења у лажном терминалу"
+
+#~ msgid "Unexpected error in select() reading data from a child process (%s)"
+#~ msgstr ""
+#~ "Неочекивана грешка у функцији select() при читању података у наследном "
+#~ "процесу (%s)"
+
+#~ msgid "Unexpected error in waitpid() (%s)"
+#~ msgstr "Неочекивана грешка унутар извршења функције waitpid() (%s)"
+
+#~ msgid "Unable to eject media"
+#~ msgstr "Не могу да избацим носач"
+
+#~ msgid "Home"
+#~ msgstr "Лични"
+
+#~ msgid "Unknown GnomeVFSSeekPosition %d"
+#~ msgstr "Непознато GnomeVFSSeekPosition %d"
+
+#~ msgid "The identity of the remote computer (%s) is unknown."
+#~ msgstr "Идентитет удаљеног рачунара (%s) није познат."
+
+#~ msgid "Didn't find a valid settings file at %s\n"
+#~ msgstr "Нисам нашао исправну датотеку са подешавањима у %s\n"
+
+#~ msgid "Use the %s environment variable to specify a different location.\n"
+#~ msgstr "Користите променљиву окружења %s да назначите другу путању.\n"
+
+#~ msgid "Your HTTP Proxy requires you to log in.\n"
+#~ msgstr "Ваш ХТТП посредник захтева пријаву.\n"
+
+#~ msgid ""
+#~ "You must log in to access \"%s\".\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Морате се пријавити како бисте приступили „%s“.\n"
+#~ "%s"
+
+#~ msgid "Your password will be transmitted unencrypted."
+#~ msgstr "Лозинка ће бити пренета незаштићена."
+
+#~ msgid "Your password will be transmitted encrypted."
+#~ msgstr "Лозинка ће бити шифрована пре преноса."
+
+#~ msgid "You must log in to access %s domain %s\n"
+#~ msgstr "Морате се пријавити како бисте приступили %s, домен %s\n"
+
+#~ msgid "You must log in to access %s\n"
+#~ msgstr "Морате се пријавити како бисте приступили %s\n"
+
+#~ msgid "Default component viewer application"
+#~ msgstr "Подразумевани програм за преглед делова"
+
+#~ msgid "Default terminal application"
+#~ msgstr "Подразумевани терминалски програм"
+
+# bug: no slang, s/exec/execut.../?
+#~ msgid "Exec argument for default terminal"
+#~ msgstr "Аргумент извршавања за подразумевани терминал"
+
+#~ msgid ""
+#~ "The application to use for viewing files that require a component to view "
+#~ "them. The parameter %s will be replaced by the file's URIs, the parameter "
+#~ "%c will be replaced by the component IID."
+#~ msgstr ""
+#~ "Програм који се користи за прегледање датотека које захтевају компоненту "
+#~ "за преглед. Параметар %s ће бити замењен адресом датотеке, а параметар %c "
+#~ "ће бити замењен IID-ом компоненте."
+
+#~ msgid ""
+#~ "The default terminal application to use for applications that require a "
+#~ "terminal."
+#~ msgstr ""
+#~ "Подразумевани терминалски програм који се користи за програме којима је "
+#~ "неопходан терминал."
+
+# bug: no slang, s/exec/execute.../?
+#~ msgid "The exec argument to use for the default terminal application."
+#~ msgstr "Аргумент извршавања за подразумевани терминалски програм."
+
+#~ msgid "Run the command in a terminal"
+#~ msgstr "Покрени наредбу у терминалу"
+
+#~ msgid "The command used to handle \"aim\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „aim“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"callto\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „callto“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"ghelp\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „ghelp“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"h323\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „h323“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"http\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „http“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"https\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „https“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"info\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „info“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"mailto\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „mailto“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"man\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „man“ адресама, ако је укључено."
+
+#~ msgid "The command used to handle \"trash\" URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „trash“ адресама, ако је укључено."
+
+#~ msgid "The handler for \"aim\" URLs"
+#~ msgstr "Руковаоц „aim“ адресама"
+
+#~ msgid "The handler for \"callto\" URLs"
+#~ msgstr "Руковаоц „callto“ адресама"
+
+#~ msgid "The handler for \"ghelp\" URLs"
+#~ msgstr "Руковаоц „ghelp“ адресама"
+
+#~ msgid "The handler for \"h323\" URLs"
+#~ msgstr "Руковаоц „h323“ адресама"
+
+#~ msgid "The handler for \"http\" URLs"
+#~ msgstr "Руковаоц „http“ адресама"
+
+#~ msgid "The handler for \"https\" URLs"
+#~ msgstr "Руковаоц „https“ адресама"
+
+#~ msgid "The handler for \"info\" URLs"
+#~ msgstr "Руковаоц „info“ адресама"
+
+#~ msgid "The handler for \"mailto\" URLs"
+#~ msgstr "Руковаоц „mailto“ адресама"
+
+#~ msgid "The handler for \"man\" URLs"
+#~ msgstr "Руковаоц „man“ адресама"
+
+#~ msgid "The handler for \"trash\" URLs"
+#~ msgstr "Руковаоц „trash“ адресама"
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"aim"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„aim“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle "
+#~ "\"callto\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„callto“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"ghelp"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„ghelp“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"h323"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„h323“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"http"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„http“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"https"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„https“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"info"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„info“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle "
+#~ "\"mailto\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„mailto“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"man"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„man“ адресе."
+
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle \"trash"
+#~ "\" URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„trash“ адресе."
+
+#~ msgid ""
+#~ "True if the command used to handle this type of URL should be run in a "
+#~ "terminal."
+#~ msgstr ""
+#~ "Укључено ако наредба која се користи за ове адресе треба да се покреће у "
+#~ "терминалу."
+
+#~ msgid "Whether the specified command should handle \"aim\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „aim“ адресе."
+
+#~ msgid "Whether the specified command should handle \"callto\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „callto“ адресе."
+
+#~ msgid "Whether the specified command should handle \"ghelp\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „ghelp“ адресе."
+
+#~ msgid "Whether the specified command should handle \"h323\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „h323“ адресе."
+
+#~ msgid "Whether the specified command should handle \"http\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „http“ адресе."
+
+#~ msgid "Whether the specified command should handle \"https\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „https“ адресе."
+
+#~ msgid "Whether the specified command should handle \"info\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „info“ адресе."
+
+#~ msgid "Whether the specified command should handle \"mailto\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „mailto“ адресе."
+
+#~ msgid "Whether the specified command should handle \"man\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „man“ адресе."
+
+#~ msgid "Whether the specified command should handle \"trash\" URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „trash“ адресе."
+
+#~ msgid ""
+#~ "Comma separated list of DNS-SD domains that should be visible in the "
+#~ "\"network:///\" location."
+#~ msgstr ""
+#~ "Запетом раздвојен списак DNS-SD домена који су доступни на путањи "
+#~ "„network:///."
+
+#~ msgid "Extra domains to look for DNS-SD services in"
+#~ msgstr "Допунски домени на којима да тражи DNS-SD услуге"
+
+#~ msgid "How to display local DNS-SD service"
+#~ msgstr "Како да приказује локалну DNS-SD услугу"
+
+#~ msgid "Possible values are \"merged\", \"separate\" and \"disabled\"."
+#~ msgstr ""
+#~ "Допуштене вредности су „merged“ (спојено), „separate“ (раздвојено) и "
+#~ "„disabled“ (искључено)."
+
+#~ msgid "Authenticate proxy server connections"
+#~ msgstr "Идентификуј везе са посредничким сервером"
+
+#~ msgid "Automatic proxy configuration URL"
+#~ msgstr "Адреса за самоподешавање посредника"
+
+#~ msgid "Enables the proxy settings when accessing HTTP over the Internet."
+#~ msgstr "Укључује подешавања посредника при приступу вебу преко Интернета."
+
+#~ msgid "FTP proxy host name"
+#~ msgstr "Име FTP посредника"
+
+#~ msgid "FTP proxy port"
+#~ msgstr "Порт FTP посредника"
+
+#~ msgid "HTTP proxy host name"
+#~ msgstr "Име HTTP посредника"
+
+#~ msgid "HTTP proxy port"
+#~ msgstr "Порт HTTP посредника"
+
+#~ msgid "HTTP proxy username"
+#~ msgstr "Корисник HTTP посредника"
+
+#~ msgid ""
+#~ "If true, then connections to the proxy server require authentication. The "
+#~ "username/password combo is defined by \"/system/http_proxy/"
+#~ "authentication_user\" and \"/system/http_proxy/authentication_password\"."
+#~ msgstr ""
+#~ "Уколико је постављено, везе са посредничким сервером се идентификују. Пар "
+#~ "корисник/лозинка се узима из „/system/http_proxy/authentication_user“ и „/"
+#~ "system/http_proxy/authentication_password“."
+
+#~ msgid "Non-proxy hosts"
+#~ msgstr "Беспосредничке адресе"
+
+#~ msgid "Password to pass as authentication when doing HTTP proxying."
+#~ msgstr "Лозинка која се користи за идентификацију код веб посредника."
+
+#~ msgid "Proxy configuration mode"
+#~ msgstr "Начин подешавања посредника"
+
+#~ msgid "SOCKS proxy host name"
+#~ msgstr "Име SOCKS посредника"
+
+#~ msgid "SOCKS proxy port"
+#~ msgstr "Порт SOCKS посредника"
+
+#~ msgid "Secure HTTP proxy host name"
+#~ msgstr "Име безбедног HTTP посредника"
+
+#~ msgid "Secure HTTP proxy port"
+#~ msgstr "Порт безбедног HTTP посредника"
+
+#~ msgid ""
+#~ "Select the proxy configuration mode. Supported values are \"none\", "
+#~ "\"manual\", \"auto\"."
+#~ msgstr ""
+#~ "Изаберите режим подешавања посредника. Допуштене вредности су „none“, "
+#~ "„manual“ и „auto“."
+
+#~ msgid "The machine name to proxy FTP through."
+#~ msgstr "Име рачунара за FTP посредовање."
+
+#~ msgid "The machine name to proxy HTTP through."
+#~ msgstr "Име рачунара за веб (HTTP) посредовање."
+
+#~ msgid "The machine name to proxy secure HTTP through."
+#~ msgstr "Име рачунара за безбедно веб (HTTPS) посредовање."
+
+# bug: s/socks/SOCKS/
+#~ msgid "The machine name to proxy socks through."
+#~ msgstr "Име рачунара за SOCKS посредовање."
+
+#~ msgid ""
+#~ "The port on the machine defined by \"/system/http_proxy/host\" that you "
+#~ "proxy through."
+#~ msgstr ""
+#~ "Порт рачунара датог у „/system/http_proxy/host“ кроз који посредује."
+
+#~ msgid ""
+#~ "The port on the machine defined by \"/system/proxy/ftp_host\" that you "
+#~ "proxy through."
+#~ msgstr ""
+#~ "Порт рачунара датог у „/system/proxy/ftp_proxy“ кроз који посредује."
+
+#~ msgid ""
+#~ "The port on the machine defined by \"/system/proxy/secure_host\" that you "
+#~ "proxy through."
+#~ msgstr ""
+#~ "Порт рачунара датог у „/system/proxy/secure_proxy“ кроз који посредује."
+
+#~ msgid ""
+#~ "The port on the machine defined by \"/system/proxy/socks_host\" that you "
+#~ "proxy through."
+#~ msgstr ""
+#~ "Порт машине одређене помоћу „/system/proxy/socks_proxy“ која је посредник."
+
+#~ msgid ""
+#~ "This key contains a list of hosts which are connected to directly, rather "
+#~ "than via the proxy (if it is active). The values can be hostnames, "
+#~ "domains (using an initial wildcard like *.foo.com), IP host addresses "
+#~ "(both IPv4 and IPv6) and network addresses with a netmask (something like "
+#~ "192.168.0.0/24)."
+#~ msgstr ""
+#~ "Овај кључ садржи списак рачунара који су непосредно повезани, уместо "
+#~ "путем посредника (уколико је у дејству). Ове вредности могу бити имена "
+#~ "рачунара, домени (помоћу почетних навода као што је *.нешто.ију), ИП "
+#~ "адресе рачунара (било ИП4 било ИП6) и адресе мрежа уз мрежну маску (нешто "
+#~ "као што је 192.168.0.0/24)."
+
+#~ msgid "URL that provides proxy configuration values."
+#~ msgstr "Адреса која обезбеђује вредности за подешавање посредника."
+
+#~ msgid "Use HTTP proxy"
+#~ msgstr "Користи веб посредника"
+
+#~ msgid "User name to pass as authentication when doing HTTP proxying."
+#~ msgstr "Корисничко име које се шаље при идентификацији код веб посредника."
+
+#~ msgid "SMB workgroup"
+#~ msgstr "СМБ радна група"
+
+#~ msgid ""
+#~ "The Windows networking workgroup or domain that the user is part of. In "
+#~ "order for a new workgroup to fully take effect the user may need to log "
+#~ "out and log back in."
+#~ msgstr ""
+#~ "Радна група или домен Windows мреже чији је корисник члан. Да би нова "
+#~ "радна група узела маха корисник ће можда морати да се одјави и поново "
+#~ "пријави."
+
+# Гномов Виртуелни Систем Датотека — ВСД? Или Гномово „опонашање система датотека“ — ОСД?
+#~ msgid "Could not initialize gnome vfs"
+#~ msgstr "Не могу да покренем Гномово опонашање система датотека"
+
+#~ msgid "Standard Moniker factory"
+#~ msgstr "Производња обичног надимка"
+
+#~ msgid "file MonikerExtender"
+#~ msgstr "датотека MonikerExtender"
+
+#~ msgid "generic Gnome VFS moniker"
+#~ msgstr "основни надимак Гномовог опонашавача система датотека"
+
+#~ msgid "generic file moniker"
+#~ msgstr "основни надимак датотеке"
+
+#~ msgid "Display SCSI drives"
+#~ msgstr "Прикажи SCSI уређаје"
+
+#~ msgid "Display SCSI optical drives"
+#~ msgstr "Прикажи оптичке SCSI уређаје"
+
+#~ msgid "Display drives with removable media"
+#~ msgstr "Прикажи уређаје са уклоњивим носачима"
+
+#~ msgid "Display external drives"
+#~ msgstr "Прикажи спољашње уређаје"
+
+#~ msgid "Display internal hard drives"
+#~ msgstr "Прикажи унутрашње тврде дискове"
+
+#~ msgid ""
+#~ "Whether to display SCSI optical drives even if /system/storage/"
+#~ "display_scsi_drives is set to FALSE."
+#~ msgstr ""
+#~ "Да ли да приказује оптичке SCSI уређаје чак и ако је /system/storage/"
+#~ "display_scsi_drives искључен."
+
+#~ msgid "Whether to display drives and mountable volumes from SCSI drives."
+#~ msgstr "Да ли да приказује уређаје и прикључиве дискове са SCSI уређаја."
+
+#~ msgid ""
+#~ "Whether to display drives and mountable volumes from drives with "
+#~ "removable media (e.g. drives where media can be inserted and removed)."
+#~ msgstr ""
+#~ "Да ли да приказује уређаје и прикључиве дискове са уређаја са уклоњивим "
+#~ "носачима (нпр. уређаји где се носач може убацити и избацити)."
+
+# bug: hotpluggable is technobabble, second part of "eg." should be enough
+#~ msgid ""
+#~ "Whether to display drives and mountable volumes from external drives (e."
+#~ "g. drives that are hotpluggable; e.g. drives that can be attached and "
+#~ "detached while the system is running)."
+#~ msgstr ""
+#~ "Да ли да приказује уређаје и прикључиве дискове са спољашњих уређаја "
+#~ "(нпр. уређаји који се могу прикључити у току рада)."
+
+#~ msgid ""
+#~ "Whether to display drives and mountable volumes from internal hard drives "
+#~ "(non-SCSI optical drives are always shown)."
+#~ msgstr ""
+#~ "Да ли да приказује уређаје и прикључиве дискове са унутрашњих тврдих "
+#~ "дискова (отпички не-SCSI дискови се увек приказују)."
+
+#~ msgid "The window workgroup the user is part of"
+#~ msgstr "Виндоуз радна група које је корисник члан"
+
+#~ msgid "Optical Disc"
+#~ msgstr "Оптички диск"
+
+# Чаробни штапић? :)
+#~ msgid "Memory Stick Media"
+#~ msgstr "Меморијски штапић (MS)"
+
+#~ msgid "Smart Media Media"
+#~ msgstr "Мудри носач (SM)"
+
+#~ msgid "Mac OS disk"
+#~ msgstr "Мекинтош диск"
+
+#~ msgid "Mac OS X disk"
+#~ msgstr "Мекинтош ОС-Икс диск"
+
+# Транскрипција на нивоу ;-)
+#~ msgid "Windows Disk"
+#~ msgstr "Виндуз диск"
+
+#~ msgid "Linux Disk"
+#~ msgstr "Линукс диск"
+
+#~ msgid "File could not be opened: %s"
+#~ msgstr "Датотека се не може отворити: %s"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid ""
+#~ "desktop entries contain line '%s' which is not an entry, group, or comment"
+#~ msgstr ""
+#~ "„.desktop“ датотека садржи ред „%s“ који није унос, група ни примедба"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries file does not start with legal start group"
+#~ msgstr "„.desktop“ датотека не почиње са исправном почетном групом"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries contain line '%s' which is not UTF-8"
+#~ msgstr "„.desktop“ датотека садржи ред „%s“ који није УТФ-8"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries contain unknown encoding '%s'"
+#~ msgstr "„.desktop“ датотека користи непознато кодирање „%s“"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries do not have group '%s'"
+#~ msgstr "„.desktop“ датотека нема групу „%s“"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries do not have key '%s'"
+#~ msgstr "„.desktop“ датотека нема кључ „%s“"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid ""
+#~ "desktop entries contain key '%s' which has value that cannot be "
+#~ "interpreted."
+#~ msgstr ""
+#~ "„.desktop“ датотека садржи кључ „%s“ који има вредност која се не може "
+#~ "разумети."
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid ""
+#~ "desktop entries contain no translated value for key '%s' with locale '%s'."
+#~ msgstr ""
+#~ "„.desktop“ датотека не садржи превод вредности кључа „%s“ у локалитету „%"
+#~ "s“."
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries contain invalid escape sequence '%s'"
+#~ msgstr "„.desktop“ датотека садржи неисправан знак за истицање „%s“"
+
+# bug: "desktop entries" sucks pretty much (it could be "entries in .desktop file")
+#~ msgid "desktop entries contain escape character at end of line"
+#~ msgstr ""
+#~ "„.desktop“ датотека садржи неисправан знак за истицање на крају реда"
+
+#~ msgid "Value '%s' cannot be interpreted as a number."
+#~ msgstr "Вредност „%s“ се не може посматрати као број."
+
+#~ msgid "Value '%s' cannot be interpreted as a boolean."
+#~ msgstr "Вредност „%s“ се не може посматрати као истинитосна вредност."
+
+#~ msgid "Applications"
+#~ msgstr "Програми"
+
+#~ msgid "Cards"
+#~ msgstr "Карте"
+
+#~ msgid "Folders"
+#~ msgstr "Фасцикле"
+
+#~ msgid "Help"
+#~ msgstr "Помоћ"
+
+#~ msgid "Hosts"
+#~ msgstr "Рачунари"
+
+#~ msgid "Links"
+#~ msgstr "Везе"
+
+#~ msgid "Mail"
+#~ msgstr "Пошта"
+
+#~ msgid "Tools"
+#~ msgstr "Алати"
+
+#~ msgid "Windows"
+#~ msgstr "Прозори"
+
+# bug: inconsistent with other strings which use "...to handle \"h323\" URLs..."
+#~ msgid "The command used to handle HTTP URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „http“ адресама, ако је укључено."
+
+# bug: inconsistent with other strings which use "...to handle \"h323\" URLs..."
+#~ msgid "The command used to handle HTTPS URLs, if enabled."
+#~ msgstr "Наредба коришћена за баратање „https“ адресама, ако је укључено."
+
+# bug: inconsistent with other strings; should be "The handler for \"http\" URLs"
+#~ msgid "The handler for HTTP URLs"
+#~ msgstr "Руковаоц „http“ адресама"
+
+# bug: inconsistent with other strings; should be "The handler for \"https\" URLs"
+#~ msgid "The handler for HTTPS URLs"
+#~ msgstr "Руковаоц „https“ адресама"
+
+# bug: inconsistent; should be "...should handle \"http\" URLs."
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle HTTP "
+#~ "URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„http“ адресе."
+
+# bug: inconsistent; should be "...should handle \"https\" URLs."
+#~ msgid ""
+#~ "True if the command specified in the \"command\" key should handle HTTPS "
+#~ "URLs."
+#~ msgstr ""
+#~ "Укључено ако наредба наведена у кључу „command“ треба да се користи за "
+#~ "„https“ адресе."
+
+# bug: inconsistent; should be "...should handle \"http\" URLs".
+#~ msgid "Whether the specified command should handle HTTP URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „http“ адресе."
+
+# bug: inconsistent; should be "...should handle \"https\" URLs".
+#~ msgid "Whether the specified command should handle HTTPS URLs"
+#~ msgstr "Да ли наведена наредба треба да се користи за „https“ адресе."
+
+#~ msgid "H323 URL handler"
+#~ msgstr "Руковалац H323 адресама"
+
+#~ msgid "HTTP URL handler"
+#~ msgstr "Руковалац HTTP адресама"
+
+#~ msgid "HTTPS URL handler"
+#~ msgstr "Руковалац HTTPS адресама"
+
+#~ msgid "Handle callto URLs"
+#~ msgstr "Баратај callto адресама"
+
+#~ msgid "Handle ghelp URLs"
+#~ msgstr "Баратај ghelp адресама"
+
+#~ msgid "Handle info URLs"
+#~ msgstr "Баратај info адресама"
+
+#~ msgid "Handle mailto URLs"
+#~ msgstr "Баратај mailto адресама"
+
+#~ msgid "Handle man URLs"
+#~ msgstr "Баратај man адресама"
+
+#~ msgid "callto URL handler"
+#~ msgstr "Руковалац callto адресама"
+
+#~ msgid "ghelp URL handler"
+#~ msgstr "Руковалац ghelp адресама"
+
+#~ msgid "info URL handler"
+#~ msgstr "Руковалац info адресама"
+
+#~ msgid "mailto URL handler"
+#~ msgstr "Руковалац mailto адресама"
+
+#~ msgid "man URL handler"
+#~ msgstr "Руковалац man адресама"
+
+#~ msgid "trash URL handler"
+#~ msgstr "Руковалац trash адресама"
+
+#~ msgid "Could not get information for file '%s': %s"
+#~ msgstr "Не могу да сазнам податке о датотеци „%s“: %s"
+
+# bug: as above [inconsistent wording]
+#~ msgid ""
+#~ "Failed to load image '%s': reason not known, probably a corrupt image file"
+#~ msgstr ""
+#~ "Неуспешно учитавање слике „%s“: разлог непознат, вероватно оштећена "
+#~ "датотека слике"
+
+#~ msgid "How to handle http URLs"
+#~ msgstr "Како баратати http адресама"
+
+#~ msgid "How to handle https URLs"
+#~ msgstr "Како баратати https адресама"
+
+#~ msgid "Set to true to have a program specified in command handle https URLs"
+#~ msgstr ""
+#~ "Укључите ако желите да програм наведен у наредби барата https адресама"
+
+#~ msgid ""
+#~ "Set to true to have a program specified in programs/ghelp handle ghelp "
+#~ "URLs"
+#~ msgstr ""
+#~ "Укључите ако желите да програм наведен у programs/ghelp барата ghelp "
+#~ "адресама"
+
+#~ msgid ""
+#~ "Set to true to have a program specified in programs/info handle info URLs"
+#~ msgstr ""
+#~ "Укључите ако желите да програм наведен у programs/info барата info "
+#~ "адресама"
+
+#~ msgid ""
+#~ "Set to true to have a program specified in programs/man handle man URLs"
+#~ msgstr ""
+#~ "Укључите ако желите да програм наведен у programs/man барата man адресама"
+
+#~ msgid "URL handler for h323 uris"
+#~ msgstr "Руковаоц h323 адресама"
+
+#~ msgid "URL handler for http uris"
+#~ msgstr "Руковаоц http адресама"
+
+#~ msgid "URL handler for https uris"
+#~ msgstr "Руковаоц https адресама"
+
+#~ msgid "Hosts are not contacted via the proxy"
+#~ msgstr "Рачунарима се не приступа преко посредника"
+
+#~ msgid "The machine name to proxy http through."
+#~ msgstr "Име рачунара HTTP посредника."
+
+#~ msgid "Use proxy settings when accessing http"
+#~ msgstr "Користи подешавања посредника при приступу вебу"
+
+#~ msgid "http proxy username"
+#~ msgstr "Корисничко име HTTP посредника"
+
+# bug: plural-forms
+#~ msgid "1 byte"
+#~ msgstr "1 бајт"

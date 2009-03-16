@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.gtk.Private.GPhoto2VolumeMonitor
+Exec=@libexecdir@/gvfs-gphoto2-volume-monitor

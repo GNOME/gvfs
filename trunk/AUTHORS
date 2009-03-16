@@ -1,0 +1,65 @@
+Overall Superhero (Desgin, Implementation, etc pp)
+==================================================
+Alexander Larsson <alexl@redhat.com>
+
+
+FUSE Integration
+===============
+Hans Petter Jansson <hpj@novell.com>
+
+HAL Integration
+===============
+David Zeuthen <davidz@redhat.com>
+
+Keyring Integration
+===================
+Carlos Garcia Campos <carlosgc@gnome.org>
+
+Backends
+=====================================
+
+CDDA backend
+============
+David Zeuthen <davidz@redhat.com>
+
+Gphoto2 backend
+===============
+David Zeuthen <davidz@redhat.com>
+
+Archive Backend
+===============
+Benjamin Otte <otte@gnome.org>
+
+FTP Backend
+===========
+Benjamin Otte <otte@gnome.org>
+Andreas Henriksson <andreas@fatal.se>
+
+Http/WebDAV Backend
+===================
+Christian Kellner <gicmo@gnome.org>
+Dan Winship <danw@gnome.org>
+
+Network Backend
+===============
+Andrew Walton <awalton@svn.gnome.org>
+
+ObexFTP Backend
+===============
+Bastien Nocera <hadess@hadess.net>
+
+SFTP Backend
+===========
+Alexander Larsson <alexl@redhat.com>
+
+Smb Backend
+===========
+Alexander Larsson <alexl@redhat.com>
+
+Test Backend
+============
+Tomas Bzatek <tbzatek@redhat.com>
+
+Trash Backend
+=============
+Ryan Lortie <desrt@desrt.ca>

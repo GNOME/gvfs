@@ -1,0 +1,32 @@
+Implement the rest of the mountable GDaemonFile ops:
+   unmount_mountable
+   eject_mountable
+
+implement readahead in GVFSReadStream, time difference
+
+implement seek & truncate
+
+implement get_file_info for GFileInputStreamDaemon, needs marshalling attributes over custom protocol
+
+finish implementing copy progress callbacks
+
+implement stuff in GDaemonVolume / GDaemonVolumeMonitor
+
+convert GDaemonFiles to fuse paths on request
+
+detect fuse paths and reverse map back to GDaemonFile
+
+remove owners from bus_name_map when they fail
+
+smb support for smbc_getxattr!
+smb - handle server going down
+
+add trash:/// support 
+
+decide exactly how to handle not-mounted errors and make sure its consistent.
+mount daemons should re-register when new owner for vfs daemon.
+
+Make built-in uri parsers link into gvfs shared lib instead of using a module
+ (smb is a shared lib atm to make sure that works)
+
+Implement GFileCreateFlags in backends as possible

@@ -1,0 +1,4 @@
+[Mount]
+Type=network
+Exec=@libexecdir@/gvfsd-network
+AutoMount=true
