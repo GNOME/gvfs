@@ -180,7 +180,7 @@ msgid ""
 "records are missing. Keys required: \"%s\"."
 msgstr ""
 "ਡੋਮੇਨ \"%3$s\" ਉੱਤੇ ਸਰਵਿਸ \"%2$s\" ਰਿਜ਼ੋਲਵਰ \"%1$s\" ਗਲਤੀ। ਇੱਕ ਜਾਂ ਵੱਧ TXT "
-"ਰਿਕਾਰਡ ਗੁੰਮ ਹਨ। ਕੁੰਜੀਆਂ ਚਾਹੀਦੀਆਂ ਹਨ: \"%s\""
+"ਰਿਕਾਰਡ ਗੁੰਮ ਹਨ। ਕੁੰਜੀਆਂ ਚਾਹੀਦੀਆਂ ਹਨ: \"%4$s\""
 
 #: ../common/gvfsdnssdresolver.c:1126
 #, c-format
