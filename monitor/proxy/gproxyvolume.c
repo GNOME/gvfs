@@ -122,22 +122,6 @@ g_proxy_volume_finalize (GObject *object)
   if (volume->identifiers != NULL)
     g_hash_table_unref (volume->identifiers);
 
-  if (volume->shadow_mount != NULL)
-    {
-      signal_emit_in_idle (volume->shadow_mount, "unmounted", NULL);
-      signal_emit_in_idle (volume->volume_monitor, "mount-removed", volume->shadow_mount);
-      g_proxy_shadow_mount_remove (volume->shadow_mount);
-      g_object_unref (volume->shadow_mount);
-    }
-
-  if (volume->union_monitor != NULL)
-    {
-      g_signal_handlers_disconnect_by_func (volume->union_monitor, union_monitor_mount_added, volume);
-      g_signal_handlers_disconnect_by_func (volume->union_monitor, union_monitor_mount_removed, volume);
-      g_signal_handlers_disconnect_by_func (volume->union_monitor, union_monitor_mount_changed, volume);
-      g_object_unref (volume->union_monitor);
-    }
-
   if (volume->volume_monitor != NULL)
     {
       g_object_unref (volume->volume_monitor);
@@ -150,10 +134,46 @@ g_proxy_volume_finalize (GObject *object)
 }
 
 static void
+g_proxy_volume_dispose (GObject *object)
+{
+  GProxyVolume *volume;
+
+  volume = G_PROXY_VOLUME (object);
+
+  if (volume->shadow_mount != NULL)
+    {
+      signal_emit_in_idle (volume->shadow_mount, "unmounted", NULL);
+      signal_emit_in_idle (volume->volume_monitor, "mount-removed", volume->shadow_mount);
+      g_proxy_shadow_mount_remove (volume->shadow_mount);
+      g_object_unref (volume->shadow_mount);
+      
+      volume->shadow_mount = NULL;
+    }
+  
+  if (volume->union_monitor != NULL)
+    {
+      g_signal_handlers_disconnect_by_func (volume->union_monitor,
+                                            union_monitor_mount_added, volume);
+      g_signal_handlers_disconnect_by_func (volume->union_monitor,
+                                            union_monitor_mount_removed, volume);
+      g_signal_handlers_disconnect_by_func (volume->union_monitor,
+                                            union_monitor_mount_changed, volume);
+      g_object_unref (volume->union_monitor);
+
+      volume->union_monitor = NULL;
+    }
+  
+  if (G_OBJECT_CLASS (g_proxy_volume_parent_class)->dispose)
+    (*G_OBJECT_CLASS (g_proxy_volume_parent_class)->dispose) (object);
+}
+
+
+static void
 g_proxy_volume_class_init (GProxyVolumeClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
+  gobject_class->dispose = g_proxy_volume_dispose;
   gobject_class->finalize = g_proxy_volume_finalize;
 }
 

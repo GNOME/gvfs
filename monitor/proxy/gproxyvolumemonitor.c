@@ -72,6 +72,8 @@ static DBusHandlerResult filter_function (DBusConnection *connection, DBusMessag
 
 static void signal_emit_in_idle (gpointer object, const char *signal_name, gpointer other_object);
 
+static void dispose_in_idle (gpointer object);
+
 static gboolean is_supported (GProxyVolumeMonitorClass *klass);
 
 /* The is_supported API is kinda lame and doesn't pass in the class,
@@ -517,6 +519,21 @@ signal_emit_in_idle (gpointer object, const char *signal_name, gpointer other_ob
   g_idle_add ((GSourceFunc) signal_emit_in_idle_do, data);
 }
 
+static gboolean
+dispose_in_idle_do (GObject *object)
+{
+  g_object_run_dispose (object);
+  g_object_unref (object);
+
+  return FALSE;
+}
+
+static void
+dispose_in_idle (gpointer object)
+{
+  g_idle_add ((GSourceFunc) dispose_in_idle_do, g_object_ref (object));
+}
+
 
 
 static DBusHandlerResult
@@ -734,6 +751,7 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
               g_hash_table_remove (monitor->volumes, id);
               signal_emit_in_idle (volume, "removed", NULL);
               signal_emit_in_idle (monitor, "volume-removed", volume);
+              dispose_in_idle (volume);
               g_object_unref (volume);
             }
         }

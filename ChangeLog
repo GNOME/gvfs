@@ -1,3 +1,14 @@
+2009-03-17  Alexander Larsson  <alexl@redhat.com>
+
+        Bug 575552 – icons for audio cds duplicated on the desktop after remounts
+
+        * monitor/proxy/gproxyvolumemonitor.c:
+	Dispose volumes when removed
+
+        * monitor/proxy/gproxyvolume.c:
+	When disposed, disconnect from union volume monitor so that we don't get
+	a mount_added for a later mount and create a shadow mount for that.
+
 2009-03-16  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 575286 – [PATCH] fix GError overwrite warning when missing delete permission.
