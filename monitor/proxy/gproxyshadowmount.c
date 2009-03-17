@@ -49,6 +49,7 @@ struct _GProxyShadowMount {
 
   GProxyVolume *volume;
   GMount *real_mount;
+  gboolean real_mount_shadowed;
   GFile *root;
 };
 
@@ -73,6 +74,12 @@ g_proxy_shadow_mount_finalize (GObject *object)
 
   g_proxy_shadow_mount_remove (mount);
 
+  if (mount->real_mount != NULL)
+    {
+      g_object_unref (mount->real_mount);
+      mount->real_mount = NULL;
+    }
+  
   if (mount->volume_monitor != NULL)
     g_object_unref (mount->volume_monitor);
 
@@ -107,13 +114,12 @@ g_proxy_shadow_mount_init (GProxyShadowMount *proxy_shadow_mount)
 void
 g_proxy_shadow_mount_remove (GProxyShadowMount *mount)
 {
-  if (mount->real_mount != NULL)
+  if (mount->real_mount_shadowed)
     {
       g_mount_unshadow (mount->real_mount);
       signal_emit_in_idle (mount->real_mount, "changed", NULL);
       signal_emit_in_idle (mount->volume_monitor, "mount-changed", mount->real_mount);
-      g_object_unref (mount->real_mount);
-      mount->real_mount = NULL;
+      mount->real_mount_shadowed = FALSE;
     }
 }
 
@@ -138,6 +144,7 @@ g_proxy_shadow_mount_new (GProxyVolumeMonitor *volume_monitor,
   mount->volume_monitor = g_object_ref (volume_monitor);
   mount->volume = g_object_ref (volume);
   mount->real_mount = g_object_ref (real_mount);
+  mount->real_mount_shadowed = TRUE;
   mount->root = activation_root;
 
   g_mount_shadow (mount->real_mount);

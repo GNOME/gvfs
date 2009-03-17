@@ -1,5 +1,15 @@
 2009-03-17  Alexander Larsson  <alexl@redhat.com>
 
+        * monitor/proxy/gproxyshadowmount.c:
+        (g_proxy_shadow_mount_remove):
+	Don't unref the real mount directly when we're unshadowed, because
+	that means most functions in the shadow mount won't work in the
+	removed signal emissions.
+	This caused lots of spew in e.g. gvfs-mount -oi on unmount of
+	a shadowed mount.
+
+2009-03-17  Alexander Larsson  <alexl@redhat.com>
+
         Bug 575552 – icons for audio cds duplicated on the desktop after remounts
 
         * monitor/proxy/gproxyvolumemonitor.c:
