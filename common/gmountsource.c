@@ -433,8 +433,8 @@ op_ask_password_reply (GObject *source_object,
   handled = g_mount_source_ask_password_finish (source,
                                                 res,
                                                 &aborted,
-                                                &username,
                                                 &password,
+                                                &username,
                                                 &domain,
 						NULL,
 						&password_save);
@@ -475,6 +475,7 @@ op_ask_password (GMountOperation *op,
                                      flags,
 				     op_ask_password_reply,
 				     g_object_ref (op));
+  g_signal_stop_emission_by_name (op, "ask_password");
   return TRUE;
 }
 
@@ -695,8 +696,40 @@ op_ask_question (GMountOperation *op,
 				     n_choices,
 				     op_ask_question_reply,
 				     g_object_ref (op));
+  g_signal_stop_emission_by_name (op, "ask_question");
   return TRUE;
 }
+
+static gboolean
+op_aborted (GMountOperation *op,
+	    GMountSource    *source)
+{
+  DBusMessage *message;
+  DBusConnection *connection;
+
+  /* If no dbus id specified, reply that we weren't handled */
+  if (source->dbus_id[0] == 0)
+    goto out;
+
+  connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
+  if (connection == NULL)
+    goto out;
+  
+  message = dbus_message_new_method_call (source->dbus_id,
+					  source->obj_path,
+					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					  G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED);
+
+  if (message)
+    {
+      dbus_connection_send (connection, message, NULL);
+      dbus_message_unref (message);
+    }
+
+ out:
+  return TRUE;
+}
+
 
 GMountOperation *
 g_mount_source_get_operation (GMountSource *mount_source)
@@ -711,6 +744,7 @@ g_mount_source_get_operation (GMountSource *mount_source)
 
   g_signal_connect (op, "ask_password", (GCallback)op_ask_password, mount_source);
   g_signal_connect (op, "ask_question", (GCallback)op_ask_question, mount_source);
+  g_signal_connect (op, "aborted", (GCallback)op_aborted, mount_source);
 
   return op;
 }

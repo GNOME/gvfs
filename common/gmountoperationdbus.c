@@ -51,6 +51,8 @@ static void              mount_op_ask_password        (GMountOperationDBus *op_d
 						       DBusMessage         *message);
 static void              mount_op_ask_question        (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
+static void              mount_op_aborted             (GMountOperationDBus *op_dbus,
+						       DBusMessage         *message);
 
 static void
 g_mount_operation_dbus_free (GMountOperationDBus *op_dbus)
@@ -131,6 +133,10 @@ mount_op_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION))
     mount_op_ask_question (op_dbus, message);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED))
+    mount_op_aborted (op_dbus, message);
   else
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
@@ -321,4 +327,11 @@ mount_op_ask_question (GMountOperationDBus *op_dbus,
     }
   
   dbus_free_string_array (choices);
+}
+
+static void
+mount_op_aborted (GMountOperationDBus *op_dbus,
+		  DBusMessage         *message)
+{
+  g_signal_emit_by_name (op_dbus->op, "aborted");
 }

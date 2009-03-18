@@ -73,6 +73,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OPERATION_INTERFACE "org.gtk.vfs.MountOperation"
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD "askPassword"
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION "askQuestion"
+#define G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED "aborted"
 
 /* Implemented by the spawner of a process, the spawned process sends the
    spawned message (with noreply) when it has spawned and gotten a dbus id */

@@ -1,3 +1,17 @@
+2009-03-18  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 575728 – crash in Open Folder: mountin a crypto volume
+
+        * common/gvfsdaemonprotocol.h:
+        * common/gmountoperationdbus.c:
+	Handle the new "aborted" signal
+
+        * common/gmountsource.c:
+	Fix argument order in g_mount_source_ask_password_finish call.
+	stop signal emissions in ask_password and ask_question handlers
+	to avoid the default handler sending a not implemented error.
+	Handle the new "aborted" signal.
+
 2009-03-17  Alexander Larsson  <alexl@redhat.com>
 
         * monitor/proxy/gproxyshadowmount.c:
