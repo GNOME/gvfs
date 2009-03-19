@@ -145,6 +145,7 @@ struct _GVfsBackendSftp
   char *host;
   int port;
   gboolean user_specified;
+  gboolean user_specified_in_uri;
   char *user;
   char *tmp_password;
 
@@ -1529,7 +1530,7 @@ do_mount (GVfsBackend *backend,
   read_reply_async (op_backend);
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
-  if (op_backend->user_specified)
+  if (op_backend->user_specified_in_uri)
     g_mount_spec_set (sftp_mount_spec, "user", op_backend->user);
   g_mount_spec_set (sftp_mount_spec, "host", op_backend->host);
   if (op_backend->port != -1)
@@ -1543,7 +1544,7 @@ do_mount (GVfsBackend *backend,
   g_vfs_backend_set_mount_spec (backend, sftp_mount_spec);
   g_mount_spec_unref (sftp_mount_spec);
 
-  if (op_backend->user_specified)
+  if (op_backend->user_specified_in_uri)
     /* Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>" */
     display_name = g_strdup_printf (_("sftp for %s on %s"), op_backend->user, op_backend->host);
   else
@@ -1602,7 +1603,11 @@ try_mount (GVfsBackend *backend,
   op_backend->host = g_strdup (host);
   op_backend->user = g_strdup (user);
   if (op_backend->user)
-    op_backend->user_specified = TRUE;
+    {
+      op_backend->user_specified = TRUE;
+      op_backend->user_specified_in_uri = TRUE;
+    }
+      
 
   return FALSE;
 }

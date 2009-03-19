@@ -1,3 +1,12 @@
+2009-03-19  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Make sure we only set the "user" part in the mountspec
+	if it was in the original requested uri/mountspec to mount.
+	Otherwise we might end up mounting sftp://user@foo/ instead
+	of sftp://foo/, and the mounting app will fail to read after
+	the mount succeeds.
+
 2009-03-18  Alexander Larsson  <alexl@redhat.com>
 
 	Bug 575728 – crash in Open Folder: mountin a crypto volume
