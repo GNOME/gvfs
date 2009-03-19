@@ -1,14 +1,14 @@
-# translation of gvfs.gnome-2-24.po to Kannada
+# translation of gvfs.HEAD.kn.po to Kannada
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Shankar Prasad <svenkate@redhat.com>, 2008.
+# Shankar Prasad <svenkate@redhat.com>, 2008, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs.gnome-2-24\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-18 11:04+0000\n"
-"PO-Revision-Date: 2008-09-19 17:50+0530\n"
+"Project-Id-Version: gvfs.HEAD.kn\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
+"POT-Creation-Date: 2009-02-04 19:03+0000\n"
+"PO-Revision-Date: 2009-03-19 15:08+0530\n"
 "Last-Translator: Shankar Prasad <svenkate@redhat.com>\n"
 "Language-Team: Kannada <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,46 +19,47 @@ msgstr ""
 
 #: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
 msgid "Operation not supported, files on different mounts"
-msgstr ""
+msgstr "ಕಾರ್ಯಕ್ಕೆ ಬೆಂಬಲವಿಲ್ಲ, ಬೇರೆ ಆರೋಹಣಾ ತಾಣದ ಮೇಲಿರುವ ಕಡತಗಳು"
 
 #: ../client/gdaemonfile.c:787
 msgid "Invalid return value from get_info"
-msgstr ""
+msgstr "get_info ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
 #: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
 msgid "Invalid return value from query_info"
-msgstr ""
+msgstr "query_info ಇಂದ ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
-#: ../client/gdaemonfile.c:894
+#: ../client/gdaemonfile.c:894 ../client/gvfsiconloadable.c:338
 msgid "Couldn't get stream file descriptor"
-msgstr ""
+msgstr "ಸ್ಟ್ರೀಮ್ ಕಡತ ವಿವರಣೆಗಾರನನ್ನು ಪಡೆಯಲಾಗಲಿಲ್ಲ"
 
 #: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
 #: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
 #: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
 #: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
+#: ../client/gvfsiconloadable.c:370
 msgid "Invalid return value from open"
-msgstr ""
+msgstr "ತೆರೆಯಲ್ಪಟ್ಟಿರುವದರಿಂದ ಮರಳಿದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯ"
 
 #: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
 #: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2220
+#: ../client/gdaemonfile.c:2220 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
-msgstr ""
+msgstr "ಸ್ಟ್ರೀಮ್ ಕಡತ ವಿವರಣೆಗಾರನನ್ನು ಪಡೆಯಲಾಗಿಲ್ಲ"
 
 #: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
 msgid "Invalid return value from call"
-msgstr ""
+msgstr "ಕರೆಯಿಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
 #: ../client/gdaemonfile.c:1534
 msgid "Invalid return value from get_filesystem_info"
-msgstr ""
+msgstr "get_filesystem_info ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
 #: ../client/gdaemonfile.c:1647
 msgid "Could not find enclosing mount"
-msgstr ""
+msgstr "ಅಡಕಗೊಳಿಸಲಾದ ಆರೋಹಣವು ಕಂಡುಬಂದಿಲ್ಲ"
 
 #: ../client/gdaemonfile.c:1677
 #, c-format
@@ -67,15 +68,15 @@ msgstr "ಅಮಾನ್ಯವಾದ ಕಡತದ ಹೆಸರು %s"
 
 #: ../client/gdaemonfile.c:1719
 msgid "Invalid return value from query_filesystem_info"
-msgstr ""
+msgstr "query_filesystem_info ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
 #: ../client/gdaemonfile.c:2142
 msgid "Invalid return value from monitor_dir"
-msgstr ""
+msgstr "monitor_dir ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
 #: ../client/gdaemonfile.c:2191
 msgid "Invalid return value from monitor_file"
-msgstr ""
+msgstr "monitor_file ಇಂದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯವು ಮರಳಿದೆ"
 
 #: ../client/gdaemonfileenumerator.c:351
 #: ../client/gdaemonfileinputstream.c:518
@@ -84,15 +85,17 @@ msgstr ""
 #: ../client/gdaemonfileinputstream.c:1032
 #: ../client/gdaemonfileoutputstream.c:458
 #: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:772
-#: ../daemon/gvfsbackendobexftp.c:793 ../daemon/gvfsbackendobexftp.c:912
-#: ../daemon/gvfsbackendobexftp.c:1049 ../daemon/gvfsbackendobexftp.c:1113
-#: ../daemon/gvfsbackendobexftp.c:1250 ../daemon/gvfsbackendobexftp.c:1277
-#: ../daemon/gvfsbackendobexftp.c:1336 ../daemon/gvfsbackendobexftp.c:1358
-#: ../daemon/gvfsbackendobexftp.c:1418 ../daemon/gvfsbackendobexftp.c:1437
-#: ../daemon/gvfsbackendsmb.c:1087 ../daemon/gvfsbackendtest.c:87
+#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:1060
+#: ../daemon/gvfsbackendobexftp.c:1081 ../daemon/gvfsbackendobexftp.c:1200
+#: ../daemon/gvfsbackendobexftp.c:1337 ../daemon/gvfsbackendobexftp.c:1401
+#: ../daemon/gvfsbackendobexftp.c:1601 ../daemon/gvfsbackendobexftp.c:1708
+#: ../daemon/gvfsbackendobexftp.c:1858 ../daemon/gvfsbackendobexftp.c:1885
+#: ../daemon/gvfsbackendobexftp.c:1944 ../daemon/gvfsbackendobexftp.c:1966
+#: ../daemon/gvfsbackendobexftp.c:2029 ../daemon/gvfsbackendobexftp.c:2048
+#: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
 #: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
 #: ../daemon/gvfschannel.c:298
+#, c-format
 msgid "Operation was cancelled"
 msgstr "ಕಾರ್ಯಾಚರಣೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ"
 
@@ -106,38 +109,42 @@ msgstr "ಕಾರ್ಯಾಚರಣೆಯನ್ನು ರದ್ದುಗೊಳ�
 #: ../client/gdaemonfileoutputstream.c:1064
 #, c-format
 msgid "Error in stream protocol: %s"
-msgstr ""
+msgstr "ಸ್ಟ್ರೀಮ್‌ ಪ್ರೊಟೋಕಾಲ್‌ನಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ: %s"
 
 #: ../client/gdaemonfileinputstream.c:458
 #: ../client/gdaemonfileinputstream.c:1310
 #: ../client/gdaemonfileoutputstream.c:410
 #: ../client/gdaemonfileoutputstream.c:1064
 msgid "End of stream"
-msgstr ""
+msgstr "ಸ್ಟ್ರೀಮ್‌ನ ಅಂತ್ಯ"
 
 #: ../client/gdaemonfileinputstream.c:1207
 #: ../client/gdaemonfileoutputstream.c:942
 msgid "Seek not supported on stream"
-msgstr ""
+msgstr "ಸ್ಟ್ರೀಮ್‍ನಲ್ಲಿ ಕೋರುವುದು (seek) ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"
 
 #: ../client/gdaemonfileinputstream.c:1237
 msgid "The query info operation is not supported"
-msgstr ""
+msgstr "ಮಾಹಿತಿಯ ಪ್ರಶ್ನಿಸುವ ಕಾರ್ಯಕ್ಕೆ ಬೆಂಬಲವಿಲ್ಲ"
 
 #: ../client/gdaemonfileoutputstream.c:991
 #, c-format
 msgid "Query info not supported on stream"
-msgstr ""
+msgstr "ಮಾಹಿತಿಯ ಪ್ರಶ್ನಿಸುವ ಕಾರ್ಯಕ್ಕೆ ಸ್ಟ್ರೀಮ್‌ನಲ್ಲಿ ಬೆಂಬಲವಿಲ್ಲ"
 
-#: ../client/gdaemonvfs.c:757
+#: ../client/gdaemonvfs.c:830
 #, c-format
 msgid "Error while getting mount info: %s"
-msgstr ""
+msgstr "ಆರೋಹಣಾ ಮಾಹಿತಿಯನ್ನು ಪಡೆದುಕೊಳ್ಳುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ: %s"
 
 #: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "ಡೀಮನ್‌ಗೆ ಸಂಪರ್ಕ ಹೊಂದುವಲ್ಲಿ ದೋಷ: %s"
+
+#: ../client/gvfsiconloadable.c:145
+msgid "Invalid return value from open_icon_for_read"
+msgstr "open_icon_for_read ಇಂದ ಮರಳಿದ ಅಮಾನ್ಯವಾದ ಮೌಲ್ಯ"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -149,13 +156,59 @@ msgstr "ಸಾಕೆಟ್‌ ಅನ್ನು ನಿರ್ಮಿಸುವಲ್�
 msgid "Error connecting to socket: %s"
 msgstr "ಸಾಕೆಟ್‌ನೊಂದೊಗೆ ಸಂಪರ್ಕ ಹೊಂದುವಲ್ಲಿ ದೋಷ: %s"
 
-#: ../common/gvfsdaemonprotocol.c:515
+#: ../common/gvfsdaemonprotocol.c:454
 msgid "Invalid file info format"
 msgstr "ಅಮಾನ್ಯವಾದ ಕಡತದ ಮಾಹಿತಿ ವಿನ್ಯಾಸ"
 
-#: ../common/gvfsdaemonprotocol.c:532
+#: ../common/gvfsdaemonprotocol.c:471
 msgid "Invalid attribute info list content"
+msgstr "ಅಮಾನ್ಯವಾದ ಗುಣವಿಶೇಷ ಮಾಹಿತಿ ಪಟ್ಟಿ ವಿಷಯ"
+
+#: ../common/gvfsdnssdresolver.c:208
+#, c-format
+#| msgid "Error deleting file: %s"
+msgid "Error initializing Avahi: %s"
+msgstr "Avahiಯನ್ನು ಆರಂಭಿಸುವಲ್ಲಿ ದೋಷ: %s"
+
+#: ../common/gvfsdnssdresolver.c:254
+#, c-format
+#| msgid "Error creating socket: %s"
+msgid "Error creating Avahi resolver: %s"
+msgstr "Avahi ಪರಿಹಾರಕವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ದೋಷ: %s"
+
+#: ../common/gvfsdnssdresolver.c:1094
+#, c-format
+msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "\"%s\" ಸೇವೆ \"%s\" ಅನ್ನು ಡೊಮೈನ್‌ \"%s\" ನ ಮೇಲೆ ಪರಿಹರಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
+
+#: ../common/gvfsdnssdresolver.c:1114
+#, c-format
+msgid ""
+"Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
+"records are missing. Keys required: \"%s\"."
 msgstr ""
+"\"%s\" ಸೇವೆ \"%s\" ಅನ್ನು ಡೊಮೈನ್‌ \"%s\" ನ ಮೇಲೆ ಪರಿಹರಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ. ಒಂದು ಅಥವ ಹೆಚ್ಚಿನ TXT "
+"ದಾಖಲೆಗಳು ಕಾಣೆಯಾಗಿವೆ. ಅಗತ್ಯವಿರುವ ಕೀಲಿಗಳೆಂದರೆ: \"%s\"."
+
+#: ../common/gvfsdnssdresolver.c:1126
+#, c-format
+msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
+msgstr "\"%s\" ಸೇವೆ \"%s\" ಅನ್ನು ಡೊಮೈನ್‌ \"%s\" ನ ಮೇಲೆ ಪರಿಹರಿಸುವಾಗ ಸಮಯ ಮೀರಿದೆ"
+
+#: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
+#: ../common/gvfsdnssdutils.c:280
+#, c-format
+msgid "Malformed dns-sd encoded_triple '%s'"
+msgstr "dns-sd encoded_triple '%s' ತಪ್ಪಾಗಿದೆ"
+
+#: ../common/gvfsicon.c:250
+#, c-format
+msgid "Can't handle version %d of GVfsIcon encoding"
+msgstr "GVfsIcon ಎನ್‌ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
+
+#: ../common/gvfsicon.c:260
+msgid "Malformed input data for GVfsIcon"
+msgstr "GVfsIcon ಗಾಗಿ ತಪ್ಪಾದ ಇನ್‌ಪುಟ್ ದತ್ತಾಂಶ"
 
 #: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
 #, c-format
@@ -192,74 +245,76 @@ msgstr "ಯಾವುದೆ ಆರೋಹಣಾ ಬಗೆಯನ್ನು ಸೂಚ
 #: ../daemon/daemon-main.c:241
 #, c-format
 msgid "mountpoint for %s already running"
-msgstr ""
+msgstr "%s ಗಾಗಿನ ಆರೋಹಣ ತಾಣವು ಈಗಾಗಲೆ ಚಾಲನೆಯಲ್ಲಿದೆ"
 
 #: ../daemon/daemon-main.c:252
 msgid "error starting mount daemon"
-msgstr ""
+msgstr "ಆರೋಹಣ ಡೀಮನ್ ಅನ್ನು ಆರಂಭಿಸುವಲ್ಲಿ ದೋಷ"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:963
-#: ../daemon/gvfsbackendsftp.c:1894
+#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:1094
+#: ../daemon/gvfsbackendsftp.c:1903
 #, c-format
 msgid "/ on %s"
 msgstr "/ %s ನಲ್ಲಿ"
 
-#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1479
-#: ../daemon/gvfsbackendsftp.c:1553
+#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1640
+#: ../daemon/gvfsbackendsftp.c:1566
 msgid "No hostname specified"
-msgstr ""
+msgstr "ಯಾವುದೆ ಅತಿಥೇಯ ಹೆಸರನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1456 ../daemon/gvfsbackendhttp.c:299
-#: ../daemon/gvfsbackendobexftp.c:603 ../daemon/gvfsbackendobexftp.c:614
-#: ../daemon/gvfsbackendsmb.c:623
+#: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:306
+#: ../daemon/gvfsbackendobexftp.c:836 ../daemon/gvfsbackendobexftp.c:852
+#: ../daemon/gvfsbackendobexftp.c:871 ../daemon/gvfsbackendsmb.c:641
 msgid "Invalid mount spec"
-msgstr ""
+msgstr "ಅಮಾನ್ಯವಾದ ಆರೋಹಣಾ spec"
 
 #: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
-#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:822
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:345
-#: ../daemon/gvfsbackendftp.c:2101 ../daemon/gvfsbackendnetwork.c:590
-#: ../daemon/gvfsbackendsmbbrowse.c:804 ../daemon/gvfsbackendsmbbrowse.c:871
-#: ../daemon/gvfsbackendsmbbrowse.c:1042 ../daemon/gvfsbackendsmbbrowse.c:1116
+#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
+#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:399
+#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:647
+#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
+#: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
 #, c-format
 msgid "File doesn't exist"
 msgstr "ಕಡತ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:393
-#: ../daemon/gvfsbackendftp.c:912 ../daemon/gvfsbackendnetwork.c:637
+#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:446
+#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:694
 msgid "The file is not a directory"
-msgstr ""
+msgstr "ಕಡತವು ಒಂದು ಕೋಶವಾಗಿಲ್ಲ"
 
 #. Translators: This is the name of the backend
 #: ../daemon/gvfsbackendburn.c:346
 msgid "Burn"
-msgstr ""
+msgstr "ಬರೆ"
 
 #: ../daemon/gvfsbackendburn.c:376
 msgid "Unable to create temporary directory"
-msgstr ""
+msgstr "ತಾತ್ಕಾಲಿಕ ಕೋಶವನ್ನು ನಿರ್ಮಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
-#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1098
-#: ../daemon/gvfsbackendgphoto2.c:1987 ../daemon/gvfsbackendgphoto2.c:2706
+#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1063
+#: ../daemon/gvfsbackendgphoto2.c:1916 ../daemon/gvfsbackendgphoto2.c:2626
+#: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
-msgstr ""
+msgstr "ಅಂತಹ ಯಾವುದೆ ಕಡತ ಅಥವ ಕೋಶವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2043
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2183
 msgid "Directory not empty"
-msgstr ""
+msgstr "ಕೋಶವು ಖಾಲಿಯಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
+#: ../daemon/gvfsbackendobexftp.c:1783
 msgid "Can't copy file over directory"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಕೋಶದ ಮೇಲೆ ಕಾಪಿ ಮಾಡುವಂತಿಲ್ಲ"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:651
@@ -267,7 +322,7 @@ msgid "CD/DVD Creator"
 msgstr "CD/DVD ರಚನಾಕಾರ"
 
 #: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2700
 msgid "File exists"
 msgstr "ಕಡತವು ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ"
 
@@ -280,113 +335,115 @@ msgstr "ಕಡತವು ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ"
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
 #: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
 #: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobpull.c:173 ../daemon/gvfsjobpush.c:173
-#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
-#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobread.c:120
-#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
-#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
-#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:132
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:173
+#: ../daemon/gvfsjobpush.c:173 ../daemon/gvfsjobqueryattributes.c:135
+#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
+#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
+#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
+#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
+#: ../daemon/gvfsjobunmountmountable.c:132
 #: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
 msgid "Operation not supported by backend"
-msgstr ""
+msgstr "ಕಾರ್ಯಕ್ಕೆ ಬ್ಯಾಕೆಂಡ್‌ನಿಂದ ಬೆಂಬಲವಿಲ್ಲ"
 
 #: ../daemon/gvfsbackendburn.c:854
 msgid "No such file or directory in target path"
-msgstr ""
+msgstr "ಸೂಚಿತ ಮಾರ್ಗದಲ್ಲಿ ಅಂತಹ ಯಾವುದೆ ಕಡತ ಅಥವ ಕೋಶವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendburn.c:877
+#: ../daemon/gvfsbackendburn.c:877 ../daemon/gvfsbackendobexftp.c:1752
 msgid "Can't copy directory over directory"
-msgstr ""
+msgstr "ಕೋಶವನ್ನು ಕೋಶಕ್ಕೆ ಕಾಪಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendburn.c:886
+#: ../daemon/gvfsbackendburn.c:886 ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Target file exists"
-msgstr ""
+msgstr "ಸೂಚಿತ ಕಡತವು ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendburn.c:893
+#: ../daemon/gvfsbackendburn.c:893 ../daemon/gvfsbackendobexftp.c:1767
 msgid "Can't recursively copy directory"
-msgstr ""
+msgstr "ಕೋಶವನ್ನು ಪುನರಾವರ್ತಿತವಾಗಿ ಕಾಪಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendgphoto2.c:2360
-#: ../daemon/gvfsbackendgphoto2.c:2569 ../daemon/gvfsbackendgphoto2.c:2666
-#: ../daemon/gvfsbackendgphoto2.c:2759
+#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendcomputer.c:731
+#: ../daemon/gvfsbackendgphoto2.c:2281 ../daemon/gvfsbackendgphoto2.c:2490
+#: ../daemon/gvfsbackendgphoto2.c:2587 ../daemon/gvfsbackendgphoto2.c:2679
 msgid "Not supported"
-msgstr ""
+msgstr "ಬೆಂಬಲವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:223 ../daemon/gvfsbackendgphoto2.c:1403
+#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendgphoto2.c:1303
 msgid "Cannot connect to the system bus"
-msgstr ""
+msgstr "ವ್ಯವಸ್ಥೆಯ ಬಸ್‌ಗೆ ಸಂಪರ್ಕ ಹೊಂದಲು ಸಾಧ್ಯವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:233 ../daemon/gvfsbackendgphoto2.c:1415
+#: ../daemon/gvfsbackendcdda.c:310 ../daemon/gvfsbackendgphoto2.c:1315
 msgid "Cannot create libhal context"
-msgstr ""
+msgstr "libhal ಸನ್ನಿವೇಶವನ್ನು ನಿರ್ಮಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:246 ../daemon/gvfsbackendgphoto2.c:1428
+#: ../daemon/gvfsbackendcdda.c:324 ../daemon/gvfsbackendgphoto2.c:1328
 msgid "Cannot initialize libhal"
-msgstr ""
+msgstr "libhal ಅನ್ನು ಆರಂಭಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:261 ../daemon/gvfsbackendcdda.c:332
+#: ../daemon/gvfsbackendcdda.c:339 ../daemon/gvfsbackendcdda.c:415
 msgid "No drive specified"
-msgstr ""
+msgstr "ಯಾವುದೆ ಡ್ರೈವನ್ನು ಸೂಚಿಸಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:276
+#: ../daemon/gvfsbackendcdda.c:355
 #, c-format
 msgid "Cannot find drive %s"
-msgstr ""
+msgstr "ಡ್ರೈವ್ %s ಕಂಡುಬಂದಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:286
+#: ../daemon/gvfsbackendcdda.c:368
 #, c-format
 msgid "Drive %s does not contain audio files"
-msgstr ""
+msgstr "ಡ್ರೈವ್‌ %s ಯಾವುದೆ ಆಡಿಯೊ ಕಡತಗಳನ್ನು ಹೊಂದಿಲ್ಲ"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:294
+#: ../daemon/gvfsbackendcdda.c:377
 #, c-format
 msgid "cdda mount on %s"
-msgstr ""
+msgstr "%s ನಲ್ಲಿನ cdda"
 
-#: ../daemon/gvfsbackendcdda.c:295 ../daemon/gvfsbackendcdda.c:799
+#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendcdda.c:895
 #: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:233
 #: ../monitor/hal/ghalvolume.c:254
 #, c-format
 msgid "Audio Disc"
 msgstr "ಆಡಿಯೋ ಡಿಸ್ಕ್‍"
 
-#: ../daemon/gvfsbackendcdda.c:356 ../daemon/gvfsbackendgphoto2.c:1656
+#: ../daemon/gvfsbackendcdda.c:439 ../daemon/gvfsbackendgphoto2.c:1550
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ಕಡತವ್ಯವಸ್ಥೆಯು ಕಾರ್ಯನಿರತವಾಗಿದೆ: %d ತೆರೆದ ಕಡತ"
+msgstr[1] "ಕಡತವ್ಯವಸ್ಥೆಯು ಕಾರ್ಯನಿರತವಾಗಿದೆ: %d ತೆರೆದ ಕಡತಗಳು"
 
-#: ../daemon/gvfsbackendcdda.c:546
+#: ../daemon/gvfsbackendcdda.c:630
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr ""
+msgstr "%s ನಂತಹ ಯಾವುದೆ ಕಡತವಿಲ್ಲ (ಡ್ರೈವ್‌ %s ನಲ್ಲಿ)"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:655
+#: ../daemon/gvfsbackendcdda.c:739
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
-msgstr ""
+msgstr "ಡ್ರೈವ್‌ %s ನಲ್ಲಿನ 'paranoia' ಇಂದ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendcdda.c:718
+#: ../daemon/gvfsbackendcdda.c:802
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr ""
+msgstr "ಡ್ರೈವ್‌ %s ನಲ್ಲಿ ಸ್ಟ್ರೀಮ್‌ ಅನ್ನು ಕೋರುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendcdda.c:815 ../daemon/gvfsbackendgphoto2.c:1713
+#: ../daemon/gvfsbackendcdda.c:914 ../daemon/gvfsbackendgphoto2.c:1606
 #, c-format
 msgid "No such file"
-msgstr ""
+msgstr "ಅಂತಹ ಯಾವುದೆ ಕಡತವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:829
+#: ../daemon/gvfsbackendcdda.c:928
 #, c-format
 msgid "The file does not exist or isn't an audio track"
-msgstr ""
+msgstr "ಕಡತವು ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ ಅಥವ ಅದು ಒಂದು ಆಡಿಯೊ ಟ್ರಾಕ್ ಆಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcdda.c:935
+#: ../daemon/gvfsbackendcdda.c:1034
 msgid "Audio CD Filesystem Service"
-msgstr ""
+msgstr "ಆಡಿಯೊ CD ಕಡತವ್ಯವಸ್ಥೆ ಸೇವೆ"
 
 #: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
 msgid "Computer"
@@ -396,414 +453,428 @@ msgstr "ಗಣಕ"
 msgid "Filesystem"
 msgstr "ಕಡತವ್ಯವಸ್ಥೆ"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1705
-#: ../daemon/gvfsbackendobexftp.c:758 ../daemon/gvfsbackendsmb.c:666
-#: ../daemon/gvfsbackendtrash.c:678 ../daemon/gvfsbackendtrash.c:1786
+#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
+#: ../daemon/gvfsbackendobexftp.c:1046 ../daemon/gvfsbackendsmb.c:684
+#: ../daemon/gvfsbackendtrash.c:232
+#, c-format
 msgid "Can't open directory"
-msgstr ""
+msgstr "ಕೋಶವನ್ನು ತೆರೆಯಲಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcomputer.c:594 ../daemon/gvfsbackendcomputer.c:732
+#: ../daemon/gvfsbackendcomputer.c:594
 msgid "Can't open mountable file"
-msgstr ""
+msgstr "ಆರೋಹಿಸಬಹುದಾದ ಕಡತವನ್ನು ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcomputer.c:780 ../daemon/gvfsbackendsftp.c:1037
+#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1044
 #, c-format
 msgid "Internal error: %s"
 msgstr "ಆಂತರಿಕ ದೋಷ: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:812 ../daemon/gvfsbackendcomputer.c:929
+#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
 msgid "Can't mount file"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಆರೋಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcomputer.c:824
+#: ../daemon/gvfsbackendcomputer.c:823
 msgid "No media in the drive"
-msgstr ""
+msgstr "ಡ್ರೈವಿನಲ್ಲಿ ಯಾವುದೆ ಮೀಡಿಯ ಇಲ್ಲ"
 
-#: ../daemon/gvfsbackendcomputer.c:881 ../daemon/gvfsbackendcomputer.c:972
-#: ../daemon/gvfsbackendcomputer.c:1072
+#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
+#: ../daemon/gvfsbackendcomputer.c:1071
 msgid "Not a mountable file"
-msgstr ""
+msgstr "ಒಂದು ಆರೋಹಿಸಬಹುದಾದ ಕಡತವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcomputer.c:987
+#: ../daemon/gvfsbackendcomputer.c:986
 msgid "Can't unmount file"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಅವರೋಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendcomputer.c:1103
+#: ../daemon/gvfsbackendcomputer.c:1102
 msgid "Can't eject file"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಹೊರ ತಳ್ಳಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackenddav.c:503 ../daemon/gvfsbackenddav.c:1523
-#: ../daemon/gvfsbackendhttp.c:245
+#: ../daemon/gvfsbackenddav.c:526 ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackendhttp.c:252
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP ದೋಷ: %s"
 
-#: ../daemon/gvfsbackenddav.c:520
+#: ../daemon/gvfsbackenddav.c:543
 msgid "Could not parse response"
-msgstr ""
+msgstr "ಪ್ರತ್ಯುತ್ತರವನ್ನು ಪಾರ್ಸ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackenddav.c:529
+#: ../daemon/gvfsbackenddav.c:552
 msgid "Empty response"
-msgstr ""
+msgstr "ಖಾಲಿ ಇರುವ ಪ್ರತ್ಯುತ್ತರ"
 
-#: ../daemon/gvfsbackenddav.c:537
+#: ../daemon/gvfsbackenddav.c:560
 msgid "Unexpected reply from server"
-msgstr ""
+msgstr "ಪರಿಚಾರಕದಿಂದ ಅನಿರೀಕ್ಷಿತ ಪ್ರತ್ಯುತ್ತರವು ಬಂದಿದೆ"
 
-#: ../daemon/gvfsbackenddav.c:1156 ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackenddav.c:1179 ../daemon/gvfsbackenddav.c:1798
 msgid "Response invalid"
-msgstr ""
+msgstr "ಪ್ರತ್ಯುತ್ತರವು ಅಮಾನ್ಯವಾಗಿದೆ"
 
-#: ../daemon/gvfsbackenddav.c:1299
+#: ../daemon/gvfsbackenddav.c:1322
 msgid "WebDAV share"
 msgstr "WebDAV ಹಂಚಿಕೆ"
 
-#: ../daemon/gvfsbackenddav.c:1301
+#: ../daemon/gvfsbackenddav.c:1324
 #, c-format
 msgid "Enter password for %s"
 msgstr "%s ಗಾಗಿ ಗುಪ್ತಪದವನ್ನು ನಮೂದಿಸಿ"
 
-#: ../daemon/gvfsbackenddav.c:1304
+#: ../daemon/gvfsbackenddav.c:1327
 msgid "Please enter proxy password"
-msgstr ""
+msgstr "ದಯವಿಟ್ಟು ಪ್ರಾಕ್ಸಿ ಗುಪ್ತಪದವನ್ನು ನಮೂದಿಸಿ"
 
-#: ../daemon/gvfsbackenddav.c:1527 ../daemon/gvfsbackenddav.c:1531
+#: ../daemon/gvfsbackenddav.c:1662 ../daemon/gvfsbackenddav.c:1666
 msgid "Not a WebDAV enabled share"
-msgstr ""
+msgstr "ಒಂದು WebDAV ಶಕ್ತವಾಗಿರುವ ಹಂಚಿಕೆಯಲ್ಲ"
 
-#: ../daemon/gvfsbackenddav.c:1554
+#: ../daemon/gvfsbackenddav.c:1694
 #, c-format
 msgid "WebDAV on %s"
 msgstr "%s ನಲ್ಲಿ WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1614 ../daemon/gvfsbackenddav.c:1687
+#: ../daemon/gvfsbackenddav.c:1754 ../daemon/gvfsbackenddav.c:1827
 msgid "Could not create request"
-msgstr ""
+msgstr "ಮನವಿಯನ್ನು ನಿರ್ಮಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackenddav.c:1750 ../daemon/gvfsbackenddav.c:2003
-#: ../daemon/gvfsbackenddav.c:2114 ../daemon/gvfsbackendftp.c:1699
-#: ../daemon/gvfsbackendftp.c:2365 ../daemon/gvfsbackendsftp.c:3559
-#: ../daemon/gvfsbackendsmb.c:1822
+#: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
+#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1860
+#: ../daemon/gvfsbackendftp.c:2526 ../daemon/gvfsbackendsftp.c:3588
+#: ../daemon/gvfsbackendsmb.c:1912
 msgid "Target file already exists"
-msgstr ""
+msgstr "ಸೂಚಿತ ಕಡತವು ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ"
 
-#: ../daemon/gvfsbackenddav.c:1823 ../daemon/gvfsbackendsftp.c:2807
-#: ../daemon/gvfsbackendsmb.c:1056
+#: ../daemon/gvfsbackenddav.c:1963 ../daemon/gvfsbackendsftp.c:2836
+#: ../daemon/gvfsbackendsmb.c:1074
 msgid "The file was externally modified"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಹೊರಗಿನಿಂದ ಮಾರ್ಪಡಿಸಲಾಗಿದೆ"
 
-#: ../daemon/gvfsbackenddav.c:1854 ../daemon/gvfsbackendsmb.c:1092
-#: ../daemon/gvfsbackendsmb.c:1839
+#: ../daemon/gvfsbackenddav.c:1994 ../daemon/gvfsbackendsmb.c:1110
+#: ../daemon/gvfsbackendsmb.c:1929
 msgid "Backup file creation failed"
-msgstr ""
+msgstr "ಪರ್ಯಾಯ (ಬ್ಯಾಕ್ಅಪ್‌) ಕಡತವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ವಿಫಲತೆ"
 
-#. TODO: Name
-#: ../daemon/gvfsbackenddnssd.c:433
-msgid "dns-sd"
-msgstr "dns-sd"
+#. "separate": a link to dns-sd://local/
+#: ../daemon/gvfsbackenddnssd.c:493 ../daemon/gvfsbackendnetwork.c:394
+msgid "Local Network"
+msgstr "ಸ್ಥಳೀಯ ಜಾಲಬಂಧ"
 
-#: ../daemon/gvfsbackenddnssd.c:669 ../daemon/gvfsbackendnetwork.c:731
+#: ../daemon/gvfsbackenddnssd.c:737 ../daemon/gvfsbackendnetwork.c:798
 msgid "Can't monitor file or directory."
-msgstr ""
+msgstr "ಕಡತ ಅಥವ ಕೋಶದ ಮೇಲ್ವಿಚಾರಣೆಯನ್ನು ನೋಡಿಕೊಳ್ಳಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:687
+#: ../daemon/gvfsbackenddnssd.c:755
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:688 ../daemon/gvfsbackendnetwork.c:676
-#: ../daemon/gvfsbackendnetwork.c:814 ../daemon/gvfsbackendnetwork.c:815
+#: ../daemon/gvfsbackenddnssd.c:756 ../daemon/gvfsbackendnetwork.c:733
+#: ../daemon/gvfsbackendnetwork.c:883 ../daemon/gvfsbackendnetwork.c:884
 msgid "Network"
 msgstr "ಜಾಲಬಂಧ"
 
-#: ../daemon/gvfsbackendftp.c:236
+#: ../daemon/gvfsbackendftp.c:252
 msgid "Accounts are unsupported"
-msgstr ""
+msgstr "ಖಾತೆಗಳಿಗೆ ಬೆಂಬಲವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendftp.c:240
+#: ../daemon/gvfsbackendftp.c:256
 msgid "Host closed connection"
-msgstr ""
+msgstr "ಅತಿಥೇಯವು ಸಂಪರ್ಕವನ್ನು ಮುಚ್ಚಿದೆ"
 
-#: ../daemon/gvfsbackendftp.c:244
+#: ../daemon/gvfsbackendftp.c:260
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:248
-msgid "Data connection closed"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:255 ../daemon/gvfsbackendftp.c:259
-msgid "Operation failed"
-msgstr ""
+msgstr "ದತ್ತಾಂಶದ ಸಂಪರ್ಕವನ್ನು ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ. ಬಹುಷಃ ನಿಮ್ಮ ಫೈರ್ವಾಲ್‌ ಇದನ್ನು ನಿರ್ಬಂಧಿಸುತ್ತಿರಬಹುದು?"
 
 #: ../daemon/gvfsbackendftp.c:264
+msgid "Data connection closed"
+msgstr "ದತ್ತಾಂಶ ಸಂಪರ್ಕವನ್ನು ಮುಚ್ಚಲಾಗಿದೆ"
+
+#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:275
+msgid "Operation failed"
+msgstr "ಕಾರ್ಯವು ವಿಫಲಗೊಂಡಿದೆ"
+
+#: ../daemon/gvfsbackendftp.c:280
 msgid "No space left on server"
-msgstr ""
+msgstr "ಪರಿಚಾರಕದಲ್ಲಿ ಯಾವುದೆ ಜಾಗ ಉಳಿದಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendftp.c:272 ../daemon/gvfsbackendsftp.c:3868
+#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:3897
+#: ../daemon/gvfsbackendsmb.c:1576
 msgid "Operation unsupported"
-msgstr ""
+msgstr "ಕಾರ್ಯಕ್ಕೆ ಬೆಂಬಲವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendftp.c:276 ../daemon/gvfsbackendsftp.c:289
+#: ../daemon/gvfsbackendftp.c:292 ../daemon/gvfsbackendsftp.c:296
 msgid "Permission denied"
 msgstr "ಅನುಮತಿಯು ನಿರಾಕರಿಸಲ್ಪಟ್ಟಿದೆ"
 
-#: ../daemon/gvfsbackendftp.c:280
+#: ../daemon/gvfsbackendftp.c:296
 msgid "Page type unknown"
-msgstr ""
+msgstr "ಪುಟದ ಬಗೆಯು ಅಜ್ಞಾತವಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendftp.c:284 ../daemon/gvfsbackendftp.c:2211
+#: ../daemon/gvfsbackendftp.c:300 ../daemon/gvfsbackendftp.c:2372
 msgid "Invalid filename"
-msgstr ""
+msgstr "ಅಮಾನ್ಯ ಕಡತದ ಹೆಸರು"
 
-#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendftp.c:364
-#: ../daemon/gvfsbackendftp.c:393 ../daemon/gvfsbackendftp.c:412
-#: ../daemon/gvfsbackendftp.c:425 ../daemon/gvfsbackendftp.c:817
+#: ../daemon/gvfsbackendftp.c:304 ../daemon/gvfsbackendftp.c:380
+#: ../daemon/gvfsbackendftp.c:409 ../daemon/gvfsbackendftp.c:428
+#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:929
 msgid "Invalid reply"
-msgstr ""
+msgstr "ಅಮಾನ್ಯವಾದ ಪ್ರತ್ಯುತ್ತರ"
 
-#: ../daemon/gvfsbackendftp.c:532
+#: ../daemon/gvfsbackendftp.c:548
 msgid "broken transmission"
-msgstr ""
+msgstr "ತುಂಡಾದ ವರ್ಗಾವಣೆ"
 
-#: ../daemon/gvfsbackendftp.c:677 ../daemon/gvfsbackendftp.c:837
+#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendftp.c:851
 msgid "Could not connect to host"
-msgstr ""
-
-#. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1337
-#, c-format
-msgid "Enter password for ftp on %s"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:1362 ../daemon/gvfsbackendsftp.c:874
-msgid "Password dialog cancelled"
-msgstr ""
-
-#: ../daemon/gvfsbackendftp.c:1441
-#, c-format
-msgid "ftp on %s"
-msgstr ""
+msgstr "ಅತಿಥೇಯಕ್ಕೆ ಸಂಪರ್ಕಸಾಧಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1445
+#: ../daemon/gvfsbackendftp.c:1494
+#, c-format
+#| msgid "Enter password for %s"
+msgid "Enter password for ftp as %s on %s"
+msgstr "%s ಆಗಿ %s ನಲ್ಲಿನ ftp ಗಾಗಿ ಗುಪ್ತಪದವನ್ನು ನಮೂದಿಸಿ"
+
+#. translators: %s here is the hostname
+#: ../daemon/gvfsbackendftp.c:1497
+#, c-format
+msgid "Enter password for ftp on %s"
+msgstr "%s ನಲ್ಲಿನ ftpಗಾಗಿ ಗುಪ್ತಪದವನ್ನು ನಮೂದಿಸಿ"
+
+#: ../daemon/gvfsbackendftp.c:1523 ../daemon/gvfsbackendsftp.c:881
+#: ../daemon/gvfsbackendsmb.c:599 ../daemon/gvfsbackendsmbbrowse.c:986
+msgid "Password dialog cancelled"
+msgstr "ಗುಪ್ತಪದದ ಸಂವಾದವನ್ನು ಮುಚ್ಚಲಾಗಿದೆ"
+
+#: ../daemon/gvfsbackendftp.c:1602
+#, c-format
+msgid "ftp on %s"
+msgstr "%s ನಲ್ಲಿನ ftp"
+
+#. Translators: the first %s is the username, the second the host name
+#: ../daemon/gvfsbackendftp.c:1606
 #, c-format
 msgid "ftp as %s on %s"
-msgstr ""
+msgstr "%s ಆಗಿ %s ನಲ್ಲಿನ ftp"
 
-#: ../daemon/gvfsbackendftp.c:1529 ../daemon/gvfsbackendsftp.c:1958
-#: ../daemon/gvfsbackendsftp.c:3550
+#: ../daemon/gvfsbackendftp.c:1690 ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:3579
 msgid "File is directory"
-msgstr ""
+msgstr "ಕಡತವು ಕೋಶವಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendftp.c:1751 ../daemon/gvfsbackendftp.c:2326
+#: ../daemon/gvfsbackendftp.c:1912 ../daemon/gvfsbackendftp.c:2487
 msgid "backups not supported yet"
-msgstr ""
+msgstr "ಪರ್ಯಾಯ ಪ್ರತಿಗೆ(ಬ್ಯಾಕ್‌ಅಪ್‌) ಇನ್ನೂ ಸಹ ಬೆಂಬಲವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendftp.c:1828
+#: ../daemon/gvfsbackendftp.c:1989
 msgid "filename too long"
-msgstr ""
+msgstr "ಕಡತದ ಹೆಸರು ಬಹಳ ಉದ್ದವಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendftp.c:2345
+#: ../daemon/gvfsbackendftp.c:2506
 msgid "Invalid destination filename"
-msgstr ""
+msgstr "ಅಮಾನ್ಯವಾದ ಸೂಚಿತ ಕಡತದ ಹೆಸರು"
 
-#: ../daemon/gvfsbackendgphoto2.c:501
+#: ../daemon/gvfsbackendgphoto2.c:486
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr ""
+msgstr "%s: %d: ಕೋಶವು ಅಥವ ಕಡತವು ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:508
+#: ../daemon/gvfsbackendgphoto2.c:493
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr ""
+msgstr "%s: %d: ಅಂತಹ ಯಾವುದೆ ಕಡತ ಅಥವ ಕೋಶವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:514
+#: ../daemon/gvfsbackendgphoto2.c:499
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: ಅಮಾನ್ಯವಾದ ಕಡತದ ಹೆಸರು"
 
-#: ../daemon/gvfsbackendgphoto2.c:520
+#: ../daemon/gvfsbackendgphoto2.c:505
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: ಬೆಂಬಲವಿಲ್ಲ"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:693
+#: ../daemon/gvfsbackendgphoto2.c:675
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "ಡಿಜಿಟಲ್ ಕ್ಯಾಮೆರಾ (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:841 ../monitor/gphoto2/ggphoto2volume.c:183
+#: ../daemon/gvfsbackendgphoto2.c:823 ../monitor/gphoto2/ggphoto2volume.c:183
 #, c-format
 msgid "%s Camera"
 msgstr "%s ಕ್ಯಾಮೆರಾ"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:178
+#: ../daemon/gvfsbackendgphoto2.c:826 ../monitor/gphoto2/ggphoto2volume.c:178
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s ಆಡಿಯೋ ಪ್ಲೇಯರ್"
 
-#: ../daemon/gvfsbackendgphoto2.c:853 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:835 ../monitor/gphoto2/ggphoto2volume.c:192
 msgid "Camera"
 msgstr "ಕ್ಯಾಮೆರಾ"
 
-#: ../daemon/gvfsbackendgphoto2.c:855 ../monitor/gphoto2/ggphoto2volume.c:190
+#: ../daemon/gvfsbackendgphoto2.c:837 ../monitor/gphoto2/ggphoto2volume.c:190
 msgid "Audio Player"
 msgstr "ಆಡಿಯೋ ಪ್ಲೇಯರ್"
 
-#: ../daemon/gvfsbackendgphoto2.c:1325 ../daemon/gvfsbackendgphoto2.c:2014
-msgid "Failed to get folder list"
-msgstr ""
-
-#: ../daemon/gvfsbackendgphoto2.c:1443
+#: ../daemon/gvfsbackendgphoto2.c:1343
 msgid "No device specified"
-msgstr ""
+msgstr "ಯಾವುದೆ ಸಾಧನವನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1460
+#: ../daemon/gvfsbackendgphoto2.c:1360
 msgid "Cannot create gphoto2 context"
-msgstr ""
+msgstr "gphoto2 ಸನ್ನಿವೇಶವನ್ನು ನಿರ್ಮಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1470
+#: ../daemon/gvfsbackendgphoto2.c:1370
 msgid "Error creating camera"
-msgstr ""
+msgstr "ಕ್ಯಾಮೆರಾವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1483 ../daemon/gvfsbackendgphoto2.c:1493
+#: ../daemon/gvfsbackendgphoto2.c:1383 ../daemon/gvfsbackendgphoto2.c:1393
 msgid "Error loading device information"
-msgstr ""
+msgstr "ಸಾಧನೆಯ ಮಾಹಿತಿಯನ್ನು ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1505
+#: ../daemon/gvfsbackendgphoto2.c:1405
 msgid "Error looking up device information"
-msgstr ""
+msgstr "ಸಾಧನೆಯ ಮಾಹಿತಿಗಾಗಿ ನೋಡುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1515
+#: ../daemon/gvfsbackendgphoto2.c:1415
 msgid "Error getting device information"
-msgstr ""
+msgstr "ಸಾಧನೆಯ ಮಾಹಿತಿಯನ್ನು ಪಡೆದುಕೊಳ್ಳಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1528
+#: ../daemon/gvfsbackendgphoto2.c:1428
 msgid "Error setting up camera communications port"
-msgstr ""
+msgstr "ಕ್ಯಾಮೆರಾದ ಸಂಪರ್ಕಗಳ ಸ್ಥಾನವನ್ನು ಸಿದ್ಧಗೊಳಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendgphoto2.c:1439
 msgid "Error initializing camera"
-msgstr ""
+msgstr "ಕ್ಯಾಮೆರಾವನ್ನು ಆರಂಭಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1553
+#: ../daemon/gvfsbackendgphoto2.c:1447
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr ""
+msgstr "gphoto2 ಅನ್ನು %s ನಲ್ಲಿ ಆರೋಹಿಸಲಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1628
+#: ../daemon/gvfsbackendgphoto2.c:1522
 msgid "No camera specified"
-msgstr ""
+msgstr "ಯಾವುದೆ ಕ್ಯಾಮೆರಾವನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1721
+#: ../daemon/gvfsbackendgphoto2.c:1614
 msgid "Error creating file object"
-msgstr ""
+msgstr "ಕಡತ ವಸ್ತುವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1736
+#: ../daemon/gvfsbackendgphoto2.c:1629
 msgid "Error getting file"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಪಡೆಯುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1746
+#: ../daemon/gvfsbackendgphoto2.c:1639
 msgid "Error getting data from file"
-msgstr ""
+msgstr "ಕಡತದಿಂದ ದತ್ತಾಂಶವನ್ನು ಪಡೆಯುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1841 ../daemon/gvfsbackendgphoto2.c:3030
+#: ../daemon/gvfsbackendgphoto2.c:1696
+#, c-format
+msgid "Malformed icon identifier '%s'"
+msgstr "ಸರಿ ಇಲ್ಲದ ಚಿಹ್ನೆ ಗುರುತುಗಾರ '%s'"
+
+#: ../daemon/gvfsbackendgphoto2.c:1772 ../daemon/gvfsbackendgphoto2.c:2950
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr ""
+msgstr "ಕ್ಯಾಮೆರಾ %s ನಲ್ಲಿನ ಸ್ಟ್ರೀಮ್‌ನಲ್ಲಿ ಕೋರುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1981 ../daemon/gvfsbackendsmbbrowse.c:1112
+#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1388
 msgid "Not a directory"
-msgstr ""
+msgstr "ಒಂದು ಕೋಶವಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2080
+#: ../daemon/gvfsbackendgphoto2.c:1943
+msgid "Failed to get folder list"
+msgstr "ಕಡತಕೋಶದ ಪಟ್ಟಿಯನ್ನು ಪಡೆಯುವಲ್ಲಿ ವಿಫಲತೆ"
+
+#: ../daemon/gvfsbackendgphoto2.c:2008
 msgid "Failed to get file list"
-msgstr ""
+msgstr "ಕಡತದ ಪಟ್ಟಿಯನ್ನು ಪಡೆಯುವಲ್ಲಿ ವಿಫಲತೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2372
+#: ../daemon/gvfsbackendgphoto2.c:2293
 msgid "Error creating directory"
-msgstr ""
+msgstr "ಕೋಶವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2581
+#: ../daemon/gvfsbackendgphoto2.c:2502
 msgid "Name already exists"
-msgstr ""
+msgstr "ಹೆಸರು ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2592 ../daemon/gvfsbackendgphoto2.c:3221
+#: ../daemon/gvfsbackendgphoto2.c:2513 ../daemon/gvfsbackendgphoto2.c:3141
 msgid "New name too long"
-msgstr ""
+msgstr "ಹೊಸ ಹೆಸರು ಬಹಳ ಉದ್ದವಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2602 ../daemon/gvfsbackendgphoto2.c:3232
+#: ../daemon/gvfsbackendgphoto2.c:2523 ../daemon/gvfsbackendgphoto2.c:3152
 msgid "Error renaming dir"
-msgstr ""
+msgstr "ಕೋಶದ ಹೆಸರನ್ನು ಬದಲಾಯಿಸುವಲ್ಲಿ ದೋಷ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3245
+#: ../daemon/gvfsbackendgphoto2.c:2536 ../daemon/gvfsbackendgphoto2.c:3165
 msgid "Error renaming file"
-msgstr ""
+msgstr "ಕಡತದ ಹೆಸರನ್ನು ಬದಲಾಯಿಸುವಲ್ಲಿ ದೋಷ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2679
+#: ../daemon/gvfsbackendgphoto2.c:2599
 #, c-format
 msgid "Directory '%s' is not empty"
-msgstr ""
+msgstr "ಕೋಶ '%s' ವು ಖಾಲಿಯಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2690
+#: ../daemon/gvfsbackendgphoto2.c:2610
 msgid "Error deleting directory"
-msgstr ""
+msgstr "ಕೋಶವನ್ನು ಅಳಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2716
+#: ../daemon/gvfsbackendgphoto2.c:2636
 msgid "Error deleting file"
-msgstr ""
+msgstr "ಕಡತವನ್ನು ಅಳಿಸುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2769
+#: ../daemon/gvfsbackendgphoto2.c:2689
 msgid "Can't write to directory"
-msgstr ""
+msgstr "ಕೋಶಕ್ಕೆ ಬರೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2816
+#: ../daemon/gvfsbackendgphoto2.c:2736
 msgid "Cannot allocate new file to append to"
-msgstr ""
+msgstr "ಸೇರಿಸಬೇಕಿರುವ ಹೊಸ ಕಡತವನ್ನು ನಿಯೋಜಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2831
+#: ../daemon/gvfsbackendgphoto2.c:2751
 msgid "Cannot read file to append to"
-msgstr ""
+msgstr "ಸೇರಿಸಬೇಕಿರುವ ಕಡತವನ್ನು ಓದಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2842
+#: ../daemon/gvfsbackendgphoto2.c:2762
 msgid "Cannot get data of file to append to"
-msgstr ""
+msgstr "ಸೇರಿಸಬೇಕಿರುವ ಕಡತದ ದತ್ತಾಂಶವನ್ನು ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"
+
+#: ../daemon/gvfsbackendgphoto2.c:3049
+msgid "Error writing file"
+msgstr "ಕಡತಕ್ಕೆ ಬರೆಯುವಲ್ಲಿ ದೋಷ ಉಂಟಾಗಿದೆ"
+
+#: ../daemon/gvfsbackendgphoto2.c:3097
+msgid "Not supported (not same directory)"
+msgstr "ಬೆಂಬಲವಿಲ್ಲ (ಒಂದೇ ಕೋಶವಾಗಿಲ್ಲ)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3109
+msgid "Not supported (src is dir, dst is dir)"
+msgstr "ಬೆಂಬಲವಿಲ್ಲ (src ಯು ಕೋಶವಾಗಿರುತ್ತದೆ, dst ಯು ಕಡತವಾಗಿರುತ್ತದೆ)"
+
+#: ../daemon/gvfsbackendgphoto2.c:3117
+msgid "Not supported (src is dir, dst is existing file)"
+msgstr "ಬೆಂಬಲವಿಲ್ಲ (src ಯು ಕೋಶವಾಗಿರುತ್ತದೆ, dst ಯು ಈಗಿರುವ ಕಡತವಾಗಿರುತ್ತದೆ)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3129
-msgid "Error writing file"
-msgstr ""
-
-#: ../daemon/gvfsbackendgphoto2.c:3177
-msgid "Not supported (not same directory)"
-msgstr ""
-
-#: ../daemon/gvfsbackendgphoto2.c:3189
-msgid "Not supported (src is dir, dst is dir)"
-msgstr ""
-
-#: ../daemon/gvfsbackendgphoto2.c:3197
-msgid "Not supported (src is dir, dst is existing file)"
-msgstr ""
-
-#: ../daemon/gvfsbackendgphoto2.c:3209
 msgid "Not supported (src is file, dst is dir)"
-msgstr ""
+msgstr "ಬೆಂಬಲವಿಲ್ಲ (src ಯು ಕಡತವಾಗಿರುತ್ತದೆ, dst ಕೋಶವಾಗಿರುತ್ತದೆ)"
 
-#: ../daemon/gvfsbackendhttp.c:241
+#: ../daemon/gvfsbackendhttp.c:248
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP ಕ್ಲೈಂಟ್ ದೋಷ: %s"
 
-#: ../daemon/gvfsbackendhttp.c:560 ../daemon/gvfsbackendsftp.c:1882
-#: ../daemon/gvfsbackendsmb.c:1319 ../daemon/gvfsbackendtrash.c:1006
-#: ../daemon/gvfsdaemonutils.c:211
+#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:1891
+#: ../daemon/gvfsbackendsmb.c:1337 ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (ಅಮಾನ್ಯವಾದ ಎನ್ಕೋಡಿಂಗ್)"
 
@@ -812,20 +883,15 @@ msgid "Directory notification not supported"
 msgstr "ಕೋಶದ ಸೂಚನೆ ನೀಡುವಿಕೆಗೆ ಬೆಂಬಲವಿಲ್ಲ"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:268 ../daemon/gvfsbackendsmbbrowse.c:699
+#: ../daemon/gvfsbackendnetwork.c:270 ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "ವಿಂಡೋಸ್ ಜಾಲಬಂಧ"
 
-#. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackendnetwork.c:392
-msgid "Local Network"
-msgstr "ಸ್ಥಳೀಯ ಜಾಲಬಂಧ"
-
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:862
+#: ../daemon/gvfsbackendnetwork.c:932
 msgid "Network Location Monitor"
-msgstr ""
+msgstr "Network Location Monitor"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -833,74 +899,78 @@ msgstr ""
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:442 ../daemon/gvfsbackendsmb.c:528
-#: ../daemon/gvfsbackendsmb.c:1312
+#: ../daemon/gvfsbackendobexftp.c:656 ../daemon/gvfsbackendsmb.c:538
+#: ../daemon/gvfsbackendsmb.c:1330
 #, c-format
 msgid "%s on %s"
 msgstr "%s, %s ನಲ್ಲಿ"
 
-#: ../daemon/gvfsbackendobexftp.c:699
+#: ../daemon/gvfsbackendobexftp.c:865
+msgid "USB support missing. Please contact your software vendor"
+msgstr "USB ಬೆಂಬಲವು ಕಾಣುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ತಂತ್ರಾಂಶ ಮಾರಾಟಗಾರರನ್ನು ಸಂಪರ್ಕಿಸಿ"
+
+#: ../daemon/gvfsbackendobexftp.c:985
 msgid "Connection to the device lost"
 msgstr "ಸಾಧನದೊಂದಿಗಿನ ಸಂಪರ್ಕವು ತಪ್ಪಿಹೋಗಿದೆ"
 
-#: ../daemon/gvfsbackendobexftp.c:1194
+#: ../daemon/gvfsbackendobexftp.c:1482
 msgid "Device requires a software update"
 msgstr "ಸಾಧನಕ್ಕೆ ಒಂದು ತಂತ್ರಾಂಶ ಅಪ್ಡೇಟಿನ ಅಗತ್ಯವಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:281
+#: ../daemon/gvfsbackendsftp.c:288
 msgid "ssh program unexpectedly exited"
 msgstr "ssh ಪ್ರೊಗ್ರಾಂ ಅನಿರೀಕ್ಷಿತವಾಗಿ ನಿರ್ಗಮಿಸಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:296
+#: ../daemon/gvfsbackendsftp.c:303
 msgid "Hostname not known"
 msgstr "ಅತಿಥೇಯದ ಹೆಸರು ತಿಳಿದಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsftp.c:303
+#: ../daemon/gvfsbackendsftp.c:310
 msgid "No route to host"
 msgstr "ಅತಿಥೇಯಕ್ಕೆ ಯಾವುದೆ ಮಾರ್ಗವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendsftp.c:317
 msgid "Connection refused by server"
 msgstr "ಪರಿಚಾರಕದಿಂದ ಸಂಪರ್ಕವು ನಿರಾಕರಿಸಲ್ಪಟ್ಟಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:317
+#: ../daemon/gvfsbackendsftp.c:324
 msgid "Host key verification failed"
 msgstr "ಅತಿಥೇಯ ಕೀಲಿಯ ಪರಿಶೀಲನೆಯು ವಿಫಲಗೊಂಡಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:400
+#: ../daemon/gvfsbackendsftp.c:407
 msgid "Unable to spawn ssh program"
-msgstr ""
+msgstr "ssh ಪ್ರೊಗ್ರಾಮನ್ನು ಉತ್ಪಾದಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsftp.c:416
+#: ../daemon/gvfsbackendsftp.c:423
 #, c-format
 msgid "Unable to spawn ssh program: %s"
-msgstr ""
+msgstr "ssh ಪ್ರೊಗ್ರಾಮನ್ನು ಉತ್ಪಾದಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ: %s"
 
-#: ../daemon/gvfsbackendsftp.c:528 ../daemon/gvfsbackendsftp.c:780
+#: ../daemon/gvfsbackendsftp.c:535 ../daemon/gvfsbackendsftp.c:787
 msgid "Timed out when logging in"
-msgstr ""
+msgstr "ನಿರ್ಗಮಿಸುವಾಗ ಕಾಲಾವಧಿ ಮೀರಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:858
+#: ../daemon/gvfsbackendsftp.c:865
 msgid "Enter passphrase for key"
 msgstr "ಕೀಲಿಗಾಗಿ ಗುಪ್ತವಾಕ್ಯವನ್ನು ನಮೂದಿಸಿ"
 
-#: ../daemon/gvfsbackendsftp.c:860
+#: ../daemon/gvfsbackendsftp.c:867
 msgid "Enter password"
 msgstr "ಗುಪ್ತಪದವನ್ನು ನಮೂದಿಸಿ"
 
-#: ../daemon/gvfsbackendsftp.c:921
+#: ../daemon/gvfsbackendsftp.c:928
 msgid "Can't send password"
 msgstr "ಗುಪ್ತಪದವನ್ನು ಕಳುಹಿಸಲಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:936
 msgid "Log In Anyway"
 msgstr "ಪರವಾಗಿಲ್ಲ ಪ್ರವೇಶಿಸು"
 
-#: ../daemon/gvfsbackendsftp.c:929
+#: ../daemon/gvfsbackendsftp.c:936
 msgid "Cancel Login"
 msgstr "ಪ್ರವೇಶವನ್ನು ರದ್ದುಗೊಳಿಸು"
 
-#: ../daemon/gvfsbackendsftp.c:939
+#: ../daemon/gvfsbackendsftp.c:946
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -909,150 +979,175 @@ msgid ""
 "The identity sent by the remote computer is %s. If you want to be absolutely "
 "sure it is safe to continue, contact the system administrator."
 msgstr ""
+"ದೂರಸ್ಥ ಗಣಕದ (%s) ಗುರುತನ್ನು ತಿಳಿಯಲಾಗಲಿಲ್ಲ.\n"
+"ನೀವು ಮೊದಲ ಬಾರಿಗೆ ಗಣಕಕ್ಕೆ ಪ್ರವೇಶಿಸಿದಲ್ಲಿ ಹೀಗೆ ಆಗುತ್ತದೆ.\n"
+"\n"
+"ದೂರಸ್ಥ ಗಣಕದಿಂದ ಕಳುಹಿಸಲಾದ ಗುರುತು %s ಆಗಿದೆ. ಇದು ಮುಂದುವರೆಯಲು ಸುರಕ್ಷಿತಾಗಿದೆಯೆ ಎಂದು ಖಚಿತಪಡಿಸಕೊಳ್ಳಲು ನಿಮ್ಮ ಗಣಕ ವ್ಯವಸ್ಥಾಪಕರನ್ನು ಸಂಪರ್ಕಿಸಿ."
 
-#: ../daemon/gvfsbackendsftp.c:959
+#: ../daemon/gvfsbackendsftp.c:966
 msgid "Login dialog cancelled"
-msgstr ""
+msgstr "ಪ್ರವೇಶಿಸುವ ಸಂವಾದವನ್ನು ಮುಚ್ಚಲಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:979
+#: ../daemon/gvfsbackendsftp.c:986
 msgid "Can't send host identity confirmation"
-msgstr ""
+msgstr "ಅತಿಥೇಯ ಗುರುತಿನ ಮಾಹಿತಿಯನ್ನು ಕಳುಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsftp.c:1472 ../daemon/gvfsbackendsftp.c:1495
+#: ../daemon/gvfsbackendsftp.c:1479 ../daemon/gvfsbackendsftp.c:1502
 msgid "Protocol error"
 msgstr "ಪ್ರೊಟೋಕಾಲ್ ದೋಷ"
 
+#. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
+#: ../daemon/gvfsbackendsftp.c:1527
+#, c-format
+#| msgid "sftp on %s"
+msgid "sftp for %s on %s"
+msgstr "%s ಗಾಗಿನ (%s ನಲ್ಲಿ) sftp"
+
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1519
+#: ../daemon/gvfsbackendsftp.c:1530
 #, c-format
 msgid "sftp on %s"
 msgstr "%s ನಲ್ಲಿ sftp"
 
-#: ../daemon/gvfsbackendsftp.c:1543
+#: ../daemon/gvfsbackendsftp.c:1556
 msgid "Unable to find supported ssh command"
 msgstr "ಬೆಂಬಲಿತವಾದ ssh ಆಜ್ಞೆಯನ್ನು ಪತ್ತೆ ಮಾಡುವಲ್ಲಿ ವಿಫಲತೆ"
 
-#: ../daemon/gvfsbackendsftp.c:1967
+#: ../daemon/gvfsbackendsftp.c:1976
 msgid "Failure"
 msgstr "ವಿಫಲತೆ"
 
-#: ../daemon/gvfsbackendsftp.c:2023 ../daemon/gvfsbackendsftp.c:2082
-#: ../daemon/gvfsbackendsftp.c:2093 ../daemon/gvfsbackendsftp.c:2149
-#: ../daemon/gvfsbackendsftp.c:2235 ../daemon/gvfsbackendsftp.c:2285
-#: ../daemon/gvfsbackendsftp.c:2331 ../daemon/gvfsbackendsftp.c:2406
-#: ../daemon/gvfsbackendsftp.c:2513 ../daemon/gvfsbackendsftp.c:2553
-#: ../daemon/gvfsbackendsftp.c:2603 ../daemon/gvfsbackendsftp.c:2672
-#: ../daemon/gvfsbackendsftp.c:2692 ../daemon/gvfsbackendsftp.c:2844
-#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2924
-#: ../daemon/gvfsbackendsftp.c:2981 ../daemon/gvfsbackendsftp.c:3252
-#: ../daemon/gvfsbackendsftp.c:3319 ../daemon/gvfsbackendsftp.c:3448
-#: ../daemon/gvfsbackendsftp.c:3483 ../daemon/gvfsbackendsftp.c:3511
-#: ../daemon/gvfsbackendsftp.c:3619 ../daemon/gvfsbackendsftp.c:3673
-#: ../daemon/gvfsbackendsftp.c:3707 ../daemon/gvfsbackendsftp.c:3741
-#: ../daemon/gvfsbackendsftp.c:3756 ../daemon/gvfsbackendsftp.c:3771
-#: ../daemon/gvfsbackendsftp.c:3849
+#: ../daemon/gvfsbackendsftp.c:2032 ../daemon/gvfsbackendsftp.c:2111
+#: ../daemon/gvfsbackendsftp.c:2122 ../daemon/gvfsbackendsftp.c:2178
+#: ../daemon/gvfsbackendsftp.c:2264 ../daemon/gvfsbackendsftp.c:2314
+#: ../daemon/gvfsbackendsftp.c:2360 ../daemon/gvfsbackendsftp.c:2435
+#: ../daemon/gvfsbackendsftp.c:2542 ../daemon/gvfsbackendsftp.c:2582
+#: ../daemon/gvfsbackendsftp.c:2632 ../daemon/gvfsbackendsftp.c:2701
+#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2873
+#: ../daemon/gvfsbackendsftp.c:2898 ../daemon/gvfsbackendsftp.c:2953
+#: ../daemon/gvfsbackendsftp.c:3010 ../daemon/gvfsbackendsftp.c:3281
+#: ../daemon/gvfsbackendsftp.c:3348 ../daemon/gvfsbackendsftp.c:3477
+#: ../daemon/gvfsbackendsftp.c:3512 ../daemon/gvfsbackendsftp.c:3540
+#: ../daemon/gvfsbackendsftp.c:3648 ../daemon/gvfsbackendsftp.c:3702
+#: ../daemon/gvfsbackendsftp.c:3736 ../daemon/gvfsbackendsftp.c:3770
+#: ../daemon/gvfsbackendsftp.c:3785 ../daemon/gvfsbackendsftp.c:3800
+#: ../daemon/gvfsbackendsftp.c:3878
 msgid "Invalid reply received"
 msgstr "ಅಮಾನ್ಯವಾದ ಪ್ರತ್ಯುತ್ತರವನ್ನು ಪಡೆಯಲಾಗಿದೆ"
 
-#: ../daemon/gvfsbackendsftp.c:2351
+#: ../daemon/gvfsbackendsftp.c:2084
+#, c-format
+msgid "Invalid icon_id '%s' in OpenIconForRead"
+msgstr "OpenIconForRead ನಲ್ಲಿ ಅಮಾನ್ಯವಾದ icon_id '%s'"
+
+#: ../daemon/gvfsbackendsftp.c:2380
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "ಬ್ಯಾಕ್ಅಪ್ ಕಡತವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ದೋಷ: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2754
+#: ../daemon/gvfsbackendsftp.c:2783
 msgid "Unable to create temporary file"
 msgstr "ತಾತ್ಕಾಲಿಕ ಕಡತವನ್ನು ನಿರ್ಮಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsftp.c:3545 ../daemon/gvfsbackendsmb.c:1811
+#: ../daemon/gvfsbackendsftp.c:3574 ../daemon/gvfsbackendsmb.c:1901
 msgid "Can't move directory over directory"
-msgstr ""
+msgstr "ಕೋಶವನ್ನು ಇನ್ನೊಂದು ಕೋಶಕ್ಕೆ ಸ್ಥಳಾಂತರಿಸಲಾಗುವುದಿಲ್ಲ"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:213
+#: ../daemon/gvfsbackendsmb.c:222
 #, c-format
 msgid "Password required for share %s on %s"
-msgstr ""
+msgstr "ಹಂಚಿಕೆ %s ಗಾಗಿ ಗುಪ್ತಪದದ ಅಗತ್ಯವಿದೆ(%s ನಲ್ಲಿನ)"
 
-#: ../daemon/gvfsbackendsmb.c:468 ../daemon/gvfsbackendsmb.c:514
+#: ../daemon/gvfsbackendsmb.c:478 ../daemon/gvfsbackendsmb.c:524
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "ಆಂತರಿಕ ದೋಷ (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:587
+#: ../daemon/gvfsbackendsmb.c:604
 msgid "Failed to mount Windows share"
-msgstr ""
+msgstr "ವಿಂಡೋಸ್ ಹಂಚಿಕೆಯನ್ನು ಆರೋಹಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsmb.c:735 ../daemon/gvfsbackendsmb.c:1191
+#: ../daemon/gvfsbackendsmb.c:753 ../daemon/gvfsbackendsmb.c:1209
 msgid "Unsupported seek type"
-msgstr ""
+msgstr "ಬೆಂಬಲವಿರದ ಕೋರಿಕೆಯ ಬಗೆ"
 
-#: ../daemon/gvfsbackendsmb.c:1255
+#: ../daemon/gvfsbackendsmb.c:1273
 #, c-format
 msgid "Backup file creation failed: %s"
-msgstr ""
+msgstr "ಪರ್ಯಾಯ ಪ್ರತಿ(ಬ್ಯಾಕ್‌ಅಪ್) ಕಡತವನ್ನು ನಿರ್ಮಿಸುವಲ್ಲಿ ವಿಫಲಗೊಂಡಿದೆ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1713
+#: ../daemon/gvfsbackendsmb.c:1803
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "ಕಡತವನ್ನು ಅಳಿಸುವಲ್ಲಿ ದೋಷ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1787
+#: ../daemon/gvfsbackendsmb.c:1877
 #, c-format
 msgid "Error moving file: %s"
 msgstr "ಕಡತವನ್ನು ಸ್ಥಳಾಂತರಿಸುವಲ್ಲಿ ದೋಷ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1859
+#: ../daemon/gvfsbackendsmb.c:1949
 #, c-format
 msgid "Error removing target file: %s"
-msgstr ""
+msgstr "ಸೂಚಿತ ಕಡತವನ್ನು ತೆಗೆದು ಹಾಕುವಲ್ಲಿ ದೋಷ: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1883
+#: ../daemon/gvfsbackendsmb.c:1973
 msgid "Can't recursively move directory"
 msgstr "ಪುನರಾವರ್ತಿತವಾಗಿ ಕೋಶವನ್ನು ಸ್ಥಳಾಂತರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
 
-#: ../daemon/gvfsbackendsmb.c:1946
+#: ../daemon/gvfsbackendsmb.c:2037
 msgid "Windows Shares Filesystem Service"
-msgstr ""
+msgstr "ವಿಂಡೋಸ್ ಶೇರ್ಸ್ ಫೈಲ್‌ಸಿಸ್ಟಂ ಸೇವೆ"
+
+#. translators: %s is a server name
+#: ../daemon/gvfsbackendsmbbrowse.c:365
+#, c-format
+#| msgid "Enter password for %s"
+msgid "Password required for %s"
+msgstr "%s ಗಾಗಿನ ಗುಪ್ತಪದ"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
-#: ../daemon/gvfsbackendsmbbrowse.c:707
+#: ../daemon/gvfsbackendsmbbrowse.c:893
 #, c-format
 msgid "Windows shares on %s"
-msgstr ""
+msgstr "%s ನಲ್ಲಿನ ವಿಂಡೋಸ್ ಹಂಚಿಕೆ"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:799 ../daemon/gvfsbackendsmbbrowse.c:845
+#. translators: We tried to mount a windows (samba) share, but failed
+#: ../daemon/gvfsbackendsmbbrowse.c:992
+msgid "Failed to retrieve share list from server"
+msgstr "ಪರಿಚಾರಕದಿಂದ ಹಂಚಿಕಾ ಪಟ್ಟಿಯನ್ನು ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+
+#: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
 msgstr "ಆರೋಹಿಸಲು ಸಾಧ್ಯವಿರದ ಕಡತ"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:867
+#: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
 msgstr "ಒಂದು ಸಾಮಾನ್ಯವಾದ ಕಡತವಲ್ಲ"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1224
+#: ../daemon/gvfsbackendsmbbrowse.c:1501
 msgid "Windows Network Filesystem Service"
 msgstr "ವಿಂಡೋಸ್ ಜಾಲಬಂಧ ಕಡತವ್ಯವಸ್ಥೆ ಸೇವೆ"
 
-#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
+#, c-format
+msgid "The trash folder may not be deleted"
+msgstr "ಕಸದಬುಟ್ಟಿ ಕಡತಕೋಶವನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
+
+#: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
+#, c-format
+msgid "Items in the trash may not be modified"
+msgstr "ಕಸದಬುಟ್ಟಿಯಲ್ಲಿನ ಅಂಶಗಳನ್ನು ಮಾರ್ಪಡಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+
 #. Translators: this is the display name of the backend
-#: ../daemon/gvfsbackendtrash.c:641 ../daemon/gvfsbackendtrash.c:1229
+#. translators: This is the name of the backend
+#: ../daemon/gvfsbackendtrash.c:735 ../daemon/gvfsbackendtrash.c:843
 msgid "Trash"
 msgstr "ಕಸಬುಟ್ಟಿ"
-
-#: ../daemon/gvfsbackendtrash.c:1019
-#, c-format
-msgid "%s (in trash)"
-msgstr "%s (ಕಸದಬುಟ್ಟಿಯಲ್ಲಿ)"
-
-#: ../daemon/gvfsbackendtrash.c:1330
-msgid "Can't delete trash"
-msgstr "ಕಸದಬುಟ್ಟಿಯನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
-
-#: ../daemon/gvfsbackendtrash.c:1677 ../daemon/gvfsbackendtrash.c:1752
-msgid "Trash directory notification not supported"
-msgstr ""
 
 #: ../daemon/gvfsdaemon.c:1032
 msgid "Invalid backend type"
@@ -1065,7 +1160,7 @@ msgstr "fd ಅನ್ನು ಕಳುಹಿಸುವಲ್ಲಿ ದೋಷ: %s"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
-msgstr ""
+msgstr "ಸಾಂಕೇತಿಕಕೊಂಡಿಗಳು ಬ್ಯಾಕ್‌ಎಂಡಿನಿಂದ ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"
 
 #: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
@@ -1077,7 +1172,7 @@ msgstr "ಹಳೆಯ ಡೀಮನ್ ಅನ್ನು ಬದಲಾಯಿಸು."
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
-msgstr ""
+msgstr "ಫ್ಯೂಸನ್ನು ಆರಂಭಿಸಬೇಡಿ."
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
@@ -1095,7 +1190,7 @@ msgid "%s: %s"
 msgstr "%s: %s"
 
 #: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:337
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:364
 #: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
 #: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
 #: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
@@ -1104,30 +1199,168 @@ msgstr "%s: %s"
 msgid "Try \"%s --help\" for more information."
 msgstr "ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ \"%s --help\" ಅನ್ನು ನೋಡಿ."
 
-#: ../daemon/mount.c:439
+#: ../daemon/mount.c:456
 msgid "Invalid arguments from spawned child"
-msgstr ""
+msgstr "ಉತ್ಪಾದಿಸಲಾದ ಚೈಲ್ಡಿನಿಂದ ಅಮಾನ್ಯವಾದ ಆರ್ಗುಮೆಂಟ್‌ಗಳು"
 
-#: ../daemon/mount.c:740
+#: ../daemon/mount.c:767
 #, c-format
 msgid "Automount failed: %s"
 msgstr "ಸ್ವಯಂಆರೋಹಣ ವಿಫಲಗೊಂಡಿದೆ: %s"
 
-#: ../daemon/mount.c:785
+#: ../daemon/mount.c:812 ../daemon/mount.c:886
 msgid "The specified location is not mounted"
 msgstr "ಸೂಚಿಸಲಾದ ಸ್ಥಳವು ಆರೋಹಿತವಾಗಿಲ್ಲ"
 
-#: ../daemon/mount.c:790
+#: ../daemon/mount.c:817
 msgid "The specified location is not supported"
 msgstr "ಸೂಚಿಸಲಾದ ಸ್ಥಳವು ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"
 
-#: ../daemon/mount.c:954
+#: ../daemon/mount.c:1023
 msgid "Location is already mounted"
 msgstr "ಸ್ಥಳವು ಈಗಾಗಲೆ ಆರೋಹಿತವಾಗಿದೆ"
 
-#: ../daemon/mount.c:962
+#: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "ಸ್ಥಳವನ್ನು ಆರೋಹಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
+
+#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
+msgid "CD-ROM Disc"
+msgstr "CD-ROM ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
+msgid "Blank CD-ROM Disc"
+msgstr "ಖಾಲಿ CD-ROM ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
+msgid "CD-R Disc"
+msgstr "CD-R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:41 ../monitor/hal/hal-utils.c:41
+msgid "Blank CD-R Disc"
+msgstr "ಖಾಲಿ CD-R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
+msgid "CD-RW Disc"
+msgstr "CD-RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:42 ../monitor/hal/hal-utils.c:42
+msgid "Blank CD-RW Disc"
+msgstr "ಖಾಲಿ CD-RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+msgid "DVD-ROM Disc"
+msgstr "DVD-ROM ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
+#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
+msgid "Blank DVD-ROM Disc"
+msgstr "ಖಾಲಿ DVD-ROM ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
+msgid "DVD-RAM Disc"
+msgstr "DVD-RAM ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:44 ../monitor/hal/hal-utils.c:44
+msgid "Blank DVD-RAM Disc"
+msgstr "ಖಾಲಿ DVD-RAM ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
+msgid "DVD-RW Disc"
+msgstr "DVD-RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:46 ../monitor/hal/hal-utils.c:46
+msgid "Blank DVD-RW Disc"
+msgstr "ಖಾಲಿ DVD-RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
+msgid "DVD+R Disc"
+msgstr "DVD+R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:47 ../monitor/hal/hal-utils.c:47
+msgid "Blank DVD+R Disc"
+msgstr "ಖಾಲಿ DVD+R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
+msgid "DVD+RW Disc"
+msgstr "DVD+RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:48 ../monitor/hal/hal-utils.c:48
+msgid "Blank DVD+RW Disc"
+msgstr "ಖಾಲಿ DVD+RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
+msgid "DVD+R DL Disc"
+msgstr "DVD+R DL ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:49 ../monitor/hal/hal-utils.c:49
+msgid "Blank DVD+R DL Disc"
+msgstr "ಖಾಲಿ DVD+R DL ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
+msgid "Blu-Ray Disc"
+msgstr "ಬ್ಲೂ-ರೇ ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:50 ../monitor/hal/hal-utils.c:50
+msgid "Blank Blu-Ray Disc"
+msgstr "ಖಾಲಿ ಬ್ಲೂ-ರೇ ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
+msgid "Blu-Ray R Disc"
+msgstr "ಬ್ಲೂ-ರೇ R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:51 ../monitor/hal/hal-utils.c:51
+msgid "Blank Blu-Ray R Disc"
+msgstr "ಖಾಲಿ ಬ್ಲೂ-ರೇ R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
+msgid "Blu-Ray RW Disc"
+msgstr "ಬ್ಲೂ-ರೇ RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:52 ../monitor/hal/hal-utils.c:52
+msgid "Blank Blu-Ray RW Disc"
+msgstr "ಖಾಲಿ ಬ್ಲೂ-ರೇ RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
+msgid "HD DVD Disc"
+msgstr "HD DVD ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:53 ../monitor/hal/hal-utils.c:53
+msgid "Blank HD DVD Disc"
+msgstr "ಖಾಲಿ HD DVD ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
+msgid "HD DVD-R Disc"
+msgstr "HD DVD-R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:54 ../monitor/hal/hal-utils.c:54
+msgid "Blank HD DVD-R Disc"
+msgstr "ಖಾಲಿ HD DVD-R ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
+msgid "HD DVD-RW Disc"
+msgstr "HD DVD-RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:55 ../monitor/hal/hal-utils.c:55
+msgid "Blank HD DVD-RW Disc"
+msgstr "ಖಾಲಿ HD DVD-RW ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
+msgid "MO Disc"
+msgstr "MO ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:56 ../monitor/hal/hal-utils.c:56
+msgid "Blank MO Disc"
+msgstr "ಖಾಲಿ MO ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
+msgid "Disc"
+msgstr "ಡಿಸ್ಕ್‍"
+
+#: ../monitor/gphoto2/hal-utils.c:57 ../monitor/hal/hal-utils.c:57
+msgid "Blank Disc"
+msgstr "ಖಾಲಿ ಡಿಸ್ಕ್‍"
 
 #: ../monitor/hal/ghaldrive.c:130
 msgid "CD-ROM"
@@ -1274,7 +1507,9 @@ msgstr "ಸಮೂಹ ಶೇಖರಣಾ ಡ್ರೈವ್"
 #: ../monitor/hal/ghaldrive.c:723
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "ಮಾಧ್ಯಮವನ್ನು ಹೊರತಳ್ಳಲು ವಿಫಲಗೊಂಡಿದೆ; ಮಾಧ್ಯಮದಲ್ಲಿ ಒಂದು ಅಥವ ಹೆಚ್ಚಿನ ಪರಿಮಾಣಗಳು ಕಾರ್ಯನಿರತವಾಗಿವೆ."
+msgstr ""
+"ಮಾಧ್ಯಮವನ್ನು ಹೊರತಳ್ಳಲು ವಿಫಲಗೊಂಡಿದೆ; ಮಾಧ್ಯಮದಲ್ಲಿ ಒಂದು ಅಥವ ಹೆಚ್ಚಿನ ಪರಿಮಾಣಗಳು "
+"ಕಾರ್ಯನಿರತವಾಗಿವೆ."
 
 #: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
 #, c-format
@@ -1308,144 +1543,6 @@ msgstr "%s ಮಾಧ್ಯಮ"
 msgid "%s Encrypted Data"
 msgstr "%s ಗೂಢಲಿಪೀಕರಣ ದತ್ತಾಂಶ"
 
-#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
-msgid "CD-ROM Disc"
-msgstr "CD-ROM ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:40 ../monitor/gphoto2/hal-utils.c:40
-msgid "Blank CD-ROM Disc"
-msgstr "ಖಾಲಿ CD-ROM ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
-msgid "CD-R Disc"
-msgstr "CD-R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:41 ../monitor/gphoto2/hal-utils.c:41
-msgid "Blank CD-R Disc"
-msgstr "ಖಾಲಿ CD-R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
-msgid "CD-RW Disc"
-msgstr "CD-RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:42 ../monitor/gphoto2/hal-utils.c:42
-msgid "Blank CD-RW Disc"
-msgstr "ಖಾಲಿ CD-RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-msgid "DVD-ROM Disc"
-msgstr "DVD-ROM ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:43 ../monitor/hal/hal-utils.c:45
-#: ../monitor/gphoto2/hal-utils.c:43 ../monitor/gphoto2/hal-utils.c:45
-msgid "Blank DVD-ROM Disc"
-msgstr "ಖಾಲಿ DVD-ROM ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
-msgid "DVD-RAM Disc"
-msgstr "DVD-RAM ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:44 ../monitor/gphoto2/hal-utils.c:44
-msgid "Blank DVD-RAM Disc"
-msgstr "ಖಾಲಿ DVD-RAM ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
-msgid "DVD-RW Disc"
-msgstr "DVD-RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:46 ../monitor/gphoto2/hal-utils.c:46
-msgid "Blank DVD-RW Disc"
-msgstr "ಖಾಲಿ DVD-RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
-msgid "DVD+R Disc"
-msgstr "DVD+R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:47 ../monitor/gphoto2/hal-utils.c:47
-msgid "Blank DVD+R Disc"
-msgstr "ಖಾಲಿ DVD+R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
-msgid "DVD+RW Disc"
-msgstr "DVD+RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:48 ../monitor/gphoto2/hal-utils.c:48
-msgid "Blank DVD+RW Disc"
-msgstr "ಖಾಲಿ DVD+RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
-msgid "DVD+R DL Disc"
-msgstr "DVD+R DL ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:49 ../monitor/gphoto2/hal-utils.c:49
-msgid "Blank DVD+R DL Disc"
-msgstr "ಖಾಲಿ DVD+R DL ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
-msgid "Blu-Ray Disc"
-msgstr "ಬ್ಲೂ-ರೇ ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:50 ../monitor/gphoto2/hal-utils.c:50
-msgid "Blank Blu-Ray Disc"
-msgstr "ಖಾಲಿ ಬ್ಲೂ-ರೇ ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
-msgid "Blu-Ray R Disc"
-msgstr "ಬ್ಲೂ-ರೇ R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:51 ../monitor/gphoto2/hal-utils.c:51
-msgid "Blank Blu-Ray R Disc"
-msgstr "ಖಾಲಿ ಬ್ಲೂ-ರೇ R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
-msgid "Blu-Ray RW Disc"
-msgstr "ಬ್ಲೂ-ರೇ RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:52 ../monitor/gphoto2/hal-utils.c:52
-msgid "Blank Blu-Ray RW Disc"
-msgstr "ಖಾಲಿ ಬ್ಲೂ-ರೇ RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
-msgid "HD DVD Disc"
-msgstr "HD DVD ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:53 ../monitor/gphoto2/hal-utils.c:53
-msgid "Blank HD DVD Disc"
-msgstr "ಖಾಲಿ HD DVD ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
-msgid "HD DVD-R Disc"
-msgstr "HD DVD-R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:54 ../monitor/gphoto2/hal-utils.c:54
-msgid "Blank HD DVD-R Disc"
-msgstr "ಖಾಲಿ HD DVD-R ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
-msgid "HD DVD-RW Disc"
-msgstr "HD DVD-RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:55 ../monitor/gphoto2/hal-utils.c:55
-msgid "Blank HD DVD-RW Disc"
-msgstr "ಖಾಲಿ HD DVD-RW ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
-msgid "MO Disc"
-msgstr "MO ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:56 ../monitor/gphoto2/hal-utils.c:56
-msgid "Blank MO Disc"
-msgstr "ಖಾಲಿ MO ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
-msgid "Disc"
-msgstr "ಡಿಸ್ಕ್‍"
-
-#: ../monitor/hal/hal-utils.c:57 ../monitor/gphoto2/hal-utils.c:57
-msgid "Blank Disc"
-msgstr "ಖಾಲಿ ಡಿಸ್ಕ್‍"
-
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:57
@@ -1476,7 +1573,7 @@ msgstr "%s: %s:ಮುಚ್ಚುವಲ್ಲಿ ದೋಷ: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr ""
+msgstr "LOCATION... - LOCATIONS ಅನ್ನು ಮಾನಕ ಔಟ್‌ಪುಟ್‌ಗೆ ಒಟ್ಟುಗೂಡಿಸಿ(concatenate)."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1486,13 +1583,13 @@ msgid ""
 "like the traditional cat utility, but using gvfs location instead local "
 "files: for example you can use something like smb://server/resource/file.txt "
 "as location to concatenate."
-msgstr ""
+msgstr "ಕಡತಗಳನ್ನು ಒಟ್ಟುಗೂಡಿಸಿ (Concatenate) ನಂತರ ಮಾನಕವಾದ ಔಟ್‌ಪುಟ್‌ಗೆ ಮುದ್ರಿಸಿ. ಇದು ಸಾಂಪ್ರದಾಯಿಕ cat ಸೌಕರ್ಯದಂತೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ, ಆದರೆ ಸ್ಥಳೀಯ ಕಡತಗಳನ್ನು ಬದಲಿಗೆ gvfs ಅನ್ನು ಬಳಸುತ್ತದೆ: ಉದಾಹರಣೆಗೆ ಒಟ್ಟಿಗೆ ಜೋಡಿಸಲು ಸ್ಥಳವಾಗಿ smb://server/resource/file.txt ನ ರೀತಿಯದನ್ನು ಬಳಸಿ."
 
 #: ../programs/gvfs-cat.c:148
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
-msgstr ""
+msgstr "ಸೂಚನೆ: ನಿಮಗೆ -n, -T ಅಥವ ಇತರೆ ಫಾರ್ಮಾಟ್‌ ಮಾಡಬಹುದಾದ ಆಯ್ಕೆಗಳ ಅಗತ್ಯವಿದ್ದಲ್ಲಿ cat ಮೂಲಕ ಪೈಪ್‌ ಮಾಡಿ."
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1525,5 +1622,5 @@ msgstr "FILES... - ನೋಂದಾಯಿಸಲಾದ ಅನ್ವಯಗಳಿಂ
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
-msgstr ""
+msgstr "ಈ ಬಗೆಯನ್ನು ಕಡತಗಳನ್ನು ನಿಭಾಯಿಸಲು ನೋಂದಾಯಿಸಲಾದ ಪೂರ್ವನಿಯೋಜಿತ ಅನ್ವಯದೊಂದಿಗೆ ಕಡತವನ್ನು(ಗಳನ್ನು) ತೆರೆಯಲಾಗುತ್ತದೆ."
 
