@@ -155,7 +155,11 @@ g_vfs_decode_uri (const char *uri)
 	      authority   = [ userinfo "@" ] host [ ":" port ]
       */
 
-      userinfo_end = memchr (authority_start, '@', authority_end - authority_start);
+      /* Look for the last so that any multiple @ signs are put in the username part.
+       * This is not quite correct, as @ should be escaped here, but this happens
+       * in practice, so lets handle it the "nicer" way at least. */
+      userinfo_end = g_strrstr_len (authority_start,
+				    authority_end - authority_start, "@");
       if (userinfo_end)
 	{
 	  userinfo_start = authority_start;

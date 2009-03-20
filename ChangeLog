@@ -1,3 +1,10 @@
+2009-03-20  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 548648 – g_daemon_vfs_parse_name() fails to parse user names with '@' chars
+	* client/gvfsuriutils.c (g_vfs_decode_uri):
+	Make sure multiple @ in the authority part are put in the username.
+	This is an invalid uri, but we might as well handle it in the better way.
+
 2009-03-19  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:
