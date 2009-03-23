@@ -162,26 +162,31 @@ trash_item_get_trashinfo (GFile  *path,
 
   if (g_key_file_load_from_file (keyfile, trashinfo, 0, NULL))
     {
-      char *orig;
+      char *orig, *decoded;
 
+      decoded = NULL;
       orig = g_key_file_get_string (keyfile,
                                     "Trash Info", "Path",
                                     NULL);
 
       if (orig == NULL)
         *original = NULL;
-
-      else if (g_path_is_absolute (orig))
-        *original = g_file_new_for_path (orig);
-
       else
-        {
-          GFile *rootdir;
+	{
+	  decoded = g_uri_unescape_string (orig, NULL);
 
-          rootdir = g_file_get_parent (trashdir);
-          *original = g_file_get_child (rootdir, orig);
-          g_object_unref (rootdir);
-        }
+	  if (g_path_is_absolute (decoded))
+	    *original = g_file_new_for_path (decoded);
+	  else
+	    {
+	      GFile *rootdir;
+	      
+	      rootdir = g_file_get_parent (trashdir);
+	      *original = g_file_get_child (rootdir, decoded);
+	      g_object_unref (rootdir);
+	    }
+	  g_free (decoded);
+	}
 
       g_free (orig);
 
