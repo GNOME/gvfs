@@ -1,5 +1,13 @@
 2009-03-23  Alexander Larsson  <alexl@redhat.com>
 
+        * daemon/gvfsbackendsftp.c:
+	Fix various error cases to return right error:
+	Append to existing directory
+	replace existing directory
+	enumerate non-directory
+
+2009-03-23  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 576337 – trash:/// show escaped filenames without decoding
 
         * daemon/trashlib/trashitem.c:

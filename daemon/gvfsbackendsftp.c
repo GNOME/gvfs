@@ -1647,22 +1647,38 @@ io_error_code_for_sftp_error (guint32 code, int failure_error)
   return error_code;
 }
 
-static gboolean
-error_from_status (GVfsJob *job,
-                   GDataInputStream *reply,
-                   int failure_error,
-                   int allowed_sftp_error,
-                   GError **error)
+static char *
+error_message (GIOErrorEnum error)
 {
-  guint32 code;
-  gint error_code;
-  char *message;
+  switch (error)
+    {
+    case G_IO_ERROR_NOT_EMPTY:
+      return _("Directory not empty");
+    case G_IO_ERROR_EXISTS:
+      return _("Target file exists");
+    case G_IO_ERROR_NOT_SUPPORTED:
+      return _("Operation unsupported");
+    case G_IO_ERROR_PERMISSION_DENIED:
+      return _("Permission denied");
+    case G_IO_ERROR_NOT_FOUND:
+      return _("No such file or directory");
+    default:
+      return "Unknown reason";
+    }
+}
 
+static gboolean
+error_from_status_code (GVfsJob *job,
+			guint32 code,
+			int failure_error,
+			int allowed_sftp_error,
+			GError **error)
+{
+  gint error_code;
+  
   if (failure_error == -1)
     failure_error = G_IO_ERROR_FAILED;
   
-  code = g_data_input_stream_read_uint32 (reply, NULL, NULL);
-
   if (code == SSH_FX_OK ||
       (allowed_sftp_error != -1 &&
        code == allowed_sftp_error))
@@ -1671,15 +1687,64 @@ error_from_status (GVfsJob *job,
   if (error)
     {
       error_code = io_error_code_for_sftp_error (code, failure_error);
-      message = read_string (reply, NULL);
-      if (message == NULL)
-        message = g_strdup ("Unknown reason");
-      
-      *error = g_error_new_literal (G_IO_ERROR, error_code, message);
-      g_free (message);
+      *error = g_error_new_literal (G_IO_ERROR, error_code,
+				    error_message (error_code));
     }
   
   return FALSE;
+}
+
+static gboolean
+failure_from_status_code (GVfsJob *job,
+			  guint32 code,
+			  int failure_error,
+			  int allowed_sftp_error)
+{
+  GError *error;
+
+  error = NULL;
+  if (error_from_status_code (job, code, failure_error, allowed_sftp_error, &error))
+    return TRUE;
+  else
+    {
+      g_vfs_job_failed_from_error (job, error);
+      g_error_free (error);
+    }
+  return FALSE;
+}
+
+static gboolean
+result_from_status_code (GVfsJob *job,
+			 guint32 code,
+			 int failure_error,
+			 int allowed_sftp_error)
+{
+  gboolean res;
+
+  res = failure_from_status_code (job, code, 
+				  failure_error,
+				  allowed_sftp_error);
+  if (res)
+    g_vfs_job_succeeded (job);
+  
+  return res;
+}
+
+
+static gboolean
+error_from_status (GVfsJob *job,
+                   GDataInputStream *reply,
+                   int failure_error,
+                   int allowed_sftp_error,
+                   GError **error)
+{
+  guint32 code;
+
+  code = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+
+  return error_from_status_code (job, code,
+				 failure_error, allowed_sftp_error,
+				 error);
 }
 
 static gboolean
@@ -1701,7 +1766,6 @@ failure_from_status (GVfsJob *job,
   return FALSE;
 }
 
-
 static gboolean
 result_from_status (GVfsJob *job,
                     GDataInputStream *reply,
@@ -1717,6 +1781,89 @@ result_from_status (GVfsJob *job,
     g_vfs_job_succeeded (job);
   
   return res;
+}
+
+
+
+typedef struct _ErrorFromStatData ErrorFromStatData;
+
+typedef void (*ErrorFromStatCallback) (GVfsBackendSftp *backend,
+				       GVfsJob *job,
+				       gint original_error,
+				       gint stat_error,
+				       GFileInfo *info,
+				       gpointer user_data);
+				       
+
+struct _ErrorFromStatData {
+  gint original_error;
+  ErrorFromStatCallback callback;
+  gpointer user_data;
+};
+
+static void
+error_from_lstat_reply (GVfsBackendSftp *backend,
+			int reply_type,
+			GDataInputStream *reply,
+			guint32 len,
+			GVfsJob *job,
+			gpointer user_data)
+{
+  ErrorFromStatData *data = user_data;
+  GFileInfo *info;
+  gint stat_error;
+
+  stat_error = 0;
+  info = NULL;
+  if (reply_type == SSH_FXP_STATUS)
+    stat_error = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+  else if (reply_type == SSH_FXP_ATTRS)
+    {
+      info = g_file_info_new ();
+      parse_attributes (backend,
+			info,
+			NULL,
+			reply,
+			NULL);
+    }
+  else
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        _("Invalid reply received"));
+      goto out;
+    }
+
+  data->callback (backend, job,
+		  data->original_error,
+		  stat_error,
+		  info,
+		  data->user_data);
+
+ out:
+  g_slice_free (ErrorFromStatData, data);
+}
+
+static void
+error_from_lstat (GVfsBackendSftp *backend,
+		  GVfsJob *job,
+		  GDataInputStream *original_reply,
+		  const char *path,
+		  ErrorFromStatCallback callback,
+		  gpointer user_data)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+  GDataOutputStream *command;
+  ErrorFromStatData *data;
+  
+  command = new_command_stream (op_backend, SSH_FXP_LSTAT);
+  put_string (command, path);
+
+  data = g_slice_new (ErrorFromStatData);
+  data->original_error = g_data_input_stream_read_uint32 (original_reply, NULL, NULL);
+  data->callback = callback;
+  data->user_data = user_data;
+  queue_command_stream_and_free (op_backend, command, error_from_lstat_reply,
+				 G_VFS_JOB (job), data);
 }
 
 static void
@@ -2635,6 +2782,26 @@ try_create (GVfsBackend *backend,
 }
 
 static void
+append_to_error (GVfsBackendSftp *backend,
+		 GVfsJob *job,
+		 gint original_error,
+		 gint stat_error,
+		 GFileInfo *info,
+		 gpointer user_data)
+{
+  if ((original_error == SSH_FX_FAILURE) &&
+      info != NULL &&
+      g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+    {
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+			_("File is directory"));
+      return;
+    }
+
+  result_from_status_code (job, original_error, -1, -1);
+}
+
+static void
 append_to_reply (GVfsBackendSftp *backend,
                  int reply_type,
                  GDataInputStream *reply,
@@ -2646,7 +2813,10 @@ append_to_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply, -1, -1);
+      error_from_lstat (backend, job, reply,
+			G_VFS_JOB_OPEN_FOR_WRITE (job)->filename,
+			append_to_error,
+			NULL);
       return;
     }
 
@@ -2953,6 +3123,14 @@ replace_stat_reply (GVfsBackendSftp *backend,
       parse_attributes (backend, info, NULL,
                         reply, NULL);
 
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+	{
+	  g_object_unref (info);
+          g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                            _("File is directory"));
+          return;
+	}
+      
       if (op_job->etag != NULL)
         {
           current_etag = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ETAG_VALUE);
@@ -3024,7 +3202,7 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
           /* Replace existing file code: */
           
           command = new_command_stream (backend,
-                                        SSH_FXP_STAT);
+                                        SSH_FXP_LSTAT);
           put_string (command, op_job->filename);
           queue_command_stream_and_free (backend, command, replace_stat_reply, G_VFS_JOB (job), NULL);
         }
@@ -3400,6 +3578,29 @@ read_dir_reply (GVfsBackendSftp *backend,
 }
 
 static void
+open_dir_error (GVfsBackendSftp *backend,
+		GVfsJob *job,
+		gint original_error,
+		gint stat_error,
+		GFileInfo *info,
+		gpointer user_data)
+{
+  if ((original_error == SSH_FX_FAILURE ||
+       original_error == SSH_FX_NO_SUCH_FILE) &&
+      info != NULL &&
+      g_file_info_get_file_type (info) != G_FILE_TYPE_DIRECTORY)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+		        G_IO_ERROR,
+			G_IO_ERROR_NOT_DIRECTORY,
+			_("The file is not a directory"));
+      return;
+    }
+
+  result_from_status_code (job, original_error, -1, -1);
+}
+
+static void
 open_dir_reply (GVfsBackendSftp *backend,
                 int reply_type,
                 GDataInputStream *reply,
@@ -3415,7 +3616,10 @@ open_dir_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply, -1, -1);
+      error_from_lstat (backend, job, reply,
+			G_VFS_JOB_ENUMERATE (job)->filename,
+			open_dir_error,
+			NULL);
       return;
     }
 
