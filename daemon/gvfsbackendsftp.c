@@ -1730,6 +1730,11 @@ result_from_status_code (GVfsJob *job,
   return res;
 }
 
+static guint32
+read_status_code (GDataInputStream *status_reply)
+{
+  return g_data_input_stream_read_uint32 (status_reply, NULL, NULL);
+}
 
 static gboolean
 error_from_status (GVfsJob *job,
@@ -1740,7 +1745,7 @@ error_from_status (GVfsJob *job,
 {
   guint32 code;
 
-  code = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+  code = read_status_code (reply);
 
   return error_from_status_code (job, code,
 				 failure_error, allowed_sftp_error,
@@ -1816,7 +1821,7 @@ error_from_lstat_reply (GVfsBackendSftp *backend,
   stat_error = 0;
   info = NULL;
   if (reply_type == SSH_FXP_STATUS)
-    stat_error = g_data_input_stream_read_uint32 (reply, NULL, NULL);
+    stat_error = read_status_code (reply);
   else if (reply_type == SSH_FXP_ATTRS)
     {
       info = g_file_info_new ();
@@ -1846,7 +1851,7 @@ error_from_lstat_reply (GVfsBackendSftp *backend,
 static void
 error_from_lstat (GVfsBackendSftp *backend,
 		  GVfsJob *job,
-		  GDataInputStream *original_reply,
+		  guint32 original_error,
 		  const char *path,
 		  ErrorFromStatCallback callback,
 		  gpointer user_data)
@@ -1859,7 +1864,7 @@ error_from_lstat (GVfsBackendSftp *backend,
   put_string (command, path);
 
   data = g_slice_new (ErrorFromStatData);
-  data->original_error = g_data_input_stream_read_uint32 (original_reply, NULL, NULL);
+  data->original_error = original_error;
   data->callback = callback;
   data->user_data = user_data;
   queue_command_stream_and_free (op_backend, command, error_from_lstat_reply,
@@ -2731,6 +2736,71 @@ try_close_read (GVfsBackend *backend,
   return TRUE;
 }
 
+static void not_dir_or_not_exist_error (GVfsBackendSftp *backend,
+					GVfsJob *job,
+					char *filename);
+
+static void
+not_dir_or_not_exist_error_cb (GVfsBackendSftp *backend,
+			       GVfsJob *job,
+			       gint original_error,
+			       gint stat_error,
+			       GFileInfo *info,
+			       gpointer user_data)
+{
+  char *path;
+
+  path = user_data;
+  if (info != NULL)
+    {
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+	/* Parent is a directory, so must not have found child */
+	g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+			  _("No such file or directory"));
+      else /* Some path element was not a directory */
+	g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
+			  _("Not a directory"));
+    }
+  else if (stat_error == SSH_FX_NO_SUCH_FILE)
+    {
+      not_dir_or_not_exist_error (backend, job, path);
+    }
+  else
+    {
+      /* Some other weird error, lets say "not found" */
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+			_("No such file or directory"));
+    }
+  
+  g_free (path);
+}
+
+static void
+not_dir_or_not_exist_error (GVfsBackendSftp *backend,
+			    GVfsJob *job,
+			    char *filename)
+{
+  char *parent;
+
+  parent = g_path_get_dirname (filename);
+  if (strcmp (parent, ".") == 0)
+    {
+      g_free (parent);
+      /* Root not found? Weird, but at least not
+	 NOT_DIRECTORY, so lets report not found */
+      g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+			_("No such file or directory"));
+      return;
+    }
+    
+  error_from_lstat (backend,
+		    job,
+		    SSH_FX_NO_SUCH_FILE,
+		    filename,
+		    not_dir_or_not_exist_error_cb,
+		    parent);
+}
+
 static void
 create_reply (GVfsBackendSftp *backend,
               int reply_type,
@@ -2740,10 +2810,22 @@ create_reply (GVfsBackendSftp *backend,
               gpointer user_data)
 {
   SftpHandle *handle;
+  guint32 code;
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      result_from_status (job, reply, G_IO_ERROR_EXISTS, -1);
+      code = read_status_code (reply);
+
+      if (code == SSH_FX_NO_SUCH_FILE)
+	{
+	  /* openssh sftp returns NO_SUCH_FILE for both ENOTDIR and ENOENT,
+	     we need to stat-walk the hierarchy to see what the error was */
+	  not_dir_or_not_exist_error (backend, job,
+				      G_VFS_JOB_OPEN_FOR_WRITE (job)->filename);
+	  return;
+	}
+      
+      result_from_status_code (job, code, G_IO_ERROR_EXISTS, -1);
       return;
     }
 
@@ -2798,6 +2880,14 @@ append_to_error (GVfsBackendSftp *backend,
       return;
     }
 
+  if (original_error == SSH_FX_NO_SUCH_FILE)
+    {
+      not_dir_or_not_exist_error (backend, job,
+				  G_VFS_JOB_OPEN_FOR_WRITE (job)->filename);
+      return;
+    }
+  
+
   result_from_status_code (job, original_error, -1, -1);
 }
 
@@ -2813,7 +2903,7 @@ append_to_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      error_from_lstat (backend, job, reply,
+      error_from_lstat (backend, job, read_status_code (reply),
 			G_VFS_JOB_OPEN_FOR_WRITE (job)->filename,
 			append_to_error,
 			NULL);
@@ -3193,6 +3283,13 @@ replace_exclusive_reply (GVfsBackendSftp *backend,
         /* Open should not return OK */
         g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                           _("Invalid reply received"));
+      else if (error->code == G_IO_ERROR_NOT_FOUND)
+	{
+          g_error_free (error);
+	  /* openssh sftp returns NO_SUCH_FILE for ENOTDIR */
+	  not_dir_or_not_exist_error (backend, job,
+				      G_VFS_JOB_OPEN_FOR_WRITE (job)->filename);
+	}
       else if (error->code == G_IO_ERROR_EXISTS)
         {
           /* It was *probably* the EXCL flag failing. I wish we had
@@ -3616,7 +3713,7 @@ open_dir_reply (GVfsBackendSftp *backend,
   
   if (reply_type == SSH_FXP_STATUS)
     {
-      error_from_lstat (backend, job, reply,
+      error_from_lstat (backend, job, read_status_code (reply),
 			G_VFS_JOB_ENUMERATE (job)->filename,
 			open_dir_error,
 			NULL);

@@ -1,3 +1,9 @@
+2009-03-24  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsftp.c:
+	Fix reporting of "not found" or "not directory" errors when
+	sftp returns NOT_FOUND, since that can mean either of these.
+
 2009-03-23  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:
