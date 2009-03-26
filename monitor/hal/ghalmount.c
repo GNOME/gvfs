@@ -775,6 +775,7 @@ typedef struct {
   guint error_channel_source_id;
   GString *error_string;
   gboolean using_legacy;
+  gchar **argv;
 } UnmountOp;
 
 static void 
@@ -824,6 +825,7 @@ unmount_cb (GPid pid, gint status, gpointer user_data)
   g_source_remove (data->error_channel_source_id);
   g_io_channel_unref (data->error_channel);
   g_string_free (data->error_string, TRUE);
+  g_strfreev (data->argv);
   close (data->error_fd);
   g_spawn_close_pid (pid);
 
@@ -846,28 +848,16 @@ unmount_read_error (GIOChannel *channel,
   return TRUE;
 }
 
-static void
-unmount_do (GMount               *mount,
-                  GCancellable         *cancellable,
-                  GAsyncReadyCallback   callback,
-                  gpointer              user_data,
-                  char                **argv,
-                  gboolean              using_legacy)
+static gboolean
+unmount_do_cb (gpointer user_data)
 {
-  UnmountOp *data;
+  UnmountOp *data = (UnmountOp *) user_data;
   GPid child_pid;
   GError *error;
 
-  data = g_new0 (UnmountOp, 1);
-  data->object = g_object_ref (mount);
-  data->callback = callback;
-  data->user_data = user_data;
-  data->cancellable = cancellable;  
-  data->using_legacy = using_legacy;
-  
   error = NULL;
   if (!g_spawn_async_with_pipes (NULL,         /* working dir */
-                                 argv,
+                                 data->argv,
                                  NULL,         /* envp */
                                  G_SPAWN_DO_NOT_REAP_CHILD|G_SPAWN_SEARCH_PATH,
                                  NULL,         /* child_setup */
@@ -886,15 +876,43 @@ unmount_do (GMount               *mount,
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
       g_error_free (error);
+      g_strfreev (data->argv);
       g_free (data);
-      return;
+
+      return FALSE;
     }
   data->error_string = g_string_new ("");
   data->error_channel = g_io_channel_unix_new (data->error_fd);
   data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, unmount_read_error, data);
   g_child_watch_add (child_pid, unmount_cb, data);
+
+  return FALSE;
 }
 
+static void
+unmount_do (GMount               *mount,
+            GCancellable         *cancellable,
+            GAsyncReadyCallback   callback,
+            gpointer              user_data,
+            char                **argv,
+            gboolean              using_legacy)
+{
+  GHalMount *hal_mount = G_HAL_MOUNT (mount);
+  UnmountOp *data;
+
+  data = g_new0 (UnmountOp, 1);
+  data->object = g_object_ref (mount);
+  data->callback = callback;
+  data->user_data = user_data;
+  data->cancellable = cancellable;
+  data->using_legacy = using_legacy;
+  data->argv = g_strdupv (argv);
+
+  if (hal_mount->volume_monitor != NULL)
+    g_signal_emit_by_name (hal_mount->volume_monitor, "mount-pre-unmount", mount);
+
+  g_timeout_add (500, unmount_do_cb, data);
+}
 
 static void
 g_hal_mount_unmount (GMount              *mount,

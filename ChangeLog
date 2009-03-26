@@ -1,3 +1,15 @@
+2009-03-26  Carlos Garnacho  <carlosg@gnome.org>
+
+	Bug 576083 – pre-unmount signals not being triggered
+
+	* monitor/hal/ghalmount.c (unmount_do) (unmount_do_cb): Emit
+	::mount-pre-unmount and wait 500msec before actually trying to
+	unmount.
+	* monitor/proxy/gproxyshadowmount.c (real_mount_pre_unmount_cb): Proxy
+	the shadowed mount pre-unmount signal.
+	* monitor/proxy/gproxyvolumemonitor.c (filter_function): GMount
+	doesn't have the ::pre-unmount signal yet, so don't emit it.
+
 2009-03-24  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsftp.c:

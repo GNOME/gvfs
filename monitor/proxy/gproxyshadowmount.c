@@ -49,6 +49,7 @@ struct _GProxyShadowMount {
 
   GProxyVolume *volume;
   GMount *real_mount;
+  gulong pre_unmount_signal_id;
   gboolean real_mount_shadowed;
   GFile *root;
 };
@@ -111,6 +112,15 @@ g_proxy_shadow_mount_init (GProxyShadowMount *proxy_shadow_mount)
 {
 }
 
+static void
+real_mount_pre_unmount_cb (GVolumeMonitor    *volume_monitor,
+                           GMount            *mount,
+                           GProxyShadowMount *shadow_mount)
+{
+  if (mount == shadow_mount->real_mount)
+    g_signal_emit_by_name (shadow_mount->volume_monitor, "mount-pre-unmount", shadow_mount);
+}
+
 void
 g_proxy_shadow_mount_remove (GProxyShadowMount *mount)
 {
@@ -120,6 +130,12 @@ g_proxy_shadow_mount_remove (GProxyShadowMount *mount)
       signal_emit_in_idle (mount->real_mount, "changed", NULL);
       signal_emit_in_idle (mount->volume_monitor, "mount-changed", mount->real_mount);
       mount->real_mount_shadowed = FALSE;
+
+      if (mount->pre_unmount_signal_id != 0)
+        {
+          g_signal_handler_disconnect (mount, mount->pre_unmount_signal_id);
+          mount->pre_unmount_signal_id = 0;
+        }
     }
 }
 
@@ -150,6 +166,9 @@ g_proxy_shadow_mount_new (GProxyVolumeMonitor *volume_monitor,
   g_mount_shadow (mount->real_mount);
   signal_emit_in_idle (mount->real_mount, "changed", NULL);
   signal_emit_in_idle (mount->volume_monitor, "mount-changed", mount->real_mount);
+
+  mount->pre_unmount_signal_id = g_signal_connect (mount->volume_monitor, "mount-pre-unmount",
+                                                   G_CALLBACK (real_mount_pre_unmount_cb), mount);
 
   g_object_set_data (G_OBJECT (mount),
                      "g-proxy-shadow-mount-volume-monitor-name",
