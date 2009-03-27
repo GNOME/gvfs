@@ -1,3 +1,9 @@
+2009-03-27  Alexander Larsson  <alexl@redhat.com>
+
+        * daemon/gvfsbackendsmb.c:
+	Work around bug in libsmbclient (samba bug #6228)
+	Ensure we return EEXISTS in do_create even if target is a directory
+
 2009-03-26  Carlos Garnacho  <carlosg@gnome.org>
 
 	Bug 576083 – pre-unmount signals not being triggered

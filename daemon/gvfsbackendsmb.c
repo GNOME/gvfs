@@ -660,6 +660,15 @@ try_mount (GVfsBackend *backend,
   return FALSE;
 }
 
+static int
+fixup_open_errno (int err)
+{
+  /* samba has a bug (#6228) where it doesn't set errno if path resolving failed */
+  if (err == 0)
+    err = ENOTDIR;
+  return err;
+}
+
 static void 
 do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
@@ -677,11 +686,13 @@ do_open_for_read (GVfsBackend *backend,
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  errno = 0;
   file = smbc_open (op_backend->smb_context, uri, O_RDONLY, 0);
 
   if (file == NULL)
     {
-      olderr = errno;
+      olderr = fixup_open_errno (errno);
+      
       smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
       res = smbc_stat (op_backend->smb_context, uri, &st);
       g_free (uri);
@@ -846,15 +857,24 @@ do_create (GVfsBackend *backend,
   SMBCFILE *file;
   SmbWriteHandle *handle;
   smbc_open_fn smbc_open;
+  int errsv;
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
-					O_CREAT|O_WRONLY|O_EXCL, 0666);
+		    O_CREAT|O_WRONLY|O_EXCL, 0666);
   g_free (uri);
 
   if (file == NULL)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+    {
+      errsv = fixup_open_errno (errno);
+
+      /* We guarantee EEXIST on create on existing dir */
+      if (errsv == EISDIR)
+	errsv = EEXIST;
+      g_vfs_job_failed_from_errno (G_VFS_JOB (job), errsv);
+    }
   else
     {
       handle = g_new0 (SmbWriteHandle, 1);
@@ -882,12 +902,13 @@ do_append_to (GVfsBackend *backend,
 
   uri = create_smb_uri (op_backend->server, op_backend->share, filename);
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
+  errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
 					O_CREAT|O_WRONLY|O_APPEND, 0666);
   g_free (uri);
 
   if (file == NULL)
-    g_vfs_job_failed_from_errno (G_VFS_JOB (job), errno);
+    g_vfs_job_failed_from_errno (G_VFS_JOB (job), fixup_open_errno (errno));
   else
     {
       handle = g_new0 (SmbWriteHandle, 1);
@@ -956,8 +977,9 @@ open_tmpfile (GVfsBackendSmb *backend,
     tmp_uri = g_strconcat (dir_uri, filename, NULL);
 
     smbc_open = smbc_getFunctionOpen (backend->smb_context);
+    errno = 0;
     file = smbc_open (backend->smb_context, tmp_uri,
-				       O_CREAT|O_WRONLY|O_EXCL, 0666);
+		      O_CREAT|O_WRONLY|O_EXCL, 0666);
   } while (file == NULL && errno == EEXIST);
 
   g_free (dir_uri);
@@ -1003,13 +1025,13 @@ copy_file (GVfsBackendSmb *backend,
   smbc_close = smbc_getFunctionClose (backend->smb_context);
 
   from_file = smbc_open (backend->smb_context, from_uri,
-					  O_RDONLY, 0666);
+			 O_RDONLY, 0666);
   if (from_file == NULL || g_vfs_job_is_cancelled (job))
     goto out;
   
   to_file = smbc_open (backend->smb_context, to_uri,
-					O_CREAT|O_WRONLY|O_TRUNC, 0666);
-
+		       O_CREAT|O_WRONLY|O_TRUNC, 0666);
+  
   if (from_file == NULL || g_vfs_job_is_cancelled (job))
     goto out;
 
@@ -1079,11 +1101,12 @@ do_replace (GVfsBackend *backend,
   smbc_open = smbc_getFunctionOpen (op_backend->smb_context);
   smbc_stat = smbc_getFunctionStat (op_backend->smb_context);
   
+  errno = 0;
   file = smbc_open (op_backend->smb_context, uri,
-					O_CREAT|O_WRONLY|O_EXCL, 0);
+		    O_CREAT|O_WRONLY|O_EXCL, 0);
   if (file == NULL && errno != EEXIST)
     {
-      int errsv = errno;
+      int errsv = fixup_open_errno (errno);
 
       g_set_error_literal (&error, G_IO_ERROR,
 			   g_io_error_from_errno (errsv),
@@ -1148,11 +1171,12 @@ do_replace (GVfsBackend *backend,
 	      backup_uri = NULL;
 	    }
 	  
+	  errno = 0;
 	  file = smbc_open (op_backend->smb_context, uri,
-						O_CREAT|O_WRONLY|O_TRUNC, 0);
+			    O_CREAT|O_WRONLY|O_TRUNC, 0);
 	  if (file == NULL)
 	    {
-              int errsv = errno;
+              int errsv = fixup_open_errno (errno);
 
 	      g_set_error_literal (&error, G_IO_ERROR,
 				   g_io_error_from_errno (errsv),
