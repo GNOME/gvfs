@@ -1,5 +1,13 @@
 2009-03-31  Alexander Larsson  <alexl@redhat.com>
 
+        * client/gdaemonmount.c:
+        (g_daemon_mount_guess_content_type):
+        * monitor/proxy/gproxymount.c:
+        (g_proxy_mount_guess_content_type):
+	Make sure async callbacks are sent in mainloop.
+
+2009-03-31  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 567635 – flickering context menu item
 
 	* monitor/proxy/gproxyshadowmount.c:

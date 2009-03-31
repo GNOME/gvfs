@@ -614,7 +614,7 @@ g_proxy_mount_guess_content_type (GMount              *mount,
                                       callback,
                                       user_data,
                                       NULL);
-  g_simple_async_result_complete (simple);
+  g_simple_async_result_complete_in_idle (simple);
   g_object_unref (simple);
 }
 
