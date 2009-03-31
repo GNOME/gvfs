@@ -1,3 +1,11 @@
+2009-03-31  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 567635 – flickering context menu item
+
+	* monitor/proxy/gproxyshadowmount.c:
+	Make sure we return the shadow object as the source_object
+	when wrapping the shadowed mounts operations.
+
 2009-03-27  Alexander Larsson  <alexl@redhat.com>
 
         * daemon/gvfsbackendsmb.c:
