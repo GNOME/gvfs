@@ -1406,8 +1406,19 @@ vfs_write (const gchar *path, const gchar *buf, size_t len, off_t offset,
 static gint
 vfs_flush (const gchar *path, struct fuse_file_info *fi)
 {
+  FileHandle *fh = get_file_handle_from_info (fi);
+
   debug_print ("vfs_flush: %s\n", path);
 
+  if (fh)
+    {
+      file_handle_close_stream (fh);
+
+      /* get_file_handle_from_info () adds a "working ref", so release that. */
+      file_handle_unref (fh);
+    }
+
+  /* TODO: Error handling. */
   return 0;
 }
 

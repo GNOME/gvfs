@@ -1,3 +1,11 @@
+2009-04-01  Hans Petter Jansson  <hpj@novell.com>
+
+        Potential fix for bug #574968 - gvfs ftp backend appears to not wait
+        for ftpd return code on STOR.
+
+        * client/gvfsfusedaemon.c
+        (vfs_flush): Implement by closing stream.
+
 2009-03-31  Alexander Larsson  <alexl@redhat.com>
 
         * client/gdaemonmount.c:
