@@ -165,6 +165,7 @@ errno_from_error (GError *error)
       { G_IO_ERROR_WRONG_ETAG,         EIO          },
       { G_IO_ERROR_TIMED_OUT,          EIO          },
       { G_IO_ERROR_BUSY,               EBUSY        },
+      { G_IO_ERROR_WOULD_BLOCK,        EAGAIN       },
       { -1,                            -1           }
     };
 
