@@ -1,3 +1,14 @@
+Major changes in 1.2.1
+======================
+* Fix duplicate CD audio icons after remount
+* Fix problems mounting encrypted volumes
+* Handle usernames with @ in them better in uris
+* trash: handle weird filenames correctly
+* sftp: Fix various error conditions
+* volume monitors: emit pre-unmount signals
+* smb: Fix various error conditions
+* fuse: Make sure closing a file flushed the file on the backend
+
 Major changes in 1.2.0
 ======================
 * sftp: Don't hang if ssh no authentication method availible
