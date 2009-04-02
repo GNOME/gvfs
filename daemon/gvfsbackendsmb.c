@@ -1474,15 +1474,17 @@ set_info_from_stat (GVfsBackendSmb *backend,
 					G_FILE_ATTRIBUTE_STANDARD_ICON))
     {
       icon = NULL;
+      content_type = NULL;
+      
       if (S_ISDIR(statbuf->st_mode))
 	{
 	  content_type = g_strdup ("inode/directory");
-	  if (strcmp (basename, "/") == 0)
+	  if (basename != NULL && strcmp (basename, "/") == 0)
 	    icon = g_themed_icon_new ("folder-remote");
 	  else
 	    icon = g_themed_icon_new ("folder");
 	}
-      else
+      else if (basename != NULL)
 	{
 	  content_type = g_content_type_guess (basename, NULL, 0, NULL);
 	  if (content_type)

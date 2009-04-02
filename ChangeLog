@@ -1,5 +1,12 @@
 2009-04-02  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 577748 – gvfsd-smb crash after unconnecting and connecting again a smb share
+	
+	* daemon/gvfsbackendsmb.c (set_info_from_stat):
+	Don't crash if basename is NULL
+
+2009-04-02  Alexander Larsson  <alexl@redhat.com>
+
 	* NEWS:
 	Update for release
 
