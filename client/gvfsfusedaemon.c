@@ -1424,6 +1424,25 @@ vfs_flush (const gchar *path, struct fuse_file_info *fi)
 }
 
 static gint
+vfs_fsync (const gchar *path, gint sync_data_only, struct fuse_file_info *fi)
+{
+  FileHandle *fh = get_file_handle_from_info (fi);
+
+  debug_print ("vfs_flush: %s\n", path);
+
+  if (fh)
+    {
+      file_handle_close_stream (fh);
+
+      /* get_file_handle_from_info () adds a "working ref", so release that. */
+      file_handle_unref (fh);
+    }
+
+  /* TODO: Error handling. */
+  return 0;
+}
+
+static gint
 vfs_opendir (const gchar *path, struct fuse_file_info *fi)
 {
   GFile *file;
@@ -2302,6 +2321,7 @@ static struct fuse_operations vfs_oper =
   .create      = vfs_create,
   .release     = vfs_release,
   .flush       = vfs_flush,
+  .fsync       = vfs_fsync,
 
   .read        = vfs_read,
   .write       = vfs_write,

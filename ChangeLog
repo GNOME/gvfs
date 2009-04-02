@@ -1,5 +1,13 @@
 2009-04-01  Hans Petter Jansson  <hpj@novell.com>
 
+        Related to bug #574968 - gvfs ftp backend appears to not wait for ftpd
+        return code on STOR.
+
+        * client/gvfsfusedaemon.c
+        (vfs_fsync): Implement by closing stream.
+
+2009-04-01  Hans Petter Jansson  <hpj@novell.com>
+
         * client/gvfsfusedaemon.c
         (errno_from_error): Add G_IO_ERROR_WOULD_BLOCK -> EAGAIN mapping.
 
