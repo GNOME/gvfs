@@ -1,5 +1,11 @@
 2009-04-01  Hans Petter Jansson  <hpj@novell.com>
 
+        * client/gvfsfusedaemon.c
+        (vfs_flush)
+        (vfs_fsync): Hold file mutex while closing stream.
+
+2009-04-01  Hans Petter Jansson  <hpj@novell.com>
+
         Related to bug #574968 - gvfs ftp backend appears to not wait for ftpd
         return code on STOR.
 

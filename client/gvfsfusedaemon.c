@@ -1413,7 +1413,9 @@ vfs_flush (const gchar *path, struct fuse_file_info *fi)
 
   if (fh)
     {
+      g_mutex_lock (fh->mutex);
       file_handle_close_stream (fh);
+      g_mutex_unlock (fh->mutex);
 
       /* get_file_handle_from_info () adds a "working ref", so release that. */
       file_handle_unref (fh);
@@ -1432,7 +1434,9 @@ vfs_fsync (const gchar *path, gint sync_data_only, struct fuse_file_info *fi)
 
   if (fh)
     {
+      g_mutex_lock (fh->mutex);
       file_handle_close_stream (fh);
+      g_mutex_unlock (fh->mutex);
 
       /* get_file_handle_from_info () adds a "working ref", so release that. */
       file_handle_unref (fh);
