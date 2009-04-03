@@ -1,3 +1,11 @@
+2009-04-03  Alexander Larsson  <alexl@redhat.com>
+
+	Bug 577799 – gvfs as-needed patch
+
+	* daemon/Makefile.am:
+	Fix link order when --as-needed is used.
+	Patch from Cygwin Ports maintainer
+
 2009-04-02  Alexander Larsson  <alexl@redhat.com>
 
 	* configure.ac:

@@ -272,7 +272,7 @@ gvfsd_trash_CPPFLAGS = \
 	-DBACKEND_TYPES='"trash", G_VFS_TYPE_BACKEND_TRASH,' \
 	-Itrashlib
 
-gvfsd_trash_LDADD = $(libraries) trashlib/libtrash.a
+gvfsd_trash_LDADD = trashlib/libtrash.a $(libraries)
 
 gvfsd_computer_SOURCES = \
 	gvfsbackendcomputer.c gvfsbackendcomputer.h \
