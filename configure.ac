@@ -198,6 +198,30 @@ AC_SUBST(GCONF_CFLAGS)
 
 AM_CONDITIONAL(USE_GCONF, [test "$msg_gconf" = "yes"])
 
+dnl ************************************
+dnl *** Check for gnome-disk-utility ***
+dnl ************************************
+
+AC_ARG_ENABLE(gdu, [  --disable-gdu           build without GDU volume monitor])
+msg_gdu=no
+GDU_LIBS=
+GDU_CFLAGS=
+GDU_REQUIRED=0.3
+
+if test "x$enable_gdu" != "xno"; then
+  PKG_CHECK_EXISTS([gdu >= $GDU_REQUIRED], msg_gdu=yes)
+
+  if test "x$msg_gdu" == "xyes"; then
+    PKG_CHECK_MODULES([GDU],[gdu >= $GDU_REQUIRED])
+    AC_DEFINE(HAVE_GDU, 1, [Define to 1 if gnome-disk-utility is available])
+  fi
+fi
+
+AC_SUBST(GDU_LIBS)
+AC_SUBST(GDU_CFLAGS)
+
+AM_CONDITIONAL(USE_GDU, [test "$msg_gdu" = "yes"])
+
 dnl **********************
 dnl *** Check for HAL ***
 dnl **********************
@@ -558,6 +582,7 @@ daemon/Makefile
 monitor/Makefile
 monitor/proxy/Makefile
 monitor/hal/Makefile
+monitor/gdu/Makefile
 monitor/gphoto2/Makefile
 gconf/Makefile
 programs/Makefile
@@ -579,7 +604,8 @@ echo "
 	archive support:	      $msg_archive
         GConf support:                $msg_gconf
         DNS-SD support:               $msg_avahi
-	Use HAL for volume monitor:   $msg_hal (with fast init path: $have_hal_fast_init)
+	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)
+	Build GDU volume monitor:     $msg_gdu
 	GNOME Keyring support:        $msg_keyring
 	Bash-completion support:      $msg_bash_completion
 "

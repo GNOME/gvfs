@@ -1,0 +1,5 @@
+[RemoteVolumeMonitor]
+Name=GProxyVolumeMonitorGdu
+DBusName=org.gtk.Private.GduVolumeMonitor
+IsNative=true
+NativePriority=3
