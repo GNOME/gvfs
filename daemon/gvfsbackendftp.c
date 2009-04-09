@@ -1001,6 +1001,9 @@ ftp_connection_close_data_connection (FtpConnection *conn)
  * make it easy to distinguish from GVfs paths.
  */
 
+#define ftp_filename_equal g_str_equal
+#define ftp_filename_copy(name) ((FtpFile *) g_strdup ((const char *) (name)))
+
 static FtpFile *
 ftp_filename_from_gvfs_path (FtpConnection *conn, const char *pathname)
 {
@@ -1028,7 +1031,25 @@ ftp_filename_construct (FtpConnection *conn, const FtpFile *dirname, const char 
   return (FtpFile *) g_build_path ("/", (char *) dirname, basename, NULL);
 }
 
-#define ftp_filename_equal g_str_equal
+/* NB: returns the root directory for the root directory.
+ * Use ftp_filename_equal() afterwards to detect this */
+static FtpFile *
+ftp_filename_get_parent (FtpConnection *conn, const FtpFile *file)
+{
+  char *dirname, *filename;
+  FtpFile *dir;
+
+  filename = ftp_filename_to_gvfs_path (conn, file);
+  dirname = g_path_get_dirname (filename);
+  if (dirname[0] == '.' && dirname[1] == 0)
+    dir = ftp_filename_copy (file);
+  else
+    dir = ftp_filename_from_gvfs_path (conn, dirname);
+  g_free (filename);
+  g_free (dirname);
+
+  return dir;
+}
 
 /*** COMMON FUNCTIONS WITH SPECIAL HANDLING ***/
 
@@ -1694,6 +1715,21 @@ error_550_is_directory (FtpConnection *conn, const FtpFile *file)
 }
 
 static void
+error_550_parent_not_found (FtpConnection *conn, const FtpFile *file)
+{
+  FtpFile *dir = ftp_filename_get_parent (conn, file);
+
+  if (!ftp_filename_equal (file, dir) && !ftp_connection_try_cd (conn, dir))
+    {
+      g_set_error_literal (&conn->error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_FOUND,
+                           _("Parent directory not found"));
+    }
+
+  g_free (dir);
+}
+
+static void
 do_open_for_read (GVfsBackend *backend,
 		  GVfsJobOpenForRead *job,
 		  const char *filename)
@@ -1819,18 +1855,12 @@ gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *ftp,
 				      FtpConnection * conn,
 				      const FtpFile * file)
 {
-  char *dirname, *filename;
-  FtpFile *dir;
+  FtpFile *dir = ftp_filename_get_parent (conn, file);
 
-  filename = ftp_filename_to_gvfs_path (conn, file);
-  dirname = g_path_get_dirname (filename);
-  dir = ftp_filename_from_gvfs_path (conn, dirname);
-
-  gvfs_backend_ftp_purge_cache_directory (ftp, dir);
+  if (!ftp_filename_equal (file, dir))
+    gvfs_backend_ftp_purge_cache_directory (ftp, dir);
 
   g_free (dir);
-  g_free (filename);
-  g_free (dirname);
 }
 
 /* forward declaration */
@@ -2497,15 +2527,19 @@ do_make_directory (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   FtpFile *file;
+  static const Ftp550Handler make_directory_handlers[] = { error_550_parent_not_found, NULL };
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
     return;
 
   file = ftp_filename_from_gvfs_path (conn, filename);
-  ftp_connection_send (conn,
-		       0,
-		       "MKD %s", file);
+  ftp_connection_send_and_check (conn,
+                                 0,
+                                 make_directory_handlers,
+                                 file,
+                                 "MKD %s", file);
+
   /* FIXME: Compare created file with name from server result to be sure 
    * it's correct and otherwise fail. */
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);

@@ -1,3 +1,13 @@
+2009-04-09  Benjamin Otte  <otte@gnome.org>
+
+	* daemon/gvfsbackendftp.c: (ftp_filename_get_parent),
+	(error_550_parent_not_found),
+	(gvfs_backend_ftp_purge_cache_of_file), (do_make_directory):
+	Return the proper error in make_directory if the parent directory does
+	not exist yet.
+	Includes generalization of function ftp_filename_get_parent()
+	based on a patch by Andreas Henriksson <andreas@fatal.se>
+
 2009-04-09  Andreas Henriksson <andreas@fatal.se>
 
 	reviewed by: Benjamin Otte  <otte@gnome.org>
