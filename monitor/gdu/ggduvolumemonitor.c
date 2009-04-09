@@ -617,7 +617,7 @@ get_mount_point_for_device (GduDevice *d, GList *fstab_mount_points)
   for (l = fstab_mount_points; l != NULL; l = l->next)
     {
       GUnixMountPoint *mount_point = l->data;
-      const gchar *device_file;
+      const gchar *fstab_device_file;
       const gchar *fstab_mount_path;
 
       fstab_mount_path = g_unix_mount_point_get_mount_path (mount_point);
@@ -627,18 +627,18 @@ get_mount_point_for_device (GduDevice *d, GList *fstab_mount_points)
           goto out;
         }
 
-      device_file = g_unix_mount_point_get_device_path (mount_point);
-      if (g_str_has_prefix (device_file, "LABEL="))
+      fstab_device_file = g_unix_mount_point_get_device_path (mount_point);
+      if (g_str_has_prefix (fstab_device_file, "LABEL="))
         {
-          if (g_strcmp0 (device_file + 6, gdu_device_id_get_label (d)) == 0)
+          if (g_strcmp0 (fstab_device_file + 6, gdu_device_id_get_label (d)) == 0)
             {
               ret = mount_point;
               goto out;
             }
         }
-      else if (g_str_has_prefix (device_file, "UUID="))
+      else if (g_str_has_prefix (fstab_device_file, "UUID="))
         {
-          if (g_ascii_strcasecmp (device_file + 5, gdu_device_id_get_uuid (d)) == 0)
+          if (g_ascii_strcasecmp (fstab_device_file + 5, gdu_device_id_get_uuid (d)) == 0)
             {
               ret = mount_point;
               goto out;
@@ -646,11 +646,11 @@ get_mount_point_for_device (GduDevice *d, GList *fstab_mount_points)
         }
       else
         {
-          char resolved_device_file[PATH_MAX];
+          char resolved_fstab_device_file[PATH_MAX];
 
           /* handle symlinks such as /dev/disk/by-uuid/47C2-1994 */
-          if (realpath (device_file, resolved_device_file) != NULL &&
-              g_strcmp0 (resolved_device_file, device_file) == 0)
+          if (realpath (fstab_device_file, resolved_fstab_device_file) != NULL &&
+              g_strcmp0 (resolved_fstab_device_file, device_file) == 0)
             {
               ret = mount_point;
               goto out;
