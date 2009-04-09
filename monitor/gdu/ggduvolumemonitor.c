@@ -671,9 +671,6 @@ should_mount_be_ignored (GduPool *pool, GduDevice *d)
 
   ret = FALSE;
 
-  if (gdu_device_is_mounted (d))
-    goto out;
-
   mount_path = gdu_device_get_mount_path (d);
   if (mount_path == NULL || strlen (mount_path) == 0)
     goto out;
