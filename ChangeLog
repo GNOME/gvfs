@@ -1,5 +1,15 @@
 2009-04-09  Benjamin Otte  <otte@gnome.org>
 
+	Bug 573349 – Impossible to create a new folder in a ftp emplacement if
+	there's already a folder named "new folder"
+
+	* daemon/gvfsbackendftp.c: (error_550_exists), (do_make_directory):
+	throw G_IO_ERROR_EXISTS if the directory we try to create already
+	exists.
+	based on a patch by Andreas Henriksson <andreas@fatal.se>
+
+2009-04-09  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (error_550_parent_not_found):
 	the last commit broke string freeze, so use an existing string
 	instead.

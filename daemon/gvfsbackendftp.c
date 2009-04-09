@@ -1700,6 +1700,32 @@ do_unmount (GVfsBackend *   backend,
 }
 
 static void
+error_550_exists (FtpConnection *conn, const FtpFile *file)
+{
+  /* FIXME:
+   * What we should do here is look at the cache to figure out if the file 
+   * exists, but as cache access is currently only exposed via the backend
+   * structure (it should be properly abstracted into an opaque thread-safe
+   * structure and then be available per-connection), we cannot do that.
+   * So instead, we use the same code we use when trying to find hidden
+   * directories.
+   */
+  if (ftp_connection_try_cd (conn, file) ||
+      ftp_connection_send (conn, 0, "SIZE %s", file))
+    {
+      g_set_error_literal (&conn->error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_EXISTS,
+                           _("Target file already exists"));
+    }
+  else
+    {
+      /* clear potential error from ftp_connection_send() in else if line above */
+      ftp_connection_clear_error (conn);
+    }
+}
+
+static void
 error_550_is_directory (FtpConnection *conn, const FtpFile *file)
 {
   guint response = ftp_connection_send (conn, 
@@ -2527,7 +2553,7 @@ do_make_directory (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   FtpFile *file;
-  static const Ftp550Handler make_directory_handlers[] = { error_550_parent_not_found, NULL };
+  static const Ftp550Handler make_directory_handlers[] = { error_550_exists, error_550_parent_not_found, NULL };
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
