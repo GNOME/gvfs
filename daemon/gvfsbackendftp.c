@@ -1723,7 +1723,7 @@ error_550_parent_not_found (FtpConnection *conn, const FtpFile *file)
     {
       g_set_error_literal (&conn->error, G_IO_ERROR,
                            G_IO_ERROR_NOT_FOUND,
-                           _("Parent directory not found"));
+                           _("No such file or directory"));
     }
 
   g_free (dir);

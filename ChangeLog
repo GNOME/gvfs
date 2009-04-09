@@ -1,5 +1,11 @@
 2009-04-09  Benjamin Otte  <otte@gnome.org>
 
+	* daemon/gvfsbackendftp.c: (error_550_parent_not_found):
+	the last commit broke string freeze, so use an existing string
+	instead.
+
+2009-04-09  Benjamin Otte  <otte@gnome.org>
+
 	* daemon/gvfsbackendftp.c: (ftp_filename_get_parent),
 	(error_550_parent_not_found),
 	(gvfs_backend_ftp_purge_cache_of_file), (do_make_directory):
