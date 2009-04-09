@@ -293,6 +293,56 @@ update_volume (GGduVolume *volume)
             volume->should_automount = FALSE;
         }
 
+      /* Avoid automounting volumes from
+       *
+       * 1. drives on a 'virtual' or unset bus
+       * 2. volumes without a drive
+       *
+       * This is to avoid interference with things like Fedora's
+       * livecd-tools that use device-mapper to set up images. See
+       * https://bugzilla.redhat.com/show_bug.cgi?id=494144 for more
+       * background.
+       *
+       * In the future we might want to relax 1. so automounting
+       * things like Linux MD and LVM2 devices work.
+       */
+      if (volume->drive != NULL)
+        {
+          GduPresentable *drive_presentable;
+          drive_presentable = g_gdu_drive_get_presentable (volume->drive);
+          if (drive_presentable != NULL)
+            {
+              GduDevice *drive_device;
+              drive_device = gdu_presentable_get_device (drive_presentable);
+              if (drive_device != NULL)
+                {
+                  const gchar *bus;
+                  bus = gdu_device_drive_get_connection_interface (drive_device);
+                  if (bus == NULL || strlen (bus) == 0 || g_strcmp0 (bus, "virtual") == 0)
+                    {
+                      volume->should_automount = FALSE;
+                    }
+                  g_object_unref (drive_device);
+                }
+              else
+                {
+                  volume->should_automount = FALSE;
+                }
+            }
+          else
+            {
+              volume->should_automount = FALSE;
+            }
+        }
+      else
+        {
+          volume->should_automount = FALSE;
+        }
+
+      g_debug ("should_automount = %d for %s",
+               volume->should_automount,
+               device != NULL ? gdu_device_get_device_file (device) : "(none)");
+
       g_free (activation_uri);
     }
 
