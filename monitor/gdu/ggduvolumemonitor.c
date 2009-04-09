@@ -763,15 +763,17 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
 
   device = gdu_presentable_get_device (GDU_PRESENTABLE (d));
 
-  /* the GduDevice for an activatable drive (such as RAID) is NULL if the drive is not
-   * activated; never ignore these
+  /* If there is no GduDevice for a drive, then ignore it.
+   *
+   * Note that right now the only drives without a GduDevice are Linux
+   * MD arrays not yet activated. In the future we might want to
+   * display these so the user can start the array.
    */
   if (device == NULL)
-    goto out;
-
-  /* never ignore drives with removable media */
-  if (gdu_device_is_removable (device))
-    goto out;
+    {
+      ret = TRUE;
+      goto out;
+    }
 
   has_volumes = FALSE;
   all_volumes_are_ignored = TRUE;
