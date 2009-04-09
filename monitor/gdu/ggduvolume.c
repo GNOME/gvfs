@@ -339,10 +339,6 @@ update_volume (GGduVolume *volume)
           volume->should_automount = FALSE;
         }
 
-      g_debug ("should_automount = %d for %s",
-               volume->should_automount,
-               device != NULL ? gdu_device_get_device_file (device) : "(none)");
-
       g_free (activation_uri);
     }
 
