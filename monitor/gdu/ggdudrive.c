@@ -166,7 +166,11 @@ update_drive (GGduDrive *drive)
       drive->device_file = g_strdup (gdu_device_get_device_file (device));
       drive->is_media_removable = gdu_device_is_removable (device);
       drive->has_media = gdu_device_is_media_available (device);
-      drive->can_eject = gdu_device_drive_get_is_media_ejectable (device) || gdu_device_drive_get_requires_eject (device);
+      /* All drives with removable media are ejectable
+       *
+       * See http://bugzilla.gnome.org/show_bug.cgi?id=576587 for why we want this.
+       */
+      drive->can_eject = gdu_device_drive_get_is_media_ejectable (device) || gdu_device_drive_get_requires_eject (device) || gdu_device_is_removable (device);
       drive->is_media_check_automatic = gdu_device_is_media_change_detected (device);
       drive->can_poll_for_media = TRUE;
     }
