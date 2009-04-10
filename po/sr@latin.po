@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-10 11:25+0200\n"
+"POT-Creation-Date: 2009-04-10 19:28+0200\n"
 "PO-Revision-Date: 2009-03-23 21:18+0100\n"
 "Last-Translator: Miloš Popović <gpopac@gnail.com>\n"
 "Language-Team: Serbian (sr) <gnom@prevod.org>\n"
@@ -138,7 +138,7 @@ msgstr "Greška u prikupljanju podataka o montiranju: %s"
 #: ../client/gvfsdaemondbus.c:567 ../client/gvfsdaemondbus.c:998
 #, c-format
 msgid "Error connecting to daemon: %s"
-msgstr "Greška pri povezivanju sa demonom: %s"
+msgstr "Greška pri povezivanju sa upravljačkim programom: %s"
 
 #: ../client/gvfsiconloadable.c:145
 msgid "Invalid return value from open_icon_for_read"
@@ -263,7 +263,7 @@ msgstr "već je pokrenuta tačka montiranja za %s"
 
 #: ../daemon/daemon-main.c:276
 msgid "error starting mount daemon"
-msgstr "greška pri pokretanju demona za montiranje"
+msgstr "greška pri pokretanju upravljačkog programa za montiranje"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -1196,7 +1196,7 @@ msgstr "Neispravna dbas poruka"
 
 #: ../daemon/main.c:45
 msgid "Replace old daemon."
-msgstr "Zameni starog demona."
+msgstr "Zameni stari upravljački program."
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
@@ -1204,11 +1204,11 @@ msgstr "Ne pokreći fuse."
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
-msgstr "Gvfs demon"
+msgstr "Upravljački program za GVFS"
 
 #: ../daemon/main.c:61
 msgid "Main daemon for GVFS"
-msgstr "Glavni demon za Gvfs"
+msgstr "Glavni upravljački program za GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
