@@ -751,13 +751,13 @@ static gboolean
 should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
 {
   GduDevice *device;
-  gboolean ret;
+  gboolean ignored;
   gboolean has_volumes;
   gboolean all_volumes_are_ignored;
   GList *enclosed;
   GList *l;
 
-  ret = FALSE;
+  ignored = FALSE;
   device = NULL;
   enclosed = NULL;
 
@@ -771,7 +771,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
    */
   if (device == NULL)
     {
-      ret = TRUE;
+      ignored = TRUE;
       goto out;
     }
 
@@ -801,11 +801,20 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
 
   /* we ignore a drive if
    *
-   * a) it doesn't have any volumes; or
+   * a) no volumes are available AND media is available; OR
    *
    * b) the volumes of the drive are all ignored
    */
-  ret = (!has_volumes) || (has_volumes && all_volumes_are_ignored);
+  if (!has_volumes)
+    {
+      if (gdu_device_is_media_available (device))
+        ignored = TRUE;
+    }
+  else
+    {
+      if (all_volumes_are_ignored)
+        ignored = TRUE;
+    }
 
  out:
   g_list_foreach (enclosed, (GFunc) g_object_unref, NULL);
@@ -814,7 +823,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
   if (device != NULL)
     g_object_unref (device);
 
-  return ret;
+  return ignored;
 }
 
 static void
