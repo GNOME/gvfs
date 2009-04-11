@@ -799,7 +799,13 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
         }
     }
 
-  ret = has_volumes && all_volumes_are_ignored;
+  /* we ignore a drive if
+   *
+   * a) it doesn't have any volumes; or
+   *
+   * b) the volumes of the drive are all ignored
+   */
+  ret = (!has_volumes) || (has_volumes && all_volumes_are_ignored);
 
  out:
   g_list_foreach (enclosed, (GFunc) g_object_unref, NULL);
