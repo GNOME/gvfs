@@ -1,3 +1,9 @@
+2009-04-11  Alexander Larsson  <alexl@redhat.com>
+
+	* monitor/proxy/gproxyshadowmount.c:
+	(g_proxy_shadow_mount_remove):
+	Disconnect pre_unmount signal from right object.
+
 2009-04-09  Benjamin Otte  <otte@gnome.org>
 
 	Bug 573349 – Impossible to create a new folder in a ftp emplacement if

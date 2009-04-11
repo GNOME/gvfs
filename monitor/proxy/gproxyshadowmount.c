@@ -133,7 +133,8 @@ g_proxy_shadow_mount_remove (GProxyShadowMount *mount)
 
       if (mount->pre_unmount_signal_id != 0)
         {
-          g_signal_handler_disconnect (mount, mount->pre_unmount_signal_id);
+          g_signal_handler_disconnect (mount->volume_monitor,
+                                       mount->pre_unmount_signal_id);
           mount->pre_unmount_signal_id = 0;
         }
     }
