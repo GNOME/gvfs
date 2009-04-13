@@ -1,3 +1,8 @@
+Major changes in 1.2.2
+======================
+* ftp: Fix error handling in some cases
+* proxy monitor: Fix warning spew
+
 Major changes in 1.2.1
 ======================
 * Fix duplicate CD audio icons after remount
