@@ -50,6 +50,9 @@ GGduVolume *g_gdu_volume_new            (GVolumeMonitor   *volume_monitor,
                                          GGduDrive        *drive,
                                          GFile            *activation_root);
 
+GGduVolume *g_gdu_volume_new_for_unix_mount_point (GVolumeMonitor   *volume_monitor,
+                                                   GUnixMountPoint  *unix_mount_point);
+
 void        g_gdu_volume_set_mount      (GGduVolume       *volume,
                                          GGduMount        *mount);
 void        g_gdu_volume_unset_mount    (GGduVolume       *volume,
@@ -69,9 +72,11 @@ gboolean    g_gdu_volume_has_uuid       (GGduVolume       *volume,
 gboolean   g_gdu_volume_has_device_file (GGduVolume      *volume,
                                          const gchar     *device_file);
 
-GduPresentable *g_gdu_volume_get_presentable (GGduVolume      *volume);
+GduPresentable *g_gdu_volume_get_presentable (GGduVolume *volume);
 
 GduPresentable *g_gdu_volume_get_presentable_with_cleartext (GGduVolume *volume);
+
+GUnixMountPoint *g_gdu_volume_get_unix_mount_point (GGduVolume *volume);
 
 G_END_DECLS
 

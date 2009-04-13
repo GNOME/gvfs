@@ -51,6 +51,7 @@ struct _GGduVolumeMonitor {
 
   GList *drives;
   GList *volumes;
+  GList *fstab_volumes;
   GList *mounts;
 
   /* we keep volumes/mounts for blank and audio discs separate to handle e.g. mixed discs properly */
@@ -78,6 +79,9 @@ static void update_drives            (GGduVolumeMonitor *monitor,
                                       GList **added_drives,
                                       GList **removed_drives);
 static void update_volumes           (GGduVolumeMonitor *monitor,
+                                      GList **added_volumes,
+                                      GList **removed_volumes);
+static void update_fstab_volumes     (GGduVolumeMonitor *monitor,
                                       GList **added_volumes,
                                       GList **removed_volumes);
 static void update_mounts            (GGduVolumeMonitor *monitor,
@@ -135,6 +139,7 @@ g_gdu_volume_monitor_finalize (GObject *object)
   g_list_free (monitor->last_mounts);
 
   list_free (monitor->drives);
+  list_free (monitor->fstab_volumes);
   list_free (monitor->volumes);
   list_free (monitor->mounts);
 
@@ -171,6 +176,8 @@ get_volumes (GVolumeMonitor *volume_monitor)
   monitor = G_GDU_VOLUME_MONITOR (volume_monitor);
 
   l = g_list_copy (monitor->volumes);
+  ll = g_list_copy (monitor->fstab_volumes);
+  l = g_list_concat (l, ll);
   ll = g_list_copy (monitor->disc_volumes);
   l = g_list_concat (l, ll);
 
@@ -205,6 +212,13 @@ get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   volume = NULL;
 
   for (l = monitor->volumes; l != NULL; l = l->next)
+    {
+      volume = l->data;
+      if (g_gdu_volume_has_uuid (volume, uuid))
+        goto found;
+    }
+
+  for (l = monitor->fstab_volumes; l != NULL; l = l->next)
     {
       volume = l->data;
       if (g_gdu_volume_has_uuid (volume, uuid))
@@ -549,14 +563,49 @@ find_volume_for_mount_path (GGduVolumeMonitor *monitor,
   for (l = monitor->volumes; l != NULL; l = l->next)
     {
       GGduVolume *volume = l->data;
-
       if (g_gdu_volume_has_mount_path (volume, mount_path))
         {
           found = volume;
-          break;
+          goto out;
         }
     }
 
+  for (l = monitor->fstab_volumes; l != NULL; l = l->next)
+    {
+      GGduVolume *volume = l->data;
+      if (g_gdu_volume_has_mount_path (volume, mount_path))
+        {
+          found = volume;
+          goto out;
+        }
+    }
+
+ out:
+  return found;
+}
+
+static GGduVolume *
+find_volume_for_unix_mount_point (GGduVolumeMonitor *monitor,
+                                  GUnixMountPoint   *unix_mount_point)
+{
+  GList *l;
+  GGduVolume *found;
+
+  found = NULL;
+  for (l = monitor->fstab_volumes; l != NULL; l = l->next)
+    {
+      GGduVolume *volume = l->data;
+      GUnixMountPoint *volume_mount_point;
+
+      volume_mount_point = g_gdu_volume_get_unix_mount_point (volume);
+      if (g_unix_mount_point_compare (unix_mount_point, volume_mount_point) == 0)
+        {
+          found = volume;
+          goto out;
+        }
+    }
+
+ out:
   return found;
 }
 
@@ -859,6 +908,7 @@ update_all (GGduVolumeMonitor *monitor,
 
   update_drives (monitor, &added_drives, &removed_drives);
   update_volumes (monitor, &added_volumes, &removed_volumes);
+  update_fstab_volumes (monitor, &added_volumes, &removed_volumes);
   update_mounts (monitor, &added_mounts, &removed_mounts);
   update_discs (monitor,
                 &added_volumes, &removed_volumes,
@@ -935,16 +985,34 @@ find_volume_for_device_file (GGduVolumeMonitor *monitor,
                             const gchar       *device_file)
 {
   GList *l;
+  GGduVolume *ret;
 
+  ret = NULL;
   for (l = monitor->volumes; l != NULL; l = l->next)
     {
       GGduVolume *volume = G_GDU_VOLUME (l->data);
 
       if (g_gdu_volume_has_device_file (volume, device_file))
-        return volume;
+        {
+          ret = volume;
+          goto out;
+        }
     }
 
-  return NULL;
+  ret = NULL;
+  for (l = monitor->fstab_volumes; l != NULL; l = l->next)
+    {
+      GGduVolume *volume = G_GDU_VOLUME (l->data);
+
+      if (g_gdu_volume_has_device_file (volume, device_file))
+        {
+          ret = volume;
+          goto out;
+        }
+    }
+
+ out:
+  return ret;
 }
 
 static GGduDrive *
@@ -1183,6 +1251,106 @@ update_volumes (GGduVolumeMonitor *monitor,
   g_list_free (new_volumes);
 
   g_list_free (cur_volumes);
+
+  g_list_foreach (fstab_mount_points, (GFunc) g_unix_mount_point_free, NULL);
+  g_list_free (fstab_mount_points);
+}
+
+static void
+update_fstab_volumes (GGduVolumeMonitor *monitor,
+                      GList **added_volumes,
+                      GList **removed_volumes)
+{
+  GList *fstab_mount_points;
+  GList *cur_fstab_mount_points;
+  GList *new_fstab_mount_points;
+  GList *removed, *added;
+  GList *l;
+  GGduVolume *volume;
+
+  fstab_mount_points = g_unix_mount_points_get (NULL);
+
+  cur_fstab_mount_points = NULL;
+  for (l = monitor->fstab_volumes; l != NULL; l = l->next)
+    cur_fstab_mount_points = g_list_prepend (cur_fstab_mount_points, g_gdu_volume_get_unix_mount_point (G_GDU_VOLUME (l->data)));
+
+  new_fstab_mount_points = NULL;
+  for (l = fstab_mount_points; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      const gchar *device_file;
+
+      /* only show user mountable mount points */
+      if (!g_unix_mount_point_is_user_mountable (mount_point))
+        continue;
+
+      /* only show stuff that can be mounted in user-visible locations */
+      if (!_g_unix_mount_point_guess_should_display (mount_point))
+        continue;
+
+      /* ignore mount point if the device doesn't exist or is handled by DeviceKit-disks */
+      device_file = g_unix_mount_point_get_device_path (mount_point);
+      if (g_str_has_prefix (device_file, "/dev/"))
+        {
+          gchar resolved_path[PATH_MAX];
+          GduDevice *device;
+
+          /* doesn't exist */
+          if (realpath (device_file, resolved_path) != 0)
+            continue;
+
+          /* is handled by DKD */
+          device = gdu_pool_get_by_device_file (monitor->pool, resolved_path);
+          if (device != NULL)
+            {
+              g_object_unref (device);
+              continue;
+            }
+        }
+
+      new_fstab_mount_points = g_list_prepend (new_fstab_mount_points, mount_point);
+    }
+
+  diff_sorted_lists (cur_fstab_mount_points,
+                     new_fstab_mount_points, (GCompareFunc) g_unix_mount_point_compare,
+                     &added, &removed);
+
+  for (l = removed; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+      volume = find_volume_for_unix_mount_point (monitor, mount_point);
+      if (volume != NULL)
+        {
+          g_gdu_volume_removed (volume);
+          monitor->fstab_volumes = g_list_remove (monitor->fstab_volumes, volume);
+          *removed_volumes = g_list_prepend (*removed_volumes, volume);
+          /*g_debug ("removed volume for /etc/fstab mount point %s", g_unix_mount_point_get_mount_path (mount_point));*/
+        }
+    }
+
+  for (l = added; l != NULL; l = l->next)
+    {
+      GUnixMountPoint *mount_point = l->data;
+
+      volume = g_gdu_volume_new_for_unix_mount_point (G_VOLUME_MONITOR (monitor), mount_point);
+      if (volume != NULL)
+        {
+          /* steal mount_point since g_gdu_volume_new_for_unix_mount_point() takes ownership of it */
+          fstab_mount_points = g_list_remove (fstab_mount_points, mount_point);
+          monitor->fstab_volumes = g_list_prepend (monitor->fstab_volumes, volume);
+          *added_volumes = g_list_prepend (*added_volumes, g_object_ref (volume));
+          /*g_debug ("added volume for /etc/fstab mount point %s", g_unix_mount_point_get_mount_path (mount_point));*/
+        }
+      else
+        {
+          g_unix_mount_point_free (mount_point);
+        }
+    }
+
+  g_list_free (added);
+  g_list_free (removed);
+
+  g_list_free (cur_fstab_mount_points);
 
   g_list_foreach (fstab_mount_points, (GFunc) g_unix_mount_point_free, NULL);
   g_list_free (fstab_mount_points);

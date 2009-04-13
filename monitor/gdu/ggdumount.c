@@ -696,8 +696,13 @@ g_gdu_mount_unmount (GMount              *_mount,
 {
   GGduMount *mount = G_GDU_MOUNT (_mount);
   GSimpleAsyncResult *simple;
+  GduPresentable *gdu_volume;
 
-  if (mount->volume == NULL)
+  gdu_volume = NULL;
+  if (mount->volume != NULL)
+    gdu_volume = g_gdu_volume_get_presentable_with_cleartext (mount->volume);
+
+  if (mount->volume == NULL || gdu_volume == NULL)
     {
       gchar *argv[] = {"umount", NULL, NULL};
 
@@ -710,7 +715,7 @@ g_gdu_mount_unmount (GMount              *_mount,
 
       eject_unmount_do (_mount, cancellable, callback, user_data, argv);
     }
-  else
+  else if (gdu_volume != NULL)
     {
       simple = g_simple_async_result_new (G_OBJECT (mount),
                                           callback,
@@ -726,17 +731,24 @@ g_gdu_mount_unmount (GMount              *_mount,
       else
         {
           GduDevice *device;
-          GduPresentable *volume;
 
           /* TODO: honor flags */
 
-          volume = g_gdu_volume_get_presentable_with_cleartext (mount->volume);
-          device = gdu_presentable_get_device (volume);
-
+          device = gdu_presentable_get_device (gdu_volume);
           gdu_device_op_filesystem_unmount (device, unmount_cb, simple);
-
           g_object_unref (device);
         }
+    }
+  else
+    {
+      simple = g_simple_async_result_new_error (G_OBJECT (mount),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_FAILED,
+                                                _("Operation not supported by backend"));
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
     }
 }
 
@@ -855,7 +867,8 @@ g_gdu_mount_guess_content_type_sync (GMount              *_mount,
     {
       GduPresentable *presentable;
       presentable = g_gdu_volume_get_presentable_with_cleartext (mount->volume);
-      device = gdu_presentable_get_device (presentable);
+      if (presentable != NULL)
+        device = gdu_presentable_get_device (presentable);
     }
 
   /* doesn't make sense to probe blank discs - look at the disc type instead */

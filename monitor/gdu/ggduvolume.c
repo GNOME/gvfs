@@ -35,11 +35,21 @@
 #include "ggduvolume.h"
 #include "ggdumount.h"
 
+/* for BUFSIZ */
+#include <stdio.h>
+
 #include "polkit.h"
 
 typedef struct MountOpData MountOpData;
 
 static void cancel_pending_mount_op (MountOpData *data);
+
+static void g_gdu_volume_mount_unix_mount_point (GGduVolume          *volume,
+                                                 GMountMountFlags     flags,
+                                                 GMountOperation     *mount_operation,
+                                                 GCancellable        *cancellable,
+                                                 GAsyncReadyCallback  callback,
+                                                 gpointer             user_data);
 
 struct _GGduVolume
 {
@@ -49,7 +59,11 @@ struct _GGduVolume
   GGduMount      *mount;          /* owned by volume monitor */
   GGduDrive      *drive;          /* owned by volume monitor */
 
+  /* only set if constructed via new() */
   GduVolume *gdu_volume;
+
+  /* only set if constructed via new_for_unix_mount_point() */
+  GUnixMountPoint *unix_mount_point;
 
   /* if the volume is encrypted, this is != NULL when unlocked */
   GduVolume *cleartext_gdu_volume;
@@ -60,7 +74,7 @@ struct _GGduVolume
    */
   MountOpData *pending_mount_op;
 
-  /* the following members need to be set upon construction */
+  /* the following members need to be set upon construction, see constructors and update_volume() */
   GIcon *icon;
   GFile *activation_root;
   gchar *name;
@@ -108,6 +122,11 @@ g_gdu_volume_finalize (GObject *object)
       g_signal_handlers_disconnect_by_func (volume->gdu_volume, gdu_volume_changed, volume);
       g_signal_handlers_disconnect_by_func (volume->gdu_volume, gdu_volume_job_changed, volume);
       g_object_unref (volume->gdu_volume);
+    }
+
+  if (volume->unix_mount_point != NULL)
+    {
+      g_unix_mount_point_free (volume->unix_mount_point);
     }
 
   if (volume->cleartext_gdu_volume != NULL)
@@ -173,6 +192,30 @@ update_volume (GGduVolume *volume)
   old_icon = volume->icon != NULL ? g_object_ref (volume->icon) : NULL;
 
   /* ---------------------------------------------------------------------------------------------------- */
+
+  /* if the volume is a fstab mount point, get the data from there */
+  if (volume->unix_mount_point != NULL)
+    {
+      volume->can_mount = TRUE;
+      volume->should_automount = FALSE;
+
+      g_free (volume->device_file);
+      volume->device_file = g_strdup (g_unix_mount_point_get_device_path (volume->unix_mount_point));
+
+      if (volume->icon != NULL)
+        g_object_unref (volume->icon);
+      if (g_strcmp0 (g_unix_mount_point_get_fs_type (volume->unix_mount_point), "nfs") == 0)
+        volume->icon = g_themed_icon_new_with_default_fallbacks ("folder-remote");
+      else
+        volume->icon = g_unix_mount_point_guess_icon (volume->unix_mount_point);
+
+      g_free (volume->name);
+      volume->name = g_unix_mount_point_guess_name (volume->unix_mount_point);
+
+      //volume->can_eject = g_unix_mount_point_guess_can_eject (volume->unix_mount_point);
+
+      goto update_done;
+    }
 
   /* in with the new */
   device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
@@ -347,6 +390,8 @@ update_volume (GGduVolume *volume)
 
   /* ---------------------------------------------------------------------------------------------------- */
 
+ update_done:
+
   /* compute whether something changed */
   changed = !((old_can_mount == volume->can_mount) &&
               (old_should_automount == volume->should_automount) &&
@@ -409,6 +454,23 @@ gdu_cleartext_volume_job_changed (GduPresentable *presentable,
   /*g_debug ("cleartext volume: presentable_job_changed %p: %s", volume, gdu_presentable_get_id (GDU_PRESENTABLE (presentable)));*/
   if (update_volume (volume))
     emit_changed (volume);
+}
+
+GGduVolume *
+g_gdu_volume_new_for_unix_mount_point (GVolumeMonitor   *volume_monitor,
+                                       GUnixMountPoint  *unix_mount_point)
+{
+  GGduVolume *volume;
+
+  volume = g_object_new (G_TYPE_GDU_VOLUME, NULL);
+  volume->volume_monitor = volume_monitor;
+  g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(volume->volume_monitor));
+
+  volume->unix_mount_point = unix_mount_point;
+
+  update_volume (volume);
+
+  return volume;
 }
 
 GGduVolume *
@@ -1084,6 +1146,18 @@ g_gdu_volume_mount (GVolume             *_volume,
   pool = NULL;
   device = NULL;
 
+  /* for fstab mounts, call the native mount command */
+  if (volume->unix_mount_point != NULL)
+    {
+      g_gdu_volume_mount_unix_mount_point (volume,
+                                           flags,
+                                           mount_operation,
+                                           cancellable,
+                                           callback,
+                                           user_data);
+      goto out;
+    }
+
   if (volume->pending_mount_op != NULL)
     {
       simple = g_simple_async_result_new_error (G_OBJECT (volume),
@@ -1204,9 +1278,250 @@ g_gdu_volume_mount_finish (GVolume       *volume,
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (result);
 
-  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_gdu_volume_mount);
+  //g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_gdu_volume_mount);
 
   return !g_simple_async_result_propagate_error (simple, error);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+typedef struct {
+  GGduVolume *volume;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+  GCancellable *cancellable;
+  int error_fd;
+  GIOChannel *error_channel;
+  guint error_channel_source_id;
+  GString *error_string;
+
+  guint wait_for_mount_timeout_id;
+  gulong wait_for_mount_changed_signal_handler_id;
+} MountPointOp;
+
+static void
+mount_point_op_free (MountPointOp *data)
+{
+  if (data->error_channel_source_id > 0)
+    g_source_remove (data->error_channel_source_id);
+  if (data->error_channel != NULL)
+    g_io_channel_unref (data->error_channel);
+  if (data->error_string != NULL)
+    g_string_free (data->error_string, TRUE);
+  if (data->error_fd > 0)
+    close (data->error_fd);
+  g_free (data);
+}
+
+static void
+mount_point_op_changed_cb (GVolume *volume,
+                           gpointer user_data)
+{
+  MountPointOp *data = user_data;
+  GSimpleAsyncResult *simple;
+
+  /* keep waiting if the mount hasn't appeared */
+  if (data->volume->mount == NULL)
+    goto out;
+
+  simple = g_simple_async_result_new (G_OBJECT (data->volume),
+                                      data->callback,
+                                      data->user_data,
+                                      NULL);
+  /* complete in idle to make sure the mount is added before we return */
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+
+  g_signal_handler_disconnect (data->volume, data->wait_for_mount_changed_signal_handler_id);
+  g_source_remove (data->wait_for_mount_timeout_id);
+
+  mount_point_op_free (data);
+
+ out:
+  ;
+}
+
+static gboolean
+mount_point_op_never_appeared_cb (gpointer user_data)
+{
+  MountPointOp *data = user_data;
+  GSimpleAsyncResult *simple;
+
+  simple = g_simple_async_result_new_error (G_OBJECT (data->volume),
+                                            data->callback,
+                                            data->user_data,
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_FAILED,
+                                            "Timeout waiting for mount to appear");
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+
+  g_signal_handler_disconnect (data->volume, data->wait_for_mount_changed_signal_handler_id);
+  g_source_remove (data->wait_for_mount_timeout_id);
+
+  mount_point_op_free (data);
+
+  return FALSE;
+}
+
+static void
+mount_point_op_cb (GPid pid, gint status, gpointer user_data)
+{
+  MountPointOp *data = user_data;
+  GSimpleAsyncResult *simple;
+
+  g_spawn_close_pid (pid);
+
+  if (WEXITSTATUS (status) != 0)
+    {
+      GError *error;
+      error = g_error_new_literal (G_IO_ERROR,
+                                   G_IO_ERROR_FAILED,
+                                   data->error_string->str);
+      simple = g_simple_async_result_new_from_error (G_OBJECT (data->volume),
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_error_free (error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+      mount_point_op_free (data);
+    }
+  else
+    {
+      /* wait for the GMount to appear - this is to honor this requirement
+       *
+       *  "If the mount operation succeeded, g_volume_get_mount() on
+       *   volume is guaranteed to return the mount right after calling
+       *   this function; there's no need to listen for the
+       *   'mount-added' signal on GVolumeMonitor."
+       *
+       * So we set up a signal handler waiting for it to appear. We also set up
+       * a timer for handling the case when it never appears.
+       */
+      if (data->volume->mount == NULL)
+        {
+          /* no need to ref, GSimpleAsyncResult has a ref on data->volume */
+          data->wait_for_mount_timeout_id = g_timeout_add (5 * 1000,
+                                            mount_point_op_never_appeared_cb,
+                                            data);
+          data->wait_for_mount_changed_signal_handler_id = g_signal_connect (data->volume,
+                                                                             "changed",
+                                                                             G_CALLBACK (mount_point_op_changed_cb),
+                                                                             data);
+        }
+      else
+        {
+          /* have the mount already, finish up */
+          simple = g_simple_async_result_new (G_OBJECT (data->volume),
+                                              data->callback,
+                                              data->user_data,
+                                              NULL);
+          g_simple_async_result_complete (simple);
+          g_object_unref (simple);
+          mount_point_op_free (data);
+        }
+    }
+}
+
+static gboolean
+mount_point_op_read_error (GIOChannel *channel,
+                           GIOCondition condition,
+                           gpointer user_data)
+{
+  MountPointOp *data = user_data;
+  gchar buf[BUFSIZ];
+  gsize bytes_read;
+  GError *error;
+  GIOStatus status;
+
+  error = NULL;
+read:
+  status = g_io_channel_read_chars (channel, buf, sizeof (buf), &bytes_read, &error);
+  if (status == G_IO_STATUS_NORMAL)
+   {
+     g_string_append_len (data->error_string, buf, bytes_read);
+     if (bytes_read == sizeof (buf))
+        goto read;
+   }
+  else if (status == G_IO_STATUS_EOF)
+    {
+      g_string_append_len (data->error_string, buf, bytes_read);
+    }
+  else if (status == G_IO_STATUS_ERROR)
+    {
+      if (data->error_string->len > 0)
+        g_string_append (data->error_string, "\n");
+
+      g_string_append (data->error_string, error->message);
+      g_error_free (error);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static void
+g_gdu_volume_mount_unix_mount_point (GGduVolume          *volume,
+                                     GMountMountFlags     flags,
+                                     GMountOperation     *mount_operation,
+                                     GCancellable        *cancellable,
+                                     GAsyncReadyCallback  callback,
+                                     gpointer             user_data)
+{
+  MountPointOp *data;
+  GPid child_pid;
+  GError *error;
+  const gchar *argv[] = {"mount", NULL, NULL};
+
+  argv[1] = g_unix_mount_point_get_mount_path (volume->unix_mount_point);
+
+  data = g_new0 (MountPointOp, 1);
+  data->volume = volume;
+  data->callback = callback;
+  data->user_data = user_data;
+  data->cancellable = cancellable;
+
+  error = NULL;
+  if (!g_spawn_async_with_pipes (NULL,         /* working dir */
+                                 (gchar **) argv,
+                                 NULL,         /* envp */
+                                 G_SPAWN_DO_NOT_REAP_CHILD|G_SPAWN_SEARCH_PATH,
+                                 NULL,         /* child_setup */
+                                 NULL,         /* user_data for child_setup */
+                                 &child_pid,
+                                 NULL,         /* standard_input */
+                                 NULL,         /* standard_output */
+                                 &(data->error_fd),
+                                 &error))
+    {
+      g_assert (error != NULL);
+      goto handle_error;
+    }
+
+  data->error_string = g_string_new ("");
+
+  data->error_channel = g_io_channel_unix_new (data->error_fd);
+  g_io_channel_set_flags (data->error_channel, G_IO_FLAG_NONBLOCK, &error);
+  if (error != NULL)
+    goto handle_error;
+
+  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, mount_point_op_read_error, data);
+  g_child_watch_add (child_pid, mount_point_op_cb, data);
+
+handle_error:
+  if (error != NULL)
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_from_error (G_OBJECT (data->volume),
+                                                     data->callback,
+                                                     data->user_data,
+                                                     error);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+
+      mount_point_op_free (data);
+    }
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1300,19 +1615,22 @@ g_gdu_volume_get_identifier (GVolume     *_volume,
 
   id = NULL;
 
-  device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
+  if (volume->gdu_volume != NULL)
+    {
+      device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
 
-  label = gdu_device_id_get_label (device);
-  uuid = gdu_device_id_get_uuid (device);
+      label = gdu_device_id_get_label (device);
+      uuid = gdu_device_id_get_uuid (device);
 
-  g_object_unref (device);
+      g_object_unref (device);
 
-  if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
-    id = g_strdup (volume->device_file);
-  else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
-    id = strlen (label) > 0 ? g_strdup (label) : NULL;
-  else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
-    id = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
+      if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+        id = g_strdup (volume->device_file);
+      else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
+        id = strlen (label) > 0 ? g_strdup (label) : NULL;
+      else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
+        id = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
+    }
 
   return id;
 }
@@ -1326,19 +1644,21 @@ g_gdu_volume_enumerate_identifiers (GVolume *_volume)
   const gchar *label;
   const gchar *uuid;
 
-  device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
-
-  label = gdu_device_id_get_label (device);
-  uuid = gdu_device_id_get_uuid (device);
-
-  g_object_unref (device);
-
   p = g_ptr_array_new ();
-  g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
-  if (strlen (label) > 0)
-    g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
-  if (strlen (uuid) > 0)
-    g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
+
+  if (volume->gdu_volume != NULL)
+    {
+      device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
+      label = gdu_device_id_get_label (device);
+      uuid = gdu_device_id_get_uuid (device);
+      g_object_unref (device);
+
+      g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
+      if (strlen (label) > 0)
+        g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
+      if (strlen (uuid) > 0)
+        g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
+    }
 
   g_ptr_array_add (p, NULL);
 
@@ -1451,4 +1771,10 @@ g_gdu_volume_get_presentable_with_cleartext (GGduVolume *volume)
     ret = volume->gdu_volume;
 
   return GDU_PRESENTABLE (ret);
+}
+
+GUnixMountPoint *
+g_gdu_volume_get_unix_mount_point (GGduVolume *volume)
+{
+  return volume->unix_mount_point;
 }
