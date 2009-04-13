@@ -38,6 +38,9 @@
 #include "ggdumount.h"
 #include "ggduvolume.h"
 
+#define BUSY_UNMOUNT_NUM_ATTEMPTS              5
+#define BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS 500
+
 struct _GGduMount
 {
   GObject parent;
@@ -451,26 +454,52 @@ g_gdu_mount_can_eject (GMount *_mount)
 
 typedef struct {
   GMount *mount;
+
+  gchar **argv;
+  guint num_attempts_left;
+
   GAsyncReadyCallback callback;
   gpointer user_data;
   GCancellable *cancellable;
+
   int error_fd;
   GIOChannel *error_channel;
   guint error_channel_source_id;
   GString *error_string;
-} UnmountEjectOp;
+
+} UnmountOp;
+
+static gboolean unmount_attempt (UnmountOp *data);
 
 static void
-eject_unmount_cb (GPid pid, gint status, gpointer user_data)
+unmount_cb (GPid pid, gint status, gpointer user_data)
 {
-  UnmountEjectOp *data = user_data;
+  UnmountOp *data = user_data;
   GSimpleAsyncResult *simple;
+
+  g_spawn_close_pid (pid);
 
   if (WEXITSTATUS (status) != 0)
     {
       GError *error;
+      gint error_code;
+
+      error_code = G_IO_ERROR_FAILED;
+      /* we may want to add more strstr() checks here depending on what unmount helper is being used etc... */
+      if (data->error_string->str != NULL && strstr (data->error_string->str, "is busy") != NULL)
+        error_code = G_IO_ERROR_BUSY;
+
+      if (error_code == G_IO_ERROR_BUSY && data->num_attempts_left > 0)
+        {
+          g_timeout_add (BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS,
+                         (GSourceFunc) unmount_attempt,
+                         data);
+          data->num_attempts_left -= 1;
+          goto out;
+        }
+
       error = g_error_new_literal (G_IO_ERROR,
-                                   G_IO_ERROR_FAILED,
+                                   error_code,
                                    data->error_string->str);
       simple = g_simple_async_result_new_from_error (G_OBJECT (data->mount),
                                                      data->callback,
@@ -493,16 +522,19 @@ eject_unmount_cb (GPid pid, gint status, gpointer user_data)
   g_io_channel_unref (data->error_channel);
   g_string_free (data->error_string, TRUE);
   close (data->error_fd);
-  g_spawn_close_pid (pid);
+  g_strfreev (data->argv);
   g_free (data);
+
+ out:
+  ;
 }
 
 static gboolean
-eject_unmount_read_error (GIOChannel *channel,
-                          GIOCondition condition,
-                          gpointer user_data)
+unmount_read_error (GIOChannel *channel,
+                    GIOCondition condition,
+                    gpointer user_data)
 {
-  UnmountEjectOp *data = user_data;
+  UnmountOp *data = user_data;
   gchar buf[BUFSIZ];
   gsize bytes_read;
   GError *error;
@@ -532,26 +564,15 @@ read:
   return TRUE;
 }
 
-static void
-eject_unmount_do (GMount              *mount,
-                  GCancellable        *cancellable,
-                  GAsyncReadyCallback  callback,
-                  gpointer             user_data,
-                  char               **argv)
+static gboolean
+unmount_attempt (UnmountOp *data)
 {
-  UnmountEjectOp *data;
   GPid child_pid;
   GError *error;
 
-  data = g_new0 (UnmountEjectOp, 1);
-  data->mount = mount;
-  data->callback = callback;
-  data->user_data = user_data;
-  data->cancellable = cancellable;
-
   error = NULL;
   if (!g_spawn_async_with_pipes (NULL,         /* working dir */
-                                 argv,
+                                 data->argv,
                                  NULL,         /* envp */
                                  G_SPAWN_DO_NOT_REAP_CHILD|G_SPAWN_SEARCH_PATH,
                                  NULL,         /* child_setup */
@@ -572,8 +593,8 @@ eject_unmount_do (GMount              *mount,
   if (error != NULL)
     goto handle_error;
 
-  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, eject_unmount_read_error, data);
-  g_child_watch_add (child_pid, eject_unmount_cb, data);
+  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, unmount_read_error, data);
+  g_child_watch_add (child_pid, unmount_cb, data);
 
 handle_error:
 
@@ -596,6 +617,28 @@ handle_error:
       g_error_free (error);
       g_free (data);
     }
+
+  return FALSE;
+}
+
+static void
+unmount_do (GMount              *mount,
+            GCancellable        *cancellable,
+            GAsyncReadyCallback  callback,
+            gpointer             user_data,
+            char               **argv)
+{
+  UnmountOp *data;
+
+  data = g_new0 (UnmountOp, 1);
+  data->mount = mount;
+  data->callback = callback;
+  data->user_data = user_data;
+  data->cancellable = cancellable;
+  data->num_attempts_left = BUSY_UNMOUNT_NUM_ATTEMPTS;
+  data->argv = g_strdupv (argv);
+
+  unmount_attempt (data);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -619,19 +662,54 @@ luks_lock_cb (GduDevice *device,
   g_object_unref (simple);
 }
 
+static gboolean gdu_unmount_attempt (GSimpleAsyncResult *simple);
+
 static void
-unmount_cb (GduDevice *device,
-            GError    *error,
-            gpointer   user_data)
+gdu_unmount_cb (GduDevice *device,
+                GError    *error,
+                gpointer   user_data)
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
 
   if (error != NULL)
     {
+      gint error_code;
+
+      /*g_debug ("domain=%s error_code=%d '%s'", g_quark_to_string (error->domain), error->code, error->message);*/
+
+      error_code = G_IO_ERROR_FAILED;
+      if (error->domain == GDU_ERROR && error->code == GDU_ERROR_BUSY)
+        error_code = G_IO_ERROR_BUSY;
+
       /* We could handle PolicyKit integration here but this action is allowed by default
        * and this won't be needed when porting to PolicyKit 1.0 anyway
        */
-      g_simple_async_result_set_from_error (simple, error);
+
+      if (error_code == G_IO_ERROR_BUSY)
+        {
+          guint num_attempts_left;
+
+          num_attempts_left = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (simple), "num-attempts-left"));
+
+          if (num_attempts_left > 0)
+            {
+              num_attempts_left -= 1;
+              g_object_set_data (G_OBJECT (simple),
+                                 "num-attempts-left",
+                                 GUINT_TO_POINTER (num_attempts_left));
+
+              g_timeout_add (BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS,
+                             (GSourceFunc) gdu_unmount_attempt,
+                             simple);
+              goto out;
+            }
+        }
+
+      g_simple_async_result_set_error (simple,
+                                       G_IO_ERROR,
+                                       error_code,
+                                       "%s",
+                                       error->message);
       g_error_free (error);
       g_simple_async_result_complete (simple);
       g_object_unref (simple);
@@ -687,6 +765,17 @@ unmount_cb (GduDevice *device,
   ;
 }
 
+static gboolean
+gdu_unmount_attempt (GSimpleAsyncResult *simple)
+{
+  GduDevice *device;
+
+  /* TODO: honor flags */
+  device = g_object_get_data (G_OBJECT (simple), "gdu-device");
+  gdu_device_op_filesystem_unmount (device, gdu_unmount_cb, simple);
+  return FALSE;
+}
+
 static void
 g_gdu_mount_unmount (GMount              *_mount,
                      GMountUnmountFlags   flags,
@@ -697,6 +786,21 @@ g_gdu_mount_unmount (GMount              *_mount,
   GGduMount *mount = G_GDU_MOUNT (_mount);
   GSimpleAsyncResult *simple;
   GduPresentable *gdu_volume;
+
+  /* emit the ::mount-pre-unmount signal */
+  g_signal_emit_by_name (mount->volume_monitor, "mount-pre-unmount", mount);
+
+  /* If we end up with G_IO_ERROR_BUSY, try again BUSY_UNMOUNT_NUM_ATTEMPTS times
+   * waiting BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS milliseconds between each
+   * attempt.
+   *
+   * This is to give other processes recieving the ::mount-pre-unmount signal some
+   * time to close file descriptors.
+   *
+   * TODO: Unfortunately this code is a bit messy because we take two different
+   *       codepaths depending on whether we use GDU or the native unmount command.
+   *       It would be good to clean this up.
+   */
 
   gdu_volume = NULL;
   if (mount->volume != NULL)
@@ -713,7 +817,7 @@ g_gdu_mount_unmount (GMount              *_mount,
       else
         argv[1] = mount->device_file;
 
-      eject_unmount_do (_mount, cancellable, callback, user_data, argv);
+      unmount_do (_mount, cancellable, callback, user_data, argv);
     }
   else if (gdu_volume != NULL)
     {
@@ -721,6 +825,10 @@ g_gdu_mount_unmount (GMount              *_mount,
                                           callback,
                                           user_data,
                                           NULL);
+
+      g_object_set_data (G_OBJECT (simple),
+                         "num-attempts-left",
+                         GUINT_TO_POINTER (BUSY_UNMOUNT_NUM_ATTEMPTS));
 
       if (mount->is_burn_mount)
         {
@@ -731,12 +839,9 @@ g_gdu_mount_unmount (GMount              *_mount,
       else
         {
           GduDevice *device;
-
-          /* TODO: honor flags */
-
           device = gdu_presentable_get_device (gdu_volume);
-          gdu_device_op_filesystem_unmount (device, unmount_cb, simple);
-          g_object_unref (device);
+          g_object_set_data_full (G_OBJECT (simple), "gdu-device", device, g_object_unref);
+          gdu_unmount_attempt (simple);
         }
     }
   else
@@ -759,6 +864,8 @@ g_gdu_mount_unmount_finish (GMount       *mount,
 {
   return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
 }
+
+/* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct {
   GObject *object;
