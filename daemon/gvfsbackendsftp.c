@@ -333,6 +333,84 @@ look_for_stderr_errors (GVfsBackend *backend, GError **error)
     }
 }
 
+static gchar*
+read_dbus_string_dict_value (DBusMessageIter *args, const gchar *key)
+{
+  DBusMessageIter items, entry;
+  gchar *str, *sig;
+
+  sig = dbus_message_iter_get_signature (args);
+  if (!sig || strcmp (sig, "a{ss}") != 0)
+    return NULL;
+
+  dbus_message_iter_recurse (args, &items);
+
+  if (dbus_message_iter_has_next (&items))
+    {
+      do
+	{
+	  dbus_message_iter_recurse (&items, &entry);
+	  dbus_message_iter_get_basic (&entry, &str);
+	  if (str && strcmp (key, str) == 0) 
+	    {
+	      dbus_message_iter_next (&entry);
+	      dbus_message_iter_get_basic (&entry, &str);
+	      return g_strdup (str);
+	    }
+	}
+      while (dbus_message_iter_next (&items));
+    }
+
+  return NULL;
+}
+
+static void
+setup_ssh_environment (void)
+{
+  DBusConnection *dconn;
+  DBusMessage *reply;
+  DBusMessage *msg;
+  DBusMessageIter args;
+  DBusError derr;
+  gchar *env;
+
+  dbus_error_init (&derr);
+  dconn = dbus_bus_get (DBUS_BUS_SESSION, &derr);
+  if (!dconn)
+    return;
+
+  msg = dbus_message_new_method_call ("org.gnome.keyring",
+				      "/org/gnome/keyring/daemon",
+				      "org.gnome.keyring.Daemon",
+				      "GetEnvironment");
+  if (!msg)
+    {
+      dbus_connection_unref (dconn);
+      return;
+    }
+
+  /* Send message and get a handle for a reply */
+  reply = dbus_connection_send_with_reply_and_block (dconn, msg, 1000, &derr);
+  dbus_message_unref (msg);
+  if (!reply)
+    {
+      dbus_connection_unref (dconn);
+      return;
+    }
+
+  /* Read the return value */
+  if (dbus_message_iter_init (reply, &args))
+    {
+      env = read_dbus_string_dict_value (&args, "SSH_AUTH_SOCK");
+      if (env && env[0])
+	g_setenv ("SSH_AUTH_SOCK", env, TRUE);
+      g_free (env);
+    }
+
+  dbus_message_unref (reply);
+  dbus_connection_unref (dconn);
+}
+
 static char **
 setup_ssh_commandline (GVfsBackend *backend)
 {
@@ -1557,6 +1635,18 @@ do_mount (GVfsBackend *backend,
   setup_icon (op_backend, job);
   
   /* NOTE: job_succeeded called async from setup_icon reply */
+}
+
+static void
+real_do_mount (GVfsBackend *backend,
+	       GVfsJobMount *job,
+	       GMountSpec *mount_spec,
+	       GMountSource *mount_source,
+	       gboolean is_automount)
+{
+  setup_ssh_environment ();
+
+  do_mount (backend, job, mount_spec, mount_source, is_automount);
 }
 
 static gboolean
@@ -4481,7 +4571,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
   
   gobject_class->finalize = g_vfs_backend_sftp_finalize;
 
-  backend_class->mount = do_mount;
+  backend_class->mount = real_do_mount;
   backend_class->try_mount = try_mount;
   backend_class->try_open_icon_for_read = try_open_icon_for_read;
   backend_class->try_open_for_read = try_open_for_read;
