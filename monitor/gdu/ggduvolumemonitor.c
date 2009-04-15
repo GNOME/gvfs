@@ -720,6 +720,12 @@ should_mount_be_ignored (GduPool *pool, GduDevice *d)
 
   ret = FALSE;
 
+  if (gdu_device_get_presentation_hide (d))
+    {
+      ret = TRUE;
+      goto out;
+    }
+
   mount_path = gdu_device_get_mount_path (d);
   if (mount_path == NULL || strlen (mount_path) == 0)
     goto out;
@@ -750,6 +756,9 @@ should_volume_be_ignored (GduPool *pool, GduVolume *volume, GList *fstab_mount_p
   device = NULL;
 
   device = gdu_presentable_get_device (GDU_PRESENTABLE (volume));
+
+  if (gdu_device_get_presentation_hide (device))
+    goto out;
 
   usage = gdu_device_id_get_usage (device);
   type = gdu_device_id_get_type (device);
@@ -823,6 +832,9 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
       ignored = TRUE;
       goto out;
     }
+
+  if (gdu_device_get_presentation_hide (device))
+    goto out;
 
   has_volumes = FALSE;
   all_volumes_are_ignored = TRUE;
