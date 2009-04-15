@@ -648,6 +648,27 @@ g_gdu_volume_get_mount (GVolume *volume)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+static gchar **
+get_mount_options (GduDevice *device)
+{
+  gchar **ret;
+
+  /* one day we might read this from user settings */
+  if (g_strcmp0 (gdu_device_id_get_usage (device), "filesystem") == 0 &&
+      g_strcmp0 (gdu_device_id_get_type (device), "vfat") == 0)
+    {
+      ret = g_new0 (gchar *, 2);
+      ret[0] = g_strdup ("flush");
+      ret[1] = NULL;
+    }
+  else
+    ret = NULL;
+
+  return ret;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 struct MountOpData
 {
   GGduVolume *volume;
@@ -735,8 +756,11 @@ mount_obtain_authz_cb (GObject *source_object,
     }
   else
     {
+      gchar **mount_options;
       /* got the authz, now try again */
-      gdu_device_op_filesystem_mount (data->device_to_mount, mount_cb, data);
+      mount_options = get_mount_options (data->device_to_mount);
+      gdu_device_op_filesystem_mount (data->device_to_mount, mount_options, mount_cb, data);
+      g_strfreev (mount_options);
       goto out;
     }
 
@@ -842,7 +866,10 @@ mount_cleartext_device (MountOpData *data,
     }
   else
     {
-      gdu_device_op_filesystem_mount (data->device_to_mount, mount_cb, data);
+      gchar **mount_options;
+      mount_options = get_mount_options (data->device_to_mount);
+      gdu_device_op_filesystem_mount (data->device_to_mount, mount_options, mount_cb, data);
+      g_strfreev (mount_options);
     }
 
   g_object_unref (pool);
@@ -1260,8 +1287,11 @@ g_gdu_volume_mount (GVolume             *_volume,
     }
   else
     {
+      gchar **mount_options;
       data->device_to_mount = g_object_ref (device);
-      gdu_device_op_filesystem_mount (data->device_to_mount, mount_cb, data);
+      mount_options = get_mount_options (data->device_to_mount);
+      gdu_device_op_filesystem_mount (data->device_to_mount, mount_options, mount_cb, data);
+      g_strfreev (mount_options);
     }
 
  out:
