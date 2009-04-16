@@ -34,7 +34,7 @@ bin_SCRIPTS =					\
 
 if ENABLE_BASHCOMP
 profiledir = $(BASHCOMP_DIR)
-profile_SCRIPTS = gvfs-bash-completion.sh
+profile_DATA = gvfs-bash-completion.sh
 endif
 
 gvfs_cat_SOURCES = gvfs-cat.c
