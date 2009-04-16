@@ -1,5 +1,15 @@
 2009-04-16  Alexander Larsson  <alexl@redhat.com>
 
+	* daemon/gvfsbackend.[ch]:
+	Add g_vfs_backend_is_mounted()
+
+	* daemon/gvfsdaemon.c:
+	(g_vfs_daemon_re_register_job_sources):
+	Don't re-register backends that have not finished mounted
+	yet. (#578861)
+
+2009-04-16  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 578574 – always show drive names in computer://
 
 	* daemon/gvfsbackendcomputer.c:

@@ -452,6 +452,7 @@ char      **g_vfs_backend_get_x_content_types            (GVfsBackend        *ba
 GIcon      *g_vfs_backend_get_icon                       (GVfsBackend        *backend);
 GMountSpec *g_vfs_backend_get_mount_spec                 (GVfsBackend        *backend);
 GVfsDaemon *g_vfs_backend_get_daemon                     (GVfsBackend        *backend);
+gboolean    g_vfs_backend_is_mounted                     (GVfsBackend        *backend);
 
 void        g_vfs_backend_add_auto_info                  (GVfsBackend           *backend,
 							  GFileAttributeMatcher *matcher,

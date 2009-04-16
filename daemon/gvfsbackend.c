@@ -67,7 +67,8 @@ struct _GVfsBackendPrivate
 {
   GVfsDaemon *daemon;
   char *object_path;
-  
+
+  gboolean is_mounted;
   char *display_name;
   char *stable_name;
   char **x_content_types;
@@ -273,6 +274,11 @@ g_vfs_backend_get_daemon (GVfsBackend *backend)
   return backend->priv->daemon;
 }
 
+gboolean
+g_vfs_backend_is_mounted (GVfsBackend *backend)
+{
+  return backend->priv->is_mounted;
+}
 
 void
 g_vfs_backend_set_display_name (GVfsBackend *backend,
@@ -604,6 +610,8 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
   char *x_content_types_string;
   char *icon_str;
 
+  backend->priv->is_mounted = TRUE;
+
   if (backend->priv->x_content_types != NULL && g_strv_length (backend->priv->x_content_types) > 0)
     x_content_types_string = g_strjoinv (" ", backend->priv->x_content_types);
   else
@@ -632,7 +640,7 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 				 DBUS_TYPE_OBJECT_PATH, &backend->priv->object_path,
 				 DBUS_TYPE_STRING, &backend->priv->display_name,
 				 DBUS_TYPE_STRING, &stable_name,
-                                 DBUS_TYPE_STRING, &x_content_types_string,
+				 DBUS_TYPE_STRING, &x_content_types_string,
 				 DBUS_TYPE_STRING, &icon_str,
 				 DBUS_TYPE_STRING, &backend->priv->prefered_filename_encoding,
 				 DBUS_TYPE_BOOLEAN, &user_visible,

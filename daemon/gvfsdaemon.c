@@ -354,7 +354,14 @@ g_vfs_daemon_re_register_job_sources (GVfsDaemon *daemon)
   for (l = daemon->job_sources; l != NULL; l = l->next)
     {
       if (G_VFS_IS_BACKEND (l->data))
-	g_vfs_backend_register_mount (l->data, NULL, NULL);
+	{
+	  GVfsBackend *backend = l->data;
+
+	  /* Only re-register if we registered before, not e.g
+	     if we're currently mounting. */
+	  if (g_vfs_backend_is_mounted (backend))
+	    g_vfs_backend_register_mount (backend, NULL, NULL);
+	}
     }
   
   g_mutex_unlock (daemon->lock);
