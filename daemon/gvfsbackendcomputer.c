@@ -310,6 +310,9 @@ recompute_files (GVfsBackendComputer *backend)
   char *basename, *filename;
   const char *extension;
   int uniq;
+  gchar *s;
+  gchar *display_name;
+  gchar *drive_name;
 
   volume_monitor = backend->volume_monitor;
 
@@ -407,16 +410,40 @@ recompute_files (GVfsBackendComputer *backend)
 
       if (file->mount)
         {
+          if (file->drive != NULL)
+            {
+              drive_name = g_drive_get_name (file->drive);
+              s = g_mount_get_name (file->mount);
+              display_name = g_strdup_printf ("%s: %s", drive_name, s);
+              g_free (s);
+              g_free (drive_name);
+            }
+          else
+            {
+              display_name = g_mount_get_name (file->mount);
+            }
           file->icon = g_mount_get_icon (file->mount);
-          file->display_name = g_mount_get_name (file->mount);
+          file->display_name = display_name;
           file->root = g_mount_get_root (file->mount);
           file->can_unmount = g_mount_can_unmount (file->mount);
           file->can_eject = g_mount_can_eject (file->mount);
         }
       else if (file->volume)
         {
+          if (file->drive != NULL)
+            {
+              drive_name = g_drive_get_name (file->drive);
+              s = g_volume_get_name (file->volume);
+              display_name = g_strdup_printf ("%s: %s", drive_name, s);
+              g_free (s);
+              g_free (drive_name);
+            }
+          else
+            {
+              display_name = g_volume_get_name (file->volume);
+            }
           file->icon = g_volume_get_icon (file->volume);
-          file->display_name = g_volume_get_name (file->volume);
+          file->display_name = display_name;
           file->can_mount = g_volume_can_mount (file->volume);
           file->root = NULL;
           file->can_eject = g_volume_can_eject (file->volume);

@@ -1,10 +1,19 @@
 2009-04-16  Alexander Larsson  <alexl@redhat.com>
 
+	Bug 578574 – always show drive names in computer://
+
+	* daemon/gvfsbackendcomputer.c:
+	(recompute_files):
+	If mount has a drive, use its name as part of the display name.
+	Patch from David Zeuthen
+
+2009-04-16  Alexander Larsson  <alexl@redhat.com>
+
 	Bug 523420 – gvfs-bash-completion.sh has a shebang and is executable
-	
+
 	* programs/Makefile.am:
 	Don't install gvfs-bash-completion.sh as executable
-	
+
 	* programs/gvfs-bash-completion.sh:
 	Remove shebang
 
