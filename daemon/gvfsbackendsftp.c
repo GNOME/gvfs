@@ -1962,17 +1962,35 @@ error_from_lstat (GVfsBackendSftp *backend,
 }
 
 static void
+set_access_attributes_trusted (GFileInfo *info,
+			       guint32 perm)
+{
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+				     perm & 0x4);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+				     perm & 0x2);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+				     perm & 0x1);
+}
+
+/* For files we don't own we can't trust a negative response to this check, as
+   something else could allow us to do the operation, for instance an ACL
+   or some sticky bit thing */
+static void
 set_access_attributes (GFileInfo *info,
                        guint32 perm)
 {
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
-                                     perm & 0x4);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
-                                     perm & 0x2);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
-                                     perm & 0x1);
+  if (perm & 0x4)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+				       TRUE);
+  if (perm & 0x2)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+				       TRUE);
+  if (perm & 0x1)
+    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE,
+				       TRUE);
 }
-  
+
 
 static void
 parse_attributes (GVfsBackendSftp *backend,
@@ -2099,7 +2117,7 @@ parse_attributes (GVfsBackendSftp *backend,
       if (has_uid && backend->my_uid != (guint32)-1)
         {
           if (uid == backend->my_uid)
-            set_access_attributes (info, (mode >> 6) & 0x7);
+            set_access_attributes_trusted (info, (mode >> 6) & 0x7);
           else if (gid == backend->my_gid)
             set_access_attributes (info, (mode >> 3) & 0x7);
           else
