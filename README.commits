@@ -25,6 +25,11 @@ people committing to GVfs to follow a few rules:
    commit message will be reverted. See below for the expected format
    of commit messages.
 
+3) Try to separate each change into multiple small commits that are
+   independent ("micro commits" in git speak). This way its easier to
+   see what each change does, making it easier to review, to cherry pick
+   to other branches, to revert, and to bisect.
+
 Notes:
 
 * When developing larger features or complicated bug fixes, it is
