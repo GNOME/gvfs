@@ -1,0 +1,15 @@
+gvfs-cat
+gvfs-copy
+gvfs-info
+gvfs-ls
+gvfs-mkdir
+gvfs-monitor-dir
+gvfs-monitor-file
+gvfs-mount
+gvfs-move
+gvfs-open
+gvfs-rename
+gvfs-rm
+gvfs-save
+gvfs-trash
+gvfs-tree

@@ -1,6 +1,8 @@
+ChangeLog
 Makefile
 Makefile.in
 *~
+*.a
 *.o
 *.la
 *.lo
@@ -20,6 +22,7 @@ config.guess
 config.sub
 configure
 libtool
+intltool-*.in
 depcomp
 ltmain.sh
 install-sh
@@ -31,3 +34,5 @@ core
 compile
 gtk-doc.make
 *.pc
+*.service
+*-marshal.[ch]
