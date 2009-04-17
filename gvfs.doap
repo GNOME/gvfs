@@ -1,0 +1,28 @@
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+
+  <name xml:lang="en">gvfs</name>
+  <shortdesc xml:lang="en">Virtual filesystem implementation for gio</shortdesc>
+  <!--
+  <homepage rdf:resource="http://www.gnome.org/" />
+  -->
+  <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gvfs-list" />
+
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Alexander Larsson</foaf:name>
+      <foaf:mbox rdf:resource="alexl@redhat.com" />
+      <gnome:userid>alexl</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Christian Kellner</foaf:name>
+      <foaf:mbox rdf:resource="gicmo@gnome.org" />
+      <gnome:userid>gicmo</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+</Project>
