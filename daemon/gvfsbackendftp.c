@@ -2158,56 +2158,41 @@ enumerate_directory (GVfsBackendFtp *ftp,
   return files;
 }
 
-/* NB: This gets a file info for the given object, no matter if it's a dir 
- * or a file */
 static GFileInfo *
-create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink)
+create_file_info_from_parent (GVfsBackendFtp *ftp, FtpConnection *conn, 
+    const FtpFile *dir, const FtpFile *file, char **symlink)
 {
   const GList *walk, *files;
-  char *dirname;
-  FtpFile *dir, *file;
-  GFileInfo *info;
+  GFileInfo *info = NULL;
   gpointer iter;
 
-  if (symlink)
-    *symlink = NULL;
-
-  if (g_str_equal (filename, "/"))
-    return ftp->dir_ops->get_root (conn);
-
-  dirname = g_path_get_dirname (filename);
-  dir = ftp_filename_from_gvfs_path (conn, dirname);
-  g_free (dirname);
-
   files = enumerate_directory (ftp, conn, dir, TRUE);
-  if (files)
+  if (files == NULL)
+    return NULL;
+
+  iter = ftp->dir_ops->iter_new (conn);
+  for (walk = files; walk; walk = walk->next)
     {
-      iter = ftp->dir_ops->iter_new (conn);
-      for (walk = files; walk; walk = walk->next)
-        {
-          info = ftp->dir_ops->iter_process (iter,
-                                             conn,
-                                             dir,
-                                             file,
-                                             walk->data,
-                                             symlink);
-          if (info)
-            break;
-        }
-      ftp->dir_ops->iter_free (iter);
-      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-
-      if (info != NULL)
-        {
-          g_free (dir);
-          return info;
-        }
+      info = ftp->dir_ops->iter_process (iter,
+                                         conn,
+                                         dir,
+                                         file,
+                                         walk->data,
+                                         symlink);
+      if (info)
+        break;
     }
+  ftp->dir_ops->iter_free (iter);
+  g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
 
-  g_free (dir);
+  return info;
+}
 
-  /* try to find hidden file/directory */
-  file = ftp_filename_from_gvfs_path (conn, filename);
+static GFileInfo *
+create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn, 
+    const FtpFile *file, const char *filename, char **symlink)
+{
+  GFileInfo *info;
 
   if (ftp_connection_try_cd (conn, file))
     {
@@ -2241,6 +2226,7 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
     }
   else
     {
+      info = NULL;
       /* clear error from ftp_connection_send() in else if line above */
       ftp_connection_clear_error (conn);
 
@@ -2250,6 +2236,34 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
        * If you have ways to improve file detection, patches are welcome. */
     }
 
+  return info;
+}
+
+/* NB: This gets a file info for the given object, no matter if it's a dir 
+ * or a file */
+static GFileInfo *
+create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink)
+{
+  char *dirname;
+  FtpFile *dir, *file;
+  GFileInfo *info;
+
+  if (symlink)
+    *symlink = NULL;
+
+  if (g_str_equal (filename, "/"))
+    return ftp->dir_ops->get_root (conn);
+
+  dirname = g_path_get_dirname (filename);
+  dir = ftp_filename_from_gvfs_path (conn, dirname);
+  g_free (dirname);
+  file = ftp_filename_from_gvfs_path (conn, filename);
+
+  info = create_file_info_from_parent (ftp, conn, dir, file, symlink);
+  if (info == NULL)
+    info = create_file_info_from_file (ftp, conn, file, filename, symlink);
+
+  g_free (dir);
   g_free (file);
   return info;
 }
