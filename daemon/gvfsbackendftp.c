@@ -505,7 +505,7 @@ ftp_connection_receive (FtpConnection *conn,
  * codes other than 2xx cause an error. The last read ftp command will be put 
  * into @conn->read_buffer.
  *
- * Returns: 0 on error or the receied FTP code otherwise.
+ * Returns: 0 on error or the received FTP code otherwise.
  *     
  **/
 static guint
