@@ -787,10 +787,6 @@ ftp_connection_prepare (FtpConnection *conn)
     conn->workarounds |= FTP_WORKAROUND_FEAT_AFTER_LOGIN;
     conn->features = 0;
   }
-
-  /* instruct server that we'll give and assume we get utf8 */
-  if (conn->features & FTP_FEATURE_UTF8)
-    ftp_connection_send (conn, 0, "OPTS UTF8 ON");
 }
 
 static gboolean
@@ -822,14 +818,21 @@ ftp_connection_use (FtpConnection *conn)
     if (ftp_connection_send (conn, 0, "FEAT") != 0) {
       ftp_connection_parse_features (conn);
     } else {
-      ftp_connection_clear_error(conn);
+      ftp_connection_clear_error (conn);
       conn->features = FTP_FEATURES_DEFAULT;
     }
   }
 
+  /* instruct server that we'll give and assume we get utf8 */
+  if (conn->features & FTP_FEATURE_UTF8) 
+    {
+      if (!ftp_connection_send (conn, 0, "OPTS UTF8 ON"))
+        ftp_connection_clear_error (conn);
+    }
+
   if (ftp_connection_send (conn, 0, "SYST"))
     ftp_connection_parse_system (conn);
-  ftp_connection_clear_error(conn);
+  ftp_connection_clear_error (conn);
 
   return TRUE;
 }
