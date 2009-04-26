@@ -823,7 +823,7 @@ ftp_connection_use (FtpConnection *conn)
       ftp_connection_parse_features (conn);
     } else {
       ftp_connection_clear_error(conn);
-      conn->features = FTP_FEATURE_EPSV;
+      conn->features = FTP_FEATURES_DEFAULT;
     }
   }
 
