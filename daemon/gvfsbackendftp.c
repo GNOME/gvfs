@@ -2180,74 +2180,76 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
   g_free (dirname);
 
   files = enumerate_directory (ftp, conn, dir, TRUE);
-  if (files == NULL)
+  if (files)
     {
-      g_free (dir);
-      return NULL;
-    }
-
-  file = ftp_filename_from_gvfs_path (conn, filename);
-  iter = ftp->dir_ops->iter_new (conn);
-  for (walk = files; walk; walk = walk->next)
-    {
-      info = ftp->dir_ops->iter_process (iter,
-					 conn,
-					 dir,
-					 file,
-					 walk->data,
-					 symlink);
-      if (info)
-	break;
-    }
-  ftp->dir_ops->iter_free (iter);
-  g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-
-  /* try to find hidden file/directory */
-  if (info == NULL)
-    {
-      if (ftp_connection_try_cd (conn, file))
+      iter = ftp->dir_ops->iter_new (conn);
+      for (walk = files; walk; walk = walk->next)
         {
-          char *tmp;
-
-          info = g_file_info_new ();
-
-          tmp = g_path_get_basename (filename);
-          g_file_info_set_name (info, tmp);
-          g_free (tmp);
-
-          gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_DIRECTORY);
-
-          g_file_info_set_is_hidden (info, TRUE);
+          info = ftp->dir_ops->iter_process (iter,
+                                             conn,
+                                             dir,
+                                             file,
+                                             walk->data,
+                                             symlink);
+          if (info)
+            break;
         }
-      else if (ftp_connection_send (conn, 0, "SIZE %s", file))
+      ftp->dir_ops->iter_free (iter);
+      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
+
+      if (info != NULL)
         {
-          char *tmp;
-
-          info = g_file_info_new ();
-
-          tmp = g_path_get_basename (filename);
-          g_file_info_set_name (info, tmp);
-          g_free (tmp);
-
-          gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_REGULAR);
-
-          g_file_info_set_size (info, strtoul (conn->read_buffer+4, NULL, 0));
-
-          g_file_info_set_is_hidden (info, TRUE);
-        }
-      else
-        {
-          /* clear error from ftp_connection_send() in else if line above */
-          ftp_connection_clear_error (conn);
-
-          /* note that there might still be a file/directory, we just have 
-           * no way to figure this out (in particular on ftp servers that 
-           * don't support SIZE.
-           * If you have ways to improve file detection, patches are welcome. */
+          g_free (dir);
+          return info;
         }
     }
 
   g_free (dir);
+
+  /* try to find hidden file/directory */
+  file = ftp_filename_from_gvfs_path (conn, filename);
+
+  if (ftp_connection_try_cd (conn, file))
+    {
+      char *tmp;
+
+      info = g_file_info_new ();
+
+      tmp = g_path_get_basename (filename);
+      g_file_info_set_name (info, tmp);
+      g_free (tmp);
+
+      gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_DIRECTORY);
+
+      g_file_info_set_is_hidden (info, TRUE);
+    }
+  else if (ftp_connection_send (conn, 0, "SIZE %s", file))
+    {
+      char *tmp;
+
+      info = g_file_info_new ();
+
+      tmp = g_path_get_basename (filename);
+      g_file_info_set_name (info, tmp);
+      g_free (tmp);
+
+      gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_REGULAR);
+
+      g_file_info_set_size (info, strtoul (conn->read_buffer+4, NULL, 0));
+
+      g_file_info_set_is_hidden (info, TRUE);
+    }
+  else
+    {
+      /* clear error from ftp_connection_send() in else if line above */
+      ftp_connection_clear_error (conn);
+
+      /* note that there might still be a file/directory, we just have 
+       * no way to figure this out (in particular on ftp servers that 
+       * don't support SIZE.
+       * If you have ways to improve file detection, patches are welcome. */
+    }
+
   g_free (file);
   return info;
 }
