@@ -833,8 +833,10 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
       goto out;
     }
 
-  if (gdu_device_get_presentation_hide (device))
+  if (gdu_device_get_presentation_hide (device)) {
+    ignored = TRUE;
     goto out;
+  }
 
   has_volumes = FALSE;
   all_volumes_are_ignored = TRUE;
