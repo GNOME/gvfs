@@ -51,7 +51,6 @@ struct _GGduDrive {
   gboolean can_eject;
   gboolean can_poll_for_media;
   gboolean is_media_check_automatic;
-  time_t time_of_last_media_insertion;
 };
 
 static void g_gdu_drive_drive_iface_init (GDriveIface *iface);
@@ -178,9 +177,6 @@ update_drive (GGduDrive *drive)
   if (device != NULL)
     g_object_unref (device);
 
-  if (drive->has_media != old_has_media)
-    drive->time_of_last_media_insertion = time (NULL);
-
   /* compute whether something changed */
   changed = !((old_is_media_removable == drive->is_media_removable) &&
               (old_has_media == drive->has_media) &&
@@ -232,8 +228,6 @@ g_gdu_drive_new (GVolumeMonitor       *volume_monitor,
   g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(drive->volume_monitor));
 
   drive->presentable = g_object_ref (presentable);
-
-  drive->time_of_last_media_insertion = time (NULL);
 
   g_signal_connect (drive->presentable, "changed", G_CALLBACK (presentable_changed), drive);
   g_signal_connect (drive->presentable, "job-changed", G_CALLBACK (presentable_job_changed), drive);
@@ -685,7 +679,16 @@ g_gdu_drive_has_presentable (GGduDrive       *drive,
 time_t
 g_gdu_drive_get_time_of_last_media_insertion (GGduDrive *drive)
 {
-  return drive->time_of_last_media_insertion;
+  GduDevice *device;
+  time_t ret;
+
+  ret = 0;
+  device = gdu_presentable_get_device (drive->presentable);
+  if (device != NULL) {
+    ret = gdu_device_get_media_detection_time (device);
+    g_object_unref (device);
+  }
+  return ret;
 }
 
 GduPresentable *
