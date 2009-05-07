@@ -1239,7 +1239,7 @@ dir_default_iter_process (gpointer        iter,
   else if (symlink)
     *symlink = NULL;
 
-  g_file_info_set_size (info, strtoul (result.fe_size, NULL, 10));
+  g_file_info_set_size (info, g_ascii_strtoull (result.fe_size, NULL, 10));
 
   gvfs_file_info_populate_default (info, s,
 				   type == 'f' ? G_FILE_TYPE_REGULAR :
@@ -2231,7 +2231,7 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
 
           gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_REGULAR);
 
-          g_file_info_set_size (info, strtoul (conn->read_buffer+4, NULL, 0));
+          g_file_info_set_size (info, g_ascii_strtoull (conn->read_buffer+4, NULL, 0));
 
           g_file_info_set_is_hidden (info, TRUE);
         }
