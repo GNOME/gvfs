@@ -815,7 +815,10 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
         {
           mount = g_hash_table_lookup (monitor->mounts, id);
           if (mount != NULL)
-            signal_emit_in_idle (monitor, "mount-pre-unmount", mount);
+            {
+              signal_emit_in_idle (mount, "pre-unmount", NULL);
+              signal_emit_in_idle (monitor, "mount-pre-unmount", mount);
+            }
         }
       else if (strcmp (member, "MountRemoved") == 0)
         {
