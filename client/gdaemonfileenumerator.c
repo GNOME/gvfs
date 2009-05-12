@@ -417,11 +417,8 @@ g_daemon_file_enumerator_next_files_finish (GFileEnumerator  *enumerator,
   GList *l;
 
   l = g_simple_async_result_get_op_res_gpointer (G_SIMPLE_ASYNC_RESULT (result));
-  /* We want the caller to own this, and not the result, so clear the result data */
-  g_simple_async_result_set_op_res_gpointer (G_SIMPLE_ASYNC_RESULT (result),
-					     NULL, NULL);
-  
-  return l;
+  g_list_foreach (l, (GFunc)g_object_ref, NULL);
+  return g_list_copy (l);
 }
 
 static gboolean
