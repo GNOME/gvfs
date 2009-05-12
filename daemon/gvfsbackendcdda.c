@@ -460,7 +460,8 @@ get_track_num_from_name (GVfsBackendCdda *cdda_backend, const char *filename)
   char *basename;
 
   basename = g_path_get_basename (filename);
-  if (sscanf (basename, "Track %d.wav", &n) == 1)
+  if (sscanf (basename, "Track %d.wav", &n) == 1 &&
+      g_str_has_suffix (basename, ".wav"))
     {
       g_free (basename);
       return n;
