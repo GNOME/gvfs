@@ -2113,7 +2113,6 @@ error2:
   ftp_connection_close_data_connection (conn);
   ftp_connection_receive (conn, 0);
 error:
-  ftp_connection_close_data_connection (conn);
   g_list_foreach (list, (GFunc) g_free, NULL);
   g_list_free (list);
   return NULL;
