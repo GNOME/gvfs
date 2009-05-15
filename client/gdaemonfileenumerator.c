@@ -162,6 +162,20 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 {
   GList *rest, *l;
 
+  if (daemon->cancelled_tag != 0)
+    g_cancellable_disconnect (daemon->async_cancel,
+			      daemon->cancelled_tag);
+
+  /* cancelled signal handler won't execute after this */
+
+  /* TODO: There is actually a small race here, where
+     trigger_async_done could happen twice if the operation
+     succeeds for some other reason and cancellation happens
+     on some other thread right before the above call.
+     However, this can only happen if cancellation happens
+     outside the main thread which is kinda unusual for async
+     ops. However, it would be nice to handle this too. */
+
   if (ok)
     {
       l = daemon->infos;
@@ -181,9 +195,6 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 
   g_simple_async_result_complete_in_idle (daemon->async_res);
   
-  if (daemon->cancelled_tag != 0)
-    g_signal_handler_disconnect (daemon->async_cancel,
-				 daemon->cancelled_tag);
   daemon->async_cancel = 0;
   daemon->cancelled_tag = 0;
 
@@ -400,10 +411,12 @@ g_daemon_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
     trigger_async_done (daemon, TRUE);
   else
     {
-      if (cancellable)
-	daemon->cancelled_tag = g_signal_connect (cancellable, "cancelled", (GCallback)async_cancelled, daemon);
       daemon->timeout_tag = g_timeout_add (G_VFS_DBUS_TIMEOUT_MSECS,
 					   async_timeout, daemon);
+      if (cancellable)
+	daemon->cancelled_tag =
+	  g_cancellable_connect (cancellable, (GCallback)async_cancelled,
+				 daemon, NULL);
     }
   
   G_UNLOCK (infos);

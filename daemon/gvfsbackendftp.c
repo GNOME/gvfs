@@ -1316,19 +1316,21 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 {
   FtpConnection *conn = NULL;
   GTimeVal now;
-  guint id;
+  gulong id;
+
+  if (g_cancellable_is_cancelled (job->cancellable))
+    return NULL;
 
   g_mutex_lock (ftp->mutex);
-  id = g_signal_connect (job->cancellable, 
-			       "cancelled", 
-			       G_CALLBACK (do_broadcast),
-			       ftp->cond);
+  id = g_cancellable_connect (job->cancellable,
+			      G_CALLBACK (do_broadcast),
+			      ftp->cond, NULL);
   while (conn == NULL && ftp->queue != NULL)
     {
       if (g_cancellable_is_cancelled (job->cancellable))
 	break;
-      conn = g_queue_pop_head (ftp->queue);
 
+      conn = g_queue_pop_head (ftp->queue);
       if (conn != NULL)
 	{
 	  /* Figure out if this connection had a timeout sent. If so, skip it. */
@@ -1393,7 +1395,7 @@ g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp,
 	  break;
 	}
     }
-  g_signal_handler_disconnect (job->cancellable, id);
+  g_cancellable_disconnect (job->cancellable, id);
 
   return conn;
 }

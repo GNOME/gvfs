@@ -679,8 +679,8 @@ fd_source_finalize (GSource *source)
   FDSource *fd_source = (FDSource *)source;
 
   if (fd_source->cancelled_tag)
-    g_signal_handler_disconnect (fd_source->cancellable,
-				 fd_source->cancelled_tag);
+    g_cancellable_disconnect (fd_source->cancellable,
+			      fd_source->cancelled_tag);
 
   if (fd_source->cancellable)
     g_object_unref (fd_source->cancellable);
@@ -723,10 +723,9 @@ __g_fd_source_new (int fd,
 
   if (cancellable)
     fd_source->cancelled_tag =
-      g_signal_connect_data (cancellable, "cancelled",
+      g_cancellable_connect (cancellable,
 			     (GCallback)fd_source_cancelled_cb,
-			     NULL, NULL,
-			     0);
+			     NULL, NULL);
   
   return source;
 }
