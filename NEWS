@@ -1,3 +1,11 @@
+Major changes in 1.2.3
+======================
+* Pick up SSH_AUTH_SOCK from gnome-keyring
+* sftp: Don't trust remote permissions for uids other than user
+* ftp: Fix logging in to a FTP server only works for the 2nd attempt
+* ftp: Handle files > 4 gig
+* fix crash with newer glib
+
 Major changes in 1.2.2
 ======================
 * ftp: Fix error handling in some cases
