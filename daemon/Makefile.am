@@ -239,10 +239,9 @@ gvfsd_ftp_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendftp.h \
 	-DDEFAULT_BACKEND_TYPE=ftp \
 	-DMAX_JOB_THREADS=10 \
-	$(HTTP_CFLAGS) \
 	-DBACKEND_TYPES='"ftp", G_VFS_TYPE_BACKEND_FTP,'
 
-gvfsd_ftp_LDADD = $(libraries) $(HTTP_LIBS)
+gvfsd_ftp_LDADD = $(libraries)
 
 gvfsd_sftp_SOURCES = \
 	sftp.h \
