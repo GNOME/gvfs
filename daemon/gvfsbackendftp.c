@@ -1625,55 +1625,55 @@ try_login:
     {
       ftp_connection_pop_job (conn);
       ftp_connection_free (conn);
+      g_object_unref (addr);
+      return;
     }
+
+  if (prompt && !anonymous)
+    {
+      /* a prompt was created, so we have to save the password */
+      g_vfs_keyring_save_password (ftp->user,
+                                   g_network_address_get_hostname (addr),
+                                   NULL,
+                                   "ftp",
+                                   NULL,
+                                   NULL,
+                                   port == 21 ? 0 : port,
+                                   ftp->password,
+                                   password_save);
+      g_free (prompt);
+    }
+
+  mount_spec = g_mount_spec_new ("ftp");
+  g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (addr));
+  if (port != 21)
+    {
+      char *port_str = g_strdup_printf ("%u", port);
+      g_mount_spec_set (mount_spec, "port", port_str);
+      g_free (port_str);
+    }
+
+  if (ftp->has_initial_user)
+    g_mount_spec_set (mount_spec, "user", ftp->user);
+      
+  if (g_str_equal (ftp->user, "anonymous"))
+    display_name = g_strdup_printf (_("ftp on %s"), ftp->host_display_name);
   else
     {
-      if (prompt && !anonymous)
-	{
-	  /* a prompt was created, so we have to save the password */
-	  g_vfs_keyring_save_password (ftp->user,
-				       g_network_address_get_hostname (addr),
-				       NULL,
-				       "ftp",
-				       NULL,
-				       NULL,
-				       port == 21 ? 0 : port,
-				       ftp->password,
-				       password_save);
-	  g_free (prompt);
-	}
-
-      mount_spec = g_mount_spec_new ("ftp");
-      g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (addr));
-      if (port != 21)
-	{
-	  char *port_str = g_strdup_printf ("%u", port);
-	  g_mount_spec_set (mount_spec, "port", port_str);
-	  g_free (port_str);
-	}
-
-      if (ftp->has_initial_user)
-        g_mount_spec_set (mount_spec, "user", ftp->user);
-          
-      if (g_str_equal (ftp->user, "anonymous"))
-        display_name = g_strdup_printf (_("ftp on %s"), ftp->host_display_name);
-      else
-	{
-	  /* Translators: the first %s is the username, the second the host name */
-	  display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, ftp->host_display_name);
-	}
-      g_vfs_backend_set_mount_spec (backend, mount_spec);
-      g_mount_spec_unref (mount_spec);
-
-      g_vfs_backend_set_display_name (backend, display_name);
-      g_free (display_name);
-      g_vfs_backend_set_icon_name (backend, "folder-remote");
-
-      ftp->connections = 1;
-      ftp->max_connections = G_MAXUINT;
-      ftp->queue = g_queue_new ();
-      g_vfs_backend_ftp_push_connection (ftp, conn);
+      /* Translators: the first %s is the username, the second the host name */
+      display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, ftp->host_display_name);
     }
+  g_vfs_backend_set_mount_spec (backend, mount_spec);
+  g_mount_spec_unref (mount_spec);
+
+  g_vfs_backend_set_display_name (backend, display_name);
+  g_free (display_name);
+  g_vfs_backend_set_icon_name (backend, "folder-remote");
+
+  ftp->connections = 1;
+  ftp->max_connections = G_MAXUINT;
+  ftp->queue = g_queue_new ();
+  g_vfs_backend_ftp_push_connection (ftp, conn);
   
   g_object_unref (addr);
 }
