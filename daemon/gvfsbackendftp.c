@@ -79,6 +79,13 @@
 typedef unsigned char FtpFile;
 typedef struct _FtpConnection FtpConnection;
 
+typedef struct _FtpDirEntry FtpDirEntry;
+struct _FtpDirEntry {
+  gsize         size;
+  gsize         length;
+  gchar         data[1];
+};
+
 typedef struct FtpDirReader FtpDirReader;
 struct FtpDirReader {
   void		(* init_data)	(FtpConnection *conn,
@@ -1424,10 +1431,31 @@ g_vfs_backend_ftp_finalize (GObject *object)
 }
 
 static void
-list_free (gpointer list)
+ftp_dir_entry_free (gpointer entry)
 {
-  g_list_foreach (list, (GFunc) g_free, NULL);
-  g_list_free (list);
+  g_free (entry);
+}
+
+static FtpDirEntry *
+ftp_dir_entry_grow (FtpDirEntry *entry)
+{
+  entry = g_try_realloc (entry, sizeof (FtpDirEntry) + entry->size + 4096);
+  if (entry == NULL)
+    return NULL;
+  entry->size += 4096;
+  return entry;
+}
+
+static FtpDirEntry *
+ftp_dir_entry_new (void)
+{
+  FtpDirEntry *entry;
+  
+  entry = g_malloc (4096);
+  entry->size = 4096 - sizeof (FtpDirEntry);
+  entry->length = 0;
+
+  return entry;
 }
 
 static void
@@ -1439,7 +1467,7 @@ g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
   ftp->directory_cache = g_hash_table_new_full (g_str_hash,
 					        g_str_equal,
 						g_free,
-						list_free);
+						ftp_dir_entry_free);
   g_static_rw_lock_init (&ftp->directory_cache_lock);
 
   ftp->dir_ops = &dir_default;
@@ -2026,46 +2054,38 @@ do_write (GVfsBackend *backend,
   ftp_connection_pop_job (conn);
 }
 
-static GList *
+static FtpDirEntry *
 do_enumerate_directory (FtpConnection *conn)
 {
-  gsize size, n_bytes, bytes_read;
+  gsize n_bytes;
   SoupSocketIOStatus status;
-  gboolean got_boundary;
-  char *name;
-  GList *list = NULL;
+  FtpDirEntry *entry;
 
   if (ftp_connection_in_error (conn))
     return NULL;
 
-  size = 128;
-  bytes_read = 0;
-  name = g_malloc (size);
+  entry = ftp_dir_entry_new ();
 
   do
     {
-      if (bytes_read + 3 >= size)
-	{
-	  if (size >= 16384)
+      if (entry->size - entry->length < 128)
+        {
+          entry = ftp_dir_entry_grow (entry);
+          if (entry == NULL)
 	    {
-	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FILENAME_TOO_LONG,
-			           _("filename too long"));
-	      break;
+	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			           _("Out of memory while reading directory contents"));
+	      return NULL;
 	    }
-	  size += 128;
-	  name = g_realloc (name, size);
 	}
-      status = soup_socket_read_until (conn->data,
-				       name + bytes_read,
-				       size - bytes_read - 1,
-				       "\n",
-				       1,
-				       &n_bytes,
-				       &got_boundary,
-				       conn->job->cancellable,
-				       &conn->error);
+      status = soup_socket_read (conn->data,
+                                 entry->data + entry->length,
+				 entry->size - entry->length - 1,
+				 &n_bytes,
+                                 conn->job->cancellable,
+                                 &conn->error);
 
-      bytes_read += n_bytes;
+      entry->length += n_bytes;
       switch (status)
 	{
 	  case SOUP_SOCKET_EOF:
@@ -2075,18 +2095,10 @@ do_enumerate_directory (FtpConnection *conn)
 		status = SOUP_SOCKET_EOF;
 		break;
 	      }
-	    if (got_boundary)
-	      {
-		name[bytes_read - 1] = 0;
-		if (bytes_read >= 2 && name[bytes_read - 2] == '\r') 
-				name[bytes_read - 2] = 0;
-		DEBUG ("--- %s\n", name);
-		list = g_list_prepend (list, g_strdup (name));
-		bytes_read = 0;
-	      }
 	    break;
 	  case SOUP_SOCKET_ERROR:
-	    goto error2;
+            ftp_dir_entry_free (entry);
+            return NULL;
 	  case SOUP_SOCKET_WOULD_BLOCK:
 	  default:
 	    g_assert_not_reached ();
@@ -2095,90 +2107,78 @@ do_enumerate_directory (FtpConnection *conn)
     }
   while (status == SOUP_SOCKET_OK);
 
-  if (bytes_read)
-    {
-      name[bytes_read] = 0;
-      DEBUG ("--- %s\n", name);
-      list = g_list_prepend (list, name);
-    }
-  else
-    g_free (name);
-
   ftp_connection_close_data_connection (conn);
   ftp_connection_receive (conn, 0);
   if (ftp_connection_in_error (conn))
-    goto error;
+    {
+      ftp_dir_entry_free (entry);
+      return NULL;
+    }
+  /* null-terminate, just because */
+  entry->data[entry->length] = 0;
 
-  return g_list_reverse (list);
-
-error2:
-  ftp_connection_close_data_connection (conn);
-  ftp_connection_receive (conn, 0);
-error:
-  g_list_foreach (list, (GFunc) g_free, NULL);
-  g_list_free (list);
-  return NULL;
+  return entry;
 }
 
 /* IMPORTANT: SUCK ALARM!
  * locks ftp->directory_cache_lock but only iff it returns !NULL */
-static const GList *
+static const FtpDirEntry *
 enumerate_directory (GVfsBackendFtp *ftp,
                      FtpConnection * conn,
 		     const FtpFile * dir,
 		     gboolean	     use_cache)
 {
-  GList *files;
+  FtpDirEntry *entry;
 
   g_static_rw_lock_reader_lock (&ftp->directory_cache_lock);
   do {
     if (use_cache)
-      files = g_hash_table_lookup (ftp->directory_cache, dir);
+      entry = g_hash_table_lookup (ftp->directory_cache, dir);
     else
       {
 	use_cache = TRUE;
-	files = NULL;
+	entry = NULL;
       }
-    if (files == NULL)
+    if (entry == NULL)
       {
 	g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
 	ftp->dir_ops->init_data (conn, dir);
-	files = do_enumerate_directory (conn);
-	if (files == NULL)
-	  {
-	    return NULL;
-	  }
+	entry = do_enumerate_directory (conn);
+	if (entry == NULL)
+          return NULL;
 	g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
-	g_hash_table_insert (ftp->directory_cache, g_strdup ((const char *) dir), files);
+	g_hash_table_insert (ftp->directory_cache, g_strdup ((const char *) dir), entry);
 	g_static_rw_lock_writer_unlock (&ftp->directory_cache_lock);
-	files = NULL;
+	entry = NULL;
 	g_static_rw_lock_reader_lock (&ftp->directory_cache_lock);
       }
-  } while (files == NULL);
+  } while (entry == NULL);
 
-  return files;
+  return entry;
 }
 
 static GFileInfo *
 create_file_info_from_parent (GVfsBackendFtp *ftp, FtpConnection *conn, 
     const FtpFile *dir, const FtpFile *file, char **symlink)
 {
-  const GList *walk, *files;
   GFileInfo *info = NULL;
   gpointer iter;
+  const FtpDirEntry *entry;
+  const char *sol, *eol;
 
-  files = enumerate_directory (ftp, conn, dir, TRUE);
-  if (files == NULL)
+  entry = enumerate_directory (ftp, conn, dir, TRUE);
+  if (entry == NULL)
     return NULL;
 
   iter = ftp->dir_ops->iter_new (conn);
-  for (walk = files; walk; walk = walk->next)
+  for (sol = eol = entry->data; eol; sol = eol + 1)
     {
+      eol = memchr (sol, '\n', entry->length - (sol - entry->data));
       info = ftp->dir_ops->iter_process (iter,
                                          conn,
                                          dir,
                                          file,
-                                         walk->data,
+                                         sol,
                                          symlink);
       if (info)
         break;
@@ -2397,13 +2397,14 @@ do_enumerate (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  const GList *walk, *files;
   FtpFile *dir;
   gpointer iter;
   GSList *symlink_targets = NULL;
   GSList *symlink_fileinfos = NULL;
   GSList *twalk, *fwalk;
   GFileInfo *info;
+  const FtpDirEntry *entry;
+  const char *sol, *eol;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
@@ -2414,21 +2415,23 @@ do_enumerate (GVfsBackend *backend,
    */
 
   dir = ftp_filename_from_gvfs_path (conn, dirname);
-  files = enumerate_directory (ftp, conn, dir, FALSE);
+  entry = enumerate_directory (ftp, conn, dir, FALSE);
   if (ftp_connection_pop_job (conn))
     {
       ftp_connection_push_job (conn, G_VFS_JOB (job));
-      if (files != NULL)
+      if (entry != NULL)
 	{
 	  iter = ftp->dir_ops->iter_new (conn);
-	  for (walk = files; walk; walk = walk->next)
-	    {
+          for (sol = eol = entry->data; eol; sol = eol + 1)
+            {
 	      char *symlink = NULL;
+
+              eol = memchr (sol, '\n', entry->length - (sol - entry->data));
 	      info = ftp->dir_ops->iter_process (iter,
 						 conn,
 						 dir,
 						 NULL,
-						 walk->data,
+						 sol,
 						 query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? NULL : &symlink);
 	      if (symlink)
 		{
@@ -2462,7 +2465,7 @@ do_enumerate (GVfsBackend *backend,
       ftp_connection_clear_error (conn);
     }
   else
-    g_assert (files == NULL);
+    g_assert (entry == NULL);
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
   g_free (dir);
@@ -2539,8 +2542,8 @@ do_delete (GVfsBackend *backend,
 				      "RMD %s", file);
       if (response == 550)
 	{
-	  const GList *files = enumerate_directory (ftp, conn, file, FALSE);
-	  if (files)
+	  const FtpDirEntry *entry = enumerate_directory (ftp, conn, file, FALSE);
+	  if (entry)
 	    {
 	      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
 	      g_set_error_literal (&conn->error, 
