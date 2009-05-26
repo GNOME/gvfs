@@ -90,7 +90,6 @@ typedef struct FtpDirReader FtpDirReader;
 struct FtpDirReader {
   void		(* init_data)	(FtpConnection *conn,
 				 const FtpFile *dir);
-  GFileInfo *	(* get_root)	(FtpConnection *conn);
   gpointer	(* iter_new)	(FtpConnection *conn);
   GFileInfo *	(* iter_process)(gpointer       iter,
 				 FtpConnection *conn,
@@ -1114,33 +1113,6 @@ dir_default_init_data (FtpConnection *conn, const FtpFile *dir)
 		       (conn->system == FTP_SYSTEM_UNIX) ? "LIST -a" : "LIST");
 }
 
-static GFileInfo *
-dir_default_get_root (FtpConnection *conn)
-{
-  GFileInfo *info;
-  GIcon *icon;
-  char *display_name;
-  
-  info = g_file_info_new ();
-  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-
-  g_file_info_set_name (info, "/");
-  display_name = g_strdup_printf (_("/ on %s"),
-      soup_address_get_name (soup_socket_get_remote_address (conn->commands)));
-  g_file_info_set_display_name (info, display_name);
-  g_free (display_name);
-  g_file_info_set_edit_name (info, "/");
-
-  g_file_info_set_content_type (info, "inode/directory");
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
-
-  icon = g_themed_icon_new ("folder-remote");
-  g_file_info_set_icon (info, icon);
-  g_object_unref (icon);
-
-  return info;
-}
-
 static gpointer
 dir_default_iter_new (FtpConnection *conn)
 {
@@ -1283,7 +1255,6 @@ dir_default_iter_free (gpointer iter)
 
 static const FtpDirReader dir_default = {
   dir_default_init_data,
-  dir_default_get_root,
   dir_default_iter_new,
   dir_default_iter_process,
   dir_default_iter_free
@@ -2050,6 +2021,32 @@ do_write (GVfsBackend *backend,
   ftp_connection_pop_job (conn);
 }
 
+static GFileInfo *
+create_file_info_for_root (GVfsBackendFtp *ftp)
+{
+  GFileInfo *info;
+  GIcon *icon;
+  char *display_name;
+  
+  info = g_file_info_new ();
+  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+
+  g_file_info_set_name (info, "/");
+  display_name = g_strdup_printf (_("/ on %s"), ftp->host_display_name);
+  g_file_info_set_display_name (info, display_name);
+  g_free (display_name);
+  g_file_info_set_edit_name (info, "/");
+
+  g_file_info_set_content_type (info, "inode/directory");
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+
+  icon = g_themed_icon_new ("folder-remote");
+  g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+
+  return info;
+}
+
 static FtpDirEntry *
 do_enumerate_directory (FtpConnection *conn)
 {
@@ -2249,7 +2246,7 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
     *symlink = NULL;
 
   if (g_str_equal (filename, "/"))
-    return ftp->dir_ops->get_root (conn);
+    return create_file_info_for_root (ftp);
 
   dirname = g_path_get_dirname (filename);
   dir = ftp_filename_from_gvfs_path (conn, dirname);
