@@ -1480,6 +1480,7 @@ do_mount (GVfsBackend *backend,
   char *display_name;
   gboolean aborted, anonymous, break_on_fail;
   GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
+  GNetworkAddress *addr;
   guint port;
 
   conn = ftp_connection_create (ftp->addr,
@@ -1496,7 +1497,8 @@ do_mount (GVfsBackend *backend,
 
   ftp_connection_prepare (conn);
 
-  port = g_network_address_get_port (G_NETWORK_ADDRESS (ftp->addr));
+  addr = G_NETWORK_ADDRESS (ftp->addr);
+  port = g_network_address_get_port (addr);
   username = NULL;
   password = NULL;
   break_on_fail = FALSE;
@@ -1509,7 +1511,7 @@ do_mount (GVfsBackend *backend,
     }
   
   if (g_vfs_keyring_lookup_password (ftp->user,
-				     g_network_address_get_hostname (G_NETWORK_ADDRESS (ftp->addr)),
+				     g_network_address_get_hostname (addr),
 				     NULL,
 				     "ftp",
 				     NULL,
@@ -1603,6 +1605,22 @@ try_login:
   
   ftp_connection_use (conn);
 
+  /* Save the address of the current connection, so that for future connections,
+   * we are sure to connect to the same machine.
+   * The idea here is to avoid using mirrors that have a different state, which 
+   * might cause Heisenbugs.
+   */
+  if (!ftp_connection_in_error (conn))
+    {
+      ftp->addr = G_SOCKET_CONNECTABLE (g_socket_connection_get_remote_address (G_SOCKET_CONNECTION (conn->commands), &conn->error));
+      if (ftp->addr == NULL)
+        {
+          DEBUG ("error querying remote address: %s\nUsing original address instead.", conn->error->message);
+          ftp_connection_clear_error (conn);
+          ftp->addr = g_object_ref (addr);
+        }
+    }
+
   if (ftp_connection_in_error (conn))
     {
       ftp_connection_pop_job (conn);
@@ -1614,7 +1632,7 @@ try_login:
 	{
 	  /* a prompt was created, so we have to save the password */
 	  g_vfs_keyring_save_password (ftp->user,
-				       g_network_address_get_hostname (G_NETWORK_ADDRESS (ftp->addr)),
+				       g_network_address_get_hostname (addr),
 				       NULL,
 				       "ftp",
 				       NULL,
@@ -1626,7 +1644,7 @@ try_login:
 	}
 
       mount_spec = g_mount_spec_new ("ftp");
-      g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (G_NETWORK_ADDRESS (ftp->addr)));
+      g_mount_spec_set (mount_spec, "host", g_network_address_get_hostname (addr));
       if (port != 21)
 	{
 	  char *port_str = g_strdup_printf ("%u", port);
@@ -1656,6 +1674,8 @@ try_login:
       ftp->queue = g_queue_new ();
       g_vfs_backend_ftp_push_connection (ftp, conn);
     }
+  
+  g_object_unref (addr);
 }
 
 static gboolean
