@@ -137,6 +137,7 @@ struct _GVfsBackendFtp
   char *		user;
   gboolean              has_initial_user;
   char *		password;	/* password or NULL for anonymous */
+  char *                host_display_name;
 
   /* vfuncs */
   const FtpDirReader *	dir_ops;
@@ -1482,7 +1483,6 @@ do_mount (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  char *host;
   char *prompt = NULL;
   char *username;
   char *password;
@@ -1506,14 +1506,6 @@ do_mount (GVfsBackend *backend,
   ftp_connection_prepare (conn);
 
   port = soup_address_get_port (ftp->addr);
-  /* FIXME: need to translate this? */
-  if (port == 21)
-    host = g_strdup (soup_address_get_name (ftp->addr));
-  else
-    host = g_strdup_printf ("%s:%u", 
-	                    soup_address_get_name (ftp->addr),
-	                    port);
-
   username = NULL;
   password = NULL;
   break_on_fail = FALSE;
@@ -1547,10 +1539,10 @@ do_mount (GVfsBackend *backend,
 	{
 	  if (ftp->has_initial_user)
 	    /* Translators: the first %s is the username, the second the host name */
-	    prompt = g_strdup_printf (_("Enter password for ftp as %s on %s"), ftp->user, host);
+	    prompt = g_strdup_printf (_("Enter password for ftp as %s on %s"), ftp->user, ftp->host_display_name);
 	  else
 	    /* translators: %s here is the hostname */
-	    prompt = g_strdup_printf (_("Enter password for ftp on %s"), host);
+	    prompt = g_strdup_printf (_("Enter password for ftp on %s"), ftp->host_display_name);
 	}
 	  
       flags = G_ASK_PASSWORD_NEED_PASSWORD;
@@ -1655,11 +1647,11 @@ try_login:
         g_mount_spec_set (mount_spec, "user", ftp->user);
           
       if (g_str_equal (ftp->user, "anonymous"))
-        display_name = g_strdup_printf (_("ftp on %s"), host);
+        display_name = g_strdup_printf (_("ftp on %s"), ftp->host_display_name);
       else
 	{
 	  /* Translators: the first %s is the username, the second the host name */
-	  display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, host);
+	  display_name = g_strdup_printf (_("ftp as %s on %s"), ftp->user, ftp->host_display_name);
 	}
       g_vfs_backend_set_mount_spec (backend, mount_spec);
       g_mount_spec_unref (mount_spec);
@@ -1673,8 +1665,6 @@ try_login:
       ftp->queue = g_queue_new ();
       g_vfs_backend_ftp_push_connection (ftp, conn);
     }
-
-  g_free (host);
 }
 
 static gboolean
@@ -1698,7 +1688,9 @@ try_mount (GVfsBackend *backend,
     }
   port_str = g_mount_spec_get (mount_spec, "port");
   if (port_str == NULL)
-    port = 21;
+    {
+      port = 21;
+    }
   else
     {
       /* FIXME: error handling? */
@@ -1708,6 +1700,10 @@ try_mount (GVfsBackend *backend,
   ftp->addr = soup_address_new (host, port);
   ftp->user = g_strdup (g_mount_spec_get (mount_spec, "user"));
   ftp->has_initial_user = ftp->user != NULL;
+  if (port == 21)
+    ftp->host_display_name = g_strdup (host);
+  else
+    ftp->host_display_name = g_strdup_printf ("%s:%u", host, port);
 
   return FALSE;
 }
