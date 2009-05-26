@@ -1378,6 +1378,11 @@ soup_authenticate_interactive (SoupSession *session,
 
   if (res && !aborted)
     {
+      /* it's not safe to assume that we get the username filed in,
+         in the case that we provied a default username */
+      if (new_username == NULL)
+        new_username = g_strdup (info->username);
+
       soup_auth_authenticate (auth, new_username, new_password);
 
       g_free (info->username);
