@@ -49,14 +49,7 @@
 #include "gvfskeyring.h"
 
 #include "ParseFTPList.h"
-
-#define PRINT_DEBUG
-
-#ifdef PRINT_DEBUG
-#define DEBUG g_print
-#else
-#define DEBUG(...)
-#endif
+#include "gvfsftpconnection.h"
 
 /* timeout for network connect/send/receive (use 0 for none) */
 #define TIMEOUT_IN_SECONDS 30
@@ -172,14 +165,8 @@ struct _FtpConnection
   FtpSystem		system;
   FtpWorkarounds	workarounds;
 
-  GSocketClient *       client;                 /* used for both command and data connection */
-  GIOStream *		commands;               /* ftp command stream */
-  gchar *	      	read_buffer;            /* buffer for reading commands */
-  gsize			read_buffer_size;       /* size of read_buffer */
-  gsize			read_bytes;             /* amount of bytes already read */
-  gsize                 read_lines;             /* end of last processed line */
-
-  GIOStream *		data;                   /* ftp data stream */
+  GVfsFtpConnection *   conn;                   /* the connection in use */
+  char **               read_buffer;
 };
 
 static void
@@ -187,12 +174,9 @@ ftp_connection_free (FtpConnection *conn)
 {
   g_assert (conn->job == NULL);
 
-  if (conn->commands)
-    g_object_unref (conn->commands);
-  if (conn->data)
-    g_object_unref (conn->data);
-  g_object_unref (conn->client);
-  g_free (conn->read_buffer);
+  if (conn->conn)
+    g_vfs_ftp_connection_free (conn->conn);
+  g_strfreev (conn->read_buffer);
 
   g_slice_free (FtpConnection, conn);
 }
@@ -342,82 +326,6 @@ typedef enum {
   RESPONSE_FAIL_200 = (1 << 5)
 } ResponseFlags;
 
-static void
-ftp_connection_receive_purge (FtpConnection *conn)
-{
-  if (conn->read_bytes >= conn->read_lines)
-    {
-      memmove (conn->read_buffer, conn->read_buffer + conn->read_lines, conn->read_bytes - conn->read_lines);
-      conn->read_bytes -= conn->read_lines;
-      conn->read_lines = 0;
-    }
-  else
-    {
-      conn->read_bytes = 0;
-      conn->read_lines = 0;
-    }
-}
-
-static const char *
-ftp_connection_receive_line (FtpConnection *conn)
-{
-  gssize n_bytes;
-  char *newline;
-
-  for (;;) {
-    newline = memchr (conn->read_buffer + conn->read_lines,
-                      '\r',
-                      conn->read_bytes - conn->read_lines);
-    if (newline &&
-        /* checks newline isn't last character we've read */
-        newline - conn->read_buffer + 1 < conn->read_bytes &&
-        newline[1] == '\n')
-      {
-        const char *result;
-        
-        /* NULL the newline, so we can use the strings in there without copies */
-        newline[0] = 0;
-        newline[1] = 0;
-        
-        result = conn->read_buffer + conn->read_lines;
-        conn->read_lines = newline - conn->read_buffer + 2;
-        g_assert (conn->read_lines <= conn->read_bytes);
-        return result;
-      }
-
-    if (conn->read_buffer_size - conn->read_bytes < 128)
-      {
-        gsize new_size = conn->read_buffer_size + 1024;
-        /* FIXME: upper limit for size? */
-        gchar *new = g_try_realloc (conn->read_buffer, new_size);
-        if (new)
-          {
-            conn->read_buffer = new;
-            conn->read_buffer_size = new_size;
-          }
-        else
-          {
-            g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                 _("Invalid reply"));
-            return NULL;
-          }
-      }
-      
-    n_bytes = g_input_stream_read (g_io_stream_get_input_stream (conn->commands),
-                                   conn->read_buffer + conn->read_bytes,
-                                   conn->read_buffer_size - conn->read_bytes,
-                                   conn->job->cancellable,
-                                   &conn->error);
-
-    if (n_bytes < 0)
-      return NULL;
-
-    conn->read_bytes += n_bytes;
-  }
-
-  g_assert_not_reached ();
-}
-
 /**
  * ftp_connection_receive:
  * @conn: connection to receive from
@@ -435,62 +343,20 @@ static guint
 ftp_connection_receive (FtpConnection *conn,
 			ResponseFlags  flags)
 {
-  const char *line;
-  enum {
-    FIRST_LINE,
-    MULTILINE,
-    DONE
-  } reply_state = FIRST_LINE;
-  guint response = 0;
+  guint response;
 
   g_assert (conn->job != NULL);
 
   if (ftp_connection_in_error (conn))
     return 0;
 
-  ftp_connection_receive_purge (conn);
+  g_strfreev (conn->read_buffer);
+  conn->read_buffer = NULL;
 
-  while (reply_state != DONE)
-    {
-      line = ftp_connection_receive_line (conn);
-      if (line == NULL)
-        return 0;
-
-      DEBUG ("<-- %s\n", line);
-
-      if (reply_state == FIRST_LINE)
-	{
-	  if (line[0] <= '0' || line[0] > '5' ||
-	      line[1] < '0' || line[1] > '9' ||
-	      line[2] < '0' || line[2] > '9')
-	    {
-	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-				   _("Invalid reply"));
-	      return 0;
-	    }
-	  response = 100 * (line[0] - '0') +
-		      10 * (line[1] - '0') +
-		 	   (line[2] - '0');
-	  if (line[3] == ' ')
-	    reply_state = DONE;
-	  else if (line[3] == '-')
-	    reply_state = MULTILINE;
-	  else
-	    {
-	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-				   _("Invalid reply"));
-	      return 0;
-	    }
-	}
-      else
-	{
-	  if (line[0] == conn->read_buffer[0] &&
-              line[1] == conn->read_buffer[1] &&
-              line[2] == conn->read_buffer[2] &&
-	      line[3] == ' ')
-	    reply_state = DONE;
-	}
-    }
+  response = g_vfs_ftp_connection_receive (conn->conn, 
+                                           &conn->read_buffer,
+                                           conn->job->cancellable,
+                                           &conn->error);
 
   switch (STATUS_GROUP (response))
     {
@@ -570,10 +436,9 @@ ftp_connection_sendv (FtpConnection *conn,
     DEBUG ("--> %s\n", command->str);
 #endif
   g_string_append (command, "\r\n");
-  g_output_stream_write_all (g_io_stream_get_output_stream (conn->commands),
+  g_vfs_ftp_connection_send (conn->conn,
                              command->str,
                              command->len,
-                             NULL,
                              conn->job->cancellable,
                              &conn->error);
   
@@ -669,17 +534,11 @@ ftp_connection_parse_features (FtpConnection *conn)
     { "EPSV", FTP_FEATURE_EPSV },
     { "UTF8", FTP_FEATURE_UTF8 },
   };
-  char **supported;
   guint i, j;
 
-  /* The "\n" should really be "\r\n" but we deal with both to handle broken
-   * servers. We strip off '\r' later, if it exists. */
-  supported = g_strsplit (conn->read_buffer, "\n", -1);
-
-  for (i = 1; supported[i]; i++)
+  for (i = 1; conn->read_buffer[i]; i++)
     {
-      char *feature = supported[i];
-      int len;
+      char *feature = conn->read_buffer[i];
 
       if (feature[0] != ' ')
 	continue;
@@ -691,11 +550,6 @@ ftp_connection_parse_features (FtpConnection *conn)
       while (g_ascii_isspace (feature[0]))
         feature++;
 
-      /* strip off trailing '\r', if it exists. */
-      len = strlen(feature);
-      if (len > 0 && feature[len-1] == '\r')
-	      feature[len-1] = '\0';
-
       for (j = 0; j < G_N_ELEMENTS (features); j++)
 	{
 	  if (g_ascii_strcasecmp (feature, features[j].name) == 0)
@@ -705,25 +559,21 @@ ftp_connection_parse_features (FtpConnection *conn)
 	    }
 	}
     }
-  
-  g_strfreev (supported);
 }
 
 /* NB: you must free the connection if it's in error returning from here */
 static FtpConnection *
-ftp_connection_create (GSocketConnectable *connectable,
-		       GVfsJob *           job)
+ftp_connection_create (GSocketConnectable *addr,
+		       GVfsJob *       job)
 {
   FtpConnection *conn;
 
   conn = g_slice_new0 (FtpConnection);
   ftp_connection_push_job (conn, job);
 
-  conn->client = g_socket_client_new ();
-  conn->commands = G_IO_STREAM (g_socket_client_connect (conn->client,
-                                                         connectable,
-                                                         conn->job->cancellable,
-                                                         &conn->error));
+  conn->conn = g_vfs_ftp_connection_new (addr,
+                                         conn->job->cancellable,
+                                         &conn->error);
 
   ftp_connection_receive (conn, 0);
   return conn;
@@ -773,7 +623,7 @@ ftp_connection_parse_system (FtpConnection *conn)
     { "WINDOWS_NT ", FTP_SYSTEM_WINDOWS }
   };
   guint i;
-  char *system_name = conn->read_buffer + 4;
+  char *system_name = conn->read_buffer[0] + 4;
 
   for (i = 0; i < G_N_ELEMENTS (known_systems); i++) 
     {
@@ -854,7 +704,7 @@ ftp_connection_create_remote_address (FtpConnection *conn, guint port)
 {
   GSocketAddress *old, *new;
 
-  old = g_socket_connection_get_remote_address (G_SOCKET_CONNECTION (conn->commands), &conn->error);
+  old = g_vfs_ftp_connection_get_address (conn->conn, &conn->error);
   if (old == NULL)
     return NULL;
   g_assert (G_IS_INET_SOCKET_ADDRESS (old));
@@ -883,7 +733,8 @@ ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
   if (STATUS_GROUP (status) != 2)
     return FALSE;
 
-  s = strrchr (conn->read_buffer, '(');
+  /* FIXME: parse multiple lines? */
+  s = strrchr (conn->read_buffer[0], '(');
   if (!s)
     return FALSE;
 
@@ -896,18 +747,19 @@ ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
   if (addr == NULL)
     return FALSE;
 
-  conn->data = G_IO_STREAM (g_socket_client_connect (conn->client,
-                                                     G_SOCKET_CONNECTABLE (addr),
-                                                     conn->job->cancellable,
-                                                     &conn->error));
-  g_object_unref (addr);
-  if (conn->data == NULL)
+  if (!g_vfs_ftp_connection_open_data_connection (conn->conn,
+                                                    addr,
+                                                    conn->job->cancellable,
+                                                    &conn->error))
     {
+      g_object_unref (addr);
       DEBUG ("Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
       conn->workarounds |= FTP_WORKAROUND_BROKEN_EPSV;
       ftp_connection_clear_error (conn);
       return FALSE;
     }
+  
+  g_object_unref (addr);
   return TRUE;
 }
 
@@ -927,7 +779,7 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
   /* parse response and try to find the address to connect to.
    * This code does the same as curl.
    */
-  for (s = conn->read_buffer; *s; s++)
+  for (s = conn->read_buffer[0]; *s; s++)
     {
       if (sscanf (s, "%u,%u,%u,%u,%u,%u", 
 		 &ip1, &ip2, &ip3, &ip4, 
@@ -954,14 +806,16 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
       addr = g_inet_socket_address_new (inet_addr, port1 << 8 | port2);
       g_object_unref (inet_addr);
 
-      conn->data = G_IO_STREAM (g_socket_client_connect (conn->client,
-                                                         G_SOCKET_CONNECTABLE (addr),
-                                                         conn->job->cancellable,
-                                                         &conn->error));
-      g_object_unref (addr);
-      if (conn->data)
-        return TRUE;
+      if (g_vfs_ftp_connection_open_data_connection (conn->conn,
+                                                       addr,
+                                                       conn->job->cancellable,
+                                                       &conn->error))
+        {
+          g_object_unref (addr);
+          return TRUE;
+        }
          
+      g_object_unref (addr);
       /* set workaround flag (see below), so we don't try this again */
       DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
       conn->workarounds |= FTP_WORKAROUND_PASV_ADDR;
@@ -978,18 +832,24 @@ ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
   addr = ftp_connection_create_remote_address (conn, port1 << 8 | port2);
   if (addr == NULL)
     return FALSE;
-  conn->data = G_IO_STREAM (g_socket_client_connect (conn->client,
-                                                     G_SOCKET_CONNECTABLE (addr),
-                                                     conn->job->cancellable,
-                                                     &conn->error));
+  if (!g_vfs_ftp_connection_open_data_connection (conn->conn,
+                                                    addr,
+                                                    conn->job->cancellable,
+                                                    &conn->error))
+    {
+      g_object_unref (addr);
+      return FALSE;
+    }
+
   g_object_unref (addr);
-  return conn->data != NULL;
+  return TRUE;
 }
 
 static gboolean
 ftp_connection_ensure_data_connection (FtpConnection *conn)
 {
-  g_assert (conn->data == NULL);
+  if (ftp_connection_in_error (conn))
+    return FALSE;
 
   if (ftp_connection_ensure_data_connection_epsv (conn))
     return TRUE;
@@ -1006,11 +866,7 @@ ftp_connection_ensure_data_connection (FtpConnection *conn)
 static void
 ftp_connection_close_data_connection (FtpConnection *conn)
 {
-  if (conn == NULL || conn->data == NULL)
-    return;
-
-  g_object_unref (conn->data);
-  conn->data = NULL;
+  g_vfs_ftp_connection_close_data_connection (conn->conn);
 }
 
 /*** FILE MAPPINGS ***/
@@ -1612,7 +1468,7 @@ try_login:
    */
   if (!ftp_connection_in_error (conn))
     {
-      ftp->addr = G_SOCKET_CONNECTABLE (g_socket_connection_get_remote_address (G_SOCKET_CONNECTION (conn->commands), &conn->error));
+      ftp->addr = G_SOCKET_CONNECTABLE (g_vfs_ftp_connection_get_address (conn->conn, &conn->error));
       if (ftp->addr == NULL)
         {
           DEBUG ("error querying remote address: %s\nUsing original address instead.", conn->error->message);
@@ -1856,11 +1712,11 @@ do_read (GVfsBackend *     backend,
 
   ftp_connection_push_job (conn, G_VFS_JOB (job));
 
-  n_bytes = g_input_stream_read (g_io_stream_get_input_stream (conn->data),
-		                 buffer,
-		                 bytes_requested,
-		                 conn->job->cancellable,
-		                 &conn->error);
+  n_bytes = g_vfs_ftp_connection_read_data (conn->conn,
+                                            buffer,
+                                            bytes_requested,
+                                            conn->job->cancellable,
+                                            &conn->error);
 
   if (n_bytes >= 0)
     g_vfs_job_read_set_size (job, n_bytes);
@@ -2049,12 +1905,12 @@ do_write (GVfsBackend *backend,
   ftp_connection_push_job (conn, G_VFS_JOB (job));
 
   /* FIXME: use write_all here? */
-  n_bytes = g_output_stream_write (g_io_stream_get_output_stream (conn->data),
-		                   buffer,
-		                   buffer_size,
-                                   G_VFS_JOB (job)->cancellable,
-                                   &conn->error);
-  
+  n_bytes = g_vfs_ftp_connection_write_data (conn->conn,
+                                             buffer,
+                                             buffer_size,
+                                             G_VFS_JOB (job)->cancellable,
+                                             &conn->error);
+            
   if (n_bytes >= 0)
     g_vfs_job_write_set_written_size (job, n_bytes);
   ftp_connection_pop_job (conn);
@@ -2109,11 +1965,11 @@ do_enumerate_directory (FtpConnection *conn)
 	      return NULL;
 	    }
 	}
-      n_bytes = g_input_stream_read (g_io_stream_get_input_stream (conn->data),
-                                     entry->data + entry->length,
-                                     entry->size - entry->length - 1,
-                                     conn->job->cancellable,
-                                     &conn->error);
+      n_bytes = g_vfs_ftp_connection_read_data (conn->conn,
+                                                entry->data + entry->length,
+                                                entry->size - entry->length - 1,
+                                                conn->job->cancellable,
+                                                &conn->error);
 
       if (n_bytes < 0)
         {
@@ -2239,7 +2095,7 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
 
       gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_REGULAR);
 
-      g_file_info_set_size (info, g_ascii_strtoull (conn->read_buffer+4, NULL, 0));
+      g_file_info_set_size (info, g_ascii_strtoull (conn->read_buffer[0] + 4, NULL, 0));
 
       g_file_info_set_is_hidden (info, TRUE);
     }
