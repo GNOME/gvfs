@@ -51,9 +51,7 @@
 #include "ParseFTPList.h"
 #include "gvfsftpconnection.h"
 #include "gvfsftpfile.h"
-
-/* timeout for network connect/send/receive (use 0 for none) */
-#define TIMEOUT_IN_SECONDS 30
+#include "gvfsftptask.h"
 
 /*
  * about filename interpretation in the ftp backend
@@ -69,9 +67,6 @@
  * paths exactly match those of a TVFS-using FTP server.
  */
 
-/* unsinged char is on purpose, so we get warnings when we misuse them */
-typedef struct _FtpConnection FtpConnection;
-
 typedef struct _FtpDirEntry FtpDirEntry;
 struct _FtpDirEntry {
   gsize         size;
@@ -79,13 +74,12 @@ struct _FtpDirEntry {
   gchar         data[1];
 };
 
-typedef struct FtpDirReader FtpDirReader;
 struct FtpDirReader {
-  void		(* init_data)	(FtpConnection *    conn,
+  void		(* init_data)	(GVfsFtpTask *      task,
 				 const GVfsFtpFile *dir);
-  gpointer	(* iter_new)	(FtpConnection *    conn);
+  gpointer	(* iter_new)	(GVfsFtpTask *      task);
   GFileInfo *	(* iter_process)(gpointer           iter,
-				 FtpConnection *    conn,
+				 GVfsFtpTask *      task,
 				 const GVfsFtpFile *dirname,
 				 const GVfsFtpFile *must_match_file,
 				 const char *       line,
@@ -93,452 +87,33 @@ struct FtpDirReader {
   void		(* iter_free)	(gpointer	    iter);
 };
 
-typedef enum {
-  FTP_FEATURE_MDTM = (1 << 0),
-  FTP_FEATURE_SIZE = (1 << 1),
-  FTP_FEATURE_TVFS = (1 << 2),
-  FTP_FEATURE_EPSV = (1 << 3),
-  FTP_FEATURE_UTF8 = (1 << 4),
-} FtpFeatures;
-#define FTP_FEATURES_DEFAULT (FTP_FEATURE_EPSV)
-
-typedef enum {
-  FTP_SYSTEM_UNKNOWN = 0,
-  FTP_SYSTEM_UNIX,
-  FTP_SYSTEM_WINDOWS
-} FtpSystem;
-
-typedef enum {
-  /* Server advertises support for EPSV (or we assume that it supports it),
-   * but it does fail to do so, we set this flag so we can fall back to 
-   * PASV. */
-  FTP_WORKAROUND_BROKEN_EPSV = (1 << 0),
-  /* Server replies with a wrong address in PASV, we use connection IP 
-   * instead */
-  FTP_WORKAROUND_PASV_ADDR = (1 << 1),
-  /* server does not allow querying features before login, so we try after
-   * logging in instead. */
-  FTP_WORKAROUND_FEAT_AFTER_LOGIN = (1 << 2),
-} FtpWorkarounds;
-
-struct _GVfsBackendFtp
-{
-  GVfsBackend		backend;
-
-  GSocketConnectable *  addr;
-  GSocketClient *       connection_factory;
-  char *		user;
-  gboolean              has_initial_user;
-  char *		password;	/* password or NULL for anonymous */
-  char *                host_display_name;
-
-  /* vfuncs */
-  const FtpDirReader *	dir_ops;
-
-  /* connection collection */
-  GQueue *		queue;
-  GMutex *		mutex;
-  GCond *		cond;
-  guint			connections;
-  guint			max_connections;
-
-  /* caching results from dir queries */
-  GStaticRWLock		directory_cache_lock;
-  GHashTable *		directory_cache;
-};
-
 G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
 
-#define STATUS_GROUP(status) ((status) / 100)
-
-typedef void (* Ftp550Handler) (FtpConnection *conn, const GVfsFtpFile *file);
-
-/*** FTP CONNECTION ***/
-
-struct _FtpConnection
-{
-  /* per-job data */
-  GError *		error;
-  GVfsJob *		job;
-
-  FtpFeatures		features;
-  FtpSystem		system;
-  FtpWorkarounds	workarounds;
-
-  GVfsFtpConnection *   conn;                   /* the connection in use */
-  char **               read_buffer;
-};
-
-static void
-ftp_connection_free (FtpConnection *conn)
-{
-  g_assert (conn->job == NULL);
-
-  if (conn->conn)
-    g_vfs_ftp_connection_free (conn->conn);
-  g_strfreev (conn->read_buffer);
-
-  g_slice_free (FtpConnection, conn);
-}
-
-#define ftp_connection_in_error(conn) ((conn)->error != NULL)
-#define ftp_connection_clear_error(conn) (g_clear_error (&(conn)->error))
+/*** CODE ***/
 
 static gboolean
-ftp_connection_pop_job (FtpConnection *conn)
+gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
 {
-  gboolean result;
-  GError *error;
-  GVfsJob *job;
-
-  g_return_val_if_fail (conn->job != NULL, FALSE);
-
-  /* sending a reply is racy after the reply is sent. The connection may be
-   * reused in a different thread before the reply sending returns. This is
-   * racy in particular when the connection is used as a read/write handle.
-   */
-  error = conn->error;
-  conn->error = NULL;
-  job = conn->job;
-  conn->job = NULL;
-
-  if (error)
-    {
-      g_vfs_job_failed_from_error (job, error);
-      g_clear_error (&error);
-      result = FALSE;
-    }
-  else
-    {
-      g_vfs_job_succeeded (job);
-      result = TRUE;
-    }
-
-  return result;
-}
-
-static void
-ftp_connection_push_job (FtpConnection *conn, GVfsJob *job)
-{
-  g_return_if_fail (conn->job == NULL);
-
-  /* FIXME: ref the job? */
-  conn->job = job;
-}
-
-/**
- * ftp_error_set_from_response:
- * @error: pointer to an error to be set or %NULL
- * @response: an FTP response code to use as the error message
- *
- * Sets an error based on an FTP response code.
- **/
-static void
-ftp_connection_set_error_from_response (FtpConnection *conn, guint response)
-{
-  const char *msg;
-  int code;
-
-  /* Please keep this list ordered by response code,
-   * but group responses with the same message. */
-  switch (response)
-    {
-      case 332: /* Need account for login. */
-      case 532: /* Need account for storing files. */
-	/* FIXME: implement a sane way to handle accounts. */
-	code = G_IO_ERROR_NOT_SUPPORTED;
-	msg = _("Accounts are unsupported");
-	break;
-      case 421: /* Service not available, closing control connection. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Host closed connection");
-	break;
-      case 425: /* Can't open data connection. */
-	code = G_IO_ERROR_CLOSED;
-	msg = _("Cannot open data connection. Maybe your firewall prevents this?");
-	break;
-      case 426: /* Connection closed; transfer aborted. */
-	code = G_IO_ERROR_CLOSED;
-	msg = _("Data connection closed");
-	break;
-      case 450: /* Requested file action not taken. File unavailable (e.g., file busy). */
-      case 550: /* Requested action not taken. File unavailable (e.g., file not found, no access). */
-	/* FIXME: This is a lot of different errors. So we have to pretend to 
-	 * be smart here. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Operation failed");
-	break;
-      case 451: /* Requested action aborted: local error in processing. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Operation failed");
-	break;
-      case 452: /* Requested action not taken. Insufficient storage space in system. */
-      case 552:
-	code = G_IO_ERROR_NO_SPACE;
-	msg = _("No space left on server");
-	break;
-      case 500: /* Syntax error, command unrecognized. */
-      case 501: /* Syntax error in parameters or arguments. */
-      case 502: /* Command not implemented. */
-      case 503: /* Bad sequence of commands. */
-      case 504: /* Command not implemented for that parameter. */
-	code = G_IO_ERROR_NOT_SUPPORTED;
-	msg = _("Operation unsupported");
-	break;
-      case 530: /* Not logged in. */
-	code = G_IO_ERROR_PERMISSION_DENIED;
-	msg = _("Permission denied");
-	break;
-      case 551: /* Requested action aborted: page type unknown. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Page type unknown");
-	break;
-      case 553: /* Requested action not taken. File name not allowed. */
-	code = G_IO_ERROR_INVALID_FILENAME;
-	msg = _("Invalid filename");
-	break;
-      default:
-	code = G_IO_ERROR_FAILED;
-	msg = _("Invalid reply");
-	break;
-    }
-
-  DEBUG ("error: %s\n", msg);
-  g_set_error_literal (&conn->error, G_IO_ERROR, code, msg);
-}
-
-/**
- * ResponseFlags:
- * RESPONSE_PASS_100: Don't treat 1XX responses, but return them
- * RESPONSE_PASS_300: Don't treat 3XX responses, but return them
- * RESPONSE_PASS_400: Don't treat 4XX responses, but return them
- * RESPONSE_PASS_500: Don't treat 5XX responses, but return them
- * RESPONSE_PASS_550: Don't treat 550 responses, but return them
- * RESPONSE_FAIL_200: Fail on a 2XX response
- */
-
-typedef enum {
-  RESPONSE_PASS_100 = (1 << 0),
-  RESPONSE_PASS_300 = (1 << 1),
-  RESPONSE_PASS_400 = (1 << 2),
-  RESPONSE_PASS_500 = (1 << 3),
-  RESPONSE_PASS_550 = (1 << 4),
-  RESPONSE_FAIL_200 = (1 << 5)
-} ResponseFlags;
-
-/**
- * ftp_connection_receive:
- * @conn: connection to receive from
- * @flags: flags for handling the response
- * @error: pointer to error message
- *
- * Reads a command and stores it in @conn->read_buffer. The read buffer will be
- * null-terminated and contain @conn->read_bytes bytes. Afterwards, the response
- * will be parsed and processed according to @flags. By default, all responses
- * but 2xx will cause an error.
- *
- * Returns: 0 on error, the ftp code otherwise
- **/
-static guint
-ftp_connection_receive (FtpConnection *conn,
-			ResponseFlags  flags)
-{
-  guint response;
-
-  g_assert (conn->job != NULL);
-
-  if (ftp_connection_in_error (conn))
-    return 0;
-
-  g_strfreev (conn->read_buffer);
-  conn->read_buffer = NULL;
-
-  response = g_vfs_ftp_connection_receive (conn->conn, 
-                                           &conn->read_buffer,
-                                           conn->job->cancellable,
-                                           &conn->error);
-
-  switch (STATUS_GROUP (response))
-    {
-      case 0:
-	return 0;
-      case 1:
-	if (flags & RESPONSE_PASS_100)
-	  break;
-	ftp_connection_set_error_from_response (conn, response);
-	return 0;
-      case 2:
-	if (flags & RESPONSE_FAIL_200)
-	  {
-	    ftp_connection_set_error_from_response (conn, response);
-	    return 0;
-	  }
-	break;
-      case 3:
-	if (flags & RESPONSE_PASS_300)
-	  break;
-	ftp_connection_set_error_from_response (conn, response);
-	return 0;
-      case 4:
-	if (flags & RESPONSE_PASS_400)
-	  break;
-	ftp_connection_set_error_from_response (conn, response);
-	return 0;
-	break;
-      case 5:
-	if ((flags & RESPONSE_PASS_500) || (response == 550 && (flags & RESPONSE_PASS_550)))
-	  break;
-	ftp_connection_set_error_from_response (conn, response);
-	return 0;
-      default:
-	g_assert_not_reached ();
-	break;
-    }
-
-  return response;
-}
-
-/**
- * ftp_connection_send:
- * @conn: the connection to send to
- * @flags: #ResponseFlags to use
- * @error: pointer to take an error
- * @format: format string to construct command from 
- *          (without trailing \r\n)
- * @...: arguments to format string
- *
- * Takes a command, waits for an answer and parses it. Without any @flags, FTP 
- * codes other than 2xx cause an error. The last read ftp command will be put 
- * into @conn->read_buffer.
- *
- * Returns: 0 on error or the received FTP code otherwise.
- *     
- **/
-static guint
-ftp_connection_sendv (FtpConnection *conn,
-		      ResponseFlags  flags,
-		      const char *   format,
-		      va_list	     varargs)
-{
-  GString *command;
-
-  g_assert (conn->job != NULL);
-
-  if (ftp_connection_in_error (conn))
-    return 0;
-
-  command = g_string_new ("");
-  g_string_append_vprintf (command, format, varargs);
-#ifdef PRINT_DEBUG
-  if (g_str_has_prefix (command->str, "PASS"))
-    DEBUG ("--> PASS ***\n");
-  else
-    DEBUG ("--> %s\n", command->str);
-#endif
-  g_string_append (command, "\r\n");
-  g_vfs_ftp_connection_send (conn->conn,
-                             command->str,
-                             command->len,
-                             conn->job->cancellable,
-                             &conn->error);
-  
-  g_string_free (command, TRUE);
-
-  return ftp_connection_receive (conn, flags);
-}
-
-static guint
-ftp_connection_send (FtpConnection *conn,
-		     ResponseFlags  flags,
-		     const char *   format,
-		     ...) G_GNUC_PRINTF (3, 4);
-static guint
-ftp_connection_send (FtpConnection *conn,
-		     ResponseFlags  flags,
-		     const char *   format,
-		     ...)
-{
-  va_list varargs;
-  guint response;
-
-  va_start (varargs, format);
-  response = ftp_connection_sendv (conn,
-				   flags,
-				   format,
-				   varargs);
-  va_end (varargs);
-  return response;
-}
-
-static void
-ftp_connection_check_file (FtpConnection *conn,
-                           const Ftp550Handler *handlers,
-                           const GVfsFtpFile *file)
-{
-  while (*handlers && !ftp_connection_in_error (conn))
-    {
-      (*handlers) (conn, file);
-      handlers++;
-    }
-}
-
-static guint
-ftp_connection_send_and_check (FtpConnection *conn,
-                               ResponseFlags flags,
-                               const Ftp550Handler *handlers,
-                               const GVfsFtpFile *file,
-                               const char *format,
-                               ...) G_GNUC_PRINTF (5, 6);
-static guint
-ftp_connection_send_and_check (FtpConnection *conn,
-                               ResponseFlags flags,
-                               const Ftp550Handler *handlers,
-                               const GVfsFtpFile *file,
-                               const char *format,
-                               ...)
-{
-  va_list varargs;
-  guint response;
-
-  /* check that there's no 550 handling used - don't allow bad use of API */
-  g_return_val_if_fail ((flags & RESPONSE_PASS_550) == 0, 0);
-  g_return_val_if_fail (handlers != NULL, 0);
-  g_return_val_if_fail (file != NULL, 0);
-
-  va_start (varargs, format);
-  response = ftp_connection_sendv (conn,
-                                   flags | RESPONSE_PASS_550,
-                                   format,
-                                   varargs);
-  va_end (varargs);
-  if (response == 550)
-    {
-      ftp_connection_check_file (conn, handlers, file);
-      if (!ftp_connection_in_error (conn))
-          ftp_connection_set_error_from_response (conn, response);
-      response = 0;
-    }
-  return response;
-}
-
-static void
-ftp_connection_parse_features (FtpConnection *conn)
-{
-  struct {
+  const struct {
     const char *	name;		/* name of feature */
-    FtpFeatures		enable;		/* flags to enable with this feature */
+    GVfsFtpFeature      enable;		/* flags to enable with this feature */
   } features[] = {
-    { "MDTM", FTP_FEATURE_MDTM },
-    { "SIZE", FTP_FEATURE_SIZE },
-    { "TVFS", FTP_FEATURE_TVFS },
-    { "EPSV", FTP_FEATURE_EPSV },
-    { "UTF8", FTP_FEATURE_UTF8 },
+    { "MDTM", G_VFS_FTP_FEATURE_MDTM },
+    { "SIZE", G_VFS_FTP_FEATURE_SIZE },
+    { "TVFS", G_VFS_FTP_FEATURE_TVFS },
+    { "EPSV", G_VFS_FTP_FEATURE_EPSV },
+    { "UTF8", G_VFS_FTP_FEATURE_UTF8 },
   };
   guint i, j;
+  char **reply;
 
-  for (i = 1; conn->read_buffer[i]; i++)
+  if (!g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "FEAT"))
+    return FALSE;
+
+  task->backend->features = 0;
+  for (i = 1; reply[i]; i++)
     {
-      char *feature = conn->read_buffer[i];
+      char *feature = reply[i];
 
       if (feature[0] != ' ')
 	continue;
@@ -555,338 +130,69 @@ ftp_connection_parse_features (FtpConnection *conn)
 	  if (g_ascii_strcasecmp (feature, features[j].name) == 0)
 	    {
 	      DEBUG ("feature %s supported\n", features[j].name);
-	      conn->features |= features[j].enable;
+	      task->backend->features |= 1 << features[j].enable;
 	    }
 	}
     }
-}
 
-/* NB: you must free the connection if it's in error returning from here */
-static FtpConnection *
-ftp_connection_create (GSocketConnectable *addr,
-		       GVfsJob *       job)
-{
-  FtpConnection *conn;
+  g_strfreev (reply);
 
-  conn = g_slice_new0 (FtpConnection);
-  ftp_connection_push_job (conn, job);
-
-  conn->conn = g_vfs_ftp_connection_new (addr,
-                                         conn->job->cancellable,
-                                         &conn->error);
-
-  ftp_connection_receive (conn, 0);
-  return conn;
-}
-
-static guint
-ftp_connection_login (FtpConnection *conn,
-		      const char *   username,
-		      const char *   password)
-{
-  guint status;
-
-  if (ftp_connection_in_error (conn))
-    return 0;
-
-  status = ftp_connection_send (conn, RESPONSE_PASS_300,
-                                "USER %s", username);
-  
-  if (STATUS_GROUP (status) == 3)
-    {
-      /* rationale for choosing the default password:
-       * - some ftp servers expect something that looks like an email address
-       * - we don't want to send the user's name or address, as that would be
-       *   a privacy problem
-       * - we want to give ftp server administrators a chance to notify us of 
-       *   problems with our client.
-       * - we don't want to drown in spam.
-       */
-      if (password == NULL || password[0] == 0)
-	password = "gvfsd-ftp-" VERSION "@example.com";
-      status = ftp_connection_send (conn, 0,
-				    "PASS %s", password);
-    }
-
-  return status;
+  return TRUE;
 }
 
 static void
-ftp_connection_parse_system (FtpConnection *conn)
+gvfs_backend_ftp_determine_system (GVfsFtpTask *task)
 {
   static const struct {
-    const char *id;
-    FtpSystem	system;
+    const char *  id;
+    GVfsFtpSystem system;
   } known_systems[] = {
     /* NB: the first entry that matches is taken, so order matters */
-    { "UNIX ", FTP_SYSTEM_UNIX },
-    { "WINDOWS_NT ", FTP_SYSTEM_WINDOWS }
+    { "UNIX ", G_VFS_FTP_SYSTEM_UNIX },
+    { "WINDOWS_NT ", G_VFS_FTP_SYSTEM_WINDOWS }
   };
   guint i;
-  char *system_name = conn->read_buffer[0] + 4;
+  char *system_name;
+  char **reply;
 
+  if (g_vfs_ftp_task_is_in_error (task))
+    return;
+
+  if (!g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "SYST"))
+    {
+      g_vfs_ftp_task_clear_error (task);
+      return;
+    }
+
+  system_name = reply[0] + 4;
   for (i = 0; i < G_N_ELEMENTS (known_systems); i++) 
     {
       if (g_ascii_strncasecmp (system_name, 
 	                       known_systems[i].id, 
 			       strlen (known_systems[i].id)) == 0)
 	{
-	  conn->system = known_systems[i].system;
-	  DEBUG ("system is %u\n", conn->system);
+	  task->backend->system = known_systems[i].system;
+	  DEBUG ("system is %u\n", task->backend->system);
 	  break;
 	}
     }
-}
 
-static void
-ftp_connection_prepare (FtpConnection *conn)
-{
-  /* check supported features */
-  if (ftp_connection_send (conn, 0, "FEAT") != 0) {
-    ftp_connection_parse_features (conn);
-  } else {
-    ftp_connection_clear_error(conn);
-    conn->workarounds |= FTP_WORKAROUND_FEAT_AFTER_LOGIN;
-    conn->features = 0;
-  }
-}
-
-static gboolean
-ftp_connection_use (FtpConnection *conn)
-{
-  /* only binary transfers please */
-  ftp_connection_send (conn, 0, "TYPE I");
-  if (ftp_connection_in_error (conn))
-    return FALSE;
-
-#if 0
-  /* RFC 2428 suggests to send this to make NAT routers happy */
-  /* XXX: Disabled for the following reasons:
-   * - most ftp clients don't use it
-   * - lots of broken ftp servers can't see the difference between 
-   *   "EPSV" and "EPSV ALL"
-   * - impossible to dynamically fall back to regular PASV in case
-   *   EPSV doesn't work for some reason.
-   * If this makes your ftp connection fail, please file a bug and we will
-   * try to invent a way to make this all work. Until then, we'll just 
-   * ignore the RFC.
-   */
-  if (conn->features & FTP_FEATURE_EPSV)
-    ftp_connection_send (conn, 0, "EPSV ALL");
-  ftp_connection_clear_error(conn);
-#endif
-
-  if (conn->workarounds & FTP_WORKAROUND_FEAT_AFTER_LOGIN) {
-    if (ftp_connection_send (conn, 0, "FEAT") != 0) {
-      ftp_connection_parse_features (conn);
-    } else {
-      ftp_connection_clear_error (conn);
-      conn->features = FTP_FEATURES_DEFAULT;
-    }
-  }
-
-  /* instruct server that we'll give and assume we get utf8 */
-  if (conn->features & FTP_FEATURE_UTF8) 
-    {
-      if (!ftp_connection_send (conn, 0, "OPTS UTF8 ON"))
-        ftp_connection_clear_error (conn);
-    }
-
-  if (ftp_connection_send (conn, 0, "SYST"))
-    ftp_connection_parse_system (conn);
-  ftp_connection_clear_error (conn);
-
-  return TRUE;
-}
-
-static GSocketAddress *
-ftp_connection_create_remote_address (FtpConnection *conn, guint port)
-{
-  GSocketAddress *old, *new;
-
-  old = g_vfs_ftp_connection_get_address (conn->conn, &conn->error);
-  if (old == NULL)
-    return NULL;
-  g_assert (G_IS_INET_SOCKET_ADDRESS (old));
-  new = g_inet_socket_address_new (g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (old)), port);
-
-  return new;
-}
-
-static gboolean
-ftp_connection_ensure_data_connection_epsv (FtpConnection *conn)
-{
-  const char *s;
-  guint port;
-  GSocketAddress *addr;
-  guint status;
-
-  g_assert (conn->error == NULL);
-
-  if ((conn->features & FTP_FEATURE_EPSV) == 0)
-    return FALSE;
-
-  if (conn->workarounds & FTP_WORKAROUND_BROKEN_EPSV)
-    return FALSE;
-
-  status = ftp_connection_send (conn, RESPONSE_PASS_500, "EPSV");
-  if (STATUS_GROUP (status) != 2)
-    return FALSE;
-
-  /* FIXME: parse multiple lines? */
-  s = strrchr (conn->read_buffer[0], '(');
-  if (!s)
-    return FALSE;
-
-  s += 4;
-  port = strtoul (s, NULL, 10);
-  if (port == 0)
-    return FALSE;
-
-  addr = ftp_connection_create_remote_address (conn, port);
-  if (addr == NULL)
-    return FALSE;
-
-  if (!g_vfs_ftp_connection_open_data_connection (conn->conn,
-                                                    addr,
-                                                    conn->job->cancellable,
-                                                    &conn->error))
-    {
-      g_object_unref (addr);
-      DEBUG ("Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
-      conn->workarounds |= FTP_WORKAROUND_BROKEN_EPSV;
-      ftp_connection_clear_error (conn);
-      return FALSE;
-    }
-  
-  g_object_unref (addr);
-  return TRUE;
-}
-
-static gboolean
-ftp_connection_ensure_data_connection_pasv (FtpConnection *conn)
-{
-  guint ip1, ip2, ip3, ip4, port1, port2;
-  const char *s;
-  GSocketAddress *addr;
-  guint status;
-
-  /* only binary transfers please */
-  status = ftp_connection_send (conn, 0, "PASV");
-  if (status == 0)
-    return FALSE;
-
-  /* parse response and try to find the address to connect to.
-   * This code does the same as curl.
-   */
-  for (s = conn->read_buffer[0]; *s; s++)
-    {
-      if (sscanf (s, "%u,%u,%u,%u,%u,%u", 
-		 &ip1, &ip2, &ip3, &ip4, 
-		 &port1, &port2) == 6)
-       break;
-    }
-  if (*s == 0)
-    {
-      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid reply"));
-      return FALSE;
-    }
-
-  if (!(conn->workarounds & FTP_WORKAROUND_PASV_ADDR))
-    {
-      guint8 ip[4];
-      GInetAddress *inet_addr;
-
-      ip[0] = ip1;
-      ip[1] = ip2;
-      ip[2] = ip3;
-      ip[3] = ip4;
-      inet_addr = g_inet_address_new_from_bytes (ip, G_SOCKET_FAMILY_IPV4);
-      addr = g_inet_socket_address_new (inet_addr, port1 << 8 | port2);
-      g_object_unref (inet_addr);
-
-      if (g_vfs_ftp_connection_open_data_connection (conn->conn,
-                                                       addr,
-                                                       conn->job->cancellable,
-                                                       &conn->error))
-        {
-          g_object_unref (addr);
-          return TRUE;
-        }
-         
-      g_object_unref (addr);
-      /* set workaround flag (see below), so we don't try this again */
-      DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
-      conn->workarounds |= FTP_WORKAROUND_PASV_ADDR;
-      ftp_connection_clear_error (conn);
-    }
-
-  /* Workaround code:
-   * Various ftp servers aren;t setup correctly when behind a NAT. They report
-   * their own IP address (like 10.0.0.4) and not the address in front of the
-   * NAT. But this is likely the same address that we connected to with our
-   * command connetion. So if the address given by PASV fails, we fall back 
-   * to the address of the command stream.
-   */
-  addr = ftp_connection_create_remote_address (conn, port1 << 8 | port2);
-  if (addr == NULL)
-    return FALSE;
-  if (!g_vfs_ftp_connection_open_data_connection (conn->conn,
-                                                    addr,
-                                                    conn->job->cancellable,
-                                                    &conn->error))
-    {
-      g_object_unref (addr);
-      return FALSE;
-    }
-
-  g_object_unref (addr);
-  return TRUE;
-}
-
-static gboolean
-ftp_connection_ensure_data_connection (FtpConnection *conn)
-{
-  if (ftp_connection_in_error (conn))
-    return FALSE;
-
-  if (ftp_connection_ensure_data_connection_epsv (conn))
-    return TRUE;
-
-  if (ftp_connection_in_error (conn))
-    return FALSE;
-
-  if (ftp_connection_ensure_data_connection_pasv (conn))
-    return TRUE;
-
-  return FALSE;
-}
-
-static void
-ftp_connection_close_data_connection (FtpConnection *conn)
-{
-  g_vfs_ftp_connection_close_data_connection (conn->conn);
+  g_strfreev (reply);
 }
 
 /*** COMMON FUNCTIONS WITH SPECIAL HANDLING ***/
 
 static gboolean
-ftp_connection_cd (FtpConnection *conn, const GVfsFtpFile *file)
+g_vfs_ftp_task_cd (GVfsFtpTask *task, const GVfsFtpFile *file)
 {
-  guint response = ftp_connection_send (conn,
-					RESPONSE_PASS_500,
+  guint response = g_vfs_ftp_task_send (task,
+					G_VFS_FTP_PASS_550,
 					"CWD %s", g_vfs_ftp_file_get_ftp_path (file));
   if (response == 550)
     {
-      g_set_error_literal (&conn->error, 
+      g_set_error_literal (&task->error, 
 		           G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
 			   _("The file is not a directory"));
-      response = 0;
-    }
-  else if (STATUS_GROUP (response) == 5)
-    {
-      ftp_connection_set_error_from_response (conn, response);
       response = 0;
     }
 
@@ -894,14 +200,14 @@ ftp_connection_cd (FtpConnection *conn, const GVfsFtpFile *file)
 }
 
 static gboolean
-ftp_connection_try_cd (FtpConnection *conn, const GVfsFtpFile *file)
+g_vfs_ftp_task_try_cd (GVfsFtpTask *task, const GVfsFtpFile *file)
 {
-  if (ftp_connection_in_error (conn))
+  if (g_vfs_ftp_task_is_in_error (task))
     return FALSE;
 
-  if (!ftp_connection_cd (conn, file))
+  if (!g_vfs_ftp_task_cd (task, file))
     {
-      ftp_connection_clear_error (conn);
+      g_vfs_ftp_task_clear_error (task);
       return FALSE;
     }
   
@@ -911,25 +217,25 @@ ftp_connection_try_cd (FtpConnection *conn, const GVfsFtpFile *file)
 /*** default directory reading ***/
 
 static void
-dir_default_init_data (FtpConnection *conn, const GVfsFtpFile *dir)
+dir_default_init_data (GVfsFtpTask *task, const GVfsFtpFile *dir)
 {
-  ftp_connection_cd (conn, dir);
-  ftp_connection_ensure_data_connection (conn);
+  g_vfs_ftp_task_cd (task, dir);
+  g_vfs_ftp_task_open_data_connection (task);
 
-  ftp_connection_send (conn,
-		       RESPONSE_PASS_100 | RESPONSE_FAIL_200,
-		       (conn->system == FTP_SYSTEM_UNIX) ? "LIST -a" : "LIST");
+  g_vfs_ftp_task_send (task,
+		       G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
+		       (task->backend->system == G_VFS_FTP_SYSTEM_UNIX) ? "LIST -a" : "LIST");
 }
 
 static gpointer
-dir_default_iter_new (FtpConnection *conn)
+dir_default_iter_new (GVfsFtpTask *task)
 {
   return g_slice_new0 (struct list_state);
 }
 
 static GFileInfo *
 dir_default_iter_process (gpointer           iter,
-			  FtpConnection     *conn,
+                          GVfsFtpTask *      task,
 			  const GVfsFtpFile *dir,
 			  const GVfsFtpFile *must_match_file,
 			  const char        *line,
@@ -970,10 +276,7 @@ dir_default_iter_process (gpointer           iter,
     }
   else
     {
-      name = NULL;
-      g_assert_not_reached (); 
-      // FIXME:
-      //name = (GVfsFtpFile *) t;
+      name = g_vfs_ftp_file_new_from_ftp (task->backend, t);
       g_free (t);
     }
   if (name == NULL)
@@ -1041,7 +344,7 @@ dir_default_iter_process (gpointer           iter,
 				   type == 'l' ? G_FILE_TYPE_SYMBOLIC_LINK :
 				   G_FILE_TYPE_DIRECTORY);
 
-  if (conn->system == FTP_SYSTEM_UNIX)
+  if (task->backend->system == G_VFS_FTP_SYSTEM_UNIX)
     g_file_info_set_is_hidden (info, result.fe_fnlen > 0 &&
 	                             result.fe_fname[0] == '.');
 
@@ -1075,126 +378,6 @@ static const FtpDirReader dir_default = {
 };
 
 /*** BACKEND ***/
-
-static void
-g_vfs_backend_ftp_push_connection (GVfsBackendFtp *ftp, FtpConnection *conn)
-{
-  /* we allow conn == NULL to ease error cases */
-  if (conn == NULL)
-    return;
-
-  if (conn->job)
-    ftp_connection_pop_job (conn);
-
-  g_mutex_lock (ftp->mutex);
-  if (ftp->queue)
-    {
-      g_queue_push_tail (ftp->queue, conn);
-      g_cond_signal (ftp->cond);
-    }
-  else
-    ftp_connection_free (conn);
-  g_mutex_unlock (ftp->mutex);
-}
-
-static void
-do_broadcast (GCancellable *cancellable, GCond *cond)
-{
-  g_cond_broadcast (cond);
-}
-
-static FtpConnection *
-g_vfs_backend_ftp_pop_connection (GVfsBackendFtp *ftp, 
-				  GVfsJob *	  job)
-{
-  FtpConnection *conn = NULL;
-  GTimeVal now;
-  gulong id;
-
-  if (g_cancellable_is_cancelled (job->cancellable))
-    return NULL;
-
-  g_mutex_lock (ftp->mutex);
-  id = g_cancellable_connect (job->cancellable,
-			      G_CALLBACK (do_broadcast),
-			      ftp->cond, NULL);
-  while (conn == NULL && ftp->queue != NULL)
-    {
-      if (g_cancellable_is_cancelled (job->cancellable))
-	break;
-
-      conn = g_queue_pop_head (ftp->queue);
-      if (conn != NULL)
-	{
-	  /* Figure out if this connection had a timeout sent. If so, skip it. */
-	  g_mutex_unlock (ftp->mutex);
-	  ftp_connection_push_job (conn, job);
-	  if (ftp_connection_send (conn, 0, "NOOP"))
-	    break;
-	      
-	  ftp_connection_clear_error (conn);
-	  conn->job = NULL;
-	  ftp_connection_free (conn);
-	  conn = NULL;
-	  g_mutex_lock (ftp->mutex);
-	  ftp->connections--;
-	  continue;
-	}
-
-      if (ftp->connections < ftp->max_connections)
-	{
-	  /* Save current number of connections here, so we can limit maximum 
-	   * connections later.
-	   * This is necessary for threading reasons (connections can be 
-	   * opened or closed while we are still in the opening process. */
-	  guint maybe_max_connections = ftp->connections;
-
-	  ftp->connections++;
-	  g_mutex_unlock (ftp->mutex);
-	  conn = ftp_connection_create (ftp->addr, job);
-	  if (G_LIKELY (!ftp_connection_in_error (conn)))
-            {
-              ftp_connection_prepare (conn);
-              ftp_connection_login (conn, ftp->user, ftp->password);
-              ftp_connection_use (conn);
-              if (G_LIKELY (!ftp_connection_in_error (conn)))
-                break;
-            }
-
-	  ftp_connection_clear_error (conn);
-	  /* Don't call ftp_connection_pop_job () here, the job isn't done yet */
-	  conn->job = NULL;
-	  ftp_connection_free (conn);
-	  conn = NULL;
-	  g_mutex_lock (ftp->mutex);
-	  ftp->connections--;
-	  ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
-	  if (ftp->max_connections == 0)
-	    {
-	      DEBUG ("no more connections left, exiting...");
-	      /* FIXME: shut down properly */
-	      exit (0);
-	    }
-
-	  continue;
-	}
-
-      g_get_current_time (&now);
-      g_time_val_add (&now, TIMEOUT_IN_SECONDS * 1000 * 1000);
-      if (!g_cond_timed_wait (ftp->cond, ftp->mutex, &now))
-	{
-	  g_vfs_job_failed (G_VFS_JOB (job),
-			   G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK,
-			   /* defeat string freeze! */
-			   /* _("Resource temporarily unavailable")); */
-			   "%s", g_strerror (EAGAIN));
-	  break;
-	}
-    }
-  g_cancellable_disconnect (job->cancellable, id);
-
-  return conn;
-}
 
 static void
 g_vfs_backend_ftp_finalize (GObject *object)
@@ -1270,7 +453,7 @@ do_mount (GVfsBackend *backend,
 	  gboolean is_automount)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   char *prompt = NULL;
   char *username;
   char *password;
@@ -1280,19 +463,24 @@ do_mount (GVfsBackend *backend,
   GNetworkAddress *addr;
   guint port;
 
-  conn = ftp_connection_create (ftp->addr,
-			        G_VFS_JOB (job));
+  task.conn = g_vfs_ftp_connection_new (ftp->addr, task.cancellable, &task.error);
   /* fail fast here. No need to ask for a password if we know the hostname
    * doesn't exist or the given host/port doesn't have an ftp server running.
    */
-  if (ftp_connection_in_error (conn))
+  if (task.conn == NULL)
     {
-      ftp_connection_pop_job (conn);
-      ftp_connection_free (conn);
+      g_vfs_ftp_task_done (&task);
       return;
     }
 
-  ftp_connection_prepare (conn);
+  /* send pre-login commands */
+  g_vfs_ftp_task_receive (&task, 0, NULL);
+  if (!gvfs_backend_ftp_determine_features (&task))
+    {
+      g_vfs_ftp_task_clear_error (&task);
+      g_vfs_backend_ftp_use_workaround (ftp, G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN);
+      ftp->features = 0;
+    }
 
   addr = G_NETWORK_ADDRESS (ftp->addr);
   port = g_network_address_get_port (addr);
@@ -1357,7 +545,7 @@ do_mount (GVfsBackend *backend,
 		        &password_save) ||
 	  aborted) 
 	{
-	  g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+	  g_set_error_literal (&task.error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
 			       _("Password dialog cancelled"));
 	  break;
 	}
@@ -1374,7 +562,7 @@ try_login:
       g_free (ftp->password);
       if (anonymous)
 	{
-	  if (ftp_connection_login (conn, "anonymous", "") != 0)
+	  if (g_vfs_ftp_task_login (&task, "anonymous", "") != 0)
 	    {
 	      ftp->user = g_strdup ("anonymous");
 	      ftp->password = g_strdup ("");
@@ -1387,41 +575,53 @@ try_login:
 	{
 	  ftp->user = username ? g_strdup (username) : g_strdup ("");
 	  ftp->password = g_strdup (password);
-	  if (ftp_connection_login (conn, username, password) != 0)
+	  if (g_vfs_ftp_task_login (&task, username, password) != 0)
 	    break;
 	}
       g_free (username);
       g_free (password);
       
       if (break_on_fail ||
-          !g_error_matches (conn->error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
+          !g_error_matches (task.error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
 	break;
 
-      ftp_connection_clear_error (conn);
+      g_vfs_ftp_task_clear_error (&task);
     }
   
-  ftp_connection_use (conn);
+  /* send post-login commands */
+  if (g_vfs_backend_ftp_uses_workaround (ftp, G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN) &&
+      !g_vfs_ftp_task_is_in_error (&task))
+    {
+      if (!gvfs_backend_ftp_determine_features (&task))
+        {
+          g_vfs_ftp_task_clear_error (&task);
+          ftp->features = G_VFS_FTP_FEATURES_DEFAULT;
+        }
+    }
+  g_vfs_ftp_task_setup_connection (&task);
+  gvfs_backend_ftp_determine_system (&task);
 
   /* Save the address of the current connection, so that for future connections,
    * we are sure to connect to the same machine.
    * The idea here is to avoid using mirrors that have a different state, which 
    * might cause Heisenbugs.
    */
-  if (!ftp_connection_in_error (conn))
+  if (!g_vfs_ftp_task_is_in_error (&task))
     {
-      ftp->addr = G_SOCKET_CONNECTABLE (g_vfs_ftp_connection_get_address (conn->conn, &conn->error));
+      ftp->addr = G_SOCKET_CONNECTABLE (g_vfs_ftp_connection_get_address (task.conn, &task.error));
       if (ftp->addr == NULL)
         {
-          DEBUG ("error querying remote address: %s\nUsing original address instead.", conn->error->message);
-          ftp_connection_clear_error (conn);
+          DEBUG ("error querying remote address: %s\nUsing original address instead.", task.error->message);
+          g_vfs_ftp_task_clear_error (&task);
           ftp->addr = g_object_ref (addr);
         }
     }
 
-  if (ftp_connection_in_error (conn))
+  if (g_vfs_ftp_task_is_in_error (&task))
     {
-      ftp_connection_pop_job (conn);
-      ftp_connection_free (conn);
+      g_vfs_ftp_connection_free (task.conn);
+      task.conn = NULL;
+      g_vfs_ftp_task_done (&task);
       g_object_unref (addr);
       return;
     }
@@ -1470,9 +670,9 @@ try_login:
   ftp->connections = 1;
   ftp->max_connections = G_MAXUINT;
   ftp->queue = g_queue_new ();
-  g_vfs_backend_ftp_push_connection (ftp, conn);
   
   g_object_unref (addr);
+  g_vfs_ftp_task_done (&task);
 }
 
 static gboolean
@@ -1521,13 +721,13 @@ do_unmount (GVfsBackend *   backend,
 	    GVfsJobUnmount *job)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpConnection *conn;
 
   g_mutex_lock (ftp->mutex);
   while ((conn = g_queue_pop_head (ftp->queue)))
     {
       /* FIXME: properly quit */
-      ftp_connection_free (conn);
+      g_vfs_ftp_connection_free (conn);
     }
   g_queue_free (ftp->queue);
   ftp->queue = NULL;
@@ -1537,54 +737,58 @@ do_unmount (GVfsBackend *   backend,
 }
 
 static void
-error_550_exists (FtpConnection *conn, const GVfsFtpFile *file)
+error_550_exists (GVfsFtpTask *task, gpointer file)
 {
   /* FIXME:
    * What we should do here is look at the cache to figure out if the file 
-   * exists, but as cache access is currently only exposed via the backend
+   * exists, but as cache access is only exposed via the backend
    * structure (it should be properly abstracted into an opaque thread-safe
-   * structure and then be available per-connection), we cannot do that.
+   * structure and then be available per-connection), we could not do that.
    * So instead, we use the same code we use when trying to find hidden
    * directories.
    */
-  if (ftp_connection_try_cd (conn, file) ||
-      ftp_connection_send (conn, 0, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
+  if (g_vfs_ftp_task_try_cd (task, file) ||
+      g_vfs_ftp_task_send (task, 0, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
     {
-      g_set_error_literal (&conn->error,
+      g_set_error_literal (&task->error,
                            G_IO_ERROR,
                            G_IO_ERROR_EXISTS,
                            _("Target file already exists"));
     }
   else
     {
-      /* clear potential error from ftp_connection_send() in else if line above */
-      ftp_connection_clear_error (conn);
+      /* clear potential error from g_vfs_ftp_task_send() above */
+      g_vfs_ftp_task_clear_error (task);
     }
 }
 
 static void
-error_550_is_directory (FtpConnection *conn, const GVfsFtpFile *file)
+error_550_is_directory (GVfsFtpTask *task, gpointer file)
 {
-  guint response = ftp_connection_send (conn, 
-                                        RESPONSE_PASS_550,
-                                        "CWD %s", g_vfs_ftp_file_get_ftp_path (file));
-
-  if (STATUS_GROUP (response) == 2)
+  if (g_vfs_ftp_task_send (task, 
+                           G_VFS_FTP_PASS_550,
+                           "CWD %s", g_vfs_ftp_file_get_ftp_path (file)))
     {
-      g_set_error_literal (&conn->error, G_IO_ERROR, 
+      g_set_error_literal (&task->error, G_IO_ERROR, 
 	                   G_IO_ERROR_IS_DIRECTORY,
         	           _("File is directory"));
     }
+  else
+    {
+      /* clear potential error from g_vfs_ftp_task_send() above */
+      g_vfs_ftp_task_clear_error (task);
+    }
 }
 
 static void
-error_550_parent_not_found (FtpConnection *conn, const GVfsFtpFile *file)
+error_550_parent_not_found (GVfsFtpTask *task, gpointer file)
 {
   GVfsFtpFile *dir = g_vfs_ftp_file_new_parent (file);
 
-  if (!g_vfs_ftp_file_equal (file, dir) && !ftp_connection_try_cd (conn, dir))
+  if (!g_vfs_ftp_file_equal (file, dir) && !g_vfs_ftp_task_try_cd (task, dir))
     {
-      g_set_error_literal (&conn->error, G_IO_ERROR,
+      /* Yes, this is a weird error for a missing parent directory */
+      g_set_error_literal (&task->error, G_IO_ERROR,
                            G_IO_ERROR_NOT_FOUND,
                            _("No such file or directory"));
     }
@@ -1598,33 +802,31 @@ do_open_for_read (GVfsBackend *backend,
 		  const char *filename)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
-  static const Ftp550Handler open_read_handlers[] = { error_550_is_directory, NULL };
+  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory, NULL };
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (!conn)
-    return;
-
-  ftp_connection_ensure_data_connection (conn);
-
+  g_vfs_ftp_task_open_data_connection (&task);
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
-  ftp_connection_send_and_check (conn,
-		                 RESPONSE_PASS_100 | RESPONSE_FAIL_200, 
+
+  g_vfs_ftp_task_send_and_check (&task,
+		                 G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200, 
 		                 &open_read_handlers[0],
 		                 file,
+                                 NULL,
 		                 "RETR %s", g_vfs_ftp_file_get_ftp_path (file));
   g_vfs_ftp_file_free (file);
 
-  if (ftp_connection_in_error (conn))
-    g_vfs_backend_ftp_push_connection (ftp, conn);
-  else
+  if (!g_vfs_ftp_task_is_in_error (&task))
     {
       /* don't push the connection back, it's our handle now */
+      GVfsFtpConnection *conn = g_vfs_ftp_task_take_connection (&task);
+
       g_vfs_job_open_for_read_set_handle (job, conn);
       g_vfs_job_open_for_read_set_can_seek (job, FALSE);
-      ftp_connection_pop_job (conn);
     }
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -1633,12 +835,14 @@ do_close_read (GVfsBackend *     backend,
 	       GVfsBackendHandle handle)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn = handle;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
+  GVfsFtpConnection *conn = handle;
 
-  ftp_connection_push_job (conn, G_VFS_JOB (job));
-  ftp_connection_close_data_connection (conn);
-  ftp_connection_receive (conn, 0); 
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_ftp_task_give_connection (&task, conn);
+  g_vfs_ftp_task_close_data_connection (&task);
+  g_vfs_ftp_task_receive (&task, 0, NULL); 
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -1648,63 +852,60 @@ do_read (GVfsBackend *     backend,
 	 char *            buffer,
 	 gsize             bytes_requested)
 {
-  FtpConnection *conn = handle;
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
+  GVfsFtpConnection *conn = handle;
   gssize n_bytes;
 
-  ftp_connection_push_job (conn, G_VFS_JOB (job));
-
-  n_bytes = g_vfs_ftp_connection_read_data (conn->conn,
+  n_bytes = g_vfs_ftp_connection_read_data (conn,
                                             buffer,
                                             bytes_requested,
-                                            conn->job->cancellable,
-                                            &conn->error);
+                                            task.cancellable,
+                                            &task.error);
 
   if (n_bytes >= 0)
     g_vfs_job_read_set_size (job, n_bytes);
-  ftp_connection_pop_job (conn);
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
-do_start_write (GVfsBackendFtp *ftp,
-		FtpConnection *conn,
+do_start_write (GVfsFtpTask *task,
 		GFileCreateFlags flags,
 		const char *format,
-		...) G_GNUC_PRINTF (4, 5);
+		...) G_GNUC_PRINTF (3, 4);
 static void
-do_start_write (GVfsBackendFtp *ftp,
-		FtpConnection *conn,
+do_start_write (GVfsFtpTask *task,
 		GFileCreateFlags flags,
 		const char *format,
 		...)
 {
   va_list varargs;
-  guint status;
 
   /* FIXME: can we honour the flags? */
 
-  ftp_connection_ensure_data_connection (conn);
+  g_vfs_ftp_task_open_data_connection (task);
 
   va_start (varargs, format);
-  status = ftp_connection_sendv (conn,
-				RESPONSE_PASS_100 | RESPONSE_FAIL_200,
-				format,
-				varargs);
+  g_vfs_ftp_task_sendv (task,
+                        G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
+                        NULL,
+                        format,
+                        varargs);
   va_end (varargs);
 
-  if (ftp_connection_in_error (conn))
-    g_vfs_backend_ftp_push_connection (ftp, conn);
-  else
+  if (!g_vfs_ftp_task_is_in_error (task))
     {
       /* don't push the connection back, it's our handle now */
-      g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (conn->job), conn);
-      g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (conn->job), FALSE);
-      ftp_connection_pop_job (conn);
+      GVfsFtpConnection *conn = g_vfs_ftp_task_take_connection (task);
+      g_vfs_job_open_for_write_set_handle (G_VFS_JOB_OPEN_FOR_WRITE (task->job), conn);
+      g_vfs_job_open_for_write_set_can_seek (G_VFS_JOB_OPEN_FOR_WRITE (task->job), FALSE);
     }
 }
 
 static void
-gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *ftp,
-					const GVfsFtpFile * dir)
+gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *   ftp,
+					const GVfsFtpFile *dir)
 {
   g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
   g_hash_table_remove (ftp->directory_cache, dir);
@@ -1712,9 +913,8 @@ gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *ftp,
 }
 
 static void
-gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *ftp,
-				      FtpConnection * conn,
-				      const GVfsFtpFile * file)
+gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *   ftp,
+				      const GVfsFtpFile *file)
 {
   GVfsFtpFile *dir = g_vfs_ftp_file_new_parent (file);
 
@@ -1726,7 +926,7 @@ gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *ftp,
 
 /* forward declaration */
 static GFileInfo *
-create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink);
+create_file_info (GVfsFtpTask *task, const char *filename, char **symlink);
 
 static void
 do_create (GVfsBackend *backend,
@@ -1735,32 +935,27 @@ do_create (GVfsBackend *backend,
 	   GFileCreateFlags flags)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GFileInfo *info;
   GVfsFtpFile *file;
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
-
-  info = create_file_info (ftp, conn, filename, NULL);
+  info = create_file_info (&task, filename, NULL);
   if (info)
     {
       g_object_unref (info);
-      g_set_error_literal (&conn->error,
+      g_set_error_literal (&task.error,
 		           G_IO_ERROR,
 			   G_IO_ERROR_EXISTS,
 			   _("Target file already exists"));
-      goto error;
+      g_vfs_ftp_task_done (&task);
+      return;
     }
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
-  do_start_write (ftp, conn, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
+  do_start_write (&task, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
+  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
   g_vfs_ftp_file_free (file);
-  return;
 
-error:
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -1770,18 +965,15 @@ do_append (GVfsBackend *backend,
 	   GFileCreateFlags flags)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
-
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
-  do_start_write (ftp, conn, flags, "APPE %s", g_vfs_ftp_file_get_ftp_path (file));
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
+  do_start_write (&task, flags, "APPE %s", g_vfs_ftp_file_get_ftp_path (file));
+  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
   g_vfs_ftp_file_free (file);
-  return;
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -1793,28 +985,26 @@ do_replace (GVfsBackend *backend,
 	    GFileCreateFlags flags)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
 
   if (make_backup)
     {
       /* FIXME: implement! */
-      g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR,
-			G_IO_ERROR_CANT_CREATE_BACKUP,
-			_("backups not supported yet"));
+      g_set_error_literal (&task.error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_CANT_CREATE_BACKUP,
+                           _("backups not supported yet"));
+      g_vfs_ftp_task_done (&task);
       return;
     }
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
-
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
-  do_start_write (ftp, conn, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
+  do_start_write (&task, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
+  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
   g_vfs_ftp_file_free (file);
-  return;
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -1823,14 +1013,14 @@ do_close_write (GVfsBackend *backend,
 	        GVfsBackendHandle handle)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn = handle;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
 
-  ftp_connection_push_job (conn, G_VFS_JOB (job));
+  g_vfs_ftp_task_give_connection (&task, handle);
 
-  ftp_connection_close_data_connection (conn);
-  ftp_connection_receive (conn, 0); 
+  g_vfs_ftp_task_close_data_connection (&task);
+  g_vfs_ftp_task_receive (&task, 0, NULL); 
 
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -1840,21 +1030,22 @@ do_write (GVfsBackend *backend,
 	  char *buffer,
 	  gsize buffer_size)
 {
-  FtpConnection *conn = handle;
+  GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
+  GVfsFtpConnection *conn = handle;
   gssize n_bytes;
 
-  ftp_connection_push_job (conn, G_VFS_JOB (job));
-
   /* FIXME: use write_all here? */
-  n_bytes = g_vfs_ftp_connection_write_data (conn->conn,
+  n_bytes = g_vfs_ftp_connection_write_data (conn,
                                              buffer,
                                              buffer_size,
-                                             G_VFS_JOB (job)->cancellable,
-                                             &conn->error);
+                                             task.cancellable,
+                                             &task.error);
             
   if (n_bytes >= 0)
     g_vfs_job_write_set_written_size (job, n_bytes);
-  ftp_connection_pop_job (conn);
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static GFileInfo *
@@ -1884,12 +1075,12 @@ create_file_info_for_root (GVfsBackendFtp *ftp)
 }
 
 static FtpDirEntry *
-do_enumerate_directory (FtpConnection *conn)
+do_enumerate_directory (GVfsFtpTask *task)
 {
   gssize n_bytes;
   FtpDirEntry *entry;
 
-  if (ftp_connection_in_error (conn))
+  if (g_vfs_ftp_task_is_in_error (task))
     return NULL;
 
   entry = ftp_dir_entry_new ();
@@ -1901,16 +1092,16 @@ do_enumerate_directory (FtpConnection *conn)
           entry = ftp_dir_entry_grow (entry);
           if (entry == NULL)
 	    {
-	      g_set_error_literal (&conn->error, G_IO_ERROR, G_IO_ERROR_FAILED,
+	      g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			           _("Out of memory while reading directory contents"));
 	      return NULL;
 	    }
 	}
-      n_bytes = g_vfs_ftp_connection_read_data (conn->conn,
+      n_bytes = g_vfs_ftp_connection_read_data (task->conn,
                                                 entry->data + entry->length,
                                                 entry->size - entry->length - 1,
-                                                conn->job->cancellable,
-                                                &conn->error);
+                                                task->cancellable,
+                                                &task->error);
 
       if (n_bytes < 0)
         {
@@ -1922,9 +1113,9 @@ do_enumerate_directory (FtpConnection *conn)
     }
   while (n_bytes > 0);
 
-  ftp_connection_close_data_connection (conn);
-  ftp_connection_receive (conn, 0);
-  if (ftp_connection_in_error (conn))
+  g_vfs_ftp_task_close_data_connection (task);
+  g_vfs_ftp_task_receive (task, 0, NULL);
+  if (g_vfs_ftp_task_is_in_error (task))
     {
       ftp_dir_entry_free (entry);
       return NULL;
@@ -1938,11 +1129,11 @@ do_enumerate_directory (FtpConnection *conn)
 /* IMPORTANT: SUCK ALARM!
  * locks ftp->directory_cache_lock but only iff it returns !NULL */
 static const FtpDirEntry *
-enumerate_directory (GVfsBackendFtp *ftp,
-                     FtpConnection * conn,
-		     const GVfsFtpFile * dir,
-		     gboolean	     use_cache)
+enumerate_directory (GVfsFtpTask *      task,
+		     const GVfsFtpFile *dir,
+		     gboolean	        use_cache)
 {
+  GVfsBackendFtp *ftp = task->backend;
   FtpDirEntry *entry;
 
   g_static_rw_lock_reader_lock (&ftp->directory_cache_lock);
@@ -1957,8 +1148,8 @@ enumerate_directory (GVfsBackendFtp *ftp,
     if (entry == NULL)
       {
 	g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-	ftp->dir_ops->init_data (conn, dir);
-	entry = do_enumerate_directory (conn);
+	ftp->dir_ops->init_data (task, dir);
+	entry = do_enumerate_directory (task);
 	if (entry == NULL)
           return NULL;
 	g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
@@ -1973,44 +1164,47 @@ enumerate_directory (GVfsBackendFtp *ftp,
 }
 
 static GFileInfo *
-create_file_info_from_parent (GVfsBackendFtp *ftp, FtpConnection *conn, 
-    const GVfsFtpFile *dir, const GVfsFtpFile *file, char **symlink)
+create_file_info_from_parent (GVfsFtpTask *      task, 
+                              const GVfsFtpFile *dir,
+                              const GVfsFtpFile *file,
+                              char **            symlink)
 {
   GFileInfo *info = NULL;
   gpointer iter;
   const FtpDirEntry *entry;
   const char *sol, *eol;
 
-  entry = enumerate_directory (ftp, conn, dir, TRUE);
+  entry = enumerate_directory (task, dir, TRUE);
   if (entry == NULL)
     return NULL;
 
-  iter = ftp->dir_ops->iter_new (conn);
+  iter = task->backend->dir_ops->iter_new (task);
   for (sol = eol = entry->data; eol; sol = eol + 1)
     {
       eol = memchr (sol, '\n', entry->length - (sol - entry->data));
-      info = ftp->dir_ops->iter_process (iter,
-                                         conn,
-                                         dir,
-                                         file,
-                                         sol,
-                                         symlink);
+      info = task->backend->dir_ops->iter_process (iter,
+                                                   task,
+                                                   dir,
+                                                   file,
+                                                   sol,
+                                                   symlink);
       if (info)
         break;
     }
-  ftp->dir_ops->iter_free (iter);
-  g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
+  task->backend->dir_ops->iter_free (iter);
+  g_static_rw_lock_reader_unlock (&task->backend->directory_cache_lock);
 
   return info;
 }
 
 static GFileInfo *
-create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn, 
-    const GVfsFtpFile *file, const char *filename, char **symlink)
+create_file_info_from_file (GVfsFtpTask *task, const GVfsFtpFile *file, 
+    const char *filename, char **symlink)
 {
   GFileInfo *info;
+  char **reply;
 
-  if (ftp_connection_try_cd (conn, file))
+  if (g_vfs_ftp_task_try_cd (task, file))
     {
       char *tmp;
 
@@ -2024,7 +1218,7 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
 
       g_file_info_set_is_hidden (info, TRUE);
     }
-  else if (ftp_connection_send (conn, 0, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
+  else if (g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
     {
       char *tmp;
 
@@ -2036,7 +1230,8 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
 
       gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_REGULAR);
 
-      g_file_info_set_size (info, g_ascii_strtoull (conn->read_buffer[0] + 4, NULL, 0));
+      g_file_info_set_size (info, g_ascii_strtoull (reply[0] + 4, NULL, 0));
+      g_strfreev (reply);
 
       g_file_info_set_is_hidden (info, TRUE);
     }
@@ -2044,7 +1239,7 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
     {
       info = NULL;
       /* clear error from ftp_connection_send() in else if line above */
-      ftp_connection_clear_error (conn);
+      g_vfs_ftp_task_clear_error (task);
 
       /* note that there might still be a file/directory, we just have 
        * no way to figure this out (in particular on ftp servers that 
@@ -2058,7 +1253,7 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
 /* NB: This gets a file info for the given object, no matter if it's a dir 
  * or a file */
 static GFileInfo *
-create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink)
+create_file_info (GVfsFtpTask *task, const char *filename, char **symlink)
 {
   GVfsFtpFile *dir, *file;
   GFileInfo *info;
@@ -2067,14 +1262,14 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
     *symlink = NULL;
 
   if (g_str_equal (filename, "/"))
-    return create_file_info_for_root (ftp);
+    return create_file_info_for_root (task->backend);
 
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (task->backend, filename);
   dir = g_vfs_ftp_file_new_parent (file);
 
-  info = create_file_info_from_parent (ftp, conn, dir, file, symlink);
+  info = create_file_info_from_parent (task, dir, file, symlink);
   if (info == NULL)
-    info = create_file_info_from_file (ftp, conn, file, filename, symlink);
+    info = create_file_info_from_file (task, file, filename, symlink);
 
   g_vfs_ftp_file_free (dir);
   g_vfs_ftp_file_free (file);
@@ -2082,7 +1277,7 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
 }
 
 static GFileInfo *
-resolve_symlink (GVfsBackendFtp *ftp, FtpConnection *conn, GFileInfo *original, const char *filename)
+resolve_symlink (GVfsFtpTask *task, GFileInfo *original, const char *filename)
 {
   GFileInfo *info = NULL;
   char *symlink, *newlink;
@@ -2097,7 +1292,7 @@ resolve_symlink (GVfsBackendFtp *ftp, FtpConnection *conn, GFileInfo *original, 
     G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET
   };
 
-  if (ftp_connection_in_error (conn))
+  if (g_vfs_ftp_task_is_in_error (task))
     return original;
 
   /* How many symlinks should we follow?
@@ -2106,8 +1301,7 @@ resolve_symlink (GVfsBackendFtp *ftp, FtpConnection *conn, GFileInfo *original, 
   symlink = g_strdup (filename);
   for (i = 0; i < 8 && symlink; i++)
     {
-      info = create_file_info (ftp,
-			       conn,
+      info = create_file_info (task,
 			       symlink,
 			       &newlink);
       if (!newlink)
@@ -2118,10 +1312,10 @@ resolve_symlink (GVfsBackendFtp *ftp, FtpConnection *conn, GFileInfo *original, 
     }
   g_free (symlink);
 
-  if (ftp_connection_in_error (conn))
+  if (g_vfs_ftp_task_is_in_error (task))
     {
       g_assert (info == NULL);
-      ftp_connection_clear_error (conn);
+      g_vfs_ftp_task_clear_error (task);
       return original;
     }
   if (info == NULL)
@@ -2158,30 +1352,24 @@ do_query_info (GVfsBackend *backend,
 	       GFileAttributeMatcher *matcher)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GFileInfo *real;
   char *symlink;
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
-
   if (query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
     {
-      real = create_file_info (ftp,
-			       conn,
+      real = create_file_info (&task,
 			       filename,
 			       NULL);
     }
   else
     {
-      real = create_file_info (ftp,
-			       conn,
+      real = create_file_info (&task,
 			       filename,
 			       &symlink);
       if (symlink)
 	{
-	  real = resolve_symlink (ftp, conn, real, symlink);
+	  real = resolve_symlink (&task, real, symlink);
 	  g_free (symlink);
 	}
     }
@@ -2191,13 +1379,15 @@ do_query_info (GVfsBackend *backend,
       g_file_info_copy_into (real, info);
       g_object_unref (real);
     }
-  else if (!ftp_connection_in_error (conn))
-    g_set_error_literal (&conn->error,
-			 G_IO_ERROR,
-			 G_IO_ERROR_NOT_FOUND,
-			 _("File doesn't exist"));
+  else if (!g_vfs_ftp_task_is_in_error (&task))
+    {
+      g_set_error_literal (&task.error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_NOT_FOUND,
+                           _("File doesn't exist"));
+    }
 
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -2208,7 +1398,7 @@ do_enumerate (GVfsBackend *backend,
 	      GFileQueryInfoFlags query_flags)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *dir;
   gpointer iter;
   GSList *symlink_targets = NULL;
@@ -2218,69 +1408,60 @@ do_enumerate (GVfsBackend *backend,
   const FtpDirEntry *entry;
   const char *sol, *eol;
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
-
   /* no need to check for IS_DIR, because the enumeration code will return that
    * automatically.
    */
 
   dir = g_vfs_ftp_file_new_from_gvfs (ftp, dirname);
-  entry = enumerate_directory (ftp, conn, dir, FALSE);
-  if (ftp_connection_pop_job (conn))
+  entry = enumerate_directory (&task, dir, FALSE);
+  if (entry != NULL)
     {
-      ftp_connection_push_job (conn, G_VFS_JOB (job));
-      if (entry != NULL)
-	{
-	  iter = ftp->dir_ops->iter_new (conn);
-          for (sol = eol = entry->data; eol; sol = eol + 1)
+      g_vfs_job_succeeded (task.job);
+      task.job = NULL;
+
+      iter = ftp->dir_ops->iter_new (&task);
+      for (sol = eol = entry->data; eol; sol = eol + 1)
+        {
+          char *symlink = NULL;
+
+          eol = memchr (sol, '\n', entry->length - (sol - entry->data));
+          info = ftp->dir_ops->iter_process (iter,
+                                             &task,
+                                             dir,
+                                             NULL,
+                                             sol,
+                                             query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? NULL : &symlink);
+          if (symlink)
             {
-	      char *symlink = NULL;
+              /* This is necessary due to our locking. 
+               * And we must not unlock here because it might invalidate the list we iterate */
+              symlink_targets = g_slist_prepend (symlink_targets, symlink);
+              symlink_fileinfos = g_slist_prepend (symlink_fileinfos, info);
+            }
+          else if (info)
+            {
+              g_vfs_job_enumerate_add_info (job, info);
+              g_object_unref (info);
+            }
+        }
+      ftp->dir_ops->iter_free (iter);
+      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
+      for (twalk = symlink_targets, fwalk = symlink_fileinfos; twalk; 
+           twalk = twalk->next, fwalk = fwalk->next)
+        {
+          info = resolve_symlink (&task, fwalk->data, twalk->data);
+          g_free (twalk->data);
+          g_vfs_job_enumerate_add_info (job, info);
+          g_object_unref (info);
+        }
+      g_slist_free (symlink_targets);
+      g_slist_free (symlink_fileinfos);
 
-              eol = memchr (sol, '\n', entry->length - (sol - entry->data));
-	      info = ftp->dir_ops->iter_process (iter,
-						 conn,
-						 dir,
-						 NULL,
-						 sol,
-						 query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? NULL : &symlink);
-	      if (symlink)
-		{
-		  /* This is necessary due to our locking. 
-		   * And we must not unlock here because it might invalidate the list we iterate */
-		  symlink_targets = g_slist_prepend (symlink_targets, symlink);
-		  symlink_fileinfos = g_slist_prepend (symlink_fileinfos, info);
-		}
-	      else if (info)
-		{
-		  g_vfs_job_enumerate_add_info (job, info);
-		  g_object_unref (info);
-		}
-	    }
-	  ftp->dir_ops->iter_free (iter);
-	  g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-	  for (twalk = symlink_targets, fwalk = symlink_fileinfos; twalk; 
-	       twalk = twalk->next, fwalk = fwalk->next)
-	    {
-	      info = resolve_symlink (ftp, conn, fwalk->data, twalk->data);
-	      g_free (twalk->data);
-	      g_vfs_job_enumerate_add_info (job, info);
-	      g_object_unref (info);
-	    }
-	  g_slist_free (symlink_targets);
-	  g_slist_free (symlink_fileinfos);
-	}
-      
       g_vfs_job_enumerate_done (job);
-      conn->job = NULL;
-      ftp_connection_clear_error (conn);
     }
-  else
-    g_assert (entry == NULL);
-
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+  
   g_vfs_ftp_file_free (dir);
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -2290,30 +1471,27 @@ do_set_display_name (GVfsBackend *backend,
 		     const char *display_name)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *original, *dir, *now;
-
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
 
   original = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   dir = g_vfs_ftp_file_new_parent (original);
-  now = g_vfs_ftp_file_new_child (dir, display_name, &conn->error);
-  ftp_connection_send (conn,
-		       RESPONSE_PASS_300 | RESPONSE_FAIL_200,
+  now = g_vfs_ftp_file_new_child (dir, display_name, &task.error);
+  g_vfs_ftp_task_send (&task,
+		       G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
 		       "RNFR %s", g_vfs_ftp_file_get_ftp_path (original));
-  ftp_connection_send (conn,
+  g_vfs_ftp_task_send (&task,
 		       0,
 		       "RNTO %s", g_vfs_ftp_file_get_ftp_path (now));
 
   /* FIXME: parse result of RNTO here? */
   g_vfs_job_set_display_name_set_new_path (job, g_vfs_ftp_file_get_gvfs_path (now));
   gvfs_backend_ftp_purge_cache_directory (ftp, dir);
-  g_vfs_backend_ftp_push_connection (ftp, conn);
   g_vfs_ftp_file_free (now);
   g_vfs_ftp_file_free (dir);
   g_vfs_ftp_file_free (original);
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -2322,51 +1500,44 @@ do_delete (GVfsBackend *backend,
 	   const char *filename)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
   guint response;
-
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
 
   /* We try file deletion first. If that fails, we try directory deletion.
    * The file-first-then-directory order has been decided by coin-toss. */
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
-  response = ftp_connection_send (conn,
-				  RESPONSE_PASS_500,
+  response = g_vfs_ftp_task_send (&task,
+				  G_VFS_FTP_PASS_500,
 				  "DELE %s", g_vfs_ftp_file_get_ftp_path (file));
-  if (STATUS_GROUP (response) == 5)
+  if (G_VFS_FTP_RESPONSE_GROUP (response) == 5)
     {
-      response = ftp_connection_send (conn,
-				      RESPONSE_PASS_500,
+      response = g_vfs_ftp_task_send (&task,
+				      G_VFS_FTP_PASS_550,
 				      "RMD %s", g_vfs_ftp_file_get_ftp_path (file));
       if (response == 550)
 	{
-	  const FtpDirEntry *entry = enumerate_directory (ftp, conn, file, FALSE);
+	  const FtpDirEntry *entry = enumerate_directory (&task, file, FALSE);
 	  if (entry)
 	    {
 	      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-	      g_set_error_literal (&conn->error, 
+	      g_set_error_literal (&task.error, 
 				   G_IO_ERROR,
 				   G_IO_ERROR_NOT_EMPTY,
 				   g_strerror (ENOTEMPTY));
 	    }
 	  else
             {
-              ftp_connection_clear_error (conn);
-              ftp_connection_set_error_from_response (conn, response);
+              g_vfs_ftp_task_clear_error (&task);
+              g_vfs_ftp_task_set_error_from_response (&task, response);
             }
-	}
-      else if (STATUS_GROUP (response) == 5)
-	{
-	  ftp_connection_set_error_from_response (conn, response);
 	}
     }
 
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
   g_vfs_ftp_file_free (file);
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -2375,27 +1546,24 @@ do_make_directory (GVfsBackend *backend,
 		   const char *filename)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
-  static const Ftp550Handler make_directory_handlers[] = { error_550_exists, error_550_parent_not_found, NULL };
-
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
+  static const GVfsFtpErrorFunc make_directory_handlers[] = { error_550_exists, error_550_parent_not_found, NULL };
 
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
-  ftp_connection_send_and_check (conn,
+  g_vfs_ftp_task_send_and_check (&task,
                                  0,
                                  make_directory_handlers,
                                  file,
+                                 NULL,
                                  "MKD %s", g_vfs_ftp_file_get_ftp_path (file));
 
   /* FIXME: Compare created file with name from server result to be sure 
    * it's correct and otherwise fail. */
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
   g_vfs_ftp_file_free (file);
 
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -2408,35 +1576,34 @@ do_move (GVfsBackend *backend,
 	 gpointer progress_callback_data)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
-  FtpConnection *conn;
+  GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *srcfile, *destfile;
 
   /* FIXME: what about G_FILE_COPY_NOFOLLOW_SYMLINKS and G_FILE_COPY_ALL_METADATA? */
 
   if (flags & G_FILE_COPY_BACKUP)
     {
-      /* FIXME: implement! */
-      g_vfs_job_failed (G_VFS_JOB (job),
-			G_IO_ERROR,
-			G_IO_ERROR_CANT_CREATE_BACKUP,
-			_("backups not supported yet"));
+      /* FIXME: implement? */
+      g_set_error_literal (&task.error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_CANT_CREATE_BACKUP,
+                           _("backups not supported yet"));
+      g_vfs_ftp_task_done (&task);
       return;
     }
 
-  conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
-  if (conn == NULL)
-    return;
-
   srcfile = g_vfs_ftp_file_new_from_gvfs (ftp, source);
   destfile = g_vfs_ftp_file_new_from_gvfs (ftp, destination);
-  if (ftp_connection_try_cd (conn, destfile))
+  if (g_vfs_ftp_task_try_cd (&task, destfile))
     {
       char *basename = g_path_get_basename (source);
-      GVfsFtpFile *real = g_vfs_ftp_file_new_child (destfile, basename, &conn->error);
+      GVfsFtpFile *real = g_vfs_ftp_file_new_child (destfile, basename, &task.error);
 
       g_free (basename);
       if (real == NULL)
-	goto out;
+        {
+	  goto out;
+        }
       else
 	{
 	  g_vfs_ftp_file_free (destfile);
@@ -2446,15 +1613,14 @@ do_move (GVfsBackend *backend,
 
   if (!(flags & G_FILE_COPY_OVERWRITE))
     {
-      GFileInfo *info = create_file_info (ftp,
-                                          conn,
+      GFileInfo *info = create_file_info (&task,
                                           g_vfs_ftp_file_get_gvfs_path (destfile),
                                           NULL);
 
       if (info)
 	{
 	  g_object_unref (info);
-	  g_set_error_literal (&conn->error,
+	  g_set_error_literal (&task.error,
 			       G_IO_ERROR,
 		               G_IO_ERROR_EXISTS,
 			       _("Target file already exists"));
@@ -2462,19 +1628,20 @@ do_move (GVfsBackend *backend,
 	}
     }
 
-  ftp_connection_send (conn,
-		       RESPONSE_PASS_300 | RESPONSE_FAIL_200,
+  g_vfs_ftp_task_send (&task,
+		       G_VFS_FTP_PASS_300 | G_VFS_FTP_FAIL_200,
 		       "RNFR %s", g_vfs_ftp_file_get_ftp_path (srcfile));
-  ftp_connection_send (conn,
+  g_vfs_ftp_task_send (&task,
 		       0,
 		       "RNTO %s", g_vfs_ftp_file_get_ftp_path (destfile));
 
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, srcfile);
-  gvfs_backend_ftp_purge_cache_of_file (ftp, conn, destfile);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, srcfile);
+  gvfs_backend_ftp_purge_cache_of_file (ftp, destfile);
 out:
   g_vfs_ftp_file_free (srcfile);
   g_vfs_ftp_file_free (destfile);
-  g_vfs_backend_ftp_push_connection (ftp, conn);
+
+  g_vfs_ftp_task_done (&task);
 }
 
 static void
@@ -2503,3 +1670,71 @@ g_vfs_backend_ftp_class_init (GVfsBackendFtpClass *klass)
   backend_class->make_directory = do_make_directory;
   backend_class->move = do_move;
 }
+
+/*** PUBLIC API ***/
+
+/**
+ * g_vfs_backend_ftp_has_feature:
+ * @ftp: the backend
+ * @feature: feature to check
+ *
+ * Checks if the FTP server supports a given @feature. Features are determined
+ * once during the mount phase and are not queried again.
+ *
+ * Returns: %TRUE if @feature is supported.
+ **/
+gboolean
+g_vfs_backend_ftp_has_feature (GVfsBackendFtp *ftp,
+                               GVfsFtpFeature  feature)
+{
+  g_return_val_if_fail (G_VFS_IS_BACKEND_FTP (ftp), FALSE);
+  g_return_val_if_fail (feature < 32, FALSE);
+
+  return (ftp->features & (1 << feature)) != 0;
+}
+
+/**
+ * g_vfs_backend_ftp_uses_workaround:
+ * @ftp: the backend
+ * @workaround: workaround to check
+ *
+ * Checks if the given @workaround was enabled previously using
+ * g_vfs_backend_ftp_use_workaround(). See that function for a discussion
+ * of the purpose of workarounds.
+ *
+ * Returns: %TRUE if the workaround is enabled
+ **/
+gboolean
+g_vfs_backend_ftp_uses_workaround (GVfsBackendFtp *  ftp,
+                                  GVfsFtpWorkaround workaround)
+{
+  g_return_val_if_fail (G_VFS_IS_BACKEND_FTP (ftp), FALSE);
+  g_return_val_if_fail (workaround < 32, FALSE);
+
+  return (g_atomic_int_get (&ftp->workarounds) & (1 << workaround)) != 0;
+}
+
+/**
+ * g_vfs_backend_ftp_use_workaround:
+ * @ftp: the backend
+ * @workaround: workaround to set
+ *
+ * Sets the given @workaround to be used on the backend. Workarounds are flags
+ * set on the backend to ensure a special behavior in the client to work 
+ * around problems with servers. See the existing workarounds for examples.
+ **/
+void
+g_vfs_backend_ftp_use_workaround (GVfsBackendFtp *  ftp,
+                                  GVfsFtpWorkaround workaround)
+{
+  int cur, set;
+
+  g_return_if_fail (G_VFS_IS_BACKEND_FTP (ftp));
+  g_return_if_fail (workaround < 32);
+
+  set = 1 << workaround;
+  while (((cur = g_atomic_int_get (&ftp->workarounds)) & set) == 0 &&
+         !g_atomic_int_compare_and_exchange (&ftp->workarounds, cur, cur | set));
+    
+}
+

@@ -275,3 +275,30 @@ g_vfs_ftp_connection_read_contents (GVfsFtpConnection *conn,
   g_assert_not_reached ();
 }
 
+/**
+ * g_vfs_ftp_connection_is_usable:
+ * @conn: a connection
+ *
+ * Checks if this connection can still be used to send new commands. For 
+ * example, if the connection was closed, this is not possible and this 
+ * function will return %FALSE.
+ *
+ * Returns: %TRUE if the connection is still usable
+ **/
+gboolean
+g_vfs_ftp_connection_is_usable (GVfsFtpConnection *conn)
+{
+  GIOCondition cond;
+
+  g_return_val_if_fail (conn != NULL, FALSE);
+
+  /* FIXME: return FALSE here if a send or receive failed irrecoverably */
+
+  cond = G_IO_ERR | G_IO_HUP;
+  cond = g_socket_condition_check (g_socket_connection_get_socket (G_SOCKET_CONNECTION (conn->commands)), cond);
+  if (cond)
+    return FALSE;
+
+  return TRUE;
+}
+

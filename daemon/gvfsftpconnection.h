@@ -53,6 +53,7 @@ guint                   g_vfs_ftp_connection_receive          (GVfsFtpConnection
                                                                GCancellable *           cancellable,
                                                                GError **                error);
 
+gboolean                g_vfs_ftp_connection_is_usable        (GVfsFtpConnection *      conn);
 GSocketAddress *        g_vfs_ftp_connection_get_address      (GVfsFtpConnection *      conn,
                                                                GError **                error);
 
