@@ -10,7 +10,6 @@ gvfs_gdu_volume_monitor_SOURCES =			\
 	ggduvolume.c		ggduvolume.h		\
 	ggdumount.c		ggdumount.h		\
 	ggduvolumemonitor.c	ggduvolumemonitor.h	\
-	polkit.c		polkit.h		\
 	$(NULL)
 
 gvfs_gdu_volume_monitor_CFLAGS =		\
@@ -29,12 +28,12 @@ gvfs_gdu_volume_monitor_CFLAGS =		\
 gvfs_gdu_volume_monitor_LDFLAGS =	\
 	$(NULL)
 
-gvfs_gdu_volume_monitor_LDADD  =		     			      \
-	$(GLIB_LIBS)                                 			      \
-	$(GDU_LIBS)                                  			      \
+gvfs_gdu_volume_monitor_LDADD  =		     			      	\
+	$(GLIB_LIBS)                                 			      	\
+	$(GDU_LIBS)                                  			      	\
 	$(DBUS_LIBS)                                 				\
-	$(top_builddir)/common/libgvfscommon.la 			      \
-	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
+	$(top_builddir)/common/libgvfscommon.la 			      	\
+	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la 	\
 	$(NULL)
 
 remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors

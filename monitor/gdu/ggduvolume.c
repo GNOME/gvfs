@@ -38,8 +38,6 @@
 /* for BUFSIZ */
 #include <stdio.h>
 
-#include "polkit.h"
-
 typedef struct MountOpData MountOpData;
 
 static void cancel_pending_mount_op (MountOpData *data);
@@ -725,57 +723,6 @@ static void
 mount_cb (GduDevice *device,
           gchar     *mount_point,
           GError    *error,
-          gpointer   user_data);
-
-static void
-mount_obtain_authz_cb (GObject *source_object,
-                       GAsyncResult *res,
-                       gpointer user_data)
-{
-  MountOpData *data = user_data;
-  gboolean obtained_authz;
-  GError *error;
-
-  /* if we've already aborted due to device removal / cancellation, just bail out */
-  if (data->is_cancelled)
-    goto bailout;
-
-  error = NULL;
-  obtained_authz = _obtain_authz_finish (res, &error);
-
-  if (!obtained_authz)
-    {
-      /* be quiet if the daemon is inhibited */
-      if (error->code == GDU_ERROR_INHIBITED)
-        {
-          error->domain = G_IO_ERROR;
-          error->code = G_IO_ERROR_FAILED_HANDLED;
-        }
-      g_simple_async_result_set_from_error (data->simple, error);
-      g_simple_async_result_complete (data->simple);
-    }
-  else
-    {
-      gchar **mount_options;
-      /* got the authz, now try again */
-      mount_options = get_mount_options (data->device_to_mount);
-      gdu_device_op_filesystem_mount (data->device_to_mount, mount_options, mount_cb, data);
-      g_strfreev (mount_options);
-      goto out;
-    }
-
- bailout:
-  data->volume->pending_mount_op = NULL;
-  mount_op_data_unref (data);
-
- out:
-  ;
-}
-
-static void
-mount_cb (GduDevice *device,
-          gchar     *mount_point,
-          GError    *error,
           gpointer   user_data)
 {
   MountOpData *data = user_data;
@@ -786,41 +733,13 @@ mount_cb (GduDevice *device,
 
   if (error != NULL)
     {
-      PolKitAction *pk_action;
-      PolKitResult pk_result;
-
-      /* only attempt to show authentication dialog if we have a mount operation */
-      if (data->mount_operation != NULL && gdu_error_check_polkit_not_authorized (error,
-                                                                                  &pk_action,
-                                                                                  &pk_result))
+      /* be quiet if the DeviceKit-disks daemon is inhibited */
+      if (error->code == GDU_ERROR_INHIBITED)
         {
-          if (pk_result != POLKIT_RESULT_NO && pk_result != POLKIT_RESULT_UNKNOWN)
-            {
-              const gchar *action_id;
-              /* try to obtain the authorization */
-              polkit_action_get_action_id (pk_action, (char **) &action_id);
-              _obtain_authz (action_id,
-                             data->cancellable,
-                             mount_obtain_authz_cb,
-                             data);
-              goto out;
-            }
-          else
-            {
-              g_simple_async_result_set_from_error (data->simple, error);
-            }
-          polkit_action_unref (pk_action);
+          error->domain = G_IO_ERROR;
+          error->code = G_IO_ERROR_FAILED_HANDLED;
         }
-      else
-        {
-          /* be quiet if the daemon is inhibited */
-          if (error->code == GDU_ERROR_INHIBITED)
-            {
-              error->domain = G_IO_ERROR;
-              error->code = G_IO_ERROR_FAILED_HANDLED;
-            }
-          g_simple_async_result_set_from_error (data->simple, error);
-        }
+      g_simple_async_result_set_from_error (data->simple, error);
       g_error_free (error);
     }
   else
@@ -834,8 +753,6 @@ mount_cb (GduDevice *device,
   data->volume->pending_mount_op = NULL;
   mount_op_data_unref (data);
 
- out:
-  ;
 }
 
 static void
