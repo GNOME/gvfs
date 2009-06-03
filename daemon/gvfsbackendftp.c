@@ -1210,10 +1210,18 @@ dir_default_iter_process (gpointer        iter,
 
       if (symlink)
 	{
-	  char *str = g_path_get_dirname (s);
-	  char *symlink_file = g_build_path ("/", str, link, NULL);
+          char *str;
+          char *symlink_file;
 
-	  g_free (str);
+          if (link[0] != '/')
+            {
+              str = g_path_get_dirname (s);
+              symlink_file = g_build_path ("/", str, link, NULL);
+              g_free (str);
+            }
+          else
+            symlink_file = g_strdup(link);
+
 	  while ((str = strstr (symlink_file, "/../")))
 	    {
 	      char *end = str + 4;
