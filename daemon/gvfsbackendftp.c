@@ -50,6 +50,7 @@
 
 #include "ParseFTPList.h"
 #include "gvfsftpconnection.h"
+#include "gvfsftpfile.h"
 
 /* timeout for network connect/send/receive (use 0 for none) */
 #define TIMEOUT_IN_SECONDS 30
@@ -69,7 +70,6 @@
  */
 
 /* unsinged char is on purpose, so we get warnings when we misuse them */
-typedef unsigned char FtpFile;
 typedef struct _FtpConnection FtpConnection;
 
 typedef struct _FtpDirEntry FtpDirEntry;
@@ -81,16 +81,16 @@ struct _FtpDirEntry {
 
 typedef struct FtpDirReader FtpDirReader;
 struct FtpDirReader {
-  void		(* init_data)	(FtpConnection *conn,
-				 const FtpFile *dir);
-  gpointer	(* iter_new)	(FtpConnection *conn);
-  GFileInfo *	(* iter_process)(gpointer       iter,
-				 FtpConnection *conn,
-				 const FtpFile *dirname,
-				 const FtpFile *must_match_file,
-				 const char    *line,
-				 char	      **symlink);
-  void		(* iter_free)	(gpointer	iter);
+  void		(* init_data)	(FtpConnection *    conn,
+				 const GVfsFtpFile *dir);
+  gpointer	(* iter_new)	(FtpConnection *    conn);
+  GFileInfo *	(* iter_process)(gpointer           iter,
+				 FtpConnection *    conn,
+				 const GVfsFtpFile *dirname,
+				 const GVfsFtpFile *must_match_file,
+				 const char *       line,
+				 char **            symlink);
+  void		(* iter_free)	(gpointer	    iter);
 };
 
 typedef enum {
@@ -151,7 +151,7 @@ G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
 
 #define STATUS_GROUP(status) ((status) / 100)
 
-typedef void (* Ftp550Handler) (FtpConnection *conn, const FtpFile *file);
+typedef void (* Ftp550Handler) (FtpConnection *conn, const GVfsFtpFile *file);
 
 /*** FTP CONNECTION ***/
 
@@ -473,7 +473,7 @@ ftp_connection_send (FtpConnection *conn,
 static void
 ftp_connection_check_file (FtpConnection *conn,
                            const Ftp550Handler *handlers,
-                           const FtpFile *file)
+                           const GVfsFtpFile *file)
 {
   while (*handlers && !ftp_connection_in_error (conn))
     {
@@ -486,14 +486,14 @@ static guint
 ftp_connection_send_and_check (FtpConnection *conn,
                                ResponseFlags flags,
                                const Ftp550Handler *handlers,
-                               const FtpFile *file,
+                               const GVfsFtpFile *file,
                                const char *format,
                                ...) G_GNUC_PRINTF (5, 6);
 static guint
 ftp_connection_send_and_check (FtpConnection *conn,
                                ResponseFlags flags,
                                const Ftp550Handler *handlers,
-                               const FtpFile *file,
+                               const GVfsFtpFile *file,
                                const char *format,
                                ...)
 {
@@ -869,79 +869,14 @@ ftp_connection_close_data_connection (FtpConnection *conn)
   g_vfs_ftp_connection_close_data_connection (conn->conn);
 }
 
-/*** FILE MAPPINGS ***/
-
-/* FIXME: This most likely needs adaption to non-unix like directory structures.
- * There's at least the case of multiple roots (Netware) plus probably a shitload
- * of weird old file systems (starting with MS-DOS)
- * But we first need a way to detect that.
- */
-
-/**
- * FtpFile:
- *
- * Byte string used to identify a file on the FTP server. It's typedef'ed to
- * make it easy to distinguish from GVfs paths.
- */
-
-#define ftp_filename_equal g_str_equal
-#define ftp_filename_copy(name) ((FtpFile *) g_strdup ((const char *) (name)))
-
-static FtpFile *
-ftp_filename_from_gvfs_path (FtpConnection *conn, const char *pathname)
-{
-  return (FtpFile *) g_strdup (pathname);
-}
-
-static char *
-ftp_filename_to_gvfs_path (FtpConnection *conn, const FtpFile *filename)
-{
-  return g_strdup ((const char *) filename);
-}
-
-/* Takes an FTP dirname and a basename (as used in RNTO or as result from LIST 
- * or similar) and gets the new ftp filename from it.
- *
- * Returns: the filename or %NULL if filename construction wasn't possible.
- */
-/* let's hope we can live without a connection here, or we have to rewrite LIST */
-static FtpFile *
-ftp_filename_construct (FtpConnection *conn, const FtpFile *dirname, const char *basename)
-{
-  if (strpbrk (basename, "/\r\n"))
-    return NULL;
-
-  return (FtpFile *) g_build_path ("/", (char *) dirname, basename, NULL);
-}
-
-/* NB: returns the root directory for the root directory.
- * Use ftp_filename_equal() afterwards to detect this */
-static FtpFile *
-ftp_filename_get_parent (FtpConnection *conn, const FtpFile *file)
-{
-  char *dirname, *filename;
-  FtpFile *dir;
-
-  filename = ftp_filename_to_gvfs_path (conn, file);
-  dirname = g_path_get_dirname (filename);
-  if (dirname[0] == '.' && dirname[1] == 0)
-    dir = ftp_filename_copy (file);
-  else
-    dir = ftp_filename_from_gvfs_path (conn, dirname);
-  g_free (filename);
-  g_free (dirname);
-
-  return dir;
-}
-
 /*** COMMON FUNCTIONS WITH SPECIAL HANDLING ***/
 
 static gboolean
-ftp_connection_cd (FtpConnection *conn, const FtpFile *file)
+ftp_connection_cd (FtpConnection *conn, const GVfsFtpFile *file)
 {
   guint response = ftp_connection_send (conn,
 					RESPONSE_PASS_500,
-					"CWD %s", file);
+					"CWD %s", g_vfs_ftp_file_get_ftp_path (file));
   if (response == 550)
     {
       g_set_error_literal (&conn->error, 
@@ -959,7 +894,7 @@ ftp_connection_cd (FtpConnection *conn, const FtpFile *file)
 }
 
 static gboolean
-ftp_connection_try_cd (FtpConnection *conn, const FtpFile *file)
+ftp_connection_try_cd (FtpConnection *conn, const GVfsFtpFile *file)
 {
   if (ftp_connection_in_error (conn))
     return FALSE;
@@ -976,7 +911,7 @@ ftp_connection_try_cd (FtpConnection *conn, const FtpFile *file)
 /*** default directory reading ***/
 
 static void
-dir_default_init_data (FtpConnection *conn, const FtpFile *dir)
+dir_default_init_data (FtpConnection *conn, const GVfsFtpFile *dir)
 {
   ftp_connection_cd (conn, dir);
   ftp_connection_ensure_data_connection (conn);
@@ -993,20 +928,21 @@ dir_default_iter_new (FtpConnection *conn)
 }
 
 static GFileInfo *
-dir_default_iter_process (gpointer        iter,
-			  FtpConnection  *conn,
-			  const FtpFile  *dirname,
-			  const FtpFile  *must_match_file,
-			  const char     *line,
-			  char		**symlink)
+dir_default_iter_process (gpointer           iter,
+			  FtpConnection     *conn,
+			  const GVfsFtpFile *dir,
+			  const GVfsFtpFile *must_match_file,
+			  const char        *line,
+			  char		   **symlink)
 {
   struct list_state *state = iter;
   struct list_result result = { 0, };
   GTimeVal tv = { 0, 0 };
   GFileInfo *info;
   int type;
-  FtpFile *name;
-  char *s, *t;
+  GVfsFtpFile *name;
+  const char *s;
+  char *t;
 
   type = ParseFTPList (line, state, &result);
   if (type != 'd' && type != 'f' && type != 'l')
@@ -1026,26 +962,32 @@ dir_default_iter_process (gpointer        iter,
 	return NULL;
     }
 
-  s = g_strndup (result.fe_fname, result.fe_fnlen);
-  if (dirname)
+  t = g_strndup (result.fe_fname, result.fe_fnlen);
+  if (dir)
     {
-      name = ftp_filename_construct (conn, dirname, s);
-      g_free (s);
+      name = g_vfs_ftp_file_new_child  (dir, t, NULL);
+      g_free (t);
     }
   else
-    name = (FtpFile *) s;
+    {
+      name = NULL;
+      g_assert_not_reached (); 
+      // FIXME:
+      //name = (GVfsFtpFile *) t;
+      g_free (t);
+    }
   if (name == NULL)
     return NULL;
 
-  if (must_match_file && !ftp_filename_equal (name, must_match_file))
+  if (must_match_file && !g_vfs_ftp_file_equal (name, must_match_file))
     {
-      g_free (name);
+      g_vfs_ftp_file_free (name);
       return NULL;
     }
 
   info = g_file_info_new ();
 
-  s = ftp_filename_to_gvfs_path (conn, name);
+  s = g_vfs_ftp_file_get_gvfs_path (name);
 
   t = g_path_get_basename (s);
   g_file_info_set_name (info, t);
@@ -1057,7 +999,7 @@ dir_default_iter_process (gpointer        iter,
 
       link = g_strndup (result.fe_lname, result.fe_lnlen);
 
-      /* FIXME: this whole stuff is not FtpFile save */
+      /* FIXME: this whole stuff is not GVfsFtpFile save */
       g_file_info_set_symlink_target (info, link);
       g_file_info_set_is_symlink (info, TRUE);
 
@@ -1103,8 +1045,7 @@ dir_default_iter_process (gpointer        iter,
     g_file_info_set_is_hidden (info, result.fe_fnlen > 0 &&
 	                             result.fe_fname[0] == '.');
 
-  g_free (s);
-  g_free (name);
+  g_vfs_ftp_file_free (name);
 
   /* Workaround:
    * result.fetime.tm_year contains actual year instead of offset-from-1900,
@@ -1312,9 +1253,9 @@ g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
   ftp->mutex = g_mutex_new ();
   ftp->cond = g_cond_new ();
 
-  ftp->directory_cache = g_hash_table_new_full (g_str_hash,
-					        g_str_equal,
-						g_free,
+  ftp->directory_cache = g_hash_table_new_full (g_vfs_ftp_file_hash,
+					        g_vfs_ftp_file_equal,
+						g_vfs_ftp_file_free,
 						ftp_dir_entry_free);
   g_static_rw_lock_init (&ftp->directory_cache_lock);
 
@@ -1596,7 +1537,7 @@ do_unmount (GVfsBackend *   backend,
 }
 
 static void
-error_550_exists (FtpConnection *conn, const FtpFile *file)
+error_550_exists (FtpConnection *conn, const GVfsFtpFile *file)
 {
   /* FIXME:
    * What we should do here is look at the cache to figure out if the file 
@@ -1607,7 +1548,7 @@ error_550_exists (FtpConnection *conn, const FtpFile *file)
    * directories.
    */
   if (ftp_connection_try_cd (conn, file) ||
-      ftp_connection_send (conn, 0, "SIZE %s", file))
+      ftp_connection_send (conn, 0, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
     {
       g_set_error_literal (&conn->error,
                            G_IO_ERROR,
@@ -1622,11 +1563,11 @@ error_550_exists (FtpConnection *conn, const FtpFile *file)
 }
 
 static void
-error_550_is_directory (FtpConnection *conn, const FtpFile *file)
+error_550_is_directory (FtpConnection *conn, const GVfsFtpFile *file)
 {
   guint response = ftp_connection_send (conn, 
                                         RESPONSE_PASS_550,
-                                        "CWD %s", file);
+                                        "CWD %s", g_vfs_ftp_file_get_ftp_path (file));
 
   if (STATUS_GROUP (response) == 2)
     {
@@ -1637,18 +1578,18 @@ error_550_is_directory (FtpConnection *conn, const FtpFile *file)
 }
 
 static void
-error_550_parent_not_found (FtpConnection *conn, const FtpFile *file)
+error_550_parent_not_found (FtpConnection *conn, const GVfsFtpFile *file)
 {
-  FtpFile *dir = ftp_filename_get_parent (conn, file);
+  GVfsFtpFile *dir = g_vfs_ftp_file_new_parent (file);
 
-  if (!ftp_filename_equal (file, dir) && !ftp_connection_try_cd (conn, dir))
+  if (!g_vfs_ftp_file_equal (file, dir) && !ftp_connection_try_cd (conn, dir))
     {
       g_set_error_literal (&conn->error, G_IO_ERROR,
                            G_IO_ERROR_NOT_FOUND,
                            _("No such file or directory"));
     }
 
-  g_free (dir);
+  g_vfs_ftp_file_free (dir);
 }
 
 static void
@@ -1658,7 +1599,7 @@ do_open_for_read (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *file;
+  GVfsFtpFile *file;
   static const Ftp550Handler open_read_handlers[] = { error_550_is_directory, NULL };
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
@@ -1667,13 +1608,13 @@ do_open_for_read (GVfsBackend *backend,
 
   ftp_connection_ensure_data_connection (conn);
 
-  file = ftp_filename_from_gvfs_path (conn, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   ftp_connection_send_and_check (conn,
 		                 RESPONSE_PASS_100 | RESPONSE_FAIL_200, 
 		                 &open_read_handlers[0],
 		                 file,
-		                 "RETR %s", file);
-  g_free (file);
+		                 "RETR %s", g_vfs_ftp_file_get_ftp_path (file));
+  g_vfs_ftp_file_free (file);
 
   if (ftp_connection_in_error (conn))
     g_vfs_backend_ftp_push_connection (ftp, conn);
@@ -1763,7 +1704,7 @@ do_start_write (GVfsBackendFtp *ftp,
 
 static void
 gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *ftp,
-					const FtpFile * dir)
+					const GVfsFtpFile * dir)
 {
   g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
   g_hash_table_remove (ftp->directory_cache, dir);
@@ -1773,14 +1714,14 @@ gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *ftp,
 static void
 gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *ftp,
 				      FtpConnection * conn,
-				      const FtpFile * file)
+				      const GVfsFtpFile * file)
 {
-  FtpFile *dir = ftp_filename_get_parent (conn, file);
+  GVfsFtpFile *dir = g_vfs_ftp_file_new_parent (file);
 
-  if (!ftp_filename_equal (file, dir))
+  if (!g_vfs_ftp_file_equal (file, dir))
     gvfs_backend_ftp_purge_cache_directory (ftp, dir);
 
-  g_free (dir);
+  g_vfs_ftp_file_free (dir);
 }
 
 /* forward declaration */
@@ -1796,7 +1737,7 @@ do_create (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
   GFileInfo *info;
-  FtpFile *file;
+  GVfsFtpFile *file;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
@@ -1812,10 +1753,10 @@ do_create (GVfsBackend *backend,
 			   _("Target file already exists"));
       goto error;
     }
-  file = ftp_filename_from_gvfs_path (conn, filename);
-  do_start_write (ftp, conn, flags, "STOR %s", file);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  do_start_write (ftp, conn, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
-  g_free (file);
+  g_vfs_ftp_file_free (file);
   return;
 
 error:
@@ -1830,16 +1771,16 @@ do_append (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *file;
+  GVfsFtpFile *file;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
     return;
 
-  file = ftp_filename_from_gvfs_path (conn, filename);
-  do_start_write (ftp, conn, flags, "APPE %s", filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  do_start_write (ftp, conn, flags, "APPE %s", g_vfs_ftp_file_get_ftp_path (file));
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
-  g_free (file);
+  g_vfs_ftp_file_free (file);
   return;
 }
 
@@ -1853,7 +1794,7 @@ do_replace (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *file;
+  GVfsFtpFile *file;
 
   if (make_backup)
     {
@@ -1869,10 +1810,10 @@ do_replace (GVfsBackend *backend,
   if (conn == NULL)
     return;
 
-  file = ftp_filename_from_gvfs_path (conn, filename);
-  do_start_write (ftp, conn, flags, "STOR %s", file);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  do_start_write (ftp, conn, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
-  g_free (file);
+  g_vfs_ftp_file_free (file);
   return;
 }
 
@@ -1999,7 +1940,7 @@ do_enumerate_directory (FtpConnection *conn)
 static const FtpDirEntry *
 enumerate_directory (GVfsBackendFtp *ftp,
                      FtpConnection * conn,
-		     const FtpFile * dir,
+		     const GVfsFtpFile * dir,
 		     gboolean	     use_cache)
 {
   FtpDirEntry *entry;
@@ -2021,7 +1962,7 @@ enumerate_directory (GVfsBackendFtp *ftp,
 	if (entry == NULL)
           return NULL;
 	g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
-	g_hash_table_insert (ftp->directory_cache, g_strdup ((const char *) dir), entry);
+	g_hash_table_insert (ftp->directory_cache, g_vfs_ftp_file_copy (dir), entry);
 	g_static_rw_lock_writer_unlock (&ftp->directory_cache_lock);
 	entry = NULL;
 	g_static_rw_lock_reader_lock (&ftp->directory_cache_lock);
@@ -2033,7 +1974,7 @@ enumerate_directory (GVfsBackendFtp *ftp,
 
 static GFileInfo *
 create_file_info_from_parent (GVfsBackendFtp *ftp, FtpConnection *conn, 
-    const FtpFile *dir, const FtpFile *file, char **symlink)
+    const GVfsFtpFile *dir, const GVfsFtpFile *file, char **symlink)
 {
   GFileInfo *info = NULL;
   gpointer iter;
@@ -2065,7 +2006,7 @@ create_file_info_from_parent (GVfsBackendFtp *ftp, FtpConnection *conn,
 
 static GFileInfo *
 create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn, 
-    const FtpFile *file, const char *filename, char **symlink)
+    const GVfsFtpFile *file, const char *filename, char **symlink)
 {
   GFileInfo *info;
 
@@ -2083,7 +2024,7 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
 
       g_file_info_set_is_hidden (info, TRUE);
     }
-  else if (ftp_connection_send (conn, 0, "SIZE %s", file))
+  else if (ftp_connection_send (conn, 0, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
     {
       char *tmp;
 
@@ -2119,8 +2060,7 @@ create_file_info_from_file (GVfsBackendFtp *ftp, FtpConnection *conn,
 static GFileInfo *
 create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename, char **symlink)
 {
-  char *dirname;
-  FtpFile *dir, *file;
+  GVfsFtpFile *dir, *file;
   GFileInfo *info;
 
   if (symlink)
@@ -2129,17 +2069,15 @@ create_file_info (GVfsBackendFtp *ftp, FtpConnection *conn, const char *filename
   if (g_str_equal (filename, "/"))
     return create_file_info_for_root (ftp);
 
-  dirname = g_path_get_dirname (filename);
-  dir = ftp_filename_from_gvfs_path (conn, dirname);
-  g_free (dirname);
-  file = ftp_filename_from_gvfs_path (conn, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  dir = g_vfs_ftp_file_new_parent (file);
 
   info = create_file_info_from_parent (ftp, conn, dir, file, symlink);
   if (info == NULL)
     info = create_file_info_from_file (ftp, conn, file, filename, symlink);
 
-  g_free (dir);
-  g_free (file);
+  g_vfs_ftp_file_free (dir);
+  g_vfs_ftp_file_free (file);
   return info;
 }
 
@@ -2271,7 +2209,7 @@ do_enumerate (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *dir;
+  GVfsFtpFile *dir;
   gpointer iter;
   GSList *symlink_targets = NULL;
   GSList *symlink_fileinfos = NULL;
@@ -2288,7 +2226,7 @@ do_enumerate (GVfsBackend *backend,
    * automatically.
    */
 
-  dir = ftp_filename_from_gvfs_path (conn, dirname);
+  dir = g_vfs_ftp_file_new_from_gvfs (ftp, dirname);
   entry = enumerate_directory (ftp, conn, dir, FALSE);
   if (ftp_connection_pop_job (conn))
     {
@@ -2342,7 +2280,7 @@ do_enumerate (GVfsBackend *backend,
     g_assert (entry == NULL);
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
-  g_free (dir);
+  g_vfs_ftp_file_free (dir);
 }
 
 static void
@@ -2353,40 +2291,29 @@ do_set_display_name (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  char *name;
-  FtpFile *original, *dir, *now;
+  GVfsFtpFile *original, *dir, *now;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
     return;
 
-  original = ftp_filename_from_gvfs_path (conn, filename);
-  name = g_path_get_dirname (filename);
-  dir = ftp_filename_from_gvfs_path (conn, name);
-  g_free (name);
-  now = ftp_filename_construct (conn, dir, display_name);
-  if (now == NULL)
-    {
-      g_set_error_literal (&conn->error, 
-		           G_IO_ERROR,
-		           G_IO_ERROR_INVALID_FILENAME,
-			   _("Invalid filename"));
-    }
+  original = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  dir = g_vfs_ftp_file_new_parent (original);
+  now = g_vfs_ftp_file_new_child (dir, display_name, &conn->error);
   ftp_connection_send (conn,
 		       RESPONSE_PASS_300 | RESPONSE_FAIL_200,
-		       "RNFR %s", original);
-  g_free (original);
+		       "RNFR %s", g_vfs_ftp_file_get_ftp_path (original));
   ftp_connection_send (conn,
 		       0,
-		       "RNTO %s", now);
+		       "RNTO %s", g_vfs_ftp_file_get_ftp_path (now));
 
-  name = ftp_filename_to_gvfs_path (conn, now);
-  g_free (now);
-  g_vfs_job_set_display_name_set_new_path (job, name);
-  g_free (name);
+  /* FIXME: parse result of RNTO here? */
+  g_vfs_job_set_display_name_set_new_path (job, g_vfs_ftp_file_get_gvfs_path (now));
   gvfs_backend_ftp_purge_cache_directory (ftp, dir);
-  g_free (dir);
   g_vfs_backend_ftp_push_connection (ftp, conn);
+  g_vfs_ftp_file_free (now);
+  g_vfs_ftp_file_free (dir);
+  g_vfs_ftp_file_free (original);
 }
 
 static void
@@ -2396,7 +2323,7 @@ do_delete (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *file;
+  GVfsFtpFile *file;
   guint response;
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
@@ -2405,15 +2332,15 @@ do_delete (GVfsBackend *backend,
 
   /* We try file deletion first. If that fails, we try directory deletion.
    * The file-first-then-directory order has been decided by coin-toss. */
-  file = ftp_filename_from_gvfs_path (conn, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   response = ftp_connection_send (conn,
 				  RESPONSE_PASS_500,
-				  "DELE %s", file);
+				  "DELE %s", g_vfs_ftp_file_get_ftp_path (file));
   if (STATUS_GROUP (response) == 5)
     {
       response = ftp_connection_send (conn,
 				      RESPONSE_PASS_500,
-				      "RMD %s", file);
+				      "RMD %s", g_vfs_ftp_file_get_ftp_path (file));
       if (response == 550)
 	{
 	  const FtpDirEntry *entry = enumerate_directory (ftp, conn, file, FALSE);
@@ -2438,7 +2365,7 @@ do_delete (GVfsBackend *backend,
     }
 
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
-  g_free (file);
+  g_vfs_ftp_file_free (file);
   g_vfs_backend_ftp_push_connection (ftp, conn);
 }
 
@@ -2449,24 +2376,24 @@ do_make_directory (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *file;
+  GVfsFtpFile *file;
   static const Ftp550Handler make_directory_handlers[] = { error_550_exists, error_550_parent_not_found, NULL };
 
   conn = g_vfs_backend_ftp_pop_connection (ftp, G_VFS_JOB (job));
   if (conn == NULL)
     return;
 
-  file = ftp_filename_from_gvfs_path (conn, filename);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   ftp_connection_send_and_check (conn,
                                  0,
                                  make_directory_handlers,
                                  file,
-                                 "MKD %s", file);
+                                 "MKD %s", g_vfs_ftp_file_get_ftp_path (file));
 
   /* FIXME: Compare created file with name from server result to be sure 
    * it's correct and otherwise fail. */
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, file);
-  g_free (file);
+  g_vfs_ftp_file_free (file);
 
   g_vfs_backend_ftp_push_connection (ftp, conn);
 }
@@ -2482,7 +2409,7 @@ do_move (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   FtpConnection *conn;
-  FtpFile *srcfile, *destfile;
+  GVfsFtpFile *srcfile, *destfile;
 
   /* FIXME: what about G_FILE_COPY_NOFOLLOW_SYMLINKS and G_FILE_COPY_ALL_METADATA? */
 
@@ -2500,31 +2427,30 @@ do_move (GVfsBackend *backend,
   if (conn == NULL)
     return;
 
-  srcfile = ftp_filename_from_gvfs_path (conn, source);
-  destfile = ftp_filename_from_gvfs_path (conn, destination);
+  srcfile = g_vfs_ftp_file_new_from_gvfs (ftp, source);
+  destfile = g_vfs_ftp_file_new_from_gvfs (ftp, destination);
   if (ftp_connection_try_cd (conn, destfile))
     {
       char *basename = g_path_get_basename (source);
-      FtpFile *real = ftp_filename_construct (conn, destfile, basename);
+      GVfsFtpFile *real = g_vfs_ftp_file_new_child (destfile, basename, &conn->error);
 
       g_free (basename);
       if (real == NULL)
-	g_set_error_literal (&conn->error, 
-		             G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
-			     _("Invalid destination filename"));
+	goto out;
       else
 	{
-	  g_free (destfile);
+	  g_vfs_ftp_file_free (destfile);
 	  destfile = real;
 	}
     }
 
   if (!(flags & G_FILE_COPY_OVERWRITE))
     {
-      char *destfilename = ftp_filename_to_gvfs_path (conn, destfile);
-      GFileInfo *info = create_file_info (ftp, conn, destfilename, NULL);
+      GFileInfo *info = create_file_info (ftp,
+                                          conn,
+                                          g_vfs_ftp_file_get_gvfs_path (destfile),
+                                          NULL);
 
-      g_free (destfilename);
       if (info)
 	{
 	  g_object_unref (info);
@@ -2538,16 +2464,16 @@ do_move (GVfsBackend *backend,
 
   ftp_connection_send (conn,
 		       RESPONSE_PASS_300 | RESPONSE_FAIL_200,
-		       "RNFR %s", srcfile);
+		       "RNFR %s", g_vfs_ftp_file_get_ftp_path (srcfile));
   ftp_connection_send (conn,
 		       0,
-		       "RNTO %s", destfile);
+		       "RNTO %s", g_vfs_ftp_file_get_ftp_path (destfile));
 
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, srcfile);
   gvfs_backend_ftp_purge_cache_of_file (ftp, conn, destfile);
 out:
-  g_free (srcfile);
-  g_free (destfile);
+  g_vfs_ftp_file_free (srcfile);
+  g_vfs_ftp_file_free (destfile);
   g_vfs_backend_ftp_push_connection (ftp, conn);
 }
 

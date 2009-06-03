@@ -231,6 +231,7 @@ gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(XML_LIBS) $(HAL_LIBS) $(libraries)
 
 gvfsd_ftp_SOURCES = \
 	gvfsftpconnection.c gvfsftpconnection.h \
+	gvfsftpfile.c gvfsftpfile.h \
 	gvfsbackendftp.c gvfsbackendftp.h \
 	ParseFTPList.c ParseFTPList.h \
 	daemon-main.c daemon-main.h \
