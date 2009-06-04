@@ -50,6 +50,7 @@
 
 #include "ParseFTPList.h"
 #include "gvfsftpconnection.h"
+#include "gvfsftpdircache.h"
 #include "gvfsftpfile.h"
 #include "gvfsftptask.h"
 
@@ -67,29 +68,7 @@
  * paths exactly match those of a TVFS-using FTP server.
  */
 
-typedef struct _FtpDirEntry FtpDirEntry;
-struct _FtpDirEntry {
-  gsize         size;
-  gsize         length;
-  gchar         data[1];
-};
-
-struct FtpDirReader {
-  void		(* init_data)	(GVfsFtpTask *      task,
-				 const GVfsFtpFile *dir);
-  gpointer	(* iter_new)	(GVfsFtpTask *      task);
-  GFileInfo *	(* iter_process)(gpointer           iter,
-				 GVfsFtpTask *      task,
-				 const GVfsFtpFile *dirname,
-				 const GVfsFtpFile *must_match_file,
-				 const char *       line,
-				 char **            symlink);
-  void		(* iter_free)	(gpointer	    iter);
-};
-
 G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
-
-/*** CODE ***/
 
 static gboolean
 gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
@@ -180,6 +159,44 @@ gvfs_backend_ftp_determine_system (GVfsFtpTask *task)
   g_strfreev (reply);
 }
 
+static GFileInfo *
+g_vfs_bacend_ftp_create_root_file_info (GVfsBackendFtp *ftp)
+{
+  GFileInfo *info;
+  GIcon *icon;
+  char *display_name;
+  
+  info = g_file_info_new ();
+  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+
+  g_file_info_set_name (info, "/");
+  display_name = g_strdup_printf (_("/ on %s"), ftp->host_display_name);
+  g_file_info_set_display_name (info, display_name);
+  g_free (display_name);
+  g_file_info_set_edit_name (info, "/");
+
+  g_file_info_set_content_type (info, "inode/directory");
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+
+  icon = g_themed_icon_new ("folder-remote");
+  g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+
+  return info;
+}
+
+static void
+gvfs_backend_ftp_setup_directory_cache (GVfsBackendFtp *ftp)
+{
+  if (ftp->system == G_VFS_FTP_SYSTEM_UNIX)
+    ftp->dir_funcs = &g_vfs_ftp_dir_cache_funcs_unix;
+  else
+    ftp->dir_funcs = &g_vfs_ftp_dir_cache_funcs_default;
+
+  ftp->dir_cache = g_vfs_ftp_dir_cache_new (ftp->dir_funcs,
+                                            g_vfs_bacend_ftp_create_root_file_info (ftp));
+}
+
 /*** COMMON FUNCTIONS WITH SPECIAL HANDLING ***/
 
 static gboolean
@@ -217,169 +234,6 @@ g_vfs_ftp_task_try_cd (GVfsFtpTask *task, const GVfsFtpFile *file)
 /*** default directory reading ***/
 
 static void
-dir_default_init_data (GVfsFtpTask *task, const GVfsFtpFile *dir)
-{
-  g_vfs_ftp_task_cd (task, dir);
-  g_vfs_ftp_task_open_data_connection (task);
-
-  g_vfs_ftp_task_send (task,
-		       G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
-		       (task->backend->system == G_VFS_FTP_SYSTEM_UNIX) ? "LIST -a" : "LIST");
-}
-
-static gpointer
-dir_default_iter_new (GVfsFtpTask *task)
-{
-  return g_slice_new0 (struct list_state);
-}
-
-static GFileInfo *
-dir_default_iter_process (gpointer           iter,
-                          GVfsFtpTask *      task,
-			  const GVfsFtpFile *dir,
-			  const GVfsFtpFile *must_match_file,
-			  const char        *line,
-			  char		   **symlink)
-{
-  struct list_state *state = iter;
-  struct list_result result = { 0, };
-  GTimeVal tv = { 0, 0 };
-  GFileInfo *info;
-  int type;
-  GVfsFtpFile *name;
-  const char *s;
-  char *t;
-
-  type = ParseFTPList (line, state, &result);
-  if (type != 'd' && type != 'f' && type != 'l')
-    return NULL;
-
-  /* don't list . and .. directories
-   * Let's hope they're not important files on some ftp servers
-   */
-  if (type == 'd')
-    {
-      if (result.fe_fnlen == 1 && 
-	  result.fe_fname[0] == '.')
-	return NULL;
-      if (result.fe_fnlen == 2 && 
-	  result.fe_fname[0] == '.' &&
-	  result.fe_fname[1] == '.')
-	return NULL;
-    }
-
-  t = g_strndup (result.fe_fname, result.fe_fnlen);
-  if (dir)
-    {
-      name = g_vfs_ftp_file_new_child  (dir, t, NULL);
-      g_free (t);
-    }
-  else
-    {
-      name = g_vfs_ftp_file_new_from_ftp (task->backend, t);
-      g_free (t);
-    }
-  if (name == NULL)
-    return NULL;
-
-  if (must_match_file && !g_vfs_ftp_file_equal (name, must_match_file))
-    {
-      g_vfs_ftp_file_free (name);
-      return NULL;
-    }
-
-  info = g_file_info_new ();
-
-  s = g_vfs_ftp_file_get_gvfs_path (name);
-
-  t = g_path_get_basename (s);
-  g_file_info_set_name (info, t);
-  g_free (t);
-
-  if (type == 'l')
-    {
-      char *link;
-
-      link = g_strndup (result.fe_lname, result.fe_lnlen);
-
-      /* FIXME: this whole stuff is not GVfsFtpFile save */
-      g_file_info_set_symlink_target (info, link);
-      g_file_info_set_is_symlink (info, TRUE);
-
-      if (symlink)
-	{
-	  char *str = g_path_get_dirname (s);
-	  char *symlink_file = g_build_path ("/", str, link, NULL);
-
-	  g_free (str);
-	  while ((str = strstr (symlink_file, "/../")))
-	    {
-	      char *end = str + 4;
-	      char *start;
-	      start = str - 1;
-	      while (start >= symlink_file && *start != '/')
-		start--;
-
-	      if (start < symlink_file) {
-		      *symlink_file = '/';
-		      start = symlink_file;
-	      }
-
-	      memmove (start + 1, end, strlen (end) + 1);
-	    }
-	  str = symlink_file + strlen (symlink_file) - 1;
-	  while (*str == '/' && str > symlink_file)
-	    *str-- = 0;
-	  *symlink = symlink_file;
-	}
-      g_free (link);
-    }
-  else if (symlink)
-    *symlink = NULL;
-
-  g_file_info_set_size (info, g_ascii_strtoull (result.fe_size, NULL, 10));
-
-  gvfs_file_info_populate_default (info, s,
-				   type == 'f' ? G_FILE_TYPE_REGULAR :
-				   type == 'l' ? G_FILE_TYPE_SYMBOLIC_LINK :
-				   G_FILE_TYPE_DIRECTORY);
-
-  if (task->backend->system == G_VFS_FTP_SYSTEM_UNIX)
-    g_file_info_set_is_hidden (info, result.fe_fnlen > 0 &&
-	                             result.fe_fname[0] == '.');
-
-  g_vfs_ftp_file_free (name);
-
-  /* Workaround:
-   * result.fetime.tm_year contains actual year instead of offset-from-1900,
-   * which mktime expects.
-   */
-  if (result.fe_time.tm_year >= 1900)
-	  result.fe_time.tm_year -= 1900;
-
-  tv.tv_sec = mktime (&result.fe_time);
-  if (tv.tv_sec != -1)
-    g_file_info_set_modification_time (info, &tv);
-
-  return info;
-}
-
-static void
-dir_default_iter_free (gpointer iter)
-{
-  g_slice_free (struct list_state, iter);
-}
-
-static const FtpDirReader dir_default = {
-  dir_default_init_data,
-  dir_default_iter_new,
-  dir_default_iter_process,
-  dir_default_iter_free
-};
-
-/*** BACKEND ***/
-
-static void
 g_vfs_backend_ftp_finalize (GObject *object)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (object);
@@ -392,9 +246,6 @@ g_vfs_backend_ftp_finalize (GObject *object)
   g_cond_free (ftp->cond);
   g_mutex_free (ftp->mutex);
 
-  g_hash_table_destroy (ftp->directory_cache);
-  g_static_rw_lock_free (&ftp->directory_cache_lock);
-
   g_free (ftp->user);
   g_free (ftp->password);
 
@@ -403,46 +254,10 @@ g_vfs_backend_ftp_finalize (GObject *object)
 }
 
 static void
-ftp_dir_entry_free (gpointer entry)
-{
-  g_free (entry);
-}
-
-static FtpDirEntry *
-ftp_dir_entry_grow (FtpDirEntry *entry)
-{
-  entry = g_try_realloc (entry, sizeof (FtpDirEntry) + entry->size + 4096);
-  if (entry == NULL)
-    return NULL;
-  entry->size += 4096;
-  return entry;
-}
-
-static FtpDirEntry *
-ftp_dir_entry_new (void)
-{
-  FtpDirEntry *entry;
-  
-  entry = g_malloc (4096);
-  entry->size = 4096 - sizeof (FtpDirEntry);
-  entry->length = 0;
-
-  return entry;
-}
-
-static void
 g_vfs_backend_ftp_init (GVfsBackendFtp *ftp)
 {
   ftp->mutex = g_mutex_new ();
   ftp->cond = g_cond_new ();
-
-  ftp->directory_cache = g_hash_table_new_full (g_vfs_ftp_file_hash,
-					        g_vfs_ftp_file_equal,
-						g_vfs_ftp_file_free,
-						ftp_dir_entry_free);
-  g_static_rw_lock_init (&ftp->directory_cache_lock);
-
-  ftp->dir_ops = &dir_default;
 }
 
 static void
@@ -600,6 +415,7 @@ try_login:
     }
   g_vfs_ftp_task_setup_connection (&task);
   gvfs_backend_ftp_determine_system (&task);
+  gvfs_backend_ftp_setup_directory_cache (ftp);
 
   /* Save the address of the current connection, so that for future connections,
    * we are sure to connect to the same machine.
@@ -903,30 +719,74 @@ do_start_write (GVfsFtpTask *task,
     }
 }
 
-static void
-gvfs_backend_ftp_purge_cache_directory (GVfsBackendFtp *   ftp,
-					const GVfsFtpFile *dir)
-{
-  g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
-  g_hash_table_remove (ftp->directory_cache, dir);
-  g_static_rw_lock_writer_unlock (&ftp->directory_cache_lock);
-}
-
-static void
-gvfs_backend_ftp_purge_cache_of_file (GVfsBackendFtp *   ftp,
-				      const GVfsFtpFile *file)
-{
-  GVfsFtpFile *dir = g_vfs_ftp_file_new_parent (file);
-
-  if (!g_vfs_ftp_file_equal (file, dir))
-    gvfs_backend_ftp_purge_cache_directory (ftp, dir);
-
-  g_vfs_ftp_file_free (dir);
-}
-
-/* forward declaration */
+/* NB: This gets a file info for the given object, no matter if it's a dir 
+ * or a file */
 static GFileInfo *
-create_file_info (GVfsFtpTask *task, const char *filename, char **symlink);
+create_file_info (GVfsFtpTask *task, GVfsFtpFile *file, gboolean resolve_symlinks)
+{
+  GFileInfo *info;
+  char **reply;
+
+  if (g_vfs_ftp_task_is_in_error (task))
+    return NULL;
+
+  info = g_vfs_ftp_dir_cache_lookup_file (task->backend->dir_cache, task, file, resolve_symlinks);
+  if (info)
+    return info;
+
+  g_vfs_ftp_task_clear_error (task);
+
+  /* the directory cache fails when the parent directory of the file is not readable.
+   * This cannot happen on Unix, but it can happen on FTP.
+   * In this case we try to figure out as much as possible about the file (does it even exist?)
+   * using standard ftp commands.
+   */
+  if (g_vfs_ftp_task_try_cd (task, file))
+    {
+      char *tmp;
+
+      info = g_file_info_new ();
+
+      tmp = g_path_get_basename (g_vfs_ftp_file_get_gvfs_path (file));
+      g_file_info_set_name (info, tmp);
+      g_free (tmp);
+
+      gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file), G_FILE_TYPE_DIRECTORY);
+
+      g_file_info_set_is_hidden (info, TRUE);
+    }
+  else if (g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
+    {
+      char *tmp;
+
+      info = g_file_info_new ();
+
+      tmp = g_path_get_basename (g_vfs_ftp_file_get_gvfs_path (file));
+      g_file_info_set_name (info, tmp);
+      g_free (tmp);
+
+      gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file), G_FILE_TYPE_REGULAR);
+
+      g_file_info_set_size (info, g_ascii_strtoull (reply[0] + 4, NULL, 0));
+      g_strfreev (reply);
+
+      g_file_info_set_is_hidden (info, TRUE);
+    }
+  else
+    {
+      info = NULL;
+      /* clear error from ftp_connection_send() in else if line above */
+      g_vfs_ftp_task_clear_error (task);
+
+      /* note that there might still be a file/directory, we just have 
+       * no way to figure this out (in particular on ftp servers that 
+       * don't support SIZE.
+       * If you have ways to improve file detection, patches are welcome. */
+    }
+
+  return info;
+}
+
 
 static void
 do_create (GVfsBackend *backend,
@@ -939,7 +799,8 @@ do_create (GVfsBackend *backend,
   GFileInfo *info;
   GVfsFtpFile *file;
 
-  info = create_file_info (&task, filename, NULL);
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  info = create_file_info (&task, file, FALSE);
   if (info)
     {
       g_object_unref (info);
@@ -947,12 +808,12 @@ do_create (GVfsBackend *backend,
 		           G_IO_ERROR,
 			   G_IO_ERROR_EXISTS,
 			   _("Target file already exists"));
+      g_vfs_ftp_file_free (file);
       g_vfs_ftp_task_done (&task);
       return;
     }
-  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   do_start_write (&task, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
-  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
 
   g_vfs_ftp_task_done (&task);
@@ -970,7 +831,7 @@ do_append (GVfsBackend *backend,
 
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   do_start_write (&task, flags, "APPE %s", g_vfs_ftp_file_get_ftp_path (file));
-  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
 
   g_vfs_ftp_task_done (&task);
@@ -1001,7 +862,7 @@ do_replace (GVfsBackend *backend,
 
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
   do_start_write (&task, flags, "STOR %s", g_vfs_ftp_file_get_ftp_path (file));
-  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
 
   g_vfs_ftp_task_done (&task);
@@ -1048,301 +909,6 @@ do_write (GVfsBackend *backend,
   g_vfs_ftp_task_done (&task);
 }
 
-static GFileInfo *
-create_file_info_for_root (GVfsBackendFtp *ftp)
-{
-  GFileInfo *info;
-  GIcon *icon;
-  char *display_name;
-  
-  info = g_file_info_new ();
-  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
-
-  g_file_info_set_name (info, "/");
-  display_name = g_strdup_printf (_("/ on %s"), ftp->host_display_name);
-  g_file_info_set_display_name (info, display_name);
-  g_free (display_name);
-  g_file_info_set_edit_name (info, "/");
-
-  g_file_info_set_content_type (info, "inode/directory");
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
-
-  icon = g_themed_icon_new ("folder-remote");
-  g_file_info_set_icon (info, icon);
-  g_object_unref (icon);
-
-  return info;
-}
-
-static FtpDirEntry *
-do_enumerate_directory (GVfsFtpTask *task)
-{
-  gssize n_bytes;
-  FtpDirEntry *entry;
-
-  if (g_vfs_ftp_task_is_in_error (task))
-    return NULL;
-
-  entry = ftp_dir_entry_new ();
-
-  do
-    {
-      if (entry->size - entry->length < 128)
-        {
-          entry = ftp_dir_entry_grow (entry);
-          if (entry == NULL)
-	    {
-	      g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			           _("Out of memory while reading directory contents"));
-	      return NULL;
-	    }
-	}
-      n_bytes = g_vfs_ftp_connection_read_data (task->conn,
-                                                entry->data + entry->length,
-                                                entry->size - entry->length - 1,
-                                                task->cancellable,
-                                                &task->error);
-
-      if (n_bytes < 0)
-        {
-          ftp_dir_entry_free (entry);
-          return NULL;
-        }
-
-      entry->length += n_bytes;
-    }
-  while (n_bytes > 0);
-
-  g_vfs_ftp_task_close_data_connection (task);
-  g_vfs_ftp_task_receive (task, 0, NULL);
-  if (g_vfs_ftp_task_is_in_error (task))
-    {
-      ftp_dir_entry_free (entry);
-      return NULL;
-    }
-  /* null-terminate, just because */
-  entry->data[entry->length] = 0;
-
-  return entry;
-}
-
-/* IMPORTANT: SUCK ALARM!
- * locks ftp->directory_cache_lock but only iff it returns !NULL */
-static const FtpDirEntry *
-enumerate_directory (GVfsFtpTask *      task,
-		     const GVfsFtpFile *dir,
-		     gboolean	        use_cache)
-{
-  GVfsBackendFtp *ftp = task->backend;
-  FtpDirEntry *entry;
-
-  g_static_rw_lock_reader_lock (&ftp->directory_cache_lock);
-  do {
-    if (use_cache)
-      entry = g_hash_table_lookup (ftp->directory_cache, dir);
-    else
-      {
-	use_cache = TRUE;
-	entry = NULL;
-      }
-    if (entry == NULL)
-      {
-	g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-	ftp->dir_ops->init_data (task, dir);
-	entry = do_enumerate_directory (task);
-	if (entry == NULL)
-          return NULL;
-	g_static_rw_lock_writer_lock (&ftp->directory_cache_lock);
-	g_hash_table_insert (ftp->directory_cache, g_vfs_ftp_file_copy (dir), entry);
-	g_static_rw_lock_writer_unlock (&ftp->directory_cache_lock);
-	entry = NULL;
-	g_static_rw_lock_reader_lock (&ftp->directory_cache_lock);
-      }
-  } while (entry == NULL);
-
-  return entry;
-}
-
-static GFileInfo *
-create_file_info_from_parent (GVfsFtpTask *      task, 
-                              const GVfsFtpFile *dir,
-                              const GVfsFtpFile *file,
-                              char **            symlink)
-{
-  GFileInfo *info = NULL;
-  gpointer iter;
-  const FtpDirEntry *entry;
-  const char *sol, *eol;
-
-  entry = enumerate_directory (task, dir, TRUE);
-  if (entry == NULL)
-    return NULL;
-
-  iter = task->backend->dir_ops->iter_new (task);
-  for (sol = eol = entry->data; eol; sol = eol + 1)
-    {
-      eol = memchr (sol, '\n', entry->length - (sol - entry->data));
-      info = task->backend->dir_ops->iter_process (iter,
-                                                   task,
-                                                   dir,
-                                                   file,
-                                                   sol,
-                                                   symlink);
-      if (info)
-        break;
-    }
-  task->backend->dir_ops->iter_free (iter);
-  g_static_rw_lock_reader_unlock (&task->backend->directory_cache_lock);
-
-  return info;
-}
-
-static GFileInfo *
-create_file_info_from_file (GVfsFtpTask *task, const GVfsFtpFile *file, 
-    const char *filename, char **symlink)
-{
-  GFileInfo *info;
-  char **reply;
-
-  if (g_vfs_ftp_task_try_cd (task, file))
-    {
-      char *tmp;
-
-      info = g_file_info_new ();
-
-      tmp = g_path_get_basename (filename);
-      g_file_info_set_name (info, tmp);
-      g_free (tmp);
-
-      gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_DIRECTORY);
-
-      g_file_info_set_is_hidden (info, TRUE);
-    }
-  else if (g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
-    {
-      char *tmp;
-
-      info = g_file_info_new ();
-
-      tmp = g_path_get_basename (filename);
-      g_file_info_set_name (info, tmp);
-      g_free (tmp);
-
-      gvfs_file_info_populate_default (info, filename, G_FILE_TYPE_REGULAR);
-
-      g_file_info_set_size (info, g_ascii_strtoull (reply[0] + 4, NULL, 0));
-      g_strfreev (reply);
-
-      g_file_info_set_is_hidden (info, TRUE);
-    }
-  else
-    {
-      info = NULL;
-      /* clear error from ftp_connection_send() in else if line above */
-      g_vfs_ftp_task_clear_error (task);
-
-      /* note that there might still be a file/directory, we just have 
-       * no way to figure this out (in particular on ftp servers that 
-       * don't support SIZE.
-       * If you have ways to improve file detection, patches are welcome. */
-    }
-
-  return info;
-}
-
-/* NB: This gets a file info for the given object, no matter if it's a dir 
- * or a file */
-static GFileInfo *
-create_file_info (GVfsFtpTask *task, const char *filename, char **symlink)
-{
-  GVfsFtpFile *dir, *file;
-  GFileInfo *info;
-
-  if (symlink)
-    *symlink = NULL;
-
-  if (g_str_equal (filename, "/"))
-    return create_file_info_for_root (task->backend);
-
-  file = g_vfs_ftp_file_new_from_gvfs (task->backend, filename);
-  dir = g_vfs_ftp_file_new_parent (file);
-
-  info = create_file_info_from_parent (task, dir, file, symlink);
-  if (info == NULL)
-    info = create_file_info_from_file (task, file, filename, symlink);
-
-  g_vfs_ftp_file_free (dir);
-  g_vfs_ftp_file_free (file);
-  return info;
-}
-
-static GFileInfo *
-resolve_symlink (GVfsFtpTask *task, GFileInfo *original, const char *filename)
-{
-  GFileInfo *info = NULL;
-  char *symlink, *newlink;
-  guint i;
-  static const char *copy_attributes[] = {
-    G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK,
-    G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
-    G_FILE_ATTRIBUTE_STANDARD_NAME,
-    G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
-    G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME,
-    G_FILE_ATTRIBUTE_STANDARD_COPY_NAME,
-    G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET
-  };
-
-  if (g_vfs_ftp_task_is_in_error (task))
-    return original;
-
-  /* How many symlinks should we follow?
-   * <alex> maybe 8?
-   */
-  symlink = g_strdup (filename);
-  for (i = 0; i < 8 && symlink; i++)
-    {
-      info = create_file_info (task,
-			       symlink,
-			       &newlink);
-      if (!newlink)
-	break;
-
-      g_free (symlink);
-      symlink = newlink;
-    }
-  g_free (symlink);
-
-  if (g_vfs_ftp_task_is_in_error (task))
-    {
-      g_assert (info == NULL);
-      g_vfs_ftp_task_clear_error (task);
-      return original;
-    }
-  if (info == NULL)
-    return original;
-
-  for (i = 0; i < G_N_ELEMENTS (copy_attributes); i++)
-    {
-      GFileAttributeType type;
-      gpointer value;
-
-      if (!g_file_info_get_attribute_data (original,
-					   copy_attributes[i],
-					   &type,
-					   &value,
-					   NULL))
-	continue;
-      
-      g_file_info_set_attribute (info,
-	                         copy_attributes[i],
-				 type,
-				 value);
-    }
-  g_object_unref (original);
-
-  return info;
-}
-
 static void
 do_query_info (GVfsBackend *backend,
 	       GVfsJobQueryInfo *job,
@@ -1353,26 +919,11 @@ do_query_info (GVfsBackend *backend,
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
+  GVfsFtpFile *file;
   GFileInfo *real;
-  char *symlink;
-
-  if (query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
-    {
-      real = create_file_info (&task,
-			       filename,
-			       NULL);
-    }
-  else
-    {
-      real = create_file_info (&task,
-			       filename,
-			       &symlink);
-      if (symlink)
-	{
-	  real = resolve_symlink (&task, real, symlink);
-	  g_free (symlink);
-	}
-    }
+  
+  file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
+  real = create_file_info (&task, file, query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? FALSE : TRUE);
 
   if (real)
     {
@@ -1400,68 +951,29 @@ do_enumerate (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *dir;
-  gpointer iter;
-  GSList *symlink_targets = NULL;
-  GSList *symlink_fileinfos = NULL;
-  GSList *twalk, *fwalk;
-  GFileInfo *info;
-  const FtpDirEntry *entry;
-  const char *sol, *eol;
-
-  /* no need to check for IS_DIR, because the enumeration code will return that
-   * automatically.
-   */
+  GList *list;
 
   dir = g_vfs_ftp_file_new_from_gvfs (ftp, dirname);
-  entry = enumerate_directory (&task, dir, FALSE);
-  if (entry != NULL)
+  list = g_vfs_ftp_dir_cache_lookup_dir (ftp->dir_cache,
+                                         &task,
+                                         dir,
+                                         TRUE,
+                                         query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? FALSE : TRUE);
+  if (g_vfs_ftp_task_is_in_error (&task))
     {
-      g_vfs_job_succeeded (task.job);
-      task.job = NULL;
-
-      iter = ftp->dir_ops->iter_new (&task);
-      for (sol = eol = entry->data; eol; sol = eol + 1)
-        {
-          char *symlink = NULL;
-
-          eol = memchr (sol, '\n', entry->length - (sol - entry->data));
-          info = ftp->dir_ops->iter_process (iter,
-                                             &task,
-                                             dir,
-                                             NULL,
-                                             sol,
-                                             query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? NULL : &symlink);
-          if (symlink)
-            {
-              /* This is necessary due to our locking. 
-               * And we must not unlock here because it might invalidate the list we iterate */
-              symlink_targets = g_slist_prepend (symlink_targets, symlink);
-              symlink_fileinfos = g_slist_prepend (symlink_fileinfos, info);
-            }
-          else if (info)
-            {
-              g_vfs_job_enumerate_add_info (job, info);
-              g_object_unref (info);
-            }
-        }
-      ftp->dir_ops->iter_free (iter);
-      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
-      for (twalk = symlink_targets, fwalk = symlink_fileinfos; twalk; 
-           twalk = twalk->next, fwalk = fwalk->next)
-        {
-          info = resolve_symlink (&task, fwalk->data, twalk->data);
-          g_free (twalk->data);
-          g_vfs_job_enumerate_add_info (job, info);
-          g_object_unref (info);
-        }
-      g_slist_free (symlink_targets);
-      g_slist_free (symlink_fileinfos);
-
-      g_vfs_job_enumerate_done (job);
+      g_assert (list == NULL);
+      g_vfs_ftp_task_done (&task);
+      return;
     }
-  
-  g_vfs_ftp_file_free (dir);
+
   g_vfs_ftp_task_done (&task);
+
+  g_vfs_job_enumerate_add_infos (job, list);
+  g_vfs_job_enumerate_done (job);
+
+  g_list_foreach (list, (GFunc) g_object_unref, NULL);
+  g_list_free (list);
+  g_vfs_ftp_file_free (dir);
 }
 
 static void
@@ -1486,7 +998,7 @@ do_set_display_name (GVfsBackend *backend,
 
   /* FIXME: parse result of RNTO here? */
   g_vfs_job_set_display_name_set_new_path (job, g_vfs_ftp_file_get_gvfs_path (now));
-  gvfs_backend_ftp_purge_cache_directory (ftp, dir);
+  g_vfs_ftp_dir_cache_purge_dir (ftp->dir_cache, dir);
   g_vfs_ftp_file_free (now);
   g_vfs_ftp_file_free (dir);
   g_vfs_ftp_file_free (original);
@@ -1517,14 +1029,19 @@ do_delete (GVfsBackend *backend,
 				      "RMD %s", g_vfs_ftp_file_get_ftp_path (file));
       if (response == 550)
 	{
-	  const FtpDirEntry *entry = enumerate_directory (&task, file, FALSE);
-	  if (entry)
+	  GList *list = g_vfs_ftp_dir_cache_lookup_dir (ftp->dir_cache,
+                                                        &task,
+                                                        file,
+                                                        FALSE,
+                                                        FALSE);
+	  if (list)
 	    {
-	      g_static_rw_lock_reader_unlock (&ftp->directory_cache_lock);
 	      g_set_error_literal (&task.error, 
 				   G_IO_ERROR,
 				   G_IO_ERROR_NOT_EMPTY,
 				   g_strerror (ENOTEMPTY));
+              g_list_foreach (list, (GFunc) g_object_unref, NULL);
+              g_list_free (list);
 	    }
 	  else
             {
@@ -1534,7 +1051,7 @@ do_delete (GVfsBackend *backend,
 	}
     }
 
-  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
 
   g_vfs_ftp_task_done (&task);
@@ -1560,7 +1077,7 @@ do_make_directory (GVfsBackend *backend,
 
   /* FIXME: Compare created file with name from server result to be sure 
    * it's correct and otherwise fail. */
-  gvfs_backend_ftp_purge_cache_of_file (ftp, file);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, file);
   g_vfs_ftp_file_free (file);
 
   g_vfs_ftp_task_done (&task);
@@ -1614,8 +1131,8 @@ do_move (GVfsBackend *backend,
   if (!(flags & G_FILE_COPY_OVERWRITE))
     {
       GFileInfo *info = create_file_info (&task,
-                                          g_vfs_ftp_file_get_gvfs_path (destfile),
-                                          NULL);
+                                          destfile,
+                                          FALSE);
 
       if (info)
 	{
@@ -1635,8 +1152,8 @@ do_move (GVfsBackend *backend,
 		       0,
 		       "RNTO %s", g_vfs_ftp_file_get_ftp_path (destfile));
 
-  gvfs_backend_ftp_purge_cache_of_file (ftp, srcfile);
-  gvfs_backend_ftp_purge_cache_of_file (ftp, destfile);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, srcfile);
+  g_vfs_ftp_dir_cache_purge_file (ftp->dir_cache, destfile);
 out:
   g_vfs_ftp_file_free (srcfile);
   g_vfs_ftp_file_free (destfile);

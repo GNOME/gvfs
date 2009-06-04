@@ -41,6 +41,7 @@ GVfsFtpFile *     g_vfs_ftp_file_new_child              (const GVfsFtpFile *    
 GVfsFtpFile *     g_vfs_ftp_file_copy                   (const GVfsFtpFile *    file);
 void              g_vfs_ftp_file_free                   (GVfsFtpFile *          file);
 
+gboolean          g_vfs_ftp_file_is_root                (const GVfsFtpFile *    file);
 const char *      g_vfs_ftp_file_get_ftp_path           (const GVfsFtpFile *    file);
 const char *      g_vfs_ftp_file_get_gvfs_path          (const GVfsFtpFile *    file);
 

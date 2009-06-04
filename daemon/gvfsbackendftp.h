@@ -58,7 +58,9 @@ typedef enum {
   G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN,
 } GVfsFtpWorkaround;
 
-typedef struct FtpDirReader FtpDirReader;
+/* forward declarations */
+typedef struct _GVfsFtpDirCache GVfsFtpDirCache;
+typedef struct _GVfsFtpDirFuncs GVfsFtpDirFuncs;
 
 #define G_VFS_TYPE_BACKEND_FTP         (g_vfs_backend_ftp_get_type ())
 #define G_VFS_BACKEND_FTP(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_VFS_TYPE_BACKEND_FTP, GVfsBackendFtp))
@@ -85,8 +87,9 @@ struct _GVfsBackendFtp
   int                   features;               /* GVfsFtpFeatures that are supported */
   int                   workarounds;            /* GVfsFtpWorkarounds in use - int because it's atomic */
 
-  /* vfuncs */
-  const FtpDirReader *	dir_ops;
+  /* directory cache */
+  const GVfsFtpDirFuncs *dir_funcs;             /* functions used in directory cache */
+  GVfsFtpDirCache *     dir_cache;              /* directory cache */
 
   /* connection collection - accessed from gvfsftptask.c */
   GMutex *		mutex;                  /* mutex protecting the following variables */
@@ -94,10 +97,6 @@ struct _GVfsBackendFtp
   GQueue *		queue;                  /* queue containing the connections */
   guint			connections;            /* current number of connections */
   guint			max_connections;        /* upper server limit for number of connections - dynamically generated */
-
-  /* caching results from dir queries */
-  GStaticRWLock		directory_cache_lock;
-  GHashTable *		directory_cache;
 };
 
 struct _GVfsBackendFtpClass

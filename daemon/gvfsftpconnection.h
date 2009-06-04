@@ -64,6 +64,7 @@ gboolean                g_vfs_ftp_connection_open_data_connection
                                                                GError **                error);
 void                    g_vfs_ftp_connection_close_data_connection
                                                               (GVfsFtpConnection *      conn);
+GIOStream *             g_vfs_ftp_connection_get_data_stream  (GVfsFtpConnection *      conn);
 gssize                  g_vfs_ftp_connection_write_data       (GVfsFtpConnection *      conn,
                                                                const char *             data,
                                                                gsize                    len,

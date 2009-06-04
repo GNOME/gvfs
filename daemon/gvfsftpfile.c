@@ -132,11 +132,11 @@ g_vfs_ftp_file_new_parent (const GVfsFtpFile *file)
 
   g_return_val_if_fail (file != NULL, NULL);
 
+  if (g_vfs_ftp_file_is_root (file))
+    return g_vfs_ftp_file_copy (file);
+
   dirname = g_path_get_dirname (file->gvfs_path);
-  if (dirname[0] == '.' && dirname[1] == 0)
-    dir = g_vfs_ftp_file_copy (file);
-  else
-    dir = g_vfs_ftp_file_new_from_gvfs (file->backend, dirname);
+  dir = g_vfs_ftp_file_new_from_gvfs (file->backend, dirname);
   g_free (dirname);
 
   return dir;
@@ -217,6 +217,22 @@ g_vfs_ftp_file_free (GVfsFtpFile *file)
   g_slice_free (GVfsFtpFile, file);
 }
 
+/**
+ * g_vfs_ftp_file_is_root:
+ * @file: the file to check
+ *
+ * Checks if the given file references the root directory.
+ *
+ * Returns: %TRUE if @file references the root directory
+ **/
+gboolean
+g_vfs_ftp_file_is_root (const GVfsFtpFile *file)
+{
+  g_return_val_if_fail (file != NULL, FALSE);
+
+  return file->gvfs_path[0] == '/' &&
+         file->gvfs_path[1] == 0;
+}
 
 /**
  * g_vfs_ftp_file_get_ftp_path:
