@@ -283,7 +283,10 @@ g_vfs_ftp_task_release_connection (GVfsFtpTask *task)
       g_cond_signal (task->backend->cond);
     }
   else
-    g_vfs_ftp_connection_free (task->conn);
+    {
+      task->backend->connections--;
+      g_vfs_ftp_connection_free (task->conn);
+    }
   g_mutex_unlock (task->backend->mutex);
   task->conn = NULL;
 }
