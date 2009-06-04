@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -73,10 +73,10 @@ g_vfs_ftp_dir_cache_entry_unref (GVfsFtpDirCacheEntry *entry)
  * g_vfs_ftp_dir_cache_entry_add:
  * @entry: the entry to add data to
  * @file: the file to add. The function takes ownership of the argument.
- * @info: the file info of the @file. The function takes ownership of the 
+ * @info: the file info of the @file. The function takes ownership of the
  *        reference.
  *
- * Adds a new file entry to the directory belonging to @entry. This function 
+ * Adds a new file entry to the directory belonging to @entry. This function
  * must only be called from a @GVfsFtpListDirFunc.
  **/
 void
@@ -152,17 +152,17 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
     return entry;
 
   if (g_vfs_ftp_task_send (task,
-		           G_VFS_FTP_PASS_550,
-			   "CWD %s", g_vfs_ftp_file_get_ftp_path (dir)) == 550)
+        	           G_VFS_FTP_PASS_550,
+        		   "CWD %s", g_vfs_ftp_file_get_ftp_path (dir)) == 550)
     {
-      g_set_error_literal (&task->error, 
-		           G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
-			   _("The file is not a directory"));
+      g_set_error_literal (&task->error,
+        	           G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
+        		   _("The file is not a directory"));
     }
   g_vfs_ftp_task_open_data_connection (task);
 
   g_vfs_ftp_task_send (task,
-		       G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
+        	       G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
                        "%s", cache->funcs->command);
   if (g_vfs_ftp_task_is_in_error (task))
     return NULL;
@@ -183,8 +183,8 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
       return NULL;
     }
   g_mutex_lock (cache->lock);
-  g_hash_table_insert (cache->directories, 
-                       g_vfs_ftp_file_copy (dir), 
+  g_hash_table_insert (cache->directories,
+                       g_vfs_ftp_file_copy (dir),
                        g_vfs_ftp_dir_cache_entry_ref (entry));
   g_mutex_unlock (cache->lock);
   return entry;
@@ -211,13 +211,13 @@ g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
   GVfsFtpFile *tmp, *link;
   guint i, lookups = 0;
 
-  if (!g_file_info_get_is_symlink (original) || 
+  if (!g_file_info_get_is_symlink (original) ||
       g_vfs_ftp_task_is_in_error (task))
     return original;
 
   info = g_object_ref (original);
   link = g_vfs_ftp_file_copy (file);
-  do 
+  do
     {
       /* This must not happen, as we use one of our own GFileInfos */
       g_assert (g_file_info_get_symlink_target (info) != NULL);
@@ -271,16 +271,16 @@ g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
       gpointer value;
 
       if (!g_file_info_get_attribute_data (original,
-					   copy_attributes[i],
-					   &type,
-					   &value,
-					   NULL))
-	continue;
-      
+        				   copy_attributes[i],
+        				   &type,
+        				   &value,
+        				   NULL))
+        continue;
+     
       g_file_info_set_attribute (result,
-	                         copy_attributes[i],
-				 type,
-				 value);
+                                 copy_attributes[i],
+        			 type,
+        			 value);
     }
   g_object_unref (original);
 
@@ -389,10 +389,10 @@ g_vfs_ftp_dir_cache_purge_dir (GVfsFtpDirCache *  cache,
 
 void
 g_vfs_ftp_dir_cache_purge_file (GVfsFtpDirCache *  cache,
-				const GVfsFtpFile *file)
+        			const GVfsFtpFile *file)
 {
   GVfsFtpFile *dir;
-  
+ 
   g_return_if_fail (cache != NULL);
   g_return_if_fail (file != NULL);
 
@@ -448,13 +448,13 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
       /* don't list . and .. directories
        * Let's hope they're not important files on some ftp servers
        */
-      if (result.fe_fnlen == 1 && 
+      if (result.fe_fnlen == 1 &&
           result.fe_fname[0] == '.')
         {
           g_free (line);
           continue;
         }
-      if (result.fe_fnlen == 2 && 
+      if (result.fe_fnlen == 2 &&
           result.fe_fname[0] == '.' &&
           result.fe_fname[1] == '.')
         {
@@ -528,7 +528,7 @@ g_vfs_ftp_dir_cache_funcs_resolve_default (GVfsFtpTask *      task,
 
   g_return_val_if_fail (file != NULL, NULL);
   g_return_val_if_fail (target != NULL, NULL);
-  
+ 
   if (target[0] == '/')
     return g_vfs_ftp_file_new_from_ftp (task->backend, target);
 

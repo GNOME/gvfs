@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2008 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -47,10 +47,10 @@ typedef enum {
 
 typedef enum {
   /* Server advertises support for EPSV (or we assume that it supports it),
-   * but it does fail to do so, we set this flag so we can fall back to 
+   * but it does fail to do so, we set this flag so we can fall back to
    * PASV. */
   G_VFS_FTP_WORKAROUND_BROKEN_EPSV,
-  /* Server replies with a wrong address in PASV, we use connection IP 
+  /* Server replies with a wrong address in PASV, we use connection IP
    * instead */
   G_VFS_FTP_WORKAROUND_PASV_ADDR,
   /* server does not allow querying features before login, so we try after
@@ -74,16 +74,16 @@ typedef struct _GVfsBackendFtpClass   GVfsBackendFtpClass;
 
 struct _GVfsBackendFtp
 {
-  GVfsBackend		backend;
+  GVfsBackend        	backend;
 
   GSocketConnectable *  addr;
   GSocketClient *       connection_factory;
-  char *		user;
+  char *        	user;
   gboolean              has_initial_user;
-  char *		password;	        /* password or NULL for anonymous */
+  char *        	password;	        /* password or NULL for anonymous */
   char *                host_display_name;
 
-  GVfsFtpSystem		system;                 /* the system from the SYST response */
+  GVfsFtpSystem        	system;                 /* the system from the SYST response */
   int                   features;               /* GVfsFtpFeatures that are supported */
   int                   workarounds;            /* GVfsFtpWorkarounds in use - int because it's atomic */
 
@@ -92,11 +92,11 @@ struct _GVfsBackendFtp
   GVfsFtpDirCache *     dir_cache;              /* directory cache */
 
   /* connection collection - accessed from gvfsftptask.c */
-  GMutex *		mutex;                  /* mutex protecting the following variables */
-  GCond *		cond;                   /* cond used to signal tasks waiting on the mutex */
-  GQueue *		queue;                  /* queue containing the connections */
-  guint			connections;            /* current number of connections */
-  guint			max_connections;        /* upper server limit for number of connections - dynamically generated */
+  GMutex *        	mutex;                  /* mutex protecting the following variables */
+  GCond *        	cond;                   /* cond used to signal tasks waiting on the mutex */
+  GQueue *        	queue;                  /* queue containing the connections */
+  guint        		connections;            /* current number of connections */
+  guint        		max_connections;        /* upper server limit for number of connections - dynamically generated */
 };
 
 struct _GVfsBackendFtpClass

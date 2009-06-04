@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@
 /**
  * GVfsFtpFile:
  *
- * This structure maps between GVfs paths and the actual paths as used on an 
+ * This structure maps between GVfs paths and the actual paths as used on an
  * FTP server. The mapping may not be a 1-to-1 mapping, so always use this
  * structure if you need to do operations on paths.
  */
@@ -148,8 +148,8 @@ g_vfs_ftp_file_new_parent (const GVfsFtpFile *file)
  * @display_name: the basename to use for the new file
  * @error: location to take an eventual error or %NULL
  *
- * Tries to create a new file for the given @display_name in the given @parent 
- * directory. If the display name is invalid, @error is set and %NULL is 
+ * Tries to create a new file for the given @display_name in the given @parent
+ * directory. If the display name is invalid, @error is set and %NULL is
  * returned.
  *
  * Returns: a new file or %NULL on error
@@ -165,7 +165,7 @@ g_vfs_ftp_file_new_child (const GVfsFtpFile *parent, const char *display_name, G
 
   if (strpbrk (display_name, "/\r\n"))
     {
-      g_set_error_literal (error, 
+      g_set_error_literal (error,
                            G_IO_ERROR, G_IO_ERROR_INVALID_FILENAME,
                            _("Filename contains invalid characters."));
       return NULL;
@@ -241,7 +241,7 @@ g_vfs_ftp_file_is_root (const GVfsFtpFile *file)
  * Gets the string to refer to @file on the ftp server. This string may not be
  * valid UTF-8.
  *
- * Returns: the path to refer to @file on the FTP server. 
+ * Returns: the path to refer to @file on the FTP server.
  **/
 const char *
 g_vfs_ftp_file_get_ftp_path (const GVfsFtpFile *file)
@@ -272,7 +272,7 @@ g_vfs_ftp_file_get_gvfs_path (const GVfsFtpFile *file)
  * @a: a #GVfsFtpFile
  * @b: a #GVfsFtpFile
  *
- * Compares @a and @b. If they reference the same file, %TRUE is returned. 
+ * Compares @a and @b. If they reference the same file, %TRUE is returned.
  * This function uses #gconstpointer arguments to the #GEqualFunc type.
  *
  * Returns: %TRUE if @a and @b reference the same file.

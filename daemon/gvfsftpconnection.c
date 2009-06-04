@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -34,10 +34,10 @@ struct _GVfsFtpConnection
 {
   GSocketClient *       client;                 /* socket client used for opening connections */
 
-  GIOStream *		commands;               /* ftp command stream */
+  GIOStream *        	commands;               /* ftp command stream */
   GDataInputStream *    commands_in;            /* wrapper around in stream to allow line-wise reading */
 
-  GIOStream *		data;                   /* ftp data stream or NULL if not in use */
+  GIOStream *        	data;                   /* ftp data stream or NULL if not in use */
 
   int                   debug_id;               /* unique id for debugging purposes */
 };
@@ -151,37 +151,37 @@ g_vfs_ftp_connection_receive (GVfsFtpConnection *conn,
         g_ptr_array_add (lines, line);
 
       if (reply_state == FIRST_LINE)
-	{
-	  if (line[0] <= '0' || line[0] > '5' ||
-	      line[1] < '0' || line[1] > '9' ||
-	      line[2] < '0' || line[2] > '9')
-	    {
-	      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-				   _("Invalid reply"));
+        {
+          if (line[0] <= '0' || line[0] > '5' ||
+              line[1] < '0' || line[1] > '9' ||
+              line[2] < '0' || line[2] > '9')
+            {
+              g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+        			   _("Invalid reply"));
               goto fail;
-	    }
-	  response = 100 * (line[0] - '0') +
-		      10 * (line[1] - '0') +
-		 	   (line[2] - '0');
-	  if (line[3] == ' ')
-	    reply_state = DONE;
-	  else if (line[3] == '-')
-	    reply_state = MULTILINE;
-	  else
-	    {
-	      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-				   _("Invalid reply"));
+            }
+          response = 100 * (line[0] - '0') +
+        	      10 * (line[1] - '0') +
+        	 	   (line[2] - '0');
+          if (line[3] == ' ')
+            reply_state = DONE;
+          else if (line[3] == '-')
+            reply_state = MULTILINE;
+          else
+            {
+              g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+        			   _("Invalid reply"));
               goto fail;
-	    }
-	}
+            }
+        }
       else
-	{
-	  if (line[0] - '0' == response / 100 &&
+        {
+          if (line[0] - '0' == response / 100 &&
               line[1] - '0' == (response / 10) % 10 &&
-              line[2] - '0' == response % 10 && 
-	      line[3] == ' ')
-	    reply_state = DONE;
-	}
+              line[2] - '0' == response % 10 &&
+              line[3] == ' ')
+            reply_state = DONE;
+        }
       if (!lines)
         g_free (line);
     }
@@ -312,8 +312,8 @@ g_vfs_ftp_connection_read_contents (GVfsFtpConnection *conn,
  * g_vfs_ftp_connection_is_usable:
  * @conn: a connection
  *
- * Checks if this connection can still be used to send new commands. For 
- * example, if the connection was closed, this is not possible and this 
+ * Checks if this connection can still be used to send new commands. For
+ * example, if the connection was closed, this is not possible and this
  * function will return %FALSE.
  *
  * Returns: %TRUE if the connection is still usable

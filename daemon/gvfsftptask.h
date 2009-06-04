@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@ guint                   g_vfs_ftp_task_sendv                    (GVfsFtpTask *  
                                                                  GVfsFtpResponseFlags   flags,
                                                                  char ***               reply,
                                                                  const char *           format,
-		                                                 va_list                varargs);
+        	                                                 va_list                varargs);
 guint                   g_vfs_ftp_task_receive                  (GVfsFtpTask *          task,
                                                                  GVfsFtpResponseFlags   flags,
                                                                  char ***               reply);

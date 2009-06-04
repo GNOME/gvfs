@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@
  * @G_VFS_FTP_PASS_550: Don't treat 550 responses, but return them
  * @G_VFS_FTP_FAIL_200: Fail on a 2XX response
  *
- * These flags can be passed to gvfs_ftp_task_receive() (and in 
+ * These flags can be passed to gvfs_ftp_task_receive() (and in
  * turn gvfs_ftp_task_send()) to influence the behavior of the functions.
  */
 
@@ -67,9 +67,9 @@
  * @task: task to handle
  * @data: data argument provided to g_vfs_ftp_task_send_and_check()
  *
- * Function prototype for error checking functions used by 
- * g_vfs_ftp_task_send_and_check(). When called, these functions are supposed 
- * to check a specific error condition and if met, set an error on the passed 
+ * Function prototype for error checking functions used by
+ * g_vfs_ftp_task_send_and_check(). When called, these functions are supposed
+ * to check a specific error condition and if met, set an error on the passed
  * @task.
  */
 
@@ -91,21 +91,21 @@ g_vfs_ftp_task_login (GVfsFtpTask *task,
 
   status = g_vfs_ftp_task_send (task, G_VFS_FTP_PASS_300,
                                 "USER %s", username);
-  
+ 
   if (G_VFS_FTP_RESPONSE_GROUP (status) == 3)
     {
       /* rationale for choosing the default password:
        * - some ftp servers expect something that looks like an email address
        * - we don't want to send the user's name or address, as that would be
        *   a privacy problem
-       * - we want to give ftp server administrators a chance to notify us of 
+       * - we want to give ftp server administrators a chance to notify us of
        *   problems with our client.
        * - we don't want to drown in spam.
        */
       if (password == NULL || password[0] == 0)
-	password = "gvfsd-ftp-" VERSION "@example.com";
+        password = "gvfsd-ftp-" VERSION "@example.com";
       status = g_vfs_ftp_task_send (task, 0,
-				    "PASS %s", password);
+        			    "PASS %s", password);
     }
 
   return status;
@@ -133,21 +133,21 @@ g_vfs_ftp_task_setup_connection (GVfsFtpTask *task)
   /* RFC 2428 suggests to send this to make NAT routers happy */
   /* XXX: Disabled for the following reasons:
    * - most ftp clients don't use it
-   * - lots of broken ftp servers can't see the difference between 
+   * - lots of broken ftp servers can't see the difference between
    *   "EPSV" and "EPSV ALL"
    * - impossible to dynamically fall back to regular PASV in case
    *   EPSV doesn't work for some reason.
    * If this makes your ftp connection fail, please file a bug and we will
-   * try to invent a way to make this all work. Until then, we'll just 
+   * try to invent a way to make this all work. Until then, we'll just
    * ignore the RFC.
    */
-  if (g_vfs_backend_ftp_has_feature (task->backend, g_VFS_FTP_FEATURE_EPSV)) 
+  if (g_vfs_backend_ftp_has_feature (task->backend, g_VFS_FTP_FEATURE_EPSV))
     g_vfs_ftp_task_send (task, 0, "EPSV ALL");
   g_vfs_ftp_task_clear_error (task);
 #endif
 
   /* instruct server that we'll give and assume we get utf8 */
-  if (g_vfs_backend_ftp_has_feature (task->backend, G_VFS_FTP_FEATURE_UTF8)) 
+  if (g_vfs_backend_ftp_has_feature (task->backend, G_VFS_FTP_FEATURE_UTF8))
     {
       if (!g_vfs_ftp_task_send (task, 0, "OPTS UTF8 ON"))
         g_vfs_ftp_task_clear_error (task);
@@ -168,12 +168,12 @@ do_broadcast (GCancellable *cancellable, GCond *cond)
  * Acquires a new connection for use by this @task. This uses the connection
  * pool of @task's backend, so it reuses previously opened connections and
  * does not reopen new connections unnecessarily. If all connections are busy,
- * it waits %G_VFS_FTP_TIMEOUT_IN_SECONDS seconds for a new connection to 
+ * it waits %G_VFS_FTP_TIMEOUT_IN_SECONDS seconds for a new connection to
  * become available. Keep in mind that a newly acquired connection might have
  * timed out and therefore closed by the FTP server. You must account for
  * this when sending the first command to the server.
  *
- * Returns: %TRUE if a connection could be acquired, %FALSE if an error 
+ * Returns: %TRUE if a connection could be acquired, %FALSE if an error
  *          occured
  **/
 static gboolean
@@ -192,15 +192,15 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
   ftp = task->backend;
   g_mutex_lock (ftp->mutex);
   id = g_cancellable_connect (task->cancellable,
-			      G_CALLBACK (do_broadcast),
-			      ftp->cond, NULL);
+        		      G_CALLBACK (do_broadcast),
+        		      ftp->cond, NULL);
   while (task->conn == NULL && ftp->queue != NULL)
     {
       if (g_cancellable_is_cancelled (task->cancellable))
         {
-	  task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CANCELLED,
-			                     _("Operation was cancelled"));
-	  break;
+          task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CANCELLED,
+        		                     _("Operation was cancelled"));
+          break;
         }
 
       task->conn = g_queue_pop_head (ftp->queue);
@@ -208,17 +208,17 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
         break;
 
       if (ftp->connections < ftp->max_connections)
-	{
-	  /* Save current number of connections here, so we can limit maximum 
-	   * connections later.
-	   * This is necessary for threading reasons (connections can be 
-	   * opened or closed while we are still in the opening process. */
-	  guint maybe_max_connections = ftp->connections;
+        {
+          /* Save current number of connections here, so we can limit maximum
+           * connections later.
+           * This is necessary for threading reasons (connections can be
+           * opened or closed while we are still in the opening process. */
+          guint maybe_max_connections = ftp->connections;
 
-	  ftp->connections++;
-	  g_mutex_unlock (ftp->mutex);
-	  task->conn = g_vfs_ftp_connection_new (ftp->addr, task->cancellable, &task->error);
-	  if (G_LIKELY (task->conn != NULL))
+          ftp->connections++;
+          g_mutex_unlock (ftp->mutex);
+          task->conn = g_vfs_ftp_connection_new (ftp->addr, task->cancellable, &task->error);
+          if (G_LIKELY (task->conn != NULL))
             {
               g_vfs_ftp_task_receive (task, 0, NULL);
               g_vfs_ftp_task_login (task, ftp->user, ftp->password);
@@ -227,30 +227,30 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
                 break;
             }
 
-	  g_vfs_ftp_task_clear_error (task);
-	  g_vfs_ftp_connection_free (task->conn);
-	  task->conn = NULL;
-	  g_mutex_lock (ftp->mutex);
-	  ftp->connections--;
-	  ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
-	  if (ftp->max_connections == 0)
-	    {
-	      g_debug ("no more connections left, exiting...");
-	      /* FIXME: shut down properly */
-	      exit (0);
-	    }
+          g_vfs_ftp_task_clear_error (task);
+          g_vfs_ftp_connection_free (task->conn);
+          task->conn = NULL;
+          g_mutex_lock (ftp->mutex);
+          ftp->connections--;
+          ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
+          if (ftp->max_connections == 0)
+            {
+              g_debug ("no more connections left, exiting...");
+              /* FIXME: shut down properly */
+              exit (0);
+            }
 
-	  continue;
-	}
+          continue;
+        }
 
       g_get_current_time (&now);
       g_time_val_add (&now, G_VFS_FTP_TIMEOUT_IN_SECONDS * 1000 * 1000);
       if (!g_cond_timed_wait (ftp->cond, ftp->mutex, &now))
-	{
-	  task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_BUSY,
-			                     _("The FTP server is busy. Try again later"));
-	  break;
-	}
+        {
+          task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_BUSY,
+        		                     _("The FTP server is busy. Try again later"));
+          break;
+        }
     }
   g_cancellable_disconnect (task->cancellable, id);
   g_mutex_unlock (ftp->mutex);
@@ -295,8 +295,8 @@ g_vfs_ftp_task_release_connection (GVfsFtpTask *task)
  * g_vfs_ftp_task_done:
  * @task: the task to finalize
  *
- * Finalizes the given task and clears all memory in use. It also marks the 
- * associated job as success or failure depending on the error state of the 
+ * Finalizes the given task and clears all memory in use. It also marks the
+ * associated job as success or failure depending on the error state of the
  * task.
  **/
 void
@@ -323,7 +323,7 @@ g_vfs_ftp_task_done (GVfsFtpTask *task)
  * @task: the task
  * @response: the response code
  *
- * Sets the @task into an error state. The exact error is determined from the 
+ * Sets the @task into an error state. The exact error is determined from the
  * @response code.
  **/
 void
@@ -341,62 +341,62 @@ g_vfs_ftp_task_set_error_from_response (GVfsFtpTask *task, guint response)
     {
       case 332: /* Need account for login. */
       case 532: /* Need account for storing files. */
-	/* FIXME: implement a sane way to handle accounts. */
-	code = G_IO_ERROR_NOT_SUPPORTED;
-	msg = _("Accounts are unsupported");
-	break;
+        /* FIXME: implement a sane way to handle accounts. */
+        code = G_IO_ERROR_NOT_SUPPORTED;
+        msg = _("Accounts are unsupported");
+        break;
       case 421: /* Service not available, closing control connection. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Host closed connection");
-	break;
+        code = G_IO_ERROR_FAILED;
+        msg = _("Host closed connection");
+        break;
       case 425: /* Can't open data connection. */
-	code = G_IO_ERROR_CLOSED;
-	msg = _("Cannot open data connection. Maybe your firewall prevents this?");
-	break;
+        code = G_IO_ERROR_CLOSED;
+        msg = _("Cannot open data connection. Maybe your firewall prevents this?");
+        break;
       case 426: /* Connection closed; transfer aborted. */
-	code = G_IO_ERROR_CLOSED;
-	msg = _("Data connection closed");
-	break;
+        code = G_IO_ERROR_CLOSED;
+        msg = _("Data connection closed");
+        break;
       case 450: /* Requested file action not taken. File unavailable (e.g., file busy). */
       case 550: /* Requested action not taken. File unavailable (e.g., file not found, no access). */
-	/* FIXME: This is a lot of different errors. So we have to pretend to 
-	 * be smart here. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Operation failed");
-	break;
+        /* FIXME: This is a lot of different errors. So we have to pretend to
+         * be smart here. */
+        code = G_IO_ERROR_FAILED;
+        msg = _("Operation failed");
+        break;
       case 451: /* Requested action aborted: local error in processing. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Operation failed");
-	break;
+        code = G_IO_ERROR_FAILED;
+        msg = _("Operation failed");
+        break;
       case 452: /* Requested action not taken. Insufficient storage space in system. */
       case 552:
-	code = G_IO_ERROR_NO_SPACE;
-	msg = _("No space left on server");
-	break;
+        code = G_IO_ERROR_NO_SPACE;
+        msg = _("No space left on server");
+        break;
       case 500: /* Syntax error, command unrecognized. */
       case 501: /* Syntax error in parameters or arguments. */
       case 502: /* Command not implemented. */
       case 503: /* Bad sequence of commands. */
       case 504: /* Command not implemented for that parameter. */
-	code = G_IO_ERROR_NOT_SUPPORTED;
-	msg = _("Operation unsupported");
-	break;
+        code = G_IO_ERROR_NOT_SUPPORTED;
+        msg = _("Operation unsupported");
+        break;
       case 530: /* Not logged in. */
-	code = G_IO_ERROR_PERMISSION_DENIED;
-	msg = _("Permission denied");
-	break;
+        code = G_IO_ERROR_PERMISSION_DENIED;
+        msg = _("Permission denied");
+        break;
       case 551: /* Requested action aborted: page type unknown. */
-	code = G_IO_ERROR_FAILED;
-	msg = _("Page type unknown");
-	break;
+        code = G_IO_ERROR_FAILED;
+        msg = _("Page type unknown");
+        break;
       case 553: /* Requested action not taken. File name not allowed. */
-	code = G_IO_ERROR_INVALID_FILENAME;
-	msg = _("Invalid filename");
-	break;
+        code = G_IO_ERROR_INVALID_FILENAME;
+        msg = _("Invalid filename");
+        break;
       default:
-	code = G_IO_ERROR_FAILED;
-	msg = _("Invalid reply");
-	break;
+        code = G_IO_ERROR_FAILED;
+        msg = _("Invalid reply");
+        break;
     }
 
   g_set_error_literal (&task->error, G_IO_ERROR, code, msg);
@@ -407,8 +407,8 @@ g_vfs_ftp_task_set_error_from_response (GVfsFtpTask *task, guint response)
  * @task: the task
  * @conn: the connection that the @task should use
  *
- * Forces a given @task to do I/O using the given connection. The @task must 
- * not have a connection associated with itself. The @task will take 
+ * Forces a given @task to do I/O using the given connection. The @task must
+ * not have a connection associated with itself. The @task will take
  * ownership of @conn.
  **/
 void
@@ -429,7 +429,7 @@ g_vfs_ftp_task_give_connection (GVfsFtpTask *      task,
  * g_vfs_ftp_task_give_connection(). This or any other task will not use the
  * connection anymore. The @task must have a connection in use.
  *
- * Returns: The connection that @task was using. You acquire ownership of 
+ * Returns: The connection that @task was using. You acquire ownership of
  *          the connection.
  **/
 GVfsFtpConnection *
@@ -450,11 +450,11 @@ g_vfs_ftp_task_take_connection (GVfsFtpTask *task)
  * g_vfs_ftp_task_send:
  * @task: the sending task
  * @flags: response flags to use when sending
- * @format: format string to construct command from 
+ * @format: format string to construct command from
  *          (without trailing \r\n)
  * @...: arguments to format string
  *
- * Shortcut to calling g_vfs_ftp_task_send_and_check() with the reply, funcs 
+ * Shortcut to calling g_vfs_ftp_task_send_and_check() with the reply, funcs
  * and data arguments set to %NULL. See that function for details.
  *
  * Returns: 0 on error or the received FTP code otherwise.
@@ -473,10 +473,10 @@ g_vfs_ftp_task_send (GVfsFtpTask *        task,
 
   va_start (varargs, format);
   response = g_vfs_ftp_task_sendv (task,
-				   flags,
+        			   flags,
                                    NULL,
-				   format,
-				   varargs);
+        			   format,
+        			   varargs);
   va_end (varargs);
   return response;
 }
@@ -486,32 +486,32 @@ g_vfs_ftp_task_send (GVfsFtpTask *        task,
  * @task: the sending task
  * @flags: response flags to use when sending
  * @funcs: %NULL or %NULL-terminated array of functions used to determine the
- *         exact failure case upon a "550 Operation Failed" reply. This is 
- *         often necessary 
+ *         exact failure case upon a "550 Operation Failed" reply. This is
+ *         often necessary
  * @data: data to pass to @funcs.
  * @reply: %NULL or pointer to take a char array containing the full reply of
- *         the ftp server upon successful reply. Use g_strfreev() to free 
+ *         the ftp server upon successful reply. Use g_strfreev() to free
  *         after use.
- * @format: format string to construct command from 
+ * @format: format string to construct command from
  *          (without trailing \r\n)
  * @...: arguments to format string
  *
- * Takes an ftp command in printf-style @format, potentially acquires a 
+ * Takes an ftp command in printf-style @format, potentially acquires a
  * connection automatically, sends the command and waits for an answer from
  * the ftp server. Without any @flags, FTP response codes other than 2xx cause
- * an error. If @reply is not %NULL, the full reply will be put into a 
- * %NULL-terminated string array that must be freed with g_strfreev() after 
- * use. 
- * If @funcs is set, the 550 response code will cause all of these functions to 
- * be called in order passing them the @task and @data arguments given to this 
- * function until one of them sets an error on @task. This error will then be 
+ * an error. If @reply is not %NULL, the full reply will be put into a
+ * %NULL-terminated string array that must be freed with g_strfreev() after
+ * use.
+ * If @funcs is set, the 550 response code will cause all of these functions to
+ * be called in order passing them the @task and @data arguments given to this
+ * function until one of them sets an error on @task. This error will then be
  * returned from this function. If none of those functions sets an error, the
  * generic error for the 550 response will be used.
  * If an error has been set on @task previously, this function will do nothing.
  *
  * Returns: 0 on error or the received FTP code otherwise.
  **/
-guint 
+guint
 g_vfs_ftp_task_send_and_check (GVfsFtpTask *           task,
                                GVfsFtpResponseFlags    flags,
                                const GVfsFtpErrorFunc *funcs,
@@ -535,10 +535,10 @@ g_vfs_ftp_task_send_and_check (GVfsFtpTask *           task,
 
   va_start (varargs, format);
   response = g_vfs_ftp_task_sendv (task,
-				   flags,
+        			   flags,
                                    reply,
-				   format,
-				   varargs);
+        			   format,
+        			   varargs);
   va_end (varargs);
 
   if (response == 550 && funcs)
@@ -560,13 +560,13 @@ g_vfs_ftp_task_send_and_check (GVfsFtpTask *           task,
  * g_vfs_ftp_task_sendv:
  * @task: the sending task
  * @flags: response flags to use when receiving the reply
- * @reply: %NULL or pointer to char array that takes the full reply from the 
+ * @reply: %NULL or pointer to char array that takes the full reply from the
  *         server
- * @format: format string to construct command from 
+ * @format: format string to construct command from
  *          (without trailing \r\n)
  * @varargs: arguments to format string
  *
- * This is the varargs version of g_vfs_ftp_task_send(). See that function 
+ * This is the varargs version of g_vfs_ftp_task_send(). See that function
  * for details.
  *
  * Returns: the received FTP code or 0 on error.
@@ -607,7 +607,7 @@ retry:
                              &task->error);
 
   response = g_vfs_ftp_task_receive (task, flags, reply);
-  
+ 
   /* NB: requires adaption if we allow passing 4xx responses */
   if (retry_on_timeout &&
       g_vfs_ftp_task_is_in_error (task) &&
@@ -626,15 +626,15 @@ retry:
  * g_vfs_ftp_task_receive:
  * @task: the receiving task
  * @flags: response flags to use
- * @reply: %NULL or pointer to char array that takes the full reply from the 
+ * @reply: %NULL or pointer to char array that takes the full reply from the
  *         server
  *
- * Unless @task is in an error state, this function receives a reply from 
- * the @task's connection. The @task must have a connection set, which will 
- * happen when either g_vfs_ftp_task_send() or 
- * g_vfs_ftp_task_give_connection() have been called on the @task before. 
- * Unless @flags are given, all reply codes not in the 200s cause an error. 
- * If @task is in an error state when calling this function, nothing will 
+ * Unless @task is in an error state, this function receives a reply from
+ * the @task's connection. The @task must have a connection set, which will
+ * happen when either g_vfs_ftp_task_send() or
+ * g_vfs_ftp_task_give_connection() have been called on the @task before.
+ * Unless @flags are given, all reply codes not in the 200s cause an error.
+ * If @task is in an error state when calling this function, nothing will
  * happen and the function will just return.
  *
  * Returns: the received FTP code or 0 on error.
@@ -651,7 +651,7 @@ g_vfs_ftp_task_receive (GVfsFtpTask *        task,
     return 0;
   g_return_val_if_fail (task->conn != NULL, 0);
 
-  response = g_vfs_ftp_connection_receive (task->conn, 
+  response = g_vfs_ftp_connection_receive (task->conn,
                                            reply,
                                            task->cancellable,
                                            &task->error);
@@ -659,36 +659,36 @@ g_vfs_ftp_task_receive (GVfsFtpTask *        task,
   switch (G_VFS_FTP_RESPONSE_GROUP (response))
     {
       case 0:
-	return 0;
+        return 0;
       case 1:
-	if (flags & G_VFS_FTP_PASS_100)
-	  break;
-	g_vfs_ftp_task_set_error_from_response (task, response);
-	return 0;
+        if (flags & G_VFS_FTP_PASS_100)
+          break;
+        g_vfs_ftp_task_set_error_from_response (task, response);
+        return 0;
       case 2:
-	if (flags & G_VFS_FTP_FAIL_200)
-	  {
-	    g_vfs_ftp_task_set_error_from_response (task, response);
-	    return 0;
-	  }
-	break;
+        if (flags & G_VFS_FTP_FAIL_200)
+          {
+            g_vfs_ftp_task_set_error_from_response (task, response);
+            return 0;
+          }
+        break;
       case 3:
-	if (flags & G_VFS_FTP_PASS_300)
-	  break;
-	g_vfs_ftp_task_set_error_from_response (task, response);
-	return 0;
+        if (flags & G_VFS_FTP_PASS_300)
+          break;
+        g_vfs_ftp_task_set_error_from_response (task, response);
+        return 0;
       case 4:
-	g_vfs_ftp_task_set_error_from_response (task, response);
-	return 0;
+        g_vfs_ftp_task_set_error_from_response (task, response);
+        return 0;
       case 5:
-	if ((flags & G_VFS_FTP_PASS_500) || 
+        if ((flags & G_VFS_FTP_PASS_500) ||
             (response == 550 && (flags & G_VFS_FTP_PASS_550)))
-	  break;
-	g_vfs_ftp_task_set_error_from_response (task, response);
-	return 0;
+          break;
+        g_vfs_ftp_task_set_error_from_response (task, response);
+        return 0;
       default:
-	g_assert_not_reached ();
-	break;
+        g_assert_not_reached ();
+        break;
     }
 
   return response;
@@ -753,7 +753,7 @@ g_vfs_ftp_task_open_data_connection_epsv (GVfsFtpTask *task)
       g_vfs_ftp_task_clear_error (task);
       return FALSE;
     }
-  
+ 
   g_object_unref (addr);
   return TRUE;
 
@@ -781,16 +781,16 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
    */
   for (s = reply[0]; *s; s++)
     {
-      if (sscanf (s, "%u,%u,%u,%u,%u,%u", 
-		 &ip1, &ip2, &ip3, &ip4, 
-		 &port1, &port2) == 6)
+      if (sscanf (s, "%u,%u,%u,%u,%u,%u",
+        	 &ip1, &ip2, &ip3, &ip4,
+        	 &port1, &port2) == 6)
        break;
     }
   g_strfreev (reply);
   if (*s == 0)
     {
       g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid reply"));
+        		   _("Invalid reply"));
       return FALSE;
     }
 
@@ -815,7 +815,7 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
           g_object_unref (addr);
           return TRUE;
         }
-         
+        
       g_object_unref (addr);
       /* set workaround flag (see below), so we don't try this again */
       g_debug ("# Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
@@ -827,7 +827,7 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
    * Various ftp servers aren't setup correctly when behind a NAT. They report
    * their own IP address (like 10.0.0.4) and not the address in front of the
    * NAT. But this is likely the same address that we connected to with our
-   * command connetion. So if the address given by PASV fails, we fall back 
+   * command connetion. So if the address given by PASV fails, we fall back
    * to the address of the command stream.
    */
   addr = g_vfs_ftp_task_create_remote_address (task, port1 << 8 | port2);
