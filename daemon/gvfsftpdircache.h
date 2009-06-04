@@ -36,6 +36,7 @@ typedef struct _GVfsFtpDirCacheEntry GVfsFtpDirCacheEntry;
 struct _GVfsFtpDirFuncs {
   const char *          command;
   gboolean              (* process)                             (GInputStream *         stream,
+                                                                 int                    debug_id,
                                                                  const GVfsFtpFile *    dir,
                                                                  GVfsFtpDirCacheEntry * entry,
                                                                  GCancellable *         cancellable,

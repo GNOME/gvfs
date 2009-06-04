@@ -108,7 +108,7 @@ gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
 	{
 	  if (g_ascii_strcasecmp (feature, features[j].name) == 0)
 	    {
-	      DEBUG ("feature %s supported\n", features[j].name);
+	      g_debug ("# feature %s supported\n", features[j].name);
 	      task->backend->features |= 1 << features[j].enable;
 	    }
 	}
@@ -125,10 +125,11 @@ gvfs_backend_ftp_determine_system (GVfsFtpTask *task)
   static const struct {
     const char *  id;
     GVfsFtpSystem system;
+    const char *  debug_name;
   } known_systems[] = {
     /* NB: the first entry that matches is taken, so order matters */
-    { "UNIX ", G_VFS_FTP_SYSTEM_UNIX },
-    { "WINDOWS_NT ", G_VFS_FTP_SYSTEM_WINDOWS }
+    { "UNIX ", G_VFS_FTP_SYSTEM_UNIX, "Unix"},
+    { "WINDOWS_NT ", G_VFS_FTP_SYSTEM_WINDOWS, "Windows NT" }
   };
   guint i;
   char *system_name;
@@ -151,7 +152,7 @@ gvfs_backend_ftp_determine_system (GVfsFtpTask *task)
 			       strlen (known_systems[i].id)) == 0)
 	{
 	  task->backend->system = known_systems[i].system;
-	  DEBUG ("system is %u\n", task->backend->system);
+	  g_debug ("# system is %s\n", known_systems[i].debug_name);
 	  break;
 	}
     }
@@ -427,7 +428,7 @@ try_login:
       ftp->addr = G_SOCKET_CONNECTABLE (g_vfs_ftp_connection_get_address (task.conn, &task.error));
       if (ftp->addr == NULL)
         {
-          DEBUG ("error querying remote address: %s\nUsing original address instead.", task.error->message);
+          g_debug ("# error querying remote address: %s\nUsing original address instead.", task.error->message);
           g_vfs_ftp_task_clear_error (&task);
           ftp->addr = g_object_ref (addr);
         }

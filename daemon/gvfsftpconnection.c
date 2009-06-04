@@ -27,6 +27,9 @@
 
 #include "gvfsftpconnection.h"
 
+/* used for identifying the connection during debugging */
+static volatile int debug_id = 0;
+
 struct _GVfsFtpConnection
 {
   GSocketClient *       client;                 /* socket client used for opening connections */
@@ -35,6 +38,8 @@ struct _GVfsFtpConnection
   GDataInputStream *    commands_in;            /* wrapper around in stream to allow line-wise reading */
 
   GIOStream *		data;                   /* ftp data stream or NULL if not in use */
+
+  int                   debug_id;               /* unique id for debugging purposes */
 };
 
 GVfsFtpConnection *
@@ -48,6 +53,7 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
 
   conn = g_slice_new0 (GVfsFtpConnection);
   conn->client = g_socket_client_new ();
+  conn->debug_id = g_atomic_int_exchange_and_add (&debug_id, 1);
   conn->commands = G_IO_STREAM (g_socket_client_connect (conn->client,
                                                          addr,
                                                          cancellable,
@@ -93,6 +99,11 @@ g_vfs_ftp_connection_send (GVfsFtpConnection *conn,
     len = strlen (command);
   g_return_val_if_fail (command[len-2] == '\r' && command[len-1] == '\n', FALSE);
 
+  if (g_str_has_prefix (command, "PASS"))
+    g_debug ("--%2d ->  PASS ***\r\n", conn->debug_id);
+  else
+    g_debug ("--%2d ->  %s", conn->debug_id, command);
+
   return g_output_stream_write_all (g_io_stream_get_output_stream (conn->commands),
                                     command,
                                     len,
@@ -135,7 +146,7 @@ g_vfs_ftp_connection_receive (GVfsFtpConnection *conn,
           goto fail;
         }
 
-      DEBUG ("<-- %s\n", line);
+      g_debug ("<-%2d --  %s\r\n", conn->debug_id, line);
       if (lines)
         g_ptr_array_add (lines, line);
 
@@ -230,6 +241,7 @@ g_vfs_ftp_connection_close_data_connection (GVfsFtpConnection *conn)
 /**
  * g_vfs_ftp_connection_get_data_stream:
  * @conn: a connection
+ * @debug_id: %NULL or pointer taking id to use for debugging purposes
  *
  * Gets the data stream in use by @conn. It is an error to call this function
  * when no data stream exists. Be sure to check the return value of
@@ -238,11 +250,13 @@ g_vfs_ftp_connection_close_data_connection (GVfsFtpConnection *conn)
  * Returns: the data stream of @conn
  **/
 GIOStream *
-g_vfs_ftp_connection_get_data_stream (GVfsFtpConnection *conn)
+g_vfs_ftp_connection_get_data_stream (GVfsFtpConnection *conn, int *debug_id)
 {
   g_return_val_if_fail (conn != NULL, NULL);
   g_return_val_if_fail (conn->data != NULL, NULL);
 
+  if (debug_id)
+    *debug_id = conn->debug_id;
   return conn->data;
 }
 

@@ -235,7 +235,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 	  ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
 	  if (ftp->max_connections == 0)
 	    {
-	      DEBUG ("no more connections left, exiting...");
+	      g_debug ("no more connections left, exiting...");
 	      /* FIXME: shut down properly */
 	      exit (0);
 	    }
@@ -600,16 +600,6 @@ retry:
       retry_on_timeout = TRUE;
     }
 
-#ifdef PRINT_DEBUG
-  if (g_str_has_prefix (command->str, "PASS"))
-    DEBUG ("--> PASS ***\n");
-  else
-    {
-      command->str[command->len - 2] = 0;
-      DEBUG ("--> %s\n", command->str);
-      command->str[command->len - 2] = '\r';
-    }
-#endif
   g_vfs_ftp_connection_send (task->conn,
                              command->str,
                              command->len,
@@ -758,7 +748,7 @@ g_vfs_ftp_task_open_data_connection_epsv (GVfsFtpTask *task)
                                                   &task->error))
     {
       g_object_unref (addr);
-      DEBUG ("Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
+      g_debug ("# Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
       g_vfs_backend_ftp_use_workaround (task->backend, G_VFS_FTP_WORKAROUND_BROKEN_EPSV);
       g_vfs_ftp_task_clear_error (task);
       return FALSE;
@@ -828,7 +818,7 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
          
       g_object_unref (addr);
       /* set workaround flag (see below), so we don't try this again */
-      DEBUG ("Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
+      g_debug ("# Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
       g_vfs_backend_ftp_use_workaround (task->backend, G_VFS_FTP_WORKAROUND_PASV_ADDR);
       g_vfs_ftp_task_clear_error (task);
     }

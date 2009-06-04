@@ -138,6 +138,8 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
                                   guint              stamp)
 {
   GVfsFtpDirCacheEntry *entry;
+  GIOStream *stream;
+  int debug_id;
 
   g_mutex_lock (cache->lock);
   entry = g_hash_table_lookup (cache->directories, dir);
@@ -166,7 +168,9 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
     return NULL;
 
   entry = g_vfs_ftp_dir_cache_entry_new (stamp);
-  cache->funcs->process (g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task->conn)),
+  stream = g_vfs_ftp_connection_get_data_stream (task->conn, &debug_id);
+  cache->funcs->process (g_io_stream_get_input_stream (stream),
+                         debug_id,
                          dir,
                          entry,
                          task->cancellable,
@@ -407,6 +411,7 @@ g_vfs_ftp_dir_cache_purge_file (GVfsFtpDirCache *  cache,
 
 static gboolean
 g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
+                                   int                   debug_id,
                                    const GVfsFtpFile *   dir,
                                    GVfsFtpDirCacheEntry *entry,
                                    gboolean              is_unix,
@@ -432,6 +437,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
       struct list_result result = { 0, };
       GTimeVal tv = { 0, 0 };
 
+      g_debug ("<<%2d <<  %s\n", debug_id, line);
       type = ParseFTPList (line, &state, &result);
       if (type != 'd' && type != 'f' && type != 'l')
         {
@@ -565,22 +571,24 @@ g_vfs_ftp_dir_cache_funcs_resolve_default (GVfsFtpTask *      task,
 
 static gboolean
 g_vfs_ftp_dir_cache_funcs_process_unix (GInputStream *        stream,
+                                        int                   debug_id,
                                         const GVfsFtpFile *   dir,
                                         GVfsFtpDirCacheEntry *entry,
                                         GCancellable *        cancellable,
                                         GError **             error)
 {
-  return g_vfs_ftp_dir_cache_funcs_process (stream, dir, entry, TRUE, cancellable, error);
+  return g_vfs_ftp_dir_cache_funcs_process (stream, debug_id, dir, entry, TRUE, cancellable, error);
 }
 
 static gboolean
 g_vfs_ftp_dir_cache_funcs_process_default (GInputStream *        stream,
+                                           int                   debug_id,
                                            const GVfsFtpFile *   dir,
                                            GVfsFtpDirCacheEntry *entry,
                                            GCancellable *        cancellable,
                                            GError **             error)
 {
-  return g_vfs_ftp_dir_cache_funcs_process (stream, dir, entry, FALSE, cancellable, error);
+  return g_vfs_ftp_dir_cache_funcs_process (stream, debug_id, dir, entry, FALSE, cancellable, error);
 }
 
 const GVfsFtpDirFuncs g_vfs_ftp_dir_cache_funcs_unix = {
