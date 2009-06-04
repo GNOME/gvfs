@@ -27,7 +27,7 @@ DISTCLEANFILES = \
 	$(NULL)
 
 distclean-local:
-	if test $(srdcir) = .; then :; else \
+	if test "$(srcdir)" = "."; then :; else \
 		rm -f ChangeLog; \
 	fi
 
