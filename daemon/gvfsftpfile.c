@@ -171,7 +171,7 @@ g_vfs_ftp_file_new_child (const GVfsFtpFile *parent, const char *display_name, G
       return NULL;
     }
 
-  new_path = g_strconcat (parent->gvfs_path, "/", display_name, NULL);
+  new_path = g_strconcat (parent->gvfs_path, parent->gvfs_path[1] == 0 ? "" : "/", display_name, NULL);
   child = g_vfs_ftp_file_new_from_gvfs (parent->backend, new_path);
   g_free (new_path);
   return child;
