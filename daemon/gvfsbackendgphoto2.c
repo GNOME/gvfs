@@ -56,7 +56,7 @@
 #include "gvfsicon.h"
 
 /* showing debug traces */
-#if 0
+#if 1
 #define DEBUG_SHOW_TRACES 1
 #endif
 
@@ -627,7 +627,7 @@ static void
 _gphoto2_logger_func (GPLogLevel level, const char *domain, const char *format, va_list args, void *data)
 {
   g_fprintf (stderr, "libgphoto2: %s: ", domain);
-  g_vfprintf (stderr, message, args);
+  g_vfprintf (stderr, format, args);
   va_end (args);
   g_fprintf (stderr, "\n");
 }
@@ -1340,7 +1340,9 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
       head = &storage_info[i];
     }
 
-  prefix = g_strdup_printf ("%s/", head->basedir);
+  /* Some cameras, such as the Canon 5D, won't report the basedir */
+  if (head->fields & GP_STORAGEINFO_BASE)
+    prefix = g_strdup_printf ("%s/", head->basedir);
 
  out:
 
@@ -1348,6 +1350,8 @@ ensure_ignore_prefix (GVfsBackendGphoto2 *gphoto2_backend, GVfsJob *job)
     gphoto2_backend->ignore_prefix = g_strdup ("/");
   else
     gphoto2_backend->ignore_prefix = prefix;
+
+  DEBUG ("Using ignore_prefix='%s'", gphoto2_backend->ignore_prefix);
 
   return TRUE;
 }
@@ -1992,7 +1996,7 @@ do_enumerate (GVfsBackend *backend,
   using_cached_file_list = FALSE;
 
   filename = add_ignore_prefix (gphoto2_backend, given_filename);
-  DEBUG ("enumerate (%s)", given_filename);
+  DEBUG ("enumerate ('%s', with_prefix='%s')", given_filename, filename);
 
   split_filename_with_ignore_prefix (gphoto2_backend, given_filename, &as_dir, &as_name);
   if (!is_directory (gphoto2_backend, as_dir, as_name))
