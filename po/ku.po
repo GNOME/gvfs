@@ -1,20 +1,22 @@
 # translation of ku.po to Kurdish
 # Copyright (C) 2008 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
 # Erdal Ronahi <erdal dot ronahi at gmail dot com>, 2008.
+# Erdal Ronahi <erdal dot ronahi at gmail dot com>, 2009
 msgid ""
 msgstr ""
 "Project-Id-Version: ku\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-03-20 13:52+0000\n"
-"PO-Revision-Date: 2008-03-21 02:04+0100\n"
+"PO-Revision-Date: 2009-06-05 17:08+0200\n"
 "Last-Translator: Erdal Ronahi <erdal dot ronahi at gmail dot com>\n"
-"Language-Team: Kurdish <ku@li.org>\n"
+"Language-Team: http;//pckurd.net\n"
+"Language: ku\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural= n != 1;"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.3.1\n"
 
 #: ../client/gdaemonfile.c:464 ../client/gdaemonfile.c:1867
 msgid "Operation not supported, files on different mounts"
@@ -62,7 +64,7 @@ msgstr ""
 #: ../client/gdaemonfile.c:1579
 #, c-format
 msgid "Invalid filename %s"
-msgstr ""
+msgstr "Navê pelê %s yê nederbasdar"
 
 #: ../client/gdaemonfile.c:1621
 msgid "Invalid return value from query_filesystem_info"
@@ -1359,4 +1361,3 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr ""
-
