@@ -311,10 +311,7 @@ g_vfs_ftp_dir_cache_lookup_file (GVfsFtpDirCache *  cache,
   entry = g_vfs_ftp_dir_cache_lookup_entry (cache, task, dir, 0);
   g_vfs_ftp_file_free (dir);
   if (entry == NULL)
-    {
-      g_vfs_ftp_dir_cache_entry_unref (entry);
-      return NULL;
-    }
+    return NULL;
 
   info = g_hash_table_lookup (entry->files, file);
   if (info != NULL)
