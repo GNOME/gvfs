@@ -56,7 +56,7 @@
 #include "gvfsicon.h"
 
 /* showing debug traces */
-#if 1
+#if 0
 #define DEBUG_SHOW_TRACES 1
 #endif
 
