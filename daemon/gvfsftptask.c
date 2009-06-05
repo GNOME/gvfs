@@ -245,7 +245,8 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 
       g_get_current_time (&now);
       g_time_val_add (&now, G_VFS_FTP_TIMEOUT_IN_SECONDS * 1000 * 1000);
-      if (!g_cond_timed_wait (ftp->cond, ftp->mutex, &now))
+      if (ftp->busy_connections >= ftp->connections ||
+          !g_cond_timed_wait (ftp->cond, ftp->mutex, &now))
         {
           task->error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_BUSY,
         		                     _("The FTP server is busy. Try again later"));
@@ -419,6 +420,11 @@ g_vfs_ftp_task_give_connection (GVfsFtpTask *      task,
   g_return_if_fail (task->conn == NULL);
 
   task->conn = conn;
+  /* this connection is not busy anymore */
+  g_mutex_lock (task->backend->mutex);
+  g_assert (task->backend->busy_connections > 0);
+  task->backend->busy_connections--;
+  g_mutex_unlock (task->backend->mutex);
 }
 
 /**
@@ -436,12 +442,23 @@ GVfsFtpConnection *
 g_vfs_ftp_task_take_connection (GVfsFtpTask *task)
 {
   GVfsFtpConnection *conn;
+  GVfsBackendFtp *ftp;
 
   g_return_val_if_fail (task != NULL, NULL);
   g_return_val_if_fail (task->conn != NULL, NULL);
 
   conn = task->conn;
   task->conn = NULL;
+
+  ftp = task->backend;
+  /* mark this connection as busy */
+  g_mutex_lock (ftp->mutex);
+  ftp->busy_connections++;
+  /* if all connections are busy, signal all waiting threads, 
+   * so they stop waiting and return BUSY earlier */
+  if (ftp->busy_connections >= ftp->connections)
+    g_cond_broadcast (ftp->cond);
+  g_mutex_unlock (ftp->mutex);
 
   return conn;
 }

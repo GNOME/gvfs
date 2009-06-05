@@ -96,6 +96,7 @@ struct _GVfsBackendFtp
   GCond *        	cond;                   /* cond used to signal tasks waiting on the mutex */
   GQueue *        	queue;                  /* queue containing the connections */
   guint        		connections;            /* current number of connections */
+  guint                 busy_connections;       /* current number of connections being used for reads/writes */
   guint        		max_connections;        /* upper server limit for number of connections - dynamically generated */
 };
 
