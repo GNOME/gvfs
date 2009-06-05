@@ -391,7 +391,7 @@ try_login:
         {
           ftp->user = username ? g_strdup (username) : g_strdup ("");
           ftp->password = g_strdup (password);
-          if (g_vfs_ftp_task_login (&task, username, password) != 0)
+          if (g_vfs_ftp_task_login (&task, ftp->user, ftp->password) != 0)
             break;
         }
       g_free (username);
