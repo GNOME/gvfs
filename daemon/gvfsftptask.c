@@ -869,6 +869,17 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
  *
  * Closes any data connection @task might have opened.
  */
+void
+g_vfs_ftp_task_close_data_connection (GVfsFtpTask *task)
+{
+  g_return_if_fail (task != NULL);
+
+  if (task->conn == NULL)
+    return;
+
+  g_vfs_ftp_connection_close_data_connection (task->conn);
+}
+
 /**
  * g_vfs_ftp_task_open_data_connection:
  * @task: a task not having an open data connection
@@ -883,9 +894,6 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
 
   if (g_vfs_ftp_task_is_in_error (task))
     return;
-
-  /* only check this here, erroneous connection might have failed to acquire a connection. */
-  g_return_if_fail (task->conn != NULL);
 
   if (g_vfs_ftp_task_open_data_connection_epsv (task))
     return;

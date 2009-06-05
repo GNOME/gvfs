@@ -83,10 +83,7 @@ guint                   g_vfs_ftp_task_receive                  (GVfsFtpTask *  
                                                                  GVfsFtpResponseFlags   flags,
                                                                  char ***               reply);
 void                    g_vfs_ftp_task_open_data_connection     (GVfsFtpTask *          task);
-#define g_vfs_ftp_task_close_data_connection(task) G_STMT_START{\
-  if ((task)->conn) \
-    g_vfs_ftp_connection_close_data_connection((task)->conn);\
-}G_STMT_END
+void                    g_vfs_ftp_task_close_data_connection    (GVfsFtpTask *          task);
 
 gboolean                g_vfs_ftp_task_login                    (GVfsFtpTask *          task,
                                                                  const char *           username,
