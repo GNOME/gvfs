@@ -74,16 +74,16 @@ typedef struct _GVfsBackendFtpClass   GVfsBackendFtpClass;
 
 struct _GVfsBackendFtp
 {
-  GVfsBackend        	backend;
+  GVfsBackend                backend;
 
   GSocketConnectable *  addr;
   GSocketClient *       connection_factory;
-  char *        	user;
+  char *                user;
   gboolean              has_initial_user;
-  char *        	password;	        /* password or NULL for anonymous */
+  char *                password;	        /* password or NULL for anonymous */
   char *                host_display_name;
 
-  GVfsFtpSystem        	system;                 /* the system from the SYST response */
+  GVfsFtpSystem                system;                 /* the system from the SYST response */
   int                   features;               /* GVfsFtpFeatures that are supported */
   int                   workarounds;            /* GVfsFtpWorkarounds in use - int because it's atomic */
 
@@ -92,12 +92,12 @@ struct _GVfsBackendFtp
   GVfsFtpDirCache *     dir_cache;              /* directory cache */
 
   /* connection collection - accessed from gvfsftptask.c */
-  GMutex *        	mutex;                  /* mutex protecting the following variables */
-  GCond *        	cond;                   /* cond used to signal tasks waiting on the mutex */
-  GQueue *        	queue;                  /* queue containing the connections */
-  guint        		connections;            /* current number of connections */
+  GMutex *                mutex;                  /* mutex protecting the following variables */
+  GCond *                cond;                   /* cond used to signal tasks waiting on the mutex */
+  GQueue *                queue;                  /* queue containing the connections */
+  guint                	connections;            /* current number of connections */
   guint                 busy_connections;       /* current number of connections being used for reads/writes */
-  guint        		max_connections;        /* upper server limit for number of connections - dynamically generated */
+  guint                	max_connections;        /* upper server limit for number of connections - dynamically generated */
 };
 
 struct _GVfsBackendFtpClass
