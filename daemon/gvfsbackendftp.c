@@ -1162,6 +1162,19 @@ out:
   g_vfs_ftp_task_done (&task);
 }
 
+static void
+cancel_timer_cb (GCancellable *orig, GCancellable *to_cancel)
+{
+  g_cancellable_cancel (to_cancel);
+}
+
+static gboolean
+cancel_cancellable (gpointer cancellable)
+{
+  g_cancellable_cancel (cancellable);
+  return FALSE;
+}
+
 static gssize
 ftp_output_stream_splice (GOutputStream *output,
                           GInputStream *input,
@@ -1174,36 +1187,88 @@ ftp_output_stream_splice (GOutputStream *output,
   gssize n_read, n_written;
   gssize bytes_copied;
   char buffer[8192], *p;
-  gboolean res;
+  GCancellable *timer_cancel;
+  gulong cancel_cb_id;
 
   bytes_copied = 0;
+  timer_cancel = NULL;
+
   for (;;) 
     {
-      n_read = g_input_stream_read (input, buffer, sizeof (buffer), cancellable, error);
+      n_read = g_input_stream_read (input, buffer, sizeof (buffer), timer_cancel ? timer_cancel : cancellable, error);
       if (n_read == -1)
-        return -1;
-        
+        {
+          if (g_cancellable_is_cancelled (timer_cancel) &&
+              !g_cancellable_is_cancelled (cancellable))
+            {
+              g_cancellable_disconnect (cancellable, cancel_cb_id);
+              g_object_unref (timer_cancel);
+              timer_cancel = NULL;
+              g_clear_error (error);
+              progress_callback (bytes_copied, total_size, progress_callback_data);
+            }
+          else
+            {
+              bytes_copied = -1;
+              break;
+            }
+        }
       if (n_read == 0)
-        return bytes_copied;
+        break;
 
       p = buffer;
       while (n_read > 0)
         {
-          n_written = g_output_stream_write (output, p, n_read, cancellable, error);
+          n_written = g_output_stream_write (output, p, n_read, timer_cancel ? timer_cancel : cancellable, error);
           if (n_written == -1)
-            return -1;
+            {
+              if (g_cancellable_is_cancelled (timer_cancel) &&
+                  !g_cancellable_is_cancelled (cancellable))
+                {
+                  g_cancellable_disconnect (cancellable, cancel_cb_id);
+                  g_object_unref (timer_cancel);
+                  timer_cancel = NULL;
+                  g_clear_error (error);
+                  progress_callback (bytes_copied + n_written, total_size, progress_callback_data);
+                }
+              else
+                {
+                  bytes_copied = -1;
+                  break;
+                }
+            }
 
           p += n_written;
           n_read -= n_written;
           bytes_copied += n_written;
+          if (progress_callback && timer_cancel == NULL)
+            {
+              timer_cancel = g_cancellable_new ();
+              cancel_cb_id = g_cancellable_connect (cancellable, 
+                                                    G_CALLBACK (cancel_timer_cb),
+                                                    timer_cancel,
+                                                    NULL);
+              g_object_ref (timer_cancel);
+              g_timeout_add_seconds_full (G_PRIORITY_DEFAULT,
+                                          1,
+                                          cancel_cancellable,
+                                          timer_cancel,
+                                          g_object_unref);
+            }
         }
     }
-  while (res);
 
-  if (res)
-    return bytes_copied;
+  if (timer_cancel != NULL)
+    {
+      /* no need to remove the timeout, it'll remove itself fine and we
+       * don't get into races that way */
+      g_cancellable_disconnect (cancellable, cancel_cb_id);
+      g_object_unref (timer_cancel);
+    }
+  if (bytes_copied >= 0 && progress_callback)
+    progress_callback (bytes_copied, total_size, progress_callback_data);
 
-  return -1;
+  return bytes_copied;
 }
 
 static void
