@@ -583,7 +583,7 @@ static void
 error_550_is_directory (GVfsFtpTask *task, gpointer file)
 {
   if (g_vfs_ftp_task_send (task,
-                           G_VFS_FTP_PASS_550,
+                           0,
                            "CWD %s", g_vfs_ftp_file_get_ftp_path (file)))
     {
       g_set_error_literal (&task->error, G_IO_ERROR,
