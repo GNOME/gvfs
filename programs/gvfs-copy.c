@@ -63,13 +63,21 @@ is_dir (GFile *file)
   return res;
 }
 
+static GTimeVal start_time;
 static void
 show_progress (goffset current_num_bytes,
 	       goffset total_num_bytes,
 	       gpointer user_data)
 {
-  g_print ("progress %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT"\n",
-	   current_num_bytes, total_num_bytes);
+  GTimeVal tv;
+  char *size;
+
+  g_get_current_time (&tv);
+
+  size = g_format_size_for_display (current_num_bytes / MAX (tv.tv_sec - start_time.tv_sec, 1));
+  g_print ("progress %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT" (%s/s)\n",
+	   current_num_bytes, total_num_bytes, size);
+  g_free (size);
 }
 
 
@@ -154,6 +162,7 @@ main (int argc, char *argv[])
 	
 	
       error = NULL;
+      g_get_current_time (&start_time);
       if (!g_file_copy (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
 	{
 	  if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
