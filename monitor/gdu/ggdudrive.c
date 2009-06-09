@@ -169,7 +169,7 @@ update_drive (GGduDrive *drive)
        *
        * See http://bugzilla.gnome.org/show_bug.cgi?id=576587 for why we want this.
        */
-      drive->can_eject = gdu_device_drive_get_is_media_ejectable (device) || gdu_device_drive_get_requires_eject (device) || gdu_device_is_removable (device);
+      drive->can_eject = gdu_device_drive_get_is_media_ejectable (device) || gdu_device_drive_get_requires_eject (device) || gdu_device_is_removable (device) || gdu_device_drive_get_can_detach (device);
       drive->is_media_check_automatic = gdu_device_is_media_change_detected (device);
       drive->can_poll_for_media = TRUE;
     }
@@ -352,6 +352,23 @@ g_gdu_drive_can_poll_for_media (GDrive *_drive)
 }
 
 static void
+detach_cb (GduDevice *device,
+           GError    *error,
+           gpointer   user_data)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+
+  if (error != NULL)
+    {
+      g_simple_async_result_set_from_error (simple, error);
+      g_error_free (error);
+    }
+
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static void
 eject_cb (GduDevice *device,
           GError    *error,
           gpointer   user_data)
@@ -360,9 +377,6 @@ eject_cb (GduDevice *device,
 
   if (error != NULL)
     {
-      /* We could handle PolicyKit integration here but this action is allowed by default
-       * and this won't be needed when porting to PolicyKit 1.0 anyway
-       */
       g_simple_async_result_set_from_error (simple, error);
       g_error_free (error);
     }
@@ -401,7 +415,27 @@ g_gdu_drive_eject_do (GDrive              *_drive,
                                           user_data,
                                           NULL);
 
-      gdu_device_op_drive_eject (device, eject_cb, simple);
+      /* Note that we also offer the Eject option for non-removable
+       * devices (see update_drive() above) that are detachable so the
+       * device may actually not be removable when we get here...
+       *
+       * However, keep in mind that a device may be both removable and
+       * detachable (e.g. a usb optical drive)..
+       *
+       * Now, consider what would happen if we detached a USB optical
+       * drive? The device would power down without actually ejecting
+       * the media... and it would require a power-cycle or a replug
+       * to use it for other media. Therefore, never detach devices
+       * with removable media, only eject them.
+       */
+      if (gdu_device_drive_get_can_detach (device) && !gdu_device_is_removable (device))
+        {
+          gdu_device_op_drive_detach (device, detach_cb, simple);
+        }
+      else
+        {
+          gdu_device_op_drive_eject (device, eject_cb, simple);
+        }
       g_object_unref (device);
     }
 }
