@@ -96,17 +96,15 @@ struct _GVfsFtpDirCache
   GHashTable *          directories;    /* GVfsFtpFile of directory => GVfsFtpDirCacheEntry mapping */
   guint                 stamp;          /* used to identify validity of cache when flushing */
   GMutex *              lock;           /* mutex for thread safety of stamp and hash table */
-  GFileInfo *           root;           /* file info for '/' */
   const GVfsFtpDirFuncs *funcs;         /* functions to call */
 };
 
 GVfsFtpDirCache *
-g_vfs_ftp_dir_cache_new (const GVfsFtpDirFuncs *funcs, GFileInfo *root)
+g_vfs_ftp_dir_cache_new (const GVfsFtpDirFuncs *funcs)
 {
   GVfsFtpDirCache *cache;
 
   g_return_val_if_fail (funcs != NULL, NULL);
-  g_return_val_if_fail (G_IS_FILE_INFO (root), NULL);
 
   cache = g_slice_new0 (GVfsFtpDirCache);
   cache->directories = g_hash_table_new_full (g_vfs_ftp_file_hash,
@@ -115,7 +113,6 @@ g_vfs_ftp_dir_cache_new (const GVfsFtpDirFuncs *funcs, GFileInfo *root)
                                               (GDestroyNotify) g_vfs_ftp_dir_cache_entry_unref);
   cache->lock = g_mutex_new();
   cache->funcs = funcs;
-  cache->root = root;
 
   return cache;
 }
@@ -127,7 +124,6 @@ g_vfs_ftp_dir_cache_free (GVfsFtpDirCache *cache)
 
   g_hash_table_destroy (cache->directories);
   g_mutex_free (cache->lock);
-  g_object_unref (cache->root);
   g_slice_free (GVfsFtpDirCache, cache);
 }
 
@@ -191,13 +187,51 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
 }
 
 static GFileInfo *
+g_vfs_ftp_dir_cache_lookup_file_internal (GVfsFtpDirCache *  cache,
+                                          GVfsFtpTask *      task,
+                                          const GVfsFtpFile *file,
+                                          guint              stamp)
+{
+  GVfsFtpDirCacheEntry *entry;
+  GVfsFtpFile *dir;
+  GFileInfo *info;
+
+  if (g_vfs_ftp_task_is_in_error (task))
+    return NULL;
+
+  if (!g_vfs_ftp_file_is_root (file))
+    {
+      dir = g_vfs_ftp_file_new_parent (file);
+      entry = g_vfs_ftp_dir_cache_lookup_entry (cache, task, dir, stamp);
+      g_vfs_ftp_file_free (dir);
+      if (entry == NULL)
+        return NULL;
+
+      info = g_hash_table_lookup (entry->files, file);
+      if (info != NULL)
+        {
+          /* NB: the order of ref/unref is important here */
+          g_object_ref (info);
+          g_vfs_ftp_dir_cache_entry_unref (entry);
+          return info;
+        }
+
+      g_vfs_ftp_dir_cache_entry_unref (entry);
+    }
+
+  if (!g_vfs_ftp_task_is_in_error (task))
+    info = cache->funcs->lookup_uncached (task, file);
+
+  return info;
+}
+
+static GFileInfo *
 g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
                                      GVfsFtpTask *      task,
                                      const GVfsFtpFile *file,
                                      GFileInfo *        original,
                                      guint              stamp)
 {
-  GVfsFtpDirCacheEntry *entry;
   static const char *copy_attributes[] = {
     G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK,
     G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
@@ -230,27 +264,12 @@ g_vfs_ftp_dir_cache_resolve_symlink (GVfsFtpDirCache *  cache,
           g_vfs_ftp_task_clear_error (task);
           return original;
         }
-      tmp = g_vfs_ftp_file_new_parent (link);
-      entry = g_vfs_ftp_dir_cache_lookup_entry (cache, task, tmp, stamp);
-      g_vfs_ftp_file_free (tmp);
-      if (entry == NULL)
-        {
-          g_vfs_ftp_file_free (link);
-          /* clear the (potential) error here, dangling symlinks etc should not cause errors */
-          g_vfs_ftp_task_clear_error (task);
-          return original;
-        }
-      info = g_hash_table_lookup (entry->files, link);
+      info = g_vfs_ftp_dir_cache_lookup_file_internal (cache, task, link, stamp);
       if (info == NULL)
         {
-          g_vfs_ftp_dir_cache_entry_unref (entry);
           g_vfs_ftp_file_free (link);
+          g_vfs_ftp_task_clear_error (task);
           return original;
-        }
-      else
-        {
-          g_object_ref (info);
-          g_vfs_ftp_dir_cache_entry_unref (entry);
         }
     }
   while (g_file_info_get_is_symlink (info) && lookups++ < 8);
@@ -293,35 +312,17 @@ g_vfs_ftp_dir_cache_lookup_file (GVfsFtpDirCache *  cache,
                                  const GVfsFtpFile *file,
                                  gboolean           resolve_symlinks)
 {
-  GVfsFtpDirCacheEntry *entry;
-  GVfsFtpFile *dir;
   GFileInfo *info;
 
   g_return_val_if_fail (cache != NULL, NULL);
   g_return_val_if_fail (task != NULL, NULL);
   g_return_val_if_fail (file != NULL, NULL);
 
-  if (g_vfs_ftp_task_is_in_error (task))
-    return NULL;
+  info = g_vfs_ftp_dir_cache_lookup_file_internal (cache, task, file, 0);
 
-  if (g_vfs_ftp_file_is_root (file))
-    return g_object_ref (cache->root);
+  if (info != NULL && resolve_symlinks)
+    info = g_vfs_ftp_dir_cache_resolve_symlink (cache, task, file, info, 0);
 
-  dir = g_vfs_ftp_file_new_parent (file);
-  entry = g_vfs_ftp_dir_cache_lookup_entry (cache, task, dir, 0);
-  g_vfs_ftp_file_free (dir);
-  if (entry == NULL)
-    return NULL;
-
-  info = g_hash_table_lookup (entry->files, file);
-  if (info != NULL)
-    {
-      g_object_ref (info);
-      if (resolve_symlinks)
-        info = g_vfs_ftp_dir_cache_resolve_symlink (cache, task, file, info, 0);
-    }
-
-  g_vfs_ftp_dir_cache_entry_unref (entry);
   return info;
 }
 
@@ -365,6 +366,7 @@ g_vfs_ftp_dir_cache_lookup_dir (GVfsFtpDirCache *  cache,
       g_object_ref (info);
       if (resolve_symlinks)
         info = g_vfs_ftp_dir_cache_resolve_symlink (cache, task, file, info, stamp);
+      g_assert (!g_vfs_ftp_task_is_in_error (task));
       result = g_list_prepend (result, info);
     }
   g_vfs_ftp_dir_cache_entry_unref (entry);
@@ -405,6 +407,94 @@ g_vfs_ftp_dir_cache_purge_file (GVfsFtpDirCache *  cache,
 
 #include "ParseFTPList.h"
 #include "gvfsdaemonutils.h"
+
+static GFileInfo *
+create_root_file_info (GVfsBackendFtp *ftp)
+{
+  GFileInfo *info;
+  GIcon *icon;
+  char *display_name;
+ 
+  info = g_file_info_new ();
+  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+
+  g_file_info_set_name (info, "/");
+  display_name = g_strdup_printf (_("/ on %s"), ftp->host_display_name);
+  g_file_info_set_display_name (info, display_name);
+  g_free (display_name);
+  g_file_info_set_edit_name (info, "/");
+
+  g_file_info_set_content_type (info, "inode/directory");
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, "inode/directory");
+
+  icon = g_themed_icon_new ("folder-remote");
+  g_file_info_set_icon (info, icon);
+  g_object_unref (icon);
+
+  return info;
+}
+
+static GFileInfo *
+g_vfs_ftp_dir_cache_funcs_lookup_uncached (GVfsFtpTask *      task,
+                                           const GVfsFtpFile *file)
+{
+  GFileInfo *info;
+  char **reply;
+
+  if (g_vfs_ftp_file_is_root (file))
+    return create_root_file_info (task->backend);
+
+  /* the directory cache fails when the parent directory of the file is not readable.
+   * This cannot happen on Unix, but it can happen on FTP.
+   * In this case we try to figure out as much as possible about the file (does it even exist?)
+   * using standard ftp commands.
+   */
+  if (g_vfs_ftp_task_send (task, 0, "CWD %s", g_vfs_ftp_file_get_ftp_path (file)))
+    {
+      char *tmp;
+
+      info = g_file_info_new ();
+
+      tmp = g_path_get_basename (g_vfs_ftp_file_get_gvfs_path (file));
+      g_file_info_set_name (info, tmp);
+      g_free (tmp);
+
+      gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file), G_FILE_TYPE_DIRECTORY);
+
+      g_file_info_set_is_hidden (info, TRUE);
+      
+      return info;
+    }
+  
+  g_vfs_ftp_task_clear_error (task);
+  if (g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
+    {
+      char *tmp;
+
+      info = g_file_info_new ();
+
+      tmp = g_path_get_basename (g_vfs_ftp_file_get_gvfs_path (file));
+      g_file_info_set_name (info, tmp);
+      g_free (tmp);
+
+      gvfs_file_info_populate_default (info, g_vfs_ftp_file_get_gvfs_path (file), G_FILE_TYPE_REGULAR);
+
+      g_file_info_set_size (info, g_ascii_strtoull (reply[0] + 4, NULL, 0));
+      g_strfreev (reply);
+
+      g_file_info_set_is_hidden (info, TRUE);
+      return info;
+    }
+      
+  g_vfs_ftp_task_clear_error (task);
+
+  /* note that there might still be a file/directory, we just have
+   * no way to figure this out (in particular on ftp servers that
+   * don't support SIZE.
+   * If you have ways to improve file detection, patches are welcome. */
+
+  return NULL;
+}
 
 static gboolean
 g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
@@ -591,11 +681,13 @@ g_vfs_ftp_dir_cache_funcs_process_default (GInputStream *        stream,
 const GVfsFtpDirFuncs g_vfs_ftp_dir_cache_funcs_unix = {
   "LIST -a",
   g_vfs_ftp_dir_cache_funcs_process_unix,
+  g_vfs_ftp_dir_cache_funcs_lookup_uncached,
   g_vfs_ftp_dir_cache_funcs_resolve_default
 };
 
 const GVfsFtpDirFuncs g_vfs_ftp_dir_cache_funcs_default = {
   "LIST",
   g_vfs_ftp_dir_cache_funcs_process_default,
+  g_vfs_ftp_dir_cache_funcs_lookup_uncached,
   g_vfs_ftp_dir_cache_funcs_resolve_default
 };

@@ -41,6 +41,8 @@ struct _GVfsFtpDirFuncs {
                                                                  GVfsFtpDirCacheEntry * entry,
                                                                  GCancellable *         cancellable,
                                                                  GError **              error);
+  GFileInfo *           (* lookup_uncached)                     (GVfsFtpTask *          task,
+                                                                 const GVfsFtpFile *    file);
   GVfsFtpFile *         (* resolve_symlink)                     (GVfsFtpTask *          task,
                                                                  const GVfsFtpFile *    file,
                                                                  const char *           target);
@@ -49,8 +51,7 @@ struct _GVfsFtpDirFuncs {
 extern const GVfsFtpDirFuncs g_vfs_ftp_dir_cache_funcs_unix;
 extern const GVfsFtpDirFuncs g_vfs_ftp_dir_cache_funcs_default;
 
-GVfsFtpDirCache *       g_vfs_ftp_dir_cache_new                 (const GVfsFtpDirFuncs *funcs,
-                                                                 GFileInfo *            root);
+GVfsFtpDirCache *       g_vfs_ftp_dir_cache_new                 (const GVfsFtpDirFuncs *funcs);
 void                    g_vfs_ftp_dir_cache_free                (GVfsFtpDirCache *      cache);
 
 GFileInfo *             g_vfs_ftp_dir_cache_lookup_file         (GVfsFtpDirCache *      cache,
