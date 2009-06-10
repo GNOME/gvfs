@@ -241,7 +241,7 @@ trash_backend_open_for_read (GVfsBackend        *vfs_backend,
         {
           GFileInputStream *stream;
 
-          stream = g_file_read (real, NULL, &error);
+          stream = g_file_read (real, G_VFS_JOB (job)->cancellable, &error);
           g_object_unref (real);
       
           if (stream)
@@ -272,7 +272,7 @@ trash_backend_read (GVfsBackend       *backend,
   gssize bytes;
 
   bytes = g_input_stream_read (handle, buffer, bytes_requested,
-                               NULL, &error);
+                               G_VFS_JOB (job)->cancellable, &error);
 
   if (bytes >= 0)
     {
@@ -318,7 +318,7 @@ trash_backend_close_read (GVfsBackend       *backend,
 {
   GError *error = NULL;
 
-  if (g_input_stream_close (handle, NULL, &error))
+  if (g_input_stream_close (handle, G_VFS_JOB (job)->cancellable, &error))
     {
       g_vfs_job_succeeded (G_VFS_JOB (job));
       g_object_unref (handle);
@@ -449,8 +449,9 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
               if (remove_source)
                 it_worked = trash_item_restore (item, destination, &error);
               else
-                it_worked = g_file_copy (real, destination, flags,
-                                         NULL, NULL, NULL, &error);
+                it_worked = g_file_copy (real, destination, flags, 
+                                         G_VFS_JOB (job)->cancellable, 
+                                         progress_callback, progress_callback_data, &error);
 
               g_object_unref (destination);
 
@@ -548,7 +549,8 @@ trash_backend_enumerate_root (GVfsBackendTrash      *backend,
       GFileInfo *info;
 
       info = g_file_query_info (trash_item_get_file (item),
-                                job->attributes, flags, NULL, NULL);
+                                job->attributes, flags,
+                                G_VFS_JOB (job)->cancellable, NULL);
 
       if (info)
         {
@@ -600,7 +602,8 @@ trash_backend_enumerate_non_root (GVfsBackendTrash      *backend,
       GFileEnumerator *enumerator;
 
       enumerator = g_file_enumerate_children (real, job->attributes,
-                                              job->flags, NULL, &error);
+                                              job->flags, 
+                                              G_VFS_JOB (job)->cancellable, &error);
       g_object_unref (real);
 
       if (enumerator)
@@ -610,7 +613,8 @@ trash_backend_enumerate_non_root (GVfsBackendTrash      *backend,
           g_vfs_job_succeeded (G_VFS_JOB (job));
 
           while ((info = g_file_enumerator_next_file (enumerator,
-                                                      NULL, &error)))
+                                                      G_VFS_JOB (job)->cancellable,
+                                                      &error)))
             {
               trash_backend_add_info (NULL, info, FALSE);
               g_vfs_job_enumerate_add_info (job, info);
@@ -701,8 +705,11 @@ trash_backend_query_info (GVfsBackend           *vfs_backend,
         {
           GFileInfo *real_info;
 
-          real_info = g_file_query_info (real, job->attributes,
-                                         flags, NULL, &error);
+          real_info = g_file_query_info (real, 
+                                         job->attributes,
+                                         flags,
+                                         G_VFS_JOB (job)->cancellable,
+                                         &error);
           g_object_unref (real);
 
           if (real_info)
