@@ -49,6 +49,7 @@ struct _GVfsJobPull
   GFileCopyFlags flags;
   char *callback_obj_path;
   gboolean remove_source;
+  gboolean send_progress;
 };
 
 struct _GVfsJobPullClass

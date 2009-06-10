@@ -1528,8 +1528,9 @@ push_transfer_started_cb (DBusGProxy *proxy,
 
   op_backend->status = ASYNC_RUNNING;
   job_data->total_bytes = (goffset) total_bytes;
-  job_data->progress_callback (0, job_data->total_bytes,
-                               job_data->progress_callback_data);
+  if (job_data->progress_callback)
+    job_data->progress_callback (0, job_data->total_bytes,
+                                 job_data->progress_callback_data);
 
   g_cond_signal (op_backend->cond);
   g_mutex_unlock (op_backend->mutex);
@@ -1561,9 +1562,10 @@ push_transfer_progress_cb (DBusGProxy *proxy,
 
   g_message ("transfer progress");
 
-  job_data->progress_callback ((goffset) bytes_transferred,
-                               job_data->total_bytes,
-                               job_data->progress_callback_data);
+  if (job_data->progress_callback)
+    job_data->progress_callback ((goffset) bytes_transferred,
+                                 job_data->total_bytes,
+                                 job_data->progress_callback_data);
 }
 
 static void

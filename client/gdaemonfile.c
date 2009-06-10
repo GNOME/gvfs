@@ -1958,10 +1958,12 @@ file_transfer (GFile                  *source,
   gboolean source_is_daemon;
   gboolean dest_is_daemon;
   gboolean native_transfer;
+  gboolean send_progress;
 
   native_transfer  = FALSE;
   source_is_daemon = G_IS_DAEMON_FILE (source);
   dest_is_daemon   = G_IS_DAEMON_FILE (destination);
+  send_progress    = progress_callback != NULL;
 
   if (source_is_daemon && dest_is_daemon)
     native_transfer = TRUE;
@@ -2028,6 +2030,7 @@ file_transfer (GFile                  *source,
                                    obj_path, progress_callback_message, &data,
                                    NULL, cancellable, error,
                                    G_DBUS_TYPE_CSTRING, &local_path,
+                                   DBUS_TYPE_BOOLEAN, &send_progress,
                                    DBUS_TYPE_UINT32, &flags_dbus,
                                    DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
                                    DBUS_TYPE_BOOLEAN, &dbus_remove_source,
@@ -2040,6 +2043,7 @@ file_transfer (GFile                  *source,
                                    obj_path, progress_callback_message, &data,
                                    NULL, cancellable, error,
                                    G_DBUS_TYPE_CSTRING, &local_path,
+                                   DBUS_TYPE_BOOLEAN, &send_progress,
                                    DBUS_TYPE_UINT32, &flags_dbus,
                                    DBUS_TYPE_OBJECT_PATH, &dbus_obj_path,
                                    DBUS_TYPE_BOOLEAN, &dbus_remove_source,

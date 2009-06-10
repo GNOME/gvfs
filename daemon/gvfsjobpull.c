@@ -87,7 +87,7 @@ g_vfs_job_pull_new (DBusConnection *connection,
   int path1_len, path2_len;
   const char *path1_data, *path2_data, *callback_obj_path;
   dbus_uint32_t flags;
-  dbus_bool_t remove_source;
+  dbus_bool_t remove_source, send_progress;
 
   dbus_error_init (&derror);
   if (!dbus_message_get_args (message, &derror,
@@ -95,6 +95,7 @@ g_vfs_job_pull_new (DBusConnection *connection,
 			      &path1_data, &path1_len,
 			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
 			      &path2_data, &path2_len,
+                              DBUS_TYPE_BOOLEAN, &send_progress,
                               DBUS_TYPE_UINT32, &flags,
 			      DBUS_TYPE_OBJECT_PATH, &callback_obj_path,
                               DBUS_TYPE_BOOLEAN, &remove_source,
@@ -118,6 +119,7 @@ g_vfs_job_pull_new (DBusConnection *connection,
   job->local_path = g_strndup (path2_data, path2_len);
   job->backend = backend;
   job->flags = flags;
+  job->send_progress = send_progress;
   job->remove_source = remove_source;
   g_debug ("Remove Source: %s\n", remove_source ? "true" : "false");
   if (strcmp (callback_obj_path, "/org/gtk/vfs/void") != 0)
@@ -180,8 +182,8 @@ run (GVfsJob *job)
                op_job->local_path,
                op_job->flags,
                op_job->remove_source,
-               progress_callback,
-               job);
+               op_job->send_progress ? progress_callback : NULL,
+               op_job->send_progress ? job : NULL);
 }
 
 static gboolean
@@ -199,8 +201,8 @@ try (GVfsJob *job)
                           op_job->local_path,
                           op_job->flags,
                           op_job->remove_source,
-                          progress_callback,
-                          job);
+                          op_job->send_progress ? progress_callback : NULL,
+                          op_job->send_progress ? job : NULL);
 }
 
 /* Might be called on an i/o thread */
