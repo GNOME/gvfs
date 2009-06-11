@@ -526,9 +526,9 @@ do_unmount (GVfsBackend *   backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
-/* sets EPERM if file exists */
+/* NB: sets EPERM if file exists, ENOENT if not - an error will _always_ be set */
 static void
-error_550_permission (GVfsFtpTask *task, gpointer file)
+error_550_permission_or_not_found (GVfsFtpTask *task, gpointer file)
 {
   GFileInfo *info;
   
@@ -545,6 +545,10 @@ error_550_permission (GVfsFtpTask *task, gpointer file)
     {
       /* clear potential error from file lookup above */
       g_vfs_ftp_task_clear_error (task);
+      g_set_error_literal (&task->error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_NOT_FOUND,
+                           _("File does not exist"));
     }
 }
 
@@ -615,7 +619,9 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
-  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory, error_550_permission, NULL };
+  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory, 
+                                                         error_550_permission_or_not_found, 
+                                                         NULL };
 
   g_vfs_ftp_task_open_data_connection (&task);
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
