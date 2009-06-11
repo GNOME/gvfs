@@ -529,17 +529,12 @@ do_unmount (GVfsBackend *   backend,
 static void
 error_550_exists (GVfsFtpTask *task, gpointer file)
 {
-  /* FIXME:
-   * What we should do here is look at the cache to figure out if the file
-   * exists, but as cache access is only exposed via the backend
-   * structure (it should be properly abstracted into an opaque thread-safe
-   * structure and then be available per-connection), we could not do that.
-   * So instead, we use the same code we use when trying to find hidden
-   * directories.
-   */
-  if (g_vfs_ftp_task_try_cd (task, file) ||
-      g_vfs_ftp_task_send (task, 0, "SIZE %s", g_vfs_ftp_file_get_ftp_path (file)))
+  GFileInfo *info;
+  
+  info = g_vfs_ftp_dir_cache_lookup_file (task->backend->dir_cache, task, file, FALSE);
+  if (info)
     {
+      g_object_unref (info);
       g_set_error_literal (&task->error,
                            G_IO_ERROR,
                            G_IO_ERROR_EXISTS,
@@ -547,7 +542,7 @@ error_550_exists (GVfsFtpTask *task, gpointer file)
     }
   else
     {
-      /* clear potential error from g_vfs_ftp_task_send() above */
+      /* clear potential error from file lookup above */
       g_vfs_ftp_task_clear_error (task);
     }
 }
@@ -555,19 +550,23 @@ error_550_exists (GVfsFtpTask *task, gpointer file)
 static void
 error_550_is_directory (GVfsFtpTask *task, gpointer file)
 {
-  if (g_vfs_ftp_task_send (task,
-                           0,
-                           "CWD %s", g_vfs_ftp_file_get_ftp_path (file)))
+  GFileInfo *info;
+  
+  /* need to resolve symlinks here to know if a link is a dir or not */
+  info = g_vfs_ftp_dir_cache_lookup_file (task->backend->dir_cache, task, file, TRUE);
+  if (info && g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
     {
+      g_object_unref (info);
       g_set_error_literal (&task->error, G_IO_ERROR,
                            G_IO_ERROR_IS_DIRECTORY,
                            _("File is directory"));
+      return;
     }
-  else
-    {
-      /* clear potential error from g_vfs_ftp_task_send() above */
-      g_vfs_ftp_task_clear_error (task);
-    }
+  else if (info)
+    g_object_unref (info);
+  
+  /* clear potential error from file lookup above */
+  g_vfs_ftp_task_clear_error (task);
 }
 
 static void
