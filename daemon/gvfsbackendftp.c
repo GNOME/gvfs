@@ -1269,7 +1269,7 @@ do_pull (GVfsBackend *         backend,
       goto out;
     }
 
-  input = g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task.conn, NULL));
+  input = g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task.conn));
   ftp_output_stream_splice (output,
                             input,
                             total_size,

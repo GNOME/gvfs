@@ -48,6 +48,7 @@ guint                   g_vfs_ftp_connection_receive          (GVfsFtpConnection
 gboolean                g_vfs_ftp_connection_is_usable        (GVfsFtpConnection *      conn);
 GSocketAddress *        g_vfs_ftp_connection_get_address      (GVfsFtpConnection *      conn,
                                                                GError **                error);
+guint                   g_vfs_ftp_connection_get_debug_id     (GVfsFtpConnection *      conn);
 
 gboolean                g_vfs_ftp_connection_open_data_connection
                                                               (GVfsFtpConnection *      conn,
@@ -56,8 +57,7 @@ gboolean                g_vfs_ftp_connection_open_data_connection
                                                                GError **                error);
 void                    g_vfs_ftp_connection_close_data_connection
                                                               (GVfsFtpConnection *      conn);
-GIOStream *             g_vfs_ftp_connection_get_data_stream  (GVfsFtpConnection *      conn,
-                                                               int *                    debug_id);
+GIOStream *             g_vfs_ftp_connection_get_data_stream  (GVfsFtpConnection *      conn);
 gssize                  g_vfs_ftp_connection_write_data       (GVfsFtpConnection *      conn,
                                                                const char *             data,
                                                                gsize                    len,

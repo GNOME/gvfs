@@ -134,8 +134,6 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
                                   guint              stamp)
 {
   GVfsFtpDirCacheEntry *entry;
-  GIOStream *stream;
-  int debug_id;
 
   g_mutex_lock (cache->lock);
   entry = g_hash_table_lookup (cache->directories, dir);
@@ -164,9 +162,8 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
     return NULL;
 
   entry = g_vfs_ftp_dir_cache_entry_new (stamp);
-  stream = g_vfs_ftp_connection_get_data_stream (task->conn, &debug_id);
-  cache->funcs->process (g_io_stream_get_input_stream (stream),
-                         debug_id,
+  cache->funcs->process (g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task->conn)),
+                         g_vfs_ftp_connection_get_debug_id (task->conn),
                          dir,
                          entry,
                          task->cancellable,

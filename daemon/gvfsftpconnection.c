@@ -239,9 +239,25 @@ g_vfs_ftp_connection_close_data_connection (GVfsFtpConnection *conn)
 }
 
 /**
+ * g_vfs_ftp_connection_get_debug_id:
+ * @conn: the connection
+ *
+ * Gets an ID that uniquely identifies this connection. Intended for use in 
+ * debug print statements.
+ *
+ * Returns: the ID to use for referring to this connection in debug messages
+ **/
+guint
+g_vfs_ftp_connection_get_debug_id (GVfsFtpConnection *conn)
+{
+  g_return_val_if_fail (conn != NULL, 0);
+
+  return conn->debug_id;
+}
+
+/**
  * g_vfs_ftp_connection_get_data_stream:
  * @conn: a connection
- * @debug_id: %NULL or pointer taking id to use for debugging purposes
  *
  * Gets the data stream in use by @conn. It is an error to call this function
  * when no data stream exists. Be sure to check the return value of
@@ -250,13 +266,11 @@ g_vfs_ftp_connection_close_data_connection (GVfsFtpConnection *conn)
  * Returns: the data stream of @conn
  **/
 GIOStream *
-g_vfs_ftp_connection_get_data_stream (GVfsFtpConnection *conn, int *debug_id)
+g_vfs_ftp_connection_get_data_stream (GVfsFtpConnection *conn)
 {
   g_return_val_if_fail (conn != NULL, NULL);
   g_return_val_if_fail (conn->data != NULL, NULL);
 
-  if (debug_id)
-    *debug_id = conn->debug_id;
   return conn->data;
 }
 
