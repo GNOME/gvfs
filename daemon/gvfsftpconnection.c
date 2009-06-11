@@ -274,54 +274,6 @@ g_vfs_ftp_connection_get_data_stream (GVfsFtpConnection *conn)
   return conn->data;
 }
 
-gssize
-g_vfs_ftp_connection_write_data (GVfsFtpConnection *conn,
-                                 const char *       data,
-                                 gsize              len,
-                                 GCancellable *     cancellable,
-                                 GError **          error)
-{
-  g_return_val_if_fail (conn != NULL, -1);
-  g_return_val_if_fail (conn->data != NULL, -1);
-
-  /* FIXME: use write_all here? */
-  return g_output_stream_write (g_io_stream_get_output_stream (conn->data),
-                                data,
-                                len,
-                                cancellable,
-                                error);
-}
-
-gssize
-g_vfs_ftp_connection_read_data (GVfsFtpConnection *conn,
-                                char *             data,
-                                gsize              len,
-                                GCancellable *     cancellable,
-                                GError **          error)
-{
-  g_return_val_if_fail (conn != NULL, -1);
-  g_return_val_if_fail (conn->data != NULL, -1);
-
-  return g_input_stream_read (g_io_stream_get_input_stream (conn->data),
-                               data,
-                               len,
-                               cancellable,
-                               error);
-}
-
-gboolean
-g_vfs_ftp_connection_read_contents (GVfsFtpConnection *conn,
-                                    char **            data,
-                                    gsize *            len,
-                                    GCancellable *     cancellable,
-                                    GError **          error)
-{
-  g_return_val_if_fail (conn != NULL, -1);
-  g_return_val_if_fail (conn->data != NULL, -1);
-
-  g_assert_not_reached ();
-}
-
 /**
  * g_vfs_ftp_connection_is_usable:
  * @conn: a connection

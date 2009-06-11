@@ -672,13 +672,15 @@ do_read (GVfsBackend *     backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpConnection *conn = handle;
+  GInputStream *input;
   gssize n_bytes;
 
-  n_bytes = g_vfs_ftp_connection_read_data (conn,
-                                            buffer,
-                                            bytes_requested,
-                                            task.cancellable,
-                                            &task.error);
+  input = g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (conn));
+  n_bytes = g_input_stream_read (input,
+                                 buffer,
+                                 bytes_requested,
+                                 task.cancellable,
+                                 &task.error);
 
   if (n_bytes >= 0)
     g_vfs_job_read_set_size (job, n_bytes);
@@ -826,14 +828,17 @@ do_write (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpConnection *conn = handle;
+  GOutputStream *output;
   gssize n_bytes;
 
+  output = g_io_stream_get_output_stream (g_vfs_ftp_connection_get_data_stream (conn));
+
   /* FIXME: use write_all here? */
-  n_bytes = g_vfs_ftp_connection_write_data (conn,
-                                             buffer,
-                                             buffer_size,
-                                             task.cancellable,
-                                             &task.error);
+  n_bytes = g_output_stream_write (output,
+                                   buffer,
+                                   buffer_size,
+                                   task.cancellable,
+                                   &task.error);
            
   if (n_bytes >= 0)
     g_vfs_job_write_set_written_size (job, n_bytes);
