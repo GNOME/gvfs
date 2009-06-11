@@ -560,6 +560,10 @@ g_vfs_ftp_task_send_and_check (GVfsFtpTask *           task,
 
   if (response == 550 && funcs)
     {
+      /* close a potentially open data connection, the error handlers
+       * might try to open new ones and that would cause assertions */
+      g_vfs_ftp_task_close_data_connection (task);
+
       while (*funcs && !g_vfs_ftp_task_is_in_error (task))
         {
           (*funcs) (task, data);
