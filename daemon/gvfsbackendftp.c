@@ -526,6 +526,28 @@ do_unmount (GVfsBackend *   backend,
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
+/* sets EPERM if file exists */
+static void
+error_550_permission (GVfsFtpTask *task, gpointer file)
+{
+  GFileInfo *info;
+  
+  info = g_vfs_ftp_dir_cache_lookup_file (task->backend->dir_cache, task, file, FALSE);
+  if (info)
+    {
+      g_object_unref (info);
+      g_set_error_literal (&task->error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_PERMISSION_DENIED,
+                           _("Insufficient permissions"));
+    }
+  else
+    {
+      /* clear potential error from file lookup above */
+      g_vfs_ftp_task_clear_error (task);
+    }
+}
+
 static void
 error_550_exists (GVfsFtpTask *task, gpointer file)
 {
@@ -593,7 +615,7 @@ do_open_for_read (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *file;
-  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory, NULL };
+  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory, error_550_permission, NULL };
 
   g_vfs_ftp_task_open_data_connection (&task);
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
