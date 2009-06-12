@@ -879,6 +879,14 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
         ignored = TRUE;
     }
 
+  /* special case for audio discs: don't ignore the drive since we'll create
+   * a cdda:// mount for the drive
+   */
+  if (gdu_device_is_optical_disc (device) && gdu_device_optical_disc_get_num_audio_tracks (device) > 0)
+    {
+      ignored = FALSE;
+    }
+
  out:
   g_list_foreach (enclosed, (GFunc) g_object_unref, NULL);
   g_list_free (enclosed);
