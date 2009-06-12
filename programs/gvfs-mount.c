@@ -490,17 +490,18 @@ list_volumes (GList *volumes,
               g_free (uri);
               g_object_unref (activation_root);
             }
-      icon = g_volume_get_icon (volume);
-      if (icon)
-        {
-          if (G_IS_THEMED_ICON (icon))
-            show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
+          icon = g_volume_get_icon (volume);
+          if (icon)
+            {
+              if (G_IS_THEMED_ICON (icon))
+                show_themed_icon_names (G_THEMED_ICON (icon), indent + 2);
 
-          g_object_unref (icon);
-        }
+              g_object_unref (icon);
+            }
 
 	  g_print ("%*scan_mount=%d\n", indent + 2, "", g_volume_can_mount (volume));
 	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_volume_can_eject (volume));
+	  g_print ("%*sshould_automount=%d\n", indent + 2, "", g_volume_should_automount (volume));
 	  g_free (uuid);
 	}
       
