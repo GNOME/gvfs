@@ -235,7 +235,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
           if (ftp->max_connections == 0)
             {
-              g_debug ("no more connections left, exiting...");
+              g_debug ("no more connections left, exiting...\n");
               /* FIXME: shut down properly */
               exit (0);
             }
@@ -715,6 +715,23 @@ g_vfs_ftp_task_receive (GVfsFtpTask *        task,
   return response;
 }
 
+/**
+ * g_vfs_ftp_task_close_data_connection:
+ * @task: a task potentially having an open data connection
+ *
+ * Closes any data connection @task might have opened.
+ */
+void
+g_vfs_ftp_task_close_data_connection (GVfsFtpTask *task)
+{
+  g_return_if_fail (task != NULL);
+
+  if (task->conn == NULL)
+    return;
+
+  g_vfs_ftp_connection_close_data_connection (task->conn);
+}
+
 static GSocketAddress *
 g_vfs_ftp_task_create_remote_address (GVfsFtpTask *task, guint port)
 {
@@ -729,20 +746,17 @@ g_vfs_ftp_task_create_remote_address (GVfsFtpTask *task, guint port)
   return new;
 }
 
-static gboolean
-g_vfs_ftp_task_open_data_connection_epsv (GVfsFtpTask *task)
+static GVfsFtpMethod
+g_vfs_ftp_task_open_data_connection_epsv (GVfsFtpTask *task, GVfsFtpMethod method)
 {
   const char *s;
   char **reply;
   guint port;
   GSocketAddress *addr;
   guint status;
+  gboolean success;
 
   g_assert (task->error == NULL);
-
-  if (!g_vfs_backend_ftp_has_feature (task->backend, G_VFS_FTP_FEATURE_EPSV) ||
-      g_vfs_backend_ftp_uses_workaround (task->backend, G_VFS_FTP_WORKAROUND_BROKEN_EPSV))
-    return FALSE;
 
   status = g_vfs_ftp_task_send_and_check (task, G_VFS_FTP_PASS_500, NULL, NULL, &reply, "EPSV");
   if (G_VFS_FTP_RESPONSE_GROUP (status) != 2)
@@ -761,41 +775,34 @@ g_vfs_ftp_task_open_data_connection_epsv (GVfsFtpTask *task)
   g_strfreev (reply);
   addr = g_vfs_ftp_task_create_remote_address (task, port);
   if (addr == NULL)
-    return FALSE;
+    return G_VFS_FTP_METHOD_ANY;
 
-  if (!g_vfs_ftp_connection_open_data_connection (task->conn,
-                                                  addr,
-                                                  task->cancellable,
-                                                  &task->error))
-    {
-      g_object_unref (addr);
-      g_debug ("# Successful EPSV response code, but data connection failed. Enabling FTP_WORKAROUND_BROKEN_EPSV.\n");
-      g_vfs_backend_ftp_use_workaround (task->backend, G_VFS_FTP_WORKAROUND_BROKEN_EPSV);
-      g_vfs_ftp_task_clear_error (task);
-      return FALSE;
-    }
- 
+  success = g_vfs_ftp_connection_open_data_connection (task->conn,
+                                                       addr,
+                                                       task->cancellable,
+                                                       &task->error);
   g_object_unref (addr);
-  return TRUE;
+  return success ? G_VFS_FTP_METHOD_EPSV : G_VFS_FTP_METHOD_ANY;
 
 fail:
   g_strfreev (reply);
-  return FALSE;
+  return G_VFS_FTP_METHOD_ANY;
 }
 
-static gboolean
-g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
+static GVfsFtpMethod
+g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod method)
 {
   guint ip1, ip2, ip3, ip4, port1, port2;
   char **reply;
   const char *s;
   GSocketAddress *addr;
   guint status;
+  gboolean success;
 
   /* only binary transfers please */
   status = g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "PASV");
   if (status == 0)
-    return FALSE;
+    return G_VFS_FTP_METHOD_ANY;
 
   /* parse response and try to find the address to connect to.
    * This code does the same as curl.
@@ -812,10 +819,10 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
     {
       g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_FAILED,
         		   _("Invalid reply"));
-      return FALSE;
+      return G_VFS_FTP_METHOD_ANY;
     }
 
-  if (!g_vfs_backend_ftp_uses_workaround (task->backend, G_VFS_FTP_WORKAROUND_PASV_ADDR))
+  if (method == G_VFS_FTP_METHOD_PASV || method == G_VFS_FTP_METHOD_ANY)
     {
       guint8 ip[4];
       GInetAddress *inet_addr;
@@ -828,60 +835,86 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task)
       addr = g_inet_socket_address_new (inet_addr, port1 << 8 | port2);
       g_object_unref (inet_addr);
 
-      if (g_vfs_ftp_connection_open_data_connection (task->conn,
-                                                     addr,
-                                                     task->cancellable,
-                                                     &task->error))
-        {
-          g_object_unref (addr);
-          return TRUE;
-        }
-        
+      success = g_vfs_ftp_connection_open_data_connection (task->conn,
+                                                           addr,
+                                                           task->cancellable,
+                                                           &task->error);
       g_object_unref (addr);
-      /* set workaround flag (see below), so we don't try this again */
-      g_debug ("# Successfull PASV response but data connection failed. Enabling FTP_WORKAROUND_PASV_ADDR.\n");
-      g_vfs_backend_ftp_use_workaround (task->backend, G_VFS_FTP_WORKAROUND_PASV_ADDR);
+      if (success)
+        return G_VFS_FTP_METHOD_PASV;
+      if (g_vfs_ftp_task_is_in_error (task) && method != G_VFS_FTP_METHOD_ANY)
+        return G_VFS_FTP_METHOD_ANY;
+
       g_vfs_ftp_task_clear_error (task);
     }
 
-  /* Workaround code:
-   * Various ftp servers aren't setup correctly when behind a NAT. They report
-   * their own IP address (like 10.0.0.4) and not the address in front of the
-   * NAT. But this is likely the same address that we connected to with our
-   * command connetion. So if the address given by PASV fails, we fall back
-   * to the address of the command stream.
-   */
-  addr = g_vfs_ftp_task_create_remote_address (task, port1 << 8 | port2);
-  if (addr == NULL)
-    return FALSE;
-  if (!g_vfs_ftp_connection_open_data_connection (task->conn,
-                                                  addr,
-                                                  task->cancellable,
-                                                  &task->error))
+  if (method == G_VFS_FTP_METHOD_PASV_ADDR || method == G_VFS_FTP_METHOD_ANY)
     {
+      /* Workaround code:
+       * Various ftp servers aren't setup correctly when behind a NAT. They report
+       * their own IP address (like 10.0.0.4) and not the address in front of the
+       * NAT. But this is likely the same address that we connected to with our
+       * command connetion. So if the address given by PASV fails, we fall back
+       * to the address of the command stream.
+       */
+      addr = g_vfs_ftp_task_create_remote_address (task, port1 << 8 | port2);
+      if (addr == NULL)
+        return G_VFS_FTP_METHOD_ANY;
+      success = g_vfs_ftp_connection_open_data_connection (task->conn,
+                                                           addr,
+                                                           task->cancellable,
+                                                           &task->error);
       g_object_unref (addr);
-      return FALSE;
+      if (success)
+        return G_VFS_FTP_METHOD_PASV_ADDR;
     }
 
-  g_object_unref (addr);
-  return TRUE;
+  return G_VFS_FTP_METHOD_ANY;
 }
 
-/**
- * g_vfs_ftp_task_close_data_connection:
- * @task: a task potentially having an open data connection
- *
- * Closes any data connection @task might have opened.
- */
-void
-g_vfs_ftp_task_close_data_connection (GVfsFtpTask *task)
+typedef GVfsFtpMethod (* GVfsFtpOpenDataConnectionFunc) (GVfsFtpTask *task, GVfsFtpMethod method);
+
+static GVfsFtpMethod
+g_vfs_ftp_task_open_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused)
 {
-  g_return_if_fail (task != NULL);
+  static const struct {
+    GVfsFtpFeature required_feature;
+    GVfsFtpOpenDataConnectionFunc func;
+  } funcs_ordered[] = {
+    { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_open_data_connection_epsv },
+    { 0,                      g_vfs_ftp_task_open_data_connection_pasv }
+  };
+  GVfsFtpMethod method;
+  guint i;
 
-  if (task->conn == NULL)
-    return;
+  /* first try all advertised features */
+  for (i = 0; i < G_N_ELEMENTS (funcs_ordered); i++)
+    {
+      if (funcs_ordered[i].required_feature &&
+          !g_vfs_backend_ftp_has_feature (task->backend, funcs_ordered[i].required_feature))
+        continue;
+      method = funcs_ordered[i].func (task, G_VFS_FTP_METHOD_ANY);
+      if (method != G_VFS_FTP_METHOD_ANY)
+        return method;
+      
+      g_vfs_ftp_task_clear_error (task);
+    }
 
-  g_vfs_ftp_connection_close_data_connection (task->conn);
+  /* then try if the non-advertised features work */
+  for (i = 0; i < G_N_ELEMENTS (funcs_ordered); i++)
+    {
+      if (!funcs_ordered[i].required_feature ||
+          g_vfs_backend_ftp_has_feature (task->backend, funcs_ordered[i].required_feature))
+        continue;
+      method = funcs_ordered[i].func (task, G_VFS_FTP_METHOD_ANY);
+      if (method != G_VFS_FTP_METHOD_ANY)
+        return method;
+      
+      g_vfs_ftp_task_clear_error (task);
+    }
+
+  /* finally, just give up */
+  return G_VFS_FTP_METHOD_ANY;
 }
 
 /**
@@ -894,17 +927,48 @@ g_vfs_ftp_task_close_data_connection (GVfsFtpTask *task)
 void
 g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
 {
+  static const GVfsFtpOpenDataConnectionFunc connect_funcs[] = {
+    [G_VFS_FTP_METHOD_ANY] = g_vfs_ftp_task_open_data_connection_any,
+    [G_VFS_FTP_METHOD_EPSV] = g_vfs_ftp_task_open_data_connection_epsv,
+    [G_VFS_FTP_METHOD_PASV] = g_vfs_ftp_task_open_data_connection_pasv,
+    [G_VFS_FTP_METHOD_PASV_ADDR] = g_vfs_ftp_task_open_data_connection_pasv,
+    [G_VFS_FTP_METHOD_EPRT] = NULL,
+    [G_VFS_FTP_METHOD_PORT] = NULL
+  };
+  GVfsFtpMethod method, result;
+
   g_return_if_fail (task != NULL);
 
+  /* FIXME: get the method from elsewhere */
+  method = g_atomic_int_get (&task->backend->method);
+  
+  g_assert (method < G_N_ELEMENTS (connect_funcs) && connect_funcs[method]);
+
   if (g_vfs_ftp_task_is_in_error (task))
     return;
 
-  if (g_vfs_ftp_task_open_data_connection_epsv (task))
-    return;
+  result = connect_funcs[method] (task, method);
 
-  if (g_vfs_ftp_task_is_in_error (task))
-    return;
+  /* be sure to try all possibilities if one failed */
+  if (result == G_VFS_FTP_METHOD_ANY &&
+      method != G_VFS_FTP_METHOD_ANY &&
+      !g_vfs_ftp_task_is_in_error (task))
+    result = g_vfs_ftp_task_open_data_connection_any (task, G_VFS_FTP_METHOD_ANY);
 
-  g_vfs_ftp_task_open_data_connection_pasv (task);
+  g_assert (result < G_N_ELEMENTS (connect_funcs) && connect_funcs[result]);
+  if (result != method)
+    {
+      static const char *methods[] = {
+        [G_VFS_FTP_METHOD_ANY] = "any",
+        [G_VFS_FTP_METHOD_EPSV] = "EPSV",
+        [G_VFS_FTP_METHOD_PASV] = "PASV",
+        [G_VFS_FTP_METHOD_PASV_ADDR] = "PASV with workaround",
+        [G_VFS_FTP_METHOD_EPRT] = "EPRT",
+        [G_VFS_FTP_METHOD_PORT] = "PORT"
+      };
+      g_atomic_int_set (&task->backend->method, result);
+      g_debug ("# set default data connection method from %s to %s\n",
+               methods[method], methods[result]);
+    }
 }
 

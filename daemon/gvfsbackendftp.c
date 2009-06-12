@@ -54,6 +54,23 @@
 #include "gvfsftpfile.h"
 #include "gvfsftptask.h"
 
+/*** GTK DOC ***/
+
+/**
+ * GVfsFtpMethod:
+ * @G_VFS_FTP_METHOD_UNKNOWN: method has not yet been determined
+ * @G_VFS_FTP_METHOD_EPSV: use EPSV command
+ * @G_VFS_FTP_METHOD_PASV: use PASV command
+ * @G_VFS_FTP_METHOD_PASV_ADDR: use PASV command, but ignore the returned 
+ *                              address and only use it's port
+ * @G_VFS_FTP_METHOD_EPRT: use the EPRT command
+ * @G_VFS_FTP_METHOD_PORT: use the PORT command
+ *
+ * Possible methods for creating data connections to the ftp server. If the 
+ * method is @G_VFS_FTP_METHOD_UNKNOWN, all possibilities are tried.
+ */
+
+
 /*
  * about filename interpretation in the ftp backend
  *
@@ -67,6 +84,8 @@
  * use it without the need to escape. We also can operate on full paths as our
  * paths exactly match those of a TVFS-using FTP server.
  */
+
+/** CODE ***/
 
 G_DEFINE_TYPE (GVfsBackendFtp, g_vfs_backend_ftp, G_VFS_TYPE_BACKEND)
 

@@ -46,13 +46,15 @@ typedef enum {
 } GVfsFtpSystem;
 
 typedef enum {
-  /* Server advertises support for EPSV (or we assume that it supports it),
-   * but it does fail to do so, we set this flag so we can fall back to
-   * PASV. */
-  G_VFS_FTP_WORKAROUND_BROKEN_EPSV,
-  /* Server replies with a wrong address in PASV, we use connection IP
-   * instead */
-  G_VFS_FTP_WORKAROUND_PASV_ADDR,
+  G_VFS_FTP_METHOD_ANY = 0,
+  G_VFS_FTP_METHOD_EPSV,
+  G_VFS_FTP_METHOD_PASV,
+  G_VFS_FTP_METHOD_PASV_ADDR,
+  G_VFS_FTP_METHOD_EPRT,
+  G_VFS_FTP_METHOD_PORT
+} GVfsFtpMethod;
+
+typedef enum {
   /* server does not allow querying features before login, so we try after
    * logging in instead. */
   G_VFS_FTP_WORKAROUND_FEAT_AFTER_LOGIN,
@@ -86,6 +88,7 @@ struct _GVfsBackendFtp
   GVfsFtpSystem         system;                 /* the system from the SYST response */
   int                   features;               /* GVfsFtpFeatures that are supported */
   int                   workarounds;            /* GVfsFtpWorkarounds in use - int because it's atomic */
+  int                   method;                 /* preferred GVfsFtpMethod - int because it's atomic */
 
   /* directory cache */
   const GVfsFtpDirFuncs *dir_funcs;             /* functions used in directory cache */
