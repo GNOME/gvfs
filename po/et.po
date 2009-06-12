@@ -12,9 +12,9 @@ msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-05-26 18:50+0000\n"
-"PO-Revision-Date: 2009-03-26 21:24+0300\n"
-"Last-Translator: Mattias Põldaru <mahfiaz gmail com>\n"
+"POT-Creation-Date: 2009-06-11 09:19+0000\n"
+"PO-Revision-Date: 2009-06-12 10:00+0300\n"
+"Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,7 +37,7 @@ msgid "Invalid return value from open"
 msgstr "open tagastas vigase väärtuse"
 
 msgid "Didn't get stream file descriptor"
-msgstr "Ei õnnestunud voofaili deskriptiorit saada"
+msgstr "Ei õnnestunud voofaili deskriptorit saada"
 
 msgid "Invalid return value from call"
 msgstr "call tagastas vigase väärtuse"
@@ -396,39 +396,6 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Võrk"
 
-msgid "Accounts are unsupported"
-msgstr "Kontod pole toetatud"
-
-msgid "Host closed connection"
-msgstr "Host sulges ühenduse"
-
-msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr "Andmeühendust pole võimalik avada. Võibolla tulemüür takistab seda?"
-
-msgid "Data connection closed"
-msgstr "Andmeühendus on suletud"
-
-msgid "Operation failed"
-msgstr "Operatsioon nurjus"
-
-msgid "No space left on server"
-msgstr "Serveris pole vaba ruumi"
-
-msgid "Operation unsupported"
-msgstr "Operatsioon pole toetatud"
-
-msgid "Permission denied"
-msgstr "Ligipääs keelatud"
-
-msgid "Page type unknown"
-msgstr "Tundmatu lehe tüüp"
-
-msgid "Invalid filename"
-msgstr "Vigane failinimi"
-
-msgid "Invalid reply"
-msgstr "Vigane vastus"
-
 #. Translators: the first %s is the username, the second the host name
 #, c-format
 msgid "Enter password for ftp as %s on %s"
@@ -451,17 +418,17 @@ msgstr "ftp hostil %s"
 msgid "ftp as %s on %s"
 msgstr "ftp kasutajanimega %s hostil %s"
 
+msgid "Insufficient permissions"
+msgstr "Puuduvad õigused"
+
+msgid "File does not exist"
+msgstr "Faili pole olemas"
+
 msgid "File is directory"
 msgstr "Fail on kataloog"
 
 msgid "backups not supported yet"
 msgstr "varukoopiad pole veel toetatud"
-
-msgid "Out of memory while reading directory contents"
-msgstr "Kataloogi sisu lugemisel lõppes mälu"
-
-msgid "Invalid destination filename"
-msgstr "Vigane sihtfaili nimi"
 
 #, c-format
 msgid "%s: %d: Directory or file exists"
@@ -653,6 +620,9 @@ msgstr "Seadmele on vaja teha tarkvarauuendus"
 msgid "ssh program unexpectedly exited"
 msgstr "ssh-programm lõpetas ootamatult"
 
+msgid "Permission denied"
+msgstr "Ligipääs keelatud"
+
 msgid "Hostname not known"
 msgstr "Hostinimi on tundmatu"
 
@@ -725,6 +695,9 @@ msgstr "sftp hostil %s"
 
 msgid "Unable to find supported ssh command"
 msgstr "Toetatud ssh-käsku pole võimalik leida"
+
+msgid "Operation unsupported"
+msgstr "Operatsioon pole toetatud"
 
 msgid "Invalid reply received"
 msgstr "Võeti vastu vigane vastus"
@@ -1189,6 +1162,39 @@ msgid ""
 msgstr ""
 "Faili(de) avamine selle failitüübi käsitlemiseks registreeritud vaikimisi "
 "rakendusega."
+
+#~ msgid "Accounts are unsupported"
+#~ msgstr "Kontod pole toetatud"
+
+#~ msgid "Host closed connection"
+#~ msgstr "Host sulges ühenduse"
+
+#~ msgid "Cannot open data connection. Maybe your firewall prevents this?"
+#~ msgstr "Andmeühendust pole võimalik avada. Võibolla tulemüür takistab seda?"
+
+#~ msgid "Data connection closed"
+#~ msgstr "Andmeühendus on suletud"
+
+#~ msgid "Operation failed"
+#~ msgstr "Operatsioon nurjus"
+
+#~ msgid "No space left on server"
+#~ msgstr "Serveris pole vaba ruumi"
+
+#~ msgid "Page type unknown"
+#~ msgstr "Tundmatu lehe tüüp"
+
+#~ msgid "Invalid filename"
+#~ msgstr "Vigane failinimi"
+
+#~ msgid "Invalid reply"
+#~ msgstr "Vigane vastus"
+
+#~ msgid "Out of memory while reading directory contents"
+#~ msgstr "Kataloogi sisu lugemisel lõppes mälu"
+
+#~ msgid "Invalid destination filename"
+#~ msgstr "Vigane sihtfaili nimi"
 
 #~ msgid "broken transmission"
 #~ msgstr "vigane ülekanne"
