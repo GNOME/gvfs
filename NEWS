@@ -1,3 +1,20 @@
+Major changes in 1.3.1
+======================
+* Add Gnome Disk utility based volume monitor
+* Emit pre-unmount signal on GMounts
+* Use new race-free cancellation connect APIs
+* fix crash with newer glib
+* avoid sending progress info if not needed
+* ftp: Convert to use gio network APIs
+* ftp: Restructure code significantly
+* ftp: Fix logging in to a FTP server only works for the 2nd attempt
+* ftp: Handle files > 4 gig
+* gphoto: Fix support for Canon EOS 5D
+* sftp: Pick up SSH_AUTH_SOCK from gnome-keyring
+* sftp: Don't trust remote permissions for uids other than user
+* cdda: verify filenames before using
+* gvfs-copy: Show speed when copying
+
 Major changes in 1.2.2
 ======================
 * ftp: Fix error handling in some cases
