@@ -747,7 +747,7 @@ g_vfs_ftp_task_create_remote_address (GVfsFtpTask *task, guint port)
 }
 
 static GVfsFtpMethod
-g_vfs_ftp_task_open_data_connection_epsv (GVfsFtpTask *task, GVfsFtpMethod method)
+g_vfs_ftp_task_setup_data_connection_epsv (GVfsFtpTask *task, GVfsFtpMethod method)
 {
   const char *s;
   char **reply;
@@ -790,7 +790,7 @@ fail:
 }
 
 static GVfsFtpMethod
-g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod method)
+g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod method)
 {
   guint ip1, ip2, ip3, ip4, port1, port2;
   char **reply;
@@ -875,14 +875,14 @@ g_vfs_ftp_task_open_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod metho
 typedef GVfsFtpMethod (* GVfsFtpOpenDataConnectionFunc) (GVfsFtpTask *task, GVfsFtpMethod method);
 
 static GVfsFtpMethod
-g_vfs_ftp_task_open_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused)
+g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused)
 {
   static const struct {
     GVfsFtpFeature required_feature;
     GVfsFtpOpenDataConnectionFunc func;
   } funcs_ordered[] = {
-    { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_open_data_connection_epsv },
-    { 0,                      g_vfs_ftp_task_open_data_connection_pasv }
+    { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_epsv },
+    { 0,                      g_vfs_ftp_task_setup_data_connection_pasv }
   };
   GVfsFtpMethod method;
   guint i;
@@ -918,20 +918,23 @@ g_vfs_ftp_task_open_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused
 }
 
 /**
- * g_vfs_ftp_task_open_data_connection:
+ * g_vfs_ftp_task_setup_data_connection:
  * @task: a task not having an open data connection
  *
- * Tries to open a data connection to the ftp server. If the operation fails,
- * @task will be set into an error state.
+ * Sets up a data connection to the ftp server with using the best method for 
+ * this task. If the operation fails, @task will be set into an error state.
+ * You must call g_vfs_ftp_task_open_data_connection() to finish setup and 
+ * ensure the data connection actually gets opened. Usually, this requires 
+ * sending an FTP command down the stream.
  **/
 void
-g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
+g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
 {
   static const GVfsFtpOpenDataConnectionFunc connect_funcs[] = {
-    [G_VFS_FTP_METHOD_ANY] = g_vfs_ftp_task_open_data_connection_any,
-    [G_VFS_FTP_METHOD_EPSV] = g_vfs_ftp_task_open_data_connection_epsv,
-    [G_VFS_FTP_METHOD_PASV] = g_vfs_ftp_task_open_data_connection_pasv,
-    [G_VFS_FTP_METHOD_PASV_ADDR] = g_vfs_ftp_task_open_data_connection_pasv,
+    [G_VFS_FTP_METHOD_ANY] = g_vfs_ftp_task_setup_data_connection_any,
+    [G_VFS_FTP_METHOD_EPSV] = g_vfs_ftp_task_setup_data_connection_epsv,
+    [G_VFS_FTP_METHOD_PASV] = g_vfs_ftp_task_setup_data_connection_pasv,
+    [G_VFS_FTP_METHOD_PASV_ADDR] = g_vfs_ftp_task_setup_data_connection_pasv,
     [G_VFS_FTP_METHOD_EPRT] = NULL,
     [G_VFS_FTP_METHOD_PORT] = NULL
   };
@@ -953,7 +956,7 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
   if (result == G_VFS_FTP_METHOD_ANY &&
       method != G_VFS_FTP_METHOD_ANY &&
       !g_vfs_ftp_task_is_in_error (task))
-    result = g_vfs_ftp_task_open_data_connection_any (task, G_VFS_FTP_METHOD_ANY);
+    result = g_vfs_ftp_task_setup_data_connection_any (task, G_VFS_FTP_METHOD_ANY);
 
   g_assert (result < G_N_ELEMENTS (connect_funcs) && connect_funcs[result]);
   if (result != method)
@@ -970,5 +973,21 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
       g_debug ("# set default data connection method from %s to %s\n",
                methods[method], methods[result]);
     }
+}
+
+/**
+ * g_vfs_ftp_task_open_data_connection:
+ * @task: a task
+ *
+ * Tries to open a data connection to the ftp server. If the operation fails,
+ * @task will be set into an error state.
+ **/
+void
+g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
+{
+  g_return_if_fail (task != NULL);
+
+  if (g_vfs_ftp_task_is_in_error (task))
+    return;
 }
 

@@ -82,6 +82,7 @@ guint                   g_vfs_ftp_task_sendv                    (GVfsFtpTask *  
 guint                   g_vfs_ftp_task_receive                  (GVfsFtpTask *          task,
                                                                  GVfsFtpResponseFlags   flags,
                                                                  char ***               reply);
+void                    g_vfs_ftp_task_setup_data_connection    (GVfsFtpTask *          task);
 void                    g_vfs_ftp_task_open_data_connection     (GVfsFtpTask *          task);
 void                    g_vfs_ftp_task_close_data_connection    (GVfsFtpTask *          task);
 

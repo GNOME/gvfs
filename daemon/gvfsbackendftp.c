@@ -642,7 +642,7 @@ do_open_for_read (GVfsBackend *backend,
                                                          error_550_permission_or_not_found, 
                                                          NULL };
 
-  g_vfs_ftp_task_open_data_connection (&task);
+  g_vfs_ftp_task_setup_data_connection (&task);
   file = g_vfs_ftp_file_new_from_gvfs (ftp, filename);
 
   g_vfs_ftp_task_send_and_check (&task,
@@ -652,6 +652,8 @@ do_open_for_read (GVfsBackend *backend,
                                  NULL,
                                  "RETR %s", g_vfs_ftp_file_get_ftp_path (file));
   g_vfs_ftp_file_free (file);
+
+  g_vfs_ftp_task_open_data_connection (&task);
 
   if (!g_vfs_ftp_task_is_in_error (&task))
     {
@@ -722,7 +724,7 @@ do_start_write (GVfsFtpTask *task,
 
   /* FIXME: can we honour the flags? */
 
-  g_vfs_ftp_task_open_data_connection (task);
+  g_vfs_ftp_task_setup_data_connection (task);
 
   va_start (varargs, format);
   g_vfs_ftp_task_sendv (task,
@@ -731,6 +733,8 @@ do_start_write (GVfsFtpTask *task,
                         format,
                         varargs);
   va_end (varargs);
+
+  g_vfs_ftp_task_open_data_connection (task);
 
   if (!g_vfs_ftp_task_is_in_error (task))
     {
@@ -1280,13 +1284,14 @@ do_pull (GVfsBackend *         backend,
     }
   else
     total_size = 0;
-  g_vfs_ftp_task_open_data_connection (&task);
+  g_vfs_ftp_task_setup_data_connection (&task);
   g_vfs_ftp_task_send_and_check (&task,
                                  G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
                                  &open_read_handlers[0],
                                  src,
                                  NULL,
                                  "RETR %s", g_vfs_ftp_file_get_ftp_path (src));
+  g_vfs_ftp_task_open_data_connection (&task);
   if (g_vfs_ftp_task_is_in_error (&task))
     {
       g_vfs_ftp_file_free (src);

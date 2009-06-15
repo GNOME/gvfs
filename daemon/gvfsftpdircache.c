@@ -153,11 +153,11 @@ g_vfs_ftp_dir_cache_lookup_entry (GVfsFtpDirCache *  cache,
         	           G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY,
         		   _("The file is not a directory"));
     }
-  g_vfs_ftp_task_open_data_connection (task);
-
+  g_vfs_ftp_task_setup_data_connection (task);
   g_vfs_ftp_task_send (task,
         	       G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
                        "%s", cache->funcs->command);
+  g_vfs_ftp_task_open_data_connection (task);
   if (g_vfs_ftp_task_is_in_error (task))
     return NULL;
 
