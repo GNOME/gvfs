@@ -799,7 +799,6 @@ g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod meth
   guint status;
   gboolean success;
 
-  /* only binary transfers please */
   status = g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "PASV");
   if (status == 0)
     return G_VFS_FTP_METHOD_ANY;
@@ -872,6 +871,45 @@ g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod meth
   return G_VFS_FTP_METHOD_ANY;
 }
 
+static GVfsFtpMethod
+g_vfs_ftp_task_open_data_connection_port (GVfsFtpTask *task, GVfsFtpMethod unused)
+{
+  GSocketAddress *addr;
+  guint status, i, port;
+  char *ip_string;
+
+  /* workaround for the task not having a connection yet */
+  if (task->conn == NULL &&
+      g_vfs_ftp_task_send (task, 0, "NOOP") == 0)
+    return G_VFS_FTP_METHOD_ANY;
+
+  addr = g_vfs_ftp_connection_listen_data_connection (task->conn, &task->error);
+  if (addr == NULL)
+    return G_VFS_FTP_METHOD_ANY;
+  /* the PORT command only supports IPv4 */
+  if (g_socket_address_get_family (addr) != G_SOCKET_FAMILY_IPV4)
+    {
+      g_object_unref (addr);
+      return G_VFS_FTP_METHOD_ANY;
+    }
+
+  ip_string = g_inet_address_to_string (g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (addr)));
+  for (i = 0; ip_string[i]; i++)
+    {
+      if (ip_string[i] == '.')
+        ip_string[i] = ',';
+    }
+  port = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr));
+
+  status = g_vfs_ftp_task_send (task, 0, "PORT %s,%u,%u", ip_string, port >> 8, port & 0xFF);
+  g_free (ip_string);
+  g_object_unref (addr);
+  if (status == 0)
+    return G_VFS_FTP_METHOD_ANY;
+  
+  return G_VFS_FTP_METHOD_PORT;
+}
+
 typedef GVfsFtpMethod (* GVfsFtpOpenDataConnectionFunc) (GVfsFtpTask *task, GVfsFtpMethod method);
 
 static GVfsFtpMethod
@@ -882,7 +920,8 @@ g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unuse
     GVfsFtpOpenDataConnectionFunc func;
   } funcs_ordered[] = {
     { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_epsv },
-    { 0,                      g_vfs_ftp_task_setup_data_connection_pasv }
+    { 0,                      g_vfs_ftp_task_setup_data_connection_pasv },
+    { 0,                      g_vfs_ftp_task_open_data_connection_port }
   };
   GVfsFtpMethod method;
   guint i;
@@ -936,15 +975,15 @@ g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
     [G_VFS_FTP_METHOD_PASV] = g_vfs_ftp_task_setup_data_connection_pasv,
     [G_VFS_FTP_METHOD_PASV_ADDR] = g_vfs_ftp_task_setup_data_connection_pasv,
     [G_VFS_FTP_METHOD_EPRT] = NULL,
-    [G_VFS_FTP_METHOD_PORT] = NULL
+    [G_VFS_FTP_METHOD_PORT] = g_vfs_ftp_task_open_data_connection_port
   };
   GVfsFtpMethod method, result;
 
   g_return_if_fail (task != NULL);
 
-  /* FIXME: get the method from elsewhere */
+  task->method = G_VFS_FTP_METHOD_ANY;
+
   method = g_atomic_int_get (&task->backend->method);
-  
   g_assert (method < G_N_ELEMENTS (connect_funcs) && connect_funcs[method]);
 
   if (g_vfs_ftp_task_is_in_error (task))
@@ -973,6 +1012,7 @@ g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
       g_debug ("# set default data connection method from %s to %s\n",
                methods[method], methods[result]);
     }
+  task->method = result;
 }
 
 /**
@@ -989,5 +1029,11 @@ g_vfs_ftp_task_open_data_connection (GVfsFtpTask *task)
 
   if (g_vfs_ftp_task_is_in_error (task))
     return;
+
+  if (task->method == G_VFS_FTP_METHOD_EPRT ||
+      task->method == G_VFS_FTP_METHOD_PORT)
+    g_vfs_ftp_connection_accept_data_connection (task->conn, 
+                                                 task->cancellable,
+                                                 &task->error);
 }
 

@@ -55,6 +55,13 @@ gboolean                g_vfs_ftp_connection_open_data_connection
                                                                GSocketAddress *         addr,
                                                                GCancellable *           cancellable,
                                                                GError **                error);
+GSocketAddress *        g_vfs_ftp_connection_listen_data_connection
+                                                              (GVfsFtpConnection *      conn,
+                                                               GError **                error);
+gboolean                g_vfs_ftp_connection_accept_data_connection
+                                                              (GVfsFtpConnection *      conn,
+                                                               GCancellable *           cancellable,
+                                                               GError **                error);
 void                    g_vfs_ftp_connection_close_data_connection
                                                               (GVfsFtpConnection *      conn);
 GIOStream *             g_vfs_ftp_connection_get_data_stream  (GVfsFtpConnection *      conn);

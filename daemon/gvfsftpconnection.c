@@ -22,10 +22,12 @@
 
 #include <config.h>
 
+#include "gvfsftpconnection.h"
+
 #include <string.h>
 #include <glib/gi18n.h>
 
-#include "gvfsftpconnection.h"
+#include "gvfsbackendftp.h"
 
 /* used for identifying the connection during debugging */
 static volatile int debug_id = 0;
@@ -37,6 +39,7 @@ struct _GVfsFtpConnection
   GIOStream *        	commands;               /* ftp command stream */
   GDataInputStream *    commands_in;            /* wrapper around in stream to allow line-wise reading */
 
+  GSocket *             listen_socket;          /* socket we are listening on for active FTP connections */
   GIOStream *        	data;                   /* ftp data stream or NULL if not in use */
 
   int                   debug_id;               /* unique id for debugging purposes */
@@ -71,11 +74,22 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
   return conn;
 }
 
+static void
+g_vfs_ftp_connection_stop_listening (GVfsFtpConnection *conn)
+{
+  if (conn->listen_socket)
+    {
+      g_object_unref (conn->listen_socket);
+      conn->listen_socket = NULL;
+    }
+}
+
 void
 g_vfs_ftp_connection_free (GVfsFtpConnection *conn)
 {
   g_return_if_fail (conn != NULL);
 
+  g_vfs_ftp_connection_stop_listening (conn);
   if (conn->data)
     g_vfs_ftp_connection_close_data_connection (conn);
 
@@ -218,12 +232,153 @@ g_vfs_ftp_connection_open_data_connection (GVfsFtpConnection *conn,
   g_return_val_if_fail (conn != NULL, FALSE);
   g_return_val_if_fail (conn->data == NULL, FALSE);
 
+  g_vfs_ftp_connection_stop_listening (conn);
+
   conn->data = G_IO_STREAM (g_socket_client_connect (conn->client,
                                                      G_SOCKET_CONNECTABLE (addr),
                                                      cancellable,
                                                      error));
 
   return conn->data != NULL;
+}
+
+/**
+ * g_vfs_ftp_connection_listen_data_connection:
+ * @conn: a connection
+ * @error: %NULL or location to take potential errors
+ *
+ * Initiates a listening socket that the FTP server can connect to. To accept 
+ * connections and initialize data transfers, use 
+ * g_vfs_ftp_connection_accept_data_connection().
+ * This function supports what is known as "active FTP", while
+ * g_vfs_ftp_connection_open_data_connection() is to be used for "passive FTP".
+ *
+ * Returns: the actual address the socket is listening on or %NULL on error
+ **/
+GSocketAddress *
+g_vfs_ftp_connection_listen_data_connection (GVfsFtpConnection *conn,
+                                             GError **          error)
+{
+  GSocketAddress *local, *addr;
+
+  g_return_val_if_fail (conn != NULL, NULL);
+  g_return_val_if_fail (conn->data == NULL, FALSE);
+
+  g_vfs_ftp_connection_stop_listening (conn);
+
+  local = g_socket_connection_get_local_address (G_SOCKET_CONNECTION (conn->commands), error);
+  if (local == NULL)
+    return NULL;
+
+  conn->listen_socket = g_socket_new (g_socket_address_get_family (local),
+                                      G_SOCKET_TYPE_STREAM,
+                                      G_SOCKET_PROTOCOL_TCP,
+                                      error);
+  if (conn->listen_socket == NULL)
+    return NULL;
+
+  g_assert (G_IS_INET_SOCKET_ADDRESS (local));
+  addr = g_inet_socket_address_new (g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (local)), 0);
+  g_object_unref (local);
+
+  if (!g_socket_bind (conn->listen_socket, addr, TRUE, error) ||
+      !g_socket_listen (conn->listen_socket, error) ||
+      !(local = g_socket_get_local_address (conn->listen_socket, error)))
+    {
+      g_object_unref (addr);
+      g_vfs_ftp_connection_stop_listening (conn);
+      return NULL;
+    }
+
+  g_object_unref (addr);
+  return local;
+}
+
+static void
+cancel_timer_cb (GCancellable *orig, GCancellable *to_cancel)
+{
+  g_cancellable_cancel (to_cancel);
+}
+
+static gboolean
+cancel_cancellable (gpointer cancellable)
+{
+  g_cancellable_cancel (cancellable);
+  return FALSE;
+}
+
+/**
+ * g_vfs_ftp_connection_accept_data_connection:
+ * @conn: a listening connection
+ * @cancellable: cancellable to interrupt wait
+ * @error: %NULL or location to take a potential error
+ *
+ * Opens a data connection for @conn by accepting an incoming connection on the
+ * address it is listening on via g_vfs_ftp_connection_listen_data_connection(),
+ * which must have been called prior to this function.
+ * If this function succeeds, a data connection will have been opened, and calls
+ * to g_vfs_ftp_connection_get_data_stream() will work.
+ *
+ * Returns: %TRUE if a connection was successfully acquired
+ **/
+gboolean
+g_vfs_ftp_connection_accept_data_connection (GVfsFtpConnection *conn,
+                                             GCancellable *     cancellable,
+                                             GError **          error)
+{
+  GSocket *accepted;
+  GCancellable *timer;
+  gulong cancel_cb_id;
+  GIOCondition condition;
+
+  g_return_val_if_fail (conn != NULL, FALSE);
+  g_return_val_if_fail (conn->data == NULL, FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (conn->listen_socket), FALSE);
+
+  timer = g_cancellable_new ();
+  cancel_cb_id = g_cancellable_connect (cancellable, 
+                                        G_CALLBACK (cancel_timer_cb),
+                                        timer,
+                                        NULL);
+  g_object_ref (timer);
+  g_timeout_add_seconds_full (G_PRIORITY_DEFAULT,
+                              G_VFS_FTP_TIMEOUT_IN_SECONDS,
+                              cancel_cancellable,
+                              timer,
+                              g_object_unref);
+
+  condition = g_socket_condition_wait (conn->listen_socket, G_IO_IN, timer, error);
+
+  g_cancellable_disconnect (cancellable, cancel_cb_id);
+  g_object_unref (timer);
+
+  if ((condition & G_IO_IN) == 0)
+    {
+      if (g_cancellable_is_cancelled (timer) &&
+          !g_cancellable_is_cancelled (cancellable))
+        {
+          g_clear_error (error);
+          g_set_error_literal (error, 
+                               G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+                               _("Failed to create active FTP connection. "
+                                 "Maybe your router does not support this?"));
+        }
+      else if (error && *error == NULL)
+        {
+          g_set_error_literal (error, 
+                               G_IO_ERROR, G_IO_ERROR_HOST_NOT_FOUND,
+                               _("Failed to create active FTP connection."));
+        }
+      return FALSE;
+    }
+
+  accepted = g_socket_accept (conn->listen_socket, error);
+  if (accepted == NULL)
+    return FALSE;
+
+  conn->data = G_IO_STREAM (g_socket_connection_factory_create_connection (accepted));
+  g_object_unref (accepted);
+  return TRUE;
 }
 
 void

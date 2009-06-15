@@ -47,6 +47,7 @@ struct _GVfsFtpTask
 
   GError *              error;          /* NULL or current error - will be propagated to task */
   GVfsFtpConnection *   conn;           /* connection in use by this task or NULL if none */
+  GVfsFtpMethod         method;         /* method currently in use (only valid after call to _setup_data_connection() */
 };
 
 typedef void (* GVfsFtpErrorFunc) (GVfsFtpTask *task, gpointer data);
