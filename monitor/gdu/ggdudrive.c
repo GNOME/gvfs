@@ -177,6 +177,15 @@ update_drive (GGduDrive *drive)
   if (device != NULL)
     g_object_unref (device);
 
+  /* Never use empty/blank names (#582772) */
+  if (drive->name == NULL || strlen (drive->name) == 0)
+    {
+      if (drive->device_file != NULL)
+        drive->name = g_strdup_printf (_("Unnamed Drive (%s)"), drive->device_file);
+      else
+        drive->name = g_strdup (_("Unnamed Drive"));
+    }
+
   /* compute whether something changed */
   changed = !((old_is_media_removable == drive->is_media_removable) &&
               (old_has_media == drive->has_media) &&
