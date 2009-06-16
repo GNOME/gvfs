@@ -1123,13 +1123,12 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
     }
   if (mime_type == NULL)
     mime_type = g_content_type_guess (name, NULL, 0, NULL);
-  if (mime_type == NULL)  
+  if (mime_type == NULL)
     mime_type = g_strdup ("application/octet-stream");
   g_file_info_set_content_type (info, mime_type);
 
-  /* assume that all JPG files, and only all JPG files, has a preview file */
-  if (strcmp (mime_type, "image/jpg") == 0 ||
-      strcmp (mime_type, "image/jpeg") == 0)
+  /* we offer thumbnails for both pics and video (see bgo #585853) */
+  if (g_str_has_prefix (mime_type, "image") || g_str_has_prefix (mime_type, "video"))
     {
       char *icon_id;
       GIcon *icon;
@@ -1739,7 +1738,8 @@ do_open_for_read_real (GVfsBackend *backend,
       goto out;
     }
 
-  DEBUG ("  data=%p size=%ld handle=%p", read_handle->data, read_handle->size, read_handle);
+  DEBUG ("  data=%p size=%ld handle=%p get_preview=%d",
+         read_handle->data, read_handle->size, read_handle, get_preview);
 
   g_mutex_lock (gphoto2_backend->lock);
   gphoto2_backend->num_open_files_for_reading++;
