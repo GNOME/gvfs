@@ -382,6 +382,10 @@ g_vfs_ftp_task_set_error_from_response (GVfsFtpTask *task, guint response)
         code = G_IO_ERROR_NOT_SUPPORTED;
         msg = _("Operation unsupported");
         break;
+      case 522: /* EPRT: unsupported network protocol */
+        code = G_IO_ERROR_NOT_SUPPORTED;
+        msg = _("Unsupported network protocol");
+        break;
       case 530: /* Not logged in. */
         code = G_IO_ERROR_PERMISSION_DENIED;
         msg = _("Permission denied");
