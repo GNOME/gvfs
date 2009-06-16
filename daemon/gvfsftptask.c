@@ -876,7 +876,52 @@ g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod meth
 }
 
 static GVfsFtpMethod
-g_vfs_ftp_task_open_data_connection_port (GVfsFtpTask *task, GVfsFtpMethod unused)
+g_vfs_ftp_task_setup_data_connection_eprt (GVfsFtpTask *task, GVfsFtpMethod unused)
+{
+  GSocketAddress *addr;
+  guint status, port, family;
+  char *ip_string;
+
+  /* workaround for the task not having a connection yet */
+  if (task->conn == NULL &&
+      g_vfs_ftp_task_send (task, 0, "NOOP") == 0)
+    return G_VFS_FTP_METHOD_ANY;
+
+  addr = g_vfs_ftp_connection_listen_data_connection (task->conn, &task->error);
+  if (addr == NULL)
+    return G_VFS_FTP_METHOD_ANY;
+  switch (g_socket_address_get_family (addr))
+    {
+      case G_SOCKET_FAMILY_IPV4:
+        family = 1;
+        break;
+      case G_SOCKET_FAMILY_IPV6:
+        family = 2;
+        break;
+      default:
+        g_object_unref (addr);
+        return G_VFS_FTP_METHOD_ANY;
+    }
+
+  ip_string = g_inet_address_to_string (g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (addr)));
+  /* if this ever happens (and it must not for IP4 and IP6 addresses), 
+   * we need to add support for using a different separator */
+  g_assert (strchr (ip_string, '|') == NULL);
+  port = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr));
+
+  /* we could handle the 522 response here, (unsupported network family),
+   * but I don't think that will buy us anything */
+  status = g_vfs_ftp_task_send (task, 0, "EPRT |%u|%s|%u|", family, ip_string, port);
+  g_free (ip_string);
+  g_object_unref (addr);
+  if (status == 0)
+    return G_VFS_FTP_METHOD_ANY;
+  
+  return G_VFS_FTP_METHOD_EPRT;
+}
+
+static GVfsFtpMethod
+g_vfs_ftp_task_setup_data_connection_port (GVfsFtpTask *task, GVfsFtpMethod unused)
 {
   GSocketAddress *addr;
   guint status, i, port;
@@ -925,7 +970,8 @@ g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unuse
   } funcs_ordered[] = {
     { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_epsv },
     { 0,                      g_vfs_ftp_task_setup_data_connection_pasv },
-    { 0,                      g_vfs_ftp_task_open_data_connection_port }
+    { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_eprt },
+    { 0,                      g_vfs_ftp_task_setup_data_connection_port }
   };
   GVfsFtpMethod method;
   guint i;
@@ -974,12 +1020,12 @@ void
 g_vfs_ftp_task_setup_data_connection (GVfsFtpTask *task)
 {
   static const GVfsFtpOpenDataConnectionFunc connect_funcs[] = {
-    [G_VFS_FTP_METHOD_ANY] = g_vfs_ftp_task_setup_data_connection_any,
-    [G_VFS_FTP_METHOD_EPSV] = g_vfs_ftp_task_setup_data_connection_epsv,
-    [G_VFS_FTP_METHOD_PASV] = g_vfs_ftp_task_setup_data_connection_pasv,
+    [G_VFS_FTP_METHOD_ANY]       = g_vfs_ftp_task_setup_data_connection_any,
+    [G_VFS_FTP_METHOD_EPSV]      = g_vfs_ftp_task_setup_data_connection_epsv,
+    [G_VFS_FTP_METHOD_PASV]      = g_vfs_ftp_task_setup_data_connection_pasv,
     [G_VFS_FTP_METHOD_PASV_ADDR] = g_vfs_ftp_task_setup_data_connection_pasv,
-    [G_VFS_FTP_METHOD_EPRT] = NULL,
-    [G_VFS_FTP_METHOD_PORT] = g_vfs_ftp_task_open_data_connection_port
+    [G_VFS_FTP_METHOD_EPRT]      = g_vfs_ftp_task_setup_data_connection_eprt,
+    [G_VFS_FTP_METHOD_PORT]      = g_vfs_ftp_task_setup_data_connection_port
   };
   GVfsFtpMethod method, result;
 
