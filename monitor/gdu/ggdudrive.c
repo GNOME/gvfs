@@ -148,7 +148,10 @@ update_drive (GGduDrive *drive)
   drive->icon = gdu_presentable_get_icon (drive->presentable);
 
   g_free (drive->name);
-  drive->name = gdu_presentable_get_name (drive->presentable);
+  if (_is_pc_floppy_drive (device))
+    drive->name = g_strdup (_("Floppy Drive"));
+  else
+    drive->name = gdu_presentable_get_name (drive->presentable);
 
   /* the GduDevice for an activatable drive (such as RAID) is NULL if the drive is not activated */
   if (device == NULL)

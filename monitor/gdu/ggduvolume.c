@@ -304,7 +304,10 @@ update_volume (GGduVolume *volume)
       volume->icon = gdu_presentable_get_icon (GDU_PRESENTABLE (volume->gdu_volume));
 
       g_free (volume->name);
-      volume->name = gdu_presentable_get_name (GDU_PRESENTABLE (volume->gdu_volume));
+      if (_is_pc_floppy_drive (device))
+        volume->name = g_strdup (_("Floppy Disk"));
+      else
+        volume->name = gdu_presentable_get_name (GDU_PRESENTABLE (volume->gdu_volume));
 
       /* special case the name and icon for audio discs */
       activation_uri = volume->activation_root != NULL ? g_file_get_uri (volume->activation_root) : NULL;

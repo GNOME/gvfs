@@ -744,6 +744,32 @@ should_mount_be_ignored (GduPool *pool, GduDevice *d)
   return ret;
 }
 
+gboolean
+_is_pc_floppy_drive (GduDevice *device)
+{
+  gboolean ret;
+  gchar **drive_media_compat;
+  const gchar *drive_connection_interface;
+
+  ret = FALSE;
+
+  if (device != NULL)
+    {
+      drive_media_compat = gdu_device_drive_get_media_compatibility (device);
+      drive_connection_interface = gdu_device_drive_get_connection_interface (device);
+
+      if (g_strcmp0 (drive_connection_interface, "platform") == 0 &&
+          (drive_media_compat != NULL &&
+           g_strv_length (drive_media_compat) > 0 &&
+           g_strcmp0 (drive_media_compat[0], "floppy") == 0))
+        {
+          ret = TRUE;
+        }
+    }
+
+  return ret;
+}
+
 static gboolean
 should_volume_be_ignored (GduPool *pool, GduVolume *volume, GList *fstab_mount_points)
 {
@@ -763,7 +789,7 @@ should_volume_be_ignored (GduPool *pool, GduVolume *volume, GList *fstab_mount_p
   usage = gdu_device_id_get_usage (device);
   type = gdu_device_id_get_type (device);
 
-  if (g_strcmp0 (usage, "filesystem") == 0)
+  if (_is_pc_floppy_drive (device) || g_strcmp0 (usage, "filesystem") == 0)
     {
       GUnixMountPoint *mount_point;
 

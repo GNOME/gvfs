@@ -55,6 +55,8 @@ GType g_gdu_volume_monitor_get_type (void) G_GNUC_CONST;
 
 GVolumeMonitor *g_gdu_volume_monitor_new                          (void);
 
+gboolean _is_pc_floppy_drive (GduDevice *device);
+
 G_END_DECLS
 
 #endif /* __G_GDU_VOLUME_MONITOR_H__ */
