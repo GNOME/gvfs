@@ -99,6 +99,7 @@ gvfs_backend_ftp_determine_features (GVfsFtpTask *task)
     { "MDTM", G_VFS_FTP_FEATURE_MDTM },
     { "SIZE", G_VFS_FTP_FEATURE_SIZE },
     { "TVFS", G_VFS_FTP_FEATURE_TVFS },
+    { "EPRT", G_VFS_FTP_FEATURE_EPRT },
     { "EPSV", G_VFS_FTP_FEATURE_EPSV },
     { "UTF8", G_VFS_FTP_FEATURE_UTF8 },
   };

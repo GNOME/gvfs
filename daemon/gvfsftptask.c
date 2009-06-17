@@ -970,7 +970,7 @@ g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unuse
   } funcs_ordered[] = {
     { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_epsv },
     { 0,                      g_vfs_ftp_task_setup_data_connection_pasv },
-    { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_eprt },
+    { G_VFS_FTP_FEATURE_EPRT, g_vfs_ftp_task_setup_data_connection_eprt },
     { 0,                      g_vfs_ftp_task_setup_data_connection_port }
   };
   GVfsFtpMethod method;
