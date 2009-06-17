@@ -21,7 +21,6 @@
  *          Cosimo Cecchi <cosimoc@gnome.org>
  */
 
-
 #include <config.h>
 
 #include <sys/types.h>
@@ -66,6 +65,9 @@ typedef struct {
   gboolean can_mount;
   gboolean can_unmount;
   gboolean can_eject;
+  gboolean can_start;
+  gboolean can_stop;
+  GDriveStartStopType start_stop_type;
   
   GDrive *drive;
   GVolume *volume;
@@ -133,7 +135,10 @@ computer_file_equal (ComputerFile *a,
 
   if (a->can_mount != b->can_mount ||
       a->can_unmount != b->can_unmount ||
-      a->can_eject != b->can_eject)
+      a->can_eject != b->can_eject ||
+      a->can_start != b->can_start ||
+      a->can_stop != b->can_stop ||
+      a->start_stop_type != b->start_stop_type)
     return FALSE;
 
   return TRUE;
@@ -458,6 +463,11 @@ recompute_files (GVfsBackendComputer *backend)
 
       if (file->drive)
         {
+          file->can_start = g_drive_can_start (file->drive);
+          file->can_stop = g_drive_can_stop (file->drive);
+          file->start_stop_type = g_drive_get_start_stop_type (file->drive);
+          if (file->can_start)
+            file->can_mount = FALSE;
           basename = g_drive_get_name (file->drive);
           extension = ".drive";
         }
@@ -650,6 +660,9 @@ file_info_from_file (ComputerFile *file,
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_MOUNT, file->can_mount);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_UNMOUNT, file->can_unmount);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_EJECT, file->can_eject);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_START, file->can_start);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_MOUNTABLE_CAN_STOP, file->can_stop);
+  g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_MOUNTABLE_START_STOP_TYPE, file->start_stop_type);
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, FALSE);
@@ -781,8 +794,6 @@ mount_volume_cb (GObject *source_object,
   
   volume = G_VOLUME (source_object);
 
-  /* TODO: We're leaking the GMountOperation here */
-  
   error = NULL;
   if (g_volume_mount_finish (volume, res, &error))
     {
@@ -910,6 +921,8 @@ try_mount_mountable (GVfsBackend *backend,
       if (file->volume)
         {
           mount_op = g_mount_source_get_operation (mount_source);
+          /* free mount_op when job is completed */
+          g_object_set_data_full (G_OBJECT (job), "gvfs-backend-computer-mount-op", mount_op, g_object_unref);
           g_volume_mount (file->volume,
                           0,
                           mount_op,
@@ -1133,6 +1146,145 @@ try_eject_mountable (GVfsBackend *backend,
   return TRUE;
 }
 
+
+static void
+drive_start_cb (GObject *source_object,
+                GAsyncResult *res,
+                gpointer user_data)
+{
+  GVfsJobStartMountable *job = user_data;
+  GError *error;
+  GDrive *drive;
+
+  drive = G_DRIVE (source_object);
+
+  error = NULL;
+  if (g_drive_start_finish (drive, res, &error))
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+static gboolean
+try_start_mountable (GVfsBackend *backend,
+                     GVfsJobStartMountable *job,
+                     const char *filename,
+                     GMountSource *mount_source)
+{
+  ComputerFile *file;
+  GMountOperation *start_op;
+
+  file = lookup (G_VFS_BACKEND_COMPUTER (backend),
+                 G_VFS_JOB (job), filename);
+
+  if (file == &root)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_MOUNTABLE_FILE,
+                        _("Not a mountable file"));
+    }
+  else if (file != NULL)
+    {
+      if (file->drive != NULL)
+        {
+          start_op = g_mount_source_get_operation (mount_source);
+          /* free start_op when job is completed */
+          g_object_set_data_full (G_OBJECT (job), "gvfs-backend-computer-start-op", start_op, g_object_unref);
+          g_drive_start (file->drive,
+                         0,
+                         start_op,
+                         G_VFS_JOB (job)->cancellable,
+                         drive_start_cb,
+                         job);
+        }
+      else
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _("Can't start file"));
+        }
+    }
+  else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Can't start file"));
+    }
+  return TRUE;
+}
+
+
+static void
+drive_stop_cb (GObject *source_object,
+               GAsyncResult *res,
+               gpointer user_data)
+{
+  GVfsJobStopMountable *job = user_data;
+  GError *error;
+  GDrive *drive;
+
+  drive = G_DRIVE (source_object);
+
+  error = NULL;
+  if (g_drive_stop_finish (drive, res, &error))
+    {
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      g_vfs_job_failed_from_error  (G_VFS_JOB (job), error);
+      g_error_free (error);
+    }
+}
+
+static gboolean
+try_stop_mountable (GVfsBackend *backend,
+                    GVfsJobStopMountable *job,
+                    const char *filename,
+                    GMountUnmountFlags flags)
+{
+  ComputerFile *file;
+
+  file = lookup (G_VFS_BACKEND_COMPUTER (backend),
+                 G_VFS_JOB (job), filename);
+
+  if (file == &root)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_MOUNTABLE_FILE,
+                        _("Not a mountable file"));
+    }
+  else if (file != NULL)
+    {
+      if (file->drive != NULL)
+        {
+          g_drive_stop (file->drive,
+                        flags,
+                        G_VFS_JOB (job)->cancellable,
+                        drive_stop_cb,
+                        job);
+        }
+      else
+        {
+          g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                            G_IO_ERROR_NOT_SUPPORTED,
+                            _("Can't stop file"));
+        }
+    }
+  else
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_SUPPORTED,
+                        _("Can't stop file"));
+    }
+  return TRUE;
+}
+
 static void
 g_vfs_backend_computer_class_init (GVfsBackendComputerClass *klass)
 {
@@ -1149,4 +1301,6 @@ g_vfs_backend_computer_class_init (GVfsBackendComputerClass *klass)
   backend_class->try_mount_mountable = try_mount_mountable;
   backend_class->try_unmount_mountable = try_unmount_mountable;
   backend_class->try_eject_mountable = try_eject_mountable;
+  backend_class->try_start_mountable = try_start_mountable;
+  backend_class->try_stop_mountable = try_stop_mountable;
 }

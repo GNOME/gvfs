@@ -281,10 +281,8 @@ mount_op_ask_question (GMountOperationDBus *op_dbus,
   const char *message_string;
   char **choices;
   int num_choices;
-  dbus_bool_t handled = FALSE;
   DBusMessage *reply;
   DBusError error;
-  gboolean res;
   DBusMessageIter iter;
 
   reply = NULL;
@@ -316,15 +314,7 @@ mount_op_ask_question (GMountOperationDBus *op_dbus,
 
   g_signal_emit_by_name (op_dbus->op, "ask_question",
 			 message_string,
-			 choices,
-			 &res);
-  if (!res)
-    {
-      _g_dbus_message_append_args (reply,
-				   DBUS_TYPE_BOOLEAN, &handled,
-				   0);
-      mount_op_send_reply (op_dbus, reply);
-    }
+			 choices);
   
   dbus_free_string_array (choices);
 }

@@ -46,6 +46,8 @@
 #include <gvfsjobunmount.h>
 #include <gvfsjobmountmountable.h>
 #include <gvfsjobunmountmountable.h>
+#include <gvfsjobstartmountable.h>
+#include <gvfsjobstopmountable.h>
 #include <gvfsjobmakedirectory.h>
 #include <gvfsjobmakesymlink.h>
 #include <gvfsjobcreatemonitor.h>
@@ -531,6 +533,14 @@ backend_dbus_handler (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_EJECT_MOUNTABLE))
     job = g_vfs_job_unmount_mountable_new (connection, message, backend, TRUE);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_START_MOUNTABLE))
+    job = g_vfs_job_start_mountable_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_STOP_MOUNTABLE))
+    job = g_vfs_job_stop_mountable_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME))

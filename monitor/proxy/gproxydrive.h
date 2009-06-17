@@ -50,6 +50,15 @@ void          g_proxy_drive_update       (GProxyDrive         *drive,
                                           DBusMessageIter     *iter);
 const char   *g_proxy_drive_get_id       (GProxyDrive         *drive);
 
+void          g_proxy_drive_handle_start_op_ask_password (GProxyDrive        *drive,
+                                                          DBusMessageIter    *iter);
+
+void          g_proxy_drive_handle_start_op_ask_question (GProxyDrive        *drive,
+                                                          DBusMessageIter    *iter);
+
+void          g_proxy_drive_handle_start_op_aborted      (GProxyDrive        *drive,
+                                                          DBusMessageIter    *iter);
+
 G_END_DECLS
 
 #endif /* __G_PROXY_DRIVE_H__ */

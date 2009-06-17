@@ -47,6 +47,8 @@ typedef struct _GVfsJobMount            GVfsJobMount;
 typedef struct _GVfsJobUnmount          GVfsJobUnmount;
 typedef struct _GVfsJobMountMountable   GVfsJobMountMountable;
 typedef struct _GVfsJobUnmountMountable GVfsJobUnmountMountable;
+typedef struct _GVfsJobStartMountable   GVfsJobStartMountable;
+typedef struct _GVfsJobStopMountable    GVfsJobStopMountable;
 typedef struct _GVfsJobOpenForRead      GVfsJobOpenForRead;
 typedef struct _GVfsJobOpenIconForRead  GVfsJobOpenIconForRead;
 typedef struct _GVfsJobSeekRead         GVfsJobSeekRead;
@@ -415,6 +417,23 @@ struct _GVfsBackendClass
   gboolean (*try_query_writable_namespaces) (GVfsBackend *backend,
 					     GVfsJobQueryAttributes *job,
 					     const char *filename);
+
+  void     (*start_mountable)   (GVfsBackend *backend,
+				 GVfsJobStartMountable *job,
+				 const char *filename,
+				 GMountSource *mount_source);
+  gboolean (*try_start_mountable) (GVfsBackend *backend,
+                                   GVfsJobStartMountable *job,
+                                   const char *filename,
+                                   GMountSource *mount_source);
+  void     (*stop_mountable) (GVfsBackend *backend,
+                              GVfsJobStopMountable *job,
+                              const char *filename,
+                              GMountUnmountFlags flags);
+  gboolean (*try_stop_mountable)   (GVfsBackend *backend,
+				    GVfsJobStopMountable *job,
+				    const char *filename,
+				    GMountUnmountFlags flags);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;

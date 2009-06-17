@@ -1326,6 +1326,95 @@ g_daemon_file_mount_mountable_finish (GFile               *file,
 }
 
 static void
+start_mountable_async_cb (DBusMessage *reply,
+			  DBusConnection *connection,
+			  GSimpleAsyncResult *result,
+			  GCancellable *cancellable,
+			  gpointer callback_data)
+{
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_start_mountable (GFile               *file,
+			       GDriveStartFlags     flags,
+			       GMountOperation     *start_operation,
+			       GCancellable        *cancellable,
+			       GAsyncReadyCallback  callback,
+			       gpointer             user_data)
+{
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
+
+  mount_source = g_mount_operation_dbus_wrap (start_operation, _g_daemon_vfs_get_async_bus ());
+
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+
+  if (start_operation)
+    g_object_ref (start_operation);
+
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_START_MOUNTABLE,
+		      cancellable,
+		      callback, user_data,
+		      start_mountable_async_cb,
+		      start_operation, start_operation ? g_object_unref : NULL,
+		      DBUS_TYPE_STRING, &dbus_id,
+		      DBUS_TYPE_OBJECT_PATH, &obj_path,
+		      0);
+
+  g_object_unref (mount_source);
+}
+
+static gboolean
+g_daemon_file_start_mountable_finish (GFile               *file,
+				      GAsyncResult        *result,
+				      GError             **error)
+{
+  return TRUE;
+}
+
+static void
+stop_mountable_async_cb (DBusMessage *reply,
+                         DBusConnection *connection,
+                         GSimpleAsyncResult *result,
+                         GCancellable *cancellable,
+                         gpointer callback_data)
+{
+  g_simple_async_result_complete (result);
+}
+
+static void
+g_daemon_file_stop_mountable (GFile               *file,
+                              GMountUnmountFlags   flags,
+                              GCancellable        *cancellable,
+                              GAsyncReadyCallback  callback,
+                              gpointer             user_data)
+{
+  guint32 dbus_flags;
+
+  dbus_flags = flags;
+  do_async_path_call (file,
+		      G_VFS_DBUS_MOUNT_OP_STOP_MOUNTABLE,
+		      cancellable,
+		      callback, user_data,
+		      stop_mountable_async_cb,
+		      NULL, NULL,
+		      DBUS_TYPE_UINT32, &dbus_flags,
+		      0);
+}
+
+static gboolean
+g_daemon_file_stop_mountable_finish (GFile               *file,
+                                     GAsyncResult        *result,
+                                     GError             **error)
+{
+  return TRUE;
+}
+
+
+static void
 eject_mountable_async_cb (DBusMessage *reply,
 			  DBusConnection *connection,
 			  GSimpleAsyncResult *result,
@@ -2787,6 +2876,10 @@ g_daemon_file_file_iface_init (GFileIface *iface)
   iface->make_symbolic_link = g_daemon_file_make_symbolic_link;
   iface->monitor_dir = g_daemon_file_monitor_dir;
   iface->monitor_file = g_daemon_file_monitor_file;
+  iface->start_mountable = g_daemon_file_start_mountable;
+  iface->start_mountable_finish = g_daemon_file_start_mountable_finish;
+  iface->stop_mountable = g_daemon_file_stop_mountable;
+  iface->stop_mountable_finish = g_daemon_file_stop_mountable_finish;
 
   /* Async operations */
 

@@ -41,6 +41,14 @@ G_BEGIN_DECLS
 typedef struct _GProxyVolumeMonitor GProxyVolumeMonitor;
 typedef struct _GProxyVolumeMonitorClass GProxyVolumeMonitorClass;
 
+/* Timeout used for D-Bus messages in msec - this needs to be high enough
+ * to ensure that the user has time to interact with e.g. mount operation
+ * dialogs.
+ *
+ * We use 30 minutes.
+ */
+#define G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT 30*60*1000
+
 /* Forward definitions */
 typedef struct _GProxyDrive GProxyDrive;
 typedef struct _GProxyVolume GProxyVolume;

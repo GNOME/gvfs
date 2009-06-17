@@ -613,7 +613,7 @@ g_mount_source_ask_question_async (GMountSource       *source,
   _g_dbus_message_append_args (message,
 			       DBUS_TYPE_STRING, &message_string,
 			       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
-			       choices, n_choices,
+			       &choices, n_choices,
 			       0);
 
   result = g_simple_async_result_new (G_OBJECT (source), callback, user_data, 
@@ -687,13 +687,12 @@ static gboolean
 op_ask_question (GMountOperation *op,
 		 const char      *message,
 		 const char     **choices,
-		 gint             n_choices,
 		 GMountSource    *mount_source)
 {
   g_mount_source_ask_question_async (mount_source,
 				     message,
 				     choices,
-				     n_choices,
+				     g_strv_length ((gchar **) choices),
 				     op_ask_question_reply,
 				     g_object_ref (op));
   g_signal_stop_emission_by_name (op, "ask_question");
@@ -740,7 +739,6 @@ g_mount_source_get_operation (GMountSource *mount_source)
   g_object_set_data_full (G_OBJECT (op), "source",
 			  g_object_ref (mount_source),
 			  g_object_unref);
-
 
   g_signal_connect (op, "ask_password", (GCallback)op_ask_password, mount_source);
   g_signal_connect (op, "ask_question", (GCallback)op_ask_question, mount_source);

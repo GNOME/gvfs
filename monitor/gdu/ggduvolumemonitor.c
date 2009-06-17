@@ -836,7 +836,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
 {
   GduDevice *device;
   gboolean ignored;
-  gboolean has_volumes;
+  gboolean have_volumes;
   gboolean all_volumes_are_ignored;
   GList *enclosed;
   GList *l;
@@ -847,24 +847,26 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
 
   device = gdu_presentable_get_device (GDU_PRESENTABLE (d));
 
-  /* If there is no GduDevice for a drive, then ignore it.
-   *
-   * Note that right now the only drives without a GduDevice are Linux
-   * MD arrays not yet activated. In the future we might want to
-   * display these so the user can start the array.
+  /* If there is no GduDevice for a drive, then ignore it unless
+   * we know how to start it. Right now this is only relevant
+   * for GduLinuxMdDrive but we can add other stuff to libgdu
+   * in the future and things will work here
    */
   if (device == NULL)
     {
-      ignored = TRUE;
-      goto out;
+      if (!gdu_drive_is_activatable (d))
+        {
+          ignored = TRUE;
+          goto out;
+        }
     }
 
-  if (gdu_device_get_presentation_hide (device)) {
+  if (device != NULL && gdu_device_get_presentation_hide (device)) {
     ignored = TRUE;
     goto out;
   }
 
-  has_volumes = FALSE;
+  have_volumes = FALSE;
   all_volumes_are_ignored = TRUE;
 
   /* never ignore a drive if it has volumes that we don't want to ignore */
@@ -878,7 +880,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
         {
           GduVolume *volume = GDU_VOLUME (enclosed_presentable);
 
-          has_volumes = TRUE;
+          have_volumes = TRUE;
 
           if (!should_volume_be_ignored (pool, volume, fstab_mount_points))
             {
@@ -894,23 +896,26 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
    *
    * b) the volumes of the drive are all ignored
    */
-  if (!has_volumes)
+  if (device != NULL)
     {
-      if (gdu_device_is_media_available (device))
-        ignored = TRUE;
-    }
-  else
-    {
-      if (all_volumes_are_ignored)
-        ignored = TRUE;
-    }
+      if (!have_volumes)
+        {
+          if (gdu_device_is_media_available (device))
+            ignored = TRUE;
+        }
+      else
+        {
+          if (all_volumes_are_ignored)
+            ignored = TRUE;
+        }
 
-  /* special case for audio discs: don't ignore the drive since we'll create
-   * a cdda:// mount for the drive
-   */
-  if (gdu_device_is_optical_disc (device) && gdu_device_optical_disc_get_num_audio_tracks (device) > 0)
-    {
-      ignored = FALSE;
+      /* special case for audio discs: don't ignore the drive since we'll create
+       * a cdda:// mount for the drive
+       */
+      if (gdu_device_is_optical_disc (device) && gdu_device_optical_disc_get_num_audio_tracks (device) > 0)
+        {
+          ignored = FALSE;
+        }
     }
 
  out:

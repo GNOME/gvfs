@@ -542,6 +542,9 @@ list_drives (GList *drives,
       
       if (extra_detail)
 	{
+          GEnumValue *enum_value;
+          gpointer klass;
+
 	  ids = g_drive_enumerate_identifiers (drive);
 	  if (ids && ids[0] != NULL)
 	    {
@@ -569,8 +572,19 @@ list_drives (GList *drives,
 	  g_print ("%*sis_media_check_automatic=%d\n", indent + 2, "", g_drive_is_media_check_automatic (drive));
 	  g_print ("%*scan_poll_for_media=%d\n", indent + 2, "", g_drive_can_poll_for_media (drive));
 	  g_print ("%*scan_eject=%d\n", indent + 2, "", g_drive_can_eject (drive));
+	  g_print ("%*scan_start=%d\n", indent + 2, "", g_drive_can_start (drive));
+	  g_print ("%*scan_stop=%d\n", indent + 2, "", g_drive_can_stop (drive));
+
+          enum_value = NULL;
+          klass = g_type_class_ref (G_TYPE_DRIVE_START_STOP_TYPE);
+          if (klass != NULL)
+            {
+              enum_value = g_enum_get_value (klass, g_drive_get_start_stop_type (drive));
+              g_print ("%*sstart_stop_type=%s\n", indent + 2, "",
+                       enum_value != NULL ? enum_value->value_nick : "UNKNOWN");
+              g_type_class_unref (klass);
+            }
 	}
-      
       volumes = g_drive_get_volumes (drive);
       list_volumes (volumes, indent + 2, FALSE);
       g_list_foreach (volumes, (GFunc)g_object_unref, NULL);

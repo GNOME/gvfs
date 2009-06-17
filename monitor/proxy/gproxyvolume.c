@@ -936,7 +936,7 @@ g_proxy_volume_mount (GVolume             *volume,
 
       _g_dbus_connection_call_async (connection,
                                      message,
-                                     30 * 60 * 1000,                /* 30 minute timeout */
+                                     G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT,                /* 30 minute timeout */
                                      (GAsyncDBusCallback) mount_cb,
                                      data);
       dbus_message_unref (message);

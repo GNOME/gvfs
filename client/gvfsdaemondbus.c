@@ -508,10 +508,19 @@ async_call_send (AsyncDBusCall *async_call)
 {
   AsyncCallCancelData *cancel_data;
 
+  _g_dbus_connection_call_async (async_call->connection,
+				 async_call->message,
+				 G_VFS_DBUS_TIMEOUT_MSECS,
+				 async_dbus_response,
+				 async_call);
+
   if (async_call->cancellable)
     {
       cancel_data = g_new0 (AsyncCallCancelData, 1);
       cancel_data->connection = dbus_connection_ref (async_call->connection);
+      /* make sure we get the serial *after* the message has been sent, otherwise
+       * it will be 0
+       */
       cancel_data->serial = dbus_message_get_serial (async_call->message);
       async_call->cancelled_tag =
 	g_signal_connect_data (async_call->cancellable, "cancelled",
@@ -520,12 +529,6 @@ async_call_send (AsyncDBusCall *async_call)
 			       (GClosureNotify)async_call_cancel_data_free,
 			       0);
     }
-
-  _g_dbus_connection_call_async (async_call->connection,
-				 async_call->message,
-				 G_VFS_DBUS_TIMEOUT_MSECS,
-				 async_dbus_response,
-				 async_call);
 }
 
 static void

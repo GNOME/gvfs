@@ -53,8 +53,13 @@ struct _GProxyDrive {
   gboolean is_media_check_automatic;
   gboolean has_media;
   gboolean is_media_removable;
+  gboolean can_start;
+  gboolean can_stop;
+  GDriveStartStopType start_stop_type;
 
   GHashTable *identifiers;
+
+  GHashTable *hash_start_op_id_to_data;
 };
 
 static void g_proxy_drive_drive_iface_init (GDriveIface *iface);
@@ -87,6 +92,8 @@ g_proxy_drive_finalize (GObject *object)
   if (drive->identifiers != NULL)
     g_hash_table_unref (drive->identifiers);
 
+  g_hash_table_unref (drive->hash_start_op_id_to_data);
+
   if (G_OBJECT_CLASS (g_proxy_drive_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_proxy_drive_parent_class)->finalize) (object);
 }
@@ -107,6 +114,7 @@ g_proxy_drive_class_finalize (GProxyDriveClass *klass)
 static void
 g_proxy_drive_init (GProxyDrive *proxy_drive)
 {
+  proxy_drive->hash_start_op_id_to_data = g_hash_table_new (g_str_hash, g_str_equal);
 }
 
 GProxyDrive *
@@ -129,10 +137,13 @@ g_proxy_drive_new (GProxyVolumeMonitor *volume_monitor)
  * boolean              has-media
  * boolean              is-media-removable
  * boolean              is-media-check-automatic
+ * boolean              can-start
+ * boolean              can-stop
+ * uint32               start-stop-type
  * array:string         volume-ids
  * dict:string->string  identifiers
  */
-#define DRIVE_STRUCT_TYPE "(sssbbbbasa{ss})"
+#define DRIVE_STRUCT_TYPE "(sssbbbbbbuasa{ss})"
 
 void
 g_proxy_drive_update (GProxyDrive         *drive,
@@ -148,6 +159,9 @@ g_proxy_drive_update (GProxyDrive         *drive,
   dbus_bool_t has_media;
   dbus_bool_t is_media_removable;
   dbus_bool_t is_media_check_automatic;
+  dbus_bool_t can_start;
+  dbus_bool_t can_stop;
+  dbus_uint32_t start_stop_type;
   GPtrArray *volume_ids;
   GHashTable *identifiers;
 
@@ -167,6 +181,12 @@ g_proxy_drive_update (GProxyDrive         *drive,
   dbus_message_iter_get_basic (&iter_struct, &is_media_removable);
   dbus_message_iter_next (&iter_struct);
   dbus_message_iter_get_basic (&iter_struct, &is_media_check_automatic);
+  dbus_message_iter_next (&iter_struct);
+  dbus_message_iter_get_basic (&iter_struct, &can_start);
+  dbus_message_iter_next (&iter_struct);
+  dbus_message_iter_get_basic (&iter_struct, &can_stop);
+  dbus_message_iter_next (&iter_struct);
+  dbus_message_iter_get_basic (&iter_struct, &start_stop_type);
   dbus_message_iter_next (&iter_struct);
 
   volume_ids = g_ptr_array_new ();
@@ -215,6 +235,9 @@ g_proxy_drive_update (GProxyDrive         *drive,
   drive->has_media = has_media;
   drive->is_media_removable = is_media_removable;
   drive->is_media_check_automatic = is_media_check_automatic;
+  drive->can_start = can_start;
+  drive->can_stop = can_stop;
+  drive->start_stop_type = start_stop_type;
   drive->identifiers = identifiers != NULL ? g_hash_table_ref (identifiers) : NULL;
   drive->volume_ids = g_strdupv ((char **) volume_ids->pdata);
 
@@ -353,6 +376,45 @@ g_proxy_drive_can_poll_for_media (GDrive *drive)
   return res;
 }
 
+static gboolean
+g_proxy_drive_can_start (GDrive *drive)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  gboolean res;
+
+  G_LOCK (proxy_drive);
+  res = proxy_drive->can_start;
+  G_UNLOCK (proxy_drive);
+
+  return res;
+}
+
+static gboolean
+g_proxy_drive_can_stop (GDrive *drive)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  gboolean res;
+
+  G_LOCK (proxy_drive);
+  res = proxy_drive->can_stop;
+  G_UNLOCK (proxy_drive);
+
+  return res;
+}
+
+static GDriveStartStopType
+g_proxy_drive_get_start_stop_type (GDrive *drive)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  GDriveStartStopType res;
+
+  G_LOCK (proxy_drive);
+  res = proxy_drive->start_stop_type;
+  G_UNLOCK (proxy_drive);
+
+  return res;
+}
+
 static char *
 g_proxy_drive_get_identifier (GDrive              *drive,
                               const char          *kind)
@@ -465,6 +527,8 @@ operation_cancelled (GCancellable *cancellable,
   dbus_message_unref (message);
   dbus_connection_unref (connection);
 }
+
+/* ---------------------------------------------------------------------------------------------------- */
 
 static void
 eject_cb (DBusMessage *reply,
@@ -587,6 +651,557 @@ g_proxy_drive_eject_finish (GDrive        *drive,
   return TRUE;
 }
 
+/* ---------------------------------------------------------------------------------------------------- */
+
+static void
+stop_cb (DBusMessage *reply,
+          GError *error,
+          DBusOp *data)
+{
+  if (data->cancelled_handler_id > 0)
+    g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
+
+  if (!g_cancellable_is_cancelled (data->cancellable))
+    {
+      GSimpleAsyncResult *simple;
+
+      if (error != NULL)
+        simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                       data->callback,
+                                                       data->user_data,
+                                                       error);
+      else
+        simple = g_simple_async_result_new (G_OBJECT (data->drive),
+                                            data->callback,
+                                            data->user_data,
+                                            NULL);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+    }
+
+  g_object_unref (data->drive);
+  g_free (data->cancellation_id);
+  if (data->cancellable != NULL)
+    g_object_unref (data->cancellable);
+  g_free (data);
+}
+
+static void
+g_proxy_drive_stop (GDrive              *drive,
+                    GMountUnmountFlags   flags,
+                    GCancellable        *cancellable,
+                    GAsyncReadyCallback  callback,
+                    gpointer             user_data)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  DBusConnection *connection;
+  const char *name;
+  DBusMessage *message;
+  DBusOp *data;
+  dbus_uint32_t _flags = flags;
+
+  G_LOCK (proxy_drive);
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_error (G_OBJECT (drive),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_CANCELLED,
+                                                _("Operation was cancelled"));
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      G_UNLOCK (proxy_drive);
+      goto out;
+    }
+
+  data = g_new0 (DBusOp, 1);
+  data->drive = g_object_ref (drive);
+  data->callback = callback;
+  data->user_data = user_data;
+
+  if (cancellable != NULL)
+    {
+      data->cancellation_id = g_strdup_printf ("%p", cancellable);
+      data->cancellable = g_object_ref (cancellable);
+      data->cancelled_handler_id = g_signal_connect (data->cancellable,
+                                                     "cancelled",
+                                                     G_CALLBACK (operation_cancelled),
+                                                     data);
+    }
+  else
+    {
+      data->cancellation_id = g_strdup ("");
+    }
+
+  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_drive->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (proxy_drive->volume_monitor);
+
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "DriveStop");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(proxy_drive->id),
+                            DBUS_TYPE_STRING,
+                            &(data->cancellation_id),
+                            DBUS_TYPE_UINT32,
+                            &_flags,
+                            DBUS_TYPE_INVALID);
+  G_UNLOCK (proxy_drive);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 -1,
+                                 (GAsyncDBusCallback) stop_cb,
+                                 data);
+  dbus_connection_unref (connection);
+  dbus_message_unref (message);
+ out:
+  ;
+}
+
+static gboolean
+g_proxy_drive_stop_finish (GDrive        *drive,
+                           GAsyncResult  *result,
+                           GError       **error)
+{
+  if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error))
+    return FALSE;
+  return TRUE;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+typedef struct {
+  GProxyDrive *drive;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+
+  gchar *cancellation_id;
+  GCancellable *cancellable;
+  gulong cancelled_handler_id;
+
+  gchar *start_op_id;
+  GMountOperation *start_operation;
+  gulong reply_handler_id;
+} DBusStartOp;
+
+static void
+start_cb (DBusMessage  *reply,
+          GError       *error,
+          DBusStartOp  *data)
+{
+  if (data->cancelled_handler_id > 0)
+    g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
+
+  if (!g_cancellable_is_cancelled (data->cancellable))
+    {
+      GSimpleAsyncResult *simple;
+
+      if (error != NULL)
+        simple = g_simple_async_result_new_from_error (G_OBJECT (data->drive),
+                                                       data->callback,
+                                                       data->user_data,
+                                                       error);
+      else
+        simple = g_simple_async_result_new (G_OBJECT (data->drive),
+                                            data->callback,
+                                            data->user_data,
+                                            NULL);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+    }
+
+  /* free DBusStartOp */
+  if (strlen (data->start_op_id) > 0)
+    g_hash_table_remove (data->drive->hash_start_op_id_to_data, data->start_op_id);
+  g_object_unref (data->drive);
+
+  g_free (data->start_op_id);
+  if (data->reply_handler_id > 0)
+    g_signal_handler_disconnect (data->start_operation, data->reply_handler_id);
+  if (data->start_operation != NULL)
+    g_object_unref (data->start_operation);
+
+  g_free (data->cancellation_id);
+  if (data->cancellable != NULL)
+    g_object_unref (data->cancellable);
+
+  g_free (data);
+}
+
+static void
+start_cancelled (GCancellable *cancellable,
+                 gpointer      user_data)
+{
+  DBusStartOp *data = user_data;
+  GSimpleAsyncResult *simple;
+  DBusConnection *connection;
+  DBusMessage *message;
+  const char *name;
+
+  G_LOCK (proxy_drive);
+
+  simple = g_simple_async_result_new_error (G_OBJECT (data->drive),
+                                            data->callback,
+                                            data->user_data,
+                                            G_IO_ERROR,
+                                            G_IO_ERROR_CANCELLED,
+                                            _("Operation was cancelled"));
+  g_simple_async_result_complete_in_idle (simple);
+  g_object_unref (simple);
+
+  /* Now tell the remote drive monitor that the op has been cancelled */
+  connection = g_proxy_volume_monitor_get_dbus_connection (data->drive->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (data->drive->volume_monitor);
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "CancelOperation");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(data->cancellation_id),
+                            DBUS_TYPE_INVALID);
+
+  G_UNLOCK (proxy_drive);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 -1,
+                                 (GAsyncDBusCallback) cancel_operation_reply_cb,
+                                 NULL);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
+}
+
+static void
+g_proxy_drive_start (GDrive              *drive,
+                     GDriveStartFlags     flags,
+                     GMountOperation     *start_operation,
+                     GCancellable        *cancellable,
+                     GAsyncReadyCallback  callback,
+                     gpointer             user_data)
+{
+  GProxyDrive *proxy_drive = G_PROXY_DRIVE (drive);
+  DBusStartOp *data;
+  DBusConnection *connection;
+  const char *name;
+  DBusMessage *message;
+
+  G_LOCK (proxy_drive);
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new_error (G_OBJECT (drive),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_CANCELLED,
+                                                _("Operation was cancelled"));
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      G_UNLOCK (proxy_drive);
+      goto out;
+    }
+
+  data = g_new0 (DBusStartOp, 1);
+  data->drive = g_object_ref (drive);
+  data->callback = callback;
+  data->user_data = user_data;
+  if (cancellable != NULL)
+    {
+      data->cancellation_id = g_strdup_printf ("%p", cancellable);
+      data->cancellable = g_object_ref (cancellable);
+      data->cancelled_handler_id = g_signal_connect (data->cancellable,
+                                                     "cancelled",
+                                                     G_CALLBACK (start_cancelled),
+                                                     data);
+    }
+  else
+    {
+      data->cancellation_id = g_strdup ("");
+    }
+
+  if (start_operation != NULL)
+    {
+      data->start_op_id = g_strdup_printf ("%p", start_operation);
+      data->start_operation = g_object_ref (start_operation);
+      g_hash_table_insert (proxy_drive->hash_start_op_id_to_data,
+                           data->start_op_id,
+                           data);
+    }
+  else
+    {
+      data->start_op_id = g_strdup ("");
+    }
+
+  connection = g_proxy_volume_monitor_get_dbus_connection (proxy_drive->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (proxy_drive->volume_monitor);
+
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "DriveStart");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(proxy_drive->id),
+                            DBUS_TYPE_STRING,
+                            &(data->cancellation_id),
+                            DBUS_TYPE_UINT32,
+                            &(flags),
+                            DBUS_TYPE_STRING,
+                            &(data->start_op_id),
+                            DBUS_TYPE_INVALID);
+  G_UNLOCK (proxy_drive);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT,
+                                 (GAsyncDBusCallback) start_cb,
+                                 data);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
+
+ out:
+  ;
+}
+
+
+static void
+start_op_reply_cb (DBusMessage *reply,
+                   GError      *error,
+                   DBusStartOp      *data)
+{
+  if (error != NULL)
+    {
+      g_warning ("Error from StartOpReply(): %s", error->message);
+    }
+}
+
+static void
+start_operation_reply (GMountOperation        *start_operation,
+                       GMountOperationResult  result,
+                       gpointer               user_data)
+{
+  DBusStartOp *data = user_data;
+  DBusConnection *connection;
+  const char *name;
+  DBusMessage *message;
+  const char *user_name;
+  const char *domain;
+  const char *password;
+  char *encoded_password;
+  dbus_uint32_t password_save;
+  dbus_uint32_t choice;
+  dbus_bool_t anonymous;
+
+  connection = g_proxy_volume_monitor_get_dbus_connection (data->drive->volume_monitor);
+  name = g_proxy_volume_monitor_get_dbus_name (data->drive->volume_monitor);
+
+  user_name     = g_mount_operation_get_username (start_operation);
+  domain        = g_mount_operation_get_domain (start_operation);
+  password      = g_mount_operation_get_password (start_operation);
+  password_save = g_mount_operation_get_password_save (start_operation);
+  choice        = g_mount_operation_get_choice (start_operation);
+  anonymous     = g_mount_operation_get_anonymous (start_operation);
+
+  if (user_name == NULL)
+    user_name = "";
+  if (domain == NULL)
+    domain = "";
+  if (password == NULL)
+    password = "";
+
+  /* NOTE: this is not to add "security", it's merely to prevent accidental exposure
+   *       of passwords when running dbus-monitor
+   */
+  encoded_password = g_base64_encode ((const guchar *) password, (gsize) (strlen (password) + 1));
+
+  message = dbus_message_new_method_call (name,
+                                          "/org/gtk/Private/RemoteVolumeMonitor",
+                                          "org.gtk.Private.RemoteVolumeMonitor",
+                                          "StartOpReply");
+  dbus_message_append_args (message,
+                            DBUS_TYPE_STRING,
+                            &(data->drive->id),
+                            DBUS_TYPE_STRING,
+                            &(data->start_op_id),
+                            DBUS_TYPE_INT32,
+                            &result,
+                            DBUS_TYPE_STRING,
+                            &user_name,
+                            DBUS_TYPE_STRING,
+                            &domain,
+                            DBUS_TYPE_STRING,
+                            &encoded_password,
+                            DBUS_TYPE_INT32,
+                            &password_save,
+                            DBUS_TYPE_INT32,
+                            &choice,
+                            DBUS_TYPE_BOOLEAN,
+                            &anonymous,
+                            DBUS_TYPE_INVALID);
+
+  _g_dbus_connection_call_async (connection,
+                                 message,
+                                 -1,
+                                 (GAsyncDBusCallback) start_op_reply_cb,
+                                 data);
+
+  g_free (encoded_password);
+  dbus_message_unref (message);
+  dbus_connection_unref (connection);
+}
+
+void
+g_proxy_drive_handle_start_op_ask_password (GProxyDrive        *drive,
+                                            DBusMessageIter    *iter)
+{
+  const char *start_op_id;
+  const char *message;
+  const char *default_user;
+  const char *default_domain;
+  dbus_int32_t flags;
+  DBusStartOp *data;
+
+  dbus_message_iter_get_basic (iter, &start_op_id);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &message);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &default_user);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &default_domain);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &flags);
+  dbus_message_iter_next (iter);
+
+  data = g_hash_table_lookup (drive->hash_start_op_id_to_data, start_op_id);
+
+  /* since eavesdropping is enabled on the session bus we get this signal even if it
+   * is for another application; so silently ignore it if it's not for us
+   */
+  if (data == NULL)
+    goto out;
+
+  if (data->reply_handler_id == 0)
+    {
+      data->reply_handler_id = g_signal_connect (data->start_operation,
+                                                 "reply",
+                                                 G_CALLBACK (start_operation_reply),
+                                                 data);
+    }
+
+  g_signal_emit_by_name (data->start_operation,
+                         "ask-password",
+                         message,
+                         default_user,
+                         default_domain,
+                         flags);
+
+ out:
+  ;
+}
+
+void
+g_proxy_drive_handle_start_op_ask_question (GProxyDrive        *drive,
+                                            DBusMessageIter    *iter)
+{
+  const char *start_op_id;
+  const char *message;
+  GPtrArray *choices;
+  DBusMessageIter iter_array;
+  DBusStartOp *data;
+
+  choices = NULL;
+
+  dbus_message_iter_get_basic (iter, &start_op_id);
+  dbus_message_iter_next (iter);
+
+  dbus_message_iter_get_basic (iter, &message);
+  dbus_message_iter_next (iter);
+
+  choices = g_ptr_array_new ();
+  dbus_message_iter_recurse (iter, &iter_array);
+  while (dbus_message_iter_get_arg_type (&iter_array) != DBUS_TYPE_INVALID)
+    {
+      const char *choice;
+      dbus_message_iter_get_basic (&iter_array, &choice);
+      dbus_message_iter_next (&iter_array);
+
+      g_ptr_array_add (choices, g_strdup (choice));
+    }
+  g_ptr_array_add (choices, NULL);
+
+  data = g_hash_table_lookup (drive->hash_start_op_id_to_data, start_op_id);
+
+  /* since eavesdropping is enabled on the session bus we get this signal even if it
+   * is for another application; so silently ignore it if it's not for us
+   */
+  if (data == NULL)
+    goto out;
+
+  if (data->reply_handler_id == 0)
+    {
+      data->reply_handler_id = g_signal_connect (data->start_operation,
+                                                 "reply",
+                                                 G_CALLBACK (start_operation_reply),
+                                                 data);
+    }
+
+  g_signal_emit_by_name (data->start_operation,
+                         "ask-question",
+                         message,
+                         choices->pdata);
+
+ out:
+  g_ptr_array_free (choices, TRUE);
+}
+
+void
+g_proxy_drive_handle_start_op_aborted (GProxyDrive        *drive,
+                                       DBusMessageIter    *iter)
+{
+  const char *start_op_id;
+  DBusStartOp *data;
+
+  dbus_message_iter_get_basic (iter, &start_op_id);
+  dbus_message_iter_next (iter);
+
+  data = g_hash_table_lookup (drive->hash_start_op_id_to_data, start_op_id);
+
+  /* since eavesdropping is enabled on the session bus we get this signal even if it
+   * is for another application; so silently ignore it if it's not for us
+   */
+  if (data == NULL)
+    goto out;
+
+  g_signal_emit_by_name (data->start_operation, "aborted");
+
+ out:
+  ;
+}
+
+static gboolean
+g_proxy_drive_start_finish (GDrive        *drive,
+                            GAsyncResult  *result,
+                            GError       **error)
+{
+  if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error))
+    return FALSE;
+  return TRUE;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
 static void
 poll_for_media_cb (DBusMessage *reply,
                    GError *error,
@@ -703,6 +1318,8 @@ g_proxy_drive_poll_for_media_finish (GDrive        *drive,
   return TRUE;
 }
 
+/* ---------------------------------------------------------------------------------------------------- */
+
 
 static void
 g_proxy_drive_drive_iface_init (GDriveIface *iface)
@@ -722,6 +1339,13 @@ g_proxy_drive_drive_iface_init (GDriveIface *iface)
   iface->poll_for_media_finish = g_proxy_drive_poll_for_media_finish;
   iface->get_identifier = g_proxy_drive_get_identifier;
   iface->enumerate_identifiers = g_proxy_drive_enumerate_identifiers;
+  iface->can_start = g_proxy_drive_can_start;
+  iface->start = g_proxy_drive_start;
+  iface->start_finish = g_proxy_drive_start_finish;
+  iface->can_stop = g_proxy_drive_can_stop;
+  iface->stop = g_proxy_drive_stop;
+  iface->stop_finish = g_proxy_drive_stop_finish;
+  iface->get_start_stop_type = g_proxy_drive_get_start_stop_type;
 }
 
 void

@@ -639,7 +639,11 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
   else  if (dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveChanged") ||
             dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveConnected") ||
             dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveDisconnected") ||
-            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveEjectButton"))
+            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveEjectButton") ||
+            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveStopButton") ||
+            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "StartOpAskPassword") ||
+            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "StartOpAskQuestion") ||
+            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "StartOpAborted"))
     {
 
       dbus_message_iter_init (message, &iter);
@@ -692,6 +696,33 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
               signal_emit_in_idle (drive, "eject-button", NULL);
               signal_emit_in_idle (monitor, "drive-eject-button", drive);
             }
+        }
+      else if (strcmp (member, "DriveStopButton") == 0)
+        {
+          drive = g_hash_table_lookup (monitor->drives, id);
+          if (drive != NULL)
+            {
+              signal_emit_in_idle (drive, "stop-button", NULL);
+              signal_emit_in_idle (monitor, "drive-stop-button", drive);
+            }
+        }
+      else if (strcmp (member, "StartOpAskPassword") == 0)
+        {
+          drive = g_hash_table_lookup (monitor->drives, id);
+          if (drive != NULL)
+            g_proxy_drive_handle_start_op_ask_password (drive, &iter);
+        }
+      else if (strcmp (member, "StartOpAskQuestion") == 0)
+        {
+          drive = g_hash_table_lookup (monitor->drives, id);
+          if (drive != NULL)
+            g_proxy_drive_handle_start_op_ask_question (drive, &iter);
+        }
+      else if (strcmp (member, "StartOpAborted") == 0)
+        {
+          drive = g_hash_table_lookup (monitor->drives, id);
+          if (drive != NULL)
+            g_proxy_drive_handle_start_op_aborted (drive, &iter);
         }
 
     }
