@@ -31,6 +31,7 @@
 static char *attributes = NULL;
 static gboolean show_hidden = FALSE;
 static gboolean show_long = FALSE;
+static gboolean nofollow_symlinks = FALSE;
 static char *show_completions = NULL;
 
 static GOptionEntry entries[] = 
@@ -39,6 +40,7 @@ static GOptionEntry entries[] =
 	{ "hidden", 'h', 0, G_OPTION_ARG_NONE, &show_hidden, "Show hidden files", NULL },
         { "long", 'l', 0, G_OPTION_ARG_NONE, &show_long, "Use a long listing format", NULL },
         { "show-completions", 'c', 0, G_OPTION_ARG_STRING, &show_completions, "Show completions", NULL}, 
+        { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, "Don't follow symlinks", NULL},
 	{ NULL }
 };
 
@@ -137,7 +139,11 @@ list (GFile *file)
     return;
 
   error = NULL;
-  enumerator = g_file_enumerate_children (file, attributes, 0, NULL, &error);
+  enumerator = g_file_enumerate_children (file,
+                                          attributes, 
+                                          nofollow_symlinks ? G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS : 0,
+                                          NULL,
+                                          &error);
   if (enumerator == NULL)
     {
       g_printerr ("Error: %s\n", error->message);
@@ -328,7 +334,7 @@ print_completions (const char *arg)
       enumerator = g_file_enumerate_children (parent, 
                                               G_FILE_ATTRIBUTE_STANDARD_NAME ","
                                               G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                                              0, 
+                                              nofollow_symlinks ? G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS : 0,
                                               NULL, 
                                               NULL);
       if (enumerator != NULL)
