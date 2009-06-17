@@ -9,6 +9,7 @@
 
 #include "metatree.h"
 #include <glib.h>
+#include <glib/gstdio.h>
 #include "crc32.h"
 
 #define MAGIC "\xda\x1ameta"
@@ -1639,4 +1640,326 @@ meta_tree_set_stringv (MetaTree                         *tree,
 		       const char                      **value)
 {
   return FALSE;
+}
+
+static char *
+canonicalize_filename (const char *filename)
+{
+  char *canon, *start, *p, *q;
+  char *cwd;
+  int i;
+
+  if (!g_path_is_absolute (filename))
+    {
+      cwd = g_get_current_dir ();
+      canon = g_build_filename (cwd, filename, NULL);
+      g_free (cwd);
+    }
+  else
+    canon = g_strdup (filename);
+
+  start = (char *)g_path_skip_root (canon);
+
+  if (start == NULL)
+    {
+      /* This shouldn't really happen, as g_get_current_dir() should
+	 return an absolute pathname, but bug 573843 shows this is
+	 not always happening */
+      g_free (canon);
+      return g_build_filename (G_DIR_SEPARATOR_S, filename, NULL);
+    }
+
+  /* POSIX allows double slashes at the start to
+   * mean something special (as does windows too).
+   * So, "//" != "/", but more than two slashes
+   * is treated as "/".
+   */
+  i = 0;
+  for (p = start - 1;
+       (p >= canon) &&
+	 G_IS_DIR_SEPARATOR (*p);
+       p--)
+    i++;
+  if (i > 2)
+    {
+      i -= 1;
+      start -= i;
+      memmove (start, start+i, strlen (start+i)+1);
+    }
+
+  p = start;
+  while (*p != 0)
+    {
+      if (p[0] == '.' && (p[1] == 0 || G_IS_DIR_SEPARATOR (p[1])))
+	{
+	  memmove (p, p+1, strlen (p+1)+1);
+	}
+      else if (p[0] == '.' && p[1] == '.' && (p[2] == 0 || G_IS_DIR_SEPARATOR (p[2])))
+	{
+	  q = p + 2;
+	  /* Skip previous separator */
+	  p = p - 2;
+	  if (p < start)
+	    p = start;
+	  while (p > start && !G_IS_DIR_SEPARATOR (*p))
+	    p--;
+	  if (G_IS_DIR_SEPARATOR (*p))
+	    *p++ = G_DIR_SEPARATOR;
+	  memmove (p, q, strlen (q)+1);
+	}
+      else
+	{
+	  /* Skip until next separator */
+	  while (*p != 0 && !G_IS_DIR_SEPARATOR (*p))
+	    p++;
+
+	  if (*p != 0)
+	    {
+	      /* Canonicalize one separator */
+	      *p++ = G_DIR_SEPARATOR;
+	    }
+	}
+
+      /* Remove additional separators */
+      q = p;
+      while (*q && G_IS_DIR_SEPARATOR (*q))
+	q++;
+
+      if (p != q)
+	memmove (p, q, strlen (q)+1);
+    }
+
+  /* Remove trailing slashes */
+  if (p > start && G_IS_DIR_SEPARATOR (*(p-1)))
+    *(p-1) = 0;
+
+  return canon;
+}
+
+static char *
+strip_trailing_slashes (const char *path)
+{
+  char *path_copy;
+  int len;
+
+  path_copy = g_strdup (path);
+  len = strlen (path_copy);
+  while (len > 1 && path_copy[len-1] == '/')
+    path_copy[--len] = 0;
+
+  return path_copy;
+ }
+
+static char *
+expand_symlink (const char *link)
+{
+  char *resolved, *canonical, *parent, *link2;
+  char symlink_value[4096];
+  ssize_t res;
+
+  res = readlink (link, symlink_value, sizeof (symlink_value) - 1);
+
+  if (res == -1)
+    return g_strdup (link);
+  symlink_value[res] = 0;
+
+  if (g_path_is_absolute (symlink_value))
+    return canonicalize_filename (symlink_value);
+  else
+    {
+      link2 = strip_trailing_slashes (link);
+      parent = g_path_get_dirname (link2);
+      g_free (link2);
+
+      resolved = g_build_filename (parent, symlink_value, NULL);
+      g_free (parent);
+
+      canonical = canonicalize_filename (resolved);
+
+      g_free (resolved);
+
+      return canonical;
+    }
+}
+
+static char *
+split_filename (const char *path, char **basename)
+{
+  char *parent;
+  char *path_copy;
+
+  path_copy = strip_trailing_slashes (path);
+
+  parent = g_path_get_dirname (path_copy);
+  if (strcmp (parent, ".") == 0 ||
+      strcmp (parent, path_copy) == 0)
+    {
+      *basename = NULL;
+      g_free (parent);
+      g_free (path_copy);
+      return NULL;
+    }
+  *basename = g_path_get_basename (path_copy);
+  g_free (path_copy);
+
+  return parent;
+}
+
+static void
+expand_all (char **path,
+	    dev_t *path_dev)
+{
+  char *tmp;
+  struct stat path_stat;
+  int num_recursions;
+
+  num_recursions = 0;
+  do {
+    if (g_lstat (*path, &path_stat) != 0)
+      {
+	*path_dev = 0;
+	return;
+      }
+
+    if (S_ISLNK (path_stat.st_mode))
+      {
+	tmp = *path;
+	*path = expand_symlink (*path);
+	g_free (tmp);
+      }
+
+    num_recursions++;
+    if (num_recursions > 12)
+      break;
+  } while (S_ISLNK (path_stat.st_mode));
+
+  *path_dev = path_stat.st_dev;
+}
+
+static char *
+join_path_list (GList *list)
+{
+  GList *l;
+  gsize len;
+  char *str;
+
+  len = 0;
+  for (l = list; l != NULL; l = l->next)
+    len += strlen (l->data) + 1;
+
+  str = malloc (len);
+  *str = 0;
+
+  for (l = list; l != NULL; l = l->next)
+    {
+      strcat (str, l->data);
+      if (l->next != NULL)
+	strcat (str, "/");
+    }
+
+  return str;
+}
+
+typedef struct {
+  char *dirname;
+
+  char *mountpoint;
+  char *prefix;
+} MountpointCache;
+
+struct _MetaLookupCache {
+  GList *mountpoint_cache;
+};
+
+static const char *
+find_mountpoint_for (MetaLookupCache *cache,
+		     const char *file,
+		     dev_t       dev,
+		     char      **prefix_out)
+{
+  char *first_dir, *dir, *first_basename, *basename, *last;
+  dev_t dir_dev;
+  GList *basenames, *l;
+  MountpointCache *c;
+
+  basenames = NULL;
+  first_dir = split_filename (file, &first_basename);
+
+  for (l = cache->mountpoint_cache; l != NULL; l = l->next)
+    {
+      c = l->data;
+      if (g_strcmp0 (c->dirname, first_dir) == 0)
+	goto out;
+    }
+
+  basename = NULL;
+  dir = g_strdup (first_dir);
+  last = g_strdup (file);
+  while (1)
+    {
+      expand_all (&dir, &dir_dev);
+      if (dev != dir_dev)
+	{
+	  g_free (basename);
+	  g_free (dir);
+
+	  c = g_new (MountpointCache, 1);
+	  c->dirname = g_strdup (first_dir);
+	  c->mountpoint = last;
+	  c->prefix = join_path_list (basenames);
+	  cache->mountpoint_cache = g_list_prepend (cache->mountpoint_cache, c);
+
+	  g_list_foreach (basenames, (GFunc)g_free, NULL);
+	  g_list_free (basenames);
+
+	  break;
+	}
+      if (basename)
+	basenames = g_list_prepend (basenames, basename);
+
+      g_free (last);
+      last = dir;
+      dir = split_filename (last, &basename);
+    }
+
+ out:
+  *prefix_out = g_build_filename (c->prefix, first_basename, NULL);
+  g_free (first_dir);
+  g_free (first_basename);
+  return c->mountpoint;
+}
+
+MetaLookupCache *
+meta_lookup_cache_new (void)
+{
+  MetaLookupCache *cache;
+
+  cache = g_new0 (MetaLookupCache, 1);
+
+  return cache;
+}
+
+void
+meta_lookup_cache_free (MetaLookupCache *cache)
+{
+  g_free (cache);
+}
+
+
+MetaTree *
+meta_lookup_cache_lookup (MetaLookupCache *cache,
+			  const char *filename,
+			  guint64 device)
+{
+  const char *mountpoint;
+  char *prefix;
+
+  mountpoint = find_mountpoint_for (cache,
+				    filename,
+				    device,
+				    &prefix);
+
+  /* TODO: more work */
+  g_print ("mountpoint: %s, prefix: %s\n", mountpoint, prefix);
+  return NULL;
 }
