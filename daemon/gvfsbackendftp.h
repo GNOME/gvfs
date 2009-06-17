@@ -38,7 +38,7 @@ typedef enum {
   G_VFS_FTP_FEATURE_EPSV,
   G_VFS_FTP_FEATURE_UTF8
 } GVfsFtpFeature;
-#define G_VFS_FTP_FEATURES_DEFAULT (1 << G_VFS_FTP_FEATURE_EPSV)
+#define G_VFS_FTP_FEATURES_DEFAULT (0)
 
 typedef enum {
   G_VFS_FTP_SYSTEM_UNKNOWN = 0,
