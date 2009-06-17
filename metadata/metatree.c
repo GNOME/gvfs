@@ -10,6 +10,7 @@
 #include "metatree.h"
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <errno.h>
 #include "crc32.h"
 
 #define MAGIC "\xda\x1ameta"
@@ -1871,6 +1872,182 @@ struct _MetaLookupCache {
   GList *mountpoint_cache;
 };
 
+#ifdef __linux__
+static gboolean
+mountinfo_strequal_escaped (const char *s,
+			    const char *escaped)
+{
+  char c;
+  while (*s != 0 && *escaped != ' ' && *escaped != 0)
+    {
+      if (*escaped == '\\')
+	{
+	  escaped++;
+	  c = *escaped++ - '0';
+	  c <<= 3;
+	  c |= *escaped++ - '0';
+	  c <<= 3;
+	  c |= *escaped++ - '0';
+	}
+      else
+	c = *escaped++;
+
+      if (c != *s++)
+	return FALSE;
+    }
+  if (*s == 0 && (*escaped == 0 || *escaped == ' '))
+    return TRUE;
+  return FALSE;
+}
+
+static char *
+mountinfo_unescape (const char *escaped)
+{
+  char *res, *s;
+  char c;
+  gsize len;
+
+  s = strchr (escaped, ' ');
+  if (s)
+    len = s - escaped;
+  else
+    len = strlen (escaped);
+  res = malloc (len + 1);
+  s = res;
+
+  while (*escaped != 0 && *escaped != ' ')
+    {
+      if (*escaped == '\\')
+	{
+	  escaped++;
+	  c = *escaped++ - '0';
+	  c <<= 3;
+	  c |= *escaped++ - '0';
+	  c <<= 3;
+	  c |= *escaped++ - '0';
+	}
+      else
+	c = *escaped++;
+      *s++ = c;
+    }
+  *s = 0;
+  return res;
+}
+
+/* We want to avoid mmap and stat as these are not ideal
+   operations for a proc file */
+static char *
+read_contents (char *filename)
+{
+  char *data;
+  gsize len;
+  gsize bytes_read;
+  int fd;
+
+  fd = open (filename, O_RDONLY);
+
+  if (fd == -1)
+    return NULL;
+
+  len = 4096;
+  data = g_malloc (len);
+
+  bytes_read = 0;
+  while (1)
+    {
+      gssize rc;
+
+      if (len - bytes_read < 100)
+	{
+	  len = len + 4096;
+	  data = g_realloc (data, len);
+	}
+
+      rc = read (fd, data + bytes_read,
+		 len - bytes_read);
+      if (rc < 0)
+	{
+	  if (errno != EINTR)
+	    {
+	      g_free (data);
+	      close (fd);
+	      return NULL;
+	    }
+	}
+      else if (rc == 0)
+	break;
+      else
+	bytes_read += rc;
+    }
+  close (fd);
+
+  /* zero terminate */
+  if (len - bytes_read < 1)
+    data = g_realloc (data, bytes_read + 1);
+  data[bytes_read] = 0;
+
+  return (char *)data;
+}
+#endif
+
+
+static char *
+get_extra_prefix_for_mount (const char *mountpoint)
+{
+#ifdef __linux__
+  gchar *contents;
+  char *res;
+  char *line;
+  char *line_root;
+  char *line_mountpoint;
+
+  if (mountpoint &&
+      (contents = read_contents ("/proc/self/mountinfo")) != NULL)
+    {
+      line = contents;
+      while (line != NULL && *line != 0)
+	{
+	  /* parent id */
+	  line = strchr (line, ' ');
+	  line_mountpoint = NULL;
+	  if (line)
+	    {
+	      /* major:minor */
+	      line = strchr (line+1, ' ');
+	      if (line)
+		{
+		  /* root */
+		  line = strchr (line+1, ' ');
+		  line_root = line + 1;
+		  if (line)
+		    {
+		      /* mountpoint */
+		      line = strchr (line+1, ' ');
+		      line_mountpoint = line + 1;
+		    }
+		}
+	    }
+
+	  if (line_mountpoint &&
+	      mountinfo_strequal_escaped (mountpoint, line_mountpoint))
+	    {
+	      res = mountinfo_unescape (line_root);
+	      g_free (contents);
+	      return res;
+	    }
+
+	  line = strchr (line, '\n');
+	  if (line)
+	    line++;
+	}
+
+      g_free (contents);
+    }
+
+#endif
+  return NULL;
+}
+
 static const char *
 find_mountpoint_for (MetaLookupCache *cache,
 		     const char *file,
@@ -1960,6 +2137,10 @@ meta_lookup_cache_lookup (MetaLookupCache *cache,
 				    &prefix);
 
   /* TODO: more work */
-  g_print ("mountpoint: %s, prefix: %s\n", mountpoint, prefix);
+  g_print ("mountpoint: %s, prefix: %s\n",
+	   mountpoint, prefix);
+  g_print ("extra prefix: %s\n",
+	   get_extra_prefix_for_mount (mountpoint));
+
   return NULL;
 }
