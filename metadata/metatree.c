@@ -1744,24 +1744,11 @@ canonicalize_filename (const char *filename)
   return canon;
 }
 
+/* Invariant: If link is canonical, so is result */
 static char *
-strip_trailing_slashes (const char *path)
+follow_symlink (const char *link)
 {
-  char *path_copy;
-  int len;
-
-  path_copy = g_strdup (path);
-  len = strlen (path_copy);
-  while (len > 1 && path_copy[len-1] == '/')
-    path_copy[--len] = 0;
-
-  return path_copy;
- }
-
-static char *
-expand_symlink (const char *link)
-{
-  char *resolved, *canonical, *parent, *link2;
+  char *resolved, *canonical, *parent;
   char symlink_value[4096];
   ssize_t res;
 
@@ -1775,10 +1762,7 @@ expand_symlink (const char *link)
     return canonicalize_filename (symlink_value);
   else
     {
-      link2 = strip_trailing_slashes (link);
-      parent = g_path_get_dirname (link2);
-      g_free (link2);
-
+      parent = g_path_get_dirname (link);
       resolved = g_build_filename (parent, symlink_value, NULL);
       g_free (parent);
 
@@ -1790,34 +1774,24 @@ expand_symlink (const char *link)
     }
 }
 
+/* Returns parent path or NULL if none */
 static char *
-split_filename (const char *path, char **basename)
+get_dirname (const char *path)
 {
   char *parent;
-  char *path_copy;
 
-  path_copy = strip_trailing_slashes (path);
-
-  parent = g_path_get_dirname (path_copy);
+  parent = g_path_get_dirname (path);
   if (strcmp (parent, ".") == 0 ||
-      strcmp (parent, path_copy) == 0)
-    {
-      if (basename)
-	*basename = NULL;
-      g_free (parent);
-      g_free (path_copy);
-      return NULL;
-    }
-  if (basename)
-    *basename = g_path_get_basename (path_copy);
-  g_free (path_copy);
+      strcmp (parent, path) == 0)
+    return NULL;
 
   return parent;
 }
 
+/* Invariant: If path is canonical, so is result */
 static void
-expand_all (char **path,
-	    dev_t *path_dev)
+follow_symlink_recursively (char **path,
+			    dev_t *path_dev)
 {
   char *tmp;
   struct stat path_stat;
@@ -1834,7 +1808,7 @@ expand_all (char **path,
     if (S_ISLNK (path_stat.st_mode))
       {
 	tmp = *path;
-	*path = expand_symlink (*path);
+	*path = follow_symlink (*path);
 	g_free (tmp);
       }
 
@@ -1846,42 +1820,11 @@ expand_all (char **path,
   *path_dev = path_stat.st_dev;
 }
 
-static char *
-join_path_list (GList *list)
-{
-  GList *l;
-  gsize len;
-  char *str;
-
-  len = 2;
-  for (l = list; l != NULL; l = l->next)
-    len += strlen (l->data) + 1;
-
-  str = g_malloc (len);
-  str[0] = '/';
-  str[1] = 0;
-
-  for (l = list; l != NULL; l = l->next)
-    {
-      strcat (str, l->data);
-      if (l->next != NULL)
-	strcat (str, "/");
-    }
-
-  return str;
-}
-
-typedef struct {
-  char *dirname;
-
-  char *mountpoint;
-  char *prefix;
-} MountpointCache;
-
 struct _MetaLookupCache {
-  GList *mountpoint_cache;
   char *last_parent;
   char *last_parent_expanded;
+  char *last_parent_mountpoint;
+
   dev_t last_device;
   char *last_device_tree;
 };
@@ -2185,66 +2128,79 @@ get_extra_prefix_for_mount (const char *mountpoint)
   return NULL;
 }
 
-/* Expands symlinks for parents and look for a mountpoint */
+static dev_t
+get_devnum (const char *path)
+{
+  struct stat path_stat;
+
+  if (g_lstat (path, &path_stat) != 0)
+    return 0;
+
+  return path_stat.st_dev;
+}
+
+/* Expands symlinks for parents and look for a mountpoint
+ * file is symlink expanded and canonical
+ */
 static const char *
 find_mountpoint_for (MetaLookupCache *cache,
 		     const char *file,
 		     dev_t       dev,
 		     char      **prefix_out)
 {
-  char *first_dir, *dir, *first_basename, *basename, *last;
+  char *first_dir, *dir, *last;
+  const char *prefix;
   dev_t dir_dev;
-  GList *basenames, *l;
-  MountpointCache *c;
+  char *extra_prefix;
 
-  basenames = NULL;
-  first_dir = split_filename (file, &first_basename);
+  first_dir = get_dirname (file);
 
-  for (l = cache->mountpoint_cache; l != NULL; l = l->next)
-    {
-      c = l->data;
-      if (g_strcmp0 (c->dirname, first_dir) == 0)
-	goto out;
-    }
+  g_assert (cache->last_parent_expanded != NULL);
+  g_assert (strcmp (cache->last_parent_expanded, first_dir) == 0);
 
-  basename = NULL;
+  if (cache->last_parent_mountpoint != NULL)
+    goto out; /* Cache hit! */
+
   dir = g_strdup (first_dir);
-  last = strip_trailing_slashes (file);
+  last = g_strdup (file);
   while (1)
     {
-      expand_all (&dir, &dir_dev);
-      if (dev != dir_dev)
+      dir_dev = get_devnum (dir);
+      if (dir == NULL ||
+	  dev != dir_dev)
 	{
-	  g_free (basename);
 	  g_free (dir);
-
-	  c = g_new (MountpointCache, 1);
-	  c->dirname = g_strdup (first_dir);
-	  c->mountpoint = last;
-	  c->prefix = join_path_list (basenames);
-	  cache->mountpoint_cache = g_list_prepend (cache->mountpoint_cache, c);
-
-	  g_list_foreach (basenames, (GFunc)g_free, NULL);
-	  g_list_free (basenames);
-
+	  cache->last_parent_mountpoint = last;
 	  break;
 	}
-      if (basename)
-	basenames = g_list_prepend (basenames, basename);
 
       g_free (last);
       last = dir;
-      dir = split_filename (last, &basename);
+      dir = get_dirname (last);
     }
 
  out:
-  *prefix_out = g_build_filename (c->prefix, first_basename, NULL);
   g_free (first_dir);
-  g_free (first_basename);
-  return c->mountpoint;
+
+  prefix = file + strlen (cache->last_parent_mountpoint);
+  if (*prefix == 0)
+    prefix = "/";
+
+  extra_prefix = get_extra_prefix_for_mount (cache->last_parent_mountpoint);
+  if (extra_prefix)
+    {
+      *prefix_out = g_build_filename (extra_prefix, prefix, NULL);
+      g_free (extra_prefix);
+    }
+  else
+    *prefix_out = g_strdup (prefix);
+
+  return cache->last_parent_mountpoint;
 }
 
-/* Resolves all symlinks, including the ones for basename */
+/* Resolves all symlinks, including the ones for basename.
+ * Invariant: If path is canonical, so is result.
+ */
 static char *
 expand_all_symlinks (const char *path)
 {
@@ -2254,21 +2210,20 @@ expand_all_symlinks (const char *path)
   char *path_copy;
 
   path_copy = g_strdup (path);
-  expand_all (&path_copy, &dev);
+  follow_symlink_recursively (&path_copy, &dev);
 
-  parent = split_filename (path_copy, &basename);
-
+  parent = get_dirname (path_copy);
   if (parent)
     {
       parent_expanded = expand_all_symlinks (parent);
+      basename = g_path_get_basename (path_copy);
       res = g_build_filename (parent_expanded, basename, NULL);
       g_free (parent_expanded);
+      g_free (basename);
+      g_free (parent);
     }
   else
     res = path_copy;
-
-  g_free (parent);
-  g_free (basename);
 
   return res;
 }
@@ -2288,6 +2243,7 @@ meta_lookup_cache_free (MetaLookupCache *cache)
 {
   g_free (cache->last_parent);
   g_free (cache->last_parent_expanded);
+  g_free (cache->last_parent_mountpoint);
   g_free (cache);
 }
 
@@ -2340,7 +2296,9 @@ expand_parents (MetaLookupCache *cache,
       g_free (cache->last_parent);
       cache->last_parent = parent;
       cache->last_parent_expanded = expand_all_symlinks (parent);
-    }
+      g_free (cache->last_parent_mountpoint);
+      cache->last_parent_mountpoint = NULL;
+   }
   else
     g_free (parent);
 
@@ -2399,7 +2357,7 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
   if (treename)
     {
       mountpoint = find_mountpoint_for (cache,
-					filename,
+					expanded,
 					device,
 					&prefix);
 
@@ -2409,16 +2367,6 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 	  /* Fall back to root */
 	  g_free (prefix);
 	  treename = NULL;
-	}
-      else
-	{
-	  extra_prefix = get_extra_prefix_for_mount (mountpoint);
-	  if (extra_prefix)
-	    {
-	      char *t = prefix;
-	      prefix = g_build_filename (extra_prefix, prefix, NULL);
-	      g_free (t);
-	    }
 	}
     }
 
