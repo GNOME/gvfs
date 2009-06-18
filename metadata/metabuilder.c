@@ -27,6 +27,14 @@ meta_builder_new (void)
   return builder;
 }
 
+void
+meta_builder_free (MetaBuilder *builder)
+{
+  if (builder->root)
+    metafile_free (builder->root);
+  g_free (builder);
+}
+
 static gint
 compare_metafile (gconstpointer  a,
 		  gconstpointer  b)
@@ -62,6 +70,32 @@ metafile_new (const char *name,
 					     compare_metafile);
 
   return f;
+}
+
+static void
+metadata_free (MetaData *data)
+{
+  g_free (data->key);
+  if (data->is_list)
+    {
+      g_list_foreach (data->values, (GFunc)g_free, NULL);
+      g_list_free (data->values);
+    }
+  else
+    g_free (data->value);
+
+  g_free (data);
+}
+
+void
+metafile_free (MetaFile *file)
+{
+  g_free (file->name);
+  g_list_foreach (file->children, (GFunc)metafile_free, NULL);
+  g_list_free (file->children);
+  g_list_foreach (file->data, (GFunc)metadata_free, NULL);
+  g_list_free (file->data);
+  g_free (file);
 }
 
 MetaFile *
@@ -351,7 +385,7 @@ metafile_collect_keywords (MetaFile *file,
     }
 }
 
-GHashTable *
+static GHashTable *
 string_block_begin (void)
 {
   return g_hash_table_new (g_str_hash, g_str_equal);
@@ -537,7 +571,7 @@ write_metadata (GString *out,
     }
 }
 
-gboolean
+static gboolean
 write_all_data_and_close (int fd, char *data, gsize len)
 {
   gsize written;

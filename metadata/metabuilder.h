@@ -29,6 +29,7 @@ struct _MetaData {
 };
 
 MetaBuilder *meta_builder_new       (void);
+void         meta_builder_free      (MetaBuilder *builder);
 void         meta_builder_print     (MetaBuilder *builder);
 MetaFile *   meta_builder_lookup    (MetaBuilder *builder,
 				     const char  *path,
@@ -37,6 +38,7 @@ gboolean     meta_builder_write     (MetaBuilder *builder,
 				     const char  *filename);
 MetaFile *   metafile_new           (const char  *name,
 				     MetaFile    *parent);
+void         metafile_free          (MetaFile    *file);
 MetaFile *   metafile_lookup_child  (MetaFile    *metafile,
 				     const char  *name,
 				     gboolean     create);
