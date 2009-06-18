@@ -9,6 +9,7 @@
 #include <time.h>
 
 #include "metatree.h"
+#include "metabuilder.h"
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <errno.h>
@@ -234,11 +235,33 @@ meta_tree_init (MetaTree *tree)
   int fd;
   void *data;
   guint32 *attributes;
+  gboolean retried;
   int i;
 
+  retried = FALSE;
+ retry:
   fd = open (tree->filename, O_RDONLY);
   if (fd == -1)
-    return FALSE;
+    {
+      if (tree->for_write && !retried)
+	{
+	  MetaBuilder *builder;
+	  char *dir;
+
+	  dir = g_path_get_dirname (tree->filename);
+	  g_mkdir_with_parents (dir, 0700);
+
+	  builder = meta_builder_new ();
+	  retried = TRUE;
+	  if (meta_builder_write (builder, tree->filename))
+	    {
+	      meta_builder_free (builder);
+	      goto retry;
+	    }
+	  meta_builder_free (builder);
+	}
+      return FALSE;
+    }
 
   if (fstat (fd, &statbuf) != 0 ||
       statbuf.st_size < sizeof (MetaFileHeader))
