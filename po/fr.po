@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-14 16:00+0100\n"
-"PO-Revision-Date: 2009-02-14 16:16+0100\n"
+"PO-Revision-Date: 2009-06-18 18:16+0200\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -1523,20 +1523,22 @@ msgstr ""
 "L'éjection du média a échoué ; un ou plusieurs volumes sont en cours "
 "d'utilisation sur le média."
 
+# gvfs utilise les préfixes SI
+# voir aussi #550100
 #: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
 #, c-format
 msgid "%.1f kB"
-msgstr "%.1f Kio"
+msgstr "%.1f Ko"
 
 #: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:176
 #, c-format
 msgid "%.1f MB"
-msgstr "%.1f Mio"
+msgstr "%.1f Mo"
 
 #: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:181
 #, c-format
 msgid "%.1f GB"
-msgstr "%.1f Gio"
+msgstr "%.1f Go"
 
 #: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:252
 msgid "Mixed Audio/Data Disc"
