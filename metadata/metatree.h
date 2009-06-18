@@ -26,9 +26,10 @@ MetaTree        *meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 						const char *filename,
 						guint64 device);
 
-void      meta_tree_free    (MetaTree   *tree);
 MetaTree *meta_tree_open    (const char *filename,
 			     gboolean    for_write);
+MetaTree *meta_tree_ref     (MetaTree   *tree);
+void      meta_tree_unref   (MetaTree   *tree);
 void      meta_tree_refresh (MetaTree   *tree); /* May invalidates all strings */
 
 

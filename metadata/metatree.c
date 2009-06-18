@@ -104,6 +104,7 @@ typedef struct {
 } MetaJournal;
 
 struct _MetaTree {
+  int refcount;
   char *filename;
   gboolean for_write;
 
@@ -226,14 +227,6 @@ meta_tree_clear (MetaTree *tree)
     }
 }
 
-void
-meta_tree_free (MetaTree *tree)
-{
-  meta_tree_clear (tree);
-  g_free (tree->filename);
-  g_free (tree);
-}
-
 static gboolean
 meta_tree_init (MetaTree *tree)
 {
@@ -320,15 +313,35 @@ meta_tree_open (const char *filename,
   g_assert (sizeof (MetaFileDataEnt) == 8);
 
   tree = g_new0 (MetaTree, 1);
+  tree->refcount = 1;
   tree->filename = g_strdup (filename);
   tree->for_write = for_write;
 
   if (!meta_tree_init (tree))
     {
-      meta_tree_free (tree);
+      meta_tree_unref (tree);
       return NULL;
     }
   return tree;
+}
+
+MetaTree *
+meta_tree_ref (MetaTree *tree)
+{
+  tree->refcount++;
+  return tree;
+}
+
+void
+meta_tree_unref (MetaTree *tree)
+{
+  tree->refcount--;
+  if (tree->refcount == 0)
+    {
+      meta_tree_clear (tree);
+      g_free (tree->filename);
+      g_free (tree);
+    }
 }
 
 void
