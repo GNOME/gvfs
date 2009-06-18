@@ -2,6 +2,7 @@ NULL =
 
 INCLUDES = -I$(top_srcdir) \
 	-I$(top_srcdir)/client \
+	-I$(top_srcdir)/metadata \
 	-I$(top_srcdir)/common \
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
@@ -51,7 +52,7 @@ giomodules_LTLIBRARIES = libgvfsdbus.la
 
 libgvfsdbus_la_LDFLAGS = $(module_flags)
 libgvfsdbus_la_SOURCES = $(vfssources)
-libgvfsdbus_la_LIBADD  = $(vfslibs)
+libgvfsdbus_la_LIBADD  = $(vfslibs) ../metadata/libmetadata.la
 
 noinst_PROGRAMS = test-uri-utils
 

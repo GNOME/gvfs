@@ -24,6 +24,7 @@
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <dbus/dbus.h>
 #include "gdaemonvfs.h"
 #include "gvfsuriutils.h"
@@ -38,7 +39,9 @@
 #include "gdaemonvolumemonitor.h"
 #include "gvfsicon.h"
 #include "gvfsiconloadable.h"
+#include "metatree.h"
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 typedef struct  {
   char *type;
@@ -1066,6 +1069,352 @@ g_daemon_vfs_parse_name (GVfs       *vfs,
   return file;
 }
 
+static gboolean
+enumerate_keys_callback (const char *key,
+			 MetaKeyType type,
+			 gpointer value,
+			 gpointer user_data)
+{
+  GFileInfo  *info = user_data;
+  char *attr;
+
+  attr = g_strconcat ("metadata::", key, NULL);
+
+  if (type == META_KEY_TYPE_STRING)
+    g_file_info_set_attribute_string (info, attr, (char *)value);
+  else
+    g_file_info_set_attribute_stringv (info, attr, (char **)value);
+
+  g_free (attr);
+
+  return TRUE;
+}
+
+static void
+g_daemon_vfs_local_file_add_info (GVfs       *vfs,
+				  const char *filename,
+				  guint64     device,
+				  GFileAttributeMatcher *matcher,
+				  GFileInfo  *info,
+				  GCancellable *cancellable,
+				  gpointer    *extra_data,
+				  GDestroyNotify *extra_data_free)
+{
+  MetaLookupCache *cache;
+  const char *first;
+  char *tree_path;
+  gboolean all;
+  MetaTree *tree;
+
+  /* Filename may or may not be a symlink, but we should not follow it.
+     However, we want to follow symlinks for all parents that have the same
+     device node */
+  all = g_file_attribute_matcher_enumerate_namespace (matcher, "metadata");
+
+  first = NULL;
+  if (!all)
+    {
+      first = g_file_attribute_matcher_enumerate_next (matcher);
+
+      if (first == NULL)
+	return; /* No match */
+    }
+
+  if (*extra_data == NULL)
+    {
+      *extra_data = meta_lookup_cache_new ();
+      *extra_data_free = (GDestroyNotify)meta_lookup_cache_free;
+    }
+  cache = (MetaLookupCache *)*extra_data;
+
+  tree = meta_lookup_cache_lookup_path (cache,
+					filename,
+					device,
+					FALSE,
+					&tree_path);
+
+  if (tree)
+    {
+      meta_tree_enumerate_keys (tree, tree_path,
+				enumerate_keys_callback, info);
+      meta_tree_unref (tree);
+      g_free (tree_path);
+    }
+}
+
+static void
+g_daemon_vfs_add_writable_namespaces (GVfs       *vfs,
+				      GFileAttributeInfoList *list)
+{
+  g_file_attribute_info_list_add (list,
+				  "metadata",
+				  G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
+				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+}
+
+static void
+send_message_oneway (DBusMessage *message)
+{
+  DBusConnection *connection;
+
+  connection = _g_dbus_connection_get_sync (NULL, NULL);
+  if (connection == NULL)
+    return;
+
+  dbus_connection_send (connection, message, NULL);
+  dbus_connection_flush (connection);
+}
+
+static gboolean
+send_message (DBusMessage *message,
+	      GCancellable *cancellable,
+	      GError **error)
+{
+  DBusConnection *connection;
+  DBusError derror;
+  DBusMessage *reply;
+
+  connection = _g_dbus_connection_get_sync (NULL, NULL);
+  if (connection == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_FAILED,
+		   _("Error setting file metadata: %s"),
+		   _("Can't contact session bus"));
+      return FALSE;
+    }
+
+  dbus_error_init (&derror);
+  /* TODO: Handle cancellable */
+  reply = dbus_connection_send_with_reply_and_block (connection, message,
+						     G_VFS_DBUS_TIMEOUT_MSECS,
+						     &derror);
+  if (!reply)
+    {
+      _g_error_from_dbus (&derror, error);
+      dbus_error_free (&derror);
+      return FALSE;
+    }
+
+  dbus_message_unref (reply);
+
+  return TRUE;
+}
+
+static gboolean
+g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
+					const char *filename,
+					GFileInfo  *info,
+					GFileQueryInfoFlags flags,
+					GCancellable *cancellable,
+					GError    **error)
+{
+  GFileAttributeType type;
+  MetaLookupCache *cache;
+  const char *metatreefile;
+  struct stat statbuf;
+  char **attributes;
+  char *tree_path;
+  char *key;
+  MetaTree *tree;
+  int errsv;
+  int i;
+  DBusMessage *message;
+  gboolean res;
+
+  res = TRUE;
+  if (g_file_info_has_namespace (info, "metadata"))
+    {
+      attributes = g_file_info_list_attributes (info, "metadata");
+
+      if (g_lstat (filename, &statbuf) != 0)
+	{
+	  errsv = errno;
+	  g_set_error (error, G_IO_ERROR,
+		       g_io_error_from_errno (errsv),
+		       _("Error setting file metadata: %s"),
+		       g_strerror (errsv));
+	  error = NULL; /* Don't set further errors */
+
+	  for (i = 0; attributes[i] != NULL; i++)
+	    g_file_info_set_attribute_status (info, attributes[i],
+					      G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+
+	  res = FALSE;
+	}
+      else
+	{
+	  cache = meta_lookup_cache_new ();
+	  tree = meta_lookup_cache_lookup_path (cache,
+						filename,
+						statbuf.st_dev,
+						FALSE,
+						&tree_path);
+	  message =
+	    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
+					  G_VFS_DBUS_METADATA_PATH,
+					  G_VFS_DBUS_METADATA_INTERFACE,
+					  G_VFS_DBUS_METADATA_OP_SET);
+	  g_assert (message != NULL);
+	  metatreefile = meta_tree_get_filename (tree);
+	  _g_dbus_message_append_args (message,
+				       G_DBUS_TYPE_CSTRING, &metatreefile,
+				       G_DBUS_TYPE_CSTRING, &tree_path,
+				       0);
+	  meta_lookup_cache_free (cache);
+	  meta_tree_unref (tree);
+	  g_free (tree_path);
+
+	  for (i = 0; attributes[i] != NULL; i++)
+	    {
+	      key = attributes[i] + strlen ("metadata::");
+	      type = g_file_info_get_attribute_type (info, attributes[i]);
+	      if (type == G_FILE_ATTRIBUTE_TYPE_STRING)
+		{
+		  const char *val = g_file_info_get_attribute_string (info, attributes[i]);
+		  _g_dbus_message_append_args (message,
+					       DBUS_TYPE_STRING, &key,
+					       DBUS_TYPE_STRING, &val,
+					       0);
+		  g_file_info_set_attribute_status (info, attributes[i],
+						    G_FILE_ATTRIBUTE_STATUS_SET);
+		}
+	      else if (type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
+		{
+		  char **val = g_file_info_get_attribute_stringv (info, attributes[i]);
+		  _g_dbus_message_append_args (message,
+					       DBUS_TYPE_STRING, &key,
+					       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
+					       0);
+		  g_file_info_set_attribute_status (info, attributes[i],
+						    G_FILE_ATTRIBUTE_STATUS_SET);
+		}
+	      else
+		{
+		  res = FALSE;
+		  g_set_error (error, G_IO_ERROR,
+			       G_IO_ERROR_INVALID_ARGUMENT,
+			       _("Error setting file metadata: %s"),
+			       _("values must be string or list of strings"));
+		  error = NULL; /* Don't set further errors */
+		  g_file_info_set_attribute_status (info, attributes[i],
+						    G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+		}
+	    }
+
+	  if (!send_message (message,
+			     cancellable, error))
+	    {
+	      res = FALSE;
+	      error = NULL; /* Don't set further errors */
+	      for (i = 0; attributes[i] != NULL; i++)
+		g_file_info_set_attribute_status (info, attributes[i],
+						  G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+	    }
+
+	  dbus_message_unref (message);
+	}
+
+      g_strfreev (attributes);
+    }
+
+  return res;
+}
+
+static void
+g_daemon_vfs_local_file_removed (GVfs       *vfs,
+				 const char *filename)
+{
+  MetaLookupCache *cache;
+  DBusMessage *message;
+  const char *metatreefile;
+  MetaTree *tree;
+  char *tree_path;
+
+  cache = meta_lookup_cache_new ();
+  tree = meta_lookup_cache_lookup_path (cache,
+					filename,
+					0,
+					FALSE,
+					&tree_path);
+  if (tree)
+    {
+      message =
+	dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
+				      G_VFS_DBUS_METADATA_PATH,
+				      G_VFS_DBUS_METADATA_INTERFACE,
+				      G_VFS_DBUS_METADATA_OP_REMOVE);
+      g_assert (message != NULL);
+      metatreefile = meta_tree_get_filename (tree);
+      _g_dbus_message_append_args (message,
+				   G_DBUS_TYPE_CSTRING, &metatreefile,
+				   G_DBUS_TYPE_CSTRING, &tree_path,
+				   0);
+      send_message_oneway (message);
+      dbus_message_unref (message);
+      meta_tree_unref (tree);
+      g_free (tree_path);
+    }
+
+  meta_lookup_cache_free (cache);
+}
+
+static void
+g_daemon_vfs_local_file_moved (GVfs       *vfs,
+			       const char *source,
+			       const char *dest)
+{
+  MetaLookupCache *cache;
+  DBusMessage *message;
+  const char *metatreefile;
+  MetaTree *tree1, *tree2;
+  char *tree_path1, *tree_path2;
+
+  cache = meta_lookup_cache_new ();
+  tree1 = meta_lookup_cache_lookup_path (cache,
+					 source,
+					 0,
+					 FALSE,
+					 &tree_path1);
+  tree2 = meta_lookup_cache_lookup_path (cache,
+					 dest,
+					 0,
+					 FALSE,
+					 &tree_path2);
+  if (tree1 && tree2 && tree1 == tree2)
+    {
+      message =
+	dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
+				      G_VFS_DBUS_METADATA_PATH,
+				      G_VFS_DBUS_METADATA_INTERFACE,
+				      G_VFS_DBUS_METADATA_OP_MOVE);
+      g_assert (message != NULL);
+      metatreefile = meta_tree_get_filename (tree1);
+      _g_dbus_message_append_args (message,
+				   G_DBUS_TYPE_CSTRING, &metatreefile,
+				   G_DBUS_TYPE_CSTRING, &tree_path1,
+				   G_DBUS_TYPE_CSTRING, &tree_path2,
+				   0);
+      send_message_oneway (message);
+      dbus_message_unref (message);
+    }
+
+  if (tree1)
+    {
+      meta_tree_unref (tree1);
+      g_free (tree_path1);
+    }
+
+  if (tree2)
+    {
+      meta_tree_unref (tree2);
+      g_free (tree_path2);
+    }
+
+  meta_lookup_cache_free (cache);
+}
+
 DBusConnection *
 _g_daemon_vfs_get_async_bus (void)
 {
@@ -1089,11 +1438,11 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
 {
   GObjectClass *object_class;
   GVfsClass *vfs_class;
-  
+
   object_class = (GObjectClass *) class;
 
   g_daemon_vfs_parent_class = g_type_class_peek_parent (class);
-  
+
   object_class->finalize = g_daemon_vfs_finalize;
 
   vfs_class = G_VFS_CLASS (class);
@@ -1103,6 +1452,11 @@ g_daemon_vfs_class_init (GDaemonVfsClass *class)
   vfs_class->get_file_for_uri = g_daemon_vfs_get_file_for_uri;
   vfs_class->get_supported_uri_schemes = g_daemon_vfs_get_supported_uri_schemes;
   vfs_class->parse_name = g_daemon_vfs_parse_name;
+  vfs_class->local_file_add_info = g_daemon_vfs_local_file_add_info;
+  vfs_class->add_writable_namespaces = g_daemon_vfs_add_writable_namespaces;
+  vfs_class->local_file_set_attributes = g_daemon_vfs_local_file_set_attributes;
+  vfs_class->local_file_removed = g_daemon_vfs_local_file_removed;
+  vfs_class->local_file_moved = g_daemon_vfs_local_file_moved;
 }
 
 /* Module API */
