@@ -11,6 +11,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <errno.h>
+#include <poll.h>
 #include "crc32.h"
 
 #define MAGIC "\xda\x1ameta"
@@ -1873,31 +1874,62 @@ struct _MetaLookupCache {
 };
 
 #ifdef __linux__
-static gboolean
-mountinfo_strequal_escaped (const char *s,
-			    const char *escaped)
-{
-  char c;
-  while (*s != 0 && *escaped != ' ' && *escaped != 0)
-    {
-      if (*escaped == '\\')
-	{
-	  escaped++;
-	  c = *escaped++ - '0';
-	  c <<= 3;
-	  c |= *escaped++ - '0';
-	  c <<= 3;
-	  c |= *escaped++ - '0';
-	}
-      else
-	c = *escaped++;
 
-      if (c != *s++)
-	return FALSE;
+typedef struct {
+  char *mountpoint;
+  char *root;
+} MountinfoEntry;
+
+static gboolean mountinfo_initialized = FALSE;
+static int mountinfo_fd = -1;
+static MountinfoEntry *mountinfo_roots = NULL;
+G_LOCK_DEFINE_STATIC (mountinfo);
+
+/* We want to avoid mmap and stat as these are not ideal
+   operations for a proc file */
+static char *
+read_contents (int fd)
+{
+  char *data;
+  gsize len;
+  gsize bytes_read;
+
+  len = 4096;
+  data = g_malloc (len);
+
+  bytes_read = 0;
+  while (1)
+    {
+      gssize rc;
+
+      if (len - bytes_read < 100)
+	{
+	  len = len + 4096;
+	  data = g_realloc (data, len);
+	}
+
+      rc = read (fd, data + bytes_read,
+		 len - bytes_read);
+      if (rc < 0)
+	{
+	  if (errno != EINTR)
+	    {
+	      g_free (data);
+	      return NULL;
+	    }
+	}
+      else if (rc == 0)
+	break;
+      else
+	bytes_read += rc;
     }
-  if (*s == 0 && (*escaped == 0 || *escaped == ' '))
-    return TRUE;
-  return FALSE;
+
+  /* zero terminate */
+  if (len - bytes_read < 1)
+    data = g_realloc (data, bytes_read + 1);
+  data[bytes_read] = 0;
+
+  return (char *)data;
 }
 
 static char *
@@ -1934,60 +1966,140 @@ mountinfo_unescape (const char *escaped)
   return res;
 }
 
-/* We want to avoid mmap and stat as these are not ideal
-   operations for a proc file */
-static char *
-read_contents (char *filename)
+static MountinfoEntry *
+parse_mountinfo (const char *contents)
 {
-  char *data;
-  gsize len;
-  gsize bytes_read;
-  int fd;
+  GArray *a;
+  const char *line;
+  const char *line_root;
+  const char *line_mountpoint;
 
-  fd = open (filename, O_RDONLY);
+  a = g_array_new (TRUE, TRUE, sizeof (MountinfoEntry));
 
-  if (fd == -1)
-    return NULL;
-
-  len = 4096;
-  data = g_malloc (len);
-
-  bytes_read = 0;
-  while (1)
+  line = contents;
+  while (line != NULL && *line != 0)
     {
-      gssize rc;
-
-      if (len - bytes_read < 100)
+      /* parent id */
+      line = strchr (line, ' ');
+      line_mountpoint = NULL;
+      if (line)
 	{
-	  len = len + 4096;
-	  data = g_realloc (data, len);
-	}
-
-      rc = read (fd, data + bytes_read,
-		 len - bytes_read);
-      if (rc < 0)
-	{
-	  if (errno != EINTR)
+	  /* major:minor */
+	  line = strchr (line+1, ' ');
+	  if (line)
 	    {
-	      g_free (data);
-	      close (fd);
-	      return NULL;
+	      /* root */
+	      line = strchr (line+1, ' ');
+	      line_root = line + 1;
+	      if (line)
+		{
+		  /* mountpoint */
+		  line = strchr (line+1, ' ');
+		  line_mountpoint = line + 1;
+		}
 	    }
 	}
-      else if (rc == 0)
-	break;
-      else
-	bytes_read += rc;
+
+      if (line_mountpoint && !(line_root[0] == '/' && line_root[1] == ' '))
+	{
+	  MountinfoEntry new_entry;
+
+	  new_entry.mountpoint = mountinfo_unescape (line_mountpoint);
+	  new_entry.root = mountinfo_unescape (line_root);
+
+	  g_array_append_val (a, new_entry);
+	}
+
+      line = strchr (line, '\n');
+      if (line)
+	line++;
     }
-  close (fd);
 
-  /* zero terminate */
-  if (len - bytes_read < 1)
-    data = g_realloc (data, bytes_read + 1);
-  data[bytes_read] = 0;
-
-  return (char *)data;
+  return (MountinfoEntry *)g_array_free (a, FALSE);
 }
+
+static void
+free_mountinfo (void)
+{
+  int i;
+
+  if (mountinfo_roots)
+    {
+      for (i = 0; mountinfo_roots[i].mountpoint != NULL; i++)
+	{
+	  g_free (mountinfo_roots[i].mountpoint);
+	  g_free (mountinfo_roots[i].root);
+	}
+      g_free (mountinfo_roots);
+      mountinfo_roots = NULL;
+    }
+}
+
+static void
+update_mountinfo (void)
+{
+  char *contents;
+  int res;
+  gboolean first;
+  struct pollfd pfd;
+
+  first = FALSE;
+  if (!mountinfo_initialized)
+    {
+      mountinfo_initialized = TRUE;
+      mountinfo_fd = open ("/proc/self/mountinfo", O_RDONLY);
+      first = TRUE;
+    }
+
+  if (mountinfo_fd == -1)
+    return;
+
+  if (!first)
+    {
+      pfd.fd = mountinfo_fd;
+      pfd.events = POLLIN | POLLOUT | POLLPRI;
+      pfd.revents = 0;
+      res = poll (&pfd, 1, 0);
+      if (res == 0)
+	return;
+    }
+
+  free_mountinfo ();
+  contents = read_contents (mountinfo_fd);
+  lseek (mountinfo_fd, SEEK_SET, 0);
+  if (contents)
+    mountinfo_roots = parse_mountinfo (contents);
+}
+
+static const char *
+find_mountinfo_root_for_mountpoint (const char *mountpoint)
+{
+  char *res;
+  int i;
+
+  res = NULL;
+
+  G_LOCK (mountinfo);
+
+  update_mountinfo ();
+
+  if (mountinfo_roots)
+    {
+      for (i = 0; mountinfo_roots[i].mountpoint != NULL; i++)
+	{
+	  if (strcmp (mountinfo_roots[i].mountpoint, mountpoint) == 0)
+	    {
+	      res = g_strdup (mountinfo_roots[i].root);
+	      break;
+	    }
+	}
+    }
+
+  G_UNLOCK (mountinfo);
+
+  return res;
+}
+
 #endif
 
 
@@ -1995,55 +2107,7 @@ static char *
 get_extra_prefix_for_mount (const char *mountpoint)
 {
 #ifdef __linux__
-  gchar *contents;
-  char *res;
-  char *line;
-  char *line_root;
-  char *line_mountpoint;
-
-  if (mountpoint &&
-      (contents = read_contents ("/proc/self/mountinfo")) != NULL)
-    {
-      line = contents;
-      while (line != NULL && *line != 0)
-	{
-	  /* parent id */
-	  line = strchr (line, ' ');
-	  line_mountpoint = NULL;
-	  if (line)
-	    {
-	      /* major:minor */
-	      line = strchr (line+1, ' ');
-	      if (line)
-		{
-		  /* root */
-		  line = strchr (line+1, ' ');
-		  line_root = line + 1;
-		  if (line)
-		    {
-		      /* mountpoint */
-		      line = strchr (line+1, ' ');
-		      line_mountpoint = line + 1;
-		    }
-		}
-	    }
-
-	  if (line_mountpoint &&
-	      mountinfo_strequal_escaped (mountpoint, line_mountpoint))
-	    {
-	      res = mountinfo_unescape (line_root);
-	      g_free (contents);
-	      return res;
-	    }
-
-	  line = strchr (line, '\n');
-	  if (line)
-	    line++;
-	}
-
-      g_free (contents);
-    }
-
+  return find_mountinfo_root_for_mountpoint (mountpoint);
 #endif
   return NULL;
 }
