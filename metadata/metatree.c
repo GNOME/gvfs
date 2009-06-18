@@ -1892,6 +1892,7 @@ struct _MetaLookupCache {
   char *last_parent;
   char *last_parent_expanded;
   char *last_parent_mountpoint;
+  char *last_parent_mountpoint_extra_prefix;
 
   dev_t last_device;
   char *last_device_tree;
@@ -2239,6 +2240,7 @@ find_mountpoint_for (MetaLookupCache *cache,
 	{
 	  g_free (dir);
 	  cache->last_parent_mountpoint = last;
+	  cache->last_parent_mountpoint_extra_prefix = get_extra_prefix_for_mount (last);
 	  break;
 	}
 
@@ -2254,12 +2256,8 @@ find_mountpoint_for (MetaLookupCache *cache,
   if (*prefix == 0)
     prefix = "/";
 
-  extra_prefix = get_extra_prefix_for_mount (cache->last_parent_mountpoint);
-  if (extra_prefix)
-    {
-      *prefix_out = g_build_filename (extra_prefix, prefix, NULL);
-      g_free (extra_prefix);
-    }
+  if (cache->last_parent_mountpoint_extra_prefix)
+    *prefix_out = g_build_filename (cache->last_parent_mountpoint_extra_prefix, prefix, NULL);
   else
     *prefix_out = g_strdup (prefix);
 
@@ -2312,6 +2310,7 @@ meta_lookup_cache_free (MetaLookupCache *cache)
   g_free (cache->last_parent);
   g_free (cache->last_parent_expanded);
   g_free (cache->last_parent_mountpoint);
+  g_free (cache->last_parent_mountpoint_extra_prefix);
   g_free (cache);
 }
 
@@ -2366,6 +2365,8 @@ expand_parents (MetaLookupCache *cache,
       cache->last_parent_expanded = expand_all_symlinks (parent);
       g_free (cache->last_parent_mountpoint);
       cache->last_parent_mountpoint = NULL;
+      g_free (cache->last_parent_mountpoint_extra_prefix);
+      cache->last_parent_mountpoint_extra_prefix = NULL;
    }
   else
     g_free (parent);
