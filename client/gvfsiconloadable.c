@@ -141,8 +141,8 @@ g_vfs_icon_load (GLoadableIcon  *icon,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from open_icon_for_read"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "open_icon_for_read");
       return NULL;
     }
 
@@ -371,7 +371,7 @@ load_async_cb (DBusMessage *reply,
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from open"));
+				       _("Invalid return value from %s"), "open");
       _g_simple_async_result_complete_with_cancellable (result, cancellable);
       return;
     }

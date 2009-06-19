@@ -863,8 +863,9 @@ g_daemon_file_query_info (GFile                *file,
   if (!dbus_message_iter_init (reply, &iter) ||
       (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
     {
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from get_info"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   /* Translators: %s is the name of a programming function */
+			   _("Invalid return value from %s"), "get_info");
       goto out;
     }
 
@@ -898,7 +899,7 @@ query_info_async_cb (DBusMessage *reply,
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from query_info"));
+				       _("Invalid return value from %s"), "query_info");
       _g_simple_async_result_complete_with_cancellable (result, cancellable);
       return;
     }
@@ -1013,7 +1014,7 @@ read_async_cb (DBusMessage *reply,
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from open"));
+				       _("Invalid return value from %s"), "open");
       _g_simple_async_result_complete_with_cancellable (result, cancellable);
       return;
     }
@@ -1091,8 +1092,8 @@ g_daemon_file_read (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from open"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "open");
       return NULL;
     }
   
@@ -1154,8 +1155,8 @@ g_daemon_file_append_to (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from open"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "open");
       return NULL;
     }
   
@@ -1217,8 +1218,8 @@ g_daemon_file_create (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from open"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "open");
       return NULL;
     }
   
@@ -1283,8 +1284,8 @@ g_daemon_file_replace (GFile *file,
 			      DBUS_TYPE_INVALID))
     {
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from open"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "open");
       return NULL;
     }
   
@@ -1346,7 +1347,7 @@ mount_mountable_async_cb (DBusMessage *reply,
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from call"));
+				       _("Invalid return value from %s"), "call");
       _g_simple_async_result_complete_with_cancellable (result, cancellable);
 
       return;
@@ -1363,7 +1364,7 @@ mount_mountable_async_cb (DBusMessage *reply,
 	{
 	  g_simple_async_result_set_error (result,
 					   G_IO_ERROR, G_IO_ERROR_FAILED,
-					   _("Invalid return value from call"));
+					   _("Invalid return value from %s"), "call");
           _g_simple_async_result_complete_with_cancellable (result, cancellable);
 	  return;
 	}
@@ -1846,8 +1847,8 @@ g_daemon_file_query_filesystem_info (GFile                *file,
   if (!dbus_message_iter_init (reply, &iter) ||
       (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRUCT))
     {
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from get_filesystem_info"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "get_filesystem_info");
       goto out;
     }
 
@@ -1876,7 +1877,7 @@ query_fs_info_async_cb (DBusMessage *reply,
     {
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
-				       _("Invalid return value from query_info"));
+				       _("Invalid return value from %s"), "query_info");
       _g_simple_async_result_complete_with_cancellable (result, cancellable);
       return;
     }
@@ -2031,8 +2032,8 @@ g_daemon_file_set_display_name (GFile *file,
 				      G_DBUS_TYPE_CSTRING, &new_path,
 				      0))
     {
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from query_filesystem_info"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "query_filesystem_info");
       goto out;
     }
 
@@ -2531,8 +2532,8 @@ g_daemon_file_monitor_dir (GFile* file,
     {
       g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from monitor_dir"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "monitor_dir");
       return NULL;
     }
   
@@ -2580,8 +2581,8 @@ g_daemon_file_monitor_file (GFile* file,
     {
       g_mount_info_unref (mount_info);
       dbus_message_unref (reply);
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-			   _("Invalid return value from monitor_file"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+			   _("Invalid return value from %s"), "monitor_file");
       return NULL;
     }
   
@@ -2645,7 +2646,7 @@ append_to_async_cb (DBusMessage *reply,
 			      DBUS_TYPE_INVALID))
     {
       g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       "%s", _("Invalid return value from open"));
+                                       _("Invalid return value from %s"), "open");
       goto failure;
     }
 
@@ -2729,7 +2730,7 @@ create_async_cb (DBusMessage *reply,
 			      DBUS_TYPE_INVALID))
     {
       g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       "%s", _("Invalid return value from open"));
+                                       _("Invalid return value from %s"), "open");
       goto failure;
     }
 
@@ -2804,7 +2805,7 @@ enumerate_children_async_cb (DBusMessage *reply,
   if (reply == NULL || connection == NULL)
   {
     g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                     "Invalid return value from enumerate_children");
+                                     _("Invalid return value from %s"), "enumerate_children");
     goto out;
   }
 
@@ -2992,7 +2993,7 @@ replace_async_cb (DBusMessage *reply,
 			      DBUS_TYPE_INVALID))
     {
       g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       "%s", _("Invalid return value from open"));
+                                       _("Invalid return value from %s"), "open");
       goto failure;
     }
 
@@ -3072,7 +3073,7 @@ set_display_name_async_cb (DBusMessage *reply,
 				      0))
     {
       g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
-                                       "%s", "Invalid return value from set_display_name");
+                                       _("Invalid return value from %s"), "set_display_name");
       goto out;
     }
 
