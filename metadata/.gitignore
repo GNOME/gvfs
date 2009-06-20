@@ -2,3 +2,5 @@ convert-nautilus-metadata
 meta-get
 meta-ls
 meta-set
+meta-get-tree
+gvfsd-metadata
