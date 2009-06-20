@@ -37,8 +37,15 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
-#include <libhal.h>
-#include <dbus/dbus.h>
+#ifdef HAVE_GUDEV
+  #include <gudev/gudev.h>
+#elif defined(HAVE_HAL)
+  #include <libhal.h>
+  #include <dbus/dbus.h>
+#else
+  #error Needs hal or gudev
+#endif
+
 
 #include "gvfsbackendcdda.h"
 #include "gvfsjobopenforread.h"
@@ -91,9 +98,13 @@ struct _GVfsBackendCdda
 {
   GVfsBackend parent_instance;
 
+#ifdef HAVE_GUDEV
+  GUdevClient *gudev_client;
+#elif defined(HAVE_HAL)
   DBusConnection *dbus_connection;
   LibHalContext *hal_ctx;
   char *hal_udi;
+#endif
 
   guint64 size;
 
@@ -184,6 +195,27 @@ fetch_metadata (GVfsBackendCdda *cdda_backend)
   cdio_destroy (cdio);
 }
 
+#ifdef HAVE_GUDEV
+static void
+on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
+{
+  GVfsBackendCdda *cdda_backend = G_VFS_BACKEND_CDDA (user_data);
+  const gchar *u_dev = g_udev_device_get_device_file (device);
+
+  /* we unmount ourselves if the changed device is "our's" and it either gets
+   * removed or changed to "no media" */
+  if (cdda_backend->device_path == NULL || g_strcmp0 (cdda_backend->device_path, u_dev) != 0)
+    return;
+  if (strcmp (action, "remove") == 0 || (strcmp (action, "change") == 0 &&
+      g_udev_device_get_property_as_int (device, "ID_CDROM_MEDIA") != 1))
+    {
+      /*g_warning ("we have been removed!");*/
+      /* TODO: need a cleaner way to force unmount ourselves */
+      exit (1);
+    }
+}
+
+#elif defined(HAVE_HAL)
 static void
 find_udi_for_device (GVfsBackendCdda *cdda_backend)
 {
@@ -237,6 +269,7 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
       exit (1);
     }
 }
+#endif
 
 static void
 g_vfs_backend_cdda_finalize (GObject *object)
@@ -287,6 +320,26 @@ do_mount (GVfsBackend *backend,
 
   //g_warning ("do_mount %p", cdda_backend);
 
+#ifdef HAVE_GUDEV
+  /* setup gudev */
+  const char *subsystems[] = {"block", NULL};
+  GUdevDevice *gudev_device;
+
+  cdda_backend->gudev_client = g_udev_client_new (subsystems);
+  if (cdda_backend->gudev_client == NULL)
+    {
+      release_device (cdda_backend);
+      release_metadata (cdda_backend);
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gudev client"));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+
+  g_signal_connect (cdda_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), cdda_backend);
+
+#elif defined(HAVE_HAL)
+
   /* setup libhal */
 
   dbus_error_init (&dbus_error);
@@ -329,6 +382,7 @@ do_mount (GVfsBackend *backend,
 
   libhal_ctx_set_device_removed (cdda_backend->hal_ctx, _hal_device_removed);
   libhal_ctx_set_user_data (cdda_backend->hal_ctx, cdda_backend);
+#endif
 
   /* setup libcdio */
 
@@ -346,7 +400,15 @@ do_mount (GVfsBackend *backend,
 
   cdda_backend->device_path = g_strdup_printf ("/dev/%s", host);
 
+#ifdef HAVE_GUDEV
+  gudev_device = g_udev_client_query_by_device_file (cdda_backend->gudev_client, cdda_backend->device_path);
+  if (gudev_device != NULL)
+    cdda_backend->size = g_udev_device_get_sysfs_attr_as_uint64 (gudev_device, "size") * 512;
+  g_object_unref (gudev_device);
+
+#elif defined(HAVE_HAL)
   find_udi_for_device (cdda_backend);
+#endif
 
   cdda_backend->drive = cdio_cddap_identify (cdda_backend->device_path, 0, NULL);
   if (cdda_backend->drive == NULL)

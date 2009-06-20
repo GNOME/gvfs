@@ -13,6 +13,7 @@ INCLUDES =					\
 	$(OBEXFTP_CFLAGS) $(XML_CFLAGS)		\
 	$(KEYRING_CFLAGS)			\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
+	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	-DLIBEXEC_DIR=\"$(libexecdir)/\" 	\
 	-DMOUNTABLE_DIR=\"$(mountdir)/\" 	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
@@ -358,10 +359,19 @@ gvfsd_cdda_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendcdda.h \
 	-DDEFAULT_BACKEND_TYPE=cdda \
 	-DMAX_JOB_THREADS=1 \
-	$(CDDA_CFLAGS) $(HAL_CFLAGS) \
-	-DBACKEND_TYPES='"cdda", G_VFS_TYPE_BACKEND_CDDA,'
+	-DBACKEND_TYPES='"cdda", G_VFS_TYPE_BACKEND_CDDA,' \
+	$(CDDA_CFLAGS)
+if USE_GUDEV
+gvfsd_cdda_CPPFLAGS +=	$(GUDEV_CFLAGS)
+else
+gvfsd_cdda_CPPFLAGS +=	$(HAL_CFLAGS)
+endif
 
+if USE_GUDEV
+gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(GUDEV_LIBS)
+else
 gvfsd_cdda_LDADD = $(libraries) $(CDDA_LIBS) $(HAL_LIBS)
+endif
 
 gvfsd_gphoto2_SOURCES = \
 	gvfsbackendgphoto2.c gvfsbackendgphoto2.h \

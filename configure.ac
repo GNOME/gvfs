@@ -284,6 +284,25 @@ AC_SUBST(HAL_CFLAGS)
 
 AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
 
+dnl **********************
+dnl *** Check for gudev ***
+dnl **********************
+AC_ARG_ENABLE(gudev, [  --disable-gudev           build without gudev support])
+msg_gudev=no
+GUDEV_REQUIRED=001
+
+if test "x$enable_gudev" != "xno"; then
+  PKG_CHECK_EXISTS([gudev-1.0 >= $GUDEV_REQUIRED], msg_gudev=yes)
+
+  if test "x$msg_gudev" = "xyes"; then
+    PKG_CHECK_MODULES(GUDEV, [gudev-1.0 >= $GUDEV_REQUIRED])
+    AC_DEFINE(HAVE_GUDEV, 1, [Define to 1 if gudev is available])
+  fi
+fi
+AC_SUBST(GUDEV_CFLAGS)
+AC_SUBST(GUDEV_LIBS)
+AM_CONDITIONAL(USE_GUDEV, [test "$msg_gudev" = "yes"])
+
 dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
 dnl **************************************************
@@ -292,11 +311,11 @@ msg_cdda=no
 CDDA_LIBS=
 CDDA_CFLAGS=
 
-if test "x$enable_cdda" != "xno"; then
-  PKG_CHECK_EXISTS(libcdio_paranoia >= 0.78.2 hal >= $HAL_REQUIRED, msg_cdda=yes)
+if test "x$enable_cdda" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
+  PKG_CHECK_EXISTS(libcdio_paranoia >= 0.78.2, msg_cdda=yes)
 
   if test "x$msg_cdda" = "xyes"; then
-    PKG_CHECK_MODULES(CDDA, libcdio_paranoia hal >= $HAL_REQUIRED)
+    PKG_CHECK_MODULES(CDDA, libcdio_paranoia)
     AC_DEFINE(HAVE_CDDA, 1, [Define to 1 if CDDA is going to be built])
   fi
 fi
