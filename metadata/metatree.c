@@ -1851,7 +1851,10 @@ get_dirname (const char *path)
   parent = g_path_get_dirname (path);
   if (strcmp (parent, ".") == 0 ||
       strcmp (parent, path) == 0)
-    return NULL;
+    {
+      g_free (parent);
+      return NULL;
+    }
 
   return parent;
 }
@@ -2223,6 +2226,11 @@ find_mountpoint_for (MetaLookupCache *cache,
   char *extra_prefix;
 
   first_dir = get_dirname (file);
+  if (first_dir == NULL)
+    {
+      *prefix_out = g_strdup ("/");
+      return "/";
+    }
 
   g_assert (cache->last_parent_expanded != NULL);
   g_assert (strcmp (cache->last_parent_expanded, first_dir) == 0);
@@ -2349,13 +2357,9 @@ expand_parents (MetaLookupCache *cache,
   char *path_copy;
 
   path_copy = canonicalize_filename (path);
-  parent = g_path_get_dirname (path_copy);
-  if (strcmp (parent, ".") == 0 ||
-      strcmp (parent, path_copy) == 0)
-    {
-      g_free (parent);
-      return path_copy;
-    }
+  parent = get_dirname (path_copy);
+  if (parent == NULL)
+    return path_copy;
 
   if (cache->last_parent == NULL ||
       strcmp (cache->last_parent, parent) != 0)
@@ -2448,6 +2452,8 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
     }
 
  found:
+  g_print ("Fount treename %s, prefix: %s\n",
+	   treename, prefix);
   tree = meta_tree_lookup_by_name (treename, for_write);
 
   if (tree)
