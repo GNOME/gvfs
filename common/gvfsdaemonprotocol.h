@@ -94,6 +94,14 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MONITOR_CLIENT_INTERFACE "org.gtk.vfs.MonitorClient"
 #define G_VFS_DBUS_MONITOR_CLIENT_OP_CHANGED "Changed"
 
+/* The well known name of the metadata daemon */
+#define G_VFS_DBUS_METADATA_NAME "org.gtk.vfs.Metadata"
+#define G_VFS_DBUS_METADATA_PATH "/org/gtk/vfs/metadata"
+#define G_VFS_DBUS_METADATA_INTERFACE "org.gtk.vfs.Metadata"
+#define G_VFS_DBUS_METADATA_OP_SET "Set"
+#define G_VFS_DBUS_METADATA_OP_UNSET "Unset"
+#define G_VFS_DBUS_METADATA_OP_REMOVE "Remove"
+#define G_VFS_DBUS_METADATA_OP_MOVE "Move"
 
 /* Mounts time out in 10 minutes, since they can be slow, with auth, etc */
 #define G_VFS_DBUS_MOUNT_TIMEOUT_MSECS (1000*60*10)
