@@ -32,6 +32,8 @@
 
 #define KEY_IS_LIST_MASK (1<<31)
 
+static GStaticRWLock metatree_lock = G_STATIC_RW_LOCK_INIT;
+
 typedef enum {
   JOURNAL_OP_SET_KEY,
   JOURNAL_OP_SETV_KEY,
@@ -105,7 +107,7 @@ typedef struct {
 } MetaJournal;
 
 struct _MetaTree {
-  int refcount;
+  volatile guint ref_count;
   char *filename;
   gboolean for_write;
 
@@ -124,10 +126,11 @@ struct _MetaTree {
   MetaJournal *journal;
 };
 
-static MetaJournal *meta_journal_open (const char  *filename,
-				       gboolean     for_write,
-				       guint32      tag);
-static void         meta_journal_free (MetaJournal *journal);
+static MetaJournal *meta_journal_open          (const char  *filename,
+						gboolean     for_write,
+						guint32      tag);
+static void         meta_journal_free          (MetaJournal *journal);
+static void         meta_journal_validate_more (MetaJournal *journal);
 
 static gpointer
 verify_block_pointer (MetaTree *tree, guint32 pos, guint32 len)
@@ -336,7 +339,7 @@ meta_tree_open (const char *filename,
   g_assert (sizeof (MetaFileDataEnt) == 8);
 
   tree = g_new0 (MetaTree, 1);
-  tree->refcount = 1;
+  tree->ref_count = 1;
   tree->filename = g_strdup (filename);
   tree->for_write = for_write;
 
@@ -349,6 +352,7 @@ meta_tree_open (const char *filename,
 }
 
 static GHashTable *cached_trees = NULL;
+G_LOCK_DEFINE_STATIC (cached_trees);
 
 MetaTree *
 meta_tree_lookup_by_name (const char *name,
@@ -356,6 +360,8 @@ meta_tree_lookup_by_name (const char *name,
 {
   MetaTree *tree;
   char *filename;
+
+  G_LOCK (cached_trees);
 
   if (cached_trees == NULL)
     cached_trees = g_hash_table_new_full (g_str_hash,
@@ -366,8 +372,11 @@ meta_tree_lookup_by_name (const char *name,
   tree = g_hash_table_lookup (cached_trees, name);
   if (tree && tree->for_write == for_write)
     {
+      meta_tree_ref (tree);
+      G_UNLOCK (cached_trees);
+
       meta_tree_refresh (tree);
-      return meta_tree_ref (tree);
+      return tree;
     }
 
   filename = g_build_filename (g_get_user_data_dir (), "gvfs-metadata", name, NULL);
@@ -377,21 +386,27 @@ meta_tree_lookup_by_name (const char *name,
   if (tree)
     g_hash_table_insert (cached_trees, g_strdup (name), meta_tree_ref (tree));
 
+  G_UNLOCK (cached_trees);
+
   return tree;
 }
 
 MetaTree *
 meta_tree_ref (MetaTree *tree)
 {
-  tree->refcount++;
+  gint old_val;
+
+  old_val = g_atomic_int_exchange_and_add ((int *)&tree->ref_count, 1);
   return tree;
 }
 
 void
 meta_tree_unref (MetaTree *tree)
 {
-  tree->refcount--;
-  if (tree->refcount == 0)
+  gboolean is_zero;
+
+  is_zero = g_atomic_int_dec_and_test ((int *)&tree->ref_count);
+  if (is_zero)
     {
       meta_tree_clear (tree);
       g_free (tree->filename);
@@ -399,18 +414,64 @@ meta_tree_unref (MetaTree *tree)
     }
 }
 
-void
-meta_tree_refresh (MetaTree *tree)
+static gboolean
+meta_tree_needs_rereading (MetaTree *tree)
 {
   if (tree->header != NULL &&
       GUINT32_FROM_BE (tree->header->rotated) == 0)
-    return; /* Got a valid tree and its not rotated */
-
-  if (tree->header)
-    meta_tree_clear (tree);
-  meta_tree_init (tree);
+    return FALSE; /* Got a valid tree and its not rotated */
+  return TRUE;
 }
 
+static gboolean
+meta_tree_has_new_journal_entries (MetaTree *tree)
+{
+  guint32 num_entries;
+  MetaJournal *journal;
+
+  journal = tree->journal;
+
+  if (journal == NULL ||
+      !tree->journal->journal_valid)
+    return FALSE; /* Once we've seen a failure, never look for more */
+
+  /* TODO: Use atomic read here? */
+  num_entries = GUINT32_FROM_BE (*(volatile guint32 *)&journal->header->num_entries);
+
+  return journal->last_entry_num < num_entries;
+}
+
+void
+meta_tree_refresh (MetaTree *tree)
+{
+  gboolean needs_refresh;
+
+  g_static_rw_lock_reader_lock (&metatree_lock);
+  needs_refresh =
+    meta_tree_needs_rereading (tree) ||
+    meta_tree_has_new_journal_entries (tree);
+  g_static_rw_lock_reader_unlock (&metatree_lock);
+
+  if (needs_refresh)
+    {
+      g_static_rw_lock_writer_lock (&metatree_lock);
+
+      /* Needs to recheck since we dropped read lock */
+      if (meta_tree_needs_rereading (tree))
+	{
+	  if (tree->header)
+	    meta_tree_clear (tree);
+	  meta_tree_init (tree);
+	}
+      else if (meta_tree_has_new_journal_entries (tree))
+	meta_journal_validate_more (tree->journal);
+
+      g_static_rw_lock_writer_unlock (&metatree_lock);
+    }
+  else
+    {
+    }
+}
 
 struct FindName {
   MetaTree *tree;
@@ -637,7 +698,7 @@ verify_journal_entry (MetaJournal *journal,
   return (MetaJournalEntry *)(journal->data + offset + entry_len);
 }
 
-/* Try to validate more entries */
+/* Try to validate more entries, call with writer lock */
 static void
 meta_journal_validate_more (MetaJournal *journal)
 {
@@ -771,6 +832,7 @@ meta_journal_entry_new_set (guint64 mtime,
   return meta_journal_entry_finish (out);
 }
 
+/* Call with writer lock held */
 static gboolean
 meta_journal_add_entry (MetaJournal *journal,
 			GString *entry)
@@ -1116,12 +1178,14 @@ meta_tree_lookup_key_type  (MetaTree                         *tree,
   MetaKeyType type;
   gpointer value;
 
+  g_static_rw_lock_reader_lock (&metatree_lock);
+
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
 						    key,
 						    &type, &value);
   if (new_path == NULL)
-    return type;
+    goto out; /* type is set */
 
   data = meta_tree_lookup_data (tree, new_path);
   ent = NULL;
@@ -1131,11 +1195,15 @@ meta_tree_lookup_key_type  (MetaTree                         *tree,
   g_free (new_path);
 
   if (ent == NULL)
-    return META_KEY_TYPE_NONE;
-  if (GUINT32_FROM_BE (ent->key) & KEY_IS_LIST_MASK)
-    return META_KEY_TYPE_STRINGV;
+    type = META_KEY_TYPE_NONE;
+  else if (GUINT32_FROM_BE (ent->key) & KEY_IS_LIST_MASK)
+    type = META_KEY_TYPE_STRINGV;
   else
-    return META_KEY_TYPE_STRING;
+    type = META_KEY_TYPE_STRING;
+
+ out:
+  g_static_rw_lock_reader_unlock (&metatree_lock);
+  return type;
 }
 
 guint64
@@ -1147,15 +1215,18 @@ meta_tree_get_last_changed (MetaTree                         *tree,
 }
 
 char *
-meta_tree_lookup_string    (MetaTree                         *tree,
-			    const char                       *path,
-			    const char                       *key)
+meta_tree_lookup_string (MetaTree   *tree,
+			 const char *path,
+			 const char *key)
 {
   MetaFileData *data;
   MetaFileDataEnt *ent;
   MetaKeyType type;
   gpointer value;
   char *new_path;
+  char *res;
+
+  g_static_rw_lock_reader_lock (&metatree_lock);
 
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
@@ -1163,9 +1234,10 @@ meta_tree_lookup_string    (MetaTree                         *tree,
 						    &type, &value);
   if (new_path == NULL)
     {
+      res = NULL;
       if (type == META_KEY_TYPE_STRING)
-	return g_strdup (value);
-      return NULL;
+	res = g_strdup (value);
+      goto out;
     }
 
   data = meta_tree_lookup_data (tree, new_path);
@@ -1176,10 +1248,16 @@ meta_tree_lookup_string    (MetaTree                         *tree,
   g_free (new_path);
 
   if (ent == NULL)
-    return NULL;
-  if (ent->key & KEY_IS_LIST_MASK)
-    return NULL;
-  return verify_string (tree, ent->value);
+    res = NULL;
+  else if (ent->key & KEY_IS_LIST_MASK)
+    res = NULL;
+  else
+    res = g_strdup (verify_string (tree, ent->value));
+
+ out:
+  g_static_rw_lock_reader_unlock (&metatree_lock);
+
+  return res;
 }
 
 char **
@@ -1402,6 +1480,8 @@ meta_tree_enumerate_dir (MetaTree                         *tree,
   MetaFileDir *dir;
   char *res_path;
 
+  g_static_rw_lock_reader_lock (&metatree_lock);
+
   data.children = children =
     g_hash_table_new_full (g_str_hash,
 			   g_str_equal,
@@ -1445,6 +1525,7 @@ meta_tree_enumerate_dir (MetaTree                         *tree,
     }
  out:
   g_hash_table_destroy (children);
+  g_static_rw_lock_reader_unlock (&metatree_lock);
 }
 
 typedef struct {
@@ -1614,6 +1695,8 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
   GHashTableIter iter;
   char *res_path;
 
+  g_static_rw_lock_reader_lock (&metatree_lock);
+
   keydata.keys = keys =
     g_hash_table_new_full (g_str_hash,
 			   g_str_equal,
@@ -1661,13 +1744,26 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
     }
  out:
   g_hash_table_destroy (keys);
+  g_static_rw_lock_reader_unlock (&metatree_lock);
+}
+
+/* Needs write lock */
+static gboolean
+meta_tree_flush_locked (MetaTree *tree)
+{
+  /* TODO: roll over */
+  return FALSE;
 }
 
 gboolean
 meta_tree_flush (MetaTree *tree)
 {
-  /* TODO: roll over */
-  return FALSE;
+  gboolean res;
+
+  g_static_rw_lock_writer_lock (&metatree_lock);
+  res = meta_tree_flush_locked (tree);
+  g_static_rw_lock_writer_unlock (&metatree_lock);
+  return res;
 }
 
 gboolean
@@ -1675,6 +1771,7 @@ meta_tree_unset (MetaTree                         *tree,
 		 const char                       *path,
 		 const char                       *key)
 {
+  /* TODO */
   return FALSE;
 }
 
@@ -1686,27 +1783,36 @@ meta_tree_set_string (MetaTree                         *tree,
 {
   GString *entry;
   guint64 mtime;
+  gboolean res;
+
+  g_static_rw_lock_writer_lock (&metatree_lock);
 
   if (tree->journal == NULL ||
       !tree->journal->journal_valid)
-    return FALSE;
+    {
+      res = FALSE;
+      goto out;
+    }
 
   mtime = time (NULL);
 
   entry = meta_journal_entry_new_set (mtime, path, key, value);
 
+  res = TRUE;
  retry:
   if (!meta_journal_add_entry (tree->journal, entry))
     {
-      if (meta_tree_flush (tree))
+      if (meta_tree_flush_locked (tree))
 	goto retry;
 
-      g_string_free (entry, TRUE);
-      return FALSE;
+      res = FALSE;
     }
 
   g_string_free (entry, TRUE);
-  return TRUE;
+
+ out:
+  g_static_rw_lock_writer_unlock (&metatree_lock);
+  return res;
 }
 
 gboolean
@@ -2223,7 +2329,6 @@ find_mountpoint_for (MetaLookupCache *cache,
   char *first_dir, *dir, *last;
   const char *prefix;
   dev_t dir_dev;
-  char *extra_prefix;
 
   first_dir = get_dirname (file);
   if (first_dir == NULL)
@@ -2452,10 +2557,7 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
     }
 
  found:
-  g_print ("Fount treename %s, prefix: %s\n",
-	   treename, prefix);
   tree = meta_tree_lookup_by_name (treename, for_write);
-
   if (tree)
     {
       *tree_path = prefix;

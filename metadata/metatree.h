@@ -9,6 +9,8 @@ typedef enum {
   META_KEY_TYPE_STRINGV
 } MetaKeyType;
 
+/* Note: These are called with the read-lock held, so
+   don't call any MetaTree operations */
 typedef gboolean (*meta_tree_dir_enumerate_callback) (const char *entry,
 						      guint64 last_changed,
 						      gboolean has_children,
@@ -20,6 +22,7 @@ typedef gboolean (*meta_tree_keys_enumerate_callback) (const char *key,
 						       gpointer value,
 						       gpointer user_data);
 
+/* MetaLookupCache is not threadsafe */
 MetaLookupCache *meta_lookup_cache_new         (void);
 void             meta_lookup_cache_free        (MetaLookupCache *cache);
 MetaTree        *meta_lookup_cache_lookup_path (MetaLookupCache *cache,
@@ -28,6 +31,7 @@ MetaTree        *meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 						gboolean for_write,
 						char **tree_path);
 
+/* All public MetaTree calls are threadsafe */
 MetaTree *meta_tree_open           (const char *filename,
 				    gboolean    for_write);
 MetaTree *meta_tree_lookup_by_name (const char *name,
