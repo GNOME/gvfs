@@ -32,13 +32,14 @@ MetaTree        *meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 						char **tree_path);
 
 /* All public MetaTree calls are threadsafe */
-MetaTree *meta_tree_open           (const char *filename,
-				    gboolean    for_write);
-MetaTree *meta_tree_lookup_by_name (const char *name,
-				    gboolean    for_write);
-MetaTree *meta_tree_ref            (MetaTree   *tree);
-void      meta_tree_unref          (MetaTree   *tree);
-void      meta_tree_refresh        (MetaTree   *tree); /* May invalidates all strings */
+MetaTree *  meta_tree_open           (const char *filename,
+				      gboolean    for_write);
+MetaTree *  meta_tree_lookup_by_name (const char *name,
+				      gboolean    for_write);
+MetaTree *  meta_tree_ref            (MetaTree   *tree);
+void        meta_tree_unref          (MetaTree   *tree);
+void        meta_tree_refresh        (MetaTree   *tree);
+const char *meta_tree_get_filename   (MetaTree   *tree);
 
 MetaKeyType meta_tree_lookup_key_type  (MetaTree                         *tree,
 					const char                       *path,

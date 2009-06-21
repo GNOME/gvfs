@@ -351,6 +351,12 @@ meta_tree_open (const char *filename,
   return tree;
 }
 
+const char *
+meta_tree_get_filename (MetaTree *tree)
+{
+  return tree->filename;
+}
+
 static GHashTable *cached_trees = NULL;
 G_LOCK_DEFINE_STATIC (cached_trees);
 
