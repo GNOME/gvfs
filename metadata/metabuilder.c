@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 #include <glib/gstdio.h>
 
 #define MAJOR_VERSION 1
@@ -1024,7 +1025,7 @@ meta_builder_write (MetaBuilder *builder,
     goto out;
 
   /* Open old file so we can set it rotated */
-  fd2 = open (filename, O_RDONLY);
+  fd2 = open (filename, O_RDWR);
   if (g_rename (tmp_name, filename) == -1)
     {
       if (fd2 != -1)
@@ -1035,25 +1036,19 @@ meta_builder_write (MetaBuilder *builder,
   /* Mark old file (if any) as rotated) */
   if (fd2 != -1)
     {
-      gboolean have_old_tag;
       guint32 old_tag;
       char *old_log;
-      guint32 c = 0xffffffff;
+      char *data;
 
+      data = mmap (NULL, RANDOM_TAG_OFFSET + 4, PROT_READ|PROT_WRITE, MAP_SHARED, fd2, 0);
 
-      if (lseek(fd2, RANDOM_TAG_OFFSET, SEEK_SET) == RANDOM_TAG_OFFSET &&
-	  read (fd2, &old_tag, 4) == 4)
+      if (data)
 	{
-	  have_old_tag = TRUE;
-	  old_tag = GUINT32_FROM_BE (old_tag);
-	}
+	  old_tag = GUINT32_FROM_BE (*(guint32 *)(data + RANDOM_TAG_OFFSET));
+	  *(guint32 *)(data + ROTATED_OFFSET) = 0xffffffff;
+	  munmap (data, RANDOM_TAG_OFFSET + 4);
+	  close (fd2);
 
-      if (lseek(fd2, ROTATED_OFFSET, SEEK_SET) == ROTATED_OFFSET)
-	write (fd2, &c, 4);
-      close (fd2);
-
-      if (have_old_tag)
-	{
 	  old_log = get_journal_filename (filename, old_tag);
 	  g_unlink (old_log);
 	  g_free (old_log);
