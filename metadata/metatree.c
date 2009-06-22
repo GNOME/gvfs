@@ -447,6 +447,22 @@ meta_tree_has_new_journal_entries (MetaTree *tree)
   return journal->last_entry_num < num_entries;
 }
 
+
+/* Must be called with a write lock held */
+static void
+meta_tree_refresh_locked (MetaTree *tree)
+{
+  /* Needs to recheck since we dropped read lock */
+  if (meta_tree_needs_rereading (tree))
+    {
+      if (tree->header)
+	meta_tree_clear (tree);
+      meta_tree_init (tree);
+    }
+  else if (meta_tree_has_new_journal_entries (tree))
+    meta_journal_validate_more (tree->journal);
+}
+
 void
 meta_tree_refresh (MetaTree *tree)
 {
@@ -461,21 +477,8 @@ meta_tree_refresh (MetaTree *tree)
   if (needs_refresh)
     {
       g_static_rw_lock_writer_lock (&metatree_lock);
-
-      /* Needs to recheck since we dropped read lock */
-      if (meta_tree_needs_rereading (tree))
-	{
-	  if (tree->header)
-	    meta_tree_clear (tree);
-	  meta_tree_init (tree);
-	}
-      else if (meta_tree_has_new_journal_entries (tree))
-	meta_journal_validate_more (tree->journal);
-
+      meta_tree_refresh_locked (tree);
       g_static_rw_lock_writer_unlock (&metatree_lock);
-    }
-  else
-    {
     }
 }
 
@@ -1753,11 +1756,150 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
   g_static_rw_lock_reader_unlock (&metatree_lock);
 }
 
+
+static void
+copy_tree_to_builder (MetaTree *tree,
+		      MetaFileDirEnt *dirent,
+		      MetaFile *builder_file)
+{
+  MetaFile *builder_child;
+  MetaFileData *data;
+  MetaFileDataEnt *ent;
+  MetaFileDir *dir;
+  MetaFileDirEnt *child_dirent;
+  MetaKeyType type;
+  char *child_name, *key_name, *value;
+  guint32 i, num_keys, num_children;
+  guint32 key_id;
+
+  /* Copy metadata */
+  data = verify_metadata_block (tree, dirent->metadata);
+  if (data)
+    {
+      num_keys = GUINT32_FROM_BE (data->num_keys);
+      for (i = 0; i < num_keys; i++)
+	{
+	  ent = &data->keys[i];
+
+	  key_id = GUINT32_FROM_BE (ent->key) & ~KEY_IS_LIST_MASK;
+	  if (GUINT32_FROM_BE (ent->key) & KEY_IS_LIST_MASK)
+	    type = META_KEY_TYPE_STRINGV;
+	  else
+	    type = META_KEY_TYPE_STRING;
+
+	  if (key_id >= tree->num_attributes)
+	    continue;
+
+	  key_name = tree->attributes[key_id];
+	  if (key_name == NULL)
+	    continue;
+
+	  if (type == META_KEY_TYPE_STRING)
+	    {
+	      value = verify_string (tree, ent->value);
+	      metafile_key_set_value (builder_file,
+				      key_name, value);
+	    }
+	  else
+	    {
+	      g_print ("TODO: Handle stringv metadata from tree\n");
+	    }
+	}
+    }
+
+  /* Copy last changed time */
+  builder_file->last_changed = get_time_t (tree, dirent->last_changed);
+
+  /* Copy children */
+  if (dirent->children != 0 &&
+      (dir = verify_children_block (tree, dirent->children)) != NULL)
+    {
+      num_children = GUINT32_FROM_BE (dir->num_children);
+      for (i = 0; i < num_children; i++)
+	{
+	  child_dirent = &dir->children[i];
+	  child_name = verify_string (tree, child_dirent->name);
+	  if (child_name != NULL)
+	    {
+	      builder_child = metafile_new (child_name, builder_file);
+	      copy_tree_to_builder (tree, child_dirent, builder_child);
+	    }
+	}
+    }
+}
+
+static void
+apply_journal_to_builder (MetaTree *tree,
+			  MetaBuilder *builder)
+{
+  MetaJournal *journal;
+  MetaJournalEntry *entry;
+  guint32 *sizep;
+  char *journal_path, *journal_key, *source_path;
+  char *value;
+  MetaFile *file;
+
+  journal = tree->journal;
+
+  entry = journal->first_entry;
+  while (entry < journal->last_entry)
+    {
+      journal_path = &entry->path[0];
+
+      switch (entry->entry_type)
+	{
+	case JOURNAL_OP_SET_KEY:
+	  journal_key = get_next_arg (journal_path);
+	  value = get_next_arg (journal_key);
+	  file = meta_builder_lookup (builder, journal_path, TRUE);
+	  metafile_key_set_value (file,
+				  journal_key,
+				  value);
+	  break;
+	case JOURNAL_OP_SETV_KEY:
+	  journal_key = get_next_arg (journal_path);
+	  value = get_next_arg (journal_key);
+	  /* TODO */
+	  break;
+	case JOURNAL_OP_UNSET_KEY:
+	  journal_key = get_next_arg (journal_path);
+	  /* TODO */
+	  break;
+	case JOURNAL_OP_COPY_PATH:
+	  source_path = get_next_arg (journal_path);
+	  /* TODO */
+	  break;
+	case JOURNAL_OP_REMOVE_PATH:
+	  /* TODO */
+	  break;
+	default:
+	  break;
+	}
+
+      sizep = (guint32 *)entry;
+      entry = (MetaJournalEntry *)((char *)entry + GUINT32_FROM_BE (*(sizep)));
+    }
+}
+
+
 /* Needs write lock */
 static gboolean
 meta_tree_flush_locked (MetaTree *tree)
 {
-  /* TODO: roll over */
+  MetaBuilder *builder;
+
+  builder = meta_builder_new ();
+
+  copy_tree_to_builder (tree, tree->root, builder->root);
+
+  if (tree->journal)
+    apply_journal_to_builder (tree, builder);
+
+  meta_builder_write (builder,
+		      meta_tree_get_filename (tree));
+
+  meta_tree_refresh_locked (tree);
+
   return FALSE;
 }
 
