@@ -20,11 +20,11 @@ typedef gboolean (*meta_tree_keys_enumerate_callback) (const char *key,
 						       gpointer value,
 						       gpointer user_data);
 
-MetaLookupCache *meta_lookup_cache_new    (void);
-void             meta_lookup_cache_free   (MetaLookupCache *cache);
-MetaTree        *meta_lookup_cache_lookup (MetaLookupCache *cache,
-					   const char *filename,
-					   guint64 device);
+MetaLookupCache *meta_lookup_cache_new         (void);
+void             meta_lookup_cache_free        (MetaLookupCache *cache);
+MetaTree        *meta_lookup_cache_lookup_path (MetaLookupCache *cache,
+						const char *filename,
+						guint64 device);
 
 void      meta_tree_free    (MetaTree   *tree);
 MetaTree *meta_tree_open    (const char *filename,

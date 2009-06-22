@@ -165,6 +165,26 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0,
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
 
+dnl *************************
+dnl *** Check for libudev ***
+dnl *************************
+AC_ARG_ENABLE(udev, [  --disable-udev           build without libudev])
+msg_udev=no
+UDEV_CFLAGS=
+UDEV_LIBS=
+
+if test "x$enable_udev" != "xno"; then
+  PKG_CHECK_EXISTS(libudev >= 138, msg_udev=yes)
+
+  if test "x$msg_udev" = "xyes"; then
+    PKG_CHECK_MODULES(UDEV, libudev)
+    AC_DEFINE(HAVE_LIBUDEV, 1, [Define to 1 if libudev availible])
+  fi
+fi
+
+AC_SUBST(UDEV_CFLAGS)
+AC_SUBST(UDEV_LIBS)
+
 dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************

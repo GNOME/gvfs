@@ -1,3 +1,4 @@
+#include "config.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -13,6 +14,11 @@
 #include <errno.h>
 #include <poll.h>
 #include "crc32.h"
+
+#ifdef HAVE_LIBUDEV
+#define LIBUDEV_I_KNOW_THE_API_IS_SUBJECT_TO_CHANGE
+#include <libudev.h>
+#endif
 
 #define MAGIC "\xda\x1ameta"
 #define MAGIC_LEN 6
@@ -1796,12 +1802,14 @@ split_filename (const char *path, char **basename)
   if (strcmp (parent, ".") == 0 ||
       strcmp (parent, path_copy) == 0)
     {
-      *basename = NULL;
+      if (basename)
+	*basename = NULL;
       g_free (parent);
       g_free (path_copy);
       return NULL;
     }
-  *basename = g_path_get_basename (path_copy);
+  if (basename)
+    *basename = g_path_get_basename (path_copy);
   g_free (path_copy);
 
   return parent;
@@ -1845,12 +1853,13 @@ join_path_list (GList *list)
   gsize len;
   char *str;
 
-  len = 0;
+  len = 2;
   for (l = list; l != NULL; l = l->next)
     len += strlen (l->data) + 1;
 
-  str = malloc (len);
-  *str = 0;
+  str = g_malloc (len);
+  str[0] = '/';
+  str[1] = 0;
 
   for (l = list; l != NULL; l = l->next)
     {
@@ -1871,7 +1880,71 @@ typedef struct {
 
 struct _MetaLookupCache {
   GList *mountpoint_cache;
+  char *last_parent;
+  char *last_parent_expanded;
+  dev_t last_device;
+  char *last_device_tree;
 };
+
+#ifdef HAVE_LIBUDEV
+
+struct udev *udev;
+G_LOCK_DEFINE_STATIC (udev);
+
+static char *
+get_tree_from_udev (MetaLookupCache *cache,
+		    dev_t devnum)
+{
+  struct udev_device *dev;
+  const char *uuid, *label;
+  char *res;
+
+  G_LOCK (udev);
+
+  if (udev == NULL)
+    udev = udev_new ();
+
+  dev = udev_device_new_from_devnum (udev, 'b', devnum);
+  uuid = udev_device_get_property_value (dev, "ID_FS_UUID_ENC");
+
+  res = NULL;
+  if (uuid)
+    {
+      res = g_strconcat ("uuid-", uuid, NULL);
+    }
+  else
+    {
+      label = udev_device_get_property_value (dev, "ID_FS_LABEL_ENC");
+
+      if (label)
+	res = g_strconcat ("label-", label, NULL);
+    }
+
+  udev_device_unref (dev);
+
+  G_UNLOCK (udev);
+
+  return res;
+}
+#endif
+
+static const char *
+get_tree_for_device (MetaLookupCache *cache,
+		     dev_t device)
+{
+#ifdef HAVE_LIBUDEV
+  if (device != cache->last_device)
+    {
+      cache->last_device = device;
+      g_free (cache->last_device_tree);
+      cache->last_device_tree = get_tree_from_udev (cache, device);
+    }
+
+  return cache->last_device_tree;
+#endif
+  return NULL;
+}
+
 
 #ifdef __linux__
 
@@ -2071,7 +2144,7 @@ update_mountinfo (void)
     mountinfo_roots = parse_mountinfo (contents);
 }
 
-static const char *
+static char *
 find_mountinfo_root_for_mountpoint (const char *mountpoint)
 {
   char *res;
@@ -2112,6 +2185,7 @@ get_extra_prefix_for_mount (const char *mountpoint)
   return NULL;
 }
 
+/* Expands symlinks for parents and look for a mountpoint */
 static const char *
 find_mountpoint_for (MetaLookupCache *cache,
 		     const char *file,
@@ -2135,7 +2209,7 @@ find_mountpoint_for (MetaLookupCache *cache,
 
   basename = NULL;
   dir = g_strdup (first_dir);
-  last = g_strdup (file);
+  last = strip_trailing_slashes (file);
   while (1)
     {
       expand_all (&dir, &dir_dev);
@@ -2170,6 +2244,35 @@ find_mountpoint_for (MetaLookupCache *cache,
   return c->mountpoint;
 }
 
+/* Resolves all symlinks, including the ones for basename */
+static char *
+expand_all_symlinks (const char *path)
+{
+  char *parent, *parent_expanded;
+  char *basename, *res;
+  dev_t dev;
+  char *path_copy;
+
+  path_copy = g_strdup (path);
+  expand_all (&path_copy, &dev);
+
+  parent = split_filename (path_copy, &basename);
+
+  if (parent)
+    {
+      parent_expanded = expand_all_symlinks (parent);
+      res = g_build_filename (parent_expanded, basename, NULL);
+      g_free (parent_expanded);
+    }
+  else
+    res = path_copy;
+
+  g_free (parent);
+  g_free (basename);
+
+  return res;
+}
+
 MetaLookupCache *
 meta_lookup_cache_new (void)
 {
@@ -2183,28 +2286,150 @@ meta_lookup_cache_new (void)
 void
 meta_lookup_cache_free (MetaLookupCache *cache)
 {
+  g_free (cache->last_parent);
+  g_free (cache->last_parent_expanded);
   g_free (cache);
 }
 
+static gboolean
+path_has_prefix (const char *path,
+		 const char *prefix)
+{
+  int prefix_len;
+
+  if (prefix == NULL)
+    return TRUE;
+
+  prefix_len = strlen (prefix);
+
+  if (strncmp (path, prefix, prefix_len) == 0 &&
+      (prefix_len == 0 || /* empty prefix always matches */
+       prefix[prefix_len - 1] == '/' || /* last char in prefix was a /, so it must be in path too */
+       path[prefix_len] == 0 ||
+       path[prefix_len] == '/'))
+    return TRUE;
+
+  return FALSE;
+}
+
+struct HomedirData {
+  dev_t device;
+  char *expanded_path;
+};
+
+static char *
+expand_parents (MetaLookupCache *cache,
+		const char *path)
+{
+  char *parent;
+  char *basename, *res;
+  char *path_copy;
+
+  path_copy = canonicalize_filename (path);
+  parent = g_path_get_dirname (path_copy);
+  if (strcmp (parent, ".") == 0 ||
+      strcmp (parent, path_copy) == 0)
+    {
+      g_free (parent);
+      return path_copy;
+    }
+
+  if (cache->last_parent == NULL ||
+      strcmp (cache->last_parent, parent) != 0)
+    {
+      g_free (cache->last_parent);
+      cache->last_parent = parent;
+      cache->last_parent_expanded = expand_all_symlinks (parent);
+    }
+  else
+    g_free (parent);
+
+  basename = g_path_get_basename (path_copy);
+  res = g_build_filename (cache->last_parent_expanded, basename, NULL);
+  g_free (basename);
+
+  return res;
+}
 
 MetaTree *
-meta_lookup_cache_lookup (MetaLookupCache *cache,
-			  const char *filename,
-			  guint64 device)
+meta_lookup_cache_lookup_path (MetaLookupCache *cache,
+			       const char *filename,
+			       guint64 device)
 {
   const char *mountpoint;
+  const char *treename;
   char *prefix;
+  char *expanded;
+  static struct HomedirData homedir_data_storage;
+  static gsize homedir_datap = 0;
+  struct HomedirData *homedir_data;
+  char *extra_prefix;
 
-  mountpoint = find_mountpoint_for (cache,
-				    filename,
-				    device,
-				    &prefix);
+  if (g_once_init_enter (&homedir_datap))
+    {
+      char *e;
+      struct stat statbuf;
 
-  /* TODO: more work */
-  g_print ("mountpoint: %s, prefix: %s\n",
-	   mountpoint, prefix);
-  g_print ("extra prefix: %s\n",
-	   get_extra_prefix_for_mount (mountpoint));
+      g_stat (g_get_home_dir(), &statbuf);
+      homedir_data_storage.device = statbuf.st_dev;
+      e = canonicalize_filename (g_get_home_dir());
+      homedir_data_storage.expanded_path = expand_all_symlinks (e);
+      g_free (e);
+      g_once_init_leave (&homedir_datap, (gsize)&homedir_data_storage);
+    }
+  homedir_data = (struct HomedirData *)homedir_datap;
+
+  /* Canonicalized form with all symlinks expanded in parents */
+  expanded = expand_parents (cache, filename);
+
+  if (homedir_data->device == device &&
+      path_has_prefix (expanded, homedir_data->expanded_path))
+    {
+      treename = "home";
+      prefix = expanded + strlen (homedir_data->expanded_path);
+      if (*prefix == 0)
+	prefix = g_strdup ("/");
+      else
+	prefix = g_strdup (prefix);
+      goto found;
+    }
+
+  treename = get_tree_for_device (cache, device);
+
+  if (treename)
+    {
+      mountpoint = find_mountpoint_for (cache,
+					filename,
+					device,
+					&prefix);
+
+      if (mountpoint == NULL ||
+	  strcmp (mountpoint, "/") == 0)
+	{
+	  /* Fall back to root */
+	  g_free (prefix);
+	  treename = NULL;
+	}
+      else
+	{
+	  extra_prefix = get_extra_prefix_for_mount (mountpoint);
+	  if (extra_prefix)
+	    {
+	      char *t = prefix;
+	      prefix = g_build_filename (extra_prefix, prefix, NULL);
+	      g_free (t);
+	    }
+	}
+    }
+
+  if (!treename)
+    {
+      treename = "root";
+      prefix = g_strdup (expanded);
+    }
+
+ found:
+  g_print ("Found tree %s:%s\n", treename, prefix);
 
   return NULL;
 }
