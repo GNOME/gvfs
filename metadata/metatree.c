@@ -5,8 +5,46 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <time.h>
+
+#if HAVE_SYS_STATFS_H
+#include <sys/statfs.h>
+#endif
+#if HAVE_SYS_STATVFS_H
+#include <sys/statvfs.h>
+#endif
+#if HAVE_SYS_VFS_H
+#include <sys/vfs.h>
+#elif HAVE_SYS_MOUNT_H
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#include <sys/mount.h>
+#endif
+
+#if defined(HAVE_STATFS) && defined(HAVE_STATVFS)
+/* Some systems have both statfs and statvfs, pick the
+   most "native" for these */
+# if !defined(HAVE_STRUCT_STATFS_F_BAVAIL)
+   /* on solaris and irix, statfs doesn't even have the
+      f_bavail field */
+#  define USE_STATVFS
+# else
+  /* at least on linux, statfs is the actual syscall */
+#  define USE_STATFS
+# endif
+
+#elif defined(HAVE_STATFS)
+
+# define USE_STATFS
+
+#elif defined(HAVE_STATVFS)
+
+# define USE_STATVFS
+
+#endif
 
 #include "metatree.h"
 #include "metabuilder.h"
@@ -115,6 +153,7 @@ struct _MetaTree {
   volatile guint ref_count;
   char *filename;
   gboolean for_write;
+  gboolean on_nfs;
 
   int fd;
   char *data;
@@ -131,7 +170,8 @@ struct _MetaTree {
   MetaJournal *journal;
 };
 
-static MetaJournal *meta_journal_open          (const char  *filename,
+static MetaJournal *meta_journal_open          (MetaTree    *tree,
+						const char  *filename,
 						gboolean     for_write,
 						guint32      tag);
 static void         meta_journal_free          (MetaJournal *journal);
@@ -237,6 +277,144 @@ meta_tree_clear (MetaTree *tree)
 }
 
 static gboolean
+is_on_nfs (char *filename)
+{
+#ifdef USE_STATFS
+  struct statfs statfs_buffer;
+  int statfs_result;
+#elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
+  struct statvfs statfs_buffer;
+  int statfs_result;
+#endif
+  char *dirname;
+  gboolean res;
+
+  dirname = g_path_get_dirname (filename);
+
+  res = FALSE;
+
+#ifdef USE_STATFS
+
+# if STATFS_ARGS == 2
+  statfs_result = statfs (dirname, &statfs_buffer);
+# elif STATFS_ARGS == 4
+  statfs_result = statfs (dirname, &statfs_buffer,
+			  sizeof (statfs_buffer), 0);
+# endif
+  if (statfs_result == 0)
+    res = statfs_buffer.f_type == 0x6969;
+
+#elif defined(USE_STATVFS) && defined(HAVE_STRUCT_STATVFS_F_BASETYPE)
+  statfs_result = statvfs (dirname, &statfs_buffer);
+
+  if (statfs_result == 0)
+    res = strcmp (statfs_buffer.f_basetype, "nfs") == 0;
+#endif
+
+  g_free (dirname);
+
+  return res;
+}
+
+static gboolean
+link_to_tmp (const char *source, char *tmpl)
+{
+  char *XXXXXX;
+  int count, res;
+  static const char letters[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  static const int NLETTERS = sizeof (letters) - 1;
+  glong value;
+  GTimeVal tv;
+  static int counter = 0;
+
+  /* find the last occurrence of "XXXXXX" */
+  XXXXXX = g_strrstr (tmpl, "XXXXXX");
+  g_assert (XXXXXX != NULL);
+
+  /* Get some more or less random data.  */
+  g_get_current_time (&tv);
+  value = (tv.tv_usec ^ tv.tv_sec) + counter++;
+
+  for (count = 0; count < 100; value += 7777, ++count)
+    {
+      glong v = value;
+
+      /* Fill in the random bits.  */
+      XXXXXX[0] = letters[v % NLETTERS];
+      v /= NLETTERS;
+      XXXXXX[1] = letters[v % NLETTERS];
+      v /= NLETTERS;
+      XXXXXX[2] = letters[v % NLETTERS];
+      v /= NLETTERS;
+      XXXXXX[3] = letters[v % NLETTERS];
+      v /= NLETTERS;
+      XXXXXX[4] = letters[v % NLETTERS];
+      v /= NLETTERS;
+      XXXXXX[5] = letters[v % NLETTERS];
+
+      res = link (source, tmpl);
+
+      if (res >= 0)
+	return TRUE;
+      else if (errno != EEXIST)
+	/* Any other error will apply also to other names we might
+	 *  try, and there are 2^32 or so of them, so give up now.
+	 */
+	return FALSE;
+    }
+
+  return FALSE;
+}
+
+static int
+safe_open (MetaTree *tree,
+	   char *filename,
+	   int flags)
+{
+  if (tree->on_nfs)
+    {
+      char *dirname, *tmpname;
+      int fd, errsv;
+
+      /* On NFS if another client unlinks an open file
+       * it is actually removed on the server and this
+       * client will get an ESTALE error on later access.
+       *
+       * For a local (i.e. on this client) unlink this is
+       * handled by the kernel keeping track of unlinks of
+       * open files (by this client) using ".nfsXXXX" files.
+       *
+       * We work around the ESTALE problem by first linking
+       * the file to a temp file that we then unlink on
+       * this client. We never leak the tmpfile (unless
+       * the kernel crashes) and no other client should
+       * remove our tmpfile.
+       */
+
+      dirname = g_path_get_dirname (filename);
+      tmpname = g_build_filename (dirname, ".openXXXXXX", NULL);
+      g_free (dirname);
+
+      if (!link_to_tmp (filename, tmpname))
+	fd = open (filename, flags); /* link failed, what can we do... */
+      else
+	{
+	  fd = open (tmpname, flags);
+	  errsv = errno;
+	  unlink (tmpname);
+	  errno = errsv;
+	}
+
+      g_free (tmpname);
+      return fd;
+    }
+  else
+    return open (filename, flags);
+
+}
+
+static gboolean
 meta_tree_init (MetaTree *tree)
 {
   struct stat statbuf;
@@ -248,7 +426,8 @@ meta_tree_init (MetaTree *tree)
 
   retried = FALSE;
  retry:
-  fd = open (tree->filename, O_RDONLY);
+  tree->on_nfs = is_on_nfs (tree->filename);
+  fd = safe_open (tree, tree->filename, O_RDONLY);
   if (fd == -1)
     {
       if (tree->for_write && !retried)
@@ -317,7 +496,7 @@ meta_tree_init (MetaTree *tree)
   tree->tag = GUINT32_FROM_BE (tree->header->random_tag);
   tree->time_t_base = GINT64_FROM_BE (tree->header->time_t_base);
 
-  tree->journal = meta_journal_open (tree->filename, tree->for_write, tree->tag);
+  tree->journal = meta_journal_open (tree, tree->filename, tree->for_write, tree->tag);
 
   /* There is a race with tree replacing, where the journal could have been
      deleted (and the tree replaced) inbetween opening the tree file and the
@@ -909,7 +1088,7 @@ meta_journal_add_entry (MetaJournal *journal,
 }
 
 static MetaJournal *
-meta_journal_open (const char *filename, gboolean for_write, guint32 tag)
+meta_journal_open (MetaTree *tree, const char *filename, gboolean for_write, guint32 tag)
 {
   MetaJournal *journal;
   struct stat statbuf;
@@ -927,7 +1106,7 @@ meta_journal_open (const char *filename, gboolean for_write, guint32 tag)
   else
     open_flags = O_RDONLY;
 
-  fd = open (journal_filename, open_flags);
+  fd = safe_open (tree, journal_filename, open_flags);
   g_free (journal_filename);
   if (fd == -1)
     return NULL;

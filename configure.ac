@@ -563,6 +563,67 @@ dnl ==========================================================================
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 
 dnl ==========================================================================
+dnl Look for various fs info getters
+
+AC_CHECK_HEADERS([sys/statfs.h sys/statvfs.h sys/vfs.h sys/mount.h sys/param.h])
+AC_CHECK_FUNCS(statvfs statfs)
+AC_CHECK_MEMBERS([struct statfs.f_fstypename, struct statfs.f_bavail],,, [#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#ifdef HAVE_SYS_STATFS_H
+#include <sys/statfs.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifdef HAVE_SYS_MOUNT_H
+#include <sys/mount.h>
+#endif])
+# struct statvfs.f_basetype is available on Solaris but not for Linux. 
+AC_CHECK_MEMBERS([struct statvfs.f_basetype],,, [#include <sys/statvfs.h>])
+
+dnl
+dnl if statfs() takes 2 arguments (Posix) or 4 (Solaris)
+dnl
+if test "$ac_cv_func_statfs" = yes ; then
+  AC_MSG_CHECKING([number of arguments to statfs()])
+  AC_TRY_COMPILE([#include <unistd.h>
+  #ifdef HAVE_SYS_PARAM_H
+  #include <sys/param.h>
+  #endif
+  #ifdef HAVE_SYS_VFS_H
+  #include <sys/vfs.h>
+  #endif
+  #ifdef HAVE_SYS_MOUNT_H
+  #include <sys/mount.h>
+  #endif
+  #ifdef HAVE_SYS_STATFS_H
+  #include <sys/statfs.h>
+  #endif], [struct statfs st;
+  statfs(NULL, &st);],[
+    AC_MSG_RESULT([2])
+    AC_DEFINE(STATFS_ARGS, 2, [Number of arguments to statfs()])],[
+    AC_TRY_COMPILE([#include <unistd.h>
+  #ifdef HAVE_SYS_PARAM_H
+  #include <sys/param.h>
+  #endif
+  #ifdef HAVE_SYS_VFS_H
+  #include <sys/vfs.h>
+  #endif
+  #ifdef HAVE_SYS_MOUNT_H
+  #include <sys/mount.h>
+  #endif
+  #ifdef HAVE_SYS_STATFS_H
+  #include <sys/statfs.h>
+  #endif], [struct statfs st;
+  statfs(NULL, &st, sizeof (st), 0);],[
+      AC_MSG_RESULT([4])
+      AC_DEFINE(STATFS_ARGS, 4, [Number of arguments to statfs()])],[
+      AC_MSG_RESULT(unknown)
+      AC_MSG_ERROR([unable to determine number of arguments to statfs()])])])
+fi
+
+dnl ==========================================================================
 dnl Turn on the additional warnings last, so -Werror doesn't affect other tests.
 
 AC_ARG_ENABLE(more-warnings,
@@ -603,7 +664,7 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 else
 	AC_MSG_RESULT(no)
 fi
-			       
+
 AC_OUTPUT([
 Makefile
 common/Makefile
