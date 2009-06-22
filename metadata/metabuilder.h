@@ -50,6 +50,8 @@ void         metafile_key_unset     (MetaFile    *metafile,
 void         metafile_key_set_value (MetaFile    *metafile,
 				     const char  *key,
 				     const char  *value);
+void         metafile_key_list_set  (MetaFile    *metafile,
+				     const char  *key);
 void         metafile_key_list_add  (MetaFile    *metafile,
 				     const char  *key,
 				     const char  *value);

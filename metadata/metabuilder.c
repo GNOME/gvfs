@@ -229,6 +229,23 @@ metafile_key_set_value (MetaFile *metafile,
 }
 
 void
+metafile_key_list_set (MetaFile    *metafile,
+		       const char  *key)
+{
+  MetaData *data;
+
+  data = metafile_key_lookup (metafile, key, TRUE);
+  if (!data->is_list)
+    {
+      metadata_clear (data);
+      data->is_list = TRUE;
+    }
+  g_list_foreach (data->values, (GFunc)g_free, NULL);
+  g_list_free (data->values);
+  data->values = NULL;
+}
+
+void
 metafile_key_list_add (MetaFile *metafile,
 		       const char *key,
 		       const char *value)
