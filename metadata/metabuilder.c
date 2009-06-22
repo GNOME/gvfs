@@ -16,6 +16,8 @@
 #define RANDOM_TAG_OFFSET 12
 #define ROTATED_OFFSET 8
 
+#define KEY_IS_LIST_MASK (1<<31)
+
 MetaBuilder *
 meta_builder_new (void)
 {
@@ -459,6 +461,68 @@ string_block_end (GString *out,
     g_string_append_c (out, 0);
 }
 
+
+static GList *
+stringv_block_begin (void)
+{
+  return NULL;
+}
+
+
+typedef struct {
+  guint32 offset;
+  GList *strings;
+} StringvInfo;
+
+static void
+append_stringv (GString *out,
+		GList *strings,
+		GList **stringv_block)
+{
+  guint32 offset;
+  StringvInfo *info;
+
+  append_uint32 (out, 0xdeaddead, &offset);
+
+  info = g_new (StringvInfo, 1);
+  info->offset = offset;
+  info->strings = strings;
+
+  *stringv_block = g_list_prepend (*stringv_block, info);
+}
+
+static void
+stringv_block_end (GString *out,
+		   GHashTable *string_block,
+		   GList *stringv_block)
+{
+  guint32 table_offset;
+  StringvInfo *info;
+  GList *l, *s;
+
+
+  for (l = stringv_block; l != NULL; l = l->next)
+    {
+      info = l->data;
+
+      table_offset = out->len;
+
+      append_uint32 (out, g_list_length (info->strings), NULL);
+      for (s = info->strings; s != NULL; s = s->next)
+	append_string (out, s->data, string_block);
+
+      set_uint32 (out, info->offset, table_offset);
+
+      g_free (info);
+    }
+
+  g_list_free (stringv_block);
+
+  /* Pad to 32bit */
+  while (out->len % 4 != 0)
+    g_string_append_c (out, 0);
+}
+
 static void
 write_children (GString *out,
 		MetaBuilder *builder)
@@ -512,6 +576,7 @@ write_children (GString *out,
 static void
 write_metadata_for_file (GString *out,
 			 MetaFile *file,
+			 GList **stringvs,
 			 GHashTable *strings,
 			 GHashTable *key_hash)
 {
@@ -528,12 +593,14 @@ write_metadata_for_file (GString *out,
     {
       data = l->data;
 
-      if (data->is_list)
-	continue; /* TODO: we skip this for now */
-
       key = GPOINTER_TO_UINT (g_hash_table_lookup (key_hash, data->key));
+      if (data->is_list)
+	key |= KEY_IS_LIST_MASK;
       append_uint32 (out, key, NULL);
-      append_string (out, data->value, strings);
+      if (data->is_list)
+	append_stringv (out, data->values, stringvs);
+      else
+	append_string (out, data->value, strings);
     }
 }
 
@@ -543,6 +610,7 @@ write_metadata (GString *out,
 		GHashTable *key_hash)
 {
   GHashTable *strings;
+  GList *stringvs;
   MetaFile *child, *file;
   GList *l;
   GList *files;
@@ -551,8 +619,10 @@ write_metadata (GString *out,
   if (builder->root->data != NULL)
     {
       strings = string_block_begin ();
+      stringvs = stringv_block_begin ();
       write_metadata_for_file (out, builder->root,
-			       strings, key_hash);
+			       &stringvs, strings, key_hash);
+      stringv_block_end (out, strings, stringvs);
       string_block_end (out, strings);
     }
 
@@ -568,6 +638,7 @@ write_metadata (GString *out,
 	continue; /* No children, skip file */
 
       strings = string_block_begin ();
+      stringvs = stringv_block_begin ();
 
       for (l = file->children; l != NULL; l = l->next)
 	{
@@ -575,12 +646,13 @@ write_metadata (GString *out,
 
 	  if (child->data != NULL)
 	    write_metadata_for_file (out, child,
-				     strings, key_hash);
+				     &stringvs, strings, key_hash);
 
 	  if (child->children != NULL)
 	    files = g_list_append (files, child);
 	}
 
+      stringv_block_end (out, strings, stringvs);
       string_block_end (out, strings);
     }
 }
