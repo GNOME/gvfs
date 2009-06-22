@@ -66,6 +66,11 @@ typedef struct {
 } MetaFileDir;
 
 typedef struct {
+  guint32 num_strings;
+  guint32 strings[1];
+} MetaFileStringv;
+
+typedef struct {
   guint32 key;
   guint32 value;
 } MetaFileDataEnt;
@@ -1258,7 +1263,7 @@ meta_tree_lookup_string (MetaTree   *tree,
 
   if (ent == NULL)
     res = NULL;
-  else if (ent->key & KEY_IS_LIST_MASK)
+  else if (GUINT32_FROM_BE (ent->key) & KEY_IS_LIST_MASK)
     res = NULL;
   else
     res = g_strdup (verify_string (tree, ent->value));
@@ -1269,13 +1274,90 @@ meta_tree_lookup_string (MetaTree   *tree,
   return res;
 }
 
+static char **
+get_stringv_from_journal (gpointer value,
+			  gboolean dup_strings)
+{
+  char *valuep = value;
+  guint32 num_strings, i;
+  char **res;
+
+  while (((gsize)valuep) % 4 != 0)
+    valuep++;
+
+  num_strings = GUINT32_FROM_BE (*(guint32 *)valuep);
+  valuep += 4;
+
+  res = g_new (char *, num_strings + 1);
+
+  for (i = 0; i < num_strings; i++)
+    {
+      if (dup_strings)
+	res[i] = g_strdup (valuep);
+      else
+	res[i] = valuep;
+      valuep = get_next_arg (valuep);
+    }
+
+  res[i] = NULL;
+
+  return res;
+}
+
 char **
 meta_tree_lookup_stringv   (MetaTree                         *tree,
 			    const char                       *path,
 			    const char                       *key)
 {
-  /* TODO */
-  return NULL;
+  MetaFileData *data;
+  MetaFileDataEnt *ent;
+  MetaKeyType type;
+  MetaFileStringv *stringv;
+  gpointer value;
+  char *new_path;
+  char **res;
+  guint32 num_strings, i;
+
+  g_static_rw_lock_reader_lock (&metatree_lock);
+
+  new_path = meta_journal_reverse_map_path_and_key (tree->journal,
+						    path,
+						    key,
+						    &type, &value);
+  if (new_path == NULL)
+    {
+      res = NULL;
+      if (type == META_KEY_TYPE_STRINGV)
+	res = get_stringv_from_journal (value, TRUE);
+      goto out;
+    }
+
+  data = meta_tree_lookup_data (tree, new_path);
+  ent = NULL;
+  if (data)
+    ent = meta_data_get_key (tree, data, key);
+
+  g_free (new_path);
+
+  if (ent == NULL)
+    res = NULL;
+  else if ((GUINT32_FROM_BE (ent->key) & KEY_IS_LIST_MASK) == 0)
+    res = NULL;
+  else
+    {
+      stringv = verify_array_block (tree, ent->value,
+				    sizeof (guint32));
+      num_strings = GUINT32_FROM_BE (stringv->num_strings);
+      res = g_new (char *, num_strings + 1);
+      for (i = 0; i < num_strings; i++)
+	res[i] = verify_string (tree, stringv->strings[i]);
+      res[i] = NULL;
+    }
+
+ out:
+  g_static_rw_lock_reader_unlock (&metatree_lock);
+
+  return res;
 }
 
 typedef struct {
@@ -1644,13 +1726,17 @@ enumerate_data (MetaTree *tree,
 		meta_tree_keys_enumerate_callback callback,
 		gpointer user_data)
 {
-  guint32 i, num_keys;
+  guint32 i, j, num_keys, num_strings;
   MetaFileDataEnt *ent;
   EnumKeysInfo *info;
   char *key_name;
   guint32 key_id;
   MetaKeyType type;
   gpointer value;
+  MetaFileStringv *stringv;
+  gpointer free_me;
+  char **strv;
+  char *strv_static[10];
 
   num_keys = GUINT32_FROM_BE (data->num_keys);
   for (i = 0; i < num_keys; i++)
@@ -1674,12 +1760,28 @@ enumerate_data (MetaTree *tree,
       if (info)
 	continue; /* overridden, handle later */
 
+      free_me = NULL;
       if (type == META_KEY_TYPE_STRING)
 	value = verify_string (tree, ent->value);
       else
 	{
-	  value = NULL;
-	  g_print ("TODO: Handle stringv metadata from tree\n");
+	  stringv = verify_array_block (tree, ent->value,
+					sizeof (guint32));
+	  num_strings = GUINT32_FROM_BE (stringv->num_strings);
+
+	  if (num_strings < 10)
+	    strv = strv_static;
+	  else
+	    {
+	      strv = g_new (char *, num_strings + 1);
+	      free_me = (gpointer)strv;
+	    }
+
+	  for (j = 0; j < num_strings; j++)
+	    strv[j] = verify_string (tree, stringv->strings[j]);
+	  strv[j] = NULL;
+
+	  value = strv;
 	}
 
       if (!callback (key_name,
@@ -1687,6 +1789,8 @@ enumerate_data (MetaTree *tree,
 		     value,
 		     user_data))
 	return FALSE;
+
+      g_free (free_me);
     }
   return TRUE;
 }
@@ -1741,8 +1845,8 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
 	value = info->value;
       else
 	{
-	  value = NULL;
-	  g_print ("TODO: Handle stringv metadata from journal\n");
+	  g_assert (info->type == META_KEY_TYPE_STRINGV);
+	  value = get_stringv_from_journal (info->value, FALSE);
 	}
 
       if (!callback (info->key,
@@ -1750,6 +1854,10 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
 		     value,
 		     user_data))
 	break;
+
+      if (info->type == META_KEY_TYPE_STRINGV)
+	g_free (value);
+
     }
  out:
   g_hash_table_destroy (keys);
@@ -1769,7 +1877,7 @@ copy_tree_to_builder (MetaTree *tree,
   MetaFileDirEnt *child_dirent;
   MetaKeyType type;
   char *child_name, *key_name, *value;
-  guint32 i, num_keys, num_children;
+  guint32 i, num_keys, num_children, j;
   guint32 key_id;
 
   /* Copy metadata */
@@ -1797,12 +1905,32 @@ copy_tree_to_builder (MetaTree *tree,
 	  if (type == META_KEY_TYPE_STRING)
 	    {
 	      value = verify_string (tree, ent->value);
-	      metafile_key_set_value (builder_file,
-				      key_name, value);
+	      if (value)
+		metafile_key_set_value (builder_file,
+					key_name, value);
 	    }
 	  else
 	    {
-	      g_print ("TODO: Handle stringv metadata from tree\n");
+	      MetaFileStringv *stringv;
+	      guint32 num_strings;
+	      char *str;
+
+	      stringv = verify_array_block (tree, ent->value,
+					    sizeof (guint32));
+
+	      if (stringv)
+		{
+		  metafile_key_list_set (builder_file, key_name);
+
+		  num_strings = GUINT32_FROM_BE (stringv->num_strings);
+		  for (j = 0; j < num_strings; j++)
+		    {
+		      str = verify_string (tree, stringv->strings[j]);
+		      if (str)
+			metafile_key_list_add (builder_file,
+					       key_name, str);
+		    }
+		}
 	    }
 	}
     }
@@ -1837,7 +1965,9 @@ apply_journal_to_builder (MetaTree *tree,
   guint32 *sizep;
   char *journal_path, *journal_key, *source_path;
   char *value;
+  char **strv;
   MetaFile *file;
+  int i;
 
   journal = tree->journal;
 
@@ -1859,7 +1989,14 @@ apply_journal_to_builder (MetaTree *tree,
 	case JOURNAL_OP_SETV_KEY:
 	  journal_key = get_next_arg (journal_path);
 	  value = get_next_arg (journal_key);
-	  /* TODO */
+	  strv = get_stringv_from_journal (value, FALSE);
+	  file = meta_builder_lookup (builder, journal_path, TRUE);
+
+	  metafile_key_list_set (file, journal_key);
+	  for (i = 0; strv[i] != NULL; i++)
+	    metafile_key_list_add (file, journal_key, strv[i]);
+
+	  g_free (strv);
 	  break;
 	case JOURNAL_OP_UNSET_KEY:
 	  journal_key = get_next_arg (journal_path);
