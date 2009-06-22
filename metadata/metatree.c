@@ -1002,6 +1002,7 @@ get_prefix_match (const char *path,
 typedef gboolean (*journal_key_callback) (MetaJournal *journal,
 					  MetaJournalEntryType entry_type,
 					  const char *path,
+					  guint64 mtime,
 					  const char *key,
 					  gpointer value,
 					  char **iter_path,
@@ -1009,6 +1010,7 @@ typedef gboolean (*journal_key_callback) (MetaJournal *journal,
 typedef gboolean (*journal_path_callback) (MetaJournal *journal,
 					   MetaJournalEntryType entry_type,
 					   const char *path,
+					   guint64 mtime,
 					   const char *source_path,
 					   char **iter_path,
 					   gpointer user_data);
@@ -1025,6 +1027,7 @@ meta_journal_iterate (MetaJournal *journal,
   char *journal_path, *journal_key, *source_path;
   char *path_copy, *value;
   gboolean res;
+  guint64 mtime;
 
   path_copy = g_strdup (path);
 
@@ -1037,6 +1040,7 @@ meta_journal_iterate (MetaJournal *journal,
       sizep = (guint32 *)entry;
       entry = (MetaJournalEntry *)((char *)entry - GUINT32_FROM_BE (*(sizep-1)));
 
+      mtime = GUINT64_FROM_BE (entry->mtime);
       journal_path = &entry->path[0];
 
       if (journal_entry_is_key_type (entry) &&
@@ -1047,7 +1051,7 @@ meta_journal_iterate (MetaJournal *journal,
 
 	  /* Only affects is path is exactly the same */
 	  res = key_callback (journal, entry->entry_type,
-			      journal_path, journal_key,
+			      journal_path, mtime, journal_key,
 			      value,
 			      &path_copy, user_data);
 	  if (!res)
@@ -1064,7 +1068,7 @@ meta_journal_iterate (MetaJournal *journal,
 	    source_path = get_next_arg (journal_path);
 
 	  res = path_callback (journal, entry->entry_type,
-			       journal_path, source_path,
+			       journal_path, mtime, source_path,
 			       &path_copy, user_data);
 	  if (!res)
 	    {
@@ -1082,6 +1086,7 @@ meta_journal_iterate (MetaJournal *journal,
 typedef struct {
   const char *key;
   MetaKeyType type;
+  guint64 mtime;
   gpointer value;
 } PathKeyData;
 
@@ -1089,6 +1094,7 @@ static gboolean
 journal_iter_key (MetaJournal *journal,
 		  MetaJournalEntryType entry_type,
 		  const char *path,
+		  guint64 mtime,
 		  const char *key,
 		  gpointer value,
 		  char **iter_path,
@@ -1098,6 +1104,11 @@ journal_iter_key (MetaJournal *journal,
 
   if (strcmp (path, *iter_path) != 0)
     return TRUE; /* No match, continue */
+
+  data->mtime = mtime;
+
+  if (data->key == NULL)
+    return FALSE; /* Matched path, not interested in key, stop iterating */
 
   if (strcmp (data->key, key) != 0)
     return TRUE; /* No match, continue */
@@ -1127,6 +1138,7 @@ static gboolean
 journal_iter_path (MetaJournal *journal,
 		   MetaJournalEntryType entry_type,
 		   const char *path,
+		   guint64 mtime,
 		   const char *source_path,
 		   char **iter_path,
 		   gpointer user_data)
@@ -1145,6 +1157,7 @@ journal_iter_path (MetaJournal *journal,
     {
       if (data)
 	{
+	  data->mtime = mtime;
 	  data->type = META_KEY_TYPE_NONE;
 	  data->value = NULL;
 	}
@@ -1165,6 +1178,7 @@ meta_journal_reverse_map_path_and_key (MetaJournal *journal,
 				       const char *path,
 				       const char *key,
 				       MetaKeyType *type,
+				       guint64 *mtime,
 				       gpointer *value)
 {
   PathKeyData data = {0};
@@ -1177,6 +1191,8 @@ meta_journal_reverse_map_path_and_key (MetaJournal *journal,
 				   journal_iter_path,
 				   &data);
   *type = data.type;
+  if (mtime)
+    *mtime = data.mtime;
   *value = data.value;
   return res_path;
 }
@@ -1197,7 +1213,7 @@ meta_tree_lookup_key_type  (MetaTree                         *tree,
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
 						    key,
-						    &type, &value);
+						    &type, NULL, &value);
   if (new_path == NULL)
     goto out; /* type is set */
 
@@ -1221,11 +1237,38 @@ meta_tree_lookup_key_type  (MetaTree                         *tree,
 }
 
 guint64
-meta_tree_get_last_changed (MetaTree                         *tree,
-			    const char                       *path)
+meta_tree_get_last_changed (MetaTree *tree,
+			    const char *path)
 {
-  /* TODO */
-  return 0;
+  MetaFileDirEnt *dirent;
+  MetaKeyType type;
+  char *new_path;
+  gpointer value;
+  guint64 res, mtime;
+
+  g_static_rw_lock_reader_lock (&metatree_lock);
+
+  new_path = meta_journal_reverse_map_path_and_key (tree->journal,
+						    path,
+						    NULL,
+						    &type, &mtime, &value);
+  if (new_path == NULL)
+    {
+      res = mtime;
+      goto out;
+    }
+
+  res = 0;
+  dirent = meta_tree_lookup (tree, new_path);
+  if (dirent)
+    res = get_time_t (tree, dirent->last_changed);
+
+  g_free (new_path);
+
+ out:
+  g_static_rw_lock_reader_unlock (&metatree_lock);
+
+  return res;
 }
 
 char *
@@ -1245,7 +1288,7 @@ meta_tree_lookup_string (MetaTree   *tree,
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
 						    key,
-						    &type, &value);
+						    &type, NULL, &value);
   if (new_path == NULL)
     {
       res = NULL;
@@ -1323,7 +1366,7 @@ meta_tree_lookup_stringv   (MetaTree                         *tree,
   new_path = meta_journal_reverse_map_path_and_key (tree->journal,
 						    path,
 						    key,
-						    &type, &value);
+						    &type, NULL, &value);
   if (new_path == NULL)
     {
       res = NULL;
@@ -1417,6 +1460,7 @@ static gboolean
 enum_dir_iter_key (MetaJournal *journal,
 		   MetaJournalEntryType entry_type,
 		   const char *path,
+		   guint64 mtime,
 		   const char *key,
 		   gpointer value,
 		   char **iter_path,
@@ -1437,7 +1481,7 @@ enum_dir_iter_key (MetaJournal *journal,
 	{
 	  info->exists = TRUE;
 	  if (info->last_changed == 0)
-	    info->last_changed = 0; /*TODO*/
+	    info->last_changed = mtime;
 	  info->has_children |= !direct_child;
 	  info->has_data |=
 	    direct_child && entry_type != JOURNAL_OP_UNSET_KEY;
@@ -1451,6 +1495,7 @@ static gboolean
 enum_dir_iter_path (MetaJournal *journal,
 		    MetaJournalEntryType entry_type,
 		    const char *path,
+		    guint64 mtime,
 		    const char *source_path,
 		    char **iter_path,
 		    gpointer user_data)
@@ -1474,7 +1519,7 @@ enum_dir_iter_path (MetaJournal *journal,
 	    {
 	      info->exists = TRUE;
 	      if (info->last_changed == 0)
-		info->last_changed = 0; /*TODO*/
+		info->last_changed = mtime;
 	      info->has_children = TRUE;
 	      info->has_data = TRUE;
 	    }
@@ -1661,6 +1706,7 @@ static gboolean
 enum_keys_iter_key (MetaJournal *journal,
 		    MetaJournalEntryType entry_type,
 		    const char *path,
+		    guint64 mtime,
 		    const char *key,
 		    gpointer value,
 		    char **iter_path,
@@ -1693,6 +1739,7 @@ static gboolean
 enum_keys_iter_path (MetaJournal *journal,
 		     MetaJournalEntryType entry_type,
 		     const char *path,
+		     guint64 mtime,
 		     const char *source_path,
 		     char **iter_path,
 		     gpointer user_data)
