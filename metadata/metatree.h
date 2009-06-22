@@ -71,4 +71,4 @@ gboolean    meta_tree_set_string       (MetaTree                         *tree,
 gboolean    meta_tree_set_stringv      (MetaTree                         *tree,
 					const char                       *path,
 					const char                       *key,
-					const char                      **value);
+					char                            **value);

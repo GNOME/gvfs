@@ -846,6 +846,29 @@ meta_journal_entry_new_set (guint64 mtime,
   return meta_journal_entry_finish (out);
 }
 
+static GString *
+meta_journal_entry_new_setv (guint64 mtime,
+			     const char *path,
+			     const char *key,
+			     char      **value)
+{
+  GString *out;
+  int i;
+
+  out = meta_journal_entry_init (JOURNAL_OP_SETV_KEY, mtime, path);
+  append_string (out, key);
+
+  /* Pad to 32bit */
+  while (out->len % 4 != 0)
+    g_string_append_c (out, 0);
+
+  append_uint32 (out, g_strv_length ((char **)value));
+  for (i = 0; value[i] != NULL; i++)
+    append_string (out, value[i]);
+
+  return meta_journal_entry_finish (out);
+}
+
 /* Call with writer lock held */
 static gboolean
 meta_journal_add_entry (MetaJournal *journal,
@@ -2165,9 +2188,40 @@ gboolean
 meta_tree_set_stringv (MetaTree                         *tree,
 		       const char                       *path,
 		       const char                       *key,
-		       const char                      **value)
+		       char                            **value)
 {
-  return FALSE;
+  GString *entry;
+  guint64 mtime;
+  gboolean res;
+
+  g_static_rw_lock_writer_lock (&metatree_lock);
+
+  if (tree->journal == NULL ||
+      !tree->journal->journal_valid)
+    {
+      res = FALSE;
+      goto out;
+    }
+
+  mtime = time (NULL);
+
+  entry = meta_journal_entry_new_setv (mtime, path, key, value);
+
+  res = TRUE;
+ retry:
+  if (!meta_journal_add_entry (tree->journal, entry))
+    {
+      if (meta_tree_flush_locked (tree))
+	goto retry;
+
+      res = FALSE;
+    }
+
+  g_string_free (entry, TRUE);
+
+ out:
+  g_static_rw_lock_writer_unlock (&metatree_lock);
+  return res;
 }
 
 static char *
