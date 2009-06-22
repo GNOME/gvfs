@@ -325,6 +325,38 @@ meta_tree_open (const char *filename,
   return tree;
 }
 
+static GHashTable *cached_trees = NULL;
+
+MetaTree *
+meta_tree_lookup_by_name (const char *name,
+			  gboolean    for_write)
+{
+  MetaTree *tree;
+  char *filename;
+
+  if (cached_trees == NULL)
+    cached_trees = g_hash_table_new_full (g_str_hash,
+					  g_str_equal,
+					  (GDestroyNotify)g_free,
+					  (GDestroyNotify)meta_tree_unref);
+
+  tree = g_hash_table_lookup (cached_trees, name);
+  if (tree && tree->for_write == for_write)
+    {
+      meta_tree_refresh (tree);
+      return meta_tree_ref (tree);
+    }
+
+  filename = g_build_filename (g_get_user_data_dir (), "gvfs-metadata", name, NULL);
+  tree = meta_tree_open (filename, for_write);
+  g_free (filename);
+
+  if (tree)
+    g_hash_table_insert (cached_trees, g_strdup (name), meta_tree_ref (tree));
+
+  return tree;
+}
+
 MetaTree *
 meta_tree_ref (MetaTree *tree)
 {
@@ -2325,7 +2357,9 @@ expand_parents (MetaLookupCache *cache,
 MetaTree *
 meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 			       const char *filename,
-			       guint64 device)
+			       guint64 device,
+			       gboolean for_write,
+			       char **tree_path)
 {
   const char *mountpoint;
   const char *treename;
@@ -2334,7 +2368,7 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
   static struct HomedirData homedir_data_storage;
   static gsize homedir_datap = 0;
   struct HomedirData *homedir_data;
-  char *extra_prefix;
+  MetaTree *tree;
 
   if (g_once_init_enter (&homedir_datap))
     {
@@ -2390,7 +2424,14 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
     }
 
  found:
-  g_print ("Found tree %s:%s\n", treename, prefix);
+  tree = meta_tree_lookup_by_name (treename, for_write);
 
+  if (tree)
+    {
+      *tree_path = prefix;
+      return tree;
+    }
+
+  g_free (prefix);
   return NULL;
 }

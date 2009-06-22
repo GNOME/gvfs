@@ -24,14 +24,17 @@ MetaLookupCache *meta_lookup_cache_new         (void);
 void             meta_lookup_cache_free        (MetaLookupCache *cache);
 MetaTree        *meta_lookup_cache_lookup_path (MetaLookupCache *cache,
 						const char *filename,
-						guint64 device);
+						guint64 device,
+						gboolean for_write,
+						char **tree_path);
 
-MetaTree *meta_tree_open    (const char *filename,
-			     gboolean    for_write);
-MetaTree *meta_tree_ref     (MetaTree   *tree);
-void      meta_tree_unref   (MetaTree   *tree);
-void      meta_tree_refresh (MetaTree   *tree); /* May invalidates all strings */
-
+MetaTree *meta_tree_open           (const char *filename,
+				    gboolean    for_write);
+MetaTree *meta_tree_lookup_by_name (const char *name,
+				    gboolean    for_write);
+MetaTree *meta_tree_ref            (MetaTree   *tree);
+void      meta_tree_unref          (MetaTree   *tree);
+void      meta_tree_refresh        (MetaTree   *tree); /* May invalidates all strings */
 
 MetaKeyType meta_tree_lookup_key_type  (MetaTree                         *tree,
 					const char                       *path,
