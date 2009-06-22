@@ -2,6 +2,7 @@ NULL =
 
 SUBDIRS = \
 	common \
+	metadata \
 	client \
 	daemon \
 	monitor \

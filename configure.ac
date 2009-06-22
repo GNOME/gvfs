@@ -154,6 +154,17 @@ if test "x$enable_avahi" != "xno"; then
 	AC_SUBST(AVAHI_LIBS)
 fi
 
+dnl ************************
+dnl *** Check for libXML ***
+dnl ************************
+PKG_CHECK_MODULES(LIBXML, libxml-2.0,
+	[AM_CONDITIONAL(HAVE_LIBXML, true)
+	AC_DEFINE(HAVE_LIBXML, [], [Set if we have libxml])]
+	msg_libxml=yes,
+        [AM_CONDITIONAL(HAVE_LIBXML, false)])
+AC_SUBST(LIBXML_CFLAGS)
+AC_SUBST(LIBXML_LIBS)
+
 dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************
@@ -577,6 +588,7 @@ AC_OUTPUT([
 Makefile
 common/Makefile
 client/Makefile
+metadata/Makefile
 daemon/trashlib/Makefile
 daemon/Makefile
 monitor/Makefile

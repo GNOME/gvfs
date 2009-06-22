@@ -1,0 +1,109 @@
+Tree file:
+
+Generic:
+Breath-first stored, first tree, then data
+offsets and sizes are uint32
+time_t are uint32 with base stored in header
+data stored in big endian
+non-string blocks padded to 32bit
+all key names and values are utf8, without zeros
+filenames are byte strings
+
+
+Detailed:
+magic
+file type version
+
+guint32 rotated # != 0 => new file has been written, changed at runtime
+guint32 random_tag
+offset to root
+offset to keywords
+gint64 time_t base (other time_ts stored as offsets)
+
+keywords:
+n_keywords
+array of offset to keywords, sorted by keyword
+string block for keywords
+
+root dirent:
+offset to name ("/")
+offset to children for root
+offset to root metadata
+time_t last_change for root metadata
+
+children:
+Each dir in breath-first order:
+  int num_children
+  children, array of: (sorted by name)
+    offset name
+    offset children
+    offset metadata
+    time_t last_change_metadata
+  string block for names:
+    zero terminated strings
+
+metadata:
+each metadata block: (in breath first order)
+  int num_keys
+  keys, array of: sorted by keyword
+    guint32 keyword | high bit set => is_list
+    offset value (pointer to string, or array of strings)
+  block of string arrays for values
+for each directory, string block of values for metadata in dir
+
+----------------------------------------
+------------- Journal ------------------
+----------------------------------------
+
+Fixed size, rotated when full
+Array of operations, each with a checksum
+Readers handle only up to first non-ok checksum
+Writer periodically rewrites stable tree and creates new journal
+
+strings are stored as plain zero terminated c-strings
+
+Updates to stable:
+1 block writes
+2 write new stable to tmp file, w/ fsync
+3 create new empty journal (name based on random_tag)
+4 rename new stable over old
+5 set rotated to true in old (via open fd)
+6 sync old fd
+7 remove old journal
+8 re-enable writes
+
+When opening a stable file + journal there is a race where we can open the
+old tree, but then the old journal is removed before we read it. To
+handle this, on open you must always re-check "rotated" after the
+journal has been opened (or failed to open) and verified
+
+Journal file header:
+char[6] magic
+char[2] file type version
+guint32 random_tag
+guint32 file_size # Must be same as file size
+guint32 num_entries
+
+Journal entry:
+
+guint32 entry_size # Must verify wrt file size (includes entry_size, etc)
+guint32 crc32 # crc32 of following data, including padding and last size
+guint64 mtime
+byte operation type (set: 0, set_list: 1: unset: 2, move: 3, copy: 4)
+cstring path # target if copy/move
+ set:
+  cstring key
+  cstring value
+ set_list:
+  cstring key
+  <zero padding to even 32bit address>
+  guint32 n_values
+  cstring value
+ uset:
+  cstring key
+ copy: (overwrites all destination data)
+  cstring source_path
+ remove:
+  <nothing>
+<zero padding to even 32bit address>
+guint32 entry_size_end # Must be same as entry_size, for reverse skipping
