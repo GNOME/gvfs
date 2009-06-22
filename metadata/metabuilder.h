@@ -34,11 +34,20 @@ void         meta_builder_print     (MetaBuilder *builder);
 MetaFile *   meta_builder_lookup    (MetaBuilder *builder,
 				     const char  *path,
 				     gboolean     create);
+void         meta_builder_remove    (MetaBuilder *builder,
+				     const char  *path,
+				     guint64      mtime);
+void         meta_builder_copy      (MetaBuilder *builder,
+				     const char  *source_path,
+				     const char  *dest_path,
+				     guint64      mtime);
 gboolean     meta_builder_write     (MetaBuilder *builder,
 				     const char  *filename);
 MetaFile *   metafile_new           (const char  *name,
 				     MetaFile    *parent);
 void         metafile_free          (MetaFile    *file);
+void         metafile_set_mtime     (MetaFile    *file,
+				     guint64      mtime);
 MetaFile *   metafile_lookup_child  (MetaFile    *metafile,
 				     const char  *name,
 				     gboolean     create);

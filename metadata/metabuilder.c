@@ -74,6 +74,44 @@ metafile_new (const char *name,
   return f;
 }
 
+static MetaData *
+metadata_new (const char *key,
+	      MetaFile *file)
+{
+  MetaData *data;
+
+  data = g_new0 (MetaData, 1);
+  data->key = g_strdup (key);
+
+  if (file)
+    file->data = g_list_insert_sorted (file->data, data, compare_metadata);
+
+  return data;
+}
+
+static MetaData *
+metadata_dup (MetaFile *file,
+	      MetaData *data)
+{
+  MetaData *new_data;
+  GList *l;
+
+  new_data = metadata_new (data->key, file);
+
+  new_data->is_list = data->is_list;
+  if (data->is_list)
+    {
+      for (l = data->values; l != NULL; l = l->next)
+	new_data->values =
+	  g_list_prepend (new_data->values, g_strdup (l->data));
+      new_data->values = g_list_reverse (new_data->values);
+    }
+  else
+    new_data->value = g_strdup (data->value);
+
+  return new_data;
+}
+
 static void
 metadata_free (MetaData *data)
 {
@@ -120,15 +158,17 @@ metafile_lookup_child (MetaFile *metafile,
   return child;
 }
 
-MetaFile *
-meta_builder_lookup (MetaBuilder *builder,
-		     const char *path,
-		     gboolean create)
+static MetaFile *
+meta_builder_lookup_with_parent (MetaBuilder *builder,
+				 const char *path,
+				 gboolean create,
+				 MetaFile **parent)
 {
-  MetaFile *f;
+  MetaFile *f, *last;
   const char *element_start;
   char *element;
 
+  last = NULL;
   f = builder->root;
   while (f)
     {
@@ -143,25 +183,105 @@ meta_builder_lookup (MetaBuilder *builder,
 	path++;
       element = g_strndup (element_start, path - element_start);
 
+      last = f;
       f = metafile_lookup_child (f, element, create);
       g_free (element);
     }
+
+  if (parent)
+    *parent = last;
+
   return f;
 }
 
-static MetaData *
-metadata_new (const char *key,
-	      MetaFile *file)
+
+MetaFile *
+meta_builder_lookup (MetaBuilder *builder,
+		     const char *path,
+		     gboolean create)
 {
-  MetaData *data;
+  return meta_builder_lookup_with_parent (builder, path, create, NULL);
+}
 
-  data = g_new0 (MetaData, 1);
-  data->key = g_strdup (key);
+void
+meta_builder_remove (MetaBuilder *builder,
+		     const char  *path,
+		     guint64 mtime)
+{
+  MetaFile *f, *parent;
 
-  if (file)
-    file->data = g_list_insert_sorted (file->data, data, compare_metadata);
+  f = meta_builder_lookup_with_parent (builder, path, FALSE, &parent);
 
-  return data;
+  if (f == NULL)
+    return;
+
+  if (parent != NULL)
+    {
+      parent->children = g_list_remove (parent->children, f);
+      metafile_free (f);
+      if (mtime)
+	parent->last_changed = mtime;
+    }
+  else
+    {
+      /* Removing root not allowed, just remove children */
+      g_list_foreach (f->children, (GFunc)metafile_free, NULL);
+      g_list_free (f->children);
+      f->children = NULL;
+      if (mtime)
+	f->last_changed = mtime;
+    }
+}
+
+
+static void
+meta_file_copy_into (MetaFile *src,
+		     MetaFile *dest,
+		     guint64 mtime)
+{
+  MetaFile *src_child, *dest_child;
+  GList *l;
+
+  if (mtime)
+    dest->last_changed = mtime;
+  else
+    dest->last_changed = src->last_changed;
+
+  for (l = src->data; l != NULL; l = l->next)
+    metadata_dup (dest, l->data);
+
+  for (l = src->children; l != NULL; l = l->next)
+    {
+      src_child = l->data;
+      dest_child = metafile_new (src_child->name, dest);
+      meta_file_copy_into (src_child, dest_child, mtime);
+    }
+}
+
+void
+meta_builder_copy (MetaBuilder *builder,
+		   const char  *source_path,
+		   const char  *dest_path,
+		   guint64      mtime)
+{
+  MetaFile *src, *dest;
+
+  meta_builder_remove (builder, dest_path, mtime);
+
+  src = meta_builder_lookup (builder, source_path, FALSE);
+  if (src == NULL)
+    return;
+
+  dest = meta_builder_lookup (builder, dest_path, TRUE);
+
+  meta_file_copy_into (src, dest, mtime);
+}
+
+void
+metafile_set_mtime (MetaFile    *file,
+		    guint64      mtime)
+{
+  file->last_changed = mtime;
 }
 
 MetaData *
