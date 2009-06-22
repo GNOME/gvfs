@@ -1963,6 +1963,7 @@ apply_journal_to_builder (MetaTree *tree,
   MetaJournal *journal;
   MetaJournalEntry *entry;
   guint32 *sizep;
+  guint64 mtime;
   char *journal_path, *journal_key, *source_path;
   char *value;
   char **strv;
@@ -1974,6 +1975,7 @@ apply_journal_to_builder (MetaTree *tree,
   entry = journal->first_entry;
   while (entry < journal->last_entry)
     {
+      mtime = GUINT64_FROM_BE (entry->mtime);
       journal_path = &entry->path[0];
 
       switch (entry->entry_type)
@@ -1985,6 +1987,7 @@ apply_journal_to_builder (MetaTree *tree,
 	  metafile_key_set_value (file,
 				  journal_key,
 				  value);
+	  metafile_set_mtime (file, mtime);
 	  break;
 	case JOURNAL_OP_SETV_KEY:
 	  journal_key = get_next_arg (journal_path);
@@ -1997,17 +2000,28 @@ apply_journal_to_builder (MetaTree *tree,
 	    metafile_key_list_add (file, journal_key, strv[i]);
 
 	  g_free (strv);
+	  metafile_set_mtime (file, mtime);
 	  break;
 	case JOURNAL_OP_UNSET_KEY:
 	  journal_key = get_next_arg (journal_path);
-	  /* TODO */
+	  file = meta_builder_lookup (builder, journal_path, FALSE);
+	  if (file)
+	    {
+	      metafile_key_unset (file, journal_key);
+	      metafile_set_mtime (file, mtime);
+	    }
 	  break;
 	case JOURNAL_OP_COPY_PATH:
 	  source_path = get_next_arg (journal_path);
-	  /* TODO */
+	  meta_builder_copy (builder,
+			     source_path,
+			     journal_path,
+			     mtime);
 	  break;
 	case JOURNAL_OP_REMOVE_PATH:
-	  /* TODO */
+	  meta_builder_remove (builder,
+			       journal_path,
+			       mtime);
 	  break;
 	default:
 	  break;
