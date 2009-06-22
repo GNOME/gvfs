@@ -200,6 +200,20 @@ metadata_clear (MetaData *data)
 }
 
 void
+metafile_key_unset (MetaFile *metafile,
+		    const char *key)
+{
+  MetaData *data;
+
+  data = metafile_key_lookup (metafile, key, FALSE);
+  if (data)
+    {
+      metafile->data = g_list_remove (metafile->data, data);
+      metadata_free (data);
+    }
+}
+
+void
 metafile_key_set_value (MetaFile *metafile,
 			const char *key,
 			const char *value)

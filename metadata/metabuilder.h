@@ -45,6 +45,8 @@ MetaFile *   metafile_lookup_child  (MetaFile    *metafile,
 MetaData *   metafile_key_lookup    (MetaFile    *file,
 				     const char  *key,
 				     gboolean     create);
+void         metafile_key_unset     (MetaFile    *metafile,
+				     const char  *key);
 void         metafile_key_set_value (MetaFile    *metafile,
 				     const char  *key,
 				     const char  *value);
