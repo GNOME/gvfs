@@ -1049,6 +1049,28 @@ meta_journal_entry_new_setv (guint64 mtime,
 }
 
 static GString *
+meta_journal_entry_new_remove (guint64 mtime,
+			       const char *path)
+{
+  GString *out;
+
+  out = meta_journal_entry_init (JOURNAL_OP_REMOVE_PATH, mtime, path);
+  return meta_journal_entry_finish (out);
+}
+
+static GString *
+meta_journal_entry_new_copy (guint64 mtime,
+			     const char *src,
+			     const char *dst)
+{
+  GString *out;
+
+  out = meta_journal_entry_init (JOURNAL_OP_COPY_PATH, mtime, dst);
+  append_string (out, src);
+  return meta_journal_entry_finish (out);
+}
+
+static GString *
 meta_journal_entry_new_unset (guint64 mtime,
 			      const char *path,
 			      const char *key)
@@ -2446,6 +2468,83 @@ meta_tree_set_stringv (MetaTree                         *tree,
   return res;
 }
 
+gboolean
+meta_tree_remove (MetaTree *tree,
+		  const char *path)
+{
+  GString *entry;
+  guint64 mtime;
+  gboolean res;
+
+  g_static_rw_lock_writer_lock (&metatree_lock);
+
+  if (tree->journal == NULL ||
+      !tree->journal->journal_valid)
+    {
+      res = FALSE;
+      goto out;
+    }
+
+  mtime = time (NULL);
+
+  entry = meta_journal_entry_new_remove (mtime, path);
+
+  res = TRUE;
+ retry:
+  if (!meta_journal_add_entry (tree->journal, entry))
+    {
+      if (meta_tree_flush_locked (tree))
+	goto retry;
+
+      res = FALSE;
+    }
+
+  g_string_free (entry, TRUE);
+
+ out:
+  g_static_rw_lock_writer_unlock (&metatree_lock);
+  return res;
+}
+
+gboolean
+meta_tree_copy (MetaTree                         *tree,
+		const char                       *src,
+		const char                       *dest)
+{
+  GString *entry;
+  guint64 mtime;
+  gboolean res;
+
+  g_static_rw_lock_writer_lock (&metatree_lock);
+
+  if (tree->journal == NULL ||
+      !tree->journal->journal_valid)
+    {
+      res = FALSE;
+      goto out;
+    }
+
+  mtime = time (NULL);
+
+  entry = meta_journal_entry_new_copy (mtime, src, dest);
+
+  res = TRUE;
+ retry:
+  if (!meta_journal_add_entry (tree->journal, entry))
+    {
+      if (meta_tree_flush_locked (tree))
+	goto retry;
+
+      res = FALSE;
+    }
+
+  g_string_free (entry, TRUE);
+
+ out:
+  g_static_rw_lock_writer_unlock (&metatree_lock);
+  return res;
+}
+
 static char *
 canonicalize_filename (const char *filename)
 {
@@ -2622,6 +2721,7 @@ follow_symlink_recursively (char **path,
 struct _MetaLookupCache {
   char *last_parent;
   char *last_parent_expanded;
+  dev_t last_parent_dev;
   char *last_parent_mountpoint;
   char *last_parent_mountpoint_extra_prefix;
 
@@ -3003,7 +3103,8 @@ find_mountpoint_for (MetaLookupCache *cache,
  * Invariant: If path is canonical, so is result.
  */
 static char *
-expand_all_symlinks (const char *path)
+expand_all_symlinks (const char *path,
+		     dev_t *dev_out)
 {
   char *parent, *parent_expanded;
   char *basename, *res;
@@ -3012,11 +3113,13 @@ expand_all_symlinks (const char *path)
 
   path_copy = g_strdup (path);
   follow_symlink_recursively (&path_copy, &dev);
+  if (dev_out)
+    *dev_out = dev;
 
   parent = get_dirname (path_copy);
   if (parent)
     {
-      parent_expanded = expand_all_symlinks (parent);
+      parent_expanded = expand_all_symlinks (parent, NULL);
       basename = g_path_get_basename (path_copy);
       res = g_build_filename (parent_expanded, basename, NULL);
       g_free (parent_expanded);
@@ -3077,23 +3180,29 @@ struct HomedirData {
 
 static char *
 expand_parents (MetaLookupCache *cache,
-		const char *path)
+		const char *path,
+		dev_t *parent_dev_out)
 {
   char *parent;
   char *basename, *res;
   char *path_copy;
+  dev_t parent_dev;
 
   path_copy = canonicalize_filename (path);
   parent = get_dirname (path_copy);
   if (parent == NULL)
-    return path_copy;
+    {
+      *parent_dev_out = 0;
+      return path_copy;
+    }
 
   if (cache->last_parent == NULL ||
       strcmp (cache->last_parent, parent) != 0)
     {
       g_free (cache->last_parent);
       cache->last_parent = parent;
-      cache->last_parent_expanded = expand_all_symlinks (parent);
+      cache->last_parent_expanded = expand_all_symlinks (parent, &parent_dev);
+      cache->last_parent_dev = parent_dev;
       g_free (cache->last_parent_mountpoint);
       cache->last_parent_mountpoint = NULL;
       g_free (cache->last_parent_mountpoint_extra_prefix);
@@ -3102,6 +3211,7 @@ expand_parents (MetaLookupCache *cache,
   else
     g_free (parent);
 
+  *parent_dev_out = cache->last_parent_dev;
   basename = g_path_get_basename (path_copy);
   res = g_build_filename (cache->last_parent_expanded, basename, NULL);
   g_free (basename);
@@ -3124,6 +3234,7 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
   static gsize homedir_datap = 0;
   struct HomedirData *homedir_data;
   MetaTree *tree;
+  dev_t parent_dev;
 
   if (g_once_init_enter (&homedir_datap))
     {
@@ -3133,14 +3244,17 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
       g_stat (g_get_home_dir(), &statbuf);
       homedir_data_storage.device = statbuf.st_dev;
       e = canonicalize_filename (g_get_home_dir());
-      homedir_data_storage.expanded_path = expand_all_symlinks (e);
+      homedir_data_storage.expanded_path = expand_all_symlinks (e, NULL);
       g_free (e);
       g_once_init_leave (&homedir_datap, (gsize)&homedir_data_storage);
     }
   homedir_data = (struct HomedirData *)homedir_datap;
 
   /* Canonicalized form with all symlinks expanded in parents */
-  expanded = expand_parents (cache, filename);
+  expanded = expand_parents (cache, filename, &parent_dev);
+
+  if (device == 0) /* Unknown, use same as parent */
+    device = parent_dev;
 
   if (homedir_data->device == device &&
       path_has_prefix (expanded, homedir_data->expanded_path))

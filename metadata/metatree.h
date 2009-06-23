@@ -72,3 +72,8 @@ gboolean    meta_tree_set_stringv      (MetaTree                         *tree,
 					const char                       *path,
 					const char                       *key,
 					char                            **value);
+gboolean    meta_tree_remove           (MetaTree                         *tree,
+					const char                       *path);
+gboolean    meta_tree_copy             (MetaTree                         *tree,
+					const char                       *src,
+					const char                       *dest);
