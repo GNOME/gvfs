@@ -170,6 +170,7 @@ struct _MetaTree {
   MetaJournal *journal;
 };
 
+static void         meta_tree_refresh_locked   (MetaTree    *tree);
 static MetaJournal *meta_journal_open          (MetaTree    *tree,
 						const char  *filename,
 						gboolean     for_write,
@@ -504,7 +505,7 @@ meta_tree_init (MetaTree *tree)
      journal. However we can detect this case by looking at the tree and see
      if its been rotated, we do this to ensure we have an uptodate tree+journal
      combo. */
-  meta_tree_refresh (tree);
+  meta_tree_refresh_locked (tree);
 
   return TRUE;
 
