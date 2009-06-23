@@ -13,3 +13,4 @@ gvfs-rm
 gvfs-save
 gvfs-trash
 gvfs-tree
+gvfs-set-attribute

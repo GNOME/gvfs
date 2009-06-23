@@ -18,6 +18,7 @@ bin_PROGRAMS =					\
 	gvfs-ls					\
 	gvfs-tree				\
 	gvfs-info				\
+	gvfs-set-attribute			\
 	gvfs-trash				\
 	gvfs-rename                             \
 	gvfs-rm					\
@@ -51,6 +52,9 @@ gvfs_save_LDADD = $(libraries)
 
 gvfs_info_SOURCES = gvfs-info.c
 gvfs_info_LDADD = $(libraries)
+
+gvfs_set_attribute_SOURCES = gvfs-set-attribute.c
+gvfs_set_attribute_LDADD = $(libraries)
 
 gvfs_trash_SOURCES = gvfs-trash.c
 gvfs_trash_LDADD = $(libraries)
