@@ -40,6 +40,7 @@ MetaTree *  meta_tree_ref            (MetaTree   *tree);
 void        meta_tree_unref          (MetaTree   *tree);
 void        meta_tree_refresh        (MetaTree   *tree);
 const char *meta_tree_get_filename   (MetaTree   *tree);
+gboolean    meta_tree_exists         (MetaTree   *tree);
 
 MetaKeyType meta_tree_lookup_key_type  (MetaTree                         *tree,
 					const char                       *path,

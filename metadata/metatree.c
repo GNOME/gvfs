@@ -269,7 +269,7 @@ meta_tree_clear (MetaTree *tree)
     }
 
   tree->len = 0;
-  if (tree->fd != 0)
+  if (tree->fd != -1)
     {
       close (tree->fd);
       tree->fd = 0;
@@ -447,6 +447,7 @@ meta_tree_init (MetaTree *tree)
 	    }
 	  meta_builder_free (builder);
 	}
+      tree->fd = -1;
       return FALSE;
     }
 
@@ -526,12 +527,10 @@ meta_tree_open (const char *filename,
   tree->ref_count = 1;
   tree->filename = g_strdup (filename);
   tree->for_write = for_write;
+  tree->fd = -1;
 
-  if (!meta_tree_init (tree))
-    {
-      meta_tree_unref (tree);
-      return NULL;
-    }
+  meta_tree_init (tree);
+
   return tree;
 }
 
@@ -539,6 +538,12 @@ const char *
 meta_tree_get_filename (MetaTree *tree)
 {
   return tree->filename;
+}
+
+gboolean
+meta_tree_exists (MetaTree *tree)
+{
+  return tree->fd != -1;
 }
 
 static GHashTable *cached_trees = NULL;
@@ -607,6 +612,9 @@ meta_tree_unref (MetaTree *tree)
 static gboolean
 meta_tree_needs_rereading (MetaTree *tree)
 {
+  if (tree->fd == -1)
+    return TRUE;
+
   if (tree->header != NULL &&
       GUINT32_FROM_BE (tree->header->rotated) == 0)
     return FALSE; /* Got a valid tree and its not rotated */
@@ -733,6 +741,9 @@ meta_tree_lookup (MetaTree *tree,
 {
   MetaFileDirEnt *dirent;
   char *path_copy;
+
+  if (tree->root == NULL)
+    return NULL;
 
   path_copy = g_strdup (path);
   dirent = dir_lookup_path (tree, tree->root, path_copy);
