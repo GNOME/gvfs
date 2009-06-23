@@ -153,11 +153,11 @@ show_info (GFileInfo *info)
   name = g_file_info_get_display_name (info);
   if (name)
     g_print ("display name: %s\n", name);
-  
+
   name = g_file_info_get_edit_name (info);
   if (name)
     g_print ("edit name: %s\n", name);
-  
+
   name = g_file_info_get_name (info);
   if (name)
     {
@@ -165,16 +165,22 @@ show_info (GFileInfo *info)
       g_print ("name: %s\n", escaped);
       g_free (escaped);
     }
-  
-  type = type_to_string (g_file_info_get_file_type (info));
-  g_print ("type: %s\n", type);
-  
-  size = g_file_info_get_size (info);
-  g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
-  
+
+  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_TYPE))
+    {
+      type = type_to_string (g_file_info_get_file_type (info));
+      g_print ("type: %s\n", type);
+    }
+
+  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE))
+    {
+      size = g_file_info_get_size (info);
+      g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
+    }
+
   if (g_file_info_get_is_hidden (info))
     g_print ("hidden\n");
-  
+
   show_attributes (info);
 }
 
