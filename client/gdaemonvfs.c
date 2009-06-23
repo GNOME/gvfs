@@ -1203,6 +1203,22 @@ send_message (DBusMessage *message,
 }
 
 static gboolean
+strv_equal (char **a, char **b)
+{
+  int i;
+
+  if (g_strv_length (a) != g_strv_length (b))
+    return FALSE;
+
+  for (i = 0; a[i] != NULL; i++)
+    {
+      if (strcmp (a[i], b[i]) != 0)
+	return FALSE;
+    }
+  return TRUE;
+}
+
+static gboolean
 g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 					const char *filename,
 					GFileInfo  *info,
@@ -1219,7 +1235,7 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
   char *key;
   MetaTree *tree;
   int errsv;
-  int i;
+  int i, num_set;
   DBusMessage *message;
   gboolean res;
 
@@ -1263,30 +1279,42 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 				       G_DBUS_TYPE_CSTRING, &tree_path,
 				       0);
 	  meta_lookup_cache_free (cache);
-	  meta_tree_unref (tree);
-	  g_free (tree_path);
 
+	  num_set = 0;
 	  for (i = 0; attributes[i] != NULL; i++)
 	    {
 	      key = attributes[i] + strlen ("metadata::");
 	      type = g_file_info_get_attribute_type (info, attributes[i]);
 	      if (type == G_FILE_ATTRIBUTE_TYPE_STRING)
 		{
+		  const char *current;
 		  const char *val = g_file_info_get_attribute_string (info, attributes[i]);
-		  _g_dbus_message_append_args (message,
-					       DBUS_TYPE_STRING, &key,
-					       DBUS_TYPE_STRING, &val,
-					       0);
+
+		  current = meta_tree_lookup_string (tree, tree_path, key);
+		  if (current == NULL || strcmp (current, val) != 0)
+		    {
+		      num_set++;
+		      _g_dbus_message_append_args (message,
+						   DBUS_TYPE_STRING, &key,
+						   DBUS_TYPE_STRING, &val,
+						   0);
+		    }
 		  g_file_info_set_attribute_status (info, attributes[i],
 						    G_FILE_ATTRIBUTE_STATUS_SET);
 		}
 	      else if (type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
 		{
+		  char **current;
 		  char **val = g_file_info_get_attribute_stringv (info, attributes[i]);
-		  _g_dbus_message_append_args (message,
-					       DBUS_TYPE_STRING, &key,
-					       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
-					       0);
+		  current = meta_tree_lookup_stringv (tree, tree_path, key);
+		  if (current == NULL || !strv_equal (current, val))
+		    {
+		      num_set++;
+		      _g_dbus_message_append_args (message,
+						   DBUS_TYPE_STRING, &key,
+						   DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
+						   0);
+		    }
 		  g_file_info_set_attribute_status (info, attributes[i],
 						    G_FILE_ATTRIBUTE_STATUS_SET);
 		}
@@ -1301,9 +1329,13 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 		  g_file_info_set_attribute_status (info, attributes[i],
 						    G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
 		}
+
+	      meta_tree_unref (tree);
+	      g_free (tree_path);
 	    }
 
-	  if (!send_message (message,
+	  if (num_set > 0 &&
+	      !send_message (message,
 			     cancellable, error))
 	    {
 	      res = FALSE;
