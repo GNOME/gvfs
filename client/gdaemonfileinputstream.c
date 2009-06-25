@@ -1631,6 +1631,7 @@ typedef void (*AsyncIteratorDone) (GInputStream *stream,
 				   gpointer op_data,
 				   GAsyncReadyCallback callback,
 				   gpointer callback_data,
+                                   GCancellable *cancellable,
 				   GError *io_error);
 
 struct AsyncIterator {
@@ -1654,6 +1655,7 @@ async_iterator_done (AsyncIterator *iterator, GError *io_error)
 		     iterator->iterator_data,
 		     iterator->callback,
 		     iterator->callback_data,
+                     iterator->cancellable,
 		     io_error);
 
   g_free (iterator);
@@ -1829,6 +1831,7 @@ async_read_done (GInputStream *stream,
 		 gpointer op_data,
 		 GAsyncReadyCallback callback,
 		 gpointer user_data,
+                 GCancellable *cancellable,
 		 GError *io_error)
 {
   ReadOperation *op;
@@ -1859,7 +1862,7 @@ async_read_done (GInputStream *stream,
     g_simple_async_result_set_from_error (simple, error);
 
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
-  g_simple_async_result_complete (simple);
+  _g_simple_async_result_complete_with_cancellable (simple, cancellable);
   g_object_unref (simple);
   
   if (op->ret_error)
@@ -1941,6 +1944,7 @@ async_close_done (GInputStream *stream,
 		  gpointer op_data,
 		  GAsyncReadyCallback callback,
 		  gpointer user_data,
+                  GCancellable *cancellable,
 		  GError *io_error)
 {
   GDaemonFileInputStream *file;
@@ -1948,7 +1952,6 @@ async_close_done (GInputStream *stream,
   CloseOperation *op;
   gboolean result;
   GError *error;
-  GCancellable *cancellable = NULL; /* TODO: get cancellable */
 
   file = G_DAEMON_FILE_INPUT_STREAM (stream);
   
@@ -1984,7 +1987,7 @@ async_close_done (GInputStream *stream,
     g_simple_async_result_set_from_error (simple, error);
 
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
-  g_simple_async_result_complete (simple);
+  _g_simple_async_result_complete_with_cancellable (simple, cancellable);
   g_object_unref (simple);
   
   if (op->ret_error)
@@ -2029,6 +2032,7 @@ async_query_done (GInputStream *stream,
 		  gpointer op_data,
 		  GAsyncReadyCallback callback,
 		  gpointer user_data,
+                  GCancellable *cancellable,
 		  GError *io_error)
 {
   GDaemonFileInputStream *file;
@@ -2063,7 +2067,7 @@ async_query_done (GInputStream *stream,
 					       g_object_unref);
   
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
-  g_simple_async_result_complete (simple);
+  _g_simple_async_result_complete_with_cancellable (simple, cancellable);
   g_object_unref (simple);
   
   if (op->ret_error)

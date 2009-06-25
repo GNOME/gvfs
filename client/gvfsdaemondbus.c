@@ -1024,3 +1024,28 @@ _g_dbus_connection_get_sync (const char *dbus_id,
 
   return connection;
 }
+
+/**
+ * _g_simple_async_result_complete_with_cancellable:
+ * @result: the result
+ * @cancellable: a cancellable to check
+ *
+ * If @cancellable is cancelled, sets @result into the cancelled error
+ * state. Then calls g_simple_async_result_complete().
+ * This function is useful to ensure that @result is properly set into
+ * an error state on cancellation.
+ **/
+void
+_g_simple_async_result_complete_with_cancellable (GSimpleAsyncResult *result,
+                                                  GCancellable       *cancellable)
+{
+  if (cancellable &&
+      g_cancellable_is_cancelled (cancellable))
+    g_simple_async_result_set_error (result,
+                                     G_IO_ERROR,
+                                     G_IO_ERROR_CANCELLED,
+                                     "%s", _("Operation was cancelled"));
+
+  g_simple_async_result_complete (result);
+}
+

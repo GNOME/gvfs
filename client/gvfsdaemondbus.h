@@ -75,6 +75,10 @@ DBusMessage *   _g_vfs_daemon_call_sync                 (DBusMessage            
 GFileInfo *     _g_dbus_get_file_info                   (DBusMessageIter                *iter,
 							 GError                        **error);
 
+void        _g_simple_async_result_complete_with_cancellable
+                                                        (GSimpleAsyncResult             *result,
+                                                         GCancellable                   *cancellable);
+
 G_END_DECLS
 
 #endif /* __G_VFS_DAEMON_DBUS_H__ */

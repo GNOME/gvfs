@@ -208,7 +208,7 @@ async_path_call_done (DBusMessage *reply,
   if (io_error != NULL)
     {
       g_simple_async_result_set_from_error (data->result, io_error);
-      g_simple_async_result_complete (data->result);
+      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
     }
   else
@@ -239,7 +239,7 @@ do_async_path_call_callback (GMountInfo *mount_info,
   if (error != NULL)
     {
       g_simple_async_result_set_from_error (data->result, error);      
-      g_simple_async_result_complete (data->result);
+      _g_simple_async_result_complete_with_cancellable (data->result, data->cancellable);
       async_path_call_free (data);
       return;
     }
@@ -321,6 +321,7 @@ do_async_path_call (GVfsIcon *vfs_icon,
 
 typedef struct {
   GSimpleAsyncResult *result;
+  GCancellable *cancellable;
   gboolean can_seek;
 } GetFDData;
 
@@ -343,9 +344,12 @@ load_async_get_fd_cb (int fd,
       g_simple_async_result_set_op_res_gpointer (data->result, stream, g_object_unref);
     }
 
-  g_simple_async_result_complete (data->result);
+  _g_simple_async_result_complete_with_cancellable (data->result,
+                                                    data->cancellable);
 
   g_object_unref (data->result);
+  if (data->cancellable)
+    g_object_unref (data->cancellable);
   g_free (data);
 }
 
@@ -368,12 +372,14 @@ load_async_cb (DBusMessage *reply,
       g_simple_async_result_set_error (result,
 				       G_IO_ERROR, G_IO_ERROR_FAILED,
 				       _("Invalid return value from open"));
-      g_simple_async_result_complete (result);
+      _g_simple_async_result_complete_with_cancellable (result, cancellable);
       return;
     }
 
   get_fd_data = g_new0 (GetFDData, 1);
   get_fd_data->result = g_object_ref (result);
+  if (cancellable)
+    get_fd_data->cancellable = g_object_ref (cancellable);
   get_fd_data->can_seek = can_seek;
 
   _g_dbus_connection_get_fd_async (connection, fd_id,

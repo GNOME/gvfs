@@ -1183,6 +1183,7 @@ typedef void (*AsyncIteratorDone) (GOutputStream *stream,
 				   gpointer op_data,
 				   GAsyncReadyCallback callback,
 				   gpointer callback_data,
+                                   GCancellable *cancellable,
 				   GError *io_error);
 
 struct AsyncIterator {
@@ -1206,6 +1207,7 @@ async_iterator_done (AsyncIterator *iterator, GError *io_error)
 		     iterator->iterator_data,
 		     iterator->callback,
 		     iterator->callback_data,
+                     iterator->cancellable,
 		     io_error);
 
   g_free (iterator);
@@ -1381,6 +1383,7 @@ async_write_done (GOutputStream *stream,
 		  gpointer op_data,
 		  GAsyncReadyCallback callback,
 		  gpointer user_data,
+                  GCancellable *cancellable,
 		  GError *io_error)
 {
   GSimpleAsyncResult *simple;
@@ -1411,7 +1414,7 @@ async_write_done (GOutputStream *stream,
     g_simple_async_result_set_from_error (simple, error);
 
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
-  g_simple_async_result_complete (simple);
+  _g_simple_async_result_complete_with_cancellable (simple, cancellable);
   g_object_unref (simple);
 
   if (op->ret_error)
@@ -1513,7 +1516,7 @@ async_close_done (GOutputStream *stream,
     g_simple_async_result_set_from_error (simple, error);
 
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
-  g_simple_async_result_complete (simple);
+  _g_simple_async_result_complete_with_cancellable (simple, cancellable);
   g_object_unref (simple);
   
   if (op->ret_error)
@@ -1558,6 +1561,7 @@ async_query_done (GOutputStream *stream,
 		  gpointer op_data,
 		  GAsyncReadyCallback callback,
 		  gpointer user_data,
+                  GCancellable *cancellable,
 		  GError *io_error)
 {
   GDaemonFileOutputStream *file;
@@ -1592,7 +1596,7 @@ async_query_done (GOutputStream *stream,
 					       g_object_unref);
   
   /* Complete immediately, not in idle, since we're already in a mainloop callout */
-  g_simple_async_result_complete (simple);
+  _g_simple_async_result_complete_with_cancellable (simple, cancellable);
   g_object_unref (simple);
   
   if (op->ret_error)
