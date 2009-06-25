@@ -286,6 +286,7 @@ _g_dbus_append_file_info (DBusMessageIter *iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
 					 DBUS_TYPE_STRING_AS_STRING	
+					 DBUS_TYPE_UINT32_AS_STRING
 					 DBUS_TYPE_VARIANT_AS_STRING	
 					 DBUS_STRUCT_END_CHAR_AS_STRING,
 					 &array_iter))
@@ -329,19 +330,21 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
   GObject *obj;
 
   dbus_message_iter_recurse (iter, &inner_struct_iter);
-      
+
   if (dbus_message_iter_get_arg_type (&inner_struct_iter) != DBUS_TYPE_STRING)
     goto error;
 	
   dbus_message_iter_get_basic (&inner_struct_iter, &attribute_temp);
   *attribute = g_strdup (attribute_temp);
 
+  dbus_message_iter_next (&inner_struct_iter);
+
   dbus_message_iter_get_basic (&inner_struct_iter, &dbus_status);
   if (status)
     *status = dbus_status;
 
   dbus_message_iter_next (&inner_struct_iter);
-	
+
   if (dbus_message_iter_get_arg_type (&inner_struct_iter) != DBUS_TYPE_VARIANT)
     goto error;
 
@@ -580,7 +583,7 @@ _g_dbus_append_attribute_info_list (DBusMessageIter         *iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
 					 DBUS_TYPE_STRING_AS_STRING	
-					 DBUS_TYPE_UINT32_AS_STRING	
+					 DBUS_TYPE_UINT32_AS_STRING
 					 DBUS_TYPE_UINT32_AS_STRING	
 					 DBUS_STRUCT_END_CHAR_AS_STRING,
 					 &array_iter))
