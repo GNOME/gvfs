@@ -119,6 +119,7 @@ metadata_set (const char *treefile,
   gboolean res;
   const char *key;
   int n_elements;
+  char c;
 
   info = tree_info_lookup (treefile);
   if (info == NULL)
@@ -160,7 +161,7 @@ metadata_set (const char *treefile,
 	    }
 	  g_strfreev (strv);
 	}
-      else
+      else if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_STRING)
 	{
 	  /* string */
 	  if (!_g_dbus_message_iter_get_args (iter, derror,
@@ -175,6 +176,24 @@ metadata_set (const char *treefile,
 	      dbus_set_error (derror,
 			      DBUS_ERROR_FAILED,
 			      _("Unable to set metadata key"));
+	      res = FALSE;
+	    }
+	}
+      else if (dbus_message_iter_get_arg_type (iter) == DBUS_TYPE_BYTE)
+	{
+	  /* Unset */
+	  if (!_g_dbus_message_iter_get_args (iter, derror,
+					      DBUS_TYPE_BYTE, &c,
+					      0))
+	    {
+	      res = FALSE;
+	      break;
+	    }
+	  if (!meta_tree_unset (info->tree, path, key))
+	    {
+	      dbus_set_error (derror,
+			      DBUS_ERROR_FAILED,
+			      _("Unable to unset metadata key"));
 	      res = FALSE;
 	    }
 	}
