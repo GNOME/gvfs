@@ -47,6 +47,14 @@ get_object_signature (GObject *obj)
 }
 
 static void
+append_strv (DBusMessageIter *iter, char **strv)
+{
+  _g_dbus_message_iter_append_args (iter,
+				    DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &strv, g_strv_length (strv),
+				    0);
+}
+
+static void
 append_object (DBusMessageIter *iter, GObject *obj)
 {
   DBusMessageIter obj_struct_iter;
@@ -100,6 +108,9 @@ _g_dbus_attribute_value_destroy (GFileAttributeType          type,
   case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
     g_free (value->ptr);
     break;
+  case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+    g_strfreev (value->ptr);
+    break;
   case G_FILE_ATTRIBUTE_TYPE_OBJECT:
     if (value->ptr)
       g_object_unref (value->ptr);
@@ -136,6 +147,9 @@ _g_dbus_type_from_file_attribute_type (GFileAttributeType type)
     case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
       dbus_type = DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING;
       break;
+    case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+      dbus_type = DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING;
+      break;
     case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
       dbus_type = DBUS_TYPE_BOOLEAN_AS_STRING;
       break;
@@ -153,6 +167,9 @@ _g_dbus_type_from_file_attribute_type (GFileAttributeType type)
       break;
     case G_FILE_ATTRIBUTE_TYPE_OBJECT:
       dbus_type = DBUS_TYPE_STRUCT_AS_STRING;
+      break;
+    case G_FILE_ATTRIBUTE_TYPE_INVALID:
+      dbus_type = DBUS_TYPE_BYTE_AS_STRING;
       break;
     default:
       dbus_type = NULL;
@@ -201,8 +218,17 @@ _g_dbus_append_file_attribute (DBusMessageIter *iter,
 					   DBUS_TYPE_STRING, &value_p))
 	_g_dbus_oom ();
     }
-  else if (dbus_type[0] == DBUS_TYPE_ARRAY)
+  else if (dbus_type[0] == DBUS_TYPE_ARRAY && dbus_type[1] == DBUS_TYPE_BYTE)
     _g_dbus_message_iter_append_cstring (&variant_iter, (char *)value_p);
+  else if (dbus_type[0] == DBUS_TYPE_ARRAY && dbus_type[1] == DBUS_TYPE_STRING)
+    append_strv (&variant_iter, (char **)value_p);
+  else if (dbus_type[0] == DBUS_TYPE_BYTE)
+    {
+      char byte = 0;
+      if (!dbus_message_iter_append_basic (&variant_iter,
+					   DBUS_TYPE_BYTE, &byte))
+	_g_dbus_oom ();
+    }
   else if (dbus_type[0] == DBUS_STRUCT_BEGIN_CHAR)
     append_object (&variant_iter, (GObject *)value_p);
   else if (dbus_type[0] == DBUS_TYPE_BOOLEAN)
@@ -286,8 +312,10 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
   int n_elements;
   DBusMessageIter inner_struct_iter, variant_iter, cstring_iter, obj_iter;
   const gchar *attribute_temp;
+  int element_type;
   dbus_uint32_t obj_type;
   dbus_bool_t dbus_bool;
+  guint8 byte;
   GObject *obj;
 
   dbus_message_iter_recurse (iter, &inner_struct_iter);
@@ -313,15 +341,34 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
       value->ptr = g_strdup (str);
       break;
     case DBUS_TYPE_ARRAY:
-      if (dbus_message_iter_get_element_type (&variant_iter) != DBUS_TYPE_BYTE)
+      element_type = dbus_message_iter_get_element_type (&variant_iter);
+      if (element_type == DBUS_TYPE_BYTE)
+	{
+	  *type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
+
+	  dbus_message_iter_recurse (&variant_iter, &cstring_iter);
+	  dbus_message_iter_get_fixed_array (&cstring_iter,
+					     &str, &n_elements);
+	  value->ptr = g_strndup (str, n_elements);
+	}
+      else if (element_type == DBUS_TYPE_STRING)
+	{
+	  char **strv;
+	  int n_elements;
+	  if (!_g_dbus_message_iter_get_args (iter, NULL,
+					      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &strv, &n_elements,
+					      0))
+	    goto error;
+	  *type = G_FILE_ATTRIBUTE_TYPE_STRINGV;
+	  value->ptr = strv;
+	}
+      else
 	goto error;
 
-      *type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
-
-      dbus_message_iter_recurse (&variant_iter, &cstring_iter);
-      dbus_message_iter_get_fixed_array (&cstring_iter,
-					 &str, &n_elements);
-      value->ptr = g_strndup (str, n_elements);
+      break;
+    case DBUS_TYPE_BYTE:
+      dbus_message_iter_get_basic (&variant_iter, &byte);
+      *type = G_FILE_ATTRIBUTE_TYPE_INVALID;
       break;
     case DBUS_TYPE_BOOLEAN:
       dbus_message_iter_get_basic (&variant_iter, &dbus_bool);

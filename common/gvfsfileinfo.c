@@ -45,6 +45,25 @@ put_string (GDataOutputStream *out,
   g_data_output_stream_put_string (out, str, NULL, NULL);
 }
 
+static void
+put_stringv (GDataOutputStream *out,
+	     char **strv)
+{
+  int len, i;
+
+  len = g_strv_length (strv);
+  if (len > G_MAXUINT16)
+    {
+      g_warning ("GFileInfo stringv to large, (%d elements)\n", (int)len);
+      len = 0;
+    }
+
+  g_data_output_stream_put_uint16 (out, len,
+				   NULL, NULL);
+  for (i = 0; i < len; i++)
+    put_string (out, strv[i]);
+}
+
 static char *
 read_string (GDataInputStream *in)
 {
@@ -56,6 +75,21 @@ read_string (GDataInputStream *in)
   g_input_stream_read_all (G_INPUT_STREAM (in), str, len, &len, NULL, NULL);
   str[len] = 0;
   return str;
+}
+
+static char **
+read_stringv (GDataInputStream *in)
+{
+  int len, i;
+  char **strv;
+
+  len = g_data_input_stream_read_uint16 (in, NULL, NULL);
+
+  strv = g_new (char *, len + 1);
+  for (i = 0; i < len; i++)
+    strv[i] = read_string (in);
+  strv[i] = NULL;
+  return strv;
 }
 
 char *
@@ -102,6 +136,9 @@ gvfs_file_info_marshal (GFileInfo *info,
 	  break;
 	case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
 	  put_string (out, g_file_info_get_attribute_byte_string (info, attr));
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+	  put_stringv (out, g_file_info_get_attribute_stringv (info, attr));
 	  break;
 	case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
 	  g_data_output_stream_put_byte (out,
@@ -174,7 +211,7 @@ gvfs_file_info_demarshal (char      *data,
   GInputStream *memstream;
   GDataInputStream *in;
   GFileInfo *info;
-  char *attr, *str;
+  char *attr, *str, **strv;
   GFileAttributeType type;
   GFileAttributeStatus status;
   GObject *obj;
@@ -207,6 +244,11 @@ gvfs_file_info_demarshal (char      *data,
 	  str = read_string (in);
 	  g_file_info_set_attribute_byte_string (info, attr, str);
 	  g_free (str);
+	  break;
+	case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+	  strv = read_stringv (in);
+	  g_file_info_set_attribute_stringv (info, attr, strv);
+	  g_strfreev (strv);
 	  break;
 	case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
 	  g_file_info_set_attribute_boolean (info, attr,
@@ -261,6 +303,7 @@ gvfs_file_info_demarshal (char      *data,
 	    g_object_unref (obj);
 	  break;
 	case G_FILE_ATTRIBUTE_TYPE_INVALID:
+	  break;
 	default:
 	  g_warning ("Unsupported GFileInfo attribute type %d\n", type);
 	  g_free (attr);
