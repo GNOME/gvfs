@@ -230,9 +230,6 @@ gvfs_file_info_demarshal (char      *data,
       type = g_data_input_stream_read_byte (in, NULL, NULL);
       status = g_data_input_stream_read_byte (in, NULL, NULL);
 
-      /* TODO: There is no way to set the status. This is required for
-	 g_file_set_attributes_from_info() */
-      
       switch (type)
 	{
 	case G_FILE_ATTRIBUTE_TYPE_STRING:
@@ -310,6 +307,7 @@ gvfs_file_info_demarshal (char      *data,
 	  goto out;
 	  break;
 	}
+      g_file_info_set_attribute_status (info, attr, status);
       g_free (attr);
     }
   

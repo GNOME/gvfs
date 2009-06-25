@@ -161,6 +161,7 @@ typedef struct {
   DBUS_TYPE_ARRAY_AS_STRING			 \
     DBUS_STRUCT_BEGIN_CHAR_AS_STRING		 \
       DBUS_TYPE_STRING_AS_STRING		 \
+      DBUS_TYPE_UINT32_AS_STRING		 \
       DBUS_TYPE_VARIANT_AS_STRING		 \
     DBUS_STRUCT_END_CHAR_AS_STRING
 
@@ -184,12 +185,14 @@ gpointer   _g_dbus_attribute_as_pointer          (GFileAttributeType          ty
 const char*_g_dbus_type_from_file_attribute_type (GFileAttributeType          type);
 void       _g_dbus_append_file_attribute         (DBusMessageIter            *iter,
 						  const char                 *attribute,
+						  GFileAttributeStatus        status,
 						  GFileAttributeType          type,
 						  gpointer                    value_p);
 void       _g_dbus_append_file_info              (DBusMessageIter            *iter,
 						  GFileInfo                  *file_info);
 gboolean   _g_dbus_get_file_attribute            (DBusMessageIter            *iter,
 						  gchar                     **attribute,
+						  GFileAttributeStatus       *status,
 						  GFileAttributeType         *type,
 						  GDbusAttributeValue        *value);
 GFileInfo *_g_dbus_get_file_info                 (DBusMessageIter            *iter,

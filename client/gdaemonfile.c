@@ -1979,7 +1979,7 @@ g_daemon_file_set_attribute (GFile *file,
 				  DBUS_TYPE_UINT32,
 				  &flags_dbus);
 
-  _g_dbus_append_file_attribute (&iter, attribute, type, value_p);
+  _g_dbus_append_file_attribute (&iter, attribute, 0, type, value_p);
 
   my_error = NULL;
   reply = _g_vfs_daemon_call_sync (message,

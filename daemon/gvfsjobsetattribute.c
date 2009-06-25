@@ -113,7 +113,7 @@ g_vfs_job_set_attribute_new (DBusConnection *connection,
 
   flags = flags_u32;
 
-  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, &type, &value)))
+  if (!(filename && _g_dbus_get_file_attribute (&iter, &attribute, NULL, &type, &value)))
     {
       reply = dbus_message_new_error (message,
 				      DBUS_ERROR_FAILED,

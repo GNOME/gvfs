@@ -183,12 +183,14 @@ _g_dbus_type_from_file_attribute_type (GFileAttributeType type)
 void
 _g_dbus_append_file_attribute (DBusMessageIter *iter,
 			       const char *attribute,
+			       GFileAttributeStatus status,
 			       GFileAttributeType type,
 			       gpointer value_p)
 {
   DBusMessageIter variant_iter, inner_struct_iter;
   const char *dbus_type;
   GObject *obj = NULL;
+  guint32 dbus_status;
 
   dbus_type = _g_dbus_type_from_file_attribute_type (type);
 
@@ -201,6 +203,12 @@ _g_dbus_append_file_attribute (DBusMessageIter *iter,
   if (!dbus_message_iter_append_basic (&inner_struct_iter,
 				       DBUS_TYPE_STRING,
 				       &attribute))
+    _g_dbus_oom ();
+
+  dbus_status = status;
+  if (!dbus_message_iter_append_basic (&inner_struct_iter,
+				       DBUS_TYPE_UINT32,
+				       &dbus_status))
     _g_dbus_oom ();
 
   if (dbus_type[0] == DBUS_TYPE_STRUCT)
@@ -286,10 +294,11 @@ _g_dbus_append_file_info (DBusMessageIter *iter,
   for (i = 0; attributes[i] != NULL; i++)
     {
       GFileAttributeType type;
+      GFileAttributeStatus status;
       gpointer value_p;
 
-      if (g_file_info_get_attribute_data (info, attributes[i], &type, &value_p, NULL))
-	_g_dbus_append_file_attribute (&array_iter, attributes [i], type, value_p);
+      if (g_file_info_get_attribute_data (info, attributes[i], &type, &value_p, &status))
+	_g_dbus_append_file_attribute (&array_iter, attributes [i], status, type, value_p);
     }
   
   g_strfreev (attributes);
@@ -304,6 +313,7 @@ _g_dbus_append_file_info (DBusMessageIter *iter,
 gboolean
 _g_dbus_get_file_attribute (DBusMessageIter *iter,
 			    gchar **attribute,
+			    GFileAttributeStatus *status,
 			    GFileAttributeType *type,
 			    GDbusAttributeValue *value)
 {
@@ -313,7 +323,7 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
   DBusMessageIter inner_struct_iter, variant_iter, cstring_iter, obj_iter;
   const gchar *attribute_temp;
   int element_type;
-  dbus_uint32_t obj_type;
+  dbus_uint32_t obj_type, dbus_status;
   dbus_bool_t dbus_bool;
   guint8 byte;
   GObject *obj;
@@ -325,6 +335,10 @@ _g_dbus_get_file_attribute (DBusMessageIter *iter,
 	
   dbus_message_iter_get_basic (&inner_struct_iter, &attribute_temp);
   *attribute = g_strdup (attribute_temp);
+
+  dbus_message_iter_get_basic (&inner_struct_iter, &dbus_status);
+  if (status)
+    *status = dbus_status;
 
   dbus_message_iter_next (&inner_struct_iter);
 	
@@ -465,6 +479,7 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
   DBusMessageIter struct_iter, array_iter;
   gchar *attribute;
   GFileAttributeType type;
+  GFileAttributeStatus status;
   GDbusAttributeValue value;
 
   info = g_file_info_new ();
@@ -481,10 +496,12 @@ _g_dbus_get_file_info (DBusMessageIter *iter,
 
   while (dbus_message_iter_get_arg_type (&array_iter) == DBUS_TYPE_STRUCT)
     {
-      if (!_g_dbus_get_file_attribute (&array_iter, &attribute, &type, &value))
+      if (!_g_dbus_get_file_attribute (&array_iter, &attribute, &status, &type, &value))
         goto error;
 
       g_file_info_set_attribute (info, attribute, type, _g_dbus_attribute_as_pointer (type, &value));
+      if (status)
+	g_file_info_set_attribute_status (info, attribute, status);
 
       g_free (attribute);
       _g_dbus_attribute_value_destroy (type, &value);
