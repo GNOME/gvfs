@@ -199,7 +199,6 @@ g_mount_spec_ref (GMountSpec *spec)
   return spec;
 }
 
-
 void
 g_mount_spec_unref (GMountSpec *spec)
 {
@@ -455,31 +454,42 @@ char *
 g_mount_spec_to_string (GMountSpec *spec)
 {
   GString *str;
-  char *k;
-  char *v;
   int i;
+  gboolean first;
 
   if (spec == NULL)
     return g_strdup ("(null)");
 
-  str = g_string_new ("");
+  str = g_string_new (g_mount_spec_get_type (spec));
+  g_string_append_c (str, ':');
 
+  first = TRUE;
   for (i = 0; i < spec->items->len; i++)
     {
       GMountSpecItem *item = &g_array_index (spec->items, GMountSpecItem, i);
 
-      k = g_uri_escape_string (item->key, NULL, TRUE);
-      v = g_uri_escape_string (item->value, NULL, TRUE);
-      g_string_append_printf (str, "%s=%s,", k, v);
-      g_free (k);
-      g_free (v);
-    }
-  k = g_uri_escape_string ("__mount_prefix", NULL, TRUE);
-  v = g_uri_escape_string (spec->mount_prefix, NULL, TRUE);
-  g_string_append_printf (str, "%s=%s", k, v);
-  g_free (k);
-  g_free (v);
+      if (strcmp (item->key, "type") == 0)
+	continue;
 
+      if (!first)
+	g_string_append_c (str, ',');
+      first = FALSE;
+
+      g_string_append_printf (str, "%s=", item->key);
+      g_string_append_uri_escaped (str, item->value,
+				   "$&'()*+",
+				   TRUE);
+    }
+
+  if (strcmp (spec->mount_prefix, "/") != 0)
+    {
+      g_string_append_printf (str, ",prefix=");
+      g_string_append_uri_escaped (str, spec->mount_prefix,
+				   "$&'()*+",
+				   TRUE);
+    }
+
+  g_print ("str: %s\n", str->str);
   return g_string_free (str, FALSE);
 }
 
@@ -491,6 +501,8 @@ g_mount_spec_new_from_string (const gchar     *str,
   GMountSpec *mount_spec;
   char **kv_pairs;
   char *mount_prefix;
+  const char *colon;
+  GMountSpecItem item;
   int i;
 
   g_return_val_if_fail (str != NULL, NULL);
@@ -499,11 +511,19 @@ g_mount_spec_new_from_string (const gchar     *str,
   mount_prefix = NULL;
   items = g_array_new (FALSE, TRUE, sizeof (GMountSpecItem));
 
+  colon = strchr (str, ':');
+  if (colon)
+    {
+      item.key = g_strdup ("type");
+      item.value = g_strndup (str, colon - str - 1);
+      g_array_append_val (items, item);
+      str = colon + 1;
+    }
+
   kv_pairs = g_strsplit (str, ",", 0);
   for (i = 0; kv_pairs[i] != NULL; i++)
     {
       char **tokens;
-      GMountSpecItem item;
 
       tokens = g_strsplit (kv_pairs[i], "=", 0);
       if (g_strv_length (tokens) != 2)
@@ -518,16 +538,15 @@ g_mount_spec_new_from_string (const gchar     *str,
           goto fail;
         }
 
-      item.key = g_uri_unescape_string (tokens[0], NULL);
       item.value = g_uri_unescape_string (tokens[1], NULL);
-
-      if (strcmp (item.key, "__mount_prefix") == 0)
+      if (strcmp (tokens[0], "prefix") == 0)
         {
           g_free (item.key);
           mount_prefix = item.value;
         }
       else
         {
+	  item.key = g_strdup (tokens[0]);
           g_array_append_val (items, item);
         }
 
@@ -536,14 +555,7 @@ g_mount_spec_new_from_string (const gchar     *str,
   g_strfreev (kv_pairs);
 
   if (mount_prefix == NULL)
-    {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_INVALID_ARGUMENT,
-                   "Didn't find __mount_prefix while decoding '%s' GMountSpec",
-                   str);
-      goto fail;
-    }
+    mount_prefix = g_strdup ("/");
 
   /* this constructor takes ownership of the data we pass in */
   mount_spec = g_mount_spec_new_from_data (items,
