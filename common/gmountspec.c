@@ -489,7 +489,6 @@ g_mount_spec_to_string (GMountSpec *spec)
 				   TRUE);
     }
 
-  g_print ("str: %s\n", str->str);
   return g_string_free (str, FALSE);
 }
 
