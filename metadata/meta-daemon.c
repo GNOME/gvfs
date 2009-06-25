@@ -205,6 +205,175 @@ metadata_set (const char *treefile,
   return res;
 }
 
+static void
+append_string (DBusMessageIter *iter,
+	       const char *key,
+	       const char *string)
+{
+  DBusMessageIter variant_iter, struct_iter;
+
+  if (!dbus_message_iter_open_container (iter,
+					 DBUS_TYPE_STRUCT,
+					 NULL,
+					 &struct_iter))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &key))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_open_container (&struct_iter,
+					 DBUS_TYPE_VARIANT,
+					 DBUS_TYPE_STRING_AS_STRING,
+					 &variant_iter))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_append_basic (&variant_iter,
+				       DBUS_TYPE_STRING, &string))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_close_container (&struct_iter, &variant_iter))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_close_container (iter, &struct_iter))
+    _g_dbus_oom ();
+}
+
+static void
+append_stringv (DBusMessageIter *iter,
+		const char *key,
+		char **stringv)
+{
+  DBusMessageIter variant_iter, struct_iter;
+
+  if (!dbus_message_iter_open_container (iter,
+					 DBUS_TYPE_STRUCT,
+					 NULL,
+					 &struct_iter))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_append_basic (&struct_iter,
+				       DBUS_TYPE_STRING,
+				       &key))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_open_container (&struct_iter,
+					 DBUS_TYPE_VARIANT,
+					 DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING,
+					 &variant_iter))
+    _g_dbus_oom ();
+
+  _g_dbus_message_iter_append_args (&variant_iter,
+				    DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &stringv, g_strv_length (stringv),
+				    0);
+
+  if (!dbus_message_iter_close_container (&struct_iter, &variant_iter))
+    _g_dbus_oom ();
+
+  if (!dbus_message_iter_close_container (iter, &struct_iter))
+    _g_dbus_oom ();
+}
+
+static void
+append_key (DBusMessageIter *iter,
+	    MetaTree *tree,
+	    const char *path,
+	    const char *key)
+{
+  MetaKeyType keytype;
+  char *str;
+  char **strv;
+
+  keytype = meta_tree_lookup_key_type (tree, path, key);
+
+  if (keytype == META_KEY_TYPE_STRING)
+    {
+      str = meta_tree_lookup_string (tree, path, key);
+      append_string (iter, key, str);
+      g_free (str);
+    }
+  else if (keytype == META_KEY_TYPE_STRINGV)
+    {
+      strv = meta_tree_lookup_stringv (tree, path, key);
+      append_stringv (iter, key, strv);
+      g_strfreev (strv);
+    }
+}
+
+static gboolean
+enum_keys (const char *key,
+	   MetaKeyType type,
+	   gpointer value,
+	   gpointer user_data)
+{
+  GPtrArray *keys = user_data;
+
+  g_ptr_array_add (keys, g_strdup (key));
+  return TRUE;
+}
+
+static DBusMessage *
+metadata_get (const char *treefile,
+	      const char *path,
+	      DBusMessage *message,
+	      DBusMessageIter *iter,
+	      DBusError *derror)
+{
+  TreeInfo *info;
+  const char *key;
+  DBusMessage *reply;
+  DBusMessageIter reply_iter;
+  GPtrArray *keys;
+  int i;
+  gboolean free_keys;
+
+  info = tree_info_lookup (treefile);
+  if (info == NULL)
+    {
+      dbus_set_error (derror,
+		      DBUS_ERROR_FILE_NOT_FOUND,
+		      _("Can't find metadata file %s"),
+		      treefile);
+      return NULL;
+    }
+
+  reply = dbus_message_new_method_return (message);
+  dbus_message_iter_init_append (reply, &reply_iter);
+
+  keys = g_ptr_array_new ();
+  if (dbus_message_iter_get_arg_type (iter) == 0)
+    {
+      /* Get all keys */
+      free_keys = TRUE;
+      meta_tree_enumerate_keys (info->tree, path, enum_keys, keys);
+    }
+  else
+    {
+      free_keys = FALSE;
+      while (dbus_message_iter_get_arg_type (iter) != 0)
+	{
+	  if (!_g_dbus_message_iter_get_args (iter, derror,
+					      DBUS_TYPE_STRING, &key,
+					      0))
+	    break;
+
+	  g_ptr_array_add (keys, key);
+	}
+    }
+
+  for (i = 0; i < keys->len; i++)
+    {
+      key = g_ptr_array_index (keys, i);
+      append_key (&reply_iter, info->tree, path, key);
+      if (free_keys)
+	g_free (key);
+    }
+  g_ptr_array_free (keys, TRUE);
+
+  return reply;
+}
+
 static gboolean
 metadata_unset (const char *treefile,
 		const char *path,
@@ -418,6 +587,28 @@ metadata_message (DBusConnection  *connection,
 	}
       else
 	reply = dbus_message_new_method_return (message);
+
+      g_free (treefile);
+      g_free (path);
+    }
+
+  if (dbus_message_is_method_call (message,
+				   G_VFS_DBUS_METADATA_INTERFACE,
+				   G_VFS_DBUS_METADATA_OP_GET))
+    {
+      treefile = NULL;
+      path = NULL;
+      if (!_g_dbus_message_iter_get_args (&iter, &derror,
+					  G_DBUS_TYPE_CSTRING, &treefile,
+					  G_DBUS_TYPE_CSTRING, &path,
+					  0) ||
+	  (reply = metadata_get (treefile, path, message, &iter, &derror)) == NULL)
+	{
+	  reply = dbus_message_new_error (message,
+					  derror.name,
+					  derror.message);
+	  dbus_error_free (&derror);
+	}
 
       g_free (treefile);
       g_free (path);
