@@ -228,8 +228,24 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
   GList *rest, *l;
 
   if (daemon->cancelled_tag != 0)
-    g_cancellable_disconnect (daemon->async_cancel,
-			      daemon->cancelled_tag);
+    {
+      /* If ok, we're a normal callback on the main thread,
+	 ensure protection against a thread cancelling and
+	 running the callback again.
+	 If !ok then we're in a callback which may be
+	 from another thread, but we're guaranteed that
+	 cancellation will only happen once. However
+	 we can't use g_cancellable_disconnect, as this
+	 deadlocks if we call it from within the signal
+	 handler.
+      */
+      if (ok)
+	g_cancellable_disconnect (daemon->async_cancel,
+				  daemon->cancelled_tag);
+      else
+	g_signal_handler_disconnect (daemon->async_cancel,
+				     daemon->cancelled_tag);
+    }
 
   /* cancelled signal handler won't execute after this */
 
@@ -430,14 +446,19 @@ async_cancelled (GCancellable *cancellable,
 				   G_IO_ERROR,
 				   G_IO_ERROR_CANCELLED,
 				   _("Operation was cancelled"));
+  G_LOCK (infos);
   trigger_async_done (daemon, FALSE);
+  G_UNLOCK (infos);
 }
 
 static gboolean
 async_timeout (gpointer data)
 {
   GDaemonFileEnumerator *daemon = G_DAEMON_FILE_ENUMERATOR (data);
+
+  G_LOCK (infos);
   trigger_async_done (daemon, TRUE);
+  G_UNLOCK (infos);
   return FALSE;
 }
 
