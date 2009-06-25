@@ -28,6 +28,7 @@
 #include "gmountspec.h"
 #include "gmounttracker.h"
 #include "gvfsuriutils.h"
+#include <metatree.h>
 
 G_BEGIN_DECLS
 
@@ -67,6 +68,15 @@ GMountSpec *    _g_daemon_vfs_get_mount_spec_for_path  (GMountSpec              
 						        const char               *new_path);
 void            _g_daemon_vfs_invalidate_dbus_id       (const char               *dbus_id);
 DBusConnection *_g_daemon_vfs_get_async_bus            (void);
+gboolean        _g_daemon_vfs_send_message_sync        (DBusMessage              *message,
+							GCancellable             *cancellable,
+							GError                  **error);
+int             _g_daemon_vfs_append_metadata_for_set  (DBusMessage *message,
+							MetaTree *tree,
+							const char *path,
+							const char *attribute,
+							GFileAttributeType type,
+							gpointer   value);
 
 
 

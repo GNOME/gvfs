@@ -40,16 +40,9 @@
 #include "gdbusutils.h"
 #include "gmountoperationdbus.h"
 #include <gio/gio.h>
+#include "metatree.h"
 
 static void g_daemon_file_file_iface_init (GFileIface       *iface);
-
-struct _GDaemonFile
-{
-  GObject parent_instance;
-
-  GMountSpec *mount_spec;
-  char *path;
-};
 
 static void g_daemon_file_read_async (GFile *file,
 				      int io_priority,
@@ -709,7 +702,7 @@ g_daemon_file_enumerate_children (GFile      *file,
   DBusConnection *connection;
   char *uri;
 
-  enumerator = g_daemon_file_enumerator_new (file);
+  enumerator = g_daemon_file_enumerator_new (file, attributes);
   obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
 
 
@@ -744,6 +737,70 @@ g_daemon_file_enumerate_children (GFile      *file,
     dbus_message_unref (reply);
   g_object_unref (enumerator);
   return NULL;
+}
+
+
+static gboolean
+enumerate_keys_callback (const char *key,
+			 MetaKeyType type,
+			 gpointer value,
+			 gpointer user_data)
+{
+  GFileInfo  *info = user_data;
+  char *attr;
+
+  attr = g_strconcat ("metadata::", key, NULL);
+
+  if (type == META_KEY_TYPE_STRING)
+    g_file_info_set_attribute_string (info, attr, (char *)value);
+  else
+    g_file_info_set_attribute_stringv (info, attr, (char **)value);
+
+  g_free (attr);
+
+  return TRUE;
+}
+
+static void
+add_metadata (GFile *file,
+	      const char *attributes,
+	      GFileInfo *info)
+{
+  GDaemonFile *daemon_file;
+  GFileAttributeMatcher *matcher;
+  const char *first;
+  char *treename;
+  gboolean all;
+  MetaTree *tree;
+
+  daemon_file = G_DAEMON_FILE (file);
+
+  matcher = g_file_attribute_matcher_new (attributes);
+  all = g_file_attribute_matcher_enumerate_namespace (matcher, "metadata");
+
+  first = NULL;
+  if (!all)
+    {
+      first = g_file_attribute_matcher_enumerate_next (matcher);
+
+      if (first == NULL)
+	{
+	  g_file_attribute_matcher_unref (matcher);
+	  return; /* No match */
+	}
+    }
+
+  treename = g_mount_spec_to_string (daemon_file->mount_spec);
+  tree = meta_tree_lookup_by_name (treename, FALSE);
+  g_free (treename);
+
+  g_file_info_set_attribute_mask (info, matcher);
+  meta_tree_enumerate_keys (tree, daemon_file->path,
+			    enumerate_keys_callback, info);
+  g_file_info_unset_attribute_mask (info);
+
+  meta_tree_unref (tree);
+  g_file_attribute_matcher_unref (matcher);
 }
 
 static GFileInfo *
@@ -790,6 +847,9 @@ g_daemon_file_query_info (GFile                *file,
 
   info = _g_dbus_get_file_info (&iter, error);
 
+  if (info)
+    add_metadata (file, attributes, info);
+
  out:
   dbus_message_unref (reply);
   return info;
@@ -802,9 +862,11 @@ query_info_async_cb (DBusMessage *reply,
 		     GCancellable *cancellable,
 		     gpointer callback_data)
 {
+  const char *attributes = callback_data;
   DBusMessageIter iter;
   GFileInfo *info;
   GError *error;
+  GFile *file;
 
   info = NULL;
   
@@ -827,6 +889,10 @@ query_info_async_cb (DBusMessage *reply,
       _g_simple_async_result_complete_with_cancellable (result, cancellable);
       return;
     }
+
+  file = G_FILE (g_async_result_get_source_object (G_ASYNC_RESULT (result)));
+  add_metadata (file, attributes, info);
+  g_object_unref (file);
 
   g_simple_async_result_set_op_res_gpointer (result, info, g_object_unref);
   _g_simple_async_result_complete_with_cancellable (result, cancellable);
@@ -851,7 +917,7 @@ g_daemon_file_query_info_async (GFile                      *file,
 		      G_VFS_DBUS_MOUNT_OP_QUERY_INFO,
 		      cancellable,
 		      callback, user_data,
-		      query_info_async_cb, NULL, NULL,
+		      query_info_async_cb, g_strdup (attributes), g_free,
 		      DBUS_TYPE_STRING, &attributes,
 		      DBUS_TYPE_UINT32, &dbus_flags,
 		      DBUS_TYPE_STRING, &uri,
@@ -1947,9 +2013,77 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
   list = _g_dbus_get_attribute_info_list (&iter, error);
   
   dbus_message_unref (reply);
+
+  if (list)
+    g_file_attribute_info_list_add (list,
+				    "metadata",
+				    G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
+				    G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				    G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
   
   return list;
+}
 
+static gboolean
+set_metadata_attribute (GFile *file,
+			const char *attribute,
+			GFileAttributeType type,
+			gpointer value,
+			GCancellable *cancellable,
+			GError **error)
+{
+  GDaemonFile *daemon_file;
+  DBusMessage *message;
+  char *treename;
+  const char *metatreefile;
+  MetaTree *tree;
+  int appended;
+  gboolean res;
+
+  daemon_file = G_DAEMON_FILE (file);
+
+  treename = g_mount_spec_to_string (daemon_file->mount_spec);
+  tree = meta_tree_lookup_by_name (treename, FALSE);
+  g_free (treename);
+
+  message =
+    dbus_message_new_method_call (G_VFS_DBUS_METADATA_NAME,
+				  G_VFS_DBUS_METADATA_PATH,
+				  G_VFS_DBUS_METADATA_INTERFACE,
+				  G_VFS_DBUS_METADATA_OP_SET);
+  g_assert (message != NULL);
+  metatreefile = meta_tree_get_filename (tree);
+  _g_dbus_message_append_args (message,
+			       G_DBUS_TYPE_CSTRING, &metatreefile,
+			       G_DBUS_TYPE_CSTRING, &daemon_file->path,
+			       0);
+
+  appended = _g_daemon_vfs_append_metadata_for_set (message,
+						    tree,
+						    daemon_file->path,
+						    attribute,
+						    type,
+						    value);
+
+  res = TRUE;
+  if (appended == -1)
+    {
+      res = FALSE;
+      g_set_error (error, G_IO_ERROR,
+		   G_IO_ERROR_INVALID_ARGUMENT,
+		   _("Error setting file metadata: %s"),
+		   _("values must be string or list of strings"));
+    }
+  else if (appended > 0 &&
+      !_g_daemon_vfs_send_message_sync (message,
+					cancellable, error))
+    res = FALSE;
+
+  dbus_message_unref (message);
+
+  meta_tree_unref (tree);
+
+  return res;
 }
 
 static gboolean
@@ -1965,6 +2099,9 @@ g_daemon_file_set_attribute (GFile *file,
   DBusMessageIter iter;
   dbus_uint32_t flags_dbus;
   GError *my_error;
+
+  if (g_str_has_prefix (attribute, "metadata::"))
+    return set_metadata_attribute (file, attribute, type, value_p, cancellable, error);
 
  retry:
   
@@ -2528,7 +2665,7 @@ g_daemon_file_enumerate_children_async (GFile                      *file,
   GDaemonFileEnumerator *enumerator;
   char *uri;
 
-  enumerator = g_daemon_file_enumerator_new (file);
+  enumerator = g_daemon_file_enumerator_new (file, attributes);
   obj_path = g_daemon_file_enumerator_get_object_path (enumerator);
 
   uri = g_file_get_uri (file);

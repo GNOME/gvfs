@@ -30,6 +30,8 @@
 #include <gio/gio.h>
 #include <gvfsdaemondbus.h>
 #include <gvfsdaemonprotocol.h>
+#include "gdaemonfile.h"
+#include "metatree.h"
 
 #define OBJ_PATH_PREFIX "/org/gtk/vfs/client/enumerator/"
 
@@ -55,6 +57,9 @@ struct _GDaemonFileEnumerator
   gulong cancelled_tag;
   guint timeout_tag;
   GSimpleAsyncResult *async_res;
+
+  GFileAttributeMatcher *matcher;
+  MetaTree *metadata_tree;
 };
 
 G_DEFINE_TYPE (GDaemonFileEnumerator, g_daemon_file_enumerator, G_TYPE_FILE_ENUMERATOR)
@@ -107,6 +112,10 @@ g_daemon_file_enumerator_finalize (GObject *object)
 
   free_info_list (daemon->infos);
 
+  g_file_attribute_matcher_unref (daemon->matcher);
+  if (daemon->metadata_tree)
+    meta_tree_unref (daemon->metadata_tree);
+
   if (daemon->sync_connection)
     dbus_connection_unref (daemon->sync_connection);
   
@@ -145,16 +154,72 @@ g_daemon_file_enumerator_init (GDaemonFileEnumerator *daemon)
 }
 
 GDaemonFileEnumerator *
-g_daemon_file_enumerator_new (GFile *file)
+g_daemon_file_enumerator_new (GFile *file,
+			      const char *attributes)
 {
   GDaemonFileEnumerator *daemon;
+  char *treename;
 
   daemon = g_object_new (G_TYPE_DAEMON_FILE_ENUMERATOR,
                          "container", file,
                          NULL);
-  
+
+  daemon->matcher = g_file_attribute_matcher_new (attributes);
+  if (g_file_attribute_matcher_enumerate_namespace (daemon->matcher, "metadata") ||
+      g_file_attribute_matcher_enumerate_next (daemon->matcher) != NULL)
+    {
+      treename = g_mount_spec_to_string (G_DAEMON_FILE (file)->mount_spec);
+      daemon->metadata_tree = meta_tree_lookup_by_name (treename, FALSE);
+      g_free (treename);
+    }
+
   return daemon;
 }
+
+static gboolean
+enumerate_keys_callback (const char *key,
+			 MetaKeyType type,
+			 gpointer value,
+			 gpointer user_data)
+{
+  GFileInfo  *info = user_data;
+  char *attr;
+
+  attr = g_strconcat ("metadata::", key, NULL);
+
+  if (type == META_KEY_TYPE_STRING)
+    g_file_info_set_attribute_string (info, attr, (char *)value);
+  else
+    g_file_info_set_attribute_stringv (info, attr, (char **)value);
+
+  g_free (attr);
+
+  return TRUE;
+}
+
+static void
+add_metadata (GFileInfo *info,
+	      GDaemonFileEnumerator *daemon)
+{
+  GFile *container;
+  const char *name;
+  char *path;
+
+  if (!daemon->metadata_tree)
+    return;
+
+  name = g_file_info_get_name (info);
+  container = g_file_enumerator_get_container (G_FILE_ENUMERATOR (daemon));
+  path = g_build_filename (G_DAEMON_FILE (container)->path, name, NULL);
+
+  g_file_info_set_attribute_mask (info, daemon->matcher);
+  meta_tree_enumerate_keys (daemon->metadata_tree, path,
+			    enumerate_keys_callback, info);
+  g_file_info_unset_attribute_mask (info);
+
+  g_free (path);
+}
+
 
 /* Called with infos lock held */
 static void
@@ -187,7 +252,9 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 	  rest->prev = NULL;
 	}
       daemon->infos = rest;
-      
+
+      g_list_foreach (l, add_metadata, daemon);
+
       g_simple_async_result_set_op_res_gpointer (daemon->async_res,
 						 l,
 						 (GDestroyNotify)free_info_list);
@@ -301,7 +368,10 @@ g_daemon_file_enumerator_next_file (GFileEnumerator *enumerator,
 	  done = TRUE;
 	  info = daemon->infos->data;
 	  if (info)
-	    g_assert (G_IS_FILE_INFO (info));
+	    {
+	      g_assert (G_IS_FILE_INFO (info));
+	      add_metadata (G_FILE_INFO (info), daemon);
+	    }
 	  daemon->infos = g_list_delete_link (daemon->infos, daemon->infos);
 	}
       else if (daemon->done)

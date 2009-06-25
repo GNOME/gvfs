@@ -39,7 +39,6 @@
 #include "gdaemonvolumemonitor.h"
 #include "gvfsicon.h"
 #include "gvfsiconloadable.h"
-#include "metatree.h"
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
@@ -1166,10 +1165,12 @@ send_message_oneway (DBusMessage *message)
   dbus_connection_flush (connection);
 }
 
-static gboolean
-send_message (DBusMessage *message,
-	      GCancellable *cancellable,
-	      GError **error)
+/* Sends a message on the session bus and blocks for the reply,
+   using the thread local connection */
+gboolean
+_g_daemon_vfs_send_message_sync (DBusMessage *message,
+				 GCancellable *cancellable,
+				 GError **error)
 {
   DBusConnection *connection;
   DBusError derror;
@@ -1218,6 +1219,69 @@ strv_equal (char **a, char **b)
   return TRUE;
 }
 
+/* -1 => error, otherwise number of added items */
+int
+_g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
+				       MetaTree *tree,
+				       const char *path,
+				       const char *attribute,
+				       GFileAttributeType type,
+				       gpointer   value)
+{
+  const char *key;
+  int res;
+
+  key = attribute + strlen ("metadata::");
+
+  res = 0;
+  if (type == G_FILE_ATTRIBUTE_TYPE_STRING)
+    {
+      const char *current;
+      const char *val = (char *)value;
+
+      current = meta_tree_lookup_string (tree, path, key);
+      if (current == NULL || strcmp (current, val) != 0)
+	{
+	  res = 1;
+	  _g_dbus_message_append_args (message,
+				       DBUS_TYPE_STRING, &key,
+				       DBUS_TYPE_STRING, &val,
+				       0);
+	}
+    }
+  else if (type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
+    {
+      char **current;
+      char **val = (char **)value;
+      current = meta_tree_lookup_stringv (tree, path, key);
+      if (current == NULL || !strv_equal (current, val))
+	{
+	  res = 1;
+	  _g_dbus_message_append_args (message,
+				       DBUS_TYPE_STRING, &key,
+				       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
+				       0);
+	}
+    }
+  else if (type == G_FILE_ATTRIBUTE_TYPE_INVALID)
+    {
+      if (meta_tree_lookup_key_type (tree, path, key) != META_KEY_TYPE_NONE)
+	{
+	  char c = 0;
+	  res = 1;
+	  /* Byte => unset */
+	  _g_dbus_message_append_args (message,
+				       DBUS_TYPE_STRING, &key,
+				       DBUS_TYPE_BYTE, &c,
+				       0);
+	}
+    }
+  else
+    res = -1;
+
+  return res;
+}
+
 static gboolean
 g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 					const char *filename,
@@ -1232,12 +1296,13 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
   struct stat statbuf;
   char **attributes;
   char *tree_path;
-  char *key;
   MetaTree *tree;
   int errsv;
   int i, num_set;
   DBusMessage *message;
   gboolean res;
+  int appended;
+  gpointer value;
 
   res = TRUE;
   if (g_file_info_has_namespace (info, "metadata"))
@@ -1283,75 +1348,40 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 	  num_set = 0;
 	  for (i = 0; attributes[i] != NULL; i++)
 	    {
-	      key = attributes[i] + strlen ("metadata::");
-	      type = g_file_info_get_attribute_type (info, attributes[i]);
-	      if (type == G_FILE_ATTRIBUTE_TYPE_STRING)
+	      if (g_file_info_get_attribute_data (info, attributes[i], &type, &value, NULL))
 		{
-		  const char *current;
-		  const char *val = g_file_info_get_attribute_string (info, attributes[i]);
-
-		  current = meta_tree_lookup_string (tree, tree_path, key);
-		  if (current == NULL || strcmp (current, val) != 0)
+		  appended = _g_daemon_vfs_append_metadata_for_set (message,
+								    tree,
+								    tree_path,
+								    attributes[i],
+								    type,
+								    value);
+		  if (appended != -1)
 		    {
-		      num_set++;
-		      _g_dbus_message_append_args (message,
-						   DBUS_TYPE_STRING, &key,
-						   DBUS_TYPE_STRING, &val,
-						   0);
+		      num_set += appended;
+		      g_file_info_set_attribute_status (info, attributes[i],
+							G_FILE_ATTRIBUTE_STATUS_SET);
 		    }
-		  g_file_info_set_attribute_status (info, attributes[i],
-						    G_FILE_ATTRIBUTE_STATUS_SET);
-		}
-	      else if (type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
-		{
-		  char **current;
-		  char **val = g_file_info_get_attribute_stringv (info, attributes[i]);
-		  current = meta_tree_lookup_stringv (tree, tree_path, key);
-		  if (current == NULL || !strv_equal (current, val))
+		  else
 		    {
-		      num_set++;
-		      _g_dbus_message_append_args (message,
-						   DBUS_TYPE_STRING, &key,
-						   DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
-						   0);
+		      res = FALSE;
+		      g_set_error (error, G_IO_ERROR,
+				   G_IO_ERROR_INVALID_ARGUMENT,
+				   _("Error setting file metadata: %s"),
+				   _("values must be string or list of strings"));
+		      error = NULL; /* Don't set further errors */
+		      g_file_info_set_attribute_status (info, attributes[i],
+							G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
 		    }
-		  g_file_info_set_attribute_status (info, attributes[i],
-						    G_FILE_ATTRIBUTE_STATUS_SET);
 		}
-	      else if (type == G_FILE_ATTRIBUTE_TYPE_INVALID)
-		{
-		  if (meta_tree_lookup_key_type (tree, tree_path, key) != META_KEY_TYPE_NONE)
-		    {
-		      char c = 0;
-		      num_set++;
-		      /* Byte => unset */
-		      _g_dbus_message_append_args (message,
-						   DBUS_TYPE_STRING, &key,
-						   DBUS_TYPE_BYTE, &c,
-						   0);
-		    }
-		  g_file_info_set_attribute_status (info, attributes[i],
-						    G_FILE_ATTRIBUTE_STATUS_SET);
-		}
-	      else
-		{
-		  res = FALSE;
-		  g_set_error (error, G_IO_ERROR,
-			       G_IO_ERROR_INVALID_ARGUMENT,
-			       _("Error setting file metadata: %s"),
-			       _("values must be string or list of strings"));
-		  error = NULL; /* Don't set further errors */
-		  g_file_info_set_attribute_status (info, attributes[i],
-						    G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
-		}
-
-	      meta_tree_unref (tree);
-	      g_free (tree_path);
 	    }
 
+	  meta_tree_unref (tree);
+	  g_free (tree_path);
+
 	  if (num_set > 0 &&
-	      !send_message (message,
-			     cancellable, error))
+	      !_g_daemon_vfs_send_message_sync (message,
+						cancellable, error))
 	    {
 	      res = FALSE;
 	      error = NULL; /* Don't set further errors */

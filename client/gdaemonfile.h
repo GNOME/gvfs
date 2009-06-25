@@ -44,6 +44,14 @@ struct _GDaemonFileClass
   GObjectClass parent_class;
 };
 
+struct _GDaemonFile
+{
+  GObject parent_instance;
+
+  GMountSpec *mount_spec;
+  char *path;
+};
+
 GType g_daemon_file_get_type (void) G_GNUC_CONST;
   
 GFile * g_daemon_file_new (GMountSpec *mount_spec,
