@@ -91,7 +91,9 @@ attribute_type_from_string (const char *str)
     return G_FILE_ATTRIBUTE_TYPE_INT64;
   if (strcmp (str, "object") == 0)
     return G_FILE_ATTRIBUTE_TYPE_OBJECT;
-  return G_FILE_ATTRIBUTE_TYPE_INVALID;
+  if (strcmp (str, "unset") == 0)
+    return G_FILE_ATTRIBUTE_TYPE_INVALID;
+  return -1;
 }
 
 int
@@ -179,6 +181,9 @@ main (int argc, char *argv[])
       value = &argv[3];
       break;
     case G_FILE_ATTRIBUTE_TYPE_INVALID:
+      value = NULL;
+      break;
+    case -1:
     case G_FILE_ATTRIBUTE_TYPE_OBJECT:
     default:
       g_printerr (_("Invalid attribute type %s\n"), attr_type);
