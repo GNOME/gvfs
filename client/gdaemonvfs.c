@@ -1318,6 +1318,21 @@ g_daemon_vfs_local_file_set_attributes (GVfs       *vfs,
 		  g_file_info_set_attribute_status (info, attributes[i],
 						    G_FILE_ATTRIBUTE_STATUS_SET);
 		}
+	      else if (type == G_FILE_ATTRIBUTE_TYPE_INVALID)
+		{
+		  if (meta_tree_lookup_key_type (tree, tree_path, key) != META_KEY_TYPE_NONE)
+		    {
+		      char c = 0;
+		      num_set++;
+		      /* Byte => unset */
+		      _g_dbus_message_append_args (message,
+						   DBUS_TYPE_STRING, &key,
+						   DBUS_TYPE_BYTE, &c,
+						   0);
+		    }
+		  g_file_info_set_attribute_status (info, attributes[i],
+						    G_FILE_ATTRIBUTE_STATUS_SET);
+		}
 	      else
 		{
 		  res = FALSE;
