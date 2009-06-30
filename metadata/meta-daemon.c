@@ -488,7 +488,7 @@ register_name (DBusConnection *conn,
     }
   else if (ret == DBUS_REQUEST_NAME_REPLY_EXISTS)
     {
-      g_printerr ("VFS daemon already running, exiting.\n");
+      g_printerr ("Metadata daemon already running, exiting.\n");
       return FALSE;
     }
   else if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
@@ -662,6 +662,7 @@ metadata_message (DBusConnection  *connection,
 
       g_free (treefile);
       g_free (path);
+      g_free (dest_path);
     }
 
   if (reply)
@@ -702,7 +703,7 @@ main (int argc, char *argv[])
   g_set_application_name (_("GVFS Metadata Daemon"));
   context = g_option_context_new ("");
 
-  g_option_context_set_summary (context, _("Main daemon for GVFS"));
+  g_option_context_set_summary (context, _("Metadata daemon for GVFS"));
 
   g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
 

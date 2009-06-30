@@ -998,6 +998,7 @@ metadata_create_static (MetaBuilder *builder,
   write_metadata (out, builder, key_hash);
 
   g_hash_table_destroy (key_hash);
+  g_list_free (keys);
 
   return out;
 }
