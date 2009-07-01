@@ -51,6 +51,8 @@ static void              mount_op_ask_password        (GMountOperationDBus *op_d
 						       DBusMessage         *message);
 static void              mount_op_ask_question        (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
+static void              mount_op_show_processes      (GMountOperationDBus *op_dbus,
+						       DBusMessage         *message);
 static void              mount_op_aborted             (GMountOperationDBus *op_dbus,
 						       DBusMessage         *message);
 
@@ -133,6 +135,10 @@ mount_op_message_function (DBusConnection  *connection,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION))
     mount_op_ask_question (op_dbus, message);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_PROCESSES))
+    mount_op_show_processes (op_dbus, message);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
 					G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED))
@@ -320,8 +326,91 @@ mount_op_ask_question (GMountOperationDBus *op_dbus,
 }
 
 static void
+show_processes_reply (GMountOperation *op,
+                      GMountOperationResult result,
+                      gpointer data)
+{
+  DBusMessage *reply = data;
+  guint32 choice;
+  dbus_bool_t handled, abort_dbus;
+  GMountOperationDBus *op_dbus;
+
+  op_dbus = g_object_get_data (G_OBJECT (op), "dbus-op");
+
+  handled = (result != G_MOUNT_OPERATION_UNHANDLED);
+  abort_dbus = (result == G_MOUNT_OPERATION_ABORTED);
+
+  choice = g_mount_operation_get_choice (op);
+
+  _g_dbus_message_append_args (reply,
+			       DBUS_TYPE_BOOLEAN, &handled,
+			       DBUS_TYPE_BOOLEAN, &abort_dbus,
+			       DBUS_TYPE_UINT32, &choice,
+			       0);
+
+  mount_op_send_reply (op_dbus, reply);
+}
+
+static void
+mount_op_show_processes (GMountOperationDBus *op_dbus,
+                         DBusMessage         *message)
+{
+  const char *message_string;
+  char **choices;
+  int num_choices;
+  gint32 **process_pids;
+  int num_process_pids;
+  DBusMessage *reply;
+  DBusError error;
+  DBusMessageIter iter;
+  GArray *processes;
+
+  reply = NULL;
+
+  dbus_message_iter_init (message, &iter);
+  dbus_error_init (&error);
+  if (!_g_dbus_message_iter_get_args (&iter,
+				      &error,
+				      DBUS_TYPE_STRING, &message_string,
+				      DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
+				      &choices, &num_choices,
+				      DBUS_TYPE_ARRAY, DBUS_TYPE_INT32,
+				      &process_pids, &num_process_pids,
+				      0))
+    {
+      reply = dbus_message_new_error (message, error.name, error.message);
+      if (reply == NULL)
+	_g_dbus_oom ();
+      if (!dbus_connection_send (op_dbus->connection, reply, NULL))
+	_g_dbus_oom ();
+      dbus_message_unref (reply);
+      dbus_error_free (&error);
+      return;
+    }
+
+  processes = g_array_sized_new (FALSE, FALSE, sizeof (GPid), num_process_pids);
+  g_array_append_vals (processes, process_pids, num_process_pids);
+
+  reply = dbus_message_new_method_return (message);
+  if (reply == NULL)
+    _g_dbus_oom ();
+
+  g_signal_connect (op_dbus->op, "reply", (GCallback)show_processes_reply, reply);
+
+  g_signal_emit_by_name (op_dbus->op, "show_processes",
+			 message_string,
+                         processes,
+			 choices);
+
+  dbus_free_string_array (choices);
+  g_array_unref (processes);
+}
+
+static void
 mount_op_aborted (GMountOperationDBus *op_dbus,
 		  DBusMessage         *message)
 {
+  /* also emit reply to make the all DBus ops return */
+  g_mount_operation_reply (op_dbus->op, G_MOUNT_OPERATION_UNHANDLED);
   g_signal_emit_by_name (op_dbus->op, "aborted");
 }

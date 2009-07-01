@@ -39,6 +39,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OP_EJECT_MOUNTABLE "EjectMountable"
 #define G_VFS_DBUS_MOUNT_OP_START_MOUNTABLE "StartMountable"
 #define G_VFS_DBUS_MOUNT_OP_STOP_MOUNTABLE "StopMountable"
+#define G_VFS_DBUS_MOUNT_OP_POLL_MOUNTABLE "PollMountable"
 #define G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME "SetDisplayName"
 #define G_VFS_DBUS_MOUNT_OP_DELETE "Delete"
 #define G_VFS_DBUS_MOUNT_OP_TRASH "Trash"
@@ -75,6 +76,7 @@ G_BEGIN_DECLS
 #define G_VFS_DBUS_MOUNT_OPERATION_INTERFACE "org.gtk.vfs.MountOperation"
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_PASSWORD "askPassword"
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ASK_QUESTION "askQuestion"
+#define G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_PROCESSES "showProcesses"
 #define G_VFS_DBUS_MOUNT_OPERATION_OP_ABORTED "aborted"
 
 /* Implemented by the spawner of a process, the spawned process sends the

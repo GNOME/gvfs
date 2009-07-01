@@ -428,7 +428,9 @@ try_mount (GVfsBackend *backend,
 
 static void
 do_unmount (GVfsBackend *backend,
-            GVfsJobUnmount *job)
+            GVfsJobUnmount *job,
+            GMountUnmountFlags flags,
+            GMountSource *mount_source)
 {
   GError *error;
   GVfsBackendCdda *cdda_backend = G_VFS_BACKEND_CDDA (backend);

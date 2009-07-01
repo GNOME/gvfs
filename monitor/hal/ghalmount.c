@@ -915,11 +915,12 @@ unmount_do (GMount               *mount,
 }
 
 static void
-g_hal_mount_unmount (GMount              *mount,
-                     GMountUnmountFlags   flags,
-                     GCancellable        *cancellable,
-                     GAsyncReadyCallback  callback,
-                     gpointer             user_data)
+g_hal_mount_unmount_with_operation (GMount              *mount,
+                                    GMountUnmountFlags   flags,
+                                    GMountOperation     *mount_operation,
+                                    GCancellable        *cancellable,
+                                    GAsyncReadyCallback  callback,
+                                    gpointer             user_data)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   char *argv[] = {"gnome-mount", "-u", "-b", "-d", NULL, NULL};
@@ -945,11 +946,29 @@ g_hal_mount_unmount (GMount              *mount,
 }
 
 static gboolean
-g_hal_mount_unmount_finish (GMount       *mount,
+g_hal_mount_unmount_with_operation_finish (GMount       *mount,
+                                           GAsyncResult  *result,
+                                           GError       **error)
+{
+  return TRUE;
+}
+
+static void
+g_hal_mount_unmount (GMount              *mount,
+                     GMountUnmountFlags   flags,
+                     GCancellable        *cancellable,
+                     GAsyncReadyCallback  callback,
+                     gpointer             user_data)
+{
+  return g_hal_mount_unmount_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_hal_mount_unmount_finish (GMount        *mount,
                             GAsyncResult  *result,
                             GError       **error)
 {
-  return TRUE;
+  return g_hal_mount_unmount_with_operation_finish (mount, result, error);
 }
 
 typedef struct {
@@ -970,11 +989,12 @@ eject_wrapper_callback (GObject *source_object,
 }
 
 static void
-g_hal_mount_eject (GMount              *mount,
-                   GMountUnmountFlags   flags,
-                   GCancellable        *cancellable,
-                   GAsyncReadyCallback  callback,
-                   gpointer             user_data)
+g_hal_mount_eject_with_operation (GMount              *mount,
+                                  GMountUnmountFlags   flags,
+                                  GMountOperation     *mount_operation,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   GDrive *drive;
@@ -990,15 +1010,15 @@ g_hal_mount_eject (GMount              *mount,
       data->object = g_object_ref (mount);
       data->callback = callback;
       data->user_data = user_data;
-      g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
+      g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, data);
       g_object_unref (drive);
     }
 }
 
 static gboolean
-g_hal_mount_eject_finish (GMount        *mount,
-                          GAsyncResult  *result,
-                          GError       **error)
+g_hal_mount_eject_with_operation_finish (GMount        *mount,
+                                         GAsyncResult  *result,
+                                         GError       **error)
 {
   GHalMount *hal_mount = G_HAL_MOUNT (mount);
   GDrive *drive;
@@ -1012,10 +1032,28 @@ g_hal_mount_eject_finish (GMount        *mount,
   
   if (drive != NULL)
     {
-      res = g_drive_eject_finish (drive, result, error);
+      res = g_drive_eject_with_operation_finish (drive, result, error);
       g_object_unref (drive);
     }
   return res;
+}
+
+static void
+g_hal_mount_eject (GMount              *mount,
+                   GMountUnmountFlags   flags,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
+{
+  return g_hal_mount_eject_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_hal_mount_eject_finish (GMount        *mount,
+                          GAsyncResult  *result,
+                          GError       **error)
+{
+  return g_hal_mount_eject_with_operation_finish (mount, result, error);
 }
 
 /* TODO: handle force_rescan */
@@ -1142,8 +1180,12 @@ g_hal_mount_mount_iface_init (GMountIface *iface)
   iface->can_eject = g_hal_mount_can_eject;
   iface->unmount = g_hal_mount_unmount;
   iface->unmount_finish = g_hal_mount_unmount_finish;
+  iface->unmount_with_operation = g_hal_mount_unmount_with_operation;
+  iface->unmount_with_operation_finish = g_hal_mount_unmount_with_operation_finish;
   iface->eject = g_hal_mount_eject;
   iface->eject_finish = g_hal_mount_eject_finish;
+  iface->eject_with_operation = g_hal_mount_eject_with_operation;
+  iface->eject_with_operation_finish = g_hal_mount_eject_with_operation_finish;
   iface->guess_content_type = g_hal_mount_guess_content_type;
   iface->guess_content_type_finish = g_hal_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_hal_mount_guess_content_type_sync;

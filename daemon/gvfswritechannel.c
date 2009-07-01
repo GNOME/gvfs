@@ -218,9 +218,11 @@ g_vfs_write_channel_send_written (GVfsWriteChannel  *write_channel,
 
 
 GVfsWriteChannel *
-g_vfs_write_channel_new (GVfsBackend *backend)
+g_vfs_write_channel_new (GVfsBackend *backend,
+                         GPid         actual_consumer)
 {
   return g_object_new (G_VFS_TYPE_WRITE_CHANNEL,
 		       "backend", backend,
+                       "actual-consumer", actual_consumer,
 		       NULL);
 }

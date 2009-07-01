@@ -53,7 +53,8 @@ G_DEFINE_TYPE_WITH_CODE (GVfsChannel, g_vfs_channel, G_TYPE_OBJECT,
 
 enum {
   PROP_0,
-  PROP_BACKEND
+  PROP_BACKEND,
+  PROP_ACTUAL_CONSUMER
 };
 
 typedef struct
@@ -85,6 +86,7 @@ struct _GVfsChannelPrivate
   GInputStream *command_stream;
   GOutputStream *reply_stream;
   int remote_fd;
+  GPid actual_consumer;
   
   GVfsBackendHandle backend_handle;
   GVfsJob *current_job;
@@ -172,6 +174,17 @@ g_vfs_channel_class_init (GVfsChannelClass *klass)
 							G_VFS_TYPE_BACKEND,
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+
+  g_object_class_install_property (gobject_class,
+				   PROP_ACTUAL_CONSUMER,
+				   g_param_spec_int ("actual-consumer",
+                                                     P_("Actual Consumer"),
+                                                     P_("The process id of the remote end"),
+                                                     G_MININT,
+                                                     G_MAXINT,
+                                                     0,
+                                                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+                                                     G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 }
 
 static void
@@ -213,6 +226,11 @@ g_vfs_channel_set_property (GObject         *object,
 	g_object_unref (channel->priv->backend);
       channel->priv->backend = G_VFS_BACKEND (g_value_dup_object (value));
       break;
+
+    case PROP_ACTUAL_CONSUMER:
+      channel->priv->actual_consumer = g_value_get_int (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -231,6 +249,9 @@ g_vfs_channel_get_property (GObject    *object,
     {
     case PROP_BACKEND:
       g_value_set_object (value, channel->priv->backend);
+      break;
+    case PROP_ACTUAL_CONSUMER:
+      g_value_set_int (value, channel->priv->actual_consumer);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -718,3 +739,10 @@ g_vfs_channel_get_current_seq_nr (GVfsChannel *channel)
 {
   return channel->priv->current_job_seq_nr;
 }
+
+GPid
+g_vfs_channel_get_actual_consumer (GVfsChannel *channel)
+{
+  return channel->priv->actual_consumer;
+}
+

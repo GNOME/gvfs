@@ -184,6 +184,29 @@ errno_from_error (GError *error)
   return EIO;
 }
 
+/* Conveys the pid of the client to filesystem backends; see
+ * get_pid_for_file() in gdaemonfile.c
+ *
+ * can only be called during a filesystem op
+ */
+static void
+set_pid_for_file (GFile *file)
+{
+  struct fuse_context *context;
+
+  if (file == NULL)
+    goto out;
+
+  context = fuse_get_context ();
+  if (context == NULL)
+    goto out;
+
+  g_object_set_data (G_OBJECT (file), "gvfs-fuse-client-pid", GUINT_TO_POINTER (context->pid));
+
+ out:
+  ;
+}
+
 static FileHandle *
 file_handle_new (const gchar *path)
 {
@@ -992,6 +1015,7 @@ vfs_open (const gchar *path, struct fuse_file_info *fi)
               debug_print ("vfs_open: flags=%o\n", fi->flags);
 
               /* Set up a stream here, so we can check for errors */
+              set_pid_for_file (file);
 
               if (fi->flags & O_WRONLY || fi->flags & O_RDWR)
                 result = setup_output_stream (file, fh);
@@ -1075,6 +1099,7 @@ vfs_create (const gchar *path, mode_t mode, struct fuse_file_info *fi)
             }
 
           file_output_stream = g_file_create (file, 0, NULL, &error);
+          set_pid_for_file (file);
           if (file_output_stream)
             {
               FileHandle *fh = get_or_create_file_handle_for_path (path);

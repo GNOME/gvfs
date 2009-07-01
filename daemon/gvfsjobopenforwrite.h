@@ -61,6 +61,8 @@ struct _GVfsJobOpenForWrite
   gboolean can_seek;
   goffset initial_offset;
   GVfsWriteChannel *write_channel;
+
+  GPid pid;
 };
 
 struct _GVfsJobOpenForWriteClass
@@ -79,6 +81,7 @@ void     g_vfs_job_open_for_write_set_can_seek       (GVfsJobOpenForWrite *job,
 						      gboolean             can_seek);
 void     g_vfs_job_open_for_write_set_initial_offset (GVfsJobOpenForWrite *job,
 						      goffset              initial_offset);
+GPid     g_vfs_job_open_for_write_get_pid            (GVfsJobOpenForWrite *job);
 
 G_END_DECLS
 

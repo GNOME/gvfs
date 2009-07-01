@@ -699,12 +699,241 @@ op_ask_question (GMountOperation *op,
   return TRUE;
 }
 
+typedef struct ShowProcessesData ShowProcessesData;
+
+struct ShowProcessesData {
+
+  /* results: */
+  gboolean aborted;
+  guint32  choice;
+};
+
+/* the callback from dbus -> main thread */
+static void
+show_processes_reply (DBusMessage *reply,
+                      GError      *error,
+                      gpointer     _data)
+{
+  GSimpleAsyncResult *result;
+  ShowProcessesData *data;
+  dbus_bool_t handled, aborted;
+  guint32 choice;
+  DBusMessageIter iter;
+
+  result = G_SIMPLE_ASYNC_RESULT (_data);
+  handled = TRUE;
+
+  data = g_new0 (ShowProcessesData, 1);
+  g_simple_async_result_set_op_res_gpointer (result, data, g_free);
+
+  if (reply == NULL)
+    {
+      data->aborted = TRUE;
+    }
+  else
+    {
+      dbus_message_iter_init (reply, &iter);
+      if (!_g_dbus_message_iter_get_args (&iter, NULL,
+					  DBUS_TYPE_BOOLEAN, &handled,
+					  DBUS_TYPE_BOOLEAN, &aborted,
+					  DBUS_TYPE_UINT32, &choice,
+					  0))
+	data->aborted = TRUE;
+      else
+	{
+	  data->aborted = aborted;
+	  data->choice = choice;
+	}
+    }
+
+  if (handled == FALSE)
+    {
+      g_simple_async_result_set_error (result, G_IO_ERROR, G_IO_ERROR_FAILED, "Internal Error");
+    }
+
+  g_simple_async_result_complete (result);
+}
+
+void
+g_mount_source_show_processes_async (GMountSource        *source,
+                                     const char          *message_string,
+                                     GArray              *processes,
+                                     const char         **choices,
+                                     gint                 n_choices,
+                                     GAsyncReadyCallback  callback,
+                                     gpointer             user_data)
+{
+  GSimpleAsyncResult *result;
+  DBusMessage *message;
+
+  /* If no dbus id specified, reply that we weren't handled */
+  if (source->dbus_id[0] == 0)
+    {
+      g_simple_async_report_error_in_idle (G_OBJECT (source),
+					   callback,
+					   user_data,
+					   G_IO_ERROR, G_IO_ERROR_FAILED,
+					   "Internal Error");
+      return;
+    }
+
+  result = g_simple_async_result_new (G_OBJECT (source), callback, user_data,
+                                      g_mount_source_show_processes_async);
+
+  if (message_string == NULL)
+    message_string = "";
+
+  message = dbus_message_new_method_call (source->dbus_id,
+					  source->obj_path,
+					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
+					  G_VFS_DBUS_MOUNT_OPERATION_OP_SHOW_PROCESSES);
+
+  _g_dbus_message_append_args (message,
+			       DBUS_TYPE_STRING, &message_string,
+			       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
+			       &choices, n_choices,
+			       DBUS_TYPE_ARRAY, DBUS_TYPE_INT32,
+			       &processes->data, processes->len,
+			       0);
+
+  /* 30 minute timeout */
+  _g_dbus_connection_call_async (NULL, message, 1000 * 60 * 30,
+				 show_processes_reply, result);
+  dbus_message_unref (message);
+}
+
+gboolean
+g_mount_source_show_processes_finish (GMountSource *source,
+                                      GAsyncResult *result,
+                                      gboolean     *aborted,
+                                      gint         *choice_out)
+{
+  ShowProcessesData *data, def= { FALSE, };
+  GSimpleAsyncResult *simple;
+
+  simple = G_SIMPLE_ASYNC_RESULT (result);
+
+  if (g_simple_async_result_propagate_error (simple, NULL))
+    data = &def;
+  else
+    data = (ShowProcessesData *) g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (aborted)
+    *aborted = data->aborted;
+
+  if (choice_out)
+    *choice_out = data->choice;
+
+  return data != &def;
+}
+
+gboolean
+g_mount_source_show_processes (GMountSource *source,
+                               const char   *message,
+                               GArray       *processes,
+                               const char  **choices,
+                               gint          n_choices,
+                               gboolean     *aborted_out,
+                               gint         *choice_out)
+{
+  gint choice;
+  gboolean handled, aborted;
+  AskSyncData data = {NULL};
+
+  data.mutex = g_mutex_new ();
+  data.cond = g_cond_new ();
+
+  g_mutex_lock (data.mutex);
+
+  g_mount_source_show_processes_async (source,
+                                       message,
+                                       processes,
+                                       choices,
+                                       n_choices,
+                                       ask_reply_sync,
+                                       &data);
+
+  g_cond_wait (data.cond, data.mutex);
+  g_mutex_unlock (data.mutex);
+
+  g_cond_free (data.cond);
+  g_mutex_free (data.mutex);
+
+  handled = g_mount_source_show_processes_finish (source,
+                                                  data.result,
+                                                  &aborted,
+                                                  &choice);
+
+  g_object_unref (data.result);
+
+  if (aborted_out)
+    *aborted_out = aborted;
+
+  if (choice_out)
+    *choice_out = choice;
+
+  return handled;
+}
+
+static void
+op_show_processes_reply (GObject      *source_object,
+                         GAsyncResult *res,
+                         gpointer      user_data)
+{
+  GMountOperationResult result;
+  GMountOperation *op;
+  GMountSource *source;
+  gboolean handled, aborted;
+  gint choice;
+
+  source = G_MOUNT_SOURCE (source_object);
+  op = G_MOUNT_OPERATION (user_data);
+
+  handled = g_mount_source_show_processes_finish (source,
+                                                  res,
+                                                  &aborted,
+                                                  &choice);
+
+  if (!handled)
+    result = G_MOUNT_OPERATION_UNHANDLED;
+  else if (aborted)
+    result = G_MOUNT_OPERATION_ABORTED;
+  else
+    {
+      result = G_MOUNT_OPERATION_HANDLED;
+      g_mount_operation_set_choice (op, choice);
+    }
+
+  g_mount_operation_reply (op, result);
+  g_object_unref (op);
+}
+
 static gboolean
-op_aborted (GMountOperation *op,
-	    GMountSource    *source)
+op_show_processes (GMountOperation *op,
+                   const char      *message,
+                   GArray          *processes,
+                   const char     **choices,
+                   GMountSource    *mount_source)
+{
+  g_mount_source_show_processes_async (mount_source,
+                                       message,
+                                       processes,
+                                       choices,
+                                       g_strv_length ((gchar **) choices),
+                                       op_show_processes_reply,
+                                       g_object_ref (op));
+  g_signal_stop_emission_by_name (op, "show_processes");
+  return TRUE;
+}
+
+gboolean
+g_mount_source_abort (GMountSource *source)
 {
   DBusMessage *message;
   DBusConnection *connection;
+  gboolean ret;
+
+  ret = FALSE;
 
   /* If no dbus id specified, reply that we weren't handled */
   if (source->dbus_id[0] == 0)
@@ -713,7 +942,7 @@ op_aborted (GMountOperation *op,
   connection = dbus_bus_get (DBUS_BUS_SESSION, NULL);
   if (connection == NULL)
     goto out;
-  
+
   message = dbus_message_new_method_call (source->dbus_id,
 					  source->obj_path,
 					  G_VFS_DBUS_MOUNT_OPERATION_INTERFACE,
@@ -725,8 +954,24 @@ op_aborted (GMountOperation *op,
       dbus_message_unref (message);
     }
 
+  ret = TRUE;
+
  out:
-  return TRUE;
+  return ret;
+}
+
+static void
+op_aborted (GMountOperation *op,
+	    GMountSource    *source)
+{
+  g_mount_source_abort (source);
+}
+
+gboolean
+g_mount_source_is_dummy (GMountSource *source)
+{
+  g_return_val_if_fail (G_IS_MOUNT_SOURCE (source), TRUE);
+  return source->dbus_id[0] == 0;
 }
 
 
@@ -742,6 +987,7 @@ g_mount_source_get_operation (GMountSource *mount_source)
 
   g_signal_connect (op, "ask_password", (GCallback)op_ask_password, mount_source);
   g_signal_connect (op, "ask_question", (GCallback)op_ask_question, mount_source);
+  g_signal_connect (op, "show_processes", (GCallback)op_show_processes, mount_source);
   g_signal_connect (op, "aborted", (GCallback)op_aborted, mount_source);
 
   return op;

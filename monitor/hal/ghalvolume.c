@@ -859,11 +859,12 @@ eject_wrapper_callback (GObject *source_object,
 }
 
 static void
-g_hal_volume_eject (GVolume              *volume,
-                    GMountUnmountFlags   flags,
-                    GCancellable        *cancellable,
-                    GAsyncReadyCallback  callback,
-                    gpointer             user_data)
+g_hal_volume_eject_with_operation (GVolume              *volume,
+                                   GMountUnmountFlags   flags,
+                                   GMountOperation     *mount_operation,
+                                   GCancellable        *cancellable,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   GHalDrive *drive;
@@ -881,23 +882,41 @@ g_hal_volume_eject (GVolume              *volume,
       data->object = g_object_ref (volume);
       data->callback = callback;
       data->user_data = user_data;
-      g_drive_eject (G_DRIVE (drive), flags, cancellable, eject_wrapper_callback, data);
+      g_drive_eject_with_operation (G_DRIVE (drive), flags, mount_operation, cancellable, eject_wrapper_callback, data);
       g_object_unref (drive);
     }
 }
 
 static gboolean
-g_hal_volume_eject_finish (GVolume        *volume,
-                          GAsyncResult  *result,
-                          GError       **error)
+g_hal_volume_eject_with_operation_finish (GVolume        *volume,
+                                          GAsyncResult  *result,
+                                          GError       **error)
 {
   GHalVolume *hal_volume = G_HAL_VOLUME (volume);
   gboolean res;
 
   res = TRUE;
   if (hal_volume->drive != NULL)
-    res = g_drive_eject_finish (G_DRIVE (hal_volume->drive), result, error);
+    res = g_drive_eject_with_operation_finish (G_DRIVE (hal_volume->drive), result, error);
   return res;
+}
+
+static void
+g_hal_volume_eject (GVolume              *volume,
+                    GMountUnmountFlags   flags,
+                    GCancellable        *cancellable,
+                    GAsyncReadyCallback  callback,
+                    gpointer             user_data)
+{
+  return g_hal_volume_eject_with_operation (volume, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_hal_volume_eject_finish (GVolume        *volume,
+                           GAsyncResult  *result,
+                           GError       **error)
+{
+  return g_hal_volume_eject_with_operation_finish (volume, result, error);
 }
 
 static char *
@@ -980,6 +999,8 @@ g_hal_volume_volume_iface_init (GVolumeIface *iface)
   iface->mount_finish = g_hal_volume_mount_finish;
   iface->eject = g_hal_volume_eject;
   iface->eject_finish = g_hal_volume_eject_finish;
+  iface->eject_with_operation = g_hal_volume_eject_with_operation;
+  iface->eject_with_operation_finish = g_hal_volume_eject_with_operation_finish;
   iface->get_identifier = g_hal_volume_get_identifier;
   iface->enumerate_identifiers = g_hal_volume_enumerate_identifiers;
   iface->get_activation_root = g_hal_volume_get_activation_root;

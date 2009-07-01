@@ -49,6 +49,7 @@ typedef struct _GVfsJobMountMountable   GVfsJobMountMountable;
 typedef struct _GVfsJobUnmountMountable GVfsJobUnmountMountable;
 typedef struct _GVfsJobStartMountable   GVfsJobStartMountable;
 typedef struct _GVfsJobStopMountable    GVfsJobStopMountable;
+typedef struct _GVfsJobPollMountable    GVfsJobPollMountable;
 typedef struct _GVfsJobOpenForRead      GVfsJobOpenForRead;
 typedef struct _GVfsJobOpenIconForRead  GVfsJobOpenIconForRead;
 typedef struct _GVfsJobSeekRead         GVfsJobSeekRead;
@@ -100,9 +101,13 @@ struct _GVfsBackendClass
    */
 
   void     (*unmount)           (GVfsBackend *backend,
-				 GVfsJobUnmount *job);
+				 GVfsJobUnmount *job,
+				 GMountUnmountFlags flags,
+                                 GMountSource *mount_source);
   gboolean (*try_unmount)       (GVfsBackend *backend,
-				 GVfsJobUnmount *job);
+				 GVfsJobUnmount *job,
+				 GMountUnmountFlags flags,
+                                 GMountSource *mount_source);
   void     (*mount)             (GVfsBackend *backend,
 				 GVfsJobMount *job,
 				 GMountSpec *mount_spec,
@@ -124,19 +129,23 @@ struct _GVfsBackendClass
   void     (*unmount_mountable) (GVfsBackend *backend,
 				 GVfsJobUnmountMountable *job,
 				 const char *filename,
-				 GMountUnmountFlags flags);
+				 GMountUnmountFlags flags,
+                                 GMountSource *mount_source);
   gboolean (*try_unmount_mountable)(GVfsBackend *backend,
 				    GVfsJobUnmountMountable *job,
 				    const char *filename,
-				    GMountUnmountFlags flags);
+				    GMountUnmountFlags flags,
+                                    GMountSource *mount_source);
   void     (*eject_mountable)   (GVfsBackend *backend,
 				 GVfsJobUnmountMountable *job,
 				 const char *filename,
-				 GMountUnmountFlags flags);
+				 GMountUnmountFlags flags,
+                                 GMountSource *mount_source);
   gboolean (*try_eject_mountable)(GVfsBackend *backend,
 				  GVfsJobUnmountMountable *job,
 				  const char *filename,
-				  GMountUnmountFlags flags);
+				  GMountUnmountFlags flags,
+                                  GMountSource *mount_source);
   void     (*open_for_read)     (GVfsBackend *backend,
 				 GVfsJobOpenForRead *job,
 				 const char *filename);
@@ -429,11 +438,19 @@ struct _GVfsBackendClass
   void     (*stop_mountable) (GVfsBackend *backend,
                               GVfsJobStopMountable *job,
                               const char *filename,
-                              GMountUnmountFlags flags);
+                              GMountUnmountFlags flags,
+                              GMountSource *mount_source);
   gboolean (*try_stop_mountable)   (GVfsBackend *backend,
 				    GVfsJobStopMountable *job,
 				    const char *filename,
-				    GMountUnmountFlags flags);
+				    GMountUnmountFlags flags,
+                                    GMountSource *mount_source);
+  void     (*poll_mountable) (GVfsBackend *backend,
+                              GVfsJobPollMountable *job,
+                              const char *filename);
+  gboolean (*try_poll_mountable)   (GVfsBackend *backend,
+				    GVfsJobPollMountable *job,
+				    const char *filename);
 };
 
 GType g_vfs_backend_get_type (void) G_GNUC_CONST;
@@ -477,6 +494,16 @@ void        g_vfs_backend_add_auto_info                  (GVfsBackend           
 							  GFileAttributeMatcher *matcher,
 							  GFileInfo             *info,
 							  const char            *uri);
+
+gboolean    g_vfs_backend_has_blocking_processes         (GVfsBackend           *backend);
+
+gboolean    g_vfs_backend_unmount_with_operation_finish (GVfsBackend  *backend,
+                                                         GAsyncResult *res);
+
+void        g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
+                                                  GMountSource       *mount_source,
+                                                  GAsyncReadyCallback callback,
+                                                  gpointer            user_data);
 
 G_END_DECLS
 

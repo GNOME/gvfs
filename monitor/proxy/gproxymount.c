@@ -36,6 +36,7 @@
 #include "gproxyvolumemonitor.h"
 #include "gproxymount.h"
 #include "gproxyvolume.h"
+#include "gproxymountoperation.h"
 
 /* Protects all fields of GProxyMount that can change */
 G_LOCK_DEFINE_STATIC(proxy_mount);
@@ -372,11 +373,12 @@ eject_wrapper_callback (GObject *source_object,
 }
 
 static void
-g_proxy_mount_eject (GMount              *mount,
-                     GMountUnmountFlags   flags,
-                     GCancellable        *cancellable,
-                     GAsyncReadyCallback  callback,
-                     gpointer             user_data)
+g_proxy_mount_eject_with_operation (GMount              *mount,
+                                    GMountUnmountFlags   flags,
+                                    GMountOperation     *mount_operation,
+                                    GCancellable        *cancellable,
+                                    GAsyncReadyCallback  callback,
+                                    gpointer             user_data)
 {
   GDrive *drive;
 
@@ -389,15 +391,15 @@ g_proxy_mount_eject (GMount              *mount,
       data->object = g_object_ref (mount);
       data->callback = callback;
       data->user_data = user_data;
-      g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
+      g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, data);
       g_object_unref (drive);
     }
 }
 
 static gboolean
-g_proxy_mount_eject_finish (GMount        *mount,
-                            GAsyncResult  *result,
-                            GError       **error)
+g_proxy_mount_eject_with_operation_finish (GMount        *mount,
+                                           GAsyncResult  *result,
+                                           GError       **error)
 {
   GDrive *drive;
   gboolean res;
@@ -408,10 +410,28 @@ g_proxy_mount_eject_finish (GMount        *mount,
 
   if (drive != NULL)
     {
-      res = g_drive_eject_finish (drive, result, error);
+      res = g_drive_eject_with_operation_finish (drive, result, error);
       g_object_unref (drive);
     }
   return res;
+}
+
+static void
+g_proxy_mount_eject (GMount              *mount,
+                     GMountUnmountFlags   flags,
+                     GCancellable        *cancellable,
+                     GAsyncReadyCallback  callback,
+                     gpointer             user_data)
+{
+  g_proxy_mount_eject_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_proxy_mount_eject_finish (GMount        *mount,
+                            GAsyncResult  *result,
+                            GError       **error)
+{
+  return g_proxy_mount_eject_with_operation_finish (mount, result, error);
 }
 
 typedef struct {
@@ -422,6 +442,8 @@ typedef struct {
   gchar *cancellation_id;
   GCancellable *cancellable;
   gulong cancelled_handler_id;
+
+  const gchar *mount_op_id;
 } DBusOp;
 
 static void
@@ -504,6 +526,7 @@ unmount_cb (DBusMessage *reply,
       g_object_unref (simple);
     }
 
+  g_proxy_mount_operation_destroy (data->mount_op_id);
   g_object_unref (data->mount);
   g_free (data->cancellation_id);
   if (data->cancellable != NULL)
@@ -512,11 +535,12 @@ unmount_cb (DBusMessage *reply,
 }
 
 static void
-g_proxy_mount_unmount (GMount              *mount,
-                       GMountUnmountFlags   flags,
-                       GCancellable        *cancellable,
-                       GAsyncReadyCallback  callback,
-                       gpointer             user_data)
+g_proxy_mount_unmount_with_operation (GMount              *mount,
+                                      GMountUnmountFlags   flags,
+                                      GMountOperation     *mount_operation,
+                                      GCancellable        *cancellable,
+                                      GAsyncReadyCallback  callback,
+                                      gpointer             user_data)
 {
   GProxyMount *proxy_mount = G_PROXY_MOUNT (mount);
   DBusConnection *connection;
@@ -546,6 +570,7 @@ g_proxy_mount_unmount (GMount              *mount,
   data->mount = g_object_ref (mount);
   data->callback = callback;
   data->user_data = user_data;
+  data->mount_op_id = g_proxy_mount_operation_wrap (mount_operation, proxy_mount->volume_monitor);
 
   if (cancellable != NULL)
     {
@@ -575,12 +600,14 @@ g_proxy_mount_unmount (GMount              *mount,
                             &(data->cancellation_id),
                             DBUS_TYPE_UINT32,
                             &_flags,
+                            DBUS_TYPE_STRING,
+                            &(data->mount_op_id),
                             DBUS_TYPE_INVALID);
   G_UNLOCK (proxy_mount);
 
   _g_dbus_connection_call_async (connection,
                                  message,
-                                 -1,
+                                 G_PROXY_VOLUME_MONITOR_DBUS_TIMEOUT, /* 30 minute timeout */
                                  (GAsyncDBusCallback) unmount_cb,
                                  data);
 
@@ -591,13 +618,31 @@ g_proxy_mount_unmount (GMount              *mount,
 }
 
 static gboolean
-g_proxy_mount_unmount_finish (GMount        *mount,
-                              GAsyncResult  *result,
-                              GError       **error)
+g_proxy_mount_unmount_with_operation_finish (GMount        *mount,
+                                             GAsyncResult  *result,
+                                             GError       **error)
 {
   if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error))
     return FALSE;
   return TRUE;
+}
+
+static void
+g_proxy_mount_unmount (GMount              *mount,
+                       GMountUnmountFlags   flags,
+                       GCancellable        *cancellable,
+                       GAsyncReadyCallback  callback,
+                       gpointer             user_data)
+{
+  g_proxy_mount_unmount_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_proxy_mount_unmount_finish (GMount        *mount,
+                              GAsyncResult  *result,
+                              GError       **error)
+{
+  return g_proxy_mount_unmount_with_operation_finish (mount, result, error);
 }
 
 static void
@@ -651,8 +696,12 @@ g_proxy_mount_mount_iface_init (GMountIface *iface)
   iface->can_eject = g_proxy_mount_can_eject;
   iface->unmount = g_proxy_mount_unmount;
   iface->unmount_finish = g_proxy_mount_unmount_finish;
+  iface->unmount_with_operation = g_proxy_mount_unmount_with_operation;
+  iface->unmount_with_operation_finish = g_proxy_mount_unmount_with_operation_finish;
   iface->eject = g_proxy_mount_eject;
   iface->eject_finish = g_proxy_mount_eject_finish;
+  iface->eject_with_operation = g_proxy_mount_eject_with_operation;
+  iface->eject_with_operation_finish = g_proxy_mount_eject_with_operation_finish;
   iface->guess_content_type = g_proxy_mount_guess_content_type;
   iface->guess_content_type_finish = g_proxy_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_proxy_mount_guess_content_type_sync;

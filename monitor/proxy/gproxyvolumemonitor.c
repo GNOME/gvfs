@@ -41,6 +41,7 @@
 #include "gproxymount.h"
 #include "gproxyvolume.h"
 #include "gproxydrive.h"
+#include "gproxymountoperation.h"
 
 G_LOCK_DEFINE_STATIC(proxy_vm);
 
@@ -640,10 +641,7 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
             dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveConnected") ||
             dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveDisconnected") ||
             dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveEjectButton") ||
-            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveStopButton") ||
-            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "StartOpAskPassword") ||
-            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "StartOpAskQuestion") ||
-            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "StartOpAborted"))
+            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "DriveStopButton"))
     {
 
       dbus_message_iter_init (message, &iter);
@@ -706,32 +704,11 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
               signal_emit_in_idle (monitor, "drive-stop-button", drive);
             }
         }
-      else if (strcmp (member, "StartOpAskPassword") == 0)
-        {
-          drive = g_hash_table_lookup (monitor->drives, id);
-          if (drive != NULL)
-            g_proxy_drive_handle_start_op_ask_password (drive, &iter);
-        }
-      else if (strcmp (member, "StartOpAskQuestion") == 0)
-        {
-          drive = g_hash_table_lookup (monitor->drives, id);
-          if (drive != NULL)
-            g_proxy_drive_handle_start_op_ask_question (drive, &iter);
-        }
-      else if (strcmp (member, "StartOpAborted") == 0)
-        {
-          drive = g_hash_table_lookup (monitor->drives, id);
-          if (drive != NULL)
-            g_proxy_drive_handle_start_op_aborted (drive, &iter);
-        }
 
     }
   else if (dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeChanged") ||
            dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeAdded") ||
-           dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeRemoved") ||
-           dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpAskPassword") ||
-           dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpAskQuestion") ||
-           dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpAborted"))
+           dbus_message_is_signal (message, "org.gtk.Private.RemoteVolumeMonitor", "VolumeRemoved"))
     {
       dbus_message_iter_init (message, &iter);
       dbus_message_iter_get_basic (&iter, &the_dbus_name);
@@ -785,24 +762,6 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
               dispose_in_idle (volume);
               g_object_unref (volume);
             }
-        }
-      else if (strcmp (member, "MountOpAskPassword") == 0)
-        {
-          volume = g_hash_table_lookup (monitor->volumes, id);
-          if (volume != NULL)
-            g_proxy_volume_handle_mount_op_ask_password (volume, &iter);
-        }
-      else if (strcmp (member, "MountOpAskQuestion") == 0)
-        {
-          volume = g_hash_table_lookup (monitor->volumes, id);
-          if (volume != NULL)
-            g_proxy_volume_handle_mount_op_ask_question (volume, &iter);
-        }
-      else if (strcmp (member, "MountOpAborted") == 0)
-        {
-          volume = g_hash_table_lookup (monitor->volumes, id);
-          if (volume != NULL)
-            g_proxy_volume_handle_mount_op_aborted (volume, &iter);
         }
 
     }
@@ -862,6 +821,37 @@ filter_function (DBusConnection *connection, DBusMessage *message, void *user_da
               signal_emit_in_idle (monitor, "mount-removed", mount);
               g_object_unref (mount);
             }
+        }
+    }
+  else if (dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpAskPassword") ||
+           dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpAskQuestion") ||
+           dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpShowProcesses") ||
+           dbus_message_is_method_call (message, "org.gtk.Private.RemoteVolumeMonitor", "MountOpAborted"))
+    {
+      dbus_message_iter_init (message, &iter);
+      dbus_message_iter_get_basic (&iter, &the_dbus_name);
+      dbus_message_iter_next (&iter);
+      dbus_message_iter_get_basic (&iter, &id);
+      dbus_message_iter_next (&iter);
+
+      if (strcmp (the_dbus_name, klass->dbus_name) != 0)
+        goto not_for_us;
+
+      if (strcmp (member, "MountOpAskPassword") == 0)
+        {
+          g_proxy_mount_operation_handle_ask_password (id, &iter);
+        }
+      else if (strcmp (member, "MountOpAskQuestion") == 0)
+        {
+          g_proxy_mount_operation_handle_ask_question (id, &iter);
+        }
+      else if (strcmp (member, "MountOpShowProcesses") == 0)
+        {
+          g_proxy_mount_operation_handle_show_processes (id, &iter);
+        }
+      else if (strcmp (member, "MountOpAborted") == 0)
+        {
+          g_proxy_mount_operation_handle_aborted (id, &iter);
         }
     }
 

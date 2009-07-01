@@ -46,6 +46,13 @@ static DBusMessage *create_reply (GVfsJob *job,
 static void
 g_vfs_job_unmount_finalize (GObject *object)
 {
+  GVfsJobUnmount *job;
+
+   job = G_VFS_JOB_UNMOUNT (object);
+
+  if (job->mount_source)
+    g_object_unref (job->mount_source);
+
   if (G_OBJECT_CLASS (g_vfs_job_unmount_parent_class)->finalize)
     (*G_OBJECT_CLASS (g_vfs_job_unmount_parent_class)->finalize) (object);
 }
@@ -77,6 +84,30 @@ g_vfs_job_unmount_new (DBusConnection *connection,
 		       GVfsBackend *backend)
 {
   GVfsJobUnmount *job;
+  DBusMessage *reply;
+  DBusMessageIter iter;
+  DBusError derror;
+  const char *dbus_id, *obj_path;
+  guint32 flags;
+  
+  
+  dbus_error_init (&derror);
+  dbus_message_iter_init (message, &iter);
+
+  if (!_g_dbus_message_iter_get_args (&iter, &derror, 
+                                      DBUS_TYPE_STRING, &dbus_id,
+                                      DBUS_TYPE_OBJECT_PATH, &obj_path,
+                                      DBUS_TYPE_UINT32, &flags,
+				      0))
+    {
+      reply = dbus_message_new_error (message,
+				      derror.name,
+                                      derror.message);
+      dbus_error_free (&derror);
+
+      dbus_connection_send (connection, reply, NULL);
+      return NULL;
+    }
 
   g_debug ("g_vfs_job_unmount_new request: %p\n", message);
   
@@ -86,6 +117,8 @@ g_vfs_job_unmount_new (DBusConnection *connection,
 		      NULL);
 
   job->backend = backend;
+  job->flags = flags;
+  job->mount_source = g_mount_source_new (dbus_id, obj_path);
   
   return G_VFS_JOB (job);
 }
@@ -97,7 +130,9 @@ run (GVfsJob *job)
   GVfsBackendClass *class = G_VFS_BACKEND_GET_CLASS (op_job->backend);
 
   class->unmount (op_job->backend,
-		  op_job);
+		  op_job,
+                  op_job->flags,
+                  op_job->mount_source);
 }
 
 static gboolean
@@ -119,7 +154,9 @@ try (GVfsJob *job)
     }
 
   return class->try_unmount (op_job->backend,
-			     op_job);
+			     op_job,
+                             op_job->flags,
+                             op_job->mount_source);
 }
 
 static void

@@ -91,11 +91,13 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
   DBusError derror;
   int path_len;
   const char *path_data;
+  guint32 pid;
   
   dbus_error_init (&derror);
   if (!dbus_message_get_args (message, &derror, 
 			      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
 			      &path_data, &path_len,
+                              DBUS_TYPE_UINT32, &pid,
 			      0))
     {
       reply = dbus_message_new_error (message,
@@ -114,6 +116,7 @@ g_vfs_job_open_for_read_new (DBusConnection *connection,
 
   job->filename = g_strndup (path_data, path_len);
   job->backend = backend;
+  job->pid = pid;
   
   return G_VFS_JOB (job);
 }
@@ -182,7 +185,8 @@ create_reply (GVfsJob *job,
   g_assert (open_job->backend_handle != NULL);
 
   error = NULL;
-  channel = g_vfs_read_channel_new (open_job->backend);
+  channel = g_vfs_read_channel_new (open_job->backend,
+                                    open_job->pid);
 
   remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));
   if (!dbus_connection_send_fd (connection, 
@@ -216,4 +220,10 @@ create_reply (GVfsJob *job,
 static void
 finished (GVfsJob *job)
 {
+}
+
+GPid
+g_vfs_job_open_for_read_get_pid (GVfsJobOpenForRead *job)
+{
+  return job->pid;
 }

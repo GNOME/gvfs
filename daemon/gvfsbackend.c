@@ -48,6 +48,7 @@
 #include <gvfsjobunmountmountable.h>
 #include <gvfsjobstartmountable.h>
 #include <gvfsjobstopmountable.h>
+#include <gvfsjobpollmountable.h>
 #include <gvfsjobmakedirectory.h>
 #include <gvfsjobmakesymlink.h>
 #include <gvfsjobcreatemonitor.h>
@@ -543,6 +544,10 @@ backend_dbus_handler (DBusConnection  *connection,
     job = g_vfs_job_stop_mountable_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
 					G_VFS_DBUS_MOUNT_INTERFACE,
+					G_VFS_DBUS_MOUNT_OP_POLL_MOUNTABLE))
+    job = g_vfs_job_poll_mountable_new (connection, message, backend);
+  else if (dbus_message_is_method_call (message,
+					G_VFS_DBUS_MOUNT_INTERFACE,
 					G_VFS_DBUS_MOUNT_OP_SET_DISPLAY_NAME))
     job = g_vfs_job_set_display_name_new (connection, message, backend);
   else if (dbus_message_is_method_call (message,
@@ -693,3 +698,248 @@ g_vfs_backend_unregister_mount (GVfsBackend *backend,
 				 callback, user_data);
   dbus_message_unref (message);
 }
+
+/* ------------------------------------------------------------------------------------------------- */
+
+typedef struct
+{
+  GVfsBackend *backend;
+  GMountSource *mount_source;
+
+  gboolean ret;
+  gboolean aborted;
+  gint choice;
+
+  const gchar *message;
+  const gchar *choices[3];
+
+  gboolean no_more_processes;
+
+  GAsyncReadyCallback callback;
+  gpointer            user_data;
+
+  guint timeout_id;
+} UnmountWithOpData;
+
+static void
+complete_unmount_with_op (UnmountWithOpData *data)
+{
+  gboolean ret;
+  GSimpleAsyncResult *simple;
+
+  g_source_remove (data->timeout_id);
+
+  ret = TRUE;
+
+  if (data->no_more_processes)
+    {
+      /* do nothing, e.g. return TRUE to signal we should unmount */
+    }
+  else
+    {
+      if (data->aborted || data->choice == 1)
+        {
+          ret = FALSE;
+        }
+    }
+
+  simple = g_simple_async_result_new (G_OBJECT (data->backend),
+                                      data->callback,
+                                      data->user_data,
+                                      NULL);
+  g_simple_async_result_set_op_res_gboolean (simple, ret);
+  g_simple_async_result_complete (simple);
+  g_object_unref (simple);
+}
+
+static void
+on_show_processes_reply (GMountSource  *mount_source,
+                         GAsyncResult  *res,
+                         gpointer       user_data)
+{
+  UnmountWithOpData *data = user_data;
+
+  /* Do nothing if we've handled this already */
+  if (data->no_more_processes)
+    return;
+
+  data->ret = g_mount_source_show_processes_finish (mount_source,
+                                                    res,
+                                                    &data->aborted,
+                                                    &data->choice);
+
+  complete_unmount_with_op (data);
+}
+
+static gboolean
+on_update_processes_timeout (gpointer user_data)
+{
+  UnmountWithOpData *data = user_data;
+  GArray *processes;
+
+  processes = g_vfs_daemon_get_blocking_processes (g_vfs_backend_get_daemon (data->backend));
+  if (processes->len == 0)
+    {
+      /* no more processes, abort mount op */
+      g_mount_source_abort (data->mount_source);
+      data->no_more_processes = TRUE;
+      complete_unmount_with_op (data);
+    }
+  else
+    {
+      /* ignore reply */
+      g_mount_source_show_processes_async (data->mount_source,
+                                           data->message,
+                                           processes,
+                                           data->choices,
+                                           g_strv_length ((gchar **) data->choices),
+                                           NULL,
+                                           NULL);
+    }
+
+  g_array_unref (processes);
+
+  /* keep timeout around */
+  return TRUE;
+}
+
+static void
+unmount_with_op_data_free (UnmountWithOpData *data)
+{
+  g_free (data);
+}
+
+
+/**
+ * g_vfs_backend_unmount_with_operation_finish:
+ * @backend: A #GVfsBackend.
+ * @res: A #GAsyncResult obtained from the @callback function passed
+ *     to g_vfs_backend_unmount_with_operation().
+ *
+ * Gets the result of the operation started by
+ * gvfs_backend_unmount_with_operation_sync().
+ *
+ * Returns: %TRUE if the backend should be unmounted (either no blocking
+ *     processes or the user decided to unmount anyway), %FALSE if
+ *     no action should be taken.
+ */
+gboolean
+g_vfs_backend_unmount_with_operation_finish (GVfsBackend *backend,
+                                             GAsyncResult *res)
+{
+  gboolean ret;
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+
+  if (g_simple_async_result_propagate_error (simple, NULL))
+    {
+      ret = FALSE;
+    }
+  else
+    {
+      ret = g_simple_async_result_get_op_res_gboolean (simple);
+    }
+
+  return ret;
+}
+
+/**
+ * gvfs_backend_unmount_with_operation:
+ * @backend: A #GVfsBackend.
+ * @callback: A #GAsyncReadyCallback.
+ * @user_data: User data to pass to @callback.
+ *
+ * Utility function to checks if there are pending operations on
+ * @backend preventing unmount. If not, then @callback is invoked
+ * immediately.
+ *
+ * Otherwise, a dialog will be shown (using @mount_source) to interact
+ * with the user about blocking processes (e.g. using the
+ * #GMountOperation::show-processes signal). The list of blocking
+ * processes is continuously updated.
+ *
+ * Once the user has decided (or if it's not possible to interact with
+ * the user), @callback will be invoked. You can then call
+ * g_vfs_backend_unmount_with_operation_finish() to get the result
+ * of the operation.
+ */
+void
+g_vfs_backend_unmount_with_operation (GVfsBackend        *backend,
+                                      GMountSource       *mount_source,
+                                      GAsyncReadyCallback callback,
+                                      gpointer            user_data)
+{
+  GArray *processes;
+  UnmountWithOpData *data;
+
+  g_return_if_fail (G_VFS_IS_BACKEND (backend));
+  g_return_if_fail (G_IS_MOUNT_SOURCE (mount_source));
+  g_return_if_fail (callback != NULL);
+
+  processes = g_vfs_daemon_get_blocking_processes (g_vfs_backend_get_daemon (backend));
+  /* if no processes are blocking, complete immediately */
+  if (processes->len == 0)
+    {
+      GSimpleAsyncResult *simple;
+      simple = g_simple_async_result_new (G_OBJECT (backend),
+                                          callback,
+                                          user_data,
+                                          NULL);
+      g_simple_async_result_set_op_res_gboolean (simple, TRUE);
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+      goto out;
+    }
+
+  data = g_new0 (UnmountWithOpData, 1);
+  data->backend = backend;
+  data->mount_source = mount_source;
+  data->callback = callback;
+  data->user_data = user_data;
+
+  data->choices[0] = _("Unmount Anyway");
+  data->choices[1] = _("Cancel");
+  data->choices[2] = NULL;
+  data->message = _("Volume is busy\n"
+                    "One or more applications are keeping the volume busy.");
+
+  /* free data when the mount source goes away */
+  g_object_set_data_full (G_OBJECT (mount_source),
+                          "unmount-op-data",
+                          data,
+                          (GDestroyNotify) unmount_with_op_data_free);
+
+  /* show processes */
+  g_mount_source_show_processes_async (mount_source,
+                                       data->message,
+                                       processes,
+                                       data->choices,
+                                       g_strv_length ((gchar **) data->choices),
+                                       (GAsyncReadyCallback) on_show_processes_reply,
+                                       data);
+
+  /* update these processes every two secs */
+  data->timeout_id = g_timeout_add_seconds (2,
+                                            on_update_processes_timeout,
+                                            data);
+
+ out:
+  g_array_unref (processes);
+
+}
+
+gboolean
+g_vfs_backend_has_blocking_processes (GVfsBackend  *backend)
+{
+  gboolean ret;
+  GArray *processes;
+
+  ret = FALSE;
+  processes = g_vfs_daemon_get_blocking_processes (g_vfs_backend_get_daemon (backend));
+  if (processes->len > 0)
+    ret = TRUE;
+
+  g_array_unref (processes);
+
+  return ret;
+}
+

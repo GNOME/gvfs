@@ -49,6 +49,9 @@ g_vfs_job_stop_mountable_finalize (GObject *object)
 
   job = G_VFS_JOB_STOP_MOUNTABLE (object);
 
+  if (job->mount_source)
+    g_object_unref (job->mount_source);
+
   g_free (job->filename);
   
   if (G_OBJECT_CLASS (g_vfs_job_stop_mountable_parent_class)->finalize)
@@ -83,6 +86,7 @@ g_vfs_job_stop_mountable_new (DBusConnection *connection,
   DBusMessageIter iter;
   DBusError derror;
   char *path;
+  const char *dbus_id, *obj_path;
   guint32 flags;
   
   dbus_error_init (&derror);
@@ -92,6 +96,8 @@ g_vfs_job_stop_mountable_new (DBusConnection *connection,
   if (!_g_dbus_message_iter_get_args (&iter, &derror, 
 				      G_DBUS_TYPE_CSTRING, &path,
 				      DBUS_TYPE_UINT32, &flags,
+                                      DBUS_TYPE_STRING, &dbus_id,
+                                      DBUS_TYPE_OBJECT_PATH, &obj_path,
 				      0))
     {
       g_free (path);
@@ -111,6 +117,7 @@ g_vfs_job_stop_mountable_new (DBusConnection *connection,
 
   job->filename = path;
   job->backend = backend;
+  job->mount_source = g_mount_source_new (dbus_id, obj_path);
   job->flags = flags;
   
   return G_VFS_JOB (job);
@@ -132,7 +139,8 @@ run (GVfsJob *job)
   class->stop_mountable (op_job->backend,
                          op_job,
                          op_job->filename,
-                         op_job->flags);
+                         op_job->flags,
+                         op_job->mount_source);
 }
 
 static gboolean
@@ -147,7 +155,8 @@ try (GVfsJob *job)
   return class->try_stop_mountable (op_job->backend,
                                     op_job,
                                     op_job->filename,
-                                    op_job->flags);
+                                    op_job->flags,
+                                    op_job->mount_source);
 }
 
 /* Might be called on an i/o thread */

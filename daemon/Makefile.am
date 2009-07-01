@@ -126,6 +126,7 @@ libdaemon_la_SOURCES = \
 	gvfsjobunmountmountable.c gvfsjobunmountmountable.h \
 	gvfsjobstartmountable.c gvfsjobstartmountable.h \
 	gvfsjobstopmountable.c gvfsjobstopmountable.h \
+	gvfsjobpollmountable.c gvfsjobpollmountable.h \
 	gvfsjobopenforread.c gvfsjobopenforread.h \
 	gvfsjobopeniconforread.c gvfsjobopeniconforread.h \
 	gvfsjobread.c gvfsjobread.h \

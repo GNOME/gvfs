@@ -232,7 +232,7 @@ unmount_done_cb (GObject *object,
   gboolean succeeded;
   GError *error = NULL;
 
-  succeeded = g_mount_unmount_finish (G_MOUNT (object), res, &error);
+  succeeded = g_mount_unmount_with_operation_finish (G_MOUNT (object), res, &error);
 
   g_object_unref (G_MOUNT (object));
 
@@ -250,6 +250,7 @@ unmount (GFile *file)
 {
   GMount *mount;
   GError *error = NULL;
+  GMountOperation *mount_op;
 
   if (file == NULL)
     return;
@@ -261,7 +262,9 @@ unmount (GFile *file)
       return;
     }
 
-  g_mount_unmount (mount, 0, NULL, unmount_done_cb, NULL);
+  mount_op = new_mount_op ();
+  g_mount_unmount_with_operation (mount, 0, mount_op, NULL, unmount_done_cb, NULL);
+  g_object_unref (mount_op);
 
   outstanding_mounts++;
 }

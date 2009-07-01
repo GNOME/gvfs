@@ -54,6 +54,7 @@ struct _GGduDrive {
 
   GDriveStartStopType start_stop_type;
   gboolean can_start;
+  gboolean can_start_degraded;
   gboolean can_stop;
 };
 
@@ -131,6 +132,7 @@ update_drive (GGduDrive *drive)
   gboolean old_has_media;
   gboolean old_can_eject;
   gboolean old_can_start;
+  gboolean old_can_start_degraded;
   gboolean old_can_stop;
   gboolean old_start_stop_type;
   gboolean old_is_media_check_automatic;
@@ -141,6 +143,7 @@ update_drive (GGduDrive *drive)
   old_has_media = drive->has_media;
   old_can_eject = drive->can_eject;
   old_can_start = drive->can_start;
+  old_can_start_degraded = drive->can_start_degraded;
   old_can_stop = drive->can_stop;
   old_start_stop_type = drive->start_stop_type;
   old_can_poll_for_media = drive->can_poll_for_media;
@@ -193,11 +196,18 @@ update_drive (GGduDrive *drive)
   /* determine start/stop type */
   drive->can_stop = FALSE;
   drive->can_start = FALSE;
+  drive->can_start_degraded = FALSE;
   drive->start_stop_type = G_DRIVE_START_STOP_TYPE_UNKNOWN;
   if (gdu_drive_is_activatable (GDU_DRIVE (drive->presentable)))
     {
+      gboolean can_activate;
+      gboolean degraded;
+
+      can_activate = gdu_drive_can_activate (GDU_DRIVE (drive->presentable), &degraded);
+
       drive->can_stop  = gdu_drive_can_deactivate (GDU_DRIVE (drive->presentable));
-      drive->can_start = gdu_drive_can_activate (GDU_DRIVE (drive->presentable), NULL);
+      drive->can_start = can_activate && !degraded;
+      drive->can_start_degraded = can_activate && degraded;
       drive->start_stop_type = G_DRIVE_START_STOP_TYPE_MULTIDISK;
     }
   else if (device != NULL && gdu_device_drive_get_can_detach (device))
@@ -232,6 +242,7 @@ update_drive (GGduDrive *drive)
            */
           drive->can_stop = TRUE;
           drive->can_start = FALSE;
+          drive->can_start_degraded = FALSE;
           drive->start_stop_type = G_DRIVE_START_STOP_TYPE_SHUTDOWN;
         }
     }
@@ -253,6 +264,7 @@ update_drive (GGduDrive *drive)
               (old_has_media == drive->has_media) &&
               (old_can_eject == drive->can_eject) &&
               (old_can_start == drive->can_start) &&
+              (old_can_start_degraded == drive->can_start_degraded) &&
               (old_can_stop == drive->can_stop) &&
               (old_start_stop_type == drive->start_stop_type) &&
               (old_is_media_check_automatic == drive->is_media_check_automatic) &&
@@ -433,6 +445,13 @@ g_gdu_drive_can_start (GDrive *_drive)
 }
 
 static gboolean
+g_gdu_drive_can_start_degraded (GDrive *_drive)
+{
+  GGduDrive *drive = G_GDU_DRIVE (_drive);
+  return drive->can_start_degraded;
+}
+
+static gboolean
 g_gdu_drive_can_stop (GDrive *_drive)
 {
   GGduDrive *drive = G_GDU_DRIVE (_drive);
@@ -458,6 +477,7 @@ typedef struct {
   GDrive *drive;
   GAsyncReadyCallback callback;
   gpointer user_data;
+  GMountOperation *mount_operation;
   GCancellable *cancellable;
   GMountUnmountFlags flags;
 
@@ -510,11 +530,12 @@ unmount_mounts_do (UnmountMountsOp *data)
 
       /*g_warning ("unmounting %p", mount);*/
 
-      g_mount_unmount (mount,
-                       data->flags,
-                       data->cancellable,
-                       unmount_mounts_cb,
-                       data);
+      g_mount_unmount_with_operation (mount,
+                                      data->flags,
+                                      data->mount_operation,
+                                      data->cancellable,
+                                      unmount_mounts_cb,
+                                      data);
     }
 }
 
@@ -528,7 +549,7 @@ unmount_mounts_cb (GObject *source_object,
   GSimpleAsyncResult *simple;
   GError *error = NULL;
 
-  if (!g_mount_unmount_finish (mount, res, &error))
+  if (!g_mount_unmount_with_operation_finish (mount, res, &error))
     {
       /* make the error dialog more targeted to the drive.. unless the user has already seen a dialog */
       if (error->code != G_IO_ERROR_FAILED_HANDLED)
@@ -564,6 +585,7 @@ unmount_mounts_cb (GObject *source_object,
 static void
 unmount_mounts (GGduDrive           *drive,
                 GMountUnmountFlags   flags,
+                GMountOperation     *mount_operation,
                 GCancellable        *cancellable,
                 GAsyncReadyCallback  callback,
                 gpointer             user_data,
@@ -576,6 +598,7 @@ unmount_mounts (GGduDrive           *drive,
 
   data = g_new0 (UnmountMountsOp, 1);
   data->drive = g_object_ref (drive);
+  data->mount_operation = mount_operation;
   data->cancellable = cancellable;
   data->callback = callback;
   data->user_data = user_data;
@@ -689,17 +712,19 @@ g_gdu_drive_eject_on_all_unmounted (GDrive              *_drive,
 }
 
 static void
-g_gdu_drive_eject (GDrive              *_drive,
-                   GMountUnmountFlags   flags,
-                   GCancellable        *cancellable,
-                   GAsyncReadyCallback  callback,
-                   gpointer             user_data)
+g_gdu_drive_eject_with_operation (GDrive              *_drive,
+                                  GMountUnmountFlags   flags,
+                                  GMountOperation     *mount_operation,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
 {
   GGduDrive *drive = G_GDU_DRIVE (_drive);
 
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
   unmount_mounts (drive,
                   flags,
+                  mount_operation,
                   cancellable,
                   callback,
                   user_data,
@@ -708,11 +733,29 @@ g_gdu_drive_eject (GDrive              *_drive,
 }
 
 static gboolean
+g_gdu_drive_eject_with_operation_finish (GDrive        *drive,
+                                         GAsyncResult  *result,
+                                         GError       **error)
+{
+  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+}
+
+static void
+g_gdu_drive_eject (GDrive              *drive,
+                   GMountUnmountFlags   flags,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
+{
+  g_gdu_drive_eject_with_operation (drive, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
 g_gdu_drive_eject_finish (GDrive        *drive,
                           GAsyncResult  *result,
                           GError       **error)
 {
-  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+  return g_gdu_drive_eject_with_operation_finish (drive, result, error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -807,6 +850,7 @@ g_gdu_drive_stop_on_all_unmounted (GDrive              *_drive,
 static void
 g_gdu_drive_stop (GDrive              *_drive,
                   GMountUnmountFlags   flags,
+                  GMountOperation     *mount_operation,
                   GCancellable        *cancellable,
                   GAsyncReadyCallback  callback,
                   gpointer             user_data)
@@ -816,6 +860,7 @@ g_gdu_drive_stop (GDrive              *_drive,
   /* first we need to go through all the volumes and unmount their assoicated mounts (if any) */
   unmount_mounts (drive,
                   flags,
+                  mount_operation,
                   cancellable,
                   callback,
                   user_data,
@@ -1132,6 +1177,8 @@ g_gdu_drive_drive_iface_init (GDriveIface *iface)
   iface->can_poll_for_media = g_gdu_drive_can_poll_for_media;
   iface->eject = g_gdu_drive_eject;
   iface->eject_finish = g_gdu_drive_eject_finish;
+  iface->eject_with_operation = g_gdu_drive_eject_with_operation;
+  iface->eject_with_operation_finish = g_gdu_drive_eject_with_operation_finish;
   iface->poll_for_media = g_gdu_drive_poll_for_media;
   iface->poll_for_media_finish = g_gdu_drive_poll_for_media_finish;
   iface->get_identifier = g_gdu_drive_get_identifier;
@@ -1139,6 +1186,7 @@ g_gdu_drive_drive_iface_init (GDriveIface *iface)
 
   iface->get_start_stop_type = g_gdu_drive_get_start_stop_type;
   iface->can_start = g_gdu_drive_can_start;
+  iface->can_start_degraded = g_gdu_drive_can_start_degraded;
   iface->can_stop = g_gdu_drive_can_stop;
   iface->start = g_gdu_drive_start;
   iface->start_finish = g_gdu_drive_start_finish;

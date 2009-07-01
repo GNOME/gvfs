@@ -47,7 +47,8 @@ struct _GVfsWriteChannelClass
 
 GType g_vfs_write_channel_get_type (void) G_GNUC_CONST;
 
-GVfsWriteChannel *g_vfs_write_channel_new              (GVfsBackend      *backend);
+GVfsWriteChannel *g_vfs_write_channel_new              (GVfsBackend      *backend,
+                                                        GPid              actual_consumer);
 void              g_vfs_write_channel_send_written     (GVfsWriteChannel *write_channel,
 							gsize             bytes_written);
 void              g_vfs_write_channel_send_closed      (GVfsWriteChannel *write_channel,

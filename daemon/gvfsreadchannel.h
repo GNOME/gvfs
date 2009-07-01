@@ -47,7 +47,8 @@ struct _GVfsReadChannelClass
 
 GType g_vfs_read_channel_get_type (void) G_GNUC_CONST;
 
-GVfsReadChannel *g_vfs_read_channel_new                (GVfsBackend        *backend);
+GVfsReadChannel *g_vfs_read_channel_new                (GVfsBackend        *backend,
+                                                        GPid                actual_consumer);
 void            g_vfs_read_channel_send_data          (GVfsReadChannel     *read_channel,
 						       char               *buffer,
 						       gsize               count);

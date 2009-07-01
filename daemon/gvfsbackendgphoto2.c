@@ -51,12 +51,13 @@
 #include "gvfsjobwrite.h"
 #include "gvfsjobclosewrite.h"
 #include "gvfsjobcreatemonitor.h"
+#include "gvfsjobunmount.h"
 #include "gvfsmonitor.h"
 #include "gvfsjobseekwrite.h"
 #include "gvfsicon.h"
 
 /* showing debug traces */
-#if 0
+#if 1
 #define DEBUG_SHOW_TRACES 1
 #endif
 
@@ -175,9 +176,6 @@ struct _GVfsBackendGphoto2
   /* see comment in ensure_ignore_prefix() */
   char *ignore_prefix;
 
-  /* list of open files */
-  int num_open_files_for_reading;
-
   DBusConnection *dbus_connection;
   LibHalContext *hal_ctx;
   char *hal_udi;
@@ -219,6 +217,9 @@ struct _GVfsBackendGphoto2
   /* monitors (only used on the IO thread) */
   GList *dir_monitor_proxies;
   GList *file_monitor_proxies;
+
+  /* list of open read handles (only used on the IO thread) */
+  GList *open_read_handles;
 
   /* list of open write handles (only used on the IO thread) */
   GList *open_write_handles;
@@ -1630,31 +1631,76 @@ try_mount (GVfsBackend *backend,
 /* ------------------------------------------------------------------------------------------------- */
 
 static void
-do_unmount (GVfsBackend *backend,
-            GVfsJobUnmount *job)
+unmount_with_op_cb (GVfsBackend  *backend,
+                    GAsyncResult *res,
+                    gpointer      user_data)
 {
-  GError *error;
-  GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (backend);
-  int num_open_files;
+  GVfsJobUnmount *job = G_VFS_JOB_UNMOUNT (user_data);
+  gboolean should_unmount;
 
-  num_open_files = gphoto2_backend->num_open_files_for_reading + g_list_length (gphoto2_backend->open_write_handles);
+  DEBUG ("In unmount_with_op_cb");
 
-  if (num_open_files > 0)
+  should_unmount = g_vfs_backend_unmount_with_operation_finish (backend,
+                                                                res);
+
+  DEBUG ("should_unmount=%d", should_unmount);
+
+  if (should_unmount)
     {
-      error = g_error_new (G_IO_ERROR, G_IO_ERROR_BUSY, 
-                           ngettext("File system is busy: %d open file",
-                                    "File system is busy: %d open files",
-                                    num_open_files),
-                           num_open_files);
+
+      DEBUG ("unmounted %p", backend);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else
+    {
+      GError *error;
+      error = g_error_new (G_IO_ERROR,
+                           G_IO_ERROR_FAILED_HANDLED,
+                           _("Filesystem is busy"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
-      return;
+    }
+}
+
+static gboolean
+try_unmount (GVfsBackend        *backend,
+             GVfsJobUnmount     *job,
+             GMountUnmountFlags  flags,
+             GMountSource       *mount_source)
+{
+  DEBUG ("In try_unmount, unmount_flags=%d", flags, mount_source);
+
+  if (flags & G_MOUNT_UNMOUNT_FORCE)
+    {
+      DEBUG ("forcibly unmounted %p", backend);
+      g_vfs_job_succeeded (G_VFS_JOB (job));
+    }
+  else if (g_mount_source_is_dummy (mount_source))
+    {
+      if (g_vfs_backend_has_blocking_processes (backend))
+        {
+          GError *error;
+          error = g_error_new (G_IO_ERROR,
+                               G_IO_ERROR_BUSY,
+                               _("Filesystem is busy"));
+          g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+          g_error_free (error);
+        }
+      else
+        {
+          DEBUG ("unmounted %p", backend);
+          g_vfs_job_succeeded (G_VFS_JOB (job));
+        }
+    }
+  else
+    {
+      g_vfs_backend_unmount_with_operation (backend,
+                                            mount_source,
+                                            (GAsyncReadyCallback) unmount_with_op_cb,
+                                            job);
     }
 
-  release_device (gphoto2_backend);
-  g_vfs_job_succeeded (G_VFS_JOB (job));
-
-  DEBUG ("unmounted %p", backend);
+  return TRUE;
 }
 
 /* ------------------------------------------------------------------------------------------------- */
@@ -1742,7 +1788,7 @@ do_open_for_read_real (GVfsBackend *backend,
          read_handle->data, read_handle->size, read_handle, get_preview);
 
   g_mutex_lock (gphoto2_backend->lock);
-  gphoto2_backend->num_open_files_for_reading++;
+  gphoto2_backend->open_read_handles = g_list_prepend (gphoto2_backend->open_read_handles, read_handle);
   g_mutex_unlock (gphoto2_backend->lock);
       
   read_handle->cursor = 0;
@@ -1889,11 +1935,11 @@ do_close_read (GVfsBackend *backend,
 
   DEBUG ("close_read() handle=%p", handle);
 
-  free_read_handle (read_handle);
-
   g_mutex_lock (gphoto2_backend->lock);
-  gphoto2_backend->num_open_files_for_reading--;
+  gphoto2_backend->open_read_handles = g_list_remove (gphoto2_backend->open_read_handles, read_handle);
   g_mutex_unlock (gphoto2_backend->lock);
+
+  free_read_handle (read_handle);
   
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -3403,7 +3449,7 @@ g_vfs_backend_gphoto2_class_init (GVfsBackendGphoto2Class *klass)
 
   backend_class->try_mount = try_mount;
   backend_class->mount = do_mount;
-  backend_class->unmount = do_unmount;
+  backend_class->try_unmount = try_unmount;
   backend_class->open_icon_for_read = do_open_icon_for_read;
   backend_class->open_for_read = do_open_for_read;
   backend_class->try_read = try_read;

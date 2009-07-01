@@ -39,7 +39,7 @@
 #include "ggduvolume.h"
 
 #define BUSY_UNMOUNT_NUM_ATTEMPTS              5
-#define BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS 500
+#define BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS 100
 
 struct _GGduMount
 {
@@ -456,7 +456,6 @@ typedef struct {
   GMount *mount;
 
   gchar **argv;
-  guint num_attempts_left;
 
   GAsyncReadyCallback callback;
   gpointer user_data;
@@ -467,14 +466,14 @@ typedef struct {
   guint error_channel_source_id;
   GString *error_string;
 
-} UnmountOp;
+} BinUnmountData;
 
-static gboolean unmount_attempt (UnmountOp *data);
+static gboolean bin_unmount_attempt (BinUnmountData *data);
 
 static void
-unmount_cb (GPid pid, gint status, gpointer user_data)
+bin_unmount_cb (GPid pid, gint status, gpointer user_data)
 {
-  UnmountOp *data = user_data;
+  BinUnmountData *data = user_data;
   GSimpleAsyncResult *simple;
 
   g_spawn_close_pid (pid);
@@ -488,15 +487,6 @@ unmount_cb (GPid pid, gint status, gpointer user_data)
       /* we may want to add more strstr() checks here depending on what unmount helper is being used etc... */
       if (data->error_string->str != NULL && strstr (data->error_string->str, "is busy") != NULL)
         error_code = G_IO_ERROR_BUSY;
-
-      if (error_code == G_IO_ERROR_BUSY && data->num_attempts_left > 0)
-        {
-          g_timeout_add (BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS,
-                         (GSourceFunc) unmount_attempt,
-                         data);
-          data->num_attempts_left -= 1;
-          goto out;
-        }
 
       error = g_error_new_literal (G_IO_ERROR,
                                    error_code,
@@ -524,17 +514,14 @@ unmount_cb (GPid pid, gint status, gpointer user_data)
   close (data->error_fd);
   g_strfreev (data->argv);
   g_free (data);
-
- out:
-  ;
 }
 
 static gboolean
-unmount_read_error (GIOChannel *channel,
-                    GIOCondition condition,
-                    gpointer user_data)
+bin_unmount_read_error (GIOChannel *channel,
+                        GIOCondition condition,
+                        gpointer user_data)
 {
-  UnmountOp *data = user_data;
+  BinUnmountData *data = user_data;
   gchar buf[BUFSIZ];
   gsize bytes_read;
   GError *error;
@@ -565,7 +552,7 @@ read:
 }
 
 static gboolean
-unmount_attempt (UnmountOp *data)
+bin_unmount_attempt (BinUnmountData *data)
 {
   GPid child_pid;
   GError *error;
@@ -578,8 +565,8 @@ unmount_attempt (UnmountOp *data)
                                  NULL,         /* child_setup */
                                  NULL,         /* user_data for child_setup */
                                  &child_pid,
-                                 NULL,           /* standard_input */
-                                 NULL,           /* standard_output */
+                                 NULL,         /* standard_input */
+                                 NULL,         /* standard_output */
                                  &(data->error_fd),
                                  &error)) {
     g_assert (error != NULL);
@@ -593,8 +580,8 @@ unmount_attempt (UnmountOp *data)
   if (error != NULL)
     goto handle_error;
 
-  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, unmount_read_error, data);
-  g_child_watch_add (child_pid, unmount_cb, data);
+  data->error_channel_source_id = g_io_add_watch (data->error_channel, G_IO_IN, bin_unmount_read_error, data);
+  g_child_watch_add (child_pid, bin_unmount_cb, data);
 
 handle_error:
 
@@ -622,116 +609,345 @@ handle_error:
 }
 
 static void
-unmount_do (GMount              *mount,
-            GCancellable        *cancellable,
-            GAsyncReadyCallback  callback,
-            gpointer             user_data,
-            char               **argv)
+bin_unmount_do (GMount              *mount,
+                GCancellable        *cancellable,
+                GAsyncReadyCallback  callback,
+                gpointer             user_data,
+                char               **argv)
 {
-  UnmountOp *data;
+  BinUnmountData *data;
 
-  data = g_new0 (UnmountOp, 1);
+  data = g_new0 (BinUnmountData, 1);
   data->mount = mount;
   data->callback = callback;
   data->user_data = user_data;
   data->cancellable = cancellable;
-  data->num_attempts_left = BUSY_UNMOUNT_NUM_ATTEMPTS;
   data->argv = g_strdupv (argv);
 
-  unmount_attempt (data);
+  bin_unmount_attempt (data);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
-static void
-luks_lock_cb (GduDevice *device,
-              GError    *error,
-              gpointer   user_data)
+
+static GArray *
+_get_busy_processes (GduDevice *device)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GArray *processes;
+  GList *open_files, *l;
 
-  if (error != NULL)
+  processes = g_array_new (FALSE, FALSE, sizeof (GPid));
+
+  open_files = gdu_device_filesystem_list_open_files_sync (device, NULL);
+  for (l = open_files; l != NULL; l = l->next)
     {
-      /* We could handle PolicyKit integration here but this action is allowed by default
-       * and this won't be needed when porting to PolicyKit 1.0 anyway
-       */
-      g_simple_async_result_set_from_error (simple, error);
-      g_error_free (error);
+      GduProcess *gdup = GDU_PROCESS (l->data);
+      GPid pid = gdu_process_get_id (gdup);
+      g_array_append_val (processes, pid);
     }
+  g_list_foreach (open_files, (GFunc) g_object_unref, NULL);
+  g_list_free (open_files);
 
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  return processes;
 }
 
-static gboolean gdu_unmount_attempt (GSimpleAsyncResult *simple);
+typedef struct
+{
+  gint ref_count;
+
+  GGduMount *mount;
+  GMountUnmountFlags flags;
+  GduDevice *device;
+
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+
+  GCancellable *cancellable;
+  GMountOperation *mount_operation;
+
+  gulong cancelled_handler_id;
+  gulong mount_op_reply_handler_id;
+  guint retry_unmount_timer_id;
+
+  gboolean completed;
+} _GduUnmountData;
+
+static _GduUnmountData *
+_gdu_unmount_data_ref (_GduUnmountData *data)
+{
+  g_atomic_int_inc (&data->ref_count);
+  return data;
+}
 
 static void
-gdu_unmount_cb (GduDevice *device,
-                GError    *error,
-                gpointer   user_data)
+_gdu_unmount_data_unref (_GduUnmountData *data)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  if (!g_atomic_int_dec_and_test (&data->ref_count))
+    return;
+
+  if (data->cancelled_handler_id > 0)
+    g_signal_handler_disconnect (data->cancellable, data->cancelled_handler_id);
+  if (data->mount_op_reply_handler_id > 0)
+    {
+      /* make the operation dialog go away */
+      g_signal_emit_by_name (data->mount_operation, "aborted");
+      g_signal_handler_disconnect (data->mount_operation, data->mount_op_reply_handler_id);
+    }
+  if (data->retry_unmount_timer_id > 0)
+    {
+      g_source_remove (data->retry_unmount_timer_id);
+    }
+
+  g_object_unref (data->mount);
+  if (data->cancellable != NULL)
+    g_object_unref (data->cancellable);
+  if (data->mount_operation != NULL)
+    g_object_unref (data->mount_operation);
+  g_object_unref (data->device);
+
+  g_free (data);
+}
+
+static void
+_gdu_unmount_luks_lock_cb (GduDevice *device,
+                           GError    *error,
+                           gpointer   user_data)
+{
+  _GduUnmountData *data = user_data;
+  GSimpleAsyncResult *simple;
 
   if (error != NULL)
     {
-      gint error_code;
-
-      /*g_debug ("domain=%s error_code=%d '%s'", g_quark_to_string (error->domain), error->code, error->message);*/
-
-      error_code = G_IO_ERROR_FAILED;
+      /* translate to GduError to GIOError */
       if (error->domain == GDU_ERROR && error->code == GDU_ERROR_BUSY)
-        error_code = G_IO_ERROR_BUSY;
+        error->code = G_IO_ERROR_BUSY;
+      else
+        error->code = G_IO_ERROR_FAILED;
+      error->domain = G_IO_ERROR;
 
-      /* We could handle PolicyKit integration here but this action is allowed by default
-       * and this won't be needed when porting to PolicyKit 1.0 anyway
-       */
-
-      if (error_code == G_IO_ERROR_BUSY)
+      if (!data->completed)
         {
-          guint num_attempts_left;
-
-          num_attempts_left = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (simple), "num-attempts-left"));
-
-          if (num_attempts_left > 0)
-            {
-              num_attempts_left -= 1;
-              g_object_set_data (G_OBJECT (simple),
-                                 "num-attempts-left",
-                                 GUINT_TO_POINTER (num_attempts_left));
-
-              g_timeout_add (BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS,
-                             (GSourceFunc) gdu_unmount_attempt,
-                             simple);
-              goto out;
-            }
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->mount),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+          g_error_free (error);
+          data->completed = TRUE;
+          _gdu_unmount_data_unref (data);
+          g_simple_async_result_complete_in_idle (simple);
+          g_object_unref (simple);
         }
-
-      g_simple_async_result_set_error (simple,
-                                       G_IO_ERROR,
-                                       error_code,
-                                       "%s",
-                                       error->message);
-      g_error_free (error);
-      g_simple_async_result_complete (simple);
-      g_object_unref (simple);
       goto out;
     }
 
-  /* if volume is a cleartext LUKS block device, then also lock this one */
+  /* we're done */
+  if (!data->completed)
+    {
+      simple = g_simple_async_result_new (G_OBJECT (data->mount),
+                                          data->callback,
+                                          data->user_data,
+                                          NULL);
+      data->completed = TRUE;
+      _gdu_unmount_data_unref (data);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+    }
+
+ out:
+  /* release the ref taken when calling gdu_device_op_luks_lock() */
+  _gdu_unmount_data_unref (data);
+}
+
+static void _gdu_unmount_attempt (_GduUnmountData *data,
+                                  gboolean         force_unmount);
+
+static void
+_gdu_unmount_on_mount_op_reply (GMountOperation       *mount_operation,
+                                GMountOperationResult result,
+                                gpointer              user_data)
+{
+  _GduUnmountData *data = user_data;
+  GSimpleAsyncResult *simple;
+  gint choice;
+
+  /* disconnect the signal handler */
+  g_warn_if_fail (data->mount_op_reply_handler_id != 0);
+  g_signal_handler_disconnect (data->mount_operation,
+                               data->mount_op_reply_handler_id);
+  data->mount_op_reply_handler_id = 0;
+
+  choice = g_mount_operation_get_choice (mount_operation);
+
+  if (result == G_MOUNT_OPERATION_ABORTED ||
+      (result == G_MOUNT_OPERATION_HANDLED && choice == 1))
+    {
+      /* don't show an error dialog here */
+      if (!data->completed)
+        {
+          simple = g_simple_async_result_new_error (G_OBJECT (data->mount),
+                                                    data->callback,
+                                                    data->user_data,
+                                                    G_IO_ERROR,
+                                                    G_IO_ERROR_FAILED_HANDLED,
+                                                    "GMountOperation aborted (user should never see this "
+                                                    "error since it is G_IO_ERROR_FAILED_HANDLED)");
+          data->completed = TRUE;
+          _gdu_unmount_data_unref (data);
+          g_simple_async_result_complete_in_idle (simple);
+          g_object_unref (simple);
+        }
+    }
+  else if (result == G_MOUNT_OPERATION_HANDLED)
+    {
+      /* user chose force unmount => try again with force_unmount==TRUE */
+
+      _gdu_unmount_attempt (data, TRUE);
+    }
+  else
+    {
+      /* result == G_MOUNT_OPERATION_UNHANDLED => GMountOperation instance doesn't
+       * support :show-processes signal
+       */
+      if (!data->completed)
+        {
+          simple = g_simple_async_result_new_error (G_OBJECT (data->mount),
+                                                    data->callback,
+                                                    data->user_data,
+                                                    G_IO_ERROR,
+                                                    G_IO_ERROR_BUSY,
+                                                    _("One or more programs are preventing the unmount operation."));
+          data->completed = TRUE;
+          _gdu_unmount_data_unref (data);
+          g_simple_async_result_complete_in_idle (simple);
+          g_object_unref (simple);
+        }
+    }
+}
+
+static gboolean
+_gdu_unmount_on_retry_unmount_timer (gpointer user_data)
+{
+  _GduUnmountData *data = user_data;
+
+  /* we're removing the timeout */
+  data->retry_unmount_timer_id = 0;
+
+  if (data->completed)
+    goto out;
+
+  /* timeout expired => try again */
+  _gdu_unmount_attempt (data, FALSE);
+
+ out:
+  return FALSE;
+}
+
+
+static void
+_gdu_unmount_cb (GduDevice *device,
+                 GError    *error,
+                 gpointer   user_data)
+{
+  _GduUnmountData *data = user_data;
+  GSimpleAsyncResult *simple;
+
+  if (error != NULL)
+    {
+      /* translate to GduError to GIOError */
+      if (error->domain == GDU_ERROR && error->code == GDU_ERROR_BUSY)
+        error->code = G_IO_ERROR_BUSY;
+      else
+        error->code = G_IO_ERROR_FAILED;
+      error->domain = G_IO_ERROR;
+
+      /* if the user passed in a GMountOperation, then do the GMountOperation::show-processes dance ... */
+      if (error->code == G_IO_ERROR_BUSY && data->mount_operation != NULL)
+        {
+          GArray *processes;
+
+          /* TODO: might be better to do this Async - punt on this until gdu uses GCancellable... */
+          processes = _get_busy_processes (device);
+
+          if (processes != NULL && processes->len > 0)
+            {
+              const gchar *choices[3] = {NULL, NULL, NULL};
+              const gchar *message;
+
+              if (data->mount_op_reply_handler_id == 0)
+                {
+                  data->mount_op_reply_handler_id = g_signal_connect (data->mount_operation,
+                                                                      "reply",
+                                                                      G_CALLBACK (_gdu_unmount_on_mount_op_reply),
+                                                                      data);
+                }
+              choices[0] = _("Unmount Anyway");
+              choices[1] = _("Cancel");
+              message = _("Volume is busy\n"
+                          "One or more applications are keeping the volume busy.");
+              g_signal_emit_by_name (data->mount_operation,
+                                     "show-processes",
+                                     message,
+                                     processes,
+                                     choices);
+
+              /* set up a timer to try unmounting every two seconds - this will also
+               * update the list of busy processes
+               */
+              if (data->retry_unmount_timer_id == 0)
+                {
+                  data->retry_unmount_timer_id = g_timeout_add_seconds (2,
+                                                                        _gdu_unmount_on_retry_unmount_timer,
+                                                                        data);
+                }
+              goto out;
+            }
+          else
+            {
+              if (processes != NULL)
+                g_array_unref (processes);
+              /* falls through to reporting an error */
+            }
+        }
+
+      /* otherwise, just report the error */
+
+      if (!data->completed)
+        {
+          simple = g_simple_async_result_new_from_error (G_OBJECT (data->mount),
+                                                         data->callback,
+                                                         data->user_data,
+                                                         error);
+          g_error_free (error);
+          data->completed = TRUE;
+          _gdu_unmount_data_unref (data);
+          g_simple_async_result_complete_in_idle (simple);
+          g_object_unref (simple);
+        }
+      goto out;
+    }
+
+  /* success! if we unmounted a cleartext device, also tear down the crypto mapping */
   if (gdu_device_is_luks_cleartext (device))
     {
       const gchar *luks_cleartext_slave_object_path;
       GduDevice *luks_cleartext_slave;
       GduPool *pool;
 
-      luks_cleartext_slave_object_path = gdu_device_luks_cleartext_get_slave (device);
+      luks_cleartext_slave_object_path = gdu_device_luks_cleartext_get_slave (data->device);
       if (luks_cleartext_slave_object_path == NULL)
         {
-          g_simple_async_result_set_error (simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
-                                           "Cannot get LUKS cleartext slave");
-          g_simple_async_result_complete (simple);
-          g_object_unref (simple);
+          if (!data->completed)
+            {
+              simple = g_simple_async_result_new_error (G_OBJECT (data->mount),
+                                                        data->callback,
+                                                        data->user_data,
+                                                        G_IO_ERROR,
+                                                        G_IO_ERROR_FAILED,
+                                                        _("Cannot get LUKS cleartext slave"));
+              data->completed = TRUE;
+              _gdu_unmount_data_unref (data);
+              g_simple_async_result_complete_in_idle (simple);
+              g_object_unref (simple);
+            }
           goto out;
         }
 
@@ -741,66 +957,133 @@ gdu_unmount_cb (GduDevice *device,
 
       if (luks_cleartext_slave == NULL)
         {
-          g_simple_async_result_set_error (simple,
-                                           G_IO_ERROR,
-                                           G_IO_ERROR_FAILED,
-                                           "Cannot get LUKS cleartext slave");
-          g_simple_async_result_complete (simple);
-          g_object_unref (simple);
+          if (!data->completed)
+            {
+              simple = g_simple_async_result_new_error (G_OBJECT (data->mount),
+                                                        data->callback,
+                                                        data->user_data,
+                                                        G_IO_ERROR,
+                                                        G_IO_ERROR_FAILED,
+                                                        _("Cannot get LUKS cleartext slave from path `%s'"),
+                                                        luks_cleartext_slave_object_path);
+              data->completed = TRUE;
+              _gdu_unmount_data_unref (data);
+              g_simple_async_result_complete_in_idle (simple);
+              g_object_unref (simple);
+            }
           goto out;
         }
 
+      /* take an extra ref on data since we may complete before the callback */
       gdu_device_op_luks_lock (luks_cleartext_slave,
-                               luks_lock_cb,
-                               simple);
+                               _gdu_unmount_luks_lock_cb,
+                               _gdu_unmount_data_ref (data));
 
       g_object_unref (luks_cleartext_slave);
       goto out;
     }
 
-  g_simple_async_result_complete (simple);
-  g_object_unref (simple);
+  /* not a cleartext device => we're done */
+  if (!data->completed)
+    {
+      simple = g_simple_async_result_new (G_OBJECT (data->mount),
+                                          data->callback,
+                                          data->user_data,
+                                          NULL);
+      data->completed = TRUE;
+      _gdu_unmount_data_unref (data);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+    }
 
  out:
-  ;
-}
-
-static gboolean
-gdu_unmount_attempt (GSimpleAsyncResult *simple)
-{
-  GduDevice *device;
-
-  /* TODO: honor flags */
-  device = g_object_get_data (G_OBJECT (simple), "gdu-device");
-  gdu_device_op_filesystem_unmount (device, gdu_unmount_cb, simple);
-  return FALSE;
+  /* release the ref taken when calling gdu_device_op_filesystem_unmount() */
+  _gdu_unmount_data_unref (data);
 }
 
 static void
-g_gdu_mount_unmount (GMount              *_mount,
-                     GMountUnmountFlags   flags,
-                     GCancellable        *cancellable,
-                     GAsyncReadyCallback  callback,
-                     gpointer             user_data)
+_gdu_unmount_attempt (_GduUnmountData *data,
+                      gboolean         force_unmount)
+{
+  /* TODO: honor force_unmount */
+
+  /* take an extra ref on data since we may complete before the callback */
+  gdu_device_op_filesystem_unmount (data->device, _gdu_unmount_cb, _gdu_unmount_data_ref (data));
+}
+
+
+static void
+_gdu_unmount_on_cancelled (GMount   *mount,
+                           gpointer  user_data)
+{
+  _GduUnmountData *data = user_data;
+
+  if (!data->completed)
+    {
+      GSimpleAsyncResult *simple;
+
+      simple = g_simple_async_result_new_error (G_OBJECT (data->mount),
+                                                data->callback,
+                                                data->user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_CANCELLED,
+                                                _("Operation was cancelled"));
+      data->completed = TRUE;
+      _gdu_unmount_data_unref (data);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+    }
+}
+
+static void
+_gdu_unmount_do (GGduMount           *mount,
+                 GMountUnmountFlags   flags,
+                 GMountOperation     *mount_operation,
+                 GCancellable        *cancellable,
+                 GAsyncReadyCallback  callback,
+                 gpointer             user_data,
+                 GduDevice           *device)
+{
+  _GduUnmountData *data;
+
+  data = g_new0 (_GduUnmountData, 1);
+  data->ref_count = 1;
+  data->mount = g_object_ref (mount);
+  data->flags = flags;
+  data->mount_operation = mount_operation != NULL ? g_object_ref (mount_operation) : NULL;
+  data->cancellable = cancellable != NULL ? g_object_ref (cancellable) : NULL;
+  data->callback = callback;
+  data->user_data = user_data;
+  data->device = g_object_ref (device);
+
+  /* operation may be cancelled at any time */
+  if (data->cancellable != NULL)
+    {
+      data->cancelled_handler_id = g_signal_connect (data->cancellable,
+                                                     "cancelled",
+                                                     G_CALLBACK (_gdu_unmount_on_cancelled),
+                                                     data);
+    }
+
+  /* attempt to unmount */
+  _gdu_unmount_attempt (data, FALSE);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+static void
+g_gdu_mount_unmount_with_operation (GMount              *_mount,
+                                    GMountUnmountFlags   flags,
+                                    GMountOperation     *mount_operation,
+                                    GCancellable        *cancellable,
+                                    GAsyncReadyCallback  callback,
+                                    gpointer             user_data)
 {
   GGduMount *mount = G_GDU_MOUNT (_mount);
-  GSimpleAsyncResult *simple;
   GduPresentable *gdu_volume;
 
   /* emit the ::mount-pre-unmount signal */
   g_signal_emit_by_name (mount->volume_monitor, "mount-pre-unmount", mount);
-
-  /* If we end up with G_IO_ERROR_BUSY, try again BUSY_UNMOUNT_NUM_ATTEMPTS times
-   * waiting BUSY_UNMOUNT_MS_DELAY_BETWEEN_ATTEMPTS milliseconds between each
-   * attempt.
-   *
-   * This is to give other processes recieving the ::mount-pre-unmount signal some
-   * time to close file descriptors.
-   *
-   * TODO: Unfortunately this code is a bit messy because we take two different
-   *       codepaths depending on whether we use GDU or the native unmount command.
-   *       It would be good to clean this up.
-   */
 
   gdu_volume = NULL;
   if (mount->volume != NULL)
@@ -817,22 +1100,18 @@ g_gdu_mount_unmount (GMount              *_mount,
       else
         argv[1] = mount->device_file;
 
-      unmount_do (_mount, cancellable, callback, user_data, argv);
+      bin_unmount_do (_mount, cancellable, callback, user_data, argv);
     }
   else if (gdu_volume != NULL)
     {
-      simple = g_simple_async_result_new (G_OBJECT (mount),
-                                          callback,
-                                          user_data,
-                                          NULL);
-
-      g_object_set_data (G_OBJECT (simple),
-                         "num-attempts-left",
-                         GUINT_TO_POINTER (BUSY_UNMOUNT_NUM_ATTEMPTS));
-
       if (mount->is_burn_mount)
         {
-          /* burn mounts are really never mounted... */
+          /* burn mounts are really never mounted so complete successfully immediately */
+          GSimpleAsyncResult *simple;
+          simple = g_simple_async_result_new (G_OBJECT (mount),
+                                              callback,
+                                              user_data,
+                                              NULL);
           g_simple_async_result_complete (simple);
           g_object_unref (simple);
         }
@@ -840,12 +1119,13 @@ g_gdu_mount_unmount (GMount              *_mount,
         {
           GduDevice *device;
           device = gdu_presentable_get_device (gdu_volume);
-          g_object_set_data_full (G_OBJECT (simple), "gdu-device", device, g_object_unref);
-          gdu_unmount_attempt (simple);
+          _gdu_unmount_do (mount, flags, mount_operation, cancellable, callback, user_data, device);
+          g_object_unref (device);
         }
     }
   else
     {
+      GSimpleAsyncResult *simple;
       simple = g_simple_async_result_new_error (G_OBJECT (mount),
                                                 callback,
                                                 user_data,
@@ -858,11 +1138,29 @@ g_gdu_mount_unmount (GMount              *_mount,
 }
 
 static gboolean
-g_gdu_mount_unmount_finish (GMount       *mount,
+g_gdu_mount_unmount_with_operation_finish (GMount       *mount,
+                                           GAsyncResult  *result,
+                                           GError       **error)
+{
+  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+}
+
+static void
+g_gdu_mount_unmount (GMount              *mount,
+                     GMountUnmountFlags   flags,
+                     GCancellable        *cancellable,
+                     GAsyncReadyCallback  callback,
+                     gpointer             user_data)
+{
+  g_gdu_mount_unmount_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_gdu_mount_unmount_finish (GMount        *mount,
                             GAsyncResult  *result,
                             GError       **error)
 {
-  return !g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), error);
+  return g_gdu_mount_unmount_with_operation_finish (mount, result, error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -885,11 +1183,12 @@ eject_wrapper_callback (GObject *source_object,
 }
 
 static void
-g_gdu_mount_eject (GMount              *mount,
-                   GMountUnmountFlags   flags,
-                   GCancellable        *cancellable,
-                   GAsyncReadyCallback  callback,
-                   gpointer             user_data)
+g_gdu_mount_eject_with_operation (GMount              *mount,
+                                  GMountUnmountFlags   flags,
+                                  GMountOperation     *mount_operation,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
 {
   GGduMount *gdu_mount = G_GDU_MOUNT (mount);
   GDrive *drive;
@@ -905,7 +1204,7 @@ g_gdu_mount_eject (GMount              *mount,
       data->object = g_object_ref (mount);
       data->callback = callback;
       data->user_data = user_data;
-      g_drive_eject (drive, flags, cancellable, eject_wrapper_callback, data);
+      g_drive_eject_with_operation (drive, flags, mount_operation, cancellable, eject_wrapper_callback, data);
       g_object_unref (drive);
     }
   else
@@ -924,9 +1223,9 @@ g_gdu_mount_eject (GMount              *mount,
 }
 
 static gboolean
-g_gdu_mount_eject_finish (GMount        *_mount,
-                          GAsyncResult  *result,
-                          GError       **error)
+g_gdu_mount_eject_with_operation_finish (GMount        *_mount,
+                                         GAsyncResult  *result,
+                                         GError       **error)
 {
   GGduMount *mount = G_GDU_MOUNT (_mount);
   GDrive *drive;
@@ -940,7 +1239,7 @@ g_gdu_mount_eject_finish (GMount        *_mount,
 
   if (drive != NULL)
     {
-      res = g_drive_eject_finish (drive, result, error);
+      res = g_drive_eject_with_operation_finish (drive, result, error);
       g_object_unref (drive);
     }
   else
@@ -950,6 +1249,24 @@ g_gdu_mount_eject_finish (GMount        *_mount,
     }
 
   return res;
+}
+
+static void
+g_gdu_mount_eject (GMount              *mount,
+                   GMountUnmountFlags   flags,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
+{
+  g_gdu_mount_eject_with_operation (mount, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_gdu_mount_eject_finish (GMount        *mount,
+                          GAsyncResult  *result,
+                          GError       **error)
+{
+  return g_gdu_mount_eject_with_operation_finish (mount, result, error);
 }
 
 /* TODO: handle force_rescan */
@@ -1063,8 +1380,12 @@ g_gdu_mount_mount_iface_init (GMountIface *iface)
   iface->can_eject = g_gdu_mount_can_eject;
   iface->unmount = g_gdu_mount_unmount;
   iface->unmount_finish = g_gdu_mount_unmount_finish;
+  iface->unmount_with_operation = g_gdu_mount_unmount_with_operation;
+  iface->unmount_with_operation_finish = g_gdu_mount_unmount_with_operation_finish;
   iface->eject = g_gdu_mount_eject;
   iface->eject_finish = g_gdu_mount_eject_finish;
+  iface->eject_with_operation = g_gdu_mount_eject_with_operation;
+  iface->eject_with_operation_finish = g_gdu_mount_eject_with_operation_finish;
   iface->guess_content_type = g_gdu_mount_guess_content_type;
   iface->guess_content_type_finish = g_gdu_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_gdu_mount_guess_content_type_sync;

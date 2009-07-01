@@ -47,6 +47,7 @@ struct _GVfsJobUnmountMountable
   char *filename;
   gboolean eject;
   GMountUnmountFlags flags;
+  GMountSource *mount_source;
 };
 
 struct _GVfsJobUnmountMountableClass

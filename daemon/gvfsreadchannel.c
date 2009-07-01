@@ -282,9 +282,11 @@ g_vfs_read_channel_send_data (GVfsReadChannel  *read_channel,
 
 
 GVfsReadChannel *
-g_vfs_read_channel_new (GVfsBackend *backend)
+g_vfs_read_channel_new (GVfsBackend *backend,
+                        GPid         actual_consumer)
 {
   return g_object_new (G_VFS_TYPE_READ_CHANNEL,
 		       "backend", backend,
+                       "actual-consumer", actual_consumer,
 		       NULL);
 }

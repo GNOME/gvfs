@@ -96,6 +96,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
   dbus_bool_t make_backup;
   const char *etag;
   guint32 flags;
+  guint32 pid;
 
   path = NULL;
   dbus_error_init (&derror);
@@ -106,6 +107,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
 				      DBUS_TYPE_STRING, &etag,
 				      DBUS_TYPE_BOOLEAN, &make_backup,
 				      DBUS_TYPE_UINT32, &flags,
+                                      DBUS_TYPE_UINT32, &pid,
 				      0))
     {
       reply = dbus_message_new_error (message,
@@ -130,6 +132,7 @@ g_vfs_job_open_for_write_new (DBusConnection *connection,
   job->make_backup = make_backup;
   job->flags = flags;
   job->backend = backend;
+  job->pid = pid;
   
   return G_VFS_JOB (job);
 }
@@ -273,7 +276,8 @@ create_reply (GVfsJob *job,
   g_assert (open_job->backend_handle != NULL);
 
   error = NULL;
-  channel = g_vfs_write_channel_new (open_job->backend);
+  channel = g_vfs_write_channel_new (open_job->backend,
+                                     open_job->pid);
 
   remote_fd = g_vfs_channel_steal_remote_fd (G_VFS_CHANNEL (channel));
   if (!dbus_connection_send_fd (connection, 
@@ -309,4 +313,10 @@ create_reply (GVfsJob *job,
 static void
 finished (GVfsJob *job)
 {
+}
+
+GPid
+g_vfs_job_open_for_write_get_pid (GVfsJobOpenForWrite *job)
+{
+  return job->pid;
 }

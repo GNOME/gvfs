@@ -2306,7 +2306,9 @@ do_set_display_name (GVfsBackend           *backend,
 
 static gboolean
 try_unmount (GVfsBackend    *backend,
-             GVfsJobUnmount *job)
+             GVfsJobUnmount *job,
+             GMountUnmountFlags flags,
+             GMountSource *mount_source)
 {
   _exit (0);
 }

@@ -516,7 +516,6 @@ static gboolean
 g_hal_drive_can_eject (GDrive *drive)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
-  gboolean res;
   
   return hal_drive->can_eject;
 }
@@ -621,6 +620,7 @@ typedef struct {
   GDrive *drive;
   GAsyncReadyCallback callback;
   gpointer user_data;
+  GMountOperation *mount_operation;
   GCancellable *cancellable;
   GMountUnmountFlags flags;
 
@@ -652,7 +652,7 @@ _eject_unmount_mounts_cb (GObject *source_object,
   GSimpleAsyncResult *simple;
   GError *error = NULL;
 
-  if (!g_mount_unmount_finish (mount, res, &error))
+  if (!g_mount_unmount_with_operation_finish (mount, res, &error))
     {
       /* make the error dialog more targeted to the drive.. unless the user has already seen a dialog */
       if (error->code != G_IO_ERROR_FAILED_HANDLED)
@@ -710,20 +710,22 @@ _eject_unmount_mounts (UnmountMountsOp *data)
 
       /*g_warning ("unmounting %p", mount);*/
 
-      g_mount_unmount (mount,
-                       data->flags,
-                       data->cancellable,
-                       _eject_unmount_mounts_cb,
-                       data);
+      g_mount_unmount_with_operation (mount,
+                                      data->flags,
+                                      data->mount_operation,
+                                      data->cancellable,
+                                      _eject_unmount_mounts_cb,
+                                      data);
     }
 }
 
 static void
-g_hal_drive_eject (GDrive              *drive,
-                   GMountUnmountFlags   flags,
-                   GCancellable        *cancellable,
-                   GAsyncReadyCallback  callback,
-                   gpointer             user_data)
+g_hal_drive_eject_with_operation (GDrive              *drive,
+                                  GMountUnmountFlags   flags,
+                                  GMountOperation     *mount_operation,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
 {
   GHalDrive *hal_drive = G_HAL_DRIVE (drive);
   UnmountMountsOp *data;
@@ -733,6 +735,7 @@ g_hal_drive_eject (GDrive              *drive,
 
   data = g_new0 (UnmountMountsOp, 1);
   data->drive = g_object_ref (drive);
+  data->mount_operation = mount_operation;
   data->cancellable = cancellable;
   data->callback = callback;
   data->user_data = user_data;
@@ -752,11 +755,29 @@ g_hal_drive_eject (GDrive              *drive,
 }
 
 static gboolean
+g_hal_drive_eject_with_operation_finish (GDrive        *drive,
+                                         GAsyncResult  *result,
+                                         GError       **error)
+{
+  return TRUE;
+}
+
+static void
+g_hal_drive_eject (GDrive              *drive,
+                   GMountUnmountFlags   flags,
+                   GCancellable        *cancellable,
+                   GAsyncReadyCallback  callback,
+                   gpointer             user_data)
+{
+  g_hal_drive_eject (drive, flags, cancellable, callback, user_data);
+}
+
+static gboolean
 g_hal_drive_eject_finish (GDrive        *drive,
                           GAsyncResult  *result,
                           GError       **error)
 {
-  return TRUE;
+  return g_hal_drive_eject_with_operation_finish (drive, result, error);
 }
 
 typedef struct {
@@ -929,6 +950,8 @@ g_hal_drive_drive_iface_init (GDriveIface *iface)
   iface->can_poll_for_media = g_hal_drive_can_poll_for_media;
   iface->eject = g_hal_drive_eject;
   iface->eject_finish = g_hal_drive_eject_finish;
+  iface->eject_with_operation = g_hal_drive_eject_with_operation;
+  iface->eject_with_operation_finish = g_hal_drive_eject_with_operation_finish;
   iface->poll_for_media = g_hal_drive_poll_for_media;
   iface->poll_for_media_finish = g_hal_drive_poll_for_media_finish;
   iface->get_identifier = g_hal_drive_get_identifier;

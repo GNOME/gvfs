@@ -253,7 +253,9 @@ do_mount (GVfsBackend *backend,
 
 
 static void
-do_unmount (GVfsBackend *backend, GVfsJobUnmount *job)
+do_unmount (GVfsBackend *backend, GVfsJobUnmount *job,
+            GMountUnmountFlags flags,
+            GMountSource *mount_source)
 {
   GVfsBackendLocalTest *op_backend;
 

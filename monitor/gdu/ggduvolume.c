@@ -1015,10 +1015,6 @@ mount_with_mount_operation (MountOpData *data)
   if (toplevel != NULL)
     drive_name = gdu_presentable_get_name (toplevel);
 
-  /* This is going to look ass until bug 573416 is fixed. Unfortunately
-   * the gtk+ maintain has stated "oh, I stopped using luks" but that's
-   * more of a gtk+ problem ;-)
-   */
   if (drive_name != NULL)
     {
       if (gdu_device_is_partition (device))
@@ -1494,11 +1490,12 @@ eject_wrapper_callback (GObject *source_object,
 }
 
 static void
-g_gdu_volume_eject (GVolume              *volume,
-                    GMountUnmountFlags   flags,
-                    GCancellable        *cancellable,
-                    GAsyncReadyCallback  callback,
-                    gpointer             user_data)
+g_gdu_volume_eject_with_operation (GVolume              *volume,
+                                   GMountUnmountFlags   flags,
+                                   GMountOperation     *mount_operation,
+                                   GCancellable        *cancellable,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
 {
   GGduVolume *gdu_volume = G_GDU_VOLUME (volume);
   GGduDrive *drive;
@@ -1514,7 +1511,7 @@ g_gdu_volume_eject (GVolume              *volume,
       data->object = g_object_ref (volume);
       data->callback = callback;
       data->user_data = user_data;
-      g_drive_eject (G_DRIVE (drive), flags, cancellable, eject_wrapper_callback, data);
+      g_drive_eject_with_operation (G_DRIVE (drive), flags, mount_operation, cancellable, eject_wrapper_callback, data);
       g_object_unref (drive);
     }
   else
@@ -1532,9 +1529,9 @@ g_gdu_volume_eject (GVolume              *volume,
 }
 
 static gboolean
-g_gdu_volume_eject_finish (GVolume        *volume,
-                           GAsyncResult  *result,
-                           GError       **error)
+g_gdu_volume_eject_with_operation_finish (GVolume        *volume,
+                                          GAsyncResult  *result,
+                                          GError       **error)
 {
   GGduVolume *gdu_volume = G_GDU_VOLUME (volume);
   gboolean res;
@@ -1542,7 +1539,7 @@ g_gdu_volume_eject_finish (GVolume        *volume,
   res = TRUE;
   if (gdu_volume->drive != NULL)
     {
-      res = g_drive_eject_finish (G_DRIVE (gdu_volume->drive), result, error);
+      res = g_drive_eject_with_operation_finish (G_DRIVE (gdu_volume->drive), result, error);
     }
   else
     {
@@ -1551,6 +1548,24 @@ g_gdu_volume_eject_finish (GVolume        *volume,
     }
 
   return res;
+}
+
+static void
+g_gdu_volume_eject (GVolume              *volume,
+                    GMountUnmountFlags   flags,
+                    GCancellable        *cancellable,
+                    GAsyncReadyCallback  callback,
+                    gpointer             user_data)
+{
+  g_gdu_volume_eject_with_operation (volume, flags, NULL, cancellable, callback, user_data);
+}
+
+static gboolean
+g_gdu_volume_eject_finish (GVolume        *volume,
+                           GAsyncResult  *result,
+                           GError       **error)
+{
+  return g_gdu_volume_eject_with_operation_finish (volume, result, error);
 }
 
 static char *
@@ -1637,6 +1652,8 @@ g_gdu_volume_volume_iface_init (GVolumeIface *iface)
   iface->mount_finish = g_gdu_volume_mount_finish;
   iface->eject = g_gdu_volume_eject;
   iface->eject_finish = g_gdu_volume_eject_finish;
+  iface->eject_with_operation = g_gdu_volume_eject_with_operation;
+  iface->eject_with_operation_finish = g_gdu_volume_eject_with_operation_finish;
   iface->get_identifier = g_gdu_volume_get_identifier;
   iface->enumerate_identifiers = g_gdu_volume_enumerate_identifiers;
   iface->get_activation_root = g_gdu_volume_get_activation_root;

@@ -528,7 +528,9 @@ try_mount (GVfsBackend *backend,
 
 static void
 do_unmount (GVfsBackend *   backend,
-            GVfsJobUnmount *job)
+            GVfsJobUnmount *job,
+            GMountUnmountFlags flags,
+            GMountSource *mount_source)
 {
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpConnection *conn;

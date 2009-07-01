@@ -40,6 +40,8 @@
 #include <gvfsdaemonprotocol.h>
 #include <gvfsdaemonutils.h>
 #include <gvfsjobmount.h>
+#include <gvfsjobopenforread.h>
+#include <gvfsjobopenforwrite.h>
 #include <gdbusutils.h>
 
 enum {
@@ -1065,3 +1067,33 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
   job = g_vfs_job_mount_new (mount_spec, mount_source, is_automount, request, backend);
   g_vfs_daemon_queue_job (daemon, job);
 }
+
+/**
+ * g_vfs_daemon_get_blocking_processes:
+ * @daemon: A #GVfsDaemon.
+ *
+ * Gets all processes that blocks unmounting, e.g. processes with open
+ * file handles.
+ *
+ * Returns: An array of #GPid. Free with g_array_unref().
+ */
+GArray *
+g_vfs_daemon_get_blocking_processes (GVfsDaemon *daemon)
+{
+  GArray *processes;
+  GList *l;
+
+  processes = g_array_new (FALSE, FALSE, sizeof (GPid));
+  for (l = daemon->job_sources; l != NULL; l = l->next)
+    {
+      if (G_VFS_IS_CHANNEL (l->data))
+        {
+          GPid pid;
+          pid = g_vfs_channel_get_actual_consumer (G_VFS_CHANNEL (l->data));
+          g_array_append_val (processes, pid);
+        }
+    }
+
+  return processes;
+}
+

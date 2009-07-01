@@ -33,6 +33,8 @@
 #include "gdaemonfile.h"
 #include "gvfsdaemonprotocol.h"
 #include "gdbusutils.h"
+#include "gmountsource.h"
+#include "gmountoperationdbus.h"
 
 /* Protects all fields of GDaemonMount that can change
    which at this point is just foreign_volume */
@@ -173,17 +175,20 @@ unmount_reply (DBusMessage *reply,
 }
 
 static void
-g_daemon_mount_unmount (GMount *mount,
-			GMountUnmountFlags flags,
-			GCancellable *cancellable,
-			GAsyncReadyCallback callback,
-			gpointer         user_data)
+g_daemon_mount_unmount_with_operation (GMount *mount,
+                                       GMountUnmountFlags flags,
+                                       GMountOperation *mount_operation,
+                                       GCancellable *cancellable,
+                                       GAsyncReadyCallback callback,
+                                       gpointer         user_data)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
   DBusMessage *message;
   GMountInfo *mount_info;
   GSimpleAsyncResult *res;
   guint32 dbus_flags;
+  GMountSource *mount_source;
+  const char *dbus_id, *obj_path;
 
   mount_info = daemon_mount->mount_info;
 
@@ -193,18 +198,45 @@ g_daemon_mount_unmount (GMount *mount,
 				  G_VFS_DBUS_MOUNT_INTERFACE,
 				  G_VFS_DBUS_MOUNT_OP_UNMOUNT);
 
+  mount_source = g_mount_operation_dbus_wrap (mount_operation, _g_daemon_vfs_get_async_bus ());
+  dbus_id = g_mount_source_get_dbus_id (mount_source);
+  obj_path = g_mount_source_get_obj_path (mount_source);
+
   dbus_flags = flags;
-  _g_dbus_message_append_args (message, DBUS_TYPE_UINT32, &dbus_flags, 0);
+  _g_dbus_message_append_args (message,
+                               DBUS_TYPE_STRING, &dbus_id, DBUS_TYPE_OBJECT_PATH, &obj_path,
+                               DBUS_TYPE_UINT32, &dbus_flags,
+                               0);
   
   res = g_simple_async_result_new (G_OBJECT (mount),
 				   callback, user_data,
-				   g_daemon_mount_unmount);
+				   g_daemon_mount_unmount_with_operation);
   
   _g_vfs_daemon_call_async (message,
 			    unmount_reply, res,
 			    cancellable);
   
   dbus_message_unref (message);
+
+  g_object_unref (mount_source);
+}
+
+static gboolean
+g_daemon_mount_unmount_with_operation_finish (GMount *mount,
+                                              GAsyncResult *result,
+                                              GError **error)
+{
+  return TRUE;
+}
+
+static void
+g_daemon_mount_unmount (GMount *mount,
+			GMountUnmountFlags flags,
+			GCancellable *cancellable,
+			GAsyncReadyCallback callback,
+			gpointer         user_data)
+{
+  g_daemon_mount_unmount_with_operation (mount, flags, NULL, cancellable, callback, user_data);
 }
 
 static gboolean
@@ -212,7 +244,7 @@ g_daemon_mount_unmount_finish (GMount *mount,
 				GAsyncResult *result,
 				GError **error)
 {
-  return TRUE;
+  return g_daemon_mount_unmount_with_operation_finish (mount, result, error);
 }
 
 static char **
@@ -272,6 +304,8 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->can_eject = g_daemon_mount_can_eject;
   iface->unmount = g_daemon_mount_unmount;
   iface->unmount_finish = g_daemon_mount_unmount_finish;
+  iface->unmount_with_operation = g_daemon_mount_unmount_with_operation;
+  iface->unmount_with_operation_finish = g_daemon_mount_unmount_with_operation_finish;
   iface->guess_content_type = g_daemon_mount_guess_content_type;
   iface->guess_content_type_finish = g_daemon_mount_guess_content_type_finish;
   iface->guess_content_type_sync = g_daemon_mount_guess_content_type_sync;

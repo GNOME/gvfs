@@ -44,6 +44,8 @@ struct _GVfsJobUnmount
   GVfsJobDBus parent_instance;
 
   GVfsBackend *backend;
+  GMountUnmountFlags flags;
+  GMountSource *mount_source;
 };
 
 struct _GVfsJobUnmountClass
