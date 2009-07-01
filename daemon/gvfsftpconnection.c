@@ -372,7 +372,7 @@ g_vfs_ftp_connection_accept_data_connection (GVfsFtpConnection *conn,
       return FALSE;
     }
 
-  accepted = g_socket_accept (conn->listen_socket, error);
+  accepted = g_socket_accept (conn->listen_socket, cancellable, error);
   if (accepted == NULL)
     return FALSE;
 
