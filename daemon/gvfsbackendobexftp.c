@@ -34,7 +34,9 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
-#include <libhal.h>
+#if defined(HAVE_HAL)
+  #include <libhal.h>
+#endif	
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-bindings.h>
 #include <dbus/dbus-glib-lowlevel.h>
@@ -330,9 +332,11 @@ _get_usb_intfnum_and_properties (DBusGProxy *obex_manager, const char *device, c
   int usb_bus_num;
   int usb_device_num;
   int usb_intf_num;
+#ifdef HAVE_HAL
   DBusError dbus_error;
   DBusConnection *dbus_connection;
   LibHalContext *hal_ctx;
+#endif
   int ods_intf_num = 1;
   int n;
 
@@ -347,6 +351,7 @@ _get_usb_intfnum_and_properties (DBusGProxy *obex_manager, const char *device, c
 
   g_message ("Parsed '%s' into bus=%d device=%d interface=%d", device, usb_bus_num, usb_device_num, usb_intf_num);
 
+#ifdef HAVE_HAL
   dbus_error_init (&dbus_error);
   dbus_connection = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_error);
   if (dbus_error_is_set (&dbus_error))
@@ -467,6 +472,7 @@ end:
   dbus_connection_close (dbus_connection);
   dbus_connection_unref (dbus_connection);
   dbus_error_free (&dbus_error);
+#endif /* HAVE_HAL */
 
   return ods_intf_num;
 }

@@ -333,7 +333,7 @@ msg_obexftp=no
 OBEXFTP_LIBS=
 OBEXFTP_CFLAGS=
 
-if test "x$enable_obexftp" != "xno" -a "x$msg_hal" = "xyes" ; then
+if test "x$enable_obexftp" != "xno";  then
   PKG_CHECK_EXISTS(dbus-glib-1 bluez >= 4.0, msg_obexftp=yes)
 
   dnl Make sure we have expat
