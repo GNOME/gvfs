@@ -59,3 +59,8 @@ gvfsd_metadata_SOURCES = meta-daemon.c
 servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = gvfs-metadata.service.in
 service_DATA = gvfs-metadata.service
+
+EXTRA_DIST = gvfs-metadata.service.in
+
+clean-local:
+	rm -f gvfs-metadata.service

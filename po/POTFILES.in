@@ -36,6 +36,10 @@ daemon/gvfsbackendtrash.c
 daemon/gvfschannel.c
 daemon/gvfsdaemon.c
 daemon/gvfsdaemonutils.c
+daemon/gvfsftpconnection.c
+daemon/gvfsftpdircache.c
+daemon/gvfsftpfile.c
+daemon/gvfsftptask.c
 daemon/gvfsjobcloseread.c
 daemon/gvfsjobclosewrite.c
 daemon/gvfsjobcopy.c
@@ -51,6 +55,7 @@ daemon/gvfsjobmove.c
 daemon/gvfsjobopenforread.c
 daemon/gvfsjobopenforwrite.c
 daemon/gvfsjobopeniconforread.c
+daemon/gvfsjobpollmountable.c
 daemon/gvfsjobpull.c
 daemon/gvfsjobpush.c
 daemon/gvfsjobqueryattributes.c
@@ -63,12 +68,19 @@ daemon/gvfsjobseekread.c
 daemon/gvfsjobseekwrite.c
 daemon/gvfsjobsetattribute.c
 daemon/gvfsjobsetdisplayname.c
+daemon/gvfsjobstartmountable.c
+daemon/gvfsjobstopmountable.c
 daemon/gvfsjobtrash.c
 daemon/gvfsjobunmount.c
 daemon/gvfsjobunmountmountable.c
 daemon/gvfsjobwrite.c
 daemon/main.c
 daemon/mount.c
+metadata/meta-daemon.c
+monitor/gdu/gdu-volume-monitor-daemon.c
+monitor/gdu/ggdudrive.c
+monitor/gdu/ggdumount.c
+monitor/gdu/ggduvolume.c
 monitor/gphoto2/ggphoto2volume.c
 monitor/gphoto2/ggphoto2volumemonitor.c
 monitor/gphoto2/hal-utils.c
@@ -88,4 +100,5 @@ programs/gvfs-mkdir.c
 programs/gvfs-move.c
 programs/gvfs-open.c
 programs/gvfs-save.c
+programs/gvfs-set-attribute.c
 programs/gvfs-tree.c
