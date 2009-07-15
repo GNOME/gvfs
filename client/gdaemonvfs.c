@@ -298,6 +298,9 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 
   bindtextdomain (GETTEXT_PACKAGE, GVFS_LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  
+  if (g_thread_supported ())
+    dbus_threads_init_default ();
 
   vfs->async_bus = dbus_bus_get_private (DBUS_BUS_SESSION, NULL);
 
@@ -306,9 +309,6 @@ g_daemon_vfs_init (GDaemonVfs *vfs)
 
   g_assert (the_vfs == NULL);
   the_vfs = vfs;
-  
-  if (g_thread_supported ())
-    dbus_threads_init_default ();
 
   /* We disable SIGPIPE globally. This is sort of bad
      for s library to do since its a global resource.
