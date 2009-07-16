@@ -3,6 +3,10 @@ NULL =
 
 libexec_PROGRAMS = gvfs-gphoto2-volume-monitor
 
+if USE_GUDEV
+gvfs_gphoto2_volume_monitor_SOURCES =
+
+else
 BUILT_SOURCES =                                         \
 	hal-marshal.h           hal-marshal.c
 
@@ -12,12 +16,15 @@ hal-marshal.h: hal-marshal.list
 hal-marshal.c: hal-marshal.list
 	echo "#include \"hal-marshal.h\"" > $@ && glib-genmarshal $< --prefix=hal_marshal --body >> $@
 
-
 gvfs_gphoto2_volume_monitor_SOURCES =			\
 	hal-utils.c 		hal-utils.h 		\
 	hal-marshal.c		hal-marshal.h		\
 	hal-device.c		hal-device.h		\
 	hal-pool.c		hal-pool.h		\
+	$(NULL)
+endif
+
+gvfs_gphoto2_volume_monitor_SOURCES +=			\
 	gphoto2-volume-monitor-daemon.c			\
 	ggphoto2volume.c	ggphoto2volume.h	\
 	ggphoto2volumemonitor.c	ggphoto2volumemonitor.h	\
@@ -28,23 +35,35 @@ gvfs_gphoto2_volume_monitor_CFLAGS =		\
 	-I$(top_srcdir)/common                  \
 	-I$(top_srcdir)/monitor/proxy           \
 	$(GLIB_CFLAGS)                          \
-	$(HAL_CFLAGS)                           \
 	$(GPHOTO2_CFLAGS)			\
 	-DGIO_MODULE_DIR=\"$(GIO_MODULE_DIR)\"	\
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"	\
 	-DG_DISABLE_DEPRECATED			\
+	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
 	$(NULL)
+
+if USE_GUDEV
+gvfs_gphoto2_volume_monitor_CFLAGS += $(GUDEV_CFLAGS)
+else
+gvfs_gphoto2_volume_monitor_CFLAGS += $(HAL_CFLAGS)
+endif
 
 gvfs_gphoto2_volume_monitor_LDFLAGS =	\
 	$(NULL)
 
 gvfs_gphoto2_volume_monitor_LDADD  =		     			      \
 	$(GLIB_LIBS)                                 			      \
-	$(HAL_LIBS)                                  			      \
 	$(GPHOTO2_LIBS)                              			      \
 	$(top_builddir)/common/libgvfscommon.la 			      \
 	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)
+
+if USE_GUDEV
+gvfs_gphoto2_volume_monitor_LDADD += $(GUDEV_LIBS)
+else
+gvfs_gphoto2_volume_monitor_LDADD += $(HAL_LIBS)
+endif
+
 
 remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors
 remote_volume_monitors_DATA = gphoto2.monitor

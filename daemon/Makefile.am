@@ -387,10 +387,19 @@ gvfsd_gphoto2_CPPFLAGS = \
 	-DBACKEND_HEADER=gvfsbackendgphoto2.h \
 	-DDEFAULT_BACKEND_TYPE=gphoto2 \
 	-DMAX_JOB_THREADS=1 \
-	$(GPHOTO2_CFLAGS) $(HAL_CFLAGS) \
+	$(GPHOTO2_CFLAGS) \
 	-DBACKEND_TYPES='"gphoto2", G_VFS_TYPE_BACKEND_GPHOTO2,'
+if USE_GUDEV
+gvfsd_gphoto2_CPPFLAGS += $(GUDEV_CFLAGS)
+else
+gvfsd_gphoto2_CPPFLAGS += $(HAL_CFLAGS)
+endif
 
+if USE_GUDEV
+gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(GUDEV_LIBS)
+else
 gvfsd_gphoto2_LDADD = $(libraries) $(GPHOTO2_LIBS) $(HAL_LIBS)
+endif
 
 gvfsd_http_SOURCES = \
 	soup-input-stream.c soup-input-stream.h \

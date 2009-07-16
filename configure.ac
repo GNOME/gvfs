@@ -367,7 +367,7 @@ msg_gphoto2=no
 GPHOTO2_LIBS=
 GPHOTO2_CFLAGS=
 
-if test "x$enable_gphoto2" != "xno" -a "x$msg_hal" = "xyes" ; then
+if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "xyes" \); then
   PKG_CHECK_EXISTS(libgphoto2, msg_gphoto2=yes)
 
   # Need OS tweaks in hal volume monitor backend
@@ -720,3 +720,12 @@ echo "
 	GNOME Keyring support:        $msg_keyring
 	Bash-completion support:      $msg_bash_completion
 "
+
+# The gudev gphoto monitor needs a recent libgphoto; point to the required patch if the version is too old
+if test "x$msg_gudev" = "xyes"; then
+  PKG_CHECK_EXISTS(libgphoto2 >= 2.4.7,, msg_gphoto_patch=yes)
+  if test "x$msg_gphoto_patch" = "xyes"; then
+    AC_MSG_WARN([You are using a libgphoto2 version earlier than 2.4.7. To work with gudev, you must apply the patch in http://sourceforge.net/tracker/?func=detail&aid=2801117&group_id=8874&atid=308874])
+  fi
+fi
+

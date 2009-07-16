@@ -35,8 +35,14 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <gphoto2.h>
-#include <libhal.h>
-#include <dbus/dbus.h>
+#ifdef HAVE_GUDEV
+  #include <gudev/gudev.h>
+#elif defined(HAVE_HAL)
+  #include <libhal.h>
+  #include <dbus/dbus.h>
+#else
+  #error Needs hal or gudev
+#endif
 #include <sys/time.h>
 
 #include "gvfsbackendgphoto2.h"
@@ -176,11 +182,16 @@ struct _GVfsBackendGphoto2
   /* see comment in ensure_ignore_prefix() */
   char *ignore_prefix;
 
+#ifdef HAVE_GUDEV
+  GUdevClient *gudev_client;
+  GUdevDevice *udev_device;
+#elif defined(HAVE_HAL)
   DBusConnection *dbus_connection;
   LibHalContext *hal_ctx;
   char *hal_udi;
   char *hal_name;
-  char *hal_icon_name;
+#endif
+  char *icon_name;
 
   /* whether we can write to the device */
   gboolean can_write;
@@ -542,6 +553,13 @@ release_device (GVfsBackendGphoto2 *gphoto2_backend)
       gphoto2_backend->camera = NULL;
     }
 
+#ifdef HAVE_GUDEV
+  if (gphoto2_backend->gudev_client != NULL)
+    g_object_unref (gphoto2_backend->gudev_client);
+  if (gphoto2_backend->udev_device != NULL)
+    g_object_unref (gphoto2_backend->udev_device);
+
+#elif defined(HAVE_HAL)
   if (gphoto2_backend->dbus_connection != NULL)
     {
       dbus_connection_close (gphoto2_backend->dbus_connection);
@@ -559,8 +577,9 @@ release_device (GVfsBackendGphoto2 *gphoto2_backend)
   gphoto2_backend->hal_udi = NULL;
   g_free (gphoto2_backend->hal_name);
   gphoto2_backend->hal_name = NULL;
-  g_free (gphoto2_backend->hal_icon_name);
-  gphoto2_backend->hal_icon_name = NULL;
+#endif
+  g_free (gphoto2_backend->icon_name);
+  gphoto2_backend->icon_name = NULL;
 
   g_free (gphoto2_backend->ignore_prefix);
   gphoto2_backend->ignore_prefix = NULL;
@@ -660,13 +679,13 @@ compute_icon_name (GVfsBackendGphoto2 *gphoto2_backend)
 {
   char *result;
 
-  if (gphoto2_backend->hal_icon_name == NULL)
+  if (gphoto2_backend->icon_name == NULL)
     {
       result = g_strdup_printf ("camera-photo");
     }
   else
     {
-      result = g_strdup (gphoto2_backend->hal_icon_name);
+      result = g_strdup (gphoto2_backend->icon_name);
     }
 
   return result;
@@ -677,8 +696,28 @@ compute_icon_name (GVfsBackendGphoto2 *gphoto2_backend)
 static char *
 compute_display_name (GVfsBackendGphoto2 *gphoto2_backend)
 {
-  char *result;
+  char *result = NULL;
 
+#ifdef HAVE_GUDEV
+  const char *s;
+
+  /* the real "nice" and user-visible name is computed in the monitor; just try
+   * using the product name here */
+  if (gphoto2_backend->udev_device != NULL)
+    {
+      s = g_udev_device_get_sysfs_attr (gphoto2_backend->udev_device, "product");
+      if (s == NULL)
+        s = g_udev_device_get_property (gphoto2_backend->udev_device, "ID_MODEL");
+
+      if (s != NULL)
+        result = g_strdup (s);
+    }
+  if (result == NULL )
+    {
+      /* Translator: %s represents the device, e.g. usb:001,042  */
+      result = g_strdup_printf (_("Digital Camera (%s)"), gphoto2_backend->gphoto2_port);
+    }
+#elif defined(HAVE_HAL)
   if (gphoto2_backend->hal_name == NULL)
     {
       /* Translator: %s represents the device, e.g. usb:001,042  */
@@ -688,12 +727,76 @@ compute_display_name (GVfsBackendGphoto2 *gphoto2_backend)
     {
       result = g_strdup (gphoto2_backend->hal_name);
     }
+#endif
 
   return result;
 }
 
 /* ------------------------------------------------------------------------------------------------- */
 
+#ifdef HAVE_GUDEV
+static void
+setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
+{
+  gchar *devname;
+  char *comma;
+  char *camera_x_content_types[] = {"x-content/image-dcf", NULL};
+
+  /* turn usb:001,041 string into an udev device name */
+  if (!g_str_has_prefix (gphoto2_backend->gphoto2_port, "usb:"))
+    return;
+  devname = g_strconcat ("/dev/bus/usb/", gphoto2_backend->gphoto2_port+4, NULL);
+  if ((comma = strchr (devname, ',')) == NULL)
+    {
+      g_free (devname);
+      return;
+    }
+  *comma = '/';
+  DEBUG ("Parsed '%s' into device name %s", gphoto2_backend->gphoto2_port, devname);
+
+  /* find corresponding GUdevDevice */
+  gphoto2_backend->udev_device = g_udev_client_query_by_device_file (gphoto2_backend->gudev_client, devname);
+  g_free (devname);
+  if (gphoto2_backend->udev_device)
+    {
+      DEBUG ("-> sysfs path %s, subsys %s, name %s", g_udev_device_get_sysfs_path (gphoto2_backend->udev_device), g_udev_device_get_subsystem (gphoto2_backend->udev_device), g_udev_device_get_name (gphoto2_backend->udev_device));
+
+      /* determine icon name */
+      if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"))
+          gphoto2_backend->icon_name = g_strdup (g_udev_device_get_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"));
+      else if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER"))
+          gphoto2_backend->icon_name = g_strdup ("multimedia-player");
+      else
+          gphoto2_backend->icon_name = g_strdup ("camera-photo");
+    }
+  else
+      DEBUG ("-> did not find matching udev device");
+
+  g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend), camera_x_content_types);
+}
+
+static void
+on_uevent (GUdevClient *client, gchar *action, GUdevDevice *device, gpointer user_data)
+{
+  GVfsBackendGphoto2 *gphoto2_backend = G_VFS_BACKEND_GPHOTO2 (user_data);
+
+  DEBUG ("on_uevent action %s, device %s", action, g_udev_device_get_device_file (device));
+
+  if (gphoto2_backend->udev_device != NULL && 
+      g_strcmp0 (g_udev_device_get_device_file (gphoto2_backend->udev_device), g_udev_device_get_device_file (device)) == 0 &&
+      strcmp (action, "remove") == 0)
+    {
+      DEBUG ("we have been removed!");
+
+      /* nuke all caches so we're a bit more valgrind friendly */
+      caches_invalidate_all (gphoto2_backend);
+
+      /* TODO: need a cleaner way to force unmount ourselves */
+      exit (1);
+    }
+}
+
+#elif defined(HAVE_HAL)
 static void
 find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
 {
@@ -851,17 +954,17 @@ find_udi_for_device (GVfsBackendGphoto2 *gphoto2_backend)
                           gphoto2_backend->hal_name = name;
                           if (icon_from_hal != NULL)
                             {
-                              gphoto2_backend->hal_icon_name = g_strdup (icon_from_hal);
+                              gphoto2_backend->icon_name = g_strdup (icon_from_hal);
                             }
                           else
                             {
                               if (m == 1)
                                 {
-                                  gphoto2_backend->hal_icon_name = g_strdup ("multimedia-player");
+                                  gphoto2_backend->icon_name = g_strdup ("multimedia-player");
                                 }
                               else
                                 {
-                                  gphoto2_backend->hal_icon_name = g_strdup ("camera-photo");
+                                  gphoto2_backend->icon_name = g_strdup ("camera-photo");
                                 }
                             }
 
@@ -909,6 +1012,7 @@ _hal_device_removed (LibHalContext *hal_ctx, const char *udi)
       exit (1);
     }
 }
+#endif
 
 /* ------------------------------------------------------------------------------------------------- */
 
@@ -1376,13 +1480,30 @@ do_mount (GVfsBackend *backend,
   GPPortInfo info;
   GPPortInfoList *il = NULL;
   int n;
-  DBusError dbus_error;
   CameraStorageInformation *storage_info;
   int num_storage_info;
 
   DEBUG ("do_mount %p", gphoto2_backend);
 
+#ifdef HAVE_GUDEV
+  /* setup gudev */
+  const char *subsystems[] = {"usb", NULL};
+
+  gphoto2_backend->gudev_client = g_udev_client_new (subsystems);
+  if (gphoto2_backend->gudev_client == NULL)
+    {
+      release_device (gphoto2_backend);
+      g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Cannot create gudev client"));
+      g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      g_error_free (error);
+      return;
+    }
+
+  g_signal_connect (gphoto2_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), gphoto2_backend);
+
+#elif defined(HAVE_HAL)
   /* setup libhal */
+  DBusError dbus_error;
 
   dbus_error_init (&dbus_error);
   gphoto2_backend->dbus_connection = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_error);
@@ -1423,6 +1544,7 @@ do_mount (GVfsBackend *backend,
 
   libhal_ctx_set_device_removed (gphoto2_backend->hal_ctx, _hal_device_removed);
   libhal_ctx_set_user_data (gphoto2_backend->hal_ctx, gphoto2_backend);
+#endif
 
   /* setup gphoto2 */
 
@@ -1442,7 +1564,11 @@ do_mount (GVfsBackend *backend,
 
   DEBUG ("  decoded host='%s'", gphoto2_backend->gphoto2_port);
 
+#ifdef HAVE_GUDEV
+  setup_for_device (gphoto2_backend);
+#elif defined(HAVE_HAL)
   find_udi_for_device (gphoto2_backend);
+#endif
 
   gphoto2_backend->context = gp_context_new ();
   if (gphoto2_backend->context == NULL)

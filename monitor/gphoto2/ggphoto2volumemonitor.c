@@ -35,25 +35,42 @@
 #include "ggphoto2volumemonitor.h"
 #include "ggphoto2volume.h"
 
+#ifdef HAVE_GUDEV
+#include <gio/gio.h>
+#include <gio/gunixmounts.h>
+#else
 #include "hal-pool.h"
+#endif
 
 G_LOCK_DEFINE_STATIC(hal_vm);
 
 static GGPhoto2VolumeMonitor *the_volume_monitor = NULL;
+#ifndef HAVE_GUDEV
 static HalPool *pool = NULL;
+#endif
 
 struct _GGPhoto2VolumeMonitor {
   GNativeVolumeMonitor parent;
 
   GUnixMountMonitor *mount_monitor;
 
+#ifdef HAVE_GUDEV
+  GUdevClient *gudev_client;
+#else
   HalPool *pool;
+#endif
 
   GList *last_camera_devices;
 
   GList *camera_volumes;
 };
 
+#ifdef HAVE_GUDEV
+static void on_uevent                (GUdevClient *client, 
+                                      gchar *action,
+                                      GUdevDevice *device,
+                                      gpointer user_data);
+#else
 static void hal_changed              (HalPool    *pool,
                                       HalDevice  *device,
                                       gpointer    user_data);
@@ -64,7 +81,9 @@ static void update_all (GGPhoto2VolumeMonitor *monitor,
 static void update_cameras           (GGPhoto2VolumeMonitor *monitor,
                                       GList **added_volumes,
                                       GList **removed_volumes);
+#endif
 
+static GList* get_stores_for_camera (int bus_num, int device_num);
 
 G_DEFINE_TYPE (GGPhoto2VolumeMonitor, g_gphoto2_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
@@ -75,6 +94,7 @@ list_free (GList *objects)
   g_list_free (objects);
 }
 
+#ifndef HAVE_GUDEV
 static HalPool *
 get_hal_pool (void)
 {
@@ -85,6 +105,7 @@ get_hal_pool (void)
 
   return pool;
 }
+#endif
 
 static void
 g_gphoto2_volume_monitor_dispose (GObject *object)
@@ -108,9 +129,14 @@ g_gphoto2_volume_monitor_finalize (GObject *object)
 
   monitor = G_GPHOTO2_VOLUME_MONITOR (object);
 
-  g_signal_handlers_disconnect_by_func (monitor->pool, hal_changed, monitor);
+#ifdef HAVE_GUDEV
+  g_signal_handlers_disconnect_by_func (monitor->gudev_client, on_uevent, monitor);
 
+  g_object_unref (monitor->gudev_client);
+#else
+  g_signal_handlers_disconnect_by_func (monitor->pool, hal_changed, monitor);
   g_object_unref (monitor->pool);
+#endif
 
   list_free (monitor->last_camera_devices);
   list_free (monitor->camera_volumes);
@@ -161,6 +187,145 @@ get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
   return NULL;
 }
 
+#ifdef HAVE_GUDEV
+
+static void
+gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean do_emit)
+{
+    GGPhoto2Volume *volume;
+    GList *store_heads, *l;
+    guint num_store_heads;
+    const char *property;
+    int usb_bus_num;
+    int usb_device_num;
+
+    property = g_udev_device_get_property (device, "BUSNUM");
+    if (property == NULL) {
+	g_warning("device %s has no BUSNUM property, ignoring", g_udev_device_get_device_file (device));
+	return;
+    }
+    usb_bus_num = atoi (property);
+
+    property = g_udev_device_get_property (device, "DEVNUM");
+    if (property == NULL) {
+	g_warning("device %s has no DEVNUM property, ignoring", g_udev_device_get_device_file (device));
+	return;
+    }
+    usb_device_num = atoi (property);
+
+    /* g_debug ("gudev_add_camera: camera device %s (bus: %i, device: %i)", 
+             g_udev_device_get_device_file (device),
+             usb_bus_num, usb_device_num); */
+
+    store_heads = get_stores_for_camera (usb_bus_num, usb_device_num);
+    num_store_heads = g_list_length (store_heads);
+    for (l = store_heads ; l != NULL; l = l->next)
+      {
+        char *store_path = (char *) l->data;
+        GFile *activation_mount_root;
+        gchar *uri;
+
+        /* If we only have a single store, don't use the store name at all. The backend automatically
+         * prepend the storename; this is to work around bugs with devices (like the iPhone) for which
+         * the store name changes every time the camera is initialized (e.g. mounted).
+         */
+        if (num_store_heads == 1)
+          {
+            uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]", usb_bus_num, usb_device_num);
+          }
+        else
+          {
+            uri = g_strdup_printf ("gphoto2://[usb:%03d,%03d]/%s", usb_bus_num, usb_device_num,
+                                   store_path[0] == '/' ? store_path + 1 : store_path);
+          }
+        /* g_debug ("gudev_add_camera: ... adding URI for storage head: %s", uri); */
+        activation_mount_root = g_file_new_for_uri (uri);
+        g_free (uri);
+
+        volume = g_gphoto2_volume_new (G_VOLUME_MONITOR (monitor),
+                                       device, 
+                                       monitor->gudev_client,
+                                       activation_mount_root);
+        if (volume != NULL)
+          {
+            monitor->camera_volumes = g_list_prepend (monitor->camera_volumes, volume);
+            if (do_emit)
+                g_signal_emit_by_name (monitor, "volume_added", volume);
+          }
+
+        if (activation_mount_root != NULL)
+          g_object_unref (activation_mount_root);
+      }
+
+    g_list_foreach (store_heads, (GFunc) g_free, NULL);
+    g_list_free (store_heads);
+}
+
+static void
+gudev_remove_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device)
+{
+    /* g_debug ("gudev_remove_camera: %s", g_udev_device_get_device_file (device)); */
+
+    GList *l;
+    const gchar* sysfs_path = g_udev_device_get_sysfs_path (device);
+  
+    for (l = monitor->camera_volumes; l != NULL; l = l->next)
+      {
+        GGPhoto2Volume *volume = G_GPHOTO2_VOLUME (l->data);
+
+        if (g_gphoto2_volume_has_path (volume, sysfs_path))
+          {
+            /* g_debug ("gudev_remove_camera: found volume %s, deleting", sysfs_path); */
+            g_signal_emit_by_name (monitor, "volume_removed", volume);
+            g_signal_emit_by_name (volume, "removed");
+            g_gphoto2_volume_removed (volume);
+            monitor->camera_volumes = g_list_remove (monitor->camera_volumes, volume);
+            g_object_unref (volume);
+          }
+      }
+}
+
+static void
+on_uevent (GUdevClient *client, 
+           gchar *action,
+           GUdevDevice *device,
+           gpointer user_data)
+{
+  GGPhoto2VolumeMonitor *monitor = G_GPHOTO2_VOLUME_MONITOR (user_data);
+
+  /* g_debug ("on_uevent: action=%s, device=%s", action, g_udev_device_get_device_file(device)); */
+
+  /* filter out uninteresting events */
+  if (!g_udev_device_has_property (device, "ID_GPHOTO2"))
+    {
+      /* g_debug ("on_uevent: discarding, not ID_GPHOTO2"); */
+      return;
+    }
+
+  if (strcmp (action, "add") == 0)
+     gudev_add_camera (monitor, device, TRUE); 
+  else if (strcmp (action, "remove") == 0)
+     gudev_remove_camera (monitor, device); 
+}
+
+/* Find all attached gphoto supported cameras; this is called on startup
+ * (coldplugging). */
+static void
+gudev_coldplug_cameras (GGPhoto2VolumeMonitor *monitor)
+{
+    GList *usb_devices, *l;
+
+    usb_devices = g_udev_client_query_by_subsystem (monitor->gudev_client, "usb");
+    for (l = usb_devices; l != NULL; l = l->next)
+    {
+        GUdevDevice *d = l->data;
+        if (g_udev_device_has_property (d, "ID_GPHOTO2"))
+            gudev_add_camera (monitor, d, FALSE);
+    }
+}
+
+#else
+
 static void
 hal_changed (HalPool    *pool,
              HalDevice  *device,
@@ -172,6 +337,7 @@ hal_changed (HalPool    *pool,
 
   update_all (monitor, TRUE);
 }
+#endif
 
 static GObject *
 g_gphoto2_volume_monitor_constructor (GType                  type,
@@ -204,6 +370,18 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
                                       construct_properties);
 
   monitor = G_GPHOTO2_VOLUME_MONITOR (object);
+
+#ifdef HAVE_GUDEV
+  const char *subsystems[] = {"usb", NULL};
+  monitor->gudev_client = g_udev_client_new (subsystems);
+
+  g_signal_connect (monitor->gudev_client, 
+                    "uevent", G_CALLBACK (on_uevent), 
+                    monitor);
+
+  gudev_coldplug_cameras (monitor);
+
+#else
   monitor->pool = g_object_ref (get_hal_pool ());
 
   g_signal_connect (monitor->pool,
@@ -215,6 +393,7 @@ g_gphoto2_volume_monitor_constructor (GType                  type,
                     monitor);
 
   update_all (monitor, FALSE);
+#endif
 
   G_LOCK (hal_vm);
   the_volume_monitor = monitor;
@@ -231,7 +410,13 @@ g_gphoto2_volume_monitor_init (GGPhoto2VolumeMonitor *monitor)
 static gboolean
 is_supported (void)
 {
+#ifdef HAVE_GUDEV
+  /* Today's Linux desktops pretty much need udev to have anything working, so
+   * assume it's there */
+  return TRUE;
+#else
   return get_hal_pool() != NULL;
+#endif
 }
 
 static void
@@ -267,6 +452,7 @@ g_gphoto2_volume_monitor_new (void)
   return G_VOLUME_MONITOR (monitor);
 }
 
+#ifndef HAVE_GUDEV
 static void
 diff_sorted_lists (GList         *list1,
                    GList         *list2,
@@ -405,6 +591,7 @@ update_all (GGPhoto2VolumeMonitor *monitor,
       list_free (added_volumes);
     }
 }
+#endif
 
 static GList *
 get_stores_for_camera (int bus_num, int device_num)
@@ -482,6 +669,7 @@ out:
   return l;
 }
 
+#ifndef HAVE_GUDEV
 static void
 update_cameras (GGPhoto2VolumeMonitor *monitor,
                 GList **added_volumes,
@@ -618,3 +806,4 @@ update_cameras (GGPhoto2VolumeMonitor *monitor,
   list_free (monitor->last_camera_devices);
   monitor->last_camera_devices = new_camera_devices;
 }
+#endif

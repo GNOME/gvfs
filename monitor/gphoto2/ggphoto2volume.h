@@ -26,7 +26,13 @@
 #include <glib-object.h>
 #include <gio/gio.h>
 
-#include "hal-pool.h"
+#ifdef HAVE_GUDEV
+ #include <gudev/gudev.h>
+#elif defined(HAVE_HAL)
+ #include "hal-pool.h"
+#else
+ #error Needs gudev or hal
+#endif
 #include "ggphoto2volumemonitor.h"
 
 G_BEGIN_DECLS
@@ -46,12 +52,22 @@ struct _GGPhoto2VolumeClass {
 GType g_gphoto2_volume_get_type (void) G_GNUC_CONST;
 
 GGPhoto2Volume *g_gphoto2_volume_new            (GVolumeMonitor   *volume_monitor,
+#ifdef HAVE_GUDEV
+                                                 GUdevDevice      *device,
+                                                 GUdevClient      *gudev_client,
+#else
                                                  HalDevice        *device,
                                                  HalPool          *pool,
+#endif
                                                  GFile            *activation_root);
 
+#ifdef HAVE_GUDEV
+gboolean    g_gphoto2_volume_has_path       (GGPhoto2Volume       *volume,
+                                             const char       *path);
+#else
 gboolean    g_gphoto2_volume_has_udi        (GGPhoto2Volume       *volume,
                                              const char       *udi);
+#endif
 
 void        g_gphoto2_volume_removed        (GGPhoto2Volume       *volume);
 

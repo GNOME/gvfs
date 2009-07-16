@@ -33,7 +33,9 @@
 
 #include "ggphoto2volume.h"
 
+#ifndef HAVE_GUDEV
 #include "hal-utils.h"
+#endif
 
 /* Protects all fields of GHalDrive that can change */
 G_LOCK_DEFINE_STATIC(gphoto2_volume);
@@ -44,8 +46,12 @@ struct _GGPhoto2Volume {
   GVolumeMonitor *volume_monitor; /* owned by volume monitor */
 
   char *device_path;
+#ifdef HAVE_GUDEV
+  GUdevDevice *device;
+#else
   HalDevice *device;
   HalDevice *drive_device;
+#endif
 
   GFile *activation_root;
 
@@ -138,6 +144,120 @@ dupv_and_uniqify (char **str_array)
   return result;
 }
 
+#ifdef HAVE_GUDEV
+static int hexdigit(char c)
+{
+  if (c >= 'a')
+      return c - 'a' + 10;
+  if (c >= 'A')
+     return c - 'A' + 10;
+  g_return_val_if_fail (c >= '0' && c <= '9', 0);
+  return c - '0';
+}
+
+/* Do not free result, it's a static buffer */
+static const char*
+udev_decode_string (const char* encoded)
+{
+  static char decoded[4096];
+  int len;
+  const char* s;
+
+  if (encoded == NULL)
+      return NULL;
+
+  for (len = 0, s = encoded; *s && len < sizeof(decoded)-1; ++len, ++s)
+    {
+      /* need to check for NUL terminator in advance */
+      if (s[0] == '\\' && s[1] == 'x' && s[2] >= '0' && s[3] >= '0')
+	{
+	  decoded[len] = (hexdigit(s[2]) << 4) | hexdigit(s[3]);
+	  s += 3;
+	}
+      else
+	  decoded[len] = *s;
+    }
+  decoded[len] = '\0';
+  return decoded;
+}
+
+static void
+set_volume_name (GGPhoto2Volume *v)
+{
+  const char *gphoto_name;
+  const char *product = NULL;
+  const char *vendor;
+  const char *model;
+
+  /* our preference: ID_GPHOTO2 > ID_MEDIA_PLAYER_{VENDOR,PRODUCT} > product >
+   * ID_{VENDOR,MODEL} */
+
+  gphoto_name = g_udev_device_get_property (v->device, "ID_GPHOTO2");
+  if (gphoto_name != NULL && strcmp (gphoto_name, "1") != 0)
+    {
+      v->name = g_strdup (gphoto_name);
+      return;
+    }
+
+  vendor = g_udev_device_get_property (v->device, "ID_MEDIA_PLAYER_VENDOR");
+  if (vendor == NULL)
+      vendor = g_udev_device_get_property (v->device, "ID_VENDOR_ENC");
+  model = g_udev_device_get_property (v->device, "ID_MEDIA_PLAYER_MODEL");
+  if (model == NULL)
+    {
+      model = g_udev_device_get_property (v->device, "ID_MODEL_ENC");
+      product = g_udev_device_get_sysfs_attr (v->device, "product");
+    }
+
+  v->name = NULL;
+  if (product != NULL && strlen (product) > 0)
+    v->name = g_strdup (product);
+  else if (vendor == NULL)
+    {
+      if (model != NULL)
+        v->name = g_strdup (udev_decode_string (model));
+    }
+  else
+    {
+      if (model != NULL)
+	{
+	  /* we can't call udev_decode_string() twice in one g_strdup_printf(),
+	   * it returns a static buffer */
+	  gchar *temp = g_strdup_printf ("%s %s", vendor, model);
+          v->name = g_strdup (udev_decode_string (temp));
+	  g_free (temp);
+        }
+      else
+        {
+          if (g_udev_device_has_property (v->device, "ID_MEDIA_PLAYER"))
+            {
+              /* Translators: %s is the device vendor */
+              v->name = g_strdup_printf (_("%s Audio Player"), udev_decode_string (vendor));
+	    }
+	  else
+	    {
+	      /* Translators: %s is the device vendor */
+	      v->name = g_strdup_printf (_("%s Camera"), udev_decode_string (vendor));
+	    }
+        }
+    }
+
+  if (v->name == NULL)
+      v->name = g_strdup (_("Camera"));
+}
+
+static void
+set_volume_icon (GGPhoto2Volume *volume)
+{
+  if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"))
+      volume->icon = g_strdup (g_udev_device_get_property (volume->device, "ID_MEDIA_PLAYER_ICON_NAME"));
+  else if (g_udev_device_has_property (volume->device, "ID_MEDIA_PLAYER"))
+      volume->icon = g_strdup ("multimedia-player");
+  else
+      volume->icon = g_strdup ("camera-photo");
+}
+
+#else
 static void
 do_update_from_hal_for_camera (GGPhoto2Volume *v)
 {
@@ -239,23 +359,40 @@ hal_changed (HalDevice *device, const char *key, gpointer user_data)
   /*g_warning ("hal modifying %s (property %s changed)", gphoto2_volume->device_path, key);*/
   update_from_hal (gphoto2_volume, TRUE);
 }
+#endif
 
 GGPhoto2Volume *
 g_gphoto2_volume_new (GVolumeMonitor   *volume_monitor,
+#ifdef HAVE_GUDEV
+                      GUdevDevice      *device,
+                      GUdevClient      *gudev_client,
+#else
                       HalDevice        *device,
                       HalPool          *pool,
+#endif
                       GFile            *activation_root)
 {
   GGPhoto2Volume *volume;
+#ifndef HAVE_GUDEV
   HalDevice *drive_device;
   const char *storage_udi;
+#endif
   const char *device_path;
 
   g_return_val_if_fail (volume_monitor != NULL, NULL);
   g_return_val_if_fail (device != NULL, NULL);
+#ifdef HAVE_GUDEV
+  g_return_val_if_fail (gudev_client != NULL, NULL);
+#else
   g_return_val_if_fail (pool != NULL, NULL);
+#endif
   g_return_val_if_fail (activation_root != NULL, NULL);
 
+#ifdef HAVE_GUDEV
+  if (!g_udev_device_has_property (device, "ID_GPHOTO2"))
+      return NULL;
+  device_path = g_udev_device_get_device_file (device);
+#else
   if (!(hal_device_has_capability (device, "camera") ||
         (hal_device_has_capability (device, "portable_audio_player") &&
          hal_device_get_property_bool (device, "camera.libgphoto2.support"))))
@@ -276,19 +413,28 @@ g_gphoto2_volume_new (GVolumeMonitor   *volume_monitor,
   device_path = hal_device_get_property_string (drive_device, "linux.device_file");
   if (strlen (device_path) == 0)
     device_path = NULL;
+#endif
 
   volume = g_object_new (G_TYPE_GPHOTO2_VOLUME, NULL);
   volume->volume_monitor = volume_monitor;
   g_object_add_weak_pointer (G_OBJECT (volume_monitor), (gpointer) &(volume->volume_monitor));
   volume->device_path = g_strdup (device_path);
   volume->device = g_object_ref (device);
+#ifndef HAVE_GUDEV
   volume->drive_device = g_object_ref (drive_device);
+#endif
   volume->activation_root = g_object_ref (activation_root);
 
+#ifdef HAVE_GUDEV
+  set_volume_name (volume);
+  set_volume_icon (volume);
+  /* we do not really need to listen for changes */
+#else
   g_signal_connect_object (device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
   g_signal_connect_object (drive_device, "hal_property_changed", (GCallback) hal_changed, volume, 0);
 
   update_from_hal (volume, FALSE);
+#endif
 
   return volume;
 }
@@ -360,6 +506,24 @@ g_gphoto2_volume_get_mount (GVolume *volume)
   return NULL;
 }
 
+#ifdef HAVE_GUDEV
+gboolean
+g_gphoto2_volume_has_path (GGPhoto2Volume  *volume,
+                      const char  *sysfs_path)
+{
+  GGPhoto2Volume *gphoto2_volume = G_GPHOTO2_VOLUME (volume);
+  gboolean res;
+
+  G_LOCK (gphoto2_volume);
+  res = FALSE;
+  if (gphoto2_volume->device != NULL)
+    res = strcmp (g_udev_device_get_sysfs_path   (gphoto2_volume->device), sysfs_path) == 0;
+  G_UNLOCK (gphoto2_volume);
+  return res;
+}
+
+#else
+
 gboolean
 g_gphoto2_volume_has_udi (GGPhoto2Volume  *volume,
                       const char  *udi)
@@ -374,6 +538,7 @@ g_gphoto2_volume_has_udi (GGPhoto2Volume  *volume,
   G_UNLOCK (gphoto2_volume);
   return res;
 }
+#endif
 
 typedef struct
 {
@@ -449,9 +614,12 @@ g_gphoto2_volume_get_identifier (GVolume              *volume,
 
   G_LOCK (gphoto2_volume);
   id = NULL;
+#ifndef HAVE_GUDEV
   if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_HAL_UDI) == 0)
     id = g_strdup (hal_device_get_udi (gphoto2_volume->device));
-  else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+  else 
+#endif
+    if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
     id = g_strdup (gphoto2_volume->device_path);
   G_UNLOCK (gphoto2_volume);
 
@@ -468,8 +636,10 @@ g_gphoto2_volume_enumerate_identifiers (GVolume *volume)
 
   res = g_ptr_array_new ();
 
+#ifndef HAVE_GUDEV
   g_ptr_array_add (res,
                    g_strdup (G_VOLUME_IDENTIFIER_KIND_HAL_UDI));
+#endif
 
   if (gphoto2_volume->device_path && *gphoto2_volume->device_path != 0)
     g_ptr_array_add (res,
