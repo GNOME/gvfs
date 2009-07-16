@@ -258,7 +258,7 @@ HAL_LIBS=
 HAL_CFLAGS=
 HAL_REQUIRED=0.5.10
 
-if test "x$enable_hal" != "xno"; then
+if test "x$enable_hal" != "xno" && test "x$msg_gdu" = "xno"; then
   PKG_CHECK_EXISTS([hal >= $HAL_REQUIRED], msg_hal=yes)
 
   if test "x$msg_hal" = "xyes"; then
