@@ -293,6 +293,16 @@ if test "x$enable_gudev" != "xno"; then
 fi
 AM_CONDITIONAL(USE_GUDEV, [test "$msg_gudev" = "yes"])
 
+if test "x$msg_gudev" = "xyes"; then
+  msg_hotplug_backend="gudev"
+else 
+  if test "x$msg_hal" = "xyes"; then
+    msg_hotplug_backend="hal"
+  else
+    msg_hotplug_backend="none"
+  fi
+fi
+
 dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
 dnl **************************************************
@@ -702,6 +712,8 @@ echo
 echo "gvfs configuration summary:"
 echo "
         gio module directory : $giomodulesdir
+
+        hotplug backend:              $msg_hotplug_backend
 
         FTP/HTTP/WebDAV support       $msg_http
         ObexFTP support               $msg_obexftp
