@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-09 17:19+0530\n"
-"PO-Revision-Date: 2009-07-09 17:42+0530\n"
+"POT-Creation-Date: 2009-07-15 21:36+0530\n"
+"PO-Revision-Date: 2009-07-15 21:49+0530\n"
 "Last-Translator: Dr.T.Vasudevan <agnihot3@gmail.com>\n"
 "Language-Team: Tamil <Ubuntu-l10n-tam@lists.ubuntu.com>\n"
 "MIME-Version: 1.0\n"
@@ -116,6 +116,7 @@ msgstr "monitor_file இலிருந்து கொடுக்கப்ப�
 #: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1162
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
 #: ../monitor/proxy/gproxydrive.c:521 ../monitor/proxy/gproxydrive.c:609
 #: ../monitor/proxy/gproxydrive.c:757 ../monitor/proxy/gproxydrive.c:892
 #: ../monitor/proxy/gproxydrive.c:943 ../monitor/proxy/gproxydrive.c:1067
@@ -279,21 +280,22 @@ msgstr "ஏற்ற வகை குறிப்பிடப்படவில�
 #: ../daemon/daemon-main.c:265
 #, c-format
 msgid "mountpoint for %s already running"
-msgstr "%sக்கான ஏற்றிப்புள்ளி ஏற்கனவே இயக்கத்திலுள்ளது"
+msgstr "%s க்கான ஏற்றிப்புள்ளி ஏற்கனவே இயக்கத்திலுள்ளது"
 
 #: ../daemon/daemon-main.c:276
 msgid "error starting mount daemon"
 msgstr "டீமானை ஏற்றும் போது பிழை"
 
-#: ../daemon/gvfsbackend.c:899
+#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
 msgid "Unmount Anyway"
 msgstr "எவ்வாறேனும் ஏற்ற நீக்கம் செய்யவும்"
 
-#: ../daemon/gvfsbackend.c:900
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
+#: ../monitor/gdu/ggdumount.c:883
 msgid "Cancel"
 msgstr "ரத்து செய்யவும்"
 
-#: ../daemon/gvfsbackend.c:902
+#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -305,6 +307,7 @@ msgstr ""
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2187
+#: ../daemon/gvfsftpdircache.c:419
 #, c-format
 msgid "/ on %s"
 msgstr "%s இல் /"
@@ -341,7 +344,7 @@ msgstr "அடைவை திறக்க முடியவில்லை"
 #: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
-#: ../daemon/gvfsbackendsftp.c:3801
+#: ../daemon/gvfsbackendsftp.c:3801 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "கோப்பு அடைவாகாது"
 
@@ -398,15 +401,18 @@ msgstr "கோப்பு உள்ளது"
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
 #: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
 #: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:175
-#: ../daemon/gvfsjobpush.c:175 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobqueryinforead.c:119 ../daemon/gvfsjobqueryinfowrite.c:119
-#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
+#: ../monitor/gdu/ggduvolume.c:1525
 msgid "Operation not supported by backend"
 msgstr "செயல்பாடு பின்புலத்தால் துணைபுரியவில்லை"
 
@@ -470,8 +476,8 @@ msgid "cdda mount on %s"
 msgstr "%s இல் cdda ஏற்றி"
 
 #: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/hal/ghalmount.c:325 ../monitor/hal/ghalvolume.c:225
-#: ../monitor/hal/ghalvolume.c:246
+#: ../monitor/gdu/ggduvolume.c:320 ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "இசை வட்டு"
@@ -658,7 +664,7 @@ msgstr "ftp கடவுச்சொல்லை %s ஆக %s அன்று �
 #: ../daemon/gvfsbackendftp.c:332
 #, c-format
 msgid "Enter password for ftp on %s"
-msgstr "ftp கடவுச்சொல்லை %sஇல் உள்ளிடவும்"
+msgstr "ftp கடவுச்சொல்லை %s இல் உள்ளிடவும்"
 
 #: ../daemon/gvfsbackendftp.c:358 ../daemon/gvfsbackendsftp.c:966
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
@@ -779,13 +785,14 @@ msgstr "காமிராவை துவக்கும் போது பி
 #: ../daemon/gvfsbackendgphoto2.c:1543
 #, c-format
 msgid "gphoto2 mount on %s"
-msgstr "gphoto2 %sஇல் ஏற்றப்பட்டது"
+msgstr "gphoto2 %s இல் ஏற்றப்பட்டது"
 
 #: ../daemon/gvfsbackendgphoto2.c:1618
 msgid "No camera specified"
 msgstr "காமிரா ஏதும் குறிப்பிடப்படவில்லை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1659 ../daemon/gvfsbackendgphoto2.c:1685, c-format
+#: ../daemon/gvfsbackendgphoto2.c:1659 ../daemon/gvfsbackendgphoto2.c:1685
+#, c-format
 msgid "Filesystem is busy"
 msgstr "கோப்பு முறைமை வேலையாக உள்ளது"
 
@@ -947,6 +954,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "ssh நிரல் எதிர்பாராமல் வெளியேறியது "
 
 #: ../daemon/gvfsbackendsftp.c:300 ../daemon/gvfsbackendsftp.c:1752
+#: ../daemon/gvfsftptask.c:391
 msgid "Permission denied"
 msgstr "அனுமதி மறுக்கப்பட்டது"
 
@@ -1043,7 +1051,7 @@ msgid "Unable to find supported ssh command"
 msgstr "துணைபுரியும் sshஇன் கட்டளையை கண்டுபிடிக்க முடியவில்லை"
 
 #: ../daemon/gvfsbackendsftp.c:1750 ../daemon/gvfsbackendsftp.c:4518
-#: ../daemon/gvfsbackendsmb.c:1664
+#: ../daemon/gvfsbackendsmb.c:1664 ../daemon/gvfsftptask.c:383
 msgid "Operation unsupported"
 msgstr "துணைபுரியாத செயல்பாடு"
 
@@ -1142,14 +1150,14 @@ msgstr "விண்டோஸ் பங்கீடு கோப்பு மு
 #: ../daemon/gvfsbackendsmbbrowse.c:365
 #, c-format
 msgid "Password required for %s"
-msgstr " %sக்கு கடவுச்சொல் தேவைப்படுகிறது"
+msgstr " %s க்கு கடவுச்சொல் தேவைப்படுகிறது"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
 #: ../daemon/gvfsbackendsmbbrowse.c:893
 #, c-format
 msgid "Windows shares on %s"
-msgstr "%sஇல் விண்டோஸ் பங்கீடுகள்"
+msgstr "%s இல் விண்டோஸ் பங்கீடுகள்"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:992
@@ -1158,7 +1166,7 @@ msgstr "சேவையகத்தில் இருந்து பங்க�
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
-msgstr "கோப்பு ஏற்றித்தக்கதல்ல"
+msgstr "கோப்பு ஏற்றத்தக்கதல்ல"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
@@ -1189,7 +1197,70 @@ msgstr "தவறான பின்புல வகை"
 #: ../daemon/gvfsdaemonutils.c:104
 #, c-format
 msgid "Error sending fd: %s"
-msgstr "fdயை அனுப்புவதில் பிழை: %s"
+msgstr "fd யை அனுப்புவதில் பிழை: %s"
+
+#: ../daemon/gvfsftpconnection.c:158
+msgid "Unexpected end of stream"
+msgstr "எதிர்பாராத ஓடையின் முடிவு"
+
+#: ../daemon/gvfsftpconnection.c:174 ../daemon/gvfsftpconnection.c:187
+#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:824
+msgid "Invalid reply"
+msgstr "தவறான பதில்"
+
+#: ../daemon/gvfsftpconnection.c:363
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr "இயங்கும் எஃப்டிபி இணைப்பை உருவாக்க முடியவில்லை. உங்கள் திசைவி இதனை தடுக்கிறதோ."
+
+#: ../daemon/gvfsftpconnection.c:370
+msgid "Failed to create active FTP connection."
+msgstr "இயங்கும் எஃப்டிபி இணைப்பை உருவாக்க முடியவில்லை."
+
+#: ../daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "கோப்பு பெயரில் செல்லாத எண் எழுத்து குறியீடுகள்"
+
+#: ../daemon/gvfsftptask.c:252
+msgid "The FTP server is busy. Try again later"
+msgstr " எஃப்டிபி  சேவையகம் பதில் தரவில்லை. மீண்டும் பிறகு முயற்சி செய்யவும்."
+
+#: ../daemon/gvfsftptask.c:347
+msgid "Accounts are unsupported"
+msgstr "கணக்குகள் துணைபுரியவில்லை"
+
+#: ../daemon/gvfsftptask.c:351
+msgid "Host closed connection"
+msgstr "புரவலன் மூடப்பட்ட இணைப்பு"
+
+#: ../daemon/gvfsftptask.c:355
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "தரவு இணைப்பை திறக்க முடியவில்லை. உங்கள் ஃபயர்வால் இதனை தடுக்கிறதா?"
+
+#: ../daemon/gvfsftptask.c:359
+msgid "Data connection closed"
+msgstr "தரவு இணைப்பு இல்லை"
+
+#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+msgid "Operation failed"
+msgstr "செயல்பாடு செயலிழக்கப்பட்டது"
+
+#: ../daemon/gvfsftptask.c:375
+msgid "No space left on server"
+msgstr "சேவையகத்தில் இடம் இல்லை"
+
+#: ../daemon/gvfsftptask.c:387
+msgid "Unsupported network protocol"
+msgstr "ஆதரவில்லாத  வலைப்பின்னல் முறைமை"
+
+#: ../daemon/gvfsftptask.c:395
+msgid "Page type unknown"
+msgstr "தெரியாத பக்கம் வகை"
+
+#: ../daemon/gvfsftptask.c:399
+msgid "Invalid filename"
+msgstr "தவறான கோப்பு பெயர்"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
@@ -1199,7 +1270,7 @@ msgstr "Symlinks பின்புலத்தால் துணைபுர�
 msgid "Invalid dbus message"
 msgstr "தவறான dbus தகவல்"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:45 ../metadata/meta-daemon.c:693
 msgid "Replace old daemon."
 msgstr "பழைய டீமானை மாற்றவும்."
 
@@ -1217,17 +1288,18 @@ msgstr "GVFSக்கான முக்கியமான டீமான்"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76
+#: ../daemon/main.c:76 ../metadata/meta-daemon.c:717
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:719
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:109 ../programs/gvfs-info.c:370
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
 #: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "மேலும் தகவலுக்கு \"%s --help\"ஐ முயற்சிக்கவும்."
@@ -1256,6 +1328,112 @@ msgstr "இடம் ஏற்கனவே ஏற்றப்பட்டள்�
 #: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "இடம் ஏற்றப்படுமாறு இல்லை"
+
+#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:449, c-format
+msgid "Can't find metadata file %s"
+msgstr "மெடா தரவு கோப்பு %sஐ கண்டுபிடிக்க முடியவில்லை"
+
+#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+msgid "Unable to set metadata key"
+msgstr "மெடா தரவு விசையை அமைக்க முடியவில்லை"
+
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+msgid "Unable to unset metadata key"
+msgstr "மெடா தரவு விசையை அமைப்பி நீக்க முடியவில்லை"
+
+#: ../metadata/meta-daemon.c:428
+msgid "Unable to remove metadata keys"
+msgstr "மெடா தரவு விசைகளை நீக்க முடியவில்லை"
+
+#: ../metadata/meta-daemon.c:459
+msgid "Unable to move metadata keys"
+msgstr "மெடா தரவு விசைகளை நகற்ற முடியவில்லை"
+
+#: ../metadata/meta-daemon.c:703
+msgid "GVFS Metadata Daemon"
+msgstr "GVFS மெடா தரவு கிங்கரன்"
+
+#: ../metadata/meta-daemon.c:706
+msgid "Metadata daemon for GVFS"
+msgstr "GVFS மெடா தரவு கிங்கரன்"
+
+#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
+msgid "GVfs GDU Volume Monitor"
+msgstr "GVfs GDU ஒலியளவு கண்காணிப்பு"
+
+#: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
+msgid "Floppy Drive"
+msgstr "நெகிழ்வட்டு இயக்கி"
+
+#: ../monitor/gdu/ggdudrive.c:257
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr " பெயரில்லா இயக்கி (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:259
+msgid "Unnamed Drive"
+msgstr "பெயரில்லா இயக்கி"
+
+#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"ஊடகத்தை வெளியேற்ற முடியவில்லை, ஊடகத்தில் ஒன்று அல்லது பல தொகுதிகள் பணியில் இருக்கலாம்."
+
+#: ../monitor/gdu/ggdudrive.c:1003
+msgid ""
+"Start drive in degraded mode?\n"
+"Starting a drive in degraded mode means that the drive is no longer tolerant "
+"to failures. Data on the drive may be irrevocably lost if a component fails."
+msgstr "இயக்கியை கீழ்படுத்திய பாங்கில் துவக்கவா?\n"
+"இயக்கியை கீழ்படுத்திய பாங்கில் துவக்குவது என்பது இயக்கி இனி தவறுகளை மன்னிக்காது என பொருள். ஒரு பாகம் தோல்வி அடைந்தாலும் "
+"இயக்கியில் உள்ள தரவு முற்றிலும் இழக்கப்படும்."
+
+#: ../monitor/gdu/ggdudrive.c:1009
+msgid "Start Anyway"
+msgstr "எவ்வாறேனும் துவக்கவும்"
+
+#: ../monitor/gdu/ggdumount.c:817
+msgid "One or more programs are preventing the unmount operation."
+msgstr "ஏற்ற நீக்கத்தை ஒன்றோ மேலோ நிரல்கள் தடுக்கின்றன."
+
+#: ../monitor/gdu/ggdumount.c:945
+msgid "Cannot get LUKS cleartext slave"
+msgstr "லுக்ஸ்(LUKS) க்ளீயர்டெக்ஸ்ட் ஸ்லேவ் ஐ பெறமுடியவில்லை "
+
+#: ../monitor/gdu/ggdumount.c:967
+#, c-format
+msgid "Cannot get LUKS cleartext slave from path `%s'"
+msgstr"லுக்ஸ்(LUKS) க்ளீயர்டெக்ஸ்ட் ஸ்லேவ் ஐ `%s' பாதையில் இருந்து பெறமுடியவில்லை "
+#: ../monitor/gdu/ggduvolume.c:308
+msgid "Floppy Disk"
+msgstr "நெகிழ்வட்டு இயக்கி"
+
+#: ../monitor/gdu/ggduvolume.c:1022
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data on partition %d."
+msgstr "தொகுதியின் பூட்டு திறக்க ஒரு கடவுச்சொல்லை உள்ளிடுக \n"
+"சாதனம்  \"%s\" %d பிரிவில் மறையாக்கம் செய்த தரவை கொண்டு உள்ளது."
+
+#: ../monitor/gdu/ggduvolume.c:1029
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data."
+msgstr "தொகுதியின் பூட்டு திறக்க ஒரு கடவுச்சொல்லை உள்ளிடுக \n"
+"சாதனம்  \"%s\" மறையாக்கம் செய்த தரவை கொண்டு உள்ளது."
+
+#: ../monitor/gdu/ggduvolume.c:1036
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device %s contains encrypted data."
+msgstr "தொகுதியின் பூட்டு திறக்க ஒரு கடவுச்சொல்லை உள்ளிடுக \n"
+"சாதனம்  %s மறையாக்கம் செய்த தரவை கொண்டு உள்ளது."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1477,10 +1655,6 @@ msgstr "%s/%s இயக்கி"
 msgid "%s Drive"
 msgstr "%s இயக்கி"
 
-#: ../monitor/hal/ghaldrive.c:179
-msgid "Floppy Drive"
-msgstr "நெகிழ்வட்டு இயக்கி"
-
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
 msgstr "மென்பொருள் RAID இயக்கி"
@@ -1536,12 +1710,6 @@ msgstr "Thumb இயக்கி"
 #: ../monitor/hal/ghaldrive.c:214
 msgid "Mass Storage Drive"
 msgstr "அதிகமாக சேமிக்கும் இயக்கி"
-
-#: ../monitor/hal/ghaldrive.c:662
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"ஊடகத்தை வெளியேற்ற முடியவில்லை, ஊடகத்தில் ஒன்று அல்லது பல தொகுதிகள் பணியில் இருக்கலாம்."
 
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
@@ -1626,8 +1794,8 @@ msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
-"குறிப்பு: சற்று பைப் வழியாக cat பன்னுங்க,  உங்களுக்கு உருமாற்றும் வழிகள் -n, -T or "
-"தேவைப்பட்டால்   அல்லதுமற்ற"
+"குறிப்பு: சற்று பைப் வழியாக cat பன்னுங்க,  உங்களுக்கு உருமாற்றும் வழிகள் -n, -T அல்லது "
+"தேவைப்பட்டால்"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1664,39 +1832,28 @@ msgstr ""
 "திறந்த கோப்பு(கள்) ஏற்கனவேயுள்ள பயன்பாட்டுடன் பதிவானவைகள் மற்றும் கையாழக்கூடிய கோப்பு "
 "வகையை சரர்ந்தவை"
 
+#: ../programs/gvfs-set-attribute.c:137, c-format
+msgid "Location not specified\n"
+msgstr "இடத்தை குறிப்பிடப்படவில்லை\n"
+
+#: ../programs/gvfs-set-attribute.c:145, c-format
+msgid "Attribute not specified\n"
+msgstr "பண்புக்கூறு குறிப்பிடப்படவில்லை\n"
+
+#: ../programs/gvfs-set-attribute.c:189, c-format
+msgid "Invalid attribute type %s\n"
+msgstr "செல்லுபடியாகாத பண்புக்கூறு வகை %s\n "
+
+#: ../programs/gvfs-set-attribute.c:199, c-format
+msgid "Error setting attribute: %s\n"
+msgstr "பண்புக்கூறு அமைப்பதில் பிழை: %s\n"
+
 #~ msgid "The query info operation is not supported"
 #~ msgstr "வினா தகவல் செயல்பாடு துணைபுரிவதில்லை"
 
 #~| msgid "Seek not supported on stream"
 #~ msgid "Query info not supported on stream"
 #~ msgstr "ஓடையில்  தேடல் தகவலுக்கு ஆதரவில்லை"
-
-#~ msgid "Accounts are unsupported"
-#~ msgstr "கணக்குகள் துணைபுரியவில்லை"
-
-#~ msgid "Host closed connection"
-#~ msgstr "புரவலன் மூடப்பட்ட இணைப்பு"
-
-#~ msgid "Cannot open data connection. Maybe your firewall prevents this?"
-#~ msgstr "தரவு இணைப்பை திறக்க முடியவில்லை. உங்கள் ஃபயர்வால் இதனை தடுக்கிறதா?"
-
-#~ msgid "Data connection closed"
-#~ msgstr "தரவு இணைப்பு இல்லை"
-
-#~ msgid "Operation failed"
-#~ msgstr "செயல்பாடு செயலிழக்கப்பட்டது"
-
-#~ msgid "No space left on server"
-#~ msgstr "சேவையகத்தில் இடம் இல்லை"
-
-#~ msgid "Page type unknown"
-#~ msgstr "தெரியாத பக்கம் வகை"
-
-#~ msgid "Invalid filename"
-#~ msgstr "தவறான கோப்பு பெயர்"
-
-#~ msgid "Invalid reply"
-#~ msgstr "தவறான பதில்"
 
 #~ msgid "broken transmission"
 #~ msgstr "பிளவுப்பட்ட பரிமாற்றம்"
