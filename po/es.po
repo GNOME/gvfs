@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-07-08 17:27+0000\n"
-"PO-Revision-Date: 2009-07-08 22:20+0200\n"
+"POT-Creation-Date: 2009-07-13 20:40+0000\n"
+"PO-Revision-Date: 2009-07-17 12:28+0200\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -110,6 +110,7 @@ msgstr "El valor devuelto por monitor_file no es válido"
 #: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1162
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
 #: ../monitor/proxy/gproxydrive.c:521 ../monitor/proxy/gproxydrive.c:609
 #: ../monitor/proxy/gproxydrive.c:757 ../monitor/proxy/gproxydrive.c:892
 #: ../monitor/proxy/gproxydrive.c:943 ../monitor/proxy/gproxydrive.c:1067
@@ -279,17 +280,16 @@ msgstr "el punto de montaje para %s ya se está usando"
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
-#: ../daemon/gvfsbackend.c:899
-#| msgid "Log In Anyway"
+#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
 msgid "Unmount Anyway"
 msgstr "Desmontar de todas formas"
 
-#: ../daemon/gvfsbackend.c:900
-#| msgid "Cancel Login"
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
+#: ../monitor/gdu/ggdumount.c:883
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../daemon/gvfsbackend.c:902
+#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
@@ -301,6 +301,7 @@ msgstr ""
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2187
+#: ../daemon/gvfsftpdircache.c:419
 #, c-format
 msgid "/ on %s"
 msgstr "/ en %s"
@@ -337,7 +338,7 @@ msgstr "No se puede abrir el directorio"
 #: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
-#: ../daemon/gvfsbackendsftp.c:3801
+#: ../daemon/gvfsbackendsftp.c:3801 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "El archivo no es un directorio"
 
@@ -394,15 +395,18 @@ msgstr "El archivo ya existe"
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
 #: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
 #: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:175
-#: ../daemon/gvfsjobpush.c:175 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobqueryinforead.c:119 ../daemon/gvfsjobqueryinfowrite.c:119
-#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
+#: ../monitor/gdu/ggduvolume.c:1525
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -430,7 +434,6 @@ msgid "Not supported"
 msgstr "No soportado"
 
 #: ../daemon/gvfsbackendcdda.c:333
-#| msgid "Cannot create gphoto2 context"
 msgid "Cannot create gudev client"
 msgstr "No se puede crear el cliente gudev"
 
@@ -467,8 +470,8 @@ msgid "cdda mount on %s"
 msgstr "CDDA montado en %s"
 
 #: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/hal/ghalmount.c:325 ../monitor/hal/ghalvolume.c:225
-#: ../monitor/hal/ghalvolume.c:246
+#: ../monitor/gdu/ggduvolume.c:320 ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "Disco de sonido"
@@ -558,7 +561,6 @@ msgid "Can't stop file"
 msgstr "No se puede parar el archivo"
 
 #: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
-#| msgid "Can't stop file"
 msgid "Can't poll file"
 msgstr "No se puede sondear el archivo"
 
@@ -785,7 +787,6 @@ msgstr "No se especificó ninguna cámara"
 
 #: ../daemon/gvfsbackendgphoto2.c:1659 ../daemon/gvfsbackendgphoto2.c:1685
 #, c-format
-#| msgid "Filesystem"
 msgid "Filesystem is busy"
 msgstr "El sistema de archivos está ocupado"
 
@@ -947,6 +948,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "el programa de ssh finalizó inesperadamente"
 
 #: ../daemon/gvfsbackendsftp.c:300 ../daemon/gvfsbackendsftp.c:1752
+#: ../daemon/gvfsftptask.c:391
 msgid "Permission denied"
 msgstr "Permiso denegado"
 
@@ -1044,7 +1046,7 @@ msgid "Unable to find supported ssh command"
 msgstr "No se pudo encontrar el comando ssh soportado"
 
 #: ../daemon/gvfsbackendsftp.c:1750 ../daemon/gvfsbackendsftp.c:4518
-#: ../daemon/gvfsbackendsmb.c:1664
+#: ../daemon/gvfsbackendsmb.c:1664 ../daemon/gvfsftptask.c:383
 msgid "Operation unsupported"
 msgstr "La operación no está soportada"
 
@@ -1192,6 +1194,74 @@ msgstr "Tipo de backend no válido"
 msgid "Error sending fd: %s"
 msgstr "Error al enviar el descriptor de archivo: %s"
 
+#: ../daemon/gvfsftpconnection.c:158
+#| msgid "Unexpected reply from server"
+msgid "Unexpected end of stream"
+msgstr "Final de flujo inesperado"
+
+#: ../daemon/gvfsftpconnection.c:174 ../daemon/gvfsftpconnection.c:187
+#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:824
+msgid "Invalid reply"
+msgstr "Se recibió una respuesta no válida"
+
+#: ../daemon/gvfsftpconnection.c:363
+#| msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr "Falló al crear la conexión FTP activa. ¿Quizá su router no lo soporta?"
+
+#: ../daemon/gvfsftpconnection.c:370
+msgid "Failed to create active FTP connection."
+msgstr "Falló al crear la conexión FTP activa."
+
+#: ../daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "El nombre de archivo contiene caracteres no válidos."
+
+#: ../daemon/gvfsftptask.c:252
+msgid "The FTP server is busy. Try again later"
+msgstr "El servidor FTP está ocupado. Inténtelo de nuevo más tarde."
+
+#: ../daemon/gvfsftptask.c:347
+msgid "Accounts are unsupported"
+msgstr "Las cuentas no están soportadas"
+
+#: ../daemon/gvfsftptask.c:351
+msgid "Host closed connection"
+msgstr "El servidor cerró la conexión"
+
+#: ../daemon/gvfsftptask.c:355
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr ""
+"No se puede abrir la conexión de datos. ¿Quizá su cortafuegos lo esté "
+"impidiendo?"
+
+#: ../daemon/gvfsftptask.c:359
+msgid "Data connection closed"
+msgstr "Se cerró la conexión de datos"
+
+#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+msgid "Operation failed"
+msgstr "Falló la operación"
+
+#: ../daemon/gvfsftptask.c:375
+msgid "No space left on server"
+msgstr "No queda espacio libre en el servidor"
+
+#: ../daemon/gvfsftptask.c:387
+#| msgid "Unsupported seek type"
+msgid "Unsupported network protocol"
+msgstr "Protocolo de red no soportado"
+
+#: ../daemon/gvfsftptask.c:395
+msgid "Page type unknown"
+msgstr "Tipo de página desconocido"
+
+#: ../daemon/gvfsftptask.c:399
+msgid "Invalid filename"
+msgstr "Nombre de archivo no válido"
+
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
 msgstr "El backend no soporta enlaces simbólicos"
@@ -1200,7 +1270,7 @@ msgstr "El backend no soporta enlaces simbólicos"
 msgid "Invalid dbus message"
 msgstr "Mensaje de D-Bus no válido"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:45 ../metadata/meta-daemon.c:693
 msgid "Replace old daemon."
 msgstr "Reemplace el demonio antiguo."
 
@@ -1218,17 +1288,18 @@ msgstr "Demonio principal para GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76
+#: ../daemon/main.c:76 ../metadata/meta-daemon.c:717
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:719
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
 #: ../programs/gvfs-copy.c:109 ../programs/gvfs-info.c:370
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
 #: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Intente \"%s --help\" para obtener más información."
@@ -1257,6 +1328,125 @@ msgstr "La ubicación ya está montada"
 #: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "La ubicación no es montable"
+
+#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:449
+#, c-format
+#| msgid "Cannot find drive %s"
+msgid "Can't find metadata file %s"
+msgstr "No se puede encontrar el archivo de metadatos %s"
+
+#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+msgid "Unable to set metadata key"
+msgstr "No se puede establecer la clave de metadatos"
+
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+msgid "Unable to unset metadata key"
+msgstr "No se puede desestablecer la clave de metadatos"
+
+#: ../metadata/meta-daemon.c:428
+msgid "Unable to remove metadata keys"
+msgstr "No se pueden quitar las claves de metadatos"
+
+#: ../metadata/meta-daemon.c:459
+msgid "Unable to move metadata keys"
+msgstr "No se pueden mover las claves de metadatos"
+
+#: ../metadata/meta-daemon.c:703
+#| msgid "GVFS Daemon"
+msgid "GVFS Metadata Daemon"
+msgstr "Demonio de metadatos de GVFS"
+
+#: ../metadata/meta-daemon.c:706
+#| msgid "Main daemon for GVFS"
+msgid "Metadata daemon for GVFS"
+msgstr "Demonio de metadatos para GVFS"
+
+#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
+msgid "GVfs GDU Volume Monitor"
+msgstr "Monitor de volúmenes GDU de GVfs"
+
+#: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
+msgid "Floppy Drive"
+msgstr "Disquete"
+
+#: ../monitor/gdu/ggdudrive.c:257
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "Unidad sin nombre (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:259
+#| msgid "Tape Drive"
+msgid "Unnamed Drive"
+msgstr "Unidad sin nombre"
+
+#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"Falló al expulsar el medio, uno o más volúmenes están ocupados en el medio."
+
+#: ../monitor/gdu/ggdudrive.c:1003
+msgid ""
+"Start drive in degraded mode?\n"
+"Starting a drive in degraded mode means that the drive is no longer tolerant "
+"to failures. Data on the drive may be irrevocably lost if a component fails."
+msgstr ""
+"¿Iniciar la unidad en modo degradado?\n"
+"Iniciar una unidad en modo degradado significa que la unidad no tiene "
+"tolerancia a fallos. Los datos en la unidad se pueden perder "
+"irrevocablemente si un componente falla."
+
+#: ../monitor/gdu/ggdudrive.c:1009
+#| msgid "Unmount Anyway"
+msgid "Start Anyway"
+msgstr "Iniciar de todas formas"
+
+#: ../monitor/gdu/ggdumount.c:817
+msgid "One or more programs are preventing the unmount operation."
+msgstr "Uno o más programas evitan la operación de desmontado."
+
+#: ../monitor/gdu/ggdumount.c:945
+msgid "Cannot get LUKS cleartext slave"
+msgstr "No se puede obtener el esclavo LUKS en texto claro"
+
+#: ../monitor/gdu/ggdumount.c:967
+#, c-format
+msgid "Cannot get LUKS cleartext slave from path `%s'"
+msgstr "No se puede obtener el esclavo LUKS en texto claro desde la ruta «%s»"
+
+#: ../monitor/gdu/ggduvolume.c:308
+#| msgid "Floppy Drive"
+msgid "Floppy Disk"
+msgstr "Disquete"
+
+#: ../monitor/gdu/ggduvolume.c:1022
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data on partition %d."
+msgstr ""
+"Introducir una contraseña para desbloquear el volumen\n"
+"El dispositivo «%s» contiene datos cifrados en la partición %d."
+
+#: ../monitor/gdu/ggduvolume.c:1029
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data."
+msgstr ""
+"Introducir una contraseña para desbloquear el volumen\n"
+"El dispositivo «%s» contiene datos cifrados."
+
+#: ../monitor/gdu/ggduvolume.c:1036
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device %s contains encrypted data."
+msgstr ""
+"Introducir una contraseña para desbloquear el volumen\n"
+"El dispositivo %s contiene datos cifrados."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1478,10 +1668,6 @@ msgstr "Unidad %s/%s"
 msgid "%s Drive"
 msgstr "Unidad %s"
 
-#: ../monitor/hal/ghaldrive.c:179
-msgid "Floppy Drive"
-msgstr "Disquete"
-
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
 msgstr "Unidad RAID por software"
@@ -1537,12 +1723,6 @@ msgstr "Unidad Thumb"
 #: ../monitor/hal/ghaldrive.c:214
 msgid "Mass Storage Drive"
 msgstr "Unidad de almacenamiento masivo"
-
-#: ../monitor/hal/ghaldrive.c:662
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"Falló al expulsar el medio, uno o más volúmenes están ocupados en el medio."
 
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
@@ -1665,34 +1845,29 @@ msgstr ""
 "Abre el/los archivo/s con la aplicación predeterminada registrada para "
 "manejar el tipo de archivo."
 
-#~ msgid "Accounts are unsupported"
-#~ msgstr "Las cuentas no están soportadas"
+#: ../programs/gvfs-set-attribute.c:137
+#, c-format
+#| msgid "No mount type specified"
+msgid "Location not specified\n"
+msgstr "No se especificó una ubicación\n"
 
-#~ msgid "Host closed connection"
-#~ msgstr "El servidor cerró la conexión"
+#: ../programs/gvfs-set-attribute.c:145
+#, c-format
+#| msgid "No drive specified"
+msgid "Attribute not specified\n"
+msgstr "No se especificó un atributo\n"
 
-#~ msgid "Cannot open data connection. Maybe your firewall prevents this?"
-#~ msgstr ""
-#~ "No se puede abrir la conexión de datos. ¿Quizá su cortafuegos lo esté "
-#~ "impidiendo?"
+#: ../programs/gvfs-set-attribute.c:189
+#, c-format
+#| msgid "Invalid attribute info list content"
+msgid "Invalid attribute type %s\n"
+msgstr "Tipo de atributo no válido %s\n"
 
-#~ msgid "Data connection closed"
-#~ msgstr "Se cerró la conexión de datos"
-
-#~ msgid "Operation failed"
-#~ msgstr "Falló la operación"
-
-#~ msgid "No space left on server"
-#~ msgstr "No queda espacio libre en el servidor"
-
-#~ msgid "Page type unknown"
-#~ msgstr "Tipo de página desconocido"
-
-#~ msgid "Invalid filename"
-#~ msgstr "Nombre de archivo no válido"
-
-#~ msgid "Invalid reply"
-#~ msgstr "Se recibió una respuesta no válida"
+#: ../programs/gvfs-set-attribute.c:199
+#, c-format
+#| msgid "Error deleting file: %s"
+msgid "Error setting attribute: %s\n"
+msgstr "Error al establecer el archivo: %s\n"
 
 #~ msgid "broken transmission"
 #~ msgstr "transmisión rota"
