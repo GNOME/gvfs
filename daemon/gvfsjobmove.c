@@ -132,11 +132,11 @@ g_vfs_job_move_progress_callback (goffset current_num_bytes,
   dbus_uint64_t current_dbus, total_dbus;
   DBusMessage *message;
 
-  g_debug ("progress_callback " G_GOFFSET_FORMAT "/" G_GOFFSET_FORMAT "\n", current_num_bytes, total_num_bytes);
+  g_debug ("progress_callback %" G_GOFFSET_FORMAT "/%" G_GOFFSET_FORMAT "\n", current_num_bytes, total_num_bytes);
 
   if (op_job->callback_obj_path == NULL)
     return;
-  
+
   message =
     dbus_message_new_method_call (dbus_message_get_sender (dbus_job->message),
 				  op_job->callback_obj_path,
