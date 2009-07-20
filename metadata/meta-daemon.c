@@ -479,6 +479,7 @@ register_name (DBusConnection *conn,
   if (replace)
     flags |= DBUS_NAME_FLAG_REPLACE_EXISTING;
 
+  dbus_error_init (&error);
   ret = dbus_bus_request_name (conn, G_VFS_DBUS_METADATA_NAME, flags, &error);
   if (ret == -1)
     {
