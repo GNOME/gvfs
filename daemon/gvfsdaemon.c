@@ -999,10 +999,25 @@ peer_to_peer_filter_func (DBusConnection *conn,
 			  DBusMessage    *message,
 			  gpointer        data)
 {
+  GVfsDaemon *daemon = data;
+
   if (dbus_message_is_signal (message,
 			      DBUS_INTERFACE_LOCAL,
 			      "Disconnected"))
     {
+      GList *l;
+
+      g_mutex_lock (daemon->lock);
+      for (l = daemon->jobs; l != NULL; l = l->next)
+        {
+          GVfsJob *job = l->data;
+          
+          if (G_VFS_IS_JOB_DBUS (job) &&
+              G_VFS_JOB_DBUS (job)->connection == conn)
+            g_vfs_job_cancel (job);
+        }
+      g_mutex_unlock (daemon->lock);
+
       /* The peer-to-peer connection was disconnected */
       dbus_connection_unref (conn);
       return DBUS_HANDLER_RESULT_HANDLED;
