@@ -764,7 +764,7 @@ g_vfs_ftp_task_setup_data_connection_epsv (GVfsFtpTask *task, GVfsFtpMethod meth
 
   status = g_vfs_ftp_task_send_and_check (task, G_VFS_FTP_PASS_500, NULL, NULL, &reply, "EPSV");
   if (G_VFS_FTP_RESPONSE_GROUP (status) != 2)
-    goto fail;
+    return G_VFS_FTP_METHOD_ANY;
 
   /* FIXME: parse multiple lines? */
   s = strrchr (reply[0], '(');
