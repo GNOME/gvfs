@@ -1057,7 +1057,7 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
   obj_path = g_strdup_printf ("/org/gtk/vfs/mount/%d", ++daemon->mount_counter);
   backend = g_object_new (backend_type,
 			  "daemon", daemon,
-			  "object_path", obj_path,
+			  "object-path", obj_path,
 			  NULL);
   g_free (obj_path);
 
