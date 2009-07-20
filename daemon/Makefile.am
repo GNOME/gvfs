@@ -37,7 +37,7 @@ service_DATA = gvfs-daemon.service
 %.mount: %.mount.in ../config.log
 	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
-libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest
+libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp
 
 mount_in_files = sftp.mount.in trash.mount.in computer.mount.in burn.mount.in localtest.mount.in
 mount_DATA =  sftp.mount trash.mount computer.mount burn.mount localtest.mount
@@ -48,7 +48,7 @@ mount_DATA += http.mount dav.mount ftp.mount
 if HAVE_AVAHI
 mount_DATA += dav+sd.mount
 endif
-libexec_PROGRAMS += gvfsd-http gvfsd-dav gvfsd-ftp
+libexec_PROGRAMS += gvfsd-http gvfsd-dav
 endif
 
 mount_in_files += smb.mount.in smb-browse.mount.in
