@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
 "POT-Creation-Date: 2009-07-13 20:40+0000\n"
-"PO-Revision-Date: 2009-07-16 11:09+0300\n"
+"PO-Revision-Date: 2009-07-23 17:13+0300\n"
 "Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +109,7 @@ msgid "Invalid file info format"
 msgstr "Vigane failiandmete vorming"
 
 msgid "Invalid attribute info list content"
-msgstr "Sobimatu atribuutide infoloendi sisu"
+msgstr "Vigane rekvisiiditeabe nimekirja sisu"
 
 #, c-format
 msgid "Error initializing Avahi: %s"
@@ -842,12 +842,12 @@ msgstr "Andmevoo ootamatu lõpp"
 msgid "Invalid reply"
 msgstr "Vigane vastus"
 
-#, fuzzy
-#| msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr "Andmeühendust pole võimalik avada. Võibolla tulemüür takistab seda?"
+msgstr ""
+"Tõrge aktiivse FTP-ühenduse loomisel. Võibolla sinu ruuter ei toeta "
+"selliseid ühendusi?"
 
 msgid "Failed to create active FTP connection."
 msgstr "Tõrge aktiivse FTP-ühenduse loomisel."
@@ -937,13 +937,13 @@ msgid "Can't find metadata file %s"
 msgstr "Metaandmete faili %s pole võimalik leida"
 
 msgid "Unable to set metadata key"
-msgstr ""
+msgstr "Metaandmete võtit pole võimalik määrata"
 
 msgid "Unable to unset metadata key"
 msgstr ""
 
 msgid "Unable to remove metadata keys"
-msgstr ""
+msgstr "Metaandmete võtmeid pole võimalik eemaldada"
 
 msgid "Unable to move metadata keys"
 msgstr ""
@@ -981,7 +981,7 @@ msgid "Start Anyway"
 msgstr ""
 
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "Üks või mitu programmi takistavad lahtiühendamist."
 
 msgid "Cannot get LUKS cleartext slave"
 msgstr ""
@@ -998,18 +998,24 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
+"Sisesta andmeruumi lukust lahtivõtmiseks parool\n"
+"Seadmel \"%s\" on krüptitud andmeid sisaldav jaotis %d."
 
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
+"Sisesta andmeruumi lukust lahtivõtmiseks parool\n"
+"Seade \"%s\" sisaldab krüptitud andmed."
 
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
+"Sisesta andmeruumi lukust lahtivõtmiseks parool\n"
+"Seade %s sisaldab krüptitud andmed."
 
 msgid "CD-ROM Disc"
 msgstr "CD-ROM plaat"
@@ -1325,20 +1331,17 @@ msgstr ""
 msgid "Location not specified\n"
 msgstr "Asukoht on määramata\n"
 
-#, fuzzy, c-format
-#| msgid "No drive specified"
+#, c-format
 msgid "Attribute not specified\n"
-msgstr "Ketas on määramata"
+msgstr "Rekvisiit on määramata\n"
 
-#, fuzzy, c-format
-#| msgid "Invalid attribute info list content"
+#, c-format
 msgid "Invalid attribute type %s\n"
-msgstr "Sobimatu atribuutide infoloendi sisu"
+msgstr "Vigane rekvisiidi liik %s\n"
 
-#, fuzzy, c-format
-#| msgid "Error deleting file: %s"
+#, c-format
 msgid "Error setting attribute: %s\n"
-msgstr "Viga faili kustutamisel: %s"
+msgstr "Viga rekvisiidi määramisel: %s\n"
 
 #~ msgid "Out of memory while reading directory contents"
 #~ msgstr "Kataloogi sisu lugemisel lõppes mälu"
