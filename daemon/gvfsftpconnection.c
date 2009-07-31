@@ -45,6 +45,22 @@ struct _GVfsFtpConnection
   int                   debug_id;               /* unique id for debugging purposes */
 };
 
+static void
+enable_keepalive (GSocketConnection *conn)
+{
+  /* We enable keepalive on the socket, because data connections can be
+   * idle for a long time while data is transferred using the data
+   * connection. And there are still buggy routers in existance that purge
+   * idle connections from time to time.
+   * To work around this problem, we set the keep alive flag here. It's the
+   * user's responsibility to configure his kernel properly so that the
+   * keepalive packets are sent before the buggy router disconnects the
+   * TCP connection. If a user asks, a howto is at
+   * http://tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/
+   */
+  g_socket_set_keepalive (g_socket_connection_get_socket (conn), TRUE);
+}
+
 GVfsFtpConnection *
 g_vfs_ftp_connection_new (GSocketConnectable *addr,
                           GCancellable *      cancellable,
@@ -68,6 +84,7 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
       return NULL;
     }
 
+  enable_keepalive (G_SOCKET_CONNECTION (conn->commands));
   conn->commands_in = G_DATA_INPUT_STREAM (g_data_input_stream_new (g_io_stream_get_input_stream (conn->commands)));
   g_data_input_stream_set_newline_type (conn->commands_in, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 
