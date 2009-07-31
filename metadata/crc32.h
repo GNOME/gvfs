@@ -46,4 +46,4 @@
 
 #include <glib.h>
 
-guint32 crc32(const void *ptr, size_t len);
+guint32 metadata_crc32(const void *ptr, size_t len);

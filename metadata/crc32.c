@@ -82,7 +82,7 @@ static const guint32 crcTable[256] = {
 };
 
 guint32
-crc32 (const void *ptr, size_t len)
+metadata_crc32 (const void *ptr, size_t len)
 {
   guint32 crc = 0xFFFFFFFF;
   const guint8 *bp = (const guint8 *) ptr;
