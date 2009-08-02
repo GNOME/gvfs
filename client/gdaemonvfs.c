@@ -1248,6 +1248,7 @@ _g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
 				       DBUS_TYPE_STRING, &val,
 				       0);
 	}
+      g_free (current);
     }
   else if (type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
     {

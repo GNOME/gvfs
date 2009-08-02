@@ -1909,6 +1909,7 @@ meta_tree_enumerate_dir (MetaTree                         *tree,
 	break;
     }
  out:
+  g_free (res_path);
   g_hash_table_destroy (children);
   g_static_rw_lock_reader_unlock (&metatree_lock);
 }
@@ -2156,6 +2157,7 @@ meta_tree_enumerate_keys (MetaTree                         *tree,
 
     }
  out:
+  g_free (res_path);
   g_hash_table_destroy (keys);
   g_static_rw_lock_reader_unlock (&metatree_lock);
 }
@@ -3116,7 +3118,7 @@ find_mountpoint_for (MetaLookupCache *cache,
  */
 static char *
 expand_all_symlinks (const char *path,
-		     dev_t *dev_out)
+		     dev_t      *dev_out)
 {
   char *parent, *parent_expanded;
   char *basename, *res;
@@ -3137,6 +3139,7 @@ expand_all_symlinks (const char *path,
       g_free (parent_expanded);
       g_free (basename);
       g_free (parent);
+      g_free (path_copy);
     }
   else
     res = path_copy;
