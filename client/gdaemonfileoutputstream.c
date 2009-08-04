@@ -1474,6 +1474,7 @@ async_close_done (GOutputStream *stream,
 		  gpointer op_data,
 		  GAsyncReadyCallback callback,
 		  gpointer user_data,
+                  GCancellable *cancellable,
 		  GError *io_error)
 {
   GDaemonFileOutputStream *file;
@@ -1481,7 +1482,6 @@ async_close_done (GOutputStream *stream,
   CloseOperation *op;
   gboolean result;
   GError *error;
-  GCancellable *cancellable = NULL; /* TODO: get cancellable */
 
   file = G_DAEMON_FILE_OUTPUT_STREAM (stream);
   
@@ -1544,7 +1544,7 @@ g_daemon_file_output_stream_close_async (GOutputStream     *stream,
 			   op, io_priority,
 			   (GAsyncReadyCallback)callback, data,
 			   cancellable,
-			   (AsyncIteratorDone)async_close_done);
+			   async_close_done);
 }
 
 static gboolean
