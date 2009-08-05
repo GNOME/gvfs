@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.1.x\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-22 18:19+0200\n"
-"PO-Revision-Date: 2009-07-22 18:24+0200\n"
+"Report-Msgid-Bugs-To:\n"
+"POT-Creation-Date: 2009-08-05 10:40+0200\n"
+"PO-Revision-Date: 2009-08-05 10:42+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -69,12 +69,12 @@ msgid "Invalid return value from query_filesystem_info"
 msgstr "Ugyldig returverdi fra query_filesystem_info"
 
 #: ../client/gdaemonfile.c:2229 ../client/gdaemonvfs.c:1184
-#: ../client/gdaemonvfs.c:1317 ../client/gdaemonvfs.c:1370
+#: ../client/gdaemonvfs.c:1318 ../client/gdaemonvfs.c:1371
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Feil under setting av metadata for fil: %s"
 
-#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1371
+#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1372
 msgid "values must be string or list of strings"
 msgstr "verdier må være av type streng eller liste med strenger"
 
@@ -1189,25 +1189,24 @@ msgstr "Ugyldige type motor"
 msgid "Error sending fd: %s"
 msgstr "Feil ved sending av fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:158
+#: ../daemon/gvfsftpconnection.c:175
 msgid "Unexpected end of stream"
 msgstr "Uventet slutt på strøm"
 
-#: ../daemon/gvfsftpconnection.c:174 ../daemon/gvfsftpconnection.c:187
+#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
 #: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:824
 msgid "Invalid reply"
 msgstr "Ugyldig svar"
 
-#: ../daemon/gvfsftpconnection.c:363
-#, fuzzy
+#: ../daemon/gvfsftpconnection.c:380
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr "Kan ikke åpne dataforbindelse. Kanskje en brannmur forhindrer dette?"
+msgstr "Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
 
-#: ../daemon/gvfsftpconnection.c:370
+#: ../daemon/gvfsftpconnection.c:387
 msgid "Failed to create active FTP connection."
-msgstr ""
+msgstr "Klarte ikke å åpne aktiv FTP-tilkobling."
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
@@ -1387,7 +1386,7 @@ msgstr "Start likevel"
 
 #: ../monitor/gdu/ggdumount.c:817
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "Ett eller flere programmer forhindrer avmonteringsoperasjonen."
 
 #: ../monitor/gdu/ggdumount.c:945
 msgid "Cannot get LUKS cleartext slave"
@@ -1831,11 +1830,11 @@ msgid "Attribute not specified\n"
 msgstr "Attributt ikke oppgitt\n"
 
 #: ../programs/gvfs-set-attribute.c:189
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid attribute type %s\n"
-msgstr "Ugyldig listeinnhold for attributtinformasjon"
+msgstr "Ugyldig type attributt %s\n"
 
 #: ../programs/gvfs-set-attribute.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "Error setting attribute: %s\n"
-msgstr "Feil under sletting av fil: %s"
+msgstr "Feil under setting av attributt: %s\n"
