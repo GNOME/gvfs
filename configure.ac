@@ -324,6 +324,28 @@ AC_SUBST(CDDA_CFLAGS)
 
 AM_CONDITIONAL(USE_CDDA, [test "$msg_cdda" = "yes"])
 
+dnl *************************************************
+dnl *** Check if we should build with AFC backend ***
+dnl *************************************************
+AC_ARG_ENABLE(afc, [  --disable-afc           build without AFC backend])
+msg_afc=no
+AFC_LIBS=
+AFC_CFLAGS=
+
+if test "x$enable_afc" != "xno" -a "x$msg_gudev" = "xyes" ; then
+  PKG_CHECK_EXISTS(libiphone-1.0 >= 0.9.2 libusbmuxd >= 1.0, msg_afc=yes)
+
+  if test "x$msg_afc" = "xyes"; then
+    PKG_CHECK_MODULES(AFC, libiphone-1.0 libusbmuxd >= 1.0)
+    AC_DEFINE(HAVE_AFC, 1, [Define to 1 if AFC is going to be built])
+  fi
+fi
+
+AC_SUBST(AFC_LIBS)
+AC_SUBST(AFC_CFLAGS)
+
+AM_CONDITIONAL(USE_AFC, [test "$msg_afc" = "yes"])
+
 dnl *****************************************************
 dnl *** Check if we should build with obexftp backend ***
 dnl *****************************************************
@@ -695,6 +717,7 @@ monitor/proxy/Makefile
 monitor/hal/Makefile
 monitor/gdu/Makefile
 monitor/gphoto2/Makefile
+monitor/afc/Makefile
 gconf/Makefile
 programs/Makefile
 test/Makefile
@@ -712,7 +735,8 @@ echo "
 	FUSE support:                 $msg_fuse
         CDDA support:                 $msg_cdda
         Gphoto2 support:              $msg_gphoto2
-	archive support:	      $msg_archive
+	archive support:              $msg_archive
+	AFC support:                  $msg_afc
         GConf support:                $msg_gconf
         DNS-SD support:               $msg_avahi
 	Build HAL volume monitor:     $msg_hal (with fast init path: $have_hal_fast_init)

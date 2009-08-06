@@ -1,0 +1,7 @@
+[Mount]
+Type=afc
+Exec=@libexecdir@/gvfsd-afc
+AutoMount=false
+Scheme=afc
+DefaultPort=1
+

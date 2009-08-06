@@ -101,6 +101,12 @@ mount_DATA += archive.mount
 libexec_PROGRAMS += gvfsd-archive
 endif
 
+mount_in_files += afc.mount.in
+if USE_AFC
+mount_DATA += afc.mount
+libexec_PROGRAMS += gvfsd-afc
+endif
+
 EXTRA_DIST = gvfs-daemon.service.in $(mount_in_files) obexftp-marshal.list
 
 DISTCLEANFILES = gvfs-daemon.service $(mount_DATA)
@@ -442,3 +448,20 @@ gvfsd_dav_LDADD = $(libraries) $(HTTP_LIBS)
 if HAVE_AVAHI
 gvfsd_dav_LDADD += $(top_builddir)/common/libgvfscommon-dnssd.la
 endif
+
+gvfsd_afc_SOURCES = \
+	gvfsbackendafc.c gvfsbackendafc.h \
+	daemon-main.c daemon-main.h \
+	daemon-main-generic.c
+
+gvfsd_afc_CPPFLAGS = \
+	-DBACKEND_HEADER=gvfsbackendafc.h \
+	-DDEFAULT_BACKEND_TYPE=afc \
+	-DMAX_JOB_THREADS=1 \
+	$(AFC_CFLAGS) \
+	-DBACKEND_TYPES='"afc", G_VFS_TYPE_BACKEND_AFC,'
+
+gvfsd_afc_LDADD = \
+	$(libraries) \
+	$(AFC_LIBS)
+
