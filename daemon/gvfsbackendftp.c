@@ -1255,9 +1255,21 @@ do_pull (GVfsBackend *         backend,
   GFile *dest;
   GInputStream *input;
   GOutputStream *output;
-  GFileInfo *info;
-  goffset total_size;
+  goffset total_size = 0;
   
+  src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
+
+  g_vfs_ftp_task_setup_data_connection (&task);
+  g_vfs_ftp_task_send_and_check (&task,
+                                 G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
+                                 &open_read_handlers[0],
+                                 src,
+                                 NULL,
+                                 "RETR %s", g_vfs_ftp_file_get_ftp_path (src));
+  g_vfs_ftp_task_open_data_connection (&task);
+  if (g_vfs_ftp_task_is_in_error (&task))
+    goto out;
+
   dest = g_file_new_for_path (local_path);
   if (flags & G_FILE_COPY_OVERWRITE)
     output = G_OUTPUT_STREAM (g_file_replace (dest,
@@ -1273,32 +1285,20 @@ do_pull (GVfsBackend *         backend,
                                              &task.error));
   g_object_unref (dest);
   if (output == NULL)
-    goto out;
-
-  src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
-  if (progress_callback)
-    info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, src, TRUE);
-  else
-    info = NULL;
-  if (info)
     {
-      total_size = g_file_info_get_size (info);
-      g_object_unref (info);
-    }
-  else
-    total_size = 0;
-  g_vfs_ftp_task_setup_data_connection (&task);
-  g_vfs_ftp_task_send_and_check (&task,
-                                 G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
-                                 &open_read_handlers[0],
-                                 src,
-                                 NULL,
-                                 "RETR %s", g_vfs_ftp_file_get_ftp_path (src));
-  g_vfs_ftp_task_open_data_connection (&task);
-  if (g_vfs_ftp_task_is_in_error (&task))
-    {
-      g_vfs_ftp_file_free (src);
+      g_vfs_ftp_task_close_data_connection (&task);
+      g_vfs_ftp_task_receive (&task, 0, NULL);
       goto out;
+    }
+
+  if (progress_callback)
+    {
+      GFileInfo *info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, src, TRUE);
+      if (info)
+        {
+          total_size = g_file_info_get_size (info);
+          g_object_unref (info);
+        }
     }
 
   input = g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task.conn));
@@ -1318,8 +1318,9 @@ do_pull (GVfsBackend *         backend,
                 	   G_VFS_FTP_PASS_500,
                            "DELE %s", g_vfs_ftp_file_get_ftp_path (src));
     }
-  g_vfs_ftp_file_free (src);
+
 out:
+  g_vfs_ftp_file_free (src);
   g_vfs_ftp_task_done (&task);
 }
 
