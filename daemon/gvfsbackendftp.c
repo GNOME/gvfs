@@ -650,7 +650,7 @@ do_open_for_read (GVfsBackend *backend,
 
   g_vfs_ftp_task_send_and_check (&task,
                                  G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
-                                 &open_read_handlers[0],
+                                 open_read_handlers,
                                  file,
                                  NULL,
                                  "RETR %s", g_vfs_ftp_file_get_ftp_path (file));
@@ -1249,6 +1249,65 @@ ftp_output_stream_splice (GOutputStream *output,
 }
 
 static void
+do_pull_improve_error_message (GVfsFtpTask *task,
+		               GFile       *dest,
+                               gboolean     overwrite)
+{
+  GFileInfo *info;
+  GFileType file_type;
+  
+  /* There was an error opening the source, try to set a good error for it.
+   * Code taken from glib's gio/gfile.c:open_source_for_copy() function */
+
+  if (g_vfs_ftp_task_error_matches (task, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY))
+    {
+      /* The source is a directory, don't fail with WOULD_RECURSE immediately, 
+       * as that is less useful to the app. Better check for errors on the 
+       * target instead. 
+       */
+      g_vfs_ftp_task_clear_error (task);
+      
+      info = g_file_query_info (dest, G_FILE_ATTRIBUTE_STANDARD_TYPE,
+				G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+				task->cancellable, &task->error);
+      if (info != NULL)
+	{
+	  file_type = g_file_info_get_file_type (info);
+	  g_object_unref (info);
+	  
+	  if (overwrite)
+	    {
+	      if (file_type == G_FILE_TYPE_DIRECTORY)
+		{
+		  g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                       _("Can't copy directory over directory"));
+		  return;
+		}
+	      /* continue to would_recurse error */
+	    }
+	  else
+	    {
+	      g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                   _("Target file already exists"));
+	      return;
+	    }
+	}
+      else
+	{
+	  /* Error getting info from target, return that error 
+           * (except for NOT_FOUND, which is no error here) 
+           */
+	  if (!g_vfs_ftp_task_error_matches (task, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+            return;
+          g_vfs_ftp_task_clear_error (task);
+	}
+      
+      g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                           _("Can't recursively copy directory"));
+    }
+}
+
+static void
 do_pull (GVfsBackend *         backend,
          GVfsJobPull *         job,
          const char *          source,
@@ -1258,7 +1317,9 @@ do_pull (GVfsBackend *         backend,
          GFileProgressCallback progress_callback,
          gpointer              progress_callback_data)
 {
-  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory, NULL };
+  static const GVfsFtpErrorFunc open_read_handlers[] = { error_550_is_directory,
+                                                         error_550_permission_or_not_found, 
+                                                         NULL };
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *src;
@@ -1268,19 +1329,22 @@ do_pull (GVfsBackend *         backend,
   goffset total_size = 0;
   
   src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
+  dest = g_file_new_for_path (local_path);
 
   g_vfs_ftp_task_setup_data_connection (&task);
   g_vfs_ftp_task_send_and_check (&task,
                                  G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
-                                 &open_read_handlers[0],
+                                 open_read_handlers,
                                  src,
                                  NULL,
                                  "RETR %s", g_vfs_ftp_file_get_ftp_path (src));
   g_vfs_ftp_task_open_data_connection (&task);
   if (g_vfs_ftp_task_is_in_error (&task))
-    goto out;
+    {
+      do_pull_improve_error_message (&task, dest, flags & G_FILE_COPY_OVERWRITE);
+      goto out;
+    }
 
-  dest = g_file_new_for_path (local_path);
   if (flags & G_FILE_COPY_OVERWRITE)
     output = G_OUTPUT_STREAM (g_file_replace (dest,
                                               NULL,
@@ -1293,7 +1357,6 @@ do_pull (GVfsBackend *         backend,
                                              0,
                                              task.cancellable,
                                              &task.error));
-  g_object_unref (dest);
   if (output == NULL)
     {
       g_vfs_ftp_task_close_data_connection (&task);
@@ -1330,6 +1393,7 @@ do_pull (GVfsBackend *         backend,
     }
 
 out:
+  g_object_unref (dest);
   g_vfs_ftp_file_free (src);
   g_vfs_ftp_task_done (&task);
 }

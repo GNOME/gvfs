@@ -56,6 +56,7 @@ typedef void (* GVfsFtpErrorFunc) (GVfsFtpTask *task, gpointer data);
 void                    g_vfs_ftp_task_done                     (GVfsFtpTask *          task);
 
 #define g_vfs_ftp_task_is_in_error(task) ((task)->error != NULL)
+#define g_vfs_ftp_task_error_matches(task, domain, code) (g_error_matches ((task)->error, (domain), (code)))
 #define g_vfs_ftp_task_clear_error(task) (g_clear_error (&(task)->error))
 void                    g_vfs_ftp_task_set_error_from_response  (GVfsFtpTask *          task,
                                                                  guint                  response);
