@@ -917,7 +917,7 @@ do_enumerate (GVfsBackend *backend,
   GVfsBackendFtp *ftp = G_VFS_BACKEND_FTP (backend);
   GVfsFtpTask task = G_VFS_FTP_TASK_INIT (ftp, G_VFS_JOB (job));
   GVfsFtpFile *dir;
-  GList *list;
+  GList *list, *walk;
 
   dir = g_vfs_ftp_file_new_from_gvfs (ftp, dirname);
   list = g_vfs_ftp_dir_cache_lookup_dir (ftp->dir_cache,
@@ -934,10 +934,20 @@ do_enumerate (GVfsBackend *backend,
 
   g_vfs_ftp_task_done (&task);
 
-  g_vfs_job_enumerate_add_infos (job, list);
+  for (walk = list; walk; walk = walk->next)
+    {
+      GFileInfo *matched_info = g_file_info_new ();
+
+      /* copy into a new GFileInfo as g_vfs_job_enumerate_add_info()
+       * modifies the given GFileInfo */
+      g_file_info_set_attribute_mask (matched_info, matcher);
+      g_file_info_copy_into (walk->data, matched_info);
+      g_vfs_job_enumerate_add_info (job, matched_info);
+      g_object_unref (matched_info);
+      g_object_unref (walk->data);
+    }
   g_vfs_job_enumerate_done (job);
 
-  g_list_foreach (list, (GFunc) g_object_unref, NULL);
   g_list_free (list);
   g_vfs_ftp_file_free (dir);
 }
