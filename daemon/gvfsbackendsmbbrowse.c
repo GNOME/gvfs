@@ -1229,6 +1229,7 @@ get_file_info_from_entry (GVfsBackendSmbBrowse *backend, BrowseEntry *entry, GFi
   g_file_info_set_edit_name (info, entry->name_utf8);
   g_file_info_set_attribute_string (info, "smb::comment", entry->comment);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_STANDARD_IS_VIRTUAL, TRUE);
+  g_file_info_set_content_type (info, "inode/directory");
 
   icon = NULL;
   if (entry->smbc_type == SMBC_WORKGROUP)
@@ -1355,6 +1356,7 @@ try_query_info (GVfsBackend *backend,
       g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
       g_file_info_set_name (info, "/");
       g_file_info_set_display_name (info, g_vfs_backend_get_display_name (backend));
+      g_file_info_set_content_type (info, "inode/directory");
       icon = g_vfs_backend_get_icon (backend);
       if (icon != NULL)
         g_file_info_set_icon (info, icon);
