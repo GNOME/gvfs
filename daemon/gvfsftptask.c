@@ -817,13 +817,14 @@ g_vfs_ftp_task_setup_data_connection_pasv (GVfsFtpTask *task, GVfsFtpMethod meth
         	 &port1, &port2) == 6)
        break;
     }
-  g_strfreev (reply);
   if (*s == 0)
     {
+      g_strfreev (reply);
       g_set_error_literal (&task->error, G_IO_ERROR, G_IO_ERROR_FAILED,
         		   _("Invalid reply"));
       return G_VFS_FTP_METHOD_ANY;
     }
+  g_strfreev (reply);
 
   if (method == G_VFS_FTP_METHOD_PASV || method == G_VFS_FTP_METHOD_ANY)
     {
