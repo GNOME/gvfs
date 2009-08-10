@@ -1188,15 +1188,15 @@ ftp_output_stream_splice (GOutputStream *output,
               current = cancellable;
               g_clear_error (error);
               progress_callback (bytes_copied, total_size, progress_callback_data);
+              continue;
             }
           else
             {
               bytes_copied = -1;
               break;
             }
+          g_assert_not_reached();
         }
-      if (n_read == 0)
-        break;
 
       p = buffer;
       while (n_read > 0)
@@ -1211,12 +1211,14 @@ ftp_output_stream_splice (GOutputStream *output,
                   current = cancellable;
                   g_clear_error (error);
                   progress_callback (bytes_copied, total_size, progress_callback_data);
+                  continue;
                 }
               else
                 {
                   bytes_copied = -1;
                   break;
                 }
+              g_assert_not_reached();
             }
 
           p += n_written;
