@@ -940,7 +940,6 @@ do_enumerate (GVfsBackend *backend,
 
       /* copy into a new GFileInfo as g_vfs_job_enumerate_add_info()
        * modifies the given GFileInfo */
-      g_file_info_set_attribute_mask (matched_info, matcher);
       g_file_info_copy_into (walk->data, matched_info);
       g_vfs_job_enumerate_add_info (job, matched_info);
       g_object_unref (matched_info);
