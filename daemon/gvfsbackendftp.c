@@ -1387,7 +1387,8 @@ do_pull (GVfsBackend *         backend,
                             &task.error);
   g_vfs_ftp_task_close_data_connection (&task);
   g_vfs_ftp_task_receive (&task, 0, NULL);
-  
+  g_object_unref (output);
+
   if (remove_source)
     {
       g_vfs_ftp_task_send (&task,
