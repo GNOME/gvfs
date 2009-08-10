@@ -508,6 +508,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
   int type;
   GVfsFtpFile *file;
   char *line, *s;
+  gsize length;
 
   /* protect against code reorg - in current code, error never is NULL */
   g_assert (error != NULL);
@@ -516,10 +517,16 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
   data = g_data_input_stream_new (stream);
   /* we use LF only, because the mozilla code can handle lines ending in CR */
   g_data_input_stream_set_newline_type (data, G_DATA_STREAM_NEWLINE_TYPE_LF);
-  while ((line = g_data_input_stream_read_line (data, NULL, cancellable, error)))
+  while ((line = g_data_input_stream_read_line (data, &length, cancellable, error)))
     {
       struct list_result result = { 0, };
       GTimeVal tv = { 0, 0 };
+
+      /* strip trailing \r - ParseFTPList only removes it if the line ends in \r\n,
+       * but we stripped the \n already.
+       */
+      if (length > 0 && line[length - 1] == '\r')
+        line[--length] = '\0';
 
       g_debug ("<<%2d <<  %s\n", debug_id, line);
       type = ParseFTPList (line, &state, &result);
@@ -551,6 +558,7 @@ g_vfs_ftp_dir_cache_funcs_process (GInputStream *        stream,
       g_free (s);
       if (file == NULL)
         {
+          g_debug ("# invalid filename, skipping");
           g_free (line);
           continue;
         }
