@@ -1196,6 +1196,8 @@ ftp_output_stream_splice (GOutputStream *output,
             }
           g_assert_not_reached();
         }
+      if (n_read == 0)
+        break;
 
       p = buffer;
       while (n_read > 0)
