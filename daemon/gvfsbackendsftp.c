@@ -1034,7 +1034,6 @@ handle_login (GVfsBackend *backend,
                strstr (buffer, "Key fingerprint:") != NULL)
         {
 	  const gchar *choices[] = {_("Log In Anyway"), _("Cancel Login")};
-	  const gchar *v_choices = (const gchar *)choices;
 	  const gchar *choice_string;
 	  gchar *hostname = NULL;
 	  gchar *fingerprint = NULL;
@@ -1055,7 +1054,7 @@ handle_login (GVfsBackend *backend,
 
 	  if (!g_mount_source_ask_question (mount_source,
 					    message,
-					    &v_choices,
+					    choices,
 					    2,
 					    &aborted,
 					    &choice) || 
