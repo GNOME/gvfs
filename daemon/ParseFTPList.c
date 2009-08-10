@@ -782,7 +782,7 @@ int ParseFTPList(const char *line, struct list_state *state,
         state->parsed_one = 1;
         state->lstyle = lstyle;
 
-        p = &(line[linelen_sans_wsp]); /* line end sans wsp */
+        p = &(line[linelen]); /* line end */
         result->fe_cinfs = 1;
         result->fe_fname = tokens[3];
         result->fe_fnlen = p - tokens[3];
@@ -811,7 +811,7 @@ int ParseFTPList(const char *line, struct list_state *state,
                 result->fe_type = 'l';
                 result->fe_fnlen = p - result->fe_fname;
                 result->fe_lname = p + 4;
-                result->fe_lnlen = &(line[linelen_sans_wsp]) 
+                result->fe_lnlen = &(line[linelen]) 
                                    - result->fe_lname;
                 break;
               }
@@ -826,8 +826,13 @@ int ParseFTPList(const char *line, struct list_state *state,
           result->fe_time.tm_mon--;
           result->fe_time.tm_mday = atoi(tokens[0]+3);
           result->fe_time.tm_year = atoi(tokens[0]+6);
+          /* if year has only two digits then assume that
+               00-79 is 2000-2079
+               80-99 is 1980-1999 */
           if (result->fe_time.tm_year < 80)
-            result->fe_time.tm_year += 100;
+            result->fe_time.tm_year += 2000;
+          else if (result->fe_time.tm_year < 100)
+            result->fe_time.tm_year += 1900;
         }
 
         result->fe_time.tm_hour = atoi(tokens[1]+0);
@@ -1156,23 +1161,42 @@ int ParseFTPList(const char *line, struct list_state *state,
         } /* time/year */
         
         result->fe_fname = tokens[tokmarker+4];
-        result->fe_fnlen = (&(line[linelen_sans_wsp]))
+        result->fe_fnlen = (&(line[linelen]))
                            - (result->fe_fname);
 
         if (result->fe_type == 'l' && result->fe_fnlen > 4)
         {
-          p = result->fe_fname + 1;
-          for (pos = 1; pos < (result->fe_fnlen - 4); pos++)
+          /* First try to use result->fe_size to find " -> " sequence.
+             This can give proper result for cases like "aaa -> bbb -> ccc". */
+          guint32 fe_size = atoi(result->fe_size);
+
+          if (result->fe_fnlen > (fe_size + 4) &&
+              g_strncmp(result->fe_fname + result->fe_fnlen - fe_size - 4 , " -> ", 4) == 0)
           {
-            if (*p == ' ' && p[1] == '-' && p[2] == '>' && p[3] == ' ')
+            result->fe_lname = result->fe_fname + (result->fe_fnlen - fe_size);
+            result->fe_lnlen = (&(line[linelen])) - (result->fe_lname);
+            result->fe_fnlen -= fe_size + 4;
+          }
+          else
+          {
+            /* Search for sequence " -> " from the end for case when there are
+               more occurrences. F.e. if ftpd returns "a -> b -> c" assume
+               "a -> b" as a name. Powerusers can remove unnecessary parts
+               manually but there is no way to follow the link when some
+               essential part is missing. */
+            p = result->fe_fname + (result->fe_fnlen - 5);
+            for (pos = (result->fe_fnlen - 5); pos > 0; pos--)
             {
-              result->fe_lname = p + 4;
-              result->fe_lnlen = (&(line[linelen_sans_wsp]))
-                               - (result->fe_lname);
-              result->fe_fnlen = pos;
-              break;
+              if (p && g_str_has_prefix(p, " -> "))
+              {
+                result->fe_lname = p + 4;
+                result->fe_lnlen = (&(line[linelen]))
+                                 - (result->fe_lname);
+                result->fe_fnlen = pos;
+                break;
+              }
+              p--;
             }
-            p++;
           }
         }
 
