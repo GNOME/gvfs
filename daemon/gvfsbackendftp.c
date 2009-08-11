@@ -371,24 +371,24 @@ try_login:
       g_free (ftp->password);
       if (anonymous)
         {
-              ftp->user = g_strdup ("anonymous");
-              ftp->password = g_strdup ("");
+          g_free (username);
+          g_free (password);
+          ftp->user = g_strdup ("anonymous");
+          ftp->password = g_strdup ("");
           if (g_vfs_ftp_task_login (&task, "anonymous", "") != 0)
-            {
-              break;
-            }
+            break;
+          g_free (ftp->user);
+          g_free (ftp->password);
           ftp->user = NULL;
           ftp->password = NULL;
         }
       else
         {
-          ftp->user = username ? g_strdup (username) : g_strdup ("");
-          ftp->password = g_strdup (password);
+          ftp->user = username ? username : g_strdup ("");
+          ftp->password = password;
           if (g_vfs_ftp_task_login (&task, ftp->user, ftp->password) != 0)
             break;
         }
-      g_free (username);
-      g_free (password);
      
       if (break_on_fail ||
           !g_error_matches (task.error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
