@@ -369,6 +369,7 @@ soup_input_stream_done_io (GInputStream *stream)
     {
       g_source_destroy (priv->cancel_watch);
       priv->cancel_watch = NULL;
+      g_cancellable_release_fd (priv->cancellable);
     }
   priv->cancellable = NULL;
 
