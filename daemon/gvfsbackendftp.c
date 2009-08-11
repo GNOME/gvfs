@@ -905,6 +905,7 @@ do_query_info (GVfsBackend *backend,
     }
 
   g_vfs_ftp_task_done (&task);
+  g_vfs_ftp_file_free (file);
 }
 
 static void
