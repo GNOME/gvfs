@@ -44,7 +44,6 @@ static GList *outstanding_mount_op_objects = NULL;
 static GHashTable *unique_names_being_watched = NULL;
 
 /* #define DEBUG_ENABLED */
-#define DEBUG_ENABLED
 
 #ifdef DEBUG_ENABLED
 static void

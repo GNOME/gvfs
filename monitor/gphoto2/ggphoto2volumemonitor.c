@@ -656,6 +656,8 @@ get_stores_for_camera (int bus_num, int device_num)
       else
         basedir = "/";
 
+      /* g_debug ("capacitykbytes[%d] = %d", i, (gint) storage_info[i].capacitykbytes); */
+
       l = g_list_prepend (l, g_strdup (basedir));
     }
 
