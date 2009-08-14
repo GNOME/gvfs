@@ -599,6 +599,8 @@ append_volume (GVolume *volume, DBusMessageIter *iter_array)
       DBusMessageIter iter_dict_entry;
       char *id_value;
       id_value = g_volume_get_identifier (volume, identifiers[n]);
+      if (id_value == NULL)
+        continue;
       dbus_message_iter_open_container (&iter_identifiers,
                                         DBUS_TYPE_DICT_ENTRY,
                                         NULL,
