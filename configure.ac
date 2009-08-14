@@ -236,7 +236,7 @@ AC_ARG_ENABLE(gdu, [  --disable-gdu           build without GDU volume monitor])
 msg_gdu=no
 GDU_LIBS=
 GDU_CFLAGS=
-GDU_REQUIRED=0.3
+GDU_REQUIRED=0.4
 
 if test "x$enable_gdu" != "xno"; then
   PKG_CHECK_EXISTS([gdu >= $GDU_REQUIRED], msg_gdu=yes)
