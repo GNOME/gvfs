@@ -264,25 +264,29 @@ gudev_add_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device, gboolean 
 static void
 gudev_remove_camera (GGPhoto2VolumeMonitor *monitor, GUdevDevice *device)
 {
-    /* g_debug ("gudev_remove_camera: %s", g_udev_device_get_device_file (device)); */
+  GList *l, *ll;
+  const gchar* sysfs_path;
 
-    GList *l;
-    const gchar* sysfs_path = g_udev_device_get_sysfs_path (device);
-  
-    for (l = monitor->camera_volumes; l != NULL; l = l->next)
-      {
-        GGPhoto2Volume *volume = G_GPHOTO2_VOLUME (l->data);
+  sysfs_path = g_udev_device_get_sysfs_path (device);
 
-        if (g_gphoto2_volume_has_path (volume, sysfs_path))
-          {
-            /* g_debug ("gudev_remove_camera: found volume %s, deleting", sysfs_path); */
-            g_signal_emit_by_name (monitor, "volume_removed", volume);
-            g_signal_emit_by_name (volume, "removed");
-            g_gphoto2_volume_removed (volume);
-            monitor->camera_volumes = g_list_remove (monitor->camera_volumes, volume);
-            g_object_unref (volume);
-          }
-      }
+  /* g_debug ("gudev_remove_camera: %s", g_udev_device_get_device_file (device)); */
+
+  for (l = monitor->camera_volumes; l != NULL; l = ll)
+    {
+      GGPhoto2Volume *volume = G_GPHOTO2_VOLUME (l->data);
+
+      ll = l->next;
+
+      if (g_gphoto2_volume_has_path (volume, sysfs_path))
+        {
+          /* g_debug ("gudev_remove_camera: found volume %s, deleting", sysfs_path); */
+          g_signal_emit_by_name (monitor, "volume_removed", volume);
+          g_signal_emit_by_name (volume, "removed");
+          g_gphoto2_volume_removed (volume);
+          monitor->camera_volumes = g_list_remove (monitor->camera_volumes, volume);
+          g_object_unref (volume);
+        }
+    }
 }
 
 static void
