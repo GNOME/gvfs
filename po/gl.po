@@ -1,4 +1,4 @@
-# translation of gvfs-master-po-gl.po to Galician
+# translation of gvfs.master.po to Galician
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gvfs package.
 #
@@ -10,10 +10,10 @@
 # Antón Méixome <meixome@mancomun.org>, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs-master-po-gl\n"
+"Project-Id-Version: gvfs.master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-10 16:27+0200\n"
-"PO-Revision-Date: 2009-07-10 12:22+0200\n"
+"POT-Creation-Date: 2009-08-17 13:19+0200\n"
+"PO-Revision-Date: 2009-08-17 12:02+0200\n"
 "Last-Translator: Antón Méixome <meixome@mancomun.org>\n"
 "Language-Team: Galician <gnome@mancomun.org>\n"
 "MIME-Version: 1.0\n"
@@ -1207,74 +1207,70 @@ msgid "Error sending fd: %s"
 msgstr "Houbo un erro ao enviar fd: %s"
 
 #: ../daemon/gvfsftpconnection.c:175
-#, fuzzy
 msgid "Unexpected end of stream"
-msgstr "Resposta inesperada do servidor"
+msgstr "Fin inesperado do fluxo"
 
 #: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
 #: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:824
-#, fuzzy
 msgid "Invalid reply"
-msgstr "Recibiuse unha resposta non válida"
+msgstr "Resposta incorrecta"
 
 #: ../daemon/gvfsftpconnection.c:380
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
+"Produciuse un fallou coa creación a conexión FTP activa. Pode ser que o seu "
+"encamiñador non a permita?"
 
 #: ../daemon/gvfsftpconnection.c:387
 msgid "Failed to create active FTP connection."
-msgstr ""
+msgstr "Produciuse un fallo coa creación dunha conexión FTP activa."
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr ""
+msgstr "O nome do ficheiro contén caracteres incorrectos."
 
 #: ../daemon/gvfsftptask.c:252
 msgid "The FTP server is busy. Try again later"
-msgstr ""
+msgstr "O servidor de FTP está ocupado. Ténteo de novo máis tarde"
 
 #: ../daemon/gvfsftptask.c:347
-#, fuzzy
 msgid "Accounts are unsupported"
-msgstr "Non compatíbel"
+msgstr "As contas non son compatíbeis"
 
 #: ../daemon/gvfsftptask.c:351
 msgid "Host closed connection"
-msgstr ""
+msgstr "Conexión ao host pechada"
 
 #: ../daemon/gvfsftptask.c:355
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
+"Non se pode abrir a conexión de datos. Podería ser que a súa devasa o impida?"
 
 #: ../daemon/gvfsftptask.c:359
 msgid "Data connection closed"
-msgstr ""
+msgstr "Conexión de datos pechada"
 
 #: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
-#, fuzzy
 msgid "Operation failed"
-msgstr "Cancelouse a operación"
+msgstr "A operación fallou"
 
 #: ../daemon/gvfsftptask.c:375
-#, fuzzy
 msgid "No space left on server"
-msgstr "Non existe o ficheiro %s no dispositivo %s"
+msgstr "Non queda espazo no servidor "
 
 #: ../daemon/gvfsftptask.c:387
-#, fuzzy
 msgid "Unsupported network protocol"
-msgstr "O tipo de busca non é compatíbel"
+msgstr "Este protocolo de rede  non é compatíbel"
 
 #: ../daemon/gvfsftptask.c:395
 msgid "Page type unknown"
-msgstr ""
+msgstr "Tipo de páxina descoñecido"
 
 #: ../daemon/gvfsftptask.c:399
-#, fuzzy
 msgid "Invalid filename"
-msgstr "O nome de ficheiro %s non é válido"
+msgstr "O nome de ficheiro non é válido"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
@@ -1346,39 +1342,37 @@ msgstr "A localización non é montábel"
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
 #: ../metadata/meta-daemon.c:449
-#, fuzzy, c-format
+#, c-format
 msgid "Can't find metadata file %s"
-msgstr "Non é posíbel encontrar o dispositivo %s"
+msgstr "Non é posíbel encontrar o ficheiro de metadatos %s"
 
 #: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
 msgid "Unable to set metadata key"
-msgstr ""
+msgstr "Non foi quen de configurar a chave dos metadatos"
 
 #: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
 msgid "Unable to unset metadata key"
-msgstr ""
+msgstr "Non foi quen de desconfigurar a chave dos metadatos"
 
 #: ../metadata/meta-daemon.c:428
 msgid "Unable to remove metadata keys"
-msgstr ""
+msgstr "Non foi quen de eliminar as chaves dos metadatos"
 
 #: ../metadata/meta-daemon.c:459
 msgid "Unable to move metadata keys"
-msgstr ""
+msgstr "Non foi quen de mover as chaves dos metadatos"
 
 #: ../metadata/meta-daemon.c:704
-#, fuzzy
 msgid "GVFS Metadata Daemon"
-msgstr "Daemon GVFS"
+msgstr "Demoño de metadatos GVFS"
 
 #: ../metadata/meta-daemon.c:707
-#, fuzzy
 msgid "Metadata daemon for GVFS"
-msgstr "O demoño principal para GVFS"
+msgstr "O demoño de metadatos para GVFS"
 
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
-msgstr ""
+msgstr "GVfs GDU Monitor de volume"
 
 #: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
@@ -1387,12 +1381,11 @@ msgstr "Disqueteira"
 #: ../monitor/gdu/ggdudrive.c:257
 #, c-format
 msgid "Unnamed Drive (%s)"
-msgstr ""
+msgstr "Dispositivo sen nome (%s)"
 
 #: ../monitor/gdu/ggdudrive.c:259
-#, fuzzy
 msgid "Unnamed Drive"
-msgstr "Unidade de cinta"
+msgstr "Dispositivo sen nome"
 
 #: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
 #, c-format
@@ -1406,27 +1399,29 @@ msgid ""
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
+"Iniciar o dispositivo en modo degradado?\n"
+"Iniciar un dispositivo en modo degradado significa que o dispositivo xa non "
+"será tolerante cos fallos. Os datos no dispositivo poden ser perdidos "
+"irrevogabelmente se falla un compoñente."
 
 #: ../monitor/gdu/ggdudrive.c:1009
-#, fuzzy
 msgid "Start Anyway"
-msgstr "Desmontar de todas formas"
+msgstr "Iniciar de todas formas"
 
 #: ../monitor/gdu/ggdumount.c:817
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "Un ou máis programas están impedindo a operación de desmontado."
 
 #: ../monitor/gdu/ggdumount.c:945
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "Non se pode obter o escravo LUKS en texto claro"
 
 #: ../monitor/gdu/ggdumount.c:967
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr ""
+msgstr "Non se pode obter o escravo LUKS en texto claro no camiño '%s'"
 
 #: ../monitor/gdu/ggduvolume.c:308
-#, fuzzy
 msgid "Floppy Disk"
 msgstr "Disqueteira"
 
@@ -1436,6 +1431,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
+"Introduza un contrasinal para desbloquear  o volume\n"
+"O dispositivos \"%s\" contén datos cifrados na partición %d."
 
 #: ../monitor/gdu/ggduvolume.c:1029
 #, c-format
@@ -1443,6 +1440,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
+"Introduza un contrasinal para desbloquear o volume\n"
+"O dispositivo \"%s\" contén datos cifrados."
 
 #: ../monitor/gdu/ggduvolume.c:1036
 #, c-format
@@ -1450,6 +1449,8 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
+"Introduza o contrasinal para desbloquear o volume\n"
+"O dispositivo%s contén datos cifrados."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1850,21 +1851,21 @@ msgstr ""
 "tipo de ficheiro."
 
 #: ../programs/gvfs-set-attribute.c:137
-#, fuzzy, c-format
+#, c-format
 msgid "Location not specified\n"
-msgstr "Non se especificou ningún tipo de montaxe"
+msgstr "Non se especificou ningunha localización\n"
 
 #: ../programs/gvfs-set-attribute.c:145
-#, fuzzy, c-format
+#, c-format
 msgid "Attribute not specified\n"
-msgstr "Non se especificou ningún dispositivo"
+msgstr "Non se especificou ningún atributo\n"
 
 #: ../programs/gvfs-set-attribute.c:189
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid attribute type %s\n"
-msgstr "O contido da lista de información de atributos non é válido"
+msgstr "O tipo de atributo %s non é válido\n"
 
 #: ../programs/gvfs-set-attribute.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "Error setting attribute: %s\n"
-msgstr "Erro ao eliminar o ficheiro: %s"
+msgstr "Erro ao estabelecer o atributo: %s\n"
