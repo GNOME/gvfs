@@ -2336,6 +2336,7 @@ static gboolean
 meta_tree_flush_locked (MetaTree *tree)
 {
   MetaBuilder *builder;
+  gboolean res;
 
   builder = meta_builder_new ();
 
@@ -2344,13 +2345,14 @@ meta_tree_flush_locked (MetaTree *tree)
   if (tree->journal)
     apply_journal_to_builder (tree, builder);
 
-  if (!meta_builder_write (builder,
-			   meta_tree_get_filename (tree)))
-    return FALSE;
+  res = meta_builder_write (builder,
+			    meta_tree_get_filename (tree));
+  if (res)
+    meta_tree_refresh_locked (tree);
 
-  meta_tree_refresh_locked (tree);
+  meta_builder_free (builder);
 
-  return TRUE;
+  return res;
 }
 
 gboolean
