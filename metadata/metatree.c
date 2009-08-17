@@ -2344,12 +2344,13 @@ meta_tree_flush_locked (MetaTree *tree)
   if (tree->journal)
     apply_journal_to_builder (tree, builder);
 
-  meta_builder_write (builder,
-		      meta_tree_get_filename (tree));
+  if (!meta_builder_write (builder,
+			   meta_tree_get_filename (tree)))
+    return FALSE;
 
   meta_tree_refresh_locked (tree);
 
-  return FALSE;
+  return TRUE;
 }
 
 gboolean
