@@ -438,6 +438,7 @@ meta_tree_init (MetaTree *tree)
 
 	  dir = g_path_get_dirname (tree->filename);
 	  g_mkdir_with_parents (dir, 0700);
+	  g_free (dir);
 
 	  builder = meta_builder_new ();
 	  retried = TRUE;

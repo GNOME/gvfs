@@ -590,6 +590,7 @@ string_block_end (GString *out,
 	  offset = GPOINTER_TO_UINT (l->data);
 	  set_uint32 (out, offset, string_offset);
 	}
+      g_list_free (offsets);
     }
 
   g_hash_table_destroy (string_block);
@@ -675,7 +676,7 @@ write_children (GString *out,
   while (files != NULL)
     {
       file = files->data;
-      files = g_list_remove_link (files, files);
+      files = g_list_delete_link (files, files);
 
       if (file->children == NULL)
 	continue; /* No children, skip file */
@@ -770,7 +771,7 @@ write_metadata (GString *out,
   while (files != NULL)
     {
       file = files->data;
-      files = g_list_remove_link (files, files);
+      files = g_list_delete_link (files, files);
 
       if (file->children == NULL)
 	continue; /* No children, skip file */
