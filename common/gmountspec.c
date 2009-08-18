@@ -71,7 +71,7 @@ g_mount_spec_new_from_data (GArray *items,
   if (mount_prefix == NULL)
     spec->mount_prefix = g_strdup ("/");
   else
-    spec->mount_prefix = mount_prefix;
+    spec->mount_prefix = g_mount_spec_canonicalize_path (mount_prefix);
 
   g_array_sort (spec->items, item_compare);
   
@@ -112,7 +112,7 @@ g_mount_spec_set_mount_prefix  (GMountSpec      *spec,
 				const char      *mount_prefix)
 {
   g_free (spec->mount_prefix);
-  spec->mount_prefix = g_strdup (mount_prefix);
+  spec->mount_prefix = g_mount_spec_canonicalize_path (mount_prefix);
 }
 
 
