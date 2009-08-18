@@ -23,6 +23,7 @@
 /*
  * TODO: - locking
  *       - cancellation
+ *       - get rid of g_main_loop (bug 555436#c32)
  */
 
 #include <config.h>
@@ -1248,15 +1249,23 @@ g_vfs_dns_sd_resolver_resolve_sync (GVfsDnsSdResolver  *resolver,
 
   g_return_val_if_fail (G_VFS_IS_DNS_SD_RESOLVER (resolver), FALSE);
 
+  /* TODO: get rid of this nested mainloop, port to avahi mainloop instead  */
+  /*       see http://bugzilla.gnome.org/show_bug.cgi?id=555436#c32 */
+
   data = g_new0 (ResolveDataSync, 1);
-  data->loop = g_main_loop_new (NULL, FALSE);
+  /* mark the main loop as running to have an indication
+     whether g_main_loop_quit() was called before g_main_loop_run() */
+  data->loop = g_main_loop_new (NULL, TRUE);
 
   g_vfs_dns_sd_resolver_resolve (resolver,
                                  cancellable,
                                  (GAsyncReadyCallback) resolve_sync_cb,
                                  data);
 
-  g_main_loop_run (data->loop);
+  /* start main loop only if wasn't quit before
+     (i.e. in case when pulling record from cache) */
+  if (g_main_loop_is_running (data->loop))
+    g_main_loop_run (data->loop);
 
   ret = data->ret;
   if (data->error != NULL)
