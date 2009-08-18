@@ -74,6 +74,8 @@
 #define USE_PTY 1
 #endif
 
+#define SFTP_READ_TIMEOUT 40   /* seconds */
+
 static GQuark id_q;
 
 typedef enum {
@@ -598,7 +600,7 @@ wait_for_reply (GVfsBackend *backend, int stdout_fd, GError **error)
   FD_ZERO (&ifds);
   FD_SET (stdout_fd, &ifds);
   
-  tv.tv_sec = 20;
+  tv.tv_sec = SFTP_READ_TIMEOUT;
   tv.tv_usec = 0;
       
   ret = select (stdout_fd+1, &ifds, NULL, NULL, &tv);
@@ -859,7 +861,7 @@ handle_login (GVfsBackend *backend,
       FD_SET (stdout_fd, &ifds);
       FD_SET (prompt_fd, &ifds);
       
-      tv.tv_sec = 20;
+      tv.tv_sec = SFTP_READ_TIMEOUT;
       tv.tv_usec = 0;
       
       ret = select (MAX (stdout_fd, prompt_fd)+1, &ifds, NULL, NULL, &tv);
