@@ -110,7 +110,8 @@ g_daemon_mount_get_root (GMount *mount)
 {
   GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
 
-  return g_daemon_file_new (daemon_mount->mount_info->mount_spec, "/");
+  return g_daemon_file_new (daemon_mount->mount_info->mount_spec, 
+        daemon_mount->mount_info->mount_spec->mount_prefix);
 }
 
 static GIcon *
