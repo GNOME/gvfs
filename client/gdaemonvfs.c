@@ -386,7 +386,6 @@ convert_fuse_path (GVfs     *vfs,
       if (mount_info)
 	{
 	  g_object_unref (file);
-	  /* TODO: Do we need to look at the prefix of the mount_spec? */
 	  file = g_daemon_file_new (mount_info->mount_spec, mount_path);
 	  g_free (mount_path);
 	  g_mount_info_unref (mount_info);
@@ -993,6 +992,7 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
   DBusMessageIter iter;
   DBusError derror;
   int len;
+  const char *mount_path_end;
 	
   info = lookup_mount_info_by_fuse_path_in_cache (fuse_path,
 						  mount_path);
@@ -1031,9 +1031,12 @@ _g_daemon_vfs_get_mount_info_by_fuse_sync (const char *fuse_path,
 	{
 	  len = strlen (info->fuse_mountpoint);
 	  if (fuse_path[len] == 0)
-	    *mount_path = g_strdup ("/");
+	    mount_path_end = "/";
 	  else
-	    *mount_path = g_strdup (fuse_path + len);
+	    mount_path_end = fuse_path + len;
+
+	  *mount_path = g_build_filename (info->mount_spec->mount_prefix,
+					  mount_path_end, NULL);
 	}
       else
 	{
