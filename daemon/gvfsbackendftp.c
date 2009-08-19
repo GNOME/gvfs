@@ -926,6 +926,7 @@ do_enumerate (GVfsBackend *backend,
                                          dir,
                                          TRUE,
                                          query_flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS ? FALSE : TRUE);
+  g_vfs_ftp_file_free (dir);
   if (g_vfs_ftp_task_is_in_error (&task))
     {
       g_assert (list == NULL);
@@ -949,7 +950,6 @@ do_enumerate (GVfsBackend *backend,
   g_vfs_job_enumerate_done (job);
 
   g_list_free (list);
-  g_vfs_ftp_file_free (dir);
 }
 
 static void
