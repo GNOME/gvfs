@@ -723,12 +723,14 @@ do_read (GVfsBackend *backend,
   ssize_t res;
   smbc_read_fn smbc_read;
 
-  /* For some reason requests of 65536 bytes broke for me (returned 0)
-   * Maybe some smb protocol limit
+  /* libsmbclient limits blocksize to (64*1024)-2 for Windows servers,
+   * let's do the same here to achieve reasonable performance. (#588391)
+   *
+   * TODO: port to pull mechanism (#592468)
    */
-  if (bytes_requested > 65535)
-    bytes_requested = 65535;
-  
+  if (bytes_requested > 65534)
+    bytes_requested = 65534;
+
   smbc_read = smbc_getFunctionRead (op_backend->smb_context);
   res = smbc_read (op_backend->smb_context, (SMBCFILE *)handle, buffer, bytes_requested);
 
@@ -738,7 +740,6 @@ do_read (GVfsBackend *backend,
     {
       g_vfs_job_read_set_size (job, res);
       g_vfs_job_succeeded (G_VFS_JOB (job));
-	    
     }
 }
 
