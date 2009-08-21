@@ -59,6 +59,7 @@
 #include "gvfsjobqueryfsinfo.h"
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
+#include "gvfsjobmakedirectory.h"
 #include "gvfsdaemonprotocol.h"
 #include "gvfskeyring.h"
 #include "sftp.h"
@@ -4344,6 +4345,27 @@ try_make_symlink (GVfsBackend *backend,
 }
 
 static void
+mkdir_stat_reply (GVfsBackendSftp *backend,
+                  int reply_type,
+                  GDataInputStream *reply,
+                  guint32 len,
+                  GVfsJob *job,
+                  gpointer user_data)
+{
+  if (reply_type == SSH_FXP_STATUS)
+    /* We got some error, but lets report the original FAILURE, as
+       these extra errors are not really mkdir errors, we just wanted
+       to implement EEXISTS */
+    result_from_status_code (job, SSH_FX_FAILURE, -1, -1);
+  else if (reply_type != SSH_FXP_ATTRS)
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
+                      _("Invalid reply received"));
+  else
+    g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_EXISTS,
+                      _("Target file exists"));
+}
+
+static void
 make_directory_reply (GVfsBackendSftp *backend,
                       int reply_type,
                       GDataInputStream *reply,
@@ -4352,7 +4374,23 @@ make_directory_reply (GVfsBackendSftp *backend,
                       gpointer user_data)
 {
   if (reply_type == SSH_FXP_STATUS)
-    result_from_status (job, reply, -1, -1); 
+    {
+      gint stat_error;
+
+      stat_error = read_status_code (reply);
+      if (stat_error == SSH_FX_FAILURE)
+        {
+          /* Generic SFTP error, let's stat the target */
+          GDataOutputStream *command;
+
+          command = new_command_stream (backend,
+                                        SSH_FXP_LSTAT);
+          put_string (command, G_VFS_JOB_MAKE_DIRECTORY (job)->filename);
+          queue_command_stream_and_free (backend, command, mkdir_stat_reply, G_VFS_JOB (job), NULL);
+        }
+      else
+        result_from_status_code (job, stat_error, -1, -1);
+    }
   else
     g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
                       _("Invalid reply received"));
@@ -4371,7 +4409,7 @@ try_make_directory (GVfsBackend *backend,
   put_string (command, filename);
   /* No file info - flag 0 */
   g_data_output_stream_put_uint32 (command, 0, NULL, NULL);
-  
+
   queue_command_stream_and_free (op_backend, command, make_directory_reply, G_VFS_JOB (job), NULL);
 
   return TRUE;
