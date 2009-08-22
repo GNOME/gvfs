@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-21 12:39+0300\n"
-"PO-Revision-Date: 2009-08-21 12:38+0300\n"
+"POT-Creation-Date: 2009-08-22 17:07+0300\n"
+"PO-Revision-Date: 2009-08-22 17:00+0300\n"
 "Last-Translator: Alexander Shopov <ash@contact.bg>\n"
 "Language-Team: Bulgarian <dict@fsa-bg.org>\n"
 "MIME-Version: 1.0\n"
@@ -294,8 +294,8 @@ msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
-"Дялът е зает\n"
-"Една или повече програми не са освободили дяла."
+"Файловата система е заета\n"
+"Една или повече програми не са я освободили."
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -556,7 +556,7 @@ msgstr "Файлът не може да бъде изваден"
 
 #: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
 msgid "Can't start file"
-msgstr "Файлът не може да бъде пуснат"
+msgstr "Файлът не може да бъде стартиран"
 
 #: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
 msgid "Can't stop file"
@@ -1365,7 +1365,7 @@ msgstr "Демон на GVFS за метаданни"
 
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
-msgstr "Датчик за дялове на GVfs"
+msgstr "Датчик за файлови системи на GVfs"
 
 #: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
@@ -1384,8 +1384,8 @@ msgstr "Устройство без име"
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
-"Неуспех при изваждането на носител. Поне един от томовете на носителя са "
-"заети."
+"Неуспех при изваждането на носител. Поне една от файловите системи на "
+"носителя са заети."
 
 #: ../monitor/gdu/ggdudrive.c:1003
 msgid ""
@@ -1393,14 +1393,14 @@ msgid ""
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
-"Да се пусне ли устройството във влошен режим?\n"
+"Да се стартира ли устройството във влошен режим?\n"
 "Работата в такъв режим означава, че устройството повече няма да се справя с "
 "грешките. Данните върху него ще бъдат безвъзвратно загубени, ако някой "
 "компонент се повреди."
 
 #: ../monitor/gdu/ggdudrive.c:1009
 msgid "Start Anyway"
-msgstr "Пускане въпреки всичко"
+msgstr "Стартиране въпреки всичко"
 
 #: ../monitor/gdu/ggdumount.c:817
 msgid "One or more programs are preventing the unmount operation."
@@ -1429,7 +1429,7 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
-"Въведете парола, за да отключите дяла\n"
+"Въведете парола, за да отключите файловата система\n"
 "Устройството „%s“ съдържа шифрирани данни на дял %d."
 
 #: ../monitor/gdu/ggduvolume.c:1029
@@ -1438,7 +1438,7 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
-"Въведете парола, за да отключите дяла\n"
+"Въведете парола, за да отключите файловата система\n"
 "Устройството „%s“ съдържа шифрирани данни."
 
 #: ../monitor/gdu/ggduvolume.c:1036
@@ -1447,7 +1447,7 @@ msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
-"Въведете парола, за да отключите дяла\n"
+"Въведете парола, за да отключите файловата система\n"
 "Устройството %s съдържа шифрирани данни."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
