@@ -1,3 +1,17 @@
+Major changes in 1.3.5
+======================
+
+* Properly translate gvfs-* programs
+* Implement support for g_cancellable_release_fd
+* sftp: Handle existing file on mkdir
+* smb: Better performance when reading files
+* ftp: Fix memory leaks
+* Make dav mounts work be accessible with fuse (#590730,#590862)
+* metadata: Fix memory leaks in daemon
+* metadata: Fix rare write error on journal wrapover
+* gphoto: Handle removal of camera with multiple storage heads
+* hal: Fix crash for volumes with no HAL UDI
+
 Major changes in 1.3.4
 ======================
 
