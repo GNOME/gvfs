@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -24,14 +24,17 @@
 
 #include <glib.h>
 #include <locale.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 
+static gboolean force = FALSE;
 
-static GOptionEntry entries[] = 
+static GOptionEntry entries[] =
 {
-	{ NULL }
+  {"force", 'f', 0, G_OPTION_ARG_NONE, &force,
+   N_("ignore nonexistent files, never prompt"), NULL},
+  { NULL }
 };
-
 
 int
 main (int argc, char *argv[])
@@ -39,27 +42,29 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
-  
+
   setlocale (LC_ALL, "");
 
   g_type_init ();
-  
+
   error = NULL;
-  context = g_option_context_new ("- move files to trash");
+  context = g_option_context_new (_("- move files to trash"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
-  
+
   if (argc > 1)
     {
       int i;
-      
+
       for (i = 1; i < argc; i++) {
 	file = g_file_new_for_commandline_arg (argv[i]);
 	error = NULL;
 	if (!g_file_trash (file, NULL, &error))
 	  {
-	    g_print ("Error trashing file: %s\n", error->message);
+	    if (!force ||
+		!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+	      g_printerr (_("Error trashing file: %s\n"), error->message);
 	    g_error_free (error);
 	  }
 	g_object_unref (file);
