@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2008 Christian Kellner <gicmo@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -24,9 +24,10 @@
 
 #include <glib.h>
 #include <locale.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 
-static GOptionEntry entries[] = 
+static GOptionEntry entries[] =
 {
   { NULL }
 };
@@ -45,7 +46,7 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new ("- rename file");
+  context = g_option_context_new (_("- rename file"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
@@ -53,24 +54,24 @@ main (int argc, char *argv[])
   if (argc < 3)
     {
       g_printerr ("Usage: %s location new_name\n",
-                  g_get_prgname ());
+		  g_get_prgname ());
       return 1;
     }
 
   file = g_file_new_for_commandline_arg (argv[1]);
 
   new_file = g_file_set_display_name (file, argv[2],
-                                      NULL, &error);
+				      NULL, &error);
 
   if (new_file == NULL)
     {
-      g_print ("Error: %s\n", error->message);
+      g_printerr (_("Error: %s\n"), error->message);
       g_error_free (error);
     }
   else
     {
       char *uri = g_file_get_uri (new_file);
-      g_print ("Rename successful. New uri: %s\n", uri);
+      g_print (_("Rename successful. New uri: %s\n"), uri);
       g_object_unref (new_file);
       g_free (uri);
     }

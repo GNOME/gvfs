@@ -97,8 +97,12 @@ programs/gvfs-copy.c
 programs/gvfs-info.c
 programs/gvfs-ls.c
 programs/gvfs-mkdir.c
+programs/gvfs-mount.c
 programs/gvfs-move.c
 programs/gvfs-open.c
+programs/gvfs-rename.c
+programs/gvfs-rm.c
 programs/gvfs-save.c
 programs/gvfs-set-attribute.c
+programs/gvfs-trash.c
 programs/gvfs-tree.c

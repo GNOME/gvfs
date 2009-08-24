@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -39,15 +39,15 @@ static gboolean backup = FALSE;
 static gboolean preserve = FALSE;
 static gboolean no_target_directory = FALSE;
 
-static GOptionEntry entries[] = 
+static GOptionEntry entries[] =
 {
-	{ "no-target-directory", 'T', 0, G_OPTION_ARG_NONE, &no_target_directory, "no target directory", NULL },
-	{ "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, "show progress", NULL },
-	{ "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, "prompt before overwrite", NULL },
-	{ "preserve", 'p', 0, G_OPTION_ARG_NONE, &preserve, "preserve all attributes", NULL },
-	{ "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, "backup existing destination files", NULL },
-	{ "no-dereference", 'P', 0, G_OPTION_ARG_NONE, &no_dereference, "never follow symbolic links", NULL },
-	{ NULL }
+  { "no-target-directory", 'T', 0, G_OPTION_ARG_NONE, &no_target_directory, N_("no target directory"), NULL },
+  { "progress", 'p', 0, G_OPTION_ARG_NONE, &progress, N_("show progress"), NULL },
+  { "interactive", 'i', 0, G_OPTION_ARG_NONE, &interactive, N_("prompt before overwrite"), NULL },
+  { "preserve", 'p', 0, G_OPTION_ARG_NONE, &preserve, N_("preserve all attributes"), NULL },
+  { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("backup existing destination files"), NULL },
+  { "no-dereference", 'P', 0, G_OPTION_ARG_NONE, &no_dereference, N_("never follow symbolic links"), NULL },
+  { NULL }
 };
 
 static gboolean
@@ -55,7 +55,7 @@ is_dir (GFile *file)
 {
   GFileInfo *info;
   gboolean res;
-  
+
   info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE, 0, NULL, NULL);
   res = info && g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
   if (info)
@@ -75,7 +75,8 @@ show_progress (goffset current_num_bytes,
   g_get_current_time (&tv);
 
   size = g_format_size_for_display (current_num_bytes / MAX (tv.tv_sec - start_time.tv_sec, 1));
-  g_print ("progress %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT" (%s/s)\n",
+  g_print (_("progress"));
+  g_print (" %"G_GINT64_FORMAT"/%"G_GINT64_FORMAT" (%s/s)\n",
 	   current_num_bytes, total_num_bytes, size);
   g_free (size);
 }
@@ -91,23 +92,23 @@ main (int argc, char *argv[])
   char *basename;
   int i;
   GFileCopyFlags flags;
-  
+
   setlocale (LC_ALL, "");
 
   g_type_init ();
-  
+
   error = NULL;
-  context = g_option_context_new ("- output files at <location>");
+  context = g_option_context_new (_("- output files at <location>"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
-  
+
   if (error != NULL)
     {
-      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
-                  g_get_prgname ());
+		  g_get_prgname ());
       g_printerr ("\n");
       g_error_free(error);
       return 1;
@@ -115,7 +116,7 @@ main (int argc, char *argv[])
 
   if (argc <= 2)
     {
-      g_printerr ("Missing operand\n");
+      g_printerr (_("Missing operand\n"));
       return 1;
     }
 
@@ -123,16 +124,16 @@ main (int argc, char *argv[])
 
   if (no_target_directory && argc > 3)
     {
-      g_printerr ("Too many arguments\n");
+      g_printerr (_("Too many arguments\n"));
       g_object_unref (dest);
       return 1;
     }
-  
+
   dest_is_dir = is_dir (dest);
 
   if (!dest_is_dir && argc > 3)
     {
-      g_printerr ("Target %s is not a directory\n", argv[argc-1]);
+      g_printerr (_("Target %s is not a directory\n"), argv[argc-1]);
       g_object_unref (dest);
       return 1;
     }
@@ -159,8 +160,8 @@ main (int argc, char *argv[])
 	flags |= G_FILE_COPY_NOFOLLOW_SYMLINKS;
       if (preserve)
 	flags |= G_FILE_COPY_ALL_METADATA;
-	
-	
+
+
       error = NULL;
       g_get_current_time (&start_time);
       if (!g_file_copy (source, target, flags, NULL, progress?show_progress:NULL, NULL, &error))
@@ -168,12 +169,12 @@ main (int argc, char *argv[])
 	  if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
 	    {
 	      char line[16];
-	      
+
 	      g_error_free (error);
 	      error = NULL;
 
 	      basename = g_file_get_basename (target);
-	      g_print ("overwrite %s?", basename);
+	      g_print (_("overwrite %s?"), basename);
 	      g_free (basename);
 
 	      if (fgets(line, sizeof (line), stdin) &&
@@ -187,7 +188,7 @@ main (int argc, char *argv[])
 	  else
 	    {
 	    copy_failed:
-	      g_printerr ("Error copying file %s: %s\n", argv[i], error->message);
+	      g_printerr (_("Error copying file %s: %s\n"), argv[i], error->message);
 	      g_error_free (error);
 	    }
 	}

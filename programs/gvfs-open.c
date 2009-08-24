@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@
 static gchar **locations = NULL;
 
 static GOptionEntry entries[] = {
-  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, "files", NULL},
+  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, N_("files"), NULL},
   {NULL}
 };
 
@@ -63,7 +63,7 @@ open (GFile *file, char *arg_string)
       /* Translators: the first %s is the program name, the second one  */
       /* is the URI of the file, the third is the error message.        */
       g_printerr (_("%s: %s: error opening location: %s\n"),
-                  g_get_prgname (), g_file_get_uri (file), error->message);
+		  g_get_prgname (), g_file_get_uri (file), error->message);
       g_error_free (error);
       return;
     }
@@ -84,7 +84,7 @@ open (GFile *file, char *arg_string)
       res = g_app_info_launch_uris (app, &l,
 				    NULL, &error);
     }
-  
+
   if (!res)
     {
       /* Translators: the first %s is the program name, the second one  */
@@ -93,7 +93,7 @@ open (GFile *file, char *arg_string)
 		  g_get_prgname (), g_file_get_uri (file), error->message);
 	  g_error_free (error);
     }
-  
+
   g_object_unref (app);
 
   return;
@@ -132,13 +132,13 @@ main (int argc, char *argv[])
   g_option_context_parse (context, &argc, &argv, &error);
 
   g_option_context_free (context);
-  
+
   if (error != NULL)
     {
-      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
-                  g_get_prgname ());
+		  g_get_prgname ());
       g_printerr ("\n");
       g_error_free(error);
       return 1;
@@ -151,7 +151,7 @@ main (int argc, char *argv[])
       g_printerr (_("%s: missing locations"), g_get_prgname ());
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
-                  g_get_prgname ());
+		  g_get_prgname ());
       g_printerr ("\n");
       return 1;
     }

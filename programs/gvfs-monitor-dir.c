@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -73,7 +73,7 @@ dir_monitor_callback (GFileMonitor* monitor,
       g_print ("Event = ATTRIB CHANGED\n");
       break;
     }
-  
+
   return TRUE;
 }
 
@@ -84,17 +84,17 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
-  
+
   setlocale (LC_ALL, "");
-  
+
   g_type_init ();
-  
+
   error = NULL;
   context = g_option_context_new ("- monitor directory <location>");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
-  
+
   if (argc > 1)
     {
       file = g_file_new_for_commandline_arg (argv[1]);
@@ -107,10 +107,10 @@ main (int argc, char *argv[])
 	  return 1;
 	}
     }
-  
+
   main_loop = g_main_loop_new (NULL, FALSE);
-  
+
   g_main_loop_run (main_loop);
-  
+
   return 0;
 }

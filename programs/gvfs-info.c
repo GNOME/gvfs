@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -32,13 +32,13 @@ static gboolean nofollow_symlinks = FALSE;
 static gboolean filesystem = FALSE;
 static gboolean writable = FALSE;
 
-static GOptionEntry entries[] = 
+static GOptionEntry entries[] =
 {
-	{ "query-writable", 'w', 0, G_OPTION_ARG_NONE, &writable, "List writable attributes", NULL },
-	{ "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, "Get filesystem info", NULL },
-	{ "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, "The attributes to get", NULL },
-	{ "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, "Don't follow symlinks", NULL },
-	{ NULL }
+  { "query-writable", 'w', 0, G_OPTION_ARG_NONE, &writable, N_("List writable attributes"), NULL },
+  { "filesystem", 'f', 0, G_OPTION_ARG_NONE, &filesystem, N_("Get filesystem info"), NULL },
+  { "attributes", 'a', 0, G_OPTION_ARG_STRING, &attributes, N_("The attributes to get"), NULL },
+  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symlinks"), NULL },
+  { NULL }
 };
 
 static const char *
@@ -47,28 +47,28 @@ type_to_string (GFileType type)
   switch (type)
     {
     default:
-      return "invalid type";
-      
+      return _("invalid type");
+
     case G_FILE_TYPE_UNKNOWN:
-      return "unknown";
-      
+      return _("unknown");
+
     case G_FILE_TYPE_REGULAR:
-      return "regular";
-      
+      return _("regular");
+
     case G_FILE_TYPE_DIRECTORY:
-      return "directory";
-      
+      return _("directory");
+
     case G_FILE_TYPE_SYMBOLIC_LINK:
-      return "symlink";
+      return _("symlink");
 
     case G_FILE_TYPE_SPECIAL:
-      return "special";
+      return _("special");
 
     case G_FILE_TYPE_SHORTCUT:
-      return "shortcut";
+      return _("shortcut");
 
     case G_FILE_TYPE_MOUNTABLE:
-      return "mountable";
+      return _("mountable");
     }
 }
 
@@ -78,7 +78,7 @@ escape_string (const char *in)
   GString *str;
   static char *hex_digits = "0123456789abcdef";
   char c;
-  
+
 
   str = g_string_new ("");
 
@@ -103,42 +103,42 @@ show_attributes (GFileInfo *info)
   char **attributes;
   char *s;
   int i;
-  
+
   attributes = g_file_info_list_attributes (info, NULL);
-  
-  g_print ("attributes:\n");
+
+  g_print (_("attributes:\n"));
   for (i = 0; attributes[i] != NULL; i++)
     {
       /* list the icons in order rather than displaying "GThemedIcon:0x8df7200" */
       if (strcmp (attributes[i], "standard::icon") == 0)
-        {
-          GIcon *icon;
-          int j;
-          const char * const *names = NULL;
-          icon = g_file_info_get_icon (info);
+	{
+	  GIcon *icon;
+	  int j;
+	  const char * const *names = NULL;
+	  icon = g_file_info_get_icon (info);
 
-          /* only look up names if GThemedIcon */
-          if (G_IS_THEMED_ICON(icon))
-            {
+	  /* only look up names if GThemedIcon */
+	  if (G_IS_THEMED_ICON(icon))
+	    {
 	      names = g_themed_icon_get_names (G_THEMED_ICON (icon));
 	      g_print ("  %s: ", attributes[i]);
-              for (j = 0; names[j] != NULL; j++)
+	      for (j = 0; names[j] != NULL; j++)
 		g_print ("%s%s", names[j], (names[j+1] == NULL)?"":", ");
 	      g_print ("\n");
-            }
-          else
-            {
-              s = g_file_info_get_attribute_as_string (info, attributes[i]);
-              g_print ("  %s: %s\n", attributes[i], s);
-              g_free (s);
-            }
-        }
+	    }
+	  else
+	    {
+	      s = g_file_info_get_attribute_as_string (info, attributes[i]);
+	      g_print ("  %s: %s\n", attributes[i], s);
+	      g_free (s);
+	    }
+	}
       else
-        {
-          s = g_file_info_get_attribute_as_string (info, attributes[i]);
-          g_print ("  %s: %s\n", attributes[i], s);
-          g_free (s);
-        }
+	{
+	  s = g_file_info_get_attribute_as_string (info, attributes[i]);
+	  g_print ("  %s: %s\n", attributes[i], s);
+	  g_free (s);
+	}
     }
   g_strfreev (attributes);
 }
@@ -152,34 +152,35 @@ show_info (GFileInfo *info)
 
   name = g_file_info_get_display_name (info);
   if (name)
-    g_print ("display name: %s\n", name);
+    g_print (_("display name: %s\n"), name);
 
   name = g_file_info_get_edit_name (info);
   if (name)
-    g_print ("edit name: %s\n", name);
+    g_print (_("edit name: %s\n"), name);
 
   name = g_file_info_get_name (info);
   if (name)
     {
       escaped = escape_string (name);
-      g_print ("name: %s\n", escaped);
+      g_print (_("name: %s\n"), escaped);
       g_free (escaped);
     }
 
   if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_TYPE))
     {
       type = type_to_string (g_file_info_get_file_type (info));
-      g_print ("type: %s\n", type);
+      g_print (_("type: %s\n"), type);
     }
 
   if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE))
     {
       size = g_file_info_get_size (info);
-      g_print ("size: %"G_GUINT64_FORMAT"\n", (guint64)size);
+      g_print (_("size: "));
+      g_print (" %"G_GUINT64_FORMAT"\n", (guint64)size);
     }
 
   if (g_file_info_get_is_hidden (info))
-    g_print ("hidden\n");
+    g_print (_("hidden\n"));
 
   show_attributes (info);
 }
@@ -200,7 +201,7 @@ query_info (GFile *file)
   flags = 0;
   if (nofollow_symlinks)
     flags |= G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS;
-  
+
   error = NULL;
   if (filesystem)
     info = g_file_query_filesystem_info (file, attributes, NULL, &error);
@@ -262,16 +263,16 @@ attribute_flags_to_string (GFileAttributeInfoFlags flags)
   } flag_descr[] = {
     {
       G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE,
-      "Copy with file"
+      N_("Copy with file")
     },
     {
       G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED,
-      "Keep with file when moved"
+      N_("Keep with file when moved")
     }
   };
 
   first = TRUE;
-  
+
   s = g_string_new ("");
   for (i = 0; i < G_N_ELEMENTS (flag_descr); i++)
     {
@@ -279,7 +280,7 @@ attribute_flags_to_string (GFileAttributeInfoFlags flags)
 	{
 	  if (!first)
 	    g_string_append (s, ", ");
-	  g_string_append (s, flag_descr[i].descr);
+	  g_string_append (s, gettext (flag_descr[i].descr));
 	  first = FALSE;
 	}
     }
@@ -303,12 +304,12 @@ get_writable_info (GFile *file)
   list = g_file_query_settable_attributes (file, NULL, &error);
   if (list == NULL)
     {
-      g_printerr ("Error getting writable attributes: %s\n", error->message);
+      g_printerr (_("Error getting writable attributes: %s\n"), error->message);
       g_error_free (error);
       return;
     }
 
-  g_print ("Settable attributes:\n");
+  g_print (_("Settable attributes:\n"));
   for (i = 0; i < list->n_infos; i++)
     {
       flags = attribute_flags_to_string (list->infos[i].flags);
@@ -320,7 +321,7 @@ get_writable_info (GFile *file)
     }
 
   g_file_attribute_info_list_unref (list);
-  
+
   list = g_file_query_writable_namespaces (file, NULL, &error);
   if (list == NULL)
     {
@@ -331,7 +332,7 @@ get_writable_info (GFile *file)
 
   if (list->n_infos > 0)
     {
-      g_print ("Writable attribute namespaces:\n");
+      g_print (_("Writable attribute namespaces:\n"));
       for (i = 0; i < list->n_infos; i++)
 	{
 	  flags = attribute_flags_to_string (list->infos[i].flags);
@@ -341,7 +342,7 @@ get_writable_info (GFile *file)
 		   (*flags != 0)?", ":"", flags);
 	}
     }
-  
+
   g_file_attribute_info_list_unref (list);
 }
 
@@ -352,32 +353,32 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
-  
+
   setlocale (LC_ALL, "");
 
   g_type_init ();
-  
+
   error = NULL;
-  context = g_option_context_new ("- show info for <location>");
+  context = g_option_context_new (_("- show info for <location>"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
-  
+
   if (error != NULL)
     {
-      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
-                  g_get_prgname ());
+		  g_get_prgname ());
       g_printerr ("\n");
       g_error_free(error);
       return 1;
     }
- 
+
   if (argc > 1)
     {
       int i;
-      
+
       for (i = 1; i < argc; i++) {
 	file = g_file_new_for_commandline_arg (argv[i]);
 	if (writable)

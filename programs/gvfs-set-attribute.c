@@ -33,8 +33,8 @@ static gboolean nofollow_symlinks = FALSE;
 
 static GOptionEntry entries[] =
 {
-	{ "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv]", NULL },
-	{ "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, "Don't follow symlinks", NULL },
+  { "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, N_("attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, stringv]"), NULL },
+  { "nofollow-symlinks", 'n', 0, G_OPTION_ARG_NONE, &nofollow_symlinks, N_("Don't follow symlinks"), NULL },
 	{ NULL }
 };
 
@@ -116,14 +116,14 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (" <location> <attribute> <values> - set attribute");
+  context = g_option_context_new (_(" <location> <attribute> <values> - set attribute"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
 
   if (error != NULL)
     {
-      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
 		  g_get_prgname ());

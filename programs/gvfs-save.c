@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- * 
+ *
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -38,15 +38,15 @@ static gboolean append = FALSE;
 static gboolean priv = FALSE;
 static gboolean print_etag = FALSE;
 
-static GOptionEntry entries[] = 
+static GOptionEntry entries[] =
 {
-	{ "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, "Create backup", NULL },
-	{ "create", 'c', 0, G_OPTION_ARG_NONE, &create, "Only create if not existing", NULL },
-	{ "append", 'a', 0, G_OPTION_ARG_NONE, &append, "Append to end of file", NULL },
-	{ "private", 'p', 0, G_OPTION_ARG_NONE, &priv, "When creating a file, restrict access to the current user only", NULL },
-	{ "print_etag", 'v', 0, G_OPTION_ARG_NONE, &print_etag, "Print new etag at end", NULL },
-	{ "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, "The etag of the file being overwritten", NULL },
-	{ NULL }
+  { "backup", 'b', 0, G_OPTION_ARG_NONE, &backup, N_("Create backup"), NULL },
+  { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Only create if not existing"), NULL },
+  { "append", 'a', 0, G_OPTION_ARG_NONE, &append, N_("Append to end of file"), NULL },
+  { "private", 'p', 0, G_OPTION_ARG_NONE, &priv, N_("When creating a file, restrict access to the current user only"), NULL },
+  { "print_etag", 'v', 0, G_OPTION_ARG_NONE, &print_etag, N_("Print new etag at end"), NULL },
+  { "etag", 'e', 0, G_OPTION_ARG_STRING, &etag, N_("The etag of the file being overwritten"), NULL },
+  { NULL }
 };
 
 static gboolean
@@ -73,20 +73,20 @@ save (GFile *file)
     out = (GOutputStream *)g_file_replace  (file, etag, backup, flags, NULL, &error);
   if (out == NULL)
     {
-      g_printerr ("Error opening file: %s\n", error->message);
+      g_printerr (_("Error opening file: %s\n"), error->message);
       g_error_free (error);
       return FALSE;
     }
-  
+
   save_res = TRUE;
-  
+
   while (1)
     {
       res = read (STDIN_FILENO, buffer, 1024);
       if (res > 0)
 	{
 	  ssize_t written;
-	  
+
 	  p = buffer;
 	  while (res > 0)
 	    {
@@ -106,7 +106,7 @@ save (GFile *file)
       else if (res < 0)
 	{
 	  save_res = FALSE;
-	  perror ("Error reading stdin");
+	  perror (_("Error reading stdin"));
 	  break;
 	}
       else if (res == 0)
@@ -114,12 +114,12 @@ save (GFile *file)
     }
 
  out:
-  
+
   close_res = g_output_stream_close (out, NULL, &error);
   if (!close_res)
     {
       save_res = FALSE;
-      g_printerr ("Error closing: %s\n", error->message);
+      g_printerr (_("Error closing: %s\n"), error->message);
       g_error_free (error);
     }
 
@@ -131,12 +131,12 @@ save (GFile *file)
       if (etag)
 	g_print ("Etag: %s\n", etag);
       else
-	g_print ("Etag not available\n");
+	g_print (_("Etag not available\n"));
       g_free (etag);
     }
-  
+
   g_object_unref (out);
-  
+
   return save_res;
 }
 
@@ -147,30 +147,30 @@ main (int argc, char *argv[])
   GOptionContext *context;
   GFile *file;
   gboolean res;
-  
+
   setlocale (LC_ALL, "");
 
   g_type_init ();
-  
+
   error = NULL;
-  context = g_option_context_new ("- output files at <location>");
+  context = g_option_context_new (_("- output files at <location>"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
-  
+
   if (error != NULL)
     {
-      g_printerr ("Error parsing commandline options: %s\n", error->message);
+      g_printerr (_("Error parsing commandline options: %s\n"), error->message);
       g_printerr ("\n");
       g_printerr (_("Try \"%s --help\" for more information."),
-                  g_get_prgname ());
+		  g_get_prgname ());
       g_printerr ("\n");
       g_error_free(error);
       return 1;
     }
 
   res = FALSE;
-  
+
   if (argc > 1)
     {
       file = g_file_new_for_commandline_arg (argv[1]);
