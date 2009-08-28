@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-23 07:35+0900\n"
-"PO-Revision-Date: 2009-08-23 07:48+0900\n"
+"POT-Creation-Date: 2009-08-29 00:31+0900\n"
+"PO-Revision-Date: 2009-08-29 00:32+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: GNOME Korea <gnome-kr-hackers@lists.kldp.net>\n"
 "MIME-Version: 1.0\n"
@@ -194,7 +194,8 @@ msgstr "Avahi resolver를 만드는데 오류: %s"
 #: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니다 (도메인 \"%s\")"
+msgstr ""
+"\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니다 (도메인 \"%s\")"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -207,7 +208,9 @@ msgstr "\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
-msgstr "\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니다 (도메인 \"%s\"). 필요한 TXT 레코드가 없습니다. 필요한 키는: \"%s\"."
+msgstr ""
+"\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니다 (도메인 \"%s\"). 필"
+"요한 TXT 레코드가 없습니다. 필요한 키는: \"%s\"."
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -217,7 +220,8 @@ msgstr "\"%s\" 타입의 \"%s\" 서비스를 찾는데 오류가 발생했습니
 #: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "\"%s\" 타입의 \"%s\" 서비스를 찾는데 제한 시간이 초과했습니다 (도메인 \"%s\")"
+msgstr ""
+"\"%s\" 타입의 \"%s\" 서비스를 찾는데 제한 시간이 초과했습니다 (도메인 \"%s\")"
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
@@ -520,7 +524,7 @@ msgstr "파일 시스템"
 
 #: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
-msgstr "마운트 가능한 파일을 열 수 없습니다"
+msgstr "마운트 정보 파일을 열 수 없습니다"
 
 #: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1146
 #, c-format
@@ -539,7 +543,7 @@ msgstr "드라이브에 매체가 없습니다"
 #: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
 #: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
-msgstr "마운트 할 수 없는 파일"
+msgstr "마운트 정보 파일이 아닙니다"
 
 #: ../daemon/gvfsbackendcomputer.c:1055
 msgid "Can't unmount file"
@@ -919,7 +923,7 @@ msgstr "윈도 네트워크"
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
-msgstr "네트워크 위치 감시기"
+msgstr "네트워크 위치 정보"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -1162,7 +1166,7 @@ msgstr "서버에서 공유 목록을 가져오는데 실패했습니다"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
-msgstr "파일을 마운트할 수 없습니다"
+msgstr "파일이 마운트 정보가 아닙니다"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
@@ -1208,7 +1212,8 @@ msgstr "잘못된 응답"
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
-msgstr "FTP 연결을 만드는데 실패했습니다. 아마도 라우터가 지원하지 않는 것 같습니다?"
+msgstr ""
+"FTP 연결을 만드는데 실패했습니다. 아마도 라우터가 지원하지 않는 것 같습니다?"
 
 #: ../daemon/gvfsftpconnection.c:387
 msgid "Failed to create active FTP connection."
@@ -1291,9 +1296,9 @@ msgstr "%s: %s"
 
 #: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:109 ../programs/gvfs-info.c:370
+#: ../programs/gvfs-copy.c:110 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-move.c:98 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
 #: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
@@ -1323,7 +1328,7 @@ msgstr "위치가 이미 마운트되어 있습니다"
 
 #: ../daemon/mount.c:1031
 msgid "Location is not mountable"
-msgstr "위치가 마운트 가능하지 않습니다"
+msgstr "위치가 마운트 정보가 아닙니다"
 
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
@@ -1385,7 +1390,8 @@ msgid ""
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
 "드라이브를 저수준 모드로 시작할까요?\n"
-"저수준 모드로 드라이브를 시작하면 드라이브가 실패에 취약할 수 있습니다. 한 동작이 실패하면 드라이브의 데이터가 복구 불가능하도록 손상될 수 있습니다."
+"저수준 모드로 드라이브를 시작하면 드라이브가 실패에 취약할 수 있습니다. 한 동"
+"작이 실패하면 드라이브의 데이터가 복구 불가능하도록 손상될 수 있습니다."
 
 #: ../monitor/gdu/ggdudrive.c:1009
 msgid "Start Anyway"
@@ -1743,6 +1749,10 @@ msgstr "%s 미디어"
 msgid "%s Encrypted Data"
 msgstr "%s 암호화한 자료"
 
+#: ../programs/gvfs-cat.c:37
+msgid "locations"
+msgstr "위치"
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:57
@@ -1773,7 +1783,7 @@ msgstr "%s: %s:닫는 중 오류: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr "LOCATION... - 위치에 있는 파일들을 합쳐서 표준출력으로 출력합니다."
+msgstr "<위치>... - <위치>에 있는 파일들을 합쳐서 표준출력으로 출력합니다."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1796,12 +1806,298 @@ msgstr ""
 "알림: -n, -T, 등과 같은 형식 출력 옵션이 필요하면 파이프를 통해서 cat과 같이 "
 "실행하십시오."
 
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:108
+#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:96
+#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr "명령행 옵션을 파싱하는데 오류: %s\n"
+
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
 #: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: 위치를 입력하지 않았습니다"
+
+#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+msgid "no target directory"
+msgstr "대상 디렉터리가 없습니다"
+
+#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+msgid "show progress"
+msgstr "진행률 표시"
+
+#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+msgid "prompt before overwrite"
+msgstr "덮어 쓰기 전에 확인 질문"
+
+#: ../programs/gvfs-copy.c:47
+msgid "preserve all attributes"
+msgstr "모든 속성 유지"
+
+#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+msgid "backup existing destination files"
+msgstr "기존에 있던 대상 파일 백업"
+
+#: ../programs/gvfs-copy.c:49
+msgid "never follow symbolic links"
+msgstr "심볼릭 링크 따라가지 않음"
+
+#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#, c-format
+msgid "progress"
+msgstr "진행"
+
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
+#: ../programs/gvfs-save.c:156
+msgid "- output files at <location>"
+msgstr "- <위치>에 파일을 출력합니다"
+
+#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
+#, c-format
+msgid "Missing operand\n"
+msgstr "피연산자가 빠졌습니다\n"
+
+#: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
+#, c-format
+msgid "Too many arguments\n"
+msgstr "인수가 너무 많습니다\n"
+
+#: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
+#, c-format
+msgid "Target %s is not a directory\n"
+msgstr "대상 '%s'이(가) 디렉터리가 아닙니다\n"
+
+#: ../programs/gvfs-copy.c:177
+#, c-format
+msgid "overwrite %s?"
+msgstr "'%s'을(를) 덮어 쓰시겠습니까?"
+
+#: ../programs/gvfs-copy.c:191
+#, c-format
+msgid "Error copying file %s: %s\n"
+msgstr "%s 파일을 복사하는데 오류: %s\n"
+
+#: ../programs/gvfs-info.c:37
+msgid "List writable attributes"
+msgstr "쓰기 가능 속성을 열거합니다"
+
+#: ../programs/gvfs-info.c:38
+msgid "Get filesystem info"
+msgstr "파일 시스템 정보를 가져옵니다"
+
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+msgid "The attributes to get"
+msgstr "가져올 속성"
+
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-set-attribute.c:37
+msgid "Don't follow symlinks"
+msgstr "심볼릭 링크를 따라가지 않습니다"
+
+#: ../programs/gvfs-info.c:50
+msgid "invalid type"
+msgstr "잘못된 종류"
+
+#: ../programs/gvfs-info.c:53
+msgid "unknown"
+msgstr "알 수 없음"
+
+#: ../programs/gvfs-info.c:56
+msgid "regular"
+msgstr "보통"
+
+#: ../programs/gvfs-info.c:59
+msgid "directory"
+msgstr "디렉터리"
+
+#: ../programs/gvfs-info.c:62
+msgid "symlink"
+msgstr "심볼릭 링크"
+
+#: ../programs/gvfs-info.c:65
+msgid "special"
+msgstr "특수"
+
+#: ../programs/gvfs-info.c:68
+msgid "shortcut"
+msgstr "줄임"
+
+#: ../programs/gvfs-info.c:71
+msgid "mountable"
+msgstr "마운트 정보"
+
+#: ../programs/gvfs-info.c:109
+#, c-format
+msgid "attributes:\n"
+msgstr "속성:\n"
+
+#: ../programs/gvfs-info.c:155
+#, c-format
+msgid "display name: %s\n"
+msgstr "표시 이름: %s\n"
+
+#: ../programs/gvfs-info.c:159
+#, c-format
+msgid "edit name: %s\n"
+msgstr "편집 이름: %s\n"
+
+#: ../programs/gvfs-info.c:165
+#, c-format
+msgid "name: %s\n"
+msgstr "이름: %s\n"
+
+#: ../programs/gvfs-info.c:172
+#, c-format
+msgid "type: %s\n"
+msgstr "종류: %s\n"
+
+#: ../programs/gvfs-info.c:178
+#, c-format
+msgid "size: "
+msgstr "크기: "
+
+#: ../programs/gvfs-info.c:183
+#, c-format
+msgid "hidden\n"
+msgstr "숨김\n"
+
+#: ../programs/gvfs-info.c:266
+msgid "Copy with file"
+msgstr "파일 복사"
+
+#: ../programs/gvfs-info.c:270
+msgid "Keep with file when moved"
+msgstr "옮길 때 파일 유지"
+
+#: ../programs/gvfs-info.c:307
+#, c-format
+msgid "Error getting writable attributes: %s\n"
+msgstr "쓰기 가능 속성을 가져오는데 오류: %s\n"
+
+#: ../programs/gvfs-info.c:312
+#, c-format
+msgid "Settable attributes:\n"
+msgstr "설정 가능한 속성:\n"
+
+#: ../programs/gvfs-info.c:335
+#, c-format
+msgid "Writable attribute namespaces:\n"
+msgstr "쓰기 가능 속성 네임스페이스:\n"
+
+#: ../programs/gvfs-info.c:362
+msgid "- show info for <location>"
+msgstr "- <위치>에 대한 정보를 표시합니다"
+
+#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+msgid "Show hidden files"
+msgstr "숨김 파일 표시"
+
+#: ../programs/gvfs-ls.c:41
+msgid "Use a long listing format"
+msgstr "자세한 형식으로 열거합니다"
+
+#: ../programs/gvfs-ls.c:42
+msgid "Show completions"
+msgstr "완성 표시"
+
+#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-rename.c:68
+#, c-format
+msgid "Error: %s\n"
+msgstr "오류: %s\n"
+
+#: ../programs/gvfs-ls.c:383
+msgid "- list files at <location>"
+msgstr "- <위치>에 있는 파일을 열거합니다"
+
+#: ../programs/gvfs-mkdir.c:33
+msgid "create parent directories"
+msgstr "상위 디렉터리를 만듭니다"
+
+#: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
+msgid "- delete files"
+msgstr "- 파일을 삭제합니다"
+
+#: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
+#, c-format
+msgid "Error creating directory: %s\n"
+msgstr "디렉터리를 만드는데 오류: %s\n"
+
+#: ../programs/gvfs-mount.c:54
+msgid "Mount as mountable"
+msgstr "마운트 정보 파일 마운트"
+
+#: ../programs/gvfs-mount.c:55
+msgid "Mount volume with device file"
+msgstr "장치 파일로 볼륨을 마운트"
+
+#: ../programs/gvfs-mount.c:56
+msgid "Unmount"
+msgstr "마운트 해제"
+
+#: ../programs/gvfs-mount.c:57
+msgid "Unmount all mounts with the given scheme"
+msgstr "주어진 방식에 따라 마운트한 사항을 마운트 해제"
+
+#: ../programs/gvfs-mount.c:58
+msgid "List"
+msgstr "목록"
+
+#: ../programs/gvfs-mount.c:59
+msgid "Show extra information for List and Monitor"
+msgstr "목록 및 정보 보기에서 추가로 정보 표시"
+
+#: ../programs/gvfs-mount.c:60
+msgid "Monitor events"
+msgstr "이벤트 정보 보기"
+
+#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#, c-format
+msgid "Error mounting location: %s\n"
+msgstr "다음 위치를 마운트하는데 오류: %s\n"
+
+#: ../programs/gvfs-mount.c:241
+#, c-format
+msgid "Error unmounting mount: %s\n"
+msgstr "마운트 해제하는데 오류: %s\n"
+
+# FIXME: 뭔 소리
+#: ../programs/gvfs-mount.c:262
+#, c-format
+msgid "Error finding enclosing mount: %s\n"
+msgstr "둘러싸인 마운트를 찾을 수 없습니다: %s\n"
+
+#: ../programs/gvfs-mount.c:673
+#, c-format
+msgid "Error mounting %s: %s\n"
+msgstr "%s 마운트에 오류: %s\n"
+
+#: ../programs/gvfs-mount.c:687
+#, c-format
+msgid "Mounted %s at %s\n"
+msgstr "마운트 %s, 위치 %s\n"
+
+#: ../programs/gvfs-mount.c:738
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr "장치 파일 %s에 볼륨이 없습니다\n"
+
+#: ../programs/gvfs-mount.c:931
+msgid "- mount <location>"
+msgstr "- <위치>를 마운트합니다"
+
+#: ../programs/gvfs-move.c:173
+#, c-format
+msgid "Error moving file %s: %s\n"
+msgstr "%s 파일을 옮기는데 오류: %s\n"
+
+#: ../programs/gvfs-open.c:37
+msgid "files"
+msgstr "파일"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1819,7 +2115,7 @@ msgstr "%s: %s: 프로그램 실행 오류: %s\n"
 
 #: ../programs/gvfs-open.c:122
 msgid "FILES... - open FILES with registered application."
-msgstr "FILES... - 등록된 프로그램으로 파일을 엽니다."
+msgstr "<파일>... - 등록된 프로그램으로 <파일>을 엽니다."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1828,6 +2124,74 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "파일의 형식을 처리하는 등록된 기본 프로그램으로 파일을 엽니다."
+
+#: ../programs/gvfs-rename.c:49
+msgid "- rename file"
+msgstr "- 파일의 이름을 바꿉니다"
+
+#: ../programs/gvfs-rename.c:74
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr "이름 바꾸기 성공. 새 URI: %s\n"
+
+#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+msgid "ignore nonexistent files, never prompt"
+msgstr "없는 파일을 무시하고 물어보지 않습니다"
+
+#: ../programs/gvfs-save.c:43
+msgid "Create backup"
+msgstr "백업을 만듭니다"
+
+#: ../programs/gvfs-save.c:44
+msgid "Only create if not existing"
+msgstr "없을 경우에만 새로 만듭니다"
+
+#: ../programs/gvfs-save.c:45
+msgid "Append to end of file"
+msgstr "파일 뒤에 덧붙입니다"
+
+#: ../programs/gvfs-save.c:46
+msgid "When creating a file, restrict access to the current user only"
+msgstr "파일을 만들 때 현재 사용자만 접근할 수 있도록 제한합니다"
+
+#: ../programs/gvfs-save.c:47
+msgid "Print new etag at end"
+msgstr "끝에 새 etag를 표시합니다"
+
+#: ../programs/gvfs-save.c:48
+msgid "The etag of the file being overwritten"
+msgstr "파일의 etag를 덮어 씁니다"
+
+#: ../programs/gvfs-save.c:76
+#, c-format
+msgid "Error opening file: %s\n"
+msgstr "파일을 여는데 오류: %s\n"
+
+#: ../programs/gvfs-save.c:109
+msgid "Error reading stdin"
+msgstr "표준 입력을 읽는데 오류"
+
+#: ../programs/gvfs-save.c:122
+#, c-format
+msgid "Error closing: %s\n"
+msgstr "닫는데 오류: %s\n"
+
+#: ../programs/gvfs-save.c:134
+#, c-format
+msgid "Etag not available\n"
+msgstr "etag가 없습니다\n"
+
+#: ../programs/gvfs-set-attribute.c:36
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+msgstr ""
+"속성 종류 [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+
+#: ../programs/gvfs-set-attribute.c:119
+msgid " <location> <attribute> <values> - set attribute"
+msgstr " <위치> <속성> <값> - 속성을 설정합니다"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
@@ -1849,56 +2213,19 @@ msgstr "올바르지 않은 속성 종류, %s\n"
 msgid "Error setting attribute: %s\n"
 msgstr "속성을 설정하는데 오류: %s\n"
 
-#~ msgid "The query info operation is not supported"
-#~ msgstr "정보 질의 동작을 지원하지 않습니다"
+#: ../programs/gvfs-trash.c:51
+msgid "- move files to trash"
+msgstr "- 파일을 휴지통으로 옮깁니다"
 
-#~ msgid "Query info not supported on stream"
-#~ msgstr "스트림에서는 정보 질의를 지원하지 않습니다"
+#: ../programs/gvfs-trash.c:67
+#, c-format
+msgid "Error trashing file: %s\n"
+msgstr "파일을 휴지통에 버리는데 오류: %s\n"
 
-#~ msgid "broken transmission"
-#~ msgstr "전송이 깨어짐"
+#: ../programs/gvfs-tree.c:37
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "심볼릭 링크, 마운트, 줄임을 디렉터리처럼 따라갑니다"
 
-#~ msgid "Could not connect to host"
-#~ msgstr "호스트에 연결할 수 없습니다"
-
-#~ msgid "filename too long"
-#~ msgstr "파일 이름이 너무 깁니다"
-
-#~ msgid "Invalid destination filename"
-#~ msgstr "잘못된 목표 파일 이름"
-
-#~ msgid "Can't delete trash"
-#~ msgstr "휴지통은 지울 수 없습니다"
-
-#~ msgid "Can't pull trash"
-#~ msgstr "휴지통을 가져올 수 없습니다"
-
-#~ msgid "dns-sd"
-#~ msgstr "dns-sd"
-
-#~ msgid "%s (in trash)"
-#~ msgstr "(휴지통에 있는) %s"
-
-#~ msgid "Trash directory notification not supported"
-#~ msgstr "휴지통 디렉토리 알림을 지원하지 않습니다"
-
-#~ msgid "File unavailable"
-#~ msgstr "파일을 얻을 수 없습니다"
-
-#~ msgid "%.1f kB Media"
-#~ msgstr "%.1f kB 미디어"
-
-#~ msgid "%.1f MB Media"
-#~ msgstr "%.1f MB 미디어"
-
-#~ msgid "%.1f GB Media"
-#~ msgstr "%.1f GB 미디어"
-
-#~ msgid "Invalid reply from server."
-#~ msgstr "서버에서 잘못된 응답을 받았습니다."
-
-#~ msgid "Audio Disc on %s"
-#~ msgstr "%s의 음악 디스크"
-
-#~ msgid "The file does not exist"
-#~ msgstr "파일이 없습니다"
+#: ../programs/gvfs-tree.c:242
+msgid "- list contents of directories in a tree-like format"
+msgstr "- 디렉터리의 내용을 트리 형식으로 봅니다"
