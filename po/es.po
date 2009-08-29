@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-08-24 15:06+0000\n"
-"PO-Revision-Date: 2009-08-24 19:14+0200\n"
+"POT-Creation-Date: 2009-08-28 15:33+0000\n"
+"PO-Revision-Date: 2009-08-29 15:19+0200\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -1755,7 +1755,6 @@ msgid "%s Encrypted Data"
 msgstr "Datos cifrados %s"
 
 #: ../programs/gvfs-cat.c:37
-#| msgid "%s: missing locations"
 msgid "locations"
 msgstr "ubicaciones"
 
@@ -1830,7 +1829,6 @@ msgid "%s: missing locations"
 msgstr "%s: faltan ubicaciones"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-#| msgid "Not a directory"
 msgid "no target directory"
 msgstr "sin directorio de destino"
 
@@ -1847,7 +1845,6 @@ msgid "preserve all attributes"
 msgstr "conservar todos los atributos"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
-#| msgid "Backup file creation failed"
 msgid "backup existing destination files"
 msgstr "respaldar los archivos de destino existentes"
 
@@ -1863,7 +1860,7 @@ msgstr "progreso"
 #: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
 #: ../programs/gvfs-save.c:156
 msgid "- output files at <location>"
-msgstr ""
+msgstr "- mover los archivos a <location>"
 
 #: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
 #, c-format
@@ -1877,7 +1874,6 @@ msgstr "Demasiados argumentos\n"
 
 #: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
 #, c-format
-#| msgid "The file is not a directory"
 msgid "Target %s is not a directory\n"
 msgstr "El destino %s no es un directorio\n"
 
@@ -1888,7 +1884,6 @@ msgstr "¿sobreescribir %s?"
 
 #: ../programs/gvfs-copy.c:191
 #, c-format
-#| msgid "Error moving file: %s"
 msgid "Error copying file %s: %s\n"
 msgstr "Error al copiar el archivo %s: %s\n"
 
@@ -1897,7 +1892,6 @@ msgid "List writable attributes"
 msgstr "Lista de los atributos escribibles"
 
 #: ../programs/gvfs-info.c:38
-#| msgid "Filesystem"
 msgid "Get filesystem info"
 msgstr "Obtener la información del sistema de archivos"
 
@@ -1911,7 +1905,6 @@ msgid "Don't follow symlinks"
 msgstr "No seguir enlaces simbólicos"
 
 #: ../programs/gvfs-info.c:50
-#| msgid "Invalid backend type"
 msgid "invalid type"
 msgstr "tipo no válido"
 
@@ -1924,7 +1917,6 @@ msgid "regular"
 msgstr "regular"
 
 #: ../programs/gvfs-info.c:59
-#| msgid "Not a directory"
 msgid "directory"
 msgstr "directorio"
 
@@ -1941,7 +1933,6 @@ msgid "shortcut"
 msgstr "atajo"
 
 #: ../programs/gvfs-info.c:71
-#| msgid "Not a mountable file"
 msgid "mountable"
 msgstr "montable"
 
@@ -1981,7 +1972,6 @@ msgid "hidden\n"
 msgstr "oculto\n"
 
 #: ../programs/gvfs-info.c:266
-#| msgid "Error writing file"
 msgid "Copy with file"
 msgstr "Copiar con el archivo"
 
@@ -1990,25 +1980,25 @@ msgid "Keep with file when moved"
 msgstr "Mantener el archivo al moverlo"
 
 #: ../programs/gvfs-info.c:307
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error setting attribute: %s\n"
 msgid "Error getting writable attributes: %s\n"
-msgstr "Error al establecer el archivo: %s\n"
+msgstr "Error al obtener los atributos escribibles: %s\n"
 
 #: ../programs/gvfs-info.c:312
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error setting attribute: %s\n"
 msgid "Settable attributes:\n"
-msgstr "Error al establecer el archivo: %s\n"
+msgstr "Atributos configurables:\n"
 
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "Espacios de nombres de los atributos escribibles:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
-msgstr ""
+msgstr "- mostrar información para <location>"
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
@@ -2016,7 +2006,7 @@ msgstr "Mostrar archivos ocultos"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
-msgstr ""
+msgstr "Usar formato de lista larga"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
@@ -2025,7 +2015,6 @@ msgstr "Mostrar opciones de completado"
 #: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:68
 #, c-format
-#| msgid "Error: %s"
 msgid "Error: %s\n"
 msgstr "Error: %s\n"
 
@@ -2034,24 +2023,20 @@ msgid "- list files at <location>"
 msgstr "- listar los archivos en <location>"
 
 #: ../programs/gvfs-mkdir.c:33
-#, fuzzy
 #| msgid "Can't open directory"
 msgid "create parent directories"
-msgstr "No se puede abrir el directorio"
+msgstr "crear directorios padre"
 
 #: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
-#| msgid "Error deleting file"
 msgid "- delete files"
 msgstr "- borrar achivos"
 
 #: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
 #, c-format
-#| msgid "Error creating directory"
 msgid "Error creating directory: %s\n"
 msgstr "Error al crear el directorio: %s\n"
 
 #: ../programs/gvfs-mount.c:54
-#| msgid "Not a mountable file"
 msgid "Mount as mountable"
 msgstr "Montar como montable"
 
@@ -2060,7 +2045,6 @@ msgid "Mount volume with device file"
 msgstr "Montar el volumen con el archivo de dispositivo"
 
 #: ../programs/gvfs-mount.c:56
-#| msgid "Unmount Anyway"
 msgid "Unmount"
 msgstr "Desmontar"
 
@@ -2074,33 +2058,32 @@ msgstr "Lista"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Show extra information for List and Monitor"
-msgstr ""
+msgstr "Mostrar información adicional para Lista y Monitorizar"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Monitor events"
-msgstr ""
+msgstr "Monitorizar eventos"
 
 #: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s: %s: error opening location: %s\n"
 msgid "Error mounting location: %s\n"
-msgstr "%s: %s: error al abrir la ubicación: %s\n"
+msgstr "Error al montar la ubicación: %s\n"
 
 #: ../programs/gvfs-mount.c:241
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error connecting to daemon: %s"
 msgid "Error unmounting mount: %s\n"
-msgstr "Error al conectar con el demonio: %s"
+msgstr "Error al desmontar el punto de montaje: %s\n"
 
 #: ../programs/gvfs-mount.c:262
-#, fuzzy, c-format
+#, c-format
 #| msgid "Could not find enclosing mount"
 msgid "Error finding enclosing mount: %s\n"
-msgstr "No se pudo encontrar el punto de montaje adjunto"
+msgstr "Error al encontrar el montaje adjunto: %s\n"
 
 #: ../programs/gvfs-mount.c:673
 #, c-format
-#| msgid "Error moving file: %s"
 msgid "Error mounting %s: %s\n"
 msgstr "Error al montar %s: %s\n"
 
@@ -2112,16 +2095,14 @@ msgstr "%s montado en %s\n"
 #: ../programs/gvfs-mount.c:738
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr ""
+msgstr "No existe un volumen para el archivo de dispositivo %s\n"
 
 #: ../programs/gvfs-mount.c:931
-#| msgid "%s: missing locations"
 msgid "- mount <location>"
 msgstr "- montar <ubicación>"
 
 #: ../programs/gvfs-move.c:173
 #, c-format
-#| msgid "Error moving file: %s"
 msgid "Error moving file %s: %s\n"
 msgstr "Error al mover el archivo %s: %s\n"
 
@@ -2158,18 +2139,17 @@ msgstr ""
 "manejar el tipo de archivo."
 
 #: ../programs/gvfs-rename.c:49
-#| msgid "Error renaming file"
 msgid "- rename file"
 msgstr "- renombrar archivo"
 
 #: ../programs/gvfs-rename.c:74
 #, c-format
 msgid "Rename successful. New uri: %s\n"
-msgstr ""
+msgstr "Renombrado correctamente. URI nuevo: %s\n"
 
 #: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
 msgid "ignore nonexistent files, never prompt"
-msgstr ""
+msgstr "ignorar archivos existentes, nunca preguntar"
 
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
@@ -2177,56 +2157,57 @@ msgstr "Crear respaldo"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Crear sólo si no existen"
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
-msgstr ""
+msgstr "Añadir al final del archivo"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr ""
+msgstr "Al crear el archivo restringir el acceso sólo para al usuario actual"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr ""
+msgstr "Imprimir una etiqueta-e nueva al final"
 
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "La etiqueta-e"
 
 #: ../programs/gvfs-save.c:76
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error moving file: %s"
 msgid "Error opening file: %s\n"
-msgstr "Error al mover el archivo: %s"
+msgstr "Error al abrir el archivo: %s\n"
 
 #: ../programs/gvfs-save.c:109
-#, fuzzy
 #| msgid "Error renaming dir"
 msgid "Error reading stdin"
-msgstr "Error al renombrar el directorio"
+msgstr "Error al leer stdin"
 
 #: ../programs/gvfs-save.c:122
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s: %s:error closing: %s\n"
 msgid "Error closing: %s\n"
-msgstr "%s: %s:error al cerrar: %s\n"
+msgstr "Error al cerrar: %s\n"
 
 #: ../programs/gvfs-save.c:134
 #, c-format
 msgid "Etag not available\n"
-msgstr ""
+msgstr "Etiqueta-e no disponible\n"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv]"
 msgstr ""
+"tipo de atributo [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr "<location> <attribute> <values> - establecer atributo"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
@@ -2250,21 +2231,21 @@ msgstr "Error al establecer el archivo: %s\n"
 
 #: ../programs/gvfs-trash.c:51
 msgid "- move files to trash"
-msgstr ""
+msgstr "- mover archivos a la papelera"
 
 #: ../programs/gvfs-trash.c:67
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error deleting file: %s"
 msgid "Error trashing file: %s\n"
-msgstr "Error al borrar el archivo: %s"
+msgstr "Error al borrar el archivo: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr ""
+msgstr "Seguir enlaces simbólicos, montajes y atajos como directorios"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr ""
+msgstr "- listar los contenidos de los directorios en una vista de árbol"
 
 #~ msgid "broken transmission"
 #~ msgstr "transmisión rota"
