@@ -12,9 +12,9 @@ msgstr ""
 "Project-Id-Version: gvfs HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-08-21 18:42+0000\n"
-"PO-Revision-Date: 2009-08-22 16:59+0300\n"
-"Last-Translator: Mattias Põldaru <mahfiaz gmail com>\n"
+"POT-Creation-Date: 2009-08-28 15:33+0000\n"
+"PO-Revision-Date: 2009-08-30 08:55+0300\n"
+"Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1256,6 +1256,9 @@ msgstr "%s meedium"
 msgid "%s Encrypted Data"
 msgstr "%s krüptitud andmed"
 
+msgid "locations"
+msgstr ""
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #, c-format
@@ -1303,11 +1306,226 @@ msgstr ""
 "Märkus: vormindusvõtmete (näiteks -n, -T või mõne muu) kasutamiseks suuna "
 "väljund programmile cat."
 
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr ""
+
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: asukohad on puudu"
+
+msgid "no target directory"
+msgstr "pole sihtkataloog"
+
+msgid "show progress"
+msgstr ""
+
+msgid "prompt before overwrite"
+msgstr ""
+
+msgid "preserve all attributes"
+msgstr ""
+
+msgid "backup existing destination files"
+msgstr ""
+
+msgid "never follow symbolic links"
+msgstr ""
+
+#, c-format
+msgid "progress"
+msgstr ""
+
+msgid "- output files at <location>"
+msgstr ""
+
+#, c-format
+msgid "Missing operand\n"
+msgstr ""
+
+#, c-format
+msgid "Too many arguments\n"
+msgstr "Liiga palju argumente\n"
+
+#, c-format
+msgid "Target %s is not a directory\n"
+msgstr "Sihtkoht %s pole kataloog\n"
+
+#, c-format
+msgid "overwrite %s?"
+msgstr ""
+
+#, c-format
+msgid "Error copying file %s: %s\n"
+msgstr "Viga faili %s kopeerimisel: %s\n"
+
+msgid "List writable attributes"
+msgstr ""
+
+msgid "Get filesystem info"
+msgstr "Failisüsteemi andmete hankimine"
+
+msgid "The attributes to get"
+msgstr ""
+
+msgid "Don't follow symlinks"
+msgstr ""
+
+msgid "invalid type"
+msgstr "vigane liik"
+
+msgid "unknown"
+msgstr "tundmatu"
+
+msgid "regular"
+msgstr "tavaline"
+
+msgid "directory"
+msgstr "kataloog"
+
+msgid "symlink"
+msgstr "nimeviit"
+
+msgid "special"
+msgstr ""
+
+msgid "shortcut"
+msgstr ""
+
+msgid "mountable"
+msgstr ""
+
+#, c-format
+msgid "attributes:\n"
+msgstr ""
+
+#, c-format
+msgid "display name: %s\n"
+msgstr ""
+
+#, c-format
+msgid "edit name: %s\n"
+msgstr ""
+
+#, c-format
+msgid "name: %s\n"
+msgstr "nimi: %s\n"
+
+#, c-format
+msgid "type: %s\n"
+msgstr "liik: %s\n"
+
+#, c-format
+msgid "size: "
+msgstr "suurus: "
+
+#, c-format
+msgid "hidden\n"
+msgstr "peidetud\n"
+
+msgid "Copy with file"
+msgstr ""
+
+msgid "Keep with file when moved"
+msgstr ""
+
+#, c-format
+msgid "Error getting writable attributes: %s\n"
+msgstr "Viga kirjutatavate rekvisiitide hankimisel: %s\n"
+
+#, c-format
+msgid "Settable attributes:\n"
+msgstr "Määratavad rekvisiidid:\n"
+
+#, c-format
+msgid "Writable attribute namespaces:\n"
+msgstr ""
+
+msgid "- show info for <location>"
+msgstr ""
+
+msgid "Show hidden files"
+msgstr ""
+
+msgid "Use a long listing format"
+msgstr ""
+
+msgid "Show completions"
+msgstr ""
+
+#, c-format
+msgid "Error: %s\n"
+msgstr "Viga: %s\n"
+
+msgid "- list files at <location>"
+msgstr ""
+
+msgid "create parent directories"
+msgstr ""
+
+msgid "- delete files"
+msgstr ""
+
+#, c-format
+msgid "Error creating directory: %s\n"
+msgstr "Viga kataloogi loomisel: %s\n"
+
+msgid "Mount as mountable"
+msgstr ""
+
+msgid "Mount volume with device file"
+msgstr ""
+
+msgid "Unmount"
+msgstr "Haagi lahti"
+
+msgid "Unmount all mounts with the given scheme"
+msgstr ""
+
+msgid "List"
+msgstr ""
+
+msgid "Show extra information for List and Monitor"
+msgstr ""
+
+msgid "Monitor events"
+msgstr ""
+
+#, c-format
+msgid "Error mounting location: %s\n"
+msgstr "Viga asukoha ühendamisel: %s\n"
+
+#, c-format
+msgid "Error unmounting mount: %s\n"
+msgstr ""
+
+#, c-format
+msgid "Error finding enclosing mount: %s\n"
+msgstr "Viga haakepunkti kirje leidmisel: %s\n"
+
+#, c-format
+msgid "Error mounting %s: %s\n"
+msgstr "Viga %s ühendamisel: %s\n"
+
+#, c-format
+msgid "Mounted %s at %s\n"
+msgstr ""
+
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr ""
+
+msgid "- mount <location>"
+msgstr ""
+
+#, c-format
+msgid "Error moving file %s: %s\n"
+msgstr "Viga faili %s ümbertõstmisel: %s\n"
+
+msgid "files"
+msgstr ""
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1333,6 +1551,57 @@ msgstr ""
 "Faili(de) avamine selle failitüübi käsitlemiseks registreeritud vaikimisi "
 "rakendusega."
 
+msgid "- rename file"
+msgstr ""
+
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr ""
+
+msgid "ignore nonexistent files, never prompt"
+msgstr ""
+
+msgid "Create backup"
+msgstr ""
+
+msgid "Only create if not existing"
+msgstr ""
+
+msgid "Append to end of file"
+msgstr ""
+
+msgid "When creating a file, restrict access to the current user only"
+msgstr ""
+
+msgid "Print new etag at end"
+msgstr ""
+
+msgid "The etag of the file being overwritten"
+msgstr ""
+
+#, c-format
+msgid "Error opening file: %s\n"
+msgstr "Viga faili avamisel: %s\n"
+
+msgid "Error reading stdin"
+msgstr "Viga standardsisendi lugemisel"
+
+#, c-format
+msgid "Error closing: %s\n"
+msgstr "Viga sulgemisel: %s\n"
+
+#, c-format
+msgid "Etag not available\n"
+msgstr ""
+
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+msgstr ""
+
+msgid " <location> <attribute> <values> - set attribute"
+msgstr ""
+
 #, c-format
 msgid "Location not specified\n"
 msgstr "Asukoht on määramata\n"
@@ -1348,6 +1617,19 @@ msgstr "Vigane rekvisiidi liik %s\n"
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "Viga rekvisiidi määramisel: %s\n"
+
+msgid "- move files to trash"
+msgstr ""
+
+#, c-format
+msgid "Error trashing file: %s\n"
+msgstr "Viga faili viskamisel prügikasti: %s\n"
+
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr ""
+
+msgid "- list contents of directories in a tree-like format"
+msgstr ""
 
 #~ msgid "Out of memory while reading directory contents"
 #~ msgstr "Kataloogi sisu lugemisel lõppes mälu"
