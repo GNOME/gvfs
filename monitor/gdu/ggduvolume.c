@@ -337,51 +337,12 @@ update_volume (GGduVolume *volume)
             volume->should_automount = FALSE;
         }
 
-      /* Avoid automounting volumes from
-       *
-       * 1. drives on a 'virtual' or unset bus
-       * 2. volumes without a drive
-       *
-       * This is to avoid interference with things like Fedora's
-       * livecd-tools that use device-mapper to set up images. See
-       * https://bugzilla.redhat.com/show_bug.cgi?id=494144 for more
-       * background.
-       *
-       * In the future we might want to relax 1. so automounting
-       * things like Linux MD and LVM2 devices work.
+      /* Respect the presentation hint for whether the volume should be automounted - normally
+       * nopolicy is only FALSE for "physical" devices - e.g. only "physical" devices will
+       * be set to be automounted.
        */
-      if (volume->drive != NULL)
-        {
-          GduPresentable *drive_presentable;
-          drive_presentable = g_gdu_drive_get_presentable (volume->drive);
-          if (drive_presentable != NULL)
-            {
-              GduDevice *drive_device;
-              drive_device = gdu_presentable_get_device (drive_presentable);
-              if (drive_device != NULL)
-                {
-                  const gchar *bus;
-                  bus = gdu_device_drive_get_connection_interface (drive_device);
-                  if (bus == NULL || strlen (bus) == 0 || g_strcmp0 (bus, "virtual") == 0)
-                    {
-                      volume->should_automount = FALSE;
-                    }
-                  g_object_unref (drive_device);
-                }
-              else
-                {
-                  volume->should_automount = FALSE;
-                }
-            }
-          else
-            {
-              volume->should_automount = FALSE;
-            }
-        }
-      else
-        {
-          volume->should_automount = FALSE;
-        }
+      if (gdu_device_get_presentation_nopolicy (device))
+        volume->should_automount = FALSE;
 
       g_free (activation_uri);
     }
@@ -650,22 +611,28 @@ g_gdu_volume_get_mount (GVolume *volume)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static gchar **
-get_mount_options (GduDevice *device)
+get_mount_options (GduDevice *device,
+                   gboolean   allow_user_interaction)
 {
-  gchar **ret;
+  GPtrArray *p;
+
+  p = g_ptr_array_new ();
 
   /* one day we might read this from user settings */
   if (g_strcmp0 (gdu_device_id_get_usage (device), "filesystem") == 0 &&
       g_strcmp0 (gdu_device_id_get_type (device), "vfat") == 0)
     {
-      ret = g_new0 (gchar *, 2);
-      ret[0] = g_strdup ("flush");
-      ret[1] = NULL;
+      g_ptr_array_add (p, g_strdup ("flush"));
     }
-  else
-    ret = NULL;
 
-  return ret;
+  if (!allow_user_interaction)
+    {
+      g_ptr_array_add (p, g_strdup ("auth_no_user_interaction"));
+    }
+
+  g_ptr_array_add (p, NULL);
+
+  return (gchar **) g_ptr_array_free (p, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -787,7 +754,7 @@ mount_cleartext_device (MountOpData *data,
   else
     {
       gchar **mount_options;
-      mount_options = get_mount_options (data->device_to_mount);
+      mount_options = get_mount_options (data->device_to_mount, data->mount_operation != NULL);
       gdu_device_op_filesystem_mount (data->device_to_mount, mount_options, mount_cb, data);
       g_strfreev (mount_options);
     }
@@ -1205,7 +1172,7 @@ g_gdu_volume_mount (GVolume             *_volume,
     {
       gchar **mount_options;
       data->device_to_mount = g_object_ref (device);
-      mount_options = get_mount_options (data->device_to_mount);
+      mount_options = get_mount_options (data->device_to_mount, data->mount_operation != NULL);
       gdu_device_op_filesystem_mount (data->device_to_mount, mount_options, mount_cb, data);
       g_strfreev (mount_options);
     }
