@@ -209,6 +209,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
 
       if (ftp->connections < ftp->max_connections)
         {
+          static GThread *last_thread = NULL;
           /* Save current number of connections here, so we can limit maximum
            * connections later.
            * This is necessary for threading reasons (connections can be
@@ -216,6 +217,7 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
           guint maybe_max_connections = ftp->connections;
 
           ftp->connections++;
+          last_thread = g_thread_self ();
           g_mutex_unlock (ftp->mutex);
           task->conn = g_vfs_ftp_connection_new (ftp->addr, task->cancellable, &task->error);
           if (G_LIKELY (task->conn != NULL))
@@ -227,19 +229,27 @@ g_vfs_ftp_task_acquire_connection (GVfsFtpTask *task)
                 break;
             }
 
-          g_vfs_ftp_task_clear_error (task);
           g_vfs_ftp_connection_free (task->conn);
           task->conn = NULL;
           g_mutex_lock (ftp->mutex);
           ftp->connections--;
-          ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
-          if (ftp->max_connections == 0)
+          /* If this value is still equal to our thread it means there were no races 
+           * trying to open connections and the maybe_max_connections value is 
+           * reliable. */
+          if (last_thread == g_thread_self () && 
+              !g_vfs_ftp_task_error_matches (task, G_IO_ERROR, G_IO_ERROR_CANCELLED))
             {
-              g_debug ("no more connections left, exiting...\n");
-              /* FIXME: shut down properly */
-              exit (0);
+              g_print ("maybe: %u, max %u (due to %s)\n", maybe_max_connections, ftp->max_connections, task->error->message);
+              ftp->max_connections = MIN (ftp->max_connections, maybe_max_connections);
+              if (ftp->max_connections == 0)
+                {
+                  g_debug ("no more connections left, exiting...\n");
+                  /* FIXME: shut down properly */
+                  exit (0);
+                }
             }
 
+          g_vfs_ftp_task_clear_error (task);
           continue;
         }
 
