@@ -38,6 +38,7 @@ struct _GVfsFtpConnection
 
   GIOStream *        	commands;               /* ftp command stream */
   GDataInputStream *    commands_in;            /* wrapper around in stream to allow line-wise reading */
+  gboolean              waiting_for_reply;           /* TRUE if a command was sent but no reply received yet */
 
   GSocket *             listen_socket;          /* socket we are listening on for active FTP connections */
   GIOStream *        	data;                   /* ftp data stream or NULL if not in use */
@@ -87,6 +88,8 @@ g_vfs_ftp_connection_new (GSocketConnectable *addr,
   enable_keepalive (G_SOCKET_CONNECTION (conn->commands));
   conn->commands_in = G_DATA_INPUT_STREAM (g_data_input_stream_new (g_io_stream_get_input_stream (conn->commands)));
   g_data_input_stream_set_newline_type (conn->commands_in, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+  /* The first thing that needs to happen is receiving the welcome message */
+  conn->waiting_for_reply = TRUE;
 
   return conn;
 }
@@ -124,6 +127,7 @@ g_vfs_ftp_connection_send (GVfsFtpConnection *conn,
                            GError **          error)
 {
   g_return_val_if_fail (conn != NULL, FALSE);
+  g_return_val_if_fail (!conn->waiting_for_reply, FALSE);
   g_return_val_if_fail (command != NULL, FALSE);
   g_return_val_if_fail (len >= -1, FALSE);
   if (len < 0)
@@ -135,6 +139,7 @@ g_vfs_ftp_connection_send (GVfsFtpConnection *conn,
   else
     g_debug ("--%2d ->  %s", conn->debug_id, command);
 
+  conn->waiting_for_reply = TRUE;
   return g_output_stream_write_all (g_io_stream_get_output_stream (conn->commands),
                                     command,
                                     len,
@@ -158,7 +163,8 @@ g_vfs_ftp_connection_receive (GVfsFtpConnection *conn,
   GPtrArray *lines;
   guint response = 0;
 
-  g_return_val_if_fail (conn != NULL, FALSE);
+  g_return_val_if_fail (conn != NULL, 0);
+  g_return_val_if_fail (conn->waiting_for_reply, 0);
 
   if (reply)
     lines = g_ptr_array_new_with_free_func (g_free);
@@ -222,6 +228,13 @@ g_vfs_ftp_connection_receive (GVfsFtpConnection *conn,
       g_ptr_array_add (lines, NULL);
       *reply = (char **) g_ptr_array_free (lines, FALSE);
     }
+
+  /* 1xx commands are intermediate commands and require a further
+   * message from the server to complete
+   */
+  if (response >= 200)
+    conn->waiting_for_reply = FALSE;
+
   return response;
 
 fail:
@@ -450,9 +463,10 @@ g_vfs_ftp_connection_get_data_stream (GVfsFtpConnection *conn)
  * g_vfs_ftp_connection_is_usable:
  * @conn: a connection
  *
- * Checks if this connection can still be used to send new commands. For
- * example, if the connection was closed, this is not possible and this
- * function will return %FALSE.
+ * Checks if this connection can be used to send new commands. For
+ * example, if the connection is in the process of a command sequence or
+ * if the connection was closed, this is not possible and this function 
+ * will return %FALSE.
  *
  * Returns: %TRUE if the connection is still usable
  **/
@@ -463,7 +477,8 @@ g_vfs_ftp_connection_is_usable (GVfsFtpConnection *conn)
 
   g_return_val_if_fail (conn != NULL, FALSE);
 
-  /* FIXME: return FALSE here if a send or receive failed irrecoverably */
+  if (conn->waiting_for_reply)
+    return FALSE;
 
   cond = G_IO_ERR | G_IO_HUP;
   cond = g_socket_condition_check (g_socket_connection_get_socket (G_SOCKET_CONNECTION (conn->commands)), cond);
