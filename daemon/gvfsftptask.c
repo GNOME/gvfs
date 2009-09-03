@@ -305,8 +305,7 @@ g_vfs_ftp_task_done (GVfsFtpTask *task)
 {
   g_return_if_fail (task != NULL);
 
-  if (task->conn)
-    g_vfs_ftp_task_release_connection (task);
+  g_vfs_ftp_task_release_connection (task);
 
   if (task->job)
     {
