@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-27 14:15+0300\n"
-"PO-Revision-Date: 2009-08-27 14:15+0300\n"
+"POT-Creation-Date: 2009-09-05 21:45+0200\n"
+"PO-Revision-Date: 2009-09-05 21:44+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -405,7 +405,7 @@ msgstr "الملف موجود"
 #: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1525
+#: ../monitor/gdu/ggduvolume.c:1492
 msgid "Operation not supported by backend"
 msgstr "لا تدعم الخلفية هذا العملية"
 
@@ -958,7 +958,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "خرج برنامج ssh بصورة غير متوقّعة"
 
 #: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "رُفض التّصريح"
 
@@ -1055,7 +1055,7 @@ msgid "Unable to find supported ssh command"
 msgstr "تعذّر إيجاد أمر ssh مدعوم"
 
 #: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:383
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "عمليّة غير مدعومة"
 
@@ -1203,22 +1203,22 @@ msgstr "نوع خلفية غير سليم"
 msgid "Error sending fd: %s"
 msgstr "حدث خطأ أثناء إرسال fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:175
+#: ../daemon/gvfsftpconnection.c:181
 msgid "Unexpected end of stream"
 msgstr "نهاية دَفق غير متوقّعة"
 
-#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
-#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:831
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "رد غير صالح"
 
-#: ../daemon/gvfsftpconnection.c:380
+#: ../daemon/gvfsftpconnection.c:393
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr "تعذّر إنشاء اتصال FTP نشط. ربما لا يدعم المُسير (روتر) هذا؟"
 
-#: ../daemon/gvfsftpconnection.c:387
+#: ../daemon/gvfsftpconnection.c:400
 msgid "Failed to create active FTP connection."
 msgstr "تعذّر إنشاء اتصال FTP نشط."
 
@@ -1226,43 +1226,43 @@ msgstr "تعذّر إنشاء اتصال FTP نشط."
 msgid "Filename contains invalid characters."
 msgstr "يحتوي اسم الملف على حروف غير مقبولة."
 
-#: ../daemon/gvfsftptask.c:252
+#: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
 msgstr "خادوم FTP مشغول. حاول فيما بعد"
 
-#: ../daemon/gvfsftptask.c:347
+#: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
 msgstr "الحسابات غير مدعومة"
 
-#: ../daemon/gvfsftptask.c:351
+#: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
 msgstr "قطع الخادوم الاتصال"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "لا يمكن فتح اتصال. هل هناك حائط ناري؟"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "أُغلق اتصال البيانات"
 
-#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "فشلت العمليّة"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:384
 msgid "No space left on server"
 msgstr "لا توجد مساحة كافية على الخادوم"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:396
 msgid "Unsupported network protocol"
 msgstr "بروتوكول شبكة غير مدعوم"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
 msgstr "نوع الصّفحة غير معروف"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
 msgstr "اسم ملف غير صالح"
 
@@ -1417,7 +1417,7 @@ msgstr ""
 msgid "Floppy Disk"
 msgstr "قرص مرن"
 
-#: ../monitor/gdu/ggduvolume.c:1022
+#: ../monitor/gdu/ggduvolume.c:989
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1426,7 +1426,7 @@ msgstr ""
 "أدخل كلمة السر لفتح الحجم\n"
 "الجهاز \"%s\" يحتوي بيانات مُعمّاة على القسم %d."
 
-#: ../monitor/gdu/ggduvolume.c:1029
+#: ../monitor/gdu/ggduvolume.c:996
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1435,7 +1435,7 @@ msgstr ""
 "أدخل كلمة السر لفتح الحجم\n"
 "الجهاز \"%s\" يحتوي بيانات مُعمّاة."
 
-#: ../monitor/gdu/ggduvolume.c:1036
+#: ../monitor/gdu/ggduvolume.c:1003
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1848,7 +1848,7 @@ msgstr "فشل إنشاء الملف الاحتياطي"
 
 #: ../programs/gvfs-copy.c:49
 msgid "never follow symbolic links"
-msgstr ""
+msgstr "لا تتبع الوصلات الرمزية أبدا"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
