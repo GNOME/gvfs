@@ -3220,6 +3220,7 @@ expand_parents (MetaLookupCache *cache,
       strcmp (cache->last_parent, parent) != 0)
     {
       g_free (cache->last_parent);
+      g_free (cache->last_parent_expanded);
       cache->last_parent = parent;
       cache->last_parent_expanded = expand_all_symlinks (parent, &parent_dev);
       cache->last_parent_dev = parent_dev;
@@ -3233,6 +3234,7 @@ expand_parents (MetaLookupCache *cache,
 
   *parent_dev_out = cache->last_parent_dev;
   basename = g_path_get_basename (path_copy);
+  g_free (path_copy);
   res = g_build_filename (cache->last_parent_expanded, basename, NULL);
   g_free (basename);
 
@@ -3313,6 +3315,7 @@ meta_lookup_cache_lookup_path (MetaLookupCache *cache,
     }
 
  found:
+  g_free (expanded);
   tree = meta_tree_lookup_by_name (treename, for_write);
   if (tree)
     {
