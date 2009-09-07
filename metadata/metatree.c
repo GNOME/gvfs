@@ -3087,7 +3087,8 @@ find_mountpoint_for (MetaLookupCache *cache,
   last = g_strdup (file);
   while (1)
     {
-      dir_dev = get_devnum (dir);
+      if (dir)
+	dir_dev = get_devnum (dir);
       if (dir == NULL ||
 	  dev != dir_dev)
 	{
