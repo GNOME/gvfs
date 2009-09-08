@@ -3172,6 +3172,7 @@ meta_lookup_cache_free (MetaLookupCache *cache)
   g_free (cache->last_parent_expanded);
   g_free (cache->last_parent_mountpoint);
   g_free (cache->last_parent_mountpoint_extra_prefix);
+  g_free (cache->last_device_tree);
   g_free (cache);
 }
 
