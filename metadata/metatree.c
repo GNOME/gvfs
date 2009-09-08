@@ -3002,7 +3002,10 @@ update_mountinfo (void)
   contents = read_contents (mountinfo_fd);
   lseek (mountinfo_fd, SEEK_SET, 0);
   if (contents)
-    mountinfo_roots = parse_mountinfo (contents);
+    {
+      mountinfo_roots = parse_mountinfo (contents);
+      g_free (contents);
+    }
 }
 
 static char *
