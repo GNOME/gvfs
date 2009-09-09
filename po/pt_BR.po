@@ -5,13 +5,15 @@
 # Jonh Wendell <wendell@bani.com.br>, 2008.
 # Vladimir Melo <vmelo@gnome.org>, 2008, 2009.
 # Jonh Wendell <jwendell@gnome.org>, 2009.
+# Fábio Nogueira <fnogueira@gnome.org>, 2009.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs 1.3.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-25 15:04-0300\n"
-"PO-Revision-Date: 2009-08-25 15:02-0300\n"
-"Last-Translator: Jonh Wendell <jwendell@gnome.org>\n"
+"POT-Creation-Date: 2009-09-08 21:05-0300\n"
+"PO-Revision-Date: 2009-09-04 11:28-0300\n"
+"Last-Translator: Fábio Nogueira <fnogueira@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -407,7 +409,7 @@ msgstr "O arquivo existe"
 #: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1525
+#: ../monitor/gdu/ggduvolume.c:1492
 msgid "Operation not supported by backend"
 msgstr "Não há suporte à operação pelo backend"
 
@@ -496,7 +498,7 @@ msgstr "Nenhum arquivo %s na unidade %s"
 #: ../daemon/gvfsbackendcdda.c:804
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
-msgstr "Erro do aplicativo 'paranoia' na unidade %s"
+msgstr "Erro do aplicativo \"paranoia\" na unidade %s"
 
 #: ../daemon/gvfsbackendcdda.c:867
 #, c-format
@@ -856,7 +858,7 @@ msgstr "Erro ao renomear o arquivo"
 #: ../daemon/gvfsbackendgphoto2.c:2878
 #, c-format
 msgid "Directory '%s' is not empty"
-msgstr "O diretório '%s' não está vazio"
+msgstr "O diretório \"%s\" não está vazio"
 
 #: ../daemon/gvfsbackendgphoto2.c:2889
 msgid "Error deleting directory"
@@ -958,7 +960,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "programa ssh fechou inesperadamente"
 
 #: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "Permissão negada"
 
@@ -1055,7 +1057,7 @@ msgid "Unable to find supported ssh command"
 msgstr "Não foi possível localizar nenhum programa ssh com suporte"
 
 #: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:383
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Não há suporte à operação"
 
@@ -1203,16 +1205,16 @@ msgstr "Tipo de backend inválido"
 msgid "Error sending fd: %s"
 msgstr "Erro ao enviar fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:175
+#: ../daemon/gvfsftpconnection.c:181
 msgid "Unexpected end of stream"
 msgstr "Término inesperado do fluxo"
 
-#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
-#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:831
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "Resposta inválida"
 
-#: ../daemon/gvfsftpconnection.c:380
+#: ../daemon/gvfsftpconnection.c:393
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
@@ -1220,7 +1222,7 @@ msgstr ""
 "Falha ao criar uma conexão FTP ativa. Talvez o seu roteador não tenha "
 "suporte para essa conexão?"
 
-#: ../daemon/gvfsftpconnection.c:387
+#: ../daemon/gvfsftpconnection.c:400
 msgid "Failed to create active FTP connection."
 msgstr "Falha ao criar uma conexão FTP ativa."
 
@@ -1228,44 +1230,44 @@ msgstr "Falha ao criar uma conexão FTP ativa."
 msgid "Filename contains invalid characters."
 msgstr "O nome do arquivo contém caracteres inválidos."
 
-#: ../daemon/gvfsftptask.c:252
+#: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
 msgstr "O servidor FTP está ocupado. Tente novamente mais tarde"
 
-#: ../daemon/gvfsftptask.c:347
+#: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
 msgstr "Não há suporte às contas"
 
-#: ../daemon/gvfsftptask.c:351
+#: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
 msgstr "A máquina fechou a conexão"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "Não foi possível abrir a conexão de dados. O seu firewall pode evitar isso?"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "Conexão de dados fechada"
 
-#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "A operação falhou"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:384
 msgid "No space left on server"
 msgstr "Não há espaço no servidor"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:396
 msgid "Unsupported network protocol"
 msgstr "Não há suporte ao protocolo de rede"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
 msgstr "Tipo de página desconhecido"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
 msgstr "Nome de arquivo inválido"
 
@@ -1421,7 +1423,7 @@ msgstr "Não foi possível obter o slave de texto puro LUKS do caminho \"%s\""
 msgid "Floppy Disk"
 msgstr "Unidade de Disquete"
 
-#: ../monitor/gdu/ggduvolume.c:1022
+#: ../monitor/gdu/ggduvolume.c:989
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1430,7 +1432,7 @@ msgstr ""
 "Digite uma senha para desbloquear o volume\n"
 "O dispositivo \"%s\" contém dados encriptados na partição %d."
 
-#: ../monitor/gdu/ggduvolume.c:1029
+#: ../monitor/gdu/ggduvolume.c:996
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1439,7 +1441,7 @@ msgstr ""
 "Digite uma senha para desbloquear o volume\n"
 "O dispositivo \"%s\" contém dados encriptados."
 
-#: ../monitor/gdu/ggduvolume.c:1036
+#: ../monitor/gdu/ggduvolume.c:1003
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2026,9 +2028,9 @@ msgstr "- lista arquivos na <localização>"
 msgid "create parent directories"
 msgstr "cria diretórios pais"
 
-#: ../programs/gvfs-mkdir.c:50
-msgid "- create directories"
-msgstr "- cria diretórios pais"
+#: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
+msgid "- delete files"
+msgstr "- remove arquivos"
 
 #: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
 #, c-format
@@ -2147,10 +2149,6 @@ msgstr "Renomeado com sucesso. Nova URI: %s\n"
 msgid "ignore nonexistent files, never prompt"
 msgstr "ignora arquivos não existentes, nunca pergunta"
 
-#: ../programs/gvfs-rm.c:52
-msgid "- delete files"
-msgstr "- remove arquivos"
-
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
 msgstr "Cria um backup"
@@ -2242,6 +2240,9 @@ msgstr "Siga links simbólicos, pontos de montagem e atalhos"
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- lista o conteúdo de diretórios num formato de árvore"
+
+#~ msgid "- create directories"
+#~ msgstr "- cria diretórios pais"
 
 #~ msgid "The query info operation is not supported"
 #~ msgstr "Não há suporte à operação de consulta"
