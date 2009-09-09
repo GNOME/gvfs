@@ -2,148 +2,159 @@
 # Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gvfs package.
 #
-# Gabor Kelemen <kelemeng@gnome.hu>, 2008, 2009.
+# Gabor Kelemen <kelemeng at gnome dot hu>, 2008, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs head\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-02-04 19:03+0000\n"
-"PO-Revision-Date: 2009-02-08 18:39+0100\n"
-"Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
-"Language-Team: Hungarian <gnome@fsf.hu>\n"
+"Project-Id-Version: gvfs master\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-09-10 01:22+0200\n"
+"PO-Revision-Date: 2009-09-10 01:21+0200\n"
+"Last-Translator: Gabor Kelemen <kelemeng at gnome dot hu>\n"
+"Language-Team: Hungarian <gnome at fsf dot hu>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2373
 msgid "Operation not supported, files on different mounts"
 msgstr "A művelet nem támogatott, a fájlok eltérő csatolásokon vannak"
 
-#: ../client/gdaemonfile.c:787
+#: ../client/gdaemonfile.c:867
 msgid "Invalid return value from get_info"
 msgstr "A get_info visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
+#: ../client/gdaemonfile.c:901 ../client/gdaemonfile.c:1879
 msgid "Invalid return value from query_info"
 msgstr "A query_info visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfile.c:894 ../client/gvfsiconloadable.c:338
+#: ../client/gdaemonfile.c:984 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
 msgstr "Az adatfolyamfájl leírója nem kérhető le"
 
-#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
-#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
-#: ../client/gvfsiconloadable.c:370
+#: ../client/gdaemonfile.c:1016 ../client/gdaemonfile.c:1095
+#: ../client/gdaemonfile.c:1158 ../client/gdaemonfile.c:1221
+#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2646
+#: ../client/gdaemonfile.c:2730 ../client/gdaemonfile.c:2993
+#: ../client/gvfsiconloadable.c:374
 msgid "Invalid return value from open"
 msgstr "Az open visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2220 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1105 ../client/gdaemonfile.c:1168
+#: ../client/gdaemonfile.c:1231 ../client/gdaemonfile.c:1297
+#: ../client/gdaemonfile.c:2612 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Az adatfolyamfájl-leíró lekérése meghiúsult"
 
-#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
+#: ../client/gdaemonfile.c:1349 ../client/gdaemonfile.c:1366
 msgid "Invalid return value from call"
 msgstr "A hívás visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfile.c:1534
+#: ../client/gdaemonfile.c:1850
 msgid "Invalid return value from get_filesystem_info"
 msgstr "A get_filesystem_info visszatérési értéke érvénytelen"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1647
+#: ../client/gdaemonfile.c:1963
 msgid "Could not find enclosing mount"
 msgstr "Nem található befoglaló csatolási objektum"
 
-#: ../client/gdaemonfile.c:1677
+#: ../client/gdaemonfile.c:1993
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Érvénytelen fájlnév: %s"
 
-#: ../client/gdaemonfile.c:1719
+#: ../client/gdaemonfile.c:2035
 msgid "Invalid return value from query_filesystem_info"
 msgstr "A query_filesystem_info visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfile.c:2142
+#: ../client/gdaemonfile.c:2229 ../client/gdaemonvfs.c:1187
+#: ../client/gdaemonvfs.c:1321 ../client/gdaemonvfs.c:1374
+#, c-format
+msgid "Error setting file metadata: %s"
+msgstr "Hiba a fájl metaadatainak beállításakor: %s"
+
+#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1375
+msgid "values must be string or list of strings"
+msgstr "Az érték karakterlánc vagy karakterláncok listája lehet"
+
+#: ../client/gdaemonfile.c:2533
 msgid "Invalid return value from monitor_dir"
 msgstr "A monitor_dir visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfile.c:2191
+#: ../client/gdaemonfile.c:2582
 msgid "Invalid return value from monitor_file"
 msgstr "A monitor_file visszatérési értéke érvénytelen"
 
-#: ../client/gdaemonfileenumerator.c:351
-#: ../client/gdaemonfileinputstream.c:518
-#: ../client/gdaemonfileinputstream.c:674
-#: ../client/gdaemonfileinputstream.c:782
-#: ../client/gdaemonfileinputstream.c:1032
-#: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:636
-#: ../client/gdaemonfileoutputstream.c:831 ../daemon/gvfsbackendobexftp.c:1060
-#: ../daemon/gvfsbackendobexftp.c:1081 ../daemon/gvfsbackendobexftp.c:1200
-#: ../daemon/gvfsbackendobexftp.c:1337 ../daemon/gvfsbackendobexftp.c:1401
-#: ../daemon/gvfsbackendobexftp.c:1601 ../daemon/gvfsbackendobexftp.c:1708
-#: ../daemon/gvfsbackendobexftp.c:1858 ../daemon/gvfsbackendobexftp.c:1885
-#: ../daemon/gvfsbackendobexftp.c:1944 ../daemon/gvfsbackendobexftp.c:1966
-#: ../daemon/gvfsbackendobexftp.c:2029 ../daemon/gvfsbackendobexftp.c:2048
-#: ../daemon/gvfsbackendsmb.c:1105 ../daemon/gvfsbackendtest.c:87
-#: ../daemon/gvfsbackendtest.c:120 ../daemon/gvfsbackendtest.c:183
-#: ../daemon/gvfschannel.c:298
-#, c-format
+#: ../client/gdaemonfileenumerator.c:448
+#: ../client/gdaemonfileinputstream.c:630
+#: ../client/gdaemonfileinputstream.c:783
+#: ../client/gdaemonfileinputstream.c:901
+#: ../client/gdaemonfileinputstream.c:1149
+#: ../client/gdaemonfileinputstream.c:1391
+#: ../client/gdaemonfileoutputstream.c:506
+#: ../client/gdaemonfileoutputstream.c:681
+#: ../client/gdaemonfileoutputstream.c:873
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
+#: ../daemon/gvfsbackendobexftp.c:1066 ../daemon/gvfsbackendobexftp.c:1087
+#: ../daemon/gvfsbackendobexftp.c:1206 ../daemon/gvfsbackendobexftp.c:1343
+#: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendobexftp.c:1609
+#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1866
+#: ../daemon/gvfsbackendobexftp.c:1893 ../daemon/gvfsbackendobexftp.c:1952
+#: ../daemon/gvfsbackendobexftp.c:1974 ../daemon/gvfsbackendobexftp.c:2037
+#: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1163
+#: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
+#: ../monitor/proxy/gproxydrive.c:521 ../monitor/proxy/gproxydrive.c:609
+#: ../monitor/proxy/gproxydrive.c:757 ../monitor/proxy/gproxydrive.c:892
+#: ../monitor/proxy/gproxydrive.c:943 ../monitor/proxy/gproxydrive.c:1067
+#: ../monitor/proxy/gproxymount.c:477 ../monitor/proxy/gproxymount.c:562
+#: ../monitor/proxy/gproxyvolume.c:814 ../monitor/proxy/gproxyvolume.c:891
 msgid "Operation was cancelled"
 msgstr "A művelet megszakítva"
 
-#: ../client/gdaemonfileinputstream.c:450
-#: ../client/gdaemonfileinputstream.c:458
-#: ../client/gdaemonfileinputstream.c:1300
-#: ../client/gdaemonfileinputstream.c:1310
-#: ../client/gdaemonfileoutputstream.c:402
-#: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1054
-#: ../client/gdaemonfileoutputstream.c:1064
+#: ../client/gdaemonfileinputstream.c:527
+#: ../client/gdaemonfileinputstream.c:535
+#: ../client/gdaemonfileinputstream.c:1684
+#: ../client/gdaemonfileinputstream.c:1694
+#: ../client/gdaemonfileoutputstream.c:450
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:1236
+#: ../client/gdaemonfileoutputstream.c:1246
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Hiba az adatfolyam-protokollban: %s"
 
-#: ../client/gdaemonfileinputstream.c:458
-#: ../client/gdaemonfileinputstream.c:1310
-#: ../client/gdaemonfileoutputstream.c:410
-#: ../client/gdaemonfileoutputstream.c:1064
+#: ../client/gdaemonfileinputstream.c:535
+#: ../client/gdaemonfileinputstream.c:1694
+#: ../client/gdaemonfileoutputstream.c:458
+#: ../client/gdaemonfileoutputstream.c:1246
 msgid "End of stream"
 msgstr "Vége az adatfolyamnak"
 
-#: ../client/gdaemonfileinputstream.c:1207
-#: ../client/gdaemonfileoutputstream.c:942
+#: ../client/gdaemonfileinputstream.c:1330
+#: ../client/gdaemonfileoutputstream.c:981
 msgid "Seek not supported on stream"
 msgstr "Az adatfolyam nem támogatja a pozicionálást"
 
-#: ../client/gdaemonfileinputstream.c:1237
-msgid "The query info operation is not supported"
-msgstr "Az információk lekérése művelet nem támogatott"
-
-#: ../client/gdaemonfileoutputstream.c:991
-#, c-format
-msgid "Query info not supported on stream"
-msgstr "Az információk lekérését az adatfolyam nem támogatja"
-
-#: ../client/gdaemonvfs.c:830
+#: ../client/gdaemonvfs.c:831
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Hiba a csatolási információk lekérésekor: %s"
 
-#: ../client/gvfsdaemondbus.c:568 ../client/gvfsdaemondbus.c:999
+#: ../client/gdaemonvfs.c:1188
+msgid "Can't contact session bus"
+msgstr "Nem lehet csatlakozni a munkamenetbuszhoz"
+
+#: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Hiba a démonhoz csatlakozáskor: %s"
 
 #: ../client/gvfsiconloadable.c:145
-#| msgid "Invalid return value from get_info"
 msgid "Invalid return value from open_icon_for_read"
 msgstr "Az open_icon_for_read visszatérési értéke érvénytelen"
 
@@ -157,39 +168,55 @@ msgstr "Hiba a foglalat létrehozásakor: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Hiba a foglalathoz csatlakozáskor: %s"
 
-#: ../common/gvfsdaemonprotocol.c:454
+#: ../common/gvfsdaemonprotocol.c:521
 msgid "Invalid file info format"
 msgstr "Érvénytelen fájlinformáció-formátum"
 
-#: ../common/gvfsdaemonprotocol.c:471
+#: ../common/gvfsdaemonprotocol.c:538
 msgid "Invalid attribute info list content"
 msgstr "Érvénytelen attribútuminformáció-lista tartalom"
 
-#: ../common/gvfsdnssdresolver.c:208
+#: ../common/gvfsdnssdresolver.c:209
 #, c-format
-#| msgid "Error initializing camera"
 msgid "Error initializing Avahi: %s"
 msgstr "Hiba az Avahi előkészítésekor: %s"
 
-#: ../common/gvfsdnssdresolver.c:254
+#: ../common/gvfsdnssdresolver.c:255
 #, c-format
-#| msgid "Error creating socket: %s"
 msgid "Error creating Avahi resolver: %s"
 msgstr "Hiba az Avahi feloldó létrehozásakor: %s"
 
-#: ../common/gvfsdnssdresolver.c:1094
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "Hiba „%s” feloldásakor, szolgáltatás: „%s”, tartomány: „%s”"
 
-#: ../common/gvfsdnssdresolver.c:1114
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#. * - the fourth %s refers to the required TXT keys
+#.
+#: ../common/gvfsdnssdresolver.c:1126
 #, c-format
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
-msgstr "Hiba „%s” feloldásakor, szolgáltatás: „%s”, tartomány: „%s”. Néhány TXT rekord hiányzik. A szükséges kulcsok: „%s”."
+msgstr ""
+"Hiba „%s” feloldásakor, szolgáltatás: „%s”, tartomány: „%s”. Néhány TXT "
+"rekord hiányzik. A szükséges kulcsok: „%s”."
 
-#: ../common/gvfsdnssdresolver.c:1126
+#. Translators:
+#. * - the first %s refers to the service type
+#. * - the second %s refers to the service name
+#. * - the third %s refers to the domain
+#.
+#: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "Időtúllépés „%s” feloldásakor, szolgáltatás: „%s”, tartomány: „%s”"
@@ -209,81 +236,106 @@ msgstr "Nem kezelhető a GVfsIcon kódolás %d. verziója"
 msgid "Malformed input data for GVfsIcon"
 msgstr "Rosszul formált adatok a GVfsIconhoz"
 
-#: ../daemon/daemon-main.c:63 ../daemon/daemon-main.c:206
+#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:230
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Hiba a D-Bushoz csatlakozáskor: %s"
 
 #. translators: This is the default daemon's application name,
 #. * the %s is the type of the backend, like "ftp"
-#: ../daemon/daemon-main.c:78
+#: ../daemon/daemon-main.c:91
 #, c-format
 msgid "%s Filesystem Service"
 msgstr "%s fájlrendszer-szolgáltatás"
 
-#: ../daemon/daemon-main.c:97
+#: ../daemon/daemon-main.c:110
 #, c-format
 msgid "Error: %s"
 msgstr "Hiba: %s"
 
-#: ../daemon/daemon-main.c:131
+#: ../daemon/daemon-main.c:155
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Használat: %s --spawner dbus-azonosító objektum_útvonal"
 
-#: ../daemon/daemon-main.c:155 ../daemon/daemon-main.c:173
+#: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Használat: %s kulcs=érték kulcs=érték…"
 
-#: ../daemon/daemon-main.c:171
+#: ../daemon/daemon-main.c:195
 #, c-format
 msgid "No mount type specified"
 msgstr "Nincs megadva csatolástípus"
 
-#: ../daemon/daemon-main.c:241
+#: ../daemon/daemon-main.c:265
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "A(z) %s csatolási pontja már fut"
 
-#: ../daemon/daemon-main.c:252
+#: ../daemon/daemon-main.c:276
 msgid "error starting mount daemon"
 msgstr "hiba a csatolási démon indításakor"
+
+#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
+msgid "Unmount Anyway"
+msgstr "Leválasztás mindenképpen"
+
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
+#: ../monitor/gdu/ggdumount.c:883
+msgid "Cancel"
+msgstr "Mégse"
+
+#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"A kötet foglalt\n"
+"Néhány alkalmazás foglaltan tartja a kötetet."
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:315 ../daemon/gvfsbackendftp.c:1094
-#: ../daemon/gvfsbackendsftp.c:1903
+#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2189
+#: ../daemon/gvfsftpdircache.c:419
 #, c-format
 msgid "/ on %s"
 msgstr "/ ezen: %s"
 
-#: ../daemon/gvfsbackendarchive.c:515 ../daemon/gvfsbackendftp.c:1640
-#: ../daemon/gvfsbackendsftp.c:1566
+#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:504
+#: ../daemon/gvfsbackendsftp.c:1680
 msgid "No hostname specified"
 msgstr "Nincs megadva gépnév"
 
-#: ../daemon/gvfsbackendarchive.c:526 ../daemon/gvfsbackendarchive.c:555
-#: ../daemon/gvfsbackenddav.c:1591 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:836 ../daemon/gvfsbackendobexftp.c:852
-#: ../daemon/gvfsbackendobexftp.c:871 ../daemon/gvfsbackendsmb.c:641
+#: ../daemon/gvfsbackendarchive.c:529 ../daemon/gvfsbackendarchive.c:558
+#: ../daemon/gvfsbackenddav.c:1631 ../daemon/gvfsbackendhttp.c:306
+#: ../daemon/gvfsbackendobexftp.c:842 ../daemon/gvfsbackendobexftp.c:858
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendsmb.c:648
 msgid "Invalid mount spec"
 msgstr "Érvénytelen csatolási meghatározás"
 
-#: ../daemon/gvfsbackendarchive.c:636 ../daemon/gvfsbackendarchive.c:686
-#: ../daemon/gvfsbackendarchive.c:715 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:399
-#: ../daemon/gvfsbackendftp.c:2262 ../daemon/gvfsbackendnetwork.c:647
-#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
-#: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
+#: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
+#: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
+#: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
+#: ../daemon/gvfsbackenddnssd.c:398 ../daemon/gvfsbackendftp.c:904
+#: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
+#: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
+#: ../daemon/gvfsbackendsmbbrowse.c:1394
 #, c-format
 msgid "File doesn't exist"
 msgstr "A fájl nem létezik"
 
-#: ../daemon/gvfsbackendarchive.c:724 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:446
-#: ../daemon/gvfsbackendftp.c:1043 ../daemon/gvfsbackendnetwork.c:694
+#: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendcomputer.c:645
+#: ../daemon/gvfsbackendgphoto2.c:1865 ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
+msgid "Can't open directory"
+msgstr "A könyvtár nem nyitható meg"
+
+#: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendsftp.c:3803 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "A fájl nem egy könyvtár"
 
@@ -298,20 +350,24 @@ msgstr "Nem lehet ideiglenes könyvtárat létrehozni"
 
 #: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
-#: ../daemon/gvfsbackendburn.c:719 ../daemon/gvfsbackendburn.c:745
-#: ../daemon/gvfsbackendburn.c:783 ../daemon/gvfsbackendgphoto2.c:1063
-#: ../daemon/gvfsbackendgphoto2.c:1916 ../daemon/gvfsbackendgphoto2.c:2626
-#: ../daemon/gvfsbackendtrash.c:216
+#: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
+#: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:630
+#: ../daemon/gvfsbackendgphoto2.c:1194 ../daemon/gvfsbackendgphoto2.c:2186
+#: ../daemon/gvfsbackendgphoto2.c:2905 ../daemon/gvfsbackendsftp.c:1756
+#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2882
+#: ../daemon/gvfsbackendsftp.c:2902 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "Nincs ilyen fájl vagy könyvtár"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
+#: ../daemon/gvfsbackendsftp.c:1748
 msgid "Directory not empty"
 msgstr "A könyvtár nem üres"
 
-#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:906
-#: ../daemon/gvfsbackendobexftp.c:1783
+#: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Can't copy file over directory"
 msgstr "A könyvtár nem másolható át könyvtárba"
 
@@ -320,550 +376,525 @@ msgstr "A könyvtár nem másolható át könyvtárba"
 msgid "CD/DVD Creator"
 msgstr "CD/DVD-készítő"
 
-#: ../daemon/gvfsbackendburn.c:755 ../daemon/gvfsbackendburn.c:791
-#: ../daemon/gvfsbackendburn.c:926 ../daemon/gvfsbackendgphoto2.c:2700
+#: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
+#: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
+#: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
+#: ../daemon/gvfsbackendgphoto2.c:2979
 msgid "File exists"
 msgstr "A fájl létezik"
 
-#: ../daemon/gvfsbackendburn.c:829 ../daemon/gvfsjobcloseread.c:112
+#: ../daemon/gvfsbackendburn.c:828 ../daemon/gvfsjobcloseread.c:112
 #: ../daemon/gvfsjobclosewrite.c:120 ../daemon/gvfsjobcopy.c:169
 #: ../daemon/gvfsjobcreatemonitor.c:140 ../daemon/gvfsjobcreatemonitor.c:151
 #: ../daemon/gvfsjobcreatemonitor.c:174 ../daemon/gvfsjobcreatemonitor.c:192
 #: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
 #: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
-#: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:173
-#: ../daemon/gvfsjobpush.c:173 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
+#: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
+#: ../monitor/gdu/ggduvolume.c:1492
 msgid "Operation not supported by backend"
 msgstr "A háttérprogram nem támogatja a műveletet"
 
-#: ../daemon/gvfsbackendburn.c:854
+#: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
 msgstr "Nincs ilyen fájl vagy könyvtár a célútvonalon"
 
-#: ../daemon/gvfsbackendburn.c:877 ../daemon/gvfsbackendobexftp.c:1752
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1287
+#: ../daemon/gvfsbackendobexftp.c:1760
 msgid "Can't copy directory over directory"
 msgstr "A könyvtár nem másolható át könyvtárba"
 
-#: ../daemon/gvfsbackendburn.c:886 ../daemon/gvfsbackendobexftp.c:1760
-#: ../daemon/gvfsbackendobexftp.c:1791
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1768
+#: ../daemon/gvfsbackendobexftp.c:1799 ../daemon/gvfsbackendsftp.c:1750
+#: ../daemon/gvfsbackendsftp.c:4365
 msgid "Target file exists"
 msgstr "A célfájl létezik"
 
-#: ../daemon/gvfsbackendburn.c:893 ../daemon/gvfsbackendobexftp.c:1767
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1310
+#: ../daemon/gvfsbackendobexftp.c:1775
 msgid "Can't recursively copy directory"
 msgstr "A könyvtár nem másolható rekurzívan"
 
-#: ../daemon/gvfsbackendburn.c:952 ../daemon/gvfsbackendcomputer.c:731
-#: ../daemon/gvfsbackendgphoto2.c:2281 ../daemon/gvfsbackendgphoto2.c:2490
-#: ../daemon/gvfsbackendgphoto2.c:2587 ../daemon/gvfsbackendgphoto2.c:2679
+#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendgphoto2.c:2559 ../daemon/gvfsbackendgphoto2.c:2768
+#: ../daemon/gvfsbackendgphoto2.c:2865 ../daemon/gvfsbackendgphoto2.c:2958
 msgid "Not supported"
 msgstr "Nem támogatott"
 
-#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendgphoto2.c:1303
+#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1496
+msgid "Cannot create gudev client"
+msgstr "Nem hozható létre gudev kliens"
+
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1514
 msgid "Cannot connect to the system bus"
 msgstr "Nem lehet csatlakozni a rendszerbuszhoz"
 
-#: ../daemon/gvfsbackendcdda.c:310 ../daemon/gvfsbackendgphoto2.c:1315
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot create libhal context"
 msgstr "Nem hozható létre libhal kontextus"
 
-#: ../daemon/gvfsbackendcdda.c:324 ../daemon/gvfsbackendgphoto2.c:1328
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1539
 msgid "Cannot initialize libhal"
 msgstr "A libhal nem készíthető elő"
 
-#: ../daemon/gvfsbackendcdda.c:339 ../daemon/gvfsbackendcdda.c:415
+#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
 msgstr "Nincs megadva meghajtó"
 
-#: ../daemon/gvfsbackendcdda.c:355
+#: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "A(z) %s meghajtó nem található"
 
-#: ../daemon/gvfsbackendcdda.c:368
+#: ../daemon/gvfsbackendcdda.c:430
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "A(z) %s meghajtó nem tartalmaz hangfájlokat"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:377
+#: ../daemon/gvfsbackendcdda.c:439
 #, c-format
 msgid "cdda mount on %s"
 msgstr "cdda csatolás a következőn: %s"
 
-#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendcdda.c:895
-#: ../monitor/hal/ghalmount.c:435 ../monitor/hal/ghalvolume.c:233
-#: ../monitor/hal/ghalvolume.c:254
+#: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
+#: ../monitor/gdu/ggduvolume.c:320 ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "Audio lemez"
 
-#: ../daemon/gvfsbackendcdda.c:439 ../daemon/gvfsbackendgphoto2.c:1550
+#: ../daemon/gvfsbackendcdda.c:503
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
 msgstr[0] "A fájlrendszer foglalt: %d megnyitott fájl"
 msgstr[1] "A fájlrendszer foglalt: %d megnyitott fájl"
 
-#: ../daemon/gvfsbackendcdda.c:630
+#: ../daemon/gvfsbackendcdda.c:695
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Nincs %s nevű fájl a(z) %s meghajtón"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:739
+#: ../daemon/gvfsbackendcdda.c:804
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Hiba a „paranoia” programtól a következő meghajtón: %s"
 
-#: ../daemon/gvfsbackendcdda.c:802
+#: ../daemon/gvfsbackendcdda.c:867
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Hiba az adatfolyamban pozicionálásakor a(z) %s meghajtón"
 
-#: ../daemon/gvfsbackendcdda.c:914 ../daemon/gvfsbackendgphoto2.c:1606
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1873
 #, c-format
 msgid "No such file"
 msgstr "Nincs ilyen fájl"
 
-#: ../daemon/gvfsbackendcdda.c:928
+#: ../daemon/gvfsbackendcdda.c:993
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "A fájl nem létezik vagy nem egy hangsáv"
 
-#: ../daemon/gvfsbackendcdda.c:1034
+#: ../daemon/gvfsbackendcdda.c:1099
 msgid "Audio CD Filesystem Service"
 msgstr "Hang CD fájlrendszer-szolgáltatás"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
+#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
 msgid "Computer"
 msgstr "Számítógép"
 
-#: ../daemon/gvfsbackendcomputer.c:466
+#: ../daemon/gvfsbackendcomputer.c:521
 msgid "Filesystem"
 msgstr "Fájlrendszer"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1598
-#: ../daemon/gvfsbackendobexftp.c:1046 ../daemon/gvfsbackendsmb.c:684
-#: ../daemon/gvfsbackendtrash.c:232
-#, c-format
-msgid "Can't open directory"
-msgstr "A könyvtár nem nyitható meg"
-
-#: ../daemon/gvfsbackendcomputer.c:594
+#: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
 msgstr "Nem nyitható meg csatolható fájl"
 
-#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1044
+#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1146
 #, c-format
 msgid "Internal error: %s"
 msgstr "Belső hiba: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
+#: ../daemon/gvfsbackendcomputer.c:872 ../daemon/gvfsbackendcomputer.c:991
 msgid "Can't mount file"
 msgstr "A fájl nem csatolható"
 
-#: ../daemon/gvfsbackendcomputer.c:823
+#: ../daemon/gvfsbackendcomputer.c:884
 msgid "No media in the drive"
 msgstr "Nincs adathordozó a meghajtóban"
 
-#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
-#: ../daemon/gvfsbackendcomputer.c:1071
+#: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
+#: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
+#: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
 msgstr "Nem csatolható fájl"
 
-#: ../daemon/gvfsbackendcomputer.c:986
+#: ../daemon/gvfsbackendcomputer.c:1055
 msgid "Can't unmount file"
 msgstr "A fájl nem választható le"
 
-#: ../daemon/gvfsbackendcomputer.c:1102
+#: ../daemon/gvfsbackendcomputer.c:1185
 msgid "Can't eject file"
 msgstr "A fájl nem adható ki"
 
-#: ../daemon/gvfsbackenddav.c:526 ../daemon/gvfsbackenddav.c:1658
+#: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
+msgid "Can't start file"
+msgstr "A fájl nem indítható"
+
+#: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
+msgid "Can't stop file"
+msgstr "A fájl nem állítható le"
+
+#: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
+msgid "Can't poll file"
+msgstr "A fájl nem kérdezhető le"
+
+#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
 #: ../daemon/gvfsbackendhttp.c:252
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP hiba: %s"
 
-#: ../daemon/gvfsbackenddav.c:543
+#: ../daemon/gvfsbackenddav.c:578
 msgid "Could not parse response"
 msgstr "A válasz nem elemezhető"
 
-#: ../daemon/gvfsbackenddav.c:552
+#: ../daemon/gvfsbackenddav.c:587
 msgid "Empty response"
 msgstr "Üres válasz"
 
-#: ../daemon/gvfsbackenddav.c:560
+#: ../daemon/gvfsbackenddav.c:595
 msgid "Unexpected reply from server"
 msgstr "Váratlan válasz a kiszolgálótól"
 
-#: ../daemon/gvfsbackenddav.c:1179 ../daemon/gvfsbackenddav.c:1798
+#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1838
 msgid "Response invalid"
 msgstr "A válasz érvénytelen"
 
-#: ../daemon/gvfsbackenddav.c:1322
+#: ../daemon/gvfsbackenddav.c:1357
 msgid "WebDAV share"
 msgstr "WebDAV megosztás"
 
-#: ../daemon/gvfsbackenddav.c:1324
+#: ../daemon/gvfsbackenddav.c:1359
 #, c-format
 msgid "Enter password for %s"
 msgstr "Adja meg %s jelszavát"
 
-#: ../daemon/gvfsbackenddav.c:1327
+#: ../daemon/gvfsbackenddav.c:1362
 msgid "Please enter proxy password"
 msgstr "Adja meg a proxy jelszót"
 
-#: ../daemon/gvfsbackenddav.c:1662 ../daemon/gvfsbackenddav.c:1666
+#: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
 msgstr "Nem WebDAV-képes megosztás"
 
-#: ../daemon/gvfsbackenddav.c:1694
+#: ../daemon/gvfsbackenddav.c:1734
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV a következőn: %s"
 
-#: ../daemon/gvfsbackenddav.c:1754 ../daemon/gvfsbackenddav.c:1827
+#: ../daemon/gvfsbackenddav.c:1794 ../daemon/gvfsbackenddav.c:1867
 msgid "Could not create request"
 msgstr "Nem hozható létre kérés"
 
-#: ../daemon/gvfsbackenddav.c:1890 ../daemon/gvfsbackenddav.c:2143
-#: ../daemon/gvfsbackenddav.c:2254 ../daemon/gvfsbackendftp.c:1860
-#: ../daemon/gvfsbackendftp.c:2526 ../daemon/gvfsbackendsftp.c:3588
-#: ../daemon/gvfsbackendsmb.c:1912
+#: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:589
+#: ../daemon/gvfsbackendftp.c:770 ../daemon/gvfsbackendftp.c:1120
+#: ../daemon/gvfsbackendftp.c:1295 ../daemon/gvfsbackendsftp.c:4209
+#: ../daemon/gvfsbackendsmb.c:2001
 msgid "Target file already exists"
 msgstr "A célfájl már létezik"
 
-#: ../daemon/gvfsbackenddav.c:1963 ../daemon/gvfsbackendsftp.c:2836
-#: ../daemon/gvfsbackendsmb.c:1074
+#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3343
+#: ../daemon/gvfsbackendsmb.c:1132
 msgid "The file was externally modified"
 msgstr "A fájlt külső program módosította"
 
-#: ../daemon/gvfsbackenddav.c:1994 ../daemon/gvfsbackendsmb.c:1110
-#: ../daemon/gvfsbackendsmb.c:1929
+#: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1168
+#: ../daemon/gvfsbackendsmb.c:2018
 msgid "Backup file creation failed"
 msgstr "A mentési fájl létrehozása meghiúsult"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:493 ../daemon/gvfsbackendnetwork.c:394
+#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Helyi hálózat"
 
-#: ../daemon/gvfsbackenddnssd.c:737 ../daemon/gvfsbackendnetwork.c:798
+#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "A fájl vagy könyvtár nem figyelhető meg."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:755
+#: ../daemon/gvfsbackenddnssd.c:754
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:756 ../daemon/gvfsbackendnetwork.c:733
-#: ../daemon/gvfsbackendnetwork.c:883 ../daemon/gvfsbackendnetwork.c:884
+#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Hálózat"
 
-#: ../daemon/gvfsbackendftp.c:252
-msgid "Accounts are unsupported"
-msgstr "A fiókok nem támogatottak"
-
-#: ../daemon/gvfsbackendftp.c:256
-msgid "Host closed connection"
-msgstr "A gép lezárta a kapcsolatot"
-
-#: ../daemon/gvfsbackendftp.c:260
-msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr "Nem nyitható meg az adatkapcsolat. Lehet, hogy a tűzfal akadályozza?"
-
-#: ../daemon/gvfsbackendftp.c:264
-msgid "Data connection closed"
-msgstr "Az adatkapcsolat lezárva"
-
-#: ../daemon/gvfsbackendftp.c:271 ../daemon/gvfsbackendftp.c:275
-msgid "Operation failed"
-msgstr "A művelet meghiúsult"
-
-#: ../daemon/gvfsbackendftp.c:280
-msgid "No space left on server"
-msgstr "Nincs több hely a kiszolgálón"
-
-#: ../daemon/gvfsbackendftp.c:288 ../daemon/gvfsbackendsftp.c:3897
-#: ../daemon/gvfsbackendsmb.c:1576
-msgid "Operation unsupported"
-msgstr "A művelet nem támogatott"
-
-#: ../daemon/gvfsbackendftp.c:292 ../daemon/gvfsbackendsftp.c:296
-msgid "Permission denied"
-msgstr "Hozzáférés megtagadva"
-
-#: ../daemon/gvfsbackendftp.c:296
-msgid "Page type unknown"
-msgstr "Az oldaltípus ismeretlen"
-
-#: ../daemon/gvfsbackendftp.c:300 ../daemon/gvfsbackendftp.c:2372
-msgid "Invalid filename"
-msgstr "Érvénytelen fájlnév"
-
-#: ../daemon/gvfsbackendftp.c:304 ../daemon/gvfsbackendftp.c:380
-#: ../daemon/gvfsbackendftp.c:409 ../daemon/gvfsbackendftp.c:428
-#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:929
-msgid "Invalid reply"
-msgstr "Érvénytelen válasz"
-
-#: ../daemon/gvfsbackendftp.c:548
-msgid "broken transmission"
-msgstr "sérült átvitel"
-
-#: ../daemon/gvfsbackendftp.c:710 ../daemon/gvfsbackendftp.c:851
-msgid "Could not connect to host"
-msgstr "Nem lehet csatlakozni a géphez"
-
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1494
+#: ../daemon/gvfsbackendftp.c:329
 #, c-format
-#| msgid "Enter password for ftp on %s"
 msgid "Enter password for ftp as %s on %s"
 msgstr "Adja meg %s:%s FTP jelszavát"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1497
+#: ../daemon/gvfsbackendftp.c:332
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Adja meg %s FTP jelszavát"
 
-#: ../daemon/gvfsbackendftp.c:1523 ../daemon/gvfsbackendsftp.c:881
-#: ../daemon/gvfsbackendsmb.c:599 ../daemon/gvfsbackendsmbbrowse.c:986
+#: ../daemon/gvfsbackendftp.c:358 ../daemon/gvfsbackendsftp.c:969
+#: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "A jelszó megadása megszakítva"
 
-#: ../daemon/gvfsbackendftp.c:1602
+#: ../daemon/gvfsbackendftp.c:467
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp a következőn: %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1606
+#: ../daemon/gvfsbackendftp.c:471
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp %s néven a következőn: %s"
 
-#: ../daemon/gvfsbackendftp.c:1690 ../daemon/gvfsbackendsftp.c:1967
-#: ../daemon/gvfsbackendsftp.c:3579
+#: ../daemon/gvfsbackendftp.c:564
+msgid "Insufficient permissions"
+msgstr "Elégtelen jogosultságok"
+
+#: ../daemon/gvfsbackendftp.c:573
+msgid "File does not exist"
+msgstr "A fájl nem létezik"
+
+#: ../daemon/gvfsbackendftp.c:610 ../daemon/gvfsbackendsftp.c:2253
+#: ../daemon/gvfsbackendsftp.c:2989 ../daemon/gvfsbackendsftp.c:3330
+#: ../daemon/gvfsbackendsftp.c:4200
 msgid "File is directory"
 msgstr "A fájl könyvtár"
 
-#: ../daemon/gvfsbackendftp.c:1912 ../daemon/gvfsbackendftp.c:2487
+#: ../daemon/gvfsbackendftp.c:818 ../daemon/gvfsbackendftp.c:1083
+#: ../daemon/gvfsbackendsftp.c:3196
 msgid "backups not supported yet"
 msgstr "biztonsági másolatok még nem támogatottak"
 
-#: ../daemon/gvfsbackendftp.c:1989
-msgid "filename too long"
-msgstr "a fájlnév túl hosszú"
-
-#: ../daemon/gvfsbackendftp.c:2506
-msgid "Invalid destination filename"
-msgstr "Érvénytelen célfájlnév"
-
-#: ../daemon/gvfsbackendgphoto2.c:486
+#: ../daemon/gvfsbackendgphoto2.c:504
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: A könyvtár vagy fájl létezik"
 
-#: ../daemon/gvfsbackendgphoto2.c:493
+#: ../daemon/gvfsbackendgphoto2.c:511
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d Nincs ilyen fájl vagy könyvtár"
 
-#: ../daemon/gvfsbackendgphoto2.c:499
+#: ../daemon/gvfsbackendgphoto2.c:517
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: Érvénytelen fájlnév"
 
-#: ../daemon/gvfsbackendgphoto2.c:505
+#: ../daemon/gvfsbackendgphoto2.c:523
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: Nem támogatott"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:675
+#: ../daemon/gvfsbackendgphoto2.c:718 ../daemon/gvfsbackendgphoto2.c:724
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digitális fényképezőgép (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:823 ../monitor/gphoto2/ggphoto2volume.c:183
+#: ../daemon/gvfsbackendgphoto2.c:936 ../monitor/gphoto2/ggphoto2volume.c:240
+#: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
 msgstr "%s fényképezőgép"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:826 ../monitor/gphoto2/ggphoto2volume.c:178
+#: ../daemon/gvfsbackendgphoto2.c:939 ../monitor/gphoto2/ggphoto2volume.c:235
+#: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s zenelejátszó"
 
-#: ../daemon/gvfsbackendgphoto2.c:835 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../daemon/gvfsbackendgphoto2.c:948 ../monitor/gphoto2/ggphoto2volume.c:246
+#: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Fényképezőgép"
 
-#: ../daemon/gvfsbackendgphoto2.c:837 ../monitor/gphoto2/ggphoto2volume.c:190
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Zenelejátszó"
 
-#: ../daemon/gvfsbackendgphoto2.c:1343
+#: ../daemon/gvfsbackendgphoto2.c:1555
 msgid "No device specified"
 msgstr "Nincs megadva eszköz"
 
-#: ../daemon/gvfsbackendgphoto2.c:1360
+#: ../daemon/gvfsbackendgphoto2.c:1576
 msgid "Cannot create gphoto2 context"
 msgstr "Nem hozható létre gphoto2 kontextus"
 
-#: ../daemon/gvfsbackendgphoto2.c:1370
+#: ../daemon/gvfsbackendgphoto2.c:1586
 msgid "Error creating camera"
 msgstr "Hiba a fényképezőgép létrehozásakor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1383 ../daemon/gvfsbackendgphoto2.c:1393
+#: ../daemon/gvfsbackendgphoto2.c:1599 ../daemon/gvfsbackendgphoto2.c:1609
 msgid "Error loading device information"
 msgstr "Hiba az eszközinformációk létrehozásakor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1405
+#: ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error looking up device information"
 msgstr "Hiba az eszközinformációk kikeresésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1415
+#: ../daemon/gvfsbackendgphoto2.c:1631
 msgid "Error getting device information"
 msgstr "Hiba az eszközinformációk lekérésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1428
+#: ../daemon/gvfsbackendgphoto2.c:1644
 msgid "Error setting up camera communications port"
 msgstr "Hiba a fényképezőgép kommunikációs portjának beállításakor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1439
+#: ../daemon/gvfsbackendgphoto2.c:1655
 msgid "Error initializing camera"
 msgstr "Hiba a fényképezőgép előkészítésekor"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1447
+#: ../daemon/gvfsbackendgphoto2.c:1669
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 csatolás a következőn: %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1522
+#: ../daemon/gvfsbackendgphoto2.c:1744
 msgid "No camera specified"
 msgstr "Nincs megadva fényképezőgép"
 
-#: ../daemon/gvfsbackendgphoto2.c:1614
+#: ../daemon/gvfsbackendgphoto2.c:1785 ../daemon/gvfsbackendgphoto2.c:1811
+#, c-format
+msgid "Filesystem is busy"
+msgstr "A fájlrendszer foglalt"
+
+#: ../daemon/gvfsbackendgphoto2.c:1881
 msgid "Error creating file object"
 msgstr "Hiba a fájlobjektum létrehozásakor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1629
+#: ../daemon/gvfsbackendgphoto2.c:1896
 msgid "Error getting file"
 msgstr "Hiba a fájl lekérésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1639
+#: ../daemon/gvfsbackendgphoto2.c:1906
 msgid "Error getting data from file"
 msgstr "Hiba a fájl adatainak kérésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:1696
+#: ../daemon/gvfsbackendgphoto2.c:1964
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Rosszul formált ikonazonosító: „%s”"
 
-#: ../daemon/gvfsbackendgphoto2.c:1772 ../daemon/gvfsbackendgphoto2.c:2950
+#: ../daemon/gvfsbackendgphoto2.c:2040 ../daemon/gvfsbackendgphoto2.c:3229
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Hiba az adatfolyamban pozicionálásakor a(z) %s fényképezőgépen"
 
-#: ../daemon/gvfsbackendgphoto2.c:1910 ../daemon/gvfsbackendsmbbrowse.c:1388
+#: ../daemon/gvfsbackendgphoto2.c:2180 ../daemon/gvfsbackendsftp.c:2872
+#: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "Nem könyvtár"
 
-#: ../daemon/gvfsbackendgphoto2.c:1943
+#: ../daemon/gvfsbackendgphoto2.c:2213
 msgid "Failed to get folder list"
 msgstr "A mappalista lekérése meghiúsult"
 
-#: ../daemon/gvfsbackendgphoto2.c:2008
+#: ../daemon/gvfsbackendgphoto2.c:2279
 msgid "Failed to get file list"
 msgstr "A fájllista lekérése meghiúsult"
 
-#: ../daemon/gvfsbackendgphoto2.c:2293
+#: ../daemon/gvfsbackendgphoto2.c:2571
 msgid "Error creating directory"
 msgstr "Hiba a könyvtár létrehozásakor"
 
-#: ../daemon/gvfsbackendgphoto2.c:2502
+#: ../daemon/gvfsbackendgphoto2.c:2780
 msgid "Name already exists"
 msgstr "A név már létezik"
 
-#: ../daemon/gvfsbackendgphoto2.c:2513 ../daemon/gvfsbackendgphoto2.c:3141
+#: ../daemon/gvfsbackendgphoto2.c:2791 ../daemon/gvfsbackendgphoto2.c:3420
 msgid "New name too long"
 msgstr "A név túl hosszú"
 
-#: ../daemon/gvfsbackendgphoto2.c:2523 ../daemon/gvfsbackendgphoto2.c:3152
+#: ../daemon/gvfsbackendgphoto2.c:2801 ../daemon/gvfsbackendgphoto2.c:3431
 msgid "Error renaming dir"
 msgstr "Hiba a könyvtár átnevezésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:2536 ../daemon/gvfsbackendgphoto2.c:3165
+#: ../daemon/gvfsbackendgphoto2.c:2814 ../daemon/gvfsbackendgphoto2.c:3444
 msgid "Error renaming file"
 msgstr "Hiba a fájl átnevezésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:2599
+#: ../daemon/gvfsbackendgphoto2.c:2878
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "A könyvtár („%s”) nem üres"
 
-#: ../daemon/gvfsbackendgphoto2.c:2610
+#: ../daemon/gvfsbackendgphoto2.c:2889
 msgid "Error deleting directory"
 msgstr "Hiba a könyvtár törlésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:2636
+#: ../daemon/gvfsbackendgphoto2.c:2915
 msgid "Error deleting file"
 msgstr "Hiba a fájl törlésekor"
 
-#: ../daemon/gvfsbackendgphoto2.c:2689
+#: ../daemon/gvfsbackendgphoto2.c:2968
 msgid "Can't write to directory"
 msgstr "A könyvtár nem írható"
 
-#: ../daemon/gvfsbackendgphoto2.c:2736
+#: ../daemon/gvfsbackendgphoto2.c:3015
 msgid "Cannot allocate new file to append to"
 msgstr "Nem foglalható új fájl a hozzáfűzéshez"
 
-#: ../daemon/gvfsbackendgphoto2.c:2751
+#: ../daemon/gvfsbackendgphoto2.c:3030
 msgid "Cannot read file to append to"
 msgstr "Nem olvasható a fájl a hozzáfűzéshez"
 
-#: ../daemon/gvfsbackendgphoto2.c:2762
+#: ../daemon/gvfsbackendgphoto2.c:3041
 msgid "Cannot get data of file to append to"
 msgstr "Nem kérhetők le a hozzáfűzési fájl adatai"
 
-#: ../daemon/gvfsbackendgphoto2.c:3049
+#: ../daemon/gvfsbackendgphoto2.c:3328
 msgid "Error writing file"
 msgstr "Hiba a fájl írása közben"
 
-#: ../daemon/gvfsbackendgphoto2.c:3097
+#: ../daemon/gvfsbackendgphoto2.c:3376
 msgid "Not supported (not same directory)"
 msgstr "Nem támogatott (nem ugyanaz a könyvtár)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3109
+#: ../daemon/gvfsbackendgphoto2.c:3388
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Nem támogatott (a forrás könyvtár, a cél könyvtár)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3117
+#: ../daemon/gvfsbackendgphoto2.c:3396
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Nem támogatott (a forrás könyvtár, a cél meglévő fájl)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3129
+#: ../daemon/gvfsbackendgphoto2.c:3408
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Nem támogatott (a forrás fájl, a cél könyvtár)"
 
@@ -872,23 +903,23 @@ msgstr "Nem támogatott (a forrás fájl, a cél könyvtár)"
 msgid "HTTP Client Error: %s"
 msgstr "HTTP klienshiba: %s"
 
-#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:1891
-#: ../daemon/gvfsbackendsmb.c:1337 ../daemon/gvfsdaemonutils.c:211
+#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:2177
+#: ../daemon/gvfsbackendsmb.c:1424 ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (érvénytelen kódolás)"
 
-#: ../daemon/gvfsbackendlocaltest.c:853
+#: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
 msgstr "A könyvtárértesítés nem támogatott"
 
 #. smb:/// root link
-#: ../daemon/gvfsbackendnetwork.c:270 ../daemon/gvfsbackendsmbbrowse.c:885
+#: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
 msgstr "Windows hálózat"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
-#: ../daemon/gvfsbackendnetwork.c:932
+#: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
 msgstr "Hálózati helyek figyelése"
 
@@ -898,78 +929,84 @@ msgstr "Hálózati helyek figyelése"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:656 ../daemon/gvfsbackendsmb.c:538
-#: ../daemon/gvfsbackendsmb.c:1330
+#: ../daemon/gvfsbackendobexftp.c:662 ../daemon/gvfsbackendsmb.c:545
+#: ../daemon/gvfsbackendsmb.c:1417
 #, c-format
 msgid "%s on %s"
 msgstr "%s ezen: %s"
 
-#: ../daemon/gvfsbackendobexftp.c:865
+#: ../daemon/gvfsbackendobexftp.c:871
 msgid "USB support missing. Please contact your software vendor"
-msgstr "Az USB támogatás hiányzik. Lépjen kapcsolatba a szoftver szállítójával."
+msgstr ""
+"Az USB támogatás hiányzik. Lépjen kapcsolatba a szoftver szállítójával."
 
-#: ../daemon/gvfsbackendobexftp.c:985
+#: ../daemon/gvfsbackendobexftp.c:991
 msgid "Connection to the device lost"
 msgstr "A kapcsolat elveszett az eszközzel"
 
-#: ../daemon/gvfsbackendobexftp.c:1482
+#: ../daemon/gvfsbackendobexftp.c:1488
 msgid "Device requires a software update"
 msgstr "Az eszköz szoftverfrissítést igényel"
 
-#: ../daemon/gvfsbackendsftp.c:288
+#: ../daemon/gvfsbackendsftp.c:295 ../daemon/gvfsbackendsftp.c:651
 msgid "ssh program unexpectedly exited"
 msgstr "az ssh program váratlanul kilépett"
 
-#: ../daemon/gvfsbackendsftp.c:303
+#: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
+#: ../daemon/gvfsftptask.c:400
+msgid "Permission denied"
+msgstr "Hozzáférés megtagadva"
+
+#: ../daemon/gvfsbackendsftp.c:310
 msgid "Hostname not known"
 msgstr "A gépnév ismeretlen"
 
-#: ../daemon/gvfsbackendsftp.c:310
+#: ../daemon/gvfsbackendsftp.c:317
 msgid "No route to host"
 msgstr "Nincs útvonal a kiszolgálóhoz"
 
-#: ../daemon/gvfsbackendsftp.c:317
+#: ../daemon/gvfsbackendsftp.c:324
 msgid "Connection refused by server"
 msgstr "A kiszolgáló visszautasította a kapcsolatot"
 
-#: ../daemon/gvfsbackendsftp.c:324
+#: ../daemon/gvfsbackendsftp.c:331
 msgid "Host key verification failed"
 msgstr "A gép kulcsának ellenőrzése meghiúsult"
 
-#: ../daemon/gvfsbackendsftp.c:407
+#: ../daemon/gvfsbackendsftp.c:495
 msgid "Unable to spawn ssh program"
 msgstr "Az ssh program nem indítható"
 
-#: ../daemon/gvfsbackendsftp.c:423
+#: ../daemon/gvfsbackendsftp.c:511
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Az ssh program nem indítható: %s"
 
-#: ../daemon/gvfsbackendsftp.c:535 ../daemon/gvfsbackendsftp.c:787
+#: ../daemon/gvfsbackendsftp.c:613 ../daemon/gvfsbackendsftp.c:874
 msgid "Timed out when logging in"
 msgstr "Időtúllépés a bejelentkezéskor"
 
-#: ../daemon/gvfsbackendsftp.c:865
+#: ../daemon/gvfsbackendsftp.c:953
 msgid "Enter passphrase for key"
 msgstr "Adja meg a kulcs jelmondatát"
 
-#: ../daemon/gvfsbackendsftp.c:867
+#: ../daemon/gvfsbackendsftp.c:955
 msgid "Enter password"
 msgstr "Adja meg a jelszót"
 
-#: ../daemon/gvfsbackendsftp.c:928
+#: ../daemon/gvfsbackendsftp.c:1031
 msgid "Can't send password"
 msgstr "A jelszó nem küldhető el"
 
-#: ../daemon/gvfsbackendsftp.c:936
+#: ../daemon/gvfsbackendsftp.c:1039
 msgid "Log In Anyway"
 msgstr "Bejelentkezés mindenképpen"
 
-#: ../daemon/gvfsbackendsftp.c:936
+#: ../daemon/gvfsbackendsftp.c:1039
 msgid "Cancel Login"
 msgstr "Bejelentkezés megszakítása"
 
-#: ../daemon/gvfsbackendsftp.c:946
+#: ../daemon/gvfsbackendsftp.c:1048
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -984,128 +1021,133 @@ msgstr ""
 "A távoli számítógép által küldött azonosság: %s. Ha nem teljesen biztos "
 "abban, hogy biztonságos a folytatás, keresse meg a rendszergazdát."
 
-#: ../daemon/gvfsbackendsftp.c:966
+#: ../daemon/gvfsbackendsftp.c:1068
 msgid "Login dialog cancelled"
 msgstr "A bejelentkezés megszakítva"
 
-#: ../daemon/gvfsbackendsftp.c:986
+#: ../daemon/gvfsbackendsftp.c:1088
 msgid "Can't send host identity confirmation"
 msgstr "A gép azonossági információi nem küldhetők el"
 
-#: ../daemon/gvfsbackendsftp.c:1479 ../daemon/gvfsbackendsftp.c:1502
+#: ../daemon/gvfsbackendsftp.c:1581 ../daemon/gvfsbackendsftp.c:1604
 msgid "Protocol error"
 msgstr "Protokollhiba"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1527
+#: ../daemon/gvfsbackendsftp.c:1629
 #, c-format
-#| msgid "ftp as %s on %s"
 msgid "sftp for %s on %s"
 msgstr "sftp %s néven a következőn: %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1530
+#: ../daemon/gvfsbackendsftp.c:1632
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp a következőn: %s"
 
-#: ../daemon/gvfsbackendsftp.c:1556
+#: ../daemon/gvfsbackendsftp.c:1670
 msgid "Unable to find supported ssh command"
 msgstr "Nem található támogatott ssh parancs"
 
-#: ../daemon/gvfsbackendsftp.c:1976
-msgid "Failure"
-msgstr "Hiba"
+#: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "A művelet nem támogatott"
 
-#: ../daemon/gvfsbackendsftp.c:2032 ../daemon/gvfsbackendsftp.c:2111
-#: ../daemon/gvfsbackendsftp.c:2122 ../daemon/gvfsbackendsftp.c:2178
-#: ../daemon/gvfsbackendsftp.c:2264 ../daemon/gvfsbackendsftp.c:2314
-#: ../daemon/gvfsbackendsftp.c:2360 ../daemon/gvfsbackendsftp.c:2435
-#: ../daemon/gvfsbackendsftp.c:2542 ../daemon/gvfsbackendsftp.c:2582
-#: ../daemon/gvfsbackendsftp.c:2632 ../daemon/gvfsbackendsftp.c:2701
-#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2873
-#: ../daemon/gvfsbackendsftp.c:2898 ../daemon/gvfsbackendsftp.c:2953
-#: ../daemon/gvfsbackendsftp.c:3010 ../daemon/gvfsbackendsftp.c:3281
-#: ../daemon/gvfsbackendsftp.c:3348 ../daemon/gvfsbackendsftp.c:3477
-#: ../daemon/gvfsbackendsftp.c:3512 ../daemon/gvfsbackendsftp.c:3540
-#: ../daemon/gvfsbackendsftp.c:3648 ../daemon/gvfsbackendsftp.c:3702
-#: ../daemon/gvfsbackendsftp.c:3736 ../daemon/gvfsbackendsftp.c:3770
-#: ../daemon/gvfsbackendsftp.c:3785 ../daemon/gvfsbackendsftp.c:3800
-#: ../daemon/gvfsbackendsftp.c:3878
+#: ../daemon/gvfsbackendsftp.c:1929 ../daemon/gvfsbackendsftp.c:2318
+#: ../daemon/gvfsbackendsftp.c:2397 ../daemon/gvfsbackendsftp.c:2408
+#: ../daemon/gvfsbackendsftp.c:2464 ../daemon/gvfsbackendsftp.c:2550
+#: ../daemon/gvfsbackendsftp.c:2600 ../daemon/gvfsbackendsftp.c:2646
+#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2828
+#: ../daemon/gvfsbackendsftp.c:2945 ../daemon/gvfsbackendsftp.c:3026
+#: ../daemon/gvfsbackendsftp.c:3098 ../daemon/gvfsbackendsftp.c:3110
+#: ../daemon/gvfsbackendsftp.c:3168 ../daemon/gvfsbackendsftp.c:3210
+#: ../daemon/gvfsbackendsftp.c:3395 ../daemon/gvfsbackendsftp.c:3427
+#: ../daemon/gvfsbackendsftp.c:3482 ../daemon/gvfsbackendsftp.c:3539
+#: ../daemon/gvfsbackendsftp.c:3836 ../daemon/gvfsbackendsftp.c:3903
+#: ../daemon/gvfsbackendsftp.c:4038 ../daemon/gvfsbackendsftp.c:4098
+#: ../daemon/gvfsbackendsftp.c:4133 ../daemon/gvfsbackendsftp.c:4161
+#: ../daemon/gvfsbackendsftp.c:4269 ../daemon/gvfsbackendsftp.c:4323
+#: ../daemon/gvfsbackendsftp.c:4362 ../daemon/gvfsbackendsftp.c:4396
+#: ../daemon/gvfsbackendsftp.c:4430 ../daemon/gvfsbackendsftp.c:4445
+#: ../daemon/gvfsbackendsftp.c:4460 ../daemon/gvfsbackendsftp.c:4538
 msgid "Invalid reply received"
 msgstr "Érvénytelen válasz érkezett"
 
-#: ../daemon/gvfsbackendsftp.c:2084
+#: ../daemon/gvfsbackendsftp.c:2262
+msgid "Failure"
+msgstr "Hiba"
+
+#: ../daemon/gvfsbackendsftp.c:2370
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "Érvénytelen icon_id (%s) az OpenIconForRead hívásban"
 
-#: ../daemon/gvfsbackendsftp.c:2380
+#: ../daemon/gvfsbackendsftp.c:2666
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Hiba a mentési fájl létrehozásakor: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2783
+#: ../daemon/gvfsbackendsftp.c:3272
 msgid "Unable to create temporary file"
 msgstr "Nem lehet ideiglenes fájlt létrehozni"
 
-#: ../daemon/gvfsbackendsftp.c:3574 ../daemon/gvfsbackendsmb.c:1901
+#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:1990
 msgid "Can't move directory over directory"
 msgstr "A könyvtár nem helyezhető át könyvtárba"
 
 #. translators: First %s is a share name, second is a server name
-#: ../daemon/gvfsbackendsmb.c:222
+#: ../daemon/gvfsbackendsmb.c:229
 #, c-format
 msgid "Password required for share %s on %s"
 msgstr "Jelszó szükséges a(z) %2$s gép %1$s megosztásához"
 
-#: ../daemon/gvfsbackendsmb.c:478 ../daemon/gvfsbackendsmb.c:524
+#: ../daemon/gvfsbackendsmb.c:485 ../daemon/gvfsbackendsmb.c:531
 #: ../daemon/gvfsdaemonutils.c:92
 #, c-format
 msgid "Internal Error (%s)"
 msgstr "Belső hiba (%s)"
 
 #. translators: We tried to mount a windows (samba) share, but failed
-#: ../daemon/gvfsbackendsmb.c:604
+#: ../daemon/gvfsbackendsmb.c:611
 msgid "Failed to mount Windows share"
 msgstr "A Windows megosztás csatolása meghiúsult"
 
-#: ../daemon/gvfsbackendsmb.c:753 ../daemon/gvfsbackendsmb.c:1209
+#: ../daemon/gvfsbackendsmb.c:772 ../daemon/gvfsbackendsmb.c:1268
 msgid "Unsupported seek type"
 msgstr "Nem támogatott pozicionálástípus"
 
-#: ../daemon/gvfsbackendsmb.c:1273
+#: ../daemon/gvfsbackendsmb.c:1360
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "A mentési fájl létrehozása meghiúsult: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1803
+#: ../daemon/gvfsbackendsmb.c:1892
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Hiba a fájl törlésekor: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1877
+#: ../daemon/gvfsbackendsmb.c:1966
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Hiba a fájl áthelyezésekor: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1949
+#: ../daemon/gvfsbackendsmb.c:2038
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Hiba a célfájl eltávolításakor: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1973
+#: ../daemon/gvfsbackendsmb.c:2062
 msgid "Can't recursively move directory"
 msgstr "A könyvtár nem helyezhető át rekurzívan"
 
-#: ../daemon/gvfsbackendsmb.c:2037
+#: ../daemon/gvfsbackendsmb.c:2128
 msgid "Windows Shares Filesystem Service"
 msgstr "Windows megosztások fájlrendszer-szolgáltatás"
 
 #. translators: %s is a server name
 #: ../daemon/gvfsbackendsmbbrowse.c:365
 #, c-format
-#| msgid "Password required for share %s on %s"
 msgid "Password required for %s"
 msgstr "Jelszó szükséges a következőhöz: %s"
 
@@ -1129,27 +1171,25 @@ msgstr "A fájl nem csatolható"
 msgid "Not a regular file"
 msgstr "Nem szabályos fájl"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1501
+#: ../daemon/gvfsbackendsmbbrowse.c:1503
 msgid "Windows Network Filesystem Service"
 msgstr "Windows hálózat fájlrendszer-szolgáltatás"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
-#, c-format
 msgid "The trash folder may not be deleted"
 msgstr "A trash mappa nem törölhető"
 
 #: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
-#, c-format
 msgid "Items in the trash may not be modified"
 msgstr "A Kuka elemei nem módosíthatók"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:735 ../daemon/gvfsbackendtrash.c:843
+#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
 msgid "Trash"
 msgstr "Kuka"
 
-#: ../daemon/gvfsdaemon.c:1032
+#: ../daemon/gvfsdaemon.c:1056
 msgid "Invalid backend type"
 msgstr "Érvénytelen háttérprogram-típus"
 
@@ -1157,6 +1197,71 @@ msgstr "Érvénytelen háttérprogram-típus"
 #, c-format
 msgid "Error sending fd: %s"
 msgstr "Hiba a fájlleíró küldésekor: %s"
+
+#: ../daemon/gvfsftpconnection.c:181
+msgid "Unexpected end of stream"
+msgstr "Az adatfolyam váratlanul véget ért"
+
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
+msgid "Invalid reply"
+msgstr "Érvénytelen válasz"
+
+#: ../daemon/gvfsftpconnection.c:393
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr ""
+"Nem hozható létre aktív FTP kapcsolat. Lehet, hogy az útválasztó nem "
+"támogatja?"
+
+#: ../daemon/gvfsftpconnection.c:400
+msgid "Failed to create active FTP connection."
+msgstr "Nem hozható létre aktív FTP kapcsolat."
+
+#: ../daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "A fájlnév érvénytelen karaktereket tartalmaz."
+
+#: ../daemon/gvfsftptask.c:262
+msgid "The FTP server is busy. Try again later"
+msgstr "Az FTP kiszolgáló foglalt. Próbálja újra később."
+
+#: ../daemon/gvfsftptask.c:356
+msgid "Accounts are unsupported"
+msgstr "A fiókok nem támogatottak"
+
+#: ../daemon/gvfsftptask.c:360
+msgid "Host closed connection"
+msgstr "A gép lezárta a kapcsolatot"
+
+#: ../daemon/gvfsftptask.c:364
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Nem nyitható meg az adatkapcsolat. Lehet, hogy a tűzfal akadályozza?"
+
+#: ../daemon/gvfsftptask.c:368
+msgid "Data connection closed"
+msgstr "Az adatkapcsolat lezárva"
+
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
+msgid "Operation failed"
+msgstr "A művelet meghiúsult"
+
+#: ../daemon/gvfsftptask.c:384
+msgid "No space left on server"
+msgstr "Nincs több hely a kiszolgálón"
+
+#: ../daemon/gvfsftptask.c:396
+msgid "Unsupported network protocol"
+msgstr "Nem támogatott hálózati protokoll"
+
+#: ../daemon/gvfsftptask.c:404
+msgid "Page type unknown"
+msgstr "Az oldaltípus ismeretlen"
+
+#: ../daemon/gvfsftptask.c:408
+msgid "Invalid filename"
+msgstr "Érvénytelen fájlnév"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
@@ -1166,7 +1271,7 @@ msgstr "A háttérprogram nem támogatja a szimbolikus linkeket"
 msgid "Invalid dbus message"
 msgstr "Érvénytelen D-Bus üzenet"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
 msgstr "A régi démon helyettesítése."
 
@@ -1184,17 +1289,18 @@ msgstr "A GVFS elsődleges démona"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76
+#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:364
-#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:131
-#: ../programs/gvfs-open.c:144 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-tree.c:251
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:110 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:98 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "További információkért adja ki a következő parancsot: „%s --help”."
@@ -1223,6 +1329,119 @@ msgstr "A hely már csatolva van"
 #: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "A hely nem csatolható"
+
+#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:449
+#, c-format
+msgid "Can't find metadata file %s"
+msgstr "A(z) %s metaadatfájl nem található"
+
+#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+msgid "Unable to set metadata key"
+msgstr "A metaadatkulcs nem állítható be"
+
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+msgid "Unable to unset metadata key"
+msgstr "A metaadatkulcs nem törölhető"
+
+#: ../metadata/meta-daemon.c:428
+msgid "Unable to remove metadata keys"
+msgstr "A metaadatkulcsok nem távolíthatók el"
+
+#: ../metadata/meta-daemon.c:459
+msgid "Unable to move metadata keys"
+msgstr "A metaadatkulcsok nem helyezhetők át"
+
+#: ../metadata/meta-daemon.c:704
+msgid "GVFS Metadata Daemon"
+msgstr "GVFS metaadatdémon"
+
+#: ../metadata/meta-daemon.c:707
+msgid "Metadata daemon for GVFS"
+msgstr "A GVFS metaadatdémona"
+
+#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
+msgid "GVfs GDU Volume Monitor"
+msgstr "GVfs GDU kötetfigyelő"
+
+#: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
+msgid "Floppy Drive"
+msgstr "Hajlékonylemezes meghajtó"
+
+#: ../monitor/gdu/ggdudrive.c:257
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "Névtelen meghajtó (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:259
+msgid "Unnamed Drive"
+msgstr "Névtelen meghajtó"
+
+#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr "Az adathordozó kiadása meghiúsult, mivel néhány kötete foglalt."
+
+#: ../monitor/gdu/ggdudrive.c:1003
+msgid ""
+"Start drive in degraded mode?\n"
+"Starting a drive in degraded mode means that the drive is no longer tolerant "
+"to failures. Data on the drive may be irrevocably lost if a component fails."
+msgstr ""
+"Elindítja a meghajtót leromlott módban?\n"
+"A meghajtó leromlott módban indítása azt jelenti, hogy az már nem viseli el "
+"a meghibásodásokat. A meghajtón található adatok visszavonhatatlanul "
+"elveszhetnek, ha egy összetevő meghibásodik."
+
+#: ../monitor/gdu/ggdudrive.c:1009
+msgid "Start Anyway"
+msgstr "Indítás mindenképp"
+
+#: ../monitor/gdu/ggdumount.c:817
+msgid "One or more programs are preventing the unmount operation."
+msgstr "Néhány program megakadályozza a leválasztási műveletet."
+
+# fixme: WTF?
+#: ../monitor/gdu/ggdumount.c:945
+msgid "Cannot get LUKS cleartext slave"
+msgstr "Nem kérhető le a LUKS egyszerű szöveges szolga"
+
+#: ../monitor/gdu/ggdumount.c:967
+#, c-format
+msgid "Cannot get LUKS cleartext slave from path `%s'"
+msgstr "Nem kérhető le a LUKS egyszerű szöveges szolga az útvonalról: „%s”"
+
+#: ../monitor/gdu/ggduvolume.c:308
+msgid "Floppy Disk"
+msgstr "Hajlékonylemez"
+
+#: ../monitor/gdu/ggduvolume.c:989
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data on partition %d."
+msgstr ""
+"Adja meg a jelszót a kötet feloldásához\n"
+"A(z) „%s” eszköz titkosított adatokat tartalmaz a(z) %d. partíción."
+
+#: ../monitor/gdu/ggduvolume.c:996
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data."
+msgstr ""
+"Adja meg a jelszót a kötet feloldásához\n"
+"A(z) „%s” eszköz titkosított adatokat tartalmaz."
+
+#: ../monitor/gdu/ggduvolume.c:1003
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device %s contains encrypted data."
+msgstr ""
+"Adja meg a jelszót a kötet feloldásához\n"
+"A(z) „%s” eszköz titkosított adatokat tartalmaz."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1362,184 +1581,179 @@ msgstr "Lemez"
 msgid "Blank Disc"
 msgstr "Üres lemez"
 
-#: ../monitor/hal/ghaldrive.c:130
+#: ../monitor/hal/ghaldrive.c:127
 msgid "CD-ROM"
 msgstr "CD-ROM"
 
-#: ../monitor/hal/ghaldrive.c:132
+#: ../monitor/hal/ghaldrive.c:129
 msgid "CD-R"
 msgstr "CD-R"
 
-#: ../monitor/hal/ghaldrive.c:134
+#: ../monitor/hal/ghaldrive.c:131
 msgid "CD-RW"
 msgstr "CD-RW"
 
-#: ../monitor/hal/ghaldrive.c:138
+#: ../monitor/hal/ghaldrive.c:135
 msgid "DVD-ROM"
 msgstr "DVD-ROM"
 
-#: ../monitor/hal/ghaldrive.c:140
+#: ../monitor/hal/ghaldrive.c:137
 msgid "DVD+R"
 msgstr "DVD+R"
 
-#: ../monitor/hal/ghaldrive.c:142
+#: ../monitor/hal/ghaldrive.c:139
 msgid "DVD+RW"
 msgstr "DVD+RW"
 
-#: ../monitor/hal/ghaldrive.c:144
+#: ../monitor/hal/ghaldrive.c:141
 msgid "DVD-R"
 msgstr "DVD-R"
 
-#: ../monitor/hal/ghaldrive.c:146
+#: ../monitor/hal/ghaldrive.c:143
 msgid "DVD-RW"
 msgstr "DVD-RW"
 
-#: ../monitor/hal/ghaldrive.c:148
+#: ../monitor/hal/ghaldrive.c:145
 msgid "DVD-RAM"
 msgstr "DVD-RAM"
 
-#: ../monitor/hal/ghaldrive.c:151
+#: ../monitor/hal/ghaldrive.c:148
 msgid "DVD±R"
 msgstr "DVD±R"
 
-#: ../monitor/hal/ghaldrive.c:154
+#: ../monitor/hal/ghaldrive.c:151
 msgid "DVD±RW"
 msgstr "DVD±RW"
 
-#: ../monitor/hal/ghaldrive.c:156
+#: ../monitor/hal/ghaldrive.c:153
 msgid "HDDVD"
 msgstr "HDDVD"
 
-#: ../monitor/hal/ghaldrive.c:158
+#: ../monitor/hal/ghaldrive.c:155
 msgid "HDDVD-r"
 msgstr "HDDVD-r"
 
-#: ../monitor/hal/ghaldrive.c:160
+#: ../monitor/hal/ghaldrive.c:157
 msgid "HDDVD-RW"
 msgstr "HDDVD-RW"
 
-#: ../monitor/hal/ghaldrive.c:162
+#: ../monitor/hal/ghaldrive.c:159
 msgid "Blu-ray"
 msgstr "Blu-ray"
 
-#: ../monitor/hal/ghaldrive.c:164
+#: ../monitor/hal/ghaldrive.c:161
 msgid "Blu-ray-R"
 msgstr "Blu-ray-R"
 
-#: ../monitor/hal/ghaldrive.c:166
+#: ../monitor/hal/ghaldrive.c:163
 msgid "Blu-ray-RE"
 msgstr "Blu-ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
-#: ../monitor/hal/ghaldrive.c:172
+#: ../monitor/hal/ghaldrive.c:169
 #, c-format
 msgid "%s/%s Drive"
 msgstr "%s/%s meghajtó"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
-#: ../monitor/hal/ghaldrive.c:178
+#: ../monitor/hal/ghaldrive.c:175
 #, c-format
 msgid "%s Drive"
 msgstr "%s meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:182
-msgid "Floppy Drive"
-msgstr "Hajlékonylemezes meghajtó"
-
-#: ../monitor/hal/ghaldrive.c:188
+#: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
 msgstr "Szoftveres RAID meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:190
+#: ../monitor/hal/ghaldrive.c:187
 msgid "USB Drive"
 msgstr "USB meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:192
+#: ../monitor/hal/ghaldrive.c:189
 msgid "ATA Drive"
 msgstr "ATA meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:194
+#: ../monitor/hal/ghaldrive.c:191
 msgid "SCSI Drive"
 msgstr "SCSI meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:196
+#: ../monitor/hal/ghaldrive.c:193
 msgid "FireWire Drive"
 msgstr "FireWire meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:200
+#: ../monitor/hal/ghaldrive.c:197
 msgid "Tape Drive"
 msgstr "Szalagos meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:202
+#: ../monitor/hal/ghaldrive.c:199
 msgid "CompactFlash Drive"
 msgstr "CompactFlash meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:204
+#: ../monitor/hal/ghaldrive.c:201
 msgid "MemoryStick Drive"
 msgstr "MemoryStick meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:206
+#: ../monitor/hal/ghaldrive.c:203
 msgid "SmartMedia Drive"
 msgstr "SmartMedia meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:208
+#: ../monitor/hal/ghaldrive.c:205
 msgid "SD/MMC Drive"
 msgstr "SD/MMC meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:210
+#: ../monitor/hal/ghaldrive.c:207
 msgid "Zip Drive"
 msgstr "Zip meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:212
+#: ../monitor/hal/ghaldrive.c:209
 msgid "Jaz Drive"
 msgstr "Jaz meghajtó"
 
-#: ../monitor/hal/ghaldrive.c:214
+#: ../monitor/hal/ghaldrive.c:211
 msgid "Thumb Drive"
 msgstr "Pen drive"
 
-#: ../monitor/hal/ghaldrive.c:217
+#: ../monitor/hal/ghaldrive.c:214
 msgid "Mass Storage Drive"
 msgstr "Tömeges tárolómeghajtó"
 
-#: ../monitor/hal/ghaldrive.c:723
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr "Az adathordozó kiadása meghiúsult, mivel néhány kötete foglalt."
-
-#: ../monitor/hal/ghalmount.c:301 ../monitor/hal/ghalvolume.c:171
+#: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
 msgstr "%.1f kB"
 
-#: ../monitor/hal/ghalmount.c:306 ../monitor/hal/ghalvolume.c:176
+#: ../monitor/hal/ghalmount.c:164 ../monitor/hal/ghalvolume.c:168
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: ../monitor/hal/ghalmount.c:311 ../monitor/hal/ghalvolume.c:181
+#: ../monitor/hal/ghalmount.c:169 ../monitor/hal/ghalvolume.c:173
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: ../monitor/hal/ghalmount.c:433 ../monitor/hal/ghalvolume.c:252
+#: ../monitor/hal/ghalmount.c:323 ../monitor/hal/ghalvolume.c:244
 msgid "Mixed Audio/Data Disc"
 msgstr "Vegyes hang/adatlemez"
 
 #. Translators: %s is the size of the mount (e.g. 512 MB)
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalmount.c:446 ../monitor/hal/ghalvolume.c:263
+#: ../monitor/hal/ghalmount.c:336 ../monitor/hal/ghalvolume.c:255
 #, c-format
 msgid "%s Media"
 msgstr "%s adathordozó"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
-#: ../monitor/hal/ghalvolume.c:240
+#: ../monitor/hal/ghalvolume.c:232
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s titkosított adatok"
+
+#: ../programs/gvfs-cat.c:37
+msgid "locations"
+msgstr "helyek"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1595,34 +1809,319 @@ msgstr ""
 "Megjegyzés: irányítsa keresztül a cat programon, ha annak formázási "
 "lehetőségeire van szükség, mint például a -n, -T vagy hasonlók."
 
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:108
+#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:96
+#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr "Hiba a parancssori kapcsolók feldolgozásakor: %s\n"
+
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
-#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:142
+#: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: hiányzó helyek"
 
+#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+msgid "no target directory"
+msgstr "nincs célkönyvtár"
+
+#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+msgid "show progress"
+msgstr "folyamat megjelenítése"
+
+#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+msgid "prompt before overwrite"
+msgstr "kérdés felülírás előtt"
+
+#: ../programs/gvfs-copy.c:47
+msgid "preserve all attributes"
+msgstr "minden attribútum megőrzése"
+
+#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+msgid "backup existing destination files"
+msgstr "meglévő célfájlok biztonsági mentése"
+
+#: ../programs/gvfs-copy.c:49
+msgid "never follow symbolic links"
+msgstr "soha ne kövesse a szimbolikus linkeket"
+
+#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#, c-format
+msgid "progress"
+msgstr "folyamat"
+
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
+#: ../programs/gvfs-save.c:156
+msgid "- output files at <location>"
+msgstr "– fájlok kiírása a <helyre>"
+
+#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
+#, c-format
+msgid "Missing operand\n"
+msgstr "Hiányzó operandus\n"
+
+#: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
+#, c-format
+msgid "Too many arguments\n"
+msgstr "Túl sok paraméter\n"
+
+#: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
+#, c-format
+msgid "Target %s is not a directory\n"
+msgstr "A(z) %s cél nem egy könyvtár\n"
+
+#: ../programs/gvfs-copy.c:177
+#, c-format
+msgid "overwrite %s?"
+msgstr "felülírja a következőt: %s?"
+
+#: ../programs/gvfs-copy.c:191
+#, c-format
+msgid "Error copying file %s: %s\n"
+msgstr "Hiba a(z) %s fájl áthelyezésekor: %s\n"
+
+#: ../programs/gvfs-info.c:37
+msgid "List writable attributes"
+msgstr "Írható attribútumok felsorolása"
+
+#: ../programs/gvfs-info.c:38
+msgid "Get filesystem info"
+msgstr "Fájlrendszer-információk lekérése"
+
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+msgid "The attributes to get"
+msgstr "A lekérendő attribútumok"
+
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-set-attribute.c:37
+msgid "Don't follow symlinks"
+msgstr "Ne kövesse a szimbolikus linkeket"
+
+#: ../programs/gvfs-info.c:50
+msgid "invalid type"
+msgstr "érvénytelen típus"
+
+#: ../programs/gvfs-info.c:53
+msgid "unknown"
+msgstr "ismeretlen"
+
+#: ../programs/gvfs-info.c:56
+msgid "regular"
+msgstr "szabályos"
+
+#: ../programs/gvfs-info.c:59
+msgid "directory"
+msgstr "könyvtár"
+
+#: ../programs/gvfs-info.c:62
+msgid "symlink"
+msgstr "szimbolikus link"
+
+#: ../programs/gvfs-info.c:65
+msgid "special"
+msgstr "speciális"
+
+#: ../programs/gvfs-info.c:68
+msgid "shortcut"
+msgstr "indítóikon"
+
+#: ../programs/gvfs-info.c:71
+msgid "mountable"
+msgstr "csatolható"
+
+#: ../programs/gvfs-info.c:109
+#, c-format
+msgid "attributes:\n"
+msgstr "attribútumok:\n"
+
+#: ../programs/gvfs-info.c:155
+#, c-format
+msgid "display name: %s\n"
+msgstr "megjelenő név: %s\n"
+
+#: ../programs/gvfs-info.c:159
+#, c-format
+msgid "edit name: %s\n"
+msgstr "szerkeszthető név: %s\n"
+
+#: ../programs/gvfs-info.c:165
+#, c-format
+msgid "name: %s\n"
+msgstr "név: %s\n"
+
+#: ../programs/gvfs-info.c:172
+#, c-format
+msgid "type: %s\n"
+msgstr "típus: %s\n"
+
+#: ../programs/gvfs-info.c:178
+#, c-format
+msgid "size: "
+msgstr "méret: "
+
+#: ../programs/gvfs-info.c:183
+#, c-format
+msgid "hidden\n"
+msgstr "rejtett\n"
+
+#: ../programs/gvfs-info.c:266
+msgid "Copy with file"
+msgstr "Másolás fájllal"
+
+#: ../programs/gvfs-info.c:270
+msgid "Keep with file when moved"
+msgstr "Megtartás a fájllal áthelyezéskor"
+
+#: ../programs/gvfs-info.c:307
+#, c-format
+msgid "Error getting writable attributes: %s\n"
+msgstr "Hiba az írható attribútumok lekérésekor: %s\n"
+
+#: ../programs/gvfs-info.c:312
+#, c-format
+msgid "Settable attributes:\n"
+msgstr "Beállítható attribútumok:\n"
+
+#: ../programs/gvfs-info.c:335
+#, c-format
+msgid "Writable attribute namespaces:\n"
+msgstr "Írható attribútumnévterek:\n"
+
+#: ../programs/gvfs-info.c:362
+msgid "- show info for <location>"
+msgstr "– a <hely> információinak megjelenítése"
+
+#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+msgid "Show hidden files"
+msgstr "Rejtett fájlok megjelenítése"
+
+#: ../programs/gvfs-ls.c:41
+msgid "Use a long listing format"
+msgstr "Hosszú kiírási formátum használata"
+
+#: ../programs/gvfs-ls.c:42
+msgid "Show completions"
+msgstr "Kiegészítése megjelenítése"
+
+#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-rename.c:68
+#, c-format
+msgid "Error: %s\n"
+msgstr "Hiba: %s\n"
+
+#: ../programs/gvfs-ls.c:383
+msgid "- list files at <location>"
+msgstr "– fájlok felsorolása a <helyen>"
+
+#: ../programs/gvfs-mkdir.c:33
+msgid "create parent directories"
+msgstr "szülőkönyvtárak létrehozása"
+
+#: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
+msgid "- delete files"
+msgstr "– fájlok törlése"
+
+#: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
+#, c-format
+msgid "Error creating directory: %s\n"
+msgstr "Hiba a könyvtár létrehozásakor: %s\n"
+
+#: ../programs/gvfs-mount.c:54
+msgid "Mount as mountable"
+msgstr "Csatolás csatolhatóként"
+
+#: ../programs/gvfs-mount.c:55
+msgid "Mount volume with device file"
+msgstr "Kötet csatolása eszközfájllal"
+
+#: ../programs/gvfs-mount.c:56
+msgid "Unmount"
+msgstr "Leválasztás"
+
+#: ../programs/gvfs-mount.c:57
+msgid "Unmount all mounts with the given scheme"
+msgstr "Az adott sémájú összes csatolás leválasztása"
+
+#: ../programs/gvfs-mount.c:58
+msgid "List"
+msgstr "Listázás"
+
+#: ../programs/gvfs-mount.c:59
+msgid "Show extra information for List and Monitor"
+msgstr "További információk megjelenítése a --list és --monitor kapcsolókkal"
+
+#: ../programs/gvfs-mount.c:60
+msgid "Monitor events"
+msgstr "Események figyelése"
+
+#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#, c-format
+msgid "Error mounting location: %s\n"
+msgstr "Hiba a hely csatolásakor: %s\n"
+
+#: ../programs/gvfs-mount.c:241
+#, c-format
+msgid "Error unmounting mount: %s\n"
+msgstr "Hiba a csatolás leválasztásakor: %s\n"
+
+#: ../programs/gvfs-mount.c:262
+#, c-format
+msgid "Error finding enclosing mount: %s\n"
+msgstr "Nem található a befoglaló csatolás: %s\n"
+
+#: ../programs/gvfs-mount.c:673
+#, c-format
+msgid "Error mounting %s: %s\n"
+msgstr "Hiba a(z) %s csatolásakor: %s\n"
+
+#: ../programs/gvfs-mount.c:687
+#, c-format
+msgid "Mounted %s at %s\n"
+msgstr "%s csatolva ide: %s\n"
+
+#: ../programs/gvfs-mount.c:738
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr "Nincs kötet a következő eszközfájlhoz: %s\n"
+
+#: ../programs/gvfs-mount.c:931
+msgid "- mount <location>"
+msgstr "– a <hely> csatolása"
+
+#: ../programs/gvfs-move.c:173
+#, c-format
+msgid "Error moving file %s: %s\n"
+msgstr "Hiba a(z) %s fájl áthelyezésekor: %s\n"
+
+#: ../programs/gvfs-open.c:37
+msgid "files"
+msgstr "fájlok"
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:56
+#: ../programs/gvfs-open.c:65
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
 msgstr "%s: %s: hiba a hely megnyitásakor: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
-#: ../programs/gvfs-open.c:83
+#: ../programs/gvfs-open.c:92
 #, c-format
 msgid "%s: %s: error launching application: %s\n"
 msgstr "%s: %s: hiba az alkalmazás indításakor: %s\n"
 
-#: ../programs/gvfs-open.c:113
+#: ../programs/gvfs-open.c:122
 msgid "FILES... - open FILES with registered application."
 msgstr "FÁJLOK… – FÁJLOK megnyitása a bejegyzett alkalmazással."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
-#: ../programs/gvfs-open.c:117
+#: ../programs/gvfs-open.c:126
 msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
@@ -1630,3 +2129,107 @@ msgstr ""
 "A fájlok megnyitása az adott fájltípus kezelésére bejegyzett alapértelmezett "
 "alkalmazással."
 
+#: ../programs/gvfs-rename.c:49
+msgid "- rename file"
+msgstr "– fájl átnevezése"
+
+#: ../programs/gvfs-rename.c:74
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr "Az átnevezés sikeres. Az új URI: %s\n"
+
+#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+msgid "ignore nonexistent files, never prompt"
+msgstr "nem létező fájlok figyelmen kívül hagyása, soha ne kérdezzen"
+
+#: ../programs/gvfs-save.c:43
+msgid "Create backup"
+msgstr "Biztonsági másolat készítése"
+
+#: ../programs/gvfs-save.c:44
+msgid "Only create if not existing"
+msgstr "Létrehozás csak ha még nem létezik"
+
+#: ../programs/gvfs-save.c:45
+msgid "Append to end of file"
+msgstr "Hozzáfűzés a fájl végéhez"
+
+#: ../programs/gvfs-save.c:46
+msgid "When creating a file, restrict access to the current user only"
+msgstr "Fájl létrehozásakor hozzáférés korlátozása a jelenlegi felhasználóra"
+
+#: ../programs/gvfs-save.c:47
+msgid "Print new etag at end"
+msgstr "Új etag kiírása befejezéskor"
+
+#: ../programs/gvfs-save.c:48
+msgid "The etag of the file being overwritten"
+msgstr "A felülírt fájl etagja"
+
+#: ../programs/gvfs-save.c:76
+#, c-format
+msgid "Error opening file: %s\n"
+msgstr "Hiba a fájl megnyitásakor: %s\n"
+
+#: ../programs/gvfs-save.c:109
+msgid "Error reading stdin"
+msgstr "Hiba a szabványos bemenet olvasásakor"
+
+#: ../programs/gvfs-save.c:122
+#, c-format
+msgid "Error closing: %s\n"
+msgstr "Hiba a következő lezárásakor: %s\n"
+
+#: ../programs/gvfs-save.c:134
+#, c-format
+msgid "Etag not available\n"
+msgstr "Az etag nem érhető el\n"
+
+#: ../programs/gvfs-set-attribute.c:36
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+msgstr ""
+"attribútumtípus [karakterlánc, bájtsorozat, logikai, uint32, int32, uint64, "
+"int64, stringv]"
+
+#: ../programs/gvfs-set-attribute.c:119
+msgid " <location> <attribute> <values> - set attribute"
+msgstr " <hely> <attribútum> <érték> - attribútum beállítása"
+
+#: ../programs/gvfs-set-attribute.c:137
+#, c-format
+msgid "Location not specified\n"
+msgstr "Nincs megadva hely\n"
+
+#: ../programs/gvfs-set-attribute.c:145
+#, c-format
+msgid "Attribute not specified\n"
+msgstr "Nincs megadva attribútum\n"
+
+#: ../programs/gvfs-set-attribute.c:189
+#, c-format
+msgid "Invalid attribute type %s\n"
+msgstr "Érvénytelen attribútumtípus (%s)\n"
+
+#: ../programs/gvfs-set-attribute.c:199
+#, c-format
+msgid "Error setting attribute: %s\n"
+msgstr "Hiba az attribútum beállításakor: %s\n"
+
+#: ../programs/gvfs-trash.c:51
+msgid "- move files to trash"
+msgstr "– fájlok áthelyezése a Kukába"
+
+#: ../programs/gvfs-trash.c:67
+#, c-format
+msgid "Error trashing file: %s\n"
+msgstr "Hiba a fájl Kukába dobásakor: %s\n"
+
+#: ../programs/gvfs-tree.c:37
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "Szimbolikus linkek, csatolások és indítóikonok követése könyvtárakként"
+
+#: ../programs/gvfs-tree.c:242
+msgid "- list contents of directories in a tree-like format"
+msgstr "– könyvtárak tartalmának felsorolása fa-szerű formátumban"
