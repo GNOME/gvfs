@@ -297,7 +297,7 @@ archive_file_get_from_path (ArchiveFile *file, const char *filename, gboolean ad
 static void
 create_root_file (GVfsBackendArchive *ba)
 {
-  ArchiveFile *root = g_slice_new0 (ArchiveFile);
+  ArchiveFile *root;
   GFileInfo *info;
   char *s, *display_name;
   GIcon *icon;
