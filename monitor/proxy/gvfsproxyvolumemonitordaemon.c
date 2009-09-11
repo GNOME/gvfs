@@ -951,6 +951,8 @@ handle_mount_op_reply (DBusConnection *connection, DBusMessage *message)
   sender = dbus_message_get_sender (message);
 
   /* Find the op */
+  mount_operation = NULL;
+
   for (l = outstanding_mount_op_objects; l != NULL; l = l->next)
     {
       GMountOperation *op = G_MOUNT_OPERATION (l->data);
