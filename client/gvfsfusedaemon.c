@@ -2175,15 +2175,13 @@ mount_tracker_unmounted_cb (GVolumeMonitor *volume_monitor,
   GList *l;
 
   root = g_mount_get_root (mount);
-  
+
   mount_list_lock ();
-  
-  root = g_mount_get_root (mount);
 
   for (l = mount_list; l != NULL; l = l->next)
     {
       MountRecord *mount_record = l->data;
-      
+
       if (g_file_equal (root, mount_record->root))
         {
           mount_list = g_list_delete_link (mount_list, l);
@@ -2191,7 +2189,7 @@ mount_tracker_unmounted_cb (GVolumeMonitor *volume_monitor,
           break;
         }
     }
-      
+
   mount_list_unlock ();
 
   g_object_unref (root);
