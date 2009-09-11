@@ -510,6 +510,7 @@ find_file_insensitive_exists_callback (GObject *source_object,
       g_simple_async_result_complete_in_idle (simple);
       g_object_unref (simple);
       clear_find_file_insensitive_state (data);
+      g_object_unref (info);
     }
 
   else
