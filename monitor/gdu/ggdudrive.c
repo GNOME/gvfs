@@ -394,7 +394,7 @@ g_gdu_drive_get_volumes (GDrive *_drive)
 static gboolean
 g_gdu_drive_has_volumes (GDrive *_drive)
 {
-  GGduDrive *drive = G_GDU_DRIVE (drive);
+  GGduDrive *drive = G_GDU_DRIVE (_drive);
   gboolean res;
 
   res = drive->volumes != NULL;
