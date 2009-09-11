@@ -893,10 +893,8 @@ monitor_drive_eject_button (GVolumeMonitor *volume_monitor, GDrive *drive)
 static void
 monitor (void)
 {
-  GMainLoop *loop;
   GVolumeMonitor *volume_monitor;
 
-  loop = g_main_loop_new (NULL, FALSE);
   volume_monitor = g_volume_monitor_get ();
 
   g_signal_connect (volume_monitor, "mount-added", (GCallback) monitor_mount_added, NULL);
