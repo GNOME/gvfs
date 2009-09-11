@@ -326,6 +326,7 @@ g_proxy_mount_operation_handle_show_processes (const gchar      *wrapped_id,
   g_return_if_fail (iter != NULL);
 
   choices = NULL;
+  processes = NULL;
 
   G_LOCK (proxy_op);
   data = g_hash_table_lookup (id_to_op, wrapped_id);
@@ -382,8 +383,10 @@ g_proxy_mount_operation_handle_show_processes (const gchar      *wrapped_id,
                          choices->pdata);
 
  out:
-  g_ptr_array_free (choices, TRUE);
-  g_array_unref (processes);
+  if (choices)
+    g_ptr_array_free (choices, TRUE);
+  if (processes)
+    g_array_unref (processes);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
