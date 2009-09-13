@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-13 14:02+0200\n"
-"PO-Revision-Date: 2009-09-12 14:44+0200\n"
+"POT-Creation-Date: 2009-09-13 14:59+0200\n"
+"PO-Revision-Date: 2009-09-13 14:49+0200\n"
 "Last-Translator: Ask Hjorth Larsen <asklarsen@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "MIME-Version: 1.0\n"
@@ -1958,15 +1958,17 @@ msgstr "montérbar entitet"
 msgid "attributes:\n"
 msgstr "attributter:\n"
 
+# kommandoen 'gvfs-info' anfører et 'display name' for en fil, så det må være substantiv
 #: ../programs/gvfs-info.c:155
 #, c-format
 msgid "display name: %s\n"
-msgstr "vis navn: %s\n"
+msgstr "visningsnavn: %s\n"
 
+# samme situation som for 'display name'
 #: ../programs/gvfs-info.c:159
 #, c-format
 msgid "edit name: %s\n"
-msgstr "redigér navn: %s\n"
+msgstr "redigeringsnavn: %s\n"
 
 #: ../programs/gvfs-info.c:165
 #, c-format
@@ -2248,7 +2250,7 @@ msgstr "- flyt filer til papirkurv"
 #: ../programs/gvfs-trash.c:67
 #, c-format
 msgid "Error trashing file: %s\n"
-msgstr "Fejl ved flytning af fil papirkurv: %s\n"
+msgstr "Fejl ved flytning af fil til papirkurv: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
