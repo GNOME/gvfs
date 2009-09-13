@@ -4,6 +4,13 @@
 #
 # Ask Hjorth Larsen <asklarsen@gmail.com>, 2008, 09.
 #
+# Konventioner
+# ------------
+#
+# mappe -> katalog (følger anbefaling for tekstværktøjer; gvfs indeholder vist fortrinsvis strenge der bliver brugt på kommandolinje.  Dette kan/bør måske  diskuteres!
+# mountable (subst) -> monterbar entitet
+#
+#
 # Bemærk:
 # Her er brugt volume -> diskenhed.  Dette skal måske erstattes efter diskussion på mailinglisten
 #
@@ -11,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-12 03:23+0200\n"
-"PO-Revision-Date: 2009-08-16 04:39+0200\n"
+"POT-Creation-Date: 2009-09-13 14:02+0200\n"
+"PO-Revision-Date: 2009-09-12 14:44+0200\n"
 "Last-Translator: Ask Hjorth Larsen <asklarsen@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "MIME-Version: 1.0\n"
@@ -336,14 +343,14 @@ msgstr "Filen findes ikke"
 #: ../daemon/gvfsbackendgphoto2.c:1865 ../daemon/gvfsbackendobexftp.c:1052
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
-msgstr "Kan ikke åbne mappe"
+msgstr "Kan ikke åbne katalog"
 
 #: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
 #: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3803 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
-msgstr "Filen er ikke en mappe"
+msgstr "Filen er ikke et katalog"
 
 # name of the backend?  Så må vi hellere være forsigtige
 #. Translators: This is the name of the backend
@@ -353,7 +360,7 @@ msgstr "Burn"
 
 #: ../daemon/gvfsbackendburn.c:376
 msgid "Unable to create temporary directory"
-msgstr "Kan ikke oprette midlertidig mappe"
+msgstr "Kan ikke oprette midlertidigt katalog"
 
 #: ../daemon/gvfsbackendburn.c:405 ../daemon/gvfsbackendburn.c:416
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
@@ -366,17 +373,17 @@ msgstr "Kan ikke oprette midlertidig mappe"
 #: ../daemon/gvfsbackendsftp.c:2902 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
-msgstr "Filen eller mappen findes ikke"
+msgstr "Filen eller kataloget findes ikke"
 
 #: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
 #: ../daemon/gvfsbackendsftp.c:1748
 msgid "Directory not empty"
-msgstr "Mappen er ikke tom"
+msgstr "Kataloget er ikke tomt"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
 #: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Can't copy file over directory"
-msgstr "Kan ikke kopiere fil over mappe"
+msgstr "Kan ikke kopiere fil over katalog"
 
 #. Translators: this is the display name of the backend
 #: ../daemon/gvfsbackendburn.c:651
@@ -416,12 +423,12 @@ msgstr "Operationen understøttes ikke af backend"
 
 #: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
-msgstr "Filen eller mappen findes ikke i destinationsstien"
+msgstr "Filen eller kataloget findes ikke i destinationsstien"
 
 #: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1287
 #: ../daemon/gvfsbackendobexftp.c:1760
 msgid "Can't copy directory over directory"
-msgstr "Kan ikke kopiere mappe over mappen"
+msgstr "Kan ikke kopiere kataloget over kataloget"
 
 #: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1768
 #: ../daemon/gvfsbackendobexftp.c:1799 ../daemon/gvfsbackendsftp.c:1750
@@ -432,7 +439,7 @@ msgstr "Destinationsfilen findes"
 #: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1310
 #: ../daemon/gvfsbackendobexftp.c:1775
 msgid "Can't recursively copy directory"
-msgstr "Kan ikke kopiere mappen rekursivt"
+msgstr "Kan ikke kopiere kataloget rekursivt"
 
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
 #: ../daemon/gvfsbackendgphoto2.c:2559 ../daemon/gvfsbackendgphoto2.c:2768
@@ -647,7 +654,7 @@ msgstr "Lokalt netværk"
 
 #: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
-msgstr "Kan ikke overvåge fil eller mappe."
+msgstr "Kan ikke overvåge fil eller katalog."
 
 #. TODO: Names, etc
 #: ../daemon/gvfsbackenddnssd.c:754
@@ -699,7 +706,7 @@ msgstr "Filen findes ikke"
 #: ../daemon/gvfsbackendsftp.c:2989 ../daemon/gvfsbackendsftp.c:3330
 #: ../daemon/gvfsbackendsftp.c:4200
 msgid "File is directory"
-msgstr "Filen er en mappe"
+msgstr "Filen er et katalog"
 
 #: ../daemon/gvfsbackendftp.c:818 ../daemon/gvfsbackendftp.c:1083
 #: ../daemon/gvfsbackendsftp.c:3196
@@ -709,12 +716,12 @@ msgstr "sikkerhedskopier understøttes endnu ikke"
 #: ../daemon/gvfsbackendgphoto2.c:504
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %d: Mappen eller filen findes"
+msgstr "%s: %d: Kataloget eller filen findes"
 
 #: ../daemon/gvfsbackendgphoto2.c:511
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr "%s: %d: Ingen sådan fil eller mappe findes"
+msgstr "%s: %d: Ingen sådan fil eller katalog findes"
 
 #: ../daemon/gvfsbackendgphoto2.c:517
 #, c-format
@@ -841,7 +848,7 @@ msgstr "Kunne ikke hente filliste"
 
 #: ../daemon/gvfsbackendgphoto2.c:2571
 msgid "Error creating directory"
-msgstr "Fejl ved oprettelse af mappe"
+msgstr "Fejl ved oprettelse af katalog"
 
 #: ../daemon/gvfsbackendgphoto2.c:2780
 msgid "Name already exists"
@@ -853,7 +860,7 @@ msgstr "Det nye navn er for langt"
 
 #: ../daemon/gvfsbackendgphoto2.c:2801 ../daemon/gvfsbackendgphoto2.c:3431
 msgid "Error renaming dir"
-msgstr "Fejl ved omdøbning af mappe"
+msgstr "Fejl ved omdøbning af katalog"
 
 #: ../daemon/gvfsbackendgphoto2.c:2814 ../daemon/gvfsbackendgphoto2.c:3444
 msgid "Error renaming file"
@@ -862,11 +869,11 @@ msgstr "Fejl ved omdøbning af fil"
 #: ../daemon/gvfsbackendgphoto2.c:2878
 #, c-format
 msgid "Directory '%s' is not empty"
-msgstr "Mappen \"%s\" er ikke tom"
+msgstr "Kataloget \"%s\" er ikke tomt"
 
 #: ../daemon/gvfsbackendgphoto2.c:2889
 msgid "Error deleting directory"
-msgstr "Fejl ved sletning af mappe"
+msgstr "Fejl ved sletning af katalog"
 
 #: ../daemon/gvfsbackendgphoto2.c:2915
 msgid "Error deleting file"
@@ -874,7 +881,7 @@ msgstr "Fejl ved sletning af fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:2968
 msgid "Can't write to directory"
-msgstr "Kan ikke skrive til mappe"
+msgstr "Kan ikke skrive til katalog"
 
 #: ../daemon/gvfsbackendgphoto2.c:3015
 msgid "Cannot allocate new file to append to"
@@ -894,19 +901,19 @@ msgstr "Fejl under skrivning af fil"
 
 #: ../daemon/gvfsbackendgphoto2.c:3376
 msgid "Not supported (not same directory)"
-msgstr "Ikke understøttet (ikke samme mappe)"
+msgstr "Ikke understøttet (ikke samme katalog)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3388
 msgid "Not supported (src is dir, dst is dir)"
-msgstr "Ikke understøttet (kilde er mappe, destination er mappe)"
+msgstr "Ikke understøttet (kilde er katalog, destination er katalog)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3396
 msgid "Not supported (src is dir, dst is existing file)"
-msgstr "Ikke understøttet (kilde er mappe, destination er eksisterende fil)"
+msgstr "Ikke understøttet (kilde er katalog, destination er eksisterende fil)"
 
 #: ../daemon/gvfsbackendgphoto2.c:3408
 msgid "Not supported (src is file, dst is dir)"
-msgstr "Ikke understøttet (kilde er fil, destination er mappe)"
+msgstr "Ikke understøttet (kilde er fil, destination er katalog)"
 
 #: ../daemon/gvfsbackendhttp.c:248
 #, c-format
@@ -920,7 +927,7 @@ msgstr " (ugyldig kodning)"
 
 #: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
-msgstr "Mappeunderrettelse understøttes ikke"
+msgstr "Katalogunderrettelse understøttes ikke"
 
 #. smb:/// root link
 #: ../daemon/gvfsbackendnetwork.c:269 ../daemon/gvfsbackendsmbbrowse.c:885
@@ -1104,7 +1111,7 @@ msgstr "Kunne ikke oprette midlertidig fil"
 
 #: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:1990
 msgid "Can't move directory over directory"
-msgstr "Kan ikke flytte mappe over mappe"
+msgstr "Kan ikke flytte katalog over katalog"
 
 #. translators: First %s is a share name, second is a server name
 #: ../daemon/gvfsbackendsmb.c:229
@@ -1149,7 +1156,7 @@ msgstr "Fejl ved fjernelse af destinationsfil: %s"
 
 #: ../daemon/gvfsbackendsmb.c:2062
 msgid "Can't recursively move directory"
-msgstr "Kan ikke flytte mappen rekursivt"
+msgstr "Kan ikke flytte kataloget rekursivt"
 
 #: ../daemon/gvfsbackendsmb.c:2128
 msgid "Windows Shares Filesystem Service"
@@ -1175,7 +1182,7 @@ msgstr "Kunne ikke hente delingsliste fra server"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
-msgstr "Denne fil kan ikke monteres"
+msgstr "Filen er ikke en montérbar entitet"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
@@ -1187,7 +1194,7 @@ msgstr "Filsystemstjeneste til Windows-netværk"
 
 #: ../daemon/gvfsbackendtrash.c:370 ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
-msgstr "Papirkurvsmappen kan ikke slettes"
+msgstr "Papirkurvskataloget kan ikke slettes"
 
 #: ../daemon/gvfsbackendtrash.c:387 ../daemon/gvfsbackendtrash.c:440
 msgid "Items in the trash may not be modified"
@@ -1763,9 +1770,8 @@ msgid "%s Encrypted Data"
 msgstr "%s krypteret data"
 
 #: ../programs/gvfs-cat.c:37
-#, fuzzy
 msgid "locations"
-msgstr "%s: mangler placeringer"
+msgstr "placeringer"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1829,7 +1835,7 @@ msgstr ""
 #: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
 #, c-format
 msgid "Error parsing commandline options: %s\n"
-msgstr ""
+msgstr "Fejl under fortolkning af kommandolinjetilvalg: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1839,292 +1845,284 @@ msgid "%s: missing locations"
 msgstr "%s: mangler placeringer"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-#, fuzzy
 msgid "no target directory"
-msgstr "Ikke en mappe"
+msgstr "intet målkatalog"
 
 #: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
 msgid "show progress"
-msgstr ""
+msgstr "vis fremgang"
 
 #: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
 msgid "prompt before overwrite"
-msgstr ""
+msgstr "spørg før der overskrives"
 
 #: ../programs/gvfs-copy.c:47
 msgid "preserve all attributes"
-msgstr ""
+msgstr "bevar alle attributter"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
-#, fuzzy
 msgid "backup existing destination files"
-msgstr "Oprettelse af sikkerhedskopi af filen slog fejl"
+msgstr "opret sikkerhedskopier af eksisterende destinationsfiler"
 
 #: ../programs/gvfs-copy.c:49
 msgid "never follow symbolic links"
-msgstr ""
+msgstr "følg aldrig symbolske lænker"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
 msgid "progress"
-msgstr ""
+msgstr "fremgang"
 
+# Kør f.eks. gvfs-copy --help for at se sammenhæng
 #: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
 #: ../programs/gvfs-save.c:156
 msgid "- output files at <location>"
-msgstr ""
+msgstr "- skriv filer til <placering>"
 
 #: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
 #, c-format
 msgid "Missing operand\n"
-msgstr ""
+msgstr "Manglende operand\n"
 
 #: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
 #, c-format
 msgid "Too many arguments\n"
-msgstr ""
+msgstr "For mange argumenter\n"
 
 #: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
-#, fuzzy, c-format
+#, c-format
 msgid "Target %s is not a directory\n"
-msgstr "Filen er ikke en mappe"
+msgstr "Målet %s er ikke et katalog\n"
 
 #: ../programs/gvfs-copy.c:177
 #, c-format
 msgid "overwrite %s?"
-msgstr ""
+msgstr "overskriv %s?"
 
 #: ../programs/gvfs-copy.c:191
-#, fuzzy, c-format
+#, c-format
 msgid "Error copying file %s: %s\n"
-msgstr "Fejl ved flytning af fil: %s"
+msgstr "Fejl ved kopiering af filen %s: %s\n"
 
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
-msgstr ""
+msgstr "Udskriv skrivbare attributter"
 
 #: ../programs/gvfs-info.c:38
-#, fuzzy
 msgid "Get filesystem info"
-msgstr "Filsystem"
+msgstr "Hent filsysteminfo"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
-msgstr ""
+msgstr "Attributter at hente"
 
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symlinks"
-msgstr ""
+msgstr "Følg ikke symlænker"
 
 #: ../programs/gvfs-info.c:50
-#, fuzzy
 msgid "invalid type"
-msgstr "Ugyldig backend-type"
+msgstr "ugyldig type"
 
 #: ../programs/gvfs-info.c:53
 msgid "unknown"
-msgstr ""
+msgstr "ukendt"
 
 #: ../programs/gvfs-info.c:56
 msgid "regular"
-msgstr ""
+msgstr "regulær"
 
 #: ../programs/gvfs-info.c:59
-#, fuzzy
 msgid "directory"
-msgstr "Ikke en mappe"
+msgstr "katalog"
 
 #: ../programs/gvfs-info.c:62
 msgid "symlink"
-msgstr ""
+msgstr "symlænke"
 
 #: ../programs/gvfs-info.c:65
 msgid "special"
-msgstr ""
+msgstr "speciel"
 
 #: ../programs/gvfs-info.c:68
 msgid "shortcut"
-msgstr ""
+msgstr "genvej"
 
 #: ../programs/gvfs-info.c:71
-#, fuzzy
 msgid "mountable"
-msgstr "Ikke en monterbar fil"
+msgstr "montérbar entitet"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
 msgid "attributes:\n"
-msgstr ""
+msgstr "attributter:\n"
 
 #: ../programs/gvfs-info.c:155
 #, c-format
 msgid "display name: %s\n"
-msgstr ""
+msgstr "vis navn: %s\n"
 
 #: ../programs/gvfs-info.c:159
 #, c-format
 msgid "edit name: %s\n"
-msgstr ""
+msgstr "redigér navn: %s\n"
 
 #: ../programs/gvfs-info.c:165
 #, c-format
 msgid "name: %s\n"
-msgstr ""
+msgstr "navn: %s\n"
 
 #: ../programs/gvfs-info.c:172
 #, c-format
 msgid "type: %s\n"
-msgstr ""
+msgstr "type: %s\n"
 
 #: ../programs/gvfs-info.c:178
 #, c-format
 msgid "size: "
-msgstr ""
+msgstr "størrelse: "
 
 #: ../programs/gvfs-info.c:183
 #, c-format
 msgid "hidden\n"
-msgstr ""
+msgstr "skjult\n"
 
 #: ../programs/gvfs-info.c:266
-#, fuzzy
 msgid "Copy with file"
-msgstr "Fejl under skrivning af fil"
+msgstr "Kopiér med fil"
 
 #: ../programs/gvfs-info.c:270
 msgid "Keep with file when moved"
-msgstr ""
+msgstr "Bliv ved fil efter flytning"
 
 #: ../programs/gvfs-info.c:307
-#, fuzzy, c-format
+#, c-format
 msgid "Error getting writable attributes: %s\n"
-msgstr "Fejl ved indstilling af attribut: %s\n"
+msgstr "Fejl ved hentning af skrivbare attributter: %s\n"
 
+# Tydeligvis ikke det samme som skrivbare, så jeg vælger den forsigtige mulighed, nemlig den tættest mulige oversættelse
 #: ../programs/gvfs-info.c:312
-#, fuzzy, c-format
+#, c-format
 msgid "Settable attributes:\n"
-msgstr "Fejl ved indstilling af attribut: %s\n"
+msgstr "Sætbare attributter:\n"
 
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "Navnerum for skrivbare attributter:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
-msgstr ""
+msgstr "- vis info for <placering>"
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
-msgstr ""
+msgstr "Vis skjulte filer"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
-msgstr ""
+msgstr "Brug et langt udskriftsformat"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
-msgstr ""
+msgstr "Vis fuldførelser"
 
 #: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:68
-#, fuzzy, c-format
+#, c-format
 msgid "Error: %s\n"
-msgstr "Fejl: %s"
+msgstr "Fejl: %s\n"
 
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
-msgstr ""
+msgstr "- udskriv filer i <placering>"
 
 #: ../programs/gvfs-mkdir.c:33
-#, fuzzy
 msgid "create parent directories"
-msgstr "Kan ikke åbne mappe"
+msgstr "opret ophavskataloger"
 
 #: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
-#, fuzzy
 msgid "- delete files"
-msgstr "Fejl ved sletning af fil"
+msgstr "- slet filer"
 
 #: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
-#, fuzzy, c-format
+#, c-format
 msgid "Error creating directory: %s\n"
-msgstr "Fejl ved oprettelse af mappe"
+msgstr "Fejl ved oprettelse af katalog: %s\n"
 
 #: ../programs/gvfs-mount.c:54
-#, fuzzy
 msgid "Mount as mountable"
-msgstr "Ikke en monterbar fil"
+msgstr "Montér som montérbar entitet"
 
 #: ../programs/gvfs-mount.c:55
 msgid "Mount volume with device file"
-msgstr ""
+msgstr "Montér diskenhed med enhedsfil"
 
 #: ../programs/gvfs-mount.c:56
-#, fuzzy
 msgid "Unmount"
-msgstr "Afmontér alligevel"
+msgstr "Afmontér"
 
+# scheme?
 #: ../programs/gvfs-mount.c:57
 msgid "Unmount all mounts with the given scheme"
-msgstr ""
+msgstr "Afmontér alle monteringer med den givne metode"
 
+# List som i 'føre på liste', jeg skulle mene at dette ses ved siden af parameteren --list i gvfs-mount's --help
 #: ../programs/gvfs-mount.c:58
 msgid "List"
-msgstr ""
+msgstr "Udskriv"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Show extra information for List and Monitor"
-msgstr ""
+msgstr "Vis ekstra information ved Udskriv og Overvåg"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Monitor events"
-msgstr ""
+msgstr "Overvåg begivenheder"
 
 #: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
-#, fuzzy, c-format
+#, c-format
 msgid "Error mounting location: %s\n"
-msgstr "%s: %s: fejl ved åbning af placering: %s\n"
+msgstr "Fejl ved montering af placering: %s\n"
 
 #: ../programs/gvfs-mount.c:241
-#, fuzzy, c-format
+#, c-format
 msgid "Error unmounting mount: %s\n"
-msgstr "Fejl ved forbindelse til dæmon: %s"
+msgstr "Fejl ved afmontering af montering: %s\n"
 
 #: ../programs/gvfs-mount.c:262
-#, fuzzy, c-format
+#, c-format
 msgid "Error finding enclosing mount: %s\n"
-msgstr "Kunne ikke finde det omsluttende monteringsobjekt"
+msgstr "Fejl ved søgning efter det omsluttende monteringsobjekt: %s\n"
 
 #: ../programs/gvfs-mount.c:673
-#, fuzzy, c-format
+#, c-format
 msgid "Error mounting %s: %s\n"
-msgstr "Fejl ved flytning af fil: %s"
+msgstr "Fejl ved montering af %s: %s\n"
 
 #: ../programs/gvfs-mount.c:687
 #, c-format
 msgid "Mounted %s at %s\n"
-msgstr ""
+msgstr "Monterede %s på %s\n"
 
 #: ../programs/gvfs-mount.c:738
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr ""
+msgstr "Ingen diskenhed for enhedsfilen %s\n"
 
 #: ../programs/gvfs-mount.c:929
-#, fuzzy
 msgid "- mount <location>"
-msgstr "%s: mangler placeringer"
+msgstr "- montér <placering>"
 
 #: ../programs/gvfs-move.c:173
-#, fuzzy, c-format
+#, c-format
 msgid "Error moving file %s: %s\n"
-msgstr "Fejl ved flytning af fil: %s"
+msgstr "Fejl ved flytning af filen %s: %s\n"
 
 #: ../programs/gvfs-open.c:37
 msgid "files"
-msgstr ""
+msgstr "filer"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2155,72 +2153,73 @@ msgstr ""
 "filtype."
 
 #: ../programs/gvfs-rename.c:49
-#, fuzzy
 msgid "- rename file"
-msgstr "Fejl ved omdøbning af fil"
+msgstr "- omdøb fil"
 
 #: ../programs/gvfs-rename.c:74
 #, c-format
 msgid "Rename successful. New uri: %s\n"
-msgstr ""
+msgstr "Omdøbning fuldført. Ny uri: %s\n"
 
 #: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
 msgid "ignore nonexistent files, never prompt"
-msgstr ""
+msgstr "ignorér ikke-eksisterende filer, spørg aldrig"
 
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
-msgstr ""
+msgstr "Opret sikkerhedskopi"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Opret kun hvis mål ikke findes"
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
-msgstr ""
+msgstr "Føj til slutningen af filen"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr ""
+msgstr "Begræns adgang til kun den aktuelle bruger, når en fil oprettes"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr ""
+msgstr "Udskriv nyt etag i slutningen"
 
+# Etag skrives med stort i en af de engelske strenge, så det må man åbenbart godt
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "Etag for filen, der overskrives"
 
 #: ../programs/gvfs-save.c:76
-#, fuzzy, c-format
+#, c-format
 msgid "Error opening file: %s\n"
-msgstr "Fejl ved flytning af fil: %s"
+msgstr "Fejl ved åbning af fil: %s\n"
 
 #: ../programs/gvfs-save.c:109
-#, fuzzy
 msgid "Error reading stdin"
-msgstr "Fejl ved omdøbning af mappe"
+msgstr "Fejl ved læsning fra stdin"
 
 #: ../programs/gvfs-save.c:122
-#, fuzzy, c-format
+#, c-format
 msgid "Error closing: %s\n"
-msgstr "%s: %s: fejl ved lukning: %s\n"
+msgstr "Fejl ved lukning: %s\n"
 
 #: ../programs/gvfs-save.c:134
-#, fuzzy, c-format
+#, c-format
 msgid "Etag not available\n"
-msgstr "Filen utilgængelig"
+msgstr "Etag ikke tilgængeligt\n"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv]"
 msgstr ""
+"attributtype [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr " <placering> <attribut> <værdier> - sæt attribut"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
@@ -2244,20 +2243,20 @@ msgstr "Fejl ved indstilling af attribut: %s\n"
 
 #: ../programs/gvfs-trash.c:51
 msgid "- move files to trash"
-msgstr ""
+msgstr "- flyt filer til papirkurv"
 
 #: ../programs/gvfs-trash.c:67
-#, fuzzy, c-format
+#, c-format
 msgid "Error trashing file: %s\n"
-msgstr "Fejl ved sletning af fil: %s"
+msgstr "Fejl ved flytning af fil papirkurv: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr ""
+msgstr "Følg symlænker, monteringer og genveje som kataloger"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr ""
+msgstr "- udskriv indholdet af kataloger i et træagtigt format"
 
 #~ msgid "The query info operation is not supported"
 #~ msgstr "Query-info-operationen understøttes ikke"
