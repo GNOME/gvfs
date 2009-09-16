@@ -2156,26 +2156,28 @@ g_daemon_file_query_writable_namespaces (GFile                      *file,
   GFileAttributeInfoList *list;
   DBusMessageIter iter;
 
-  reply = do_sync_path_call (file, 
+  reply = do_sync_path_call (file,
 			     G_VFS_DBUS_MOUNT_OP_QUERY_WRITABLE_NAMESPACES,
 			     NULL, NULL,
 			     cancellable, error,
 			     0);
-  if (reply == NULL)
-    return NULL;
+  if (reply)
+    {
+      dbus_message_iter_init (reply, &iter);
+      list = _g_dbus_get_attribute_info_list (&iter, error);
+      dbus_message_unref (reply);
+    }
+  else
+    {
+      list = g_file_attribute_info_list_new ();
+    }
 
-  dbus_message_iter_init (reply, &iter);
-  list = _g_dbus_get_attribute_info_list (&iter, error);
-  
-  dbus_message_unref (reply);
+  g_file_attribute_info_list_add (list,
+				  "metadata",
+				  G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
+				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
 
-  if (list)
-    g_file_attribute_info_list_add (list,
-				    "metadata",
-				    G_FILE_ATTRIBUTE_TYPE_STRING, /* Also STRINGV, but no way express this ... */
-				    G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				    G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-  
   return list;
 }
 
