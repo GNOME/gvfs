@@ -13,18 +13,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs trunk\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-08-30 10:40+0000\n"
-"PO-Revision-Date: 2009-08-30 16:36+0100\n"
-"Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-09-18 22:00+0200\n"
+"PO-Revision-Date: 2009-09-16 13:05+0200\n"
+"Last-Translator: Christian Kirbach <Christian.Kirbach@googlemail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2373
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2375
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "Vorgang wird nicht unterstützt, die Dateien liegen an verschiedenen "
@@ -44,15 +43,15 @@ msgstr "Beschreibung des Datenstroms konnte nicht geholt werden"
 
 #: ../client/gdaemonfile.c:1016 ../client/gdaemonfile.c:1095
 #: ../client/gdaemonfile.c:1158 ../client/gdaemonfile.c:1221
-#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2646
-#: ../client/gdaemonfile.c:2730 ../client/gdaemonfile.c:2993
+#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2648
+#: ../client/gdaemonfile.c:2732 ../client/gdaemonfile.c:2995
 #: ../client/gvfsiconloadable.c:374
 msgid "Invalid return value from open"
 msgstr "Ungültiger Rückgabewert von open"
 
 #: ../client/gdaemonfile.c:1105 ../client/gdaemonfile.c:1168
 #: ../client/gdaemonfile.c:1231 ../client/gdaemonfile.c:1297
-#: ../client/gdaemonfile.c:2612 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:2614 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Beschreibung des Datenstroms konnte nicht geholt werden"
 
@@ -79,25 +78,26 @@ msgstr "Ungültiger Dateiname %s"
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Ungültiger Rückgabewert von query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2229 ../client/gdaemonvfs.c:1187
+#: ../client/gdaemonfile.c:2231 ../client/gdaemonvfs.c:1187
 #: ../client/gdaemonvfs.c:1321 ../client/gdaemonvfs.c:1374
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Fehler beim Setzen der Metadaten der Datei: %s"
 
-#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1375
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1375
 msgid "values must be string or list of strings"
 msgstr "Werte müssen Zeichenketten oder Listen aus Zeichenketten sein"
 
-#: ../client/gdaemonfile.c:2533
+#: ../client/gdaemonfile.c:2535
 msgid "Invalid return value from monitor_dir"
 msgstr "Ungültiger Rückgabewert von monitor_dir"
 
-#: ../client/gdaemonfile.c:2582
+#: ../client/gdaemonfile.c:2584
 msgid "Invalid return value from monitor_file"
 msgstr "Ungültiger Rückgabewert von monitor_file"
 
-#: ../client/gdaemonfileenumerator.c:448 ../client/gdaemonfileinputstream.c:630
+#: ../client/gdaemonfileenumerator.c:448
+#: ../client/gdaemonfileinputstream.c:630
 #: ../client/gdaemonfileinputstream.c:783
 #: ../client/gdaemonfileinputstream.c:901
 #: ../client/gdaemonfileinputstream.c:1149
@@ -412,7 +412,7 @@ msgstr "Datei existiert bereits"
 #: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1525
+#: ../monitor/gdu/ggduvolume.c:1492
 msgid "Operation not supported by backend"
 msgstr "Vorgang wird vom Backend nicht unterstützt"
 
@@ -562,16 +562,12 @@ msgid "Can't eject file"
 msgstr "Datei kann nicht ausgeworfen werden"
 
 #: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
-#, fuzzy
-#| msgid "Can't mount file"
 msgid "Can't start file"
-msgstr "Datei kann nicht eingehängt werden"
+msgstr "Datei kann nicht gestartet werden"
 
 #: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
-#, fuzzy
-#| msgid "Can't mount file"
 msgid "Can't stop file"
-msgstr "Datei kann nicht eingehängt werden"
+msgstr "Datei kann nicht gestoppt werden"
 
 #: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
 msgid "Can't poll file"
@@ -967,7 +963,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "Das SSH-Programm wurde unerwartet beendet"
 
 #: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "Zugriff verweigert"
 
@@ -1065,7 +1061,7 @@ msgid "Unable to find supported ssh command"
 msgstr "Es konnte kein unterstütztes SSH-Programm gefunden werden"
 
 #: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:383
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Vorgang wird nicht unterstützt"
 
@@ -1213,24 +1209,24 @@ msgstr "Ungültiger Backend-Typ"
 msgid "Error sending fd: %s"
 msgstr "Fehler beim Senden von fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:175
+#: ../daemon/gvfsftpconnection.c:181
 msgid "Unexpected end of stream"
 msgstr "Unerwartetes Ende des Datenstroms"
 
-#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
-#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:831
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "Ungültige Antwort"
 
-#: ../daemon/gvfsftpconnection.c:380
+#: ../daemon/gvfsftpconnection.c:393
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"Es konnte keine aktive FTP-Verbindung hergestellt werden. Wird dies eventuell "
-"von Ihrem Router nicht unterstützt?"
+"Es konnte keine aktive FTP-Verbindung hergestellt werden. Wird dies "
+"eventuell von Ihrem Router nicht unterstützt?"
 
-#: ../daemon/gvfsftpconnection.c:387
+#: ../daemon/gvfsftpconnection.c:400
 msgid "Failed to create active FTP connection."
 msgstr "Erstellung einer aktiven FTP-Verbindung ist gescheitert."
 
@@ -1238,45 +1234,45 @@ msgstr "Erstellung einer aktiven FTP-Verbindung ist gescheitert."
 msgid "Filename contains invalid characters."
 msgstr "Dateiname enthält ungültige Zeichen."
 
-#: ../daemon/gvfsftptask.c:252
+#: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
 msgstr "Der FTP-Server ist beschäftigt. Bitte versuchen Sie es später erneut."
 
-#: ../daemon/gvfsftptask.c:347
+#: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
 msgstr "Konten werden nicht unterstützt"
 
-#: ../daemon/gvfsftptask.c:351
+#: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
 msgstr "Verbindung wurde von Gegenstelle getrennt"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
 "Es konnte keine Datenverbindung hergestellt werden. Wird dies eventuell von "
 "Ihrer Firewall unterbunden?"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "Datenverbindung geschlossen"
 
-#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "Vorgang fehlgeschlagen"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:384
 msgid "No space left on server"
 msgstr "Der Speicherplatz auf dem Server ist aufgebraucht"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:396
 msgid "Unsupported network protocol"
 msgstr "Nicht unterstütztes Netzwerkprotokoll"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
 msgstr "Unbekannter Seitentyp"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
 msgstr "Ungültiger Dateiname"
 
@@ -1311,13 +1307,13 @@ msgstr "Hauptdienst für GVFS."
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720 ../programs/gvfs-cat.c:163
-#: ../programs/gvfs-cat.c:176 ../programs/gvfs-copy.c:110
-#: ../programs/gvfs-info.c:371 ../programs/gvfs-ls.c:392
-#: ../programs/gvfs-mkdir.c:59 ../programs/gvfs-move.c:98
-#: ../programs/gvfs-open.c:140 ../programs/gvfs-open.c:153
-#: ../programs/gvfs-save.c:165 ../programs/gvfs-set-attribute.c:128
-#: ../programs/gvfs-tree.c:251
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:110 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:98 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Versuchen Sie »%s --help« für mehr Informationen"
@@ -1423,18 +1419,18 @@ msgstr "Ein oder mehrere Programme verhindern das Aushängen."
 
 #: ../monitor/gdu/ggdumount.c:945
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "LUKS-Klartext des Slave kann nicht erhalten werden"
 
 #: ../monitor/gdu/ggdumount.c:967
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr ""
+msgstr "LUKS-Klartext des Slave kann nicht aus Pfad »%s« erhalten werden"
 
 #: ../monitor/gdu/ggduvolume.c:308
 msgid "Floppy Disk"
 msgstr "Diskettenlaufwerk"
 
-#: ../monitor/gdu/ggduvolume.c:1022
+#: ../monitor/gdu/ggduvolume.c:989
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1443,7 +1439,7 @@ msgstr ""
 "Geben Sie ein Passwort zum Entsperren des Datenträgers ein.\n"
 "Das Gerät »%s« enthält verschlüsselte Daten auf Partition %d."
 
-#: ../monitor/gdu/ggduvolume.c:1029
+#: ../monitor/gdu/ggduvolume.c:996
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1452,7 +1448,7 @@ msgstr ""
 "Geben Sie ein Passwort zum Entsperren des Datenträgers ein.\n"
 "Das Gerät »%s« enthält verschlüsselte Daten."
 
-#: ../monitor/gdu/ggduvolume.c:1036
+#: ../monitor/gdu/ggduvolume.c:1003
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2090,10 +2086,9 @@ msgid "Error unmounting mount: %s\n"
 msgstr "Fehler beim Aushängen des Ortes: %s\n"
 
 #: ../programs/gvfs-mount.c:262
-#, fuzzy, c-format
-#| msgid "Could not find enclosing mount"
+#, c-format
 msgid "Error finding enclosing mount: %s\n"
-msgstr "Es wurde kein gültiger Speicherort gefunden"
+msgstr "Fehler beim Suchen nach dem einschließenden Einhängepunkt: %s\n"
 
 #: ../programs/gvfs-mount.c:673
 #, c-format
@@ -2110,7 +2105,7 @@ msgstr "»%s« wurde unter »%s« eingehangen\n"
 msgid "No volume for device file %s\n"
 msgstr "Kein Datenträger für Gerätedatei »%s«\n"
 
-#: ../programs/gvfs-mount.c:931
+#: ../programs/gvfs-mount.c:929
 msgid "- mount <location>"
 msgstr "- <location> einhängen"
 
@@ -2182,12 +2177,10 @@ msgstr ""
 "Beim Erstellen einer Datei Zugriff auf den aktuellen Benutzer beschränken"
 
 #: ../programs/gvfs-save.c:47
-#, fuzzy
 msgid "Print new etag at end"
 msgstr "Neuen Etag am Ende drucken"
 
 #: ../programs/gvfs-save.c:48
-#, fuzzy
 msgid "The etag of the file being overwritten"
 msgstr "Der Etag der Datei, die überschrieben wird"
 
