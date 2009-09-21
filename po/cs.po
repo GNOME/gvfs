@@ -2,83 +2,91 @@
 # Copyright (C) 2008, 2009 the author(s) of gvfs.
 # This file is distributed under the same license as the gvfs package.
 # Petr Kovar <pknbe@volny.cz>, 2008, 2009.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-08 19:24+0100\n"
-"PO-Revision-Date: 2009-03-08 19:21+0100\n"
+"POT-Creation-Date: 2009-09-21 02:44+0200\n"
+"PO-Revision-Date: 2009-09-21 02:42+0200\n"
 "Last-Translator: Petr Kovar <pknbe@volny.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: KBabel 1.11.4\n"
 
-#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2375
 msgid "Operation not supported, files on different mounts"
 msgstr "Operace není podporována, soubory na rozdílných připojeních"
 
-#: ../client/gdaemonfile.c:787
+#: ../client/gdaemonfile.c:867
 msgid "Invalid return value from get_info"
 msgstr "Neplatná návratová hodnota od get_info"
 
-#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
+#: ../client/gdaemonfile.c:901 ../client/gdaemonfile.c:1879
 msgid "Invalid return value from query_info"
 msgstr "Neplatná návratová hodnota od query_info"
 
-#: ../client/gdaemonfile.c:894 ../client/gvfsiconloadable.c:338
+#: ../client/gdaemonfile.c:984 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
 msgstr "Nelze získat deskriptor proudového souboru"
 
-#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
-#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
-#: ../client/gvfsiconloadable.c:370
+#: ../client/gdaemonfile.c:1016 ../client/gdaemonfile.c:1095
+#: ../client/gdaemonfile.c:1158 ../client/gdaemonfile.c:1221
+#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2648
+#: ../client/gdaemonfile.c:2732 ../client/gdaemonfile.c:2995
+#: ../client/gvfsiconloadable.c:374
 msgid "Invalid return value from open"
 msgstr "Neplatná návratová hodnota od open"
 
-#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2220 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1105 ../client/gdaemonfile.c:1168
+#: ../client/gdaemonfile.c:1231 ../client/gdaemonfile.c:1297
+#: ../client/gdaemonfile.c:2614 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Nezískán deskriptor proudového souboru"
 
-#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
+#: ../client/gdaemonfile.c:1349 ../client/gdaemonfile.c:1366
 msgid "Invalid return value from call"
 msgstr "Neplatná návratová hodnota od call"
 
-#: ../client/gdaemonfile.c:1534
+#: ../client/gdaemonfile.c:1850
 msgid "Invalid return value from get_filesystem_info"
 msgstr "Neplatná návratová hodnota od get_filesystem_info"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1647
+#: ../client/gdaemonfile.c:1963
 msgid "Could not find enclosing mount"
-msgstr "Nelze nalézt viditelné připojení"
+msgstr "Nelze nalézt uzavřené připojení"
 
-#: ../client/gdaemonfile.c:1677
+#: ../client/gdaemonfile.c:1993
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Neplatný název souboru %s"
 
-#: ../client/gdaemonfile.c:1719
+#: ../client/gdaemonfile.c:2035
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Neplatná návratová hodnota od query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2142
+#: ../client/gdaemonfile.c:2231 ../client/gdaemonvfs.c:1187
+#: ../client/gdaemonvfs.c:1321 ../client/gdaemonvfs.c:1374
+#, c-format
+msgid "Error setting file metadata: %s"
+msgstr "Chyba při nastavování metadat souboru: %s"
+
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1375
+msgid "values must be string or list of strings"
+msgstr "hodnoty musí být řetězcem nebo seznamem řetězců"
+
+#: ../client/gdaemonfile.c:2535
 msgid "Invalid return value from monitor_dir"
 msgstr "Neplatná návratová hodnota od monitor_dir"
 
-#: ../client/gdaemonfile.c:2191
+#: ../client/gdaemonfile.c:2584
 msgid "Invalid return value from monitor_file"
 msgstr "Neplatná návratová hodnota od monitor_file"
 
-#: ../client/gdaemonfileenumerator.c:351
+#: ../client/gdaemonfileenumerator.c:448
 #: ../client/gdaemonfileinputstream.c:630
 #: ../client/gdaemonfileinputstream.c:783
 #: ../client/gdaemonfileinputstream.c:901
@@ -87,39 +95,41 @@ msgstr "Neplatná návratová hodnota od monitor_file"
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052
-#: ../daemon/gvfsbackendobexftp.c:1060 ../daemon/gvfsbackendobexftp.c:1081
-#: ../daemon/gvfsbackendobexftp.c:1200 ../daemon/gvfsbackendobexftp.c:1337
-#: ../daemon/gvfsbackendobexftp.c:1401 ../daemon/gvfsbackendobexftp.c:1601
-#: ../daemon/gvfsbackendobexftp.c:1708 ../daemon/gvfsbackendobexftp.c:1858
-#: ../daemon/gvfsbackendobexftp.c:1885 ../daemon/gvfsbackendobexftp.c:1944
-#: ../daemon/gvfsbackendobexftp.c:1966 ../daemon/gvfsbackendobexftp.c:2029
-#: ../daemon/gvfsbackendobexftp.c:2048 ../daemon/gvfsbackendsmb.c:1139
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
+#: ../daemon/gvfsbackendobexftp.c:1066 ../daemon/gvfsbackendobexftp.c:1087
+#: ../daemon/gvfsbackendobexftp.c:1206 ../daemon/gvfsbackendobexftp.c:1343
+#: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendobexftp.c:1609
+#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1866
+#: ../daemon/gvfsbackendobexftp.c:1893 ../daemon/gvfsbackendobexftp.c:1952
+#: ../daemon/gvfsbackendobexftp.c:1974 ../daemon/gvfsbackendobexftp.c:2037
+#: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:298
-#: ../monitor/proxy/gproxydrive.c:442 ../monitor/proxy/gproxydrive.c:526
-#: ../monitor/proxy/gproxydrive.c:644 ../monitor/proxy/gproxymount.c:455
-#: ../monitor/proxy/gproxymount.c:538 ../monitor/proxy/gproxyvolume.c:783
-#: ../monitor/proxy/gproxyvolume.c:860
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
+#: ../monitor/proxy/gproxydrive.c:521 ../monitor/proxy/gproxydrive.c:609
+#: ../monitor/proxy/gproxydrive.c:757 ../monitor/proxy/gproxydrive.c:892
+#: ../monitor/proxy/gproxydrive.c:943 ../monitor/proxy/gproxydrive.c:1067
+#: ../monitor/proxy/gproxymount.c:477 ../monitor/proxy/gproxymount.c:562
+#: ../monitor/proxy/gproxyvolume.c:814 ../monitor/proxy/gproxyvolume.c:891
 msgid "Operation was cancelled"
 msgstr "Operace byla zrušena"
 
 #: ../client/gdaemonfileinputstream.c:527
 #: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1682
-#: ../client/gdaemonfileinputstream.c:1692
+#: ../client/gdaemonfileinputstream.c:1684
+#: ../client/gdaemonfileinputstream.c:1694
 #: ../client/gdaemonfileoutputstream.c:450
 #: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1234
-#: ../client/gdaemonfileoutputstream.c:1244
+#: ../client/gdaemonfileoutputstream.c:1236
+#: ../client/gdaemonfileoutputstream.c:1246
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Chyba v proudovém protokolu: %s"
 
 #: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1692
+#: ../client/gdaemonfileinputstream.c:1694
 #: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1244
+#: ../client/gdaemonfileoutputstream.c:1246
 msgid "End of stream"
 msgstr "Konec proudu"
 
@@ -128,12 +138,16 @@ msgstr "Konec proudu"
 msgid "Seek not supported on stream"
 msgstr "Hledání v proudu nepodporováno"
 
-#: ../client/gdaemonvfs.c:830
+#: ../client/gdaemonvfs.c:831
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Chyba při získávání informace o připojení: %s"
 
-#: ../client/gvfsdaemondbus.c:567 ../client/gvfsdaemondbus.c:998
+#: ../client/gdaemonvfs.c:1188
+msgid "Can't contact session bus"
+msgstr "Nezdařilo se kontaktovat sběrnici sezení"
+
+#: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Chyba při spojování s démonem: %s"
@@ -152,20 +166,20 @@ msgstr "Chyba při vytváření socketu: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Chyba při spojování se socketem: %s"
 
-#: ../common/gvfsdaemonprotocol.c:454
+#: ../common/gvfsdaemonprotocol.c:521
 msgid "Invalid file info format"
 msgstr "Neplatný formát informace o souboru"
 
-#: ../common/gvfsdaemonprotocol.c:471
+#: ../common/gvfsdaemonprotocol.c:538
 msgid "Invalid attribute info list content"
 msgstr "Neplatný obsah seznamu informací o atributech"
 
-#: ../common/gvfsdnssdresolver.c:208
+#: ../common/gvfsdnssdresolver.c:209
 #, c-format
 msgid "Error initializing Avahi: %s"
 msgstr "Chyba při spouštění Avahi: %s"
 
-#: ../common/gvfsdnssdresolver.c:254
+#: ../common/gvfsdnssdresolver.c:255
 #, c-format
 msgid "Error creating Avahi resolver: %s"
 msgstr "Chyba při vytváření překladače Avahi: %s"
@@ -175,7 +189,7 @@ msgstr "Chyba při vytváření překladače Avahi: %s"
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1099
+#: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "Chyba při řešení služby \"%s\" \"%s\" v doméně \"%s\""
@@ -186,7 +200,7 @@ msgstr "Chyba při řešení služby \"%s\" \"%s\" v doméně \"%s\""
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
 #.
-#: ../common/gvfsdnssdresolver.c:1125
+#: ../common/gvfsdnssdresolver.c:1126
 #, c-format
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
@@ -200,7 +214,7 @@ msgstr ""
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1142
+#: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
 msgstr "Při řešení služby \"%s\" \"%s\" v doméně \"%s\" vypršel čas"
@@ -220,7 +234,7 @@ msgstr "Nelze zpracovat verzi %d kódování GVfsIcon"
 msgid "Malformed input data for GVfsIcon"
 msgstr "Chybná vstupní data u GVfsIcon"
 
-#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:226
+#: ../daemon/daemon-main.c:76 ../daemon/daemon-main.c:230
 #, c-format
 msgid "Error connecting to D-Bus: %s"
 msgstr "Chyba při spojování s D-Bus: %s"
@@ -237,64 +251,89 @@ msgstr "Služba systému souborů %s"
 msgid "Error: %s"
 msgstr "Chyba: %s"
 
-#: ../daemon/daemon-main.c:151
+#: ../daemon/daemon-main.c:155
 #, c-format
 msgid "Usage: %s --spawner dbus-id object_path"
 msgstr "Použití: %s --spawner dbus-id cesta_objektu"
 
-#: ../daemon/daemon-main.c:175 ../daemon/daemon-main.c:193
+#: ../daemon/daemon-main.c:179 ../daemon/daemon-main.c:197
 #, c-format
 msgid "Usage: %s key=value key=value ..."
 msgstr "Použití: %s klíč=hodnota klíč=hodnota ..."
 
-#: ../daemon/daemon-main.c:191
+#: ../daemon/daemon-main.c:195
 #, c-format
 msgid "No mount type specified"
 msgstr "Nezadán žádný typ připojení"
 
-#: ../daemon/daemon-main.c:261
+#: ../daemon/daemon-main.c:265
 #, c-format
 msgid "mountpoint for %s already running"
 msgstr "bod připojení %s již běží"
 
-#: ../daemon/daemon-main.c:272
+#: ../daemon/daemon-main.c:276
 msgid "error starting mount daemon"
 msgstr "chyba při spouštění démona mount"
+
+#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
+msgid "Unmount Anyway"
+msgstr "Přesto odpojit"
+
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
+#: ../monitor/gdu/ggdumount.c:883
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"Svazek je zaneprázdněn\n"
+"Je zaneprázdněn kvůli jedné nebo více aplikacím."
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendftp.c:1096
-#: ../daemon/gvfsbackendsftp.c:1912
+#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2189
+#: ../daemon/gvfsftpdircache.c:419
 #, c-format
 msgid "/ on %s"
 msgstr "/ na %s"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:1642
-#: ../daemon/gvfsbackendsftp.c:1577
+#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:504
+#: ../daemon/gvfsbackendsftp.c:1680
 msgid "No hostname specified"
 msgstr "Nebyl zadán název hostitele"
 
 #: ../daemon/gvfsbackendarchive.c:529 ../daemon/gvfsbackendarchive.c:558
-#: ../daemon/gvfsbackenddav.c:1626 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:836 ../daemon/gvfsbackendobexftp.c:852
-#: ../daemon/gvfsbackendobexftp.c:871 ../daemon/gvfsbackendsmb.c:648
+#: ../daemon/gvfsbackenddav.c:1631 ../daemon/gvfsbackendhttp.c:306
+#: ../daemon/gvfsbackendobexftp.c:842 ../daemon/gvfsbackendobexftp.c:858
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendsmb.c:648
 msgid "Invalid mount spec"
 msgstr "Neplatné určení připojení"
 
-#: ../daemon/gvfsbackendarchive.c:639 ../daemon/gvfsbackendarchive.c:689
-#: ../daemon/gvfsbackendarchive.c:718 ../daemon/gvfsbackendcdda.c:921
-#: ../daemon/gvfsbackendcomputer.c:572 ../daemon/gvfsbackenddnssd.c:398
-#: ../daemon/gvfsbackendftp.c:2264 ../daemon/gvfsbackendnetwork.c:646
-#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
-#: ../daemon/gvfsbackendsmbbrowse.c:1323 ../daemon/gvfsbackendsmbbrowse.c:1392
+#: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
+#: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
+#: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
+#: ../daemon/gvfsbackenddnssd.c:398 ../daemon/gvfsbackendftp.c:904
+#: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
+#: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
+#: ../daemon/gvfsbackendsmbbrowse.c:1394
 #, c-format
 msgid "File doesn't exist"
 msgstr "Soubor neexistuje"
 
-#: ../daemon/gvfsbackendarchive.c:727 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:445
-#: ../daemon/gvfsbackendftp.c:1045 ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendcomputer.c:645
+#: ../daemon/gvfsbackendgphoto2.c:1865 ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
+msgid "Can't open directory"
+msgstr "Nelze otevřít adresář"
+
+#: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendsftp.c:3803 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "Soubor není adresářem"
 
@@ -311,19 +350,22 @@ msgstr "Nezdařilo se vytvoření dočasného adresáře"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendgphoto2.c:1089
-#: ../daemon/gvfsbackendgphoto2.c:1998 ../daemon/gvfsbackendgphoto2.c:2717
-#: ../daemon/gvfsbackendtrash.c:216
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:630
+#: ../daemon/gvfsbackendgphoto2.c:1194 ../daemon/gvfsbackendgphoto2.c:2186
+#: ../daemon/gvfsbackendgphoto2.c:2905 ../daemon/gvfsbackendsftp.c:1756
+#: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2882
+#: ../daemon/gvfsbackendsftp.c:2902 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "Neexistuje žádný takový soubor nebo adresář"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2218
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
+#: ../daemon/gvfsbackendsftp.c:1748
 msgid "Directory not empty"
 msgstr "Adresář není prázdný"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1783
+#: ../daemon/gvfsbackendobexftp.c:1791
 msgid "Can't copy file over directory"
 msgstr "Nelze kopírovat nad adresář"
 
@@ -335,7 +377,7 @@ msgstr "Tvůrce CD/DVD"
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2791
+#: ../daemon/gvfsbackendgphoto2.c:2979
 msgid "File exists"
 msgstr "Soubor existuje"
 
@@ -346,17 +388,20 @@ msgstr "Soubor existuje"
 #: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
 #: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
-#: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:173
-#: ../daemon/gvfsjobpush.c:173 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobqueryinforead.c:119 ../daemon/gvfsjobqueryinfowrite.c:119
-#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
+#: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
+#: ../monitor/gdu/ggduvolume.c:1492
 msgid "Operation not supported by backend"
 msgstr "Operace není podpůrnou vrstvou podporována"
 
@@ -364,65 +409,72 @@ msgstr "Operace není podpůrnou vrstvou podporována"
 msgid "No such file or directory in target path"
 msgstr "V cílové cestě neexistuje žádný takový soubor nebo adresář"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendobexftp.c:1752
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1287
+#: ../daemon/gvfsbackendobexftp.c:1760
 msgid "Can't copy directory over directory"
 msgstr "Nelze kopírovat adresář nad adresář"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1760
-#: ../daemon/gvfsbackendobexftp.c:1791
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1768
+#: ../daemon/gvfsbackendobexftp.c:1799 ../daemon/gvfsbackendsftp.c:1750
+#: ../daemon/gvfsbackendsftp.c:4365
 msgid "Target file exists"
 msgstr "Cílový soubor existuje"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendobexftp.c:1767
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1310
+#: ../daemon/gvfsbackendobexftp.c:1775
 msgid "Can't recursively copy directory"
 msgstr "Nelze rekurzivně kopírovat adresář"
 
-#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:731
-#: ../daemon/gvfsbackendgphoto2.c:2371 ../daemon/gvfsbackendgphoto2.c:2580
-#: ../daemon/gvfsbackendgphoto2.c:2677 ../daemon/gvfsbackendgphoto2.c:2770
+#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendgphoto2.c:2559 ../daemon/gvfsbackendgphoto2.c:2768
+#: ../daemon/gvfsbackendgphoto2.c:2865 ../daemon/gvfsbackendgphoto2.c:2958
 msgid "Not supported"
 msgstr "Nepodporováno"
 
-#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendgphoto2.c:1377
+#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1496
+msgid "Cannot create gudev client"
+msgstr "Nelze vytvořit klienta gudev"
+
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1514
 msgid "Cannot connect to the system bus"
 msgstr "Nezdařilo se připojit k systémové sběrnici"
 
-#: ../daemon/gvfsbackendcdda.c:310 ../daemon/gvfsbackendgphoto2.c:1389
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot create libhal context"
 msgstr "Nelze vytvořit kontext libhal"
 
-#: ../daemon/gvfsbackendcdda.c:324 ../daemon/gvfsbackendgphoto2.c:1402
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1539
 msgid "Cannot initialize libhal"
 msgstr "Nelze spustit libhal"
 
-#: ../daemon/gvfsbackendcdda.c:339 ../daemon/gvfsbackendcdda.c:415
+#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
 msgstr "Nezadána žádná mechanika"
 
-#: ../daemon/gvfsbackendcdda.c:355
+#: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Nelze najít mechaniku %s"
 
-#: ../daemon/gvfsbackendcdda.c:368
+#: ../daemon/gvfsbackendcdda.c:430
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Mechanika %s neobsahuje zvukové soubory"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:377
+#: ../daemon/gvfsbackendcdda.c:439
 #, c-format
 msgid "cdda mount on %s"
 msgstr "připojení cdda na %s"
 
-#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendcdda.c:895
-#: ../monitor/hal/ghalmount.c:325 ../monitor/hal/ghalvolume.c:225
-#: ../monitor/hal/ghalvolume.c:246
+#: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
+#: ../monitor/gdu/ggduvolume.c:320 ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "Zvukový disk"
 
-#: ../daemon/gvfsbackendcdda.c:439 ../daemon/gvfsbackendgphoto2.c:1630
+#: ../daemon/gvfsbackendcdda.c:503
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -430,81 +482,88 @@ msgstr[0] "Systém souborů je zaneprázdněn: %d otevřený soubor"
 msgstr[1] "Systém souborů je zaneprázdněn: %d otevřené soubory"
 msgstr[2] "Systém souborů je zaneprázdněn: %d otevřených souborů"
 
-#: ../daemon/gvfsbackendcdda.c:630
+#: ../daemon/gvfsbackendcdda.c:695
 #, c-format
 msgid "No such file %s on drive %s"
 msgstr "Žádný takový soubor %s na mechanice %s neexistuje"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:739
+#: ../daemon/gvfsbackendcdda.c:804
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Chyba knihovny paranoia na mechanice %s"
 
-#: ../daemon/gvfsbackendcdda.c:802
+#: ../daemon/gvfsbackendcdda.c:867
 #, c-format
 msgid "Error seeking in stream on drive %s"
 msgstr "Chyba při hledání v proudu na mechanice %s"
 
-#: ../daemon/gvfsbackendcdda.c:914 ../daemon/gvfsbackendgphoto2.c:1686
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1873
 #, c-format
 msgid "No such file"
 msgstr "Žádný takový soubor neexistuje"
 
-#: ../daemon/gvfsbackendcdda.c:928
+#: ../daemon/gvfsbackendcdda.c:993
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Soubor neexistuje nebo není zvukovou stopou"
 
-#: ../daemon/gvfsbackendcdda.c:1034
+#: ../daemon/gvfsbackendcdda.c:1099
 msgid "Audio CD Filesystem Service"
 msgstr "Služba systému souborů zvukového CD"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
+#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
 msgid "Computer"
 msgstr "Počítač"
 
-#: ../daemon/gvfsbackendcomputer.c:466
+#: ../daemon/gvfsbackendcomputer.c:521
 msgid "Filesystem"
 msgstr "Systém souborů"
 
-#: ../daemon/gvfsbackendcomputer.c:590 ../daemon/gvfsbackendgphoto2.c:1678
-#: ../daemon/gvfsbackendobexftp.c:1046 ../daemon/gvfsbackendsmb.c:691
-#: ../daemon/gvfsbackendtrash.c:232
-msgid "Can't open directory"
-msgstr "Nelze otevřít adresář"
-
-#: ../daemon/gvfsbackendcomputer.c:594
+#: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
 msgstr "Nelze otevřít připojitelný soubor"
 
-#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1055
+#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1146
 #, c-format
 msgid "Internal error: %s"
 msgstr "Vnitřní chyba: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
+#: ../daemon/gvfsbackendcomputer.c:872 ../daemon/gvfsbackendcomputer.c:991
 msgid "Can't mount file"
 msgstr "Nelze připojit soubor"
 
-#: ../daemon/gvfsbackendcomputer.c:823
+#: ../daemon/gvfsbackendcomputer.c:884
 msgid "No media in the drive"
 msgstr "V mechanice není médium"
 
-#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
-#: ../daemon/gvfsbackendcomputer.c:1071
+#: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
+#: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
+#: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
 msgstr "Není připojitelným souborem"
 
-#: ../daemon/gvfsbackendcomputer.c:986
+#: ../daemon/gvfsbackendcomputer.c:1055
 msgid "Can't unmount file"
 msgstr "Nelze odpojit soubor"
 
-#: ../daemon/gvfsbackendcomputer.c:1102
+#: ../daemon/gvfsbackendcomputer.c:1185
 msgid "Can't eject file"
 msgstr "Nelze vysunout soubor"
 
-#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1693
+#: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
+msgid "Can't start file"
+msgstr "Nelze aktivovat soubor"
+
+#: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
+msgid "Can't stop file"
+msgstr "Nelze deaktivovat soubor"
+
+#: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
+msgid "Can't poll file"
+msgstr "Nelze se dotázat souboru"
+
+#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
 #: ../daemon/gvfsbackendhttp.c:252
 #, c-format
 msgid "HTTP Error: %s"
@@ -522,7 +581,7 @@ msgstr "Prázdná odpověď"
 msgid "Unexpected reply from server"
 msgstr "Neočekávaná odpověď od serveru"
 
-#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1833
+#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1838
 msgid "Response invalid"
 msgstr "Neplatná odpověď"
 
@@ -539,33 +598,34 @@ msgstr "Zadejte heslo k %s"
 msgid "Please enter proxy password"
 msgstr "Zadejte prosím heslo proxy"
 
-#: ../daemon/gvfsbackenddav.c:1697 ../daemon/gvfsbackenddav.c:1701
+#: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
 msgstr "Není sdílením s povoleným WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1729
+#: ../daemon/gvfsbackenddav.c:1734
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV na %s"
 
-#: ../daemon/gvfsbackenddav.c:1789 ../daemon/gvfsbackenddav.c:1862
+#: ../daemon/gvfsbackenddav.c:1794 ../daemon/gvfsbackenddav.c:1867
 msgid "Could not create request"
 msgstr "Nelze vytvořit požadavek"
 
-#: ../daemon/gvfsbackenddav.c:1925 ../daemon/gvfsbackenddav.c:2178
-#: ../daemon/gvfsbackenddav.c:2289 ../daemon/gvfsbackendftp.c:1862
-#: ../daemon/gvfsbackendftp.c:2528 ../daemon/gvfsbackendsftp.c:3783
-#: ../daemon/gvfsbackendsmb.c:1974
+#: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:589
+#: ../daemon/gvfsbackendftp.c:770 ../daemon/gvfsbackendftp.c:1120
+#: ../daemon/gvfsbackendftp.c:1295 ../daemon/gvfsbackendsftp.c:4209
+#: ../daemon/gvfsbackendsmb.c:2001
 msgid "Target file already exists"
 msgstr "Cílový soubor už existuje"
 
-#: ../daemon/gvfsbackenddav.c:1998 ../daemon/gvfsbackendsftp.c:2950
-#: ../daemon/gvfsbackendsmb.c:1108
+#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3343
+#: ../daemon/gvfsbackendsmb.c:1132
 msgid "The file was externally modified"
 msgstr "Soubor byl upraven externě"
 
-#: ../daemon/gvfsbackenddav.c:2029 ../daemon/gvfsbackendsmb.c:1144
-#: ../daemon/gvfsbackendsmb.c:1991
+#: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1168
+#: ../daemon/gvfsbackendsmb.c:2018
 msgid "Backup file creation failed"
 msgstr "Selhala tvorba záložního souboru"
 
@@ -588,297 +648,252 @@ msgstr "Dns-SD"
 msgid "Network"
 msgstr "Síť"
 
-#: ../daemon/gvfsbackendftp.c:254
-msgid "Accounts are unsupported"
-msgstr "Účty nejsou podporovány"
-
-#: ../daemon/gvfsbackendftp.c:258
-msgid "Host closed connection"
-msgstr "Hostitel ukončil spojení"
-
-#: ../daemon/gvfsbackendftp.c:262
-msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr "Nelze otevřít datové spojení. Možná to znemožňuje firewall?"
-
-#: ../daemon/gvfsbackendftp.c:266
-msgid "Data connection closed"
-msgstr "Datové spojení ukončeno"
-
-#: ../daemon/gvfsbackendftp.c:273 ../daemon/gvfsbackendftp.c:277
-msgid "Operation failed"
-msgstr "Operace selhala"
-
-#: ../daemon/gvfsbackendftp.c:282
-msgid "No space left on server"
-msgstr "Na serveru není volné místo"
-
-#: ../daemon/gvfsbackendftp.c:290 ../daemon/gvfsbackendsftp.c:4094
-#: ../daemon/gvfsbackendsmb.c:1638
-msgid "Operation unsupported"
-msgstr "Operace nepodporována"
-
-#: ../daemon/gvfsbackendftp.c:294 ../daemon/gvfsbackendsftp.c:299
-msgid "Permission denied"
-msgstr "Přístup odepřen"
-
-#: ../daemon/gvfsbackendftp.c:298
-msgid "Page type unknown"
-msgstr "Neznámý typ strany"
-
-#: ../daemon/gvfsbackendftp.c:302 ../daemon/gvfsbackendftp.c:2374
-msgid "Invalid filename"
-msgstr "Neplatný název souboru"
-
-#: ../daemon/gvfsbackendftp.c:306 ../daemon/gvfsbackendftp.c:389
-#: ../daemon/gvfsbackendftp.c:414 ../daemon/gvfsbackendftp.c:428
-#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:931
-msgid "Invalid reply"
-msgstr "Neplatná odpověď"
-
-#: ../daemon/gvfsbackendftp.c:549
-msgid "broken transmission"
-msgstr "chybný přenos"
-
-#: ../daemon/gvfsbackendftp.c:713 ../daemon/gvfsbackendftp.c:854
-msgid "Could not connect to host"
-msgstr "Nezdařilo se připojit k hostiteli"
-
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1496
+#: ../daemon/gvfsbackendftp.c:329
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Zadejte heslo k ftp jako %s na %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1499
+#: ../daemon/gvfsbackendftp.c:332
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Zadejte heslo k ftp na %s"
 
-#: ../daemon/gvfsbackendftp.c:1525 ../daemon/gvfsbackendsftp.c:877
+#: ../daemon/gvfsbackendftp.c:358 ../daemon/gvfsbackendsftp.c:969
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "Dialog zadání hesla zrušen"
 
-#: ../daemon/gvfsbackendftp.c:1604
+#: ../daemon/gvfsbackendftp.c:467
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp na %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1608
+#: ../daemon/gvfsbackendftp.c:471
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp jako %s na %s"
 
-#: ../daemon/gvfsbackendftp.c:1692 ../daemon/gvfsbackendsftp.c:1976
-#: ../daemon/gvfsbackendsftp.c:3774
+#: ../daemon/gvfsbackendftp.c:564
+msgid "Insufficient permissions"
+msgstr "Nedostatečná oprávnění"
+
+#: ../daemon/gvfsbackendftp.c:573
+msgid "File does not exist"
+msgstr "Soubor neexistuje"
+
+#: ../daemon/gvfsbackendftp.c:610 ../daemon/gvfsbackendsftp.c:2253
+#: ../daemon/gvfsbackendsftp.c:2989 ../daemon/gvfsbackendsftp.c:3330
+#: ../daemon/gvfsbackendsftp.c:4200
 msgid "File is directory"
 msgstr "Soubor je adresářem"
 
-#: ../daemon/gvfsbackendftp.c:1914 ../daemon/gvfsbackendftp.c:2489
-#: ../daemon/gvfsbackendsftp.c:2811
+#: ../daemon/gvfsbackendftp.c:818 ../daemon/gvfsbackendftp.c:1083
+#: ../daemon/gvfsbackendsftp.c:3196
 msgid "backups not supported yet"
 msgstr "zálohy zatím nejsou podporovány"
 
-#: ../daemon/gvfsbackendftp.c:1991
-msgid "filename too long"
-msgstr "název souboru je příliš dlouhý"
-
-#: ../daemon/gvfsbackendftp.c:2508
-msgid "Invalid destination filename"
-msgstr "Neplatný název cílového souboru"
-
-#: ../daemon/gvfsbackendgphoto2.c:492
+#: ../daemon/gvfsbackendgphoto2.c:504
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: Adresář nebo soubor existuje"
 
-#: ../daemon/gvfsbackendgphoto2.c:499
+#: ../daemon/gvfsbackendgphoto2.c:511
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: Neexistuje žádný takový soubor nebo adresář"
 
-#: ../daemon/gvfsbackendgphoto2.c:505
+#: ../daemon/gvfsbackendgphoto2.c:517
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: Neplatný název souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:511
+#: ../daemon/gvfsbackendgphoto2.c:523
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: Nepodporováno"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:684
+#: ../daemon/gvfsbackendgphoto2.c:718 ../daemon/gvfsbackendgphoto2.c:724
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digitální fotoaparát (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:832 ../monitor/gphoto2/ggphoto2volume.c:179
+#: ../daemon/gvfsbackendgphoto2.c:936 ../monitor/gphoto2/ggphoto2volume.c:240
+#: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
 msgstr "Fotoaparát %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:835 ../monitor/gphoto2/ggphoto2volume.c:174
+#: ../daemon/gvfsbackendgphoto2.c:939 ../monitor/gphoto2/ggphoto2volume.c:235
+#: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "Zvukový přehrávač %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:188
+#: ../daemon/gvfsbackendgphoto2.c:948 ../monitor/gphoto2/ggphoto2volume.c:246
+#: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Fotoaparát"
 
-#: ../daemon/gvfsbackendgphoto2.c:846 ../monitor/gphoto2/ggphoto2volume.c:186
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Zvukový přehrávač"
 
-#: ../daemon/gvfsbackendgphoto2.c:1417
+#: ../daemon/gvfsbackendgphoto2.c:1555
 msgid "No device specified"
 msgstr "Nezadáno žádné zařízení"
 
-#: ../daemon/gvfsbackendgphoto2.c:1434
+#: ../daemon/gvfsbackendgphoto2.c:1576
 msgid "Cannot create gphoto2 context"
 msgstr "Nelze vytvořit kontext gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1444
+#: ../daemon/gvfsbackendgphoto2.c:1586
 msgid "Error creating camera"
 msgstr "Chyba při vytváření prvku fotoaparátu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1457 ../daemon/gvfsbackendgphoto2.c:1467
+#: ../daemon/gvfsbackendgphoto2.c:1599 ../daemon/gvfsbackendgphoto2.c:1609
 msgid "Error loading device information"
 msgstr "Chyba při nahrávání informací o zařízení"
 
-#: ../daemon/gvfsbackendgphoto2.c:1479
+#: ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error looking up device information"
 msgstr "Chyba při vyhledávání informací o zařízení"
 
-#: ../daemon/gvfsbackendgphoto2.c:1489
+#: ../daemon/gvfsbackendgphoto2.c:1631
 msgid "Error getting device information"
 msgstr "Chyba při získávání informací o zařízení"
 
-#: ../daemon/gvfsbackendgphoto2.c:1502
+#: ../daemon/gvfsbackendgphoto2.c:1644
 msgid "Error setting up camera communications port"
 msgstr "Chyba při nastavování komunikačního portu fotoaparátu"
 
-#: ../daemon/gvfsbackendgphoto2.c:1513
+#: ../daemon/gvfsbackendgphoto2.c:1655
 msgid "Error initializing camera"
 msgstr "Chyba při spouštění fotoaparátu"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1527
+#: ../daemon/gvfsbackendgphoto2.c:1669
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "připojení gphoto2 na %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1602
+#: ../daemon/gvfsbackendgphoto2.c:1744
 msgid "No camera specified"
 msgstr "Nebyl zadán žádný fotoaparát"
 
-#: ../daemon/gvfsbackendgphoto2.c:1694
+#: ../daemon/gvfsbackendgphoto2.c:1785 ../daemon/gvfsbackendgphoto2.c:1811
+#, c-format
+msgid "Filesystem is busy"
+msgstr "Systém souborů je zaneprázdněn"
+
+#: ../daemon/gvfsbackendgphoto2.c:1881
 msgid "Error creating file object"
 msgstr "Chyba při vytváření objektu souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:1709
+#: ../daemon/gvfsbackendgphoto2.c:1896
 msgid "Error getting file"
 msgstr "Chyba při získávání souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:1719
+#: ../daemon/gvfsbackendgphoto2.c:1906
 msgid "Error getting data from file"
 msgstr "Chyba při získávání dat ze souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:1776
+#: ../daemon/gvfsbackendgphoto2.c:1964
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Chybný identifikátor ikony \"%s\""
 
-#: ../daemon/gvfsbackendgphoto2.c:1852 ../daemon/gvfsbackendgphoto2.c:3041
+#: ../daemon/gvfsbackendgphoto2.c:2040 ../daemon/gvfsbackendgphoto2.c:3229
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Chyba při hledání v proudu ve fotoaparátu %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1992 ../daemon/gvfsbackendsmbbrowse.c:1388
+#: ../daemon/gvfsbackendgphoto2.c:2180 ../daemon/gvfsbackendsftp.c:2872
+#: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "Není adresářem"
 
-#: ../daemon/gvfsbackendgphoto2.c:2025
+#: ../daemon/gvfsbackendgphoto2.c:2213
 msgid "Failed to get folder list"
 msgstr "Nezdařilo se získání seznamu složek"
 
-#: ../daemon/gvfsbackendgphoto2.c:2091
+#: ../daemon/gvfsbackendgphoto2.c:2279
 msgid "Failed to get file list"
 msgstr "Nezdařilo se získání seznamu souborů"
 
-#: ../daemon/gvfsbackendgphoto2.c:2383
+#: ../daemon/gvfsbackendgphoto2.c:2571
 msgid "Error creating directory"
 msgstr "Chyba při vytváření adresáře"
 
-#: ../daemon/gvfsbackendgphoto2.c:2592
+#: ../daemon/gvfsbackendgphoto2.c:2780
 msgid "Name already exists"
 msgstr "Název již existuje"
 
-#: ../daemon/gvfsbackendgphoto2.c:2603 ../daemon/gvfsbackendgphoto2.c:3232
+#: ../daemon/gvfsbackendgphoto2.c:2791 ../daemon/gvfsbackendgphoto2.c:3420
 msgid "New name too long"
 msgstr "Nový název je příliš dlouhý"
 
-#: ../daemon/gvfsbackendgphoto2.c:2613 ../daemon/gvfsbackendgphoto2.c:3243
+#: ../daemon/gvfsbackendgphoto2.c:2801 ../daemon/gvfsbackendgphoto2.c:3431
 msgid "Error renaming dir"
 msgstr "Chyba při přejmenovávání adresáře"
 
-#: ../daemon/gvfsbackendgphoto2.c:2626 ../daemon/gvfsbackendgphoto2.c:3256
+#: ../daemon/gvfsbackendgphoto2.c:2814 ../daemon/gvfsbackendgphoto2.c:3444
 msgid "Error renaming file"
 msgstr "Chyba při přejmenovávání souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:2690
+#: ../daemon/gvfsbackendgphoto2.c:2878
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "Adresář \"%s\" není prázdný"
 
-#: ../daemon/gvfsbackendgphoto2.c:2701
+#: ../daemon/gvfsbackendgphoto2.c:2889
 msgid "Error deleting directory"
 msgstr "Chyba při mazání adresáře"
 
-#: ../daemon/gvfsbackendgphoto2.c:2727
+#: ../daemon/gvfsbackendgphoto2.c:2915
 msgid "Error deleting file"
 msgstr "Chyba při mazání souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendgphoto2.c:2968
 msgid "Can't write to directory"
 msgstr "Nelze zapisovat do adresáře"
 
-#: ../daemon/gvfsbackendgphoto2.c:2827
+#: ../daemon/gvfsbackendgphoto2.c:3015
 msgid "Cannot allocate new file to append to"
 msgstr "Nelze alokovat nový soubor, ke kterému má proběhnout přidání"
 
-#: ../daemon/gvfsbackendgphoto2.c:2842
+#: ../daemon/gvfsbackendgphoto2.c:3030
 msgid "Cannot read file to append to"
 msgstr "Nelze přečíst soubor, ke kterému má proběhnout přidání"
 
-#: ../daemon/gvfsbackendgphoto2.c:2853
+#: ../daemon/gvfsbackendgphoto2.c:3041
 msgid "Cannot get data of file to append to"
 msgstr "Nelze získat data souboru, ke kterému má proběhnout přidání"
 
-#: ../daemon/gvfsbackendgphoto2.c:3140
+#: ../daemon/gvfsbackendgphoto2.c:3328
 msgid "Error writing file"
 msgstr "Chyba při zápisu souboru"
 
-#: ../daemon/gvfsbackendgphoto2.c:3188
+#: ../daemon/gvfsbackendgphoto2.c:3376
 msgid "Not supported (not same directory)"
 msgstr "Nepodporováno (nejedná se o stejný adresář)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3200
+#: ../daemon/gvfsbackendgphoto2.c:3388
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Nepodporováno (zdroj je adresář, cíl je adresář)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3208
+#: ../daemon/gvfsbackendgphoto2.c:3396
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Nepodporováno (zdroj je adresář, cíl je existující soubor)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:3408
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Nepodporováno (zdroj je soubor, cíl je adresář)"
 
@@ -887,12 +902,12 @@ msgstr "Nepodporováno (zdroj je soubor, cíl je adresář)"
 msgid "HTTP Client Error: %s"
 msgstr "Klientská chyba HTTP: %s"
 
-#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:1900
-#: ../daemon/gvfsbackendsmb.c:1399 ../daemon/gvfsdaemonutils.c:211
+#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:2177
+#: ../daemon/gvfsbackendsmb.c:1424 ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (neplatné kódování)"
 
-#: ../daemon/gvfsbackendlocaltest.c:853
+#: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
 msgstr "Adresářové upozornění nepodporováno"
 
@@ -913,78 +928,83 @@ msgstr "Sledování síťových umístění"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:656 ../daemon/gvfsbackendsmb.c:545
-#: ../daemon/gvfsbackendsmb.c:1392
+#: ../daemon/gvfsbackendobexftp.c:662 ../daemon/gvfsbackendsmb.c:545
+#: ../daemon/gvfsbackendsmb.c:1417
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
 
-#: ../daemon/gvfsbackendobexftp.c:865
+#: ../daemon/gvfsbackendobexftp.c:871
 msgid "USB support missing. Please contact your software vendor"
 msgstr "Schází podpora USB: Kontaktujte prosím dodavatele softwaru."
 
-#: ../daemon/gvfsbackendobexftp.c:985
+#: ../daemon/gvfsbackendobexftp.c:991
 msgid "Connection to the device lost"
 msgstr "Ztraceno spojení se zařízením"
 
-#: ../daemon/gvfsbackendobexftp.c:1482
+#: ../daemon/gvfsbackendobexftp.c:1488
 msgid "Device requires a software update"
 msgstr "Zařízení vyžaduje softwarovou aktualizaci"
 
-#: ../daemon/gvfsbackendsftp.c:291
+#: ../daemon/gvfsbackendsftp.c:295 ../daemon/gvfsbackendsftp.c:651
 msgid "ssh program unexpectedly exited"
 msgstr "program ssh neočekávaně skončil"
 
-#: ../daemon/gvfsbackendsftp.c:306
+#: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
+#: ../daemon/gvfsftptask.c:400
+msgid "Permission denied"
+msgstr "Přístup odepřen"
+
+#: ../daemon/gvfsbackendsftp.c:310
 msgid "Hostname not known"
 msgstr "Název hostitele není znám"
 
-#: ../daemon/gvfsbackendsftp.c:313
+#: ../daemon/gvfsbackendsftp.c:317
 msgid "No route to host"
 msgstr "K hostiteli neexistuje cesta"
 
-#: ../daemon/gvfsbackendsftp.c:320
+#: ../daemon/gvfsbackendsftp.c:324
 msgid "Connection refused by server"
 msgstr "Spojení odmítnuto serverem"
 
-#: ../daemon/gvfsbackendsftp.c:327
+#: ../daemon/gvfsbackendsftp.c:331
 msgid "Host key verification failed"
 msgstr "Ověření klíče hostitele selhalo"
 
-#: ../daemon/gvfsbackendsftp.c:413
+#: ../daemon/gvfsbackendsftp.c:495
 msgid "Unable to spawn ssh program"
 msgstr "Nelze spustit program ssh"
 
-#: ../daemon/gvfsbackendsftp.c:429
+#: ../daemon/gvfsbackendsftp.c:511
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Nelze spustit program ssh: %s"
 
-#: ../daemon/gvfsbackendsftp.c:531 ../daemon/gvfsbackendsftp.c:783
+#: ../daemon/gvfsbackendsftp.c:613 ../daemon/gvfsbackendsftp.c:874
 msgid "Timed out when logging in"
 msgstr "Při přihlašování vypršel časový limit"
 
-#: ../daemon/gvfsbackendsftp.c:861
+#: ../daemon/gvfsbackendsftp.c:953
 msgid "Enter passphrase for key"
 msgstr "Zadejte heslo ke klíči"
 
-#: ../daemon/gvfsbackendsftp.c:863
+#: ../daemon/gvfsbackendsftp.c:955
 msgid "Enter password"
 msgstr "Zadejte heslo"
 
-#: ../daemon/gvfsbackendsftp.c:939
+#: ../daemon/gvfsbackendsftp.c:1031
 msgid "Can't send password"
 msgstr "Nelze odeslat heslo"
 
-#: ../daemon/gvfsbackendsftp.c:947
+#: ../daemon/gvfsbackendsftp.c:1039
 msgid "Log In Anyway"
 msgstr "Přesto se přihlásit"
 
-#: ../daemon/gvfsbackendsftp.c:947
+#: ../daemon/gvfsbackendsftp.c:1039
 msgid "Cancel Login"
 msgstr "Zrušit přihlášení"
 
-#: ../daemon/gvfsbackendsftp.c:957
+#: ../daemon/gvfsbackendsftp.c:1048
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -999,72 +1019,78 @@ msgstr ""
 "Identita zaslaná vzdáleným počítačem má podobu %s. Chcete-li mít jistotu, že "
 "je bezpečné pokračovat, kontaktujte prosím správce systému."
 
-#: ../daemon/gvfsbackendsftp.c:977
+#: ../daemon/gvfsbackendsftp.c:1068
 msgid "Login dialog cancelled"
 msgstr "Přihlašovací dialog zrušen"
 
-#: ../daemon/gvfsbackendsftp.c:997
+#: ../daemon/gvfsbackendsftp.c:1088
 msgid "Can't send host identity confirmation"
 msgstr "Nelze odeslat potvrzení identity hostitele"
 
-#: ../daemon/gvfsbackendsftp.c:1490 ../daemon/gvfsbackendsftp.c:1513
+#: ../daemon/gvfsbackendsftp.c:1581 ../daemon/gvfsbackendsftp.c:1604
 msgid "Protocol error"
 msgstr "Chyba protokolu"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1538
+#: ../daemon/gvfsbackendsftp.c:1629
 #, c-format
 msgid "sftp for %s on %s"
 msgstr "sftp jako %s na %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1541
+#: ../daemon/gvfsbackendsftp.c:1632
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp na %s"
 
-#: ../daemon/gvfsbackendsftp.c:1567
+#: ../daemon/gvfsbackendsftp.c:1670
 msgid "Unable to find supported ssh command"
 msgstr "Nezdařilo se nalézt podporovaný příkaz ssh"
 
-#: ../daemon/gvfsbackendsftp.c:1985
-msgid "Failure"
-msgstr "Selhání"
+#: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "Operace nepodporována"
 
-#: ../daemon/gvfsbackendsftp.c:2041 ../daemon/gvfsbackendsftp.c:2120
-#: ../daemon/gvfsbackendsftp.c:2131 ../daemon/gvfsbackendsftp.c:2187
-#: ../daemon/gvfsbackendsftp.c:2273 ../daemon/gvfsbackendsftp.c:2323
-#: ../daemon/gvfsbackendsftp.c:2369 ../daemon/gvfsbackendsftp.c:2444
-#: ../daemon/gvfsbackendsftp.c:2551 ../daemon/gvfsbackendsftp.c:2591
-#: ../daemon/gvfsbackendsftp.c:2641 ../daemon/gvfsbackendsftp.c:2713
-#: ../daemon/gvfsbackendsftp.c:2725 ../daemon/gvfsbackendsftp.c:2783
-#: ../daemon/gvfsbackendsftp.c:2825 ../daemon/gvfsbackendsftp.c:3002
-#: ../daemon/gvfsbackendsftp.c:3027 ../daemon/gvfsbackendsftp.c:3082
-#: ../daemon/gvfsbackendsftp.c:3139 ../daemon/gvfsbackendsftp.c:3410
-#: ../daemon/gvfsbackendsftp.c:3477 ../daemon/gvfsbackendsftp.c:3612
-#: ../daemon/gvfsbackendsftp.c:3672 ../daemon/gvfsbackendsftp.c:3707
-#: ../daemon/gvfsbackendsftp.c:3735 ../daemon/gvfsbackendsftp.c:3843
-#: ../daemon/gvfsbackendsftp.c:3897 ../daemon/gvfsbackendsftp.c:3933
-#: ../daemon/gvfsbackendsftp.c:3967 ../daemon/gvfsbackendsftp.c:3982
-#: ../daemon/gvfsbackendsftp.c:3997 ../daemon/gvfsbackendsftp.c:4075
+#: ../daemon/gvfsbackendsftp.c:1929 ../daemon/gvfsbackendsftp.c:2318
+#: ../daemon/gvfsbackendsftp.c:2397 ../daemon/gvfsbackendsftp.c:2408
+#: ../daemon/gvfsbackendsftp.c:2464 ../daemon/gvfsbackendsftp.c:2550
+#: ../daemon/gvfsbackendsftp.c:2600 ../daemon/gvfsbackendsftp.c:2646
+#: ../daemon/gvfsbackendsftp.c:2721 ../daemon/gvfsbackendsftp.c:2828
+#: ../daemon/gvfsbackendsftp.c:2945 ../daemon/gvfsbackendsftp.c:3026
+#: ../daemon/gvfsbackendsftp.c:3098 ../daemon/gvfsbackendsftp.c:3110
+#: ../daemon/gvfsbackendsftp.c:3168 ../daemon/gvfsbackendsftp.c:3210
+#: ../daemon/gvfsbackendsftp.c:3395 ../daemon/gvfsbackendsftp.c:3427
+#: ../daemon/gvfsbackendsftp.c:3482 ../daemon/gvfsbackendsftp.c:3539
+#: ../daemon/gvfsbackendsftp.c:3836 ../daemon/gvfsbackendsftp.c:3903
+#: ../daemon/gvfsbackendsftp.c:4038 ../daemon/gvfsbackendsftp.c:4098
+#: ../daemon/gvfsbackendsftp.c:4133 ../daemon/gvfsbackendsftp.c:4161
+#: ../daemon/gvfsbackendsftp.c:4269 ../daemon/gvfsbackendsftp.c:4323
+#: ../daemon/gvfsbackendsftp.c:4362 ../daemon/gvfsbackendsftp.c:4396
+#: ../daemon/gvfsbackendsftp.c:4430 ../daemon/gvfsbackendsftp.c:4445
+#: ../daemon/gvfsbackendsftp.c:4460 ../daemon/gvfsbackendsftp.c:4538
 msgid "Invalid reply received"
 msgstr "Přijata neplatná odpověď"
 
-#: ../daemon/gvfsbackendsftp.c:2093
+#: ../daemon/gvfsbackendsftp.c:2262
+msgid "Failure"
+msgstr "Selhání"
+
+#: ../daemon/gvfsbackendsftp.c:2370
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "Neplatné icon_id \"%s\" v OpenIconForRead"
 
-#: ../daemon/gvfsbackendsftp.c:2389
+#: ../daemon/gvfsbackendsftp.c:2666
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Chyba při vytváření záložního souboru: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2887
+#: ../daemon/gvfsbackendsftp.c:3272
 msgid "Unable to create temporary file"
 msgstr "Nelze vytvořit dočasný soubor"
 
-#: ../daemon/gvfsbackendsftp.c:3769 ../daemon/gvfsbackendsmb.c:1963
+#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:1990
 msgid "Can't move directory over directory"
 msgstr "Nelze přesunout adresář nad adresář"
 
@@ -1085,35 +1111,35 @@ msgstr "Vnitřní chyba (%s)"
 msgid "Failed to mount Windows share"
 msgstr "Selhalo připojení sdílení Windows"
 
-#: ../daemon/gvfsbackendsmb.c:760 ../daemon/gvfsbackendsmb.c:1243
+#: ../daemon/gvfsbackendsmb.c:772 ../daemon/gvfsbackendsmb.c:1268
 msgid "Unsupported seek type"
 msgstr "Nepodporovaný typ hledání"
 
-#: ../daemon/gvfsbackendsmb.c:1335
+#: ../daemon/gvfsbackendsmb.c:1360
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Tvorba záložního souboru selhala: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1865
+#: ../daemon/gvfsbackendsmb.c:1892
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Chyba při mazání souboru: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1939
+#: ../daemon/gvfsbackendsmb.c:1966
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Chyba při přesouvání souboru: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2011
+#: ../daemon/gvfsbackendsmb.c:2038
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Chyba při odstraňování cílového souboru: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2035
+#: ../daemon/gvfsbackendsmb.c:2062
 msgid "Can't recursively move directory"
 msgstr "Nelze rekurzivně přesunout adresář"
 
-#: ../daemon/gvfsbackendsmb.c:2101
+#: ../daemon/gvfsbackendsmb.c:2128
 msgid "Windows Shares Filesystem Service"
 msgstr "Služba systému souborů sdílení prostředků Windows"
 
@@ -1143,7 +1169,7 @@ msgstr "Soubor není připojitelný"
 msgid "Not a regular file"
 msgstr "Není obyčejným souborem"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1501
+#: ../daemon/gvfsbackendsmbbrowse.c:1503
 msgid "Windows Network Filesystem Service"
 msgstr "Služba systému souborů sítě Windows"
 
@@ -1157,11 +1183,11 @@ msgstr "Položky v koši nemohou být měněny"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:735 ../daemon/gvfsbackendtrash.c:843
+#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
 msgid "Trash"
 msgstr "Koš"
 
-#: ../daemon/gvfsdaemon.c:1032
+#: ../daemon/gvfsdaemon.c:1056
 msgid "Invalid backend type"
 msgstr "Neplatný typ podpůrné vrstvy"
 
@@ -1169,6 +1195,69 @@ msgstr "Neplatný typ podpůrné vrstvy"
 #, c-format
 msgid "Error sending fd: %s"
 msgstr "Chyba při odesílání fd: %s"
+
+#: ../daemon/gvfsftpconnection.c:181
+msgid "Unexpected end of stream"
+msgstr "Neočekávaný konec proudu"
+
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
+msgid "Invalid reply"
+msgstr "Neplatná odpověď"
+
+#: ../daemon/gvfsftpconnection.c:393
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr "Nelze vytvořit aktivní spojení FTP. Možná to nepodporuje router?"
+
+#: ../daemon/gvfsftpconnection.c:400
+msgid "Failed to create active FTP connection."
+msgstr "Nepodařilo se vytvořit aktivní spojení FTP."
+
+#: ../daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "Název souboru obsahuje neplatné znaky."
+
+#: ../daemon/gvfsftptask.c:262
+msgid "The FTP server is busy. Try again later"
+msgstr "Server je zaneprázdněn. Zkuste to znovu později"
+
+#: ../daemon/gvfsftptask.c:356
+msgid "Accounts are unsupported"
+msgstr "Účty nejsou podporovány"
+
+#: ../daemon/gvfsftptask.c:360
+msgid "Host closed connection"
+msgstr "Hostitel ukončil spojení"
+
+#: ../daemon/gvfsftptask.c:364
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr "Nelze otevřít datové spojení. Možná to znemožňuje firewall?"
+
+#: ../daemon/gvfsftptask.c:368
+msgid "Data connection closed"
+msgstr "Datové spojení ukončeno"
+
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
+msgid "Operation failed"
+msgstr "Operace selhala"
+
+#: ../daemon/gvfsftptask.c:384
+msgid "No space left on server"
+msgstr "Na serveru není volné místo"
+
+#: ../daemon/gvfsftptask.c:396
+msgid "Unsupported network protocol"
+msgstr "Nepodporovaný síťový protokol"
+
+#: ../daemon/gvfsftptask.c:404
+msgid "Page type unknown"
+msgstr "Neznámý typ strany"
+
+#: ../daemon/gvfsftptask.c:408
+msgid "Invalid filename"
+msgstr "Neplatný název souboru"
 
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
@@ -1178,7 +1267,7 @@ msgstr "Symbolické odkazy nejsou podpůrnou vrstvou podporovány"
 msgid "Invalid dbus message"
 msgstr "Neplatná zpráva dbus"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
 msgstr "Nahradit starého démona."
 
@@ -1196,17 +1285,18 @@ msgstr "Hlavní démon GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76
+#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:364
-#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:140
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:110 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:98 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
 msgstr "Více informací viz \"%s --help\"."
@@ -1235,6 +1325,119 @@ msgstr "Umístění je již připojeno"
 #: ../daemon/mount.c:1031
 msgid "Location is not mountable"
 msgstr "Umístění není připojitelné"
+
+#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:449
+#, c-format
+msgid "Can't find metadata file %s"
+msgstr "Nelze najít soubor metadat %s"
+
+#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+msgid "Unable to set metadata key"
+msgstr "Nepodařilo se nastavit klíč metadat"
+
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+msgid "Unable to unset metadata key"
+msgstr "Nepodařilo se zrušit nastavení klíče metadat"
+
+#: ../metadata/meta-daemon.c:428
+msgid "Unable to remove metadata keys"
+msgstr "Nepodařilo se odstranit klíče metadat"
+
+#: ../metadata/meta-daemon.c:459
+msgid "Unable to move metadata keys"
+msgstr "Nepodařilo se přesunout klíče metadat"
+
+#: ../metadata/meta-daemon.c:704
+msgid "GVFS Metadata Daemon"
+msgstr "Démon metadat GVFS"
+
+#: ../metadata/meta-daemon.c:707
+msgid "Metadata daemon for GVFS"
+msgstr "Démon metadat technologie GVFS"
+
+#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
+msgid "GVfs GDU Volume Monitor"
+msgstr "Sledování svazků GVfs GDU"
+
+#: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
+msgid "Floppy Drive"
+msgstr "Disketová mechanika"
+
+#: ../monitor/gdu/ggdudrive.c:257
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "Bezejmenná mechanika (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:259
+msgid "Unnamed Drive"
+msgstr "Bezejmenná mechanika"
+
+#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"Nezdařilo se vysunutí média, jeden nebo více svazků na médiu je zaneprázdněn."
+
+#: ../monitor/gdu/ggdudrive.c:1003
+msgid ""
+"Start drive in degraded mode?\n"
+"Starting a drive in degraded mode means that the drive is no longer tolerant "
+"to failures. Data on the drive may be irrevocably lost if a component fails."
+msgstr ""
+"Aktivovat mechaniku ve sníženém režimu?\n"
+"Aktivování mechaniky ve sníženém režimu znamená, že mechanika již nebude "
+"indiferentní k selháním. Data na mechanice mohou být nenávratně ztracena, "
+"pokud součástka selže."
+
+#: ../monitor/gdu/ggdudrive.c:1009
+msgid "Start Anyway"
+msgstr "Přesto aktivovat"
+
+#: ../monitor/gdu/ggdumount.c:817
+msgid "One or more programs are preventing the unmount operation."
+msgstr "Jeden nebo více programů znemožňují provést odpojení."
+
+#: ../monitor/gdu/ggdumount.c:945
+msgid "Cannot get LUKS cleartext slave"
+msgstr "Nelze získat LUKS cleartext slave"
+
+#: ../monitor/gdu/ggdumount.c:967
+#, c-format
+msgid "Cannot get LUKS cleartext slave from path `%s'"
+msgstr "Nelze získat LUKS cleartext slave z cesty \"%s\""
+
+#: ../monitor/gdu/ggduvolume.c:308
+msgid "Floppy Disk"
+msgstr "Disketa"
+
+#: ../monitor/gdu/ggduvolume.c:989
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data on partition %d."
+msgstr ""
+"Svazek odemknete zadáním hesla\n"
+"Zařízení %s obsahuje šifrovaná data na oddíle %d."
+
+#: ../monitor/gdu/ggduvolume.c:996
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data."
+msgstr ""
+"Svazek odemknete zadáním hesla\n"
+"Zařízení \"%s\" obsahuje šifrovaná data."
+
+#: ../monitor/gdu/ggduvolume.c:1003
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device %s contains encrypted data."
+msgstr ""
+"Svazek odemknete zadáním hesla\n"
+"Zařízení %s obsahuje šifrovaná data."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1456,10 +1659,6 @@ msgstr "Mechanika %s/%s"
 msgid "%s Drive"
 msgstr "Mechanika %s"
 
-#: ../monitor/hal/ghaldrive.c:179
-msgid "Floppy Drive"
-msgstr "Disketová mechanika"
-
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
 msgstr "Softwarové zařízení RAID"
@@ -1516,12 +1715,6 @@ msgstr "Přenosná mechanika"
 msgid "Mass Storage Drive"
 msgstr "Velkokapacitní mechanika"
 
-#: ../monitor/hal/ghaldrive.c:662
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"Nezdařilo se vysunutí média, jeden nebo více svazků na médiu je zaneprázdněn."
-
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
@@ -1553,6 +1746,10 @@ msgstr "Médium %s"
 #, c-format
 msgid "%s Encrypted Data"
 msgstr "%s - šifrovaná data"
+
+#: ../programs/gvfs-cat.c:37
+msgid "locations"
+msgstr "umístění"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1608,12 +1805,297 @@ msgstr ""
 "Poznámka: je-li třeba formátovací volby typu -n, -T apod., stačí použít "
 "rouru pomocí cat."
 
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:108
+#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:96
+#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr "Chyba při analýze voleb příkazové řádky: %s\n"
+
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
 #: ../programs/gvfs-cat.c:174 ../programs/gvfs-open.c:151
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: scházejí umístění"
+
+#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+msgid "no target directory"
+msgstr "bez cílového adresáře"
+
+#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+msgid "show progress"
+msgstr "zobrazit průběhu"
+
+#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+msgid "prompt before overwrite"
+msgstr "dotázat se před přepsáním"
+
+#: ../programs/gvfs-copy.c:47
+msgid "preserve all attributes"
+msgstr "zachovat všechny atributy"
+
+#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+msgid "backup existing destination files"
+msgstr "zálohovat existující cílové soubory"
+
+#: ../programs/gvfs-copy.c:49
+msgid "never follow symbolic links"
+msgstr "nikdy nesledovat symbolické odkazy"
+
+#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#, c-format
+msgid "progress"
+msgstr "průběh"
+
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
+#: ../programs/gvfs-save.c:156
+msgid "- output files at <location>"
+msgstr "- výstupní soubory v <location>"
+
+#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
+#, c-format
+msgid "Missing operand\n"
+msgstr "Chybějící operand\n"
+
+#: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
+#, c-format
+msgid "Too many arguments\n"
+msgstr "Příliš mnoho argumentů\n"
+
+#: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
+#, c-format
+msgid "Target %s is not a directory\n"
+msgstr "Cíl %s není adresářem\n"
+
+#: ../programs/gvfs-copy.c:177
+#, c-format
+msgid "overwrite %s?"
+msgstr "přepsat %s?"
+
+#: ../programs/gvfs-copy.c:191
+#, c-format
+msgid "Error copying file %s: %s\n"
+msgstr "Chyba při kopírování souboru: %s: %s\n"
+
+#: ../programs/gvfs-info.c:37
+msgid "List writable attributes"
+msgstr "Vypsat zapisovatelné atributy"
+
+#: ../programs/gvfs-info.c:38
+msgid "Get filesystem info"
+msgstr "Získat informaci o systému souborů"
+
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+msgid "The attributes to get"
+msgstr "Atributy, které se mají získat"
+
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-set-attribute.c:37
+msgid "Don't follow symlinks"
+msgstr "Nesledovat symbolické odkazy"
+
+#: ../programs/gvfs-info.c:50
+msgid "invalid type"
+msgstr "neplatný typ"
+
+#: ../programs/gvfs-info.c:53
+msgid "unknown"
+msgstr "neznámé"
+
+#: ../programs/gvfs-info.c:56
+msgid "regular"
+msgstr "obyčejné"
+
+#: ../programs/gvfs-info.c:59
+msgid "directory"
+msgstr "adresář"
+
+#: ../programs/gvfs-info.c:62
+msgid "symlink"
+msgstr "symbolický odkaz"
+
+#: ../programs/gvfs-info.c:65
+msgid "special"
+msgstr "zvláštní"
+
+#: ../programs/gvfs-info.c:68
+msgid "shortcut"
+msgstr "zástupce"
+
+#: ../programs/gvfs-info.c:71
+msgid "mountable"
+msgstr "připojitelný"
+
+#: ../programs/gvfs-info.c:109
+#, c-format
+msgid "attributes:\n"
+msgstr "atributy:\n"
+
+#: ../programs/gvfs-info.c:155
+#, c-format
+msgid "display name: %s\n"
+msgstr "zobrazený název: %s\n"
+
+#: ../programs/gvfs-info.c:159
+#, c-format
+msgid "edit name: %s\n"
+msgstr "upravit název: %s\n"
+
+#: ../programs/gvfs-info.c:165
+#, c-format
+msgid "name: %s\n"
+msgstr "název: %s\n"
+
+#: ../programs/gvfs-info.c:172
+#, c-format
+msgid "type: %s\n"
+msgstr "typ: %s\n"
+
+#: ../programs/gvfs-info.c:178
+#, c-format
+msgid "size: "
+msgstr "velikost: "
+
+#: ../programs/gvfs-info.c:183
+#, c-format
+msgid "hidden\n"
+msgstr "skryté\n"
+
+#: ../programs/gvfs-info.c:266
+msgid "Copy with file"
+msgstr "Kopírovat se souborem"
+
+#: ../programs/gvfs-info.c:270
+msgid "Keep with file when moved"
+msgstr "Při přesunutí kopírovat se souborem"
+
+#: ../programs/gvfs-info.c:307
+#, c-format
+msgid "Error getting writable attributes: %s\n"
+msgstr "Chyba při získávání zapisovatelných atributů: %s\n"
+
+#: ../programs/gvfs-info.c:312
+#, c-format
+msgid "Settable attributes:\n"
+msgstr "Nastavitelné atributy:\n"
+
+#: ../programs/gvfs-info.c:335
+#, c-format
+msgid "Writable attribute namespaces:\n"
+msgstr "Jmenné prostory zapisovatelných atributů:\n"
+
+#: ../programs/gvfs-info.c:362
+msgid "- show info for <location>"
+msgstr "- zobrazit informace k <location>"
+
+#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+msgid "Show hidden files"
+msgstr "Zobrazit skryté soubory"
+
+#: ../programs/gvfs-ls.c:41
+msgid "Use a long listing format"
+msgstr "Použít dlouhý formát výpisu"
+
+#: ../programs/gvfs-ls.c:42
+msgid "Show completions"
+msgstr "Zobrazit dokončení"
+
+#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-rename.c:68
+#, c-format
+msgid "Error: %s\n"
+msgstr "Chyba: %s\n"
+
+#: ../programs/gvfs-ls.c:383
+msgid "- list files at <location>"
+msgstr "- vypsat soubory v <location>"
+
+#: ../programs/gvfs-mkdir.c:33
+msgid "create parent directories"
+msgstr "vytvořit nadřazené adresáře"
+
+#: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
+msgid "- delete files"
+msgstr "- smazat soubory"
+
+#: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
+#, c-format
+msgid "Error creating directory: %s\n"
+msgstr "Chyba při vytváření adresáře: %s\n"
+
+#: ../programs/gvfs-mount.c:54
+msgid "Mount as mountable"
+msgstr "Připojit jako připojitelné"
+
+#: ../programs/gvfs-mount.c:55
+msgid "Mount volume with device file"
+msgstr "Připojit svazek se souborem zařízení"
+
+#: ../programs/gvfs-mount.c:56
+msgid "Unmount"
+msgstr "Odpojit"
+
+#: ../programs/gvfs-mount.c:57
+msgid "Unmount all mounts with the given scheme"
+msgstr "Odpojit všechna připojení s daným schématem"
+
+#: ../programs/gvfs-mount.c:58
+msgid "List"
+msgstr "Vypsat"
+
+#: ../programs/gvfs-mount.c:59
+msgid "Show extra information for List and Monitor"
+msgstr "Zobrazit dodatečné informace k výpisu a sledování"
+
+#: ../programs/gvfs-mount.c:60
+msgid "Monitor events"
+msgstr "Sledovat události"
+
+#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#, c-format
+msgid "Error mounting location: %s\n"
+msgstr "Chyba při připojování umístění: %s\n"
+
+#: ../programs/gvfs-mount.c:241
+#, c-format
+msgid "Error unmounting mount: %s\n"
+msgstr "Chyba při odpojování připojení: %s\n"
+
+#: ../programs/gvfs-mount.c:262
+#, c-format
+msgid "Error finding enclosing mount: %s\n"
+msgstr "Chyba při hledání uzavření připojení: %s\n"
+
+#: ../programs/gvfs-mount.c:673
+#, c-format
+msgid "Error mounting %s: %s\n"
+msgstr "Chyba při připojování: %s: %s\n"
+
+#: ../programs/gvfs-mount.c:687
+#, c-format
+msgid "Mounted %s at %s\n"
+msgstr "Připojeno %s v %s\n"
+
+#: ../programs/gvfs-mount.c:738
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr "K souboru zařízení %s neexistuje svazek\n"
+
+#: ../programs/gvfs-mount.c:929
+msgid "- mount <location>"
+msgstr "- připojit <location>"
+
+#: ../programs/gvfs-move.c:173
+#, c-format
+msgid "Error moving file %s: %s\n"
+msgstr "Chyba při přesouvání souboru: %s: %s\n"
+
+#: ../programs/gvfs-open.c:37
+msgid "files"
+msgstr "soubory"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1642,3 +2124,108 @@ msgid ""
 msgstr ""
 "Otevře soubor(y) s výchozí aplikací registrovanou k obsluze typu daného "
 "souboru."
+
+#: ../programs/gvfs-rename.c:49
+msgid "- rename file"
+msgstr "- přejmenovat soubor"
+
+#: ../programs/gvfs-rename.c:74
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr "Přejmenování úspěšné. Nové URI: %s\n"
+
+#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+msgid "ignore nonexistent files, never prompt"
+msgstr "ignorovat neexistující soubory, nikdy se nedotazovat"
+
+#: ../programs/gvfs-save.c:43
+msgid "Create backup"
+msgstr "Vytvořit zálohu"
+
+#: ../programs/gvfs-save.c:44
+msgid "Only create if not existing"
+msgstr "Vytvořit pouze tehdy, pokud neexistuje"
+
+#: ../programs/gvfs-save.c:45
+msgid "Append to end of file"
+msgstr "Přidat na konec souboru"
+
+#: ../programs/gvfs-save.c:46
+msgid "When creating a file, restrict access to the current user only"
+msgstr "Při vytváření souboru omezit přístup jen na aktuálního uživatele"
+
+#: ../programs/gvfs-save.c:47
+msgid "Print new etag at end"
+msgstr "Vypsat novou etag na konci"
+
+#: ../programs/gvfs-save.c:48
+msgid "The etag of the file being overwritten"
+msgstr "etag nového souboru se přepisuje"
+
+#: ../programs/gvfs-save.c:76
+#, c-format
+msgid "Error opening file: %s\n"
+msgstr "Chyba při otevírání souboru: %s\n"
+
+#: ../programs/gvfs-save.c:109
+msgid "Error reading stdin"
+msgstr "Chyba při čtení stdin"
+
+#: ../programs/gvfs-save.c:122
+#, c-format
+msgid "Error closing: %s\n"
+msgstr "Chyba při zavírání: %s\n"
+
+#: ../programs/gvfs-save.c:134
+#, c-format
+msgid "Etag not available\n"
+msgstr "etag není k dispozici\n"
+
+#: ../programs/gvfs-set-attribute.c:36
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+msgstr ""
+"typ atributu [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+
+#: ../programs/gvfs-set-attribute.c:119
+msgid " <location> <attribute> <values> - set attribute"
+msgstr " <location> <attribute> <values> - nastavit atribut"
+
+#: ../programs/gvfs-set-attribute.c:137
+#, c-format
+msgid "Location not specified\n"
+msgstr "Nezadáno žádné umístění\n"
+
+#: ../programs/gvfs-set-attribute.c:145
+#, c-format
+msgid "Attribute not specified\n"
+msgstr "Nezadán žádný atribut\n"
+
+#: ../programs/gvfs-set-attribute.c:189
+#, c-format
+msgid "Invalid attribute type %s\n"
+msgstr "Neplatný typ atributu %s\n"
+
+#: ../programs/gvfs-set-attribute.c:199
+#, c-format
+msgid "Error setting attribute: %s\n"
+msgstr "Chyba při nastavování atributu: %s\n"
+
+#: ../programs/gvfs-trash.c:51
+msgid "- move files to trash"
+msgstr "- přesunout soubory do koše"
+
+#: ../programs/gvfs-trash.c:67
+#, c-format
+msgid "Error trashing file: %s\n"
+msgstr "Chyba při přesunování souboru do koše: %s\n"
+
+#: ../programs/gvfs-tree.c:37
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "Sledovat symbolické odkazy, připojení a zástupce jako adresáře"
+
+#: ../programs/gvfs-tree.c:242
+msgid "- list contents of directories in a tree-like format"
+msgstr "- vypsat obsah adresářů ve stromové struktuře"
