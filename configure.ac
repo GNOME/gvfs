@@ -372,7 +372,7 @@ if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" 
 
   # Need OS tweaks in hal volume monitor backend
   case "$host" in
-    *-linux*)
+    *-linux* | *-freebsd* | *-kfreebsd*-gnu)
       use_gphoto2=yes
       ;;
     *)
