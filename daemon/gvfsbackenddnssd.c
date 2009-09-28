@@ -74,12 +74,6 @@ static struct {
           "folder-remote-ssh"
         },
 	{
-          "_ssh._tcp",
-          "sftp",
-          FALSE,
-          "folder-remote-ssh"
-        },
-	{
 	  "_smb._tcp",
 	  "smb",
 	  FALSE,
