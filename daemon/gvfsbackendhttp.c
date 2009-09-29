@@ -47,6 +47,7 @@
 #include "gvfsjobqueryattributes.h"
 #include "gvfsjobenumerate.h"
 #include "gvfsdaemonprotocol.h"
+#include "gvfsdaemonutils.h"
 
 #include "soup-input-stream.h"
 
@@ -539,10 +540,12 @@ query_info_ready (SoupSession *session,
   const char            *text;
   GFileInfo             *info;
   char                  *basename;
+  char                  *ed_name;
 
   job     = G_VFS_JOB_QUERY_INFO (user_data);
   info    = job->file_info;
   matcher = job->attribute_matcher;
+  ed_name = NULL;
 
   if (! SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
     {
@@ -562,30 +565,18 @@ query_info_ready (SoupSession *session,
       g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
     {
-      char *display_name = g_filename_display_name (basename);
-
-      if (strstr (display_name, "\357\277\275") != NULL)
-        {
-          char *p = display_name;
-          display_name = g_strconcat (display_name, _(" (invalid encoding)"), NULL);
-          g_free (p);
-        }
-
-      g_file_info_set_display_name (info, display_name);
-      g_free (display_name);
+      ed_name = gvfs_file_info_populate_names_as_local (info, basename);
     }
 
-  if (basename != NULL &&
+  if (ed_name != NULL &&
       g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
     {
-      char *edit_name = g_filename_display_name (basename);
-      g_file_info_set_edit_name (info, edit_name);
-      g_free (edit_name);
-    } 
+      g_file_info_set_edit_name (info, ed_name);
+    }
 
   g_free (basename);
-
+  g_free (ed_name);
 
   text = soup_message_headers_get (msg->response_headers,
                                    "Content-Length");
@@ -601,15 +592,22 @@ query_info_ready (SoupSession *session,
   if (text)
     {
       char *p = strchr (text, ';');
+      char *tmp = NULL;
+      GIcon *icon;
 
       if (p != NULL)
-        {
-          char *tmp = g_strndup (text, p - text);
-          g_file_info_set_content_type (info, tmp);
-          g_free (tmp);
-        }
-      else
-        g_file_info_set_content_type (info, text);
+        text = tmp = g_strndup (text, p - text);
+
+      g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
+      g_file_info_set_content_type (info, text);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, text);
+
+      icon = g_content_type_get_icon (text);
+      g_file_info_set_icon (info, icon);
+      g_object_unref (icon);
+
+      g_free (tmp);
+
     }
 
 
