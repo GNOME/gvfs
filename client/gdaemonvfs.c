@@ -648,6 +648,7 @@ fill_mountable_info (GDaemonVfs *vfs)
 
   infos = g_ptr_array_new ();
   uri_schemes = g_ptr_array_new ();
+  g_ptr_array_add (uri_schemes, g_strdup ("file"));
   count = 0;
   do
     {
