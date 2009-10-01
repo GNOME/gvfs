@@ -871,7 +871,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
 
   /* never ignore a drive if it has volumes that we don't want to ignore */
   enclosed = gdu_pool_get_enclosed_presentables (pool, GDU_PRESENTABLE (d));
-  for (l = enclosed; l != NULL; l = l->next)
+  for (l = enclosed; l != NULL && all_volumes_are_ignored; l = l->next)
     {
       GduPresentable *enclosed_presentable = GDU_PRESENTABLE (l->data);
 
@@ -879,6 +879,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
       if (GDU_IS_VOLUME (enclosed_presentable))
         {
           GduVolume *volume = GDU_VOLUME (enclosed_presentable);
+          GduDevice *volume_device;
 
           have_volumes = TRUE;
 
@@ -886,6 +887,44 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
             {
               all_volumes_are_ignored = FALSE;
               break;
+            }
+
+          /* The volume may be an extended partition - we need to check all logical
+           * partitions as well (#597041)
+           */
+          volume_device = gdu_presentable_get_device (GDU_PRESENTABLE (volume));
+          if (volume_device != NULL)
+            {
+              if (g_strcmp0 (gdu_device_partition_get_scheme (volume_device), "mbr") == 0)
+                {
+                  gint type;
+
+                  type = strtol (gdu_device_partition_get_type (volume_device), NULL, 0);
+                  if (type == 0x05 || type == 0x0f || type == 0x85)
+                    {
+                      GList *enclosed_logical;
+                      GList *ll;
+
+                      enclosed_logical = gdu_pool_get_enclosed_presentables (pool, GDU_PRESENTABLE (volume));
+                      for (ll = enclosed_logical; ll != NULL && all_volumes_are_ignored; ll = ll->next)
+                        {
+                          GduPresentable *enclosed_logical_presentable = GDU_PRESENTABLE (ll->data);
+
+                          if (GDU_IS_VOLUME (enclosed_logical_presentable))
+                            {
+                              if (!should_volume_be_ignored (pool,
+                                                             GDU_VOLUME (enclosed_logical_presentable),
+                                                             fstab_mount_points))
+                                {
+                                  all_volumes_are_ignored = FALSE;
+                                }
+                            }
+                        }
+                      g_list_foreach (enclosed_logical, (GFunc) g_object_unref, NULL);
+                      g_list_free (enclosed_logical);
+                    }
+                }
+              g_object_unref (volume_device);
             }
         }
     }
