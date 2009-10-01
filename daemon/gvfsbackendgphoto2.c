@@ -1242,6 +1242,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
   if (mime_type == NULL)
     mime_type = g_strdup ("application/octet-stream");
   g_file_info_set_content_type (info, mime_type);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, mime_type);
 
   /* we offer thumbnails for both pics and video (see bgo #585853) */
   if (g_str_has_prefix (mime_type, "image") || g_str_has_prefix (mime_type, "video"))
