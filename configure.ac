@@ -17,11 +17,7 @@ AM_PROG_LIBTOOL
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 AM_PROG_CC_C_O
 
-
-# Make libtool use --silent when --silent is passed to make
-changequote(,)dnl
-LIBTOOL="${LIBTOOL} \$(shell echo \"\$(MFLAGS)\" | awk '/^[^ ]*s/ { print \"--silent\" }')"
-changequote([,])dnl
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 AC_TYPE_PID_T
 AC_TYPE_SIGNAL
