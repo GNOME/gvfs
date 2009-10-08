@@ -486,7 +486,9 @@ trash_item_delete (TrashItem  *item,
       temp_name = g_file_get_child (expunged, buffer);
 
       /* "restore" the item into the expunged folder */
-      if (trash_item_restore (item, temp_name, NULL))
+      if (trash_item_restore (item, temp_name,
+			      G_FILE_COPY_OVERWRITE | G_FILE_COPY_NOFOLLOW_SYMLINKS,
+			      NULL))
         {
           trash_expunge (expunged);
           success = TRUE;
@@ -507,11 +509,11 @@ trash_item_delete (TrashItem  *item,
 gboolean
 trash_item_restore (TrashItem  *item,
                     GFile      *dest,
+		    GFileCopyFlags flags,
                     GError    **error)
 {
   if (g_file_move (item->file, dest,
-                   G_FILE_COPY_OVERWRITE |
-                   G_FILE_COPY_NOFOLLOW_SYMLINKS |
+		   flags |
                    G_FILE_COPY_NO_FALLBACK_FOR_MOVE,
                    NULL, NULL, NULL, error))
     {
