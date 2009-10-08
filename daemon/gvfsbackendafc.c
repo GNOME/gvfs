@@ -876,6 +876,11 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
     g_file_info_set_edit_name (info, display_name);
 
   g_free (display_name);
+
+  /* mark dot files as hidden */
+  if (basename != NULL && basename[0] == '.')
+     g_file_info_set_is_hidden (info, TRUE);
+
 }
 
 /* Callback for iterating over a directory. */
