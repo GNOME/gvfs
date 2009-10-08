@@ -447,7 +447,7 @@ trash_backend_pull (GVfsBackend           *vfs_backend,
               destination = g_file_new_for_path (local_path);
 
               if (remove_source)
-                it_worked = trash_item_restore (item, destination, &error);
+                it_worked = trash_item_restore (item, destination, flags, &error);
               else
                 it_worked = g_file_copy (real, destination, flags, 
                                          G_VFS_JOB (job)->cancellable, 
