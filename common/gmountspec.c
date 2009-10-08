@@ -514,7 +514,7 @@ g_mount_spec_new_from_string (const gchar     *str,
   if (colon)
     {
       item.key = g_strdup ("type");
-      item.value = g_strndup (str, colon - str - 1);
+      item.value = g_strndup (str, colon - str);
       g_array_append_val (items, item);
       str = colon + 1;
     }
