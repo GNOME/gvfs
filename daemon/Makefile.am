@@ -28,14 +28,14 @@ libraries =						\
 
 # D-BUS service file
 %.service: %.service.in ../config.log
-	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = gvfs-daemon.service.in
 service_DATA = gvfs-daemon.service
 
 %.mount: %.mount.in ../config.log
-	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 libexec_PROGRAMS=gvfsd gvfsd-sftp gvfsd-trash gvfsd-computer gvfsd-burn gvfsd-localtest gvfsd-ftp
 
@@ -82,10 +82,10 @@ libexec_PROGRAMS += gvfsd-obexftp
 BUILT_SOURCES = obexftp-marshal.c obexftp-marshal.h
 
 obexftp-marshal.h: obexftp-marshal.list
-	glib-genmarshal $< --prefix=obexftp_marshal --header > $@
+	$(AM_V_GEN) glib-genmarshal $< --prefix=obexftp_marshal --header > $@
 
 obexftp-marshal.c: obexftp-marshal.list
-	echo "#include \"obexftp-marshal.h\"" > $@ && glib-genmarshal $< --prefix=obexftp_marshal --body >> $@
+	$(AM_V_GEN) echo "#include \"obexftp-marshal.h\"" > $@ && glib-genmarshal $< --prefix=obexftp_marshal --body >> $@
 
 endif
 

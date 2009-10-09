@@ -54,7 +54,7 @@ gvfsd_metadata_SOURCES = meta-daemon.c
 
 # D-BUS service file
 %.service: %.service.in ../config.log
-	sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 servicedir = $(DBUS_SERVICE_DIR)
 service_in_files = gvfs-metadata.service.in

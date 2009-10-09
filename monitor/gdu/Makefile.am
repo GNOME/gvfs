@@ -44,7 +44,7 @@ service_in_files = org.gtk.Private.GduVolumeMonitor.service.in
 service_DATA     = $(service_in_files:.service.in=.service)
 
 $(service_DATA): $(service_in_files) Makefile
-	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 clean-local:
 	rm -f *~ *.loT $(BUILT_SOURCES) $(service_DATA)

@@ -11,10 +11,10 @@ BUILT_SOURCES =                                         \
 	hal-marshal.h           hal-marshal.c
 
 hal-marshal.h: hal-marshal.list
-	glib-genmarshal $< --prefix=hal_marshal --header > $@
+	$(AM_V_GEN) glib-genmarshal $< --prefix=hal_marshal --header > $@
 
 hal-marshal.c: hal-marshal.list
-	echo "#include \"hal-marshal.h\"" > $@ && glib-genmarshal $< --prefix=hal_marshal --body >> $@
+	$(AM_V_GEN) echo "#include \"hal-marshal.h\"" > $@ && glib-genmarshal $< --prefix=hal_marshal --body >> $@
 
 gvfs_gphoto2_volume_monitor_SOURCES =			\
 	hal-utils.c 		hal-utils.h 		\
@@ -73,7 +73,7 @@ service_in_files = org.gtk.Private.GPhoto2VolumeMonitor.service.in
 service_DATA     = $(service_in_files:.service.in=.service)
 
 $(service_DATA): $(service_in_files) Makefile
-	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+	$(AM_V_GEN) $(SED) -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 clean-local:
 	rm -f *~ *.loT $(BUILT_SOURCES) $(service_DATA)
