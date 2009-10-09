@@ -43,6 +43,7 @@ typedef struct {
   char *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
+  char *default_location;
   char *fuse_mountpoint; /* Always set, even if fuse not availible */
   
   /* Daemon object ref */
@@ -189,6 +190,7 @@ vfs_mount_free (VfsMount *mount)
   g_free (mount->icon);
   g_free (mount->fuse_mountpoint);
   g_free (mount->prefered_filename_encoding);
+  g_free (mount->default_location);
   g_free (mount->dbus_id);
   g_free (mount->object_path);
   g_mount_spec_unref (mount->mount_spec);
@@ -250,7 +252,6 @@ vfs_mount_to_dbus (VfsMount *mount,
 				       DBUS_TYPE_BOOLEAN,
 				       &user_visible))
     _g_dbus_oom ();
-	      
 
   fuse_mountpoint = "";
   if (fuse_available && mount->fuse_mountpoint)
@@ -258,6 +259,8 @@ vfs_mount_to_dbus (VfsMount *mount,
   _g_dbus_message_iter_append_cstring (&struct_iter, fuse_mountpoint);
 
   g_mount_spec_to_dbus (&struct_iter, mount->mount_spec);
+
+  _g_dbus_message_iter_append_cstring (&struct_iter, mount->default_location);
 
   if (!dbus_message_iter_close_container (iter, &struct_iter))
     _g_dbus_oom ();
@@ -671,7 +674,8 @@ register_mount (DBusConnection *connection,
   VfsMount *mount;
   DBusMessage *reply;
   DBusError error;
-  const char *display_name, *stable_name, *x_content_types, *icon, *obj_path, *id, *prefered_filename_encoding;
+  const char *display_name, *stable_name, *x_content_types, *icon, *obj_path;
+  const char *id, *prefered_filename_encoding, *default_location;
   dbus_bool_t user_visible;
   DBusMessageIter iter;
   GMountSpec *mount_spec;
@@ -716,6 +720,13 @@ register_mount (DBusConnection *connection,
 	  mount->dbus_id = g_strdup (id);
 	  mount->object_path = g_strdup (obj_path);
 	  mount->mount_spec = mount_spec;
+
+	  if (_g_dbus_message_iter_get_args (&iter, NULL,
+					     G_DBUS_TYPE_CSTRING, &default_location,
+					     0))
+	    mount->default_location = default_location;
+	  else
+	    mount->default_location = g_strdup ("");
 
 	  if (user_visible)
 	    {
@@ -918,7 +929,7 @@ list_mounts (DBusConnection *connection,
 
   dbus_message_iter_init_append (reply, &iter);
 
-  
+
   if (!dbus_message_iter_open_container (&iter,
 					 DBUS_TYPE_ARRAY,
 					 DBUS_STRUCT_BEGIN_CHAR_AS_STRING
@@ -932,6 +943,7 @@ list_mounts (DBusConnection *connection,
 					   DBUS_TYPE_BOOLEAN_AS_STRING
 					   DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
  					   G_MOUNT_SPEC_TYPE_AS_STRING
+					   DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING
 					 DBUS_STRUCT_END_CHAR_AS_STRING,
 					 &array_iter))
     _g_dbus_oom ();

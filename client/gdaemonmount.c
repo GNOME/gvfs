@@ -130,6 +130,19 @@ g_daemon_mount_get_name (GMount *mount)
   return g_strdup (daemon_mount->mount_info->display_name);
 }
 
+static GFile *
+g_daemon_mount_get_default_location (GMount *mount)
+{
+  GDaemonMount *daemon_mount = G_DAEMON_MOUNT (mount);
+  const char *location = daemon_mount->mount_info->default_location;
+
+  if (location == NULL || location[0] == '\0')
+    location = daemon_mount->mount_info->mount_spec->mount_prefix;
+
+  return g_daemon_file_new (daemon_mount->mount_info->mount_spec,
+                            location);
+}
+
 static char *
 g_daemon_mount_get_uuid (GMount *mount)
 {
@@ -301,6 +314,7 @@ g_daemon_mount_mount_iface_init (GMountIface *iface)
   iface->get_uuid = g_daemon_mount_get_uuid;
   iface->get_volume = g_daemon_mount_get_volume;
   iface->get_drive = g_daemon_mount_get_drive;
+  iface->get_default_location = g_daemon_mount_get_default_location;
   iface->can_unmount = g_daemon_mount_can_unmount;
   iface->can_eject = g_daemon_mount_can_eject;
   iface->unmount = g_daemon_mount_unmount;

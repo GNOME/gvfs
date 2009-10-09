@@ -359,7 +359,7 @@ list_mounts (GList *mounts,
   GMount *mount;
   GVolume *volume;
   char *name, *uuid, *uri;
-  GFile *root;
+  GFile *root, *default_location;
   GIcon *icon;
   char **x_content_types;
   char *type_name;
@@ -393,6 +393,15 @@ list_mounts (GList *mounts,
           uuid = g_mount_get_uuid (mount);
           if (uuid)
             g_print ("%*suuid=%s\n", indent + 2, "", uuid);
+
+          default_location = g_mount_get_default_location (mount);
+          if (default_location)
+            {
+              char *loc_uri = g_file_get_uri (default_location);
+              g_print ("%*sdefault_location=%s\n", indent + 2, "", loc_uri);
+              g_free (loc_uri);
+              g_object_unref (default_location);
+            }
 
           icon = g_mount_get_icon (mount);
           if (icon)

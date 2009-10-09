@@ -78,6 +78,7 @@ struct _GVfsBackendPrivate
   GIcon *icon;
   char *prefered_filename_encoding;
   gboolean user_visible;
+  char *default_location;
   GMountSpec *mount_spec;
 };
 
@@ -153,6 +154,7 @@ g_vfs_backend_finalize (GObject *object)
   if (backend->priv->icon != NULL)
     g_object_unref (backend->priv->icon);
   g_free (backend->priv->prefered_filename_encoding);
+  g_free (backend->priv->default_location);
   if (backend->priv->mount_spec)
     g_mount_spec_unref (backend->priv->mount_spec);
   
@@ -204,6 +206,7 @@ g_vfs_backend_init (GVfsBackend *backend)
   backend->priv->display_name = g_strdup ("");
   backend->priv->stable_name = g_strdup ("");
   backend->priv->user_visible = TRUE;
+  backend->priv->default_location = g_strdup ("");
 }
 
 static void
@@ -367,6 +370,26 @@ g_vfs_backend_set_user_visible (GVfsBackend  *backend,
   backend->priv->user_visible = user_visible;
 }
 
+/**
+ * g_vfs_backend_set_default_location:
+ * @backend: backend
+ * @location: the default location
+ *
+ * With this function the backend can set a "default location", which is a path
+ * that reflects the main entry point for the user (e.g.  * the home directory,
+ * or the root of the volume).
+ *
+ * NB: Does not include the mount prefix, you need to prepend that if there is
+ * one.
+ **/
+void
+g_vfs_backend_set_default_location (GVfsBackend  *backend,
+                                    const char   *location)
+{
+  g_free (backend->priv->default_location);
+  backend->priv->default_location = g_strdup (location);
+}
+
 void
 g_vfs_backend_set_mount_spec (GVfsBackend *backend,
 			      GMountSpec *mount_spec)
@@ -406,6 +429,12 @@ GIcon *
 g_vfs_backend_get_icon (GVfsBackend *backend)
 {
   return backend->priv->icon;
+}
+
+const char *
+g_vfs_backend_get_default_location (GVfsBackend  *backend)
+{
+  return backend->priv->default_location;
 }
 
 GMountSpec *
@@ -664,6 +693,11 @@ g_vfs_backend_register_mount (GVfsBackend *backend,
 
   dbus_message_iter_init_append (message, &iter);
   g_mount_spec_to_dbus (&iter, backend->priv->mount_spec);
+
+  _g_dbus_message_append_args (message,
+			       G_DBUS_TYPE_CSTRING, &backend->priv->default_location,
+			       0);
+
 
   dbus_message_set_auto_start (message, TRUE);
 

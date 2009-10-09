@@ -97,7 +97,8 @@ g_mount_info_dup (GMountInfo *info)
   copy->user_visible = info->user_visible;
   copy->prefered_filename_encoding = g_strdup (info->prefered_filename_encoding);
   copy->fuse_mountpoint = g_strdup (info->fuse_mountpoint);
-  
+  copy->default_location = g_strdup (info->default_location);
+
   return copy;
 }
 
@@ -122,6 +123,7 @@ g_mount_info_unref (GMountInfo *info)
       g_mount_spec_unref (info->mount_spec);
       g_free (info->prefered_filename_encoding);
       g_free (info->fuse_mountpoint);
+      g_free (info->default_location);
       g_free (info);
     }
 }
@@ -166,6 +168,7 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   char *dbus_id;
   char *obj_path;
   char *fuse_mountpoint;
+  char *default_location;
   GIcon *icon;
   GError *error;
 
@@ -193,6 +196,12 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
     return NULL;
   }
 
+  if (!_g_dbus_message_iter_get_args (&struct_iter, NULL,
+                                      G_DBUS_TYPE_CSTRING, &default_location,
+                                      0))
+    default_location = g_strdup ("");
+
+
   if (icon_str == NULL || strlen (icon_str) == 0)
     icon_str = "drive-removable-media";
   error = NULL;
@@ -216,7 +225,8 @@ g_mount_info_from_dbus (DBusMessageIter *iter)
   info->user_visible = user_visible;
   info->prefered_filename_encoding = g_strdup (prefered_filename_encoding);
   info->fuse_mountpoint = fuse_mountpoint;
-  
+  info->default_location = default_location;
+
   return info;
 }
 

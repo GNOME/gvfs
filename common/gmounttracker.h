@@ -50,6 +50,7 @@ typedef struct {
   gboolean user_visible;
   char *prefered_filename_encoding; /* NULL -> UTF8 */
   char *fuse_mountpoint;
+  char *default_location;
   GMountSpec *mount_spec;
 } GMountInfo;
 
