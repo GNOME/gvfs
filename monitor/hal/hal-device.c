@@ -44,6 +44,9 @@ G_DEFINE_TYPE (HalDevice, hal_device, G_TYPE_OBJECT)
 static void
 hal_device_finalize (HalDevice *device)
 {
+  libhal_device_remove_property_watch (device->priv->hal_ctx,
+      device->priv->udi, NULL);
+  
   if (device->priv->properties != NULL)
     libhal_free_property_set (device->priv->properties);
   g_free (device->priv->udi);
@@ -222,6 +225,8 @@ HalDevice *
 hal_device_new_from_udi (LibHalContext *hal_ctx, const char *udi)
 {
   HalDevice *device;
+
+  libhal_device_add_property_watch (hal_ctx, udi, NULL);
   
   device = HAL_DEVICE (g_object_new (HAL_TYPE_DEVICE, NULL));
   device->priv->udi = g_strdup (udi);
@@ -236,6 +241,8 @@ hal_device_new_from_udi_and_properties (LibHalContext *hal_ctx,
                                         LibHalPropertySet *properties)
 {
   HalDevice *device;
+  
+  libhal_device_add_property_watch (hal_ctx, udi, NULL);
   
   device = HAL_DEVICE (g_object_new (HAL_TYPE_DEVICE, NULL));
   device->priv->udi = g_strdup (udi);
