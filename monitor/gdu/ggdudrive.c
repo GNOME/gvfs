@@ -212,39 +212,31 @@ update_drive (GGduDrive *drive)
     }
   else if (device != NULL && gdu_device_drive_get_can_detach (device))
     {
-      /* If the device is not ejectable, just detach on Eject() and claim to be ejectable.
+      /* Ideally, for non-ejectable devices (e.g. non-cdrom, non-zip)
+       * such as USB sticks we'd display "Eject" instead of "Shutdown"
+       * since it is more familiar and the common case. The way this
+       * should work is that after the Eject() method returns we call
+       * Detach() - see eject_cb() below.
        *
-       * This is so we get the UI to display "Eject" instead of "Shutdown" since it is
-       * more familiar and the common case. The way this works is that after the Eject()
-       * method returns we call Detach() - see eject_cb() below.
+       * (Note that it's not enough to just call Detach() since some
+       * devices, such as the Kindle, only works with Eject(). So we
+       * call them both in order).
        *
-       * (Note that it's not enough to just call Detach() since some devices, such as
-       * the Kindle, only works with Eject(). So we call them both in order)
+       * We actually used to do this (and that's why eject_cb() still
+       * has this code) but some systems use internal USB devices for
+       * e.g. SD card readers. If we were to detach these then the
+       * user would have to power-cycle the system to get the device
+       * back. See http://bugs.freedesktop.org/show_bug.cgi?id=24343
+       * for more details.
+       *
+       * In the future, if we know for sure that a port is external
+       * (like, from DMI data) we can go back to doing this. For now
+       * the user will get all the options...
        */
-      if (!gdu_device_drive_get_is_media_ejectable (device))
-        {
-          drive->can_eject = TRUE;
-          /* we still set this since
-           *
-           * a) it helps when debugging things using gvfs-mount(1) output
-           *    since the tool will print can_stop=0 but start_stop_type=shutdown
-           *
-           * b) we use it in eject_cb() to determine we need to call Detach()
-           *    after Eject() successfully completes
-           */
-          drive->start_stop_type = G_DRIVE_START_STOP_TYPE_SHUTDOWN;
-        }
-      else
-        {
-          /* So here the device is ejectable and detachable - for example, a USB CD-ROM
-           * drive or a CD-ROM drive in an Ultrabay - for these, we want to offer both
-           * "Eject" and "Shutdown" options in the UI
-           */
-          drive->can_stop = TRUE;
-          drive->can_start = FALSE;
-          drive->can_start_degraded = FALSE;
-          drive->start_stop_type = G_DRIVE_START_STOP_TYPE_SHUTDOWN;
-        }
+      drive->can_stop = TRUE;
+      drive->can_start = FALSE;
+      drive->can_start_degraded = FALSE;
+      drive->start_stop_type = G_DRIVE_START_STOP_TYPE_SHUTDOWN;
     }
 
   if (device != NULL)
