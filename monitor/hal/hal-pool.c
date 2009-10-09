@@ -327,13 +327,6 @@ hal_pool_new (char **cap_only)
   pool->priv->devices = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
   pool->priv->cap_only = g_strdupv (cap_only);
   
-  /* Gah, unfortunately we have to watch all devices as HAL's PropertyModified signal
-   * doesn't include the capabilities...
-   */
-  dbus_bus_add_match (dbus_connection,
-                      "type='signal',"
-                      "interface='org.freedesktop.Hal.Device',"
-                      "sender='org.freedesktop.Hal'", NULL);
   libhal_ctx_set_device_added (hal_ctx, _hal_device_added);
   libhal_ctx_set_device_removed (hal_ctx, _hal_device_removed);
   libhal_ctx_set_device_property_modified (hal_ctx, _hal_property_modified);
