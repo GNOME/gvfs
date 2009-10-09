@@ -834,7 +834,10 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
         }
 
       if (content_type)
-        g_file_info_set_content_type (info, content_type);
+        {
+          g_file_info_set_content_type (info, content_type);
+          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
+        }
 
       if (icon == NULL)
         icon = g_themed_icon_new ("text-x-generic");
