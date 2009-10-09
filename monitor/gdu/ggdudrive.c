@@ -190,7 +190,7 @@ update_drive (GGduDrive *drive)
        */
       drive->can_eject = gdu_device_drive_get_is_media_ejectable (device) || gdu_device_drive_get_requires_eject (device) || gdu_device_is_removable (device);
       drive->is_media_check_automatic = gdu_device_is_media_change_detected (device);
-      drive->can_poll_for_media = TRUE;
+      drive->can_poll_for_media = gdu_device_is_removable (device);
     }
 
   /* determine start/stop type */
