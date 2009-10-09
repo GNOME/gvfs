@@ -1494,7 +1494,7 @@ g_vfs_backend_smb_browse_class_init (GVfsBackendSmbBrowseClass *klass)
     }
 #endif
 
-  DEBUG ("g_vfs_backend_smb_browse_class_init - default workgroup = '%s'\n", default_workgroup);
+  DEBUG ("g_vfs_backend_smb_browse_class_init - default workgroup = '%s'\n", default_workgroup ? default_workgroup : "NULL");
 }
 
 void
