@@ -1493,6 +1493,40 @@ get_uid_sync (GVfsBackendSftp *backend)
   return TRUE;
 }
 
+static gboolean
+get_home_sync (GVfsBackendSftp *backend)
+{
+  GDataOutputStream *command;
+  GDataInputStream *reply;
+  char *home_path;
+  int type;
+
+  command = new_command_stream (backend, SSH_FXP_REALPATH);
+  put_string (command, ".");
+  send_command_sync_and_unref_command (backend, command, NULL, NULL);
+
+  reply = read_reply_sync (backend, NULL, NULL);
+  if (reply == NULL)
+    return FALSE;
+
+  type = g_data_input_stream_read_byte (reply, NULL, NULL);
+  /*id =*/ (void) g_data_input_stream_read_uint32 (reply, NULL, NULL);
+
+  /* On error, set home to NULL and ignore */
+  if (type == SSH_FXP_NAME)
+    {
+    /* count = */ (void) g_data_input_stream_read_uint32 (reply, NULL, NULL);
+
+      home_path = read_string (reply, NULL);
+      g_vfs_backend_set_default_location (G_VFS_BACKEND (backend), home_path);
+      g_free (home_path);
+    }
+
+  g_object_unref (reply);
+
+  return TRUE;
+}
+
 static void
 do_mount (GVfsBackend *backend,
           GVfsJobMount *job,
@@ -1526,7 +1560,7 @@ do_mount (GVfsBackend *backend,
       g_strfreev (args);
       return;
     }
-  
+
   g_strfreev (args);
 
   op_backend->command_stream = g_unix_output_stream_new (stdin_fd, TRUE);
@@ -1596,17 +1630,17 @@ do_mount (GVfsBackend *backend,
       g_free (extension_name);
       g_free (extension_data);
     }
-      
+
   g_object_unref (reply);
 
-  if (!get_uid_sync (op_backend))
+  if (!get_uid_sync (op_backend) || !get_home_sync (op_backend))
     {
       g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Protocol error"));
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
       g_error_free (error);
       return;
     }
-  
+
   read_reply_async (op_backend);
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
