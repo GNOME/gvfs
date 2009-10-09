@@ -1,14 +1,14 @@
 # Catalan translation of gvfs.
 # Copyright (C) 2008, Free Software Foundation Inc.
 # This file is distributed under the same license as the gvfs package.
-# Gil Forcada <gilforcada@guifi.net>, 2008.
+# Gil Forcada <gilforcada@guifi.net>, 2008, 2009.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-28 12:37+0200\n"
-"PO-Revision-Date: 2009-08-28 12:37+0200\n"
+"POT-Creation-Date: 2009-10-10 00:21+0200\n"
+"PO-Revision-Date: 2009-10-10 00:18+0200\n"
 "Last-Translator: Gil Forcada <gilforcada@guifi.net>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2373
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2375
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "L'operació no està implementada. Els fitxers estan en diferents punts de "
@@ -36,15 +36,15 @@ msgstr "No s'ha pogut obtenir el descriptor de fitxer del flux"
 
 #: ../client/gdaemonfile.c:1016 ../client/gdaemonfile.c:1095
 #: ../client/gdaemonfile.c:1158 ../client/gdaemonfile.c:1221
-#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2646
-#: ../client/gdaemonfile.c:2730 ../client/gdaemonfile.c:2993
+#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2648
+#: ../client/gdaemonfile.c:2732 ../client/gdaemonfile.c:2995
 #: ../client/gvfsiconloadable.c:374
 msgid "Invalid return value from open"
 msgstr "«open» ha retornat un valor no vàlid"
 
 #: ../client/gdaemonfile.c:1105 ../client/gdaemonfile.c:1168
 #: ../client/gdaemonfile.c:1231 ../client/gdaemonfile.c:1297
-#: ../client/gdaemonfile.c:2612 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:2614 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "No s'ha obtingut el descriptor de fitxer del flux"
 
@@ -71,21 +71,21 @@ msgstr "El nom de fitxer %s no és vàlid"
 msgid "Invalid return value from query_filesystem_info"
 msgstr "«query_filesystem_info» ha retornat un valor no vàlid"
 
-#: ../client/gdaemonfile.c:2229 ../client/gdaemonvfs.c:1187
-#: ../client/gdaemonvfs.c:1321 ../client/gdaemonvfs.c:1374
-#, fuzzy, c-format
+#: ../client/gdaemonfile.c:2231 ../client/gdaemonvfs.c:1188
+#: ../client/gdaemonvfs.c:1322 ../client/gdaemonvfs.c:1375
+#, c-format
 msgid "Error setting file metadata: %s"
-msgstr "S'ha produït un error en suprimir el fitxer: %s"
+msgstr "S'ha produït un error en establir les metadades del fitxer: %s"
 
-#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1375
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1376
 msgid "values must be string or list of strings"
-msgstr ""
+msgstr "els valors han de ser una cadena o una llista de cadenes"
 
-#: ../client/gdaemonfile.c:2533
+#: ../client/gdaemonfile.c:2535
 msgid "Invalid return value from monitor_dir"
 msgstr "«monitor_dir» ha retornat un valor no vàlid"
 
-#: ../client/gdaemonfile.c:2582
+#: ../client/gdaemonfile.c:2584
 msgid "Invalid return value from monitor_file"
 msgstr "«monitor_file» ha retornat un valor no vàlid"
 
@@ -141,16 +141,15 @@ msgstr "Final del flux"
 msgid "Seek not supported on stream"
 msgstr "No està implementada la cerca en el flux"
 
-#: ../client/gdaemonvfs.c:831
+#: ../client/gdaemonvfs.c:832
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr ""
 "S'ha produït un error en obtenir la informació del punt de muntatge: %s"
 
-#: ../client/gdaemonvfs.c:1188
-#, fuzzy
+#: ../client/gdaemonvfs.c:1189
 msgid "Can't contact session bus"
-msgstr "No s'ha pogut connectar al bus del sistema"
+msgstr "No es pot contactar amb el bus de la sessió"
 
 #: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
 #, c-format
@@ -281,21 +280,21 @@ msgid "error starting mount daemon"
 msgstr "s'ha produït un error en iniciar el dimoni de muntatge"
 
 #: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
-#, fuzzy
 msgid "Unmount Anyway"
-msgstr "Entra igualment"
+msgstr "Desmunta igualment"
 
-#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1002
 #: ../monitor/gdu/ggdumount.c:883
-#, fuzzy
 msgid "Cancel"
-msgstr "Cancel·la l'entrada"
+msgstr "Cancel·la"
 
 #: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
+"El volum està ocupat\n"
+"Hi ha alguna aplicació que el manté ocupat."
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -321,7 +320,7 @@ msgstr "Especificació de muntatge no vàlida"
 #: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
 #: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
 #: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
-#: ../daemon/gvfsbackenddnssd.c:398 ../daemon/gvfsbackendftp.c:904
+#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:904
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
 #: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
 #: ../daemon/gvfsbackendsmbbrowse.c:1394
@@ -336,7 +335,7 @@ msgid "Can't open directory"
 msgstr "No es pot obrir el directori"
 
 #: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3803 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
@@ -406,7 +405,7 @@ msgstr "Existeix el fitxer"
 #: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
 #: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1525
+#: ../monitor/gdu/ggduvolume.c:1492
 msgid "Operation not supported by backend"
 msgstr "El rerefons no ha implementat l'operació"
 
@@ -437,21 +436,20 @@ msgid "Not supported"
 msgstr "No és implementat"
 
 #: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1496
-#, fuzzy
 msgid "Cannot create gudev client"
-msgstr "No s'ha pogut crear el context gphoto2"
+msgstr "No es pot crear el client gudev"
 
 #: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1514
 msgid "Cannot connect to the system bus"
-msgstr "No s'ha pogut connectar al bus del sistema"
+msgstr "No es pot connectar al bus del sistema"
 
 #: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot create libhal context"
-msgstr "No s'ha pogut crear el context libhal"
+msgstr "No es pot crear el context libhal"
 
 #: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1539
 msgid "Cannot initialize libhal"
-msgstr "No s'ha pogut inicialitzar la libhal"
+msgstr "No es pot inicialitzar la libhal"
 
 #: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
@@ -460,7 +458,7 @@ msgstr "No s'ha especificat la unitat"
 #: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
-msgstr "No s'ha pogut trobar la unitat %s"
+msgstr "No es pot trobar la unitat %s"
 
 #: ../daemon/gvfsbackendcdda.c:430
 #, c-format
@@ -557,19 +555,16 @@ msgid "Can't eject file"
 msgstr "No es pot expulsar el fitxer"
 
 #: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
-#, fuzzy
 msgid "Can't start file"
-msgstr "No es pot muntar el fitxer"
+msgstr "No es pot iniciar el fitxer"
 
 #: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
-#, fuzzy
 msgid "Can't stop file"
-msgstr "No es pot muntar el fitxer"
+msgstr "No es pot aturar el fitxer"
 
 #: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
-#, fuzzy
 msgid "Can't poll file"
-msgstr "No es pot muntar el fitxer"
+msgstr "No es pot enquestar el fitxer"
 
 #: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
 #: ../daemon/gvfsbackendhttp.c:252
@@ -638,20 +633,20 @@ msgid "Backup file creation failed"
 msgstr "No s'ha pogut crear el fitxer de còpia de seguretat"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
+#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Xarxa local"
 
-#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
+#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "No es pot fer un seguiment del fitxer o directori."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:754
+#: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
 #: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Xarxa"
@@ -686,10 +681,9 @@ msgstr "FTP com a %s a %s"
 
 #: ../daemon/gvfsbackendftp.c:564
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "No teniu prou permisos"
 
 #: ../daemon/gvfsbackendftp.c:573
-#, fuzzy
 msgid "File does not exist"
 msgstr "No existeix el fitxer"
 
@@ -761,7 +755,7 @@ msgstr "No s'ha especificat el dispositiu"
 
 #: ../daemon/gvfsbackendgphoto2.c:1576
 msgid "Cannot create gphoto2 context"
-msgstr "No s'ha pogut crear el context gphoto2"
+msgstr "No es pot crear el context gphoto2"
 
 #: ../daemon/gvfsbackendgphoto2.c:1586
 msgid "Error creating camera"
@@ -799,9 +793,9 @@ msgid "No camera specified"
 msgstr "No s'ha especificat cap càmera"
 
 #: ../daemon/gvfsbackendgphoto2.c:1785 ../daemon/gvfsbackendgphoto2.c:1811
-#, fuzzy, c-format
+#, c-format
 msgid "Filesystem is busy"
-msgstr "Sistema de fitxers"
+msgstr "El sistema de fitxers està ocupat"
 
 #: ../daemon/gvfsbackendgphoto2.c:1881
 msgid "Error creating file object"
@@ -877,15 +871,15 @@ msgstr "No es pot escriure en el directori"
 
 #: ../daemon/gvfsbackendgphoto2.c:3015
 msgid "Cannot allocate new file to append to"
-msgstr "No s'ha pogut ubicar el fitxer nou al que afegir"
+msgstr "No es pot ubicar el fitxer nou al que afegir"
 
 #: ../daemon/gvfsbackendgphoto2.c:3030
 msgid "Cannot read file to append to"
-msgstr "No s'ha pogut llegir el fitxer al que afegir"
+msgstr "No es pot llegir el fitxer al que afegir"
 
 #: ../daemon/gvfsbackendgphoto2.c:3041
 msgid "Cannot get data of file to append to"
-msgstr "No s'ha pogut obtenir dades del fitxer al que afegir"
+msgstr "No es pot obtenir dades del fitxer al que afegir"
 
 #: ../daemon/gvfsbackendgphoto2.c:3328
 msgid "Error writing file"
@@ -965,7 +959,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "el programa SSH ha sortit inesperadament"
 
 #: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "Permís denegat"
 
@@ -1008,7 +1002,7 @@ msgstr "Introduïu la contrasenya"
 
 #: ../daemon/gvfsbackendsftp.c:1031
 msgid "Can't send password"
-msgstr "No s'ha pogut enviar la contrasenya"
+msgstr "No es pot enviar la contrasenya"
 
 #: ../daemon/gvfsbackendsftp.c:1039
 msgid "Log In Anyway"
@@ -1039,7 +1033,7 @@ msgstr "S'ha cancel·lat el diàleg d'entrada"
 
 #: ../daemon/gvfsbackendsftp.c:1088
 msgid "Can't send host identity confirmation"
-msgstr "No s'ha pogut enviar la confirmació de la identitat de l'ordinador"
+msgstr "No es pot enviar la confirmació de la identitat de l'ordinador"
 
 #: ../daemon/gvfsbackendsftp.c:1581 ../daemon/gvfsbackendsftp.c:1604
 msgid "Protocol error"
@@ -1062,7 +1056,7 @@ msgid "Unable to find supported ssh command"
 msgstr "No s'ha pogut trobar l'ordre de SSH implementada"
 
 #: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:383
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Operació no implementada"
 
@@ -1210,72 +1204,69 @@ msgstr "Tipus de rerefons no vàlid"
 msgid "Error sending fd: %s"
 msgstr "S'ha produït un error en enviar el descriptor de fitxer: %s"
 
-#: ../daemon/gvfsftpconnection.c:175
-#, fuzzy
+#: ../daemon/gvfsftpconnection.c:181
 msgid "Unexpected end of stream"
-msgstr "Resposta inesperada del servidor"
+msgstr "El flux ha acabat de forma no esperada"
 
-#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
-#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:831
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "S'ha rebut una resposta no vàlida"
 
-#: ../daemon/gvfsftpconnection.c:380
-#, fuzzy
+#: ../daemon/gvfsftpconnection.c:393
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"No s'ha pogut obrir una connexió de dades. Potser el tallafocs no ho permet?"
+"No s'ha pogut crear una connexió FTP activa. Potser el vostre encaminador no "
+"ho permet?"
 
-#: ../daemon/gvfsftpconnection.c:387
-#, fuzzy
+#: ../daemon/gvfsftpconnection.c:400
 msgid "Failed to create active FTP connection."
-msgstr "No s'ha pogut ubicar el context de SMB"
+msgstr "No s'ha pogut crear una connexió FTP activa."
 
 #: ../daemon/gvfsftpfile.c:170
 msgid "Filename contains invalid characters."
-msgstr ""
+msgstr "El nom de fitxer conté caràcters no vàlids."
 
-#: ../daemon/gvfsftptask.c:252
+#: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
-msgstr ""
+msgstr "El servidor d'FTP està ocupat. Proveu-ho d'aquí una estona"
 
-#: ../daemon/gvfsftptask.c:347
+#: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
 msgstr "No es poden utilitzar comptes"
 
-#: ../daemon/gvfsftptask.c:351
+#: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
 msgstr "L'ordinador remot ha tancat la connexió"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr ""
-"No s'ha pogut obrir una connexió de dades. Potser el tallafocs no ho permet?"
+"No es pot obrir una connexió de dades. Potser el tallafocs no ho permet?"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "S'ha tancat la connexió de dades"
 
-#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "Ha fallat l'operació"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:384
 msgid "No space left on server"
 msgstr "No hi ha espai lliure en el servidor"
 
-#: ../daemon/gvfsftptask.c:387
-#, fuzzy
+#: ../daemon/gvfsftptask.c:396
 msgid "Unsupported network protocol"
-msgstr "Tipus de cerca no implementada"
+msgstr "El tipus de protocol de xarxa no està implementat"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
 msgstr "Tipus de pàgina desconeguda"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
 msgstr "Nom de fitxer no vàlid"
 
@@ -1349,110 +1340,118 @@ msgstr "La ubicació no és pot muntar"
 #: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
 #: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
 #: ../metadata/meta-daemon.c:449
-#, fuzzy, c-format
+#, c-format
 msgid "Can't find metadata file %s"
-msgstr "No s'ha pogut trobar la unitat %s"
+msgstr "No es pot trobar el fitxer de metadades %s"
 
 #: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
 msgid "Unable to set metadata key"
-msgstr ""
+msgstr "No s'ha pogut establir la clau de les metadades"
 
 #: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
 msgid "Unable to unset metadata key"
-msgstr ""
+msgstr "No s'ha pogut treure la clau de les metadades"
 
 #: ../metadata/meta-daemon.c:428
 msgid "Unable to remove metadata keys"
-msgstr ""
+msgstr "No s'han pogut suprimir les claus de les metadades"
 
 #: ../metadata/meta-daemon.c:459
 msgid "Unable to move metadata keys"
-msgstr ""
+msgstr "No s'han pogut moure les claus de les metadades"
 
 #: ../metadata/meta-daemon.c:704
-#, fuzzy
 msgid "GVFS Metadata Daemon"
-msgstr "Dimoni del GVFS"
+msgstr "Dimoni de metadades del GVFS"
 
 #: ../metadata/meta-daemon.c:707
-#, fuzzy
 msgid "Metadata daemon for GVFS"
-msgstr "Dimoni principal del GVFS"
+msgstr "Dimoni de metadades pel GVFS"
 
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
-msgstr ""
+msgstr "Seguiment dels volums GDU del GVFS"
 
 #: ../monitor/gdu/ggdudrive.c:165 ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
 msgstr "Unitat de disquet"
 
-#: ../monitor/gdu/ggdudrive.c:257
+#: ../monitor/gdu/ggdudrive.c:249
 #, c-format
 msgid "Unnamed Drive (%s)"
-msgstr ""
+msgstr "Unitat sense nom (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:259
-#, fuzzy
+#: ../monitor/gdu/ggdudrive.c:251
 msgid "Unnamed Drive"
-msgstr "Unitat de cinta"
+msgstr "Unitat sense nom"
 
-#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:551 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "No s'ha pogut expulsar el suport. Alguns dels volums del suport estan "
 "ocupats."
 
-#: ../monitor/gdu/ggdudrive.c:1003
+#: ../monitor/gdu/ggdudrive.c:995
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
+"Voleu iniciar la unitat en mode degradat?\n"
+"Iniciar una unitat en mode degradat significa que la unitat no permetrà cap "
+"errada. Si falla algun component de la unitat es poden perdre dades de forma "
+"irrecuperable."
 
-#: ../monitor/gdu/ggdudrive.c:1009
+#: ../monitor/gdu/ggdudrive.c:1001
 msgid "Start Anyway"
-msgstr ""
+msgstr "Inicia igualment"
 
 #: ../monitor/gdu/ggdumount.c:817
 msgid "One or more programs are preventing the unmount operation."
-msgstr ""
+msgstr "Algun programa impedeix realitzar l'operació de desmuntatge."
 
+# FIXME
 #: ../monitor/gdu/ggdumount.c:945
 msgid "Cannot get LUKS cleartext slave"
-msgstr ""
+msgstr "No es pot obtenir l'esclau de text clar del LUKS"
 
+# FIXME
 #: ../monitor/gdu/ggdumount.c:967
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
-msgstr ""
+msgstr "No es pot obtenir l'esclau de text clar del LUKS en el camí «%s»"
 
 #: ../monitor/gdu/ggduvolume.c:308
-#, fuzzy
 msgid "Floppy Disk"
-msgstr "Unitat de disquet"
+msgstr "Disquet"
 
-#: ../monitor/gdu/ggduvolume.c:1022
+#: ../monitor/gdu/ggduvolume.c:989
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data on partition %d."
 msgstr ""
+"Introduïu la contrasenya per a desbloquejar el volum\n"
+"El dispositiu «%s» conté dades encriptades a la partició %d."
 
-#: ../monitor/gdu/ggduvolume.c:1029
+#: ../monitor/gdu/ggduvolume.c:996
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device \"%s\" contains encrypted data."
 msgstr ""
+"Introduïu la contrasenya per a desbloquejar el volum\n"
+"El dispositiu «%s» conté dades encriptades."
 
-#: ../monitor/gdu/ggduvolume.c:1036
+#: ../monitor/gdu/ggduvolume.c:1003
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
 "The device %s contains encrypted data."
 msgstr ""
+"Introduïu la contrasenya per a desbloquejar el volum\n"
+"El dispositiu %s conté dades encriptades."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1763,9 +1762,8 @@ msgid "%s Encrypted Data"
 msgstr "%s dades xifrades"
 
 #: ../programs/gvfs-cat.c:37
-#, fuzzy
 msgid "locations"
-msgstr "%s: manquen les ubicacions"
+msgstr "ubicacions"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1829,6 +1827,7 @@ msgstr ""
 #, c-format
 msgid "Error parsing commandline options: %s\n"
 msgstr ""
+"S'ha produït un error en analitzar les opcions de la línia d'ordres: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1838,291 +1837,282 @@ msgid "%s: missing locations"
 msgstr "%s: manquen les ubicacions"
 
 #: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
-#, fuzzy
 msgid "no target directory"
-msgstr "No és un directori"
+msgstr "no hi ha cap directori de destí"
 
 #: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
 msgid "show progress"
-msgstr ""
+msgstr "mostra el progrés"
 
 #: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
 msgid "prompt before overwrite"
-msgstr ""
+msgstr "pregunta abans de sobreescriure"
 
 #: ../programs/gvfs-copy.c:47
 msgid "preserve all attributes"
-msgstr ""
+msgstr "conserva tots els atributs"
 
 #: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
-#, fuzzy
 msgid "backup existing destination files"
-msgstr "No s'ha pogut crear el fitxer de còpia de seguretat"
+msgstr ""
+"crea una còpia de seguretat dels fitxers que ja existeixin en el directori "
+"de destinació"
 
 #: ../programs/gvfs-copy.c:49
 msgid "never follow symbolic links"
-msgstr ""
+msgstr "no segueixis mai els enllaços simbòlics"
 
 #: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
 #, c-format
 msgid "progress"
-msgstr ""
+msgstr "progrés"
 
 #: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
 #: ../programs/gvfs-save.c:156
 msgid "- output files at <location>"
-msgstr ""
+msgstr "- bolca els fitxers a <ubicació>"
 
 #: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
 #, c-format
 msgid "Missing operand\n"
-msgstr ""
+msgstr "Manca un operand\n"
 
 #: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
 #, c-format
 msgid "Too many arguments\n"
-msgstr ""
+msgstr "Massa arguments\n"
 
 #: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
-#, fuzzy, c-format
+#, c-format
 msgid "Target %s is not a directory\n"
-msgstr "El fitxer no és un directori"
+msgstr "El destí %s no és un directori\n"
 
 #: ../programs/gvfs-copy.c:177
 #, c-format
 msgid "overwrite %s?"
-msgstr ""
+msgstr "voleu sobreescriure %s?"
 
 #: ../programs/gvfs-copy.c:191
-#, fuzzy, c-format
+#, c-format
 msgid "Error copying file %s: %s\n"
-msgstr "S'ha produït un error en moure el fitxer: %s"
+msgstr "S'ha produït un error en copiar el fitxer %s: %s\n"
 
 #: ../programs/gvfs-info.c:37
 msgid "List writable attributes"
-msgstr ""
+msgstr "Llista els atributs d'escriptura"
 
 #: ../programs/gvfs-info.c:38
-#, fuzzy
 msgid "Get filesystem info"
-msgstr "Sistema de fitxers"
+msgstr "Obté la informació del sistema de fitxers"
 
 #: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
 msgid "The attributes to get"
-msgstr ""
+msgstr "Els atributs que es volen obtenir"
 
 #: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
 #: ../programs/gvfs-set-attribute.c:37
 msgid "Don't follow symlinks"
-msgstr ""
+msgstr "No segueixis els enllaços simbòlics"
 
 #: ../programs/gvfs-info.c:50
-#, fuzzy
 msgid "invalid type"
-msgstr "Tipus de rerefons no vàlid"
+msgstr "tipus no vàlid"
 
 #: ../programs/gvfs-info.c:53
 msgid "unknown"
-msgstr ""
+msgstr "desconegut"
 
 #: ../programs/gvfs-info.c:56
 msgid "regular"
-msgstr ""
+msgstr "normal"
 
 #: ../programs/gvfs-info.c:59
-#, fuzzy
 msgid "directory"
-msgstr "No és un directori"
+msgstr "directori"
 
 #: ../programs/gvfs-info.c:62
 msgid "symlink"
-msgstr ""
+msgstr "enllaç simbòlic"
 
 #: ../programs/gvfs-info.c:65
 msgid "special"
-msgstr ""
+msgstr "especial"
 
 #: ../programs/gvfs-info.c:68
 msgid "shortcut"
-msgstr ""
+msgstr "drecera"
 
 #: ../programs/gvfs-info.c:71
-#, fuzzy
 msgid "mountable"
-msgstr "No és un fitxer muntable"
+msgstr "muntable"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
 msgid "attributes:\n"
-msgstr ""
+msgstr "atributs:\n"
 
 #: ../programs/gvfs-info.c:155
 #, c-format
 msgid "display name: %s\n"
-msgstr ""
+msgstr "nom que es mostra: %s\n"
 
 #: ../programs/gvfs-info.c:159
 #, c-format
 msgid "edit name: %s\n"
-msgstr ""
+msgstr "edita el nom: %s\n"
 
 #: ../programs/gvfs-info.c:165
 #, c-format
 msgid "name: %s\n"
-msgstr ""
+msgstr "nom: %s\n"
 
 #: ../programs/gvfs-info.c:172
 #, c-format
 msgid "type: %s\n"
-msgstr ""
+msgstr "tipus: %s\n"
 
 #: ../programs/gvfs-info.c:178
 #, c-format
 msgid "size: "
-msgstr ""
+msgstr "mida: "
 
 #: ../programs/gvfs-info.c:183
 #, c-format
 msgid "hidden\n"
-msgstr ""
+msgstr "ocult\n"
 
 #: ../programs/gvfs-info.c:266
-#, fuzzy
 msgid "Copy with file"
-msgstr "S'ha produït un error en escriure el fitxer"
+msgstr "Copia amb el fitxer"
 
 #: ../programs/gvfs-info.c:270
 msgid "Keep with file when moved"
-msgstr ""
+msgstr "Mantén-lo amb el fitxer quan es mogui"
 
 #: ../programs/gvfs-info.c:307
-#, fuzzy, c-format
+#, c-format
 msgid "Error getting writable attributes: %s\n"
-msgstr "S'ha produït un error en suprimir el fitxer: %s"
+msgstr "S'ha produït un error en obtenir els atributs d'escriptura: %s\n"
 
 #: ../programs/gvfs-info.c:312
 #, c-format
 msgid "Settable attributes:\n"
-msgstr ""
+msgstr "Atributs que es poden establir:\n"
 
 #: ../programs/gvfs-info.c:335
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "Espais de nom d'atributs d'escriptura:\n"
 
 #: ../programs/gvfs-info.c:362
 msgid "- show info for <location>"
-msgstr ""
+msgstr "- mostra informació sobre <ubicació>"
 
 #: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
 msgid "Show hidden files"
-msgstr ""
+msgstr "Mostra els fitxers ocults"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
-msgstr ""
+msgstr "Utilitza un format de llistat ampliat"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
-msgstr ""
+msgstr "Mostra les complecions"
 
 #: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:68
-#, fuzzy, c-format
+#, c-format
 msgid "Error: %s\n"
-msgstr "Error: %s"
+msgstr "Error: %s\n"
 
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
-msgstr ""
+msgstr "- llista els fitxers a <ubicació>"
 
 #: ../programs/gvfs-mkdir.c:33
-#, fuzzy
 msgid "create parent directories"
-msgstr "No es pot obrir el directori"
+msgstr "crea els directoris pare"
 
 #: ../programs/gvfs-mkdir.c:50 ../programs/gvfs-rm.c:52
-#, fuzzy
 msgid "- delete files"
-msgstr "S'ha produït un error en suprimir el fitxer"
+msgstr "- suprimeix els fitxers"
 
 #: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
-#, fuzzy, c-format
+#, c-format
 msgid "Error creating directory: %s\n"
-msgstr "S'ha produït un error en crear el directori"
+msgstr "S'ha produït un error en crear el directori: %s\n"
 
 #: ../programs/gvfs-mount.c:54
-#, fuzzy
 msgid "Mount as mountable"
-msgstr "No és un fitxer muntable"
+msgstr "Munta com a muntable"
 
 #: ../programs/gvfs-mount.c:55
 msgid "Mount volume with device file"
-msgstr ""
+msgstr "Munta el volum amb el fitxer de dispositiu"
 
 #: ../programs/gvfs-mount.c:56
 msgid "Unmount"
-msgstr ""
+msgstr "Desmunta"
 
 #: ../programs/gvfs-mount.c:57
 msgid "Unmount all mounts with the given scheme"
-msgstr ""
+msgstr "Desmunta tots els muntables que compleixin l'esquema donat"
 
 #: ../programs/gvfs-mount.c:58
 msgid "List"
-msgstr ""
+msgstr "Llista"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Show extra information for List and Monitor"
-msgstr ""
+msgstr "Mostra informació addicional en llistar i en fer seguiments"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Monitor events"
-msgstr ""
+msgstr "Fes un seguiment dels esdeveniments"
 
 #: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
-#, fuzzy, c-format
+#, c-format
 msgid "Error mounting location: %s\n"
-msgstr "%s: %s: s'ha produït un error en obrir la ubicació: %s\n"
+msgstr "S'ha produït un error en muntar la ubicació: %s\n"
 
 #: ../programs/gvfs-mount.c:241
-#, fuzzy, c-format
+#, c-format
 msgid "Error unmounting mount: %s\n"
-msgstr "S'ha produït un error en connectar-se al dimoni: %s"
+msgstr "S'ha produït un error desmuntar el muntatge: %s\n"
 
 #: ../programs/gvfs-mount.c:262
-#, fuzzy, c-format
+#, c-format
 msgid "Error finding enclosing mount: %s\n"
-msgstr "No s'ha pogut trobar el punt de muntatge de tancament"
+msgstr "No s'ha pogut trobar el punt de muntatge de tancament: %s\n"
 
 #: ../programs/gvfs-mount.c:673
-#, fuzzy, c-format
+#, c-format
 msgid "Error mounting %s: %s\n"
-msgstr "S'ha produït un error en moure el fitxer: %s"
+msgstr "S'ha produït un error en muntar %s: %s\n"
 
 #: ../programs/gvfs-mount.c:687
 #, c-format
 msgid "Mounted %s at %s\n"
-msgstr ""
+msgstr "S'ha muntat %s a %s\n"
 
 #: ../programs/gvfs-mount.c:738
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr ""
+msgstr "No hi ha cap volum pel fitxer de dispositiu %s\n"
 
-#: ../programs/gvfs-mount.c:931
-#, fuzzy
+#: ../programs/gvfs-mount.c:929
 msgid "- mount <location>"
-msgstr "%s: manquen les ubicacions"
+msgstr "- muntatge <location>"
 
 #: ../programs/gvfs-move.c:173
-#, fuzzy, c-format
+#, c-format
 msgid "Error moving file %s: %s\n"
-msgstr "S'ha produït un error en moure el fitxer: %s"
+msgstr "S'ha produït un error en moure el fitxer %s: %s\n"
 
 #: ../programs/gvfs-open.c:37
 msgid "files"
-msgstr ""
+msgstr "fitxers"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -2153,109 +2143,111 @@ msgstr ""
 "aquest tipus de fitxer."
 
 #: ../programs/gvfs-rename.c:49
-#, fuzzy
 msgid "- rename file"
-msgstr "S'ha produït un error en canviar el nom del fitxer"
+msgstr "- canvia el nom del fitxer"
 
 #: ../programs/gvfs-rename.c:74
 #, c-format
 msgid "Rename successful. New uri: %s\n"
-msgstr ""
+msgstr "S'ha canviat el nom correctament. URI nova: %s\n"
 
 #: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
 msgid "ignore nonexistent files, never prompt"
-msgstr ""
+msgstr "ignora els fitxers que no existeixin, no ho preguntis mai"
 
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
-msgstr ""
+msgstr "Crea una còpia de seguretat"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Crea només si no existeix"
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
-msgstr ""
+msgstr "Afegeix al final del fitxer"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr ""
+msgstr "En crear un fitxer, limita l'accés a només l'usuari actual"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr ""
+msgstr "Mostra la nova etag al final"
 
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "L'etag del fitxer que s'està sobreescrivint"
 
 #: ../programs/gvfs-save.c:76
-#, fuzzy, c-format
+#, c-format
 msgid "Error opening file: %s\n"
-msgstr "S'ha produït un error en moure el fitxer: %s"
+msgstr "S'ha produït un error en obrir el fitxer: %s\n"
 
 #: ../programs/gvfs-save.c:109
-#, fuzzy
 msgid "Error reading stdin"
-msgstr "S'ha produït un error en canviar el nom del directori"
+msgstr "S'ha produït un error en llegir l'entrada estàndard (stdin)"
 
 #: ../programs/gvfs-save.c:122
-#, fuzzy, c-format
+#, c-format
 msgid "Error closing: %s\n"
-msgstr "%s: %s:error en tancar: %s\n"
+msgstr "S'ha produït un error en tancar: %s\n"
 
 #: ../programs/gvfs-save.c:134
-#, fuzzy, c-format
+#, c-format
 msgid "Etag not available\n"
-msgstr "El fitxer no està disponible"
+msgstr "L'etag no està disponible\n"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv]"
 msgstr ""
+"tipus d'atribut [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr " <ubicació> <atribut> <valors> - estableix un atribut"
 
 #: ../programs/gvfs-set-attribute.c:137
-#, fuzzy, c-format
+#, c-format
 msgid "Location not specified\n"
-msgstr "No s'ha especificat el tipus de muntatge"
+msgstr "No s'ha especificat la ubicació\n"
 
 #: ../programs/gvfs-set-attribute.c:145
-#, fuzzy, c-format
+#, c-format
 msgid "Attribute not specified\n"
-msgstr "No s'ha especificat la unitat"
+msgstr "No s'ha especificat l'atribut\n"
 
 #: ../programs/gvfs-set-attribute.c:189
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid attribute type %s\n"
-msgstr "El contingut de la llista d'informació dels atributs no és vàlid"
+msgstr "El tipus d'atribut no és vàlid %s\n"
 
 #: ../programs/gvfs-set-attribute.c:199
-#, fuzzy, c-format
+#, c-format
 msgid "Error setting attribute: %s\n"
-msgstr "S'ha produït un error en suprimir el fitxer: %s"
+msgstr "S'ha produït un error en establir l'atribut: %s\n"
 
 #: ../programs/gvfs-trash.c:51
 msgid "- move files to trash"
-msgstr ""
+msgstr "- mou els fitxers a la paperera"
 
 #: ../programs/gvfs-trash.c:67
-#, fuzzy, c-format
+#, c-format
 msgid "Error trashing file: %s\n"
-msgstr "S'ha produït un error en suprimir el fitxer: %s"
+msgstr "S'ha produït un error en suprimir el fitxer: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
 msgstr ""
+"Segueix els enllaços simbòlics, els muntatges i les drecers com si fossin "
+"directoris"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr ""
+msgstr "- llista els continguts dels directories en un format a l'estil arbre"
 
 #~ msgid "broken transmission"
 #~ msgstr "transmissió trencada"
