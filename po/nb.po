@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs 1.1.x\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-01 13:33+0200\n"
-"PO-Revision-Date: 2009-09-01 13:53+0200\n"
+"Project-Id-Version: gvfs 1.2.x\n"
+"Report-Msgid-Bugs-To:\n"
+"POT-Creation-Date: 2009-10-11 22:01+0200\n"
+"PO-Revision-Date: 2009-10-11 22:03+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian Bokmål <i18n-nb@lister.ping.uio.no>\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2373
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2375
 msgid "Operation not supported, files on different mounts"
 msgstr "Operasjonen er ikke støttet. Filer på forskjellige monteringspunkter"
 
@@ -33,15 +33,15 @@ msgstr "Kunne ikke finne fildeskriptor for strøm"
 
 #: ../client/gdaemonfile.c:1016 ../client/gdaemonfile.c:1095
 #: ../client/gdaemonfile.c:1158 ../client/gdaemonfile.c:1221
-#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2646
-#: ../client/gdaemonfile.c:2730 ../client/gdaemonfile.c:2993
+#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2648
+#: ../client/gdaemonfile.c:2732 ../client/gdaemonfile.c:2995
 #: ../client/gvfsiconloadable.c:374
 msgid "Invalid return value from open"
 msgstr "Ugyldig returverdi fra open"
 
 #: ../client/gdaemonfile.c:1105 ../client/gdaemonfile.c:1168
 #: ../client/gdaemonfile.c:1231 ../client/gdaemonfile.c:1297
-#: ../client/gdaemonfile.c:2612 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:2614 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "Fant ikke fildeskriptor for strøm"
 
@@ -68,21 +68,21 @@ msgstr "Ugyldig filnavn %s"
 msgid "Invalid return value from query_filesystem_info"
 msgstr "Ugyldig returverdi fra query_filesystem_info"
 
-#: ../client/gdaemonfile.c:2229 ../client/gdaemonvfs.c:1187
-#: ../client/gdaemonvfs.c:1321 ../client/gdaemonvfs.c:1374
+#: ../client/gdaemonfile.c:2231 ../client/gdaemonvfs.c:1188
+#: ../client/gdaemonvfs.c:1322 ../client/gdaemonvfs.c:1375
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Feil under setting av metadata for fil: %s"
 
-#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1375
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1376
 msgid "values must be string or list of strings"
 msgstr "verdier må være av type streng eller liste med strenger"
 
-#: ../client/gdaemonfile.c:2533
+#: ../client/gdaemonfile.c:2535
 msgid "Invalid return value from monitor_dir"
 msgstr "Ugyldig returverdi fra monitor_dir"
 
-#: ../client/gdaemonfile.c:2582
+#: ../client/gdaemonfile.c:2584
 msgid "Invalid return value from monitor_file"
 msgstr "Ugyldig returverdi fra monitor_file"
 
@@ -138,12 +138,12 @@ msgstr "Slutt på strømmen"
 msgid "Seek not supported on stream"
 msgstr "Søking ikke støttet på strøm"
 
-#: ../client/gdaemonvfs.c:831
+#: ../client/gdaemonvfs.c:832
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Feil ved henting av informasjon om monteringspunkt: %s"
 
-#: ../client/gdaemonvfs.c:1188
+#: ../client/gdaemonvfs.c:1189
 msgid "Can't contact session bus"
 msgstr "Kunne ikke kontakte systembussen"
 
@@ -279,7 +279,7 @@ msgstr "feil under oppstart av monteringstjenesten"
 msgid "Unmount Anyway"
 msgstr "Avmonter likevel"
 
-#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1002
 #: ../monitor/gdu/ggdumount.c:883
 msgid "Cancel"
 msgstr "Avbryt"
@@ -316,7 +316,7 @@ msgstr "Ugyldige monteringsspesifikasjon"
 #: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
 #: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
 #: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
-#: ../daemon/gvfsbackenddnssd.c:398 ../daemon/gvfsbackendftp.c:904
+#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:904
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
 #: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
 #: ../daemon/gvfsbackendsmbbrowse.c:1394
@@ -331,7 +331,7 @@ msgid "Can't open directory"
 msgstr "Kan ikke åpne katalog"
 
 #: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3803 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
@@ -629,20 +629,20 @@ msgid "Backup file creation failed"
 msgstr "Oppretting av sikkerhetskopi feilet"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
+#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Lokalt nettverk"
 
-#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
+#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "Kan ikke overvåke fil eller katalog."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:754
+#: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
 #: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Nettverk"
@@ -950,7 +950,7 @@ msgid "ssh program unexpectedly exited"
 msgstr "SSH-program avsluttet uventet"
 
 #: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "Tilgang nektet"
 
@@ -1048,7 +1048,7 @@ msgid "Unable to find supported ssh command"
 msgstr "Kan ikke finne støttet ssh-kommando"
 
 #: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:383
+#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
 msgstr "Operasjonen støttes ikke"
 
@@ -1196,23 +1196,23 @@ msgstr "Ugyldig type motor"
 msgid "Error sending fd: %s"
 msgstr "Feil ved sending av fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:175
+#: ../daemon/gvfsftpconnection.c:181
 msgid "Unexpected end of stream"
 msgstr "Uventet slutt på strøm"
 
-#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
-#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:831
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "Ugyldig svar"
 
-#: ../daemon/gvfsftpconnection.c:380
+#: ../daemon/gvfsftpconnection.c:393
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
 "Kan ikke åpne aktiv FTP-tilkobling. Kanskje din ruter ikke støtter dette?"
 
-#: ../daemon/gvfsftpconnection.c:387
+#: ../daemon/gvfsftpconnection.c:400
 msgid "Failed to create active FTP connection."
 msgstr "Klarte ikke å åpne aktiv FTP-tilkobling."
 
@@ -1220,43 +1220,43 @@ msgstr "Klarte ikke å åpne aktiv FTP-tilkobling."
 msgid "Filename contains invalid characters."
 msgstr "Filnavnet inneholder ugyldige tegn."
 
-#: ../daemon/gvfsftptask.c:252
+#: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
 msgstr "FTP-tjeneren er opptatt. Prøv igjen senere"
 
-#: ../daemon/gvfsftptask.c:347
+#: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
 msgstr "Kontoer er ikke støttet"
 
-#: ../daemon/gvfsftptask.c:351
+#: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
 msgstr "Vert lukket forbindelsen"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "Kan ikke åpne dataforbindelse. Kanskje en brannmur forhindrer dette?"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "Dataforbindelse lukket"
 
-#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "Operasjonen feilet"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:384
 msgid "No space left on server"
 msgstr "Ikke mer plass på tjener"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:396
 msgid "Unsupported network protocol"
 msgstr "Nettverksprotokoll ikke støttet"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
 msgstr "Ukjent sidetype"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
 msgstr "Ugyldig filnavn"
 
@@ -1366,31 +1366,33 @@ msgstr "GVfs GDU volumovervåking"
 msgid "Floppy Drive"
 msgstr "Diskettstasjon"
 
-#: ../monitor/gdu/ggdudrive.c:257
+#: ../monitor/gdu/ggdudrive.c:249
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Stasjon uten navn (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:259
+#: ../monitor/gdu/ggdudrive.c:251
 msgid "Unnamed Drive"
 msgstr "Stasjon uten navn"
 
-#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:551 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "Klarte ikke å løse ut medie. Ett eller flere volum på mediet er opptatt."
 
-#: ../monitor/gdu/ggdudrive.c:1003
+#: ../monitor/gdu/ggdudrive.c:995
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
 "Start stasjon i nedgradert modus?\n"
-"Hvis du starter en stasjon i nedgradert modus betyr dette at stasjonen ikke lenger er tolerant for feil. Data på stasjonen kan gå tapt hvis en komponent feiler."
+"Hvis du starter en stasjon i nedgradert modus betyr dette at stasjonen ikke "
+"lenger er tolerant for feil. Data på stasjonen kan gå tapt hvis en komponent "
+"feiler."
 
-#: ../monitor/gdu/ggdudrive.c:1009
+#: ../monitor/gdu/ggdudrive.c:1001
 msgid "Start Anyway"
 msgstr "Start likevel"
 
@@ -2064,9 +2066,9 @@ msgid "Error unmounting mount: %s\n"
 msgstr "Feil ved avmontering av monteringspunkt: %s\n"
 
 #: ../programs/gvfs-mount.c:262
-#, fuzzy, c-format
+#, c-format
 msgid "Error finding enclosing mount: %s\n"
-msgstr "Kan ikke finne omsluttende montering"
+msgstr "Klarte ikke å finne omsluttende montering: %s\n"
 
 #: ../programs/gvfs-mount.c:673
 #, c-format
@@ -2083,7 +2085,7 @@ msgstr "Monterte %s i %s\n"
 msgid "No volume for device file %s\n"
 msgstr "Ingen volum for enhetsfil %s\n"
 
-#: ../programs/gvfs-mount.c:931
+#: ../programs/gvfs-mount.c:929
 msgid "- mount <location>"
 msgstr "- monter <lokasjon>"
 
@@ -2151,15 +2153,15 @@ msgstr "Legg til ved slutten av filen"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr ""
+msgstr "Begrens aksess til aktiv bruker når en fil opprettes"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
-msgstr ""
+msgstr "Skriv ut ny etag ved slutten"
 
 #: ../programs/gvfs-save.c:48
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "Etag for filen som overskrives"
 
 #: ../programs/gvfs-save.c:76
 #, c-format
@@ -2167,9 +2169,8 @@ msgid "Error opening file: %s\n"
 msgstr "Feil under åpning av fil: %s\n"
 
 #: ../programs/gvfs-save.c:109
-#, fuzzy
 msgid "Error reading stdin"
-msgstr "Feil ved endring av navn på katalog"
+msgstr "Feil ved lesing fra stdin"
 
 #: ../programs/gvfs-save.c:122
 #, c-format
@@ -2179,17 +2180,17 @@ msgstr "Feil ved lukking: %s\n"
 #: ../programs/gvfs-save.c:134
 #, c-format
 msgid "Etag not available\n"
-msgstr ""
+msgstr "Etag ikke tilgjengelig\n"
 
 #: ../programs/gvfs-set-attribute.c:36
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv]"
-msgstr ""
+msgstr "type attributt [string, bytestring, boolean, uint32, int32, uint64, int64, stringv]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr "<lokasjon> <attributt> <verdier> - sett attributt"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
@@ -2213,7 +2214,7 @@ msgstr "Feil under setting av attributt: %s\n"
 
 #: ../programs/gvfs-trash.c:51
 msgid "- move files to trash"
-msgstr ""
+msgstr "- flytt filer til papirkurven"
 
 #: ../programs/gvfs-trash.c:67
 #, c-format
@@ -2226,4 +2227,4 @@ msgstr "Følg symbolske lenker, monteringspunkter og snarveier som kataloger"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr ""
+msgstr "- vis innholdet i kataloger i et trelignende format"
