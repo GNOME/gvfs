@@ -740,7 +740,9 @@ setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
 {
   gchar *devname;
   char *comma;
+  gboolean is_media_player = FALSE;
   char *camera_x_content_types[] = {"x-content/image-dcf", NULL};
+  char *media_player_x_content_types[] = {"x-content/audio-player", NULL};
 
   /* turn usb:001,041 string into an udev device name */
   if (!g_str_has_prefix (gphoto2_backend->gphoto2_port, "usb:"))
@@ -763,16 +765,25 @@ setup_for_device (GVfsBackendGphoto2 *gphoto2_backend)
 
       /* determine icon name */
       if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"))
+	{
           gphoto2_backend->icon_name = g_strdup (g_udev_device_get_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER_ICON_NAME"));
+	  is_media_player = TRUE;
+	}
       else if (g_udev_device_has_property (gphoto2_backend->udev_device, "ID_MEDIA_PLAYER"))
+	{
           gphoto2_backend->icon_name = g_strdup ("multimedia-player");
+	  is_media_player = TRUE;
+	}
       else
           gphoto2_backend->icon_name = g_strdup ("camera-photo");
     }
   else
       DEBUG ("-> did not find matching udev device");
 
-  g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend), camera_x_content_types);
+  if (is_media_player)
+      g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend), media_player_x_content_types);
+  else
+      g_vfs_backend_set_x_content_types (G_VFS_BACKEND (gphoto2_backend), camera_x_content_types);
 }
 
 static void
