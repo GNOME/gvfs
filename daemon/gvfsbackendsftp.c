@@ -964,8 +964,8 @@ handle_login (GVfsBackend *backend,
                                                 &password_save) ||
                   aborted)
                 {
-                  g_set_error_literal (error,
-	                               G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                  g_set_error_literal (error, G_IO_ERROR,
+                                       aborted ? G_IO_ERROR_FAILED_HANDLED : G_IO_ERROR_PERMISSION_DENIED,
         	                       _("Password dialog cancelled"));
                   ret_val = FALSE;
                   break;
