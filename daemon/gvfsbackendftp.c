@@ -354,7 +354,8 @@ do_mount (GVfsBackend *backend,
                         &password_save) ||
           aborted)
         {
-          g_set_error_literal (&task.error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+          g_set_error_literal (&task.error, G_IO_ERROR,
+                               aborted ? G_IO_ERROR_FAILED_HANDLED : G_IO_ERROR_PERMISSION_DENIED,
                 	       _("Password dialog cancelled"));
           break;
         }

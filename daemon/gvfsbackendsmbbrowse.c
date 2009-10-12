@@ -982,7 +982,7 @@ do_mount (GVfsBackend *backend,
     {
       if (op_backend->mount_cancelled)
         g_vfs_job_failed (G_VFS_JOB (job),
-                         G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+                         G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED,
                          _("Password dialog cancelled"));
       else
         /* TODO: Error from errno? */
