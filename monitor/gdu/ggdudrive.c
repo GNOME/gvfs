@@ -188,7 +188,9 @@ update_drive (GGduDrive *drive)
        *
        * See also below where we e.g. set can_eject to TRUE for non-removable drives.
        */
-      drive->can_eject = gdu_device_drive_get_is_media_ejectable (device) || gdu_device_drive_get_requires_eject (device) || gdu_device_is_removable (device);
+      drive->can_eject = ((gdu_device_drive_get_is_media_ejectable (device) || gdu_device_is_removable (device)) &&
+                          gdu_device_is_media_available (device) && ! _is_pc_floppy_drive (device)) ||
+                         gdu_device_drive_get_requires_eject (device);
       drive->is_media_check_automatic = gdu_device_is_media_change_detected (device);
       drive->can_poll_for_media = gdu_device_is_removable (device);
     }
