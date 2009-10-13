@@ -641,6 +641,18 @@ eject_cb (GduDevice *device,
 {
   GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
   GGduDrive *drive;
+  gboolean drive_detachable;
+
+  drive = G_GDU_DRIVE (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
+  drive_detachable = drive->can_stop == FALSE && drive->start_stop_type == G_DRIVE_START_STOP_TYPE_SHUTDOWN;
+
+  if (error != NULL && error->code == G_IO_ERROR_FAILED &&
+      drive_detachable && ! drive->has_media && drive->is_media_removable)
+    {
+      /* Silently drop the error if there's no media in drive and we're still trying to detach it (see below) */
+      g_error_free (error);
+      error = NULL;
+    }
 
   if (error != NULL)
     {
@@ -651,8 +663,7 @@ eject_cb (GduDevice *device,
       goto out;
     }
 
-  drive = G_GDU_DRIVE (g_async_result_get_source_object (G_ASYNC_RESULT (simple)));
-  if (drive->can_stop == FALSE && drive->start_stop_type == G_DRIVE_START_STOP_TYPE_SHUTDOWN)
+  if (drive_detachable)
     {
       /* If device is not ejectable but it is detachable and we don't support stop(),
        * then also run Detach() after Eject() - see update_drive() for details for why...
