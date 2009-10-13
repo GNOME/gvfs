@@ -473,7 +473,7 @@ recompute_files (GVfsBackendComputer *backend)
           file->icon = g_drive_get_icon (file->drive);
           file->display_name = g_drive_get_name (file->drive);
           file->can_eject = g_drive_can_eject (file->drive);
-          file->can_mount = TRUE;
+          file->can_mount = ! g_drive_is_media_removable (file->drive) || ! g_drive_is_media_check_automatic (file->drive) || g_drive_has_media (file->drive);
         }
 
       if (file->drive)
