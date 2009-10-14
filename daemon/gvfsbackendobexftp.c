@@ -1816,6 +1816,7 @@ do_push (GVfsBackend *backend,
       push_data_free (job_data);
 
       g_vfs_job_failed_from_error (G_VFS_JOB (job), error);
+      return;
     }
 
   push_data_free (job_data);
