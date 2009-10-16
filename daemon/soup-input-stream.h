@@ -70,6 +70,8 @@ gboolean      soup_input_stream_send_finish (GInputStream        *stream,
 					     GAsyncResult        *result,
 					     GError             **error);
 
+SoupMessage  *soup_input_stream_get_message (GInputStream         *stream);
+
 #define SOUP_HTTP_ERROR soup_http_error_quark()
 GQuark soup_http_error_quark (void);
 

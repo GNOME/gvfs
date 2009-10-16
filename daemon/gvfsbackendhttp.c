@@ -529,30 +529,15 @@ try_close_read (GVfsBackend       *backend,
 
 /* *** query_info () *** */
 
-static void 
-query_info_ready (SoupSession *session,
-                  SoupMessage *msg,
-                  gpointer     user_data)
+static void
+file_info_from_message (SoupMessage *msg,
+                        GFileInfo *info,
+                        GFileAttributeMatcher *matcher)
 {
-  GFileAttributeMatcher *matcher;
-  GVfsJobQueryInfo      *job;
-  const SoupURI         *uri;
-  const char            *text;
-  GFileInfo             *info;
-  char                  *basename;
-  char                  *ed_name;
-
-  job     = G_VFS_JOB_QUERY_INFO (user_data);
-  info    = job->file_info;
-  matcher = job->attribute_matcher;
-  ed_name = NULL;
-
-  if (! SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
-    {
-      g_vfs_job_failed_from_http_status (G_VFS_JOB (job), msg->status_code,
-                                         msg->reason_phrase);
-      return;
-    }
+  const SoupURI *uri;
+  const char    *text;
+  char          *basename;
+  char          *ed_name = NULL;
 
   uri = soup_message_get_uri (msg);
   basename = http_uri_get_basename (uri->path);
@@ -636,7 +621,29 @@ query_info_ready (SoupSession *session,
                                         G_FILE_ATTRIBUTE_ETAG_VALUE,
                                         text);
     }
+}
 
+static void
+query_info_ready (SoupSession *session,
+                  SoupMessage *msg,
+                  gpointer     user_data)
+{
+  GFileAttributeMatcher *matcher;
+  GVfsJobQueryInfo      *job;
+  GFileInfo             *info;
+
+  job     = G_VFS_JOB_QUERY_INFO (user_data);
+  info    = job->file_info;
+  matcher = job->attribute_matcher;
+
+  if (! SOUP_STATUS_IS_SUCCESSFUL (msg->status_code))
+    {
+      g_vfs_job_failed_from_http_status (G_VFS_JOB (job), msg->status_code,
+                                         msg->reason_phrase);
+      return;
+    }
+
+  file_info_from_message (msg, info, matcher);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
@@ -663,6 +670,24 @@ try_query_info (GVfsBackend           *backend,
 }
 
 
+static gboolean
+try_query_info_on_read (GVfsBackend           *backend,
+                        GVfsJobQueryInfoRead  *job,
+                        GVfsBackendHandle      handle,
+                        GFileInfo             *info,
+                        GFileAttributeMatcher *attribute_matcher)
+{
+    SoupMessage *msg = soup_input_stream_get_message (G_INPUT_STREAM (handle));
+
+    file_info_from_message (msg, info, attribute_matcher);
+    g_object_unref (msg);
+
+    g_vfs_job_succeeded (G_VFS_JOB (job));
+
+    return TRUE;
+}
+
+
 static void
 g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
 {
@@ -673,11 +698,11 @@ g_vfs_backend_http_class_init (GVfsBackendHttpClass *klass)
 
   backend_class = G_VFS_BACKEND_CLASS (klass); 
 
-  backend_class->try_mount         = try_mount;
-  backend_class->try_open_for_read = try_open_for_read;
-  backend_class->try_read          = try_read;
-  backend_class->try_seek_on_read  = try_seek_on_read;
-  backend_class->try_close_read    = try_close_read;
-  backend_class->try_query_info    = try_query_info;
-
+  backend_class->try_mount              = try_mount;
+  backend_class->try_open_for_read      = try_open_for_read;
+  backend_class->try_read               = try_read;
+  backend_class->try_seek_on_read       = try_seek_on_read;
+  backend_class->try_close_read         = try_close_read;
+  backend_class->try_query_info         = try_query_info;
+  backend_class->try_query_info_on_read = try_query_info_on_read;
 }

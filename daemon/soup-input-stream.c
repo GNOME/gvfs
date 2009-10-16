@@ -912,6 +912,13 @@ soup_input_stream_truncate (GSeekable     *seekable,
   return FALSE;
 }
 
+SoupMessage *
+soup_input_stream_get_message (GInputStream *stream)
+{
+  SoupInputStreamPrivate *priv = SOUP_INPUT_STREAM_GET_PRIVATE (stream);
+  return priv->msg ? g_object_ref (priv->msg) : NULL;
+}
+
 GQuark
 soup_http_error_quark (void)
 {
