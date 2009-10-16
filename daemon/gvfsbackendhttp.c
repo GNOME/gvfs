@@ -549,39 +549,23 @@ file_info_from_message (SoupMessage *msg,
   if (basename != NULL &&
       g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
-    {
-      ed_name = gvfs_file_info_populate_names_as_local (info, basename);
-    }
+    ed_name = gvfs_file_info_populate_names_as_local (info, basename);
 
   if (ed_name != NULL &&
       g_file_attribute_matcher_matches (matcher,
                                         G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME))
-    {
-      g_file_info_set_edit_name (info, ed_name);
-    }
+    g_file_info_set_edit_name (info, ed_name);
 
   g_free (basename);
   g_free (ed_name);
 
-  text = soup_message_headers_get (msg->response_headers,
-                                   "Content-Length");
+  if (soup_message_headers_get_encoding(msg->response_headers) == SOUP_ENCODING_CONTENT_LENGTH)
+    g_file_info_set_size (info, soup_message_headers_get_content_length (msg->response_headers));
+
+  text = soup_message_headers_get_content_type (msg->response_headers, NULL);
   if (text)
     {
-      guint64 size = g_ascii_strtoull (text, NULL, 10);
-      g_file_info_set_size (info, size);
-    }
-
-
-  text = soup_message_headers_get (msg->response_headers,
-                                   "Content-Type");
-  if (text)
-    {
-      char *p = strchr (text, ';');
-      char *tmp = NULL;
       GIcon *icon;
-
-      if (p != NULL)
-        text = tmp = g_strndup (text, p - text);
 
       g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
       g_file_info_set_content_type (info, text);
@@ -590,9 +574,6 @@ file_info_from_message (SoupMessage *msg,
       icon = g_content_type_get_icon (text);
       g_file_info_set_icon (info, icon);
       g_object_unref (icon);
-
-      g_free (tmp);
-
     }
 
 
