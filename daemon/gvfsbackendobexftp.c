@@ -1826,7 +1826,18 @@ do_push (GVfsBackend *backend,
    */
   _invalidate_cache_helper (op_backend);
 
-  g_vfs_job_succeeded (G_VFS_JOB (job));
+  if (remove_source && g_unlink (local_path) == -1)
+    {
+      int errsv = errno;
+
+      g_vfs_job_failed (G_VFS_JOB (job),
+                        G_IO_ERROR,
+                        g_io_error_from_errno (errsv),
+                        _("Error deleting file: %s"),
+                        g_strerror (errsv));
+    }
+  else
+    g_vfs_job_succeeded (G_VFS_JOB (job));
 
   op_backend->doing_io = FALSE;
   g_mutex_unlock (op_backend->mutex);
