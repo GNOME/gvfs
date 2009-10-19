@@ -1,3 +1,12 @@
+Major changes in 1.4.1
+======================
+* Translation updates
+* FreeBSD support for the gphoto2 backend
+* Don't silently overwrite when restoring from trash
+* Avoid error dialogs when the user canceled
+* Fix a crash in the obexftp backend
+* Don't confuse media players for cameras
+
 Major changes in 1.4.0
 ======================
 * Translation updates
