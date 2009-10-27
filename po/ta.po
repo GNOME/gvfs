@@ -11,16 +11,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master.ta\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-10-13 15:16+0000\n"
-"PO-Revision-Date: 2009-08-26 15:32+0530\n"
-"Last-Translator: I. Felix <ifelix@redhat.com>\n"
-"Language-Team: Tamil <fedora-trans-ta@redhat.com>\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-10-27 14:53+0530\n"
+"PO-Revision-Date: 2009-10-27 14:54+0530\n"
+"Last-Translator: Dr.T.Vasudevan <agnihot3@gmail.com>\n"
+"Language-Team: Tamil <Ubuntu-l10n-tam@lists.ubuntu.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n!=1);\\n\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\\n"
 "\n"
 "\n"
 "\n"
@@ -28,7 +27,8 @@ msgstr ""
 "\n"
 "\n"
 "\n"
-"X-Generator: KBabel 1.11.4\n"
+"\n"
+"X-Generator: Lokalize 0.3\n"
 
 #: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
@@ -45,11 +45,9 @@ msgstr "செயல்பாடு துணைபுரியவில்ல�
 #: ../client/gdaemonfile.c:2649 ../client/gdaemonfile.c:2733
 #: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
 #: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
-#: ../client/gvfsiconloadable.c:374
-#, fuzzy, c-format
-#| msgid "Invalid return value from open"
+#: ../client/gvfsiconloadable.c:374, c-format
 msgid "Invalid return value from %s"
-msgstr "திறப்பதிலிருந்து கொடுக்கப்பட்ட தவறான மதிப்பு"
+msgstr " %s லிருந்து திரும்பிய செல்லுபடியாகாத மதிப்பு"
 
 #: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
@@ -95,10 +93,10 @@ msgstr "மதிப்புகள் சரங்களாகவோ அல்�
 #: ../daemon/gvfsbackendobexftp.c:1066 ../daemon/gvfsbackendobexftp.c:1087
 #: ../daemon/gvfsbackendobexftp.c:1206 ../daemon/gvfsbackendobexftp.c:1343
 #: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendobexftp.c:1609
-#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1866
-#: ../daemon/gvfsbackendobexftp.c:1893 ../daemon/gvfsbackendobexftp.c:1952
-#: ../daemon/gvfsbackendobexftp.c:1974 ../daemon/gvfsbackendobexftp.c:2037
-#: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1878
+#: ../daemon/gvfsbackendobexftp.c:1905 ../daemon/gvfsbackendobexftp.c:1964
+#: ../daemon/gvfsbackendobexftp.c:1986 ../daemon/gvfsbackendobexftp.c:2049
+#: ../daemon/gvfsbackendobexftp.c:2068 ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
@@ -317,7 +315,7 @@ msgid "File doesn't exist"
 msgstr "கோப்பு இல்லை"
 
 #: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1866 ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendgphoto2.c:1877 ../daemon/gvfsbackendobexftp.c:1052
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "அடைவை திறக்க முடியவில்லை"
@@ -343,8 +341,8 @@ msgstr "தற்காலிக கோப்பினை உருவாக்�
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
 #: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:631
-#: ../daemon/gvfsbackendgphoto2.c:1194 ../daemon/gvfsbackendgphoto2.c:2187
-#: ../daemon/gvfsbackendgphoto2.c:2906 ../daemon/gvfsbackendsftp.c:1756
+#: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2198
+#: ../daemon/gvfsbackendgphoto2.c:2917 ../daemon/gvfsbackendsftp.c:1756
 #: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2882
 #: ../daemon/gvfsbackendsftp.c:2902 ../daemon/gvfsbackendtrash.c:216
 #, c-format
@@ -369,7 +367,7 @@ msgstr "CD/DVD Creator"
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2980
+#: ../daemon/gvfsbackendgphoto2.c:2991
 msgid "File exists"
 msgstr "கோப்பு உள்ளது"
 
@@ -418,24 +416,24 @@ msgid "Can't recursively copy directory"
 msgstr "கோப்பினை நகர்த்த முடியாது"
 
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2560 ../daemon/gvfsbackendgphoto2.c:2769
-#: ../daemon/gvfsbackendgphoto2.c:2866 ../daemon/gvfsbackendgphoto2.c:2959
+#: ../daemon/gvfsbackendgphoto2.c:2571 ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendgphoto2.c:2877 ../daemon/gvfsbackendgphoto2.c:2970
 msgid "Not supported"
 msgstr "துணைபுரியவில்லை"
 
-#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1497
+#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "குடெவ் சார்ந்தோனை உருவாக்க முடியாது"
 
-#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1515
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "கணினி பஸ் உடன் இணைக்க முடியவில்லை"
 
-#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1527
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "லிப்ஹால் சூழலை உருவாக்க முடியாது"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1540
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "லிப்ஹால் ஐ துவக்க முடியாது"
 
@@ -489,7 +487,7 @@ msgstr "இயக்கி %s இல் 'paranoia'இலிருந்து �
 msgid "Error seeking in stream on drive %s"
 msgstr "%s இயக்கியல் இணைப்பை தேடும் போது பிழை"
 
-#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1874
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1885
 #, c-format
 msgid "No such file"
 msgstr "எந்த கோப்பும் இல்லை"
@@ -714,7 +712,7 @@ msgstr "டிஜிட்டல் நிழற்பட கருவி (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:936 ../monitor/gphoto2/ggphoto2volume.c:240
+#: ../daemon/gvfsbackendgphoto2.c:947 ../monitor/gphoto2/ggphoto2volume.c:240
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -722,169 +720,169 @@ msgstr "%s நிழற்பட கருவி"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:939 ../monitor/gphoto2/ggphoto2volume.c:235
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:235
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s இசை இயக்கி"
 
-#: ../daemon/gvfsbackendgphoto2.c:948 ../monitor/gphoto2/ggphoto2volume.c:246
+#: ../daemon/gvfsbackendgphoto2.c:959 ../monitor/gphoto2/ggphoto2volume.c:246
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "நிழற்பட கருவி"
 
-#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "இசை இயக்கி"
 
-#: ../daemon/gvfsbackendgphoto2.c:1556
+#: ../daemon/gvfsbackendgphoto2.c:1567
 msgid "No device specified"
 msgstr "எந்த சாதனமும் குறிப்பிடப்படவில்லை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1577
+#: ../daemon/gvfsbackendgphoto2.c:1588
 msgid "Cannot create gphoto2 context"
 msgstr "ஜிபோட்டோ2 சூழலை உருவாக்க முடியாது"
 
-#: ../daemon/gvfsbackendgphoto2.c:1587
+#: ../daemon/gvfsbackendgphoto2.c:1598
 msgid "Error creating camera"
 msgstr "காமிராவை உருவாக்கும் போது பிழை "
 
-#: ../daemon/gvfsbackendgphoto2.c:1600 ../daemon/gvfsbackendgphoto2.c:1610
+#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error loading device information"
 msgstr "சாதனத்தின் தகவலை ஏற்றும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1622
+#: ../daemon/gvfsbackendgphoto2.c:1633
 msgid "Error looking up device information"
 msgstr "சாதனத்தின் தகவலை காணும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1632
+#: ../daemon/gvfsbackendgphoto2.c:1643
 msgid "Error getting device information"
 msgstr "சாதனத்தின் தகவலை பெறும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1645
+#: ../daemon/gvfsbackendgphoto2.c:1656
 msgid "Error setting up camera communications port"
 msgstr "காமிரா இணைப்பு துறையை அமைக்கும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1656
+#: ../daemon/gvfsbackendgphoto2.c:1667
 msgid "Error initializing camera"
 msgstr "காமிராவை துவக்கும் போது பிழை"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1670
+#: ../daemon/gvfsbackendgphoto2.c:1681
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 %s இல் ஏற்றப்பட்டது"
 
-#: ../daemon/gvfsbackendgphoto2.c:1745
+#: ../daemon/gvfsbackendgphoto2.c:1756
 msgid "No camera specified"
 msgstr "காமிரா ஏதும் குறிப்பிடப்படவில்லை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1786 ../daemon/gvfsbackendgphoto2.c:1812
+#: ../daemon/gvfsbackendgphoto2.c:1797 ../daemon/gvfsbackendgphoto2.c:1823
 #, c-format
 msgid "Filesystem is busy"
 msgstr "கோப்பு முறைமை வேலையாக உள்ளது"
 
-#: ../daemon/gvfsbackendgphoto2.c:1882
+#: ../daemon/gvfsbackendgphoto2.c:1893
 msgid "Error creating file object"
 msgstr "கோப்பு பொருளை உருவாக்கும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1897
+#: ../daemon/gvfsbackendgphoto2.c:1908
 msgid "Error getting file"
 msgstr "கோப்பு பெறுதலில் பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1907
+#: ../daemon/gvfsbackendgphoto2.c:1918
 msgid "Error getting data from file"
 msgstr "கோப்பிலிருந்து தகவலை பெறும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:1965
+#: ../daemon/gvfsbackendgphoto2.c:1976
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "சிதைந்த சின்னம் அடையாளம் காணி '%s'"
 
-#: ../daemon/gvfsbackendgphoto2.c:2041 ../daemon/gvfsbackendgphoto2.c:3230
+#: ../daemon/gvfsbackendgphoto2.c:2052 ../daemon/gvfsbackendgphoto2.c:3241
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "%s காமிரா ஓடையில் தேடும் போது பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:2181 ../daemon/gvfsbackendsftp.c:2872
+#: ../daemon/gvfsbackendgphoto2.c:2192 ../daemon/gvfsbackendsftp.c:2872
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "ஒரு அடைவு அல்ல"
 
-#: ../daemon/gvfsbackendgphoto2.c:2214
+#: ../daemon/gvfsbackendgphoto2.c:2225
 msgid "Failed to get folder list"
 msgstr "அடைவு பட்டியலை பெறுதல் தோல்வியுற்றது"
 
-#: ../daemon/gvfsbackendgphoto2.c:2280
+#: ../daemon/gvfsbackendgphoto2.c:2291
 msgid "Failed to get file list"
 msgstr "கோப்பு பட்டியலை பெறுதல் தோல்வியுற்றது"
 
-#: ../daemon/gvfsbackendgphoto2.c:2572
+#: ../daemon/gvfsbackendgphoto2.c:2583
 msgid "Error creating directory"
 msgstr "அடைவை உருவாக்கும் போது பிழை "
 
-#: ../daemon/gvfsbackendgphoto2.c:2781
+#: ../daemon/gvfsbackendgphoto2.c:2792
 msgid "Name already exists"
 msgstr "இந்த பெயர் ஏற்கனவே உள்ளது "
 
-#: ../daemon/gvfsbackendgphoto2.c:2792 ../daemon/gvfsbackendgphoto2.c:3421
+#: ../daemon/gvfsbackendgphoto2.c:2803 ../daemon/gvfsbackendgphoto2.c:3432
 msgid "New name too long"
 msgstr "புதிய பெயர் மிக நீளமானது "
 
-#: ../daemon/gvfsbackendgphoto2.c:2802 ../daemon/gvfsbackendgphoto2.c:3432
+#: ../daemon/gvfsbackendgphoto2.c:2813 ../daemon/gvfsbackendgphoto2.c:3443
 msgid "Error renaming dir"
 msgstr "அடைவை மறு பெயரிடுவதில் பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:2815 ../daemon/gvfsbackendgphoto2.c:3445
+#: ../daemon/gvfsbackendgphoto2.c:2826 ../daemon/gvfsbackendgphoto2.c:3456
 msgid "Error renaming file"
 msgstr "கோப்பை மறு பெயரிடுவதில் பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:2879
+#: ../daemon/gvfsbackendgphoto2.c:2890
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "அடைவு '%s' வெற்றாக இல்லை"
 
-#: ../daemon/gvfsbackendgphoto2.c:2890
+#: ../daemon/gvfsbackendgphoto2.c:2901
 msgid "Error deleting directory"
 msgstr "அடைவை அழித்தலில் பிழை:"
 
-#: ../daemon/gvfsbackendgphoto2.c:2916
+#: ../daemon/gvfsbackendgphoto2.c:2927
 msgid "Error deleting file"
 msgstr "கோப்பு அழித்தலில் பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:2969
+#: ../daemon/gvfsbackendgphoto2.c:2980
 msgid "Can't write to directory"
 msgstr "அடைவுக்கு எழுத முடியவில்லை"
 
-#: ../daemon/gvfsbackendgphoto2.c:3016
+#: ../daemon/gvfsbackendgphoto2.c:3027
 msgid "Cannot allocate new file to append to"
 msgstr "பின்னால் சேர்ப்பதற்கு புதிய கோப்பு ஒன்றை ஒதுக்க முடியாது"
 
-#: ../daemon/gvfsbackendgphoto2.c:3031
+#: ../daemon/gvfsbackendgphoto2.c:3042
 msgid "Cannot read file to append to"
 msgstr "பின்னால் சேர்ப்பதற்கு கோப்பை படிக்க முடியாது"
 
-#: ../daemon/gvfsbackendgphoto2.c:3042
+#: ../daemon/gvfsbackendgphoto2.c:3053
 msgid "Cannot get data of file to append to"
 msgstr "பின்னால் சேர்ப்பதற்கு கோப்பு தரவை பெற முடியாது"
 
-#: ../daemon/gvfsbackendgphoto2.c:3329
+#: ../daemon/gvfsbackendgphoto2.c:3340
 msgid "Error writing file"
 msgstr "கோப்பு எழுதுதலில் பிழை"
 
-#: ../daemon/gvfsbackendgphoto2.c:3377
+#: ../daemon/gvfsbackendgphoto2.c:3388
 msgid "Not supported (not same directory)"
 msgstr "ஆதரவில்லை (அதே அடைவு அல்ல)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3389
+#: ../daemon/gvfsbackendgphoto2.c:3400
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "ஆதரவில்லை ( மூலம் அதே அடைவு, இலக்கு அதே அடைவு)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3397
+#: ../daemon/gvfsbackendgphoto2.c:3408
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "ஆதரவில்லை ( மூலம் அடைவு, இலக்கு இருப்பு கோப்பு)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3409
+#: ../daemon/gvfsbackendgphoto2.c:3420
 msgid "Not supported (src is file, dst is dir)"
 msgstr "ஆதரவில்லை ( மூலம் கோப்பு, இலக்கு அடைவு)"
 
@@ -931,6 +929,11 @@ msgstr "சாதனத்துக்கு தொடர்பு அற்ற�
 #: ../daemon/gvfsbackendobexftp.c:1488
 msgid "Device requires a software update"
 msgstr "சாதனத்துக்கு மென்பொருள் இற்றைப்படுத்தல் அவசியம்."
+
+#: ../daemon/gvfsbackendobexftp.c:1836 ../daemon/gvfsbackendsmb.c:1892
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "கோப்பு அழித்தலில் பிழை: %s"
 
 #: ../daemon/gvfsbackendsftp.c:295 ../daemon/gvfsbackendsftp.c:651
 msgid "ssh program unexpectedly exited"
@@ -1110,11 +1113,6 @@ msgstr "துணைபுரியாத தேடும் வகை"
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "பின்சேமிப்பு கோப்பினை உருவாக்க முடியவில்லை: %s"
-
-#: ../daemon/gvfsbackendsmb.c:1892
-#, c-format
-msgid "Error deleting file: %s"
-msgstr "கோப்பு அழித்தலில் பிழை: %s"
 
 #: ../daemon/gvfsbackendsmb.c:1966
 #, c-format
@@ -2008,10 +2006,8 @@ msgid "create parent directories"
 msgstr "பெற்றோர் அமைவுகளை உருவாக்கு"
 
 #: ../programs/gvfs-mkdir.c:50
-#, fuzzy
-#| msgid "create parent directories"
 msgid "- create directories"
-msgstr "பெற்றோர் அமைவுகளை உருவாக்கு"
+msgstr "- அடைவுகளை உருவாக்கு"
 
 #: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
 #, c-format
@@ -2181,8 +2177,7 @@ msgstr "Etag கிடைக்கப் பெறவில்லை\n"
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv]"
-msgstr ""
-"பண்பு வகை [string, bytestring, boolean, uint32, int32, uint64, int64, stringv]"
+msgstr "பண்பு வகை [string, bytestring, boolean, uint32, int32, uint64, int64, stringv]"
 
 #: ../programs/gvfs-set-attribute.c:119
 msgid " <location> <attribute> <values> - set attribute"
