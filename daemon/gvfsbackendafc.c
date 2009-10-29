@@ -797,6 +797,10 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
         {
           g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_NLINK, atoi(afcinfo[i+1]));
         }
+      else if (g_str_equal (afcinfo[i], "st_mtime"))
+        {
+	  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, atoll(afcinfo[i+1]) / 1000000000);
+	}
       else if (g_str_equal (afcinfo[i], "LinkTarget"))
         {
           linktarget = g_strdup (afcinfo[i+1]);
