@@ -218,21 +218,21 @@ g_vfs_backend_iphone_check (iphone_error_t cond, GVfsJob *job)
 }
 
 static void
-_usbmuxd_event_cb (const usbmuxd_event_t *event, void *user_data)
+_iphone_event_cb (const iphone_event_t *event, void *user_data)
 {
   GVfsBackendAfc *afc_backend = G_VFS_BACKEND_AFC (user_data);
 
   g_return_if_fail (afc_backend->uuid != NULL);
-  if (event->event != UE_DEVICE_REMOVE)
+  if (event->event != IPHONE_DEVICE_REMOVE)
     return;
-  if (g_str_equal (event->device.uuid, afc_backend->uuid) == FALSE)
+  if (g_str_equal (event->uuid, afc_backend->uuid) == FALSE)
     return;
 
   g_print ("Shutting down AFC backend for device uuid %s\n", afc_backend->uuid);
 
   g_vfs_backend_afc_close_connection (afc_backend);
 
-  usbmuxd_unsubscribe();
+  iphone_event_unsubscribe ();
 
   /* TODO: need a cleaner way to force unmount ourselves */
   exit (1);
@@ -258,7 +258,8 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   self = G_VFS_BACKEND_AFC(backend);
   self->connected = FALSE;
-  usbmuxd_subscribe (_usbmuxd_event_cb, self);
+
+  iphone_event_subscribe (_iphone_event_cb, self);
 
   /* setup afc */
 
@@ -318,7 +319,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   retries = 0;
   do {
-      err = iphone_get_device_by_uuid(&self->dev, self->uuid);
+      err = iphone_device_new(&self->dev, self->uuid);
       if (err == IPHONE_E_SUCCESS)
           break;
       g_usleep (G_USEC_PER_SEC);
@@ -368,11 +369,10 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
     }
 
   /* set correct fd icon spec name depending on device model */
-  self->model = afc_get_device_info_field (self->afc_cli, "Model");
-  if (G_UNLIKELY(self->model == NULL))
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_get_device_info_key (self->afc_cli, "Model", &self->model), G_VFS_JOB(job))))
     goto out_destroy_afc;
 
-  if (strstr(self->model, "iPod") != NULL)
+  if ((self->model != NULL) && (strstr(self->model, "iPod") != NULL))
     {
       g_vfs_backend_set_icon_name (G_VFS_BACKEND(self), "multimedia-player-apple-ipod-touch");
     }

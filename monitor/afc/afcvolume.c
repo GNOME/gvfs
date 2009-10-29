@@ -37,7 +37,7 @@ G_DEFINE_TYPE_EXTENDED(GVfsAfcVolume, g_vfs_afc_volume, G_TYPE_OBJECT, 0,
 static void
 g_vfs_afc_volume_finalize (GObject *object)
 {
-  GVfsAfcVolume *self;
+  GVfsAfcVolume *self = NULL;
 
   self = G_VFS_AFC_VOLUME(object);
 
@@ -81,7 +81,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
 
   retries = 0;
   do {
-      err = iphone_get_device_by_uuid (&dev, self->uuid);
+      err = iphone_device_new (&dev, self->uuid);
       if (err == IPHONE_E_SUCCESS)
         break;
       g_usleep (G_USEC_PER_SEC);
@@ -113,8 +113,8 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   if (afc_client_new (dev, port, &afc_cli) == AFC_E_SUCCESS)
     {
       /* set correct fd icon spec name depending on device model */
-      model = afc_get_device_info_field (afc_cli, "Model");
-      if (model != NULL)
+      model = NULL;
+      if (afc_get_device_info_key (afc_cli, "Model", &model) == AFC_E_SUCCESS)
         {
           if(g_str_has_prefix(model, "iPod") != FALSE)
             {

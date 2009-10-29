@@ -10,7 +10,7 @@
 #include <gvfsproxyvolumemonitordaemon.h>
 #include <stdio.h>
 #include <gio/gio.h>
-#include <usbmuxd.h>
+#include <libiphone/libiphone.h>
 #include "afcvolume.h"
 #include "afcvolumemonitor.h"
 
@@ -69,7 +69,7 @@ g_vfs_afc_monitor_remove_volume (GVfsAfcVolumeMonitor *self,
 }
 
 static void
-g_vfs_afc_monitor_usbmuxd_event (const usbmuxd_event_t *event, void *user_data)
+g_vfs_afc_monitor_iphone_event (const iphone_event_t *event, void *user_data)
 {
   GVfsAfcVolumeMonitor *self;
 
@@ -77,10 +77,10 @@ g_vfs_afc_monitor_usbmuxd_event (const usbmuxd_event_t *event, void *user_data)
 
   self = G_VFS_AFC_VOLUME_MONITOR(user_data);
 
-  if (event->event == UE_DEVICE_ADD)
-    g_vfs_afc_monitor_create_volume (self, event->device.uuid);
+  if (event->event == IPHONE_DEVICE_ADD)
+    g_vfs_afc_monitor_create_volume (self, event->uuid);
   else
-    g_vfs_afc_monitor_remove_volume (self, event->device.uuid);
+    g_vfs_afc_monitor_remove_volume (self, event->uuid);
 }
 
 static GObject *
@@ -94,7 +94,7 @@ g_vfs_afc_volume_monitor_constructor (GType type, guint ncps,
 
   self->volumes = NULL;
 
-  usbmuxd_subscribe(g_vfs_afc_monitor_usbmuxd_event, self);
+  iphone_event_subscribe(g_vfs_afc_monitor_iphone_event, self);
 
   g_print ("Volume monitor alive\n");
 
@@ -115,10 +115,10 @@ g_vfs_afc_volume_monitor_finalize (GObject *_self)
 
   self = G_VFS_AFC_VOLUME_MONITOR(_self);
 
-  usbmuxd_unsubscribe();
-
   if (self->volumes)
     list_free (self->volumes);
+
+  iphone_event_unsubscribe();
 
   if (G_OBJECT_CLASS(g_vfs_afc_volume_monitor_parent_class)->finalize)
     (*G_OBJECT_CLASS(g_vfs_afc_volume_monitor_parent_class)->finalize)( G_OBJECT(self));
