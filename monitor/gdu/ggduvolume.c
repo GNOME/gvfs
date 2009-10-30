@@ -172,7 +172,7 @@ static gboolean
 update_volume (GGduVolume *volume)
 {
   GduDevice *device;
-  GduPool *pool;
+  GduPool *pool = NULL;
   time_t now;
   gboolean changed;
   gboolean old_can_mount;
@@ -217,10 +217,11 @@ update_volume (GGduVolume *volume)
 
   /* in with the new */
   device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
-  pool = gdu_device_get_pool (device);
+  if (device != NULL)
+    pool = gdu_device_get_pool (device);
 
   keep_cleartext_volume = FALSE;
-  if (gdu_device_is_luks (device))
+  if (device != NULL && gdu_device_is_luks (device))
     {
       const gchar *holder_objpath;
 
@@ -287,13 +288,17 @@ update_volume (GGduVolume *volume)
       volume->name = gdu_presentable_get_name (GDU_PRESENTABLE (volume->cleartext_gdu_volume));
 
       g_free (volume->device_file);
-      volume->device_file = g_strdup (gdu_device_get_device_file (luks_cleartext_volume_device));
+      if (luks_cleartext_volume_device != NULL)
+        volume->device_file = g_strdup (gdu_device_get_device_file (luks_cleartext_volume_device));
+      else
+        volume->device_file = NULL;
 
       volume->can_mount = TRUE;
 
       volume->should_automount = FALSE;
 
-      g_object_unref (luks_cleartext_volume_device);
+      if (luks_cleartext_volume_device != NULL)
+        g_object_unref (luks_cleartext_volume_device);
     }
   else
     {
@@ -321,7 +326,10 @@ update_volume (GGduVolume *volume)
         }
 
       g_free (volume->device_file);
-      volume->device_file = g_strdup (gdu_device_get_device_file (device));
+      if (device != NULL)
+        volume->device_file = g_strdup (gdu_device_get_device_file (device));
+      else
+        volume->device_file = NULL;
 
       volume->can_mount = TRUE;
 
@@ -341,14 +349,16 @@ update_volume (GGduVolume *volume)
        * nopolicy is only FALSE for "physical" devices - e.g. only "physical" devices will
        * be set to be automounted.
        */
-      if (gdu_device_get_presentation_nopolicy (device))
+      if (device != NULL && gdu_device_get_presentation_nopolicy (device))
         volume->should_automount = FALSE;
 
       g_free (activation_uri);
     }
 
-  g_object_unref (pool);
-  g_object_unref (device);
+  if (pool != NULL)
+    g_object_unref (pool);
+  if (device != NULL)
+    g_object_unref (device);
 
   /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1082,6 +1092,20 @@ g_gdu_volume_mount (GVolume             *_volume,
     }
 
   device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
+
+  if (device == NULL)
+    {
+      simple = g_simple_async_result_new_error (G_OBJECT (volume),
+                                                callback,
+                                                user_data,
+                                                G_IO_ERROR,
+                                                G_IO_ERROR_FAILED,
+                                                "Underlying device missing");
+      g_simple_async_result_complete (simple);
+      g_object_unref (simple);
+      goto out;
+    }
+
   pool = gdu_device_get_pool (device);
 
   /* Makes no sense to mount
@@ -1129,11 +1153,14 @@ g_gdu_volume_mount (GVolume             *_volume,
 
       luks_cleartext_volume_device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->cleartext_gdu_volume));
 
-      object_path_of_cleartext_device = gdu_device_get_object_path (luks_cleartext_volume_device);
+      if (luks_cleartext_volume_device != NULL)
+        {
+          object_path_of_cleartext_device = gdu_device_get_object_path (luks_cleartext_volume_device);
 
-      mount_cleartext_device (data, object_path_of_cleartext_device);
+          mount_cleartext_device (data, object_path_of_cleartext_device);
 
-      g_object_unref (luks_cleartext_volume_device);
+          g_object_unref (luks_cleartext_volume_device);
+        }
       goto out;
     }
 
@@ -1551,17 +1578,20 @@ g_gdu_volume_get_identifier (GVolume     *_volume,
     {
       device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
 
-      label = gdu_device_id_get_label (device);
-      uuid = gdu_device_id_get_uuid (device);
+      if (device != NULL)
+        {
+          label = gdu_device_id_get_label (device);
+          uuid = gdu_device_id_get_uuid (device);
 
-      g_object_unref (device);
+          g_object_unref (device);
 
-      if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
-        id = g_strdup (volume->device_file);
-      else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
-        id = strlen (label) > 0 ? g_strdup (label) : NULL;
-      else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
-        id = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
+          if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE) == 0)
+            id = g_strdup (volume->device_file);
+          else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_LABEL) == 0)
+            id = strlen (label) > 0 ? g_strdup (label) : NULL;
+          else if (strcmp (kind, G_VOLUME_IDENTIFIER_KIND_UUID) == 0)
+            id = strlen (uuid) > 0 ? g_strdup (uuid) : NULL;
+        }
     }
 
   return id;
@@ -1577,19 +1607,24 @@ g_gdu_volume_enumerate_identifiers (GVolume *_volume)
   const gchar *uuid;
 
   p = g_ptr_array_new ();
+  label = NULL;
 
   if (volume->gdu_volume != NULL)
     {
       device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->gdu_volume));
-      label = gdu_device_id_get_label (device);
-      uuid = gdu_device_id_get_uuid (device);
-      g_object_unref (device);
 
-      g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
-      if (strlen (label) > 0)
-        g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
-      if (strlen (uuid) > 0)
-        g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
+      if (device != NULL)
+        {
+          label = gdu_device_id_get_label (device);
+          uuid = gdu_device_id_get_uuid (device);
+          g_object_unref (device);
+
+          g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE));
+          if (strlen (label) > 0)
+            g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_LABEL));
+          if (strlen (uuid) > 0)
+            g_ptr_array_add (p, g_strdup (G_VOLUME_IDENTIFIER_KIND_UUID));
+        }
     }
 
   g_ptr_array_add (p, NULL);
@@ -1638,8 +1673,11 @@ g_gdu_volume_has_device_file (GGduVolume   *volume,
     {
       GduDevice *luks_cleartext_volume_device;
       luks_cleartext_volume_device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->cleartext_gdu_volume));
-      _device_file = gdu_device_get_device_file (luks_cleartext_volume_device);
-      g_object_unref (luks_cleartext_volume_device);
+      if (luks_cleartext_volume_device != NULL)
+        {
+          _device_file = gdu_device_get_device_file (luks_cleartext_volume_device);
+          g_object_unref (luks_cleartext_volume_device);
+        }
     }
 
   return g_strcmp0 (_device_file, device_file) == 0;
@@ -1682,8 +1720,11 @@ g_gdu_volume_has_uuid (GGduVolume  *volume,
     {
       GduDevice *luks_cleartext_volume_device;
       luks_cleartext_volume_device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->cleartext_gdu_volume));
-      _uuid = gdu_device_id_get_uuid (luks_cleartext_volume_device);
-      g_object_unref (luks_cleartext_volume_device);
+      if (luks_cleartext_volume_device != NULL)
+        {
+          _uuid = gdu_device_id_get_uuid (luks_cleartext_volume_device);
+          g_object_unref (luks_cleartext_volume_device);
+        }
     }
 
   return g_strcmp0 (_uuid, uuid) == 0;
