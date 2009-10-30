@@ -842,7 +842,6 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
   GList *l;
 
   ignored = FALSE;
-  device = NULL;
   enclosed = NULL;
 
   device = gdu_presentable_get_device (GDU_PRESENTABLE (d));
@@ -1074,7 +1073,7 @@ find_disc_volume_for_device_file (GGduVolumeMonitor *monitor,
 
 static GGduVolume *
 find_volume_for_device_file (GGduVolumeMonitor *monitor,
-                            const gchar       *device_file)
+                             const gchar       *device_file)
 {
   GList *l;
   GGduVolume *ret;
@@ -1183,9 +1182,6 @@ update_drives (GGduVolumeMonitor *monitor,
   for (l = removed; l != NULL; l = l->next)
     {
       GduPresentable *p = GDU_PRESENTABLE (l->data);
-      GduDevice *d;
-
-      d = gdu_presentable_get_device (p);
 
       drive = find_drive_by_presentable (monitor, p);
       if (drive != NULL)
@@ -1195,16 +1191,11 @@ update_drives (GGduVolumeMonitor *monitor,
           monitor->drives = g_list_remove (monitor->drives, drive);
           *removed_drives = g_list_prepend (*removed_drives, drive);
         }
-      if (d != NULL)
-        g_object_unref (d);
     }
 
   for (l = added; l != NULL; l = l->next)
     {
       GduPresentable *p = GDU_PRESENTABLE (l->data);
-      GduDevice *d;
-
-      d = gdu_presentable_get_device (p);
 
       drive = find_drive_by_presentable (monitor, p);
       if (drive == NULL)
@@ -1217,8 +1208,6 @@ update_drives (GGduVolumeMonitor *monitor,
               *added_drives = g_list_prepend (*added_drives, g_object_ref (drive));
             }
         }
-      if (d != NULL)
-        g_object_unref (d);
     }
 
   g_list_free (added);
