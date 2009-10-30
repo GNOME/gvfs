@@ -329,7 +329,7 @@ msg_afc=no
 AFC_LIBS=
 AFC_CFLAGS=
 
-if test "x$enable_afc" != "xno" -a "x$msg_gudev" = "xyes" ; then
+if test "x$enable_afc" != "xno" ; then
   PKG_CHECK_EXISTS(libiphone-1.0 >= 0.9.4, msg_afc=yes)
 
   if test "x$msg_afc" = "xyes"; then
