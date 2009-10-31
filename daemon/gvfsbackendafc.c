@@ -1075,6 +1075,41 @@ g_vfs_backend_afc_set_display_name (GVfsBackend *backend,
 }
 
 static void
+g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
+				 GVfsJobSetAttribute *job,
+				 const char *filename,
+				 const char *attribute,
+				 GFileAttributeType type,
+				 gpointer value_p,
+				 GFileQueryInfoFlags flags)
+{
+  GVfsBackendAfc *self;
+  uint64_t mtime = 0;
+
+  self = G_VFS_BACKEND_AFC(backend);
+  g_return_if_fail(self->connected);
+
+  if (g_str_equal (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) != FALSE)
+    {
+      g_vfs_job_failed (G_VFS_JOB (job),
+			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+			_("Operation unsupported"));
+      return;
+    }
+
+  mtime = *(guint64*)(value_p) * (guint64)1000000000;
+
+  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_set_file_time (self->afc_cli,
+                                                             filename, mtime),
+                                          G_VFS_JOB(job))))
+    {
+      return;
+    }
+
+  g_vfs_job_succeeded (G_VFS_JOB(job));
+}
+
+static void
 g_vfs_backend_afc_make_directory (GVfsBackend *backend,
                                   GVfsJobMakeDirectory *job,
                                   const char *path)
@@ -1221,6 +1256,7 @@ g_vfs_backend_afc_class_init (GVfsBackendAfcClass *klass)
   backend_class->make_symlink     = g_vfs_backend_afc_make_symlink;
   backend_class->move             = g_vfs_backend_afc_move;
   backend_class->set_display_name = g_vfs_backend_afc_set_display_name;
+  backend_class->set_attribute    = g_vfs_backend_afc_set_attribute;
 }
 
 /*
