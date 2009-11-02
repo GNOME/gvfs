@@ -1085,6 +1085,7 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
 {
   GVfsBackendAfc *self;
   uint64_t mtime = 0;
+  afc_error_t err;
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail(self->connected);
@@ -1099,9 +1100,13 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
 
   mtime = *(guint64*)(value_p) * (guint64)1000000000;
 
-  if (G_UNLIKELY(g_vfs_backend_afc_check (afc_set_file_time (self->afc_cli,
-                                                             filename, mtime),
-                                          G_VFS_JOB(job))))
+  err = afc_set_file_time (self->afc_cli, filename, mtime);
+  if (err == AFC_E_UNKNOWN_PACKET_TYPE)
+    {
+      /* ignore error for pre-3.1 devices as the do not support setting file modification times */
+      return g_vfs_job_succeeded (G_VFS_JOB(job));
+    }
+  if (G_UNLIKELY(g_vfs_backend_afc_check (err, G_VFS_JOB(job))))
     {
       return;
     }
