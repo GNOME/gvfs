@@ -10,7 +10,7 @@ INCLUDES =					\
 	-I$(top_srcdir)/common			\
 	-I$(top_builddir)			\
 	$(GLIB_CFLAGS) $(DBUS_CFLAGS) 		\
-	$(OBEXFTP_CFLAGS) $(XML_CFLAGS)		\
+	$(OBEXFTP_CFLAGS) $(EXPAT_CFLAGS)	\
 	$(KEYRING_CFLAGS)			\
 	-DDBUS_API_SUBJECT_TO_CHANGE		\
 	-DG_UDEV_API_IS_SUBJECT_TO_CHANGE	\
@@ -239,7 +239,7 @@ if USE_HAL
 gvfsd_obexftp_CPPFLAGS += $(HAL_CFLAGS)
 endif
 
-gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(XML_LIBS) $(libraries)
+gvfsd_obexftp_LDADD = $(OBEXFTP_LIBS) $(EXPAT_LIBS) $(libraries)
 if USE_HAL
 gvfsd_obexftp_LDADD += $(HAL_LIBS)
 endif

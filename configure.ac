@@ -43,12 +43,8 @@ DISTCHECK_CONFIGURE_FLAGS="--enable-gtk-doc"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.21.2 gthread-2.0 gobject-2.0 gmodule-no-export-2.0 gio-unix-2.0 gio-2.0 )
-AC_SUBST(GLIB_CFLAGS)
-AC_SUBST(GLIB_LIBS)
 
 PKG_CHECK_MODULES(DBUS, dbus-1)
-AC_SUBST(DBUS_CFLAGS)
-AC_SUBST(DBUS_LIBS)
 
 AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
 DBUS_SERVICE_DIR=$with_dbus_service_dir
@@ -158,8 +154,6 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0,
 	AC_DEFINE(HAVE_LIBXML, [], [Set if we have libxml])]
 	msg_libxml=yes,
         [AM_CONDITIONAL(HAVE_LIBXML, false)])
-AC_SUBST(LIBXML_CFLAGS)
-AC_SUBST(LIBXML_LIBS)
 
 dnl *************************
 dnl *** Check for libudev ***
@@ -178,9 +172,6 @@ if test "x$enable_udev" != "xno"; then
   fi
 fi
 
-AC_SUBST(UDEV_CFLAGS)
-AC_SUBST(UDEV_LIBS)
-
 dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************
@@ -197,9 +188,6 @@ if test "x$enable_fuse" != "xno"; then
     AC_DEFINE(HAVE_FUSE, 1, [Define to 1 if FUSE is available])
   fi
 fi
-
-AC_SUBST(FUSE_LIBS)
-AC_SUBST(FUSE_CFLAGS)
 
 AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
 
@@ -219,9 +207,6 @@ if test "x$enable_gconf" != "xno"; then
     AC_DEFINE(HAVE_GCONF, 1, [Define to 1 if GConf is available])
   fi
 fi
-
-AC_SUBST(GCONF_LIBS)
-AC_SUBST(GCONF_CFLAGS)
 
 AM_CONDITIONAL(USE_GCONF, [test "$msg_gconf" = "yes"])
 
@@ -243,9 +228,6 @@ if test "x$enable_gdu" != "xno"; then
     AC_DEFINE(HAVE_GDU, 1, [Define to 1 if gnome-disk-utility is available])
   fi
 fi
-
-AC_SUBST(GDU_LIBS)
-AC_SUBST(GDU_CFLAGS)
 
 AM_CONDITIONAL(USE_GDU, [test "$msg_gdu" = "yes"])
 
@@ -275,9 +257,6 @@ if test "x$enable_hal" != "xno"; then
   fi
 fi
 
-AC_SUBST(HAL_LIBS)
-AC_SUBST(HAL_CFLAGS)
-
 AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
 
 dnl **********************
@@ -295,8 +274,6 @@ if test "x$enable_gudev" != "xno"; then
     AC_DEFINE(HAVE_GUDEV, 1, [Define to 1 if gudev is available])
   fi
 fi
-AC_SUBST(GUDEV_CFLAGS)
-AC_SUBST(GUDEV_LIBS)
 AM_CONDITIONAL(USE_GUDEV, [test "$msg_gudev" = "yes"])
 
 dnl **************************************************
@@ -315,9 +292,6 @@ if test "x$enable_cdda" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" = "
     AC_DEFINE(HAVE_CDDA, 1, [Define to 1 if CDDA is going to be built])
   fi
 fi
-
-AC_SUBST(CDDA_LIBS)
-AC_SUBST(CDDA_CFLAGS)
 
 AM_CONDITIONAL(USE_CDDA, [test "$msg_cdda" = "yes"])
 
@@ -366,16 +340,15 @@ if test "x$enable_obexftp" != "xno";  then
 
     msg_obexftp=yes
     AC_DEFINE(HAVE_OBEXFTP, 1, [Define to 1 if ObexFTP is going to be built])
-    XML_CFLAGS=""
-    XML_LIBS="-lexpat"
+    EXPAT_CFLAGS=""
+    EXPAT_LIBS="-lexpat"
   else
     msg_obexftp=no
   fi
 fi
 
-AC_SUBST(XML_LIBS)
-AC_SUBST(XML_CFLAGS)
-
+AC_SUBST(EXPAT_CFLAGS)
+AC_SUBST(EXPAT_LIBS)
 AM_CONDITIONAL(USE_OBEXFTP, [test "$msg_obexftp" = "yes"])
 
 dnl *************************
@@ -410,9 +383,6 @@ if test "x$enable_gphoto2" != "xno" -a \( "x$msg_hal" = "xyes" -o "x$msg_gudev" 
   fi
 fi
 
-AC_SUBST(GPHOTO2_LIBS)
-AC_SUBST(GPHOTO2_CFLAGS)
-
 AM_CONDITIONAL(USE_GPHOTO2, [test "$msg_gphoto2" = "yes"])
 
 dnl *******************************
@@ -431,9 +401,6 @@ if test "x$enable_keyring" != "xno"; then
     AC_DEFINE(HAVE_KEYRING, 1, [Define to 1 if GNOME Keyring is available])
   fi
 fi
-
-AC_SUBST(KEYRING_LIBS)
-AC_SUBST(KEYRING_CFLAGS)
 
 AM_CONDITIONAL(USE_KEYRING, [test "$msg_keyring" = "yes"])
 
