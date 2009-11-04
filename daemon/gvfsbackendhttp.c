@@ -82,6 +82,7 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
 {
   const char         *debug;
   SoupSessionFeature *proxy_resolver;
+  SoupSessionFeature *cookie_jar;
 
   g_vfs_backend_set_user_visible (G_VFS_BACKEND (backend), FALSE);  
 
@@ -98,6 +99,13 @@ g_vfs_backend_http_init (GVfsBackendHttp *backend)
   soup_session_add_feature (backend->session, proxy_resolver);
   soup_session_add_feature (backend->session_async, proxy_resolver);
   g_object_unref (proxy_resolver);
+
+  /* Cookie handling - stored temporarlly in memory, mostly useful for
+   * authentication in WebDAV. */
+  cookie_jar = g_object_new (SOUP_TYPE_COOKIE_JAR, NULL);
+  soup_session_add_feature (backend->session, cookie_jar);
+  soup_session_add_feature (backend->session_async, cookie_jar);
+  g_object_unref (cookie_jar);
 
   /* Logging */
   debug = g_getenv ("GVFS_HTTP_DEBUG");
