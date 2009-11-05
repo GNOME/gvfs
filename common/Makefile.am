@@ -4,7 +4,7 @@ lib_LTLIBRARIES=libgvfscommon.la
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/gvfs \
 	-I$(top_srcdir)/daemon \
-	$(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+	$(GLIB_CFLAGS) $(DBUS_CFLAGS) $(EXPAT_CFLAGS) \
 	-DG_LOG_DOMAIN=\"GVFS\" -DG_DISABLE_DEPRECATED \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
@@ -25,8 +25,9 @@ libgvfscommon_la_SOURCES = 	\
 libgvfscommon_la_LDFLAGS = -no-undefined
 
 libgvfscommon_la_LIBADD =	\
-	$(DBUS_LIBS) 	\
-	$(GLIB_LIBS)
+	$(DBUS_LIBS) 		\
+	$(GLIB_LIBS)		\
+	$(EXPAT_LIBS)
 
 if HAVE_AVAHI
 lib_LTLIBRARIES += libgvfscommon-dnssd.la

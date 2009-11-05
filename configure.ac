@@ -210,6 +210,22 @@ fi
 
 AM_CONDITIONAL(USE_GCONF, [test "$msg_gconf" = "yes"])
 
+dnl ********************************************
+dnl *** Check for expat (for obexftp and gdu ***
+dnl ********************************************
+
+dnl Make sure we have expat
+AC_CHECK_LIB(expat, XML_ParserCreate_MM,
+             [ AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false) ],
+             have_expat=false)
+if test "x$have_expat" = "xtrue"; then
+  EXPAT_CFLAGS=""
+  EXPAT_LIBS="-lexpat"
+  AC_DEFINE(HAVE_EXPAT,, [Define to 1 if you have expat available])
+fi
+AC_SUBST(EXPAT_CFLAGS)
+AC_SUBST(EXPAT_LIBS)
+
 dnl ************************************
 dnl *** Check for gnome-disk-utility ***
 dnl ************************************
@@ -328,11 +344,6 @@ OBEXFTP_CFLAGS=
 if test "x$enable_obexftp" != "xno";  then
   PKG_CHECK_EXISTS(dbus-glib-1 bluez >= 4.0, msg_obexftp=yes)
 
-  dnl Make sure we have expat
-  AC_CHECK_LIB(expat, XML_ParserCreate_MM,
-               [ AC_CHECK_HEADERS(expat.h, have_expat=true, have_expat=false) ],
-               have_expat=false)
-
   if test "x$msg_obexftp" = "xyes" -a "x$have_expat" = "xtrue"; then
     PKG_CHECK_MODULES(OBEXFTP, dbus-glib-1 bluez >= 4.0)
     AC_SUBST(OBEXFTP_LIBS)
@@ -340,15 +351,11 @@ if test "x$enable_obexftp" != "xno";  then
 
     msg_obexftp=yes
     AC_DEFINE(HAVE_OBEXFTP, 1, [Define to 1 if ObexFTP is going to be built])
-    EXPAT_CFLAGS=""
-    EXPAT_LIBS="-lexpat"
   else
     msg_obexftp=no
   fi
 fi
 
-AC_SUBST(EXPAT_CFLAGS)
-AC_SUBST(EXPAT_LIBS)
 AM_CONDITIONAL(USE_OBEXFTP, [test "$msg_obexftp" = "yes"])
 
 dnl *************************

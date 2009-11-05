@@ -25,6 +25,10 @@
 #include <string.h>
 #include <glib/gi18n-lib.h>
 
+#ifdef HAVE_EXPAT
+#include <expat.h>
+#endif
+
 #include "gvfsmountinfo.h"
 
 #define VOLUME_INFO_GROUP "Volume Info"
@@ -402,6 +406,252 @@ GIcon *g_vfs_mount_info_query_xdg_volume_info_finish (GFile          *directory,
   GIcon *ret;
 
   g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_vfs_mount_info_query_xdg_volume_info);
+
+  ret = NULL;
+
+  if (g_simple_async_result_propagate_error (simple, error))
+    goto out;
+
+  ret = g_simple_async_result_get_op_res_gpointer (simple);
+
+  if (out_name != NULL)
+    *out_name = g_strdup (g_object_get_data (G_OBJECT (simple), "name"));
+
+ out:
+  return ret;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+#ifdef HAVE_EXPAT
+
+typedef struct {
+  gboolean in_name;
+  char *name;
+  const char *icon_path;
+  gboolean image_is_small;
+} BdmvParseData;
+
+static void
+bdmt_parse_start_tag (void                *data,
+                      const gchar         *element_name,
+                      const gchar        **attr)
+{
+  BdmvParseData *bdata = (BdmvParseData *) data;
+  const char *image;
+  gboolean image_small;
+  gint i;
+
+  if (g_str_equal (element_name, "di:name"))
+    {
+      bdata->in_name = TRUE;
+      return;
+    }
+
+  if (g_str_equal (element_name, "di:thumbnail") == FALSE)
+    return;
+
+  image = NULL;
+  image_small = FALSE;
+
+  for (i = 0; attr[i]; ++i)
+    {
+      const char *name;
+      const char *value;
+
+      name = attr[i];
+      value = attr[++i];
+
+      if (g_str_equal (name, "href"))
+        {
+          image = value;
+        }
+      else if (g_str_equal (name, "size") && value)
+        {
+          image_small = g_str_equal (value, "416x240");
+        }
+    }
+
+  if (bdata->icon_path == NULL)
+    {
+      bdata->icon_path = image;
+      bdata->image_is_small = image_small;
+      return;
+    }
+
+  if (image != NULL &&
+      bdata->icon_path != NULL &&
+      bdata->image_is_small != FALSE)
+    {
+      bdata->icon_path = image;
+      bdata->image_is_small = image_small;
+    }
+}
+
+static void
+bdmt_parse_end_tag (void                *data,
+                    const gchar         *element_name)
+{
+  BdmvParseData *bdata = (BdmvParseData *) data;
+
+  if (g_str_equal (element_name, "di:name"))
+    bdata->in_name = FALSE;
+}
+
+static void
+bdmt_parse_text (void                *data,
+                 const XML_Char      *text,
+                 int                  text_len)
+{
+  BdmvParseData *bdata = (BdmvParseData *) data;
+
+  if (bdata->in_name == FALSE)
+    return;
+
+  bdata->name = g_strndup (text, text_len);
+}
+
+static void
+on_bdmv_volume_info_loaded (GObject      *source_object,
+                            GAsyncResult *res,
+                            gpointer      user_data)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (user_data);
+  GFile *bdmt_volume_info_file;
+  gchar *content;
+  gsize content_length;
+  GError *error;
+  BdmvParseData data;
+  XML_Parser parser;
+  const gchar *icon_file;
+  GIcon *icon;
+
+  content = NULL;
+  parser = NULL;
+  icon_file = NULL;
+  memset (&data, 0, sizeof (data));
+
+  bdmt_volume_info_file = G_FILE (source_object);
+
+  error = NULL;
+  if (g_file_load_contents_finish (bdmt_volume_info_file,
+                                   res,
+                                   &content,
+                                   &content_length,
+                                   NULL,
+                                   &error))
+    {
+      data.name = NULL;
+
+      parser = XML_ParserCreate (NULL);
+      XML_SetElementHandler (parser,
+                                   (XML_StartElementHandler) bdmt_parse_start_tag,
+                                   (XML_EndElementHandler) bdmt_parse_end_tag);
+      XML_SetCharacterDataHandler (parser,
+                                         (XML_CharacterDataHandler) bdmt_parse_text);
+      XML_SetUserData (parser, &data);
+      if (XML_Parse (parser, content, content_length, TRUE) == 0)
+        {
+          g_warning ("Failed to parse bdmt file");
+          goto out;
+        }
+      g_message ("icon file: %s", data.icon_path);
+      g_message ("name: %s", data.name);
+      icon_file = data.icon_path;
+
+      icon = NULL;
+
+      if (icon_file != NULL)
+        {
+          GFile *dir, *f;
+
+          dir = g_file_get_parent (bdmt_volume_info_file);
+          if (dir)
+            {
+              f = g_file_resolve_relative_path (dir, icon_file);
+              if (f)
+                {
+                  icon = g_file_icon_new (f);
+                  g_object_unref (f);
+                }
+
+              g_object_unref (dir);
+            }
+        }
+
+      g_simple_async_result_set_op_res_gpointer (simple, icon, NULL);
+      if (data.name != NULL)
+        g_object_set_data_full (G_OBJECT (simple), "name", data.name, g_free);
+      data.name = NULL; /* steals name */
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+    }
+
+ out:
+
+  if (error != NULL)
+    {
+      g_simple_async_result_set_from_error (simple, error);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      g_error_free (error);
+    }
+
+  if (parser != NULL)
+    XML_ParserFree (parser);
+  g_free (data.name);
+  g_free (content);
+}
+#endif /* HAVE_EXPAT */
+
+void
+g_vfs_mount_info_query_bdmv_volume_info (GFile               *directory,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data)
+{
+#ifdef HAVE_EXPAT
+  GSimpleAsyncResult *simple;
+  GFile *file;
+
+  simple = g_simple_async_result_new (G_OBJECT (directory),
+                                      callback,
+                                      user_data,
+                                      g_vfs_mount_info_query_bdmv_volume_info);
+
+  /* FIXME: handle other languages:
+   * Check the current locale
+   * Get 3 letter-code from 2 letter locale using /usr/share/xml/iso-codes/iso_639_3.xml
+   * load bdmt_<code>.xml
+   * Fall-back to bdmt_eng.xml if it fails */
+  file = g_file_resolve_relative_path (directory, "BDMV/META/DL/bdmt_eng.xml");
+  g_file_load_contents_async (file,
+                              cancellable,
+                              on_bdmv_volume_info_loaded,
+                              simple);
+  g_object_unref (file);
+#else
+  GSimpleAsyncResult *simple;
+  simple = g_simple_async_result_new (G_OBJECT (directory),
+                                      callback,
+                                      user_data,
+                                      g_vfs_mount_info_query_bdmv_volume_info);
+  g_simple_async_result_set_error (simple,
+                                   G_IO_ERROR,
+                                   G_IO_ERROR_NOT_SUPPORTED,
+                                   "gvfs built without Expat support, no BDMV support");
+#endif /* HAVE_EXPAT */
+}
+
+GIcon *g_vfs_mount_info_query_bdmv_volume_info_finish (GFile          *directory,
+                                                       GAsyncResult   *res,
+                                                       gchar         **out_name,
+                                                       GError        **error)
+{
+  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
+  GIcon *ret;
+
+  g_warn_if_fail (g_simple_async_result_get_source_tag (simple) == g_vfs_mount_info_query_bdmv_volume_info);
 
   ret = NULL;
 

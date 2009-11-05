@@ -47,6 +47,16 @@ GIcon *g_vfs_mount_info_query_xdg_volume_info_finish (GFile          *directory,
                                                       gchar         **out_name,
                                                       GError        **error);
 
+void g_vfs_mount_info_query_bdmv_volume_info (GFile               *directory,
+                                              GCancellable        *cancellable,
+                                              GAsyncReadyCallback  callback,
+                                              gpointer             user_data);
+
+GIcon *g_vfs_mount_info_query_bdmv_volume_info_finish (GFile          *directory,
+                                                       GAsyncResult   *res,
+                                                       gchar         **out_name,
+                                                       GError        **error);
+
 G_END_DECLS
 
 #endif /* __G_VFS_MOUNT_INFO_H__ */
