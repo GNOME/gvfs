@@ -65,6 +65,7 @@ g_vfs_afc_monitor_remove_volume (GVfsAfcVolumeMonitor *self,
       g_print ("removing volume for device uuid '%s'\n", uuid);
       self->volumes = g_list_remove (self->volumes, volume);
       g_signal_emit_by_name (self, "volume-removed", volume);
+      g_object_unref (volume);
     }
 }
 
