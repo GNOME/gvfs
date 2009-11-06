@@ -733,6 +733,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
                                          GFileInfo *info,
                                          char **afcinfo,
                                          const char *basename,
+                                         const char *path,
                                          GFileAttributeMatcher *matcher,
                                          GFileQueryInfoFlags flags)
 {
@@ -742,6 +743,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
   char *display_name;
   char *linktarget = NULL;
   char **afctargetinfo = NULL;
+  gboolean hidden = FALSE;
   int i;
 
   /* get file attributes from info list */
@@ -859,7 +861,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
         {
           /* query the linktarget instead and merge the file info of it */
           if (AFC_E_SUCCESS == afc_get_file_info (self->afc_cli, linktarget, &afctargetinfo))
-            g_vfs_backend_afc_set_info_from_afcinfo (self, info, afctargetinfo, linktarget, matcher, flags);
+            g_vfs_backend_afc_set_info_from_afcinfo (self, info, afctargetinfo, linktarget, NULL, matcher, flags);
           if (afctargetinfo)
             g_strfreev (afctargetinfo);
         }
@@ -886,8 +888,69 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
 
   /* mark dot files as hidden */
   if (basename != NULL && basename[0] == '.')
-     g_file_info_set_is_hidden (info, TRUE);
+     hidden = TRUE;
 
+  g_file_info_set_is_hidden (info, hidden);
+
+  /* Check for matching thumbnail in .MISC directory */
+  if (path != NULL &&
+      g_str_has_prefix (path, "/DCIM/") &&
+      hidden == FALSE &&
+      basename != NULL &&
+      type == G_FILE_TYPE_REGULAR &&
+      strlen (path) > 1 &&
+      strlen (basename) > 4 &&
+      basename[strlen(basename) - 4] == '.')
+    {
+      char *thumb_uri, *thumb_base, *thumb_path;
+      char *parent, *ptr, *no_suffix;
+      char **thumb_afcinfo;
+      GFile *thumb_file;
+
+      GMountSpec *mount_spec;
+      const char *port;
+
+      /* Parent directory */
+      ptr = strrchr (path, '/');
+      if (ptr == NULL)
+        return;
+      parent = g_strndup (path, ptr - path);
+
+      /* Basename with suffix replaced */
+      no_suffix = g_strndup (basename, strlen (basename) - 3);
+      thumb_base = g_strdup_printf ("%s%s", no_suffix, "THM");
+      g_free (no_suffix);
+
+      /* Full thumbnail path */
+      thumb_path = g_build_filename (parent, ".MISC", thumb_base, NULL);
+
+      g_free (parent);
+      g_free (thumb_base);
+
+      thumb_afcinfo = NULL;
+      if (afc_get_file_info (self->afc_cli, thumb_path, &thumb_afcinfo) != 0)
+        {
+          g_strfreev (thumb_afcinfo);
+          g_free (thumb_path);
+          return;
+        }
+      g_strfreev (thumb_afcinfo);
+
+      /* Get the URI for the thumbnail file */
+      mount_spec = g_vfs_backend_get_mount_spec (G_VFS_BACKEND (self));
+      port = g_mount_spec_get (mount_spec, "port");
+      thumb_uri = g_strdup_printf ("afc://%s%s%s", self->uuid, port ? port : "", thumb_path);
+      thumb_file = g_file_new_for_uri (thumb_uri);
+      g_free (thumb_uri);
+
+      /* Set preview icon */
+      icon = g_file_icon_new (thumb_file);
+      g_object_unref (thumb_file);
+      g_file_info_set_attribute_object (info,
+                                        G_FILE_ATTRIBUTE_PREVIEW_ICON,
+                                        G_OBJECT (icon));
+      g_object_unref (icon);
+    }
 }
 
 /* Callback for iterating over a directory. */
@@ -934,7 +997,7 @@ g_vfs_backend_afc_enumerate (GVfsBackend *backend,
       if (G_LIKELY(afc_get_file_info(self->afc_cli, file_path, &afcinfo) == AFC_E_SUCCESS))
         {
           info = g_file_info_new ();
-          g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, *ptr, matcher, flags);
+          g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, *ptr, file_path, matcher, flags);
           g_vfs_job_enumerate_add_info (job, info);
           g_object_unref (G_OBJECT(info));
           g_strfreev (afcinfo);
@@ -978,7 +1041,7 @@ g_vfs_backend_afc_query_info (GVfsBackend *backend,
   else
     basename = path;
 
-  g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, basename, matcher, flags);
+  g_vfs_backend_afc_set_info_from_afcinfo (self, info, afcinfo, basename, path, matcher, flags);
   if (afcinfo)
     g_strfreev (afcinfo);
 
