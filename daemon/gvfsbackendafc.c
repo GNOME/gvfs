@@ -1090,7 +1090,7 @@ g_vfs_backend_afc_set_attribute (GVfsBackend *backend,
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail(self->connected);
 
-  if (g_str_equal (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) != FALSE)
+  if (g_str_equal (attribute, G_FILE_ATTRIBUTE_TIME_MODIFIED) == FALSE)
     {
       g_vfs_job_failed (G_VFS_JOB (job),
 			G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
