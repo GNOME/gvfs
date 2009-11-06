@@ -255,6 +255,9 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   int retries;
   iphone_error_t err;
   lockdownd_client_t lockdown_cli = NULL;
+  char *camera_x_content_types[] = { "x-content/audio-player", "x-content/image-dcf", NULL};
+  char *media_player_x_content_types[] = {"x-content/audio-player", NULL};
+  char **dcim_afcinfo;
 
   self = G_VFS_BACKEND_AFC(backend);
   self->connected = FALSE;
@@ -383,6 +386,14 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   /* lockdown connection is not needed anymore */
   lockdownd_client_free (lockdown_cli);
+
+  /* Add camera item if necessary */
+  dcim_afcinfo = NULL;
+  if (afc_get_file_info (self->afc_cli, "/DCIM", &dcim_afcinfo) == AFC_E_SUCCESS)
+    g_vfs_backend_set_x_content_types (backend, camera_x_content_types);
+  else
+    g_vfs_backend_set_x_content_types (backend, media_player_x_content_types);
+  g_strfreev (dcim_afcinfo);
 
   self->connected = TRUE;
   g_vfs_job_succeeded (G_VFS_JOB(job));
