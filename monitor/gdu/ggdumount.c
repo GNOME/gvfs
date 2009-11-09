@@ -68,6 +68,10 @@ struct _GGduMount
   gchar *xdg_volume_info_name;
   GIcon *xdg_volume_info_icon;
   gboolean searched_for_xdg_volume_info;
+
+  gchar *bdmv_volume_info_name;
+  GIcon *bdmv_volume_info_icon;
+  gboolean searched_for_bdmv_volume_info;
 };
 
 static gboolean update_mount (GGduMount *mount);
@@ -173,6 +177,23 @@ got_xdg_volume_info_cb (GObject      *source_object,
   g_object_unref (mount);
 }
 
+static void
+got_bdmv_volume_info_cb (GObject      *source_object,
+                         GAsyncResult *res,
+                         gpointer      user_data)
+{
+  GGduMount *mount = G_GDU_MOUNT (user_data);
+
+  mount->bdmv_volume_info_icon = g_vfs_mount_info_query_bdmv_volume_info_finish (G_FILE (source_object),
+                                                                                 res,
+                                                                                 &(mount->bdmv_volume_info_name),
+                                                                                 NULL);
+  if (update_mount (mount))
+    emit_changed (mount);
+
+  g_object_unref (mount);
+}
+
 static gboolean
 update_mount (GGduMount *mount)
 {
@@ -194,8 +215,10 @@ update_mount (GGduMount *mount)
       if (mount->icon != NULL)
         g_object_unref (mount->icon);
 
-      /* order of preference: xdg, autorun, probed */
-      if (mount->xdg_volume_info_icon != NULL)
+      /* order of preference: bdmv, xdg, autorun, probed */
+      if (mount->bdmv_volume_info_icon != NULL)
+        mount->icon = g_object_ref (mount->bdmv_volume_info_icon);
+      else if (mount->xdg_volume_info_icon != NULL)
         mount->icon = g_object_ref (mount->xdg_volume_info_icon);
       else if (mount->autorun_icon != NULL)
         mount->icon = g_object_ref (mount->autorun_icon);
@@ -204,7 +227,9 @@ update_mount (GGduMount *mount)
 
       g_free (mount->name);
 
-      /* order of preference : xdg, probed */
+      /* order of preference : bdmv, xdg, probed */
+      if (mount->bdmv_volume_info_name != NULL)
+        mount->name = g_strdup (mount->bdmv_volume_info_name);
       if (mount->xdg_volume_info_name != NULL)
         mount->name = g_strdup (mount->xdg_volume_info_name);
       else
@@ -217,8 +242,10 @@ update_mount (GGduMount *mount)
       if (mount->icon != NULL)
         g_object_unref (mount->icon);
 
-      /* order of preference: xdg, autorun, probed */
-      if (mount->xdg_volume_info_icon != NULL)
+      /* order of preference: bdmv, xdg, autorun, probed */
+      if (mount->bdmv_volume_info_icon != NULL)
+        mount->icon = g_object_ref (mount->bdmv_volume_info_icon);
+      else if (mount->xdg_volume_info_icon != NULL)
         mount->icon = g_object_ref (mount->xdg_volume_info_icon);
       else if (mount->autorun_icon != NULL)
         mount->icon = g_object_ref (mount->autorun_icon);
@@ -227,8 +254,10 @@ update_mount (GGduMount *mount)
 
       g_free (mount->name);
 
-      /* order of preference : xdg, probed */
-      if (mount->xdg_volume_info_name != NULL)
+      /* order of preference : bdmv, xdg, probed */
+      if (mount->bdmv_volume_info_name != NULL)
+        mount->name = g_strdup (mount->bdmv_volume_info_name);
+      else if (mount->xdg_volume_info_name != NULL)
         mount->name = g_strdup (mount->xdg_volume_info_name);
       else
         mount->name = g_strdup (mount->mount_entry_name);
@@ -246,6 +275,16 @@ update_mount (GGduMount *mount)
     g_object_unref (old_icon);
 
   /*g_debug ("in update_mount(), changed=%d", changed);*/
+
+  /* search for BDMV */
+  if (!mount->searched_for_bdmv_volume_info)
+    {
+      mount->searched_for_bdmv_volume_info = TRUE;
+      g_vfs_mount_info_query_bdmv_volume_info (mount->root,
+      					       NULL,
+      					       got_bdmv_volume_info_cb,
+      					       g_object_ref (mount));
+    }
 
   /* search for .xdg-volume-info */
   if (!mount->searched_for_xdg_volume_info)
