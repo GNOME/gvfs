@@ -1591,8 +1591,36 @@ do_query_fs_info (GVfsBackend *backend,
 		  GFileInfo *info,
 		  GFileAttributeMatcher *attribute_matcher)
 {
+  GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+  smbc_statvfs_fn smbc_statvfs;
+  struct statvfs st = {0};
+  char *uri;
+  int res;
+
   g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
-  
+
+#ifdef DEPRECATED_SMBC_INTERFACE
+  if (g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
+      g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_FILESYSTEM_FREE) ||
+      g_file_attribute_matcher_matches (attribute_matcher,
+					G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))
+    {
+      uri = create_smb_uri (op_backend->server, op_backend->share, filename);
+      smbc_statvfs = smbc_getFunctionStatVFS (op_backend->smb_context);
+      res = smbc_statvfs (op_backend->smb_context, uri, &st);
+      g_free (uri);
+
+      if (res == 0)
+        {
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, st.f_bsize * st.f_blocks);
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, st.f_bsize * st.f_bavail);
+          g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, st.f_flag & SMBC_VFS_FEATURE_RDONLY);
+        }
+    }
+#endif
+
   g_vfs_job_succeeded (G_VFS_JOB (job));
 }
 
