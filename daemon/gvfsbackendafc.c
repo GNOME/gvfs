@@ -904,7 +904,8 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
   g_file_info_set_is_hidden (info, hidden);
 
   /* Check for matching thumbnail in .MISC directory */
-  if (path != NULL &&
+  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_PREVIEW_ICON) &&
+      path != NULL &&
       g_str_has_prefix (path, "/DCIM/") &&
       hidden == FALSE &&
       basename != NULL &&
