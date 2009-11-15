@@ -137,10 +137,18 @@ g_vfs_afc_volume_new (GVolumeMonitor *monitor,
                       const char     *uuid)
 {
   GVfsAfcVolume *self;
+  GFile *root;
+  char *uri;
 
   self = G_VFS_AFC_VOLUME(g_object_new (G_VFS_TYPE_AFC_VOLUME, NULL));
   self->monitor = monitor;
   self->uuid = g_strdup (uuid);
+
+  uri = g_strdup_printf ("afc://%s", self->uuid);
+  root = g_file_new_for_uri (uri);
+  g_free (uri);
+
+  g_object_set_data_full (G_OBJECT(self), "root", root, g_object_unref);
 
   /* Get mount information here */
   if (!_g_vfs_afc_volume_update_metadata (self))
@@ -233,23 +241,18 @@ g_vfs_afc_volume_mount (GVolume             *volume,
   GVfsAfcVolume *afc_volume = G_VFS_AFC_VOLUME (volume);
   ActivationMountOp *data;
   GFile *root;
-  char *uri;
 
   g_print ("g_vfs_afc_volume_mount (can_mount=%d uuid=%s)\n",
            g_vfs_afc_volume_can_mount (volume),
            afc_volume->uuid);
 
-  uri = g_strdup_printf ("afc://%s", afc_volume->uuid);
-  root = g_file_new_for_uri (uri);
-  g_free (uri);
+  root = g_object_get_data (G_OBJECT (volume), "root");
 
   data = g_new0 (ActivationMountOp, 1);
   data->enclosing_volume = afc_volume;
   data->callback = callback;
   data->user_data = user_data;
   data->root = root;
-
-  g_object_set_data_full (G_OBJECT(volume), "root", g_object_ref (root), g_object_unref);
 
   g_file_mount_enclosing_volume (root,
                                  0,
