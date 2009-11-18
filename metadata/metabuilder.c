@@ -1010,8 +1010,8 @@ meta_builder_write (MetaBuilder *builder,
 {
   GString *out;
   guint32 random_tag;
-  int fd, fd2;
-  char *tmp_name;
+  int fd, fd2, fd_dir;
+  char *tmp_name, *dirname;
 
   out = metadata_create_static (builder, &random_tag);
 
@@ -1034,6 +1034,17 @@ meta_builder_write (MetaBuilder *builder,
 	close (fd2);
       goto out;
     }
+
+  /* Sync the directory to make sure that the entry in the directory containing
+     the new medata file has also reached disk. */
+  dirname = g_path_get_dirname (filename);
+  fd_dir = open (dirname, O_RDONLY);
+  if (fd_dir > -1)
+    {
+      fsync (fd_dir);
+      close (fd_dir);
+    }
+  g_free (dirname);
 
   /* Mark old file (if any) as rotated) */
   if (fd2 != -1)
