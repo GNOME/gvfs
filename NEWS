@@ -1,3 +1,26 @@
+Major changes in 1.5.1
+======================
+* Translation updates
+* FreeBSD support for the gphoto2 backend
+* Don't show ssh dns-sd items in dns-sd:, only sftp ones
+* New AFC backend, providing access to Apple's iPhone, and iPod Touch devices
+* Don't silently overwrite when restoring from trash
+* Don't subscribe to unnecessary HAL D-Bus events
+* Avoid error dialogs when the user canceled
+* Don't confuse media players for cameras
+* gdu: Consider logical partitions when determining if a drive should be ignored
+* gdu: Separated "Safely Remove Drive" from "Eject"
+* gdu: Disallow mounting/ejecting empty drives
+* gdu: Handle NULL device objects
+* obexftp: Fix a crash in the backend
+* obexftp: Delete source file after move (remove_source switch)
+* http: Support querying input streams
+* http: Store and use cookies
+* smb: Support querying filesystem size and free space
+* ftp: Fixed parsing of CMU/VMS-IP FTP style listing
+* Support for loading icon and title on Blu-ray video discs
+* Bugs fixed: 595981, 596867, 517014, 593045, 594928, 586724, 586729, 597104, 580825
+
 Major changes in 1.4.0
 ======================
 * Translation updates

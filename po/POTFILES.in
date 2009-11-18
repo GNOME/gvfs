@@ -16,6 +16,7 @@ common/gvfsdnssdutils.c
 common/gvfsicon.c
 daemon/daemon-main.c
 daemon/gvfsbackend.c
+daemon/gvfsbackendafc.c
 daemon/gvfsbackendarchive.c
 daemon/gvfsbackendburn.c
 daemon/gvfsbackendcdda.c
