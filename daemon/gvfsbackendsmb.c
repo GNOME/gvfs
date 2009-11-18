@@ -1614,8 +1614,12 @@ do_query_fs_info (GVfsBackend *backend,
 
       if (res == 0)
         {
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, st.f_bsize * st.f_blocks);
-          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, st.f_bsize * st.f_bavail);
+          /* FIXME: inconsistent return values (libsmbclient-3.4.2)
+           *       - for linux samba hosts, f_frsize is zero and f_bsize is a real block size
+           *       - for some Windows hosts (XP), f_frsize and f_bsize should be multiplied to get real block size
+           */
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, st.f_bsize * st.f_blocks * ((st.f_frsize == 0) ? 1 : st.f_frsize));
+          g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, st.f_bsize * st.f_bfree * ((st.f_frsize == 0) ? 1 : st.f_frsize));
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, st.f_flag & SMBC_VFS_FEATURE_RDONLY);
         }
     }
