@@ -470,6 +470,8 @@ if test "x$enable_samba" != "xno"; then
                 else
                 	SAMBA_LIBS="-lsmbclient"
                 fi
+                AC_CHECK_LIB(smbclient, smbc_getFunctionStatVFS, 
+                        AC_DEFINE(HAVE_SAMBA_STAT_VFS, , [Define to 1 if smbclient supports smbc_stat_fn]))
 	else
 		AC_CHECK_LIB(smbclient, smbc_new_context,samba_old_libs="yes", samba_old_libs="no")
 		if test "x${samba_old_libs}" != "xno"; then
