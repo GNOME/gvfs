@@ -1592,14 +1592,15 @@ do_query_fs_info (GVfsBackend *backend,
 		  GFileAttributeMatcher *attribute_matcher)
 {
   GVfsBackendSmb *op_backend = G_VFS_BACKEND_SMB (backend);
+
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
+
+#ifdef HAVE_SAMBA_STAT_VFS
   smbc_statvfs_fn smbc_statvfs;
   struct statvfs st = {0};
   char *uri;
   int res;
 
-  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "cifs");
-
-#ifdef DEPRECATED_SMBC_INTERFACE
   if (g_file_attribute_matcher_matches (attribute_matcher,
 					G_FILE_ATTRIBUTE_FILESYSTEM_SIZE) ||
       g_file_attribute_matcher_matches (attribute_matcher,
