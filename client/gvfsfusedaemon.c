@@ -892,7 +892,12 @@ vfs_readlink (const gchar *path, gchar *target, size_t size)
 {
   debug_print ("vfs_readlink: %s\n", path);
 
-  return 0;
+  /* This is not implemented because it would allow remote servers to launch
+   * symlink attacks on the local machine.  There's not much of a use for
+   * "readlink" anyway since we don't pass G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+   * so non-broken symlinks will be followed transparently. */
+
+  return -ENOSYS;
 }
 
 static gint
