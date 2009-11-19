@@ -940,7 +940,8 @@ metadata_create_static (MetaBuilder *builder,
 
   /* Store the base as the min value in use minus one so that
      0 is free to mean "not defined" */
-  time_t_min = time_t_min - 1;
+  if (time_t_min != 0)
+    time_t_min = time_t_min - 1;
 
   /* Pick the base as the minimum, unless that leads to
      a 32bit overflow */
