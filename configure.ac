@@ -657,7 +657,7 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	-Wcast-align -Wsign-compare \
 	$CFLAGS"
 
-	for option in -Wno-strict-aliasing -Wno-sign-compare; do
+	for option in -Wno-strict-aliasing -Wno-sign-compare -Wtype-limits; do
 		SAVE_CFLAGS="$CFLAGS"
 		CFLAGS="$CFLAGS $option"
 		AC_MSG_CHECKING([whether gcc understands $option])
