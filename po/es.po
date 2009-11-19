@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-10-01 16:01+0000\n"
-"PO-Revision-Date: 2009-10-11 12:07+0200\n"
+"POT-Creation-Date: 2009-11-19 14:56+0000\n"
+"PO-Revision-Date: 2009-11-19 20:13+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -37,7 +37,6 @@ msgstr ""
 #: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
 #: ../client/gvfsiconloadable.c:374
 #, c-format
-#| msgid "Invalid return value from open"
 msgid "Invalid return value from %s"
 msgstr "%s devolvió un valor no válido"
 
@@ -85,13 +84,13 @@ msgstr "los valores deben ser cadenas o listas de cadenas"
 #: ../daemon/gvfsbackendobexftp.c:1066 ../daemon/gvfsbackendobexftp.c:1087
 #: ../daemon/gvfsbackendobexftp.c:1206 ../daemon/gvfsbackendobexftp.c:1343
 #: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendobexftp.c:1609
-#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1866
-#: ../daemon/gvfsbackendobexftp.c:1893 ../daemon/gvfsbackendobexftp.c:1952
-#: ../daemon/gvfsbackendobexftp.c:1974 ../daemon/gvfsbackendobexftp.c:2037
-#: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1878
+#: ../daemon/gvfsbackendobexftp.c:1905 ../daemon/gvfsbackendobexftp.c:1964
+#: ../daemon/gvfsbackendobexftp.c:1986 ../daemon/gvfsbackendobexftp.c:2049
+#: ../daemon/gvfsbackendobexftp.c:2068 ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
 #: ../monitor/proxy/gproxydrive.c:521 ../monitor/proxy/gproxydrive.c:609
 #: ../monitor/proxy/gproxydrive.c:757 ../monitor/proxy/gproxydrive.c:892
 #: ../monitor/proxy/gproxydrive.c:943 ../monitor/proxy/gproxydrive.c:1067
@@ -257,22 +256,125 @@ msgstr "el punto de montaje para %s ya se está usando"
 msgid "error starting mount daemon"
 msgstr "error al iniciar el demonio de montado"
 
-#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
+#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:921
 msgid "Unmount Anyway"
 msgstr "Desmontar de todas formas"
 
-#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
-#: ../monitor/gdu/ggdumount.c:883
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1015
+#: ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
+#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:923
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
 "El volumen está ocupado\n"
 "Una o más aplicaciones mantienen el volumen ocupado."
+
+#: ../daemon/gvfsbackendafc.c:145
+msgid "Internal Apple File Control error"
+msgstr "Error de control de archivos interno de Apple"
+
+#: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:574
+msgid "File does not exist"
+msgstr "El archivo no existe"
+
+#: ../daemon/gvfsbackendafc.c:152
+#| msgid "Directory not empty"
+msgid "The directory is not empty"
+msgstr "El directorio no está vacío"
+
+#: ../daemon/gvfsbackendafc.c:156
+#| msgid "The file is not a directory"
+msgid "The device did not respond"
+msgstr "El dispositivo no respondió"
+
+#: ../daemon/gvfsbackendafc.c:160
+#| msgid "The specified location is not supported"
+msgid "The connection was interrupted"
+msgstr "Se interrumpió la conexión"
+
+#: ../daemon/gvfsbackendafc.c:164
+#| msgid "Invalid reply received"
+msgid "Invalid Apple File Control data received"
+msgstr "Se recibieron datos no válidos del control de archivos de Apple"
+
+#: ../daemon/gvfsbackendafc.c:168
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "Error no manejable de control de archivos de Apple (%d)"
+
+#: ../daemon/gvfsbackendafc.c:185
+msgid "Lockdown Error: Invalid Argument"
+msgstr "Error de bloqueo: argumento no válido"
+
+#: ../daemon/gvfsbackendafc.c:189
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "Error de bloqueo no manejable (%d)"
+
+#: ../daemon/gvfsbackendafc.c:206
+msgid "iPhone Device Error: Invalid Argument"
+msgstr "Error del dispositivo iPhone: argumento no válido"
+
+#: ../daemon/gvfsbackendafc.c:210
+msgid ""
+"iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr ""
+"Error del dispositivo iPhone: No se encontró el dispositivo. Asegúrese de "
+"que usbmuxd está configurado correctamente."
+
+#: ../daemon/gvfsbackendafc.c:213
+#, c-format
+msgid "Unhandled iPhone Device error (%d)"
+msgstr "Error no manejable del dispositivo iPhone (%d)"
+
+#: ../daemon/gvfsbackendafc.c:274 ../daemon/gvfsbackendarchive.c:529
+#: ../daemon/gvfsbackendarchive.c:558 ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:842
+#: ../daemon/gvfsbackendobexftp.c:858 ../daemon/gvfsbackendobexftp.c:877
+#: ../daemon/gvfsbackendsmb.c:648
+msgid "Invalid mount spec"
+msgstr "Especificación de montaje no válida"
+
+#: ../daemon/gvfsbackendafc.c:280
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr ""
+"Ubicación AFC no válida: debe ser de la forma afc://uuid:número-de-puerto"
+
+#: ../daemon/gvfsbackendafc.c:295
+#, c-format
+msgid "Service %d on Apple Mobile Device"
+msgstr "Servicio %d en el dispositivo móvil de Apple"
+
+#: ../daemon/gvfsbackendafc.c:301
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "Dispositivo móvil de Apple"
+
+#: ../daemon/gvfsbackendafc.c:351
+#, c-format
+#| msgid "%s: %s"
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#: ../daemon/gvfsbackendafc.c:546 ../daemon/gvfsbackendafc.c:1253
+#| msgid "backups not supported yet"
+msgid "Backups are not yet supported."
+msgstr "Aún no se soportan los respaldos."
+
+#: ../daemon/gvfsbackendafc.c:684
+#| msgid "invalid type"
+msgid "Invalid seek type"
+msgstr "Tipo de búsqueda no soportado"
+
+#: ../daemon/gvfsbackendafc.c:1172 ../daemon/gvfsbackendsftp.c:1752
+#: ../daemon/gvfsbackendsftp.c:4557 ../daemon/gvfsbackendsmb.c:1698
+#: ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "La operación no está soportada"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -283,22 +385,15 @@ msgstr ""
 msgid "/ on %s"
 msgstr "/ en %s"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:504
+#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:505
 #: ../daemon/gvfsbackendsftp.c:1680
 msgid "No hostname specified"
 msgstr "No se especificó un nombre de servidor"
 
-#: ../daemon/gvfsbackendarchive.c:529 ../daemon/gvfsbackendarchive.c:558
-#: ../daemon/gvfsbackenddav.c:1631 ../daemon/gvfsbackendhttp.c:307
-#: ../daemon/gvfsbackendobexftp.c:842 ../daemon/gvfsbackendobexftp.c:858
-#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendsmb.c:648
-msgid "Invalid mount spec"
-msgstr "Especificación de montaje no válida"
-
 #: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
 #: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
 #: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
-#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:904
+#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:905
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
 #: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
 #: ../daemon/gvfsbackendsmbbrowse.c:1394
@@ -307,7 +402,7 @@ msgid "File doesn't exist"
 msgstr "El archivo no existe"
 
 #: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1865 ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendgphoto2.c:1877 ../daemon/gvfsbackendobexftp.c:1052
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
@@ -332,9 +427,9 @@ msgstr "No se pudo crear el directorio temporal"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:630
-#: ../daemon/gvfsbackendgphoto2.c:1194 ../daemon/gvfsbackendgphoto2.c:2186
-#: ../daemon/gvfsbackendgphoto2.c:2905 ../daemon/gvfsbackendsftp.c:1756
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:631
+#: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2198
+#: ../daemon/gvfsbackendgphoto2.c:2917 ../daemon/gvfsbackendsftp.c:1756
 #: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2882
 #: ../daemon/gvfsbackendsftp.c:2902 ../daemon/gvfsbackendtrash.c:216
 #, c-format
@@ -359,7 +454,7 @@ msgstr "Creador de CD/DVD"
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2979
+#: ../daemon/gvfsbackendgphoto2.c:2991
 msgid "File exists"
 msgstr "El archivo ya existe"
 
@@ -382,8 +477,8 @@ msgstr "El archivo ya existe"
 #: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
 #: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1492
+#: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
+#: ../monitor/gdu/ggduvolume.c:1519
 msgid "Operation not supported by backend"
 msgstr "El backend no soporta la operación"
 
@@ -391,7 +486,7 @@ msgstr "El backend no soporta la operación"
 msgid "No such file or directory in target path"
 msgstr "El archivo o directorio no existe en la ruta de destino"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1287
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1288
 #: ../daemon/gvfsbackendobexftp.c:1760
 msgid "Can't copy directory over directory"
 msgstr "No se puede copiar un directorio sobre otro directorio"
@@ -402,30 +497,30 @@ msgstr "No se puede copiar un directorio sobre otro directorio"
 msgid "Target file exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1310
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1311
 #: ../daemon/gvfsbackendobexftp.c:1775
 msgid "Can't recursively copy directory"
 msgstr "No se puede copiar recursivamente un directorio"
 
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2559 ../daemon/gvfsbackendgphoto2.c:2768
-#: ../daemon/gvfsbackendgphoto2.c:2865 ../daemon/gvfsbackendgphoto2.c:2958
+#: ../daemon/gvfsbackendgphoto2.c:2571 ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendgphoto2.c:2877 ../daemon/gvfsbackendgphoto2.c:2970
 msgid "Not supported"
 msgstr "No soportado"
 
-#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1496
+#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "No se puede crear el cliente gudev"
 
-#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1514
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "No se pudo conectar con el bus del sistema"
 
-#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1526
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "No se pudo crear el contexto libhal"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "No se puede inicializar libhal"
 
@@ -450,7 +545,7 @@ msgid "cdda mount on %s"
 msgstr "CDDA montado en %s"
 
 #: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/gdu/ggduvolume.c:320 ../monitor/hal/ghalmount.c:325
+#: ../monitor/gdu/ggduvolume.c:325 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
@@ -479,7 +574,7 @@ msgstr "Error de «paranoia» en la unidad %s"
 msgid "Error seeking in stream on drive %s"
 msgstr "Error al buscar en el flujo en la unidad %s"
 
-#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1873
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1885
 #, c-format
 msgid "No such file"
 msgstr "No existe el archivo"
@@ -545,7 +640,7 @@ msgid "Can't poll file"
 msgstr "No se puede sondear el archivo"
 
 #: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
-#: ../daemon/gvfsbackendhttp.c:253
+#: ../daemon/gvfsbackendhttp.c:261
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Error HTTP: %s"
@@ -593,10 +688,10 @@ msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
 #: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
-#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:589
-#: ../daemon/gvfsbackendftp.c:770 ../daemon/gvfsbackendftp.c:1120
-#: ../daemon/gvfsbackendftp.c:1295 ../daemon/gvfsbackendsftp.c:4209
-#: ../daemon/gvfsbackendsmb.c:2001
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:590
+#: ../daemon/gvfsbackendftp.c:771 ../daemon/gvfsbackendftp.c:1121
+#: ../daemon/gvfsbackendftp.c:1296 ../daemon/gvfsbackendsftp.c:4209
+#: ../daemon/gvfsbackendsmb.c:2034
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
 
@@ -606,7 +701,7 @@ msgid "The file was externally modified"
 msgstr "El archivo se modificó externamente"
 
 #: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1168
-#: ../daemon/gvfsbackendsmb.c:2018
+#: ../daemon/gvfsbackendsmb.c:2051
 msgid "Backup file creation failed"
 msgstr "Falló la creación del archivo de respaldo"
 
@@ -641,37 +736,33 @@ msgstr "Introduzca la contraseña para el ftp %s en %s"
 msgid "Enter password for ftp on %s"
 msgstr "Introduzca la contraseña para el ftp en %s"
 
-#: ../daemon/gvfsbackendftp.c:358 ../daemon/gvfsbackendsftp.c:969
+#: ../daemon/gvfsbackendftp.c:359 ../daemon/gvfsbackendsftp.c:969
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "Se canceló el diálogo de la contraseña"
 
-#: ../daemon/gvfsbackendftp.c:467
+#: ../daemon/gvfsbackendftp.c:468
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp en %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:471
+#: ../daemon/gvfsbackendftp.c:472
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "%s en el ftp de %s"
 
-#: ../daemon/gvfsbackendftp.c:564
+#: ../daemon/gvfsbackendftp.c:565
 msgid "Insufficient permissions"
 msgstr "Permisos insuficientes"
 
-#: ../daemon/gvfsbackendftp.c:573
-msgid "File does not exist"
-msgstr "El archivo no existe"
-
-#: ../daemon/gvfsbackendftp.c:610 ../daemon/gvfsbackendsftp.c:2253
+#: ../daemon/gvfsbackendftp.c:611 ../daemon/gvfsbackendsftp.c:2253
 #: ../daemon/gvfsbackendsftp.c:2989 ../daemon/gvfsbackendsftp.c:3330
 #: ../daemon/gvfsbackendsftp.c:4200
 msgid "File is directory"
 msgstr "El archivo es un directorio"
 
-#: ../daemon/gvfsbackendftp.c:818 ../daemon/gvfsbackendftp.c:1083
+#: ../daemon/gvfsbackendftp.c:819 ../daemon/gvfsbackendftp.c:1084
 #: ../daemon/gvfsbackendsftp.c:3196
 msgid "backups not supported yet"
 msgstr "aún no se soportan los respaldos"
@@ -704,7 +795,7 @@ msgstr "Cámara digital (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:936 ../monitor/gphoto2/ggphoto2volume.c:240
+#: ../daemon/gvfsbackendgphoto2.c:947 ../monitor/gphoto2/ggphoto2volume.c:240
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -712,173 +803,173 @@ msgstr "Cámara %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:939 ../monitor/gphoto2/ggphoto2volume.c:235
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:235
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "Reproductor de sonido %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:948 ../monitor/gphoto2/ggphoto2volume.c:246
+#: ../daemon/gvfsbackendgphoto2.c:959 ../monitor/gphoto2/ggphoto2volume.c:246
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Reproductor de sonido"
 
-#: ../daemon/gvfsbackendgphoto2.c:1555
+#: ../daemon/gvfsbackendgphoto2.c:1567
 msgid "No device specified"
 msgstr "No se especificó el dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1576
+#: ../daemon/gvfsbackendgphoto2.c:1588
 msgid "Cannot create gphoto2 context"
 msgstr "No se puede crear el contexto gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1586
+#: ../daemon/gvfsbackendgphoto2.c:1598
 msgid "Error creating camera"
 msgstr "Error al crear la cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1599 ../daemon/gvfsbackendgphoto2.c:1609
+#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error loading device information"
 msgstr "Error al cargar la información del dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1621
+#: ../daemon/gvfsbackendgphoto2.c:1633
 msgid "Error looking up device information"
 msgstr "Error al buscar la información del dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1631
+#: ../daemon/gvfsbackendgphoto2.c:1643
 msgid "Error getting device information"
 msgstr "Error al obtener la información del dispositivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1644
+#: ../daemon/gvfsbackendgphoto2.c:1656
 msgid "Error setting up camera communications port"
 msgstr "Error al establecer el puerto de comunicaciones de la cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
+#: ../daemon/gvfsbackendgphoto2.c:1667
 msgid "Error initializing camera"
 msgstr "Error al inicializar la cámara"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1669
+#: ../daemon/gvfsbackendgphoto2.c:1681
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 montado en %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1744
+#: ../daemon/gvfsbackendgphoto2.c:1756
 msgid "No camera specified"
 msgstr "No se especificó ninguna cámara"
 
-#: ../daemon/gvfsbackendgphoto2.c:1785 ../daemon/gvfsbackendgphoto2.c:1811
+#: ../daemon/gvfsbackendgphoto2.c:1797 ../daemon/gvfsbackendgphoto2.c:1823
 #, c-format
 msgid "Filesystem is busy"
 msgstr "El sistema de archivos está ocupado"
 
-#: ../daemon/gvfsbackendgphoto2.c:1881
+#: ../daemon/gvfsbackendgphoto2.c:1893
 msgid "Error creating file object"
 msgstr "Error al crear el archivo objeto"
 
-#: ../daemon/gvfsbackendgphoto2.c:1896
+#: ../daemon/gvfsbackendgphoto2.c:1908
 msgid "Error getting file"
 msgstr "Error al obtener el archivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1906
+#: ../daemon/gvfsbackendgphoto2.c:1918
 msgid "Error getting data from file"
 msgstr "Error al obtener datos del archivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:1964
+#: ../daemon/gvfsbackendgphoto2.c:1976
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Identificador de icono «%s» mal formado"
 
-#: ../daemon/gvfsbackendgphoto2.c:2040 ../daemon/gvfsbackendgphoto2.c:3229
+#: ../daemon/gvfsbackendgphoto2.c:2052 ../daemon/gvfsbackendgphoto2.c:3241
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Error al buscar en el flujo en la cámara %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2180 ../daemon/gvfsbackendsftp.c:2872
+#: ../daemon/gvfsbackendgphoto2.c:2192 ../daemon/gvfsbackendsftp.c:2872
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "No es un directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2213
+#: ../daemon/gvfsbackendgphoto2.c:2225
 msgid "Failed to get folder list"
 msgstr "Falló al obtener la lista de carpetas"
 
-#: ../daemon/gvfsbackendgphoto2.c:2279
+#: ../daemon/gvfsbackendgphoto2.c:2291
 msgid "Failed to get file list"
 msgstr "Falló al obtener la lista de archivos"
 
-#: ../daemon/gvfsbackendgphoto2.c:2571
+#: ../daemon/gvfsbackendgphoto2.c:2583
 msgid "Error creating directory"
 msgstr "Error al crear el directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendgphoto2.c:2792
 msgid "Name already exists"
 msgstr "El nombre ya existe"
 
-#: ../daemon/gvfsbackendgphoto2.c:2791 ../daemon/gvfsbackendgphoto2.c:3420
+#: ../daemon/gvfsbackendgphoto2.c:2803 ../daemon/gvfsbackendgphoto2.c:3432
 msgid "New name too long"
 msgstr "El nuevo nombre es demasiado largo"
 
-#: ../daemon/gvfsbackendgphoto2.c:2801 ../daemon/gvfsbackendgphoto2.c:3431
+#: ../daemon/gvfsbackendgphoto2.c:2813 ../daemon/gvfsbackendgphoto2.c:3443
 msgid "Error renaming dir"
 msgstr "Error al renombrar el directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2814 ../daemon/gvfsbackendgphoto2.c:3444
+#: ../daemon/gvfsbackendgphoto2.c:2826 ../daemon/gvfsbackendgphoto2.c:3456
 msgid "Error renaming file"
 msgstr "Error al renombrar el archivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:2878
+#: ../daemon/gvfsbackendgphoto2.c:2890
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "El directorio «%s» no está vacío"
 
-#: ../daemon/gvfsbackendgphoto2.c:2889
+#: ../daemon/gvfsbackendgphoto2.c:2901
 msgid "Error deleting directory"
 msgstr "Error al borrar el directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:2915
+#: ../daemon/gvfsbackendgphoto2.c:2927
 msgid "Error deleting file"
 msgstr "Error al borrar el archivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:2968
+#: ../daemon/gvfsbackendgphoto2.c:2980
 msgid "Can't write to directory"
 msgstr "No se puede escribir en el directorio"
 
-#: ../daemon/gvfsbackendgphoto2.c:3015
+#: ../daemon/gvfsbackendgphoto2.c:3027
 msgid "Cannot allocate new file to append to"
 msgstr "No se puede asignar el nuevo archivo en el que añadir"
 
-#: ../daemon/gvfsbackendgphoto2.c:3030
+#: ../daemon/gvfsbackendgphoto2.c:3042
 msgid "Cannot read file to append to"
 msgstr "No se puede leer el archivo en el que añadir"
 
-#: ../daemon/gvfsbackendgphoto2.c:3041
+#: ../daemon/gvfsbackendgphoto2.c:3053
 msgid "Cannot get data of file to append to"
 msgstr "No se puede obtener los datos del archivo en el que añadir"
 
-#: ../daemon/gvfsbackendgphoto2.c:3328
+#: ../daemon/gvfsbackendgphoto2.c:3340
 msgid "Error writing file"
 msgstr "Error al escribir el archivo"
 
-#: ../daemon/gvfsbackendgphoto2.c:3376
+#: ../daemon/gvfsbackendgphoto2.c:3388
 msgid "Not supported (not same directory)"
 msgstr "No soportado (no es el mismo directorio)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3388
+#: ../daemon/gvfsbackendgphoto2.c:3400
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "No soportado (src es un directorio, dst es un directorio)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3396
+#: ../daemon/gvfsbackendgphoto2.c:3408
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "No soportado (src es un directorio, dst es un archivo existente)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3408
+#: ../daemon/gvfsbackendgphoto2.c:3420
 msgid "Not supported (src is file, dst is dir)"
 msgstr "No soportado (src es un archivo, dst es un directorio)"
 
-#: ../daemon/gvfsbackendhttp.c:249
+#: ../daemon/gvfsbackendhttp.c:257
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "Error HTTP en el cliente: %s"
@@ -921,6 +1012,11 @@ msgstr "Se perdió la conexión con el dispositivo"
 #: ../daemon/gvfsbackendobexftp.c:1488
 msgid "Device requires a software update"
 msgstr "El dispositivo requiere una actualización de software"
+
+#: ../daemon/gvfsbackendobexftp.c:1836 ../daemon/gvfsbackendsmb.c:1925
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Error al borrar el archivo: %s"
 
 #: ../daemon/gvfsbackendsftp.c:295 ../daemon/gvfsbackendsftp.c:651
 msgid "ssh program unexpectedly exited"
@@ -1024,11 +1120,6 @@ msgstr "sftp en %s"
 msgid "Unable to find supported ssh command"
 msgstr "No se pudo encontrar el comando ssh soportado"
 
-#: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:392
-msgid "Operation unsupported"
-msgstr "La operación no está soportada"
-
 #: ../daemon/gvfsbackendsftp.c:1929 ../daemon/gvfsbackendsftp.c:2318
 #: ../daemon/gvfsbackendsftp.c:2397 ../daemon/gvfsbackendsftp.c:2408
 #: ../daemon/gvfsbackendsftp.c:2464 ../daemon/gvfsbackendsftp.c:2550
@@ -1072,7 +1163,7 @@ msgstr "Error al crear el archivo de respaldo: %s"
 msgid "Unable to create temporary file"
 msgstr "No se pudo crear el archivo temporal"
 
-#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:1990
+#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:2023
 msgid "Can't move directory over directory"
 msgstr "No se puede mover un directorio sobre un directorio"
 
@@ -1102,26 +1193,21 @@ msgstr "Tipo de búsqueda no soportado"
 msgid "Backup file creation failed: %s"
 msgstr "Falló la creación del archivo de respaldo: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1892
-#, c-format
-msgid "Error deleting file: %s"
-msgstr "Error al borrar el archivo: %s"
-
-#: ../daemon/gvfsbackendsmb.c:1966
+#: ../daemon/gvfsbackendsmb.c:1999
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Error al mover el archivo: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2038
+#: ../daemon/gvfsbackendsmb.c:2071
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Error al eliminar el archivo destino: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2062
+#: ../daemon/gvfsbackendsmb.c:2095
 msgid "Can't recursively move directory"
 msgstr "No se puede mover recursivamente un directorio"
 
-#: ../daemon/gvfsbackendsmb.c:2128
+#: ../daemon/gvfsbackendsmb.c:2161
 msgid "Windows Shares Filesystem Service"
 msgstr "Servicio del sistema de archivos compartidos de Windows"
 
@@ -1349,22 +1435,22 @@ msgstr "Monitor de volúmenes GDU de GVfs"
 msgid "Floppy Drive"
 msgstr "Disquete"
 
-#: ../monitor/gdu/ggdudrive.c:257
+#: ../monitor/gdu/ggdudrive.c:251
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Unidad sin nombre (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:259
+#: ../monitor/gdu/ggdudrive.c:253
 msgid "Unnamed Drive"
 msgstr "Unidad sin nombre"
 
-#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:553 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr ""
 "Falló al expulsar el medio, uno o más volúmenes están ocupados en el medio."
 
-#: ../monitor/gdu/ggdudrive.c:1003
+#: ../monitor/gdu/ggdudrive.c:1008
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
@@ -1375,28 +1461,28 @@ msgstr ""
 "tolerancia a fallos. Los datos en la unidad se pueden perder "
 "irrevocablemente si un componente falla."
 
-#: ../monitor/gdu/ggdudrive.c:1009
+#: ../monitor/gdu/ggdudrive.c:1014
 msgid "Start Anyway"
 msgstr "Iniciar de todas formas"
 
-#: ../monitor/gdu/ggdumount.c:817
+#: ../monitor/gdu/ggdumount.c:856
 msgid "One or more programs are preventing the unmount operation."
 msgstr "Uno o más programas evitan la operación de desmontado."
 
-#: ../monitor/gdu/ggdumount.c:945
+#: ../monitor/gdu/ggdumount.c:984
 msgid "Cannot get LUKS cleartext slave"
 msgstr "No se puede obtener el esclavo LUKS en texto claro"
 
-#: ../monitor/gdu/ggdumount.c:967
+#: ../monitor/gdu/ggdumount.c:1006
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "No se puede obtener el esclavo LUKS en texto claro desde la ruta «%s»"
 
-#: ../monitor/gdu/ggduvolume.c:308
+#: ../monitor/gdu/ggduvolume.c:313
 msgid "Floppy Disk"
 msgstr "Disquete"
 
-#: ../monitor/gdu/ggduvolume.c:989
+#: ../monitor/gdu/ggduvolume.c:999
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1405,7 +1491,7 @@ msgstr ""
 "Introducir una contraseña para desbloquear el volumen\n"
 "El dispositivo «%s» contiene datos cifrados en la partición %d."
 
-#: ../monitor/gdu/ggduvolume.c:996
+#: ../monitor/gdu/ggduvolume.c:1006
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1414,7 +1500,7 @@ msgstr ""
 "Introducir una contraseña para desbloquear el volumen\n"
 "El dispositivo «%s» contiene datos cifrados."
 
-#: ../monitor/gdu/ggduvolume.c:1003
+#: ../monitor/gdu/ggduvolume.c:1013
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -2002,7 +2088,6 @@ msgid "create parent directories"
 msgstr "crear directorios padre"
 
 #: ../programs/gvfs-mkdir.c:50
-#| msgid "create parent directories"
 msgid "- create directories"
 msgstr "- crear directorios"
 
