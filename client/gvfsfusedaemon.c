@@ -2083,40 +2083,53 @@ vfs_utimens (const gchar *path, const struct timespec tv [2])
   if (file)
     {
       guint64 atime;
+      guint32 atime_usec;
       guint64 mtime;
+      guint32 mtime_usec;
+      GFileInfo *info;
 
       if (tv)
         {
-          atime = (guint64) tv [0].tv_sec * 1000000 + (guint64) tv [0].tv_nsec / (guint64) 1000;
-          mtime = (guint64) tv [1].tv_sec * 1000000 + (guint64) tv [1].tv_nsec / (guint64) 1000;
+          atime = (guint64) tv [0].tv_sec;
+          atime_usec = (guint32) tv [0].tv_nsec / (guint32) 1000;
+          mtime = (guint64) tv [1].tv_sec;
+          mtime_usec = (guint32) tv [1].tv_nsec / (guint32) 1000;
         }
       else
         {
           struct timeval tiv;
 
           gettimeofday (&tiv, NULL);
-          atime = (guint64) tiv.tv_sec * (guint64) 1000000 + (guint64) tiv.tv_usec;
+          atime = (guint64) tiv.tv_sec;
+          atime_usec = (guint32) tiv.tv_usec;
           mtime = atime;
+          mtime_usec = atime_usec;
         }
 
-      g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
-                            G_FILE_ATTRIBUTE_TYPE_UINT64, &atime,
-                            0, NULL, &error);
+      info = g_file_info_new ();
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED, mtime);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, mtime_usec);
+      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_ACCESS, atime);
+      g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_TIME_ACCESS_USEC, atime_usec);
 
-      if (!error)
-        {
-          g_file_set_attribute (file, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-                                G_FILE_ATTRIBUTE_TYPE_UINT64, &mtime,
-                                0, NULL, &error);
-        }
+      g_file_set_attributes_from_info (file, info, 0, NULL, &error);
 
       if (error)
         {
-          result = -errno_from_error (error);
+          /* As long as not all backends support all attributes we set,
+             report failure only if neither mtime and atime have been set. */
+          if (g_file_info_get_attribute_status (info, G_FILE_ATTRIBUTE_TIME_ACCESS) == G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING &&
+              g_file_info_get_attribute_status (info, G_FILE_ATTRIBUTE_TIME_MODIFIED) == G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING)
+            {
+              /* Note: we only get first error from the attributes we try to set,  might not be accurate
+                       (a limitation of g_file_set_attributes_from_info()). */
+              result = -errno_from_error (error);
+            }
           g_error_free (error);
         }
 
       g_object_unref (file);
+      g_object_unref (info);
     }
   else if (path_is_mount_list (path))
     {
