@@ -799,7 +799,7 @@ write_metadata (GString *out,
 static gboolean
 write_all_data_and_close (int fd, char *data, gsize len)
 {
-  gsize written;
+  gssize written;
   gboolean res;
 
   res = FALSE;
