@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-11-19 19:13+0000\n"
-"PO-Revision-Date: 2009-11-20 08:30+0100\n"
-"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
+"POT-Creation-Date: 2009-11-20 13:11+0000\n"
+"PO-Revision-Date: 2009-11-20 14:19+0100\n"
+"Last-Translator: Matej Urbančič <matej.urban@gmail.com>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: ../client/gdaemonfile.c:498
 #: ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
-msgstr "Dejanje ni dovoljeno, saj so datoteke na različnih priklopnih mestih"
+msgstr "Dejanje ni podprto, saj so datoteke na različnih priklopnih mestih"
 
 #. Translators: %s is the name of a programming function
 #: ../client/gdaemonfile.c:868
@@ -80,7 +80,7 @@ msgstr "Neveljavno ime datoteke %s"
 #: ../client/gdaemonvfs.c:1375
 #, c-format
 msgid "Error setting file metadata: %s"
-msgstr "Napaka med nastavitvijo metapodatkovne datoteke: %s"
+msgstr "Napaka med nastavitvijo metapodatkov datoteke: %s"
 
 #: ../client/gdaemonfile.c:2233
 #: ../client/gdaemonvfs.c:1376
@@ -158,7 +158,7 @@ msgstr "Iskanje po pretoku ni podprto"
 #: ../client/gdaemonvfs.c:832
 #, c-format
 msgid "Error while getting mount info: %s"
-msgstr "Napaka med pridobivanjem podrobnosti priklopa_ %s"
+msgstr "Napaka med pridobivanjem podrobnosti priklopa: %s"
 
 #: ../client/gdaemonvfs.c:1189
 msgid "Can't contact session bus"
@@ -349,16 +349,16 @@ msgstr "Prezrta napaka zaklepanja (%d)"
 
 #: ../daemon/gvfsbackendafc.c:206
 msgid "iPhone Device Error: Invalid Argument"
-msgstr "Napaka iPhone naprave: neveljeven argument"
+msgstr "Napaka iPhone naprave: neveljaven argument"
 
 #: ../daemon/gvfsbackendafc.c:210
 msgid "iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
-msgstr "Napaka iPhone naprave: Ni mogoče najti naprave. Prepričajte se, da usbmuxd deluje pravilno."
+msgstr "Napaka iPhone naprave: ni mogoče najti naprave; prepričajte se, da usbmuxd deluje pravilno."
 
 #: ../daemon/gvfsbackendafc.c:213
 #, c-format
 msgid "Unhandled iPhone Device error (%d)"
-msgstr "Prezrta napaka IPhone naprave (%d)"
+msgstr "Prezrta napaka iPhone naprave (%d)"
 
 #: ../daemon/gvfsbackendafc.c:274
 #: ../daemon/gvfsbackendarchive.c:529
@@ -897,22 +897,22 @@ msgstr "izdelava varnostnih kopij ni podprta"
 #: ../daemon/gvfsbackendgphoto2.c:504
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr "%s: %d: Datoteka ali mapa že obstaja"
+msgstr "%s: %d: datoteka ali mapa že obstaja"
 
 #: ../daemon/gvfsbackendgphoto2.c:511
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr "%s: %d: Ni take mape ali datoteke"
+msgstr "%s: %d: ni take mape ali datoteke"
 
 #: ../daemon/gvfsbackendgphoto2.c:517
 #, c-format
 msgid "%s: %d: Invalid filename"
-msgstr "%s: %d: Neveljavno ime datoteke"
+msgstr "%s: %d: neveljavno ime datoteke"
 
 #: ../daemon/gvfsbackendgphoto2.c:523
 #, c-format
 msgid "%s: %d: Not Supported"
-msgstr "%s: %d: Ni podprto"
+msgstr "%s: %d: ni podprto"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:718
@@ -1019,8 +1019,8 @@ msgstr "Neveljavno oblikovano določilo ikone '%s'"
 #: ../daemon/gvfsbackendgphoto2.c:2052
 #: ../daemon/gvfsbackendgphoto2.c:3241
 #, c-format
-msgid "Error seeking in stream on camera '%s'"
-msgstr "Napaka med iskanjem pretoka na kameri '%s'"
+msgid "Error seeking in stream on camera %s"
+msgstr "Napaka med iskanjem pretoka na kameri %s"
 
 #: ../daemon/gvfsbackendgphoto2.c:2192
 #: ../daemon/gvfsbackendsftp.c:2872
@@ -1194,7 +1194,7 @@ msgstr "Ni mogoče oživiti ssh programa"
 #: ../daemon/gvfsbackendsftp.c:511
 #, c-format
 msgid "Unable to spawn ssh program: %s"
-msgstr "Ni mogoče oživiti ssh programa: %s"
+msgstr "Ni mogoče zagnati ssh programa: %s"
 
 #: ../daemon/gvfsbackendsftp.c:613
 #: ../daemon/gvfsbackendsftp.c:874
@@ -1313,7 +1313,7 @@ msgstr "Napaka"
 #: ../daemon/gvfsbackendsftp.c:2370
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
-msgstr "Naveljaven ID ikone '%s' v OpenIconForRead"
+msgstr "Neveljaven ID ikone '%s' v OpenIconForRead"
 
 #: ../daemon/gvfsbackendsftp.c:2666
 #, c-format
@@ -1511,7 +1511,7 @@ msgstr "Zamenjaj starejši ozadnji program"
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
-msgstr "Ne zaženi fuse."
+msgstr "Ne zaženi programa fuse."
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
@@ -2081,7 +2081,7 @@ msgstr "Združevanje datotek na mestih in pri tiskanju preko standardnega odvoda
 
 #: ../programs/gvfs-cat.c:148
 msgid "Note: just pipe through cat if you need its formatting option like -n, -T or other."
-msgstr "Opomba: uporaba cevi preko ukaza cat, če potrebujete možnosti oblikovanja kot so -n, -T in druge."
+msgstr "Opomba: uporaba cevi z ukazom cat je koristna, kadae potrebujete možnosti oblikovanja kot so -n, -T in druge."
 
 #: ../programs/gvfs-cat.c:161
 #: ../programs/gvfs-copy.c:108
@@ -2237,7 +2237,7 @@ msgstr "prikaži ime: %s\n"
 #: ../programs/gvfs-info.c:159
 #, c-format
 msgid "edit name: %s\n"
-msgstr "uredi ime:%s\n"
+msgstr "uredi ime: %s\n"
 
 #: ../programs/gvfs-info.c:165
 #, c-format
@@ -2524,7 +2524,7 @@ msgstr "Sledi simbolnim povezavam, priklopom in bližnjicam map"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
-msgstr "_ izpiši vsebino map v drevesni obliki"
+msgstr "- izpiši vsebino map v drevesni obliki"
 
 #~ msgid "Invalid return value from get_info"
 #~ msgstr "Vrnjena neveljavna vrednost get_info"
