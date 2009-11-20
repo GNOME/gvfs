@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-10-30 10:32+0000\n"
-"PO-Revision-Date: 2009-10-30 11:45+0100\n"
+"POT-Creation-Date: 2009-11-19 19:13+0000\n"
+"PO-Revision-Date: 2009-11-20 08:30+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -117,7 +117,7 @@ msgstr "vrednosti morajo biti v nizu ali v seznamu nizov"
 #: ../daemon/gvfsbackendtest.c:187
 #: ../daemon/gvfschannel.c:319
 #: ../daemon/gvfsftptask.c:202
-#: ../monitor/gdu/ggdumount.c:1030
+#: ../monitor/gdu/ggdumount.c:1069
 #: ../monitor/proxy/gproxydrive.c:521
 #: ../monitor/proxy/gproxydrive.c:609
 #: ../monitor/proxy/gproxydrive.c:757
@@ -289,24 +289,124 @@ msgid "error starting mount daemon"
 msgstr "napaka med zaganjanjem ozadnjega programa priklopa"
 
 #: ../daemon/gvfsbackend.c:899
-#: ../monitor/gdu/ggdumount.c:882
+#: ../monitor/gdu/ggdumount.c:921
 msgid "Unmount Anyway"
 msgstr "Vseeno odklopi"
 
 #: ../daemon/gvfsbackend.c:900
 #: ../monitor/gdu/ggdudrive.c:1015
-#: ../monitor/gdu/ggdumount.c:883
+#: ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "Prekliči"
 
 #: ../daemon/gvfsbackend.c:902
-#: ../monitor/gdu/ggdumount.c:884
+#: ../monitor/gdu/ggdumount.c:923
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
 "Pogon je zaseden\n"
 "En ali več programov ohranjajo pogon zaseden."
+
+#: ../daemon/gvfsbackendafc.c:145
+msgid "Internal Apple File Control error"
+msgstr "Notranja napaka Apple nadzora datotek"
+
+#: ../daemon/gvfsbackendafc.c:149
+#: ../daemon/gvfsbackendftp.c:574
+msgid "File does not exist"
+msgstr "Datoteka ne obstaja"
+
+#: ../daemon/gvfsbackendafc.c:152
+msgid "The directory is not empty"
+msgstr "Mapa ni prazna"
+
+#: ../daemon/gvfsbackendafc.c:156
+msgid "The device did not respond"
+msgstr "Naprava se ne odziva"
+
+#: ../daemon/gvfsbackendafc.c:160
+msgid "The connection was interrupted"
+msgstr "Povezava je bila prekinjena"
+
+#: ../daemon/gvfsbackendafc.c:164
+msgid "Invalid Apple File Control data received"
+msgstr "Prejeti neveljavni podatki Apple nadzora datotek"
+
+#: ../daemon/gvfsbackendafc.c:168
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "Prezrta napaka Apple nadzora datotek (%d)"
+
+#: ../daemon/gvfsbackendafc.c:185
+msgid "Lockdown Error: Invalid Argument"
+msgstr "Napaka zaklepanja: neveljaven argument"
+
+#: ../daemon/gvfsbackendafc.c:189
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "Prezrta napaka zaklepanja (%d)"
+
+#: ../daemon/gvfsbackendafc.c:206
+msgid "iPhone Device Error: Invalid Argument"
+msgstr "Napaka iPhone naprave: neveljeven argument"
+
+#: ../daemon/gvfsbackendafc.c:210
+msgid "iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr "Napaka iPhone naprave: Ni mogoče najti naprave. Prepričajte se, da usbmuxd deluje pravilno."
+
+#: ../daemon/gvfsbackendafc.c:213
+#, c-format
+msgid "Unhandled iPhone Device error (%d)"
+msgstr "Prezrta napaka IPhone naprave (%d)"
+
+#: ../daemon/gvfsbackendafc.c:274
+#: ../daemon/gvfsbackendarchive.c:529
+#: ../daemon/gvfsbackendarchive.c:558
+#: ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendhttp.c:315
+#: ../daemon/gvfsbackendobexftp.c:842
+#: ../daemon/gvfsbackendobexftp.c:858
+#: ../daemon/gvfsbackendobexftp.c:877
+#: ../daemon/gvfsbackendsmb.c:648
+msgid "Invalid mount spec"
+msgstr "Neveljavno določilo priklopa"
+
+#: ../daemon/gvfsbackendafc.c:280
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "Neveljavno AFC mesto: zapis mora biti oblikovan kot afc://uuid:port-number"
+
+#: ../daemon/gvfsbackendafc.c:295
+#, c-format
+msgid "Service %d on Apple Mobile Device"
+msgstr "Storitev %d na napravi Apple Mobile"
+
+#: ../daemon/gvfsbackendafc.c:301
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "Naprava Apple Mobile"
+
+#: ../daemon/gvfsbackendafc.c:351
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#: ../daemon/gvfsbackendafc.c:546
+#: ../daemon/gvfsbackendafc.c:1253
+msgid "Backups are not yet supported."
+msgstr "Izdelava varnostnih kopij ni podprta."
+
+#: ../daemon/gvfsbackendafc.c:684
+msgid "Invalid seek type"
+msgstr "Neveljavna vrsta iskanja"
+
+#: ../daemon/gvfsbackendafc.c:1172
+#: ../daemon/gvfsbackendsftp.c:1752
+#: ../daemon/gvfsbackendsftp.c:4557
+#: ../daemon/gvfsbackendsmb.c:1698
+#: ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "Dejanje ni podprto"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -323,17 +423,6 @@ msgstr "/ na %s"
 #: ../daemon/gvfsbackendsftp.c:1680
 msgid "No hostname specified"
 msgstr "Ni določenega imena gostitelja"
-
-#: ../daemon/gvfsbackendarchive.c:529
-#: ../daemon/gvfsbackendarchive.c:558
-#: ../daemon/gvfsbackenddav.c:1631
-#: ../daemon/gvfsbackendhttp.c:307
-#: ../daemon/gvfsbackendobexftp.c:842
-#: ../daemon/gvfsbackendobexftp.c:858
-#: ../daemon/gvfsbackendobexftp.c:877
-#: ../daemon/gvfsbackendsmb.c:648
-msgid "Invalid mount spec"
-msgstr "Neveljavno določilo priklopa"
 
 #: ../daemon/gvfsbackendarchive.c:616
 #: ../daemon/gvfsbackendarchive.c:660
@@ -468,9 +557,9 @@ msgstr "Datoteka obstaja"
 #: ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154
 #: ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1134
-#: ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1492
+#: ../monitor/gdu/ggdumount.c:1173
+#: ../monitor/gdu/ggdumount.c:1257
+#: ../monitor/gdu/ggduvolume.c:1519
 msgid "Operation not supported by backend"
 msgstr "Hrbtenica ne podpira dejanja"
 
@@ -550,7 +639,7 @@ msgstr "cdda priklop na %s"
 
 #: ../daemon/gvfsbackendcdda.c:440
 #: ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/gdu/ggduvolume.c:320
+#: ../monitor/gdu/ggduvolume.c:325
 #: ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225
 #: ../monitor/hal/ghalvolume.c:246
@@ -660,7 +749,7 @@ msgstr "Ni mogoče vrednotiti datoteke"
 
 #: ../daemon/gvfsbackenddav.c:561
 #: ../daemon/gvfsbackenddav.c:1698
-#: ../daemon/gvfsbackendhttp.c:253
+#: ../daemon/gvfsbackendhttp.c:261
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Napaka HTTP: %s"
@@ -718,7 +807,7 @@ msgstr "Ni mogoče ustvariti zahteve"
 #: ../daemon/gvfsbackendftp.c:1121
 #: ../daemon/gvfsbackendftp.c:1296
 #: ../daemon/gvfsbackendsftp.c:4209
-#: ../daemon/gvfsbackendsmb.c:2001
+#: ../daemon/gvfsbackendsmb.c:2034
 msgid "Target file already exists"
 msgstr "Ciljna datoteka že obstaja"
 
@@ -730,7 +819,7 @@ msgstr "Datoteka je bila zunanje spremenjena"
 
 #: ../daemon/gvfsbackenddav.c:2034
 #: ../daemon/gvfsbackendsmb.c:1168
-#: ../daemon/gvfsbackendsmb.c:2018
+#: ../daemon/gvfsbackendsmb.c:2051
 msgid "Backup file creation failed"
 msgstr "Ni mogoče ustvariti varnostne kopije"
 
@@ -790,10 +879,6 @@ msgstr "ftp kot %s na %s"
 #: ../daemon/gvfsbackendftp.c:565
 msgid "Insufficient permissions"
 msgstr "Nezadostna dovoljenja"
-
-#: ../daemon/gvfsbackendftp.c:574
-msgid "File does not exist"
-msgstr "Datoteka ne obstaja"
 
 #: ../daemon/gvfsbackendftp.c:611
 #: ../daemon/gvfsbackendsftp.c:2253
@@ -934,8 +1019,8 @@ msgstr "Neveljavno oblikovano določilo ikone '%s'"
 #: ../daemon/gvfsbackendgphoto2.c:2052
 #: ../daemon/gvfsbackendgphoto2.c:3241
 #, c-format
-msgid "Error seeking in stream on camera %s"
-msgstr "Napaka med iskanjem pretoka na kameri %s"
+msgid "Error seeking in stream on camera '%s'"
+msgstr "Napaka med iskanjem pretoka na kameri '%s'"
 
 #: ../daemon/gvfsbackendgphoto2.c:2192
 #: ../daemon/gvfsbackendsftp.c:2872
@@ -1023,7 +1108,7 @@ msgstr "Ni podprto (vir je mapa, cilj je obstoječa datoteka)"
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Ni podprto (vir je datoteka, cilj je mapa)"
 
-#: ../daemon/gvfsbackendhttp.c:249
+#: ../daemon/gvfsbackendhttp.c:257
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "Napaka HTTP odjemalca: %s"
@@ -1070,7 +1155,7 @@ msgid "Device requires a software update"
 msgstr "Naprava zahteva programsko posodobitev"
 
 #: ../daemon/gvfsbackendobexftp.c:1836
-#: ../daemon/gvfsbackendsmb.c:1892
+#: ../daemon/gvfsbackendsmb.c:1925
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Napaka med brisanjem datoteke: %s"
@@ -1178,13 +1263,6 @@ msgstr "sftp na %s"
 msgid "Unable to find supported ssh command"
 msgstr "Ni mogoče najti podprtega ssh ukaza"
 
-#: ../daemon/gvfsbackendsftp.c:1752
-#: ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665
-#: ../daemon/gvfsftptask.c:392
-msgid "Operation unsupported"
-msgstr "Dejanje ni podprto"
-
 #: ../daemon/gvfsbackendsftp.c:1929
 #: ../daemon/gvfsbackendsftp.c:2318
 #: ../daemon/gvfsbackendsftp.c:2397
@@ -1247,7 +1325,7 @@ msgid "Unable to create temporary file"
 msgstr "Ni mogoče ustvariti začasne datoteke"
 
 #: ../daemon/gvfsbackendsftp.c:4195
-#: ../daemon/gvfsbackendsmb.c:1990
+#: ../daemon/gvfsbackendsmb.c:2023
 msgid "Can't move directory over directory"
 msgstr "Ni mogoče premakniti mape čez mapo"
 
@@ -1279,21 +1357,21 @@ msgstr "Nepodprta vrsta iskanja"
 msgid "Backup file creation failed: %s"
 msgstr "Ni mogoče ustvariti varnostne kopije: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1966
+#: ../daemon/gvfsbackendsmb.c:1999
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Napaka med premikanjem datoteke: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2038
+#: ../daemon/gvfsbackendsmb.c:2071
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Napaka med odstranjevanjem ciljne datoteke: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2062
+#: ../daemon/gvfsbackendsmb.c:2095
 msgid "Can't recursively move directory"
 msgstr "Ni mogoče po strukturi map premakniti mape"
 
-#: ../daemon/gvfsbackendsmb.c:2128
+#: ../daemon/gvfsbackendsmb.c:2161
 msgid "Windows Shares Filesystem Service"
 msgstr "Storitev Souporabe datotečnega sistema Oken"
 
@@ -1566,24 +1644,24 @@ msgstr ""
 msgid "Start Anyway"
 msgstr "Vseeno zaženi"
 
-#: ../monitor/gdu/ggdumount.c:817
+#: ../monitor/gdu/ggdumount.c:856
 msgid "One or more programs are preventing the unmount operation."
 msgstr "En ali več programov preprečujejo odklop pogona."
 
-#: ../monitor/gdu/ggdumount.c:945
+#: ../monitor/gdu/ggdumount.c:984
 msgid "Cannot get LUKS cleartext slave"
 msgstr "Ni mogoče pridobiti LUKS cleartext podrejenega procesa"
 
-#: ../monitor/gdu/ggdumount.c:967
+#: ../monitor/gdu/ggdumount.c:1006
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "Ni mogoče pridobiti LUKS cleartext podrejenega procesa na poti `%s'"
 
-#: ../monitor/gdu/ggduvolume.c:308
+#: ../monitor/gdu/ggduvolume.c:313
 msgid "Floppy Disk"
 msgstr "Disketna enota"
 
-#: ../monitor/gdu/ggduvolume.c:989
+#: ../monitor/gdu/ggduvolume.c:999
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1592,7 +1670,7 @@ msgstr ""
 "Vnesite geslo za odklepanje pogona\n"
 "Naprava \"%s\" vsebuje tudi šifrirane podatke na razdelku %d."
 
-#: ../monitor/gdu/ggduvolume.c:996
+#: ../monitor/gdu/ggduvolume.c:1006
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1601,7 +1679,7 @@ msgstr ""
 "Vnesite geslo za odklepanje pogona\n"
 "Naprava \"%s\" vsebuje tudi šifrirane podatke."
 
-#: ../monitor/gdu/ggduvolume.c:1003
+#: ../monitor/gdu/ggduvolume.c:1013
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1951,13 +2029,13 @@ msgstr "Mešani zvočno-podatkovni disk"
 #: ../monitor/hal/ghalvolume.c:255
 #, c-format
 msgid "%s Media"
-msgstr "%s Medij"
+msgstr "%s nosilec"
 
 #. Translators: %s is the size of the volume (e.g. 512 MB)
 #: ../monitor/hal/ghalvolume.c:232
 #, c-format
 msgid "%s Encrypted Data"
-msgstr "%s šifrirani podatki"
+msgstr "%s šifrirani nosilec"
 
 #: ../programs/gvfs-cat.c:37
 msgid "locations"
@@ -2219,7 +2297,7 @@ msgstr "Uporabi zapis v dolgi obliki"
 
 #: ../programs/gvfs-ls.c:42
 msgid "Show completions"
-msgstr "Prikaži zaključke"
+msgstr "Pokaži dopolnjevanje"
 
 #: ../programs/gvfs-ls.c:164
 #: ../programs/gvfs-ls.c:171
@@ -2268,7 +2346,7 @@ msgstr "Seznam"
 
 #: ../programs/gvfs-mount.c:59
 msgid "Show extra information for List and Monitor"
-msgstr "Prikaži več podrobnosti sezama in nadzornika"
+msgstr "Pokaži več podrobnosti sezama in nadzornika"
 
 #: ../programs/gvfs-mount.c:60
 msgid "Monitor events"
