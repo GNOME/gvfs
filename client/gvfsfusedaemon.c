@@ -784,7 +784,8 @@ getattr_for_file (GFile *file, struct stat *sbuf)
                                  G_FILE_ATTRIBUTE_TIME_MODIFIED ","
                                  G_FILE_ATTRIBUTE_TIME_ACCESS ","
                                  G_FILE_ATTRIBUTE_UNIX_BLOCK_SIZE ","
-                                 G_FILE_ATTRIBUTE_UNIX_BLOCKS,
+                                 G_FILE_ATTRIBUTE_UNIX_BLOCKS ","
+				 "access::*",
                                  0, NULL, &error);
 
   if (file_info)
