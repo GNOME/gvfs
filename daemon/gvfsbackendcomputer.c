@@ -440,7 +440,7 @@ recompute_files (GVfsBackendComputer *backend)
                                                               G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
           file->icon = g_mount_get_icon (file->mount);
           file->display_name = display_name;
-          file->root = g_mount_get_root (file->mount);
+          file->root = g_mount_get_default_location (file->mount);
           file->can_unmount = g_mount_can_unmount (file->mount);
           file->can_eject = g_mount_can_eject (file->mount);
         }
