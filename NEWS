@@ -1,3 +1,13 @@
+Major changes in 1.4.2
+======================
+
+* ftp: fix parsing of CMU/VMS-IP listings
+* metadata: Make more robust
+* fuse: Return ENOSYS for readlink
+* http: Return icons for query_file_info
+* smb: Support querying free space
+* fuse: Support setting timestamps
+
 Major changes in 1.4.1
 ======================
 * Translation updates
