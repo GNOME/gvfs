@@ -675,7 +675,8 @@ register_mount (DBusConnection *connection,
   DBusMessage *reply;
   DBusError error;
   const char *display_name, *stable_name, *x_content_types, *icon, *obj_path;
-  const char *id, *prefered_filename_encoding, *default_location;
+  const char *id, *prefered_filename_encoding;
+  char *default_location;
   dbus_bool_t user_visible;
   DBusMessageIter iter;
   GMountSpec *mount_spec;
