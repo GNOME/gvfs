@@ -1267,6 +1267,7 @@ _g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
 				       DBUS_TYPE_ARRAY, DBUS_TYPE_STRING, &val, g_strv_length (val),
 				       0);
 	}
+      g_strfreev (current);
     }
   else if (type == G_FILE_ATTRIBUTE_TYPE_INVALID)
     {
