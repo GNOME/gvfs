@@ -64,16 +64,9 @@ struct _GProxyDrive {
 
 static void g_proxy_drive_drive_iface_init (GDriveIface *iface);
 
-#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
-  const GInterfaceInfo g_implement_interface_info = { \
-    (GInterfaceInitFunc) iface_init, NULL, NULL \
-  }; \
-  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
-}
-
 G_DEFINE_DYNAMIC_TYPE_EXTENDED (GProxyDrive, g_proxy_drive, G_TYPE_OBJECT, 0,
-                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_DRIVE,
-                                                                g_proxy_drive_drive_iface_init))
+                                G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_DRIVE,
+                                                               g_proxy_drive_drive_iface_init))
 
 static void
 g_proxy_drive_finalize (GObject *object)

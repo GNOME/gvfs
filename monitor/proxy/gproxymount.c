@@ -58,15 +58,9 @@ struct _GProxyMount {
 
 static void g_proxy_mount_mount_iface_init (GMountIface *iface);
 
-#define _G_IMPLEMENT_INTERFACE_DYNAMIC(TYPE_IFACE, iface_init)       { \
-  const GInterfaceInfo g_implement_interface_info = { \
-    (GInterfaceInitFunc) iface_init, NULL, NULL \
-  }; \
-  g_type_module_add_interface (type_module, g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
-}
 G_DEFINE_DYNAMIC_TYPE_EXTENDED (GProxyMount, g_proxy_mount, G_TYPE_OBJECT, 0,
-                                _G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_MOUNT,
-                                                                g_proxy_mount_mount_iface_init))
+                                G_IMPLEMENT_INTERFACE_DYNAMIC (G_TYPE_MOUNT,
+                                                               g_proxy_mount_mount_iface_init))
 
 static void
 g_proxy_mount_finalize (GObject *object)
