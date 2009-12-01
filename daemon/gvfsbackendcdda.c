@@ -316,7 +316,6 @@ do_mount (GVfsBackend *backend,
   GVfsBackendCdda *cdda_backend = G_VFS_BACKEND_CDDA (backend);
   GError *error = NULL;
   GMountSpec *cdda_mount_spec;
-  DBusError dbus_error;
 
   //g_warning ("do_mount %p", cdda_backend);
 
@@ -339,6 +338,7 @@ do_mount (GVfsBackend *backend,
   g_signal_connect (cdda_backend->gudev_client, "uevent", G_CALLBACK (on_uevent), cdda_backend);
 
 #elif defined(HAVE_HAL)
+  DBusError dbus_error;
 
   /* setup libhal */
 
