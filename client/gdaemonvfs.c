@@ -1240,7 +1240,7 @@ _g_daemon_vfs_append_metadata_for_set (DBusMessage *message,
   res = 0;
   if (type == G_FILE_ATTRIBUTE_TYPE_STRING)
     {
-      const char *current;
+      char *current;
       const char *val = (char *)value;
 
       current = meta_tree_lookup_string (tree, path, key);
