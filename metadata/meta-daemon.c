@@ -321,7 +321,7 @@ metadata_get (const char *treefile,
 	      DBusError *derror)
 {
   TreeInfo *info;
-  const char *key;
+  char *key;
   DBusMessage *reply;
   DBusMessageIter reply_iter;
   GPtrArray *keys;
