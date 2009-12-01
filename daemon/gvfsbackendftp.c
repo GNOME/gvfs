@@ -1167,6 +1167,9 @@ ftp_output_stream_splice (GOutputStream *output,
   GCancellable *current, *timer_cancel;
   gulong cancel_cb_id;
 
+  timer_cancel = NULL;
+  cancel_cb_id = 0;
+
   bytes_copied = 0;
   if (progress_callback)
     {
