@@ -1657,7 +1657,7 @@ meta_tree_lookup_stringv   (MetaTree                         *tree,
       num_strings = GUINT32_FROM_BE (stringv->num_strings);
       res = g_new (char *, num_strings + 1);
       for (i = 0; i < num_strings; i++)
-	res[i] = verify_string (tree, stringv->strings[i]);
+	res[i] = g_strdup (verify_string (tree, stringv->strings[i]));
       res[i] = NULL;
     }
 
