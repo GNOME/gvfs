@@ -101,49 +101,6 @@ g_gphoto2_volume_init (GGPhoto2Volume *gphoto2_volume)
 {
 }
 
-static gboolean
-changed_in_idle (gpointer data)
-{
-  GGPhoto2Volume *volume = data;
-
-  g_signal_emit_by_name (volume, "changed");
-  if (volume->volume_monitor != NULL)
-    g_signal_emit_by_name (volume->volume_monitor, "volume_changed", volume);
-  g_object_unref (volume);
-
-  return FALSE;
-}
-
-static char **
-dupv_and_uniqify (char **str_array)
-{
-  int n, m, o;
-  int len;
-  char **result;
-
-  result = g_strdupv (str_array);
-  len = g_strv_length (result);
-
-  for (n = 0; n < len; n++)
-    {
-      char *s = result[n];
-      for (m = n + 1; m < len; m++)
-        {
-          char *p = result[m];
-          if (strcmp (s, p) == 0)
-            {
-              for (o = m + 1; o < len; o++)
-                result[o - 1] = result[o];
-              len--;
-              result[len] = NULL;
-              m--;
-            }
-        }
-    }
-
-  return result;
-}
-
 #ifdef HAVE_GUDEV
 static int hexdigit(char c)
 {
@@ -258,6 +215,49 @@ set_volume_icon (GGPhoto2Volume *volume)
 }
 
 #else
+static gboolean
+changed_in_idle (gpointer data)
+{
+  GGPhoto2Volume *volume = data;
+
+  g_signal_emit_by_name (volume, "changed");
+  if (volume->volume_monitor != NULL)
+    g_signal_emit_by_name (volume->volume_monitor, "volume_changed", volume);
+  g_object_unref (volume);
+
+  return FALSE;
+}
+
+static char **
+dupv_and_uniqify (char **str_array)
+{
+  int n, m, o;
+  int len;
+  char **result;
+
+  result = g_strdupv (str_array);
+  len = g_strv_length (result);
+
+  for (n = 0; n < len; n++)
+    {
+      char *s = result[n];
+      for (m = n + 1; m < len; m++)
+        {
+          char *p = result[m];
+          if (strcmp (s, p) == 0)
+            {
+              for (o = m + 1; o < len; o++)
+                result[o - 1] = result[o];
+              len--;
+              result[len] = NULL;
+              m--;
+            }
+        }
+    }
+
+  return result;
+}
+
 static void
 do_update_from_hal_for_camera (GGPhoto2Volume *v)
 {
