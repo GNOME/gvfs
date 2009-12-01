@@ -269,7 +269,7 @@ trigger_async_done (GDaemonFileEnumerator *daemon, gboolean ok)
 	}
       daemon->infos = rest;
 
-      g_list_foreach (l, add_metadata, daemon);
+      g_list_foreach (l, (GFunc)add_metadata, daemon);
 
       g_simple_async_result_set_op_res_gpointer (daemon->async_res,
 						 l,
