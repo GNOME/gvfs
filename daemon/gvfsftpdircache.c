@@ -216,10 +216,10 @@ g_vfs_ftp_dir_cache_lookup_file_internal (GVfsFtpDirCache *  cache,
       g_vfs_ftp_dir_cache_entry_unref (entry);
     }
 
-  if (!g_vfs_ftp_task_is_in_error (task))
-    info = cache->funcs->lookup_uncached (task, file);
+  if (g_vfs_ftp_task_is_in_error (task))
+    return NULL;
 
-  return info;
+  return cache->funcs->lookup_uncached (task, file);
 }
 
 static GFileInfo *
