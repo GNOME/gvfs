@@ -191,6 +191,58 @@ gvfs_backend_ftp_setup_directory_cache (GVfsBackendFtp *ftp)
   ftp->dir_cache = g_vfs_ftp_dir_cache_new (ftp->dir_funcs);
 }
 
+static GVfsFtpFile *
+g_vfs_backend_create_file_from_reply (GVfsBackendFtp *ftp, const char *name)
+{
+  const char *end;
+
+  end = name + strlen (name);
+
+  /* strip leading spaces */
+  while (g_ascii_isspace (*name))
+    name++;
+
+  /* strip leading and trailing quote character */
+  /* FIXME: need to unescape th contained string? */
+  if (*name == '"' && end[-1] == '"')
+    {
+      name++;
+      end--;
+    }
+
+  if (*end == '\0') {
+    return g_vfs_ftp_file_new_from_ftp (ftp, name);
+  } else {
+    char *s = g_strndup (name, end - name);
+    GVfsFtpFile *file = g_vfs_ftp_file_new_from_ftp (ftp, s);
+    g_free (s);
+    return file;
+  }
+}
+
+static void
+gvfs_backend_ftp_determine_default_location (GVfsFtpTask *task)
+{
+  char **reply;
+  GVfsFtpFile *home;
+
+  if (g_vfs_ftp_task_is_in_error (task))
+    return;
+
+  if (!g_vfs_ftp_task_send_and_check (task, 0, NULL, NULL, &reply, "PWD"))
+    {
+      g_vfs_ftp_task_clear_error (task);
+      return;
+    }
+
+  home = g_vfs_backend_create_file_from_reply (task->backend, reply[0] + 4);
+  g_vfs_backend_set_default_location (G_VFS_BACKEND (task->backend),
+                                      g_vfs_ftp_file_get_gvfs_path (home));
+  g_vfs_ftp_file_free (home);
+
+  g_strfreev (reply);
+}
+
 /*** COMMON FUNCTIONS WITH SPECIAL HANDLING ***/
 
 static gboolean
@@ -411,6 +463,7 @@ try_login:
   g_vfs_ftp_task_setup_connection (&task);
   gvfs_backend_ftp_determine_system (&task);
   gvfs_backend_ftp_setup_directory_cache (ftp);
+  gvfs_backend_ftp_determine_default_location (&task);
 
   /* Save the address of the current connection, so that for future connections,
    * we are sure to connect to the same machine.
