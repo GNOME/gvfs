@@ -77,6 +77,7 @@ struct _GGduVolume
   GFile *activation_root;
   gchar *name;
   gchar *device_file;
+  dev_t dev;
   gchar *uuid;
   gboolean can_mount;
   gboolean should_automount;
@@ -179,6 +180,7 @@ update_volume (GGduVolume *volume)
   gboolean old_should_automount;
   gchar *old_name;
   gchar *old_device_file;
+  dev_t old_dev;
   GIcon *old_icon;
   gboolean keep_cleartext_volume;
 
@@ -187,6 +189,7 @@ update_volume (GGduVolume *volume)
   old_should_automount = volume->should_automount;
   old_name = g_strdup (volume->name);
   old_device_file = g_strdup (volume->device_file);
+  old_dev = volume->dev;
   old_icon = volume->icon != NULL ? g_object_ref (volume->icon) : NULL;
 
   /* ---------------------------------------------------------------------------------------------------- */
@@ -194,11 +197,14 @@ update_volume (GGduVolume *volume)
   /* if the volume is a fstab mount point, get the data from there */
   if (volume->unix_mount_point != NULL)
     {
+      struct stat_buf;
+
       volume->can_mount = TRUE;
       volume->should_automount = FALSE;
 
       g_free (volume->device_file);
       volume->device_file = g_strdup (g_unix_mount_point_get_device_path (volume->unix_mount_point));
+      volume->dev = 0;
 
       if (volume->icon != NULL)
         g_object_unref (volume->icon);
@@ -289,9 +295,15 @@ update_volume (GGduVolume *volume)
 
       g_free (volume->device_file);
       if (luks_cleartext_volume_device != NULL)
-        volume->device_file = g_strdup (gdu_device_get_device_file (luks_cleartext_volume_device));
+        {
+          volume->device_file = g_strdup (gdu_device_get_device_file (luks_cleartext_volume_device));
+          volume->dev = gdu_device_get_dev (luks_cleartext_volume_device);
+        }
       else
-        volume->device_file = NULL;
+        {
+          volume->device_file = NULL;
+          volume->dev = 0;
+        }
 
       volume->can_mount = TRUE;
 
@@ -327,9 +339,15 @@ update_volume (GGduVolume *volume)
 
       g_free (volume->device_file);
       if (device != NULL)
-        volume->device_file = g_strdup (gdu_device_get_device_file (device));
+        {
+          volume->device_file = g_strdup (gdu_device_get_device_file (device));
+          volume->dev = gdu_device_get_dev (device);
+        }
       else
-        volume->device_file = NULL;
+        {
+          volume->device_file = NULL;
+          volume->dev = 0;
+        }
 
       volume->can_mount = TRUE;
 
@@ -369,6 +387,7 @@ update_volume (GGduVolume *volume)
               (old_should_automount == volume->should_automount) &&
               (g_strcmp0 (old_name, volume->name) == 0) &&
               (g_strcmp0 (old_device_file, volume->device_file) == 0) &&
+              (old_dev == volume->dev) &&
               g_icon_equal (old_icon, volume->icon)
               );
 
@@ -1673,6 +1692,28 @@ g_gdu_volume_volume_iface_init (GVolumeIface *iface)
   iface->get_identifier = g_gdu_volume_get_identifier;
   iface->enumerate_identifiers = g_gdu_volume_enumerate_identifiers;
   iface->get_activation_root = g_gdu_volume_get_activation_root;
+}
+
+gboolean
+g_gdu_volume_has_dev (GGduVolume   *volume,
+                      dev_t         dev)
+{
+  dev_t _dev;
+
+  _dev = volume->dev;
+
+  if (volume->cleartext_gdu_volume != NULL)
+    {
+      GduDevice *luks_cleartext_volume_device;
+      luks_cleartext_volume_device = gdu_presentable_get_device (GDU_PRESENTABLE (volume->cleartext_gdu_volume));
+      if (luks_cleartext_volume_device != NULL)
+        {
+          _dev = gdu_device_get_dev (luks_cleartext_volume_device);
+          g_object_unref (luks_cleartext_volume_device);
+        }
+    }
+
+  return _dev == dev;
 }
 
 gboolean

@@ -46,6 +46,7 @@ struct _GGduDrive {
   GIcon *icon;
   gchar *name;
   gchar *device_file;
+  dev_t dev;
   gboolean is_media_removable;
   gboolean has_media;
   gboolean can_eject;
@@ -128,6 +129,7 @@ update_drive (GGduDrive *drive)
   GIcon *old_icon;
   gchar *old_name;
   gchar *old_device_file;
+  dev_t old_dev;
   gboolean old_is_media_removable;
   gboolean old_has_media;
   gboolean old_can_eject;
@@ -151,6 +153,7 @@ update_drive (GGduDrive *drive)
 
   old_name = g_strdup (drive->name);
   old_device_file = g_strdup (drive->device_file);
+  old_dev = drive->dev;
   old_icon = drive->icon != NULL ? g_object_ref (drive->icon) : NULL;
 
   /* in with the new */
@@ -170,6 +173,7 @@ update_drive (GGduDrive *drive)
   if (device == NULL)
     {
       g_free (drive->device_file);
+      drive->dev = 0;
       drive->device_file = NULL;
       drive->is_media_removable = TRUE;
       drive->has_media = TRUE;
@@ -179,6 +183,7 @@ update_drive (GGduDrive *drive)
   else
     {
       g_free (drive->device_file);
+      drive->dev = gdu_device_get_dev (device);
       drive->device_file = g_strdup (gdu_device_get_device_file (device));
       drive->is_media_removable = gdu_device_is_removable (device);
       drive->has_media = gdu_device_is_media_available (device);
@@ -265,6 +270,7 @@ update_drive (GGduDrive *drive)
               (old_can_poll_for_media == drive->can_poll_for_media) &&
               (g_strcmp0 (old_name, drive->name) == 0) &&
               (g_strcmp0 (old_device_file, drive->device_file) == 0) &&
+              (old_dev == drive->dev) &&
               g_icon_equal (old_icon, drive->icon)
               );
 
@@ -1200,10 +1206,10 @@ g_gdu_drive_drive_iface_init (GDriveIface *iface)
 }
 
 gboolean
-g_gdu_drive_has_device_file (GGduDrive      *drive,
-                             const gchar    *device_file)
+g_gdu_drive_has_dev (GGduDrive      *drive,
+                     dev_t           dev)
 {
-  return g_strcmp0 (drive->device_file, device_file) == 0;
+  return drive->dev == dev;
 }
 
 gboolean

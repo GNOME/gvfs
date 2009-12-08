@@ -71,6 +71,8 @@ gboolean    g_gdu_volume_has_uuid       (GGduVolume       *volume,
                                          const char       *uuid);
 gboolean   g_gdu_volume_has_device_file (GGduVolume      *volume,
                                          const gchar     *device_file);
+gboolean   g_gdu_volume_has_dev         (GGduVolume       *volume,
+                                         dev_t             dev);
 
 GduPresentable *g_gdu_volume_get_presentable (GGduVolume *volume);
 
