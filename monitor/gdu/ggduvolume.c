@@ -351,13 +351,56 @@ update_volume (GGduVolume *volume)
 
       volume->can_mount = TRUE;
 
-      /* If a volume (partition) appear _much later_ than when media was insertion it
-       * can only be because the media was repartitioned. We don't want to automount
-       * such volumes.
+      /* Only automount filesystems from drives of known types/interconnects:
+       *
+       *  - USB
+       *  - Firewire
+       *  - sdio
+       *  - optical discs
+       *
+       * The mantra here is "be careful" - we really don't want to
+       * automount fs'es from all devices in a SAN etc - We REALLY
+       * need to be CAREFUL here.
+       *
+       * Sidebar: Actually, a surprisingly large number of admins like
+       *          to log into GNOME as root (thus having all polkit
+       *          authorizations) and if weren't careful we'd
+       *          automount all mountable devices from the box. See
+       *          the enterprise distro bug trackers for details.
        */
-      volume->should_automount = TRUE;
+      volume->should_automount = FALSE;
       if (volume->drive != NULL)
         {
+          GduPresentable *drive_presentable;
+          drive_presentable = g_gdu_drive_get_presentable (volume->drive);
+          if (drive_presentable != NULL)
+            {
+              GduDevice *drive_device;
+              drive_device = gdu_presentable_get_device (drive_presentable);
+              if (drive_device != NULL)
+                {
+                  if (gdu_device_is_drive (drive_device))
+                    {
+                      const gchar *connection_interface;
+
+                      connection_interface = gdu_device_drive_get_connection_interface (drive_device);
+
+                      if (g_strcmp0 (connection_interface, "usb") == 0 ||
+                          g_strcmp0 (connection_interface, "firewire") == 0 ||
+                          g_strcmp0 (connection_interface, "sdio") == 0 ||
+                          gdu_device_is_optical_disc (drive_device))
+                        {
+                          volume->should_automount = TRUE;
+                        }
+                    }
+                  g_object_unref (drive_device);
+                }
+            }
+
+          /* If a volume (partition) appear _much later_ than when media was inserted it
+           * can only be because the media was repartitioned. We don't want to automount
+           * such volumes.
+           */
           now = time (NULL);
           if (now - g_gdu_drive_get_time_of_last_media_insertion (volume->drive) > 5)
             volume->should_automount = FALSE;
