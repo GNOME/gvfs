@@ -988,7 +988,21 @@ mount_with_mount_operation (MountOpData *data)
 
   device = gdu_presentable_get_device (GDU_PRESENTABLE (data->volume->gdu_volume));
 
-  toplevel = gdu_presentable_get_toplevel (GDU_PRESENTABLE (data->volume->gdu_volume));
+  toplevel = gdu_presentable_get_enclosing_presentable (GDU_PRESENTABLE (data->volume->gdu_volume));
+  /* handle logical partitions enclosed by an extented partition */
+  if (GDU_IS_VOLUME (toplevel))
+    {
+      GduPresentable *temp;
+      temp = toplevel;
+      toplevel = gdu_presentable_get_enclosing_presentable (toplevel);
+      g_object_unref (temp);
+      if (!GDU_IS_DRIVE (toplevel))
+        {
+          g_object_unref (toplevel);
+          toplevel = NULL;
+        }
+    }
+
   if (toplevel != NULL)
     drive_name = gdu_presentable_get_name (toplevel);
 
