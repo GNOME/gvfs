@@ -52,8 +52,8 @@ void       g_gdu_drive_set_volume      (GGduDrive      *drive,
 void       g_gdu_drive_unset_volume    (GGduDrive      *drive,
                                         GGduVolume     *volume);
 void       g_gdu_drive_disconnected    (GGduDrive      *drive);
-gboolean   g_gdu_drive_has_device_file (GGduDrive      *drive,
-                                        const gchar    *device_file);
+gboolean   g_gdu_drive_has_dev         (GGduDrive      *drive,
+                                        dev_t           dev);
 time_t     g_gdu_drive_get_time_of_last_media_insertion (GGduDrive      *drive);
 
 gboolean   g_gdu_drive_has_presentable (GGduDrive       *drive,

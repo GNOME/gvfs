@@ -1061,16 +1061,37 @@ find_disc_volume_for_device_file (GGduVolumeMonitor *monitor,
                                   const gchar       *device_file)
 {
   GList *l;
+  GGduVolume *ret;
+  struct stat stat_buf;
+
+  ret = NULL;
+
+  if (stat (device_file, &stat_buf) == 0)
+    {
+      for (l = monitor->disc_volumes; l != NULL; l = l->next)
+        {
+          GGduVolume *volume = G_GDU_VOLUME (l->data);
+          if (g_gdu_volume_has_dev (volume, stat_buf.st_rdev))
+            {
+              ret = volume;
+              goto out;
+            }
+        }
+    }
 
   for (l = monitor->disc_volumes; l != NULL; l = l->next)
     {
       GGduVolume *volume = G_GDU_VOLUME (l->data);
 
       if (g_gdu_volume_has_device_file (volume, device_file))
-        return volume;
+        {
+          ret = volume;
+          goto out;
+        }
     }
 
-  return NULL;
+ out:
+  return ret;
 }
 
 static GGduVolume *
@@ -1079,8 +1100,23 @@ find_volume_for_device_file (GGduVolumeMonitor *monitor,
 {
   GList *l;
   GGduVolume *ret;
+  struct stat stat_buf;
 
   ret = NULL;
+
+  if (stat (device_file, &stat_buf) == 0)
+    {
+      for (l = monitor->volumes; l != NULL; l = l->next)
+        {
+          GGduVolume *volume = G_GDU_VOLUME (l->data);
+          if (g_gdu_volume_has_dev (volume, stat_buf.st_rdev))
+            {
+              ret = volume;
+              goto out;
+            }
+        }
+    }
+
   for (l = monitor->volumes; l != NULL; l = l->next)
     {
       GGduVolume *volume = G_GDU_VOLUME (l->data);
@@ -1113,12 +1149,19 @@ find_drive_by_device_file (GGduVolumeMonitor *monitor,
                            const gchar       *device_file)
 {
   GList *l;
+  struct stat stat_buf;
+
+  if (stat (device_file, &stat_buf) != 0)
+    {
+      g_warning ("%s:%s: Error statting %s: %m", G_STRLOC, G_STRFUNC, device_file);
+      return NULL;
+    }
 
   for (l = monitor->drives; l != NULL; l = l->next)
     {
       GGduDrive *drive = G_GDU_DRIVE (l->data);
 
-      if (g_gdu_drive_has_device_file (drive, device_file))
+      if (g_gdu_drive_has_dev (drive, stat_buf.st_rdev))
         return drive;
     }
 

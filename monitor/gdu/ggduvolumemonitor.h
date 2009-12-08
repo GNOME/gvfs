@@ -28,6 +28,11 @@
 #include <gio/gio.h>
 #include <gio/gunixmounts.h>
 
+/* for dev_t */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <gdu/gdu.h>
 
 G_BEGIN_DECLS
