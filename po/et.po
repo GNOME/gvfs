@@ -9,12 +9,12 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs HEAD\n"
+"Project-Id-Version: gvfs MASTER\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-08-28 15:33+0000\n"
-"PO-Revision-Date: 2009-09-11 23:02+0300\n"
-"Last-Translator: Mattias Põldaru <mahfiaz gmail com>\n"
+"POT-Creation-Date: 2009-11-18 13:07+0000\n"
+"PO-Revision-Date: 2009-12-10 11:21+0200\n"
+"Last-Translator: Ivar Smolin <okul@linux.ee>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,26 +24,16 @@ msgstr ""
 msgid "Operation not supported, files on different mounts"
 msgstr "Operatsioon pole toetatud, failid asuvad eri ketastel"
 
-msgid "Invalid return value from get_info"
-msgstr "get_info tagastas vigase väärtuse"
-
-msgid "Invalid return value from query_info"
-msgstr "query_info tagastas vigase väärtuse"
+#. Translators: %s is the name of a programming function
+#, c-format
+msgid "Invalid return value from %s"
+msgstr "%s tagastas vigase väärtuse"
 
 msgid "Couldn't get stream file descriptor"
 msgstr "Voo failideskriptorit pole võimalik hankida"
 
-msgid "Invalid return value from open"
-msgstr "open tagastas vigase väärtuse"
-
 msgid "Didn't get stream file descriptor"
 msgstr "Ei õnnestunud voofaili deskriptorit saada"
-
-msgid "Invalid return value from call"
-msgstr "call tagastas vigase väärtuse"
-
-msgid "Invalid return value from get_filesystem_info"
-msgstr "get_filesystem_info tagastas vigase väärtuse"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
@@ -54,21 +44,12 @@ msgstr "Haakepunktile vastavat kirjet ei leitud"
 msgid "Invalid filename %s"
 msgstr "Vigane failinimi %s"
 
-msgid "Invalid return value from query_filesystem_info"
-msgstr "query_filesystem_info tagastas vigase väärtuse"
-
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Viga faili metaandmete määramisel: %s"
 
 msgid "values must be string or list of strings"
 msgstr "väärtus peab olema sõne või sõnede loend"
-
-msgid "Invalid return value from monitor_dir"
-msgstr "monitor_dir tagastas vigase väärtuse"
-
-msgid "Invalid return value from monitor_file"
-msgstr "monitor_file tagastas vigase väärtuse"
 
 msgid "Operation was cancelled"
 msgstr "Operatsioon katkestati"
@@ -93,9 +74,6 @@ msgstr "Seansisiiniga pole võimalik ühenduda"
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Viga deemoniga ühendumisel: %s"
-
-msgid "Invalid return value from open_icon_for_read"
-msgstr "open_icon_for_read tagastas sobimatu väärtuse"
 
 #, c-format
 msgid "Error creating socket: %s"
@@ -208,6 +186,73 @@ msgstr ""
 "Köide on hõivatud\n"
 "Vähemalt üks rakendus hoiab köidet hõivatuna."
 
+msgid "Internal Apple File Control error"
+msgstr ""
+
+msgid "File does not exist"
+msgstr "Faili pole olemas"
+
+msgid "The directory is not empty"
+msgstr "Kataloog pole tühi"
+
+msgid "The device did not respond"
+msgstr "Seade ei reageeri"
+
+msgid "The connection was interrupted"
+msgstr "Ühendused katkestati"
+
+msgid "Invalid Apple File Control data received"
+msgstr ""
+
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr ""
+
+msgid "Lockdown Error: Invalid Argument"
+msgstr ""
+
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr ""
+
+msgid "iPhone Device Error: Invalid Argument"
+msgstr ""
+
+msgid ""
+"iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr ""
+
+#, c-format
+msgid "Unhandled iPhone Device error (%d)"
+msgstr ""
+
+msgid "Invalid mount spec"
+msgstr "Vigane ühendamiskirjeldus"
+
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr ""
+
+#, c-format
+msgid "Service %d on Apple Mobile Device"
+msgstr ""
+
+#, c-format
+msgid "Apple Mobile Device"
+msgstr ""
+
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+msgid "Backups are not yet supported."
+msgstr "Varukoopiad pole veel toetatud"
+
+msgid "Invalid seek type"
+msgstr ""
+
+msgid "Operation unsupported"
+msgstr "Operatsioon pole toetatud"
+
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
@@ -217,9 +262,6 @@ msgstr "hosti %s /"
 
 msgid "No hostname specified"
 msgstr "Hostinimi on määramata"
-
-msgid "Invalid mount spec"
-msgstr "Vigane ühendamiskirjeldus"
 
 #, c-format
 msgid "File doesn't exist"
@@ -456,9 +498,6 @@ msgstr "ftp kasutaja %s hostil %s"
 msgid "Insufficient permissions"
 msgstr "Puuduvad õigused"
 
-msgid "File does not exist"
-msgstr "Faili pole olemas"
-
 msgid "File is directory"
 msgstr "Fail on kataloog"
 
@@ -622,9 +661,6 @@ msgstr "Pole toetatud (lähtekoht on fail, sihtkoht on kataloog)"
 msgid "HTTP Client Error: %s"
 msgstr "HTTP-kliendi viga: %s"
 
-msgid " (invalid encoding)"
-msgstr " (vigane kodeering)"
-
 msgid "Directory notification not supported"
 msgstr "Kataloogiteavitus pole toetatud"
 
@@ -655,6 +691,10 @@ msgstr "Ühendus seadmega on katkenud"
 
 msgid "Device requires a software update"
 msgstr "Seadmele on vaja teha tarkvarauuendus"
+
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Viga faili kustutamisel: %s"
 
 msgid "ssh program unexpectedly exited"
 msgstr "ssh-programm lõpetas ootamatult"
@@ -735,11 +775,11 @@ msgstr "sftp hostil %s"
 msgid "Unable to find supported ssh command"
 msgstr "Toetatud ssh-käsku pole võimalik leida"
 
-msgid "Operation unsupported"
-msgstr "Operatsioon pole toetatud"
-
 msgid "Invalid reply received"
 msgstr "Võeti vastu vigane vastus"
+
+msgid " (invalid encoding)"
+msgstr " (vigane kodeering)"
 
 msgid "Failure"
 msgstr "Tõrge"
@@ -777,10 +817,6 @@ msgstr "Kerimise tüüp pole toetatud"
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Tõrge varufaili loomisel: %s"
-
-#, c-format
-msgid "Error deleting file: %s"
-msgstr "Viga faili kustutamisel: %s"
 
 #, c-format
 msgid "Error moving file: %s"
@@ -1257,7 +1293,7 @@ msgid "%s Encrypted Data"
 msgstr "%s krüptitud andmed"
 
 msgid "locations"
-msgstr ""
+msgstr "asukohad"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1336,7 +1372,7 @@ msgstr ""
 
 #, c-format
 msgid "progress"
-msgstr ""
+msgstr "edenemine"
 
 msgid "- output files at <location>"
 msgstr ""
@@ -1355,7 +1391,7 @@ msgstr "Sihtkoht %s pole kataloog\n"
 
 #, c-format
 msgid "overwrite %s?"
-msgstr ""
+msgstr "kas kirjutada %s üle?"
 
 #, c-format
 msgid "Error copying file %s: %s\n"
@@ -1463,10 +1499,10 @@ msgid "- list files at <location>"
 msgstr ""
 
 msgid "create parent directories"
-msgstr ""
+msgstr "ülemiste kataloogide loomine"
 
-msgid "- delete files"
-msgstr ""
+msgid "- create directories"
+msgstr "- kataloogide loomine"
 
 #, c-format
 msgid "Error creating directory: %s\n"
@@ -1561,8 +1597,11 @@ msgstr ""
 msgid "ignore nonexistent files, never prompt"
 msgstr ""
 
+msgid "- delete files"
+msgstr "- failide kustutamine"
+
 msgid "Create backup"
-msgstr ""
+msgstr "Varukoopia loomine"
 
 msgid "Only create if not existing"
 msgstr ""
@@ -1630,6 +1669,30 @@ msgstr ""
 
 msgid "- list contents of directories in a tree-like format"
 msgstr ""
+
+#~ msgid "Invalid return value from get_info"
+#~ msgstr "get_info tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from query_info"
+#~ msgstr "query_info tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from call"
+#~ msgstr "call tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from get_filesystem_info"
+#~ msgstr "get_filesystem_info tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from query_filesystem_info"
+#~ msgstr "query_filesystem_info tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from monitor_dir"
+#~ msgstr "monitor_dir tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from monitor_file"
+#~ msgstr "monitor_file tagastas vigase väärtuse"
+
+#~ msgid "Invalid return value from open_icon_for_read"
+#~ msgstr "open_icon_for_read tagastas sobimatu väärtuse"
 
 #~ msgid "Out of memory while reading directory contents"
 #~ msgstr "Kataloogi sisu lugemisel lõppes mälu"
