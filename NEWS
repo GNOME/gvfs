@@ -1,3 +1,12 @@
+Major changes in 1.4.3
+======================
+* smb: Fix free space calculation on older samba servers
+* metadata: Fix memory leak
+* ftp: Fix some uninitilized variable reads
+* gdu: Only automount whitelisted volume types
+* gdu: Fix with newer versions of mount(8)
+* gdu: Fix with newer versions of gnome-disk-utility
+
 Major changes in 1.4.2
 ======================
 
