@@ -518,7 +518,7 @@ recompute_files (GVfsBackendComputer *backend)
   
   file = g_slice_new0 (ComputerFile);
   file->filename = g_strdup ("root.link");
-  file->display_name = g_strdup (_("Filesystem"));
+  file->display_name = g_strdup (_("File System"));
   file->icon = g_themed_icon_new ("drive-harddisk");
   file->root = g_file_new_for_path ("/");
   file->prio = 0;
