@@ -365,11 +365,17 @@ do_mount (GVfsBackend *backend,
                 		     port == 21 ? 0 : port,
                 		     &username,
                 		     NULL,
-                		     &password))
+                		     &password) &&
+      username != NULL &&
+      password != NULL)
     {
       anonymous = FALSE;
       goto try_login;
     }
+  g_free (username);
+  g_free (password);
+  username = NULL;
+  password = NULL;
 
   while (TRUE)
     {
