@@ -502,9 +502,28 @@ g_vfs_backend_obexftp_finalize (GObject *object)
 static void
 g_vfs_backend_obexftp_init (GVfsBackendObexftp *backend)
 {
+  DBusConnection *conn;
+  DBusGConnection *connection;
+  DBusError error;
   GError *err = NULL;
 
-  backend->connection = dbus_g_bus_get (DBUS_BUS_SESSION, &err);
+  /* Otherwise dbus-glib doesn't setup it value types */
+  connection = dbus_g_bus_get (DBUS_BUS_SESSION, NULL);
+
+  if (connection != NULL)
+        dbus_g_connection_unref (connection);
+
+  /* Connect to the session bus via a private connection */
+  dbus_error_init (&error);
+  conn = dbus_bus_get_private (DBUS_BUS_SESSION, &error);
+  if (conn == NULL) {
+      g_printerr ("Connecting to session bus failed: %s\n", err->message);
+      dbus_error_free (&error);
+      return;
+  }
+  dbus_connection_setup_with_g_main (conn, NULL);
+
+  backend->connection = dbus_connection_get_g_connection (conn);
   if (backend->connection == NULL) {
       g_printerr ("Connecting to session bus failed: %s\n", err->message);
       g_error_free (err);
