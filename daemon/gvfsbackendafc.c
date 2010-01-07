@@ -765,10 +765,11 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
       if (g_str_equal (afcinfo[i], "st_size"))
         {
           g_file_info_set_size (info, atoll(afcinfo[i+1]));
-        } else if (g_str_equal (afcinfo[i], "st_blocks"))
-          {
+        }
+      else if (g_str_equal (afcinfo[i], "st_blocks"))
+        {
             g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_UNIX_BLOCKS, atoi(afcinfo[i+1]));
-          }
+        }
       else if (g_str_equal (afcinfo[i], "st_ifmt"))
         {
           if (g_str_equal (afcinfo[i+1], "S_IFREG"))
