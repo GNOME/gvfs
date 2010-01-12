@@ -32,6 +32,14 @@ distclean-local:
 		rm -f ChangeLog; \
 	fi
 
+install-data-hook:
+	if test -z "$(DESTDIR)" ; then					\
+		$(GIO_QUERYMODULES) $(DESTDIR)$(giomodulesdir) ;	\
+	fi
+
+uninstall-local:
+	$(RM) $(DESTDIR)$(GIO_MODULE_DIR)/giomodules.cache
+
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \
 	  (GIT_DIR=$(top_srcdir)/.git ./missing --run git log GVFS_1_2_2.. --stat -M -C --name-status  --date=short --no-color) | fmt --split-only > $@.tmp \

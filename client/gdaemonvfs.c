@@ -1587,3 +1587,14 @@ void
 g_io_module_unload (GIOModule   *module)
 {
 }
+
+char **
+g_io_module_query (void)
+{
+  char *eps[] = {
+    G_VFS_EXTENSION_POINT_NAME,
+    G_VOLUME_MONITOR_EXTENSION_POINT_NAME,
+    NULL
+  };
+  return g_strdupv (eps);
+}

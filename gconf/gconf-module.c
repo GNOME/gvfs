@@ -43,3 +43,13 @@ void
 g_io_module_unload (GIOModule *module)
 {
 }
+
+char **
+g_io_module_query (void)
+{
+  char *eps[] = {
+    G_DESKTOP_APP_INFO_LOOKUP_EXTENSION_POINT_NAME,
+    NULL
+  };
+  return g_strdupv (eps);
+}

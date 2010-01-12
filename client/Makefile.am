@@ -10,7 +10,7 @@ INCLUDES = -I$(top_srcdir) \
 	-DGVFS_LOCALEDIR=\""$(localedir)"\"     \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
-module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_vfs_.*|g_io_module_load|g_io_module_unload'
+module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_vfs_.*|g_io_module_load|g_io_module_unload|g_io_module_query'
 
 ## Common to dynamic and static client libs
 

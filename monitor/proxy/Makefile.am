@@ -3,7 +3,7 @@ NULL =
 
 remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors
 
-module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_io_module_(load|unload)'
+module_flags = -export_dynamic -avoid-version -module -no-undefined -export-symbols-regex '^g_io_module_(load|unload|query)'
 
 giomodules_LTLIBRARIES = libgioremote-volume-monitor.la
 
