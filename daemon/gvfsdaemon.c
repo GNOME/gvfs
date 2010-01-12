@@ -1081,6 +1081,7 @@ g_vfs_daemon_initiate_mount (GVfsDaemon *daemon,
 
   job = g_vfs_job_mount_new (mount_spec, mount_source, is_automount, request, backend);
   g_vfs_daemon_queue_job (daemon, job);
+  g_object_unref (job);
 }
 
 /**
