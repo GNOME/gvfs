@@ -280,7 +280,10 @@ trash_watcher_new (TrashRoot *root)
 void
 trash_watcher_free (TrashWatcher *watcher)
 {
-  g_assert_not_reached ();
+  /* We just leak everything here, as this is not normally hit.
+     This used to be a g_assert_not_reached(), and that got hit when
+     mounting the trash backend failed due to the trash already being
+     mounted. */
 }
 
 void
