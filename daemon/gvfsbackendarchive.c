@@ -590,6 +590,7 @@ do_unmount (GVfsBackend *backend,
   GVfsBackendArchive *ba = G_VFS_BACKEND_ARCHIVE (backend);
 
   g_object_unref (ba->file);
+  ba->file = NULL;
   archive_file_free (ba->files);
   ba->files = NULL;
 
