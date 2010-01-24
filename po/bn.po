@@ -1,95 +1,76 @@
 # Bengali Translation of the gvfs.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail.com>, 2008.
 # Runa Bhattacharjee <runab@redhat.com>, 2009.
 # Maruf Ovee <maruf@ankur.org.bd>, 2009.
+# Israt Jahan <israt@ankur.org.bd>, 2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs\n"
+"Project-Id-Version: bn\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-08-23 16:37+0000\n"
-"PO-Revision-Date: 2009-08-18 13:09+0700\n"
-"Last-Translator: Maruf Ovee <maruf@ankur.org.bd>\n"
+"POT-Creation-Date: 2009-11-18 13:07+0000\n"
+"PO-Revision-Date: 2010-01-24 13:09+0700\n"
+"Last-Translator: Israt Jahan <israt@ankur.org.bd>\n"
 "Language-Team: Bengali <ankur-bd-l10n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2373
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
 msgstr "এই কর্ম অসমর্থিত, ফাইলগুলো আলাদা মাউন্টে অবস্থিত"
 
-#: ../client/gdaemonfile.c:867
-msgid "Invalid return value from get_info"
-msgstr "get_info থেকে প্রাপ্ত মান সঠিক নয়"
+#. Translators: %s is the name of a programming function
+#: ../client/gdaemonfile.c:868 ../client/gdaemonfile.c:902
+#: ../client/gdaemonfile.c:1017 ../client/gdaemonfile.c:1096
+#: ../client/gdaemonfile.c:1159 ../client/gdaemonfile.c:1222
+#: ../client/gdaemonfile.c:1288 ../client/gdaemonfile.c:1350
+#: ../client/gdaemonfile.c:1367 ../client/gdaemonfile.c:1851
+#: ../client/gdaemonfile.c:1880 ../client/gdaemonfile.c:2036
+#: ../client/gdaemonfile.c:2536 ../client/gdaemonfile.c:2585
+#: ../client/gdaemonfile.c:2649 ../client/gdaemonfile.c:2733
+#: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
+#: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
+#: ../client/gvfsiconloadable.c:374
+#| msgid "Invalid return value from open"
+msgid "Invalid return value from %s"
+msgstr "%s থেকে প্রাপ্ত মান সঠিক নয়"
 
-#: ../client/gdaemonfile.c:901 ../client/gdaemonfile.c:1879
-msgid "Invalid return value from query_info"
-msgstr "query_info থেকে প্রাপ্ত মান সঠিক নয়"
-
-#: ../client/gdaemonfile.c:984 ../client/gvfsiconloadable.c:339
+#: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
 msgstr "স্ট্রীম ফাইলের বর্নণাকারী পাওয়া সম্ভব হয়নি"
 
-#: ../client/gdaemonfile.c:1016 ../client/gdaemonfile.c:1095
-#: ../client/gdaemonfile.c:1158 ../client/gdaemonfile.c:1221
-#: ../client/gdaemonfile.c:1287 ../client/gdaemonfile.c:2646
-#: ../client/gdaemonfile.c:2730 ../client/gdaemonfile.c:2993
-#: ../client/gvfsiconloadable.c:374
-msgid "Invalid return value from open"
-msgstr "open থেকে প্রাপ্ত মান সঠিক নয়"
-
-#: ../client/gdaemonfile.c:1105 ../client/gdaemonfile.c:1168
-#: ../client/gdaemonfile.c:1231 ../client/gdaemonfile.c:1297
-#: ../client/gdaemonfile.c:2612 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1106 ../client/gdaemonfile.c:1169
+#: ../client/gdaemonfile.c:1232 ../client/gdaemonfile.c:1298
+#: ../client/gdaemonfile.c:2615 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
 msgstr "স্ট্রীম ফাইলের বর্নণাকারী পাওয়া সম্ভব হয়নি"
 
-#: ../client/gdaemonfile.c:1349 ../client/gdaemonfile.c:1366
-msgid "Invalid return value from call"
-msgstr "call থেকে প্রাপ্ত মান সঠিক নয়"
-
-#: ../client/gdaemonfile.c:1850
-msgid "Invalid return value from get_filesystem_info"
-msgstr "get_filesystem_info থেকে প্রাপ্ত মান সঠিক নয়"
-
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1963
+#: ../client/gdaemonfile.c:1964
 msgid "Could not find enclosing mount"
 msgstr "এনক্লোজিং মাউন্ট খুঁজে পাওয়া যায়নি"
 
-#: ../client/gdaemonfile.c:1993
+#: ../client/gdaemonfile.c:1994
 #, c-format
 msgid "Invalid filename %s"
 msgstr "ফাইলের নাম %s সঠিক নয়"
 
-#: ../client/gdaemonfile.c:2035
-msgid "Invalid return value from query_filesystem_info"
-msgstr "query_filesystem_info থেকে প্রাপ্ত মান সঠিক নয়"
-
-#: ../client/gdaemonfile.c:2229 ../client/gdaemonvfs.c:1187
-#: ../client/gdaemonvfs.c:1321 ../client/gdaemonvfs.c:1374
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1188
+#: ../client/gdaemonvfs.c:1322 ../client/gdaemonvfs.c:1375
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "ফাইল মেটাডাটা সেটিং এ ত্রুটি: %s"
 
-#: ../client/gdaemonfile.c:2230 ../client/gdaemonvfs.c:1375
+#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1376
 msgid "values must be string or list of strings"
 msgstr "মান অবশ্যই স্ট্রিং অথবা স্ট্রিং এর তালিকা হতে হবে"
-
-#: ../client/gdaemonfile.c:2533
-msgid "Invalid return value from monitor_dir"
-msgstr "monitor_dir থেকে প্রাপ্ত মান সঠিক নয়"
-
-#: ../client/gdaemonfile.c:2582
-msgid "Invalid return value from monitor_file"
-msgstr "monitor_file থেকে প্রাপ্ত মান সঠিক নয়"
 
 #: ../client/gdaemonfileenumerator.c:448
 #: ../client/gdaemonfileinputstream.c:630
@@ -104,13 +85,13 @@ msgstr "monitor_file থেকে প্রাপ্ত মান সঠিক �
 #: ../daemon/gvfsbackendobexftp.c:1066 ../daemon/gvfsbackendobexftp.c:1087
 #: ../daemon/gvfsbackendobexftp.c:1206 ../daemon/gvfsbackendobexftp.c:1343
 #: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendobexftp.c:1609
-#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1866
-#: ../daemon/gvfsbackendobexftp.c:1893 ../daemon/gvfsbackendobexftp.c:1952
-#: ../daemon/gvfsbackendobexftp.c:1974 ../daemon/gvfsbackendobexftp.c:2037
-#: ../daemon/gvfsbackendobexftp.c:2056 ../daemon/gvfsbackendsmb.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1878
+#: ../daemon/gvfsbackendobexftp.c:1905 ../daemon/gvfsbackendobexftp.c:1964
+#: ../daemon/gvfsbackendobexftp.c:1986 ../daemon/gvfsbackendobexftp.c:2049
+#: ../daemon/gvfsbackendobexftp.c:2068 ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
-#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1030
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
 #: ../monitor/proxy/gproxydrive.c:521 ../monitor/proxy/gproxydrive.c:609
 #: ../monitor/proxy/gproxydrive.c:757 ../monitor/proxy/gproxydrive.c:892
 #: ../monitor/proxy/gproxydrive.c:943 ../monitor/proxy/gproxydrive.c:1067
@@ -143,12 +124,12 @@ msgstr "স্ট্রিমের শেষাংশ"
 msgid "Seek not supported on stream"
 msgstr "স্ট্রিমের ক্ষেত্রে seek কমান্ড সহযোগে খোঁজা সমর্থিত নয়"
 
-#: ../client/gdaemonvfs.c:831
+#: ../client/gdaemonvfs.c:832
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "মাউন্টের বর্ণনা প্রাপ্তিতে ত্রুটি: %s"
 
-#: ../client/gdaemonvfs.c:1188
+#: ../client/gdaemonvfs.c:1189
 msgid "Can't contact session bus"
 msgstr "সেশন বাসের সাথে সংযোগ স্থাপনে ব্যর্থ"
 
@@ -156,10 +137,6 @@ msgstr "সেশন বাসের সাথে সংযোগ স্থা�
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "daemon-এর সাথে সংযোগে ত্রুটি:%s"
-
-#: ../client/gvfsiconloadable.c:145
-msgid "Invalid return value from open_icon_for_read"
-msgstr "open_icon_for_read থেকে প্রাপ্ত মান সঠিক নয়"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -282,22 +259,123 @@ msgstr "%s-এর মাউন্টপয়েন্ট বর্তমানে 
 msgid "error starting mount daemon"
 msgstr "মাউন্ট daemon চালু করতে ত্রুটি ঘটেছে"
 
-#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:882
+#: ../daemon/gvfsbackend.c:899 ../monitor/gdu/ggdumount.c:921
 msgid "Unmount Anyway"
 msgstr "যাইহোক আন-মাউন্ট করা হবে"
 
-#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1010
-#: ../monitor/gdu/ggdumount.c:883
+#: ../daemon/gvfsbackend.c:900 ../monitor/gdu/ggdudrive.c:1015
+#: ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "বাতিল করুন"
 
-#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:884
+#: ../daemon/gvfsbackend.c:902 ../monitor/gdu/ggdumount.c:923
 msgid ""
 "Volume is busy\n"
 "One or more applications are keeping the volume busy."
 msgstr ""
 "ভলিউমটি ব্যস্ত\n"
 "এক বা একাধিক অ্যাপ্লিকেশন ভলিউমটি ব্যস্ত রাখছে"
+
+#: ../daemon/gvfsbackendafc.c:145
+msgid "Internal Apple File Control error"
+msgstr "অন্তর্বর্তী অ্যাপেল ফাইল কন্ট্রোল ত্রুটি"
+
+#: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:574
+msgid "File does not exist"
+msgstr "ফাইল অনুপস্থিত"
+
+#: ../daemon/gvfsbackendafc.c:152
+#| msgid "Directory not empty"
+msgid "The directory is not empty"
+msgstr "ডিরেক্টরি খালি নয়"
+
+#: ../daemon/gvfsbackendafc.c:156
+#| msgid "The file is not a directory"
+msgid "The device did not respond"
+msgstr "ডিভাইসটি সাড়া দেয়নি"
+
+#: ../daemon/gvfsbackendafc.c:160
+#| msgid "The specified location is not supported"
+msgid "The connection was interrupted"
+msgstr "সংযোগটি ব্যাহত হয়েছিল"
+
+#: ../daemon/gvfsbackendafc.c:164
+#| msgid "Invalid reply received"
+msgid "Invalid Apple File Control data received"
+msgstr "অকার্যকর অ্যাপল ফাইল কন্ট্রোল ডাটা গ্রহন করেছে"
+
+#: ../daemon/gvfsbackendafc.c:168
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "হ্যান্ডেল করা বিহীন ফাইল কন্ট্রোল ত্রুটি (%d)"
+
+#: ../daemon/gvfsbackendafc.c:185
+msgid "Lockdown Error: Invalid Argument"
+msgstr "লকডাউন ত্রুটি: অকার্যকর আর্গুমেন্ট"
+
+#: ../daemon/gvfsbackendafc.c:189
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "হ্যান্ডেল করা বিহীন লকডাউন ত্রুটি (%d)"
+
+#: ../daemon/gvfsbackendafc.c:206
+msgid "iPhone Device Error: Invalid Argument"
+msgstr "iPhone ডিভাইস ত্রুটি: অকার্যকর আর্গুমেন্ট"
+
+#: ../daemon/gvfsbackendafc.c:210
+msgid ""
+"iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr ""
+"iPhone ডিভাইস ত্রুটি: কোনো ডিভাইস পাওয়া যায়নি। নিশ্চিত করুন যে usbmuxd "
+"সঠিকভাবে সেট করা হয়েছে।"
+
+#: ../daemon/gvfsbackendafc.c:213
+#, c-format
+msgid "Unhandled iPhone Device error (%d)"
+msgstr "হ্যান্ডেল করা বিহীন iPhone ডিভাইস ত্রুটি (%d)"
+
+#: ../daemon/gvfsbackendafc.c:274 ../daemon/gvfsbackendarchive.c:529
+#: ../daemon/gvfsbackendarchive.c:558 ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:842
+#: ../daemon/gvfsbackendobexftp.c:858 ../daemon/gvfsbackendobexftp.c:877
+#: ../daemon/gvfsbackendsmb.c:648
+msgid "Invalid mount spec"
+msgstr "মাউন্ট বর্ণনা সঠিক নয়"
+
+#: ../daemon/gvfsbackendafc.c:280
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "Invalid AFC location: must be in the form of afc://uuid:port-number"
+
+#: ../daemon/gvfsbackendafc.c:295
+#, c-format
+msgid "Service %d on Apple Mobile Device"
+msgstr "Service %d on Apple Mobile Device"
+
+#: ../daemon/gvfsbackendafc.c:301
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "অ্যাপেল মোবাইল ডিভাইস"
+
+#: ../daemon/gvfsbackendafc.c:351
+#| msgid "%s: %s"
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#: ../daemon/gvfsbackendafc.c:546 ../daemon/gvfsbackendafc.c:1253
+#| msgid "backups not supported yet"
+msgid "Backups are not yet supported."
+msgstr "ব্যাক আপের জন্য সমর্থন অনুপস্থিত।"
+
+#: ../daemon/gvfsbackendafc.c:684
+#| msgid "Invalid backend type"
+msgid "Invalid seek type"
+msgstr "অকার্যকর অনুসন্ধাণ ধরণ"
+
+#: ../daemon/gvfsbackendafc.c:1172 ../daemon/gvfsbackendsftp.c:1752
+#: ../daemon/gvfsbackendsftp.c:4557 ../daemon/gvfsbackendsmb.c:1697
+#: ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "এই কর্মটি অসমর্থিত"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -308,22 +386,15 @@ msgstr ""
 msgid "/ on %s"
 msgstr "%s-র উপর"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:504
+#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:505
 #: ../daemon/gvfsbackendsftp.c:1680
 msgid "No hostname specified"
 msgstr "কোনো হোস্ট-এর নাম উল্লেখ করা হয়নি"
 
-#: ../daemon/gvfsbackendarchive.c:529 ../daemon/gvfsbackendarchive.c:558
-#: ../daemon/gvfsbackenddav.c:1631 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:842 ../daemon/gvfsbackendobexftp.c:858
-#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendsmb.c:648
-msgid "Invalid mount spec"
-msgstr "মাউন্ট বর্ণনা সঠিক নয়"
-
 #: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
 #: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
 #: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
-#: ../daemon/gvfsbackenddnssd.c:398 ../daemon/gvfsbackendftp.c:904
+#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:905
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
 #: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
 #: ../daemon/gvfsbackendsmbbrowse.c:1394
@@ -332,13 +403,13 @@ msgid "File doesn't exist"
 msgstr "ফাইল অনুপস্থিত"
 
 #: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1865 ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendgphoto2.c:1877 ../daemon/gvfsbackendobexftp.c:1052
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "ডিরেক্টরি খোলা সম্ভব হয়নি"
 
 #: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:445
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:206 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3803 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
@@ -357,9 +428,9 @@ msgstr "অস্থায়ী ডিরেক্টরি প্রস্তু�
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:630
-#: ../daemon/gvfsbackendgphoto2.c:1194 ../daemon/gvfsbackendgphoto2.c:2186
-#: ../daemon/gvfsbackendgphoto2.c:2905 ../daemon/gvfsbackendsftp.c:1756
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:631
+#: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2198
+#: ../daemon/gvfsbackendgphoto2.c:2917 ../daemon/gvfsbackendsftp.c:1756
 #: ../daemon/gvfsbackendsftp.c:2869 ../daemon/gvfsbackendsftp.c:2882
 #: ../daemon/gvfsbackendsftp.c:2902 ../daemon/gvfsbackendtrash.c:216
 #, c-format
@@ -384,7 +455,7 @@ msgstr "CD/DVD নির্মাণ ব্যবস্থা"
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2979
+#: ../daemon/gvfsbackendgphoto2.c:2991
 msgid "File exists"
 msgstr "ফাইল উপস্থিত রয়েছে"
 
@@ -407,8 +478,8 @@ msgstr "ফাইল উপস্থিত রয়েছে"
 #: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
 #: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
 #: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
-#: ../monitor/gdu/ggdumount.c:1134 ../monitor/gdu/ggdumount.c:1218
-#: ../monitor/gdu/ggduvolume.c:1525
+#: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
+#: ../monitor/gdu/ggduvolume.c:1519
 msgid "Operation not supported by backend"
 msgstr "এই কর্মটি ব্যাক-এন্ড দ্বারা সমর্থিত নয়"
 
@@ -416,7 +487,7 @@ msgstr "এই কর্মটি ব্যাক-এন্ড দ্বার�
 msgid "No such file or directory in target path"
 msgstr "উদ্দিষ্ট পাথে এই নামে ফাইল বা ডিরেক্টরি উপস্থিত নেই"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1287
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1288
 #: ../daemon/gvfsbackendobexftp.c:1760
 msgid "Can't copy directory over directory"
 msgstr "একটি ডিরেক্টরির উপরে অন্য ডিরেক্টরি অনুলিপি করা সম্ভব নয়"
@@ -427,30 +498,30 @@ msgstr "একটি ডিরেক্টরির উপরে অন্য �
 msgid "Target file exists"
 msgstr "উদ্দিষ্ট ফাইল উপস্থিত"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1310
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1311
 #: ../daemon/gvfsbackendobexftp.c:1775
 msgid "Can't recursively copy directory"
 msgstr "ডিরেক্টরিকে রিকার্সিভ পদ্ধতিতে অনুলিপি করা সম্ভব নয়"
 
 #: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2559 ../daemon/gvfsbackendgphoto2.c:2768
-#: ../daemon/gvfsbackendgphoto2.c:2865 ../daemon/gvfsbackendgphoto2.c:2958
+#: ../daemon/gvfsbackendgphoto2.c:2571 ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendgphoto2.c:2877 ../daemon/gvfsbackendgphoto2.c:2970
 msgid "Not supported"
 msgstr "সমর্থিত নয়"
 
-#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1496
+#: ../daemon/gvfsbackendcdda.c:333 ../daemon/gvfsbackendgphoto2.c:1508
 msgid "Cannot create gudev client"
 msgstr "gphoto2 ক্লায়েন্ট নির্মাণ করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1514
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1526
 msgid "Cannot connect to the system bus"
 msgstr "সিস্টেম বাসের সাথে সংযোগ স্থাপনে ব্যর্থ"
 
-#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1526
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1538
 msgid "Cannot create libhal context"
 msgstr "libhal কনটেক্সট নির্মাণ করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1551
 msgid "Cannot initialize libhal"
 msgstr "libhal আরম্ভ করতে ব্যর্থ"
 
@@ -475,7 +546,7 @@ msgid "cdda mount on %s"
 msgstr "%s-এর উপর cdda মাউন্ট"
 
 #: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
-#: ../monitor/gdu/ggduvolume.c:320 ../monitor/hal/ghalmount.c:325
+#: ../monitor/gdu/ggduvolume.c:325 ../monitor/hal/ghalmount.c:325
 #: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
@@ -504,7 +575,7 @@ msgstr "ড্রাইভ %s এ 'paranoia' থেকে উৎপন্ন ত
 msgid "Error seeking in stream on drive %s"
 msgstr "ড্রাইভ %s-এ স্ট্রীম খুঁজতে ত্রুটি"
 
-#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1873
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1885
 #, c-format
 msgid "No such file"
 msgstr "এই নামে ফাইল অনুপস্থিত"
@@ -570,7 +641,7 @@ msgid "Can't poll file"
 msgstr "ফাইল পোল করা সম্ভব হয়নি"
 
 #: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
-#: ../daemon/gvfsbackendhttp.c:252
+#: ../daemon/gvfsbackendhttp.c:261
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "HTTP ত্রুটি: %s"
@@ -618,10 +689,10 @@ msgid "Could not create request"
 msgstr "অনুরোধ তৈরি করা সম্ভব হয়নি"
 
 #: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
-#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:589
-#: ../daemon/gvfsbackendftp.c:770 ../daemon/gvfsbackendftp.c:1120
-#: ../daemon/gvfsbackendftp.c:1295 ../daemon/gvfsbackendsftp.c:4209
-#: ../daemon/gvfsbackendsmb.c:2001
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:590
+#: ../daemon/gvfsbackendftp.c:771 ../daemon/gvfsbackendftp.c:1121
+#: ../daemon/gvfsbackendftp.c:1296 ../daemon/gvfsbackendsftp.c:4209
+#: ../daemon/gvfsbackendsmb.c:2033
 msgid "Target file already exists"
 msgstr "উল্লিখিত ফাইল বর্তমানে উপস্থিত"
 
@@ -631,25 +702,25 @@ msgid "The file was externally modified"
 msgstr "ফাইলটি স্বতন্ত্ররূপে পরিবর্তন করা হয়েছে"
 
 #: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1168
-#: ../daemon/gvfsbackendsmb.c:2018
+#: ../daemon/gvfsbackendsmb.c:2050
 msgid "Backup file creation failed"
 msgstr "ব্যাকআপ ফাইল তৈরি করা সম্ভব হয়নি"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
+#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "স্থানীয় নেটওয়ার্ক"
 
-#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
+#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
 msgstr "ফাইল বা ডিরেক্টরি নিরীক্ষণ করা সম্ভব হয়নি"
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:754
+#: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
 #: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "নেটওয়ার্ক"
@@ -666,37 +737,33 @@ msgstr "%1$s রূপে %2$s-এর উপর ftp-এর জন্য পা�
 msgid "Enter password for ftp on %s"
 msgstr "%s-এর উপর ftp-এর জন্য পাসওয়ার্ড লিখুন"
 
-#: ../daemon/gvfsbackendftp.c:358 ../daemon/gvfsbackendsftp.c:969
+#: ../daemon/gvfsbackendftp.c:359 ../daemon/gvfsbackendsftp.c:969
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "পাসওয়ার্ড ডায়ালগ বন্ধ করা হয়েছে"
 
-#: ../daemon/gvfsbackendftp.c:467
+#: ../daemon/gvfsbackendftp.c:468
 #, c-format
 msgid "ftp on %s"
 msgstr "%s-এর উপর ftp"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:471
+#: ../daemon/gvfsbackendftp.c:472
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "%1$s নামে %2$s-তে ftp করুন"
 
-#: ../daemon/gvfsbackendftp.c:564
+#: ../daemon/gvfsbackendftp.c:565
 msgid "Insufficient permissions"
 msgstr "অপর্যাপ্ত অনুমতি"
 
-#: ../daemon/gvfsbackendftp.c:573
-msgid "File does not exist"
-msgstr "ফাইল অনুপস্থিত"
-
-#: ../daemon/gvfsbackendftp.c:610 ../daemon/gvfsbackendsftp.c:2253
+#: ../daemon/gvfsbackendftp.c:611 ../daemon/gvfsbackendsftp.c:2253
 #: ../daemon/gvfsbackendsftp.c:2989 ../daemon/gvfsbackendsftp.c:3330
 #: ../daemon/gvfsbackendsftp.c:4200
 msgid "File is directory"
 msgstr "চিহ্নিত ফাইলটি ডিরেক্টরি"
 
-#: ../daemon/gvfsbackendftp.c:818 ../daemon/gvfsbackendftp.c:1083
+#: ../daemon/gvfsbackendftp.c:819 ../daemon/gvfsbackendftp.c:1084
 #: ../daemon/gvfsbackendsftp.c:3196
 msgid "backups not supported yet"
 msgstr "ব্যাক আপের জন্য সমর্থন অনুপস্থিত"
@@ -729,7 +796,7 @@ msgstr "ডিজিটাল ক্যামেরা (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:936 ../monitor/gphoto2/ggphoto2volume.c:240
+#: ../daemon/gvfsbackendgphoto2.c:947 ../monitor/gphoto2/ggphoto2volume.c:240
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
@@ -737,181 +804,176 @@ msgstr "%s ক্যামেরা"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:939 ../monitor/gphoto2/ggphoto2volume.c:235
+#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:235
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s অডিও প্লেয়ার"
 
-#: ../daemon/gvfsbackendgphoto2.c:948 ../monitor/gphoto2/ggphoto2volume.c:246
+#: ../daemon/gvfsbackendgphoto2.c:959 ../monitor/gphoto2/ggphoto2volume.c:246
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "ক্যামেরা"
 
-#: ../daemon/gvfsbackendgphoto2.c:950 ../monitor/gphoto2/ggphoto2volume.c:306
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "অডিও প্লেয়ার"
 
-#: ../daemon/gvfsbackendgphoto2.c:1555
+#: ../daemon/gvfsbackendgphoto2.c:1567
 msgid "No device specified"
 msgstr "কোনো ডিভাইস চিহ্নিত করা হয়নি"
 
-#: ../daemon/gvfsbackendgphoto2.c:1576
+#: ../daemon/gvfsbackendgphoto2.c:1588
 msgid "Cannot create gphoto2 context"
 msgstr "gphoto2 কনটেক্সট নির্মাণ করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:1586
+#: ../daemon/gvfsbackendgphoto2.c:1598
 msgid "Error creating camera"
 msgstr "ক্যামেরা তৈরি করতে ত্রুটি"
 
-#: ../daemon/gvfsbackendgphoto2.c:1599 ../daemon/gvfsbackendgphoto2.c:1609
+#: ../daemon/gvfsbackendgphoto2.c:1611 ../daemon/gvfsbackendgphoto2.c:1621
 msgid "Error loading device information"
 msgstr "ডিভাইস সংক্রান্ত তথ্য লোড করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:1621
+#: ../daemon/gvfsbackendgphoto2.c:1633
 msgid "Error looking up device information"
 msgstr "ডিভাইস সংক্রান্ত তথ্য অনুসন্ধান করতে ত্রুটি"
 
-#: ../daemon/gvfsbackendgphoto2.c:1631
+#: ../daemon/gvfsbackendgphoto2.c:1643
 msgid "Error getting device information"
 msgstr "ডিভাইস সংক্রান্ত ত্রুটি প্রাপ্ত করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:1644
+#: ../daemon/gvfsbackendgphoto2.c:1656
 msgid "Error setting up camera communications port"
 msgstr "ক্যামেরার সাথে সংযোগকারী পোর্ট নির্ধারণ করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:1655
+#: ../daemon/gvfsbackendgphoto2.c:1667
 msgid "Error initializing camera"
 msgstr "ক্যামেরা আরম্ভ করতে ব্যর্থ"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1669
+#: ../daemon/gvfsbackendgphoto2.c:1681
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "%s-তে gphoto2 মাউন্ট করা হয়েছে"
 
-#: ../daemon/gvfsbackendgphoto2.c:1744
+#: ../daemon/gvfsbackendgphoto2.c:1756
 msgid "No camera specified"
 msgstr "কোনো ক্যামেরা উল্লেখ করা হয়নি"
 
-#: ../daemon/gvfsbackendgphoto2.c:1785 ../daemon/gvfsbackendgphoto2.c:1811
+#: ../daemon/gvfsbackendgphoto2.c:1797 ../daemon/gvfsbackendgphoto2.c:1823
 #, c-format
 msgid "Filesystem is busy"
 msgstr "ফাইল-সিস্টেম ব্যস্ত আছে"
 
-#: ../daemon/gvfsbackendgphoto2.c:1881
+#: ../daemon/gvfsbackendgphoto2.c:1893
 msgid "Error creating file object"
 msgstr "ফাইল অবজেক্ট তৈরি করতে ত্রুটি"
 
-#: ../daemon/gvfsbackendgphoto2.c:1896
+#: ../daemon/gvfsbackendgphoto2.c:1908
 msgid "Error getting file"
 msgstr "ফাইল প্রাপ্ত করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:1906
+#: ../daemon/gvfsbackendgphoto2.c:1918
 msgid "Error getting data from file"
 msgstr "ফাইল থেকে তথ্য প্রাপ্ত করতে ত্রুটি"
 
-#: ../daemon/gvfsbackendgphoto2.c:1964
+#: ../daemon/gvfsbackendgphoto2.c:1976
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "আইকন নির্দেশক '%s' ত্রুটিপূর্ণ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2040 ../daemon/gvfsbackendgphoto2.c:3229
+#: ../daemon/gvfsbackendgphoto2.c:2052 ../daemon/gvfsbackendgphoto2.c:3241
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "ক্যামেরা %s-এর মধ্যে স্ট্রীম সিক করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:2180 ../daemon/gvfsbackendsftp.c:2872
+#: ../daemon/gvfsbackendgphoto2.c:2192 ../daemon/gvfsbackendsftp.c:2872
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "এটি একটি ডিরেক্টরি নয়"
 
-#: ../daemon/gvfsbackendgphoto2.c:2213
+#: ../daemon/gvfsbackendgphoto2.c:2225
 msgid "Failed to get folder list"
 msgstr "ফোল্ডার তালিকা প্রাপ্ত করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2279
+#: ../daemon/gvfsbackendgphoto2.c:2291
 msgid "Failed to get file list"
 msgstr "ফাইলের তালিকা প্রাপ্ত করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2571
+#: ../daemon/gvfsbackendgphoto2.c:2583
 msgid "Error creating directory"
 msgstr "ডিরেক্টরি নির্মাণ করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:2780
+#: ../daemon/gvfsbackendgphoto2.c:2792
 msgid "Name already exists"
 msgstr "উল্লিখিত নাম বর্তমানে উপস্থিত"
 
-#: ../daemon/gvfsbackendgphoto2.c:2791 ../daemon/gvfsbackendgphoto2.c:3420
+#: ../daemon/gvfsbackendgphoto2.c:2803 ../daemon/gvfsbackendgphoto2.c:3432
 msgid "New name too long"
 msgstr "নতুন নাম অত্যাধিক লম্বা"
 
-#: ../daemon/gvfsbackendgphoto2.c:2801 ../daemon/gvfsbackendgphoto2.c:3431
+#: ../daemon/gvfsbackendgphoto2.c:2813 ../daemon/gvfsbackendgphoto2.c:3443
 msgid "Error renaming dir"
 msgstr "ডিরেক্টরির নাম পরিবর্তন করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:2814 ../daemon/gvfsbackendgphoto2.c:3444
+#: ../daemon/gvfsbackendgphoto2.c:2826 ../daemon/gvfsbackendgphoto2.c:3456
 msgid "Error renaming file"
 msgstr "ফাইলের নাম পরিবর্তন করতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:2878
+#: ../daemon/gvfsbackendgphoto2.c:2890
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "ডিরেক্টরি '%s' ফাঁকা নয়"
 
-#: ../daemon/gvfsbackendgphoto2.c:2889
+#: ../daemon/gvfsbackendgphoto2.c:2901
 msgid "Error deleting directory"
 msgstr "ডিরেক্টরি মুছে ফেলতে সমস্যা"
 
-#: ../daemon/gvfsbackendgphoto2.c:2915
+#: ../daemon/gvfsbackendgphoto2.c:2927
 msgid "Error deleting file"
 msgstr "ফাইল মুছে ফেলতে ত্রুটি"
 
-#: ../daemon/gvfsbackendgphoto2.c:2968
+#: ../daemon/gvfsbackendgphoto2.c:2980
 msgid "Can't write to directory"
 msgstr "ডিরেক্টরির মধ্যে লেখা সম্ভব নয়"
 
-#: ../daemon/gvfsbackendgphoto2.c:3015
+#: ../daemon/gvfsbackendgphoto2.c:3027
 msgid "Cannot allocate new file to append to"
 msgstr "সংযোজন করার উদ্দেশ্যে নতুন ফাইল বরাদ্দ করা সম্ভব নয়"
 
-#: ../daemon/gvfsbackendgphoto2.c:3030
+#: ../daemon/gvfsbackendgphoto2.c:3042
 msgid "Cannot read file to append to"
 msgstr "সংযোজন করার উদ্দেশ্যে চিহ্নিত ফাইল পড়তে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:3041
+#: ../daemon/gvfsbackendgphoto2.c:3053
 msgid "Cannot get data of file to append to"
 msgstr "সংযোজন করার উদ্দেশ্যে চিহ্নিত ফাইলের তথ্য প্রাপ্ত করতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:3328
+#: ../daemon/gvfsbackendgphoto2.c:3340
 msgid "Error writing file"
 msgstr "ফাইলে লিখতে ব্যর্থ"
 
-#: ../daemon/gvfsbackendgphoto2.c:3376
+#: ../daemon/gvfsbackendgphoto2.c:3388
 msgid "Not supported (not same directory)"
 msgstr "সমর্থিত নয় (এক ডিরেক্টরি নয়)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3388
+#: ../daemon/gvfsbackendgphoto2.c:3400
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "সমর্থিত নয় (src ও dst উভয় ডিরেক্টরি)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3396
+#: ../daemon/gvfsbackendgphoto2.c:3408
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "সমর্থিত নয় (src একটি ডিরেক্টরি, dst একটি উপস্থিত ফাইল)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3408
+#: ../daemon/gvfsbackendgphoto2.c:3420
 msgid "Not supported (src is file, dst is dir)"
 msgstr "সমর্থিত নয় (src একটি ফাইল, dst একটি ডিরেক্টরি)"
 
-#: ../daemon/gvfsbackendhttp.c:248
+#: ../daemon/gvfsbackendhttp.c:257
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "HTTP Client ত্রুটি: %s"
-
-#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:2177
-#: ../daemon/gvfsbackendsmb.c:1424 ../daemon/gvfsdaemonutils.c:211
-msgid " (invalid encoding)"
-msgstr " (এনকোডিং সঠিক নয়)"
 
 #: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
@@ -952,12 +1014,17 @@ msgstr "ডিভাইসের সাথে সংযোগ বিচ্ছি
 msgid "Device requires a software update"
 msgstr "ডিভাইস দ্বারা প্রয়োগকারী সফ্টওয়্যার আপডেট করা আবশ্যক"
 
+#: ../daemon/gvfsbackendobexftp.c:1836 ../daemon/gvfsbackendsmb.c:1924
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "ফাইল মুছে ফেলতে ত্রুটি: %s"
+
 #: ../daemon/gvfsbackendsftp.c:295 ../daemon/gvfsbackendsftp.c:651
 msgid "ssh program unexpectedly exited"
 msgstr "ssh প্রোগ্রাম অপ্রত্যাশিতভাবে বন্ধ হয়ে গেছে"
 
 #: ../daemon/gvfsbackendsftp.c:303 ../daemon/gvfsbackendsftp.c:1754
-#: ../daemon/gvfsftptask.c:391
+#: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "অনুমতি প্রাপ্ত হয়নি"
 
@@ -1053,11 +1120,6 @@ msgstr "%s-এর উপর sftp"
 msgid "Unable to find supported ssh command"
 msgstr "সমর্থিত ssh কম্যান্ড খুঁজে পাওয়া যায়নি"
 
-#: ../daemon/gvfsbackendsftp.c:1752 ../daemon/gvfsbackendsftp.c:4557
-#: ../daemon/gvfsbackendsmb.c:1665 ../daemon/gvfsftptask.c:383
-msgid "Operation unsupported"
-msgstr "এই কর্মটি অসমর্থিত"
-
 #: ../daemon/gvfsbackendsftp.c:1929 ../daemon/gvfsbackendsftp.c:2318
 #: ../daemon/gvfsbackendsftp.c:2397 ../daemon/gvfsbackendsftp.c:2408
 #: ../daemon/gvfsbackendsftp.c:2464 ../daemon/gvfsbackendsftp.c:2550
@@ -1078,6 +1140,11 @@ msgstr "এই কর্মটি অসমর্থিত"
 msgid "Invalid reply received"
 msgstr "প্রাপ্ত উত্তর সঠিক নয়"
 
+#: ../daemon/gvfsbackendsftp.c:2177 ../daemon/gvfsbackendsmb.c:1424
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (এনকোডিং সঠিক নয়)"
+
 #: ../daemon/gvfsbackendsftp.c:2262
 msgid "Failure"
 msgstr "বিফলতা"
@@ -1096,7 +1163,7 @@ msgstr "ব্যাক-আপ ফাইল তৈরি করতে ত্র�
 msgid "Unable to create temporary file"
 msgstr "অস্থায়ী ফাইল প্রস্তুত করতে অক্ষম"
 
-#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:1990
+#: ../daemon/gvfsbackendsftp.c:4195 ../daemon/gvfsbackendsmb.c:2022
 msgid "Can't move directory over directory"
 msgstr "একটি ডিরেক্টরির উপর অন্য ডিরেক্টরি সরিয়ে ফেলা যাবে না"
 
@@ -1126,26 +1193,21 @@ msgstr "সিক-এর ধরন সমর্থিত নয়"
 msgid "Backup file creation failed: %s"
 msgstr "ব্যাক-আপ ফাইল প্রস্তুত করা যায়নি: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1892
-#, c-format
-msgid "Error deleting file: %s"
-msgstr "ফাইল মুছে ফেলতে ত্রুটি: %s"
-
-#: ../daemon/gvfsbackendsmb.c:1966
+#: ../daemon/gvfsbackendsmb.c:1998
 #, c-format
 msgid "Error moving file: %s"
 msgstr "ফাইল সরাতে ত্রুটি: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2038
+#: ../daemon/gvfsbackendsmb.c:2070
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "উদ্দিষ্ট ফাইল সরিয়ে ফেলতে ত্রুটি: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2062
+#: ../daemon/gvfsbackendsmb.c:2094
 msgid "Can't recursively move directory"
 msgstr "রিকার্সিভ রূপে ডিরেক্টরটি স্থানান্তর করা সম্ভব নয়"
 
-#: ../daemon/gvfsbackendsmb.c:2128
+#: ../daemon/gvfsbackendsmb.c:2160
 msgid "Windows Shares Filesystem Service"
 msgstr "Windows Shares Filesystem Service"
 
@@ -1202,22 +1264,22 @@ msgstr "চিহ্নিত ব্যাক-এন্ড প্রকার �
 msgid "Error sending fd: %s"
 msgstr "fd প্রদানে ত্রুটি: %s"
 
-#: ../daemon/gvfsftpconnection.c:175
+#: ../daemon/gvfsftpconnection.c:181
 msgid "Unexpected end of stream"
 msgstr "স্ট্রীম এর প্রত্যাশিত প্রান্ত"
 
-#: ../daemon/gvfsftpconnection.c:191 ../daemon/gvfsftpconnection.c:204
-#: ../daemon/gvfsftptask.c:403 ../daemon/gvfsftptask.c:831
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "উত্তর বৈধ নয়"
 
-#: ../daemon/gvfsftpconnection.c:380
+#: ../daemon/gvfsftpconnection.c:393
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr "সক্রিয় FTP সংযোগ তৈরি সম্ভব হয়নি। সম্ভবত আপনার রাউটার এটি সমর্থন করেনা?"
 
-#: ../daemon/gvfsftpconnection.c:387
+#: ../daemon/gvfsftpconnection.c:400
 msgid "Failed to create active FTP connection."
 msgstr "সক্রিয় FTP সংযোগ তৈরি করতে ব্যর্থ।"
 
@@ -1225,43 +1287,43 @@ msgstr "সক্রিয় FTP সংযোগ তৈরি করতে ব্�
 msgid "Filename contains invalid characters."
 msgstr "ফাইলের নাম অকার্যকর অক্ষর ধারণ করে।"
 
-#: ../daemon/gvfsftptask.c:252
+#: ../daemon/gvfsftptask.c:262
 msgid "The FTP server is busy. Try again later"
 msgstr "FTP সার্ভারটি ব্যস্ত। আবার চেষ্টা করুন"
 
-#: ../daemon/gvfsftptask.c:347
+#: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
 msgstr "অ্যাকাউন্ট সমর্থিত নয়"
 
-#: ../daemon/gvfsftptask.c:351
+#: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
 msgstr "হোস্ট সংযোগ বন্ধ করেছে"
 
-#: ../daemon/gvfsftptask.c:355
+#: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
 msgstr "তথ্য সংযোগ তৈরি সম্ভব হয়নি। সম্ভবত ফায়ারওয়াল দ্বারা এটি প্রতিরোধ করা হচ্ছে?"
 
-#: ../daemon/gvfsftptask.c:359
+#: ../daemon/gvfsftptask.c:368
 msgid "Data connection closed"
 msgstr "তথ্য সংযোগ বন্ধ করা হয়েছে"
 
-#: ../daemon/gvfsftptask.c:366 ../daemon/gvfsftptask.c:370
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
 msgid "Operation failed"
 msgstr "কাজ বিফল"
 
-#: ../daemon/gvfsftptask.c:375
+#: ../daemon/gvfsftptask.c:384
 msgid "No space left on server"
 msgstr "সার্ভারে কোনো অবশিষ্ট স্থান নেই"
 
-#: ../daemon/gvfsftptask.c:387
+#: ../daemon/gvfsftptask.c:396
 msgid "Unsupported network protocol"
 msgstr "অসমর্থিত নেটওয়ার্ক প্রোটোকেল"
 
-#: ../daemon/gvfsftptask.c:395
+#: ../daemon/gvfsftptask.c:404
 msgid "Page type unknown"
 msgstr "অজানা পেজ প্রকার"
 
-#: ../daemon/gvfsftptask.c:399
+#: ../daemon/gvfsftptask.c:408
 msgid "Invalid filename"
 msgstr "ফাইলের নাম বৈধ নয়"
 
@@ -1298,9 +1360,9 @@ msgstr "%1$s: %2$s"
 
 #: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:109 ../programs/gvfs-info.c:370
+#: ../programs/gvfs-copy.c:110 ../programs/gvfs-info.c:371
 #: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-move.c:98 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
 #: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
@@ -1371,49 +1433,52 @@ msgstr "GVfs GDU ভলিউম মনিটর"
 msgid "Floppy Drive"
 msgstr "ফ্লপি ড্রাইভ"
 
-#: ../monitor/gdu/ggdudrive.c:257
+#: ../monitor/gdu/ggdudrive.c:251
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "অজানা ড্রাইভ (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:259
+#: ../monitor/gdu/ggdudrive.c:253
 msgid "Unnamed Drive"
 msgstr "নামহীন ড্রাইভ"
 
-#: ../monitor/gdu/ggdudrive.c:559 ../monitor/hal/ghaldrive.c:662
+#: ../monitor/gdu/ggdudrive.c:553 ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "মিডিয়াতে একাধিক ভলিউম ব্যস্ত; মিডিয়া বের করা যায়নি"
 
-#: ../monitor/gdu/ggdudrive.c:1003
+#: ../monitor/gdu/ggdudrive.c:1008
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant "
 "to failures. Data on the drive may be irrevocably lost if a component fails."
 msgstr ""
+"Start drive in degraded mode?\nStarting a drive in degraded mode means that "
+"the drive is no longer tolerant to failures. Data on the drive may be "
+"irrevocably lost if a component fails."
 
-#: ../monitor/gdu/ggdudrive.c:1009
+#: ../monitor/gdu/ggdudrive.c:1014
 msgid "Start Anyway"
 msgstr "যাইহোক চালু করুন"
 
-#: ../monitor/gdu/ggdumount.c:817
+#: ../monitor/gdu/ggdumount.c:856
 msgid "One or more programs are preventing the unmount operation."
 msgstr "এক বা একাধিক প্রোগ্রাম আনঅ্যামাউন্ট কার্যক্রম প্রতিরোধ করছে।"
 
-#: ../monitor/gdu/ggdumount.c:945
+#: ../monitor/gdu/ggdumount.c:984
 msgid "Cannot get LUKS cleartext slave"
 msgstr "LUKS cleartext স্লেভ পাওয়া যাবেনা"
 
-#: ../monitor/gdu/ggdumount.c:967
+#: ../monitor/gdu/ggdumount.c:1006
 #, c-format
 msgid "Cannot get LUKS cleartext slave from path `%s'"
 msgstr "পথ `%s' থেকে LUKS cleartext স্লেভ পাওয়া যাবেনা"
 
-#: ../monitor/gdu/ggduvolume.c:308
+#: ../monitor/gdu/ggduvolume.c:313
 msgid "Floppy Disk"
 msgstr "ফ্লপি ডিস্ক"
 
-#: ../monitor/gdu/ggduvolume.c:1022
+#: ../monitor/gdu/ggduvolume.c:999
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1422,7 +1487,7 @@ msgstr ""
 "ভলিউম অনবরুদ্ধ করতে একটি পাসওয়ার্ড প্রবেশ করান\n"
 "ডিভাইস \"%1$s\" পার্টিশন %2$d এ এনক্রিপ্টকৃত ডাটা ধারণ করে।"
 
-#: ../monitor/gdu/ggduvolume.c:1029
+#: ../monitor/gdu/ggduvolume.c:1006
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1431,7 +1496,7 @@ msgstr ""
 "ভলিউম অনবরুদ্ধ করতে একটি পাসওয়ার্ড প্রবেশ করান\n"
 "ডিভাইস \"%s\" এনক্রিপ্টকৃত ডাটা ধারণ করে।"
 
-#: ../monitor/gdu/ggduvolume.c:1036
+#: ../monitor/gdu/ggduvolume.c:1013
 #, c-format
 msgid ""
 "Enter a password to unlock the volume\n"
@@ -1748,6 +1813,11 @@ msgstr "%s মিডিয়া"
 msgid "%s Encrypted Data"
 msgstr "%s এনক্রিপ্ট করা তথ্য"
 
+#: ../programs/gvfs-cat.c:37
+#| msgid "%s: missing locations"
+msgid "locations"
+msgstr "অবস্থান"
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:57
@@ -1778,7 +1848,6 @@ msgstr "%1$s: %2$s:বন্ধ করতে ত্রুটি: %3$s\n"
 
 # this looks like an option from the command line, hence not translating
 #: ../programs/gvfs-cat.c:136
-#, fuzzy
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
 msgstr "LOCATION... - concatenate LOCATIONS to standard output."
 
@@ -1786,7 +1855,6 @@ msgstr "LOCATION... - concatenate LOCATIONS to standard output."
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
 #: ../programs/gvfs-cat.c:141
-#, fuzzy
 msgid ""
 "Concatenate files at locations and print to the standard output. Works just "
 "like the traditional cat utility, but using gvfs location instead local "
@@ -1800,13 +1868,21 @@ msgstr ""
 
 # this looks like an option from the command line, hence not translating
 #: ../programs/gvfs-cat.c:148
-#, fuzzy
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
+
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:108
+#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:96
+#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr "কমান্ডলাইন অপশন পার্সিং ত্রুটি: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1815,23 +1891,307 @@ msgstr ""
 msgid "%s: missing locations"
 msgstr "%s: অবস্থান অনুপস্থিত"
 
+#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+#| msgid "Not a directory"
+msgid "no target directory"
+msgstr "টার্গেট ডিরেক্টরি নয়"
+
+#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+msgid "show progress"
+msgstr "অগ্রগতি দেখানো হবে"
+
+#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+msgid "prompt before overwrite"
+msgstr "লেখা-প্রতিস্থাপনের পূর্বে প্রম্পট করা হবে"
+
+#: ../programs/gvfs-copy.c:47
+msgid "preserve all attributes"
+msgstr "সব বৈশিষ্ট্য সংরক্ষণ করুন"
+
+#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+#| msgid "Backup file creation failed"
+msgid "backup existing destination files"
+msgstr "বর্তমান উদ্দিষ্ট ফাইলের ব্যাকআপ তৈরি করুন"
+
+#: ../programs/gvfs-copy.c:49
+msgid "never follow symbolic links"
+msgstr "প্রতীকি লিংক কখনো অনুসরণ করে না"
+
+#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#, c-format
+msgid "progress"
+msgstr "অগ্রগতি"
+
+#: ../programs/gvfs-copy.c:101 ../programs/gvfs-move.c:89
+#: ../programs/gvfs-save.c:156
+msgid "- output files at <location>"
+msgstr "- output files at <location>"
+
+#: ../programs/gvfs-copy.c:119 ../programs/gvfs-move.c:107
+#, c-format
+msgid "Missing operand\n"
+msgstr "Missing operand\n"
+
+#: ../programs/gvfs-copy.c:127 ../programs/gvfs-move.c:115
+#, c-format
+msgid "Too many arguments\n"
+msgstr "Too many arguments\n"
+
+#: ../programs/gvfs-copy.c:136 ../programs/gvfs-move.c:124
+#| msgid "The file is not a directory"
+msgid "Target %s is not a directory\n"
+msgstr "%s একটি ডিরেক্টরি নয়\n"
+
+#: ../programs/gvfs-copy.c:177
+#, c-format
+msgid "overwrite %s?"
+msgstr "লেখা-প্রতিস্থাপন %s?"
+
+#: ../programs/gvfs-copy.c:191
+#| msgid "Error moving file: %s"
+msgid "Error copying file %s: %s\n"
+msgstr "ফাইল অনুলিপিতে ত্রুটি %s: %s\n"
+
+#: ../programs/gvfs-info.c:37
+msgid "List writable attributes"
+msgstr "লিখনযোগ্য বৈশিষ্ট্য তালিকাবদ্ধ করুন"
+
+#: ../programs/gvfs-info.c:38
+#| msgid "Filesystem"
+msgid "Get filesystem info"
+msgstr "ফাইল-সিস্টেম তথ্য গ্রহন"
+
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+msgid "The attributes to get"
+msgstr "গ্রহন করার জন্য বৈশিষ্ট্য"
+
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-set-attribute.c:37
+msgid "Don't follow symlinks"
+msgstr "প্রতীকি লিংক অনুসরণ করবেন না"
+
+#: ../programs/gvfs-info.c:50
+#| msgid "Invalid backend type"
+msgid "invalid type"
+msgstr "অসমর্থিত ধরণ"
+
+#: ../programs/gvfs-info.c:53
+msgid "unknown"
+msgstr "অজানা"
+
+#: ../programs/gvfs-info.c:56
+msgid "regular"
+msgstr "নিয়মিত"
+
+#: ../programs/gvfs-info.c:59
+#| msgid "Not a directory"
+msgid "directory"
+msgstr "ডিরেক্টরি"
+
+#: ../programs/gvfs-info.c:62
+msgid "symlink"
+msgstr "প্রতীকি লিংক"
+
+#: ../programs/gvfs-info.c:65
+msgid "special"
+msgstr "বিশেষ"
+
+#: ../programs/gvfs-info.c:68
+msgid "shortcut"
+msgstr "শর্টকাট"
+
+#: ../programs/gvfs-info.c:71
+#| msgid "Not a mountable file"
+msgid "mountable"
+msgstr "ফাইলটি মাউন্টযোগ্য"
+
+#: ../programs/gvfs-info.c:109
+msgid "attributes:\n"
+msgstr "বৈশিষ্ট্য:\n"
+
+#: ../programs/gvfs-info.c:155
+#, c-format
+msgid "display name: %s\n"
+msgstr "প্রদর্শনের নাম: %s\n"
+
+#: ../programs/gvfs-info.c:159
+#, c-format
+msgid "edit name: %s\n"
+msgstr "সম্পাদন নাম: %s\n"
+
+#: ../programs/gvfs-info.c:165
+#, c-format
+msgid "name: %s\n"
+msgstr "নাম: %s\n"
+
+#: ../programs/gvfs-info.c:172
+#, c-format
+msgid "type: %s\n"
+msgstr "ধরণ: %s\n"
+
+#: ../programs/gvfs-info.c:178
+#, c-format
+msgid "size: "
+msgstr "আকার: "
+
+#: ../programs/gvfs-info.c:183
+#, c-format
+msgid "hidden\n"
+msgstr "লুকানো\n"
+
+#: ../programs/gvfs-info.c:266
+#| msgid "Error writing file"
+msgid "Copy with file"
+msgstr "ফাইলসহ অনুলিপি করুন"
+
+#: ../programs/gvfs-info.c:270
+msgid "Keep with file when moved"
+msgstr "সরানোর সময় ফাইলসহ রাখুন"
+
+#: ../programs/gvfs-info.c:307
+#| msgid "Error setting attribute: %s\n"
+msgid "Error getting writable attributes: %s\n"
+msgstr "লিখনযোগ্য বৈশিষ্ট্য গ্রহন করতে ত্রুটি: %s\n"
+
+#: ../programs/gvfs-info.c:312
+#| msgid "Error setting attribute: %s\n"
+msgid "Settable attributes:\n"
+msgstr "বৈশিষ্ট্য সেটিং বৈশিষ্ট্য:\n"
+
+#: ../programs/gvfs-info.c:335
+msgid "Writable attribute namespaces:\n"
+msgstr "লিখনযোগ্য বৈশিষ্ট্য নেমস্পেস:\n"
+
+#: ../programs/gvfs-info.c:362
+msgid "- show info for <location>"
+msgstr "- show info for <location>"
+
+#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+msgid "Show hidden files"
+msgstr "লুকানো ফাইল প্রদর্শন"
+
+#: ../programs/gvfs-ls.c:41
+msgid "Use a long listing format"
+msgstr "একটি দীর্য তালিকাকরণ বিন্যাস ব্যবহার করুন"
+
+#: ../programs/gvfs-ls.c:42
+msgid "Show completions"
+msgstr "সম্পূর্ণকরণ দেখানো হয়"
+
+#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-rename.c:68
+#| msgid "Error: %s"
+msgid "Error: %s\n"
+msgstr "ত্রুটি : %s\n"
+
+#: ../programs/gvfs-ls.c:383
+msgid "- list files at <location>"
+msgstr "- list files at <location>"
+
+#: ../programs/gvfs-mkdir.c:33
+#| msgid "Can't open directory"
+msgid "create parent directories"
+msgstr "প্যারেন্ট ডিরেক্টরি তৈরি করে"
+
+#: ../programs/gvfs-mkdir.c:50
+#| msgid "Error creating directory"
+msgid "- create directories"
+msgstr "- create directories"
+
+#: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
+#| msgid "Error creating directory"
+msgid "Error creating directory: %s\n"
+msgstr "ডিরেক্টরি তৈরিতে ত্রুটি: %s\n"
+
+#: ../programs/gvfs-mount.c:54
+#| msgid "Not a mountable file"
+msgid "Mount as mountable"
+msgstr "মাউন্টযোগ্য হিসেবে মাউন্ট করুন"
+
+#: ../programs/gvfs-mount.c:55
+msgid "Mount volume with device file"
+msgstr "ডিভাইস ফাইল সহ মাউন্ট করুন"
+
+#: ../programs/gvfs-mount.c:56
+#| msgid "Unmount Anyway"
+msgid "Unmount"
+msgstr "আন-মাউন্ট"
+
+#: ../programs/gvfs-mount.c:57
+msgid "Unmount all mounts with the given scheme"
+msgstr "প্রদত্ত স্কীমসহ সব আনমাউন্ট করুন"
+
+#: ../programs/gvfs-mount.c:58
+msgid "List"
+msgstr "তালিকা"
+
+#: ../programs/gvfs-mount.c:59
+msgid "Show extra information for List and Monitor"
+msgstr "তালিকা এবং মনিটরের জন্য কিছু অতিরিক্ত তথ্য দেখানো হবে"
+
+#: ../programs/gvfs-mount.c:60
+msgid "Monitor events"
+msgstr "পর্যবেক্ষণ ইভেন্ট"
+
+#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#| msgid "%s: %s: error opening location: %s\n"
+msgid "Error mounting location: %s\n"
+msgstr "অবস্থান মাউন্টে ত্রুটি: %s\n"
+
+#: ../programs/gvfs-mount.c:241
+#| msgid "Error connecting to daemon: %s"
+msgid "Error unmounting mount: %s\n"
+msgstr "মাউন্ট আনমাউন্টে ত্রুটি:%s\n"
+
+#: ../programs/gvfs-mount.c:262
+#| msgid "Could not find enclosing mount"
+msgid "Error finding enclosing mount: %s\n"
+msgstr "এনক্লোজিং মাউন্ট খুঁজে পাওয়া যায়নি: %s\n"
+
+#: ../programs/gvfs-mount.c:673
+#| msgid "Error moving file: %s"
+msgid "Error mounting %s: %s\n"
+msgstr "ফাইল সরাতে ত্রুটি %s: %s\n"
+
+#: ../programs/gvfs-mount.c:687
+msgid "Mounted %s at %s\n"
+msgstr "%s কে %sতে মাউন্ট করা হয়েছে \n"
+
+#: ../programs/gvfs-mount.c:738
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr "ডিভাইস ফাইলের জন্য কোনো ভলিউম নেই %s\n"
+
+#: ../programs/gvfs-mount.c:929
+#| msgid "%s: missing locations"
+msgid "- mount <location>"
+msgstr "- mount <location>"
+
+#: ../programs/gvfs-move.c:173
+#| msgid "Error moving file: %s"
+msgid "Error moving file %s: %s\n"
+msgstr "ফাইল সরাতে ত্রুটি %s: %s\n"
+
+#: ../programs/gvfs-open.c:37
+msgid "files"
+msgstr "ফাইল"
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-open.c:65
 #, c-format
 msgid "%s: %s: error opening location: %s\n"
-msgstr "%1$s: %2$s: চিহ্নিত অবস্থান খুলতে ত্রুটি: %3$s\n"
+msgstr "%s: %s: চিহ্নিত অবস্থান খুলতে ত্রুটি: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-open.c:92
 #, c-format
 msgid "%s: %s: error launching application: %s\n"
-msgstr "%1$s: %2$s: অ্যাপ্লিকেশন আরম্ভ করতে ত্রুটি: %3$s\n"
+msgstr "%s: %s: অ্যাপ্লিকেশন আরম্ভ করতে ত্রুটি: %s\n"
 
 # this looks like an option from the command line, hence not translating
 #: ../programs/gvfs-open.c:122
-#, fuzzy
 msgid "FILES... - open FILES with registered application."
 msgstr "FILES... - open FILES with registered application."
 
@@ -1843,6 +2203,80 @@ msgid ""
 "Opens the file(s) with the default application registered to handle the type "
 "of the file."
 msgstr "ফাইলের ধরণ হ্যান্ডেল করতে রেজিস্ট্রিকৃত ডিফল্ট অ্যাপ্লিকেশন দিয়ে ফাইলগুলো খুলুন।"
+
+#: ../programs/gvfs-rename.c:49
+#| msgid "Error renaming file"
+msgid "- rename file"
+msgstr "- rename file"
+
+#: ../programs/gvfs-rename.c:74
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr "পুনরায় নামকরণ সফল। নতুন uri: %s\n"
+
+#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+msgid "ignore nonexistent files, never prompt"
+msgstr "অবাস্তব ফাইল উপেক্ষা করুন, কখনো প্রম্পট করা হবে না"
+
+#: ../programs/gvfs-rm.c:52
+#| msgid "Error deleting file"
+msgid "- delete files"
+msgstr "- delete files"
+
+#: ../programs/gvfs-save.c:43
+msgid "Create backup"
+msgstr "ব্যাকআপ তৈরি করুন"
+
+#: ../programs/gvfs-save.c:44
+msgid "Only create if not existing"
+msgstr "যদি উপস্থিত না থাকে শুধু তখন তৈরি করুন"
+
+#: ../programs/gvfs-save.c:45
+msgid "Append to end of file"
+msgstr "ফাইলের পরিশেষে যোগ করা হবে"
+
+#: ../programs/gvfs-save.c:46
+msgid "When creating a file, restrict access to the current user only"
+msgstr "When creating a file, restrict access to the current user only"
+
+#: ../programs/gvfs-save.c:47
+msgid "Print new etag at end"
+msgstr "Print new etag at end"
+
+#: ../programs/gvfs-save.c:48
+msgid "The etag of the file being overwritten"
+msgstr "The etag of the file being overwritten"
+
+#: ../programs/gvfs-save.c:76
+#| msgid "Error moving file: %s"
+msgid "Error opening file: %s\n"
+msgstr "ফাইল সরাতে ত্রুটি: %s\n"
+
+#: ../programs/gvfs-save.c:109
+#| msgid "Error renaming dir"
+msgid "Error reading stdin"
+msgstr "stdin পড়তে ত্রুটি"
+
+#: ../programs/gvfs-save.c:122
+#| msgid "%s: %s:error closing: %s\n"
+msgid "Error closing: %s\n"
+msgstr "বন্ধ করতে ত্রুটি: %s\n"
+
+#: ../programs/gvfs-save.c:134
+msgid "Etag not available\n"
+msgstr "Etag পাওয়া যায়নি\n"
+
+#: ../programs/gvfs-set-attribute.c:36
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+msgstr ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+
+#: ../programs/gvfs-set-attribute.c:119
+msgid " <location> <attribute> <values> - set attribute"
+msgstr " <location> <attribute> <values> - set attribute"
 
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
@@ -1863,6 +2297,47 @@ msgstr "বৈশিষ্ট্যের ধরন %s সঠিক নয়\n"
 #, c-format
 msgid "Error setting attribute: %s\n"
 msgstr "বৈশিষ্ট্য সেটিং ত্রুটি: %s\n"
+
+#: ../programs/gvfs-trash.c:51
+msgid "- move files to trash"
+msgstr "- move files to trash"
+
+#: ../programs/gvfs-trash.c:67
+#| msgid "Error deleting file: %s"
+msgid "Error trashing file: %s\n"
+msgstr "ফাইল মুছে ফেলতে ত্রুটি: %s\n"
+
+#: ../programs/gvfs-tree.c:37
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "Follow symlinks, mounts and shortcuts like dirs"
+
+#: ../programs/gvfs-tree.c:242
+msgid "- list contents of directories in a tree-like format"
+msgstr "- list contents of directories in a tree-like format"
+
+#~ msgid "Invalid return value from get_info"
+#~ msgstr "get_info থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from query_info"
+#~ msgstr "query_info থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from call"
+#~ msgstr "call থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from get_filesystem_info"
+#~ msgstr "get_filesystem_info থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from query_filesystem_info"
+#~ msgstr "query_filesystem_info থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from monitor_dir"
+#~ msgstr "monitor_dir থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from monitor_file"
+#~ msgstr "monitor_file থেকে প্রাপ্ত মান সঠিক নয়"
+
+#~ msgid "Invalid return value from open_icon_for_read"
+#~ msgstr "open_icon_for_read থেকে প্রাপ্ত মান সঠিক নয়"
 
 #~ msgid "broken transmission"
 #~ msgstr "বিচ্ছিন্ন সংযোগ"
