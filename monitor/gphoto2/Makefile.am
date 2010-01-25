@@ -3,10 +3,6 @@ NULL =
 
 libexec_PROGRAMS = gvfs-gphoto2-volume-monitor
 
-if USE_GUDEV
-gvfs_gphoto2_volume_monitor_SOURCES =
-
-else
 BUILT_SOURCES =                                         \
 	hal-marshal.h           hal-marshal.c
 
@@ -16,6 +12,11 @@ hal-marshal.h: hal-marshal.list
 hal-marshal.c: hal-marshal.list
 	$(AM_V_GEN) echo "#include \"hal-marshal.h\"" > $@ && glib-genmarshal $< --prefix=hal_marshal --body >> $@
 
+
+if USE_GUDEV
+gvfs_gphoto2_volume_monitor_SOURCES =
+
+else
 gvfs_gphoto2_volume_monitor_SOURCES =			\
 	hal-utils.c 		hal-utils.h 		\
 	hal-marshal.c		hal-marshal.h		\
