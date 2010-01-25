@@ -1,3 +1,18 @@
+Major changes in 1.5.2
+======================
+* Support new "default location" gio mount attribute
+* Enable support for lazy loading of gio modules
+* Don't build hal if building gdu
+* daemon: Finalize backend on unmount
+* metadata: stability and leak fixes
+* metadata: fix data loss on i/o error
+* fuse: Don't support readlink
+* fuse: Allow setting mtime
+* fuse: Fix permissions
+* smb: Fix free space reporting on some servers
+* gdu: handle mounts better
+* trash: Fix crash/assert
+
 Major changes in 1.5.1
 ======================
 * Translation updates
