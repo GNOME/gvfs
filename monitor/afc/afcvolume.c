@@ -77,7 +77,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   iphone_error_t err;
   guint retries;
   char *model, *display_name;
-  int port;
+  guint16 port;
 
   retries = 0;
   do {
@@ -90,7 +90,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   if (err != IPHONE_E_SUCCESS)
     return 0;
 
-  if (lockdownd_client_new (dev, &lockdown_cli) != LOCKDOWN_E_SUCCESS)
+  if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
     {
       iphone_device_free (dev);
       return 0;

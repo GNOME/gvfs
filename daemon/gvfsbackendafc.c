@@ -249,7 +249,8 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   const char *str;
   char *tmp;
   char *display_name;
-  int port, virtual_port;
+  guint16 port;
+  int virtual_port;
   GMountSpec *real_spec;
   GVfsBackendAfc *self;
   int retries;
@@ -330,8 +331,9 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   if (G_UNLIKELY(g_vfs_backend_iphone_check(err, G_VFS_JOB(job))))
     goto out_destroy_service;
-  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_client_new (self->dev,
-                                                                      &lockdown_cli),
+  if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_client_new_with_handshake (self->dev,
+                                                                                     &lockdown_cli,
+                                                                                     "gvfsd-afc"),
                                                 G_VFS_JOB(job))))
     {
       goto out_destroy_dev;
@@ -1305,7 +1307,6 @@ g_vfs_backend_afc_init (GVfsBackendAfc *self)
     {
       /* enable full debugging */
       iphone_set_debug_level (1);
-      iphone_set_debug_mask (DBGMASK_ALL);
     }
 }
 
