@@ -9,9 +9,9 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include <libiphone/libiphone.h>
-#include <libiphone/lockdown.h>
-#include <libiphone/afc.h>
+#include <libimobiledevice/libimobiledevice.h>
+#include <libimobiledevice/lockdown.h>
+#include <libimobiledevice/afc.h>
 
 #include "afcvolume.h"
 
@@ -71,28 +71,28 @@ g_vfs_afc_volume_class_init (GVfsAfcVolumeClass *klass)
 static int
 _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
 {
-  iphone_device_t dev;
+  idevice_t dev;
   afc_client_t afc_cli;
   lockdownd_client_t lockdown_cli = NULL;
-  iphone_error_t err;
+  idevice_error_t err;
   guint retries;
   char *model, *display_name;
   guint16 port;
 
   retries = 0;
   do {
-      err = iphone_device_new (&dev, self->uuid);
-      if (err == IPHONE_E_SUCCESS)
+      err = idevice_new (&dev, self->uuid);
+      if (err == IDEVICE_E_SUCCESS)
         break;
       g_usleep (G_USEC_PER_SEC);
   } while (retries++ < 10);
 
-  if (err != IPHONE_E_SUCCESS)
+  if (err != IDEVICE_E_SUCCESS)
     return 0;
 
   if (lockdownd_client_new_with_handshake (dev, &lockdown_cli, "gvfs-afc-volume-monitor") != LOCKDOWN_E_SUCCESS)
     {
-      iphone_device_free (dev);
+      idevice_free (dev);
       return 0;
     }
 
@@ -106,7 +106,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
   if (lockdownd_start_service (lockdown_cli, DEFAULT_SERVICE, &port) != LOCKDOWN_E_SUCCESS)
     {
       lockdownd_client_free (lockdown_cli);
-      iphone_device_free (dev);
+      idevice_free (dev);
       return 0;
     }
 
@@ -127,7 +127,7 @@ _g_vfs_afc_volume_update_metadata (GVfsAfcVolume *self)
     }
 
   lockdownd_client_free (lockdown_cli);
-  iphone_device_free (dev);
+  idevice_free (dev);
 
   return 1;
 }

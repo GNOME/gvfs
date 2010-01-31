@@ -331,10 +331,10 @@ AFC_LIBS=
 AFC_CFLAGS=
 
 if test "x$enable_afc" != "xno" ; then
-  PKG_CHECK_EXISTS(libiphone-1.0 >= 0.9.6, msg_afc=yes)
+  PKG_CHECK_EXISTS(libimobiledevice-1.0 >= 0.9.7, msg_afc=yes)
 
   if test "x$msg_afc" = "xyes"; then
-    PKG_CHECK_MODULES(AFC, libiphone-1.0)
+    PKG_CHECK_MODULES(AFC, libimobiledevice-1.0)
     AC_DEFINE(HAVE_AFC, 1, [Define to 1 if AFC is going to be built])
   fi
 fi

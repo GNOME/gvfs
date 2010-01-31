@@ -16,9 +16,9 @@
 #include <glib/gi18n.h>
 #include <errno.h>
 
-#include <libiphone/libiphone.h>
-#include <libiphone/lockdown.h>
-#include <libiphone/afc.h>
+#include <libimobiledevice/libimobiledevice.h>
+#include <libimobiledevice/lockdown.h>
+#include <libimobiledevice/afc.h>
 
 #include "gvfsbackendafc.h"
 #include "gvfsjobopenforread.h"
@@ -46,7 +46,7 @@ struct _GVfsBackendAfc {
   char *model;
   gboolean connected;
 
-  iphone_device_t dev;
+  idevice_t dev;
   afc_client_t afc_cli;
 };
 
@@ -124,7 +124,7 @@ g_vfs_backend_afc_close_connection (GVfsBackendAfc *self)
       afc_client_free (self->afc_cli);
       g_free (self->model);
       self->model = NULL;
-      iphone_device_free (self->dev);
+      idevice_free (self->dev);
     }
   self->connected = FALSE;
 }
@@ -194,23 +194,23 @@ g_vfs_backend_lockdownd_check (lockdownd_error_t cond, GVfsJob *job)
 }
 
 static int
-g_vfs_backend_iphone_check (iphone_error_t cond, GVfsJob *job)
+g_vfs_backend_idevice_check (idevice_error_t cond, GVfsJob *job)
 {
-  if (G_LIKELY(cond == IPHONE_E_SUCCESS))
+  if (G_LIKELY(cond == IDEVICE_E_SUCCESS))
         return 0;
 
   switch (cond)
     {
-    case IPHONE_E_INVALID_ARG:
+    case IDEVICE_E_INVALID_ARG:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                        _("iPhone Device Error: Invalid Argument"));
+                        _("libimobiledevice Error: Invalid Argument"));
       break;
-    case IPHONE_E_NO_DEVICE:
+    case IDEVICE_E_NO_DEVICE:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."));
+                        _("libimobiledevice Error: No device found. Make sure usbmuxd is set up correctly."));
     default:
       g_vfs_job_failed (job, G_IO_ERROR, G_IO_ERROR_FAILED,
-                        _("Unhandled iPhone Device error (%d)"), cond);
+                        _("Unhandled libimobiledevice error (%d)"), cond);
       break;
     }
 
@@ -218,12 +218,12 @@ g_vfs_backend_iphone_check (iphone_error_t cond, GVfsJob *job)
 }
 
 static void
-_iphone_event_cb (const iphone_event_t *event, void *user_data)
+_idevice_event_cb (const idevice_event_t *event, void *user_data)
 {
   GVfsBackendAfc *afc_backend = G_VFS_BACKEND_AFC (user_data);
 
   g_return_if_fail (afc_backend->uuid != NULL);
-  if (event->event != IPHONE_DEVICE_REMOVE)
+  if (event->event != IDEVICE_DEVICE_REMOVE)
     return;
   if (g_str_equal (event->uuid, afc_backend->uuid) == FALSE)
     return;
@@ -232,7 +232,7 @@ _iphone_event_cb (const iphone_event_t *event, void *user_data)
 
   g_vfs_backend_afc_close_connection (afc_backend);
 
-  iphone_event_unsubscribe ();
+  idevice_event_unsubscribe ();
 
   /* TODO: need a cleaner way to force unmount ourselves */
   exit (1);
@@ -254,7 +254,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   GMountSpec *real_spec;
   GVfsBackendAfc *self;
   int retries;
-  iphone_error_t err;
+  idevice_error_t err;
   lockdownd_client_t lockdown_cli = NULL;
   char *camera_x_content_types[] = { "x-content/audio-player", "x-content/image-dcf", NULL};
   char *media_player_x_content_types[] = {"x-content/audio-player", NULL};
@@ -263,7 +263,7 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
   self = G_VFS_BACKEND_AFC(backend);
   self->connected = FALSE;
 
-  iphone_event_subscribe (_iphone_event_cb, self);
+  idevice_event_subscribe (_idevice_event_cb, self);
 
   /* setup afc */
 
@@ -323,13 +323,13 @@ g_vfs_backend_afc_mount (GVfsBackend *backend,
 
   retries = 0;
   do {
-      err = iphone_device_new(&self->dev, self->uuid);
-      if (err == IPHONE_E_SUCCESS)
+      err = idevice_new(&self->dev, self->uuid);
+      if (err == IDEVICE_E_SUCCESS)
           break;
       g_usleep (G_USEC_PER_SEC);
   } while (retries++ < 10);
 
-  if (G_UNLIKELY(g_vfs_backend_iphone_check(err, G_VFS_JOB(job))))
+  if (G_UNLIKELY(g_vfs_backend_idevice_check(err, G_VFS_JOB(job))))
     goto out_destroy_service;
   if (G_UNLIKELY(g_vfs_backend_lockdownd_check (lockdownd_client_new_with_handshake (self->dev,
                                                                                      &lockdown_cli,
@@ -408,7 +408,7 @@ out_destroy_lockdown:
   lockdownd_client_free (lockdown_cli);
 
 out_destroy_dev:
-  iphone_device_free (self->dev);
+  idevice_free (self->dev);
 
 out_destroy_service:
   g_free (self->service);
@@ -1306,7 +1306,7 @@ g_vfs_backend_afc_init (GVfsBackendAfc *self)
   if (g_getenv ("GVFS_DEBUG") != NULL)
     {
       /* enable full debugging */
-      iphone_set_debug_level (1);
+      idevice_set_debug_level (1);
     }
 }
 
