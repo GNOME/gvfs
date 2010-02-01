@@ -1,22 +1,21 @@
 # translation of gvfs.HEAD.po to Español
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
-# Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009.
+# Jorge González <jorgegonz@svn.gnome.org>, 2008, 2009, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-12-16 14:26+0000\n"
-"PO-Revision-Date: 2009-12-19 13:47+0100\n"
+"POT-Creation-Date: 2010-02-01 16:28+0000\n"
+"PO-Revision-Date: 2010-02-01 19:10+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
@@ -81,13 +80,13 @@ msgstr "los valores deben ser cadenas o listas de cadenas"
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
 #: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
-#: ../daemon/gvfsbackendobexftp.c:1066 ../daemon/gvfsbackendobexftp.c:1087
-#: ../daemon/gvfsbackendobexftp.c:1206 ../daemon/gvfsbackendobexftp.c:1343
-#: ../daemon/gvfsbackendobexftp.c:1407 ../daemon/gvfsbackendobexftp.c:1609
-#: ../daemon/gvfsbackendobexftp.c:1716 ../daemon/gvfsbackendobexftp.c:1878
-#: ../daemon/gvfsbackendobexftp.c:1905 ../daemon/gvfsbackendobexftp.c:1964
-#: ../daemon/gvfsbackendobexftp.c:1986 ../daemon/gvfsbackendobexftp.c:2049
-#: ../daemon/gvfsbackendobexftp.c:2068 ../daemon/gvfsbackendsmb.c:1163
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
 #: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
 #: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
@@ -277,7 +276,7 @@ msgstr ""
 msgid "Internal Apple File Control error"
 msgstr "Error de control de archivos interno de Apple"
 
-#: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:627
+#: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:633
 msgid "File does not exist"
 msgstr "El archivo no existe"
 
@@ -312,58 +311,64 @@ msgid "Unhandled Lockdown error (%d)"
 msgstr "Error de bloqueo no manejable (%d)"
 
 #: ../daemon/gvfsbackendafc.c:206
-msgid "iPhone Device Error: Invalid Argument"
-msgstr "Error del dispositivo iPhone: argumento no válido"
+#| msgid "iPhone Device Error: Invalid Argument"
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "Error de libimobiledevice: argumento no válido"
 
 #: ../daemon/gvfsbackendafc.c:210
+#| msgid ""
+#| "iPhone Device Error: No device found. Make sure usbmuxd is set up "
+#| "correctly."
 msgid ""
-"iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
+"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
+"correctly."
 msgstr ""
-"Error del dispositivo iPhone: No se encontró el dispositivo. Asegúrese de "
-"que usbmuxd está configurado correctamente."
+"Error de libimobiledevice: no se encontró el dispositivo. Asegúrese de que "
+"usbmuxd está configurado correctamente."
 
 #: ../daemon/gvfsbackendafc.c:213
 #, c-format
-msgid "Unhandled iPhone Device error (%d)"
-msgstr "Error no manejable del dispositivo iPhone (%d)"
+#| msgid "Unhandled iPhone Device error (%d)"
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "Error no manejable de libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:274 ../daemon/gvfsbackendarchive.c:529
+#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:529
 #: ../daemon/gvfsbackendarchive.c:558 ../daemon/gvfsbackenddav.c:1631
-#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:842
-#: ../daemon/gvfsbackendobexftp.c:858 ../daemon/gvfsbackendobexftp.c:877
+#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:648
 msgid "Invalid mount spec"
 msgstr "Especificación de montaje no válida"
 
-#: ../daemon/gvfsbackendafc.c:280
+#: ../daemon/gvfsbackendafc.c:281
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr ""
 "Ubicación AFC no válida: debe ser de la forma afc://uuid:número-de-puerto"
 
-#: ../daemon/gvfsbackendafc.c:295
+#: ../daemon/gvfsbackendafc.c:296
 #, c-format
 msgid "Service %d on Apple Mobile Device"
 msgstr "Servicio %d en el dispositivo móvil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:301
+#: ../daemon/gvfsbackendafc.c:302
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Dispositivo móvil de Apple"
 
-#: ../daemon/gvfsbackendafc.c:351
+#: ../daemon/gvfsbackendafc.c:353
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../daemon/gvfsbackendafc.c:546 ../daemon/gvfsbackendafc.c:1253
+#: ../daemon/gvfsbackendafc.c:548 ../daemon/gvfsbackendafc.c:1256
 msgid "Backups are not yet supported."
 msgstr "Aún no se soportan los respaldos."
 
-#: ../daemon/gvfsbackendafc.c:684
+#: ../daemon/gvfsbackendafc.c:686
 msgid "Invalid seek type"
 msgstr "Tipo de búsqueda no soportado"
 
-#: ../daemon/gvfsbackendafc.c:1172 ../daemon/gvfsbackendsftp.c:1786
+#: ../daemon/gvfsbackendafc.c:1175 ../daemon/gvfsbackendsftp.c:1786
 #: ../daemon/gvfsbackendsftp.c:4591 ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
@@ -378,15 +383,15 @@ msgstr "La operación no está soportada"
 msgid "/ on %s"
 msgstr "/ en %s"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:558
+#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:564
 #: ../daemon/gvfsbackendsftp.c:1714
 msgid "No hostname specified"
 msgstr "No se especificó un nombre de servidor"
 
-#: ../daemon/gvfsbackendarchive.c:616 ../daemon/gvfsbackendarchive.c:660
-#: ../daemon/gvfsbackendarchive.c:710 ../daemon/gvfsbackendarchive.c:739
+#: ../daemon/gvfsbackendarchive.c:617 ../daemon/gvfsbackendarchive.c:661
+#: ../daemon/gvfsbackendarchive.c:711 ../daemon/gvfsbackendarchive.c:740
 #: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
-#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:958
+#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:964
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
 #: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
 #: ../daemon/gvfsbackendsmbbrowse.c:1394
@@ -394,13 +399,13 @@ msgstr "No se especificó un nombre de servidor"
 msgid "File doesn't exist"
 msgstr "El archivo no existe"
 
-#: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1877 ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendarchive.c:625 ../daemon/gvfsbackendcomputer.c:645
+#: ../daemon/gvfsbackendgphoto2.c:1877 ../daemon/gvfsbackendobexftp.c:1071
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "No se puede abrir el directorio"
 
-#: ../daemon/gvfsbackendarchive.c:748 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:258 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3837 ../daemon/gvfsftpdircache.c:154
@@ -420,7 +425,7 @@ msgstr "No se pudo crear el directorio temporal"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:684
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:690
 #: ../daemon/gvfsbackendgphoto2.c:1205 ../daemon/gvfsbackendgphoto2.c:2198
 #: ../daemon/gvfsbackendgphoto2.c:2917 ../daemon/gvfsbackendsftp.c:1790
 #: ../daemon/gvfsbackendsftp.c:2903 ../daemon/gvfsbackendsftp.c:2916
@@ -435,7 +440,7 @@ msgid "Directory not empty"
 msgstr "El directorio no está vacío"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1791
+#: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "No se puede copiar un archivo sobre un directorio"
 
@@ -479,19 +484,19 @@ msgstr "El backend no soporta la operación"
 msgid "No such file or directory in target path"
 msgstr "El archivo o directorio no existe en la ruta de destino"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1344
-#: ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1350
+#: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "No se puede copiar un directorio sobre otro directorio"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1768
-#: ../daemon/gvfsbackendobexftp.c:1799 ../daemon/gvfsbackendsftp.c:1784
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1784
 #: ../daemon/gvfsbackendsftp.c:4399
 msgid "Target file exists"
 msgstr "El archivo destino ya existe"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1367
-#: ../daemon/gvfsbackendobexftp.c:1775
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1373
+#: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
 msgstr "No se puede copiar recursivamente un directorio"
 
@@ -586,7 +591,6 @@ msgid "Computer"
 msgstr "Equipo"
 
 #: ../daemon/gvfsbackendcomputer.c:521
-#| msgid "Filesystem"
 msgid "File System"
 msgstr "Sistema de archivos"
 
@@ -682,9 +686,9 @@ msgid "Could not create request"
 msgstr "No se pudo crear la petición"
 
 #: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
-#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:643
-#: ../daemon/gvfsbackendftp.c:824 ../daemon/gvfsbackendftp.c:1174
-#: ../daemon/gvfsbackendftp.c:1352 ../daemon/gvfsbackendsftp.c:4243
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:649
+#: ../daemon/gvfsbackendftp.c:830 ../daemon/gvfsbackendftp.c:1180
+#: ../daemon/gvfsbackendftp.c:1358 ../daemon/gvfsbackendsftp.c:4243
 #: ../daemon/gvfsbackendsmb.c:2038
 msgid "Target file already exists"
 msgstr "El archivo destino ya existe"
@@ -719,44 +723,44 @@ msgid "Network"
 msgstr "Red"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:381
+#: ../daemon/gvfsbackendftp.c:387
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Introduzca la contraseña para el ftp %s en %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:384
+#: ../daemon/gvfsbackendftp.c:390
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Introduzca la contraseña para el ftp en %s"
 
-#: ../daemon/gvfsbackendftp.c:411 ../daemon/gvfsbackendsftp.c:969
+#: ../daemon/gvfsbackendftp.c:417 ../daemon/gvfsbackendsftp.c:969
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
 msgstr "Se canceló el diálogo de la contraseña"
 
-#: ../daemon/gvfsbackendftp.c:521
+#: ../daemon/gvfsbackendftp.c:527
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp en %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:525
+#: ../daemon/gvfsbackendftp.c:531
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "%s en el ftp de %s"
 
-#: ../daemon/gvfsbackendftp.c:618
+#: ../daemon/gvfsbackendftp.c:624
 msgid "Insufficient permissions"
 msgstr "Permisos insuficientes"
 
-#: ../daemon/gvfsbackendftp.c:664 ../daemon/gvfsbackendsftp.c:2287
+#: ../daemon/gvfsbackendftp.c:670 ../daemon/gvfsbackendsftp.c:2287
 #: ../daemon/gvfsbackendsftp.c:3023 ../daemon/gvfsbackendsftp.c:3364
 #: ../daemon/gvfsbackendsftp.c:4234
 msgid "File is directory"
 msgstr "El archivo es un directorio"
 
-#: ../daemon/gvfsbackendftp.c:872 ../daemon/gvfsbackendftp.c:1137
+#: ../daemon/gvfsbackendftp.c:878 ../daemon/gvfsbackendftp.c:1143
 #: ../daemon/gvfsbackendsftp.c:3230
 msgid "backups not supported yet"
 msgstr "aún no se soportan los respaldos"
@@ -989,25 +993,25 @@ msgstr "Monitor de ubicación de red"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:662 ../daemon/gvfsbackendsmb.c:545
+#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:545
 #: ../daemon/gvfsbackendsmb.c:1417
 #, c-format
 msgid "%s on %s"
 msgstr "%s en %s"
 
-#: ../daemon/gvfsbackendobexftp.c:871
+#: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
 msgstr "Falta el soporte para USB. Contacte con el fabricante de su software."
 
-#: ../daemon/gvfsbackendobexftp.c:991
+#: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
 msgstr "Se perdió la conexión con el dispositivo"
 
-#: ../daemon/gvfsbackendobexftp.c:1488
+#: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
 msgstr "El dispositivo requiere una actualización de software"
 
-#: ../daemon/gvfsbackendobexftp.c:1836 ../daemon/gvfsbackendsmb.c:1929
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1929
 #, c-format
 msgid "Error deleting file: %s"
 msgstr "Error al borrar el archivo: %s"
