@@ -983,6 +983,17 @@ struct _GVfsFtpOpenDataConnectionMethod {
     GVfsFtpOpenDataConnectionFunc func;
 };
 
+static gboolean
+g_vfs_ftp_task_open_data_connection_method_is_supported (const GVfsFtpOpenDataConnectionMethod *method,
+                                                         GVfsFtpTask *                          task)
+{
+  if (method->required_feature &&
+      !g_vfs_backend_ftp_has_feature (task->backend, method->required_feature))
+    return FALSE;
+
+  return TRUE;
+}
+
 static GVfsFtpMethod
 g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused)
 {
@@ -998,8 +1009,7 @@ g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unuse
   /* first try all advertised features */
   for (i = 0; i < G_N_ELEMENTS (funcs_ordered); i++)
     {
-      if (funcs_ordered[i].required_feature &&
-          !g_vfs_backend_ftp_has_feature (task->backend, funcs_ordered[i].required_feature))
+      if (!g_vfs_ftp_task_open_data_connection_method_is_supported (&funcs_ordered[i], task))
         continue;
       method = funcs_ordered[i].func (task, G_VFS_FTP_METHOD_ANY);
       if (method != G_VFS_FTP_METHOD_ANY)
@@ -1011,8 +1021,7 @@ g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unuse
   /* then try if the non-advertised features work */
   for (i = 0; i < G_N_ELEMENTS (funcs_ordered); i++)
     {
-      if (!funcs_ordered[i].required_feature ||
-          g_vfs_backend_ftp_has_feature (task->backend, funcs_ordered[i].required_feature))
+      if (g_vfs_ftp_task_open_data_connection_method_is_supported (&funcs_ordered[i], task))
         continue;
       method = funcs_ordered[i].func (task, G_VFS_FTP_METHOD_ANY);
       if (method != G_VFS_FTP_METHOD_ANY)
