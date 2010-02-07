@@ -1027,10 +1027,10 @@ static GVfsFtpMethod
 g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused)
 {
   static const GVfsFtpOpenDataConnectionMethod funcs_ordered[] = {
-    { G_VFS_FTP_FEATURE_EPSV, G_SOCKET_FAMILY_INVALID, g_vfs_ftp_task_setup_data_connection_epsv },
     { 0,                      G_SOCKET_FAMILY_IPV4,    g_vfs_ftp_task_setup_data_connection_pasv },
-    { G_VFS_FTP_FEATURE_EPRT, G_SOCKET_FAMILY_INVALID, g_vfs_ftp_task_setup_data_connection_eprt },
-    { 0,                      G_SOCKET_FAMILY_IPV4,    g_vfs_ftp_task_setup_data_connection_port }
+    { G_VFS_FTP_FEATURE_EPSV, G_SOCKET_FAMILY_INVALID, g_vfs_ftp_task_setup_data_connection_epsv },
+    { 0,                      G_SOCKET_FAMILY_IPV4,    g_vfs_ftp_task_setup_data_connection_port },
+    { G_VFS_FTP_FEATURE_EPRT, G_SOCKET_FAMILY_INVALID, g_vfs_ftp_task_setup_data_connection_eprt }
   };
   GVfsFtpMethod method;
   GSocketFamily family;
