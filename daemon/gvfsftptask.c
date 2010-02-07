@@ -980,36 +980,68 @@ typedef GVfsFtpMethod (* GVfsFtpOpenDataConnectionFunc) (GVfsFtpTask *task, GVfs
 typedef struct _GVfsFtpOpenDataConnectionMethod GVfsFtpOpenDataConnectionMethod;
 struct _GVfsFtpOpenDataConnectionMethod {
     GVfsFtpFeature                required_feature;
+    GSocketFamily                 required_family;
     GVfsFtpOpenDataConnectionFunc func;
 };
 
 static gboolean
 g_vfs_ftp_task_open_data_connection_method_is_supported (const GVfsFtpOpenDataConnectionMethod *method,
-                                                         GVfsFtpTask *                          task)
+                                                         GVfsFtpTask *                          task,
+                                                         GSocketFamily                          family)
 {
   if (method->required_feature &&
       !g_vfs_backend_ftp_has_feature (task->backend, method->required_feature))
     return FALSE;
 
+  if (method->required_family != G_SOCKET_FAMILY_INVALID &&
+      method->required_family != family)
+    return FALSE;
+
   return TRUE;
+}
+
+static GSocketFamily
+g_vfs_ftp_task_get_socket_family (GVfsFtpTask *task)
+{
+  GSocketAddress *addr;
+  GSocketFamily family;
+
+  /* workaround for the task not having a connection yet */
+  if (task->conn == NULL &&
+      g_vfs_ftp_task_send (task, 0, "NOOP") == 0)
+    {
+      g_vfs_ftp_task_clear_error (task);
+      return G_SOCKET_FAMILY_INVALID;
+    }
+
+  addr = g_vfs_ftp_connection_get_address (task->conn, NULL);
+  if (addr == NULL)
+    return G_SOCKET_FAMILY_INVALID;
+
+  family = g_socket_address_get_family (addr);
+  g_object_unref (addr);
+  return family;
 }
 
 static GVfsFtpMethod
 g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unused)
 {
   static const GVfsFtpOpenDataConnectionMethod funcs_ordered[] = {
-    { G_VFS_FTP_FEATURE_EPSV, g_vfs_ftp_task_setup_data_connection_epsv },
-    { 0,                      g_vfs_ftp_task_setup_data_connection_pasv },
-    { G_VFS_FTP_FEATURE_EPRT, g_vfs_ftp_task_setup_data_connection_eprt },
-    { 0,                      g_vfs_ftp_task_setup_data_connection_port }
+    { G_VFS_FTP_FEATURE_EPSV, G_SOCKET_FAMILY_INVALID, g_vfs_ftp_task_setup_data_connection_epsv },
+    { 0,                      G_SOCKET_FAMILY_IPV4,    g_vfs_ftp_task_setup_data_connection_pasv },
+    { G_VFS_FTP_FEATURE_EPRT, G_SOCKET_FAMILY_INVALID, g_vfs_ftp_task_setup_data_connection_eprt },
+    { 0,                      G_SOCKET_FAMILY_IPV4,    g_vfs_ftp_task_setup_data_connection_port }
   };
   GVfsFtpMethod method;
+  GSocketFamily family;
   guint i;
+
+  family = g_vfs_ftp_task_get_socket_family (task);
 
   /* first try all advertised features */
   for (i = 0; i < G_N_ELEMENTS (funcs_ordered); i++)
     {
-      if (!g_vfs_ftp_task_open_data_connection_method_is_supported (&funcs_ordered[i], task))
+      if (!g_vfs_ftp_task_open_data_connection_method_is_supported (&funcs_ordered[i], task, family))
         continue;
       method = funcs_ordered[i].func (task, G_VFS_FTP_METHOD_ANY);
       if (method != G_VFS_FTP_METHOD_ANY)
@@ -1021,7 +1053,7 @@ g_vfs_ftp_task_setup_data_connection_any (GVfsFtpTask *task, GVfsFtpMethod unuse
   /* then try if the non-advertised features work */
   for (i = 0; i < G_N_ELEMENTS (funcs_ordered); i++)
     {
-      if (g_vfs_ftp_task_open_data_connection_method_is_supported (&funcs_ordered[i], task))
+      if (g_vfs_ftp_task_open_data_connection_method_is_supported (&funcs_ordered[i], task, family))
         continue;
       method = funcs_ordered[i].func (task, G_VFS_FTP_METHOD_ANY);
       if (method != G_VFS_FTP_METHOD_ANY)
