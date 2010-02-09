@@ -33,7 +33,7 @@ distclean-local:
 	fi
 
 install-data-hook:
-	if test -z "$(DESTDIR)" ; then					\
+	if test ! -z "$(DESTDIR)" -a "$(GIO_QUERYMODULES)" != "no" ; then					\
 		$(GIO_QUERYMODULES) $(DESTDIR)$(giomodulesdir) ;	\
 	fi
 

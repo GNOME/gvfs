@@ -26,8 +26,8 @@ gvfs_afc_volume_monitor_LDADD = \
 	$(GLIB_LIBS) \
 	$(DBUS_LIBS) \
 	$(AFC_LIBS) \
-	$(top_srcdir)/common/libgvfscommon.la \
-	$(top_srcdir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
+	$(top_builddir)/common/libgvfscommon.la \
+	$(top_builddir)/monitor/proxy/libgvfsproxyvolumemonitordaemon-noin.la \
 	$(NULL)
 
 remote_volume_monitorsdir = $(datadir)/gvfs/remote-volume-monitors
