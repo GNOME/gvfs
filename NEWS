@@ -1,3 +1,10 @@
+Major changes in 1.5.3
+======================
+* afc: Update for libimobiledevice (rename of libiphone)
+* ftp: Handle cases where symlink target is not defined
+* ftp: Prefer PASV/PORT to EPSV/EPRT for IPv4, the latter for IPv6
+* Translation updates
+
 Major changes in 1.5.2
 ======================
 * Support new "default location" gio mount attribute
