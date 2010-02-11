@@ -1,13 +1,15 @@
-# This file is distributed under the same license as the program package.
+# Slovenian translation of gvfs.
+# Copyright (C) 2005-2006 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gvfs package.
 #
-# Matej Urbančič <mateju@svn.gnome.org>, 2008 - 2009.
+# Matej Urbančič <mateju@svn.gnome.org>, 2008 - 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-12-20 22:14+0000\n"
-"PO-Revision-Date: 2009-12-30 11:00+0100\n"
+"POT-Creation-Date: 2010-02-10 21:38+0000\n"
+"PO-Revision-Date: 2010-02-11 08:04+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -98,19 +100,19 @@ msgstr "vrednosti morajo biti v nizu ali v seznamu nizov"
 #: ../client/gdaemonfileoutputstream.c:873
 #: ../client/gdaemonfileoutputstream.c:1052
 #: ../client/gvfsdaemondbus.c:1048
-#: ../daemon/gvfsbackendobexftp.c:1066
-#: ../daemon/gvfsbackendobexftp.c:1087
-#: ../daemon/gvfsbackendobexftp.c:1206
-#: ../daemon/gvfsbackendobexftp.c:1343
-#: ../daemon/gvfsbackendobexftp.c:1407
-#: ../daemon/gvfsbackendobexftp.c:1609
-#: ../daemon/gvfsbackendobexftp.c:1716
-#: ../daemon/gvfsbackendobexftp.c:1878
-#: ../daemon/gvfsbackendobexftp.c:1905
-#: ../daemon/gvfsbackendobexftp.c:1964
-#: ../daemon/gvfsbackendobexftp.c:1986
-#: ../daemon/gvfsbackendobexftp.c:2049
+#: ../daemon/gvfsbackendobexftp.c:1085
+#: ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225
+#: ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426
+#: ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735
+#: ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924
+#: ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005
 #: ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087
 #: ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91
 #: ../daemon/gvfsbackendtest.c:124
@@ -348,59 +350,59 @@ msgid "Unhandled Lockdown error (%d)"
 msgstr "Prezrta napaka zaklepanja (%d)"
 
 #: ../daemon/gvfsbackendafc.c:206
-msgid "iPhone Device Error: Invalid Argument"
-msgstr "Napaka iPhone naprave: neveljaven argument"
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "Napaka libimobiledevice: neveljaven argument"
 
 #: ../daemon/gvfsbackendafc.c:210
-msgid "iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
-msgstr "Napaka iPhone naprave: ni mogoče najti naprave; prepričajte se, da usbmuxd deluje pravilno."
+msgid "libimobiledevice Error: No device found. Make sure usbmuxd is set up correctly."
+msgstr "Napaka libimobiledevice: ni mogoče najti naprave; prepričajte se, da usbmuxd deluje pravilno."
 
 #: ../daemon/gvfsbackendafc.c:213
 #, c-format
-msgid "Unhandled iPhone Device error (%d)"
-msgstr "Prezrta napaka iPhone naprave (%d)"
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "Prezrta napaka libimobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:274
+#: ../daemon/gvfsbackendafc.c:275
 #: ../daemon/gvfsbackendarchive.c:529
 #: ../daemon/gvfsbackendarchive.c:558
 #: ../daemon/gvfsbackenddav.c:1631
 #: ../daemon/gvfsbackendhttp.c:315
-#: ../daemon/gvfsbackendobexftp.c:842
-#: ../daemon/gvfsbackendobexftp.c:858
+#: ../daemon/gvfsbackendobexftp.c:861
 #: ../daemon/gvfsbackendobexftp.c:877
+#: ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:648
 msgid "Invalid mount spec"
 msgstr "Neveljavno določilo priklopa"
 
-#: ../daemon/gvfsbackendafc.c:280
+#: ../daemon/gvfsbackendafc.c:281
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
 msgstr "Neveljavno AFC mesto: zapis mora biti oblikovan kot afc://uuid:port-number"
 
-#: ../daemon/gvfsbackendafc.c:295
+#: ../daemon/gvfsbackendafc.c:296
 #, c-format
 msgid "Service %d on Apple Mobile Device"
 msgstr "Storitev %d na napravi Apple Mobile"
 
-#: ../daemon/gvfsbackendafc.c:301
+#: ../daemon/gvfsbackendafc.c:302
 #, c-format
 msgid "Apple Mobile Device"
 msgstr "Naprava Apple Mobile"
 
-#: ../daemon/gvfsbackendafc.c:351
+#: ../daemon/gvfsbackendafc.c:353
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../daemon/gvfsbackendafc.c:546
-#: ../daemon/gvfsbackendafc.c:1253
+#: ../daemon/gvfsbackendafc.c:548
+#: ../daemon/gvfsbackendafc.c:1256
 msgid "Backups are not yet supported."
 msgstr "Izdelava varnostnih kopij ni podprta."
 
-#: ../daemon/gvfsbackendafc.c:684
+#: ../daemon/gvfsbackendafc.c:686
 msgid "Invalid seek type"
 msgstr "Neveljavna vrsta iskanja"
 
-#: ../daemon/gvfsbackendafc.c:1172
+#: ../daemon/gvfsbackendafc.c:1175
 #: ../daemon/gvfsbackendsftp.c:1786
 #: ../daemon/gvfsbackendsftp.c:4591
 #: ../daemon/gvfsbackendsmb.c:1702
@@ -413,7 +415,7 @@ msgstr "Dejanje ni podprto"
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:318
 #: ../daemon/gvfsbackendsftp.c:2223
-#: ../daemon/gvfsftpdircache.c:419
+#: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "/ na %s"
@@ -424,10 +426,10 @@ msgstr "/ na %s"
 msgid "No hostname specified"
 msgstr "Ni določenega imena gostitelja"
 
-#: ../daemon/gvfsbackendarchive.c:616
-#: ../daemon/gvfsbackendarchive.c:660
-#: ../daemon/gvfsbackendarchive.c:710
-#: ../daemon/gvfsbackendarchive.c:739
+#: ../daemon/gvfsbackendarchive.c:617
+#: ../daemon/gvfsbackendarchive.c:661
+#: ../daemon/gvfsbackendarchive.c:711
+#: ../daemon/gvfsbackendarchive.c:740
 #: ../daemon/gvfsbackendcdda.c:986
 #: ../daemon/gvfsbackendcomputer.c:627
 #: ../daemon/gvfsbackenddnssd.c:392
@@ -441,16 +443,16 @@ msgstr "Ni določenega imena gostitelja"
 msgid "File doesn't exist"
 msgstr "Datoteka ne obstaja"
 
-#: ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendarchive.c:625
 #: ../daemon/gvfsbackendcomputer.c:645
 #: ../daemon/gvfsbackendgphoto2.c:1877
-#: ../daemon/gvfsbackendobexftp.c:1052
+#: ../daemon/gvfsbackendobexftp.c:1071
 #: ../daemon/gvfsbackendsmb.c:702
 #: ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Ni mogoče odpreti mape"
 
-#: ../daemon/gvfsbackendarchive.c:748
+#: ../daemon/gvfsbackendarchive.c:749
 #: ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714
 #: ../daemon/gvfsbackenddnssd.c:439
@@ -500,7 +502,7 @@ msgstr "Mapa ni prazna"
 
 #: ../daemon/gvfsbackendburn.c:459
 #: ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1791
+#: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "Ni mogoče kopirati datoteke preko mape"
 
@@ -569,13 +571,13 @@ msgstr "Ni take datoteke ali mape na ciljni poti"
 
 #: ../daemon/gvfsbackendburn.c:876
 #: ../daemon/gvfsbackendftp.c:1350
-#: ../daemon/gvfsbackendobexftp.c:1760
+#: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "Ni mogoče kopirati mape preko mape"
 
 #: ../daemon/gvfsbackendburn.c:885
-#: ../daemon/gvfsbackendobexftp.c:1768
-#: ../daemon/gvfsbackendobexftp.c:1799
+#: ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818
 #: ../daemon/gvfsbackendsftp.c:1784
 #: ../daemon/gvfsbackendsftp.c:4399
 msgid "Target file exists"
@@ -583,7 +585,7 @@ msgstr "Ciljna datoteka obstaja"
 
 #: ../daemon/gvfsbackendburn.c:892
 #: ../daemon/gvfsbackendftp.c:1373
-#: ../daemon/gvfsbackendobexftp.c:1775
+#: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
 msgstr "Ni mogoče kopirati drevesne strukture mape"
 
@@ -1135,26 +1137,26 @@ msgstr "Monitor omrežnih mest"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:662
+#: ../daemon/gvfsbackendobexftp.c:681
 #: ../daemon/gvfsbackendsmb.c:545
 #: ../daemon/gvfsbackendsmb.c:1417
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
 
-#: ../daemon/gvfsbackendobexftp.c:871
+#: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
 msgstr "Podpora za USB ni nameščena. Stopite v stik s ponudnikom programske opreme"
 
-#: ../daemon/gvfsbackendobexftp.c:991
+#: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
 msgstr "Povezava z napravo je bila izgubljena"
 
-#: ../daemon/gvfsbackendobexftp.c:1488
+#: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
 msgstr "Naprava zahteva programsko posodobitev"
 
-#: ../daemon/gvfsbackendobexftp.c:1836
+#: ../daemon/gvfsbackendobexftp.c:1855
 #: ../daemon/gvfsbackendsmb.c:1929
 #, c-format
 msgid "Error deleting file: %s"
