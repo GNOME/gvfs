@@ -51,7 +51,6 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <errno.h>
-#include <poll.h>
 #include "crc32.h"
 
 #ifdef HAVE_LIBUDEV
@@ -2989,7 +2988,7 @@ update_mountinfo (void)
   char *contents;
   int res;
   gboolean first;
-  struct pollfd pfd;
+  GPollFD pfd;
 
   first = FALSE;
   if (!mountinfo_initialized)
@@ -3005,9 +3004,9 @@ update_mountinfo (void)
   if (!first)
     {
       pfd.fd = mountinfo_fd;
-      pfd.events = POLLIN | POLLOUT | POLLPRI;
+      pfd.events = G_IO_IN | G_IO_OUT | G_IO_PRI;
       pfd.revents = 0;
-      res = poll (&pfd, 1, 0);
+      res = g_poll (&pfd, 1, 0);
       if (res == 0)
 	return;
     }
