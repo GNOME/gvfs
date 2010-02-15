@@ -161,6 +161,8 @@ struct _GVfsBackendSftp
   GInputStream *reply_stream;
   GDataInputStream *error_stream;
 
+  GCancellable *reply_stream_cancellable;
+
   guint32 current_id;
   
   /* Output Queue */
@@ -254,6 +256,9 @@ g_vfs_backend_sftp_finalize (GObject *object)
   if (backend->command_stream)
     g_object_unref (backend->command_stream);
   
+  if (backend->reply_stream_cancellable)
+    g_object_unref (backend->reply_stream_cancellable);
+
   if (backend->reply_stream)
     g_object_unref (backend->reply_stream);
   
@@ -1216,6 +1221,13 @@ read_reply_async_got_len  (GObject *source_object,
   error = NULL;
   res = g_input_stream_read_finish (G_INPUT_STREAM (source_object), result, &error);
 
+  /* Bail out if cancelled */
+  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+    {
+      g_object_unref (backend);
+      return;
+    }
+
   check_input_stream_read_result (backend, res, error);
 
   backend->reply_size_read += res;
@@ -1224,7 +1236,8 @@ read_reply_async_got_len  (GObject *source_object,
     {
       g_input_stream_read_async (backend->reply_stream,
 				 &backend->reply_size + backend->reply_size_read, 4 - backend->reply_size_read,
-				 0, NULL, read_reply_async_got_len, backend);
+				 0, backend->reply_stream_cancellable, read_reply_async_got_len,
+				 backend);
       return;
     }
   backend->reply_size = GUINT32_FROM_BE (backend->reply_size);
@@ -1242,7 +1255,9 @@ read_reply_async (GVfsBackendSftp *backend)
   backend->reply_size_read = 0;
   g_input_stream_read_async (backend->reply_stream,
                              &backend->reply_size, 4,
-                             0, NULL, read_reply_async_got_len, backend);
+                             0, backend->reply_stream_cancellable,
+                             read_reply_async_got_len,
+                             backend);
 }
 
 static void send_command (GVfsBackendSftp *backend);
@@ -1595,6 +1610,7 @@ do_mount (GVfsBackend *backend,
     }
 
   op_backend->reply_stream = g_unix_input_stream_new (stdout_fd, TRUE);
+  op_backend->reply_stream_cancellable = g_cancellable_new ();
 
   make_fd_nonblocking (stderr_fd);
   is = g_unix_input_stream_new (stderr_fd, TRUE);
@@ -1641,7 +1657,7 @@ do_mount (GVfsBackend *backend,
       return;
     }
 
-  read_reply_async (op_backend);
+  read_reply_async (g_object_ref (op_backend));
 
   sftp_mount_spec = g_mount_spec_new ("sftp");
   if (op_backend->user_specified_in_uri)
@@ -1736,6 +1752,21 @@ try_mount (GVfsBackend *backend,
       
 
   return FALSE;
+}
+
+static gboolean
+try_unmount (GVfsBackend *backend,
+             GVfsJobUnmount *job,
+             GMountUnmountFlags flags,
+             GMountSource *mount_source)
+{
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+
+  if (op_backend->reply_stream && op_backend->reply_stream_cancellable)
+    g_cancellable_cancel (op_backend->reply_stream_cancellable);
+  g_vfs_job_succeeded (G_VFS_JOB (job));
+
+  return TRUE;
 }
 
 static int
@@ -4664,6 +4695,7 @@ g_vfs_backend_sftp_class_init (GVfsBackendSftpClass *klass)
 
   backend_class->mount = real_do_mount;
   backend_class->try_mount = try_mount;
+  backend_class->try_unmount = try_unmount;
   backend_class->try_open_icon_for_read = try_open_icon_for_read;
   backend_class->try_open_for_read = try_open_for_read;
   backend_class->try_read = try_read;
