@@ -110,8 +110,7 @@ g_vfs_ftp_connection_free (GVfsFtpConnection *conn)
   g_return_if_fail (conn != NULL);
 
   g_vfs_ftp_connection_stop_listening (conn);
-  if (conn->data)
-    g_vfs_ftp_connection_close_data_connection (conn);
+  g_vfs_ftp_connection_close_data_connection (conn);
 
   g_object_unref (conn->commands_in);
   g_object_unref (conn->commands);
