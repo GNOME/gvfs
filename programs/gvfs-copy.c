@@ -81,6 +81,19 @@ show_progress (goffset current_num_bytes,
   g_free (size);
 }
 
+static void
+show_help (GOptionContext *context, const char *error)
+{
+  char *help;
+
+  if (error)
+    g_printerr (_("Error: %s"), error);
+
+  help = g_option_context_get_help (context, TRUE, NULL);
+  g_printerr ("%s", help);
+  g_free (help);
+  g_option_context_free (context);
+}
 
 int
 main (int argc, char *argv[])
@@ -98,10 +111,9 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- output files at <location>"));
+  context = g_option_context_new (_("SOURCE... DEST - copy file(s) from SOURCE to DEST"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
-  g_option_context_free (context);
 
   if (error != NULL)
     {
@@ -116,7 +128,7 @@ main (int argc, char *argv[])
 
   if (argc <= 2)
     {
-      g_printerr (_("Missing operand\n"));
+      show_help (context, _("Missing operand\n"));
       return 1;
     }
 
@@ -124,7 +136,7 @@ main (int argc, char *argv[])
 
   if (no_target_directory && argc > 3)
     {
-      g_printerr (_("Too many arguments\n"));
+      show_help (context, _("Too many arguments\n"));
       g_object_unref (dest);
       return 1;
     }
@@ -134,9 +146,12 @@ main (int argc, char *argv[])
   if (!dest_is_dir && argc > 3)
     {
       g_printerr (_("Target %s is not a directory\n"), argv[argc-1]);
+      show_help (context, NULL);
       g_object_unref (dest);
       return 1;
     }
+
+  g_option_context_free (context);
 
   for (i = 1; i < argc - 1; i++)
     {
