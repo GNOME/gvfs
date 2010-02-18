@@ -28,11 +28,14 @@
 #include <errno.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 
 static GMainLoop *main_loop;
 
+static gboolean dont_pair_moves = FALSE;
 static GOptionEntry entries[] = {
+  { "no-pair", 'N', 0, G_OPTION_ARG_NONE, &dont_pair_moves, N_("Don't send single MOVED events."), NULL },
   { NULL }
 };
 
@@ -48,6 +51,13 @@ dir_monitor_callback (GFileMonitor* monitor,
   g_print ("Directory Monitor Event:\n");
   g_print ("Child = %s\n", name);
   g_free (name);
+
+  if (other_file)
+    {
+      name = g_file_get_parse_name (other_file);
+      g_print ("Other = %s\n", name);
+      g_free (name);
+    }
 
   switch (eflags)
     {
@@ -72,6 +82,9 @@ dir_monitor_callback (GFileMonitor* monitor,
     case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
       g_print ("Event = ATTRIB CHANGED\n");
       break;
+    case G_FILE_MONITOR_EVENT_MOVED:
+      g_print ("Event = MOVED\n");
+      break;
     }
 
   return TRUE;
@@ -90,21 +103,30 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new ("- monitor directory <location>");
+  context = g_option_context_new ("- monitor directory <location> [location]...");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
 
   if (argc > 1)
     {
-      file = g_file_new_for_commandline_arg (argv[1]);
-      dmonitor = g_file_monitor_directory (file, G_FILE_MONITOR_WATCH_MOUNTS, NULL, NULL);
-      if (dmonitor != NULL)
-	g_signal_connect (dmonitor, "changed", (GCallback)dir_monitor_callback, NULL);
-      else
+      int i;
+      GFileMonitorFlags flags = G_FILE_MONITOR_WATCH_MOUNTS;
+
+      if (!dont_pair_moves)
+	flags |= G_FILE_MONITOR_SEND_MOVED;
+
+      for (i = 1; i < argc; i++)
 	{
-	  g_print ("Monitoring not supported for %s\n", argv[1]);
-	  return 1;
+	  file = g_file_new_for_commandline_arg (argv[i]);
+	  dmonitor = g_file_monitor_directory (file, flags, NULL, NULL);
+	  if (dmonitor != NULL)
+	    g_signal_connect (dmonitor, "changed", (GCallback)dir_monitor_callback, NULL);
+	  else
+	    {
+	      g_print ("Monitoring not supported for %s\n", argv[1]);
+	      return 1;
+	    }
 	}
     }
 

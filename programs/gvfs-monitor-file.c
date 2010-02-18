@@ -28,11 +28,14 @@
 #include <errno.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 
 static GMainLoop *main_loop;
 
+static gboolean dont_pair_moves = FALSE;
 static GOptionEntry entries[] = {
+  { "no-pair", 'N', 0, G_OPTION_ARG_NONE, &dont_pair_moves, N_("Don't send single MOVED events."), NULL },
   { NULL }
 };
 
@@ -42,8 +45,18 @@ file_monitor_callback (GFileMonitor* monitor,
 		       GFile* other_file,
 		       GFileMonitorEvent eflags)
 {
+  char *name = g_file_get_parse_name (child);
   g_print ("File Monitor Event:\n");
-  g_print ("File = %s\n", g_file_get_parse_name (child));
+  g_print ("File = %s\n", name);
+  g_free (name);
+
+  if (other_file)
+    {
+      name = g_file_get_parse_name (other_file);
+      g_print ("Other = %s\n", name);
+      g_free (name);
+    }
+
   switch (eflags)
     {
     case G_FILE_MONITOR_EVENT_CHANGED:
@@ -67,6 +80,10 @@ file_monitor_callback (GFileMonitor* monitor,
     case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
       g_print ("Event = ATTRIB CHANGED\n");
       break;
+    case G_FILE_MONITOR_EVENT_MOVED:
+      g_print ("Event = MOVED\n");
+      break;
+
     }
 
   return TRUE;
@@ -85,16 +102,25 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new ("- monitor file <location>");
+  context = g_option_context_new ("- monitor file <location> [location]...");
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
 
   if (argc > 1)
     {
-      file = g_file_new_for_commandline_arg (argv[1]);
-      fmonitor = g_file_monitor_file (file, G_FILE_MONITOR_WATCH_MOUNTS, NULL, NULL);
-      g_signal_connect (fmonitor, "changed", (GCallback)file_monitor_callback, NULL);
+      int i;
+      GFileMonitorFlags flags = G_FILE_MONITOR_WATCH_MOUNTS;
+
+      if (!dont_pair_moves)
+	flags |= G_FILE_MONITOR_SEND_MOVED;
+
+       for (i = 1; i < argc; i++)
+	{
+	  file = g_file_new_for_commandline_arg (argv[i]);
+	  fmonitor = g_file_monitor_file (file, flags, NULL, NULL);
+	  g_signal_connect (fmonitor, "changed", (GCallback)file_monitor_callback, NULL);
+	}
     }
 
   main_loop = g_main_loop_new (NULL, FALSE);
