@@ -153,7 +153,7 @@ main (int argc, char *argv[])
   g_type_init ();
 
   error = NULL;
-  context = g_option_context_new (_("- output files at <location>"));
+  context = g_option_context_new (_("DEST - read from standart input and save to DEST"));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
