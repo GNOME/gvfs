@@ -818,45 +818,44 @@ g_gdu_drive_stop_on_all_unmounted (GDrive              *_drive,
   GSimpleAsyncResult *simple;
   GduDevice *device;
 
-  device = gdu_presentable_get_device (drive->presentable);
-  if (device == NULL)
-    {
-      simple = g_simple_async_result_new_error (G_OBJECT (drive),
-                                                callback,
-                                                user_data,
-                                                G_IO_ERROR,
-                                                G_IO_ERROR_FAILED,
-                                                "Drive is activatable and not running");
-      g_simple_async_result_complete_in_idle (simple);
-      g_object_unref (simple);
-    }
-  else
-    {
-      simple = g_simple_async_result_new (G_OBJECT (drive),
-                                          callback,
-                                          user_data,
-                                          NULL);
+  simple = g_simple_async_result_new (G_OBJECT (drive),
+                                      callback,
+                                      user_data,
+                                      NULL);
 
-      switch (drive->start_stop_type)
+  switch (drive->start_stop_type)
+    {
+    case G_DRIVE_START_STOP_TYPE_SHUTDOWN:
+      device = gdu_presentable_get_device (drive->presentable);
+      if (device == NULL)
         {
-        case G_DRIVE_START_STOP_TYPE_SHUTDOWN:
-          gdu_device_op_drive_detach (device, stop_cb, simple);
-          break;
-
-        case G_DRIVE_START_STOP_TYPE_MULTIDISK:
-          gdu_drive_deactivate (GDU_DRIVE (drive->presentable), drive_deactivate_cb, simple);
-          break;
-
-        default:
           g_simple_async_result_set_error (simple,
                                            G_IO_ERROR,
-                                           G_IO_ERROR_NOT_SUPPORTED,
-                                           "start_stop_type %d not supported",
-                                           drive->start_stop_type);
+                                           G_IO_ERROR_FAILED,
+                                           "Cannot detach: drive has no GduDevice object");
           g_simple_async_result_complete_in_idle (simple);
           g_object_unref (simple);
-          break;
         }
+      else
+        {
+          gdu_device_op_drive_detach (device, stop_cb, simple);
+          g_object_unref (device);
+        }
+      break;
+
+    case G_DRIVE_START_STOP_TYPE_MULTIDISK:
+      gdu_drive_deactivate (GDU_DRIVE (drive->presentable), drive_deactivate_cb, simple);
+      break;
+
+    default:
+      g_simple_async_result_set_error (simple,
+                                       G_IO_ERROR,
+                                       G_IO_ERROR_NOT_SUPPORTED,
+                                       "start_stop_type %d not supported",
+                                       drive->start_stop_type);
+      g_simple_async_result_complete_in_idle (simple);
+      g_object_unref (simple);
+      break;
     }
 }
 
