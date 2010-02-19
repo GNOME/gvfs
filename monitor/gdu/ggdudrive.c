@@ -177,7 +177,7 @@ update_drive (GGduDrive *drive)
       g_free (drive->device_file);
       drive->dev = 0;
       drive->device_file = NULL;
-      drive->is_media_removable = TRUE;
+      drive->is_media_removable = FALSE;
       drive->has_media = TRUE;
       drive->can_eject = FALSE;
       drive->can_poll_for_media = FALSE;
