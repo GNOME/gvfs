@@ -849,9 +849,7 @@ should_drive_be_ignored (GduPool *pool, GduDrive *d, GList *fstab_mount_points)
   device = gdu_presentable_get_device (GDU_PRESENTABLE (d));
 
   /* If there is no GduDevice for a drive, then ignore it unless
-   * we know how to start it. Right now this is only relevant
-   * for GduLinuxMdDrive but we can add other stuff to libgdu
-   * in the future and things will work here
+   * we know how to start it (e.g. RAID arrays, Volume Groups)
    */
   if (device == NULL)
     {
