@@ -1339,6 +1339,16 @@ do_pull (GVfsBackend *         backend,
   src = g_vfs_ftp_file_new_from_gvfs (ftp, source);
   dest = g_file_new_for_path (local_path);
 
+  if (progress_callback)
+    {
+      GFileInfo *info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, src, TRUE);
+      if (info)
+        {
+          total_size = g_file_info_get_size (info);
+          g_object_unref (info);
+        }
+    }
+
   g_vfs_ftp_task_setup_data_connection (&task);
   g_vfs_ftp_task_send_and_check (&task,
                                  G_VFS_FTP_PASS_100 | G_VFS_FTP_FAIL_200,
@@ -1370,16 +1380,6 @@ do_pull (GVfsBackend *         backend,
       g_vfs_ftp_task_close_data_connection (&task);
       g_vfs_ftp_task_receive (&task, 0, NULL);
       goto out;
-    }
-
-  if (progress_callback)
-    {
-      GFileInfo *info = g_vfs_ftp_dir_cache_lookup_file (ftp->dir_cache, &task, src, TRUE);
-      if (info)
-        {
-          total_size = g_file_info_get_size (info);
-          g_object_unref (info);
-        }
     }
 
   input = g_io_stream_get_input_stream (g_vfs_ftp_connection_get_data_stream (task.conn));
