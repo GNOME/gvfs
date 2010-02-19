@@ -151,6 +151,7 @@ struct _GVfsBackendSftp
   gboolean user_specified_in_uri;
   char *user;
   char *tmp_password;
+  GPasswordSave password_save;
 
   guint32 my_uid;
   guint32 my_gid;
@@ -846,7 +847,6 @@ handle_login (GVfsBackend *backend,
   gboolean ret_val;
   char *new_password = NULL;
   char *new_user = NULL;
-  GPasswordSave password_save = G_PASSWORD_SAVE_NEVER;
   gsize bytes_written;
   gboolean password_in_keyring = FALSE;
   const gchar *authtype = NULL;
@@ -966,7 +966,7 @@ handle_login (GVfsBackend *backend,
                                                 &new_user,
                                                 NULL,
 						NULL,
-                                                &password_save) ||
+                                                &op_backend->password_save) ||
                   aborted)
                 {
                   g_set_error_literal (error, G_IO_ERROR,
@@ -1111,7 +1111,7 @@ handle_login (GVfsBackend *backend,
 				   :
 				   0, 
                                    new_password,
-                                   password_save);
+                                   op_backend->password_save);
     }
 
   g_free (object);
@@ -1662,8 +1662,11 @@ real_do_mount (GVfsBackend *backend,
 	       GMountSource *mount_source,
 	       gboolean is_automount)
 {
+  GVfsBackendSftp *op_backend = G_VFS_BACKEND_SFTP (backend);
+
   setup_ssh_environment ();
 
+  op_backend->password_save = G_PASSWORD_SAVE_NEVER;
   do_mount (backend, job, mount_spec, mount_source, is_automount);
 }
 
