@@ -169,7 +169,9 @@ update_drive (GGduDrive *drive)
   else
     drive->name = gdu_presentable_get_name (drive->presentable);
 
-  /* the GduDevice for an activatable drive (such as RAID) is NULL if the drive is not activated */
+  /* It's perfectly fine to not have a GduDevice - for example, this is the case for non-running
+   * MD RAID arrays as well as LVM2 Volume Group "drives"
+   */
   if (device == NULL)
     {
       g_free (drive->device_file);
