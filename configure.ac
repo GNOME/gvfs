@@ -47,7 +47,9 @@ PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.23.4 gthread-2.0 gobject-2.0 gmodule-no-ex
 
 PKG_CHECK_MODULES(DBUS, dbus-1)
 
-AC_ARG_WITH(dbus_service_dir, [  --with-dbus-service-dir=PATH choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
+AC_ARG_WITH(dbus_service_dir,
+		AS_HELP_STRING([--with-dbus-service-dir=PATH],[choose directory for dbus service files]),
+		[default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
 DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
@@ -112,7 +114,7 @@ AC_SEARCH_LIBS(login_tty, util, [AC_DEFINE([HAVE_LOGIN_TTY],[],[Whether login_tt
 dnl **************************************************
 dnl *** Check if we should build with http backend ***
 dnl **************************************************
-AC_ARG_ENABLE(http, [  --disable-http           build without http/dav backend])
+AC_ARG_ENABLE(http, AS_HELP_STRING([--disable-http],[build without http/dav backend]))
 msg_http=no
 HTTP_CFLAGS=
 HTTP_LIBS=
@@ -135,7 +137,7 @@ dnl *** Check if we should build with DNS-SD backend ***
 dnl **************************************************
 AM_CONDITIONAL(HAVE_AVAHI, false)
 			  
-AC_ARG_ENABLE(avahi, [  --disable-avahi     build without avahi support])
+AC_ARG_ENABLE(avahi, AS_HELP_STRING([--disable-avahi],[build without avahi support]))
 msg_avahi=no
 if test "x$enable_avahi" != "xno"; then
 	PKG_CHECK_MODULES(AVAHI, avahi-glib >= 0.6 avahi-client >= 0.6,
@@ -159,7 +161,7 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0,
 dnl *************************
 dnl *** Check for libudev ***
 dnl *************************
-AC_ARG_ENABLE(udev, [  --disable-udev           build without libudev])
+AC_ARG_ENABLE(udev, AS_HELP_STRING([--disable-udev],[build without libudev]))
 msg_udev=no
 UDEV_CFLAGS=
 UDEV_LIBS=
@@ -176,7 +178,7 @@ fi
 dnl **********************
 dnl *** Check for FUSE ***
 dnl **********************
-AC_ARG_ENABLE(fuse, [  --disable-fuse           build without FUSE support])
+AC_ARG_ENABLE(fuse, AS_HELP_STRING([--disable-fuse],[build without FUSE support]))
 msg_fuse=no
 FUSE_LIBS=
 FUSE_CFLAGS=
@@ -195,7 +197,7 @@ AM_CONDITIONAL(USE_FUSE, [test "$msg_fuse" = "yes"])
 dnl **********************
 dnl *** Check for GConf ***
 dnl **********************
-AC_ARG_ENABLE(gconf, [  --disable-gconf           build without GConf support])
+AC_ARG_ENABLE(gconf, AS_HELP_STRING([--disable-gconf],[build without GConf support]))
 msg_gconf=no
 GCONF_LIBS=
 GCONF_CFLAGS=
@@ -231,7 +233,7 @@ dnl ************************************
 dnl *** Check for gnome-disk-utility ***
 dnl ************************************
 
-AC_ARG_ENABLE(gdu, [  --disable-gdu           build without GDU volume monitor])
+AC_ARG_ENABLE(gdu, AS_HELP_STRING([--disable-gdu],[build without GDU volume monitor]))
 msg_gdu=no
 GDU_LIBS=
 GDU_CFLAGS=
@@ -251,7 +253,7 @@ AM_CONDITIONAL(USE_GDU, [test "$msg_gdu" = "yes"])
 dnl **********************
 dnl *** Check for HAL ***
 dnl **********************
-AC_ARG_ENABLE(hal, [  --disable-hal           build without HAL support])
+AC_ARG_ENABLE(hal, AS_HELP_STRING([--disable-hal],[build without HAL support]))
 msg_hal=no
 have_hal_fast_init=no
 HAL_LIBS=
@@ -279,7 +281,7 @@ AM_CONDITIONAL(USE_HAL, [test "$msg_hal" = "yes"])
 dnl **********************
 dnl *** Check for gudev ***
 dnl **********************
-AC_ARG_ENABLE(gudev, [  --disable-gudev           build without gudev support])
+AC_ARG_ENABLE(gudev, AS_HELP_STRING([--disable-gudev],[build without gudev support]))
 msg_gudev=no
 GUDEV_REQUIRED=001
 
@@ -306,7 +308,7 @@ fi
 dnl **************************************************
 dnl *** Check if we should build with CDDA backend ***
 dnl **************************************************
-AC_ARG_ENABLE(cdda, [  --disable-cdda           build without CDDA backend])
+AC_ARG_ENABLE(cdda, AS_HELP_STRING([--disable-cdda],[build without CDDA backend]))
 msg_cdda=no
 CDDA_LIBS=
 CDDA_CFLAGS=
@@ -325,7 +327,7 @@ AM_CONDITIONAL(USE_CDDA, [test "$msg_cdda" = "yes"])
 dnl *************************************************
 dnl *** Check if we should build with AFC backend ***
 dnl *************************************************
-AC_ARG_ENABLE(afc, [  --disable-afc           build without AFC backend])
+AC_ARG_ENABLE(afc, AS_HELP_STRING([--disable-afc],[build without AFC backend]))
 msg_afc=no
 AFC_LIBS=
 AFC_CFLAGS=
@@ -347,7 +349,7 @@ AM_CONDITIONAL(USE_AFC, [test "$msg_afc" = "yes"])
 dnl *****************************************************
 dnl *** Check if we should build with obexftp backend ***
 dnl *****************************************************
-AC_ARG_ENABLE(obexftp, [  --disable-obexftp           build without ObexFTP backend])
+AC_ARG_ENABLE(obexftp, AS_HELP_STRING([--disable-obexftp],[build without ObexFTP backend]))
 msg_obexftp=no
 OBEXFTP_LIBS=
 OBEXFTP_CFLAGS=
@@ -372,7 +374,7 @@ AM_CONDITIONAL(USE_OBEXFTP, [test "$msg_obexftp" = "yes"])
 dnl *************************
 dnl *** Check for gphoto2 ***
 dnl *************************
-AC_ARG_ENABLE(gphoto2, [  --disable-gphoto2           build without gphoto2 support])
+AC_ARG_ENABLE(gphoto2, AS_HELP_STRING([--disable-gphoto2],[build without gphoto2 support]))
 msg_gphoto2=no
 GPHOTO2_LIBS=
 GPHOTO2_CFLAGS=
@@ -406,7 +408,7 @@ AM_CONDITIONAL(USE_GPHOTO2, [test "$msg_gphoto2" = "yes"])
 dnl *******************************
 dnl *** Check for GNOME Keyring ***
 dnl *******************************
-AC_ARG_ENABLE(keyring, [  --disable-keyring           build without GNOME Keyring support])
+AC_ARG_ENABLE(keyring, AS_HELP_STRING([--disable-keyring],[build without GNOME Keyring support]))
 msg_keyring=no
 KEYRING_LIBS=
 KEYRING_CFLAGS=
@@ -425,10 +427,10 @@ AM_CONDITIONAL(USE_KEYRING, [test "$msg_keyring" = "yes"])
 dnl ==========================================================================
 dnl Samba 3.0
 
-AC_ARG_ENABLE(samba, [  --disable-samba       build without samba support])
+AC_ARG_ENABLE(samba, AS_HELP_STRING([--disable-samba],[build without samba support]))
 msg_samba="no"
 if test "x$enable_samba" != "xno"; then
-  AC_ARG_WITH(samba-includes, [  --with-samba-includes=PREFIX     Location of samba includes.],
+  AC_ARG_WITH(samba-includes, AS_HELP_STRING([--with-samba-includes=PREFIX],[Location of samba includes.]),
 	      with_samba_includes="$withval", with_samba_includes="/usr/include")
   have_samba_includes="no"
   if test "x${with_samba_includes}" != "xno"; then
@@ -458,7 +460,7 @@ if test "x$enable_samba" != "xno"; then
 		SAMBA_CFLAGS=""
 	fi
   fi
-  AC_ARG_WITH(samba-libs, [  --with-samba-libs=PREFIX     	Location of Samba libs.],
+  AC_ARG_WITH(samba-libs, AS_HELP_STRING([--with-samba-libs=PREFIX],[Location of Samba libs.]),
 	      with_samba_libs="$withval", with_samba_libs="/usr/lib")
   if test "x${with_samba_libs}" != "xno" -a "x${have_samba_includes}" != "xno"; then
 	LDFLAGS_save="$LDFLAGS"
@@ -498,10 +500,10 @@ dnl ****************************
 dnl *** Check for libarchive ***
 dnl ****************************
 
-AC_ARG_ENABLE(archive, [  --disable-archive       build without archive support])
+AC_ARG_ENABLE(archive, AS_HELP_STRING([--disable-archive],[build without archive support]))
 msg_archive="no"
 if test "x$enable_archive" != "xno"; then
-  AC_ARG_WITH(archive-includes, [  --with-archive-includes=PREFIX     Location of archive includes.],
+  AC_ARG_WITH(archive-includes, AS_HELP_STRING([--with-archive-includes=PREFIX],[Location of archive includes.]),
 	      with_archive_includes="$withval", with_archive_includes="/usr/include")
   have_archive_includes="no"
   if test "x${with_archive_includes}" != "xno"; then
@@ -522,7 +524,7 @@ if test "x$enable_archive" != "xno"; then
 		ARCHIVE_CFLAGS=""
 	fi
   fi
-  AC_ARG_WITH(archive-libs, [  --with-archive-libs=PREFIX     	Location of Archive libs.],
+  AC_ARG_WITH(archive-libs, AS_HELP_STRING ([--with-archive-libs=PREFIX],[Location of Archive libs.]),
 	      with_archive_libs="$withval", with_archive_libs="/usr/lib")
   if test "x${with_archive_libs}" != "xno" -a "x${have_archive_includes}" != "xno"; then
 	LDFLAGS_save="$LDFLAGS"
@@ -651,7 +653,7 @@ dnl ==========================================================================
 dnl Turn on the additional warnings last, so -Werror doesn't affect other tests.
 
 AC_ARG_ENABLE(more-warnings,
-[  --enable-more-warnings  Maximum compiler warnings],
+AS_HELP_STRING([--enable-more-warnings],[Maximum compiler warnings]),
 set_more_warnings="$enableval",[
 if test -f $srcdir/CVSVERSION; then
 	is_cvs_version=true
