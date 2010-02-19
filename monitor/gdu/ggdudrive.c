@@ -1217,7 +1217,7 @@ gboolean
 g_gdu_drive_has_presentable (GGduDrive       *drive,
                              GduPresentable  *presentable)
 {
-  return gdu_presentable_get_id (drive->presentable) == gdu_presentable_get_id (presentable);
+  return g_strcmp0 (gdu_presentable_get_id (drive->presentable), gdu_presentable_get_id (presentable)) == 0;
 }
 
 time_t
