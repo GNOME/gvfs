@@ -195,6 +195,8 @@ struct _GVfsBackendGphoto2
 
   /* whether we can write to the device */
   gboolean can_write;
+  /* whether we can delete files from to the device */
+  gboolean can_delete;
 
   /* This lock protects all members in this class that are not
    * used both on the main thread and on the IO thread. 
@@ -1135,7 +1137,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
       g_object_unref (icon);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, gphoto2_backend->can_write);
-      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_write);
+      g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_delete);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
       g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, FALSE); 
@@ -1187,7 +1189,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
           g_file_info_set_size (info, 0);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, gphoto2_backend->can_write);
-          g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_write);
+          g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_delete);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, TRUE);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
           g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, gphoto2_backend->can_write); 
@@ -1280,7 +1282,7 @@ file_get_info (GVfsBackendGphoto2 *gphoto2_backend,
 
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ, TRUE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE, gphoto2_backend->can_write);
-  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_write);
+  g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_DELETE, gphoto2_backend->can_delete);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH, FALSE);
   g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_RENAME, gphoto2_backend->can_write); 
@@ -1689,6 +1691,7 @@ do_mount (GVfsBackend *backend,
   g_free (fuse_name);
 
   gphoto2_backend->can_write = FALSE;
+  gphoto2_backend->can_delete = FALSE;
   rc = gp_camera_get_storageinfo (gphoto2_backend->camera, &storage_info, &num_storage_info, gphoto2_backend->context);
   if (rc == 0)
     {
@@ -1697,10 +1700,16 @@ do_mount (GVfsBackend *backend,
           if (storage_info[0].fields & GP_STORAGEINFO_ACCESS && storage_info[0].access == GP_STORAGEINFO_AC_READWRITE)
             {
               gphoto2_backend->can_write = TRUE;
+              gphoto2_backend->can_delete = TRUE;
+            }
+          if (storage_info[0].fields & GP_STORAGEINFO_ACCESS && storage_info[0].access == GP_STORAGEINFO_AC_READONLY_WITH_DELETE)
+            {
+              gphoto2_backend->can_delete = TRUE;
             }
         }
     }
   DEBUG ("  can_write = %d", gphoto2_backend->can_write);
+  DEBUG ("  can_delete = %d", gphoto2_backend->can_delete);
 
   g_vfs_job_succeeded (G_VFS_JOB (job));
 
@@ -2870,7 +2879,7 @@ do_delete (GVfsBackend *backend,
   name = NULL;
   dir_name = NULL;
 
-  if (!gphoto2_backend->can_write)
+  if (!gphoto2_backend->can_delete)
     {
       g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
                         G_IO_ERROR_NOT_SUPPORTED,
