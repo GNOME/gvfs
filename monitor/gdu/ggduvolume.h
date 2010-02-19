@@ -73,6 +73,8 @@ gboolean   g_gdu_volume_has_device_file (GGduVolume      *volume,
                                          const gchar     *device_file);
 gboolean   g_gdu_volume_has_dev         (GGduVolume       *volume,
                                          dev_t             dev);
+gboolean   g_gdu_volume_has_presentable (GGduVolume       *volume,
+                                         GduPresentable   *presentable);
 
 GduPresentable *g_gdu_volume_get_presentable (GGduVolume *volume);
 

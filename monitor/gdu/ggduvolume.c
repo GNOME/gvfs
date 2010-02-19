@@ -1851,3 +1851,12 @@ g_gdu_volume_get_unix_mount_point (GGduVolume *volume)
 {
   return volume->unix_mount_point;
 }
+
+gboolean
+g_gdu_volume_has_presentable (GGduVolume       *volume,
+                              GduPresentable  *presentable)
+{
+  return volume->gdu_volume != NULL &&
+    g_strcmp0 (gdu_presentable_get_id (GDU_PRESENTABLE (volume->gdu_volume)),
+               gdu_presentable_get_id (presentable)) == 0;
+}
