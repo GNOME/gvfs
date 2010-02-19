@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: gvfs.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-02-18 16:27+0000\n"
-"PO-Revision-Date: 2010-02-18 18:51+0100\n"
+"POT-Creation-Date: 2010-02-19 11:54+0000\n"
+"PO-Revision-Date: 2010-02-19 13:02+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Operation not supported, files on different mounts"
 msgstr ""
 "La operación no está soportada, los archivos están en diferentes puntos de "
-"montajesudo "
+"montaje "
 
 #. Translators: %s is the name of a programming function
 #: ../client/gdaemonfile.c:868 ../client/gdaemonfile.c:902
@@ -2251,7 +2251,8 @@ msgid "Etag not available\n"
 msgstr "Etiqueta-e no disponible\n"
 
 #: ../programs/gvfs-save.c:156
-msgid "DEST - read from standart input and save to DEST"
+#| msgid "DEST - read from standart input and save to DEST"
+msgid "DEST - read from standard input and save to DEST"
 msgstr "DESTINO: leer de entrada estándar y guardar en DESTINO"
 
 #: ../programs/gvfs-set-attribute.c:36
