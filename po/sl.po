@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-02-18 17:52+0000\n"
-"PO-Revision-Date: 2010-02-19 08:23+0100\n"
+"POT-Creation-Date: 2010-02-19 13:16+0000\n"
+"PO-Revision-Date: 2010-02-19 14:23+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -77,15 +77,15 @@ msgid "Invalid filename %s"
 msgstr "Neveljavno ime datoteke %s"
 
 #: ../client/gdaemonfile.c:2232
-#: ../client/gdaemonvfs.c:1188
-#: ../client/gdaemonvfs.c:1323
-#: ../client/gdaemonvfs.c:1376
+#: ../client/gdaemonvfs.c:1200
+#: ../client/gdaemonvfs.c:1335
+#: ../client/gdaemonvfs.c:1388
 #, c-format
 msgid "Error setting file metadata: %s"
 msgstr "Napaka med nastavitvijo metapodatkov datoteke: %s"
 
 #: ../client/gdaemonfile.c:2233
-#: ../client/gdaemonvfs.c:1377
+#: ../client/gdaemonvfs.c:1389
 msgid "values must be string or list of strings"
 msgstr "vrednosti morajo biti v nizu ali v seznamu nizov"
 
@@ -162,7 +162,7 @@ msgstr "Iskanje po pretoku ni podprto"
 msgid "Error while getting mount info: %s"
 msgstr "Napaka med pridobivanjem podrobnosti priklopa: %s"
 
-#: ../client/gdaemonvfs.c:1189
+#: ../client/gdaemonvfs.c:1201
 msgid "Can't contact session bus"
 msgstr "Ni se mogoče povezati z vodilom seje"
 
@@ -2486,7 +2486,7 @@ msgid "Etag not available\n"
 msgstr "Etag ni na voljo\n"
 
 #: ../programs/gvfs-save.c:156
-msgid "DEST - read from standart input and save to DEST"
+msgid "DEST - read from standard input and save to DEST"
 msgstr "CILJ - preberi preko standardnega vhoda in shrani na cilj"
 
 #: ../programs/gvfs-set-attribute.c:36
