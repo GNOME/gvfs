@@ -863,6 +863,7 @@ handler_lookup_mount_reply (DBusMessage *reply,
 typedef struct {
   GMountInfoLookupCallback callback;
   gpointer user_data;
+  GMountInfo *info;
 } GetMountInfoData;
 
 static void
@@ -893,6 +894,16 @@ async_get_mount_info_response (DBusMessage *reply,
   g_free (data);
 }
 
+static gboolean
+async_get_mount_info_cache_hit (gpointer _data)
+{
+  GetMountInfoData *data = _data;
+  data->callback (data->info, data->user_data, NULL);
+  g_mount_info_unref (data->info);
+  g_free (data);
+  return FALSE;
+}
+
 void
 _g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
 				    const char *path,
@@ -903,13 +914,17 @@ _g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
   GetMountInfoData *data;
   DBusMessage *message;
   DBusMessageIter iter;
-  
+
+  data = g_new0 (GetMountInfoData, 1);
+  data->callback = callback;
+  data->user_data = user_data;
+
   info = lookup_mount_info_in_cache (spec, path);
 
   if (info != NULL)
     {
-      callback (info, user_data, NULL);
-      g_mount_info_unref (info);
+      data->info = info;
+      g_idle_add (async_get_mount_info_cache_hit, data);
       return;
     }
 
@@ -923,9 +938,6 @@ _g_daemon_vfs_get_mount_info_async (GMountSpec *spec,
   dbus_message_iter_init_append (message, &iter);
   g_mount_spec_to_dbus_with_path (&iter, spec, path);
 
-  data = g_new0 (GetMountInfoData, 1);
-  data->callback = callback;
-  data->user_data = user_data;
   
   _g_dbus_connection_call_async (the_vfs->async_bus, message, G_VFS_DBUS_TIMEOUT_MSECS,
 				 async_get_mount_info_response,
