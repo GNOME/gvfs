@@ -1142,6 +1142,23 @@ find_volume_for_device_file (GGduVolumeMonitor *monitor,
   return ret;
 }
 
+static GGduVolume *
+find_volume_for_presentable (GGduVolumeMonitor *monitor,
+                             GduPresentable    *presentable)
+{
+  GList *l;
+
+  for (l = monitor->volumes; l != NULL; l = l->next)
+    {
+      GGduVolume *volume = G_GDU_VOLUME (l->data);
+
+      if (g_gdu_volume_has_presentable (volume, presentable))
+        return volume;
+    }
+
+  return NULL;
+}
+
 static GGduDrive *
 find_drive_by_device_file (GGduVolumeMonitor *monitor,
                            const gchar       *device_file)
@@ -1308,21 +1325,14 @@ update_volumes (GGduVolumeMonitor *monitor,
   for (l = removed; l != NULL; l = l->next)
     {
       GduPresentable *p = GDU_PRESENTABLE (l->data);
-      GduDevice *d;
 
-      d = gdu_presentable_get_device (p);
-
-      if (d != NULL)
+      volume = find_volume_for_presentable (monitor, p);
+      if (volume != NULL)
         {
-          volume = find_volume_for_device_file (monitor, gdu_device_get_device_file (d));
-          if (volume != NULL)
-            {
-              /*g_debug ("removing volume %s", gdu_device_get_device_file (d));*/
-              g_gdu_volume_removed (volume);
-              monitor->volumes = g_list_remove (monitor->volumes, volume);
-              *removed_volumes = g_list_prepend (*removed_volumes, volume);
-            }
-          g_object_unref (d);
+          /*g_debug ("removing volume %s", gdu_device_get_device_file (d));*/
+          g_gdu_volume_removed (volume);
+          monitor->volumes = g_list_remove (monitor->volumes, volume);
+          *removed_volumes = g_list_prepend (*removed_volumes, volume);
         }
     }
 
@@ -1339,41 +1349,14 @@ update_volumes (GGduVolumeMonitor *monitor,
 
       if (volume == NULL)
         {
-          GduPresentable *toplevel_drive;
+          GduDrive *gdu_drive;
 
-          toplevel_drive = gdu_presentable_get_enclosing_presentable (p);
-          /* handle logical partitions enclosed by an extented partition */
-          if (GDU_IS_VOLUME (toplevel_drive))
+          drive = NULL;
+          gdu_drive = gdu_volume_get_drive (GDU_VOLUME (p));
+          if (gdu_drive != NULL)
             {
-              GduPresentable *temp;
-              temp = toplevel_drive;
-              toplevel_drive = gdu_presentable_get_enclosing_presentable (toplevel_drive);
-              g_object_unref (temp);
-            }
-
-          if (toplevel_drive != NULL)
-            {
-              if (GDU_IS_DRIVE (toplevel_drive))
-                {
-                  GduDevice *toplevel_drive_device;
-
-                  drive = NULL;
-                  toplevel_drive_device = gdu_presentable_get_device (toplevel_drive);
-                  if (toplevel_drive_device != NULL)
-                    {
-                      drive = find_drive_by_device_file (monitor, gdu_device_get_device_file (toplevel_drive_device));
-                      /*g_debug ("adding volume %s (drive %s)",
-                        gdu_device_get_device_file (d),
-                        gdu_device_get_device_file (toplevel_device));*/
-                      g_object_unref (toplevel_drive_device);
-                    }
-                }
-              g_object_unref (toplevel_drive);
-            }
-          else
-            {
-              drive = NULL;
-              /*g_debug ("adding volume %s (no drive)", gdu_device_get_device_file (d));*/
+              drive = find_drive_by_presentable (monitor, GDU_PRESENTABLE (gdu_drive));
+              g_object_unref (gdu_drive);
             }
 
           volume = g_gdu_volume_new (G_VOLUME_MONITOR (monitor),
