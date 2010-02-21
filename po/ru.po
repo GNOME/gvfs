@@ -2,83 +2,75 @@
 # Copyright (C) 2008 Free Software Foudnation Inc.
 # This file is distributed under the same license as the gvfs package.
 #
-# Leonid Kanter <leon@asplinux.ru>, 2008.
+# Leonid Kanter <leon@asplinux.ru>, 2008, 2010.
+# Artur Sibagatullin <ArtSib@mail.ru>, 2009, 2010.
+# Alexander Saprykin <xelfium@gmail.com>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: gvfs trunk\n"
+"Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-14 23:40+0300\n"
-"PO-Revision-Date: 2009-03-14 23:24+0300\n"
-"Last-Translator: Yuriy Penkin <yuriy.penkin@gmail.com>\n"
-"Language-Team: Russian <en@li.org>\n"
+"POT-Creation-Date: 2010-02-21 16:59+0200\n"
+"PO-Revision-Date: 2010-02-21 17:13+0200\n"
+"Last-Translator: Leonid Kanter <leon@asplinux.ru>\n"
+"Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: KBabel 1.11.4\n"
 
-#: ../client/gdaemonfile.c:482 ../client/gdaemonfile.c:1984
+#: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
 msgid "Operation not supported, files on different mounts"
 msgstr "Действие не поддерживается, файлы на разных точках монтирования"
 
-#: ../client/gdaemonfile.c:787
-msgid "Invalid return value from get_info"
-msgstr "Функция get_info вернула неверное значение"
+#. Translators: %s is the name of a programming function
+#: ../client/gdaemonfile.c:868 ../client/gdaemonfile.c:902
+#: ../client/gdaemonfile.c:1017 ../client/gdaemonfile.c:1096
+#: ../client/gdaemonfile.c:1159 ../client/gdaemonfile.c:1222
+#: ../client/gdaemonfile.c:1288 ../client/gdaemonfile.c:1350
+#: ../client/gdaemonfile.c:1367 ../client/gdaemonfile.c:1851
+#: ../client/gdaemonfile.c:1880 ../client/gdaemonfile.c:2036
+#: ../client/gdaemonfile.c:2536 ../client/gdaemonfile.c:2585
+#: ../client/gdaemonfile.c:2649 ../client/gdaemonfile.c:2733
+#: ../client/gdaemonfile.c:2808 ../client/gdaemonfile.c:2996
+#: ../client/gdaemonfile.c:3076 ../client/gvfsiconloadable.c:145
+#: ../client/gvfsiconloadable.c:374
+#, c-format
+msgid "Invalid return value from %s"
+msgstr "Неверное возвращённое значение от %s"
 
-#: ../client/gdaemonfile.c:816 ../client/gdaemonfile.c:1563
-msgid "Invalid return value from query_info"
-msgstr "Функция query_info вернула неверное значение"
-
-#: ../client/gdaemonfile.c:894 ../client/gvfsiconloadable.c:338
+#: ../client/gdaemonfile.c:985 ../client/gvfsiconloadable.c:339
 msgid "Couldn't get stream file descriptor"
-msgstr "Не удаётся получить описание файла потока"
+msgstr "Не удаётся получить дескриптор файла потока"
 
-#: ../client/gdaemonfile.c:926 ../client/gdaemonfile.c:996
-#: ../client/gdaemonfile.c:1055 ../client/gdaemonfile.c:1114
-#: ../client/gdaemonfile.c:1176 ../client/gdaemonfile.c:2252
-#: ../client/gdaemonfile.c:2330 ../client/gdaemonfile.c:2589
-#: ../client/gvfsiconloadable.c:370
-msgid "Invalid return value from open"
-msgstr "Функция open вернула неверное значение"
-
-#: ../client/gdaemonfile.c:1006 ../client/gdaemonfile.c:1065
-#: ../client/gdaemonfile.c:1124 ../client/gdaemonfile.c:1186
-#: ../client/gdaemonfile.c:2220 ../client/gvfsiconloadable.c:155
+#: ../client/gdaemonfile.c:1106 ../client/gdaemonfile.c:1169
+#: ../client/gdaemonfile.c:1232 ../client/gdaemonfile.c:1298
+#: ../client/gdaemonfile.c:2615 ../client/gvfsiconloadable.c:155
 msgid "Didn't get stream file descriptor"
-msgstr "Дескриптор файла потока не был получен"
-
-#: ../client/gdaemonfile.c:1238 ../client/gdaemonfile.c:1255
-msgid "Invalid return value from call"
-msgstr "Функция call вернула неверное значение"
-
-#: ../client/gdaemonfile.c:1534
-msgid "Invalid return value from get_filesystem_info"
-msgstr "Функция get_filesystem_info вернула неверное значение"
+msgstr "Дескриптор потокового файла не был получен"
 
 #. translators: this is an error message when there is no user visible "mount" object
 #. corresponding to a particular path/uri
-#: ../client/gdaemonfile.c:1647
+#: ../client/gdaemonfile.c:1964
 msgid "Could not find enclosing mount"
 msgstr "Не удаётся найти точку монтирования"
 
-#: ../client/gdaemonfile.c:1677
+#: ../client/gdaemonfile.c:1994
 #, c-format
 msgid "Invalid filename %s"
 msgstr "Неверное имя файла %s"
 
-#: ../client/gdaemonfile.c:1719
-msgid "Invalid return value from query_filesystem_info"
-msgstr "Функция query_filesystem_info вернула неверное значение"
+#: ../client/gdaemonfile.c:2232 ../client/gdaemonvfs.c:1200
+#: ../client/gdaemonvfs.c:1335 ../client/gdaemonvfs.c:1388
+#, c-format
+msgid "Error setting file metadata: %s"
+msgstr "Ошибка установки метаданных файла: %s"
 
-#: ../client/gdaemonfile.c:2142
-msgid "Invalid return value from monitor_dir"
-msgstr "Получено неверное значение от функции monitor_dir"
+#: ../client/gdaemonfile.c:2233 ../client/gdaemonvfs.c:1389
+msgid "values must be string or list of strings"
+msgstr "значения должны быть строками или списком строк"
 
-#: ../client/gdaemonfile.c:2191
-msgid "Invalid return value from monitor_file"
-msgstr "Получено неверное значение от функции monitor_file"
-
-#: ../client/gdaemonfileenumerator.c:351
+#: ../client/gdaemonfileenumerator.c:448
 #: ../client/gdaemonfileinputstream.c:630
 #: ../client/gdaemonfileinputstream.c:783
 #: ../client/gdaemonfileinputstream.c:901
@@ -87,39 +79,41 @@ msgstr "Получено неверное значение от функции m
 #: ../client/gdaemonfileoutputstream.c:506
 #: ../client/gdaemonfileoutputstream.c:681
 #: ../client/gdaemonfileoutputstream.c:873
-#: ../client/gdaemonfileoutputstream.c:1052
-#: ../daemon/gvfsbackendobexftp.c:1060 ../daemon/gvfsbackendobexftp.c:1081
-#: ../daemon/gvfsbackendobexftp.c:1200 ../daemon/gvfsbackendobexftp.c:1337
-#: ../daemon/gvfsbackendobexftp.c:1401 ../daemon/gvfsbackendobexftp.c:1601
-#: ../daemon/gvfsbackendobexftp.c:1708 ../daemon/gvfsbackendobexftp.c:1858
-#: ../daemon/gvfsbackendobexftp.c:1885 ../daemon/gvfsbackendobexftp.c:1944
-#: ../daemon/gvfsbackendobexftp.c:1966 ../daemon/gvfsbackendobexftp.c:2029
-#: ../daemon/gvfsbackendobexftp.c:2048 ../daemon/gvfsbackendsmb.c:1139
+#: ../client/gdaemonfileoutputstream.c:1052 ../client/gvfsdaemondbus.c:1048
+#: ../daemon/gvfsbackendobexftp.c:1085 ../daemon/gvfsbackendobexftp.c:1106
+#: ../daemon/gvfsbackendobexftp.c:1225 ../daemon/gvfsbackendobexftp.c:1362
+#: ../daemon/gvfsbackendobexftp.c:1426 ../daemon/gvfsbackendobexftp.c:1628
+#: ../daemon/gvfsbackendobexftp.c:1735 ../daemon/gvfsbackendobexftp.c:1897
+#: ../daemon/gvfsbackendobexftp.c:1924 ../daemon/gvfsbackendobexftp.c:1983
+#: ../daemon/gvfsbackendobexftp.c:2005 ../daemon/gvfsbackendobexftp.c:2068
+#: ../daemon/gvfsbackendobexftp.c:2087 ../daemon/gvfsbackendsmb.c:1163
 #: ../daemon/gvfsbackendtest.c:91 ../daemon/gvfsbackendtest.c:124
-#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:298
-#: ../monitor/proxy/gproxydrive.c:442 ../monitor/proxy/gproxydrive.c:526
-#: ../monitor/proxy/gproxydrive.c:644 ../monitor/proxy/gproxymount.c:455
-#: ../monitor/proxy/gproxymount.c:538 ../monitor/proxy/gproxyvolume.c:783
-#: ../monitor/proxy/gproxyvolume.c:860
+#: ../daemon/gvfsbackendtest.c:187 ../daemon/gvfschannel.c:319
+#: ../daemon/gvfsftptask.c:202 ../monitor/gdu/ggdumount.c:1069
+#: ../monitor/proxy/gproxydrive.c:514 ../monitor/proxy/gproxydrive.c:602
+#: ../monitor/proxy/gproxydrive.c:750 ../monitor/proxy/gproxydrive.c:885
+#: ../monitor/proxy/gproxydrive.c:936 ../monitor/proxy/gproxydrive.c:1060
+#: ../monitor/proxy/gproxymount.c:471 ../monitor/proxy/gproxymount.c:556
+#: ../monitor/proxy/gproxyvolume.c:807 ../monitor/proxy/gproxyvolume.c:884
 msgid "Operation was cancelled"
-msgstr "Действие было прервано"
+msgstr "Действие было отменено"
 
 #: ../client/gdaemonfileinputstream.c:527
 #: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1682
-#: ../client/gdaemonfileinputstream.c:1692
+#: ../client/gdaemonfileinputstream.c:1684
+#: ../client/gdaemonfileinputstream.c:1694
 #: ../client/gdaemonfileoutputstream.c:450
 #: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1234
-#: ../client/gdaemonfileoutputstream.c:1244
+#: ../client/gdaemonfileoutputstream.c:1236
+#: ../client/gdaemonfileoutputstream.c:1246
 #, c-format
 msgid "Error in stream protocol: %s"
 msgstr "Ошибка в протоколе потока: %s"
 
 #: ../client/gdaemonfileinputstream.c:535
-#: ../client/gdaemonfileinputstream.c:1692
+#: ../client/gdaemonfileinputstream.c:1694
 #: ../client/gdaemonfileoutputstream.c:458
-#: ../client/gdaemonfileoutputstream.c:1244
+#: ../client/gdaemonfileoutputstream.c:1246
 msgid "End of stream"
 msgstr "Конец потока"
 
@@ -128,19 +122,19 @@ msgstr "Конец потока"
 msgid "Seek not supported on stream"
 msgstr "Поиск в потоке не поддерживается"
 
-#: ../client/gdaemonvfs.c:830
+#: ../client/gdaemonvfs.c:832
 #, c-format
 msgid "Error while getting mount info: %s"
 msgstr "Ошибка получения информации о монтировании: %s"
 
-#: ../client/gvfsdaemondbus.c:567 ../client/gvfsdaemondbus.c:998
+#: ../client/gdaemonvfs.c:1201
+msgid "Can't contact session bus"
+msgstr "Не удаётся подключиться к шине сеанса"
+
+#: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
 #, c-format
 msgid "Error connecting to daemon: %s"
 msgstr "Ошибка подключения к демону: %s"
-
-#: ../client/gvfsiconloadable.c:145
-msgid "Invalid return value from open_icon_for_read"
-msgstr "Функция open_icon_for_read вернула неверное значение"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -152,33 +146,33 @@ msgstr "Ошибка создания сокета: %s"
 msgid "Error connecting to socket: %s"
 msgstr "Ошибка подключения к сокету: %s"
 
-#: ../common/gvfsdaemonprotocol.c:454
+#: ../common/gvfsdaemonprotocol.c:521
 msgid "Invalid file info format"
 msgstr "Неверный формат информации о файле"
 
-#: ../common/gvfsdaemonprotocol.c:471
+#: ../common/gvfsdaemonprotocol.c:538
 msgid "Invalid attribute info list content"
-msgstr "Неверное содержимое списка информации об атрибутах."
+msgstr "Неверное содержимое списка информации об атрибутах"
 
-#: ../common/gvfsdnssdresolver.c:208
+#: ../common/gvfsdnssdresolver.c:209
 #, c-format
 msgid "Error initializing Avahi: %s"
-msgstr "Ошибка при инициализации Avahi: %s"
+msgstr "Ошибка инициализации Avahi: %s"
 
-#: ../common/gvfsdnssdresolver.c:254
+#: ../common/gvfsdnssdresolver.c:255
 #, c-format
 msgid "Error creating Avahi resolver: %s"
-msgstr "Ошибка при создания сервиса разрешения имён Avahi: %s"
+msgstr "Ошибка создания службы разрешения имён Avahi: %s"
 
 #. Translators:
 #. * - the first %s refers to the service type
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1099
+#: ../common/gvfsdnssdresolver.c:1100
 #, c-format
 msgid "Error resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "Ошибка при разрешении имени «%s» сервиса «%s» на «%s»"
+msgstr "Ошибка разрешения имени «%s» службы «%s» на «%s»"
 
 #. Translators:
 #. * - the first %s refers to the service type
@@ -186,13 +180,13 @@ msgstr "Ошибка при разрешении имени «%s» сервис�
 #. * - the third %s refers to the domain
 #. * - the fourth %s refers to the required TXT keys
 #.
-#: ../common/gvfsdnssdresolver.c:1125
+#: ../common/gvfsdnssdresolver.c:1126
 #, c-format
 msgid ""
 "Error resolving \"%s\" service \"%s\" on domain \"%s\". One or more TXT "
 "records are missing. Keys required: \"%s\"."
 msgstr ""
-"Ошибка при разрешении имени «%s» сервиса «%s» на «%s». Одна или несколько TXT "
+"Ошибка разрешения имени «%s» службы «%s» на «%s». Одна или несколько TXT "
 "записей не найдены. Требуются ключи: «%s»"
 
 #. Translators:
@@ -200,10 +194,10 @@ msgstr ""
 #. * - the second %s refers to the service name
 #. * - the third %s refers to the domain
 #.
-#: ../common/gvfsdnssdresolver.c:1142
+#: ../common/gvfsdnssdresolver.c:1143
 #, c-format
 msgid "Timed out resolving \"%s\" service \"%s\" on domain \"%s\""
-msgstr "Истёк период ожидания «%s» сервиса «%s» на «%s»"
+msgstr "Истёк период ожидания «%s» службы «%s» на «%s»"
 
 #: ../common/gvfsdnssdutils.c:233 ../common/gvfsdnssdutils.c:263
 #: ../common/gvfsdnssdutils.c:280
@@ -232,7 +226,8 @@ msgstr "Ошибка подключения к D-Bus: %s"
 msgid "%s Filesystem Service"
 msgstr "Служба файловой системы %s"
 
-#: ../daemon/daemon-main.c:110
+#: ../daemon/daemon-main.c:110 ../programs/gvfs-copy.c:90
+#: ../programs/gvfs-move.c:78
 #, c-format
 msgid "Error: %s"
 msgstr "Ошибка: %s"
@@ -261,47 +256,152 @@ msgstr "точка монтирования для %s уже запущена"
 msgid "error starting mount daemon"
 msgstr "ошибка запуска демона монтирования"
 
+#: ../daemon/gvfsbackend.c:933 ../monitor/gdu/ggdumount.c:921
+msgid "Unmount Anyway"
+msgstr "Всё равно отсоединить"
+
+#: ../daemon/gvfsbackend.c:934 ../monitor/gdu/ggdudrive.c:1022
+#: ../monitor/gdu/ggdumount.c:922
+msgid "Cancel"
+msgstr "Отменить"
+
+#: ../daemon/gvfsbackend.c:936 ../monitor/gdu/ggdumount.c:923
+msgid ""
+"Volume is busy\n"
+"One or more applications are keeping the volume busy."
+msgstr ""
+"Том занят\n"
+"Одно или более приложений используют том."
+
+#: ../daemon/gvfsbackendafc.c:145
+msgid "Internal Apple File Control error"
+msgstr "Внутренняя ошибка Apple File Control"
+
+#: ../daemon/gvfsbackendafc.c:149 ../daemon/gvfsbackendftp.c:633
+msgid "File does not exist"
+msgstr "Файл не существует"
+
+#: ../daemon/gvfsbackendafc.c:152
+msgid "The directory is not empty"
+msgstr "Каталог не пуст"
+
+#: ../daemon/gvfsbackendafc.c:156
+msgid "The device did not respond"
+msgstr "Устройство не отвечает"
+
+#: ../daemon/gvfsbackendafc.c:160
+msgid "The connection was interrupted"
+msgstr "Соединение было прервано"
+
+#: ../daemon/gvfsbackendafc.c:164
+msgid "Invalid Apple File Control data received"
+msgstr "Неверные данные получены от Apple File Control"
+
+#: ../daemon/gvfsbackendafc.c:168
+#, c-format
+msgid "Unhandled Apple File Control error (%d)"
+msgstr "Неизвестная ошибка Apple File Control (%d)"
+
+#: ../daemon/gvfsbackendafc.c:185
+msgid "Lockdown Error: Invalid Argument"
+msgstr "Ошибка блокировки: неверный аргумент"
+
+#: ../daemon/gvfsbackendafc.c:189
+#, c-format
+msgid "Unhandled Lockdown error (%d)"
+msgstr "Неизвестная ошибка блокировки (%d)"
+
+#: ../daemon/gvfsbackendafc.c:206
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "Ошибка libmobiledevice: неверный аргумент"
+
+#: ../daemon/gvfsbackendafc.c:210
+msgid ""
+"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
+"correctly."
+msgstr "Ошибка libmobiledevice: устройство не найдено. Убедитесь, что usbmuxd установлен корректно."
+
+#: ../daemon/gvfsbackendafc.c:213
+#, c-format
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "Неизвестная ошибка libmobiledevice (%d)"
+
+#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:529
+#: ../daemon/gvfsbackendarchive.c:558 ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
+#: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
+#: ../daemon/gvfsbackendsmb.c:648
+msgid "Invalid mount spec"
+msgstr "Неверная спецификация монтирования"
+
+#: ../daemon/gvfsbackendafc.c:281
+msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
+msgstr "Неверный адрес AFC: должен быть в формате afc://uuid:port-number"
+
+#: ../daemon/gvfsbackendafc.c:296
+#, c-format
+msgid "Service %d on Apple Mobile Device"
+msgstr "Служба %d на мобильном устройстве Apple"
+
+#: ../daemon/gvfsbackendafc.c:302
+#, c-format
+msgid "Apple Mobile Device"
+msgstr "Мобильное устройство Apple"
+
+#: ../daemon/gvfsbackendafc.c:353
+#, c-format
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+#: ../daemon/gvfsbackendafc.c:548 ../daemon/gvfsbackendafc.c:1256
+msgid "Backups are not yet supported."
+msgstr "Резервные копии ещё не поддерживаются."
+
+#: ../daemon/gvfsbackendafc.c:686
+msgid "Invalid seek type"
+msgstr "Неверный тип поиска"
+
+#: ../daemon/gvfsbackendafc.c:1175 ../daemon/gvfsbackendsftp.c:1820
+#: ../daemon/gvfsbackendsftp.c:4625 ../daemon/gvfsbackendsmb.c:1702
+#: ../daemon/gvfsftptask.c:392
+msgid "Operation unsupported"
+msgstr "Действие не поддерживается"
+
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendftp.c:1096
-#: ../daemon/gvfsbackendsftp.c:1922
+#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2257
+#: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "/ на %s"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:1642
-#: ../daemon/gvfsbackendsftp.c:1587
+#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:564
+#: ../daemon/gvfsbackendsftp.c:1733
 msgid "No hostname specified"
 msgstr "Имя узла не указано"
 
-#: ../daemon/gvfsbackendarchive.c:529 ../daemon/gvfsbackendarchive.c:558
-#: ../daemon/gvfsbackenddav.c:1626 ../daemon/gvfsbackendhttp.c:306
-#: ../daemon/gvfsbackendobexftp.c:836 ../daemon/gvfsbackendobexftp.c:852
-#: ../daemon/gvfsbackendobexftp.c:871 ../daemon/gvfsbackendsmb.c:648
-msgid "Invalid mount spec"
-msgstr "Неверная спецификация монтирования"
-
-#: ../daemon/gvfsbackendarchive.c:614 ../daemon/gvfsbackendarchive.c:658
-#: ../daemon/gvfsbackendarchive.c:708 ../daemon/gvfsbackendarchive.c:737
-#: ../daemon/gvfsbackendcdda.c:921 ../daemon/gvfsbackendcomputer.c:572
-#: ../daemon/gvfsbackenddnssd.c:398 ../daemon/gvfsbackendftp.c:2264
+#: ../daemon/gvfsbackendarchive.c:617 ../daemon/gvfsbackendarchive.c:661
+#: ../daemon/gvfsbackendarchive.c:711 ../daemon/gvfsbackendarchive.c:740
+#: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
+#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:964
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
-#: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1323
-#: ../daemon/gvfsbackendsmbbrowse.c:1392
+#: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
+#: ../daemon/gvfsbackendsmbbrowse.c:1394
 #, c-format
 msgid "File doesn't exist"
 msgstr "Файл не существует"
 
-#: ../daemon/gvfsbackendarchive.c:622 ../daemon/gvfsbackendcomputer.c:590
-#: ../daemon/gvfsbackendgphoto2.c:1690 ../daemon/gvfsbackendobexftp.c:1046
-#: ../daemon/gvfsbackendsmb.c:691 ../daemon/gvfsbackendtrash.c:232
+#: ../daemon/gvfsbackendarchive.c:625 ../daemon/gvfsbackendcomputer.c:645
+#: ../daemon/gvfsbackendgphoto2.c:1886 ../daemon/gvfsbackendobexftp.c:1071
+#: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "Не удаётся открыть каталог"
 
-#: ../daemon/gvfsbackendarchive.c:746 ../daemon/gvfsbackendburn.c:680
-#: ../daemon/gvfsbackendcomputer.c:651 ../daemon/gvfsbackenddnssd.c:445
-#: ../daemon/gvfsbackendftp.c:1045 ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
+#: ../daemon/gvfsbackendftp.c:258 ../daemon/gvfsbackendnetwork.c:693
+#: ../daemon/gvfsbackendsftp.c:3871 ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "Этот файл не является каталогом"
 
@@ -318,19 +418,22 @@ msgstr "Не удаётся создать временный каталог"
 #: ../daemon/gvfsbackendburn.c:451 ../daemon/gvfsbackendburn.c:672
 #: ../daemon/gvfsbackendburn.c:717 ../daemon/gvfsbackendburn.c:743
 #: ../daemon/gvfsbackendburn.c:781 ../daemon/gvfsbackendburn.c:972
-#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendgphoto2.c:1089
-#: ../daemon/gvfsbackendgphoto2.c:2010 ../daemon/gvfsbackendgphoto2.c:2729
-#: ../daemon/gvfsbackendtrash.c:216
+#: ../daemon/gvfsbackendburn.c:1008 ../daemon/gvfsbackendftp.c:690
+#: ../daemon/gvfsbackendgphoto2.c:1207 ../daemon/gvfsbackendgphoto2.c:2207
+#: ../daemon/gvfsbackendgphoto2.c:2926 ../daemon/gvfsbackendsftp.c:1824
+#: ../daemon/gvfsbackendsftp.c:2937 ../daemon/gvfsbackendsftp.c:2950
+#: ../daemon/gvfsbackendsftp.c:2970 ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
 msgstr "Нет такого файла или каталога"
 
-#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2218
+#: ../daemon/gvfsbackendburn.c:425 ../daemon/gvfsbackenddav.c:2223
+#: ../daemon/gvfsbackendsftp.c:1816
 msgid "Directory not empty"
 msgstr "Каталог не пустой"
 
 #: ../daemon/gvfsbackendburn.c:459 ../daemon/gvfsbackendburn.c:904
-#: ../daemon/gvfsbackendobexftp.c:1783
+#: ../daemon/gvfsbackendobexftp.c:1810
 msgid "Can't copy file over directory"
 msgstr "Не удаётся скопировать файл поверх каталога"
 
@@ -342,7 +445,7 @@ msgstr "Создание CD/DVD"
 #: ../daemon/gvfsbackendburn.c:753 ../daemon/gvfsbackendburn.c:789
 #: ../daemon/gvfsbackendburn.c:924 ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990 ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2803
+#: ../daemon/gvfsbackendgphoto2.c:3000
 msgid "File exists"
 msgstr "Файл существует"
 
@@ -353,83 +456,93 @@ msgstr "Файл существует"
 #: ../daemon/gvfsjobdelete.c:122 ../daemon/gvfsjobenumerate.c:256
 #: ../daemon/gvfsjobmakedirectory.c:122 ../daemon/gvfsjobmount.c:109
 #: ../daemon/gvfsjobmountmountable.c:156 ../daemon/gvfsjobmove.c:168
-#: ../daemon/gvfsjobopenforread.c:130 ../daemon/gvfsjobopenforwrite.c:148
-#: ../daemon/gvfsjobopenforwrite.c:162 ../daemon/gvfsjobopenforwrite.c:176
-#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpull.c:173
-#: ../daemon/gvfsjobpush.c:173 ../daemon/gvfsjobqueryattributes.c:135
-#: ../daemon/gvfsjobqueryfsinfo.c:131 ../daemon/gvfsjobqueryinfo.c:149
-#: ../daemon/gvfsjobqueryinforead.c:119 ../daemon/gvfsjobqueryinfowrite.c:119
-#: ../daemon/gvfsjobread.c:120 ../daemon/gvfsjobseekread.c:119
-#: ../daemon/gvfsjobseekwrite.c:119 ../daemon/gvfsjobsetattribute.c:150
-#: ../daemon/gvfsjobsetdisplayname.c:127 ../daemon/gvfsjobtrash.c:122
-#: ../daemon/gvfsjobunmountmountable.c:132
-#: ../daemon/gvfsjobunmountmountable.c:146 ../daemon/gvfsjobwrite.c:120
+#: ../daemon/gvfsjobopenforread.c:133 ../daemon/gvfsjobopenforwrite.c:151
+#: ../daemon/gvfsjobopenforwrite.c:165 ../daemon/gvfsjobopenforwrite.c:179
+#: ../daemon/gvfsjobopeniconforread.c:120 ../daemon/gvfsjobpollmountable.c:125
+#: ../daemon/gvfsjobpull.c:175 ../daemon/gvfsjobpush.c:175
+#: ../daemon/gvfsjobqueryattributes.c:135 ../daemon/gvfsjobqueryfsinfo.c:131
+#: ../daemon/gvfsjobqueryinfo.c:149 ../daemon/gvfsjobqueryinforead.c:119
+#: ../daemon/gvfsjobqueryinfowrite.c:119 ../daemon/gvfsjobread.c:120
+#: ../daemon/gvfsjobseekread.c:119 ../daemon/gvfsjobseekwrite.c:119
+#: ../daemon/gvfsjobsetattribute.c:150 ../daemon/gvfsjobsetdisplayname.c:127
+#: ../daemon/gvfsjobstartmountable.c:132 ../daemon/gvfsjobstopmountable.c:135
+#: ../daemon/gvfsjobtrash.c:122 ../daemon/gvfsjobunmountmountable.c:139
+#: ../daemon/gvfsjobunmountmountable.c:154 ../daemon/gvfsjobwrite.c:120
+#: ../monitor/gdu/ggdumount.c:1173 ../monitor/gdu/ggdumount.c:1257
+#: ../monitor/gdu/ggduvolume.c:1595
 msgid "Operation not supported by backend"
-msgstr "Действие не поддерживается драйвером"
+msgstr "Действие не поддерживается внутренней реализацией"
 
 #: ../daemon/gvfsbackendburn.c:853
 msgid "No such file or directory in target path"
 msgstr "Нет такого файла или каталога в пути назначения"
 
-#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendobexftp.c:1752
+#: ../daemon/gvfsbackendburn.c:876 ../daemon/gvfsbackendftp.c:1350
+#: ../daemon/gvfsbackendobexftp.c:1779
 msgid "Can't copy directory over directory"
 msgstr "Не удаётся скопировать каталог поверх каталога"
 
-#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1760
-#: ../daemon/gvfsbackendobexftp.c:1791
+#: ../daemon/gvfsbackendburn.c:885 ../daemon/gvfsbackendobexftp.c:1787
+#: ../daemon/gvfsbackendobexftp.c:1818 ../daemon/gvfsbackendsftp.c:1818
+#: ../daemon/gvfsbackendsftp.c:4433
 msgid "Target file exists"
 msgstr "Файл назначения уже существует"
 
-#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendobexftp.c:1767
+#: ../daemon/gvfsbackendburn.c:892 ../daemon/gvfsbackendftp.c:1373
+#: ../daemon/gvfsbackendobexftp.c:1794
 msgid "Can't recursively copy directory"
 msgstr "Не удаётся скопировать каталог рекурсивно"
 
-#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:731
-#: ../daemon/gvfsbackendgphoto2.c:2383 ../daemon/gvfsbackendgphoto2.c:2592
-#: ../daemon/gvfsbackendgphoto2.c:2689 ../daemon/gvfsbackendgphoto2.c:2782
+#: ../daemon/gvfsbackendburn.c:950 ../daemon/gvfsbackendcomputer.c:794
+#: ../daemon/gvfsbackendgphoto2.c:2580 ../daemon/gvfsbackendgphoto2.c:2789
+#: ../daemon/gvfsbackendgphoto2.c:2886 ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Not supported"
 msgstr "Не поддерживается"
 
-#: ../daemon/gvfsbackendcdda.c:299 ../daemon/gvfsbackendgphoto2.c:1389
+#: ../daemon/gvfsbackendcdda.c:332 ../daemon/gvfsbackendgphoto2.c:1510
+msgid "Cannot create gudev client"
+msgstr "Не удалось создать клиент gudev"
+
+#: ../daemon/gvfsbackendcdda.c:352 ../daemon/gvfsbackendgphoto2.c:1528
 msgid "Cannot connect to the system bus"
 msgstr "Не удаётся подключиться к системной шине"
 
-#: ../daemon/gvfsbackendcdda.c:310 ../daemon/gvfsbackendgphoto2.c:1401
+#: ../daemon/gvfsbackendcdda.c:363 ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
 msgstr "Не удалось получить контекст libhal"
 
-#: ../daemon/gvfsbackendcdda.c:324 ../daemon/gvfsbackendgphoto2.c:1414
+#: ../daemon/gvfsbackendcdda.c:377 ../daemon/gvfsbackendgphoto2.c:1553
 msgid "Cannot initialize libhal"
 msgstr "Не удалось инициализировать libhal"
 
-#: ../daemon/gvfsbackendcdda.c:339 ../daemon/gvfsbackendcdda.c:415
+#: ../daemon/gvfsbackendcdda.c:393 ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
 msgstr "Устройство не указано"
 
-#: ../daemon/gvfsbackendcdda.c:355
+#: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
 msgstr "Не удаётся найти устройство %s"
 
-#: ../daemon/gvfsbackendcdda.c:368
+#: ../daemon/gvfsbackendcdda.c:430
 #, c-format
 msgid "Drive %s does not contain audio files"
 msgstr "Устройство %s не содержит звуковых файлов"
 
 #. Translator: %s is the device the disc is inserted into
-#: ../daemon/gvfsbackendcdda.c:377
+#: ../daemon/gvfsbackendcdda.c:439
 #, c-format
 msgid "cdda mount on %s"
 msgstr "подключение cdda на %s"
 
-#: ../daemon/gvfsbackendcdda.c:378 ../daemon/gvfsbackendcdda.c:895
-#: ../monitor/hal/ghalmount.c:325 ../monitor/hal/ghalvolume.c:225
-#: ../monitor/hal/ghalvolume.c:246
+#: ../daemon/gvfsbackendcdda.c:440 ../daemon/gvfsbackendcdda.c:960
+#: ../monitor/gdu/ggduvolume.c:337 ../monitor/hal/ghalmount.c:325
+#: ../monitor/hal/ghalvolume.c:225 ../monitor/hal/ghalvolume.c:246
 #, c-format
 msgid "Audio Disc"
 msgstr "Звуковой диск"
 
-#: ../daemon/gvfsbackendcdda.c:439 ../daemon/gvfsbackendgphoto2.c:1642
+#: ../daemon/gvfsbackendcdda.c:503
 #, c-format
 msgid "File system is busy: %d open file"
 msgid_plural "File system is busy: %d open files"
@@ -437,76 +550,89 @@ msgstr[0] "Файловая система занята: %d открытый ф�
 msgstr[1] "Файловая система занята: %d открытых файла"
 msgstr[2] "Файловая система занята: %d открытых файлов"
 
-#: ../daemon/gvfsbackendcdda.c:630
+#: ../daemon/gvfsbackendcdda.c:695
 #, c-format
 msgid "No such file %s on drive %s"
-msgstr "Нет такого файла %s на устройстве %s"
+msgstr "Файл %s на устройстве %s отсутствует"
 
 #. Translators: paranoia is the name of the cd audio reading library
-#: ../daemon/gvfsbackendcdda.c:739
+#: ../daemon/gvfsbackendcdda.c:804
 #, c-format
 msgid "Error from 'paranoia' on drive %s"
 msgstr "Ошибка программы \"paranoia\" на устройстве %s"
 
-#: ../daemon/gvfsbackendcdda.c:802
+#: ../daemon/gvfsbackendcdda.c:867
 #, c-format
 msgid "Error seeking in stream on drive %s"
-msgstr "Ошибка поиска в потоке на устройстве %s"
+msgstr "Ошибка позиционирования в потоке на устройстве %s"
 
-#: ../daemon/gvfsbackendcdda.c:914 ../daemon/gvfsbackendgphoto2.c:1698
+#: ../daemon/gvfsbackendcdda.c:979 ../daemon/gvfsbackendgphoto2.c:1894
 #, c-format
 msgid "No such file"
 msgstr "Нет такого файла"
 
-#: ../daemon/gvfsbackendcdda.c:928
+#: ../daemon/gvfsbackendcdda.c:993
 #, c-format
 msgid "The file does not exist or isn't an audio track"
 msgstr "Файл не существует или не является звуковой дорожкой"
 
-#: ../daemon/gvfsbackendcdda.c:1034
+#: ../daemon/gvfsbackendcdda.c:1099
 msgid "Audio CD Filesystem Service"
 msgstr "Служба файловой системы Audio CD"
 
-#: ../daemon/gvfsbackendcomputer.c:179 ../daemon/gvfsbackendcomputer.c:693
+#: ../daemon/gvfsbackendcomputer.c:192 ../daemon/gvfsbackendcomputer.c:756
 msgid "Computer"
 msgstr "Компьютер"
 
-#: ../daemon/gvfsbackendcomputer.c:466
-msgid "Filesystem"
+#: ../daemon/gvfsbackendcomputer.c:521
+msgid "File System"
 msgstr "Файловая система"
 
-#: ../daemon/gvfsbackendcomputer.c:594
+#: ../daemon/gvfsbackendcomputer.c:649
 msgid "Can't open mountable file"
-msgstr "Не удаётся открыть монтируемый файл"
+msgstr "Не удаётся открыть подключаемый файл"
 
-#: ../daemon/gvfsbackendcomputer.c:779 ../daemon/gvfsbackendsftp.c:1065
+#: ../daemon/gvfsbackendcomputer.c:840 ../daemon/gvfsbackendsftp.c:1151
 #, c-format
 msgid "Internal error: %s"
 msgstr "Внутренняя ошибка: %s"
 
-#: ../daemon/gvfsbackendcomputer.c:811 ../daemon/gvfsbackendcomputer.c:928
+#: ../daemon/gvfsbackendcomputer.c:872 ../daemon/gvfsbackendcomputer.c:991
 msgid "Can't mount file"
-msgstr "Не удаётся смонтировать файл"
+msgstr "Не удаётся подключить файл"
 
-#: ../daemon/gvfsbackendcomputer.c:823
+#: ../daemon/gvfsbackendcomputer.c:884
 msgid "No media in the drive"
-msgstr "В устройстве нет диска"
+msgstr "В устройстве нет носителя"
 
-#: ../daemon/gvfsbackendcomputer.c:880 ../daemon/gvfsbackendcomputer.c:971
-#: ../daemon/gvfsbackendcomputer.c:1071
+#: ../daemon/gvfsbackendcomputer.c:941 ../daemon/gvfsbackendcomputer.c:1036
+#: ../daemon/gvfsbackendcomputer.c:1142 ../daemon/gvfsbackendcomputer.c:1232
+#: ../daemon/gvfsbackendcomputer.c:1305 ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
-msgstr "Файл не является монтируемым"
+msgstr "Файл не является подключаемым"
 
-#: ../daemon/gvfsbackendcomputer.c:986
+#: ../daemon/gvfsbackendcomputer.c:1055
 msgid "Can't unmount file"
-msgstr "Не удаётся отмонтировать файл"
+msgstr "Не удаётся отключить файл"
 
-#: ../daemon/gvfsbackendcomputer.c:1102
+#: ../daemon/gvfsbackendcomputer.c:1185
 msgid "Can't eject file"
 msgstr "Не удаётся извлечь файл"
 
-#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1693
-#: ../daemon/gvfsbackendhttp.c:252
+#: ../daemon/gvfsbackendcomputer.c:1252 ../daemon/gvfsbackendcomputer.c:1259
+msgid "Can't start file"
+msgstr "Не удаётся начать файл"
+
+#: ../daemon/gvfsbackendcomputer.c:1325 ../daemon/gvfsbackendcomputer.c:1332
+msgid "Can't stop file"
+msgstr "Не удаётся закончить файл"
+
+#: ../daemon/gvfsbackendcomputer.c:1389 ../daemon/gvfsbackendcomputer.c:1396
+msgid "Can't poll file"
+msgstr "Не удаётся обработать события над файлом"
+
+#: ../daemon/gvfsbackenddav.c:561 ../daemon/gvfsbackenddav.c:1698
+#: ../daemon/gvfsbackendhttp.c:261
 #, c-format
 msgid "HTTP Error: %s"
 msgstr "Ошибка HTTP: %s"
@@ -523,7 +649,7 @@ msgstr "Пустой ответ"
 msgid "Unexpected reply from server"
 msgstr "Неожиданный ответ от сервера"
 
-#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1833
+#: ../daemon/gvfsbackenddav.c:1214 ../daemon/gvfsbackenddav.c:1838
 msgid "Response invalid"
 msgstr "Неверный ответ"
 
@@ -540,362 +666,307 @@ msgstr "Введите пароль для %s"
 msgid "Please enter proxy password"
 msgstr "Введите пароль прокси-сервера"
 
-#: ../daemon/gvfsbackenddav.c:1697 ../daemon/gvfsbackenddav.c:1701
+#: ../daemon/gvfsbackenddav.c:1702 ../daemon/gvfsbackenddav.c:1706
 msgid "Not a WebDAV enabled share"
 msgstr "Не является ресурсом WebDAV"
 
-#: ../daemon/gvfsbackenddav.c:1729
+#: ../daemon/gvfsbackenddav.c:1734
 #, c-format
 msgid "WebDAV on %s"
 msgstr "WebDAV на %s"
 
-#: ../daemon/gvfsbackenddav.c:1789 ../daemon/gvfsbackenddav.c:1862
+#: ../daemon/gvfsbackenddav.c:1794 ../daemon/gvfsbackenddav.c:1867
 msgid "Could not create request"
 msgstr "Не удаётся создать запрос"
 
-#: ../daemon/gvfsbackenddav.c:1925 ../daemon/gvfsbackenddav.c:2178
-#: ../daemon/gvfsbackenddav.c:2289 ../daemon/gvfsbackendftp.c:1862
-#: ../daemon/gvfsbackendftp.c:2528 ../daemon/gvfsbackendsftp.c:3793
-#: ../daemon/gvfsbackendsmb.c:1974
+#: ../daemon/gvfsbackenddav.c:1930 ../daemon/gvfsbackenddav.c:2183
+#: ../daemon/gvfsbackenddav.c:2294 ../daemon/gvfsbackendftp.c:649
+#: ../daemon/gvfsbackendftp.c:830 ../daemon/gvfsbackendftp.c:1180
+#: ../daemon/gvfsbackendftp.c:1358 ../daemon/gvfsbackendsftp.c:4277
+#: ../daemon/gvfsbackendsmb.c:2038
 msgid "Target file already exists"
 msgstr "Файл назначения уже существует"
 
-#: ../daemon/gvfsbackenddav.c:1998 ../daemon/gvfsbackendsftp.c:2960
-#: ../daemon/gvfsbackendsmb.c:1108
+#: ../daemon/gvfsbackenddav.c:2003 ../daemon/gvfsbackendsftp.c:3411
+#: ../daemon/gvfsbackendsmb.c:1132
 msgid "The file was externally modified"
 msgstr "Файл был изменён извне"
 
-#: ../daemon/gvfsbackenddav.c:2029 ../daemon/gvfsbackendsmb.c:1144
-#: ../daemon/gvfsbackendsmb.c:1991
+#: ../daemon/gvfsbackenddav.c:2034 ../daemon/gvfsbackendsmb.c:1168
+#: ../daemon/gvfsbackendsmb.c:2055
 msgid "Backup file creation failed"
 msgstr "Ошибка создания резервной копии файла"
 
 #. "separate": a link to dns-sd://local/
-#: ../daemon/gvfsbackenddnssd.c:492 ../daemon/gvfsbackendnetwork.c:393
+#: ../daemon/gvfsbackenddnssd.c:486 ../daemon/gvfsbackendnetwork.c:393
 msgid "Local Network"
 msgstr "Локальная сеть"
 
-#: ../daemon/gvfsbackenddnssd.c:736 ../daemon/gvfsbackendnetwork.c:797
+#: ../daemon/gvfsbackenddnssd.c:730 ../daemon/gvfsbackendnetwork.c:797
 msgid "Can't monitor file or directory."
-msgstr "Не удаётся отслеживать состояние файла или каталога."
+msgstr "Не удаётся отследить состояние файла или каталога."
 
 #. TODO: Names, etc
-#: ../daemon/gvfsbackenddnssd.c:754
+#: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
 msgstr "Dns-SD"
 
-#: ../daemon/gvfsbackenddnssd.c:755 ../daemon/gvfsbackendnetwork.c:732
+#: ../daemon/gvfsbackenddnssd.c:749 ../daemon/gvfsbackendnetwork.c:732
 #: ../daemon/gvfsbackendnetwork.c:882 ../daemon/gvfsbackendnetwork.c:883
 msgid "Network"
 msgstr "Сеть"
 
-#: ../daemon/gvfsbackendftp.c:254
-msgid "Accounts are unsupported"
-msgstr "Учётные записи не поддерживаются"
-
-#: ../daemon/gvfsbackendftp.c:258
-msgid "Host closed connection"
-msgstr "Узел закрыл соединение"
-
-#: ../daemon/gvfsbackendftp.c:262
-msgid "Cannot open data connection. Maybe your firewall prevents this?"
-msgstr ""
-"Не удаётся установить соединение данных. Проверьте, пожалуйста, настройки "
-"брандмауэра."
-
-#: ../daemon/gvfsbackendftp.c:266
-msgid "Data connection closed"
-msgstr "Соединение данных закрыто"
-
-#: ../daemon/gvfsbackendftp.c:273 ../daemon/gvfsbackendftp.c:277
-msgid "Operation failed"
-msgstr "Сбой операции"
-
-#: ../daemon/gvfsbackendftp.c:282
-msgid "No space left on server"
-msgstr "На сервере не осталось свободного места"
-
-#: ../daemon/gvfsbackendftp.c:290 ../daemon/gvfsbackendsftp.c:4104
-#: ../daemon/gvfsbackendsmb.c:1638
-msgid "Operation unsupported"
-msgstr "Действие неподдерживается"
-
-#: ../daemon/gvfsbackendftp.c:294 ../daemon/gvfsbackendsftp.c:299
-msgid "Permission denied"
-msgstr "Доступ запрещен"
-
-#: ../daemon/gvfsbackendftp.c:298
-msgid "Page type unknown"
-msgstr "Неизвестный тип страницы"
-
-#: ../daemon/gvfsbackendftp.c:302 ../daemon/gvfsbackendftp.c:2374
-msgid "Invalid filename"
-msgstr "Неверное имя файла"
-
-#: ../daemon/gvfsbackendftp.c:306 ../daemon/gvfsbackendftp.c:389
-#: ../daemon/gvfsbackendftp.c:414 ../daemon/gvfsbackendftp.c:428
-#: ../daemon/gvfsbackendftp.c:441 ../daemon/gvfsbackendftp.c:931
-msgid "Invalid reply"
-msgstr "Неверный ответ"
-
-#: ../daemon/gvfsbackendftp.c:549
-msgid "broken transmission"
-msgstr "сбой передачи"
-
-#: ../daemon/gvfsbackendftp.c:713 ../daemon/gvfsbackendftp.c:854
-msgid "Could not connect to host"
-msgstr "Не удаётся подключиться к узлу"
-
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1496
+#: ../daemon/gvfsbackendftp.c:387
 #, c-format
 msgid "Enter password for ftp as %s on %s"
 msgstr "Введите пароль ftp для пользователя %s на %s"
 
 #. translators: %s here is the hostname
-#: ../daemon/gvfsbackendftp.c:1499
+#: ../daemon/gvfsbackendftp.c:390
 #, c-format
 msgid "Enter password for ftp on %s"
 msgstr "Введите пароль для ftp на %s"
 
-#: ../daemon/gvfsbackendftp.c:1525 ../daemon/gvfsbackendsftp.c:887
+#: ../daemon/gvfsbackendftp.c:417 ../daemon/gvfsbackendsftp.c:974
 #: ../daemon/gvfsbackendsmb.c:606 ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
-msgstr "Диалог ввода пароля прерван"
+msgstr "Ввод пароля отменён"
 
-#: ../daemon/gvfsbackendftp.c:1604
+#: ../daemon/gvfsbackendftp.c:527
 #, c-format
 msgid "ftp on %s"
 msgstr "ftp на %s"
 
 #. Translators: the first %s is the username, the second the host name
-#: ../daemon/gvfsbackendftp.c:1608
+#: ../daemon/gvfsbackendftp.c:531
 #, c-format
 msgid "ftp as %s on %s"
 msgstr "ftp как %s на %s"
 
-#: ../daemon/gvfsbackendftp.c:1692 ../daemon/gvfsbackendsftp.c:1986
-#: ../daemon/gvfsbackendsftp.c:3784
+#: ../daemon/gvfsbackendftp.c:624
+msgid "Insufficient permissions"
+msgstr "Недостаточно прав доступа"
+
+#: ../daemon/gvfsbackendftp.c:670 ../daemon/gvfsbackendsftp.c:2321
+#: ../daemon/gvfsbackendsftp.c:3057 ../daemon/gvfsbackendsftp.c:3398
+#: ../daemon/gvfsbackendsftp.c:4268
 msgid "File is directory"
 msgstr "Файл является каталогом"
 
-#: ../daemon/gvfsbackendftp.c:1914 ../daemon/gvfsbackendftp.c:2489
-#: ../daemon/gvfsbackendsftp.c:2821
+#: ../daemon/gvfsbackendftp.c:878 ../daemon/gvfsbackendftp.c:1143
+#: ../daemon/gvfsbackendsftp.c:3264
 msgid "backups not supported yet"
-msgstr "резервные копии еще не поддерживаются"
+msgstr "резервные копии ещё не поддерживаются"
 
-#: ../daemon/gvfsbackendftp.c:1991
-msgid "filename too long"
-msgstr "имя файла слишком длинное"
-
-#: ../daemon/gvfsbackendftp.c:2508
-msgid "Invalid destination filename"
-msgstr "Неверное имя файла назначения"
-
-#: ../daemon/gvfsbackendgphoto2.c:492
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: файл или каталог не существует"
 
-#: ../daemon/gvfsbackendgphoto2.c:499
+#: ../daemon/gvfsbackendgphoto2.c:513
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: нет такого файла или каталога"
 
-#: ../daemon/gvfsbackendgphoto2.c:505
+#: ../daemon/gvfsbackendgphoto2.c:519
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: неверное имя файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:511
+#: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: не поддерживается"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:684
+#: ../daemon/gvfsbackendgphoto2.c:720 ../daemon/gvfsbackendgphoto2.c:726
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Цифровая камера (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:832 ../monitor/gphoto2/ggphoto2volume.c:179
+#: ../daemon/gvfsbackendgphoto2.c:949 ../monitor/gphoto2/ggphoto2volume.c:197
+#: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
 msgid "%s Camera"
 msgstr "Камера %s"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:835 ../monitor/gphoto2/ggphoto2volume.c:174
+#: ../daemon/gvfsbackendgphoto2.c:952 ../monitor/gphoto2/ggphoto2volume.c:192
+#: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "Звуковой проигрыватель %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:844 ../monitor/gphoto2/ggphoto2volume.c:188
+#: ../daemon/gvfsbackendgphoto2.c:961 ../monitor/gphoto2/ggphoto2volume.c:203
+#: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Камера"
 
-#: ../daemon/gvfsbackendgphoto2.c:846 ../monitor/gphoto2/ggphoto2volume.c:186
+#: ../daemon/gvfsbackendgphoto2.c:963 ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Звуковой проигрыватель"
 
-#: ../daemon/gvfsbackendgphoto2.c:1429
+#: ../daemon/gvfsbackendgphoto2.c:1569
 msgid "No device specified"
 msgstr "Устройство не указано"
 
-#: ../daemon/gvfsbackendgphoto2.c:1446
+#: ../daemon/gvfsbackendgphoto2.c:1590
 msgid "Cannot create gphoto2 context"
 msgstr "Не удалось создать контекст gphoto2"
 
-#: ../daemon/gvfsbackendgphoto2.c:1456
+#: ../daemon/gvfsbackendgphoto2.c:1600
 msgid "Error creating camera"
-msgstr "Ошибка при создании объекта камеры"
+msgstr "Ошибка создания объекта камеры"
 
-#: ../daemon/gvfsbackendgphoto2.c:1469 ../daemon/gvfsbackendgphoto2.c:1479
+#: ../daemon/gvfsbackendgphoto2.c:1613 ../daemon/gvfsbackendgphoto2.c:1623
 msgid "Error loading device information"
-msgstr "Ошибка при загрузке информации об устройстве"
+msgstr "Ошибка загрузки информации об устройстве"
 
-#: ../daemon/gvfsbackendgphoto2.c:1491
+#: ../daemon/gvfsbackendgphoto2.c:1635
 msgid "Error looking up device information"
 msgstr "Не удалось найти информацию об устройстве"
 
-#: ../daemon/gvfsbackendgphoto2.c:1501
+#: ../daemon/gvfsbackendgphoto2.c:1645
 msgid "Error getting device information"
-msgstr "Ошибка при получении информации об устройстве"
+msgstr "Ошибка получения информации об устройстве"
 
-#: ../daemon/gvfsbackendgphoto2.c:1514
+#: ../daemon/gvfsbackendgphoto2.c:1658
 msgid "Error setting up camera communications port"
-msgstr "Ошибка при установке порта для связи с камерой"
+msgstr "Ошибка установки порта для связи с камерой"
 
-#: ../daemon/gvfsbackendgphoto2.c:1525
+#: ../daemon/gvfsbackendgphoto2.c:1669
 msgid "Error initializing camera"
-msgstr "Ошибка при инициализации камеры"
+msgstr "Ошибка инициализации камеры"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1539
+#: ../daemon/gvfsbackendgphoto2.c:1683
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "подключение gphoto2 на %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1614
+#: ../daemon/gvfsbackendgphoto2.c:1765
 msgid "No camera specified"
 msgstr "Камера не определена"
 
-#: ../daemon/gvfsbackendgphoto2.c:1706
+#: ../daemon/gvfsbackendgphoto2.c:1806 ../daemon/gvfsbackendgphoto2.c:1832
+#, c-format
+msgid "Filesystem is busy"
+msgstr "Файловая система занята"
+
+#: ../daemon/gvfsbackendgphoto2.c:1902
 msgid "Error creating file object"
-msgstr "Ошибка при создания объекта файла"
+msgstr "Ошибка создания объекта файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:1721
+#: ../daemon/gvfsbackendgphoto2.c:1917
 msgid "Error getting file"
-msgstr "Ошибка при получении файла"
+msgstr "Ошибка получения файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:1731
+#: ../daemon/gvfsbackendgphoto2.c:1927
 msgid "Error getting data from file"
-msgstr "Ошибка при получении данных из файла"
+msgstr "Ошибка получения данных из файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:1788
+#: ../daemon/gvfsbackendgphoto2.c:1985
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Некорректный идентификатор значка «%s»"
 
-#: ../daemon/gvfsbackendgphoto2.c:1864 ../daemon/gvfsbackendgphoto2.c:3053
+#: ../daemon/gvfsbackendgphoto2.c:2061 ../daemon/gvfsbackendgphoto2.c:3250
 #, c-format
 msgid "Error seeking in stream on camera %s"
-msgstr "Ошибка поиска в потоке, созданном камерой %s"
+msgstr "Ошибка позиционирования в потоке, созданном камерой %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2004 ../daemon/gvfsbackendsmbbrowse.c:1388
+#: ../daemon/gvfsbackendgphoto2.c:2201 ../daemon/gvfsbackendsftp.c:2940
+#: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "Не является каталогом"
 
-#: ../daemon/gvfsbackendgphoto2.c:2037
+#: ../daemon/gvfsbackendgphoto2.c:2234
 msgid "Failed to get folder list"
 msgstr "Не удалось получить список каталогов"
 
-#: ../daemon/gvfsbackendgphoto2.c:2103
+#: ../daemon/gvfsbackendgphoto2.c:2300
 msgid "Failed to get file list"
 msgstr "Не удалось получить список файлов"
 
-#: ../daemon/gvfsbackendgphoto2.c:2395
+#: ../daemon/gvfsbackendgphoto2.c:2592
 msgid "Error creating directory"
 msgstr "Ошибка создания каталога"
 
-#: ../daemon/gvfsbackendgphoto2.c:2604
+#: ../daemon/gvfsbackendgphoto2.c:2801
 msgid "Name already exists"
 msgstr "Такое имя уже существует"
 
-#: ../daemon/gvfsbackendgphoto2.c:2615 ../daemon/gvfsbackendgphoto2.c:3244
+#: ../daemon/gvfsbackendgphoto2.c:2812 ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
 msgstr "Слишком длинное имя"
 
-#: ../daemon/gvfsbackendgphoto2.c:2625 ../daemon/gvfsbackendgphoto2.c:3255
+#: ../daemon/gvfsbackendgphoto2.c:2822 ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
-msgstr "Ошибка при переименовании каталога"
+msgstr "Ошибка переименования каталога"
 
-#: ../daemon/gvfsbackendgphoto2.c:2638 ../daemon/gvfsbackendgphoto2.c:3268
+#: ../daemon/gvfsbackendgphoto2.c:2835 ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
-msgstr "Ошибка при переименовании файла"
+msgstr "Ошибка переименования файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:2702
+#: ../daemon/gvfsbackendgphoto2.c:2899
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "Каталог «%s» не пустой"
 
-#: ../daemon/gvfsbackendgphoto2.c:2713
+#: ../daemon/gvfsbackendgphoto2.c:2910
 msgid "Error deleting directory"
-msgstr "Ошибка при удалении каталога"
+msgstr "Ошибка удаления каталога"
 
-#: ../daemon/gvfsbackendgphoto2.c:2739
+#: ../daemon/gvfsbackendgphoto2.c:2936
 msgid "Error deleting file"
-msgstr "Ошибка при удалении файла"
+msgstr "Ошибка удаления файла"
 
-#: ../daemon/gvfsbackendgphoto2.c:2792
+#: ../daemon/gvfsbackendgphoto2.c:2989
 msgid "Can't write to directory"
 msgstr "Не удаётся произвести запись в каталог"
 
-#: ../daemon/gvfsbackendgphoto2.c:2839
+#: ../daemon/gvfsbackendgphoto2.c:3036
 msgid "Cannot allocate new file to append to"
-msgstr "не удалось выделить новый файл для добавления в конец"
+msgstr "Не удалось выделить новый файл для добавления в конец"
 
-#: ../daemon/gvfsbackendgphoto2.c:2854
+#: ../daemon/gvfsbackendgphoto2.c:3051
 msgid "Cannot read file to append to"
 msgstr "Не удалось прочитать файл для добавления в конец"
 
-#: ../daemon/gvfsbackendgphoto2.c:2865
+#: ../daemon/gvfsbackendgphoto2.c:3062
 msgid "Cannot get data of file to append to"
 msgstr "Не удалось получить данные файла для добавления в конец"
 
-#: ../daemon/gvfsbackendgphoto2.c:3152
+#: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
 msgstr "Ошибка записи в файл"
 
-#: ../daemon/gvfsbackendgphoto2.c:3200
+#: ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Not supported (not same directory)"
 msgstr "Не поддерживается (не тот же самый каталог)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3212
+#: ../daemon/gvfsbackendgphoto2.c:3409
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Не поддерживается (источник - каталог, назначение - каталог)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3220
+#: ../daemon/gvfsbackendgphoto2.c:3417
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Не поддерживается (источник - каталог, назначение - существующий файл)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3232
+#: ../daemon/gvfsbackendgphoto2.c:3429
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Не поддерживается (источник - файл, назначение - каталог)"
 
-#: ../daemon/gvfsbackendhttp.c:248
+#: ../daemon/gvfsbackendhttp.c:257
 #, c-format
 msgid "HTTP Client Error: %s"
 msgstr "Ошибка клиента HTTP: %s"
 
-#: ../daemon/gvfsbackendhttp.c:570 ../daemon/gvfsbackendsftp.c:1910
-#: ../daemon/gvfsbackendsmb.c:1399 ../daemon/gvfsdaemonutils.c:211
-msgid " (invalid encoding)"
-msgstr " (неверная кодировка)"
-
-#: ../daemon/gvfsbackendlocaltest.c:853
+#: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
 msgstr "Уведомление для каталогов не поддерживается"
 
@@ -908,7 +979,7 @@ msgstr "Сеть Windows"
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
-msgstr "Обзор сети"
+msgstr "Обозреватель сети"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -916,80 +987,88 @@ msgstr "Обзор сети"
 #. lead to G_IO_ERROR_NOT_MOUNTED errors
 #.
 #. Translators: This is "<sharename> on <servername>" and is used as name for an SMB share
-#: ../daemon/gvfsbackendobexftp.c:656 ../daemon/gvfsbackendsmb.c:545
-#: ../daemon/gvfsbackendsmb.c:1392
+#: ../daemon/gvfsbackendobexftp.c:681 ../daemon/gvfsbackendsmb.c:545
+#: ../daemon/gvfsbackendsmb.c:1417
 #, c-format
 msgid "%s on %s"
 msgstr "%s на %s"
 
-#: ../daemon/gvfsbackendobexftp.c:865
+#: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
-msgstr ""
-"Не найдена поддержка USB. Свяжитесь с вашим поставщиком программного "
-"обеспечения"
+msgstr "Не найдена поддержка USB. Свяжитесь с поставщиком программного обеспечения"
 
-#: ../daemon/gvfsbackendobexftp.c:985
+#: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
 msgstr "Соединение с устройством потеряно"
 
-#: ../daemon/gvfsbackendobexftp.c:1482
+#: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
 msgstr "Устройство требует обновления программного обеспечения"
 
-#: ../daemon/gvfsbackendsftp.c:291 ../daemon/gvfsbackendsftp.c:569
+#: ../daemon/gvfsbackendobexftp.c:1855 ../daemon/gvfsbackendsmb.c:1929
+#, c-format
+msgid "Error deleting file: %s"
+msgstr "Ошибка удаления файла: %s"
+
+#: ../daemon/gvfsbackendsftp.c:301 ../daemon/gvfsbackendsftp.c:657
 msgid "ssh program unexpectedly exited"
 msgstr "Программа ssh неожиданно завершилась"
 
-#: ../daemon/gvfsbackendsftp.c:306
+#: ../daemon/gvfsbackendsftp.c:309 ../daemon/gvfsbackendsftp.c:1822
+#: ../daemon/gvfsftptask.c:400
+msgid "Permission denied"
+msgstr "Доступ запрещён"
+
+#: ../daemon/gvfsbackendsftp.c:316
 msgid "Hostname not known"
 msgstr "Имя узла неизвестно"
 
-#: ../daemon/gvfsbackendsftp.c:313
+#: ../daemon/gvfsbackendsftp.c:323
 msgid "No route to host"
 msgstr "Нет маршрута к узлу"
 
-#: ../daemon/gvfsbackendsftp.c:320
+#: ../daemon/gvfsbackendsftp.c:330
 msgid "Connection refused by server"
 msgstr "Соединение отклонено сервером"
 
-#: ../daemon/gvfsbackendsftp.c:327
+#: ../daemon/gvfsbackendsftp.c:337
 msgid "Host key verification failed"
 msgstr "Сбой проверки сертификата узла"
 
-#: ../daemon/gvfsbackendsftp.c:413
+#: ../daemon/gvfsbackendsftp.c:501
 msgid "Unable to spawn ssh program"
 msgstr "Не удаётся выполнить программу ssh"
 
-#: ../daemon/gvfsbackendsftp.c:429
+#: ../daemon/gvfsbackendsftp.c:517
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Не удаётся выполнить программу ssh: %s"
 
-#: ../daemon/gvfsbackendsftp.c:531 ../daemon/gvfsbackendsftp.c:792
+#: ../daemon/gvfsbackendsftp.c:619 ../daemon/gvfsbackendsftp.c:879
 msgid "Timed out when logging in"
 msgstr "Время ожидания входа в систему истекло"
 
-#: ../daemon/gvfsbackendsftp.c:871
+#: ../daemon/gvfsbackendsftp.c:958
 msgid "Enter passphrase for key"
-msgstr "Введите ключевую разу для ключа"
+msgstr "Введите ключевую фразу для ключа"
 
-#: ../daemon/gvfsbackendsftp.c:873
+#: ../daemon/gvfsbackendsftp.c:960
 msgid "Enter password"
 msgstr "Введите пароль"
 
-#: ../daemon/gvfsbackendsftp.c:949
+#: ../daemon/gvfsbackendsftp.c:1036
 msgid "Can't send password"
 msgstr "Не удаётся отправить пароль"
 
-#: ../daemon/gvfsbackendsftp.c:957
+#: ../daemon/gvfsbackendsftp.c:1044
 msgid "Log In Anyway"
-msgstr "Подключиться всё равно"
+msgstr "Всё равно войти"
 
-#: ../daemon/gvfsbackendsftp.c:957
+#: ../daemon/gvfsbackendsftp.c:1044
 msgid "Cancel Login"
-msgstr "Отменить подключение"
+msgstr "Отменить вход"
 
-#: ../daemon/gvfsbackendsftp.c:967
+#: ../daemon/gvfsbackendsftp.c:1053
 #, c-format
 msgid ""
 "The identity of the remote computer (%s) is unknown.\n"
@@ -1005,72 +1084,78 @@ msgstr ""
 "быть абсолютно уверенным в безопасности подключения к этому компьютеру, "
 "обратитесь к системному администратору."
 
-#: ../daemon/gvfsbackendsftp.c:987
+#: ../daemon/gvfsbackendsftp.c:1073
 msgid "Login dialog cancelled"
-msgstr "Диалог ввода пароля прерван"
+msgstr "Окно входа отменено"
 
-#: ../daemon/gvfsbackendsftp.c:1007
+#: ../daemon/gvfsbackendsftp.c:1093
 msgid "Can't send host identity confirmation"
-msgstr "Не удаётся отправить подтверждение идентификации узла"
+msgstr "Не удаётся отправить подтверждение подлинности узла"
 
-#: ../daemon/gvfsbackendsftp.c:1500 ../daemon/gvfsbackendsftp.c:1523
+#: ../daemon/gvfsbackendsftp.c:1631 ../daemon/gvfsbackendsftp.c:1654
 msgid "Protocol error"
 msgstr "Ошибка протокола"
 
 #. Translators: This is the name of an sftp share, like "sftp for <user>on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1548
+#: ../daemon/gvfsbackendsftp.c:1679
 #, c-format
 msgid "sftp for %s on %s"
 msgstr "sftp пользователя %s на %s"
 
 #. Translators: This is the name of an sftp share, like "sftp on <hostname>"
-#: ../daemon/gvfsbackendsftp.c:1551
+#: ../daemon/gvfsbackendsftp.c:1682
 #, c-format
 msgid "sftp on %s"
 msgstr "sftp на %s"
 
-#: ../daemon/gvfsbackendsftp.c:1577
+#: ../daemon/gvfsbackendsftp.c:1723
 msgid "Unable to find supported ssh command"
 msgstr "Не удаётся найти поддерживаемую команду ssh"
 
-#: ../daemon/gvfsbackendsftp.c:1995
-msgid "Failure"
-msgstr "Ошибка"
-
-#: ../daemon/gvfsbackendsftp.c:2051 ../daemon/gvfsbackendsftp.c:2130
-#: ../daemon/gvfsbackendsftp.c:2141 ../daemon/gvfsbackendsftp.c:2197
-#: ../daemon/gvfsbackendsftp.c:2283 ../daemon/gvfsbackendsftp.c:2333
-#: ../daemon/gvfsbackendsftp.c:2379 ../daemon/gvfsbackendsftp.c:2454
-#: ../daemon/gvfsbackendsftp.c:2561 ../daemon/gvfsbackendsftp.c:2601
-#: ../daemon/gvfsbackendsftp.c:2651 ../daemon/gvfsbackendsftp.c:2723
-#: ../daemon/gvfsbackendsftp.c:2735 ../daemon/gvfsbackendsftp.c:2793
-#: ../daemon/gvfsbackendsftp.c:2835 ../daemon/gvfsbackendsftp.c:3012
-#: ../daemon/gvfsbackendsftp.c:3037 ../daemon/gvfsbackendsftp.c:3092
-#: ../daemon/gvfsbackendsftp.c:3149 ../daemon/gvfsbackendsftp.c:3420
-#: ../daemon/gvfsbackendsftp.c:3487 ../daemon/gvfsbackendsftp.c:3622
-#: ../daemon/gvfsbackendsftp.c:3682 ../daemon/gvfsbackendsftp.c:3717
-#: ../daemon/gvfsbackendsftp.c:3745 ../daemon/gvfsbackendsftp.c:3853
-#: ../daemon/gvfsbackendsftp.c:3907 ../daemon/gvfsbackendsftp.c:3943
-#: ../daemon/gvfsbackendsftp.c:3977 ../daemon/gvfsbackendsftp.c:3992
-#: ../daemon/gvfsbackendsftp.c:4007 ../daemon/gvfsbackendsftp.c:4085
+#: ../daemon/gvfsbackendsftp.c:1997 ../daemon/gvfsbackendsftp.c:2386
+#: ../daemon/gvfsbackendsftp.c:2465 ../daemon/gvfsbackendsftp.c:2476
+#: ../daemon/gvfsbackendsftp.c:2532 ../daemon/gvfsbackendsftp.c:2618
+#: ../daemon/gvfsbackendsftp.c:2668 ../daemon/gvfsbackendsftp.c:2714
+#: ../daemon/gvfsbackendsftp.c:2789 ../daemon/gvfsbackendsftp.c:2896
+#: ../daemon/gvfsbackendsftp.c:3013 ../daemon/gvfsbackendsftp.c:3094
+#: ../daemon/gvfsbackendsftp.c:3166 ../daemon/gvfsbackendsftp.c:3178
+#: ../daemon/gvfsbackendsftp.c:3236 ../daemon/gvfsbackendsftp.c:3278
+#: ../daemon/gvfsbackendsftp.c:3463 ../daemon/gvfsbackendsftp.c:3495
+#: ../daemon/gvfsbackendsftp.c:3550 ../daemon/gvfsbackendsftp.c:3607
+#: ../daemon/gvfsbackendsftp.c:3904 ../daemon/gvfsbackendsftp.c:3971
+#: ../daemon/gvfsbackendsftp.c:4106 ../daemon/gvfsbackendsftp.c:4166
+#: ../daemon/gvfsbackendsftp.c:4201 ../daemon/gvfsbackendsftp.c:4229
+#: ../daemon/gvfsbackendsftp.c:4337 ../daemon/gvfsbackendsftp.c:4391
+#: ../daemon/gvfsbackendsftp.c:4430 ../daemon/gvfsbackendsftp.c:4464
+#: ../daemon/gvfsbackendsftp.c:4498 ../daemon/gvfsbackendsftp.c:4513
+#: ../daemon/gvfsbackendsftp.c:4528 ../daemon/gvfsbackendsftp.c:4606
 msgid "Invalid reply received"
 msgstr "Получен неверный ответ"
 
-#: ../daemon/gvfsbackendsftp.c:2103
+#: ../daemon/gvfsbackendsftp.c:2245 ../daemon/gvfsbackendsmb.c:1424
+#: ../daemon/gvfsdaemonutils.c:211
+msgid " (invalid encoding)"
+msgstr " (неверная кодировка)"
+
+#: ../daemon/gvfsbackendsftp.c:2330
+msgid "Failure"
+msgstr "Ошибка"
+
+#: ../daemon/gvfsbackendsftp.c:2438
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "Некорректный icon_id «%s» в OpenIconForRead"
 
-#: ../daemon/gvfsbackendsftp.c:2399
+#: ../daemon/gvfsbackendsftp.c:2734
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Ошибка создания резервной копии файла: %s"
 
-#: ../daemon/gvfsbackendsftp.c:2897
+#: ../daemon/gvfsbackendsftp.c:3340
 msgid "Unable to create temporary file"
 msgstr "Не удаётся создать временный файл"
 
-#: ../daemon/gvfsbackendsftp.c:3779 ../daemon/gvfsbackendsmb.c:1963
+#: ../daemon/gvfsbackendsftp.c:4263 ../daemon/gvfsbackendsmb.c:2027
 msgid "Can't move directory over directory"
 msgstr "Не удаётся переместить каталог поверх каталога"
 
@@ -1091,35 +1176,30 @@ msgstr "Внутренняя ошибка (%s)"
 msgid "Failed to mount Windows share"
 msgstr "Ошибка подключения ресурса Windows"
 
-#: ../daemon/gvfsbackendsmb.c:760 ../daemon/gvfsbackendsmb.c:1243
+#: ../daemon/gvfsbackendsmb.c:772 ../daemon/gvfsbackendsmb.c:1268
 msgid "Unsupported seek type"
-msgstr "Неподдерживаемый тип поиска"
+msgstr "Неподдерживаемый тип позиционирования"
 
-#: ../daemon/gvfsbackendsmb.c:1335
+#: ../daemon/gvfsbackendsmb.c:1360
 #, c-format
 msgid "Backup file creation failed: %s"
 msgstr "Ошибка создания резервного файла: %s"
 
-#: ../daemon/gvfsbackendsmb.c:1865
-#, c-format
-msgid "Error deleting file: %s"
-msgstr "Ошибка удаления файла: %s"
-
-#: ../daemon/gvfsbackendsmb.c:1939
+#: ../daemon/gvfsbackendsmb.c:2003
 #, c-format
 msgid "Error moving file: %s"
 msgstr "Ошибка перемещения файла: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2011
+#: ../daemon/gvfsbackendsmb.c:2075
 #, c-format
 msgid "Error removing target file: %s"
 msgstr "Ошибка удаления файла назначения: %s"
 
-#: ../daemon/gvfsbackendsmb.c:2035
+#: ../daemon/gvfsbackendsmb.c:2099
 msgid "Can't recursively move directory"
 msgstr "Не удаётся переместить каталог рекурсивно"
 
-#: ../daemon/gvfsbackendsmb.c:2101
+#: ../daemon/gvfsbackendsmb.c:2165
 msgid "Windows Shares Filesystem Service"
 msgstr "Служба файловой системы ресурсов Windows"
 
@@ -1143,13 +1223,13 @@ msgstr "Не удалось получить список доступных н�
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1080 ../daemon/gvfsbackendsmbbrowse.c:1126
 msgid "The file is not a mountable"
-msgstr "Этот файл не является монтируемым"
+msgstr "Этот файл не является подключаемым"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
 msgstr "Не является обычным файлом"
 
-#: ../daemon/gvfsbackendsmbbrowse.c:1501
+#: ../daemon/gvfsbackendsmbbrowse.c:1503
 msgid "Windows Network Filesystem Service"
 msgstr "Служба сетевой файловой системы Windows"
 
@@ -1163,34 +1243,101 @@ msgstr "Элементы в корзине не могут быть измене
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
-#: ../daemon/gvfsbackendtrash.c:735 ../daemon/gvfsbackendtrash.c:843
+#: ../daemon/gvfsbackendtrash.c:742 ../daemon/gvfsbackendtrash.c:850
 msgid "Trash"
 msgstr "Корзина"
 
-#: ../daemon/gvfsdaemon.c:1032
+#: ../daemon/gvfsdaemon.c:1056
 msgid "Invalid backend type"
-msgstr "Неверный тип драйвера"
+msgstr "Неверный тип внутреннего компонента"
 
 #: ../daemon/gvfsdaemonutils.c:104
 #, c-format
 msgid "Error sending fd: %s"
 msgstr "Ошибка передачи fd: %s"
 
+#: ../daemon/gvfsftpconnection.c:181
+msgid "Unexpected end of stream"
+msgstr "Неожиданный конец потока"
+
+#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
+msgid "Invalid reply"
+msgstr "Неверный ответ"
+
+#: ../daemon/gvfsftpconnection.c:393
+msgid ""
+"Failed to create active FTP connection. Maybe your router does not support "
+"this?"
+msgstr ""
+"Не удалось установить активное FTP соединение. Возможно, маршрутизатор не "
+"поддерживает этого."
+
+#: ../daemon/gvfsftpconnection.c:400
+msgid "Failed to create active FTP connection."
+msgstr "Не удалось установить активное FTP соединение."
+
+#: ../daemon/gvfsftpfile.c:170
+msgid "Filename contains invalid characters."
+msgstr "Имя файла содержит недопустимые символы."
+
+#: ../daemon/gvfsftptask.c:262
+msgid "The FTP server is busy. Try again later"
+msgstr "FTP сервер занят. Повторите попытку позднее"
+
+#: ../daemon/gvfsftptask.c:356
+msgid "Accounts are unsupported"
+msgstr "Учётные записи не поддерживаются"
+
+#: ../daemon/gvfsftptask.c:360
+msgid "Host closed connection"
+msgstr "Узел закрыл соединение"
+
+#: ../daemon/gvfsftptask.c:364
+msgid "Cannot open data connection. Maybe your firewall prevents this?"
+msgstr ""
+"Не удаётся установить соединение данных. Проверьте параметры межсетевого "
+"экрана."
+
+#: ../daemon/gvfsftptask.c:368
+msgid "Data connection closed"
+msgstr "Соединение с данными закрыто"
+
+#: ../daemon/gvfsftptask.c:375 ../daemon/gvfsftptask.c:379
+msgid "Operation failed"
+msgstr "Сбой операции"
+
+#: ../daemon/gvfsftptask.c:384
+msgid "No space left on server"
+msgstr "На сервере не осталось свободного места"
+
+#: ../daemon/gvfsftptask.c:396
+msgid "Unsupported network protocol"
+msgstr "Неподдерживаемый сетевой протокол"
+
+#: ../daemon/gvfsftptask.c:404
+msgid "Page type unknown"
+msgstr "Неизвестный тип страницы"
+
+#: ../daemon/gvfsftptask.c:408
+msgid "Invalid filename"
+msgstr "Неверное имя файла"
+
 #: ../daemon/gvfsjobmakesymlink.c:126
 msgid "Symlinks not supported by backend"
-msgstr "Символические ссылки не поддерживаются драйвером"
+msgstr "Символические ссылки не поддерживаются внутренней реализацией"
 
 #: ../daemon/gvfsjobsetattribute.c:120
 msgid "Invalid dbus message"
 msgstr "Неверное сообщение dbus"
 
-#: ../daemon/main.c:45
+#: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
-msgstr "Заменить старый демон."
+msgstr "Заменить старого демона."
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
-msgstr "Не запускать fuse"
+msgstr "Не запускать fuse."
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
@@ -1202,46 +1349,159 @@ msgstr "Основной демон GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
-#: ../daemon/main.c:76
+#: ../daemon/main.c:76 ../metadata/meta-daemon.c:718
 #, c-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: ../daemon/main.c:78 ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:101 ../programs/gvfs-info.c:364
-#: ../programs/gvfs-ls.c:386 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:97 ../programs/gvfs-open.c:140
+#: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
+#: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
+#: ../programs/gvfs-copy.c:122 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
+#: ../programs/gvfs-move.c:110 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
-#: ../programs/gvfs-tree.c:251
+#: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
-msgstr ""
-"Для получения дополнительной информации используйте команду \"%s --help\""
+msgstr "Для получения дополнительной информации используйте команду «%s --help»."
 
-#: ../daemon/mount.c:456
+#: ../daemon/mount.c:459
 msgid "Invalid arguments from spawned child"
 msgstr "Неверные аргументы от порождённого дочернего процесса"
 
-#: ../daemon/mount.c:767
+#: ../daemon/mount.c:779
 #, c-format
 msgid "Automount failed: %s"
-msgstr "Сбой автомонтирования: %s"
+msgstr "Сбой автоматического подключения: %s"
 
-#: ../daemon/mount.c:812 ../daemon/mount.c:886
+#: ../daemon/mount.c:824 ../daemon/mount.c:898
 msgid "The specified location is not mounted"
-msgstr "Указанный адрес не смонтирован"
+msgstr "Указанный адрес не подключён"
 
-#: ../daemon/mount.c:817
+#: ../daemon/mount.c:829
 msgid "The specified location is not supported"
 msgstr "Указанный адрес не поддерживается"
 
-#: ../daemon/mount.c:1023
+#: ../daemon/mount.c:1036
 msgid "Location is already mounted"
-msgstr "Адрес уже смонтирован"
+msgstr "Адрес уже подключён"
 
-#: ../daemon/mount.c:1031
+#: ../daemon/mount.c:1044
 msgid "Location is not mountable"
-msgstr "Адрес не является монтируемым"
+msgstr "Адрес не является подключаемым"
+
+#: ../metadata/meta-daemon.c:130 ../metadata/meta-daemon.c:336
+#: ../metadata/meta-daemon.c:390 ../metadata/meta-daemon.c:419
+#: ../metadata/meta-daemon.c:449
+#, c-format
+msgid "Can't find metadata file %s"
+msgstr "Невозможно найти файл метаданных %s"
+
+#: ../metadata/meta-daemon.c:160 ../metadata/meta-daemon.c:179
+msgid "Unable to set metadata key"
+msgstr "Невозможно установить ключ метаданных"
+
+#: ../metadata/meta-daemon.c:197 ../metadata/meta-daemon.c:399
+msgid "Unable to unset metadata key"
+msgstr "Невозможно отключить ключ метаданных"
+
+#: ../metadata/meta-daemon.c:428
+msgid "Unable to remove metadata keys"
+msgstr "Невозможно удалить ключи метаданных"
+
+#: ../metadata/meta-daemon.c:459
+msgid "Unable to move metadata keys"
+msgstr "Невозможно переместить ключи метаданных"
+
+#: ../metadata/meta-daemon.c:704
+msgid "GVFS Metadata Daemon"
+msgstr "Демон метаданных GVFS"
+
+#: ../metadata/meta-daemon.c:707
+msgid "Metadata daemon for GVFS"
+msgstr "Демон метаданных для GVFS"
+
+#: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
+msgid "GVfs GDU Volume Monitor"
+msgstr "Монитор томов GVfs GDU"
+
+#: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
+msgid "Floppy Drive"
+msgstr "Флоппи-дисковод"
+
+#: ../monitor/gdu/ggdudrive.c:258
+#, c-format
+msgid "Unnamed Drive (%s)"
+msgstr "Безымянное устройство (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:260
+msgid "Unnamed Drive"
+msgstr "Безымянный накопитель (%s)"
+
+#: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
+#, c-format
+msgid "Failed to eject media; one or more volumes on the media are busy."
+msgstr ""
+"Не удаётся извлечь диск, потому что один или несколько томов этого диска "
+"заняты."
+
+#: ../monitor/gdu/ggdudrive.c:1015
+msgid ""
+"Start drive in degraded mode?\n"
+"Starting a drive in degraded mode means that the drive is no longer tolerant "
+"to failures. Data on the drive may be irrevocably lost if a component fails."
+msgstr ""
+"Подключить накопитель в режиме с ухудшенными характеристиками?\n"
+"Подключение в таком режиме означает, что накопитель не будет защищён от "
+"ошибок. Данные на нём могут быть безвозвратно утеряны в случае поломки."
+
+#: ../monitor/gdu/ggdudrive.c:1021
+msgid "Start Anyway"
+msgstr "Всё равно подключить"
+
+#: ../monitor/gdu/ggdumount.c:856
+msgid "One or more programs are preventing the unmount operation."
+msgstr "Одна или более программ препятствуют отключению."
+
+#: ../monitor/gdu/ggdumount.c:984
+msgid "Cannot get LUKS cleartext slave"
+msgstr "Невозможно получить LUKS cleartext slave"
+
+#: ../monitor/gdu/ggdumount.c:1006
+#, c-format
+msgid "Cannot get LUKS cleartext slave from path `%s'"
+msgstr "Невозможно получить LUKS cleartext slave из пути `%s'"
+
+#: ../monitor/gdu/ggduvolume.c:325
+msgid "Floppy Disk"
+msgstr "Флоппи-дисковод"
+
+#: ../monitor/gdu/ggduvolume.c:1075
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data on partition %d."
+msgstr ""
+"Введите пароль для разблокирования тома\n"
+"Устройство «%s» содержит зашифрованные данные на разделе %d."
+
+#: ../monitor/gdu/ggduvolume.c:1082
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device \"%s\" contains encrypted data."
+msgstr ""
+"Введите пароль для разблокирования тома\n"
+"Устройство «%s» содержит зашифрованные данные."
+
+#: ../monitor/gdu/ggduvolume.c:1089
+#, c-format
+msgid ""
+"Enter a password to unlock the volume\n"
+"The device %s contains encrypted data."
+msgstr ""
+"Введите пароль для разблокирования тома\n"
+"Устройство %s содержит зашифрованные данные."
 
 #: ../monitor/gphoto2/hal-utils.c:40 ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
@@ -1463,10 +1723,6 @@ msgstr "Устройство %s/%s"
 msgid "%s Drive"
 msgstr "Устройство %s"
 
-#: ../monitor/hal/ghaldrive.c:179
-msgid "Floppy Drive"
-msgstr "Флоппи-дисковод"
-
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
 msgstr "Устройство программного RAID"
@@ -1523,13 +1779,6 @@ msgstr "USB Flash брелок"
 msgid "Mass Storage Drive"
 msgstr "Запоминающее устройство"
 
-#: ../monitor/hal/ghaldrive.c:662
-#, c-format
-msgid "Failed to eject media; one or more volumes on the media are busy."
-msgstr ""
-"Не удаётся извлечь диск, потому что один или несколько томов этого диска "
-"заняты."
-
 #: ../monitor/hal/ghalmount.c:159 ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
@@ -1562,6 +1811,10 @@ msgstr "Диск %s"
 msgid "%s Encrypted Data"
 msgstr "Зашифрованные данные %s"
 
+#: ../programs/gvfs-cat.c:37
+msgid "locations"
+msgstr "адреса"
+
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:57
@@ -1574,14 +1827,14 @@ msgstr "%s: %s: ошибка открытия файла: %s\n"
 #: ../programs/gvfs-cat.c:80
 #, c-format
 msgid "%s: %s, error writing to stdout"
-msgstr "%s: %s, ошибка записи на стандартный вывод"
+msgstr "%s: %s, ошибка записи в стандартный вывод"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
 #: ../programs/gvfs-cat.c:92
 #, c-format
 msgid "%s: %s: error reading: %s\n"
-msgstr "%s: %s, ошибка чтения: %s\n"
+msgstr "%s: %s: ошибка чтения: %s\n"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1592,7 +1845,7 @@ msgstr "%s: %s:ошибка закрытия: %s\n"
 
 #: ../programs/gvfs-cat.c:136
 msgid "LOCATION... - concatenate LOCATIONS to standard output."
-msgstr "АДРЕС... - каскадировать АДРЕСА на стандартный вывод."
+msgstr "АДРЕС... - объединять АДРЕСА со стандартным выводом."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1605,16 +1858,25 @@ msgid ""
 msgstr ""
 "Объединить все файлы в каталоге и вывести их на стандартный вывод. Работает "
 "как стандартная утилита cat, но вместо адреса локального файла использует "
-"адрес gvfs. Например, вы можете использовать адрес вида smb://server/"
-"resource/file.txt"
+"адрес gvfs. Например, можно использовать адрес вида smb://server/resource/"
+"file.txt."
 
 #: ../programs/gvfs-cat.c:148
 msgid ""
 "Note: just pipe through cat if you need its formatting option like -n, -T or "
 "other."
 msgstr ""
-"Примечание: если вам необходимы параметры форматирования, такие как -n, -T "
-"или другие, достаточно просто пропустить вывод через команду cat."
+"Примечание: если необходимы параметры форматирования, такие как -n, -T или "
+"другие, достаточно просто пропустить вывод через команду cat."
+
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:120
+#: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
+#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:108
+#: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
+#: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
+#, c-format
+msgid "Error parsing commandline options: %s\n"
+msgstr "Ошибка разбора параметров командной строки: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1622,6 +1884,283 @@ msgstr ""
 #, c-format
 msgid "%s: missing locations"
 msgstr "%s: не указаны адреса"
+
+#: ../programs/gvfs-copy.c:44 ../programs/gvfs-move.c:42
+msgid "no target directory"
+msgstr "целевой каталог отсутствует"
+
+#: ../programs/gvfs-copy.c:45 ../programs/gvfs-move.c:43
+msgid "show progress"
+msgstr "показать ход выполнения"
+
+#: ../programs/gvfs-copy.c:46 ../programs/gvfs-move.c:44
+msgid "prompt before overwrite"
+msgstr "спросить перед перезаписью"
+
+#: ../programs/gvfs-copy.c:47
+msgid "preserve all attributes"
+msgstr "сохранить все атрибуты"
+
+#: ../programs/gvfs-copy.c:48 ../programs/gvfs-move.c:45
+msgid "backup existing destination files"
+msgstr "создать резервную копию существующих файлов"
+
+#: ../programs/gvfs-copy.c:49
+msgid "never follow symbolic links"
+msgstr "никогда не следовать символическим ссылкам"
+
+#: ../programs/gvfs-copy.c:78 ../programs/gvfs-move.c:67
+#, c-format
+msgid "progress"
+msgstr "ход выполнения"
+
+#: ../programs/gvfs-copy.c:114
+msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
+msgstr "SOURCE... DEST - копировать файл(ы) из SOURCE в DEST"
+
+#: ../programs/gvfs-copy.c:131 ../programs/gvfs-move.c:119
+msgid "Missing operand\n"
+msgstr "Отсутствует операнд\n"
+
+#: ../programs/gvfs-copy.c:139 ../programs/gvfs-move.c:127
+msgid "Too many arguments\n"
+msgstr "Слишком много аргументов\n"
+
+#: ../programs/gvfs-copy.c:148 ../programs/gvfs-move.c:136
+#, c-format
+msgid "Target %s is not a directory\n"
+msgstr "Цель %s не является каталогом\n"
+
+#: ../programs/gvfs-copy.c:192
+#, c-format
+msgid "overwrite %s?"
+msgstr "перезаписать %s?"
+
+#: ../programs/gvfs-copy.c:206
+#, c-format
+msgid "Error copying file %s: %s\n"
+msgstr "Ошибка копирования файла %s: %s\n"
+
+#: ../programs/gvfs-info.c:37
+msgid "List writable attributes"
+msgstr "Перечислить записываемые атрибуты"
+
+#: ../programs/gvfs-info.c:38
+msgid "Get filesystem info"
+msgstr "Получить информацию о файловой системе"
+
+#: ../programs/gvfs-info.c:39 ../programs/gvfs-ls.c:39
+msgid "The attributes to get"
+msgstr "Получаемые атрибуты"
+
+#: ../programs/gvfs-info.c:40 ../programs/gvfs-ls.c:43
+#: ../programs/gvfs-set-attribute.c:37
+msgid "Don't follow symlinks"
+msgstr "Не следовать символическим ссылкам"
+
+#: ../programs/gvfs-info.c:50
+msgid "invalid type"
+msgstr "неверный тип"
+
+#: ../programs/gvfs-info.c:53
+msgid "unknown"
+msgstr "неизвестный"
+
+#: ../programs/gvfs-info.c:56
+msgid "regular"
+msgstr "обычный"
+
+#: ../programs/gvfs-info.c:59
+msgid "directory"
+msgstr "каталог"
+
+#: ../programs/gvfs-info.c:62
+msgid "symlink"
+msgstr "символическая ссылка"
+
+#: ../programs/gvfs-info.c:65
+msgid "special"
+msgstr "специальный"
+
+#: ../programs/gvfs-info.c:68
+msgid "shortcut"
+msgstr "комбинация клавиш"
+
+#: ../programs/gvfs-info.c:71
+msgid "mountable"
+msgstr "подключаемый"
+
+#: ../programs/gvfs-info.c:109
+#, c-format
+msgid "attributes:\n"
+msgstr "атрибуты:\n"
+
+#: ../programs/gvfs-info.c:155
+#, c-format
+msgid "display name: %s\n"
+msgstr "отображаемое имя: %s\n"
+
+#: ../programs/gvfs-info.c:159
+#, c-format
+msgid "edit name: %s\n"
+msgstr "редактируемое имя: %s\n"
+
+#: ../programs/gvfs-info.c:165
+#, c-format
+msgid "name: %s\n"
+msgstr "имя: %s\n"
+
+#: ../programs/gvfs-info.c:172
+#, c-format
+msgid "type: %s\n"
+msgstr "тип: %s\n"
+
+#: ../programs/gvfs-info.c:178
+#, c-format
+msgid "size: "
+msgstr "размер:"
+
+#: ../programs/gvfs-info.c:183
+#, c-format
+msgid "hidden\n"
+msgstr "скрытый\n"
+
+#: ../programs/gvfs-info.c:266
+msgid "Copy with file"
+msgstr "Копировать с файлом"
+
+#: ../programs/gvfs-info.c:270
+msgid "Keep with file when moved"
+msgstr "Сохранять с файлом при перемещении"
+
+#: ../programs/gvfs-info.c:307
+#, c-format
+msgid "Error getting writable attributes: %s\n"
+msgstr "Ошибка получения записываемых атрибутов: %s\n"
+
+#: ../programs/gvfs-info.c:312
+#, c-format
+msgid "Settable attributes:\n"
+msgstr "Устанавливаемые атрибуты:\n"
+
+#: ../programs/gvfs-info.c:335
+#, c-format
+msgid "Writable attribute namespaces:\n"
+msgstr "Пространства имён записываемых атрибутов:\n"
+
+#: ../programs/gvfs-info.c:362
+msgid "- show info for <location>"
+msgstr "- показать информацию об <адресе>"
+
+#: ../programs/gvfs-ls.c:40 ../programs/gvfs-tree.c:36
+msgid "Show hidden files"
+msgstr "Показывать скрытые файлы"
+
+#: ../programs/gvfs-ls.c:41
+msgid "Use a long listing format"
+msgstr "Использовать расширенный формат"
+
+#: ../programs/gvfs-ls.c:42
+msgid "Show completions"
+msgstr "Показывать завершения"
+
+#: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
+#: ../programs/gvfs-rename.c:68
+#, c-format
+msgid "Error: %s\n"
+msgstr "Ошибка: %s\n"
+
+#: ../programs/gvfs-ls.c:383
+msgid "- list files at <location>"
+msgstr "- перечислить файлы в <location>"
+
+#: ../programs/gvfs-mkdir.c:33
+msgid "create parent directories"
+msgstr "создать родительские каталоги"
+
+#: ../programs/gvfs-mkdir.c:50
+msgid "- create directories"
+msgstr "- создать каталоги"
+
+#: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
+#, c-format
+msgid "Error creating directory: %s\n"
+msgstr "Ошибка создания каталога: %s\n"
+
+#: ../programs/gvfs-mount.c:54
+msgid "Mount as mountable"
+msgstr "Подключить как подключаемый"
+
+#: ../programs/gvfs-mount.c:55
+msgid "Mount volume with device file"
+msgstr "Подключить том с файлом устройства"
+
+#: ../programs/gvfs-mount.c:56
+msgid "Unmount"
+msgstr "Отключить"
+
+#: ../programs/gvfs-mount.c:57
+msgid "Unmount all mounts with the given scheme"
+msgstr "Отключить все точки монтирования по заданной схеме"
+
+#: ../programs/gvfs-mount.c:58
+msgid "List"
+msgstr "Список"
+
+#: ../programs/gvfs-mount.c:59
+msgid "Show extra information for List and Monitor"
+msgstr "Показать дополнительную информацию для «Списка» и «Монитора»"
+
+#: ../programs/gvfs-mount.c:60
+msgid "Monitor events"
+msgstr "Отслеживать события"
+
+#: ../programs/gvfs-mount.c:163 ../programs/gvfs-mount.c:184
+#, c-format
+msgid "Error mounting location: %s\n"
+msgstr "Ошибка подключения адреса: %s\n"
+
+#: ../programs/gvfs-mount.c:241
+#, c-format
+msgid "Error unmounting mount: %s\n"
+msgstr "Ошибка отключения точки монтирования: %s\n"
+
+#: ../programs/gvfs-mount.c:262
+#, c-format
+msgid "Error finding enclosing mount: %s\n"
+msgstr "Не удаётся найти точку монтирования: %s\n"
+
+#: ../programs/gvfs-mount.c:682
+#, c-format
+msgid "Error mounting %s: %s\n"
+msgstr "Ошибка подключения %s: %s\n"
+
+#: ../programs/gvfs-mount.c:696
+#, c-format
+msgid "Mounted %s at %s\n"
+msgstr "Подключено %s в %s\n"
+
+#: ../programs/gvfs-mount.c:747
+#, c-format
+msgid "No volume for device file %s\n"
+msgstr "Нет тома для файла устройства %s\n"
+
+#: ../programs/gvfs-mount.c:938
+msgid "- mount <location>"
+msgstr "- подключить <адрес>"
+
+#: ../programs/gvfs-move.c:102
+msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
+msgstr "SOURCE... DEST - переместить файл(ы) из SOURCE в DEST"
+
+#: ../programs/gvfs-move.c:188
+#, c-format
+msgid "Error moving file %s: %s\n"
+msgstr "Ошибка перемещения файла %s: %s\n"
+
+#: ../programs/gvfs-open.c:37
+msgid "files"
+msgstr "файлы"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1639,7 +2178,7 @@ msgstr "%s: %s: ошибка запуска приложения: %s\n"
 
 #: ../programs/gvfs-open.c:122
 msgid "FILES... - open FILES with registered application."
-msgstr "ФАЙЛЫ... - открывает ФАЙЛЫ в зарегистрированном приложении."
+msgstr "ФАЙЛЫ... - открыть ФАЙЛЫ в зарегистрированном приложении."
 
 #. Translators: this message will appear after the usage string
 #. and before the list of options.
@@ -1651,32 +2190,116 @@ msgstr ""
 "Открывает файл(ы) в приложении по умолчанию, зарегистрированном для "
 "обработки файлов этого типа."
 
-#~ msgid "The query info operation is not supported"
-#~ msgstr "Операция запроса информации не поддерживается"
+#: ../programs/gvfs-rename.c:49
+msgid "- rename file"
+msgstr "- переименовать файл"
 
-#~ msgid "Query info not supported on stream"
-#~ msgstr "Запрос информации не поддерживается потоком"
+#: ../programs/gvfs-rename.c:74
+#, c-format
+msgid "Rename successful. New uri: %s\n"
+msgstr "Переименование успешно завершено. Новый URI: %s\n"
 
-#~ msgid "dns-sd"
-#~ msgstr "dns-sd"
+#: ../programs/gvfs-rm.c:35 ../programs/gvfs-trash.c:35
+msgid "ignore nonexistent files, never prompt"
+msgstr "игнорировать несуществующие файлы, никогда не спрашивать"
 
-#~ msgid "%s (in trash)"
-#~ msgstr "%s (в корзине)"
+#: ../programs/gvfs-rm.c:52
+msgid "- delete files"
+msgstr "- удалить файлы"
 
-#~ msgid "Can't delete trash"
-#~ msgstr "Не удаётся удалить корзину"
+#: ../programs/gvfs-save.c:43
+msgid "Create backup"
+msgstr "Создать резервную копию"
 
-#~ msgid "Trash directory notification not supported"
-#~ msgstr "Уведомление не поддерживается для каталога корзины"
+#: ../programs/gvfs-save.c:44
+msgid "Only create if not existing"
+msgstr "Создать только если не существует"
 
-#~ msgid "File unavailable"
-#~ msgstr "Файл недоступен"
+#: ../programs/gvfs-save.c:45
+msgid "Append to end of file"
+msgstr "Добавить в конец файла"
 
-#~ msgid "%.1f kB Media"
-#~ msgstr "Диск %.1f КБ"
+#: ../programs/gvfs-save.c:46
+msgid "When creating a file, restrict access to the current user only"
+msgstr "При создании файла ограничить права доступа только для текущего пользователя"
 
-#~ msgid "%.1f MB Media"
-#~ msgstr "Диск %.1f МБ"
+#: ../programs/gvfs-save.c:47
+msgid "Print new etag at end"
+msgstr "Добавлять атрибут etag в конце"
 
-#~ msgid "%.1f GB Media"
-#~ msgstr "Диск %.1f ГБ"
+#: ../programs/gvfs-save.c:48
+msgid "The etag of the file being overwritten"
+msgstr "Перезаписывается атрибут файла etag"
+
+#: ../programs/gvfs-save.c:76
+#, c-format
+msgid "Error opening file: %s\n"
+msgstr "Ошибка открытия файла: %s\n"
+
+#: ../programs/gvfs-save.c:109
+msgid "Error reading stdin"
+msgstr "Ошибка чтения стандартного потока ввода"
+
+#: ../programs/gvfs-save.c:122
+#, c-format
+msgid "Error closing: %s\n"
+msgstr "Ошибка закрытия файла: %s\n"
+
+#: ../programs/gvfs-save.c:134
+#, c-format
+msgid "Etag not available\n"
+msgstr "Etag недоступен\n"
+
+#: ../programs/gvfs-save.c:156
+msgid "DEST - read from standard input and save to DEST"
+msgstr "DEST - прочитать из стандартного ввода и сохранить в DEST"
+
+#: ../programs/gvfs-set-attribute.c:36
+msgid ""
+"attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+msgstr ""
+"тип атрибута [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
+
+#: ../programs/gvfs-set-attribute.c:119
+msgid " <location> <attribute> <values> - set attribute"
+msgstr " <адрес> <атрибут> <значения> - установить атрибуты"
+
+#: ../programs/gvfs-set-attribute.c:137
+#, c-format
+msgid "Location not specified\n"
+msgstr "Адрес не определён\n"
+
+#: ../programs/gvfs-set-attribute.c:145
+#, c-format
+msgid "Attribute not specified\n"
+msgstr "Атрибут не определён\n"
+
+#: ../programs/gvfs-set-attribute.c:189
+#, c-format
+msgid "Invalid attribute type %s\n"
+msgstr "Неверный тип атрибута %s\n"
+
+#: ../programs/gvfs-set-attribute.c:199
+#, c-format
+msgid "Error setting attribute: %s\n"
+msgstr "Ошибка установки атрибута: %s\n"
+
+#: ../programs/gvfs-trash.c:51
+msgid "- move files to trash"
+msgstr "- переместить файлы в корзину"
+
+#: ../programs/gvfs-trash.c:67
+#, c-format
+msgid "Error trashing file: %s\n"
+msgstr "Ошибка перемещения файла в корзину: %s\n"
+
+#: ../programs/gvfs-tree.c:37
+msgid "Follow symlinks, mounts and shortcuts like dirs"
+msgstr "Воспринимать символические ссылки, точки монтирования и ярлыки как каталоги"
+
+#: ../programs/gvfs-tree.c:242
+msgid "- list contents of directories in a tree-like format"
+msgstr "- вывести содержимое каталогов в виде дерева"
+
