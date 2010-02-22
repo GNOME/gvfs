@@ -1,3 +1,13 @@
+Major changes in 1.5.4
+======================
+* gphoto2: Better support for devices that are read-only + delete
+* gdu: Various fixes and preparation for LVM
+* ftp: fix asserts
+* sftp: remember to save password if username changed
+* gio module: don't call g_file_find_enclosing_mount_async callback directly
+* gvfs-monitor: Track moves if availible
+* Translation updates
+
 Major changes in 1.5.3
 ======================
 * afc: Update for libimobiledevice (rename of libiphone)
