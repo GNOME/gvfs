@@ -98,6 +98,8 @@ programs/gvfs-copy.c
 programs/gvfs-info.c
 programs/gvfs-ls.c
 programs/gvfs-mkdir.c
+programs/gvfs-monitor-dir.c
+programs/gvfs-monitor-file.c
 programs/gvfs-mount.c
 programs/gvfs-move.c
 programs/gvfs-open.c
