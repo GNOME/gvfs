@@ -48,8 +48,8 @@ PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.23.4 gthread-2.0 gobject-2.0 gmodule-no-ex
 PKG_CHECK_MODULES(DBUS, dbus-1)
 
 AC_ARG_WITH(dbus_service_dir,
-		AS_HELP_STRING([--with-dbus-service-dir=PATH],[choose directory for dbus service files]),
-		[default=PREFIX/share/dbus-1/services]], with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
+		AS_HELP_STRING([--with-dbus-service-dir=PATH],[choose directory for dbus service files, [default=PREFIX/share/dbus-1/services]]),
+            with_dbus_service_dir="$withval", with_dbus_service_dir=$datadir/dbus-1/services)
 DBUS_SERVICE_DIR=$with_dbus_service_dir
 AC_SUBST(DBUS_SERVICE_DIR)
 
