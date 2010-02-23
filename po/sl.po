@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
-"POT-Creation-Date: 2010-02-19 13:16+0000\n"
-"PO-Revision-Date: 2010-02-19 14:23+0100\n"
+"POT-Creation-Date: 2010-02-22 21:05+0000\n"
+"PO-Revision-Date: 2010-02-23 10:06+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -298,7 +298,7 @@ msgid "Unmount Anyway"
 msgstr "Vseeno odklopi"
 
 #: ../daemon/gvfsbackend.c:934
-#: ../monitor/gdu/ggdudrive.c:1021
+#: ../monitor/gdu/ggdudrive.c:1022
 #: ../monitor/gdu/ggdumount.c:922
 msgid "Cancel"
 msgstr "Prekliči"
@@ -405,8 +405,8 @@ msgid "Invalid seek type"
 msgstr "Neveljavna vrsta iskanja"
 
 #: ../daemon/gvfsbackendafc.c:1175
-#: ../daemon/gvfsbackendsftp.c:1817
-#: ../daemon/gvfsbackendsftp.c:4622
+#: ../daemon/gvfsbackendsftp.c:1820
+#: ../daemon/gvfsbackendsftp.c:4625
 #: ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
@@ -416,7 +416,7 @@ msgstr "Dejanje ni podprto"
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
 #: ../daemon/gvfsbackendarchive.c:318
-#: ../daemon/gvfsbackendsftp.c:2254
+#: ../daemon/gvfsbackendsftp.c:2257
 #: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
@@ -424,7 +424,7 @@ msgstr "/ na %s"
 
 #: ../daemon/gvfsbackendarchive.c:518
 #: ../daemon/gvfsbackendftp.c:564
-#: ../daemon/gvfsbackendsftp.c:1730
+#: ../daemon/gvfsbackendsftp.c:1733
 msgid "No hostname specified"
 msgstr "Ni določenega imena gostitelja"
 
@@ -447,7 +447,7 @@ msgstr "Datoteka ne obstaja"
 
 #: ../daemon/gvfsbackendarchive.c:625
 #: ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1877
+#: ../daemon/gvfsbackendgphoto2.c:1886
 #: ../daemon/gvfsbackendobexftp.c:1071
 #: ../daemon/gvfsbackendsmb.c:702
 #: ../daemon/gvfsbackendtrash.c:232
@@ -460,7 +460,7 @@ msgstr "Ni mogoče odpreti mape"
 #: ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:258
 #: ../daemon/gvfsbackendnetwork.c:693
-#: ../daemon/gvfsbackendsftp.c:3868
+#: ../daemon/gvfsbackendsftp.c:3871
 #: ../daemon/gvfsftpdircache.c:154
 msgid "The file is not a directory"
 msgstr "Datoteka ni mapa"
@@ -484,13 +484,13 @@ msgstr "Ni mogoče ustvariti začasne mape"
 #: ../daemon/gvfsbackendburn.c:972
 #: ../daemon/gvfsbackendburn.c:1008
 #: ../daemon/gvfsbackendftp.c:690
-#: ../daemon/gvfsbackendgphoto2.c:1205
-#: ../daemon/gvfsbackendgphoto2.c:2198
-#: ../daemon/gvfsbackendgphoto2.c:2917
-#: ../daemon/gvfsbackendsftp.c:1821
-#: ../daemon/gvfsbackendsftp.c:2934
-#: ../daemon/gvfsbackendsftp.c:2947
-#: ../daemon/gvfsbackendsftp.c:2967
+#: ../daemon/gvfsbackendgphoto2.c:1207
+#: ../daemon/gvfsbackendgphoto2.c:2207
+#: ../daemon/gvfsbackendgphoto2.c:2926
+#: ../daemon/gvfsbackendsftp.c:1824
+#: ../daemon/gvfsbackendsftp.c:2937
+#: ../daemon/gvfsbackendsftp.c:2950
+#: ../daemon/gvfsbackendsftp.c:2970
 #: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
@@ -498,7 +498,7 @@ msgstr "Ni take datoteke ali mape"
 
 #: ../daemon/gvfsbackendburn.c:425
 #: ../daemon/gvfsbackenddav.c:2223
-#: ../daemon/gvfsbackendsftp.c:1813
+#: ../daemon/gvfsbackendsftp.c:1816
 msgid "Directory not empty"
 msgstr "Mapa ni prazna"
 
@@ -519,7 +519,7 @@ msgstr "CD/DVD zapisovalnik"
 #: ../daemon/gvfsbackendburn.c:986
 #: ../daemon/gvfsbackendburn.c:990
 #: ../daemon/gvfsbackendburn.c:1000
-#: ../daemon/gvfsbackendgphoto2.c:2991
+#: ../daemon/gvfsbackendgphoto2.c:3000
 msgid "File exists"
 msgstr "Datoteka obstaja"
 
@@ -580,8 +580,8 @@ msgstr "Ni mogoče kopirati mape preko mape"
 #: ../daemon/gvfsbackendburn.c:885
 #: ../daemon/gvfsbackendobexftp.c:1787
 #: ../daemon/gvfsbackendobexftp.c:1818
-#: ../daemon/gvfsbackendsftp.c:1815
-#: ../daemon/gvfsbackendsftp.c:4430
+#: ../daemon/gvfsbackendsftp.c:1818
+#: ../daemon/gvfsbackendsftp.c:4433
 msgid "Target file exists"
 msgstr "Ciljna datoteka obstaja"
 
@@ -593,30 +593,30 @@ msgstr "Ni mogoče kopirati drevesne strukture mape"
 
 #: ../daemon/gvfsbackendburn.c:950
 #: ../daemon/gvfsbackendcomputer.c:794
-#: ../daemon/gvfsbackendgphoto2.c:2571
-#: ../daemon/gvfsbackendgphoto2.c:2780
-#: ../daemon/gvfsbackendgphoto2.c:2877
-#: ../daemon/gvfsbackendgphoto2.c:2970
+#: ../daemon/gvfsbackendgphoto2.c:2580
+#: ../daemon/gvfsbackendgphoto2.c:2789
+#: ../daemon/gvfsbackendgphoto2.c:2886
+#: ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Not supported"
 msgstr "Ni podprto"
 
 #: ../daemon/gvfsbackendcdda.c:332
-#: ../daemon/gvfsbackendgphoto2.c:1508
+#: ../daemon/gvfsbackendgphoto2.c:1510
 msgid "Cannot create gudev client"
 msgstr "Ni mogoče ustvariti gudev odjemalca"
 
 #: ../daemon/gvfsbackendcdda.c:352
-#: ../daemon/gvfsbackendgphoto2.c:1526
+#: ../daemon/gvfsbackendgphoto2.c:1528
 msgid "Cannot connect to the system bus"
 msgstr "Ni se mogoče povezati s sistemskim vodilom"
 
 #: ../daemon/gvfsbackendcdda.c:363
-#: ../daemon/gvfsbackendgphoto2.c:1538
+#: ../daemon/gvfsbackendgphoto2.c:1540
 msgid "Cannot create libhal context"
 msgstr "Ni mogoče ustvariti libhal vsebine"
 
 #: ../daemon/gvfsbackendcdda.c:377
-#: ../daemon/gvfsbackendgphoto2.c:1551
+#: ../daemon/gvfsbackendgphoto2.c:1553
 msgid "Cannot initialize libhal"
 msgstr "Ni mogoče zagnati libhal"
 
@@ -677,7 +677,7 @@ msgid "Error seeking in stream on drive %s"
 msgstr "Napaka med iskanjem po pretoku na pogonu %s"
 
 #: ../daemon/gvfsbackendcdda.c:979
-#: ../daemon/gvfsbackendgphoto2.c:1885
+#: ../daemon/gvfsbackendgphoto2.c:1894
 #, c-format
 msgid "No such file"
 msgstr "Ni take datoteke"
@@ -810,13 +810,13 @@ msgstr "Ni mogoče ustvariti zahteve"
 #: ../daemon/gvfsbackendftp.c:830
 #: ../daemon/gvfsbackendftp.c:1180
 #: ../daemon/gvfsbackendftp.c:1358
-#: ../daemon/gvfsbackendsftp.c:4274
+#: ../daemon/gvfsbackendsftp.c:4277
 #: ../daemon/gvfsbackendsmb.c:2038
 msgid "Target file already exists"
 msgstr "Ciljna datoteka že obstaja"
 
 #: ../daemon/gvfsbackenddav.c:2003
-#: ../daemon/gvfsbackendsftp.c:3408
+#: ../daemon/gvfsbackendsftp.c:3411
 #: ../daemon/gvfsbackendsmb.c:1132
 msgid "The file was externally modified"
 msgstr "Datoteka je bila zunanje spremenjena"
@@ -885,49 +885,49 @@ msgid "Insufficient permissions"
 msgstr "Nezadostna dovoljenja"
 
 #: ../daemon/gvfsbackendftp.c:670
-#: ../daemon/gvfsbackendsftp.c:2318
-#: ../daemon/gvfsbackendsftp.c:3054
-#: ../daemon/gvfsbackendsftp.c:3395
-#: ../daemon/gvfsbackendsftp.c:4265
+#: ../daemon/gvfsbackendsftp.c:2321
+#: ../daemon/gvfsbackendsftp.c:3057
+#: ../daemon/gvfsbackendsftp.c:3398
+#: ../daemon/gvfsbackendsftp.c:4268
 msgid "File is directory"
 msgstr "Datoteka je mapa"
 
 #: ../daemon/gvfsbackendftp.c:878
 #: ../daemon/gvfsbackendftp.c:1143
-#: ../daemon/gvfsbackendsftp.c:3261
+#: ../daemon/gvfsbackendsftp.c:3264
 msgid "backups not supported yet"
 msgstr "izdelava varnostnih kopij ni podprta"
 
-#: ../daemon/gvfsbackendgphoto2.c:504
+#: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Directory or file exists"
 msgstr "%s: %d: datoteka ali mapa že obstaja"
 
-#: ../daemon/gvfsbackendgphoto2.c:511
+#: ../daemon/gvfsbackendgphoto2.c:513
 #, c-format
 msgid "%s: %d: No such file or directory"
 msgstr "%s: %d: ni take mape ali datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:517
+#: ../daemon/gvfsbackendgphoto2.c:519
 #, c-format
 msgid "%s: %d: Invalid filename"
 msgstr "%s: %d: neveljavno ime datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:523
+#: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
 msgid "%s: %d: Not Supported"
 msgstr "%s: %d: ni podprto"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:718
-#: ../daemon/gvfsbackendgphoto2.c:724
+#: ../daemon/gvfsbackendgphoto2.c:720
+#: ../daemon/gvfsbackendgphoto2.c:726
 #, c-format
 msgid "Digital Camera (%s)"
 msgstr "Digitalni fotoaparat (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:947
+#: ../daemon/gvfsbackendgphoto2.c:949
 #: ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
 #, c-format
@@ -936,179 +936,179 @@ msgstr "%s kamera"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
-#: ../daemon/gvfsbackendgphoto2.c:950
+#: ../daemon/gvfsbackendgphoto2.c:952
 #: ../monitor/gphoto2/ggphoto2volume.c:192
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
 msgstr "%s predvajalnik zvoka"
 
-#: ../daemon/gvfsbackendgphoto2.c:959
+#: ../daemon/gvfsbackendgphoto2.c:961
 #: ../monitor/gphoto2/ggphoto2volume.c:203
 #: ../monitor/gphoto2/ggphoto2volume.c:308
 msgid "Camera"
 msgstr "Fotoaparat"
 
-#: ../daemon/gvfsbackendgphoto2.c:961
+#: ../daemon/gvfsbackendgphoto2.c:963
 #: ../monitor/gphoto2/ggphoto2volume.c:306
 msgid "Audio Player"
 msgstr "Predvajalnik zvoka"
 
-#: ../daemon/gvfsbackendgphoto2.c:1567
+#: ../daemon/gvfsbackendgphoto2.c:1569
 msgid "No device specified"
 msgstr "Ni določene naprave"
 
-#: ../daemon/gvfsbackendgphoto2.c:1588
+#: ../daemon/gvfsbackendgphoto2.c:1590
 msgid "Cannot create gphoto2 context"
 msgstr "Ni mogoče ustvariti gphoto2 vsebine"
 
-#: ../daemon/gvfsbackendgphoto2.c:1598
+#: ../daemon/gvfsbackendgphoto2.c:1600
 msgid "Error creating camera"
 msgstr "Napaka med ustvarjanjem kamere"
 
-#: ../daemon/gvfsbackendgphoto2.c:1611
-#: ../daemon/gvfsbackendgphoto2.c:1621
+#: ../daemon/gvfsbackendgphoto2.c:1613
+#: ../daemon/gvfsbackendgphoto2.c:1623
 msgid "Error loading device information"
 msgstr "Napaka med nalaganjem podrobnosti naprave"
 
-#: ../daemon/gvfsbackendgphoto2.c:1633
+#: ../daemon/gvfsbackendgphoto2.c:1635
 msgid "Error looking up device information"
 msgstr "Napaka med preverjanjem podrobnosti naprave"
 
-#: ../daemon/gvfsbackendgphoto2.c:1643
+#: ../daemon/gvfsbackendgphoto2.c:1645
 msgid "Error getting device information"
 msgstr "Napaka med pridobivanjem podrobnosti naprave"
 
-#: ../daemon/gvfsbackendgphoto2.c:1656
+#: ../daemon/gvfsbackendgphoto2.c:1658
 msgid "Error setting up camera communications port"
 msgstr "Napaka med nastavljanjem povezovalnih vrat kamere"
 
-#: ../daemon/gvfsbackendgphoto2.c:1667
+#: ../daemon/gvfsbackendgphoto2.c:1669
 msgid "Error initializing camera"
 msgstr "Napaka med zaganjanjem kamere"
 
 #. Translator: %s represents the device, e.g. usb:001,042
-#: ../daemon/gvfsbackendgphoto2.c:1681
+#: ../daemon/gvfsbackendgphoto2.c:1683
 #, c-format
 msgid "gphoto2 mount on %s"
 msgstr "gphoto2 priklop na %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:1756
+#: ../daemon/gvfsbackendgphoto2.c:1765
 msgid "No camera specified"
 msgstr "Ni določene kamere"
 
-#: ../daemon/gvfsbackendgphoto2.c:1797
-#: ../daemon/gvfsbackendgphoto2.c:1823
+#: ../daemon/gvfsbackendgphoto2.c:1806
+#: ../daemon/gvfsbackendgphoto2.c:1832
 #, c-format
 msgid "Filesystem is busy"
 msgstr "Datotečni sistem je zaseden"
 
-#: ../daemon/gvfsbackendgphoto2.c:1893
+#: ../daemon/gvfsbackendgphoto2.c:1902
 msgid "Error creating file object"
 msgstr "Napaka med ustvarjanjem predmeta datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:1908
+#: ../daemon/gvfsbackendgphoto2.c:1917
 msgid "Error getting file"
 msgstr "Napaka med pridobivanjem datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:1918
+#: ../daemon/gvfsbackendgphoto2.c:1927
 msgid "Error getting data from file"
 msgstr "Napaka med branjem podatkov iz datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:1976
+#: ../daemon/gvfsbackendgphoto2.c:1985
 #, c-format
 msgid "Malformed icon identifier '%s'"
 msgstr "Neveljavno oblikovano določilo ikone '%s'"
 
-#: ../daemon/gvfsbackendgphoto2.c:2052
-#: ../daemon/gvfsbackendgphoto2.c:3241
+#: ../daemon/gvfsbackendgphoto2.c:2061
+#: ../daemon/gvfsbackendgphoto2.c:3250
 #, c-format
 msgid "Error seeking in stream on camera %s"
 msgstr "Napaka med iskanjem pretoka na kameri %s"
 
-#: ../daemon/gvfsbackendgphoto2.c:2192
-#: ../daemon/gvfsbackendsftp.c:2937
+#: ../daemon/gvfsbackendgphoto2.c:2201
+#: ../daemon/gvfsbackendsftp.c:2940
 #: ../daemon/gvfsbackendsmbbrowse.c:1390
 msgid "Not a directory"
 msgstr "Ni imenik"
 
-#: ../daemon/gvfsbackendgphoto2.c:2225
+#: ../daemon/gvfsbackendgphoto2.c:2234
 msgid "Failed to get folder list"
 msgstr "Napaka med pridobivanjem seznama map"
 
-#: ../daemon/gvfsbackendgphoto2.c:2291
+#: ../daemon/gvfsbackendgphoto2.c:2300
 msgid "Failed to get file list"
 msgstr "Napaka med pridobivanjem seznama datotek"
 
-#: ../daemon/gvfsbackendgphoto2.c:2583
+#: ../daemon/gvfsbackendgphoto2.c:2592
 msgid "Error creating directory"
 msgstr "Napaka med ustvarjanjem mape"
 
-#: ../daemon/gvfsbackendgphoto2.c:2792
+#: ../daemon/gvfsbackendgphoto2.c:2801
 msgid "Name already exists"
 msgstr "Ime že obstaja"
 
-#: ../daemon/gvfsbackendgphoto2.c:2803
-#: ../daemon/gvfsbackendgphoto2.c:3432
+#: ../daemon/gvfsbackendgphoto2.c:2812
+#: ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
 msgstr "Novo ime datoteke je predolgo"
 
-#: ../daemon/gvfsbackendgphoto2.c:2813
-#: ../daemon/gvfsbackendgphoto2.c:3443
+#: ../daemon/gvfsbackendgphoto2.c:2822
+#: ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
 msgstr "Napaka med preimenovanjem mape"
 
-#: ../daemon/gvfsbackendgphoto2.c:2826
-#: ../daemon/gvfsbackendgphoto2.c:3456
+#: ../daemon/gvfsbackendgphoto2.c:2835
+#: ../daemon/gvfsbackendgphoto2.c:3465
 msgid "Error renaming file"
 msgstr "Napaka med preimenovanjem datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:2890
+#: ../daemon/gvfsbackendgphoto2.c:2899
 #, c-format
 msgid "Directory '%s' is not empty"
 msgstr "Mapa '%s' ni prazna"
 
-#: ../daemon/gvfsbackendgphoto2.c:2901
+#: ../daemon/gvfsbackendgphoto2.c:2910
 msgid "Error deleting directory"
 msgstr "Napaka med brisanjem mape"
 
-#: ../daemon/gvfsbackendgphoto2.c:2927
+#: ../daemon/gvfsbackendgphoto2.c:2936
 msgid "Error deleting file"
 msgstr "Napaka med brisanjem datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:2980
+#: ../daemon/gvfsbackendgphoto2.c:2989
 msgid "Can't write to directory"
 msgstr "Ni mogoče pisati v mapo"
 
-#: ../daemon/gvfsbackendgphoto2.c:3027
+#: ../daemon/gvfsbackendgphoto2.c:3036
 msgid "Cannot allocate new file to append to"
 msgstr "Ni mogoče določiti nove datoteke za pripenjanje"
 
-#: ../daemon/gvfsbackendgphoto2.c:3042
+#: ../daemon/gvfsbackendgphoto2.c:3051
 msgid "Cannot read file to append to"
 msgstr "Ni mogoče prebrati datoteke za pripenjanje"
 
-#: ../daemon/gvfsbackendgphoto2.c:3053
+#: ../daemon/gvfsbackendgphoto2.c:3062
 msgid "Cannot get data of file to append to"
 msgstr "Ni mogoče pridobiti podatkov datoteke za pripenjanje"
 
-#: ../daemon/gvfsbackendgphoto2.c:3340
+#: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
 msgstr "Napaka med pisanjem datoteke"
 
-#: ../daemon/gvfsbackendgphoto2.c:3388
+#: ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Not supported (not same directory)"
 msgstr "Ni podprto (ni ista mapa)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3400
+#: ../daemon/gvfsbackendgphoto2.c:3409
 msgid "Not supported (src is dir, dst is dir)"
 msgstr "Ni podprto (vir je mapa, cilj je mapa)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3408
+#: ../daemon/gvfsbackendgphoto2.c:3417
 msgid "Not supported (src is dir, dst is existing file)"
 msgstr "Ni podprto (vir je mapa, cilj je obstoječa datoteka)"
 
-#: ../daemon/gvfsbackendgphoto2.c:3420
+#: ../daemon/gvfsbackendgphoto2.c:3429
 msgid "Not supported (src is file, dst is dir)"
 msgstr "Ni podprto (vir je datoteka, cilj je mapa)"
 
@@ -1164,43 +1164,43 @@ msgstr "Naprava zahteva programsko posodobitev"
 msgid "Error deleting file: %s"
 msgstr "Napaka med brisanjem datoteke: %s"
 
-#: ../daemon/gvfsbackendsftp.c:300
-#: ../daemon/gvfsbackendsftp.c:656
+#: ../daemon/gvfsbackendsftp.c:301
+#: ../daemon/gvfsbackendsftp.c:657
 msgid "ssh program unexpectedly exited"
 msgstr "ssh program je nepričakovano zaključen"
 
-#: ../daemon/gvfsbackendsftp.c:308
-#: ../daemon/gvfsbackendsftp.c:1819
+#: ../daemon/gvfsbackendsftp.c:309
+#: ../daemon/gvfsbackendsftp.c:1822
 #: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
 msgstr "Ni ustreznih dovoljenj"
 
-#: ../daemon/gvfsbackendsftp.c:315
+#: ../daemon/gvfsbackendsftp.c:316
 msgid "Hostname not known"
 msgstr "Ime gostitelja ni znano"
 
-#: ../daemon/gvfsbackendsftp.c:322
+#: ../daemon/gvfsbackendsftp.c:323
 msgid "No route to host"
 msgstr "Ni poti do gostitelja"
 
-#: ../daemon/gvfsbackendsftp.c:329
+#: ../daemon/gvfsbackendsftp.c:330
 msgid "Connection refused by server"
 msgstr "Strežnik je zavrnil povezavo"
 
-#: ../daemon/gvfsbackendsftp.c:336
+#: ../daemon/gvfsbackendsftp.c:337
 msgid "Host key verification failed"
 msgstr "Neuspešna overitev ključa gostitelja"
 
-#: ../daemon/gvfsbackendsftp.c:500
+#: ../daemon/gvfsbackendsftp.c:501
 msgid "Unable to spawn ssh program"
 msgstr "Ni mogoče oživiti ssh programa"
 
-#: ../daemon/gvfsbackendsftp.c:516
+#: ../daemon/gvfsbackendsftp.c:517
 #, c-format
 msgid "Unable to spawn ssh program: %s"
 msgstr "Ni mogoče zagnati ssh programa: %s"
 
-#: ../daemon/gvfsbackendsftp.c:618
+#: ../daemon/gvfsbackendsftp.c:619
 #: ../daemon/gvfsbackendsftp.c:879
 msgid "Timed out when logging in"
 msgstr "Časovni  zamik prijave je potekel"
@@ -1263,72 +1263,72 @@ msgstr "sftp za %s na %s"
 msgid "sftp on %s"
 msgstr "sftp na %s"
 
-#: ../daemon/gvfsbackendsftp.c:1720
+#: ../daemon/gvfsbackendsftp.c:1723
 msgid "Unable to find supported ssh command"
 msgstr "Ni mogoče najti podprtega ssh ukaza"
 
-#: ../daemon/gvfsbackendsftp.c:1994
-#: ../daemon/gvfsbackendsftp.c:2383
-#: ../daemon/gvfsbackendsftp.c:2462
-#: ../daemon/gvfsbackendsftp.c:2473
-#: ../daemon/gvfsbackendsftp.c:2529
-#: ../daemon/gvfsbackendsftp.c:2615
-#: ../daemon/gvfsbackendsftp.c:2665
-#: ../daemon/gvfsbackendsftp.c:2711
-#: ../daemon/gvfsbackendsftp.c:2786
-#: ../daemon/gvfsbackendsftp.c:2893
-#: ../daemon/gvfsbackendsftp.c:3010
-#: ../daemon/gvfsbackendsftp.c:3091
-#: ../daemon/gvfsbackendsftp.c:3163
-#: ../daemon/gvfsbackendsftp.c:3175
-#: ../daemon/gvfsbackendsftp.c:3233
-#: ../daemon/gvfsbackendsftp.c:3275
-#: ../daemon/gvfsbackendsftp.c:3460
-#: ../daemon/gvfsbackendsftp.c:3492
-#: ../daemon/gvfsbackendsftp.c:3547
-#: ../daemon/gvfsbackendsftp.c:3604
-#: ../daemon/gvfsbackendsftp.c:3901
-#: ../daemon/gvfsbackendsftp.c:3968
-#: ../daemon/gvfsbackendsftp.c:4103
-#: ../daemon/gvfsbackendsftp.c:4163
-#: ../daemon/gvfsbackendsftp.c:4198
-#: ../daemon/gvfsbackendsftp.c:4226
-#: ../daemon/gvfsbackendsftp.c:4334
-#: ../daemon/gvfsbackendsftp.c:4388
-#: ../daemon/gvfsbackendsftp.c:4427
-#: ../daemon/gvfsbackendsftp.c:4461
-#: ../daemon/gvfsbackendsftp.c:4495
-#: ../daemon/gvfsbackendsftp.c:4510
-#: ../daemon/gvfsbackendsftp.c:4525
-#: ../daemon/gvfsbackendsftp.c:4603
+#: ../daemon/gvfsbackendsftp.c:1997
+#: ../daemon/gvfsbackendsftp.c:2386
+#: ../daemon/gvfsbackendsftp.c:2465
+#: ../daemon/gvfsbackendsftp.c:2476
+#: ../daemon/gvfsbackendsftp.c:2532
+#: ../daemon/gvfsbackendsftp.c:2618
+#: ../daemon/gvfsbackendsftp.c:2668
+#: ../daemon/gvfsbackendsftp.c:2714
+#: ../daemon/gvfsbackendsftp.c:2789
+#: ../daemon/gvfsbackendsftp.c:2896
+#: ../daemon/gvfsbackendsftp.c:3013
+#: ../daemon/gvfsbackendsftp.c:3094
+#: ../daemon/gvfsbackendsftp.c:3166
+#: ../daemon/gvfsbackendsftp.c:3178
+#: ../daemon/gvfsbackendsftp.c:3236
+#: ../daemon/gvfsbackendsftp.c:3278
+#: ../daemon/gvfsbackendsftp.c:3463
+#: ../daemon/gvfsbackendsftp.c:3495
+#: ../daemon/gvfsbackendsftp.c:3550
+#: ../daemon/gvfsbackendsftp.c:3607
+#: ../daemon/gvfsbackendsftp.c:3904
+#: ../daemon/gvfsbackendsftp.c:3971
+#: ../daemon/gvfsbackendsftp.c:4106
+#: ../daemon/gvfsbackendsftp.c:4166
+#: ../daemon/gvfsbackendsftp.c:4201
+#: ../daemon/gvfsbackendsftp.c:4229
+#: ../daemon/gvfsbackendsftp.c:4337
+#: ../daemon/gvfsbackendsftp.c:4391
+#: ../daemon/gvfsbackendsftp.c:4430
+#: ../daemon/gvfsbackendsftp.c:4464
+#: ../daemon/gvfsbackendsftp.c:4498
+#: ../daemon/gvfsbackendsftp.c:4513
+#: ../daemon/gvfsbackendsftp.c:4528
+#: ../daemon/gvfsbackendsftp.c:4606
 msgid "Invalid reply received"
 msgstr "Prejet neveljaven odgovor"
 
-#: ../daemon/gvfsbackendsftp.c:2242
+#: ../daemon/gvfsbackendsftp.c:2245
 #: ../daemon/gvfsbackendsmb.c:1424
 #: ../daemon/gvfsdaemonutils.c:211
 msgid " (invalid encoding)"
 msgstr " (neveljavni nabor znakov)"
 
-#: ../daemon/gvfsbackendsftp.c:2327
+#: ../daemon/gvfsbackendsftp.c:2330
 msgid "Failure"
 msgstr "Napaka"
 
-#: ../daemon/gvfsbackendsftp.c:2435
+#: ../daemon/gvfsbackendsftp.c:2438
 #, c-format
 msgid "Invalid icon_id '%s' in OpenIconForRead"
 msgstr "Neveljaven ID ikone '%s' v OpenIconForRead"
 
-#: ../daemon/gvfsbackendsftp.c:2731
+#: ../daemon/gvfsbackendsftp.c:2734
 #, c-format
 msgid "Error creating backup file: %s"
 msgstr "Napaka med ustvarjanjem varnostne datoteke: %s"
 
-#: ../daemon/gvfsbackendsftp.c:3337
+#: ../daemon/gvfsbackendsftp.c:3340
 msgid "Unable to create temporary file"
 msgstr "Ni mogoče ustvariti začasne datoteke"
 
-#: ../daemon/gvfsbackendsftp.c:4260
+#: ../daemon/gvfsbackendsftp.c:4263
 #: ../daemon/gvfsbackendsmb.c:2027
 msgid "Can't move directory over directory"
 msgstr "Ni mogoče premakniti mape čez mapo"
@@ -1621,22 +1621,22 @@ msgstr "GVfs GDU nadzornik pogonov"
 msgid "Floppy Drive"
 msgstr "Disketna enota"
 
-#: ../monitor/gdu/ggdudrive.c:256
+#: ../monitor/gdu/ggdudrive.c:258
 #, c-format
 msgid "Unnamed Drive (%s)"
 msgstr "Neimenovan pogon (%s)"
 
-#: ../monitor/gdu/ggdudrive.c:258
+#: ../monitor/gdu/ggdudrive.c:260
 msgid "Unnamed Drive"
 msgstr "Neimenovan pogon"
 
-#: ../monitor/gdu/ggdudrive.c:559
+#: ../monitor/gdu/ggdudrive.c:561
 #: ../monitor/hal/ghaldrive.c:662
 #, c-format
 msgid "Failed to eject media; one or more volumes on the media are busy."
 msgstr "Napaka med odpiranjem medija: ena ali več enot medija je zasedenih."
 
-#: ../monitor/gdu/ggdudrive.c:1014
+#: ../monitor/gdu/ggdudrive.c:1015
 msgid ""
 "Start drive in degraded mode?\n"
 "Starting a drive in degraded mode means that the drive is no longer tolerant to failures. Data on the drive may be irrevocably lost if a component fails."
@@ -1644,7 +1644,7 @@ msgstr ""
 "Ali naj se pogon zažene v Start drive in odstavljenem načinu?\n"
 "Zagon pogona v tem načinu pomeni, da na pogonu ne bodo delovale sistemske varovalke in zato zapisovanje ne bo nadzorovano. Podatki pogona bodo izgubljeni, če delovanje pogona odpove."
 
-#: ../monitor/gdu/ggdudrive.c:1020
+#: ../monitor/gdu/ggdudrive.c:1021
 msgid "Start Anyway"
 msgstr "Vseeno zaženi"
 
@@ -2323,6 +2323,11 @@ msgstr "- ustvari mape"
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "Napaka med ustvarjanjem mape: %s\n"
+
+#: ../programs/gvfs-monitor-dir.c:38
+#: ../programs/gvfs-monitor-file.c:38
+msgid "Don't send single MOVED events."
+msgstr "Ne pošlji enojnih MOVED dogodkov."
 
 #: ../programs/gvfs-mount.c:54
 msgid "Mount as mountable"
