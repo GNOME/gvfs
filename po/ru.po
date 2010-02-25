@@ -5,18 +5,20 @@
 # Leonid Kanter <leon@asplinux.ru>, 2008, 2010.
 # Artur Sibagatullin <ArtSib@mail.ru>, 2009, 2010.
 # Alexander Saprykin <xelfium@gmail.com>, 2010.
+# Yuri Kozlov <yuray@komyakino.ru>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-21 16:59+0200\n"
-"PO-Revision-Date: 2010-02-21 17:13+0200\n"
-"Last-Translator: Leonid Kanter <leon@asplinux.ru>\n"
-"Language-Team: Russian <ru@li.org>\n"
+"POT-Creation-Date: 2010-02-25 13:20+0200\n"
+"PO-Revision-Date: 2010-02-24 19:58+0300\n"
+"Last-Translator: Yuri Kozlov <yuray@komyakino.ru>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: KBabel 1.11.4\n"
 
 #: ../client/gdaemonfile.c:498 ../client/gdaemonfile.c:2376
@@ -134,7 +136,7 @@ msgstr "Не удаётся подключиться к шине сеанса"
 #: ../client/gvfsdaemondbus.c:570 ../client/gvfsdaemondbus.c:1002
 #, c-format
 msgid "Error connecting to daemon: %s"
-msgstr "Ошибка подключения к демону: %s"
+msgstr "Ошибка подключения к службе: %s"
 
 #: ../common/gsysutils.c:136
 #, c-format
@@ -254,7 +256,7 @@ msgstr "точка монтирования для %s уже запущена"
 
 #: ../daemon/daemon-main.c:276
 msgid "error starting mount daemon"
-msgstr "ошибка запуска демона монтирования"
+msgstr "ошибка запуска службы монтирования"
 
 #: ../daemon/gvfsbackend.c:933 ../monitor/gdu/ggdumount.c:921
 msgid "Unmount Anyway"
@@ -319,7 +321,9 @@ msgstr "Ошибка libmobiledevice: неверный аргумент"
 msgid ""
 "libimobiledevice Error: No device found. Make sure usbmuxd is set up "
 "correctly."
-msgstr "Ошибка libmobiledevice: устройство не найдено. Убедитесь, что usbmuxd установлен корректно."
+msgstr ""
+"Ошибка libmobiledevice: устройство не найдено. Убедитесь, что usbmuxd "
+"установлен корректно."
 
 #: ../daemon/gvfsbackendafc.c:213
 #, c-format
@@ -995,7 +999,8 @@ msgstr "%s на %s"
 
 #: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
-msgstr "Не найдена поддержка USB. Свяжитесь с поставщиком программного обеспечения"
+msgstr ""
+"Не найдена поддержка USB. Свяжитесь с поставщиком программного обеспечения"
 
 #: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
@@ -1333,7 +1338,7 @@ msgstr "Неверное сообщение dbus"
 
 #: ../daemon/main.c:45 ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
-msgstr "Заменить старого демона."
+msgstr "Заменить старую службу."
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
@@ -1341,11 +1346,11 @@ msgstr "Не запускать fuse."
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
-msgstr "Демон GVFS"
+msgstr "Служба GVFS"
 
 #: ../daemon/main.c:61
 msgid "Main daemon for GVFS"
-msgstr "Основной демон GVFS"
+msgstr "Главная служба GVFS"
 
 #. Translators: the first %s is the application name,
 #. the second %s is the error message
@@ -1363,7 +1368,8 @@ msgstr "%s: %s"
 #: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
 msgid "Try \"%s --help\" for more information."
-msgstr "Для получения дополнительной информации используйте команду «%s --help»."
+msgstr ""
+"Для получения дополнительной информации используйте команду «%s --help»."
 
 #: ../daemon/mount.c:459
 msgid "Invalid arguments from spawned child"
@@ -1415,11 +1421,11 @@ msgstr "Невозможно переместить ключи метаданн�
 
 #: ../metadata/meta-daemon.c:704
 msgid "GVFS Metadata Daemon"
-msgstr "Демон метаданных GVFS"
+msgstr "Служба метаданных GVFS"
 
 #: ../metadata/meta-daemon.c:707
 msgid "Metadata daemon for GVFS"
-msgstr "Демон метаданных для GVFS"
+msgstr "Служба метаданных для GVFS"
 
 #: ../monitor/gdu/gdu-volume-monitor-daemon.c:40
 msgid "GVfs GDU Volume Monitor"
@@ -1427,7 +1433,7 @@ msgstr "Монитор томов GVfs GDU"
 
 #: ../monitor/gdu/ggdudrive.c:168 ../monitor/hal/ghaldrive.c:179
 msgid "Floppy Drive"
-msgstr "Флоппи-дисковод"
+msgstr "Устройство чтения дискет"
 
 #: ../monitor/gdu/ggdudrive.c:258
 #, c-format
@@ -1436,7 +1442,7 @@ msgstr "Безымянное устройство (%s)"
 
 #: ../monitor/gdu/ggdudrive.c:260
 msgid "Unnamed Drive"
-msgstr "Безымянный накопитель (%s)"
+msgstr "Безымянное устройство"
 
 #: ../monitor/gdu/ggdudrive.c:561 ../monitor/hal/ghaldrive.c:662
 #, c-format
@@ -1474,7 +1480,7 @@ msgstr "Невозможно получить LUKS cleartext slave из пути
 
 #: ../monitor/gdu/ggduvolume.c:325
 msgid "Floppy Disk"
-msgstr "Флоппи-дисковод"
+msgstr "Дискета"
 
 #: ../monitor/gdu/ggduvolume.c:1075
 #, c-format
@@ -2087,6 +2093,10 @@ msgstr "- создать каталоги"
 msgid "Error creating directory: %s\n"
 msgstr "Ошибка создания каталога: %s\n"
 
+#: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
+msgid "Don't send single MOVED events."
+msgstr "Не посылать одиночные события MOVED."
+
 #: ../programs/gvfs-mount.c:54
 msgid "Mount as mountable"
 msgstr "Подключить как подключаемый"
@@ -2221,7 +2231,8 @@ msgstr "Добавить в конец файла"
 
 #: ../programs/gvfs-save.c:46
 msgid "When creating a file, restrict access to the current user only"
-msgstr "При создании файла ограничить права доступа только для текущего пользователя"
+msgstr ""
+"При создании файла ограничить права доступа только для текущего пользователя"
 
 #: ../programs/gvfs-save.c:47
 msgid "Print new etag at end"
@@ -2297,9 +2308,9 @@ msgstr "Ошибка перемещения файла в корзину: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr "Воспринимать символические ссылки, точки монтирования и ярлыки как каталоги"
+msgstr ""
+"Воспринимать символические ссылки, точки монтирования и ярлыки как каталоги"
 
 #: ../programs/gvfs-tree.c:242
 msgid "- list contents of directories in a tree-like format"
 msgstr "- вывести содержимое каталогов в виде дерева"
-
