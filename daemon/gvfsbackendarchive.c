@@ -160,6 +160,18 @@ gvfs_archive_close (struct archive *archive,
 
 #define gvfs_archive_in_error(archive) ((archive)->error != NULL)
 
+static void
+gvfs_archive_set_error_from_errno (GVfsArchive *archive)
+{
+  if (gvfs_archive_in_error (archive))
+    return;
+
+  g_vfs_job_failed_literal (archive->job,
+                            G_IO_ERROR,
+                            g_io_error_from_errno (archive_errno (archive->archive)),
+                            archive_error_string (archive->archive));
+}
+
 static void 
 gvfs_archive_push_job (GVfsArchive *archive, GVfsJob *job)
 {
@@ -177,13 +189,6 @@ gvfs_archive_pop_job (GVfsArchive *archive)
     {
       g_vfs_job_failed_from_error (archive->job, archive->error);
       g_clear_error (&archive->error);
-    }
-  else if (archive_errno (archive->archive))
-    {
-      g_vfs_job_failed_literal (archive->job,
-				G_IO_ERROR,
-				archive_errno (archive->archive),
-				archive_error_string (archive->archive));
     }
   else
     g_vfs_job_succeeded (archive->job);
@@ -479,6 +484,8 @@ create_file_tree (GVfsBackendArchive *ba, GVfsJob *job)
     }
   while (result != ARCHIVE_FATAL && result != ARCHIVE_EOF);
 
+  if (result == ARCHIVE_FATAL)
+    gvfs_archive_set_error_from_errno (archive);
   fixup_dirs (ba->files);
   
   gvfs_archive_finish (archive);
@@ -688,6 +695,8 @@ do_read (GVfsBackend *backend,
   bytes_read = archive_read_data (archive->archive, buffer, bytes_requested);
   if (bytes_read >= 0)
     g_vfs_job_read_set_size (job, bytes_read);
+  else
+    gvfs_archive_set_error_from_errno (archive);
   gvfs_archive_pop_job (archive);
 }
 
