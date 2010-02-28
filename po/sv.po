@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-21 17:06+0100\n"
-"PO-Revision-Date: 2010-02-21 17:07+0100\n"
+"POT-Creation-Date: 2010-02-28 13:05+0100\n"
+"PO-Revision-Date: 2010-02-28 13:05+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -361,8 +361,8 @@ msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Ohanterat fel i libimobiledevice (%d)"
 
 #: ../daemon/gvfsbackendafc.c:275
-#: ../daemon/gvfsbackendarchive.c:529
-#: ../daemon/gvfsbackendarchive.c:558
+#: ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendarchive.c:565
 #: ../daemon/gvfsbackenddav.c:1631
 #: ../daemon/gvfsbackendhttp.c:315
 #: ../daemon/gvfsbackendobexftp.c:861
@@ -411,23 +411,23 @@ msgstr "Åtgärden stöds inte"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:318
+#: ../daemon/gvfsbackendarchive.c:323
 #: ../daemon/gvfsbackendsftp.c:2257
 #: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "/ på %s"
 
-#: ../daemon/gvfsbackendarchive.c:518
+#: ../daemon/gvfsbackendarchive.c:525
 #: ../daemon/gvfsbackendftp.c:564
 #: ../daemon/gvfsbackendsftp.c:1733
 msgid "No hostname specified"
 msgstr "Inget värdnamn angivet"
 
-#: ../daemon/gvfsbackendarchive.c:617
-#: ../daemon/gvfsbackendarchive.c:661
-#: ../daemon/gvfsbackendarchive.c:711
-#: ../daemon/gvfsbackendarchive.c:740
+#: ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendarchive.c:668
+#: ../daemon/gvfsbackendarchive.c:720
+#: ../daemon/gvfsbackendarchive.c:749
 #: ../daemon/gvfsbackendcdda.c:986
 #: ../daemon/gvfsbackendcomputer.c:627
 #: ../daemon/gvfsbackenddnssd.c:392
@@ -441,7 +441,7 @@ msgstr "Inget värdnamn angivet"
 msgid "File doesn't exist"
 msgstr "Filen finns inte"
 
-#: ../daemon/gvfsbackendarchive.c:625
+#: ../daemon/gvfsbackendarchive.c:632
 #: ../daemon/gvfsbackendcomputer.c:645
 #: ../daemon/gvfsbackendgphoto2.c:1886
 #: ../daemon/gvfsbackendobexftp.c:1071
@@ -450,7 +450,7 @@ msgstr "Filen finns inte"
 msgid "Can't open directory"
 msgstr "Kan inte öppna katalog"
 
-#: ../daemon/gvfsbackendarchive.c:749
+#: ../daemon/gvfsbackendarchive.c:758
 #: ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714
 #: ../daemon/gvfsbackenddnssd.c:439
@@ -1430,22 +1430,22 @@ msgstr "Ogiltig typ av bakände"
 msgid "Error sending fd: %s"
 msgstr "Fel vid sändning av fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:181
+#: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
 msgstr "Oväntat slut på strömmen"
 
-#: ../daemon/gvfsftpconnection.c:197
-#: ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftpconnection.c:196
+#: ../daemon/gvfsftpconnection.c:209
 #: ../daemon/gvfsftptask.c:412
 #: ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "Ogiltigt svar"
 
-#: ../daemon/gvfsftpconnection.c:393
+#: ../daemon/gvfsftpconnection.c:392
 msgid "Failed to create active FTP connection. Maybe your router does not support this?"
 msgstr "Kan inte skapa aktiv FTP-anslutning. Kanske har din router inte stöd för detta?"
 
-#: ../daemon/gvfsftpconnection.c:400
+#: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
 msgstr "Misslyckades med att skapa aktiv FTP-anslutning."
 
@@ -2324,6 +2324,11 @@ msgstr "- skapa kataloger"
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "Fel vid skapande av katalog: %s\n"
+
+#: ../programs/gvfs-monitor-dir.c:38
+#: ../programs/gvfs-monitor-file.c:38
+msgid "Don't send single MOVED events."
+msgstr "Skicka inte enstaka MOVED-händelser."
 
 #: ../programs/gvfs-mount.c:54
 msgid "Mount as mountable"
