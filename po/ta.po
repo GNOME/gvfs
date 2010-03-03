@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gvfs.master.ta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-22 12:03+0530\n"
-"PO-Revision-Date: 2010-02-22 12:11+0530\n"
+"POT-Creation-Date: 2010-03-03 21:42+0530\n"
+"PO-Revision-Date: 2010-03-03 21:43+0530\n"
 "Last-Translator: Dr,T,Vasudevan <agnihot3@gmail.com>\n"
 "Language-Team: Tamil <Ubuntu-l10n-tam@lists.ubuntu.com>>\n"
 "MIME-Version: 1.0\n"
@@ -338,8 +338,8 @@ msgstr "லிப்மொபைல்  டிவைஸ் பிழை: எந�
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "கையாள முடியாத லிப்மொபைல்  டிவைஸ் பிழை (%d)"
 
-#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:529
-#: ../daemon/gvfsbackendarchive.c:558 ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendarchive.c:565 ../daemon/gvfsbackenddav.c:1631
 #: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
 #: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:648
@@ -382,19 +382,19 @@ msgstr "துணைபுரியாத செயல்பாடு"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2257
+#: ../daemon/gvfsbackendarchive.c:323 ../daemon/gvfsbackendsftp.c:2257
 #: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "%s இல் /"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:564
+#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:564
 #: ../daemon/gvfsbackendsftp.c:1733
 msgid "No hostname specified"
 msgstr "புரவலன் பெயர் குறிப்பிடப்படவில்லை"
 
-#: ../daemon/gvfsbackendarchive.c:617 ../daemon/gvfsbackendarchive.c:661
-#: ../daemon/gvfsbackendarchive.c:711 ../daemon/gvfsbackendarchive.c:740
+#: ../daemon/gvfsbackendarchive.c:624 ../daemon/gvfsbackendarchive.c:668
+#: ../daemon/gvfsbackendarchive.c:720 ../daemon/gvfsbackendarchive.c:749
 #: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
 #: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:964
 #: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
@@ -404,13 +404,13 @@ msgstr "புரவலன் பெயர் குறிப்பிடப்�
 msgid "File doesn't exist"
 msgstr "கோப்பு இல்லை"
 
-#: ../daemon/gvfsbackendarchive.c:625 ../daemon/gvfsbackendcomputer.c:645
+#: ../daemon/gvfsbackendarchive.c:632 ../daemon/gvfsbackendcomputer.c:645
 #: ../daemon/gvfsbackendgphoto2.c:1886 ../daemon/gvfsbackendobexftp.c:1071
 #: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
 msgid "Can't open directory"
 msgstr "அடைவை திறக்க முடியவில்லை"
 
-#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendarchive.c:758 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:258 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3871 ../daemon/gvfsftpdircache.c:154
@@ -1266,22 +1266,22 @@ msgstr "தவறான பின்புல வகை"
 msgid "Error sending fd: %s"
 msgstr "fd யை அனுப்புவதில் பிழை: %s"
 
-#: ../daemon/gvfsftpconnection.c:181
+#: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
 msgstr "எதிர்பாராத ஓடையின் முடிவு"
 
-#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
 #: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "தவறான பதில்"
 
-#: ../daemon/gvfsftpconnection.c:393
+#: ../daemon/gvfsftpconnection.c:392
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr "இயங்கும் எஃப்டிபி இணைப்பை உருவாக்க முடியவில்லை. உங்கள் திசைவி இதனை தடுக்கிறதோ."
 
-#: ../daemon/gvfsftpconnection.c:400
+#: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
 msgstr "இயங்கும் எஃப்டிபி இணைப்பை உருவாக்க முடியவில்லை."
 
@@ -2091,6 +2091,10 @@ msgstr "- அடைவுகளை உருவாக்கு"
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "பிழையை உருவாக்கும் அடைவு: %s\n"
+
+#: ../programs/gvfs-monitor-dir.c:38 ../programs/gvfs-monitor-file.c:38
+msgid "Don't send single MOVED events."
+msgstr "த னி MOVED நிகழ்வுகளை அனுப்பாதே "
 
 #: ../programs/gvfs-mount.c:54
 msgid "Mount as mountable"
