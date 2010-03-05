@@ -40,6 +40,7 @@ main (int argc, char *argv[])
   GError         *error;
   GFile          *file;
   GFile          *new_file;
+  int             retval = 0;
 
   setlocale (LC_ALL, "");
 
@@ -67,6 +68,7 @@ main (int argc, char *argv[])
     {
       g_printerr (_("Error: %s\n"), error->message);
       g_error_free (error);
+      retval = 1;
     }
   else
     {
@@ -77,5 +79,5 @@ main (int argc, char *argv[])
     }
 
   g_object_unref (file);
-  return 0;
+  return retval;
 }

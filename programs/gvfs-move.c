@@ -93,6 +93,7 @@ main (int argc, char *argv[])
   char *basename;
   int i;
   GFileCopyFlags flags;
+  int retval = 0;
 
   setlocale (LC_ALL, "");
 
@@ -187,6 +188,7 @@ main (int argc, char *argv[])
 	    move_failed:
 	      g_printerr (_("Error moving file %s: %s\n"), argv[i], error->message);
 	      g_error_free (error);
+	      retval = 1;
 	    }
 	}
 
@@ -196,5 +198,5 @@ main (int argc, char *argv[])
 
   g_object_unref (dest);
 
-  return 0;
+  return retval;
 }

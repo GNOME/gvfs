@@ -42,6 +42,7 @@ main (int argc, char *argv[])
   GError *error;
   GOptionContext *context;
   GFile *file;
+  int retval = 0;
 
   setlocale (LC_ALL, "");
 
@@ -64,12 +65,15 @@ main (int argc, char *argv[])
 	  {
 	    if (!force ||
 		!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
-	      g_printerr (_("Error trashing file: %s\n"), error->message);
+	      {
+	        g_printerr (_("Error trashing file: %s\n"), error->message);
+	        retval = 1;
+	      }
 	    g_error_free (error);
 	  }
 	g_object_unref (file);
       }
     }
 
-  return 0;
+  return retval;
 }
