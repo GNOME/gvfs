@@ -429,6 +429,44 @@ g_vfs_backend_afc_unmount (GVfsBackend *backend,
   g_vfs_job_succeeded (G_VFS_JOB(job));
 }
 
+static gboolean file_get_info (GVfsBackendAfc *backend, const char *path, GFileInfo *info);
+
+static gboolean
+is_directory (GVfsBackendAfc *backend,
+              const char *path)
+{
+  gboolean result = FALSE;
+  GFileInfo *info;
+
+  info = g_file_info_new();
+  if (file_get_info (backend, path, info))
+    {
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+        result = TRUE;
+    }
+
+  g_object_unref (info);
+  return result;
+}
+
+static gboolean
+is_regular (GVfsBackendAfc *backend,
+            const char *path)
+{
+  gboolean result = FALSE;
+  GFileInfo *info;
+
+  info = g_file_info_new();
+  if (file_get_info (backend, path, info))
+    {
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_REGULAR)
+	result = TRUE;
+    }
+
+  g_object_unref (info);
+  return result;
+}
+
 /* Callback to open an existing file for reading. */
 static void
 g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
@@ -440,6 +478,22 @@ g_vfs_backend_afc_open_for_read (GVfsBackend *backend,
 
   self = G_VFS_BACKEND_AFC(backend);
   g_return_if_fail (self->connected);
+
+  if (is_directory (self, path))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_IS_DIRECTORY,
+                        _("Can't open directory"));
+      return;
+    }
+
+  if (!is_regular (self, path))
+    {
+      g_vfs_job_failed (G_VFS_JOB (job), G_IO_ERROR,
+                        G_IO_ERROR_NOT_FOUND,
+                        _("File doesn't exist"));
+      return;
+    }
 
   if (G_UNLIKELY(g_vfs_backend_afc_check (afc_file_open (self->afc_cli,
                                                          path, AFC_FOPEN_RDONLY, &fd),
@@ -967,6 +1021,36 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
                                         G_OBJECT (icon));
       g_object_unref (icon);
     }
+}
+
+static gboolean
+file_get_info (GVfsBackendAfc *backend,
+               const char *path,
+               GFileInfo *info)
+{
+  char **afcinfo = NULL;
+  const char *basename, *ptr;
+  gboolean result = FALSE;
+
+  g_return_val_if_fail (backend->connected, result);
+  g_return_val_if_fail (info, result);
+
+  if (G_LIKELY(afc_get_file_info (backend->afc_cli, path, &afcinfo) == AFC_E_SUCCESS))
+    {
+      ptr = strrchr (path, '/');
+      if (ptr && ptr[1] != '\0')
+        basename = ptr + 1;
+      else
+        basename = path;
+
+      g_vfs_backend_afc_set_info_from_afcinfo (backend, info, afcinfo, basename, path, NULL, 0);
+      result = TRUE;
+    }
+
+  if (afcinfo)
+    g_strfreev(afcinfo);
+
+  return result;
 }
 
 /* Callback for iterating over a directory. */
