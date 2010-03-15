@@ -701,7 +701,7 @@ msgstr ""
 #: ../daemon/gvfsbackendsftp.c:1151
 #, c-format
 msgid "Internal error: %s"
-msgstr "Binnenfehler: s"
+msgstr "Binnenfehler: %s"
 
 #: ../daemon/gvfsbackendcomputer.c:872
 #: ../daemon/gvfsbackendcomputer.c:991
