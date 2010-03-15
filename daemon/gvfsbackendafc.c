@@ -781,6 +781,7 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
           else if (g_str_equal (afcinfo[i+1], "S_IFDIR"))
             {
               type = G_FILE_TYPE_DIRECTORY;
+              content_type = g_strdup ("inode/directory");
             }
           else if (g_str_equal (afcinfo[i+1], "S_IFLNK"))
             {
@@ -825,6 +826,15 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
         }
     }
 
+  if (content_type == NULL)
+    content_type = g_content_type_guess (basename, NULL, 0, NULL);
+  
+  if (content_type)
+    {
+      g_file_info_set_content_type (info, content_type);
+      g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
+    }
+
   /* and set some additional info */
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID, getuid ());
   g_file_info_set_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_GID, getgid ());
@@ -838,25 +848,16 @@ g_vfs_backend_afc_set_info_from_afcinfo (GVfsBackendAfc *self,
     {
       if (type == G_FILE_TYPE_DIRECTORY)
         {
-          content_type = g_strdup ("inode/directory");
           icon = g_themed_icon_new ("folder");
         }
       else
         {
-          if (content_type == NULL)
-            content_type = g_content_type_guess (basename, NULL, 0, NULL);
           if (content_type)
             {
               icon = g_content_type_get_icon (content_type);
               if (G_IS_THEMED_ICON(icon))
                 g_themed_icon_append_name (G_THEMED_ICON(icon), "text-x-generic");
             }
-        }
-
-      if (content_type)
-        {
-          g_file_info_set_content_type (info, content_type);
-          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE, content_type);
         }
 
       if (icon == NULL)
