@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gvfs master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gvfs&component=general\n"
 "POT-Creation-Date: 2010-03-13 17:01+0000\n"
-"PO-Revision-Date: 2010-03-15 14:09+0100\n"
+"PO-Revision-Date: 2010-03-18 13:37+0100\n"
 "Last-Translator: Nils-Christoph Fiedler <fiedler@medienkompanie.de>\n"
 "Language-Team: Low German <nds-lowgerman@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -126,9 +126,8 @@ msgstr ""
 #: ../monitor/proxy/gproxymount.c:556
 #: ../monitor/proxy/gproxyvolume.c:807
 #: ../monitor/proxy/gproxyvolume.c:884
-#, fuzzy
 msgid "Operation was cancelled"
-msgstr "De Operatschoon weur avbreken."
+msgstr "De Operatschoon weur avbreken"
 
 #: ../client/gdaemonfileinputstream.c:527
 #: ../client/gdaemonfileinputstream.c:535
@@ -255,7 +254,7 @@ msgstr ""
 #: ../daemon/daemon-main.c:91
 #, c-format
 msgid "%s Filesystem Service"
-msgstr ""
+msgstr "%s Dateisystemdeenst"
 
 #: ../daemon/daemon-main.c:110
 #: ../programs/gvfs-copy.c:90
@@ -292,7 +291,7 @@ msgstr ""
 #: ../daemon/gvfsbackend.c:933
 #: ../monitor/gdu/ggdumount.c:921
 msgid "Unmount Anyway"
-msgstr ""
+msgstr "So un so inbinnen"
 
 #: ../daemon/gvfsbackend.c:934
 #: ../monitor/gdu/ggdudrive.c:1022
@@ -318,15 +317,15 @@ msgstr "Düsse Datei givt dat nich"
 
 #: ../daemon/gvfsbackendafc.c:152
 msgid "The directory is not empty"
-msgstr ""
+msgstr "Dat Verteeknis is nich leer"
 
 #: ../daemon/gvfsbackendafc.c:156
 msgid "The device did not respond"
-msgstr ""
+msgstr "Dat Lööpwark antert nich"
 
 #: ../daemon/gvfsbackendafc.c:160
 msgid "The connection was interrupted"
-msgstr ""
+msgstr "De verbinnen weur unnerbroken"
 
 #: ../daemon/gvfsbackendafc.c:164
 msgid "Invalid Apple File Control data received"
@@ -405,7 +404,7 @@ msgstr ""
 #: ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
-msgstr ""
+msgstr "Operatschoon nich unnerstütt"
 
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
@@ -489,13 +488,13 @@ msgstr ""
 #: ../daemon/gvfsbackendtrash.c:216
 #, c-format
 msgid "No such file or directory"
-msgstr ""
+msgstr "Datei or Verteeknis givt dat nich"
 
 #: ../daemon/gvfsbackendburn.c:425
 #: ../daemon/gvfsbackenddav.c:2223
 #: ../daemon/gvfsbackendsftp.c:1816
 msgid "Directory not empty"
-msgstr ""
+msgstr "Verteeknis is nich leer"
 
 #: ../daemon/gvfsbackendburn.c:459
 #: ../daemon/gvfsbackendburn.c:904
@@ -593,7 +592,7 @@ msgstr ""
 #: ../daemon/gvfsbackendgphoto2.c:2886
 #: ../daemon/gvfsbackendgphoto2.c:2979
 msgid "Not supported"
-msgstr ""
+msgstr "Nich unnerstütt"
 
 #: ../daemon/gvfsbackendcdda.c:332
 #: ../daemon/gvfsbackendgphoto2.c:1510
@@ -618,12 +617,12 @@ msgstr ""
 #: ../daemon/gvfsbackendcdda.c:393
 #: ../daemon/gvfsbackendcdda.c:477
 msgid "No drive specified"
-msgstr ""
+msgstr "Keen Lööpwark utwählt"
 
 #: ../daemon/gvfsbackendcdda.c:417
 #, c-format
 msgid "Cannot find drive %s"
-msgstr ""
+msgstr "Künn Lööpwark %s nich finnen"
 
 #: ../daemon/gvfsbackendcdda.c:430
 #, c-format
@@ -719,7 +718,7 @@ msgstr ""
 #: ../daemon/gvfsbackendcomputer.c:1305
 #: ../daemon/gvfsbackendcomputer.c:1374
 msgid "Not a mountable file"
-msgstr ""
+msgstr "Keene inbinnbare Datei"
 
 #: ../daemon/gvfsbackendcomputer.c:1055
 msgid "Can't unmount file"
@@ -757,7 +756,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackenddav.c:587
 msgid "Empty response"
-msgstr ""
+msgstr "Leere Anter"
 
 #: ../daemon/gvfsbackenddav.c:595
 msgid "Unexpected reply from server"
@@ -766,7 +765,7 @@ msgstr ""
 #: ../daemon/gvfsbackenddav.c:1214
 #: ../daemon/gvfsbackenddav.c:1838
 msgid "Response invalid"
-msgstr ""
+msgstr "Anter nich akerat"
 
 #: ../daemon/gvfsbackenddav.c:1357
 msgid "WebDAV share"
@@ -834,7 +833,7 @@ msgstr ""
 #. TODO: Names, etc
 #: ../daemon/gvfsbackenddnssd.c:748
 msgid "Dns-SD"
-msgstr ""
+msgstr "DNS-SD"
 
 #: ../daemon/gvfsbackenddnssd.c:749
 #: ../daemon/gvfsbackendnetwork.c:732
@@ -847,20 +846,20 @@ msgstr "Netwark"
 #: ../daemon/gvfsbackendftp.c:387
 #, c-format
 msgid "Enter password for ftp as %s on %s"
-msgstr ""
+msgstr "Passwort för FTP ingeven as %s op %s"
 
 #. translators: %s here is the hostname
 #: ../daemon/gvfsbackendftp.c:390
 #, c-format
 msgid "Enter password for ftp on %s"
-msgstr ""
+msgstr "Passwoort för FTP ingeven op %s"
 
 #: ../daemon/gvfsbackendftp.c:417
 #: ../daemon/gvfsbackendsftp.c:974
 #: ../daemon/gvfsbackendsmb.c:606
 #: ../daemon/gvfsbackendsmbbrowse.c:986
 msgid "Password dialog cancelled"
-msgstr ""
+msgstr "Passwoortdialog avbroken"
 
 #: ../daemon/gvfsbackendftp.c:527
 #, c-format
@@ -894,38 +893,38 @@ msgstr ""
 #: ../daemon/gvfsbackendgphoto2.c:506
 #, c-format
 msgid "%s: %d: Directory or file exists"
-msgstr ""
+msgstr "%s: %d: Verteeknis or Datei givt dat all"
 
 #: ../daemon/gvfsbackendgphoto2.c:513
 #, c-format
 msgid "%s: %d: No such file or directory"
-msgstr ""
+msgstr "%s: %d: Keene Datei or Verteeknis"
 
 #: ../daemon/gvfsbackendgphoto2.c:519
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %d: Invalid filename"
-msgstr "[Falscher Dateinaam]"
+msgstr "%s: %d: nich akerater Dateinaam"
 
 #: ../daemon/gvfsbackendgphoto2.c:525
 #, c-format
 msgid "%s: %d: Not Supported"
-msgstr ""
+msgstr "%s: %d: Nich unnerstütt"
 
 #. Translator: %s represents the device, e.g. usb:001,042
 #: ../daemon/gvfsbackendgphoto2.c:720
 #: ../daemon/gvfsbackendgphoto2.c:726
 #, c-format
 msgid "Digital Camera (%s)"
-msgstr ""
+msgstr "Digitaler Knippskassen (%s)"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
 #: ../daemon/gvfsbackendgphoto2.c:949
 #: ../monitor/gphoto2/ggphoto2volume.c:197
 #: ../monitor/gphoto2/ggphoto2volume.c:299
-#, fuzzy, c-format
+#, c-format
 msgid "%s Camera"
-msgstr "Knippskassen"
+msgstr "%s Knippskassen"
 
 #. Translator: %s is the vendor name, e.g. Panasonic
 #. Translators: %s is the device vendor
@@ -934,7 +933,7 @@ msgstr "Knippskassen"
 #: ../monitor/gphoto2/ggphoto2volume.c:294
 #, c-format
 msgid "%s Audio Player"
-msgstr ""
+msgstr "%s Musikspeeler"
 
 #: ../daemon/gvfsbackendgphoto2.c:961
 #: ../monitor/gphoto2/ggphoto2volume.c:203
@@ -949,7 +948,7 @@ msgstr "Musikspeeler"
 
 #: ../daemon/gvfsbackendgphoto2.c:1569
 msgid "No device specified"
-msgstr ""
+msgstr "Keen Lööpwark utwählt"
 
 #: ../daemon/gvfsbackendgphoto2.c:1590
 msgid "Cannot create gphoto2 context"
@@ -957,7 +956,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendgphoto2.c:1600
 msgid "Error creating camera"
-msgstr ""
+msgstr "Künn Knippskassen nich erstellen"
 
 #: ../daemon/gvfsbackendgphoto2.c:1613
 #: ../daemon/gvfsbackendgphoto2.c:1623
@@ -988,21 +987,21 @@ msgstr ""
 
 #: ../daemon/gvfsbackendgphoto2.c:1765
 msgid "No camera specified"
-msgstr ""
+msgstr "Keene Kamera utwählt"
 
 #: ../daemon/gvfsbackendgphoto2.c:1806
 #: ../daemon/gvfsbackendgphoto2.c:1832
 #, c-format
 msgid "Filesystem is busy"
-msgstr ""
+msgstr "Dateisystem het wat to doon"
 
 #: ../daemon/gvfsbackendgphoto2.c:1902
 msgid "Error creating file object"
-msgstr ""
+msgstr "Künn Dateielement nich erstellen"
 
 #: ../daemon/gvfsbackendgphoto2.c:1917
 msgid "Error getting file"
-msgstr ""
+msgstr "Künn Datei nich kregen"
 
 #: ../daemon/gvfsbackendgphoto2.c:1927
 msgid "Error getting data from file"
@@ -1027,53 +1026,51 @@ msgstr "Keen Verteeknis"
 
 #: ../daemon/gvfsbackendgphoto2.c:2234
 msgid "Failed to get folder list"
-msgstr ""
+msgstr "Künn Verteeknislist nich kregen"
 
 #: ../daemon/gvfsbackendgphoto2.c:2300
 msgid "Failed to get file list"
-msgstr ""
+msgstr "Künn Dateilist nich kregen"
 
 #: ../daemon/gvfsbackendgphoto2.c:2592
 msgid "Error creating directory"
-msgstr ""
+msgstr "Künn Verteeknis nich erstellen"
 
 #: ../daemon/gvfsbackendgphoto2.c:2801
 msgid "Name already exists"
-msgstr ""
+msgstr "Naam givt dat all"
 
 #: ../daemon/gvfsbackendgphoto2.c:2812
 #: ../daemon/gvfsbackendgphoto2.c:3441
 msgid "New name too long"
-msgstr ""
+msgstr "Nejer Naam to lang"
 
 #: ../daemon/gvfsbackendgphoto2.c:2822
 #: ../daemon/gvfsbackendgphoto2.c:3452
 msgid "Error renaming dir"
-msgstr ""
+msgstr "Künn Verteeknisnaam nich ännern"
 
 #: ../daemon/gvfsbackendgphoto2.c:2835
 #: ../daemon/gvfsbackendgphoto2.c:3465
-#, fuzzy
 msgid "Error renaming file"
-msgstr "Fehler bi'm annern Naam geven vun de Datei \"%s\": %s"
+msgstr "Fehler bi'm annern Naam geven vun de Datei"
 
 #: ../daemon/gvfsbackendgphoto2.c:2899
 #, c-format
 msgid "Directory '%s' is not empty"
-msgstr ""
+msgstr "Verteeknis '%s' is nich leer"
 
 #: ../daemon/gvfsbackendgphoto2.c:2910
 msgid "Error deleting directory"
-msgstr ""
+msgstr "Künn Verteeknis nich löschen"
 
 #: ../daemon/gvfsbackendgphoto2.c:2936
-#, fuzzy
 msgid "Error deleting file"
-msgstr "Fehler bi'm Löschen vun de Datei '%s': %s"
+msgstr "Fehler bi'm Löschen vun de Datei"
 
 #: ../daemon/gvfsbackendgphoto2.c:2989
 msgid "Can't write to directory"
-msgstr ""
+msgstr "Künn nich in Verteeknis schrieven"
 
 #: ../daemon/gvfsbackendgphoto2.c:3036
 msgid "Cannot allocate new file to append to"
@@ -1089,7 +1086,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendgphoto2.c:3349
 msgid "Error writing file"
-msgstr ""
+msgstr "Fehler bi'm Schrieven vun de Datei"
 
 #: ../daemon/gvfsbackendgphoto2.c:3397
 msgid "Not supported (not same directory)"
@@ -1110,23 +1107,23 @@ msgstr ""
 #: ../daemon/gvfsbackendhttp.c:257
 #, c-format
 msgid "HTTP Client Error: %s"
-msgstr ""
+msgstr "HTTP Client Fehler: %s"
 
 #: ../daemon/gvfsbackendlocaltest.c:855
 msgid "Directory notification not supported"
-msgstr ""
+msgstr "Verteeknisnahrichten nich unnerstütt"
 
 #. smb:/// root link
 #: ../daemon/gvfsbackendnetwork.c:269
 #: ../daemon/gvfsbackendsmbbrowse.c:885
 msgid "Windows Network"
-msgstr ""
+msgstr "Windows Netwark"
 
 #. Translators: this is the friendly name of the 'network://' backend that
 #. * shows computers in your local network.
 #: ../daemon/gvfsbackendnetwork.c:931
 msgid "Network Location Monitor"
-msgstr ""
+msgstr "Netwark Ort Oppasser"
 
 #. Set the mountspec according to original uri, no matter whether user changes
 #. credentials during mount loop. Nautilus and other gio clients depend
@@ -1143,11 +1140,11 @@ msgstr "%s op %s"
 
 #: ../daemon/gvfsbackendobexftp.c:890
 msgid "USB support missing. Please contact your software vendor"
-msgstr ""
+msgstr "USB Unnerstütten fehlt. Bidde frag dien Programmverkeuper"
 
 #: ../daemon/gvfsbackendobexftp.c:1010
 msgid "Connection to the device lost"
-msgstr ""
+msgstr "Verbinnen to'm Lööpwark im dutt"
 
 #: ../daemon/gvfsbackendobexftp.c:1507
 msgid "Device requires a software update"
@@ -1155,9 +1152,9 @@ msgstr ""
 
 #: ../daemon/gvfsbackendobexftp.c:1855
 #: ../daemon/gvfsbackendsmb.c:1929
-#, fuzzy, c-format
+#, c-format
 msgid "Error deleting file: %s"
-msgstr "Fehler bi'm Löschen vun de Datei '%s': %s"
+msgstr "Fehler bi'm Löschen vun de Datei: %s"
 
 #: ../daemon/gvfsbackendsftp.c:301
 #: ../daemon/gvfsbackendsftp.c:657
@@ -1168,19 +1165,19 @@ msgstr ""
 #: ../daemon/gvfsbackendsftp.c:1822
 #: ../daemon/gvfsftptask.c:400
 msgid "Permission denied"
-msgstr ""
+msgstr "Togang nich tolaten"
 
 #: ../daemon/gvfsbackendsftp.c:316
 msgid "Hostname not known"
-msgstr ""
+msgstr "Hostnaam nich bekannt"
 
 #: ../daemon/gvfsbackendsftp.c:323
 msgid "No route to host"
-msgstr ""
+msgstr "Keene Route to'm Host"
 
 #: ../daemon/gvfsbackendsftp.c:330
 msgid "Connection refused by server"
-msgstr ""
+msgstr "De Server wiest de Verbinnen torügg"
 
 #: ../daemon/gvfsbackendsftp.c:337
 msgid "Host key verification failed"
@@ -1202,7 +1199,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendsftp.c:958
 msgid "Enter passphrase for key"
-msgstr ""
+msgstr "Passphrase för Slötel ingeven"
 
 #: ../daemon/gvfsbackendsftp.c:960
 msgid "Enter password"
@@ -1210,7 +1207,7 @@ msgstr "Passwoord ingeven"
 
 #: ../daemon/gvfsbackendsftp.c:1036
 msgid "Can't send password"
-msgstr ""
+msgstr "Künn Passwoort nich sennen"
 
 #: ../daemon/gvfsbackendsftp.c:1044
 msgid "Log In Anyway"
@@ -1231,7 +1228,7 @@ msgstr ""
 
 #: ../daemon/gvfsbackendsftp.c:1073
 msgid "Login dialog cancelled"
-msgstr ""
+msgstr "Anmellendialog avbroken"
 
 #: ../daemon/gvfsbackendsftp.c:1093
 msgid "Can't send host identity confirmation"
@@ -1374,14 +1371,14 @@ msgstr ""
 #: ../daemon/gvfsbackendsmbbrowse.c:365
 #, c-format
 msgid "Password required for %s"
-msgstr ""
+msgstr "Passwoort nödig för %s"
 
 #. translators: Name for the location that lists the smb shares
 #. availible on a server (%s is the name of the server)
 #: ../daemon/gvfsbackendsmbbrowse.c:893
 #, c-format
 msgid "Windows shares on %s"
-msgstr ""
+msgstr "Windows deelt op %s"
 
 #. translators: We tried to mount a windows (samba) share, but failed
 #: ../daemon/gvfsbackendsmbbrowse.c:992
@@ -1395,21 +1392,21 @@ msgstr ""
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1148
 msgid "Not a regular file"
-msgstr ""
+msgstr "Keene normale Datei"
 
 #: ../daemon/gvfsbackendsmbbrowse.c:1503
 msgid "Windows Network Filesystem Service"
-msgstr ""
+msgstr "Windows Netwark Dateisystemdeenst"
 
 #: ../daemon/gvfsbackendtrash.c:370
 #: ../daemon/gvfsbackendtrash.c:426
 msgid "The trash folder may not be deleted"
-msgstr ""
+msgstr "De Papierkörv künn nich löscht werrn"
 
 #: ../daemon/gvfsbackendtrash.c:387
 #: ../daemon/gvfsbackendtrash.c:440
 msgid "Items in the trash may not be modified"
-msgstr ""
+msgstr "De Dateien im Papierkörv künn nich ännert werrn"
 
 #. Translators: this is the display name of the backend
 #. translators: This is the name of the backend
@@ -1456,11 +1453,11 @@ msgstr ""
 
 #: ../daemon/gvfsftptask.c:356
 msgid "Accounts are unsupported"
-msgstr ""
+msgstr "Togangs sünd nich unnerstütt"
 
 #: ../daemon/gvfsftptask.c:360
 msgid "Host closed connection"
-msgstr ""
+msgstr "Host het Verbinnen sluten"
 
 #: ../daemon/gvfsftptask.c:364
 msgid "Cannot open data connection. Maybe your firewall prevents this?"
@@ -1502,7 +1499,7 @@ msgstr ""
 #: ../daemon/main.c:45
 #: ../metadata/meta-daemon.c:694
 msgid "Replace old daemon."
-msgstr ""
+msgstr "Ollen Daemon överschrieven."
 
 #: ../daemon/main.c:46
 msgid "Don't start fuse."
@@ -1510,7 +1507,7 @@ msgstr ""
 
 #: ../daemon/main.c:58
 msgid "GVFS Daemon"
-msgstr ""
+msgstr "GVFS Daemon"
 
 #: ../daemon/main.c:61
 msgid "Main daemon for GVFS"
@@ -1635,7 +1632,7 @@ msgstr ""
 
 #: ../monitor/gdu/ggdudrive.c:1021
 msgid "Start Anyway"
-msgstr ""
+msgstr "So un so starten"
 
 #: ../monitor/gdu/ggdumount.c:856
 msgid "One or more programs are preventing the unmount operation."
@@ -1652,7 +1649,7 @@ msgstr ""
 
 #: ../monitor/gdu/ggduvolume.c:325
 msgid "Floppy Disk"
-msgstr ""
+msgstr "Diskettenlööpwark"
 
 #: ../monitor/gdu/ggduvolume.c:1075
 #, c-format
@@ -1678,96 +1675,96 @@ msgstr ""
 #: ../monitor/gphoto2/hal-utils.c:40
 #: ../monitor/hal/hal-utils.c:40
 msgid "CD-ROM Disc"
-msgstr ""
+msgstr "CD-ROM Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:40
 #: ../monitor/hal/hal-utils.c:40
 msgid "Blank CD-ROM Disc"
-msgstr ""
+msgstr "Blanke CD-ROM Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:41
 #: ../monitor/hal/hal-utils.c:41
 msgid "CD-R Disc"
-msgstr ""
+msgstr "CD-R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:41
 #: ../monitor/hal/hal-utils.c:41
 msgid "Blank CD-R Disc"
-msgstr ""
+msgstr "Blanke CD-R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:42
 #: ../monitor/hal/hal-utils.c:42
 msgid "CD-RW Disc"
-msgstr ""
+msgstr "CD-RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:42
 #: ../monitor/hal/hal-utils.c:42
 msgid "Blank CD-RW Disc"
-msgstr ""
+msgstr "Blanke CD-RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:43
 #: ../monitor/gphoto2/hal-utils.c:45
 #: ../monitor/hal/hal-utils.c:43
 #: ../monitor/hal/hal-utils.c:45
 msgid "DVD-ROM Disc"
-msgstr ""
+msgstr "DVD-ROM Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:43
 #: ../monitor/gphoto2/hal-utils.c:45
 #: ../monitor/hal/hal-utils.c:43
 #: ../monitor/hal/hal-utils.c:45
 msgid "Blank DVD-ROM Disc"
-msgstr ""
+msgstr "Blanke DVD-ROM Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:44
 #: ../monitor/hal/hal-utils.c:44
 msgid "DVD-RAM Disc"
-msgstr ""
+msgstr "DVD-RAMJ Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:44
 #: ../monitor/hal/hal-utils.c:44
 msgid "Blank DVD-RAM Disc"
-msgstr ""
+msgstr "Blanke DVD-RAM Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:46
 #: ../monitor/hal/hal-utils.c:46
 msgid "DVD-RW Disc"
-msgstr ""
+msgstr "DVD-RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:46
 #: ../monitor/hal/hal-utils.c:46
 msgid "Blank DVD-RW Disc"
-msgstr ""
+msgstr "Blanke DVD-RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:47
 #: ../monitor/hal/hal-utils.c:47
 msgid "DVD+R Disc"
-msgstr ""
+msgstr "DVD+R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:47
 #: ../monitor/hal/hal-utils.c:47
 msgid "Blank DVD+R Disc"
-msgstr ""
+msgstr "Blanke DVD+R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:48
 #: ../monitor/hal/hal-utils.c:48
 msgid "DVD+RW Disc"
-msgstr ""
+msgstr "DVD+RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:48
 #: ../monitor/hal/hal-utils.c:48
 msgid "Blank DVD+RW Disc"
-msgstr ""
+msgstr "Blanke DVD+RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:49
 #: ../monitor/hal/hal-utils.c:49
 msgid "DVD+R DL Disc"
-msgstr ""
+msgstr "DVD+R DL Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:49
 #: ../monitor/hal/hal-utils.c:49
 msgid "Blank DVD+R DL Disc"
-msgstr ""
+msgstr "Blanke DVD+R DL Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:50
 #: ../monitor/hal/hal-utils.c:50
@@ -1777,7 +1774,7 @@ msgstr "Blu-ray Disk"
 #: ../monitor/gphoto2/hal-utils.c:50
 #: ../monitor/hal/hal-utils.c:50
 msgid "Blank Blu-Ray Disc"
-msgstr ""
+msgstr "Blanke Blue-Ray Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:51
 #: ../monitor/hal/hal-utils.c:51
@@ -1787,68 +1784,67 @@ msgstr "Blu-ray R Disk"
 #: ../monitor/gphoto2/hal-utils.c:51
 #: ../monitor/hal/hal-utils.c:51
 msgid "Blank Blu-Ray R Disc"
-msgstr ""
+msgstr "Blanke Blue-Ray R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:52
 #: ../monitor/hal/hal-utils.c:52
 msgid "Blu-Ray RW Disc"
-msgstr ""
+msgstr "Blue-Ray RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:52
 #: ../monitor/hal/hal-utils.c:52
 msgid "Blank Blu-Ray RW Disc"
-msgstr ""
+msgstr "Blanke Blue-Ray RW DIsk"
 
 #: ../monitor/gphoto2/hal-utils.c:53
 #: ../monitor/hal/hal-utils.c:53
 msgid "HD DVD Disc"
-msgstr ""
+msgstr "HD DVD DIsk"
 
 #: ../monitor/gphoto2/hal-utils.c:53
 #: ../monitor/hal/hal-utils.c:53
 msgid "Blank HD DVD Disc"
-msgstr ""
+msgstr "Blanke HD DVD Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:54
 #: ../monitor/hal/hal-utils.c:54
 msgid "HD DVD-R Disc"
-msgstr ""
+msgstr "HD DVD-R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:54
 #: ../monitor/hal/hal-utils.c:54
 msgid "Blank HD DVD-R Disc"
-msgstr ""
+msgstr "Blanke DVD-R Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:55
 #: ../monitor/hal/hal-utils.c:55
 msgid "HD DVD-RW Disc"
-msgstr ""
+msgstr "HD DVD-RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:55
 #: ../monitor/hal/hal-utils.c:55
 msgid "Blank HD DVD-RW Disc"
-msgstr ""
+msgstr "Blanke HD DVD-RW Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:56
 #: ../monitor/hal/hal-utils.c:56
 msgid "MO Disc"
-msgstr ""
+msgstr "MO Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:56
 #: ../monitor/hal/hal-utils.c:56
 msgid "Blank MO Disc"
-msgstr ""
+msgstr "Blanke MO Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:57
 #: ../monitor/hal/hal-utils.c:57
 msgid "Disc"
-msgstr ""
+msgstr "Disk"
 
 #: ../monitor/gphoto2/hal-utils.c:57
 #: ../monitor/hal/hal-utils.c:57
-#, fuzzy
 msgid "Blank Disc"
-msgstr "_Blanke Disk"
+msgstr "Blanke Disk"
 
 #: ../monitor/hal/ghaldrive.c:127
 msgid "CD-ROM"
@@ -1888,111 +1884,111 @@ msgstr "DVD-RAM"
 
 #: ../monitor/hal/ghaldrive.c:148
 msgid "DVD±R"
-msgstr ""
+msgstr "DVD±R"
 
 #: ../monitor/hal/ghaldrive.c:151
 msgid "DVD±RW"
-msgstr ""
+msgstr "DVD±RW"
 
 #: ../monitor/hal/ghaldrive.c:153
 msgid "HDDVD"
-msgstr ""
+msgstr "HDDVD"
 
 #: ../monitor/hal/ghaldrive.c:155
 msgid "HDDVD-r"
-msgstr ""
+msgstr "HDDVD-R"
 
 #: ../monitor/hal/ghaldrive.c:157
 msgid "HDDVD-RW"
-msgstr ""
+msgstr "HDDVD-RW"
 
 #: ../monitor/hal/ghaldrive.c:159
 msgid "Blu-ray"
-msgstr ""
+msgstr "Blue-Ray"
 
 #: ../monitor/hal/ghaldrive.c:161
 msgid "Blu-ray-R"
-msgstr ""
+msgstr "Blue-Ray-R"
 
 #: ../monitor/hal/ghaldrive.c:163
 msgid "Blu-ray-RE"
-msgstr ""
+msgstr "Blue-Ray-RE"
 
 #. translators: This wis something like "CD-ROM/DVD Drive" or
 #. "CD-RW/Blue-ray Drive" depending on the properties of the drive
 #: ../monitor/hal/ghaldrive.c:169
 #, c-format
 msgid "%s/%s Drive"
-msgstr ""
+msgstr "%s/%s Lööpwark"
 
 #. translators: This wis something like "CD-ROM Drive" or "CD-RW Drive
 #. depending on the properties of the drive
 #: ../monitor/hal/ghaldrive.c:175
 #, c-format
 msgid "%s Drive"
-msgstr ""
+msgstr "%s Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:185
 msgid "Software RAID Drive"
-msgstr ""
+msgstr "Programm un RAID Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:187
 msgid "USB Drive"
-msgstr ""
+msgstr "USB Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:189
 msgid "ATA Drive"
-msgstr ""
+msgstr "ATA Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:191
 msgid "SCSI Drive"
-msgstr ""
+msgstr "SCSI Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:193
 msgid "FireWire Drive"
-msgstr ""
+msgstr "FireWire Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:197
 msgid "Tape Drive"
-msgstr ""
+msgstr "Kassetten Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:199
 msgid "CompactFlash Drive"
-msgstr ""
+msgstr "CompactFlash Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:201
 msgid "MemoryStick Drive"
-msgstr ""
+msgstr "MemoryStick Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:203
 msgid "SmartMedia Drive"
-msgstr ""
+msgstr "SmartMedia Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:205
 msgid "SD/MMC Drive"
-msgstr ""
+msgstr "SD/MMC Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:207
 msgid "Zip Drive"
-msgstr ""
+msgstr "Zip Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:209
 msgid "Jaz Drive"
-msgstr ""
+msgstr "Jaz Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:211
 msgid "Thumb Drive"
-msgstr ""
+msgstr "Thumb Lööpwark"
 
 #: ../monitor/hal/ghaldrive.c:214
 msgid "Mass Storage Drive"
-msgstr ""
+msgstr "Massenspieker Lööpwark"
 
 #: ../monitor/hal/ghalmount.c:159
 #: ../monitor/hal/ghalvolume.c:163
 #, c-format
 msgid "%.1f kB"
-msgstr ""
+msgstr "%.1f kB"
 
 #: ../monitor/hal/ghalmount.c:164
 #: ../monitor/hal/ghalvolume.c:168
@@ -2004,7 +2000,7 @@ msgstr "%.1f MB"
 #: ../monitor/hal/ghalvolume.c:173
 #, c-format
 msgid "%.1f GB"
-msgstr ""
+msgstr "%.1f GB"
 
 #: ../monitor/hal/ghalmount.c:323
 #: ../monitor/hal/ghalvolume.c:244
@@ -2023,7 +2019,7 @@ msgstr "%s Medien"
 #: ../monitor/hal/ghalvolume.c:232
 #, c-format
 msgid "%s Encrypted Data"
-msgstr ""
+msgstr "%s verslötelte Daten"
 
 #: ../programs/gvfs-cat.c:37
 msgid "locations"
@@ -2096,12 +2092,12 @@ msgstr ""
 #: ../programs/gvfs-copy.c:44
 #: ../programs/gvfs-move.c:42
 msgid "no target directory"
-msgstr ""
+msgstr "keen Täälverteeknis"
 
 #: ../programs/gvfs-copy.c:45
 #: ../programs/gvfs-move.c:43
 msgid "show progress"
-msgstr ""
+msgstr "Tostand opwiesen"
 
 #: ../programs/gvfs-copy.c:46
 #: ../programs/gvfs-move.c:44
@@ -2125,7 +2121,7 @@ msgstr ""
 #: ../programs/gvfs-move.c:67
 #, c-format
 msgid "progress"
-msgstr ""
+msgstr "Tostand"
 
 #: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
@@ -2163,7 +2159,7 @@ msgstr ""
 
 #: ../programs/gvfs-info.c:38
 msgid "Get filesystem info"
-msgstr ""
+msgstr "Dateisysteminfo kregen"
 
 #: ../programs/gvfs-info.c:39
 #: ../programs/gvfs-ls.c:39
@@ -2178,7 +2174,7 @@ msgstr ""
 
 #: ../programs/gvfs-info.c:50
 msgid "invalid type"
-msgstr ""
+msgstr "nich akerater typ"
 
 #: ../programs/gvfs-info.c:53
 msgid "unknown"
@@ -2186,7 +2182,7 @@ msgstr "unbekannt"
 
 #: ../programs/gvfs-info.c:56
 msgid "regular"
-msgstr ""
+msgstr "normal"
 
 #: ../programs/gvfs-info.c:59
 msgid "directory"
@@ -2194,11 +2190,11 @@ msgstr "Verteeknis"
 
 #: ../programs/gvfs-info.c:62
 msgid "symlink"
-msgstr ""
+msgstr "symlink"
 
 #: ../programs/gvfs-info.c:65
 msgid "special"
-msgstr ""
+msgstr "sünnerlich"
 
 #: ../programs/gvfs-info.c:68
 msgid "shortcut"
@@ -2206,17 +2202,17 @@ msgstr "Kortsnied"
 
 #: ../programs/gvfs-info.c:71
 msgid "mountable"
-msgstr ""
+msgstr "inbinnbar"
 
 #: ../programs/gvfs-info.c:109
 #, c-format
 msgid "attributes:\n"
-msgstr ""
+msgstr "Attribute:\n"
 
 #: ../programs/gvfs-info.c:155
 #, c-format
 msgid "display name: %s\n"
-msgstr ""
+msgstr "Naam opwiesen: %s\n"
 
 #: ../programs/gvfs-info.c:159
 #, c-format
@@ -2224,14 +2220,14 @@ msgid "edit name: %s\n"
 msgstr "Naam bewarken: %s\n"
 
 #: ../programs/gvfs-info.c:165
-#, fuzzy, c-format
+#, c-format
 msgid "name: %s\n"
-msgstr "_Naam:"
+msgstr "Naam: %s\n"
 
 #: ../programs/gvfs-info.c:172
-#, fuzzy, c-format
+#, c-format
 msgid "type: %s\n"
-msgstr "_Typ:"
+msgstr "Typ: %s\n"
 
 #: ../programs/gvfs-info.c:178
 #, c-format
@@ -2239,13 +2235,13 @@ msgid "size: "
 msgstr "Gröte:"
 
 #: ../programs/gvfs-info.c:183
-#, fuzzy, c-format
+#, c-format
 msgid "hidden\n"
-msgstr "Verbargt"
+msgstr "verbargt\n"
 
 #: ../programs/gvfs-info.c:266
 msgid "Copy with file"
-msgstr ""
+msgstr "Mit Datei koperen"
 
 #: ../programs/gvfs-info.c:270
 msgid "Keep with file when moved"
@@ -2272,9 +2268,8 @@ msgstr ""
 
 #: ../programs/gvfs-ls.c:40
 #: ../programs/gvfs-tree.c:36
-#, fuzzy
 msgid "Show hidden files"
-msgstr "_Verbargte Dateien opwiesen"
+msgstr "Verbargte Dateien opwiesen"
 
 #: ../programs/gvfs-ls.c:41
 msgid "Use a long listing format"
@@ -2287,9 +2282,9 @@ msgstr ""
 #: ../programs/gvfs-ls.c:164
 #: ../programs/gvfs-ls.c:171
 #: ../programs/gvfs-rename.c:69
-#, fuzzy, c-format
+#, c-format
 msgid "Error: %s\n"
-msgstr "Fehler"
+msgstr "Fehler: %s\n"
 
 #: ../programs/gvfs-ls.c:383
 msgid "- list files at <location>"
@@ -2300,9 +2295,8 @@ msgid "create parent directories"
 msgstr ""
 
 #: ../programs/gvfs-mkdir.c:51
-#, fuzzy
 msgid "- create directories"
-msgstr "Verteeknisse erstellen"
+msgstr "- Verteeknisse erstellen"
 
 #: ../programs/gvfs-mkdir.c:79
 #: ../programs/gvfs-mkdir.c:88
@@ -2435,11 +2429,11 @@ msgstr "- Dateien löschen"
 
 #: ../programs/gvfs-save.c:43
 msgid "Create backup"
-msgstr ""
+msgstr "Erstelle Sekernkopie"
 
 #: ../programs/gvfs-save.c:44
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Jüst erstellen, wenn es dat noh nich givt"
 
 #: ../programs/gvfs-save.c:45
 msgid "Append to end of file"
@@ -2491,7 +2485,7 @@ msgstr ""
 #: ../programs/gvfs-set-attribute.c:137
 #, c-format
 msgid "Location not specified\n"
-msgstr ""
+msgstr "Keen Ort angeven\n"
 
 #: ../programs/gvfs-set-attribute.c:145
 #, c-format
@@ -2510,12 +2504,12 @@ msgstr ""
 
 #: ../programs/gvfs-trash.c:52
 msgid "- move files to trash"
-msgstr ""
+msgstr "- verschuv Dateien in'n Papierkörv"
 
 #: ../programs/gvfs-trash.c:69
 #, c-format
 msgid "Error trashing file: %s\n"
-msgstr ""
+msgstr "Fehler bi'm Löschen vun de Datei: %s\n"
 
 #: ../programs/gvfs-tree.c:37
 msgid "Follow symlinks, mounts and shortcuts like dirs"
