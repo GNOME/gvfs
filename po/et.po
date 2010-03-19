@@ -12,14 +12,16 @@ msgstr ""
 "Project-Id-Version: gvfs MASTER\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gvfs&component=general\n"
-"POT-Creation-Date: 2009-11-18 13:07+0000\n"
-"PO-Revision-Date: 2009-12-10 11:21+0200\n"
-"Last-Translator: Ivar Smolin <okul@linux.ee>\n"
+"POT-Creation-Date: 2010-03-18 12:39+0000\n"
+"PO-Revision-Date: 2010-03-19 09:46+0300\n"
+"Last-Translator: Mattias Põldaru <mahfiaz gmail com>\n"
 "Language-Team: Estonian <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Estonian\n"
+"X-Poedit-Country: ESTONIA\n"
 
 msgid "Operation not supported, files on different mounts"
 msgstr "Operatsioon pole toetatud, failid asuvad eri ketastel"
@@ -187,7 +189,7 @@ msgstr ""
 "Vähemalt üks rakendus hoiab köidet hõivatuna."
 
 msgid "Internal Apple File Control error"
-msgstr ""
+msgstr "Apple failijuhtimise siseviga"
 
 msgid "File does not exist"
 msgstr "Faili pole olemas"
@@ -202,53 +204,63 @@ msgid "The connection was interrupted"
 msgstr "Ühendused katkestati"
 
 msgid "Invalid Apple File Control data received"
-msgstr ""
+msgstr "Saadi vigased Apple failijuhtimise andmed"
 
 #, c-format
 msgid "Unhandled Apple File Control error (%d)"
-msgstr ""
+msgstr "Käsitlematu Apple failijuhtimise viga (%d)"
 
 msgid "Lockdown Error: Invalid Argument"
-msgstr ""
+msgstr "Lukustuse viga: sobimatu argument"
 
 #, c-format
 msgid "Unhandled Lockdown error (%d)"
-msgstr ""
+msgstr "Käsitlematu lukustuse viga (%d)"
 
-msgid "iPhone Device Error: Invalid Argument"
-msgstr ""
+msgid "libimobiledevice Error: Invalid Argument"
+msgstr "libimobiledevice viga: sobimatu argument"
 
 msgid ""
-"iPhone Device Error: No device found. Make sure usbmuxd is set up correctly."
+"libimobiledevice Error: No device found. Make sure usbmuxd is set up "
+"correctly."
 msgstr ""
+"libimobiledevice viga: ühtegi seadet ei leitud. Veendu, et usbmuxd on "
+"õigesti seadistatud."
 
 #, c-format
-msgid "Unhandled iPhone Device error (%d)"
-msgstr ""
+msgid "Unhandled libimobiledevice error (%d)"
+msgstr "Käsitlematu libimobiledevice viga (%d)"
 
 msgid "Invalid mount spec"
 msgstr "Vigane ühendamiskirjeldus"
 
 msgid "Invalid AFC location: must be in the form of afc://uuid:port-number"
-msgstr ""
+msgstr "Sobimatu AFC asukoht: peab olema kujul afc://uuid:port-number"
 
 #, c-format
 msgid "Service %d on Apple Mobile Device"
-msgstr ""
+msgstr "Teenus %d Apple mobiil"
 
 #, c-format
 msgid "Apple Mobile Device"
-msgstr ""
+msgstr "Apple mobiil"
 
 #, c-format
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
+msgid "Can't open directory"
+msgstr "Kataloogi pole võimalik avada"
+
+#, c-format
+msgid "File doesn't exist"
+msgstr "Faili pole olemas"
+
 msgid "Backups are not yet supported."
 msgstr "Varukoopiad pole veel toetatud"
 
 msgid "Invalid seek type"
-msgstr ""
+msgstr "Sobimatu kerimise liik"
 
 msgid "Operation unsupported"
 msgstr "Operatsioon pole toetatud"
@@ -262,13 +274,6 @@ msgstr "hosti %s /"
 
 msgid "No hostname specified"
 msgstr "Hostinimi on määramata"
-
-#, c-format
-msgid "File doesn't exist"
-msgstr "Faili pole olemas"
-
-msgid "Can't open directory"
-msgstr "Kataloogi pole võimalik avada"
 
 msgid "The file is not a directory"
 msgstr "Fail pole kataloog"
@@ -380,7 +385,7 @@ msgstr "Audio-CD failisüsteemi teenus"
 msgid "Computer"
 msgstr "Arvuti"
 
-msgid "Filesystem"
+msgid "File System"
 msgstr "Failisüsteem"
 
 msgid "Can't open mountable file"
@@ -884,7 +889,7 @@ msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
 msgstr ""
-"Tõrge aktiivse FTP-ühenduse loomisel. Võibolla sinu ruuter ei toeta "
+"Tõrge aktiivse FTP-ühenduse loomisel. Võib-olla sinu ruuter ei toeta "
 "selliseid ühendusi?"
 
 msgid "Failed to create active FTP connection."
@@ -1264,7 +1269,7 @@ msgid "Thumb Drive"
 msgstr "Mälupulk"
 
 msgid "Mass Storage Drive"
-msgstr "Massalvesti"
+msgstr "Masssalvesti"
 
 #, c-format
 msgid "%.1f kB"
@@ -1344,7 +1349,7 @@ msgstr ""
 
 #, c-format
 msgid "Error parsing commandline options: %s\n"
-msgstr ""
+msgstr "Viga käsurea võtmete analüüsimisel: %s\n"
 
 #. Translators: the %s is the program name. This error message
 #. means the user is calling gvfs-cat without any argument.
@@ -1356,32 +1361,30 @@ msgid "no target directory"
 msgstr "pole sihtkataloog"
 
 msgid "show progress"
-msgstr ""
+msgstr "edenemise näitamine"
 
 msgid "prompt before overwrite"
-msgstr ""
+msgstr "enne ülekirjutamist küsitakse"
 
 msgid "preserve all attributes"
-msgstr ""
+msgstr "säilitatakse kõik rekvisiidid"
 
 msgid "backup existing destination files"
-msgstr ""
+msgstr "olemasolevad sihtfailid varundatakse"
 
 msgid "never follow symbolic links"
-msgstr ""
+msgstr "kunagi ei järgita sümbolviitasid"
 
 #, c-format
 msgid "progress"
 msgstr "edenemine"
 
-msgid "- output files at <location>"
-msgstr ""
+msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
+msgstr "ALLIKAS... SIHT - failide kopeerimine ALLIKAST SIHTkohta"
 
-#, c-format
 msgid "Missing operand\n"
-msgstr ""
+msgstr "Puudub operand\n"
 
-#, c-format
 msgid "Too many arguments\n"
 msgstr "Liiga palju argumente\n"
 
@@ -1398,16 +1401,16 @@ msgid "Error copying file %s: %s\n"
 msgstr "Viga faili %s kopeerimisel: %s\n"
 
 msgid "List writable attributes"
-msgstr ""
+msgstr "Kirjutatavate rekvisiitide loend"
 
 msgid "Get filesystem info"
 msgstr "Failisüsteemi andmete hankimine"
 
 msgid "The attributes to get"
-msgstr ""
+msgstr "Rekvisiidid, mida hankida"
 
 msgid "Don't follow symlinks"
-msgstr ""
+msgstr "Sümbolviitasid ei järgita"
 
 msgid "invalid type"
 msgstr "vigane liik"
@@ -1425,25 +1428,25 @@ msgid "symlink"
 msgstr "nimeviit"
 
 msgid "special"
-msgstr ""
+msgstr "eriline"
 
 msgid "shortcut"
-msgstr ""
+msgstr "otsetee"
 
 msgid "mountable"
-msgstr ""
+msgstr "haagitav"
 
 #, c-format
 msgid "attributes:\n"
-msgstr ""
+msgstr "rekvisiidid:\n"
 
 #, c-format
 msgid "display name: %s\n"
-msgstr ""
+msgstr "kuvanimi: %s\n"
 
 #, c-format
 msgid "edit name: %s\n"
-msgstr ""
+msgstr "nime muutmine: %s\n"
 
 #, c-format
 msgid "name: %s\n"
@@ -1462,10 +1465,10 @@ msgid "hidden\n"
 msgstr "peidetud\n"
 
 msgid "Copy with file"
-msgstr ""
+msgstr "Kopeeritakse koos failiga"
 
 msgid "Keep with file when moved"
-msgstr ""
+msgstr "Hoitakse ümbertõstmisel koos failiga"
 
 #, c-format
 msgid "Error getting writable attributes: %s\n"
@@ -1477,26 +1480,26 @@ msgstr "Määratavad rekvisiidid:\n"
 
 #, c-format
 msgid "Writable attribute namespaces:\n"
-msgstr ""
+msgstr "Kirjutatavad rekvisiitide nimeruumid:\n"
 
 msgid "- show info for <location>"
-msgstr ""
+msgstr "- info kuvamine <asukoha> kohta"
 
 msgid "Show hidden files"
-msgstr ""
+msgstr "Varjatud faile kuvatakse"
 
 msgid "Use a long listing format"
-msgstr ""
+msgstr "Kasutatakse pikaloendilist vormingut"
 
 msgid "Show completions"
-msgstr ""
+msgstr "Kuvatakse lõpetamisi"
 
 #, c-format
 msgid "Error: %s\n"
 msgstr "Viga: %s\n"
 
 msgid "- list files at <location>"
-msgstr ""
+msgstr "- <asukohas> olevate failide loend"
 
 msgid "create parent directories"
 msgstr "ülemiste kataloogide loomine"
@@ -1508,26 +1511,29 @@ msgstr "- kataloogide loomine"
 msgid "Error creating directory: %s\n"
 msgstr "Viga kataloogi loomisel: %s\n"
 
+msgid "Don't send single MOVED events."
+msgstr "Ei saadeta ühtegi LIIGUTAMISE sündmust."
+
 msgid "Mount as mountable"
-msgstr ""
+msgstr "Haagi haagitavana"
 
 msgid "Mount volume with device file"
-msgstr ""
+msgstr "Köite haakimine seadmefailiga"
 
 msgid "Unmount"
 msgstr "Haagi lahti"
 
 msgid "Unmount all mounts with the given scheme"
-msgstr ""
+msgstr "Kõigi antud skeemiga haagete lahtihaakimine"
 
 msgid "List"
-msgstr ""
+msgstr "Loend"
 
 msgid "Show extra information for List and Monitor"
-msgstr ""
+msgstr "Loendi ja monitori kohta lisateabe kuvamine"
 
 msgid "Monitor events"
-msgstr ""
+msgstr "Sündmuste monitooring"
 
 #, c-format
 msgid "Error mounting location: %s\n"
@@ -1535,7 +1541,7 @@ msgstr "Viga asukoha ühendamisel: %s\n"
 
 #, c-format
 msgid "Error unmounting mount: %s\n"
-msgstr ""
+msgstr "Tõrge haake lahtihaakimisel: %s\n"
 
 #, c-format
 msgid "Error finding enclosing mount: %s\n"
@@ -1547,21 +1553,24 @@ msgstr "Viga %s ühendamisel: %s\n"
 
 #, c-format
 msgid "Mounted %s at %s\n"
-msgstr ""
+msgstr "%s haagiti kohta %s\n"
 
 #, c-format
 msgid "No volume for device file %s\n"
-msgstr ""
+msgstr "Seadmefailile %s puudub köide\n"
 
 msgid "- mount <location>"
-msgstr ""
+msgstr "- haagi <asukoht>"
+
+msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
+msgstr "ALLIKAS... SIHT - faili(de) liigutamine ALLIKAST SIHTkohta"
 
 #, c-format
 msgid "Error moving file %s: %s\n"
 msgstr "Viga faili %s ümbertõstmisel: %s\n"
 
 msgid "files"
-msgstr ""
+msgstr "failid"
 
 #. Translators: the first %s is the program name, the second one
 #. is the URI of the file, the third is the error message.
@@ -1588,14 +1597,14 @@ msgstr ""
 "rakendusega."
 
 msgid "- rename file"
-msgstr ""
+msgstr "- faili ümbernimetamine"
 
 #, c-format
 msgid "Rename successful. New uri: %s\n"
-msgstr ""
+msgstr "Ümbernimetamine edukas. Uus URI: %s\n"
 
 msgid "ignore nonexistent files, never prompt"
-msgstr ""
+msgstr "Mitteolemasolevaid faile eiratakse, kunagi ei küsita"
 
 msgid "- delete files"
 msgstr "- failide kustutamine"
@@ -1604,19 +1613,20 @@ msgid "Create backup"
 msgstr "Varukoopia loomine"
 
 msgid "Only create if not existing"
-msgstr ""
+msgstr "Luuakse ainult siis, kui pole juba olemas"
 
 msgid "Append to end of file"
-msgstr ""
+msgstr "Faili lõppu lisamine"
 
 msgid "When creating a file, restrict access to the current user only"
 msgstr ""
+"Uue faili loomisel piiratakse ligipääsuõigused ainult sellele kasutajale"
 
 msgid "Print new etag at end"
-msgstr ""
+msgstr "Lõppu trükitakse uus etag"
 
 msgid "The etag of the file being overwritten"
-msgstr ""
+msgstr "Selle faili etag on üle kirjutatud"
 
 #, c-format
 msgid "Error opening file: %s\n"
@@ -1631,15 +1641,20 @@ msgstr "Viga sulgemisel: %s\n"
 
 #, c-format
 msgid "Etag not available\n"
-msgstr ""
+msgstr "Etag ei ole saadaval\n"
+
+msgid "DEST - read from standard input and save to DEST"
+msgstr "DEST - loetakse standardsisendit ja kirjutatakse DEST-i"
 
 msgid ""
 "attribute type [string, bytestring, boolean, uint32, int32, uint64, int64, "
 "stringv]"
 msgstr ""
+"rekvisiidi liik [string, bytestring, boolean, uint32, int32, uint64, int64, "
+"stringv]"
 
 msgid " <location> <attribute> <values> - set attribute"
-msgstr ""
+msgstr " <asukoht> <rekvisiit> <väärtused> - rekvisiidi määramine"
 
 #, c-format
 msgid "Location not specified\n"
@@ -1658,74 +1673,14 @@ msgid "Error setting attribute: %s\n"
 msgstr "Viga rekvisiidi määramisel: %s\n"
 
 msgid "- move files to trash"
-msgstr ""
+msgstr "- failide viskamine prügikasti"
 
 #, c-format
 msgid "Error trashing file: %s\n"
 msgstr "Viga faili viskamisel prügikasti: %s\n"
 
 msgid "Follow symlinks, mounts and shortcuts like dirs"
-msgstr ""
+msgstr "Sümbolviitade, haakepunktide ja kaustalaadsete otseteede järgimine"
 
 msgid "- list contents of directories in a tree-like format"
-msgstr ""
-
-#~ msgid "Invalid return value from get_info"
-#~ msgstr "get_info tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from query_info"
-#~ msgstr "query_info tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from call"
-#~ msgstr "call tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from get_filesystem_info"
-#~ msgstr "get_filesystem_info tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from query_filesystem_info"
-#~ msgstr "query_filesystem_info tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from monitor_dir"
-#~ msgstr "monitor_dir tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from monitor_file"
-#~ msgstr "monitor_file tagastas vigase väärtuse"
-
-#~ msgid "Invalid return value from open_icon_for_read"
-#~ msgstr "open_icon_for_read tagastas sobimatu väärtuse"
-
-#~ msgid "Out of memory while reading directory contents"
-#~ msgstr "Kataloogi sisu lugemisel lõppes mälu"
-
-#~ msgid "Invalid destination filename"
-#~ msgstr "Vigane sihtfaili nimi"
-
-#~ msgid "broken transmission"
-#~ msgstr "vigane ülekanne"
-
-#~ msgid "Could not connect to host"
-#~ msgstr "Hostiga pole võimalik ühendust võtta"
-
-#~ msgid "filename too long"
-#~ msgstr "failinimi on liiga pikk"
-
-#~ msgid "The query info operation is not supported"
-#~ msgstr "Andmete pärimise operatsioon pole toetatud"
-
-#~ msgid "Query info not supported on stream"
-#~ msgstr "Andmevoogude korral pole andmepäring toetatud"
-
-#~ msgid "%s (in trash)"
-#~ msgstr "%s (prügikastis)"
-
-#~ msgid "Can't delete trash"
-#~ msgstr "Prügikasti pole võimalik kustutada"
-
-#~ msgid "Trash directory notification not supported"
-#~ msgstr "Prügikataloogi teavitus pole toetatud"
-
-#~ msgid "Error getting port info from port info list"
-#~ msgstr "Viga pordi andmete hankimisel pordi andmete nimekirjast"
-
-#~ msgid "File system is busy: %d open files"
-#~ msgstr "Failisüsteem on hõivatud: %d faili on avatud"
+msgstr "- kataloogide sisuloetelu puu"
