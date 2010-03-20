@@ -1,3 +1,4 @@
+# translation of gvfs.master.ru.po to Russian
 # Russian translation for gvfs
 # Copyright (C) 2008 Free Software Foudnation Inc.
 # This file is distributed under the same license as the gvfs package.
@@ -10,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-25 13:20+0200\n"
-"PO-Revision-Date: 2010-02-24 19:58+0300\n"
+"POT-Creation-Date: 2010-03-20 11:58+0200\n"
+"PO-Revision-Date: 2010-03-20 09:14+0300\n"
 "Last-Translator: Yuri Kozlov <yuray@komyakino.ru>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -330,8 +331,8 @@ msgstr ""
 msgid "Unhandled libimobiledevice error (%d)"
 msgstr "Неизвестная ошибка libmobiledevice (%d)"
 
-#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:529
-#: ../daemon/gvfsbackendarchive.c:558 ../daemon/gvfsbackenddav.c:1631
+#: ../daemon/gvfsbackendafc.c:275 ../daemon/gvfsbackendarchive.c:536
+#: ../daemon/gvfsbackendarchive.c:565 ../daemon/gvfsbackenddav.c:1631
 #: ../daemon/gvfsbackendhttp.c:315 ../daemon/gvfsbackendobexftp.c:861
 #: ../daemon/gvfsbackendobexftp.c:877 ../daemon/gvfsbackendobexftp.c:896
 #: ../daemon/gvfsbackendsmb.c:648
@@ -357,15 +358,33 @@ msgstr "Мобильное устройство Apple"
 msgid "%s (%s)"
 msgstr "%s (%s)"
 
-#: ../daemon/gvfsbackendafc.c:548 ../daemon/gvfsbackendafc.c:1256
+#: ../daemon/gvfsbackendafc.c:486 ../daemon/gvfsbackendarchive.c:632
+#: ../daemon/gvfsbackendcomputer.c:645 ../daemon/gvfsbackendgphoto2.c:1886
+#: ../daemon/gvfsbackendobexftp.c:1071 ../daemon/gvfsbackendsmb.c:702
+#: ../daemon/gvfsbackendtrash.c:232
+msgid "Can't open directory"
+msgstr "Не удаётся открыть каталог"
+
+#: ../daemon/gvfsbackendafc.c:494 ../daemon/gvfsbackendarchive.c:624
+#: ../daemon/gvfsbackendarchive.c:668 ../daemon/gvfsbackendarchive.c:720
+#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendcdda.c:986
+#: ../daemon/gvfsbackendcomputer.c:627 ../daemon/gvfsbackenddnssd.c:392
+#: ../daemon/gvfsbackendftp.c:964 ../daemon/gvfsbackendnetwork.c:646
+#: ../daemon/gvfsbackendsmbbrowse.c:1085 ../daemon/gvfsbackendsmbbrowse.c:1152
+#: ../daemon/gvfsbackendsmbbrowse.c:1324 ../daemon/gvfsbackendsmbbrowse.c:1394
+#, c-format
+msgid "File doesn't exist"
+msgstr "Файл не существует"
+
+#: ../daemon/gvfsbackendafc.c:602 ../daemon/gvfsbackendafc.c:1341
 msgid "Backups are not yet supported."
 msgstr "Резервные копии ещё не поддерживаются."
 
-#: ../daemon/gvfsbackendafc.c:686
+#: ../daemon/gvfsbackendafc.c:740
 msgid "Invalid seek type"
 msgstr "Неверный тип поиска"
 
-#: ../daemon/gvfsbackendafc.c:1175 ../daemon/gvfsbackendsftp.c:1820
+#: ../daemon/gvfsbackendafc.c:1260 ../daemon/gvfsbackendsftp.c:1820
 #: ../daemon/gvfsbackendsftp.c:4625 ../daemon/gvfsbackendsmb.c:1702
 #: ../daemon/gvfsftptask.c:392
 msgid "Operation unsupported"
@@ -374,35 +393,18 @@ msgstr "Действие не поддерживается"
 #. FIXME: this should really be "/ in %s", but can't change
 #. due to string freeze.
 #. Translators: This is the name of the root of an sftp share, like "/ on <hostname>"
-#: ../daemon/gvfsbackendarchive.c:318 ../daemon/gvfsbackendsftp.c:2257
+#: ../daemon/gvfsbackendarchive.c:323 ../daemon/gvfsbackendsftp.c:2257
 #: ../daemon/gvfsftpdircache.c:428
 #, c-format
 msgid "/ on %s"
 msgstr "/ на %s"
 
-#: ../daemon/gvfsbackendarchive.c:518 ../daemon/gvfsbackendftp.c:564
+#: ../daemon/gvfsbackendarchive.c:525 ../daemon/gvfsbackendftp.c:564
 #: ../daemon/gvfsbackendsftp.c:1733
 msgid "No hostname specified"
 msgstr "Имя узла не указано"
 
-#: ../daemon/gvfsbackendarchive.c:617 ../daemon/gvfsbackendarchive.c:661
-#: ../daemon/gvfsbackendarchive.c:711 ../daemon/gvfsbackendarchive.c:740
-#: ../daemon/gvfsbackendcdda.c:986 ../daemon/gvfsbackendcomputer.c:627
-#: ../daemon/gvfsbackenddnssd.c:392 ../daemon/gvfsbackendftp.c:964
-#: ../daemon/gvfsbackendnetwork.c:646 ../daemon/gvfsbackendsmbbrowse.c:1085
-#: ../daemon/gvfsbackendsmbbrowse.c:1152 ../daemon/gvfsbackendsmbbrowse.c:1324
-#: ../daemon/gvfsbackendsmbbrowse.c:1394
-#, c-format
-msgid "File doesn't exist"
-msgstr "Файл не существует"
-
-#: ../daemon/gvfsbackendarchive.c:625 ../daemon/gvfsbackendcomputer.c:645
-#: ../daemon/gvfsbackendgphoto2.c:1886 ../daemon/gvfsbackendobexftp.c:1071
-#: ../daemon/gvfsbackendsmb.c:702 ../daemon/gvfsbackendtrash.c:232
-msgid "Can't open directory"
-msgstr "Не удаётся открыть каталог"
-
-#: ../daemon/gvfsbackendarchive.c:749 ../daemon/gvfsbackendburn.c:680
+#: ../daemon/gvfsbackendarchive.c:758 ../daemon/gvfsbackendburn.c:680
 #: ../daemon/gvfsbackendcomputer.c:714 ../daemon/gvfsbackenddnssd.c:439
 #: ../daemon/gvfsbackendftp.c:258 ../daemon/gvfsbackendnetwork.c:693
 #: ../daemon/gvfsbackendsftp.c:3871 ../daemon/gvfsftpdircache.c:154
@@ -1261,16 +1263,16 @@ msgstr "Неверный тип внутреннего компонента"
 msgid "Error sending fd: %s"
 msgstr "Ошибка передачи fd: %s"
 
-#: ../daemon/gvfsftpconnection.c:181
+#: ../daemon/gvfsftpconnection.c:180
 msgid "Unexpected end of stream"
 msgstr "Неожиданный конец потока"
 
-#: ../daemon/gvfsftpconnection.c:197 ../daemon/gvfsftpconnection.c:210
+#: ../daemon/gvfsftpconnection.c:196 ../daemon/gvfsftpconnection.c:209
 #: ../daemon/gvfsftptask.c:412 ../daemon/gvfsftptask.c:840
 msgid "Invalid reply"
 msgstr "Неверный ответ"
 
-#: ../daemon/gvfsftpconnection.c:393
+#: ../daemon/gvfsftpconnection.c:392
 msgid ""
 "Failed to create active FTP connection. Maybe your router does not support "
 "this?"
@@ -1278,7 +1280,7 @@ msgstr ""
 "Не удалось установить активное FTP соединение. Возможно, маршрутизатор не "
 "поддерживает этого."
 
-#: ../daemon/gvfsftpconnection.c:400
+#: ../daemon/gvfsftpconnection.c:399
 msgid "Failed to create active FTP connection."
 msgstr "Не удалось установить активное FTP соединение."
 
@@ -1361,9 +1363,9 @@ msgstr "%s: %s"
 
 #: ../daemon/main.c:78 ../metadata/meta-daemon.c:720
 #: ../programs/gvfs-cat.c:163 ../programs/gvfs-cat.c:176
-#: ../programs/gvfs-copy.c:122 ../programs/gvfs-info.c:371
-#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:59
-#: ../programs/gvfs-move.c:110 ../programs/gvfs-open.c:140
+#: ../programs/gvfs-copy.c:123 ../programs/gvfs-info.c:371
+#: ../programs/gvfs-ls.c:392 ../programs/gvfs-mkdir.c:60
+#: ../programs/gvfs-move.c:111 ../programs/gvfs-open.c:140
 #: ../programs/gvfs-open.c:153 ../programs/gvfs-save.c:165
 #: ../programs/gvfs-set-attribute.c:128 ../programs/gvfs-tree.c:251
 #, c-format
@@ -1779,7 +1781,7 @@ msgstr "Дисковод Jaz"
 
 #: ../monitor/hal/ghaldrive.c:211
 msgid "Thumb Drive"
-msgstr "USB Flash брелок"
+msgstr "USB флеш-накопитель"
 
 #: ../monitor/hal/ghaldrive.c:214
 msgid "Mass Storage Drive"
@@ -1875,9 +1877,9 @@ msgstr ""
 "Примечание: если необходимы параметры форматирования, такие как -n, -T или "
 "другие, достаточно просто пропустить вывод через команду cat."
 
-#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:120
+#: ../programs/gvfs-cat.c:161 ../programs/gvfs-copy.c:121
 #: ../programs/gvfs-info.c:369 ../programs/gvfs-ls.c:390
-#: ../programs/gvfs-mkdir.c:57 ../programs/gvfs-move.c:108
+#: ../programs/gvfs-mkdir.c:58 ../programs/gvfs-move.c:109
 #: ../programs/gvfs-open.c:138 ../programs/gvfs-save.c:163
 #: ../programs/gvfs-set-attribute.c:126 ../programs/gvfs-tree.c:249
 #, c-format
@@ -1920,29 +1922,29 @@ msgstr "никогда не следовать символическим ссы
 msgid "progress"
 msgstr "ход выполнения"
 
-#: ../programs/gvfs-copy.c:114
+#: ../programs/gvfs-copy.c:115
 msgid "SOURCE... DEST - copy file(s) from SOURCE to DEST"
 msgstr "SOURCE... DEST - копировать файл(ы) из SOURCE в DEST"
 
-#: ../programs/gvfs-copy.c:131 ../programs/gvfs-move.c:119
+#: ../programs/gvfs-copy.c:132 ../programs/gvfs-move.c:120
 msgid "Missing operand\n"
 msgstr "Отсутствует операнд\n"
 
-#: ../programs/gvfs-copy.c:139 ../programs/gvfs-move.c:127
+#: ../programs/gvfs-copy.c:140 ../programs/gvfs-move.c:128
 msgid "Too many arguments\n"
 msgstr "Слишком много аргументов\n"
 
-#: ../programs/gvfs-copy.c:148 ../programs/gvfs-move.c:136
+#: ../programs/gvfs-copy.c:149 ../programs/gvfs-move.c:137
 #, c-format
 msgid "Target %s is not a directory\n"
 msgstr "Цель %s не является каталогом\n"
 
-#: ../programs/gvfs-copy.c:192
+#: ../programs/gvfs-copy.c:193
 #, c-format
 msgid "overwrite %s?"
 msgstr "перезаписать %s?"
 
-#: ../programs/gvfs-copy.c:206
+#: ../programs/gvfs-copy.c:207
 #, c-format
 msgid "Error copying file %s: %s\n"
 msgstr "Ошибка копирования файла %s: %s\n"
@@ -2071,7 +2073,7 @@ msgid "Show completions"
 msgstr "Показывать завершения"
 
 #: ../programs/gvfs-ls.c:164 ../programs/gvfs-ls.c:171
-#: ../programs/gvfs-rename.c:68
+#: ../programs/gvfs-rename.c:69
 #, c-format
 msgid "Error: %s\n"
 msgstr "Ошибка: %s\n"
@@ -2084,11 +2086,11 @@ msgstr "- перечислить файлы в <location>"
 msgid "create parent directories"
 msgstr "создать родительские каталоги"
 
-#: ../programs/gvfs-mkdir.c:50
+#: ../programs/gvfs-mkdir.c:51
 msgid "- create directories"
 msgstr "- создать каталоги"
 
-#: ../programs/gvfs-mkdir.c:78 ../programs/gvfs-mkdir.c:86
+#: ../programs/gvfs-mkdir.c:79 ../programs/gvfs-mkdir.c:88
 #, c-format
 msgid "Error creating directory: %s\n"
 msgstr "Ошибка создания каталога: %s\n"
@@ -2159,11 +2161,11 @@ msgstr "Нет тома для файла устройства %s\n"
 msgid "- mount <location>"
 msgstr "- подключить <адрес>"
 
-#: ../programs/gvfs-move.c:102
+#: ../programs/gvfs-move.c:103
 msgid "SOURCE... DEST - move file(s) from SOURCE to DEST"
 msgstr "SOURCE... DEST - переместить файл(ы) из SOURCE в DEST"
 
-#: ../programs/gvfs-move.c:188
+#: ../programs/gvfs-move.c:189
 #, c-format
 msgid "Error moving file %s: %s\n"
 msgstr "Ошибка перемещения файла %s: %s\n"
@@ -2200,11 +2202,11 @@ msgstr ""
 "Открывает файл(ы) в приложении по умолчанию, зарегистрированном для "
 "обработки файлов этого типа."
 
-#: ../programs/gvfs-rename.c:49
+#: ../programs/gvfs-rename.c:50
 msgid "- rename file"
 msgstr "- переименовать файл"
 
-#: ../programs/gvfs-rename.c:74
+#: ../programs/gvfs-rename.c:76
 #, c-format
 msgid "Rename successful. New uri: %s\n"
 msgstr "Переименование успешно завершено. Новый URI: %s\n"
@@ -2213,7 +2215,7 @@ msgstr "Переименование успешно завершено. Новы
 msgid "ignore nonexistent files, never prompt"
 msgstr "игнорировать несуществующие файлы, никогда не спрашивать"
 
-#: ../programs/gvfs-rm.c:52
+#: ../programs/gvfs-rm.c:53
 msgid "- delete files"
 msgstr "- удалить файлы"
 
@@ -2297,11 +2299,11 @@ msgstr "Неверный тип атрибута %s\n"
 msgid "Error setting attribute: %s\n"
 msgstr "Ошибка установки атрибута: %s\n"
 
-#: ../programs/gvfs-trash.c:51
+#: ../programs/gvfs-trash.c:52
 msgid "- move files to trash"
 msgstr "- переместить файлы в корзину"
 
-#: ../programs/gvfs-trash.c:67
+#: ../programs/gvfs-trash.c:69
 #, c-format
 msgid "Error trashing file: %s\n"
 msgstr "Ошибка перемещения файла в корзину: %s\n"
